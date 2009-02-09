@@ -22,14 +22,13 @@
 
 
 
+
 package ucar.unidata.data.radar;
 
 
 import ucar.atd.dorade.DoradePARM;
 import ucar.atd.dorade.DoradeSweep;
-
 import ucar.ma2.InvalidRangeException;
-
 import ucar.nc2.Attribute;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateAxis1D;
@@ -40,7 +39,6 @@ import ucar.nc2.dt.TypedDatasetFactory;
 import ucar.nc2.dt.grid.GeoGrid;
 import ucar.nc2.dt.grid.GridCoordSys;
 import ucar.nc2.units.DateUnit;
-
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSourceImpl;
@@ -48,26 +46,20 @@ import ucar.unidata.data.DataUtil;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.util.*;
-
 import ucar.visad.RadarMapProjection;
 import ucar.visad.Util;
 import ucar.visad.data.CachedFlatField;
-
 import visad.*;
 import visad.Set;
-
 import visad.bom.Radar2DCoordinateSystem;
 import visad.bom.Radar3DCoordinateSystem;
-
 import visad.georef.EarthLocation;
+import visad.georef.EarthLocationLite;
 import visad.georef.EarthLocationTuple;
 import visad.georef.NamedLocation;
-import visad.georef.EarthLocationLite;
 
 import java.io.IOException;
-
 import java.rmi.RemoteException;
-
 import java.util.*;
 
 
@@ -156,8 +148,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      *
      * @throws VisADException problem creating data
      */
-    public CDMRadarAdapter(DataSourceImpl source, String fileName)
-            throws VisADException {
+    public CDMRadarAdapter(DataSourceImpl source,
+                           String fileName) throws VisADException {
         swpFileName     = fileName;
         this.dataSource = source;
         if (dataSource != null) {
@@ -234,24 +226,34 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @return EarthLocation.
      */
     public EarthLocation getRadarStationInFile() {
-        Attribute latAttr = rds.findGlobalAttributeIgnoreCase("RadarLatitude");
-        if(latAttr == null)
-           latAttr = rds.findGlobalAttributeIgnoreCase("StationLatitude");
-        Attribute lonAttr = rds.findGlobalAttributeIgnoreCase("RadarLongitude");
-        if(lonAttr == null)
-           lonAttr = rds.findGlobalAttributeIgnoreCase("StationLongitude");
-        Attribute altAttr = rds.findGlobalAttributeIgnoreCase("RadarAltitude");
-        if(altAttr == null)
-            altAttr = rds.findGlobalAttributeIgnoreCase("StationElevationInMeters");
+        Attribute latAttr =
+            rds.findGlobalAttributeIgnoreCase("RadarLatitude");
+        if (latAttr == null) {
+            latAttr = rds.findGlobalAttributeIgnoreCase("StationLatitude");
+        }
+        Attribute lonAttr =
+            rds.findGlobalAttributeIgnoreCase("RadarLongitude");
+        if (lonAttr == null) {
+            lonAttr = rds.findGlobalAttributeIgnoreCase("StationLongitude");
+        }
+        Attribute altAttr =
+            rds.findGlobalAttributeIgnoreCase("RadarAltitude");
+        if (altAttr == null) {
+            altAttr =
+                rds.findGlobalAttributeIgnoreCase("StationElevationInMeters");
+        }
 
-        if(latAttr != null && lonAttr != null && altAttr != null) {
-            double   latitude = latAttr.getNumericValue().doubleValue();
-            double   longitude = lonAttr.getNumericValue().doubleValue();
-            double   altitude = altAttr.getNumericValue().doubleValue();
-            EarthLocation elt =
-                        new EarthLocationLite(new Real(RealType.Latitude,
-                            latitude), new Real(RealType.Longitude, longitude),
-                                       new Real(RealType.Altitude, altitude));
+        if ((latAttr != null) && (lonAttr != null) && (altAttr != null)) {
+            double latitude  = latAttr.getNumericValue().doubleValue();
+            double longitude = lonAttr.getNumericValue().doubleValue();
+            double altitude  = altAttr.getNumericValue().doubleValue();
+            if ((latitude == 0.0) && (longitude == 0.0)) {
+                return null;
+            }
+            EarthLocation elt = new EarthLocationLite(
+                                    new Real(RealType.Latitude, latitude),
+                                    new Real(RealType.Longitude, longitude),
+                                    new Real(RealType.Altitude, altitude));
             return elt;
 
         } else {
@@ -259,6 +261,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
 
     }
+
     /**
      *  init from the named data file
      *
@@ -287,11 +290,14 @@ public class CDMRadarAdapter implements RadarAdapter {
             Attribute vcpAttr = rds.findGlobalAttributeIgnoreCase(
                                     "VolumeCoveragePatternName");
             EarthLocation elf = getRadarStationInFile();
-            if(elf != null) {
-                if(radarLocation instanceof NamedLocation) {
-                    String sID = ((NamedLocation) radarLocation).getIdentifier().getValue();
-                    if(stationID.equalsIgnoreCase(sID))
-                       radarLocation = elf;
+            if (elf != null) {
+                if (radarLocation instanceof NamedLocation) {
+                    String sID =
+                        ((NamedLocation) radarLocation).getIdentifier()
+                            .getValue();
+                    if (stationID.equalsIgnoreCase(sID)) {
+                        radarLocation = elf;
+                    }
                 }
 
             }
@@ -466,9 +472,9 @@ public class CDMRadarAdapter implements RadarAdapter {
      *
      *  @throws VisADException unable to create VisAD object
      */
-    private RealTupleType makeDomainType2D(float cellSpacing,
-                                           float centerOfFirstCell)
-            throws VisADException {
+    private RealTupleType makeDomainType2D(
+            float cellSpacing,
+            float centerOfFirstCell) throws VisADException {
         CoordinateSystem cs = (radarLocation == null)
                               ? null
                               : new Radar2DCoordinateSystem((float) radarLocation
@@ -522,9 +528,9 @@ public class CDMRadarAdapter implements RadarAdapter {
      *
      * @throws VisADException unable to create VisAD object
      */
-    private RealTupleType makeDomainType3D(float cellSpacing,
-                                           float centerOfFirstCell)
-            throws VisADException {
+    private RealTupleType makeDomainType3D(
+            float cellSpacing,
+            float centerOfFirstCell) throws VisADException {
         CoordinateSystem cs = (radarLocation == null)
                               ? null
                               : new Radar3DCoordinateSystem(
@@ -545,8 +551,9 @@ public class CDMRadarAdapter implements RadarAdapter {
      *
      * @throws VisADException unable to create VisAD object
      */
-    private void makeDomainTypes(float cellSpacing, float centerOfFirstCell)
-            throws VisADException {
+    private void makeDomainTypes(
+            float cellSpacing,
+            float centerOfFirstCell) throws VisADException {
         radarDomain2d = makeDomainType2D(cellSpacing, centerOfFirstCell);
         radarDomain3d = makeDomainType3D(cellSpacing, centerOfFirstCell);
     }
@@ -659,8 +666,9 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException   problem with Java RMI
      * @throws VisADException    problem creating VisAD object
      */
-    private FieldImpl getCAPPIOld(int moment, String varName, Real level)
-            throws VisADException, RemoteException, IOException {
+    private FieldImpl getCAPPIOld(int moment, String varName,
+                                  Real level) throws VisADException,
+                                      RemoteException, IOException {
 
         Trace.call1("   getCAPPI", level.longString());
         ObjectPair cacheKey =
@@ -852,8 +860,9 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException   problem with Java RMI
      * @throws VisADException    problem creating VisAD object
      */
-    public FieldImpl getCAPPI(int moment, String varName, Real level)
-            throws VisADException, RemoteException, IOException {
+    public FieldImpl getCAPPI(int moment, String varName,
+                              Real level) throws VisADException,
+                                  RemoteException, IOException {
 
         Trace.call1("   rsl_getCAPPI", level.longString());
         ObjectPair cacheKey =
@@ -1051,8 +1060,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws IOException  problem reading data
      */
     float[][][] getRayData(RadialDatasetSweep.RadialVariable sweepVar,
-                           int numberOfRay, int numBin)
-            throws IOException {
+                           int numberOfRay, int numBin) throws IOException {
 
         Object[] cut            = getCutIdx(sweepVar);
         int      numberOfSweeps = cut.length;
@@ -1570,9 +1578,10 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException couldn't create a remote data object
      * @throws VisADException  couldn't create the data
      */
-    public DataImpl getData(DataChoice dataChoice, DataSelection subset,
-                            Hashtable requestProperties)
-            throws VisADException, RemoteException {
+    public DataImpl getData(
+            DataChoice dataChoice, DataSelection subset,
+            Hashtable requestProperties) throws VisADException,
+                RemoteException {
 
         Object      choiceId = dataChoice.getId();
         String      vn;
@@ -1704,7 +1713,9 @@ public class CDMRadarAdapter implements RadarAdapter {
                     Object s      = dataChoice.getProperty(PROP_ANGLE);
                     int    sIndex = 0;
                     if (s == null) {
-                        if( anglesMap.get(vn) == null) return null;
+                        if (anglesMap.get(vn) == null) {
+                            return null;
+                        }
                         sIndex = getAngleIdx((double[]) anglesMap.get(vn),
                                              value);
                     } else {
@@ -1797,8 +1808,9 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException Java RMI problem
      * @throws VisADException  Couldn't create VisAD Object
      */
-    public FieldImpl getRHIOld(int moment, String varName, double rhiAz)
-            throws VisADException, RemoteException, IOException {
+    public FieldImpl getRHIOld(int moment, String varName,
+                               double rhiAz) throws VisADException,
+                                   RemoteException, IOException {
 
         Trace.call1("   getRHI");
         Trace.call1("   getRHI.setup");
@@ -2004,8 +2016,9 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException Java RMI problem
      * @throws VisADException  Couldn't create VisAD Object
      */
-    public FieldImpl getRHI(int moment, String varName, double rhiAz)
-            throws VisADException, RemoteException, IOException {
+    public FieldImpl getRHI(int moment, String varName,
+                            double rhiAz) throws VisADException,
+                                RemoteException, IOException {
 
         if (rhiAz > 359.5) {
             rhiAz = 0.0;
@@ -2214,8 +2227,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      *
      * @throws IOException _more_
      */
-    private void getRHIData(RadialDatasetSweep.RadialVariable sweepVar)
-            throws IOException {
+    private void getRHIData(
+            RadialDatasetSweep.RadialVariable sweepVar) throws IOException {
 
         Object[] cut            = getCutIdx(sweepVar);
         int      numberOfSweeps = cut.length;
@@ -2405,8 +2418,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws VisADException  couldn't create VisAD object
      * @throws RemoteException  couldn't create remote object
      */
-    public void setStationLocation(EarthLocation el)
-            throws VisADException, RemoteException {
+    public void setStationLocation(EarthLocation el) throws VisADException,
+            RemoteException {
         radarLocation = el;
         if (el instanceof NamedLocation) {
             stationID =
@@ -2446,9 +2459,10 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException Java RMI problem
      * @throws VisADException   problem creating domain
      */
-    public FlatField getRaster(int moment, String varName)
-            throws VisADException, RemoteException, IOException,
-                   InvalidRangeException {
+    public FlatField getRaster(int moment,
+                               String varName) throws VisADException,
+                                   RemoteException, IOException,
+                                   InvalidRangeException {
 
         //List cacheKey = Misc.newList(varName, baseTime, stationName);
         ObjectPair cacheKey =
@@ -2579,8 +2593,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws VisADException Couldn't create VisAD Object
      */
     private Linear1DSet makeLinear1DSet(CoordinateAxis1D axis, RealType type,
-                                        Unit u)
-            throws VisADException {
+                                        Unit u) throws VisADException {
         Trace.call1("GeoGridAdapter.makeLinear1DSet");
 
         Linear1DSet result =
@@ -2608,8 +2621,9 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws VisADException  Couldn't create VisAD Object
      */
     public FlatField getSweep(int moment, double elevation, String varName,
-                              int idx, boolean want3D)
-            throws VisADException, RemoteException, IOException {
+                              int idx,
+                              boolean want3D) throws VisADException,
+                                  RemoteException, IOException {
 
         Trace.call1(" getSweep " + elevation);
 
@@ -2975,8 +2989,9 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException Java RMI problem
      * @throws VisADException  Couldn't create VisAD Object
      */
-    public FlatField getVolume(int moment, String varName)
-            throws VisADException, RemoteException, IOException {
+    public FlatField getVolume(int moment,
+                               String varName) throws VisADException,
+                                   RemoteException, IOException {
 
         //        Trace.call1("volume preamble");
         ObjectPair cacheKey =
