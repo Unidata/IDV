@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -97,7 +98,8 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         MouseMotionListener, KeyListener {
 
 
-    private static Color disabledColor = new Color(230,230,230);
+    /** _more_          */
+    private static Color disabledColor = new Color(230, 230, 230);
 
 
     /* Implementation Notes:
@@ -261,7 +263,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         // default navigation and projection
         navigate = new Navigation();
         project  = new LatLonProjection("Cyl.Eq");  // default projection
-        navigate.setMapArea((Rectangle2D) project.getDefaultMapArea());
+        navigate.setMapArea(normalizeRectangle(project.getDefaultMapArea()));
 
         // toolbar actions
         makeActions();
@@ -285,7 +287,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         // catch resize events
         addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
-                setNewBounds(getBounds(),false);
+                setNewBounds(getBounds(), false);
             }
         });
 
@@ -305,9 +307,14 @@ public class NavigatedPanel extends JPanel implements MouseListener,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param enabled _more_
+     */
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
-        setNewBounds(getBounds(),true);
+        setNewBounds(getBounds(), true);
         repaint();
     }
 
@@ -398,7 +405,9 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      * @return background color
      */
     public Color getBackgroundColor() {
-        return (isEnabled()?backColor:disabledColor);
+        return (isEnabled()
+                ? backColor
+                : disabledColor);
     }
 
     /**
@@ -438,7 +447,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         if (debugBB) {
             System.out.println("NPsetMapArea " + ma);
         }
-        navigate.setMapArea(ma);
+        navigate.setMapArea(normalizeRectangle(ma));
     }
 
     /**
@@ -470,6 +479,29 @@ public class NavigatedPanel extends JPanel implements MouseListener,
     }
 
     /**
+     * If the projection is a LatLonProjection then this routine
+     * normalizes the rectangle to be between -180/180
+     *
+     * @param bb Incoming rectangle
+     *
+     * @return The input bb if not in LatLon, else the bb normalized
+     */
+    public ProjectionRect normalizeRectangle(ProjectionRect bb) {
+        if ((bb == null) || (project == null)
+            || !project.isLatLon()) {
+            return bb;
+        }
+        ProjectionRect newRect          = new ProjectionRect(bb);
+        double         maxLon           = newRect.x + newRect.width;
+        double         normalizedMaxLon = LatLonPointImpl.lonNormal(maxLon);
+        newRect.x += (normalizedMaxLon - maxLon);
+        return newRect;
+    }
+
+
+
+
+    /**
      * Set the Projection, change the Map Area to the projection's default
      *
      * @param p the Projection
@@ -477,7 +509,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
     public void setProjectionImpl(ProjectionImpl p) {
         // switch projections
         project = p;
-        navigate.setMapArea(project.getDefaultMapArea());
+        navigate.setMapArea(normalizeRectangle(project.getDefaultMapArea()));
         // transfer reference point to new coord system
         if (hasReference) {
             refWorld.setLocation(project.latLonToProj(refLatLon));
@@ -761,19 +793,21 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      * Set the new bounds
      *
      * @param b new bounds
+     * @param force _more_
      */
-    private void setNewBounds(Rectangle b,boolean force) {
+    private void setNewBounds(Rectangle b, boolean force) {
         boolean sameSize = (b.width == myBounds.width)
                            && (b.height == myBounds.height);
         if (debugBounds) {
             System.out.println("NavigatedPanel setBounds old= " + myBounds);
         }
-        if (!force && sameSize && (b.x == myBounds.x) && (b.y == myBounds.y)) {
+        if ( !force && sameSize && (b.x == myBounds.x)
+                && (b.y == myBounds.y)) {
             return;
         }
 
         myBounds.setBounds(b);
-        if (!force && sameSize) {
+        if ( !force && sameSize) {
             return;
         }
 
@@ -820,8 +854,8 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         Rectangle bounds          = getBounds();
 
 
-        Color color = getBackgroundColor();
-        
+        Color     color           = getBackgroundColor();
+
         if (draggingMode) {
             if (debugDraw) {
                 System.out.println("draw draggingMode ");
@@ -854,7 +888,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
             Rectangle2D screenRect = navigate.worldToScreen(selectedRegion);
             g.setColor(Color.cyan);
             Stroke stroke = g.getStroke();
-            
+
             g.setStroke(new BasicStroke(2.0f));
             g.draw(screenRect);
             g.setStroke(stroke);
@@ -1030,7 +1064,9 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      * @param e  event to handle
      */
     public void mouseClicked(MouseEvent e) {
-        if(!isEnabled()) {return;}
+        if ( !isEnabled()) {
+            return;
+        }
         // pick event
         if (SwingUtilities.isRightMouseButton(e)) {
             LatLonPoint llp = screenToEarth(new Point2D.Double(e.getX(),
@@ -1084,7 +1120,9 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      * @param e  event to handle
      */
     public void mousePressed(MouseEvent e) {
-        if(!isEnabled()) {return;}
+        if ( !isEnabled()) {
+            return;
+        }
         requestFocus();
         startX          = e.getX();
         startY          = e.getY();
@@ -1158,7 +1196,9 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      * @param e  event to handle
      */
     public void mouseReleased(MouseEvent e) {
-        if(!isEnabled()) {return;}
+        if ( !isEnabled()) {
+            return;
+        }
 
         if (shouldSelectRegion(e) && (screenRegion != null)) {
             selectedRegion =
@@ -1226,7 +1266,9 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      * @param e  event to handle
      */
     public void mouseDragged(MouseEvent e) {
-        if(!isEnabled()) {return;}
+        if ( !isEnabled()) {
+            return;
+        }
 
         if (regionDragPoint != null) {
             int       newX = e.getX();
@@ -1291,7 +1333,9 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      * @param e  event to handle
      */
     public void mouseMoved(MouseEvent e) {
-        if(!isEnabled()) {return;}
+        if ( !isEnabled()) {
+            return;
+        }
         if ( !draggingMode) {
             showStatus(e.getX(), e.getY());
         }
@@ -1627,7 +1671,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      *  Reset the  zoom and projection
      */
     public void resetZoom() {
-        navigate.setMapArea(project.getDefaultMapArea());
+        navigate.setMapArea(normalizeRectangle(project.getDefaultMapArea()));
         drawG();
     }
 
@@ -1725,7 +1769,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      * @param bounds The bounds
      */
     public void setSelectedRegionBounds(ProjectionRect bounds) {
-        selectedRegionBounds = bounds;
+        selectedRegionBounds = normalizeRectangle(bounds);
     }
 
 
