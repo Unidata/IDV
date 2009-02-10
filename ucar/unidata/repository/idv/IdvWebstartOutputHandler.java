@@ -117,7 +117,9 @@ public class IdvWebstartOutputHandler extends OutputHandler {
             Entry entry = state.entry;
             if(entry.getResource().getPath().endsWith(".xidv") ||
                entry.getResource().getPath().endsWith(".zidv")) {
-                String suffix = "/"+entry.getId()+".jnlp";
+                String fileTail = getStorageManager().getFileTail(entry);
+                String suffix = "/"+IOUtil.stripExtension(fileTail)+".jnlp";
+                //                suffix = java.net.URLEncoder.encode(suffix);
                 links.add(makeLink(request, state.getEntry(),OUTPUT_WEBSTART,suffix));
             } else {
                 DataOutputHandler data = (DataOutputHandler) getRepository().getOutputHandler(DataOutputHandler.OUTPUT_OPENDAP);
@@ -139,8 +141,9 @@ public class IdvWebstartOutputHandler extends OutputHandler {
         if(entry.getResource().getPath().endsWith(".xidv") ||
            entry.getResource().getPath().endsWith(".zidv")) {
 
+            String fileTail = getStorageManager().getFileTail(entry);
             String url = HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
-                                      + entry.getName(), ARG_ENTRYID, entry.getId());
+                                      + fileTail, ARG_ENTRYID, entry.getId());
             url = getRepository().absoluteUrl(url);
             jnlp = jnlp.replace("%ARG%","-bundle");
             jnlp = jnlp.replace("%URL%",url);

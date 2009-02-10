@@ -507,11 +507,12 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 String toDate =
                     repositoryClient.formatDate(toDateFld.getDate());
                 int      cnt = 0;
+
+
                 Document doc = XmlUtil.makeDocument();
                 //Create the top level node
                 Element root = XmlUtil.create(doc, TAG_ENTRIES);
                 List tags = StringUtil.split(tagFld.getText().trim(),",",true,true);
-
 
                 String mainId    = (cnt++) + "";
                 String contentId = (cnt++) + "";
@@ -581,7 +582,6 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                 }
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 ZipOutputStream       zos = new ZipOutputStream(bos);
-
                 for(int i=0;i<files.size();i++) {
                     String file = files.get(i);
                     String name = zipEntryNames.get(i);
@@ -592,7 +592,6 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     zos.write(bytes, 0, bytes.length);
                     zos.closeEntry();
                 }
-
 
 
                 if(zidvFile!=null && isZidv && uploadZidvDataCbx.isSelected()) {
@@ -701,6 +700,12 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
             attrs.add(attr);
             attrs.add(v);
         }
+    }
+
+
+    public void publishIslImage(Element tag, Image image) {
+        
+
     }
 
 
