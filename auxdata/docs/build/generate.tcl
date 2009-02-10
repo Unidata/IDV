@@ -1020,8 +1020,7 @@ proc gen::walkTree {indexFile {parent ""}} {
                 if  {![file exists $f]} {
                     puts "Error: file $f does not exist."
                 } else {
-                        
-                    lappend ::filesToCopy  $f [file join [gen::getTargetDir] [file join $dir $fileDir] ]
+                    lappend ::filesToCopy  $f [file join [gen::getTargetDir] $fileDir ] 
 ##                    puts "lappend ::filesToCopy  $f [file join [gen::getTargetDir] [file join $dir $fileDir]]"
 ##                    lappend ::filesToCopy  $f [file join [gen::getTargetDir] $dir [file dirname $f]]
                 }
