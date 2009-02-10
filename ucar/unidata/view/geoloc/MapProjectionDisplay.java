@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -221,6 +222,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
     /** use 0-360 for longitude range */
     private static boolean use360 = true;
+
+    /** flag for adjusting lons or not */
     private static boolean adjustLons = false;
 
     /**
@@ -1097,7 +1100,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                 ((MapProjection3DAdapter) coordinateSystem)
                     .getMapProjection();
 
-            adjustLons = false;
+            boolean isLatLon = false;
+            adjustLons = true;
             if (mp instanceof ProjectionCoordinateSystem) {
                 ProjectionImpl proj =
                     ((ProjectionCoordinateSystem) mp).getProjection();
@@ -1107,26 +1111,26 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                     maxLon    = minLon + r2d2.getWidth();
                     centerLon = minLon + r2d2.getWidth() / 2;
                 }
-                //adjustLons = true;
+                isLatLon = true;
             } else if (mp instanceof TrivialMapProjection) {
                 Rectangle2D r2d2 = mp.getDefaultMapArea();
                 minLon    = r2d2.getX();
                 maxLon    = minLon + r2d2.getWidth();
                 centerLon = minLon + r2d2.getWidth() / 2;
-                //adjustLons = true;
+                isLatLon  = true;
             }
-            /*
-            if (((minLon >= -180) && (minLon < 180))
-                    && ((maxLon > -180) && (maxLon <= 180))) {
-                use360 = false;
-            }
-            */
+            // TODO:  figure out what we should be doing here.
             use360 = !((minLon >= -185) && (maxLon <= 185));
+            if ((isLatLon && !use360)      // lat/lon projections in +/-180 rang
+                    || !mp.isXYOrder()) {  // Vis5D
+                adjustLons = false;
+            }
             /*
-            */
             System.out.println("DisplayProjectionLon"+myInstance+
               " has range of " + minLon + " to " + maxLon +
-              " with center at " + centerLon + "; use360 = " + use360);
+              " with center at " + centerLon + "; use360 = " + use360 +
+              "; adjust lons = " + adjustLons);
+            */
 
             displayLatitudeType = new DisplayRealType("ProjectionLat"
                     + myInstance, true, -90.0, 90.0, 0.0, CommonUnit.degree);
@@ -1511,9 +1515,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             /*
             */
             if (adjustLons) {
-            t2[lonIndex] = (use360)
-                           ? GeoUtils.normalizeLongitude360(latlonalt[1])
-                           : GeoUtils.normalizeLongitude(latlonalt[1]);
+                t2[lonIndex] = (use360)
+                               ? GeoUtils.normalizeLongitude360(latlonalt[1])
+                               : GeoUtils.normalizeLongitude(latlonalt[1]);
             }
             t2 = mapProjection.fromReference(t2);
             if (t2 == null) {
@@ -1586,9 +1590,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             /*
             */
             if (adjustLons) {
-            t2[lonIndex] = (use360)
-                           ? GeoUtils.normalizeLongitude360(latlonalt[1])
-                           : GeoUtils.normalizeLongitude(latlonalt[1]);
+                t2[lonIndex] = (use360)
+                               ? GeoUtils.normalizeLongitude360(latlonalt[1])
+                               : GeoUtils.normalizeLongitude(latlonalt[1]);
             }
             t2 = mapProjection.fromReference(t2);
             if (t2 == null) {
@@ -1649,9 +1653,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             /*
             */
             if (adjustLons) {
-            xyz[1] = (use360)
-                     ? GeoUtils.normalizeLongitude360(t2[lonIndex])
-                     : GeoUtils.normalizeLongitude(t2[lonIndex]);
+                xyz[1] = (use360)
+                         ? GeoUtils.normalizeLongitude360(t2[lonIndex])
+                         : GeoUtils.normalizeLongitude(t2[lonIndex]);
             }
             call2("fromReference(d)", numpoints);
             return xyz;
@@ -1692,9 +1696,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             /*
             */
             if (adjustLons) {
-            xyz[1] = (use360)
-                     ? GeoUtils.normalizeLongitude360(t2[lonIndex])
-                     : GeoUtils.normalizeLongitude(t2[lonIndex]);
+                xyz[1] = (use360)
+                         ? GeoUtils.normalizeLongitude360(t2[lonIndex])
+                         : GeoUtils.normalizeLongitude(t2[lonIndex]);
             }
             call2("fromReference(f)", numpoints);
             return xyz;
