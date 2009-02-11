@@ -25,8 +25,8 @@
 package ucar.unidata.data.point;
 
 
-import ucar.nc2.dt.PointObsDataset;
-import ucar.nc2.dt.TypedDatasetFactory;
+import ucar.nc2.ft.FeatureDatasetFactoryManager;
+import ucar.nc2.ft.point.PointDatasetImpl;
 
 import ucar.unidata.data.*;
 
@@ -40,19 +40,10 @@ import ucar.unidata.util.WrapperException;
 
 import visad.*;
 
-import visad.data.netcdf.Plain;
-
-import visad.georef.EarthLocation;
-import visad.georef.EarthLocationTuple;
-
-import java.net.MalformedURLException;
-
-import java.net.URL;
-
 import java.rmi.RemoteException;
 
-
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -71,7 +62,7 @@ public class NetcdfPointDataSource extends PointDataSource {
         LogUtil.getLogInstance(NetcdfPointDataSource.class.getName());
 
     /** the dataset */
-    private PointObsDataset dataset;
+    private PointDatasetImpl dataset;
 
 
     /**
@@ -206,7 +197,7 @@ public class NetcdfPointDataSource extends PointDataSource {
      *
      * @return dataset
      */
-    public PointObsDataset getDataset() {
+    public PointDatasetImpl getDataset() {
         if (dataset == null) {
             Trace.call1("NetcdfPointDataSource.getDataSet",
                         " name = " + sources);
@@ -221,7 +212,7 @@ public class NetcdfPointDataSource extends PointDataSource {
      *
      * @return the dataset
      */
-    protected PointObsDataset doMakeDataset() {
+    protected PointDatasetImpl doMakeDataset() {
         String file = getFilePath();
         if (file == null) {
             if (haveBeenUnPersisted) {
@@ -235,19 +226,19 @@ public class NetcdfPointDataSource extends PointDataSource {
             sources = new ArrayList();
             sources.add(file);
         }
-        StringBuilder   buf     = new StringBuilder();
-        PointObsDataset pods    = null;
+        Formatter   buf     = new Formatter();
+        PointDatasetImpl pods    = null;
         Exception       toThrow = new Exception("Datset is null");
         try {
             file = convertSourceFile(file);
-            pods = (PointObsDataset) TypedDatasetFactory.open(
+            pods = (PointDatasetImpl) FeatureDatasetFactoryManager.open(
                 ucar.nc2.constants.FeatureType.POINT, file, null, buf);
         } catch (Exception exc) {
             pods = null;
         }
         if (pods == null) {
             toThrow =
-                new BadDataException("Unable to make a PointObsDataset from "
+                new BadDataException("Unable to make a PointDataset from "
                                      + file + "\nError = " + buf.toString());
             setInError(true);
             throw new WrapperException(
@@ -274,7 +265,7 @@ public class NetcdfPointDataSource extends PointDataSource {
 
 
     /**
-     * Make PointObs from the PointObsDataset
+     * Make PointObs from the choice
      *
      * @param dataChoice   choice for data (source of data)
      * @param subset       subsetting parameters
@@ -312,30 +303,16 @@ public class NetcdfPointDataSource extends PointDataSource {
             source = id.toString();
         }
 
-
-
-
         FieldImpl obs = null;
         Trace.call1("NetcdfPointDatasource:makeObs");
         if (obs == null) {
             //TODO: We are nulling out the data set to fix a bug where we cannot
             //use the same data set twice in a row
             this.dataset = null;
-            PointObsDataset pods = getDataset();
+            PointDatasetImpl pods = getDataset();
             if (pods == null) {
                 return null;
             }
-            /*
-            StringBuilder buf = new StringBuilder();
-            PointObsDataset pods = (PointObsDataset) TypedDatasetFactory.open(
-                                       ucar.nc2.constants.FeatureType.POINT,
-                                       source, null, buf);
-            if (pods == null) {
-                throw new BadDataException(
-                    "Unable to make a PointObsDataset from " + source
-                    + "\nError = " + buf.toString());
-            }
-            */
             obs = PointObFactory.makePointObs(pods, getBinRoundTo(),
                     getBinWidth(), bbox, sample);
             pods.close();
@@ -345,7 +322,6 @@ public class NetcdfPointDataSource extends PointDataSource {
     }
 
 
-
     /**
      * test
      *
@@ -353,33 +329,32 @@ public class NetcdfPointDataSource extends PointDataSource {
      */
     public static void main(String[] args) {
         try {
-            StringBuilder buf   = new StringBuilder();
+            Formatter buf   = new Formatter();
             int           cnt   = ((args.length > 1)
                                    ? new Integer(args[1]).intValue()
                                    : 1);
             long          total = 0;
             for (int i = 0; i < cnt; i++) {
                 long tt1 = System.currentTimeMillis();
-                PointObsDataset pods =
-                    (PointObsDataset) TypedDatasetFactory.open(
-                        ucar.nc2.constants.FeatureType.POINT, args[0], null,
-                        buf);
+                PointDatasetImpl pods =
+                    (PointDatasetImpl) FeatureDatasetFactoryManager.open(
+                        ucar.nc2.constants.FeatureType.POINT, args[0], null, buf);
                 long tt2 = System.currentTimeMillis();
                 if (pods == null) {
                     throw new BadDataException(
-                        "Unable to make a PointObsDataset from " + args[0]
+                        "Unable to make a PointDataset from " + args[0]
                         + "\nError = " + buf.toString());
                 }
                 Trace.startTrace();
                 long      t1    = System.currentTimeMillis();
-                FieldImpl field = PointObFactory.makePointObs(pods, 0, 0);
+                FieldImpl field = PointObFactory.makePointObs(pods, 0, 0, null, false);
                 PointObFactory.makeTimeSequenceOfPointObs(field, 0);
                 //                PointObFactory.makePointObsOnly(pods, 0, 0,null);
                 long t2 = System.currentTimeMillis();
 
                 if (i != 0) {
                     total += (t2 - t1);
-                    System.err.println("PointObsDataset time:" + (tt2 - tt1)
+                    System.err.println("PointDatasetImpl time:" + (tt2 - tt1)
                                        + " makePointObs time:" + (t2 - t1)
                                        + " avg:" + (total / i));
                 }
@@ -390,8 +365,6 @@ public class NetcdfPointDataSource extends PointDataSource {
         }
 
     }
-
-
 
 }
 
