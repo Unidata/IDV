@@ -73,6 +73,7 @@ import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.Util;
+import ucar.visad.quantities.CommonUnits;
 
 import visad.*;
 
@@ -382,6 +383,8 @@ public class PointObFactory {
         CFPointObWriter writer    = null;
         int             numFloat  = 0;
         int             numString = 0;
+        int[]           lengths   = null;
+        boolean[]       isText    = null;
         for (PointOb ob : obs) {
             EarthLocation el        = ob.getEarthLocation();
             Real          alt       = el.getAltitude();
@@ -390,9 +393,9 @@ public class PointObFactory {
             TupleType     type      = (TupleType) tuple.getType();
             MathType[]    types     = type.getComponents();
             int           numFields = types.length;
-            int[]         lengths   = new int[numFields];
-            boolean[]     isText    = new boolean[numFields];
             if (writer == null) {
+                lengths   = new int[numFields];
+                isText    = new boolean[numFields];
                 boolean haveText = false;
                 for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
                     lengths[fieldIdx] = 0;
@@ -404,8 +407,12 @@ public class PointObFactory {
                     isText[fieldIdx] = false;
                     PointObVar pointObVar = new PointObVar();
                     pointObVar.setName(Util.cleanTypeName(types[fieldIdx]));
-                    pointObVar.setUnits(
-                        ((RealType) types[fieldIdx]).getDefaultUnit() + "");
+                    Unit unit = ((RealType) types[fieldIdx]).getDefaultUnit();
+                    if(unit!=null) {
+                        pointObVar.setUnits(unit + "");
+                        System.err.println ("Var:" + pointObVar.getName() +" unit: " +pointObVar.getUnits());
+                    }
+
                     pointObVar.setDataType(DataType.DOUBLE);
                     dataVars.add(pointObVar);
                     numFloat++;
@@ -437,11 +444,11 @@ public class PointObFactory {
                         continue;
                     }
                     PointObVar pointObVar = new PointObVar();
-                    System.err.println("idx:" + fieldIdx + "   name:"
-                                       + Util.cleanTypeName(types[fieldIdx])
-                                       + " length:" + lengths[fieldIdx]);
+                    //                    System.err.println("idx:" + fieldIdx + "   name:"
+                    //                                       + Util.cleanTypeName(types[fieldIdx])
+                    //                                       + " length:" + lengths[fieldIdx]);
                     pointObVar.setName(Util.cleanTypeName(types[fieldIdx]));
-                    pointObVar.setDataType(DataType.CHAR);
+                    pointObVar.setDataType(DataType.STRING);
                     pointObVar.setLen(lengths[fieldIdx]);
                     dataVars.add(pointObVar);
                     numString++;
@@ -459,15 +466,27 @@ public class PointObFactory {
             for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
                 if (isText[fieldIdx]) {
                     svals[scnt++] = ((Text) data[fieldIdx]).getValue();
-                    System.err.println(fieldIdx + ":" + svals[scnt - 1]);
+                    //                    System.err.println(fieldIdx + ":" + svals[scnt - 1]);
                 } else {
                     dvals[dcnt++] = ((Real) data[fieldIdx]).getValue();
                 }
             }
 
-            writer.addPoint(llp.getLatitude().getValue(),
-                            llp.getLongitude().getValue(), ((alt != null)
-                    ? alt.getValue()
+
+            /*
+            int xxx=1;
+            for(PointObVar pov:dataVars) {
+                System.out.println ("var #" + xxx+" "+pov.getName() + " " + pov.getDataType() + " unit:" + pov.getUnits());
+                xxx++;
+            }
+            if(true) break;
+            */
+
+            //            System.out.println ("#dvals:" + dvals.length + " #svals:" + svals.length);
+
+            writer.addPoint(llp.getLatitude().getValue(CommonUnit.degree),
+                            llp.getLongitude().getValue(CommonUnit.degree), ((alt != null)
+                    ? alt.getValue(CommonUnit.meter)
                     : 0.0), ucar.visad.Util.makeDate(ob.getDateTime()),
                             dvals, svals);
         }
@@ -696,6 +715,7 @@ public class PointObFactory {
             TupleType finalTupleType = null;
             Trace.call1("loop-2", " num vars: " + numNotRequired);
             int cnt = 0;
+
             for (int i = 0; i < length; i++) {
                 DateTime dateTime = (DateTime) times.get(i);
                 Tuple    ob       = (Tuple) input.getSample(i);
@@ -1359,7 +1379,7 @@ public class PointObFactory {
         TupleType         finalTT = null;
         PointObTuple      pot     = null;
         List              pos     = new ArrayList(100000);
-        List              times   = new ArrayList(1000000);
+        List              times   = new ArrayList(100000);
 
         //First do spatial subset and collect times
         //First collect times
