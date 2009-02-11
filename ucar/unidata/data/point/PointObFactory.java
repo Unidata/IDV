@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data.point;
 
 
@@ -394,8 +392,8 @@ public class PointObFactory {
             MathType[]    types     = type.getComponents();
             int           numFields = types.length;
             if (writer == null) {
-                lengths   = new int[numFields];
-                isText    = new boolean[numFields];
+                lengths = new int[numFields];
+                isText  = new boolean[numFields];
                 boolean haveText = false;
                 for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
                     lengths[fieldIdx] = 0;
@@ -408,9 +406,11 @@ public class PointObFactory {
                     PointObVar pointObVar = new PointObVar();
                     pointObVar.setName(Util.cleanTypeName(types[fieldIdx]));
                     Unit unit = ((RealType) types[fieldIdx]).getDefaultUnit();
-                    if(unit!=null) {
+                    if (unit != null) {
                         pointObVar.setUnits(unit + "");
-                        System.err.println ("Var:" + pointObVar.getName() +" unit: " +pointObVar.getUnits());
+                        System.err.println("Var:" + pointObVar.getName()
+                                           + " unit: "
+                                           + pointObVar.getUnits());
                     }
 
                     pointObVar.setDataType(DataType.DOUBLE);
@@ -455,7 +455,7 @@ public class PointObFactory {
                 }
                 writer = new CFPointObWriter(dos, attrs, ((alt != null)
                         ? alt.getUnit().toString()
-                                                          : null), dataVars, obs.size());
+                        : null), dataVars, obs.size());
             }
 
             double[] dvals = new double[numFloat];
@@ -485,10 +485,11 @@ public class PointObFactory {
             //            System.out.println ("#dvals:" + dvals.length + " #svals:" + svals.length);
 
             writer.addPoint(llp.getLatitude().getValue(CommonUnit.degree),
-                            llp.getLongitude().getValue(CommonUnit.degree), ((alt != null)
-                    ? alt.getValue(CommonUnit.meter)
-                    : 0.0), ucar.visad.Util.makeDate(ob.getDateTime()),
-                            dvals, svals);
+                            llp.getLongitude().getValue(CommonUnit.degree),
+                            ((alt != null)
+                             ? alt.getValue(CommonUnit.meter)
+                             : 0.0), ucar.visad.Util.makeDate(
+                                 ob.getDateTime()), dvals, svals);
         }
 
 

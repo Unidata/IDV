@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data.point;
 
 
@@ -77,9 +75,16 @@ import javax.swing.event.*;
  */
 public class TextPointDataSource extends PointDataSource {
 
+    /** property id for the header map */
     public static final String PROP_HEADER_MAP = "data.textpoint.map";
+
+    /** property id for the header params */
     public static final String PROP_HEADER_PARAMS = "data.textpoint.params";
+
+    /** property id for how many rows to skip */
     public static final String PROP_HEADER_SKIP = "data.textpoint.skip";
+
+    /** property id for the whole header blob, map and params */
     public static final String PROP_HEADER_BLOB = "data.textpoint.blob";
 
     /** Where to write out the saved meta data listing */
@@ -99,7 +104,7 @@ public class TextPointDataSource extends PointDataSource {
     /** The visad textadapter map params line. We have this here if the data file does not have it */
     private String params;
 
-    /** _more_ */
+    /** the default real */
     private Real dfltReal;
 
     /** logging category */
@@ -144,9 +149,11 @@ public class TextPointDataSource extends PointDataSource {
     /** group var name */
     private String groupVarName = null;
 
-    private String lastType="";
+    /** last type */
+    private String lastType = "";
 
-    private String lastLabel="";
+    /** last label */
+    private String lastLabel = "";
 
     /**
      * Default constructor
@@ -194,11 +201,11 @@ public class TextPointDataSource extends PointDataSource {
     }
 
     /**
-     * _more_
+     * the data choice
      *
-     * @param dataChoice _more_
+     * @param dataChoice the data choice
      *
-     * @return _more_
+     * @return the file or url this data choice refers to
      */
     protected String getSource(DataChoice dataChoice) {
         Object id = dataChoice.getId();
@@ -209,13 +216,13 @@ public class TextPointDataSource extends PointDataSource {
     }
 
     /**
-     * _more_
+     * get the input stream for the given file or url
      *
-     * @param contents _more_
+     * @param contents the header contents
      *
-     * @return _more_
+     * @return the input stream
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     private InputStream getInputStream(String contents) throws Exception {
         InputStream is = new ByteArrayInputStream(contents.getBytes());
@@ -243,18 +250,18 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
-     * _more_
+     * make the observations from the given datachoice
      *
-     * @param dataChoice _more_
-     * @param subset _more_
-     * @param bbox _more_
-     * @param trackParam _more_
-     * @param sampleIt _more_
-     * @param showAttributeGuiIfNeeded _more_
+     * @param dataChoice the data choice
+     * @param subset data selection to subset with
+     * @param bbox bounding box to subset
+     * @param trackParam the parameter to use for thetrack
+     * @param sampleIt do we just sample or do we read the full set of obs
+     * @param showAttributeGuiIfNeeded popup the gui if we have a problem
      *
-     * @return _more_
+     * @return the field
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
                                 LatLonRect bbox, String trackParam,
@@ -277,18 +284,19 @@ public class TextPointDataSource extends PointDataSource {
         if (obs == null) {
             TextAdapter ta = null;
             try {
-                if(params==null || params.length()==0) {
-                    params = getProperty(PROP_HEADER_PARAMS,(String)null);
+                if ((params == null) || (params.length() == 0)) {
+                    params = getProperty(PROP_HEADER_PARAMS, (String) null);
                 }
-                if(map==null || map.length()==0) {
-                    map = getProperty(PROP_HEADER_MAP,(String)null);
+                if ((map == null) || (map.length() == 0)) {
+                    map = getProperty(PROP_HEADER_MAP, (String) null);
                 }
-                if(skipRows == 0) {
+                if (skipRows == 0) {
                     skipRows = getProperty(PROP_HEADER_SKIP, skipRows);
                 }
-                String blob= getProperty(PROP_HEADER_BLOB,(String)null);
-                if(blob!=null && metaDataFields.size()==0) {
-                    metaDataFields = (List) getDataContext().getIdv().decodeObject(blob);
+                String blob = getProperty(PROP_HEADER_BLOB, (String) null);
+                if ((blob != null) && (metaDataFields.size() == 0)) {
+                    metaDataFields =
+                        (List) getDataContext().getIdv().decodeObject(blob);
                     applySavedMetaData(metaDataFields);
                 }
 
@@ -327,13 +335,13 @@ public class TextPointDataSource extends PointDataSource {
     }
 
     /**
-     * _more_
+     * test
      *
-     * @param source _more_
+     * @param source test source
      *
-     * @return _more_
+     * @return the data
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     private Data test(String source) throws Exception {
         String      contents  = IOUtil.readContents(source, getClass());
@@ -405,11 +413,11 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
-     * _more_
+     * update the attribute gui
      *
-     * @param lbl _more_
-     * @param index _more_
-     * @param lines _more_
+     * @param lbl the label
+     * @param index index
+     * @param lines the lines to show
      */
     private void setLineText(JLabel lbl, int index, List lines) {
         //        if(true) {
@@ -505,9 +513,9 @@ public class TextPointDataSource extends PointDataSource {
     }
 
     /**
-     * _more_
+     * update the gui
      *
-     * @param line _more_
+     * @param line the sampled text line
      */
     public void applyNames(String line) {
         List toks = StringUtil.split(line, getDelimiter(), false, false);
@@ -629,7 +637,7 @@ public class TextPointDataSource extends PointDataSource {
     private Hashtable getMetaDataMap() {
         Hashtable pointMetaDataMap =
             (Hashtable) getDataContext().getIdv().getStore().getEncodedFile(
-                                                                            PREF_METADATAMAP);
+                PREF_METADATAMAP);
         if (pointMetaDataMap == null) {
             pointMetaDataMap = new Hashtable();
         }
@@ -651,43 +659,58 @@ public class TextPointDataSource extends PointDataSource {
 
 
 
+    /**
+     * write the plugin
+     */
     public void writePlugin() {
         try {
-            JTextField typeFld = new JTextField(lastType,30);
-            JTextField labelFld = new JTextField(lastLabel,30);
-            JCheckBox trajectoryCbx = new JCheckBox("Is trajectory data",false);
-            JComponent contents = GuiUtils.formLayout(new Object[]{
-                "Type:",            typeFld,
-                "Label:",           labelFld,
-                new JLabel(""),trajectoryCbx});
-            if(!GuiUtils.showOkCancelDialog(null,"Data Source Type Plugin",  contents,null)) return;
-            lastType = typeFld.getText().trim();
+            JTextField typeFld  = new JTextField(lastType, 30);
+            JTextField labelFld = new JTextField(lastLabel, 30);
+            JCheckBox trajectoryCbx = new JCheckBox("Is trajectory data",
+                                          false);
+            JComponent contents = GuiUtils.formLayout(new Object[] {
+                "Type:", typeFld, "Label:", labelFld, new JLabel(""),
+                trajectoryCbx
+            });
+            if ( !GuiUtils.showOkCancelDialog(null,
+                    "Data Source Type Plugin", contents, null)) {
+                return;
+            }
+            lastType  = typeFld.getText().trim();
             lastLabel = labelFld.getText().trim();
-            String[]tmp = makeMetadataHeader();
-            if(tmp==null) return;
-            String trajectory = (trajectoryCbx.isSelected()?"true":"false");
-            String xml = DataManager.getDatasourceXml(lastType, lastLabel, getClass(),Misc.newHashtable(new Object[]{PROP_HEADER_MAP,
-                                                                                                        tmp[0],
-                                                                                                        PROP_HEADER_PARAMS,tmp[1],
-                                                                                                        PROP_HEADER_SKIP,
-                                                                                                        ""+skipRows,
-                                                                                                                     "dataistrajectory",
-                                                                                                                     trajectory,
-                                                                                                        PROP_HEADER_BLOB,
-                                                                                                        getDataContext().getIdv().encodeObject(metaDataFields,false)}));
-            getDataContext().getIdv().getPluginManager().addText(xml, lastType+"datasource.xml");
+            String[] tmp = makeMetadataHeader();
+            if (tmp == null) {
+                return;
+            }
+            String trajectory = (trajectoryCbx.isSelected()
+                                 ? "true"
+                                 : "false");
+            String xml = DataManager.getDatasourceXml(lastType, lastLabel,
+                             getClass(), Misc.newHashtable(new Object[] {
+                PROP_HEADER_MAP, tmp[0], PROP_HEADER_PARAMS, tmp[1],
+                PROP_HEADER_SKIP, "" + skipRows, "dataistrajectory",
+                trajectory, PROP_HEADER_BLOB,
+                getDataContext().getIdv().encodeObject(metaDataFields, false)
+            }));
+            getDataContext().getIdv().getPluginManager().addText(xml,
+                    lastType + "datasource.xml");
         } catch (Exception exc) {
             logException("Writing data source type", exc);
         }
     }
 
+    /**
+     * write the header text to a file
+     */
     public void writeHeader() {
         try {
-            String filename = FileManager.getWriteFile(FileManager.FILTER_CSV,
-                                                       null);
-            if(filename == null) return;
-            String[]tmp = makeMetadataHeader();
-            StringBuffer  sb = new StringBuffer(tmp[0]);
+            String filename =
+                FileManager.getWriteFile(FileManager.FILTER_CSV, null);
+            if (filename == null) {
+                return;
+            }
+            String[]     tmp = makeMetadataHeader();
+            StringBuffer sb  = new StringBuffer(tmp[0]);
             sb.append("\n");
             sb.append(tmp[1]);
             IOUtil.writeFile(filename, sb.toString());
@@ -706,8 +729,7 @@ public class TextPointDataSource extends PointDataSource {
         List items = new ArrayList();
         items.add(GuiUtils.makeMenuItem("Save Currrent", this,
                                         "saveMetaDataMap"));
-        items.add(GuiUtils.makeMenuItem("Write Header", this,
-                                        "writeHeader"));
+        items.add(GuiUtils.makeMenuItem("Write Header", this, "writeHeader"));
         items.add(GuiUtils.makeMenuItem("Write Data Source Plugin", this,
                                         "writePlugin"));
         Hashtable pointMetaDataMap = getMetaDataMap();
@@ -843,16 +865,21 @@ public class TextPointDataSource extends PointDataSource {
      * Apply properties
      */
     private void applyMetaDataFields() {
-        String[]tmp = makeMetadataHeader();
-        map = tmp[0];
+        String[] tmp = makeMetadataHeader();
+        map    = tmp[0];
         params = tmp[1];
     }
 
 
+    /**
+     * make the metadata header from the gui
+     *
+     * @return the metadata header
+     */
     private String[] makeMetadataHeader() {
         String map    = "(index)->(";
         String params = "";
-        int cnt = 0;
+        int    cnt    = 0;
         metaDataFields = new ArrayList();
         String delimiter = getDelimiter();
         int    skip      = 0;
@@ -920,7 +947,7 @@ public class TextPointDataSource extends PointDataSource {
             params = params + "]";
         }
         map = map + ")";
-        return new String[]{map,params};
+        return new String[] { map, params };
         //        System.out.println (map);
         //        System.out.println (params);
 
@@ -967,23 +994,23 @@ public class TextPointDataSource extends PointDataSource {
         return hashCode;
     }
 
-    /** _more_ */
+    /** var names */
     List varNames = new ArrayList();
 
     /**
-     * _more_
+     * make a trajectory form the obs data
      *
-     * @param trackParamIndex _more_
-     * @param latIndex _more_
-     * @param lonIndex _more_
-     * @param altIndex _more_
-     * @param times _more_
-     * @param tuples _more_
+     * @param trackParamIndex which parameter to use
+     * @param latIndex where is the lat
+     * @param lonIndex where is the lion
+     * @param altIndex where is the alt
+     * @param times the data tuples
+     * @param tuples the trajectory
      *
-     * @return _more_
+     * @return the trajectory
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     private FieldImpl makeTrack(int trackParamIndex, int latIndex,
                                 int lonIndex, int altIndex, List times,
@@ -1059,11 +1086,11 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
-     * _more_
+     * get the default real value to use
      *
-     * @return _more_
+     * @return dflt value
      *
-     * @throws VisADException _more_
+     * @throws VisADException On badness
      */
     private Real getDefaultValue() throws VisADException {
         if (dfltReal == null) {
@@ -1080,7 +1107,7 @@ public class TextPointDataSource extends PointDataSource {
      * We use the FieldImpl that has domain recNum, recnum or index.
      * (
      * @param input     raw VisAD data
-     * @param trackParam _more_
+     * @param trackParam the track parameter
      * @return field of PointObs
      *
      * @throws VisADException   couldn't make the observations
@@ -1408,9 +1435,9 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
-     * _more_
+     * should we make trajectories out of the point obs
      *
-     * @return _more_
+     * @return make trajectories
      */
     private boolean isTrajectoryEnabled() {
         return getProperty("dataistrajectory", false);
@@ -1650,7 +1677,7 @@ public class TextPointDataSource extends PointDataSource {
     }
 
     /**
-     * Class ParamRow _more_
+     * Class ParamRow data structure for gui
      *
      *
      * @author IDV Development Team
@@ -1658,32 +1685,32 @@ public class TextPointDataSource extends PointDataSource {
      */
     private static class ParamRow {
 
-        /** _more_ */
+        /** name widget */
         JComboBox nameBox;
 
-        /** _more_ */
+        /** extra field */
         JTextField extraFld;
 
-        /** _more_ */
+        /** missing field */
         JTextField missingFld;
 
-        /** _more_ */
+        /** unit field */
         JTextField unitFld;
 
-        /** _more_ */
+        /** button */
         JButton popupBtn;
 
-        /** _more_ */
+        /** shows the sample from the csv file */
         JLabel sample;
 
-        /** _more_ */
+        /** names */
         static Vector boxNames;
 
-        /** _more_ */
+        /** units */
         static Vector unitNames;
 
         /**
-         * _more_
+         * ctor
          */
         public ParamRow() {
             if (boxNames == null) {
@@ -1697,9 +1724,9 @@ public class TextPointDataSource extends PointDataSource {
         }
 
         /**
-         * _more_
+         * clean up the name
          *
-         * @return _more_
+         * @return cleaned up name
          */
         public String getCleanName() {
             return ucar.visad.Util.cleanName(getName());
@@ -1707,56 +1734,56 @@ public class TextPointDataSource extends PointDataSource {
 
 
         /**
-         * _more_
+         * set the name
          *
-         * @param name _more_
+         * @param name the name
          */
         public void setName(String name) {
             nameBox.setSelectedItem(name);
         }
 
         /**
-         * _more_
+         * get the name entered by the user
          *
-         * @return _more_
+         * @return the name
          */
         public String getName() {
             return nameBox.getSelectedItem().toString().trim();
         }
 
         /**
-         * _more_
+         * get the extra entered by the user
          *
-         * @return _more_
+         * @return extra
          */
         public String getExtra() {
             return extraFld.getText().trim();
         }
 
         /**
-         * _more_
+         * get the missing value entered by the user
          *
-         * @return _more_
+         * @return missing vlaue
          */
         public String getMissing() {
             return missingFld.getText().trim();
         }
 
         /**
-         * _more_
+         * get the unit entered by the user
          *
-         * @return _more_
+         * @return unit
          */
         public String getUnit() {
             return unitFld.getText().trim();
         }
 
         /**
-         * _more_
+         * init the widget
          *
-         * @param tokIdx _more_
-         * @param toks _more_
-         * @param comps _more_
+         * @param tokIdx token idx
+         * @param toks samples
+         * @param comps comps
          */
         public void init(int tokIdx, List toks, List comps) {
             if (nameBox == null) {
@@ -1789,9 +1816,9 @@ public class TextPointDataSource extends PointDataSource {
         }
 
         /**
-         * _more_
+         * update the gui
          *
-         * @param fields _more_
+         * @param fields tje fields
          */
         public void applyMetaData(List fields) {
             nameBox.setSelectedItem((String) fields.get(0));
@@ -1805,9 +1832,9 @@ public class TextPointDataSource extends PointDataSource {
         }
 
         /**
-         * _more_
+         * add the gui state to the list
          *
-         * @param metaDataFields _more_
+         * @param metaDataFields the list
          */
         public void addToMetaData(List metaDataFields) {
             metaDataFields.add(Misc.newList(getCleanName(), getUnit(),

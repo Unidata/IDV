@@ -20,16 +20,15 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data.point;
 
 
 import ucar.unidata.data.*;
 
-import ucar.unidata.sql.SqlUtil;
-
 import ucar.unidata.geoloc.LatLonPoint;
 import ucar.unidata.geoloc.LatLonRect;
+
+import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
@@ -38,6 +37,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
 import visad.*;
+
 import visad.georef.*;
 
 
@@ -45,6 +45,7 @@ import visad.georef.*;
 import java.rmi.RemoteException;
 
 import java.sql.*;
+
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
@@ -63,26 +64,37 @@ import java.util.TimeZone;
  */
 public class DbPointDataSource extends PointDataSource {
 
-    /** _more_          */
+    /** calender */
     public static final GregorianCalendar calendar =
         new GregorianCalendar(DateUtil.TIMEZONE_GMT);
 
+    /** the db table */
     private String tableName = "pointdata";
+
+    /** time column */
     private String timeColumn = "time";
+
+    /** lat col */
     private String latitudeColumn = "latitude";
+
+    /** long col */
     private String longitudeColumn = "longitude";
+
+    /** alt col */
     private String altitudeColumn = "altitude";
 
 
-    /** hard coded data base url for now       */
+    /** hard coded data base url for now */
     private String dbUrl = "jdbc:derby:pointdata;create=true";
 
-    /** the db connection      */
+    /** the db connection */
     private Connection connection;
 
 
+    /** search criteria */
     private String fromDate = "-1 year";
 
+    /** search criteria */
     private String toDate = "now";
 
 
@@ -103,9 +115,8 @@ public class DbPointDataSource extends PointDataSource {
      * @param source      Source URL
      * @param properties  <code>Hashtable</code> of properties for the source.
      *
-     * @throws VisADException  couldn't create the VisAD data
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public DbPointDataSource(DataSourceDescriptor descriptor, String source,
                              Hashtable properties)
@@ -121,9 +132,9 @@ public class DbPointDataSource extends PointDataSource {
 
 
     /**
-     * _more_
+     * get the jdbc connection
      *
-     * @return _more_
+     * @return the jdbc connection
      */
     public Connection getConnection() {
         if (connection != null) {
@@ -198,11 +209,11 @@ public class DbPointDataSource extends PointDataSource {
     }
 
     /**
-     * _more_
+     * intialize the jdbc connection
      *
-     * @return _more_
+     * @return success
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     private boolean initConnection() throws Exception {
         if (getConnection() == null) {
@@ -232,32 +243,35 @@ public class DbPointDataSource extends PointDataSource {
 
 
     /**
-     * _more_
+     * make the obs
      *
-     * @param dataChoice _more_
-     * @param subset _more_
-     * @param bbox _more_
+     * @param dataChoice the data choice
+     * @param subset the data selection
+     * @param bbox the bbox
      *
-     * @return _more_
+     * @return the obs
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
                                 LatLonRect bbox)
             throws Exception {
 
-        String columns = timeColumn +"," + latitudeColumn + "," + longitudeColumn + "," +
-            altitudeColumn + "," + "station,temperature, winddir, windspeed";
-        Date []dateRange = DateUtil.getDateRange(fromDate, toDate, new Date());
+        String columns = timeColumn + "," + latitudeColumn + ","
+                         + longitudeColumn + "," + altitudeColumn + ","
+                         + "station,temperature, winddir, windspeed";
+        Date[] dateRange = DateUtil.getDateRange(fromDate, toDate,
+                               new Date());
         List whereList = new ArrayList();
-        if(dateRange[0]!=null) {
+        if (dateRange[0] != null) {
             whereList.add(SqlUtil.ge(timeColumn, dateRange[0]));
         }
-        if(dateRange[1]!=null) {
+        if (dateRange[1] != null) {
             whereList.add(SqlUtil.le(timeColumn, dateRange[1]));
         }
 
-        String query = SqlUtil.makeSelect(columns, Misc.newList(tableName), SqlUtil.makeAnd(whereList));
+        String query = SqlUtil.makeSelect(columns, Misc.newList(tableName),
+                                          SqlUtil.makeAnd(whereList));
         //        System.err.println (query);
         Statement        statement = evaluate(query);
         SqlUtil.Iterator iter      = SqlUtil.getIterator(statement);
@@ -355,7 +369,7 @@ public class DbPointDataSource extends PointDataSource {
 
     /**
      * add to properties. The comps list contains pairs of label/widget.
-     * 
+     *
      *
      * @param comps comps
      */
@@ -383,13 +397,13 @@ public class DbPointDataSource extends PointDataSource {
 
 
     /**
-     * _more_
+     * execute the sql
      *
-     * @param sql _more_
+     * @param sql the sql
      *
-     * @return _more_
+     * @return the stmt
      *
-     * @throws SQLException _more_
+     * @throws SQLException On badness
      */
     private Statement evaluate(String sql) throws SQLException {
         Statement stmt = getConnection().createStatement();

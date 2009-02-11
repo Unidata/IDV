@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data.point;
 
 
@@ -226,9 +224,9 @@ public class NetcdfPointDataSource extends PointDataSource {
             sources = new ArrayList();
             sources.add(file);
         }
-        Formatter   buf     = new Formatter();
+        Formatter        buf     = new Formatter();
         PointDatasetImpl pods    = null;
-        Exception       toThrow = new Exception("Datset is null");
+        Exception        toThrow = new Exception("Datset is null");
         try {
             file = convertSourceFile(file);
             pods = (PointDatasetImpl) FeatureDatasetFactoryManager.open(
@@ -281,16 +279,16 @@ public class NetcdfPointDataSource extends PointDataSource {
     }
 
     /**
-     * _more_
+     * make the obs
      *
-     * @param dataChoice _more_
-     * @param subset _more_
-     * @param bbox _more_
-     * @param sample _more_
+     * @param dataChoice the datachoice
+     * @param subset teh data selection
+     * @param bbox the bbox
+     * @param sample just a taste?
      *
-     * @return _more_
+     * @return the obs
      *
-     * @throws Exception _more_
+     * @throws Exception on badness
      */
     protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
                                 LatLonRect bbox, boolean sample)
@@ -330,15 +328,16 @@ public class NetcdfPointDataSource extends PointDataSource {
     public static void main(String[] args) {
         try {
             Formatter buf   = new Formatter();
-            int           cnt   = ((args.length > 1)
-                                   ? new Integer(args[1]).intValue()
-                                   : 1);
-            long          total = 0;
+            int       cnt   = ((args.length > 1)
+                               ? new Integer(args[1]).intValue()
+                               : 1);
+            long      total = 0;
             for (int i = 0; i < cnt; i++) {
                 long tt1 = System.currentTimeMillis();
                 PointDatasetImpl pods =
                     (PointDatasetImpl) FeatureDatasetFactoryManager.open(
-                        ucar.nc2.constants.FeatureType.POINT, args[0], null, buf);
+                        ucar.nc2.constants.FeatureType.POINT, args[0], null,
+                        buf);
                 long tt2 = System.currentTimeMillis();
                 if (pods == null) {
                     throw new BadDataException(
@@ -346,8 +345,9 @@ public class NetcdfPointDataSource extends PointDataSource {
                         + "\nError = " + buf.toString());
                 }
                 Trace.startTrace();
-                long      t1    = System.currentTimeMillis();
-                FieldImpl field = PointObFactory.makePointObs(pods, 0, 0, null, false);
+                long t1 = System.currentTimeMillis();
+                FieldImpl field = PointObFactory.makePointObs(pods, 0, 0,
+                                      null, false);
                 PointObFactory.makeTimeSequenceOfPointObs(field, 0);
                 //                PointObFactory.makePointObsOnly(pods, 0, 0,null);
                 long t2 = System.currentTimeMillis();

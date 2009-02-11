@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.data.point;
 
 
@@ -309,10 +307,10 @@ public abstract class PointDataSource extends FilesDataSource {
          */
         public void applyToDataSelection(DataSelection dataSelection) {
             if (dataSelection != null) {
-                StationModel plotModel =  getPlotModel();
-                if(plotModel!=null) {
+                StationModel plotModel = getPlotModel();
+                if (plotModel != null) {
                     dataSelection.putProperty(PROP_STATIONMODELNAME,
-                                              plotModel.getName());
+                            plotModel.getName());
                 }
             }
         }
