@@ -2223,7 +2223,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 }
                 //                label = "<nobr>" + label+"</nobr>";
                 String url = getEntryManager().getAjaxLink(request, entry,
-                                 label, baseUrl, true, false);
+                                                           label, baseUrl, true, false,true);
                 String link = favoritesWrapper.replace("${link}", url);
                 favoriteLinks.add("<nobr>" + link + "<nobr>");
             }
@@ -2245,7 +2245,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 }
                 //                label = "<nobr>" + label+"</nobr>";
                 String url = getEntryManager().getAjaxLink(request, entry,
-                                 label, baseUrl, true, false);
+                                                           label, baseUrl, true, false,true);
                 String link = favoritesWrapper.replace("${link}", url);
                 cartLinks.add("<nobr>" + link + "<nobr>");
                 //                cartLinks.add(link);

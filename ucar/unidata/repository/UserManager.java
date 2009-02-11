@@ -1303,8 +1303,8 @@ public class UserManager extends RepositoryManager {
                                         "Create an association")) + HtmlUtil.space(
                                             1) + entry.getLabel()));
                 } else if (splitScreen) {
-                    colSB.append(getEntryManager().getAjaxLink(request,
-                            entry));
+                    colSB.append(getEntryManager().getAjaxLink(request, entry,
+                                                               entry.getLabel(), null, true, true,false));
 
                 } else {
                     String links = HtmlUtil.checkbox("entry_"

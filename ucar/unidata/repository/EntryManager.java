@@ -2774,7 +2774,7 @@ return new Result(title, sb);
                                  String linkText, String url,
                                  boolean includeIcon)
             throws Exception {
-        return getAjaxLink(request, entry, linkText, url, includeIcon, true);
+        return getAjaxLink(request, entry, linkText, url, includeIcon, true,true);
     }
 
 
@@ -2795,20 +2795,25 @@ return new Result(title, sb);
     protected String getAjaxLink(Request request, Entry entry,
                                  String linkText, String url,
                                  boolean includeIcon,
-                                 boolean forTreeNavigation)
+                                 boolean forTreeNavigation, 
+                                 boolean showLink)
             throws Exception {
 
+        if(url == null) {
+            url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                   entry);
+        }
 
         StringBuffer sb      = new StringBuffer();
         String       entryId = entry.getId();
 
         String       uid     = "link_" + HtmlUtil.blockCnt++;
+        String event  = "";
         if (includeIcon) {
             boolean okToMove = !request.getUser().getAnonymous();
             String  icon     = getIconUrl(request, entry);
             String dropEvent = HtmlUtil.onMouseUp("mouseUpOnEntry(event,'"
                                    + entry.getId() + "')");
-            String event  = "";
 
             String compId = "popup_" + HtmlUtil.blockCnt++;
             String linkId = "img_" + uid;
@@ -2816,7 +2821,7 @@ return new Result(title, sb);
             if (entry.isGroup() && forTreeNavigation) {
                 event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
                         HtmlUtil.squote(entryId) + "," + HtmlUtil.squote(uid)
-                        + ",null,null,"
+                        + ",null,'showLink=" + showLink +"',null,"
                         + HtmlUtil.squote(iconUrl(ICON_FOLDER_OPEN))));
             } else if ( !forTreeNavigation) {
                 event = HtmlUtil.onMouseClick("showMenu(event,"
@@ -2875,8 +2880,12 @@ return new Result(title, sb);
                                        + ");") + HtmlUtil.onMouseMove(
                                            "tooltip.onMouseMove(event," + qid
                                            + "," + qlinkId + ");");
-        sb.append(HtmlUtil.href(url, linkText,
-                                HtmlUtil.id(linkId) + " " + tooltipEvents));
+        if(showLink) {
+            sb.append(HtmlUtil.href(url, linkText,
+                                    HtmlUtil.id(linkId) + " " + tooltipEvents));
+        } else {
+            sb.append(HtmlUtil.span(linkText,HtmlUtil.id(linkId) + " " + tooltipEvents));
+        }
 
         String link = HtmlUtil.span(sb.toString(),
                                     HtmlUtil.id("span_" + entry.getId()));

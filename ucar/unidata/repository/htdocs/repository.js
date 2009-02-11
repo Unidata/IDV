@@ -719,6 +719,7 @@ function hideMore(base) {
 	showObject(link);
 }
 
+
 function showMore(base) {
         var link = util.getDomObject("morelink_" + base);
         var div = util.getDomObject("morediv_" + base);

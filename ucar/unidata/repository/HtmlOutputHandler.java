@@ -793,6 +793,7 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb     = new StringBuffer();
         String       folder = iconUrl(ICON_FOLDER_CLOSED);
+        System.err.println(request);
         for (Group subGroup : subGroups) {
             sb.append(getEntryManager().getAjaxLink(request, subGroup));
         }
