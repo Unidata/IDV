@@ -1340,10 +1340,18 @@ public class UserManager extends RepositoryManager {
             sb.append(HtmlUtil.open(HtmlUtil.TAG_TD,
                                     HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
                                         "50%")));
-            sb.append("<ul style=\"list-style-image : url("
-                      + getRepository().iconUrl(ICON_FILE) + ")\">");
+            if(splitScreen) {
+                sb.append(HtmlUtil.open(HtmlUtil.TAG_DIV,HtmlUtil.style("max-height: 600px; overflow-y: auto;")));
+            } else {
+                sb.append("<ul style=\"list-style-image : url("
+                          + getRepository().iconUrl(ICON_FILE) + ")\">");
+            }
             sb.append(colSB);
-            sb.append("</ul>");
+            if(splitScreen) {
+                sb.append(HtmlUtil.close(HtmlUtil.TAG_DIV));
+            } else {
+                sb.append("</ul>");
+            }
             sb.append(HtmlUtil.close(HtmlUtil.TAG_TD));
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TR));
