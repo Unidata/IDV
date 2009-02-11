@@ -448,7 +448,7 @@ public class PointObFactory {
                 }
                 writer = new CFPointObWriter(dos, attrs, ((alt != null)
                         ? alt.getUnit().toString()
-                        : null), dataVars);
+                                                          : null), dataVars, obs.size());
             }
 
             double[] dvals = new double[numFloat];
@@ -470,9 +470,6 @@ public class PointObFactory {
                     ? alt.getValue()
                     : 0.0), ucar.visad.Util.makeDate(ob.getDateTime()),
                             dvals, svals);
-            if (true) {
-                break;
-            }
         }
 
 
