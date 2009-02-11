@@ -75,9 +75,15 @@ public class IOUtil {
             return true;
         }
 
-        if (StringUtil.stringMatch(fileOrUrl, ".*\\." + suffix + "\\?")) {
+        if(fileOrUrl.indexOf("." + suffix +"?")>=0) {
             return true;
         }
+
+        //Doing the regexp for some big b64 encoded strings goes off into never-never land
+        //        if (StringUtil.stringMatch(fileOrUrl, ".*\\." + suffix + "\\?")) {
+        //            return true;
+        //        }
+
         return false;
 
     }
