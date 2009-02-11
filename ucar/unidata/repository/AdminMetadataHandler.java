@@ -66,6 +66,8 @@ public class AdminMetadataHandler extends MetadataHandler {
         new Metadata.Type("admin.localfile.pattern", "Local File Pattern");
 
     //TODO:
+
+    /** _more_          */
     public static Metadata.Type TYPE_ANONYMOUS_UPLOAD =
         new Metadata.Type("admin.anonymousupload", "Anonymous Upload");
 
@@ -145,9 +147,11 @@ public class AdminMetadataHandler extends MetadataHandler {
         }
 
         if (type.equals(TYPE_ANONYMOUS_UPLOAD)) {
-            return new String[] { lbl, "From:" + metadata.getAttr1() + " IP: " + metadata.getAttr2()}; 
+            return new String[] { lbl,
+                                  "From:" + metadata.getAttr1() + " IP: "
+                                  + metadata.getAttr2() };
         }
-       
+
         if (type.equals(TYPE_LOCALFILE_PATTERN)) {
             return new String[] { lbl, "Local File Pattern" };
         }
@@ -217,8 +221,9 @@ public class AdminMetadataHandler extends MetadataHandler {
             content = HtmlUtil.row(HtmlUtil.colspan(submit, 2))
                       + HtmlUtil.formEntry(lbl, input);
         }
-        if(type.equals(TYPE_ANONYMOUS_UPLOAD)) {
-            content = "From:" + metadata.getAttr1() + " IP: " + metadata.getAttr2(); 
+        if (type.equals(TYPE_ANONYMOUS_UPLOAD)) {
+            content = "From:" + metadata.getAttr1() + " IP: "
+                      + metadata.getAttr2();
         }
 
 

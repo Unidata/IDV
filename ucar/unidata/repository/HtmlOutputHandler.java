@@ -83,7 +83,8 @@ public class HtmlOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_TIMELINE =
-        new OutputType("Timeline", "default.timeline", OutputType.TYPE_HTML,"",ICON_CLOCK);
+        new OutputType("Timeline", "default.timeline", OutputType.TYPE_HTML,
+                       "", ICON_CLOCK);
 
     /** _more_ */
     public static final OutputType OUTPUT_GRAPH = new OutputType("Graph",
@@ -108,6 +109,7 @@ public class HtmlOutputHandler extends OutputHandler {
     public static final OutputType OUTPUT_METADATAXML =
         new OutputType("metadataxml", OutputType.TYPE_INTERNAL);
 
+    /** _more_          */
     public static final OutputType OUTPUT_LINKSXML =
         new OutputType("linksxml", OutputType.TYPE_INTERNAL);
 
@@ -186,14 +188,15 @@ public class HtmlOutputHandler extends OutputHandler {
 
         sb.append("</table>");
 
-        String links = getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL);
-        String contents =  HtmlUtil.makeTabs(Misc.newList(msg("Information"),msg("Links")), 
-                                             Misc.newList(sb.toString(),links),
-                                             true,  "tab_content");
+        String links = getEntryManager().getEntryActionsTable(request, entry,
+                           OutputType.TYPE_ALL);
+        String contents = HtmlUtil.makeTabs(Misc.newList(msg("Information"),
+                              msg("Links")), Misc.newList(sb.toString(),
+                                  links), true, "tab_content");
 
         //        String       contents = sb.toString();
 
-        StringBuffer xml      = new StringBuffer("<content>\n");
+        StringBuffer xml = new StringBuffer("<content>\n");
         XmlUtil.appendCdata(xml,
                             getRepository().translate(request, contents));
         xml.append("\n</content>");
@@ -203,13 +206,24 @@ public class HtmlOutputHandler extends OutputHandler {
     }
 
 
-    public Result getLinksXml(Request request, Entry entry)
-            throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result getLinksXml(Request request, Entry entry) throws Exception {
         StringBuffer sb = new StringBuffer("<content>\n");
-        String links = getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL);
-        String closeLink =  HtmlUtil.jsLink(HtmlUtil.onMouseClick("hidePopupObject();"), 
-                                            HtmlUtil.img(iconUrl(ICON_CLOSE)),"");
-        sb.append(closeLink+HtmlUtil.br());
+        String links = getEntryManager().getEntryActionsTable(request, entry,
+                           OutputType.TYPE_ALL);
+        String closeLink =
+            HtmlUtil.jsLink(HtmlUtil.onMouseClick("hidePopupObject();"),
+                            HtmlUtil.img(iconUrl(ICON_CLOSE)), "");
+        sb.append(closeLink + HtmlUtil.br());
         sb.append(links);
         sb.append("\n</content>");
         return new Result("", sb, "text/xml");
@@ -256,7 +270,7 @@ public class HtmlOutputHandler extends OutputHandler {
             String informationBlock = getInformationTabs(request, entry,
                                           false);
             sb.append(HtmlUtil.makeShowHideBlock(msg("Information"),
-                                                 informationBlock, true));
+                    informationBlock, true));
 
             StringBuffer metadataSB = new StringBuffer();
             getMetadataManager().decorateEntry(request, entry, metadataSB,
@@ -687,10 +701,14 @@ public class HtmlOutputHandler extends OutputHandler {
                             new Link(
                                 request.entryUrl(
                                     getRepository().URL_ENTRY_FORM,
-                                    entry), iconUrl(ICON_EDIT), msg("Edit Entry")));
-                        sb.append(new Link(request
-                            .entryUrl(getRepository().getMetadataManager()
-                                .URL_METADATA_ADDFORM, entry), iconUrl(ICON_ADD), msg("Add Metadata")));
+                                    entry), iconUrl(ICON_EDIT),
+                                            msg("Edit Entry")));
+                        sb.append(
+                            new Link(
+                                request.entryUrl(
+                                    getRepository().getMetadataManager()
+                                        .URL_METADATA_ADDFORM, entry), iconUrl(
+                                            ICON_ADD), msg("Add Metadata")));
                         if (decorate) {
                             sb.append("</td></tr>");
                         }
@@ -745,7 +763,8 @@ public class HtmlOutputHandler extends OutputHandler {
     public Result getActionXml(Request request, Entry entry)
             throws Exception {
         StringBuffer sb = new StringBuffer();
-        sb.append(getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL));
+        sb.append(getEntryManager().getEntryActionsTable(request, entry,
+                OutputType.TYPE_ALL));
 
         StringBuffer xml = new StringBuffer("<content>\n");
         XmlUtil.appendCdata(xml,
@@ -761,6 +780,7 @@ public class HtmlOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param parent _more_
      * @param subGroups _more_
      * @param entries _more_
      *
@@ -768,8 +788,8 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result getChildrenXml(Request request, Group parent, List<Group> subGroups,
-                                 List<Entry> entries)
+    public Result getChildrenXml(Request request, Group parent,
+                                 List<Group> subGroups, List<Entry> entries)
             throws Exception {
         StringBuffer sb     = new StringBuffer();
         String       folder = iconUrl(ICON_FOLDER_CLOSED);
@@ -783,10 +803,13 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if ((subGroups.size() == 0) && (entries.size() == 0)) {
             sb.append("No sub-groups.");
-            if(getAccessManager().hasPermissionSet(parent,Permission.ACTION_VIEWCHILDREN)) {
-                if(!getAccessManager().canDoAction(request, parent, Permission.ACTION_VIEWCHILDREN)) {
+            if (getAccessManager().hasPermissionSet(parent,
+                    Permission.ACTION_VIEWCHILDREN)) {
+                if ( !getAccessManager().canDoAction(request, parent,
+                        Permission.ACTION_VIEWCHILDREN)) {
                     sb.append(HtmlUtil.space(1));
-                    sb.append("You do not have permission to view the sub-groups of this entry");
+                    sb.append(
+                        "You do not have permission to view the sub-groups of this entry");
                 }
             }
         }
@@ -896,7 +919,7 @@ public class HtmlOutputHandler extends OutputHandler {
         tabTitles.add("Basic");
         Object basic;
         tabContent.add(basic = entry.getTypeHandler().getEntryContent(entry,
-                                                                      request, false, true));
+                request, false, true));
 
 
         for (TwoFacedObject tfo : getMetadataHtml(request, entry, true,
@@ -909,10 +932,11 @@ public class HtmlOutputHandler extends OutputHandler {
         tabTitles.add(msg("Associations"));
         tabContent.add(getAssociationBlock(request, entry));
         tabTitles.add(msg("Links"));
-        tabContent.add(getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL));
+        tabContent.add(getEntryManager().getEntryActionsTable(request, entry,
+                OutputType.TYPE_ALL));
 
 
-        
+
         return HtmlUtil.makeTabs(tabTitles, tabContent, true, (fixedHeight
                 ? "tab_content_fixedheight"
                 : "tab_content"));
@@ -983,7 +1007,7 @@ public class HtmlOutputHandler extends OutputHandler {
             String informationBlock = getInformationTabs(request, group,
                                           false);
             sb.append(HtmlUtil.makeShowHideBlock(msg("Information"),
-                                                 informationBlock, false));
+                    informationBlock, false));
 
             StringBuffer metadataSB = new StringBuffer();
             getMetadataManager().decorateEntry(request, group, metadataSB,
@@ -1016,10 +1040,15 @@ public class HtmlOutputHandler extends OutputHandler {
                         entriesSB.toString(), true));
             }
 
-            if (!group.isDummy() && subGroups.size() == 0 && entries.size() == 0) {
-                if(getAccessManager().hasPermissionSet(group,Permission.ACTION_VIEWCHILDREN)) {
-                    if(!getAccessManager().canDoAction(request, group, Permission.ACTION_VIEWCHILDREN)) {
-                        sb.append(getRepository().warning("You do not have permission to view the sub-groups of this entry"));
+            if ( !group.isDummy() && (subGroups.size() == 0)
+                    && (entries.size() == 0)) {
+                if (getAccessManager().hasPermissionSet(group,
+                        Permission.ACTION_VIEWCHILDREN)) {
+                    if ( !getAccessManager().canDoAction(request, group,
+                            Permission.ACTION_VIEWCHILDREN)) {
+                        sb.append(
+                            getRepository().warning(
+                                "You do not have permission to view the sub-groups of this entry"));
                     }
                 }
             }
@@ -1041,13 +1070,13 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
 
-    /** _more_          */
+    /** _more_ */
     private static boolean checkedTemplates = false;
 
-    /** _more_          */
+    /** _more_ */
     private static String entryTemplate;
 
-    /** _more_          */
+    /** _more_ */
     private static String groupTemplate;
 
     /**
@@ -1105,7 +1134,8 @@ public class HtmlOutputHandler extends OutputHandler {
         }
         String tmp = StringUtil.replace(timelineAppletTemplate, "${times}",
                                         StringUtil.join(",", times));
-        tmp = StringUtil.replace(tmp, "${root}", getRepository().getUrlBase());
+        tmp = StringUtil.replace(tmp, "${root}",
+                                 getRepository().getUrlBase());
         tmp = StringUtil.replace(tmp, "${labels}",
                                  StringUtil.join(",", labels));
         tmp = StringUtil.replace(tmp, "${ids}", StringUtil.join(",", ids));

@@ -113,11 +113,13 @@ public class RssOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_RSS_FULL =
-        new OutputType("Full RSS Feed", "rss.full", OutputType.TYPE_NONHTML,"",ICON_RSS);
+        new OutputType("Full RSS Feed", "rss.full", OutputType.TYPE_NONHTML,
+                       "", ICON_RSS);
 
     /** _more_ */
     public static final OutputType OUTPUT_RSS_SUMMARY =
-        new OutputType("RSS Feed", "rss.summary", OutputType.TYPE_NONHTML,"",ICON_RSS);
+        new OutputType("RSS Feed", "rss.summary", OutputType.TYPE_NONHTML,
+                       "", ICON_RSS);
 
 
 
@@ -155,7 +157,11 @@ public class RssOutputHandler extends OutputHandler {
             throws Exception {
 
         if (state.getEntry() != null) {
-            links.add(makeLink(request, state.entry, OUTPUT_RSS_SUMMARY,"/" +IOUtil.stripExtension(state.getEntry().getName())+ ".rss"));
+            links.add(
+                makeLink(
+                    request, state.entry, OUTPUT_RSS_SUMMARY,
+                    "/" + IOUtil.stripExtension(state.getEntry().getName())
+                    + ".rss"));
         }
     }
 

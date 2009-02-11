@@ -30,8 +30,6 @@ import ucar.unidata.sql.Clause;
 
 import ucar.unidata.sql.SqlUtil;
 
-import java.awt.Image;
-
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
@@ -42,6 +40,8 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
+
+import java.awt.Image;
 
 
 
@@ -70,8 +70,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -318,11 +318,24 @@ return new Result(title, sb);
                             OutputHandler.OUTPUT_HTML.getId().toString())));
             }
         }
-        return addEntryHeader(request, entry, processEntryShow(request, entry));
+        return addEntryHeader(request, entry,
+                              processEntryShow(request, entry));
     }
 
 
-    public Result addEntryHeader(Request request, Entry entry, Result result) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param result _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result addEntryHeader(Request request, Entry entry, Result result)
+            throws Exception {
         if (result.getShouldDecorate()) {
             //            if(entry.getDescription().indexOf("<noentryheader>")>=0) return result;
             String output = request.getString(ARG_OUTPUT, (String) "");
@@ -374,6 +387,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryForm(Request request) throws Exception {
+
         Group        group = null;
         String       type  = null;
         Entry        entry = null;
@@ -382,7 +396,7 @@ return new Result(title, sb);
         //                           Misc.newList("contents1","contents2","contents3")));
         if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
-            type = entry.getTypeHandler().getType();
+            type  = entry.getTypeHandler().getType();
             if ( !entry.isTopGroup()) {
                 group = findGroup(request, entry.getParentGroupId());
             }
@@ -450,18 +464,23 @@ return new Result(title, sb);
             sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons, 2)));
             if (entry != null) {
                 sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
-                if(isAnonymousUpload(entry)) {
-                    Metadata metadata = 
-                        getMetadataManager().findMetadata(entry, AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD,
-                                                          false);
-                    String extra="";
-                    if(metadata!=null) {
+                if (isAnonymousUpload(entry)) {
+                    Metadata metadata =
+                        getMetadataManager().findMetadata(entry,
+                            AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD,
+                            false);
+                    String extra = "";
+                    if (metadata != null) {
                         String user = metadata.getAttr1();
-                        extra = "<br><b>From user:</b> " + metadata.getAttr1()+ " <b>From ip:</b> " + metadata.getAttr2();
+                        extra = "<br><b>From user:</b> "
+                                + metadata.getAttr1() + " <b>From ip:</b> "
+                                + metadata.getAttr2();
                     }
-                    String msg  =HtmlUtil.space(2) +msg("Make public?")+extra;
+                    String msg = HtmlUtil.space(2) + msg("Make public?")
+                                 + extra;
                     sb.append(HtmlUtil.formEntry(msgLabel("Publish"),
-                                                 HtmlUtil.checkbox(ARG_PUBLISH,"true",false)+msg));
+                            HtmlUtil.checkbox(ARG_PUBLISH, "true", false)
+                            + msg));
                 }
             } else {
                 sb.append(HtmlUtil.hidden(ARG_TYPE, type));
@@ -472,9 +491,10 @@ return new Result(title, sb);
         }
         sb.append(HtmlUtil.formTableClose());
         if (entry == null) {
-            return addEntryHeader(request, group,new Result(title, sb));
+            return addEntryHeader(request, group, new Result(title, sb));
         }
         return makeEntryEditResult(request, entry, title, sb);
+
     }
 
 
@@ -493,7 +513,8 @@ return new Result(title, sb);
         if (download) {
             ActionManager.Action action = new ActionManager.Action() {
                 public void run(Object actionId) throws Exception {
-                    Result result = doProcessEntryChange(request, false, actionId);
+                    Result result = doProcessEntryChange(request, false,
+                                        actionId);
                     getActionManager().setContinueHtml(actionId,
                             HtmlUtil.href(result.getRedirectUrl(),
                                           msg("Continue")));
@@ -513,32 +534,34 @@ return new Result(title, sb);
      * _more_
      *
      * @param request _more_
+     * @param forUpload _more_
      * @param actionId _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    private Result doProcessEntryChange(Request request, boolean forUpload, Object actionId)
+    private Result doProcessEntryChange(Request request, boolean forUpload,
+                                        Object actionId)
             throws Exception {
+
         boolean     download    = request.get(ARG_RESOURCE_DOWNLOAD, false);
         Entry       entry       = null;
         TypeHandler typeHandler = null;
         boolean     newEntry    = true;
         if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
-            if(entry == null) {
-                throw new IllegalArgumentException(
-                                                   "Cannot find entry");
+            if (entry == null) {
+                throw new IllegalArgumentException("Cannot find entry");
             }
-            if(forUpload) {
+            if (forUpload) {
                 throw new IllegalArgumentException(
-                                                   "Cannot edit when doing an upload");
+                    "Cannot edit when doing an upload");
             }
             if ( !getAccessManager().canDoAction(request, entry,
-                                                 Permission.ACTION_EDIT)) {
-                    throw new RepositoryUtil.AccessException("Cannot edit:"
-                                                             + entry.getLabel());
+                    Permission.ACTION_EDIT)) {
+                throw new RepositoryUtil.AccessException("Cannot edit:"
+                        + entry.getLabel());
             }
             if (entry.getIsLocalFile()) {
                 return new Result(
@@ -580,8 +603,9 @@ return new Result(title, sb);
                     request.entryUrl(
                         getRepository().URL_ENTRY_DELETE, entry));
             }
-        } else if(forUpload) {
-            typeHandler = getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
+        } else if (forUpload) {
+            typeHandler =
+                getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
         } else {
             typeHandler =
                 getRepository().getTypeHandler(request.getString(ARG_TYPE,
@@ -589,11 +613,11 @@ return new Result(title, sb);
         }
 
 
-        List<Entry> entries = new ArrayList<Entry>();
-        String dataType = "";
-        if(false && forUpload) {
+        List<Entry> entries  = new ArrayList<Entry>();
+        String      dataType = "";
+        if (false && forUpload) {
             //            dataType = DATATYPE_UPLOAD;
-        } else  if (request.defined(ARG_DATATYPE)) {
+        } else if (request.defined(ARG_DATATYPE)) {
             dataType = request.getString(ARG_DATATYPE, "");
         } else {
             dataType = request.getString(ARG_DATATYPE_SELECT, "");
@@ -604,34 +628,35 @@ return new Result(title, sb);
             String groupId = request.getString(ARG_GROUP, (String) null);
             if (groupId == null) {
                 throw new IllegalArgumentException(
-                                                   "You must specify a parent group");
+                    "You must specify a parent group");
             }
             Group parentGroup = findGroup(request);
             if ( !getAccessManager().canDoAction(request, parentGroup,
-                                                 (forUpload?Permission.ACTION_UPLOAD:
-                                                  Permission.ACTION_NEW))) {
+                    (forUpload
+                     ? Permission.ACTION_UPLOAD
+                     : Permission.ACTION_NEW))) {
                 throw new RepositoryUtil.AccessException("Cannot add:"
-                                                         + entry.getLabel());
+                        + entry.getLabel());
             }
 
 
-            List<String> resources    = new ArrayList();
-            List<String> origNames    = new ArrayList();
+            List<String> resources     = new ArrayList();
+            List<String> origNames     = new ArrayList();
 
-            String       resource     = request.getString(ARG_URL, BLANK);
-            String       filename     = request.getUploadedFile(ARG_FILE);
-            String       localFilename   = null;
-            boolean      unzipArchive = false;
+            String       resource      = request.getString(ARG_URL, BLANK);
+            String       filename      = request.getUploadedFile(ARG_FILE);
+            String       localFilename = null;
+            boolean      unzipArchive  = false;
 
-            boolean      isFile       = false;
-            boolean      isLocalFile       = false;
-            String       resourceName = request.getString(ARG_FILE,
-                                                          BLANK);
+            boolean      isFile        = false;
+            boolean      isLocalFile   = false;
+            String       resourceName  = request.getString(ARG_FILE, BLANK);
 
-            if(request.defined(ARG_LOCALFILE)) {
-                filename = request.getString(ARG_LOCALFILE,(String)null);
-                if(!request.getUser().getAdmin()) {
-                    throw new IllegalArgumentException ("Only administrators can add a local file");
+            if (request.defined(ARG_LOCALFILE)) {
+                filename = request.getString(ARG_LOCALFILE, (String) null);
+                if ( !request.getUser().getAdmin()) {
+                    throw new IllegalArgumentException(
+                        "Only administrators can add a local file");
                 }
                 getRepository().checkLocalFile(new File(filename));
                 isLocalFile = true;
@@ -644,27 +669,27 @@ return new Result(title, sb);
 
             unzipArchive = request.get(ARG_FILE_UNZIP, false);
 
-            if(isLocalFile) {
-                isFile       = true;
-                resource     = filename;
-            } else  if (filename != null) {
-                isFile       = true;
-                resource     = filename;
-            }  else {
-                if(!download) {
+            if (isLocalFile) {
+                isFile   = true;
+                resource = filename;
+            } else if (filename != null) {
+                isFile   = true;
+                resource = filename;
+            } else {
+                if ( !download) {
                     unzipArchive = false;
                 } else {
                     String url = resource;
                     if ( !url.startsWith("http:")
-                         && !url.startsWith("https:")
-                         && !url.startsWith("ftp:")) {
+                            && !url.startsWith("https:")
+                            && !url.startsWith("ftp:")) {
                         throw new IllegalArgumentException(
-                                                           "Cannot download url:" + url);
+                            "Cannot download url:" + url);
                     }
                     isFile = true;
                     String tail = IOUtil.getFileTail(resource);
                     File newFile = getStorageManager().getTmpFile(request,
-                                                                  tail);
+                                       tail);
                     RepositoryUtil.checkFilePath(newFile.toString());
                     resourceName = tail;
                     resource     = newFile.toString();
@@ -674,23 +699,24 @@ return new Result(title, sb);
                     //                Object startLoad(String name) {
                     if (actionId != null) {
                         JobManager.getManager().startLoad("File copy",
-                                                          actionId);
+                                actionId);
                     }
                     int length = connection.getContentLength();
                     if (length > 0 & actionId != null) {
                         getActionManager().setActionMessage(actionId,
-                                                            msg("Downloading") + " " + length + " "
-                                                            + msg("bytes"));
+                                msg("Downloading") + " " + length + " "
+                                + msg("bytes"));
                     }
                     FileOutputStream toStream = new FileOutputStream(newFile);
                     try {
-                        int bytes = IOUtil.writeTo(fromStream, toStream, actionId, length);
+                        int bytes = IOUtil.writeTo(fromStream, toStream,
+                                        actionId, length);
                         //System.err.println ("getting url " + resource +"\nread " + bytes);
                         if (bytes < 0) {
                             return new Result(
-                                              request.entryUrl(
-                                                               getRepository().URL_ENTRY_SHOW,
-                                                               parentGroup));
+                                request.entryUrl(
+                                    getRepository().URL_ENTRY_SHOW,
+                                    parentGroup));
                         }
                     } finally {
                         try {
@@ -702,12 +728,13 @@ return new Result(title, sb);
             }
 
 
-            if(unzipArchive && !(resource.endsWith(".zip") ||
-                                 resource.endsWith(".jar"))) {
+            if (unzipArchive
+                    && !(resource.endsWith(".zip")
+                         || resource.endsWith(".jar"))) {
                 unzipArchive = false;
             }
 
-            if (!unzipArchive) {
+            if ( !unzipArchive) {
                 resources.add(resource);
                 origNames.add(resourceName);
             } else {
@@ -720,8 +747,7 @@ return new Result(title, sb);
                     }
                     String name =
                         IOUtil.getFileTail(ze.getName().toLowerCase());
-                    File f = getStorageManager().getTmpFile(request,
-                                                            name);
+                    File f = getStorageManager().getTmpFile(request, name);
                     RepositoryUtil.checkFilePath(f.toString());
                     FileOutputStream fos = new FileOutputStream(f);
 
@@ -734,17 +760,16 @@ return new Result(title, sb);
 
             if (request.exists(ARG_CANCEL)) {
                 return new Result(
-                                  request.entryUrl(
-                                                   getRepository().URL_ENTRY_SHOW, parentGroup));
+                    request.entryUrl(
+                        getRepository().URL_ENTRY_SHOW, parentGroup));
             }
 
 
-            String description = request.getString(ARG_DESCRIPTION,
-                                                   BLANK);
+            String description = request.getString(ARG_DESCRIPTION, BLANK);
 
-            Date createDate = new Date();
-            Date[] dateRange = request.getDateRange(ARG_FROMDATE,
-                                                    ARG_TODATE, createDate);
+            Date   createDate  = new Date();
+            Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
+                                   createDate);
             if (dateRange[0] == null) {
                 dateRange[0] = ((dateRange[1] == null)
                                 ? createDate
@@ -759,13 +784,12 @@ return new Result(title, sb);
 
 
             for (int resourceIdx = 0; resourceIdx < resources.size();
-                 resourceIdx++) {
+                    resourceIdx++) {
                 String theResource = (String) resources.get(resourceIdx);
                 String origName    = (String) origNames.get(resourceIdx);
                 if (isFile && !isLocalFile) {
-                    theResource =
-                        getStorageManager().moveToStorage(request,
-                                                          new File(theResource)).toString();
+                    theResource = getStorageManager().moveToStorage(request,
+                            new File(theResource)).toString();
                 }
                 String name = request.getString(ARG_NAME, BLANK);
                 if (name.indexOf("${") >= 0) {}
@@ -777,11 +801,10 @@ return new Result(title, sb);
                 Date[] theDateRange = { dateRange[0], dateRange[1] };
 
                 if (request.defined(ARG_DATE_PATTERN)) {
-                    String format =
-                        request.getUnsafeString(ARG_DATE_PATTERN, BLANK);
+                    String format = request.getUnsafeString(ARG_DATE_PATTERN,
+                                        BLANK);
                     String pattern = null;
-                    for (int i = 0; i < DateUtil.DATE_PATTERNS.length;
-                         i++) {
+                    for (int i = 0; i < DateUtil.DATE_PATTERNS.length; i++) {
                         if (format.equals(DateUtil.DATE_FORMATS[i])) {
                             pattern = DateUtil.DATE_PATTERNS[i];
                             break;
@@ -793,11 +816,11 @@ return new Result(title, sb);
 
                     if (pattern != null) {
                         Pattern datePattern = Pattern.compile(pattern);
-                        Matcher matcher = datePattern.matcher(origName);
+                        Matcher matcher     = datePattern.matcher(origName);
                         if (matcher.find()) {
                             String dateString = matcher.group(0);
                             Date dttm = RepositoryUtil.makeDateFormat(
-                                                                      format).parse(dateString);
+                                            format).parse(dateString);
                             theDateRange[0] = dttm;
                             theDateRange[1] = dttm;
                             //                            System.err.println("got it");
@@ -807,10 +830,10 @@ return new Result(title, sb);
                     }
                 }
 
-                String id =  getRepository().getGUID();
+                String id           = getRepository().getGUID();
                 String resourceType = Resource.TYPE_UNKNOWN;
-                if(isLocalFile) {
-                    resourceType=Resource.TYPE_LOCAL_FILE;
+                if (isLocalFile) {
+                    resourceType = Resource.TYPE_LOCAL_FILE;
                 } else if (isFile) {
                     resourceType = Resource.TYPE_STOREDFILE;
                 } else {
@@ -823,51 +846,50 @@ return new Result(title, sb);
 
                 if ( !typeHandler.canBeCreatedBy(request)) {
                     throw new IllegalArgumentException(
-                                                       "Cannot create an entry of type "
-                                                       + typeHandler.getDescription());
+                        "Cannot create an entry of type "
+                        + typeHandler.getDescription());
                 }
 
                 entry = typeHandler.createEntry(id);
-             
+
                 entry.initEntry(name, description, parentGroup,
                                 request.getUser(),
                                 new Resource(theResource, resourceType),
                                 dataType, createDate.getTime(),
                                 theDateRange[0].getTime(),
                                 theDateRange[1].getTime(), null);
-                if(forUpload) {
-                    initUploadedEntry(request, entry,parentGroup);
+                if (forUpload) {
+                    initUploadedEntry(request, entry, parentGroup);
                 }
 
                 setEntryState(request, entry);
                 entries.add(entry);
             }
         } else {
-            String       filename     = request.getUploadedFile(ARG_FILE);
+            String filename = request.getUploadedFile(ARG_FILE);
             //Did they upload a new file???
-            if(filename !=null && entry.getResource().isStoredFile()) {
-                filename =
-                    getStorageManager().moveToStorage(request,
-                                                      new File(filename)).toString();
+            if ((filename != null) && entry.getResource().isStoredFile()) {
+                filename = getStorageManager().moveToStorage(request,
+                        new File(filename)).toString();
                 getStorageManager().removeFile(entry.getResource());
-                entry.setResource(new Resource(filename, Resource.TYPE_STOREDFILE));
+                entry.setResource(new Resource(filename,
+                        Resource.TYPE_STOREDFILE));
             }
 
             if (entry.isTopGroup()) {
                 //                    throw new IllegalArgumentException(
                 //                        "Cannot edit top-level group");
             }
-            Date[] dateRange = request.getDateRange(ARG_FROMDATE,
-                                                    ARG_TODATE, new Date());
-            String newName = request.getString(ARG_NAME,
-                                               entry.getLabel());
+            Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE,
+                                   new Date());
+            String newName = request.getString(ARG_NAME, entry.getLabel());
 
 
 
             if (entry.isGroup()) {
                 if (newName.indexOf(Group.IDDELIMITER) >= 0) {
                     throw new IllegalArgumentException(
-                                                       "Cannot have a '/' in group name:" + newName);
+                        "Cannot have a '/' in group name:" + newName);
                 }
 
                 /**
@@ -884,16 +906,16 @@ return new Result(title, sb);
 
             entry.setName(newName);
             entry.setDescription(request.getString(ARG_DESCRIPTION,
-                                                   entry.getDescription()));
-            
-            if(request.get(ARG_PUBLISH,false) && isAnonymousUpload(entry)) {
+                    entry.getDescription()));
+
+            if (request.get(ARG_PUBLISH, false) && isAnonymousUpload(entry)) {
                 publishAnonymousEntry(entry);
             } else {
                 entry.setDataType(dataType);
             }
             if (request.defined(ARG_URL)) {
                 entry.setResource(new Resource(request.getString(ARG_URL,
-                                                                 BLANK)));
+                        BLANK)));
             }
 
             //                System.err.println("dateRange:" + dateRange[0] + " " + dateRange[1]);
@@ -913,16 +935,14 @@ return new Result(title, sb);
         }
 
 
-        if (request.getUser().getAdmin()
-            && request.defined(ARG_USER_ID)) {
+        if (request.getUser().getAdmin() && request.defined(ARG_USER_ID)) {
 
             User newUser =
                 getUserManager().findUser(request.getString(ARG_USER_ID,
-                                                            "").trim());
+                    "").trim());
             if (newUser == null) {
-                throw new IllegalArgumentException(
-                                                   "Could not find user: "
-                                                   + request.getString(ARG_USER_ID, ""));
+                throw new IllegalArgumentException("Could not find user: "
+                        + request.getString(ARG_USER_ID, ""));
             }
             for (Entry theEntry : entries) {
                 theEntry.setUser(newUser);
@@ -936,30 +956,30 @@ return new Result(title, sb);
         insertEntries(entries, newEntry);
 
 
-        if(forUpload) {
+        if (forUpload) {
             entry = (Entry) entries.get(0);
             return new Result(
-                              request.entryUrl(
-                                               getRepository().URL_ENTRY_SHOW, entry.getParentGroup(),
-                                               ARG_MESSAGE,
-                                               "File has been uploaded"));
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, entry.getParentGroup(),
+                    ARG_MESSAGE, "File has been uploaded"));
         }
 
         if (entries.size() == 1) {
             entry = (Entry) entries.get(0);
             return new Result(
-                              request.entryUrl(getRepository().URL_ENTRY_SHOW, entry));
+                request.entryUrl(getRepository().URL_ENTRY_SHOW, entry));
         } else if (entries.size() > 1) {
             entry = (Entry) entries.get(0);
             return new Result(
-                              request.entryUrl(
-                                               getRepository().URL_ENTRY_SHOW, entry.getParentGroup(),
-                                               ARG_MESSAGE,
-                                               entries.size() + HtmlUtil.pad(msg("files uploaded"))));
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, entry.getParentGroup(),
+                    ARG_MESSAGE,
+                    entries.size() + HtmlUtil.pad(msg("files uploaded"))));
         } else {
             return new Result(BLANK,
                               new StringBuffer(msg("No entries created")));
         }
+
     }
 
 
@@ -1191,9 +1211,12 @@ return new Result(title, sb);
      * @param sb _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
     protected Result makeEntryEditResult(Request request, Entry entry,
-                                         String title, StringBuffer sb) throws Exception {
+                                         String title, StringBuffer sb)
+            throws Exception {
         Result result = new Result(title, sb);
         result.putProperty(PROP_NAVSUBLINKS,
                            getRepository().getSubNavLinks(request,
@@ -1201,7 +1224,7 @@ return new Result(title, sb);
                                 ? getRepository().groupEditUrls
                                 : getRepository().entryEditUrls), "?"
                                 + ARG_ENTRYID + "=" + entry.getId()));
-        return addEntryHeader(request, entry,result);
+        return addEntryHeader(request, entry, result);
     }
 
 
@@ -1379,26 +1402,43 @@ return new Result(title, sb);
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processEntryUploadOk(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
         Entry        entry = getEntry(request);
         //We use the datatype on the entry to flag the uploaded entries
         entry.setDataType("");
-        insertEntries((List<Entry>)Misc.newList(entry),true);
-        return new Result(
-                          request.entryUrl(getRepository().URL_ENTRY_SHOW,entry));
+        insertEntries((List<Entry>) Misc.newList(entry), true);
+        return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                           entry));
     }
 
+    /** _more_          */
     public final static String DATATYPE_UPLOAD = "upload";
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
     private void publishAnonymousEntry(Entry entry) throws Exception {
-        Metadata metadata = 
-            getMetadataManager().findMetadata(entry, AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD,
-                                              false);
+        Metadata metadata = getMetadataManager().findMetadata(entry,
+                                AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD,
+                                false);
         //Reset the datatype
-        if(metadata!=null) {
+        if (metadata != null) {
             User newUser = getUserManager().findUser(metadata.getAttr1());
-            if(newUser!=null) {
+            if (newUser != null) {
                 entry.setUser(newUser);
             } else {
                 entry.setUser(entry.getParentGroup().getUser());
@@ -1410,53 +1450,89 @@ return new Result(title, sb);
 
     }
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public boolean isAnonymousUpload(Entry entry) {
-        return Misc.equals(entry.getDataType(),DATATYPE_UPLOAD);
+        return Misc.equals(entry.getDataType(), DATATYPE_UPLOAD);
     }
 
 
-    private void initUploadedEntry(Request request, Entry entry,Group parentGroup) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param parentGroup _more_
+     *
+     * @throws Exception _more_
+     */
+    private void initUploadedEntry(Request request, Entry entry,
+                                   Group parentGroup)
+            throws Exception {
         String oldType = entry.getDataType();
         entry.setDataType(DATATYPE_UPLOAD);
 
         String user = request.getUser().getId();
-        if(user.length()==0) {
+        if (user.length() == 0) {
             user = "anonymous";
         }
-        entry.addMetadata(new Metadata(getRepository().getGUID(),entry.getId(),
-                                       AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD.getType(),
-                                       false,
-                                       user,
-                                       request.getIp(),(oldType!=null?oldType:""),""));
+        entry.addMetadata(
+            new Metadata(
+                getRepository().getGUID(), entry.getId(),
+                AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD.getType(), false,
+                user, request.getIp(), ((oldType != null)
+                                        ? oldType
+                                        : ""), ""));
         User parentUser = parentGroup.getUser();
         if (true || getAdmin().isEmailCapable()) {
-            StringBuffer  contents = new StringBuffer("A new entry has been uploaded to the RAMADDA server under the group: ");
-            String url1 = HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),ARG_ENTRYID,parentGroup.getId());
+            StringBuffer contents =
+                new StringBuffer(
+                    "A new entry has been uploaded to the RAMADDA server under the group: ");
+            String url1 =
+                HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
+                             ARG_ENTRYID, parentGroup.getId());
 
-            contents.append(HtmlUtil.href(url1,parentGroup.getFullName()));
+            contents.append(HtmlUtil.href(url1, parentGroup.getFullName()));
             contents.append("<p>\n\n");
-            String url = HtmlUtil.url(getRepository().URL_ENTRY_FORM.getFullUrl(),ARG_ENTRYID,entry.getId());
+            String url =
+                HtmlUtil.url(getRepository().URL_ENTRY_FORM.getFullUrl(),
+                             ARG_ENTRYID, entry.getId());
             contents.append("Edit to confirm: ");
-            contents.append(HtmlUtil.href(url,entry.getLabel()));
-            if ( getAdmin().isEmailCapable()) {
-                getAdmin().sendEmail(parentUser.getEmail(), "Uploaded Entry", contents.toString(),
-                                     true);
+            contents.append(HtmlUtil.href(url, entry.getLabel()));
+            if (getAdmin().isEmailCapable()) {
+                getAdmin().sendEmail(parentUser.getEmail(), "Uploaded Entry",
+                                     contents.toString(), true);
             }
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processEntryUpload(Request request) throws Exception {
-        TypeHandler typeHandler = getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
+        TypeHandler typeHandler =
+            getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
         Group        group = findGroup(request);
         StringBuffer sb    = new StringBuffer();
-        if(!request.exists(ARG_NAME)) {
+        if ( !request.exists(ARG_NAME)) {
             sb.append(request.uploadForm(getRepository().URL_ENTRY_UPLOAD,
                                          HtmlUtil.attr("name", "entryform")));
             sb.append(HtmlUtil.submit(msg("Upload")));
             sb.append(HtmlUtil.formTable());
             sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
-            typeHandler.addToEntryForm(request,  sb, null);
+            typeHandler.addToEntryForm(request, sb, null);
             sb.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.submit(msg("Upload")));
             sb.append(HtmlUtil.formClose());
@@ -1536,29 +1612,32 @@ return new Result(title, sb);
         //        System.err.println("request:" + request);
 
         String path = entry.getResource().getPath();
-        String mimeType = getRepository().getMimeTypeFromSuffix(IOUtil.getFileExtension(entry.getResource().getPath()));
+        String mimeType = getRepository().getMimeTypeFromSuffix(
+                              IOUtil.getFileExtension(
+                                  entry.getResource().getPath()));
 
-          if (request.defined(ARG_IMAGEWIDTH)
-                && ImageUtils.isImage(path)) {
+        if (request.defined(ARG_IMAGEWIDTH) && ImageUtils.isImage(path)) {
             int    width    = request.get(ARG_IMAGEWIDTH, 75);
             String thumbDir = getStorageManager().getThumbDir();
-            String thumb = IOUtil.joinDir(thumbDir,
-                                          "entry" + IOUtil.cleanFileName(entry.getId()) + "_"
-                                          + width + IOUtil.getFileExtension(path));
-            if (!new File(thumb).exists()) {
-                Image image = ImageUtils.readImage(entry.getResource().getPath());
-                image = ImageUtils.resize(image, width,-1);
+            String thumb =
+                IOUtil.joinDir(thumbDir,
+                               "entry" + IOUtil.cleanFileName(entry.getId())
+                               + "_" + width + IOUtil.getFileExtension(path));
+            if ( !new File(thumb).exists()) {
+                Image image =
+                    ImageUtils.readImage(entry.getResource().getPath());
+                image = ImageUtils.resize(image, width, -1);
                 ImageUtils.waitOnImage(image);
                 ImageUtils.writeImageToFile(image, thumb);
             }
-            return new Result(
-                BLANK, IOUtil.getInputStream(thumb,
-                                             getClass()),mimeType);
-        } else {
-            InputStream inputStream =  IOUtil.getInputStream(entry.getResource()
-                                                    .getPath(), getClass());
             return new Result(BLANK,
-                              inputStream, mimeType);
+                              IOUtil.getInputStream(thumb, getClass()),
+                              mimeType);
+        } else {
+            InputStream inputStream =
+                IOUtil.getInputStream(entry.getResource().getPath(),
+                                      getClass());
+            return new Result(BLANK, inputStream, mimeType);
         }
 
     }
@@ -1630,7 +1709,7 @@ return new Result(title, sb);
      */
     public Result processEntryCopy(Request request) throws Exception {
 
-        String fromIds = request.getString(ARG_FROM, "");
+        String      fromIds = request.getString(ARG_FROM, "");
         List<Entry> entries = new ArrayList<Entry>();
         for (String id : StringUtil.split(fromIds, ",", true, true)) {
             Entry entry = getEntry(request, id, false);
@@ -1649,40 +1728,48 @@ return new Result(title, sb);
         }
 
 
-        if (entries.size()==0) {
+        if (entries.size() == 0) {
             throw new IllegalArgumentException("No entries specified");
         }
 
         if (request.exists(ARG_CANCEL)) {
             return new Result(
-                request.entryUrl(getRepository().URL_ENTRY_SHOW, entries.get(0)));
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, entries.get(0)));
         }
 
         if ( !request.exists(ARG_TO)) {
             StringBuffer sb     = new StringBuffer();
             List<Entry>  cart   = getUserManager().getCart(request);
             boolean      didOne = false;
-            List<Entry> favorites = FavoriteEntry.getEntries(getUserManager().getFavorites(request,                                    request.getUser()));
+            List<Entry> favorites = FavoriteEntry.getEntries(
+                                        getUserManager().getFavorites(
+                                            request, request.getUser()));
             List<Group> groups = getGroups(cart);
             groups.addAll(getGroups(favorites));
             HashSet seen = new HashSet();
-            for (Group group: groups) {
-                if(seen.contains(group.getId())) continue;
+            for (Group group : groups) {
+                if (seen.contains(group.getId())) {
+                    continue;
+                }
                 seen.add(group.getId());
                 if ( !getAccessManager().canDoAction(request, group,
                         Permission.ACTION_NEW)) {
                     continue;
                 }
                 boolean ok = true;
-                for(Entry fromEntry: entries) {
+                for (Entry fromEntry : entries) {
                     if ( !okToMove(fromEntry, group)) {
                         ok = false;
                     }
                 }
-                if(!ok) continue;
+                if ( !ok) {
+                    continue;
+                }
 
                 if ( !didOne) {
-                    sb.append(header("Please select a group to copy/move the given entries to:"));
+                    sb.append(
+                        header("Please select a group to copy/move the given entries to:"));
                     sb.append("<ul>");
                 }
                 sb.append(HtmlUtil.img(getIconUrl(request, group)));
@@ -1691,7 +1778,8 @@ return new Result(title, sb);
                     HtmlUtil.href(
                         request.url(
                             getRepository().URL_ENTRY_COPY, ARG_FROM,
-                            fromIds, ARG_TO, group.getId()), group.getLabel()));
+                            fromIds, ARG_TO,
+                            group.getId()), group.getLabel()));
                 sb.append(HtmlUtil.br());
                 didOne = true;
             }
@@ -1704,13 +1792,15 @@ return new Result(title, sb);
             } else {
                 sb.append("</ul>");
             }
-            return addEntryHeader(request, entries.get(0),new Result(msg("Entry Move/Copy"), sb));
+            return addEntryHeader(request, entries.get(0),
+                                  new Result(msg("Entry Move/Copy"), sb));
         }
 
 
         String toId = request.getString(ARG_TO, "");
         if (toId == null) {
-            throw new IllegalArgumentException("No destination group specified");
+            throw new IllegalArgumentException(
+                "No destination group specified");
         }
 
         Entry toEntry = getEntry(request, toId);
@@ -1727,11 +1817,11 @@ return new Result(title, sb);
 
 
         if (request.exists(ARG_ACTION_MOVE)) {
-            for(Entry fromEntry: entries) {
+            for (Entry fromEntry : entries) {
                 if ( !getAccessManager().canDoAction(request, fromEntry,
-                                                     Permission.ACTION_EDIT)) {
+                        Permission.ACTION_EDIT)) {
                     throw new RepositoryUtil.AccessException("Cannot move:"
-                                                             + fromEntry.getLabel());
+                            + fromEntry.getLabel());
                 }
             }
         }
@@ -1744,23 +1834,27 @@ return new Result(title, sb);
 
 
         StringBuffer fromList = new StringBuffer();
-        for(Entry fromEntry: entries) {
+        for (Entry fromEntry : entries) {
             if ( !okToMove(fromEntry, toEntry)) {
                 StringBuffer sb = new StringBuffer();
                 sb.append(
-                          getRepository().error(
-                                                msg("Cannot move a group to its descendent")));
-                return addEntryHeader(request, fromEntry,new Result("", sb));
+                    getRepository().error(
+                        msg("Cannot move a group to its descendent")));
+                return addEntryHeader(request, fromEntry, new Result("", sb));
             }
             fromList.append(HtmlUtil.space(3));
-            fromList.append(getEntryManager().getBreadCrumbs(request, fromEntry));
+            fromList.append(getEntryManager().getBreadCrumbs(request,
+                    fromEntry));
             fromList.append(HtmlUtil.br());
         }
 
 
-        if (!(request.exists(ARG_ACTION_MOVE) ||  request.exists(ARG_ACTION_COPY))) {
+        if ( !(request.exists(ARG_ACTION_MOVE)
+                || request.exists(ARG_ACTION_COPY))) {
             StringBuffer sb = new StringBuffer();
-            sb.append(msgLabel("Are you sure you want to copy/move the following entries to the group"));
+            sb.append(
+                msgLabel(
+                    "Are you sure you want to copy/move the following entries to the group"));
             sb.append(HtmlUtil.br());
             sb.append(HtmlUtil.space(3));
             sb.append(toEntry.getLabel());
@@ -1775,52 +1869,73 @@ return new Result(title, sb);
             fb.append(HtmlUtil.space(1));
             fb.append(HtmlUtil.submit("Cancel", ARG_CANCEL));
             fb.append(HtmlUtil.formClose());
-            StringBuffer contents = new StringBuffer(getRepository().question(sb.toString(), fb.toString()));
+            StringBuffer contents =
+                new StringBuffer(getRepository().question(sb.toString(),
+                    fb.toString()));
             contents.append(fromList);
-            return new Result(msg("Move confirm"),contents);
+            return new Result(msg("Move confirm"), contents);
         }
 
 
-        if(request.exists(ARG_ACTION_MOVE)) {
-            return processEntryMove(request, toGroup,entries);
-        } else if(request.exists(ARG_ACTION_COPY)) {
+        if (request.exists(ARG_ACTION_MOVE)) {
+            return processEntryMove(request, toGroup, entries);
+        } else if (request.exists(ARG_ACTION_COPY)) {
             return processEntryCopy(request, toGroup, entries);
         }
 
-        return new Result(msg("Move"),new StringBuffer());
+        return new Result(msg("Move"), new StringBuffer());
     }
 
 
-    private  Result processEntryCopy(Request request, Group toGroup, List<Entry> entries) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        Connection connection = getDatabaseManager().getNewConnection();
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param toGroup _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Result processEntryCopy(Request request, Group toGroup,
+                                    List<Entry> entries)
+            throws Exception {
+        StringBuffer sb         = new StringBuffer();
+        Connection   connection = getDatabaseManager().getNewConnection();
         connection.setAutoCommit(false);
-        Statement statement = connection.createStatement();
+        Statement   statement  = connection.createStatement();
         List<Entry> newEntries = new ArrayList<Entry>();
         try {
             List<String[]> ids = getDescendents(request, entries, connection,
-                                                  true);
-            Hashtable<String,Entry>  oldIdToNewEntry= new Hashtable<String,Entry>();
-            for (int i = 0;i<ids.size(); i++) {
-                String[] tuple = ids.get(i);
-                String   id    = tuple[0];
-                Entry oldEntry = getEntry(request,id);
-                String newId = getRepository().getGUID();
+                                     true);
+            Hashtable<String, Entry> oldIdToNewEntry = new Hashtable<String,
+                                                           Entry>();
+            for (int i = 0; i < ids.size(); i++) {
+                String[] tuple    = ids.get(i);
+                String   id       = tuple[0];
+                Entry    oldEntry = getEntry(request, id);
+                String   newId    = getRepository().getGUID();
                 Entry newEntry = oldEntry.getTypeHandler().createEntry(newId);
                 oldIdToNewEntry.put(oldEntry.getId(), newEntry);
                 //(String name, String description, Group group,User user, Resource resource, String dataType,
                 //                          long createDate, long startDate, long endDate, Object[] values) {
                 //See if this new entry is somewhere down in the tree
-                Entry newParent = oldIdToNewEntry.get(oldEntry.getParentGroupId());
-                if(newParent==null) {
+                Entry newParent =
+                    oldIdToNewEntry.get(oldEntry.getParentGroupId());
+                if (newParent == null) {
                     newParent = toGroup;
                 }
                 Resource newResource = new Resource(oldEntry.getResource());
-                if(newResource.isFile()) {
-                    String newFileName = getStorageManager().getFileTail(oldEntry.getResource().getFile().getName());
-                    String newFile = getStorageManager().copyToStorage(request,
-                                                                       oldEntry.getResource().getFile(),
-                                                                       getRepository().getGUID() + "_" + newFileName).toString();
+                if (newResource.isFile()) {
+                    String newFileName =
+                        getStorageManager().getFileTail(
+                            oldEntry.getResource().getFile().getName());
+                    String newFile =
+                        getStorageManager().copyToStorage(request,
+                            oldEntry.getResource().getFile(),
+                            getRepository().getGUID() + "_"
+                            + newFileName).toString();
                     newResource.setPath(newFile);
                     //                    System.err.println("old file: " + oldEntry.getResource());
                     //                    System.err.println("new file: " + newResource);
@@ -1829,19 +1944,18 @@ return new Result(title, sb);
 
                 newEntry.initEntry(oldEntry.getName(),
                                    oldEntry.getDescription(),
-                                   (Group)newParent,
-                                   request.getUser(),
-                                   newResource,
-                                   oldEntry.getDataType(),
+                                   (Group) newParent, request.getUser(),
+                                   newResource, oldEntry.getDataType(),
                                    oldEntry.getCreateDate(),
                                    oldEntry.getStartDate(),
                                    oldEntry.getEndDate(),
                                    oldEntry.getValues());
 
                 List<Metadata> newMetadata = new ArrayList<Metadata>();
-                for (Metadata oldMetadata : getMetadataManager().getMetadata(oldEntry)) {
-                    newMetadata.add(new Metadata(getRepository().getGUID(), newEntry.getId(),
-                                                 oldMetadata));
+                for (Metadata oldMetadata : getMetadataManager().getMetadata(
+                        oldEntry)) {
+                    newMetadata.add(new Metadata(getRepository().getGUID(),
+                            newEntry.getId(), oldMetadata));
                 }
                 newEntry.setMetadata(newMetadata);
                 newEntries.add(newEntry);
@@ -1849,8 +1963,7 @@ return new Result(title, sb);
             insertEntries(newEntries, true);
             return new Result(request.url(getRepository().URL_ENTRY_SHOW,
                                           ARG_ENTRYID, toGroup.getId(),
-                                          ARG_MESSAGE,
-                                          "Entries copied"));
+                                          ARG_MESSAGE, "Entries copied"));
         } finally {
             try {
                 connection.close();
@@ -1858,52 +1971,62 @@ return new Result(title, sb);
         }
     }
 
-    /******************
-                if (false && fromEntry.isGroup()) {
-                    newId = getGroupId(toGroup);
-                    fromEntry.setId(newId);
-                    String[] info = {
-                        Tables.ENTRIES.NAME, Tables.ENTRIES.COL_ID,
-                        Tables.ENTRIES.NAME,
-                        Tables.ENTRIES.COL_PARENT_GROUP_ID,
-                        Tables.METADATA.NAME, Tables.METADATA.COL_ENTRY_ID,
-                        Tables.COMMENTS.NAME, Tables.COMMENTS.COL_ENTRY_ID,
-                        Tables.ASSOCIATIONS.NAME,
-                        Tables.ASSOCIATIONS.COL_FROM_ENTRY_ID,
-                        Tables.ASSOCIATIONS.NAME,
-                        Tables.ASSOCIATIONS.COL_TO_ENTRY_ID,
-                        Tables.PERMISSIONS.NAME,
-                        Tables.PERMISSIONS.COL_ENTRY_ID
-                    };
+    /**
+     *           if (false && fromEntry.isGroup()) {
+     *               newId = getGroupId(toGroup);
+     *               fromEntry.setId(newId);
+     *               String[] info = {
+     *                   Tables.ENTRIES.NAME, Tables.ENTRIES.COL_ID,
+     *                   Tables.ENTRIES.NAME,
+     *                   Tables.ENTRIES.COL_PARENT_GROUP_ID,
+     *                   Tables.METADATA.NAME, Tables.METADATA.COL_ENTRY_ID,
+     *                   Tables.COMMENTS.NAME, Tables.COMMENTS.COL_ENTRY_ID,
+     *                   Tables.ASSOCIATIONS.NAME,
+     *                   Tables.ASSOCIATIONS.COL_FROM_ENTRY_ID,
+     *                   Tables.ASSOCIATIONS.NAME,
+     *                   Tables.ASSOCIATIONS.COL_TO_ENTRY_ID,
+     *                   Tables.PERMISSIONS.NAME,
+     *                   Tables.PERMISSIONS.COL_ENTRY_ID
+     *               };
+     *
+     *
+     *               for (int i = 0; i < info.length; i += 2) {
+     *                   String sql = "UPDATE  " + info[i] + " SET "
+     *                                + SqlUtil.unDot(info[i + 1]) + " = "
+     *                                + SqlUtil.quote(newId) + " WHERE "
+     *                                + SqlUtil.eq(info[i + 1],
+     *                                    SqlUtil.quote(oldId));
+     *                   //                        System.err.println (sql);
+     *                   statement.execute(sql);
+     *               }
+     *
+     *               //TODO: we also cache the group full names
+     *                                   synchronized(MUTEX_ENTRY) {
+     *                   entryCache.remove(oldId);
+     *                   entryCache.put(fromEntry.getId(), fromEntry);
+     *                   groupCache.remove(fromEntry.getId());
+     *                   groupCache.put(fromEntry.getId(), (Group) fromEntry);
+     *                   }
+     *           }
+     *
+     * @param request _more_
+     * @param toGroup _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
 
 
-                    for (int i = 0; i < info.length; i += 2) {
-                        String sql = "UPDATE  " + info[i] + " SET "
-                                     + SqlUtil.unDot(info[i + 1]) + " = "
-                                     + SqlUtil.quote(newId) + " WHERE "
-                                     + SqlUtil.eq(info[i + 1],
-                                         SqlUtil.quote(oldId));
-                        //                        System.err.println (sql);
-                        statement.execute(sql);
-                    }
-
-                    //TODO: we also cache the group full names
-                                        synchronized(MUTEX_ENTRY) {
-                        entryCache.remove(oldId);
-                        entryCache.put(fromEntry.getId(), fromEntry);
-                        groupCache.remove(fromEntry.getId());
-                        groupCache.put(fromEntry.getId(), (Group) fromEntry);
-                        }
-                }
-    **********/
-
-
-    private  Result processEntryMove(Request request, Group toGroup, List<Entry> entries) throws Exception {
+    private Result processEntryMove(Request request, Group toGroup,
+                                    List<Entry> entries)
+            throws Exception {
         Connection connection = getDatabaseManager().getNewConnection();
         connection.setAutoCommit(false);
         Statement statement = connection.createStatement();
         try {
-            for(Entry fromEntry: entries) {
+            for (Entry fromEntry : entries) {
                 fromEntry.setParentGroup(toGroup);
                 String oldId = fromEntry.getId();
                 String newId = oldId;
@@ -1921,7 +2044,8 @@ return new Result(title, sb);
             connection.setAutoCommit(true);
             getRepository().clearCache();
             return new Result(request.url(getRepository().URL_ENTRY_SHOW,
-                                          ARG_ENTRYID, entries.get(0).getId()));
+                                          ARG_ENTRYID,
+                                          entries.get(0).getId()));
         } finally {
             try {
                 connection.close();
@@ -1951,14 +2075,16 @@ return new Result(title, sb);
             sb.append(msgLabel("Import a catalog"));
             sb.append(HtmlUtil.formTable());
             sb.append(HtmlUtil.formEntry(msgLabel("URL"),
-                                         HtmlUtil.input(ARG_CATALOG, BLANK, HtmlUtil.SIZE_70)));
-            sb.append(HtmlUtil.formEntry("", HtmlUtil.checkbox(ARG_RECURSE, "true", false)+
-                                         HtmlUtil.space(1) +msg("Recurse")+
-                                         HtmlUtil.space(1)+
-                                         HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD, "true", false) +
-                                         HtmlUtil.space(1)+
-                                         msg("Download URLS")));
-            sb.append(HtmlUtil.formEntry("",HtmlUtil.submit(msg("Go"))));
+                                         HtmlUtil.input(ARG_CATALOG, BLANK,
+                                             HtmlUtil.SIZE_70)));
+            sb.append(
+                HtmlUtil.formEntry(
+                    "",
+                    HtmlUtil.checkbox(ARG_RECURSE, "true", false)
+                    + HtmlUtil.space(1) + msg("Recurse") + HtmlUtil.space(1)
+                    + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD, "true", false)
+                    + HtmlUtil.space(1) + msg("Download URLS")));
+            sb.append(HtmlUtil.formEntry("", HtmlUtil.submit(msg("Go"))));
             sb.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.formClose());
         }
@@ -2075,17 +2201,17 @@ return new Result(title, sb);
         Document  resultDoc  = XmlUtil.makeDocument();
         Element resultRoot = XmlUtil.create(resultDoc, TAG_RESPONSE, null,
                                             new String[] { ATTR_CODE,
-                                                           CODE_OK });
+                CODE_OK });
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
             if (node.getTagName().equals(TAG_ENTRY)) {
                 Entry entry = processEntryXml(request, node, entries,
-                                  origFileToStorage, true,false);
+                                  origFileToStorage, true, false);
                 //                System.err.println("entry:" + entry.getFullName() + " " + entry.getId());
 
                 XmlUtil.create(resultDoc, TAG_ENTRY, resultRoot,
                                new String[] { ATTR_ID,
-                                              entry.getId() });
+                        entry.getId() });
                 newEntries.add(entry);
                 if (XmlUtil.getAttribute(node, ATTR_ADDMETADATA, false)) {
                     List<Entry> tmpEntries =
@@ -2130,6 +2256,7 @@ return new Result(title, sb);
      * @param entries _more_
      * @param files _more_
      * @param checkAccess _more_
+     * @param internal _more_
      *
      * @return _more_
      *
@@ -2137,8 +2264,7 @@ return new Result(title, sb);
      */
     protected Entry processEntryXml(Request request, Element node,
                                     Hashtable entries, Hashtable files,
-                                    boolean checkAccess,
-                                    boolean internal)
+                                    boolean checkAccess, boolean internal)
             throws Exception {
 
         String name = XmlUtil.getAttribute(node, ATTR_NAME);
@@ -2168,13 +2294,13 @@ return new Result(title, sb);
 
         if (checkAccess) {
             if ( !getAccessManager().canDoAction(request, parentGroup,
-                                                 Permission.ACTION_NEW)) {
-                if ( getAccessManager().canDoAction(request, parentGroup,
-                                                    Permission.ACTION_UPLOAD)) {
+                    Permission.ACTION_NEW)) {
+                if (getAccessManager().canDoAction(request, parentGroup,
+                        Permission.ACTION_UPLOAD)) {
                     doAnonymousUpload = true;
                 } else {
                     throw new IllegalArgumentException(
-                                                       "Cannot add to parent group:" + parentId);
+                        "Cannot add to parent group:" + parentId);
                 }
             }
         }
@@ -2184,13 +2310,16 @@ return new Result(title, sb);
         if (file != null) {
             String tmp = (String) files.get(file);
             String newFile = getStorageManager().moveToStorage(request,
-                                                               new File(tmp)).toString();
+                                 new File(tmp)).toString();
             file = newFile;
         }
-        String url   = XmlUtil.getAttribute(node, ATTR_URL, (String) null);
-        String localFile   = XmlUtil.getAttribute(node, ATTR_LOCALFILE, (String) null);
-        String localFileToMove   = XmlUtil.getAttribute(node, ATTR_LOCALFILETOMOVE, (String) null);
-        String tmpid = XmlUtil.getAttribute(node, ATTR_ID, (String) null);
+        String url = XmlUtil.getAttribute(node, ATTR_URL, (String) null);
+        String localFile = XmlUtil.getAttribute(node, ATTR_LOCALFILE,
+                               (String) null);
+        String localFileToMove = XmlUtil.getAttribute(node,
+                                     ATTR_LOCALFILETOMOVE, (String) null);
+        String      tmpid = XmlUtil.getAttribute(node, ATTR_ID,
+                                (String) null);
 
         TypeHandler typeHandler = getRepository().getTypeHandler(type);
         if (typeHandler == null) {
@@ -2205,14 +2334,20 @@ return new Result(title, sb);
         if (file != null) {
             resource = new Resource(file, Resource.TYPE_STOREDFILE);
         } else if (localFile != null) {
-            if(!request.getUser().getAdmin()) throw new IllegalArgumentException("Only administrators can upload a local file");
+            if ( !request.getUser().getAdmin()) {
+                throw new IllegalArgumentException(
+                    "Only administrators can upload a local file");
+            }
             resource = new Resource(localFile, Resource.TYPE_LOCAL_FILE);
         } else if (localFileToMove != null) {
-            if(!request.getUser().getAdmin()) throw new IllegalArgumentException("Only administrators can upload a local file");
-            localFileToMove = 
-                getStorageManager().moveToStorage(request,
-                                                  new File(localFileToMove)).toString();
-            resource = new Resource(localFileToMove, Resource.TYPE_STOREDFILE);
+            if ( !request.getUser().getAdmin()) {
+                throw new IllegalArgumentException(
+                    "Only administrators can upload a local file");
+            }
+            localFileToMove = getStorageManager().moveToStorage(request,
+                    new File(localFileToMove)).toString();
+            resource = new Resource(localFileToMove,
+                                    Resource.TYPE_STOREDFILE);
         } else if (url != null) {
             resource = new Resource(url, Resource.TYPE_URL);
         } else {
@@ -2241,8 +2376,8 @@ return new Result(title, sb);
                         resource, dataType, createDate.getTime(),
                         fromDate.getTime(), toDate.getTime(), null);
 
-        if(doAnonymousUpload) {
-            initUploadedEntry(request, entry,parentGroup);
+        if (doAnonymousUpload) {
+            initUploadedEntry(request, entry, parentGroup);
         }
         entry.setNorth(Misc.decodeLatLon(XmlUtil.getAttribute(node,
                 ATTR_NORTH, entry.getNorth() + "")));
@@ -2256,7 +2391,8 @@ return new Result(title, sb);
         for (Element entryChild : (List<Element>) entryChildren) {
             String tag = entryChild.getTagName();
             if (tag.equals(TAG_METADATA)) {
-                getMetadataManager().processMetadataXml(entry, entryChild,files,internal);
+                getMetadataManager().processMetadataXml(entry, entryChild,
+                        files, internal);
             } else if (tag.equals(TAG_DESCRIPTION)) {}
             else {
                 throw new IllegalArgumentException("Unknown tag:"
@@ -2315,10 +2451,11 @@ return new Result(title, sb);
         //        sb.append(makeEntryHeader(request, entry));
         sb.append("<p>");
         sb.append(getCommentHtml(request, entry));
-        return addEntryHeader(request, entry,new OutputHandler(getRepository(),
-                                                               "tmp").makeLinksResult(request,
-                                                                                      msg("Entry Comments"), sb,
-                                                                                      new OutputHandler.State(entry)));
+        return addEntryHeader(request, entry,
+                              new OutputHandler(getRepository(),
+                                  "tmp").makeLinksResult(request,
+                                      msg("Entry Comments"), sb,
+                                      new OutputHandler.State(entry)));
     }
 
 
@@ -2432,10 +2569,12 @@ return new Result(title, sb);
             });
             //Now clear out the comments in the cached entry
             entry.setComments(null);
-            return addEntryHeader(request, entry,  
-                                  new Result(request.url(getRepository().URL_COMMENTS_SHOW,
-                                                         ARG_ENTRYID, entry.getId(),
-                                                         ARG_MESSAGE, "Comment added")));
+            return addEntryHeader(
+                request, entry,
+                new Result(
+                    request.url(
+                        getRepository().URL_COMMENTS_SHOW, ARG_ENTRYID,
+                        entry.getId(), ARG_MESSAGE, "Comment added")));
         }
 
         sb.append(msgLabel("Add comment for") + getEntryLink(request, entry));
@@ -2456,10 +2595,11 @@ return new Result(title, sb);
                     HtmlUtil.submit(msg("Cancel"), ARG_CANCEL))));
         sb.append(HtmlUtil.formTableClose());
         sb.append(HtmlUtil.formClose());
-        return addEntryHeader(request, entry,new OutputHandler(getRepository(),
-                                 "tmp").makeLinksResult(request,
-                                     msg("Entry Comments"), sb,
-                                     new OutputHandler.State(entry)));
+        return addEntryHeader(request, entry,
+                              new OutputHandler(getRepository(),
+                                  "tmp").makeLinksResult(request,
+                                      msg("Entry Comments"), sb,
+                                      new OutputHandler.State(entry)));
     }
 
 
@@ -2512,8 +2652,9 @@ return new Result(title, sb);
                                                   entry.getId(),
                                                   ARG_COMMENT_ID,
                                                   comment.getId()), HtmlUtil
-                                                      .img(iconUrl(ICON_DELETE), msg(
-                                                              "Delete comment"))));
+                                                      .img(iconUrl(
+                                                          ICON_DELETE), msg(
+                                                          "Delete comment"))));
             if (canEdit) {
                 //                sb.append(HtmlUtil.formEntry(BLANK, deleteLink));
             }
@@ -2634,12 +2775,27 @@ return new Result(title, sb);
                                  boolean includeIcon)
             throws Exception {
         return getAjaxLink(request, entry, linkText, url, includeIcon, true);
-    }        
+    }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param linkText _more_
+     * @param url _more_
+     * @param includeIcon _more_
+     * @param forTreeNavigation _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected String getAjaxLink(Request request, Entry entry,
                                  String linkText, String url,
-                                 boolean includeIcon, boolean forTreeNavigation)
+                                 boolean includeIcon,
+                                 boolean forTreeNavigation)
             throws Exception {
 
 
@@ -2652,24 +2808,24 @@ return new Result(title, sb);
             String  icon     = getIconUrl(request, entry);
             String dropEvent = HtmlUtil.onMouseUp("mouseUpOnEntry(event,'"
                                    + entry.getId() + "')");
-            String event="";
+            String event  = "";
 
-            String       compId = "popup_" + HtmlUtil.blockCnt++;
+            String compId = "popup_" + HtmlUtil.blockCnt++;
             String linkId = "img_" + uid;
 
-            if(entry.isGroup() && forTreeNavigation) {
+            if (entry.isGroup() && forTreeNavigation) {
                 event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
-                                                            HtmlUtil.squote(entryId) + ","
-                                                            + HtmlUtil.squote(uid) +",null,null,"+
-                                                            HtmlUtil.squote(iconUrl(ICON_FOLDER_OPEN))));
-            } else if(!forTreeNavigation) {
+                        HtmlUtil.squote(entryId) + "," + HtmlUtil.squote(uid)
+                        + ",null,null,"
+                        + HtmlUtil.squote(iconUrl(ICON_FOLDER_OPEN))));
+            } else if ( !forTreeNavigation) {
                 event = HtmlUtil.onMouseClick("showMenu(event,"
-                                              + HtmlUtil.squote(linkId) + ","
-                                              + HtmlUtil.squote(compId) + ");");
+                        + HtmlUtil.squote(linkId) + ","
+                        + HtmlUtil.squote(compId) + ");");
             }
 
             if (okToMove) {
-                event += (entry.isGroup()&&forTreeNavigation
+                event += ((entry.isGroup() && forTreeNavigation)
                           ? HtmlUtil.onMouseOver("mouseOverOnEntry(event,"
                           + HtmlUtil.squote(entryId) + ")")
                           : "") + HtmlUtil
@@ -2685,17 +2841,18 @@ return new Result(title, sb);
                         ? dropEvent
                         : "");
             }
-            String img = HtmlUtil.img(icon, (entry.isGroup()&&forTreeNavigation
-                                             ? msg("Click to open group") +"; "
-                                             : "") + (okToMove
-                                                      ? msg("Drag to move")
-                                                      : ""), HtmlUtil.id("img_" + uid) + event);
+            String img = HtmlUtil.img(icon,
+                                      ((entry.isGroup() && forTreeNavigation)
+                                       ? msg("Click to open group") + "; "
+                                       : "") + (okToMove
+                    ? msg("Drag to move")
+                    : ""), HtmlUtil.id("img_" + uid) + event);
 
 
 
 
             sb.append(img);
-            if(!entry.isGroup()||!forTreeNavigation) {
+            if ( !entry.isGroup() || !forTreeNavigation) {
                 //                String links = getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL);
                 //                sb.append(getRepository().makePopupDiv(links, compId, true));
             }
@@ -2708,22 +2865,25 @@ return new Result(title, sb);
 
         String elementId = entry.getId();
         String qid       = HtmlUtil.squote(elementId);
-        String linkId =  "link_"+(HtmlUtil.blockCnt++);
-        String qlinkId =  HtmlUtil.squote(linkId);
-        String tooltipEvents =
-            HtmlUtil.onMouseOver("tooltip.onMouseOver(event," + qid + "," + qlinkId+");")
-            + HtmlUtil.onMouseOut("tooltip.onMouseOut(event," + qid + "," + qlinkId+ ");")
-            + HtmlUtil.onMouseMove("tooltip.onMouseMove(event," + qid + "," + qlinkId+ ");");
+        String linkId    = "link_" + (HtmlUtil.blockCnt++);
+        String qlinkId   = HtmlUtil.squote(linkId);
+        String tooltipEvents = HtmlUtil.onMouseOver(
+                                   "tooltip.onMouseOver(event," + qid + ","
+                                   + qlinkId + ");") + HtmlUtil.onMouseOut(
+                                       "tooltip.onMouseOut(event," + qid
+                                       + "," + qlinkId
+                                       + ");") + HtmlUtil.onMouseMove(
+                                           "tooltip.onMouseMove(event," + qid
+                                           + "," + qlinkId + ");");
         sb.append(HtmlUtil.href(url, linkText,
-                                HtmlUtil.id(linkId) + " "
-                                + tooltipEvents));
+                                HtmlUtil.id(linkId) + " " + tooltipEvents));
 
         String link = HtmlUtil.span(sb.toString(),
                                     HtmlUtil.id("span_" + entry.getId()));
 
 
         if (includeIcon) {
-            link = link  +"<br>" 
+            link = link + "<br>"
                    + HtmlUtil.div("",
                                   HtmlUtil.attrs(HtmlUtil.ATTR_STYLE,
                                       "display:none;visibility:hidden",
@@ -2768,30 +2928,48 @@ return new Result(title, sb);
 
 
 
-    protected String getEntryActionsTable(Request request, Entry entry,int typeMask)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param typeMask _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected String getEntryActionsTable(Request request, Entry entry,
+                                          int typeMask)
             throws Exception {
-        List<Link> links   = getEntryLinks(request, entry);
-        StringBuffer htmlSB = new StringBuffer("<table cellspacing=\"0\" cellpadding=\"0\">");
-        StringBuffer nonHtmlSB = new StringBuffer("<table cellspacing=\"0\" cellpadding=\"0\">");
-        StringBuffer actionSB = new StringBuffer("<table cellspacing=\"0\" cellpadding=\"0\">");
+        List<Link> links = getEntryLinks(request, entry);
+        StringBuffer htmlSB =
+            new StringBuffer("<table cellspacing=\"0\" cellpadding=\"0\">");
+        StringBuffer nonHtmlSB =
+            new StringBuffer("<table cellspacing=\"0\" cellpadding=\"0\">");
+        StringBuffer actionSB =
+            new StringBuffer("<table cellspacing=\"0\" cellpadding=\"0\">");
         for (Link link : links) {
             StringBuffer sb;
-            if(!link.isType(typeMask)) continue;
+            if ( !link.isType(typeMask)) {
+                continue;
+            }
             int type = link.getType();
-            if(type == OutputType.TYPE_ACTION) {
+            if (type == OutputType.TYPE_ACTION) {
                 sb = actionSB;
-            } else if(type == OutputType.TYPE_HTML) {
+            } else if (type == OutputType.TYPE_HTML) {
                 sb = htmlSB;
-            } else if(type == OutputType.TYPE_NONHTML) {
+            } else if (type == OutputType.TYPE_NONHTML) {
                 sb = nonHtmlSB;
             } else {
                 continue;
             }
             sb.append("<tr><td>");
-            if(link.getIcon()==null) {
+            if (link.getIcon() == null) {
                 sb.append(HtmlUtil.space(1));
             } else {
-                sb.append(HtmlUtil.href(link.getUrl(), HtmlUtil.img(link.getIcon())));
+                sb.append(HtmlUtil.href(link.getUrl(),
+                                        HtmlUtil.img(link.getIcon())));
 
             }
             sb.append(HtmlUtil.space(1));
@@ -2803,9 +2981,10 @@ return new Result(title, sb);
         actionSB.append("</table>");
         htmlSB.append("</table>");
         nonHtmlSB.append("</table>");
-        StringBuffer menu  = new StringBuffer();
+        StringBuffer menu = new StringBuffer();
         menu.append("<table cellspacing=\"0\" cellpadding=\"4\">");
-        menu.append(HtmlUtil.rowTop(HtmlUtil.cols(htmlSB.toString(),nonHtmlSB.toString(),actionSB.toString())));
+        menu.append(HtmlUtil.rowTop(HtmlUtil.cols(htmlSB.toString(),
+                nonHtmlSB.toString(), actionSB.toString())));
         menu.append("</table>");
         return menu.toString();
 
@@ -2817,37 +2996,57 @@ return new Result(title, sb);
      *
      * @param request _more_
      * @param entry _more_
+     * @param justActions _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public String getEntryToolbar(Request request, Entry entry,boolean justActions)
-        throws Exception {
+    public String getEntryToolbar(Request request, Entry entry,
+                                  boolean justActions)
+            throws Exception {
         List<Link>   links = getEntryLinks(request, entry);
         StringBuffer sb    = new StringBuffer();
         for (Link link : links) {
-            if(link.getType()== OutputType.TYPE_ACTION ||
-               (!justActions && link.getType()== OutputType.TYPE_NONHTML)) {
+            if ((link.getType() == OutputType.TYPE_ACTION)
+                    || ( !justActions
+                         && (link.getType() == OutputType.TYPE_NONHTML))) {
                 String href = HtmlUtil.href(link.getUrl(),
                                             HtmlUtil.img(link.getIcon(),
-                                                         link.getLabel(),
-                                                         link.getLabel()));
+                                                link.getLabel(),
+                                                link.getLabel()));
                 sb.append(HtmlUtil.inset(href, 0, 3, 0, 0));
             }
         }
         return sb.toString();
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public String getEntryMenubar(Request request, Entry entry)
-        throws Exception {
-            StringBuffer editMenuInner = 
-                new StringBuffer(getEntryActionsTable(request, entry,OutputType.TYPE_ACTION));
-            StringBuffer viewMenuInner = 
-                new StringBuffer(getEntryActionsTable(request, entry,OutputType.TYPE_HTML|OutputType.TYPE_NONHTML));
-            String editMenu = getRepository().makePopupLink("<span class=entrymenulink>Edit</span>",editMenuInner.toString(),true);
-            String viewMenu = getRepository().makePopupLink("<span class=entrymenulink>View</span>",viewMenuInner.toString(),true);
-            return HtmlUtil.span(editMenu.toString() + viewMenu.toString(),HtmlUtil.cssClass("entrymenubar"));
+            throws Exception {
+        StringBuffer editMenuInner =
+            new StringBuffer(getEntryActionsTable(request, entry,
+                OutputType.TYPE_ACTION));
+        StringBuffer viewMenuInner =
+            new StringBuffer(getEntryActionsTable(request, entry,
+                OutputType.TYPE_HTML | OutputType.TYPE_NONHTML));
+        String editMenu = getRepository().makePopupLink(
+                              "<span class=entrymenulink>Edit</span>",
+                              editMenuInner.toString(), true);
+        String viewMenu = getRepository().makePopupLink(
+                              "<span class=entrymenulink>View</span>",
+                              viewMenuInner.toString(), true);
+        return HtmlUtil.span(editMenu.toString() + viewMenu.toString(),
+                             HtmlUtil.cssClass("entrymenubar"));
     }
 
 
@@ -2918,7 +3117,8 @@ return new Result(title, sb);
         //                entry), entry.getLabel()));
         //        breadcrumbs.add(HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
         //                entry), entry.getLabel()));
-        String separator = getRepository().getTemplateProperty(request,"ramadda.template.breadcrumbs.separator", "");
+        String separator = getRepository().getTemplateProperty(request,
+                               "ramadda.template.breadcrumbs.separator", "");
         return StringUtil.join(HtmlUtil.pad("&gt;"), breadcrumbs);
     }
 
@@ -2996,25 +3196,31 @@ return new Result(title, sb);
         }
         titleList.add(entry.getLabel());
         String nav;
-        String separator = getRepository().getTemplateProperty(request,"ramadda.template.breadcrumbs.separator", "");
-        
-        String links = getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL);
-        String entryLink =   HtmlUtil.space(1) + getAjaxLink(request, entry,
-                                                             entry.getLabel(), false);
+        String separator = getRepository().getTemplateProperty(request,
+                               "ramadda.template.breadcrumbs.separator", "");
+
+        String links = getEntryManager().getEntryActionsTable(request, entry,
+                           OutputType.TYPE_ALL);
+        String entryLink = HtmlUtil.space(1)
+                           + getAjaxLink(request, entry, entry.getLabel(),
+                                         false);
 
         if (makeLinkForLastGroup) {
             breadcrumbs.add(entryLink);
             nav = StringUtil.join(separator, breadcrumbs);
             nav = HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"));
         } else {
-            String img  = getRepository().makePopupLink(HtmlUtil.img(getIconUrl(request, entry)),links, true);
+            String img = getRepository().makePopupLink(
+                             HtmlUtil.img(getIconUrl(request, entry)), links,
+                             true);
             nav = StringUtil.join(separator, breadcrumbs);
-            String toolbar =getEntryToolbar(request, entry,true); 
-            String menubar =getEntryMenubar(request, entry); 
+            String toolbar = getEntryToolbar(request, entry, true);
+            String menubar = getEntryMenubar(request, entry);
 
             String header =
                 "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
-                + HtmlUtil.rowBottom("<td class=\"entryname\" >"  + img+entryLink
+                + HtmlUtil.rowBottom("<td class=\"entryname\" >" + img
+                                     + entryLink
                                      + "</td><td align=\"right\">" + toolbar
                                      + "</td>") + "</table>";
             nav = HtmlUtil.div(
@@ -3043,8 +3249,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    public Entry getEntry(Request request, String entryId)
-            throws Exception {
+    public Entry getEntry(Request request, String entryId) throws Exception {
         return getEntry(request, entryId, true);
     }
 
@@ -3059,8 +3264,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    public Entry getEntry(Request request, String entryId,
-                             boolean andFilter)
+    public Entry getEntry(Request request, String entryId, boolean andFilter)
             throws Exception {
         return getEntry(request, entryId, andFilter, false);
     }
@@ -3109,8 +3313,8 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    public Entry getEntry(Request request, String entryId,
-                             boolean andFilter, boolean abbreviated)
+    public Entry getEntry(Request request, String entryId, boolean andFilter,
+                          boolean abbreviated)
             throws Exception {
 
 
@@ -3207,8 +3411,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    public List[] getEntries(Request request,
-                                StringBuffer searchCriteriaSB)
+    public List[] getEntries(Request request, StringBuffer searchCriteriaSB)
             throws Exception {
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
         List<Clause> where = typeHandler.assembleWhereClause(request,
@@ -3821,7 +4024,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public List<String> getChildIds(Request request, Group group,
-                                       List<Clause> where)
+                                    List<Clause> where)
             throws Exception {
         List<String> ids          = new ArrayList<String>();
 
@@ -3926,7 +4129,8 @@ return new Result(title, sb);
 
         group.setSubEntries(entries);
         group.setSubGroups(subGroups);
-        Result result =  outputHandler.outputGroup(request, group, subGroups, entries);
+        Result result = outputHandler.outputGroup(request, group, subGroups,
+                            entries);
 
         return result;
     }
@@ -3944,7 +4148,7 @@ return new Result(title, sb);
      * @return _more_
      */
     public List<Entry> sortEntriesOnDate(List<Entry> entries,
-                                            final boolean descending) {
+                                         final boolean descending) {
         Comparator comp = new Comparator() {
             public int compare(Object o1, Object o2) {
                 Entry e1 = (Entry) o1;
@@ -4015,12 +4219,14 @@ return new Result(title, sb);
      * _more_
      *
      * @param xmlFile _more_
+     * @param internal _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Entry parseEntryXml(File xmlFile, boolean internal) throws Exception {
+    public Entry parseEntryXml(File xmlFile, boolean internal)
+            throws Exception {
         Element root = XmlUtil.getRoot(IOUtil.readContents(xmlFile));
         return processEntryXml(
             new Request(getRepository(), getUserManager().getDefaultUser()),
@@ -4041,7 +4247,7 @@ return new Result(title, sb);
                            "." + file.getName() + ".ramadda"));
         Entry fileInfoEntry = null;
         if (xmlFile.exists()) {
-            fileInfoEntry = parseEntryXml(xmlFile,true);
+            fileInfoEntry = parseEntryXml(xmlFile, true);
             if (fileInfoEntry.getName().length() == 0) {
                 fileInfoEntry.setName(file.getName());
             }
@@ -4131,7 +4337,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Group findGroupFromName(String name, User user,
-                                      boolean createIfNeeded)
+                                   boolean createIfNeeded)
             throws Exception {
         return findGroupFromName(name, user, createIfNeeded, false);
     }
@@ -4385,10 +4591,17 @@ return new Result(title, sb);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entries _more_
+     *
+     * @return _more_
+     */
     public List<Group> getGroups(List<Entry> entries) {
         List<Group> groupList = new ArrayList<Group>();
-        for(Entry entry: entries) {
-            if(entry.isGroup()) {
+        for (Entry entry : entries) {
+            if (entry.isGroup()) {
                 groupList.add((Group) entry);
             }
         }
@@ -4526,11 +4739,16 @@ return new Result(title, sb);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     */
     protected void addStatusInfo(StringBuffer sb) {
         sb.append(HtmlUtil.formEntry(msgLabel("Entry Cache"),
-                                     entryCache.size()+""));
+                                     entryCache.size() + ""));
         sb.append(HtmlUtil.formEntry(msgLabel("Group Cache"),
-                                     groupCache.size()+""));
+                                     groupCache.size() + ""));
 
     }
 
@@ -4571,16 +4789,20 @@ return new Result(title, sb);
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public String getIconUrl(Request request,Entry entry) throws Exception {
-        if(isAnonymousUpload(entry)) {
+    public String getIconUrl(Request request, Entry entry) throws Exception {
+        if (isAnonymousUpload(entry)) {
             return iconUrl(ICON_ENTRY_UPLOAD);
         }
 
-        return entry.getTypeHandler().getIconUrl(request,entry);
+        return entry.getTypeHandler().getIconUrl(request, entry);
     }
 
     /**
@@ -4662,16 +4884,20 @@ return new Result(title, sb);
                 continue;
             }
 
-            if(isSynthEntry(entry.getId())) {
-                for(String childId: getChildIds(request, (Group) entry, null)) {
-                    Entry childEntry  =getEntry(request,childId);
-                    if(childEntry==null) continue;
-                    children.add(new String[] { childId, childEntry.getType(), childEntry.getResource().getPath(),
-                                                childEntry.getResource().getType()});
-                    if(childEntry.isGroup()) {
+            if (isSynthEntry(entry.getId())) {
+                for (String childId : getChildIds(request, (Group) entry,
+                        null)) {
+                    Entry childEntry = getEntry(request, childId);
+                    if (childEntry == null) {
+                        continue;
+                    }
+                    children.add(new String[] { childId, childEntry.getType(),
+                            childEntry.getResource().getPath(),
+                            childEntry.getResource().getType() });
+                    if (childEntry.isGroup()) {
                         children.addAll(getDescendents(request,
-                                                       (List<Entry>) Misc.newList(childEntry),
-                                                       connection, false));
+                                (List<Entry>) Misc.newList(childEntry),
+                                connection, false));
                     }
                 }
                 return children;
@@ -4735,7 +4961,7 @@ return new Result(title, sb);
         String name = request.getString(ARG_NAME, (String) null);
         if (name != null) {
             String type = request.getString(ARG_TYPE, "");
-            addAssociation(request, fromEntry, toEntry, name,type);
+            addAssociation(request, fromEntry, toEntry, name, type);
             //            return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
             return new Result(
                 request.url(
@@ -4857,7 +5083,7 @@ return new Result(title, sb);
         }
         return addAssociation(request, fromEntry, toEntry,
                               XmlUtil.getAttribute(node, ATTR_NAME),
-                              XmlUtil.getAttribute(node, ATTR_TYPE,""));
+                              XmlUtil.getAttribute(node, ATTR_TYPE, ""));
     }
 
 
@@ -4869,13 +5095,14 @@ return new Result(title, sb);
      * @param fromEntry _more_
      * @param toEntry _more_
      * @param name _more_
+     * @param type _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     public String addAssociation(Request request, Entry fromEntry,
-                                  Entry toEntry, String name, String type)
+                                 Entry toEntry, String name, String type)
             throws Exception {
         if ( !getAccessManager().canDoAction(request, fromEntry,
                                              Permission.ACTION_NEW)) {
@@ -4888,15 +5115,26 @@ return new Result(title, sb);
                     + toEntry);
         }
         //Clear the cached associations
-        return addAssociation(request, new Association(getRepository().getGUID(),name,type,
-                                                    fromEntry.getId(),
-                                                    toEntry.getId()));
+        return addAssociation(request,
+                              new Association(getRepository().getGUID(),
+                                  name, type, fromEntry.getId(),
+                                  toEntry.getId()));
 
     }
 
 
-    public String addAssociation(Request request, Association association) 
-        throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param association _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String addAssociation(Request request, Association association)
+            throws Exception {
 
         PreparedStatement assocInsert =
             getDatabaseManager().getPreparedStatement(
@@ -4915,25 +5153,41 @@ return new Result(title, sb);
     }
 
 
-    public void associationChanged(Request request, Association association) 
-        throws Exception {
-        Entry fromEntry  = getEntry(request, association.getFromId());
-        if(fromEntry!=null)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param association _more_
+     *
+     * @throws Exception _more_
+     */
+    public void associationChanged(Request request, Association association)
+            throws Exception {
+        Entry fromEntry = getEntry(request, association.getFromId());
+        if (fromEntry != null) {
             fromEntry.setAssociations(null);
-        Entry toEntry  = getEntry(request, association.getToId());
-        if(toEntry!=null)
+        }
+        Entry toEntry = getEntry(request, association.getToId());
+        if (toEntry != null) {
             toEntry.setAssociations(null);
+        }
 
     }
 
 
-    public void deleteAssociation(Request request, Association association) 
-        throws Exception {
-        getDatabaseManager().delete(
-            Tables.ASSOCIATIONS.NAME,
-            Clause.eq(
-                Tables.ASSOCIATIONS.COL_ID,
-                association.getId()));
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param association _more_
+     *
+     * @throws Exception _more_
+     */
+    public void deleteAssociation(Request request, Association association)
+            throws Exception {
+        getDatabaseManager().delete(Tables.ASSOCIATIONS.NAME,
+                                    Clause.eq(Tables.ASSOCIATIONS.COL_ID,
+                                        association.getId()));
     }
 
     /**
@@ -4975,12 +5229,12 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    public List<Association> getAssociations(Request request,
-                                             String entryId)
+    public List<Association> getAssociations(Request request, String entryId)
             throws Exception {
         Entry entry = getEntryManager().getEntry(request, entryId);
         if (entry == null) {
-            throw new IllegalArgumentException("getAssociations Entry is null:" + entryId);
+            throw new IllegalArgumentException(
+                "getAssociations Entry is null:" + entryId);
         }
         return getAssociations(request, entry);
     }
@@ -5005,7 +5259,7 @@ return new Result(title, sb);
             return new ArrayList<Association>();
         }
 
-        List<Association> associations = 
+        List<Association> associations =
             getAssociations(
                 request,
                 Clause.or(

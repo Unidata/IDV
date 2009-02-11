@@ -123,6 +123,11 @@ public class Resource {
         this.type = type;
     }
 
+    /**
+     * _more_
+     *
+     * @param that _more_
+     */
     public Resource(Resource that) {
         this.path = that.path;
         this.type = that.type;

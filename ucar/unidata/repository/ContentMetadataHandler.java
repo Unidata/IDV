@@ -26,10 +26,7 @@ import org.w3c.dom.*;
 
 
 import ucar.unidata.sql.SqlUtil;
-import java.net.URL;
-import java.net.URLConnection;
 import ucar.unidata.ui.ImageUtils;
-import java.awt.Image;
 
 
 import ucar.unidata.util.DateUtil;
@@ -41,10 +38,15 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
+import java.awt.Image;
+
 
 import java.io.*;
 import java.io.File;
 import java.io.FileInputStream;
+
+import java.net.URL;
+import java.net.URLConnection;
 
 
 import java.sql.Statement;
@@ -96,20 +98,36 @@ public class ContentMetadataHandler extends MetadataHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param metadata _more_
+     * @param doc _more_
+     * @param datasetNode _more_
+     *
+     * @throws Exception _more_
+     */
     public void addMetadataToCatalog(Request request, Entry entry,
                                      Metadata metadata, Document doc,
                                      Element datasetNode)
             throws Exception {
         Metadata.Type type = getType(metadata.getType());
         if (type.equals(TYPE_THUMBNAIL)) {
-            XmlUtil.create(doc, ThreddsMetadataHandler.getTag(ThreddsMetadataHandler.TYPE_PROPERTY), datasetNode,
-                           new String[] { ThreddsMetadataHandler.ATTR_NAME,
-                                          "thumbnail", ThreddsMetadataHandler.ATTR_VALUE,
-                                          getRepository().absoluteUrl(request.url(
-                                                      getRepository().getMetadataManager().URL_METADATA_VIEW,
-                                                      ARG_ENTRYID, metadata.getEntryId(), ARG_METADATA_ID,
-                                                      metadata.getId()/*,ARG_THUMBNAIL,"true"*/))
-                                           });
+            XmlUtil.create(
+                doc,
+                ThreddsMetadataHandler.getTag(
+                    ThreddsMetadataHandler.TYPE_PROPERTY), datasetNode,
+                        new String[] { ThreddsMetadataHandler.ATTR_NAME,
+                                       "thumbnail", ThreddsMetadataHandler
+                                           .ATTR_VALUE, getRepository()
+                                           .absoluteUrl(request
+                                               .url(getRepository()
+                                                   .getMetadataManager()
+                                                       .URL_METADATA_VIEW, ARG_ENTRYID, metadata
+                                                           .getEntryId(), ARG_METADATA_ID, metadata
+                                                               .getId() /*,ARG_THUMBNAIL,"true"*/)) });
         }
     }
 
@@ -120,41 +138,46 @@ public class ContentMetadataHandler extends MetadataHandler {
      *
      * @param entry _more_
      * @param node _more_
+     * @param fileMap _more_
+     * @param internal _more_
      *
      * @throws Exception _more_
      */
-    public void processMetadataXml(Entry entry, Element node, Hashtable fileMap,boolean internal)
+    public void processMetadataXml(Entry entry, Element node,
+                                   Hashtable fileMap, boolean internal)
             throws Exception {
         String type = XmlUtil.getAttribute(node, ATTR_TYPE);
         if (getType(type).equals(TYPE_THUMBNAIL)
                 || getType(type).equals(TYPE_ATTACHMENT)) {
-            String fileArg = XmlUtil.getAttribute(node, ATTR_ATTR1, "");
+            String fileArg  = XmlUtil.getAttribute(node, ATTR_ATTR1, "");
 
-            String fileName =null;
+            String fileName = null;
 
-            if(internal) {
+            if (internal) {
                 fileName = fileArg;
             } else {
-                String tmpFile = (String)fileMap.get(fileArg);
-                if(tmpFile==null) {
-                    System.err.println ("No attachment uploaded file:" + fileArg);
-                    System.err.println ("available files: " + fileMap);
+                String tmpFile = (String) fileMap.get(fileArg);
+                if (tmpFile == null) {
+                    System.err.println("No attachment uploaded file:"
+                                       + fileArg);
+                    System.err.println("available files: " + fileMap);
                     return;
                 }
                 File file = new File(tmpFile);
                 fileName =
                     getRepository().getStorageManager().copyToEntryDir(entry,
-                                                                       file).getName();
+                        file).getName();
             }
 
-            Metadata metadata =
-                new Metadata(getRepository().getGUID(), entry.getId(), type,
-                             XmlUtil.getAttribute(node, ATTR_INHERITED,
-                                 DFLT_INHERITED), fileName,
-                             "","","");
+            Metadata metadata = new Metadata(getRepository().getGUID(),
+                                             entry.getId(), type,
+                                             XmlUtil.getAttribute(node,
+                                                 ATTR_INHERITED,
+                                                 DFLT_INHERITED), fileName,
+                                                     "", "", "");
             entry.addMetadata(metadata);
         } else {
-            super.processMetadataXml(entry, node,fileMap,internal);
+            super.processMetadataXml(entry, node, fileMap, internal);
         }
 
     }
@@ -172,7 +195,7 @@ public class ContentMetadataHandler extends MetadataHandler {
         Metadata.Type type = getType(metadata.getType());
         if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
             String fileArg = metadata.getAttr1();
-            if (!entry.getIsLocalFile()) {
+            if ( !entry.getIsLocalFile()) {
                 fileArg =
                     getRepository().getStorageManager().copyToEntryDir(entry,
                         new File(fileArg)).getName();
@@ -241,21 +264,27 @@ public class ContentMetadataHandler extends MetadataHandler {
                                ? " "
                                : "");
         if (ImageUtils.isImage(f.toString())) {
-            String img= HtmlUtil.img(
-                                      request.url(
-                                                  getRepository().getMetadataManager().URL_METADATA_VIEW,
-                                                  ARG_ENTRYID, metadata.getEntryId(), ARG_METADATA_ID,
-                                                  metadata.getId(),ARG_THUMBNAIL,""+forLink), msg("Click to enlarge"), extra);
+            String img =
+                HtmlUtil
+                    .img(request
+                        .url(getRepository().getMetadataManager()
+                            .URL_METADATA_VIEW, ARG_ENTRYID,
+                                metadata.getEntryId(), ARG_METADATA_ID,
+                                metadata.getId(), ARG_THUMBNAIL,
+                                "" + forLink), msg("Click to enlarge"),
+                                    extra);
 
-            if(forLink) {
-                String bigimg= HtmlUtil.img(
-                                      request.url(
-                                                  getRepository().getMetadataManager().URL_METADATA_VIEW,
-                                                  ARG_ENTRYID, metadata.getEntryId(), ARG_METADATA_ID,
-                                                  metadata.getId()), "thumbnail", "");
+            if (forLink) {
+                String bigimg =
+                    HtmlUtil
+                        .img(request
+                            .url(getRepository().getMetadataManager()
+                                .URL_METADATA_VIEW, ARG_ENTRYID,
+                                    metadata.getEntryId(), ARG_METADATA_ID,
+                                    metadata.getId()), "thumbnail", "");
 
 
-                img = getRepository().makePopupLink(img,bigimg,true);
+                img = getRepository().makePopupLink(img, bigimg, true);
             }
             return img;
         } else if (f.exists()) {
@@ -344,11 +373,12 @@ public class ContentMetadataHandler extends MetadataHandler {
             }
             String mimeType = getRepository().getMimeTypeFromSuffix(
                                   IOUtil.getFileExtension(f.toString()));
-            if(request.get(ARG_THUMBNAIL,false)) {
-                File thumb = getStorageManager().getTmpFile(request, IOUtil.getFileTail(f.toString()));
-                if(!thumb.exists()) {
+            if (request.get(ARG_THUMBNAIL, false)) {
+                File thumb = getStorageManager().getTmpFile(request,
+                                 IOUtil.getFileTail(f.toString()));
+                if ( !thumb.exists()) {
                     Image image = ImageUtils.readImage(f.toString());
-                    image = ImageUtils.resize(image, 100,-1);
+                    image = ImageUtils.resize(image, 100, -1);
                     ImageUtils.waitOnImage(image);
                     ImageUtils.writeImageToFile(image, thumb.toString());
                 }
@@ -390,31 +420,33 @@ public class ContentMetadataHandler extends MetadataHandler {
             if ( !newMetadata) {
                 //TODO: delete the old thumbs file
             }
-            String url = request.getString(ARG_ATTR2 + suffix,"");
+            String url     = request.getString(ARG_ATTR2 + suffix, "");
             String theFile = null;
-            if(url.length()>0) {
-                String tail = IOUtil.getFileTail(url);
-                File tmpFile = getStorageManager().getTmpFile(request,
-                                                              tail);
+            if (url.length() > 0) {
+                String tail    = IOUtil.getFileTail(url);
+                File   tmpFile = getStorageManager().getTmpFile(request,
+                                     tail);
                 RepositoryUtil.checkFilePath(tmpFile.toString());
-                URL           fromUrl    = new URL(url);
-                URLConnection connection = fromUrl.openConnection();
-                InputStream   fromStream = connection.getInputStream();
-                FileOutputStream toStream = new FileOutputStream(tmpFile);
+                URL              fromUrl    = new URL(url);
+                URLConnection    connection = fromUrl.openConnection();
+                InputStream      fromStream = connection.getInputStream();
+                FileOutputStream toStream   = new FileOutputStream(tmpFile);
                 try {
-                        int bytes = IOUtil.writeTo(fromStream, toStream);
-                        if (bytes < 0) {
-                            throw new IllegalArgumentException("Could not download url:" + url);
-                        }
-                } catch(Exception ioe) {
-                    throw new IllegalArgumentException("Could not download url:" + url);
+                    int bytes = IOUtil.writeTo(fromStream, toStream);
+                    if (bytes < 0) {
+                        throw new IllegalArgumentException(
+                            "Could not download url:" + url);
+                    }
+                } catch (Exception ioe) {
+                    throw new IllegalArgumentException(
+                        "Could not download url:" + url);
                 } finally {
                     try {
                         toStream.close();
                         fromStream.close();
                     } catch (Exception exc) {}
                 }
-                theFile =  tmpFile.toString();
+                theFile = tmpFile.toString();
             } else {
                 String fileArg = request.getUploadedFile(ARG_ATTR1 + suffix);
                 if (fileArg == null) {
@@ -423,9 +455,10 @@ public class ContentMetadataHandler extends MetadataHandler {
 
                 theFile = fileArg;
             }
-            
-            theFile = getRepository().getStorageManager().moveToEntryDir(entry,
-                                                               new File(theFile)).getName();
+
+            theFile =
+                getRepository().getStorageManager().moveToEntryDir(entry,
+                    new File(theFile)).getName();
             metadataList.add(new Metadata(id, entry.getId(), type, false,
                                           theFile, "", "", ""));
             return;
@@ -482,9 +515,9 @@ public class ContentMetadataHandler extends MetadataHandler {
                     msgLabel((type.equals(TYPE_THUMBNAIL)
                               ? "Thumbnail"
                               : "Attachment")), HtmlUtil.fileInput(arg1,
-                                                                   size) + image,
-                                               msgLabel("Or download URL"),
-                                               HtmlUtil.input(arg2,"",size)});
+                              size) + image,
+                    msgLabel("Or download URL"),
+                    HtmlUtil.input(arg2, "", size) });
         }
 
         if (content == null) {

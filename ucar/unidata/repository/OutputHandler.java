@@ -22,8 +22,10 @@
 package ucar.unidata.repository;
 
 
-import ucar.unidata.repository.collab.*;
 import org.w3c.dom.*;
+
+
+import ucar.unidata.repository.collab.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -86,7 +88,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /** _more_ */
     public static final OutputType OUTPUT_HTML = new OutputType("Entry",
                                                      "default.html",
-                                                                OutputType.TYPE_HTML,"",ICON_INFORMATION);
+                                                     OutputType.TYPE_HTML,
+                                                     "", ICON_INFORMATION);
 
 
     /** _more_ */
@@ -146,8 +149,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     public void init() {}
 
 
-    public void clearCache() {
-    }
+    /**
+     * _more_
+     */
+    public void clearCache() {}
 
     /**
      * _more_
@@ -258,7 +263,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * @author IDV Development Team
      * @version $Revision: 1.3 $
      */
-    public static  class State {
+    public static class State {
 
         /** _more_ */
         public static final int FOR_UNKNOWN = 0;
@@ -292,9 +297,9 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         public State(Entry entry) {
             if (entry != null) {
                 if (entry.isGroup()) {
-                    group = (Group) entry;
-                    this.subGroups   = group.getSubGroups();
-                    this.entries = group.getSubEntries();
+                    group          = (Group) entry;
+                    this.subGroups = group.getSubGroups();
+                    this.entries   = group.getSubEntries();
                 } else {
                     this.entry = entry;
                 }
@@ -320,17 +325,28 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         /**
          * _more_
          *
+         *
+         * @param group _more_
          * @param entries _more_
          */
         public State(Group group, List<Entry> entries) {
-            this.group = group;
+            this.group   = group;
             this.entries = entries;
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean isDummyGroup() {
-            Entry entry  = getEntry();
-            if(entry==null) return false;
-            if(!entry.isGroup()) return false;
+            Entry entry = getEntry();
+            if (entry == null) {
+                return false;
+            }
+            if ( !entry.isGroup()) {
+                return false;
+            }
             return entry.isDummy();
         }
 
@@ -411,7 +427,9 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     protected void addLinks(Request request, Result result, State state)
             throws Exception {
         state.forWhat = State.FOR_HEADER;
-        if(state.getEntry().getDescription().indexOf("<nolinks>")>=0) return;
+        if (state.getEntry().getDescription().indexOf("<nolinks>") >= 0) {
+            return;
+        }
         result.putProperty(
             PROP_NAVSUBLINKS,
             getHeader(
@@ -474,16 +492,16 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             url = HtmlUtil.url(getRepository().URL_ENTRY_SHOW + suffix,
                                ARG_OUTPUT, outputType.toString());
         } else {
-            url = request.getEntryUrl(getRepository().URL_ENTRY_SHOW + suffix, entry);
-            url = HtmlUtil.url(url,
-                               ARG_ENTRYID, entry.getId(), ARG_OUTPUT,
+            url = request.getEntryUrl(getRepository().URL_ENTRY_SHOW
+                                      + suffix, entry);
+            url = HtmlUtil.url(url, ARG_ENTRYID, entry.getId(), ARG_OUTPUT,
                                outputType.toString());
         }
         int linkType = OutputType.TYPE_ACTION;
         return new Link(url, (outputType.getIcon() == null)
                              ? null
                              : iconUrl(outputType.getIcon()), outputType
-                                     .getLabel(), outputType);
+                                 .getLabel(), outputType);
 
     }
 
@@ -501,12 +519,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     protected void addOutputLink(Request request, Entry entry,
                                  List<Link> links, OutputType type)
             throws Exception {
-        links.add(
-            new Link(
-                request.entryUrl(
-                    getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                    type), iconUrl(type.getIcon()),
-                           type.getLabel(), type));
+        links.add(new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                            entry, ARG_OUTPUT,
+                                            type), iconUrl(type.getIcon()),
+                                                type.getLabel(), type));
 
     }
 
@@ -608,8 +624,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * @throws Exception _more_
      */
     public static String getSelect(Request request, String elementId,
-                                      String label, boolean allEntries,
-                                      String type)
+                                   String label, boolean allEntries,
+                                   String type)
             throws Exception {
         String event = HtmlUtil.call("selectInitialClick",
                                      "event," + HtmlUtil.squote(elementId)
@@ -641,7 +657,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         String       linkText = entry.getLabel();
         StringBuffer sb       = new StringBuffer();
         String       entryId  = entry.getId();
-        String       icon     = getEntryManager().getIconUrl(request,entry);
+        String       icon     = getEntryManager().getIconUrl(request, entry);
         String       event;
         String       uid = "link_" + HtmlUtil.blockCnt++;
         if (entry.isGroup()) {
@@ -703,21 +719,21 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      */
     public List<Link> getNextPrevLinks(Request request, Entry entry,
                                        OutputType output) {
-        Link link;
+        Link       link;
         List<Link> links = new ArrayList<Link>();
 
-        link = new Link(
-                request.entryUrl(
-                    getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                    output, ARG_PREVIOUS, "true"), iconUrl(ICON_LEFT), 
-                msg("View Previous Entry"));
+        link = new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                         entry, ARG_OUTPUT, output,
+                                         ARG_PREVIOUS,
+                                         "true"), iconUrl(ICON_LEFT),
+                                             msg("View Previous Entry"));
 
         link.setLinkType(OutputType.TYPE_NONHTML);
         links.add(link);
-        link = new Link(
-                request.entryUrl(
-                    getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                    output, ARG_NEXT, "true"), iconUrl(ICON_RIGHT), msg("View Next Entry"));
+        link = new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                         entry, ARG_OUTPUT, output, ARG_NEXT,
+                                         "true"), iconUrl(ICON_RIGHT),
+                                             msg("View Next Entry"));
         link.setLinkType(OutputType.TYPE_NONHTML);
         links.add(link);
         return links;
@@ -766,7 +782,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                        "getentries"));
 
         List<Link> links = getRepository().getOutputLinks(request,
-                                                          new State(getEntryManager().getDummyGroup(),entries));
+                               new State(getEntryManager().getDummyGroup(),
+                                         entries));
 
         List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
         for (Link link : links) {
@@ -869,7 +886,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
             if (showCrumbs) {
                 String img =
-                    HtmlUtil.img(getEntryManager().getIconUrl(request,entry));
+                    HtmlUtil.img(getEntryManager().getIconUrl(request,
+                        entry));
                 sb.append(img);
                 sb.append(HtmlUtil.space(1));
                 sb.append(getEntryManager().getBreadCrumbs(request, entry));
@@ -926,10 +944,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
         List   items          = new ArrayList();
         Object initialMessage = request.remove(ARG_MESSAGE);
-        String onLinkTemplate =
-            getRepository().getTemplateProperty(request,"ramadda.template.sublink.on", "");
-        String offLinkTemplate =
-            getRepository().getTemplateProperty(request,"ramadda.template.sublink.off", "");
+        String onLinkTemplate = getRepository().getTemplateProperty(request,
+                                    "ramadda.template.sublink.on", "");
+        String offLinkTemplate = getRepository().getTemplateProperty(request,
+                                     "ramadda.template.sublink.off", "");
         for (Link link : links) {
             OutputType outputType = link.getOutputType();
             String     url        = link.getUrl();
@@ -1006,10 +1024,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String RESOURCE_ENTRYTEMPLATE = "entrytemplate.txt";
 
-    /** _more_          */
+    /** _more_ */
     public static final String RESOURCE_GROUPTEMPLATE = "grouptemplate.txt";
 
 
@@ -1022,18 +1040,19 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /** _more_ */
     public static final String WIKIPROP_IMPORT = "import";
 
+    /** _more_          */
     public static final String WIKIPROP_COMMENTS = "comments";
 
     /** _more_ */
     public static final String WIKIPROP_TOOLBAR = "toolbar";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKIPROP_BREADCRUMBS = "breadcrumbs";
 
     /** _more_ */
     public static final String WIKIPROP_INFORMATION = "information";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKIPROP_IMAGE = "image";
 
     /** _more_ */
@@ -1059,15 +1078,14 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
     //        WIKIPROP_IMPORT = "import";
 
-    /** _more_          */
+    /** _more_ */
     public static final String[] WIKIPROPS = {
         WIKIPROP_INFORMATION, WIKIPROP_NAME, WIKIPROP_DESCRIPTION,
-        WIKIPROP_COMMENTS,
-        WIKIPROP_BREADCRUMBS, WIKIPROP_TOOLBAR, WIKIPROP_IMAGE,
-        WIKIPROP_LINKS  /*,
-          WIKIPROP_CHILDREN_GROUPS,
-          WIKIPROP_CHILDREN_ENTRIES,
-          WIKIPROP_CHILDREN*/
+        WIKIPROP_COMMENTS, WIKIPROP_BREADCRUMBS, WIKIPROP_TOOLBAR,
+        WIKIPROP_IMAGE, WIKIPROP_LINKS  /*,
+                          WIKIPROP_CHILDREN_GROUPS,
+                          WIKIPROP_CHILDREN_ENTRIES,
+                          WIKIPROP_CHILDREN*/
     };
 
 
@@ -1120,14 +1138,14 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 } else {
                     remainder = "";
                 }
-                theEntry =  findWikiEntry(request, wikiUtil, id, entry);
+                theEntry = findWikiEntry(request, wikiUtil, id, entry);
                 if (theEntry == null) {
                     return "<b>Could not find entry&lt;" + id + "&gt;</b>";
                 }
             }
             Hashtable props = new Hashtable();
             props = StringUtil.parseHtmlProperties(remainder);
-            addWikiLink(wikiUtil,  theEntry);
+            addWikiLink(wikiUtil, theEntry);
             String include = handleWikiImport(wikiUtil, request, theEntry,
                                  tag, props);
             if (include != null) {
@@ -1151,7 +1169,9 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      */
     public String getImageUrl(Request request, Entry entry) {
         if ( !entry.getResource().isImage()) {
-            if(true)return null;
+            if (true) {
+                return null;
+            }
             if (entry.hasAreaDefined()) {
                 return request.url(repository.URL_GETMAP, ARG_SOUTH,
                                    "" + entry.getSouth(), ARG_WEST,
@@ -1203,11 +1223,11 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         } else if (include.equals(WIKIPROP_LINKS)) {
             blockTitle = Misc.getProperty(props, "title", msg("Links"));
             blockContent = getEntryManager().getEntryActionsTable(request,
-                    entry,OutputType.TYPE_ALL);
+                    entry, OutputType.TYPE_ALL);
         } else if (include.equals(WIKIPROP_COMMENTS)) {
             return getCommentBlock(request, entry).toString();
         } else if (include.equals(WIKIPROP_TOOLBAR)) {
-            return getEntryManager().getEntryToolbar(request, entry,false);
+            return getEntryManager().getEntryToolbar(request, entry, false);
         } else if (include.equals(WIKIPROP_BREADCRUMBS)) {
             return getEntryManager().getBreadCrumbs(request, entry);
         } else if (include.equals(WIKIPROP_DESCRIPTION)) {
@@ -1332,19 +1352,21 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                    Entry importEntry, String tag,
                                    Hashtable props) {
         try {
-            Request myRequest = new Request(getRepository(), request.getUser(),getRepository().URL_ENTRY_SHOW.toString()) {
-                    public void putExtraProperty(Object key, Object value) {
-                        request.putExtraProperty(key, value);
-                    }
-                    public Object getExtraProperty(Object key) {
-                        return request.getExtraProperty(key);
-                    }
+            Request myRequest =
+                new Request(getRepository(), request.getUser(),
+                            getRepository().URL_ENTRY_SHOW.toString()) {
+                public void putExtraProperty(Object key, Object value) {
+                    request.putExtraProperty(key, value);
+                }
+                public Object getExtraProperty(Object key) {
+                    return request.getExtraProperty(key);
+                }
 
-                };
-            
+            };
 
 
-            for (Enumeration keys =props.keys(); keys.hasMoreElements();) {
+
+            for (Enumeration keys = props.keys(); keys.hasMoreElements(); ) {
                 Object key = keys.nextElement();
                 myRequest.put(key, props.get(key));
             }
@@ -1374,21 +1396,26 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             String propertyValue;
             if ( !outputType.getIsHtml()) {
                 List<Link> links = new ArrayList<Link>();
-                handler.getEntryLinks(myRequest,new State(importEntry),links);
+                handler.getEntryLinks(myRequest, new State(importEntry),
+                                      links);
                 Link theLink = null;
-                for(Link link: links) {
-                    if(Misc.equals(outputType, link.getOutputType())) {
+                for (Link link : links) {
+                    if (Misc.equals(outputType, link.getOutputType())) {
                         theLink = link;
                         break;
                     }
                 }
 
-                String url = (theLink!=null?
-                              theLink.getUrl():
-                              myRequest.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                               importEntry, ARG_OUTPUT, outputType.getId()));
+                String url = ((theLink != null)
+                              ? theLink.getUrl()
+                              : myRequest.entryUrl(
+                                  getRepository().URL_ENTRY_SHOW,
+                                  importEntry, ARG_OUTPUT,
+                                  outputType.getId()));
                 String label = importEntry.getName() + " - "
-                    + (theLink!=null?theLink.getLabel():outputType.getLabel());
+                               + ((theLink != null)
+                                  ? theLink.getLabel()
+                                  : outputType.getLabel());
                 propertyValue = getEntryManager().getAjaxLink(myRequest,
                         importEntry, label, url, false);
             } else {
@@ -1416,6 +1443,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * _more_
      *
      * @param request _more_
+     * @param wikiUtil _more_
      * @param name _more_
      * @param parent _more_
      *
@@ -1423,14 +1451,15 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public Entry findWikiEntry(Request request, WikiUtil wikiUtil, String name, Entry parent)
+    public Entry findWikiEntry(Request request, WikiUtil wikiUtil,
+                               String name, Entry parent)
             throws Exception {
         name = name.trim();
         Entry theEntry = null;
         theEntry = getEntryManager().getEntry(request, name);
-        if (theEntry == null && parent.isGroup()) {
+        if ((theEntry == null) && parent.isGroup()) {
             for (Entry child : getEntryManager().getChildren(request,
-                                                             (Group)parent)) {
+                    (Group) parent)) {
                 if (child.getName().trim().equalsIgnoreCase(name)) {
                     theEntry = child;
                     break;
@@ -1441,56 +1470,83 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     }
 
 
-    public String makeWikiEditBar(Request request,Entry entry, String textAreaId) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param textAreaId _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String makeWikiEditBar(Request request, Entry entry,
+                                  String textAreaId)
+            throws Exception {
 
         String select = OutputHandler.getSelect(request, textAreaId,
                             "Add link", true, "wikilink") + HtmlUtil.space(1)
                                 + OutputHandler.getSelect(request,
-                                                          textAreaId, "Add import entry", true,
+                                    textAreaId, "Add import entry", true,
                                     "entryid");
 
         StringBuffer buttons = new StringBuffer();
-        buttons.append(addWikiEditButton(textAreaId,"button_bold.png", "Bold text", "\\'\\'\\'",
-                                 "\\'\\'\\'", "Bold text",
-                                 "mw-editbutton-bold"));
-        buttons.append(addWikiEditButton(textAreaId,"button_italic.png", "Italic text",
-                                 "\\'\\'", "\\'\\'", "Italic text",
-                                 "mw-editbutton-italic"));
-        buttons.append(addWikiEditButton(textAreaId,"button_link.png", "Internal link", "[[",
-                                 "]]", "Link title", "mw-editbutton-link"));
-        buttons.append(addWikiEditButton(textAreaId,"button_extlink.png",
-                                 "External link (remember http:// prefix)",
-                                 "[", "]",
-                                 "http://www.example.com link title",
-                                 "mw-editbutton-extlink"));
-        buttons.append(addWikiEditButton(textAreaId,"button_headline.png", "Level 2 headline",
-                                 "\\n== ", " ==\\n", "Headline text",
-                                 "mw-editbutton-headline"));
-        buttons.append(addWikiEditButton(textAreaId,"button_linebreak.png", "Line break",
-                                 "<br>", "", "", "mw-editbutton-headline"));
-        buttons.append(addWikiEditButton(textAreaId,"button_strike.png", "Strike Through",
-                                 "<s>", "</s>", "Strike-through text",
-                                 "mw-editbutton-headline"));
-        buttons.append(addWikiEditButton(textAreaId,"button_upper_letter.png", "Super Script",
-                                 "<sup>", "</sup>", "Super script text",
-                                 "mw-editbutton-headline"));
-        buttons.append(addWikiEditButton(textAreaId,"button_lower_letter.png", "Sub Script",
-                                 "<sub>", "</sub>", "Subscript script text",
-                                 "mw-editbutton-headline"));
-        buttons.append(addWikiEditButton(textAreaId,"button_small.png", "Small text", "<small>",
-                                 "</small>", "Small text",
-                                 "mw-editbutton-headline"));
-        buttons.append(addWikiEditButton(textAreaId,"button_blockquote.png",
-                                 "Insert block quote", "<blockquote>",
-                                 "</blockquote>", "Quoted text",
-                                 "mw-editbutton-headline"));
+        buttons.append(addWikiEditButton(textAreaId, "button_bold.png",
+                                         "Bold text", "\\'\\'\\'",
+                                         "\\'\\'\\'", "Bold text",
+                                         "mw-editbutton-bold"));
+        buttons.append(addWikiEditButton(textAreaId, "button_italic.png",
+                                         "Italic text", "\\'\\'", "\\'\\'",
+                                         "Italic text",
+                                         "mw-editbutton-italic"));
+        buttons.append(addWikiEditButton(textAreaId, "button_link.png",
+                                         "Internal link", "[[", "]]",
+                                         "Link title", "mw-editbutton-link"));
+        buttons.append(
+            addWikiEditButton(
+                textAreaId, "button_extlink.png",
+                "External link (remember http:// prefix)", "[", "]",
+                "http://www.example.com link title",
+                "mw-editbutton-extlink"));
+        buttons.append(addWikiEditButton(textAreaId, "button_headline.png",
+                                         "Level 2 headline", "\\n== ",
+                                         " ==\\n", "Headline text",
+                                         "mw-editbutton-headline"));
+        buttons.append(addWikiEditButton(textAreaId, "button_linebreak.png",
+                                         "Line break", "<br>", "", "",
+                                         "mw-editbutton-headline"));
+        buttons.append(addWikiEditButton(textAreaId, "button_strike.png",
+                                         "Strike Through", "<s>", "</s>",
+                                         "Strike-through text",
+                                         "mw-editbutton-headline"));
+        buttons.append(addWikiEditButton(textAreaId,
+                                         "button_upper_letter.png",
+                                         "Super Script", "<sup>", "</sup>",
+                                         "Super script text",
+                                         "mw-editbutton-headline"));
+        buttons.append(addWikiEditButton(textAreaId,
+                                         "button_lower_letter.png",
+                                         "Sub Script", "<sub>", "</sub>",
+                                         "Subscript script text",
+                                         "mw-editbutton-headline"));
+        buttons.append(addWikiEditButton(textAreaId, "button_small.png",
+                                         "Small text", "<small>", "</small>",
+                                         "Small text",
+                                         "mw-editbutton-headline"));
+        buttons.append(addWikiEditButton(textAreaId, "button_blockquote.png",
+                                         "Insert block quote",
+                                         "<blockquote>", "</blockquote>",
+                                         "Quoted text",
+                                         "mw-editbutton-headline"));
         //        buttons.append(addWikiEditButton(textAreaId,"button_image.png","Embedded file","[[File:","]]","Example.jpg","mw-editbutton-image"));
         //        buttons.append(addWikiEditButton(textAreaId,"button_media.png","File link","[[Media:","]]","Example.ogg","mw-editbutton-media"));
         //        buttons.append(addWikiEditButton(textAreaId,"button_nowiki.png","Ignore wiki formatting","\\x3cnowiki\\x3e","\\x3c/nowiki\\x3e","Insert non-formatted text here","mw-editbutton-nowiki"));
         //        buttons.append(addWikiEditButton(textAreaId,"button_sig.png","Your signature with timestamp","--~~~~","","","mw-editbutton-signature"));
-        buttons.append(addWikiEditButton(textAreaId,"button_hr.png",
-                                 "Horizontal line (use sparingly)",
-                                 "\\n----\\n", "", "", "mw-editbutton-hr"));
+        buttons.append(addWikiEditButton(textAreaId, "button_hr.png",
+                                         "Horizontal line (use sparingly)",
+                                         "\\n----\\n", "", "",
+                                         "mw-editbutton-hr"));
 
         StringBuffer propertyMenu = new StringBuffer();
         StringBuffer importMenu   = new StringBuffer();
@@ -1554,15 +1610,14 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                          "Add Entry Property");
         String propertyButton =
             getRepository().makePopupLink(propertyMenuLabel,
-                propertyMenu.toString());
+                                          propertyMenu.toString());
         buttons.append(propertyButton);
         String importMenuLabel =
             HtmlUtil.img(iconUrl("/icons/wiki/button_import.png"),
                          "Import Entry Property");
-        String importButton =
-            getRepository().makePopupLink(importMenuLabel,
-                HtmlUtil.hbox(importMenu.toString(),
-                              importOutputMenu.toString()));
+        String importButton = getRepository().makePopupLink(importMenuLabel,
+                                  HtmlUtil.hbox(importMenu.toString(),
+                                      importOutputMenu.toString()));
         buttons.append(importButton);
         buttons.append(HtmlUtil.space(2));
         buttons.append(select);
@@ -1574,6 +1629,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /**
      * _more_
      *
+     *
+     * @param textAreaId _more_
      * @param icon _more_
      * @param label _more_
      * @param prefix _more_
@@ -1583,18 +1640,19 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @return _more_
      */
-    private String addWikiEditButton(String textAreaId, String icon, String label, String prefix,
-                             String suffix, String example, String huh) {
+    private String addWikiEditButton(String textAreaId, String icon,
+                                     String label, String prefix,
+                                     String suffix, String example,
+                                     String huh) {
         String prop = prefix + example + suffix;
         String js;
         if (suffix.length() == 0) {
-            js = "javascript:insertText(" + HtmlUtil.squote(textAreaId)
-                 + "," + HtmlUtil.squote(prop) + ");";
+            js = "javascript:insertText(" + HtmlUtil.squote(textAreaId) + ","
+                 + HtmlUtil.squote(prop) + ");";
         } else {
-            js = "javascript:insertTags(" + HtmlUtil.squote(textAreaId)
-                 + "," + HtmlUtil.squote(prefix) + ","
-                 + HtmlUtil.squote(suffix) + "," + HtmlUtil.squote(example)
-                 + ");";
+            js = "javascript:insertTags(" + HtmlUtil.squote(textAreaId) + ","
+                 + HtmlUtil.squote(prefix) + "," + HtmlUtil.squote(suffix)
+                 + "," + HtmlUtil.squote(example) + ");";
         }
         return HtmlUtil.href(js,
                              HtmlUtil.img(iconUrl("/icons/wiki/" + icon),
@@ -1616,39 +1674,42 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      */
     public String getWikiLink(WikiUtil wikiUtil, String name, String label) {
         try {
-            Entry   entry    = (Entry) wikiUtil.getProperty(PROP_ENTRY);
-            Request request  = (Request) wikiUtil.getProperty(PROP_REQUEST);
-            Group   parent   = entry.getParentGroup();
+            Entry   entry   = (Entry) wikiUtil.getProperty(PROP_ENTRY);
+            Request request = (Request) wikiUtil.getProperty(PROP_REQUEST);
+            Group   parent  = entry.getParentGroup();
 
 
             name = name.trim();
-            if(name.startsWith("Category:")) {
+            if (name.startsWith("Category:")) {
                 String category = name.substring("Category:".length());
                 String url = request.url(getRepository().URL_ENTRY_SEARCH,
-                                         ARG_METADATA_TYPE+".wikicategory",
+                                         ARG_METADATA_TYPE + ".wikicategory",
                                          "wikicategory",
-                                         ARG_METADATA_ATTR1+".wikicategory",
-                                         category);
+                                         ARG_METADATA_ATTR1
+                                         + ".wikicategory", category);
                 wikiUtil.addCategoryLink(HtmlUtil.href(url, category));
-                List categories = (List) wikiUtil.getProperty("wikicategories");
-                if(categories == null) {
-                    wikiUtil.putProperty("wikicategories",categories = new ArrayList());
+                List categories =
+                    (List) wikiUtil.getProperty("wikicategories");
+                if (categories == null) {
+                    wikiUtil.putProperty("wikicategories",
+                                         categories = new ArrayList());
                 }
                 categories.add(category);
                 return "";
             }
 
-            Entry   theEntry=null;
+            Entry theEntry = null;
             //If the entry is a group first check its children.
-            if(entry.isGroup()) {
-                theEntry= findWikiEntry(request, wikiUtil,name, (Group)entry);
+            if (entry.isGroup()) {
+                theEntry = findWikiEntry(request, wikiUtil, name,
+                                         (Group) entry);
             }
-            if(theEntry==null) {
-                theEntry= findWikiEntry(request, wikiUtil,name, parent);
+            if (theEntry == null) {
+                theEntry = findWikiEntry(request, wikiUtil, name, parent);
             }
 
             if (theEntry != null) {
-                addWikiLink(wikiUtil,  theEntry);
+                addWikiLink(wikiUtil, theEntry);
                 if (label.trim().length() == 0) {
                     label = theEntry.getName();
                 }
@@ -1667,11 +1728,13 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 }
             }
 
-            
+
             String url = request.url(getRepository().URL_ENTRY_FORM,
                                      ARG_NAME, name, ARG_GROUP,
-                                     (entry.isGroup()?entry.getId():parent.getId()), ARG_TYPE,
-                                     WikiPageTypeHandler.TYPE_WIKIPAGE);
+                                     (entry.isGroup()
+                                      ? entry.getId()
+                                      : parent.getId()), ARG_TYPE,
+                                          WikiPageTypeHandler.TYPE_WIKIPAGE);
 
             return HtmlUtil.href(url, name,
                                  HtmlUtil.cssClass("wiki-link-noexist"));
@@ -1720,15 +1783,28 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         WikiUtil wikiUtil = new WikiUtil(Misc.newHashtable(new Object[] {
                                 PROP_REQUEST,
                                 request, PROP_ENTRY, entry }));
-        return wikifyEntry(request, entry, wikiUtil, wikiContent, subGroups, subEntries);
+        return wikifyEntry(request, entry, wikiUtil, wikiContent, subGroups,
+                           subEntries);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param wikiUtil _more_
+     * @param wikiContent _more_
+     * @param subGroups _more_
+     * @param subEntries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public String wikifyEntry(Request request, Entry entry,
-                              WikiUtil wikiUtil,
-                              String wikiContent, 
-                              List<Group> subGroups,
-                              List<Entry> subEntries)
+                              WikiUtil wikiUtil, String wikiContent,
+                              List<Group> subGroups, List<Entry> subEntries)
             throws Exception {
         List children = new ArrayList();
         if (subGroups != null) {
@@ -1751,12 +1827,18 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
     }
 
+    /**
+     * _more_
+     *
+     * @param wikiUtil _more_
+     * @param toEntry _more_
+     */
     protected void addWikiLink(WikiUtil wikiUtil, Entry toEntry) {
-        Hashtable links  = (Hashtable)wikiUtil.getProperty("wikilinks");
-        if(links == null) {
-            wikiUtil.putProperty("wikilinks",links = new Hashtable());
+        Hashtable links = (Hashtable) wikiUtil.getProperty("wikilinks");
+        if (links == null) {
+            wikiUtil.putProperty("wikilinks", links = new Hashtable());
         }
-        links.put(toEntry,toEntry);
+        links.put(toEntry, toEntry);
     }
 
 

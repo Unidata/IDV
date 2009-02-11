@@ -53,7 +53,11 @@ public class RepositoryBase implements Constants, RepositorySource {
     public final RequestUrl URL_GETMAP = new RequestUrl(this, "/getmap");
 
 
-    public final RequestUrl URL_HELP = new RequestUrl(this, "/help/index.html");
+    /** _more_          */
+    public final RequestUrl URL_HELP = new RequestUrl(this,
+                                           "/help/index.html");
+
+    /** _more_          */
     public final RequestUrl URL_PING = new RequestUrl(this, "/ping");
 
     /** _more_ */
@@ -65,8 +69,7 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public final RequestUrl URL_SEARCH_FORM = new RequestUrl(this,
-                                                  "/search/form",
-                                                  "Advanced");
+                                                  "/search/form", "Advanced");
 
     /** _more_ */
     public final RequestUrl URL_SEARCH_TEXTFORM = new RequestUrl(this,
@@ -169,8 +172,10 @@ public class RepositoryBase implements Constants, RepositorySource {
     public final RequestUrl URL_ENTRY_NEW = new RequestUrl(this,
                                                 "/entry/new", "New Entry");
 
+    /** _more_          */
     public final RequestUrl URL_ENTRY_UPLOAD = new RequestUrl(this,
-                                                "/entry/upload", "Upload a file");
+                                                   "/entry/upload",
+                                                   "Upload a file");
 
 
     /** _more_ */
@@ -187,12 +192,13 @@ public class RepositoryBase implements Constants, RepositorySource {
                                                  "/user/login");
 
 
+    /** _more_          */
     public final RequestUrl URL_USER_FAVORITE = new RequestUrl(this,
-                                                 "/user/favorite");
+                                                    "/user/favorite");
 
     /** _more_ */
     public final RequestUrl URL_USER_ACTIVITY = new RequestUrl(this,
-                                                 "/user/activity");
+                                                    "/user/activity");
 
     /** _more_ */
     public final RequestUrl URL_USER_RESETPASSWORD =
@@ -210,10 +216,12 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public final RequestUrl URL_USER_HOME = new RequestUrl(this,
-                                                "/user/home","User Home");
+                                                "/user/home", "User Home");
 
+    /** _more_          */
     public final RequestUrl URL_USER_PROFILE = new RequestUrl(this,
-                                                "/user/profile","User Profile");
+                                                   "/user/profile",
+                                                   "User Profile");
 
     /** _more_ */
     public final RequestUrl URL_USER_SETTINGS = new RequestUrl(this,
@@ -396,15 +404,26 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @return _more_
      */
     public String httpsUrl(String url) {
-        String  port = getProperty(PROP_SSL_PORT,"").trim();
-        if(port.length()==0) throw new IllegalStateException ("Do not have ssl port defined");
-        if(port.equals("default")) 
+        String port = getProperty(PROP_SSL_PORT, "").trim();
+        if (port.length() == 0) {
+            throw new IllegalStateException("Do not have ssl port defined");
+        }
+        if (port.equals("default")) {
             return "https://" + getHostname() + url;
-        else
-            return "https://" + getHostname() +":" + port + url;
+        } else {
+            return "https://" + getHostname() + ":" + port + url;
+        }
     }
 
-    public String getProperty(String name,String dflt) {
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public String getProperty(String name, String dflt) {
         return dflt;
     }
 
@@ -559,8 +578,15 @@ public class RepositoryBase implements Constants, RepositorySource {
         return urlBase + f;
     }
 
-    public  String iconUrl(String f) {
-        String path = getProperty(f,f);
+    /**
+     * _more_
+     *
+     * @param f _more_
+     *
+     * @return _more_
+     */
+    public String iconUrl(String f) {
+        String path = getProperty(f, f);
         return urlBase + path;
     }
 

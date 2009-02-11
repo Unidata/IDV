@@ -153,10 +153,10 @@ public class Entry extends Entity {
 
 
 
-   /**
-     * _more_
-     *
-     * @param template _more_
+    /**
+     *  _more_
+     * 
+     *  @param template _more_
      */
     public void initWith(Entry template) {
         setName(template.getName());

@@ -68,6 +68,7 @@ public class User {
     /** _more_ */
     private List<String> roles;
 
+    /** _more_          */
     private List<FavoriteEntry> favorites;
 
 
@@ -75,6 +76,7 @@ public class User {
     private String language = "";
 
 
+    /** _more_          */
     private String template;
 
     /**
@@ -122,10 +124,11 @@ public class User {
      * @param password _more_
      * @param admin _more_
      * @param language _more_
+     * @param template _more_
      */
     public User(String id, String name, String email, String question,
                 String answer, String password, boolean admin,
-                String language,String template) {
+                String language, String template) {
 
         this.id       = id;
         this.name     = name;
@@ -428,42 +431,44 @@ public class User {
 
 
     /**
-       Set the Template property.
-
-       @param value The new value for Template
-    **/
-    public void setTemplate (String value) {
-	template = value;
+     *  Set the Template property.
+     *
+     *  @param value The new value for Template
+     */
+    public void setTemplate(String value) {
+        template = value;
     }
 
     /**
-       Get the Template property.
-
-       @return The Template
-    **/
-    public String getTemplate () {
-        if(template == null) return "";
-	return template;
+     *  Get the Template property.
+     *
+     *  @return The Template
+     */
+    public String getTemplate() {
+        if (template == null) {
+            return "";
+        }
+        return template;
     }
 
 
 
     /**
-       Set the Favorites property.
-
-       @param value The new value for Favorites
-    **/
-    public void setFavorites (List<FavoriteEntry> value) {
-	favorites = value;
+     *  Set the Favorites property.
+     *
+     *  @param value The new value for Favorites
+     */
+    public void setFavorites(List<FavoriteEntry> value) {
+        favorites = value;
     }
 
     /**
-       Get the Favorites property.
-
-       @return The Favorites
-    **/
-    public List<FavoriteEntry> getFavorites () {
-	return favorites;
+     *  Get the Favorites property.
+     *
+     *  @return The Favorites
+     */
+    public List<FavoriteEntry> getFavorites() {
+        return favorites;
     }
 
 

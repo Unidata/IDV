@@ -98,11 +98,15 @@ public class GenericTypeHandler extends TypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public String getIconUrl(Request request,Entry entry) throws Exception {
+    public String getIconUrl(Request request, Entry entry) throws Exception {
         String icon = getProperty("icon", (String) null);
         if (icon != null) {
             return iconUrl(icon);
@@ -155,7 +159,7 @@ public class GenericTypeHandler extends TypeHandler {
         tableDef.append(COL_ID + " varchar(200))");
         try {
             statement.execute(tableDef.toString());
-            
+
         } catch (Throwable exc) {
             if (exc.toString().indexOf("already exists") < 0) {
                 //TODO:

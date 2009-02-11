@@ -82,7 +82,7 @@ public class Column implements Constants {
     /** _more_ */
     public static final String TYPE_STRING = "string";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_CLOB = "clob";
 
     /** _more_ */

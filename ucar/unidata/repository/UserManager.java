@@ -76,16 +76,14 @@ public class UserManager extends RepositoryManager {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_CART = new OutputType("Add to Cart",
-                                                     "user.cart",
-                                                     OutputType.TYPE_NONHTML,"",ICON_CART_ADD);
+    public static final OutputType OUTPUT_CART =
+        new OutputType("Add to Cart", "user.cart", OutputType.TYPE_NONHTML,
+                       "", ICON_CART_ADD);
 
-    public static final OutputType OUTPUT_FAVORITE = new OutputType("Add as Favorite",
-                                                     "user.addfavorite",
-                                                     OutputType.TYPE_NONHTML,"",ICON_FAVORITE);
-
-    /** _more_ */
-    public static final String COOKIE_NAME = "repositorysession";
+    /** _more_          */
+    public static final OutputType OUTPUT_FAVORITE =
+        new OutputType("Add as Favorite", "user.addfavorite",
+                       OutputType.TYPE_NONHTML, "", ICON_FAVORITE);
 
     /** _more_ */
     public static final String ROLE_ANY = "any";
@@ -94,16 +92,12 @@ public class UserManager extends RepositoryManager {
     public static final String ROLE_NONE = "none";
 
 
-    /** _more_ */
-    private Hashtable<String, Session> sessionMap = new Hashtable<String,
-                                                        Session>();
-
 
 
     /** _more_ */
-    protected RequestUrl[] userUrls = {  getRepositoryBase().URL_USER_HOME,
-                                         getRepositoryBase().URL_USER_SETTINGS,
-                                         getRepositoryBase().URL_USER_CART };
+    protected RequestUrl[] userUrls = { getRepositoryBase().URL_USER_HOME,
+                                        getRepositoryBase().URL_USER_SETTINGS,
+                                        getRepositoryBase().URL_USER_CART };
 
 
     /** _more_ */
@@ -119,9 +113,6 @@ public class UserManager extends RepositoryManager {
     private Hashtable userCart = new Hashtable();
 
     /** _more_ */
-    private List ipUserList = new ArrayList();
-
-    /** _more_ */
     public final User localFileUser = new User("localuser", false);
 
     /**
@@ -131,15 +122,9 @@ public class UserManager extends RepositoryManager {
      */
     public UserManager(Repository repository) {
         super(repository);
-        //        ipUserList.add("128.117.156.*");
-        //        ipUserList.add("jeffmc");
-
     }
 
-    public void init() {
-        Misc.run(new Runnable() {public void run() {
-            cullSessions();}});
-    }
+
 
 
     /**
@@ -163,267 +148,46 @@ public class UserManager extends RepositoryManager {
 
 
 
-    private void cullSessions() {
-        //Wait a while before starting
-        Misc.sleepSeconds(60);
-        while(true) {
-            try {
-                cullSessionsInner();
-            } catch(Exception exc) {
-                logException("Culling sessions", exc);
-
-                return;
-                       
-
-            }
-            //cull every hour
-            Misc.sleepSeconds(60*60);
-        }
-    }
-
-
-    private void cullSessionsInner() throws Exception  {
-        List<Session> sessionsToDelete = new ArrayList<Session>();
-        Date now = new Date(); 
-
-        Statement stmt = getDatabaseManager().select(Tables.SESSIONS.COLUMNS,
-                                                     Tables.SESSIONS.NAME,(Clause)null); 
-        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
-        ResultSet        results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                Session session = makeSession(results);
-                Date lastActiveDate = session.getLastActivity();
-                //Check if the last activity was > 24 hours ago
-                sessionsToDelete.add(session);
-            }
-        }
-        for(Session session: sessionsToDelete) {
-            removeSession(session.getId());
-        }
-
-    }
-
-
-    //TODO: we need to clean out old sessions every once in a while
-
-    /**
-     * _more_
-     *
-     * @param sessionId _more_
-     *
-     * @return _more_
-     */
-    public Session getSession(String sessionId) throws Exception  {
-        Session session = sessionMap.get(sessionId);
-        if(session == null) {
-            Statement stmt = getDatabaseManager().select(Tables.SESSIONS.COLUMNS,
-                                                         Tables.SESSIONS.NAME, 
-                                                         Clause.eq(Tables.SESSIONS.COL_SESSION_ID, sessionId));
-            SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
-            ResultSet        results;
-            //COL_SESSION_ID,COL_USER_ID,COL_CREATE_DATE,COL_LAST_ACTIVE_DATE,COL_EXTRA
-            while ((results = iter.next()) != null) {
-                while (results.next()) {
-                    session = makeSession(results);
-                    break;
-                }
-            }
-
-        }
-        return session;
-    }
-
-    private Session makeSession(ResultSet results) throws Exception {
-        int col=1;
-        String sessionId = results.getString(col++);
-        String userId   = results.getString(col++);
-        User   user   = findUser(userId);
-        if(user == null)user = getAnonymousUser();
-        Date createDate = getDatabaseManager().getDate(results, col++);
-        Date lastActiveDate = getDatabaseManager().getDate(results, col++);
-        //See if we have it in the map
-        Session session = sessionMap.get(sessionId);
-        if(session !=null) return session;
-        return  new Session(sessionId,user, createDate, lastActiveDate);
-    }
-
-
-    public void removeSession(String sessionId) throws Exception {
-        sessionMap.remove(sessionId);
-        getDatabaseManager().delete(Tables.SESSIONS.NAME, Clause.eq(Tables.SESSIONS.COL_SESSION_ID,sessionId));
-    }
-
-    public void addSession(String sessionId,Session session) throws Exception {
-        sessionMap.put(sessionId,  session);
-        //COL_SESSION_ID,COL_USER_ID,COL_CREATE_DATE,COL_LAST_ACTIVE_DATE,COL_EXTRA
-        getDatabaseManager().executeInsert(Tables.SESSIONS.INSERT, new Object[] {
-            sessionId, session.user.getId(),new Date(),new Date(),""
-        });
-    }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    private List<Session> getSessions() throws Exception {
-        List<Session> sessions = new ArrayList<Session>();
-        Statement stmt = getDatabaseManager().select(Tables.SESSIONS.COLUMNS,
-                                                     Tables.SESSIONS.NAME,(Clause)null); 
-        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
-        ResultSet        results;
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                sessions.add(makeSession(results));
-            }
-        }
-        return sessions;
-    }
-
-
-
 
     /**
      * _more_
      *
      * @param request _more_
+     * @param user _more_
+     *
+     * @return _more_
      *
      * @throws Exception _more_
      */
-    protected void checkSession(Request request) throws Exception {
-
-        User         user    = request.getUser();
-        List<String> cookies = getCookies(request);
-
-        for (String cookieValue : cookies) {
-            request.setSessionId(cookieValue);
-            if (user == null) {
-                Session session = getSession(request.getSessionId());
-                if (session != null) {
-                    session.setLastActivity(new Date());
-                    user = session.user = getCurrentUser(session.user);
-                    break;
-                }
-            }
-        }
-
-
-        if ((user == null) && request.hasParameter(ARG_SESSIONID)) {
-            Session session =getSession(request.getString(ARG_SESSIONID));
-            if (session != null) {
-                session.setLastActivity(new Date());
-                user = session.user = getCurrentUser(session.user);
-            }
-        }
-
-        //Check for url auth
-        if ((user == null) && request.exists(ARG_AUTH_USER)
-                && request.exists(ARG_AUTH_PASSWORD)) {
-            String userId   = request.getString(ARG_AUTH_USER, "");
-            String password = request.getString(ARG_AUTH_PASSWORD, "");
-            user = findUser(userId, false);
-            if (user == null) {
-                throw new IllegalArgumentException(msgLabel("Unknown user")
-                        + userId);
-            }
-            if ( !user.getPassword().equals(hashPassword(password))) {
-                throw new IllegalArgumentException(msg("Incorrect password"));
-            }
-            setUserSession(request, user);
-        }
-
-
-        //Check for basic auth
-        if (user == null) {
-            String auth =
-                (String) request.getHttpHeaderArgs().get("Authorization");
-            if (auth == null) {
-                auth = (String) request.getHttpHeaderArgs().get(
-                    "authorization");
-            }
-
-            if (auth != null) {
-                auth = auth.trim();
-                //Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
-                if (auth.startsWith("Basic")) {
-                    auth = new String(
-                        XmlUtil.decodeBase64(auth.substring(5).trim()));
-                    String[] toks = StringUtil.split(auth, ":", 2);
-                    if (toks.length == 2) {
-                        user = findUser(toks[0], false);
-                        if (user == null) {
-                            throw new RepositoryUtil.AccessException(
-                                msgLabel("Unknown user") + toks[0]);
-                        }
-                        if ( !user.getPassword().equals(
-                                hashPassword(toks[1]))) {
-                            throw new RepositoryUtil.AccessException(
-                                msg("Incorrect password"));
-                        }
-                    }
-                    setUserSession(request, user);
-                }
-            }
-        }
-
-        if (user == null) {
-            String requestIp = request.getIp();
-            if (requestIp != null) {
-                for (int i = 0; i < ipUserList.size(); i += 2) {
-                    String ip       = (String) ipUserList.get(i);
-                    String userName = (String) ipUserList.get(i + 1);
-                    if (requestIp.matches(ip)) {
-                        user = findUser(userName, false);
-                        if (user == null) {
-                            user = new User(userName, false);
-                            makeOrUpdateUser(user, false);
-                        }
-                    }
-                }
-            }
-        }
-
-
-        if (request.getSessionId() == null) {
-            //            request.setSessionId(getSessionId());
-        }
-
-        //Make sure we have the current user state
-        user = getCurrentUser(user);
-
-        if (user == null) {
-            user = getUserManager().getAnonymousUser();
-        }
-
-
-        request.setUser(user);
-    }
-
-    public List<FavoriteEntry> getFavorites(Request request, User user) throws Exception {
-        List<FavoriteEntry> favorites  = user.getFavorites();
-        if(favorites == null) {
+    public List<FavoriteEntry> getFavorites(Request request, User user)
+            throws Exception {
+        List<FavoriteEntry> favorites = user.getFavorites();
+        if (favorites == null) {
             favorites = new ArrayList<FavoriteEntry>();
-            Statement stmt = getDatabaseManager().select(Tables.FAVORITES.COLUMNS,
-                                                         Tables.FAVORITES.NAME, 
-                                                         Clause.eq(Tables.FAVORITES.COL_USER_ID, user.getId()));
+            Statement stmt = getDatabaseManager().select(
+                                 Tables.FAVORITES.COLUMNS,
+                                 Tables.FAVORITES.NAME,
+                                 Clause.eq(
+                                     Tables.FAVORITES.COL_USER_ID,
+                                     user.getId()));
             SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
             ResultSet        results;
             //COL_ID,COL_USER_ID,COL_ENTRY_ID,COL_NAME,COL_CATEGORY
             while ((results = iter.next()) != null) {
                 while (results.next()) {
-                    int col=1;
-                    String id = results.getString(col++);
-                    String userId =     results.getString(col++);
-                    Entry entry = getEntryManager().getEntry(request, results.getString(col++));
-                    String name = results.getString(col++);
+                    int    col    = 1;
+                    String id     = results.getString(col++);
+                    String userId = results.getString(col++);
+                    Entry entry = getEntryManager().getEntry(request,
+                                      results.getString(col++));
+                    String name     = results.getString(col++);
                     String category = results.getString(col++);
-                    if(entry == null) {
+                    if (entry == null) {
                         //TODO: delete it from the list of favorites
                         continue;
-                    } 
-                    favorites.add(new FavoriteEntry(id,entry,name,category));
+                    }
+                    favorites.add(new FavoriteEntry(id, entry, name,
+                            category));
                 }
             }
             user.setFavorites(favorites);
@@ -440,7 +204,7 @@ public class UserManager extends RepositoryManager {
      *
      * @return _more_
      */
-    private User getCurrentUser(User user) {
+    public User getCurrentUser(User user) {
         if (user == null) {
             return null;
         }
@@ -453,119 +217,12 @@ public class UserManager extends RepositoryManager {
 
 
 
-    private Hashtable sessionMessages;
-    //    String sessionMessage;
-
-
-    public String getSessionMessage(Request request) {
-        String sessionMessage = null;
-        Object id  = request.getSessionId();
-        if(id !=null && sessionMessages!=null) {
-            synchronized(sessionMessages) {
-                sessionMessage = (String) sessionMessages.get(id);
-                if(sessionMessage!=null) {
-                    sessionMessages.remove(id);
-                }
-            }
-        }
-        return sessionMessage;
-    }
-
-    public void setSessionMessage(String message) throws Exception {
-        sessionMessages = new Hashtable();
-        if(message!=null && message.trim().length()>0) {
-        synchronized(sessionMessages) {
-            for(Session session: getSessions()) {
-                sessionMessages.put(session.getId(), message);
-            }
-        }
-        }
-    }
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    private List<String> getCookies(Request request) throws Exception {
-        List<String> cookies = new ArrayList<String>();
-        String       cookie  = request.getHeaderArg("Cookie");
-        if (cookie == null) {
-            return cookies;
-        }
-        request.tmp.append("cookie from header:" + cookie + "<p>");
-
-        List toks = StringUtil.split(cookie, ";", true, true);
-        for (int i = 0; i < toks.size(); i++) {
-            String tok     = (String) toks.get(i);
-            List   subtoks = StringUtil.split(tok, "=", true, true);
-            if (subtoks.size() != 2) {
-                continue;
-            }
-            String cookieName  = (String) subtoks.get(0);
-            String cookieValue = (String) subtoks.get(1);
-            if (cookieName.equals(COOKIE_NAME)) {
-                cookies.add(cookieValue);
-            }
-        }
-        request.tmp.append("cookies:" + cookies + "<p>");
-        return cookies;
-    }
 
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    protected String getSessionId() {
-        return getRepository().getGUID() + "_" + Math.random();
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param user _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void setUserSession(Request request, User user)
-            throws Exception {
-        if (request.getSessionId() == null) {
-            request.setSessionId(getSessionId());
-        }
-        addSession(request.getSessionId(),
-                   new Session(request.getSessionId(), user, new Date()));
-        request.setUser(user);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void removeUserSession(Request request) throws Exception {
-        if (request.getSessionId() != null) {
-            removeSession(request.getSessionId());
-        }
-        List<String> cookies = getCookies(request);
-        for (String cookieValue : cookies) {
-            removeSession(cookieValue);
-        }
-        request.setUser(getUserManager().getAnonymousUser());
-    }
 
 
 
@@ -626,12 +283,15 @@ public class UserManager extends RepositoryManager {
         sb.append(header(msg("Please login")));
         String id = request.getString(ARG_USER_ID, "");
         if (getRepository().isSSLEnabled(request)) {
-            sb.append(HtmlUtil.formPost(getRepositoryBase().URL_USER_LOGIN.getHttpsUrl("")));
+            sb.append(
+                HtmlUtil.formPost(
+                    getRepositoryBase().URL_USER_LOGIN.getHttpsUrl("")));
             //            sb.append(
             //                HtmlUtil.formPost(getRepositoryBase().URL_USER_LOGIN.toString()));
         } else {
             sb.append(
-                HtmlUtil.formPost(getRepositoryBase().URL_USER_LOGIN.toString()));
+                HtmlUtil.formPost(
+                    getRepositoryBase().URL_USER_LOGIN.toString()));
         }
         if (request.defined(ARG_REDIRECT)) {
             sb.append(HtmlUtil.hidden(ARG_REDIRECT,
@@ -791,13 +451,13 @@ public class UserManager extends RepositoryManager {
                 Tables.USERS.COL_NAME, Tables.USERS.COL_PASSWORD,
                 Tables.USERS.COL_EMAIL, Tables.USERS.COL_QUESTION,
                 Tables.USERS.COL_ANSWER, Tables.USERS.COL_ADMIN,
-                Tables.USERS.COL_LANGUAGE,
-                Tables.USERS.COL_TEMPLATE
+                Tables.USERS.COL_LANGUAGE, Tables.USERS.COL_TEMPLATE
             }, new Object[] {
                 user.getName(), user.getPassword(), user.getEmail(),
                 user.getQuestion(), user.getAnswer(), user.getAdmin()
                         ? new Integer(1)
-                : new Integer(0), user.getLanguage(),user.getTemplate()
+                        : new Integer(0), user.getLanguage(),
+                user.getTemplate()
             });
             userMap.put(user.getId(), user);
             return;
@@ -806,7 +466,8 @@ public class UserManager extends RepositoryManager {
         getDatabaseManager().executeInsert(Tables.USERS.INSERT, new Object[] {
             user.getId(), user.getName(), user.getEmail(), user.getQuestion(),
             user.getAnswer(), user.getPassword(),
-            new Boolean(user.getAdmin()), user.getLanguage(), user.getTemplate()
+            new Boolean(user.getAdmin()), user.getLanguage(),
+            user.getTemplate()
         });
 
         userMap.put(user.getId(), user);
@@ -901,8 +562,7 @@ public class UserManager extends RepositoryManager {
             throws Exception {
         user.setName(request.getString(ARG_USER_NAME, user.getName()));
         user.setEmail(request.getString(ARG_USER_EMAIL, user.getEmail()));
-        user.setTemplate(request.getString(ARG_TEMPLATE,
-                                           user.getTemplate()));
+        user.setTemplate(request.getString(ARG_TEMPLATE, user.getTemplate()));
 
 
         user.setLanguage(request.getString(ARG_USER_LANGUAGE,
@@ -1065,10 +725,11 @@ public class UserManager extends RepositoryManager {
                                      HtmlUtil.input(ARG_USER_EMAIL,
                                          user.getEmail(), HtmlUtil.SIZE_40)));
 
-        List<TwoFacedObject> templates = getRepository().getTemplateSelectList();
+        List<TwoFacedObject> templates =
+            getRepository().getTemplateSelectList();
         sb.append(HtmlUtil.formEntry(msgLabel("Page Template"),
-                                     HtmlUtil.select(ARG_TEMPLATE,
-                                                     templates, user.getTemplate())));
+                                     HtmlUtil.select(ARG_TEMPLATE, templates,
+                                         user.getTemplate())));
 
         List languages = new ArrayList(getRepository().getLanguages());
         languages.add(0, new TwoFacedObject("None", ""));
@@ -1150,7 +811,7 @@ public class UserManager extends RepositoryManager {
                     break;
                 }
                 User user = new User(id, name, email, "", "",
-                                     hashPassword(password1), false, "","");
+                                     hashPassword(password1), false, "", "");
                 user.setRoles(roles);
                 users.add(user);
             }
@@ -1212,8 +873,8 @@ public class UserManager extends RepositoryManager {
 
             if (okToAdd) {
                 makeOrUpdateUser(new User(id, name, email, "", "",
-                                          hashPassword(password1), admin,
-                                          "",""), false);
+                                          hashPassword(password1), admin, "",
+                                          ""), false);
                 String userEditLink =
                     request.url(getRepositoryBase().URL_USER_EDIT,
                                 ARG_USER_ID, id);
@@ -1230,9 +891,11 @@ public class UserManager extends RepositoryManager {
         sb.append(request.form(getRepositoryBase().URL_USER_NEW));
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry(msgLabel("ID"),
-                                     HtmlUtil.input(ARG_USER_ID, id, HtmlUtil.SIZE_40)));
+                                     HtmlUtil.input(ARG_USER_ID, id,
+                                         HtmlUtil.SIZE_40)));
         sb.append(HtmlUtil.formEntry(msgLabel("Name"),
-                                     HtmlUtil.input(ARG_USER_NAME, name, HtmlUtil.SIZE_40)));
+                                     HtmlUtil.input(ARG_USER_NAME, name,
+                                         HtmlUtil.SIZE_40)));
 
 
         sb.append(HtmlUtil.formEntry(msgLabel("Admin"),
@@ -1240,7 +903,8 @@ public class UserManager extends RepositoryManager {
                                          "true", admin)));
 
         sb.append(HtmlUtil.formEntry(msgLabel("Email"),
-                                     HtmlUtil.input(ARG_USER_EMAIL, email, HtmlUtil.SIZE_40)));
+                                     HtmlUtil.input(ARG_USER_EMAIL, email,
+                                         HtmlUtil.SIZE_40)));
 
         sb.append(HtmlUtil.formEntry(msgLabel("Password"),
                                      HtmlUtil.password(ARG_USER_PASSWORD1)));
@@ -1288,38 +952,6 @@ public class UserManager extends RepositoryManager {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public StringBuffer getSessionList(Request request) throws Exception {
-        List<Session> sessions    = getSessions();
-        StringBuffer  sessionHtml = new StringBuffer(HtmlUtil.formTable());
-        sessionHtml.append(
-            HtmlUtil.row(
-                HtmlUtil.cols(
-                    HtmlUtil.bold(msg("User")), HtmlUtil.bold(msg("Since")),
-                    HtmlUtil.bold(msg("Last Activity")))));
-        for (Session session : sessions) {
-            sessionHtml.append(
-                HtmlUtil.row(
-                    HtmlUtil.cols(
-                        session.user.getLabel(),
-                        formatDate(request, session.createDate),
-                        formatDate(request, session.getLastActivity()))));
-        }
-        sessionHtml.append(HtmlUtil.formTableClose());
-        return sessionHtml;
-    }
-
-
-
-
 
 
 
@@ -1362,44 +994,45 @@ public class UserManager extends RepositoryManager {
 
 
         usersHtml.append("<table>");
-        usersHtml.append(
-            HtmlUtil.row(
-                HtmlUtil.cols(
-                              "",
-                    HtmlUtil.bold(msg("ID")) + HtmlUtil.space(2),
-                    HtmlUtil.bold(msg("Name")) + HtmlUtil.space(2),
-                              //                    HtmlUtil.bold(msg("Roles")) + HtmlUtil.space(2),
-                    HtmlUtil.bold(msg("Email")) + HtmlUtil.space(2),
-                    HtmlUtil.bold(msg("Admin?")) + HtmlUtil.space(2))));
+        usersHtml.append(HtmlUtil.row(HtmlUtil.cols("",
+                HtmlUtil.bold(msg("ID")) + HtmlUtil.space(2),
+                HtmlUtil.bold(msg("Name")) + HtmlUtil.space(2),
+        //                    HtmlUtil.bold(msg("Roles")) + HtmlUtil.space(2),
+        HtmlUtil.bold(msg("Email")) + HtmlUtil.space(2), HtmlUtil.bold(
+            msg("Admin?")) + HtmlUtil.space(2))));
 
         for (User user : users) {
-            String userEditLink =
-                HtmlUtil.href(request.url(getRepositoryBase().URL_USER_EDIT,
+            String userEditLink = HtmlUtil.href(
+                                      request.url(
+                                          getRepositoryBase().URL_USER_EDIT,
                                           ARG_USER_ID,
-                                          user.getId()), HtmlUtil.img(iconUrl(ICON_EDIT),msg("Edit user")));
+                                          user.getId()), HtmlUtil.img(
+                                              iconUrl(ICON_EDIT),
+                                              msg("Edit user")));
 
             String userProfileLink =
                 HtmlUtil.href(
                     HtmlUtil.url(
                         request.url(getRepository().URL_USER_PROFILE),
-                        ARG_USER_ID,
-                        user.getId()), user.getId(),
+                        ARG_USER_ID, user.getId()), user.getId(),
                             "title=\"View user profile\"");
 
             String userLogLink =
-                HtmlUtil.href(request.url(getRepositoryBase().URL_USER_ACTIVITY,
-                                          ARG_USER_ID,
-                                          user.getId()), HtmlUtil.img(getRepository().iconUrl(ICON_LOG),msg("View user log") ));
+                HtmlUtil.href(
+                    request.url(
+                        getRepositoryBase().URL_USER_ACTIVITY, ARG_USER_ID,
+                        user.getId()), HtmlUtil.img(
+                            getRepository().iconUrl(ICON_LOG),
+                            msg("View user log")));
 
 
             String row = (user.getAdmin()
                           ? "<tr valign=\"top\" style=\"background-color:#cccccc;\">"
                           : "<tr valign=\"top\" >") + HtmlUtil.cols(
-                                                                    userLogLink+ userEditLink, userProfileLink,
-                                                                    user.getName(),
-                                                                    /*user.getRolesAsString("<br>"),*/
-                                                                    user.getEmail(),
-                              "" + user.getAdmin()) + "</tr>";
+                              userLogLink + userEditLink, userProfileLink,
+                              user.getName(),
+            /*user.getRolesAsString("<br>"),*/
+            user.getEmail(), "" + user.getAdmin()) + "</tr>";
             usersHtml.append(row);
 
             List<String> roles = user.getRoles();
@@ -1441,7 +1074,8 @@ public class UserManager extends RepositoryManager {
 
 
         tabTitles.add(msg("Current Sessions"));
-        tabContent.add(getSessionList(request).toString());
+        tabContent.add(
+            getSessionManager().getSessionList(request).toString());
 
 
         tabTitles.add(msg("Recent User Activity"));
@@ -1582,6 +1216,7 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result showCart(Request request) throws Exception {
+
         StringBuffer sb = new StringBuffer();
         if (request.exists(ARG_MESSAGE)) {
             sb.append(
@@ -1594,24 +1229,26 @@ public class UserManager extends RepositoryManager {
             return makeResult(request, "User Cart", sb);
         }
 
-        boolean splitScreen = request.getString(ARG_ACTION,"").equals(ACTION_SPLIT);
-        boolean haveFrom = request.defined(ARG_FROM);
-        StringBuffer header = new StringBuffer();
+        boolean splitScreen = request.getString(ARG_ACTION,
+                                  "").equals(ACTION_SPLIT);
+        boolean      haveFrom = request.defined(ARG_FROM);
+        StringBuffer header   = new StringBuffer();
 
-        if(!haveFrom) {
-            if(splitScreen) {
+        if ( !haveFrom) {
+            if (splitScreen) {
                 header.append(
-                          HtmlUtil.href(
-                                        request.url(
-                                                    getRepositoryBase().URL_USER_CART), msg("Unsplit Screen")));
+                    HtmlUtil.href(
+                        request.url(getRepositoryBase().URL_USER_CART),
+                        msg("Unsplit Screen")));
             } else {
                 header.append(
-                          HtmlUtil.href(
-                                        request.url(
-                                                    getRepositoryBase().URL_USER_CART, ARG_ACTION,
-                                                    ACTION_SPLIT), msg("Split Screen")));
+                    HtmlUtil.href(
+                        request.url(
+                            getRepositoryBase().URL_USER_CART, ARG_ACTION,
+                            ACTION_SPLIT), msg("Split Screen")));
             }
-            header.append(HtmlUtil.span("&nbsp;|&nbsp;", HtmlUtil.cssClass("separator")));
+            header.append(HtmlUtil.span("&nbsp;|&nbsp;",
+                                        HtmlUtil.cssClass("separator")));
         }
 
         header.append(
@@ -1632,7 +1269,9 @@ public class UserManager extends RepositoryManager {
 
 
         if ( !haveFrom && !splitScreen) {
-            String[] formTuple = getRepository().getHtmlOutputHandler().getEntryFormStart(request,entries);
+            String[] formTuple =
+                getRepository().getHtmlOutputHandler().getEntryFormStart(
+                    request, entries);
 
             sb.append(formTuple[2]);
         }
@@ -1640,55 +1279,67 @@ public class UserManager extends RepositoryManager {
             getRepository().getOutputHandler(request);
 
         int cnt = 1;
-        if(splitScreen) cnt=2;
-        List<StringBuffer>columns = new ArrayList<StringBuffer>();
-        for(int column=0;column<cnt;column++) {
+        if (splitScreen) {
+            cnt = 2;
+        }
+        List<StringBuffer> columns = new ArrayList<StringBuffer>();
+        for (int column = 0; column < cnt; column++) {
             StringBuffer colSB = new StringBuffer();
             columns.add(colSB);
             for (Entry entry : entries) {
-                if(!splitScreen) {
+                if ( !splitScreen) {
                     colSB.append(HtmlUtil.tag(HtmlUtil.TAG_LI));
                     colSB.append(HtmlUtil.space(1));
                 }
                 if (haveFrom) {
                     colSB.append(
-                                 HtmlUtil.href(
-                                               request.url(
-                                                           getRepository().URL_ASSOCIATION_ADD, ARG_FROM,
-                                                           request.getString(ARG_FROM, ""), ARG_TO,
-                                                           entry.getId()), HtmlUtil.img(
-                                                                                        getRepository().iconUrl(ICON_ASSOCIATION),
-                                                                                        msg("Create an association"))+HtmlUtil.space(1)+entry.getLabel()));
-                } else if(splitScreen) {
-                    colSB.append(getEntryManager().getAjaxLink(request, entry));
+                        HtmlUtil.href(
+                            request.url(
+                                getRepository().URL_ASSOCIATION_ADD,
+                                ARG_FROM, request.getString(ARG_FROM, ""),
+                                ARG_TO, entry.getId()), HtmlUtil.img(
+                                    getRepository().iconUrl(
+                                        ICON_ASSOCIATION), msg(
+                                        "Create an association")) + HtmlUtil.space(
+                                            1) + entry.getLabel()));
+                } else if (splitScreen) {
+                    colSB.append(getEntryManager().getAjaxLink(request,
+                            entry));
 
                 } else {
-                    String links = HtmlUtil.checkbox("entry_" + entry.getId(),
-                                                     "true");
-                    colSB.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
+                    String links = HtmlUtil.checkbox("entry_"
+                                       + entry.getId(), "true");
+                    colSB.append(HtmlUtil.hidden("all_" + entry.getId(),
+                            "1"));
                     colSB.append(links);
                     colSB.append(
-                                 HtmlUtil.href(
-                                               request.url(
-                                                           getRepositoryBase().URL_USER_CART, ARG_FROM,
-                                                           entry.getId()), HtmlUtil.img(
-                                                                                        getRepository().iconUrl(ICON_ASSOCIATION),
-                                                                                        msg("Create an association"))));
+                        HtmlUtil.href(
+                            request.url(
+                                getRepositoryBase().URL_USER_CART, ARG_FROM,
+                                entry.getId()), HtmlUtil.img(
+                                    getRepository().iconUrl(
+                                        ICON_ASSOCIATION), msg(
+                                        "Create an association"))));
 
                 }
-                if(!splitScreen) {
+                if ( !splitScreen) {
                     colSB.append(HtmlUtil.space(1));
-                    if (haveFrom) {
-                    } else {
-                        colSB.append(getEntryManager().getBreadCrumbs(request, entry));
+                    if (haveFrom) {}
+                    else {
+                        colSB.append(
+                            getEntryManager().getBreadCrumbs(request, entry));
                     }
                 }
             }
         }
-        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"75%")));
-        sb.append(HtmlUtil.open(HtmlUtil.TAG_TR,HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,"top")));
-        for(StringBuffer colSB: columns) {
-            sb.append(HtmlUtil.open(HtmlUtil.TAG_TD,HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"50%")));
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,
+                                HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "75%")));
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TR,
+                                HtmlUtil.attr(HtmlUtil.ATTR_VALIGN, "top")));
+        for (StringBuffer colSB : columns) {
+            sb.append(HtmlUtil.open(HtmlUtil.TAG_TD,
+                                    HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
+                                        "50%")));
             sb.append("<ul style=\"list-style-image : url("
                       + getRepository().iconUrl(ICON_FILE) + ")\">");
             sb.append(colSB);
@@ -1702,6 +1353,7 @@ public class UserManager extends RepositoryManager {
             sb.append("</form>");
         }
         return makeResult(request, "User Cart", sb);
+
     }
 
     /**
@@ -1730,11 +1382,15 @@ public class UserManager extends RepositoryManager {
      * @return _more_
      */
     public String getUserLinks(Request request) {
-        User   user     = request.getUser(); 
-        String template = getRepository().getTemplateProperty(request,"ramadda.template.link.wrapper", "");
-        template = getRepository().getTemplateProperty(request,"ramadda.template.userlink.wrapper", template);
-        String separator = getRepository().getTemplateProperty(request,"ramadda.template.link.separator", "");
-        separator = getRepository().getTemplateProperty(request,"ramadda.template.userlink.separator", separator);
+        User user = request.getUser();
+        String template = getRepository().getTemplateProperty(request,
+                              "ramadda.template.link.wrapper", "");
+        template = getRepository().getTemplateProperty(request,
+                "ramadda.template.userlink.wrapper", template);
+        String separator = getRepository().getTemplateProperty(request,
+                               "ramadda.template.link.separator", "");
+        separator = getRepository().getTemplateProperty(request,
+                "ramadda.template.userlink.separator", separator);
 
         List extras = new ArrayList();
         List urls   = new ArrayList();
@@ -1763,7 +1419,7 @@ public class UserManager extends RepositoryManager {
             tips.add(msg("Logout"));
             extras.add("");
             urls.add(request.url(getRepositoryBase().URL_USER_HOME));
-            String label = user.getLabel().replace(" ","&nbsp;");
+            String label = user.getLabel().replace(" ", "&nbsp;");
             labels.add(label);
             tips.add(msg("Go to user settings"));
         }
@@ -1785,29 +1441,47 @@ public class UserManager extends RepositoryManager {
         return StringUtil.join(separator, links);
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processFavorite(Request request) throws Exception {
         String message = "";
-        User user  = request.getUser();
-        if(user.getAnonymous()) {
-            return new Result(msg("Favorites"), new StringBuffer(getRepository().error("Anonymous users cannCot have favorites")));
+        User   user    = request.getUser();
+        if (user.getAnonymous()) {
+            return new Result(
+                msg("Favorites"),
+                new StringBuffer(
+                    getRepository().error(
+                        "Anonymous users cannCot have favorites")));
         }
         String entryId = request.getString(ARG_ENTRYID, BLANK);
 
-        if(request.get(ARG_FAVORITE_ADD,false)) {
-            Entry entry = getEntryManager().getEntry(request,entryId);
-            if(entry == null) {
-                return new Result(msg("Favorites"), new StringBuffer(getRepository().error("Cannot find or access entry")));
+        if (request.get(ARG_FAVORITE_ADD, false)) {
+            Entry entry = getEntryManager().getEntry(request, entryId);
+            if (entry == null) {
+                return new Result(
+                    msg("Favorites"),
+                    new StringBuffer(
+                        getRepository().error(
+                            "Cannot find or access entry")));
             }
 
-            addFavorites(request,user, (List<Entry>)Misc.newList(entry));
+            addFavorites(request, user, (List<Entry>) Misc.newList(entry));
             message = msg("Favorite added");
-        } else if(request.get(ARG_FAVORITE_DELETE,false)) {
-            getDatabaseManager().delete(Tables.FAVORITES.NAME,
-                                        Clause.and(
-                                                   Clause.eq(Tables.FAVORITES.COL_ID,
-                                                             request.getString(ARG_FAVORITE_ID,"")),
-                                                   Clause.eq(Tables.FAVORITES.COL_USER_ID,
-                                                             user.getId())));
+        } else if (request.get(ARG_FAVORITE_DELETE, false)) {
+            getDatabaseManager().delete(
+                Tables.FAVORITES.NAME,
+                Clause.and(
+                    Clause.eq(
+                        Tables.FAVORITES.COL_ID,
+                        request.getString(ARG_FAVORITE_ID, "")), Clause.eq(
+                            Tables.FAVORITES.COL_USER_ID, user.getId())));
             message = msg("Favorite deleted");
             user.setFavorites(null);
         } else {
@@ -1815,26 +1489,39 @@ public class UserManager extends RepositoryManager {
         }
 
         String redirect = getRepositoryBase().URL_USER_HOME.toString();
-        return new Result(HtmlUtil.url(redirect,
-                                       ARG_MESSAGE, message));
+        return new Result(HtmlUtil.url(redirect, ARG_MESSAGE, message));
 
     }
 
 
-    private void addFavorites(Request request, User user, List<Entry> entries) throws Exception {
-        List<Entry> favorites = FavoriteEntry.getEntries(getFavorites(request, user));
-        if(user.getAnonymous()) throw new IllegalArgumentException("Need to be logged in to add favorites");
-        for(Entry entry: entries) {
-            if(favorites.contains(entry)) continue;
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param user _more_
+     * @param entries _more_
+     *
+     * @throws Exception _more_
+     */
+    private void addFavorites(Request request, User user, List<Entry> entries)
+            throws Exception {
+        List<Entry> favorites =
+            FavoriteEntry.getEntries(getFavorites(request, user));
+        if (user.getAnonymous()) {
+            throw new IllegalArgumentException(
+                "Need to be logged in to add favorites");
+        }
+        for (Entry entry : entries) {
+            if (favorites.contains(entry)) {
+                continue;
+            }
             //COL_ID,COL_USER_ID,COL_ENTRY_ID,COL_NAME
-            String name = "";
+            String name     = "";
             String category = "";
             getDatabaseManager().executeInsert(Tables.FAVORITES.INSERT,
-                                               new Object[] {
-                                                   getRepository().getGUID(),
-                                                   user.getId(), 
-                                                   entry.getId(),
-                                                   name,category});
+                    new Object[] { getRepository().getGUID(),
+                                   user.getId(), entry.getId(), name,
+                                   category });
         }
         user.setFavorites(null);
     }
@@ -1850,7 +1537,8 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processHome(Request request) throws Exception {
-        boolean responseAsXml  = request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML);
+        boolean responseAsXml = request.getString(ARG_RESPONSE,
+                                    "").equals(RESPONSE_XML);
         StringBuffer sb   = new StringBuffer();
         User         user = request.getUser();
         if (user.getAnonymous()) {
@@ -1880,21 +1568,24 @@ public class UserManager extends RepositoryManager {
 
 
         int cnt = 0;
-        for(FavoriteEntry favorite:  getFavorites(request, user)) {
-            if(cnt==0) {
+        for (FavoriteEntry favorite : getFavorites(request, user)) {
+            if (cnt == 0) {
                 sb.append(msgHeader("Favorites"));
             }
             cnt++;
             //TODO: Use the categories
             String removeLink =
-                HtmlUtil.href(request.url(getRepositoryBase().URL_USER_FAVORITE,
-                                          ARG_FAVORITE_ID,
-                                          favorite.getId(),
-                                          ARG_FAVORITE_DELETE,"true"), 
-                              HtmlUtil.img(getRepository().iconUrl(ICON_DELETE),msg("Delete this favorite") ));
+                HtmlUtil.href(
+                    request.url(
+                        getRepositoryBase().URL_USER_FAVORITE,
+                        ARG_FAVORITE_ID, favorite.getId(),
+                        ARG_FAVORITE_DELETE, "true"), HtmlUtil.img(
+                            getRepository().iconUrl(ICON_DELETE),
+                            msg("Delete this favorite")));
             sb.append(removeLink);
             sb.append(HtmlUtil.space(1));
-            sb.append(getEntryManager().getBreadCrumbs(request, favorite.getEntry()));
+            sb.append(getEntryManager().getBreadCrumbs(request,
+                    favorite.getEntry()));
             sb.append(HtmlUtil.br());
         }
 
@@ -1904,31 +1595,42 @@ public class UserManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processProfile(Request request) throws Exception {
         StringBuffer sb   = new StringBuffer();
-        User         user = findUser(request.getString(ARG_USER_ID,""));
-        if(user == null) {
+        User         user = findUser(request.getString(ARG_USER_ID, ""));
+        if (user == null) {
             sb.append(msgLabel("Unknown user"));
-            sb.append(request.getString(ARG_USER_ID,""));
+            sb.append(request.getString(ARG_USER_ID, ""));
             return new Result(msg("User Profile"), sb);
         }
 
         sb.append(msgHeader("User Profile"));
-        String searchLink = 
+        String searchLink =
             HtmlUtil.href(
-                          HtmlUtil.url(
-                                       request.url(getRepository().URL_ENTRY_SEARCH),
-                                       ARG_USER_ID,
-                                       user.getId()), HtmlUtil.img(getRepository().iconUrl(ICON_SEARCH),
-                                                                   msg("Search for entries created by this user")));
+                HtmlUtil.url(
+                    request.url(getRepository().URL_ENTRY_SEARCH),
+                    ARG_USER_ID, user.getId()), HtmlUtil.img(
+                        getRepository().iconUrl(ICON_SEARCH),
+                        msg("Search for entries created by this user")));
 
         sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.formEntry(msgLabel("ID"),user.getId()+HtmlUtil.space(2)+ searchLink));        
-        sb.append(HtmlUtil.formEntry(msgLabel("Name"),user.getLabel()));        
+        sb.append(HtmlUtil.formEntry(msgLabel("ID"),
+                                     user.getId() + HtmlUtil.space(2)
+                                     + searchLink));
+        sb.append(HtmlUtil.formEntry(msgLabel("Name"), user.getLabel()));
         String email = user.getEmail();
-        if(email.length()>0) {
-            email = email.replace("@"," _AT_ ");
-            sb.append(HtmlUtil.formEntry(msgLabel("Email"),email));
+        if (email.length() > 0) {
+            email = email.replace("@", " _AT_ ");
+            sb.append(HtmlUtil.formEntry(msgLabel("Email"), email));
         }
         sb.append(HtmlUtil.formTableClose());
         return new Result(msg("User Profile"), sb);
@@ -2162,15 +1864,23 @@ public class UserManager extends RepositoryManager {
     }
 
 
-    private void addActivity(Request request, User user, String what, String extra) 
-        throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param user _more_
+     * @param what _more_
+     * @param extra _more_
+     *
+     * @throws Exception _more_
+     */
+    private void addActivity(Request request, User user, String what,
+                             String extra)
+            throws Exception {
         getDatabaseManager().executeInsert(Tables.USER_ACTIVITY.INSERT,
-                                           new Object[] {
-                                               user.getId(), 
-                                               new Date(), what,extra,
-                                               request.getIp()
-                                           });
-    } 
+                                           new Object[] { user.getId(),
+                new Date(), what, extra, request.getIp() });
+    }
 
 
     /**
@@ -2183,7 +1893,8 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processLogin(Request request) throws Exception {
-        boolean responseAsXml  = request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML);
+        boolean responseAsXml = request.getString(ARG_RESPONSE,
+                                    "").equals(RESPONSE_XML);
         StringBuffer sb     = new StringBuffer();
         User         user   = null;
         String       output = request.getString(ARG_OUTPUT, "");
@@ -2202,8 +1913,8 @@ public class UserManager extends RepositoryManager {
             ResultSet results = stmt.getResultSet();
             if (results.next()) {
                 user = getUser(results);
-                addActivity(request, user,"login","");
-                setUserSession(request, user);
+                addActivity(request, user, "login", "");
+                getSessionManager().setUserSession(request, user);
                 if (responseAsXml) {
                     return new Result(XmlUtil.tag(TAG_RESPONSE,
                             XmlUtil.attr(ATTR_CODE, CODE_OK),
@@ -2214,8 +1925,8 @@ public class UserManager extends RepositoryManager {
                                           XmlUtil.decodeBase64(
                                               request.getUnsafeString(
                                                   ARG_REDIRECT, "")));
-                    if(!redirect.startsWith("http")) {
-                        redirect  = getRepository().absoluteUrl(redirect);
+                    if ( !redirect.startsWith("http")) {
+                        redirect = getRepository().absoluteUrl(redirect);
                     }
                     return new Result(HtmlUtil.url(redirect, ARG_FROMLOGIN,
                             "true", ARG_MESSAGE, msg("You are logged in")));
@@ -2223,13 +1934,14 @@ public class UserManager extends RepositoryManager {
                     String redirect;
                     //If we are under ssl then redirect to non-ssl
                     if (getRepository().isSSLEnabled(request)) {
-                        redirect = getRepositoryBase().URL_USER_HOME.getFullUrl("");
+                        redirect =
+                            getRepositoryBase().URL_USER_HOME.getFullUrl("");
                     } else {
-                        redirect = getRepositoryBase().URL_USER_HOME.toString();
+                        redirect =
+                            getRepositoryBase().URL_USER_HOME.toString();
                     }
-                    return new Result(HtmlUtil.url(redirect,
-                                                   ARG_FROMLOGIN,
-                                                   "true", ARG_MESSAGE, msg("You are logged in")));
+                    return new Result(HtmlUtil.url(redirect, ARG_FROMLOGIN,
+                            "true", ARG_MESSAGE, msg("You are logged in")));
                 }
             } else {
                 if (responseAsXml) {
@@ -2265,8 +1977,8 @@ public class UserManager extends RepositoryManager {
      */
     public Result processLogout(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        removeUserSession(request);
-        request.setSessionId(getSessionId());
+        getSessionManager().removeUserSession(request);
+        request.setSessionId(getSessionManager().getSessionId());
         sb.append(getRepository().note(msg("You are logged out")));
         sb.append(makeLoginForm(request));
         Result result = new Result(msg("Logout"), sb);
@@ -2287,20 +1999,23 @@ public class UserManager extends RepositoryManager {
             protected void getEntryLinks(Request request, State state,
                                          List<Link> links)
                     throws Exception {
-                if(state.getEntry()!=null) {
-                    Link link = makeLink(request, state.getEntry(), OUTPUT_CART);
+                if (state.getEntry() != null) {
+                    Link link = makeLink(request, state.getEntry(),
+                                         OUTPUT_CART);
                     link.setLinkType(OutputType.TYPE_ACTION);
                     links.add(link);
-                    if(!request.getUser().getAnonymous()) {
-                        link = makeLink(request, state.getEntry(), OUTPUT_FAVORITE);
+                    if ( !request.getUser().getAnonymous()) {
+                        link = makeLink(request, state.getEntry(),
+                                        OUTPUT_FAVORITE);
                         link.setLinkType(OutputType.TYPE_ACTION);
                         links.add(link);
                     }
-                }            
+                }
             }
 
             public boolean canHandleOutput(OutputType output) {
-                return output.equals(OUTPUT_CART) ||  output.equals(OUTPUT_FAVORITE);
+                return output.equals(OUTPUT_CART)
+                       || output.equals(OUTPUT_FAVORITE);
             }
 
             public Result outputGroup(Request request, Group group,
@@ -2308,26 +2023,29 @@ public class UserManager extends RepositoryManager {
                                       List<Entry> entries)
                     throws Exception {
                 OutputType output = request.getOutput();
-                if(output.equals(OUTPUT_CART)) {
-                    if(group.isDummy()) {
+                if (output.equals(OUTPUT_CART)) {
+                    if (group.isDummy()) {
                         addToCart(request, entries);
-                        addToCart(request, (List<Entry>)new ArrayList(subGroups));
+                        addToCart(request,
+                                  (List<Entry>) new ArrayList(subGroups));
                     } else {
-                        addToCart(request, (List<Entry>)Misc.newList(group));
-                    } 
+                        addToCart(request, (List<Entry>) Misc.newList(group));
+                    }
                     return showCart(request);
                 } else {
                     User user = request.getUser();
-                    if(group.isDummy()) {
-                        addFavorites(request,user, entries);
-                        addFavorites(request,user, (List<Entry>)new ArrayList(subGroups));
+                    if (group.isDummy()) {
+                        addFavorites(request, user, entries);
+                        addFavorites(request, user,
+                                     (List<Entry>) new ArrayList(subGroups));
                     } else {
-                        addFavorites(request,user, (List<Entry>)Misc.newList(group));
-                    } 
-                    String redirect = getRepositoryBase().URL_USER_HOME.toString();
-                    return new Result(HtmlUtil.url(redirect,
-                                                   ARG_MESSAGE,
-                                                   msg("Favorites Added")));
+                        addFavorites(request, user,
+                                     (List<Entry>) Misc.newList(group));
+                    }
+                    String redirect =
+                        getRepositoryBase().URL_USER_HOME.toString();
+                    return new Result(HtmlUtil.url(redirect, ARG_MESSAGE,
+                            msg("Favorites Added")));
 
                 }
 
@@ -2358,88 +2076,113 @@ public class UserManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processActivityLog(Request request) throws Exception {
         StringBuffer sb   = new StringBuffer();
 
-        User user = findUser(request.getString(ARG_USER_ID,""));
+        User         user = findUser(request.getString(ARG_USER_ID, ""));
 
-        if(user == null) {
+        if (user == null) {
             sb.append(getRepository().error("Could not find user"));
         } else {
             sb.append(getUserActivities(request, user));
         }
-        Result result =  new Result(msg("User Log"), sb);
+        Result result = new Result(msg("User Log"), sb);
         result.putProperty(PROP_NAVSUBLINKS,
                            getRepository().getSubNavLinks(request,
-                                                          getAdmin().adminUrls));
+                               getAdmin().adminUrls));
         return result;
     }
 
 
 
-    private  String getUserActivities(Request request,User theUser) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        Clause clause = null;
-        String limitString = "";
-        if(theUser!=null) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param theUser _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private String getUserActivities(Request request, User theUser)
+            throws Exception {
+        StringBuffer sb          = new StringBuffer();
+        Clause       clause      = null;
+        String       limitString = "";
+        if (theUser != null) {
             clause = Clause.eq(Tables.USER_ACTIVITY.COL_USER_ID,
                                theUser.getId());
         } else {
-            limitString = getDatabaseManager().getLimitString(0, request.get(ARG_LIMIT,100));
+            limitString = getDatabaseManager().getLimitString(0,
+                    request.get(ARG_LIMIT, 100));
         }
 
 
-        Statement stmt = getDatabaseManager().select(Tables.USER_ACTIVITY.COLUMNS,
-                                                     Tables.USER_ACTIVITY.NAME,
-                                                     clause,
-                                                     " order by " + Tables.USER_ACTIVITY.COL_DATE +" desc "+
-                                                     limitString);
+        Statement stmt =
+            getDatabaseManager().select(Tables.USER_ACTIVITY.COLUMNS,
+                                        Tables.USER_ACTIVITY.NAME, clause,
+                                        " order by "
+                                        + Tables.USER_ACTIVITY.COL_DATE
+                                        + " desc " + limitString);
 
-        SqlUtil.Iterator  iter         = SqlUtil.getIterator(stmt);
-        ResultSet         results;
-        if(theUser!=null) {
+        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        ResultSet        results;
+        if (theUser != null) {
             sb.append(msgLabel("Activity for User"));
             sb.append(HtmlUtil.space(1));
             sb.append(theUser.getLabel());
         }
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
-        sb.append(HtmlUtil.row(HtmlUtil.cols(
-                                             (theUser==null? HtmlUtil.b(msg("User")):""),
-                                             HtmlUtil.b(msg("Activity")),
-                                             HtmlUtil.b(msg("Date")),
-                                             HtmlUtil.b(msg("IP Address")))));
+        sb.append(HtmlUtil.row(HtmlUtil.cols(((theUser == null)
+                ? HtmlUtil.b(msg("User"))
+                : ""), HtmlUtil.b(msg("Activity")), HtmlUtil.b(msg("Date")),
+                       HtmlUtil.b(msg("IP Address")))));
 
-        int cnt=0;
+        int cnt = 0;
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                int col=1;
-                String userId= results.getString(col++);
+                int    col      = 1;
+                String userId   = results.getString(col++);
                 String firstCol = "";
-                if(theUser==null) {
+                if (theUser == null) {
                     User user = findUser(userId);
-                    if(user==null) {
+                    if (user == null) {
                         firstCol = "No user:" + userId;
                     } else {
-                        firstCol = HtmlUtil.href(request.url(getRepositoryBase().URL_USER_ACTIVITY,
-                                                             ARG_USER_ID,
-                                                             user.getId()), HtmlUtil.img(getRepository().iconUrl(ICON_LOG),msg("View user log")) +" " + user.getLabel());
+                        firstCol =
+                            HtmlUtil.href(
+                                request.url(
+                                    getRepositoryBase().URL_USER_ACTIVITY,
+                                    ARG_USER_ID, user.getId()), HtmlUtil.img(
+                                        getRepository().iconUrl(ICON_LOG),
+                                        msg("View user log")) + " "
+                                            + user.getLabel());
                     }
 
                 }
-                Date dttm = getDatabaseManager().getDate(results, col++);
-                String what = results.getString(col++);
+                Date   dttm  = getDatabaseManager().getDate(results, col++);
+                String what  = results.getString(col++);
                 String extra = results.getString(col++);
-                String ip  =  results.getString(col++);
-                sb.append(HtmlUtil.row(HtmlUtil.cols(firstCol,
-                                                     what,
-                                                     getRepository().formatDate(dttm),ip)));
+                String ip    = results.getString(col++);
+                sb.append(HtmlUtil.row(HtmlUtil.cols(firstCol, what,
+                        getRepository().formatDate(dttm), ip)));
 
                 cnt++;
             }
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
-        if(cnt==0) {
+        if (cnt == 0) {
             sb.append(msg("No activity"));
         }
         return sb.toString();
@@ -2478,13 +2221,14 @@ public class UserManager extends RepositoryManager {
                 String redirect;
                 //If we are under ssl then redirect to non-ssl
                 if (getRepository().isSSLEnabled(request)) {
-                    redirect = getRepositoryBase().URL_USER_SETTINGS.getFullUrl("");
+                    redirect =
+                        getRepositoryBase().URL_USER_SETTINGS.getFullUrl("");
                 } else {
-                    redirect = getRepositoryBase().URL_USER_SETTINGS.toString();
+                    redirect =
+                        getRepositoryBase().URL_USER_SETTINGS.toString();
                 }
-                return new Result(HtmlUtil.url(redirect,
-                                               ARG_MESSAGE,
-                                               msg("User settings changed")));
+                return new Result(HtmlUtil.url(redirect, ARG_MESSAGE,
+                        msg("User settings changed")));
             }
         }
 
@@ -2495,7 +2239,9 @@ public class UserManager extends RepositoryManager {
         }
 
         if (getRepository().isSSLEnabled(request)) {
-            sb.append(HtmlUtil.form(getRepositoryBase().URL_USER_SETTINGS.getHttpsUrl("")));
+            sb.append(
+                HtmlUtil.form(
+                    getRepositoryBase().URL_USER_SETTINGS.getHttpsUrl("")));
         } else {
             sb.append(request.form(getRepositoryBase().URL_USER_SETTINGS));
         }
@@ -2516,123 +2262,6 @@ public class UserManager extends RepositoryManager {
     }
 
 
-    /**
-     * Class Session _more_
-     *
-     *
-     * @author IDV Development Team
-     * @version $Revision: 1.3 $
-     */
-    public static class Session {
-
-        /** _more_ */
-        String id;
-
-        /** _more_ */
-        User user;
-
-        /** _more_ */
-        Date createDate;
-
-        /** _more_ */
-        Date lastActivity;
-
-        /**
-         * _more_
-         *
-         * @param id _more_
-         * @param user _more_
-         * @param createDate _more_
-         */
-        public Session(String id, User user, Date createDate) {
-            this(id, user, createDate, new Date());
-        }
-
-        public Session(String id, User user, Date createDate,Date lastActivity) {
-            this.id         = id;
-            this.user       = user;
-            this.createDate = createDate;
-            this.lastActivity    = lastActivity;
-        }
-
-
-        /**
-           Set the Id property.
-
-           @param value The new value for Id
-        **/
-        public void setId (String value) {
-            id = value;
-        }
-
-        /**
-           Get the Id property.
-
-           @return The Id
-        **/
-        public String getId () {
-            return id;
-        }
-
-        /**
-           Set the User property.
-
-           @param value The new value for User
-        **/
-        public void setUser (User value) {
-            user = value;
-        }
-
-        /**
-           Get the User property.
-
-           @return The User
-        **/
-        public User getUser () {
-            return user;
-        }
-
-
-
-        /**
-           Set the CreateDate property.
-
-           @param value The new value for CreateDate
-        **/
-        public void setCreateDate (Date value) {
-            createDate = value;
-        }
-
-        /**
-           Get the CreateDate property.
-
-           @return The CreateDate
-        **/
-        public Date getCreateDate () {
-            return createDate;
-        }
-
-        /**
-           Set the LastActivity property.
-
-           @param value The new value for LastActivity
-        **/
-        public void setLastActivity (Date value) {
-            lastActivity = value;
-        }
-
-        /**
-           Get the LastActivity property.
-
-           @return The LastActivity
-        **/
-        public Date getLastActivity () {
-            return lastActivity;
-        }
-
-
-
-    }
 
 
 }

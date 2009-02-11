@@ -100,15 +100,19 @@ public class CatalogTypeHandler extends GenericTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public String getIconUrl(Request request,Entry entry) throws Exception {
+    public String getIconUrl(Request request, Entry entry) throws Exception {
         if (entry.isGroup()) {
             return iconUrl(ICON_FOLDER_CLOSED);
         }
-        return super.getIconUrl(request,entry);
+        return super.getIconUrl(request, entry);
     }
 
 

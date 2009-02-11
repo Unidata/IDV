@@ -144,8 +144,17 @@ public class RequestUrl {
         return path;
     }
 
+    /**
+     * _more_
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     */
     public boolean equals(Object o) {
-        if(!(o instanceof RequestUrl)) return false;
+        if ( !(o instanceof RequestUrl)) {
+            return false;
+        }
         RequestUrl that = (RequestUrl) o;
         return this.path.equals(that.path);
     }

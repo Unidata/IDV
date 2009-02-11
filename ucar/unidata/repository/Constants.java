@@ -81,11 +81,13 @@ public interface Constants {
     public static final String ICON_LCURVE = "ramadda.icon.lcurve";
 
 
+    /** _more_          */
     public static final String ICON_FAVORITE = "ramadda.icon.favorite";
 
+    /** _more_          */
     public static final String ICON_LOG = "ramadda.icon.log";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_CATALOG = "ramadda.icon.catalog";
 
     /** _more_ */
@@ -113,11 +115,13 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_CART = "ramadda.icon.cart";
 
+    /** _more_          */
     public static final String ICON_CART_ADD = "ramadda.icon.cart.add";
 
     /** _more_ */
     public static final String ICON_CLOUD = "ramadda.icon.cloud";
 
+    /** _more_          */
     public static final String ICON_CLOCK = "ramadda.icon.clock";
 
     /** _more_ */
@@ -129,6 +133,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_CALENDAR = "ramadda.icon.calendar";
 
+    /** _more_          */
     public static final String ICON_DATEGRID = "ramadda.icon.dategrid";
 
     /** _more_ */
@@ -156,7 +161,8 @@ public interface Constants {
     public static final String ICON_GRAYRECT = "ramadda.icon.grayrect";
 
     /** _more_ */
-    public static final String ICON_GRAYRECTARROW =  "ramadda.icon.grayrectarrow";
+    public static final String ICON_GRAYRECTARROW =
+        "ramadda.icon.grayrectarrow";
 
     /** _more_ */
     public static final String ICON_TOOLS = "ramadda.icon.tools";
@@ -170,7 +176,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_QUESTION = "ramadda.icon.question";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_WIKI = "ramadda.icon.wiki";
 
     /** _more_ */
@@ -188,16 +194,20 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_FOLDER = "ramadda.icon.folder";
 
-    public static final String ICON_ENTRY_UPLOAD = "ramadda.icon.entry_upload";
+    /** _more_          */
+    public static final String ICON_ENTRY_UPLOAD =
+        "ramadda.icon.entry_upload";
 
     /** _more_ */
     public static final String ICON_FOLDER_OPEN = "ramadda.icon.folder_open";
 
     /** _more_ */
-    public static final String ICON_FOLDER_CLOSED = "ramadda.icon.folder_closed";
+    public static final String ICON_FOLDER_CLOSED =
+        "ramadda.icon.folder_closed";
 
     /** _more_ */
-    public static final String ICON_FOLDER_CLOSED_LOCKED = "ramadda.icon.folder_closed_locked";
+    public static final String ICON_FOLDER_CLOSED_LOCKED =
+        "ramadda.icon.folder_closed_locked";
 
     /** _more_ */
     public static final String ICON_FILE = "ramadda.icon.file";
@@ -242,6 +252,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_NEW = "ramadda.icon.new";
 
+    /** _more_          */
     public static final String ICON_UPLOAD = "ramadda.icon.upload";
 
     /** _more_ */
@@ -269,7 +280,7 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_FROMDATE = "fromdate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SELECTTYPE = "selecttype";
 
 
@@ -347,29 +358,44 @@ public interface Constants {
     public static final String ARG_DATASET = "dataset";
 
 
+    /** _more_          */
     public static final String ARG_HEIGHT = "height";
 
     /** _more_ */
     public static final String ARG_WIKI_CREATE = "wiki.create";
+
+    /** _more_          */
     public static final String ARG_WIKI_RAW = "wiki.raw";
 
+    /** _more_          */
     public static final String ARG_WIKI_DETAILS = "wiki.details";
+
+    /** _more_          */
     public static final String ARG_WIKI_VERSION = "wiki.version";
+
+    /** _more_          */
     public static final String ARG_WIKI_COMPARE1 = "wiki.compare1";
+
+    /** _more_          */
     public static final String ARG_WIKI_COMPARE2 = "wiki.compare2";
 
 
-    public static final String ARG_WIKI_CHANGEDESCRIPTION = "wiki.changedescription";
+    /** _more_          */
+    public static final String ARG_WIKI_CHANGEDESCRIPTION =
+        "wiki.changedescription";
 
     /** _more_ */
     public static final String ARG_WIKI_TEXT = "wiki.text";
 
+    /** _more_          */
     public static final String ARG_WIKI_EDITWITH = "wiki.editwith";
 
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    /** _more_          */
     public static final String ARG_THUMBNAIL = "thumbnail";
+
     /** _more_ */
     public static final String ARG_VARIABLE = "variable";
 
@@ -528,6 +554,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_PREVIOUS = "previous";
 
+    /** _more_          */
     public static final String ARG_PUBLISH = "publish";
 
 
@@ -546,8 +573,13 @@ public interface Constants {
     public static final String ARG_SHOW_ASSOCIATIONS = "showassociations";
 
 
+    /** _more_          */
     public static final String ARG_FAVORITE_ADD = "user.favorite.add";
+
+    /** _more_          */
     public static final String ARG_FAVORITE_DELETE = "user.favorite.delete";
+
+    /** _more_          */
     public static final String ARG_FAVORITE_ID = "user.favorite.id";
 
 
@@ -569,7 +601,11 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_ACTION = "action";
+
+    /** _more_          */
     public static final String ARG_ACTION_COPY = "action.copy";
+
+    /** _more_          */
     public static final String ARG_ACTION_MOVE = "action.move";
 
     /** _more_ */
@@ -701,6 +737,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_LAYOUT = "layout";
 
+    /** _more_          */
     public static final String ARG_LIMIT = "limit";
 
     /** _more_ */
@@ -748,9 +785,13 @@ public interface Constants {
     public static final String TYPE_ASSOCIATION = "association";
 
 
+    /** _more_          */
     public static final String PROP_SSL_PORT = "ramadda.ssl.port";
+
+    /** _more_          */
     public static final String PROP_SSL_IGNORE = "ramadda.ssl.ignore";
 
+    /** _more_          */
     public static final String ARG_SSLOK = "sslok";
 
 
@@ -871,6 +912,7 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_NAVSUBLINKS = "ramadda.navsublinks";
 
+    /** _more_          */
     public static final String PROP_ENTRY_HEADER = "ramadda.entryheader";
 
     /** _more_ */
@@ -882,6 +924,7 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_HTML_TEMPLATE = "ramadda.html.template";
 
+    /** _more_          */
     public static final String PROP_HTML_TEMPLATES = "ramadda.html.templates";
 
     /** _more_ */
@@ -929,11 +972,17 @@ public interface Constants {
 
     /** _more_ */
     public static final String ATTR_FILE = "file";
+
+    /** _more_          */
     public static final String ATTR_LOCALFILE = "localfile";
+
+    /** _more_          */
     public static final String ATTR_LOCALFILETOMOVE = "localfiletomove";
 
     /** _more_ */
     public static final String ATTR_CANDONEW = "candonew";
+
+    /** _more_          */
     public static final String ATTR_CANDOUPLOAD = "candoupload";
 
     /** _more_ */
@@ -960,6 +1009,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_NODETYPE = "nodetype";
 
+    /** _more_          */
     public static final String ARG_TEMPLATE = "template";
 
     /** _more_ */
@@ -981,14 +1031,22 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_RESOURCE = "resource";
 
+    /** _more_          */
     public static final String ARG_RESPONSE = "response";
+
+    /** _more_          */
     public static final String RESPONSE_XML = "xml";
+
+    /** _more_          */
     public static final String CODE_OK = "ok";
+
+    /** _more_          */
     public static final String CODE_ERROR = "error";
 
     /** _more_ */
     public static final String ARG_URL = "url";
 
+    /** _more_          */
     public static final String ARG_LOCALFILE = "localfile";
 
     /** _more_ */
@@ -1036,6 +1094,7 @@ public interface Constants {
     /** _more_ */
     public static final String ACTION_CLEAR = "action.clear";
 
+    /** _more_          */
     public static final String ACTION_SPLIT = "action.split";
 
     /** _more_ */

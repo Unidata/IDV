@@ -76,6 +76,7 @@ public class CatalogHarvester extends Harvester {
     /** _more_ */
     boolean recurse = false;
 
+    /** _more_          */
     boolean download = false;
 
     /** _more_ */
@@ -110,13 +111,14 @@ public class CatalogHarvester extends Harvester {
      * @param url _more_
      * @param user _more_
      * @param recurse _more_
+     * @param download _more_
      */
     public CatalogHarvester(Repository repository, Group group, String url,
                             User user, boolean recurse, boolean download) {
         super(repository);
         setName("Catalog harvester");
         this.recurse  = recurse;
-        this.download =download;
+        this.download = download;
         this.topGroup = group;
         this.topUrl   = url;
         this.user     = user;
@@ -162,7 +164,7 @@ public class CatalogHarvester extends Harvester {
             System.err.println("Catalogs go too deep:" + url);
             return true;
         }
-        if(url.indexOf("hyrax/LBA")>=0) {
+        if (url.indexOf("hyrax/LBA") >= 0) {
             //            System.err.println ("Skipping bad one");
             return true;
         }
@@ -180,14 +182,15 @@ public class CatalogHarvester extends Harvester {
                 return true;
             }
             //                System.err.println("loaded:" + url);
-            NodeList  children = XmlUtil.getElements(root);
-            int cnt = 0;
-            Element datasetNode = null;
+            NodeList children    = XmlUtil.getElements(root);
+            int      cnt         = 0;
+            Element  datasetNode = null;
             for (int i = 0; i < children.getLength(); i++) {
-                Element child = (Element)children.item(i);
-                if(child.getTagName().equals(CatalogUtil.TAG_DATASET) ||
-                   child.getTagName().equals(CatalogUtil.TAG_CATALOGREF)) {
-                    if(child.getTagName().equals(CatalogUtil.TAG_DATASET)) {
+                Element child = (Element) children.item(i);
+                if (child.getTagName().equals(CatalogUtil.TAG_DATASET)
+                        || child.getTagName().equals(
+                            CatalogUtil.TAG_CATALOGREF)) {
+                    if (child.getTagName().equals(CatalogUtil.TAG_DATASET)) {
                         datasetNode = (Element) child;
                     }
                     cnt++;
@@ -195,7 +198,7 @@ public class CatalogHarvester extends Harvester {
             }
 
             //If there is just one top-level dataset node then just load that
-            if (cnt==1 && datasetNode!=null) {
+            if ((cnt == 1) && (datasetNode != null)) {
                 recurseCatalog((Element) datasetNode, parent, url, 0, depth);
             } else {
                 recurseCatalog((Element) root, parent, url, 0, depth);
@@ -264,7 +267,9 @@ public class CatalogHarvester extends Harvester {
             return;
         }
         URL catalogUrl = new URL(catalogUrlPath);
-        String   name     = XmlUtil.getAttribute(node, ATTR_NAME,IOUtil.getFileTail(catalogUrlPath));
+        String name =
+            XmlUtil.getAttribute(node, ATTR_NAME,
+                                 IOUtil.getFileTail(catalogUrlPath));
         NodeList elements = XmlUtil.getElements(node);
         String urlPath = XmlUtil.getAttribute(node,
                              CatalogOutputHandler.ATTR_URLPATH,
@@ -312,39 +317,39 @@ public class CatalogHarvester extends Harvester {
                         DFLT_INHERITED, ext, "", "", ""));
             }
             Resource resource = null;
-            if(download && (urlPath.startsWith("http:")
-                            ||urlPath.startsWith("https:")
-
-                           ||urlPath.startsWith("ftp:"))) {
-                String tail = IOUtil.getFileTail(urlPath);
-                File newFile = getStorageManager().getTmpFile(null,
-                                                              tail);
+            if (download
+                    && (urlPath.startsWith("http:")
+                        || urlPath.startsWith("https:")
+                        || urlPath.startsWith("ftp:"))) {
+                String tail    = IOUtil.getFileTail(urlPath);
+                File   newFile = getStorageManager().getTmpFile(null, tail);
                 try {
                     RepositoryUtil.checkFilePath(newFile.toString());
-                    URL           fromUrl    = new URL(urlPath);
-                    URLConnection connection = fromUrl.openConnection();
-                    InputStream   fromStream = connection.getInputStream();
+                    URL              fromUrl    = new URL(urlPath);
+                    URLConnection    connection = fromUrl.openConnection();
+                    InputStream      fromStream = connection.getInputStream();
                     FileOutputStream toStream = new FileOutputStream(newFile);
                     //                    System.err.println("writing to " + newFile);
                     int bytes = IOUtil.writeTo(fromStream, toStream);
                     toStream.close();
                     fromStream.close();
-                    if(bytes>0) {
-                        String theFile = getStorageManager().moveToStorage((Request)null,
-                                                                           newFile).toString();
-                        resource = new Resource(new File(theFile), Resource.TYPE_STOREDFILE);
+                    if (bytes > 0) {
+                        String theFile =
+                            getStorageManager().moveToStorage((Request) null,
+                                newFile).toString();
+                        resource = new Resource(new File(theFile),
+                                Resource.TYPE_STOREDFILE);
                     }
-                } catch(Exception ignore) {
+                } catch (Exception ignore) {
                     System.err.println("error " + ignore);
                     ignore.printStackTrace();
                 }
-            } 
-            if(resource == null) {
+            }
+            if (resource == null) {
                 resource = new Resource(urlPath, Resource.TYPE_URL);
             }
 
-            entry.initEntry(name, "", parent, user,
-                            resource, "",
+            entry.initEntry(name, "", parent, user, resource, "",
                             createDate.getTime(), createDate.getTime(),
                             createDate.getTime(), null);
             entries.add(entry);
@@ -375,7 +380,7 @@ public class CatalogHarvester extends Harvester {
         name = name.replace("'", "");
         Group group = null;
         Entry newGroup = getEntryManager().findEntryWithName(null, parent,
-                                                             name);
+                             name);
         if ((newGroup != null) && newGroup.isGroup()) {
             group = (Group) newGroup;
         }
@@ -406,7 +411,7 @@ public class CatalogHarvester extends Harvester {
 
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
-            String tag = child.getTagName();
+            String  tag   = child.getTagName();
             if (tag.equals(CatalogUtil.TAG_DATASET)) {
                 recurseCatalog(child, group, catalogUrlPath, xmlDepth + 1,
                                recurseDepth);
@@ -415,9 +420,10 @@ public class CatalogHarvester extends Harvester {
                     continue;
                 }
                 String url = XmlUtil.getAttribute(child, "xlink:href");
-                URL newCatalogUrl = new URL(catalogUrl, url);
+                URL    newCatalogUrl = new URL(catalogUrl, url);
                 //                System.err.println("url:" + newCatalogUrl);
-                if ( !importCatalog(newCatalogUrl.toString(), group, recurseDepth + 1)) {
+                if ( !importCatalog(newCatalogUrl.toString(), group,
+                                    recurseDepth + 1)) {
                     System.err.println("Could not load catalog:" + url);
                     System.err.println("Base catalog:" + catalogUrl);
                     System.err.println("Base URL:"

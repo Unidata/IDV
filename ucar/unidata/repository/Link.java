@@ -56,9 +56,10 @@ public class Link {
     /** _more_ */
     protected boolean hr = false;
 
+    /** _more_          */
     int type = OutputType.TYPE_ACTION;
 
-    /** _more_          */
+    /** _more_ */
     OutputType outputType;
 
 
@@ -84,33 +85,68 @@ public class Link {
      */
     public Link(String url, String icon, String label,
                 OutputType outputType) {
-        this(url, icon,label,outputType, getLinkType(outputType));
+        this(url, icon, label, outputType, getLinkType(outputType));
     }
 
 
 
-    public Link(String url, String icon, String label,
-                OutputType outputType, int linkType) {
+    /**
+     * _more_
+     *
+     * @param url _more_
+     * @param icon _more_
+     * @param label _more_
+     * @param outputType _more_
+     * @param linkType _more_
+     */
+    public Link(String url, String icon, String label, OutputType outputType,
+                int linkType) {
         this.url        = url;
         this.label      = label;
         this.icon       = icon;
         this.outputType = outputType;
-        this.type = linkType;
+        this.type       = linkType;
     }
 
+    /**
+     * _more_
+     *
+     * @param typeMask _more_
+     *
+     * @return _more_
+     */
     public boolean isType(int typeMask) {
-        return (getType()&typeMask)!=0;
+        return (getType() & typeMask) != 0;
     }
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     */
     public void setLinkType(int type) {
         this.type = type;
     }
 
+    /**
+     * _more_
+     *
+     * @param outputType _more_
+     *
+     * @return _more_
+     */
     public static int getLinkType(OutputType outputType) {
-        if(outputType == null) return OutputType.TYPE_ACTION;
+        if (outputType == null) {
+            return OutputType.TYPE_ACTION;
+        }
         return outputType.getType();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getType() {
         return type;
     }

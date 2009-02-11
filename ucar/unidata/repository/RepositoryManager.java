@@ -128,8 +128,14 @@ public class RepositoryManager implements RepositorySource, Constants,
 
 
 
-    public void logException (String message, Exception exc) {
-        System.err.println ("Error occurred: " + message);
+    /**
+     * _more_
+     *
+     * @param message _more_
+     * @param exc _more_
+     */
+    public void logException(String message, Exception exc) {
+        System.err.println("Error occurred: " + message);
         exc.printStackTrace();
     }
 
@@ -145,6 +151,13 @@ public class RepositoryManager implements RepositorySource, Constants,
         return getRepository().fileUrl(url);
     }
 
+    /**
+     * _more_
+     *
+     * @param url _more_
+     *
+     * @return _more_
+     */
     public String iconUrl(String url) {
         return getRepository().iconUrl(url);
     }
@@ -294,8 +307,8 @@ public class RepositoryManager implements RepositorySource, Constants,
     public String subHeaderLink(String url, String label, boolean toggle) {
         //        if(true) return "x";
         String img = HtmlUtil.img(iconUrl(toggle
-                ? ICON_MINUS
-                : ICON_PLUS));
+                                          ? ICON_MINUS
+                                          : ICON_PLUS));
         label = img + HtmlUtil.space(1) + label;
         String html = HtmlUtil.href(url, label,
                                     HtmlUtil.cssClass("pagesubheadinglink"));
@@ -392,6 +405,15 @@ public class RepositoryManager implements RepositorySource, Constants,
      */
     protected UserManager getUserManager() {
         return repository.getUserManager();
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected SessionManager getSessionManager() {
+        return repository.getSessionManager();
     }
 
     /**

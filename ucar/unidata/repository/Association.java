@@ -124,24 +124,45 @@ public class Association {
         return name;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getLabel() {
-        if(name==null||name.length()==0) return type;
+        if ((name == null) || (name.length() == 0)) {
+            return type;
+        }
         return name;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     */
     public boolean equals(Object o) {
-        if(!(o instanceof Association) ) return false;
+        if ( !(o instanceof Association)) {
+            return false;
+        }
         Association that = (Association) o;
-        return Misc.equals(this.name, that.name) &&
-            Misc.equals(this.type, that.type) &&
-            Misc.equals(this.fromId, that.fromId) &&
-            Misc.equals(this.toId, that.toId);
-                                             
+        return Misc.equals(this.name, that.name)
+               && Misc.equals(this.type, that.type)
+               && Misc.equals(this.fromId, that.fromId)
+               && Misc.equals(this.toId, that.toId);
+
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
-        return "name:" + name +" type:" + type + " fromId:" + fromId;
+        return "name:" + name + " type:" + type + " fromId:" + fromId;
         //        return "name:" + name +" type:" + type + " fromId:" + fromId +" toId:" + toId;
     }
 

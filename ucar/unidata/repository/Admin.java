@@ -42,7 +42,7 @@ import ucar.unidata.xml.XmlUtil;
 
 import java.io.*;
 
-import java.text.DecimalFormat;
+import java.lang.management.*;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -52,6 +52,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import java.text.DecimalFormat;
 
 
 import java.util.ArrayList;
@@ -67,7 +69,6 @@ import javax.mail.internet.InternetAddress;
 
 
 import javax.mail.internet.MimeMessage;
-import java.lang.management.*;
 
 
 
@@ -84,8 +85,10 @@ public class Admin extends RepositoryManager {
     public RequestUrl URL_ADMIN_SQL = new RequestUrl(this, "/admin/sql",
                                           "SQL");
 
-    public RequestUrl URL_ADMIN_USERMESSAGE = new RequestUrl(this, "/admin/usermessage",
-                                                            "User Message");
+    /** _more_          */
+    public RequestUrl URL_ADMIN_USERMESSAGE = new RequestUrl(this,
+                                                  "/admin/usermessage",
+                                                  "User Message");
 
     /** _more_ */
     public RequestUrl URL_ADMIN_IMPORT_CATALOG = new RequestUrl(this,
@@ -132,8 +135,8 @@ public class Admin extends RepositoryManager {
 
 
     /** _more_ */
-    public RequestUrl URL_ADMIN_LOG = new RequestUrl(this,
-                                             "/admin/log", "Log");
+    public RequestUrl URL_ADMIN_LOG = new RequestUrl(this, "/admin/log",
+                                          "Log");
 
 
     /** _more_ */
@@ -143,9 +146,7 @@ public class Admin extends RepositoryManager {
         getHarvesterManager().URL_HARVESTERS_LIST,
         /*URL_ADMIN_STARTSTOP,*/
         /*URL_ADMIN_TABLES, */
-        URL_ADMIN_LOG,
-        URL_ADMIN_SQL, URL_ADMIN_CLEANUP,
-        URL_ADMIN_USERMESSAGE
+        URL_ADMIN_LOG, URL_ADMIN_SQL, URL_ADMIN_CLEANUP, URL_ADMIN_USERMESSAGE
     };
 
 
@@ -197,17 +198,29 @@ public class Admin extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result adminUserMessage(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        if(request.exists(ARG_MESSAGE)) {
-            getUserManager().setSessionMessage(request.getString(ARG_MESSAGE,""));
+        if (request.exists(ARG_MESSAGE)) {
+            getSessionManager().setSessionMessage(
+                request.getString(ARG_MESSAGE, ""));
             sb.append(msg("Message set"));
         } else {
-            sb.append(msgHeader("Enter a message to show one time to all users"));
+            sb.append(
+                msgHeader("Enter a message to show one time to all users"));
             sb.append(request.form(URL_ADMIN_USERMESSAGE, ""));
             sb.append(HtmlUtil.formTable());
             sb.append(HtmlUtil.formEntry(msgLabel("Message"),
-                                         HtmlUtil.textArea(ARG_MESSAGE,"",5,60)));
+                                         HtmlUtil.textArea(ARG_MESSAGE, "",
+                                             5, 60)));
             sb.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.submit(msg("Set user message")));
             sb.append("</form>");
@@ -216,54 +229,58 @@ public class Admin extends RepositoryManager {
         Result result = new Result(msg("Alert Message"), sb);
         result.putProperty(PROP_NAVSUBLINKS,
                            getRepository().getSubNavLinks(request,
-                                                          getAdmin().adminUrls));
+                               getAdmin().adminUrls));
         return result;
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result adminLog(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
-        sb.append(HtmlUtil.row(HtmlUtil.cols(
-                                                HtmlUtil.b(msg("User")),
-                                                HtmlUtil.b(msg("Date")),
-                                                HtmlUtil.b(msg("Path")),
-                                                HtmlUtil.b(msg("IP")),
-                                                HtmlUtil.b(msg("User agent"))
-                                                )));
+        sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.b(msg("User")),
+                                             HtmlUtil.b(msg("Date")),
+                                             HtmlUtil.b(msg("Path")),
+                                             HtmlUtil.b(msg("IP")),
+                                             HtmlUtil.b(msg("User agent")))));
         List<Repository.LogEntry> log = getRepository().getLog();
-        for(int i=log.size()-1;i>=0;i--) {
+        for (int i = log.size() - 1; i >= 0; i--) {
             Repository.LogEntry logEntry = log.get(i);
             //Encode the path just in case the user does a XSS attack
             String path = logEntry.getPath();
-            if(path.length()>50) {
-                path = path.substring(0,49)+"...";
+            if (path.length() > 50) {
+                path = path.substring(0, 49) + "...";
             }
             String userAgent = logEntry.getUserAgent();
-            if(userAgent.indexOf("Googlebot")>=0) {
+            if (userAgent.indexOf("Googlebot") >= 0) {
                 userAgent = "Googlebot";
             }
             int idx = userAgent.indexOf("(");
-            if(idx>0) {
+            if (idx > 0) {
                 //                userAgent = userAgent.substring(0,idx);
             }
-            String dttm  = getRepository().formatDate(logEntry.getDate());
-            dttm = dttm.replace(" ","&nbsp;");
-            String user =  logEntry.getUser().getLabel();
-            user = user.replace(" ","&nbsp;");
-            sb.append(HtmlUtil.rowTop(HtmlUtil.cols(
-                                                    user,
-                                                    dttm,
-                                                    HtmlUtil.entityEncode(path),
-                                                    logEntry.getIp(),
-                                                    userAgent)));
-            
+            String dttm = getRepository().formatDate(logEntry.getDate());
+            dttm = dttm.replace(" ", "&nbsp;");
+            String user = logEntry.getUser().getLabel();
+            user = user.replace(" ", "&nbsp;");
+            sb.append(HtmlUtil.rowTop(HtmlUtil.cols(user, dttm,
+                    HtmlUtil.entityEncode(path), logEntry.getIp(),
+                    userAgent)));
+
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
 
         Result result = new Result(msg("Log"), sb);
         result.putProperty(PROP_NAVSUBLINKS,
                            getRepository().getSubNavLinks(request,
-                                                          getAdmin().adminUrls));
+                               getAdmin().adminUrls));
         return result;
     }
 
@@ -362,7 +379,7 @@ public class Admin extends RepositoryManager {
                 if (okToAdd) {
                     getUserManager().makeOrUpdateUser(new User(id, name, "",
                             "", "", getUserManager().hashPassword(password1),
-                            true, "",""), false);
+                            true, "", ""), false);
                     didIt(ARG_ADMIN_ADMINCREATED);
                     didIt(ARG_ADMIN_INSTALLCOMPLETE);
                     sb.append(msg("Site administrator created"));
@@ -698,11 +715,10 @@ public class Admin extends RepositoryManager {
 
         csb.append(
             HtmlUtil.formEntry(
-                msgLabel("Mail Server"),
-                HtmlUtil.input(
-                    PROP_ADMIN_SMTP, getProperty(PROP_ADMIN_SMTP, ""),
-                    HtmlUtil.SIZE_40) + " "
-                          + msg("For sending password reset messages")));
+                msgLabel("Mail Server"), HtmlUtil.input(
+                    PROP_ADMIN_SMTP, getProperty(
+                        PROP_ADMIN_SMTP, ""), HtmlUtil.SIZE_40) + " "
+                            + msg("For sending password reset messages")));
 
 
         csb.append(HtmlUtil.formTableClose());
@@ -765,19 +781,19 @@ public class Admin extends RepositoryManager {
 
 
 
-        asb.append(HtmlUtil.formEntry(
-                msgLabel("Hostname"),
-                HtmlUtil.input(
-                               PROP_HOSTNAME, getProperty(PROP_HOSTNAME, ""),
-                               HtmlUtil.SIZE_40)));
+        asb.append(HtmlUtil.formEntry(msgLabel("Hostname"),
+                                      HtmlUtil.input(PROP_HOSTNAME,
+                                          getProperty(PROP_HOSTNAME, ""),
+                                          HtmlUtil.SIZE_40)));
 
 
-        asb.append(HtmlUtil.formEntry(
-                msgLabel("SSL Port"),
-                HtmlUtil.input(
-                               PROP_SSL_PORT, getProperty(PROP_SSL_PORT, ""),
-                               HtmlUtil.SIZE_5) + HtmlUtil.space(1) +
-                msg("Port number for SSL access.") +HtmlUtil.space(1) +msg("Enter 'default' for default SSL port.")));
+        asb.append(HtmlUtil
+            .formEntry(msgLabel("SSL Port"), HtmlUtil
+                .input(PROP_SSL_PORT, getProperty(PROP_SSL_PORT, ""), HtmlUtil
+                    .SIZE_5) + HtmlUtil.space(1)
+                             + msg("Port number for SSL access.")
+                             + HtmlUtil.space(1)
+                             + msg("Enter 'default' for default SSL port.")));
 
 
 
@@ -814,8 +830,12 @@ public class Admin extends RepositoryManager {
                     outputSB.append(HtmlUtil.p());
                 }
                 lastGroupName = type.getGroupName();
-                outputSB.append(HtmlUtil.div(lastGroupName,HtmlUtil.cssClass("pagesubheading"))
-                                              +"\n<div style=\"margin-left:20px\">");
+                outputSB
+                    .append(
+                        HtmlUtil
+                            .div(lastGroupName, HtmlUtil
+                                .cssClass(
+                                    "pagesubheading")) + "\n<div style=\"margin-left:20px\">");
             }
             outputSB.append(HtmlUtil.checkbox("outputtype." + type.getId(),
                     "true", ok));
@@ -866,7 +886,8 @@ public class Admin extends RepositoryManager {
         return HtmlUtil.makeShowHideBlock(
             msg(title),
             HtmlUtil.div(contents, HtmlUtil.cssClass("admin-block-inner")),
-            false, HtmlUtil.cssClass("pagesubheading"), HtmlUtil.cssClass("admin-block"));
+            false, HtmlUtil.cssClass("pagesubheading"),
+            HtmlUtil.cssClass("admin-block"));
     }
 
     /**
@@ -967,14 +988,14 @@ public class Admin extends RepositoryManager {
                                             ""));
         }
 
-        getRepository().writeGlobal(
-                                    PROP_HOSTNAME,
-                                    request.getString(PROP_HOSTNAME, getProperty(PROP_HOSTNAME,"")));
+        getRepository().writeGlobal(PROP_HOSTNAME,
+                                    request.getString(PROP_HOSTNAME,
+                                        getProperty(PROP_HOSTNAME, "")));
 
 
-        getRepository().writeGlobal(
-                                    PROP_SSL_PORT,
-                                    request.getString(PROP_SSL_PORT, getProperty(PROP_SSL_PORT,"")));
+        getRepository().writeGlobal(PROP_SSL_PORT,
+                                    request.getString(PROP_SSL_PORT,
+                                        getProperty(PROP_SSL_PORT, "")));
 
 
 
@@ -1100,10 +1121,10 @@ public class Admin extends RepositoryManager {
      */
     public Result adminStats(Request request) throws Exception {
 
-        DecimalFormat fmt = new DecimalFormat("#0");
+        DecimalFormat fmt     = new DecimalFormat("#0");
 
 
-        StringBuffer stateSB = new StringBuffer();
+        StringBuffer  stateSB = new StringBuffer();
         stateSB.append(HtmlUtil.formTable());
         getStorageManager().addInfo(stateSB);
         getDatabaseManager().addInfo(stateSB);
@@ -1111,23 +1132,27 @@ public class Admin extends RepositoryManager {
 
 
 
-        StringBuffer statusSB = new StringBuffer();
-        double totalMemory   = (double) Runtime.getRuntime().maxMemory();
-        double freeMemory = (double) Runtime.getRuntime().freeMemory();
-        double highWaterMark =
+        StringBuffer statusSB    = new StringBuffer();
+        double       totalMemory = (double) Runtime.getRuntime().maxMemory();
+        double       freeMemory  = (double) Runtime.getRuntime().freeMemory();
+        double highWaterMark     =
             (double) Runtime.getRuntime().totalMemory();
-        double usedMemory = (highWaterMark - freeMemory);
+        double       usedMemory  = (highWaterMark - freeMemory);
         statusSB.append(HtmlUtil.formTable());
-        totalMemory   = totalMemory / 1000000.0;
-        usedMemory    = usedMemory / 1000000.0;
-        statusSB.append(HtmlUtil.formEntry(msgLabel("Total Memory Available"),
-                                     fmt.format(totalMemory)+" (MB)"));
+        totalMemory = totalMemory / 1000000.0;
+        usedMemory  = usedMemory / 1000000.0;
+        statusSB.append(
+            HtmlUtil.formEntry(
+                msgLabel("Total Memory Available"),
+                fmt.format(totalMemory) + " (MB)"));
         statusSB.append(HtmlUtil.formEntry(msgLabel("Used Memory"),
-                                     fmt.format(usedMemory)+" (MB)"));
+                                           fmt.format(usedMemory) + " (MB)"));
 
-        long uptime =  ManagementFactory.getRuntimeMXBean().getUptime();
+        long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
         statusSB.append(HtmlUtil.formEntry(msgLabel("Up Time"),
-                                     fmt.format((double)(uptime/1000/60)) +" " + msg("minutes")));
+                                           fmt.format((double) (uptime / 1000
+                                               / 60)) + " "
+                                                   + msg("minutes")));
 
         getEntryManager().addStatusInfo(statusSB);
 
@@ -1157,12 +1182,9 @@ public class Admin extends RepositoryManager {
             HtmlUtil.row(
                 HtmlUtil.colspan(HtmlUtil.bold(msgLabel("Types")), 2)));
         int total = 0;
-        dbSB.append(
-            HtmlUtil.row(
-                HtmlUtil.cols(
-                    "" + getDatabaseManager().getCount(
-                        Tables.ENTRIES.NAME, new Clause()), msg(
-                        "Total entries"))));
+        dbSB.append(HtmlUtil.row(HtmlUtil.cols(""
+                + getDatabaseManager().getCount(Tables.ENTRIES.NAME,
+                    new Clause()), msg("Total entries"))));
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if (typeHandler.isType(TypeHandler.TYPE_ANY)) {
                 continue;

@@ -87,11 +87,13 @@ public class CalendarOutputHandler extends OutputHandler {
     /** _more_ */
     public static final OutputType OUTPUT_GRID = new OutputType("Date Grid",
                                                      "calendar.grid",
-                                                     OutputType.TYPE_HTML,"",ICON_DATEGRID);
+                                                     OutputType.TYPE_HTML,
+                                                     "", ICON_DATEGRID);
 
     /** _more_ */
     public static final OutputType OUTPUT_CALENDAR =
-        new OutputType("Calendar", "calendar.calendar", OutputType.TYPE_HTML,"",ICON_CALENDAR);
+        new OutputType("Calendar", "calendar.calendar", OutputType.TYPE_HTML,
+                       "", ICON_CALENDAR);
 
 
     /**
@@ -572,12 +574,9 @@ public class CalendarOutputHandler extends OutputHandler {
         List navList = new ArrayList();
 
         for (int i = 0; i < navLabels.length; i++) {
-            navList.add(
-                HtmlUtil.href(
-                    navUrls.get(i),
-                    HtmlUtil.img(
-                        iconUrl(navIcons[i]), navLabels[i],
-                        " border=\"0\"")));
+            navList.add(HtmlUtil.href(navUrls.get(i),
+                                      HtmlUtil.img(iconUrl(navIcons[i]),
+                                          navLabels[i], " border=\"0\"")));
         }
 
         if (doDay) {

@@ -83,7 +83,8 @@ public class MapOutputHandler extends OutputHandler {
     /** _more_ */
     public static final OutputType OUTPUT_MAP = new OutputType("Map",
                                                     "map.map",
-                                                    OutputType.TYPE_HTML,"",ICON_MAP);
+                                                    OutputType.TYPE_HTML, "",
+                                                    ICON_MAP);
 
 
     /**
@@ -179,15 +180,16 @@ public class MapOutputHandler extends OutputHandler {
 
         sb.append(
             "<table border=\"0\" width=\"100%\"><tr valign=\"top\"><td width=700>");
-        String mapVarName =   getMap(request, entriesToUse, sb, 700, 500, true);
+        String mapVarName = getMap(request, entriesToUse, sb, 700, 500, true);
         sb.append("</td><td>");
         for (Entry entry : entriesToUse) {
             if (entry.hasLocationDefined() || entry.hasAreaDefined()) {
-                sb.append(HtmlUtil.img(getEntryManager().getIconUrl(request, entry)));
+                sb.append(HtmlUtil.img(getEntryManager().getIconUrl(request,
+                        entry)));
                 sb.append(HtmlUtil.space(1));
-                sb.append("<a href=\"javascript:hiliteEntry(" + mapVarName+","
-                          + sqt(entry.getId()) + ");\">" + entry.getName()
-                          + "</a><br>");
+                sb.append("<a href=\"javascript:hiliteEntry(" + mapVarName
+                          + "," + sqt(entry.getId()) + ");\">"
+                          + entry.getName() + "</a><br>");
             }
         }
         sb.append("</td></tr></table>");
@@ -215,13 +217,14 @@ public class MapOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public String getMap(Request request, List<Entry> entriesToUse,
-                       StringBuffer sb, int width, int height,
-                       boolean normalControls)
+                         StringBuffer sb, int width, int height,
+                         boolean normalControls)
             throws Exception {
-        StringBuffer js = new StringBuffer();
-        String mapVarName = "mapstraction"+ HtmlUtil.blockCnt++;
-        getRepository().initMap(request, mapVarName, sb, width, height, normalControls);
-        js.append(mapVarName+".resizeTo(" + width + "," + height + ");\n");
+        StringBuffer js         = new StringBuffer();
+        String       mapVarName = "mapstraction" + HtmlUtil.blockCnt++;
+        getRepository().initMap(request, mapVarName, sb, width, height,
+                                normalControls);
+        js.append(mapVarName + ".resizeTo(" + width + "," + height + ");\n");
         js.append("var marker;\n");
         js.append("var line;\n");
 
@@ -247,10 +250,10 @@ public class MapOutputHandler extends OutputHandler {
                 js.append(",");
                 js.append(llp(entry.getNorth(), entry.getWest()));
                 js.append("]);\n");
-                 js.append("initLine(line," + qt(entry.getId()) + ","
+                js.append("initLine(line," + qt(entry.getId()) + ","
                           + (makeRectangles
                              ? "1"
-                             : "0") + ","+mapVarName+");\n");
+                             : "0") + "," + mapVarName + ");\n");
 
 
 
@@ -282,10 +285,11 @@ public class MapOutputHandler extends OutputHandler {
 
                 js.append("marker.setIcon(" + qt(icon) + ");\n");
                 js.append("marker.setInfoBubble(\"" + info + "\");\n");
-                js.append("initMarker(marker," + qt(entry.getId()) + "," + mapVarName +  ");\n");
+                js.append("initMarker(marker," + qt(entry.getId()) + ","
+                          + mapVarName + ");\n");
             }
         }
-        js.append(mapVarName+".autoCenterAndZoom();\n");
+        js.append(mapVarName + ".autoCenterAndZoom();\n");
         sb.append(HtmlUtil.script(js.toString()));
         return mapVarName;
     }

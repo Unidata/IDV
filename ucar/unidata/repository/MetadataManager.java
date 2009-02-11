@@ -312,7 +312,7 @@ public class MetadataManager extends RepositoryManager {
     }
 
 
-    
+
 
 
     /**
@@ -433,7 +433,9 @@ public class MetadataManager extends RepositoryManager {
     public StringBuffer addToSearchForm(Request request, StringBuffer sb)
             throws Exception {
         for (MetadataHandler handler : metadataHandlers) {
-            if(!handler.getForUser()) continue;
+            if ( !handler.getForUser()) {
+                continue;
+            }
             handler.addToSearchForm(request, sb);
         }
         return sb;
@@ -466,14 +468,17 @@ public class MetadataManager extends RepositoryManager {
      *
      * @param entry _more_
      * @param entryChild _more_
+     * @param fileMap _more_
+     * @param internal _more_
      *
      * @throws Exception _more_
      */
-    public void processMetadataXml(Entry entry, Element entryChild, Hashtable fileMap,boolean internal)
+    public void processMetadataXml(Entry entry, Element entryChild,
+                                   Hashtable fileMap, boolean internal)
             throws Exception {
         String          type    = XmlUtil.getAttribute(entryChild, ATTR_TYPE);
         MetadataHandler handler = findMetadataHandler(type);
-        handler.processMetadataXml(entry, entryChild,fileMap, internal);
+        handler.processMetadataXml(entry, entryChild, fileMap, internal);
     }
 
     /**
@@ -554,15 +559,18 @@ public class MetadataManager extends RepositoryManager {
         String       header;
         if (doCloud) {
             request.put(ARG_TYPE, "list");
-            header =
-                HtmlUtil.href(request.getUrl(), "List")
-                + HtmlUtil.span("&nbsp;|&nbsp;", HtmlUtil.cssClass("separator"))
-                + HtmlUtil.b("Cloud");
+            header = HtmlUtil.href(request.getUrl(), "List")
+                     + HtmlUtil.span(
+                         "&nbsp;|&nbsp;",
+                         HtmlUtil.cssClass("separator")) + HtmlUtil.b(
+                             "Cloud");
         } else {
             request.put(ARG_TYPE, "cloud");
             header = HtmlUtil.b("List")
-                     + HtmlUtil.span("&nbsp;|&nbsp;", HtmlUtil.cssClass("separator"))
-                     + HtmlUtil.href(request.getUrl(), "Cloud");
+                     + HtmlUtil.span(
+                         "&nbsp;|&nbsp;",
+                         HtmlUtil.cssClass("separator")) + HtmlUtil.href(
+                             request.getUrl(), "Cloud");
         }
         sb.append(HtmlUtil.center(HtmlUtil.span(header,
                 HtmlUtil.cssClass("pagesubheading"))));
@@ -890,23 +898,25 @@ public class MetadataManager extends RepositoryManager {
 
         getDatabaseManager().executeInsert(Tables.METADATA.INSERT,
                                            new Object[] {
-                                               metadata.getId(), 
-                                               metadata.getEntryId(), 
-                                               metadata.getType(),
-                                               new Integer(metadata.getInherited()
-                                                           ? 1
-                                                           : 0), 
-                                               metadata.getAttr1(), 
-                                               metadata.getAttr2(),
-                                               metadata.getAttr3(), 
-                                               metadata.getAttr4()
-                                           });
+            metadata.getId(), metadata.getEntryId(), metadata.getType(),
+            new Integer(metadata.getInherited()
+                        ? 1
+                        : 0), metadata.getAttr1(), metadata.getAttr2(),
+            metadata.getAttr3(), metadata.getAttr4()
+        });
     }
 
+    /**
+     * _more_
+     *
+     * @param metadata _more_
+     *
+     * @throws Exception _more_
+     */
     public void deleteMetadata(Metadata metadata) throws Exception {
         getDatabaseManager().delete(Tables.METADATA.NAME,
                                     Clause.eq(Tables.METADATA.COL_ID,
-                                              metadata.getId()));
+                                        metadata.getId()));
     }
 
 

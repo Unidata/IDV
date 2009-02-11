@@ -56,8 +56,10 @@ public class Group extends Entry {
     private List<Group> children = new ArrayList<Group>();
 
 
+    /** _more_          */
     List<Group> subGroups;
 
+    /** _more_          */
     List<Entry> subEntries;
 
     /**
@@ -74,40 +76,40 @@ public class Group extends Entry {
     }
 
     /**
-       Set the SubGroups property.
-
-       @param value The new value for SubGroups
-    **/
-    public void setSubGroups (List<Group> value) {
-	subGroups = value;
+     *  Set the SubGroups property.
+     *
+     *  @param value The new value for SubGroups
+     */
+    public void setSubGroups(List<Group> value) {
+        subGroups = value;
     }
 
     /**
-       Get the SubGroups property.
-
-       @return The SubGroups
-    **/
-    public List<Group> getSubGroups () {
-	return subGroups;
+     *  Get the SubGroups property.
+     *
+     *  @return The SubGroups
+     */
+    public List<Group> getSubGroups() {
+        return subGroups;
     }
 
-/**
-Set the SubEntries property.
+    /**
+     * Set the SubEntries property.
+     *
+     * @param value The new value for SubEntries
+     */
+    public void setSubEntries(List<Entry> value) {
+        subEntries = value;
+    }
 
-@param value The new value for SubEntries
-**/
-public void setSubEntries (List<Entry> value) {
-	subEntries = value;
-}
-
-/**
-Get the SubEntries property.
-
-@return The SubEntries
-**/
-public List<Entry> getSubEntries () {
-	return subEntries;
-}
+    /**
+     * Get the SubEntries property.
+     *
+     * @return The SubEntries
+     */
+    public List<Entry> getSubEntries() {
+        return subEntries;
+    }
 
 
 

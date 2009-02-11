@@ -356,10 +356,15 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param stmt _more_
+     */
     public void close(Statement stmt) {
         try {
             stmt.close();
-        } catch(Exception ignore) {}
+        } catch (Exception ignore) {}
     }
 
 
@@ -377,11 +382,11 @@ public class DatabaseManager extends RepositoryManager {
         Statement statement = select("count(*)", table, clause);
 
         ResultSet results   = statement.getResultSet();
-        int result;
+        int       result;
         if ( !results.next()) {
-            result =  0;
+            result = 0;
         } else {
-            result =  results.getInt(1);
+            result = results.getInt(1);
         }
         close(statement);
         return result;
@@ -823,7 +828,7 @@ public class DatabaseManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public void executeInsert(String insert, Object[] values)
-        throws Exception {
+            throws Exception {
         PreparedStatement pstmt = getPreparedStatement(insert);
         setValues(pstmt, values);
         try {
@@ -1103,7 +1108,7 @@ public class DatabaseManager extends RepositoryManager {
                                      Clause.eq(column, id));
 
         ResultSet results = statement.getResultSet();
-        boolean result =  results.next();
+        boolean   result  = results.next();
         close(statement);
         return result;
     }

@@ -57,7 +57,7 @@ import java.util.List;
 public class MetadataHandler extends RepositoryManager {
 
     /** _more_ */
-    public static String ATTR_FORUSER=  "foruser";
+    public static String ATTR_FORUSER = "foruser";
 
 
 
@@ -90,6 +90,7 @@ public class MetadataHandler extends RepositoryManager {
     private List<Metadata.Type> types = new ArrayList<Metadata.Type>();
 
 
+    /** _more_          */
     boolean forUser = true;
 
 
@@ -110,12 +111,15 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @param entry _more_
      * @param node _more_
+     * @param fileMap _more_
+     * @param internal _more_
      *
      * @throws Exception _more_
      */
-    public void processMetadataXml(Entry entry, Element node, Hashtable fileMap,boolean internal)
+    public void processMetadataXml(Entry entry, Element node,
+                                   Hashtable fileMap, boolean internal)
             throws Exception {
-        forUser = XmlUtil.getAttribute(node, ATTR_FORUSER,true);
+        forUser = XmlUtil.getAttribute(node, ATTR_FORUSER, true);
         String type = XmlUtil.getAttribute(node, ATTR_TYPE);
         Metadata metadata =
             new Metadata(getRepository().getGUID(), entry.getId(), type,
@@ -790,21 +794,21 @@ public class MetadataHandler extends RepositoryManager {
 
 
     /**
-       Set the ForUser property.
-
-       @param value The new value for ForUser
-    **/
-    public void setForUser (boolean value) {
-	forUser = value;
+     *  Set the ForUser property.
+     *
+     *  @param value The new value for ForUser
+     */
+    public void setForUser(boolean value) {
+        forUser = value;
     }
 
     /**
-       Get the ForUser property.
-
-       @return The ForUser
-    **/
-    public boolean getForUser () {
-	return forUser;
+     *  Get the ForUser property.
+     *
+     *  @return The ForUser
+     */
+    public boolean getForUser() {
+        return forUser;
     }
 
 

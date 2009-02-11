@@ -95,15 +95,19 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public String getIconUrl(Request request,Entry entry) throws Exception {
+    public String getIconUrl(Request request, Entry entry) throws Exception {
         if (entry.isGroup()) {
             return iconUrl(ICON_FOLDER_CLOSED);
         }
-        return super.getIconUrl(request,entry);
+        return super.getIconUrl(request, entry);
     }
 
 
@@ -192,7 +196,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
             return ids;
         }
         long t1 = System.currentTimeMillis();
-        System.err.println ("getSynthIds " + parentEntry);
+        System.err.println("getSynthIds " + parentEntry);
         File   rootDir     = new File((String) values[0]);
         String rootDirPath = rootDir.toString();
         File   childPath   = getFileFromId(synthId, rootDir);
@@ -309,7 +313,8 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
      */
     public Entry makeSynthEntry(Request request, Entry parentEntry, String id)
             throws Exception {
-        List<Metadata> metadataList = getMetadataManager().getMetadata(parentEntry);
+        List<Metadata> metadataList =
+            getMetadataManager().getMetadata(parentEntry);
         Object[] values = parentEntry.getValues();
         if (values == null) {
             return null;
@@ -385,8 +390,8 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                 ? Resource.TYPE_LOCAL_DIRECTORY
                 : Resource.TYPE_LOCAL_FILE)), "", targetFile.lastModified(),
                 targetFile.lastModified(), targetFile.lastModified(), null);
- 
-       if (templateEntry != null) {
+
+        if (templateEntry != null) {
             entry.initWith(templateEntry);
         } else {
             //Tack on the metadata

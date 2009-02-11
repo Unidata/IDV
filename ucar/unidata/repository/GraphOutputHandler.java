@@ -83,10 +83,9 @@ import java.util.zip.*;
 public class GraphOutputHandler extends OutputHandler {
 
     /** _more_ */
-    public static final OutputType OUTPUT_GRAPH = new OutputType("Graph",
-                                                      "graph.graph",
-                                                      OutputType.TYPE_NONHTML,
-                                                      "", ICON_GRAPH);
+    public static final OutputType OUTPUT_GRAPH =
+        new OutputType("Graph", "graph.graph", OutputType.TYPE_NONHTML, "",
+                       ICON_GRAPH);
 
 
 
@@ -259,8 +258,11 @@ public class GraphOutputHandler extends OutputHandler {
         String attrs = XmlUtil.attrs(ATTR_TYPE, nodeType, ATTR_ID, entryId,
                                      ATTR_TITLE, name);
         Entry entry = getEntryManager().getEntry(request, entryId);
-        if(entry!=null) {
-            attrs+=" " + XmlUtil.attrs("imagepath",getEntryManager().getIconUrl(request, entry));
+        if (entry != null) {
+            attrs += " "
+                     + XmlUtil.attrs("imagepath",
+                                     getEntryManager().getIconUrl(request,
+                                         entry));
         }
         if (ImageUtils.isImage(resource)) {
             String imageUrl = HtmlUtil.url(

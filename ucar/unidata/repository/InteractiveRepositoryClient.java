@@ -181,10 +181,11 @@ public class InteractiveRepositoryClient extends RepositoryClient {
      * _more_
      */
     private void doMakeGroupTree() {
-        treeRoot  = new GroupNode("Top", "", true,false);
+        treeRoot  = new GroupNode("Top", "", true, false);
         treeModel = new DefaultTreeModel(treeRoot);
         groupTree = new GroupTree(treeModel);
-        groupTree.setToolTipText("<html>Right-click to show menu<br>Groups you can add to shown in<b>bold</b><br>Anonymous upload shown in <i>italics</i></html>");
+        groupTree.setToolTipText(
+            "<html>Right-click to show menu<br>Groups you can add to shown in<b>bold</b><br>Anonymous upload shown in <i>italics</i></html>");
         groupTree.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if ((e.getKeyCode() == e.VK_R) && e.isControlDown()) {
@@ -200,13 +201,17 @@ public class InteractiveRepositoryClient extends RepositoryClient {
         ToolTipManager.sharedInstance().registerComponent(groupTree);
         groupTree.setShowsRootHandles(true);
         final ImageIcon iconOpen =
-            GuiUtils.getImageIcon("/ucar/unidata/repository/htdocs/icons/folderopen.png", getClass());
+            GuiUtils.getImageIcon(
+                "/ucar/unidata/repository/htdocs/icons/folderopen.png",
+                getClass());
         final ImageIcon iconClosed =
-            GuiUtils.getImageIcon("/ucar/unidata/repository/htdocs/icons/folderclosed.png", getClass());
+            GuiUtils.getImageIcon(
+                "/ucar/unidata/repository/htdocs/icons/folderclosed.png",
+                getClass());
 
         DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {
-                private Font newFont;
-                private Font uploadFont;
+            private Font newFont;
+            private Font uploadFont;
             public Component getTreeCellRendererComponent(JTree theTree,
                     Object value, boolean sel, boolean expanded,
                     boolean leaf, int row, boolean hasFocus) {
@@ -214,14 +219,14 @@ public class InteractiveRepositoryClient extends RepositoryClient {
                         expanded, leaf, row, hasFocus);
                 if (value instanceof GroupNode) {
                     GroupNode node = (GroupNode) value;
-                    setEnabled(node.canDoNew||node.canDoUpload);
-                    if(node.canDoNew) {
-                        if(newFont==null) {
+                    setEnabled(node.canDoNew || node.canDoUpload);
+                    if (node.canDoNew) {
+                        if (newFont == null) {
                             newFont = getFont().deriveFont(Font.BOLD);
                         }
                         setFont(newFont);
-                    } else  if(node.canDoUpload) {
-                        if(uploadFont==null) {
+                    } else if (node.canDoUpload) {
+                        if (uploadFont == null) {
                             uploadFont = getFont().deriveFont(Font.ITALIC);
                         }
                         setFont(uploadFont);
@@ -260,9 +265,9 @@ public class InteractiveRepositoryClient extends RepositoryClient {
         GroupNode groupNode = (GroupNode) last;
         if (SwingUtilities.isRightMouseButton(event)) {
             JPopupMenu popup = new JPopupMenu();
-            if(groupNode.canDoNew) {
+            if (groupNode.canDoNew) {
                 popup.add(GuiUtils.makeMenuItem("Create New Group", this,
-                                                "newGroup", groupNode));
+                        "newGroup", groupNode));
             }
             popup.add(GuiUtils.makeMenuItem("Refresh", this,
                                             "refreshTreeNode", groupNode));
@@ -308,6 +313,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
         /** _more_ */
         private boolean canDoNew = false;
 
+        /** _more_          */
         private boolean canDoUpload = false;
 
         /**
@@ -316,11 +322,13 @@ public class InteractiveRepositoryClient extends RepositoryClient {
          * @param name _more_
          * @param id _more_
          * @param canDoNew _more_
+         * @param canDoUpload _more_
          */
-        public GroupNode(String name, String id, boolean canDoNew, boolean canDoUpload) {
+        public GroupNode(String name, String id, boolean canDoNew,
+                         boolean canDoUpload) {
             super(name);
-            this.id       = id;
-            this.canDoNew = canDoNew;
+            this.id          = id;
+            this.canDoNew    = canDoNew;
             this.canDoUpload = canDoUpload;
         }
 
@@ -343,15 +351,18 @@ public class InteractiveRepositoryClient extends RepositoryClient {
         public void checkExpansionInner() {
             try {
                 GuiUtils.setCursor(groupTree, GuiUtils.waitCursor);
-                boolean haveId = id.length()>0;
-                String[]args;
-                if(haveId) {
-                    args =  new String[] {
-                        ARG_ENTRYID, id, ARG_OUTPUT, "xml.xml", ARG_SESSIONID, getSessionId()};
+                boolean  haveId = id.length() > 0;
+                String[] args;
+                if (haveId) {
+                    args = new String[] {
+                        ARG_ENTRYID, id, ARG_OUTPUT, "xml.xml", ARG_SESSIONID,
+                        getSessionId()
+                    };
                 } else {
-                    args =  new String[] {ARG_OUTPUT, "xml.xml", ARG_SESSIONID, getSessionId()};
+                    args = new String[] { ARG_OUTPUT, "xml.xml",
+                                          ARG_SESSIONID, getSessionId() };
                 }
-               String url = HtmlUtil.url(URL_ENTRY_SHOW.getFullUrl(),args);
+                String url = HtmlUtil.url(URL_ENTRY_SHOW.getFullUrl(), args);
                 String xml = IOUtil.readContents(url, getClass());
                 removeAllChildren();
                 //                System.err.println ("URL:" + id);
@@ -363,8 +374,10 @@ public class InteractiveRepositoryClient extends RepositoryClient {
                     GroupNode childNode =
                         new GroupNode(XmlUtil.getAttribute(child, ATTR_NAME),
                                       XmlUtil.getAttribute(child, ATTR_ID),
-                                      XmlUtil.getAttribute(child,ATTR_CANDONEW, false),
-                                      XmlUtil.getAttribute(child,ATTR_CANDOUPLOAD, false));
+                                      XmlUtil.getAttribute(child,
+                                          ATTR_CANDONEW,
+                                          false), XmlUtil.getAttribute(child,
+                                              ATTR_CANDOUPLOAD, false));
 
                     childNode.add(
                         new DefaultMutableTreeNode("Please wait..."));
@@ -443,7 +456,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
         JTextField userFld     = new JTextField(getUser(), 30);
         List       comps       = new ArrayList();
         comps.add(GuiUtils.rLabel("Name:"));
-        comps.add(GuiUtils.inset(nameFld,4));
+        comps.add(GuiUtils.inset(nameFld, 4));
         comps.add(GuiUtils.rLabel("Server:"));
         comps.add(GuiUtils.inset(serverFld, 4));
         comps.add(GuiUtils.rLabel("Port:"));
@@ -451,7 +464,8 @@ public class InteractiveRepositoryClient extends RepositoryClient {
         comps.add(GuiUtils.rLabel("Base Path:"));
         comps.add(GuiUtils.inset(pathFld, 4));
         comps.add(GuiUtils.rLabel("User Name:"));
-        comps.add(GuiUtils.inset(GuiUtils.hbox(userFld, new JLabel(" Leave blank for anonyous")),4));
+        comps.add(GuiUtils.inset(GuiUtils.hbox(userFld,
+                new JLabel(" Leave blank for anonyous")), 4));
         comps.add(GuiUtils.rLabel("Password:"));
         comps.add(GuiUtils.inset(passwordFld, 4));
         JPanel contents = GuiUtils.doLayout(comps, 2, GuiUtils.WT_Y,

@@ -255,7 +255,9 @@ public class AccessManager extends RepositoryManager {
         }
         //        System.err.println ("cando:" + user + " " + user.getAdmin());
         //The admin can do anything
-        if(user == null) return false;
+        if (user == null) {
+            return false;
+        }
 
         if (user.getAdmin()) {
             return true;
@@ -368,15 +370,17 @@ public class AccessManager extends RepositoryManager {
         if ( !canDoAction(request, entry, Permission.ACTION_VIEW)) {
             return null;
         }
-        
+
 
         Group parent = entry.getParentGroup();
-        if(parent!=null && !canDoAction(request, parent, Permission.ACTION_VIEWCHILDREN)) {
+        if ((parent != null)
+                && !canDoAction(request, parent,
+                                Permission.ACTION_VIEWCHILDREN)) {
             return null;
         }
 
-        if(getEntryManager().isAnonymousUpload(entry)) {
-            if(!canDoAction(request,parent,Permission.ACTION_NEW)) {
+        if (getEntryManager().isAnonymousUpload(entry)) {
+            if ( !canDoAction(request, parent, Permission.ACTION_NEW)) {
                 return null;
             }
         }
@@ -504,9 +508,22 @@ public class AccessManager extends RepositoryManager {
     }
 
 
-    public boolean hasPermissionSet(Entry entry, String permission) throws Exception {
-        for(Permission p:getPermissions(entry)) {
-            if(Misc.equals(p.getAction(),permission)) return true;
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param permission _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public boolean hasPermissionSet(Entry entry, String permission)
+            throws Exception {
+        for (Permission p : getPermissions(entry)) {
+            if (Misc.equals(p.getAction(), permission)) {
+                return true;
+            }
         }
         return false;
     }
@@ -584,7 +601,10 @@ public class AccessManager extends RepositoryManager {
         }
 
         StringBuffer currentAccess = new StringBuffer();
-        currentAccess.append(HtmlUtil.open(HtmlUtil.TAG_TABLE," cellspacing=0 ccellpadding=0 border=1 "));
+        currentAccess.append(
+            HtmlUtil.open(
+                HtmlUtil.TAG_TABLE,
+                " cellspacing=0 ccellpadding=0 border=1 "));
         StringBuffer header =
             new StringBuffer(HtmlUtil.cols(HtmlUtil.bold("Entry")));
         for (int i = 0; i < Permission.ACTIONS.length; i++) {

@@ -79,20 +79,21 @@ import java.util.zip.*;
  */
 public class OutputType {
 
-    /** _more_          */
+    /** _more_ */
     public static final int TYPE_HTML = 1 << 0;
 
-    /** _more_          */
+    /** _more_ */
     public static final int TYPE_NONHTML = 1 << 1;
 
-    /** _more_          */
+    /** _more_ */
     public static final int TYPE_ACTION = 1 << 2;
 
-    /** _more_          */
+    /** _more_ */
     public static final int TYPE_INTERNAL = 1 << 3;
 
 
-    public static final int TYPE_ALL = TYPE_HTML|TYPE_ACTION|TYPE_NONHTML;
+    /** _more_          */
+    public static final int TYPE_ALL = TYPE_HTML | TYPE_ACTION | TYPE_NONHTML;
 
 
     /** _more_ */
@@ -119,7 +120,7 @@ public class OutputType {
     /** _more_ */
     private String icon;
 
-    /** _more_          */
+    /** _more_ */
     private int type = TYPE_HTML;
 
     /**
@@ -315,6 +316,11 @@ public class OutputType {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getType() {
         return type;
     }

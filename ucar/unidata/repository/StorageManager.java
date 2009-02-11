@@ -221,7 +221,8 @@ public class StorageManager extends RepositoryManager {
      */
     public String localizePath(String path) {
         path = path.replace("%repositorydir%", getRepositoryDir());
-        path = path.replace("%resourcedir%", "/ucar/unidata/repository/resources");
+        path = path.replace("%resourcedir%",
+                            "/ucar/unidata/repository/resources");
         return path;
     }
 
@@ -469,6 +470,17 @@ public class StorageManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param original _more_
+     * @param newName _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public File copyToStorage(Request request, File original, String newName)
             throws Exception {
         String            targetName = newName;

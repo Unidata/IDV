@@ -165,7 +165,7 @@ public class DataOutputHandler extends OutputHandler {
     /** _more_ */
     public static final OutputType OUTPUT_POINT_KML =
         new OutputType("Point as KML", "data.point.kml",
-                       OutputType.TYPE_NONHTML,"",ICON_KML);
+                       OutputType.TYPE_NONHTML, "", ICON_KML);
 
     /** _more_ */
     public static final OutputType OUTPUT_TRAJECTORY_MAP =
@@ -275,6 +275,9 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
+    /**
+     * _more_
+     */
     public void clearCache() {
         super.clearCache();
         ncFileCache.clear();
@@ -312,8 +315,10 @@ public class DataOutputHandler extends OutputHandler {
         long t1 = System.currentTimeMillis();
         if ( !canLoadAsCdm(entry)) {
             long t2 = System.currentTimeMillis();
-            if((t2-t1)>1)
-                System.err.println ("DataOutputHandler (cdm) getEntryLinks  " + entry.getName() +" time:" + (t2-t1));
+            if ((t2 - t1) > 1) {
+                System.err.println("DataOutputHandler (cdm) getEntryLinks  "
+                                   + entry.getName() + " time:" + (t2 - t1));
+            }
             return;
         }
 
@@ -322,30 +327,35 @@ public class DataOutputHandler extends OutputHandler {
             addOutputLink(request, entry, links, OUTPUT_GRIDSUBSET_FORM);
         } else if (canLoadAsPoint(entry)) {
             addOutputLink(request, entry, links, OUTPUT_POINT_MAP);
-            links.add(makeLink(request,entry,OUTPUT_POINT_CSV, 
-                               "/"+ IOUtil.stripExtension(entry.getName())+ ".csv"));
+            links.add(makeLink(request, entry, OUTPUT_POINT_CSV,
+                               "/" + IOUtil.stripExtension(entry.getName())
+                               + ".csv"));
 
-            links.add(makeLink(request,entry,OUTPUT_POINT_KML, 
-                               "/"+ IOUtil.stripExtension(entry.getName())+ ".kml"));
-        } else if (  canLoadAsTrajectory(entry) ) {
+            links.add(makeLink(request, entry, OUTPUT_POINT_KML,
+                               "/" + IOUtil.stripExtension(entry.getName())
+                               + ".kml"));
+        } else if (canLoadAsTrajectory(entry)) {
             addOutputLink(request, entry, links, OUTPUT_TRAJECTORY_MAP);
         }
 
         Object oldOutput = request.getOutput();
         request.put(ARG_OUTPUT, OUTPUT_OPENDAP);
         String opendapUrl = request.getRequestPath() + "/"
-                            + request.getPathEmbeddedArgs() + "/dodsC/entry.das";
+                            + request.getPathEmbeddedArgs()
+                            + "/dodsC/entry.das";
         links.add(new Link(opendapUrl, getRepository().iconUrl(ICON_OPENDAP),
                            "OpenDAP", OUTPUT_OPENDAP));
         request.put(ARG_OUTPUT, oldOutput);
 
 
-        Link cdlLink  = makeLink(request, state.entry, OUTPUT_CDL);
+        Link cdlLink = makeLink(request, state.entry, OUTPUT_CDL);
         //        cdlLink.setLinkType(OutputType.TYPE_ACTION);
         links.add(cdlLink);
         long t2 = System.currentTimeMillis();
-        if((t2-t1)>1)
-            System.err.println ("DataOutputHandler  getEntryLinks  " + entry.getName() +" time:" + (t2-t1));
+        if ((t2 - t1) > 1) {
+            System.err.println("DataOutputHandler  getEntryLinks  "
+                               + entry.getName() + " time:" + (t2 - t1));
+        }
     }
 
 
@@ -360,7 +370,8 @@ public class DataOutputHandler extends OutputHandler {
     public String getTdsUrl(Entry entry) {
         return "/" + ARG_OUTPUT + ":"
                + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ENTRYID
-               + ":" + Request.encodeEmbedded(entry.getId()) + "/dodsC/entry.das";
+               + ":" + Request.encodeEmbedded(entry.getId())
+               + "/dodsC/entry.das";
     }
 
 
@@ -391,10 +402,10 @@ public class DataOutputHandler extends OutputHandler {
         if (url == null) {
             return false;
         }
-        if(url.endsWith("~")) {
+        if (url.endsWith("~")) {
             return false;
         }
-        if(url.endsWith("#")) {
+        if (url.endsWith("#")) {
             return false;
         }
         if (entry.isGroup()) {
@@ -426,13 +437,17 @@ public class DataOutputHandler extends OutputHandler {
         if ( !entry.isFile()) {
             return false;
         }
-        if(cannotLoad(entry,TYPE_CDM)) return false;
-
-        String[]types ={TYPE_CDM,TYPE_GRID,TYPE_TRAJECTORY,TYPE_POINT};
-        for(int i=0;i<types.length;i++)  {
-            if(canLoad(entry,types[i])) return true;
+        if (cannotLoad(entry, TYPE_CDM)) {
+            return false;
         }
-        Boolean b = (Boolean)cdmEntries.get(entry.getId());
+
+        String[] types = { TYPE_CDM, TYPE_GRID, TYPE_TRAJECTORY, TYPE_POINT };
+        for (int i = 0; i < types.length; i++) {
+            if (canLoad(entry, types[i])) {
+                return true;
+            }
+        }
+        Boolean b = (Boolean) cdmEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
             if (canLoadEntry(entry)) {
@@ -461,10 +476,14 @@ public class DataOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean canLoadAsPoint(Entry entry) {
-        if(cannotLoad(entry,TYPE_POINT)) return false;
-        if(canLoad(entry,TYPE_POINT)) return true;
+        if (cannotLoad(entry, TYPE_POINT)) {
+            return false;
+        }
+        if (canLoad(entry, TYPE_POINT)) {
+            return true;
+        }
 
-        Boolean b = (Boolean)pointEntries.get(entry.getId());
+        Boolean b = (Boolean) pointEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
             if ( !canLoadEntry(entry)) {
@@ -492,14 +511,18 @@ public class DataOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean canLoadAsTrajectory(Entry entry) {
-        if(cannotLoad(entry,TYPE_TRAJECTORY)) return false;
-        if(canLoad(entry,TYPE_TRAJECTORY)) return true;
+        if (cannotLoad(entry, TYPE_TRAJECTORY)) {
+            return false;
+        }
+        if (canLoad(entry, TYPE_TRAJECTORY)) {
+            return true;
+        }
 
         if ( !canLoadAsCdm(entry)) {
             return false;
         }
 
-        Boolean b = (Boolean)trajectoryEntries.get(entry.getId());
+        Boolean b = (Boolean) trajectoryEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
             if (canLoadEntry(entry)) {
@@ -516,15 +539,31 @@ public class DataOutputHandler extends OutputHandler {
     }
 
 
+    /** _more_          */
     public static final String TYPE_CDM = "cdm";
+
+    /** _more_          */
     public static final String TYPE_GRID = "grid";
+
+    /** _more_          */
     public static final String TYPE_TRAJECTORY = "trajectory";
+
+    /** _more_          */
     public static final String TYPE_POINT = "point";
 
+    /** _more_          */
     private Hashtable prefixMap;
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param type _more_
+     *
+     * @return _more_
+     */
     private boolean cannotLoad(Entry entry, String type) {
-        String[]types ={TYPE_CDM,TYPE_GRID,TYPE_TRAJECTORY,TYPE_POINT};
+        String[] types = { TYPE_CDM, TYPE_GRID, TYPE_TRAJECTORY, TYPE_POINT };
         //If this entry can be loaded by another type then we cannot
         //load it for this type
         /*        if(!type.equals(TYPE_CDM)) {
@@ -540,18 +579,40 @@ public class DataOutputHandler extends OutputHandler {
         return hasPrefixForType(entry, type, true);
     }
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param type _more_
+     *
+     * @return _more_
+     */
     private boolean canLoad(Entry entry, String type) {
         return hasPrefixForType(entry, type, false);
     }
 
-    private boolean hasPrefixForType(Entry entry, String type,boolean forNot) {
-        if(prefixMap == null) {
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param type _more_
+     * @param forNot _more_
+     *
+     * @return _more_
+     */
+    private boolean hasPrefixForType(Entry entry, String type,
+                                     boolean forNot) {
+        if (prefixMap == null) {
             Hashtable tmp = new Hashtable();
-            String[]types ={TYPE_CDM,TYPE_GRID,TYPE_TRAJECTORY,TYPE_POINT};
-            for(int i=0;i<types.length;i++) {
-                List toks = StringUtil.split(getRepository().getProperty("ramadda.data."+types[i]+".prefixes",""),",",true,true);
-                for(String tok: (List<String>) toks) {
-                    tmp.put(types[i]+"." + tok,"");
+            String[] types = { TYPE_CDM, TYPE_GRID, TYPE_TRAJECTORY,
+                               TYPE_POINT };
+            for (int i = 0; i < types.length; i++) {
+                List toks = StringUtil.split(
+                                getRepository().getProperty(
+                                    "ramadda.data." + types[i] + ".prefixes",
+                                    ""), ",", true, true);
+                for (String tok : (List<String>) toks) {
+                    tmp.put(types[i] + "." + tok, "");
                 }
             }
             prefixMap = tmp;
@@ -560,14 +621,15 @@ public class DataOutputHandler extends OutputHandler {
         if (url == null) {
             return false;
         }
-        String ext = IOUtil.getFileExtension(url).toLowerCase();
-        String key = type +"." + ext;
-        String notKey = type +".!" + ext;
-        if(forNot)
-            return prefixMap.get(notKey)!=null;
-        else
-            return prefixMap.get(key)!=null;
-        
+        String ext    = IOUtil.getFileExtension(url).toLowerCase();
+        String key    = type + "." + ext;
+        String notKey = type + ".!" + ext;
+        if (forNot) {
+            return prefixMap.get(notKey) != null;
+        } else {
+            return prefixMap.get(key) != null;
+        }
+
 
     }
 
@@ -579,10 +641,10 @@ public class DataOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean canLoadAsGrid(Entry entry) {
-        if(cannotLoad(entry,TYPE_GRID)) {
+        if (cannotLoad(entry, TYPE_GRID)) {
             return false;
         }
-        if(canLoad(entry,TYPE_GRID)){
+        if (canLoad(entry, TYPE_GRID)) {
             return true;
         }
         if ( !canLoadAsCdm(entry)) {
@@ -590,7 +652,7 @@ public class DataOutputHandler extends OutputHandler {
         }
 
 
-        Boolean b = (Boolean)gridEntries.get(entry.getId());
+        Boolean b = (Boolean) gridEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
             if ( !canLoadEntry(entry)) {
@@ -975,7 +1037,8 @@ public class DataOutputHandler extends OutputHandler {
                                     + HtmlUtil.select(
                                         ARG_FROMDATE, formattedDates,
                                         fromDate) + HtmlUtil.img(
-                                            iconUrl(ICON_ARROW)) + HtmlUtil.select(
+                                            iconUrl(
+                                                ICON_ARROW)) + HtmlUtil.select(
                                                     ARG_TODATE,
                                                         formattedDates,
                                                             toDate)));
@@ -1066,9 +1129,9 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputPointMap(Request request, Entry entry)
             throws Exception {
 
-        String mapVarName = "mapstraction"+ HtmlUtil.blockCnt++;
+        String          mapVarName = "mapstraction" + HtmlUtil.blockCnt++;
         PointObsDataset pod = getPointDataset(entry.getResource().getPath());
-        StringBuffer    sb  = new StringBuffer();
+        StringBuffer    sb         = new StringBuffer();
         synchronized (pod) {
             List         vars = pod.getDataVariables();
             int          skip = request.get(ARG_SKIP, 0);
@@ -1079,7 +1142,7 @@ public class DataOutputHandler extends OutputHandler {
             Iterator dataIterator   = pod.getDataIterator(16384);
             int      cnt            = 0;
             int      total          = 0;
-            String   icon = iconUrl("/icons/pointdata.gif");
+            String   icon           = iconUrl("/icons/pointdata.gif");
 
             List     columnDataList = new ArrayList();
             while (dataIterator.hasNext()) {
@@ -1139,11 +1202,11 @@ public class DataOutputHandler extends OutputHandler {
                                    + "}\n");
                 js.append("marker.setInfoBubble(\"" + info.toString()
                           + "\");\n");
-                js.append("initMarker(marker," + HtmlUtil.quote("" + cnt) +"," +mapVarName
-                          + ");\n");
+                js.append("initMarker(marker," + HtmlUtil.quote("" + cnt)
+                          + "," + mapVarName + ");\n");
             }
 
-            js.append(mapVarName+".autoCenterAndZoom();\n");
+            js.append(mapVarName + ".autoCenterAndZoom();\n");
             //        js.append(mapVarName+".resizeTo(" + width + "," + height + ");\n");
 
             StringBuffer yui         = new StringBuffer();
@@ -1218,7 +1281,9 @@ public class DataOutputHandler extends OutputHandler {
                 }
             }
             //        sb.append("<table width=\"100%\"><tr valign=top><td>\n");
-            getRepository().initMap(request, mapVarName, sb, request.get(ARG_WIDTH,800), request.get(ARG_HEIGHT,500), true);
+            getRepository().initMap(request, mapVarName, sb,
+                                    request.get(ARG_WIDTH, 800),
+                                    request.get(ARG_HEIGHT, 500), true);
             /*        sb.append("</td><td>");
                       sb.append(HtmlUtil.div("",HtmlUtil.id("datatable")+HtmlUtil.cssClass(" yui-skin-sam")));
                       sb.append("</td></tr></table>");
@@ -1305,8 +1370,8 @@ public class DataOutputHandler extends OutputHandler {
             throws Exception {
         TrajectoryObsDataset tod =
             getTrajectoryDataset(entry.getResource().getPath());
-        StringBuffer sb = new StringBuffer();
-        String mapVarName = "mapstraction"+ HtmlUtil.blockCnt++;
+        StringBuffer sb         = new StringBuffer();
+        String       mapVarName = "mapstraction" + HtmlUtil.blockCnt++;
         synchronized (tod) {
             StringBuffer js           = new StringBuffer();
             List         trajectories = tod.getTrajectories();
@@ -1330,7 +1395,8 @@ public class DataOutputHandler extends OutputHandler {
                                 "endMarker.setInfoBubble(\"End time:"
                                 + todt.getEndDate() + "\");\n");
                             markerSB.append(
-                                "initMarker(endMarker,\"endMarker\"," + mapVarName+");\n");
+                                "initMarker(endMarker,\"endMarker\","
+                                + mapVarName + ");\n");
                         }
                     } else {
                         markerSB.append("var startMarker = new Marker("
@@ -1340,14 +1406,15 @@ public class DataOutputHandler extends OutputHandler {
                             "startMarker.setInfoBubble(\"Start time:"
                             + todt.getStartDate() + "\");\n");
                         markerSB.append(
-                            "initMarker(startMarker,\"startMarker\"," + mapVarName+");\n");
+                            "initMarker(startMarker,\"startMarker\","
+                            + mapVarName + ");\n");
                     }
                     js.append(MapOutputHandler.llp(lats[ptIdx], lons[ptIdx]));
                 }
                 js.append("]);\n");
                 js.append("line.setWidth(2);\n");
                 js.append("line.setColor(\"#FF0000\");\n");
-                js.append(mapVarName +".addPolyline(line);\n");
+                js.append(mapVarName + ".addPolyline(line);\n");
                 js.append(markerSB);
                 StructureData    structure = todt.getData(0);
                 VariableSimpleIF theVar    = null;
@@ -1367,8 +1434,8 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
-            js.append(mapVarName+".autoCenterAndZoom();\n");
-            getRepository().initMap(request, mapVarName,sb, 800, 500, true);
+            js.append(mapVarName + ".autoCenterAndZoom();\n");
+            getRepository().initMap(request, mapVarName, sb, 800, 500, true);
             sb.append(HtmlUtil.script(js.toString()));
             return new Result(msg("Trajectory Map"), sb);
         }
@@ -1583,7 +1650,18 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
-    public Result outputOpendap(final Request request, final Entry entry) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result outputOpendap(final Request request, final Entry entry)
+            throws Exception {
         //Bridge the ramadda servlet to the opendap servlet
         NcDODSServlet servlet = new NcDODSServlet(request, entry) {
             public ServletConfig getServletConfig() {
@@ -1662,26 +1740,31 @@ public class DataOutputHandler extends OutputHandler {
             String             reqPath = entry.getName();
             String location = entry.getResource().getFile().toString();
             try {
-            List<Metadata> metadataList = getMetadataManager().getMetadata(entry);
-            for(Metadata metadata: metadataList) {
-                if(metadata.getType().equals(ContentMetadataHandler.TYPE_ATTACHMENT)) {
-                    if(metadata.getAttr1().endsWith(".ncml")) {
-                        String ncml = IOUtil.readContents(new File(metadata.getAttr1()));
-                        ncml = ncml.replace("${location}",location);
-                        File ncmlFile = getStorageManager().getTmpFile(repositoryRequest, "tmp.ncml");
-                        IOUtil.writeBytes(ncmlFile, ncml.getBytes());
-                        System.err.println ("Doing ncml file");
-                        location = ncmlFile.toString();
-                        break;
+                List<Metadata> metadataList =
+                    getMetadataManager().getMetadata(entry);
+                for (Metadata metadata : metadataList) {
+                    if (metadata.getType().equals(
+                            ContentMetadataHandler.TYPE_ATTACHMENT)) {
+                        if (metadata.getAttr1().endsWith(".ncml")) {
+                            String ncml = IOUtil.readContents(
+                                              new File(metadata.getAttr1()));
+                            ncml = ncml.replace("${location}", location);
+                            File ncmlFile = getStorageManager().getTmpFile(
+                                                repositoryRequest,
+                                                "tmp.ncml");
+                            IOUtil.writeBytes(ncmlFile, ncml.getBytes());
+                            System.err.println("Doing ncml file");
+                            location = ncmlFile.toString();
+                            break;
+                        }
                     }
                 }
-            }
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
 
             try {
-                NetcdfFile ncFile =  getNetcdfDataset(new File(location));
+                NetcdfFile ncFile = getNetcdfDataset(new File(location));
                 GuardedDatasetImpl guardedDataset =
                     new GuardedDatasetImpl(reqPath, ncFile, true);
                 return guardedDataset;

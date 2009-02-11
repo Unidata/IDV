@@ -621,22 +621,20 @@ public class TypeHandler extends RepositoryManager {
             throws Exception {
 
         if (entry.isGroup()) {
-            if(getAccessManager().canDoAction(request, entry,
-                                              Permission.ACTION_NEW)) {
+            if (getAccessManager().canDoAction(request, entry,
+                    Permission.ACTION_NEW)) {
+                links.add(new Link(request.url(getRepository().URL_ENTRY_NEW,
+                        ARG_GROUP,
+                        entry.getId()), getRepository().iconUrl(ICON_NEW),
+                                        "New Entry or Group"));
+            } else if (getAccessManager().canDoAction(request, entry,
+                    Permission.ACTION_UPLOAD)) {
                 links.add(
-                          new Link(
-                                   request.url(
-                                               getRepository().URL_ENTRY_NEW, ARG_GROUP,
-                                               entry.getId()), getRepository().iconUrl(ICON_NEW),
-                                   "New Entry or Group"));
-            } else  if(getAccessManager().canDoAction(request, entry,
-                                              Permission.ACTION_UPLOAD)) {
-                links.add(
-                          new Link(
-                                   request.url(
-                                               getRepository().URL_ENTRY_UPLOAD, ARG_GROUP,
-                                               entry.getId()), getRepository().iconUrl(ICON_UPLOAD),
-                                   "Upload a file"));
+                    new Link(
+                        request.url(
+                            getRepository().URL_ENTRY_UPLOAD, ARG_GROUP,
+                            entry.getId()), getRepository().iconUrl(
+                                ICON_UPLOAD), "Upload a file"));
             }
 
         }
@@ -664,7 +662,7 @@ public class TypeHandler extends RepositoryManager {
         }
 
         if (getAccessManager().canDoAction(request, entry,
-                    Permission.ACTION_DELETE)) {
+                                           Permission.ACTION_DELETE)) {
             links.add(
                 new Link(
                     request.entryUrl(
@@ -691,7 +689,8 @@ public class TypeHandler extends RepositoryManager {
                 getRepository().iconUrl(ICON_COMMENTS),
                 msg("Add/View Comments")));
 
-        if (request.getUser()!=null &&  !request.getUser().getAnonymous()) {
+        if ((request.getUser() != null)
+                && !request.getUser().getAnonymous()) {
             links.add(
                 new Link(
                     request.entryUrl(
@@ -823,8 +822,8 @@ public class TypeHandler extends RepositoryManager {
                                          + formatDate(request,
                                              entry.getCreateDate())));
 
-            Resource resource  = entry.getResource();
-            String resourceLink = resource.getPath();
+            Resource resource     = entry.getResource();
+            String   resourceLink = resource.getPath();
             if (resourceLink.length() > 0) {
                 if (entry.getResource().isUrl()) {
                     resourceLink = "<a href=\"" + resourceLink + "\">"
@@ -875,14 +874,11 @@ public class TypeHandler extends RepositoryManager {
                                 getRepository().iconUrl(ICON_SEARCH),
                                 "Search for entries with this date range",
                                 " border=0 "));
-                    sb.append(
-                        HtmlUtil.formEntry(
-                            msgLabel("Date Range"),
+                    sb.append(HtmlUtil.formEntry(msgLabel("Date Range"),
                             searchLink + HtmlUtil.space(1) + startDate
                             + HtmlUtil.space(1)
-                            + HtmlUtil.img(
-                                iconUrl(ICON_RANGE)) + HtmlUtil.space(1)
-                                        + endDate));
+                            + HtmlUtil.img(iconUrl(ICON_RANGE))
+                            + HtmlUtil.space(1) + endDate));
                 } else {
                     sb.append(HtmlUtil.formEntry(msgLabel("Date"),
                             formatDate(request, entry.getStartDate())));
@@ -1167,20 +1163,25 @@ public class TypeHandler extends RepositoryManager {
         }
         int rows = getProperty("form.rows.desc", 3);
         if (okToShowInForm(ARG_DESCRIPTION)) {
-            String desc = "";
+            String desc    = "";
             String buttons = "";
-            if(entry!=null) {
-                desc =  entry.getDescription();
-                if(desc.startsWith("<wiki>")) {
+            if (entry != null) {
+                desc = entry.getDescription();
+                if (desc.startsWith("<wiki>")) {
                     rows = 20;
-                    buttons = getRepository().getHtmlOutputHandler().makeWikiEditBar(request,entry, ARG_DESCRIPTION)+HtmlUtil.br();
+                    buttons =
+                        getRepository().getHtmlOutputHandler()
+                            .makeWikiEditBar(request, entry,
+                                             ARG_DESCRIPTION) + HtmlUtil.br();
                 }
             }
             sb.append(
                 HtmlUtil.formEntryTop(
                     msgLabel("Description"),
-                    buttons+
-                    HtmlUtil.textArea(ARG_DESCRIPTION, desc, rows, 60,HtmlUtil.id(ARG_DESCRIPTION))));
+                    buttons
+                    + HtmlUtil.textArea(
+                        ARG_DESCRIPTION, desc, rows, 60,
+                        HtmlUtil.id(ARG_DESCRIPTION))));
         }
 
         if (request.getUser().getAdmin()) {
@@ -1191,15 +1192,15 @@ public class TypeHandler extends RepositoryManager {
                     : ""), HtmlUtil.SIZE_20)));
         }
 
-        boolean showFile  = okToShowInForm(ARG_FILE);
-        boolean showLocalFile  = showFile && request.getUser().getAdmin();
-        boolean showUrl   = okToShowInForm(ARG_URL);
+        boolean showFile      = okToShowInForm(ARG_FILE);
+        boolean showLocalFile = showFile && request.getUser().getAdmin();
+        boolean showUrl       = okToShowInForm(ARG_URL);
         if (okToShowInForm(ARG_RESOURCE)) {
-            List<String>  tabTitles  = new ArrayList<String> ();
-            List<String>  tabContent = new ArrayList<String> ();
+            List<String> tabTitles  = new ArrayList<String>();
+            List<String> tabContent = new ArrayList<String>();
             if (entry == null) {
-                String  urlLabel  = getFormLabel(ARG_URL, "URL");
-                String  fileLabel = getFormLabel(ARG_FILE, "File");
+                String urlLabel  = getFormLabel(ARG_URL, "URL");
+                String fileLabel = getFormLabel(ARG_FILE, "File");
                 if (showFile) {
                     String formContent = HtmlUtil.fileInput(ARG_FILE, size);
                     tabTitles.add(msg(fileLabel));
@@ -1208,10 +1209,12 @@ public class TypeHandler extends RepositoryManager {
                 if (showUrl) {
                     String download = !okToShowInForm(ARG_RESOURCE_DOWNLOAD)
                                       ? ""
-                        : HtmlUtil.space(1)
-                        + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD) + 
-                        HtmlUtil.space(1)
-                        + msg("Download");
+                                      : HtmlUtil.space(1)
+                                        + HtmlUtil
+                                            .checkbox(
+                                                ARG_RESOURCE_DOWNLOAD) + HtmlUtil
+                                                    .space(1) + msg(
+                                                        "Download");
                     String formContent = HtmlUtil.input(ARG_URL, "", size)
                                          + BLANK + download;
                     tabTitles.add(urlLabel);
@@ -1219,14 +1222,15 @@ public class TypeHandler extends RepositoryManager {
                 }
 
                 if (showLocalFile) {
-                    String formContent = HtmlUtil.input(ARG_LOCALFILE, "", size);
+                    String formContent = HtmlUtil.input(ARG_LOCALFILE, "",
+                                             size);
                     tabTitles.add(msg("Local File"));
                     tabContent.add(HtmlUtil.inset(formContent, 8));
                 }
 
-                String addMetadata = 
-                    HtmlUtil.checkbox(ARG_ADDMETADATA) + HtmlUtil.space(1)
-                    + msg("Add Metadata");
+                String addMetadata = HtmlUtil.checkbox(ARG_ADDMETADATA)
+                                     + HtmlUtil.space(1)
+                                     + msg("Add Metadata");
 
                 List datePatterns = new ArrayList();
                 datePatterns.add(new TwoFacedObject("", BLANK));
@@ -1234,45 +1238,50 @@ public class TypeHandler extends RepositoryManager {
                     datePatterns.add(DateUtil.DATE_FORMATS[i]);
                 }
 
-                String unzip=  HtmlUtil.checkbox(ARG_FILE_UNZIP) + HtmlUtil.space(1)
-                    + msg("Unzip archive") + HtmlUtil.space(3) +
-                    msgLabel("Date Pattern") +
-                    HtmlUtil.space(1) +  
-                    HtmlUtil.select(ARG_DATE_PATTERN, datePatterns) + " (" + msg("use file name")+")";
+                String unzip = HtmlUtil.checkbox(ARG_FILE_UNZIP)
+                               + HtmlUtil.space(1) + msg("Unzip archive")
+                               + HtmlUtil.space(3) + msgLabel("Date Pattern")
+                               + HtmlUtil.space(1)
+                               + HtmlUtil.select(ARG_DATE_PATTERN,
+                                   datePatterns) + " ("
+                                       + msg("use file name") + ")";
 
-                String extra =  addMetadata + HtmlUtil.space(3)+unzip;
+                String extra = addMetadata + HtmlUtil.space(3) + unzip;
 
                 if (tabTitles.size() > 1) {
                     sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
                             HtmlUtil.makeTabs(tabTitles, tabContent, true,
-                                              "tab_content", "tab_contents_noborder")+
-                                                 extra));
+                                "tab_content",
+                                "tab_contents_noborder") + extra));
                 } else {
-                    sb.append(HtmlUtil.formEntry(tabTitles.get(0)+":",
-                                                 tabContent.get(0)+extra));
+                    sb.append(HtmlUtil.formEntry(tabTitles.get(0) + ":",
+                            tabContent.get(0) + extra));
                 }
 
             } else {
-                if(entry.getResource().isFile()) {
-                    if(request.getUser().getAdmin()) {
+                if (entry.getResource().isFile()) {
+                    if (request.getUser().getAdmin()) {
                         sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
-                                                     entry.getResource().getPath()));
+                                entry.getResource().getPath()));
                     } else {
-                        String fileTail = getStorageManager().getFileTail(entry);
+                        String fileTail =
+                            getStorageManager().getFileTail(entry);
                         sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
-                                                     fileTail));
+                                fileTail));
                     }
 
-                    if(entry.getResource().isStoredFile() && showFile) {
-                        String formContent = HtmlUtil.fileInput(ARG_FILE, size);
-                        sb.append(HtmlUtil.formEntry(msgLabel("Upload new file"),
-                                                     formContent));
+                    if (entry.getResource().isStoredFile() && showFile) {
+                        String formContent = HtmlUtil.fileInput(ARG_FILE,
+                                                 size);
+                        sb.append(
+                            HtmlUtil.formEntry(
+                                msgLabel("Upload new file"), formContent));
 
                     }
 
                 } else {
                     sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
-                                                 entry.getResource().getPath()));
+                            entry.getResource().getPath()));
                 }
             }
 
@@ -1328,8 +1337,8 @@ public class TypeHandler extends RepositoryManager {
                         getRepository().makeDateInput(
                             request, ARG_FROMDATE, "entryform",
                             fromDate) + HtmlUtil.space(1)
-                                      + HtmlUtil.img(iconUrl(ICON_RANGE)) + HtmlUtil.space(
-                                                  1) +
+                                      + HtmlUtil.img(iconUrl(ICON_RANGE))
+                                      + HtmlUtil.space(1) +
                 //                        " <b>--</b> " +
                 getRepository().makeDateInput(request, ARG_TODATE,
                         "entryform", toDate) + HtmlUtil.space(2)));
@@ -1378,16 +1387,22 @@ public class TypeHandler extends RepositoryManager {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public String getIconUrl(Request request,Entry entry) throws Exception {
+    public String getIconUrl(Request request, Entry entry) throws Exception {
         Resource resource = entry.getResource();
         String   path     = resource.getPath();
         if (entry.isGroup()) {
-            if(getAccessManager().hasPermissionSet(entry,Permission.ACTION_VIEWCHILDREN)) {
-                if(!getAccessManager().canDoAction(request, entry, Permission.ACTION_VIEWCHILDREN)) {
+            if (getAccessManager().hasPermissionSet(entry,
+                    Permission.ACTION_VIEWCHILDREN)) {
+                if ( !getAccessManager().canDoAction(request, entry,
+                        Permission.ACTION_VIEWCHILDREN)) {
                     return iconUrl(ICON_FOLDER_CLOSED_LOCKED);
                 }
             }

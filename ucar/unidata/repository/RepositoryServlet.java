@@ -122,14 +122,15 @@ public class RepositoryServlet extends HttpServlet {
     }
 
     /**
-     * Create the repository. 
+     * Create the repository.
      *
      * @param port _more_
      * @param webAppProperties _more_
      *
      * @throws Exception _more_
      */
-    private synchronized void createRepository(int port, Properties webAppProperties)
+    private synchronized void createRepository(int port,
+            Properties webAppProperties)
             throws Exception {
         Repository tmp = new Repository(getInitParams(), port, true);
         tmp.init(webAppProperties);
@@ -254,10 +255,12 @@ public class RepositoryServlet extends HttpServlet {
                 }
             }
 
-            if(repositoryResult.getCacheOk()) {
-                response.setHeader("Cache-Control","public,max-age=259200");
-                response.setHeader("Expires","Tue, 08 Jan 2019 07:41:19 GMT");
-                response.setHeader("Last-Modified","Tue, 20 Jan 2009 01:45:54 GMT");
+            if (repositoryResult.getCacheOk()) {
+                response.setHeader("Cache-Control", "public,max-age=259200");
+                response.setHeader("Expires",
+                                   "Tue, 08 Jan 2019 07:41:19 GMT");
+                response.setHeader("Last-Modified",
+                                   "Tue, 20 Jan 2009 01:45:54 GMT");
             }
 
             if (repositoryResult.getRedirectUrl() != null) {
@@ -379,9 +382,9 @@ public class RepositoryServlet extends HttpServlet {
                 // Convert Map values into type String. 
 
                 while (it.hasNext()) {
-                    Map.Entry    pairs = (Map.Entry) it.next();
-                    String       key   = (String) pairs.getKey();
-                    String[]     vals  = (String[]) pairs.getValue();
+                    Map.Entry pairs = (Map.Entry) it.next();
+                    String    key   = (String) pairs.getKey();
+                    String[]  vals  = (String[]) pairs.getValue();
                     if (vals.length > 0) {
                         formArgs.put(key, vals[0]);
                     }
@@ -416,7 +419,9 @@ public class RepositoryServlet extends HttpServlet {
                 throws IOException {
             String fieldName = item.getFieldName();
             String fileName  = item.getName();
-            if(fileName == null || fileName.trim().length()==0) return;
+            if ((fileName == null) || (fileName.trim().length() == 0)) {
+                return;
+            }
             try {
                 RepositoryUtil.checkFilePath(fileName);
             } catch (Exception e) {

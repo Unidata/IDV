@@ -82,7 +82,8 @@ public class ZipOutputHandler extends OutputHandler {
     /** _more_ */
     public static final OutputType OUTPUT_ZIP = new OutputType("Zip File",
                                                     "zip.zip",
-                                                               OutputType.TYPE_NONHTML,"",ICON_ZIP);
+                                                    OutputType.TYPE_NONHTML,
+                                                    "", ICON_ZIP);
 
 
     /**
@@ -119,8 +120,11 @@ public class ZipOutputHandler extends OutputHandler {
             throws Exception {
         if (state.entry != null) {
             if (getAccessManager().canDownload(request, state.entry)) {
-                links.add(makeLink(request,state.entry,OUTPUT_ZIP, 
-                                   "/"+ IOUtil.stripExtension(state.entry.getName())+ ".zip"));
+                links.add(
+                    makeLink(
+                        request, state.entry, OUTPUT_ZIP,
+                        "/" + IOUtil.stripExtension(state.entry.getName())
+                        + ".zip"));
             }
         } else {
             boolean ok = false;
@@ -131,11 +135,15 @@ public class ZipOutputHandler extends OutputHandler {
                 }
             }
             if (ok) {
-                if(state.group!=null) {
-                    links.add(makeLink(request,state.group,OUTPUT_ZIP, 
-                                       "/"+ IOUtil.stripExtension(state.group.getName())+ ".zip"));
+                if (state.group != null) {
+                    links.add(
+                        makeLink(
+                            request, state.group, OUTPUT_ZIP,
+                            "/"
+                            + IOUtil.stripExtension(state.group.getName())
+                            + ".zip"));
                 } else {
-                    links.add(makeLink(request,state.group,OUTPUT_ZIP));
+                    links.add(makeLink(request, state.group, OUTPUT_ZIP));
                 }
             }
         }

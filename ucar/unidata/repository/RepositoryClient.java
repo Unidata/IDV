@@ -39,18 +39,19 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
+import java.io.ByteArrayOutputStream;
+
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.ByteArrayOutputStream;
 
 import java.net.URL;
 
 import java.util.ArrayList;
-import java.util.zip.*;
 
 import java.util.List;
+import java.util.zip.*;
 
 
 
@@ -84,6 +85,15 @@ public class RepositoryClient extends RepositoryBase {
      */
     public RepositoryClient() {}
 
+    /**
+     * _more_
+     *
+     * @param serverUrl _more_
+     * @param user _more_
+     * @param password _more_
+     *
+     * @throws Exception _more_
+     */
     public RepositoryClient(URL serverUrl, String user, String password)
             throws Exception {
         setPort(serverUrl.getPort());
@@ -145,98 +155,135 @@ public class RepositoryClient extends RepositoryBase {
         return HttpFormEntry.doPost(entries, url.getFullUrl());
     }
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     */
     public static void usage(String msg) {
-        System.err.println (msg);
+        System.err.println(msg);
         System.err.println(
-                           "Usage: RepositoryClient <server url> <user id> <password> <arguments>");
+            "Usage: RepositoryClient <server url> <user id> <password> <arguments>");
     }
 
 
-    private void processCommandLine(String[]args) throws Exception {
-        String xmlFile = null;
-        List<File> files = new ArrayList<File>();
-        Element root = null;            
-        Element entryNode = null;
-        Document doc = null;
-        boolean haveParent = false;
-        for( int i = 3; i<args.length;i++) {
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @throws Exception _more_
+     */
+    private void processCommandLine(String[] args) throws Exception {
+
+        String     xmlFile    = null;
+        List<File> files      = new ArrayList<File>();
+        Element    root       = null;
+        Element    entryNode  = null;
+        Document   doc        = null;
+        boolean    haveParent = false;
+        for (int i = 3; i < args.length; i++) {
             String arg = args[i];
-            if(arg.equals("-name")) {
-                if(i ==args.length) usage("Bad -name argument");
+            if (arg.equals("-name")) {
+                if (i == args.length) {
+                    usage("Bad -name argument");
+                }
                 i++;
-                if(root == null) {
+                if (root == null) {
                     doc = XmlUtil.makeDocument();
                     root = XmlUtil.create(doc, TAG_ENTRIES, null,
                                           new String[] {});
                     entryNode = XmlUtil.create(doc, TAG_ENTRY, root,
-                                               new String[] {});
-                        
+                            new String[] {});
+
                 }
-                entryNode.setAttribute(ATTR_NAME,args[i]);
-            } else if(arg.equals("-description")) {
-                if(i ==args.length) usage("Bad -description argument");
-                if(root == null) usage("Must specify -name first");
+                entryNode.setAttribute(ATTR_NAME, args[i]);
+            } else if (arg.equals("-description")) {
+                if (i == args.length) {
+                    usage("Bad -description argument");
+                }
+                if (root == null) {
+                    usage("Must specify -name first");
+                }
                 i++;
-                Element descNode = XmlUtil.create(doc, TAG_DESCRIPTION, entryNode);
-                descNode.appendChild(XmlUtil.makeCDataNode(doc,args[i],false));
-            } else if(arg.equals("-parent")) {
-                if(i ==args.length) usage("Bad -parent argument");
-                if(root == null) usage("Must specify -name first");
+                Element descNode = XmlUtil.create(doc, TAG_DESCRIPTION,
+                                       entryNode);
+                descNode.appendChild(XmlUtil.makeCDataNode(doc, args[i],
+                        false));
+            } else if (arg.equals("-parent")) {
+                if (i == args.length) {
+                    usage("Bad -parent argument");
+                }
+                if (root == null) {
+                    usage("Must specify -name first");
+                }
                 i++;
-                entryNode.setAttribute(ATTR_PARENT,args[i]);
+                entryNode.setAttribute(ATTR_PARENT, args[i]);
                 haveParent = true;
-            } else if(arg.equals("-localfile")) {
-                if(i ==args.length) usage("Bad -localfile argument");
+            } else if (arg.equals("-localfile")) {
+                if (i == args.length) {
+                    usage("Bad -localfile argument");
+                }
                 i++;
                 File f = new File(args[i]);
                 //                if(!f.exists()) usage("Bad file:" + args[i]);
-                if(root == null) {
+                if (root == null) {
                     doc = XmlUtil.makeDocument();
                     root = XmlUtil.create(doc, TAG_ENTRIES, null,
                                           new String[] {});
                     entryNode = XmlUtil.create(doc, TAG_ENTRY, root,
-                                               new String[] {});
-                    entryNode.setAttribute(ATTR_NAME, IOUtil.getFileTail(args[i]));
+                            new String[] {});
+                    entryNode.setAttribute(ATTR_NAME,
+                                           IOUtil.getFileTail(args[i]));
                 }
-                entryNode.setAttribute(ATTR_LOCALFILE,f.getPath());
-            } else if(arg.equals("-localfiletomove")) {
-                if(i ==args.length) usage("Bad -localfiletomove argument");
+                entryNode.setAttribute(ATTR_LOCALFILE, f.getPath());
+            } else if (arg.equals("-localfiletomove")) {
+                if (i == args.length) {
+                    usage("Bad -localfiletomove argument");
+                }
                 i++;
                 File f = new File(args[i]);
                 //                if(!f.exists()) usage("Bad file:" + args[i]);
-                if(root == null) {
+                if (root == null) {
                     doc = XmlUtil.makeDocument();
                     root = XmlUtil.create(doc, TAG_ENTRIES, null,
                                           new String[] {});
                     entryNode = XmlUtil.create(doc, TAG_ENTRY, root,
-                                               new String[] {});
-                    entryNode.setAttribute(ATTR_NAME, IOUtil.getFileTail(args[i]));
+                            new String[] {});
+                    entryNode.setAttribute(ATTR_NAME,
+                                           IOUtil.getFileTail(args[i]));
                 }
-                entryNode.setAttribute(ATTR_LOCALFILETOMOVE,f.getPath());
-            } else if(arg.equals("-file")) {
-                if(i ==args.length) usage("Bad -file argument");
-                i++; 
+                entryNode.setAttribute(ATTR_LOCALFILETOMOVE, f.getPath());
+            } else if (arg.equals("-file")) {
+                if (i == args.length) {
+                    usage("Bad -file argument");
+                }
+                i++;
                 File f = new File(args[i]);
-                if(!f.exists()) {
+                if ( !f.exists()) {
                     usage("File does not exist:" + args[i]);
                 }
-                if(root == null) {
+                if (root == null) {
                     doc = XmlUtil.makeDocument();
                     root = XmlUtil.create(doc, TAG_ENTRIES, null,
                                           new String[] {});
                     entryNode = XmlUtil.create(doc, TAG_ENTRY, root,
-                                               new String[] {});
-                    entryNode.setAttribute(ATTR_NAME, IOUtil.getFileTail(args[i]));
+                            new String[] {});
+                    entryNode.setAttribute(ATTR_NAME,
+                                           IOUtil.getFileTail(args[i]));
                 }
-                entryNode.setAttribute(ATTR_FILE, IOUtil.getFileTail(args[i]));
+                entryNode.setAttribute(ATTR_FILE,
+                                       IOUtil.getFileTail(args[i]));
                 files.add(f);
             } else {
-                if(!new File(args[i]).exists()) usage("Unknown argument:" + args[i]);
+                if ( !new File(args[i]).exists()) {
+                    usage("Unknown argument:" + args[i]);
+                }
                 files.add(new File(args[i]));
             }
         }
 
-        if(files.size()==0 && root == null) {
+        if ((files.size() == 0) && (root == null)) {
             usage("");
         }
 
@@ -244,20 +291,21 @@ public class RepositoryClient extends RepositoryBase {
         ZipOutputStream       zos = new ZipOutputStream(bos);
 
         //Write the xml if we have it
-        if(root!=null) {
-            if(!haveParent)usage("Must specify a parent group destination with -parent");
+        if (root != null) {
+            if ( !haveParent) {
+                usage("Must specify a parent group destination with -parent");
+            }
             String xml = XmlUtil.toString(root);
             zos.putNextEntry(new ZipEntry("entries.xml"));
             byte[] bytes = xml.getBytes();
             zos.write(bytes, 0, bytes.length);
             zos.closeEntry();
-    
+
         }
         //Now write the files
-        for(File f: files) {
+        for (File f : files) {
             zos.putNextEntry(new ZipEntry(IOUtil.getFileTail(f.toString())));
-            byte[] bytes =
-                IOUtil.readBytes(new FileInputStream(f));
+            byte[] bytes = IOUtil.readBytes(new FileInputStream(f));
             zos.write(bytes, 0, bytes.length);
             zos.closeEntry();
         }
@@ -268,21 +316,22 @@ public class RepositoryClient extends RepositoryBase {
         addUrlArgs(postEntries);
         postEntries.add(new HttpFormEntry(ARG_FILE, "entries.zip",
                                           bos.toByteArray()));
-        String[] result =doPost(URL_ENTRY_XMLCREATE,  postEntries);
+        String[] result = doPost(URL_ENTRY_XMLCREATE, postEntries);
         if (result[0] != null) {
-            System.err.println ("Error:" + result[0]);
+            System.err.println("Error:" + result[0]);
             return;
         }
 
-        System.err.println ("result:" + result[1]);
+        System.err.println("result:" + result[1]);
         Element response = XmlUtil.getRoot(result[1]);
 
-        String body = XmlUtil.getChildText(response).trim();
+        String  body     = XmlUtil.getChildText(response).trim();
         if (responseOk(response)) {
-            System.err.println ("OK:" + body);
+            System.err.println("OK:" + body);
         } else {
-            System.err.println ("Error:" + body);
+            System.err.println("Error:" + body);
         }
+
     }
 
     /**
@@ -296,13 +345,14 @@ public class RepositoryClient extends RepositoryBase {
             usage("Incorrect number of arguments");
         }
         try {
-            RepositoryClient client = new RepositoryClient(new URL(args[0]),  args[1], args[2]);
+            RepositoryClient client = new RepositoryClient(new URL(args[0]),
+                                          args[1], args[2]);
             String[] msg = { "" };
-            if (!client.isValidSession(true, msg)) {
+            if ( !client.isValidSession(true, msg)) {
                 System.err.println("Error: invalid session:" + msg[0]);
                 return;
             }
-        
+
             client.processCommandLine(args);
         } catch (Exception exc) {
             System.err.println("Error:" + exc);
@@ -328,16 +378,35 @@ public class RepositoryClient extends RepositoryBase {
         }
     }
 
-    public void addAttachment(Element node, String filename) throws Exception {
+    /**
+     * _more_
+     *
+     * @param node _more_
+     * @param filename _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addAttachment(Element node, String filename)
+            throws Exception {
         XmlUtil.create(node.getOwnerDocument(), TAG_METADATA, node,
                        new String[] { ATTR_TYPE,
-                                      "content.attachment", ATTR_ATTR1, filename });
+                                      "content.attachment", ATTR_ATTR1,
+                                      filename });
     }
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     * @param filename _more_
+     *
+     * @throws Exception _more_
+     */
     public void addThumbnail(Element node, String filename) throws Exception {
         XmlUtil.create(node.getOwnerDocument(), TAG_METADATA, node,
                        new String[] { ATTR_TYPE,
-                                      "content.thumbnail", ATTR_ATTR1, filename });
+                                      "content.thumbnail", ATTR_ATTR1,
+                                      filename });
     }
 
     /**
@@ -406,8 +475,8 @@ public class RepositoryClient extends RepositoryBase {
                                           new String[] {});
             Element groupNode = XmlUtil.create(doc, TAG_ENTRY, root,
                                     new String[] {
-                ATTR_ID, "123456789", ATTR_TYPE, TYPE_GROUP,
-                ATTR_PARENT, parentId, ATTR_NAME, name
+                ATTR_ID, "123456789", ATTR_TYPE, TYPE_GROUP, ATTR_PARENT,
+                parentId, ATTR_NAME, name
             });
 
             String xml     = XmlUtil.toString(root);
@@ -457,7 +526,9 @@ public class RepositoryClient extends RepositoryBase {
      * @return _more_
      */
     public String getSessionId() {
-        if(isAnonymous()) return "";
+        if (isAnonymous()) {
+            return "";
+        }
         return sessionId;
     }
 
@@ -476,7 +547,9 @@ public class RepositoryClient extends RepositoryBase {
      */
     public boolean isValidSession(boolean doLogin, String[] msg) {
         if ( !isValidSession(msg)) {
-            if(isAnonymous()) return false;
+            if (isAnonymous()) {
+                return false;
+            }
             if (doLogin) {
                 return doLogin(msg);
             }
@@ -497,10 +570,10 @@ public class RepositoryClient extends RepositoryBase {
     public boolean isValidSession(String[] msg) {
         try {
             String url;
-            if(isAnonymous()) {
+            if (isAnonymous()) {
                 url = HtmlUtil.url(URL_PING.getFullUrl(),
                                    new String[] { ARG_RESPONSE,
-                                                  RESPONSE_XML});
+                        RESPONSE_XML });
             } else {
                 if (sessionId == null) {
                     msg[0] = "No session id";
@@ -508,11 +581,11 @@ public class RepositoryClient extends RepositoryBase {
                 }
                 url = HtmlUtil.url(URL_USER_HOME.getFullUrl(),
                                    new String[] { ARG_RESPONSE,
-                                                  RESPONSE_XML, ARG_SESSIONID, sessionId });
+                        RESPONSE_XML, ARG_SESSIONID, sessionId });
             }
-            String  contents = IOUtil.readContents(url, getClass());
+            String contents = IOUtil.readContents(url, getClass());
             //            System.err.println ("contents:" + contents);
-            Element root     = XmlUtil.getRoot(contents);
+            Element root = XmlUtil.getRoot(contents);
             if (responseOk(root)) {
                 return true;
             } else {
@@ -520,7 +593,7 @@ public class RepositoryClient extends RepositoryBase {
                 return false;
             }
         } catch (Exception exc) {
-            System.err.println ("error:" + exc);
+            System.err.println("error:" + exc);
             msg[0] = "Could not connect to server: " + getHostname();
             return false;
         }
@@ -548,21 +621,26 @@ public class RepositoryClient extends RepositoryBase {
      *
      */
     public boolean doLogin(String[] msg) {
-        if(isAnonymous()) return true;
+        if (isAnonymous()) {
+            return true;
+        }
         try {
-            List   entries = Misc.toList(new Object[]{
-                HttpFormEntry.hidden(ARG_RESPONSE, RESPONSE_XML),
-                HttpFormEntry.hidden(ARG_USER_PASSWORD, getPassword()),
-                HttpFormEntry.hidden(ARG_USER_ID, getUser())});
-            String[] result = doPost(URL_USER_LOGIN,entries);
+            List entries = Misc.toList(new Object[] {
+                               HttpFormEntry.hidden(ARG_RESPONSE,
+                                   RESPONSE_XML),
+                               HttpFormEntry.hidden(ARG_USER_PASSWORD,
+                                   getPassword()),
+                               HttpFormEntry.hidden(ARG_USER_ID,
+                                   getUser()) });
+            String[] result = doPost(URL_USER_LOGIN, entries);
             if (result[0] != null) {
                 msg[0] = "Error logging in: " + result[0];
                 return false;
             }
-            String  contents = result[1];
+            String contents = result[1];
             //            System.err.println(contents);
-            Element root     = XmlUtil.getRoot(contents);
-            String  body     = XmlUtil.getChildText(root).trim();
+            Element root = XmlUtil.getRoot(contents);
+            String  body = XmlUtil.getChildText(root).trim();
             if (responseOk(root)) {
                 sessionId = body;
                 return true;
@@ -574,7 +652,7 @@ public class RepositoryClient extends RepositoryBase {
             msg[0] = "Could not connect to server: " + getHostname();
 
         } catch (Exception exc) {
-            msg[0] = "An error occurred: " + exc+"\n";
+            msg[0] = "An error occurred: " + exc + "\n";
         }
         return false;
     }
@@ -663,13 +741,14 @@ public class RepositoryClient extends RepositoryBase {
     protected void setPassword(String s) {
         password = s;
     }
-    /**
-       Get the Anonymous property.
 
-       @return The Anonymous
-    **/
-    public boolean isAnonymous () {
-	return user!=null && user.trim().length()==0;
+    /**
+     *  Get the Anonymous property.
+     *
+     *  @return The Anonymous
+     */
+    public boolean isAnonymous() {
+        return (user != null) && (user.trim().length() == 0);
     }
 
 

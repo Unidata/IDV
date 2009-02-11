@@ -95,7 +95,7 @@ public class Request implements Constants {
     /** _more_ */
     private Hashtable originalParameters;
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable extraProperties = new Hashtable();
 
     /** _more_ */
@@ -140,11 +140,18 @@ public class Request implements Constants {
      * @param user _more_
      */
     public Request(Repository repository, User user) {
-        this(repository, user,"");
+        this(repository, user, "");
     }
 
 
-    public Request(Repository repository, User user,String path) {
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param user _more_
+     * @param path _more_
+     */
+    public Request(Repository repository, User user, String path) {
         this.repository         = repository;
         this.user               = user;
         this.type               = path;
@@ -204,22 +211,30 @@ public class Request implements Constants {
         return entryUrl(theUrl, entry, ARG_ENTRYID);
     }
 
-    public String getEntryUrl(String  theUrl, Entry entry) {
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    public String getEntryUrl(String theUrl, Entry entry) {
         String url = theUrl.toString();
-        if(theUrl.equals(repository.URL_ENTRY_SHOW.toString())) {
+        if (theUrl.equals(repository.URL_ENTRY_SHOW.toString())) {
             try {
                 String name = entry.getFullName();
-                name = name.replace("/","_FORWARDSLASH_");
-                name  =  java.net.URLEncoder.encode(name, "UTF-8");
-                name = name.replace("_FORWARDSLASH_","/");
+                name = name.replace("/", "_FORWARDSLASH_");
+                name = java.net.URLEncoder.encode(name, "UTF-8");
+                name = name.replace("_FORWARDSLASH_", "/");
                 //A hack because the browser thinks this a zipped page
-                if(name.endsWith(".gz")) {
-                    name = name.replace(".gz","");
+                if (name.endsWith(".gz")) {
+                    name = name.replace(".gz", "");
                 }
                 url = url + "/" + name;
 
                 //                url = url + "/" + entry.getFullName();
-            } catch(Exception ignore){}
+            } catch (Exception ignore) {}
         }
 
         return url;
@@ -259,7 +274,7 @@ public class Request implements Constants {
 
 
         //        return url(theUrl, arg, entry.getId());
-        return HtmlUtil.url(url,arg,entry.getId());
+        return HtmlUtil.url(url, arg, entry.getId());
         //        return url(theUrl, arg, entry.getId());
     }
 

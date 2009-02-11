@@ -186,6 +186,13 @@ public class Metadata implements Constants {
         this.attr4     = attr4;
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param entryId _more_
+     * @param that _more_
+     */
     public Metadata(String id, String entryId, Metadata that) {
         this.id        = id;
         this.entryId   = entryId;

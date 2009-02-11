@@ -156,7 +156,7 @@ public class TextOutputHandler extends OutputHandler {
         for (String line : (List<String>) StringUtil.split(contents, "\n",
                 false, false)) {
             cnt++;
-            line = line.replace("\r","");
+            line = line.replace("\r", "");
             line = HtmlUtil.entityEncode(line);
             sb.append("<a " + HtmlUtil.attr("name", "line" + cnt)
                       + "></a><a href=#line" + cnt + ">" + cnt + "</a>"

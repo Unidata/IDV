@@ -52,22 +52,46 @@ import java.util.Properties;
  * @version $Revision: 1.3 $
  */
 public class FavoriteEntry {
+
+    /** _more_          */
     private String id;
+
+    /** _more_          */
     private Entry entry;
+
+    /** _more_          */
     private String name;
+
+    /** _more_          */
     private String category;
 
 
-    public FavoriteEntry(String id, Entry entry, String name, String category) {
-        this.id = id;
-        this.entry = entry;
-        this.name = name;
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param entry _more_
+     * @param name _more_
+     * @param category _more_
+     */
+    public FavoriteEntry(String id, Entry entry, String name,
+                         String category) {
+        this.id       = id;
+        this.entry    = entry;
+        this.name     = name;
         this.category = category;
     }
-    
+
+    /**
+     * _more_
+     *
+     * @param favorites _more_
+     *
+     * @return _more_
+     */
     public static List<Entry> getEntries(List<FavoriteEntry> favorites) {
         List<Entry> entries = new ArrayList<Entry>();
-        for(FavoriteEntry favorite: favorites) {
+        for (FavoriteEntry favorite : favorites) {
             entries.add(favorite.entry);
         }
         return entries;
@@ -75,76 +99,77 @@ public class FavoriteEntry {
 
 
     /**
-       Set the Id property.
-
-       @param value The new value for Id
-    **/
-    public void setId (String value) {
-	id = value;
+     *  Set the Id property.
+     *
+     *  @param value The new value for Id
+     */
+    public void setId(String value) {
+        id = value;
     }
 
     /**
-       Get the Id property.
-
-       @return The Id
-    **/
-    public String getId () {
-	return id;
+     *  Get the Id property.
+     *
+     *  @return The Id
+     */
+    public String getId() {
+        return id;
     }
 
     /**
-       Set the Entry property.
-
-       @param value The new value for Entry
-    **/
-    public void setEntry (Entry value) {
-	entry = value;
+     *  Set the Entry property.
+     *
+     *  @param value The new value for Entry
+     */
+    public void setEntry(Entry value) {
+        entry = value;
     }
 
     /**
-       Get the Entry property.
-
-       @return The Entry
-    **/
-    public Entry getEntry () {
-	return entry;
+     *  Get the Entry property.
+     *
+     *  @return The Entry
+     */
+    public Entry getEntry() {
+        return entry;
     }
 
     /**
-       Set the Name property.
-
-       @param value The new value for Name
-    **/
-    public void setName (String value) {
-	name = value;
+     *  Set the Name property.
+     *
+     *  @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
     }
 
     /**
-       Get the Name property.
-
-       @return The Name
-    **/
-    public String getName () {
-	return name;
+     *  Get the Name property.
+     *
+     *  @return The Name
+     */
+    public String getName() {
+        return name;
     }
 
     /**
-       Set the Category property.
-
-       @param value The new value for Category
-    **/
-    public void setCategory (String value) {
-	category = value;
+     *  Set the Category property.
+     *
+     *  @param value The new value for Category
+     */
+    public void setCategory(String value) {
+        category = value;
     }
 
     /**
-       Get the Category property.
-
-       @return The Category
-    **/
-    public String getCategory () {
-	return category;
+     *  Get the Category property.
+     *
+     *  @return The Category
+     */
+    public String getCategory() {
+        return category;
     }
 
 
 }
+

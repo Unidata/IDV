@@ -520,10 +520,10 @@ public class HarvesterManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processImportCatalog(Request request) throws Exception {
-        Group        group   = getEntryManager().findGroup(request);
-        boolean      recurse = request.get(ARG_RECURSE, false);
+        Group        group    = getEntryManager().findGroup(request);
+        boolean      recurse  = request.get(ARG_RECURSE, false);
         boolean      download = request.get(ARG_RESOURCE_DOWNLOAD, false);
-        StringBuffer sb      = new StringBuffer();
+        StringBuffer sb       = new StringBuffer();
         //        sb.append(getEntryManager().makeEntryHeader(request, group));
         sb.append("<p>");
         String catalog = request.getString(ARG_CATALOG, "").trim();
@@ -542,12 +542,13 @@ public class HarvesterManager extends RepositoryManager {
         if (catalog.length() > 0) {
             CatalogHarvester harvester =
                 new CatalogHarvester(getRepository(), group, catalog,
-                                     request.getUser(), recurse,download);
+                                     request.getUser(), recurse, download);
             harvesters.add(harvester);
             Misc.run(harvester, "run");
         }
 
-        Result result =    getEntryManager().addEntryHeader(request, group,new Result(request.url(URL_HARVESTERS_LIST)));
+        Result result = getEntryManager().addEntryHeader(request, group,
+                            new Result(request.url(URL_HARVESTERS_LIST)));
         return result;
     }
 

@@ -253,8 +253,8 @@ public class ChatOutputHandler extends OutputHandler {
                 if (session == null) {
                     String tmpSession = XmlUtil.getAttribute(node,
                                             ATTR_SESSIONID);
-                    UserManager.Session session =
-                        getUserManager().getSession(tmpSession);
+                    SessionManager.Session session =
+                        getSessionManager().getSession(tmpSession);
                     if (session == null) {
                         user = getUserManager().getAnonymousUser();
                         //                        writeError("Unknown session:" + tmpSession);
