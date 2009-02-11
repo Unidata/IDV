@@ -1036,6 +1036,8 @@ public interface Constants {
     /** _more_ */
     public static final String ACTION_CLEAR = "action.clear";
 
+    public static final String ACTION_SPLIT = "action.split";
+
     /** _more_ */
     public static final String ACTION_DELETE_ASK = "action.delete.ask";
 

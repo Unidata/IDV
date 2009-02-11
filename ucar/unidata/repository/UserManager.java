@@ -1492,13 +1492,34 @@ public class UserManager extends RepositoryManager {
             return makeResult(request, "User Cart", sb);
         }
 
-        sb.append(
+        boolean splitScreen = request.getString(ARG_ACTION,"").equals(ACTION_SPLIT);
+        boolean haveFrom = request.defined(ARG_FROM);
+        StringBuffer header = new StringBuffer();
+
+        if(!haveFrom) {
+            if(splitScreen) {
+                header.append(
+                          HtmlUtil.href(
+                                        request.url(
+                                                    getRepositoryBase().URL_USER_CART), msg("Unsplit Screen")));
+            } else {
+                header.append(
+                          HtmlUtil.href(
+                                        request.url(
+                                                    getRepositoryBase().URL_USER_CART, ARG_ACTION,
+                                                    ACTION_SPLIT), msg("Split Screen")));
+            }
+            header.append(HtmlUtil.span("&nbsp;|&nbsp;", HtmlUtil.cssClass("separator")));
+        }
+
+        header.append(
             HtmlUtil.href(
                 request.url(
                     getRepositoryBase().URL_USER_CART, ARG_ACTION,
                     ACTION_CLEAR), msg("Clear Cart")));
-        sb.append(HtmlUtil.p());
-        boolean haveFrom = request.defined(ARG_FROM);
+
+        sb.append(HtmlUtil.center(header.toString()));
+
         if (haveFrom) {
             Entry fromEntry = getEntryManager().getEntry(request,
                                   request.getString(ARG_FROM, ""));
@@ -1508,49 +1529,74 @@ public class UserManager extends RepositoryManager {
         }
 
 
-        if ( !haveFrom) {
+        if ( !haveFrom && !splitScreen) {
             String[] formTuple = getRepository().getHtmlOutputHandler().getEntryFormStart(request,entries);
 
             sb.append(formTuple[2]);
         }
-        sb.append("<ul style=\"list-style-image : url("
-                  + getRepository().iconUrl(ICON_FILE) + ")\">");
         OutputHandler outputHandler =
             getRepository().getOutputHandler(request);
-        for (Entry entry : entries) {
-            sb.append(HtmlUtil.tag(HtmlUtil.TAG_LI));
-            sb.append(HtmlUtil.space(1));
-            if (haveFrom) {
-                sb.append(
-                    HtmlUtil.href(
-                        request.url(
-                            getRepository().URL_ASSOCIATION_ADD, ARG_FROM,
-                            request.getString(ARG_FROM, ""), ARG_TO,
-                            entry.getId()), HtmlUtil.img(
-                                getRepository().iconUrl(ICON_ASSOCIATION),
-                                msg("Create an association"))+HtmlUtil.space(1)+entry.getLabel()));
-            } else {
-                String links = HtmlUtil.checkbox("entry_" + entry.getId(),
-                                   "true");
-                sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
-                sb.append(links);
-                sb.append(
-                    HtmlUtil.href(
-                        request.url(
-                            getRepositoryBase().URL_USER_CART, ARG_FROM,
-                            entry.getId()), HtmlUtil.img(
-                                getRepository().iconUrl(ICON_ASSOCIATION),
-                                msg("Create an association"))));
 
-            }
-            sb.append(HtmlUtil.space(1));
-            if (haveFrom) {
-            } else {
-                sb.append(getEntryManager().getBreadCrumbs(request, entry));
+        int cnt = 1;
+        if(splitScreen) cnt=2;
+        List<StringBuffer>columns = new ArrayList<StringBuffer>();
+        for(int column=0;column<cnt;column++) {
+            StringBuffer colSB = new StringBuffer();
+            columns.add(colSB);
+            for (Entry entry : entries) {
+                if(!splitScreen) {
+                    colSB.append(HtmlUtil.tag(HtmlUtil.TAG_LI));
+                    colSB.append(HtmlUtil.space(1));
+                }
+                if (haveFrom) {
+                    colSB.append(
+                                 HtmlUtil.href(
+                                               request.url(
+                                                           getRepository().URL_ASSOCIATION_ADD, ARG_FROM,
+                                                           request.getString(ARG_FROM, ""), ARG_TO,
+                                                           entry.getId()), HtmlUtil.img(
+                                                                                        getRepository().iconUrl(ICON_ASSOCIATION),
+                                                                                        msg("Create an association"))+HtmlUtil.space(1)+entry.getLabel()));
+                } else if(splitScreen) {
+                    colSB.append(getEntryManager().getAjaxLink(request, entry));
+
+                } else {
+                    String links = HtmlUtil.checkbox("entry_" + entry.getId(),
+                                                     "true");
+                    colSB.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
+                    colSB.append(links);
+                    colSB.append(
+                                 HtmlUtil.href(
+                                               request.url(
+                                                           getRepositoryBase().URL_USER_CART, ARG_FROM,
+                                                           entry.getId()), HtmlUtil.img(
+                                                                                        getRepository().iconUrl(ICON_ASSOCIATION),
+                                                                                        msg("Create an association"))));
+
+                }
+                if(!splitScreen) {
+                    colSB.append(HtmlUtil.space(1));
+                    if (haveFrom) {
+                    } else {
+                        colSB.append(getEntryManager().getBreadCrumbs(request, entry));
+                    }
+                }
             }
         }
-        sb.append("</ul>");
-        if ( !haveFrom) {
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"75%")));
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TR,HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,"top")));
+        for(StringBuffer colSB: columns) {
+            sb.append(HtmlUtil.open(HtmlUtil.TAG_TD,HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"50%")));
+            sb.append("<ul style=\"list-style-image : url("
+                      + getRepository().iconUrl(ICON_FILE) + ")\">");
+            sb.append(colSB);
+            sb.append("</ul>");
+            sb.append(HtmlUtil.close(HtmlUtil.TAG_TD));
+        }
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_TR));
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
+
+        if ( !haveFrom && !splitScreen) {
             sb.append("</form>");
         }
         return makeResult(request, "User Cart", sb);
