@@ -22,8 +22,6 @@
 
 
 
-
-
 package ucar.visad;
 
 
@@ -1993,7 +1991,7 @@ public final class Util {
         }
         Unit u = null;
         // clean up ** and replace with nothing
-        unitIdentifier = unitIdentifier.replaceAll("\\*\\*","");
+        unitIdentifier = unitIdentifier.replaceAll("\\*\\*", "");
         try {
 
             try {
@@ -2081,16 +2079,32 @@ public final class Util {
      * @throws Exception  problem with unit spec or parsing.
      */
     public static Real toReal(String value) throws Exception {
-        if(value.indexOf("(")>=0 &&  value.indexOf(")")>=0)
-            return toReal(value, "(",")");
-        if(value.indexOf("{")>=0 &&  value.indexOf("}")>=0)
-            return toReal(value, "{","}");
-        if(value.indexOf("<")>=0 &&  value.indexOf(">")>=0)
-            return toReal(value, "<",">");
-        return toReal(value, "[","]");
+        if ((value.indexOf("(") >= 0) && (value.indexOf(")") >= 0)) {
+            return toReal(value, "(", ")");
+        }
+        if ((value.indexOf("{") >= 0) && (value.indexOf("}") >= 0)) {
+            return toReal(value, "{", "}");
+        }
+        if ((value.indexOf("<") >= 0) && (value.indexOf(">") >= 0)) {
+            return toReal(value, "<", ">");
+        }
+        return toReal(value, "[", "]");
     }
 
-    public static Real toReal(String value, String unitOpener, String unitCloser) throws Exception {
+    /**
+     * _more_
+     *
+     * @param value _more_
+     * @param unitOpener _more_
+     * @param unitCloser _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Real toReal(String value, String unitOpener,
+                              String unitCloser)
+            throws Exception {
         value = value.trim();
         //Check if there is a unit
         int idx = value.indexOf(unitOpener);
@@ -2140,10 +2154,21 @@ public final class Util {
     }
 
 
-    public static ucar.unidata.geoloc.LatLonPointImpl toLatLonPoint(visad.georef.LatLonPoint llp) 
-        throws VisADException {
-        return new LatLonPointImpl(llp.getLatitude().getValue(CommonUnit.degree),
-                                   llp.getLongitude().getValue(CommonUnit.degree));
+    /**
+     * _more_
+     *
+     * @param llp _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public static ucar.unidata.geoloc.LatLonPointImpl toLatLonPoint(
+            visad.georef.LatLonPoint llp)
+            throws VisADException {
+        return new LatLonPointImpl(
+            llp.getLatitude().getValue(CommonUnit.degree),
+            llp.getLongitude().getValue(CommonUnit.degree));
     }
 
     /**
@@ -2264,15 +2289,12 @@ public final class Util {
     public static Real bearingDistance(EarthLocation el1, EarthLocation el2)
             throws Exception {
 
-        LatLonPoint lllp = el1.getLatLonPoint();
-        LatLonPoint rllp = el2.getLatLonPoint();
-        visad.Unit latUnit = lllp.getLatitude().getUnit();
-        visad.Unit lonUnit = lllp.getLongitude().getUnit();
-        Bearing result =
-            Bearing.calculateBearing(
-                                     toLatLonPoint(lllp),
-                                     toLatLonPoint(rllp),
-                                     null);
+        LatLonPoint lllp    = el1.getLatLonPoint();
+        LatLonPoint rllp    = el2.getLatLonPoint();
+        visad.Unit  latUnit = lllp.getLatitude().getUnit();
+        visad.Unit  lonUnit = lllp.getLongitude().getUnit();
+        Bearing result = Bearing.calculateBearing(toLatLonPoint(lllp),
+                             toLatLonPoint(rllp), null);
         return new Real(Length.getRealType(), result.getDistance(),
                         CommonUnits.KILOMETER);
     }
@@ -2448,8 +2470,19 @@ public final class Util {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param alias _more_
+     * @param unit _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
     public static RealType makeRealType(String name, String alias, Unit unit)
-        throws VisADException {
+            throws VisADException {
         RealType type    = null;
         String   newname = cleanName(name) + "[unit:" + ((unit == null)
                 ? "null"
@@ -2464,7 +2497,7 @@ public final class Util {
                 "couldn't create RealType with units compatible to "
                 + unit.toString());
         }
-        if(alias!=null) {
+        if (alias != null) {
             type.alias(alias);
         }
         return type;
@@ -2806,23 +2839,30 @@ public final class Util {
 
 
     /**
-     * _more_
+     * Make a map projection from the bounds
      *
-     * @param lat1 _more_
-     * @param lon1 _more_
-     * @param lat2 _more_
-     * @param lon2 _more_
+     * @param lat1 first lat
+     * @param lon1 first lon
+     * @param lat2 last lat
+     * @param lon2 last lon
      *
-     * @return _more_
+     * @return a map projection
      *
-     * @throws VisADException _more_
+     * @throws VisADException  problem making projection
      */
     public static MapProjection makeMapProjection(double lat1, double lon1,
             double lat2, double lon2)
             throws VisADException {
 
-        double minX = Math.max(-180, Math.min(lon1, lon2));
-        double maxX = Math.min(180, Math.max(lon1, lon2));
+        int lonMax = 180;
+        int lonMin = -180;
+        if ((lon1 > 180) || (lon2 > 180)) {
+            lonMin = 0;
+            lonMax = 360;
+        }
+
+        double minX = Math.max(lonMin, Math.min(lon1, lon2));
+        double maxX = Math.min(lonMax, Math.max(lon1, lon2));
         double minY = Math.max(-90, Math.min(lat1, lat2));
         double maxY = Math.min(90, Math.max(lat1, lat2));
         double degX = maxX - minX;
@@ -2837,8 +2877,8 @@ public final class Util {
             minY -= delta / 2;
             maxY += delta / 2;
         }
-        minX = Math.max(-180, minX);
-        maxX = Math.min(180, maxX);
+        minX = Math.max(lonMin, minX);
+        maxX = Math.min(lonMax, maxX);
         minY = Math.max(-90, minY);
         maxY = Math.min(90, maxY);
 
@@ -2865,7 +2905,7 @@ public final class Util {
      *
      * @return Did we successfully set the property
      *
-     * @throws Exception _more_
+     * @throws Exception problem setting the property
      */
     public static boolean propertySet(Object object, String name,
                                       Object value, boolean ignoreError)
@@ -2908,8 +2948,8 @@ public final class Util {
      * @param times List of times
      * @return The time field or the range if times is null
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   VisAD problem
      */
     public static Data makeTimeField(Data range, List times)
             throws VisADException, RemoteException {
@@ -2921,13 +2961,14 @@ public final class Util {
         for (int i = 0; i < times.size(); i++) {
             if (fi == null) {
                 DateTime dttm;
-                Object obj = times.get(i);
-                if(obj instanceof DateTime) {
-                    dttm = (DateTime)  obj;
-                } else if(obj instanceof Date) {
-                    dttm = new DateTime((Date)obj);
+                Object   obj = times.get(i);
+                if (obj instanceof DateTime) {
+                    dttm = (DateTime) obj;
+                } else if (obj instanceof Date) {
+                    dttm = new DateTime((Date) obj);
                 } else {
-                    throw new IllegalArgumentException("Unknown date type:" + obj);
+                    throw new IllegalArgumentException("Unknown date type:"
+                            + obj);
                 }
                 fi = new FieldImpl(new FunctionType(dttm.getType(),
                         range.getType()), timeSet);
@@ -2939,34 +2980,47 @@ public final class Util {
 
 
 
+    /**
+     * _more_
+     *
+     * @param ranges _more_
+     * @param times _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public static FieldImpl makeTimeField(List ranges, List times)
             throws VisADException, RemoteException {
-        FieldImpl fi      = null;
+        FieldImpl fi         = null;
         Hashtable timeToData = new Hashtable();
-        for(int i=0;i<times.size();i++) {
+        for (int i = 0; i < times.size(); i++) {
             Data range = (Data) ranges.get(i);
-            if(range!=null)  {
+            if (range != null) {
                 timeToData.put(times.get(i), ranges.get(i));
             }
         }
 
-        Set       timeSet = makeTimeSet(times);
-        int setSize = timeSet.getLength();
+        Set      timeSet = makeTimeSet(times);
+        int      setSize = timeSet.getLength();
 
-        Object obj = times.get(0);
-        DateTime dttm=null;
-        if(obj instanceof DateTime) {
-            dttm = (DateTime)  obj;
-        } else if(obj instanceof Date) {
-            dttm = new DateTime((Date)obj);
+        Object   obj     = times.get(0);
+        DateTime dttm    = null;
+        if (obj instanceof DateTime) {
+            dttm = (DateTime) obj;
+        } else if (obj instanceof Date) {
+            dttm = new DateTime((Date) obj);
         } else {
             throw new IllegalArgumentException("Unknown date type:" + obj);
         }
 
-        for (int i = 0; i < setSize;i++) {
-            Object time = timeSet.__getitem__(i);
-            Data range = (Data)timeToData.get(time);
-            if(range == null) continue;
+        for (int i = 0; i < setSize; i++) {
+            Object time  = timeSet.__getitem__(i);
+            Data   range = (Data) timeToData.get(time);
+            if (range == null) {
+                continue;
+            }
             if (fi == null) {
                 fi = new FieldImpl(new FunctionType(dttm.getType(),
                         range.getType()), timeSet);
@@ -2988,8 +3042,8 @@ public final class Util {
      * @param times List of times
      * @return The time field or the range if times is null
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   VisAD problem
      */
     public static Data makeTimeRangeField(Data range, List times)
             throws VisADException, RemoteException {
@@ -3041,8 +3095,8 @@ public final class Util {
      *
      * @return _more_
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   VisAD problem
      */
     public static int findIndex(Set set, Real value)
             throws VisADException, RemoteException {
@@ -3070,8 +3124,8 @@ public final class Util {
      * @param set The set
      * @return The list if items in the set
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   VisAD problem
      */
     public static List toList(Set set)
             throws VisADException, RemoteException {
@@ -3093,8 +3147,8 @@ public final class Util {
      *
      * @return _more_
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   VisAD problem
      */
     public static Set makeTimeSet(List times)
             throws VisADException, RemoteException {
@@ -3105,6 +3159,8 @@ public final class Util {
     /**
      * Export the data object as a netCDF file
      * @param data   the VisAD data to export
+     *
+     * @return _more_
      * @throws Exception  can't write data as netCDF
      */
     public static boolean exportAsNetcdf(Data data) throws Exception {
@@ -3161,29 +3217,58 @@ public final class Util {
 
     }
 
-    public static GriddedSet makeEarthDomainSet(float[]lats, float[]lons, float[]alts) throws VisADException {
-        float[][] values = new float[alts!=null?3:2][];
+    /**
+     * _more_
+     *
+     * @param lats _more_
+     * @param lons _more_
+     * @param alts _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public static GriddedSet makeEarthDomainSet(float[] lats, float[] lons,
+            float[] alts)
+            throws VisADException {
+        float[][] values = new float[(alts != null)
+                                     ? 3
+                                     : 2][];
         values[0] = lats;
         values[1] = lons;
-        if(alts!=null) {
+        if (alts != null) {
             values[2] = alts;
             return new Gridded3DSet(RealTupleType.LatitudeLongitudeAltitude,
                                     values, values[0].length);
-        } 
-        return new Gridded2DSet(RealTupleType.LatitudeLongitudeTuple,
-                                values, values[0].length);
+        }
+        return new Gridded2DSet(RealTupleType.LatitudeLongitudeTuple, values,
+                                values[0].length);
     }
 
+    /**
+     * _more_
+     *
+     * @param el _more_
+     *
+     * @return _more_
+     */
     public static ucar.unidata.geoloc.LatLonPoint toLLP(EarthLocation el) {
         return toLLP(el.getLatLonPoint());
     }
 
-    public static ucar.unidata.geoloc.LatLonPoint toLLP(visad.georef.LatLonPoint llp) {
-        return new ucar.unidata.geoloc.LatLonPointImpl(llp.getLatitude().getValue(),
-                                                    llp.getLongitude().getValue());
+    /**
+     * _more_
+     *
+     * @param llp _more_
+     *
+     * @return _more_
+     */
+    public static ucar.unidata.geoloc.LatLonPoint toLLP(
+            visad.georef.LatLonPoint llp) {
+        return new ucar.unidata.geoloc.LatLonPointImpl(
+            llp.getLatitude().getValue(), llp.getLongitude().getValue());
 
     }
 
 
 }
-
