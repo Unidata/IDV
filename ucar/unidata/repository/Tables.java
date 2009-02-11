@@ -209,6 +209,30 @@ SqlUtil.getQuestionMarks(ARRAY.length));
 };
 
 
+public static class SESSIONS {
+public static final String NAME = "sessions";
+public static final String COL_SESSION_ID = NAME + ".session_id";
+public static final String COL_USER_ID = NAME + ".user_id";
+public static final String COL_CREATE_DATE = NAME + ".create_date";
+public static final String COL_LAST_ACTIVE_DATE = NAME + ".last_active_date";
+public static final String COL_EXTRA = NAME + ".extra";
+public static final String []ARRAY= new String[] {
+COL_SESSION_ID,COL_USER_ID,COL_CREATE_DATE,COL_LAST_ACTIVE_DATE,COL_EXTRA
+};
+
+
+public static final String COLUMNS = SqlUtil.comma(ARRAY);
+public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
+public static final String INSERT=
+SqlUtil.makeInsert(
+NAME,
+NODOT_COLUMNS,
+SqlUtil.getQuestionMarks(ARRAY.length));
+
+};
+
+
+
 
 public static class FAVORITES {
 public static final String NAME = "favorites";

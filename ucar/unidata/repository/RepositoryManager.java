@@ -128,6 +128,12 @@ public class RepositoryManager implements RepositorySource, Constants,
 
 
 
+    public void logException (String message, Exception exc) {
+        System.err.println ("Error occurred: " + message);
+        exc.printStackTrace();
+    }
+
+
     /**
      * _more_
      *

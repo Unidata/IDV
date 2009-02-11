@@ -136,6 +136,11 @@ public class UserManager extends RepositoryManager {
 
     }
 
+    public void init() {
+        Misc.run(new Runnable() {public void run() {
+            cullSessions();}});
+    }
+
 
     /**
      * _more_
@@ -158,6 +163,50 @@ public class UserManager extends RepositoryManager {
 
 
 
+    private void cullSessions() {
+        //Wait a while before starting
+        Misc.sleepSeconds(60);
+        while(true) {
+            try {
+                cullSessionsInner();
+            } catch(Exception exc) {
+                logException("Culling sessions", exc);
+
+                return;
+                       
+
+            }
+            //cull every hour
+            Misc.sleepSeconds(60*60);
+        }
+    }
+
+
+    private void cullSessionsInner() throws Exception  {
+        List<Session> sessionsToDelete = new ArrayList<Session>();
+        Date now = new Date(); 
+
+        Statement stmt = getDatabaseManager().select(Tables.SESSIONS.COLUMNS,
+                                                     Tables.SESSIONS.NAME,(Clause)null); 
+        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        ResultSet        results;
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                Session session = makeSession(results);
+                Date lastActiveDate = session.getLastActivity();
+                //Check if the last activity was > 24 hours ago
+                sessionsToDelete.add(session);
+            }
+        }
+        for(Session session: sessionsToDelete) {
+            removeSession(session.getId());
+        }
+
+    }
+
+
+    //TODO: we need to clean out old sessions every once in a while
+
     /**
      * _more_
      *
@@ -165,9 +214,75 @@ public class UserManager extends RepositoryManager {
      *
      * @return _more_
      */
-    public Session getSession(String sessionId) {
-        return sessionMap.get(sessionId);
+    public Session getSession(String sessionId) throws Exception  {
+        Session session = sessionMap.get(sessionId);
+        if(session == null) {
+            Statement stmt = getDatabaseManager().select(Tables.SESSIONS.COLUMNS,
+                                                         Tables.SESSIONS.NAME, 
+                                                         Clause.eq(Tables.SESSIONS.COL_SESSION_ID, sessionId));
+            SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+            ResultSet        results;
+            //COL_SESSION_ID,COL_USER_ID,COL_CREATE_DATE,COL_LAST_ACTIVE_DATE,COL_EXTRA
+            while ((results = iter.next()) != null) {
+                while (results.next()) {
+                    session = makeSession(results);
+                    break;
+                }
+            }
+
+        }
+        return session;
     }
+
+    private Session makeSession(ResultSet results) throws Exception {
+        int col=1;
+        String sessionId = results.getString(col++);
+        String userId   = results.getString(col++);
+        User   user   = findUser(userId);
+        if(user == null)user = getAnonymousUser();
+        Date createDate = getDatabaseManager().getDate(results, col++);
+        Date lastActiveDate = getDatabaseManager().getDate(results, col++);
+        //See if we have it in the map
+        Session session = sessionMap.get(sessionId);
+        if(session !=null) return session;
+        return  new Session(sessionId,user, createDate, lastActiveDate);
+    }
+
+
+    public void removeSession(String sessionId) throws Exception {
+        sessionMap.remove(sessionId);
+        getDatabaseManager().delete(Tables.SESSIONS.NAME, Clause.eq(Tables.SESSIONS.COL_SESSION_ID,sessionId));
+    }
+
+    public void addSession(String sessionId,Session session) throws Exception {
+        sessionMap.put(sessionId,  session);
+        //COL_SESSION_ID,COL_USER_ID,COL_CREATE_DATE,COL_LAST_ACTIVE_DATE,COL_EXTRA
+        getDatabaseManager().executeInsert(Tables.SESSIONS.INSERT, new Object[] {
+            sessionId, session.user.getId(),new Date(),new Date(),""
+        });
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    private List<Session> getSessions() throws Exception {
+        List<Session> sessions = new ArrayList<Session>();
+        Statement stmt = getDatabaseManager().select(Tables.SESSIONS.COLUMNS,
+                                                     Tables.SESSIONS.NAME,(Clause)null); 
+        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        ResultSet        results;
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                sessions.add(makeSession(results));
+            }
+        }
+        return sessions;
+    }
+
+
 
 
     /**
@@ -185,9 +300,9 @@ public class UserManager extends RepositoryManager {
         for (String cookieValue : cookies) {
             request.setSessionId(cookieValue);
             if (user == null) {
-                Session session = sessionMap.get(request.getSessionId());
+                Session session = getSession(request.getSessionId());
                 if (session != null) {
-                    session.lastActivity = new Date();
+                    session.setLastActivity(new Date());
                     user = session.user = getCurrentUser(session.user);
                     break;
                 }
@@ -196,10 +311,9 @@ public class UserManager extends RepositoryManager {
 
 
         if ((user == null) && request.hasParameter(ARG_SESSIONID)) {
-            Session session =
-                sessionMap.get(request.getString(ARG_SESSIONID));
+            Session session =getSession(request.getString(ARG_SESSIONID));
             if (session != null) {
-                session.lastActivity = new Date();
+                session.setLastActivity(new Date());
                 user = session.user = getCurrentUser(session.user);
             }
         }
@@ -337,18 +451,6 @@ public class UserManager extends RepositoryManager {
         return user;
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    private List<Session> getSessions() {
-        List<Session> sessions = new ArrayList<Session>();
-        for (Enumeration keys = sessionMap.keys(); keys.hasMoreElements(); ) {
-            sessions.add(sessionMap.get((String) keys.nextElement()));
-        }
-        return sessions;
-    }
 
 
     private Hashtable sessionMessages;
@@ -369,12 +471,12 @@ public class UserManager extends RepositoryManager {
         return sessionMessage;
     }
 
-    public void setSessionMessage(String message) {
+    public void setSessionMessage(String message) throws Exception {
         sessionMessages = new Hashtable();
         if(message!=null && message.trim().length()>0) {
         synchronized(sessionMessages) {
             for(Session session: getSessions()) {
-                sessionMessages.put(session.id, message);
+                sessionMessages.put(session.getId(), message);
             }
         }
         }
@@ -441,8 +543,8 @@ public class UserManager extends RepositoryManager {
         if (request.getSessionId() == null) {
             request.setSessionId(getSessionId());
         }
-        sessionMap.put(request.getSessionId(),
-                       new Session(request.getSessionId(), user, new Date()));
+        addSession(request.getSessionId(),
+                   new Session(request.getSessionId(), user, new Date()));
         request.setUser(user);
     }
 
@@ -456,11 +558,11 @@ public class UserManager extends RepositoryManager {
      */
     protected void removeUserSession(Request request) throws Exception {
         if (request.getSessionId() != null) {
-            sessionMap.remove(request.getSessionId());
+            removeSession(request.getSessionId());
         }
         List<String> cookies = getCookies(request);
         for (String cookieValue : cookies) {
-            sessionMap.remove(cookieValue);
+            removeSession(cookieValue);
         }
         request.setUser(getUserManager().getAnonymousUser());
     }
@@ -1209,7 +1311,7 @@ public class UserManager extends RepositoryManager {
                     HtmlUtil.cols(
                         session.user.getLabel(),
                         formatDate(request, session.createDate),
-                        formatDate(request, session.lastActivity))));
+                        formatDate(request, session.getLastActivity()))));
         }
         sessionHtml.append(HtmlUtil.formTableClose());
         return sessionHtml;
@@ -2443,20 +2545,92 @@ public class UserManager extends RepositoryManager {
          * @param createDate _more_
          */
         public Session(String id, User user, Date createDate) {
+            this(id, user, createDate, new Date());
+        }
+
+        public Session(String id, User user, Date createDate,Date lastActivity) {
             this.id         = id;
             this.user       = user;
             this.createDate = createDate;
-            lastActivity    = new Date();
+            this.lastActivity    = lastActivity;
+        }
+
+
+        /**
+           Set the Id property.
+
+           @param value The new value for Id
+        **/
+        public void setId (String value) {
+            id = value;
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public User getUser() {
+           Get the Id property.
+
+           @return The Id
+        **/
+        public String getId () {
+            return id;
+        }
+
+        /**
+           Set the User property.
+
+           @param value The new value for User
+        **/
+        public void setUser (User value) {
+            user = value;
+        }
+
+        /**
+           Get the User property.
+
+           @return The User
+        **/
+        public User getUser () {
             return user;
         }
+
+
+
+        /**
+           Set the CreateDate property.
+
+           @param value The new value for CreateDate
+        **/
+        public void setCreateDate (Date value) {
+            createDate = value;
+        }
+
+        /**
+           Get the CreateDate property.
+
+           @return The CreateDate
+        **/
+        public Date getCreateDate () {
+            return createDate;
+        }
+
+        /**
+           Set the LastActivity property.
+
+           @param value The new value for LastActivity
+        **/
+        public void setLastActivity (Date value) {
+            lastActivity = value;
+        }
+
+        /**
+           Get the LastActivity property.
+
+           @return The LastActivity
+        **/
+        public Date getLastActivity () {
+            return lastActivity;
+        }
+
+
 
     }
 

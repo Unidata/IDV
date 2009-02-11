@@ -157,6 +157,20 @@ CREATE INDEX USER_ACTIVITY_INDEX_USER_ID ON user_activity (USER_ID);
 
 
 -----------------------------------------------------------------------
+--- tracks session
+-----------------------------------------------------------------------
+CREATE TABLE  sessions (
+	session_id varchar(200),
+	user_id  varchar(200),
+	create_date ramadda.datetime, 
+        last_active_date  ramadda.datetime,
+        extra  varchar(10000)};  
+
+
+CREATE INDEX SESSIONS_INDEX_USER_ID ON sessions (USER_ID);
+
+
+-----------------------------------------------------------------------
 ---  permissions on entries
 -----------------------------------------------------------------------
 CREATE TABLE  permissions (

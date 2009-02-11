@@ -717,6 +717,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     protected UserManager getUserManager() {
         if (userManager == null) {
             userManager = doMakeUserManager();
+            userManager.init();
         }
         return userManager;
     }

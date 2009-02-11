@@ -1128,7 +1128,7 @@ return new Result(title, sb);
         }
         msgSB.append(
             msg("Are you sure you want to delete all of the entries?"));
-        sb.append(request.form(getRepository().URL_ENTRY_DELETELIST));
+        sb.append(request.formPost(getRepository().URL_ENTRY_DELETELIST));
         String hidden = HtmlUtil.hidden(ARG_ENTRYIDS, idBuffer.toString());
         String form = Repository.makeOkCancelForm(request,
                           getRepository().URL_ENTRY_DELETELIST,
@@ -1766,7 +1766,7 @@ return new Result(title, sb);
             sb.append(toEntry.getLabel());
 
             StringBuffer fb = new StringBuffer();
-            fb.append(request.form(getRepository().URL_ENTRY_COPY));
+            fb.append(request.formPost(getRepository().URL_ENTRY_COPY));
             fb.append(HtmlUtil.hidden(ARG_TO, toEntry.getId()));
             fb.append(HtmlUtil.hidden(ARG_FROM, fromIds));
             fb.append(HtmlUtil.submit("Yes, copy them", ARG_ACTION_COPY));
