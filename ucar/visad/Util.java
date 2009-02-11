@@ -22,6 +22,8 @@
 
 
 
+
+
 package ucar.visad;
 
 
@@ -107,7 +109,7 @@ import javax.vecmath.*;
  */
 public final class Util {
 
-    /** _more_ */
+    /** timerange delta */
     private static final double TIMERANGE_DELTA = 0.00000001;
 
     /** The suffix added to text type names */
@@ -2029,13 +2031,13 @@ public final class Util {
     }
 
     /**
-     * _more_
+     * Make a date from a DateTime
      *
-     * @param dttm _more_
+     * @param dttm DateTime to use
      *
-     * @return _more_
+     * @return the Date
      *
-     * @throws VisADException _more_
+     * @throws VisADException problem converting units
      */
     public static Date makeDate(DateTime dttm) throws VisADException {
         return new Date((long) dttm.getValue(CommonUnit.secondsSinceTheEpoch)
@@ -2043,17 +2045,17 @@ public final class Util {
     }
 
     /**
-     * _more_
+     * Make a list of Date object from the array of DateTime's
      *
-     * @param timesArray _more_
+     * @param timesArray   array of DateTimes
      *
-     * @return _more_
+     * @return a List of Date objects
      *
-     * @throws VisADException _more_
+     * @throws VisADException  problem createing the dates
      */
-    public static List makeDates(DateTime[] timesArray)
+    public static List<Date> makeDates(DateTime[] timesArray)
             throws VisADException {
-        List dates = new ArrayList();
+        List<Date> dates = new ArrayList<Date>();
         if (timesArray != null) {
             for (int i = 0; i < timesArray.length; i++) {
                 dates.add(makeDate(timesArray[i]));
@@ -2092,15 +2094,15 @@ public final class Util {
     }
 
     /**
-     * _more_
+     * Create a Real from a string value
      *
-     * @param value _more_
-     * @param unitOpener _more_
-     * @param unitCloser _more_
+     * @param value  numeric value
+     * @param unitOpener character for start of Unit spec
+     * @param unitCloser character for end of Unit spec
      *
-     * @return _more_
+     * @return a Real
      *
-     * @throws Exception _more_
+     * @throws Exception problem parsing the strings or creating the Real
      */
     public static Real toReal(String value, String unitOpener,
                               String unitCloser)
@@ -2155,13 +2157,13 @@ public final class Util {
 
 
     /**
-     * _more_
+     * Create a LatLonPointImpl from the VisAD LatLonPoint
      *
-     * @param llp _more_
+     * @param llp   the LatLonPoint
      *
-     * @return _more_
+     * @return  the corresponding LatLonPointImpl
      *
-     * @throws VisADException _more_
+     * @throws VisADException  problem getting values from LatLonPoint
      */
     public static ucar.unidata.geoloc.LatLonPointImpl toLatLonPoint(
             visad.georef.LatLonPoint llp)
@@ -2471,15 +2473,15 @@ public final class Util {
 
 
     /**
-     * _more_
+     * Make a RealType
      *
-     * @param name _more_
-     * @param alias _more_
-     * @param unit _more_
+     * @param name name of the RealType
+     * @param alias  the alias
+     * @param unit  the default unit
      *
-     * @return _more_
+     * @return  the RealType
      *
-     * @throws VisADException _more_
+     * @throws VisADException  problem creating the RealType
      */
     public static RealType makeRealType(String name, String alias, Unit unit)
             throws VisADException {
@@ -2725,8 +2727,8 @@ public final class Util {
      *   value and we turn the other values into nan-s
      * @return a FlatField representation of the image
      *
-     * @throws IOException _more_
-     * @throws VisADException _more_
+     * @throws IOException  problem reading the image
+     * @throws VisADException problem creating the FlatField
      */
     public static FlatField makeField(Image image,
                                       boolean makeNansForAnyAlpha)
@@ -2839,15 +2841,16 @@ public final class Util {
 
 
     /**
-     * Make a map projection from the bounds
+     * Make a map projection from the points
      *
-     * @param lat1 first lat
-     * @param lon1 first lon
-     * @param lat2 last lat
-     * @param lon2 last lon
+     * @param lat1 lower left latitude
+     * @param lon1 lower left longitude
+     * @param lat2 upper right latitude
+     * @param lon2 upper right longitude
      *
-     * @return a map projection
+     * @return a corresponding MapProjection
      *
+     * @throws VisADException problem creating the map projection
      * @throws VisADException  problem making projection
      */
     public static MapProjection makeMapProjection(double lat1, double lon1,
@@ -2981,15 +2984,15 @@ public final class Util {
 
 
     /**
-     * _more_
+     * Make a time field
      *
-     * @param ranges _more_
-     * @param times _more_
+     * @param ranges ranges for each time
+     * @param times  list of times
      *
-     * @return _more_
+     * @return  the time field
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   VisAD problem
      */
     public static FieldImpl makeTimeField(List ranges, List times)
             throws VisADException, RemoteException {
@@ -3088,12 +3091,12 @@ public final class Util {
 
 
     /**
-     * _more_
+     * Find the index of a value in a Set
      *
-     * @param set _more_
-     * @param value _more_
+     * @param set   the set
+     * @param value the value
      *
-     * @return _more_
+     * @return  the index or -1 if units not convertible
      *
      * @throws RemoteException  Java RMI problem
      * @throws VisADException   VisAD problem
@@ -3141,11 +3144,11 @@ public final class Util {
 
 
     /**
-     * _more_
+     * Make a time set from a list of times
      *
-     * @param times _more_
+     * @param times  the times
      *
-     * @return _more_
+     * @return the Set
      *
      * @throws RemoteException  Java RMI problem
      * @throws VisADException   VisAD problem
@@ -3160,7 +3163,7 @@ public final class Util {
      * Export the data object as a netCDF file
      * @param data   the VisAD data to export
      *
-     * @return _more_
+     * @return true if successful
      * @throws Exception  can't write data as netCDF
      */
     public static boolean exportAsNetcdf(Data data) throws Exception {
@@ -3270,5 +3273,123 @@ public final class Util {
 
     }
 
+
+    /**
+     * Perform rotation about an arbitrary vector
+     *
+     * @param mouse  MouseBehavior for matrix manipulation
+     * @param initialTransFormMatrix  the initial matrix
+     * @param angle   the angle of rotation
+     * @param axisIComp  i component of the axis
+     * @param axisJComp  j component of the axis
+     * @param axisKComp  k component of the axis
+     * @param offsetIComp  offset i component
+     * @param offsetJComp  offset j component
+     * @param offsetKComp  offset k component
+     *
+     * @return  the rotated matrix
+     */
+    public static double[] performRotationAboutArbitraryVector(MouseBehavior mouse,
+            double[] initialTransFormMatrix, double angle, double axisIComp,
+            double axisJComp, double axisKComp, double offsetIComp,
+            double offsetJComp, double offsetKComp) {
+        double[] rotAlpha        = new double[16];
+        double[] rotPhi          = new double[16];
+        double[] rotTheta        = new double[16];
+        double[] rotAlphaRev     = new double[16];
+        double[] rotPhiRev       = new double[16];
+        double[] undoOldtransMat = new double[16];
+        double[] redoOldtransMat = new double[16];
+        double[] tempT1          = new double[16];
+        double[] tempT2          = new double[16];
+        undoOldtransMat = mouse.make_translate(offsetIComp, offsetJComp,
+                offsetKComp);
+        redoOldtransMat = mouse.make_translate(-offsetIComp, -offsetJComp,
+                -offsetKComp);
+        rotAlpha[0]  = 1.0;
+        rotAlpha[5]  = 1.0;
+        rotAlpha[10] = 1.0;
+        rotAlpha[15] = 1.0;
+
+        double a     = axisIComp;
+        double b     = axisJComp;
+        double c     = axisKComp;
+        double dProj = Math.sqrt(b * b + c * c);
+
+        double len   = Math.sqrt(a * a + b * b + c * c);
+        double sinAlpha;
+        double cosAlpha;
+        double sinPhi;
+        double cosPhi;
+        if (dProj == 0.0) {
+            sinAlpha = 0.0;
+            cosAlpha = 1.0;
+            sinPhi   = 1.0;
+            cosPhi   = 0.0;
+
+        } else {
+            sinAlpha = b / dProj;
+            cosAlpha = c / dProj;
+            sinPhi   = a / len;
+            cosPhi   = dProj / len;
+
+        }
+        rotAlpha[5]     = cosAlpha;
+        rotAlpha[6]     = sinAlpha;
+        rotAlpha[9]     = -sinAlpha;
+        rotAlpha[10]    = cosAlpha;
+
+
+        rotAlphaRev[0]  = 1.0;
+        rotAlphaRev[5]  = 1.0;
+        rotAlphaRev[10] = 1.0;
+        rotAlphaRev[15] = 1.0;
+
+        rotAlphaRev[5]  = cosAlpha;
+        rotAlphaRev[6]  = -sinAlpha;
+        rotAlphaRev[9]  = sinAlpha;
+        rotAlphaRev[10] = cosAlpha;
+
+
+
+        rotPhi[0]       = 1.0;
+        rotPhi[5]       = 1.0;
+        rotPhi[10]      = 1.0;
+        rotPhi[15]      = 1.0;
+
+
+        rotPhi[0]       = cosPhi;
+        rotPhi[2]       = sinPhi;
+        rotPhi[8]       = -sinPhi;
+        rotPhi[10]      = cosPhi;
+
+        rotPhiRev[0]    = 1.0;
+        rotPhiRev[5]    = 1.0;
+        rotPhiRev[10]   = 1.0;
+        rotPhiRev[15]   = 1.0;
+
+
+        rotPhiRev[0]    = cosPhi;
+        rotPhiRev[2]    = -sinPhi;
+        rotPhiRev[8]    = sinPhi;
+        rotPhiRev[10]   = cosPhi;
+
+        if (initialTransFormMatrix == null) {
+            tempT1 = mouse.make_matrix(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0);
+        } else {
+            tempT1 = initialTransFormMatrix;
+        }
+        tempT2 = mouse.make_matrix(0.0, 0.0, angle, 1.0, 0.0, 0.0, 0.0);
+
+        tempT1 = mouse.multiply_matrix(undoOldtransMat, tempT1);
+        tempT1 = mouse.multiply_matrix(rotAlpha, tempT1);
+        tempT1 = mouse.multiply_matrix(rotPhi, tempT1);
+        tempT1 = mouse.multiply_matrix(tempT2, tempT1);
+        tempT1 = mouse.multiply_matrix(rotPhiRev, tempT1);
+        tempT1 = mouse.multiply_matrix(rotAlphaRev, tempT1);
+        tempT1 = mouse.multiply_matrix(redoOldtransMat, tempT1);
+
+        return tempT1;
+    }
 
 }
