@@ -17,11 +17,16 @@ a &quot;Publisher&quot; menu in the [ht::menu File] menu. Choose
 [ht::menu File Publisher New] to bring up the RAMADDA Publisher configuration dialog:
 [ht::cimg images/idvpublishernew.gif]
 
-You can optionally change the name. You need to provide the server name (e.g., motherlode.ucar.edu), the port the server is running on,
+You can optionally change the name. You need to provide the server name (e.g., motherlode.ucar.edu), 
+the port the server is running on,
 the base path of the repository (&quot;/repository&quot; is the default),
 and your user id and password.  Note: the password is saved on your local 
 disk (in your IDV directory) similarly to how browsers and other clients
 save  and manage your passwords.
+<p>
+You can leave the User Id and Password fields blank to create an anonymous account. Different groups on
+a RAMADDA server can be configured to support anonymous upload. You or others won't be able to view any anonymously
+uploaded content until the group administrator OK's the publication of the content.
 <p>
 Pressing OK will create a new Publisher configuration and attempt to
 connect to the server. You can change this configuration through the
@@ -43,7 +48,10 @@ it will also popup the publish dialog:
 This allows you to enter a name and description for the entry that will be created on the RAMADDA server. You can optionally enter any  number of &quot;tags&quot; (comma separated) in the Tags field.
 <p>
 You need to select the RAMADDA group to where your new entry will be placed.
-This tree view will indicate what groups you have write access to. Select the group.  Note: by right clicking on a group you can bring up a context menu
+This tree view will indicate what groups you have write access to. The <b>bold</b> groups
+are those you have write permission for. The <i>italics</i> groups are those  that you can
+anonymously upload to.
+Select the group.  Note: by right clicking on a group you can bring up a context menu
 that allows you to create a new group or to refresh the group tree view.
 <p>
 The date range and lat/lon bounding box are taken from the date range and lat/lon extent of the the displays you have loaded. You can change these values
