@@ -2814,8 +2814,8 @@ public class StationModelControl extends ObsDisplayControl {
                                             getChart(), "saveImage"));
         }
 
-        //        items.add(GuiUtils.makeMenuItem("Export to NetCDF...",
-        //                                        this, "exportAsNetcdf"));
+        items.add(GuiUtils.makeMenuItem("Export to NetCDF...",
+                                        this, "exportAsNetcdf"));
 
         if ((table != null) && (table.getModel().getRowCount() > 0)) {
             items.add(GuiUtils.makeMenuItem("Export Selected Observation...",
