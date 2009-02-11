@@ -270,7 +270,9 @@ public class ObsListControl extends ObsDisplayControl {
         synchronized (TABLE_MUTEX) {
             tableRows = new ArrayList(tmpRows);
             colNames  = new ArrayList(tmpColNames);
-            obsModel.fireTableStructureChanged();
+            if(obsModel!=null) {
+                obsModel.fireTableStructureChanged();
+            }
         }
 
     }
