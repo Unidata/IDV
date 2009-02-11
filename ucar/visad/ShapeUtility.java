@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.visad;
 
 
@@ -127,7 +126,10 @@ public class ShapeUtility {
     /** shape id */
     public static final String PIN = "PIN";
 
+    /** Hurricane symbol */
     public static final String HURRICANE = "HURRICANE";
+
+    /** tropical storm symbol */
     public static final String TROPICALSTORM = "TROPICALSTORM";
 
     /** The identifier for a square station location marker */
@@ -169,6 +171,7 @@ public class ShapeUtility {
     /** The identifier for a minus station location marker */
     public static final int MISC_ID_MINUS = 16;
 
+    /** Id for tropical storm */
     public static final int MISC_ID_TROPICALSTORM = 17;
 
     /** The identifier for a minus station location marker */
@@ -195,15 +198,15 @@ public class ShapeUtility {
 
     /** shape names from WeatherSymbols */
     public static final String[] MISC_NAMES = {
-        CIRCLE, FILLED_CIRCLE, DIAMOND, FILLED_DIAMOND, STAR, FILLED_STAR, TROPICALSTORM, HURRICANE, 
+        CIRCLE, FILLED_CIRCLE, DIAMOND, FILLED_DIAMOND, STAR, FILLED_STAR,
+        TROPICALSTORM, HURRICANE,
     };
 
     /** shape ids from WeatherSymbols */
     public static final int[] MISC_IDS = {
         MISC_ID_CIRCLE, MISC_ID_FILLED_CIRCLE, MISC_ID_DIAMOND,
         MISC_ID_FILLED_DIAMOND, MISC_ID_STAR, MISC_ID_FILLED_STAR,
-        MISC_ID_TROPICALSTORM,
-        MISC_ID_HURRICANE
+        MISC_ID_TROPICALSTORM, MISC_ID_HURRICANE
     };
 
 

@@ -23,25 +23,27 @@
 package ucar.visad;
 
 
-
-import ucar.unidata.geoloc.*;
-import ucar.unidata.xml.*;
-import ucar.unidata.util.Misc;
-
-import org.w3c.dom.Element;
-
-import java.util.List;
-
-import java.awt.geom.Rectangle2D;
-
-import visad.*;
-import visad.georef.MapProjection;
-
 import geotransform.coords.*;
 
 import geotransform.ellipsoids.*;
 
 import geotransform.transforms.*;
+
+import org.w3c.dom.Element;
+
+
+
+import ucar.unidata.geoloc.*;
+import ucar.unidata.util.Misc;
+import ucar.unidata.xml.*;
+
+import visad.*;
+
+import visad.georef.MapProjection;
+
+import java.awt.geom.Rectangle2D;
+
+import java.util.List;
 
 
 /**
@@ -61,8 +63,7 @@ import geotransform.transforms.*;
  *      http://www.ai.sri.com/geotransform/</a>
  * @version $Revision: 1.18 $ $Date: 2005/05/13 18:34:06 $
  */
-public class UTMCoordinateSystem extends MapProjection
-        implements XmlPersistable {
+public class UTMCoordinateSystem extends MapProjection implements XmlPersistable {
 
     // specification of UTM system in use:
 
@@ -222,15 +223,15 @@ public class UTMCoordinateSystem extends MapProjection
      * See http://www.ai.sri.com/geotransform/api.html for more details about
      * 239 supported datums.
      *
-     * @throws NullPointerException if the ellipsoid is <code>null</code>.
      * @param ellipsoid the basis for some UTM coordinate system;
      *                  many choices possible
      * @param zone      the UTM zone which has positions to be converted
      * @param hemiflag  a boolean, true if points are in the northern hemisphere
      *
-     * @throws VisADException
+     * @throws VisADException on badness. Throws a NullPointerException if the ellipsoid is <code>null</code>.
      */
-    public UTMCoordinateSystem(Ellipsoid ellipsoid, int zone, boolean hemiflag)
+    public UTMCoordinateSystem(Ellipsoid ellipsoid, int zone,
+                               boolean hemiflag)
             throws VisADException {
         this(ellipsoid, zone, hemiflag, null);
     }
@@ -258,7 +259,6 @@ public class UTMCoordinateSystem extends MapProjection
      * See http://www.ai.sri.com/geotransform/api.html for more details about
      * 239 supported datums.
      *
-     * @throws NullPointerException if the ellipsoid is <code>null</code>.
      * @param ellipsoid the basis for some UTM coordinate system;
      *                  many choices possible
      * @param zone      the UTM zone which has positions to be converted
@@ -268,12 +268,13 @@ public class UTMCoordinateSystem extends MapProjection
      *
      * @throws VisADException
      */
-    public UTMCoordinateSystem(Ellipsoid ellipsoid, int zone, boolean hemiflag, Rectangle2D bounds)
+    public UTMCoordinateSystem(Ellipsoid ellipsoid, int zone,
+                               boolean hemiflag, Rectangle2D bounds)
             throws VisADException {
 
         super(RealTupleType.LatitudeLongitudeTuple,
-              new Unit[]{ CommonUnit.meter,
-                          CommonUnit.meter });
+              new Unit[] { CommonUnit.meter,
+                           CommonUnit.meter });
 
         if (ellipsoid == null) {
             throw new NullPointerException();
@@ -373,7 +374,8 @@ public class UTMCoordinateSystem extends MapProjection
      * @return a double[][] array of lat/lon; lat=result[0][i], lon=result[1][i]
      * @throws VisADException
      */
-    public double[][] ConvertUtmToLatLon(double[][] utmcoords, int zone[], boolean hemisphere_north[])
+    public double[][] ConvertUtmToLatLon(double[][] utmcoords, int zone[],
+                                         boolean hemisphere_north[])
             throws VisADException {
 
         //this.zone = zone;
@@ -445,7 +447,8 @@ public class UTMCoordinateSystem extends MapProjection
      * @return a double [][] array of lat/lon; lat=result[0][i], lon=result[1][i]
      * @throws VisADException
      */
-    public double[][] ConvertUtmToLatLon(double[][] utmcoords, int zone, boolean hemisphere_north)
+    public double[][] ConvertUtmToLatLon(double[][] utmcoords, int zone,
+                                         boolean hemisphere_north)
             throws VisADException {
 
         if ((zone < 1) || (zone > 60)) {
@@ -453,8 +456,8 @@ public class UTMCoordinateSystem extends MapProjection
                 "UTM zone number not in range 1-60");
         }
 
-        return ConvertUtmToLatLon(utmcoords, new int[]{ zone },
-                                  new boolean[]{ hemisphere_north });
+        return ConvertUtmToLatLon(utmcoords, new int[] { zone },
+                                  new boolean[] { hemisphere_north });
     }
 
     /**
@@ -475,9 +478,9 @@ public class UTMCoordinateSystem extends MapProjection
             throws VisADException {
 
         // initialize the coordinates in geotransform arrays
-        int          MAX_POINTS = (utmcoords[0].length);
+        int MAX_POINTS = (utmcoords[0].length);
 
-        Gdc_Coord_3d gdc[]      = new Gdc_Coord_3d[MAX_POINTS];  // these need to be the same len
+        Gdc_Coord_3d gdc[] = new Gdc_Coord_3d[MAX_POINTS];  // these need to be the same len
         Utm_Coord_3d utm[] = new Utm_Coord_3d[MAX_POINTS];
         for (int i = 0; i < MAX_POINTS; i++) {
             gdc[i] = new Gdc_Coord_3d();
@@ -719,3 +722,4 @@ public class UTMCoordinateSystem extends MapProjection
     }
 
 }
+

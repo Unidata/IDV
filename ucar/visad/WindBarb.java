@@ -24,11 +24,12 @@ package ucar.visad;
 
 
 import visad.*;
+
 import visad.java3d.*;
 
-import java.util.*;
-
 import java.rmi.*;
+
+import java.util.*;
 
 
 /**
@@ -62,7 +63,9 @@ public class WindBarb {
      *
      * @throws VisADException
      */
-    public static VisADGeometryArray[] staticMakeFlow(float[][] flow_values, float flowScale, float[][] spatial_values, byte[][] color_values, boolean[][] range_select, boolean isSouth)
+    public static VisADGeometryArray[] staticMakeFlow(float[][] flow_values,
+            float flowScale, float[][] spatial_values, byte[][] color_values,
+            boolean[][] range_select, boolean isSouth)
             throws VisADException {
 
         if (flow_values[0] == null) {
@@ -227,7 +230,7 @@ public class WindBarb {
                         }
                     }
                 }
-            }                 // end if (range_select[0] == null || range_select[0][j])
+            }  // end if (range_select[0] == null || range_select[0][j])
         }                     // end for (int j=0; j<len; j++)
 
         int nv = numv[0];
@@ -301,9 +304,9 @@ public class WindBarb {
                 }
                 tarray.colors = colors;
             }
-            arrays = new VisADGeometryArray[]{ array, tarray };
+            arrays = new VisADGeometryArray[] { array, tarray };
         } else {
-            arrays = new VisADGeometryArray[]{ array };
+            arrays = new VisADGeometryArray[] { array };
         }
 
         return arrays;
@@ -660,3 +663,4 @@ public class WindBarb {
     }
 
 }
+

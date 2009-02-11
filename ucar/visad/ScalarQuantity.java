@@ -23,12 +23,13 @@
 package ucar.visad;
 
 
+import visad.*;
+
+
 
 import java.rmi.RemoteException;
 
 import java.util.*;
-
-import visad.*;
 
 
 /**
@@ -115,7 +116,8 @@ public abstract class ScalarQuantity extends Quantity {
      * @throws VisADException   VisAD failure.
      * @see #ScalarQuantity(RealType realType)
      */
-    protected ScalarQuantity(String name, Unit unit, visad.Set set, int attrMask)
+    protected ScalarQuantity(String name, Unit unit, visad.Set set,
+                             int attrMask)
             throws VisADException {
         this(RealType.getRealType(name, unit, set, attrMask));
     }
@@ -160,7 +162,8 @@ public abstract class ScalarQuantity extends Quantity {
      * @throws TypeException    if an instance cannot be created.
      * @throws VisADException   if a core VisAD failure occurs.
      */
-    protected ScalarQuantity(RealType realType, CoordinateSystem coordSys, visad.Set domain)
+    protected ScalarQuantity(RealType realType, CoordinateSystem coordSys,
+                             visad.Set domain)
             throws TypeException, VisADException {
 
         super(realType.getName(),
@@ -255,7 +258,7 @@ public abstract class ScalarQuantity extends Quantity {
      */
     public final RealTuple newRealTuple(double amount, Unit unit)
             throws VisADException, RemoteException {
-        return newRealTuple(new double[]{ amount }, new Unit[]{ unit });
+        return newRealTuple(new double[] { amount }, new Unit[] { unit });
     }
 
     /**
@@ -273,9 +276,10 @@ public abstract class ScalarQuantity extends Quantity {
      * @throws RemoteException  Java RMI failure.
      * @see #newRealTuple(double[], Unit[], CoordinateSystem)
      */
-    public final RealTuple newRealTuple(double amount, Unit unit, CoordinateSystem coordSys)
+    public final RealTuple newRealTuple(double amount, Unit unit,
+                                        CoordinateSystem coordSys)
             throws VisADException, RemoteException {
-        return newRealTuple(new double[]{ amount }, new Unit[]{ unit },
+        return newRealTuple(new double[] { amount }, new Unit[] { unit },
                             coordSys);
     }
 
@@ -295,10 +299,12 @@ public abstract class ScalarQuantity extends Quantity {
      * @throws RemoteException  Java RMI failure.
      * @see #newRealTuple(double[], Unit[] ErrorEstimate[], CoordinateSystem)
      */
-    public RealTuple newRealTuple(double amount, Unit unit, ErrorEstimate error, CoordinateSystem coordSys)
+    public RealTuple newRealTuple(double amount, Unit unit,
+                                  ErrorEstimate error,
+                                  CoordinateSystem coordSys)
             throws VisADException, RemoteException {
-        return newRealTuple(new double[]{ amount }, new Unit[]{ unit },
-                            new ErrorEstimate[]{ error }, coordSys);
+        return newRealTuple(new double[] { amount }, new Unit[] { unit },
+                            new ErrorEstimate[] { error }, coordSys);
     }
 
     /**
@@ -316,7 +322,7 @@ public abstract class ScalarQuantity extends Quantity {
      */
     public RealTuple newRealTuple(Real value, CoordinateSystem coordSys)
             throws VisADException, RemoteException {
-        return newRealTuple(new Real[]{ value }, coordSys);
+        return newRealTuple(new Real[] { value }, coordSys);
     }
 
     /**
@@ -341,7 +347,9 @@ public abstract class ScalarQuantity extends Quantity {
      *                          The class of the object will be {@link Real}.
      * @throws VisADException   VisAD failure.
      */
-    public DataImpl newValue(double[] amounts, Unit[] units, ErrorEstimate[] errors, CoordinateSystem coordSys)
+    public DataImpl newValue(double[] amounts, Unit[] units,
+                             ErrorEstimate[] errors,
+                             CoordinateSystem coordSys)
             throws VisADException {
 
         if (amounts.length != 1) {
@@ -367,8 +375,8 @@ public abstract class ScalarQuantity extends Quantity {
         return newReal(amounts[0], (units == null)
                                    ? null
                                    : units[0], (errors == null)
-                                               ? null
-                                               : errors[0]);
+                ? null
+                : errors[0]);
     }
 
     /**
@@ -424,8 +432,4 @@ public abstract class ScalarQuantity extends Quantity {
         return isCompatible;
     }
 }
-
-
-
-
 

@@ -23,14 +23,15 @@
 package ucar.visad;
 
 
+import visad.*;
+
+
 
 import java.lang.reflect.*;
 
 import java.rmi.RemoteException;
 
 import java.util.*;
-
-import visad.*;
 
 
 /**
@@ -82,7 +83,8 @@ public abstract class TupleQuantity extends Quantity {
      * @see #TupleQuantity(String, ScalarQuantity[], CoordinateSystem,
      *                     visad.Set)
      */
-    protected TupleQuantity(String name, ScalarQuantity[] scalars, CoordinateSystem coordSys)
+    protected TupleQuantity(String name, ScalarQuantity[] scalars,
+                            CoordinateSystem coordSys)
             throws VisADException {
         this(name, scalars, coordSys, (visad.Set) null);
     }
@@ -101,7 +103,8 @@ public abstract class TupleQuantity extends Quantity {
      * @throws TypeException    The quantity already exists.
      * @throws VisADException   VisAD failure.
      */
-    protected TupleQuantity(String name, ScalarQuantity[] scalars, CoordinateSystem coordSys, visad.Set domain)
+    protected TupleQuantity(String name, ScalarQuantity[] scalars,
+                            CoordinateSystem coordSys, visad.Set domain)
             throws TypeException, VisADException {
 
         super(name,
@@ -137,8 +140,4 @@ public abstract class TupleQuantity extends Quantity {
      * Public instance methods:
      */
 }
-
-
-
-
 

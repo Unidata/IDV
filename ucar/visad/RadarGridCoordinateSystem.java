@@ -23,14 +23,16 @@
 package ucar.visad;
 
 
-import visad.*;
-import visad.georef.EarthLocation;
-import visad.georef.NavigatedCoordinateSystem;
-
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
 
+
+import visad.*;
+
 import visad.bom.Radar3DCoordinateSystem;
+
+import visad.georef.EarthLocation;
+import visad.georef.NavigatedCoordinateSystem;
 
 
 /**
@@ -194,3 +196,4 @@ public class RadarGridCoordinateSystem extends NavigatedCoordinateSystem {
         return (this == that) || center.equals(that.center);
     }
 }
+

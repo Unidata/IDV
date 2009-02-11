@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.visad;
 
 
@@ -122,7 +121,7 @@ public class RadarMapProjection extends AREACoordinateSystem implements XmlPersi
      */
     public RadarMapProjection(double lat, double lon, int width, int height)
             throws VisADException {
-         this(lat, lon, width, height, 1);
+        this(lat, lon, width, height, 1);
     }
 
     /**
@@ -136,10 +135,11 @@ public class RadarMapProjection extends AREACoordinateSystem implements XmlPersi
      * @param res resolution of the pixels (km)
      * @throws VisADException  unable to create the projection
      */
-    public RadarMapProjection(double lat, double lon, int width, int height, int res)
+    public RadarMapProjection(double lat, double lon, int width, int height,
+                              int res)
             throws VisADException {
-        super(makeDir(height, width), makeNav(lat, lon, height, width, res), null,
-              false);
+        super(makeDir(height, width), makeNav(lat, lon, height, width, res),
+              null, false);
         this.lat    = lat;
         this.lon    = lon;
         this.width  = width;
@@ -153,17 +153,18 @@ public class RadarMapProjection extends AREACoordinateSystem implements XmlPersi
      * @param lon   center longitude
      * @param lines number of lines
      * @param eles  number of elements
+     * @param res _more_
      * @return
      */
-    private static int[] makeNav(double lat, double lon, int lines,
-                                 int eles, int res) {
+    private static int[] makeNav(double lat, double lon, int lines, int eles,
+                                 int res) {
         int[] nav = new int[128];
         nav[0] = AREAnav.RADR;
         nav[1] = lines / 2;
         nav[2] = eles / 2;
         nav[3] = McIDASUtil.doubleLatLonToInteger(lat);
         nav[4] = McIDASUtil.doubleLatLonToInteger(-lon);  // west pos
-        nav[5] = 1000* res;
+        nav[5] = 1000 * res;
         return nav;
     }
 
@@ -230,3 +231,4 @@ public class RadarMapProjection extends AREACoordinateSystem implements XmlPersi
     }
 
 }
+

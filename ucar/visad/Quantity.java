@@ -23,12 +23,13 @@
 package ucar.visad;
 
 
+import visad.*;
+
+
 
 import java.lang.reflect.*;
 
 import java.rmi.RemoteException;
-
-import visad.*;
 
 
 /**
@@ -183,7 +184,8 @@ public abstract class Quantity {
      * @throws RemoteException  Java RMI failure.
      * @see #newRealTuple(double[], Unit[], ErrorEstimate[], CoordinateSystem)
      */
-    public final RealTuple newRealTuple(double[] amounts, Unit[] units, CoordinateSystem coordSys)
+    public final RealTuple newRealTuple(double[] amounts, Unit[] units,
+                                        CoordinateSystem coordSys)
             throws VisADException, RemoteException {
         return newRealTuple(amounts, units, (ErrorEstimate[]) null, coordSys);
     }
@@ -204,7 +206,9 @@ public abstract class Quantity {
      * @throws RemoteException  Java RMI failure.
      * @see #newRealTuple(Real[], CoordinateSystem)
      */
-    public RealTuple newRealTuple(double[] amounts, Unit[] units, ErrorEstimate[] errors, CoordinateSystem coordSys)
+    public RealTuple newRealTuple(double[] amounts, Unit[] units,
+                                  ErrorEstimate[] errors,
+                                  CoordinateSystem coordSys)
             throws VisADException, RemoteException {
 
         Real[] values = new Real[amounts.length];
@@ -215,8 +219,8 @@ public abstract class Quantity {
                                amounts[i], (units == null)
                                            ? null
                                            : units[i], (errors == null)
-                                                       ? null
-                                                       : errors[i]);
+                    ? null
+                    : errors[i]);
         }
 
         return newRealTuple(values, coordSys);
@@ -268,7 +272,9 @@ public abstract class Quantity {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    public DataImpl newValue(double[] amounts, Unit[] units, ErrorEstimate[] errors, CoordinateSystem coordSys)
+    public DataImpl newValue(double[] amounts, Unit[] units,
+                             ErrorEstimate[] errors,
+                             CoordinateSystem coordSys)
             throws VisADException, RemoteException {
         return newRealTuple(amounts, units, errors, coordSys);
     }
@@ -445,8 +451,4 @@ public abstract class Quantity {
      * }
      */
 }
-
-
-
-
 

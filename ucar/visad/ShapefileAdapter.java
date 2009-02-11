@@ -23,6 +23,30 @@
 package ucar.visad;
 
 
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+import ucar.unidata.gis.GisFeature;
+
+import ucar.unidata.gis.shapefile.DbaseFile;
+import ucar.unidata.gis.shapefile.EsriShapefile;
+
+import ucar.unidata.idv.control.drawing.ShapeGlyph;
+
+
+
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.xml.XmlUtil;
+
+import ucar.visad.data.MapSet;
+
+
+
+import visad.*;
+
+
 
 import java.awt.geom.Rectangle2D;
 
@@ -32,28 +56,6 @@ import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import ucar.visad.data.MapSet;
-
-import ucar.unidata.gis.shapefile.DbaseFile;
-import ucar.unidata.gis.GisFeature;
-import ucar.unidata.gis.shapefile.EsriShapefile;
-
-import ucar.unidata.idv.control.drawing.ShapeGlyph;
-
-
-
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.xml.XmlUtil;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-
-
-import visad.*;
 
 
 /**
@@ -215,7 +217,8 @@ public class ShapefileAdapter {
      * @throws IOException
      * @throws VisADException
      */
-    public ShapefileAdapter(String filename, Rectangle2D bBox, double coarseness)
+    public ShapefileAdapter(String filename, Rectangle2D bBox,
+                            double coarseness)
             throws IOException, VisADException {
         readSource(filename, null, bBox, coarseness);
     }
@@ -284,7 +287,8 @@ public class ShapefileAdapter {
      * @throws IOException
      * @throws VisADException
      */
-    public ShapefileAdapter(InputStream iStream, Rectangle2D bBox, double coarseness)
+    public ShapefileAdapter(InputStream iStream, Rectangle2D bBox,
+                            double coarseness)
             throws IOException, VisADException {
         this(new EsriShapefile(iStream, bBox, coarseness));
     }
@@ -315,19 +319,17 @@ public class ShapefileAdapter {
      * @throws IOException On badness
      * @throws VisADException On badness
      */
-    private void readSource(String name, InputStream iStream, Rectangle2D bBox, double coarseness)
+    private void readSource(String name, InputStream iStream,
+                            Rectangle2D bBox, double coarseness)
             throws IOException, VisADException {
         try {
-            List sets = null;
+            List   sets   = null;
 
             String lcName = name.toLowerCase();
-            if (lcName.endsWith(".gsf") ||
-                lcName.endsWith(".nws") ||
-                lcName.endsWith(".cia") ||
-                lcName.endsWith(".usg") ||
-                lcName.endsWith(".ncp") ||
-                lcName.endsWith(".rfc") ||
-                lcName.endsWith(".cpc")) {
+            if (lcName.endsWith(".gsf") || lcName.endsWith(".nws")
+                    || lcName.endsWith(".cia") || lcName.endsWith(".usg")
+                    || lcName.endsWith(".ncp") || lcName.endsWith(".rfc")
+                    || lcName.endsWith(".cpc")) {
                 sets = doReadSSF(name, iStream);
             } else if (name.endsWith(".xml")) {
                 sets = doReadXml(name, iStream);
@@ -357,6 +359,8 @@ public class ShapefileAdapter {
      *
      * @param sets List of sets
      *
+     *
+     * @return The set of sets
      * @throws VisADException On badness
      */
     public static UnionSet makeSet(List sets) throws VisADException {
@@ -366,8 +370,7 @@ public class ShapefileAdapter {
         SampledSet[] ss = new SampledSet[sets.size()];
         System.arraycopy(sets.toArray(), 0, ss, 0, sets.size());
         if (ss.length > 0) {
-            return new UnionSet(ss[0].getType(), ss, null, null, null,
-                                    false);
+            return new UnionSet(ss[0].getType(), ss, null, null, null, false);
         } else {
             return null;
         }
@@ -398,18 +401,20 @@ public class ShapefileAdapter {
             NodeList elements = XmlUtil.getElements(root);
             for (int i = 0; i < elements.getLength(); i++) {
                 Element child = (Element) elements.item(i);
-                if(!XmlUtil.hasAttribute(child, ATTR_POINTS)) {
+                if ( !XmlUtil.hasAttribute(child, ATTR_POINTS)) {
                     continue;
                 }
                 double[] points =
                     Misc.parseDoubles(XmlUtil.getAttribute(child,
-                                                           ATTR_POINTS));
+                        ATTR_POINTS));
 
 
-                boolean isRect  = false;
-                if (!child.getTagName().equals(TAG_POLYGON)) {
+                boolean isRect = false;
+                if ( !child.getTagName().equals(TAG_POLYGON)) {
                     if (child.getTagName().equals(ShapeGlyph.TAG_SHAPE)) {
-                        if(XmlUtil.getAttribute(child, ShapeGlyph.ATTR_SHAPETYPE).toLowerCase().equals("rectangle")) {
+                        if (XmlUtil.getAttribute(child,
+                                ShapeGlyph.ATTR_SHAPETYPE).toLowerCase()
+                                    .equals("rectangle")) {
                             isRect = true;
                         } else {
                             continue;
@@ -420,15 +425,18 @@ public class ShapefileAdapter {
                 }
 
 
-                if(XmlUtil.hasAttribute(child,"coordtype")) {
-                    String coord = XmlUtil.getAttribute(child,"coordtype");
-                    if(!coord.startsWith("LATLON")) continue;
-                    if(coord.equals("LATLONALT")) {
-                        double[] tmp  = new double[2*points.length/3];
-                        int tmpCnt = 0;
-                        for (int ptIdx = 0; ptIdx < points.length;ptIdx+=3) {
+                if (XmlUtil.hasAttribute(child, "coordtype")) {
+                    String coord = XmlUtil.getAttribute(child, "coordtype");
+                    if ( !coord.startsWith("LATLON")) {
+                        continue;
+                    }
+                    if (coord.equals("LATLONALT")) {
+                        double[] tmp    = new double[2 * points.length / 3];
+                        int      tmpCnt = 0;
+                        for (int ptIdx = 0; ptIdx < points.length;
+                                ptIdx += 3) {
                             tmp[tmpCnt++] = points[ptIdx];
-                            tmp[tmpCnt++] = points[ptIdx+1];
+                            tmp[tmpCnt++] = points[ptIdx + 1];
                         }
                         points = tmp;
                     }
@@ -442,7 +450,7 @@ public class ShapefileAdapter {
                     part[0][ptIdx] = (float) points[ptIdx * 2 + 1];
                 }
 
-                if(isRect) {
+                if (isRect) {
                     part = ShapeGlyph.makeRectangle(part);
                 }
 
@@ -475,20 +483,20 @@ public class ShapefileAdapter {
             if (iStream == null) {
                 iStream = IOUtil.getInputStream(name);
             }
-            DataInputStream dis = new DataInputStream(iStream);
-            short numBlks =dis.readShort();
-            System.err.println("numBlks:" +  numBlks);
+            DataInputStream dis     = new DataInputStream(iStream);
+            short           numBlks = dis.readShort();
+            System.err.println("numBlks:" + numBlks);
             dis.skipBytes(252);
 
-            for(int blockIdx=0;blockIdx<numBlks;blockIdx++) {
-                short numSegments =dis.readShort();
+            for (int blockIdx = 0; blockIdx < numBlks; blockIdx++) {
+                short numSegments = dis.readShort();
                 System.err.println("segs=" + numSegments);
                 dis.skipBytes(4);
-                for(int segIdx=0;segIdx<numSegments;segIdx++) {
+                for (int segIdx = 0; segIdx < numSegments; segIdx++) {
                     int nPts = dis.readShort();
                     System.err.println("  pts=" + nPts);
-                    dis.skipBytes(4*5);
-                    for(int ptIdx=0;ptIdx<nPts;ptIdx++) {
+                    dis.skipBytes(4 * 5);
+                    for (int ptIdx = 0; ptIdx < nPts; ptIdx++) {
                         float lat = Float.intBitsToFloat(dis.readShort());
                         float lon = Float.intBitsToFloat(dis.readShort());
                         //                        System.err.println("     lat:" + lat+"/"+lon);
@@ -500,7 +508,7 @@ public class ShapefileAdapter {
             }
 
 
-            double[] points = new double[]{-107,40};
+            double[] points = new double[] { -107, 40 };
 
             RealTupleType coordMathType =
                 new RealTupleType(RealType.Longitude, RealType.Latitude);
@@ -509,12 +517,9 @@ public class ShapefileAdapter {
                 part[1][ptIdx] = (float) points[ptIdx * 2];
                 part[0][ptIdx] = (float) points[ptIdx * 2 + 1];
             }
-            sets.add(new MapSet(coordMathType, part,
-                                      points.length / 2,
-                                      (CoordinateSystem) null,
-                                      (Unit[]) null,
-                                      (ErrorEstimate[]) null,
-                                      false /* no copy */));
+            sets.add(new MapSet(coordMathType, part, points.length / 2,
+                                (CoordinateSystem) null, (Unit[]) null,
+                                (ErrorEstimate[]) null, false /* no copy */));
         } catch (Exception exc) {
             exc.printStackTrace();
         }
@@ -536,14 +541,15 @@ public class ShapefileAdapter {
             if (iStream == null) {
                 iStream = IOUtil.getInputStream(name);
             }
-            List toks = StringUtil.split(IOUtil.readContents(iStream),  " ", true, true);
+            List toks = StringUtil.split(IOUtil.readContents(iStream), " ",
+                                         true, true);
             int xcnt = 0;
-            int cnt = 0;
-            while(cnt< toks.size()) {
+            int cnt  = 0;
+            while (cnt < toks.size()) {
                 int size = Integer.parseInt((String) toks.get(cnt));
-                cnt+=5;
+                cnt += 5;
                 double[] points = new double[size];
-                for(int i=0;i<size;i++) {
+                for (int i = 0; i < size; i++) {
                     points[i] = Double.parseDouble((String) toks.get(cnt));
                     cnt++;
                 }
@@ -555,12 +561,10 @@ public class ShapefileAdapter {
                     part[0][ptIdx] = (float) points[ptIdx * 2 + 1];
                 }
                 xcnt++;
-                sets.add(new MapSet(coordMathType, part,
-                                          points.length / 2,
-                                          (CoordinateSystem) null,
-                                          (Unit[]) null,
-                                          (ErrorEstimate[]) null,
-                                          false /* no copy */));
+                sets.add(new MapSet(coordMathType, part, points.length / 2,
+                                    (CoordinateSystem) null, (Unit[]) null,
+                                    (ErrorEstimate[]) null,
+                                    false /* no copy */));
             }
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -570,12 +574,12 @@ public class ShapefileAdapter {
 
 
 
-/**
-     * Read the shapefile
+    /**
+     *     Read the shapefile
      *
-     * @param shapefile shapefile
+     *     @param shapefile shapefile
      *
-     * @return List of point sets
+     *     @return List of point sets
      */
     private List doRead(EsriShapefile shapefile) {
         this.shapefile = shapefile;
@@ -631,8 +635,4 @@ public class ShapefileAdapter {
         return mapLines;
     }
 }
-
-
-
-
 

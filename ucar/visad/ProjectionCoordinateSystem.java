@@ -23,17 +23,19 @@
 package ucar.visad;
 
 
+import org.w3c.dom.Element;
+
+
 
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
 import ucar.unidata.xml.*;
 
-import org.w3c.dom.Element;
+import visad.*;
+
+import visad.georef.MapProjection;
 
 import java.util.ArrayList;
-
-import visad.*;
-import visad.georef.MapProjection;
 
 
 /**
@@ -46,8 +48,7 @@ import visad.georef.MapProjection;
  * @author Don Murray
  * @version $Revision: 1.25 $ $Date: 2006/08/18 17:28:41 $
  */
-public class ProjectionCoordinateSystem extends MapProjection
-        implements XmlPersistable {
+public class ProjectionCoordinateSystem extends MapProjection implements XmlPersistable {
 
     /** projection for transformations */
     private ProjectionImpl projection;
@@ -65,16 +66,14 @@ public class ProjectionCoordinateSystem extends MapProjection
      *
      * @param projection  projection to adapt
      *
-     * @throws NullPointerException if the argument is <code>null</code>.
      *
      * @throws VisADException
      */
     public ProjectionCoordinateSystem(ProjectionImpl projection)
             throws VisADException {
 
-        this(projection, 
-              new Unit[]{ CommonUnit.meter.scale(1000.0),
-                          CommonUnit.meter.scale(1000.0) });
+        this(projection, new Unit[] { CommonUnit.meter.scale(1000.0),
+                                      CommonUnit.meter.scale(1000.0) });
     }
 
     /**
@@ -83,8 +82,8 @@ public class ProjectionCoordinateSystem extends MapProjection
      * the incoming units are assumed to be km (1000 m).
      *
      * @param projection  projection to adapt
+     * @param units units to use
      *
-     * @throws NullPointerException if the argument is <code>null</code>.
      *
      * @throws VisADException
      */
@@ -256,3 +255,4 @@ public class ProjectionCoordinateSystem extends MapProjection
         return true;
     }
 }
+

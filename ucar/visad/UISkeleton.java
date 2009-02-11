@@ -23,6 +23,11 @@
 package ucar.visad;
 
 
+import visad.DisplayImpl;
+
+import visad.VisADException;
+
+
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -35,10 +40,6 @@ import java.rmi.RemoteException;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import visad.DisplayImpl;
-
-import visad.VisADException;
 
 
 /**
@@ -127,3 +128,4 @@ public abstract class UISkeleton extends TestSkeleton {
         jframe.setVisible(true);
     }
 }
+

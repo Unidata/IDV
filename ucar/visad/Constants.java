@@ -23,12 +23,13 @@
 package ucar.visad;
 
 
-
-import java.util.Hashtable;
-
 import ucar.visad.*;
 
 import visad.*;
+
+
+
+import java.util.Hashtable;
 
 
 /**
@@ -127,8 +128,4 @@ public class Constants {
         return value;
     }
 }
-
-
-
-
 

@@ -23,14 +23,16 @@
 package ucar.visad;
 
 
+import visad.*;
+
+import visad.util.DataUtility;
+
+
 
 import java.rmi.RemoteException;
 
 import java.util.Iterator;
 import java.util.Vector;
-
-import visad.*;
-import visad.util.DataUtility;
 
 
 /**
@@ -52,10 +54,8 @@ public final class VisADMath {
         Real o = null;
 
         try {
-            o = new Real(
-                RealType.getRealType(
-                    "ucar_unidata_visad_Util_One", CommonUnit.dimensionless,
-                    (Set) null), 1.0);
+            o = new Real(RealType.getRealType("ucar_unidata_visad_Util_One",
+                    CommonUnit.dimensionless, (Set) null), 1.0);
         } catch (Exception e) {
             String reason = e.getMessage();
 
@@ -119,10 +119,9 @@ public final class VisADMath {
                          ((GriddedSet) set).getLengths(),
                          set.getCoordinateSystem(), set.getSetUnits(),
                          set.getSetErrors())
-                     : (SampledSet) new IrregularSet(
-                         (SetType) set.getType(), samples,
-                         set.getCoordinateSystem(), set.getSetUnits(),
-                         set.getSetErrors());
+                     : (SampledSet) new IrregularSet((SetType) set.getType(),
+                     samples, set.getCoordinateSystem(), set.getSetUnits(),
+                     set.getSetErrors());
         }
 
         return result;
@@ -197,14 +196,11 @@ public final class VisADMath {
 
         return (set instanceof GriddedSet)
                ? (SampledSet) new Gridded1DSet(newRealType, samples,
-                                               set.getLength(),
-                                               (CoordinateSystem) null,
-                                               new Unit[]{ newUnit },
-                                               (ErrorEstimate[]) null)
+                set.getLength(), (CoordinateSystem) null,
+                new Unit[] { newUnit }, (ErrorEstimate[]) null)
                : (SampledSet) new Irregular1DSet(newRealType, samples,
-                                                 (CoordinateSystem) null,
-                                                 new Unit[]{ newUnit },
-                                                 (ErrorEstimate[]) null);
+                (CoordinateSystem) null, new Unit[] { newUnit },
+                (ErrorEstimate[]) null);
     }
 
     /**
@@ -259,14 +255,11 @@ public final class VisADMath {
         }
 
         return (set instanceof GriddedSet)
-               ? (SampledSet) GriddedSet.create(
-                   RealType.Generic, samples,
-                   ((GriddedSet) set).getLengths(), (CoordinateSystem) null,
-                   newUnits, (ErrorEstimate[]) null)
+               ? (SampledSet) GriddedSet.create(RealType.Generic, samples,
+                ((GriddedSet) set).getLengths(), (CoordinateSystem) null,
+                newUnits, (ErrorEstimate[]) null)
                : (SampledSet) new IrregularSet(RealType.Generic, samples,
-                                               (CoordinateSystem) null,
-                                               newUnits,
-                                               (ErrorEstimate[]) null);
+                (CoordinateSystem) null, newUnits, (ErrorEstimate[]) null);
     }
 
     /**
@@ -329,14 +322,11 @@ public final class VisADMath {
                 Data.LOG, new Vector());
 
         return (set instanceof GriddedSet)
-               ? (SampledSet) GriddedSet.create(
-                   newRealTupleType, samples,
-                   ((GriddedSet) set).getLengths(), (CoordinateSystem) null,
-                   newUnits, (ErrorEstimate[]) null)
+               ? (SampledSet) GriddedSet.create(newRealTupleType, samples,
+                ((GriddedSet) set).getLengths(), (CoordinateSystem) null,
+                newUnits, (ErrorEstimate[]) null)
                : (SampledSet) new IrregularSet(newRealTupleType, samples,
-                                               (CoordinateSystem) null,
-                                               newUnits,
-                                               (ErrorEstimate[]) null);
+                (CoordinateSystem) null, newUnits, (ErrorEstimate[]) null);
     }
 
     /**
@@ -406,15 +396,13 @@ public final class VisADMath {
      * units.
      *
      * @param set                   The SampledSet.
-     * @param Real                  The Real.
-     * @param real
+     * @param real                  The Real.
      * @return                      The result of adding the two data objects
      *                              together.
-     * @throws NullPointerException if an argument is <code>null</code>.
-     * @throws TypeException        if the {@link SampledSet}
+     * @throws VisADException       if a VisAD failure occurs. Throws a TypeException
+     * if the {@link SampledSet}
      *                              no component to which the {@link Real}
      *                              could be added.
-     * @throws VisADException       if a VisAD failure occurs.
      */
     static SampledSet add(SampledSet set, Real real) throws VisADException {
 
@@ -455,21 +443,17 @@ public final class VisADMath {
 
             if ((realError != null) && (newErrors[realIndex] != null)) {
                 newErrors[realIndex] = new ErrorEstimate(realSamples,
-                                                         setUnits[realIndex],
-                                                         Data.ADD,
-                                                         newErrors[realIndex],
-                                                         realError,
-                                                         Data.INDEPENDENT);
+                        setUnits[realIndex], Data.ADD, newErrors[realIndex],
+                        realError, Data.INDEPENDENT);
             }
         }
 
         return (set instanceof GriddedSet)
-               ? (SampledSet) GriddedSet.create(
-                   setType, samples, ((GriddedSet) set).getLengths(),
-                   set.getCoordinateSystem(), setUnits, newErrors)
+               ? (SampledSet) GriddedSet.create(setType, samples,
+                ((GriddedSet) set).getLengths(), set.getCoordinateSystem(),
+                setUnits, newErrors)
                : (SampledSet) new IrregularSet(setType, samples,
-                                               set.getCoordinateSystem(),
-                                               setUnits, newErrors);
+                set.getCoordinateSystem(), setUnits, newErrors);
     }
 
     /**
@@ -608,9 +592,8 @@ public final class VisADMath {
             newErrors[icomp] = ((set1Error == null) || (set2Error == null))
                                ? (ErrorEstimate) null
                                : new ErrorEstimate(newSamples[icomp],
-                                                   newUnits[icomp], Data.ADD,
-                                                   set1Error, set2Error,
-                                                   Data.INDEPENDENT);
+                               newUnits[icomp], Data.ADD, set1Error,
+                               set2Error, Data.INDEPENDENT);
         }
 
         /*
@@ -708,8 +691,7 @@ public final class VisADMath {
      * of every sample point.
      *
      * @param set               The SampledSet.
-     * @param Real              The Real.
-     * @param real
+     * @param real              The Real.
      * @return                  The result of multiplying the two data objects
      *                          together.
      * @throws VisADException   Couldn't create necessary VisAD object.
@@ -752,20 +734,17 @@ public final class VisADMath {
                 newErrors[i] = ((setErrors[i] == null) || (realError == null))
                                ? null
                                : new ErrorEstimate(values, newUnits[i],
-                                                   Data.MULTIPLY,
-                                                   setErrors[i], realError,
-                                                   Data.INDEPENDENT);
+                               Data.MULTIPLY, setErrors[i], realError,
+                               Data.INDEPENDENT);
             }
         }
 
         return (set instanceof GriddedSet)
-               ? (SampledSet) GriddedSet.create(
-                   newRealTupleType, samples,
-                   ((GriddedSet) set).getLengths(), (CoordinateSystem) null,
-                   newUnits, newErrors)
+               ? (SampledSet) GriddedSet.create(newRealTupleType, samples,
+                ((GriddedSet) set).getLengths(), (CoordinateSystem) null,
+                newUnits, newErrors)
                : (SampledSet) new IrregularSet(newRealTupleType, samples,
-                                               (CoordinateSystem) null,
-                                               newUnits, newErrors);
+                (CoordinateSystem) null, newUnits, newErrors);
     }
 
     /**
@@ -867,7 +846,7 @@ public final class VisADMath {
 
         if (data instanceof Real) {
             result = fromReference((RealTupleType) type,
-                                   new RealTuple(new Real[]{ (Real) data }));
+                                   new RealTuple(new Real[] { (Real) data }));
         } else if (data instanceof RealTuple) {
             result = fromReference((RealTupleType) type, (RealTuple) data);
         } else if (data instanceof SampledSet) {
@@ -935,11 +914,14 @@ public final class VisADMath {
 
         CoordinateSystem cs = type.getDomain().getCoordinateSystem();
 
-        return new IrregularSet(type, cs
-            .fromReference(Unit
-                .convertTuple(data.getSamples(false), data.getSetUnits(), cs
-                    .getReferenceUnits())), (CoordinateSystem) null, cs
-                        .getCoordinateSystemUnits(), (ErrorEstimate[]) null);
+        return new IrregularSet(
+            type,
+            cs.fromReference(
+                Unit.convertTuple(
+                    data.getSamples(false), data.getSetUnits(),
+                    cs.getReferenceUnits())), (CoordinateSystem) null,
+                        cs.getCoordinateSystemUnits(),
+                        (ErrorEstimate[]) null);
     }
 
     /**
@@ -1022,7 +1004,8 @@ public final class VisADMath {
      * @return                  <code>newRangeValues</code>.
      * @throws VisADException   Couldn't create necessary VisAD object.
      */
-    static double[][] curveIntegralOfGradient(SampledSet set, double[][][] gradients, double[][] newRangeValues)
+    static double[][] curveIntegralOfGradient(SampledSet set,
+            double[][][] gradients, double[][] newRangeValues)
             throws VisADException {
 
         int     componentCount   = gradients.length;
@@ -1038,7 +1021,7 @@ public final class VisADMath {
         for (int icomp = 0; icomp < componentCount; ++icomp) {
             boolean    needInitialPoint = true;
             double[][] gradient         = gradients[icomp];
-            double[]   compValues       = newRangeValues[icomp];  // computed output
+            double[]   compValues = newRangeValues[icomp];  // computed output
 
             java.util.Arrays.fill(compValues, Double.NaN);
 
@@ -1080,7 +1063,7 @@ public final class VisADMath {
                         double infinitySum   = 0;
                         int    infinityCount = 0;
                         double[][] sampleCoordinates =
-                            set.indexToDouble(new int[]{ sampleIndex });
+                            set.indexToDouble(new int[] { sampleIndex });
                         double[][] neighborCoordinates =
                             set.indexToDouble(neighborIndexes);
 
@@ -1135,46 +1118,45 @@ public final class VisADMath {
                                         - neighborCoordinates[dimIndex][i];
 
                                     delta1 += neighborDerivative
-                                              * deltaDomain;
+                                            * deltaDomain;
                                     delta2 +=
-                                        (derivatives[sampleIndex] + neighborDerivative)
-                                        * deltaDomain;
-                                }                                 // dimension loop
+                                        (derivatives[sampleIndex]
+                                         + neighborDerivative) * deltaDomain;
+                                }             // dimension loop
 
-                                delta2 /= 2;                      // deferred mean computation
+                                delta2 /= 2;  // deferred mean computation
 
                                 double error  = delta1 - delta2;
                                 double weight = 1 / (error * error);
 
                                 if (Double.isInfinite(weight)) {
                                     infinitySum += newRangeNeighborValue
-                                                   + delta2;
+                                            + delta2;
 
                                     infinityCount++;
                                 } else if (infinityCount == 0) {
-                                    valueSum +=
-                                        (newRangeNeighborValue + delta2)
-                                        * weight;
+                                    valueSum += (newRangeNeighborValue
+                                            + delta2) * weight;
                                     weightSum += weight;
                                 }
-                            }                                     // usable neighbor
-                        }                                         // neighbor loop
+                            }  // usable neighbor
+                        }      // neighbor loop
 
                         /*
                          * The value at the output sample is the weighted mean
                          * of the values computed from the neighboring points.
                          */
                         if (infinityCount != 0) {
-                            compValues[sampleIndex] =
-                                (double) (infinitySum / infinityCount);
+                            compValues[sampleIndex] = (double) (infinitySum
+                                    / infinityCount);
                         } else if (weightSum != 0) {
                             compValues[sampleIndex] = (double) (valueSum
-                                                                / weightSum);
+                                    / weightSum);
                         }
-                    }                                             // have initial value
-                }                                                 // sample point has neighbors
-            }                                                     // sample point loop
-        }                                                         // component loop
+                    }  // have initial value
+                }      // sample point has neighbors
+            }          // sample point loop
+        }              // component loop
 
         return newRangeValues;
     }
@@ -1230,7 +1212,9 @@ public final class VisADMath {
      * @return                  <code>newRangeValues</code>.
      * @throws VisADException   Couldn't create necessary VisAD object.
      */
-    static float[][] curveIntegralOfGradient(SampledSet set, float[][][] gradients, float[][] newRangeValues)
+    static float[][] curveIntegralOfGradient(SampledSet set,
+                                             float[][][] gradients,
+                                             float[][] newRangeValues)
             throws VisADException {
 
         int     componentCount   = gradients.length;
@@ -1246,7 +1230,7 @@ public final class VisADMath {
         for (int icomp = 0; icomp < componentCount; ++icomp) {
             boolean   needInitialPoint = true;
             float[][] gradient         = gradients[icomp];
-            float[]   compValues       = newRangeValues[icomp];  // computed output
+            float[]   compValues = newRangeValues[icomp];  // computed output
 
             java.util.Arrays.fill(compValues, Float.NaN);
 
@@ -1288,7 +1272,7 @@ public final class VisADMath {
                         double infinitySum   = 0;
                         int    infinityCount = 0;
                         float[][] sampleCoordinates =
-                            set.indexToValue(new int[]{ sampleIndex });
+                            set.indexToValue(new int[] { sampleIndex });
                         float[][] neighborCoordinates =
                             set.indexToValue(neighborIndexes);
 
@@ -1343,46 +1327,45 @@ public final class VisADMath {
                                         - neighborCoordinates[dimIndex][i];
 
                                     delta1 += neighborDerivative
-                                              * deltaDomain;
+                                            * deltaDomain;
                                     delta2 +=
-                                        (derivatives[sampleIndex] + neighborDerivative)
-                                        * deltaDomain;
-                                }                                // dimension loop
+                                        (derivatives[sampleIndex]
+                                         + neighborDerivative) * deltaDomain;
+                                }             // dimension loop
 
-                                delta2 /= 2;                     // deferred mean computation
+                                delta2 /= 2;  // deferred mean computation
 
                                 double error  = delta1 - delta2;
                                 double weight = 1 / (error * error);
 
                                 if (Double.isInfinite(weight)) {
                                     infinitySum += newRangeNeighborValue
-                                                   + delta2;
+                                            + delta2;
 
                                     infinityCount++;
                                 } else if (infinityCount == 0) {
-                                    valueSum +=
-                                        (newRangeNeighborValue + delta2)
-                                        * weight;
+                                    valueSum += (newRangeNeighborValue
+                                            + delta2) * weight;
                                     weightSum += weight;
                                 }
-                            }                                    // usable neighbor
-                        }                                        // neighbor loop
+                            }  // usable neighbor
+                        }      // neighbor loop
 
                         /*
                          * The value at the output sample is the weighted mean
                          * of the values computed from the neighboring points.
                          */
                         if (infinityCount != 0) {
-                            compValues[sampleIndex] =
-                                (float) (infinitySum / infinityCount);
+                            compValues[sampleIndex] = (float) (infinitySum
+                                    / infinityCount);
                         } else if (weightSum != 0) {
                             compValues[sampleIndex] = (float) (valueSum
-                                                               / weightSum);
+                                    / weightSum);
                         }
-                    }                                            // have initial value
-                }                                                // sample point has neighbors
-            }                                                    // sample point loop
-        }                                                        // component loop
+                    }  // have initial value
+                }      // sample point has neighbors
+            }          // sample point loop
+        }              // component loop
 
         return newRangeValues;
     }
@@ -1532,7 +1515,8 @@ public final class VisADMath {
      * @return                  <code>newRangeValues</code>.
      * @throws VisADException   Couldn't create necessary VisAD object.
      */
-    static double[][] curveIntegralOfGradient(GriddedSet set, double[][][] gradients, double[][] newRangeValues)
+    static double[][] curveIntegralOfGradient(GriddedSet set,
+            double[][][] gradients, double[][] newRangeValues)
             throws VisADException {
 
         int       componentCount     = gradients.length;
@@ -1554,7 +1538,7 @@ public final class VisADMath {
         for (Index index = new Index(set); index.hasPoint();
                 index.increment()) {
             int sampleIndex = index.getIndex();
-            double[][] sampleCoordinates = set.indexToDouble(new int[]{
+            double[][] sampleCoordinates = set.indexToDouble(new int[] {
                                                sampleIndex });
 
             java.util.Arrays.fill(valueSums, 0);
@@ -1570,7 +1554,7 @@ public final class VisADMath {
 
                 if (neighborIndex >= 0) {
                     double[][] neighborCoordinates =
-                        set.indexToDouble(new int[]{ neighborIndex });
+                        set.indexToDouble(new int[] { neighborIndex });
                     double deltaDomain = sampleCoordinates[idim][0]
                                          - neighborCoordinates[idim][0];
 
@@ -1598,10 +1582,9 @@ public final class VisADMath {
                             double neighborDerivative =
                                 derivatives[neighborIndex];
                             double delta1 = deltaDomain * neighborDerivative;
-                            double delta2 =
-                                deltaDomain
-                                * (derivatives[sampleIndex] + neighborDerivative)
-                                / 2;
+                            double delta2 = deltaDomain
+                                            * (derivatives[sampleIndex]
+                                               + neighborDerivative) / 2;
                             double error  = delta1 - delta2;
                             double weight = 1 / (error * error);
 
@@ -1613,8 +1596,8 @@ public final class VisADMath {
                                 infinityCounts[icomp]++;
                             } else if (infinityCounts[icomp] == 0) {
                                 valueSums[icomp] +=
-                                    (newRangeValues[icomp][neighborIndex] + delta2)
-                                    * weight;
+                                    (newRangeValues[icomp][neighborIndex]
+                                     + delta2) * weight;
                                 weightSums[icomp] += weight;
                             }
                         }  // don't need initial value
@@ -1643,7 +1626,7 @@ public final class VisADMath {
                           : Double.NaN;
                 }
             }
-        }                  // output sample-point loop
+        }  // output sample-point loop
 
         return newRangeValues;
     }
@@ -1700,7 +1683,9 @@ public final class VisADMath {
      * @return                  <code>newRangeValues</code>.
      * @throws VisADException   Couldn't create necessary VisAD object.
      */
-    static float[][] curveIntegralOfGradient(GriddedSet set, float[][][] gradients, float[][] newRangeValues)
+    static float[][] curveIntegralOfGradient(GriddedSet set,
+                                             float[][][] gradients,
+                                             float[][] newRangeValues)
             throws VisADException {
 
         int       componentCount     = gradients.length;
@@ -1722,7 +1707,7 @@ public final class VisADMath {
         for (Index index = new Index(set); index.hasPoint();
                 index.increment()) {
             int sampleIndex = index.getIndex();
-            float[][] sampleCoordinates = set.indexToValue(new int[]{
+            float[][] sampleCoordinates = set.indexToValue(new int[] {
                                               sampleIndex });
 
             java.util.Arrays.fill(valueSums, 0);
@@ -1738,7 +1723,7 @@ public final class VisADMath {
 
                 if (neighborIndex >= 0) {
                     float[][] neighborCoordinates =
-                        set.indexToValue(new int[]{ neighborIndex });
+                        set.indexToValue(new int[] { neighborIndex });
                     float deltaDomain = sampleCoordinates[idim][0]
                                         - neighborCoordinates[idim][0];
 
@@ -1766,10 +1751,9 @@ public final class VisADMath {
                             double neighborDerivative =
                                 derivatives[neighborIndex];
                             double delta1 = deltaDomain * neighborDerivative;
-                            double delta2 =
-                                deltaDomain
-                                * (derivatives[sampleIndex] + neighborDerivative)
-                                / 2;
+                            double delta2 = deltaDomain
+                                            * (derivatives[sampleIndex]
+                                               + neighborDerivative) / 2;
                             double error  = delta1 - delta2;
                             double weight = 1 / (error * error);
 
@@ -1781,8 +1765,8 @@ public final class VisADMath {
                                 infinityCounts[icomp]++;
                             } else if (infinityCounts[icomp] == 0) {
                                 valueSums[icomp] +=
-                                    (newRangeValues[icomp][neighborIndex] + delta2)
-                                    * weight;
+                                    (newRangeValues[icomp][neighborIndex]
+                                     + delta2) * weight;
                                 weightSums[icomp] += weight;
                             }
                         }  // don't need initial value
@@ -1811,7 +1795,7 @@ public final class VisADMath {
                           : Float.NaN;
                 }
             }
-        }                  // output sample-point loop
+        }  // output sample-point loop
 
         return newRangeValues;
     }
@@ -1874,7 +1858,7 @@ public final class VisADMath {
             }
 
             if (rangeType instanceof RealTupleType) {
-                rangeType = new TupleType(new MathType[]{ rangeType });
+                rangeType = new TupleType(new MathType[] { rangeType });
             }
 
             newFieldRangeType = (TupleType) rangeType;
@@ -1912,9 +1896,8 @@ public final class VisADMath {
                 for (int i = 1; i < partialCount; ++i) {
                     newComponentType = (RealType) newComponentType.binary(
                         gradientType.getComponent(i).binary(
-                            domainType.getComponent(
-                                i), Data.MULTIPLY, nilVector), Data.ADD,
-                                                               nilVector);
+                            domainType.getComponent(i), Data.MULTIPLY,
+                            nilVector), Data.ADD, nilVector);
                 }
 
                 newComponentTypes[newComponentIndex] = newComponentType;
@@ -1937,18 +1920,17 @@ public final class VisADMath {
             for (int i = 0; i < rangeSets.length; i++) {
                 if ( !(rangeSets[i] instanceof DoubleSet)) {
                     rangeSets[i] = new FloatSet(newComponentTypes[i],
-                                                (CoordinateSystem) null,
-                                                (Unit[]) null);
+                            (CoordinateSystem) null, (Unit[]) null);
                 } else {
                     useDouble = true;
                     rangeSets[i] = new DoubleSet(newComponentTypes[i],
-                                                 (CoordinateSystem) null,
-                                                 (Unit[]) null);
+                            (CoordinateSystem) null, (Unit[]) null);
                 }
             }
             newField = new FlatField(
                 new FunctionType(
-                    domainType, DataUtility.simplify(
+                    domainType,
+                    DataUtility.simplify(
                         new RealTupleType(newComponentTypes))), domainSet,
                             (CoordinateSystem) null, rangeSets,
                             (Unit[]) null);
@@ -1977,7 +1959,7 @@ public final class VisADMath {
                 }, new double[newComponentCount][domainSet.getLength()]), false);
             } else {
                 newField.setSamples(curveIntegralOfGradient(domainSet,
-                                                            new double[][][] {
+                        new double[][][] {
                     integrandValues
                 }, new double[newComponentCount][domainSet.getLength()]), false);
             }
@@ -1998,7 +1980,7 @@ public final class VisADMath {
                 }, new float[newComponentCount][domainSet.getLength()]), false);
             } else {
                 newField.setSamples(curveIntegralOfGradient(domainSet,
-                                                            new float[][][] {
+                        new float[][][] {
                     integrandValues
                 }, new float[newComponentCount][domainSet.getLength()]), false);
             }
@@ -2070,7 +2052,9 @@ public final class VisADMath {
      * @throws VisADException   Couldn't create necessary VisAD object.
      * @throws RemoteException  Java RMI failure.
      */
-    public static FlatField newFlatField(SampledSet set, MathType rangeType, CoordinateSystem rangeCoordinateSystem)
+    public static FlatField newFlatField(
+            SampledSet set, MathType rangeType,
+            CoordinateSystem rangeCoordinateSystem)
             throws VisADException, RemoteException {
         return newFlatField(set, set, rangeType, rangeCoordinateSystem);
     }
@@ -2095,7 +2079,9 @@ public final class VisADMath {
      * @throws VisADException   Couldn't create necessary VisAD object.
      * @throws RemoteException  Java RMI failure.
      */
-    public static FlatField newFlatField(SampledSet domain, SampledSet range, MathType rangeType, CoordinateSystem rangeCoordinateSystem)
+    public static FlatField newFlatField(
+            SampledSet domain, SampledSet range, MathType rangeType,
+            CoordinateSystem rangeCoordinateSystem)
             throws VisADException, RemoteException {
 
         /*
@@ -2118,10 +2104,10 @@ public final class VisADMath {
         }
 
         RealTupleType domainType = ((SetType) domain.getType()).getDomain();
-        FlatField flatField =
-            new FlatField(new FunctionType(domainType, rangeType), domain,
-                          rangeCoordinateSystem, (CoordinateSystem[]) null,
-                          (Set[]) null, range.getSetUnits());
+        FlatField flatField = new FlatField(new FunctionType(domainType,
+                                  rangeType), domain, rangeCoordinateSystem,
+                                      (CoordinateSystem[]) null,
+                                      (Set[]) null, range.getSetUnits());
         boolean useDoubles = false;
 
         for (int i = domainType.getDimension(); --i >= 0; ) {
@@ -2157,11 +2143,11 @@ public final class VisADMath {
                                    new FunctionType(domainType, domainType),
                                    new visad.SingletonSet(
                                        new visad.RealTuple(
-                                           new Real[]{
+                                           new Real[] {
                                                new Real(domainType, 2.0) })));
 
         flatField1.setSamples(new float[][] {
-            new float[]{ 2.0f }
+            new float[] { 2.0f }
         });
         System.out.println("flatField1 = \n" + flatField1);
 
@@ -2171,25 +2157,20 @@ public final class VisADMath {
                                    new FunctionType(domainType, domainType),
                                    new visad.SingletonSet(
                                        new visad.RealTuple(
-                                           new Real[]{
+                                           new Real[] {
                                                new Real(domainType, 2.0) })));
 
         flatField2.setSamples(new float[][] {
-            new float[]{ 1.0f }
+            new float[] { 1.0f }
         });
         System.out.println("flatField2 = \n" + flatField2);
 
         FlatField flatField3 = (FlatField) divide(flatField2,
-                                                  subtract(flatField1,
-                                                      flatField2));
+                                   subtract(flatField1, flatField2));
 
         System.out.println("flatField3 = \n" + flatField3);
         System.out.println("flatField3.getRangeUnits()[0][0] = "
                            + flatField3.getRangeUnits()[0][0]);
     }
 }
-
-
-
-
 

@@ -20,12 +20,12 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.visad;
 
 
 import org.w3c.dom.Element;
+
+import ucar.nc2.iosp.mcidas.McIDASAreaProjection;
 
 import ucar.unidata.data.point.PointOb;
 
@@ -55,8 +55,6 @@ import visad.georef.*;
 
 import visad.meteorology.*;
 
-import ucar.nc2.iosp.mcidas.McIDASAreaProjection;
-
 import java.io.ByteArrayInputStream;
 
 import java.io.ByteArrayOutputStream;
@@ -66,7 +64,9 @@ import java.util.List;
 
 
 import javax.media.j3d.*;
+
 import javax.vecmath.*;
+
 
 /**
  * A class for supporting XML delegates for VisAD objects.
@@ -797,27 +797,25 @@ public class VisADPersistence {
 
         addDelegate(Color3f.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
-                Color3f c= (Color3f) o;
-                float[]rgb = c.get().getRGBComponents(null);
+                Color3f c   = (Color3f) o;
+                float[] rgb = c.get().getRGBComponents(null);
                 List args = Misc.newList(new Float(rgb[0]),
                                          new Float(rgb[1]),
                                          new Float(rgb[2]));
-                List types = Misc.newList(Float.TYPE, Float.TYPE,
-                                          Float.TYPE);
+                List types = Misc.newList(Float.TYPE, Float.TYPE, Float.TYPE);
                 return e.createObjectConstructorElement(o, args, types);
             }
         });
 
         addDelegate(Vector3f.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
-                Vector3f v= (Vector3f) o;
-                float[]xyz = new float[3];
+                Vector3f v   = (Vector3f) o;
+                float[]  xyz = new float[3];
                 v.get(xyz);
                 List args = Misc.newList(new Float(xyz[0]),
                                          new Float(xyz[1]),
                                          new Float(xyz[2]));
-                List types = Misc.newList(Float.TYPE, Float.TYPE,
-                                          Float.TYPE);
+                List types = Misc.newList(Float.TYPE, Float.TYPE, Float.TYPE);
                 return e.createObjectConstructorElement(o, args, types);
             }
         });
@@ -825,8 +823,8 @@ public class VisADPersistence {
 
         addDelegate(Point3d.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
-                Point3d p= (Point3d) o;
-                double[]xyz = new double[3];
+                Point3d  p   = (Point3d) o;
+                double[] xyz = new double[3];
                 p.get(xyz);
                 List args = Misc.newList(new Double(xyz[0]),
                                          new Double(xyz[1]),

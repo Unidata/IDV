@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.visad;
 
 
@@ -51,7 +48,7 @@ public class WxSymbolGroup {
     /** maps symbol name to its description */
     private static Hashtable nameMap;
 
-    /** All WxSymbolGroup objects created_more_ */
+    /** All WxSymbolGroup objects created */
     private static List symbolGroups;
 
     //TODO: make the WeatherSymbols. values public
@@ -109,7 +106,7 @@ public class WxSymbolGroup {
      */
     private WxSymbolGroup(String name, String group, int startIndex,
                           int offset, String[][] values) {
-        this.name   = name;
+        this.name = name;
         symbolGroups.add(this);
         String prefix = "WX_" + group + "_";
         //        System.out.println ("<li> " + name +"<ul>");
@@ -200,6 +197,7 @@ public class WxSymbolGroup {
      * Initialize
      */
     private static void init() {
+
         if (indexMap != null) {
             return;
         }
@@ -207,10 +205,10 @@ public class WxSymbolGroup {
         /*
 
         System.out.println("<ul>");
-        System.out.println("<li> General Symbols <ul>"); 
+        System.out.println("<li> General Symbols <ul>");
         for (int i = 0; i < ShapeUtility.SHAPES.length; i++) {
             System.out.println("<li><b> " + ShapeUtility.SHAPES[i].getId() +"</b> - " + ShapeUtility.SHAPES[i]);
-          
+
         }
         System.out.println("</ul>");
         */
@@ -447,6 +445,7 @@ public class WxSymbolGroup {
 
 
         /*        System.out.println("</ul>");*/
+
 
 
     }

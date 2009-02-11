@@ -25,15 +25,16 @@ package ucar.visad;
 
 
 import visad.*;
+
 import visad.data.*;
 
 import visad.util.*;
 
 import java.io.IOException;
 
-import java.rmi.RemoteException;
-
 import java.net.URL;
+
+import java.rmi.RemoteException;
 
 
 /**
@@ -95,7 +96,6 @@ public class ZebraMapForm extends Form implements FormFileInformer {
      * @throws IOException       file doesn't exist
      * @throws RemoteException   Java RMI problem
      * @throws VisADException    Problem creating data
-     * @throws  UnimplementedException  - can't be done yet.
      */
     public synchronized void save(String id, Data data, boolean replace)
             throws BadFormException, IOException, RemoteException,
@@ -167,3 +167,4 @@ public class ZebraMapForm extends Form implements FormFileInformer {
         return null;
     }
 }
+

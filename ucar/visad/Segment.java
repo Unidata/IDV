@@ -70,7 +70,3 @@ public class Segment {
     }
 }
 
-
-
-
-

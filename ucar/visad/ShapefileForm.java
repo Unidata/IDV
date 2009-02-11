@@ -25,15 +25,16 @@ package ucar.visad;
 
 
 import visad.*;
+
 import visad.data.*;
 
 import visad.util.*;
 
 import java.io.IOException;
 
-import java.rmi.RemoteException;
-
 import java.net.URL;
+
+import java.rmi.RemoteException;
 
 
 /**
@@ -64,15 +65,11 @@ public class ShapefileForm extends Form implements FormFileInformer {
      */
     public boolean isThisType(String name) {
         name = name.toLowerCase();
-        return (name.endsWith(".shp") || 
-                name.endsWith(".zip") ||  
-                name.endsWith(".gsf") ||
-                name.endsWith(".nws") ||
-                name.endsWith(".cia") ||
-                name.endsWith(".usg") ||
-                name.endsWith(".ncp") ||
-                name.endsWith(".rfc") ||
-                name.endsWith(".cpc"));
+        return (name.endsWith(".shp") || name.endsWith(".zip")
+                || name.endsWith(".gsf") || name.endsWith(".nws")
+                || name.endsWith(".cia") || name.endsWith(".usg")
+                || name.endsWith(".ncp") || name.endsWith(".rfc")
+                || name.endsWith(".cpc"));
 
     }
 
@@ -109,8 +106,8 @@ public class ShapefileForm extends Form implements FormFileInformer {
      * @throws BadFormException  bad form
      * @throws IOException       file doesn't exist
      * @throws RemoteException   Java RMI problem
-     * @throws VisADException    Problem creating data
-     * @throws  UnimplementedException  - can't be done yet.
+     * @throws VisADException    Problem creating data. throws  UnimplementedException  - can't be done yet.
+     *
      */
     public synchronized void save(String id, Data data, boolean replace)
             throws BadFormException, IOException, RemoteException,
@@ -184,3 +181,4 @@ public class ShapefileForm extends Form implements FormFileInformer {
         return null;
     }
 }
+

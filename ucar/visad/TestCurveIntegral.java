@@ -23,11 +23,13 @@
 package ucar.visad;
 
 
+import visad.*;
+
+import visad.java2d.DisplayImplJ2D;
+
+
 
 import java.rmi.RemoteException;
-
-import visad.*;
-import visad.java2d.DisplayImplJ2D;
 
 
 /**
@@ -80,7 +82,7 @@ public class TestCurveIntegral extends UISkeleton {
 
         if (domain_flag == 0) {
             domainSet = (Set) new Linear2DSet(Domain, 0.d, 1000.d, LengthX,
-                                              0.d, 1000.d, LengthY);
+                    0.d, 1000.d, LengthY);
         } else if (domain_flag == 1) {
             float[][] d_samples = new float[2][n_samples];
 
@@ -96,7 +98,7 @@ public class TestCurveIntegral extends UISkeleton {
             }
 
             domainSet = (Set) new Gridded2DSet(Domain, d_samples, LengthX,
-                                               LengthY, null, null, null);
+                    LengthY, null, null, null);
         } else if (domain_flag == 3) {}
 
         FlatField  f_field = new FlatField(domain_temp, domainSet);
@@ -109,11 +111,12 @@ public class TestCurveIntegral extends UISkeleton {
 
         for (ii = 0; ii < LengthY; ii++) {
             for (jj = 0; jj < LengthX; jj++) {
-                samples[0][index] =
-                    (50)
-                    * java.lang.Math.sin(((wave_number * 2d * PI) / 1000) * 5 * jj)
-                    * java.lang.Math.sin(((wave_number * 2d * PI) / 1000) * 5
-                                         * ii);
+                samples[0][index] = (50)
+                                    * java.lang.Math.sin(
+                                        ((wave_number * 2d * PI) / 1000) * 5
+                                        * jj) * java.lang.Math.sin(
+                                            ((wave_number * 2d * PI) / 1000)
+                                            * 5 * ii);
 
                 index++;
             }
@@ -126,7 +129,7 @@ public class TestCurveIntegral extends UISkeleton {
 
         System.out.println("...derivative done");
 
-        d_field = (FlatField) FieldImpl.combine(new Field[]{
+        d_field = (FlatField) FieldImpl.combine(new Field[] {
             (Field) tuple.getComponent(0),
             (Field) tuple.getComponent(1) });
 
@@ -234,8 +237,4 @@ public class TestCurveIntegral extends UISkeleton {
         TestCurveIntegral t = new TestCurveIntegral(args);
     }
 }
-
-
-
-
 

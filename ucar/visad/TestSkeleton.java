@@ -23,10 +23,6 @@
 package ucar.visad;
 
 
-
-import java.rmi.Naming;
-import java.rmi.RemoteException;
-
 import visad.DisplayImpl;
 
 import visad.RemoteDisplay;
@@ -42,6 +38,11 @@ import visad.VisADException;
 import visad.java2d.DisplayImplJ2D;
 
 import visad.java3d.DisplayImplJ3D;
+
+
+
+import java.rmi.Naming;
+import java.rmi.RemoteException;
 
 
 /**
@@ -206,8 +207,7 @@ public abstract class TestSkeleton extends Thread {
                               argc += (handled - 1);
                           } else {
                               System.err.println(getClass().getName()
-                                                 + ": Unknown option \"-"
-                                                 + ch + "\"");
+                                      + ": Unknown option \"-" + ch + "\"");
 
                               usage = true;
                           }
@@ -237,7 +237,7 @@ public abstract class TestSkeleton extends Thread {
                                         + (hasClientServerMode()
                                            ? " [-s(erver)]"
                                            : "") + extraOptionUsage()
-                                                 + extraKeywordUsage());
+                                           + extraKeywordUsage());
         }
 
         return !usage;
@@ -468,3 +468,4 @@ public abstract class TestSkeleton extends Thread {
         return null;
     }
 }
+

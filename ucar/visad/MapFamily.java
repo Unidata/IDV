@@ -23,11 +23,6 @@
 package ucar.visad;
 
 
-
-import java.io.IOException;
-
-import java.rmi.RemoteException;
-
 import visad.Data;
 
 import visad.DataImpl;
@@ -37,7 +32,13 @@ import visad.VisADException;
 import visad.data.*;
 import visad.data.mcidas.MapForm;
 
+
+
+import java.io.IOException;
+
 import java.net.URL;
+
+import java.rmi.RemoteException;
 
 
 /**
@@ -128,7 +129,7 @@ public class MapFamily extends FunctionFormFamily {
         }
 
         throw new ArrayIndexOutOfBoundsException("Only " + list.length
-                                                 + " entries allowed");
+                + " entries allowed");
     }
 
     /**
@@ -216,8 +217,4 @@ public class MapFamily extends FunctionFormFamily {
         }
     }
 }
-
-
-
-
 

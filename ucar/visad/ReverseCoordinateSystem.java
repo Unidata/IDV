@@ -55,9 +55,8 @@ public class ReverseCoordinateSystem extends CoordinateSystem {
             return values;
         }
         if (values.length != getDimension()) {
-            throw new CoordinateSystemException(
-                "ReverseCoordinateSystem."
-                + "toReference: values wrong dimension");
+            throw new CoordinateSystemException("ReverseCoordinateSystem."
+                    + "toReference: values wrong dimension");
         }
 
         double[][] revValues = new double[getDimension()][];
@@ -82,9 +81,8 @@ public class ReverseCoordinateSystem extends CoordinateSystem {
             return revValues;
         }
         if (revValues.length != getDimension()) {
-            throw new CoordinateSystemException(
-                "ReverseCoordinateSystem."
-                + "fromReference: revValues wrong dimension");
+            throw new CoordinateSystemException("ReverseCoordinateSystem."
+                    + "fromReference: revValues wrong dimension");
         }
 
         double[][] values = new double[getDimension()][];
@@ -107,9 +105,8 @@ public class ReverseCoordinateSystem extends CoordinateSystem {
             return values;
         }
         if (values.length != getDimension()) {
-            throw new CoordinateSystemException(
-                "ReverseCoordinateSystem."
-                + "toReference: values wrong dimension");
+            throw new CoordinateSystemException("ReverseCoordinateSystem."
+                    + "toReference: values wrong dimension");
         }
 
         float[][] revValues = new float[getDimension()][];
@@ -134,9 +131,8 @@ public class ReverseCoordinateSystem extends CoordinateSystem {
             return revValues;
         }
         if (revValues.length != getDimension()) {
-            throw new CoordinateSystemException(
-                "ReverseCoordinateSystem."
-                + "fromReference: revValues wrong dimension");
+            throw new CoordinateSystemException("ReverseCoordinateSystem."
+                    + "fromReference: revValues wrong dimension");
         }
 
         float[][] values = new float[getDimension()][];
@@ -178,3 +174,4 @@ public class ReverseCoordinateSystem extends CoordinateSystem {
         return csUnits;
     }
 }
+

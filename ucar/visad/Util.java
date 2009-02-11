@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.visad;
 
 
@@ -3180,21 +3176,21 @@ public final class Util {
 
 
     /**
-     * _more_
+     * this makes a empty flat field with the given lat/lon bounds and lengths, the given fill value and the unit
      *
-     * @param lon1 _more_
-     * @param lon2 _more_
-     * @param length1 _more_
-     * @param lat1 _more_
-     * @param lat2 _more_
-     * @param length2 _more_
-     * @param fill _more_
-     * @param unitString _more_
+     * @param lon1 longitude 1
+     * @param lon2 longitude 2
+     * @param length1 number of lon points
+     * @param lat1 lat 1
+     * @param lat2 lat 2
+     * @param length2 number of lat points
+     * @param fill the fill value for the range
+     * @param unitString the unit
      *
-     * @return _more_
+     * @return the field
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
      */
     public static FlatField makeField(float lon1, float lon2, int length1,
                                       float lat1, float lat2, int length2,
@@ -3221,15 +3217,15 @@ public final class Util {
     }
 
     /**
-     * _more_
+     * This makes a gridded earth domain set with the given lats, lons and (possible null) alts It uses RealTupleType.LatitudeLongitudeAltitude or RealTupleType.LatitudeLongitudeTuple as the type
      *
-     * @param lats _more_
-     * @param lons _more_
-     * @param alts _more_
+     * @param lats the lats
+     * @param lons the lons
+     * @param alts the (possibly null) altitudes
      *
-     * @return _more_
+     * @return the griddedset
      *
-     * @throws VisADException _more_
+     * @throws VisADException on badness
      */
     public static GriddedSet makeEarthDomainSet(float[] lats, float[] lons,
             float[] alts)
@@ -3249,22 +3245,22 @@ public final class Util {
     }
 
     /**
-     * _more_
+     * convert the visad EarthLocation into a ucar.unidata.geoloc.LatLonPoint
      *
-     * @param el _more_
+     * @param el the earth location
      *
-     * @return _more_
+     * @return The LatLonPoint
      */
     public static ucar.unidata.geoloc.LatLonPoint toLLP(EarthLocation el) {
         return toLLP(el.getLatLonPoint());
     }
 
     /**
-     * _more_
+     * Convert the visad LatLonPoint to a unidata.geoloc.LatLonPoint
      *
-     * @param llp _more_
+     * @param llp the visad llp
      *
-     * @return _more_
+     * @return the unidata llp
      */
     public static ucar.unidata.geoloc.LatLonPoint toLLP(
             visad.georef.LatLonPoint llp) {
@@ -3289,10 +3285,11 @@ public final class Util {
      *
      * @return  the rotated matrix
      */
-    public static double[] performRotationAboutArbitraryVector(MouseBehavior mouse,
-            double[] initialTransFormMatrix, double angle, double axisIComp,
-            double axisJComp, double axisKComp, double offsetIComp,
-            double offsetJComp, double offsetKComp) {
+    public static double[] performRotationAboutArbitraryVector(
+            MouseBehavior mouse, double[] initialTransFormMatrix,
+            double angle, double axisIComp, double axisJComp,
+            double axisKComp, double offsetIComp, double offsetJComp,
+            double offsetKComp) {
         double[] rotAlpha        = new double[16];
         double[] rotPhi          = new double[16];
         double[] rotTheta        = new double[16];
@@ -3393,3 +3390,4 @@ public final class Util {
     }
 
 }
+

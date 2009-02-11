@@ -204,7 +204,3 @@ public class ZebraAsciiMapAdapter {
 
 }
 
-
-
-
-
