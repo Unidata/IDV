@@ -570,6 +570,9 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
         List l = StringUtil.split(commaSeparatedNames, ",", true, true);
         for (int i = 0; i < l.size(); i++) {
             String name = l.get(i).toString();
+            //A hack to make sure we don't pick up a param labeled "time" instead of the pointob time
+            if(name.equals(PointOb.PARAM_TIME)) return PointOb.BAD_INDEX;
+
             // first check to see if the name is good before aliases
             int index = Util.getIndex(tType, name);
             if (index != PointOb.BAD_INDEX) {
