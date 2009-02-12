@@ -296,8 +296,9 @@ public class AccessManager extends RepositoryManager {
                 }
                 break;
             }
+            //LOOK: make sure we pass in false here which says do not check for access control
             entry = getEntryManager().getEntry(request,
-                    entry.getParentGroupId());
+                                               entry.getParentGroupId(),false);
         }
         return false;
     }
@@ -367,9 +368,13 @@ public class AccessManager extends RepositoryManager {
                 return null;
             }
         }
+        //        System.err.println ("filter:" + entry.getFullName());
+        long t1 = System.currentTimeMillis();
         if ( !canDoAction(request, entry, Permission.ACTION_VIEW)) {
             return null;
         }
+        long t2 = System.currentTimeMillis();
+        //        System.err.println ("time to filter:" + (t2-t1));
 
 
         Group parent = entry.getParentGroup();
