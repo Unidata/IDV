@@ -650,10 +650,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    protected String getSelectLink(Request request, Entry entry,
-                                   String target, boolean allEntries,
-                                   String selectType)
-            throws Exception {
+    protected String getSelectLink(Request request, Entry entry, String target) 
+        throws Exception {
         String       linkText = entry.getLabel();
         StringBuffer sb       = new StringBuffer();
         String       entryId  = entry.getId();
@@ -662,26 +660,16 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         String       uid = "link_" + HtmlUtil.blockCnt++;
         String folderClickUrl = 
             request.entryUrl(getRepository().URL_ENTRY_SHOW,entry)+
-            "&" + HtmlUtil.arg(ARG_OUTPUT, "selectxml") +
-            "&" +HtmlUtil.arg(ATTR_TARGET, target) +
-            "&" +HtmlUtil.arg("allentries", ""+allEntries) +
-            "&" +HtmlUtil.arg(ATTR_SELECTTYPE,selectType);
+            "&" + HtmlUtil.args(new String[]{
+                ARG_OUTPUT, request.getString(ARG_OUTPUT,"selectxml"),
+                ATTR_TARGET, target,
+                ARG_ALLENTRIES, request.getString(ARG_ALLENTRIES,"true"),
+                ARG_SELECTTYPE,request.getString(ARG_SELECTTYPE,"")});
 
-        if (entry.isGroup()) {
-            event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
-                                                        HtmlUtil.squote(uid)
-                                                        + "," +
-                                                        HtmlUtil.squote(folderClickUrl)));
-
-        } else {
-            event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
-                    HtmlUtil.squote(entryId) + "," + HtmlUtil.squote(uid)
-                    + ",'selectxml',"
-                    + HtmlUtil.squote(ATTR_TARGET + "=" + target
-                                      + "&allentries=" + allEntries + "&"
-                                      + ATTR_SELECTTYPE + "=" + selectType)));
-
-        }
+        event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
+                                                    HtmlUtil.squote(uid)
+                                                    + "," +
+                                                    HtmlUtil.squote(folderClickUrl)));
         String img = HtmlUtil.img(icon, (entry.isGroup()
                                          ? "Click to open group; "
                                          : ""), HtmlUtil.id("img_" + uid)
@@ -689,17 +677,17 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         sb.append(img);
         sb.append(HtmlUtil.space(1));
 
-        String type      = request.getString(ATTR_SELECTTYPE, "");
+        String type      = request.getString(ARG_SELECTTYPE, "");
         String elementId = entry.getId();
         String value     = (entry.isGroup()
                             ? ((Group) entry).getFullName()
                             : entry.getName());
         sb.append(HtmlUtil.mouseClickHref(HtmlUtil.call("selectClick",
-                HtmlUtil.squote(target) + ","
-                + HtmlUtil.squote(entry.getId()) + ","
-                + HtmlUtil.squote(value) + ","
-                + HtmlUtil.squote(type)), linkText));
-
+                                                        HtmlUtil.comma(
+                                                            HtmlUtil.squote(target),
+                                                            HtmlUtil.squote(entry.getId()),
+                                                            HtmlUtil.squote(value),
+                                                            HtmlUtil.squote(type))), linkText));
 
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.div("",
@@ -711,7 +699,12 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     }
 
 
-
+    public Result makeAjaxResult(Request request, String contents) {
+        StringBuffer xml = new StringBuffer("<content>\n");
+        XmlUtil.appendCdata(xml,contents);
+        xml.append("\n</content>");
+        return new Result("", xml, "text/xml");
+    }
 
 
     /**

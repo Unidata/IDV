@@ -848,33 +848,17 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         String       target     = request.getString(ATTR_TARGET, "");
         StringBuffer sb         = new StringBuffer();
-        String       folder     = iconUrl(ICON_FOLDER_CLOSED);
-
-
-        boolean      allEntries = request.get("allentries", false);
-        String       type       = request.getString(ATTR_SELECTTYPE, "");
-
-
         for (Group subGroup : subGroups) {
-            sb.append(getSelectLink(request, subGroup, target, allEntries,
-                                    type));
+            sb.append(getSelectLink(request, subGroup, target));
         }
 
-        if (allEntries) {
+        if (request.get(ARG_ALLENTRIES, false)) {
             for (Entry entry : entries) {
-                sb.append(getSelectLink(request, entry, target, allEntries,
-                                        type));
+                sb.append(getSelectLink(request, entry, target));
             }
         }
-
-
-        StringBuffer xml = new StringBuffer("<content>\n");
-        XmlUtil.appendCdata(xml,
-                            getRepository().translate(request,
-                                sb.toString()));
-        xml.append("\n</content>");
-        //        System.err.println(xml);
-        return new Result("", xml, "text/xml");
+        return makeAjaxResult(request, getRepository().translate(request,
+                                                        sb.toString()));
     }
 
 

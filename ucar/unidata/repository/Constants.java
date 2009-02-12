@@ -281,7 +281,7 @@ public interface Constants {
     public static final String ATTR_FROMDATE = "fromdate";
 
     /** _more_ */
-    public static final String ATTR_SELECTTYPE = "selecttype";
+    public static final String ARG_SELECTTYPE = "selecttype";
 
 
     /** _more_ */
@@ -402,6 +402,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_ADDMETADATA = "addmetadata";
+
+    public static final String ARG_ALLENTRIES = "allentries";
 
     /** _more_ */
     public static final String ATTR_ADDMETADATA = "addmetadata";

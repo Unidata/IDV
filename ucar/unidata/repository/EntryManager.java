@@ -1790,14 +1790,15 @@ return new Result(title, sb);
                 sb.append("You need to add a destination group to your cart or your favorites");
             }
 
-            /** TODO:
+            
+
+            /*
             if(didOne) {
                 sb.append(msgLabel("Or select one here"));
             } 
             sb.append(HtmlUtil.br());
             sb.append(getTreeLink(request, getTopGroup(), ""));
-            **/
-
+            */
             return addEntryHeader(request, entries.get(0),
                                   new Result(msg("Entry Move/Copy"), sb));
         }
@@ -2785,7 +2786,8 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected String getAjaxLink(Request request, Entry entry,
+    protected String getAjaxLink(Request request, 
+                                 Entry entry,
                                  String linkText, 
                                  String url,
                                  boolean forTreeNavigation)
@@ -2810,35 +2812,35 @@ return new Result(title, sb);
 
 
         boolean okToMove = !request.getUser().getAnonymous();
-        String dropEvent = HtmlUtil.onMouseUp("mouseUpOnEntry(event,'"
-                                              + entry.getId() + "')");
+        String dropEvent = (!entry.isGroup()?"":HtmlUtil.onMouseUp(HtmlUtil.call("mouseUpOnEntry",
+                                                                                 HtmlUtil.comma("event",
+                                                                                                HtmlUtil.squote(entry.getId())))));
 
         String compId = "popup_" + HtmlUtil.blockCnt++;
         String linkId = "img_" + uid;
 
         if (entry.isGroup() && forTreeNavigation) {
             event.append(HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
-                                                        HtmlUtil.squote(uid) +","+
-                                                        HtmlUtil.squote(folderClickUrl)
-                                                        + ","+HtmlUtil.squote(iconUrl(ICON_FOLDER_OPEN)))));
+                                                             HtmlUtil.comma(
+                                                                 HtmlUtil.squote(uid),
+                                                                 HtmlUtil.squote(folderClickUrl),
+                                                                 HtmlUtil.squote(iconUrl(ICON_FOLDER_OPEN))))));
         } 
 
         if (okToMove) {
-            event.append(((entry.isGroup() && forTreeNavigation)
-                      ? HtmlUtil.onMouseOver("mouseOverOnEntry(event,"
-                                             + HtmlUtil.squote(entryId) + ")")
-                      : ""));
-            event.append(HtmlUtil.onMouseOut("mouseOutOnEntry(event,"
-                                             + HtmlUtil.squote(entryId) + ")"));
-            event.append(HtmlUtil.onMouseDown("mouseDownOnEntry(event,"
-                                              + HtmlUtil.squote(entryId) + ","
-                                              + HtmlUtil
-                                              .squote(entry.getLabel()
-                                                      .replace("'",
-                                                               "")) + ");") + (entry
-                                                                               .isGroup()
-                                                                               ? dropEvent
-                                                                               : ""));
+            if(entry.isGroup() && forTreeNavigation) {
+                event.append(HtmlUtil.onMouseOver(HtmlUtil.call("mouseOverOnEntry",
+                                                                HtmlUtil.comma("event",
+                                                                               HtmlUtil.squote(entryId)))));
+            }
+            event.append(HtmlUtil.onMouseOut(HtmlUtil.call("mouseOutOnEntry",
+                                                           HtmlUtil.comma("event", HtmlUtil.squote(entryId)))));
+
+            event.append(HtmlUtil.onMouseDown(HtmlUtil.call("mouseDownOnEntry",
+                                                           HtmlUtil.comma("event",
+                                                                          HtmlUtil.squote(entryId),
+                                                                          HtmlUtil.squote(entry.getLabel().replace("'",""))))));
+            event.append(dropEvent);
         }
         
         String img = HtmlUtil.img(getIconUrl(request, entry),
@@ -2884,14 +2886,13 @@ return new Result(title, sb);
         String qid       = HtmlUtil.squote(elementId);
         String linkId    = "link_" + (HtmlUtil.blockCnt++);
         String qlinkId   = HtmlUtil.squote(linkId);
-        String tooltipEvents = HtmlUtil.onMouseOver(
-                                   "tooltip.onMouseOver(event," + qid + ","
-                                   + qlinkId + ");") + HtmlUtil.onMouseOut(
-                                       "tooltip.onMouseOut(event," + qid
-                                       + "," + qlinkId
-                                       + ");") + HtmlUtil.onMouseMove(
-                                           "tooltip.onMouseMove(event," + qid
-                                           + "," + qlinkId + ");");
+        String tooltipEvents = HtmlUtil.onMouseOver(HtmlUtil.call("tooltip.onMouseOver",
+                                                                  HtmlUtil.comma("event",qid, qlinkId))) 
+            + HtmlUtil.onMouseOut(HtmlUtil.call("tooltip.onMouseOut",
+                                                HtmlUtil.comma("event", qid, qlinkId))) 
+
+            + HtmlUtil.onMouseMove(HtmlUtil.call("tooltip.onMouseMove", 
+                                                 HtmlUtil.comma("event" ,qid, qlinkId)));
 
         return HtmlUtil.href(url, linkText,
                              HtmlUtil.id(linkId) + " " + tooltipEvents);
