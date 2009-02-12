@@ -356,6 +356,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_DATASET = "dataset";
+    public static final String ARG_SHOWLINK = "showlink";
 
 
     /** _more_          */
@@ -690,9 +691,12 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_FROM = "from";
 
+
     /** _more_ */
     public static final String ARG_TO = "to";
+    public static final String ARG_TONAME = "toname";
 
+    public static final String ARG_ONLYGROUPS = "onlygroups";
 
     /** _more_ */
 

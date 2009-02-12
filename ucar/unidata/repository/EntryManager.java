@@ -1738,7 +1738,7 @@ return new Result(title, sb);
                     getRepository().URL_ENTRY_SHOW, entries.get(0)));
         }
 
-        if ( !request.exists(ARG_TO)) {
+        if ( !request.exists(ARG_TO) && !request.exists(ARG_TONAME)) {
             StringBuffer sb     = new StringBuffer();
             List<Entry>  cart   = getUserManager().getCart(request);
             boolean      didOne = false;
@@ -1784,29 +1784,42 @@ return new Result(title, sb);
                 didOne = true;
             }
 
-            if ( !didOne) {
-                sb.append(
-                    getRepository().note(
-                        msg(
-                        "You need to add a destination group to your cart")));
-            } else {
+            if (didOne) {
                 sb.append("</ul>");
+            } else {
+                sb.append("You need to add a destination group to your cart or your favorites");
             }
+
+            /** TODO:
+            if(didOne) {
+                sb.append(msgLabel("Or select one here"));
+            } 
+            sb.append(HtmlUtil.br());
+            sb.append(getTreeLink(request, getTopGroup(), ""));
+            **/
+
             return addEntryHeader(request, entries.get(0),
                                   new Result(msg("Entry Move/Copy"), sb));
         }
 
 
-        String toId = request.getString(ARG_TO, "");
-        if (toId == null) {
+        String toId = request.getString(ARG_TO, (String)null);
+        String toName = request.getString(ARG_TONAME, (String)null);
+        if (toId == null && toName == null) {
             throw new IllegalArgumentException(
                 "No destination group specified");
         }
 
-        Entry toEntry = getEntry(request, toId);
+
+        Entry toEntry;
+        if(toId!=null) {
+            toEntry = getEntry(request, toId);
+        } else {
+            toEntry = findGroupFromName(toName,request.getUser(),false);
+        }
         if (toEntry == null) {
             throw new RepositoryUtil.MissingEntryException(
-                "Could not find entry " + toId);
+                "Could not find entry " + (toId==null?toName:toId));
         }
         if ( !toEntry.isGroup()) {
             throw new IllegalArgumentException(
@@ -2720,23 +2733,6 @@ return new Result(title, sb);
     }
 
 
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    protected String getAjaxLink(Request request, Entry entry)
-            throws Exception {
-        return getAjaxLink(request, entry, entry.getLabel(), true);
-    }
-
     /**
      * _more_
      *
@@ -2750,11 +2746,10 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     protected String getAjaxLink(Request request, Entry entry,
-                                 String linkText, boolean includeIcon)
+                                 String linkText)
             throws Exception {
         return getAjaxLink(request, entry, linkText,
-                           request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                            entry), includeIcon);
+                           null);
     }
 
     /**
@@ -2771,10 +2766,8 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     protected String getAjaxLink(Request request, Entry entry,
-                                 String linkText, String url,
-                                 boolean includeIcon)
-            throws Exception {
-        return getAjaxLink(request, entry, linkText, url, includeIcon, true,true);
+                                 String linkText, String url)   throws Exception {
+        return getAjaxLink(request, entry, linkText, url, true);
     }
 
 
@@ -2793,10 +2786,9 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     protected String getAjaxLink(Request request, Entry entry,
-                                 String linkText, String url,
-                                 boolean includeIcon,
-                                 boolean forTreeNavigation, 
-                                 boolean showLink)
+                                 String linkText, 
+                                 String url,
+                                 boolean forTreeNavigation)
             throws Exception {
 
         if(url == null) {
@@ -2804,69 +2796,89 @@ return new Result(title, sb);
                                    entry);
         }
 
+        boolean showLink = request.get(ARG_SHOWLINK,true);
         StringBuffer sb      = new StringBuffer();
         String       entryId = entry.getId();
 
         String       uid     = "link_" + HtmlUtil.blockCnt++;
-        String event  = "";
-        if (includeIcon) {
-            boolean okToMove = !request.getUser().getAnonymous();
-            String  icon     = getIconUrl(request, entry);
-            String dropEvent = HtmlUtil.onMouseUp("mouseUpOnEntry(event,'"
-                                   + entry.getId() + "')");
+        StringBuffer event  = new StringBuffer();
+        String output = "groupxml";
+        String folderClickUrl = 
+            request.entryUrl(getRepository().URL_ENTRY_SHOW,entry)+
+            "&" + HtmlUtil.arg(ARG_OUTPUT, output) +
+            "&" + HtmlUtil.arg(ARG_SHOWLINK, ""+showLink);
 
-            String compId = "popup_" + HtmlUtil.blockCnt++;
-            String linkId = "img_" + uid;
 
-            if (entry.isGroup() && forTreeNavigation) {
-                event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
-                        HtmlUtil.squote(entryId) + "," + HtmlUtil.squote(uid)
-                        + ",null,'showLink=" + showLink +"',null,"
-                        + HtmlUtil.squote(iconUrl(ICON_FOLDER_OPEN))));
-            } else if ( !forTreeNavigation) {
-                event = HtmlUtil.onMouseClick("showMenu(event,"
-                        + HtmlUtil.squote(linkId) + ","
-                        + HtmlUtil.squote(compId) + ");");
-            }
+        boolean okToMove = !request.getUser().getAnonymous();
+        String dropEvent = HtmlUtil.onMouseUp("mouseUpOnEntry(event,'"
+                                              + entry.getId() + "')");
 
-            if (okToMove) {
-                event += ((entry.isGroup() && forTreeNavigation)
-                          ? HtmlUtil.onMouseOver("mouseOverOnEntry(event,"
-                          + HtmlUtil.squote(entryId) + ")")
-                          : "") + HtmlUtil
-                          .onMouseOut("mouseOutOnEntry(event,"
-                              + HtmlUtil.squote(entryId) + ")") + HtmlUtil
-                                  .onMouseDown("mouseDownOnEntry(event,"
-                                      + HtmlUtil.squote(entryId) + ","
-                                          + HtmlUtil
+        String compId = "popup_" + HtmlUtil.blockCnt++;
+        String linkId = "img_" + uid;
+
+        if (entry.isGroup() && forTreeNavigation) {
+            event.append(HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
+                                                        HtmlUtil.squote(uid) +","+
+                                                        HtmlUtil.squote(folderClickUrl)
+                                                        + ","+HtmlUtil.squote(iconUrl(ICON_FOLDER_OPEN)))));
+        } 
+
+        if (okToMove) {
+            event.append(((entry.isGroup() && forTreeNavigation)
+                      ? HtmlUtil.onMouseOver("mouseOverOnEntry(event,"
+                                             + HtmlUtil.squote(entryId) + ")")
+                      : ""));
+            event.append(HtmlUtil.onMouseOut("mouseOutOnEntry(event,"
+                                             + HtmlUtil.squote(entryId) + ")"));
+            event.append(HtmlUtil.onMouseDown("mouseDownOnEntry(event,"
+                                              + HtmlUtil.squote(entryId) + ","
+                                              + HtmlUtil
                                               .squote(entry.getLabel()
-                                                  .replace("'",
-                                                      "")) + ");") + (entry
-                                                          .isGroup()
-                        ? dropEvent
-                        : "");
-            }
-            String img = HtmlUtil.img(icon,
-                                      ((entry.isGroup() && forTreeNavigation)
-                                       ? msg("Click to open group") + "; "
-                                       : "") + (okToMove
-                    ? msg("Drag to move")
-                    : ""), HtmlUtil.id("img_" + uid) + event);
+                                                      .replace("'",
+                                                               "")) + ");") + (entry
+                                                                               .isGroup()
+                                                                               ? dropEvent
+                                                                               : ""));
+        }
+        
+        String img = HtmlUtil.img(getIconUrl(request, entry),
+                                  ((entry.isGroup() && forTreeNavigation)
+                                   ? msg("Click to open group") + "; "
+                                   : "") + (okToMove
+                                            ? msg("Drag to move")
+                                            : ""), HtmlUtil.id("img_" + uid) + event);
 
-
-
-
-            sb.append(img);
-            if ( !entry.isGroup() || !forTreeNavigation) {
-                //                String links = getEntryManager().getEntryActionsTable(request, entry,OutputType.TYPE_ALL);
-                //                sb.append(getRepository().makePopupDiv(links, compId, true));
-            }
-            sb.append(HtmlUtil.space(1));
-            getMetadataManager().decorateEntry(request, entry, sb, true);
+        sb.append(img);
+        sb.append(HtmlUtil.space(1));
+        getMetadataManager().decorateEntry(request, entry, sb, true);
+        if(showLink) {
+            sb.append(getTooltipLink(request, entry, linkText,url));
+        } else {
+            sb.append(HtmlUtil.span(linkText, event.toString()));
         }
 
+        String link = HtmlUtil.span(sb.toString(),
+                                    HtmlUtil.id("span_" + entry.getId()));
+
+        link = link + HtmlUtil.br()
+            + HtmlUtil.div("",
+                           HtmlUtil.attrs(HtmlUtil.ATTR_STYLE,
+                                          "display:none;visibility:hidden",
+                                          HtmlUtil.ATTR_CLASS, "folderblock",
+                                          HtmlUtil.ATTR_ID, uid));
+        return link;
+
+    }
 
 
+
+    public String getTooltipLink(Request request, Entry entry, 
+                                 String linkText,
+                                 String url) throws Exception {
+        if(url == null) {
+            url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                   entry);
+        }
 
         String elementId = entry.getId();
         String qid       = HtmlUtil.squote(elementId);
@@ -2880,31 +2892,10 @@ return new Result(title, sb);
                                        + ");") + HtmlUtil.onMouseMove(
                                            "tooltip.onMouseMove(event," + qid
                                            + "," + qlinkId + ");");
-        if(showLink) {
-            sb.append(HtmlUtil.href(url, linkText,
-                                    HtmlUtil.id(linkId) + " " + tooltipEvents));
-        } else {
-            sb.append(HtmlUtil.span(linkText,HtmlUtil.id(linkId) + " " + tooltipEvents));
-        }
 
-        String link = HtmlUtil.span(sb.toString(),
-                                    HtmlUtil.id("span_" + entry.getId()));
-
-
-        if (includeIcon) {
-            link = link + "<br>"
-                   + HtmlUtil.div("",
-                                  HtmlUtil.attrs(HtmlUtil.ATTR_STYLE,
-                                      "display:none;visibility:hidden",
-                                      HtmlUtil.ATTR_CLASS, "folderblock",
-                                      HtmlUtil.ATTR_ID, uid));
-        }
-        return link;
-
+        return HtmlUtil.href(url, linkText,
+                             HtmlUtil.id(linkId) + " " + tooltipEvents);
     }
-
-
-
 
 
     /**
@@ -3107,7 +3098,7 @@ return new Result(title, sb);
             }
             length += name.length();
             String link = ((requestUrl == null)
-                           ? getAjaxLink(request, parent, name, false)
+                           ? getTooltipLink(request, parent, name, null)
                            : HtmlUtil.href(request.entryUrl(requestUrl,
                                parent), name));
             breadcrumbs.add(0, link);
@@ -3116,8 +3107,8 @@ return new Result(title, sb);
             parent = findGroup(request, parent.getParentGroupId());
         }
         if (requestUrl == null) {
-            breadcrumbs.add(getAjaxLink(request, entry, entry.getLabel(),
-                                        false));
+            breadcrumbs.add(getTooltipLink(request, entry, entry.getLabel(),
+                                           null));
         } else {
             breadcrumbs.add(HtmlUtil.href(request.entryUrl(requestUrl,
                     entry), entry.getLabel()));
@@ -3199,7 +3190,7 @@ return new Result(title, sb);
             }
             length += name.length();
             titleList.add(0, name);
-            String link = getAjaxLink(request, parent, name, false);
+            String link = getTooltipLink(request, parent, name, null);
             breadcrumbs.add(0, link);
             parent = findGroup(request, parent.getParentGroupId());
         }
@@ -3211,8 +3202,8 @@ return new Result(title, sb);
         String links = getEntryManager().getEntryActionsTable(request, entry,
                            OutputType.TYPE_ALL);
         String entryLink = HtmlUtil.space(1)
-                           + getAjaxLink(request, entry, entry.getLabel(),
-                                         false);
+                           + getTooltipLink(request, entry, entry.getLabel(),
+                                            null);
 
         if (makeLinkForLastGroup) {
             breadcrumbs.add(entryLink);

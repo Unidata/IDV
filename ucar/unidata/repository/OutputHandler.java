@@ -660,13 +660,19 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         String       icon     = getEntryManager().getIconUrl(request, entry);
         String       event;
         String       uid = "link_" + HtmlUtil.blockCnt++;
+        String folderClickUrl = 
+            request.entryUrl(getRepository().URL_ENTRY_SHOW,entry)+
+            "&" + HtmlUtil.arg(ARG_OUTPUT, "selectxml") +
+            "&" +HtmlUtil.arg(ATTR_TARGET, target) +
+            "&" +HtmlUtil.arg("allentries", ""+allEntries) +
+            "&" +HtmlUtil.arg(ATTR_SELECTTYPE,selectType);
+
         if (entry.isGroup()) {
             event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
-                    HtmlUtil.squote(entryId) + "," + HtmlUtil.squote(uid)
-                    + ",'selectxml',"
-                    + HtmlUtil.squote(ATTR_TARGET + "=" + target
-                                      + "&allentries=" + allEntries + "&"
-                                      + ATTR_SELECTTYPE + "=" + selectType)));
+                                                        HtmlUtil.squote(uid)
+                                                        + "," +
+                                                        HtmlUtil.squote(folderClickUrl)));
+
         } else {
             event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
                     HtmlUtil.squote(entryId) + "," + HtmlUtil.squote(uid)
@@ -892,12 +898,11 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 sb.append(HtmlUtil.space(1));
                 sb.append(getEntryManager().getBreadCrumbs(request, entry));
             } else {
-                sb.append(getEntryManager().getAjaxLink(request, entry,
-                        entry.getLabel(), true));
+                sb.append(getEntryManager().getAjaxLink(request, entry, entry.getLabel()));
             }
         }
         if (doForm) {
-            sb.append("</ul>");
+            sb.append(HtmlUtil.close(HtmlUtil.TAG_UL));
             sb.append(HtmlUtil.script(jsSB.toString()));
             sb.append(getEntryFormEnd(request, base));
         }
@@ -919,8 +924,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      */
     protected String getEntryLink(Request request, Entry entry)
             throws Exception {
-        return getEntryManager().getAjaxLink(request, entry,
-                                             entry.getLabel(), false);
+        return getEntryManager().getTooltipLink(request, entry,
+                                                entry.getLabel(), null);
     }
 
 
@@ -1416,8 +1421,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                + ((theLink != null)
                                   ? theLink.getLabel()
                                   : outputType.getLabel());
-                propertyValue = getEntryManager().getAjaxLink(myRequest,
-                        importEntry, label, url, false);
+                propertyValue = getEntryManager().getTooltipLink(myRequest,
+                                                                 importEntry, label, url);
             } else {
                 Result result = getEntryManager().processEntryShow(myRequest,
                                     importEntry);
@@ -1719,12 +1724,12 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                         request.entryUrl(getRepository().URL_ENTRY_SHOW,
                                          theEntry, ARG_OUTPUT,
                                          WikiPageOutputHandler.OUTPUT_WIKI);
-                    return getEntryManager().getAjaxLink(request, theEntry,
-                            label, url, false);
+                    return getEntryManager().getTooltipLink(request, theEntry,
+                                                            label, url);
 
                 } else {
-                    return getEntryManager().getAjaxLink(request, theEntry,
-                            label, false);
+                    return getEntryManager().getTooltipLink(request, theEntry,
+                                                            label,null);
                 }
             }
 

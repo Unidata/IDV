@@ -1303,8 +1303,9 @@ public class UserManager extends RepositoryManager {
                                         "Create an association")) + HtmlUtil.space(
                                             1) + entry.getLabel()));
                 } else if (splitScreen) {
+                    request.put(ARG_SHOWLINK,"false");
                     colSB.append(getEntryManager().getAjaxLink(request, entry,
-                                                               entry.getLabel(), null, true, true,false));
+                                                               entry.getLabel(), null));
 
                 } else {
                     String links = HtmlUtil.checkbox("entry_"
@@ -1333,13 +1334,19 @@ public class UserManager extends RepositoryManager {
             }
         }
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,
-                                HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "75%")));
+                                HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "100%")));
+
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TR,
                                 HtmlUtil.attr(HtmlUtil.ATTR_VALIGN, "top")));
+        int colCnt = 0;
         for (StringBuffer colSB : columns) {
+            colCnt++;
+            String extra = "";
+            if(colCnt==1) {
+                extra = HtmlUtil.style("border-right : 1px black solid;");
+            }
             sb.append(HtmlUtil.open(HtmlUtil.TAG_TD,
-                                    HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
-                                        "50%")));
+                                    HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"50%")+extra));
             if(splitScreen) {
                 sb.append(HtmlUtil.open(HtmlUtil.TAG_DIV,HtmlUtil.style("max-height: 600px; overflow-y: auto;")));
             } else {

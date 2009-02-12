@@ -2216,14 +2216,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             List favoriteLinks = new ArrayList();
             for (FavoriteEntry favorite : favoritesList) {
                 Entry  entry   = favorite.getEntry();
-                String baseUrl = request.entryUrl(URL_ENTRY_SHOW, entry);
-                String label   = entry.getLabel();
-                if (label.length() > 12) {
-                    //                    label = label.substring(0,11)+"...";
-                }
-                //                label = "<nobr>" + label+"</nobr>";
                 String url = getEntryManager().getAjaxLink(request, entry,
-                                                           label, baseUrl, true, false,true);
+                                                           entry.getLabel(), null, false);
                 String link = favoritesWrapper.replace("${link}", url);
                 favoriteLinks.add("<nobr>" + link + "<nobr>");
             }
@@ -2238,17 +2232,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                       "<b>Cart:<b><br>${entries}");
             List cartLinks = new ArrayList();
             for (Entry entry : cartEntries) {
-                String baseUrl = request.entryUrl(URL_ENTRY_SHOW, entry);
-                String label   = entry.getLabel();
-                if (label.length() > 12) {
-                    //                    label = label.substring(0,11)+"...";
-                }
-                //                label = "<nobr>" + label+"</nobr>";
                 String url = getEntryManager().getAjaxLink(request, entry,
-                                                           label, baseUrl, true, false,true);
+                                                           entry.getLabel(), null, false);
                 String link = favoritesWrapper.replace("${link}", url);
                 cartLinks.add("<nobr>" + link + "<nobr>");
-                //                cartLinks.add(link);
             }
             favorites.append(HtmlUtil.br());
             favorites.append(cartTemplate.replace("${entries}",

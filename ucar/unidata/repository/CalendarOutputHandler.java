@@ -227,8 +227,7 @@ public class CalendarOutputHandler extends OutputHandler {
                 colSB = new StringBuffer();
                 contents.put(key, colSB);
             }
-            colSB.append(getEntryManager().getAjaxLink(request, entry, time,
-                    true));
+            colSB.append(getEntryManager().getAjaxLink(request, entry, time));
             colSB.append(HtmlUtil.br());
         }
 
@@ -464,8 +463,7 @@ public class CalendarOutputHandler extends OutputHandler {
                     }
                     dayList.add(
                         HtmlUtil.nobr(
-                            getEntryManager().getAjaxLink(
-                                request, entry, label, true)));
+                            getEntryManager().getAjaxLink(request, entry, label)));
                 }
                 didone = true;
             }

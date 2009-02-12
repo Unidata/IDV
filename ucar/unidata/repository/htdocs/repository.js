@@ -288,7 +288,9 @@ function mouseUpOnEntry(event, id) {
     }
     if(draggedEntry && draggedEntry!=id) {
         url = "${urlroot}/entry/copy?action=action.move&from=" + draggedEntry +"&to=" + id;
-        document.location = url;
+//	alert(url);
+	window.open(url,'move window','') ;
+//        document.location = url;
     }
 }
 
@@ -432,6 +434,12 @@ tooltip = new Tooltip();
 document.onkeypress = tooltip.keyPressed;
 
 
+function handleKeyPress(event) {
+        c =util.getKeyChar(event);
+}
+
+document.onkeypress = handleKeyPress;
+
 
 
 function VisibilityGroup(img) {
@@ -495,15 +503,9 @@ function toggleBlockVisibility(id, imgid, showimg, hideimg) {
 
 var originalImages = new Array();
 var changeImages = new Array();
-var entryIds = new Array();
 
-function folderClick(entryId, uid, output,args,changeImg) {
+function folderClick(uid, url, changeImg) {
     changeImages[uid] = changeImg;
-    entryIds[uid] = entryId;
-    if (!output) output = "groupxml";
-    if(!args) args ="";
-    else args = "&" + args;
-
     var block = util.getDomObject('block_'+uid);
     if(!block) {
 	block = util.getDomObject(uid);    
@@ -519,7 +521,6 @@ function folderClick(entryId, uid, output,args,changeImg) {
         block.obj.isOpen = 1;
         showObject(block);
         if(img) img.obj.src = icon_progress;
-        url = "${urlroot}/entry/show?entryid=" + entryId +"&output=" + output+args;
 	util.loadXML( url, handleFolderList,uid);
     } else {
 	if(changeImg && img) {

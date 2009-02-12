@@ -793,16 +793,23 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb     = new StringBuffer();
         String       folder = iconUrl(ICON_FOLDER_CLOSED);
-        System.err.println(request);
+        boolean showLink = request.get(ARG_SHOWLINK,true);
+        boolean onlyGroups = request.get(ARG_ONLYGROUPS,false);
+
+        int cnt = 0;
         for (Group subGroup : subGroups) {
-            sb.append(getEntryManager().getAjaxLink(request, subGroup));
+            sb.append(getEntryManager().getAjaxLink(request, subGroup,subGroup.getLabel()));
+            cnt++;
         }
 
-        for (Entry entry : entries) {
-            sb.append(getEntryManager().getAjaxLink(request, entry));
+        if(!onlyGroups) {
+            for (Entry entry : entries) {
+                sb.append(getEntryManager().getAjaxLink(request, entry,entry.getLabel()));
+                cnt++;
+            }
         }
 
-        if ((subGroups.size() == 0) && (entries.size() == 0)) {
+        if (cnt==0) {
             sb.append("No sub-groups.");
             if (getAccessManager().hasPermissionSet(parent,
                     Permission.ACTION_VIEWCHILDREN)) {
