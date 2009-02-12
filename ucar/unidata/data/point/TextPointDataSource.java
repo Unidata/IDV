@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.point;
 
 
@@ -278,6 +279,37 @@ public class TextPointDataSource extends PointDataSource {
             contents  = IOUtil.readContents(source, getClass());
             delimiter = TextAdapter.getDelimiter(source);
         }
+
+        return makeObs(contents, delimiter, subset, bbox, trackParam,
+                       sampleIt, showAttributeGuiIfNeeded);
+    }
+
+
+
+    /**
+     * make the observations from the given datachoice
+     *
+     * @param contents The text contents
+     * @param delimiter The delimiter
+     * @param dataChoice the data choice
+     * @param subset data selection to subset with
+     * @param bbox bounding box to subset
+     * @param trackParam the parameter to use for thetrack
+     * @param sampleIt do we just sample or do we read the full set of obs
+     * @param showAttributeGuiIfNeeded popup the gui if we have a problem
+     *
+     * @return the field
+     *
+     * @throws Exception On badness
+     */
+
+    protected FieldImpl makeObs(String contents, String delimiter,
+                                DataSelection subset, LatLonRect bbox,
+                                String trackParam, boolean sampleIt,
+                                boolean showAttributeGuiIfNeeded)
+            throws Exception {
+
+
 
         FieldImpl obs = null;
         //        FieldImpl obs = (FieldImpl) getCache (source);
@@ -1544,7 +1576,7 @@ public class TextPointDataSource extends PointDataSource {
      *
      * @throws Exception On badness
      */
-    public static void main(String[] args) throws Exception {
+    public static void main2(String[] args) throws Exception {
         try {
             for (int i = 0; i < 1; i++) {
                 TextPointDataSource tpds = new TextPointDataSource();
@@ -1582,6 +1614,59 @@ public class TextPointDataSource extends PointDataSource {
         System.err.println("avg:" + (total / 4));
         //putCache (source, obs);
     }
+
+
+
+
+
+
+    /**
+     * main
+     *
+     * @param args args
+     *
+     * @throws Exception on badness
+     */
+    public static void main(String[] args) throws Exception {
+        if (args.length == 0) {
+            System.err.println(
+                "Usage: java PointObFactory headerfile <.csv files>");
+            return;
+        }
+        String header = IOUtil.readContents(args[0],
+                                            TextPointDataSource.class);
+        List toks = StringUtil.split(header, "\n", true, true);
+        if (toks.size() != 2) {
+            System.err.println("Bad header");
+            return;
+
+        }
+
+        Hashtable properties = new Hashtable();
+        properties.put(TextPointDataSource.PROP_HEADER_MAP, toks.get(0));
+        properties.put(TextPointDataSource.PROP_HEADER_PARAMS, toks.get(1));
+
+        for (int i = 1; i < args.length; i++) {
+            String csvFile = args[i];
+            TextPointDataSource dataSource =
+                new TextPointDataSource(new DataSourceDescriptor(), csvFile,
+                                        properties);
+
+
+            FieldImpl field = dataSource.makeObs(IOUtil.readContents(args[i],
+                                  TextPointDataSource.class), ",", null,
+                                      null, null, false, false);
+
+
+            String ncFile = IOUtil.stripExtension(args[i]) + ".nc";
+            System.err.println("Writing nc file:" + ncFile);
+            PointObFactory.writeToNetcdf(new File(ncFile), field);
+
+        }
+
+    }
+
+
 
 
     /**

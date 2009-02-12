@@ -54,6 +54,7 @@ import ucar.nc2.ft.point.writer.CFPointObWriter;
 import ucar.nc2.ft.point.writer.PointObVar;
 
 import ucar.unidata.data.DataAlias;
+import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.GeoLocationInfo;
@@ -64,6 +65,8 @@ import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.Station;
 
 import ucar.unidata.util.JobManager;
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -408,9 +411,9 @@ public class PointObFactory {
                     Unit unit = ((RealType) types[fieldIdx]).getDefaultUnit();
                     if (unit != null) {
                         pointObVar.setUnits(unit + "");
-                        System.err.println("Var:" + pointObVar.getName()
-                                           + " unit: "
-                                           + pointObVar.getUnits());
+                        //                        System.err.println("Var:" + pointObVar.getName()
+                        //                                           + " unit: "
+                        //                                           + pointObVar.getUnits());
                     }
 
                     pointObVar.setDataType(DataType.DOUBLE);
@@ -1317,6 +1320,8 @@ public class PointObFactory {
             DataChoice.addCurrentName(new TwoFacedObject("Point Data" + ">"
                     + var.getShortName(), var.getShortName()));
 
+            //            System.err.println("param "  + var.getShortName());
+            
             // now make types
             if (isVarNumeric[varIdx]) {  // RealType
                 Unit unit = DataUtil.parseUnit(var.getUnitsString());
@@ -2109,34 +2114,6 @@ public class PointObFactory {
     }
 
 
-
-
-
-    /**
-     * main
-     *
-     * @param args args
-     *
-     * @throws Exception on badness
-     */
-    public static void main(String[] args) throws Exception {
-        Real           lat  = new Real(RealType.Latitude, 40.0);
-        Real           lon  = new Real(RealType.Longitude, -100.0);
-        Real           alt  = new Real(RealType.Altitude, 0);
-        java.util.Date dttm = new java.util.Date(1000);
-        for (int j = 0; j < 10; j++) {
-            List l  = new ArrayList(100000);
-            long t1 = System.currentTimeMillis();
-            //            DateTime[]da= new DateTime[100000];
-            GregorianCalendar utcCalendar;
-            Hashtable         ht = new Hashtable();
-            for (int i = 0; i < 100000; i++) {
-                new DateTime(dttm);
-            }
-            long t2 = System.currentTimeMillis();
-            System.err.println("time:" + (t2 - t1));
-        }
-    }
 
 
 
