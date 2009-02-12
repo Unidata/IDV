@@ -29,6 +29,7 @@ import ucar.unidata.xml.XmlUtil;
 
 import java.lang.reflect.*;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -254,6 +255,22 @@ public class HtmlUtil {
      */
     public static String open(String comp) {
         return "<" + comp + ">";
+    }
+
+    public static String comma(String s1, String s2) {
+        return comma(new String[]{s1,s2});
+    }
+
+    public static String comma(String s1, String s2,String s3) {
+        return comma(new String[]{s1,s2,s3});
+    }
+
+    public static String comma(String s1, String s2,String s3,String s4) {
+        return comma(new String[]{s1,s2,s3,s4});
+    }
+
+    public static String comma(String[] s) {
+        return StringUtil.join(",", s);
     }
 
 
@@ -760,6 +777,15 @@ public class HtmlUtil {
             addAmpersand = true;
         }
         return url;
+    }
+
+
+    public static String args(String[] args) {
+        List<String>a = new ArrayList<String>();
+        for(int i=0;i<args.length;i+=2) {
+            a.add(arg(args[i],args[i+1]));
+        }            
+        return StringUtil.join("&", a);
     }
 
 
