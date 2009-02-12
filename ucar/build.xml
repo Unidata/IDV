@@ -671,6 +671,26 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
         </jar>
     </target>
 
+
+
+    <target name="texttonc" depends="init">
+        <jar
+            basedir="${compiledir}"
+            compress="true"
+            jarfile="${jars_dest}/texttonc.jar"
+            excludes="${excludes}"
+        >
+           <manifest>
+              <attribute name="Implementation-Title" value="Unidata's Integrated Data Viewer (IDV)"/>
+              <attribute name="Implementation-Version" value="${idv.version}"/>
+              <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
+              <attribute name="Main-class" value="ucar.unidata.data.point.TextPointDataSource"/>
+              <attribute name="Class-Path" value="idv.jar auxdata.jar local-visad.jar visad.jar jython.jar external.jar ncIdv.jar"/>
+            </manifest> 
+            <include name="ucar/**/README*"/>
+        </jar>
+    </target>
+
 <!-- TODO: What do we want zipped up here? -->
     <target name="ziphelp" depends="init">
         <zip
