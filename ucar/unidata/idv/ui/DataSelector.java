@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -33,10 +34,7 @@ import ucar.unidata.data.DataSourceFactory;
 import ucar.unidata.data.DerivedDataChoice;
 import ucar.unidata.data.DescriptorDataSource;
 
-
-
 import ucar.unidata.idv.*;
-
 
 import ucar.unidata.ui.ButtonTabbedPane;
 
@@ -47,11 +45,8 @@ import ucar.unidata.util.Msg;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
-
 import java.awt.*;
 import java.awt.event.*;
-
-
 
 import java.io.File;
 
@@ -64,8 +59,6 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
-
-
 import javax.swing.tree.*;
 
 
@@ -834,7 +827,22 @@ public class DataSelector extends DataSourceHolder {
                     if (selectedChoice != null) {
                         dcd.setDataChoice(selectedChoice);
                     } else {
-                        dcd.setDataChoice(null);
+                        String choiceName =
+                            (String) dataSource.getProperty(
+                                DataSource.PROP_DATACHOICENAME);
+                        if (choiceName != null) {
+                            selectedChoice = dataSource.findDataChoice(
+                                (Object) choiceName);
+                            if (selectedChoice != null) {
+                                List selectedChoices = new ArrayList();
+                                selectedChoices.add(selectedChoice);
+                                dataTree.selectChoices(selectedChoices, true);
+                            } else {
+                                dcd.setDataChoice(null);
+                            }
+                        } else {
+                            dcd.setDataChoice(null);
+                        }
                     }
                 }
             });
