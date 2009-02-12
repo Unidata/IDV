@@ -155,10 +155,6 @@ public class HtmlUtil {
     public static final String TAG_UL = "ul";
 
 
-
-
-
-
     /** _more_          */
     public static final String ATTR_ACTION = "action";
 
@@ -756,8 +752,7 @@ public class HtmlUtil {
                 url = url + "&";
             }
             try {
-                url = url + args[i] + "="
-                      + java.net.URLEncoder.encode(args[i + 1], "UTF-8");
+                url = url + arg(args[i], args[i+1]);
             } catch (Exception exc) {
                 System.err.println("error encoding arg:" + args[i + 1] + " "
                                    + exc);
@@ -765,6 +760,18 @@ public class HtmlUtil {
             addAmpersand = true;
         }
         return url;
+    }
+
+
+    public static String arg(String name, String value) {
+        try {
+            return name + "="
+                + java.net.URLEncoder.encode(value, "UTF-8");
+        } catch (Exception exc) {
+            System.err.println("error encoding arg:" + value + " "
+                               + exc);
+            return "";
+        }
     }
 
 
