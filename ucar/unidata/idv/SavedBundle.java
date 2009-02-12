@@ -126,6 +126,7 @@ public class SavedBundle {
     public SavedBundle(Element node, String dirRoot,
                        IdvResourceManager resourceManager, boolean local) {
 
+        this.type = type;
         this.local = local;
         String typeString = XmlUtil.getAttribute(node, ATTR_TYPE, "favorite");
         if (typeString.equals(VALUE_FAVORITE)) {
@@ -136,8 +137,11 @@ public class SavedBundle {
             type = TYPE_DISPLAY;
         }
 
+
         this.url = resourceManager.getResourcePath(XmlUtil.getAttribute(node,
                 ATTR_URL));
+
+
         if ( !url.startsWith("/") && !url.startsWith("http:")
                 && !url.startsWith("ftp:")) {
             url = dirRoot + "/" + url;
@@ -185,11 +189,18 @@ public class SavedBundle {
      */
     public SavedBundle(String url, String name, List categories,
                        Object prototype, boolean local) {
+        this(url,name,categories, prototype, local, TYPE_FAVORITE);
+    }
+
+
+    public SavedBundle(String url, String name, List categories,
+                       Object prototype, boolean local, int type) {
         this.url        = url;
         this.name       = name;
         this.categories = new ArrayList(categories);
         this.prototype  = prototype;
         this.local      = local;
+        this.type = type;
     }
 
     /**
@@ -237,7 +248,6 @@ public class SavedBundle {
         } else {
             node.setAttribute(ATTR_TYPE, VALUE_FAVORITE);
         }
-
         root.appendChild(node);
     }
 
@@ -276,10 +286,10 @@ public class SavedBundle {
      *
      * @return List of SavedBundle objects
      */
-    public static List processBundleXml(Element root, String dirRoot,
+    public static List<SavedBundle> processBundleXml(Element root, String dirRoot,
                                         IdvResourceManager resourceManager,
                                         boolean local) {
-        List bundles = new ArrayList();
+        List<SavedBundle> bundles = new ArrayList<SavedBundle>();
         if (root == null) {
             return bundles;
         }

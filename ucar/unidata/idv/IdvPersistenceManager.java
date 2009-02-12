@@ -154,7 +154,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
 
     /** Holds the list of SavedBundle objects created from the bundles.xml */
-    private List bundlesFromXml;
+    private List<SavedBundle> bundlesFromXml;
 
     /** JCheckBox for saving the view state */
     private JCheckBox saveViewStateCbx;
@@ -217,10 +217,10 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     private boolean saveData = false;
 
     /** A cached list of the display templates in the users directory */
-    private List displayTemplates;
+    private List<SavedBundle> displayTemplates;
 
     /** List of bundles for saved data sources */
-    private List dataSourceBundles;
+    private List<SavedBundle> dataSourceBundles;
 
 
     /**
@@ -389,7 +389,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                   IOUtil.getFileTail(file.toString()));
                 File newFile = new File("");
                 SavedBundle savedBundle = new SavedBundle(newFile.toString(),
-                                              name, categories, true);
+                                                          name, categories, null, true,types[i]);
                 //              System.err.println (types[i] + " cats:" +savedBundle.getCategories() +" " + savedBundle);
             }
         }
@@ -406,7 +406,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @param l List of control descriptors to add to
      */
     public void getControlDescriptors(List l) {
-        List templates = getDisplayTemplates();
+        List<SavedBundle> templates = getDisplayTemplates();
         for (int i = 0; i < templates.size(); i++) {
             SavedBundle bundle = (SavedBundle) templates.get(i);
             l.add(new ControlDescriptor(
@@ -495,7 +495,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @param categories Categories for the SavedBundle objects
      * @param file Where to look
      */
-    private void loadBundlesInDirectory(List allBundles, List categories,
+    private void loadBundlesInDirectory(List<SavedBundle> allBundles, List categories,
                                         File file) {
         String[] localBundles =
             file.list(getArgsManager().getXidvZidvFileFilter());
@@ -505,7 +505,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             allBundles.add(
                 new SavedBundle(
                     filename, IOUtil.stripExtension(localBundles[i]),
-                    categories, true));
+                    categories, null, true,SavedBundle.TYPE_FAVORITE));
         }
     }
 
@@ -561,12 +561,11 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      *
      * @return bundles.xml
      */
-    public static String getBundleXml(List bundles,
+    public static String getBundleXml(List<SavedBundle> bundles,
                                       boolean includeCategoryInUrl) {
         Document doc  = XmlUtil.makeDocument();
         Element  root = doc.createElement(SavedBundle.TAG_BUNDLES);
-        for (int i = 0; i < bundles.size(); i++) {
-            SavedBundle savedBundle = (SavedBundle) bundles.get(i);
+        for (SavedBundle savedBundle: bundles) {
             savedBundle.toXml(doc, root, includeCategoryInUrl);
         }
         return XmlUtil.toString(root);
@@ -582,9 +581,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      *
      * @return list of bundles
      */
-    public List getXmlBundles(int type) {
+    public List<SavedBundle> getXmlBundles(int type) {
         if (bundlesFromXml == null) {
-            bundlesFromXml = new ArrayList();
+            bundlesFromXml = new ArrayList<SavedBundle>();
             XmlResourceCollection resources =
                 getResourceManager().getXmlResources(
                     IdvResourceManager.RSC_BUNDLEXML);
@@ -605,12 +604,12 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 LogUtil.logException("Error loading bundles xml", exc);
             }
         }
-        List subset = new ArrayList();
-        for (int i = 0; i < bundlesFromXml.size(); i++) {
+        List<SavedBundle> subset = new ArrayList<SavedBundle>();
+
+        for(SavedBundle savedBundle: bundlesFromXml) {
             if ((type == BUNDLES_ALL)
-                    || ((SavedBundle) bundlesFromXml.get(i)).getType()
-                       == type) {
-                subset.add(bundlesFromXml.get(i));
+                || savedBundle.getType() == type) {
+                subset.add(savedBundle);
             }
         }
         return subset;
@@ -622,8 +621,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      *
      * @return List of saved bundles
      */
-    public List getFavorites() {
-        List allBundles = getLocalBundles();
+    public List<SavedBundle> getFavorites() {
+        List<SavedBundle> allBundles = getLocalBundles();
         allBundles.addAll(getXmlBundles(BUNDLES_FAVORITES));
         return allBundles;
     }
@@ -798,7 +797,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             File newFile =
                 new File(IOUtil.joinDir(IOUtil.getFileRoot(bundle.getUrl()),
                                         filename + ext));
-            System.err.println(newFile);
+            //            System.err.println(newFile);
 
             if (newFile.exists()) {
                 LogUtil.userMessage("A file with the name: " + filename
@@ -906,7 +905,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @return Full path to the selected file.
      */
     private String getCategorizedFile(String title, String filename,
-                                      List bundles, final String topDir,
+                                      List<SavedBundle> bundles, final String topDir,
                                       List defaultCategories, String suffix,
                                       boolean showSubsetPanel) {
 
@@ -1585,7 +1584,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      *
      * @return List of bundles
      */
-    public List getBundles(int bundleType) {
+    public List<SavedBundle> getBundles(int bundleType) {
         if (bundleType == BUNDLES_FAVORITES) {
             return getFavorites();
         }
@@ -1772,8 +1771,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      *
      * @return List of saved bundles
      */
-    public List getLocalBundles() {
-        List   allBundles = new ArrayList();
+    public List<SavedBundle> getLocalBundles() {
+        List<SavedBundle>   allBundles = new ArrayList<SavedBundle>();
         List   bundleDirs = Misc.newList(getStore().getLocalBundlesDir());
         String sitePath   = getResourceManager().getSitePath();
 
@@ -1804,9 +1803,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      *
      * @return data source bundle list
      */
-    public List getDataSourceBundles() {
+    public List<SavedBundle> getDataSourceBundles() {
         if (dataSourceBundles == null) {
-            dataSourceBundles = new ArrayList();
+            dataSourceBundles = new ArrayList<SavedBundle>();
             String topDir = getBundleDirectory(BUNDLES_DATA);
             List   dirs   = IOUtil.getDirectories(new File(topDir), true);
             for (int dirIdx = 0; dirIdx < dirs.size(); dirIdx++) {
@@ -1820,9 +1819,10 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                           file.toString());
                     String name = IOUtil.stripExtension(templateFiles[i]);
                     dataSourceBundles.add(new SavedBundle(filename, name,
-                            categories, true));
+                                                          categories, null, true,SavedBundle.TYPE_DATA));
                 }
             }
+
             dataSourceBundles.addAll(getXmlBundles(BUNDLES_DATA));
         }
         return dataSourceBundles;
@@ -1834,7 +1834,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      *
      * @return List of display template
      */
-    public List getDisplayTemplates() {
+    public List<SavedBundle> getDisplayTemplates() {
         if (displayTemplates == null) {
             displayTemplates = new ArrayList();
             String topDir = getBundleDirectory(BUNDLES_DISPLAY);
@@ -1854,7 +1854,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                           file.toString());
                     String name = IOUtil.stripExtension(templateFiles[i]);
                     displayTemplates.add(new SavedBundle(filename, name,
-                            categories, dc, true));
+                                                         categories, dc, true,SavedBundle.TYPE_DISPLAY));
                 }
             }
             displayTemplates.addAll(getXmlBundles(BUNDLES_DISPLAY));
