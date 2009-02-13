@@ -900,6 +900,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 rowSB.append(HtmlUtil.space(1));
                 rowSB.append(getEntryManager().getBreadCrumbs(request, entry));
                 sb.append(rowSB);
+                sb.append(HtmlUtil.br());
             } else {
                 EntryLink entryLink  = getEntryManager().getAjaxLink(request, entry, entry.getLabel());
                 entryLink.setLink(rowSB + entryLink.getLink());
