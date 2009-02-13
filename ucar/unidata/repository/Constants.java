@@ -84,6 +84,9 @@ public interface Constants {
     /** _more_          */
     public static final String ICON_FAVORITE = "ramadda.icon.favorite";
 
+
+    public static final String ICON_METADATA_ADD = "ramadda.icon.metadata.add";
+
     /** _more_          */
     public static final String ICON_LOG = "ramadda.icon.log";
 
@@ -282,6 +285,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_SELECTTYPE = "selecttype";
+
+    public static final String ARG_SHORT = "short";
 
 
     /** _more_ */

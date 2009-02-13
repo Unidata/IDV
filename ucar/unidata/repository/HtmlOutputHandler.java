@@ -191,7 +191,7 @@ public class HtmlOutputHandler extends OutputHandler {
         String links = getEntryManager().getEntryActionsTable(request, entry,
                            OutputType.TYPE_ALL);
         String contents = HtmlUtil.makeTabs(Misc.newList(msg("Information"),
-                              msg("Links")), Misc.newList(sb.toString(),
+                              msg(LABEL_LINKS)), Misc.newList(sb.toString(),
                                   links), true, "tab_content");
 
         //        String       contents = sb.toString();
@@ -700,9 +700,9 @@ public class HtmlOutputHandler extends OutputHandler {
                         sb.append(
                             new Link(
                                 request.entryUrl(
-                                    getRepository().URL_ENTRY_FORM,
+                                    getMetadataManager().URL_METADATA_FORM,
                                     entry), iconUrl(ICON_EDIT),
-                                            msg("Edit Entry")));
+                                            msg("Edit Metadata")));
                         sb.append(
                             new Link(
                                 request.entryUrl(
@@ -923,7 +923,7 @@ public class HtmlOutputHandler extends OutputHandler {
         tabContent.add(getCommentBlock(request, entry));
         tabTitles.add(msg("Associations"));
         tabContent.add(getAssociationBlock(request, entry));
-        tabTitles.add(msg("Links"));
+        tabTitles.add(msg(LABEL_LINKS));
         tabContent.add(getEntryManager().getEntryActionsTable(request, entry,
                 OutputType.TYPE_ALL));
 

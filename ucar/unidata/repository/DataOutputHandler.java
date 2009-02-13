@@ -694,7 +694,7 @@ public class DataOutputHandler extends OutputHandler {
                     entry, Permission.ACTION_EDIT)) {
                 sb.append(HtmlUtil.p());
                 List<Entry> entries = (List<Entry>) Misc.newList(entry);
-                getEntryManager().addInitialMetadata(request, entries);
+                getEntryManager().addInitialMetadata(request, entries,request.get(ARG_SHORT,false));
                 getEntryManager().insertEntries(entries, false);
                 sb.append(getRepository().note("Metadata added"));
                 return makeLinksResult(request, "CDL", sb, new State(entry));
@@ -709,7 +709,11 @@ public class DataOutputHandler extends OutputHandler {
         if (getRepository().getAccessManager().canDoAction(request, entry,
                 Permission.ACTION_EDIT)) {
             request.put(ARG_ADDMETADATA, "true");
-            sb.append(HtmlUtil.href(request.getUrl(), "Add metadata"));
+            sb.append(HtmlUtil.href(request.getUrl()+"&"+HtmlUtil.arg(ARG_SHORT,"true"), msg("Add short metadata")));
+            sb.append(HtmlUtil.span("&nbsp;|&nbsp;",
+                                    HtmlUtil.cssClass("separator")));
+            
+            sb.append(HtmlUtil.href(request.getUrl(), msg("Add full metadata")));
         }
         NetcdfDataset dataset =
             getNetcdfDataset(entry.getResource().getFile());
@@ -923,7 +927,7 @@ public class DataOutputHandler extends OutputHandler {
                             List<Entry> entries =
                                 (List<Entry>) Misc.newList(newEntry);
                             getEntryManager().addInitialMetadata(request,
-                                    entries);
+                                                                 entries,request.get(ARG_SHORT,false));
                         }
                         getEntryManager().insertEntries(
                             Misc.newList(newEntry), true);

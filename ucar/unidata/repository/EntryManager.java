@@ -728,9 +728,7 @@ return new Result(title, sb);
             }
 
 
-            if (unzipArchive
-                    && !(resource.endsWith(".zip")
-                         || resource.endsWith(".jar"))) {
+            if (unzipArchive && !IOUtil.isZipFile(resource)) {
                 unzipArchive = false;
             }
 
@@ -950,7 +948,7 @@ return new Result(title, sb);
         }
 
         if (newEntry && request.get(ARG_ADDMETADATA, false)) {
-            addInitialMetadata(request, entries);
+            addInitialMetadata(request, entries,false);
         }
 
         insertEntries(entries, newEntry);
@@ -2230,7 +2228,7 @@ return new Result(title, sb);
                 if (XmlUtil.getAttribute(node, ATTR_ADDMETADATA, false)) {
                     List<Entry> tmpEntries =
                         (List<Entry>) Misc.newList(entry);
-                    addInitialMetadata(request, tmpEntries);
+                    addInitialMetadata(request, tmpEntries,false);
                 }
 
             } else if (node.getTagName().equals(TAG_ASSOCIATION)) {
@@ -4187,6 +4185,21 @@ return new Result(title, sb);
 
 
 
+    public Result addInitialMetadataToEntries(Request request, List<Entry> entries,boolean shortForm)
+            throws Exception {
+        StringBuffer sb = new StringBuffer();
+        List<Entry> changedEntries =  addInitialMetadata(request,  entries, shortForm);
+        if(changedEntries.size()==0) {
+            sb.append("No metadata added");
+        } else {
+            sb.append(changedEntries.size()+" entries changed");
+            getEntryManager().insertEntries(changedEntries, false);
+        }
+        if(entries.size()>0) {
+            return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, entries.get(0).getParentGroup(), ARG_MESSAGE,sb.toString()));
+        }
+        return new Result("Metadata", sb);
+    }
 
 
     /**
@@ -4197,12 +4210,18 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    public void addInitialMetadata(Request request, List<Entry> entries)
+    public List<Entry> addInitialMetadata(Request request, List<Entry> entries,boolean shortForm)
             throws Exception {
+        List<Entry> changedEntries = new ArrayList<Entry>();
         for (Entry theEntry : entries) {
+            if ( !getAccessManager().canDoAction(request, theEntry,
+                                                 Permission.ACTION_EDIT)) {
+                continue;
+            }
+
             Hashtable extra = new Hashtable();
             getMetadataManager().getMetadata(theEntry);
-            getMetadataManager().addInitialMetadata(request, theEntry, extra);
+            boolean changed =             getMetadataManager().addInitialMetadata(request, theEntry, extra,shortForm);
             if ( !theEntry.hasAreaDefined()
                     && (extra.get(ARG_MINLAT) != null)) {
                 theEntry.setSouth(Misc.getProperty(extra, ARG_MINLAT, 0.0));
@@ -4210,6 +4229,7 @@ return new Result(title, sb);
                 theEntry.setWest(Misc.getProperty(extra, ARG_MINLON, 0.0));
                 theEntry.setEast(Misc.getProperty(extra, ARG_MAXLON, 0.0));
                 theEntry.trimAreaResolution();
+                changed = true;
             }
             if ((extra.get(ARG_FROMDATE) != null)
                     && (theEntry.getStartDate()
@@ -4218,8 +4238,13 @@ return new Result(title, sb);
                 theEntry.setStartDate(
                     ((Date) extra.get(ARG_FROMDATE)).getTime());
                 theEntry.setEndDate(((Date) extra.get(ARG_TODATE)).getTime());
+                changed = true;
+            }
+            if(changed) {
+                changedEntries.add(theEntry);
             }
         }
+        return changedEntries;
     }
 
 

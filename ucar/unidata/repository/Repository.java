@@ -177,6 +177,17 @@ public class Repository extends RepositoryBase implements RequestHandler {
                        OutputType.TYPE_ACTION, "", ICON_DELETE);
 
 
+    /** _more_ */
+    public static final OutputType OUTPUT_METADATA_FULL =
+        new OutputType("Add full metadata", "repository.metadata.full",
+                       OutputType.TYPE_ACTION, "", ICON_METADATA_ADD);
+
+    /** _more_ */
+    public static final OutputType OUTPUT_METADATA_SHORT =
+        new OutputType("Add short metadata", "repository.metadata.short",
+                       OutputType.TYPE_ACTION, "", ICON_METADATA_ADD);
+
+
     /** _more_          */
     public static final OutputType OUTPUT_COPY =
         new OutputType("Copy/Move Entry", "repository.copy",
@@ -1557,7 +1568,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         OutputHandler outputHandler = new OutputHandler(getRepository(),
                                           "Entry Deleter") {
             public boolean canHandleOutput(OutputType output) {
-                return output.equals(OUTPUT_DELETER);
+                return output.equals(OUTPUT_DELETER) ||
+                    output.equals(OUTPUT_METADATA_SHORT) ||
+                    output.equals(OUTPUT_METADATA_FULL);
             }
             protected void getEntryLinks(Request request, State state,
                                          List<Link> links)
@@ -1565,14 +1578,35 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 if ( !state.isDummyGroup()) {
                     return;
                 }
+
+                boolean metadataOk = true;
+                for (Entry entry : state.getAllEntries()) {
+                    if ( !getAccessManager().canDoAction(request, entry,
+                            Permission.ACTION_EDIT)) {
+                        metadataOk = false;
+                        break;
+                    }
+                }
+                if(metadataOk) {
+                    links.add(makeLink(request, state.getEntry(),
+                                       OUTPUT_METADATA_SHORT));
+
+                    links.add(makeLink(request, state.getEntry(),
+                                       OUTPUT_METADATA_FULL));
+                }
+
+                boolean deleteOk = true;
                 for (Entry entry : state.getAllEntries()) {
                     if ( !getAccessManager().canDoAction(request, entry,
                             Permission.ACTION_DELETE)) {
-                        return;
+                        deleteOk = false;
+                        break;
                     }
                 }
-                links.add(makeLink(request, state.getEntry(),
-                                   OUTPUT_DELETER));
+                if(deleteOk) {
+                    links.add(makeLink(request, state.getEntry(),
+                                       OUTPUT_DELETER));
+                }
             }
 
 
@@ -1581,6 +1615,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                       List<Entry> entries)
                     throws Exception {
 
+                OutputType output = request.getOutput();
+                if(output.equals(OUTPUT_METADATA_SHORT)) {
+                    return getEntryManager().addInitialMetadataToEntries(request, entries,true);
+                }
+                if(output.equals(OUTPUT_METADATA_FULL)) {
+                    return getEntryManager().addInitialMetadataToEntries(request, entries,false);
+                }
+                
                 StringBuffer idBuffer = new StringBuffer();
                 entries.addAll(subGroups);
                 for (Entry entry : entries) {
@@ -2411,10 +2453,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         List<HtmlTemplate> theTemplates = templates;
         if (theTemplates == null) {
             theTemplates = new ArrayList<HtmlTemplate>();
-            for (String path : (List<String>) StringUtil.split(
-                    getProperty(
-                        PROP_HTML_TEMPLATES,
-                        "%resourcedir%/template.html"), ";", true, true)) {
+            for (String path :  StringUtil.split(
+                                                 getProperty(PROP_HTML_TEMPLATES,
+                                                             "%resourcedir%/template.html"), ";", true, true)) {
                 path = getStorageManager().localizePath(path);
                 try {
                     String resource = IOUtil.readContents(path, getClass());

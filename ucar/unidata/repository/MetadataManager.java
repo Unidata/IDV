@@ -288,10 +288,10 @@ public class MetadataManager extends RepositoryManager {
      * @return _more_
      */
     public List<Metadata> getInitialMetadata(Request request, Entry entry,
-                                             Hashtable extra) {
+                                             Hashtable extra,boolean shortForm) {
         List<Metadata> metadataList = new ArrayList<Metadata>();
         for (MetadataHandler handler : getMetadataHandlers()) {
-            handler.getInitialMetadata(request, entry, metadataList, extra);
+            handler.getInitialMetadata(request, entry, metadataList, extra,shortForm);
         }
         return metadataList;
     }
@@ -304,11 +304,15 @@ public class MetadataManager extends RepositoryManager {
      * @param entry _more_
      * @param extra _more_
      */
-    public void addInitialMetadata(Request request, Entry entry,
-                                   Hashtable extra) {
-        for (Metadata metadata : getInitialMetadata(request, entry, extra)) {
-            entry.addMetadata(metadata, true);
+    public boolean addInitialMetadata(Request request, Entry entry,
+                                   Hashtable extra,boolean shortForm) {
+        boolean changed = false;
+        for (Metadata metadata : getInitialMetadata(request, entry, extra,shortForm)) {
+            if(entry.addMetadata(metadata, true)) {
+                changed = true;
+            }
         }
+        return changed;
     }
 
 
@@ -713,6 +717,7 @@ public class MetadataManager extends RepositoryManager {
             sb.append(HtmlUtil.space(2));
             sb.append(HtmlUtil.submit(msg("Delete selected"), ARG_DELETE));
             sb.append(HtmlUtil.formTable());
+            StringBuffer jsSB= new StringBuffer();
             for (Metadata metadata : metadataList) {
                 metadata.setEntry(entry);
                 MetadataHandler metadataHandler =
@@ -725,12 +730,22 @@ public class MetadataManager extends RepositoryManager {
                 if (html == null) {
                     continue;
                 }
+                String cbxId = "cbx_" + metadata.getId();
                 String cbx = HtmlUtil.checkbox(ARG_METADATA_ID
                                  + SUFFIX_SELECT
-                                 + metadata.getId(), metadata.getId(), false);
+                                               + metadata.getId(), metadata.getId(), false,
+                                               HtmlUtil.id(cbxId)+" " +
+                                               HtmlUtil.attr(HtmlUtil.ATTR_TITLE,msg("Shift-click: select range; Control-click: toggle all"))+
+                                                             HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,HtmlUtil.call("checkboxClicked",
+                                                                                                               HtmlUtil.comma("event",HtmlUtil.squote(cbxId)))));
+
+                jsSB.append(HtmlUtil.call("addCheckbox",HtmlUtil.squote(cbxId)));
+                jsSB.append(";\n");
+
                 sb.append(HtmlUtil.rowTop(HtmlUtil.cols(cbx + html[0],
                         html[1])));
             }
+            sb.append(HtmlUtil.script(jsSB.toString()));
             sb.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.submit(msg("Change")));
             sb.append(HtmlUtil.space(2));

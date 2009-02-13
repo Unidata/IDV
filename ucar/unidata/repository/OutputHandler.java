@@ -85,6 +85,8 @@ import java.util.zip.*;
 public class OutputHandler extends RepositoryManager implements WikiUtil
     .WikiPageHandler {
 
+    public static final String LABEL_LINKS = "View &amp; Edit";
+
     /** _more_ */
     public static final OutputType OUTPUT_HTML = new OutputType("Entry",
                                                      "default.html",
@@ -862,20 +864,11 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             base = tuple[1];
             sb.append(tuple[2]);
         }
-        /*        sb.append("<ul" + HtmlUtil.cssClass("folderblock")
-                  + HtmlUtil.style("list-style-image : url("
-                                   + getRepository().iconUrl(ICON_BLANK)
-                                   + ")") + ">");
-        */
-        sb.append("<div" + HtmlUtil.cssClass("folderblock") +">");
-
-        //        String img = HtmlUtil.img(getRepository().iconUrl(ICON_FILE));
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_DIV, HtmlUtil.cssClass("folderblock")));
         int          cnt  = 0;
         StringBuffer jsSB = new StringBuffer();
         for (Entry entry : (List<Entry>) entries) {
             StringBuffer rowSB = new StringBuffer();
-
-            //            rowSB.append("<li>");
             if (doForm) {
                 String id = base + (cnt++);
                 String cbxId = "entry_" + entry.getId();
@@ -884,19 +877,17 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 jsSB.append(HtmlUtil.call("addCheckbox",HtmlUtil.squote(cbxId)));
                 jsSB.append(";\n");
                 rowSB.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
-
                 String cbx = HtmlUtil.checkbox(cbxId,
                                                "true", dfltSelected,HtmlUtil.id(cbxId)+" " +
-                                               "onClick=\"checkboxClicked(event,'" + cbxId +"');\" ");
+                                               HtmlUtil.attr(HtmlUtil.ATTR_TITLE,msg("Shift-click: select range; Control-click: toggle all"))+
+                                               HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,HtmlUtil.call("checkboxClicked",
+                                                                                                 HtmlUtil.comma("event",HtmlUtil.squote(cbxId)))));
                 cbx = HtmlUtil.span(cbx, HtmlUtil.id(id));
                 rowSB.append(cbx);
             }
 
             if (showCrumbs) {
-                String img =
-                    HtmlUtil.img(getEntryManager().getIconUrl(request,
-                        entry));
-                rowSB.append(img);
+                rowSB.append(HtmlUtil.img(getEntryManager().getIconUrl(request,entry)));
                 rowSB.append(HtmlUtil.space(1));
                 rowSB.append(getEntryManager().getBreadCrumbs(request, entry));
                 sb.append(rowSB);
@@ -1263,7 +1254,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             }
             return HtmlUtil.img(getImageUrl(request, entry), entry.getName());
         } else if (include.equals(WIKIPROP_LINKS)) {
-            blockTitle = Misc.getProperty(props, "title", msg("Links"));
+            blockTitle = Misc.getProperty(props, "title", msg(LABEL_LINKS));
             blockContent = getEntryManager().getEntryActionsTable(request,
                     entry, OutputType.TYPE_ALL);
         } else if (include.equals(WIKIPROP_COMMENTS)) {
