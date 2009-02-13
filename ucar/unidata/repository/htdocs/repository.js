@@ -432,10 +432,12 @@ function Tooltip () {
 tooltip = new Tooltip();
 
 document.onkeypress = tooltip.keyPressed;
+var keyEvent;
 
 
 function handleKeyPress(event) {
-        c =util.getKeyChar(event);
+    keyEvent = event;
+    c =util.getKeyChar(event);
 }
 
 document.onkeypress = handleKeyPress;
@@ -449,6 +451,64 @@ function VisibilityGroup(img) {
 	this.on = 1;
         this.groupAddEntry = groupAddEntry;
         this.groupToggleVisibility = groupToggleVisibility;
+}
+
+
+
+var checkboxes = new Array();
+var lastCbxClicked;
+
+function addCheckbox(id) {
+    var cbx = util.getDomObject(id);
+    if(cbx) {
+        checkboxes[checkboxes.length] = id;
+    }
+}
+
+
+
+function indexOf(array,object) {
+    for (i = 0; i <= array.length; i++) {
+        if(array[i] == object) return i;
+    }
+    return -1;
+}
+
+
+function checkboxClicked(event,id) {
+    if(!event) return;
+    var cbx = util.getDomObject(id);
+    var lastCbx = util.getDomObject(lastCbxClicked);
+    if(!cbx) return;
+    cbx = cbx.obj;
+
+    if(event.ctrlKey) {
+        var value = cbx.checked;
+        for (i = 0; i <= checkboxes.length; i++) {
+            var cbx = util.getDomObject(checkboxes[i]).obj;
+            cbx.checked=value;
+        }
+    }
+
+    if(event.shiftKey) {
+        if(lastCbx) {
+            var idx1 = indexOf(checkboxes, lastCbxClicked);
+            var idx2 = indexOf(checkboxes, id);
+            var value = lastCbx.obj.checked;
+            if(idx1>idx2) {
+                var tmp = idx1;
+                idx1=idx2;
+                idx2=tmp;
+            }
+
+            for(i=idx1;i<=idx2;i++) {
+                var cbx1 = util.getDomObject(checkboxes[i]).obj;
+                cbx1.checked=value;
+            }
+        }
+        return;
+    }
+    lastCbxClicked = id;
 }
 
 

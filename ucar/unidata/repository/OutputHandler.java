@@ -874,11 +874,16 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             sb.append("<li>");
             if (doForm) {
                 String id = base + (cnt++);
+                String cbxId = "entry_" + entry.getId();
                 jsSB.append(base + ".groupAddEntry(" + HtmlUtil.squote(id)
                             + ");\n");
+                jsSB.append(HtmlUtil.call("addCheckbox",HtmlUtil.squote(cbxId)));
+                jsSB.append(";\n");
                 sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
-                String cbx = HtmlUtil.checkbox("entry_" + entry.getId(),
-                                 "true", dfltSelected);
+
+                String cbx = HtmlUtil.checkbox(cbxId,
+                                               "true", dfltSelected,HtmlUtil.id(cbxId)+" " +
+                                               "onClick=\"checkboxClicked(event,'" + cbxId +"');\" ");
                 cbx = HtmlUtil.span(cbx, HtmlUtil.id(id));
                 sb.append(cbx);
             }
