@@ -1965,6 +1965,10 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String call(String function, String args) {
+        return function + "(" + args + ");";
+    }
+
+    public static String callln(String function, String args) {
         return function + "(" + args + ");\n";
     }
 
