@@ -2734,6 +2734,9 @@ return new Result(title, sb);
     }
 
 
+
+
+
     /**
      * _more_
      *
@@ -2746,7 +2749,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected String getAjaxLink(Request request, Entry entry,
+    protected EntryLink getAjaxLink(Request request, Entry entry,
                                  String linkText)
             throws Exception {
         return getAjaxLink(request, entry, linkText,
@@ -2766,7 +2769,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected String getAjaxLink(Request request, Entry entry,
+    protected EntryLink getAjaxLink(Request request, Entry entry,
                                  String linkText, String url)   throws Exception {
         return getAjaxLink(request, entry, linkText, url, true);
     }
@@ -2786,7 +2789,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected String getAjaxLink(Request request, 
+    protected EntryLink getAjaxLink(Request request, 
                                  Entry entry,
                                  String linkText, 
                                  String url,
@@ -2850,6 +2853,8 @@ return new Result(title, sb);
                                             ? msg("Drag to move")
                                             : ""), HtmlUtil.id("img_" + uid) + event);
 
+        //        StringBuffer row = new StringBuffer();
+
         sb.append(img);
         sb.append(HtmlUtil.space(1));
         getMetadataManager().decorateEntry(request, entry, sb, true);
@@ -2859,18 +2864,23 @@ return new Result(title, sb);
             sb.append(HtmlUtil.span(linkText, event.toString()));
         }
 
+
         String link = HtmlUtil.span(sb.toString(),
                                     HtmlUtil.id("span_" + entry.getId()));
 
-        link = link + HtmlUtil.br()
-            + HtmlUtil.div("",
+
+        String folderBlock = (!forTreeNavigation?"": HtmlUtil.div("",
                            HtmlUtil.attrs(HtmlUtil.ATTR_STYLE,
                                           "display:none;visibility:hidden",
                                           HtmlUtil.ATTR_CLASS, "folderblock",
-                                          HtmlUtil.ATTR_ID, uid));
-        return link;
+                                          HtmlUtil.ATTR_ID, uid)));
 
+        //        link = link + HtmlUtil.br()
+        //        return link;
+        return new EntryLink(link, folderBlock,uid);
     }
+
+
 
 
 

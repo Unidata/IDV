@@ -268,9 +268,12 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
+    public static final String DEFAULT_TIME_SHORTFORMAT = "yy/MM/dd HH:mm z";
 
     /** _more_ */
     protected SimpleDateFormat sdf;
+
+    protected SimpleDateFormat displaySdf;
 
     /** _more_ */
     protected SimpleDateFormat dateSdf =
@@ -348,12 +351,23 @@ public class RepositoryBase implements Constants, RepositorySource {
      */
     public String formatDate(Date d) {
         if (sdf == null) {
-            sdf = makeSDF(DEFAULT_TIME_FORMAT);
+            sdf = makeSDF(getProperty(PROP_DATE_FORMAT,DEFAULT_TIME_FORMAT));
         }
         if (d == null) {
             return BLANK;
         }
         return sdf.format(d);
+    }
+
+
+    public String formatDateShort(Request request, Date d) {
+        if (displaySdf == null) {
+            displaySdf = makeSDF(getProperty(PROP_DATE_SHORTFORMAT, DEFAULT_TIME_SHORTFORMAT));
+        }
+        if (d == null) {
+            return BLANK;
+        }
+        return displaySdf.format(d);
     }
 
 

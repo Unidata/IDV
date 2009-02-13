@@ -463,7 +463,7 @@ public class CalendarOutputHandler extends OutputHandler {
                     }
                     dayList.add(
                         HtmlUtil.nobr(
-                            getEntryManager().getAjaxLink(request, entry, label)));
+                            getEntryManager().getAjaxLink(request, entry, label).toString()));
                 }
                 didone = true;
             }

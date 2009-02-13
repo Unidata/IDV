@@ -862,16 +862,20 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             base = tuple[1];
             sb.append(tuple[2]);
         }
-        sb.append("<ul" + HtmlUtil.cssClass("folderblock")
+        /*        sb.append("<ul" + HtmlUtil.cssClass("folderblock")
                   + HtmlUtil.style("list-style-image : url("
                                    + getRepository().iconUrl(ICON_BLANK)
                                    + ")") + ">");
+        */
+        sb.append("<div" + HtmlUtil.cssClass("folderblock") +">");
 
         //        String img = HtmlUtil.img(getRepository().iconUrl(ICON_FILE));
         int          cnt  = 0;
         StringBuffer jsSB = new StringBuffer();
         for (Entry entry : (List<Entry>) entries) {
-            sb.append("<li>");
+            StringBuffer rowSB = new StringBuffer();
+
+            //            rowSB.append("<li>");
             if (doForm) {
                 String id = base + (cnt++);
                 String cbxId = "entry_" + entry.getId();
@@ -879,28 +883,31 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                             + ");\n");
                 jsSB.append(HtmlUtil.call("addCheckbox",HtmlUtil.squote(cbxId)));
                 jsSB.append(";\n");
-                sb.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
+                rowSB.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
 
                 String cbx = HtmlUtil.checkbox(cbxId,
                                                "true", dfltSelected,HtmlUtil.id(cbxId)+" " +
                                                "onClick=\"checkboxClicked(event,'" + cbxId +"');\" ");
                 cbx = HtmlUtil.span(cbx, HtmlUtil.id(id));
-                sb.append(cbx);
+                rowSB.append(cbx);
             }
 
             if (showCrumbs) {
                 String img =
                     HtmlUtil.img(getEntryManager().getIconUrl(request,
                         entry));
-                sb.append(img);
-                sb.append(HtmlUtil.space(1));
-                sb.append(getEntryManager().getBreadCrumbs(request, entry));
+                rowSB.append(img);
+                rowSB.append(HtmlUtil.space(1));
+                rowSB.append(getEntryManager().getBreadCrumbs(request, entry));
+                sb.append(rowSB);
             } else {
-                sb.append(getEntryManager().getAjaxLink(request, entry, entry.getLabel()));
+                EntryLink entryLink  = getEntryManager().getAjaxLink(request, entry, entry.getLabel());
+                entryLink.setLink(rowSB + entryLink.getLink());
+                decorateEntryRow(request, entry, sb,entryLink);
             }
         }
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_UL));
         if (doForm) {
-            sb.append(HtmlUtil.close(HtmlUtil.TAG_UL));
             sb.append(HtmlUtil.script(jsSB.toString()));
             sb.append(getEntryFormEnd(request, base));
         }
@@ -908,6 +915,37 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     }
 
 
+    protected void decorateEntryRow(Request request, Entry entry, StringBuffer sb, EntryLink link) {
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_DIV,HtmlUtil.cssClass("entryrow")));
+        sb.append("<table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tr><td>");
+        sb.append(link.getLink());
+        sb.append("</td><td align=right class=entryrowlabel>");
+        if(entry.getResource().isFile()) {
+            File   f    = entry.getResource().getFile();
+            //            sb.append(formatFileLength(f.length()));
+        }
+        sb.append(getRepository().formatDateShort(request, new Date(entry.getStartDate())));
+        String userLabel;
+        if(Misc.equals(request.getUser(), entry.getUser())) {
+            userLabel="me";
+        } else {
+            userLabel=entry.getUser().getId();
+        }
+        sb.append("</td><td width=\"1%\" align=right class=entryrowlabel>");
+        sb.append(HtmlUtil.space(1));
+            String userSearchLink =
+                HtmlUtil.href(
+                    HtmlUtil.url(
+                        request.url(getRepository().URL_USER_PROFILE),
+                        ARG_USER_ID,
+                        entry.getUser().getId()), userLabel,
+                            "title=\"View user profile\"");
+
+        sb.append(userSearchLink);
+        sb.append("</td></tr></table>");
+        sb.append(link.getFolderBlock());
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_DIV));
+    }
 
     /**
      * _more_

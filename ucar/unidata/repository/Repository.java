@@ -2216,9 +2216,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
             List favoriteLinks = new ArrayList();
             for (FavoriteEntry favorite : favoritesList) {
                 Entry  entry   = favorite.getEntry();
-                String url = getEntryManager().getAjaxLink(request, entry,
+                EntryLink entryLink= getEntryManager().getAjaxLink(request, entry,
                                                            entry.getLabel(), null, false);
-                String link = favoritesWrapper.replace("${link}", url);
+                String link = favoritesWrapper.replace("${link}", entryLink.toString());
                 favoriteLinks.add("<nobr>" + link + "<nobr>");
             }
             favorites.append(favoritesTemplate.replace("${entries}",
@@ -2232,9 +2232,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                       "<b>Cart:<b><br>${entries}");
             List cartLinks = new ArrayList();
             for (Entry entry : cartEntries) {
-                String url = getEntryManager().getAjaxLink(request, entry,
-                                                           entry.getLabel(), null, false);
-                String link = favoritesWrapper.replace("${link}", url);
+                EntryLink entryLink = getEntryManager().getAjaxLink(request, entry,
+                                                                          entry.getLabel(), null, false);
+                String link = favoritesWrapper.replace("${link}", entryLink.toString());
                 cartLinks.add("<nobr>" + link + "<nobr>");
             }
             favorites.append(HtmlUtil.br());

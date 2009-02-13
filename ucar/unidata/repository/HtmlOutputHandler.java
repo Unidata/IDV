@@ -798,13 +798,13 @@ public class HtmlOutputHandler extends OutputHandler {
 
         int cnt = 0;
         for (Group subGroup : subGroups) {
-            sb.append(getEntryManager().getAjaxLink(request, subGroup,subGroup.getLabel()));
+            decorateEntryRow(request,subGroup, sb, getEntryManager().getAjaxLink(request, subGroup,subGroup.getLabel()));
             cnt++;
         }
 
         if(!onlyGroups) {
             for (Entry entry : entries) {
-                sb.append(getEntryManager().getAjaxLink(request, entry,entry.getLabel()));
+                decorateEntryRow(request, entry, sb, getEntryManager().getAjaxLink(request, entry,entry.getLabel()));
                 cnt++;
             }
         }

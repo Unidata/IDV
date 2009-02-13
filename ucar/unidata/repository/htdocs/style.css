@@ -29,6 +29,26 @@ a:hover {
    text-align:center;
 }
 
+.entryrowlabel {
+    font-style:italic;
+    font-size:70%;
+}
+
+.entryrow {
+  margin-top:2px;
+}
+
+.folderblock {
+   border : 0px;
+   xborder : 1px red solid;
+   margin:0px;
+   padding:0px;
+   padding-left:18px;
+}
+
+
+
+
 .header {
   border-bottom : 1px black solid;
   background-repeat: no-repeat;
@@ -717,17 +737,6 @@ code.menu {
 }
 
 
-
-.folderblock {
-   margin:0px;
-   padding:0px;
-   padding-left:18px;
-}
-
-.folderblock li {
-   margin:0px;
-   padding:0px;   
-}
 
 
 .actionblock {

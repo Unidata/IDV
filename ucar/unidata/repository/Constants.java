@@ -794,6 +794,9 @@ public interface Constants {
     /** _more_          */
     public static final String PROP_SSL_PORT = "ramadda.ssl.port";
 
+    public static final String PROP_DATE_FORMAT = "ramadda.date.format";
+    public static final String PROP_DATE_SHORTFORMAT = "ramadda.date.shortformat";
+
     /** _more_          */
     public static final String PROP_SSL_IGNORE = "ramadda.ssl.ignore";
 
