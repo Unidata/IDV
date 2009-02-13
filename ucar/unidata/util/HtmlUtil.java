@@ -2273,7 +2273,12 @@ public class HtmlUtil {
      *
      * @param args _more_
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        System.err.println(java.net.URLEncoder.encode("&", "UTF-8"));
+        System.err.println(java.net.URLEncoder.encode("?", "UTF-8"));
+        if(true) return;
+
+
         Class        c  = HtmlUtil.class;
         StringBuffer sb = new StringBuffer();
         sb.append(

@@ -1294,6 +1294,12 @@ public class IOUtil {
     }
 
 
+    public static boolean isZipFile(String file) {
+        file = file.toLowerCase();
+        return file.endsWith(".zip") || file.endsWith(".jar") ||
+            file.endsWith(".zidv");
+    }
+
     /**
      * See if the content is in the perma-cache. If it is then return it.
      * Else read it (e.g., from  a url) and cache it.
