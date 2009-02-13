@@ -2174,6 +2174,9 @@ public class ProbeControl extends DisplayControlImpl {
         FieldImpl workingGrid = info.getWorkingGrid();
         if (workingGrid == null) {
             workingGrid = info.getGridDataInstance().getGrid();
+            if (workingGrid == null) {
+                return null;
+            }
             if (GridUtil.is3D(workingGrid)
                     && !GridUtil.isVolume(workingGrid)) {
                 workingGrid = GridUtil.make2DGridFromSlice(workingGrid,
