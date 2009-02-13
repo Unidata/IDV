@@ -585,7 +585,7 @@ public class IdvChooserManager extends IdvManager {
             String xml = "<skin>" + otherXml + "<ui>" + pre + sb.toString()
                          + post + "</ui></skin>";
             Element root  = XmlUtil.getRoot(xml);
-            XmlUi   xmlUi = new IdvXmlUi(getIdv(), root);
+            XmlUi   xmlUi = createXmlUi(root);
             collectIds(root);
             contents = (JComponent) xmlUi.getContents();
             pruneEmptyTabs(contents);
@@ -608,7 +608,14 @@ public class IdvChooserManager extends IdvManager {
 
     }
 
-
+    /**
+     * Factory method to create the IdvXmlUi to be used for the given chooser xml node
+     *
+     * @param root The chooser xml node
+     */
+    protected XmlUi createXmlUi(Element root) {
+        return new IdvXmlUi(getIdv(), root);
+    }
 
     /**
      * Remove any tabs in tabbed panes that do not contain any choosers
