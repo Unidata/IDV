@@ -2088,9 +2088,20 @@ public class XmlEncoder extends XmlUtil {
             Method theMethod = Misc.findMethod(object.getClass(), methodName,
                                    paramTypes);
             if (theMethod == null) {
+                /*
                 for (int i = 0; i < paramTypes.length; i++) {
-                    // System.err.println("type:" + paramTypes[i]);
+                    System.err.println("type:" + paramTypes[i]);
                 }
+                Method[]  methods = object.getClass().getMethods();
+                for (int i = 0; i < methods.length; i++) {
+                    if(methodName.equals(methods[i].getName())) {
+                        Class[]types = methods[i].getParameterTypes();
+                        for (int j = 0; j < types.length; j++) {
+                        }
+                    }
+                }
+                */
+
                 throw new IllegalArgumentException("Unable to find method: "
                         + object.getClass().getName() + "." + methodName);
             } else {
