@@ -51,6 +51,7 @@ import ucar.unidata.ui.symbol.StationModel;
 
 
 import ucar.unidata.util.ColorTable;
+import ucar.unidata.util.HtmlUtil;
 
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
@@ -1921,7 +1922,6 @@ public class PluginManager extends IdvManager {
                     Element root = XmlUtil.getRoot(tmpFile, getClass());
                     List bundles = SavedBundle.processBundleXml(root, dir,
                                        getResourceManager(), true);
-                    System.err.println("bundles:" + bundles);
                     addObjects(bundles);
                     continue;
                 }
@@ -2229,20 +2229,23 @@ public class PluginManager extends IdvManager {
         fileMenu.add(GuiUtils.makeMenuItem("Close", this,
                                            "closePluginDialog"));
 
-        JLabel lbl1 = new JLabel(
-                          GuiUtils.getImageIcon(
-                              "/auxdata/ui/icons/DocumentOpen16.png",
-                              getClass()));
-        JLabel lbl2 = new JLabel(
-                          GuiUtils.getImageIcon(
-                              "/auxdata/ui/icons/FindAgain16.gif",
-                              getClass()));
-        JComponent bottom = GuiUtils.hbox(new Component[] {
-                                new JLabel("Key:  "),
-                                lbl1,
-                                new JLabel(" Send to Plugin Creator      "),
-                                lbl2,
-                                new JLabel("View Contents") });
+        String []keys = {"/auxdata/ui/icons/add.png",
+                         "Install Plugin",
+                         "/auxdata/ui/icons/Delete16.gif",
+                         "Delete Plugin",
+                         "/auxdata/ui/icons/DocumentOpen16.png",
+                         "Send to Plugin Creator",
+                         "/auxdata/ui/icons/FindAgain16.gif",
+                         "View Contents"};
+
+        List<Component> keyComps = new ArrayList<Component>();
+        keyComps.add(new JLabel("Key:  "));
+        for(int keyIdx=0;keyIdx< keys.length;keyIdx+=2) {
+            keyComps.add(new JLabel(GuiUtils.getImageIcon(keys[keyIdx], getClass())));
+            keyComps.add(new JLabel(" " +keys[keyIdx+1]+"  "));
+        }
+
+        JComponent bottom = GuiUtils.hbox(keyComps);
         bottom   = GuiUtils.inset(bottom, 4);
         contents = GuiUtils.topCenterBottom(menuBar, contents, bottom);
 
@@ -2380,47 +2383,46 @@ public class PluginManager extends IdvManager {
             String sizeString = "";
             if (plugin.size != null) {
                 int s = new Integer(plugin.size).intValue();
-                sizeString = " <b>" + (s / 1000) + "KB</b>";
+                sizeString = "&nbsp;" + HtmlUtil.b((s / 1000) + "KB");
             }
 
-            catBuff.append(
-                "<tr valign=\"top\"><td align=\"right\" width=\"60\">"
-                + prefix + "</td><td width=\"30%\">" + plugin.name
-                + "</td><td align=\"right\">" + sizeString + "</td>");
-
+            StringBuffer addDelete = new StringBuffer();
             String installHtml =
                 "<a href=\"jython:idv.getPluginManager().installPlugin('"
                 + plugin.url + "')\">";
-            catBuff.append("<td width=\"30%\">");
+
             if ( !plugin.versionOk) {
-                catBuff.append("<b>requires IDV version: " + plugin.version
-                               + "</b>");
+                addDelete.append(HtmlUtil.b("requires IDV: " + plugin.version));
             } else if (plugin.deleted) {
-                catBuff.append("<b>removed</b>");
+                addDelete.append(HtmlUtil.b("removed"));
             } else if (plugin.installed) {
                 String extra = "";
                 if (plugin.hasOriginal) {
-                    extra = installHtml + "Reinstall</a>";
+                    extra = installHtml + HtmlUtil.img("idvresource:/auxdata/ui/icons/Refresh16.gif");
                 }
-                catBuff.append(
+                addDelete.append(
                     "<a href=\"jython:idv.getPluginManager().removePlugin('"
-                    + plugin.file + "')\">" + "Uninstall"
+                    + plugin.file + "')\">" + HtmlUtil.img("idvresource:/auxdata/ui/icons/Delete16.gif")
                     + "</a>&nbsp;&nbsp;" + extra);
-                loadedBuff.append("<tr><td width=\"60\">" + prefix
-                                  + "</td><td>" + plugin.category + "&gt;"
-                                  + plugin.name + "</td><td>");
-
-                loadedBuff.append(
-                    "<a href=\"jython:idv.getPluginManager().removePlugin('"
-                    + plugin.file + "')\">" + "Uninstall"
-                    + "</a>&nbsp;&nbsp;" + extra);
-                loadedBuff.append("</td></tr>");
+                loadedBuff.append(HtmlUtil.open(HtmlUtil.TAG_TR, HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,"top")));
+                loadedBuff.append(HtmlUtil.col(addDelete.toString(),HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"50")));
+                loadedBuff.append(HtmlUtil.col(plugin.category + "&gt;"+ plugin.name));
+                loadedBuff.append(HtmlUtil.col(prefix,HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"50")));
+                loadedBuff.append(HtmlUtil.close(HtmlUtil.TAG_TR));
             } else {
-                catBuff.append(installHtml + "Install</a>\n");
+                addDelete.append(installHtml + HtmlUtil.img("idvresource:/auxdata/ui/icons/add.png"));
             }
-            catBuff.append("</td><td width=\"30%\">" + plugin.desc
-                           + "</td></tr>");
+
+            String rowExtra=(plugin.installed?HtmlUtil.attr(HtmlUtil.ATTR_BGCOLOR,"#dddddd"):"");
+            catBuff.append(HtmlUtil.open(HtmlUtil.TAG_TR, rowExtra +HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,"top")));
+            catBuff.append(HtmlUtil.col(addDelete.toString(),HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"50")));
+            catBuff.append(HtmlUtil.col(plugin.name.replace(" ","&nbsp;")));
+            catBuff.append(HtmlUtil.col(sizeString,HtmlUtil.attrs(HtmlUtil.ATTR_WIDTH,"30",HtmlUtil.ATTR_ALIGN,"right")));
+            catBuff.append(HtmlUtil.col(plugin.desc));
+            catBuff.append(HtmlUtil.col(prefix,HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"50")));
+            catBuff.append(HtmlUtil.close(HtmlUtil.TAG_TR));
         }
+
         StringBuffer sb =
             new StringBuffer(
                 "<b>Available Plugins</b><br><table border=\"0\" width=\"100%\">\n");
