@@ -245,6 +245,15 @@
     <resource location="%IDVPATH%/toolbar.xml"/>
   </resources>
 
+
+<!--Defines the toolbar icons   -->
+  <resources name="idv.resource.publishers">
+    <resource location="%USERPATH%/publishers.xml"/>
+    <resource location="%SITEPATH%/publishers.xml"/>
+    <resource location="%APPPATH%/publishers.xml"/>
+    <resource location="%IDVPATH%/publishers.xml"/>
+  </resources>
+
 <!-- Defines the actions for the toolbar, etc   -->
   <resources name="idv.resource.actions">
     <resource location="%USERPATH%/actions.xml"/>
