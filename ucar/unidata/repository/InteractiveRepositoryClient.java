@@ -119,6 +119,12 @@ public class InteractiveRepositoryClient extends RepositoryClient {
 
 
 
+    public String getSelectedGroup() {
+        if(getDefaultGroupId()!=null) return getDefaultGroupId();
+        return getSelectedGroupFromTree();
+    }
+
+
     /**
      * _more_
      *

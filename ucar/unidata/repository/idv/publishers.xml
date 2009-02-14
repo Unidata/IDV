@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<object class="java.util.ArrayList">
+    <method name="add">
+        <object class="ucar.unidata.repository.idv.RamaddaPublisher">
+            <property name="RepositoryClient">
+                <object class="ucar.unidata.repository.InteractiveRepositoryClient">
+                    <property name="DefaultGroupId">
+                        <string><![CDATA[bfc82cf9-8548-4393-af10-20ec2274ceb9]]></string>
+                    </property>
+                    <property name="DefaultGroupName">
+                        <string><![CDATA[IDV Contributions Area]]></string>
+                    </property>
+                    <property name="Tmp">
+                        <parray class="byte" length="0"></parray>
+                    </property>
+                    <property name="Name">
+                        <string><![CDATA[IDV Contributions]]></string>
+                    </property>
+                    <property name="Hostname">
+                        <string><![CDATA[motherlode.ucar.edu]]></string>
+                    </property>
+                </object>
+            </property>
+            <property name="Name">
+                <string><![CDATA[IDV Contributions]]></string>
+            </property>
+        </object>
+    </method>
+</object>

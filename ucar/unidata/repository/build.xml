@@ -84,6 +84,7 @@
         >
             <include name="ucar/unidata/repository/**/*.class"/>
             <include name="ucar/unidata/repository/idv/publishertypes.xml"/>
+            <include name="ucar/unidata/repository/idv/publishers.xml"/>
             <include name="ucar/unidata/repository/htdocs/icons/folderopen.png"/>
             <include name="ucar/unidata/repository/htdocs/icons/folderclosed.png"/>
 	    </jar>

@@ -80,6 +80,11 @@ public class RepositoryClient extends RepositoryBase {
     private String name = "RAMADDA Client";
 
 
+    private String defaultGroupId;
+
+    private String defaultGroupName;
+
+
     /**
      * _more_
      */
@@ -751,6 +756,42 @@ public class RepositoryClient extends RepositoryBase {
         return (user != null) && (user.trim().length() == 0);
     }
 
+
+    /**
+       Set the DefaultGroup property.
+
+       @param value The new value for DefaultGroup
+    **/
+    public void setDefaultGroupId (String value) {
+	defaultGroupId = value;
+    }
+
+    /**
+       Get the DefaultGroup property.
+
+       @return The DefaultGroup
+    **/
+    public String getDefaultGroupId () {
+	return defaultGroupId;
+    }
+
+    /**
+       Set the DefaultGroupName property.
+
+       @param value The new value for DefaultGroupName
+    **/
+    public void setDefaultGroupName (String value) {
+	defaultGroupName = value;
+    }
+
+    /**
+       Get the DefaultGroupName property.
+
+       @return The DefaultGroupName
+    **/
+    public String getDefaultGroupName () {
+	return defaultGroupName;
+    }
 
 
 

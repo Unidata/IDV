@@ -257,6 +257,9 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
         eastFld         = new JTextField("", 5);
         westFld         = new JTextField("", 5);
         JComponent treeComp = repositoryClient.getTreeComponent();
+        if(repositoryClient.getDefaultGroupId()!=null) {
+            treeComp = new JLabel(repositoryClient.getDefaultGroupName());
+        }
 
         Insets     i        = new Insets(1, 1, 1, 1);
         JComponent bboxComp = GuiUtils.vbox(
@@ -461,7 +464,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                             "Publish to RAMADDA", contents, null)) {
                         return;
                     }
-                    parentId = repositoryClient.getSelectedGroupFromTree();
+                    parentId = repositoryClient.getSelectedGroup();
                     if (parentId == null) {
                         LogUtil.userMessage("You must select a parent group");
                     } else {
