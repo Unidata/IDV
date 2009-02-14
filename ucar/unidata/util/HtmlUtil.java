@@ -167,6 +167,7 @@ public class HtmlUtil {
 
     /** _more_          */
     public static final String ATTR_BORDER = "border";
+    public static final String ATTR_BGCOLOR = "bgcolor";
 
     /** _more_          */
     public static final String ATTR_CELLSPACING = "cellspacing";
