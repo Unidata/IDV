@@ -156,7 +156,13 @@ public class PublishManager extends IdvManager {
 
     private void  updatePublishers(boolean andWrite) {
         if(andWrite) {
-            getIdv().getStore().putEncodedFile("publishers.xml", publishers);
+            List<IdvPublisher> localPublishers = new ArrayList<IdvPublisher>();
+            for(IdvPublisher publisher: publishers) {
+                if(publisher.getLocal()) {
+                    localPublishers.add(publisher);
+                }
+            }
+            getIdv().getStore().putEncodedFile("publishers.xml", localPublishers);
         }
         for(JComboBox publishCbx: comboBoxes) {
             Object selected = publishCbx.getSelectedItem();
@@ -182,6 +188,7 @@ public class PublishManager extends IdvManager {
                     public void actionPerformed(ActionEvent ae) {
                         try {
                             IdvPublisher newPublisher = (IdvPublisher) theObject.getClass().newInstance();
+                            newPublisher.setLocal(true);
                             newPublisher.setIdv(getIdv());
                             if(newPublisher.doInitNew()) {
                                 publishers.add(newPublisher);
@@ -199,7 +206,7 @@ public class PublishManager extends IdvManager {
             JMenu deleteMenu = new JMenu("Delete");
             //            menu.addSeparator();
             boolean didone = false;
-            for(IdvPublisher publisher:(List<IdvPublisher>) publishers) {
+            for(IdvPublisher publisher: publishers) {
                 if(publisher.getLocal()) {
                     deleteMenu.add(GuiUtils.makeMenuItem(publisher.getName(),this,"deletePublisher", publisher));
                     configMenu.add(GuiUtils.makeMenuItem(publisher.getName(),this,"configurePublisher", publisher));
