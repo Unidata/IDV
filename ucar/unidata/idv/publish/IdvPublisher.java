@@ -72,6 +72,9 @@ import org.w3c.dom.NodeList;
  */
 public abstract class IdvPublisher implements Cloneable {
 
+    private boolean local = false;
+
+
     private String name="Publisher";
 
     /** Reference to the IDV */
@@ -176,6 +179,26 @@ public abstract class IdvPublisher implements Cloneable {
     public String toString() {
         return getName();
     }
+
+    /**
+       Set the Local property.
+
+       @param value The new value for Local
+    **/
+    public void setLocal (boolean value) {
+	local = value;
+    }
+
+    /**
+       Get the Local property.
+
+       @return The Local
+    **/
+    public boolean getLocal () {
+	return local;
+    }
+
+
 
 }
 

@@ -101,14 +101,28 @@ public class PublishManager extends IdvManager {
      */
     public PublishManager(IntegratedDataViewer idv) {
         super(idv);
-        publishers = (List<IdvPublisher>) (List) getIdv().getStore().getEncodedFile("publishers.xml");
-        if(publishers == null) {
-            publishers = new ArrayList<IdvPublisher>();
-        }
-        for(IdvPublisher publisher: publishers) {
-            publisher.setIdv(getIdv());
+
+        XmlResourceCollection resources = 
+            getIdv().getResourceManager().getXmlResources(IdvResourceManager.RSC_PUBLISHERS);
+        publishers = new ArrayList<IdvPublisher>();
+        for (int resourceIdx = 0; resourceIdx < resources.size();  resourceIdx++) {
+            String xml   = resources.read(resourceIdx);
+            if (xml == null) {
+                continue;
+            }
+            try {
+                List<IdvPublisher> tmp =  (List<IdvPublisher>)getIdv().decodeObject(xml);
+                for(IdvPublisher publisher: tmp) {
+                    publisher.setLocal(resources.isWritable(resourceIdx));
+                    publisher.setIdv(getIdv());
+                }
+                publishers.addAll(tmp);
+            } catch (Exception exc) {
+                logException("Loading publisher file:"  + resources.get(resourceIdx), exc);
+            }
         }
     }
+
 
     public void initMenu(final JMenu menu) {
         menu.addMenuListener(new MenuListener() {
@@ -181,16 +195,23 @@ public class PublishManager extends IdvManager {
         }
         if(publishers.size()>0) {
             JMenu configMenu = new JMenu("Configure");
-            menu.add(configMenu);
-            JMenu deleteMenu = new JMenu("Delete");
-            menu.add(deleteMenu);
 
+            JMenu deleteMenu = new JMenu("Delete");
             //            menu.addSeparator();
+            boolean didone = false;
             for(IdvPublisher publisher:(List<IdvPublisher>) publishers) {
-                deleteMenu.add(GuiUtils.makeMenuItem(publisher.getName(),this,"deletePublisher", publisher));
-                configMenu.add(GuiUtils.makeMenuItem(publisher.getName(),this,"configurePublisher", publisher));
+                if(publisher.getLocal()) {
+                    deleteMenu.add(GuiUtils.makeMenuItem(publisher.getName(),this,"deletePublisher", publisher));
+                    configMenu.add(GuiUtils.makeMenuItem(publisher.getName(),this,"configurePublisher", publisher));
+                    didone = true;
+                }
                 //                publisher.initMenu(menu);
             }
+            if(didone) {
+                menu.add(configMenu);
+                menu.add(deleteMenu);
+            }
+
         }
     }
 
