@@ -129,6 +129,9 @@ public class PluginClassLoader extends ClassLoader {
         }
     }
 
+    public String toString() {
+        return this.jarFilePath;
+    }
 
     protected void handleError(String msg, Throwable exc)  {
         throw new WrapperException(msg, exc);
@@ -212,6 +215,7 @@ public class PluginClassLoader extends ClassLoader {
             final byte[] bytes = IOUtil.readBytes(is);
             is.close();
             c = loadClass(bytes);
+            loadedClasses.put(c.getName(), c);
             loadedClasses.put(jarEntry.getName(), c);
             checkClass(c);
             return c;
@@ -235,7 +239,11 @@ public class PluginClassLoader extends ClassLoader {
      * @throws ClassNotFoundException On badness
      */
     public Class loadClass(String name) throws ClassNotFoundException {
-        //Check if we have such a class as a jar entry
+        //Check if we have this class as a jar entry
+        Class c = (Class)  loadedClasses.get(name);
+        if(c!=null) {
+            return c;
+        }
         String fileName = StringUtil.replace(name, ".", "/");
         fileName += ".class";
         JarEntry jarEntry = getJarFile().getJarEntry(fileName);
@@ -245,6 +253,18 @@ public class PluginClassLoader extends ClassLoader {
             return super.loadClass(name);
         }
     }
+
+
+    /**
+     * Check if this class is one we loaded from a plugin
+     *
+     * @return the class or null
+     */
+    public Class getClassFromPlugin(String name) {
+        return (Class)  loadedClasses.get(name);
+    }
+
+
 
     /**
      * Associate the resource name with the jar entry

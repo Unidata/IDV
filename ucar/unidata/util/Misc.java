@@ -70,7 +70,7 @@ public class Misc {
     public static boolean debug = false;
 
     /** Holds a list of any custom class loaders used in the app */
-    private static List classLoaders = new ArrayList();
+    private static List<ClassLoader> classLoaders = new ArrayList<ClassLoader>();
 
     /** override current time */
     private static long overrideCurrentTime = -1;
@@ -1485,6 +1485,26 @@ public class Misc {
                 continue;
             }
             if ( !formals[j].isAssignableFrom(actuals[j])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    public static boolean typesMatchx(Class[] formals, Class[] actuals) {
+        if (formals.length != actuals.length) {
+            System.err.println ("Bad length");
+            return false;
+        }
+        for (int j = 0; j < formals.length; j++) {
+            if (actuals[j] == null) {
+                continue;
+            }
+
+            if ( !formals[j].isAssignableFrom(actuals[j])) {
+                System.err.println ("not assignable " + formals[j].getName() + " " + actuals[j].getName()  + 
+                                    " equals? " + formals[j].equals(actuals[j]));
                 return false;
             }
         }
@@ -3735,7 +3755,7 @@ public class Misc {
      *
      * @return List of dynamic classloaders
      */
-    public static List getClassLoaders() {
+    public static List<ClassLoader> getClassLoaders() {
         return classLoaders;
     }
 
@@ -3752,16 +3772,27 @@ public class Misc {
      */
     public static Class findClass(String className)
             throws ClassNotFoundException {
-        for (int i = 0; i < classLoaders.size(); i++) {
+
+        //First look at the PluginClassLoaders. We do this because if we have 2 or more
+        //of these we can get class conflicts
+        for (ClassLoader classLoader: classLoaders) {
+            if(classLoader instanceof PluginClassLoader) {
+                PluginClassLoader pcl = (PluginClassLoader) classLoader;
+                Class c = pcl.getClassFromPlugin(className);
+                if(c!=null) return c;
+            }
+        }
+
+
+        for (ClassLoader classLoader: classLoaders) {
             try {
-                Class c = Class.forName(className, true,
-                                        (ClassLoader) classLoaders.get(i));
+                Class c = Class.forName(className, true,classLoader);
                 if (c != null) {
                     return c;
                 }
             } catch (ClassNotFoundException cnfe) {}
         }
-        return Class.forName(className);
+        return   Class.forName(className);
     }
 
 
