@@ -505,7 +505,7 @@ public class CatalogOutputHandler extends OutputHandler {
      */
     private boolean canDataLoad(Request request, Entry entry)
             throws Exception {
-        return getDataOutputHandler().canLoadAsCdm(entry);
+        return getRepository().getDataOutputHandler().canLoadAsCdm(entry);
     }
 
     /**
@@ -527,7 +527,7 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
         if (canDataLoad(request, entry)) {
-            String urlPath = getDataOutputHandler().getTdsUrl(entry);
+            String urlPath = getRepository().getDataOutputHandler().getTdsUrl(entry);
             addService(catalogInfo, SERVICE_OPENDAP,
                        getRepository().URL_ENTRY_SHOW.getFullUrl());
 

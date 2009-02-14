@@ -344,7 +344,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         File          file    = entry.getResource().getFile();
         try {
             super.getInitialMetadata(request, entry, metadataList, extra,shortForm);
-            if ( !getDataOutputHandler().canLoadAsCdm(entry)) {
+            if ( !getRepository().getDataOutputHandler().canLoadAsCdm(entry)) {
                 return;
             }
             dataset = NetcdfDataset.openDataset(file.toString());

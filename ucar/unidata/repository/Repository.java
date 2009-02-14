@@ -441,6 +441,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
+    public String formatDateShort(Request request, Date d) {
+        if (displaySdf == null) {
+            displaySdf = makeSDF(getProperty(PROP_DATE_SHORTFORMAT, DEFAULT_TIME_SHORTFORMAT));
+        }
+        if (d == null) {
+            return BLANK;
+        }
+        return displaySdf.format(d);
+    }
 
 
 
@@ -1693,6 +1702,24 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     }
 
+
+    /** _more_ */
+    private DataOutputHandler dataOutputHandler;
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public DataOutputHandler getDataOutputHandler() throws Exception {
+        if (dataOutputHandler == null) {
+            dataOutputHandler =
+                (DataOutputHandler) getRepository().getOutputHandler(
+                    DataOutputHandler.OUTPUT_OPENDAP.toString());
+        }
+        return dataOutputHandler;
+    }
 
 
 

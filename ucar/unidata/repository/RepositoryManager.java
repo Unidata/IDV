@@ -94,8 +94,7 @@ public class RepositoryManager implements RepositorySource, Constants,
     /** _more_ */
     protected Repository repository;
 
-    /** _more_ */
-    private DataOutputHandler dataOutputHandler;
+
 
     /**
      * _more_
@@ -170,22 +169,7 @@ public class RepositoryManager implements RepositorySource, Constants,
         return getRepository().iconUrl(url);
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public DataOutputHandler getDataOutputHandler() throws Exception {
-        if (dataOutputHandler == null) {
-            dataOutputHandler =
-                (DataOutputHandler) getRepository().getOutputHandler(
-                    DataOutputHandler.OUTPUT_OPENDAP.toString());
-        }
-        return dataOutputHandler;
-    }
-
+ 
 
 
     /**

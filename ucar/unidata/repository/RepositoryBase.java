@@ -339,7 +339,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      *
      * @return _more_
      */
-    private SimpleDateFormat makeSDF(String format) {
+    protected SimpleDateFormat makeSDF(String format) {
         SimpleDateFormat sdf = new SimpleDateFormat();
         sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         sdf.applyPattern(format);
@@ -364,15 +364,6 @@ public class RepositoryBase implements Constants, RepositorySource {
     }
 
 
-    public String formatDateShort(Request request, Date d) {
-        if (displaySdf == null) {
-            displaySdf = makeSDF(getProperty(PROP_DATE_SHORTFORMAT, DEFAULT_TIME_SHORTFORMAT));
-        }
-        if (d == null) {
-            return BLANK;
-        }
-        return displaySdf.format(d);
-    }
 
 
     /**
