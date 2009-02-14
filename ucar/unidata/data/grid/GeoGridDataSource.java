@@ -723,13 +723,14 @@ public class GeoGridDataSource extends GridDataSource {
             }
         });
         List        catComps = new ArrayList();
-        JTabbedPane tab      = new JTabbedPane();
+        JTabbedPane   tab = new JTabbedPane(JTabbedPane.LEFT);
+
         for (int i = 0; i < categories.size(); i++) {
             List comps = (List) catMap.get(categories.get(i));
             JPanel innerPanel = GuiUtils.doLayout(comps, 3, GuiUtils.WT_NYN,
                                     GuiUtils.WT_N);
             JScrollPane sp = new JScrollPane(GuiUtils.top(innerPanel));
-            sp.setPreferredSize(new Dimension(300, 400));
+            sp.setPreferredSize(new Dimension(500, 400));
             JPanel top =
                 GuiUtils.right(GuiUtils.rLabel("Grid Size (Points)  "));
             JComponent inner = GuiUtils.inset(GuiUtils.topCenter(top, sp), 5);
