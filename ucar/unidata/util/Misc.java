@@ -3797,12 +3797,7 @@ public class Misc {
 
 
 
-    /**
-     * Pause every n minutes
-     *
-     * @param minutesDelta   number of minutes
-     */
-    public static void pauseEvery(int minutesDelta) {
+    public static long getPauseEveryTime(int minutesDelta) {
         if (minutesDelta <= 0) {
             minutesDelta = 1;
         }
@@ -3810,12 +3805,28 @@ public class Misc {
         cal.setTime(new Date());
         int currentMinutes = cal.get(Calendar.MINUTE)
                              + cal.get(Calendar.HOUR) * 60;
+        double sleepTime;
         if (minutesDelta > currentMinutes) {
-            Misc.sleep(60 * 1000 * (minutesDelta - currentMinutes));
+            sleepTime = 60 * 1000 * (minutesDelta - currentMinutes);
         } else {
             int foo = currentMinutes % minutesDelta;
-            Misc.sleep(60 * 1000 * (minutesDelta - foo));
+            sleepTime = 60 * 1000 * (minutesDelta - foo);
         }
+        return (long)sleepTime;
+    }
+
+
+
+
+    /**
+     * Pause every n minutes
+     *
+     * @param minutesDelta   number of minutes
+     */
+    public static void pauseEvery(int minutesDelta) {
+        long sleepTime =getPauseEveryTime(minutesDelta);
+        System.err.println ("Sleeping for " + DateUtil.millisToMinutes(sleepTime) + " minutes");
+        Misc.sleep((long)sleepTime);
     }
 
 

@@ -2473,7 +2473,7 @@ public class GuiUtils extends LayoutUtil {
      * @return New JLabel showing image
      */
     public static JLabel getImageLabel(String icon) {
-        return new JLabel(Resource.getImageIcon(icon));
+        return new JLabel(getImageIcon(icon,GuiUtils.class));
     }
 
 
@@ -3352,7 +3352,7 @@ public class GuiUtils extends LayoutUtil {
         }
 
         if (icon != null) {
-            menuItem.setIcon(new ImageIcon(Resource.getImage(icon)));
+            menuItem.setIcon(getImageIcon(icon,GuiUtils.class));
         }
         if (id != null) {
             menuItems.put(id, menuItem);
