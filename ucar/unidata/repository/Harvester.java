@@ -188,7 +188,7 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     private double sleepMinutes = 5;
 
-    private String sleepUnit = "minutes";
+    private String sleepUnit = UNIT_ABSOLUTE;
 
     private int timestamp=0;
 
