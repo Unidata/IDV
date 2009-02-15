@@ -31,16 +31,14 @@ import org.w3c.dom.Element;
 import ucar.unidata.ui.HttpFormEntry;
 
 
-import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
+
 import ucar.unidata.xml.XmlUtil;
 
 import java.io.ByteArrayOutputStream;
-
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -792,7 +790,6 @@ public class RepositoryClient extends RepositoryBase {
     public String getDefaultGroupName () {
 	return defaultGroupName;
     }
-
 
 
 }

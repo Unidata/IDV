@@ -259,8 +259,15 @@ public class Admin extends RepositoryManager {
                 path = path.substring(0, 49) + "...";
             }
             String userAgent = logEntry.getUserAgent();
+            boolean isBot=true;
             if (userAgent.indexOf("Googlebot") >= 0) {
                 userAgent = "Googlebot";
+            } else if (userAgent.indexOf("Slurp;") >= 0) {
+                userAgent = "Yahoobot";
+            } else if (userAgent.indexOf("msnbot") >= 0) {
+                userAgent = "Msnbot";
+            } else {
+                isBot = false;
             }
             int idx = userAgent.indexOf("(");
             if (idx > 0) {
@@ -270,9 +277,12 @@ public class Admin extends RepositoryManager {
             dttm = dttm.replace(" ", "&nbsp;");
             String user = logEntry.getUser().getLabel();
             user = user.replace(" ", "&nbsp;");
-            sb.append(HtmlUtil.rowTop(HtmlUtil.cols(user, dttm,
-                    HtmlUtil.entityEncode(path), logEntry.getIp(),
-                    userAgent)));
+            String cols  = HtmlUtil.cols(user, dttm,
+                                         HtmlUtil.entityEncode(path), logEntry.getIp(),
+                                         userAgent);
+            sb.append(HtmlUtil.row(cols,
+                                   HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,"top")+
+                                   (!isBot?"":HtmlUtil.attr(HtmlUtil.ATTR_BGCOLOR,"#eeeeee"))));
 
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
@@ -868,6 +878,19 @@ public class Admin extends RepositoryManager {
         sb.append(makeConfigBlock("Available Output Types", osb.toString()));
 
 
+        StringBuffer umsb=new StringBuffer();
+        umsb.append(msgHeader("Enter a message to show one time to all users"));
+        umsb.append(request.form(URL_ADMIN_USERMESSAGE, ""));
+        umsb.append(HtmlUtil.formTable());
+        umsb.append(HtmlUtil.formEntry(msgLabel("Message"),
+                                       HtmlUtil.textArea(ARG_MESSAGE, "",
+                                                         5, 60)));
+        umsb.append(HtmlUtil.formTableClose());
+
+
+        //        sb.append(makeConfigBlock("User Message", usmb.toString()));
+
+
         sb.append(HtmlUtil.submit(msg("Change Settings")));
         sb.append(HtmlUtil.formClose());
         return makeResult(request, msg("Settings"), sb);
@@ -1032,6 +1055,8 @@ public class Admin extends RepositoryManager {
         getRepository().writeGlobal(PROP_ACCESS_REQUIRELOGIN,
                                     request.get(PROP_ACCESS_REQUIRELOGIN,
                                         false));
+
+
         return new Result(request.url(URL_ADMIN_SETTINGS));
     }
 

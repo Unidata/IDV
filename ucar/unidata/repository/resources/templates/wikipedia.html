@@ -32,7 +32,7 @@ ramadda.template.cart = <b>Cart:</b><div class="favorites">${entries}</div>
    font-weight: bold;
    font-size: 110%;
    color: black;
-   border-bottom: 1px #000000 solid; 
+   border-bottom: 1px #aaaaaa solid; 
 }
 
 .breadcrumbs a {
@@ -55,8 +55,12 @@ ramadda.template.cart = <b>Cart:</b><div class="favorites">${entries}</div>
    color:black;
 }
 
+.linkslabel {
+   font-weight: bold;
+}
+
 .leftbox {
-   border: 1px #999999 solid; 
+   border: 1px #aaaaaa solid; 
    margin-top: 0px;
    background-color:#ffffff;
 }
@@ -77,15 +81,15 @@ ramadda.template.cart = <b>Cart:</b><div class="favorites">${entries}</div>
 }
 
 .content {
-  border : 1px #888888 solid;
+  border : 1px #aaaaaa solid;
   min-height:500px;
   background-color:#ffffff;
   padding:5px;
 }
 
 .leftcolumn {
- margin-left:3px;
- margin-right:4px;
+   margin-left:3px;
+   margin-right:4px;
 }
 
 
@@ -134,9 +138,7 @@ a.header-leftcolumn  {
 
 
 
-
 .subnavoncomp  {
-   xfont-weight: bold;
    background-color:#ffffff;
    border: 1px #999999 solid; 
    border-bottom: 2px white solid; 
@@ -199,7 +201,7 @@ a.header-leftcolumn  {
 <td width="100">
 <a href="http://www.unidata.ucar.edu" target="external"><img border="0" width=\"120\" src="${root}/images/logo.png" align="center"></a>
 <div class="leftcolumn">
-<b>Links:</b>
+<span class="linkslabel">Links:</span>
 <div class="leftbox">${links}
 <hr width=75%>
 ${userlink}

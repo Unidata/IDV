@@ -267,6 +267,7 @@ public class HtmlOutputHandler extends OutputHandler {
         if (wikiTemplate != null) {
             sb.append(wikifyEntry(request, entry, wikiTemplate));
         } else {
+            addDescription(request, entry, sb);
             String informationBlock = getInformationTabs(request, entry,
                                           false);
             sb.append(HtmlUtil.makeShowHideBlock(msg("Information"),
@@ -872,7 +873,7 @@ public class HtmlOutputHandler extends OutputHandler {
      */
     private void addDescription(Request request, Entry entry,
                                 StringBuffer sb) {
-        String desc = entry.getDescription();
+        String desc = entry.getDescription().trim();
         if ((desc.length() > 0) && !desc.startsWith("<wiki>")) {
             desc = getEntryManager().processText(request, entry, desc);
             StringBuffer descSB =
@@ -903,9 +904,9 @@ public class HtmlOutputHandler extends OutputHandler {
         List   tabTitles  = new ArrayList<String>();
         List   tabContent = new ArrayList<String>();
         if (desc.length() > 0) {
-            tabTitles.add("Description");
-            desc = getEntryManager().processText(request, entry, desc);
-            tabContent.add(desc);
+            //            tabTitles.add("Description");
+            //            desc = getEntryManager().processText(request, entry, desc);
+            //            tabContent.add(desc);
         }
 
         tabTitles.add("Basic");
@@ -996,6 +997,7 @@ public class HtmlOutputHandler extends OutputHandler {
             allEntries.addAll(subGroups);
             sb.append(getTimelineApplet(request, allEntries));
         } else if ((wikiTemplate == null) && !group.isDummy()) {
+            addDescription(request, group, sb);
             String informationBlock = getInformationTabs(request, group,
                                           false);
             sb.append(HtmlUtil.makeShowHideBlock(msg("Information"),

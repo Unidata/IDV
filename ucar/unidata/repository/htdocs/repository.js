@@ -495,6 +495,7 @@ function checkboxClicked(event,id) {
             var idx1 = indexOf(checkboxes, lastCbxClicked);
             var idx2 = indexOf(checkboxes, id);
             var value = lastCbx.obj.checked;
+	    value = cbx.checked;
             if(idx1>idx2) {
                 var tmp = idx1;
                 idx1=idx2;
@@ -627,7 +628,11 @@ function Selector(event, id, allEntries, selecttype) {
     this.allEntries = allEntries;
     this.selecttype = selecttype;
     this.textComp = util.getDomObject(id);
-    if(!this.textComp)return false;
+    this.hiddenComp = util.getDomObject(id+".hidden");
+
+    if (!this.textComp) {
+	return false;
+    }
 
     event = util.getEvent(event);
     x = util.getEventX(event);
@@ -635,9 +640,13 @@ function Selector(event, id, allEntries, selecttype) {
 
 
     var link = util.getDomObject(id+'.selectlink');
-    if(!link)return false;
+    if(!link) {
+	return false;
+    }
     this.div = util.getDomObject('selectdiv');
-    if(!this.div)return false;
+    if(!this.div) {
+	return false;
+     }
 
     if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
         x= util.getLeft(link.obj);
@@ -669,6 +678,9 @@ function selectClick(id,entryId,value) {
     } else if (selector.selecttype=="entryid") {
         insertTagsInner(selector.textComp.obj, "{{import " +entryId+" "," }}","importtype");
     } else { 
+       if(selector.hiddenComp) {
+            selector.hiddenComp.obj.value =entryId;
+       }
        selector.textComp.obj.value =value;
     }
     selectCancel();

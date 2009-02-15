@@ -97,6 +97,37 @@
     </target>
 
 
+
+    <target name="clientjar" depends="init,clean">
+        <property name="xclasspath" value="${libsdir}/external.jar"/>
+        <property name="clientclasspath" value="${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar"/>
+        <javac
+            verbose="false"
+            classpath="${xclasspath}"
+            debug="true"
+            source="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            nowarn="true"
+            srcdir="${srcdir}"
+            fork="true"
+            memoryMaximumSize="256m"
+           target="1.5"
+        >
+        <include name="ucar/unidata/repository/InteractiveRepositoryClient.java"/>
+        </javac>
+        <jar 
+            basedir="${compiledir}"
+            compress="true"
+            jarfile="${jars_dest}/repositoryclient.jar">
+            <include name="ucar/**/*.class"/>
+            <include name="ucar/unidata/repository/htdocs/icons/folderopen.png"/>
+            <include name="ucar/unidata/repository/htdocs/icons/folderclosed.png"/>
+	    </jar>
+    </target>
+
+
     <target name="compile" depends="init,clean,jc"/>
 
 

@@ -22,50 +22,10 @@
 
 package ucar.unidata.repository;
 
-
-import org.w3c.dom.*;
-
-
-
-
-import ucar.unidata.sql.SqlUtil;
-
-import ucar.unidata.ui.ImageUtils;
-import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
-import ucar.unidata.util.HttpServer;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-
-
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
-
-import ucar.unidata.xml.XmlUtil;
-
 
 import java.io.*;
-
-import java.io.File;
-import java.io.InputStream;
-
-import java.lang.reflect.*;
-
-
-
 import java.net.*;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
@@ -74,6 +34,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
+import java.util.TimeZone;
 
 
 
@@ -84,6 +45,9 @@ import java.util.Properties;
  * @version $Revision: 1.3 $
  */
 public class RepositoryUtil {
+
+    /** timezone */
+    public static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
 
 
     /**
@@ -123,7 +87,7 @@ public class RepositoryUtil {
      */
     public static SimpleDateFormat makeDateFormat(String formatString) {
         SimpleDateFormat dateFormat = new SimpleDateFormat();
-        dateFormat.setTimeZone(DateUtil.TIMEZONE_GMT);
+        dateFormat.setTimeZone(TIMEZONE_GMT);
         dateFormat.applyPattern(formatString);
         return dateFormat;
     }

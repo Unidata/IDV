@@ -790,8 +790,6 @@ public class TypeHandler extends RepositoryManager {
             String nextPrev = StringUtil.join(HtmlUtil.space(1),
                                   outputHandler.getNextPrevLinks(request,
                                       entry, output));
-            //            sb.append(HtmlUtil.formEntry("", nextPrev));
-            //            sb.append(HtmlUtil.formEntry("<table width=100%><tr><td>" + nextPrev + "</td><td align=right>" + msgLabel("Name")+"</td></tr></table>", entry.getLabel()));
 
             if (showDescription) {
                 String nameString = entry.getName();

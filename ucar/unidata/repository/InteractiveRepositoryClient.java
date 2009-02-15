@@ -24,20 +24,14 @@ package ucar.unidata.repository;
 
 
 import org.w3c.dom.Document;
-
-
 import org.w3c.dom.Element;
-
-import ucar.unidata.ui.HttpFormEntry;
 
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
-
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 import java.awt.*;

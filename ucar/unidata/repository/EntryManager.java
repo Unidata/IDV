@@ -1475,6 +1475,10 @@ return new Result(title, sb);
         String oldType = entry.getDataType();
         entry.setDataType(DATATYPE_UPLOAD);
 
+        //Encode the name and description to prevent xss attacks
+        entry.setName(HtmlUtil.entityEncode(entry.getName()));
+        entry.setDescription(HtmlUtil.entityEncode(entry.getDescription()));
+
         String user = request.getUser().getId();
         if (user.length() == 0) {
             user = "anonymous";

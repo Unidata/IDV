@@ -190,8 +190,8 @@ public class DirectoryHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    protected void runInner() throws Exception {
-        if ( !getActive()) {
+    protected void runInner(int timestamp) throws Exception {
+        if(!canContinueRunning(timestamp)) {
             return;
         }
         if (baseGroupName.length() == 0) {

@@ -2273,7 +2273,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                       "${link}");
         String favoritesTemplate = getTemplateProperty(request,
                                        "ramadda.template.favorites",
-                                       "<b>Favorites:<b>${entries}");
+                                       "<span class=\"linkslabel\">Favorites:</span>${entries}");
         String favoritesSeparator =
             getTemplateProperty(request,
                                 "ramadda.template.favrorites.separator", "");

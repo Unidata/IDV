@@ -89,6 +89,14 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     public static final String TAG_HARVESTERS = "harvesters";
 
+    public static final String ATTR_SLEEPUNIT = "sleepunit";
+
+    public static final String UNIT_ABSOLUTE = "absolute";
+    public static final String UNIT_MINUTE = "minute";
+    public static final String UNIT_HOUR   = "hour";
+    public static final String UNIT_DAY   = "day";
+
+
     /** _more_ */
     public static final String ATTR_CLASS = "class";
 
@@ -179,6 +187,10 @@ public class Harvester extends RepositoryManager {
 
     /** _more_ */
     private double sleepMinutes = 5;
+
+    private String sleepUnit = "minutes";
+
+    private int timestamp=0;
 
     /** _more_ */
     private boolean addMetadata = false;
@@ -304,8 +316,12 @@ public class Harvester extends RepositoryManager {
                 testCount);
         this.testMode = XmlUtil.getAttribute(element, ATTR_TESTMODE,
                                              testMode);
+        this.sleepUnit =   XmlUtil.getAttribute(element, ATTR_SLEEPUNIT,
+                                                 sleepUnit);
+
         this.sleepMinutes = XmlUtil.getAttribute(element, ATTR_SLEEP,
                 sleepMinutes);
+
     }
 
     /**
@@ -361,6 +377,12 @@ public class Harvester extends RepositoryManager {
         monitor       = request.get(ATTR_MONITOR, false);
         addMetadata   = request.get(ATTR_ADDMETADATA, false);
         sleepMinutes  = request.get(ATTR_SLEEP, sleepMinutes);
+        sleepUnit     = request.getString(ATTR_SLEEPUNIT, sleepUnit);
+        if(sleepUnit.equals(UNIT_HOUR)) {
+            sleepMinutes = sleepMinutes*60;
+        } else  if(sleepUnit.equals(UNIT_DAY)) {
+            sleepMinutes = sleepMinutes*60*60;
+        }
         nameTemplate  = request.getString(ATTR_NAMETEMPLATE, nameTemplate);
         groupTemplate = request.getUnsafeString(ATTR_GROUPTEMPLATE,
                 groupTemplate);
@@ -389,6 +411,33 @@ public class Harvester extends RepositoryManager {
                                      repository.makeTypeSelect(request,
                                          false, typeHandler.getType(),
                                          false)));
+
+        List<TwoFacedObject> tfos= new ArrayList<TwoFacedObject>();
+        tfos.add(new TwoFacedObject("Absolute (minutes)",UNIT_ABSOLUTE));
+        tfos.add(new TwoFacedObject("Minutes",UNIT_MINUTE));
+        tfos.add(new TwoFacedObject("Hourly",UNIT_HOUR));
+        tfos.add(new TwoFacedObject("Daily",UNIT_DAY));
+        
+        String minutes = ""+sleepMinutes;
+        if(sleepUnit.equals(UNIT_HOUR)) {
+            minutes = ""+(sleepMinutes/60);
+        } else  if(sleepUnit.equals(UNIT_DAY)) {
+            minutes = ""+(sleepMinutes/(60*60));
+        }
+        String sleepType =  HtmlUtil.select(ATTR_SLEEPUNIT, tfos,sleepUnit);
+        String sleepLbl = "<br>" +HtmlUtil.space(3)+"e.g., 30 minutes = on the hour and the half hour<br>"+HtmlUtil.space(3);
+
+        if(sleepUnit.equals(UNIT_ABSOLUTE)) {
+            sleepLbl += "Would run in " +sleepMinutes +" minutes";
+        } else {
+            long sleepTime =Misc.getPauseEveryTime((int)sleepMinutes);
+            Date now  = new Date();
+            Date then = new Date(now.getTime()+sleepTime);
+            sleepLbl += "Would run at " + then;
+        }
+
+        
+
         //J-
         sb.append(
             HtmlUtil.formEntry(
@@ -397,10 +446,10 @@ public class Harvester extends RepositoryManager {
                 HtmlUtil.space(3) +  msgLabel("Count") + HtmlUtil.input(ATTR_TESTCOUNT, "" + testCount, HtmlUtil.SIZE_5) +
                 HtmlUtil.br()    +
                 HtmlUtil.checkbox(ATTR_ACTIVEONSTART, "true", activeOnStart) + HtmlUtil.space(1) + msg("Active on startup") +
-                HtmlUtil.space(3) + 
-                HtmlUtil.checkbox(ATTR_MONITOR, "true", monitor) + HtmlUtil.space(1) + msg("Monitor") +
-                HtmlUtil.space(3) +
-                msgLabel("Sleep") + HtmlUtil.space(1) + HtmlUtil.input(ATTR_SLEEP, ""+ sleepMinutes, HtmlUtil.SIZE_5) + HtmlUtil.space(1) + msg("(minutes)")));
+                HtmlUtil.br() + 
+                HtmlUtil.checkbox(ATTR_MONITOR, "true", monitor) + HtmlUtil.space(1) + msg("Run continually") +
+                HtmlUtil.br() + HtmlUtil.space(3) +
+                msgLabel("Every") + HtmlUtil.space(1) + HtmlUtil.input(ATTR_SLEEP, ""+ minutes, HtmlUtil.SIZE_5) + HtmlUtil.space(1) + sleepType + sleepLbl));
         //J+
     }
 
@@ -437,7 +486,10 @@ public class Harvester extends RepositoryManager {
         element.setAttribute(ATTR_MONITOR, monitor + "");
         element.setAttribute(ATTR_ADDMETADATA, addMetadata + "");
         element.setAttribute(ATTR_TYPE, typeHandler.getType());
+        
         element.setAttribute(ATTR_SLEEP, sleepMinutes + "");
+        element.setAttribute(ATTR_SLEEP, sleepMinutes + "");
+
         element.setAttribute(ATTR_TAGTEMPLATE, tagTemplate);
         element.setAttribute(ATTR_NAMETEMPLATE, nameTemplate);
         element.setAttribute(ATTR_GROUPTEMPLATE, groupTemplate);
@@ -558,6 +610,14 @@ public class Harvester extends RepositoryManager {
     }
 
 
+    public boolean canContinueRunning(int timestamp) {
+        return getActive() && (timestamp == getCurrentTimestamp());
+    }
+
+    public int getCurrentTimestamp() {
+        return timestamp;
+    }
+
     /**
      * _more_
      *
@@ -567,7 +627,7 @@ public class Harvester extends RepositoryManager {
         try {
             error = null;
             setActive(true);
-            runInner();
+            runInner(++timestamp);
         } catch (Exception exc) {
             getRepository().log("In harvester", exc);
             error = "Error: " + exc + "<br>" + LogUtil.getStackTrace(exc);
@@ -612,9 +672,11 @@ public class Harvester extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void runInner() throws Exception {}
+    protected void runInner(int timestamp) throws Exception {}
 
-
+    protected void doPause() {
+        Misc.pauseEvery((int)getSleepMinutes());
+    }
 
     /**
      * Set the Active property.

@@ -453,10 +453,11 @@ public class PatternHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    protected void runInner() throws Exception {
-        if ( !getActive()) {
+    protected void runInner(int timestamp) throws Exception {
+        if(!canContinueRunning(timestamp)) {
             return;
         }
+
         entryCnt    = 0;
         newEntryCnt = 0;
         status = new StringBuffer("Looking for initial directory listing");
@@ -474,11 +475,12 @@ public class PatternHarvester extends Harvester {
         for (FileInfo dir : dirs) {
             dirMap.put(dir.getFile(), dir);
         }
-
+        
         int cnt = 0;
-        while (getActive()) {
+
+        while (canContinueRunning(timestamp)) {
             long t1 = System.currentTimeMillis();
-            collectEntries((cnt == 0));
+            collectEntries((cnt == 0),timestamp);
             lastRunTime = System.currentTimeMillis();
             long t2 = System.currentTimeMillis();
             cnt++;
@@ -491,7 +493,7 @@ public class PatternHarvester extends Harvester {
 
             status.append("Done... sleeping for " + getSleepMinutes()
                           + " minutes<br>");
-            Misc.sleep((long) (getSleepMinutes() * 60 * 1000));
+            doPause();
             status = new StringBuffer();
         }
     }
@@ -508,7 +510,7 @@ public class PatternHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    public void collectEntries(boolean firstTime) throws Exception {
+    private void collectEntries(boolean firstTime, int timestamp) throws Exception {
 
         long           t1        = System.currentTimeMillis();
         List<Entry>    entries   = new ArrayList<Entry>();
@@ -578,7 +580,7 @@ public class PatternHarvester extends Harvester {
                     }
                 }
                 //                if(true) break;
-                if ( !getActive()) {
+                if(!canContinueRunning(timestamp)) {
                     return;
                 }
                 //                if(true) break;

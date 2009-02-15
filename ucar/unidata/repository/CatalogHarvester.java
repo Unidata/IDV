@@ -125,14 +125,15 @@ public class CatalogHarvester extends Harvester {
     }
 
 
+    
     /**
      * _more_
      *
      * @throws Exception _more_
      */
-    protected void runInner() throws Exception {
+    protected void runInner(int timestamp) throws Exception {
         groups = new ArrayList();
-        importCatalog(topUrl, topGroup, 0);
+        importCatalog(topUrl, topGroup, 0,timestamp);
         //getEntryManager().processEntries(this, null, entries,false);
         if (entries.size() > 0) {
             getEntryManager().processEntries(this, null, entries, false);
@@ -152,9 +153,9 @@ public class CatalogHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    private boolean importCatalog(String url, Group parent, int depth)
+    private boolean importCatalog(String url, Group parent, int depth, int timestamp)
             throws Exception {
-        if ( !getActive()) {
+        if(!canContinueRunning(timestamp)) {
             return true;
         }
         if (seen.get(url) != null) {
@@ -199,9 +200,9 @@ public class CatalogHarvester extends Harvester {
 
             //If there is just one top-level dataset node then just load that
             if ((cnt == 1) && (datasetNode != null)) {
-                recurseCatalog((Element) datasetNode, parent, url, 0, depth);
+                recurseCatalog((Element) datasetNode, parent, url, 0, depth,timestamp);
             } else {
-                recurseCatalog((Element) root, parent, url, 0, depth);
+                recurseCatalog((Element) root, parent, url, 0, depth,timestamp);
             }
             return true;
         } catch (Exception exc) {
@@ -256,14 +257,14 @@ public class CatalogHarvester extends Harvester {
      */
     private void recurseCatalog(Element node, Group parent,
                                 String catalogUrlPath, int xmlDepth,
-                                int recurseDepth)
+                                int recurseDepth,int timestamp)
             throws Exception {
 
         String tab = "";
         for (int i = 0; i < xmlDepth; i++) {
             tab = tab + "  ";
         }
-        if ( !getActive()) {
+        if(!canContinueRunning(timestamp)) {
             return;
         }
         URL catalogUrl = new URL(catalogUrlPath);
@@ -414,7 +415,7 @@ public class CatalogHarvester extends Harvester {
             String  tag   = child.getTagName();
             if (tag.equals(CatalogUtil.TAG_DATASET)) {
                 recurseCatalog(child, group, catalogUrlPath, xmlDepth + 1,
-                               recurseDepth);
+                               recurseDepth,timestamp);
             } else if (tag.equals(CatalogUtil.TAG_CATALOGREF)) {
                 if ( !recurse) {
                     continue;
@@ -423,7 +424,7 @@ public class CatalogHarvester extends Harvester {
                 URL    newCatalogUrl = new URL(catalogUrl, url);
                 //                System.err.println("url:" + newCatalogUrl);
                 if ( !importCatalog(newCatalogUrl.toString(), group,
-                                    recurseDepth + 1)) {
+                                    recurseDepth + 1, timestamp)) {
                     System.err.println("Could not load catalog:" + url);
                     System.err.println("Base catalog:" + catalogUrl);
                     System.err.println("Base URL:"

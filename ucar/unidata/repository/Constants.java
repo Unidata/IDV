@@ -23,49 +23,7 @@
 package ucar.unidata.repository;
 
 
-import ucar.unidata.sql.SqlUtil;
-import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.HttpServer;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-
-
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.xml.XmlUtil;
-
-import java.io.File;
-import java.io.InputStream;
-
-
-
-import java.net.*;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-
-import java.text.SimpleDateFormat;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Properties;
-
-
-
-import java.util.regex.*;
-
-
 /**
- * Class SqlUtil _more_
  *
  *
  * @author IDV Development Team
