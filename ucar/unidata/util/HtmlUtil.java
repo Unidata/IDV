@@ -1608,8 +1608,12 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String table(String contents) {
+        return table(contents,   attrs(ATTR_CELLPADDING, "0", ATTR_CELLSPACING, "0"));
+    }
+
+    public static String table(String contents,String attrs) {
         return tag(TAG_TABLE,
-                   attrs(ATTR_CELLPADDING, "5", ATTR_CELLSPACING, "0"),
+                   attrs,
                    contents);
     }
 
@@ -1621,7 +1625,7 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String table(Object[] columns) {
-        return table(row(cols(columns), " valign=\"top\" "));
+        return table(row(cols(columns), " valign=\"top\""));
     }
 
 
