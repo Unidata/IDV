@@ -188,7 +188,7 @@ function hidePopupObject() {
 
 function mouseDown(event) {
     if(popupObject) {
-        setTimeout("hidePopupObject()",1000);
+        setTimeout("hidePopupObject()",100);
     }
     event = util.getEvent(event);
     mouseIsDown = 1;
@@ -750,7 +750,7 @@ function handleAjaxPopup(request, srcId) {
 
 
 
-function showPopup(event,srcId,popupId) {
+function showPopup(event, srcId, popupId, alignLeft) {
     hidePopupObject();
     var popup = util.getDomObject(popupId);
     var srcObj = util.getDomObject(srcId);
@@ -763,10 +763,14 @@ function showPopup(event,srcId,popupId) {
         y = srcObj.obj.offsetHeight+util.getTop(srcObj.obj) + 2;
     } 
 
-//   alert(util.getRight(popup.obj));
 
-    x+=2;
-    x+=3;
+    if(alignLeft) {
+        x = util.getLeft(srcObj.obj);
+        y = srcObj.obj.offsetHeight+util.getTop(srcObj.obj) + 2;
+    } else {
+       x+=2;
+       x+=3;
+    }
 
     popupObject = popup;
     showObject(popup);
@@ -890,15 +894,14 @@ function toggleTab(mainId) {
 	if(contentId==mainContentId) {
 		content.style.visibility="visible";
                 content.style.display = "block";
-		//content.style.backgroundColor="#ffffff";
 		content.style.backgroundColor=this.onColor;
 		title.style.backgroundColor=this.onColor;
-		title.style.borderBottom = "1px #ffffff  solid";
+		title.style.borderBottom = "2px #ffffff  solid";
 	} else {
 		content.style.visibility="hidden";
                 content.style.display = "none";
 		title.style.backgroundColor=this.offColor;
-		title.style.borderBottom = "1px #000000  solid";
+		title.style.borderBottom = "1px #dddddd  solid";
 	}
     }
 }

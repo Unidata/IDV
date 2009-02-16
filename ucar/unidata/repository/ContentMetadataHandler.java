@@ -284,7 +284,7 @@ public class ContentMetadataHandler extends MetadataHandler {
                                     metadata.getId()), "thumbnail", "");
 
 
-                img = getRepository().makePopupLink(img, bigimg, true);
+                img = getRepository().makePopupLink(img, bigimg, true,false);
             }
             return img;
         } else if (f.exists()) {
@@ -505,7 +505,7 @@ public class ContentMetadataHandler extends MetadataHandler {
         String arg2 = ARG_ATTR2 + suffix;
         String size = HtmlUtil.SIZE_70;
         if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
-            String image = getHtml(request, entry, metadata, false);
+            String image = (forEdit?getHtml(request, entry, metadata, false):"");
             if (image == null) {
                 image = "";
             } else {

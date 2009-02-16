@@ -91,9 +91,18 @@ public class OutputType {
     /** _more_ */
     public static final int TYPE_INTERNAL = 1 << 3;
 
+    /** _more_ */
+    public static final int TYPE_FILE = 1 << 4;
+
+    public static final int TYPE_EDIT = 1 << 5;
+
+    public static final int TYPE_VIEW = 1 << 6;
+
+    public static final int TYPE_TOOLBAR = 1 << 7;
+
 
     /** _more_          */
-    public static final int TYPE_ALL = TYPE_HTML | TYPE_ACTION | TYPE_NONHTML;
+    public static final int TYPE_ALL = TYPE_HTML | TYPE_ACTION | TYPE_NONHTML | TYPE_FILE |TYPE_EDIT |TYPE_VIEW|TYPE_TOOLBAR;
 
 
     /** _more_ */
@@ -325,13 +334,17 @@ public class OutputType {
         return type;
     }
 
+    public boolean isType(int flag) {
+        return (flag&type)!=0;
+    }
+
     /**
      *  Get the IsHtml property.
      *
      *  @return The IsHtml
      */
     public boolean getIsHtml() {
-        return type == TYPE_HTML;
+        return isType(TYPE_HTML);
     }
 
     /**
@@ -340,7 +353,7 @@ public class OutputType {
      * @return _more_
      */
     public boolean getIsAction() {
-        return type == TYPE_ACTION;
+        return isType(TYPE_ACTION);
     }
 
 
@@ -350,7 +363,7 @@ public class OutputType {
      * @return _more_
      */
     public boolean getIsNonHtml() {
-        return type == TYPE_NONHTML;
+        return isType(TYPE_NONHTML);
     }
 
     /**
@@ -359,7 +372,19 @@ public class OutputType {
      * @return _more_
      */
     public boolean getIsInternal() {
-        return type == TYPE_INTERNAL;
+        return isType(TYPE_INTERNAL);
+    }
+
+    public boolean getIsFile() {
+        return isType(TYPE_FILE);
+    }
+
+    public boolean getIsEdit() {
+        return isType(TYPE_EDIT);
+    }
+
+    public boolean getIsView() {
+        return isType(TYPE_VIEW);
     }
 
 

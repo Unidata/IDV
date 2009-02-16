@@ -1649,8 +1649,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             HtmlUtil.img(iconUrl("/icons/wiki/button_import.png"),
                          "Import Entry Property");
         String importButton = getRepository().makePopupLink(importMenuLabel,
-                                  HtmlUtil.hbox(importMenu.toString(),
-                                      importOutputMenu.toString()));
+                                                            HtmlUtil.hbox(importMenu.toString(),
+                                                                          importOutputMenu.toString()));
         buttons.append(importButton);
         buttons.append(HtmlUtil.space(2));
         buttons.append(select);

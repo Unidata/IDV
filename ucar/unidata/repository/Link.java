@@ -63,6 +63,10 @@ public class Link {
     OutputType outputType;
 
 
+    public Link(boolean hr) {
+        this.hr = hr;
+    }
+
     /**
      * _more_
      *
@@ -70,6 +74,11 @@ public class Link {
      * @param icon _more_
      * @param label _more_
      */
+    public Link(String url, String icon, String label, int type) {
+        this(url,icon,label,null,type);
+    }
+
+
     public Link(String url, String icon, String label) {
         this(url, icon, label, null);
     }
@@ -116,7 +125,7 @@ public class Link {
      * @return _more_
      */
     public boolean isType(int typeMask) {
-        return (getType() & typeMask) != 0;
+        return (getType() & typeMask) !=0;
     }
 
     /**
@@ -160,6 +169,9 @@ public class Link {
         return outputType;
     }
 
+    public boolean getHr() {
+        return hr;
+    }
 
     /**
      * _more_

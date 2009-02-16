@@ -80,12 +80,21 @@ ramadda.template.cart = <b>Cart:</b><div class="favorites">${entries}</div>
    margin-top: 5px;
 }
 
+.innercontent {
+margin-left:5px;
+margin-right:5px;
+}
+
 .content {
   border : 1px #aaaaaa solid;
-  min-height:500px;
+  min-height:800px;
+  margin:0;
+  margin-right:4px;
   background-color:#ffffff;
-  padding:5px;
+  xpadding:5px;
 }
+
+
 
 .leftcolumn {
    margin-left:3px;
@@ -182,11 +191,7 @@ a.header-leftcolumn  {
 
 
 
-.content {
-    min-height:800px;
-    margin:0;
-    margin-right:4px;
-}
+
 
 
 
@@ -218,10 +223,11 @@ ${favorites}
 <td>
 <div  class="header-leftcolumn-title">${header.title}</div>
 <div class="topbox">
-${sublinks}
+<!--${sublinks}-->
 </div>
-<div class="content">${entry.header}${content}</div>
+<div class="content">${entry.header}<div class="innercontent">${content}</div></div>
 </td></tr></table>
+
 <div class="footer">${footer}</div>
 ${bottom}
 </body></html>

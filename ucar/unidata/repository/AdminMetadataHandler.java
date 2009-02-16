@@ -198,8 +198,11 @@ public class AdminMetadataHandler extends MetadataHandler {
         String content = "";
         if (type.equals(TYPE_TEMPLATE)) {
             String value = metadata.getAttr1();
-            if ( !forEdit) {
+            if ( !forEdit || value == null) {
                 value = getRepository().getResource(PROP_HTML_TEMPLATE);
+            }
+            if (value == null) {
+                value = "";
             }
             value = value.replace("<", "&lt;");
             value = value.replace(">", "&gt;");

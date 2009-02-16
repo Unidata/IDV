@@ -228,7 +228,6 @@ public class CalendarOutputHandler extends OutputHandler {
                 contents.put(key, colSB);
             }
             colSB.append(getEntryManager().getAjaxLink(request, entry, time));
-            colSB.append(HtmlUtil.br());
         }
 
         sb.append(
@@ -462,8 +461,8 @@ public class CalendarOutputHandler extends OutputHandler {
                         label = label.substring(0, 19) + "...";
                     }
                     dayList.add(
-                        HtmlUtil.nobr(
-                            getEntryManager().getAjaxLink(request, entry, label).toString()));
+                                HtmlUtil.nobr(
+                                              getEntryManager().getAjaxLink(request, entry, label).toString()));
                 }
                 didone = true;
             }
@@ -651,10 +650,9 @@ public class CalendarOutputHandler extends OutputHandler {
                     }
                     String dayContents = "&nbsp;";
                     if (inner != null) {
-                        dayContents = "<div class=\"calcontents\">"
-                                      + StringUtil.join("<br>", inner)
-                                      + "</div>";
-
+                        dayContents = HtmlUtil.div(
+                                                   StringUtil.join("", inner),
+                                                   HtmlUtil.cssClass("calcontents"));
                     }
                     content =
                         "<table border=0 cellspacing=\"0\" cellpadding=\"2\" width=100%><tr valign=top><td>"

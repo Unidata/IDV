@@ -106,6 +106,8 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_METADATA = "ramadda.icon.metadata";
 
+    public static final String ICON_ACCESS = "ramadda.icon.access";
+
     /** _more_ */
     public static final String ICON_CLOSE = "ramadda.icon.close";
 

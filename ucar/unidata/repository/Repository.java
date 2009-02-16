@@ -174,24 +174,24 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     public static final OutputType OUTPUT_DELETER =
         new OutputType("Delete Entry", "repository.delete",
-                       OutputType.TYPE_ACTION, "", ICON_DELETE);
+                       OutputType.TYPE_ACTION|OutputType.TYPE_EDIT, "", ICON_DELETE);
 
 
     /** _more_ */
     public static final OutputType OUTPUT_METADATA_FULL =
         new OutputType("Add full metadata", "repository.metadata.full",
-                       OutputType.TYPE_ACTION, "", ICON_METADATA_ADD);
+                       OutputType.TYPE_ACTION|OutputType.TYPE_EDIT, "", ICON_METADATA_ADD);
 
     /** _more_ */
     public static final OutputType OUTPUT_METADATA_SHORT =
         new OutputType("Add short metadata", "repository.metadata.short",
-                       OutputType.TYPE_ACTION, "", ICON_METADATA_ADD);
+                       OutputType.TYPE_ACTION|OutputType.TYPE_EDIT, "", ICON_METADATA_ADD);
 
 
     /** _more_          */
     public static final OutputType OUTPUT_COPY =
         new OutputType("Copy/Move Entry", "repository.copy",
-                       OutputType.TYPE_ACTION, "", ICON_MOVE);
+                       OutputType.TYPE_ACTION|OutputType.TYPE_EDIT, "", ICON_MOVE);
 
 
     /** _more_ */
@@ -1563,8 +1563,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         System.err.println(
                             "Couldn't load optional output handler:"
                             + XmlUtil.toString(node));
-                        System.err.println ("Error:" + exc);
-                        exc.printStackTrace();
+                        //                        System.err.println ("Error:" + exc);
+                        //                        exc.printStackTrace();
                     } else {
                         System.err.println(
                             "Error loading output handler file:" + file);
@@ -2809,7 +2809,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         List<Link> okLinks = new ArrayList<Link>();
 
         for (Link link : links) {
-            if (link.getType() == OutputType.TYPE_HTML) {
+            if (link.isType(OutputType.TYPE_HTML)) {
                 okLinks.add(link);
             }
         }
@@ -2833,8 +2833,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         List<Link> links   = getOutputLinks(request, state);
         List<Link> okLinks = new ArrayList<Link>();
         for (Link link : links) {
-            if ((link.getType() == OutputType.TYPE_ACTION)
-                    || (link.getType() == OutputType.TYPE_NONHTML)) {
+            if (link.isType(OutputType.TYPE_ACTION)
+                || link.isType(OutputType.TYPE_NONHTML)) {
                 okLinks.add(link);
             }
         }
@@ -4413,7 +4413,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public String makePopupLink(String link, String menuContents) {
-        return makePopupLink(link, menuContents, false);
+        return makePopupLink(link, menuContents, false,false);
     }
 
 
@@ -4427,13 +4427,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public String makePopupLink(String link, String menuContents,
-                                boolean makeClose) {
+                                boolean makeClose,boolean alignLeft) {
         String compId   = "menu_" + HtmlUtil.blockCnt++;
         String linkId   = "menulink_" + HtmlUtil.blockCnt++;
         String contents = makePopupDiv(menuContents, compId, makeClose);
-        String onClick = HtmlUtil.onMouseClick("showPopup(event,"
-                             + HtmlUtil.squote(linkId) + ","
-                             + HtmlUtil.squote(compId) + ");");
+        String onClick = HtmlUtil.onMouseClick(HtmlUtil.call("showPopup",
+                                                             HtmlUtil.comma(new String[]{
+                                                                 "event",
+                                                                 HtmlUtil.squote(linkId),
+                                                                 HtmlUtil.squote(compId),
+                                                                 (alignLeft?"1":"0")})));
         String href = HtmlUtil.href("javascript:noop();", link,
                                     onClick + HtmlUtil.id(linkId));
         return href + contents;

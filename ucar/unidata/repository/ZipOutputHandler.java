@@ -78,12 +78,20 @@ import java.util.zip.*;
 public class ZipOutputHandler extends OutputHandler {
 
 
-
     /** _more_ */
     public static final OutputType OUTPUT_ZIP = new OutputType("Zip File",
                                                     "zip.zip",
-                                                    OutputType.TYPE_NONHTML,
-                                                    "", ICON_ZIP);
+                                                               /*OutputType.TYPE_NONHTML|*/
+                                                               OutputType.TYPE_FILE,
+                                                               "", ICON_ZIP);
+
+
+    /** _more_ */
+    public static final OutputType OUTPUT_ZIPGROUP = new OutputType("Zip Group",
+                                                    "zip.zipgroup",
+                                                               /*OutputType.TYPE_NONHTML|*/
+                                                               OutputType.TYPE_FILE,
+                                                               "", ICON_ZIP);
 
 
     /**
@@ -97,6 +105,7 @@ public class ZipOutputHandler extends OutputHandler {
             throws Exception {
         super(repository, element);
         addType(OUTPUT_ZIP);
+        addType(OUTPUT_ZIPGROUP);
     }
 
 
@@ -138,7 +147,7 @@ public class ZipOutputHandler extends OutputHandler {
                 if (state.group != null) {
                     links.add(
                         makeLink(
-                            request, state.group, OUTPUT_ZIP,
+                            request, state.group, OUTPUT_ZIPGROUP,
                             "/"
                             + IOUtil.stripExtension(state.group.getName())
                             + ".zip"));
@@ -200,7 +209,7 @@ public class ZipOutputHandler extends OutputHandler {
      * @return _more_
      */
     public String getMimeType(OutputType output) {
-        if (output.equals(OUTPUT_ZIP)) {
+        if (output.equals(OUTPUT_ZIP)||output.equals(OUTPUT_ZIPGROUP)) {
             return repository.getMimeTypeFromSuffix(".zip");
         } else {
             return super.getMimeType(output);

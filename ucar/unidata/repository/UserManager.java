@@ -1414,8 +1414,9 @@ public class UserManager extends RepositoryManager {
 
         extras.add("");
         urls.add(request.url(getRepositoryBase().URL_USER_CART));
-        labels.add(HtmlUtil.img(getRepository().iconUrl(ICON_CART),
-                                msg("Data Cart")));
+        //        labels.add(HtmlUtil.img(getRepository().iconUrl(ICON_CART),
+        //                                msg("Data Cart")));
+        labels.add(msg("Data Cart"));
         tips.add(msg("View data cart"));
 
         if (user.getAnonymous()) {

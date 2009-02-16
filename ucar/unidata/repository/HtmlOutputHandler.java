@@ -874,7 +874,8 @@ public class HtmlOutputHandler extends OutputHandler {
     private void addDescription(Request request, Entry entry,
                                 StringBuffer sb) {
         String desc = entry.getDescription().trim();
-        if ((desc.length() > 0) && !desc.startsWith("<wiki>")) {
+        if ((desc.length() > 0) && !desc.startsWith("<wiki>") && !desc.equals("<nolinks>")) {
+            System.err.println("desc:" + desc+":");
             desc = getEntryManager().processText(request, entry, desc);
             StringBuffer descSB =
                 new StringBuffer("\n<div class=\"description\">\n");
