@@ -9,7 +9,7 @@
 
 
   <outputhandler class="ucar.unidata.repository.CatalogOutputHandler" name="THREDDS Catalog"/>
-  <outputhandler class="ucar.unidata.repository.DataOutputHandler" name="Data"/>
+  <outputhandler class="ucar.unidata.repository.DataOutputHandler" name="Data" required="false"/>
   <outputhandler class="ucar.unidata.repository.RssOutputHandler" name="RSS"/>
   <outputhandler class="ucar.unidata.repository.XmlOutputHandler" name="XML"/>
 
@@ -21,7 +21,7 @@
   <outputhandler class="ucar.unidata.repository.TextOutputHandler" name="Text"/>
   <outputhandler class="ucar.unidata.repository.collab.WikiPageOutputHandler" name="Wiki"/>
   <outputhandler class="ucar.unidata.repository.collab.ChatOutputHandler" name="Chat Room"/>
-  <outputhandler class="ucar.unidata.repository.idv.IdvOutputHandler" required="false" name="IDV Preview"/>
+  <outputhandler class="ucar.unidata.repository.idv.IdvOutputHandler"  required="false" name="IDV Preview"/>
   <outputhandler class="ucar.unidata.repository.idv.IdvWebstartOutputHandler"  name="IDV Webstart"/>
 
 <!--
