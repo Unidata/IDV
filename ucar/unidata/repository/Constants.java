@@ -43,7 +43,6 @@ public interface Constants {
     public static final String ICON_FAVORITE = "ramadda.icon.favorite";
 
 
-    public static final String ICON_METADATA_ADD = "ramadda.icon.metadata.add";
 
     /** _more_          */
     public static final String ICON_LOG = "ramadda.icon.log";
@@ -103,6 +102,12 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_ZIP = "ramadda.icon.zip";
 
+    public static final String ICON_METADATA_ADD = "ramadda.icon.metadata.add";
+
+    /** _more_ */
+    public static final String ICON_METADATA_EDIT = "ramadda.icon.metadata.edit";
+
+
     /** _more_ */
     public static final String ICON_METADATA = "ramadda.icon.metadata";
 
@@ -151,11 +156,17 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_INFORMATION = "ramadda.icon.information";
 
+    public static final String ICON_IMAGES = "ramadda.icon.images";
+
     /** _more_ */
     public static final String ICON_RIGHTARROW = "ramadda.icon.rightarrow";
 
     /** _more_ */
     public static final String ICON_FOLDER = "ramadda.icon.folder";
+
+    public static final String ICON_FOLDER_ADD = "ramadda.icon.folder_add";
+
+    public static final String ICON_ENTRY_ADD ="ramadda.icon.entry_add";
 
     /** _more_          */
     public static final String ICON_ENTRY_UPLOAD =

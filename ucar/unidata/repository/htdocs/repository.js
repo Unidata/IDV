@@ -903,12 +903,12 @@ function toggleTab(mainId) {
                 content.style.display = "block";
 		content.style.backgroundColor=this.onColor;
 		title.style.backgroundColor=this.onColor;
-		title.style.borderBottom = "2px #ffffff  solid";
+		title.style.borderBottom = "1px #ffffff  solid";
 	} else {
 		content.style.visibility="hidden";
                 content.style.display = "none";
 		title.style.backgroundColor=this.offColor;
-		title.style.borderBottom = "1px #dddddd  solid";
+		title.style.borderBottom = "1px #000000 solid";
 	}
     }
 }

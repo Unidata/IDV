@@ -702,14 +702,14 @@ public class HtmlOutputHandler extends OutputHandler {
                             new Link(
                                 request.entryUrl(
                                     getMetadataManager().URL_METADATA_FORM,
-                                    entry), iconUrl(ICON_EDIT),
+                                    entry), iconUrl(ICON_METADATA_EDIT),
                                             msg("Edit Metadata")));
                         sb.append(
                             new Link(
                                 request.entryUrl(
                                     getRepository().getMetadataManager()
                                         .URL_METADATA_ADDFORM, entry), iconUrl(
-                                            ICON_ADD), msg("Add Metadata")));
+                                            ICON_METADATA_ADD), msg("Add Metadata")));
                         if (decorate) {
                             sb.append("</td></tr>");
                         }
@@ -924,9 +924,10 @@ public class HtmlOutputHandler extends OutputHandler {
         tabContent.add(getCommentBlock(request, entry));
         tabTitles.add(msg("Associations"));
         tabContent.add(getAssociationBlock(request, entry));
-        tabTitles.add(msg(LABEL_LINKS));
-        tabContent.add(getEntryManager().getEntryActionsTable(request, entry,
-                OutputType.TYPE_ALL));
+
+        //        tabTitles.add(msg(LABEL_LINKS));
+        //        tabContent.add(getEntryManager().getEntryActionsTable(request, entry,
+        //                OutputType.TYPE_ALL));
 
 
 

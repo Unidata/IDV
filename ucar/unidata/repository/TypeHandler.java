@@ -630,12 +630,12 @@ public class TypeHandler extends RepositoryManager {
                 links.add(new Link(request.url(getRepository().URL_ENTRY_FORM,
                         ARG_GROUP,
                                                entry.getId(),
-                                               ARG_TYPE, TYPE_GROUP), getRepository().iconUrl(ICON_FOLDER),
+                                               ARG_TYPE, TYPE_GROUP), getRepository().iconUrl(ICON_FOLDER_ADD),
                                    "New Group",OutputType.TYPE_FILE));
                 links.add(new Link(request.url(getRepository().URL_ENTRY_FORM,
                         ARG_GROUP,
                                                entry.getId(),
-                                               ARG_TYPE, TYPE_FILE), getRepository().iconUrl(ICON_FILE),
+                                               ARG_TYPE, TYPE_FILE), getRepository().iconUrl(ICON_ENTRY_ADD),
                                    "New File",OutputType.TYPE_FILE));
 
                 links.add(new Link(request.url(getRepository().URL_ENTRY_NEW,
@@ -666,7 +666,7 @@ public class TypeHandler extends RepositoryManager {
             links.add(
                 new Link(
                     request.entryUrl(getMetadataManager().URL_METADATA_FORM, entry),
-                    getRepository().iconUrl(ICON_METADATA), msg("Edit Metadata"),OutputType.TYPE_EDIT));
+                    getRepository().iconUrl(ICON_METADATA_EDIT), msg("Edit Metadata"),OutputType.TYPE_EDIT));
             links.add(
                 new Link(
                     request.entryUrl(getMetadataManager().URL_METADATA_ADDFORM, entry),
@@ -826,7 +826,6 @@ public class TypeHandler extends RepositoryManager {
 
             Resource resource     = entry.getResource();
             String   resourceLink = resource.getPath();
-            System.err.println("resource link:" + resourceLink +"  " + getClass().getName());
             if (resourceLink.length() > 0) {
                 if (entry.getResource().isUrl()) {
                     resourceLink =  getResourceUrl(request, entry);

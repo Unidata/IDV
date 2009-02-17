@@ -2976,36 +2976,49 @@ return new Result(title, sb);
                                           int typeMask)
             throws Exception {
         List<Link> links = getEntryLinks(request, entry);
-        StringBuffer htmlSB=null, nonHtmlSB=null, actionSB=null;
+        StringBuffer htmlSB=null, nonHtmlSB=null, actionSB=null,fileSB=null;
+        int cnt=0;
         boolean needToAddHr = false;
+        String tableHeader = "<table cellspacing=\"0\" cellpadding=\"0\">";
         for (Link link : links) {
             StringBuffer sb;
             if (!link.isType(typeMask)) {
                 continue;
             }
             if (link.isType(OutputType.TYPE_HTML)) {
-                if(htmlSB==null) 
-                    htmlSB =  new StringBuffer("<table cellspacing=\"0\" cellpadding=\"0\">");
+                if(htmlSB==null)  {
+                    htmlSB =  new StringBuffer(tableHeader);
+                    cnt++;
+                }
                 sb = htmlSB;
             } else if (link.isType(OutputType.TYPE_NONHTML)) {
-                if(nonHtmlSB==null) 
-                    nonHtmlSB =  new StringBuffer("<table cellspacing=\"0\" cellpadding=\"0\">");
+                if(nonHtmlSB==null)  {
+                    cnt++;
+                    nonHtmlSB =  new StringBuffer(tableHeader);
+                }
                 sb = nonHtmlSB;
+            } else if (link.isType(OutputType.TYPE_FILE)) {
+                if(fileSB==null)  {
+                    cnt++;
+                    fileSB =  new StringBuffer(tableHeader);
+                }
+                sb = fileSB;
             } else {
-                if(actionSB==null) 
-                    actionSB =  new StringBuffer("<table cellspacing=\"0\" cellpadding=\"0\">");
+                if(actionSB==null) {
+                    cnt++;
+                    actionSB =  new StringBuffer(tableHeader);
+                }
                 sb = actionSB;
             }
             //Only add the hr if we have more things in the list
-            if(needToAddHr) {
-                sb.append("<tr><td colspan=2><hr></td></tr>");
+            if(cnt<2 && needToAddHr) {
+                sb.append("<tr><td colspan=2><hr class=\"menuentryseparator\"></td></tr>");
             }
             needToAddHr = link.getHr();
             if(needToAddHr) {
                 continue;
             }
-
-            sb.append("<tr><td class=\"menutd\">");
+            sb.append("<tr class=\"menurow\"><td><div  class=\"menutd\">");
             if (link.getIcon() == null) {
                 sb.append(HtmlUtil.space(1));
             } else {
@@ -3013,10 +3026,10 @@ return new Result(title, sb);
                                         HtmlUtil.img(link.getIcon())));
             }
             sb.append(HtmlUtil.space(1));
-            sb.append("</td><td class=\"menutd\">");
+            sb.append("</div></td><td><div  class=\"menutd\">");
             sb.append(HtmlUtil.href(link.getUrl(), link.getLabel(),
                                     HtmlUtil.cssClass("menulink")));
-            sb.append("</td></tr>");
+            sb.append("</div></td></tr>");
         }
         StringBuffer menu = new StringBuffer();
         menu.append("<table cellspacing=\"0\" cellpadding=\"4\">");
@@ -3029,6 +3042,10 @@ return new Result(title, sb);
         if(nonHtmlSB!=null) {
             nonHtmlSB.append("</table>");
             menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD,"",nonHtmlSB.toString()));
+        }
+        if(fileSB!=null) {
+            fileSB.append("</table>");
+            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD,"",fileSB.toString()));
         }
         if(actionSB!=null) {
             actionSB.append("</table>");
