@@ -8,8 +8,8 @@
 -->
 
 
-  <outputhandler class="ucar.unidata.repository.CatalogOutputHandler" name="THREDDS Catalog"/>
-  <outputhandler class="ucar.unidata.repository.DataOutputHandler" name="Data" required="false"/>
+  <outputhandler class="ucar.unidata.repository.data.CatalogOutputHandler" name="THREDDS Catalog"/>
+  <outputhandler class="ucar.unidata.repository.data.DataOutputHandler" name="Data" required="false"/>
   <outputhandler class="ucar.unidata.repository.RssOutputHandler" name="RSS"/>
   <outputhandler class="ucar.unidata.repository.XmlOutputHandler" name="XML"/>
 

@@ -21,6 +21,7 @@
 
 package ucar.unidata.repository;
 
+import ucar.unidata.repository.data.*;
 
 import org.w3c.dom.*;
 
@@ -815,7 +816,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected ActionManager getActionManager() {
+    public ActionManager getActionManager() {
         if (actionManager == null) {
             actionManager = doMakeActionManager();
         }
@@ -840,7 +841,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected AccessManager getAccessManager() {
+    public AccessManager getAccessManager() {
         if (accessManager == null) {
             accessManager = doMakeAccessManager();
         }
@@ -867,7 +868,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected SearchManager getSearchManager() {
+    public SearchManager getSearchManager() {
         if (searchManager == null) {
             searchManager = doMakeSearchManager();
         }
@@ -893,7 +894,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected MetadataManager getMetadataManager() {
+    public MetadataManager getMetadataManager() {
         if (metadataManager == null) {
             metadataManager = doMakeMetadataManager();
         }
@@ -907,7 +908,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected StorageManager getStorageManager() {
+    public StorageManager getStorageManager() {
         if (storageManager == null) {
             storageManager = doMakeStorageManager();
             storageManager.init();
@@ -921,7 +922,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected DatabaseManager getDatabaseManager() {
+    public DatabaseManager getDatabaseManager() {
         if (databaseManager == null) {
             databaseManager = doMakeDatabaseManager();
         }
@@ -934,7 +935,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected Admin getAdmin() {
+    public Admin getAdmin() {
         if (admin == null) {
             admin = doMakeAdmin();
         }
@@ -957,7 +958,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected void checkVersion() throws Exception {
+    public void checkVersion() throws Exception {
         double version = getDbProperty(PROP_VERSION, 0.0);
         if (version == VERSION) {
             return;
@@ -1257,7 +1258,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @param request _more_
      * @param message _more_
      */
-    protected void log(Request request, String message) {
+    public void log(Request request, String message) {
         log("user:" + request.getUser() + " -- " + message);
     }
 
@@ -1268,7 +1269,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @param message _more_
      * @param exc _more_
      */
-    protected void log(String message, Throwable exc) {
+    public void log(String message, Throwable exc) {
         System.err.println("Error:" + message);
         Throwable thr = null;
         if (exc != null) {
@@ -1298,7 +1299,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @param message _more_
      */
-    protected void log(String message) {
+    public void log(String message) {
         log(message, null);
     }
 
@@ -1708,6 +1709,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     private DataOutputHandler dataOutputHandler;
+
     /**
      * _more_
      *
@@ -3018,7 +3020,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected List<TypeHandler> getTypeHandlers() throws Exception {
+    public List<TypeHandler> getTypeHandlers() throws Exception {
         return new ArrayList<TypeHandler>(theTypeHandlers);
     }
 
@@ -3034,7 +3036,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected TypeHandler getTypeHandler(Request request) throws Exception {
+    public TypeHandler getTypeHandler(Request request) throws Exception {
         if (request != null) {
             String type = request.getString(ARG_TYPE,
                                             TypeHandler.TYPE_ANY).trim();
@@ -3053,7 +3055,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected TypeHandler getTypeHandler(String type) throws Exception {
+    public TypeHandler getTypeHandler(String type) throws Exception {
         return getTypeHandler(type, true, true);
     }
 
@@ -3068,7 +3070,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected TypeHandler getTypeHandler(String type,
+    public TypeHandler getTypeHandler(String type,
                                          boolean makeNewOneIfNeeded,
                                          boolean useDefaultIfNotFound)
             throws Exception {
@@ -3208,7 +3210,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected List getListLinks(Request request, String what,
+    public List getListLinks(Request request, String what,
                                 boolean includeExtra)
             throws Exception {
         List                 links       = new ArrayList();
@@ -3267,7 +3269,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected List getSubNavLinks(Request request, RequestUrl[] urls) {
+    public List getSubNavLinks(Request request, RequestUrl[] urls) {
         return getSubNavLinks(request, urls, BLANK);
     }
 
@@ -3302,7 +3304,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected List getSubNavLinks(Request request, RequestUrl[] urls,
+    public List getSubNavLinks(Request request, RequestUrl[] urls,
                                   String arg) {
         List   links = new ArrayList();
         String type  = request.getRequestPath();
@@ -3345,7 +3347,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @param request _more_
      * @return _more_
      */
-    protected List getNavLinks(Request request) {
+    public List getNavLinks(Request request) {
         List    links   = new ArrayList();
         boolean isAdmin = false;
         if (request != null) {
@@ -3507,7 +3509,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected static String msgHeader(String h) {
+    public static String msgHeader(String h) {
         return HtmlUtil.div(msg(h), HtmlUtil.cssClass("pageheading"));
     }
 
@@ -3779,7 +3781,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected List<TypeHandler> getTypeHandlers(Request request)
+    public List<TypeHandler> getTypeHandlers(Request request)
             throws Exception {
         TypeHandler       typeHandler = getTypeHandler(request);
         List<TypeHandler> tmp         = new ArrayList<TypeHandler>();
@@ -3860,7 +3862,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected Result listTypes(Request request) throws Exception {
+    public Result listTypes(Request request) throws Exception {
         List<TypeHandler> tmp = getTypeHandlers(request);
         return getOutputHandler(request).listTypes(request, tmp);
     }
@@ -3942,7 +3944,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected Result listAssociations(Request request) throws Exception {
+    public Result listAssociations(Request request) throws Exception {
         return getOutputHandler(request).listAssociations(request);
     }
 
@@ -3956,7 +3958,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected String getMimeTypeFromSuffix(String suffix) {
+    public String getMimeTypeFromSuffix(String suffix) {
         String type = (String) mimeTypes.get(suffix);
         if (type == null) {
             if (suffix.startsWith(".")) {
@@ -4028,7 +4030,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected String getQueryOrderAndLimit(Request request,
+    public String getQueryOrderAndLimit(Request request,
                                            boolean addOrderBy) {
         String  order     = " DESC ";
         boolean haveOrder = false;
@@ -4082,7 +4084,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected String getFieldDescription(String fieldValue, String namesFile)
+    public String getFieldDescription(String fieldValue, String namesFile)
             throws Exception {
         return getFieldDescription(fieldValue, namesFile, null);
     }
@@ -4098,7 +4100,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected Properties getFieldProperties(String namesFile)
+    public Properties getFieldProperties(String namesFile)
             throws Exception {
         if (namesFile == null) {
             return null;

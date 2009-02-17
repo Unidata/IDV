@@ -94,13 +94,20 @@ import java.util.zip.*;
 public class EntryGroup {
 
     /** _more_ */
-    Object key;
+    private     Object key;
 
     /** _more_ */
-    String name;
+    private     String name;
 
     /** _more_ */
-    List children = new ArrayList();
+    private List children = new ArrayList();
+
+
+    /** _more_ */
+    private     List keys = new ArrayList();
+
+    /** _more_ */
+    private Hashtable map = new Hashtable();
 
     /**
      * _more_
@@ -112,11 +119,7 @@ public class EntryGroup {
     }
 
 
-    /** _more_ */
-    List keys = new ArrayList();
 
-    /** _more_ */
-    Hashtable map = new Hashtable();
 
     /**
      * _more_
@@ -152,6 +155,99 @@ public class EntryGroup {
     public List keys() {
         return keys;
     }
+
+
+/**
+Set the Key property.
+
+@param value The new value for Key
+**/
+public void setKey (Object value) {
+	key = value;
+}
+
+/**
+Get the Key property.
+
+@return The Key
+**/
+public Object getKey () {
+	return key;
+}
+
+/**
+Set the Name property.
+
+@param value The new value for Name
+**/
+public void setName (String value) {
+	name = value;
+}
+
+/**
+Get the Name property.
+
+@return The Name
+**/
+public String getName () {
+	return name;
+}
+
+/**
+Set the Children property.
+
+@param value The new value for Children
+**/
+public void setChildren (List value) {
+	children = value;
+}
+
+/**
+Get the Children property.
+
+@return The Children
+**/
+public List getChildren () {
+	return children;
+}
+
+
+/**
+Set the Keys property.
+
+@param value The new value for Keys
+**/
+public void setKeys (List value) {
+	keys = value;
+}
+
+/**
+Get the Keys property.
+
+@return The Keys
+**/
+public List getKeys () {
+	return keys;
+}
+
+/**
+Set the Map property.
+
+@param value The new value for Map
+**/
+public void setMap (Hashtable value) {
+	map = value;
+}
+
+/**
+Get the Map property.
+
+@return The Map
+**/
+public Hashtable getMap () {
+	return map;
+}
+
 
 }
 

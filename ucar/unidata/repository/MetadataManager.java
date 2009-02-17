@@ -324,7 +324,7 @@ public class MetadataManager extends RepositoryManager {
      *
      * @return _more_
      */
-    protected List<MetadataHandler> getMetadataHandlers() {
+    public List<MetadataHandler> getMetadataHandlers() {
         return metadataHandlers;
     }
 

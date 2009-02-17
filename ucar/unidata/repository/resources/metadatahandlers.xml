@@ -12,5 +12,5 @@
                    name="GCMD Science Keyword"
                    type="enum_gcmdkeyword"
                    />
-  <metadatahandler class="ucar.unidata.repository.ThreddsMetadataHandler"/>
+  <metadatahandler class="ucar.unidata.repository.data.ThreddsMetadataHandler"/>
 </metadatahandlers>

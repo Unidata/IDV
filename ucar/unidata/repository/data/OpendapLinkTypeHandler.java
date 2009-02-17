@@ -21,7 +21,7 @@
  */
 
 
-package ucar.unidata.repository.collab;
+package ucar.unidata.repository.data;
 
 
 import org.w3c.dom.*;
@@ -65,7 +65,7 @@ import java.util.Properties;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class OpendapLinkTypeHandler extends TypeHandler {
+public class OpendapLinkTypeHandler extends GenericTypeHandler {
 
     /**
      * _more_
@@ -82,7 +82,18 @@ public class OpendapLinkTypeHandler extends TypeHandler {
 
 
 
+    public String xxxgetEntryResourceUrl(Request request, Entry entry) throws Exception {
 
+        String fileTail = IOUtil.stripExtension(getStorageManager().getFileTail(entry))+".html";
+        System.err.println ("getEntry:" + fileTail);
+        return HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
+                            + fileTail, ARG_ENTRYID, entry.getId());
+    }
+
+    public String getResourceUrl(Request request, Entry entry) throws Exception {
+        Resource resource     = entry.getResource();
+        return resource.getPath()+".html";
+    }
 
 }
 

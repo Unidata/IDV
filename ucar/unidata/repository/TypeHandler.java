@@ -76,6 +76,9 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     public static final String TYPE_GROUP = Constants.TYPE_GROUP;
 
+    public static final String TYPE_OPENDAPLINK = "opendaplink";
+
+
 
     /** _more_ */
     public static final String TAG_COLUMN = "column";
@@ -726,7 +729,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected boolean canDownload(Request request, Entry entry)
+    public boolean canDownload(Request request, Entry entry)
             throws Exception {
         if ( !entry.isFile()) {
             return false;
@@ -747,25 +750,17 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected Link getEntryDownloadLink(Request request, Entry entry)
+    public Link getEntryDownloadLink(Request request, Entry entry)
             throws Exception {
-
-
         if ( !getAccessManager().canDownload(request, entry)) {
             return null;
         }
         File   f    = entry.getResource().getFile();
         String size = " (" + f.length() + " bytes)";
-        if (getRepository().getProperty(PROP_DOWNLOAD_ASFILES, false)) {
-            return new Link("file://" + entry.getResource(),
-                            getRepository().iconUrl(ICON_FETCH),
-                            "Download file" + size,OutputType.TYPE_FILE);
-        } else {
-            String fileTail = getStorageManager().getFileTail(entry);
-            return new Link(getEntryManager().getEntryResourceUrl(request,
-                    entry), getRepository().iconUrl(ICON_FETCH),
-                            "Download file" + size,OutputType.TYPE_FILE);
-        }
+        String fileTail = getStorageManager().getFileTail(entry);
+        return new Link(getEntryManager().getEntryResourceUrl(request,
+                                                              entry), getRepository().iconUrl(ICON_FETCH),
+                        "Download file" + size,OutputType.TYPE_FILE);
     }
 
 
@@ -831,10 +826,11 @@ public class TypeHandler extends RepositoryManager {
 
             Resource resource     = entry.getResource();
             String   resourceLink = resource.getPath();
+            System.err.println("resource link:" + resourceLink +"  " + getClass().getName());
             if (resourceLink.length() > 0) {
                 if (entry.getResource().isUrl()) {
-                    resourceLink = "<a href=\"" + resourceLink + "\">"
-                                   + resourceLink + "</a>";
+                    resourceLink =  getResourceUrl(request, entry);
+                    resourceLink = HtmlUtil.href(resourceLink, resourceLink);
                 } else if (entry.getResource().isFile()) {
                     int idx = resourceLink.indexOf("_");
                     if (idx >= 0) {
@@ -842,8 +838,8 @@ public class TypeHandler extends RepositoryManager {
                     }
                     if (getAccessManager().canDownload(request, entry)) {
                         resourceLink = HtmlUtil.href(
-                            getEntryManager().getEntryResourceUrl(
-                                request, entry), resourceLink);
+                                                     getEntryResourceUrl(
+                                                                         request, entry), resourceLink);
 
                         resourceLink =
                             resourceLink + HtmlUtil.space(2)
@@ -936,8 +932,8 @@ public class TypeHandler extends RepositoryManager {
                         HtmlUtil.formEntryTop(
                             msgLabel("Image"),
                             HtmlUtil.img(
-                                getEntryManager().getEntryResourceUrl(
-                                    request, entry), "", "width=600")));
+                                         getEntryResourceUrl(
+                                                             request, entry), "", "width=600")));
 
 
                 } else if (entry.getResource().isUrl()) {
@@ -949,6 +945,17 @@ public class TypeHandler extends RepositoryManager {
         } else if (output.equals(XmlOutputHandler.OUTPUT_XML)) {}
         return sb;
 
+    }
+
+
+    public String getResourceUrl(Request request, Entry entry) throws Exception {
+        Resource resource     = entry.getResource();
+        return resource.getPath();
+    }
+
+
+    public String getEntryResourceUrl(Request request, Entry entry) throws Exception {
+        return getEntryManager().getEntryResourceUrl(request, entry);
     }
 
 

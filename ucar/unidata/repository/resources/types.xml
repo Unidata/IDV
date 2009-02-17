@@ -19,7 +19,7 @@
 </type>
 
 
-  <type name="opendaplink"  description="OpenDAP Link" >
+  <type name="opendaplink"  description="OpenDAP Link" handler="ucar.unidata.repository.data.OpendapLinkTypeHandler">
      <property name="icon" value="/icons/opendap.gif"/>
      <property name="form.show.date" value="false"/>
      <property name="form.show.area" value="false"/>
@@ -41,7 +41,7 @@
 
 
 
-  <type name="catalog"  description="Catalog View" handler="ucar.unidata.repository.CatalogTypeHandler">
+  <type name="catalog"  description="Catalog View" handler="ucar.unidata.repository.data.CatalogTypeHandler">
      <property name="form.show.file" value="false"/>
      <property name="form.show.url" value="true"/>
      <property name="form.label.url" value="Catalog URL"/>

@@ -20,7 +20,9 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.data;
+
+import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
@@ -299,14 +301,16 @@ public class CatalogHarvester extends Harvester {
             Element serviceNode = CatalogUtil.findServiceNodeForDataset(node,
                                       false, null);
 
+            boolean isOpendap = false;
             if (serviceNode != null) {
                 String path = XmlUtil.getAttribute(serviceNode, "base");
                 urlPath = new URL(catalogUrl, path + urlPath).toString();
-                System.err.println (XmlUtil.toString(serviceNode) + " urlPath:" + urlPath);
+                String serviceType = XmlUtil.getAttribute(serviceNode, CatalogUtil.ATTR_SERVICETYPE,"").toLowerCase();
+                isOpendap = serviceType.equals("opendap")|| serviceType.equals("dods");
             }
 
             TypeHandler typeHandler =
-                repository.getTypeHandler(TypeHandler.TYPE_FILE);
+                repository.getTypeHandler((isOpendap?TypeHandler.TYPE_OPENDAPLINK:TypeHandler.TYPE_FILE));
             entryCnt++;
             Entry  entry      = typeHandler.createEntry(repository.getGUID());
             Date   createDate = new Date();

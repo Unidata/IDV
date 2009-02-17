@@ -19,8 +19,9 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.data;
 
+import ucar.unidata.repository.*;
 
 import org.w3c.dom.*;
 
@@ -716,15 +717,15 @@ public class CatalogOutputHandler extends OutputHandler {
 
         for (int i = 0; i < parent.keys().size(); i++) {
             Object     key   = parent.keys().get(i);
-            EntryGroup group = (EntryGroup) parent.map.get(key);
+            EntryGroup group = (EntryGroup) parent.getMap().get(key);
             /*            Element dataset = XmlUtil.create(catalogInfo.doc, TAG_DATASET,
                                              datasetNode,
                                              new String[] { ATTR_NAME,
                     group.key.toString() });
             */
             Element dataset = datasetNode;
-            for (int j = 0; j < group.children.size(); j++) {
-                Object child = group.children.get(j);
+            for (int j = 0; j < group.getChildren().size(); j++) {
+                Object child = group.getChildren().get(j);
                 if (child instanceof EntryGroup) {
                     EntryGroup subGroup = (EntryGroup) child;
                     generate(request, subGroup, catalogInfo, dataset);
