@@ -77,6 +77,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -3731,7 +3732,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public String makeTypeSelect(Request request, boolean includeAny)
             throws Exception {
-        return makeTypeSelect(request, includeAny, "", false);
+        return makeTypeSelect(request, includeAny, "", false,null);
     }
 
     /**
@@ -3747,13 +3748,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     public String makeTypeSelect(Request request, boolean includeAny,
-                                 String selected, boolean checkAddOk)
+                                 String selected, boolean checkAddOk, HashSet<String> exclude)
             throws Exception {
         List<TypeHandler> typeHandlers = getTypeHandlers();
         List              tmp          = new ArrayList();
         for (TypeHandler typeHandler : typeHandlers) {
             if (typeHandler.isAnyHandler() && !includeAny) {
                 continue;
+            }
+            if(exclude!=null) {
+                if(exclude.contains(typeHandler.getType())) continue;
             }
             if (checkAddOk && !typeHandler.canBeCreatedBy(request)) {
                 continue;

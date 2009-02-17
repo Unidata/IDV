@@ -434,7 +434,7 @@ return new Result(title, sb);
                 HtmlUtil.formEntry(
                     msgLabel("Type"),
                     getRepository().makeTypeSelect(
-                        request, false, "", true)));
+                        request, false, "", true,null)));
 
             sb.append(
                 HtmlUtil.formEntry(
@@ -1562,10 +1562,25 @@ return new Result(title, sb);
         StringBuffer sb    = new StringBuffer();
         //        sb.append(makeEntryHeader(request, group));
         sb.append(HtmlUtil.p());
+        sb.append(HtmlUtil.href(request.url(getRepository().URL_ENTRY_FORM,
+                                    ARG_GROUP,
+                                    group.getId(),
+                                    ARG_TYPE, TYPE_GROUP), msg("Create a group")));
+        sb.append(HtmlUtil.p());
+        sb.append(HtmlUtil.href(request.url(getRepository().URL_ENTRY_FORM,
+                                    ARG_GROUP,
+                                    group.getId(),
+                                    ARG_TYPE, TYPE_FILE), msg("Upload a file")));
+
+        sb.append(HtmlUtil.p());
+
         sb.append(request.form(getRepository().URL_ENTRY_FORM));
-        sb.append(msgLabel("Create a"));
+        sb.append(msgLabel("Or create a"));
         sb.append(HtmlUtil.space(1));
-        sb.append(getRepository().makeTypeSelect(request, false, "", true));
+        HashSet<String> exclude = new HashSet<String>();
+        exclude.add(TYPE_FILE);
+        exclude.add(TYPE_GROUP);
+        sb.append(getRepository().makeTypeSelect(request, false, "", true,exclude));
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.submit("Go"));
         sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
@@ -2960,6 +2975,7 @@ return new Result(title, sb);
             throws Exception {
         List<Link> links = getEntryLinks(request, entry);
         StringBuffer htmlSB=null, nonHtmlSB=null, actionSB=null;
+        boolean needToAddHr = false;
         for (Link link : links) {
             StringBuffer sb;
             if (!link.isType(typeMask)) {
@@ -2978,10 +2994,15 @@ return new Result(title, sb);
                     actionSB =  new StringBuffer("<table cellspacing=\"0\" cellpadding=\"0\">");
                 sb = actionSB;
             }
-            if(link.getHr()) {
+            //Only add the hr if we have more things in the list
+            if(needToAddHr) {
                 sb.append("<tr><td colspan=2><hr></td></tr>");
+            }
+            needToAddHr = link.getHr();
+            if(needToAddHr) {
                 continue;
             }
+
             sb.append("<tr><td>");
             if (link.getIcon() == null) {
                 sb.append(HtmlUtil.space(1));

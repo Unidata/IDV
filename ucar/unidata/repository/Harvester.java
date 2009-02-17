@@ -410,7 +410,7 @@ public class Harvester extends RepositoryManager {
         sb.append(HtmlUtil.formEntry(msgLabel("Create entries of type"),
                                      repository.makeTypeSelect(request,
                                          false, typeHandler.getType(),
-                                         false)));
+                                         false,null)));
 
         List<TwoFacedObject> tfos= new ArrayList<TwoFacedObject>();
         tfos.add(new TwoFacedObject("Absolute (minutes)",UNIT_ABSOLUTE));

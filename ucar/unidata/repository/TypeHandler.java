@@ -623,10 +623,25 @@ public class TypeHandler extends RepositoryManager {
         if (entry.isGroup()) {
             if (getAccessManager().canDoAction(request, entry,
                     Permission.ACTION_NEW)) {
+
+                links.add(new Link(request.url(getRepository().URL_ENTRY_FORM,
+                        ARG_GROUP,
+                                               entry.getId(),
+                                               ARG_TYPE, TYPE_GROUP), getRepository().iconUrl(ICON_FOLDER),
+                                   "New Group",OutputType.TYPE_FILE));
+                links.add(new Link(request.url(getRepository().URL_ENTRY_FORM,
+                        ARG_GROUP,
+                                               entry.getId(),
+                                               ARG_TYPE, TYPE_FILE), getRepository().iconUrl(ICON_FILE),
+                                   "New File",OutputType.TYPE_FILE));
+
                 links.add(new Link(request.url(getRepository().URL_ENTRY_NEW,
                         ARG_GROUP,
                         entry.getId()), getRepository().iconUrl(ICON_NEW),
-                                        "New Entry or Group",OutputType.TYPE_FILE|OutputType.TYPE_TOOLBAR));
+                                        "New Entry",OutputType.TYPE_FILE|OutputType.TYPE_TOOLBAR));
+                Link hr = new Link(true);
+                hr.setLinkType(OutputType.TYPE_FILE);
+                links.add(hr);
             } else if (getAccessManager().canDoAction(request, entry,
                     Permission.ACTION_UPLOAD)) {
                 links.add(
