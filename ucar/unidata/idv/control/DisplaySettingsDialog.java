@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.event.*;
 
 
 
@@ -85,7 +86,7 @@ public class DisplaySettingsDialog {
     private JButton applyBtn;
 
     /** ??? */
-    List displayWrappers;
+    List<DisplayWrapper> displayWrappers;
 
     /** The displays */
     List displays;
@@ -99,6 +100,8 @@ public class DisplaySettingsDialog {
     /** gui component */
     private JComponent contents;
 
+
+    private JList displaysList;
 
     /**
      * ctor
@@ -193,19 +196,20 @@ public class DisplaySettingsDialog {
             dialog.setTitle("Display Settings -- " + display.getTitle());
         }
         updatePropertiesComponent();
+        //Don't change the displays list
+        if(true) return;
         for (int i = 0; i < displays.size(); i++) {
-            DisplayWrapper dw = (DisplayWrapper) displayWrappers.get(i);
+            DisplayWrapper dw =  displayWrappers.get(i);
             if (FONT_NORMAL == null) {
                 FONT_NORMAL   = dw.cbx.getFont();
                 FONT_SELECTED = FONT_NORMAL.deriveFont(Font.ITALIC);
             }
             if (dw.dci == display) {
-                dw.cbx.setForeground(Color.blue);
                 dw.cbx.setSelected(true);
-                dw.cbx.setFont(FONT_SELECTED);
+                dw.cbx.setFont(FONT_NORMAL);
             } else {
-                dw.cbx.setForeground(Color.black);
                 dw.cbx.setSelected(false);
+
                 dw.cbx.setFont(FONT_NORMAL);
             }
         }
@@ -277,21 +281,10 @@ public class DisplaySettingsDialog {
         public DisplayWrapper(DisplayControlImpl display) {
             this.dci = display;
             cbx      = new JCheckBox(dci.getTitle());
-            cbx.setToolTipText("<html>Right click to show popup menu</html>");
-            cbx.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
-                    if ( !SwingUtilities.isRightMouseButton(e)) {
-                        return;
-                    }
-                    List items = new ArrayList();
-                    items.add(
-                        GuiUtils.makeMenuItem(
-                            "Use properties from this display",
-                            DisplaySettingsDialog.this, "setDisplay", dci));
-                    JPopupMenu popup = GuiUtils.makePopupMenu(items);
-                    popup.show(cbx, e.getX(), e.getY());
-                }
-            });
+        }
+
+        public String toString() {
+            return dci.getLabel();
         }
     }
 
@@ -302,7 +295,7 @@ public class DisplaySettingsDialog {
      * @return the gui
      */
     private JComponent doMakeContents() {
-        displayWrappers = new ArrayList();
+        displayWrappers = new ArrayList<DisplayWrapper>();
         List      viewLabels = new ArrayList();
         Hashtable viewMap    = new Hashtable();
         int       viewCnt    = 0;
@@ -332,6 +325,9 @@ public class DisplaySettingsDialog {
             }
             comps.add(dw.cbx);
         }
+
+
+
         List   displayComps = new ArrayList();
         Insets compInsets   = new Insets(0, 15, 0, 0);
         Insets labelInsets  = new Insets(5, 5, 0, 0);
@@ -356,7 +352,7 @@ public class DisplaySettingsDialog {
             }
         });
 
-        applyBtn = GuiUtils.makeButton("Apply", this, "doApply");
+        applyBtn = GuiUtils.makeButton("Apply>>", this, "doApply");
         JButton   okBtn     = GuiUtils.makeButton("OK", this, "doOk");
         JButton   cancelBtn = GuiUtils.makeButton("Cancel", this, "doCancel");
         JButton   saveBtn   = GuiUtils.makeButton("Save", this, "doSave");
@@ -366,26 +362,47 @@ public class DisplaySettingsDialog {
                                         "popupDisplaySettingsMenu", holder);
         propertiesHolder = new JPanel(new BorderLayout());
 
+        displaysList = new JList(new Vector(displays));
+        displaysList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JComponent displaysSP = GuiUtils.makeScrollPane(GuiUtils.top(displaysList), 200,
+                                                        300);
+        displaysSP.setPreferredSize(new Dimension(200, 300));
+        if(display!=null) {
+            System.err.println("setting selected value");
+            displaysList.setSelectedValue(display,true);
+        }
+
+        displaysList.addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent e) {
+                    setDisplay((DisplayControlImpl) displaysList.getSelectedValue());
+                }
+            });
+
+
         JComponent groupApplyComp = GuiUtils.inset(propertiesHolder, 5);
-        leftSP = GuiUtils.makeScrollPane(GuiUtils.top(groupApplyComp), 350,
+        leftSP = GuiUtils.makeScrollPane(GuiUtils.top(groupApplyComp), 300,
                                          300);
         JScrollPane rightSP =
-            GuiUtils.makeScrollPane(GuiUtils.top(displaysComp), 350, 300);
-        leftSP.setPreferredSize(new Dimension(350, 300));
+            GuiUtils.makeScrollPane(GuiUtils.top(displaysComp), 300, 300);
+        leftSP.setPreferredSize(new Dimension(300, 300));
         rightSP.setPreferredSize(new Dimension(300, 300));
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
         JComponent buttons = GuiUtils.doLayout(new Component[] { saveBtn,
-                applyBtn, okBtn, cancelBtn }, 4, GuiUtils.WT_N,
-                    GuiUtils.WT_N);
+                                                                 okBtn, cancelBtn }, 4, GuiUtils.WT_N,
+            GuiUtils.WT_N);
 
-        JComponent applyContents =
+        JComponent sourceComp = GuiUtils.topCenter(new JLabel("Source Display"),
+                                                   displaysSP);
+        JComponent propComp = GuiUtils.topCenter(new JLabel("Properties"),
+                                                 leftSP);
+
+        JComponent targetComp = GuiUtils.topCenter(new JLabel("Target Displays"),
+                                                 rightSP);
+
+        JComponent applyContents = 
             GuiUtils.doLayout(new Component[] {
-                GuiUtils.inset(GuiUtils.leftRight(new JLabel("Properties"),
-                    holder[0]), 2),
-                GuiUtils.inset(GuiUtils.leftRight(new JLabel("Displays"),
-                    selectBtn), 2),
-                GuiUtils.inset(leftSP, 2), GuiUtils.inset(rightSP, 2), }, 2,
-                    GuiUtils.WT_YY, GuiUtils.WT_NY);
+                    sourceComp, propComp,GuiUtils.wrap(applyBtn), targetComp},
+                4,  new double[]{1,1,0,1}, GuiUtils.WT_Y);
 
         applyContents = GuiUtils.centerBottom(applyContents,
                 GuiUtils.wrap(buttons));
