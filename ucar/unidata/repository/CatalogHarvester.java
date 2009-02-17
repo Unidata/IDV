@@ -298,9 +298,11 @@ public class CatalogHarvester extends Harvester {
         if ( !haveChildDatasets && (xmlDepth > 0) && (urlPath != null)) {
             Element serviceNode = CatalogUtil.findServiceNodeForDataset(node,
                                       false, null);
+
             if (serviceNode != null) {
                 String path = XmlUtil.getAttribute(serviceNode, "base");
                 urlPath = new URL(catalogUrl, path + urlPath).toString();
+                System.err.println (XmlUtil.toString(serviceNode) + " urlPath:" + urlPath);
             }
 
             TypeHandler typeHandler =

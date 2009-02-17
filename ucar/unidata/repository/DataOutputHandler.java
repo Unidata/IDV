@@ -1152,7 +1152,7 @@ public class DataOutputHandler extends OutputHandler {
             while (dataIterator.hasNext()) {
                 PointObsDatatype po = (PointObsDatatype) dataIterator.next();
                 //                ucar.unidata.geoloc.EarthLocation el = po.getLocation();
-                ucar.nc2.dt.EarthLocation el = po.getLocation();
+                ucar.unidata.geoloc.EarthLocation el = po.getLocation();
                 if (el == null) {
                     continue;
                 }
@@ -1484,7 +1484,7 @@ public class DataOutputHandler extends OutputHandler {
             int      cnt          = 0;
             while (dataIterator.hasNext()) {
                 PointObsDatatype po = (PointObsDatatype) dataIterator.next();
-                ucar.nc2.dt.EarthLocation el = po.getLocation();
+                ucar.unidata.geoloc.EarthLocation el = po.getLocation();
                 if (el == null) {
                     continue;
                 }
@@ -1561,7 +1561,7 @@ public class DataOutputHandler extends OutputHandler {
             Iterator dataIterator = pod.getDataIterator(16384);
             while (dataIterator.hasNext()) {
                 PointObsDatatype po = (PointObsDatatype) dataIterator.next();
-                ucar.nc2.dt.EarthLocation el = po.getLocation();
+                ucar.unidata.geoloc.EarthLocation el = po.getLocation();
                 if (el == null) {
                     continue;
                 }

@@ -19,6 +19,14 @@
 </type>
 
 
+  <type name="opendaplink"  description="OpenDAP Link" >
+     <property name="icon" value="/icons/opendap.gif"/>
+     <property name="form.show.date" value="false"/>
+     <property name="form.show.area" value="false"/>
+     <property name="form.show.file" value="false"/>
+  </type>
+
+
 
   <type name="localfiles"  description="Local File View" handler="ucar.unidata.repository.LocalFileTypeHandler">
      <property name="form.show.resource" value="false"/>
