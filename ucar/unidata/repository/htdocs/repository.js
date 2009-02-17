@@ -167,18 +167,22 @@ function noop() {
 
 
 
-
 var popupObject;
 document.onmousemove = mouseMove;
 document.onmousedown = mouseDown;
 document.onmouseup   = mouseUp;
 
+
 var mouseIsDown = 0;
 var draggedEntry;
 var draggedEntryName;
 var mouseMoveCnt =0;
+var objectToHide;
 
 function hidePopupObject() {
+    if(objectToHide!=popupObject) {
+	return;
+    }
     if(popupObject) {
         hideObject(popupObject);
         popupObject = null;
@@ -186,10 +190,13 @@ function hidePopupObject() {
 }
 
 
+
 function mouseDown(event) {
     if(popupObject) {
-        setTimeout("hidePopupObject()",100);
+	objectToHide = popupObject;
+        setTimeout("hidePopupObject()",500);
     }
+
     event = util.getEvent(event);
     mouseIsDown = 1;
     mouseMoveCnt =0;

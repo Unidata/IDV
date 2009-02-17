@@ -691,7 +691,9 @@ code.menu {
    padding-top:2px;
    padding-bottom:0px;
    background-color:#eeeeee;
-   border-bottom: 1px #aaaaaa solid; 
+   border-bottom: 1px #888888 solid; 
+   margin-bottom:3px;
+
 }
 
 .entrymenulink {
@@ -716,7 +718,8 @@ a:hover .entrymenulink {
 }
 
 .menuseparator {
-   margin:0px;
+   margin-left:2px;
+   margin-right:2px;
    padding-bottom:2px;
 }
 

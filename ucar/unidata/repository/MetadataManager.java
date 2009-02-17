@@ -709,6 +709,8 @@ public class MetadataManager extends RepositoryManager {
         if (metadataList.size() == 0) {
             sb.append(
                 getRepository().note(msg("No metadata defined for entry")));
+            sb.append(msgLabel("Add new metadata"));
+            makeAddList(request, entry, sb);
         } else {
             sb.append(HtmlUtil.uploadForm(request.url(URL_METADATA_CHANGE),
                                           ""));
@@ -772,9 +774,26 @@ public class MetadataManager extends RepositoryManager {
     public Result processMetadataAddForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
         Entry        entry = getEntryManager().getEntry(request);
-        //        sb.append(getEntryManager().makeEntryHeader(request, entry));
         sb.append(HtmlUtil.p());
-        if ( !request.exists(ARG_TYPE)) {
+        if (!request.exists(ARG_TYPE)) {
+            makeAddList(request, entry, sb);
+        } else {
+            String type = request.getString(ARG_TYPE, BLANK);
+            sb.append(HtmlUtil.formTable());
+            for (MetadataHandler handler : metadataHandlers) {
+                if (handler.canHandle(type)) {
+                    handler.makeAddForm(request, entry,
+                                        handler.findType(type), sb);
+                    break;
+                }
+            }
+            sb.append(HtmlUtil.formTableClose());
+        }
+        return getEntryManager().makeEntryEditResult(request, entry,
+                msg("Add Metadata"), sb);
+    }
+
+    private void makeAddList(Request request, Entry entry, StringBuffer sb) throws Exception {
             List<String> groups   = new ArrayList<String>();
             Hashtable    groupMap = new Hashtable();
 
@@ -811,23 +830,8 @@ public class MetadataManager extends RepositoryManager {
                         false));
 
             }
-        } else {
-            String type = request.getString(ARG_TYPE, BLANK);
-            sb.append(HtmlUtil.formTable());
-            for (MetadataHandler handler : metadataHandlers) {
-                if (handler.canHandle(type)) {
-                    handler.makeAddForm(request, entry,
-                                        handler.findType(type), sb);
-                    break;
-                }
-            }
-            sb.append(HtmlUtil.formTableClose());
-        }
-        return getEntryManager().makeEntryEditResult(request, entry,
-                msg("Add Metadata"), sb);
+
     }
-
-
 
 
 

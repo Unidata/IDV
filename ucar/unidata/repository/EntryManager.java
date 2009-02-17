@@ -344,7 +344,8 @@ return new Result(title, sb);
             if ( !entry.isGroup() || !((Group) entry).isDummy()) {
                 String[] crumbs = getBreadCrumbs(request, entry, false);
                 sb.append(crumbs[1]);
-                result.setTitle(result.getTitle() + ": " + crumbs[0]);
+                //                result.setTitle(result.getTitle() + ": " + crumbs[0]);
+                //                result.setTitle(result.getTitle());
                 result.putProperty(PROP_ENTRY_HEADER, sb.toString());
             }
         }
@@ -444,7 +445,8 @@ return new Result(title, sb);
                                        ? getRepository().getTypeHandler(type)
                                        : entry.getTypeHandler());
 
-            String submitButton = HtmlUtil.submit(title = ((entry == null)
+            title = (entry==null?msg("Add Entry"):msg("Edit Entry"));
+            String submitButton = HtmlUtil.submit(((entry == null)
                     ? "Add " + typeHandler.getLabel()
                     : msg("Save")));
 
@@ -1216,12 +1218,13 @@ return new Result(title, sb);
                                          String title, StringBuffer sb)
             throws Exception {
         Result result = new Result(title, sb);
+        /*
         result.putProperty(PROP_NAVSUBLINKS,
                            getRepository().getSubNavLinks(request,
                                (entry.isGroup()
                                 ? getRepository().groupEditUrls
                                 : getRepository().entryEditUrls), "?"
-                                + ARG_ENTRYID + "=" + entry.getId()));
+                                + ARG_ENTRYID + "=" + entry.getId()));*/
         return addEntryHeader(request, entry, result);
     }
 
