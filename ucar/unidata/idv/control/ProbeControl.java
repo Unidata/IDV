@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -754,8 +755,23 @@ public class ProbeControl extends DisplayControlImpl {
      * @throws VisADException   VisAD Error
      */
     protected void resetData() throws VisADException, RemoteException {
+        resetData(true);
+    }
+
+    /**
+     * Reset the data. 
+     * 
+     * @param clearCache If true then clear the cached data in the rows
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    protected void resetData(boolean clearCache)
+            throws VisADException, RemoteException {
         //        synchronized(INFO_MUTEX) {
-        clearCachedSamples();
+        if (clearCache) {
+            clearCachedSamples();
+        }
         updateLegendLabel();
         setTimesForAnimation();
         doMoveProbe();
@@ -822,8 +838,10 @@ public class ProbeControl extends DisplayControlImpl {
             appendDataChoices(Misc.newList(dc));
             List choices = getDataChoices();
             //This should force the creation of a new one
-            getRowInfo(choices.size() - 1).initWith(oldInfo);
-            resetData();
+            ProbeRowInfo newRowInfo = getRowInfo(choices.size() - 1, false);
+            newRowInfo.initWith(oldInfo);
+            newRowInfo.setDataInstance(oldInfo.getDataInstance());
+            resetData(false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -2005,12 +2023,24 @@ public class ProbeControl extends DisplayControlImpl {
      * @return The info
      */
     private ProbeRowInfo getRowInfo(int row) {
+        return getRowInfo(row, true);
+    }
+
+    /**
+     * Create and initialize a new ProbeRowInfo if needed. Return it.
+     *
+     * @param row The row
+     * @param andInitializeData If true then have the ProbeRowInfo read its data
+     *
+     * @return The info
+     */
+    private ProbeRowInfo getRowInfo(int row, boolean andInitializeData) {
         while (row >= infos.size()) {
             ProbeRowInfo info = new ProbeRowInfo(this);
             infos.add(info);
         }
         ProbeRowInfo info = (ProbeRowInfo) infos.get(row);
-        if (info.getDataInstance() == null) {
+        if (andInitializeData && (info.getDataInstance() == null)) {
             List choices = getDataChoices();
             try {
                 DataChoice dc = (DataChoice) choices.get(row);
@@ -2103,7 +2133,6 @@ public class ProbeControl extends DisplayControlImpl {
      *
      * @param info the info
      * @param elt point
-     * @param llp point again
      * @param useRowInfoCache Do we use the cached value in the rowinfo
      *
      * @return sample
