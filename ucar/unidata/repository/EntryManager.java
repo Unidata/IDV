@@ -3003,7 +3003,7 @@ return new Result(title, sb);
                 continue;
             }
 
-            sb.append("<tr><td>");
+            sb.append("<tr><td class=\"menutd\">");
             if (link.getIcon() == null) {
                 sb.append(HtmlUtil.space(1));
             } else {
@@ -3011,7 +3011,7 @@ return new Result(title, sb);
                                         HtmlUtil.img(link.getIcon())));
             }
             sb.append(HtmlUtil.space(1));
-            sb.append("</td><td>");
+            sb.append("</td><td class=\"menutd\">");
             sb.append(HtmlUtil.href(link.getUrl(), link.getLabel(),
                                     HtmlUtil.cssClass("menulink")));
             sb.append("</td></tr>");
