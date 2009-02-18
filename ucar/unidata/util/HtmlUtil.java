@@ -86,161 +86,168 @@ public class HtmlUtil {
     /** _more_ */
     public static final String SIZE_90 = "  size=\"90\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_A = "a";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_B = "b";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_BR = "br";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_CENTER = "center";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DIV = "div";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_FORM = "form";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_HR = "hr";
 
+    /** _more_          */
     public static final String TAG_H1 = "h1";
 
+    /** _more_          */
     public static final String TAG_H2 = "h2";
 
+    /** _more_          */
     public static final String TAG_H3 = "h3";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_IMG = "img";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_INPUT = "input";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_LI = "li";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_NOBR = "nobr";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_OPTION = "option";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_P = "p";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SCRIPT = "script";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SPAN = "span";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SELECT = "select";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TABLE = "table";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TD = "td";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TR = "tr";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TEXTAREA = "textarea";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_UL = "ul";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ACTION = "action";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ALIGN = "align";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ALT = "alt";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_BORDER = "border";
+
+    /** _more_          */
     public static final String ATTR_BGCOLOR = "bgcolor";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CELLSPACING = "cellspacing";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CELLPADDING = "cellpadding";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CLASS = "class";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_COLS = "cols";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_COLSPAN = "colspan";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ENCTYPE = "enctype";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_HREF = "href";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ID = "id";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_METHOD = "method";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ONMOUSEMOVE = "onmousemove";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ONMOUSEOVER = "onmouseover";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ONMOUSEUP = "onmouseup";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ONMOUSEOUT = "onmouseout";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ONMOUSEDOWN = "onmousedown";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ONCLICK = "onClick";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ROWS = "rows";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SELECTED = "selected";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SRC = "src";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_STYLE = "style";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TITLE = "title";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VALUE = "value";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VALIGN = "valign";
-    public static final String ATTR_WIDTH="width";
+
+    /** _more_          */
+    public static final String ATTR_WIDTH = "width";
 
     //    public static final String ATTR_="";
     //    public static final String ATTR_="";
@@ -258,18 +265,52 @@ public class HtmlUtil {
         return "<" + comp + ">";
     }
 
+    /**
+     * _more_
+     *
+     * @param s1 _more_
+     * @param s2 _more_
+     *
+     * @return _more_
+     */
     public static String comma(String s1, String s2) {
-        return comma(new String[]{s1,s2});
+        return comma(new String[] { s1, s2 });
     }
 
-    public static String comma(String s1, String s2,String s3) {
-        return comma(new String[]{s1,s2,s3});
+    /**
+     * _more_
+     *
+     * @param s1 _more_
+     * @param s2 _more_
+     * @param s3 _more_
+     *
+     * @return _more_
+     */
+    public static String comma(String s1, String s2, String s3) {
+        return comma(new String[] { s1, s2, s3 });
     }
 
-    public static String comma(String s1, String s2,String s3,String s4) {
-        return comma(new String[]{s1,s2,s3,s4});
+    /**
+     * _more_
+     *
+     * @param s1 _more_
+     * @param s2 _more_
+     * @param s3 _more_
+     * @param s4 _more_
+     *
+     * @return _more_
+     */
+    public static String comma(String s1, String s2, String s3, String s4) {
+        return comma(new String[] { s1, s2, s3, s4 });
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public static String comma(String[] s) {
         return StringUtil.join(",", s);
     }
@@ -298,6 +339,13 @@ public class HtmlUtil {
         return "</" + comp + ">";
     }
 
+    /**
+     * _more_
+     *
+     * @param comp _more_
+     *
+     * @return _more_
+     */
     public static String tag(String comp) {
         return "<" + comp + "/>";
     }
@@ -623,10 +671,19 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String col(String v1) {
-        return col(v1,"");
+        return col(v1, "");
     }
-    public static String col(String v1,String attr) {
-        return tag(TAG_TD, " " +attr+" ", v1);
+
+    /**
+     * _more_
+     *
+     * @param v1 _more_
+     * @param attr _more_
+     *
+     * @return _more_
+     */
+    public static String col(String v1, String attr) {
+        return tag(TAG_TD, " " + attr + " ", v1);
     }
 
 
@@ -770,7 +827,7 @@ public class HtmlUtil {
                 url = url + "&";
             }
             try {
-                url = url + arg(args[i], args[i+1]);
+                url = url + arg(args[i], args[i + 1]);
             } catch (Exception exc) {
                 System.err.println("error encoding arg:" + args[i + 1] + " "
                                    + exc);
@@ -781,22 +838,35 @@ public class HtmlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @return _more_
+     */
     public static String args(String[] args) {
-        List<String>a = new ArrayList<String>();
-        for(int i=0;i<args.length;i+=2) {
-            a.add(arg(args[i],args[i+1]));
-        }            
+        List<String> a = new ArrayList<String>();
+        for (int i = 0; i < args.length; i += 2) {
+            a.add(arg(args[i], args[i + 1]));
+        }
         return StringUtil.join("&", a);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
     public static String arg(String name, String value) {
         try {
-            return name + "="
-                + java.net.URLEncoder.encode(value, "UTF-8");
+            return name + "=" + java.net.URLEncoder.encode(value, "UTF-8");
         } catch (Exception exc) {
-            System.err.println("error encoding arg:" + value + " "
-                               + exc);
+            System.err.println("error encoding arg:" + value + " " + exc);
             return "";
         }
     }
@@ -1041,8 +1111,15 @@ public class HtmlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public static String checkbox(String name) {
-        return checkbox(name,"true",false);
+        return checkbox(name, "true", false);
     }
 
     /**
@@ -1595,9 +1672,22 @@ public class HtmlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param left _more_
+     * @param right _more_
+     *
+     * @return _more_
+     */
     public static String leftRight(String left, String right) {
-        return tag(TAG_TABLE,attrs(ATTR_WIDTH,"100%",ATTR_CELLPADDING,"0", ATTR_CELLSPACING,"0"),
-                   row(col(left)+col(right,attr(ATTR_ALIGN,"right")),attr(ATTR_VALIGN,"top")));
+        return tag(TAG_TABLE,
+                   attrs(ATTR_WIDTH, "100%", ATTR_CELLPADDING, "0",
+                         ATTR_CELLSPACING,
+                         "0"), row(col(left)
+                         + col(right,
+                               attr(ATTR_ALIGN, "right")), attr(ATTR_VALIGN,
+                                   "top")));
     }
 
     /**
@@ -1608,13 +1698,20 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String table(String contents) {
-        return table(contents,   attrs(ATTR_CELLPADDING, "0", ATTR_CELLSPACING, "0"));
+        return table(contents,
+                     attrs(ATTR_CELLPADDING, "0", ATTR_CELLSPACING, "0"));
     }
 
-    public static String table(String contents,String attrs) {
-        return tag(TAG_TABLE,
-                   attrs,
-                   contents);
+    /**
+     * _more_
+     *
+     * @param contents _more_
+     * @param attrs _more_
+     *
+     * @return _more_
+     */
+    public static String table(String contents, String attrs) {
+        return tag(TAG_TABLE, attrs, contents);
     }
 
     /**
@@ -1973,6 +2070,14 @@ public class HtmlUtil {
         return function + "(" + args + ");";
     }
 
+    /**
+     * _more_
+     *
+     * @param function _more_
+     * @param args _more_
+     *
+     * @return _more_
+     */
     public static String callln(String function, String args) {
         return function + "(" + args + ");\n";
     }
@@ -2047,8 +2152,8 @@ public class HtmlUtil {
 
         titleSB = new StringBuffer("");
         StringBuffer contentSB = new StringBuffer();
-        StringBuffer idArray      = new StringBuffer("new Array(" );
-        boolean      didone    = false;
+        StringBuffer idArray   = new StringBuffer("new Array(");
+        int          cnt       = 0;
         for (int i = 0; i < titles.size(); i++) {
             String content = contents.get(i).toString();
             if (skipEmpty && (content.length() == 0)) {
@@ -2056,48 +2161,52 @@ public class HtmlUtil {
             }
 
             String tabId = id + "_" + i;
-            if (didone) {
+            if (cnt > 0) {
                 idArray.append(",");
             }
-            didone = true;
+            cnt++;
             idArray.append(HtmlUtil.squote(tabId));
         }
+        if ((cnt == 1) && skipEmpty) {
+            return contents.get(0).toString();
+        }
+
         idArray.append(")");
 
-        didone = false;
+        boolean didone = false;
         for (int i = 0; i < titles.size(); i++) {
             String content = contents.get(i).toString();
             if (skipEmpty && (content.length() == 0)) {
                 continue;
             }
-            String title   = titles.get(i).toString();
+            String title = titles.get(i).toString();
             String tabId = id + "_" + i;
             contentSB.append("\n");
-            contentSB.append(
-                HtmlUtil.div(
-                    content,
-                    HtmlUtil.cssClass(tabContentClass+(!didone?"_on":"_off"))
-                    + HtmlUtil.id("content_" + tabId)
-                    + HtmlUtil.style("display:" +(!didone?"block":"none")+";visibility:" + ( !didone
+            contentSB.append(HtmlUtil.div(content,
+                                          HtmlUtil.cssClass(tabContentClass
+                                              + ( !didone
+                    ? "_on"
+                    : "_off")) + HtmlUtil.id("content_" + tabId)
+                               + HtmlUtil.style("display:" + ( !didone
+                    ? "block"
+                    : "none") + ";visibility:" + ( !didone
                     ? "visible"
                     : "hidden"))));
             String link = HtmlUtil.href("javascript:" + "tabPress("
-                                        + HtmlUtil.squote(id)+"," +
-                                        idArray+"," +
-                                        HtmlUtil.squote(tabId)
+                                        + HtmlUtil.squote(id) + "," + idArray
+                                        + "," + HtmlUtil.squote(tabId)
                                         + ")", title);
-            titleSB.append(HtmlUtil.span(link,
-                                         (didone?HtmlUtil.cssClass("tab_title_off"):
-                                          HtmlUtil.cssClass("tab_title_on"))
-                                         + HtmlUtil.id("title_" + tabId)));
+            titleSB.append(HtmlUtil.span(link, (didone
+                    ? HtmlUtil.cssClass("tab_title_off")
+                    : HtmlUtil.cssClass("tab_title_on")) + HtmlUtil.id(
+                        "title_" + tabId)));
             didone = true;
         }
 
-        return  HtmlUtil.div(
-                             titleSB.toString(),
-                             HtmlUtil.cssClass("tab_titles")) + HtmlUtil.div(
-                                                                            contentSB.toString(),
-                                                                            HtmlUtil.cssClass(wrapperClass));
+        return HtmlUtil.div(
+            titleSB.toString(),
+            HtmlUtil.cssClass("tab_titles")) + HtmlUtil.div(
+                contentSB.toString(), HtmlUtil.cssClass(wrapperClass));
     }
 
 
@@ -2206,24 +2315,23 @@ public class HtmlUtil {
     public static String makeShowHideBlock(String label, String content,
                                            boolean visible,
                                            String headerExtra,
-                                           String blockExtra, 
-                                           String hideImg,
+                                           String blockExtra, String hideImg,
                                            String showImg) {
-        String       id = "block_" + (blockCnt++);
-        StringBuffer sb = new StringBuffer();
-        String img = "";
-        if(showImg!=null && showImg.length()>0) {
+        String       id  = "block_" + (blockCnt++);
+        StringBuffer sb  = new StringBuffer();
+        String       img = "";
+        if ((showImg != null) && (showImg.length() > 0)) {
             img = HtmlUtil.img(visible
                                ? hideImg
                                : showImg, "",
-                               " id='" + id
-                               + "img' ") + HtmlUtil.space(1);
+                                          " id='" + id
+                                          + "img' ") + HtmlUtil.space(1);
         }
         String link =
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleBlockVisibility('"
                 + id + "','" + id + "img','" + hideImg + "','" + showImg
-                + "')"), img + label, HtmlUtil.cssClass(
-                                                  "pagesubheadinglink"));
+                + "')"), img + label,
+                         HtmlUtil.cssClass("pagesubheadinglink"));
 
         //        sb.append(RepositoryManager.tableSubHeader(link));
         sb.append("<div  " + blockExtra + ">");
@@ -2243,15 +2351,25 @@ public class HtmlUtil {
     }
 
 
-    public static String makeShowHideBlock(String clickHtml, String label, String content,
-                                           boolean visible) {
+    /**
+     * _more_
+     *
+     * @param clickHtml _more_
+     * @param label _more_
+     * @param content _more_
+     * @param visible _more_
+     *
+     * @return _more_
+     */
+    public static String makeShowHideBlock(String clickHtml, String label,
+                                           String content, boolean visible) {
         String       id = "block_" + (blockCnt++);
         StringBuffer sb = new StringBuffer();
         String link =
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleBlockVisibility('"
                 + id + "','" + id + "img','" + "" + "','" + ""
-                + "')"), clickHtml, HtmlUtil.cssClass(
-                                                  "pagesubheadinglink")) + label;
+                + "')"), clickHtml,
+                         HtmlUtil.cssClass("pagesubheadinglink")) + label;
 
         //        sb.append(RepositoryManager.tableSubHeader(link));
         sb.append(link);
@@ -2277,11 +2395,15 @@ public class HtmlUtil {
      * _more_
      *
      * @param args _more_
+     *
+     * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
         System.err.println(java.net.URLEncoder.encode("&", "UTF-8"));
         System.err.println(java.net.URLEncoder.encode("?", "UTF-8"));
-        if(true) return;
+        if (true) {
+            return;
+        }
 
 
         Class        c  = HtmlUtil.class;
