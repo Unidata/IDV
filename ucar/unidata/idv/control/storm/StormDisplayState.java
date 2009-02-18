@@ -348,6 +348,57 @@ public class StormDisplayState {
     /** _more_          */
     private int wayCnt = -1;
 
+    private StormTrack editedStormTrack;
+    private StormTrackPoint editedStormTrackPoint;
+
+    public void handleEvent(DisplayEvent event) throws Exception {
+        int id = event.getId();
+        EarthLocation el  = stormTrackControl.toEarth(event);
+        LatLonPoint   llp = el.getLatLonPoint();
+
+        if (id == DisplayEvent.MOUSE_PRESSED) {
+            List<StormDisplayState> me = new ArrayList<StormDisplayState>();
+            me.add(this);
+
+            System.err.println ("looking");
+            Real animationTime = null;
+            if (stormTrackControl.getAnimation() != null) {
+                animationTime = stormTrackControl.getAnimation().getAniValue();
+            }
+            if(animationTime==null)  {
+                System.err.println ("no animation");
+                return;
+            }
+            Object[] tuple = stormTrackControl.findClosestPoint(el,
+                                                                me,
+                                                                animationTime,
+                                                                50);
+            if(tuple == null) {
+                System.err.println ("nothing found");
+                return;
+            }
+            editedStormTrack = (StormTrack) tuple[0];
+            editedStormTrackPoint = (StormTrackPoint) tuple[1];
+        }
+
+        if (id == DisplayEvent.MOUSE_DRAGGED) {
+            if(editedStormTrackPoint ==null) {
+                System.err.println ("nothing selected");
+                return;
+            }
+            System.err.println (editedStormTrackPoint.getLocation() + " new:" + el);
+            editedStormTrackPoint.setLocation(el);
+            updateDisplays(true);
+        }
+
+        if (id == DisplayEvent.MOUSE_RELEASED) {
+            editedStormTrackPoint = null;
+            editedStormTrack = null;
+        }
+
+
+    }
+
     /**
      * Check if its ok to show the given way.
      * if we have less than 2 ways total then always showit
@@ -358,6 +409,7 @@ public class StormDisplayState {
      */
     protected boolean okToShowWay(Way way) {
         if (wayCnt == -1) {
+
             List<StormTrack> tracks = trackCollection.getTracks();
             Hashtable        ways   = new Hashtable();
             wayCnt = 0;
@@ -1401,6 +1453,11 @@ public class StormDisplayState {
      * @throws Exception _more_
      */
     protected void updateDisplays() throws Exception {
+        updateDisplays(false);
+    }
+
+
+    protected void updateDisplays(boolean force) throws Exception {
         DisplayMaster displayMaster = stormTrackControl.getDisplayMaster();
         boolean       wasActive     = displayMaster.ensureInactive();
         try {
@@ -1409,7 +1466,7 @@ public class StormDisplayState {
                 if ( !okToShowWay(wds.getWay())) {
                     continue;
                 }
-                wds.updateDisplay();
+                wds.updateDisplay(force);
             }
         } finally {
             if (wasActive) {

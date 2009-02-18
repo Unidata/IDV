@@ -237,6 +237,8 @@ public class StormTrackControl extends DisplayControlImpl {
     private List<JRadioButton> obsWayRadioButtons;
 
 
+    private boolean editMode = false;
+
     /**
      * Create a new Track Control; set the attribute flags
      */
@@ -964,6 +966,39 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
+    protected boolean canHandleEvents() {
+        if (!editMode
+            || !getHaveInitialized()
+            || (getMakeWindow() && !getWindowVisible())) {
+            return false;
+        }
+        return isGuiShown();
+    }
+
+
+    public void handleDisplayChanged(DisplayEvent event) {
+
+        StormDisplayState current = getCurrentStormDisplayState();
+        if (current == null || !current.getActive()) {
+            return;
+        }
+        int id = event.getId();
+        if (id == DisplayEvent.MOUSE_MOVED) {
+            return;
+        }
+        if ( !canHandleEvents()) {
+            return;
+        }
+        InputEvent inputEvent = event.getInputEvent();
+        try {
+            current.handleEvent(event);
+        } catch(Exception exc) {
+            logException("Error handling edit", exc);
+        }
+    }
+
+
+
     /**
      * _more_
      *
@@ -1007,6 +1042,9 @@ public class StormTrackControl extends DisplayControlImpl {
      * @param forMenuBar _more_
      */
     protected void getEditMenuItems(List items, boolean forMenuBar) {
+        items.add(MenuUtil.makeCheckboxMenuItem("Edit Mode",
+                                                this, "editMode",null));
+
         StormDisplayState current = getCurrentStormDisplayState();
         if ((current != null) && current.getActive()) {
             items.add(GuiUtils.makeMenuItem("Add Forecast Time Chart",
@@ -2490,6 +2528,24 @@ public class StormTrackControl extends DisplayControlImpl {
         return yearTimeMode;
     }
 
+
+/**
+Set the EditMode property.
+
+@param value The new value for EditMode
+**/
+public void setEditMode (boolean value) {
+	editMode = value;
+}
+
+/**
+Get the EditMode property.
+
+@return The EditMode
+**/
+public boolean getEditMode () {
+	return editMode;
+}
 
 
 

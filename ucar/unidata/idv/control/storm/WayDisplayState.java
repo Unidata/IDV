@@ -290,7 +290,7 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    public void updateDisplay() throws Exception {
+    public void updateDisplay(boolean force) throws Exception {
 
         if ( !shouldShow()) {
             if (holder != null) {
@@ -307,7 +307,8 @@ public class WayDisplayState {
             boolean    hadTrack     = hasTrackDisplay();
             boolean    paramChanged = !Misc.equals(colorParam, tmpParam);
             boolean    modeChanged  = !(modeParam == forecastAnimationMode);
-            if ( !hadTrack || paramChanged || modeChanged) {
+            if (force ||  !hadTrack || paramChanged || modeChanged) {
+                System.err.println("makeing field");
                 colorParam = tmpParam;
                 // modeParam = forecastAnimationMode;
                 FieldImpl trackField = makeTrackField(forecastAnimationMode);
