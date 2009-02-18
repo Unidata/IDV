@@ -798,14 +798,28 @@ public class HtmlOutputHandler extends OutputHandler {
         boolean onlyGroups = request.get(ARG_ONLYGROUPS,false);
 
         int cnt = 0;
+        StringBuffer jsSB = new StringBuffer();
+        String rowId;
+        String cbxId;
+        String cbxWrapperId;
+
         for (Group subGroup : subGroups) {
-            decorateEntryRow(request,subGroup, sb, getEntryManager().getAjaxLink(request, subGroup,subGroup.getLabel()));
+            rowId = "entryrow_" + (HtmlUtil.blockCnt++);
+            cbxId = "entry_" + subGroup.getId();
+            cbxWrapperId = "cbx_" + (HtmlUtil.blockCnt++);
+            jsSB.append(HtmlUtil.callln("addEntryRow",HtmlUtil.squote(rowId)));
+            decorateEntryRow(request,subGroup, sb, getEntryManager().getAjaxLink(request, subGroup,subGroup.getLabel()),rowId);
             cnt++;
         }
 
+
         if(!onlyGroups) {
             for (Entry entry : entries) {
-                decorateEntryRow(request, entry, sb, getEntryManager().getAjaxLink(request, entry,entry.getLabel()));
+                rowId = "entryrow_" + (HtmlUtil.blockCnt++);
+                cbxId = "entry_" + entry.getId();
+                cbxWrapperId = "cbx_" + (HtmlUtil.blockCnt++);
+                jsSB.append(HtmlUtil.callln("addEntryRow",HtmlUtil.squote(rowId)));
+                decorateEntryRow(request, entry, sb, getEntryManager().getAjaxLink(request, entry,entry.getLabel()),rowId);
                 cnt++;
             }
         }
@@ -824,11 +838,18 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
 
-        StringBuffer xml = new StringBuffer("<content>\n");
+        StringBuffer xml = new StringBuffer("<response><content>\n");
         XmlUtil.appendCdata(xml,
                             getRepository().translate(request,
                                 sb.toString()));
         xml.append("\n</content>");
+
+        xml.append("<javascript>");
+        XmlUtil.appendCdata(xml,
+                            getRepository().translate(request,
+                                jsSB.toString()));
+        xml.append("</javascript>");
+        xml.append("\n</response>");
         return new Result("", xml, "text/xml");
     }
 

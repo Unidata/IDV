@@ -869,48 +869,54 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         int          cnt  = 0;
         StringBuffer jsSB = new StringBuffer();
         for (Entry entry : (List<Entry>) entries) {
-            StringBuffer rowSB = new StringBuffer();
+            StringBuffer cbxSB = new StringBuffer();
+            String rowId = base + (cnt++);
+            String cbxId = "entry_" + entry.getId();
+            String cbxWrapperId = base + (cnt++);
+            jsSB.append(HtmlUtil.callln("addEntryRow",HtmlUtil.comma(HtmlUtil.squote(rowId),HtmlUtil.squote(cbxId),HtmlUtil.squote(cbxWrapperId),base)));
             if (doForm) {
-                String id = base + (cnt++);
-                String cbxId = "entry_" + entry.getId();
-                jsSB.append(base + ".groupAddEntry(" + HtmlUtil.squote(id)
-                            + ");\n");
-                jsSB.append(HtmlUtil.call("addCheckbox",HtmlUtil.squote(cbxId)));
-                jsSB.append(";\n");
-                rowSB.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
+                cbxSB.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
                 String cbx = HtmlUtil.checkbox(cbxId,
                                                "true", dfltSelected,HtmlUtil.id(cbxId)+" " +
                                                HtmlUtil.attr(HtmlUtil.ATTR_TITLE,msg("Shift-click: select range; Control-click: toggle all"))+
-                                               HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,HtmlUtil.call("checkboxClicked",
-                                                                                                 HtmlUtil.comma("event",HtmlUtil.squote(cbxId)))));
-                cbx = HtmlUtil.span(cbx, HtmlUtil.id(id));
-                rowSB.append(cbx);
+                                               HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,HtmlUtil.call("entryRowCheckboxClicked",
+                                                                                                 HtmlUtil.comma("event",HtmlUtil.squote(rowId)))));
+                
+
+                cbxSB.append(HtmlUtil.span(cbx, HtmlUtil.id(cbxWrapperId)));
             }
 
             if (showCrumbs) {
-                rowSB.append(HtmlUtil.img(getEntryManager().getIconUrl(request,entry)));
-                rowSB.append(HtmlUtil.space(1));
-                rowSB.append(getEntryManager().getBreadCrumbs(request, entry));
-                sb.append(rowSB);
+                cbxSB.append(HtmlUtil.img(getEntryManager().getIconUrl(request,entry)));
+                cbxSB.append(HtmlUtil.space(1));
+                cbxSB.append(getEntryManager().getBreadCrumbs(request, entry));
+                sb.append(cbxSB);
                 sb.append(HtmlUtil.br());
             } else {
                 EntryLink entryLink  = getEntryManager().getAjaxLink(request, entry, entry.getLabel());
-                entryLink.setLink(rowSB + entryLink.getLink());
-                decorateEntryRow(request, entry, sb,entryLink);
+                entryLink.setLink(cbxSB + entryLink.getLink());
+                decorateEntryRow(request, entry, sb,entryLink,rowId);
             }
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_UL));
+        sb.append("\n\n");
+        sb.append(HtmlUtil.script(jsSB.toString()));
+        sb.append("\n\n");
         if (doForm) {
-            sb.append(HtmlUtil.script(jsSB.toString()));
             sb.append(getEntryFormEnd(request, base));
         }
         return link;
     }
 
 
-    protected void decorateEntryRow(Request request, Entry entry, StringBuffer sb, EntryLink link) {
-        sb.append(HtmlUtil.open(HtmlUtil.TAG_DIV,HtmlUtil.cssClass("entryrow")));
-        sb.append("<table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tr><td>");
+    protected void decorateEntryRow(Request request, Entry entry, StringBuffer sb, EntryLink link,String rowId) {
+        if(rowId==null) {
+            rowId = "entryrow_" + (HtmlUtil.blockCnt++);
+        }
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_DIV,HtmlUtil.id(rowId) +HtmlUtil.cssClass("entryrow")+ 
+                                HtmlUtil.onMouseOver(HtmlUtil.call("entryRowOver",HtmlUtil.squote(rowId))) +
+                                HtmlUtil.onMouseOut(HtmlUtil.call("entryRowOut",HtmlUtil.squote(rowId)))));
+        sb.append("<table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tr ><td>");
         sb.append(link.getLink());
         sb.append("</td><td align=right class=entryrowlabel>");
         if(entry.getResource().isFile()) {
@@ -936,8 +942,9 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
         sb.append(userSearchLink);
         sb.append("</td></tr></table>");
-        sb.append(link.getFolderBlock());
         sb.append(HtmlUtil.close(HtmlUtil.TAG_DIV));
+        sb.append(link.getFolderBlock());
+
     }
 
     /**

@@ -38,9 +38,9 @@ a:hover {
   margin-top:2px;
 }
 
+
 .folderblock {
    border : 0px;
-   xborder : 1px red solid;
    margin:0px;
    padding:0px;
    padding-left:18px;
@@ -438,13 +438,11 @@ a.header-left  {
 }
 
 .listrow1 {
-   xbackground-color:#cccccc;
    padding:4px;
    padding-bottom:0px;
 }
 
 .listrow2 {
-   xbackground-color:#efefef;
    background-color:#edf5ff;
    padding:4px;
    padding-bottom:0px;
@@ -588,8 +586,6 @@ ul {
    padding:3px;
    border : 1px solid #bbbbbb;
    background-color : #FFFFCC;
-   xbackground-color : #ffffff;
-   xbackground-color : #eeeeee;
    margin:0px;
 }
 
@@ -597,7 +593,6 @@ ul {
    border : 1px black solid;
    margin:0px;
    padding:1px;
-   xbackground-color : #FFFFCC;
    background-color : #ffffff;
 }
 
@@ -957,7 +952,6 @@ a.wiki-link-noexist {
 	.cpMonthNavigation
 			{
 			background-color:#006699;
-			xxxbackground-color:#6677DD;
 			text-align:center;
 			vertical-align:center;
 			text-decoration:none;

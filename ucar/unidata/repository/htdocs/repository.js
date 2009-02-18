@@ -462,14 +462,67 @@ function VisibilityGroup(img) {
 
 
 
-var checkboxes = new Array();
-var lastCbxClicked;
+function EntryRow (rowId, cbxId,cbxWrapperId, visibilityGroup) {
+        this.onColor = "#FFFFCC";
+	this.overColor = "#eeeeff";
+	this.rowId = rowId;
+	this.cbxId = cbxId;
+	this.cbxWrapperId = cbxWrapperId;
+	this.cbx = util.getDomObject(cbxId);
+	if(this.cbx) {
+		this.cbx = this.cbx.obj;
+		if(visibilityGroup) {
+ 	                visibilityGroup.groupAddEntry(cbxWrapperId);
+		}
+        }
 
-function addCheckbox(id) {
-    var cbx = util.getDomObject(id);
-    if(cbx) {
-        checkboxes[checkboxes.length] = id;
-    }
+	this.row = util.getDomObject(rowId);
+	if(this.row) this.row = this.row.obj;
+
+        this.setCheckbox = function(value) {
+	   if(this.cbx) this.cbx.checked = value;
+	   this.setRowColor();
+        }
+
+	this.getCheckboxValue = function() {
+            if(this.cbx) return this.cbx.checked;
+	    return 0;		
+	}
+        
+	this.setRowColor = function() {
+           if(this.cbx && this.cbx.checked) {
+               this.row.style.backgroundColor = this.onColor;		
+           } else {
+	       this.row.style.backgroundColor = "#ffffff";
+           }
+        }
+
+        this.mouseOver = function() {
+           this.row.style.backgroundColor = this.overColor;
+        }
+
+        this.mouseOut = function() {
+	   this.setRowColor();
+        }
+}
+
+
+var entryRows = new Array();
+var lastEntryRowClicked;
+
+function entryRowOver(rowId) {
+    var entryRow = findEntryRow(rowId);
+    if(entryRow) entryRow.mouseOver();
+}
+
+function entryRowOut(rowId) {
+    var entryRow = findEntryRow(rowId);
+    if(entryRow) entryRow.mouseOut();
+}
+
+
+function addEntryRow(rowId, cbxId, cbxWrapperId, visbilityGroup) {
+     entryRows[entryRows.length] = new EntryRow(rowId, cbxId, cbxWrapperId,visbilityGroup);
 }
 
 
@@ -481,28 +534,35 @@ function indexOf(array,object) {
     return -1;
 }
 
+function findEntryRow(rowId) {
+    var entryRow;
+    for (i = 0; i < entryRows.length; i++) {
+	if(entryRows[i].rowId == rowId) {
+		entryRow = entryRows[i];
+		break;
+        }
+    }
+    return entryRow;
+}
 
-function checkboxClicked(event,id) {
+function entryRowCheckboxClicked(event,rowId) {
     if(!event) return;
-    var cbx = util.getDomObject(id);
-    var lastCbx = util.getDomObject(lastCbxClicked);
-    if(!cbx) return;
-    cbx = cbx.obj;
+    var entryRow = findEntryRow(rowId);
+    if(!entryRow || !entryRow.cbx) return;
 
     if(event.ctrlKey) {
-        var value = cbx.checked;
-        for (i = 0; i <= checkboxes.length; i++) {
-            var cbx = util.getDomObject(checkboxes[i]).obj;
-            cbx.checked=value;
+        var value = entryRow.getCheckboxValue();
+        for (i = 0; i < entryRows.length; i++) {
+	    entryRows[i].setCheckbox(value);
         }
     }
 
+
     if(event.shiftKey) {
-        if(lastCbx) {
-            var idx1 = indexOf(checkboxes, lastCbxClicked);
-            var idx2 = indexOf(checkboxes, id);
-            var value = lastCbx.obj.checked;
-	    value = cbx.checked;
+        if(lastEntryRowClicked) {
+            var idx1 = indexOf(entryRows, lastEntryRowClicked);
+            var idx2 = indexOf(entryRows, entryRow);
+            var value = entryRow.getCheckboxValue();
             if(idx1>idx2) {
                 var tmp = idx1;
                 idx1=idx2;
@@ -510,14 +570,14 @@ function checkboxClicked(event,id) {
             }
 
             for(i=idx1;i<=idx2;i++) {
-                var cbx1 = util.getDomObject(checkboxes[i]).obj;
-                cbx1.checked=value;
+                entryRows[i].setCheckbox(value);
             }
         }
         return;
     }
-    lastCbxClicked = id;
+    lastEntryRowClicked = entryRow;
 }
+
 
 
 function groupAddEntry(entryId) {
@@ -612,10 +672,25 @@ function  handleFolderList(request, uid) {
     var img = util.getDomObject("img_" +uid);
     if(request.responseXML!=null) {
         var xmlDoc=request.responseXML.documentElement;
-        block.obj.innerHTML = getChildText(xmlDoc);
+	var script;
+	var html;
+	for(i=0;i<xmlDoc.childNodes.length;i++) {
+		var childNode = xmlDoc.childNodes[i];
+		if(childNode.tagName=="javascript") {
+			script =getChildText(childNode);
+		} else if(childNode.tagName=="content") {
+		        html = getChildText(childNode);
+		}
+	}
+
+	if(html) {
+		block.obj.innerHTML = html;
+	}
+	if(script) {
+		eval(script);
+	}
     }
     
-    //    alert(img + ' ' + uid + ' ' + changeImages[uid]);
     if(img) {
         if(changeImages[uid]) {
             img.obj.src = icon_folderopen;
@@ -718,12 +793,10 @@ function handleSelect(request, id) {
 
 
 
-
-
-function  getChildText(xmlDoc) {
+function  getChildText(node) {
     var text = '';
-    for(i=0;i<xmlDoc.childNodes.length;i++) {
-        text = text  + xmlDoc.childNodes[i].nodeValue;
+    for(childIdx=0;childIdx<node.childNodes.length;childIdx++) {
+        text = text  + node.childNodes[childIdx].nodeValue;
     }
     return text;
 	

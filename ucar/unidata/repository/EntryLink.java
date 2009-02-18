@@ -94,6 +94,7 @@ public class EntryLink {
     private String link;
     private         String folderBlock;
     private         String uid;
+
     public EntryLink(String link, String folderBlock, String uid) {
         this.link = link;
         this.folderBlock = folderBlock;
