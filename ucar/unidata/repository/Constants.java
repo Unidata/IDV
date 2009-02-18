@@ -122,6 +122,11 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_COMMENTS = "ramadda.icon.comments";
 
+    public static final String ICON_DOWNDART = "ramadda.icon.downdart";
+
+    public static final String ICON_RIGHTDART = "ramadda.icon.rightdart";
+
+
     /** _more_ */
     public static final String ICON_DOWNARROW = "ramadda.icon.downarrow";
 

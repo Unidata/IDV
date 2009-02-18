@@ -1146,7 +1146,7 @@ public class UserManager extends RepositoryManager {
         if (cart == null) {
             cart = new ArrayList<Entry>();
             userCart.put(sessionId, cart);
-        }
+        } 
         return cart;
     }
 
@@ -1225,7 +1225,14 @@ public class UserManager extends RepositoryManager {
         }
         List<Entry> entries = getCart(request);
         if (entries.size() == 0) {
-            sb.append(msg("No entries in cart"));
+            entries = new ArrayList<Entry>();
+            sb.append(msg("No entries in cart."));
+            sb.append(HtmlUtil.space(1));
+            sb.append(msg("Using top group."));
+            entries.add(getEntryManager().getTopGroup());
+        }
+
+        if (entries.size() == 0) {
             return makeResult(request, "User Cart", sb);
         }
 
@@ -1271,7 +1278,7 @@ public class UserManager extends RepositoryManager {
         if ( !haveFrom && !splitScreen) {
             String[] formTuple =
                 getRepository().getHtmlOutputHandler().getEntryFormStart(
-                    request, entries);
+                                                                         request, entries,false);
 
             sb.append(formTuple[2]);
         }
@@ -1283,6 +1290,7 @@ public class UserManager extends RepositoryManager {
             cnt = 2;
         }
         List<StringBuffer> columns = new ArrayList<StringBuffer>();
+        StringBuffer jsSB=null;
         for (int column = 0; column < cnt; column++) {
             StringBuffer colSB = new StringBuffer();
             columns.add(colSB);

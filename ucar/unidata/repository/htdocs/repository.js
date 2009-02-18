@@ -76,9 +76,9 @@ function Util () {
     this.print = function (s, clear) {
         var obj = util.getDomObject("output");
         if(!obj) {
-		alert('could not find print output\n'+  s);
-        	return;
-         }
+            alert('could not find print output\n'+  s);
+            return;
+        }
         if(clear) {
             obj.obj.innerHTML  ="";
         }
@@ -130,27 +130,38 @@ function Util () {
         if(!obj) return 0;
         return obj.offsetRight+this.getRight(obj.offsetParent);
     }
+
+    this.getStyle = function(obj) {
+        if(obj.style) return obj.style;
+        if (document.layers)  { 		
+            return   document.layers[obj.name];
+        }        
+        return null;
+    }
+
 }
 
 util = new Util();
 
 
 
+
+
 function DomObject(name) {
     this.obj = null;
-// DOM level 1 browsers: IE 5+, NN 6+
+    // DOM level 1 browsers: IE 5+, NN 6+
     if (document.getElementById)	{    	
         this.obj = document.getElementById(name);
         if(this.obj) 
             this.style = this.obj.style;
     }
-// IE 4
+    // IE 4
     else if (document.all)	{  			
         this.obj = document.all[name];
         if(this.obj) 
             this.style = this.obj.style;
     }
-// NN 4
+    // NN 4
     else if (document.layers)  { 		
         this.obj = document.layers[name];
         this.style = document.layers[name];
@@ -295,9 +306,9 @@ function mouseUpOnEntry(event, id) {
     }
     if(draggedEntry && draggedEntry!=id) {
         url = "${urlroot}/entry/copy?action=action.move&from=" + draggedEntry +"&to=" + id;
-//	alert(url);
+        //	alert(url);
 	window.open(url,'move window','') ;
-//        document.location = url;
+        //        document.location = url;
     }
 }
 
@@ -325,7 +336,7 @@ function Tooltip () {
     var showDelay = 500;
 
     this.debug = function(msg) {
-       	 util.print(msg);
+        util.print(msg);
     }
     this.keyPressed = function (event) {
         if(state==STATE_INIT) return;
@@ -371,7 +382,7 @@ function Tooltip () {
     this.doHide  = function() {
         currentID = "";
         if(state !=STATE_LINK && state!=STATE_TIP)
-		return;
+            return;
         state = STATE_INIT;
         hideObject(util.getDomObject("tooltipdiv"));
     }
@@ -420,9 +431,9 @@ function Tooltip () {
         y = this.getY(link,y);
         util.setPosition(obj, x,y);
         var imgEvents = " onMouseOver=\"tooltip.onMouseOver(event,'" + id +"')\" " +
-		" onMouseOut=\"tooltip.onMouseOut(event,'" + id +"')\" " +
-		" onMouseMove=\"tooltip.onMouseMove(event,'" + id +"')\" " +
-		" onClick=\"tooltip.onClick(event,'" + id +"')\" ";
+        " onMouseOut=\"tooltip.onMouseOut(event,'" + id +"')\" " +
+        " onMouseMove=\"tooltip.onMouseMove(event,'" + id +"')\" " +
+        " onClick=\"tooltip.onClick(event,'" + id +"')\" ";
 	obj.obj.innerHTML = "<div class=tooltip-link-inner><img title=\"Show tooltip\" alt=\"Show tooltip\" " + imgEvents +" src="+icon_information +"></div>";
         showObject(obj);
     }
@@ -449,71 +460,222 @@ function handleKeyPress(event) {
 
 document.onkeypress = handleKeyPress;
 
-
-
-function VisibilityGroup(img) {
-	this.numEntries = 0;
-	this.entries = new Array();
-	this.toggleImg  = img;
-	this.on = 1;
-        this.groupAddEntry = groupAddEntry;
-        this.groupToggleVisibility = groupToggleVisibility;
-}
+var groups = new Array();
+var groupList = new Array();
 
 
 
-function EntryRow (rowId, cbxId,cbxWrapperId, visibilityGroup) {
-        this.onColor = "#FFFFCC";
-	this.overColor = "#eeeeff";
-	this.rowId = rowId;
-	this.cbxId = cbxId;
-	this.cbxWrapperId = cbxWrapperId;
-	this.cbx = util.getDomObject(cbxId);
-	if(this.cbx) {
-		this.cbx = this.cbx.obj;
-		if(visibilityGroup) {
- 	                visibilityGroup.groupAddEntry(cbxWrapperId);
+function EntryFormList(formId,img,selectId, initialOn) {
+    this.entryRows = new Array();
+    this.lastEntryRowClicked=null;
+    groups[formId] = this;
+    groupList[groupList.length] = this;
+    this.formId = formId;
+    this.toggleImg  = img;
+    this.on = initialOn;
+    this.entries = new Array();
+
+    this.groupAddEntry = function(entryId) {
+        this.entries[this.entries.length] = entryId;
+    }
+
+    this.addEntryRow = function(entryRow) {
+        this.groupAddEntry(entryRow.cbxWrapperId);
+        this.entryRows[this.entryRows.length] = entryRow;
+        if(!this.on) {
+            hideObject(entryRow.cbx);
+        }
+    }
+
+
+    this.groupAddEntry(selectId);
+    if(!this.on) {
+        hideObject(selectId);
+    }
+
+    this.groupToggleVisibility = function  () {
+        this.on = !this.on;
+        this.setVisibility();
+    }
+
+
+    this.findEntryRow =function(rowId) {
+        for (i = 0; i < this.entryRows.length; i++) {
+            if(this.entryRows[i].rowId == rowId) {
+                return  this.entryRows[i];
+            }
+        }
+        return null;
+    }
+
+
+
+    this.checkboxClicked = function(event,cbxId) {
+        if(!event) return;
+        var entryRow;
+        for (i = 0; i < this.entryRows.length; i++) {
+            if(this.entryRows[i].cbxId ==cbxId) {
+                entryRow = this.entryRows[i];
+                break;
+            }
+        }
+
+        if(!entryRow || !entryRow.cbx) return;
+
+        if(event.ctrlKey) {
+            var value = entryRow.getCheckboxValue();
+            for (i = 0; i < this.entryRows.length; i++) {
+                this.entryRows[i].setCheckbox(value);
+            }
+        }
+
+        if(event.shiftKey) {
+            if(this.lastEntryRowClicked) {
+                var idx1 = indexOf(this.entryRows, this.lastEntryRowClicked);
+                var idx2 = indexOf(this.entryRows, entryRow);
+                var value = entryRow.getCheckboxValue();
+                if(idx1>idx2) {
+                    var tmp = idx1;
+                    idx1=idx2;
+                    idx2=tmp;
+                }
+
+                for(i=idx1;i<=idx2;i++) {
+                    this.entryRows[i].setCheckbox(value);
+                }
+            }
+            return;
+        }
+        this.lastEntryRowClicked = entryRow;
+    }
+
+
+
+    this.setVisibility = function  () {
+        if(this.toggleImg) {
+	    var img = util.getDomObject(this.toggleImg);
+            if(img) {
+		if(this.on) {
+   		    img.obj.src =  icon_downarrow;
+		} else {
+	            img.obj.src =  icon_rightarrow;
+
 		}
+            }
         }
 
-	this.row = util.getDomObject(rowId);
-	if(this.row) this.row = this.row.obj;
+        var form = util.getDomObject(this.formId);
+        if(form) {
+            form = form.obj;
+            for(i=0;i<form.elements.length;i++) {
+                if(this.on) {
+                    showObject(form.elements[i],"inline");
+                } else {
+                    hideObject(form.elements[i]);
+                }
 
-        this.setCheckbox = function(value) {
-	   if(this.cbx) this.cbx.checked = value;
-	   this.setRowColor();
+                
+            }
         }
 
-	this.getCheckboxValue = function() {
-            if(this.cbx) return this.cbx.checked;
-	    return 0;		
-	}
-        
-	this.setRowColor = function() {
-           if(this.cbx && this.cbx.checked) {
-               this.row.style.backgroundColor = this.onColor;		
-           } else {
-	       this.row.style.backgroundColor = "#ffffff";
-           }
+        for(i=0;i<this.entries.length;i++) {
+            obj = util.getDomObject(this.entries[i]);
+            if(!obj) continue;
+            if(this.on) {
+                showObject(obj,"inline");
+            } else {
+                hideObject(obj);
+            }
         }
-
-        this.mouseOver = function() {
-           this.row.style.backgroundColor = this.overColor;
-        }
-
-        this.mouseOut = function() {
-	   this.setRowColor();
-        }
+    }
 }
 
 
-var entryRows = new Array();
-var lastEntryRowClicked;
+function entryRowCheckboxClicked(event,cbxId) {
+
+    var cbx = util.getDomObject(cbxId);
+    if(!cbx) return;
+    cbx = cbx.obj;
+    var visibilityGroup = groups[cbx.form.id];
+    if(visibilityGroup) {
+        visibilityGroup.checkboxClicked(event,cbxId);
+    }
+}
+
+function initEntryListForm(formId) {
+    var visibilityGroup = groups[formId];
+    if(visibilityGroup) {
+        visibilityGroup.on = 0;
+        visibilityGroup.setVisbility();
+    }
+}
+
+
+function EntryRow (rowId, cbxId,cbxWrapperId) {
+    this.onColor = "#FFFFCC";
+    this.overColor = "#f5f5f5";
+    this.rowId = rowId;
+    this.cbxId = cbxId;
+    this.cbxWrapperId = cbxWrapperId;
+    this.cbx = util.getDomObject(cbxId);
+    this.row = util.getDomObject(rowId);
+    if(this.row) {
+        this.row = this.row.obj;
+    }
+
+    if(this.cbx) {
+        this.cbx = this.cbx.obj;
+        var form = this.cbx.form;
+        var visibilityGroup = groups[form.id];
+        if(visibilityGroup) {
+            visibilityGroup.addEntryRow(this);
+        }
+    }
+
+
+    this.setCheckbox = function(value) {
+        if(this.cbx) this.cbx.checked = value;
+        this.setRowColor();
+    }
+
+    this.getCheckboxValue = function() {
+        if(this.cbx) return this.cbx.checked;
+        return 0;		
+    }
+        
+    this.setRowColor = function() {
+        if(this.cbx && this.cbx.checked) {
+            this.row.style.backgroundColor = this.onColor;		
+        } else {
+            this.row.style.backgroundColor = "#ffffff";
+        }
+    }
+
+    this.mouseOver = function() {
+        this.row.style.backgroundColor = this.overColor;
+    }
+
+    this.mouseOut = function() {
+        this.setRowColor();
+    }
+}
+
+
+
+function findEntryRow(rowId) {
+    for(i=0;i<groupList.length;i++) {
+        var entryRow = groupList[i].findEntryRow(rowId);
+        if(entryRow) return entryRow;
+    }
+    return null;
+}
+
 
 function entryRowOver(rowId) {
     var entryRow = findEntryRow(rowId);
     if(entryRow) entryRow.mouseOver();
 }
+
 
 function entryRowOut(rowId) {
     var entryRow = findEntryRow(rowId);
@@ -521,9 +683,6 @@ function entryRowOut(rowId) {
 }
 
 
-function addEntryRow(rowId, cbxId, cbxWrapperId, visbilityGroup) {
-     entryRows[entryRows.length] = new EntryRow(rowId, cbxId, cbxWrapperId,visbilityGroup);
-}
 
 
 
@@ -534,35 +693,37 @@ function indexOf(array,object) {
     return -1;
 }
 
-function findEntryRow(rowId) {
-    var entryRow;
-    for (i = 0; i < entryRows.length; i++) {
-	if(entryRows[i].rowId == rowId) {
-		entryRow = entryRows[i];
-		break;
+
+var lastCbxClicked;
+
+function checkboxClicked(event, cbxPrefix, id) {
+    if(!event) return;
+    var cbx = util.getDomObject(id);
+    if(!cbx) return;
+    cbx = cbx.obj;
+
+
+    var checkBoxes = new Array();
+    var elements = cbx.form.elements;
+    for(i=0;i<elements.length;i++) {
+        if(elements[i].name.indexOf(cbxPrefix)>=0 || elements[i].id.indexOf(cbxPrefix)>=0) {
+            checkBoxes[checkBoxes.length] = elements[i];
         }
     }
-    return entryRow;
-}
 
-function entryRowCheckboxClicked(event,rowId) {
-    if(!event) return;
-    var entryRow = findEntryRow(rowId);
-    if(!entryRow || !entryRow.cbx) return;
 
+    var value = cbx.checked;
     if(event.ctrlKey) {
-        var value = entryRow.getCheckboxValue();
-        for (i = 0; i < entryRows.length; i++) {
-	    entryRows[i].setCheckbox(value);
+        for (i = 0; i < checkBoxes.length; i++) {
+	    checkBoxes[i].checked = value;
         }
     }
 
 
     if(event.shiftKey) {
-        if(lastEntryRowClicked) {
-            var idx1 = indexOf(entryRows, lastEntryRowClicked);
-            var idx2 = indexOf(entryRows, entryRow);
-            var value = entryRow.getCheckboxValue();
+        if(lastCbxClicked) {
+            var idx1 = indexOf(checkBoxes, lastCbxClicked);
+            var idx2 = indexOf(checkBoxes, cbx);
             if(idx1>idx2) {
                 var tmp = idx1;
                 idx1=idx2;
@@ -570,46 +731,17 @@ function entryRowCheckboxClicked(event,rowId) {
             }
 
             for(i=idx1;i<=idx2;i++) {
-                entryRows[i].setCheckbox(value);
+                checkBoxes[i].checked = value;
             }
         }
         return;
     }
-    lastEntryRowClicked = entryRow;
+    lastCbxClicked = cbx;
 }
 
 
 
-function groupAddEntry(entryId) {
-	this.entries[this.numEntries] = entryId;
-	this.numEntries++;
-}
 
-
-
-function groupToggleVisibility () {
-    this.on = !this.on;
-    if(this.toggleImg) {
-	    var img = util.getDomObject(this.toggleImg);
-            if(img) {
-		if(this.on) {
-   		    img.obj.src =  icon_downarrow;
-		} else {
-	            img.obj.src =  icon_rightarrow;
-
-		}
-            }
-    }
-    for(i=0;i<this.numEntries;i++) {
-        obj = util.getDomObject(this.entries[i]);
-        if(!obj) continue;
-        if(this.on) {
-            showObject(obj,"inline");
-        } else {
-            hideObject(obj);
-        }
-    }
-}
 
 
 
@@ -675,19 +807,19 @@ function  handleFolderList(request, uid) {
 	var script;
 	var html;
 	for(i=0;i<xmlDoc.childNodes.length;i++) {
-		var childNode = xmlDoc.childNodes[i];
-		if(childNode.tagName=="javascript") {
-			script =getChildText(childNode);
-		} else if(childNode.tagName=="content") {
-		        html = getChildText(childNode);
-		}
+            var childNode = xmlDoc.childNodes[i];
+            if(childNode.tagName=="javascript") {
+                script =getChildText(childNode);
+            } else if(childNode.tagName=="content") {
+                html = getChildText(childNode);
+            }
 	}
 
 	if(html) {
-		block.obj.innerHTML = html;
+            block.obj.innerHTML = html;
 	}
 	if(script) {
-		eval(script);
+            eval(script);
 	}
     }
     
@@ -728,7 +860,7 @@ function Selector(event, id, allEntries, selecttype) {
     this.div = util.getDomObject('selectdiv');
     if(!this.div) {
 	return false;
-     }
+    }
 
     if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
         x= util.getLeft(link.obj);
@@ -760,10 +892,10 @@ function selectClick(id,entryId,value) {
     } else if (selector.selecttype=="entryid") {
         insertTagsInner(selector.textComp.obj, "{{import " +entryId+" "," }}","importtype");
     } else { 
-       if(selector.hiddenComp) {
+        if(selector.hiddenComp) {
             selector.hiddenComp.obj.value =entryId;
-       }
-       selector.textComp.obj.value =value;
+        }
+        selector.textComp.obj.value =value;
     }
     selectCancel();
 }
@@ -820,12 +952,12 @@ function showAjaxPopup(event,srcId,url) {
 }
 
 function handleAjaxPopup(request, srcId) {
-        var xmlDoc=request.responseXML.documentElement;
-        text = getChildText(xmlDoc);
-	var srcObj = util.getDomObject(srcId);
-        var obj = util.getDomObject("tooltipdiv");
-	obj.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"tooltip.doHide();\" id=\"tooltipclose\"  src=" + icon_close +"></td><td>&nbsp;</td><td>" + text+"</table></div></div>";
-        showObject(obj);
+    var xmlDoc=request.responseXML.documentElement;
+    text = getChildText(xmlDoc);
+    var srcObj = util.getDomObject(srcId);
+    var obj = util.getDomObject("tooltipdiv");
+    obj.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"tooltip.doHide();\" id=\"tooltipclose\"  src=" + icon_close +"></td><td>&nbsp;</td><td>" + text+"</table></div></div>";
+    showObject(obj);
 }
 
 
@@ -848,8 +980,8 @@ function showPopup(event, srcId, popupId, alignLeft) {
         x = util.getLeft(srcObj.obj);
         y = srcObj.obj.offsetHeight+util.getTop(srcObj.obj) + 2;
     } else {
-       x+=2;
-       x+=3;
+        x+=2;
+        x+=3;
     }
 
     popupObject = popup;
@@ -863,25 +995,39 @@ function show(id) {
 }
 
 function hideObject(obj) {
-    if(!obj) return 0;
-    obj.style.visibility = "hidden";
-    obj.style.display = "none";
+    if(!obj) {
+        return 0;
+    }
+
+    var style = obj.style;
+    if(!style) {
+        style = util.getStyle(obj);
+    }
+    if(!style) {
+        //        alert("no style " + obj);
+
+        return 0;
+    }
+
+
+    style.visibility = "hidden";
+    style.display = "none";
 }
 
 
 function hideMore(base) {
-        var link = util.getDomObject("morelink_" + base);
-        var div = util.getDomObject("morediv_" + base);
-	hideObject(div);
-	showObject(link);
+    var link = util.getDomObject("morelink_" + base);
+    var div = util.getDomObject("morediv_" + base);
+    hideObject(div);
+    showObject(link);
 }
 
 
 function showMore(base) {
-        var link = util.getDomObject("morelink_" + base);
-        var div = util.getDomObject("morediv_" + base);
-	hideObject(link);
-	showObject(div);
+    var link = util.getDomObject("morelink_" + base);
+    var div = util.getDomObject("morediv_" + base);
+    hideObject(link);
+    showObject(div);
 }
 
 
@@ -890,8 +1036,17 @@ function showMore(base) {
 function showObject(obj, display) {
     if(!obj) return 0;
     if(!display) display = "block";
-    obj.style.visibility = "visible";
-    obj.style.display = display;
+
+    var style = obj.style;
+    if(!style) {
+        style = util.getStyle(obj);
+    }
+    if(!style) {
+        return 0;
+    }
+  
+    style.visibility = "visible";
+    style.display = display;
     return 1;
 }
 
@@ -926,38 +1081,38 @@ function selectDate(div,field,id,fmt) {
 var tabs = new Array();
 
 function tabPress(tabId,ids,what) {
-	if(!tabs[tabId]) {
-              tabs[tabId] = new Tab(ids);
-	}
-	tabs[tabId].toggleTab(what);
+    if(!tabs[tabId]) {
+        tabs[tabId] = new Tab(ids);
+    }
+    tabs[tabId].toggleTab(what);
 }
 
 
 
 function Tab(ids) {
-	this.ids = ids;
-	this.toggleTab = toggleTab;
-	this.onColor = "#ffffff";
-	this.offColor = "#dddddd";
+    this.ids = ids;
+    this.toggleTab = toggleTab;
+    this.onColor = "#ffffff";
+    this.offColor = "#dddddd";
 
-        for(i=0;i<ids.length;i++) {
-		var contentId  = 'content_'+ids[i];
-	        var content = util.getDomObject(contentId);
-		var titleId  = 'title_'+ids[i];
-	        var title = util.getDomObject(titleId);
-		if(i==0) {
-			this.onStyle = title.style;
-			if(title.style.backgroundColor) {
-				//this.onColor = title.style.backgroundColor;
-			}
-		} else {
-			this.offStyle = title.style;
-			if(title.style.backgroundColor) {
-				//this.offColor = title.style.backgroundColor;
-			}
-		}
-	}
-//	this.toggleTab(this.ids[0]);
+    for(i=0;i<ids.length;i++) {
+        var contentId  = 'content_'+ids[i];
+        var content = util.getDomObject(contentId);
+        var titleId  = 'title_'+ids[i];
+        var title = util.getDomObject(titleId);
+        if(i==0) {
+            this.onStyle = title.style;
+            if(title.style.backgroundColor) {
+                //this.onColor = title.style.backgroundColor;
+            }
+        } else {
+            this.offStyle = title.style;
+            if(title.style.backgroundColor) {
+                //this.offColor = title.style.backgroundColor;
+            }
+        }
+    }
+    //	this.toggleTab(this.ids[0]);
 }
 
 function toggleTab(mainId) {
@@ -968,20 +1123,20 @@ function toggleTab(mainId) {
 	var titleId  = 'title_'+this.ids[i];
 	var title = util.getDomObject(titleId);
         if(!content) {
-		continue;
+            continue;
         }
 
 	if(contentId==mainContentId) {
-		content.style.visibility="visible";
-                content.style.display = "block";
-		content.style.backgroundColor=this.onColor;
-		title.style.backgroundColor=this.onColor;
-		title.style.borderBottom = "1px #ffffff  solid";
+            content.style.visibility="visible";
+            content.style.display = "block";
+            content.style.backgroundColor=this.onColor;
+            title.style.backgroundColor=this.onColor;
+            title.style.borderBottom = "1px #ffffff  solid";
 	} else {
-		content.style.visibility="hidden";
-                content.style.display = "none";
-		title.style.backgroundColor=this.offColor;
-		title.style.borderBottom = "1px #000000 solid";
+            content.style.visibility="hidden";
+            content.style.display = "none";
+            title.style.backgroundColor=this.offColor;
+            title.style.borderBottom = "1px #000000 solid";
 	}
     }
 }
@@ -1019,70 +1174,70 @@ function insertTags(id, tagOpen, tagClose, sampleText) {
 // apply tagOpen/tagClose to selection in textarea,
 // use sampleText instead of selection if there is none
 function insertTagsInner(txtarea, tagOpen, tagClose, sampleText) {
-	var selText, isSample = false;
+    var selText, isSample = false;
 
-	if (document.selection  && document.selection.createRange) { // IE/Opera
+    if (document.selection  && document.selection.createRange) { // IE/Opera
 
-		//save window scroll position
-		if (document.documentElement && document.documentElement.scrollTop)
-			var winScroll = document.documentElement.scrollTop
-		else if (document.body)
-			var winScroll = document.body.scrollTop;
-		//get current selection  
-		txtarea.focus();
-		var range = document.selection.createRange();
-		selText = range.text;
-		//insert tags
-		checkSelectedText();
-		range.text = tagOpen + selText + tagClose;
-		//mark sample text as selected
-		if (isSample && range.moveStart) {
-			if (window.opera)
-				tagClose = tagClose.replace(/\n/g,'');
-			range.moveStart('character', - tagClose.length - selText.length); 
-			range.moveEnd('character', - tagClose.length); 
-		}
-		range.select();   
-		//restore window scroll position
-		if (document.documentElement && document.documentElement.scrollTop)
-			document.documentElement.scrollTop = winScroll
-		else if (document.body)
-			document.body.scrollTop = winScroll;
+        //save window scroll position
+        if (document.documentElement && document.documentElement.scrollTop)
+            var winScroll = document.documentElement.scrollTop
+            else if (document.body)
+                var winScroll = document.body.scrollTop;
+        //get current selection  
+        txtarea.focus();
+        var range = document.selection.createRange();
+        selText = range.text;
+        //insert tags
+        checkSelectedText();
+        range.text = tagOpen + selText + tagClose;
+        //mark sample text as selected
+        if (isSample && range.moveStart) {
+            if (window.opera)
+                tagClose = tagClose.replace(/\n/g,'');
+            range.moveStart('character', - tagClose.length - selText.length); 
+            range.moveEnd('character', - tagClose.length); 
+        }
+        range.select();   
+        //restore window scroll position
+        if (document.documentElement && document.documentElement.scrollTop)
+            document.documentElement.scrollTop = winScroll
+            else if (document.body)
+                document.body.scrollTop = winScroll;
 
-	} else if (txtarea.selectionStart || txtarea.selectionStart == '0') { // Mozilla
+    } else if (txtarea.selectionStart || txtarea.selectionStart == '0') { // Mozilla
 
-		//save textarea scroll position
-		var textScroll = txtarea.scrollTop;
-		//get current selection
-		txtarea.focus();
-		var startPos = txtarea.selectionStart;
-		var endPos = txtarea.selectionEnd;
-		selText = txtarea.value.substring(startPos, endPos);
-		//insert tags
-		checkSelectedText();
-		txtarea.value = txtarea.value.substring(0, startPos)
-			+ tagOpen + selText + tagClose
-			+ txtarea.value.substring(endPos, txtarea.value.length);
-		//set new selection
-		if (isSample) {
-			txtarea.selectionStart = startPos + tagOpen.length;
-			txtarea.selectionEnd = startPos + tagOpen.length + selText.length;
-		} else {
-			txtarea.selectionStart = startPos + tagOpen.length + selText.length + tagClose.length;
-			txtarea.selectionEnd = txtarea.selectionStart;
-		}
-		//restore textarea scroll position
-		txtarea.scrollTop = textScroll;
-	} 
+        //save textarea scroll position
+        var textScroll = txtarea.scrollTop;
+        //get current selection
+        txtarea.focus();
+        var startPos = txtarea.selectionStart;
+        var endPos = txtarea.selectionEnd;
+        selText = txtarea.value.substring(startPos, endPos);
+        //insert tags
+        checkSelectedText();
+        txtarea.value = txtarea.value.substring(0, startPos)
+            + tagOpen + selText + tagClose
+            + txtarea.value.substring(endPos, txtarea.value.length);
+        //set new selection
+        if (isSample) {
+            txtarea.selectionStart = startPos + tagOpen.length;
+            txtarea.selectionEnd = startPos + tagOpen.length + selText.length;
+        } else {
+            txtarea.selectionStart = startPos + tagOpen.length + selText.length + tagClose.length;
+            txtarea.selectionEnd = txtarea.selectionStart;
+        }
+        //restore textarea scroll position
+        txtarea.scrollTop = textScroll;
+    } 
 
-	function checkSelectedText(){
-		if (!selText) {
-			selText = sampleText;
-			isSample = true;
-		} else if (selText.charAt(selText.length - 1) == ' ') { //exclude ending space char
-			selText = selText.substring(0, selText.length - 1);
-			tagClose += ' '
+    function checkSelectedText(){
+        if (!selText) {
+            selText = sampleText;
+            isSample = true;
+        } else if (selText.charAt(selText.length - 1) == ' ') { //exclude ending space char
+            selText = selText.substring(0, selText.length - 1);
+            tagClose += ' '
 		} 
-	}
+    }
 
 }

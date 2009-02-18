@@ -775,13 +775,13 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public String[] getEntryFormStart(Request request, List entries)
+    public String[] getEntryFormStart(Request request, List entries, boolean hideIt)
             throws Exception {
         String       base   = "toggleentry" + (entryCnt++);
+        String formId = "entryform_" + (HtmlUtil.blockCnt++);
         StringBuffer formSB = new StringBuffer();
-
         formSB.append(request.formPost(getRepository().URL_ENTRY_GETENTRIES,
-                                       "getentries"));
+                                       HtmlUtil.id(formId)));
 
         List<Link> links = getRepository().getOutputLinks(request,
                                new State(getEntryManager().getDummyGroup(),
@@ -804,22 +804,39 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         selectSB.append(HtmlUtil.submit(msg("All"), "getall"));
 
         String arrowImg =
-            HtmlUtil.img(getRepository().iconUrl(ICON_DOWNARROW),
+            HtmlUtil.img(getRepository().iconUrl(ICON_RIGHTDART),
                          msg("Show/Hide Form"), HtmlUtil.id(base + "img"));
         String link = HtmlUtil.space(2)
                       + HtmlUtil.jsLink(HtmlUtil.onMouseClick(base
-                          + ".groupToggleVisibility()"), arrowImg);
+                                                              + ".groupToggleVisibility()"), arrowImg);
+        String selectId = base + "select";
         formSB.append(HtmlUtil.span(selectSB.toString(),
-                                    HtmlUtil.id(base + "select")));
+                                    HtmlUtil.id(selectId)+
+                                    (hideIt?HtmlUtil.style("display:none; visibility:hidden;"):"")));
         formSB.append(
-            HtmlUtil.script(
-                base + " = new VisibilityGroup("
-                + HtmlUtil.squote(base + "img") + ");\n"
-                + HtmlUtil.call(
-                    base + ".groupAddEntry",
-                    HtmlUtil.squote(base + "select"))));
+                      HtmlUtil.script(HtmlUtil.callln(base +"= new EntryFormList",
+                                                      HtmlUtil.comma(HtmlUtil.squote(formId),
+                                                                     HtmlUtil.squote(base + "img"),
+                                                                     HtmlUtil.squote(selectId),(hideIt?"0":"1")))));
         return new String[] { link, base, formSB.toString() };
     }
+
+
+    public void addEntryCheckbox(Request request, Entry entry, StringBuffer htmlSB, StringBuffer jsSB) 
+            throws Exception {
+        String rowId = "entryrow_" + (HtmlUtil.blockCnt++);
+        String cbxId = "entry_" + entry.getId();
+        String cbxWrapperId = "cbx_" + (HtmlUtil.blockCnt++);
+        jsSB.append(HtmlUtil.callln("new EntryRow",HtmlUtil.comma(HtmlUtil.squote(rowId),HtmlUtil.squote(cbxId),HtmlUtil.squote(cbxWrapperId))));
+
+        String cbx =HtmlUtil.checkbox(cbxId,
+                                        "true", false,HtmlUtil.id(cbxId)+" " +
+                                        HtmlUtil.attr(HtmlUtil.ATTR_TITLE,msg("Shift-click: select range; Control-click: toggle all"))+
+                                        HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,HtmlUtil.call("entryRowCheckboxClicked",
+                                                                                          HtmlUtil.comma("event",HtmlUtil.squote(cbxId)))));
+        decorateEntryRow(request,entry, htmlSB, getEntryManager().getAjaxLink(request, entry,entry.getLabel()),rowId,cbx);
+    }
+
 
     /**
      * _more_
@@ -829,11 +846,18 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @return _more_
      */
-    public String getEntryFormEnd(Request request, String base) {
+    public String getEntryFormEnd(Request request, String formId) {
         StringBuffer sb = new StringBuffer();
         sb.append(HtmlUtil.formClose());
-        sb.append(HtmlUtil.script(base + ".groupToggleVisibility();"));
+        //        sb.append(HtmlUtil.script(HtmlUtil.callln("initEntryListForm",HtmlUtil.squote(formId))));
         return sb.toString();
+    }
+
+
+
+    public String getBreadcrumbList(Request request, StringBuffer sb, List entries)
+            throws Exception {
+        return getEntriesList(request, sb, entries, true, true, false, true);
     }
 
 
@@ -845,42 +869,47 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * @param entries _more_
      * @param request _more_
      * @param doForm _more_
-     * @param dfltSelected _more_
      * @param showCrumbs _more_
      *
      *
      * @return _more_
      * @throws Exception _more_
      */
-    public String getEntriesList(StringBuffer sb, List entries,
-                                 Request request, boolean doForm,
-                                 boolean dfltSelected, boolean showCrumbs)
+    public String getEntriesList(Request request, 
+                                 StringBuffer sb, 
+                                 List entries,
+                                 boolean doFormOpen,
+                                 boolean doFormClose,
+                                 boolean doCbx,
+                                 boolean showCrumbs)
             throws Exception {
 
         String link = "";
         String base = "";
-        if (doForm) {
-            String[] tuple = getEntryFormStart(request, entries);
+        if (doFormOpen) {
+            String[] tuple = getEntryFormStart(request, entries,true);
             link = tuple[0];
             base = tuple[1];
             sb.append(tuple[2]);
         }
         sb.append(HtmlUtil.open(HtmlUtil.TAG_DIV, HtmlUtil.cssClass("folderblock")));
+        sb.append("\n\n");
         int          cnt  = 0;
         StringBuffer jsSB = new StringBuffer();
         for (Entry entry : (List<Entry>) entries) {
             StringBuffer cbxSB = new StringBuffer();
             String rowId = base + (cnt++);
             String cbxId = "entry_" + entry.getId();
-            String cbxWrapperId = base + (cnt++);
-            jsSB.append(HtmlUtil.callln("addEntryRow",HtmlUtil.comma(HtmlUtil.squote(rowId),HtmlUtil.squote(cbxId),HtmlUtil.squote(cbxWrapperId),base)));
-            if (doForm) {
+            String cbxWrapperId = "checkboxwrapper_" + (cnt++);
+            jsSB.append(HtmlUtil.callln("new EntryRow",HtmlUtil.comma(HtmlUtil.squote(rowId),HtmlUtil.squote(cbxId),HtmlUtil.squote(cbxWrapperId))));
+            if (doCbx) {
                 cbxSB.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
                 String cbx = HtmlUtil.checkbox(cbxId,
-                                               "true", dfltSelected,HtmlUtil.id(cbxId)+" " +
+                                               "true", false,HtmlUtil.id(cbxId)+" " +
+                                               HtmlUtil.style("display:none; visibility:hidden;") +
                                                HtmlUtil.attr(HtmlUtil.ATTR_TITLE,msg("Shift-click: select range; Control-click: toggle all"))+
                                                HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,HtmlUtil.call("entryRowCheckboxClicked",
-                                                                                                 HtmlUtil.comma("event",HtmlUtil.squote(rowId)))));
+                                                                                                 HtmlUtil.comma("event",HtmlUtil.squote(cbxId)))));
                 
 
                 cbxSB.append(HtmlUtil.span(cbx, HtmlUtil.id(cbxWrapperId)));
@@ -895,21 +924,21 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             } else {
                 EntryLink entryLink  = getEntryManager().getAjaxLink(request, entry, entry.getLabel());
                 entryLink.setLink(cbxSB + entryLink.getLink());
-                decorateEntryRow(request, entry, sb,entryLink,rowId);
+                decorateEntryRow(request, entry, sb,entryLink,rowId,"");
             }
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_UL));
         sb.append("\n\n");
         sb.append(HtmlUtil.script(jsSB.toString()));
         sb.append("\n\n");
-        if (doForm) {
+        if (doFormClose) {
             sb.append(getEntryFormEnd(request, base));
         }
         return link;
     }
 
 
-    protected void decorateEntryRow(Request request, Entry entry, StringBuffer sb, EntryLink link,String rowId) {
+    protected void decorateEntryRow(Request request, Entry entry, StringBuffer sb, EntryLink link,String rowId, String extra) {
         if(rowId==null) {
             rowId = "entryrow_" + (HtmlUtil.blockCnt++);
         }
@@ -917,6 +946,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                 HtmlUtil.onMouseOver(HtmlUtil.call("entryRowOver",HtmlUtil.squote(rowId))) +
                                 HtmlUtil.onMouseOut(HtmlUtil.call("entryRowOut",HtmlUtil.squote(rowId)))));
         sb.append("<table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tr ><td>");
+        sb.append(extra);
         sb.append(link.getLink());
         sb.append("</td><td align=right class=entryrowlabel>");
         if(entry.getResource().isFile()) {
@@ -1288,8 +1318,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 return "";
             }
             StringBuffer sb = new StringBuffer();
-            String link = getEntriesList(sb, children, request, true, false,
-                                         false);
+            String link = getEntriesList(request, sb, children, true,  true, true, false);
             blockContent = sb.toString();
             blockTitle = Misc.getProperty(props, "title", msg("Groups"))
                          + link;
@@ -1307,8 +1336,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             }
 
             StringBuffer sb = new StringBuffer();
-            String link = getEntriesList(sb, children, request, true, false,
-                                         false);
+            String link = getEntriesList(request, sb, children, true, true, true, false);
             blockContent = sb.toString();
             blockTitle = Misc.getProperty(props, "title", msg("Entries"))
                          + link;
@@ -1328,8 +1356,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             if (children.size() == 0) {
                 return "";
             }
-            String link = getEntriesList(sb, children, request, true, false,
-                                         false);
+            String link = getEntriesList(request, sb, children, true, true, true, false);
             blockContent = sb.toString();
             blockTitle = Misc.getProperty(props, "title", msg("Children"))
                          + link;

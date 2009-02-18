@@ -804,23 +804,13 @@ public class HtmlOutputHandler extends OutputHandler {
         String cbxWrapperId;
 
         for (Group subGroup : subGroups) {
-            rowId = "entryrow_" + (HtmlUtil.blockCnt++);
-            cbxId = "entry_" + subGroup.getId();
-            cbxWrapperId = "cbx_" + (HtmlUtil.blockCnt++);
-            jsSB.append(HtmlUtil.callln("addEntryRow",HtmlUtil.squote(rowId)));
-            decorateEntryRow(request,subGroup, sb, getEntryManager().getAjaxLink(request, subGroup,subGroup.getLabel()),rowId);
-            cnt++;
+            addEntryCheckbox(request, subGroup, sb, jsSB);
         }
 
 
         if(!onlyGroups) {
             for (Entry entry : entries) {
-                rowId = "entryrow_" + (HtmlUtil.blockCnt++);
-                cbxId = "entry_" + entry.getId();
-                cbxWrapperId = "cbx_" + (HtmlUtil.blockCnt++);
-                jsSB.append(HtmlUtil.callln("addEntryRow",HtmlUtil.squote(rowId)));
-                decorateEntryRow(request, entry, sb, getEntryManager().getAjaxLink(request, entry,entry.getLabel()),rowId);
-                cnt++;
+                addEntryCheckbox(request, entry, sb, jsSB);
             }
         }
 
@@ -923,36 +913,35 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         String desc       = entry.getDescription();
         List   tabTitles  = new ArrayList<String>();
-        List   tabContent = new ArrayList<String>();
+        List   tabContents = new ArrayList<String>();
         if (desc.length() > 0) {
             //            tabTitles.add("Description");
             //            desc = getEntryManager().processText(request, entry, desc);
-            //            tabContent.add(desc);
+            //            tabContents.add(desc);
         }
 
         tabTitles.add("Basic");
         Object basic;
-        tabContent.add(basic = entry.getTypeHandler().getEntryContent(entry,
+        tabContents.add(basic = entry.getTypeHandler().getEntryContent(entry,
                 request, false, true));
 
 
         for (TwoFacedObject tfo : getMetadataHtml(request, entry, true,
                 true)) {
             tabTitles.add(tfo.toString());
-            tabContent.add(tfo.getId());
+            tabContents.add(tfo.getId());
         }
         tabTitles.add(msg("Comments"));
-        tabContent.add(getCommentBlock(request, entry));
+        tabContents.add(getCommentBlock(request, entry));
         tabTitles.add(msg("Associations"));
-        tabContent.add(getAssociationBlock(request, entry));
+        tabContents.add(getAssociationBlock(request, entry));
 
         //        tabTitles.add(msg(LABEL_LINKS));
-        //        tabContent.add(getEntryManager().getEntryActionsTable(request, entry,
+        //        tabContents.add(getEntryManager().getEntryActionsTable(request, entry,
         //                OutputType.TYPE_ALL));
 
 
-
-        return HtmlUtil.makeTabs(tabTitles, tabContent, true, (fixedHeight
+        return HtmlUtil.makeTabs(tabTitles, tabContents, true, (fixedHeight
                 ? "tab_content_fixedheight"
                 : "tab_content"));
 
@@ -1042,16 +1031,14 @@ public class HtmlOutputHandler extends OutputHandler {
         } else {
             if (subGroups.size() > 0) {
                 StringBuffer groupsSB = new StringBuffer();
-                String link = getEntriesList(groupsSB, subGroups, request,
-                                             true, false, group.isDummy());
+                String link = getEntriesList(request, groupsSB, subGroups, true,  (entries.size()==0), true, group.isDummy());
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Groups") + link,
                         groupsSB.toString(), true));
             }
 
             if (entries.size() > 0) {
                 StringBuffer entriesSB = new StringBuffer();
-                String link = getEntriesList(entriesSB, entries, request,
-                                             true, false, group.isDummy());
+                String link = getEntriesList(request, entriesSB, entries,  (subGroups.size() == 0),  true, true, group.isDummy());
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Entries") + link,
                         entriesSB.toString(), true));
             }

@@ -578,8 +578,7 @@ public class CalendarOutputHandler extends OutputHandler {
 
         if (doDay) {
             StringBuffer tmp = new StringBuffer();
-            String link = getEntriesList(tmp, dayItems, request, true, false,
-                                         false);
+            String link = getEntriesList(request, tmp, dayItems,  true,  true, true, false);
 
             request.remove(ARG_MONTH);
             request.remove(ARG_YEAR);

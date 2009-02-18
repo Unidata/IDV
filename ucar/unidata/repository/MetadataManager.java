@@ -719,7 +719,6 @@ public class MetadataManager extends RepositoryManager {
             sb.append(HtmlUtil.space(2));
             sb.append(HtmlUtil.submit(msg("Delete selected"), ARG_DELETE));
             sb.append(HtmlUtil.formTable());
-            StringBuffer jsSB= new StringBuffer();
             for (Metadata metadata : metadataList) {
                 metadata.setEntry(entry);
                 MetadataHandler metadataHandler =
@@ -739,15 +738,11 @@ public class MetadataManager extends RepositoryManager {
                                                HtmlUtil.id(cbxId)+" " +
                                                HtmlUtil.attr(HtmlUtil.ATTR_TITLE,msg("Shift-click: select range; Control-click: toggle all"))+
                                                              HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,HtmlUtil.call("checkboxClicked",
-                                                                                                               HtmlUtil.comma("event",HtmlUtil.squote(cbxId)))));
-
-                jsSB.append(HtmlUtil.call("addCheckbox",HtmlUtil.squote(cbxId)));
-                jsSB.append(";\n");
+                                                                                                               HtmlUtil.comma("event",HtmlUtil.squote("cbx_"),HtmlUtil.squote(cbxId)))));
 
                 sb.append(HtmlUtil.rowTop(HtmlUtil.cols(cbx + html[0],
                         html[1])));
             }
-            sb.append(HtmlUtil.script(jsSB.toString()));
             sb.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.submit(msg("Change")));
             sb.append(HtmlUtil.space(2));

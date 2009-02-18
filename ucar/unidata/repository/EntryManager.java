@@ -1157,8 +1157,7 @@ return new Result(title, sb);
                           ARG_DELETE_CONFIRM, hidden);
         sb.append(getRepository().question(msgSB.toString(), form));
         sb.append("<ul>");
-        new OutputHandler(getRepository(), "tmp").getEntriesList(sb, entries,
-                          request, false, false, true);
+        new OutputHandler(getRepository(), "tmp").getBreadcrumbList(request, sb, entries);
         sb.append("</ul>");
         return new Result(msg("Delete Confirm"), sb);
     }
