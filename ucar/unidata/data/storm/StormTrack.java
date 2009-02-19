@@ -29,16 +29,14 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 
 import ucar.unidata.util.Misc;
+import ucar.visad.Util;
 
 
 import visad.*;
 
 import visad.georef.EarthLocation;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -485,6 +483,9 @@ public class StormTrack implements Comparable {
         return ((trackId.equals(other.trackId)));
     }
 
+    public StringBuffer toDiamond7(){
+        return  toDiamond7( this );
+    }
 
     public void putTemporaryProperty(Object key, Object value) {
         temporaryProperties.put(key,value);
@@ -492,6 +493,94 @@ public class StormTrack implements Comparable {
 
     public Object getTemporaryProperty(Object key) {
         return temporaryProperties.get(key);
+    }
+
+    static public StringBuffer toDiamond7( List<StormTrack> sts ){
+        StringBuffer s = new StringBuffer();
+        for(StormTrack st : sts) {
+            s.append(toDiamond7(st));
+        }
+        return s;
+    }
+
+    static public StringBuffer toDiamond7( StormTrack st ){
+        StringBuffer     sb        = new StringBuffer();
+        Calendar cal = Calendar.getInstance();
+        List<StormTrackPoint> stps = st.getTrackPoints();
+
+        for (StormTrackPoint stp : stps) {
+            Date dttm = null;
+
+            try {
+                dttm = Util.makeDate(stp.getTime());
+            }  catch (Exception excp) {
+
+            }
+            cal.setTime(dttm);
+            String year = Integer.toString(cal.get(Calendar.YEAR));
+            int mm = cal.get(Calendar.MONTH);
+            String mon = Integer.toString(mm);
+            if(mm < 10)
+                mon = "0" + mon;
+            int dd = cal.get(Calendar.DAY_OF_MONTH);
+            String day = Integer.toString(dd);
+            if(dd < 10)
+                day = "0" + day;
+            int hour = cal.get(Calendar.HOUR_OF_DAY);
+            int fhour = stp.getForecastHour();
+            EarthLocation el = stp.getLocation();
+            List<Real> attrs    = stp.getTrackAttributes();
+
+            sb.append(year.substring(2));
+            sb.append(" ");
+            sb.append(mon);
+            sb.append(" ");
+            sb.append(day);
+            sb.append(" ");
+            sb.append(hour);
+            sb.append(" ");
+            sb.append(fhour);
+            sb.append(" ");
+            sb.append(el.getLongitude().getValue());
+            sb.append(" ");
+            sb.append(el.getLatitude().getValue());
+            sb.append(" ");
+
+            Real r = stp.getAttribute(STIStormDataSource.PARAM_MAXWINDSPEED);
+            if(r == null)
+                sb.append(9999);
+            else
+                sb.append(r.getValue());
+            r = stp.getAttribute(STIStormDataSource.PARAM_MINPRESSURE);
+            if(r == null)
+                sb.append(9999);
+            else
+                sb.append(r.getValue());
+            r = stp.getAttribute(STIStormDataSource.PARAM_RADIUSMODERATEGALE);
+            if(r == null)
+                sb.append(9999);
+            else
+                sb.append(r.getValue());
+            r = stp.getAttribute(STIStormDataSource.PARAM_RADIUSWHOLEGALE);
+            if(r == null)
+                sb.append(9999);
+            else
+                sb.append(r.getValue());
+            r = stp.getAttribute(STIStormDataSource.PARAM_MOVEDIRECTION);
+            if(r == null)
+                sb.append(9999);
+            else
+                sb.append(r.getValue());
+            r = stp.getAttribute(STIStormDataSource.PARAM_MOVESPEED);
+            if(r == null)
+                sb.append(9999);
+            else
+                sb.append(r.getValue());
+
+            sb.append("\n");
+        }
+
+        return sb;
     }
 
 
