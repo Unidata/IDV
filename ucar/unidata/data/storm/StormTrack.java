@@ -80,6 +80,7 @@ public class StormTrack implements Comparable {
 
     //private Date trackStartTime;
 
+    private Hashtable temporaryProperties = new Hashtable();
 
     /**
      * _more_
@@ -438,9 +439,7 @@ public class StormTrack implements Comparable {
                 value = trackAttributes[down];
             }
         }
-
         return value;
-
     }
 
     /**
@@ -487,7 +486,13 @@ public class StormTrack implements Comparable {
     }
 
 
+    public void putTemporaryProperty(Object key, Object value) {
+        temporaryProperties.put(key,value);
+    }
 
+    public Object getTemporaryProperty(Object key) {
+        return temporaryProperties.get(key);
+    }
 
 
 }
