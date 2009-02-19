@@ -203,6 +203,9 @@ public class StormTrackControl extends DisplayControlImpl {
     /** _more_ */
     private JCheckBox mostRecentCbx;
 
+    /** _more_          */
+    private JCheckBox editedCbx;
+
 
 
     /** _more_ */
@@ -237,6 +240,7 @@ public class StormTrackControl extends DisplayControlImpl {
     private List<JRadioButton> obsWayRadioButtons;
 
 
+    /** _more_          */
     private boolean editMode = false;
 
     /**
@@ -966,20 +970,29 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected boolean canHandleEvents() {
-        if (!editMode
-            || !getHaveInitialized()
-            || (getMakeWindow() && !getWindowVisible())) {
+        if ( !editMode || !getHaveInitialized()
+                || (getMakeWindow() && !getWindowVisible())) {
             return false;
         }
         return isGuiShown();
     }
 
 
+    /**
+     * _more_
+     *
+     * @param event _more_
+     */
     public void handleDisplayChanged(DisplayEvent event) {
 
         StormDisplayState current = getCurrentStormDisplayState();
-        if (current == null || !current.getActive()) {
+        if ((current == null) || !current.getActive()) {
             return;
         }
         int id = event.getId();
@@ -992,7 +1005,7 @@ public class StormTrackControl extends DisplayControlImpl {
         InputEvent inputEvent = event.getInputEvent();
         try {
             current.handleEvent(event);
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             logException("Error handling edit", exc);
         }
     }
@@ -1042,8 +1055,8 @@ public class StormTrackControl extends DisplayControlImpl {
      * @param forMenuBar _more_
      */
     protected void getEditMenuItems(List items, boolean forMenuBar) {
-        items.add(MenuUtil.makeCheckboxMenuItem("Edit Mode",
-                                                this, "editMode",null));
+        items.add(MenuUtil.makeCheckboxMenuItem("Edit Mode", this,
+                "editMode", null));
 
         StormDisplayState current = getCurrentStormDisplayState();
         if ((current != null) && current.getActive()) {
@@ -1647,6 +1660,8 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
+
+
     /**
      * _more_
      */
@@ -2246,12 +2261,17 @@ public class StormTrackControl extends DisplayControlImpl {
         //        System.err.println ("click:" + clickPt[0]+"/"+clickPt[1] + " " +minDistance);
 
         for (int i = 0; i < numStates; i++) {
-            StormDisplayState sds   = theStates.get(i);
-            if(sds==null) continue;
+            StormDisplayState sds = theStates.get(i);
+            if (sds == null) {
+                continue;
+            }
             StormTrackCollection trackCollection = sds.getTrackCollection();
-            if(trackCollection == null) continue;
-            StormInfo         sinfo = sds.getStormInfo();
-            HashMap<Way, List> wayToTracksMap =  trackCollection.getWayToTracksHashMap();
+            if (trackCollection == null) {
+                continue;
+            }
+            StormInfo sinfo = sds.getStormInfo();
+            HashMap<Way, List> wayToTracksMap =
+                trackCollection.getWayToTracksHashMap();
             // Way obsWay = new Way(Way.OBSERVATION);
             java.util.Set<Way> ways = wayToTracksMap.keySet();
 
@@ -2531,23 +2551,23 @@ public class StormTrackControl extends DisplayControlImpl {
     }
 
 
-/**
-Set the EditMode property.
+    /**
+     * Set the EditMode property.
+     *
+     * @param value The new value for EditMode
+     */
+    public void setEditMode(boolean value) {
+        editMode = value;
+    }
 
-@param value The new value for EditMode
-**/
-public void setEditMode (boolean value) {
-	editMode = value;
-}
-
-/**
-Get the EditMode property.
-
-@return The EditMode
-**/
-public boolean getEditMode () {
-	return editMode;
-}
+    /**
+     * Get the EditMode property.
+     *
+     * @return The EditMode
+     */
+    public boolean getEditMode() {
+        return editMode;
+    }
 
 
 

@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control.storm;
 
 
@@ -39,23 +38,30 @@ import ucar.unidata.ui.colortable.ColorTableDefaults;
 import ucar.unidata.ui.symbol.StationModel;
 import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
+
 import ucar.visad.Util;
 import ucar.visad.display.CompositeDisplayable;
 import ucar.visad.display.Displayable;
 import ucar.visad.display.StationModelDisplayable;
 import ucar.visad.display.TrackDisplayable;
+
 import visad.*;
 import visad.Set;
+
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+
 import java.rmi.RemoteException;
+
 import java.text.DecimalFormat;
+
 import java.util.*;
 import java.util.List;
+
+import javax.swing.*;
 
 
 /**
@@ -183,8 +189,8 @@ public class WayDisplayState {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    protected CompositeDisplayable getHolder() throws VisADException,
-            RemoteException {
+    protected CompositeDisplayable getHolder()
+            throws VisADException, RemoteException {
         if (holder == null) {
             holder = new CompositeDisplayable("way  holder");
             stormDisplayState.addDisplayable(holder);
@@ -247,8 +253,8 @@ public class WayDisplayState {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    private void removeObsPointDisplay() throws VisADException,
-            RemoteException {
+    private void removeObsPointDisplay()
+            throws VisADException, RemoteException {
         if (obsPointDisplay != null) {
             removeDisplayable(obsPointDisplay);
             obsPointDisplay = null;
@@ -288,6 +294,8 @@ public class WayDisplayState {
     /**
      * _more_
      *
+     *
+     * @param force _more_
      * @throws Exception _more_
      */
     public void updateDisplay(boolean force) throws Exception {
@@ -307,7 +315,7 @@ public class WayDisplayState {
             boolean    hadTrack     = hasTrackDisplay();
             boolean    paramChanged = !Misc.equals(colorParam, tmpParam);
             boolean    modeChanged  = !(modeParam == forecastAnimationMode);
-            if (force ||  !hadTrack || paramChanged || modeChanged) {
+            if (force || !hadTrack || paramChanged || modeChanged) {
                 //                System.err.println("makeing field");
                 colorParam = tmpParam;
                 // modeParam = forecastAnimationMode;
@@ -540,9 +548,8 @@ public class WayDisplayState {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    private FieldImpl doDeclutter(FieldImpl obs,
-                                  StationModel sModel) throws VisADException,
-                                      RemoteException {
+    private FieldImpl doDeclutter(FieldImpl obs, StationModel sModel)
+            throws VisADException, RemoteException {
 
 
         //  long      millis           = System.currentTimeMillis();
@@ -594,7 +601,8 @@ public class WayDisplayState {
      * @throws VisADException _more_
      */
     private FieldImpl doTheActualDecluttering(FieldImpl pointObs,
-            StationModel sm) throws VisADException, RemoteException {
+            StationModel sm)
+            throws VisADException, RemoteException {
         if ((pointObs == null) || pointObs.isMissing()) {
             return pointObs;
         }
@@ -755,8 +763,8 @@ public class WayDisplayState {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    public StationModelDisplayable getObsPointDisplay() throws VisADException,
-            RemoteException {
+    public StationModelDisplayable getObsPointDisplay()
+            throws VisADException, RemoteException {
         if (obsPointDisplay == null) {
             obsPointDisplay = new StationModelDisplayable("dots");
             obsPointDisplay.setUseTimesInAnimation(false);
@@ -843,8 +851,8 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    public TrackDisplayable makeConeDisplay(StormParam param,
-                                            int mode) throws Exception {
+    public TrackDisplayable makeConeDisplay(StormParam param, int mode)
+            throws Exception {
         FieldImpl field = makeConeField(param, mode);
         if (field == null) {
             return null;
@@ -869,8 +877,8 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    public TrackDisplayable makeRingDisplay(StormParam param,
-                                            int mode) throws Exception {
+    public TrackDisplayable makeRingDisplay(StormParam param, int mode)
+            throws Exception {
         FieldImpl field = makeRingsField(param, mode);
         if (field == null) {
             return null;
@@ -1106,8 +1114,8 @@ public class WayDisplayState {
      * @return _more_
      * @throws Exception _more_
      */
-    protected FieldImpl makeConeField(StormParam stormParam,
-                                      int mode) throws Exception {
+    protected FieldImpl makeConeField(StormParam stormParam, int mode)
+            throws Exception {
         List<FieldImpl> fields = new ArrayList<FieldImpl>();
         List<DateTime>  times  = new ArrayList<DateTime>();
         Data[]          datas  = new Data[tracks.size()];
@@ -1148,8 +1156,8 @@ public class WayDisplayState {
      * @return _more_
      * @throws Exception _more_
      */
-    private List<PointOb> makePointObs(
-            StormTrack track, boolean useStartTime) throws Exception {
+    private List<PointOb> makePointObs(StormTrack track, boolean useStartTime)
+            throws Exception {
         boolean               isObservation = way.isObservation();
         DateTime              startTime     = track.getStartTime();
         List<StormTrackPoint> stps          = track.getTrackPoints();
@@ -1328,8 +1336,8 @@ public class WayDisplayState {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    public void addDisplayable(
-            Displayable displayable) throws VisADException, RemoteException {
+    public void addDisplayable(Displayable displayable)
+            throws VisADException, RemoteException {
         getHolder().addDisplayable(displayable);
     }
 
@@ -1341,8 +1349,8 @@ public class WayDisplayState {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    public void removeDisplayable(
-            Displayable displayable) throws VisADException, RemoteException {
+    public void removeDisplayable(Displayable displayable)
+            throws VisADException, RemoteException {
         getHolder().removeDisplayable(displayable);
     }
 
@@ -1540,8 +1548,8 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    protected FieldImpl makeRingsField(StormParam stormParam,
-                                       int mode) throws Exception {
+    protected FieldImpl makeRingsField(StormParam stormParam, int mode)
+            throws Exception {
         List<FieldImpl> fields = new ArrayList<FieldImpl>();
         List<DateTime>  times  = new ArrayList<DateTime>();
         Data[]          datas  = new Data[tracks.size() * 10];
@@ -1587,8 +1595,8 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    public List makeRingTrackList(StormTrack track,
-                                  StormParam param) throws Exception {
+    public List makeRingTrackList(StormTrack track, StormParam param)
+            throws Exception {
         List<StormTrackPoint> stps = getRealTrackPoints(track, param);
         List<StormTrack>      stracks        = new ArrayList();
 
@@ -1628,8 +1636,8 @@ public class WayDisplayState {
      *
      * @throws Exception _more_
      */
-    public FieldImpl makeRingTracks(StormTrack track,
-                                    StormParam param) throws Exception {
+    public FieldImpl makeRingTracks(StormTrack track, StormParam param)
+            throws Exception {
         List<StormTrackPoint> stps = getRealTrackPoints(track, param);
         List<StormTrack>      stracks        = new ArrayList();
         int                   size           = stps.size();
@@ -1676,8 +1684,8 @@ public class WayDisplayState {
      * @throws VisADException _more_
      */
     public StormTrackPoint getCirclePoint(StormTrackPoint stp, double r0,
-                                          double azimuth,
-                                          DateTime dt) throws VisADException {
+                                          double azimuth, DateTime dt)
+            throws VisADException {
         //
 
         EarthLocation el   = stp.getLocation();
@@ -1704,8 +1712,8 @@ public class WayDisplayState {
      *
      * @throws VisADException _more_
      */
-    public StormTrack makeConeTrack_Old(StormTrack track,
-                                     StormParam param) throws VisADException {
+    public StormTrack makeConeTrack_Old(StormTrack track, StormParam param)
+            throws VisADException {
         List<StormTrackPoint> stps          = getRealTrackPoints(track,
                                                   param);
         int                   size          = stps.size();
@@ -1783,8 +1791,8 @@ public class WayDisplayState {
      *
      * @throws VisADException _more_
      */
-    public StormTrack makeConeTrack(StormTrack track,
-                                    StormParam param) throws VisADException {
+    public StormTrack makeConeTrack(StormTrack track, StormParam param)
+            throws VisADException {
 
         List<StormTrackPoint> stps = getRealTrackPoints(track, param);
         int                   size          = stps.size();
@@ -1809,12 +1817,14 @@ public class WayDisplayState {
                 stp3 = stps.get(nn);
             } else {
                 stp3 = null;
-             //   return null;
+                //   return null;
             }
             p2c = getPointToCircleTangencyPointA(stp1, stp2, stp3, param,
                     true);
             nn++;
-            if( nn >= size) break;
+            if (nn >= size) {
+                break;
+            }
         }
         if (p2c != null) {
             conePointsRight.addAll(p2c);
@@ -1837,7 +1847,7 @@ public class WayDisplayState {
                 p2c = getCircleToCircleTangencyPointA(stp1, stp2, stp3,
                         param, false);
                 conePointsLeft.addAll(p2c);
-                stp1 = stp2;   // update the first point only after the valid second point
+                stp1 = stp2;  // update the first point only after the valid second point
             }
 
             stp2 = stp3;
@@ -1951,7 +1961,8 @@ public class WayDisplayState {
      */
     public List<StormTrackPoint> getPointToCircleTangencyPointA(
             StormTrackPoint sp1, StormTrackPoint sp2, StormTrackPoint sp3,
-            StormParam param, boolean right) throws VisADException {
+            StormParam param, boolean right)
+            throws VisADException {
 
         List<StormTrackPoint> trackPoints = new ArrayList<StormTrackPoint>();
         if (sp3 == null) {
@@ -2097,7 +2108,8 @@ public class WayDisplayState {
      */
     public List<StormTrackPoint> getPointToCircleTangencyPointB(
             StormTrackPoint sp1, StormTrackPoint sp2, StormParam param,
-            boolean right) throws VisADException {
+            boolean right)
+            throws VisADException {
 
         List<StormTrackPoint> trackPoints = new ArrayList<StormTrackPoint>();
 
@@ -2202,7 +2214,8 @@ public class WayDisplayState {
      */
     public List<StormTrackPoint> getCircleToCircleTangencyPointA(
             StormTrackPoint sp1, StormTrackPoint sp2, StormTrackPoint sp3,
-            StormParam param, boolean right) throws VisADException {
+            StormParam param, boolean right)
+            throws VisADException {
 
         List<StormTrackPoint> trackPoints = new ArrayList<StormTrackPoint>();
         if (sp3 == null) {
@@ -2324,8 +2337,8 @@ public class WayDisplayState {
      * @throws VisADException _more_
      */
     public StormTrackPoint getPointToCircleTangencyPoint(StormTrackPoint sp1,
-            StormTrackPoint sp2, StormParam param,
-            boolean right) throws VisADException {
+            StormTrackPoint sp2, StormParam param, boolean right)
+            throws VisADException {
 
 
         EarthLocation el1 = sp1.getLocation();
@@ -2343,7 +2356,7 @@ public class WayDisplayState {
         double lon2 = el2.getLongitude().getValue();
 
 
-        double af = getCircleAngleRange(el1, el2);
+        double af   = getCircleAngleRange(el1, el2);
         af = af * 180.0 / Math.PI;
         if (right) {
             af = af - 90;
@@ -2444,7 +2457,8 @@ public class WayDisplayState {
      * @throws VisADException _more_
      */
     public StormTrackPoint[] getHalfCircleTrackPoint(EarthLocation c,
-            double angle, double r, DateTime dt) throws VisADException {
+            double angle, double r, DateTime dt)
+            throws VisADException {
         // return 10 track point
         int               size  = 11;
 
@@ -2496,7 +2510,8 @@ public class WayDisplayState {
      * @throws VisADException _more_
      */
     public StormTrackPoint[] getHalfCircleTrackPointOld(EarthLocation c,
-            double angle, double r, DateTime dt) throws VisADException {
+            double angle, double r, DateTime dt)
+            throws VisADException {
         // return 10 track point
         int               size  = 11;
 

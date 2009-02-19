@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control.storm;
 
 
@@ -72,6 +71,7 @@ import ucar.unidata.util.IOUtil;
 
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.Range;
 
 
@@ -129,6 +129,9 @@ import javax.swing.table.*;
 public class StormDisplayState {
 
 
+    /** _more_          */
+    public static final String PROP_TRACK_TABLE = "prop.track.table";
+
     /** _more_ */
     private static String ID_OBS_CONE = "id.obs.cone";
 
@@ -179,6 +182,12 @@ public class StormDisplayState {
     /** _more_ */
     private List<StormTrackChart> charts = new ArrayList<StormTrackChart>();
 
+    /** _more_          */
+    private List<StormTrackTableModel> tableModels =
+        new ArrayList<StormTrackTableModel>();
+
+    /** _more_          */
+    private TreePanel tableTreePanel;
 
     /** _more_ */
     private Object MUTEX = new Object();
@@ -261,7 +270,7 @@ public class StormDisplayState {
         new Hashtable<Way, WayDisplayState>();
 
 
-    /** _more_          */
+    /** _more_ */
     private CommandManager commandManager;
 
 
@@ -368,10 +377,10 @@ public class StormDisplayState {
     /** _more_ */
     private int wayCnt = -1;
 
-    /** _more_          */
+    /** _more_ */
     private StormTrack editedStormTrack;
 
-    /** _more_          */
+    /** _more_ */
     private StormTrackPoint editedStormTrackPoint;
 
     /**
@@ -446,13 +455,13 @@ public class StormDisplayState {
      */
     private class PointEditCommand extends Command {
 
-        /** _more_          */
+        /** _more_ */
         StormTrack stormTrack;
 
-        /** _more_          */
+        /** _more_ */
         List<StormTrackPoint> originalPoints;
 
-        /** _more_          */
+        /** _more_ */
         List<StormTrackPoint> newPoints;
 
         /**
@@ -1675,7 +1684,23 @@ public class StormDisplayState {
      * @throws Exception _more_
      */
     protected void updateDisplays(StormTrack track) throws Exception {
-        updateDisplays(true);
+        Way             way = track.getWay();
+        WayDisplayState wds = wayDisplayStateMap.get(way);
+        if (wds != null) {
+            wds.updateDisplay(true);
+            for (StormTrackTableModel trackModel : tableModels) {
+                if (trackModel.getStormTrack().equals(track)) {
+                    trackModel.fireTableStructureChanged();
+                    Component comp = (Component) track.getTemporaryProperty(
+                                         PROP_TRACK_TABLE);
+                    if (comp != null) {
+                        tableTreePanel.show(comp);
+                        tableTreePanel.showPath(comp);
+                    }
+                    break;
+                }
+            }
+        }
     }
 
 
@@ -1990,12 +2015,13 @@ public class StormDisplayState {
      * @return _more_
      */
     private JComponent getTrackTable() {
-        TreePanel tableTreePanel = new TreePanel(true, 150);
-        int       width          = 400;
-        int       height         = 400;
+        tableTreePanel = new TreePanel(true, 150);
+        int width  = 400;
+        int height = 400;
         for (StormTrack track : trackCollection.getTracks()) {
             StormTrackTableModel tableModel = new StormTrackTableModel(this,
                                                   track);
+            tableModels.add(tableModel);
             TableSorter  sorter     = new TableSorter(tableModel);
             JTable       trackTable = new JTable(sorter);
             JTableHeader header     = trackTable.getTableHeader();
@@ -2013,6 +2039,9 @@ public class StormDisplayState {
                             new JLabel(track.getStartTime().toString()),
                             5)), contents);
             }
+
+            track.putTemporaryProperty(PROP_TRACK_TABLE, contents);
+
             tableTreePanel.addComponent(contents, track.getWay().toString(),
                                         track.getStartTime().toString(),
                                         null);
@@ -2024,27 +2053,43 @@ public class StormDisplayState {
 
 
 
+    /** _more_          */
+    public static final PatternFileFilter FILTER_DAT =
+        new PatternFileFilter(".+\\.dat", "Diamond Format (*.dat)", ".dat");
+
+    /** _more_          */
+    JCheckBox obsCbx = new JCheckBox("Observation", true);
+
+    /** _more_          */
+    JCheckBox forecastCbx = new JCheckBox("Forecast", true);
+
+    /** _more_          */
+    JCheckBox mostRecentCbx = new JCheckBox("Most Recent Forecasts", false);
+
+    /** _more_          */
+    JCheckBox editedCbx = new JCheckBox("Edited Tracks", false);
+
+
     /**
      * _more_
      */
     public void writeToXls() {
         try {
-            JCheckBox obsCbx      = new JCheckBox("Observation", true);
-            JCheckBox forecastCbx = new JCheckBox("Forecast", true);
-            JCheckBox mostRecentCbx = new JCheckBox("Most Recent Forecasts",
-                                          false);
             JComponent accessory = GuiUtils.top(GuiUtils.vbox(obsCbx,
-                                       forecastCbx, mostRecentCbx));
+                                       forecastCbx, mostRecentCbx,
+                                       editedCbx));
 
-            String filename = FileManager.getWriteFile(
-                                  Misc.newList(FileManager.FILTER_XLS),
-                                  FileManager.SUFFIX_XLS, accessory);
+            String filename =
+                FileManager.getWriteFile(Misc.newList(FileManager.FILTER_XLS,
+                    FILTER_DAT), FileManager.SUFFIX_XLS, accessory);
             if (filename == null) {
                 return;
             }
 
-            List<Way>            waysToUse = new ArrayList<Way>();
-            Hashtable<Way, List> trackMap  = new Hashtable<Way, List>();
+
+            List<StormTrack>     tracksToWrite = new ArrayList<StormTrack>();
+            List<Way>            waysToUse     = new ArrayList<Way>();
+            Hashtable<Way, List> trackMap      = new Hashtable<Way, List>();
             for (StormTrack track : trackCollection.getTracks()) {
                 List tracks = trackMap.get(track.getWay());
                 if (tracks == null) {
@@ -2053,7 +2098,26 @@ public class StormDisplayState {
                     waysToUse.add(track.getWay());
                 }
                 tracks.add(track);
+                if (track.getWay().isObservation()) {
+                    if (obsCbx.isSelected()) {
+                        tracksToWrite.add(track);
+                    }
+                } else {
+                    if (forecastCbx.isSelected()) {
+                        tracksToWrite.add(track);
+                    }
+                }
+
             }
+
+
+            if (filename.endsWith(".dat")) {
+                //                StringBuffer sb = StormTrackControl.getDiamond(tracksToWrite)
+                //IOUtil.writeFile(filename, sb.toString());
+                return;
+            }
+
+
 
 
             Hashtable    sheetNames = new Hashtable();

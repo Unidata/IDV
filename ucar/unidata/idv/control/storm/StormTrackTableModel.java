@@ -166,12 +166,25 @@ public class StormTrackTableModel extends AbstractTableModel {
      * @return _more_
      */
     public boolean isCellEditable(int rowIndex, int columnIndex) {
+        if (true) {
+            return false;
+        }
         if (columnIndex == 0) {
             return false;
         }
-        return stormDisplayState.getStormTrackControl().isEditable();
+        //        return stormDisplayState.getStormTrackControl().isEditable();
+        return stormDisplayState.getStormTrackControl().getEditMode();
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public StormTrack getStormTrack() {
+        return track;
+    }
 
     /**
      * _more_
