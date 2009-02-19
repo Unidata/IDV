@@ -510,7 +510,7 @@ public class DataManager {
         for (int i = 0; i < gempakParameters.size(); i++) {
             try {
                 String r = gempakParameters.get(i).toString();
-                ucar.nc2.iosp.gempak.GempakParameterTable.addParameters(r);
+                ucar.nc2.iosp.gempak.GempakGridParameterTable.addParameters(r);
             } catch (Exception exc) {
                 //                System.err.println ("bad:"+ exc);
             }
