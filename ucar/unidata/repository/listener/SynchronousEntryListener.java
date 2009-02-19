@@ -47,16 +47,6 @@ import java.util.List;
  */
 public class SynchronousEntryListener  extends EntryListener {
 
-
-    /** _more_ */
-    private Hashtable properties;
-
-    /** _more_ */
-    private List names = new ArrayList();
-
-    /** _more_ */
-    private List values = new ArrayList();
-
     /** _more_ */
     private Entry entry;
 
@@ -85,12 +75,11 @@ public class SynchronousEntryListener  extends EntryListener {
      */
     public SynchronousEntryListener(Repository repository, String id, Request request) {
         super(repository,null);
-        this.properties = request.getDefinedProperties();
+        Hashtable properties = request.getDefinedProperties();
         for (Enumeration keys = properties.keys(); keys.hasMoreElements(); ) {
             String arg   = (String) keys.nextElement();
             String value = (String) properties.get(arg);
-            names.add(arg);
-            values.add(value);
+            addFilter(new Filter(arg,value));
         }
     }
 

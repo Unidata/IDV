@@ -50,17 +50,12 @@ public class EntryListener implements Constants {
     private Repository repository;
 
     /** _more_ */
-    private Hashtable properties;
-
-
-    /** _more_ */
-    private List names = new ArrayList();
-
-    /** _more_ */
-    private List values = new ArrayList();
-
-    /** _more_ */
     private String id;
+
+
+    private List<Filter> filters = new ArrayList<Filter>();
+
+
 
     public EntryListener() {
     }
@@ -105,26 +100,12 @@ public class EntryListener implements Constants {
         throw new RuntimeException(exc);
     }
 
-    /**
-     * _more_
-     *
-     * @param s1 _more_
-     * @param s2 _more_
-     *
-     * @return _more_
-     */
-    public boolean nameMatch(String s1, String s2) {
-        //TODO: We need to have a StringMatcher object
-        if (s1.endsWith("%")) {
-            s1 = s1.substring(0, s1.length() - 1);
-            return s2.startsWith(s1);
+    public void addFilter(Filter filter) {
+        synchronized(filters) {
+            filters.add(filter);
         }
-        if (s1.startsWith("%")) {
-            s1 = s1.substring(1);
-            return s2.endsWith(s1);
-        }
-        return s2.equals(s1);
     }
+
 
     /**
      * _more_
@@ -134,55 +115,36 @@ public class EntryListener implements Constants {
      * @return _more_
      */
     public boolean checkEntry(Entry entry) {
-        for (int i = 0; i < names.size(); i++) {
-            String  arg   = (String) names.get(i);
-            Object  value = values.get(i);
-            boolean ok    = false;
-            if (arg.equals(ARG_TYPE)) {
-                ok = value.equals(entry.getTypeHandler().getType());
-            } else if (arg.equals(ARG_NAME)) {
-                ok = nameMatch(value.toString(), entry.getName());
-            } else if (arg.equals(ARG_DESCRIPTION)) {
-                ok = nameMatch(value.toString(), entry.getDescription());
-            } else if (arg.equals(ARG_TEXT)) {
-                ok = nameMatch(value.toString(), entry.getDescription()) ||
-                    nameMatch(value.toString(), entry.getName());
-                System.err.println("Text match:" + ok);
-            } else if (arg.equals(ARG_USER)) {
-                ok = Misc.equals(entry.getUser().getId(),value.toString());
-            } else if (arg.equals(ARG_WAIT)) {
-                ok = true;
-            } else if (arg.equals(ARG_GROUP)) {
-                //TODO: check for subgroups
-                //                ok = (value.equals(entry.getParentGroup().getFullName())
-                //                      || value.equals(entry.getParentGroup().getId()));
-            } else {
-                int match = entry.getTypeHandler().matchValue(arg, value, entry);
-                if (match == TypeHandler.MATCH_FALSE) {
-                    ok = false;
-                } else if (match == TypeHandler.MATCH_TRUE) {
-                    ok = true;
-                } else {
-                    System.err.println("unknown Entry listener argument:"
-                                       + arg);
-                    //                    ok = false;
-                    ok  =true;
-                }
-            }
-            System.err.println ("arg:" + arg + " " + ok);
-
-            if ( !ok) {
-                System.err.println("not OK");
-                return false;
-            }
+        for (Filter filter: filters) {
+            boolean ok    = filter.checkEntry(entry);
+            if(!ok) return false;
         }
-
         entryMatched(entry);
         return true;
     }
 
     protected void entryMatched(Entry entry) {
     }
+
+/**
+Set the Filters property.
+
+@param value The new value for Filters
+**/
+public void setFilters (List<Filter> value) {
+	filters = value;
+}
+
+/**
+Get the Filters property.
+
+@return The Filters
+**/
+public List<Filter> getFilters () {
+	return filters;
+}
+
+
 
 
 }
