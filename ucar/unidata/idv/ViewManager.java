@@ -3112,9 +3112,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (id == KeyEvent.KEY_PRESSED) {
             if (keyEvent.isControlDown()) {
                 if (code == KeyEvent.VK_Z) {
-                    getCommandManager().move(-1);
+                    //                    getCommandManager().move(-1);
                 } else if (code == KeyEvent.VK_Y) {
-                    getCommandManager().move(1);
+                    //                    getCommandManager().move(1);
                 }
                 return;
             }
