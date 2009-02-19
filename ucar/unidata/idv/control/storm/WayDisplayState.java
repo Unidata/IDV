@@ -491,10 +491,10 @@ public class WayDisplayState {
                     removeObsPointDisplay();
                 } else {
                     if (true) {  //(!hasObsPointDisplay()) {
-                        List thePointObs = new ArrayList(allPointObs);
-                        FieldImpl pointField =
+                        FieldImpl pointField;
+                        pointField =
                             PointObFactory.makeTimeSequenceOfPointObs(
-                                allPointObs, -1, -1);
+                                                                      allPointObs, -1, -1);
 
                         FieldImpl pointField1 = doDeclutter(pointField, sm);
                         getObsPointDisplay().setStationData(pointField1);
@@ -1068,8 +1068,9 @@ public class WayDisplayState {
         List<FieldImpl> fields = new ArrayList<FieldImpl>();
         List<DateTime>  times  = new ArrayList<DateTime>();
 
-        pointObs    = new ArrayList<PointOb>();
-        allPointObs = new ArrayList<PointOb>();
+        //Use a local list to hold the point obs so we don't run into a race condition
+        List<PointOb> localPointObs    = new ArrayList<PointOb>();
+        List<PointOb> localAllPointObs = new ArrayList<PointOb>();
         Data[] datas = new Data[tracks.size()];
         int    i     = 0;
         for (StormTrack track : tracks) {
@@ -1083,11 +1084,14 @@ public class WayDisplayState {
             fields.add(field);
             times.add(track.getStartTime());
             //  if(!way.isObservation() && mode == 0)
-            pointObs.addAll(makePointObs(track, !way.isObservation()));
+            localPointObs.addAll(makePointObs(track, !way.isObservation()));
             if (way.isObservation()) {
-                allPointObs.addAll(makeObsPointObs(track));
+                localAllPointObs.addAll(makeObsPointObs(track));
             }
         }
+
+        pointObs = localPointObs;
+        allPointObs = localAllPointObs;
 
         if (fields.size() == 0) {
             return null;
