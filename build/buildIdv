@@ -15,7 +15,7 @@ errmsg()
 
 usage()
 {
-    errmsg "Usage: $prog [build|installers|nightly|release|ftp]"
+    errmsg "Usage: $prog [build|installers|nightly|test|release|ftp]"
     exit 1
 }
 
@@ -33,8 +33,13 @@ build()
 		umask 02
 		if mkdir $newdir; then
 		    svn update build/build.xml
-		    if ant -Dbasedir=`pwd`/$newdir \
-			    -buildfile build/build.xml; then
+		    if test "$1"; then
+			ant -Dbasedir=`pwd`/$newdir -buildfile build/build.xml \
+			    "$@"
+		    else
+			ant -Dbasedir=`pwd`/$newdir -buildfile build/build.xml
+		    fi
+		    if test $? -eq 0; then
 			olddir=$(ls -l runtime | awk '{print $NF}')
                         if test $olddir != $newdir; then
                             rm -rf $olddir || echo 1>&2 \
@@ -85,7 +90,7 @@ nightly()
 {
     (
         status=1
-        if (build); then
+        if (build "$@"); then
           if (installers); then
             if cd /upc/share/idv; then
 	      umask 02
@@ -106,11 +111,32 @@ release()
 {
     (
         status=1
-        if (build); then
+        if (build "$@"); then
           if (installers); then
             if cd /upc/share/idv; then
 	      umask 02
 	      if ant -Dbasedir=`pwd` -buildfile build/build.xml release; then
+	        echo "IDV release done"
+	        status=0
+    	      else
+	        echo 1>&2 "Couldn't do IDV release stuff"
+	      fi
+            fi
+          fi
+        fi
+        return $status
+    )
+}
+
+test_release()
+{
+    (
+        status=1
+        if (build "$@"); then
+          if (installers); then
+            if cd /upc/share/idv; then
+	      umask 02
+	      if ant -Dbasedir=`pwd` -buildfile build/build.xml test_release; then
 	        echo "IDV release done"
 	        status=0
     	      else
@@ -159,6 +185,9 @@ case "$action" in
         ;;
     f|ft|ftp)
         ftp "$@"
+        ;;
+    t|te|tes|test)
+        test_release "$@"
         ;;
     n|ni|nig|nigh|night|nightl|nightly)
         nightly "$@"

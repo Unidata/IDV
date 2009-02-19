@@ -29,6 +29,7 @@ line using: and -Dbasedir=/some/other/dir
 
         <!-- srcdir is where we check out cvs code -->
         <property name="srcdir"  value="${basedir}" />
+        <property name="svn_root"  value="svn://zero/idv/trunk" />
         <property name="installerdir"  value="${basedir}/installers" />
         <mkdir dir="${installerdir}" />
         <property name="install4jdir"  value="/upc/share/install4j" />
@@ -197,8 +198,9 @@ line using: and -Dbasedir=/some/other/dir
 
 
     <target name="svnco" depends="init">
+        <echo message="Checking out ${svn_root}"/>
         <exec executable="svn">
-            <arg line="--quiet co svn://zero/idv/trunk ${srcdir}" />
+            <arg line="--quiet co ${svn_root} ${srcdir}" />
         </exec>
 <!--
         <svn>
@@ -320,7 +322,7 @@ line using: and -Dbasedir=/some/other/dir
            <param name="snapshot_path" value="${test_path}"/>
            <param name="snapshot_name" value="${test_name}"/>
            <param name="snapshot_webstart_path" value="${idv_release_path}/${test_name}"/>
-            <parm name="snapshot_download_path" value="${idv_download_path}/${test_name}"/>
+           <param name="snapshot_download_path" value="${idv_download_path}/${test_name}"/>
            <param name="snapshot_title" value="Latest IDV ${idv.version.space} test release&lt;p&gt;Built: ${start.time}"/>
        </antcall>
     </target>
