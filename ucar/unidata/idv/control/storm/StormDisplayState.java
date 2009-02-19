@@ -2073,7 +2073,7 @@ public class StormDisplayState {
     /**
      * _more_
      */
-    public void writeToXls() {
+    public void writeToDataFile() {
         try {
             JComponent accessory = GuiUtils.top(GuiUtils.vbox(obsCbx,
                                        forecastCbx, mostRecentCbx,
@@ -2112,8 +2112,8 @@ public class StormDisplayState {
 
 
             if (filename.endsWith(".dat")) {
-                //                StringBuffer sb = StormTrackControl.getDiamond(tracksToWrite)
-                //IOUtil.writeFile(filename, sb.toString());
+                StringBuffer sb = StormTrack.toDiamond7(tracksToWrite);
+                IOUtil.writeFile(filename, sb.toString());
                 return;
             }
 

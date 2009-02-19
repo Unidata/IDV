@@ -1034,8 +1034,8 @@ public class StormTrackControl extends DisplayControlImpl {
                         "deleteStormDisplayState"));
             }
             items.add(GuiUtils.MENU_SEPARATOR);
-            items.add(GuiUtils.makeMenuItem("Export to Spreadsheet", current,
-                                            "writeToXls"));
+            items.add(GuiUtils.makeMenuItem("Export to Data File", current,
+                                            "writeToDataFile"));
 
         }
         items.add(GuiUtils.makeMenuItem("Export to Google Earth", this,
