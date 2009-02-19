@@ -20,7 +20,9 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository.listener;
+
 
 import ucar.unidata.repository.*;
 
@@ -45,14 +47,16 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.30 $
  */
-public class SynchronousEntryListener  extends EntryListener {
+public class SynchronousEntryListener extends EntryListener {
 
     /** _more_ */
     private Entry entry;
 
 
-    public SynchronousEntryListener() {
-    }
+    /**
+     * _more_
+     */
+    public SynchronousEntryListener() {}
 
 
     /**
@@ -73,13 +77,14 @@ public class SynchronousEntryListener  extends EntryListener {
      * @param id _more_
      * @param request _more_
      */
-    public SynchronousEntryListener(Repository repository, String id, Request request) {
-        super(repository,null);
+    public SynchronousEntryListener(Repository repository, String id,
+                                    Request request) {
+        super(repository, null);
         Hashtable properties = request.getDefinedProperties();
         for (Enumeration keys = properties.keys(); keys.hasMoreElements(); ) {
             String arg   = (String) keys.nextElement();
             String value = (String) properties.get(arg);
-            addFilter(new Filter(arg,value));
+            addFilter(new Filter(arg, value));
         }
     }
 
@@ -87,6 +92,11 @@ public class SynchronousEntryListener  extends EntryListener {
 
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     */
     protected void entryMatched(Entry entry) {
         super.entryMatched(entry);
         this.entry = entry;

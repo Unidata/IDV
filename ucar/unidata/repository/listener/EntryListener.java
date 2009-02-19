@@ -19,7 +19,9 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository.listener;
+
 
 import ucar.unidata.repository.*;
 
@@ -53,12 +55,15 @@ public class EntryListener implements Constants {
     private String id;
 
 
+    /** _more_          */
     private List<Filter> filters = new ArrayList<Filter>();
 
 
 
-    public EntryListener() {
-    }
+    /**
+     * _more_
+     */
+    public EntryListener() {}
 
 
     /**
@@ -68,15 +73,25 @@ public class EntryListener implements Constants {
      * @param id _more_
      */
     public EntryListener(Repository repository, String id) {
-        this.id  =id;
+        this.id         = id;
         this.repository = repository;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     */
     public void setRepository(Repository repository) {
         this.repository = repository;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected Repository getRepository() {
         return repository;
     }
@@ -90,18 +105,34 @@ public class EntryListener implements Constants {
         return id;
     }
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     */
     public void setId(String id) {
         this.id = id;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param message _more_
+     * @param exc _more_
+     */
     protected void handleError(String message, Exception exc) {
         //TODO: What to do with errors
         throw new RuntimeException(exc);
     }
 
+    /**
+     * _more_
+     *
+     * @param filter _more_
+     */
     public void addFilter(Filter filter) {
-        synchronized(filters) {
+        synchronized (filters) {
             filters.add(filter);
         }
     }
@@ -115,34 +146,40 @@ public class EntryListener implements Constants {
      * @return _more_
      */
     public boolean checkEntry(Entry entry) {
-        for (Filter filter: filters) {
-            boolean ok    = filter.checkEntry(entry);
-            if(!ok) return false;
+        for (Filter filter : filters) {
+            boolean ok = filter.checkEntry(entry);
+            if ( !ok) {
+                return false;
+            }
         }
         entryMatched(entry);
         return true;
     }
 
-    protected void entryMatched(Entry entry) {
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     */
+    protected void entryMatched(Entry entry) {}
+
+    /**
+     * Set the Filters property.
+     *
+     * @param value The new value for Filters
+     */
+    public void setFilters(List<Filter> value) {
+        filters = value;
     }
 
-/**
-Set the Filters property.
-
-@param value The new value for Filters
-**/
-public void setFilters (List<Filter> value) {
-	filters = value;
-}
-
-/**
-Get the Filters property.
-
-@return The Filters
-**/
-public List<Filter> getFilters () {
-	return filters;
-}
+    /**
+     * Get the Filters property.
+     *
+     * @return The Filters
+     */
+    public List<Filter> getFilters() {
+        return filters;
+    }
 
 
 

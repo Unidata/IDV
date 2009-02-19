@@ -19,7 +19,9 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository.listener;
+
 
 import ucar.unidata.repository.*;
 
@@ -45,18 +47,38 @@ import java.util.List;
  */
 public class Filter implements Constants {
 
+    /** _more_          */
     private String field;
+
+    /** _more_          */
     private Object value;
+
+    /** _more_          */
     private boolean doNot = false;
 
-    public Filter() {
-    }
+    /**
+     * _more_
+     */
+    public Filter() {}
 
+    /**
+     * _more_
+     *
+     * @param field _more_
+     * @param value _more_
+     */
     public Filter(String field, Object value) {
         this(field, value, false);
     }
 
-    public Filter(String field, Object value,boolean doNot) {
+    /**
+     * _more_
+     *
+     * @param field _more_
+     * @param value _more_
+     * @param doNot _more_
+     */
+    public Filter(String field, Object value, boolean doNot) {
         this.field = field;
         this.value = value;
     }
@@ -92,7 +114,7 @@ public class Filter implements Constants {
      * @return _more_
      */
     public boolean checkEntry(Entry entry) {
-        boolean ok    = false;
+        boolean ok = false;
         if (field.equals(ARG_TYPE)) {
             ok = value.equals(entry.getTypeHandler().getType());
         } else if (field.equals(ARG_NAME)) {
@@ -100,10 +122,10 @@ public class Filter implements Constants {
         } else if (field.equals(ARG_DESCRIPTION)) {
             ok = nameMatch(value.toString(), entry.getDescription());
         } else if (field.equals(ARG_TEXT)) {
-            ok = nameMatch(value.toString(), entry.getDescription()) ||
-                nameMatch(value.toString(), entry.getName());
+            ok = nameMatch(value.toString(), entry.getDescription())
+                 || nameMatch(value.toString(), entry.getName());
         } else if (field.equals(ARG_USER)) {
-            ok = Misc.equals(entry.getUser().getId(),value.toString());
+            ok = Misc.equals(entry.getUser().getId(), value.toString());
         } else if (field.equals(ARG_WAIT)) {
             ok = true;
         } else if (field.equals(ARG_GROUP)) {
@@ -111,7 +133,8 @@ public class Filter implements Constants {
             //                ok = (value.equals(entry.getParentGroup().getFullName())
             //                      || value.equals(entry.getParentGroup().getId()));
         } else {
-            int match = entry.getTypeHandler().matchValue(field, value, entry);
+            int match = entry.getTypeHandler().matchValue(field, value,
+                            entry);
             if (match == TypeHandler.MATCH_FALSE) {
                 ok = false;
             } else if (match == TypeHandler.MATCH_TRUE) {
@@ -121,64 +144,66 @@ public class Filter implements Constants {
                 return true;
             }
         }
-        if(doNot) return !ok;
+        if (doNot) {
+            return !ok;
+        }
         return ok;
     }
 
-/**
-Set the Field property.
+    /**
+     * Set the Field property.
+     *
+     * @param value The new value for Field
+     */
+    public void setField(String value) {
+        field = value;
+    }
 
-@param value The new value for Field
-**/
-public void setField (String value) {
-	field = value;
-}
+    /**
+     * Get the Field property.
+     *
+     * @return The Field
+     */
+    public String getField() {
+        return field;
+    }
 
-/**
-Get the Field property.
+    /**
+     * Set the Value property.
+     *
+     * @param value The new value for Value
+     */
+    public void setValue(Object value) {
+        value = value;
+    }
 
-@return The Field
-**/
-public String getField () {
-	return field;
-}
-
-/**
-Set the Value property.
-
-@param value The new value for Value
-**/
-public void setValue (Object value) {
-	value = value;
-}
-
-/**
-Get the Value property.
-
-@return The Value
-**/
-public Object getValue () {
-	return value;
-}
+    /**
+     * Get the Value property.
+     *
+     * @return The Value
+     */
+    public Object getValue() {
+        return value;
+    }
 
 
-/**
-Set the DoNot property.
+    /**
+     * Set the DoNot property.
+     *
+     * @param value The new value for DoNot
+     */
+    public void setDoNot(boolean value) {
+        doNot = value;
+    }
 
-@param value The new value for DoNot
-**/
-public void setDoNot (boolean value) {
-	doNot = value;
-}
-
-/**
-Get the DoNot property.
-
-@return The DoNot
-**/
-public boolean getDoNot () {
-	return doNot;
-}
+    /**
+     * Get the DoNot property.
+     *
+     * @return The DoNot
+     */
+    public boolean getDoNot() {
+        return doNot;
+    }
 
 
 

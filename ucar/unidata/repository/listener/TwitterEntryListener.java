@@ -20,9 +20,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository.listener;
 
+
 import ucar.unidata.repository.*;
+
+import ucar.unidata.util.HtmlUtil;
 
 
 import java.util.ArrayList;
@@ -30,7 +34,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
-import ucar.unidata.util.HtmlUtil;
 
 /**
  *
@@ -38,11 +41,13 @@ import ucar.unidata.util.HtmlUtil;
  * @author IDV Development Team
  * @version $Revision: 1.30 $
  */
-public class TwitterEntryListener  extends PasswordEntryListener {
+public class TwitterEntryListener extends PasswordEntryListener {
 
 
-    public TwitterEntryListener() {
-    }
+    /**
+     * _more_
+     */
+    public TwitterEntryListener() {}
 
     /**
      * _more_
@@ -58,17 +63,26 @@ public class TwitterEntryListener  extends PasswordEntryListener {
 
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     */
     protected void entryMatched(Entry entry) {
         try {
-        super.entryMatched(entry);
-        System.err.println("got entry");
-        twitter4j.Twitter twitter = new twitter4j.Twitter(getUserId(), getPassword());
-        String url1 =
-            HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
-                         ARG_ENTRYID, entry.getId());
-        twitter4j.Status status = twitter.update("New entry:" + entry.getFullName()+"\n" + url1);
-        System.out.println("Successfully updated the status to [" + status.getText() + "].");
-        } catch(Exception exc) {
+            super.entryMatched(entry);
+            System.err.println("got entry");
+            twitter4j.Twitter twitter = new twitter4j.Twitter(getUserId(),
+                                            getPassword());
+            String url1 =
+                HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
+                             ARG_ENTRYID, entry.getId());
+            twitter4j.Status status = twitter.update("New entry:"
+                                          + entry.getFullName() + "\n"
+                                          + url1);
+            System.out.println("Successfully updated the status to ["
+                               + status.getText() + "].");
+        } catch (Exception exc) {
             handleError("Error posting to Twitter", exc);
         }
     }

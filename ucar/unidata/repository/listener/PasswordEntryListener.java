@@ -20,9 +20,14 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository.listener;
 
+
 import ucar.unidata.repository.*;
+
+import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.xml.XmlUtil;
 
 
 import java.util.ArrayList;
@@ -30,8 +35,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
-import ucar.unidata.util.HtmlUtil;
-import ucar.unidata.xml.XmlUtil;
 
 /**
  *
@@ -39,14 +42,19 @@ import ucar.unidata.xml.XmlUtil;
  * @author IDV Development Team
  * @version $Revision: 1.30 $
  */
-public class PasswordEntryListener  extends EntryListener {
+public class PasswordEntryListener extends EntryListener {
 
-    private String userId="";
-    private String password="";
+    /** _more_          */
+    private String userId = "";
+
+    /** _more_          */
+    private String password = "";
 
 
-    public PasswordEntryListener() {
-    }
+    /**
+     * _more_
+     */
+    public PasswordEntryListener() {}
 
     /**
      * _more_
@@ -56,7 +64,7 @@ public class PasswordEntryListener  extends EntryListener {
      * @param request _more_
      */
     public PasswordEntryListener(Repository repository) {
-        super(repository,null);
+        super(repository, null);
     }
 
 
@@ -89,26 +97,31 @@ public class PasswordEntryListener  extends EntryListener {
         return XmlUtil.encodeBase64(password.getBytes()).getBytes();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected String getPassword() {
         return password;
     }
 
     /**
-       Set the UserId property.
-
-       @param value The new value for UserId
-    **/
-    public void setUserId (String value) {
-	userId = value;
+     *  Set the UserId property.
+     *
+     *  @param value The new value for UserId
+     */
+    public void setUserId(String value) {
+        userId = value;
     }
 
     /**
-       Get the UserId property.
-
-       @return The UserId
-    **/
-    public String getUserId () {
-	return userId;
+     *  Get the UserId property.
+     *
+     *  @return The UserId
+     */
+    public String getUserId() {
+        return userId;
     }
 
 
