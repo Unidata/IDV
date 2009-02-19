@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.storm;
 
 
@@ -345,6 +346,10 @@ public class STIStormDataSource extends StormDataSource {
 
 
 
+
+
+
+
     /**
      * _more_
      *
@@ -355,14 +360,9 @@ public class STIStormDataSource extends StormDataSource {
     }
 
 
-    /**
-     * _more_
-     *
-     * @throws VisADException _more_
-     */
-    protected void initParams() throws VisADException {
-        super.initParams();
-        if (PARAM_MAXWINDSPEED == null) {
+
+    static {
+        try {
             //TODO: Make sure these are the right units
             PARAM_MAXWINDSPEED = new StormParam(makeRealType("maxwindspeed",
                     "Max_Windspeed", Util.parseUnit("m/s")));
@@ -436,25 +436,37 @@ public class STIStormDataSource extends StormDataSource {
                                             "Mean_Distance_Error",
                                             Util.parseUnit("km")), true,
                                                 false, false);
+        } catch (Exception exc) {
+            System.err.println("Error creating storm params:" + exc);
+            exc.printStackTrace();
 
-            obsParams = new StormParam[] {
-                PARAM_MAXWINDSPEED, PARAM_MINPRESSURE,
-                PARAM_RADIUSMODERATEGALE, PARAM_RADIUSWHOLEGALE,
-                PARAM_MOVEDIRECTION, PARAM_MOVESPEED
-            };
-
-            forecastParams = new StormParam[] {
-                PARAM_MAXWINDSPEED, PARAM_MINPRESSURE,
-                PARAM_RADIUSMODERATEGALE, PARAM_RADIUSWHOLEGALE,
-                PARAM_MOVEDIRECTION, PARAM_MOVESPEED,  //PARAM_DISTANCEERROR,
-                PARAM_PROBABILITY10RADIUS, PARAM_PROBABILITY20RADIUS,
-                PARAM_PROBABILITY30RADIUS, PARAM_PROBABILITY40RADIUS,
-                PARAM_PROBABILITY50RADIUS, PARAM_PROBABILITY60RADIUS,
-                PARAM_PROBABILITY70RADIUS, PARAM_PROBABILITY80RADIUS,
-                PARAM_PROBABILITY90RADIUS, PARAM_PROBABILITY100RADIUS,
-                PARAM_DISTANCE_ERROR
-            };
         }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @throws VisADException _more_
+     */
+    protected void initParams() throws VisADException {
+        super.initParams();
+
+        obsParams = new StormParam[] {
+            PARAM_MAXWINDSPEED, PARAM_MINPRESSURE, PARAM_RADIUSMODERATEGALE,
+            PARAM_RADIUSWHOLEGALE, PARAM_MOVEDIRECTION, PARAM_MOVESPEED
+        };
+
+        forecastParams = new StormParam[] {
+            PARAM_MAXWINDSPEED, PARAM_MINPRESSURE, PARAM_RADIUSMODERATEGALE,
+            PARAM_RADIUSWHOLEGALE, PARAM_MOVEDIRECTION, PARAM_MOVESPEED,  //PARAM_DISTANCEERROR,
+            PARAM_PROBABILITY10RADIUS, PARAM_PROBABILITY20RADIUS,
+            PARAM_PROBABILITY30RADIUS, PARAM_PROBABILITY40RADIUS,
+            PARAM_PROBABILITY50RADIUS, PARAM_PROBABILITY60RADIUS,
+            PARAM_PROBABILITY70RADIUS, PARAM_PROBABILITY80RADIUS,
+            PARAM_PROBABILITY90RADIUS, PARAM_PROBABILITY100RADIUS,
+            PARAM_DISTANCE_ERROR
+        };
     }
 
 
@@ -1528,11 +1540,10 @@ public class STIStormDataSource extends StormDataSource {
             } catch (Exception sqe) {
                 //  System.out.println(sqe);
                 String msg = sqe.toString();
-                if ((msg.indexOf(
-                        "Access denied") >= 0) || (msg.indexOf(
-                            "role \"" + userName
-                            + "\" does not exist") >= 0) || (msg.indexOf(
-                                "user name specified") >= 0)) {
+                if ((msg.indexOf("Access denied") >= 0) || (msg.indexOf(
+                        "role \"" + userName
+                        + "\" does not exist") >= 0) || (msg.indexOf(
+                            "user name specified") >= 0)) {
                     String label;
                     if (cnt == 0) {
                         label =

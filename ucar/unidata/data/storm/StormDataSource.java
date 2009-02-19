@@ -193,12 +193,15 @@ public abstract class StormDataSource extends DataSourceImpl {
      *
      * @throws VisADException _more_
      */
-    protected RealType makeRealType(String id, String alias, Unit unit)
-            throws VisADException {
-        alias = alias + "[unit:" + ((unit == null)
-                                    ? "null"
-                                    : Util.cleanName(unit.toString())) + "]";
-        return ucar.visad.Util.makeRealType(id, alias, unit);
+    protected static RealType makeRealType(String id, String alias, Unit unit) {
+        try {
+            alias = alias + "[unit:" + ((unit == null)
+                                        ? "null"
+                                        : Util.cleanName(unit.toString())) + "]";
+            return ucar.visad.Util.makeRealType(id, alias, unit);
+        } catch(VisADException exc) {
+            throw new RuntimeException(exc);
+        }
     }
 
 

@@ -80,6 +80,8 @@ public class StormTrack implements Comparable {
 
     private Hashtable temporaryProperties = new Hashtable();
 
+    private static final int DIAMOND_MISSING_VALUE = 9999;
+
     /**
      * _more_
      *
@@ -483,9 +485,7 @@ public class StormTrack implements Comparable {
         return ((trackId.equals(other.trackId)));
     }
 
-    public StringBuffer toDiamond7(){
-        return  toDiamond7( this );
-    }
+
 
     public void putTemporaryProperty(Object key, Object value) {
         temporaryProperties.put(key,value);
@@ -495,20 +495,24 @@ public class StormTrack implements Comparable {
         return temporaryProperties.get(key);
     }
 
-    static public StringBuffer toDiamond7( List<StormTrack> sts ){
-        StringBuffer s = new StringBuffer();
+
+
+
+    static public StringBuffer toDiamond7( List<StormTrack> sts ) throws VisADException {
+        StringBuffer sb = new StringBuffer();
+        sb.append("header\n");
         for(StormTrack st : sts) {
-            s.append(toDiamond7(st));
+            st.toDiamond7(sb);
         }
-        return s;
+        return sb;
     }
 
-    static public StringBuffer toDiamond7( StormTrack st ){
-        StringBuffer     sb        = new StringBuffer();
-        Calendar cal = Calendar.getInstance();
-        List<StormTrackPoint> stps = st.getTrackPoints();
 
-        for (StormTrackPoint stp : stps) {
+
+    public void toDiamond7(StringBuffer sb) throws VisADException {
+        Calendar cal = Calendar.getInstance();
+        sb.append("header\n");
+        for (StormTrackPoint stp : getTrackPoints()) {
             Date dttm = null;
 
             try {
@@ -541,46 +545,29 @@ public class StormTrack implements Comparable {
             sb.append(" ");
             sb.append(fhour);
             sb.append(" ");
-            sb.append(el.getLongitude().getValue());
+            sb.append(el.getLongitude().getValue(CommonUnit.degree));
             sb.append(" ");
-            sb.append(el.getLatitude().getValue());
+            sb.append(el.getLatitude().getValue(CommonUnit.degree));
             sb.append(" ");
 
-            Real r = stp.getAttribute(STIStormDataSource.PARAM_MAXWINDSPEED);
-            if(r == null)
-                sb.append(9999);
-            else
-                sb.append(r.getValue());
-            r = stp.getAttribute(STIStormDataSource.PARAM_MINPRESSURE);
-            if(r == null)
-                sb.append(9999);
-            else
-                sb.append(r.getValue());
-            r = stp.getAttribute(STIStormDataSource.PARAM_RADIUSMODERATEGALE);
-            if(r == null)
-                sb.append(9999);
-            else
-                sb.append(r.getValue());
-            r = stp.getAttribute(STIStormDataSource.PARAM_RADIUSWHOLEGALE);
-            if(r == null)
-                sb.append(9999);
-            else
-                sb.append(r.getValue());
-            r = stp.getAttribute(STIStormDataSource.PARAM_MOVEDIRECTION);
-            if(r == null)
-                sb.append(9999);
-            else
-                sb.append(r.getValue());
-            r = stp.getAttribute(STIStormDataSource.PARAM_MOVESPEED);
-            if(r == null)
-                sb.append(9999);
-            else
-                sb.append(r.getValue());
-
+            //TODO: What to do with units?
+            appendDiamondValue(sb,stp.getAttribute(STIStormDataSource.PARAM_MAXWINDSPEED));
+            appendDiamondValue(sb, stp.getAttribute(STIStormDataSource.PARAM_MINPRESSURE));
+            appendDiamondValue(sb, stp.getAttribute(STIStormDataSource.PARAM_RADIUSMODERATEGALE));
+            appendDiamondValue(sb, stp.getAttribute(STIStormDataSource.PARAM_RADIUSWHOLEGALE));
+            appendDiamondValue(sb, stp.getAttribute(STIStormDataSource.PARAM_MOVEDIRECTION));
+            appendDiamondValue(sb,stp.getAttribute(STIStormDataSource.PARAM_MOVESPEED));
             sb.append("\n");
         }
+    }
 
-        return sb;
+
+    private void appendDiamondValue(StringBuffer sb,Real r) {
+        if(r == null)
+            sb.append(DIAMOND_MISSING_VALUE);
+        else
+            sb.append(r.getValue());
+        sb.append(" ");
     }
 
 
