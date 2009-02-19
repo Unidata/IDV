@@ -1565,8 +1565,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         System.err.println(
                             "Couldn't load optional output handler:"
                             + XmlUtil.toString(node));
-                        //                        System.err.println ("Error:" + exc);
-                        //                        exc.printStackTrace();
+                        System.err.println ("*************** Error:" + exc);
+                        exc.printStackTrace();
                     } else {
                         System.err.println(
                             "Error loading output handler file:" + file);
