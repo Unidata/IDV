@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository.listener;
 
 
@@ -42,12 +43,12 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.30 $
  */
-public class PasswordEntryListener extends EntryListener {
+public abstract class PasswordEntryListener extends EntryListener {
 
-    /** _more_          */
-    private String userId = "";
+    /** _more_ */
+    private String remoteUserId = "";
 
-    /** _more_          */
+    /** _more_ */
     private String password = "";
 
 
@@ -60,14 +61,27 @@ public class PasswordEntryListener extends EntryListener {
      * _more_
      *
      * @param repository _more_
-     * @param id _more_
-     * @param request _more_
+     * @param user _more_
      */
-    public PasswordEntryListener(Repository repository) {
-        super(repository, null);
+    public PasswordEntryListener(Repository repository, User user) {
+        this(repository, user, null, null);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param user _more_
+     * @param remoteUserId _more_
+     * @param password _more_
+     */
+    public PasswordEntryListener(Repository repository, User user,
+                                 String remoteUserId, String password) {
+        super(repository, user);
+        this.remoteUserId = remoteUserId;
+        this.password     = password;
+    }
 
 
 
@@ -106,22 +120,23 @@ public class PasswordEntryListener extends EntryListener {
         return password;
     }
 
+
     /**
-     *  Set the UserId property.
+     * Set the RemoteUserId property.
      *
-     *  @param value The new value for UserId
+     * @param value The new value for RemoteUserId
      */
-    public void setUserId(String value) {
-        userId = value;
+    public void setRemoteUserId(String value) {
+        remoteUserId = value;
     }
 
     /**
-     *  Get the UserId property.
+     * Get the RemoteUserId property.
      *
-     *  @return The UserId
+     * @return The RemoteUserId
      */
-    public String getUserId() {
-        return userId;
+    public String getRemoteUserId() {
+        return remoteUserId;
     }
 
 

@@ -247,6 +247,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private List<OutputHandler> outputHandlers =
         new ArrayList<OutputHandler>();
 
+    private List<Class> entryListenerClasses =
+        new ArrayList<Class>();
+
+
     /** _more_ */
     private List<OutputHandler> allOutputHandlers =
         new ArrayList<OutputHandler>();
@@ -269,6 +273,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     private List<String> outputDefFiles = new ArrayList<String>();
+
+    private List<String> entryListenerDefFiles = new ArrayList<String>();
 
     /** _more_ */
     private List<String> metadataDefFiles = new ArrayList<String>();
@@ -665,6 +671,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         HtmlUtil.setHideShowImage(iconUrl(ICON_MINUS), iconUrl(ICON_PLUS));
 
+        EntryListener xtestListener = new TwitterEntryListener(this, getUserManager().findUser("jeffmc",false),
+                                                              "jeffmcwh",
+                                                              "mypsswrd");
+
+        EntryListener testListener = new EmailEntryListener(this, getUserManager().findUser("jeffmc",false),
+                                                            "jeffmc@unidata.ucar.edu");
+        testListener.addFilter(new Filter(ARG_TEXT,"data"));
+        entryListeners.add(testListener);
+
     }
 
 
@@ -766,7 +781,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected UserManager getUserManager() {
+    public UserManager getUserManager() {
         if (userManager == null) {
             userManager = doMakeUserManager();
         }
@@ -779,7 +794,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected SessionManager getSessionManager() {
+    public SessionManager getSessionManager() {
         if (sessionManager == null) {
             sessionManager = doMakeSessionManager();
             sessionManager.init();
@@ -792,7 +807,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected EntryManager getEntryManager() {
+    public  EntryManager getEntryManager() {
         if (entryManager == null) {
             entryManager = doMakeEntryManager();
         }
@@ -804,7 +819,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected HarvesterManager getHarvesterManager() {
+    public HarvesterManager getHarvesterManager() {
         if (harvesterManager == null) {
             harvesterManager = doMakeHarvesterManager();
         }
@@ -1567,7 +1582,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                             "Couldn't load optional output handler:"
                             + XmlUtil.toString(node));
                         System.err.println ("*************** Error:" + exc);
-                        exc.printStackTrace();
+                        //                        exc.printStackTrace();
                     } else {
                         System.err.println(
                             "Error loading output handler file:" + file);
@@ -4216,18 +4231,19 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @param entries _more_
      */
     public void checkNewEntries(List<Entry> entries) {
-        synchronized (entryListeners) {
-            List<EntryListener> listeners =
-                new ArrayList<EntryListener>(entryListeners);
+        try {
+            List<EntryListener> listeners;
+            synchronized (entryListeners) {
+                listeners = new ArrayList<EntryListener>(entryListeners);
+            }
             for (Entry entry : entries) {
                 for (EntryListener entryListener : listeners) {
-                    if (entryListener.checkEntry(entry)) {
-                        synchronized (entryListener) {
-                            entryListeners.remove(entryListener);
-                        }
-                    }
+                    entryListener.checkEntry(entry);
                 }
             }
+        } catch (Exception exc) {
+            System.err.println("Error checking listeners:" + exc);
+            exc.printStackTrace();
         }
     }
 

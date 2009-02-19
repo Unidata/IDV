@@ -626,9 +626,13 @@ function EntryRow (rowId, cbxId,cbxWrapperId) {
     if(this.cbx) {
         this.cbx = this.cbx.obj;
         var form = this.cbx.form;
-        var visibilityGroup = groups[form.id];
-        if(visibilityGroup) {
-            visibilityGroup.addEntryRow(this);
+        if(form) {
+            var visibilityGroup = groups[form.id];
+            if(visibilityGroup) {
+                visibilityGroup.addEntryRow(this);
+            }
+        } else {
+            hideObject(this.cbx);
         }
     }
 

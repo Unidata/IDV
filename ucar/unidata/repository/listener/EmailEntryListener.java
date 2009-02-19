@@ -22,52 +22,43 @@
 
 
 
+
 package ucar.unidata.repository.listener;
 
 
 import ucar.unidata.repository.*;
 
+import ucar.unidata.util.HtmlUtil;
 
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
-
-import java.io.File;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
-
 import java.util.List;
 
 
 /**
- * Class FileInfo _more_
  *
  *
  * @author IDV Development Team
  * @version $Revision: 1.30 $
  */
-public class SynchronousEntryListener extends EntryListener {
-
-    /** _more_ */
-    private Entry entry;
+public class EmailEntryListener extends PasswordEntryListener {
 
 
     /**
      * _more_
      */
-    public SynchronousEntryListener() {}
-
+    public EmailEntryListener() {}
 
     /**
      * _more_
      *
      * @param repository _more_
-     * @param request _more_
+     * @param user _more_
      */
-    public SynchronousEntryListener(Repository repository, Request request) {
-        this(repository, null, request);
+    public EmailEntryListener(Repository repository, User user) {
+        this(repository, user, null);
     }
 
 
@@ -75,21 +66,13 @@ public class SynchronousEntryListener extends EntryListener {
      * _more_
      *
      * @param repository _more_
-     * @param id _more_
-     * @param request _more_
+     * @param user _more_
+     * @param remoteUserId _more_
      */
-    public SynchronousEntryListener(Repository repository, String id,
-                                    Request request) {
-        super(repository, request.getUser());
-        Hashtable properties = request.getDefinedProperties();
-        for (Enumeration keys = properties.keys(); keys.hasMoreElements(); ) {
-            String arg   = (String) keys.nextElement();
-            String value = (String) properties.get(arg);
-            addFilter(new Filter(arg, value));
-        }
+    public EmailEntryListener(Repository repository, User user,
+                              String remoteUserId) {
+        super(repository, user, remoteUserId, (String) null);
     }
-
-
 
 
 
@@ -99,23 +82,29 @@ public class SynchronousEntryListener extends EntryListener {
      * @param entry _more_
      */
     protected void entryMatched(Entry entry) {
-        super.entryMatched(entry);
-        this.entry = entry;
-        synchronized (this) {
-            this.notify();
+        try {
+            super.entryMatched(entry);
+            String url =
+                HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
+                             ARG_ENTRYID, entry.getId());
+            StringBuffer message = new StringBuffer("New entry:"
+                                       + entry.getFullName() + "\n" + url);
+            String userId = getRemoteUserId();
+
+            String from   = getUser().getEmail();
+            if ((from == null) || (from.trim().length() == 0)) {
+                getRepository().getAdmin().sendEmail(userId, "New Entry",
+                        message.toString(), false);
+            } else {
+                getRepository().getAdmin().sendEmail(userId, from,
+                        "New Entry", message.toString(), false);
+            }
+        } catch (Exception exc) {
+            handleError("Error posting to Twitter", exc);
         }
-
     }
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public Entry getEntry() {
-        return entry;
-    }
 
 }
 

@@ -804,18 +804,20 @@ public class HtmlOutputHandler extends OutputHandler {
         String cbxWrapperId;
 
         for (Group subGroup : subGroups) {
+            cnt++;
             addEntryCheckbox(request, subGroup, sb, jsSB);
         }
 
 
         if(!onlyGroups) {
             for (Entry entry : entries) {
+                cnt++;
                 addEntryCheckbox(request, entry, sb, jsSB);
             }
         }
 
         if (cnt==0) {
-            sb.append("No sub-groups.");
+            sb.append("<i>Empty</i>");
             if (getAccessManager().hasPermissionSet(parent,
                     Permission.ACTION_VIEWCHILDREN)) {
                 if ( !getAccessManager().canDoAction(request, parent,

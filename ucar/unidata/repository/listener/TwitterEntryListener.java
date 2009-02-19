@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository.listener;
 
 
@@ -53,13 +54,25 @@ public class TwitterEntryListener extends PasswordEntryListener {
      * _more_
      *
      * @param repository _more_
-     * @param id _more_
-     * @param request _more_
+     * @param user _more_
      */
-    public TwitterEntryListener(Repository repository) {
-        super(repository);
+    public TwitterEntryListener(Repository repository, User user) {
+        this(repository, user, null, null);
     }
 
+
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param user _more_
+     * @param remoteUserId _more_
+     * @param password _more_
+     */
+    public TwitterEntryListener(Repository repository, User user,
+                                String remoteUserId, String password) {
+        super(repository, user, remoteUserId, password);
+    }
 
 
 
@@ -71,9 +84,14 @@ public class TwitterEntryListener extends PasswordEntryListener {
     protected void entryMatched(Entry entry) {
         try {
             super.entryMatched(entry);
-            System.err.println("got entry");
-            twitter4j.Twitter twitter = new twitter4j.Twitter(getUserId(),
-                                            getPassword());
+            System.err.println("twitter got entry ");
+            if (true) {
+                return;
+            }
+
+
+            twitter4j.Twitter twitter =
+                new twitter4j.Twitter(getRemoteUserId(), getPassword());
             String url1 =
                 HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
                              ARG_ENTRYID, entry.getId());

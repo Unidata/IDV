@@ -942,6 +942,15 @@ public class Admin extends RepositoryManager {
     public void sendEmail(String to, String subject, String contents,
                           boolean asHtml)
             throws Exception {
+        String from = getRepository().getProperty(PROP_ADMIN_EMAIL,
+                                                         "").trim();
+        sendEmail(to, from, subject, contents, asHtml);
+    }
+
+
+    public void sendEmail(String to, String from, String subject, String contents,
+                          boolean asHtml)
+            throws Exception {
         if ( !isEmailCapable()) {
             throw new IllegalStateException(
                 "This RAMADDA server has not been configured to send email");
@@ -951,16 +960,14 @@ public class Admin extends RepositoryManager {
         //        System.err.println("contents:" + contents);
         String smtpServer = getRepository().getProperty(PROP_ADMIN_SMTP,
                                 "").trim();
-        String serverAdmin = getRepository().getProperty(PROP_ADMIN_EMAIL,
-                                 "").trim();
 
         Properties props = new Properties();
         props.put("mail.smtp.host", smtpServer);
-        props.put("mail.from", serverAdmin);
+        props.put("mail.from", from);
         javax.mail.Session session = javax.mail.Session.getInstance(props,
                                          null);
         MimeMessage msg = new MimeMessage(session);
-        msg.setFrom(new InternetAddress(serverAdmin));
+        msg.setFrom(new InternetAddress(from));
         msg.setRecipients(Message.RecipientType.TO, to);
         msg.setSubject(subject);
         msg.setSentDate(new Date());

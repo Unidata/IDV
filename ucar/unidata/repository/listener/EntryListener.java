@@ -20,6 +20,7 @@
  */
 
 
+
 package ucar.unidata.repository.listener;
 
 
@@ -33,6 +34,7 @@ import ucar.unidata.util.StringUtil;
 import java.io.File;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -56,8 +58,24 @@ public class EntryListener implements Constants {
 
 
     /** _more_          */
+    private String userId;
+
+    /** _more_          */
+    private User user;
+
+    /** _more_          */
+    private boolean active = true;
+
+    /** _more_ */
     private List<Filter> filters = new ArrayList<Filter>();
 
+
+
+    /** _more_          */
+    private Date fromDate;
+
+    /** _more_          */
+    private Date toDate;
 
 
     /**
@@ -70,11 +88,15 @@ public class EntryListener implements Constants {
      * _more_
      *
      * @param repository _more_
-     * @param id _more_
+     * @param user _more_
      */
-    public EntryListener(Repository repository, String id) {
-        this.id         = id;
+    public EntryListener(Repository repository, User user) {
         this.repository = repository;
+        this.user       = user;
+        if (user != null) {
+            this.userId = user.getId();
+        }
+        this.id = repository.getGUID();
     }
 
 
@@ -144,14 +166,48 @@ public class EntryListener implements Constants {
      * @param entry _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public boolean checkEntry(Entry entry) {
-        for (Filter filter : filters) {
-            boolean ok = filter.checkEntry(entry);
-            if ( !ok) {
+    public boolean checkEntry(Entry entry) throws Exception {
+        System.err.println("checking entry");
+
+        if ( !getActive()) {
+            System.err.println("not activey");
+            return false;
+        }
+        if (fromDate != null) {
+            Date now = new Date();
+            if (now.getTime() < fromDate.getTime()) {
                 return false;
             }
         }
+
+        if (toDate != null) {
+            Date now = new Date();
+            if (now.getTime() > toDate.getTime()) {
+                return false;
+            }
+        }
+
+
+
+        Request request = new Request(repository, getUser());
+        if ( !repository.getAccessManager().canDoAction(request, entry,
+                Permission.ACTION_VIEW)) {
+            System.err.println("can't view");
+            return false;
+        }
+
+
+        for (Filter filter : filters) {
+            boolean ok = filter.checkEntry(entry);
+            if ( !ok) {
+                System.err.println("filter not OK");
+                return false;
+            }
+        }
+        System.err.println("Matched");
         entryMatched(entry);
         return true;
     }
@@ -182,6 +238,95 @@ public class EntryListener implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public User getUser() throws Exception {
+        if (user == null) {
+            if (repository != null) {
+                user = repository.getUserManager().findUser(userId, true);
+            }
+        }
+        return user;
+    }
+
+
+    /**
+     *  Set the UserId property.
+     *
+     *  @param value The new value for UserId
+     */
+    public void setUserId(String value) {
+        userId = value;
+    }
+
+    /**
+     *  Get the UserId property.
+     *
+     *  @return The UserId
+     */
+    public String getUserId() {
+        return userId;
+    }
+
+
+    /**
+     *  Set the Active property.
+     *
+     *  @param value The new value for Active
+     */
+    public void setActive(boolean value) {
+        active = value;
+    }
+
+    /**
+     *  Get the Active property.
+     *
+     *  @return The Active
+     */
+    public boolean getActive() {
+        return active;
+    }
+
+    /**
+     *  Set the FromDate property.
+     *
+     *  @param value The new value for FromDate
+     */
+    public void setFromDate(Date value) {
+        fromDate = value;
+    }
+
+    /**
+     *  Get the FromDate property.
+     *
+     *  @return The FromDate
+     */
+    public Date getFromDate() {
+        return fromDate;
+    }
+
+    /**
+     *  Set the ToDate property.
+     *
+     *  @param value The new value for ToDate
+     */
+    public void setToDate(Date value) {
+        toDate = value;
+    }
+
+    /**
+     *  Get the ToDate property.
+     *
+     *  @return The ToDate
+     */
+    public Date getToDate() {
+        return toDate;
+    }
 
 
 }

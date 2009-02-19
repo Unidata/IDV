@@ -223,17 +223,8 @@ public class AccessManager extends RepositoryManager {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param action _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
+
+
     public boolean canDoAction(Request request, Entry entry, String action)
             throws Exception {
         if (entry.getIsLocalFile()) {
@@ -302,6 +293,10 @@ public class AccessManager extends RepositoryManager {
         }
         return false;
     }
+
+
+
+
 
     /** _more_ */
     Hashtable seen = new Hashtable();

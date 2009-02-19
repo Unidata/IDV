@@ -1,0 +1,4 @@
+<entrylisteners>
+  <entrylistener class="ucar.unidata.repository.listener.EmailEntryListener" name="Action: Email"/>
+  <entrylistener class="ucar.unidata.repository.listener.TwitterEntryListener" name="Action: Twitter"/>
+</entrylisteners>

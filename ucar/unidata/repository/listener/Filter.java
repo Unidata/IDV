@@ -20,6 +20,7 @@
  */
 
 
+
 package ucar.unidata.repository.listener;
 
 
@@ -47,13 +48,13 @@ import java.util.List;
  */
 public class Filter implements Constants {
 
-    /** _more_          */
+    /** _more_ */
     private String field;
 
-    /** _more_          */
+    /** _more_ */
     private Object value;
 
-    /** _more_          */
+    /** _more_ */
     private boolean doNot = false;
 
     /**
