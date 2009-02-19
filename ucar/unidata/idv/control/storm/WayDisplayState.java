@@ -308,7 +308,7 @@ public class WayDisplayState {
             boolean    paramChanged = !Misc.equals(colorParam, tmpParam);
             boolean    modeChanged  = !(modeParam == forecastAnimationMode);
             if (force ||  !hadTrack || paramChanged || modeChanged) {
-                System.err.println("makeing field");
+                //                System.err.println("makeing field");
                 colorParam = tmpParam;
                 // modeParam = forecastAnimationMode;
                 FieldImpl trackField = makeTrackField(forecastAnimationMode);

@@ -22,6 +22,8 @@
 
 package ucar.unidata.idv.control.storm;
 
+import ucar.unidata.ui.Command;
+import ucar.unidata.ui.CommandManager;
 
 import org.apache.poi.hssf.usermodel.*;
 
@@ -257,6 +259,8 @@ public class StormDisplayState {
         new Hashtable<Way, WayDisplayState>();
 
 
+    private CommandManager commandManager;
+
 
     /**
      * _more_
@@ -278,6 +282,14 @@ public class StormDisplayState {
         forecastState.getConeState().setVisible(true);
         forecastState.getTrackState().setVisible(true);
         forecastState.getRingsState().setVisible(true);
+    }
+
+
+    private CommandManager getCommandManager() {
+        if (commandManager == null) {
+            commandManager = new CommandManager(100);
+        }
+        return commandManager;
     }
 
 
@@ -353,6 +365,16 @@ public class StormDisplayState {
 
     public void handleEvent(DisplayEvent event) throws Exception {
         int id = event.getId();
+        InputEvent inputEvent = event.getInputEvent();
+        if ((inputEvent instanceof KeyEvent)) {
+            KeyEvent keyEvent = (KeyEvent) inputEvent;
+            if ((keyEvent.getKeyCode() == KeyEvent.VK_Z)
+                && keyEvent.isControlDown()) {
+                getCommandManager().undo();
+                return;
+            }
+        }
+
         EarthLocation el  = stormTrackControl.toEarth(event);
         LatLonPoint   llp = el.getLatLonPoint();
 
@@ -360,13 +382,13 @@ public class StormDisplayState {
             List<StormDisplayState> me = new ArrayList<StormDisplayState>();
             me.add(this);
 
-            System.err.println ("looking");
+            //            System.err.println ("looking");
             Real animationTime = null;
             if (stormTrackControl.getAnimation() != null) {
                 animationTime = stormTrackControl.getAnimation().getAniValue();
             }
             if(animationTime==null)  {
-                System.err.println ("no animation");
+                //                System.err.println ("no animation");
                 return;
             }
             Object[] tuple = stormTrackControl.findClosestPoint(el,
@@ -374,7 +396,7 @@ public class StormDisplayState {
                                                                 animationTime,
                                                                 50);
             if(tuple == null) {
-                System.err.println ("nothing found");
+                //                System.err.println ("nothing found");
                 return;
             }
             editedStormTrack = (StormTrack) tuple[0];
@@ -383,20 +405,110 @@ public class StormDisplayState {
 
         if (id == DisplayEvent.MOUSE_DRAGGED) {
             if(editedStormTrackPoint ==null) {
-                System.err.println ("nothing selected");
                 return;
             }
-            System.err.println (editedStormTrackPoint.getLocation() + " new:" + el);
-            editedStormTrackPoint.setLocation(el);
-            updateDisplays(true);
+            handleMouseDrag(event, el);
         }
 
         if (id == DisplayEvent.MOUSE_RELEASED) {
             editedStormTrackPoint = null;
             editedStormTrack = null;
         }
+   }
+
+    private  class PointEditCommand extends Command { 
+        StormTrack stormTrack;
+        List<StormTrackPoint> originalPoints;
+
+        public PointEditCommand(StormTrack stormTrack,
+                                List<StormTrackPoint> originalPoints) {
+            this.stormTrack = stormTrack;
+            this.originalPoints  = originalPoints;
+        }
 
 
+        /**
+         * Undo
+         */
+        public void undoCommand() {
+            try {
+                stormTrack.setTrackPoints(originalPoints);
+                updateDisplays(stormTrack);
+            } catch (Exception exp) {
+                stormTrackControl.logException("undoing edit command", exp);
+            }
+        }
+
+
+    }
+
+    private void handleMouseDrag(DisplayEvent event, EarthLocation newPt) 
+        throws Exception {
+        List<StormTrackPoint> points = editedStormTrack.getTrackPoints();
+        List<StormTrackPoint> originalPoints = new ArrayList<StormTrackPoint>();
+        for(StormTrackPoint stp: points) {
+            originalPoints.add(new StormTrackPoint(stp));
+        }
+
+        //if the control key is not down  then just move the point
+        int stretchIndex = editedStormTrack.indexOf(editedStormTrackPoint);
+        if(stretchIndex<0) {
+            //this should never happen
+            throw new IllegalStateException("Cannot find track point");
+        }
+
+        EarthLocation oldPt = (EarthLocation) points.get(stretchIndex).getLocation();
+        editedStormTrackPoint.setLocation(newPt);
+
+        if ((event.getModifiers() & event.CTRL_MASK) != 0) {
+            //else do an interpolated stretch
+            int    startPts = stretchIndex - 1;
+            int    endPts   = points.size() - stretchIndex;
+            double percent  = 1.0;
+
+            double deltaY = oldPt.getLatitude().getValue(CommonUnit.degree)
+                - newPt.getLatitude().getValue(CommonUnit.degree);
+            double deltaX = LatLonPointImpl.lonNormal(oldPt.getLongitude().getValue(CommonUnit.degree))
+                - LatLonPointImpl.lonNormal(newPt.getLongitude().getValue(CommonUnit.degree));
+            //            System.err.println("delta: " + deltaX + " " + deltaY);
+            for (int i = stretchIndex - 1; i >= 0; i--) {
+                percent -= 1.0 / (double) startPts;
+                if (percent <= 0.05) {
+                    break;
+                }
+                EarthLocation pt = (EarthLocation) points.get(i).getLocation();
+                EarthLocation newEl =
+                    makePoint(
+                              pt.getLatitude().getValue(CommonUnit.degree) - deltaY * percent,
+                              LatLonPointImpl.lonNormal(pt.getLongitude().getValue(CommonUnit.degree)) - deltaX * percent);
+                //                System.err.println("   " +percent + " " + pt.getLatLonPoint() + " " + newEl.getLatLonPoint()); 
+                points.get(i).setLocation(newEl);
+            }
+            percent = 1.0;
+            for (int i = stretchIndex + 1; i < points.size(); i++) {
+                percent -= 1.0 / (double) endPts;
+                if (percent <= 0.05) {
+                    break;
+                }
+                EarthLocation pt = (EarthLocation) points.get(i).getLocation();
+                EarthLocation newEl =
+                    makePoint(
+                              pt.getLatitude().getValue(CommonUnit.degree) - deltaY * percent,
+                              LatLonPointImpl.lonNormal(pt.getLongitude().getValue(CommonUnit.degree)) - deltaX * percent);
+                points.get(i).setLocation(newEl);
+            }
+        }
+
+        getCommandManager().add(new PointEditCommand(editedStormTrack, originalPoints));
+        updateDisplays(editedStormTrack);
+    }
+
+    protected EarthLocation makePoint(double latitude, double longitude)
+        throws VisADException, RemoteException {
+        Real             altReal   = new Real(RealType.Altitude, 0);
+        return new EarthLocationLite(new Real(RealType.Latitude, latitude),
+                                      new Real(RealType.Longitude,
+                                          longitude), altReal);
     }
 
     /**
@@ -1447,6 +1559,11 @@ public class StormDisplayState {
         checkVisibility();
     }
 
+    protected void updateDisplays(StormTrack track) throws Exception {
+        updateDisplays(true);
+    }
+
+
     /**
      * _more_
      *
@@ -1456,6 +1573,8 @@ public class StormDisplayState {
         updateDisplays(false);
     }
 
+
+    //sstretch    protected void updateDisplays() throws Exception {
 
     protected void updateDisplays(boolean force) throws Exception {
         DisplayMaster displayMaster = stormTrackControl.getDisplayMaster();
