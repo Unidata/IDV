@@ -146,6 +146,7 @@
         <include name="ucar/unidata/repository/*.java"/>
         <include name="ucar/unidata/repository/data/*.java"/>
         <include name="ucar/unidata/repository/collab/*.java"/>
+        <include name="ucar/unidata/repository/listener/*.java"/>
         <include name="ucar/unidata/repository/idv/IdvWebstartOutputHandler.java"/>
         <include name="ucar/unidata/repository/idv/TdsOutputHandler.java"/>
         </javac>
@@ -225,6 +226,7 @@
         <unjar src="${jars_dest}/local-visad.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/external.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/twitter4j-1.1.4.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jetty.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jetty-util.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/mailapi.jar" dest="${tmpjardir}"/>

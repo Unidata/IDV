@@ -645,7 +645,7 @@ public class Column implements Constants {
      *
      * @return _more_
      */
-    public int matchValue(String arg, Object value, Request request,
+    public int matchValue(String arg, Object value, 
                           Entry entry) {
         if (type.equals(TYPE_LATLON)) {
             //TODO:

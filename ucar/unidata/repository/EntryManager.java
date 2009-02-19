@@ -934,6 +934,10 @@ return new Result(title, sb);
             }
             setEntryState(request, entry);
             entries.add(entry);
+
+            
+
+
         }
 
 

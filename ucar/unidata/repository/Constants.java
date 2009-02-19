@@ -570,6 +570,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_USER_ID = "user.id";
 
+    public static final String ARG_USER = "user";
+
     /** _more_ */
     public static final String ARG_SESSIONID = "sessionid";
 

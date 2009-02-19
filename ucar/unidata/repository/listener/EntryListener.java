@@ -1,5 +1,4 @@
 /**
- * $Id: TrackDataSource.java,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
  *
  * Copyright 1997-2005 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
@@ -20,7 +19,9 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.listener;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.util.IOUtil;
@@ -37,7 +38,6 @@ import java.util.List;
 
 
 /**
- * Class FileInfo _more_
  *
  *
  * @author IDV Development Team
@@ -45,8 +45,6 @@ import java.util.List;
  */
 public class EntryListener implements Constants {
 
-    /** _more_ */
-    private Request request;
 
     /** _more_ */
     private Repository repository;
@@ -54,8 +52,6 @@ public class EntryListener implements Constants {
     /** _more_ */
     private Hashtable properties;
 
-    /** _more_ */
-    private Entry entry;
 
     /** _more_ */
     private List names = new ArrayList();
@@ -66,14 +62,7 @@ public class EntryListener implements Constants {
     /** _more_ */
     private String id;
 
-    /**
-     * _more_
-     *
-     * @param repository _more_
-     * @param request _more_
-     */
-    public EntryListener(Repository repository, Request request) {
-        this(repository, null, request);
+    public EntryListener() {
     }
 
 
@@ -82,20 +71,20 @@ public class EntryListener implements Constants {
      *
      * @param repository _more_
      * @param id _more_
-     * @param request _more_
      */
-    public EntryListener(Repository repository, String id, Request request) {
-        this.request    = request;
+    public EntryListener(Repository repository, String id) {
+        this.id  =id;
         this.repository = repository;
-        this.properties = request.getDefinedProperties();
-        for (Enumeration keys = properties.keys(); keys.hasMoreElements(); ) {
-            String arg   = (String) keys.nextElement();
-            String value = (String) properties.get(arg);
-            names.add(arg);
-            values.add(value);
-        }
     }
 
+
+    public void setRepository(Repository repository) {
+        this.repository = repository;
+    }
+
+    protected Repository getRepository() {
+        return repository;
+    }
 
     /**
      * _more_
@@ -104,6 +93,16 @@ public class EntryListener implements Constants {
      */
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+
+    protected void handleError(String message, Exception exc) {
+        //TODO: What to do with errors
+        throw new RuntimeException(exc);
     }
 
     /**
@@ -145,13 +144,20 @@ public class EntryListener implements Constants {
                 ok = nameMatch(value.toString(), entry.getName());
             } else if (arg.equals(ARG_DESCRIPTION)) {
                 ok = nameMatch(value.toString(), entry.getDescription());
+            } else if (arg.equals(ARG_TEXT)) {
+                ok = nameMatch(value.toString(), entry.getDescription()) ||
+                    nameMatch(value.toString(), entry.getName());
+                System.err.println("Text match:" + ok);
+            } else if (arg.equals(ARG_USER)) {
+                ok = Misc.equals(entry.getUser().getId(),value.toString());
+            } else if (arg.equals(ARG_WAIT)) {
+                ok = true;
             } else if (arg.equals(ARG_GROUP)) {
                 //TODO: check for subgroups
                 //                ok = (value.equals(entry.getParentGroup().getFullName())
                 //                      || value.equals(entry.getParentGroup().getId()));
             } else {
-                int match = entry.getTypeHandler().matchValue(arg, value,
-                                request, entry);
+                int match = entry.getTypeHandler().matchValue(arg, value, entry);
                 if (match == TypeHandler.MATCH_FALSE) {
                     ok = false;
                 } else if (match == TypeHandler.MATCH_TRUE) {
@@ -159,30 +165,25 @@ public class EntryListener implements Constants {
                 } else {
                     System.err.println("unknown Entry listener argument:"
                                        + arg);
-                    ok = false;
+                    //                    ok = false;
+                    ok  =true;
                 }
             }
+            System.err.println ("arg:" + arg + " " + ok);
+
             if ( !ok) {
+                System.err.println("not OK");
                 return false;
             }
         }
 
-
-        this.entry = entry;
-        synchronized (this) {
-            this.notify();
-        }
+        entryMatched(entry);
         return true;
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public Entry getEntry() {
-        return entry;
+    protected void entryMatched(Entry entry) {
     }
+
 
 }
 

@@ -296,10 +296,10 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @return _more_
      */
-    public int matchValue(String arg, Object value, Request request,
+    public int matchValue(String arg, Object value, 
                           Entry entry) {
         for (Column column : columns) {
-            int match = column.matchValue(arg, value, request, entry);
+            int match = column.matchValue(arg, value,  entry);
             if (match == MATCH_FALSE) {
                 return MATCH_FALSE;
             }

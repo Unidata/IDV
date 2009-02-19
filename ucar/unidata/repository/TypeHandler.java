@@ -2365,7 +2365,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public int matchValue(String arg, Object value, Request request,
+    public int matchValue(String arg, Object value, 
                           Entry entry) {
         return MATCH_UNKNOWN;
     }

@@ -22,6 +22,7 @@
 package ucar.unidata.repository;
 
 import ucar.unidata.repository.data.*;
+import ucar.unidata.repository.listener.*;
 
 import org.w3c.dom.*;
 
@@ -4191,15 +4192,17 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     public Result processEntryListen(Request request) throws Exception {
-        EntryListener entryListener = new EntryListener(this, request);
+        SynchronousEntryListener entryListener = new SynchronousEntryListener(this, request);
         synchronized (entryListeners) {
             entryListeners.add(entryListener);
         }
         synchronized (entryListener) {
             entryListener.wait();
+            System.err.println("Done waiting");
         }
         Entry entry = entryListener.getEntry();
         if (entry == null) {
+            System.err.println("No entry");
             return new Result(BLANK, new StringBuffer("No match"),
                               getMimeTypeFromSuffix(".html"));
         }
