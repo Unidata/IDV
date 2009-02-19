@@ -64,6 +64,23 @@ public class StormTrackPoint implements Comparable {
 
 
     /**
+     * copy ctor
+     *
+     * @param that The track point to copy
+     */
+    public StormTrackPoint(StormTrackPoint that) {
+        this.location = that.location;
+        this.time = that.time;
+        if(that.attributes!=null) {
+            this.attributes = (List<Real>) new ArrayList(that.attributes);
+        }
+        this.forecastHour = that.forecastHour;
+        this.id = that.id;
+        this.edited = that.edited;
+    }
+
+
+    /**
      * _more_
      *
      * @param pointLocation _more_

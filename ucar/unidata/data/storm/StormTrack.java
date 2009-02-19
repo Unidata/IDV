@@ -454,6 +454,21 @@ public class StormTrack implements Comparable {
 
 
     /**
+     * Return the index of the given track point. This kist finds the point with the same lat/lon
+     *
+     * @param stp The track point
+     * @return The index or -1 if not found
+     */
+    public int indexOf(StormTrackPoint stp) {
+        for (int i = 0; i < trackPoints.size(); i++) {
+            if(trackPoints.get(i).getLocation().equals(stp.getLocation())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
      * _more_
      *
      * @param o _more_
