@@ -491,6 +491,7 @@ public class WayDisplayState {
                     removeObsPointDisplay();
                 } else {
                     if (true) {  //(!hasObsPointDisplay()) {
+                        List thePointObs = new ArrayList(allPointObs);
                         FieldImpl pointField =
                             PointObFactory.makeTimeSequenceOfPointObs(
                                 allPointObs, -1, -1);
