@@ -2247,9 +2247,11 @@ public class StormTrackControl extends DisplayControlImpl {
 
         for (int i = 0; i < numStates; i++) {
             StormDisplayState sds   = theStates.get(i);
+            if(sds==null) continue;
+            StormTrackCollection trackCollection = sds.getTrackCollection();
+            if(trackCollection == null) continue;
             StormInfo         sinfo = sds.getStormInfo();
-            HashMap<Way, List> wayToTracksMap =
-                sds.getTrackCollection().getWayToTracksHashMap();
+            HashMap<Way, List> wayToTracksMap =  trackCollection.getWayToTracksHashMap();
             // Way obsWay = new Way(Way.OBSERVATION);
             java.util.Set<Way> ways = wayToTracksMap.keySet();
 
