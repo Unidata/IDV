@@ -1780,7 +1780,7 @@ public class MapViewManager extends NavigatedViewManager {
         Hashtable catMenus = new Hashtable();
         for (int i = 0; i < projections.size(); i++) {
             ProjectionImpl p        = (ProjectionImpl) projections.get(i);
-            List names = StringUtil.split(p.getName(), ">", true, true);
+            List<String> names = StringUtil.split(p.getName(), ">", true, true);
             JMenu          theMenu  = projectionsMenu;
             String         catSoFar = "";
             int            catIdx   = 0;
@@ -1795,7 +1795,7 @@ public class MapViewManager extends NavigatedViewManager {
                 }
                 theMenu = tmpMenu;
             }
-            String  name      = (String) names.get(catIdx);
+            String  name      = (catIdx<names.size()? names.get(catIdx):"");
             boolean isCurrent = Misc.equals(p, currentProjection);
             if (isCurrent) {
                 //              name = "> " + name;
