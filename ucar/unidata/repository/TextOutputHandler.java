@@ -81,9 +81,9 @@ public class TextOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_TEXT = new OutputType("Text",
+    public static final OutputType OUTPUT_TEXT = new OutputType("Annotated Text",
                                                      "text",
-                                                     OutputType.TYPE_HTML);
+                                                                OutputType.TYPE_HTML,"",ICON_TEXT);
 
 
     /**
@@ -126,7 +126,7 @@ public class TextOutputHandler extends OutputHandler {
             return;
         }
         String   path     = state.entry.getResource().getPath();
-        String[] suffixes = new String[] { ".csv", ".txt", ".java", ".c" };
+        String[] suffixes = new String[] { ".csv", ".txt", ".java", ".c",".h",".cc",".f90",".cpp",".hh",".cdl",".sh","m4" };
 
         for (int i = 0; i < suffixes.length; i++) {
             if (path.endsWith(suffixes[i])) {
@@ -134,6 +134,13 @@ public class TextOutputHandler extends OutputHandler {
                 return;
             }
         }
+        String suffix = IOUtil.getFileExtension(path);
+        String type = getRepository().getMimeTypeFromSuffix(suffix);
+        if(type!=null && type.startsWith("text/")) {
+
+            links.add(makeLink(request, state.entry, OUTPUT_TEXT));
+        }
+
     }
 
 

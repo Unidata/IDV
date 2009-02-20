@@ -512,6 +512,7 @@ ul {
 }
 
 .tab_contents_noborder {
+   border-top : 1px #000000 solid;
 }
 
 .tab_content_fixedheight_off {

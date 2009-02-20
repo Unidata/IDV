@@ -759,6 +759,9 @@ public class Admin extends RepositoryManager {
                 HtmlUtil.textArea(PROP_ADMIN_PHRASES, phrases, 5, 60)));
 
 
+        dsb.append(HtmlUtil.formEntryTop(msgLabel("Facebook Comments API Key"), 
+                                         HtmlUtil.input(PROP_FACEBOOK_CONNECT_KEY, getProperty(PROP_FACEBOOK_CONNECT_KEY, ""),size)));
+
         dsb.append(HtmlUtil.formEntryTop(msgLabel("Google Maps Keys"), "<table><tr valign=top><td>"
                 + HtmlUtil.textArea(PROP_GOOGLEAPIKEYS, getProperty(PROP_GOOGLEAPIKEYS, ""), 5, 80)
                 + "</td><td>One per line:<br><i>host domain:apikey</i><br>e.g.:<i>www.yoursite.edu:google api key</i></table>"));
@@ -1017,6 +1020,13 @@ public class Admin extends RepositoryManager {
                                         request.getString(PROP_GOOGLEAPIKEYS,
                                             ""));
         }
+
+        if (request.exists(PROP_FACEBOOK_CONNECT_KEY)) {
+            getRepository().writeGlobal(PROP_FACEBOOK_CONNECT_KEY,
+                                        request.getString(PROP_FACEBOOK_CONNECT_KEY,
+                                            ""));
+        }
+
 
         getRepository().writeGlobal(PROP_HOSTNAME,
                                     request.getString(PROP_HOSTNAME,

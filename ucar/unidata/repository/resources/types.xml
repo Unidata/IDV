@@ -8,6 +8,16 @@
   </type>
 
 
+  <type name="contribution"  description="Contribution" >
+     <property name="form.show.date" value="false"/>
+     <property name="form.show.area" value="false"/>
+     <property name="form.show.datatype" value="false"/>
+  </type>
+
+
+
+
+
   <type name="wikipage"  description="Wiki Page" handler="ucar.unidata.repository.collab.WikiPageTypeHandler">
      <property name="icon" value="/icons/wiki.gif"/>
      <property name="form.rows.desc" value="50"/>

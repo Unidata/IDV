@@ -229,6 +229,11 @@ public class RepositoryBase implements Constants, RepositorySource {
                                                     "Settings");
 
     /** _more_ */
+    public final RequestUrl URL_USER_MONITORS = new RequestUrl(this,
+                                                    "/user/monitors",
+                                                    "Monitors");
+
+    /** _more_ */
     public final RequestUrl URL_USER_CART = new RequestUrl(this,
                                                 "/user/cart", "Data Cart");
 

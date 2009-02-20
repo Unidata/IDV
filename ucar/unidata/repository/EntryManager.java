@@ -474,11 +474,16 @@ return new Result(title, sb);
                             AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD,
                             false);
                     String extra = "";
+                    
                     if (metadata != null) {
+                        
                         String user = metadata.getAttr1();
+                        String email = metadata.getAttr4();
+                        if(email==null) email = "";
                         extra = "<br><b>From user:</b> "
-                                + metadata.getAttr1() + " <b>From ip:</b> "
-                                + metadata.getAttr2();
+                                + metadata.getAttr1() + 
+                            " <b>Email:</b> " + email +
+                            " <b>IP:</b> "   + metadata.getAttr2();
                     }
                     String msg = HtmlUtil.space(2) + msg("Make public?")
                                  + extra;
@@ -609,12 +614,13 @@ return new Result(title, sb);
             }
         } else if (forUpload) {
             typeHandler =
-                getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
+                getRepository().getTypeHandler(TypeHandler.TYPE_CONTRIBUTION);
         } else {
             typeHandler =
                 getRepository().getTypeHandler(request.getString(ARG_TYPE,
                     TypeHandler.TYPE_ANY));
         }
+
 
 
         List<Entry> entries  = new ArrayList<Entry>();
@@ -1453,7 +1459,7 @@ return new Result(title, sb);
         } else {
             entry.setDataType("");
         }
-
+        entry.setTypeHandler(getRepository().getTypeHandler(TypeHandler.TYPE_FILE));
     }
 
     /**
@@ -1487,9 +1493,11 @@ return new Result(title, sb);
         entry.setName(HtmlUtil.entityEncode(entry.getName()));
         entry.setDescription(HtmlUtil.entityEncode(entry.getDescription()));
 
+        String fromName = HtmlUtil.entityEncode(request.getString(ARG_CONTRIBUTION_FROMNAME,""));
+        String fromEmail = HtmlUtil.entityEncode(request.getString(ARG_CONTRIBUTION_FROMEMAIL,""));
         String user = request.getUser().getId();
         if (user.length() == 0) {
-            user = "anonymous";
+            user = fromName;
         }
         entry.addMetadata(
             new Metadata(
@@ -1497,7 +1505,7 @@ return new Result(title, sb);
                 AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD.getType(), false,
                 user, request.getIp(), ((oldType != null)
                                         ? oldType
-                                        : ""), ""));
+                                        : ""), fromEmail));
         User parentUser = parentGroup.getUser();
         if (true || getAdmin().isEmailCapable()) {
             StringBuffer contents =
@@ -1533,7 +1541,7 @@ return new Result(title, sb);
      */
     public Result processEntryUpload(Request request) throws Exception {
         TypeHandler typeHandler =
-            getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
+            getRepository().getTypeHandler(TypeHandler.TYPE_CONTRIBUTION);
         Group        group = findGroup(request);
         StringBuffer sb    = new StringBuffer();
         if ( !request.exists(ARG_NAME)) {
@@ -2487,9 +2495,25 @@ return new Result(title, sb);
                 getRepository().note(
                     request.getUnsafeString(ARG_MESSAGE, BLANK)));
         }
-        //        sb.append(makeEntryHeader(request, entry));
+        String key = getRepository().getProperty(PROP_FACEBOOK_CONNECT_KEY, "");
+        boolean haveKey = key.length()>0;
+        if(haveKey) {
+            sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"100%")));
+            sb.append("<tr valign=\"top\"><td width=\"50%\">");
+        }
+
         sb.append("<p>");
         sb.append(getCommentHtml(request, entry));
+        if(haveKey) {
+            sb.append("</td><td  width=\"50%\">");
+            String fb  ="\n\n<script src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\" type=\"text/javascript\"></script>\n" +
+            "Comment on Facebook:<br><fb:comments></fb:comments>\n" +
+            "<script type=\"text/javascript\">\n//FB.FBDebug.logLevel=6;\n//FB.FBDebug.isEnabled=1;\nFB.init(\"" + key +"\", \"/repository/xd_receiver.htm\");\n</script>\n\n";
+            sb.append(fb);
+            sb.append("</td></tr>");
+            sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
+        }
+
         return addEntryHeader(request, entry,
                               new OutputHandler(getRepository(),
                                   "tmp").makeLinksResult(request,
@@ -3165,24 +3189,31 @@ return new Result(title, sb);
         List  breadcrumbs = new ArrayList();
         Group parent      = findGroup(request, entry.getParentGroupId());
         int   length      = 0;
+        List<Group> parents = new ArrayList<Group>();
+        int totalNameLength = 0;
         while (parent != null) {
+            parents.add(parent);
+            String name = parent.getName();
+            totalNameLength+=name.length();
+            parent = findGroup(request, parent.getParentGroupId());
+        }
+
+        boolean needToClip = totalNameLength>80;
+        for(Group ancestor: parents) {
             if (length > 100) {
                 breadcrumbs.add(0, "...");
                 break;
             }
-            String name = parent.getName();
-            if (name.length() > 20) {
+            String name = ancestor.getName();
+            if (needToClip && name.length() > 20) {
                 name = name.substring(0, 19) + "...";
             }
             length += name.length();
             String link = ((requestUrl == null)
-                           ? getTooltipLink(request, parent, name, null)
+                           ? getTooltipLink(request, ancestor, name, null)
                            : HtmlUtil.href(request.entryUrl(requestUrl,
-                               parent), name));
+                                                            ancestor), name));
             breadcrumbs.add(0, link);
-            //            breadcrumbs.add(0, HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
-            //                    parent), name));
-            parent = findGroup(request, parent.getParentGroupId());
         }
         if (requestUrl == null) {
             breadcrumbs.add(getTooltipLink(request, entry, entry.getLabel(),
@@ -3252,25 +3283,36 @@ return new Result(title, sb);
         Entry      parent = findGroup(request, entry.getParentGroupId());
         OutputType output = OutputHandler.OUTPUT_HTML;
         int        length = 0;
+
+        List<Entry> parents = new ArrayList<Entry>();
+        int totalNameLength = 0;
         while (parent != null) {
             if ((stopAt != null)
                     && parent.getFullName().equals(stopAt.getFullName())) {
                 break;
             }
+            parents.add(parent);
+            String name = parent.getName();
+            totalNameLength+=name.length();
+            parent = findGroup(request, parent.getParentGroupId());
+        }
+
+        boolean needToClip = totalNameLength>80;
+        for(Entry ancestor: parents) {
             if (length > 100) {
                 titleList.add(0, "...");
                 breadcrumbs.add(0, "...");
                 break;
             }
-            String name = parent.getName();
-            if (name.length() > 20) {
+            String name = ancestor.getName();
+            if (needToClip && name.length() > 20) {
                 name = name.substring(0, 19) + "...";
             }
             length += name.length();
             titleList.add(0, name);
-            String link = getTooltipLink(request, parent, name, null);
+            String link = getTooltipLink(request, ancestor, name, null);
             breadcrumbs.add(0, link);
-            parent = findGroup(request, parent.getParentGroupId());
+            ancestor = findGroup(request, ancestor.getParentGroupId());
         }
         titleList.add(entry.getLabel());
         String nav;

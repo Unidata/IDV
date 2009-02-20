@@ -152,6 +152,8 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_WIKI = "ramadda.icon.wiki";
 
+    public static final String ICON_TEXT = "ramadda.icon.text";
+
     /** _more_ */
     public static final String ICON_WARNING = "ramadda.icon.warning";
 
@@ -394,6 +396,9 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_COLLECTION = "collection";
+
+    public static final String ARG_CONTRIBUTION_FROMNAME = "contribution.fromname";
+    public static final String ARG_CONTRIBUTION_FROMEMAIL = "contribution.fromemail";
 
     /** _more_ */
     public static final String ARG_TEXT = "text";
@@ -776,6 +781,8 @@ public interface Constants {
 
     /** _more_          */
     public static final String PROP_SSL_PORT = "ramadda.ssl.port";
+
+    public static final String PROP_FACEBOOK_CONNECT_KEY = "ramadda.facebook.connect.key";
 
     public static final String PROP_DATE_FORMAT = "ramadda.date.format";
     public static final String PROP_DATE_SHORTFORMAT = "ramadda.date.shortformat";

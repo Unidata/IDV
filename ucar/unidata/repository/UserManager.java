@@ -2213,6 +2213,13 @@ public class UserManager extends RepositoryManager {
     }
 
 
+    public Result processMonitors(Request request) throws Exception {
+        StringBuffer sb   = new StringBuffer();
+
+        
+        return makeResult(request, msg("Entry Monitors"), sb);
+    }
+
 
     /**
      * _more_

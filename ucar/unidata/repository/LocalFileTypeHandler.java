@@ -201,7 +201,8 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         String rootDirPath = rootDir.toString();
         File   childPath   = getFileFromId(synthId, rootDir);
         File[] files       = childPath.listFiles();
-        files = IOUtil.sortFilesOnName(files);
+        //        files = IOUtil.sortFilesOnName(files);
+        files = IOUtil.sortFilesOnAge(files, true);
         List<String> includes = get(values, COL_INCLUDES);
         List<String> excludes = get(values, COL_EXCLUDES);
         long age = (long) (1000

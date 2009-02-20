@@ -76,6 +76,8 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     public static final String TYPE_GROUP = Constants.TYPE_GROUP;
 
+    public static final String TYPE_CONTRIBUTION = "contribution";
+
     public static final String TYPE_OPENDAPLINK = "opendaplink";
 
 
@@ -1162,6 +1164,14 @@ public class TypeHandler extends RepositoryManager {
             throws Exception {
 
         String size = HtmlUtil.SIZE_70;
+
+        if(entry==null && getType().equals(TYPE_CONTRIBUTION)) {
+            sb.append(HtmlUtil.formEntry(msgLabel("Your Name"), HtmlUtil.input(ARG_CONTRIBUTION_FROMNAME,"",size)));
+            sb.append(HtmlUtil.formEntry(msgLabel("Your Email"), HtmlUtil.input(ARG_CONTRIBUTION_FROMEMAIL,"",size)));
+        }
+
+
+
         if (okToShowInForm(ARG_NAME)) {
             sb.append(HtmlUtil.formEntry(msgLabel("Name"),
                                          HtmlUtil.input(ARG_NAME,
@@ -1297,6 +1307,7 @@ public class TypeHandler extends RepositoryManager {
                             entry.getResource().getPath()));
                 }
             }
+
 
 
             if ( !hasDefaultDataType() && okToShowInForm(ARG_DATATYPE)) {
