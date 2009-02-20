@@ -4,16 +4,23 @@
 
 The <a href="http://www.unidata.ucar.edu/software/idv">Integrated Data Viewer (IDV)</a>
 has the ability to publish IDV bundles and generated products directly
-to a RAMADDA server that you have an account on. This facility is 
+to a RAMADDA data server. This facility is 
 defined in an IDV <i>plugin</i>. To load it you need to bring up the
 Plugin Manager from the [ht::menu Tools {Plugin Manager}] menu.
 Under <i>Miscellaneous</i> install the &quot;RAMADDA Publisher&quot;
 plugin and restart the IDV.
 
 
-<subhead intoc="false" id="configuring">Configuring the Publisher</subhead>
-If you have successfully installed the RAMADDA Publisher plugin there should be
-a &quot;Publisher&quot; menu in the [ht::menu File] menu. Choose
+<subhead intoc="false" id="configuring">Configuring the Publisher Facility</subhead>
+
+
+This plugin provides the ability to create new accounts on different RAMADDA servers. It also comes with a pre-defined anonymous account that allows you to publish content to the Contributions area on our 
+<a href="http://motherlode.ucar.edu/repository/entry/show/Top/IDV+Resources/Contributions?entryid=bfc82cf9-8548-4393-af10-20ec2274ceb9">motherlode server</a>.
+
+<p>
+If you have your own account on a RAMADDA server you can create an IDV publisher. If you have successfully installed the RAMADDA Publisher plugin there should be
+a &quot;Publisher&quot; menu in the [ht::menu File] menu. 
+Choose
 [ht::menu File Publisher New] to bring up the RAMADDA Publisher configuration dialog:
 [ht::cimg images/idvpublishernew.gif]
 
