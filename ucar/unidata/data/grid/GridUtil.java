@@ -727,7 +727,7 @@ public class GridUtil {
      *
      * @param grid The grid
      * @param el Location
-     * @param animationValue Time
+     * @param animationValue The time to sample at. If null then we just sample at the location
      * @param samplingMode mode to use
      *
      * @return Real at the given location and time
@@ -749,8 +749,8 @@ public class GridUtil {
             sampleAtLocation = GridUtil.sample(grid, el.getLatLonPoint(),
                     samplingMode);
         }
-        Data data = sampleAtLocation.evaluate(animationValue, samplingMode,
-                        Data.NO_ERRORS);
+        Data data = (animationValue==null? (Data)sampleAtLocation:(Data)sampleAtLocation.evaluate(animationValue, samplingMode,
+                                                                                      Data.NO_ERRORS));
 
         while ((data != null) && !(data instanceof Real)) {
             if (data instanceof FieldImpl) {
