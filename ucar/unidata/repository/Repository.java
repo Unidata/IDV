@@ -457,7 +457,29 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (d == null) {
             return BLANK;
         }
-        return displaySdf.format(d);
+
+        Date now  = new Date();
+        long diff = now.getTime()-d.getTime();
+        double minutes = DateUtil.millisToMinutes(diff);
+        String fullDate = formatDate(d);
+        String result;
+        if(minutes>0 && minutes<65 && minutes>55) {
+            result = "about an hour ago";
+        } else  if(diff>0 &&  diff<DateUtil.minutesToMillis(1)) {
+            result  =(int)(diff/(1000))+" seconds ago";
+        } else if(diff>0 &&  diff<DateUtil.hoursToMillis(1)) {
+            int value = (int)DateUtil.millisToMinutes(diff);
+            result = value +" minute"+(value>1?"s":"")+" ago";
+        } else  if(diff>0 && diff<DateUtil.hoursToMillis(24)) {
+            int value  = (int)(diff/(1000*60*60));
+            result = value+" hour" + (value>1?"s":"")+" ago";
+        } else if(diff>0 && diff<DateUtil.daysToMillis(6)) {
+            int value = (int)(diff/(1000*60*60*24));
+            result = value+" day" + (value>1?"s":"")+" ago";
+        } else {
+            result = displaySdf.format(d);
+        }
+        return HtmlUtil.span(result,HtmlUtil.cssClass("time") +HtmlUtil.attr(HtmlUtil.ATTR_TITLE,fullDate));
     }
 
 
@@ -671,14 +693,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         HtmlUtil.setHideShowImage(iconUrl(ICON_MINUS), iconUrl(ICON_PLUS));
 
+        /*
         EntryListener xtestListener = new TwitterEntryListener(this, getUserManager().findUser("jeffmc",false),
                                                               "jeffmcwh",
                                                               "mypsswrd");
-
+        */
+        /*
         EntryListener testListener = new EmailEntryListener(this, getUserManager().findUser("jeffmc",false),
                                                             "jeffmc@unidata.ucar.edu");
         testListener.addFilter(new Filter(ARG_TEXT,"data"));
-        entryListeners.add(testListener);
+        entryListeners.add(testListener);*/
 
     }
 

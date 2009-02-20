@@ -268,8 +268,9 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
-    public static final String DEFAULT_TIME_SHORTFORMAT = "yy/MM/dd HH:mm z";
-    public static final String DEFAULT_TIME_THISYEARFORMAT = "yy/MM/dd HH:mm z";
+    public static final String DEFAULT_TIME_SHORTFORMAT = "yyyy/MM/dd HH:mm z";
+    public static final String DEFAULT_TIME_THISYEARFORMAT = "yyyy/MM/dd HH:mm z";
+
 
     /** _more_ */
     protected SimpleDateFormat sdf;

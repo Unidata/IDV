@@ -23,6 +23,16 @@ a:hover {
 }
 
 
+.time {
+	color:#999;
+	font-size:9px;
+	font-weight:normal;
+	display:inline;
+	margin:0;
+	white-space:nowrap;
+}
+
+
 .footer {
    margin:10px;
    align:center;
@@ -487,7 +497,7 @@ ul {
 }
 
 .tab_titles {
-   border-bottom : 1px #000000 solid;
+   xborder-bottom : 1px #000000 solid;
    margin:0px;
    padding:0px;
 }
@@ -496,6 +506,7 @@ ul {
    border-left : 1px #000000 solid;
    border-right : 1px #000000 solid;
    border-bottom : 1px #000000 solid;
+   border-top : 1px #000000 solid;
    margin:0px;
    padding:0px;
 }
@@ -542,7 +553,7 @@ ul {
 	padding-top:2;
 	padding-left:6;
 	padding-right:6;
-	border-bottom:1px #ffffff  solid;
+	border-bottom:2px #ffffff  solid;
 }
 
 .tab_title_off {
@@ -558,7 +569,7 @@ ul {
    padding-top:2;
    padding-left:6;
    padding-right:6;
-   border-bottom:1px #000000  solid;
+   border-bottom:1px #dddddd  solid;
 }
 
 
@@ -703,7 +714,7 @@ code.menu {
    padding-left:10px;
    padding-top:2px;
    padding-bottom:0px;
-   background-color:#eeeeee;
+   background-color:#ddeeff;
    border-bottom: 1px #888888 solid; 
    margin-bottom:3px;
 
