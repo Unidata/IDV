@@ -784,6 +784,8 @@ public interface Constants {
 
     public static final String PROP_FACEBOOK_CONNECT_KEY = "ramadda.facebook.connect.key";
 
+    public static final String PROP_RATINGS_ENABLE = "ramadda.ratings.enable";
+
     public static final String PROP_DATE_FORMAT = "ramadda.date.format";
     public static final String PROP_DATE_SHORTFORMAT = "ramadda.date.shortformat";
 

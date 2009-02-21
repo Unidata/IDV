@@ -761,6 +761,10 @@ public class Admin extends RepositoryManager {
 
         dsb.append(HtmlUtil.formEntryTop(msgLabel("Facebook Comments API Key"), 
                                          HtmlUtil.input(PROP_FACEBOOK_CONNECT_KEY, getProperty(PROP_FACEBOOK_CONNECT_KEY, ""),size)));
+        dsb.append(HtmlUtil.formEntryTop(msgLabel("Enable Ratings"), 
+                                         HtmlUtil.checkbox(PROP_RATINGS_ENABLE, "true", getProperty(PROP_RATINGS_ENABLE, false))));
+
+
 
         dsb.append(HtmlUtil.formEntryTop(msgLabel("Google Maps Keys"), "<table><tr valign=top><td>"
                 + HtmlUtil.textArea(PROP_GOOGLEAPIKEYS, getProperty(PROP_GOOGLEAPIKEYS, ""), 5, 80)
@@ -1026,6 +1030,14 @@ public class Admin extends RepositoryManager {
                                         request.getString(PROP_FACEBOOK_CONNECT_KEY,
                                             ""));
         }
+
+        if (request.exists(PROP_RATINGS_ENABLE)) {
+            getRepository().writeGlobal(PROP_RATINGS_ENABLE,
+                                        request.get(PROP_RATINGS_ENABLE,
+                                            false));
+        }
+
+
 
 
         getRepository().writeGlobal(PROP_HOSTNAME,

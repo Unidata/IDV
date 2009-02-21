@@ -2497,12 +2497,34 @@ return new Result(title, sb);
         }
         String key = getRepository().getProperty(PROP_FACEBOOK_CONNECT_KEY, "");
         boolean haveKey = key.length()>0;
+        boolean doRatings = getRepository().getProperty(PROP_RATINGS_ENABLE,false);
+        if(doRatings) {
+            sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"100%")));
+            sb.append("<tr valign=\"top\"><td align=\"right\">");
+            String link = request.url(getRepository().URL_COMMENTS_SHOW,
+                                      ARG_ENTRYID, entry.getId());
+            String ratings = HtmlUtil.div("",HtmlUtil.cssClass("js-kit-rating") +
+                                HtmlUtil.attr(HtmlUtil.ATTR_TITLE,entry.getFullName())+
+                                HtmlUtil.attr("permalink",link)) +HtmlUtil.importJS("http://js-kit.com/ratings.js");
+            sb.append(ratings);
+
+            //            String review = "<div class=\"js-kit-rating\"></div><div class=\"js-kit-comments\"></div><script src=\"http://js-kit.com/reviews.js\"></script>";
+            //            sb.append(review);
+            //            String nav = "<div class=\"js-kit-top\" style=\"width: 300px\"  title=\"Easy Site Navigator\"></div><script src=\"http://js-kit.com/top.js\"></script>";
+            //            sb.append(nav);
+
+            sb.append("</td></tr>");
+            sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
+        }
+
         if(haveKey) {
             sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"100%")));
             sb.append("<tr valign=\"top\"><td width=\"50%\">");
         }
 
-        sb.append("<p>");
+        if(!doRatings) {
+            sb.append("<p>");
+        }
         sb.append(getCommentHtml(request, entry));
         if(haveKey) {
             sb.append("</td><td  width=\"50%\">");
@@ -2513,6 +2535,9 @@ return new Result(title, sb);
             sb.append("</td></tr>");
             sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
         }
+
+        
+
 
         return addEntryHeader(request, entry,
                               new OutputHandler(getRepository(),
