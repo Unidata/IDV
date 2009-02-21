@@ -262,9 +262,23 @@ public interface Constants {
     public static final String ATTR_FROMDATE = "fromdate";
 
     /** _more_ */
+        
     public static final String ARG_SELECTTYPE = "selecttype";
 
     public static final String ARG_SHORT = "short";
+
+
+        
+    public static final String ARG_MONITOR_NAME = "monitor_name";
+    public static final String ARG_MONITOR_ENABLED = "monitor_enabled";
+    public static final String ARG_MONITOR_FROMDATE = "monitor_fromdate";
+    public static final String ARG_MONITOR_TODATE = "monitor_todate";
+
+    public static final String ARG_MONITOR_ID = "monitorid";
+    public static final String ARG_MONITOR_CREATE = "monitorcreate";
+    public static final String ARG_MONITOR_CHANGE = "monitorchange";
+    public static final String ARG_MONITOR_DELETE = "monitordelete";
+    public static final String ARG_MONITOR_DELETE_CONFIRM = "monitordeletefconfirm";
 
 
     /** _more_ */

@@ -307,7 +307,7 @@ public class SearchManager extends RepositoryManager {
     public Result processEntrySearch(Request request) throws Exception {
 
         if (request.get(ARG_WAIT, false)) {
-            return getRepository().processEntryListen(request);
+            return getRepository().getMonitorManager().processEntryListen(request);
         }
 
         //        System.err.println("submit:" + request.getString("submit","YYY"));

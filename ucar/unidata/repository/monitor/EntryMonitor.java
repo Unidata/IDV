@@ -27,6 +27,8 @@ package ucar.unidata.repository.monitor;
 import ucar.unidata.repository.*;
 
 
+import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
@@ -51,10 +53,12 @@ public class EntryMonitor implements Constants {
 
 
     /** _more_ */
-    private Repository repository;
+    private String id;
+
+    private String name = "";
 
     /** _more_ */
-    private String id;
+    private Repository repository;
 
 
     /** _more_          */
@@ -64,7 +68,7 @@ public class EntryMonitor implements Constants {
     private User user;
 
     /** _more_          */
-    private boolean active = true;
+    private boolean enabled = true;
 
     /** _more_ */
     private List<Filter> filters = new ArrayList<Filter>();
@@ -77,6 +81,13 @@ public class EntryMonitor implements Constants {
 
     /** _more_          */
     private Date toDate;
+
+    private boolean editable = true;
+
+    public static final String ARG_ADD_ACTION = "addaction";
+    public static final String ARG_DELETE_ACTION = "deleteaction";
+    public static final String ARG_DELETE_ACTION_CONFIRM = "deleteactionconfirm";
+
 
 
     /**
@@ -91,14 +102,84 @@ public class EntryMonitor implements Constants {
      * @param repository _more_
      * @param user _more_
      */
-    public EntryMonitor(Repository repository, User user) {
+    public EntryMonitor(Repository repository, User user,String name,boolean editable) {
         this.repository = repository;
+        this.name = name;
+        this.editable = editable;
         this.user       = user;
         if (user != null) {
             this.userId = user.getId();
         }
         this.id = repository.getGUID();
+        fromDate = new Date();
+        toDate = new Date(fromDate.getTime()+(long)DateUtil.daysToMillis(7));
     }
+
+
+
+    public static EntryMonitor findMonitor(List<EntryMonitor> monitors, String id) {
+        for(EntryMonitor monitor: monitors) {
+            if(Misc.equals(monitor.getId(),id)) {
+                return monitor;
+            }
+        }
+        return null;
+    }
+
+    public static List<EntryMonitor> getEditable(List<EntryMonitor> monitors) {
+        Class[]actionClasses = {EmailAction.class,
+                                TwitterAction.class};
+        String[]actionNames = {"Send an email",
+                               "Ping Twitter"};
+
+
+
+        List<EntryMonitor> result = new ArrayList<EntryMonitor>();
+        for(EntryMonitor monitor: monitors) {
+            if(monitor.getEditable()) {
+                result.add(monitor);
+            }
+        }
+        return result;
+    }
+
+
+    public void applyEditForm(Request request) throws Exception {
+        setName(request.getString(ARG_MONITOR_NAME,getName()));
+        setEnabled(request.get(ARG_MONITOR_ENABLED,false));
+        Date[] dateRange = request.getDateRange(ARG_MONITOR_FROMDATE, ARG_MONITOR_TODATE,
+                               new Date());
+        fromDate = dateRange[0];
+        toDate = dateRange[1];
+    }
+
+    public void addToEditForm(Request request,StringBuffer sb) throws Exception {
+        sb.append(HtmlUtil.formTable());
+        sb.append(HtmlUtil.formEntry(getRepository().msgLabel("Name"),
+                                     HtmlUtil.input(ARG_MONITOR_NAME,getName(),HtmlUtil.SIZE_70)));
+        sb.append(HtmlUtil.formEntry(getRepository().msgLabel("Enabled"),
+                                     HtmlUtil.checkbox(ARG_MONITOR_ENABLED,"true",getEnabled())));
+
+        sb.append(
+                  HtmlUtil.formEntry(
+                                     getRepository().msgLabel("Valid Date Range"),
+                                     
+                                     getRepository().makeDateInput(
+                                                                   request, ARG_MONITOR_FROMDATE, "monitorform", getFromDate()) +
+                                     " " + getRepository().msg("To") +" " +
+                                     getRepository().makeDateInput(
+                                                                   request, ARG_MONITOR_TODATE, "monitorform", getToDate())));
+
+
+        sb.append(HtmlUtil.formTableClose());
+
+        StringBuffer actionForm = new StringBuffer();
+        for(MonitorAction action: actions) {
+            action.addToEditForm(actionForm);
+        }
+    }
+
+
 
 
     /**
@@ -173,8 +254,8 @@ public class EntryMonitor implements Constants {
     public boolean checkEntry(Entry entry) throws Exception {
         System.err.println("checking entry");
 
-        if ( !getActive()) {
-            System.err.println("not activey");
+        if ( !getEnabled()) {
+            System.err.println("not enabledy");
             return false;
         }
         if (fromDate != null) {
@@ -222,6 +303,9 @@ public class EntryMonitor implements Constants {
     }
 
 
+    public void addAction(MonitorAction action) {
+        actions.add(action);
+    }
 
     /**
      * Set the Filters property.
@@ -240,6 +324,7 @@ public class EntryMonitor implements Constants {
     public List<Filter> getFilters() {
         return filters;
     }
+
 
 
     /**
@@ -279,21 +364,21 @@ public class EntryMonitor implements Constants {
 
 
     /**
-     *  Set the Active property.
+     *  Set the Enabled property.
      *
-     *  @param value The new value for Active
+     *  @param value The new value for Enabled
      */
-    public void setActive(boolean value) {
-        active = value;
+    public void setEnabled(boolean value) {
+        enabled = value;
     }
 
     /**
-     *  Get the Active property.
+     *  Get the Enabled property.
      *
-     *  @return The Active
+     *  @return The Enabled
      */
-    public boolean getActive() {
-        return active;
+    public boolean getEnabled() {
+        return enabled;
     }
 
     /**
@@ -332,26 +417,70 @@ public class EntryMonitor implements Constants {
         return toDate;
     }
 
-/**
-Set the Actions property.
+    /**
+       Set the Actions property.
 
-@param value The new value for Actions
-**/
-public void setActions (List<MonitorAction> value) {
+       @param value The new value for Actions
+    **/
+    public void setActions (List<MonitorAction> value) {
 	actions = value;
-}
+    }
 
-/**
-Get the Actions property.
+    /**
+       Get the Actions property.
 
-@return The Actions
-**/
-public List<MonitorAction> getActions () {
+       @return The Actions
+    **/
+    public List<MonitorAction> getActions () {
 	return actions;
-}
+    }
+
+
+    /**
+       Set the Name property.
+
+       @param value The new value for Name
+    **/
+    public void setName (String value) {
+	name = value;
+    }
+
+    /**
+       Get the Name property.
+
+       @return The Name
+    **/
+    public String getName () {
+	return name;
+    }
+
+
+    /**
+       Set the Editable property.
+
+       @param value The new value for Editable
+    **/
+    public void setEditable (boolean value) {
+	editable = value;
+    }
+
+    /**
+       Get the Editable property.
+
+       @return The Editable
+    **/
+    public boolean getEditable () {
+	return editable;
+    }
 
 
 
+
+    public boolean equals(Object o) {
+        if(!(o instanceof EntryMonitor)) return false;
+        EntryMonitor that  = (EntryMonitor)o;
+        return this.id.equals(that.id);
+    }
 
 }
 

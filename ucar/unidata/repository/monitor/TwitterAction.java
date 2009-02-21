@@ -56,8 +56,8 @@ public class TwitterAction extends PasswordAction {
      * @param remoteUserId _more_
      * @param password _more_
      */
-    public TwitterAction(String remoteUserId, String password) {
-        super(remoteUserId, password);
+    public TwitterAction(String id, String remoteUserId, String password) {
+        super(id,remoteUserId, password);
     }
 
 

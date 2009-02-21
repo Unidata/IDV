@@ -61,8 +61,8 @@ public class EmailAction extends PasswordAction {
      * @param user _more_
      * @param remoteUserId _more_
      */
-    public EmailAction(String remoteUserId) {
-        super(remoteUserId, (String) null);
+    public EmailAction(String id, String remoteUserId) {
+        super(id,remoteUserId, (String) null);
     }
 
 

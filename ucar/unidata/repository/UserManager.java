@@ -97,7 +97,8 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     protected RequestUrl[] userUrls = { getRepositoryBase().URL_USER_HOME,
                                         getRepositoryBase().URL_USER_SETTINGS,
-                                        getRepositoryBase().URL_USER_CART };
+                                        getRepositoryBase().URL_USER_CART,
+                                        getRepositoryBase().URL_USER_MONITORS };
 
 
     /** _more_ */
@@ -1388,7 +1389,7 @@ public class UserManager extends RepositoryManager {
      *
      * @return _more_
      */
-    private Result makeResult(Request request, String title,
+    public Result makeResult(Request request, String title,
                               StringBuffer sb) {
         return getRepository().makeResult(request, title, sb,
                                           (request.getUser().getAnonymous()
@@ -2213,12 +2214,6 @@ public class UserManager extends RepositoryManager {
     }
 
 
-    public Result processMonitors(Request request) throws Exception {
-        StringBuffer sb   = new StringBuffer();
-
-        
-        return makeResult(request, msg("Entry Monitors"), sb);
-    }
 
 
     /**

@@ -67,20 +67,7 @@ public class SynchronousEntryMonitor extends EntryMonitor {
      * @param request _more_
      */
     public SynchronousEntryMonitor(Repository repository, Request request) {
-        this(repository, null, request);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param repository _more_
-     * @param id _more_
-     * @param request _more_
-     */
-    public SynchronousEntryMonitor(Repository repository, String id,
-                             Request request) {
-        super(repository, request.getUser());
+        super(repository, request.getUser(),"Synchronous Search", false);
         Hashtable properties = request.getDefinedProperties();
         for (Enumeration keys = properties.keys(); keys.hasMoreElements(); ) {
             String arg   = (String) keys.nextElement();
@@ -88,6 +75,7 @@ public class SynchronousEntryMonitor extends EntryMonitor {
             addFilter(new Filter(arg, value));
         }
     }
+
 
     protected void entryMatched(Entry entry) {
         this.entry = entry;

@@ -66,7 +66,8 @@ public abstract class PasswordAction extends MonitorAction {
      * @param remoteUserId _more_
      * @param password _more_
      */
-    public PasswordAction(String remoteUserId, String password) {
+    public PasswordAction(String id, String remoteUserId, String password) {
+        super(id);
         this.remoteUserId = remoteUserId;
         this.password     = password;
     }
@@ -85,6 +86,7 @@ public abstract class PasswordAction extends MonitorAction {
             password = new String(XmlUtil.decodeBase64(new String(value)));
         }
     }
+
 
 
     /**

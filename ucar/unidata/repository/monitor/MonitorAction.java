@@ -36,11 +36,23 @@ import ucar.unidata.repository.*;
  */
 public class MonitorAction implements Constants {
 
+    private String id;
+
 
     /**
      * _more_
      */
     public MonitorAction() {}
+
+
+    public MonitorAction(String id) {
+        this.id = id;
+    }
+
+
+    public void addToEditForm(StringBuffer sb) {
+
+    }
 
 
     /**
@@ -50,6 +62,29 @@ public class MonitorAction implements Constants {
      */
     protected void entryMatched(EntryMonitor monitor, Entry entry) {
     }
+
+
+
+    /**
+       Set the Id property.
+
+       @param value The new value for Id
+    **/
+    public void setId (String value) {
+	id = value;
+    }
+
+    /**
+       Get the Id property.
+
+       @return The Id
+    **/
+    public String getId () {
+	return id;
+    }
+
+
+
 
 }
 

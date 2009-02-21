@@ -73,7 +73,6 @@
       <api request="/user/home"     method="processHome"     admin="false"/>
       <api request="/user/profile"     method="processProfile"     admin="false"/>
       <api request="/user/settings" method="processSettings" admin="false"/>
-      <api request="/user/monitors" method="processMonitors" admin="false"/>
       <api request="/user/activity"      method="processActivityLog"      admin="true"/>
       <api request="/user/cart"     method="processCart"     admin="false"/>
       <api request="/user/resetpassword"      method="processResetPassword"    admin="false"/>
@@ -83,6 +82,10 @@
       <api request="/user/new"      method="adminUserNew"    admin="true"/>
       <api request="/user/favorite"      method="processFavorite" />
   </group>
+
+  <group handler="monitormanager">
+      <api request="/user/monitors" method="processMonitors" admin="false"/>
+   </group>
 
   <group handler="admin">
       <api request="/admin/usermessage"     method="adminUserMessage"      admin="true"/>

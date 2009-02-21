@@ -198,10 +198,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
     /** _more_ */
-    private List<EntryMonitor> entryMonitors =
-        new ArrayList<EntryMonitor>();
-
-    /** _more_ */
     private Properties mimeTypes;
 
 
@@ -304,6 +300,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     private UserManager userManager;
+
+    private MonitorManager monitorManager;
 
     /** _more_          */
     private SessionManager sessionManager;
@@ -693,17 +691,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         HtmlUtil.setHideShowImage(iconUrl(ICON_MINUS), iconUrl(ICON_PLUS));
 
-        /*
-        EntryMonitor xtestMonitor = new TwitterEntryMonitor(this, getUserManager().findUser("jeffmc",false),
-                                                              "jeffmcwh",
-                                                              "mypsswrd");
-        */
-        /*
-        EntryMonitor testMonitor = new EmailEntryMonitor(this, getUserManager().findUser("jeffmc",false),
-                                                            "jeffmc@unidata.ucar.edu");
-        testMonitor.addFilter(new Filter(ARG_TEXT,"data"));
-        entryMonitors.add(testMonitor);*/
-
     }
 
 
@@ -721,14 +708,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    protected UserManager doMakeUserManager() {
-        return new UserManager(this);
-    }
+
 
     /**
      * _more_
@@ -805,11 +785,45 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
+    protected UserManager doMakeUserManager() {
+        return new UserManager(this);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public UserManager getUserManager() {
         if (userManager == null) {
             userManager = doMakeUserManager();
         }
         return userManager;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected MonitorManager doMakeMonitorManager() {
+        return new MonitorManager(this);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public MonitorManager getMonitorManager() {
+        if (monitorManager == null) {
+            monitorManager = doMakeMonitorManager();
+        }
+        return monitorManager;
     }
 
 
@@ -1428,6 +1442,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             handler = this;
             if (handlerName.equals("usermanager")) {
                 handler = getUserManager();
+            } else if (handlerName.equals("monitormanager")) {
+                handler = getMonitorManager();
             } else if (handlerName.equals("admin")) {
                 handler = getAdmin();
             } else if (handlerName.equals("harvestermanager")) {
@@ -4219,56 +4235,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processEntryListen(Request request) throws Exception {
-        SynchronousEntryMonitor entryMonitor = new SynchronousEntryMonitor(this, request);
-        synchronized (entryMonitors) {
-            entryMonitors.add(entryMonitor);
-        }
-        synchronized (entryMonitor) {
-            entryMonitor.wait();
-            System.err.println("Done waiting");
-        }
-        Entry entry = entryMonitor.getEntry();
-        if (entry == null) {
-            System.err.println("No entry");
-            return new Result(BLANK, new StringBuffer("No match"),
-                              getMimeTypeFromSuffix(".html"));
-        }
-        return getOutputHandler(request).outputEntry(request, entry);
-    }
-
-
     /**
      * _more_
      *
      * @param entries _more_
      */
     public void checkNewEntries(List<Entry> entries) {
-        try {
-            List<EntryMonitor> monitors;
-            synchronized (entryMonitors) {
-                monitors = new ArrayList<EntryMonitor>(entryMonitors);
-            }
-            for (Entry entry : entries) {
-                for (EntryMonitor entryMonitor : monitors) {
-                    entryMonitor.checkEntry(entry);
-                }
-            }
-        } catch (Exception exc) {
-            System.err.println("Error checking monitors:" + exc);
-            exc.printStackTrace();
-        }
+        getMonitorManager().checkNewEntries(entries);
     }
 
 
