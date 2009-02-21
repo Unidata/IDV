@@ -304,8 +304,13 @@ public abstract class ChartWrapper extends DisplayComponent implements KeyListen
      */
     protected FlatField getFlatField(FieldImpl data)
             throws VisADException, RemoteException {
-        return (FlatField) data.getSample(0);
-
+        FlatField ff = null;
+        if (GridUtil.isSequence(data)) {
+            ff = (FlatField) data.getSample(0);
+        } else {
+            ff = (FlatField) data;
+        }
+        return ff;
     }
 
 
