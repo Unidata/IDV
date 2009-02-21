@@ -60,6 +60,19 @@ public class TwitterAction extends PasswordAction {
         super(id,remoteUserId, password);
     }
 
+    public void addToEditForm(EntryMonitor monitor, StringBuffer sb) {
+        sb.append(HtmlUtil.formTable());
+        sb.append(HtmlUtil.colspan("Send a Tweet",2));
+        sb.append(HtmlUtil.formEntry("Twitter ID",
+                                     HtmlUtil.input(getArgId(ARG_ACTION_ID),getRemoteUserId(),HtmlUtil.SIZE_60)));
+        sb.append(HtmlUtil.formEntry("Twitter Password",
+                                     HtmlUtil.input(getArgId(ARG_ACTION_PASSWORD),getPassword(),HtmlUtil.SIZE_60)));
+        sb.append(HtmlUtil.formEntryTop("Message",
+                                        HtmlUtil.textArea(getArgId(ARG_ACTION_MESSAGE),getMessageTemplate(),
+                                                          5,60)));
+        sb.append(HtmlUtil.formTableClose());
+    }
+
 
 
     /**

@@ -45,11 +45,19 @@ import java.util.List;
  */
 public abstract class PasswordAction extends MonitorAction {
 
+    public static final String ARG_ACTION_ID = "action_id";
+    public static final String ARG_ACTION_PASSWORD = "action_password";
+    public static final String ARG_ACTION_MESSAGE = "action_message";
+
+
     /** _more_ */
     private String remoteUserId = "";
 
     /** _more_ */
     private String password = "";
+
+    private String messageTemplate="";
+
 
     /**
      * _more_
@@ -72,6 +80,21 @@ public abstract class PasswordAction extends MonitorAction {
         this.password     = password;
     }
 
+
+    public void applyEditForm(Request request, EntryMonitor monitor) {
+        super.applyEditForm(request,  monitor);
+
+        if(request.exists(getArgId(ARG_ACTION_ID))) {
+            remoteUserId = request.getString(getArgId(ARG_ACTION_ID),remoteUserId);
+        }
+        if(request.exists(getArgId(ARG_ACTION_PASSWORD))) {
+            password = request.getString(getArgId(ARG_ACTION_PASSWORD),password);
+        }
+        if(request.exists(getArgId(ARG_ACTION_MESSAGE))) {
+            messageTemplate = request.getString(getArgId(ARG_ACTION_MESSAGE),messageTemplate);
+        }
+
+    }
 
 
     /**
@@ -128,6 +151,25 @@ public abstract class PasswordAction extends MonitorAction {
     public String getRemoteUserId() {
         return remoteUserId;
     }
+
+/**
+Set the MessageTemplate property.
+
+@param value The new value for MessageTemplate
+**/
+public void setMessageTemplate (String value) {
+	messageTemplate = value;
+}
+
+/**
+Get the MessageTemplate property.
+
+@return The MessageTemplate
+**/
+public String getMessageTemplate () {
+	return messageTemplate;
+}
+
 
 
 }

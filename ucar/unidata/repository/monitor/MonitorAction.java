@@ -39,6 +39,7 @@ public class MonitorAction implements Constants {
     private String id;
 
 
+
     /**
      * _more_
      */
@@ -49,8 +50,14 @@ public class MonitorAction implements Constants {
         this.id = id;
     }
 
+    protected String getArgId(String prefix) {
+        return prefix +"_"+id;
+    }
 
-    public void addToEditForm(StringBuffer sb) {
+    public void addToEditForm(EntryMonitor monitor, StringBuffer sb) {
+
+    }
+    public void applyEditForm(Request request, EntryMonitor monitor) {
 
     }
 

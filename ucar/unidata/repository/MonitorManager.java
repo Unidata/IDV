@@ -20,9 +20,9 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.monitor;
 
-import ucar.unidata.repository.monitor.*;
+import ucar.unidata.repository.*;
 
 import ucar.unidata.sql.Clause;
 
@@ -88,10 +88,6 @@ public class MonitorManager extends RepositoryManager {
     public MonitorManager(Repository repository) {
         super(repository);
         try {
-        entryMonitors.add(new EntryMonitor(repository, getUserManager().findUser("jeffmc",false),
-                                           "Test 1", true));
-        entryMonitors.add(new EntryMonitor(repository, getUserManager().findUser("jeffmc",false),
-                                           "Test 2", true));
         } catch(Exception exc) {
         }
     }
@@ -204,6 +200,14 @@ public class MonitorManager extends RepositoryManager {
     public Result processMonitorCreate(Request request) throws Exception {
         StringBuffer sb   = new StringBuffer();
         EntryMonitor monitor = new EntryMonitor(getRepository(),request.getUser(),"New Monitor",true);
+        String type = request.getString(ARG_MONITOR_TYPE,"email");
+        if(type.equals("email")) {
+            monitor.addAction(new EmailAction(getRepository().getGUID(),""));
+        } else  if(type.equals("twitter")) {
+            monitor.addAction(new TwitterAction(getRepository().getGUID(),"",""));
+        } else {
+            System.err.println("unknown type:" + type);
+        }
         entryMonitors.add(monitor);
         return new Result(HtmlUtil.url(
                                        getRepositoryBase().URL_USER_MONITORS.toString(),
@@ -232,10 +236,18 @@ public class MonitorManager extends RepositoryManager {
             return processMonitorCreate(request);
         }
 
+        sb.append(HtmlUtil.br());
+        sb.append(HtmlUtil.table(HtmlUtil.row(
+                                    HtmlUtil.cols(msgLabel("Create a"),
+                                                  request.form(getRepositoryBase().URL_USER_MONITORS)+
+                                                  HtmlUtil.submit("Email monitor",ARG_MONITOR_CREATE)+
+                                                  HtmlUtil.hidden(ARG_MONITOR_TYPE,"email")+
+                                                  HtmlUtil.formClose(),
+                                                  request.form(getRepositoryBase().URL_USER_MONITORS)+
+                                                  HtmlUtil.submit("Twitter monitor",ARG_MONITOR_CREATE)+
+                                                  HtmlUtil.hidden(ARG_MONITOR_TYPE,"twitter")+
+                                                  HtmlUtil.formClose()))));
 
-        sb.append(request.form(getRepositoryBase().URL_USER_MONITORS));
-        sb.append(HtmlUtil.submit("Create a monitor",ARG_MONITOR_CREATE));
-        sb.append(HtmlUtil.formClose());
         sb.append(HtmlUtil.p());
 
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));

@@ -274,6 +274,8 @@ public interface Constants {
     public static final String ARG_MONITOR_FROMDATE = "monitor_fromdate";
     public static final String ARG_MONITOR_TODATE = "monitor_todate";
 
+    public static final String ARG_MONITOR_TYPE = "monitortype";
+
     public static final String ARG_MONITOR_ID = "monitorid";
     public static final String ARG_MONITOR_CREATE = "monitorcreate";
     public static final String ARG_MONITOR_CHANGE = "monitorchange";

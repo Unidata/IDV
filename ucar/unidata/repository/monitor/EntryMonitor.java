@@ -151,16 +151,22 @@ public class EntryMonitor implements Constants {
                                new Date());
         fromDate = dateRange[0];
         toDate = dateRange[1];
+
+        for(MonitorAction action: actions) {
+            action.applyEditForm(request, this);
+        }
     }
 
     public void addToEditForm(Request request,StringBuffer sb) throws Exception {
-        sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.formEntry(getRepository().msgLabel("Name"),
+        StringBuffer stateSB = new StringBuffer();
+
+        stateSB.append(HtmlUtil.formTable());
+        stateSB.append(HtmlUtil.formEntry(getRepository().msgLabel("Name"),
                                      HtmlUtil.input(ARG_MONITOR_NAME,getName(),HtmlUtil.SIZE_70)));
-        sb.append(HtmlUtil.formEntry(getRepository().msgLabel("Enabled"),
+        stateSB.append(HtmlUtil.formEntry(getRepository().msgLabel("Enabled"),
                                      HtmlUtil.checkbox(ARG_MONITOR_ENABLED,"true",getEnabled())));
 
-        sb.append(
+        stateSB.append(
                   HtmlUtil.formEntry(
                                      getRepository().msgLabel("Valid Date Range"),
                                      
@@ -171,16 +177,39 @@ public class EntryMonitor implements Constants {
                                                                    request, ARG_MONITOR_TODATE, "monitorform", getToDate())));
 
 
-        sb.append(HtmlUtil.formTableClose());
 
-        StringBuffer actionForm = new StringBuffer();
+
+        stateSB.append(HtmlUtil.formTableClose());
+
+
+        StringBuffer searchSB = new StringBuffer();
+        addSearchToEditForm(request, searchSB);
+
+        StringBuffer actionsSB = new StringBuffer();
         for(MonitorAction action: actions) {
-            action.addToEditForm(actionForm);
+            action.addToEditForm(this,actionsSB);
         }
+
+        sb.append(HtmlUtil.makeShowHideBlock("Settings",stateSB.toString(),true));
+        sb.append(HtmlUtil.makeShowHideBlock("Search Criteria",searchSB.toString(),false));
+        sb.append(HtmlUtil.makeShowHideBlock("Actions",actionsSB.toString(),false));
+        sb.append(HtmlUtil.p());
+
     }
 
+    public void addSearchToEditForm(Request request,StringBuffer sb) throws Exception {
+        searchSB.append(HtmlUtil.formTable());
+        HashSet<String> filterMap = new HashSet<String>();
+        for(Filter filter: filters) {
+            filterMap.put(filter.getField());
+        }
+
+                
 
 
+        searchSB.append(HtmlUtil.formTableClose());        
+
+    }
 
     /**
      * _more_

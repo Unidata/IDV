@@ -46,7 +46,6 @@ import java.util.List;
 public class EmailAction extends PasswordAction {
 
 
-
     /**
      * _more_
      */
@@ -64,6 +63,20 @@ public class EmailAction extends PasswordAction {
     public EmailAction(String id, String remoteUserId) {
         super(id,remoteUserId, (String) null);
     }
+
+
+    public void addToEditForm(EntryMonitor monitor, StringBuffer sb) {
+        sb.append(HtmlUtil.formTable());
+        sb.append(HtmlUtil.colspan("Send an email",2));
+
+        sb.append(HtmlUtil.formEntry("Email address",
+                                     HtmlUtil.input(getArgId(ARG_ACTION_ID),getRemoteUserId(),HtmlUtil.SIZE_60)));
+        sb.append(HtmlUtil.formEntryTop("Message",
+                                        HtmlUtil.textArea(getArgId(ARG_ACTION_MESSAGE),getMessageTemplate(),
+                                                          5,60)));
+        sb.append(HtmlUtil.formTableClose());
+    }
+
 
 
 

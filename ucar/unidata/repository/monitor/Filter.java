@@ -48,6 +48,23 @@ import java.util.List;
  */
 public class Filter implements Constants {
 
+    public static final String[] FIELD_TYPES = {
+        ARG_TEXT,
+        ARG_TYPE,
+        ARG_USER,
+        ARG_NAME,
+        ARG_DESCRIPTION};
+
+    public static final String[] FIELD_NAMES = {
+        "Text",
+        "Type",
+        "User",
+        "Name",
+        "Description"};
+
+
+
+
     /** _more_ */
     private String field;
 
