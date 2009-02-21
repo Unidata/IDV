@@ -2517,6 +2517,14 @@ return new Result(title, sb);
             sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
         }
 
+
+
+
+        String chat = "<script type='text/javascript' src='http://cache.static.userplane.com/CommunicationSuite/assets/js/flashobject.js'></script><script type='text/javascript' src='http://cache.static.userplane.com/CommunicationSuite/assets/js/userplane.js'></script><div id='myCoolContainer'><strong>You need to upgrade your Flash Player by clicking <a href='http://www.macromedia.com/go/getflash/' target='_blank'>this link</a>.</strong><br><br><strong>If you see this and have already upgraded we suggest you follow <a href='http://www.adobe.com/cfusion/knowledgebase/index.cfm?id=tn_14157' target='_blank'>this link</a>to uninstall Flash and reinstall again.</strong></div><script type='text/javascript'>USERPLANE.config.minichat = {container : 'myCoolContainer',flashcomServer : 'flashcom.public.userplane.com',swfServer: 'swf.userplane.com',domainID : 'public.userplane.com',instanceID : 'up_domain',sessionGUID : 'User1234',width : '50%',height : '50%'};var mc = new USERPLANE.app.Minichat(USERPLANE.config.minichat);mc.render();</script>";
+
+
+
+
         if(haveKey) {
             sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"100%")));
             sb.append("<tr valign=\"top\"><td width=\"50%\">");

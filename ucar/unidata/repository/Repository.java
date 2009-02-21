@@ -22,7 +22,7 @@
 package ucar.unidata.repository;
 
 import ucar.unidata.repository.data.*;
-import ucar.unidata.repository.listener.*;
+import ucar.unidata.repository.monitor.*;
 
 import org.w3c.dom.*;
 
@@ -198,8 +198,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
     /** _more_ */
-    private List<EntryListener> entryListeners =
-        new ArrayList<EntryListener>();
+    private List<EntryMonitor> entryMonitors =
+        new ArrayList<EntryMonitor>();
 
     /** _more_ */
     private Properties mimeTypes;
@@ -247,7 +247,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private List<OutputHandler> outputHandlers =
         new ArrayList<OutputHandler>();
 
-    private List<Class> entryListenerClasses =
+    private List<Class> entryMonitorClasses =
         new ArrayList<Class>();
 
 
@@ -274,7 +274,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private List<String> outputDefFiles = new ArrayList<String>();
 
-    private List<String> entryListenerDefFiles = new ArrayList<String>();
+    private List<String> entryMonitorDefFiles = new ArrayList<String>();
 
     /** _more_ */
     private List<String> metadataDefFiles = new ArrayList<String>();
@@ -694,15 +694,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
         HtmlUtil.setHideShowImage(iconUrl(ICON_MINUS), iconUrl(ICON_PLUS));
 
         /*
-        EntryListener xtestListener = new TwitterEntryListener(this, getUserManager().findUser("jeffmc",false),
+        EntryMonitor xtestMonitor = new TwitterEntryMonitor(this, getUserManager().findUser("jeffmc",false),
                                                               "jeffmcwh",
                                                               "mypsswrd");
         */
         /*
-        EntryListener testListener = new EmailEntryListener(this, getUserManager().findUser("jeffmc",false),
+        EntryMonitor testMonitor = new EmailEntryMonitor(this, getUserManager().findUser("jeffmc",false),
                                                             "jeffmc@unidata.ucar.edu");
-        testListener.addFilter(new Filter(ARG_TEXT,"data"));
-        entryListeners.add(testListener);*/
+        testMonitor.addFilter(new Filter(ARG_TEXT,"data"));
+        entryMonitors.add(testMonitor);*/
 
     }
 
@@ -4231,15 +4231,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     public Result processEntryListen(Request request) throws Exception {
-        SynchronousEntryListener entryListener = new SynchronousEntryListener(this, request);
-        synchronized (entryListeners) {
-            entryListeners.add(entryListener);
+        SynchronousEntryMonitor entryMonitor = new SynchronousEntryMonitor(this, request);
+        synchronized (entryMonitors) {
+            entryMonitors.add(entryMonitor);
         }
-        synchronized (entryListener) {
-            entryListener.wait();
+        synchronized (entryMonitor) {
+            entryMonitor.wait();
             System.err.println("Done waiting");
         }
-        Entry entry = entryListener.getEntry();
+        Entry entry = entryMonitor.getEntry();
         if (entry == null) {
             System.err.println("No entry");
             return new Result(BLANK, new StringBuffer("No match"),
@@ -4256,17 +4256,17 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public void checkNewEntries(List<Entry> entries) {
         try {
-            List<EntryListener> listeners;
-            synchronized (entryListeners) {
-                listeners = new ArrayList<EntryListener>(entryListeners);
+            List<EntryMonitor> monitors;
+            synchronized (entryMonitors) {
+                monitors = new ArrayList<EntryMonitor>(entryMonitors);
             }
             for (Entry entry : entries) {
-                for (EntryListener entryListener : listeners) {
-                    entryListener.checkEntry(entry);
+                for (EntryMonitor entryMonitor : monitors) {
+                    entryMonitor.checkEntry(entry);
                 }
             }
         } catch (Exception exc) {
-            System.err.println("Error checking listeners:" + exc);
+            System.err.println("Error checking monitors:" + exc);
             exc.printStackTrace();
         }
     }

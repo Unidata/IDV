@@ -22,7 +22,7 @@
 
 
 
-package ucar.unidata.repository.listener;
+package ucar.unidata.repository.monitor;
 
 
 import ucar.unidata.repository.*;
@@ -43,7 +43,7 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.30 $
  */
-public abstract class PasswordEntryListener extends EntryListener {
+public abstract class PasswordAction extends MonitorAction {
 
     /** _more_ */
     private String remoteUserId = "";
@@ -51,21 +51,11 @@ public abstract class PasswordEntryListener extends EntryListener {
     /** _more_ */
     private String password = "";
 
-
     /**
      * _more_
      */
-    public PasswordEntryListener() {}
+    public PasswordAction() {}
 
-    /**
-     * _more_
-     *
-     * @param repository _more_
-     * @param user _more_
-     */
-    public PasswordEntryListener(Repository repository, User user) {
-        this(repository, user, null, null);
-    }
 
 
     /**
@@ -76,9 +66,7 @@ public abstract class PasswordEntryListener extends EntryListener {
      * @param remoteUserId _more_
      * @param password _more_
      */
-    public PasswordEntryListener(Repository repository, User user,
-                                 String remoteUserId, String password) {
-        super(repository, user);
+    public PasswordAction(String remoteUserId, String password) {
         this.remoteUserId = remoteUserId;
         this.password     = password;
     }

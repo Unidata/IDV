@@ -23,7 +23,7 @@
 
 
 
-package ucar.unidata.repository.listener;
+package ucar.unidata.repository.monitor;
 
 
 import ucar.unidata.repository.*;
@@ -43,22 +43,14 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.30 $
  */
-public class EmailEntryListener extends PasswordEntryListener {
+public class EmailAction extends PasswordAction {
+
 
 
     /**
      * _more_
      */
-    public EmailEntryListener() {}
-
-    /**
-     * _more_
-     *
-     * @param repository _more_
-     * @param user _more_
-     */
-    public EmailEntryListener(Repository repository, User user) {
-        this(repository, user, null);
+    public EmailAction() {
     }
 
 
@@ -69,9 +61,8 @@ public class EmailEntryListener extends PasswordEntryListener {
      * @param user _more_
      * @param remoteUserId _more_
      */
-    public EmailEntryListener(Repository repository, User user,
-                              String remoteUserId) {
-        super(repository, user, remoteUserId, (String) null);
+    public EmailAction(String remoteUserId) {
+        super(remoteUserId, (String) null);
     }
 
 
@@ -81,26 +72,25 @@ public class EmailEntryListener extends PasswordEntryListener {
      *
      * @param entry _more_
      */
-    protected void entryMatched(Entry entry) {
+    protected void entryMatched(EntryMonitor monitor, Entry entry) {
         try {
-            super.entryMatched(entry);
             String url =
-                HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
+                HtmlUtil.url(monitor.getRepository().URL_ENTRY_SHOW.getFullUrl(),
                              ARG_ENTRYID, entry.getId());
             StringBuffer message = new StringBuffer("New entry:"
                                        + entry.getFullName() + "\n" + url);
             String userId = getRemoteUserId();
 
-            String from   = getUser().getEmail();
+            String from   = monitor.getUser().getEmail();
             if ((from == null) || (from.trim().length() == 0)) {
-                getRepository().getAdmin().sendEmail(userId, "New Entry",
+                monitor.getRepository().getAdmin().sendEmail(userId, "New Entry",
                         message.toString(), false);
             } else {
-                getRepository().getAdmin().sendEmail(userId, from,
+                monitor.getRepository().getAdmin().sendEmail(userId, from,
                         "New Entry", message.toString(), false);
             }
         } catch (Exception exc) {
-            handleError("Error posting to Twitter", exc);
+            monitor.handleError("Error posting to Twitter", exc);
         }
     }
 

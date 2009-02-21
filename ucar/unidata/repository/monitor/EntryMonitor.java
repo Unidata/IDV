@@ -21,7 +21,7 @@
 
 
 
-package ucar.unidata.repository.listener;
+package ucar.unidata.repository.monitor;
 
 
 import ucar.unidata.repository.*;
@@ -47,7 +47,7 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.30 $
  */
-public class EntryListener implements Constants {
+public class EntryMonitor implements Constants {
 
 
     /** _more_ */
@@ -69,6 +69,7 @@ public class EntryListener implements Constants {
     /** _more_ */
     private List<Filter> filters = new ArrayList<Filter>();
 
+    private List<MonitorAction> actions = new ArrayList<MonitorAction>();
 
 
     /** _more_          */
@@ -81,7 +82,7 @@ public class EntryListener implements Constants {
     /**
      * _more_
      */
-    public EntryListener() {}
+    public EntryMonitor() {}
 
 
     /**
@@ -90,7 +91,7 @@ public class EntryListener implements Constants {
      * @param repository _more_
      * @param user _more_
      */
-    public EntryListener(Repository repository, User user) {
+    public EntryMonitor(Repository repository, User user) {
         this.repository = repository;
         this.user       = user;
         if (user != null) {
@@ -207,17 +208,20 @@ public class EntryListener implements Constants {
                 return false;
             }
         }
-        System.err.println("Matched");
         entryMatched(entry);
         return true;
     }
 
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     */
-    protected void entryMatched(Entry entry) {}
+
+    protected void entryMatched(Entry entry) {
+        System.err.println("Matched");
+        for(MonitorAction action: actions) {
+            action.entryMatched(this,entry);
+        }
+
+    }
+
+
 
     /**
      * Set the Filters property.
@@ -327,6 +331,26 @@ public class EntryListener implements Constants {
     public Date getToDate() {
         return toDate;
     }
+
+/**
+Set the Actions property.
+
+@param value The new value for Actions
+**/
+public void setActions (List<MonitorAction> value) {
+	actions = value;
+}
+
+/**
+Get the Actions property.
+
+@return The Actions
+**/
+public List<MonitorAction> getActions () {
+	return actions;
+}
+
+
 
 
 }

@@ -22,7 +22,7 @@
 
 
 
-package ucar.unidata.repository.listener;
+package ucar.unidata.repository.monitor;
 
 
 import ucar.unidata.repository.*;
@@ -31,8 +31,6 @@ import ucar.unidata.util.HtmlUtil;
 
 
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.List;
 
 
@@ -42,36 +40,24 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.30 $
  */
-public class TwitterEntryListener extends PasswordEntryListener {
+public class TwitterAction extends PasswordAction {
 
 
     /**
      * _more_
      */
-    public TwitterEntryListener() {}
+    public TwitterAction() {}
 
-    /**
-     * _more_
-     *
-     * @param repository _more_
-     * @param user _more_
-     */
-    public TwitterEntryListener(Repository repository, User user) {
-        this(repository, user, null, null);
-    }
 
 
     /**
      * _more_
      *
-     * @param repository _more_
-     * @param user _more_
      * @param remoteUserId _more_
      * @param password _more_
      */
-    public TwitterEntryListener(Repository repository, User user,
-                                String remoteUserId, String password) {
-        super(repository, user, remoteUserId, password);
+    public TwitterAction(String remoteUserId, String password) {
+        super(remoteUserId, password);
     }
 
 
@@ -81,9 +67,9 @@ public class TwitterEntryListener extends PasswordEntryListener {
      *
      * @param entry _more_
      */
-    protected void entryMatched(Entry entry) {
+    protected void entryMatched(EntryMonitor monitor, Entry entry) {
         try {
-            super.entryMatched(entry);
+            super.entryMatched(monitor, entry);
             System.err.println("twitter got entry ");
             if (true) {
                 return;
@@ -93,7 +79,7 @@ public class TwitterEntryListener extends PasswordEntryListener {
             twitter4j.Twitter twitter =
                 new twitter4j.Twitter(getRemoteUserId(), getPassword());
             String url1 =
-                HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
+                HtmlUtil.url(monitor.getRepository().URL_ENTRY_SHOW.getFullUrl(),
                              ARG_ENTRYID, entry.getId());
             twitter4j.Status status = twitter.update("New entry:"
                                           + entry.getFullName() + "\n"
@@ -101,7 +87,7 @@ public class TwitterEntryListener extends PasswordEntryListener {
             System.out.println("Successfully updated the status to ["
                                + status.getText() + "].");
         } catch (Exception exc) {
-            handleError("Error posting to Twitter", exc);
+            monitor.handleError("Error posting to Twitter", exc);
         }
     }
 

@@ -22,7 +22,7 @@
 
 
 
-package ucar.unidata.repository.listener;
+package ucar.unidata.repository.monitor;
 
 
 import ucar.unidata.repository.*;
@@ -48,7 +48,7 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.30 $
  */
-public class SynchronousEntryListener extends EntryListener {
+public class SynchronousEntryMonitor extends EntryMonitor {
 
     /** _more_ */
     private Entry entry;
@@ -57,7 +57,7 @@ public class SynchronousEntryListener extends EntryListener {
     /**
      * _more_
      */
-    public SynchronousEntryListener() {}
+    public SynchronousEntryMonitor() {}
 
 
     /**
@@ -66,7 +66,7 @@ public class SynchronousEntryListener extends EntryListener {
      * @param repository _more_
      * @param request _more_
      */
-    public SynchronousEntryListener(Repository repository, Request request) {
+    public SynchronousEntryMonitor(Repository repository, Request request) {
         this(repository, null, request);
     }
 
@@ -78,8 +78,8 @@ public class SynchronousEntryListener extends EntryListener {
      * @param id _more_
      * @param request _more_
      */
-    public SynchronousEntryListener(Repository repository, String id,
-                                    Request request) {
+    public SynchronousEntryMonitor(Repository repository, String id,
+                             Request request) {
         super(repository, request.getUser());
         Hashtable properties = request.getDefinedProperties();
         for (Enumeration keys = properties.keys(); keys.hasMoreElements(); ) {
@@ -89,22 +89,11 @@ public class SynchronousEntryListener extends EntryListener {
         }
     }
 
-
-
-
-
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     */
     protected void entryMatched(Entry entry) {
-        super.entryMatched(entry);
         this.entry = entry;
         synchronized (this) {
             this.notify();
         }
-
     }
 
 
