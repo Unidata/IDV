@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="4.1.5" transformSequenceNumber="2">
   <directoryPresets config="${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv.ico" />
-  <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/upc/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="2.6" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.5" javaMaxVersion="1.6" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
+  <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/upc/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="2.7" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.5" javaMaxVersion="1.6" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -285,7 +285,7 @@
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.FormScreen">
                   <void property="subTitle">
-                    <string>Which version of Java3D should be installed?</string>
+                    <string>Choose Java 3D Version</string>
                   </void>
                   <void property="title">
                     <string>Java 3D Version</string>
@@ -299,7 +299,19 @@
             <postActivation />
             <actions />
             <formComponents>
-              <formComponent name="" id="228" beanClass="com.install4j.runtime.beans.formcomponents.RadiobuttonsComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+              <formComponent name="" id="480" beanClass="com.install4j.runtime.beans.formcomponents.LabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.LabelComponent">
+                      <void property="labelText">
+                        <string>Which version of Java3D should be installed?</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <initScript />
+              </formComponent>
+              <formComponent name="" id="228" beanClass="com.install4j.runtime.beans.formcomponents.RadiobuttonsComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="10" insetBottom="" insetRight="" resetInitOnPrevious="false">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.formcomponents.RadiobuttonsComponent">
@@ -342,18 +354,45 @@
             <postActivation />
             <actions />
             <formComponents>
-              <formComponent name="" id="289" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+              <formComponent name="" id="478" beanClass="com.install4j.runtime.beans.formcomponents.LabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.LabelComponent">
+                      <void property="labelText">
+                        <string>Install Java OpenGL (JOGL):</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <initScript />
+              </formComponent>
+              <formComponent name="" id="289" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="10" insetBottom="" insetRight="" resetInitOnPrevious="false">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
                       <void property="checkboxText">
-                        <string>Install JOGL (Java OpenGL) for this user</string>
+                        <string>For this user</string>
                       </void>
                       <void property="initiallySelected">
                         <boolean>true</boolean>
                       </void>
                       <void property="variableName">
                         <string>installJOGLAction</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <initScript />
+              </formComponent>
+              <formComponent name="" id="475" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="10" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
+                      <void property="checkboxText">
+                        <string>For all users (Administrators only)</string>
+                      </void>
+                      <void property="variableName">
+                        <string>installJOGLActionAll</string>
                       </void>
                     </object>
                   </java>
@@ -496,7 +535,7 @@
                 </serializedBean>
                 <condition>context.getVariable("java3DVersion") != null &amp;&amp; (Integer)context.getVariable("java3DVersion") == 1</condition>
               </action>
-              <action name="Mac-OS Unzip JOGL" id="290" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="Mac-OS Unzip JOGL User" id="290" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
@@ -517,6 +556,28 @@
                   </java>
                 </serializedBean>
                 <condition>context.getBooleanVariable("installJOGLAction")</condition>
+              </action>
+              <action name="Mac-OS Unzip JOGL All" id="479" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
+                      <void property="destinationDirectory">
+                        <object class="java.io.File">
+                          <string>/Library/Java/Extensions</string>
+                        </object>
+                      </void>
+                      <void property="overwriteMode">
+                        <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                      </void>
+                      <void property="zipFile">
+                        <object class="java.io.File">
+                          <string>macos-java3d_jogl.zip</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition>context.getBooleanVariable("installJOGLActionAll")</condition>
               </action>
             </actions>
             <formComponents />
@@ -869,6 +930,7 @@
   </mediaSets>
   <buildIds buildAll="true">
     <mediaSet refId="3" />
+    <mediaSet refId="12" />
   </buildIds>
 </install4j>
 
