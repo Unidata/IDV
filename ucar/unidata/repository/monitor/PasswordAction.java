@@ -56,7 +56,7 @@ public abstract class PasswordAction extends MonitorAction {
     /** _more_ */
     private String password = "";
 
-    private String messageTemplate="A new entry has been created on ${server} by ${entry.user}\n${entry.name} ${entry.url}";
+    protected String messageTemplate=null;
 
 
     /**
@@ -82,7 +82,7 @@ public abstract class PasswordAction extends MonitorAction {
 
 
     public String getMessage(EntryMonitor monitor, Entry entry) {
-        String message  = messageTemplate.replace("${server}", monitor.getRepository().absoluteUrl(""));
+        String message  = getMessageTemplate().replace("${server}", monitor.getRepository().absoluteUrl(monitor.getRepository().getUrlBase()));
         message  = message.replace("${entry.name}", entry.getName());
         message  = message.replace("${entry.fullname}", entry.getFullName());
         message  = message.replace("${entry.user}", entry.getUser().getLabel());
@@ -97,15 +97,14 @@ public abstract class PasswordAction extends MonitorAction {
         super.applyEditForm(request,  monitor);
 
         if(request.exists(getArgId(ARG_ACTION_ID))) {
-            remoteUserId = request.getString(getArgId(ARG_ACTION_ID),remoteUserId);
+            this.remoteUserId = request.getString(getArgId(ARG_ACTION_ID),remoteUserId);
         }
         if(request.exists(getArgId(ARG_ACTION_PASSWORD))) {
-            password = request.getString(getArgId(ARG_ACTION_PASSWORD),password);
+            this.password = request.getString(getArgId(ARG_ACTION_PASSWORD),password);
         }
         if(request.exists(getArgId(ARG_ACTION_MESSAGE))) {
-            messageTemplate = request.getString(getArgId(ARG_ACTION_MESSAGE),messageTemplate);
+            this.messageTemplate = request.getString(getArgId(ARG_ACTION_MESSAGE),getMessageTemplate());
         }
-
     }
 
 
@@ -179,10 +178,15 @@ Get the MessageTemplate property.
 @return The MessageTemplate
 **/
 public String getMessageTemplate () {
+    if(messageTemplate == null) {
+        messageTemplate = getInitialMessageTemplate();
+    }
 	return messageTemplate;
 }
 
-
+    protected String getInitialMessageTemplate() {
+        return "A new entry has been created on ${server} by ${entry.user}\n${entry.name} ${entry.url}";
+    }
 
 }
 

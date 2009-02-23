@@ -69,6 +69,9 @@ public class TwitterAction extends PasswordAction {
         return "Twitter to:" + getRemoteUserId();
     }
 
+    protected String getInitialMessageTemplate() {
+        return "New RAMADDA entry: ${entry.name} ${entry.url}";
+    }
 
     public void addToEditForm(EntryMonitor monitor, StringBuffer sb) {
         sb.append(HtmlUtil.formTable());
