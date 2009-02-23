@@ -119,6 +119,8 @@ public class HtmlUtil {
     /** _more_ */
     public static final String TAG_IMG = "img";
 
+    public static final String TAG_I = "i";
+
     /** _more_ */
     public static final String TAG_INPUT = "input";
 
@@ -389,7 +391,7 @@ public class HtmlUtil {
     public static String hidden(String name, Object value) {
         return tag(TAG_INPUT,
                    attrs(ATTR_TYPE, "hidden", ATTR_NAME, name, ATTR_VALUE,
-                         "" + value));
+                         "" + value,ATTR_CLASS,"hidden"));
     }
 
 
@@ -467,6 +469,10 @@ public class HtmlUtil {
      */
     public static String b(String inner) {
         return tag(TAG_B, "", inner);
+    }
+
+    public static String italics(String inner) {
+        return tag(TAG_I, "", inner);
     }
 
     /**
@@ -1145,7 +1151,8 @@ public class HtmlUtil {
      */
     public static String radio(String name, String value, boolean checked) {
         return tag(TAG_INPUT,
-                   attrs("type", "radio", "name", name, "value", value)
+                   attrs(ATTR_CLASS,"radio",
+                         "type", "radio", "name", name, "value", value)
                    + (checked
                       ? " checked "
                       : ""));
@@ -1180,7 +1187,7 @@ public class HtmlUtil {
                                   String extra) {
         return tag(TAG_INPUT,
                    extra
-                   + attrs("type", "checkbox", "name", name, "value", value)
+                   + attrs(ATTR_CLASS,"checkbox","type", "checkbox", "name", name, "value", value)
                    + (checked
                       ? " checked "
                       : ""));
@@ -1286,7 +1293,8 @@ public class HtmlUtil {
      */
     public static String submitImage(String img, String name) {
         return tag(TAG_INPUT,
-                   attrs(ATTR_NAME, name, ATTR_BORDER, "0", ATTR_SRC, img,
+                   attrs(ATTR_CLASS,"submitimage",ATTR_NAME, name) +
+                   attrs(ATTR_BORDER, "0", ATTR_SRC, img,
                          ATTR_TYPE, "image"));
 
     }
@@ -1304,7 +1312,7 @@ public class HtmlUtil {
     public static String submitImage(String img, String name, String alt) {
         return tag(TAG_INPUT,
                    attrs(ATTR_NAME, name, ATTR_BORDER, "0", ATTR_SRC, img)
-                   + attrs(ATTR_TITLE, alt, ATTR_ALT, alt, ATTR_TYPE,
+                   + attrs(ATTR_CLASS,"submitimage",ATTR_TITLE, alt, ATTR_ALT, alt, ATTR_TYPE,
                            "image"));
     }
 
@@ -1320,7 +1328,7 @@ public class HtmlUtil {
     public static String submit(String label, String name) {
         return tag(TAG_INPUT,
                    attrs(ATTR_NAME, name, ATTR_TYPE, "submit", ATTR_VALUE,
-                         label));
+                         label,ATTR_CLASS,"submit"));
     }
 
     /**
@@ -1331,7 +1339,7 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String submit(String label) {
-        return tag(TAG_INPUT, attrs(ATTR_TYPE, "submit", ATTR_VALUE, label));
+        return tag(TAG_INPUT, attrs(ATTR_CLASS,"submit",ATTR_TYPE, "submit", ATTR_VALUE, label));
     }
 
     /**
@@ -1364,7 +1372,8 @@ public class HtmlUtil {
     public static String textArea(String name, String value, int rows,
                                   int columns, String extra) {
         return tag(TAG_TEXTAREA,
-                   attrs(ATTR_NAME, name, ATTR_ROWS, "" + rows, ATTR_COLS,
+                   attrs(ATTR_NAME, name,ATTR_CLASS,"textarea") +
+                   attrs(ATTR_ROWS, "" + rows, ATTR_COLS,
                          "" + columns) + extra, value);
     }
 
@@ -1376,7 +1385,7 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String password(String name) {
-        return tag(TAG_INPUT, attrs(ATTR_TYPE, "password", ATTR_NAME, name));
+        return tag(TAG_INPUT, attrs(ATTR_CLASS,"password",ATTR_TYPE, "password", ATTR_NAME, name));
     }
 
 
@@ -1414,7 +1423,7 @@ public class HtmlUtil {
      */
     public static String input(String name, Object value, String extra) {
         return tag(TAG_INPUT,
-                   attrs(ATTR_NAME, name, ATTR_VALUE, ((value == null)
+                   attrs(ATTR_CLASS,"input",ATTR_NAME, name, ATTR_VALUE, ((value == null)
                 ? ""
                 : value.toString())) + " " + extra);
     }
@@ -1430,7 +1439,7 @@ public class HtmlUtil {
      */
     public static String fileInput(String name, String extra) {
         return tag(TAG_INPUT,
-                   attrs(ATTR_TYPE, "file", ATTR_NAME, name) + " " + extra);
+                   attrs(ATTR_CLASS,"fileinput",ATTR_TYPE, "file", ATTR_NAME, name) + " " + extra);
     }
 
     /**
@@ -1558,7 +1567,7 @@ public class HtmlUtil {
                                 List<String> selected, String extra,
                                 int maxLength) {
         StringBuffer sb = new StringBuffer();
-        sb.append(open(TAG_SELECT, attrs(ATTR_NAME, name) + extra));
+        sb.append(open(TAG_SELECT, attrs(ATTR_NAME, name,ATTR_CLASS,"select") + extra));
         for (int i = 0; i < values.size(); i++) {
             Object obj = values.get(i);
             String value;
@@ -1733,7 +1742,7 @@ public class HtmlUtil {
      */
     public static String formTable() {
         return open(TAG_TABLE,
-                    attrs(ATTR_CELLPADDING, "5", ATTR_CELLSPACING, "5"));
+                    attrs(ATTR_CELLPADDING, "3", ATTR_CELLSPACING, "3"));
     }
 
 
