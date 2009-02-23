@@ -171,6 +171,18 @@ CREATE INDEX SESSIONS_INDEX_USER_ID ON sessions (USER_ID);
 
 
 -----------------------------------------------------------------------
+--- entry monitors
+-----------------------------------------------------------------------
+CREATE TABLE  monitors (
+	monitor_id varchar(200),
+        name       varchar(500),
+	user_id  varchar(200),
+	from_date ramadda.datetime, 
+        to_date  ramadda.datetime,
+        encoded_object  ramadda.clob);  
+
+
+-----------------------------------------------------------------------
 ---  permissions on entries
 -----------------------------------------------------------------------
 CREATE TABLE  permissions (

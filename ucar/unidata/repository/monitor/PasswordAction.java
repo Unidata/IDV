@@ -56,7 +56,7 @@ public abstract class PasswordAction extends MonitorAction {
     /** _more_ */
     private String password = "";
 
-    private String messageTemplate="";
+    private String messageTemplate="A new entry has been created on ${server} by ${entry.user}\n${entry.name} ${entry.url}";
 
 
     /**
@@ -80,6 +80,18 @@ public abstract class PasswordAction extends MonitorAction {
         this.password     = password;
     }
 
+
+    public String getMessage(EntryMonitor monitor, Entry entry) {
+        String message  = messageTemplate.replace("${server}", monitor.getRepository().absoluteUrl(""));
+        message  = message.replace("${entry.name}", entry.getName());
+        message  = message.replace("${entry.fullname}", entry.getFullName());
+        message  = message.replace("${entry.user}", entry.getUser().getLabel());
+        String url =
+            HtmlUtil.url(monitor.getRepository().URL_ENTRY_SHOW.getFullUrl(),
+                         ARG_ENTRYID, entry.getId());
+        message  = message.replace("${entry.url}", url);
+        return message;
+    }
 
     public void applyEditForm(Request request, EntryMonitor monitor) {
         super.applyEditForm(request,  monitor);

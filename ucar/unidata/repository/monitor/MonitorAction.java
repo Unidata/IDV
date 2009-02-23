@@ -34,7 +34,7 @@ import ucar.unidata.repository.*;
  * @author IDV Development Team
  * @version $Revision: 1.30 $
  */
-public class MonitorAction implements Constants {
+public abstract class MonitorAction implements Constants {
 
     private String id;
 
@@ -48,6 +48,12 @@ public class MonitorAction implements Constants {
 
     public MonitorAction(String id) {
         this.id = id;
+    }
+
+    public abstract String getActionName();
+
+    public String getSummary() {
+        return getActionName();
     }
 
     protected String getArgId(String prefix) {

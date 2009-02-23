@@ -1517,7 +1517,7 @@ public class TypeHandler extends RepositoryManager {
         //        request.remove(ARG_TODATE);
 
 
-        List<TypeHandler> typeHandlers = getRepository().getTypeHandlers();
+
         //        List<TypeHandler> typeHandlers =
         //            getRepository().getTypeHandlers(request);
 
@@ -1558,9 +1558,17 @@ public class TypeHandler extends RepositoryManager {
         StringBuffer basicSB    = new StringBuffer(HtmlUtil.formTable());
         StringBuffer advancedSB = new StringBuffer(HtmlUtil.formTable());
 
+
         addTextSearch(request, basicSB);
+        if(request.defined(ARG_USER_ID)) {
+            basicSB.append(
+                HtmlUtil.formEntry(
+                    msgLabel("User"),
+                    HtmlUtil.input(ARG_USER_ID, request.getString(ARG_USER_ID,""))));
+        }
 
 
+        List<TypeHandler> typeHandlers = getRepository().getTypeHandlers();
         if (true || (typeHandlers.size() > 1)) {
             List tmp = new ArrayList();
             for (TypeHandler typeHandler : typeHandlers) {
@@ -1625,16 +1633,8 @@ public class TypeHandler extends RepositoryManager {
          * }
          */
 
-        advancedSB.append(HtmlUtil.formEntry(msgLabel("File Suffix"),
-                                             HtmlUtil.input(ARG_FILESUFFIX,
-                                                 "", " size=\"8\" ")));
 
-
-
-
-
-
-
+        addSearchField(request, ARG_FILESUFFIX,advancedSB);
 
         basicSB.append(
             HtmlUtil.formEntry(
@@ -1767,6 +1767,17 @@ public class TypeHandler extends RepositoryManager {
         formBuffer.append(HtmlUtil.makeShowHideBlock(msg("Advanced"),
                 advancedSB.toString(), false));
     }
+
+
+    public void addSearchField(Request request, String what,StringBuffer sb) {
+        if(what.equals(ARG_FILESUFFIX)) {
+            sb.append(HtmlUtil.formEntry(msgLabel("File Suffix"),
+                                         HtmlUtil.input(ARG_FILESUFFIX,
+                                                        "", " size=\"8\" ")));
+        } 
+    }
+
+
 
 
     /**

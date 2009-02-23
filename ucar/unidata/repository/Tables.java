@@ -760,5 +760,31 @@ public class Tables {
     ;
 
 
+public static class MONITORS {
+public static final String NAME = "monitors";
+public static final String COL_MONITOR_ID = NAME + ".monitor_id";
+public static final String COL_NAME     = NAME + ".name";
+public static final String COL_USER_ID = NAME + ".user_id";
+public static final String COL_FROM_DATE = NAME + ".from_date";
+public static final String COL_TO_DATE = NAME + ".to_date";
+public static final String COL_ENCODED_OBJECT = NAME + ".encoded_object";
+public static final String []ARRAY= new String[] {
+COL_MONITOR_ID,COL_NAME,COL_USER_ID,COL_FROM_DATE,COL_TO_DATE,COL_ENCODED_OBJECT
+};
+
+
+public static final String COLUMNS = SqlUtil.comma(ARRAY);
+public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
+public static final String INSERT=
+SqlUtil.makeInsert(
+NAME,
+NODOT_COLUMNS,
+SqlUtil.getQuestionMarks(ARRAY.length));
+
+};
+
+
+
+
 }
 

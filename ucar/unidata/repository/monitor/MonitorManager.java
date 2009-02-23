@@ -37,7 +37,9 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
+
 import ucar.unidata.xml.XmlUtil;
+import ucar.unidata.xml.XmlEncoder;
 
 import java.io.File;
 
@@ -74,7 +76,7 @@ import java.util.Properties;
 public class MonitorManager extends RepositoryManager {
 
     /** _more_ */
-    private List<EntryMonitor> entryMonitors =
+    private List<EntryMonitor> monitors =
         new ArrayList<EntryMonitor>();
 
 
@@ -88,20 +90,40 @@ public class MonitorManager extends RepositoryManager {
     public MonitorManager(Repository repository) {
         super(repository);
         try {
+            initMonitors();
         } catch(Exception exc) {
+            throw new RuntimeException(exc);
         }
     }
 
 
+    private void initMonitors() throws Exception {
+        Statement stmt = getDatabaseManager().select(Tables.MONITORS.COL_ENCODED_OBJECT,
+                                                     Tables.MONITORS.NAME, new Clause(),
+                                                     " order by " + Tables.MONITORS.COL_NAME);
+        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        ResultSet        results;
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                String xml  =results.getString(1);
+                EntryMonitor monitor = (EntryMonitor) new XmlEncoder().toObject(xml);
+                monitor.setRepository(getRepository());
+                monitors.add(monitor);
+            }
+        }
+        
+    }
+
+
     public List<EntryMonitor> getEntryMonitors() {
-        return entryMonitors;
+        return monitors;
     }
 
 
     public Result processEntryListen(Request request) throws Exception {
         SynchronousEntryMonitor entryMonitor = new SynchronousEntryMonitor(getRepository(), request);
-        synchronized (entryMonitors) {
-            entryMonitors.add(entryMonitor);
+        synchronized (monitors) {
+            monitors.add(entryMonitor);
         }
         synchronized (entryMonitor) {
             entryMonitor.wait();
@@ -122,14 +144,22 @@ public class MonitorManager extends RepositoryManager {
      *
      * @param entries _more_
      */
-    public void checkNewEntries(List<Entry> entries) {
+    public void checkNewEntries(final List<Entry> entries) {
+        Misc.run(new Runnable(){
+                public void run() {
+                    checkNewEntriesInner(entries);
+                }
+            });
+    }
+
+    private void checkNewEntriesInner(List<Entry> entries) {
         try {
-            List<EntryMonitor> monitors;
-            synchronized (entryMonitors) {
-                monitors = new ArrayList<EntryMonitor>(entryMonitors);
+            List<EntryMonitor> tmpMonitors;
+            synchronized (monitors) {
+                tmpMonitors = new ArrayList<EntryMonitor>(monitors);
             }
             for (Entry entry : entries) {
-                for (EntryMonitor entryMonitor : monitors) {
+                for (EntryMonitor entryMonitor : tmpMonitors) {
                     entryMonitor.checkEntry(entry);
                 }
             }
@@ -141,21 +171,52 @@ public class MonitorManager extends RepositoryManager {
 
 
 
-    public void deleteMonitor(Request request, EntryMonitor monitor) throws Exception {
-        entryMonitors.remove(monitor);
+    private void deleteMonitor(EntryMonitor monitor) throws Exception {
+        monitors.remove(monitor);
+        if(!monitor.getEditable()) return;
+        getDatabaseManager().delete(Tables.MONITORS.NAME,
+                                    Clause.eq(Tables.MONITORS.COL_MONITOR_ID,
+                                              monitor.getId()));
+
     }        
 
+    private void insertMonitor(EntryMonitor monitor) throws Exception {
+        String xml = new XmlEncoder().toXml(monitor);
+        getDatabaseManager().executeInsert(Tables.MONITORS.INSERT,
+                                           new Object[] { monitor.getId(),
+                                                          monitor.getName(),
+                                                          monitor.getUser().getId(),
+                                                          monitor.getFromDate(),
+                                                          monitor.getToDate(),
+                                                          xml});
+    }
+
+    private void addNewMonitor(EntryMonitor monitor) throws Exception {
+        monitors.add(monitor);
+        if(!monitor.getEditable()) return;
+        insertMonitor(monitor);
+    }
+
+    private void updateMonitor(EntryMonitor monitor) throws Exception {
+        if(!monitor.getEditable()) return;
+        getDatabaseManager().delete(Tables.MONITORS.NAME,
+                                    Clause.eq(Tables.MONITORS.COL_MONITOR_ID,
+                                              monitor.getId()));
+        
+
+        insertMonitor(monitor);
+    }
 
     public Result processMonitorEdit(Request request,EntryMonitor monitor) throws Exception {
 
-
         if(request.exists(ARG_MONITOR_DELETE_CONFIRM)) {
-            deleteMonitor(request, monitor);
-            return new Result(request.url(getRepositoryBase().URL_USER_MONITORS));
+            deleteMonitor(monitor);
+            return new Result(request.url(getRepositoryBase().URL_USER_MONITORS,ARG_MESSAGE,"Monitor deleted"));
         }
 
         if(request.exists(ARG_MONITOR_CHANGE)) {
             monitor.applyEditForm(request);
+            updateMonitor(monitor);
             return new Result(HtmlUtil.url(
                                            getRepositoryBase().URL_USER_MONITORS.toString(),
                                            ARG_MONITOR_ID,
@@ -208,28 +269,49 @@ public class MonitorManager extends RepositoryManager {
         } else {
             System.err.println("unknown type:" + type);
         }
-        entryMonitors.add(monitor);
+        addNewMonitor(monitor);
         return new Result(HtmlUtil.url(
                                        getRepositoryBase().URL_USER_MONITORS.toString(),
                                        ARG_MONITOR_ID,
                                        monitor.getId()));
     }
 
+
+
+    public  boolean canView(Request request, EntryMonitor monitor) throws Exception {
+        if(request.getUser().getAdmin()) return true;
+        return Misc.equals(monitor.getUser(), request.getUser());
+    }
+
+    public  List<EntryMonitor> getEditableMonitors(Request request, List<EntryMonitor> monitors) throws Exception {
+        List<EntryMonitor> result = new ArrayList<EntryMonitor>();
+        for(EntryMonitor monitor: monitors) {
+            if(monitor.getEditable() && canView(request, monitor))  {
+                result.add(monitor);
+            }
+        }
+        return result;
+    }
+
+
     public Result processMonitors(Request request) throws Exception {
+        if(request.getUser().getAnonymous()) {
+            throw new IllegalArgumentException("Cannot access monitors");
+        }
         StringBuffer sb   = new StringBuffer();
-        List<EntryMonitor> monitors = EntryMonitor.getEditable(getEntryMonitors());
+        List<EntryMonitor> monitors = getEditableMonitors(request, getEntryMonitors());
         if(request.exists(ARG_MONITOR_ID)) {
-            EntryMonitor entryMonitor = EntryMonitor.findMonitor(monitors,request.getString(ARG_MONITOR_ID,""));
-            if(entryMonitor==null) {
+            EntryMonitor monitor = EntryMonitor.findMonitor(monitors,request.getString(ARG_MONITOR_ID,""));
+            if(monitor==null) {
                 throw new IllegalArgumentException("Could not find entry monitor");
             }
-            if(!entryMonitor.getEditable()) {
+            if(!monitor.getEditable()) {
                 throw new IllegalArgumentException("Entry monitor is not editable");
             }
-            if(!request.getUser().getAdmin() && !Misc.equals(entryMonitor.getUser(), request.getUser())) {
+            if(!canView(request, monitor)) {
                 throw new IllegalArgumentException("You are not allowed to edit thr monitor");                
             }
-            return processMonitorEdit(request, entryMonitor);
+            return processMonitorEdit(request, monitor);
         }
 
         if(request.exists(ARG_MONITOR_CREATE)) {
@@ -250,12 +332,14 @@ public class MonitorManager extends RepositoryManager {
 
         sb.append(HtmlUtil.p());
 
-        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,HtmlUtil.attrs(HtmlUtil.ATTR_CELLPADDING,"4",HtmlUtil.ATTR_CELLSPACING,"0")));
         if(monitors.size()>0) {
-            sb.append(HtmlUtil.row(HtmlUtil.cols("",msg("Enabled"),msg("Monitor"),msg("User"))));
+            sb.append(HtmlUtil.row(HtmlUtil.cols("",boldMsg("Monitor"),boldMsg("User"),boldMsg("Search Criteria"),boldMsg("Action"))));
         }
         for(EntryMonitor monitor: monitors) {
-            sb.append(HtmlUtil.open(HtmlUtil.TAG_TR));
+            sb.append(HtmlUtil.open(HtmlUtil.TAG_TR,HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,"top")+
+                                    (!monitor.isActive()?HtmlUtil.attr(HtmlUtil.ATTR_BGCOLOR,"#cccccc"):"")
+                                    ));
             sb.append(HtmlUtil.open(HtmlUtil.TAG_TD));
             sb.append(HtmlUtil.href(HtmlUtil.url(
                                                  getRepositoryBase().URL_USER_MONITORS.toString(),
@@ -268,24 +352,17 @@ public class MonitorManager extends RepositoryManager {
                                                  "true",
                                                  ARG_MONITOR_ID,
                                                  monitor.getId()),HtmlUtil.img(iconUrl(ICON_DELETE))));
-            sb.append(HtmlUtil.close(HtmlUtil.TAG_TD));
-            sb.append(HtmlUtil.open(HtmlUtil.TAG_TD));
-            if(monitor.getEnabled()) {
-                sb.append(msg("Yes"));
-            } else {
-                sb.append(msg("No"));
+            if(!monitor.isActive()) {
+                sb.append(HtmlUtil.space(1));
+                sb.append(msg("not active"));
             }
             sb.append(HtmlUtil.close(HtmlUtil.TAG_TD));
 
-            sb.append(HtmlUtil.open(HtmlUtil.TAG_TD));
-            sb.append(monitor.getName());
-            sb.append(HtmlUtil.close(HtmlUtil.TAG_TD));
 
-            sb.append(HtmlUtil.open(HtmlUtil.TAG_TD));
-            sb.append(monitor.getUser().getLabel());
-            sb.append(HtmlUtil.close(HtmlUtil.TAG_TD));
-
-
+            sb.append(HtmlUtil.col(monitor.getName()));
+            sb.append(HtmlUtil.col(monitor.getUser().getLabel()));
+            sb.append(HtmlUtil.col(monitor.getSearchSummary()));
+            sb.append(HtmlUtil.col(monitor.getActionSummary()));
             sb.append(HtmlUtil.close(HtmlUtil.TAG_TR));
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));

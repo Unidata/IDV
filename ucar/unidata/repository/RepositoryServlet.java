@@ -357,6 +357,7 @@ public class RepositoryServlet extends HttpServlet {
          */
         public void getFormArgs(HttpServletRequest request)
                 throws IOException {
+
             if (ServletFileUpload.isMultipartContent(request)) {
                 ServletFileUpload upload =
                     new ServletFileUpload(new DiskFileItemFactory());
@@ -385,8 +386,14 @@ public class RepositoryServlet extends HttpServlet {
                     Map.Entry pairs = (Map.Entry) it.next();
                     String    key   = (String) pairs.getKey();
                     String[]  vals  = (String[]) pairs.getValue();
-                    if (vals.length > 0) {
+                    if (vals.length ==1) {
                         formArgs.put(key, vals[0]);
+                    } else  if (vals.length >1) {
+                        List values = new ArrayList();
+                        for(int i=0;i<vals.length;i++) {
+                            values.add(vals[i]);
+                        }
+                        formArgs.put(key, values);
                     }
                 }
             }
@@ -402,6 +409,7 @@ public class RepositoryServlet extends HttpServlet {
         public void processFormField(FileItem item) {
             String name  = item.getFieldName();
             String value = item.getString();
+            //            System.err.println("name:" + name);
             formArgs.put(name, value);
         }
 

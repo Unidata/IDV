@@ -77,6 +77,10 @@ public class SynchronousEntryMonitor extends EntryMonitor {
     }
 
 
+    public  String getActionName() {
+        return "Synchronous Action";
+   }
+
     protected void entryMatched(Entry entry) {
         this.entry = entry;
         synchronized (this) {

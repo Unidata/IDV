@@ -52,17 +52,7 @@ public class Filter implements Constants {
         ARG_TEXT,
         ARG_TYPE,
         ARG_USER,
-        ARG_NAME,
-        ARG_DESCRIPTION};
-
-    public static final String[] FIELD_NAMES = {
-        "Text",
-        "Type",
-        "User",
-        "Name",
-        "Description"};
-
-
+        ARG_FILESUFFIX};
 
 
     /** _more_ */
@@ -99,73 +89,13 @@ public class Filter implements Constants {
     public Filter(String field, Object value, boolean doNot) {
         this.field = field;
         this.value = value;
+        this.doNot = doNot;
     }
 
 
 
-    /**
-     * _more_
-     *
-     * @param s1 _more_
-     * @param s2 _more_
-     *
-     * @return _more_
-     */
-    public boolean nameMatch(String s1, String s2) {
-        //TODO: We need to have a StringMatcher object
-        if (s1.endsWith("%")) {
-            s1 = s1.substring(0, s1.length() - 1);
-            return s2.startsWith(s1);
-        }
-        if (s1.startsWith("%")) {
-            s1 = s1.substring(1);
-            return s2.endsWith(s1);
-        }
-        return s2.equals(s1);
-    }
-
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     *
-     * @return _more_
-     */
-    public boolean checkEntry(Entry entry) {
-        boolean ok = false;
-        if (field.equals(ARG_TYPE)) {
-            ok = value.equals(entry.getTypeHandler().getType());
-        } else if (field.equals(ARG_NAME)) {
-            ok = nameMatch(value.toString(), entry.getName());
-        } else if (field.equals(ARG_DESCRIPTION)) {
-            ok = nameMatch(value.toString(), entry.getDescription());
-        } else if (field.equals(ARG_TEXT)) {
-            ok = nameMatch(value.toString(), entry.getDescription())
-                 || nameMatch(value.toString(), entry.getName());
-        } else if (field.equals(ARG_USER)) {
-            ok = Misc.equals(entry.getUser().getId(), value.toString());
-        } else if (field.equals(ARG_WAIT)) {
-            ok = true;
-        } else if (field.equals(ARG_GROUP)) {
-            //TODO: check for subgroups
-            //                ok = (value.equals(entry.getParentGroup().getFullName())
-            //                      || value.equals(entry.getParentGroup().getId()));
-        } else {
-            int match = entry.getTypeHandler().matchValue(field, value,
-                            entry);
-            if (match == TypeHandler.MATCH_FALSE) {
-                ok = false;
-            } else if (match == TypeHandler.MATCH_TRUE) {
-                ok = true;
-            } else {
-                System.err.println("unknown field:" + field);
-                return true;
-            }
-        }
-        if (doNot) {
-            return !ok;
-        }
-        return ok;
+    public String toString() {
+        return field+"=" + value;
     }
 
     /**
@@ -192,7 +122,7 @@ public class Filter implements Constants {
      * @param value The new value for Value
      */
     public void setValue(Object value) {
-        value = value;
+        this.value = value;
     }
 
     /**

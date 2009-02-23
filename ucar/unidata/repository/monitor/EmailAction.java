@@ -65,6 +65,14 @@ public class EmailAction extends PasswordAction {
     }
 
 
+    public  String getActionName() {
+        return "Email Action";
+   }
+
+    public String getSummary() {
+        return "Send an email to " + getRemoteUserId();
+    }
+
     public void addToEditForm(EntryMonitor monitor, StringBuffer sb) {
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.colspan("Send an email",2));
@@ -78,8 +86,6 @@ public class EmailAction extends PasswordAction {
     }
 
 
-
-
     /**
      * _more_
      *
@@ -87,23 +93,20 @@ public class EmailAction extends PasswordAction {
      */
     protected void entryMatched(EntryMonitor monitor, Entry entry) {
         try {
-            String url =
-                HtmlUtil.url(monitor.getRepository().URL_ENTRY_SHOW.getFullUrl(),
-                             ARG_ENTRYID, entry.getId());
-            StringBuffer message = new StringBuffer("New entry:"
-                                       + entry.getFullName() + "\n" + url);
-            String userId = getRemoteUserId();
+        String from   = monitor.getUser().getEmail();
+        if ((from == null) || (from.trim().length() == 0)) {
+            from = monitor.getRepository().getProperty(PROP_ADMIN_EMAIL, "");
+        }
 
-            String from   = monitor.getUser().getEmail();
-            if ((from == null) || (from.trim().length() == 0)) {
-                monitor.getRepository().getAdmin().sendEmail(userId, "New Entry",
-                        message.toString(), false);
-            } else {
-                monitor.getRepository().getAdmin().sendEmail(userId, from,
-                        "New Entry", message.toString(), false);
-            }
+        try {
+            String message= getMessage(monitor, entry);
+            monitor.getRepository().getAdmin().sendEmail(getRemoteUserId(), from,
+                                                             "New Entry", message, false);
         } catch (Exception exc) {
-            monitor.handleError("Error posting to Twitter", exc);
+            monitor.handleError("Error sending email to " + getRemoteUserId() + " from:" + from, exc);
+        }
+        } catch (Exception exc2) {
+            monitor.handleError("Error:", exc2);
         }
     }
 

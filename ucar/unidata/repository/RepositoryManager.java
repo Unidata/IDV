@@ -202,6 +202,10 @@ public class RepositoryManager implements RepositorySource, Constants,
         return Repository.msg(msg);
     }
 
+    public static String boldMsg(String msg) {
+        return HtmlUtil.b(msg(msg));
+    }
+
     /**
      * _more_
      *

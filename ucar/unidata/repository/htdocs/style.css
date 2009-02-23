@@ -6,6 +6,23 @@ body {
    margin: 0px;
 }
 
+.input, .password, .fileinput,.textarea,.select {
+  border : 1px #888888 solid;
+}
+
+
+
+.hidden {
+  border :none;
+}
+
+.submit {
+  xborder : 1px #666666 outset;
+  margin-left:3px;
+  margin-right:3px;
+  xfont-weight: bold;
+}
+
 
 a {
    color: #0000FF;
@@ -85,6 +102,9 @@ a.header  {
 }
 
 
+
+.content {
+}
 
 .header-content {
   color: white;
@@ -231,7 +251,6 @@ a.header-left  {
 
 .subnavoffcomp-left  {
    font-weight: bold;
-   xcolor:#000000;
    color:red;
    border-bottom : 1px #666666 solid;
    margin:0;
@@ -258,13 +277,6 @@ a.header-left  {
 
 
 
-
-
-
-
-.content {
-    xmargin:5;
-}
 
 
 

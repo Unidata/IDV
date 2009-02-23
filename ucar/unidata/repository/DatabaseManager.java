@@ -859,6 +859,7 @@ public class DatabaseManager extends RepositoryManager {
             sql = sql.replace("ramadda.datetime", "timestamp");
             sql = sql.replace("ramadda.clob", "clob(64000)");
         } else if (db.equals(DB_POSTGRES)) {
+            //TODO: handle ramadda.clob
             sql = sql.replace("ramadda.double", "float8");
             sql = sql.replace("ramadda.datetime", "timestamp");
         }
