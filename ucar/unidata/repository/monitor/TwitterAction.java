@@ -93,22 +93,12 @@ public class TwitterAction extends PasswordAction {
     protected void entryMatched(EntryMonitor monitor, Entry entry) {
         try {
             super.entryMatched(monitor, entry);
-            System.err.println("twitter got entry ");
-            if (true) {
-                return;
-            }
-
 
             twitter4j.Twitter twitter =
                 new twitter4j.Twitter(getRemoteUserId(), getPassword());
-            String url1 =
-                HtmlUtil.url(monitor.getRepository().URL_ENTRY_SHOW.getFullUrl(),
-                             ARG_ENTRYID, entry.getId());
-            twitter4j.Status status = twitter.update("New entry:"
-                                          + entry.getFullName() + "\n"
-                                          + url1);
-            System.out.println("Successfully updated the status to ["
-                               + status.getText() + "].");
+            twitter4j.Status status = twitter.update(getMessage(monitor,entry));
+            System.out.println("Successfully sent a twitter message: ["
+                               + status.getText() + "]");
         } catch (Exception exc) {
             monitor.handleError("Error posting to Twitter", exc);
         }
