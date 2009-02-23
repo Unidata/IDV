@@ -230,6 +230,8 @@ public class HtmlUtil {
     /** _more_ */
     public static final String ATTR_SELECTED = "selected";
 
+    public static final String ATTR_SIZE = "size";
+
     /** _more_ */
     public static final String ATTR_SRC = "src";
 
