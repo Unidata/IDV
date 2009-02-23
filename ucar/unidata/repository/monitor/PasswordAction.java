@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.repository.monitor;
 
 
@@ -45,8 +46,13 @@ import java.util.List;
  */
 public abstract class PasswordAction extends MonitorAction {
 
+    /** _more_          */
     public static final String ARG_ACTION_ID = "action_id";
+
+    /** _more_          */
     public static final String ARG_ACTION_PASSWORD = "action_password";
+
+    /** _more_          */
     public static final String ARG_ACTION_MESSAGE = "action_message";
 
 
@@ -56,7 +62,8 @@ public abstract class PasswordAction extends MonitorAction {
     /** _more_ */
     private String password = "";
 
-    protected String messageTemplate=null;
+    /** _more_          */
+    protected String messageTemplate = null;
 
 
     /**
@@ -71,6 +78,8 @@ public abstract class PasswordAction extends MonitorAction {
      *
      * @param repository _more_
      * @param user _more_
+     *
+     * @param id _more_
      * @param remoteUserId _more_
      * @param password _more_
      */
@@ -81,29 +90,51 @@ public abstract class PasswordAction extends MonitorAction {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param monitor _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public String getMessage(EntryMonitor monitor, Entry entry) {
-        String message  = getMessageTemplate().replace("${server}", monitor.getRepository().absoluteUrl(monitor.getRepository().getUrlBase()));
-        message  = message.replace("${entry.name}", entry.getName());
-        message  = message.replace("${entry.fullname}", entry.getFullName());
-        message  = message.replace("${entry.user}", entry.getUser().getLabel());
+        String message = getMessageTemplate().replace(
+                             "${server}",
+                             monitor.getRepository().absoluteUrl(
+                                 monitor.getRepository().getUrlBase()));
+        message = message.replace("${entry.name}", entry.getName());
+        message = message.replace("${entry.fullname}", entry.getFullName());
+        message = message.replace("${entry.user}",
+                                  entry.getUser().getLabel());
         String url =
             HtmlUtil.url(monitor.getRepository().URL_ENTRY_SHOW.getFullUrl(),
                          ARG_ENTRYID, entry.getId());
-        message  = message.replace("${entry.url}", url);
+        message = message.replace("${entry.url}", url);
         return message;
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param monitor _more_
+     */
     public void applyEditForm(Request request, EntryMonitor monitor) {
-        super.applyEditForm(request,  monitor);
+        super.applyEditForm(request, monitor);
 
-        if(request.exists(getArgId(ARG_ACTION_ID))) {
-            this.remoteUserId = request.getString(getArgId(ARG_ACTION_ID),remoteUserId);
+        if (request.exists(getArgId(ARG_ACTION_ID))) {
+            this.remoteUserId = request.getString(getArgId(ARG_ACTION_ID),
+                    remoteUserId);
         }
-        if(request.exists(getArgId(ARG_ACTION_PASSWORD))) {
-            this.password = request.getString(getArgId(ARG_ACTION_PASSWORD),password);
+        if (request.exists(getArgId(ARG_ACTION_PASSWORD))) {
+            this.password = request.getString(getArgId(ARG_ACTION_PASSWORD),
+                    password);
         }
-        if(request.exists(getArgId(ARG_ACTION_MESSAGE))) {
-            this.messageTemplate = request.getString(getArgId(ARG_ACTION_MESSAGE),getMessageTemplate());
+        if (request.exists(getArgId(ARG_ACTION_MESSAGE))) {
+            this.messageTemplate =
+                request.getString(getArgId(ARG_ACTION_MESSAGE),
+                                  getMessageTemplate());
         }
     }
 
@@ -163,27 +194,32 @@ public abstract class PasswordAction extends MonitorAction {
         return remoteUserId;
     }
 
-/**
-Set the MessageTemplate property.
-
-@param value The new value for MessageTemplate
-**/
-public void setMessageTemplate (String value) {
-	messageTemplate = value;
-}
-
-/**
-Get the MessageTemplate property.
-
-@return The MessageTemplate
-**/
-public String getMessageTemplate () {
-    if(messageTemplate == null) {
-        messageTemplate = getInitialMessageTemplate();
+    /**
+     * Set the MessageTemplate property.
+     *
+     * @param value The new value for MessageTemplate
+     */
+    public void setMessageTemplate(String value) {
+        messageTemplate = value;
     }
-	return messageTemplate;
-}
 
+    /**
+     * Get the MessageTemplate property.
+     *
+     * @return The MessageTemplate
+     */
+    public String getMessageTemplate() {
+        if (messageTemplate == null) {
+            messageTemplate = getInitialMessageTemplate();
+        }
+        return messageTemplate;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected String getInitialMessageTemplate() {
         return "A new entry has been created on ${server} by ${entry.user}\n${entry.name} ${entry.url}";
     }

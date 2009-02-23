@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.repository.monitor;
 
 
@@ -53,36 +54,68 @@ public class TwitterAction extends PasswordAction {
     /**
      * _more_
      *
+     *
+     * @param id _more_
      * @param remoteUserId _more_
      * @param password _more_
      */
     public TwitterAction(String id, String remoteUserId, String password) {
-        super(id,remoteUserId, password);
+        super(id, remoteUserId, password);
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getActionName() {
         return "Twitter Action";
-   }
+    }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getSummary() {
         return "Twitter to:" + getRemoteUserId();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected String getInitialMessageTemplate() {
         return "New RAMADDA entry: ${entry.name} ${entry.url}";
     }
 
+    /**
+     * _more_
+     *
+     * @param monitor _more_
+     * @param sb _more_
+     */
     public void addToEditForm(EntryMonitor monitor, StringBuffer sb) {
         sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.colspan("Twitter Action",2));
+        sb.append(HtmlUtil.colspan("Twitter Action", 2));
         sb.append(HtmlUtil.formEntry("Twitter ID:",
-                                     HtmlUtil.input(getArgId(ARG_ACTION_ID),getRemoteUserId(),HtmlUtil.SIZE_60)));
-        sb.append(HtmlUtil.formEntry("Twitter Password:",
-                                     HtmlUtil.input(getArgId(ARG_ACTION_PASSWORD),getPassword(),HtmlUtil.SIZE_60)));
-        sb.append(HtmlUtil.formEntryTop("Message:",
-                                        HtmlUtil.textArea(getArgId(ARG_ACTION_MESSAGE),getMessageTemplate(),
-                                                          5,60)));
+                                     HtmlUtil.input(getArgId(ARG_ACTION_ID),
+                                         getRemoteUserId(),
+                                         HtmlUtil.SIZE_60)));
+        sb.append(
+            HtmlUtil.formEntry(
+                "Twitter Password:",
+                HtmlUtil.input(
+                    getArgId(ARG_ACTION_PASSWORD), getPassword(),
+                    HtmlUtil.SIZE_60)));
+        sb.append(
+            HtmlUtil.formEntryTop(
+                "Message:",
+                HtmlUtil.textArea(
+                    getArgId(ARG_ACTION_MESSAGE), getMessageTemplate(), 5,
+                    60)));
         sb.append(HtmlUtil.formTableClose());
     }
 
@@ -91,6 +124,8 @@ public class TwitterAction extends PasswordAction {
     /**
      * _more_
      *
+     *
+     * @param monitor _more_
      * @param entry _more_
      */
     protected void entryMatched(EntryMonitor monitor, Entry entry) {
@@ -99,7 +134,8 @@ public class TwitterAction extends PasswordAction {
 
             twitter4j.Twitter twitter =
                 new twitter4j.Twitter(getRemoteUserId(), getPassword());
-            twitter4j.Status status = twitter.update(getMessage(monitor,entry));
+            twitter4j.Status status = twitter.update(getMessage(monitor,
+                                          entry));
             System.out.println("Successfully sent a twitter message: ["
                                + status.getText() + "]");
         } catch (Exception exc) {

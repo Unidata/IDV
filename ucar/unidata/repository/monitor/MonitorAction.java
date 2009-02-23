@@ -21,6 +21,7 @@
 
 
 
+
 package ucar.unidata.repository.monitor;
 
 
@@ -36,8 +37,8 @@ import ucar.unidata.repository.*;
  */
 public abstract class MonitorAction implements Constants {
 
+    /** _more_          */
     private String id;
-
 
 
     /**
@@ -46,54 +47,86 @@ public abstract class MonitorAction implements Constants {
     public MonitorAction() {}
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     */
     public MonitorAction(String id) {
         this.id = id;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public abstract String getActionName();
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getSummary() {
         return getActionName();
     }
 
+    /**
+     * _more_
+     *
+     * @param prefix _more_
+     *
+     * @return _more_
+     */
     protected String getArgId(String prefix) {
-        return prefix +"_"+id;
+        return prefix + "_" + id;
     }
 
-    public void addToEditForm(EntryMonitor monitor, StringBuffer sb) {
+    /**
+     * _more_
+     *
+     * @param monitor _more_
+     * @param sb _more_
+     */
+    public void addToEditForm(EntryMonitor monitor, StringBuffer sb) {}
 
-    }
-    public void applyEditForm(Request request, EntryMonitor monitor) {
-
-    }
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param monitor _more_
+     */
+    public void applyEditForm(Request request, EntryMonitor monitor) {}
 
 
     /**
      * _more_
      *
+     *
+     * @param monitor _more_
      * @param entry _more_
      */
-    protected void entryMatched(EntryMonitor monitor, Entry entry) {
-    }
+    protected void entryMatched(EntryMonitor monitor, Entry entry) {}
 
 
 
     /**
-       Set the Id property.
-
-       @param value The new value for Id
-    **/
-    public void setId (String value) {
-	id = value;
+     *  Set the Id property.
+     *
+     *  @param value The new value for Id
+     */
+    public void setId(String value) {
+        id = value;
     }
 
     /**
-       Get the Id property.
-
-       @return The Id
-    **/
-    public String getId () {
-	return id;
+     *  Get the Id property.
+     *
+     *  @return The Id
+     */
+    public String getId() {
+        return id;
     }
 
 

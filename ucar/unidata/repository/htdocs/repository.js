@@ -849,6 +849,7 @@ function Selector(event, id, allEntries, selecttype) {
     this.hiddenComp = util.getDomObject(id+".hidden");
 
     if (!this.textComp) {
+        //        alert("cannot find text comp " + id);
 	return false;
     }
 

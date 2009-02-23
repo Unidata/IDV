@@ -21,6 +21,7 @@
 
 
 
+
 package ucar.unidata.repository.monitor;
 
 
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import java.util.Hashtable;
 import java.util.List;
 
 
@@ -48,11 +50,9 @@ import java.util.List;
  */
 public class Filter implements Constants {
 
-    public static final String[] FIELD_TYPES = {
-        ARG_TEXT,
-        ARG_TYPE,
-        ARG_USER,
-        ARG_FILESUFFIX};
+    /** _more_          */
+    public static final String[] FIELD_TYPES = { ARG_TEXT, ARG_TYPE, ARG_USER,
+            ARG_FILESUFFIX, ARG_ANCESTOR };
 
 
     /** _more_ */
@@ -63,6 +63,10 @@ public class Filter implements Constants {
 
     /** _more_ */
     private boolean doNot = false;
+
+    /** _more_          */
+    private Hashtable properties = new Hashtable();
+
 
     /**
      * _more_
@@ -93,10 +97,46 @@ public class Filter implements Constants {
     }
 
 
-
-    public String toString() {
-        return field+"=" + value;
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
+    public Object getProperty(Object key) {
+        return properties.get(key);
     }
+
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param value _more_
+     */
+    public void putProperty(Object key, Object value) {
+        properties.put(key, value);
+    }
+
+    /**
+     * _more_
+     */
+    public void clearProperties() {
+        properties = new Hashtable();
+    }
+
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String toString() {
+        return field + "=" + value;
+    }
+
 
     /**
      * Set the Field property.

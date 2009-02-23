@@ -23,12 +23,15 @@
 
 
 
+
 package ucar.unidata.repository.monitor;
 
 
 import ucar.unidata.repository.*;
 
 import ucar.unidata.util.HtmlUtil;
+
+import ucar.unidata.util.StringUtil;
 
 
 import java.util.ArrayList;
@@ -49,8 +52,7 @@ public class EmailAction extends PasswordAction {
     /**
      * _more_
      */
-    public EmailAction() {
-    }
+    public EmailAction() {}
 
 
     /**
@@ -58,30 +60,53 @@ public class EmailAction extends PasswordAction {
      *
      * @param repository _more_
      * @param user _more_
+     *
+     * @param id _more_
      * @param remoteUserId _more_
      */
     public EmailAction(String id, String remoteUserId) {
-        super(id,remoteUserId, (String) null);
+        super(id, remoteUserId, (String) null);
     }
 
 
-    public  String getActionName() {
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getActionName() {
         return "Email Action";
-   }
+    }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getSummary() {
         return "Send an email to " + getRemoteUserId();
     }
 
+    /**
+     * _more_
+     *
+     * @param monitor _more_
+     * @param sb _more_
+     */
     public void addToEditForm(EntryMonitor monitor, StringBuffer sb) {
         sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.colspan("Send an email",2));
+        sb.append(HtmlUtil.colspan("Send an email", 2));
 
         sb.append(HtmlUtil.formEntry("Email address",
-                                     HtmlUtil.input(getArgId(ARG_ACTION_ID),getRemoteUserId(),HtmlUtil.SIZE_60)));
-        sb.append(HtmlUtil.formEntryTop("Message",
-                                        HtmlUtil.textArea(getArgId(ARG_ACTION_MESSAGE),getMessageTemplate(),
-                                                          5,60)));
+                                     HtmlUtil.input(getArgId(ARG_ACTION_ID),
+                                         getRemoteUserId(),
+                                         HtmlUtil.SIZE_60)));
+        sb.append(
+            HtmlUtil.formEntryTop(
+                "Message",
+                HtmlUtil.textArea(
+                    getArgId(ARG_ACTION_MESSAGE), getMessageTemplate(), 5,
+                    60)));
         sb.append(HtmlUtil.formTableClose());
     }
 
@@ -89,22 +114,30 @@ public class EmailAction extends PasswordAction {
     /**
      * _more_
      *
+     *
+     * @param monitor _more_
      * @param entry _more_
      */
     protected void entryMatched(EntryMonitor monitor, Entry entry) {
         try {
-        String from   = monitor.getUser().getEmail();
-        if ((from == null) || (from.trim().length() == 0)) {
-            from = monitor.getRepository().getProperty(PROP_ADMIN_EMAIL, "");
-        }
+            String from = monitor.getUser().getEmail();
+            if ((from == null) || (from.trim().length() == 0)) {
+                from = monitor.getRepository().getProperty(PROP_ADMIN_EMAIL,
+                        "");
+            }
 
-        try {
-            String message= getMessage(monitor, entry);
-            monitor.getRepository().getAdmin().sendEmail(getRemoteUserId(), from,
-                                                             "New Entry", message, false);
-        } catch (Exception exc) {
-            monitor.handleError("Error sending email to " + getRemoteUserId() + " from:" + from, exc);
-        }
+            try {
+                for(String to: StringUtil.split(getRemoteUserId(),",",true,true)) {
+                        System.err.println("sending mail to: " + to);
+                        String message = getMessage(monitor, entry);
+                        monitor.getRepository().getAdmin().sendEmail(
+                                                                     to, from, "New Entry", message, false);
+                }
+            } catch (Exception exc) {
+                monitor.handleError("Error sending email to "
+                                    + getRemoteUserId() + " from:"
+                                    + from, exc);
+            }
         } catch (Exception exc2) {
             monitor.handleError("Error:", exc2);
         }

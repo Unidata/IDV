@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.repository.monitor;
 
 
@@ -67,7 +68,7 @@ public class SynchronousEntryMonitor extends EntryMonitor {
      * @param request _more_
      */
     public SynchronousEntryMonitor(Repository repository, Request request) {
-        super(repository, request.getUser(),"Synchronous Search", false);
+        super(repository, request.getUser(), "Synchronous Search", false);
         Hashtable properties = request.getDefinedProperties();
         for (Enumeration keys = properties.keys(); keys.hasMoreElements(); ) {
             String arg   = (String) keys.nextElement();
@@ -77,10 +78,20 @@ public class SynchronousEntryMonitor extends EntryMonitor {
     }
 
 
-    public  String getActionName() {
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getActionName() {
         return "Synchronous Action";
-   }
+    }
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     */
     protected void entryMatched(Entry entry) {
         this.entry = entry;
         synchronized (this) {
