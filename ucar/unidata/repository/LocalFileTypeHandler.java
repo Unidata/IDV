@@ -196,7 +196,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
             return ids;
         }
         long t1 = System.currentTimeMillis();
-        System.err.println("getSynthIds " + parentEntry);
+        //        System.err.println("getSynthIds " + parentEntry);
         File   rootDir     = new File((String) values[0]);
         String rootDirPath = rootDir.toString();
         File   childPath   = getFileFromId(synthId, rootDir);

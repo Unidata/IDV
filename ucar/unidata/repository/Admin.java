@@ -262,7 +262,7 @@ public class Admin extends RepositoryManager {
             boolean isBot=true;
             if (userAgent.indexOf("Googlebot") >= 0) {
                 userAgent = "Googlebot";
-            } else if (userAgent.indexOf("Slurp;") >= 0) {
+            } else if (userAgent.indexOf("Slurp") >= 0) {
                 userAgent = "Yahoobot";
             } else if (userAgent.indexOf("msnbot") >= 0) {
                 userAgent = "Msnbot";

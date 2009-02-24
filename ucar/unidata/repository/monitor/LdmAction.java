@@ -28,11 +28,14 @@ package ucar.unidata.repository.monitor;
 
 import ucar.unidata.repository.*;
 
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.Misc;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -46,6 +49,48 @@ import java.util.List;
  * @version $Revision: 1.30 $
  */
 public class LdmAction extends MonitorAction {
+
+    public static final String []FEED_TYPES = {
+        "PPS",
+        "DDS",
+        "HDS",
+        "IDS",
+        "SPARE",
+        "UNIWISC",
+        "PCWS",
+        "FSL2",
+        "FSL3",
+        "FSL4",
+        "FSL5",
+        "GPSSRC",
+        "CONDUIT",
+        "FNEXRAD",
+        "LIGHTNING",
+        "WSI",
+        "DIFAX",
+        "FAA604",
+        "GPS",
+        "FNMOC",
+        "GEM",
+        "NIMAGE",
+        "NTEXT",
+        "NGRID",
+        "NPOINT",
+        "NGRAPH",
+        "NOTHER",
+        "NEXRAD3",
+        "NEXRAD2",
+        "NXRDSRC",
+        "EXP",
+        "ANY",
+        "NONE",
+        "DDPLUS",
+        "WMO",
+        "UNIDATA",
+        "FSL",
+        "NMC",
+        "NPORT",
+    };
 
     /** _more_          */
     private static final String ARG_PQINSERT = "pqinsert";
@@ -66,7 +111,7 @@ public class LdmAction extends MonitorAction {
     private String pqinsert="";
 
     /** _more_          */
-    private String feed = "spare";
+    private String feed = "SPARE";
 
     private String productId="";
 
@@ -137,8 +182,7 @@ public class LdmAction extends MonitorAction {
                                      HtmlUtil.input(getArgId(ARG_QUEUE),
                                          queue, HtmlUtil.SIZE_60)));
         sb.append(HtmlUtil.formEntry("Feed:",
-                                     HtmlUtil.input(getArgId(ARG_FEED), feed,
-                                         HtmlUtil.SIZE_20)));
+                                     HtmlUtil.select(getArgId(ARG_FEED), Misc.toList(FEED_TYPES),feed)));
         sb.append(HtmlUtil.formEntry("Product ID:",
                                      HtmlUtil.input(getArgId(ARG_PRODUCTID), productId,
                                          HtmlUtil.SIZE_60)));
@@ -157,8 +201,25 @@ public class LdmAction extends MonitorAction {
     protected void entryMatched(EntryMonitor monitor, Entry entry) {
         try {
             Resource resource = entry.getResource();
-            if(!resource.isFile()) return;
-            
+            if(!resource.isFile()) {
+                System.err.println ("Entry is not a file:" + entry);
+                return;
+            }
+            String id = (productId.trim().length()>0?"-p " + productId:"");
+            String command = pqinsert+" " +id +" -f " + feed +" -q " + queue +" " + resource.getPath();
+            System.err.println("Executing:" + command);
+            Process process = Runtime.getRuntime().exec(command);
+            int result = process.waitFor();
+            if(result==0) {
+                System.err.println("Success");
+            } else {
+                System.err.println("Failed");
+                try {
+                    InputStream is = process.getErrorStream();
+                    byte[] bytes = IOUtil.readBytes(is);
+                    System.err.println("Error:" + new String(bytes));
+                } catch(Exception noop) {}
+            }
             
         } catch (Exception exc) {
             monitor.handleError("Error posting to LDM", exc);
