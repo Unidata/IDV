@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.util;
 
 
@@ -70,7 +71,8 @@ public class Misc {
     public static boolean debug = false;
 
     /** Holds a list of any custom class loaders used in the app */
-    private static List<ClassLoader> classLoaders = new ArrayList<ClassLoader>();
+    private static List<ClassLoader> classLoaders =
+        new ArrayList<ClassLoader>();
 
     /** override current time */
     private static long overrideCurrentTime = -1;
@@ -134,6 +136,8 @@ public class Misc {
     public static void setCurrentTime(Date date) {
         overrideCurrentTime = date.getTime();
     }
+
+
 
 
 
@@ -802,8 +806,17 @@ public class Misc {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param props _more_
+     * @param prop _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public static double getProperty(Hashtable props, String prop,
-                                    double dflt) {
+                                     double dflt) {
         if (props == null) {
             return dflt;
         }
@@ -1492,9 +1505,17 @@ public class Misc {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param formals _more_
+     * @param actuals _more_
+     *
+     * @return _more_
+     */
     public static boolean typesMatchx(Class[] formals, Class[] actuals) {
         if (formals.length != actuals.length) {
-            System.err.println ("Bad length");
+            System.err.println("Bad length");
             return false;
         }
         for (int j = 0; j < formals.length; j++) {
@@ -1503,8 +1524,9 @@ public class Misc {
             }
 
             if ( !formals[j].isAssignableFrom(actuals[j])) {
-                System.err.println ("not assignable " + formals[j].getName() + " " + actuals[j].getName()  + 
-                                    " equals? " + formals[j].equals(actuals[j]));
+                System.err.println("not assignable " + formals[j].getName()
+                                   + " " + actuals[j].getName() + " equals? "
+                                   + formals[j].equals(actuals[j]));
                 return false;
             }
         }
@@ -3775,28 +3797,37 @@ public class Misc {
 
         //First look at the PluginClassLoaders. We do this because if we have 2 or more
         //of these we can get class conflicts
-        for (ClassLoader classLoader: classLoaders) {
-            if(classLoader instanceof PluginClassLoader) {
+        for (ClassLoader classLoader : classLoaders) {
+            if (classLoader instanceof PluginClassLoader) {
                 PluginClassLoader pcl = (PluginClassLoader) classLoader;
-                Class c = pcl.getClassFromPlugin(className);
-                if(c!=null) return c;
+                Class             c   = pcl.getClassFromPlugin(className);
+                if (c != null) {
+                    return c;
+                }
             }
         }
 
 
-        for (ClassLoader classLoader: classLoaders) {
+        for (ClassLoader classLoader : classLoaders) {
             try {
-                Class c = Class.forName(className, true,classLoader);
+                Class c = Class.forName(className, true, classLoader);
                 if (c != null) {
                     return c;
                 }
             } catch (ClassNotFoundException cnfe) {}
         }
-        return   Class.forName(className);
+        return Class.forName(className);
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param minutesDelta _more_
+     *
+     * @return _more_
+     */
     public static long getPauseEveryTime(int minutesDelta) {
         if (minutesDelta <= 0) {
             minutesDelta = 1;
@@ -3812,7 +3843,7 @@ public class Misc {
             int foo = currentMinutes % minutesDelta;
             sleepTime = 60 * 1000 * (minutesDelta - foo);
         }
-        return (long)sleepTime;
+        return (long) sleepTime;
     }
 
 
@@ -3824,9 +3855,11 @@ public class Misc {
      * @param minutesDelta   number of minutes
      */
     public static void pauseEvery(int minutesDelta) {
-        long sleepTime =getPauseEveryTime(minutesDelta);
-        System.err.println ("Sleeping for " + DateUtil.millisToMinutes(sleepTime) + " minutes");
-        Misc.sleep((long)sleepTime);
+        long sleepTime = getPauseEveryTime(minutesDelta);
+        System.err.println("Sleeping for "
+                           + DateUtil.millisToMinutes(sleepTime)
+                           + " minutes");
+        Misc.sleep((long) sleepTime);
     }
 
 
@@ -4177,40 +4210,87 @@ public class Misc {
         return vals;
     }
 
+
+    /**
+     * _more_
+     *
+     * @param sourceValues _more_
+     * @param lengths _more_
+     *
+     * @return _more_
+     */
+    public static int[] unpack(int[] sourceValues, int[] lengths) {
+        int[] dest   = new int[lengths.length];
+        int   bitIdx = 0;
+        int   bitCnt = 0;
+        for (int lengthIdx = 0; lengthIdx < lengths.length; lengthIdx++) {
+            int length = lengths[lengthIdx];
+            int value  = 0;
+            //            System.err.println("reading value:" + lengthIdx);
+            int    bitsReadSoFar = 0;
+            String s             = "";
+            while (bitsReadSoFar < length) {
+                int idxIntoValuesArray = bitCnt / 32;
+                int bitOffset          = 31 - (bitCnt % 32);
+                int mask               = 1 << bitOffset;
+                int v = mask & sourceValues[idxIntoValuesArray];
+                if (v != 0) {
+                    value |= 1 << (length - bitsReadSoFar - 1);
+                }
+                //                System.err.println("    bitCnt:" + bitCnt +" idx:" + idxIntoValuesArray + " offset:" + bitOffset);
+                if (v != 0) {
+                    s += "1";
+                } else {
+                    s += "0";
+                }
+                bitCnt++;
+                bitsReadSoFar++;
+            }
+            //            System.err.println("   s:" + s);
+            dest[lengthIdx] = value;
+        }
+        return dest;
+    }
+
+
+
     /**
      * Main method for testing
      *
      * @param args  args
      */
     public static void main(String[] args) {
-        double d1 = 0;
-        double d2 = Double.NaN;
-        boolean f;
-        for( int j=0;j<10;j++) {
-        long t1 = System.currentTimeMillis();
-        for(int i=0;i<10000000;i++) {
-            if(d2!=d2) {
-                f=true;
-            }
-            if(d1!=d1) {
-                f=true;
-            }
+        //        int[]lengths = {32,32,32,32};
+        int[] lengths = { 7 };
+        int   x       = 5 << (32 - 7);
+        //        printBits(5);
+        //        printBits(x);
+        int[] values = { x, 8, 9, 10 };
+        int[] result = unpack(values, lengths);
+        for (int i = 0; i < result.length; i++) {
+            System.err.println("result[" + i + "]=" + result[i]);
         }
 
-        long t2 = System.currentTimeMillis();
-        for(int i=0;i<10000000;i++) {
-            if(Double.isNaN(d2)) {
-                f=true;
+    }
+
+    /**
+     * _more_
+     *
+     * @param b _more_
+     */
+    public static void printBits(int b) {
+        String s = "";
+        for (int i = 31; i >= 0; i--) {
+            if ((b & (1 << i)) != 0) {
+                s = s + "1";
+            } else {
+                s = s + "0";
             }
-            if(Double.isNaN(d1)) {
-                f=true;
+            if (i % 8 == 0) {
+                s = s + "|";
             }
         }
-
-
-        long t3 = System.currentTimeMillis();
-        System.err.println((t2-t1) + "  " + (t3-t2));
-        }
+        System.err.println(s);
     }
 
     /**
