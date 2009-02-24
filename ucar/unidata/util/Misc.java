@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.util;
 
 
@@ -4212,45 +4213,47 @@ public class Misc {
 
 
     /**
-     * _more_
+     * Unpack an array of packed integers
      *
-     * @param sourceValues _more_
-     * @param lengths _more_
+     * @param sourceValues  packed integer array
+     * @param lengths       lengths of packed bits
      *
-     * @return _more_
+     * @param args _more_
+     *
+     * @return an array of unpacked integers
+     * public static int[] unpack(int[] sourceValues, int[] lengths) {
+     *   int[] dest   = new int[lengths.length];
+     *   int   bitIdx = 0;
+     *   int   bitCnt = 0;
+     *   for (int lengthIdx = 0; lengthIdx < lengths.length; lengthIdx++) {
+     *       int length = lengths[lengthIdx];
+     *       int value  = 0;
+     *       //            System.err.println("reading value:" + lengthIdx);
+     *       int    bitsReadSoFar = 0;
+     *       String s             = "";
+     *       while (bitsReadSoFar < length) {
+     *           int idxIntoValuesArray = bitCnt / 32;
+     *           int bitOffset          = 31 - (bitCnt % 32);
+     *           int mask               = 1 << bitOffset;
+     *           int v = mask & sourceValues[idxIntoValuesArray];
+     *           if (v != 0) {
+     *               value |= 1 << (length - bitsReadSoFar - 1);
+     *           }
+     *           //                System.err.println("    bitCnt:" + bitCnt +" idx:" + idxIntoValuesArray + " offset:" + bitOffset);
+     *           if (v != 0) {
+     *               s += "1";
+     *           } else {
+     *               s += "0";
+     *           }
+     *           bitCnt++;
+     *           bitsReadSoFar++;
+     *       }
+     *       //            System.err.println("   s:" + s);
+     *       dest[lengthIdx] = value;
+     *   }
+     *   return dest;
+     * }
      */
-    public static int[] unpack(int[] sourceValues, int[] lengths) {
-        int[] dest   = new int[lengths.length];
-        int   bitIdx = 0;
-        int   bitCnt = 0;
-        for (int lengthIdx = 0; lengthIdx < lengths.length; lengthIdx++) {
-            int length = lengths[lengthIdx];
-            int value  = 0;
-            //            System.err.println("reading value:" + lengthIdx);
-            int    bitsReadSoFar = 0;
-            String s             = "";
-            while (bitsReadSoFar < length) {
-                int idxIntoValuesArray = bitCnt / 32;
-                int bitOffset          = 31 - (bitCnt % 32);
-                int mask               = 1 << bitOffset;
-                int v = mask & sourceValues[idxIntoValuesArray];
-                if (v != 0) {
-                    value |= 1 << (length - bitsReadSoFar - 1);
-                }
-                //                System.err.println("    bitCnt:" + bitCnt +" idx:" + idxIntoValuesArray + " offset:" + bitOffset);
-                if (v != 0) {
-                    s += "1";
-                } else {
-                    s += "0";
-                }
-                bitCnt++;
-                bitsReadSoFar++;
-            }
-            //            System.err.println("   s:" + s);
-            dest[lengthIdx] = value;
-        }
-        return dest;
-    }
 
 
 
@@ -4274,11 +4277,21 @@ public class Misc {
     }
 
     /**
-     * _more_
+     * Print out the bit pattern in an integer
      *
-     * @param b _more_
+     * @param b  the integer
      */
     public static void printBits(int b) {
+        System.err.println(getBits(b));
+    }
+
+    /**
+     * Get the bits string for an int
+     *
+     * @param b  the integer
+     * @return the string as bits (e.g.: 01100001|11000000|10011010|10110100|)
+     */
+    private static String getBits(int b) {
         String s = "";
         for (int i = 31; i >= 0; i--) {
             if ((b & (1 << i)) != 0) {
@@ -4290,7 +4303,7 @@ public class Misc {
                 s = s + "|";
             }
         }
-        System.err.println(s);
+        return s;
     }
 
     /**
