@@ -2956,14 +2956,24 @@ return new Result(title, sb);
 
         String compId = "popup_" + HtmlUtil.blockCnt++;
         String linkId = "img_" + uid;
+        String prefix = "";
 
-        if (entry.isGroup() && forTreeNavigation) {
-            event.append(HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
-                                                             HtmlUtil.comma(
-                                                                 HtmlUtil.squote(uid),
-                                                                 HtmlUtil.squote(folderClickUrl),
-                                                                 HtmlUtil.squote(iconUrl(ICON_FOLDER_OPEN))))));
-        } 
+        if(forTreeNavigation) {
+            if (entry.isGroup( )) {
+                prefix = HtmlUtil.img(getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
+                                      msg("Click to open group"), 
+                                      HtmlUtil.id("img_" + uid) + 
+                                      HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
+                                                                          HtmlUtil.comma(
+                                                                                         HtmlUtil.squote(uid),
+                                                                                         HtmlUtil.squote(folderClickUrl),
+                                                                                         HtmlUtil.squote(iconUrl(ICON_TOGGLEARROWDOWN))))));
+            }  else {
+                prefix = HtmlUtil.img(getRepository().iconUrl(ICON_BLANK),"",HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"10"));
+            }
+            prefix = HtmlUtil.span(prefix,HtmlUtil.cssClass("arrow"));
+
+        }
 
         if (okToMove) {
             if(entry.isGroup() && forTreeNavigation) {
@@ -2981,10 +2991,8 @@ return new Result(title, sb);
             event.append(dropEvent);
         }
         
-        String img = HtmlUtil.img(getIconUrl(request, entry),
-                                  ((entry.isGroup() && forTreeNavigation)
-                                   ? msg("Click to open group") + "; "
-                                   : "") + (okToMove
+        String img = prefix +HtmlUtil.img(getIconUrl(request, entry),
+                                          (okToMove
                                             ? msg("Drag to move")
                                             : ""), HtmlUtil.id("img_" + uid) + event);
 

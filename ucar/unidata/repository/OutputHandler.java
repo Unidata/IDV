@@ -804,7 +804,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         selectSB.append(HtmlUtil.submit(msg("All"), "getall"));
 
         String arrowImg =
-            HtmlUtil.img(getRepository().iconUrl(ICON_RIGHTDART),
+            HtmlUtil.img(getRepository().iconUrl(ICON_GRAYRIGHTDART),
                          msg("Show/Hide Form"), HtmlUtil.id(base + "img"));
         String link = HtmlUtil.space(2)
                       + HtmlUtil.jsLink(HtmlUtil.onMouseClick(base

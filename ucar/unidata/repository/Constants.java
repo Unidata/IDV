@@ -126,6 +126,11 @@ public interface Constants {
 
     public static final String ICON_RIGHTDART = "ramadda.icon.rightdart";
 
+    public static final String ICON_GRAYRIGHTDART = "ramadda.icon.grayrightdart";
+
+    public static final String ICON_TOGGLEARROWRIGHT = "ramadda.icon.togglearrowright";
+    public static final String ICON_TOGGLEARROWDOWN = "ramadda.icon.togglearrowdown";
+
 
     /** _more_ */
     public static final String ICON_DOWNARROW = "ramadda.icon.downarrow";
@@ -167,6 +172,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ICON_RIGHTARROW = "ramadda.icon.rightarrow";
+
+
 
     /** _more_ */
     public static final String ICON_FOLDER = "ramadda.icon.folder";

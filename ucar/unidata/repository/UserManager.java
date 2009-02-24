@@ -1316,6 +1316,7 @@ public class UserManager extends RepositoryManager {
                     colSB.append(getEntryManager().getAjaxLink(request, entry,
                                                                entry.getLabel(), null));
 
+                    request.remove(ARG_SHOWLINK);
                 } else {
                     String links = HtmlUtil.checkbox("entry_"
                                        + entry.getId(), "true");

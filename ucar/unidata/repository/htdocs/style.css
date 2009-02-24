@@ -70,7 +70,7 @@ a:hover {
    border : 0px;
    margin:0px;
    padding:0px;
-   padding-left:18px;
+   padding-left:12px;
 }
 
 
@@ -120,6 +120,12 @@ a.header  {
 .header-title {
   font-size: 200%;
   color: white;
+}
+
+
+.arrow {
+      margin-right: 2px;
+      margin-bottom:4px;
 }
 
 

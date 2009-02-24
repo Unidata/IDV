@@ -1,11 +1,13 @@
 
+var root = "${urlroot}";
 var icon_close = "${urlroot}/icons/close.gif";
-var icon_rightarrow = "${urlroot}/icons/rightarrow.gif";
+var icon_rightarrow = "${urlroot}/icons/grayrightarrow.gif";
 var icon_downarrow ="${urlroot}/icons/downarrow.gif";
 var icon_progress = "${urlroot}/icons/progress.gif";
 var icon_information = "${urlroot}/icons/information.png"
 var icon_folderclosed = "${urlroot}/icons/folderclosed.png";
-var icon_folderopen = "${urlroot}/icons/folderopen.png";
+//var icon_folderopen = "${urlroot}/icons/folderopen.png";
+var icon_folderopen = "${urlroot}/icons/togglearrowdown.gif";
 
 
 function Util () {
