@@ -72,6 +72,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
@@ -992,6 +993,58 @@ return new Result(title, sb);
                               new StringBuffer(msg("No entries created")));
         }
 
+    }
+
+
+    public String replaceMacros(Entry entry, String template) {
+        Date fromDate = new Date(entry.getStartDate());
+        Date toDate = new Date(entry.getEndDate());
+
+        GregorianCalendar fromCal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        fromCal.setTime(fromDate);
+        int      fromDay    = fromCal.get(GregorianCalendar.DAY_OF_MONTH);
+        int      fromMonth  = fromCal.get(GregorianCalendar.MONTH) + 1;
+        int      fromYear   = fromCal.get(GregorianCalendar.YEAR) + 1;
+
+
+        GregorianCalendar toCal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        toCal.setTime(toDate);
+        int      toDay    = toCal.get(GregorianCalendar.DAY_OF_MONTH);
+        int      toMonth  = toCal.get(GregorianCalendar.MONTH) + 1;
+        int      toYear   = toCal.get(GregorianCalendar.YEAR) + 1;
+
+        String url =
+            HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
+                         ARG_ENTRYID, entry.getId());
+
+        String[] macros = {
+            "fromdate", getRepository().formatDate(fromDate), 
+            "fromday", ((fromDay < 10)   ? "0" : "") + fromDay, 
+            "frommonth", ((fromMonth < 10) ? "0": "") + fromMonth, 
+            "fromyear", "" + fromYear, 
+            "frommonthname",   DateUtil.MONTH_NAMES[fromCal.get(GregorianCalendar.MONTH)], 
+
+            "todate", getRepository().formatDate(toDate), 
+            "today", ((toDay < 10)   ? "0" : "") + toDay, 
+            "tomonth", ((toMonth < 10) ? "0": "") + toMonth, 
+            "toyear", "" + toYear, 
+            "tomonthname",   DateUtil.MONTH_NAMES[toCal.get(GregorianCalendar.MONTH)], 
+            "filename", getStorageManager().getFileTail(entry.getResource().getPath()),
+            "fileextension",IOUtil.getFileExtension(entry.getResource().getPath()),
+            "name", entry.getName(),
+            "fullname", entry.getFullName(),
+            "user",    entry.getUser().getLabel(),            
+            "url",    url
+        };
+        String result = template;
+
+        for (int i = 0; i < macros.length; i += 2) {
+            String macro = "${" + macros[i] + "}";
+            String value = macros[i + 1];
+            result = result.replace(macro, value);
+        }
+
+        return result;
     }
 
 

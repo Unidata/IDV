@@ -183,9 +183,13 @@ public class LdmAction extends MonitorAction {
                                          queue, HtmlUtil.SIZE_60)));
         sb.append(HtmlUtil.formEntry("Feed:",
                                      HtmlUtil.select(getArgId(ARG_FEED), Misc.toList(FEED_TYPES),feed)));
+        String tooltip = "macros: ${fromday}  ${frommonth} ${fromyear} ${frommonthname}  <br>" +
+            "${today}  ${tomonth} ${toyear} ${tomonthname} <br> " +
+            "${filename}  ${fileextension}";
         sb.append(HtmlUtil.formEntry("Product ID:",
                                      HtmlUtil.input(getArgId(ARG_PRODUCTID), productId,
-                                         HtmlUtil.SIZE_60)));
+                                         HtmlUtil.SIZE_60+
+                                                    HtmlUtil.title(tooltip))));
 
         sb.append(HtmlUtil.formTableClose());
     }
@@ -205,7 +209,10 @@ public class LdmAction extends MonitorAction {
                 System.err.println ("Entry is not a file:" + entry);
                 return;
             }
-            String id = (productId.trim().length()>0?"-p " + productId:"");
+            String id = productId.trim();
+            if(id.length()>0) {
+                id  = " -p \"" +  monitor.getRepository().getEntryManager().replaceMacros(entry, productId) +"\" ";
+            }
             String command = pqinsert+" " +id +" -f " + feed +" -q " + queue +" " + resource.getPath();
             System.err.println("Executing:" + command);
             Process process = Runtime.getRuntime().exec(command);

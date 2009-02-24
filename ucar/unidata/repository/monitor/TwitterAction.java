@@ -88,7 +88,7 @@ public class TwitterAction extends PasswordAction {
      * @return _more_
      */
     protected String getInitialMessageTemplate() {
-        return "New RAMADDA entry: ${entry.name} ${entry.url}";
+        return "New RAMADDA entry: ${name} ${url}";
     }
 
     /**

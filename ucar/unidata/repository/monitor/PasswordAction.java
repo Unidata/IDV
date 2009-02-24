@@ -103,15 +103,7 @@ public abstract class PasswordAction extends MonitorAction {
                              "${server}",
                              monitor.getRepository().absoluteUrl(
                                  monitor.getRepository().getUrlBase()));
-        message = message.replace("${entry.name}", entry.getName());
-        message = message.replace("${entry.fullname}", entry.getFullName());
-        message = message.replace("${entry.user}",
-                                  entry.getUser().getLabel());
-        String url =
-            HtmlUtil.url(monitor.getRepository().URL_ENTRY_SHOW.getFullUrl(),
-                         ARG_ENTRYID, entry.getId());
-        message = message.replace("${entry.url}", url);
-        return message;
+        return monitor.getRepository().getEntryManager().replaceMacros(entry, message);
     }
 
     /**
@@ -221,7 +213,7 @@ public abstract class PasswordAction extends MonitorAction {
      * @return _more_
      */
     protected String getInitialMessageTemplate() {
-        return "A new entry has been created on ${server} by ${entry.user}\n${entry.name} ${entry.url}";
+        return "A new entry has been created on ${server} by ${user}\n${name} ${url}";
     }
 
 }
