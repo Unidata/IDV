@@ -775,19 +775,24 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
     public String getSortLinks(Request request) {
         StringBuffer sb = new StringBuffer();
-        String oldOrderBy = request.getString(ARG_ORDERBY,null);
-        String oldAscending = request.getString(ARG_ASCENDING,null);
+        String oldOrderBy = request.getString(ARG_ORDERBY,"fromdate");
+        String oldAscending = request.getString(ARG_ASCENDING,"false");
         String[]order = {"name","true",msg("Name") + HtmlUtil.img(getRepository().iconUrl(ICON_UPARROW)),"Sort by name ascending",
                          "name","false",msg("Name")+ HtmlUtil.img(getRepository().iconUrl(ICON_DOWNARROW)),"Sort by name descending",
                          "fromdate","true",msg("Date") + HtmlUtil.img(getRepository().iconUrl(ICON_UPARROW)),"Sort by date ascending",
                          "fromdate","false",msg("Date")+ HtmlUtil.img(getRepository().iconUrl(ICON_DOWNARROW)),"Sort by date descending"};
                          
-        sb.append(HtmlUtil.span(msgLabel("Sort"),HtmlUtil.cssClass("sortlink")));
+        sb.append(HtmlUtil.span(msgLabel("Sort"),HtmlUtil.cssClass("sortlinkoff")));
         for(int i=0;i<order.length;i+=4) {
-            request.put(ARG_ORDERBY,order[i]);
-            request.put(ARG_ASCENDING,order[i+1]);
-            String url = request.getUrl();
-            sb.append(HtmlUtil.span(HtmlUtil.href(url,order[i+2]),HtmlUtil.title(order[i+3])+HtmlUtil.cssClass("sortlink")));
+            if(Misc.equals(order[i],oldOrderBy) &&
+               Misc.equals(order[i+1],oldAscending)) {
+                sb.append(HtmlUtil.span(order[i+2],HtmlUtil.cssClass("sortlinkon")));
+            } else {
+                request.put(ARG_ORDERBY,order[i]);
+                request.put(ARG_ASCENDING,order[i+1]);
+                String url = request.getUrl();
+                sb.append(HtmlUtil.span(HtmlUtil.href(url,order[i+2]),HtmlUtil.title(order[i+3])+HtmlUtil.cssClass("sortlinkoff")));
+            }
             sb.append(HtmlUtil.space(2));
         }
 

@@ -1364,6 +1364,60 @@ public interface Constants {
 
 
 
+    public static final String []LDM_FEED_TYPES = {
+        "PPS",
+        "DDS",
+        "HDS",
+        "IDS",
+        "SPARE",
+        "UNIWISC",
+        "PCWS",
+        "FSL2",
+        "FSL3",
+        "FSL4",
+        "FSL5",
+        "GPSSRC",
+        "CONDUIT",
+        "FNEXRAD",
+        "LIGHTNING",
+        "WSI",
+        "DIFAX",
+        "FAA604",
+        "GPS",
+        "FNMOC",
+        "GEM",
+        "NIMAGE",
+        "NTEXT",
+        "NGRID",
+        "NPOINT",
+        "NGRAPH",
+        "NOTHER",
+        "NEXRAD3",
+        "NEXRAD2",
+        "NXRDSRC",
+        "EXP",
+        "ANY",
+        "NONE",
+        "DDPLUS",
+        "WMO",
+        "UNIDATA",
+        "FSL",
+        "NMC",
+        "NPORT",
+    };
+
+    /** _more_          */
+    public static final String PROP_LDM_PQINSERT = "ldm.pqinsert";
+
+    /** _more_          */
+    public static final String PROP_LDM_FEED = "ldm.feed";
+
+    /** _more_          */
+    public static final String PROP_LDM_QUEUE = "ldm.queue";
+
+    /** _more_          */
+    public static final String PROP_LDM_PRODUCTID = "ldm.productid";
+
 
 }
 

@@ -16,8 +16,12 @@ body {
   border :none;
 }
 
+.errorlabel {
+    color:#F00;
+    font-weight: bold;
+}
+
 .submit {
-  xborder : 1px #666666 outset;
   margin-left:3px;
   margin-right:3px;
   xfont-weight: bold;
@@ -95,11 +99,16 @@ a.header  {
 }
 
 
-.sortlink  {
+.sortlinkon  {
+  font-size: 10pt;
+  background-color : #ccc;
+}
+
+.sortlinkoff  {
   font-size: 10pt;
 }
 
-.sortlink a {
+.sortlinkoff a {
    font-size: 10pt;
    color:black;
    text-decoration: none;

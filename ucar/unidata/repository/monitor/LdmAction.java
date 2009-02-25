@@ -35,6 +35,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -49,60 +50,6 @@ import java.util.List;
  * @version $Revision: 1.30 $
  */
 public class LdmAction extends MonitorAction {
-
-    public static final String []FEED_TYPES = {
-        "PPS",
-        "DDS",
-        "HDS",
-        "IDS",
-        "SPARE",
-        "UNIWISC",
-        "PCWS",
-        "FSL2",
-        "FSL3",
-        "FSL4",
-        "FSL5",
-        "GPSSRC",
-        "CONDUIT",
-        "FNEXRAD",
-        "LIGHTNING",
-        "WSI",
-        "DIFAX",
-        "FAA604",
-        "GPS",
-        "FNMOC",
-        "GEM",
-        "NIMAGE",
-        "NTEXT",
-        "NGRID",
-        "NPOINT",
-        "NGRAPH",
-        "NOTHER",
-        "NEXRAD3",
-        "NEXRAD2",
-        "NXRDSRC",
-        "EXP",
-        "ANY",
-        "NONE",
-        "DDPLUS",
-        "WMO",
-        "UNIDATA",
-        "FSL",
-        "NMC",
-        "NPORT",
-    };
-
-    /** _more_          */
-    private static final String ARG_PQINSERT = "pqinsert";
-
-    /** _more_          */
-    private static final String ARG_FEED = "feed";
-
-    /** _more_          */
-    private static final String ARG_QUEUE = "queue";
-
-    /** _more_          */
-    private static final String ARG_PRODUCTID = "productid";
 
     /** _more_          */
     private String queue="";
@@ -146,7 +93,7 @@ public class LdmAction extends MonitorAction {
      * @return _more_
      */
     public String getSummary() {
-        return "Inject into LDM";
+        return "Inject into the LDM";
     }
 
 
@@ -159,10 +106,10 @@ public class LdmAction extends MonitorAction {
      */
     public void applyEditForm(Request request, EntryMonitor monitor) {
         super.applyEditForm(request, monitor);
-        this.pqinsert = request.getString(getArgId(ARG_PQINSERT), "");
-        this.feed     = request.getString(getArgId(ARG_FEED), "");
-        this.queue    = request.getString(getArgId(ARG_QUEUE), "");
-        this.productId    = request.getString(getArgId(ARG_PRODUCTID), "");
+        this.pqinsert = request.getString(getArgId(PROP_LDM_PQINSERT), "");
+        this.feed     = request.getString(getArgId(PROP_LDM_FEED), "");
+        this.queue    = request.getString(getArgId(PROP_LDM_QUEUE), "");
+        this.productId    = request.getString(getArgId(PROP_LDM_PRODUCTID), "");
     }
 
 
@@ -175,19 +122,30 @@ public class LdmAction extends MonitorAction {
     public void addToEditForm(EntryMonitor monitor, StringBuffer sb) {
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.colspan("LDM Action", 2));
+
+        String ldmExtra1="";
+        if(pqinsert.length()>0 && !new File(pqinsert).exists()) {
+            ldmExtra1 = HtmlUtil.space(2) + HtmlUtil.span("File does not exist!", HtmlUtil.cssClass("errorlabel"));
+        }
+        String ldmExtra2="";
+        if(queue.length()>0 && !new File(queue).exists()) {
+            ldmExtra2 = HtmlUtil.space(2) + HtmlUtil.span("File does not exist!", HtmlUtil.cssClass("errorlabel"));
+        }
+
+
         sb.append(HtmlUtil.formEntry("Path to pqinsert:",
-                                     HtmlUtil.input(getArgId(ARG_PQINSERT),
-                                         pqinsert, HtmlUtil.SIZE_60)));
+                                     HtmlUtil.input(getArgId(PROP_LDM_PQINSERT),
+                                         pqinsert, HtmlUtil.SIZE_60)+ldmExtra1));
         sb.append(HtmlUtil.formEntry("Queue Location:",
-                                     HtmlUtil.input(getArgId(ARG_QUEUE),
-                                         queue, HtmlUtil.SIZE_60)));
+                                     HtmlUtil.input(getArgId(PROP_LDM_QUEUE),
+                                         queue, HtmlUtil.SIZE_60)+ldmExtra2));
         sb.append(HtmlUtil.formEntry("Feed:",
-                                     HtmlUtil.select(getArgId(ARG_FEED), Misc.toList(FEED_TYPES),feed)));
+                                     HtmlUtil.select(getArgId(PROP_LDM_FEED), Misc.toList(LDM_FEED_TYPES),feed)));
         String tooltip = "macros: ${fromday}  ${frommonth} ${fromyear} ${frommonthname}  <br>" +
             "${today}  ${tomonth} ${toyear} ${tomonthname} <br> " +
             "${filename}  ${fileextension}";
         sb.append(HtmlUtil.formEntry("Product ID:",
-                                     HtmlUtil.input(getArgId(ARG_PRODUCTID), productId,
+                                     HtmlUtil.input(getArgId(PROP_LDM_PRODUCTID), productId,
                                          HtmlUtil.SIZE_60+
                                                     HtmlUtil.title(tooltip))));
 
@@ -210,26 +168,32 @@ public class LdmAction extends MonitorAction {
                 return;
             }
             String id = productId.trim();
-            if(id.length()>0) {
-                id  = " -p \"" +  monitor.getRepository().getEntryManager().replaceMacros(entry, productId) +"\" ";
-            }
-            String command = pqinsert+" " +id +" -f " + feed +" -q " + queue +" " + resource.getPath();
-            System.err.println("Executing:" + command);
-            Process process = Runtime.getRuntime().exec(command);
-            int result = process.waitFor();
-            if(result==0) {
-                System.err.println("Success");
-            } else {
-                System.err.println("Failed");
-                try {
-                    InputStream is = process.getErrorStream();
-                    byte[] bytes = IOUtil.readBytes(is);
-                    System.err.println("Error:" + new String(bytes));
-                } catch(Exception noop) {}
-            }
+            id = monitor.getRepository().getEntryManager().replaceMacros(entry, id);
+
+            insertIntoQueue(pqinsert, queue, feed, id, resource.getPath());
             
         } catch (Exception exc) {
             monitor.handleError("Error posting to LDM", exc);
+        }
+    }
+
+    public static void insertIntoQueue(String pqinsert, String queue, String feed, String productId, String file) throws Exception {
+        if(productId.length()>0) {
+            productId  = " -p \"" + productId  +"\" ";
+        }
+        String command = pqinsert+" " +productId +" -f " + feed +" -q " + queue +" " + file;
+        System.err.println("Executing:" + command);
+        Process process = Runtime.getRuntime().exec(command);
+        int result = process.waitFor();
+        if(result==0) {
+            System.err.println("Success");
+        } else {
+            System.err.println("Failed");
+            try {
+                InputStream is = process.getErrorStream();
+                byte[] bytes = IOUtil.readBytes(is);
+                System.err.println("Error:" + new String(bytes));
+            } catch(Exception noop) {}
         }
     }
 

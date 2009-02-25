@@ -302,8 +302,8 @@ public class MonitorManager extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         String listLink =
             HtmlUtil.href(getRepositoryBase().URL_USER_MONITORS.toString(),
-                          msg("List"));
-        sb.append(HtmlUtil.center(listLink));
+                          msg("Monitor List"));
+        sb.append(HtmlUtil.center(HtmlUtil.b(listLink)));
 
         sb.append(msgLabel("Monitor"));
         sb.append(HtmlUtil.space(1));
@@ -522,6 +522,15 @@ public class MonitorManager extends RepositoryManager {
             sb.append(HtmlUtil.col(monitor.getSearchSummary()));
             sb.append(HtmlUtil.col(monitor.getActionSummary()));
             sb.append(HtmlUtil.close(HtmlUtil.TAG_TR));
+
+            if(monitor.getLastError()!=null && monitor.getLastError().length()>0) {
+                String msg  = HtmlUtil.makeShowHideBlock(HtmlUtil.span(msg("Error"),HtmlUtil.cssClass("errorlabel")),
+                                                         HtmlUtil.pre(monitor.getLastError()),false);
+                sb.append(HtmlUtil.row(HtmlUtil.colspan(msg,5)));
+            }
+
+            sb.append(HtmlUtil.row(HtmlUtil.colspan(HtmlUtil.hr(),5)));
+
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
 

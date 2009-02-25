@@ -22,6 +22,7 @@
 package ucar.unidata.repository.data;
 
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.monitor.LdmAction;
 import org.w3c.dom.*;
 
 
@@ -120,6 +121,10 @@ public class LdmOutputHandler extends OutputHandler {
                                  List<Link> links)
             throws Exception {
 
+        //Are we configured to do the LDM
+        if(getRepository().getProperty(PROP_LDM_PQINSERT,"").length()==0) return;
+        if(getRepository().getProperty(PROP_LDM_QUEUE,"").length()==0) return;
+
         if(!request.getUser().getAdmin()) return;
         if (state.entry != null) {
             if ( !state.entry.isFile()) {
@@ -153,19 +158,82 @@ public class LdmOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputEntry(Request request, Entry entry) throws Exception {
-        StringBuffer sb  = new StringBuffer();
-        return makeLinksResult(request, msg("LDM Insert"), sb, new State(entry));
+        return handleEntries(request, entry, (List<Entry>) Misc.newList(entry));
     }
 
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        StringBuffer sb  = new StringBuffer();
-        return makeLinksResult(request, msg("LDM Insert"), sb, new State(group));
+        return handleEntries(request, group, entries);
     }
 
-    private void insert(Entry entry) throws Exception {
-        
-    }
+    private String lastFeed = "SPARE";
+    private String lastProductId = "${filename}";
+
+    private Result handleEntries(Request request, Entry parent, List<Entry> entries) throws Exception {
+        StringBuffer sb  = new StringBuffer();
+        List<Entry> fileEntries = new ArrayList<Entry>();
+        for(Entry entry: entries) {
+            if(entry.isFile()) fileEntries.add(entry);
+        }
+
+        String feed = request.getString(PROP_LDM_FEED,lastFeed);
+        String productId = request.getString(PROP_LDM_PRODUCTID,lastProductId);
+        if(!request.defined(PROP_LDM_FEED)) {
+            String formUrl = request.url(getRepository().URL_ENTRY_SHOW);
+
+            sb.append(HtmlUtil.form(formUrl));
+            sb.append(HtmlUtil.hidden(ARG_OUTPUT,OUTPUT_LDM.getId()));
+            sb.append(HtmlUtil.formTable());
+
+            if(fileEntries.size()==1) {
+                File   f    = fileEntries.get(0).getResource().getFile();
+                String fileTail = getStorageManager().getFileTail(fileEntries.get(0));
+                String size = " (" + f.length() + " bytes)";
+                sb.append(HtmlUtil.formEntry("File:",
+                                             fileTail+size));
+            } else {
+                int size = 0;
+                for(Entry entry: fileEntries) {
+                    size+=entry.getResource().getFile().length();
+                }
+                sb.append(HtmlUtil.formEntry("Files:",
+                                             fileEntries.size()+" files. Total size:" + size));
+            }
+                                         
+
+            sb.append(HtmlUtil.formEntry("Feed:",
+                                         HtmlUtil.select(PROP_LDM_FEED, Misc.toList(LDM_FEED_TYPES),feed)));
+            String tooltip = "macros: ${fromday}  ${frommonth} ${fromyear} ${frommonthname}  <br>" +
+                "${today}  ${tomonth} ${toyear} ${tomonthname} <br> " +
+                "${filename}  ${fileextension}";
+            sb.append(HtmlUtil.formEntry("Product ID:",
+                                         HtmlUtil.input(PROP_LDM_PRODUCTID, productId,
+                                                        HtmlUtil.SIZE_60+
+                                                        HtmlUtil.title(tooltip))));
+
+            sb.append(HtmlUtil.formTableClose());
+            if(fileEntries.size()>1) 
+                sb.append(HtmlUtil.submit(msg("Insert files into LDM")));
+            else
+                sb.append(HtmlUtil.submit(msg("Insert file into LDM")));
+        } else {
+            String queue = getRepository().getProperty(PROP_LDM_QUEUE,"");
+            String pqinsert = getRepository().getProperty(PROP_LDM_PQINSERT,"");
+            for(Entry entry: fileEntries) {
+                String id = getRepository().getEntryManager().replaceMacros(entry, productId);
+                LdmAction.insertIntoQueue(pqinsert, queue, feed, id, entry.getResource().getPath());
+                sb.append("Inserted: " + getStorageManager().getFileTail(entry));
+                sb.append(HtmlUtil.br());
+            }
+            lastFeed = feed;
+            lastProductId = productId;
+        }
+
+        return makeLinksResult(request, msg("LDM Insert"), sb, new State(parent));
+    } 
+
+
+
 }
 

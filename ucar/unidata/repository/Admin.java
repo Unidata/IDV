@@ -784,7 +784,7 @@ public class Admin extends RepositoryManager {
                     PROP_ACCESS_ADMINONLY, "true",
                     getProperty(
                         PROP_ACCESS_ADMINONLY, false)) + HtmlUtil.space(2)
-                            + msg("Admin only")));
+                            + msg("Only allows administrators to access the site")));
         asb.append(
             HtmlUtil.formEntry(
                 "",
@@ -792,7 +792,7 @@ public class Admin extends RepositoryManager {
                     PROP_ACCESS_REQUIRELOGIN, "true",
                     getProperty(
                         PROP_ACCESS_REQUIRELOGIN, false)) + HtmlUtil.space(2)
-                            + msg("Require login")));
+                            + msg("Require login to access the site")));
 
 
 
@@ -823,6 +823,30 @@ public class Admin extends RepositoryManager {
                                          "<table><tr valign=top><td>"
                                          + fileWidget + "</td><td>"
                                          + fileLabel + "</td></tr></table>"));
+
+
+
+        
+        asb.append(HtmlUtil.colspan("Enable Unidata Local Data Manager (LDM) Access", 2));
+        String pqinsertPath = getProperty(PROP_LDM_PQINSERT,"");
+        String ldmExtra1="";
+        if(pqinsertPath.length()>0 && !new File(pqinsertPath).exists()) {
+            ldmExtra1 = HtmlUtil.space(2) + HtmlUtil.span("File does not exist!", HtmlUtil.cssClass("errorlabel"));
+        }
+ 
+        asb.append(HtmlUtil.formEntry("Path to pqinsert:",
+                                     HtmlUtil.input(PROP_LDM_PQINSERT,
+                                                    pqinsertPath, HtmlUtil.SIZE_60)+ldmExtra1));
+        String ldmQueue = getProperty(PROP_LDM_QUEUE, "");
+        String ldmExtra2="";
+        if(ldmQueue.length()>0 && !new File(ldmQueue).exists()) {
+            ldmExtra2 = HtmlUtil.space(2) + HtmlUtil.span("File does not exist!", HtmlUtil.cssClass("errorlabel"));
+        }
+
+        asb.append(HtmlUtil.formEntry("Queue Location:",
+                                     HtmlUtil.input(PROP_LDM_QUEUE,
+                                                    ldmQueue, HtmlUtil.SIZE_60)+ldmExtra2));
+
 
 
 
@@ -997,9 +1021,15 @@ public class Admin extends RepositoryManager {
     public Result adminSettingsDo(Request request) throws Exception {
 
         getRepository().writeGlobal(PROP_ADMIN_EMAIL,
-                                    request.getString(PROP_ADMIN_EMAIL, ""));
+                                    request.getString(PROP_ADMIN_EMAIL, "").trim());
         getRepository().writeGlobal(PROP_ADMIN_SMTP,
-                                    request.getString(PROP_ADMIN_SMTP, ""));
+                                    request.getString(PROP_ADMIN_SMTP, "").trim());
+
+        getRepository().writeGlobal(PROP_LDM_PQINSERT,
+                                    request.getString(PROP_LDM_PQINSERT, "").trim());
+        getRepository().writeGlobal(PROP_LDM_QUEUE,
+                                    request.getString(PROP_LDM_QUEUE, "").trim());
+
 
         if (request.exists(PROP_REPOSITORY_NAME)) {
             getRepository().writeGlobal(

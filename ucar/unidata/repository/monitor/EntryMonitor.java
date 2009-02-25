@@ -56,6 +56,8 @@ import java.util.List;
 public class EntryMonitor implements Constants {
 
 
+    public static final String ARG_CLEARERROR = "monitor_clearerror";
+
     /** _more_          */
     private String lastError;
 
@@ -204,6 +206,11 @@ public class EntryMonitor implements Constants {
      * @throws Exception _more_
      */
     public void applyEditForm(Request request) throws Exception {
+
+        if(request.get(ARG_CLEARERROR,false)) {
+            lastError = "";
+        }
+
         setName(request.getString(ARG_MONITOR_NAME, getName()));
         setEnabled(request.get(ARG_MONITOR_ENABLED, false));
         Date[] dateRange = request.getDateRange(ARG_MONITOR_FROMDATE,
@@ -269,6 +276,20 @@ public class EntryMonitor implements Constants {
 
         sb.append(HtmlUtil.makeShowHideBlock("Settings", stateSB.toString(),
                                              true));
+
+        if(getLastError()!=null && getLastError().length()>0) {
+            StringBuffer errorSB = new StringBuffer(); 
+            errorSB.append(HtmlUtil.checkbox(ARG_CLEARERROR,"true",true));
+            errorSB.append(" ");
+            errorSB.append(getRepository().msg("Clear error"));
+            errorSB.append(HtmlUtil.pre(getLastError()));
+            sb.append(HtmlUtil.makeShowHideBlock(HtmlUtil.span(getRepository().msg("Error"),HtmlUtil.cssClass("errorlabel")),
+                                                 errorSB.toString(), true));
+        }
+
+
+
+
         sb.append(HtmlUtil.makeShowHideBlock("Search Criteria",
                                              searchSB.toString(), false));
         sb.append(HtmlUtil.makeShowHideBlock("Actions", actionsSB.toString(),
@@ -570,7 +591,7 @@ public class EntryMonitor implements Constants {
      * @param exc _more_
      */
     protected void handleError(String message, Exception exc) {
-        lastError = message + "\n" + LogUtil.getStackTrace(exc);
+        lastError = message + "<br>" +exc +"<br>" +LogUtil.getStackTrace(exc);
         System.err.println("Error:" + message + " " + exc);
         exc.printStackTrace();
     }
