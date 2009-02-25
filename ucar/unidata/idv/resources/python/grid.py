@@ -155,8 +155,33 @@ def make2D(slice):
   return GridUtil.make2DGridFromSlice(slice)
 
 
-def averageOverTime(field,makeTimes = 0):
+def sumOverTime(field,makeTimes=0):
+    """Take the sum of the values in each time step
+    If makeTimes is true (1) then we return a field mapping all of the times
+    to the average. Else we just return the sum """
+    return GridUtil.sumOverTime(field,makeTimes);
+
+def minOverTime(field,makeTimes=0):
+    """Take the min of the values in each time step
+    If makeTimes is true (1) then we return a field mapping all of the times
+    to the average. Else we just return the min """
+    return GridUtil.minOverTime(field,makeTimes);
+
+def maxOverTime(field,makeTimes=0):
+    """Take the max of the values in each time step
+    If makeTimes is true (1) then we return a field mapping all of the times
+    to the average. Else we just return the max """
+    return GridUtil.maxOverTime(field,makeTimes);
+
+def averageOverTime(field,makeTimes=0):
     """Average the values in each time step
+    If makeTimes is true (1) then we return a field mapping all of the times
+    to the average. Else we just return the average """
+    return GridUtil.averageOverTime(field,makeTimes);
+
+
+def oldaverageOverTime(field,makeTimes = 0):
+    """@deprecated Average the values in each time step
     If makeTimes is true (1) then we return a field mapping all of the times
     to the average. Else we just return the average """
     if (GridUtil.isTimeSequence(field)==0):
