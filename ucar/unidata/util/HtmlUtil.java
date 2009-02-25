@@ -136,6 +136,8 @@ public class HtmlUtil {
     /** _more_ */
     public static final String TAG_P = "p";
 
+    public static final String TAG_PRE = "pre";
+
     /** _more_ */
     public static final String TAG_SCRIPT = "script";
 
@@ -717,6 +719,10 @@ public class HtmlUtil {
      */
     public static String div(String content, String extra) {
         return tag(TAG_DIV, extra, content);
+    }
+
+    public static String pre(String content) {
+        return tag(TAG_PRE, "", content);
     }
 
 
