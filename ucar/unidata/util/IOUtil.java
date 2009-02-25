@@ -201,7 +201,9 @@ public class IOUtil {
                         ? 1
                         : -1);
             }
-            return 0;
+            //Sort on name
+            return that.f.compareTo(this.f);
+            //            return 0;
 
         }
     }
@@ -253,11 +255,15 @@ public class IOUtil {
      * @return _more_
      */
     public static File[] sortFilesOnName(File[] files) {
+        return  sortFilesOnName(files);
+    }
+
+    public static File[] sortFilesOnName(File[] files,boolean descending) {
         List tuples = new ArrayList();
         for (int i = 0; i < files.length; i++) {
             tuples.add(new Object[] { files[i].getName(), files[i] });
         }
-        tuples = Misc.sortTuples(tuples, true);
+        tuples = Misc.sortTuples(tuples, descending);
 
         files  = new File[tuples.size()];
         for (int i = 0; i < tuples.size(); i++) {
