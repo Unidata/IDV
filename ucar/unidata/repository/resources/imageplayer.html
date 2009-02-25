@@ -50,10 +50,10 @@ focus()
 //============================================================
  
  
-imageTitles = new Array();
-imageUrls= new Array();
-imageOk = new Array();  
-//theImages = new Array();
+
+var images= new Array();
+
+
 
 
  
@@ -76,12 +76,19 @@ direction =1;
 running = 0;
 timestamp=1;
 
-numImages=0;
+function MyImage (url,label) {
+   this.url = url;
+   this.label = label;
+   this.image = null;
+   this.ok  =1;
+}
+
+
+
+
 function addImage(url,label) {
-  imageUrls[numImages ] =url;
-  imageTitles[numImages] = label;
-  imageOk[numImages] = 1;
-  numImages++;
+  images[images.length] =new MyImage(url,label);
+  
 }
 
 MODE_NORMAL=0;
@@ -103,12 +110,6 @@ image4.src = modeRockingImage;
 
 ${imagelist}
 
-images = new Array();
-for (var i = 0; i < numImages; i++) {
-  var image = new Image(700,700);
-//  images[i] = image;
-//  image.src = imageUrls[i];
-}
 
 
 
@@ -153,20 +154,20 @@ function play(mytimestamp)
       current_image--;
    }
 
-   if (current_image >= numImages) {
+   if (current_image >= images.length) {
       if (play_mode == 1) {      
          current_image = 0;
       } else  if (play_mode == 2) {              //sweep mode - change directions (go bkwd)
-         current_image = numImages-1;
+         current_image = images.length-1;
 	 direction=0;
       } else {
          current_image = 0;
       }
    }
 
-   if (current_image < numImages) {
+   if (current_image < images.length) {
      if (play_mode == 1) {               //rev loop mode - skip to last image
-        current_image = numImages-1;
+        current_image = images.length-1;
      }
      if (play_mode == 2) {
         current_image = 0;
@@ -176,10 +177,10 @@ function play(mytimestamp)
    //== Make sure there is at least one image selected
    //== and find first_selected_image and last_selected_image
    has_selected = false;
-   first_selected_image = numImages-1;
+   first_selected_image = images.length-1;
    last_selected_image = 0;
-   for (var i = 0; i < numImages; i++) {
-     if(imageOk[i]) { 
+   for (var i = 0; i < images.length; i++) {
+     if(images[i].ok) { 
        has_selected = true;
        first_selected_image = i < first_selected_image ? i : first_selected_image;  
        last_selected_image = i > last_selected_image ? i : last_selected_image;  
@@ -189,13 +190,13 @@ function play(mytimestamp)
    //== check to ensure that current image has not been deselected from the loop ==
    //== if it has, then find the next image that hasn't been ==
    if(has_selected) {
-     while (imageOk[current_image] == false) {
+     while (images[current_image].ok == false) {
          current_image++;
-         if (current_image >= numImages) {
+         if (current_image >= images.length) {
             if (play_mode == 1)
                current_image = 0;
             if (play_mode == 2) {
-               current_image = numImages-1;
+               current_image = images.length-1;
                direction=0;
             }
          }
@@ -237,19 +238,19 @@ function incrementImage(number)
    stop();
 
    //== if image is last in loop, increment to first image ==
-   if (number >= numImages) number = 0;
+   if (number >= images.length) number = 0;
  
    //== Make sure there is at least one image selected
    has_selected = false;
-   for (var i = 0; i < numImages; i++) {
-     if(imageOk[i]) { has_selected = true;}
+   for (var i = 0; i < images.length; i++) {
+     if(images[i].ok) { has_selected = true;}
    }
    if(!has_selected) { return };
 
    //== check to ensure that image has not been deselected from loop ==
-   while (imageOk[number-0] == false) {
+   while (images[number-0].ok == false) {
          number++;
-         if (number >= numImages) number =0;
+         if (number >= images.length) number =0;
    }
  
    current_image = number;
@@ -265,19 +266,19 @@ function decrementImage(number)
    stop();
  
    //== if image is first in loop, decrement to last image ==
-   if (number < 0) number = numImages-1;
+   if (number < 0) number = images.length-1;
  
    //== Make sure there is at least one image selected
    has_selected = false;
-   for (var i = 0; i < numImages; i++) {
-     if(imageOk[i-0]) { has_selected = true; }
+   for (var i = 0; i < images.length; i++) {
+     if(images[i-0].ok) { has_selected = true; }
    }
    if(!has_selected) { return };
 
    //== check to ensure that image has not been deselected from loop ==
-   while (imageOk[number-0] == false) {
+   while (images[number-0].ok == false) {
          number--;
-         if (number < 0) number = numImages-1;
+         if (number < 0) number = images.length-1;
    }
  
    current_image = number;
@@ -290,21 +291,21 @@ function decrementImage(number)
 function setImage(number,dir)
 {
    stop();
-   if (number < 0) number = numImages-1;
-   if (number >= numImages) number = 0;
+   if (number < 0) number = images.length-1;
+   if (number >= images.length) number = 0;
 
    //== Make sure there is at least one image selected
    has_selected = false;
-   for (var i = 0; i < numImages; i++) {
-     if(imageOk[i]) { has_selected = true; }
+   for (var i = 0; i < images.length; i++) {
+     if(images[i].ok) { has_selected = true; }
    }
    if(!has_selected) { return };
 
    //== check to ensure that image has not been deselected from loop ==
-   while (imageOk[number] == false) {
+   while (images[number].ok == false) {
        number+=dir;
-       if (number < 0) number = numImages-1;
-       else if(number>=numImages) number = 0;
+       if (number < 0) number = images.length-1;
+       else if(number>=images.length) number = 0;
    }
    current_image = number;
    displayImage();
@@ -336,12 +337,12 @@ function quote(s) {
 function setBoxes() {
     var boxes="";
     var hideboxes = "";
-    for (var i = 0; i < numImages; i++)
+    for (var i = 0; i < images.length; i++)
     {
       gotoalt=alt("Go to image " + i); 
       hidecolor = "blue";
       color = "blue";
-      if(imageOk[i]==0) {
+      if(images[i].ok==0) {
          hidealt=alt("Use image  " + (i+1) +" in animation"); 
          color = "red";
          hidecolor = "red";
@@ -352,7 +353,7 @@ function setBoxes() {
          }
       }
       width=10;
-      while(width>2 && numImages*width >500) {
+      while(width>2 && images.length*width >500) {
           width--;
       }
       imgAttrs = attr("border",0) + attr("width", width) + attr("height",10);
@@ -405,14 +406,14 @@ function tag(tag, attrs, contents ) {
 
 function checkImage(status,i)
 {
-   imageOk[i] = status;
+   images[i].ok = status;
    setBoxes();
 }
 
 function toggleImageOk(i)
 {
-   if(imageOk[i]==0) imageOk[i]=1;
-   else imageOk[i]=0;
+   if(images[i].ok==0) images[i].ok=1;
+   else images[i].ok=0;
    setBoxes();
 }
  
@@ -435,16 +436,14 @@ function goToImage(frame_num)
 }
 
 function displayImage() {
-//    if(!theImages[current_image]) {
-//      theImages[current_image] = new Image(800,800);
-//      theImages[current_image].src = imageUrls[current_image];
-//     }                
-
-//     document.animation.src = theImages[current_image].src;   
-     document.animation.src = imageUrls[current_image];
+    if(!images[current_image].image) {
+         images[current_image].image = new Image();
+         images[current_image].image.src = images[current_image].url;
+     }
+     document.animation.src = images[current_image].url;
      setBoxes();
-     if(imageTitles[current_image]) {
-          document.getElementById('header').innerHTML = imageTitles[current_image];
+     if(images[current_image].label) {
+          document.getElementById('header').innerHTML = images[current_image].label;
      } else  {
           document.getElementById('header').innerHTML = "";
      }
@@ -466,7 +465,7 @@ This requires Javascript for an animation of the imagery.
 <TABLE BORDER="1" CELLPADDING="0" CELLSPACING="0" width="100%" class="imageplayer">
     <TR>
     <TD width="150" align="center" valign="center" > 
-<A HREF="JavaScript: noop()" onClick="setImage(0,1)"><IMG  BORDER="0" SRC="${root}/imageplayer/control_rewind_blue.png" ALT="Got to first frame" title="Go to first frame"></A><A HREF="JavaScript: noop()" onClick="setImage(current_image-1,-1)"><IMG  BORDER="0" SRC="${root}/imageplayer/control_start_blue.png" ALT="One step back" TITLE="One step back"></A><A HREF="JavaScript: noop()" onClick="startStop()"><IMG  BORDER="0" NAME="startstop" SRC="${root}/imageplayer/control_play_blue.png" ALT="Start/Stop" TITLE="Start/Stop"></A><A HREF="JavaScript: noop()" onClick="setImage(current_image+1,1)"><IMG  BORDER="0" SRC="${root}/imageplayer/control_end_blue.png" ALT="One step forward" TITLE="One step forward"></A><A HREF="JavaScript: noop()" onClick="setImage(numImages-1,-1)"><IMG  BORDER="0" SRC="${root}/imageplayer/control_fastforward_blue.png" ALT="Go to last frame" TITLE="Go to last frame"></A></TD>
+<A HREF="JavaScript: noop()" onClick="setImage(0,1)"><IMG  BORDER="0" SRC="${root}/imageplayer/control_rewind_blue.png" ALT="Got to first frame" title="Go to first frame"></A><A HREF="JavaScript: noop()" onClick="setImage(current_image-1,-1)"><IMG  BORDER="0" SRC="${root}/imageplayer/control_start_blue.png" ALT="One step back" TITLE="One step back"></A><A HREF="JavaScript: noop()" onClick="startStop()"><IMG  BORDER="0" NAME="startstop" SRC="${root}/imageplayer/control_play_blue.png" ALT="Start/Stop" TITLE="Start/Stop"></A><A HREF="JavaScript: noop()" onClick="setImage(current_image+1,1)"><IMG  BORDER="0" SRC="${root}/imageplayer/control_end_blue.png" ALT="One step forward" TITLE="One step forward"></A><A HREF="JavaScript: noop()" onClick="setImage(images.length-1,-1)"><IMG  BORDER="0" SRC="${root}/imageplayer/control_fastforward_blue.png" ALT="Go to last frame" TITLE="Go to last frame"></A></TD>
 <TD  valign="bottom">
 <table  width="100%"><tr valign="bottom">
 <td>
@@ -510,7 +509,7 @@ This requires Javascript for an animation of the imagery.
 <TD VALIGN=top>
    <div  id="header" style="margin:2">&nbsp;</div>
    <div class="imageblock">
-  <IMG NAME="animation" BORDER=0 WIDTH=600  SRC="${firstimage}" ALT="image">
+${imagehtml}
    </div>
 </TD>
 </TR>

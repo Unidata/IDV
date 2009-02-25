@@ -202,7 +202,19 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         File   childPath   = getFileFromId(synthId, rootDir);
         File[] files       = childPath.listFiles();
         //        files = IOUtil.sortFilesOnName(files);
-        files = IOUtil.sortFilesOnAge(files, true);
+        boolean descending= !request.get(ARG_ASCENDING,false);
+
+
+        if(request.getString(ARG_ORDERBY,"").equals("name")) {
+            //            System.err.println ("by name " + descending);
+            files = IOUtil.sortFilesOnName(files, descending);
+        } else {
+            //            files = IOUtil.sortFilesOnName(files, true);
+            //            System.err.println ("by age " + descending);
+            files = IOUtil.sortFilesOnAge(files, descending);
+        }
+
+
         List<String> includes = get(values, COL_INCLUDES);
         List<String> excludes = get(values, COL_EXCLUDES);
         long age = (long) (1000

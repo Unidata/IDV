@@ -259,11 +259,11 @@ function moveFloatDiv(x,y) {
     }
 }
 
-function mouseOverOnEntry(event, id) {
+function mouseOverOnEntry(event, entryId, targetId) {
     event = util.getEvent(event);
-    if(id == draggedEntry) return;
+    if(entryId == draggedEntry) return;
     if(mouseIsDown)  {
-        var obj = util.getDomObject("span_" + id);
+        var obj = util.getDomObject(targetId);
         if(!obj)  return;
         //       if(obj.style && obj.style.borderBottom) {
         obj.style.borderBottom="2px black solid";
@@ -271,10 +271,10 @@ function mouseOverOnEntry(event, id) {
     }
 }
 
-function mouseOutOnEntry(event, id) {
+function mouseOutOnEntry(event, entryId,targetId) {
     event = util.getEvent(event);
-    if(id == draggedEntry) return;
-    var obj = util.getDomObject("span_" + id);
+    if(entryId == draggedEntry) return;
+    var obj = util.getDomObject(targetId);
     if(!obj)  return;
     if(mouseIsDown)  {
         obj.style.borderBottom="";
@@ -284,9 +284,9 @@ function mouseOutOnEntry(event, id) {
 
 
 
-function mouseDownOnEntry(event, id, name) {
+function mouseDownOnEntry(event, entryId, name) {
     event = util.getEvent(event);
-    draggedEntry = id;
+    draggedEntry = entryId;
     draggedEntryName=name;
     mouseIsDown = 1;
     if(event.preventDefault) {
@@ -298,16 +298,16 @@ function mouseDownOnEntry(event, id, name) {
 }
 
 
-function mouseUpOnEntry(event, id) {
+function mouseUpOnEntry(event, entryId, targetId) {
     event = util.getEvent(event);
-    if(id == draggedEntry) return;
-    var obj = util.getDomObject("span_" + id);
+    if(entryId == draggedEntry) return;
+    var obj = util.getDomObject(targetId);
     if(!obj)  return;
     if(mouseIsDown)  {
         obj.style.borderBottom="";
     }
-    if(draggedEntry && draggedEntry!=id) {
-        url = "${urlroot}/entry/copy?action=action.move&from=" + draggedEntry +"&to=" + id;
+    if(draggedEntry && draggedEntry!=entryId) {
+        url = "${urlroot}/entry/copy?action=action.move&from=" + draggedEntry +"&to=" + entryId;
         //	alert(url);
 	window.open(url,'move window','') ;
         //        document.location = url;

@@ -4090,9 +4090,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                            boolean addOrderBy) {
         String  order     = " DESC ";
         boolean haveOrder = false;
+
+
+        haveOrder = request.exists(ARG_ASCENDING);
+
         if (request.get(ARG_ASCENDING, false)) {
             order     = " ASC ";
-            haveOrder = true;
         }
         int    skipCnt     = request.get(ARG_SKIP, 0);
         String limitString = BLANK;
@@ -4121,6 +4124,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             }
         }
 
+        //        System.err.println(orderBy);
         return orderBy + limitString;
         //            }
         //        }

@@ -96,6 +96,16 @@ a.header  {
 }
 
 
+.sortlink  {
+  font-size: 10pt;
+}
+
+.sortlink a {
+   font-size: 10pt;
+   color:black;
+   text-decoration: none;
+}
+
 
 .header a {
 	color:white;

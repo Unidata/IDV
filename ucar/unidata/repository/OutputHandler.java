@@ -233,6 +233,15 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                         + ARG_SKIP + "="
                                         + (skip + max), msg("Next")));
             }
+            request.put(ARG_MAX,""+(max+100));
+            if(cnt>=max) {
+                sb.append(HtmlUtil.space(1));
+                sb.append(HtmlUtil.href(request.getUrl(),msg("View More")));
+                request.put(ARG_MAX,""+(max/2));
+                sb.append(HtmlUtil.space(1));
+                sb.append(HtmlUtil.href(request.getUrl(),msg("View Less")));
+            }
+            request.put(ARG_MAX,max);
         }
 
     }
@@ -764,6 +773,34 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     public static int entryCnt = 0;
 
 
+    public String getSortLinks(Request request) {
+        StringBuffer sb = new StringBuffer();
+        String oldOrderBy = request.getString(ARG_ORDERBY,null);
+        String oldAscending = request.getString(ARG_ASCENDING,null);
+        String[]order = {"name","true","Name " + HtmlUtil.img(getRepository().iconUrl(ICON_UPDART)),"Sort by name ascending",
+                         "name","false","Name "+ HtmlUtil.img(getRepository().iconUrl(ICON_DOWNDART)),"Sort by name descending",
+                         "fromdate","true","Date " + HtmlUtil.img(getRepository().iconUrl(ICON_UPDART)),"Sort by date ascending",
+                         "fromdate","false","Date "+ HtmlUtil.img(getRepository().iconUrl(ICON_DOWNDART)),"Sort by date descending"};
+                         
+        sb.append(HtmlUtil.span(msgLabel("Sort"),HtmlUtil.cssClass("sortlink")));
+        for(int i=0;i<order.length;i+=4) {
+            request.put(ARG_ORDERBY,order[i]);
+            request.put(ARG_ASCENDING,order[i+1]);
+            String url = request.getUrl();
+            sb.append(HtmlUtil.span(HtmlUtil.href(url,order[i+2]),HtmlUtil.title(order[i+3])+HtmlUtil.cssClass("sortlink")));
+            sb.append(HtmlUtil.space(2));
+        }
+
+        if(oldOrderBy!=null) {
+            request.put(ARG_ORDERBY,oldOrderBy);
+        }
+        if(oldAscending!=null) {
+            request.put(ARG_ASCENDING,oldAscending);
+        }
+        return sb.toString();
+
+    }
+
 
     /**
      * _more_
@@ -796,12 +833,20 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             tfos.add(new TwoFacedObject(outputType.getLabel(),
                                         outputType.getId()));
         }
+
+
+
+
+
         StringBuffer selectSB = new StringBuffer();
         selectSB.append(HtmlUtil.space(4));
         selectSB.append(msgLabel("View As"));
         selectSB.append(HtmlUtil.select(ARG_OUTPUT, tfos));
         selectSB.append(HtmlUtil.submit(msg("Selected"), "getselected"));
         selectSB.append(HtmlUtil.submit(msg("All"), "getall"));
+
+        selectSB.append(getSortLinks(request));
+
 
         String arrowImg =
             HtmlUtil.img(getRepository().iconUrl(ICON_GRAYRIGHTDART),

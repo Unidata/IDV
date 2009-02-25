@@ -1702,6 +1702,7 @@ return new Result(title, sb);
                               IOUtil.getFileExtension(
                                   entry.getResource().getPath()));
 
+
         if (request.defined(ARG_IMAGEWIDTH) && ImageUtils.isImage(path)) {
             int    width    = request.get(ARG_IMAGEWIDTH, 75);
             String thumbDir = getStorageManager().getThumbDir();
@@ -1720,10 +1721,13 @@ return new Result(title, sb);
                               IOUtil.getInputStream(thumb, getClass()),
                               mimeType);
         } else {
+            System.err.println("get:" + entry);
             InputStream inputStream =
                 IOUtil.getInputStream(entry.getResource().getPath(),
                                       getClass());
-            return new Result(BLANK, inputStream, mimeType);
+            Result result =new Result(BLANK, inputStream, mimeType);
+            result.setCacheOk(true);
+            return result;
         }
 
     }
@@ -2941,18 +2945,18 @@ return new Result(title, sb);
         String       entryId = entry.getId();
 
         String       uid     = "link_" + HtmlUtil.blockCnt++;
-        StringBuffer event  = new StringBuffer();
         String output = "groupxml";
         String folderClickUrl = 
             request.entryUrl(getRepository().URL_ENTRY_SHOW,entry)+
             "&" + HtmlUtil.arg(ARG_OUTPUT, output) +
             "&" + HtmlUtil.arg(ARG_SHOWLINK, ""+showLink);
 
+        String targetId = "targetspan_" + HtmlUtil.blockCnt++;
 
         boolean okToMove = !request.getUser().getAnonymous();
-        String dropEvent = (!entry.isGroup()?"":HtmlUtil.onMouseUp(HtmlUtil.call("mouseUpOnEntry",
-                                                                                 HtmlUtil.comma("event",
-                                                                                                HtmlUtil.squote(entry.getId())))));
+
+
+
 
         String compId = "popup_" + HtmlUtil.blockCnt++;
         String linkId = "img_" + uid;
@@ -2975,26 +2979,37 @@ return new Result(title, sb);
 
         }
 
+
+        StringBuffer sourceEvent  = new StringBuffer();
+        StringBuffer targetEvent  = new StringBuffer();
         if (okToMove) {
             if(entry.isGroup() && forTreeNavigation) {
-                event.append(HtmlUtil.onMouseOver(HtmlUtil.call("mouseOverOnEntry",
+                targetEvent.append(HtmlUtil.onMouseOver(HtmlUtil.call("mouseOverOnEntry",
                                                                 HtmlUtil.comma("event",
-                                                                               HtmlUtil.squote(entryId)))));
+                                                                               HtmlUtil.squote(entry.getId()),
+                                                                               HtmlUtil.squote(targetId)))));
             }
-            event.append(HtmlUtil.onMouseOut(HtmlUtil.call("mouseOutOnEntry",
-                                                           HtmlUtil.comma("event", HtmlUtil.squote(entryId)))));
+            targetEvent.append(HtmlUtil.onMouseOut(HtmlUtil.call("mouseOutOnEntry",
+                                                           HtmlUtil.comma("event", 
+                                                                          HtmlUtil.squote(entry.getId()),
+                                                                          HtmlUtil.squote(targetId)))));
 
-            event.append(HtmlUtil.onMouseDown(HtmlUtil.call("mouseDownOnEntry",
+            sourceEvent.append(HtmlUtil.onMouseDown(HtmlUtil.call("mouseDownOnEntry",
                                                            HtmlUtil.comma("event",
-                                                                          HtmlUtil.squote(entryId),
+                                                                          HtmlUtil.squote(entry.getId()),
                                                                           HtmlUtil.squote(entry.getLabel().replace("'",""))))));
-            event.append(dropEvent);
+            targetEvent.append((!entry.isGroup()?"":HtmlUtil.onMouseUp(HtmlUtil.call("mouseUpOnEntry",
+                                                                                                          HtmlUtil.comma("event",
+                                                                                                                         HtmlUtil.squote(entry.getId()),
+                                                                                                                         HtmlUtil.squote(targetId))))));
+
         }
         
         String img = prefix +HtmlUtil.img(getIconUrl(request, entry),
                                           (okToMove
                                             ? msg("Drag to move")
-                                            : ""), HtmlUtil.id("img_" + uid) + event);
+                                            : ""), HtmlUtil.id("img_" + uid) + sourceEvent);
+
 
         //        StringBuffer row = new StringBuffer();
 
@@ -3004,12 +3019,11 @@ return new Result(title, sb);
         if(showLink) {
             sb.append(getTooltipLink(request, entry, linkText,url));
         } else {
-            sb.append(HtmlUtil.span(linkText, event.toString()));
+            sb.append(HtmlUtil.span(linkText, targetEvent.toString()));
         }
 
 
-        String link = HtmlUtil.span(sb.toString(),
-                                    HtmlUtil.id("span_" + entry.getId()));
+        String link = HtmlUtil.span(sb.toString(), HtmlUtil.id(targetId)+targetEvent);
 
 
         String folderBlock = (!forTreeNavigation?"": HtmlUtil.div("",

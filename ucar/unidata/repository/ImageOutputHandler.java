@@ -298,8 +298,8 @@ public class ImageOutputHandler extends OutputHandler {
                 col++;
 
                 sb.append("<td>");
-                sb.append(HtmlUtil.img(url, "",
-                                       XmlUtil.attr(ARG_WIDTH, "400")));
+                String imgExtra =      XmlUtil.attr(ARG_WIDTH, "400");
+                sb.append(HtmlUtil.img(url, "",imgExtra));
                 sb.append("<br>\n");
                 sb.append(getEntryLink(request, entry));
                 sb.append(" " + new Date(entry.getStartDate()));
@@ -313,11 +313,28 @@ public class ImageOutputHandler extends OutputHandler {
         } else if (output.equals(OUTPUT_PLAYER)) {
             String playerTemplate =
                 repository.getResource(PROP_HTML_IMAGEPLAYER);
+            String widthAttr = "";
+            int  width = request.get(ARG_WIDTH,600);
+            if(width>0) {
+                widthAttr = HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,""+width);
+            }
+            String imageHtml = "<IMG NAME=\"animation\" BORDER=\"0\" " + widthAttr +HtmlUtil.attr("SRC", firstImage)+" ALT=\"image\">";                                  
+
             String tmp = playerTemplate.replace("${imagelist}",
                              sb.toString());
-            tmp = tmp.replace("${firstimage}", firstImage);
+            tmp = tmp.replace("${imagehtml}",imageHtml);
             tmp = StringUtil.replace(tmp, "${root}", repository.getUrlBase());
-            sb  = new StringBuffer(tmp);
+            String fullUrl = "";
+            if(width>0) {
+                request.put(ARG_WIDTH,"0");
+                fullUrl = HtmlUtil.href(request.getUrl(),msg("Use image width"));
+            } else {
+                request.put(ARG_WIDTH,"600");
+                fullUrl = HtmlUtil.href(request.getUrl(),msg("Use fixed width"));
+            }
+            
+            sb  = new StringBuffer(HtmlUtil.leftRight(getSortLinks(request),fullUrl));
+            sb.append(tmp);
         } else if (output.equals(OUTPUT_SLIDESHOW)) {
             String template = repository.getResource(PROP_HTML_SLIDESHOW);
             template = template.replace("${imagelist}", sb.toString());
