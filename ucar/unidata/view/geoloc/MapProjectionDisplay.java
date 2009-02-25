@@ -1102,6 +1102,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
             boolean isLatLon = false;
             adjustLons = true;
+            // HACK, HACK, HACK, HACK
             if (mp instanceof ProjectionCoordinateSystem) {
                 ProjectionImpl proj =
                     ((ProjectionCoordinateSystem) mp).getProjection();
@@ -1118,6 +1119,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                 maxLon    = minLon + r2d2.getWidth();
                 centerLon = minLon + r2d2.getWidth() / 2;
                 isLatLon  = true;
+            // TODO:  figure out this a little more.
+            } else if (mp instanceof AREACoordinateSystem) {
+                adjustLons = false;
             }
             // TODO:  figure out what we should be doing here.
             use360 = !((minLon >= -185) && (maxLon <= 185));
