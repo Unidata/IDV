@@ -368,7 +368,6 @@ public class DisplaySettingsDialog {
                                                         300);
         displaysSP.setPreferredSize(new Dimension(200, 300));
         if(display!=null) {
-            System.err.println("setting selected value");
             displaysList.setSelectedValue(display,true);
         }
 
