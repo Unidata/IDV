@@ -10,6 +10,15 @@ body {
   border : 1px #888888 solid;
 }
 
+//.input, .password, .fileinput,.textarea {
+//  background: #eff8ff;
+//}
+
+.input:focus, .textarea:focus {
+	background: #fffeec;
+}
+
+
 
 
 .hidden {

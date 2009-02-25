@@ -183,6 +183,7 @@ public class LdmOutputHandler extends OutputHandler {
             String formUrl = request.url(getRepository().URL_ENTRY_SHOW);
 
             sb.append(HtmlUtil.form(formUrl));
+            sb.append(HtmlUtil.hidden(ARG_ENTRYID,parent.getId()));
             sb.append(HtmlUtil.hidden(ARG_OUTPUT,OUTPUT_LDM.getId()));
             sb.append(HtmlUtil.formTable());
 

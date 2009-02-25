@@ -2551,6 +2551,17 @@ return new Result(title, sb);
                 getRepository().note(
                     request.getUnsafeString(ARG_MESSAGE, BLANK)));
         }
+
+
+        String entryUrl =    HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
+                                          ARG_ENTRYID, entry.getId());
+        String title = entry.getName();
+        String share = "<script type=\"text/javascript\">var addthis_disable_flash=\"true\" addthis_pub=\"jeffmc\";</script><a href=\"http://www.addthis.com/bookmark.php?v=20\" onmouseover=\"return addthis_open(this, '', '" + entryUrl +"', '" + title+"')\" onmouseout=\"addthis_close()\" onclick=\"return addthis_sendto()\"><img src=\"http://s7.addthis.com/static/btn/lg-share-en.gif\" width=\"125\" height=\"16\" alt=\"Bookmark and Share\" style=\"border:0\"/></a><script type=\"text/javascript\" src=\"http://s7.addthis.com/js/200/addthis_widget.js\"></script>";
+
+        sb.append(share);
+
+
+
         String key = getRepository().getProperty(PROP_FACEBOOK_CONNECT_KEY, "");
         boolean haveKey = key.length()>0;
         boolean doRatings = getRepository().getProperty(PROP_RATINGS_ENABLE,false);
@@ -3220,7 +3231,7 @@ return new Result(title, sb);
                 sb.append(HtmlUtil.inset(href, 0, 3, 0, 0));
             }
         }
-        return sb.toString();
+        return  sb.toString();
     }
 
     /**
