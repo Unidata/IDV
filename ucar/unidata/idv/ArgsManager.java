@@ -517,7 +517,8 @@ public class ArgsManager extends IdvManager {
      * @return Is the file a bundle file
      */
     public boolean isXidvFile(String name) {
-        return IOUtil.hasSuffix(name, getXidvFileFilter().getPreferredSuffix());
+        return IOUtil.hasSuffix(name, getXidvFileFilter().getPreferredSuffix()) ||
+            IOUtil.hasSuffix(name, SUFFIX_XIDV);
     }
 
     /**
@@ -550,7 +551,8 @@ public class ArgsManager extends IdvManager {
      * @return is zidv
      */
     public boolean isZidvFile(String name) {
-        return IOUtil.hasSuffix(name, getZidvFileFilter().getPreferredSuffix());
+        return IOUtil.hasSuffix(name, getZidvFileFilter().getPreferredSuffix()) ||
+            IOUtil.hasSuffix(name, SUFFIX_ZIDV);
     }
 
 
