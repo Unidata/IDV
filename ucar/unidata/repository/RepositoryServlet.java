@@ -275,6 +275,7 @@ public class RepositoryServlet extends HttpServlet {
                     response.setContentType(repositoryResult.getMimeType());
                     OutputStream output = response.getOutputStream();
                     IOUtil.writeTo(repositoryResult.getInputStream(), output);
+                    repositoryResult.getInputStream().close();
                     output.close();
                 } catch (IOException e) {
                     //We'll ignore any ioexception

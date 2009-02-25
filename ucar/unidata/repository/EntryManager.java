@@ -1721,7 +1721,6 @@ return new Result(title, sb);
                               IOUtil.getInputStream(thumb, getClass()),
                               mimeType);
         } else {
-            System.err.println("get:" + entry);
             InputStream inputStream =
                 IOUtil.getInputStream(entry.getResource().getPath(),
                                       getClass());

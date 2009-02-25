@@ -2,12 +2,15 @@
 var root = "${urlroot}";
 var icon_close = "${urlroot}/icons/close.gif";
 var icon_rightarrow = "${urlroot}/icons/grayrightarrow.gif";
-var icon_downarrow ="${urlroot}/icons/downarrow.gif";
+
+var icon_downdart ="${urlroot}/icons/downdart.gif";
+var icon_rightdart ="${urlroot}/icons/rightdart.gif";
+
 var icon_progress = "${urlroot}/icons/progress.gif";
 var icon_information = "${urlroot}/icons/information.png"
 var icon_folderclosed = "${urlroot}/icons/folderclosed.png";
-//var icon_folderopen = "${urlroot}/icons/folderopen.png";
 var icon_folderopen = "${urlroot}/icons/togglearrowdown.gif";
+
 
 
 function Util () {
@@ -558,9 +561,9 @@ function EntryFormList(formId,img,selectId, initialOn) {
 	    var img = util.getDomObject(this.toggleImg);
             if(img) {
 		if(this.on) {
-   		    img.obj.src =  icon_downarrow;
+   		    img.obj.src =  icon_downdart;
 		} else {
-	            img.obj.src =  icon_rightarrow;
+	            img.obj.src =  icon_rightdart;
 
 		}
             }

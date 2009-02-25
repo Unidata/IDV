@@ -17,6 +17,7 @@
   <outputhandler class="ucar.unidata.repository.CsvOutputHandler" name="CSV"/>
 -->
   <outputhandler class="ucar.unidata.repository.ZipOutputHandler" name="ZIP Files"/>
+  <outputhandler class="ucar.unidata.repository.data.LdmOutputHandler" name="LDM Insert"/>
   <outputhandler class="ucar.unidata.repository.GraphOutputHandler" name="Graph"/>
   <outputhandler class="ucar.unidata.repository.TextOutputHandler" name="Text"/>
   <outputhandler class="ucar.unidata.repository.collab.WikiPageOutputHandler" name="Wiki"/>

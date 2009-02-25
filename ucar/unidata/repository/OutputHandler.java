@@ -777,10 +777,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         StringBuffer sb = new StringBuffer();
         String oldOrderBy = request.getString(ARG_ORDERBY,null);
         String oldAscending = request.getString(ARG_ASCENDING,null);
-        String[]order = {"name","true","Name " + HtmlUtil.img(getRepository().iconUrl(ICON_UPDART)),"Sort by name ascending",
-                         "name","false","Name "+ HtmlUtil.img(getRepository().iconUrl(ICON_DOWNDART)),"Sort by name descending",
-                         "fromdate","true","Date " + HtmlUtil.img(getRepository().iconUrl(ICON_UPDART)),"Sort by date ascending",
-                         "fromdate","false","Date "+ HtmlUtil.img(getRepository().iconUrl(ICON_DOWNDART)),"Sort by date descending"};
+        String[]order = {"name","true",msg("Name") + HtmlUtil.img(getRepository().iconUrl(ICON_UPARROW)),"Sort by name ascending",
+                         "name","false",msg("Name")+ HtmlUtil.img(getRepository().iconUrl(ICON_DOWNARROW)),"Sort by name descending",
+                         "fromdate","true",msg("Date") + HtmlUtil.img(getRepository().iconUrl(ICON_UPARROW)),"Sort by date ascending",
+                         "fromdate","false",msg("Date")+ HtmlUtil.img(getRepository().iconUrl(ICON_DOWNARROW)),"Sort by date descending"};
                          
         sb.append(HtmlUtil.span(msgLabel("Sort"),HtmlUtil.cssClass("sortlink")));
         for(int i=0;i<order.length;i+=4) {
@@ -849,7 +849,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
 
         String arrowImg =
-            HtmlUtil.img(getRepository().iconUrl(ICON_GRAYRIGHTDART),
+            HtmlUtil.img(getRepository().iconUrl(ICON_RIGHTDART),
                          msg("Show/Hide Form"), HtmlUtil.id(base + "img"));
         String link = HtmlUtil.space(2)
                       + HtmlUtil.jsLink(HtmlUtil.onMouseClick(base
