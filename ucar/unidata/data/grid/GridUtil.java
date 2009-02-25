@@ -25,6 +25,8 @@
 
 
 
+
+
 package ucar.unidata.data.grid;
 
 
@@ -114,6 +116,21 @@ public class GridUtil {
      * Default error mode used for subsampling grids
      */
     public static final int DEFAULT_ERROR_MODE = Data.NO_ERRORS;
+
+
+    /** function for the applyFunctionOverTime routine */
+    public static final String FUNC_AVERAGE = "average";
+
+    /** function for the applyFunctionOverTime routine */
+    public static final String FUNC_SUM = "sum";
+
+    /** function for the applyFunctionOverTime routine */
+    public static final String FUNC_MAX = "max";
+
+    /** function for the applyFunctionOverTime routine */
+    public static final String FUNC_MIN = "min";
+
+
 
     /** Default ctor */
     public GridUtil() {}
@@ -749,8 +766,10 @@ public class GridUtil {
             sampleAtLocation = GridUtil.sample(grid, el.getLatLonPoint(),
                     samplingMode);
         }
-        Data data = (animationValue==null? (Data)sampleAtLocation:(Data)sampleAtLocation.evaluate(animationValue, samplingMode,
-                                                                                      Data.NO_ERRORS));
+        Data data = ((animationValue == null)
+                     ? (Data) sampleAtLocation
+                     : (Data) sampleAtLocation.evaluate(animationValue,
+                         samplingMode, Data.NO_ERRORS));
 
         while ((data != null) && !(data instanceof Real)) {
             if (data instanceof FieldImpl) {
@@ -1167,7 +1186,8 @@ public class GridUtil {
             if (Float.isNaN(values[0][0])) {
                 for (int i = 0; i < values.length; i++) {
                     for (int j = 0; j < values[i].length; j++) {
-                        if ( !Float.isNaN(values[i][j])) {
+                        float value = values[i][j];
+                        if (value == value) {
                             return false;
                         }
                     }
@@ -1186,6 +1206,178 @@ public class GridUtil {
         }
         return false;
     }
+
+
+
+    /**
+     * Check if any of the  real values in a FieldImpl are missing.
+     *
+     * @param grid   grid to check
+     * @return true if all values are missing
+     *
+     * @throws VisADException  unable to open VisAD object
+     */
+    public static boolean isAnyMissing(FieldImpl grid) throws VisADException {
+        try {
+            float[][] values = grid.getFloats(false);
+            if (values == null) {
+                return true;
+            }
+            for (int i = 0; i < values.length; i++) {
+                for (int j = 0; j < values[i].length; j++) {
+                    float value = values[i][j];
+                    if (value != value) {
+                        return true;
+                    }
+                }
+            }
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return false;
+    }
+
+
+
+
+    /**
+     * Average the grid over time
+     *
+     * @param grid   grid to average
+     * @param makeTimes If true then make a time field with the range being the same computed value
+     * If false then just return a single field of the computed values
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl averageOverTime(FieldImpl grid, boolean makeTimes)
+            throws VisADException {
+        return applyFunctionOverTime(grid, FUNC_AVERAGE, makeTimes);
+    }
+
+
+    /**
+     * Sum each grid point
+     *
+     * @param grid   grid to analyze
+     *
+     * @param grid   grid to average
+     * @param makeTimes If true then make a time field with the range being the same computed value
+     * If false then just return a single field of the computed values
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl sumOverTime(FieldImpl grid, boolean makeTimes)
+            throws VisADException {
+        return applyFunctionOverTime(grid, FUNC_SUM, makeTimes);
+    }
+
+    /**
+     * Take the min value at each grid point
+     *
+     * @param grid   grid to analyze
+     * @param makeTimes If true then make a time field with the range being the same computed value
+     * If false then just return a single field of the computed values
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl minOverTime(FieldImpl grid, boolean makeTimes)
+            throws VisADException {
+        return applyFunctionOverTime(grid, FUNC_MIN, makeTimes);
+    }
+
+    /**
+     * Take the max value at each grid point
+     *
+     * @param grid   grid to analyze
+     * @param makeTimes If true then make a time field with the range being the same computed value
+     * If false then just return a single field of the computed values
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl maxOverTime(FieldImpl grid, boolean makeTimes)
+            throws VisADException {
+        return applyFunctionOverTime(grid, FUNC_MAX, makeTimes);
+    }
+
+
+    /**
+     * Apply the function to the time steps of the given grid. The function is one of the FUNC_ enums
+     *
+     * @param grid   grid to average
+     * @param function One of the FUNC_ enums
+     * @param makeTimes If true then make a time field with the range being the same computed value
+     * If false then just return a single field of the computed values
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl applyFunctionOverTime(FieldImpl grid,
+            String function, boolean makeTimes)
+            throws VisADException {
+        try {
+            FlatField newGrid = null;
+            if ( !isTimeSequence(grid)) {
+                newGrid = (FlatField) grid.clone();
+                newGrid.setSamples(grid.getFloats(false), true);
+                return newGrid;
+            }
+            boolean   doMax        = function.equals(FUNC_MAX);
+            boolean   doMin        = function.equals(FUNC_MIN);
+            float[][] values       = null;
+            Set       timeDomain   = grid.getDomainSet();
+            int       numTimeSteps = timeDomain.getLength();
+
+
+            for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength();
+                    timeStepIdx++) {
+                FieldImpl sample = (FieldImpl) grid.getSample(timeStepIdx);
+                float[][] timeStepValues = sample.getFloats(false);
+                if (values == null) {
+                    values  = Misc.cloneArray(timeStepValues);
+                    newGrid = (FlatField) sample.clone();
+                    continue;
+                }
+                for (int i = 0; i < timeStepValues.length; i++) {
+                    for (int j = 0; j < timeStepValues[i].length; j++) {
+                        float value = timeStepValues[i][j];
+                        if (value != value) {
+                            continue;
+                        }
+                        if (doMax) {
+                            values[i][j] = Math.max(values[i][j], value);
+                        } else if (doMin) {
+                            values[i][j] = Math.min(values[i][j], value);
+                        } else {
+                            values[i][j] += value;
+                        }
+                    }
+                }
+            }
+            if (function.equals(FUNC_AVERAGE) && (numTimeSteps > 0)) {
+                for (int i = 0; i < values.length; i++) {
+                    for (int j = 0; j < values[i].length; j++) {
+                        values[i][j] = values[i][j] / numTimeSteps;
+                    }
+                }
+            }
+            newGrid.setSamples(values, false);
+            if (makeTimes) {
+                return (FieldImpl) Util.makeTimeField(newGrid,
+                        GridUtil.getDateTimeList(grid));
+            }
+            return newGrid;
+        } catch (CloneNotSupportedException cnse) {
+            throw new VisADException("Cannot clone field");
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+
+    }
+
 
 
     /**
