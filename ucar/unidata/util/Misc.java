@@ -4268,11 +4268,12 @@ public class Misc {
         int   x       = 5 << (32 - 7);
         //        printBits(5);
         //        printBits(x);
+        /*
         int[] values = { x, 8, 9, 10 };
         int[] result = unpack(values, lengths);
         for (int i = 0; i < result.length; i++) {
             System.err.println("result[" + i + "]=" + result[i]);
-        }
+            }*/
 
     }
 
