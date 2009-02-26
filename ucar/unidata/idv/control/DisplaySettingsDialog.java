@@ -80,7 +80,7 @@ public class DisplaySettingsDialog {
     private DisplayControlImpl display;
 
     /** The property values */
-    private List propertyValues = new ArrayList();
+    private List<PropertyValueWrapper> propertyValues = new ArrayList<PropertyValueWrapper>();
 
     /** apply button */
     private JButton applyBtn;
@@ -95,13 +95,14 @@ public class DisplaySettingsDialog {
     private JPanel propertiesHolder;
 
     /** gui component */
-    private JScrollPane leftSP;
+    private JScrollPane propertiesSP;
 
     /** gui component */
     private JComponent contents;
 
 
     private JList displaysList;
+    private JList displaySettingsList;
 
     /**
      * ctor
@@ -166,8 +167,8 @@ public class DisplaySettingsDialog {
      *
      * @return property values
      */
-    public List getPropertyValues() {
-        List props = new ArrayList();
+    public List<PropertyValue> getPropertyValues() {
+        List<PropertyValue> props = new ArrayList<PropertyValue>();
         for (int i = 0; i < propertyValues.size(); i++) {
             PropertyValueWrapper prop =
                 (PropertyValueWrapper) propertyValues.get(i);
@@ -190,29 +191,12 @@ public class DisplaySettingsDialog {
      */
     public void setDisplay(DisplayControlImpl display) {
         this.display   = display;
-        propertyValues = new ArrayList();
+        propertyValues = new ArrayList<PropertyValueWrapper>();
         display.addDisplaySettings(this);
         if (dialog != null) {
             dialog.setTitle("Display Settings -- " + display.getTitle());
         }
         updatePropertiesComponent();
-        //Don't change the displays list
-        if(true) return;
-        for (int i = 0; i < displays.size(); i++) {
-            DisplayWrapper dw =  displayWrappers.get(i);
-            if (FONT_NORMAL == null) {
-                FONT_NORMAL   = dw.cbx.getFont();
-                FONT_SELECTED = FONT_NORMAL.deriveFont(Font.ITALIC);
-            }
-            if (dw.dci == display) {
-                dw.cbx.setSelected(true);
-                dw.cbx.setFont(FONT_NORMAL);
-            } else {
-                dw.cbx.setSelected(false);
-
-                dw.cbx.setFont(FONT_NORMAL);
-            }
-        }
     }
 
 
@@ -357,43 +341,75 @@ public class DisplaySettingsDialog {
         JButton   cancelBtn = GuiUtils.makeButton("Cancel", this, "doCancel");
         JButton   saveBtn   = GuiUtils.makeButton("Save", this, "doSave");
 
-        JButton[] holder    = { null };
-        holder[0] = GuiUtils.makeButton("Saved Settings", this,
-                                        "popupDisplaySettingsMenu", holder);
         propertiesHolder = new JPanel(new BorderLayout());
 
+
+        int listHeight=250;
+        int listWidth=200;
         displaysList = new JList(new Vector(displays));
         displaysList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JComponent displaysSP = GuiUtils.makeScrollPane(GuiUtils.top(displaysList), 200,
-                                                        300);
-        displaysSP.setPreferredSize(new Dimension(200, 300));
+        displaysList.setBackground(null);
+        JComponent displaysSP = GuiUtils.makeScrollPane(GuiUtils.top(displaysList), listWidth,
+                                                        listHeight);
+        displaysSP.setPreferredSize(new Dimension(listWidth, listHeight));
         if(display!=null) {
             displaysList.setSelectedValue(display,true);
         }
-
         displaysList.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
-                    setDisplay((DisplayControlImpl) displaysList.getSelectedValue());
+                    DisplayControlImpl display = (DisplayControlImpl) displaysList.getSelectedValue();
+                    if(display!=null) {
+                        displaySettingsList.clearSelection();
+                        setDisplay(display);
+                    }
                 }
             });
 
 
-        JComponent groupApplyComp = GuiUtils.inset(propertiesHolder, 5);
-        leftSP = GuiUtils.makeScrollPane(GuiUtils.top(groupApplyComp), 300,
+        displaySettingsList = new JList(new Vector(idv.getResourceManager().getDisplaySettings()));
+        displaySettingsList.setBackground(null);
+        displaySettingsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JComponent displaySettingsSP = GuiUtils.makeScrollPane(GuiUtils.top(displaySettingsList), listWidth,
+                                                        listHeight);
+        displaySettingsSP.setPreferredSize(new Dimension(listWidth, listHeight));
+        displaySettingsList.addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent e) {
+                    DisplaySetting displaySetting = (DisplaySetting) displaySettingsList.getSelectedValue();
+                    if(displaySetting!=null) {
+                        displaysList.clearSelection();
+                        applyDisplaySetting(displaySetting);
+
+                    }
+                }
+            });
+
+
+
+
+        JComponent propertiesComp = GuiUtils.inset(propertiesHolder, 5);
+        propertiesSP = GuiUtils.makeScrollPane(GuiUtils.top(propertiesComp), 300,
                                          300);
         JScrollPane rightSP =
             GuiUtils.makeScrollPane(GuiUtils.top(displaysComp), 300, 300);
-        leftSP.setPreferredSize(new Dimension(300, 300));
+        propertiesSP.setPreferredSize(new Dimension(300, 300));
         rightSP.setPreferredSize(new Dimension(300, 300));
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
         JComponent buttons = GuiUtils.doLayout(new Component[] { saveBtn,
-                                                                 okBtn, cancelBtn }, 4, GuiUtils.WT_N,
-            GuiUtils.WT_N);
+                                                                 cancelBtn }, 4, GuiUtils.WT_N,
+                                               GuiUtils.WT_N);
 
-        JComponent sourceComp = GuiUtils.topCenter(new JLabel("Source Display"),
-                                                   displaysSP);
+        JComponent sourceComp = GuiUtils.topCenter(new JLabel("Source"),
+                                                   GuiUtils.doLayout(
+                                                                     new Component[]{
+                                                                         new JLabel("Displays"),
+                                                                         displaysSP,
+                                                                         new JLabel("Saved Settings"),
+                                                                         displaySettingsSP},
+                                                                     1,
+                                                                     GuiUtils.WT_Y,
+                                                                     GuiUtils.WT_NYNY));
         JComponent propComp = GuiUtils.topCenter(new JLabel("Properties"),
-                                                 leftSP);
+                                                 propertiesSP);
 
         JComponent targetComp = GuiUtils.topCenter(new JLabel("Target Displays"),
                                                  rightSP);
@@ -401,7 +417,7 @@ public class DisplaySettingsDialog {
         JComponent applyContents = 
             GuiUtils.doLayout(new Component[] {
                     sourceComp, propComp,GuiUtils.wrap(applyBtn), targetComp},
-                4,  new double[]{1,1,0,1}, GuiUtils.WT_Y);
+                4,  new double[]{1,1.25,0,1}, GuiUtils.WT_Y);
 
         applyContents = GuiUtils.centerBottom(applyContents,
                 GuiUtils.wrap(buttons));
@@ -511,25 +527,11 @@ public class DisplaySettingsDialog {
         propertiesHolder.add(BorderLayout.CENTER, GuiUtils.vbox(comps));
         propertiesHolder.validate();
         propertiesHolder.repaint();
-        leftSP.validate();
-        leftSP.getViewport().scrollRectToVisible(new Rectangle(0, 0, 1, 1));
+        propertiesSP.validate();
+        propertiesSP.getViewport().scrollRectToVisible(new Rectangle(0, 0, 1, 1));
     }
 
 
-    /**
-     * popup menu
-     *
-     * @param holder ???
-     */
-    public void popupDisplaySettingsMenu(JButton[] holder) {
-        List displaySettings = idv.getResourceManager().getDisplaySettings();
-        List applyItems = makeDisplaySettingsMenuItems(displaySettings, this,
-                              "applyDisplaySetting", "");
-        if (applyItems.size() == 0) {
-            return;
-        }
-        GuiUtils.showPopupMenu(applyItems, holder[0]);
-    }
 
 
 
@@ -537,7 +539,7 @@ public class DisplaySettingsDialog {
      * Save the settings
      */
     public void doSave() {
-        List propList = new ArrayList();
+        List<PropertyValue> propList = new ArrayList<PropertyValue>();
         for (int i = 0; i < propertyValues.size(); i++) {
             PropertyValueWrapper prop =
                 (PropertyValueWrapper) propertyValues.get(i);
@@ -549,6 +551,12 @@ public class DisplaySettingsDialog {
         }
 
         DisplaySetting.doSave(idv, dialog, propList, display);
+        Object selected = displaySettingsList.getSelectedValue();
+        displaySettingsList.setListData(new Vector(idv.getResourceManager().getDisplaySettings()));
+        if(selected!=null) {
+            displaySettingsList.setSelectedValue(selected,true);
+            
+        }
     }
 
 
@@ -558,7 +566,10 @@ public class DisplaySettingsDialog {
      * @param displaySetting The display setting
      */
     public void applyDisplaySetting(DisplaySetting displaySetting) {
-        List newProps = new ArrayList(displaySetting.getPropertyValues());
+        if (dialog != null) {
+            dialog.setTitle("Display Settings -- " + displaySetting);
+        }
+        List<PropertyValue> newProps = new ArrayList<PropertyValue>(displaySetting.getPropertyValues());
         for (int propIdx = 0; propIdx < propertyValues.size(); propIdx++) {
             PropertyValueWrapper oldProp =
                 (PropertyValueWrapper) propertyValues.get(propIdx);
@@ -605,7 +616,7 @@ public class DisplaySettingsDialog {
      *
      * @return Items
      */
-    public static List makeDisplaySettingsMenuItems(List displaySettings,
+    public static List makeDisplaySettingsMenuItems(List<DisplaySetting> displaySettings,
             Object object, String method, String labelPrefix) {
         List      items    = new ArrayList();
         Hashtable catMenus = new Hashtable();

@@ -30,6 +30,7 @@ import ucar.unidata.idv.IntegratedDataViewer;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.PropertyValue;
 import ucar.unidata.util.StringUtil;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class DisplaySetting {
     private String name;
 
     /** List of values */
-    private List propertyValues;
+    private List<PropertyValue> propertyValues;
 
     /** Is this one of the user's local display settings */
     private boolean isLocal;
@@ -70,7 +71,7 @@ public class DisplaySetting {
      * @param name The name
      * @param propertyValues The values
      */
-    public DisplaySetting(String name, List propertyValues) {
+    public DisplaySetting(String name, List<PropertyValue> propertyValues) {
         this.name           = name;
         this.propertyValues = propertyValues;
     }
@@ -143,7 +144,7 @@ public class DisplaySetting {
      * @param display The display
      */
     public static void doSave(IntegratedDataViewer idv, JDialog dialog,
-                              List propList, DisplayControlImpl display) {
+                              List<PropertyValue> propList, DisplayControlImpl display) {
 
         ControlDescriptor cd = null;
         if (display != null) {
@@ -342,7 +343,7 @@ public class DisplaySetting {
      *
      *  @param value The new value for PropertyValues
      */
-    public void setPropertyValues(List value) {
+    public void setPropertyValues(List<PropertyValue> value) {
         propertyValues = value;
     }
 
@@ -351,7 +352,7 @@ public class DisplaySetting {
      *
      *  @return The PropertyValues
      */
-    public List getPropertyValues() {
+    public List<PropertyValue> getPropertyValues() {
         return propertyValues;
     }
 
