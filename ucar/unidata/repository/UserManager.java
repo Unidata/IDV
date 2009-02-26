@@ -138,6 +138,7 @@ public class UserManager extends RepositoryManager {
     public static String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA");
+            //            MessageDigest md = MessageDigest.getInstance("SHA-512");
             md.update(password.getBytes("UTF-8"));
             return XmlUtil.encodeBase64(md.digest()).trim();
         } catch (NoSuchAlgorithmException nsae) {
@@ -327,6 +328,8 @@ public class UserManager extends RepositoryManager {
         return sb.toString();
     }
 
+    private static final String USER_DEFAULT = "default";
+    private static final String USER_ANONYMOUS = "anonymous";
 
     /**
      * _more_
@@ -336,8 +339,8 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public User getDefaultUser() throws Exception {
-        makeUserIfNeeded(new User("default", "Default User", false));
-        return findUser("default");
+        makeUserIfNeeded(new User(USER_DEFAULT, "Default User", false));
+        return findUser(USER_DEFAULT);
     }
 
     /**
@@ -1843,21 +1846,10 @@ public class UserManager extends RepositoryManager {
         }
         if (user == null) {
             if (request.exists(ARG_USER_NAME)) {
-                sb.append(getRepository().error("Not a registered user"));
+                sb.append(getRepository().error(msg("Not a registered user")));
                 sb.append(HtmlUtil.p());
             }
-            sb.append(msgHeader("Please enter your user ID"));
-            sb.append(HtmlUtil.p());
-            sb.append(
-                request.form(getRepositoryBase().URL_USER_RESETPASSWORD));
-            sb.append(msgLabel("User ID"));
-            sb.append(HtmlUtil.space(1));
-            sb.append(HtmlUtil.input(ARG_USER_NAME,
-                                     request.getString(ARG_USER_NAME, ""),
-                                     HtmlUtil.SIZE_20));
-            sb.append(HtmlUtil.space(1));
-            sb.append(HtmlUtil.submit(msg("Submit")));
-            sb.append(HtmlUtil.formClose());
+            addPasswordResetForm(request, sb, request.getString(ARG_USER_NAME, ""));
             return new Result(msg("Password Reset"), sb);
         }
 
@@ -1887,6 +1879,22 @@ public class UserManager extends RepositoryManager {
                 "Instructions on how to reset your password have been sent to your registered email address")));
         return new Result(msg("Password Reset"), sb);
         */
+    }
+
+
+    private void addPasswordResetForm(Request request, StringBuffer sb, String name) {
+        sb.append(msgHeader("Please enter your user ID"));
+        sb.append(HtmlUtil.p());
+        sb.append(
+                  request.form(getRepositoryBase().URL_USER_RESETPASSWORD));
+        sb.append(msgLabel("User ID"));
+        sb.append(HtmlUtil.space(1));
+        sb.append(HtmlUtil.input(ARG_USER_NAME,
+                                 name,
+                                 HtmlUtil.SIZE_20));
+        sb.append(HtmlUtil.space(1));
+        sb.append(HtmlUtil.submit(msg("Reset your password")));
+        sb.append(HtmlUtil.formClose());
     }
 
 
@@ -1925,20 +1933,28 @@ public class UserManager extends RepositoryManager {
         User         user   = null;
         String       output = request.getString(ARG_OUTPUT, "");
         if (request.exists(ARG_USER_ID)) {
-            String name     = request.getString(ARG_USER_ID, "");
-            String password = request.getString(ARG_USER_PASSWORD, "");
-            password = hashPassword(password);
-            Statement stmt = getDatabaseManager().select(
-                                 Tables.USERS.COLUMNS, Tables.USERS.NAME,
-                                 Clause.and(
-                                     Clause.eq(Tables.USERS.COL_ID, name),
-                                     Clause.eq(
-                                         Tables.USERS.COL_PASSWORD,
-                                         password)));
+            String name     = request.getString(ARG_USER_ID, "").trim();
+            if(name.equals(USER_DEFAULT)||name.equals(USER_ANONYMOUS)) name="";
+            String password = request.getString(ARG_USER_PASSWORD, "").trim();
+            if(name.length()>0 && password.length()>0) {
+                password = hashPassword(password);
+                Statement stmt = getDatabaseManager().select(
+                                                             Tables.USERS.COLUMNS, Tables.USERS.NAME,
+                                                             Clause.and(
+                                                                        Clause.eq(Tables.USERS.COL_ID, name),
+                                                                        Clause.eq(
+                                                                                  Tables.USERS.COL_PASSWORD,
+                                                                                  password)));
 
-            ResultSet results = stmt.getResultSet();
-            if (results.next()) {
-                user = getUser(results);
+                ResultSet results = stmt.getResultSet();
+                if (results.next()) {
+                    user = getUser(results);
+                }
+                stmt.close();
+            }
+
+
+            if(user!=null) {
                 addActivity(request, user, "login", "");
                 getSessionManager().setUserSession(request, user);
                 if (responseAsXml) {
@@ -1975,12 +1991,33 @@ public class UserManager extends RepositoryManager {
                             XmlUtil.attr(ATTR_CODE, CODE_ERROR),
                             "Incorrect user name or password"), MIME_XML);
                 }
+
+                if(name.length()>0) {
+                    //Check if they have a blank password
+                    Statement stmt = getDatabaseManager().select(
+                                                                 Tables.USERS.COL_PASSWORD, Tables.USERS.NAME,
+                                                                 Clause.eq(Tables.USERS.COL_ID, name));
+                    ResultSet results = stmt.getResultSet();
+                    if (results.next()) {
+                        password = results.getString(1);
+                        if(password == null || password.length()==0) {
+                            sb.append(
+                                      getRepository().warning(msg("You are required to reset your password")));
+
+                            addPasswordResetForm(request, sb, name);
+                            stmt.close();
+                            return new Result(msg("Login"), sb);
+                        }
+                    }
+                    stmt.close();
+                }
+
                 //TODO: what to do when we have ssl here?
                 sb.append(
-                    getRepository().warning(
-                        msg("Incorrect user name or password")));
+                    getRepository().warning(msg("Incorrect user name or password")));
+
+
             }
-            stmt.close();
         }
 
 

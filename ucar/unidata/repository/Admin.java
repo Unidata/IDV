@@ -823,8 +823,15 @@ public class Admin extends RepositoryManager {
                              + msg("Enter 'default' for default SSL port.")));
 
 
+        asb.append(HtmlUtil.colspan("Anonymous Uploads", 2));
+        asb.append(HtmlUtil.formEntryTop(msgLabel("Max directory size"),
+                                         HtmlUtil.input(PROP_UPLOAD_MAXSIZEGB,
+                                                        ""+getRepository().getProperty(PROP_UPLOAD_MAXSIZEGB,10.0),
+                                                        HtmlUtil.SIZE_10) +" (GBytes)"));
 
 
+
+        asb.append(HtmlUtil.colspan("File Access", 2));
         String fileWidget = HtmlUtil.textArea(PROP_LOCALFILEPATHS,
                                 getProperty(PROP_LOCALFILEPATHS, ""), 5, 40);
         String fileLabel =
@@ -1091,6 +1098,9 @@ public class Admin extends RepositoryManager {
 
 
 
+
+        getRepository().writeGlobal(PROP_UPLOAD_MAXSIZEGB,
+                                    request.getString(PROP_UPLOAD_MAXSIZEGB,"10").trim());
 
         if (request.exists(PROP_LOCALFILEPATHS)) {
             getRepository().writeGlobal(

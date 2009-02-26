@@ -256,10 +256,14 @@ public class WebHarvester extends Harvester {
             "Use macros: ${filename}, ${fromdate}, ${todate}, etc.";
         for (HarvesterEntry urlEntry : urlEntries) {
             sb.append(RepositoryManager.tableSubHeader("URL #" + cnt));
+            String link = "";
+            if(urlEntry.url!=null && urlEntry.url.length()>0) {
+                link = HtmlUtil.href(urlEntry.url, HtmlUtil.img(getRepository().iconUrl(ICON_LINK)),HtmlUtil.attr("target","_linkpage"));
+            }
             sb.append(HtmlUtil.formEntry(msgLabel("Fetch URL"),
                                          HtmlUtil.input(ATTR_URL + cnt,
                                              urlEntry.url,
-                                             HtmlUtil.SIZE_90)));
+                                             HtmlUtil.SIZE_80)+link));
             sb.append(
                 RepositoryManager.tableSubHeader(
                     "Then create an entry with"));
@@ -268,13 +272,13 @@ public class WebHarvester extends Harvester {
                     msgLabel("Name"),
                     HtmlUtil.input(
                         ATTR_NAME + cnt, urlEntry.name,
-                        HtmlUtil.SIZE_90 + HtmlUtil.title(templateHelp))));
+                        HtmlUtil.SIZE_80 + HtmlUtil.title(templateHelp))));
             sb.append(
                 HtmlUtil.formEntry(
                     msgLabel("Description"),
                     HtmlUtil.input(
                         ATTR_DESCRIPTION + cnt, urlEntry.description,
-                        HtmlUtil.SIZE_90 + HtmlUtil.title(templateHelp))));
+                        HtmlUtil.SIZE_80 + HtmlUtil.title(templateHelp))));
             String fieldId = ATTR_GROUP + cnt;
             String select    = OutputHandler.getGroupSelect(request, fieldId);
             sb.append(
@@ -282,27 +286,27 @@ public class WebHarvester extends Harvester {
                     msgLabel("Group"),
                     HtmlUtil.input(
                         fieldId, urlEntry.group,
-                        HtmlUtil.SIZE_90 + HtmlUtil.id(fieldId) +HtmlUtil.title(templateHelp)) + select));
+                        HtmlUtil.SIZE_80 + HtmlUtil.id(fieldId) +HtmlUtil.title(templateHelp)) + select));
             cnt++;
         }
         sb.append(RepositoryManager.tableSubHeader("URL #" + cnt));
         sb.append(HtmlUtil.formEntry(msgLabel("Fetch URL"),
                                      HtmlUtil.input(ATTR_URL + cnt, "",
-                                         HtmlUtil.SIZE_90)));
+                                         HtmlUtil.SIZE_80)));
         sb.append(
             RepositoryManager.tableSubHeader("Then create an entry with"));
         sb.append(HtmlUtil.formEntry(msgLabel("Name"),
                                      HtmlUtil.input(ATTR_NAME + cnt, "",
-                                         HtmlUtil.SIZE_90
+                                         HtmlUtil.SIZE_80
                                          + HtmlUtil.title(templateHelp))));
         sb.append(HtmlUtil.formEntry(msgLabel("Description"),
                                      HtmlUtil.input(ATTR_DESCRIPTION + cnt,
                                          "",
-                                         HtmlUtil.SIZE_90
+                                         HtmlUtil.SIZE_80
                                          + HtmlUtil.title(templateHelp))));
         sb.append(HtmlUtil.formEntry(msgLabel("Group"),
                                      HtmlUtil.input(ATTR_GROUP + cnt, "",
-                                         HtmlUtil.SIZE_90
+                                         HtmlUtil.SIZE_80
                                          + HtmlUtil.title(templateHelp))));
     }
 
@@ -343,6 +347,12 @@ public class WebHarvester extends Harvester {
         statusMessages = new ArrayList<String>();
         status         = new StringBuffer("Fetching URLS<br>");
         int cnt = 0;
+
+        if(getTestMode()) {
+            collectEntries((cnt == 0));
+            return;
+        }
+
         while (canContinueRunning(timestamp)) {
             doPause();
             if(!canContinueRunning(timestamp)) return;
@@ -383,8 +393,7 @@ public class WebHarvester extends Harvester {
                 if (statusMessages.size() > 100) {
                     statusMessages = new ArrayList<String>();
                 }
-                String crumbs = getEntryManager().makeEntryHeader(null,
-                                    entry);
+                String crumbs = getEntryManager().getBreadCrumbs(null, entry, true)[1];
                 crumbs = crumbs.replace("class=", "xclass=");
                 statusMessages.add(crumbs);
                 entryCnt++;
@@ -433,27 +442,18 @@ public class WebHarvester extends Harvester {
 
         //        groupName = groupName.replace("${dirgroup}", dirGroup);
 
-        groupName = groupName.replace("${fromdate}",
-                                      getRepository().formatDate(fromDate));
-        groupName = groupName.replace("${todate}",
-                                      getRepository().formatDate(toDate));
 
-        name = name.replace("${filename}", tail);
-        name = name.replace("${fromdate}",
-                            getRepository().formatDate(fromDate));
+        groupName  = applyMacros(groupName,  createDate, fromDate,  toDate,fileName);
+        name  = applyMacros(name,  createDate, fromDate,  toDate,fileName);
+        desc  = applyMacros(desc,  createDate, fromDate,  toDate,fileName);
 
-        name = name.replace("${todate}", getRepository().formatDate(toDate));
-
-        desc = desc.replace("${fromdate}",
-                            getRepository().formatDate(fromDate));
-        desc = desc.replace("${todate}", getRepository().formatDate(toDate));
-        desc = desc.replace("${name}", name);
 
         Group group = getEntryManager().findGroupFromName(groupName,
                           getUser(), true);
         Entry entry = typeHandler.createEntry(repository.getGUID());
         Resource resource = new Resource(newFile.toString(),
                                          Resource.TYPE_STOREDFILE);
+
 
         System.err.println ("WebHarvester: " + getName() +" adding entry: " + name);
         entry.initEntry(name, desc, group, getUser(), resource, "",

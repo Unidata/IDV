@@ -815,15 +815,21 @@ function  handleFolderList(request, uid) {
         var xmlDoc=request.responseXML.documentElement;
 	var script;
 	var html;
+
 	for(i=0;i<xmlDoc.childNodes.length;i++) {
             var childNode = xmlDoc.childNodes[i];
             if(childNode.tagName=="javascript") {
                 script =getChildText(childNode);
             } else if(childNode.tagName=="content") {
                 html = getChildText(childNode);
+            }  else {
             }
+
 	}
 
+        if(!html) {
+            html = getChildText(xmlDoc);
+        }
 	if(html) {
             block.obj.innerHTML = html;
 	}

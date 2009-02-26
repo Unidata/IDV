@@ -797,8 +797,15 @@ return new Result(title, sb);
                 String theResource = (String) resources.get(resourceIdx);
                 String origName    = (String) origNames.get(resourceIdx);
                 if (isFile && !isLocalFile) {
-                    theResource = getStorageManager().moveToStorage(request,
-                            new File(theResource)).toString();
+
+
+                    if(forUpload) {
+                        theResource = getStorageManager().moveToAnonymousStorage(request,
+                                                                                 new File(theResource),"").toString();
+                    } else {
+                        theResource = getStorageManager().moveToStorage(request,
+                                                                        new File(theResource)).toString();
+                    }
                 }
                 String name = request.getString(ARG_NAME, BLANK);
                 if (name.indexOf("${") >= 0) {}
@@ -917,8 +924,10 @@ return new Result(title, sb);
             entry.setDescription(request.getString(ARG_DESCRIPTION,
                     entry.getDescription()));
 
-            if (request.get(ARG_PUBLISH, false) && isAnonymousUpload(entry)) {
-                publishAnonymousEntry(entry);
+            if(isAnonymousUpload(entry)) {
+                if (request.get(ARG_PUBLISH, false)) {
+                    publishAnonymousEntry(request, entry);
+                }
             } else {
                 entry.setDataType(dataType);
             }
@@ -1496,7 +1505,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    private void publishAnonymousEntry(Entry entry) throws Exception {
+    private void publishAnonymousEntry(Request request, Entry entry) throws Exception {
         Metadata metadata = getMetadataManager().findMetadata(entry,
                                 AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD,
                                 false);
@@ -1513,6 +1522,12 @@ return new Result(title, sb);
             entry.setDataType("");
         }
         entry.setTypeHandler(getRepository().getTypeHandler(TypeHandler.TYPE_FILE));
+
+        if(entry.isFile()) {
+            File newFile = getStorageManager().moveToStorage(request, entry.getResource().getFile(),"");
+            entry.getResource().setPath(newFile.toString());
+        }
+
     }
 
     /**
@@ -2412,9 +2427,17 @@ return new Result(title, sb);
         String file = XmlUtil.getAttribute(node, ATTR_FILE, (String) null);
         if (file != null) {
             String tmp = (String) files.get(file);
-            String newFile = getStorageManager().moveToStorage(request,
-                                 new File(tmp)).toString();
-            file = newFile;
+            if (doAnonymousUpload) {
+                File newFile = getStorageManager().moveToAnonymousStorage(request,
+                                                                          new File(tmp),"");
+
+                System.err.println("Moved to anonymous:" + newFile);
+                file = newFile.toString();
+            } else {
+                File newFile = getStorageManager().moveToStorage(request,
+                                                                 new File(tmp));
+                file = newFile.toString();
+            }
         }
         String url = XmlUtil.getAttribute(node, ATTR_URL, (String) null);
         String localFile = XmlUtil.getAttribute(node, ATTR_LOCALFILE,
@@ -2448,7 +2471,8 @@ return new Result(title, sb);
                     "Only administrators can upload a local file");
             }
             localFileToMove = getStorageManager().moveToStorage(request,
-                    new File(localFileToMove)).toString();
+                                                                    new File(localFileToMove)).toString();
+            
             resource = new Resource(localFileToMove,
                                     Resource.TYPE_STOREDFILE);
         } else if (url != null) {

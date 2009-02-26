@@ -2705,6 +2705,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return Misc.getProperty(properties, name, dflt);
     }
 
+    public double getProperty(String name, double dflt) {
+        String prop = getProperty(name);
+        if (prop != null) {
+            return new Double(prop).doubleValue();
+        }
+        return Misc.getProperty(properties, name, dflt);
+    }
+
+
+
     /**
      * _more_
      *

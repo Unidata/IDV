@@ -86,6 +86,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ICON_LIST = "ramadda.icon.list";
+    public static final String ICON_LINK = "ramadda.icon.link";
 
     /** _more_ */
     public static final String ICON_RANGE = "ramadda.icon.range";
@@ -809,6 +810,9 @@ public interface Constants {
 
     /** _more_          */
     public static final String PROP_SSL_PORT = "ramadda.ssl.port";
+
+    public static final String PROP_UPLOAD_MAXSIZEGB = "ramadda.upload.maxsizegb";
+
 
     public static final String PROP_FACEBOOK_CONNECT_KEY = "ramadda.facebook.connect.key";
 

@@ -63,6 +63,7 @@ import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -264,6 +265,39 @@ public class Harvester extends RepositoryManager {
     }
 
 
+    public String applyMacros(String s, Date createDate, Date fromDate, Date toDate,String filename) {
+        if(fromDate ==null)
+            fromDate = createDate;
+        if(toDate ==null)
+            toDate = fromDate;
+        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        cal.setTime(fromDate);
+        int      day    = cal.get(cal.DAY_OF_MONTH);
+        int      month  = (cal.get(cal.MONTH) + 1);
+        int      year  = cal.get(cal.YEAR);
+        String[] macros = {
+            "fromdate", getRepository().formatDate(fromDate), 
+            "todate",   getRepository().formatDate(toDate), 
+            "year",   "" + year,
+            "month", ((month < 10)? "0": "") + month, 
+            "monthname",  DateUtil.MONTH_NAMES[cal.get(cal.MONTH)], 
+            "day", ((day < 10) ? "0": "") + day, 
+            "filename", filename
+        };
+
+
+        for (int i = 0; i < macros.length; i += 2) {
+            String macro = "${" + macros[i] + "}";
+            String value = macros[i + 1];
+            s =  s.replace(macro, value);
+        }
+
+        s = StringUtil.replaceDate(s, "fromdate", fromDate);
+        s = StringUtil.replaceDate(s, "todate", toDate);
+        return s;
+    }
+
+
     /**
      * _more_
      *
@@ -416,7 +450,7 @@ public class Harvester extends RepositoryManager {
         tfos.add(new TwoFacedObject("Absolute (minutes)",UNIT_ABSOLUTE));
         tfos.add(new TwoFacedObject("Minutes",UNIT_MINUTE));
         tfos.add(new TwoFacedObject("Hourly",UNIT_HOUR));
-        tfos.add(new TwoFacedObject("Daily",UNIT_DAY));
+        //        tfos.add(new TwoFacedObject("Daily",UNIT_DAY));
         
         String minutes = ""+sleepMinutes;
         if(sleepUnit.equals(UNIT_HOUR)) {

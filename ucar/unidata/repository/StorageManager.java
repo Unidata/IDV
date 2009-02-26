@@ -111,6 +111,8 @@ public class StorageManager extends RepositoryManager {
     /** _more_ */
     private String tmpDir;
 
+    private String anonymousDir;
+
     /** _more_ */
     private String uploadDir;
 
@@ -271,6 +273,14 @@ public class StorageManager extends RepositoryManager {
             IOUtil.makeDirRecursive(new File(tmpDir));
         }
         return tmpDir;
+    }
+
+    public String getAnonymousDir() {
+        if (anonymousDir == null) {
+            anonymousDir = IOUtil.joinDir(getStorageDir(), "anonymousupload");
+            IOUtil.makeDirRecursive(new File(anonymousDir));
+        }
+        return anonymousDir;
     }
 
 
@@ -442,12 +452,11 @@ public class StorageManager extends RepositoryManager {
      */
     public File moveToStorage(Request request, File original, String prefix)
             throws Exception {
-        String            targetName = prefix + original.getName();
         String            storageDir = getStorageDir();
+        String            targetName = prefix + original.getName();
 
         GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         cal.setTime(new Date());
-
         storageDir = IOUtil.joinDir(storageDir, "y" + cal.get(cal.YEAR));
         IOUtil.makeDir(storageDir);
         storageDir = IOUtil.joinDir(storageDir,
@@ -457,13 +466,32 @@ public class StorageManager extends RepositoryManager {
                                     "d" + cal.get(cal.DAY_OF_MONTH));
         IOUtil.makeDir(storageDir);
 
-
         for (int depth = 0; depth < dirDepth; depth++) {
             int index = (int) (dirRange * Math.random());
             storageDir = IOUtil.joinDir(storageDir, "data" + index);
             IOUtil.makeDir(storageDir);
         }
 
+        File newFile = new File(IOUtil.joinDir(storageDir, targetName));
+        IOUtil.moveFile(original, newFile);
+        return newFile;
+    }
+
+
+
+    public File moveToAnonymousStorage(Request request, File original, String prefix)
+        throws Exception {
+        String            storageDir = getAnonymousDir();
+        File[]files =new File(storageDir).listFiles();
+        long size = 0;
+        for(int i=0;i<files.length;i++) {
+            if(files[i].isHidden()) continue;
+            size+= files[i].length();
+        }
+
+        double sizeThresholdGB = getRepository().getProperty(PROP_UPLOAD_MAXSIZEGB,10.0);
+        if(size+original.length()> sizeThresholdGB*1000*1000*1000) throw new IllegalArgumentException("Anonymous upload area exceeded capacity");
+        String            targetName = prefix + original.getName();
         File newFile = new File(IOUtil.joinDir(storageDir, targetName));
         IOUtil.moveFile(original, newFile);
         return newFile;

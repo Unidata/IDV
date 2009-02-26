@@ -678,14 +678,18 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 ARG_ALLENTRIES, request.getString(ARG_ALLENTRIES,"true"),
                 ARG_SELECTTYPE,request.getString(ARG_SELECTTYPE,"")});
 
-        event = HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
-                                                    HtmlUtil.squote(uid)
-                                                    + "," +
-                                                    HtmlUtil.squote(folderClickUrl)));
-        String img = HtmlUtil.img(icon, (entry.isGroup()
-                                         ? "Click to open group; "
-                                         : ""), HtmlUtil.id("img_" + uid)
-                                             + event);
+        String prefix = HtmlUtil.img(getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
+                                     msg("Click to open group"), 
+                                     HtmlUtil.id("img_" + uid) + 
+                                     HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
+                                                                         HtmlUtil.comma(
+                                                                                        HtmlUtil.squote(uid),
+                                                                                        HtmlUtil.squote(folderClickUrl),
+                                                                                        HtmlUtil.squote(iconUrl(ICON_TOGGLEARROWDOWN))))));
+
+
+        String img = prefix +HtmlUtil.img(icon);
+
         sb.append(img);
         sb.append(HtmlUtil.space(1));
 

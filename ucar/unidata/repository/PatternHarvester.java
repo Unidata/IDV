@@ -792,38 +792,13 @@ public class PatternHarvester extends Harvester {
         }
         tag = tag.replace("${extension}", ext);
 
-        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
-        cal.setTime(fromDate);
+
         groupName = groupName.replace("${dirgroup}", dirGroup);
 
-        int      day    = cal.get(cal.DAY_OF_MONTH);
-        int      month  = (cal.get(cal.MONTH) + 1);
-        String[] macros = {
-            "fromdate", getRepository().formatDate(fromDate), "todate",
-            getRepository().formatDate(toDate), "year",
-            "" + cal.get(cal.YEAR), "month", ((month < 10)
-                    ? "0"
-                    : "") + month, "monthname",
-            DateUtil.MONTH_NAMES[cal.get(cal.MONTH)], "day", ((day < 10)
-                    ? "0"
-                    : "") + day, "filename", f.getName()
-        };
 
-
-        for (int i = 0; i < macros.length; i += 2) {
-            String macro = "${" + macros[i] + "}";
-            String value = macros[i + 1];
-            groupName = groupName.replace(macro, value);
-            name      = name.replace(macro, value);
-            desc      = desc.replace(macro, value);
-        }
-
-        groupName = StringUtil.replaceDate(groupName, "fromdate", fromDate);
-        groupName = StringUtil.replaceDate(groupName, "todate", toDate);
-        name      = StringUtil.replaceDate(name, "fromdate", fromDate);
-        name      = StringUtil.replaceDate(name, "todate", toDate);
-        desc      = StringUtil.replaceDate(desc, "fromdate", fromDate);
-        desc      = StringUtil.replaceDate(desc, "todate", toDate);
+        groupName  = applyMacros(groupName,  createDate, fromDate,  toDate,f.getName());
+        name  = applyMacros(name,  createDate, fromDate,  toDate,f.getName());
+        desc  = applyMacros(desc,  createDate, fromDate,  toDate,f.getName());
 
         desc      = desc.replace("${name}", name);
 
@@ -857,6 +832,7 @@ public class PatternHarvester extends Harvester {
         entry.initEntry(name, desc, group, getUser(), resource, "",
                         createDate.getTime(), fromDate.getTime(),
                         toDate.getTime(), values);
+        /*
         if (tag.length() > 0) {
             List tags = StringUtil.split(tag, ",", true, true);
             for (int i = 0; i < tags.size(); i++) {
@@ -864,8 +840,8 @@ public class PatternHarvester extends Harvester {
                         entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,
                         DFLT_INHERITED, (String) tags.get(i), "", "", ""));
             }
+            }*/
 
-        }
         typeHandler.initializeNewEntry(entry);
         return entry;
     }
