@@ -444,10 +444,10 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
 
 
     /** All display settings_ */
-    private List displaySettings;
+    private List<DisplaySetting> displaySettings;
 
     /** Local display settings_ */
-    private List localDisplaySettings;
+    private List<DisplaySetting> localDisplaySettings;
 
     /** ts */
     private long displaySettingsTimestamp = 0;
@@ -1685,9 +1685,9 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      *
      * @return display settings
      */
-    public List getDisplaySettings() {
+    public List<DisplaySetting> getDisplaySettings() {
         if (displaySettings == null) {
-            displaySettings = new ArrayList();
+            displaySettings = new ArrayList<DisplaySetting>();
             try {
                 Hashtable map = new Hashtable();
                 ResourceCollection rc =
@@ -1698,7 +1698,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
                     if (xml == null) {
                         continue;
                     }
-                    List tmp = (List) getIdv().decodeObject(xml);
+                    List<DisplaySetting> tmp = (List<DisplaySetting>) getIdv().decodeObject(xml);
                     if (tmp == null) {
                         continue;
                     }
@@ -1706,7 +1706,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
                     if (isLocal) {
                         localDisplaySettings = tmp;
                     }
-                    List uniqueOnes = new ArrayList();
+                    List<DisplaySetting> uniqueOnes = new ArrayList<DisplaySetting>();
                     for (int displaySettingIdx = 0;
                             displaySettingIdx < tmp.size();
                             displaySettingIdx++) {
@@ -1730,7 +1730,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
 
         }
         if (localDisplaySettings == null) {
-            localDisplaySettings = new ArrayList();
+            localDisplaySettings = new ArrayList<DisplaySetting>();
         }
         return displaySettings;
     }
@@ -1743,7 +1743,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      * @return displaysetting
      */
     public DisplaySetting findDisplaySetting(String name) {
-        List displaySettings = getDisplaySettings();
+        List<DisplaySetting> displaySettings = getDisplaySettings();
         for (int i = 0; i < displaySettings.size(); i++) {
             DisplaySetting displaySetting =
                 (DisplaySetting) displaySettings.get(i);
@@ -1786,7 +1786,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      *
      * @param list list
      */
-    public void removeDisplaySettings(List list) {
+    public void removeDisplaySettings(List<DisplaySetting> list) {
         for (int displaySettingIdx = 0; displaySettingIdx < list.size();
                 displaySettingIdx++) {
             DisplaySetting displaySetting =
@@ -1803,7 +1803,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      * @param displaySetting display setting
      */
     public void removeDisplaySetting(DisplaySetting displaySetting) {
-        removeDisplaySettings(Misc.newList(displaySetting));
+        removeDisplaySettings((List<DisplaySetting>)Misc.newList(displaySetting));
     }
 
 
