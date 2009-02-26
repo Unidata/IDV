@@ -2522,7 +2522,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      */
     protected Object beginWritingDataToLocalDisk(String msg) {
         final Object loadId = JobManager.getManager().startLoad(msg, true,
-                                  true);
+                                                                false);
         return loadId;
     }
 
