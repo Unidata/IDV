@@ -76,6 +76,7 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.*;
+import java.util.TimeZone;
 
 
 /**
@@ -317,6 +318,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
         List urls = new ArrayList();
         List suffixes = new ArrayList();
         SimpleDateFormat sdf = new SimpleDateFormat("_" + DATAPATH_DATE_FORMAT);
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         for (int i = 0; i < imageList.size(); i++) {
             AddeImageDescriptor aid = getDescriptor(imageList.get(i));
             String url = aid.getSource();
