@@ -198,6 +198,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         long t1 = System.currentTimeMillis();
         //        System.err.println("getSynthIds " + parentEntry);
         File   rootDir     = new File((String) values[0]);
+        if(!rootDir.exists()) throw new RepositoryUtil.MissingEntryException("Could not find entry: " + rootDir);
         String rootDirPath = rootDir.toString();
         File   childPath   = getFileFromId(synthId, rootDir);
         File[] files       = childPath.listFiles();

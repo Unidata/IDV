@@ -258,6 +258,10 @@ public class Admin extends RepositoryManager {
             if (path.length() > 50) {
                 path = path.substring(0, 49) + "...";
             }
+            path = HtmlUtil.entityEncode(path);
+            if(logEntry.getUrl()!=null) {
+                path  = HtmlUtil.href(logEntry.getUrl(),path);
+            }
             String userAgent = logEntry.getUserAgent();
             boolean isBot=true;
             if (userAgent.indexOf("Googlebot") >= 0) {
@@ -268,17 +272,23 @@ public class Admin extends RepositoryManager {
                 userAgent = "Msnbot";
             } else {
                 isBot = false;
+                String full = userAgent;
+                int idx = userAgent.indexOf("(");
+                if (idx > 0) {
+                    userAgent = userAgent.substring(0,idx);
+                    userAgent = HtmlUtil.makeShowHideBlock(userAgent,full,false);
+                }
+
+
+                
             }
-            int idx = userAgent.indexOf("(");
-            if (idx > 0) {
-                //                userAgent = userAgent.substring(0,idx);
-            }
+
             String dttm = getRepository().formatDate(logEntry.getDate());
             dttm = dttm.replace(" ", "&nbsp;");
             String user = logEntry.getUser().getLabel();
             user = user.replace(" ", "&nbsp;");
             String cols  = HtmlUtil.cols(user, dttm,
-                                         HtmlUtil.entityEncode(path), logEntry.getIp(),
+                                         path , logEntry.getIp(),
                                          userAgent);
             sb.append(HtmlUtil.row(cols,
                                    HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,"top")+

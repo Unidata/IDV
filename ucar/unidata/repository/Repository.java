@@ -4528,7 +4528,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @author IDV Development Team
      */
-    public static class LogEntry {
+    public  class LogEntry {
 
         /** _more_          */
         User user;
@@ -4545,6 +4545,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         /** _more_          */
         String userAgent;
 
+        String url;
+
         /**
          * _more_
          *
@@ -4553,6 +4555,17 @@ public class Repository extends RepositoryBase implements RequestHandler {
         public LogEntry(Request request) {
             this.user      = request.getUser();
             this.path      = request.getRequestPath();
+            
+            String entryPrefix = URL_ENTRY_SHOW.toString();
+            if(this.path.startsWith(entryPrefix)) {
+                url = request.getUrl();
+                this.path = this.path.substring(entryPrefix.length());
+                if(path.trim().length()==0) {
+                    path = "/entry/show";
+                }
+                   
+            }
+
             this.date      = new Date();
             this.ip        = request.getIp();
             this.userAgent = request.getHeaderArg("User-Agent");
@@ -4577,6 +4590,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
             return ip;
         }
 
+        public String getUrl() {
+            return url;
+        }
         /**
          *  Set the UserAgent property.
          *
