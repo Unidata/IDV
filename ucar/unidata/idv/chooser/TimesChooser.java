@@ -507,6 +507,11 @@ public class TimesChooser extends IdvChooser {
      * @param times List of thinggs to put into absolute times list
      */
     protected void setAbsoluteTimes(List times) {
+        while(times.size()>1) {
+            times.remove(0);
+        }
+
+
         List newAbsoluteTimes = makeDatedObjects(times);
         if (Misc.equals(absoluteTimes, newAbsoluteTimes)) {
             return;
@@ -702,7 +707,7 @@ public class TimesChooser extends IdvChooser {
      */
     protected void setSelectedAbsoluteTime(int from, int to) {
         if(from>to) return;
-        int[] indices = new int[to - from];
+        int[] indices = new int[to - from+1];
         int   cnt     = 0;
         for (int i = from; i <= to; i++) {
             indices[cnt++] = i;
