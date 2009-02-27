@@ -81,7 +81,7 @@ public class EmailAction extends PasswordAction {
      *
      * @return _more_
      */
-    public String getSummary() {
+    public String getSummary(EntryMonitor entryMonitor) {
         return "Send an email to " + getRemoteUserId();
     }
 

@@ -364,6 +364,8 @@ public class MonitorManager extends RepositoryManager {
         } else if (type.equals("twitter")) {
             monitor.addAction(new TwitterAction(getRepository().getGUID(),
                     "", ""));
+        } else if (type.equals("copy")) {
+            monitor.addAction(new CopyAction(getRepository().getGUID()));
         } else if (type.equals("ldm")) {
             if(!request.getUser().getAdmin()) throw new IllegalArgumentException("You need to be an admin to add an LDM action");
             monitor.addAction(new LdmAction(getRepository().getGUID()));
@@ -467,17 +469,21 @@ public class MonitorManager extends RepositoryManager {
                 HtmlUtil.formClose();
         }
             
-        sb.append(
-            HtmlUtil.table(
-                HtmlUtil.row(
-                    HtmlUtil.cols(
-                        msgLabel("Create a"), request.form(
-                                                           getRepositoryBase().URL_USER_MONITORS) + HtmlUtil.submit(
-                            "Email monitor", ARG_MONITOR_CREATE) + HtmlUtil.hidden(
-                            ARG_MONITOR_TYPE, "email") + HtmlUtil.formClose(), request.form(
-                            getRepositoryBase().URL_USER_MONITORS) + HtmlUtil.submit(
-                            "Twitter monitor", ARG_MONITOR_CREATE) + HtmlUtil.hidden(
-                                                                                     ARG_MONITOR_TYPE, "twitter") + HtmlUtil.formClose(),ldmCreate))));
+        String[] createTypes = {"email","Email Action",
+                                "twitter","Twitter Action",
+                                "copy","Copy Action"};
+
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TR));
+        for(int i=0;i<createTypes.length;i+=2) {
+            String form = request.form(getRepositoryBase().URL_USER_MONITORS) + 
+                HtmlUtil.submit(createTypes[i+1], ARG_MONITOR_CREATE) + 
+                HtmlUtil.hidden(ARG_MONITOR_TYPE, createTypes[i]) + HtmlUtil.formClose();
+            sb.append(HtmlUtil.col(form));
+        }
+        sb.append(HtmlUtil.col(ldmCreate));
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_TR));
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
 
         sb.append(HtmlUtil.p());
 

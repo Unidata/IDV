@@ -243,37 +243,39 @@ public class WebHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    public void createEditForm(Request request, StringBuffer sb)
+    public void createEditForm(Request request, StringBuffer formSB)
             throws Exception {
-        super.createEditForm(request, sb);
-        sb.append(
-            RepositoryManager.tableSubHeader(
-                "Enter urls and the groups to add them to."));
+        super.createEditForm(request, formSB);
+        StringBuffer sb = new StringBuffer();
+
+        sb.append("Enter urls and the groups to add them to.");
 
 
         int cnt = 1;
         String templateHelp =
             "Use macros: ${filename}, ${fromdate}, ${todate}, etc.";
+        StringBuffer entrySB;
         for (HarvesterEntry urlEntry : urlEntries) {
-            sb.append(RepositoryManager.tableSubHeader("URL #" + cnt));
+            entrySB = new StringBuffer();
+            entrySB.append(HtmlUtil.formTable());
             String link = "";
             if(urlEntry.url!=null && urlEntry.url.length()>0) {
                 link = HtmlUtil.href(urlEntry.url, HtmlUtil.img(getRepository().iconUrl(ICON_LINK)),HtmlUtil.attr("target","_linkpage"));
             }
-            sb.append(HtmlUtil.formEntry(msgLabel("Fetch URL"),
+            entrySB.append(HtmlUtil.formEntry(msgLabel("Fetch URL"),
                                          HtmlUtil.input(ATTR_URL + cnt,
                                              urlEntry.url,
                                              HtmlUtil.SIZE_80)+link));
-            sb.append(
+            entrySB.append(
                 RepositoryManager.tableSubHeader(
                     "Then create an entry with"));
-            sb.append(
+            entrySB.append(
                 HtmlUtil.formEntry(
                     msgLabel("Name"),
                     HtmlUtil.input(
                         ATTR_NAME + cnt, urlEntry.name,
                         HtmlUtil.SIZE_80 + HtmlUtil.title(templateHelp))));
-            sb.append(
+            entrySB.append(
                 HtmlUtil.formEntry(
                     msgLabel("Description"),
                     HtmlUtil.input(
@@ -281,33 +283,47 @@ public class WebHarvester extends Harvester {
                         HtmlUtil.SIZE_80 + HtmlUtil.title(templateHelp))));
             String fieldId = ATTR_GROUP + cnt;
             String select    = OutputHandler.getGroupSelect(request, fieldId);
-            sb.append(
+            entrySB.append(
                 HtmlUtil.formEntry(
                     msgLabel("Group"),
                     HtmlUtil.input(
                         fieldId, urlEntry.group,
                         HtmlUtil.SIZE_80 + HtmlUtil.id(fieldId) +HtmlUtil.title(templateHelp)) + select));
+            entrySB.append(HtmlUtil.formTableClose());
+            sb.append(HtmlUtil.makeShowHideBlock("URL #" + cnt,
+                                                               entrySB.toString(),true));
             cnt++;
         }
-        sb.append(RepositoryManager.tableSubHeader("URL #" + cnt));
-        sb.append(HtmlUtil.formEntry(msgLabel("Fetch URL"),
+
+        entrySB = new StringBuffer();
+        entrySB.append(HtmlUtil.formTable());
+        entrySB.append(HtmlUtil.formEntry(msgLabel("Fetch URL"),
                                      HtmlUtil.input(ATTR_URL + cnt, "",
                                          HtmlUtil.SIZE_80)));
-        sb.append(
+        entrySB.append(
             RepositoryManager.tableSubHeader("Then create an entry with"));
-        sb.append(HtmlUtil.formEntry(msgLabel("Name"),
+        entrySB.append(HtmlUtil.formEntry(msgLabel("Name"),
                                      HtmlUtil.input(ATTR_NAME + cnt, "",
                                          HtmlUtil.SIZE_80
                                          + HtmlUtil.title(templateHelp))));
-        sb.append(HtmlUtil.formEntry(msgLabel("Description"),
+        entrySB.append(HtmlUtil.formEntry(msgLabel("Description"),
                                      HtmlUtil.input(ATTR_DESCRIPTION + cnt,
                                          "",
                                          HtmlUtil.SIZE_80
                                          + HtmlUtil.title(templateHelp))));
-        sb.append(HtmlUtil.formEntry(msgLabel("Group"),
+        entrySB.append(HtmlUtil.formEntry(msgLabel("Group"),
                                      HtmlUtil.input(ATTR_GROUP + cnt, "",
                                          HtmlUtil.SIZE_80
                                          + HtmlUtil.title(templateHelp))));
+        entrySB.append(HtmlUtil.formTableClose());
+
+        sb.append(HtmlUtil.makeShowHideBlock("URL #" + cnt,
+                                                           entrySB.toString(),true));
+
+        
+        formSB.append(HtmlUtil.formTableClose());
+        formSB.append(sb);
+        formSB.append(HtmlUtil.formTable());
     }
 
 

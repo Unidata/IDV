@@ -68,7 +68,7 @@ public abstract class MonitorAction implements Constants {
      *
      * @return _more_
      */
-    public String getSummary() {
+    public String getSummary(EntryMonitor entryMonitor) {
         return getActionName();
     }
 

@@ -857,10 +857,10 @@ function Selector(event, id, allEntries, selecttype) {
     this.allEntries = allEntries;
     this.selecttype = selecttype;
     this.textComp = util.getDomObject(id);
-    this.hiddenComp = util.getDomObject(id+".hidden");
+    this.hiddenComp = util.getDomObject(id+"_hidden");
 
     if (!this.textComp) {
-        //        alert("cannot find text comp " + id);
+//	alert("cannot find text comp " + id);
 	return false;
     }
 
@@ -910,8 +910,14 @@ function selectClick(id,entryId,value) {
     } else { 
         if(selector.hiddenComp) {
             selector.hiddenComp.obj.value =entryId;
+
         }
         selector.textComp.obj.value =value;
+	if(selector.textComp.obj.value) {
+	        selector.textComp.obj.value =value;
+	} else {
+	        selector.textComp.obj.innerHtml =value;
+	}
     }
     selectCancel();
 }

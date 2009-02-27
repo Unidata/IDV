@@ -18,7 +18,10 @@ body {
 	background: #fffeec;
 }
 
-
+.disabledinput {
+        border : 0px #888888 solid;
+	background: #dddddd;
+}
 
 
 .hidden {

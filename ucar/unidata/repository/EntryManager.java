@@ -1812,7 +1812,6 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryCopy(Request request) throws Exception {
-
         String      fromIds = request.getString(ARG_FROM, "");
         List<Entry> entries = new ArrayList<Entry>();
         for (String id : StringUtil.split(fromIds, ",", true, true)) {
@@ -1825,7 +1824,7 @@ return new Result(title, sb);
                 StringBuffer sb = new StringBuffer();
                 sb.append(
                     getRepository().note(
-                        msg("Cannot delete top-level group")));
+                        msg("Cannot copy top-level group")));
                 return new Result(msg("Entry Delete"), sb);
             }
             entries.add(entry);
@@ -1933,7 +1932,6 @@ return new Result(title, sb);
         Group toGroup = (Group) toEntry;
 
 
-
         if (request.exists(ARG_ACTION_MOVE)) {
             for (Entry fromEntry : entries) {
                 if ( !getAccessManager().canDoAction(request, fromEntry,
@@ -2016,8 +2014,8 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    private Result processEntryCopy(Request request, Group toGroup,
-                                    List<Entry> entries)
+    public Result processEntryCopy(Request request, Group toGroup,
+                                   List<Entry> entries)
             throws Exception {
         StringBuffer sb         = new StringBuffer();
         Connection   connection = getDatabaseManager().getNewConnection();

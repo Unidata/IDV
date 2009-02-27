@@ -192,7 +192,7 @@ public class EntryMonitor implements Constants {
             if (i > 0) {
                 sb.append(", ");
             }
-            sb.append(actions.get(i).getSummary());
+            sb.append(actions.get(i).getSummary(this));
         }
         return sb.toString();
     }
@@ -652,6 +652,9 @@ public class EntryMonitor implements Constants {
             return false;
         }
 
+        if(filters.size()==0) {
+            return false;
+        }
 
         System.err.println(getName() + " checking entry:" + entry.getName());
 
@@ -662,6 +665,7 @@ public class EntryMonitor implements Constants {
             System.err.println("can't view");
             return false;
         }
+
 
 
         for (Filter filter : filters) {

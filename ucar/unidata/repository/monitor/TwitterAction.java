@@ -78,7 +78,7 @@ public class TwitterAction extends PasswordAction {
      *
      * @return _more_
      */
-    public String getSummary() {
+    public String getSummary(EntryMonitor entryMonitor) {
         return "Twitter to:" + getRemoteUserId();
     }
 

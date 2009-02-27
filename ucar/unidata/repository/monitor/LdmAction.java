@@ -92,7 +92,7 @@ public class LdmAction extends MonitorAction {
      *
      * @return _more_
      */
-    public String getSummary() {
+    public String getSummary(EntryMonitor entryMonitor) {
         return "Inject into the LDM";
     }
 
