@@ -690,7 +690,7 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputCdl(final Request request, Entry entry)
             throws Exception {
         StringBuffer sb = new StringBuffer();
-        if (request.get(ARG_ADDMETADATA, false)) {
+        if (request.get(ARG_METADATA_ADD, false)) {
             if (getRepository().getAccessManager().canDoAction(request,
                     entry, Permission.ACTION_EDIT)) {
                 sb.append(HtmlUtil.p());
@@ -709,8 +709,8 @@ public class DataOutputHandler extends OutputHandler {
 
         if (getRepository().getAccessManager().canDoAction(request, entry,
                 Permission.ACTION_EDIT)) {
-            request.put(ARG_ADDMETADATA, "true");
-            sb.append(HtmlUtil.href(request.getUrl()+"&"+HtmlUtil.arg(ARG_SHORT,"true"), msg("Add short metadata")));
+            request.put(ARG_METADATA_ADD, HtmlUtil.VALUE_TRUE);
+            sb.append(HtmlUtil.href(request.getUrl()+"&"+HtmlUtil.arg(ARG_SHORT,HtmlUtil.VALUE_TRUE), msg("Add short metadata")));
             sb.append(HtmlUtil.span("&nbsp;|&nbsp;",
                                     HtmlUtil.cssClass("separator")));
             
@@ -922,7 +922,7 @@ public class DataOutputHandler extends OutputHandler {
                             new Association(
                                 getRepository().getGUID(), "", "subset from",
                                 entry.getId(), newEntry.getId()));
-                        if (request.get(ARG_ADDMETADATA, false)) {
+                        if (request.get(ARG_METADATA_ADD, false)) {
                             //                            System.err.println("adding metadata");
                             newEntry.clearArea();
                             List<Entry> entries =
@@ -955,11 +955,11 @@ public class DataOutputHandler extends OutputHandler {
         if (canAdd) {
             submitExtra = HtmlUtil.space(1)
                           + HtmlUtil.checkbox(
-                              ARG_ADDTOREPOSITORY, "true",
+                              ARG_ADDTOREPOSITORY, HtmlUtil.VALUE_TRUE,
                               request.get(ARG_ADDTOREPOSITORY, false)) + msg(
                                   "Add to Repository") + HtmlUtil.checkbox(
-                                  ARG_ADDMETADATA, "true",
-                                  request.get(ARG_ADDMETADATA, false)) + msg(
+                                  ARG_METADATA_ADD, HtmlUtil.VALUE_TRUE,
+                                  request.get(ARG_METADATA_ADD, false)) + msg(
                                       "Add metadata");
 
         }
@@ -1011,7 +1011,7 @@ public class DataOutputHandler extends OutputHandler {
                         HtmlUtil.cols(
                             HtmlUtil.checkbox(
                                 ARG_VARIABLE + "." + var.getShortName(),
-                                "true", false) + HtmlUtil.space(1)
+                                HtmlUtil.VALUE_TRUE, false) + HtmlUtil.space(1)
                                     + var.getName() + HtmlUtil.space(1)
                                     + ((var.getUnitsString() != null)
                                        ? "(" + var.getUnitsString() + ")"
@@ -1036,7 +1036,7 @@ public class DataOutputHandler extends OutputHandler {
                     HtmlUtil.formEntry(
                         msgLabel("Time Range"),
                         HtmlUtil.checkbox(
-                            ARG_SUBSETTIME, "true",
+                            ARG_SUBSETTIME, HtmlUtil.VALUE_TRUE,
                             request.get(
                                 ARG_SUBSETTIME, true)) + HtmlUtil.space(1)
                                     + HtmlUtil.select(
@@ -1067,7 +1067,7 @@ public class DataOutputHandler extends OutputHandler {
                         msgLabel("Subset Spatially"),
                         "<table cellpadding=0 cellspacing=0><tr valign=top><td>"
                         + HtmlUtil.checkbox(
-                            ARG_SUBSETAREA, "true",
+                            ARG_SUBSETAREA, HtmlUtil.VALUE_TRUE,
                             request.get(ARG_SUBSETAREA, false)) + "</td><td>"
                                 + HtmlUtil.makeLatLonBox(
                                     ARG_AREA, llr.getLatMin(),
@@ -1078,7 +1078,7 @@ public class DataOutputHandler extends OutputHandler {
 
             sb.append(HtmlUtil.formEntry(msgLabel("Add Lat/Lon Variables"),
                                          HtmlUtil.checkbox(ARG_ADDLATLON,
-                                             "true",
+                                             HtmlUtil.VALUE_TRUE,
                                              request.get(ARG_ADDLATLON,
                                                  true))));
 
