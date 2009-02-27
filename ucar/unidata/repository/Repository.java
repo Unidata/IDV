@@ -4293,14 +4293,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public String getCalendarSelector(String formName, String fieldName) {
         String anchorName = "anchor." + fieldName;
         String divName    = "div." + fieldName;
+        String call = HtmlUtil.call("selectDate",
+                                    HtmlUtil.comma(HtmlUtil.squote(divName),
+                                                   "document.forms['" + formName + "']." + fieldName,
+                                                   HtmlUtil.squote(anchorName),
+                                                   HtmlUtil.squote("yyyy-MM-dd")))+"return false;";
         return HtmlUtil.href("#",
                              HtmlUtil.img(iconUrl(ICON_CALENDAR), " Choose date", HtmlUtil.attr(HtmlUtil.ATTR_BORDER,"0")),
-                             HtmlUtil.onMouseClick(HtmlUtil.call("selectDate",
-                                                                 HtmlUtil.comma(HtmlUtil.squote(divName),
-                                                                                "document.forms['" + formName + "']." + fieldName,
-                                                                                HtmlUtil.squote(anchorName),
-                                                                                HtmlUtil.squote("yyyy-MM-dd")))+"; return false;"+
-                                                   HtmlUtil.attrs(HtmlUtil.ATTR_NAME, anchorName,HtmlUtil.ATTR_ID,anchorName)))+
+                             HtmlUtil.onMouseClick(call)+
+                             HtmlUtil.attrs(HtmlUtil.ATTR_NAME, anchorName,HtmlUtil.ATTR_ID,anchorName))+
             HtmlUtil.div("",HtmlUtil.attrs(HtmlUtil.ATTR_ID, divName,
                                            HtmlUtil.ATTR_STYLE,"position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"));
     }
@@ -4332,7 +4333,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                              : timeSdf.format(date));
 
         return HtmlUtil.input(name, dateString,
-                              HtmlUtil.SIZE_10 + HtmlUtil.title(dateHelp) + getCalendarSelector(formName, name))
+                              HtmlUtil.SIZE_10 + HtmlUtil.title(dateHelp)) + getCalendarSelector(formName, name)
                                       + " T:"
                                       + HtmlUtil.input(name + ".time",
                                                        timeString,
