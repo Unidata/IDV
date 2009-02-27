@@ -77,6 +77,8 @@ public class EntryMonitor implements Constants {
     /** _more_ */
     private User user;
 
+    private Request request;
+
     /** _more_ */
     private boolean enabled = true;
 
@@ -136,6 +138,8 @@ public class EntryMonitor implements Constants {
         toDate = new Date(fromDate.getTime()
                           + (long) DateUtil.daysToMillis(7));
     }
+
+
 
 
 
@@ -447,8 +451,8 @@ public class EntryMonitor implements Constants {
                                   : filter.getValue());
             Group group =
                 (Group) getRepository().getEntryManager().getEntry(null, id);
-            Request request = new Request(repository, getUser());
-            String  select  = OutputHandler.getGroupSelect(request, what);
+
+            String  select  = OutputHandler.getGroupSelect(getRequest(), what);
             sb.append(
                 HtmlUtil.formEntry(
                     getRepository().msgLabel("Ancestor Group"),
@@ -561,7 +565,7 @@ public class EntryMonitor implements Constants {
      *
      * @return _more_
      */
-    protected Repository getRepository() {
+    public Repository getRepository() {
         return repository;
     }
 
@@ -659,9 +663,8 @@ public class EntryMonitor implements Constants {
         System.err.println(getName() + " checking entry:" + entry.getName());
 
 
-        Request request = new Request(repository, getUser());
-        if ( !repository.getAccessManager().canDoAction(request, entry,
-                Permission.ACTION_VIEW)) {
+
+        if ( !okToView(entry)) {
             System.err.println("can't view");
             return false;
         }
@@ -755,6 +758,27 @@ public class EntryMonitor implements Constants {
             return !ok;
         }
         return ok;
+    }
+
+
+
+    public Request getRequest() throws Exception {
+        if(request == null) {
+            request = new Request(repository,getUser());
+        }
+        return request;
+    }
+
+    public boolean okToAddNew(Group group) throws Exception {
+        if(group == null) return false;
+        return getRepository().getAccessManager().canDoAction(getRequest(),
+                                                              group, Permission.ACTION_NEW);
+    }
+
+    public boolean okToView(Entry entry) throws Exception {
+        if(entry == null) return false;
+        return getRepository().getAccessManager().canDoAction(getRequest(),
+                                                              entry, Permission.ACTION_VIEW);
     }
 
 

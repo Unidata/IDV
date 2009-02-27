@@ -3610,7 +3610,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         next.setTime(date);
         next.add(cal.MONTH, 1);
 
-        sb.append("<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\">");
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,HtmlUtil.attrs(HtmlUtil.ATTR_BORDER,"1",HtmlUtil.ATTR_CELLSPACING,"0",HtmlUtil.ATTR_CELLPADDING,"0")));
         String[] dayNames = {
             "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"
         };
@@ -3620,37 +3620,40 @@ public class Repository extends RepositoryBase implements RequestHandler {
                             + CalendarOutputHandler.getUrlArgs(prev), "&lt;");
         String nextUrl =
             HtmlUtil.href(url + "&" + CalendarOutputHandler.getUrlArgs(next),
-                          "&gt;") + HtmlUtil.space(1);
-        sb.append(
-            "<tr valign=top><td colspan=\"7\" align=\"center\"  class=\"calnavmonthheader\">");
-        sb.append("<table cellspacing=0 cellpadding=0 width=100%><tr>");
-        sb.append("<td width=1  class=\"calnavmonthheader\">");
-        sb.append(prevUrl);
-        sb.append("</td>");
-        sb.append("<td  class=\"calnavmonthheader\">");
-        sb.append(DateUtil.MONTH_NAMES[cal.get(cal.MONTH)]);
-        sb.append(HtmlUtil.space(1));
-        sb.append("" + theYear);
-        sb.append("</td>");
-        sb.append("<td width=1  class=\"calnavmonthheader\">");
-        sb.append(nextUrl);
-        sb.append("</td>");
-        sb.append("</table>");
+                          HtmlUtil.ENTITY_GT) + HtmlUtil.space(1);
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TR,
+                                HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,HtmlUtil.VALUE_TOP)));        
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TD,
+                                HtmlUtil.attrs(HtmlUtil.ATTR_COLSPAN,"7",HtmlUtil.ATTR_ALIGN,HtmlUtil.VALUE_CENTER,HtmlUtil.ATTR_CLASS,"calnavmonthheader")));
 
-        sb.append("</tr>");
-        sb.append("<tr>");
+
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,
+                                HtmlUtil.attrs(HtmlUtil.ATTR_CELLSPACING,"0",HtmlUtil.ATTR_CELLPADDING,"0",HtmlUtil.ATTR_WIDTH,"100%")));
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TR));
+        sb.append(HtmlUtil.col(prevUrl,HtmlUtil.attrs(HtmlUtil.ATTR_WIDTH,"1",HtmlUtil.ATTR_CLASS,"calnavmonthheader")));
+        sb.append(HtmlUtil.col(
+                               DateUtil.MONTH_NAMES[cal.get(cal.MONTH)]+
+                               HtmlUtil.space(1)+
+                               theYear,
+                               HtmlUtil.attr(HtmlUtil.ATTR_CLASS,"calnavmonthheader")));
+
+
+
+        sb.append(HtmlUtil.col(nextUrl,HtmlUtil.attrs(HtmlUtil.ATTR_WIDTH,"1",HtmlUtil.ATTR_CLASS,"calnavmonthheader")));
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_TR));
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TR));
         for (int colIdx = 0; colIdx < 7; colIdx++) {
-            sb.append("<td width=\"14%\" class=\"calnavdayheader\">"
-                      + dayNames[colIdx] + "</td>");
+            sb.append(HtmlUtil.col(dayNames[colIdx],HtmlUtil.attrs(HtmlUtil.ATTR_WIDTH,"14%",HtmlUtil.ATTR_CLASS,"calnavdayheader")));
         }
-        sb.append("</tr>");
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_TR));
         int startDow = cal.get(cal.DAY_OF_WEEK);
         while (startDow > 1) {
             cal.add(cal.DAY_OF_MONTH, -1);
             startDow--;
         }
         for (int rowIdx = 0; rowIdx < 6; rowIdx++) {
-            sb.append("<tr valign=top>");
+            sb.append(HtmlUtil.open(HtmlUtil.TAG_TR,HtmlUtil.attrs(HtmlUtil.ATTR_VALIGN,HtmlUtil.VALUE_TOP)));
             for (int colIdx = 0; colIdx < 7; colIdx++) {
                 int    thisDay   = cal.get(cal.DAY_OF_MONTH);
                 int    thisMonth = cal.get(cal.MONTH);
@@ -3680,8 +3683,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         "" + thisDay);
                 }
 
-                sb.append("<td " + HtmlUtil.cssClass(dayClass) + " >"
-                          + content + "</td>");
+                sb.append(HtmlUtil.col(content, HtmlUtil.cssClass(dayClass)));
                 sb.append("\n");
                 cal.add(cal.DAY_OF_MONTH, 1);
             }
@@ -3692,7 +3694,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 break;
             }
         }
-        sb.append("</table>");
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
     }
 
 
@@ -4291,13 +4293,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public String getCalendarSelector(String formName, String fieldName) {
         String anchorName = "anchor." + fieldName;
         String divName    = "div." + fieldName;
-        return "<A HREF=\"#\"   onClick=\"selectDate('" + divName
-               + "',document.forms['" + formName + "']." + fieldName + ",'"
-               + anchorName + "','yyyy-MM-dd'); return false;\"   NAME=\""
-               + anchorName + "\" ID=\"" + anchorName + "\">"
-               + HtmlUtil.img(iconUrl(ICON_CALENDAR), " Choose date", " border=0")
-               + "</A>" + "<DIV ID=\"" + divName
-               + "\" STYLE=\"position:absolute;visibility:hidden;background-color:white;layer-background-color:white;\"></DIV>";
+        return HtmlUtil.href("#",
+                             HtmlUtil.img(iconUrl(ICON_CALENDAR), " Choose date", HtmlUtil.attr(HtmlUtil.ATTR_BORDER,"0")),
+                             HtmlUtil.onMouseClick(HtmlUtil.call("selectDate",
+                                                                 HtmlUtil.comma(HtmlUtil.squote(divName),
+                                                                                "document.forms['" + formName + "']." + fieldName,
+                                                                                HtmlUtil.squote(anchorName),
+                                                                                HtmlUtil.squote("yyyy-MM-dd")))+"; return false;"+
+                                                   HtmlUtil.attrs(HtmlUtil.ATTR_NAME, anchorName,HtmlUtil.ATTR_ID,anchorName)))+
+            HtmlUtil.div("",HtmlUtil.attrs(HtmlUtil.ATTR_ID, divName,
+                                           HtmlUtil.ATTR_STYLE,"position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"));
     }
 
 
@@ -4327,13 +4332,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
                              : timeSdf.format(date));
 
         return HtmlUtil.input(name, dateString,
-                              HtmlUtil.SIZE_10 + " title=\"" + dateHelp
-                              + "\"") + getCalendarSelector(formName, name)
+                              HtmlUtil.SIZE_10 + HtmlUtil.title(dateHelp) + getCalendarSelector(formName, name))
                                       + " T:"
                                       + HtmlUtil.input(name + ".time",
-                                          timeString,
-                                          HtmlUtil.SIZE_15 + " title=\""
-                                          + timeHelp + "\"");
+                                                       timeString,
+                                                       HtmlUtil.SIZE_15 + HtmlUtil.attr(HtmlUtil.ATTR_TITLE, timeHelp));
     }
 
 

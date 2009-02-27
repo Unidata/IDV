@@ -643,7 +643,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                      "event," + HtmlUtil.squote(elementId)
                                      + "," + HtmlUtil.squote("" + allEntries)
                                      + "," + HtmlUtil.squote(type));
-        return HtmlUtil.mouseClickHref(event, msg(label),
+        return HtmlUtil.mouseClickHref(event, label,
                                        HtmlUtil.id(elementId
                                            + ".selectlink"));
     }
@@ -833,14 +833,18 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                new State(getEntryManager().getDummyGroup(),
                                          entries));
 
-        List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
+        List<HtmlUtil.Selector> tfos = new ArrayList<HtmlUtil.Selector>();
         for (Link link : links) {
             OutputType outputType = link.getOutputType();
             if (outputType == null) {
                 continue;
             }
-            tfos.add(new TwoFacedObject(outputType.getLabel(),
-                                        outputType.getId()));
+            String icon = link.getIcon();
+            if(icon == null) {
+                icon = getRepository().iconUrl(ICON_BLANK);
+            }
+            tfos.add(new HtmlUtil.Selector(outputType.getLabel(),
+                                           outputType.getId(),icon));
         }
 
 
@@ -879,11 +883,12 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     public void addEntryCheckbox(Request request, Entry entry, StringBuffer htmlSB, StringBuffer jsSB) 
             throws Exception {
         String rowId = "entryrow_" + (HtmlUtil.blockCnt++);
-        String cbxId = "entry_" + entry.getId();
+        String cbxId = "entry_"  + (HtmlUtil.blockCnt++);
+        String cbxArgId = "entry_" + entry.getId();
         String cbxWrapperId = "cbx_" + (HtmlUtil.blockCnt++);
         jsSB.append(HtmlUtil.callln("new EntryRow",HtmlUtil.comma(HtmlUtil.squote(rowId),HtmlUtil.squote(cbxId),HtmlUtil.squote(cbxWrapperId))));
 
-        String cbx =HtmlUtil.checkbox(cbxId,
+        String cbx =HtmlUtil.checkbox(cbxArgId,
                                         "true", false,HtmlUtil.id(cbxId)+" " +
                                         HtmlUtil.attr(HtmlUtil.ATTR_TITLE,msg("Shift-click: select range; Control-click: toggle all"))+
                                         HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,HtmlUtil.call("entryRowCheckboxClicked",

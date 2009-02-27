@@ -1841,7 +1841,7 @@ return new Result(title, sb);
                     getRepository().URL_ENTRY_SHOW, entries.get(0)));
         }
 
-        if ( !request.exists(ARG_TO) && !request.exists(ARG_TONAME)) {
+        if ( !request.exists(ARG_TO) && !request.exists(ARG_TO+"_hidden") && !request.exists(ARG_TONAME)) {
             StringBuffer sb     = new StringBuffer();
             List<Entry>  cart   = getUserManager().getCart(request);
             boolean      didOne = false;
@@ -1872,7 +1872,7 @@ return new Result(title, sb);
 
                 if ( !didOne) {
                     sb.append(
-                        header("Please select a group to copy/move the given entries to:"));
+                        header("Please select a destination group from the following list:"));
                     sb.append("<ul>");
                 }
                 sb.append(HtmlUtil.img(getIconUrl(request, group)));
@@ -1889,11 +1889,26 @@ return new Result(title, sb);
 
             if (didOne) {
                 sb.append("</ul>");
+                sb.append(
+                          header("Or select a group here:"));
             } else {
-                sb.append("You need to add a destination group to your cart or your favorites");
+                    sb.append(
+                              header("Please select a destination group:"));
             }
 
+
+            sb.append(request.formPost(getRepository().URL_ENTRY_COPY));
+            sb.append(HtmlUtil.hidden(ARG_FROM, fromIds));
+            String select = getRepository().getHtmlOutputHandler().getSelect(request, ARG_TO,
+                                                                             HtmlUtil.img(getRepository().iconUrl(ICON_FOLDER_OPEN)) +HtmlUtil.space(1)+msg("Select"),false,"");
+            sb.append(HtmlUtil.hidden(ARG_TO+"_hidden","",HtmlUtil.id(ARG_TO+"_hidden")));
             
+            sb.append(select);
+            sb.append(HtmlUtil.space(1));
+            sb.append(HtmlUtil.disabledInput(ARG_TO,
+                                             "", HtmlUtil.SIZE_60+HtmlUtil.id(ARG_TO)));
+            sb.append(HtmlUtil.submit(msg("Go")));
+            sb.append(HtmlUtil.formClose());
 
             /*
             if(didOne) {
@@ -1907,7 +1922,10 @@ return new Result(title, sb);
         }
 
 
-        String toId = request.getString(ARG_TO, (String)null);
+        String toId = request.getString(ARG_TO+"_hidden", (String)null);
+        if(toId == null)
+            toId = request.getString(ARG_TO, (String)null);
+
         String toName = request.getString(ARG_TONAME, (String)null);
         if (toId == null && toName == null) {
             throw new IllegalArgumentException(
@@ -1973,7 +1991,7 @@ return new Result(title, sb);
                     "Are you sure you want to copy/move the following entries to the group"));
             sb.append(HtmlUtil.br());
             sb.append(HtmlUtil.space(3));
-            sb.append(toEntry.getLabel());
+            sb.append(HtmlUtil.b(toEntry.getLabel()));
 
             StringBuffer fb = new StringBuffer();
             fb.append(request.formPost(getRepository().URL_ENTRY_COPY));
@@ -2588,22 +2606,15 @@ return new Result(title, sb);
         boolean haveKey = key.length()>0;
         boolean doRatings = getRepository().getProperty(PROP_RATINGS_ENABLE,false);
         if(doRatings) {
-            sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"100%")));
-            sb.append("<tr valign=\"top\"><td align=\"right\">");
             String link = request.url(getRepository().URL_COMMENTS_SHOW,
                                       ARG_ENTRYID, entry.getId());
             String ratings = HtmlUtil.div("",HtmlUtil.cssClass("js-kit-rating") +
                                 HtmlUtil.attr(HtmlUtil.ATTR_TITLE,entry.getFullName())+
                                 HtmlUtil.attr("permalink",link)) +HtmlUtil.importJS("http://js-kit.com/ratings.js");
-            sb.append(ratings);
 
-            //            String review = "<div class=\"js-kit-rating\"></div><div class=\"js-kit-comments\"></div><script src=\"http://js-kit.com/reviews.js\"></script>";
-            //            sb.append(review);
-            //            String nav = "<div class=\"js-kit-top\" style=\"width: 300px\"  title=\"Easy Site Navigator\"></div><script src=\"http://js-kit.com/top.js\"></script>";
-            //            sb.append(nav);
-
-            sb.append("</td></tr>");
-            sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
+            sb.append(HtmlUtil.table(HtmlUtil.row(HtmlUtil.col(ratings,HtmlUtil.attr(HtmlUtil.ATTR_ALIGN,HtmlUtil.VALUE_RIGHT)),
+                                                  HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,HtmlUtil.VALUE_TOP)),
+                                     HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"100%")));
         }
 
 
@@ -2620,7 +2631,7 @@ return new Result(title, sb);
         }
 
         if(!doRatings) {
-            sb.append("<p>");
+            sb.append(HtmlUtil.p());
         }
         sb.append(getCommentHtml(request, entry));
         if(haveKey) {

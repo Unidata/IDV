@@ -21,8 +21,6 @@
 
 
 
-
-
 package ucar.unidata.repository.monitor;
 
 
@@ -51,11 +49,14 @@ import java.util.List;
  */
 public class CopyAction extends MonitorAction {
 
-    //processEntryCopy(Request request, Group toGroup, List<Entry> entries)
+    public static final String ARG_SUBGROUP = "subgroup";
 
 
     private String parentGroupId;
 
+    private String subGroup="";
+
+    private Group group;
 
     /**
      * _more_
@@ -83,7 +84,10 @@ public class CopyAction extends MonitorAction {
 
     private Group getGroup(EntryMonitor entryMonitor)  {
         try {
-            return (Group) entryMonitor.getRepository().getEntryManager().findGroup(null, parentGroupId);
+            if(group == null) {
+                group = (Group) entryMonitor.getRepository().getEntryManager().findGroup(null, parentGroupId);
+            } 
+            return group;
         } catch(Exception exc) {
             return null;
         }
@@ -113,6 +117,8 @@ public class CopyAction extends MonitorAction {
     public void applyEditForm(Request request, EntryMonitor monitor) {
         super.applyEditForm(request, monitor);
         this.parentGroupId = request.getString(getArgId(ARG_GROUP)+"_hidden", "");
+        this.group = null;
+        this.subGroup = request.getString(getArgId(ARG_SUBGROUP), "").trim();
     }
 
 
@@ -127,13 +133,21 @@ public class CopyAction extends MonitorAction {
         sb.append(HtmlUtil.colspan("Copy Action", 2));
         try {
             Group group = getGroup(monitor);
+            String errorLabel = "";
+            if(group!=null&& !monitor.okToAddNew(group)) {
+                errorLabel =HtmlUtil.span(monitor.getRepository().msg("You cannot add to the group"), HtmlUtil.cssClass(HtmlUtil.CLASS_ERRORLABEL));
+            }
             String groupName = (group!=null?group.getFullName():"");
             String inputId = getArgId(ARG_GROUP);
-            String select = monitor.getRepository().getHtmlOutputHandler().getGroupSelect(null, inputId);
+            String select = monitor.getRepository().getHtmlOutputHandler().getSelect(null, inputId,
+                                                                             HtmlUtil.img(monitor.getRepository().iconUrl(ICON_FOLDER_OPEN)) +HtmlUtil.space(1)+monitor.getRepository().msg("Select"),false,"");
             sb.append(HtmlUtil.hidden(inputId+"_hidden",parentGroupId,HtmlUtil.id(inputId+"_hidden")));
-            sb.append(HtmlUtil.formEntry("Group ID:",
+            sb.append(HtmlUtil.formEntry("Group:",
                                      HtmlUtil.disabledInput(inputId,
                                                     groupName, HtmlUtil.SIZE_60+HtmlUtil.id(inputId))+select));
+            sb.append(HtmlUtil.formEntry("Sub-Group Template:",
+                                         HtmlUtil.disabledInput(getArgId(ARG_SUBGROUP),
+                                                                subGroup, HtmlUtil.SIZE_60)));
         } catch(Exception exc) {
             throw new RuntimeException(exc);
         }
@@ -174,6 +188,24 @@ public class CopyAction extends MonitorAction {
     **/
     public String getParentGroupId () {
 	return this.parentGroupId;
+    }
+
+    /**
+       Set the SubGroup property.
+
+       @param value The new value for SubGroup
+    **/
+    public void setSubGroup (String value) {
+	this.subGroup = value;
+    }
+
+    /**
+       Get the SubGroup property.
+
+       @return The SubGroup
+    **/
+    public String getSubGroup () {
+	return this.subGroup;
     }
 
 

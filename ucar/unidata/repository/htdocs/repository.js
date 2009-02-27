@@ -601,6 +601,7 @@ function entryRowCheckboxClicked(event,cbxId) {
     var cbx = util.getDomObject(cbxId);
     if(!cbx) return;
     cbx = cbx.obj;
+    if(!cbx.form) return;
     var visibilityGroup = groups[cbx.form.id];
     if(visibilityGroup) {
         visibilityGroup.checkboxClicked(event,cbxId);
@@ -713,6 +714,7 @@ function checkboxClicked(event, cbxPrefix, id) {
 
 
     var checkBoxes = new Array();
+    if(!cbx.form) return;
     var elements = cbx.form.elements;
     for(i=0;i<elements.length;i++) {
         if(elements[i].name.indexOf(cbxPrefix)>=0 || elements[i].id.indexOf(cbxPrefix)>=0) {
@@ -781,7 +783,7 @@ function folderClick(uid, url, changeImg) {
     }
 
     if(!block) {
-        alert("no block " + uid);
+//        alert("no block " + uid);
 	return;
     }
     var img = util.getDomObject("img_" +uid);
