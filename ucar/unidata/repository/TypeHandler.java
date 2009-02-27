@@ -1251,7 +1251,7 @@ public class TypeHandler extends RepositoryManager {
                     tabContent.add(HtmlUtil.inset(formContent, 8));
                 }
 
-                String addMetadata = HtmlUtil.checkbox(ARG_ADDMETADATA)
+                String addMetadata = HtmlUtil.checkbox(ARG_METADATA_ADD)
                                      + HtmlUtil.space(1)
                                      + msg("Add Metadata");
 

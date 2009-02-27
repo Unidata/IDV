@@ -250,7 +250,6 @@ public class MetadataManager extends RepositoryManager {
             return metadataList;
         }
 
-
         Statement stmt =
             getDatabaseManager().select(
                 Tables.METADATA.COLUMNS, Tables.METADATA.NAME,
@@ -272,6 +271,7 @@ public class MetadataManager extends RepositoryManager {
                         results.getString(col++), results.getString(col++)));
             }
         }
+
         entry.setMetadata(metadataList);
         return metadataList;
     }
@@ -513,8 +513,16 @@ public class MetadataManager extends RepositoryManager {
     public Result processMetadataChange(Request request) throws Exception {
         synchronized (MUTEX_METADATA) {
             Entry entry = getEntryManager().getEntry(request);
+            Group parent = entry.getParentGroup();
+            if(parent!=null) {
+                parent = (Group)getEntryManager().getEntry(request,parent.getId());
+            }
+            boolean canEditParent = parent!=null && getAccessManager().canDoAction(request, 
+                                                                                   parent,
+                                                                                   Permission.ACTION_EDIT);
 
-            if (request.exists(ARG_DELETE)) {
+
+            if (request.exists(ARG_METADATA_DELETE)) {
                 Hashtable args = request.getArgs();
                 for (Enumeration keys =
                         args.keys(); keys.hasMoreElements(); ) {
@@ -527,12 +535,35 @@ public class MetadataManager extends RepositoryManager {
                                       request.getString(arg, BLANK)));
                 }
             } else {
-                List<Metadata> newMetadata = new ArrayList<Metadata>();
+                List<Metadata> newMetadataList = new ArrayList<Metadata>();
                 for (MetadataHandler handler : metadataHandlers) {
-                    handler.handleFormSubmit(request, entry, newMetadata);
+                    handler.handleFormSubmit(request, entry, newMetadataList);
                 }
 
-                for (Metadata metadata : newMetadata) {
+                if (canEditParent && request.exists(ARG_METADATA_ADDTOPARENT)) {
+                    List<Metadata> parentMetadataList = getMetadata(parent);
+                    int cnt = 0;
+
+                    for (Metadata metadata : newMetadataList) {
+                        if(request.defined(ARG_METADATA_ID + SUFFIX_SELECT+ metadata.getId())) {
+                            Metadata newMetadata = new Metadata(getRepository().getGUID(), parent.getId(),
+                                                                metadata);
+                            
+                            if(!parentMetadataList.contains(newMetadata)){
+                                insertMetadata(newMetadata);
+                                cnt++;
+                            }
+                        }
+                    }
+                    parent.setMetadata(null);
+                    return new Result(request.url(URL_METADATA_FORM, ARG_ENTRYID,
+                                                  parent.getId(),
+                                                  ARG_MESSAGE,cnt +" " +msg("metadata items added")));
+                    
+                }
+
+
+                for (Metadata metadata : newMetadataList) {
                     getDatabaseManager().delete(Tables.METADATA.NAME,
                             Clause.eq(Tables.METADATA.COL_ID,
                                       metadata.getId()));
@@ -700,7 +731,17 @@ public class MetadataManager extends RepositoryManager {
      */
     public Result processMetadataForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
+
+        if (request.exists(ARG_MESSAGE)) {
+            sb.append(
+                getRepository().note(
+                    request.getUnsafeString(ARG_MESSAGE, BLANK)));
+        }
+
         Entry        entry = getEntryManager().getEntry(request);
+        boolean canEditParent = entry.getParentGroup()!=null && getAccessManager().canDoAction(request, 
+                                                                                         entry.getParentGroup(),
+                                                                                         Permission.ACTION_EDIT);
 
         //        sb.append(getEntryManager().makeEntryHeader(request, entry));
 
@@ -717,7 +758,11 @@ public class MetadataManager extends RepositoryManager {
             sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
             sb.append(HtmlUtil.submit(msg("Change")));
             sb.append(HtmlUtil.space(2));
-            sb.append(HtmlUtil.submit(msg("Delete selected"), ARG_DELETE));
+            sb.append(HtmlUtil.submit(msg("Delete selected"), ARG_METADATA_DELETE));
+            if(canEditParent) {
+                sb.append(HtmlUtil.space(2));
+                sb.append(HtmlUtil.submit(msg("Add selected to parent group"), ARG_METADATA_ADDTOPARENT));
+            }
             sb.append(HtmlUtil.formTable());
             for (Metadata metadata : metadataList) {
                 metadata.setEntry(entry);
@@ -746,7 +791,7 @@ public class MetadataManager extends RepositoryManager {
             sb.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.submit(msg("Change")));
             sb.append(HtmlUtil.space(2));
-            sb.append(HtmlUtil.submit(msg("Delete Selected"), ARG_DELETE));
+            sb.append(HtmlUtil.submit(msg("Delete Selected"), ARG_METADATA_DELETE));
             sb.append(HtmlUtil.formClose());
         }
 

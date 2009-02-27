@@ -971,7 +971,7 @@ return new Result(title, sb);
             }
         }
 
-        if (newEntry && request.get(ARG_ADDMETADATA, false)) {
+        if (newEntry && request.get(ARG_METADATA_ADD, false)) {
             addInitialMetadata(request, entries,false);
         }
 

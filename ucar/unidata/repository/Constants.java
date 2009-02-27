@@ -411,7 +411,11 @@ public interface Constants {
     public static final String ARG_VARIABLE = "variable";
 
     /** _more_ */
-    public static final String ARG_ADDMETADATA = "addmetadata";
+    public static final String ARG_METADATA_ADD = "metadata.add";
+    public static final String ARG_METADATA_DELETE = "metadata.delete";
+
+    public static final String ARG_METADATA_ADDTOPARENT = "metadata.addtoparent";
+
 
     public static final String ARG_ALLENTRIES = "allentries";
 
