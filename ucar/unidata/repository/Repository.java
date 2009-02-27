@@ -372,6 +372,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public Repository(String[] args, int port, boolean inTomcat)
             throws Exception {
         super(port);
+        LogUtil.setTestMode(true);
         java.net.InetAddress localMachine =
             java.net.InetAddress.getLocalHost();
         setHostname(localMachine.getHostName());

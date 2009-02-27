@@ -227,6 +227,7 @@ public class AccessManager extends RepositoryManager {
 
     public boolean canDoAction(Request request, Entry entry, String action)
             throws Exception {
+        if(entry == null) return false;
         if (entry.getIsLocalFile()) {
             if (action.equals(Permission.ACTION_NEW)) {
                 return false;

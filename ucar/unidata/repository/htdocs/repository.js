@@ -190,8 +190,10 @@ document.onmouseup   = mouseUp;
 
 
 var mouseIsDown = 0;
+var dragSource;
 var draggedEntry;
 var draggedEntryName;
+var draggedEntryIcon;
 var mouseMoveCnt =0;
 var objectToHide;
 
@@ -228,9 +230,56 @@ function mouseUp(event) {
     util.setCursor('default');
     var obj = util.getDomObject('floatdiv');
     if(obj) {
-        hideObject(obj);
+        var dragSourceObj= util.getDomObject(dragSource);
+        if(dragSourceObj) {
+            var tox = util.getLeft(dragSourceObj.obj);
+            var toy = util.getTop(dragSourceObj.obj);
+            var fromx = parseInt(obj.style.left);
+            var fromy = parseInt(obj.style.top);
+            var steps = 10;
+            var dx=(tox-fromx)/steps;
+            var dy=(toy-fromy)/steps;
+            flyBackAndHide('floatdiv',0,steps,fromx,fromy,dx,dy);
+        } else {
+            hideObject(obj);
+        }
     }
     return true;
+}
+
+
+
+
+function flyBackAndHide(id, step,steps,fromx,fromy,dx,dy) {
+    var obj = util.getDomObject(id);
+    if(!obj) {
+        return;
+    }
+    step=step+1;
+    obj.style.left = fromx+dx*step+"px";
+    obj.style.top = fromy+dy*step+"px";
+    var opacity = 80*(steps-step)/steps;
+    //    util.print(opacity);
+    //    obj.style.filter="alpha(opacity="+opacity+")";
+    //    obj.style.opacity="0." + opacity;
+
+    if(step<steps) {
+        var callback = "flyBackAndHide('" + id +"'," + step+","+steps+","+fromx+","+fromy+","+dx+","+dy+");"
+        setTimeout(callback,30);
+    } else {
+        setTimeout("finalHide('" + id+"')",150);
+        //        hideObject(obj);
+    }
+}
+
+function finalHide(id) {
+    var obj = util.getDomObject(id);
+    if(!obj) {
+        return;
+    }
+    hideObject(obj);
+    obj.style.filter="alpha(opacity=80)";
+    obj.style.opacity="0.8";
 }
 
 function mouseMove(event) {
@@ -249,18 +298,27 @@ function mouseMove(event) {
 }
 
 
+
+
+
+
 function moveFloatDiv(x,y) {
     var obj = util.getDomObject('floatdiv');
     if(obj) {
         if(obj.style.visibility!="visible") {
             obj.style.visibility = "visible";
             obj.style.display = "block";
-            obj.obj.innerHTML = draggedEntryName;
+            var icon = "";
+            if(draggedEntryIcon) {
+                icon = "<img src=\"" +draggedEntryIcon+"\"/> ";
+            }
+            obj.obj.innerHTML = icon +draggedEntryName+"<br>Drag to a group to copy/move";
         }
         obj.style.top = y;
         obj.style.left = x+10;
     }
 }
+
 
 function mouseOverOnEntry(event, entryId, targetId) {
     event = util.getEvent(event);
@@ -287,10 +345,12 @@ function mouseOutOnEntry(event, entryId,targetId) {
 
 
 
-function mouseDownOnEntry(event, entryId, name) {
+function mouseDownOnEntry(event, entryId, name, sourceIconId, icon) {
     event = util.getEvent(event);
+    dragSource  = sourceIconId;
     draggedEntry = entryId;
     draggedEntryName=name;
+    draggedEntryIcon = icon;
     mouseIsDown = 1;
     if(event.preventDefault) {
         event.preventDefault();
@@ -1032,7 +1092,6 @@ function hideObject(obj) {
 
         return 0;
     }
-
 
     style.visibility = "hidden";
     style.display = "none";

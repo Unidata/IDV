@@ -550,13 +550,15 @@ public class EntryMonitor implements Constants {
                 : "") + "= (" + value + ")";
     }
 
+    public void setRepository(String dummy) {}
+
 
     /**
      * _more_
      *
      * @param repository _more_
      */
-    public void setRepository(Repository repository) {
+    protected void setRepository(Repository repository) {
         this.repository = repository;
     }
 
@@ -565,7 +567,7 @@ public class EntryMonitor implements Constants {
      *
      * @return _more_
      */
-    public Repository getRepository() {
+    protected Repository getRepository() {
         return repository;
     }
 
@@ -738,10 +740,6 @@ public class EntryMonitor implements Constants {
             ok = users.contains(entry.getUser().getId());
         } else if (field.equals(ARG_WAIT)) {
             ok = true;
-        } else if (field.equals(ARG_GROUP)) {
-            //TODO: check for subgroups
-            //                ok = (value.equals(entry.getParentGroup().getFullName())
-            //                      || value.equals(entry.getParentGroup().getId()));
         } else {
             int match = entry.getTypeHandler().matchValue(field, value,
                             entry);

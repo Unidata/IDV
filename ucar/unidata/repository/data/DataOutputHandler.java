@@ -844,10 +844,8 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputGridSubset(Request request, Entry entry)
             throws Exception {
 
-        boolean canAdd =
-            (entry.getParentGroup() != null)
-            && getRepository().getAccessManager().canDoAction(request,
-                entry.getParentGroup(), Permission.ACTION_NEW);
+        boolean canAdd =getRepository().getAccessManager().canDoAction(request,
+                                                                       entry.getParentGroup(), Permission.ACTION_NEW);
 
         String       path   = entry.getResource().getPath();
         StringBuffer sb     = new StringBuffer();

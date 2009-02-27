@@ -202,7 +202,7 @@ public class MetadataManager extends RepositoryManager {
             }
         }
         if (checkInherited) {
-            return findMetadata(entry.getParentGroup(), type, checkInherited);
+            return findMetadata(getEntryManager().getParent(null,entry), type, checkInherited);
         }
         return null;
     }
@@ -513,10 +513,7 @@ public class MetadataManager extends RepositoryManager {
     public Result processMetadataChange(Request request) throws Exception {
         synchronized (MUTEX_METADATA) {
             Entry entry = getEntryManager().getEntry(request);
-            Group parent = entry.getParentGroup();
-            if(parent!=null) {
-                parent = (Group)getEntryManager().getEntry(request,parent.getId());
-            }
+            Group parent = getEntryManager().getParent(request,entry);
             boolean canEditParent = parent!=null && getAccessManager().canDoAction(request, 
                                                                                    parent,
                                                                                    Permission.ACTION_EDIT);
@@ -739,9 +736,9 @@ public class MetadataManager extends RepositoryManager {
         }
 
         Entry        entry = getEntryManager().getEntry(request);
-        boolean canEditParent = entry.getParentGroup()!=null && getAccessManager().canDoAction(request, 
-                                                                                         entry.getParentGroup(),
-                                                                                         Permission.ACTION_EDIT);
+        boolean canEditParent = getAccessManager().canDoAction(request, 
+                                                               getEntryManager().getParent(request,entry),
+                                                               Permission.ACTION_EDIT);
 
         //        sb.append(getEntryManager().makeEntryHeader(request, entry));
 

@@ -93,7 +93,8 @@ public class MonitorManager extends RepositoryManager {
         try {
             initMonitors();
         } catch (Exception exc) {
-            throw new RuntimeException(exc);
+            exc.printStackTrace();
+            //            throw new RuntimeException(exc);
         }
     }
 
@@ -114,13 +115,21 @@ public class MonitorManager extends RepositoryManager {
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 String xml = results.getString(1);
+                XmlEncoder xmlEncoder  =new XmlEncoder();
                 EntryMonitor monitor =
-                    (EntryMonitor) new XmlEncoder().toObject(xml);
-                monitor.setRepository(getRepository());
-                monitors.add(monitor);
+                    (EntryMonitor) xmlEncoder.toObject(xml);
+                if(monitor!=null) {
+                    monitor.setRepository(getRepository());
+                    monitors.add(monitor);
+                } else {
+                    System.err.println ("could not create monitor:" + xml);
+                    System.err.println ("messages:" + xmlEncoder.getErrorMessages());
+                    for(Exception exc: (List<Exception>)xmlEncoder.getExceptions()) {
+                        exc.printStackTrace();
+                    }
+                }
             }
         }
-
     }
 
 

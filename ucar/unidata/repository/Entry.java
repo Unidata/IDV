@@ -317,53 +317,6 @@ public class Entry extends Entity {
         return isGroup() && (getParentGroupId() == null);
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    //    public boolean isCollectionGroup() {
-    //        if (isGroup() && (getParentGroup() != null)) {
-    //            return getParentGroup().isTopGroup();
-    //        }
-    //        return false;
-    //    }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    //    public String getCollectionGroupId() {
-    //        if (getIsLocalFile()) {
-    //            return null;
-    //        }
-    //        if (isCollectionGroup()) {
-    //            return getId();
-    //        }
-    //        if (getParentGroup() == null) {
-    //            return getId();
-    //        }
-    //        return getParentGroup().getCollectionGroupId();
-    //        }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-
-    //    public Group getCollectionGroup() {
-    //        if (isCollectionGroup()) {
-    //            return (Group) this;
-    //        }
-    //        if (getParentGroup() == null) {
-    //            return (Group) this;
-    //        }
-    //        return getParentGroup().getCollectionGroup();
-    //    }
-
 
     /**
      * _more_

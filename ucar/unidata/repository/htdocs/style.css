@@ -718,11 +718,22 @@ code.menu {
          font-weight: bold;
 }
 
+
 .floatdiv {
+    filter:alpha(opacity=80);
+    -moz-opacity:0.80;
+     -khtml-opacity: 0.80;
+     opacity: 0.80;
+
    position: absolute; 
    visibility: hidden; 
    z-index: 1;
-   color: gray;
+
+   background-color:     #67a7e3;
+   border: 1px #666666 solid;   
+   color: #fff;
+   padding:4px;
+  font-weight: bold;
 }
 
 .selectdiv {

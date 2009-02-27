@@ -907,17 +907,6 @@ return new Result(title, sb);
                     throw new IllegalArgumentException(
                         "Cannot have a '/' in group name:" + newName);
                 }
-
-                /**
-                 * TODO Do we want to not allow 2 or more groups with the same name?
-                 * Entry existing = findEntryWithName(request,
-                 *                                  entry.getParentGroup(), newName);
-                 * if ((existing != null) && existing.isGroup()
-                 *       && !existing.getId().equals(entry.getId())) {
-                 *   throw new IllegalArgumentException(
-                 *       "A group with the given name already exists");
-                 * }
-                 */
             }
 
             entry.setName(newName);
@@ -3025,6 +3014,8 @@ return new Result(title, sb);
 
         StringBuffer sourceEvent  = new StringBuffer();
         StringBuffer targetEvent  = new StringBuffer();
+        String entryIcon = getIconUrl(request, entry);
+        String iconId = "img_" + uid;
         if (okToMove) {
             if(entry.isGroup() && forTreeNavigation) {
                 targetEvent.append(HtmlUtil.onMouseOver(HtmlUtil.call("mouseOverOnEntry",
@@ -3040,7 +3031,9 @@ return new Result(title, sb);
             sourceEvent.append(HtmlUtil.onMouseDown(HtmlUtil.call("mouseDownOnEntry",
                                                            HtmlUtil.comma("event",
                                                                           HtmlUtil.squote(entry.getId()),
-                                                                          HtmlUtil.squote(entry.getLabel().replace("'",""))))));
+                                                                          HtmlUtil.squote(entry.getLabel().replace("'","")),
+                                                                          HtmlUtil.squote(iconId),
+                                                                          HtmlUtil.squote(entryIcon)))));
             targetEvent.append((!entry.isGroup()?"":HtmlUtil.onMouseUp(HtmlUtil.call("mouseUpOnEntry",
                                                                                                           HtmlUtil.comma("event",
                                                                                                                          HtmlUtil.squote(entry.getId()),
@@ -3048,10 +3041,10 @@ return new Result(title, sb);
 
         }
         
-        String img = prefix +HtmlUtil.img(getIconUrl(request, entry),
+        String img = prefix +HtmlUtil.img(entryIcon,
                                           (okToMove
                                             ? msg("Drag to move")
-                                            : ""), HtmlUtil.id("img_" + uid) + sourceEvent);
+                                           : ""), HtmlUtil.id(iconId) + sourceEvent);
 
 
         //        StringBuffer row = new StringBuffer();
@@ -3507,7 +3500,9 @@ return new Result(title, sb);
 
 
 
-
+    public Group getParent(Request request, Entry entry) throws Exception {
+        return (Group)getEntry(request, entry.getParentGroupId());
+    }
 
 
 
@@ -3525,6 +3520,7 @@ return new Result(title, sb);
     public Entry getEntry(Request request, String entryId) throws Exception {
         return getEntry(request, entryId, true);
     }
+
 
     /**
      * _more_
