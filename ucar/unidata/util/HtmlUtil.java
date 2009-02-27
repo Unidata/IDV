@@ -44,127 +44,341 @@ import java.util.List;
 public class HtmlUtil {
 
     //j-
+
+    /** _more_          */
     public static final String SIZE_3 = "  size=\"3\" ";
+
+    /** _more_          */
     public static final String SIZE_5 = "  size=\"5\" ";
+
+    /** _more_          */
     public static final String SIZE_8 = "  size=\"8\" ";
+
+    /** _more_          */
     public static final String SIZE_10 = "  size=\"10\" ";
+
+    /** _more_          */
     public static final String SIZE_20 = "  size=\"20\" ";
+
+    /** _more_          */
     public static final String SIZE_15 = "  size=\"15\" ";
+
+    /** _more_          */
     public static final String SIZE_25 = "  size=\"25\" ";
+
+    /** _more_          */
     public static final String SIZE_30 = "  size=\"30\" ";
+
+    /** _more_          */
     public static final String SIZE_40 = "  size=\"40\" ";
+
+    /** _more_          */
     public static final String SIZE_50 = "  size=\"50\" ";
+
+    /** _more_          */
     public static final String SIZE_60 = "  size=\"60\" ";
+
+    /** _more_          */
     public static final String SIZE_70 = "  size=\"70\" ";
+
+    /** _more_          */
     public static final String SIZE_80 = "  size=\"80\" ";
+
+    /** _more_          */
     public static final String SIZE_90 = "  size=\"90\" ";
 
-    public static final String ENTITY_NBSP = "&nbsp;";    
+    /** _more_          */
+    public static final String ENTITY_NBSP = "&nbsp;";
+
+    /** _more_          */
     public static final String ENTITY_GT = "&gt;";
+
+    /** _more_          */
     public static final String ENTITY_LT = "&lt;";
 
+    /** _more_          */
     public static final String TAG_A = "a";
+
+    /** _more_          */
     public static final String TAG_B = "b";
+
+    /** _more_          */
     public static final String TAG_BR = "br";
+
+    /** _more_          */
     public static final String TAG_CENTER = "center";
+
+    /** _more_          */
     public static final String TAG_DIV = "div";
+
+    /** _more_          */
     public static final String TAG_FORM = "form";
+
+    /** _more_          */
     public static final String TAG_HR = "hr";
+
+    /** _more_          */
     public static final String TAG_H1 = "h1";
+
+    /** _more_          */
     public static final String TAG_H2 = "h2";
+
+    /** _more_          */
     public static final String TAG_H3 = "h3";
+
+    /** _more_          */
     public static final String TAG_I = "i";
+
+    /** _more_          */
     public static final String TAG_IMG = "img";
+
+    /** _more_          */
     public static final String TAG_INPUT = "input";
+
+    /** _more_          */
     public static final String TAG_LI = "li";
+
+    /** _more_          */
     public static final String TAG_NOBR = "nobr";
+
+    /** _more_          */
     public static final String TAG_OPTION = "option";
+
+    /** _more_          */
     public static final String TAG_P = "p";
+
+    /** _more_          */
     public static final String TAG_PRE = "pre";
+
+    /** _more_          */
     public static final String TAG_SCRIPT = "script";
+
+    /** _more_          */
     public static final String TAG_SPAN = "span";
+
+    /** _more_          */
     public static final String TAG_SELECT = "select";
+
+    /** _more_          */
     public static final String TAG_TABLE = "table";
+
+    /** _more_          */
     public static final String TAG_TD = "td";
+
+    /** _more_          */
     public static final String TAG_TR = "tr";
+
+    /** _more_          */
     public static final String TAG_TEXTAREA = "textarea";
+
+    /** _more_          */
     public static final String TAG_UL = "ul";
 
 
+    /** _more_          */
     public static final String ATTR_ACTION = "action";
+
+    /** _more_          */
     public static final String ATTR_ALIGN = "align";
+
+    /** _more_          */
     public static final String ATTR_ALT = "alt";
+
+    /** _more_          */
     public static final String ATTR_BORDER = "border";
+
+    /** _more_          */
     public static final String ATTR_BGCOLOR = "bgcolor";
+
+    /** _more_          */
     public static final String ATTR_CELLSPACING = "cellspacing";
+
+    /** _more_          */
     public static final String ATTR_CELLPADDING = "cellpadding";
+
+    /** _more_          */
     public static final String ATTR_CLASS = "class";
+
+    /** _more_          */
     public static final String ATTR_COLS = "cols";
+
+    /** _more_          */
     public static final String ATTR_COLSPAN = "colspan";
+
+    /** _more_          */
     public static final String ATTR_ENCTYPE = "enctype";
+
+    /** _more_          */
     public static final String ATTR_HREF = "href";
+
+    /** _more_          */
     public static final String ATTR_ID = "id";
+
+    /** _more_          */
     public static final String ATTR_METHOD = "method";
+
+    /** _more_          */
     public static final String ATTR_NAME = "name";
+
+    /** _more_          */
     public static final String ATTR_ONMOUSEMOVE = "onmousemove";
+
+    /** _more_          */
     public static final String ATTR_ONMOUSEOVER = "onmouseover";
+
+    /** _more_          */
     public static final String ATTR_ONMOUSEUP = "onmouseup";
+
+    /** _more_          */
     public static final String ATTR_ONMOUSEOUT = "onmouseout";
+
+    /** _more_          */
     public static final String ATTR_ONMOUSEDOWN = "onmousedown";
+
+    /** _more_          */
     public static final String ATTR_ONCLICK = "onClick";
+
+    /** _more_          */
     public static final String ATTR_READONLY = "READONLY";
+
+    /** _more_          */
     public static final String ATTR_ROWS = "rows";
+
+    /** _more_          */
     public static final String ATTR_SELECTED = "selected";
+
+    /** _more_          */
     public static final String ATTR_SIZE = "size";
+
+    /** _more_          */
     public static final String ATTR_SRC = "src";
+
+    /** _more_          */
     public static final String ATTR_STYLE = "style";
+
+    /** _more_          */
     public static final String ATTR_TYPE = "type";
+
+    /** _more_          */
     public static final String ATTR_TITLE = "title";
+
+    /** _more_          */
     public static final String ATTR_VALUE = "value";
+
+    /** _more_          */
     public static final String ATTR_VALIGN = "valign";
+
+    /** _more_          */
     public static final String ATTR_WIDTH = "width";
 
+    /** _more_          */
     public static final String CLASS_BLOCK = "block";
+
+    /** _more_          */
     public static final String CLASS_CHECKBOX = "checkbox";
+
+    /** _more_          */
     public static final String CLASS_DISABLEDINPUT = "disabledinput";
+
+    /** _more_          */
     public static final String CLASS_ERRORLABEL = "errorlabel";
+
+    /** _more_          */
     public static final String CLASS_FILEINPUT = "fileinput";
+
+    /** _more_          */
     public static final String CLASS_FORMLABEL = "formlabel";
+
+    /** _more_          */
     public static final String CLASS_HIDDEN = "hidden";
+
+    /** _more_          */
     public static final String CLASS_INPUT = "input";
+
+    /** _more_          */
     public static final String CLASS_PASSWORD = "password";
+
+    /** _more_          */
     public static final String CLASS_RADIO = "radio";
+
+    /** _more_          */
     public static final String CLASS_SELECT = "select";
+
+    /** _more_          */
     public static final String CLASS_SUBMIT = "submit";
+
+    /** _more_          */
     public static final String CLASS_SUBMITIMAGE = "submitimage";
+
+    /** _more_          */
     public static final String CLASS_TAB_CONTENT = "tab_content";
+
+    /** _more_          */
     public static final String CLASS_TAB_CONTENTS = "tab_contents";
+
+    /** _more_          */
     public static final String CLASS_TEXTAREA = "textarea";
 
 
 
+    /** _more_          */
     public static final String TYPE_FILE = "file";
+
+    /** _more_          */
     public static final String TYPE_PASSWORD = "password";
+
+    /** _more_          */
     public static final String TYPE_SUBMIT = "submit";
+
+    /** _more_          */
     public static final String TYPE_IMAGE = "image";
+
+    /** _more_          */
     public static final String TYPE_RADIO = "radio";
+
+    /** _more_          */
     public static final String TYPE_INPUT = "input";
+
+    /** _more_          */
     public static final String TYPE_TEXTAREA = "textarea";
+
+    /** _more_          */
     public static final String TYPE_CHECKBOX = "checkbox";
+
+    /** _more_          */
     public static final String TYPE_HIDDEN = "hidden";
 
 
 
+    /** _more_          */
     public static final String VALUE_BOTTOM = "bottom";
+
+    /** _more_          */
     public static final String VALUE_CENTER = "center";
-    public static final String VALUE_FALSE  = "false";
+
+    /** _more_          */
+    public static final String VALUE_FALSE = "false";
+
+    /** _more_          */
     public static final String VALUE_LEFT = "left";
-    public static final String VALUE_MULTIPART ="multipart/form-data";
+
+    /** _more_          */
+    public static final String VALUE_MULTIPART = "multipart/form-data";
+
+    /** _more_          */
     public static final String VALUE_POST = "post";
+
+    /** _more_          */
     public static final String VALUE_RIGHT = "right";
-    public static final String VALUE_SELECTED ="selected";
+
+    /** _more_          */
+    public static final String VALUE_SELECTED = "selected";
+
+    /** _more_          */
     public static final String VALUE_TOP = "top";
-    public static final String VALUE_TRUE  = "true";
+
+    /** _more_          */
+    public static final String VALUE_TRUE = "true";
 
     //j+
 
@@ -217,6 +431,22 @@ public class HtmlUtil {
      */
     public static String comma(String s1, String s2, String s3, String s4) {
         return comma(new String[] { s1, s2, s3, s4 });
+    }
+
+    /**
+     * _more_
+     *
+     * @param s1 _more_
+     * @param s2 _more_
+     * @param s3 _more_
+     * @param s4 _more_
+     * @param s5 _more_
+     *
+     * @return _more_
+     */
+    public static String comma(String s1, String s2, String s3, String s4,
+                               String s5) {
+        return comma(new String[] { s1, s2, s3, s4, s5 });
     }
 
     /**
@@ -302,14 +532,23 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String hidden(String name, Object value) {
-        return hidden(name,value,"");
+        return hidden(name, value, "");
     }
 
-    public static String hidden(String name, Object value,String extra) {
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
+    public static String hidden(String name, Object value, String extra) {
         return tag(TAG_INPUT,
-                   extra+
-                   attrs(ATTR_TYPE, TYPE_HIDDEN, ATTR_NAME, name, ATTR_VALUE,
-                         "" + value,ATTR_CLASS,CLASS_HIDDEN));
+                   extra
+                   + attrs(ATTR_TYPE, TYPE_HIDDEN, ATTR_NAME, name,
+                           ATTR_VALUE, "" + value, ATTR_CLASS, CLASS_HIDDEN));
     }
 
 
@@ -389,6 +628,13 @@ public class HtmlUtil {
         return tag(TAG_B, "", inner);
     }
 
+    /**
+     * _more_
+     *
+     * @param inner _more_
+     *
+     * @return _more_
+     */
     public static String italics(String inner) {
         return tag(TAG_I, "", inner);
     }
@@ -635,6 +881,13 @@ public class HtmlUtil {
         return tag(TAG_DIV, extra, content);
     }
 
+    /**
+     * _more_
+     *
+     * @param content _more_
+     *
+     * @return _more_
+     */
     public static String pre(String content) {
         return tag(TAG_PRE, "", content);
     }
@@ -966,19 +1219,26 @@ public class HtmlUtil {
                                        String north, String east,
                                        String west) {
         //TODO: Clean this up
-        return table("<tr><td colspan=\"2\" align=\"center\">"
-               + input(baseName + "_north", north, " size=\"5\" id=\""
-                   + baseName + "_north\"") + "</td></tr>" + "<tr><td>"
-                       + input(baseName + "_west", west, " size=\"5\" id=\""
-                           + baseName + "_west\"") + "</td><td>"
-                               + input(baseName
-                                   + "_east", east, " size=\"5\"  id=\""
-                                       + baseName + "_east\"") + "</tr>"
-                                           + "<tr><td colspan=\"2\" align=\"center\">"
-                                               + input(baseName
-                                                   + "_south", south, " size=\"5\"  id=\""
-                                                       + baseName
-                                                       + "_south\""));
+        return table(
+            "<tr><td colspan=\"2\" align=\"center\">"
+            + input(
+                baseName + "_north", north,
+                " size=\"5\" id=\"" + baseName + "_north\"") + "</td></tr>"
+                    + "<tr><td>"
+                    + input(
+                        baseName + "_west", west,
+                        " size=\"5\" id=\"" + baseName
+                        + "_west\"") + "</td><td>"
+                                     + input(
+                                         baseName + "_east", east,
+                                         " size=\"5\"  id=\"" + baseName
+                                         + "_east\"") + "</tr>"
+                                             + "<tr><td colspan=\"2\" align=\"center\">"
+                                             + input(
+                                                 baseName + "_south", south,
+                                                     " size=\"5\"  id=\""
+                                                         + baseName
+                                                             + "_south\""));
     }
 
     /**
@@ -995,14 +1255,15 @@ public class HtmlUtil {
     public static String makeLatLonBox(String baseName, double south,
                                        double north, double east,
                                        double west) {
-        return table("<tr><td colspan=\"2\" align=\"center\">"
-               + input(baseName + "_north", toString(north), " size=\"5\"")
-               + "</td></tr>" + "<tr><td>"
-               + input(baseName + "_west", toString(west), " size=\"5\"")
-               + "</td><td>"
-               + input(baseName + "_east", toString(east), " size=\"5\"")
-               + "</tr>" + "<tr><td colspan=\"2\" align=\"center\">"
-                     + input(baseName + "_south", toString(south), " size=\"5\""));
+        return table(
+            "<tr><td colspan=\"2\" align=\"center\">"
+            + input(baseName + "_north", toString(north), " size=\"5\"")
+            + "</td></tr>" + "<tr><td>"
+            + input(baseName + "_west", toString(west), " size=\"5\"")
+            + "</td><td>"
+            + input(baseName + "_east", toString(east), " size=\"5\"")
+            + "</tr>" + "<tr><td colspan=\"2\" align=\"center\">"
+            + input(baseName + "_south", toString(south), " size=\"5\""));
     }
 
     /**
@@ -1032,9 +1293,10 @@ public class HtmlUtil {
     public static String makeAreaLabel(double south, double north,
                                        double east, double west) {
         return table("<tr><td colspan=\"2\" align=\"center\">"
-               + toString(north) + "</td></tr>" + "<tr><td>" + toString(west)
-               + "</td><td>" + toString(east) + "</tr>"
-                     + "<tr><td colspan=\"2\" align=\"center\">" + toString(south));
+                     + toString(north) + "</td></tr>" + "<tr><td>"
+                     + toString(west) + "</td><td>" + toString(east)
+                     + "</tr>" + "<tr><td colspan=\"2\" align=\"center\">"
+                     + toString(south));
     }
 
 
@@ -1072,11 +1334,10 @@ public class HtmlUtil {
      */
     public static String radio(String name, String value, boolean checked) {
         return tag(TAG_INPUT,
-                   attrs(ATTR_CLASS,CLASS_RADIO,
-                         ATTR_TYPE, TYPE_RADIO, ATTR_NAME, name, ATTR_VALUE, value)
-                   + (checked
-                      ? " checked "
-                      : ""));
+                   attrs(ATTR_CLASS, CLASS_RADIO, ATTR_TYPE, TYPE_RADIO,
+                         ATTR_NAME, name, ATTR_VALUE, value) + (checked
+                ? " checked "
+                : ""));
     }
 
 
@@ -1108,10 +1369,11 @@ public class HtmlUtil {
                                   String extra) {
         return tag(TAG_INPUT,
                    extra
-                   + attrs(ATTR_CLASS,CLASS_CHECKBOX,ATTR_TYPE, TYPE_CHECKBOX, ATTR_NAME, name, ATTR_VALUE, value)
-                   + (checked
-                      ? " checked "
-                      : ""));
+                   + attrs(ATTR_CLASS, CLASS_CHECKBOX, ATTR_TYPE,
+                           TYPE_CHECKBOX, ATTR_NAME, name, ATTR_VALUE,
+                           value) + (checked
+                                     ? " checked "
+                                     : ""));
     }
 
     /**
@@ -1145,7 +1407,8 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String formPost(String url) {
-        return open(TAG_FORM, attrs(ATTR_METHOD, VALUE_POST, ATTR_ACTION, url));
+        return open(TAG_FORM,
+                    attrs(ATTR_METHOD, VALUE_POST, ATTR_ACTION, url));
     }
 
     /**
@@ -1214,9 +1477,9 @@ public class HtmlUtil {
      */
     public static String submitImage(String img, String name) {
         return tag(TAG_INPUT,
-                   attrs(ATTR_CLASS,CLASS_SUBMITIMAGE,ATTR_NAME, name) +
-                   attrs(ATTR_BORDER, "0", ATTR_SRC, img,
-                         ATTR_TYPE, TYPE_IMAGE));
+                   attrs(ATTR_CLASS, CLASS_SUBMITIMAGE, ATTR_NAME, name)
+                   + attrs(ATTR_BORDER, "0", ATTR_SRC, img, ATTR_TYPE,
+                           TYPE_IMAGE));
 
     }
 
@@ -1233,8 +1496,8 @@ public class HtmlUtil {
     public static String submitImage(String img, String name, String alt) {
         return tag(TAG_INPUT,
                    attrs(ATTR_NAME, name, ATTR_BORDER, "0", ATTR_SRC, img)
-                   + attrs(ATTR_CLASS,CLASS_SUBMITIMAGE,ATTR_TITLE, alt, ATTR_ALT, alt, ATTR_TYPE,
-                           TYPE_IMAGE));
+                   + attrs(ATTR_CLASS, CLASS_SUBMITIMAGE, ATTR_TITLE, alt,
+                           ATTR_ALT, alt, ATTR_TYPE, TYPE_IMAGE));
     }
 
 
@@ -1249,7 +1512,7 @@ public class HtmlUtil {
     public static String submit(String label, String name) {
         return tag(TAG_INPUT,
                    attrs(ATTR_NAME, name, ATTR_TYPE, TYPE_SUBMIT, ATTR_VALUE,
-                         label,ATTR_CLASS,CLASS_SUBMIT));
+                         label, ATTR_CLASS, CLASS_SUBMIT));
     }
 
     /**
@@ -1260,7 +1523,9 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String submit(String label) {
-        return tag(TAG_INPUT, attrs(ATTR_CLASS,CLASS_SUBMIT,ATTR_TYPE, TYPE_SUBMIT, ATTR_VALUE, label));
+        return tag(TAG_INPUT,
+                   attrs(ATTR_CLASS, CLASS_SUBMIT, ATTR_TYPE, TYPE_SUBMIT,
+                         ATTR_VALUE, label));
     }
 
     /**
@@ -1293,9 +1558,9 @@ public class HtmlUtil {
     public static String textArea(String name, String value, int rows,
                                   int columns, String extra) {
         return tag(TAG_TEXTAREA,
-                   attrs(ATTR_NAME, name,ATTR_CLASS,CLASS_TEXTAREA) +
-                   attrs(ATTR_ROWS, "" + rows, ATTR_COLS,
-                         "" + columns) + extra, value);
+                   attrs(ATTR_NAME, name, ATTR_CLASS, CLASS_TEXTAREA)
+                   + attrs(ATTR_ROWS, "" + rows, ATTR_COLS, "" + columns)
+                   + extra, value);
     }
 
     /**
@@ -1306,7 +1571,9 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String password(String name) {
-        return tag(TAG_INPUT, attrs(ATTR_CLASS,CLASS_PASSWORD,ATTR_TYPE, TYPE_PASSWORD, ATTR_NAME, name));
+        return tag(TAG_INPUT,
+                   attrs(ATTR_CLASS, CLASS_PASSWORD, ATTR_TYPE,
+                         TYPE_PASSWORD, ATTR_NAME, name));
     }
 
 
@@ -1344,18 +1611,30 @@ public class HtmlUtil {
      */
     public static String input(String name, Object value, String extra) {
         return tag(TAG_INPUT,
-                   attrs(ATTR_CLASS,CLASS_INPUT,ATTR_NAME, name, ATTR_VALUE, ((value == null)
-                ? ""
-                : value.toString())) + " " + extra);
+                   attrs(ATTR_CLASS, CLASS_INPUT, ATTR_NAME, name,
+                         ATTR_VALUE, ((value == null)
+                                      ? ""
+                                      : value.toString())) + " " + extra);
     }
 
 
-    public static String disabledInput(String name, Object value, String extra) {
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
+    public static String disabledInput(String name, Object value,
+                                       String extra) {
         return tag(TAG_INPUT,
-                   " " +ATTR_READONLY+" " +
-                   attrs(ATTR_CLASS,CLASS_DISABLEDINPUT,ATTR_NAME, name, ATTR_VALUE, ((value == null)
-                ? ""
-                : value.toString())) + " " + extra);
+                   " " + ATTR_READONLY + " "
+                   + attrs(ATTR_CLASS, CLASS_DISABLEDINPUT, ATTR_NAME, name,
+                           ATTR_VALUE, ((value == null)
+                                        ? ""
+                                        : value.toString())) + " " + extra);
     }
 
 
@@ -1369,7 +1648,8 @@ public class HtmlUtil {
      */
     public static String fileInput(String name, String extra) {
         return tag(TAG_INPUT,
-                   attrs(ATTR_CLASS,CLASS_FILEINPUT,ATTR_TYPE, TYPE_FILE, ATTR_NAME, name) + " " + extra);
+                   attrs(ATTR_CLASS, CLASS_FILEINPUT, ATTR_TYPE, TYPE_FILE,
+                         ATTR_NAME, name) + " " + extra);
     }
 
     /**
@@ -1481,14 +1761,34 @@ public class HtmlUtil {
         return select(name, values, selectedList, extra, maxLength);
     }
 
+    /**
+     * Class Selector _more_
+     *
+     *
+     * @author IDV Development Team
+     */
     public static class Selector {
+
+        /** _more_          */
         String label;
+
+        /** _more_          */
         String id;
+
+        /** _more_          */
         String icon;
-        public Selector(String label,   String id,       String icon) {
+
+        /**
+         * _more_
+         *
+         * @param label _more_
+         * @param id _more_
+         * @param icon _more_
+         */
+        public Selector(String label, String id, String icon) {
             this.label = label;
-            this.id = id;
-            this.icon = icon;
+            this.id    = id;
+            this.icon  = icon;
         }
     }
 
@@ -1507,7 +1807,9 @@ public class HtmlUtil {
                                 List<String> selected, String extra,
                                 int maxLength) {
         StringBuffer sb = new StringBuffer();
-        sb.append(open(TAG_SELECT, attrs(ATTR_NAME, name,ATTR_CLASS,CLASS_SELECT) + extra));
+        sb.append(open(TAG_SELECT,
+                       attrs(ATTR_NAME, name, ATTR_CLASS, CLASS_SELECT)
+                       + extra));
         for (int i = 0; i < values.size(); i++) {
             Object obj = values.get(i);
             String value;
@@ -1517,12 +1819,15 @@ public class HtmlUtil {
                 TwoFacedObject tfo = (TwoFacedObject) obj;
                 value = tfo.getId().toString();
                 label = tfo.toString();
-            }   if (obj instanceof Selector) {
+            }
+            if (obj instanceof Selector) {
                 Selector selector = (Selector) obj;
                 value = selector.id;
                 label = selector.label;
-                if(selector.icon!=null) {
-                    extraAttr = style("margin:3px;padding-left:20px;background-repeat:no-repeat; background-image: url(" + selector.icon +");");
+                if (selector.icon != null) {
+                    extraAttr = style(
+                        "margin:3px;padding-left:20px;background-repeat:no-repeat; background-image: url("
+                        + selector.icon + ");");
                 }
             } else {
                 value = label = obj.toString();
@@ -1537,8 +1842,7 @@ public class HtmlUtil {
             }
 
             sb.append(tag(TAG_OPTION,
-                          selectedAttr
-                          + extraAttr
+                          selectedAttr + extraAttr
                           + attrs(ATTR_TITLE, value, ATTR_VALUE,
                                   value), label));
         }
@@ -1645,8 +1949,9 @@ public class HtmlUtil {
                          ATTR_CELLSPACING,
                          "0"), row(col(left)
                          + col(right,
-                               attr(ATTR_ALIGN, VALUE_RIGHT)), attr(ATTR_VALIGN,
-                                                                VALUE_TOP)));
+                               attr(ATTR_ALIGN,
+                                    VALUE_RIGHT)), attr(ATTR_VALIGN,
+                                        VALUE_TOP)));
     }
 
     /**
@@ -1681,7 +1986,7 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String table(Object[] columns) {
-        return table(row(cols(columns), attr(ATTR_VALIGN,VALUE_TOP)));
+        return table(row(cols(columns), attr(ATTR_VALIGN, VALUE_TOP)));
     }
 
 
@@ -1739,8 +2044,9 @@ public class HtmlUtil {
     public static String formEntry(String left, String right) {
         return tag(TAG_TR, "",
                    tag(TAG_TD,
-                       attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_CLASS, CLASS_FORMLABEL),
-                       left) + tag(TAG_TD, "", right));
+                       attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_CLASS,
+                             CLASS_FORMLABEL), left) + tag(TAG_TD, "",
+                                 right));
 
     }
 
@@ -1773,8 +2079,9 @@ public class HtmlUtil {
         return tag(TAG_TR, attrs(ATTR_VALIGN, VALUE_TOP) + " " + trExtra,
                    tag(TAG_TD,
                        attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_VALIGN, VALUE_TOP,
-                             ATTR_CLASS, CLASS_FORMLABEL), left) + tag(TAG_TD,
-                                 "", right));
+                             ATTR_CLASS,
+                             CLASS_FORMLABEL), left) + tag(TAG_TD, "",
+                                 right));
     }
 
     /**
@@ -1788,10 +2095,12 @@ public class HtmlUtil {
      */
     public static String formEntryTop(String col1, String left,
                                       String right) {
-        return tag(TAG_TR,attrs(ATTR_VALIGN,VALUE_TOP),
-                   col(col1, attr(ATTR_VALIGN,VALUE_TOP)) +
-                   col(left, attrs(ATTR_VALIGN,VALUE_TOP,ATTR_ALIGN,VALUE_RIGHT,ATTR_CLASS,CLASS_FORMLABEL)) +
-                   col(right));
+        return tag(TAG_TR, attrs(ATTR_VALIGN, VALUE_TOP),
+                   col(col1, attr(ATTR_VALIGN, VALUE_TOP))
+                   + col(left,
+                         attrs(ATTR_VALIGN, VALUE_TOP, ATTR_ALIGN,
+                               VALUE_RIGHT, ATTR_CLASS,
+                               CLASS_FORMLABEL)) + col(right));
     }
 
     /**
@@ -2049,7 +2358,7 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String importJS(String jsUrl) {
-        return tag(TAG_SCRIPT,attr(ATTR_SRC,jsUrl),"");
+        return tag(TAG_SCRIPT, attr(ATTR_SRC, jsUrl), "");
     }
 
 
@@ -2103,9 +2412,9 @@ public class HtmlUtil {
                                   boolean skipEmpty, String tabContentClass,
                                   String wrapperClass) {
 
-        String id  = "tab_" + (tabCnt++);
-        String ids = "tab_" + (tabCnt++) + "_ids";
-        StringBuffer titleSB = new StringBuffer("");
+        String       id        = "tab_" + (tabCnt++);
+        String       ids       = "tab_" + (tabCnt++) + "_ids";
+        StringBuffer titleSB   = new StringBuffer("");
         StringBuffer contentSB = new StringBuffer();
         StringBuffer idArray   = new StringBuffer("new Array(");
         int          cnt       = 0;
@@ -2300,7 +2609,7 @@ public class HtmlUtil {
         }
 
         sb.append(content.toString());
-        sb.append(close(TAG_DIV));        
+        sb.append(close(TAG_DIV));
         sb.append(close(TAG_DIV));
         return sb.toString();
     }
@@ -2328,8 +2637,8 @@ public class HtmlUtil {
 
         //        sb.append(RepositoryManager.tableSubHeader(link));
         sb.append(link);
-        sb.append(open(TAG_SPAN, HtmlUtil.cssClass("hideshowblock")
-                       + HtmlUtil.id(id)
+        sb.append(open(TAG_SPAN,
+                       HtmlUtil.cssClass("hideshowblock") + HtmlUtil.id(id)
                        + HtmlUtil.style("display:block;visibility:visible")));
         if ( !visible) {
             sb.append(HtmlUtil.script(HtmlUtil.call("hide",
