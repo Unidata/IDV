@@ -1313,7 +1313,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         }
 
         return HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
-                            + entry.getName(), ARG_ENTRYID, entry.getId());
+                            + getStorageManager().getFileTail(entry), ARG_ENTRYID, entry.getId());
     }
 
 

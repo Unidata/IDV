@@ -277,6 +277,7 @@ public class ContentMetadataHandler extends MetadataHandler {
                                     extra);
 
             if (forLink) {
+
                 String bigimg =
                     HtmlUtil
                         .img(request
@@ -286,9 +287,18 @@ public class ContentMetadataHandler extends MetadataHandler {
                                     metadata.getId()), "thumbnail", "");
 
 
+                String imgUrl =HtmlUtil.url(getRepository().getMetadataManager().URL_METADATA_VIEW+"/"
+                                            +getRepository().getStorageManager().getFileTail(f.toString())
+                                         , ARG_ENTRYID,
+                                         metadata.getEntryId(), ARG_METADATA_ID,
+                                         metadata.getId());
+
+                
+                //                System.err.println(imgUrl);
+                //                img =  HtmlUtil.href(imgUrl,img," rel=\"shadowbox\" ");
                 img = getRepository().makePopupLink(img, bigimg, true,false);
             }
-            return img;
+           return img;
         } else if (f.exists()) {
             String name =
                 getRepository().getStorageManager().getFileTail(f.getName());

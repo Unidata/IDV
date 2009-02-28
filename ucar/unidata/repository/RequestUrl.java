@@ -40,6 +40,10 @@ public class RequestUrl {
     /** _more_ */
     private String label = null;
 
+    private boolean haveInitialized = false;
+
+    private boolean needsSsl = false;
+
     /**
      * _more_
      *
@@ -65,6 +69,8 @@ public class RequestUrl {
         this(repositorySource, path);
         this.label = label;
     }
+
+    
 
     /**
      * _more_
@@ -102,13 +108,22 @@ public class RequestUrl {
             repositorySource.getRepositoryBase().getUrlBase() + path);
     }
 
+    private void checkInit() {
+        if(!haveInitialized) {
+            repositorySource.getRepositoryBase().initRequestUrl(this);
+            haveInitialized = true;
+        }
+    }
+
+
     /**
      * _more_
      *
      * @return _more_
      */
     public String toString() {
-        return repositorySource.getRepositoryBase().getUrlBase() + path;
+        checkInit();
+        return repositorySource.getRepositoryBase().getUrlPath(this);
     }
 
 
@@ -158,6 +173,25 @@ public class RequestUrl {
         RequestUrl that = (RequestUrl) o;
         return this.path.equals(that.path);
     }
+
+/**
+Set the NeedsSsl property.
+
+@param value The new value for NeedsSsl
+**/
+public void setNeedsSsl (boolean value) {
+	this.needsSsl = value;
+}
+
+/**
+Get the NeedsSsl property.
+
+@return The NeedsSsl
+**/
+public boolean getNeedsSsl () {
+	return this.needsSsl;
+}
+
 
 
 }

@@ -264,11 +264,11 @@ public class ImageOutputHandler extends OutputHandler {
                 }
                 String url =
                     HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
-                                 + entry.getName(), ARG_ENTRYID,
-                                     entry.getId());
+                                 + getStorageManager().getFileTail(entry), ARG_ENTRYID,
+                                 entry.getId());
                 String thumburl =
                     HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
-                                 + entry.getName(), ARG_ENTRYID,
+                                 + getStorageManager().getFileTail(entry), ARG_ENTRYID,
                                      entry.getId(), ARG_IMAGEWIDTH, "" + 100);
                 String entryUrl = getEntryLink(request, entry);
                 request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
@@ -283,11 +283,23 @@ public class ImageOutputHandler extends OutputHandler {
 
             }
         } else {
+            int cnt = 0;
             for (Entry entry : entries) {
                 String url = getImageUrl(request, entry);
                 if (url == null) {
                     continue;
                 }
+                /*
+                if(cnt==0) {
+                    sb.append(HtmlUtil.href(url,"View Gallery","  rel=\"shadowbox[gallery]\" "));
+                } else {
+                    sb.append(HtmlUtil.href(url,entry.getName(),"  rel=\"shadowbox[gallery]\" class=\"hidden\" "));
+                }
+                cnt++;
+                sb.append(HtmlUtil.br());
+                if(true)
+                    continue;
+                */
                 if (col >= 2) {
                     sb.append("</tr>");
                     col = 0;
@@ -307,6 +319,7 @@ public class ImageOutputHandler extends OutputHandler {
             }
         }
 
+        sb.append(HtmlUtil.script("Shadowbox.open('gallery');"));
 
         if (output.equals(OUTPUT_GALLERY)) {
             sb.append("</table>\n");

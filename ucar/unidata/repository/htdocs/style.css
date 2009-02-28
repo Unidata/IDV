@@ -25,6 +25,11 @@ body {
 
 
 .hidden {
+   visibility: hidden; 
+   display:none;
+}
+
+.hiddeninput {
   border :none;
 }
 

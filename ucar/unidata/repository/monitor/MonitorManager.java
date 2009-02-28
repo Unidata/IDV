@@ -122,11 +122,13 @@ public class MonitorManager extends RepositoryManager {
                     monitor.setRepository(getRepository());
                     monitors.add(monitor);
                 } else {
+                    /*
                     System.err.println ("could not create monitor:" + xml);
                     System.err.println ("messages:" + xmlEncoder.getErrorMessages());
                     for(Exception exc: (List<Exception>)xmlEncoder.getExceptions()) {
                         exc.printStackTrace();
                     }
+                    */
                 }
             }
         }

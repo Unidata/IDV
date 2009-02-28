@@ -46,6 +46,7 @@ public class ApiMethod {
 
     /** _more_ */
     public static final String ATTR_REQUEST = "request";
+    public static final String ATTR_NEEDS_SSL = "needs_ssl";
 
     /** _more_ */
     public static final String ATTR_HANDLER = "handler";
@@ -105,6 +106,10 @@ public class ApiMethod {
     /** _more_ */
     private RequestUrl url;
 
+    
+    private boolean needsSsl = false;
+
+
     /**
      * _more_
      *
@@ -121,13 +126,14 @@ public class ApiMethod {
      */
     public ApiMethod(Repository repository, RequestHandler requestHandler,
                      String request, String name, Method method,
-                     boolean mustBeAdmin, boolean canCache,
+                     boolean mustBeAdmin, boolean needsSsl, boolean canCache,
                      boolean isTopLevel) {
         this.repository     = repository;
         this.requestHandler = requestHandler;
         this.request        = request;
         this.name           = name;
         this.mustBeAdmin    = mustBeAdmin;
+        this.needsSsl       = needsSsl;
         this.method         = method;
         this.canCache       = canCache;
         this.isTopLevel     = isTopLevel;
@@ -330,6 +336,24 @@ public class ApiMethod {
         return actions;
     }
 
+
+/**
+Set the NeedsSsl property.
+
+@param value The new value for NeedsSsl
+**/
+public void setNeedsSsl (boolean value) {
+	this.needsSsl = value;
+}
+
+/**
+Get the NeedsSsl property.
+
+@return The NeedsSsl
+**/
+public boolean getNeedsSsl () {
+	return this.needsSsl;
+}
 
 
 }

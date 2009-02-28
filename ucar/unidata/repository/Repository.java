@@ -135,6 +135,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     public static final String MACRO_ROOT = "root";
 
+    public static final String MACRO_HEADFINAL = "headfinal";
+
+
+
+
     /** _more_ */
     public static final String MACRO_BOTTOM = "bottom";
 
@@ -405,11 +410,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public boolean isSSLEnabled(Request request) {
-        if ( !request.get(ARG_SSLOK, true)) {
-            return false;
-        }
-        if (getProperty(PROP_SSL_IGNORE, false)) {
-            return false;
+        if(request!=null) {
+            if ( !request.get(ARG_SSLOK, true)) {
+                return false;
+            }
+            if (getProperty(PROP_SSL_IGNORE, false)) {
+                return false;
+            }
         }
         String port = getProperty(PROP_SSL_PORT, "");
         if (port.trim().length() == 0) {
@@ -1403,6 +1410,34 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     ArrayList<ApiMethod> topLevelMethods = new ArrayList();
 
+    public void initRequestUrl(RequestUrl requestUrl) {
+        try {
+            Request request = new Request(this,null, getUrlBase()+requestUrl.getPath());
+            super.initRequestUrl(requestUrl);
+            ApiMethod apiMethod = findMethod(request);
+            if(apiMethod==null) {
+                System.err.println("Could not find api for: " + requestUrl.getPath());
+                return;
+            }
+            if(getProperty("ramadda.sslok",true)) {
+            if(/*isSSLEnabled(request) &&*/ apiMethod.getNeedsSsl()) {
+                System.err.println("setting ssl for: " + requestUrl.getPath());
+                requestUrl.setNeedsSsl(true);
+            }
+            }
+        } catch(Exception exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+
+    public String getUrlPath(RequestUrl requestUrl) {
+        if(requestUrl.getNeedsSsl()) {
+            //            System.err.println("url:" +httpsUrl(getUrlBase() + requestUrl.getPath()));
+            return httpsUrl(getUrlBase() + requestUrl.getPath());
+        }
+        return getUrlBase() + requestUrl.getPath();
+    }
 
     /**
      * _more_
@@ -1419,19 +1454,22 @@ public class Repository extends RepositoryBase implements RequestHandler {
             throws Exception {
         String request    = XmlUtil.getAttribute(node,
                                 ApiMethod.ATTR_REQUEST);
+        
         String methodName = XmlUtil.getAttribute(node, ApiMethod.ATTR_METHOD);
-        boolean admin = XmlUtil.getAttribute(node, ApiMethod.ATTR_ADMIN,
+        boolean needsSsl = XmlUtil.getAttributeFromTree(node, ApiMethod.ATTR_NEEDS_SSL,
+                                             false);
+        boolean admin = XmlUtil.getAttributeFromTree(node, ApiMethod.ATTR_ADMIN,
                                              Misc.getProperty(props,
                                                  ApiMethod.ATTR_ADMIN, true));
 
-        boolean canCache = XmlUtil.getAttribute(node,
+        boolean canCache = XmlUtil.getAttributeFromTree(node,
                                ApiMethod.ATTR_CANCACHE,
                                Misc.getProperty(props,
                                    ApiMethod.ATTR_CANCACHE, true));
 
 
 
-        String handlerName = XmlUtil.getAttribute(node,
+        String handlerName = XmlUtil.getAttributeFromTree(node,
                                  ApiMethod.ATTR_HANDLER,
                                  Misc.getProperty(props,
                                      ApiMethod.ATTR_HANDLER, defaultHandler));
@@ -1496,7 +1534,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         ApiMethod apiMethod =
             new ApiMethod(this, handler, request,
                           XmlUtil.getAttribute(node, ApiMethod.ATTR_NAME,
-                              request), method, admin, canCache,
+                              request), method, admin,needsSsl, canCache,
                                         XmlUtil.getAttribute(node,
                                             ApiMethod.ATTR_TOPLEVEL, false));
         List actions = StringUtil.split(XmlUtil.getAttribute(node,
@@ -1919,7 +1957,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             incoming = incoming.substring(0, incoming.length() - 1);
         }
         String urlBase = getUrlBase();
-        if ( !incoming.startsWith(urlBase)) {
+        if (!incoming.startsWith(urlBase)) {
             return null;
         }
         incoming = incoming.substring(urlBase.length());
@@ -2379,6 +2417,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
             content = note(sessionMessage) + content;
         }
 
+        String head = "<script type=\"text/javascript\" src=\"${root}/shadowbox/adapter/shadowbox-base.js\"></script>\n<script type=\"text/javascript\" src=\"${root}/shadowbox/shadowbox.js\"></script>\n<script type=\"text/javascript\">\nShadowbox.loadSkin('classic', '${root}/shadowbox/skin'); \nShadowbox.loadLanguage('en', '${root}/shadowbox/lang');\nShadowbox.loadPlayer(['img', 'qt'], '${root}/shadowbox/player'); \nwindow.onload = Shadowbox.init;\n</script>";
+
+        head = "";
 
         String   html   = template;
         String[] macros = new String[] {
@@ -2390,11 +2431,18 @@ public class Repository extends RepositoryBase implements RequestHandler {
             result.getTitle(), MACRO_BOTTOM, result.getBottomHtml(),
             MACRO_LINKS, linksHtml, MACRO_CONTENT, content + jsContent,
             MACRO_FAVORITES, favorites.toString(), MACRO_ENTRY_HEADER,
-            entryHeader, MACRO_ROOT, getUrlBase()
+            entryHeader, 
+            MACRO_HEADFINAL,
+            head,MACRO_ROOT, getUrlBase(),
+
         };
 
+
+
+
+
         for (int i = 0; i < macros.length; i += 2) {
-            html = html.replace("${" + macros[i] + "}", macros[i + 1]);
+             html = html.replace("${" + macros[i] + "}", macros[i + 1]);
         }
 
         if (sublinksHtml.length() > 0) {

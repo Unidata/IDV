@@ -284,17 +284,9 @@ public class UserManager extends RepositoryManager {
 
         sb.append(header(msg("Please login")));
         String id = request.getString(ARG_USER_ID, "");
-        if (getRepository().isSSLEnabled(request)) {
-            sb.append(
-                HtmlUtil.formPost(
-                    getRepositoryBase().URL_USER_LOGIN.getHttpsUrl("")));
-            //            sb.append(
-            //                HtmlUtil.formPost(getRepositoryBase().URL_USER_LOGIN.toString()));
-        } else {
-            sb.append(
-                HtmlUtil.formPost(
-                    getRepositoryBase().URL_USER_LOGIN.toString()));
-        }
+        sb.append(
+                  HtmlUtil.formPost(
+                                    getRepositoryBase().URL_USER_LOGIN.toString()));
         if (request.defined(ARG_REDIRECT)) {
             sb.append(HtmlUtil.hidden(ARG_REDIRECT,
                                       request.getUnsafeString(ARG_REDIRECT,
@@ -2302,13 +2294,7 @@ public class UserManager extends RepositoryManager {
                     request.getUnsafeString(ARG_MESSAGE, "")));
         }
 
-        if (getRepository().isSSLEnabled(request)) {
-            sb.append(
-                HtmlUtil.form(
-                    getRepositoryBase().URL_USER_SETTINGS.getHttpsUrl("")));
-        } else {
-            sb.append(request.form(getRepositoryBase().URL_USER_SETTINGS));
-        }
+        sb.append(request.form(getRepositoryBase().URL_USER_SETTINGS));
         sb.append(HtmlUtil.submit(msg("Change Settings"), ARG_USER_CHANGE));
         makeUserForm(request, user, sb, false);
         sb.append(HtmlUtil.submit(msg("Change Settings"), ARG_USER_CHANGE));

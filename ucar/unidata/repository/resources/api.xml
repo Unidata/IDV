@@ -55,7 +55,7 @@
 
   <group handler="metadatamanager">
       <api request="/metadata/list"       method="processMetadataList"/>
-      <api request="/metadata/view"       method="processMetadataView"/>
+      <api request="/metadata/view/*"       method="processMetadataView"/>
       <api request="/metadata/form"       method="processMetadataForm"       actions="edit"/>
       <api request="/metadata/addform"    method="processMetadataAddForm"    actions="edit"/>
       <api request="/metadata/add"        method="processMetadataAdd"        actions="edit"/>
@@ -68,39 +68,41 @@
   <property name="cancache" value="false"/>
 
   <group handler="usermanager">
-      <api request="/user/login"    method="processLogin"    admin="false"/>
-      <api request="/user/logout"   method="processLogout"   admin="false"/>
-      <api request="/user/home"     method="processHome"     admin="false"/>
-      <api request="/user/profile"     method="processProfile"     admin="false"/>
-      <api request="/user/settings" method="processSettings" admin="false"/>
-      <api request="/user/activity"      method="processActivityLog"      admin="true"/>
-      <api request="/user/cart"     method="processCart"     admin="false"/>
-      <api request="/user/resetpassword"      method="processResetPassword"    admin="false"/>
-      <api request="/user/finduserid"      method="processFindUserId"    admin="false"/>
-      <api request="/user/list"     method="adminUserList"   admin="true"/>
-      <api request="/user/edit"     method="adminUserEdit"   admin="true"/>
-      <api request="/user/new"      method="adminUserNew"    admin="true"/>
-      <api request="/user/favorite"      method="processFavorite" />
+      <api request="/user/login"              method="processLogin"    needs_ssl="true"/>
+      <api request="/user/logout"             method="processLogout"   />
+      <api request="/user/home"               method="processHome"     />
+      <api request="/user/profile"            method="processProfile" />
+      <api request="/user/settings"           method="processSettings" needs_ssl="true"/>
+      <api request="/user/cart"               method="processCart"     />
+      <api request="/user/resetpassword"      method="processResetPassword"     needs_ssl="true"/>
+      <api request="/user/finduserid"         method="processFindUserId"    needs_ssl="true"/>
+      <api request="/user/favorite"           method="processFavorite" />
+
+      <api request="/user/list"               method="adminUserList"       admin="true"/>
+      <api request="/user/activity"           method="processActivityLog"  admin="true"/>
+      <api request="/user/edit"               method="adminUserEdit"       admin="true"/>
+      <api request="/user/new"                method="adminUserNew"        admin="true"/>
+
   </group>
 
   <group handler="monitormanager">
       <api request="/user/monitors" method="processMonitors" admin="false"/>
    </group>
 
-  <group handler="admin">
-      <api request="/admin/usermessage"     method="adminUserMessage"      admin="true"/>
-      <api request="/admin/sql"          method="adminSql"           admin="true"/>
-      <api request="/admin/log"          method="adminLog"           admin="true"/>
-      <api request="/admin/startstop"    method="adminDbStartStop"   admin="true"/>
-      <api request="/admin/settings"     method="adminSettings"      admin="true" name="Admin" toplevel="true"/>
-      <api request="/admin/settings/do"  method="adminSettingsDo"    admin="true"/>
-      <api request="/admin/tables"       method="adminDbTables"      admin="true"/>
-      <api request="/admin/dumpdb"       method="adminDbDump"        admin="true"/>
-      <api request="/admin/actions"      method="adminActions"       admin="true"/>
-      <api request="/admin/stats"        method="adminStats"         admin="true"/>
-      <api request="/admin/access"       method="adminAccess"         admin="true"/>
-      <api request="/admin/cleanup"      method="adminCleanup"       admin="true"/>
-      <api request="/admin/scan"         method="adminScanForBadParents" admin="true"/>
+  <group handler="admin" needs_ssl="true" admin="true">
+      <api request="/admin/usermessage"     method="adminUserMessage"      />
+      <api request="/admin/sql"          method="adminSql"           />
+      <api request="/admin/log"          method="adminLog"           />
+      <api request="/admin/startstop"    method="adminDbStartStop"   />
+      <api request="/admin/settings"     method="adminSettings"       name="Admin" toplevel="true"/>
+      <api request="/admin/settings/do"  method="adminSettingsDo"    />
+      <api request="/admin/tables"       method="adminDbTables"      />
+      <api request="/admin/dumpdb"       method="adminDbDump"        />
+      <api request="/admin/actions"      method="adminActions"       />
+      <api request="/admin/stats"        method="adminStats"         />
+      <api request="/admin/access"       method="adminAccess"         />
+      <api request="/admin/cleanup"      method="adminCleanup"       />
+      <api request="/admin/scan"         method="adminScanForBadParents" />
   </group>
 
   <group handler="harvestermanager">
