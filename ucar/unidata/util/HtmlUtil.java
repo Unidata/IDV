@@ -1819,8 +1819,7 @@ public class HtmlUtil {
                 TwoFacedObject tfo = (TwoFacedObject) obj;
                 value = tfo.getId().toString();
                 label = tfo.toString();
-            }
-            if (obj instanceof Selector) {
+            } else if (obj instanceof Selector) {
                 Selector selector = (Selector) obj;
                 value = selector.id;
                 label = selector.label;
