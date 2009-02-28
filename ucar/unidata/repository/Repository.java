@@ -403,8 +403,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     public int getPort() {
         String port = getProperty(PROP_PORT, (String) null);
-        if ((port != null) && (port.trim().length() > 0)) {
-            return Integer.decode(port).intValue();
+        if (port != null) {
+            port = port.trim();
+            if(port.length() > 0) {
+                return Integer.decode(port).intValue();
+            }
         }
         return super.getPort();
     }
