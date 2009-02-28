@@ -1478,6 +1478,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
         String handlerName = XmlUtil.getAttributeFromTree(node,
+
                                  ApiMethod.ATTR_HANDLER,
                                  Misc.getProperty(props,
                                      ApiMethod.ATTR_HANDLER, defaultHandler));
@@ -3903,6 +3904,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             if (checkAddOk && !typeHandler.canBeCreatedBy(request)) {
                 continue;
             }
+            //            System.err.println("type: " + typeHandler.getType()+" label:" + typeHandler.getLabel());
             tmp.add(new TwoFacedObject(typeHandler.getLabel(),
                                        typeHandler.getType()));
         }

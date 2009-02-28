@@ -496,6 +496,7 @@ return new Result(title, sb);
                 sb.append(HtmlUtil.hidden(ARG_TYPE, type));
                 sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
             }
+            //            System.err.println ("Adding to entry form " + typeHandler + " " + typeHandler.getClass().getName());
             typeHandler.addToEntryForm(request, sb, entry);
             sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons, 2)));
         }

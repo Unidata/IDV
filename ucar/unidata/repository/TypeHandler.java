@@ -191,7 +191,6 @@ public class TypeHandler extends RepositoryManager {
         super(repository);
         this.type        = type;
         this.description = description;
-
     }
 
 
