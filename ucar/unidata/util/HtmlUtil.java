@@ -290,7 +290,7 @@ public class HtmlUtil {
     public static final String CLASS_FORMLABEL = "formlabel";
 
     /** _more_          */
-    public static final String CLASS_HIDDEN = "hidden";
+    public static final String CLASS_HIDDENINPUT = "hiddeninput";
 
     /** _more_          */
     public static final String CLASS_INPUT = "input";
@@ -548,7 +548,7 @@ public class HtmlUtil {
         return tag(TAG_INPUT,
                    extra
                    + attrs(ATTR_TYPE, TYPE_HIDDEN, ATTR_NAME, name,
-                           ATTR_VALUE, "" + value, ATTR_CLASS, CLASS_HIDDEN));
+                           ATTR_VALUE, "" + value, ATTR_CLASS, CLASS_HIDDENINPUT));
     }
 
 
