@@ -787,6 +787,32 @@ public class Admin extends RepositoryManager {
 
         StringBuffer asb = new StringBuffer();
         asb.append(HtmlUtil.formTable());
+
+
+
+        asb.append(HtmlUtil.colspan("Site Information", 2));
+        asb.append(HtmlUtil.formEntry(msgLabel("Hostname"),
+                                      HtmlUtil.input(PROP_HOSTNAME,
+                                          getProperty(PROP_HOSTNAME, ""),
+                                          HtmlUtil.SIZE_40)));
+
+        asb.append(HtmlUtil.formEntry(msgLabel("HTTP Port"),
+                                      HtmlUtil.input(PROP_PORT,
+                                                     getProperty(PROP_PORT, ""),
+                                                     HtmlUtil.SIZE_5)));
+
+
+
+        asb.append(HtmlUtil
+            .formEntry(msgLabel("SSL Port"), HtmlUtil
+                .input(PROP_SSL_PORT, getProperty(PROP_SSL_PORT, ""), HtmlUtil
+                    .SIZE_5) + HtmlUtil.space(1)
+                             + msg("Port number for SSL access.")
+                             + HtmlUtil.space(1)
+                             + msg("Enter 'default' for default SSL port.")));
+
+
+        asb.append(HtmlUtil.colspan("Site Access", 2));
         asb.append(
             HtmlUtil.formEntry(
                 "",
@@ -805,22 +831,6 @@ public class Admin extends RepositoryManager {
                             + msg("Require login to access the site")));
 
 
-
-
-
-        asb.append(HtmlUtil.formEntry(msgLabel("Hostname"),
-                                      HtmlUtil.input(PROP_HOSTNAME,
-                                          getProperty(PROP_HOSTNAME, ""),
-                                          HtmlUtil.SIZE_40)));
-
-
-        asb.append(HtmlUtil
-            .formEntry(msgLabel("SSL Port"), HtmlUtil
-                .input(PROP_SSL_PORT, getProperty(PROP_SSL_PORT, ""), HtmlUtil
-                    .SIZE_5) + HtmlUtil.space(1)
-                             + msg("Port number for SSL access.")
-                             + HtmlUtil.space(1)
-                             + msg("Enter 'default' for default SSL port.")));
 
 
         asb.append(HtmlUtil.colspan("Anonymous Uploads", 2));
@@ -1090,6 +1100,11 @@ public class Admin extends RepositoryManager {
         getRepository().writeGlobal(PROP_HOSTNAME,
                                     request.getString(PROP_HOSTNAME,
                                         getProperty(PROP_HOSTNAME, "")));
+
+
+        getRepository().writeGlobal(PROP_PORT,
+                                    request.getString(PROP_PORT,
+                                        getProperty(PROP_PORT, "")));
 
 
 

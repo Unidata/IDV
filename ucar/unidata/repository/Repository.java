@@ -1348,7 +1348,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (exc != null) {
             //            exc.printStackTrace();
             thr = LogUtil.getInnerException(exc);
-            if (thr != null) {
+            if(thr instanceof RepositoryUtil.MissingEntryException) {
+                System.err.println("" + thr);                
+            } else {
                 thr.printStackTrace();
             }
         }
@@ -1432,8 +1434,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 return;
             }
             if(getProperty("ramadda.sslok",true)) {
-            if(/*isSSLEnabled(request) &&*/ apiMethod.getNeedsSsl()) {
-                System.err.println("setting ssl for: " + requestUrl.getPath());
+            if(isSSLEnabled(null) && apiMethod.getNeedsSsl()) {
+                //                System.err.println("setting ssl for: " + requestUrl.getPath());
                 requestUrl.setNeedsSsl(true);
             }
             }
@@ -1451,7 +1453,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     public String getUrlPath(RequestUrl requestUrl) {
         if(requestUrl.getNeedsSsl()) {
-            //            System.err.println("url:" + httpsUrl(getUrlBase() + requestUrl.getPath()));
             return httpsUrl(getUrlBase() + requestUrl.getPath());
         }
         return getUrlBase() + requestUrl.getPath();
