@@ -346,6 +346,8 @@ public class XmlEncoder extends XmlUtil {
     }
 
 
+    
+
     /**
      *  Define the set of default delegates (e.g., for Rectangle, Font, etc.) for common objects
      *  that don't encode very well.
@@ -492,6 +494,15 @@ public class XmlEncoder extends XmlUtil {
             return xml;
         }
     }
+
+
+    public List getExceptions() {
+        return exceptions;
+    }
+    public List getErrorMessages() {
+        return errorMessages;
+    }
+
 
 
     /**
