@@ -78,10 +78,11 @@
       <api request="/user/finduserid"         method="processFindUserId"    needs_ssl="true"/>
       <api request="/user/favorite"           method="processFavorite" />
 
-      <api request="/user/list"               method="adminUserList"       admin="true"/>
-      <api request="/user/activity"           method="processActivityLog"  admin="true"/>
-      <api request="/user/edit"               method="adminUserEdit"       admin="true"/>
-      <api request="/user/new"                method="adminUserNew"        admin="true"/>
+
+      <api request="/user/list"               method="adminUserList"       admin="true" needs_ssl="true" />/>
+      <api request="/user/activity"           method="processActivityLog"  admin="true" needs_ssl="true" />/>
+      <api request="/user/edit"               method="adminUserEdit"       admin="true" needs_ssl="true" />
+      <api request="/user/new"                method="adminUserNew"        admin="true" needs_ssl="true" />
 
   </group>
 

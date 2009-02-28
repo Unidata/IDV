@@ -1092,12 +1092,17 @@ public class Admin extends RepositoryManager {
                                         getProperty(PROP_HOSTNAME, "")));
 
 
+
+        String oldSsl =   getProperty(PROP_SSL_PORT, "");
+        String newSsl;
         getRepository().writeGlobal(PROP_SSL_PORT,
-                                    request.getString(PROP_SSL_PORT,
+                                    newSsl = request.getString(PROP_SSL_PORT,
                                         getProperty(PROP_SSL_PORT, "")));
 
 
-
+        if(!oldSsl.equals(newSsl)) {
+            getRepository().reinitializeRequestUrls();
+        }
 
         getRepository().writeGlobal(PROP_UPLOAD_MAXSIZEGB,
                                     request.getString(PROP_UPLOAD_MAXSIZEGB,"10").trim());

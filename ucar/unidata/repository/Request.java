@@ -116,6 +116,10 @@ public class Request implements Constants {
     /** _more_ */
     private String ip;
 
+    private String protocol;
+
+    private boolean secure = false;
+
     /** _more_ */
     //    private Entry collectionEntry;
 
@@ -1574,6 +1578,47 @@ public class Request implements Constants {
     public Object getExtraProperty(Object key) {
         return extraProperties.get(key);
     }
+
+
+
+/**
+Set the Protocol property.
+
+@param value The new value for Protocol
+**/
+public void setProtocol (String value) {
+	protocol = value;
+}
+
+/**
+Get the Protocol property.
+
+@return The Protocol
+**/
+public String getProtocol () {
+	return protocol;
+}
+
+
+/**
+Set the Secure property.
+
+@param value The new value for Secure
+**/
+public void setSecure (boolean value) {
+	secure = value;
+}
+
+/**
+Get the Secure property.
+
+@return The Secure
+**/
+public boolean getSecure () {
+	return secure;
+}
+
+
 
 }
 

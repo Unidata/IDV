@@ -1426,9 +1426,11 @@ public class UserManager extends RepositoryManager {
 
         if (user.getAnonymous()) {
             request.remove(ARG_MESSAGE);
+            request.remove(ARG_REDIRECT);
             String redirect =
-                XmlUtil.encodeBase64(request.getUrl().getBytes());
+                XmlUtil.encodeBase64( request.getUrl().getBytes());
             extras.add("");
+            //            System.err.println ("initial url " + request.getUrl());
             urls.add(request.url(getRepositoryBase().URL_USER_LOGIN,
                                  ARG_REDIRECT, redirect));
             labels.add(msg("Login"));
@@ -1962,6 +1964,7 @@ public class UserManager extends RepositoryManager {
                     if ( !redirect.startsWith("http")) {
                         redirect = getRepository().absoluteUrl(redirect);
                     }
+                    //                    System.err.println("xxx  redirecting to:" + redirect);
                     return new Result(HtmlUtil.url(redirect, ARG_FROMLOGIN,
                             "true", ARG_MESSAGE, msg("You are logged in")));
                 } else {
@@ -1974,6 +1977,7 @@ public class UserManager extends RepositoryManager {
                         redirect =
                             getRepositoryBase().URL_USER_HOME.toString();
                     }
+                    //                    System.err.println("yyy redirecting to:" + redirect);
                     return new Result(HtmlUtil.url(redirect, ARG_FROMLOGIN,
                             "true", ARG_MESSAGE, msg("You are logged in")));
                 }
@@ -2099,6 +2103,7 @@ public class UserManager extends RepositoryManager {
                     }
                     String redirect =
                         getRepositoryBase().URL_USER_HOME.toString();
+                    //                    System.err.println("zzz redirecting to:" + redirect);
                     return new Result(HtmlUtil.url(redirect, ARG_MESSAGE,
                             msg("Favorites Added")));
 

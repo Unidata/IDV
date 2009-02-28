@@ -80,6 +80,10 @@ public class RequestUrl {
      * @return _more_
      */
     public String getFullUrl(String suffix) {
+        checkInit();
+        if(needsSsl) {
+            return getHttpsUrl(suffix);
+        }
         return repositorySource.getRepositoryBase().absoluteUrl(
             repositorySource.getRepositoryBase().getUrlBase()
             + path) + suffix;
@@ -114,6 +118,8 @@ public class RequestUrl {
             haveInitialized = true;
         }
     }
+
+
 
 
     /**

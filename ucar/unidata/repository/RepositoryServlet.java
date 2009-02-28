@@ -227,6 +227,8 @@ public class RepositoryServlet extends HttpServlet {
                                             handler.formArgs, request,
                                             response, this);
             //            System.err.println ("request:" +   request.getRequestURI());
+            repositoryRequest.setProtocol(request.getProtocol());
+            repositoryRequest.setSecure(request.isSecure());
             repositoryRequest.setIp(request.getRemoteAddr());
             repositoryRequest.setOutputStream(response.getOutputStream());
             repositoryRequest.setFileUploads(handler.fileUploads);

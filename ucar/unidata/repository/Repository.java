@@ -173,6 +173,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     };
 
 
+    List<RequestUrl> initializedUrls = new ArrayList<RequestUrl>();
 
     /** _more_ */
     private static final int PAGE_CACHE_LIMIT = 100;
@@ -409,7 +410,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @param request _more_
      * @return _more_
      */
-    public boolean isSSLEnabled(Request request) {
+    public boolean  isSSLEnabled(Request request) {
         if(request!=null) {
             if ( !request.get(ARG_SSLOK, true)) {
                 return false;
@@ -1412,6 +1413,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     public void initRequestUrl(RequestUrl requestUrl) {
         try {
+            initializedUrls.add(requestUrl);
             Request request = new Request(this,null, getUrlBase()+requestUrl.getPath());
             super.initRequestUrl(requestUrl);
             ApiMethod apiMethod = findMethod(request);
@@ -1430,10 +1432,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
     }
 
+    protected void  reinitializeRequestUrls() {
+        for(RequestUrl requestUrl: initializedUrls) {
+            initRequestUrl(requestUrl);
+        }
+    }
+
 
     public String getUrlPath(RequestUrl requestUrl) {
         if(requestUrl.getNeedsSsl()) {
-            //            System.err.println("url:" +httpsUrl(getUrlBase() + requestUrl.getPath()));
+            //            System.err.println("url:" + httpsUrl(getUrlBase() + requestUrl.getPath()));
             return httpsUrl(getUrlBase() + requestUrl.getPath());
         }
         return getUrlBase() + requestUrl.getPath();
@@ -2018,6 +2026,21 @@ public class Repository extends RepositoryBase implements RequestHandler {
             //            System.err.println("no api method");
             return getHtdocsFile(request);
         }
+
+        if(isSSLEnabled(request)) {
+            if(apiMethod.getNeedsSsl() && !request.getSecure()) {
+                //                System.err.println ("Redirecting to ssl ");
+                
+                return new Result(httpsUrl(request.getUrl()));
+            } else if(!apiMethod.getNeedsSsl() && request.getSecure()) {
+                //                System.err.println ("Redirecting to no ssl");
+                //                System.err.println ("    request:" +request.getUrl());
+                //                System.err.println ("    full:" +absoluteUrl(request.getUrl()));
+                return new Result(absoluteUrl(request.getUrl()));
+            }
+
+        }
+
 
         String userAgent = request.getHeaderArg("User-Agent");
         if (userAgent == null) {
