@@ -372,6 +372,19 @@ public abstract class XmlUtil {
     }
 
 
+    public static boolean getAttributeFromTree(Node element, String name,
+                                           boolean dflt) {
+        if (element == null) {
+            return dflt;
+        }
+        String value = getAttributeFromTree(element, name);
+        if (value == null) {
+            return dflt;
+        }
+        return new Boolean(value).booleanValue();
+    }
+
+
 
 
     /**
