@@ -200,6 +200,17 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
 
 
+    public boolean showingAll(Request request, List<Group> subGroups,
+                              List<Entry> entries) {
+        int cnt = subGroups.size() + entries.size();
+        int max = request.get(ARG_MAX, Repository.MAX_ROWS);
+        if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
+            return false;
+        }
+        return true;        
+    }
+
+
 
     /**
      * _more_
@@ -217,29 +228,30 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         int cnt = subGroups.size() + entries.size();
         int max = request.get(ARG_MAX, Repository.MAX_ROWS);
         //        System.err.println ("cnt:" + cnt + " " + max);
-
         if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
             int skip = Math.max(0, request.get(ARG_SKIP, 0));
-            sb.append(msgLabel("Results") + (skip + 1) + "-" + (skip + cnt));
+            sb.append(msgLabel("Showing") + (skip + 1) + "-" + (skip + cnt));
             sb.append(HtmlUtil.space(4));
+            List<String> toks = new ArrayList<String>();
+
             if (skip > 0) {
-                sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP) + "&"
-                                        + ARG_SKIP + "="
-                                        + (skip - max), msg("Previous")));
-                sb.append(HtmlUtil.space(1));
+                toks.add(HtmlUtil.href(request.getUrl(ARG_SKIP) + "&"
+                                       + ARG_SKIP + "="
+                                       + (skip - max), msg("Previous...")));
             }
             if (cnt >= max) {
-                sb.append(HtmlUtil.href(request.getUrl(ARG_SKIP) + "&"
+                toks.add(HtmlUtil.href(request.getUrl(ARG_SKIP) + "&"
                                         + ARG_SKIP + "="
-                                        + (skip + max), msg("Next")));
+                                        + (skip + max), msg("Next...")));
             }
             request.put(ARG_MAX,""+(max+100));
             if(cnt>=max) {
-                sb.append(HtmlUtil.space(1));
-                sb.append(HtmlUtil.href(request.getUrl(),msg("View More")));
+                toks.add(HtmlUtil.href(request.getUrl(),msg("View More")));
                 request.put(ARG_MAX,""+(max/2));
-                sb.append(HtmlUtil.space(1));
-                sb.append(HtmlUtil.href(request.getUrl(),msg("View Less")));
+                toks.add(HtmlUtil.href(request.getUrl(),msg("View Less")));
+            }
+            if(toks.size()>0) {
+                sb.append(StringUtil.join(HtmlUtil.span("&nbsp;|&nbsp;",HtmlUtil.cssClass("separator")),toks));
             }
             request.put(ARG_MAX,max);
         }

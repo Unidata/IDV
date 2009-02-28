@@ -178,15 +178,14 @@ public class HtmlOutputHandler extends OutputHandler {
         StringBuffer sb = new StringBuffer();
         request.put(ARG_OUTPUT, OUTPUT_HTML);
         boolean didOne = false;
-        sb.append("<table>");
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
         sb.append(entry.getTypeHandler().getInnerEntryContent(entry, request,
                 OutputHandler.OUTPUT_HTML, true, false, true));
         for (TwoFacedObject tfo : getMetadataHtml(request, entry, false,
                 false)) {
             sb.append(tfo.getId().toString());
         }
-
-        sb.append("</table>");
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
 
         String links = getEntryManager().getEntryActionsTable(request, entry,
                            OutputType.TYPE_ALL);
@@ -802,6 +801,15 @@ public class HtmlOutputHandler extends OutputHandler {
         String rowId;
         String cbxId;
         String cbxWrapperId;
+
+        if(!showingAll(request, subGroups, entries)) {
+            sb.append(msgLabel("Showing")+" 1.." +(subGroups.size()+entries.size()));
+            sb.append(HtmlUtil.space(2));
+            String url = request.getEntryUrl(getRepository().URL_ENTRY_SHOW.toString(), parent);
+            url = HtmlUtil.url(url, ARG_ENTRYID, parent.getId());
+            sb.append(HtmlUtil.href(url,msg("More...")));
+            sb.append(HtmlUtil.br());
+        }
 
         for (Group subGroup : subGroups) {
             cnt++;
