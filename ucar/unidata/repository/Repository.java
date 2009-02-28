@@ -2029,13 +2029,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         if(isSSLEnabled(request)) {
             if(apiMethod.getNeedsSsl() && !request.getSecure()) {
-                //                System.err.println ("Redirecting to ssl ");
-                
+                System.err.println ("Redirecting to ssl: "+ httpsUrl(request.getUrl()));
                 return new Result(httpsUrl(request.getUrl()));
             } else if(!apiMethod.getNeedsSsl() && request.getSecure()) {
-                //                System.err.println ("Redirecting to no ssl");
+                System.err.println ("Redirecting to no ssl "+absoluteUrl(request.getUrl()));
                 //                System.err.println ("    request:" +request.getUrl());
-                //                System.err.println ("    full:" +absoluteUrl(request.getUrl()));
+                //System.err.println ("    full:" +absoluteUrl(request.getUrl()));
                 return new Result(absoluteUrl(request.getUrl()));
             }
 
