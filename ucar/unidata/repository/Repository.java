@@ -398,9 +398,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
             return hostname;
         }
         return super.getHostname();
-
     }
 
+
+    public int getPort() {
+        String port = getProperty(PROP_PORT, (String) null);
+        if ((port != null) && (port.trim().length() > 0)) {
+            return Integer.decode(port).intValue();
+        }
+        return super.getPort();
+    }
 
 
     /**

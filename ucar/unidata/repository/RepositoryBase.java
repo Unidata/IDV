@@ -264,7 +264,7 @@ public class RepositoryBase implements Constants, RepositorySource {
     private String hostname = "";
 
     /** _more_ */
-    private int port = 80;
+    private int httpPort = 80;
 
     /** _more_ */
     private boolean clientMode = false;
@@ -311,7 +311,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @throws Exception _more_
      */
     public RepositoryBase(int port) throws Exception {
-        this.port = port;
+        this.httpPort = port;
     }
 
 
@@ -407,7 +407,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @return _more_
      */
     public String absoluteUrl(String url) {
-        return "http://" + getHostname() + ":" + port + url;
+        return "http://" + getHostname() + ":" + getPort() + url;
     }
 
 
@@ -488,7 +488,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @param value The new value for Port
      */
     public void setPort(int value) {
-        port = value;
+        httpPort = value;
     }
 
     /**
@@ -497,7 +497,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @return The Port
      */
     public int getPort() {
-        return port;
+        return httpPort;
     }
 
 

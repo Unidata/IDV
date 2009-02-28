@@ -851,6 +851,10 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_HOSTNAME = "ramadda.hostname";
 
+    public static final String PROP_PORT = "ramadda.port";
+
+
+
     /** _more_ */
     public static final String PROP_GOOGLEAPIKEYS = "ramadda.googleapikeys";
 
