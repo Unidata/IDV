@@ -124,24 +124,6 @@ public class RepositoryUtil {
         }
     }
 
-    /**
-     * Class AccessException _more_
-     *
-     *
-     * @author IDV Development Team
-     * @version $Revision: 1.3 $
-     */
-    public static class AccessException extends RuntimeException {
-
-        /**
-         * _more_
-         *
-         * @param message _more_
-         */
-        public AccessException(String message) {
-            super(message);
-        }
-    }
 
     /**
      * _more_

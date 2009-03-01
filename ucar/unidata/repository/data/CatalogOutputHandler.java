@@ -194,6 +194,12 @@ public class CatalogOutputHandler extends OutputHandler {
     }
 
 
+    public AuthorizationMethod getAuthorizationMethod(Request request) {
+        return AuthorizationMethod.AUTH_HTTP;
+    }
+
+
+
     /**
      * _more_
      *

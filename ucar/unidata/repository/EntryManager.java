@@ -251,6 +251,7 @@ return new Result(title, sb);
     }
 
 
+
     /**
      * _more_
      *
@@ -261,10 +262,15 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryShow(Request request) throws Exception {
+        if(request.getCheckingAuthMethod()) {
+            OutputHandler handler = getRepository().getOutputHandler(request);
+            return new Result(handler.getAuthorizationMethod(request));
+        }
+
+
         Entry entry;
         if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
-
             if (entry == null) {
                 Entry tmp = getEntry(request,
                                      request.getString(ARG_ENTRYID, BLANK),
@@ -571,8 +577,8 @@ return new Result(title, sb);
             }
             if ( !getAccessManager().canDoAction(request, entry,
                     Permission.ACTION_EDIT)) {
-                throw new RepositoryUtil.AccessException("Cannot edit:"
-                        + entry.getLabel());
+                throw new AccessException("Cannot edit:"
+                        + entry.getLabel(),request);
             }
             if (entry.getIsLocalFile()) {
                 return new Result(
@@ -647,8 +653,8 @@ return new Result(title, sb);
                     (forUpload
                      ? Permission.ACTION_UPLOAD
                      : Permission.ACTION_NEW))) {
-                throw new RepositoryUtil.AccessException("Cannot add:"
-                        + entry.getLabel());
+                throw new AccessException("Cannot add:"
+                        + entry.getLabel(),request);
             }
 
 
@@ -1944,16 +1950,16 @@ return new Result(title, sb);
             for (Entry fromEntry : entries) {
                 if ( !getAccessManager().canDoAction(request, fromEntry,
                         Permission.ACTION_EDIT)) {
-                    throw new RepositoryUtil.AccessException("Cannot move:"
-                            + fromEntry.getLabel());
+                    throw new AccessException("Cannot move:"
+                            + fromEntry.getLabel(),request);
                 }
             }
         }
 
         if ( !getAccessManager().canDoAction(request, toEntry,
                                              Permission.ACTION_NEW)) {
-            throw new RepositoryUtil.AccessException("Cannot copy/move to:"
-                    + toEntry.getLabel());
+            throw new AccessException("Cannot copy/move to:"
+                    + toEntry.getLabel(),request);
         }
 
 
@@ -3557,8 +3563,8 @@ return new Result(title, sb);
                                  request.getString(ARG_ENTRYID, BLANK),
                                  false);
             if (tmp != null) {
-                throw new RepositoryUtil.AccessException(
-                    "You do not have access to this entry");
+                throw new AccessException(
+                    "You do not have access to this entry",request);
             }
             throw new RepositoryUtil.MissingEntryException(
                 "Could not find entry:"

@@ -97,6 +97,13 @@ public class Result {
     /** _more_ */
     public String bottomHtml = "";
 
+    private AuthorizationMethod authorizationMethod;
+
+    public Result(AuthorizationMethod authorizationMethod) {
+        this.authorizationMethod = authorizationMethod;
+    }
+
+
     /**
      * _more_
      *
@@ -502,6 +509,24 @@ public class Result {
     public String getBottomHtml() {
         return bottomHtml;
     }
+
+/**
+Set the AuthorizationMethod property.
+
+@param value The new value for AuthorizationMethod
+**/
+public void setAuthorizationMethod (AuthorizationMethod value) {
+	this.authorizationMethod = value;
+}
+
+/**
+Get the AuthorizationMethod property.
+
+@return The AuthorizationMethod
+**/
+public AuthorizationMethod getAuthorizationMethod () {
+	return this.authorizationMethod;
+}
 
 
 

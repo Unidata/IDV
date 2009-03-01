@@ -102,12 +102,22 @@ public class RequestUrl {
             + path) + suffix;
     }
 
+    public String getHttpsUrl() {
+        return repositorySource.getRepositoryBase().httpsUrl(
+            repositorySource.getRepositoryBase().getUrlBase()
+            + path);
+    }
+
     /**
      * _more_
      *
      * @return _more_
      */
     public String getFullUrl() {
+        checkInit();
+        if(needsSsl) {
+            return getHttpsUrl();
+        }
         return repositorySource.getRepositoryBase().absoluteUrl(
             repositorySource.getRepositoryBase().getUrlBase() + path);
     }

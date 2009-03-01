@@ -137,6 +137,12 @@ public class Request implements Constants {
     /** _more_ */
     private String leftMessage;
 
+    private boolean checkingAuthMethod = false;
+
+    private ApiMethod apiMethod;
+
+
+
     /**
      * _more_
      *
@@ -1616,6 +1622,42 @@ Get the Secure property.
 **/
 public boolean getSecure () {
 	return secure;
+}
+
+/**
+Set the CheckingAuthMethod property.
+
+@param value The new value for CheckingAuthMethod
+**/
+public void setCheckingAuthMethod (boolean value) {
+	this.checkingAuthMethod = value;
+}
+
+/**
+Get the CheckingAuthMethod property.
+
+@return The CheckingAuthMethod
+**/
+public boolean getCheckingAuthMethod () {
+	return this.checkingAuthMethod;
+}
+
+/**
+Set the ApiMethod property.
+
+@param value The new value for ApiMethod
+**/
+public void setApiMethod (ApiMethod value) {
+	this.apiMethod = value;
+}
+
+/**
+Get the ApiMethod property.
+
+@return The ApiMethod
+**/
+public ApiMethod getApiMethod () {
+	return this.apiMethod;
 }
 
 

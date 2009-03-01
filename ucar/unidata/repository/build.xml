@@ -80,8 +80,7 @@
         <jar 
             basedir="${compiledir}"
             compress="true"
-            jarfile="${jars_dest}/ramaddaplugin.jar"
-        >
+            jarfile="${jars_dest}/ramaddaplugin.jar">
             <include name="ucar/unidata/repository/**/*.class"/>
             <include name="ucar/unidata/repository/idv/publishertypes.xml"/>
             <include name="ucar/unidata/repository/idv/publishers.xml"/>

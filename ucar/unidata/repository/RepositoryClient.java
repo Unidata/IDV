@@ -82,6 +82,9 @@ public class RepositoryClient extends RepositoryBase {
 
     private String defaultGroupName;
 
+    private String sslPort;
+    private String title;
+    private String description;
 
     /**
      * _more_
@@ -104,6 +107,11 @@ public class RepositoryClient extends RepositoryBase {
         setUrlBase(serverUrl.getPath());
         this.user     = user;
         this.password = password;
+    }
+
+
+    protected String getHttpsPort() {
+        return sslPort;
     }
 
 
@@ -602,6 +610,11 @@ public class RepositoryClient extends RepositoryBase {
         }
     }
 
+    public boolean hasSession() {
+        return sessionId!=null;
+    }
+
+
     /**
      * _more_
      *
@@ -628,6 +641,9 @@ public class RepositoryClient extends RepositoryBase {
             return true;
         }
         try {
+            //first get the basic information including the ssl port
+            getInfo();
+
             List entries = Misc.toList(new Object[] {
                                HttpFormEntry.hidden(ARG_RESPONSE,
                                    RESPONSE_XML),
@@ -661,6 +677,26 @@ public class RepositoryClient extends RepositoryBase {
     }
 
 
+
+    private void getInfo() throws Exception {
+        String url = HtmlUtil.url(URL_INFO.getFullUrl(),
+                                  new String[] {ARG_RESPONSE,
+                                                RESPONSE_XML});
+        
+        String contents = IOUtil.readContents(url, getClass());
+        //        System.err.println(contents);
+        Element root = XmlUtil.getRoot(contents);
+
+        sslPort = XmlUtil.getGrandChildText(root, TAG_INFO_SSLPORT);
+        title = XmlUtil.getGrandChildText(root, TAG_INFO_TITLE);
+        description = XmlUtil.getGrandChildText(root, TAG_INFO_DESCRIPTION);
+        //        System.err.println (sslPort + "  "+ title +" " + description);
+        if(sslPort!=null) {
+            URL_USER_LOGIN.setNeedsSsl(true);
+        } else {
+            URL_USER_LOGIN.setNeedsSsl(false);
+        }
+    }
 
 
     /**

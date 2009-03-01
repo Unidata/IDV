@@ -1,16 +1,17 @@
-<api>
+<api handler="repository">
 
   <property name="admin" value="false"/>
   <property name="cancache" value="true"/>
 
-  <group handler="repository">
-     <api request="/help/*"           method="processHelp"/>
+  <group>
      <api request="/ping"             method="processPing"/>
+     <api request="/info"             method="processInfo"/>
+     <api request="/help/*"           method="processHelp"/>
   </group>
 
   <group handler="entrymanager">
       <api request="/entry/show"             method="processEntryShow"    name="${topgroup}" toplevel="true" ishome="true"/>
-      <api request="/entry/show/*"           method="processEntryShow"/>
+      <api request="/entry/show/*"           method="processEntryShow" checkauthmethod="true"/>
       <api request="/entry/form"             method="processEntryForm"       actions="edit"/>
       <api request="/entry/change"           method="processEntryChange"     actions="edit"/>
       <api request="/entry/delete"           method="processEntryDelete"     actions="edit"/>

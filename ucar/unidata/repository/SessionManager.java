@@ -368,16 +368,20 @@ public class SessionManager extends RepositoryManager {
                     if (toks.length == 2) {
                         user = getUserManager().findUser(toks[0], false);
                         if (user == null) {
-                            throw new RepositoryUtil.AccessException(
-                                msgLabel("Unknown user") + toks[0]);
-                        }
-                        if ( !user.getPassword().equals(
-                                getUserManager().hashPassword(toks[1]))) {
-                            throw new RepositoryUtil.AccessException(
-                                msg("Incorrect password"));
+                            System.err.println("Unknown user in auth request:" + toks[0]);
+                            //                            throw new AccessException(
+                            //                                msgLabel("Unknown user") + toks[0],request);
+                        } else  if ( !user.getPassword().equals(
+                                                                getUserManager().hashPassword(toks[1]))) {
+                            System.err.println("Wrong password in auth request:" + auth);
+                            //                            throw new AccessException(
+                            //                                msg("Incorrect password"),request);
+                            user = null;
                         }
                     }
-                    setUserSession(request, user);
+                    if(user!=null) {
+                        setUserSession(request, user);
+                    }
                 }
             }
         }

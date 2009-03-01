@@ -1387,6 +1387,21 @@ public class Repository extends RepositoryBase implements RequestHandler {
         for (User user : cmdLineUsers) {
             getUserManager().makeOrUpdateUser(user, true);
         }
+
+        //If we have an admin property then it is of the form userid:password
+        //and is used to set the password of the admin
+        String adminFromProperties = getProperty(PROP_ADMIN,null);
+        if(adminFromProperties!=null) {
+            List<String>toks = StringUtil.split(adminFromProperties,":");
+            if(toks.size()!=2) {
+                System.err.println ("Error: The " + PROP_ADMIN +" property is incorrect");
+                return;
+            }
+            User user = new User(toks.get(0),"", false);
+            user.setPassword(UserManager.hashPassword(toks.get(1).trim()));
+            getUserManager().makeOrUpdateUser(user, true,true);
+            System.err.println ("Password for:" + user.getId() +" has been updated");
+        }
     }
 
 
@@ -1476,7 +1491,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
         
         String methodName = XmlUtil.getAttribute(node, ApiMethod.ATTR_METHOD);
         boolean needsSsl = XmlUtil.getAttributeFromTree(node, ApiMethod.ATTR_NEEDS_SSL,
-                                             false);
+                                                        false);
+        boolean checkAuthMethod = XmlUtil.getAttributeFromTree(node, ApiMethod.ATTR_CHECKAUTHMETHOD,
+                                                               false);
+
         boolean admin = XmlUtil.getAttributeFromTree(node, ApiMethod.ATTR_ADMIN,
                                              Misc.getProperty(props,
                                                  ApiMethod.ATTR_ADMIN, true));
@@ -1489,10 +1507,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
         String handlerName = XmlUtil.getAttributeFromTree(node,
-
-                                 ApiMethod.ATTR_HANDLER,
-                                 Misc.getProperty(props,
-                                     ApiMethod.ATTR_HANDLER, defaultHandler));
+                                                          ApiMethod.ATTR_HANDLER,
+                                                          Misc.getProperty(props,
+                                                                           ApiMethod.ATTR_HANDLER, defaultHandler));
 
 
         RequestHandler handler = (RequestHandler) handlers.get(handlerName);
@@ -1554,7 +1571,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         ApiMethod apiMethod =
             new ApiMethod(this, handler, request,
                           XmlUtil.getAttribute(node, ApiMethod.ATTR_NAME,
-                              request), method, admin,needsSsl, canCache,
+                              request), method, admin,needsSsl,checkAuthMethod, canCache,
                                         XmlUtil.getAttribute(node,
                                             ApiMethod.ATTR_TOPLEVEL, false));
         List actions = StringUtil.split(XmlUtil.getAttribute(node,
@@ -1884,22 +1901,48 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
             //TODO: For non-html outputs come up with some error format
             Throwable inner = LogUtil.getInnerException(exc);
-            boolean badAccess = inner
-                                instanceof RepositoryUtil.AccessException;
+            boolean badAccess = inner instanceof AccessException;
             StringBuffer sb = new StringBuffer();
             if ( !badAccess) {
                 sb.append(error(msgLabel("An error has occurred")
                                 + HtmlUtil.p() + inner.getMessage()));
             } else {
-                sb.append(error(inner.getMessage()));
-                String redirect =
-                    XmlUtil.encodeBase64(request.getUrl().getBytes());
-                sb.append(getUserManager().makeLoginForm(request,
-                        HtmlUtil.hidden(ARG_REDIRECT, redirect)));
+                AccessException ae = (AccessException) inner;
+                System.err.println("got bad access " + request);
+                AuthorizationMethod authMethod = AuthorizationMethod.AUTH_HTML;
+                if(request.getApiMethod()!=null) {
+                    ApiMethod apiMethod = request.getApiMethod();
+                    System.err.println("got api method " + apiMethod);
+                    if(apiMethod.getCheckAuthMethod()) {
+                        request.setCheckingAuthMethod(true);
+                        Result authResult = (Result) apiMethod.invoke(request);
+                        authMethod = authResult.getAuthorizationMethod();
+                    }
+                }
+                if(authMethod.equals(AuthorizationMethod.AUTH_HTML)) {
+                    sb.append(error(inner.getMessage()));
+                    String redirect =
+                        XmlUtil.encodeBase64(request.getUrl().getBytes());
+                    sb.append(getUserManager().makeLoginForm(request,
+                                                             HtmlUtil.hidden(ARG_REDIRECT, redirect)));
+                } else {
+                    System.err.println("Doing HTTP auth");
+                    sb.append(inner.getMessage());
+                    if(!request.getSecure() && isSSLEnabled(null)) {
+                        System.err.println ("Redirecting to ssl: "+ httpsUrl(request.getUrl()));
+                        result = new Result(httpsUrl(request.getUrl()));
+                    } else {
+                        System.err.println ("going clear text");
+                        result = new Result("Error", sb);
+                        result.addHttpHeader("WWW-Authenticate","Basic realm=\"Secure Area\"");
+                        result.setResponseCode(Result.RESPONSE_UNAUTHORIZED);
+                    }
+                    return result;
+                }
             }
 
             if ((request.getUser() != null) && request.getUser().getAdmin()) {
-                sb.append("<pre>" + LogUtil.getStackTrace(inner) + "</pre>");
+                sb.append(HtmlUtil.pre(LogUtil.getStackTrace(inner)));
             }
 
             result = new Result(msg("Error"), sb);
@@ -2052,6 +2095,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         }
 
+        request.setApiMethod(apiMethod);
 
         String userAgent = request.getHeaderArg("User-Agent");
         if (userAgent == null) {
@@ -2063,12 +2107,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
             return getAdmin().doInitialization(request);
         }
 
-
-
         if ( !getUserManager().isRequestOk(request)
                 || !apiMethod.isRequestOk(request, this)) {
-            throw new RepositoryUtil.AccessException(
-                msg("You do not have permission to access this page"));
+            throw new AccessException(
+                msg("You do not have permission to access this page"),request);
         }
 
 
@@ -3273,6 +3315,32 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return new Result("", sb);
     }
 
+    public Result processInfo(Request request) throws Exception {
+        if (request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML)) {
+            Document doc = XmlUtil.makeDocument();
+            Element info = XmlUtil.create(doc, TAG_INFO,
+                                     null, new String[] {});
+            XmlUtil.create(doc,TAG_INFO_DESCRIPTION, info, getEntryManager().getTopGroup().getDescription(),null);
+            XmlUtil.create(doc,TAG_INFO_TITLE, info, getProperty(PROP_REPOSITORY_NAME, "Repository"),null);
+            String port = getProperty(PROP_SSL_PORT, "");
+            if (port.trim().length() == 0) {
+                XmlUtil.create(doc, TAG_INFO_SSLPORT, info,port,null);
+            }
+
+            /*
+            <info >
+            <sslport>...</sslport>
+            </info>
+            */
+
+            String xml = XmlUtil.toString(info);
+            return new Result(xml, MIME_XML);
+        }
+        StringBuffer sb = new StringBuffer("");
+        
+        return new Result("", sb);
+    }
+
 
     /**
      * _more_
@@ -3539,9 +3607,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public int getMax(Request request) {
         if (request.defined(ARG_SKIP)) {
-            return request.get(ARG_SKIP, 0) + request.get(ARG_MAX, MAX_ROWS);
+            return request.get(ARG_SKIP, 0) + request.get(ARG_MAX, DB_MAX_ROWS);
         }
-        return request.get(ARG_MAX, MAX_ROWS);
+        return request.get(ARG_MAX, DB_MAX_ROWS);
     }
 
 
@@ -4197,7 +4265,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String limitString = BLANK;
         //        if (request.defined(ARG_SKIP)) {
         //            if (skipCnt > 0) {
-        int max = request.get(ARG_MAX, MAX_ROWS);
+        int max = request.get(ARG_MAX, DB_MAX_ROWS);
         limitString = getDatabaseManager().getLimitString(skipCnt, max);
         String orderBy = BLANK;
         if (addOrderBy) {

@@ -1600,6 +1600,17 @@ public class DataOutputHandler extends OutputHandler {
     }
 
 
+    public AuthorizationMethod getAuthorizationMethod(Request request) {
+        OutputType output = request.getOutput();
+        if (output.equals(OUTPUT_WCS)||
+            output.equals(OUTPUT_OPENDAP)) {
+            return AuthorizationMethod.AUTH_HTTP;
+        }
+        return super.getAuthorizationMethod(request);
+    }
+
+
+
 
     /**
      * Serve up the entry
@@ -1621,8 +1632,6 @@ public class DataOutputHandler extends OutputHandler {
         if (output.equals(OUTPUT_WCS)) {
             return outputWcs(request, entry);
         }
-
-
         if (output.equals(OUTPUT_GRIDSUBSET)
                 || output.equals(OUTPUT_GRIDSUBSET_FORM)) {
             return outputGridSubset(request, entry);

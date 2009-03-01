@@ -60,6 +60,8 @@ public class RepositoryBase implements Constants, RepositorySource {
     /** _more_          */
     public final RequestUrl URL_PING = new RequestUrl(this, "/ping");
 
+    public final RequestUrl URL_INFO = new RequestUrl(this, "/info");
+
     /** _more_ */
     public final RequestUrl URL_MESSAGE = new RequestUrl(this, "/message");
 
@@ -419,6 +421,10 @@ public class RepositoryBase implements Constants, RepositorySource {
         return getUrlBase() + requestUrl.getPath();
     }
 
+    protected String getHttpsPort() {
+        return getProperty(PROP_SSL_PORT, "").trim();
+   }
+
     /**
      * _more_
      *
@@ -427,8 +433,8 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @return _more_
      */
     public String httpsUrl(String url) {
-        String port = getProperty(PROP_SSL_PORT, "").trim();
-        if (port.length() == 0) {
+        String port= getHttpsPort();
+        if (port!=null && port.length() == 0) {
             return "http://" + getHostname() + ":" + getPort() + url;
             //            return url;
             //            throw new IllegalStateException("Do not have ssl port defined");

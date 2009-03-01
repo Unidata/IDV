@@ -434,6 +434,11 @@ public class UserManager extends RepositoryManager {
      */
     protected void makeOrUpdateUser(User user, boolean updateIfNeeded)
             throws Exception {
+        makeOrUpdateUser(user,true,false);
+    }
+
+    protected void makeOrUpdateUser(User user, boolean updateIfNeeded, boolean onlyPassword)
+            throws Exception {
         if (getDatabaseManager().tableContains(user.getId(),
                 Tables.USERS.NAME, Tables.USERS.COL_ID)) {
             if ( !updateIfNeeded) {
@@ -441,21 +446,29 @@ public class UserManager extends RepositoryManager {
                     msgLabel("Database already contains user")
                     + user.getId());
             }
-            getDatabaseManager().update(Tables.USERS.NAME,
-                                        Tables.USERS.COL_ID, user.getId(),
-                                        new String[] {
-                Tables.USERS.COL_NAME, Tables.USERS.COL_PASSWORD,
-                Tables.USERS.COL_EMAIL, Tables.USERS.COL_QUESTION,
-                Tables.USERS.COL_ANSWER, Tables.USERS.COL_ADMIN,
-                Tables.USERS.COL_LANGUAGE, Tables.USERS.COL_TEMPLATE
-            }, new Object[] {
-                user.getName(), user.getPassword(), user.getEmail(),
-                user.getQuestion(), user.getAnswer(), user.getAdmin()
-                        ? new Integer(1)
-                        : new Integer(0), user.getLanguage(),
-                user.getTemplate()
-            });
-            userMap.put(user.getId(), user);
+            if(onlyPassword) {
+                getDatabaseManager().update(Tables.USERS.NAME,
+                                            Tables.USERS.COL_ID, user.getId(),
+                                            new String[] {Tables.USERS.COL_PASSWORD}, 
+                                            new Object[] {user.getPassword()});
+            } else {
+                getDatabaseManager().update(Tables.USERS.NAME,
+                                            Tables.USERS.COL_ID, user.getId(),
+                                            new String[] {
+                                                Tables.USERS.COL_NAME, Tables.USERS.COL_PASSWORD,
+                                                Tables.USERS.COL_EMAIL, Tables.USERS.COL_QUESTION,
+                                                Tables.USERS.COL_ANSWER, Tables.USERS.COL_ADMIN,
+                                                Tables.USERS.COL_LANGUAGE, Tables.USERS.COL_TEMPLATE
+                                            }, new Object[] {
+                                                user.getName(), user.getPassword(), user.getEmail(),
+                                                user.getQuestion(), user.getAnswer(), user.getAdmin()
+                                                ? new Integer(1)
+                                                : new Integer(0), user.getLanguage(),
+                                                user.getTemplate()
+                                            });
+                userMap.remove(user.getId());
+            }
+
             return;
         }
 

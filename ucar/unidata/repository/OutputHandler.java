@@ -203,7 +203,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     public boolean showingAll(Request request, List<Group> subGroups,
                               List<Entry> entries) {
         int cnt = subGroups.size() + entries.size();
-        int max = request.get(ARG_MAX, Repository.MAX_ROWS);
+        int max = request.get(ARG_MAX, DB_MAX_ROWS);
         if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
             return false;
         }
@@ -211,6 +211,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     }
 
 
+
+    public AuthorizationMethod getAuthorizationMethod(Request request) {
+        return AuthorizationMethod.AUTH_HTML;
+    }
 
     /**
      * _more_
@@ -226,7 +230,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                          List<Entry> entries, StringBuffer sb)
             throws Exception {
         int cnt = subGroups.size() + entries.size();
-        int max = request.get(ARG_MAX, Repository.MAX_ROWS);
+        int max = request.get(ARG_MAX, DB_MAX_ROWS);
         //        System.err.println ("cnt:" + cnt + " " + max);
         if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
             int skip = Math.max(0, request.get(ARG_SKIP, 0));

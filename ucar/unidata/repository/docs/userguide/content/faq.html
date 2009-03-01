@@ -13,6 +13,8 @@ If your RAMADDA site has been configured to send email (see <a href="#email">her
 then on the Login page you should see &quot;Forget you User ID?&quot; and
 &quot;Forget you Password?&quot; links. 
 
+
+
 <faqitem q="I forgot the administrator password and cannot access RAMADDA. How do I login?" >
 You can specify an administrator user id and password from the command line when starting RAMADDA.
 If you are running RAMADDA stand alone then just provide the arguments:<pre>
@@ -28,6 +30,12 @@ that are processed by RAMADDA.
     &lt;param-value&gt;-admin,userid,password&lt;/param-value&gt;
 </pre>
 
+<p>
+You can also set a username/password  in the repository.properties file in the RAMADDA home directory. Just add:<pre>
+ramadda.admin=userid:password
+</pre>
+and then restart RAMADDA. This sets the password for the given userid.
+Note: you should remove this entry once you have reset your password.
 </faqitem>
 
 
@@ -36,8 +44,7 @@ that are processed by RAMADDA.
 <faqitem q="How do I configure SSL access to RAMADDA?" >
 On the main Site Administration  page under the &quot;Contact&quot; area you can specify
 the SSL port number on your server. When RAMADDA is configured to use SSL the login form
-will use SSL.
-...more here...
+and the site administration pages will automatically use SSL.
 </faqitem>
 
 
