@@ -507,9 +507,10 @@ public class TimesChooser extends IdvChooser {
      * @param times List of thinggs to put into absolute times list
      */
     protected void setAbsoluteTimes(List times) {
-        while(times.size()>1) {
-            times.remove(0);
-        }
+
+        //        while(times.size()>1) {times.remove(0);}
+
+
 
 
         List newAbsoluteTimes = makeDatedObjects(times);
