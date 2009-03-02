@@ -62,6 +62,7 @@ public class JobManager {
     /** _more_          */
     private static Hashtable dialogMap = new Hashtable();
 
+    private static Hashtable stoppedLoads = new Hashtable();
 
     /** count of objects */
     private static int objectCount = 0;
@@ -79,17 +80,6 @@ public class JobManager {
         return jobManager;
     }
 
-
-    /**
-     * _more_
-     *
-     * @param name _more_
-     *
-     * @return _more_
-     */
-    public Object startLoad(String name) {
-        return startLoad(name, false);
-    }
 
     /**
      * _more_
@@ -195,7 +185,6 @@ public class JobManager {
 
         public JDialog getDialog() {
             if(dialog == null) {
-
                 dialog = GuiUtils.createDialog(null, name, modal);
                 JButton cancelBtn = new JButton("Cancel");
                 cancelBtn.addActionListener(new ActionListener() {
@@ -231,6 +220,20 @@ public class JobManager {
 
     }
 
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
+    public Object startLoad(String name) {
+        return startLoad(name, false);
+    }
+
+
+
     /**
      * _more_
      *
@@ -264,6 +267,9 @@ public class JobManager {
                     synchronized (MUTEX) {
                         if(loadMap.get(id)==null) return;
                         dialogInfo = new DialogInfo(id, name, modal);
+                        //If we're going to shwo the dialog then create it here in the MUTEX
+                        //to stop a race condition when we want to stop the run
+                        if(showDialog) dialogInfo.getDialog();
                         dialogMap.put(id, dialogInfo);
                     }
                     if (showDialog) {
@@ -337,9 +343,9 @@ public class JobManager {
             }
             loadMap.remove(id);
             DialogInfo dialogInfo = (DialogInfo) dialogMap.get(id);
+            dialogMap.remove(id);
             if ((dialogInfo != null) && (dialogInfo.dialog != null)) {
                 dialogInfo.dialog.dispose();
-                dialogMap.remove(id);
             }
         }
     }
