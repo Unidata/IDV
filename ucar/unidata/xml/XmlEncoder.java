@@ -516,6 +516,14 @@ public class XmlEncoder extends XmlUtil {
     }
 
 
+    public static Object decodeXml(String xml) throws Exception {
+        return new XmlEncoder().toObject(xml);
+    }
+
+    public static String encodeObject(Object object) throws Exception {
+        return new XmlEncoder().toXml(object);
+    }
+
 
     /**
      *  Create an object from the given xml. This will catch any exceptions and print them out
