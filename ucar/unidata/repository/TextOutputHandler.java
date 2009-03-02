@@ -122,9 +122,14 @@ public class TextOutputHandler extends OutputHandler {
         if (state.entry == null) {
             return;
         }
+
         if ( !state.entry.isFile()) {
             return;
         }
+        if (!getRepository().getAccessManager().canAccessFile(request,  state.entry)) {
+            return;
+        }
+
         String   path     = state.entry.getResource().getPath();
         String[] suffixes = new String[] { ".csv", ".txt", ".java", ".c",".h",".cc",".f90",".cpp",".hh",".cdl",".sh","m4" };
 
@@ -156,6 +161,12 @@ public class TextOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputEntry(Request request, Entry entry) throws Exception {
+        if (!getRepository().getAccessManager().canAccessFile(request,  entry)) {
+            throw new AccessException("Cannot access data",request);
+        }
+
+
+
         String contents  = IOUtil.readContents(entry.getResource().getFile());
         StringBuffer sb  = new StringBuffer();
         int          cnt = 0;

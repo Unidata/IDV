@@ -320,6 +320,10 @@ public class AccessManager extends RepositoryManager {
     }
 
 
+    public boolean canAccessFile(Request request, Entry entry) throws Exception {
+        return canDoAction(request,  entry, Permission.ACTION_FILE);
+    }
+
     /**
      * _more_
      *
@@ -342,6 +346,11 @@ public class AccessManager extends RepositoryManager {
         if ( !entry.getTypeHandler().canDownload(request, entry)) {
             return false;
         }
+
+        if (!canDoAction(request,  entry, Permission.ACTION_FILE)) {
+            return false;
+        }
+
         return getStorageManager().canDownload(request, entry);
     }
 

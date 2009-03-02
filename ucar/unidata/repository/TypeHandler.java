@@ -906,6 +906,7 @@ public class TypeHandler extends RepositoryManager {
                     sb.append(HtmlUtil.formEntry(msgLabel("Location"),
                             entry.getSouth() + "/" + entry.getEast()));
                 } else if (entry.hasAreaDefined()) {
+                    /*
                     String img =
                         HtmlUtil.img(request.url(getRepository().URL_GETMAP,
                             ARG_SOUTH, "" + entry.getSouth(), ARG_WEST,
@@ -922,6 +923,7 @@ public class TypeHandler extends RepositoryManager {
                                       + entry.getSouth()
                                       + "</td></tr></table>";
                     sb.append(HtmlUtil.formEntry(msgLabel("Area"), areaHtml));
+                    */
                 }
             }
 

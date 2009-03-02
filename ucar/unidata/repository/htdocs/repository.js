@@ -363,9 +363,13 @@ function mouseDownOnEntry(event, entryId, name, sourceIconId, icon) {
 
 function mouseUpOnEntry(event, entryId, targetId) {
     event = util.getEvent(event);
-    if(entryId == draggedEntry) return;
+    if(entryId == draggedEntry) {
+        return;
+    }
     var obj = util.getDomObject(targetId);
-    if(!obj)  return;
+    if(!obj)  {
+        return;
+    }
     if(mouseIsDown)  {
         obj.style.borderBottom="";
     }

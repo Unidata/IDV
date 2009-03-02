@@ -1321,13 +1321,14 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             if (true) {
                 return null;
             }
+            /*
             if (entry.hasAreaDefined()) {
                 return request.url(repository.URL_GETMAP, ARG_SOUTH,
                                    "" + entry.getSouth(), ARG_WEST,
                                    "" + entry.getWest(), ARG_NORTH,
                                    "" + entry.getNorth(), ARG_EAST,
                                    "" + entry.getEast());
-            }
+                                   }*/
             return null;
         }
 

@@ -152,6 +152,7 @@ public interface Constants {
 
 
     public static final String ARG_ACTION = "action";
+    public static final String ARG_ACTION_ASSOCIATE = "action.associate";
     public static final String ARG_ACTION_COPY = "action.copy";
     public static final String ARG_ACTION_ID = "actionid";
     public static final String ARG_ACTION_MOVE = "action.move";

@@ -49,10 +49,6 @@ import java.util.UUID;
 public class RepositoryBase implements Constants, RepositorySource {
 
 
-    /** _more_ */
-    public final RequestUrl URL_GETMAP = new RequestUrl(this, "/getmap");
-
-
     /** _more_          */
     public final RequestUrl URL_HELP = new RequestUrl(this,
                                            "/help/index.html");

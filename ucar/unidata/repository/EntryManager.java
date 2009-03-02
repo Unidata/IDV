@@ -1939,20 +1939,36 @@ return new Result(title, sb);
             throw new RepositoryUtil.MissingEntryException(
                 "Could not find entry " + (toId==null?toName:toId));
         }
-        if ( !toEntry.isGroup()) {
-            throw new IllegalArgumentException(
-                "Can only copy/move to a group");
+        boolean isGroup  = toEntry.isGroup();
+
+
+        if (request.exists(ARG_ACTION_ASSOCIATE)) {
+            if(entries.size()==1) {
+                return new Result(request.url(
+                                              getRepository().URL_ASSOCIATION_ADD,
+                                              ARG_FROM, entries.get(0).getId(),
+                                              ARG_TO, toEntry.getId()));
+            }
         }
-        Group toGroup = (Group) toEntry;
 
 
         if (request.exists(ARG_ACTION_MOVE)) {
+            if (!isGroup) {
+                throw new IllegalArgumentException(
+                                                   "Can only copy/move to a group");
+            }
+
             for (Entry fromEntry : entries) {
                 if ( !getAccessManager().canDoAction(request, fromEntry,
                         Permission.ACTION_EDIT)) {
                     throw new AccessException("Cannot move:"
                             + fromEntry.getLabel(),request);
                 }
+            }
+        } else  if (request.exists(ARG_ACTION_COPY)) {
+            if (!isGroup) {
+                throw new IllegalArgumentException(
+                                                   "Can only copy/move to a group");
             }
         }
 
@@ -1965,13 +1981,6 @@ return new Result(title, sb);
 
         StringBuffer fromList = new StringBuffer();
         for (Entry fromEntry : entries) {
-            if ( !okToMove(fromEntry, toEntry)) {
-                StringBuffer sb = new StringBuffer();
-                sb.append(
-                    getRepository().error(
-                        msg("Cannot move a group to its descendent")));
-                return addEntryHeader(request, fromEntry, new Result("", sb));
-            }
             fromList.append(HtmlUtil.space(3));
             fromList.append(getEntryManager().getBreadCrumbs(request,
                     fromEntry));
@@ -1980,23 +1989,35 @@ return new Result(title, sb);
 
 
         if ( !(request.exists(ARG_ACTION_MOVE)
-                || request.exists(ARG_ACTION_COPY))) {
+               || request.exists(ARG_ACTION_COPY)
+               || request.exists(ARG_ACTION_ASSOCIATE))) {
             StringBuffer sb = new StringBuffer();
-            sb.append(
-                msgLabel(
-                    "Are you sure you want to copy/move the following entries to the group"));
+            if(entries.size()>1) {
+                sb.append(msg(
+                                   "What do you want to do with the following entries?"));
+            } else {
+                sb.append(msg(
+                                   "What do you want to do with the following entry?"));
+            }
             sb.append(HtmlUtil.br());
-            sb.append(HtmlUtil.space(3));
-            sb.append(HtmlUtil.b(toEntry.getLabel()));
-
             StringBuffer fb = new StringBuffer();
             fb.append(request.formPost(getRepository().URL_ENTRY_COPY));
             fb.append(HtmlUtil.hidden(ARG_TO, toEntry.getId()));
             fb.append(HtmlUtil.hidden(ARG_FROM, fromIds));
-            fb.append(HtmlUtil.submit("Yes, copy them", ARG_ACTION_COPY));
-            fb.append(HtmlUtil.space(1));
-            fb.append(HtmlUtil.submit("Yes, move them", ARG_ACTION_MOVE));
-            fb.append(HtmlUtil.space(1));
+
+            if (isGroup) {
+                fb.append(HtmlUtil.submit((entries.size()>1?"Copy them to the group: ":"Copy it to the group: ") + toEntry.getName(), ARG_ACTION_COPY));
+                fb.append(HtmlUtil.space(1));
+                fb.append(HtmlUtil.submit((entries.size()>1?"Move them to the group: ":"Move it to the group: ") + toEntry.getName(), ARG_ACTION_MOVE));
+                fb.append(HtmlUtil.space(1));
+            }
+
+            if(entries.size()==1) {
+                fb.append(HtmlUtil.submit("Associate it with: " + toEntry.getName(), ARG_ACTION_ASSOCIATE));
+                fb.append(HtmlUtil.space(1));
+            }
+
+
             fb.append(HtmlUtil.submit("Cancel", ARG_CANCEL));
             fb.append(HtmlUtil.formClose());
             StringBuffer contents =
@@ -2007,10 +2028,30 @@ return new Result(title, sb);
         }
 
 
+        for (Entry fromEntry : entries) {
+            if ( !okToMove(fromEntry, toEntry)) {
+                StringBuffer sb = new StringBuffer();
+                sb.append(
+                    getRepository().error(
+                        msg("Cannot move a group to its descendent")));
+                return addEntryHeader(request, fromEntry, new Result("", sb));
+            }
+        }
+
         if (request.exists(ARG_ACTION_MOVE)) {
+            Group toGroup = (Group) toEntry;
             return processEntryMove(request, toGroup, entries);
         } else if (request.exists(ARG_ACTION_COPY)) {
+            Group toGroup = (Group) toEntry;
             return processEntryCopy(request, toGroup, entries);
+        } else if (request.exists(ARG_ACTION_ASSOCIATE)) {
+            System.err.println ("size:" + entries.size());
+            if(entries.size()==1) {
+                return new Result(request.url(
+                                              getRepository().URL_ASSOCIATION_ADD,
+                                              ARG_FROM, entries.get(0).getId(),
+                                              ARG_TO, toEntry.getId()));
+            }
         }
 
         return new Result(msg("Move"), new StringBuffer());
@@ -2996,7 +3037,6 @@ return new Result(title, sb);
 
 
 
-
         String compId = "popup_" + HtmlUtil.blockCnt++;
         String linkId = "img_" + uid;
         String prefix = "";
@@ -3024,11 +3064,17 @@ return new Result(title, sb);
         String entryIcon = getIconUrl(request, entry);
         String iconId = "img_" + uid;
         if (okToMove) {
-            if(entry.isGroup() && forTreeNavigation) {
+            if(forTreeNavigation) {
                 targetEvent.append(HtmlUtil.onMouseOver(HtmlUtil.call("mouseOverOnEntry",
                                                                 HtmlUtil.comma("event",
                                                                                HtmlUtil.squote(entry.getId()),
                                                                                HtmlUtil.squote(targetId)))));
+
+
+                targetEvent.append(HtmlUtil.onMouseUp(HtmlUtil.call("mouseUpOnEntry",
+                                                                    HtmlUtil.comma("event",
+                                                                                   HtmlUtil.squote(entry.getId()),
+                                                                                   HtmlUtil.squote(targetId)))));
             }
             targetEvent.append(HtmlUtil.onMouseOut(HtmlUtil.call("mouseOutOnEntry",
                                                            HtmlUtil.comma("event", 
@@ -3041,10 +3087,10 @@ return new Result(title, sb);
                                                                           HtmlUtil.squote(entry.getLabel().replace("'","")),
                                                                           HtmlUtil.squote(iconId),
                                                                           HtmlUtil.squote(entryIcon)))));
-            targetEvent.append((!entry.isGroup()?"":HtmlUtil.onMouseUp(HtmlUtil.call("mouseUpOnEntry",
-                                                                                                          HtmlUtil.comma("event",
-                                                                                                                         HtmlUtil.squote(entry.getId()),
-                                                                                                                         HtmlUtil.squote(targetId))))));
+
+
+
+
 
         }
         
@@ -5267,9 +5313,10 @@ return new Result(title, sb);
             addAssociation(request, fromEntry, toEntry, name, type);
             //            return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
             return new Result(
-                request.url(
-                    getRepositoryBase().URL_USER_CART, ARG_MESSAGE,
-                    msg("The association has been added")));
+                request.entryUrl(
+                                 getRepositoryBase().URL_ENTRY_SHOW, fromEntry,
+                                 ARG_MESSAGE,
+                                 msg("The association has been added")));
         }
 
         StringBuffer sb = new StringBuffer();

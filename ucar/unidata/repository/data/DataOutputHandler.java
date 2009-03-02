@@ -313,6 +313,11 @@ public class DataOutputHandler extends OutputHandler {
         if (entry == null) {
             return;
         }
+
+        if (!getRepository().getAccessManager().canAccessFile(request,  entry)) {
+            return;
+        }
+
         long t1 = System.currentTimeMillis();
         if ( !canLoadAsCdm(entry)) {
             long t2 = System.currentTimeMillis();
@@ -1624,6 +1629,13 @@ public class DataOutputHandler extends OutputHandler {
      */
     public Result outputEntry(final Request request, Entry entry)
             throws Exception {
+
+        if (!getRepository().getAccessManager().canDoAction(request,
+                                                            entry, Permission.ACTION_FILE)) {
+            throw new AccessException("Cannot access data",request);
+        }
+                
+
 
         OutputType output = request.getOutput();
         if (output.equals(OUTPUT_CDL)) {

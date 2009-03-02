@@ -802,7 +802,6 @@ public class Admin extends RepositoryManager {
                                                      HtmlUtil.SIZE_5)));
 
 
-
         asb.append(HtmlUtil
             .formEntry(msgLabel("SSL Port"), HtmlUtil
                 .input(PROP_SSL_PORT, getProperty(PROP_SSL_PORT, ""), HtmlUtil
@@ -1105,7 +1104,6 @@ public class Admin extends RepositoryManager {
         getRepository().writeGlobal(PROP_PORT,
                                     request.getString(PROP_PORT,
                                         getProperty(PROP_PORT, "")));
-
 
 
         String oldSsl =   getProperty(PROP_SSL_PORT, "");

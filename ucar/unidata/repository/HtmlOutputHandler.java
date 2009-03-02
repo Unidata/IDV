@@ -825,14 +825,14 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         if (cnt==0) {
-            sb.append("<i>Empty</i>");
+            sb.append(HtmlUtil.tag(HtmlUtil.TAG_I,msg("No entries in this group")));
             if (getAccessManager().hasPermissionSet(parent,
                     Permission.ACTION_VIEWCHILDREN)) {
                 if ( !getAccessManager().canDoAction(request, parent,
                         Permission.ACTION_VIEWCHILDREN)) {
                     sb.append(HtmlUtil.space(1));
                     sb.append(
-                        "You do not have permission to view the sub-groups of this entry");
+                              msg("You do not have permission to view the sub-groups of this entry"));
                 }
             }
         }
