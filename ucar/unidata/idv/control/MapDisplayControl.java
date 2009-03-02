@@ -308,6 +308,16 @@ public class MapDisplayControl extends DisplayControlImpl {
                 }
             }
 
+            if(latLonHolder!=null) {
+                latLonHolder.clearDisplayables();
+            } else {
+                latLonHolder = new CompositeDisplayable("latlonholder " + mycnt);
+                theHolder.addDisplayable(latLonHolder);
+            }
+            latLonHolder.addDisplayable(latState.getLatLonLines());
+            latLonHolder.addDisplayable(lonState.getLatLonLines());
+
+
             this.mapStates = new ArrayList();
             for (int i = 0; i < newMap.mapStates.size(); i++) {
                 MapState mapState =
@@ -812,8 +822,11 @@ public class MapDisplayControl extends DisplayControlImpl {
         JPanel llPanel = LatLonPanel.layoutPanels(latPanel, lonPanel);
 
         try {
-            latLonHolder.addDisplayable(latState.getLatLonLines());
-            latLonHolder.addDisplayable(lonState.getLatLonLines());
+            //xxxx
+            if(latLonHolder.displayableCount()==0) {
+                latLonHolder.addDisplayable(latState.getLatLonLines());
+                latLonHolder.addDisplayable(lonState.getLatLonLines());
+            }
         } catch (Exception exc) {
             logException("Initializing latlon lines", exc);
         }
@@ -1306,7 +1319,14 @@ public class MapDisplayControl extends DisplayControlImpl {
             }
             ignoreStateChange = false;
         }
+
+        public String toString() {
+            return "map state " + getVisible();
+        }
+
+
     }
+
 
     /**
      * This method can be overwritten by the derived classes that do not want the
