@@ -116,13 +116,21 @@ a.header  {
 }
 
 
-.sortlinkon  {
+.entrylistform {
   font-size: 10pt;
-  background-color : #ccc;
+	
+}
+
+.sortlinkon  {
+  background-color : #eee;
+  font-weight: bold;
+  padding-left:3px;
+  padding-right:3px;
 }
 
 .sortlinkoff  {
-  font-size: 10pt;
+  padding-left:3px;
+  padding-right:3px;
 }
 
 .sortlinkoff a {

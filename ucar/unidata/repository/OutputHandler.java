@@ -802,7 +802,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                          "fromdate","true",msg("Date") + HtmlUtil.img(getRepository().iconUrl(ICON_UPARROW)),"Sort by date ascending",
                          "fromdate","false",msg("Date")+ HtmlUtil.img(getRepository().iconUrl(ICON_DOWNARROW)),"Sort by date descending"};
                          
-        sb.append(HtmlUtil.span(msgLabel("Sort"),HtmlUtil.cssClass("sortlinkoff")));
+        sb.append(msgLabel("Sort"));
         for(int i=0;i<order.length;i+=4) {
             if(Misc.equals(order[i],oldOrderBy) &&
                Misc.equals(order[i+1],oldAscending)) {
@@ -810,10 +810,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             } else {
                 request.put(ARG_ORDERBY,order[i]);
                 request.put(ARG_ASCENDING,order[i+1]);
+                request.put(ARG_SHOWENTRYSELECTFORM,"true");
                 String url = request.getUrl();
                 sb.append(HtmlUtil.span(HtmlUtil.href(url,order[i+2]),HtmlUtil.title(order[i+3])+HtmlUtil.cssClass("sortlinkoff")));
             }
-            sb.append(HtmlUtil.space(2));
         }
 
         if(oldOrderBy!=null) {
@@ -839,6 +839,11 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      */
     public String[] getEntryFormStart(Request request, List entries, boolean hideIt)
             throws Exception {
+        if(hideIt) {
+            hideIt = !request.get(ARG_SHOWENTRYSELECTFORM,false);
+        }
+
+
         String       base   = "toggleentry" + (entryCnt++);
         String formId = "entryform_" + (HtmlUtil.blockCnt++);
         StringBuffer formSB = new StringBuffer();
@@ -865,26 +870,24 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
 
 
-
-
         StringBuffer selectSB = new StringBuffer();
-        selectSB.append(HtmlUtil.space(4));
         selectSB.append(msgLabel("View As"));
         selectSB.append(HtmlUtil.select(ARG_OUTPUT, tfos));
         selectSB.append(HtmlUtil.submit(msg("Selected"), "getselected"));
         selectSB.append(HtmlUtil.submit(msg("All"), "getall"));
-
         selectSB.append(getSortLinks(request));
 
 
         String arrowImg =
-            HtmlUtil.img(getRepository().iconUrl(ICON_RIGHTDART),
+            HtmlUtil.img(hideIt?getRepository().iconUrl(ICON_RIGHTDART):
+                         getRepository().iconUrl(ICON_DOWNDART),
                          msg("Show/Hide Form"), HtmlUtil.id(base + "img"));
         String link = HtmlUtil.space(2)
                       + HtmlUtil.jsLink(HtmlUtil.onMouseClick(base
                                                               + ".groupToggleVisibility()"), arrowImg);
         String selectId = base + "select";
         formSB.append(HtmlUtil.span(selectSB.toString(),
+                                    HtmlUtil.cssClass("entrylistform") +
                                     HtmlUtil.id(selectId)+
                                     (hideIt?HtmlUtil.style("display:none; visibility:hidden;"):"")));
         formSB.append(

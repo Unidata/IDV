@@ -287,6 +287,7 @@ public interface Constants {
     public static final String ARG_SELECTTYPE = "selecttype";
     public static final String ARG_SESSIONID = "sessionid";
     public static final String ARG_SHORT = "short";
+    public static final String ARG_SHOWENTRYSELECTFORM = "showentryselectform";
     public static final String ARG_SHOWLINK = "showlink";
     public static final String ARG_SHOWMETADATA = "showmetadata";
     public static final String ARG_SHOWYEAR = "showyear";

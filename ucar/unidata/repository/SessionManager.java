@@ -359,6 +359,7 @@ public class SessionManager extends RepositoryManager {
             }
 
             if (auth != null) {
+                System.err.println("got auth:" + auth);
                 auth = auth.trim();
                 //Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
                 if (auth.startsWith("Basic")) {
@@ -377,6 +378,8 @@ public class SessionManager extends RepositoryManager {
                             //                            throw new AccessException(
                             //                                msg("Incorrect password"),request);
                             user = null;
+                        } else {
+                            System.err.println("auth OK");
                         }
                     }
                     if(user!=null) {

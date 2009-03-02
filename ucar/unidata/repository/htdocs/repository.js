@@ -549,7 +549,9 @@ function EntryFormList(formId,img,selectId, initialOn) {
         this.entryRows[this.entryRows.length] = entryRow;
         if(!this.on) {
             hideObject(entryRow.cbx);
-        }
+        } else {
+        	showObject(entryRow.cbx,"inline");
+	}
     }
 
 
@@ -587,8 +589,9 @@ function EntryFormList(formId,img,selectId, initialOn) {
 
         if(!entryRow || !entryRow.cbx) return;
 
+
+        var value = entryRow.getCheckboxValue();
         if(event.ctrlKey) {
-            var value = entryRow.getCheckboxValue();
             for (i = 0; i < this.entryRows.length; i++) {
                 this.entryRows[i].setCheckbox(value);
             }
@@ -596,25 +599,24 @@ function EntryFormList(formId,img,selectId, initialOn) {
 
         if(event.shiftKey) {
             if(this.lastEntryRowClicked) {
-                var idx1 = indexOf(this.entryRows, this.lastEntryRowClicked);
-                var idx2 = indexOf(this.entryRows, entryRow);
-                var value = entryRow.getCheckboxValue();
-                if(idx1>idx2) {
-                    var tmp = idx1;
-                    idx1=idx2;
-                    idx2=tmp;
-                }
-
-                for(i=idx1;i<=idx2;i++) {
-                    this.entryRows[i].setCheckbox(value);
-                }
+                 var pos1 = util.getTop(this.lastEntryRowClicked.cbx);
+	         var pos2 = util.getTop(entryRow.cbx);
+		 if(pos1>pos2) {
+		    var tmp = pos1;
+		    pos1 =pos2;
+		    pos2=tmp;
+                 }
+		 for (i = 0; i < this.entryRows.length; i++) {
+        		var top = util.getTop(this.entryRows[i].cbx);
+			if(top>=pos1 && top<=pos2) {
+		            this.entryRows[i].setCheckbox(value);
+			}
+        	    }
             }
             return;
         }
         this.lastEntryRowClicked = entryRow;
     }
-
-
 
     this.setVisibility = function  () {
         if(this.toggleImg) {
@@ -793,16 +795,19 @@ function checkboxClicked(event, cbxPrefix, id) {
 
     if(event.shiftKey) {
         if(lastCbxClicked) {
-            var idx1 = indexOf(checkBoxes, lastCbxClicked);
-            var idx2 = indexOf(checkBoxes, cbx);
-            if(idx1>idx2) {
-                var tmp = idx1;
-                idx1=idx2;
-                idx2=tmp;
-            }
-
-            for(i=idx1;i<=idx2;i++) {
-                checkBoxes[i].checked = value;
+	    var pos1 = util.getTop(cbx);
+	    var pos2 = util.getTop(lastCbxClicked);
+	    if(pos1>pos2) {
+		var tmp = pos1;
+		pos1 =pos2;
+		pos2=tmp;
+	    }
+//            alert(pos1 + " " + pos2);
+	    for (i = 0; i < checkBoxes.length; i++) {
+		var top = util.getTop(checkboxes[i]);
+		if(top>=pos1 && top<=pos2) {
+	                checkBoxes[i].checked = value;
+		}
             }
         }
         return;
