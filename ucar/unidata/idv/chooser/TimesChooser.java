@@ -507,12 +507,6 @@ public class TimesChooser extends IdvChooser {
      * @param times List of thinggs to put into absolute times list
      */
     protected void setAbsoluteTimes(List times) {
-
-        //        while(times.size()>1) {times.remove(0);}
-
-
-
-
         List newAbsoluteTimes = makeDatedObjects(times);
         if (Misc.equals(absoluteTimes, newAbsoluteTimes)) {
             return;
@@ -526,7 +520,7 @@ public class TimesChooser extends IdvChooser {
             try {
                 timeline.setDatedThings(absoluteTimes, true);
                 Date endDate, startDate;
-                if (absoluteTimes.size() >0) {
+                if (absoluteTimes.size() >1) {
                     //Go back N times
                     endDate =
                         ((DatedThing) absoluteTimes.get(absoluteTimes.size()
@@ -534,7 +528,10 @@ public class TimesChooser extends IdvChooser {
                     int index = Math.max(0, absoluteTimes.size() - getNumTimesToSelect());
                     startDate =
                         ((DatedThing) absoluteTimes.get(index)).getDate();
-
+                } else   if (absoluteTimes.size() ==1) {
+                    DatedThing theDate = (DatedThing) absoluteTimes.get(0);
+                    endDate = new Date(theDate.getDate().getTime()+ DateUtil.daysToMillis(1));
+                    startDate = new Date(theDate.getDate().getTime()- DateUtil.daysToMillis(1));
                 } else {
                     startDate = new Date(System.currentTimeMillis()
                                          - DateUtil.daysToMillis(1));
@@ -559,7 +556,7 @@ public class TimesChooser extends IdvChooser {
                     startDate =
                         ((DatedThing) absoluteTimes.get(index)).getDate();
 
-                } else {
+                } else  if (absoluteTimes.size() != 1) {
                     startDate = new Date(System.currentTimeMillis()
                                          - DateUtil.daysToMillis(1));
                     endDate = new Date(System.currentTimeMillis());
