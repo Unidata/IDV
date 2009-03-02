@@ -41,6 +41,7 @@ import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.PasswordManager;
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.ResourceCollection;
 import ucar.unidata.util.StringUtil;
@@ -323,8 +324,12 @@ public class DataManager {
         // have to do this since nj2.2.20
         ucar.nc2.iosp.grib.GribServiceProvider.setIndexAlwaysInCache(true);
 
-        org.apache.commons.httpclient.auth.CredentialsProvider provider =
-            new IdvAuthenticator(dataContext.getIdv());
+        PasswordManager passwordManager = PasswordManager.getGlobalPasswordManager();
+        if(passwordManager==null) {
+            passwordManager =  new PasswordManager(dataContext.getIdv().getStore().getUserDirectory());
+            PasswordManager.setGlobalPasswordManager(passwordManager);
+        }
+        org.apache.commons.httpclient.auth.CredentialsProvider provider = passwordManager;
         //ucar.nc2.dataset.HttpClientManager.init(provider, "IDV");
         org.apache.commons.httpclient.HttpClient client =
             ucar.nc2.util.net.HttpClientManager.init(provider, "IDV");
