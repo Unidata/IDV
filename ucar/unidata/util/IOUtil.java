@@ -990,7 +990,34 @@ public class IOUtil {
         try {
             URL url = getURL(filename, origin);
             if (url != null) {
-                return url.openConnection().getInputStream();
+                URLConnection connection = url.openConnection();
+                connection.setAllowUserInteraction(true);
+                if(connection instanceof HttpURLConnection) {
+                    HttpURLConnection huc = (HttpURLConnection)connection;
+                    if(huc.getResponseCode()==401) {
+                        String 	auth = connection.getHeaderField("WWW-Authenticate"); 
+                        if(auth!=null) {
+                            PasswordManager passwordManager = PasswordManager.getGlobalPasswordManager();
+                            if(passwordManager!=null) {
+
+                                while(true) {
+                                    url = new URL(url.toString());
+                                    connection =  url.openConnection();
+                                    huc = (HttpURLConnection) connection;
+                                    String host  = url.getHost();
+                                    UserInfo userInfo = passwordManager.getUserNamePassword(host+":"+auth,"<html>The server: <i>" + host +"<i> requires a username/password</html>");
+                                    if(userInfo==null) break;
+                                    String authReturn = "Basic " + ucar.unidata.xml.XmlUtil.encodeBase64(new String(userInfo.getUserId()+":" + userInfo.getPassword()).getBytes());
+                                    huc.addRequestProperty("Authorization", authReturn);
+                                    if(huc.getResponseCode()!=401) {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return connection.getInputStream();
             }
         } catch (Exception exc) {
             throw new IOException("Could not load resource:" + filename
@@ -1943,7 +1970,23 @@ public class IOUtil {
      *
      * @throws Exception On badness
      */
-    public static void main(String[] args) throws Exception {}
+    public static void main(String[] args) throws Exception {
+
+        PasswordManager.setGlobalPasswordManager(new PasswordManager(new File(".")));
+
+        String url ="http://delllaptop:8080/repository/entry/show/Projects/PRIVATE?entryid=441dce70-b70c-4993-a514-f5b50d3234bf&output=thredds.catalog";
+        InputStream is = getInputStream(url, IOUtil.class);
+        if(is==null) {
+            is = getInputStream(url, IOUtil.class);
+        }
+        if(is==null) {
+            is = getInputStream(url, IOUtil.class);
+        }
+
+        if(is!=null) {
+            System.err.println (new String(readBytes(is)));
+        }
+    }
 
 
     /**
