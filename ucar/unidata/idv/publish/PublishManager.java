@@ -208,8 +208,8 @@ public class PublishManager extends IdvManager {
             boolean didone = false;
             for(IdvPublisher publisher: publishers) {
                 if(publisher.getLocal()) {
-                    deleteMenu.add(GuiUtils.makeMenuItem(publisher.getName(),this,"deletePublisher", publisher));
-                    configMenu.add(GuiUtils.makeMenuItem(publisher.getName(),this,"configurePublisher", publisher));
+                    deleteMenu.add(GuiUtils.makeMenuItem(publisher.toString(),this,"deletePublisher", publisher));
+                    configMenu.add(GuiUtils.makeMenuItem(publisher.toString(),this,"configurePublisher", publisher));
                     didone = true;
                 }
                 //                publisher.initMenu(menu);
