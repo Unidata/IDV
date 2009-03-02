@@ -4222,7 +4222,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 }
                 master.destroy();
             } catch (Throwable exp) {
-                logException("Destroying the View Manager", exp);
+                //Ignore  any errors when we destroy the DisplayMaster
+                Throwable wrappedExc = LogUtil.getInnerException(exp);
+                LogUtil.consoleMessage("Had an error destroying the DisplayMaster:" + wrappedExc);
+                //logException("Destroying the View Manager", exp);
             } finally {}
             master = null;
         }
