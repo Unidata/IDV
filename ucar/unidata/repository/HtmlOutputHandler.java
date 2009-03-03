@@ -825,7 +825,7 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         if (cnt==0) {
-            sb.append(HtmlUtil.tag(HtmlUtil.TAG_I,msg("No entries in this group")));
+            sb.append(HtmlUtil.tag(HtmlUtil.TAG_I,"",msg("No entries in this group")));
             if (getAccessManager().hasPermissionSet(parent,
                     Permission.ACTION_VIEWCHILDREN)) {
                 if ( !getAccessManager().canDoAction(request, parent,

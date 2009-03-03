@@ -805,9 +805,15 @@ code.menu {
    color:#000000;
 }
 
-a:hover .entrymenulink {
-	color:#ff0000;
+
+.entrymenulink a {
+   text-decoration: none;
 }
+
+ .entrymenulink a:hover {
+   color:#000000;
+}
+
 
 .entrymenubar a:hover {
    text-decoration: underline;

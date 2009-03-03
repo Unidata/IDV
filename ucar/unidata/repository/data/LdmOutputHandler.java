@@ -173,17 +173,27 @@ public class LdmOutputHandler extends OutputHandler {
     private Result handleEntries(Request request, Entry parent, List<Entry> entries) throws Exception {
         StringBuffer sb  = new StringBuffer();
         List<Entry> fileEntries = new ArrayList<Entry>();
+        List<String> ids = new ArrayList<String>();
         for(Entry entry: entries) {
-            if(entry.isFile()) fileEntries.add(entry);
+            if(entry.isFile()) {
+                fileEntries.add(entry);
+                ids.add(entry.getId());
+            }
         }
 
         String feed = request.getString(PROP_LDM_FEED,lastFeed);
         String productId = request.getString(PROP_LDM_PRODUCTID,lastProductId);
         if(!request.defined(PROP_LDM_FEED)) {
-            String formUrl = request.url(getRepository().URL_ENTRY_SHOW);
-
-            sb.append(HtmlUtil.form(formUrl));
-            sb.append(HtmlUtil.hidden(ARG_ENTRYID,parent.getId()));
+            String formUrl;
+            if (parent.isGroup() && parent.isDummy()) {
+                formUrl  = request.url(getRepository().URL_ENTRY_GETENTRIES);
+                sb.append(HtmlUtil.form(formUrl));
+                sb.append(HtmlUtil.hidden(ARG_ENTRYIDS,StringUtil.join(",",ids)));
+            } else {
+                formUrl  = request.url(getRepository().URL_ENTRY_SHOW);
+                sb.append(HtmlUtil.form(formUrl));
+                sb.append(HtmlUtil.hidden(ARG_ENTRYID,parent.getId()));
+            }
             sb.append(HtmlUtil.hidden(ARG_OUTPUT,OUTPUT_LDM.getId()));
             sb.append(HtmlUtil.formTable());
 

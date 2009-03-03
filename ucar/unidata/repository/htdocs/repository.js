@@ -66,6 +66,7 @@ function Util () {
 
 
 
+
     this.getKeyChar = function(event) {
         event = util.getEvent(event);
         if(event.keyCode) {
@@ -85,7 +86,7 @@ function Util () {
             return;
         }
         if(clear) {
-            obj.obj.innerHTML  ="";
+	     obj.obj.innerHTML  ="";
         }
         obj.obj.innerHTML  =obj.obj.innerHTML+"<br>" +s;
     }
@@ -402,7 +403,7 @@ function Tooltip () {
     var state = STATE_INIT;
     var currentID;
     var hideDelay = 1000;
-    var showDelay = 500;
+    var showDelay = 1000;
 
     this.debug = function(msg) {
         util.print(msg);
@@ -1092,13 +1093,8 @@ function hideObject(obj) {
         return 0;
     }
 
-    var style = obj.style;
+    var style = util.getStyle(obj);
     if(!style) {
-        style = util.getStyle(obj);
-    }
-    if(!style) {
-        //        alert("no style " + obj);
-
         return 0;
     }
 
@@ -1129,14 +1125,13 @@ function showObject(obj, display) {
     if(!obj) return 0;
     if(!display) display = "block";
 
-    var style = obj.style;
+    var style = util.getStyle(obj);
     if(!style) {
-        style = util.getStyle(obj);
-    }
-    if(!style) {
+        alert("no style");
         return 0;
     }
   
+
     style.visibility = "visible";
     style.display = display;
     return 1;

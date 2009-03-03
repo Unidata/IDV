@@ -816,12 +816,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             }
         }
 
-        if(oldOrderBy!=null) {
-            request.put(ARG_ORDERBY,oldOrderBy);
-        }
-        if(oldAscending!=null) {
-            request.put(ARG_ASCENDING,oldAscending);
-        }
+        request.put(ARG_ORDERBY,oldOrderBy);
+        request.put(ARG_ASCENDING,oldAscending);
         return sb.toString();
 
     }
