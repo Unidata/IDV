@@ -168,6 +168,7 @@ public class PasswordManager implements CredentialsProvider {
             serverLabel.setText(label);
             ok = false;
             dialog.pack();
+            nameFld.requestFocus();
             dialog.setVisible(true);
             if ( !ok) {
                 return null;
@@ -255,12 +256,15 @@ public class PasswordManager implements CredentialsProvider {
         passwdFld = new JPasswordField("", 10);
         saveCbx   = new JCheckBox("Save Password");
         JButton okBtn = new JButton("OK");
-        okBtn.addActionListener(new ActionListener() {
+        ActionListener okListener = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 ok = true;
                 dialog.dispose();
             }
-        });
+            };
+        nameFld.addActionListener(okListener);
+        passwdFld.addActionListener(okListener);
+        okBtn.addActionListener(okListener);
         JButton cancelBtn = new JButton("Cancel");
         cancelBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -287,7 +291,6 @@ public class PasswordManager implements CredentialsProvider {
         dialog.getContentPane().add(GuiUtils.inset(contents, 5));
         dialog.pack();
         dialog.setLocation(200, 200);
-
     }
 
 
