@@ -816,6 +816,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             }
         }
 
+        request.remove(ARG_SHOWENTRYSELECTFORM);
         request.put(ARG_ORDERBY,oldOrderBy);
         request.put(ARG_ASCENDING,oldAscending);
         return sb.toString();
