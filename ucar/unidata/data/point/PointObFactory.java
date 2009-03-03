@@ -1362,9 +1362,9 @@ public class PointObFactory {
         } else if (fc instanceof NestedPointFeatureCollection) {
             collection = ((NestedPointFeatureCollection)fc).flatten(null, null);
         }
-        System.out.println("number of obs = " + collection.size());
+        //System.out.println("number of obs = " + collection.size());
         if (llr != null) {
-            //System.out.println("subsetting to: " + llr);
+            log_.debug("subsetting to: " + llr);
             collection = collection.subset(llr, null);
             //System.out.println("new number of obs = " + collection.size());
         }
