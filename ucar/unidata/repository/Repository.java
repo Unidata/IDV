@@ -210,11 +210,19 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private Properties properties = new Properties();
 
+    private Properties cmdLineProperties = new Properties();
+
     /** _more_ */
     private Map<String, String> systemEnv;
 
     /** _more_ */
     private Properties dbProperties = new Properties();
+
+
+
+    /** _more_ */
+    private Properties phraseMap;
+
 
 
     /** _more_ */
@@ -235,8 +243,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private List<TwoFacedObject> languages = new ArrayList<TwoFacedObject>();
 
 
-    /** _more_ */
-    private Properties phraseMap;
 
 
     /** _more_ */
@@ -363,6 +369,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_          */
     private List<LogEntry> log = new ArrayList<LogEntry>();
+
+
+
+
 
 
     /**
@@ -553,13 +563,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 "/ucar/unidata/repository/resources/repository.properties",
                 getClass()));
 
-        Properties argProperties = new Properties();
         for (int i = 0; i < args.length; i++) {
             if (checkFile(args[i])) {
                 continue;
             }
             if (args[i].endsWith(".properties")) {
-                argProperties.load(IOUtil.getInputStream(args[i],
+                cmdLineProperties.load(IOUtil.getInputStream(args[i],
                         getClass()));
             } else if (args[i].equals("-dump")) {
                 dumpFile = args[i + 1];
@@ -582,9 +591,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     throw new IllegalArgumentException("Bad argument:"
                             + args[i]);
                 } else if (toks.size() == 1) {
-                    argProperties.put(toks.get(0), "");
+                    cmdLineProperties.put(toks.get(0), "");
                 } else {
-                    argProperties.put(toks.get(0), toks.get(1));
+                    cmdLineProperties.put(toks.get(0), toks.get(1));
                 }
             } else {
                 usage("Unknown argument: " + args[i]);
@@ -596,8 +605,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (contextProperties != null) {
             properties.putAll(contextProperties);
         }
-        properties.putAll(argProperties);
-
 
 
         //Call the storage manager so it can figure out the home dir
@@ -611,8 +618,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             properties.load(IOUtil.getInputStream(localPropertyFile,
                     getClass()));
         } catch (Exception exc) {}
-        //Now put back any of the cmd line arg properties because they have precedence
-        properties.putAll(argProperties);
+
 
         initPlugins();
 
@@ -663,6 +669,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
             StringUtil.split(
                 getProperty("ramadda.html.htdocroots", BLANK), ";", true,
                 true));
+
+
+
+
 
     }
 
@@ -1091,7 +1101,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     private Object[] parsePhrases(String content) {
         List<String> lines      = StringUtil.split(content, "\n", true, true);
-        Properties   properties = new Properties();
+        Properties   phrases = new Properties();
         String       type       = null;
         String       name       = null;
         for (String line : lines) {
@@ -1109,10 +1119,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
             } else if (key.equals("language.name")) {
                 name = value;
             } else {
-                properties.put(key, value);
+                phrases.put(key, value);
             }
         }
-        return new Object[] { type, name, properties };
+        return new Object[] { type, name, phrases };
     }
 
 
@@ -1283,7 +1293,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
         while (results.next()) {
             String name  = results.getString(1);
             String value = results.getString(2);
-            properties.put(name, value);
             dbProperties.put(name, value);
         }
         statement.close();
@@ -1434,6 +1443,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     ArrayList<ApiMethod> apiMethods = new ArrayList();
+    ArrayList<ApiMethod> wildCardApiMethods = new ArrayList();
 
     /** _more_ */
     ArrayList<ApiMethod> topLevelMethods = new ArrayList();
@@ -1443,7 +1453,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             initializedUrls.add(requestUrl);
             Request request = new Request(this,null, getUrlBase()+requestUrl.getPath());
             super.initRequestUrl(requestUrl);
-            ApiMethod apiMethod = findMethod(request);
+            ApiMethod apiMethod = findApiMethod(request);
             if(apiMethod==null) {
                 System.err.println("Could not find api for: " + requestUrl.getPath());
                 return;
@@ -1494,6 +1504,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                                         false);
         boolean checkAuthMethod = XmlUtil.getAttributeFromTree(node, ApiMethod.ATTR_CHECKAUTHMETHOD,
                                                                false);
+
+        String authMethod = XmlUtil.getAttributeFromTree(node, ApiMethod.ATTR_AUTHMETHOD,
+                                                         "");
 
         boolean admin = XmlUtil.getAttributeFromTree(node, ApiMethod.ATTR_ADMIN,
                                              Misc.getProperty(props,
@@ -1571,7 +1584,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         ApiMethod apiMethod =
             new ApiMethod(this, handler, request,
                           XmlUtil.getAttribute(node, ApiMethod.ATTR_NAME,
-                              request), method, admin,needsSsl,checkAuthMethod, canCache,
+                              request), method, admin,needsSsl,authMethod,checkAuthMethod, canCache,
                                         XmlUtil.getAttribute(node,
                                             ApiMethod.ATTR_TOPLEVEL, false));
         List actions = StringUtil.split(XmlUtil.getAttribute(node,
@@ -1589,8 +1602,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
             int index = apiMethods.indexOf(oldMethod);
             apiMethods.remove(index);
             apiMethods.add(index, apiMethod);
+            if(apiMethod.isWildcard()) {
+                index = wildCardApiMethods.indexOf(oldMethod);
+                wildCardApiMethods.remove(index);
+                wildCardApiMethods.add(index,apiMethod);
+            }
         } else {
             apiMethods.add(apiMethod);
+            if(apiMethod.isWildcard()) {
+                wildCardApiMethods.add(apiMethod);
+            }
         }
     }
 
@@ -1917,6 +1938,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         request.setCheckingAuthMethod(true);
                         Result authResult = (Result) apiMethod.invoke(request);
                         authMethod = authResult.getAuthorizationMethod();
+                    } else {
+                        authMethod = AuthorizationMethod.getMethod(apiMethod.getAuthMethod());
                     }
                 }
                 if(authMethod.equals(AuthorizationMethod.AUTH_HTML)) {
@@ -2014,7 +2037,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected ApiMethod findMethod(Request request) throws Exception {
+    protected ApiMethod findApiMethod(Request request) throws Exception {
         String incoming = request.getRequestPath().trim();
         if (incoming.endsWith("/")) {
             incoming = incoming.substring(0, incoming.length() - 1);
@@ -2029,39 +2052,33 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
 
+        /*
         List<Group> topGroups =
             new ArrayList<Group>(getEntryManager().getTopGroups(request));
         topGroups.add(getEntryManager().getTopGroup());
-        //        System.err.println ("incoming:" + incoming);
         for (Group group : topGroups) {
             String name = "/" + getEntryManager().getPathFromEntry(group);
-            //            System.err.println ("\t" + name);
             if (incoming.startsWith(name + "/")) {
-                //                request.setCollectionEntry(group);
                 incoming = incoming.substring(name.length());
                 break;
             }
         }
-
-
+        */
 
         ApiMethod apiMethod = (ApiMethod) requestMap.get(incoming);
         if (apiMethod == null) {
-            for (ApiMethod tmp : apiMethods) {
+            for (ApiMethod tmp : wildCardApiMethods) {
                 String path = tmp.getRequest();
-                if (path.endsWith("/*")) {
-                    path = path.substring(0, path.length() - 2);
-                    if (incoming.startsWith(path)) {
-                        apiMethod = tmp;
-                        break;
-                    }
+                path = path.substring(0, path.length() - 2);
+                if (incoming.startsWith(path)) {
+                    apiMethod = tmp;
+                    break;
                 }
             }
         }
         if ((apiMethod == null) && incoming.equals(urlBase)) {
             apiMethod = homeApi;
         }
-
         return apiMethod;
     }
 
@@ -2075,24 +2092,27 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     protected Result getResult(Request request) throws Exception {
-        ApiMethod apiMethod = findMethod(request);
-        //        System.err.println("Request:" + request);
+        boolean sslEnabled =  isSSLEnabled(request);
+        if(sslEnabled) {
+            if(getProperty(PROP_ACCESS_ALLSSL,false) && !request.getSecure()) {
+                System.err.println ("forced redirect to ssl: "+ httpsUrl(request.getUrl()));
+                return new Result(httpsUrl(request.getUrl()));
+            }
+        }
+
+        ApiMethod apiMethod = findApiMethod(request);
         if (apiMethod == null) {
-            //            System.err.println("no api method");
             return getHtdocsFile(request);
         }
 
-        if(isSSLEnabled(request)) {
+        if(sslEnabled) {
             if(apiMethod.getNeedsSsl() && !request.getSecure()) {
                 System.err.println ("Redirecting to ssl: "+ httpsUrl(request.getUrl()));
                 return new Result(httpsUrl(request.getUrl()));
             } else if(!apiMethod.getNeedsSsl() && request.getSecure()) {
                 System.err.println ("Redirecting to no ssl "+absoluteUrl(request.getUrl()));
-                //                System.err.println ("    request:" +request.getUrl());
-                //System.err.println ("    full:" +absoluteUrl(request.getUrl()));
                 return new Result(absoluteUrl(request.getUrl()));
             }
-
         }
 
         request.setApiMethod(apiMethod);
@@ -2254,118 +2274,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
-    /**
-     * Class HtmlTemplate _more_
-     *
-     *
-     * @author IDV Development Team
-     */
-    public class HtmlTemplate {
-
-        /** _more_          */
-        private String name;
-
-        /** _more_          */
-        private String id;
-
-        /** _more_          */
-        private String template;
-
-        /** _more_          */
-        private String path;
-
-        /** _more_          */
-        private Hashtable properties = new Hashtable();
-
-
-        /**
-         * _more_
-         *
-         * @param path _more_
-         * @param t _more_
-         */
-        public HtmlTemplate(String path, String t) {
-            try {
-                this.path = path;
-                Pattern pattern =
-                    Pattern.compile(
-                        "(?s)(.*)<properties>(.*)</properties>(.*)");
-                Matcher matcher = pattern.matcher(t);
-                if (matcher.find()) {
-                    template = matcher.group(1) + matcher.group(3);
-                    Properties p = new Properties();
-                    p.load(new ByteArrayInputStream(
-                        matcher.group(2).getBytes()));
-                    properties.putAll(p);
-                    //                System.err.println ("got props " + properties);
-                } else {
-                    template = t;
-                }
-                name = (String) properties.get("name");
-                id   = (String) properties.get("id");
-                if (name == null) {
-                    name = IOUtil.stripExtension(IOUtil.getFileTail(path));
-                }
-                if (id == null) {
-                    id = IOUtil.stripExtension(IOUtil.getFileTail(path));
-                }
-            } catch (Exception exc) {
-                System.err.println("Error processing template: " + path);
-                exc.printStackTrace();
-                this.template = t;
-            }
-
-        }
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public String toString() {
-            return name;
-        }
-
-        /**
-         * _more_
-         *
-         * @param request _more_
-         *
-         * @return _more_
-         */
-        public boolean isTemplateFor(Request request) {
-            if (request.getUser() == null) {
-                return false;
-            }
-            String templateId = request.getUser().getTemplate();
-            if (templateId == null) {
-                return false;
-            }
-            if (Misc.equals(id, templateId)) {
-                return true;
-            }
-            return false;
-        }
-
-        /**
-         * _more_
-         *
-         * @param name _more_
-         * @param dflt _more_
-         *
-         * @return _more_
-         */
-        public String getTemplateProperty(String name, String dflt) {
-            String value = (String) properties.get(name);
-            if (value != null) {
-                return value;
-            }
-            return getProperty(name, dflt);
-
-        }
-
-    }
-
 
 
 
@@ -2409,7 +2317,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
         if (template == null) {
-            template = getTemplate(request).template;
+            template = getTemplate(request).getTemplate();
             //            template = getResource(PROP_HTML_TEMPLATE);
         }
 
@@ -2672,7 +2580,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 path = getStorageManager().localizePath(path);
                 try {
                     String resource = IOUtil.readContents(path, getClass());
-                    HtmlTemplate template = new HtmlTemplate(path, resource);
+                    HtmlTemplate template = new HtmlTemplate(this,path, resource);
                     theTemplates.add(template);
                 } catch (Exception exc) {
                     //noop
@@ -2696,7 +2604,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public List<TwoFacedObject> getTemplateSelectList() {
         List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
         for (HtmlTemplate template : getTemplates()) {
-            tfos.add(new TwoFacedObject(template.name, template.id));
+            tfos.add(new TwoFacedObject(template.getName(), template.getId()));
         }
         return tfos;
 
@@ -2759,7 +2667,19 @@ public class Repository extends RepositoryBase implements RequestHandler {
             } catch (Exception exc) {}
         }
 
-        //Look at the repository.properties first
+        //Look at the command line properties first
+        if (prop == null) {
+            prop = (String)cmdLineProperties.get(name);
+        }
+
+
+        //Then the  database properties  first
+        if (prop == null) {
+            prop = (String) dbProperties.get(name);
+        }
+
+
+        //then the  repository.properties first
         if (prop == null) {
             prop = (String) properties.get(name);
         }
@@ -2791,7 +2711,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (prop != null) {
             return prop;
         }
-        return Misc.getProperty(properties, name, dflt);
+        return dflt;
     }
 
 
@@ -2810,7 +2730,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (prop != null) {
             return new Boolean(prop).booleanValue();
         }
-        return Misc.getProperty(properties, name, dflt);
+        return dflt;
     }
 
 
@@ -2827,7 +2747,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (prop != null) {
             return new Integer(prop).intValue();
         }
-        return Misc.getProperty(properties, name, dflt);
+        return dflt;
     }
 
     public double getProperty(String name, double dflt) {
@@ -2835,7 +2755,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (prop != null) {
             return new Double(prop).doubleValue();
         }
-        return Misc.getProperty(properties, name, dflt);
+        return dflt;
     }
 
 
@@ -2948,7 +2868,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                            new Object[] { name,
                 value });
         dbProperties.put(name, value);
-        properties.put(name, value);
         phraseMap = null;
     }
 

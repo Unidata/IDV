@@ -377,6 +377,7 @@ public interface Constants {
 
     public static final String PROP_ACCESS_ADMINONLY =        "ramadda.access.adminonly";
     public static final String PROP_ACCESS_REQUIRELOGIN =        "ramadda.access.requirelogin";
+    public static final String PROP_ACCESS_ALLSSL =        "ramadda.access.allssl";
     public static final String PROP_ADMIN = "ramadda.admin";
     public static final String PROP_ADMIN_EMAIL = "ramadda.admin.email";
     public static final String PROP_ADMIN_PHRASES = "ramadda.admin.phrases";

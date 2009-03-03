@@ -153,6 +153,7 @@ util = new Util();
 
 
 
+var blockCnt=0;
 function DomObject(name) {
     this.obj = null;
     // DOM level 1 browsers: IE 5+, NN 6+
@@ -172,6 +173,13 @@ function DomObject(name) {
         this.obj = document.layers[name];
         this.style = document.layers[name];
     }
+   if(this.obj) {
+      this.id = this.obj.id;
+      if(!this.id) {
+	this.id = "obj"+ (blockCnt++);
+      }
+   } 
+   
 }
 
 
@@ -730,10 +738,12 @@ function EntryRow (rowId, cbxId,cbxWrapperId) {
 
     this.mouseOver = function() {
         this.row.style.backgroundColor = this.overColor;
+        //        this.row.style.borderBottom =  "1px #888  solid";
     }
 
     this.mouseOut = function() {
         this.setRowColor();
+        //        this.row.style.borderBottom =  "1px #fff  solid";
     }
 }
 
@@ -896,14 +906,22 @@ function  handleFolderList(request, uid) {
                 html = getChildText(childNode);
             }  else {
             }
-
 	}
 
         if(!html) {
             html = getChildText(xmlDoc);
         }
+        var doScroll = 0;
 	if(html) {
+	    if(doScroll) {
+                block.style.maxHeight=0;
+                block.style.border = "1px #efefef  solid";
+                block.style.overflowY="hidden";
+            }
             block.obj.innerHTML = html;
+	    if(doScroll) {
+                setTimeout("scrollObject('" + block.id +"',25,1)",1);
+            }
 	}
 	if(script) {
             eval(script);
@@ -918,6 +936,20 @@ function  handleFolderList(request, uid) {
         }
     }
 
+}
+
+function scrollObject(id,cnt,lastHeight) {
+    var block = util.getDomObject(id);
+    cnt--;
+    if(cnt>0) {
+          block.style.maxHeight=parseInt(block.style.maxHeight)+20;
+          if(lastHeight!= block.obj.clientHeight) {
+              setTimeout("scrollObject('" + block.id +"',"+cnt+","+(block.obj.clientHeight)+")",100);
+              return;
+          }
+    } 
+    block.style.border = "none";
+    block.style.maxHeight=1000;
 }
 
 

@@ -224,10 +224,14 @@ public class AccessManager extends RepositoryManager {
 
 
 
+    Hashtable recentPermissions = new Hashtable();
+
+
 
     public boolean canDoAction(Request request, Entry entry, String action)
             throws Exception {
         if(entry == null) return false;
+
         if (entry.getIsLocalFile()) {
             if (action.equals(Permission.ACTION_NEW)) {
                 return false;
@@ -237,6 +241,7 @@ public class AccessManager extends RepositoryManager {
             }
         }
 
+
         String requestIp = null;
         User   user      = null;
         if (request == null) {
@@ -245,22 +250,48 @@ public class AccessManager extends RepositoryManager {
             user      = request.getUser();
             requestIp = request.getIp();
         }
-        //        System.err.println ("cando:" + user + " " + user.getAdmin());
-        //The admin can do anything
+
+
         if (user == null) {
             return false;
         }
 
+        
+        //The admin can do anything
         if (user.getAdmin()) {
             return true;
         }
 
+        //If user is owner then they can do anything
         if ( !user.getAnonymous() && Misc.equals(user, entry.getUser())) {
             return true;
         }
 
+        
+        String key = "a:" + action+"_u:" + user.getId()+"_e:" + entry.getId();
+        Object[]pastResult = (Object[]) recentPermissions.get(key);
+        Date now = new Date();
+        if(pastResult!=null) {
+            Date then = (Date) pastResult[0];
+            Boolean ok = (Boolean) pastResult[1];
+            //If we have checked this in the last 60 seconds then return the result
+            if(now.getTime()-then.getTime()<60000) {
+                return ok.booleanValue();
+            } else {
+                recentPermissions.remove(key);
+            }
+        }
+        
+        boolean result = canDoActionInner(request, entry, action,user, requestIp);
+        if (recentPermissions.size() > 10000) {
+            recentPermissions = new Hashtable();
+        }
+        recentPermissions.put(key, new Object[]{now,new Boolean(result)});
+        return result;
+    }
 
-        //        System.err.println ("can do: " + action);
+    private boolean canDoActionInner(Request request, Entry entry, String action, User user, String requestIp)
+        throws Exception {
         while (entry != null) {
             List permissions = getPermissions(entry);
             List roles       = getRoles(entry, action);
@@ -299,8 +330,6 @@ public class AccessManager extends RepositoryManager {
 
 
 
-    /** _more_ */
-    Hashtable seen = new Hashtable();
 
     /**
      * _more_

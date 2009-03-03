@@ -802,13 +802,15 @@ public class Admin extends RepositoryManager {
                                                      HtmlUtil.SIZE_5)));
 
 
+        String allSslCbx = HtmlUtil.space(3) +HtmlUtil.checkbox(PROP_ACCESS_ALLSSL,"true",getProperty(PROP_ACCESS_ALLSSL,false)) +" " +
+            msg("Force all connections to be secure");
         asb.append(HtmlUtil
             .formEntry(msgLabel("SSL Port"), HtmlUtil
                 .input(PROP_SSL_PORT, getProperty(PROP_SSL_PORT, ""), HtmlUtil
                     .SIZE_5) + HtmlUtil.space(1)
                              + msg("Port number for SSL access.")
                              + HtmlUtil.space(1)
-                             + msg("Enter 'default' for default SSL port.")));
+                       + allSslCbx));
 
 
         asb.append(HtmlUtil.colspan("Site Access", 2));
@@ -1111,6 +1113,9 @@ public class Admin extends RepositoryManager {
         getRepository().writeGlobal(PROP_SSL_PORT,
                                     newSsl = request.getString(PROP_SSL_PORT,
                                         getProperty(PROP_SSL_PORT, "")));
+
+        getRepository().writeGlobal(PROP_ACCESS_ALLSSL,
+                                    ""+request.get(PROP_ACCESS_ALLSSL,false));
 
 
         if(!oldSsl.equals(newSsl)) {

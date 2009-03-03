@@ -48,6 +48,7 @@ public class ApiMethod {
     public static final String ATTR_REQUEST = "request";
     public static final String ATTR_NEEDS_SSL = "needs_ssl";
     public static final String ATTR_CHECKAUTHMETHOD = "checkauthmethod";
+    public static final String ATTR_AUTHMETHOD = "authmethod";
 
     /** _more_ */
     public static final String ATTR_HANDLER = "handler";
@@ -110,6 +111,7 @@ public class ApiMethod {
     
     private boolean needsSsl = false;
     private boolean checkAuthMethod = false;
+    private String authMethod;
 
 
     /**
@@ -128,7 +130,7 @@ public class ApiMethod {
      */
     public ApiMethod(Repository repository, RequestHandler requestHandler,
                      String request, String name, Method method,
-                     boolean mustBeAdmin, boolean needsSsl, boolean checkAuthMethod, boolean canCache,
+                     boolean mustBeAdmin, boolean needsSsl, String authMethod,boolean checkAuthMethod, boolean canCache,
                      boolean isTopLevel) {
         this.repository     = repository;
         this.requestHandler = requestHandler;
@@ -136,10 +138,17 @@ public class ApiMethod {
         this.name           = name;
         this.mustBeAdmin    = mustBeAdmin;
         this.needsSsl       = needsSsl;
+        this.authMethod     = authMethod;
         this.checkAuthMethod     = checkAuthMethod;
+        
         this.method         = method;
         this.canCache       = canCache;
         this.isTopLevel     = isTopLevel;
+    }
+
+
+    public boolean isWildcard() {
+        return request.endsWith("/*");
     }
 
 
@@ -374,6 +383,24 @@ Get the CheckAuthMethod property.
 **/
 public boolean getCheckAuthMethod () {
 	return this.checkAuthMethod;
+}
+
+/**
+Set the AuthMethod property.
+
+@param value The new value for AuthMethod
+**/
+public void setAuthMethod (String value) {
+	this.authMethod = value;
+}
+
+/**
+Get the AuthMethod property.
+
+@return The AuthMethod
+**/
+public String getAuthMethod () {
+	return this.authMethod;
 }
 
 

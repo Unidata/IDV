@@ -137,8 +137,20 @@ public class UserManager extends RepositoryManager {
      */
     public static String hashPassword(String password) {
         try {
+            //            MessageDigest md = MessageDigest.getInstance("SHA");
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
+            md.update(password.getBytes("UTF-8"));
+            return XmlUtil.encodeBase64(md.digest()).trim();
+        } catch (NoSuchAlgorithmException nsae) {
+            throw new IllegalStateException(nsae.getMessage());
+        } catch (UnsupportedEncodingException uee) {
+            throw new IllegalStateException(uee.getMessage());
+        }
+    }
+
+    public static String hashPasswordOld(String password) {
+        try {
             MessageDigest md = MessageDigest.getInstance("SHA");
-            //            MessageDigest md = MessageDigest.getInstance("SHA-512");
             md.update(password.getBytes("UTF-8"));
             return XmlUtil.encodeBase64(md.digest()).trim();
         } catch (NoSuchAlgorithmException nsae) {
@@ -1626,6 +1638,10 @@ public class UserManager extends RepositoryManager {
         }
 
 
+        if (cnt == 0) {
+            sb.append("You have no favorite entries defined.<br>When you see an  entry or group just click on the " +
+                      HtmlUtil.img(iconUrl(ICON_FAVORITE))+" icon to add it to your list of favorites");
+        }
         return makeResult(request, "User Home", sb);
     }
 
@@ -1944,17 +1960,40 @@ public class UserManager extends RepositoryManager {
             if(name.equals(USER_DEFAULT)||name.equals(USER_ANONYMOUS)) name="";
             String password = request.getString(ARG_USER_PASSWORD, "").trim();
             if(name.length()>0 && password.length()>0) {
-                password = hashPassword(password);
+                String hashedPassword = hashPassword(password);
                 Statement stmt = getDatabaseManager().select(
                                                              Tables.USERS.COLUMNS, Tables.USERS.NAME,
                                                              Clause.and(
                                                                         Clause.eq(Tables.USERS.COL_ID, name),
                                                                         Clause.eq(
                                                                                   Tables.USERS.COL_PASSWORD,
-                                                                                  password)));
+                                                                                  hashedPassword)));
 
                 ResultSet results = stmt.getResultSet();
-                if (results.next()) {
+                if (!results.next()) {
+                    //We changed the password hash function to a new one so
+                    //check if the DB has the old hashed password
+                    //If it does then insert the new one
+                    String oldHashedPassword = hashPasswordOld(password);
+                    Statement stmt2 = getDatabaseManager().select(
+                                                                  Tables.USERS.COLUMNS, Tables.USERS.NAME,
+                                                             Clause.and(
+                                                                        Clause.eq(Tables.USERS.COL_ID, name),
+                                                                        Clause.eq(
+                                                                                  Tables.USERS.COL_PASSWORD,
+                                                                                  oldHashedPassword)));
+
+
+                    ResultSet results2 = stmt2.getResultSet();
+                    if (results2.next()) {
+                        user = getUser(results2);
+                        getDatabaseManager().update(Tables.USERS.NAME,
+                                                    Tables.USERS.COL_ID, user.getId(),
+                                                    new String[] {Tables.USERS.COL_PASSWORD}, 
+                                                    new Object[] {hashedPassword});
+                    }
+                    stmt2.close();
+                }  else {
                     user = getUser(results);
                 }
                 stmt.close();
@@ -2011,7 +2050,7 @@ public class UserManager extends RepositoryManager {
                         password = results.getString(1);
                         if(password == null || password.length()==0) {
                             sb.append(
-                                      getRepository().warning(msg("You are required to reset your password")));
+                                      getRepository().note(msg("Sorry, we were doing some cleanup and have reset your password")));
 
                             addPasswordResetForm(request, sb, name);
                             stmt.close();

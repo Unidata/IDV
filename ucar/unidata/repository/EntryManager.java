@@ -1688,6 +1688,12 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryGet(Request request) throws Exception {
+        if(request.getCheckingAuthMethod()) {
+            return new Result(AuthorizationMethod.AUTH_HTTP);
+        }
+
+
+
         String entryId = (String) request.getId((String) null);
 
         if (entryId == null) {
@@ -1735,6 +1741,7 @@ return new Result(title, sb);
             InputStream inputStream =
                 IOUtil.getInputStream(entry.getResource().getPath(),
                                       getClass());
+            
             Result result =new Result(BLANK, inputStream, mimeType);
             result.setCacheOk(true);
             return result;

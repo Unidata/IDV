@@ -47,6 +47,12 @@ public  class AuthorizationMethod {
     }
 
 
+    public static AuthorizationMethod getMethod(String method) {
+        if(method.equals(TYPE_HTTPAUTH)) 
+            return AUTH_HTTP;
+        return AUTH_HTML;
+    }
+
     public boolean equals(Object o) {
         if(!(o instanceof AuthorizationMethod)) return false;
         AuthorizationMethod that = (AuthorizationMethod) o;

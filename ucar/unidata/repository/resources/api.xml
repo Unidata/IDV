@@ -10,15 +10,15 @@
   </group>
 
   <group handler="entrymanager">
-      <api request="/entry/show"             method="processEntryShow"    name="${topgroup}" toplevel="true" ishome="true"/>
-      <api request="/entry/show/*"           method="processEntryShow" checkauthmethod="true"/>
+      <api request="/entry/show"             method="processEntryShow"       name="${topgroup}" toplevel="true" ishome="true"/>
+      <api request="/entry/show/*"           method="processEntryShow"       checkauthmethod="true"/>
       <api request="/entry/form"             method="processEntryForm"       actions="edit"/>
       <api request="/entry/change"           method="processEntryChange"     actions="edit"/>
       <api request="/entry/delete"           method="processEntryDelete"     actions="edit"/>
       <api request="/entry/deletelist"       method="processEntryListDelete" actions="edit"/>
       <api request="/entry/new"              method="processEntryNew"        actions="new"/>
-      <api request="/entry/upload"           method="processEntryUpload"        actions="upload"/>
-      <api request="/entry/get/*"            method="processEntryGet"      cancache="false" actions="file"/>
+      <api request="/entry/upload"           method="processEntryUpload"     actions="upload"/>
+      <api request="/entry/get/*"            method="processEntryGet"        authmethod="httpauth" cancache="false" actions="file"/>
       <api request="/entry/getentries"       method="processGetEntries" />
       <api request="/entry/copy"             method="processEntryCopy"/>
       <api request="/entry/xmlcreate"        method="processEntryXmlCreate"/>
