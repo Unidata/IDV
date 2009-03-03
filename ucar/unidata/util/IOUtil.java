@@ -997,15 +997,15 @@ public class IOUtil {
                     if(huc.getResponseCode()==401) {
                         String 	auth = connection.getHeaderField("WWW-Authenticate"); 
                         if(auth!=null) {
-                            PasswordManager passwordManager = PasswordManager.getGlobalPasswordManager();
-                            if(passwordManager!=null) {
+                            AccountManager accountManager = AccountManager.getGlobalAccountManager();
+                            if(accountManager!=null) {
 
                                 while(true) {
                                     url = new URL(url.toString());
                                     connection =  url.openConnection();
                                     huc = (HttpURLConnection) connection;
                                     String host  = url.getHost();
-                                    UserInfo userInfo = passwordManager.getUserNamePassword(host+":"+auth,"<html>The server: <i>" + host +"<i> requires a username/password</html>");
+                                    UserInfo userInfo = accountManager.getUserNamePassword(host+":"+auth,"<html>The server: <i>" + host +"<i> requires a username/password</html>");
                                     if(userInfo==null) break;
                                     String authReturn = "Basic " + ucar.unidata.xml.XmlUtil.encodeBase64(new String(userInfo.getUserId()+":" + userInfo.getPassword()).getBytes());
                                     huc.addRequestProperty("Authorization", authReturn);
@@ -1972,7 +1972,7 @@ public class IOUtil {
      */
     public static void main(String[] args) throws Exception {
 
-        PasswordManager.setGlobalPasswordManager(new PasswordManager(new File(".")));
+        AccountManager.setGlobalAccountManager(new AccountManager(new File(".")));
 
         String url ="http://delllaptop:8080/repository/entry/show/Projects/PRIVATE?entryid=441dce70-b70c-4993-a514-f5b50d3234bf&output=thredds.catalog";
         InputStream is = getInputStream(url, IOUtil.class);

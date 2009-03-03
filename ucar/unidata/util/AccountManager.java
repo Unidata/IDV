@@ -56,12 +56,12 @@ import javax.swing.*;
  * This class is used to provide authentication of access controlled CDM datasets.
  *
  * @author IDV Development Team
- * @version $Id: PasswordManager.java,v 1.3 2007/05/09 21:59:26 dmurray Exp $
+ * @version $Id: AccountManager.java,v 1.3 2007/05/09 21:59:26 dmurray Exp $
  */
-public class PasswordManager implements CredentialsProvider {
+public class AccountManager implements CredentialsProvider {
 
 
-    private static PasswordManager passwordManager;
+    private static AccountManager accountManager;
 
     /** for the gui */
     private JLabel serverLabel;
@@ -98,19 +98,19 @@ public class PasswordManager implements CredentialsProvider {
      * constructor
      *
      */
-    public PasswordManager(File stateDir) {
+    public AccountManager(File stateDir) {
         this.stateDir = stateDir;
     }
 
-    public static PasswordManager getGlobalPasswordManager() {
-        return passwordManager;
+    public static AccountManager getGlobalAccountManager() {
+        return accountManager;
     }
 
-    public static void setGlobalPasswordManager(PasswordManager manager) {
-        if(passwordManager!=null) {
-            throw new IllegalArgumentException("Already have a password manager");
+    public static void setGlobalAccountManager(AccountManager manager) {
+        if(accountManager!=null) {
+            throw new IllegalArgumentException("Already have an account manager");
         }
-        passwordManager = manager;
+        accountManager = manager;
     }
 
 
