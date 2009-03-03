@@ -44,8 +44,9 @@ import ucar.nc2.dt.StationObsDataset;
 import ucar.nc2.dt.StationObsDatatype;
 import ucar.nc2.dt.point.*;
 import ucar.nc2.ft.FeatureCollection;
-import ucar.nc2.ft.FeatureDatasetFactory;
+import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.ft.PointFeature;
+import ucar.nc2.ft.NestedPointFeatureCollection;
 import ucar.nc2.ft.PointFeatureCollection;
 import ucar.nc2.ft.PointFeatureIterator;
 import ucar.nc2.ft.point.*;
@@ -1230,7 +1231,7 @@ public class PointObFactory {
      *
      * @throws Exception On badness
      */
-    public static FieldImpl makePointObs(PointDatasetImpl input,
+    public static FieldImpl makePointObs(FeatureDatasetPoint input,
                                          double binRoundTo, double binWidth,
                                          LatLonRect llr, boolean sample)
             throws Exception {
@@ -1306,7 +1307,7 @@ public class PointObFactory {
         }
 
 
-        //        Trace.call1("loop-1");
+        Trace.call1("loop-1");
         int varIdx = varIdxBase;
         for (Iterator iter = actualVariables.iterator(); iter.hasNext(); ) {
             VariableSimpleIF var = (VariableSimpleIF) iter.next();
@@ -1337,7 +1338,7 @@ public class PointObFactory {
             }
             varIdx++;
         }
-        //        Trace.call2("loop-1");
+        Trace.call2("loop-1");
 
 
         String[] shortNames = (String[]) shortNamesList.toArray(
@@ -1354,9 +1355,14 @@ public class PointObFactory {
             throw new IllegalArgumentException(
                 "Can't handle point data with multiple collections");
         }
-        PointFeatureCollection collection =
-            (PointFeatureCollection) collectionList.get(0);
-        //System.out.println("number of obs = " + collection.size());
+        FeatureCollection fc = collectionList.get(0);
+        PointFeatureCollection collection = null;
+        if (fc instanceof PointFeatureCollection) {
+            collection = (PointFeatureCollection) fc;
+        } else if (fc instanceof NestedPointFeatureCollection) {
+            collection = ((NestedPointFeatureCollection)fc).flatten(null, null);
+        }
+        System.out.println("number of obs = " + collection.size());
         if (llr != null) {
             //System.out.println("subsetting to: " + llr);
             collection = collection.subset(llr, null);
@@ -1389,7 +1395,7 @@ public class PointObFactory {
 
         //First do spatial subset and collect times
         //First collect times
-        //        Trace.call1("loop-2");
+        Trace.call1("loop-2");
         while (dataIterator.hasNext()) {
             PointFeature po = (PointFeature) dataIterator.next();
             /*
@@ -1408,7 +1414,7 @@ public class PointObFactory {
                 break;
             }
         }
-        //        Trace.call2("loop-2");
+        Trace.call2("loop-2");
 
 
         //Bin times
@@ -1417,7 +1423,7 @@ public class PointObFactory {
         StructureMembers.Member member;
         PointOb[]               obs = new PointOb[pos.size()];
         //Make the obs
-        //        Trace.call1("loop-3");
+        Trace.call1("loop-3");
         int size = pos.size();
 
         for (int i = 0; i < size; i++) {
@@ -1482,7 +1488,7 @@ public class PointObFactory {
             }
         }
 
-        //        Trace.call2("loop-3");
+        Trace.call2("loop-3");
 
 
         LogUtil.message("Read " + obIdx + " observations");

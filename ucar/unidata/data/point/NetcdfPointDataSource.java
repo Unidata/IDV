@@ -24,7 +24,7 @@ package ucar.unidata.data.point;
 
 
 import ucar.nc2.ft.FeatureDatasetFactoryManager;
-import ucar.nc2.ft.point.PointDatasetImpl;
+import ucar.nc2.ft.FeatureDatasetPoint;
 
 import ucar.unidata.data.*;
 
@@ -60,7 +60,7 @@ public class NetcdfPointDataSource extends PointDataSource {
         LogUtil.getLogInstance(NetcdfPointDataSource.class.getName());
 
     /** the dataset */
-    private PointDatasetImpl dataset;
+    private FeatureDatasetPoint dataset;
 
 
     /**
@@ -191,11 +191,11 @@ public class NetcdfPointDataSource extends PointDataSource {
 
 
     /**
-     * Return the GridDataset associated with this DataSource.
+     * Return the FeatureDatasetPoint associated with this DataSource.
      *
      * @return dataset
      */
-    public PointDatasetImpl getDataset() {
+    public FeatureDatasetPoint getDataset() {
         if (dataset == null) {
             Trace.call1("NetcdfPointDataSource.getDataSet",
                         " name = " + sources);
@@ -210,7 +210,7 @@ public class NetcdfPointDataSource extends PointDataSource {
      *
      * @return the dataset
      */
-    protected PointDatasetImpl doMakeDataset() {
+    protected FeatureDatasetPoint doMakeDataset() {
         String file = getFilePath();
         if (file == null) {
             if (haveBeenUnPersisted) {
@@ -225,12 +225,16 @@ public class NetcdfPointDataSource extends PointDataSource {
             sources.add(file);
         }
         Formatter        buf     = new Formatter();
-        PointDatasetImpl pods    = null;
+        FeatureDatasetPoint pods    = null;
         Exception        toThrow = new Exception("Datset is null");
         try {
             file = convertSourceFile(file);
-            pods = (PointDatasetImpl) FeatureDatasetFactoryManager.open(
+            pods = (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
                 ucar.nc2.constants.FeatureType.POINT, file, null, buf);
+            if (pods == null) {  // try as ANY_POINT
+                pods = (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
+                    ucar.nc2.constants.FeatureType.ANY_POINT, file, null, buf);
+            }
         } catch (Exception exc) {
             pods = null;
         }
@@ -307,7 +311,7 @@ public class NetcdfPointDataSource extends PointDataSource {
             //TODO: We are nulling out the data set to fix a bug where we cannot
             //use the same data set twice in a row
             this.dataset = null;
-            PointDatasetImpl pods = getDataset();
+            FeatureDatasetPoint pods = getDataset();
             if (pods == null) {
                 return null;
             }
@@ -334,8 +338,8 @@ public class NetcdfPointDataSource extends PointDataSource {
             long      total = 0;
             for (int i = 0; i < cnt; i++) {
                 long tt1 = System.currentTimeMillis();
-                PointDatasetImpl pods =
-                    (PointDatasetImpl) FeatureDatasetFactoryManager.open(
+                FeatureDatasetPoint pods =
+                    (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
                         ucar.nc2.constants.FeatureType.POINT, args[0], null,
                         buf);
                 long tt2 = System.currentTimeMillis();
@@ -354,7 +358,7 @@ public class NetcdfPointDataSource extends PointDataSource {
 
                 if (i != 0) {
                     total += (t2 - t1);
-                    System.err.println("PointDatasetImpl time:" + (tt2 - tt1)
+                    System.err.println("FeatureDatasetPoint time:" + (tt2 - tt1)
                                        + " makePointObs time:" + (t2 - t1)
                                        + " avg:" + (total / i));
                 }
