@@ -51,6 +51,18 @@
 
 
 
+  <type name="ftp"  description="Remote FTP File View" handler="ucar.unidata.repository.FtpTypeHandler">
+     <property name="form.show.resource" value="false"/>
+     <property name="form.show.area" value="false"/>
+     <property name="form.show.date" value="false"/>
+     <column name="server" group="FTP" type="string"     label="FTP Server" columns="80"  showinhtml="false"/>
+     <column name="basedir" group="FTP" type="string"     label="Base Directory" columns="80"  showinhtml="false"/>
+     <column name="ftpuser" group="FTP" type="string"     label="User Name" columns="80"  showinhtml="false"/>
+     <column name="ftppassword" group="FTP" type="password"     label="Password" columns="80"  showinhtml="false"/>
+ </type>
+
+
+
   <type name="catalog"  description="Catalog View" handler="ucar.unidata.repository.data.CatalogTypeHandler">
      <property name="form.show.file" value="false"/>
      <property name="form.show.url" value="true"/>

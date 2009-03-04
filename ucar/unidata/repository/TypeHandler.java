@@ -148,6 +148,8 @@ public class TypeHandler extends RepositoryManager {
     private String displayTemplatePath;
 
 
+
+
     /**
      * _more_
      *
@@ -761,7 +763,6 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
-
     /**
      * _more_
      *
@@ -778,8 +779,7 @@ public class TypeHandler extends RepositoryManager {
         if ( !getAccessManager().canDownload(request, entry)) {
             return null;
         }
-        File   f        = entry.getResource().getFile();
-        String size     = " (" + f.length() + " bytes)";
+        String size     = " (" + entry.getResource().getFileSize() + " bytes)";
         String fileTail = getStorageManager().getFileTail(entry);
         return new Link(getEntryManager().getEntryResourceUrl(request,
                 entry), getRepository().iconUrl(ICON_FETCH),

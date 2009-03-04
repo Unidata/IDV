@@ -80,6 +80,10 @@ public class GenericTypeHandler extends TypeHandler {
     /** _more_ */
     Hashtable nameMap = new Hashtable();
 
+    public GenericTypeHandler() {
+        super(null);
+    }
+
     /**
      * _more_
      *

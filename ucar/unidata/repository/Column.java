@@ -82,6 +82,8 @@ public class Column implements Constants {
     /** _more_ */
     public static final String TYPE_STRING = "string";
 
+    public static final String TYPE_PASSWORD = "password";
+
     /** _more_ */
     public static final String TYPE_CLOB = "clob";
 
@@ -475,7 +477,7 @@ public class Column implements Constants {
      * @throws Exception _more_
      */
     public void createTable(Statement statement) throws Exception {
-        if (type.equals(TYPE_STRING)) {
+        if (type.equals(TYPE_STRING) || type.equals(TYPE_PASSWORD)) {
             defineColumn(statement, name, "varchar(" + size + ") ");
         } else if (type.equals(TYPE_CLOB)) {
             String clobType =
@@ -743,6 +745,12 @@ public class Column implements Constants {
                 value = "" + toString(values, offset);
             }
             widget = HtmlUtil.input(getFullName(), value, "size=\"10\"");
+            /*        } else if (type.equals(TYPE_PASSWORD)) {
+            String value = "";
+            if (entry != null) {
+                value = "" + toString(values, offset);
+            }
+            widget = HtmlUtil.password(getFullName(), value, "size=\"10\"");*/
         } else {
             String value = "";
             if (entry != null) {
