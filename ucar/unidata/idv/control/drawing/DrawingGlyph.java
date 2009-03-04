@@ -37,6 +37,9 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 
 import ucar.unidata.idv.control.DrawingControl;
 
+
+
+import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -71,6 +74,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
+import java.text.SimpleDateFormat;
 
 
 /**
@@ -129,6 +133,8 @@ public abstract class DrawingGlyph {
 
     /** xml attribute name */
     public static final String ATTR_TIMES = "times";
+
+    public static final String ATTR_TIMEFORMAT = "timeformat";
 
     /** xml attribute name */
     public static final String ATTR_ZPOSITION = "zposition";
@@ -442,6 +448,8 @@ public abstract class DrawingGlyph {
      */
     public void initFromXml(DrawingControl control, Element node)
             throws VisADException, RemoteException {
+
+
         this.control  = control;
         createdByUser = false;
 
@@ -462,6 +470,9 @@ public abstract class DrawingGlyph {
         }
         String timeAttr = XmlUtil.getAttribute(node, ATTR_TIMES,
                               (String) null);
+        String timeFormat = XmlUtil.getAttribute(node, ATTR_TIMEFORMAT,
+                              (String) null);
+        SimpleDateFormat sdf = null;
         if (timeAttr != null) {
             List timeStrings = StringUtil.split(timeAttr, ",", true, true);
             if (timeStrings.size() > 0) {
@@ -476,7 +487,21 @@ public abstract class DrawingGlyph {
                         timeValues.add(
                             new DateTime(Double.POSITIVE_INFINITY));
                     } else {
-                        timeValues.add(DateTime.createDateTime(s));
+                        if(timeFormat!=null) {
+                            if(sdf == null) {
+                                sdf = new SimpleDateFormat();
+                                sdf.applyPattern(timeFormat);
+                                sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+                            }
+                            try {
+                                timeValues.add(new DateTime(sdf.parse(s)));
+                            } catch(Exception exc) {
+                                throw new RuntimeException(exc);
+
+                            }
+                        } else {
+                            timeValues.add(DateTime.createDateTime(s));
+                        }
                     }
                 }
             }
