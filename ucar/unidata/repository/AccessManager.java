@@ -130,6 +130,8 @@ public class AccessManager extends RepositoryManager {
                 getUserManager().ROLE_ANY));
         topGroup.addPermission(new Permission(Permission.ACTION_VIEWCHILDREN,
                 getUserManager().ROLE_ANY));
+        topGroup.addPermission(new Permission(Permission.ACTION_FILE,
+                getUserManager().ROLE_ANY));
         topGroup.addPermission(new Permission(Permission.ACTION_EDIT,
                 getUserManager().ROLE_NONE));
         topGroup.addPermission(new Permission(Permission.ACTION_NEW,
@@ -224,13 +226,27 @@ public class AccessManager extends RepositoryManager {
 
 
 
+    /** _more_ */
     Hashtable recentPermissions = new Hashtable();
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param action _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public boolean canDoAction(Request request, Entry entry, String action)
             throws Exception {
-        if(entry == null) return false;
+        if (entry == null) {
+            return false;
+        }
 
         if (entry.getIsLocalFile()) {
             if (action.equals(Permission.ACTION_NEW)) {
@@ -256,7 +272,7 @@ public class AccessManager extends RepositoryManager {
             return false;
         }
 
-        
+
         //The admin can do anything
         if (user.getAdmin()) {
             return true;
@@ -267,31 +283,48 @@ public class AccessManager extends RepositoryManager {
             return true;
         }
 
-        
-        String key = "a:" + action+"_u:" + user.getId()+"_e:" + entry.getId();
-        Object[]pastResult = (Object[]) recentPermissions.get(key);
-        Date now = new Date();
-        if(pastResult!=null) {
-            Date then = (Date) pastResult[0];
-            Boolean ok = (Boolean) pastResult[1];
+
+        String key = "a:" + action + "_u:" + user.getId() + "_e:"
+                     + entry.getId();
+        Object[] pastResult = (Object[]) recentPermissions.get(key);
+        Date     now        = new Date();
+        if (pastResult != null) {
+            Date    then = (Date) pastResult[0];
+            Boolean ok   = (Boolean) pastResult[1];
             //If we have checked this in the last 60 seconds then return the result
-            if(now.getTime()-then.getTime()<60000) {
+            if (now.getTime() - then.getTime() < 60000) {
                 return ok.booleanValue();
             } else {
                 recentPermissions.remove(key);
             }
         }
-        
-        boolean result = canDoActionInner(request, entry, action,user, requestIp);
+
+        boolean result = canDoActionInner(request, entry, action, user,
+                                          requestIp);
         if (recentPermissions.size() > 10000) {
             recentPermissions = new Hashtable();
         }
-        recentPermissions.put(key, new Object[]{now,new Boolean(result)});
+        recentPermissions.put(key, new Object[] { now, new Boolean(result) });
         return result;
     }
 
-    private boolean canDoActionInner(Request request, Entry entry, String action, User user, String requestIp)
-        throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param action _more_
+     * @param user _more_
+     * @param requestIp _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private boolean canDoActionInner(Request request, Entry entry,
+                                     String action, User user,
+                                     String requestIp)
+            throws Exception {
         while (entry != null) {
             List permissions = getPermissions(entry);
             List roles       = getRoles(entry, action);
@@ -321,7 +354,7 @@ public class AccessManager extends RepositoryManager {
             }
             //LOOK: make sure we pass in false here which says do not check for access control
             entry = getEntryManager().getEntry(request,
-                                               entry.getParentGroupId(),false);
+                    entry.getParentGroupId(), false);
         }
         return false;
     }
@@ -334,7 +367,6 @@ public class AccessManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
      * @param entry _more_
      * @param action _more_
      *
@@ -349,8 +381,19 @@ public class AccessManager extends RepositoryManager {
     }
 
 
-    public boolean canAccessFile(Request request, Entry entry) throws Exception {
-        return canDoAction(request,  entry, Permission.ACTION_FILE);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public boolean canAccessFile(Request request, Entry entry)
+            throws Exception {
+        return canDoAction(request, entry, Permission.ACTION_FILE);
     }
 
     /**
@@ -376,7 +419,7 @@ public class AccessManager extends RepositoryManager {
             return false;
         }
 
-        if (!canDoAction(request,  entry, Permission.ACTION_FILE)) {
+        if ( !canDoAction(request, entry, Permission.ACTION_FILE)) {
             return false;
         }
 
@@ -571,7 +614,6 @@ public class AccessManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param request _more_
      * @param entry _more_
      *
      * @return _more_

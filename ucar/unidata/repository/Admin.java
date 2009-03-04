@@ -85,7 +85,7 @@ public class Admin extends RepositoryManager {
     public RequestUrl URL_ADMIN_SQL = new RequestUrl(this, "/admin/sql",
                                           "SQL");
 
-    /** _more_          */
+    /** _more_ */
     public RequestUrl URL_ADMIN_USERMESSAGE = new RequestUrl(this,
                                                   "/admin/usermessage",
                                                   "User Message");
@@ -259,11 +259,11 @@ public class Admin extends RepositoryManager {
                 path = path.substring(0, 49) + "...";
             }
             path = HtmlUtil.entityEncode(path);
-            if(logEntry.getUrl()!=null) {
-                path  = HtmlUtil.href(logEntry.getUrl(),path);
+            if (logEntry.getUrl() != null) {
+                path = HtmlUtil.href(logEntry.getUrl(), path);
             }
-            String userAgent = logEntry.getUserAgent();
-            boolean isBot=true;
+            String  userAgent = logEntry.getUserAgent();
+            boolean isBot     = true;
             if (userAgent.indexOf("Googlebot") >= 0) {
                 userAgent = "Googlebot";
             } else if (userAgent.indexOf("Slurp") >= 0) {
@@ -273,26 +273,29 @@ public class Admin extends RepositoryManager {
             } else {
                 isBot = false;
                 String full = userAgent;
-                int idx = userAgent.indexOf("(");
+                int    idx  = userAgent.indexOf("(");
                 if (idx > 0) {
-                    userAgent = userAgent.substring(0,idx);
-                    userAgent = HtmlUtil.makeShowHideBlock(userAgent,full,false);
+                    userAgent = userAgent.substring(0, idx);
+                    userAgent = HtmlUtil.makeShowHideBlock(userAgent, full,
+                            false);
                 }
 
 
-                
+
             }
 
             String dttm = getRepository().formatDate(logEntry.getDate());
             dttm = dttm.replace(" ", "&nbsp;");
             String user = logEntry.getUser().getLabel();
             user = user.replace(" ", "&nbsp;");
-            String cols  = HtmlUtil.cols(user, dttm,
-                                         path , logEntry.getIp(),
-                                         userAgent);
+            String cols = HtmlUtil.cols(user, dttm, path, logEntry.getIp(),
+                                        userAgent);
             sb.append(HtmlUtil.row(cols,
-                                   HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,"top")+
-                                   (!isBot?"":HtmlUtil.attr(HtmlUtil.ATTR_BGCOLOR,"#eeeeee"))));
+                                   HtmlUtil.attr(HtmlUtil.ATTR_VALIGN, "top")
+                                   + ( !isBot
+                                       ? ""
+                                       : HtmlUtil.attr(HtmlUtil.ATTR_BGCOLOR,
+                                       "#eeeeee"))));
 
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
@@ -769,10 +772,18 @@ public class Admin extends RepositoryManager {
                 HtmlUtil.textArea(PROP_ADMIN_PHRASES, phrases, 5, 60)));
 
 
-        dsb.append(HtmlUtil.formEntryTop(msgLabel("Facebook Comments API Key"), 
-                                         HtmlUtil.input(PROP_FACEBOOK_CONNECT_KEY, getProperty(PROP_FACEBOOK_CONNECT_KEY, ""),size)));
-        dsb.append(HtmlUtil.formEntryTop(msgLabel("Enable Ratings"), 
-                                         HtmlUtil.checkbox(PROP_RATINGS_ENABLE, "true", getProperty(PROP_RATINGS_ENABLE, false))));
+        dsb.append(
+            HtmlUtil.formEntryTop(
+                msgLabel("Facebook Comments API Key"),
+                HtmlUtil.input(
+                    PROP_FACEBOOK_CONNECT_KEY,
+                    getProperty(PROP_FACEBOOK_CONNECT_KEY, ""), size)));
+        dsb.append(
+            HtmlUtil.formEntryTop(
+                msgLabel("Enable Ratings"),
+                HtmlUtil.checkbox(
+                    PROP_RATINGS_ENABLE, "true",
+                    getProperty(PROP_RATINGS_ENABLE, false))));
 
 
 
@@ -798,19 +809,24 @@ public class Admin extends RepositoryManager {
 
         asb.append(HtmlUtil.formEntry(msgLabel("HTTP Port"),
                                       HtmlUtil.input(PROP_PORT,
-                                                     getProperty(PROP_PORT, ""),
-                                                     HtmlUtil.SIZE_5)));
+                                          getProperty(PROP_PORT, ""),
+                                          HtmlUtil.SIZE_5)));
 
 
-        String allSslCbx = HtmlUtil.space(3) +HtmlUtil.checkbox(PROP_ACCESS_ALLSSL,"true",getProperty(PROP_ACCESS_ALLSSL,false)) +" " +
-            msg("Force all connections to be secure");
-        asb.append(HtmlUtil
-            .formEntry(msgLabel("SSL Port"), HtmlUtil
-                .input(PROP_SSL_PORT, getProperty(PROP_SSL_PORT, ""), HtmlUtil
-                    .SIZE_5) + HtmlUtil.space(1)
-                             + msg("Port number for SSL access.")
-                             + HtmlUtil.space(1)
-                       + allSslCbx));
+        String allSslCbx =
+            HtmlUtil.space(3)
+            + HtmlUtil.checkbox(
+                PROP_ACCESS_ALLSSL, "true",
+                getProperty(PROP_ACCESS_ALLSSL, false)) + " "
+                    + msg("Force all connections to be secure");
+        asb.append(
+            HtmlUtil.formEntry(
+                msgLabel("SSL Port"),
+                HtmlUtil.input(
+                    PROP_SSL_PORT, getProperty(PROP_SSL_PORT, ""),
+                    HtmlUtil.SIZE_5) + HtmlUtil.space(1)
+                                     + msg("Port number for SSL access.")
+                                     + HtmlUtil.space(1) + allSslCbx));
 
 
         asb.append(HtmlUtil.colspan("Site Access", 2));
@@ -835,10 +851,14 @@ public class Admin extends RepositoryManager {
 
 
         asb.append(HtmlUtil.colspan("Anonymous Uploads", 2));
-        asb.append(HtmlUtil.formEntryTop(msgLabel("Max directory size"),
-                                         HtmlUtil.input(PROP_UPLOAD_MAXSIZEGB,
-                                                        ""+getRepository().getProperty(PROP_UPLOAD_MAXSIZEGB,10.0),
-                                                        HtmlUtil.SIZE_10) +" (GBytes)"));
+        asb.append(
+            HtmlUtil.formEntryTop(
+                msgLabel("Max directory size"),
+                HtmlUtil.input(
+                    PROP_UPLOAD_MAXSIZEGB,
+                    "" + getRepository().getProperty(
+                        PROP_UPLOAD_MAXSIZEGB,
+                        10.0), HtmlUtil.SIZE_10) + " (GBytes)"));
 
 
 
@@ -854,26 +874,34 @@ public class Admin extends RepositoryManager {
 
 
 
-        
-        asb.append(HtmlUtil.colspan("Enable Unidata Local Data Manager (LDM) Access", 2));
-        String pqinsertPath = getProperty(PROP_LDM_PQINSERT,"");
-        String ldmExtra1="";
-        if(pqinsertPath.length()>0 && !new File(pqinsertPath).exists()) {
-            ldmExtra1 = HtmlUtil.space(2) + HtmlUtil.span("File does not exist!", HtmlUtil.cssClass("errorlabel"));
+
+        asb.append(
+            HtmlUtil.colspan(
+                "Enable Unidata Local Data Manager (LDM) Access", 2));
+        String pqinsertPath = getProperty(PROP_LDM_PQINSERT, "");
+        String ldmExtra1    = "";
+        if ((pqinsertPath.length() > 0) && !new File(pqinsertPath).exists()) {
+            ldmExtra1 = HtmlUtil.space(2)
+                        + HtmlUtil.span("File does not exist!",
+                                        HtmlUtil.cssClass("errorlabel"));
         }
- 
+
         asb.append(HtmlUtil.formEntry("Path to pqinsert:",
-                                     HtmlUtil.input(PROP_LDM_PQINSERT,
-                                                    pqinsertPath, HtmlUtil.SIZE_60)+ldmExtra1));
-        String ldmQueue = getProperty(PROP_LDM_QUEUE, "");
-        String ldmExtra2="";
-        if(ldmQueue.length()>0 && !new File(ldmQueue).exists()) {
-            ldmExtra2 = HtmlUtil.space(2) + HtmlUtil.span("File does not exist!", HtmlUtil.cssClass("errorlabel"));
+                                      HtmlUtil.input(PROP_LDM_PQINSERT,
+                                          pqinsertPath,
+                                          HtmlUtil.SIZE_60) + ldmExtra1));
+        String ldmQueue  = getProperty(PROP_LDM_QUEUE, "");
+        String ldmExtra2 = "";
+        if ((ldmQueue.length() > 0) && !new File(ldmQueue).exists()) {
+            ldmExtra2 = HtmlUtil.space(2)
+                        + HtmlUtil.span("File does not exist!",
+                                        HtmlUtil.cssClass("errorlabel"));
         }
 
         asb.append(HtmlUtil.formEntry("Queue Location:",
-                                     HtmlUtil.input(PROP_LDM_QUEUE,
-                                                    ldmQueue, HtmlUtil.SIZE_60)+ldmExtra2));
+                                      HtmlUtil.input(PROP_LDM_QUEUE,
+                                          ldmQueue,
+                                          HtmlUtil.SIZE_60) + ldmExtra2));
 
 
 
@@ -937,13 +965,14 @@ public class Admin extends RepositoryManager {
         sb.append(makeConfigBlock("Available Output Types", osb.toString()));
 
 
-        StringBuffer umsb=new StringBuffer();
-        umsb.append(msgHeader("Enter a message to show one time to all users"));
+        StringBuffer umsb = new StringBuffer();
+        umsb.append(
+            msgHeader("Enter a message to show one time to all users"));
         umsb.append(request.form(URL_ADMIN_USERMESSAGE, ""));
         umsb.append(HtmlUtil.formTable());
         umsb.append(HtmlUtil.formEntry(msgLabel("Message"),
-                                       HtmlUtil.textArea(ARG_MESSAGE, "",
-                                                         5, 60)));
+                                       HtmlUtil.textArea(ARG_MESSAGE, "", 5,
+                                           60)));
         umsb.append(HtmlUtil.formTableClose());
 
 
@@ -1002,13 +1031,24 @@ public class Admin extends RepositoryManager {
                           boolean asHtml)
             throws Exception {
         String from = getRepository().getProperty(PROP_ADMIN_EMAIL,
-                                                         "").trim();
+                          "").trim();
         sendEmail(to, from, subject, contents, asHtml);
     }
 
 
-    public void sendEmail(String to, String from, String subject, String contents,
-                          boolean asHtml)
+    /**
+     * _more_
+     *
+     * @param to _more_
+     * @param from _more_
+     * @param subject _more_
+     * @param contents _more_
+     * @param asHtml _more_
+     *
+     * @throws Exception _more_
+     */
+    public void sendEmail(String to, String from, String subject,
+                          String contents, boolean asHtml)
             throws Exception {
         if ( !isEmailCapable()) {
             throw new IllegalStateException(
@@ -1049,14 +1089,18 @@ public class Admin extends RepositoryManager {
     public Result adminSettingsDo(Request request) throws Exception {
 
         getRepository().writeGlobal(PROP_ADMIN_EMAIL,
-                                    request.getString(PROP_ADMIN_EMAIL, "").trim());
+                                    request.getString(PROP_ADMIN_EMAIL,
+                                        "").trim());
         getRepository().writeGlobal(PROP_ADMIN_SMTP,
-                                    request.getString(PROP_ADMIN_SMTP, "").trim());
+                                    request.getString(PROP_ADMIN_SMTP,
+                                        "").trim());
 
         getRepository().writeGlobal(PROP_LDM_PQINSERT,
-                                    request.getString(PROP_LDM_PQINSERT, "").trim());
+                                    request.getString(PROP_LDM_PQINSERT,
+                                        "").trim());
         getRepository().writeGlobal(PROP_LDM_QUEUE,
-                                    request.getString(PROP_LDM_QUEUE, "").trim());
+                                    request.getString(PROP_LDM_QUEUE,
+                                        "").trim());
 
 
         if (request.exists(PROP_REPOSITORY_NAME)) {
@@ -1084,9 +1128,9 @@ public class Admin extends RepositoryManager {
         }
 
         if (request.exists(PROP_FACEBOOK_CONNECT_KEY)) {
-            getRepository().writeGlobal(PROP_FACEBOOK_CONNECT_KEY,
-                                        request.getString(PROP_FACEBOOK_CONNECT_KEY,
-                                            ""));
+            getRepository().writeGlobal(
+                PROP_FACEBOOK_CONNECT_KEY,
+                request.getString(PROP_FACEBOOK_CONNECT_KEY, ""));
         }
 
         if (request.exists(PROP_RATINGS_ENABLE)) {
@@ -1108,22 +1152,24 @@ public class Admin extends RepositoryManager {
                                         getProperty(PROP_PORT, "")));
 
 
-        String oldSsl =   getProperty(PROP_SSL_PORT, "");
+        String oldSsl = getProperty(PROP_SSL_PORT, "");
         String newSsl;
         getRepository().writeGlobal(PROP_SSL_PORT,
                                     newSsl = request.getString(PROP_SSL_PORT,
                                         getProperty(PROP_SSL_PORT, "")));
 
         getRepository().writeGlobal(PROP_ACCESS_ALLSSL,
-                                    ""+request.get(PROP_ACCESS_ALLSSL,false));
+                                    "" + request.get(PROP_ACCESS_ALLSSL,
+                                        false));
 
 
-        if(!oldSsl.equals(newSsl)) {
+        if ( !oldSsl.equals(newSsl)) {
             getRepository().reinitializeRequestUrls();
         }
 
         getRepository().writeGlobal(PROP_UPLOAD_MAXSIZEGB,
-                                    request.getString(PROP_UPLOAD_MAXSIZEGB,"10").trim());
+                                    request.getString(PROP_UPLOAD_MAXSIZEGB,
+                                        "10").trim());
 
         if (request.exists(PROP_LOCALFILEPATHS)) {
             getRepository().writeGlobal(
@@ -1648,7 +1694,7 @@ public class Admin extends RepositoryManager {
                         + deleteCnt + " entries from database");
             }
         } catch (Exception exc) {
-            log("Running cleanup", exc);
+            logError("Running cleanup", exc);
             cleanupStatus.append("An error occurred running cleanup<pre>");
             cleanupStatus.append(LogUtil.getStackTrace(exc));
             cleanupStatus.append("</pre>");

@@ -94,17 +94,17 @@ import java.util.zip.*;
 public class EntryGroup {
 
     /** _more_ */
-    private     Object key;
+    private Object key;
 
     /** _more_ */
-    private     String name;
+    private String name;
 
     /** _more_ */
     private List children = new ArrayList();
 
 
     /** _more_ */
-    private     List keys = new ArrayList();
+    private List keys = new ArrayList();
 
     /** _more_ */
     private Hashtable map = new Hashtable();
@@ -157,96 +157,96 @@ public class EntryGroup {
     }
 
 
-/**
-Set the Key property.
+    /**
+     * Set the Key property.
+     *
+     * @param value The new value for Key
+     */
+    public void setKey(Object value) {
+        key = value;
+    }
 
-@param value The new value for Key
-**/
-public void setKey (Object value) {
-	key = value;
-}
+    /**
+     * Get the Key property.
+     *
+     * @return The Key
+     */
+    public Object getKey() {
+        return key;
+    }
 
-/**
-Get the Key property.
+    /**
+     * Set the Name property.
+     *
+     * @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
+    }
 
-@return The Key
-**/
-public Object getKey () {
-	return key;
-}
+    /**
+     * Get the Name property.
+     *
+     * @return The Name
+     */
+    public String getName() {
+        return name;
+    }
 
-/**
-Set the Name property.
+    /**
+     * Set the Children property.
+     *
+     * @param value The new value for Children
+     */
+    public void setChildren(List value) {
+        children = value;
+    }
 
-@param value The new value for Name
-**/
-public void setName (String value) {
-	name = value;
-}
-
-/**
-Get the Name property.
-
-@return The Name
-**/
-public String getName () {
-	return name;
-}
-
-/**
-Set the Children property.
-
-@param value The new value for Children
-**/
-public void setChildren (List value) {
-	children = value;
-}
-
-/**
-Get the Children property.
-
-@return The Children
-**/
-public List getChildren () {
-	return children;
-}
+    /**
+     * Get the Children property.
+     *
+     * @return The Children
+     */
+    public List getChildren() {
+        return children;
+    }
 
 
-/**
-Set the Keys property.
+    /**
+     * Set the Keys property.
+     *
+     * @param value The new value for Keys
+     */
+    public void setKeys(List value) {
+        keys = value;
+    }
 
-@param value The new value for Keys
-**/
-public void setKeys (List value) {
-	keys = value;
-}
+    /**
+     * Get the Keys property.
+     *
+     * @return The Keys
+     */
+    public List getKeys() {
+        return keys;
+    }
 
-/**
-Get the Keys property.
+    /**
+     * Set the Map property.
+     *
+     * @param value The new value for Map
+     */
+    public void setMap(Hashtable value) {
+        map = value;
+    }
 
-@return The Keys
-**/
-public List getKeys () {
-	return keys;
-}
-
-/**
-Set the Map property.
-
-@param value The new value for Map
-**/
-public void setMap (Hashtable value) {
-	map = value;
-}
-
-/**
-Get the Map property.
-
-@return The Map
-**/
-public Hashtable getMap () {
-	return map;
-}
+    /**
+     * Get the Map property.
+     *
+     * @return The Map
+     */
+    public Hashtable getMap() {
+        return map;
+    }
 
 
 }

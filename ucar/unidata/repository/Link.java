@@ -56,13 +56,18 @@ public class Link {
     /** _more_ */
     protected boolean hr = false;
 
-    /** _more_          */
+    /** _more_ */
     int type = OutputType.TYPE_ACTION;
 
     /** _more_ */
     OutputType outputType;
 
 
+    /**
+     * _more_
+     *
+     * @param hr _more_
+     */
     public Link(boolean hr) {
         this.hr = hr;
     }
@@ -73,12 +78,20 @@ public class Link {
      * @param url _more_
      * @param icon _more_
      * @param label _more_
+     * @param type _more_
      */
     public Link(String url, String icon, String label, int type) {
-        this(url,icon,label,null,type);
+        this(url, icon, label, null, type);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param url _more_
+     * @param icon _more_
+     * @param label _more_
+     */
     public Link(String url, String icon, String label) {
         this(url, icon, label, null);
     }
@@ -125,7 +138,7 @@ public class Link {
      * @return _more_
      */
     public boolean isType(int typeMask) {
-        return (getType() & typeMask) !=0;
+        return (getType() & typeMask) != 0;
     }
 
     /**
@@ -169,6 +182,11 @@ public class Link {
         return outputType;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean getHr() {
         return hr;
     }

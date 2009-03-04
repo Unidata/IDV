@@ -21,9 +21,10 @@
 
 package ucar.unidata.repository.data;
 
-import ucar.unidata.repository.*;
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -194,6 +195,13 @@ public class CatalogOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     public AuthorizationMethod getAuthorizationMethod(Request request) {
         return AuthorizationMethod.AUTH_HTTP;
     }
@@ -293,11 +301,8 @@ public class CatalogOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param entries _more_
      * @param state _more_
-     * @param types _more_
      * @param links _more_
-     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
@@ -534,7 +539,8 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
         if (canDataLoad(request, entry)) {
-            String urlPath = getRepository().getDataOutputHandler().getTdsUrl(entry);
+            String urlPath =
+                getRepository().getDataOutputHandler().getTdsUrl(entry);
             addService(catalogInfo, SERVICE_OPENDAP,
                        getRepository().URL_ENTRY_SHOW.getFullUrl());
 

@@ -145,10 +145,8 @@ public class RssOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param entry _more_
      * @param state _more_
      * @param links _more_
-     * @param forHeader _more_
      *
      * @throws Exception _more_
      */

@@ -290,7 +290,6 @@ public class XmlOutputHandler extends OutputHandler {
      * _more_
      *
      * @param entry _more_
-     * @param sb _more_
      * @param doc _more_
      * @param parent _more_
      *
@@ -323,8 +322,6 @@ public class XmlOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param group _more_
-     * @param sb _more_
-     * @param open _more_
      * @param doc _more_
      * @param parent _more_
      *

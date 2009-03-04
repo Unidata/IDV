@@ -202,7 +202,8 @@ public class MetadataManager extends RepositoryManager {
             }
         }
         if (checkInherited) {
-            return findMetadata(getEntryManager().getParent(null,entry), type, checkInherited);
+            return findMetadata(getEntryManager().getParent(null, entry),
+                                type, checkInherited);
         }
         return null;
     }
@@ -284,14 +285,17 @@ public class MetadataManager extends RepositoryManager {
      * @param request _more_
      * @param entry _more_
      * @param extra _more_
+     * @param shortForm _more_
      *
      * @return _more_
      */
     public List<Metadata> getInitialMetadata(Request request, Entry entry,
-                                             Hashtable extra,boolean shortForm) {
+                                             Hashtable extra,
+                                             boolean shortForm) {
         List<Metadata> metadataList = new ArrayList<Metadata>();
         for (MetadataHandler handler : getMetadataHandlers()) {
-            handler.getInitialMetadata(request, entry, metadataList, extra,shortForm);
+            handler.getInitialMetadata(request, entry, metadataList, extra,
+                                       shortForm);
         }
         return metadataList;
     }
@@ -303,12 +307,16 @@ public class MetadataManager extends RepositoryManager {
      * @param request _more_
      * @param entry _more_
      * @param extra _more_
+     * @param shortForm _more_
+     *
+     * @return _more_
      */
     public boolean addInitialMetadata(Request request, Entry entry,
-                                   Hashtable extra,boolean shortForm) {
+                                      Hashtable extra, boolean shortForm) {
         boolean changed = false;
-        for (Metadata metadata : getInitialMetadata(request, entry, extra,shortForm)) {
-            if(entry.addMetadata(metadata, true)) {
+        for (Metadata metadata : getInitialMetadata(request, entry, extra,
+                shortForm)) {
+            if (entry.addMetadata(metadata, true)) {
                 changed = true;
             }
         }
@@ -414,8 +422,8 @@ public class MetadataManager extends RepositoryManager {
                                            node }));
                 }
             } catch (Exception exc) {
-                getRepository().log("Error loading metadata handler file:"
-                                    + file, exc);
+                getRepository().logError(
+                    "Error loading metadata handler file:" + file, exc);
                 throw exc;
             }
 
@@ -513,10 +521,11 @@ public class MetadataManager extends RepositoryManager {
     public Result processMetadataChange(Request request) throws Exception {
         synchronized (MUTEX_METADATA) {
             Entry entry = getEntryManager().getEntry(request);
-            Group parent = getEntryManager().getParent(request,entry);
-            boolean canEditParent = parent!=null && getAccessManager().canDoAction(request, 
-                                                                                   parent,
-                                                                                   Permission.ACTION_EDIT);
+            Group parent = getEntryManager().getParent(request, entry);
+            boolean canEditParent =
+                (parent != null)
+                && getAccessManager().canDoAction(request, parent,
+                    Permission.ACTION_EDIT);
 
 
             if (request.exists(ARG_METADATA_DELETE)) {
@@ -537,26 +546,29 @@ public class MetadataManager extends RepositoryManager {
                     handler.handleFormSubmit(request, entry, newMetadataList);
                 }
 
-                if (canEditParent && request.exists(ARG_METADATA_ADDTOPARENT)) {
+                if (canEditParent
+                        && request.exists(ARG_METADATA_ADDTOPARENT)) {
                     List<Metadata> parentMetadataList = getMetadata(parent);
-                    int cnt = 0;
+                    int            cnt                = 0;
 
                     for (Metadata metadata : newMetadataList) {
-                        if(request.defined(ARG_METADATA_ID + SUFFIX_SELECT+ metadata.getId())) {
-                            Metadata newMetadata = new Metadata(getRepository().getGUID(), parent.getId(),
-                                                                metadata);
-                            
-                            if(!parentMetadataList.contains(newMetadata)){
+                        if (request.defined(ARG_METADATA_ID + SUFFIX_SELECT
+                                            + metadata.getId())) {
+                            Metadata newMetadata =
+                                new Metadata(getRepository().getGUID(),
+                                             parent.getId(), metadata);
+
+                            if ( !parentMetadataList.contains(newMetadata)) {
                                 insertMetadata(newMetadata);
                                 cnt++;
                             }
                         }
                     }
                     parent.setMetadata(null);
-                    return new Result(request.url(URL_METADATA_FORM, ARG_ENTRYID,
-                                                  parent.getId(),
-                                                  ARG_MESSAGE,cnt +" " +msg("metadata items added")));
-                    
+                    return new Result(request.url(URL_METADATA_FORM,
+                            ARG_ENTRYID, parent.getId(), ARG_MESSAGE,
+                            cnt + " " + msg("metadata items added")));
+
                 }
 
 
@@ -727,7 +739,7 @@ public class MetadataManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processMetadataForm(Request request) throws Exception {
-        StringBuffer sb    = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
 
         if (request.exists(ARG_MESSAGE)) {
             sb.append(
@@ -735,10 +747,10 @@ public class MetadataManager extends RepositoryManager {
                     request.getUnsafeString(ARG_MESSAGE, BLANK)));
         }
 
-        Entry        entry = getEntryManager().getEntry(request);
-        boolean canEditParent = getAccessManager().canDoAction(request, 
-                                                               getEntryManager().getParent(request,entry),
-                                                               Permission.ACTION_EDIT);
+        Entry entry = getEntryManager().getEntry(request);
+        boolean canEditParent = getAccessManager().canDoAction(request,
+                                    getEntryManager().getParent(request,
+                                        entry), Permission.ACTION_EDIT);
 
         //        sb.append(getEntryManager().makeEntryHeader(request, entry));
 
@@ -755,10 +767,14 @@ public class MetadataManager extends RepositoryManager {
             sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
             sb.append(HtmlUtil.submit(msg("Change")));
             sb.append(HtmlUtil.space(2));
-            sb.append(HtmlUtil.submit(msg("Delete selected"), ARG_METADATA_DELETE));
-            if(canEditParent) {
+            sb.append(HtmlUtil.submit(msg("Delete selected"),
+                                      ARG_METADATA_DELETE));
+            if (canEditParent) {
                 sb.append(HtmlUtil.space(2));
-                sb.append(HtmlUtil.submit(msg("Add selected to parent group"), ARG_METADATA_ADDTOPARENT));
+                sb.append(
+                    HtmlUtil.submit(
+                        msg("Add selected to parent group"),
+                        ARG_METADATA_ADDTOPARENT));
             }
             sb.append(HtmlUtil.formTable());
             for (Metadata metadata : metadataList) {
@@ -774,13 +790,21 @@ public class MetadataManager extends RepositoryManager {
                     continue;
                 }
                 String cbxId = "cbx_" + metadata.getId();
-                String cbx = HtmlUtil.checkbox(ARG_METADATA_ID
-                                 + SUFFIX_SELECT
-                                               + metadata.getId(), metadata.getId(), false,
-                                               HtmlUtil.id(cbxId)+" " +
-                                               HtmlUtil.attr(HtmlUtil.ATTR_TITLE,msg("Shift-click: select range; Control-click: toggle all"))+
-                                                             HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,HtmlUtil.call("checkboxClicked",
-                                                                                                               HtmlUtil.comma("event",HtmlUtil.squote("cbx_"),HtmlUtil.squote(cbxId)))));
+                String cbx =
+                    HtmlUtil.checkbox(
+                        ARG_METADATA_ID + SUFFIX_SELECT + metadata.getId(),
+                        metadata.getId(), false,
+                        HtmlUtil.id(cbxId) + " "
+                        + HtmlUtil.attr(
+                            HtmlUtil.ATTR_TITLE,
+                            msg(
+                            "Shift-click: select range; Control-click: toggle all")) + HtmlUtil.attr(
+                                HtmlUtil.ATTR_ONCLICK,
+                                HtmlUtil.call(
+                                    "checkboxClicked",
+                                    HtmlUtil.comma(
+                                        "event", HtmlUtil.squote("cbx_"),
+                                        HtmlUtil.squote(cbxId)))));
 
                 sb.append(HtmlUtil.rowTop(HtmlUtil.cols(cbx + html[0],
                         html[1])));
@@ -788,7 +812,8 @@ public class MetadataManager extends RepositoryManager {
             sb.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.submit(msg("Change")));
             sb.append(HtmlUtil.space(2));
-            sb.append(HtmlUtil.submit(msg("Delete Selected"), ARG_METADATA_DELETE));
+            sb.append(HtmlUtil.submit(msg("Delete Selected"),
+                                      ARG_METADATA_DELETE));
             sb.append(HtmlUtil.formClose());
         }
 
@@ -812,7 +837,7 @@ public class MetadataManager extends RepositoryManager {
         StringBuffer sb    = new StringBuffer();
         Entry        entry = getEntryManager().getEntry(request);
         sb.append(HtmlUtil.p());
-        if (!request.exists(ARG_TYPE)) {
+        if ( !request.exists(ARG_TYPE)) {
             makeAddList(request, entry, sb);
         } else {
             String type = request.getString(ARG_TYPE, BLANK);
@@ -830,43 +855,52 @@ public class MetadataManager extends RepositoryManager {
                 msg("Add Metadata"), sb);
     }
 
-    private void makeAddList(Request request, Entry entry, StringBuffer sb) throws Exception {
-            List<String> groups   = new ArrayList<String>();
-            Hashtable    groupMap = new Hashtable();
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    private void makeAddList(Request request, Entry entry, StringBuffer sb)
+            throws Exception {
+        List<String> groups   = new ArrayList<String>();
+        Hashtable    groupMap = new Hashtable();
 
-            for (MetadataHandler handler : metadataHandlers) {
-                String       name    = handler.getHandlerGroupName();
-                StringBuffer groupSB = null;
-                for (Metadata.Type type : handler.getTypes(request, entry)) {
+        for (MetadataHandler handler : metadataHandlers) {
+            String       name    = handler.getHandlerGroupName();
+            StringBuffer groupSB = null;
+            for (Metadata.Type type : handler.getTypes(request, entry)) {
+                if (groupSB == null) {
+                    groupSB = (StringBuffer) groupMap.get(name);
                     if (groupSB == null) {
-                        groupSB = (StringBuffer) groupMap.get(name);
-                        if (groupSB == null) {
-                            groupMap.put(name, groupSB = new StringBuffer());
-                            groups.add(name);
-                        }
+                        groupMap.put(name, groupSB = new StringBuffer());
+                        groups.add(name);
                     }
-                    groupSB.append(request.uploadForm(URL_METADATA_ADDFORM));
-                    groupSB.append(HtmlUtil.hidden(ARG_ENTRYID,
-                            entry.getId()));
-                    groupSB.append(HtmlUtil.hidden(ARG_TYPE, type.getType()));
-                    groupSB.append(HtmlUtil.submit(msg("Add")));
-                    groupSB.append(HtmlUtil.space(1)
-                                   + HtmlUtil.bold(type.getLabel()));
-                    groupSB.append(HtmlUtil.formClose());
-                    groupSB.append(HtmlUtil.p());
-                    groupSB.append(NEWLINE);
                 }
+                groupSB.append(request.uploadForm(URL_METADATA_ADDFORM));
+                groupSB.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
+                groupSB.append(HtmlUtil.hidden(ARG_TYPE, type.getType()));
+                groupSB.append(HtmlUtil.submit(msg("Add")));
+                groupSB.append(HtmlUtil.space(1)
+                               + HtmlUtil.bold(type.getLabel()));
+                groupSB.append(HtmlUtil.formClose());
+                groupSB.append(HtmlUtil.p());
+                groupSB.append(NEWLINE);
             }
-            for (String name : groups) {
-                //                sb.append(header(name));
-                StringBuffer tmp = new StringBuffer();
-                tmp.append("<ul>");
-                tmp.append(groupMap.get(name));
-                tmp.append("</ul>");
-                sb.append(HtmlUtil.makeShowHideBlock(name, tmp.toString(),
-                        false));
+        }
+        for (String name : groups) {
+            //                sb.append(header(name));
+            StringBuffer tmp = new StringBuffer();
+            tmp.append("<ul>");
+            tmp.append(groupMap.get(name));
+            tmp.append("</ul>");
+            sb.append(HtmlUtil.makeShowHideBlock(name, tmp.toString(),
+                    false));
 
-            }
+        }
 
     }
 

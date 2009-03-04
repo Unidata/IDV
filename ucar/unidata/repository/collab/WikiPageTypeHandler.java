@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository.collab;
 
 
@@ -35,7 +34,6 @@ import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.WikiUtil;
 
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
@@ -43,6 +41,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.WikiUtil;
 import ucar.unidata.xml.XmlUtil;
 
 import java.sql.PreparedStatement;
@@ -67,6 +66,7 @@ import java.util.Properties;
  */
 public class WikiPageTypeHandler extends GenericTypeHandler {
 
+    /** _more_          */
     public static String ASSOC_WIKILINK = "wikilink";
 
 
@@ -102,9 +102,12 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
      */
     public Result getHtmlDisplay(Request request, Entry entry)
             throws Exception {
-        if(request.get(ARG_WIKI_DETAILS,false)) return null;
+        if (request.get(ARG_WIKI_DETAILS, false)) {
+            return null;
+        }
         Result result = getRepository().getOutputHandler(
-                                                         WikiPageOutputHandler.OUTPUT_WIKI).outputEntry(request, entry);
+                            WikiPageOutputHandler.OUTPUT_WIKI).outputEntry(
+                            request, entry);
         return result;
     }
 
@@ -160,21 +163,23 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
                                    request.getUser().getId(), new Date(),
                                    desc, newText });
             WikiUtil wikiUtil = new WikiUtil(Misc.newHashtable(new Object[] {
-                OutputHandler.PROP_REQUEST,
-                request, OutputHandler.PROP_ENTRY, entry }));
-            getRepository().getHtmlOutputHandler().wikifyEntry(request, entry,
-                                                               wikiUtil,
-                                                               newText,null,null);
-        
+                                    OutputHandler.PROP_REQUEST,
+                                    request, OutputHandler.PROP_ENTRY,
+                                    entry }));
+            getRepository().getHtmlOutputHandler().wikifyEntry(request,
+                    entry, wikiUtil, newText, null, null);
+
             List categories = (List) wikiUtil.getProperty("wikicategories");
-            if(categories == null) {
+            if (categories == null) {
                 categories = new ArrayList();
             }
             //TODO: 
-            List<Metadata> metadataList = getMetadataManager().getMetadata(entry);
-            for(Metadata metadata: (List<Metadata>)new ArrayList(metadataList)) {
-                if(metadata.getType().equals("wikicategory")) {
-                    if(!categories.contains(metadata.getAttr1())) {
+            List<Metadata> metadataList =
+                getMetadataManager().getMetadata(entry);
+            for (Metadata metadata : (List<Metadata>) new ArrayList(
+                    metadataList)) {
+                if (metadata.getType().equals("wikicategory")) {
+                    if ( !categories.contains(metadata.getAttr1())) {
                         metadataList.remove(metadata);
                         //getMetadataManager().deleteMetadata(metadata);
                     } else {
@@ -182,42 +187,46 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
                     }
                 }
             }
-            for(String cat:(List<String>) categories) {
-                Metadata metadata= new Metadata(getRepository().getGUID(),entry.getId(), "wikicategory",
-                                                false,
-                                                cat,"","","");
+            for (String cat : (List<String>) categories) {
+                Metadata metadata = new Metadata(getRepository().getGUID(),
+                                        entry.getId(), "wikicategory", false,
+                                        cat, "", "", "");
                 //                getMetadataManager().insertMetadata(metadata);
                 metadataList.add(metadata);
-            }                
-            entry.setMetadata(metadataList);
-            Hashtable<Entry,Entry> links = (Hashtable<Entry,Entry>) wikiUtil.getProperty("wikilinks");
-            if(links ==null) {
-                links = new Hashtable<Entry,Entry>();
             }
-            Hashtable ids = new Hashtable();
+            entry.setMetadata(metadataList);
+            Hashtable<Entry, Entry> links =
+                (Hashtable<Entry, Entry>) wikiUtil.getProperty("wikilinks");
+            if (links == null) {
+                links = new Hashtable<Entry, Entry>();
+            }
+            Hashtable         ids             = new Hashtable();
             List<Association> newAssociations = new ArrayList<Association>();
-            for(Enumeration keys= links.keys();keys.hasMoreElements();) {
+            for (Enumeration keys = links.keys(); keys.hasMoreElements(); ) {
                 Entry linkedEntry = (Entry) keys.nextElement();
-                Association tmp= new Association(getRepository().getGUID(),"",ASSOC_WIKILINK,
-                                                 entry.getId(),
-                                                 linkedEntry.getId());
+                Association tmp = new Association(getRepository().getGUID(),
+                                      "", ASSOC_WIKILINK, entry.getId(),
+                                      linkedEntry.getId());
                 newAssociations.add(tmp);
             }
-                
+
 
             List<Association> associations =
                 getEntryManager().getAssociations(request, entry);
-            for(Association oldAssociation: (List<Association>)new ArrayList(associations)) {
-                if(oldAssociation.getType().equals(ASSOC_WIKILINK) && 
-                   oldAssociation.getFromId().equals(entry.getId())) {
-                    if(!newAssociations.contains(oldAssociation)) {
+            for (Association oldAssociation : (List<Association>) new ArrayList(
+                    associations)) {
+                if (oldAssociation.getType().equals(ASSOC_WIKILINK)
+                        && oldAssociation.getFromId().equals(entry.getId())) {
+                    if ( !newAssociations.contains(oldAssociation)) {
                         System.err.println("delete:" + oldAssociation);
-                        getEntryManager().deleteAssociation(request, oldAssociation);
+                        getEntryManager().deleteAssociation(request,
+                                oldAssociation);
                     }
                 }
             }
-            for(Association newAssociation: (List<Association>)new ArrayList(newAssociations)) {
-                if(!associations.contains(newAssociation)) {
+            for (Association newAssociation : (List<Association>) new ArrayList(
+                    newAssociations)) {
+                if ( !associations.contains(newAssociation)) {
                     getEntryManager().addAssociation(request, newAssociation);
                 }
             }
@@ -303,7 +312,9 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
 
 
 
-        String buttons = getRepository().getHtmlOutputHandler().makeWikiEditBar(request,entry, ARG_WIKI_TEXT);
+        String buttons =
+            getRepository().getHtmlOutputHandler().makeWikiEditBar(request,
+                entry, ARG_WIKI_TEXT);
         String textWidget = buttons + HtmlUtil.br()
                             + HtmlUtil.textArea(ARG_WIKI_TEXT, wikiText, 250,
                                 60, HtmlUtil.id(ARG_WIKI_TEXT));

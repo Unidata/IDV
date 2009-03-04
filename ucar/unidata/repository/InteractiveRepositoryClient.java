@@ -113,8 +113,15 @@ public class InteractiveRepositoryClient extends RepositoryClient {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getSelectedGroup() {
-        if(getDefaultGroupId()!=null) return getDefaultGroupId();
+        if (getDefaultGroupId() != null) {
+            return getDefaultGroupId();
+        }
         return getSelectedGroupFromTree();
     }
 
@@ -313,7 +320,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
         /** _more_ */
         private boolean canDoNew = false;
 
-        /** _more_          */
+        /** _more_ */
         private boolean canDoUpload = false;
 
         /**

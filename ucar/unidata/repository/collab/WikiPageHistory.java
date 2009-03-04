@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository.collab;
 
 
@@ -38,19 +37,19 @@ import java.util.Date;
 
 public class WikiPageHistory {
 
-    /** _more_          */
+    /** _more_ */
     int version;
 
-    /** _more_          */
+    /** _more_ */
     User user;
 
-    /** _more_          */
+    /** _more_ */
     Date date;
 
-    /** _more_          */
+    /** _more_ */
     String description;
 
-    /** _more_          */
+    /** _more_ */
     String text;
 
     /**

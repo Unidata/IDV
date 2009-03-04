@@ -107,11 +107,8 @@ public class MapOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param entries _more_
      * @param state _more_
-     * @param types _more_
      * @param links _more_
-     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
@@ -203,9 +200,6 @@ public class MapOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param group _more_
-     * @param subGroups _more_
-     * @param entries _more_
      * @param entriesToUse _more_
      * @param sb _more_
      * @param width _more_

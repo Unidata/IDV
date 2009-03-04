@@ -291,15 +291,13 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @param arg _more_
      * @param value _more_
-     * @param request _more_
      * @param entry _more_
      *
      * @return _more_
      */
-    public int matchValue(String arg, Object value, 
-                          Entry entry) {
+    public int matchValue(String arg, Object value, Entry entry) {
         for (Column column : columns) {
-            int match = column.matchValue(arg, value,  entry);
+            int match = column.matchValue(arg, value, entry);
             if (match == MATCH_FALSE) {
                 return MATCH_FALSE;
             }
@@ -597,7 +595,6 @@ public class GenericTypeHandler extends TypeHandler {
      * @param output _more_
      * @param showDescription _more_
      * @param showResource _more_
-     * @param showMap _more_
      * @param linkToDownload _more_
      *
      * @return _more_

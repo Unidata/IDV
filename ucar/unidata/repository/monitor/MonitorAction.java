@@ -19,9 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository.monitor;
 
 
@@ -37,7 +34,7 @@ import ucar.unidata.repository.*;
  */
 public abstract class MonitorAction implements Constants {
 
-    /** _more_          */
+    /** _more_ */
     private String id;
 
 
@@ -66,6 +63,8 @@ public abstract class MonitorAction implements Constants {
     /**
      * _more_
      *
+     *
+     * @param entryMonitor _more_
      * @return _more_
      */
     public String getSummary(EntryMonitor entryMonitor) {

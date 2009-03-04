@@ -76,8 +76,10 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     public static final String TYPE_GROUP = Constants.TYPE_GROUP;
 
+    /** _more_ */
     public static final String TYPE_CONTRIBUTION = "contribution";
 
+    /** _more_ */
     public static final String TYPE_OPENDAPLINK = "opendaplink";
 
 
@@ -615,7 +617,6 @@ public class TypeHandler extends RepositoryManager {
      * @param entry _more_
      * @param request _more_
      * @param links _more_
-     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
@@ -628,21 +629,29 @@ public class TypeHandler extends RepositoryManager {
             if (getAccessManager().canDoAction(request, entry,
                     Permission.ACTION_NEW)) {
 
-                links.add(new Link(request.url(getRepository().URL_ENTRY_FORM,
-                        ARG_GROUP,
-                                               entry.getId(),
-                                               ARG_TYPE, TYPE_GROUP), getRepository().iconUrl(ICON_FOLDER_ADD),
-                                   "New Group",OutputType.TYPE_FILE));
-                links.add(new Link(request.url(getRepository().URL_ENTRY_FORM,
-                        ARG_GROUP,
-                                               entry.getId(),
-                                               ARG_TYPE, TYPE_FILE), getRepository().iconUrl(ICON_ENTRY_ADD),
-                                   "New File",OutputType.TYPE_FILE));
+                links.add(
+                    new Link(
+                        request.url(
+                            getRepository().URL_ENTRY_FORM, ARG_GROUP,
+                            entry.getId(), ARG_TYPE,
+                            TYPE_GROUP), getRepository().iconUrl(
+                                ICON_FOLDER_ADD), "New Group",
+                                    OutputType.TYPE_FILE));
+                links.add(
+                    new Link(
+                        request.url(
+                            getRepository().URL_ENTRY_FORM, ARG_GROUP,
+                            entry.getId(), ARG_TYPE,
+                            TYPE_FILE), getRepository().iconUrl(
+                                ICON_ENTRY_ADD), "New File",
+                                    OutputType.TYPE_FILE));
 
                 links.add(new Link(request.url(getRepository().URL_ENTRY_NEW,
                         ARG_GROUP,
                         entry.getId()), getRepository().iconUrl(ICON_NEW),
-                                        "New Entry",OutputType.TYPE_FILE|OutputType.TYPE_TOOLBAR));
+                                        "New Entry",
+                                        OutputType.TYPE_FILE
+                                        | OutputType.TYPE_TOOLBAR));
                 Link hr = new Link(true);
                 hr.setLinkType(OutputType.TYPE_FILE);
                 links.add(hr);
@@ -653,7 +662,9 @@ public class TypeHandler extends RepositoryManager {
                         request.url(
                             getRepository().URL_ENTRY_UPLOAD, ARG_GROUP,
                             entry.getId()), getRepository().iconUrl(
-                                ICON_UPLOAD), "Upload a file",OutputType.TYPE_FILE|OutputType.TYPE_TOOLBAR));
+                                ICON_UPLOAD), "Upload a file",
+                                    OutputType.TYPE_FILE
+                                    | OutputType.TYPE_TOOLBAR));
             }
 
         }
@@ -662,20 +673,26 @@ public class TypeHandler extends RepositoryManager {
             links.add(
                 new Link(
                     request.entryUrl(getRepository().URL_ENTRY_FORM, entry),
-                    getRepository().iconUrl(ICON_EDIT), msg("Edit Entry"),OutputType.TYPE_EDIT|OutputType.TYPE_TOOLBAR));
+                    getRepository().iconUrl(ICON_EDIT), msg("Edit Entry"),
+                    OutputType.TYPE_EDIT | OutputType.TYPE_TOOLBAR));
 
             links.add(
                 new Link(
-                    request.entryUrl(getMetadataManager().URL_METADATA_FORM, entry),
-                    getRepository().iconUrl(ICON_METADATA_EDIT), msg("Edit Metadata"),OutputType.TYPE_EDIT));
+                    request.entryUrl(
+                        getMetadataManager().URL_METADATA_FORM,
+                        entry), getRepository().iconUrl(ICON_METADATA_EDIT),
+                                msg("Edit Metadata"), OutputType.TYPE_EDIT));
             links.add(
                 new Link(
-                    request.entryUrl(getMetadataManager().URL_METADATA_ADDFORM, entry),
-                    getRepository().iconUrl(ICON_METADATA_ADD), msg("Add Metadata"),OutputType.TYPE_EDIT));
+                    request.entryUrl(
+                        getMetadataManager().URL_METADATA_ADDFORM,
+                        entry), getRepository().iconUrl(ICON_METADATA_ADD),
+                                msg("Add Metadata"), OutputType.TYPE_EDIT));
             links.add(
                 new Link(
                     request.entryUrl(getRepository().URL_ACCESS_FORM, entry),
-                    getRepository().iconUrl(ICON_ACCESS), msg("Access"),OutputType.TYPE_EDIT));
+                    getRepository().iconUrl(ICON_ACCESS), msg("Access"),
+                    OutputType.TYPE_EDIT));
 
         }
 
@@ -686,7 +703,9 @@ public class TypeHandler extends RepositoryManager {
                     request.entryUrl(
                         getRepository().URL_ENTRY_DELETE,
                         entry), getRepository().iconUrl(ICON_DELETE),
-                               msg("Delete Entry"),OutputType.TYPE_EDIT|OutputType.TYPE_TOOLBAR));
+                                msg("Delete Entry"),
+                                OutputType.TYPE_EDIT
+                                | OutputType.TYPE_TOOLBAR));
 
         }
 
@@ -700,7 +719,8 @@ public class TypeHandler extends RepositoryManager {
             new Link(
                 request.entryUrl(getRepository().URL_COMMENTS_SHOW, entry),
                 getRepository().iconUrl(ICON_COMMENTS),
-                msg("Add/View Comments"),OutputType.TYPE_EDIT|OutputType.TYPE_TOOLBAR));
+                msg("Add/View Comments"),
+                OutputType.TYPE_EDIT | OutputType.TYPE_TOOLBAR));
 
         if ((request.getUser() != null)
                 && !request.getUser().getAnonymous()) {
@@ -709,7 +729,9 @@ public class TypeHandler extends RepositoryManager {
                     request.entryUrl(
                         getRepository().URL_ENTRY_COPY, entry,
                         ARG_FROM), getRepository().iconUrl(ICON_MOVE),
-                                   msg("Copy/Move Entry"),OutputType.TYPE_EDIT|OutputType.TYPE_TOOLBAR));
+                                   msg("Copy/Move Entry"),
+                                   OutputType.TYPE_EDIT
+                                   | OutputType.TYPE_TOOLBAR));
         }
 
 
@@ -756,12 +778,12 @@ public class TypeHandler extends RepositoryManager {
         if ( !getAccessManager().canDownload(request, entry)) {
             return null;
         }
-        File   f    = entry.getResource().getFile();
-        String size = " (" + f.length() + " bytes)";
+        File   f        = entry.getResource().getFile();
+        String size     = " (" + f.length() + " bytes)";
         String fileTail = getStorageManager().getFileTail(entry);
         return new Link(getEntryManager().getEntryResourceUrl(request,
-                                                              entry), getRepository().iconUrl(ICON_FETCH),
-                        "Download file" + size,OutputType.TYPE_FILE);
+                entry), getRepository().iconUrl(ICON_FETCH),
+                        "Download file" + size, OutputType.TYPE_FILE);
     }
 
 
@@ -774,7 +796,6 @@ public class TypeHandler extends RepositoryManager {
      * @param output _more_
      * @param showDescription _more_
      * @param showResource _more_
-     * @param showMap _more_
      * @param linkToDownload _more_
      *
      * @return _more_
@@ -829,7 +850,7 @@ public class TypeHandler extends RepositoryManager {
             String   resourceLink = resource.getPath();
             if (resourceLink.length() > 0) {
                 if (entry.getResource().isUrl()) {
-                    resourceLink =  getResourceUrl(request, entry);
+                    resourceLink = getResourceUrl(request, entry);
                     resourceLink = HtmlUtil.href(resourceLink, resourceLink);
                 } else if (entry.getResource().isFile()) {
                     int idx = resourceLink.indexOf("_");
@@ -837,9 +858,9 @@ public class TypeHandler extends RepositoryManager {
                         resourceLink = resourceLink.substring(idx + 1);
                     }
                     if (getAccessManager().canDownload(request, entry)) {
-                        resourceLink = HtmlUtil.href(
-                                                     getEntryResourceUrl(
-                                                                         request, entry), resourceLink);
+                        resourceLink =
+                            HtmlUtil.href(getEntryResourceUrl(request,
+                                entry), resourceLink);
 
                         resourceLink =
                             resourceLink + HtmlUtil.space(2)
@@ -930,12 +951,9 @@ public class TypeHandler extends RepositoryManager {
             if (showResource && entry.getResource().isImage()) {
                 if (entry.getResource().isFile()
                         && getAccessManager().canDownload(request, entry)) {
-                    sb.append(
-                        HtmlUtil.formEntryTop(
-                            msgLabel("Image"),
-                            HtmlUtil.img(
-                                         getEntryResourceUrl(
-                                                             request, entry), "", "width=600")));
+                    sb.append(HtmlUtil.formEntryTop(msgLabel("Image"),
+                            HtmlUtil.img(getEntryResourceUrl(request, entry),
+                                         "", "width=600")));
 
 
                 } else if (entry.getResource().isUrl()) {
@@ -950,13 +968,35 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
-    public String getResourceUrl(Request request, Entry entry) throws Exception {
-        Resource resource     = entry.getResource();
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getResourceUrl(Request request, Entry entry)
+            throws Exception {
+        Resource resource = entry.getResource();
         return resource.getPath();
     }
 
 
-    public String getEntryResourceUrl(Request request, Entry entry) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getEntryResourceUrl(Request request, Entry entry)
+            throws Exception {
         return getEntryManager().getEntryResourceUrl(request, entry);
     }
 
@@ -1053,7 +1093,6 @@ public class TypeHandler extends RepositoryManager {
      *
      * @param request _more_
      * @param what _more_
-     * @param whereList _more_
      * @param clauses _more_
      * @param extra _more_
      *
@@ -1155,7 +1194,6 @@ public class TypeHandler extends RepositoryManager {
      * _more_
      *
      * @param request _more_
-     * @param formBuffer _more_
      * @param sb _more_
      * @param entry _more_
      *
@@ -1166,9 +1204,15 @@ public class TypeHandler extends RepositoryManager {
 
         String size = HtmlUtil.SIZE_70;
 
-        if(entry==null && getType().equals(TYPE_CONTRIBUTION)) {
-            sb.append(HtmlUtil.formEntry(msgLabel("Your Name"), HtmlUtil.input(ARG_CONTRIBUTION_FROMNAME,"",size)));
-            sb.append(HtmlUtil.formEntry(msgLabel("Your Email"), HtmlUtil.input(ARG_CONTRIBUTION_FROMEMAIL,"",size)));
+        if ((entry == null) && getType().equals(TYPE_CONTRIBUTION)) {
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Your Name"),
+                    HtmlUtil.input(ARG_CONTRIBUTION_FROMNAME, "", size)));
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Your Email"),
+                    HtmlUtil.input(ARG_CONTRIBUTION_FROMEMAIL, "", size)));
         }
 
 
@@ -1561,11 +1605,10 @@ public class TypeHandler extends RepositoryManager {
 
 
         addTextSearch(request, basicSB);
-        if(request.defined(ARG_USER_ID)) {
-            basicSB.append(
-                HtmlUtil.formEntry(
-                    msgLabel("User"),
-                    HtmlUtil.input(ARG_USER_ID, request.getString(ARG_USER_ID,""))));
+        if (request.defined(ARG_USER_ID)) {
+            basicSB.append(HtmlUtil.formEntry(msgLabel("User"),
+                    HtmlUtil.input(ARG_USER_ID,
+                                   request.getString(ARG_USER_ID, ""))));
         }
 
 
@@ -1635,7 +1678,7 @@ public class TypeHandler extends RepositoryManager {
          */
 
 
-        addSearchField(request, ARG_FILESUFFIX,advancedSB);
+        addSearchField(request, ARG_FILESUFFIX, advancedSB);
 
         basicSB.append(
             HtmlUtil.formEntry(
@@ -1770,12 +1813,20 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
-    public void addSearchField(Request request, String what,StringBuffer sb) {
-        if(what.equals(ARG_FILESUFFIX)) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param what _more_
+     * @param sb _more_
+     */
+    public void addSearchField(Request request, String what,
+                               StringBuffer sb) {
+        if (what.equals(ARG_FILESUFFIX)) {
             sb.append(HtmlUtil.formEntry(msgLabel("File Suffix"),
-                                         HtmlUtil.input(ARG_FILESUFFIX,
-                                                        "", " size=\"8\" ")));
-        } 
+                                         HtmlUtil.input(ARG_FILESUFFIX, "",
+                                             " size=\"8\" ")));
+        }
     }
 
 
@@ -2383,13 +2434,11 @@ public class TypeHandler extends RepositoryManager {
      *
      * @param arg _more_
      * @param value _more_
-     * @param request _more_
      * @param entry _more_
      *
      * @return _more_
      */
-    public int matchValue(String arg, Object value, 
-                          Entry entry) {
+    public int matchValue(String arg, Object value, Entry entry) {
         return MATCH_UNKNOWN;
     }
 

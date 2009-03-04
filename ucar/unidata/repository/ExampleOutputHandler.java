@@ -99,9 +99,7 @@ public class ExampleOutputHandler extends OutputHandler {
      *
      * @param request The request
      * @param state The state
-     * @param types The list to add to
      * @param links _more_
-     * @param forHeader _more_
      *
      *
      * @throws Exception On badness

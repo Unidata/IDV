@@ -22,10 +22,10 @@
 
 package ucar.unidata.repository.data;
 
-import ucar.unidata.repository.*;
-
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.sql.SqlUtil;
 
@@ -78,7 +78,7 @@ public class CatalogHarvester extends Harvester {
     /** _more_ */
     boolean recurse = false;
 
-    /** _more_          */
+    /** _more_ */
     boolean download = false;
 
     /** _more_ */
@@ -127,15 +127,17 @@ public class CatalogHarvester extends Harvester {
     }
 
 
-    
+
     /**
      * _more_
      *
+     *
+     * @param timestamp _more_
      * @throws Exception _more_
      */
     protected void runInner(int timestamp) throws Exception {
         groups = new ArrayList();
-        importCatalog(topUrl, topGroup, 0,timestamp);
+        importCatalog(topUrl, topGroup, 0, timestamp);
         //getEntryManager().processEntries(this, null, entries,false);
         if (entries.size() > 0) {
             getEntryManager().processEntries(this, null, entries, false);
@@ -150,14 +152,16 @@ public class CatalogHarvester extends Harvester {
      * @param url _more_
      * @param parent _more_
      * @param depth _more_
+     * @param timestamp _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    private boolean importCatalog(String url, Group parent, int depth, int timestamp)
+    private boolean importCatalog(String url, Group parent, int depth,
+                                  int timestamp)
             throws Exception {
-        if(!canContinueRunning(timestamp)) {
+        if ( !canContinueRunning(timestamp)) {
             return true;
         }
         if (seen.get(url) != null) {
@@ -202,9 +206,11 @@ public class CatalogHarvester extends Harvester {
 
             //If there is just one top-level dataset node then just load that
             if ((cnt == 1) && (datasetNode != null)) {
-                recurseCatalog((Element) datasetNode, parent, url, 0, depth,timestamp);
+                recurseCatalog((Element) datasetNode, parent, url, 0, depth,
+                               timestamp);
             } else {
-                recurseCatalog((Element) root, parent, url, 0, depth,timestamp);
+                recurseCatalog((Element) root, parent, url, 0, depth,
+                               timestamp);
             }
             return true;
         } catch (Exception exc) {
@@ -226,14 +232,14 @@ public class CatalogHarvester extends Harvester {
             metadata.setEntryId(entry.getId());
             try {
                 if (metadata.getAttr1().length() > 10000) {
-                    repository.log("Too long metadata:"
-                                   + metadata.getAttr1().substring(0, 100)
-                                   + "...");
+                    repository.logError("Too long metadata:"
+                                        + metadata.getAttr1().substring(0,
+                                            100) + "...");
                     continue;
                 }
                 getMetadataManager().insertMetadata(metadata);
             } catch (Exception exc) {
-                repository.log("Bad metadata", exc);
+                repository.logError("Bad metadata", exc);
                 System.err.println("metadata attr1" + metadata.getAttr1());
                 System.err.println("metadata attr2" + metadata.getAttr2());
                 System.err.println("metadata attr3" + metadata.getAttr3());
@@ -249,24 +255,23 @@ public class CatalogHarvester extends Harvester {
      *
      * @param node _more_
      * @param parent _more_
-     * @param catalogUrl _more_
-     * @param depth _more_
      * @param catalogUrlPath _more_
      * @param xmlDepth _more_
      * @param recurseDepth _more_
+     * @param timestamp _more_
      *
      * @throws Exception _more_
      */
     private void recurseCatalog(Element node, Group parent,
                                 String catalogUrlPath, int xmlDepth,
-                                int recurseDepth,int timestamp)
+                                int recurseDepth, int timestamp)
             throws Exception {
 
         String tab = "";
         for (int i = 0; i < xmlDepth; i++) {
             tab = tab + "  ";
         }
-        if(!canContinueRunning(timestamp)) {
+        if ( !canContinueRunning(timestamp)) {
             return;
         }
         URL catalogUrl = new URL(catalogUrlPath);
@@ -305,12 +310,16 @@ public class CatalogHarvester extends Harvester {
             if (serviceNode != null) {
                 String path = XmlUtil.getAttribute(serviceNode, "base");
                 urlPath = new URL(catalogUrl, path + urlPath).toString();
-                String serviceType = XmlUtil.getAttribute(serviceNode, CatalogUtil.ATTR_SERVICETYPE,"").toLowerCase();
-                isOpendap = serviceType.equals("opendap")|| serviceType.equals("dods");
+                String serviceType = XmlUtil.getAttribute(serviceNode,
+                                         CatalogUtil.ATTR_SERVICETYPE,
+                                         "").toLowerCase();
+                isOpendap = serviceType.equals("opendap")
+                            || serviceType.equals("dods");
             }
 
-            TypeHandler typeHandler =
-                repository.getTypeHandler((isOpendap?TypeHandler.TYPE_OPENDAPLINK:TypeHandler.TYPE_FILE));
+            TypeHandler typeHandler = repository.getTypeHandler((isOpendap
+                    ? TypeHandler.TYPE_OPENDAPLINK
+                    : TypeHandler.TYPE_FILE));
             entryCnt++;
             Entry  entry      = typeHandler.createEntry(repository.getGUID());
             Date   createDate = new Date();
@@ -421,7 +430,7 @@ public class CatalogHarvester extends Harvester {
             String  tag   = child.getTagName();
             if (tag.equals(CatalogUtil.TAG_DATASET)) {
                 recurseCatalog(child, group, catalogUrlPath, xmlDepth + 1,
-                               recurseDepth,timestamp);
+                               recurseDepth, timestamp);
             } else if (tag.equals(CatalogUtil.TAG_CATALOGREF)) {
                 if ( !recurse) {
                     continue;

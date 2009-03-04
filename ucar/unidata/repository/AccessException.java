@@ -23,47 +23,50 @@
 package ucar.unidata.repository;
 
 
+/**
+ * Class AccessException _more_
+ *
+ *
+ * @author IDV Development Team
+ * @version $Revision: 1.3 $
+ */
+public class AccessException extends RuntimeException {
+
+    /** _more_ */
+    Request request;
+
+
     /**
-     * Class AccessException _more_
+     * _more_
      *
-     *
-     * @author IDV Development Team
-     * @version $Revision: 1.3 $
+     * @param message _more_
+     * @param request _more_
      */
-    public  class AccessException extends RuntimeException {
-
-        Request request;
-
-
-        /**
-         * _more_
-         *
-         * @param message _more_
-         */
-        public AccessException(String message, Request request) {
-            super(message);
-            this.request=request;
-        }
-
-/**
-Set the Request property.
-
-@param value The new value for Request
-**/
-public void setRequest (Request value) {
-	this.request = value;
-}
-
-/**
-Get the Request property.
-
-@return The Request
-**/
-public Request getRequest () {
-	return this.request;
-}
-
-
-        
-
+    public AccessException(String message, Request request) {
+        super(message);
+        this.request = request;
     }
+
+    /**
+     * Set the Request property.
+     *
+     * @param value The new value for Request
+     */
+    public void setRequest(Request value) {
+        this.request = value;
+    }
+
+    /**
+     * Get the Request property.
+     *
+     * @return The Request
+     */
+    public Request getRequest() {
+        return this.request;
+    }
+
+
+
+
+}
+

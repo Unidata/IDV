@@ -67,7 +67,7 @@ public class AdminMetadataHandler extends MetadataHandler {
 
     //TODO:
 
-    /** _more_          */
+    /** _more_ */
     public static Metadata.Type TYPE_ANONYMOUS_UPLOAD =
         new Metadata.Type("admin.anonymousupload", "Anonymous Upload");
 
@@ -198,7 +198,7 @@ public class AdminMetadataHandler extends MetadataHandler {
         String content = "";
         if (type.equals(TYPE_TEMPLATE)) {
             String value = metadata.getAttr1();
-            if ( !forEdit || value == null) {
+            if ( !forEdit || (value == null)) {
                 value = getRepository().getResource(PROP_HTML_TEMPLATE);
             }
             if (value == null) {

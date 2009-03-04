@@ -121,10 +121,12 @@ public class TestGenerator extends Harvester {
     /**
      * _more_
      *
+     *
+     * @param timestamp _more_
      * @throws Exception _more_
      */
     protected void runInner(int timestamp) throws Exception {
-        if(!canContinueRunning(timestamp)) {
+        if ( !canContinueRunning(timestamp)) {
             return;
         }
         cnt = 0;
@@ -154,7 +156,7 @@ public class TestGenerator extends Harvester {
                     entries.add(entry);
                     typeHandler.initializeNewEntry(entry);
                     cnt++;
-                    if(!canContinueRunning(timestamp)) {
+                    if ( !canContinueRunning(timestamp)) {
                         return;
                     }
                     if (entries.size() > 5000) {

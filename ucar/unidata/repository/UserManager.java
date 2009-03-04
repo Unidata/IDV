@@ -80,7 +80,7 @@ public class UserManager extends RepositoryManager {
         new OutputType("Add to Cart", "user.cart", OutputType.TYPE_NONHTML,
                        "", ICON_CART_ADD);
 
-    /** _more_          */
+    /** _more_ */
     public static final OutputType OUTPUT_FAVORITE =
         new OutputType("Add as Favorite", "user.addfavorite",
                        OutputType.TYPE_NONHTML, "", ICON_FAVORITE);
@@ -98,7 +98,8 @@ public class UserManager extends RepositoryManager {
     protected RequestUrl[] userUrls = { getRepositoryBase().URL_USER_HOME,
                                         getRepositoryBase().URL_USER_SETTINGS,
                                         getRepositoryBase().URL_USER_CART,
-                                        getRepositoryBase().URL_USER_MONITORS };
+                                        getRepositoryBase()
+                                            .URL_USER_MONITORS };
 
 
     /** _more_ */
@@ -148,6 +149,13 @@ public class UserManager extends RepositoryManager {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param password _more_
+     *
+     * @return _more_
+     */
     public static String hashPasswordOld(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA");
@@ -297,8 +305,7 @@ public class UserManager extends RepositoryManager {
         sb.append(header(msg("Please login")));
         String id = request.getString(ARG_USER_ID, "");
         sb.append(
-                  HtmlUtil.formPost(
-                                    getRepositoryBase().URL_USER_LOGIN.toString()));
+            HtmlUtil.formPost(getRepositoryBase().URL_USER_LOGIN.toString()));
         if (request.defined(ARG_REDIRECT)) {
             sb.append(HtmlUtil.hidden(ARG_REDIRECT,
                                       request.getUnsafeString(ARG_REDIRECT,
@@ -332,7 +339,10 @@ public class UserManager extends RepositoryManager {
         return sb.toString();
     }
 
+    /** _more_ */
     private static final String USER_DEFAULT = "default";
+
+    /** _more_ */
     private static final String USER_ANONYMOUS = "anonymous";
 
     /**
@@ -446,10 +456,20 @@ public class UserManager extends RepositoryManager {
      */
     protected void makeOrUpdateUser(User user, boolean updateIfNeeded)
             throws Exception {
-        makeOrUpdateUser(user,true,false);
+        makeOrUpdateUser(user, true, false);
     }
 
-    protected void makeOrUpdateUser(User user, boolean updateIfNeeded, boolean onlyPassword)
+    /**
+     * _more_
+     *
+     * @param user _more_
+     * @param updateIfNeeded _more_
+     * @param onlyPassword _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void makeOrUpdateUser(User user, boolean updateIfNeeded,
+                                    boolean onlyPassword)
             throws Exception {
         if (getDatabaseManager().tableContains(user.getId(),
                 Tables.USERS.NAME, Tables.USERS.COL_ID)) {
@@ -458,26 +478,26 @@ public class UserManager extends RepositoryManager {
                     msgLabel("Database already contains user")
                     + user.getId());
             }
-            if(onlyPassword) {
-                getDatabaseManager().update(Tables.USERS.NAME,
-                                            Tables.USERS.COL_ID, user.getId(),
-                                            new String[] {Tables.USERS.COL_PASSWORD}, 
-                                            new Object[] {user.getPassword()});
+            if (onlyPassword) {
+                getDatabaseManager().update(
+                    Tables.USERS.NAME, Tables.USERS.COL_ID, user.getId(),
+                    new String[] { Tables.USERS.COL_PASSWORD },
+                    new Object[] { user.getPassword() });
             } else {
                 getDatabaseManager().update(Tables.USERS.NAME,
-                                            Tables.USERS.COL_ID, user.getId(),
-                                            new String[] {
-                                                Tables.USERS.COL_NAME, Tables.USERS.COL_PASSWORD,
-                                                Tables.USERS.COL_EMAIL, Tables.USERS.COL_QUESTION,
-                                                Tables.USERS.COL_ANSWER, Tables.USERS.COL_ADMIN,
-                                                Tables.USERS.COL_LANGUAGE, Tables.USERS.COL_TEMPLATE
-                                            }, new Object[] {
-                                                user.getName(), user.getPassword(), user.getEmail(),
-                                                user.getQuestion(), user.getAnswer(), user.getAdmin()
-                                                ? new Integer(1)
-                                                : new Integer(0), user.getLanguage(),
-                                                user.getTemplate()
-                                            });
+                                            Tables.USERS.COL_ID,
+                                            user.getId(), new String[] {
+                    Tables.USERS.COL_NAME, Tables.USERS.COL_PASSWORD,
+                    Tables.USERS.COL_EMAIL, Tables.USERS.COL_QUESTION,
+                    Tables.USERS.COL_ANSWER, Tables.USERS.COL_ADMIN,
+                    Tables.USERS.COL_LANGUAGE, Tables.USERS.COL_TEMPLATE
+                }, new Object[] {
+                    user.getName(), user.getPassword(), user.getEmail(),
+                    user.getQuestion(), user.getAnswer(), user.getAdmin()
+                            ? new Integer(1)
+                            : new Integer(0), user.getLanguage(),
+                    user.getTemplate()
+                });
                 userMap.remove(user.getId());
             }
 
@@ -1167,7 +1187,7 @@ public class UserManager extends RepositoryManager {
         if (cart == null) {
             cart = new ArrayList<Entry>();
             userCart.put(sessionId, cart);
-        } 
+        }
         return cart;
     }
 
@@ -1299,7 +1319,7 @@ public class UserManager extends RepositoryManager {
         if ( !haveFrom && !splitScreen) {
             String[] formTuple =
                 getRepository().getHtmlOutputHandler().getEntryFormStart(
-                                                                         request, entries,false);
+                    request, entries, false);
 
             sb.append(formTuple[2]);
         }
@@ -1311,7 +1331,7 @@ public class UserManager extends RepositoryManager {
             cnt = 2;
         }
         List<StringBuffer> columns = new ArrayList<StringBuffer>();
-        StringBuffer jsSB=null;
+        StringBuffer       jsSB    = null;
         for (int column = 0; column < cnt; column++) {
             StringBuffer colSB = new StringBuffer();
             columns.add(colSB);
@@ -1332,9 +1352,9 @@ public class UserManager extends RepositoryManager {
                                         "Create an association")) + HtmlUtil.space(
                                             1) + entry.getLabel()));
                 } else if (splitScreen) {
-                    request.put(ARG_SHOWLINK,"false");
-                    colSB.append(getEntryManager().getAjaxLink(request, entry,
-                                                               entry.getLabel(), null));
+                    request.put(ARG_SHOWLINK, "false");
+                    colSB.append(getEntryManager().getAjaxLink(request,
+                            entry, entry.getLabel(), null));
 
                     request.remove(ARG_SHOWLINK);
                 } else {
@@ -1372,19 +1392,24 @@ public class UserManager extends RepositoryManager {
         for (StringBuffer colSB : columns) {
             colCnt++;
             String extra = "";
-            if(colCnt==1) {
+            if (colCnt == 1) {
                 extra = HtmlUtil.style("border-right : 1px black solid;");
             }
             sb.append(HtmlUtil.open(HtmlUtil.TAG_TD,
-                                    HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"50%")+extra));
-            if(splitScreen) {
-                sb.append(HtmlUtil.open(HtmlUtil.TAG_DIV,HtmlUtil.style("max-height: 600px; overflow-y: auto;")));
+                                    HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "50%")
+                                    + extra));
+            if (splitScreen) {
+                sb.append(
+                    HtmlUtil.open(
+                        HtmlUtil.TAG_DIV,
+                        HtmlUtil.style(
+                            "max-height: 600px; overflow-y: auto;")));
             } else {
                 sb.append("<ul style=\"list-style-image : url("
                           + getRepository().iconUrl(ICON_FILE) + ")\">");
             }
             sb.append(colSB);
-            if(splitScreen) {
+            if (splitScreen) {
                 sb.append(HtmlUtil.close(HtmlUtil.TAG_DIV));
             } else {
                 sb.append("</ul>");
@@ -1410,8 +1435,7 @@ public class UserManager extends RepositoryManager {
      *
      * @return _more_
      */
-    public Result makeResult(Request request, String title,
-                              StringBuffer sb) {
+    public Result makeResult(Request request, String title, StringBuffer sb) {
         return getRepository().makeResult(request, title, sb,
                                           (request.getUser().getAnonymous()
                                            ? anonUserUrls
@@ -1453,7 +1477,7 @@ public class UserManager extends RepositoryManager {
             request.remove(ARG_MESSAGE);
             request.remove(ARG_REDIRECT);
             String redirect =
-                XmlUtil.encodeBase64( request.getUrl().getBytes());
+                XmlUtil.encodeBase64(request.getUrl().getBytes());
             extras.add("");
             //            System.err.println ("initial url " + request.getUrl());
             urls.add(request.url(getRepositoryBase().URL_USER_LOGIN,
@@ -1639,8 +1663,10 @@ public class UserManager extends RepositoryManager {
 
 
         if (cnt == 0) {
-            sb.append("You have no favorite entries defined.<br>When you see an  entry or group just click on the " +
-                      HtmlUtil.img(iconUrl(ICON_FAVORITE))+" icon to add it to your list of favorites");
+            sb.append(
+                "You have no favorite entries defined.<br>When you see an  entry or group just click on the "
+                + HtmlUtil.img(iconUrl(ICON_FAVORITE))
+                + " icon to add it to your list of favorites");
         }
         return makeResult(request, "User Home", sb);
     }
@@ -1869,10 +1895,12 @@ public class UserManager extends RepositoryManager {
         }
         if (user == null) {
             if (request.exists(ARG_USER_NAME)) {
-                sb.append(getRepository().error(msg("Not a registered user")));
+                sb.append(
+                    getRepository().error(msg("Not a registered user")));
                 sb.append(HtmlUtil.p());
             }
-            addPasswordResetForm(request, sb, request.getString(ARG_USER_NAME, ""));
+            addPasswordResetForm(request, sb,
+                                 request.getString(ARG_USER_NAME, ""));
             return new Result(msg("Password Reset"), sb);
         }
 
@@ -1905,16 +1933,21 @@ public class UserManager extends RepositoryManager {
     }
 
 
-    private void addPasswordResetForm(Request request, StringBuffer sb, String name) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     * @param name _more_
+     */
+    private void addPasswordResetForm(Request request, StringBuffer sb,
+                                      String name) {
         sb.append(msgHeader("Please enter your user ID"));
         sb.append(HtmlUtil.p());
-        sb.append(
-                  request.form(getRepositoryBase().URL_USER_RESETPASSWORD));
+        sb.append(request.form(getRepositoryBase().URL_USER_RESETPASSWORD));
         sb.append(msgLabel("User ID"));
         sb.append(HtmlUtil.space(1));
-        sb.append(HtmlUtil.input(ARG_USER_NAME,
-                                 name,
-                                 HtmlUtil.SIZE_20));
+        sb.append(HtmlUtil.input(ARG_USER_NAME, name, HtmlUtil.SIZE_20));
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.submit(msg("Reset your password")));
         sb.append(HtmlUtil.formClose());
@@ -1950,57 +1983,58 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processLogin(Request request) throws Exception {
+
         boolean responseAsXml = request.getString(ARG_RESPONSE,
                                     "").equals(RESPONSE_XML);
         StringBuffer sb     = new StringBuffer();
         User         user   = null;
         String       output = request.getString(ARG_OUTPUT, "");
         if (request.exists(ARG_USER_ID)) {
-            String name     = request.getString(ARG_USER_ID, "").trim();
-            if(name.equals(USER_DEFAULT)||name.equals(USER_ANONYMOUS)) name="";
+            String name = request.getString(ARG_USER_ID, "").trim();
+            if (name.equals(USER_DEFAULT) || name.equals(USER_ANONYMOUS)) {
+                name = "";
+            }
             String password = request.getString(ARG_USER_PASSWORD, "").trim();
-            if(name.length()>0 && password.length()>0) {
+            if ((name.length() > 0) && (password.length() > 0)) {
                 String hashedPassword = hashPassword(password);
-                Statement stmt = getDatabaseManager().select(
-                                                             Tables.USERS.COLUMNS, Tables.USERS.NAME,
-                                                             Clause.and(
-                                                                        Clause.eq(Tables.USERS.COL_ID, name),
-                                                                        Clause.eq(
-                                                                                  Tables.USERS.COL_PASSWORD,
-                                                                                  hashedPassword)));
+                Statement stmt =
+                    getDatabaseManager().select(Tables.USERS.COLUMNS,
+                        Tables.USERS.NAME,
+                        Clause.and(Clause.eq(Tables.USERS.COL_ID, name),
+                                   Clause.eq(Tables.USERS.COL_PASSWORD,
+                                             hashedPassword)));
 
                 ResultSet results = stmt.getResultSet();
-                if (!results.next()) {
+                if ( !results.next()) {
                     //We changed the password hash function to a new one so
                     //check if the DB has the old hashed password
                     //If it does then insert the new one
                     String oldHashedPassword = hashPasswordOld(password);
-                    Statement stmt2 = getDatabaseManager().select(
-                                                                  Tables.USERS.COLUMNS, Tables.USERS.NAME,
-                                                             Clause.and(
-                                                                        Clause.eq(Tables.USERS.COL_ID, name),
-                                                                        Clause.eq(
-                                                                                  Tables.USERS.COL_PASSWORD,
-                                                                                  oldHashedPassword)));
+                    Statement stmt2 =
+                        getDatabaseManager().select(Tables.USERS.COLUMNS,
+                            Tables.USERS.NAME,
+                            Clause.and(Clause.eq(Tables.USERS.COL_ID, name),
+                                       Clause.eq(Tables.USERS.COL_PASSWORD,
+                                           oldHashedPassword)));
 
 
                     ResultSet results2 = stmt2.getResultSet();
                     if (results2.next()) {
                         user = getUser(results2);
                         getDatabaseManager().update(Tables.USERS.NAME,
-                                                    Tables.USERS.COL_ID, user.getId(),
-                                                    new String[] {Tables.USERS.COL_PASSWORD}, 
-                                                    new Object[] {hashedPassword});
+                                Tables.USERS.COL_ID, user.getId(),
+                                new String[] { Tables.USERS.COL_PASSWORD },
+                                new Object[] { hashedPassword });
                     }
                     stmt2.close();
-                }  else {
+                } else {
                     user = getUser(results);
                 }
                 stmt.close();
             }
 
 
-            if(user!=null) {
+            if (user != null) {
                 addActivity(request, user, "login", "");
                 getSessionManager().setUserSession(request, user);
                 if (responseAsXml) {
@@ -2040,17 +2074,21 @@ public class UserManager extends RepositoryManager {
                             "Incorrect user name or password"), MIME_XML);
                 }
 
-                if(name.length()>0) {
+                if (name.length() > 0) {
                     //Check if they have a blank password
                     Statement stmt = getDatabaseManager().select(
-                                                                 Tables.USERS.COL_PASSWORD, Tables.USERS.NAME,
-                                                                 Clause.eq(Tables.USERS.COL_ID, name));
+                                         Tables.USERS.COL_PASSWORD,
+                                         Tables.USERS.NAME,
+                                         Clause.eq(
+                                             Tables.USERS.COL_ID, name));
                     ResultSet results = stmt.getResultSet();
                     if (results.next()) {
                         password = results.getString(1);
-                        if(password == null || password.length()==0) {
+                        if ((password == null) || (password.length() == 0)) {
                             sb.append(
-                                      getRepository().note(msg("Sorry, we were doing some cleanup and have reset your password")));
+                                getRepository().note(
+                                    msg(
+                                    "Sorry, we were doing some cleanup and have reset your password")));
 
                             addPasswordResetForm(request, sb, name);
                             stmt.close();
@@ -2062,7 +2100,8 @@ public class UserManager extends RepositoryManager {
 
                 //TODO: what to do when we have ssl here?
                 sb.append(
-                    getRepository().warning(msg("Incorrect user name or password")));
+                    getRepository().warning(
+                        msg("Incorrect user name or password")));
 
 
             }
@@ -2073,6 +2112,7 @@ public class UserManager extends RepositoryManager {
             sb.append(makeLoginForm(request));
         }
         return new Result(msg("Login"), sb);
+
     }
 
 

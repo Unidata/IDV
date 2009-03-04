@@ -110,9 +110,7 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param state _more_
-     * @param types _more_
      * @param links _more_
-     * @param forHeader _more_
      *
      * @throws Exception _more_
      */

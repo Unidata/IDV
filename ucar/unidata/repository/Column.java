@@ -471,7 +471,6 @@ public class Column implements Constants {
      *
      *
      * @param statement _more_
-     * @return _more_
      *
      * @throws Exception _more_
      */
@@ -617,7 +616,6 @@ public class Column implements Constants {
                     throw new IllegalArgumentException("Unknown expression:"
                             + expr);
                 }
-                System.err.println("where:" + where);
             }
         } else if (type.equals(TYPE_BOOLEAN)) {
             if (request.defined(id)) {
@@ -640,13 +638,11 @@ public class Column implements Constants {
      *
      * @param arg _more_
      * @param value _more_
-     * @param request _more_
      * @param entry _more_
      *
      * @return _more_
      */
-    public int matchValue(String arg, Object value, 
-                          Entry entry) {
+    public int matchValue(String arg, Object value, Entry entry) {
         if (type.equals(TYPE_LATLON)) {
             //TODO:
         } else if (type.equals(TYPE_BOOLEAN)) {

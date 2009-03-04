@@ -19,7 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository.collab;
 
 
@@ -99,10 +98,9 @@ public class ChatOutputHandler extends OutputHandler {
                                                      "", ICON_CHAT);
 
     /** _more_ */
-    public static final OutputType OUTPUT_WHITEBOARD = new OutputType("Whiteboard",
-                                                     "chat.whiteboard",
-                                                     OutputType.TYPE_HTML,
-                                                     "", ICON_CHAT);
+    public static final OutputType OUTPUT_WHITEBOARD =
+        new OutputType("Whiteboard", "chat.whiteboard", OutputType.TYPE_HTML,
+                       "", ICON_CHAT);
 
 
     /**
@@ -519,10 +517,8 @@ public class ChatOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param entry _more_
      * @param state _more_
      * @param links _more_
-     * @param forHeader _more_
      *
      * @throws Exception _more_
      */
@@ -535,7 +531,7 @@ public class ChatOutputHandler extends OutputHandler {
             if (entry.getResource().isImage()) {
                 links.add(makeLink(request, state.getEntry(),
                                    OUTPUT_WHITEBOARD));
-            } else   if ( !entry.getType().equals("chatroom")) {
+            } else if ( !entry.getType().equals("chatroom")) {
                 links.add(makeLink(request, state.getEntry(), OUTPUT_CHAT));
             } else {
                 links.add(makeLink(request, state.getEntry(),
@@ -578,15 +574,17 @@ public class ChatOutputHandler extends OutputHandler {
     public Result outputEntry(Request request, Entry entry) throws Exception {
         String chatAppletTemplate =
             getRepository().getResource(PROP_HTML_CHATAPPLET);
-        OutputType   output     = request.getOutput();
+        OutputType output = request.getOutput();
 
-        String params = "";
+        String     params = "";
         chatAppletTemplate = chatAppletTemplate.replace("${root}",
                 getRepository().getUrlBase());
-        if(entry.getResource().isImage()) {
-            String url = getEntryManager().getEntryResourceUrl(request, entry);
-            params += HtmlUtil.open("PARAM", HtmlUtil.attrs("NAME","whiteboard.bgimage", "VALUE",
-                                                            url));
+        if (entry.getResource().isImage()) {
+            String url = getEntryManager().getEntryResourceUrl(request,
+                             entry);
+            params += HtmlUtil.open("PARAM",
+                                    HtmlUtil.attrs("NAME",
+                                        "whiteboard.bgimage", "VALUE", url));
 
         }
         String session = request.getSessionId();
@@ -599,7 +597,8 @@ public class ChatOutputHandler extends OutputHandler {
                 request.getUser().getName());
         chatAppletTemplate = chatAppletTemplate.replace("${sessionid}",
                 session);
-        chatAppletTemplate = chatAppletTemplate.replace("${parameters}", params);
+        chatAppletTemplate = chatAppletTemplate.replace("${parameters}",
+                params);
         chatAppletTemplate = chatAppletTemplate.replace("${channel}",
                 entry.getId());
         return makeLinksResult(request, msg("Chat"),

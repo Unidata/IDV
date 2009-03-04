@@ -40,8 +40,10 @@ public class RequestUrl {
     /** _more_ */
     private String label = null;
 
+    /** _more_ */
     private boolean haveInitialized = false;
 
+    /** _more_ */
     private boolean needsSsl = false;
 
     /**
@@ -70,7 +72,7 @@ public class RequestUrl {
         this.label = label;
     }
 
-    
+
 
     /**
      * _more_
@@ -81,7 +83,7 @@ public class RequestUrl {
      */
     public String getFullUrl(String suffix) {
         checkInit();
-        if(needsSsl) {
+        if (needsSsl) {
             return getHttpsUrl(suffix);
         }
         return repositorySource.getRepositoryBase().absoluteUrl(
@@ -102,10 +104,14 @@ public class RequestUrl {
             + path) + suffix;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getHttpsUrl() {
         return repositorySource.getRepositoryBase().httpsUrl(
-            repositorySource.getRepositoryBase().getUrlBase()
-            + path);
+            repositorySource.getRepositoryBase().getUrlBase() + path);
     }
 
     /**
@@ -115,15 +121,18 @@ public class RequestUrl {
      */
     public String getFullUrl() {
         checkInit();
-        if(needsSsl) {
+        if (needsSsl) {
             return getHttpsUrl();
         }
         return repositorySource.getRepositoryBase().absoluteUrl(
             repositorySource.getRepositoryBase().getUrlBase() + path);
     }
 
+    /**
+     * _more_
+     */
     private void checkInit() {
-        if(!haveInitialized) {
+        if ( !haveInitialized) {
             repositorySource.getRepositoryBase().initRequestUrl(this);
             haveInitialized = true;
         }
@@ -190,23 +199,23 @@ public class RequestUrl {
         return this.path.equals(that.path);
     }
 
-/**
-Set the NeedsSsl property.
+    /**
+     * Set the NeedsSsl property.
+     *
+     * @param value The new value for NeedsSsl
+     */
+    public void setNeedsSsl(boolean value) {
+        this.needsSsl = value;
+    }
 
-@param value The new value for NeedsSsl
-**/
-public void setNeedsSsl (boolean value) {
-	this.needsSsl = value;
-}
-
-/**
-Get the NeedsSsl property.
-
-@return The NeedsSsl
-**/
-public boolean getNeedsSsl () {
-	return this.needsSsl;
-}
+    /**
+     * Get the NeedsSsl property.
+     *
+     * @return The NeedsSsl
+     */
+    public boolean getNeedsSsl() {
+        return this.needsSsl;
+    }
 
 
 

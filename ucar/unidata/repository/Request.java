@@ -116,8 +116,10 @@ public class Request implements Constants {
     /** _more_ */
     private String ip;
 
+    /** _more_ */
     private String protocol;
 
+    /** _more_ */
     private boolean secure = false;
 
     /** _more_ */
@@ -137,8 +139,10 @@ public class Request implements Constants {
     /** _more_ */
     private String leftMessage;
 
+    /** _more_ */
     private boolean checkingAuthMethod = false;
 
+    /** _more_ */
     private ApiMethod apiMethod;
 
 
@@ -723,7 +727,6 @@ public class Request implements Constants {
     /**
      * _more_
      *
-     * @param s _more_
      *
      * @param o _more_
      *
@@ -1024,7 +1027,6 @@ public class Request implements Constants {
             String tmp = v.substring(0,i);
             Matcher xx = pattern.matcher(tmp);
             if ( !xx.find()) {
-                System.err.println("BAD:" + tmp);
             }
             }*/
 
@@ -1491,30 +1493,6 @@ public class Request implements Constants {
     }
 
 
-    /**
-     *  Set the CollectionEntry property.
-     *
-     *  @param value The new value for CollectionEntry
-     *
-     * @return _more_
-     */
-    /*
-        public void setCollectionEntry(Entry value) {
-            collectionEntry = value;
-        }
-    */
-
-    /**
-     *  Get the CollectionEntry property.
-     *
-     *  @return The CollectionEntry
-     */
-    /*
-        public Entry getCollectionEntry() {
-            return collectionEntry;
-        }
-    */
-
 
 
     /**
@@ -1587,78 +1565,78 @@ public class Request implements Constants {
 
 
 
-/**
-Set the Protocol property.
+    /**
+     * Set the Protocol property.
+     *
+     * @param value The new value for Protocol
+     */
+    public void setProtocol(String value) {
+        protocol = value;
+    }
 
-@param value The new value for Protocol
-**/
-public void setProtocol (String value) {
-	protocol = value;
-}
-
-/**
-Get the Protocol property.
-
-@return The Protocol
-**/
-public String getProtocol () {
-	return protocol;
-}
+    /**
+     * Get the Protocol property.
+     *
+     * @return The Protocol
+     */
+    public String getProtocol() {
+        return protocol;
+    }
 
 
-/**
-Set the Secure property.
+    /**
+     * Set the Secure property.
+     *
+     * @param value The new value for Secure
+     */
+    public void setSecure(boolean value) {
+        secure = value;
+    }
 
-@param value The new value for Secure
-**/
-public void setSecure (boolean value) {
-	secure = value;
-}
+    /**
+     * Get the Secure property.
+     *
+     * @return The Secure
+     */
+    public boolean getSecure() {
+        return secure;
+    }
 
-/**
-Get the Secure property.
+    /**
+     * Set the CheckingAuthMethod property.
+     *
+     * @param value The new value for CheckingAuthMethod
+     */
+    public void setCheckingAuthMethod(boolean value) {
+        this.checkingAuthMethod = value;
+    }
 
-@return The Secure
-**/
-public boolean getSecure () {
-	return secure;
-}
+    /**
+     * Get the CheckingAuthMethod property.
+     *
+     * @return The CheckingAuthMethod
+     */
+    public boolean getCheckingAuthMethod() {
+        return this.checkingAuthMethod;
+    }
 
-/**
-Set the CheckingAuthMethod property.
+    /**
+     * Set the ApiMethod property.
+     *
+     * @param value The new value for ApiMethod
+     */
+    public void setApiMethod(ApiMethod value) {
+        this.apiMethod = value;
+    }
 
-@param value The new value for CheckingAuthMethod
-**/
-public void setCheckingAuthMethod (boolean value) {
-	this.checkingAuthMethod = value;
-}
-
-/**
-Get the CheckingAuthMethod property.
-
-@return The CheckingAuthMethod
-**/
-public boolean getCheckingAuthMethod () {
-	return this.checkingAuthMethod;
-}
-
-/**
-Set the ApiMethod property.
-
-@param value The new value for ApiMethod
-**/
-public void setApiMethod (ApiMethod value) {
-	this.apiMethod = value;
-}
-
-/**
-Get the ApiMethod property.
-
-@return The ApiMethod
-**/
-public ApiMethod getApiMethod () {
-	return this.apiMethod;
-}
+    /**
+     * Get the ApiMethod property.
+     *
+     * @return The ApiMethod
+     */
+    public ApiMethod getApiMethod() {
+        return this.apiMethod;
+    }
 
 
 

@@ -21,10 +21,10 @@
 
 package ucar.unidata.repository;
 
-import ucar.unidata.repository.data.*;
-
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.data.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -160,9 +160,9 @@ public class ContentMetadataHandler extends MetadataHandler {
             } else {
                 String tmpFile = (String) fileMap.get(fileArg);
                 if (tmpFile == null) {
-                    System.err.println("No attachment uploaded file:"
-                                       + fileArg);
-                    System.err.println("available files: " + fileMap);
+                    getRepository().logError("No attachment uploaded file:"
+                                             + fileArg);
+                    getRepository().logError("available files: " + fileMap);
                     return;
                 }
                 File file = new File(tmpFile);
@@ -287,18 +287,21 @@ public class ContentMetadataHandler extends MetadataHandler {
                                     metadata.getId()), "thumbnail", "");
 
 
-                String imgUrl =HtmlUtil.url(getRepository().getMetadataManager().URL_METADATA_VIEW+"/"
-                                            +getRepository().getStorageManager().getFileTail(f.toString())
-                                         , ARG_ENTRYID,
-                                         metadata.getEntryId(), ARG_METADATA_ID,
-                                         metadata.getId());
+                String imgUrl =
+                    HtmlUtil
+                        .url(getRepository().getMetadataManager()
+                            .URL_METADATA_VIEW + "/"
+                                + getRepository().getStorageManager()
+                                    .getFileTail(f.toString()), ARG_ENTRYID,
+                                        metadata.getEntryId(),
+                                        ARG_METADATA_ID, metadata.getId());
 
-                
+
                 //                System.err.println(imgUrl);
                 //                img =  HtmlUtil.href(imgUrl,img," rel=\"shadowbox\" ");
-                img = getRepository().makePopupLink(img, bigimg, true,false);
+                img = getRepository().makePopupLink(img, bigimg, true, false);
             }
-           return img;
+            return img;
         } else if (f.exists()) {
             String name =
                 getRepository().getStorageManager().getFileTail(f.getName());
@@ -517,7 +520,9 @@ public class ContentMetadataHandler extends MetadataHandler {
         String arg2 = ARG_ATTR2 + suffix;
         String size = HtmlUtil.SIZE_70;
         if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
-            String image = (forEdit?getHtml(request, entry, metadata, false):"");
+            String image = (forEdit
+                            ? getHtml(request, entry, metadata, false)
+                            : "");
             if (image == null) {
                 image = "";
             } else {

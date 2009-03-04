@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository.monitor;
 
 
@@ -114,11 +113,11 @@ public class MonitorManager extends RepositoryManager {
         ResultSet        results;
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                String xml = results.getString(1);
-                XmlEncoder xmlEncoder  =new XmlEncoder();
+                String       xml        = results.getString(1);
+                XmlEncoder   xmlEncoder = new XmlEncoder();
                 EntryMonitor monitor =
                     (EntryMonitor) xmlEncoder.toObject(xml);
-                if(monitor!=null) {
+                if (monitor != null) {
                     monitor.setRepository(getRepository());
                     monitors.add(monitor);
                 } else {
@@ -378,7 +377,10 @@ public class MonitorManager extends RepositoryManager {
         } else if (type.equals("copy")) {
             monitor.addAction(new CopyAction(getRepository().getGUID()));
         } else if (type.equals("ldm")) {
-            if(!request.getUser().getAdmin()) throw new IllegalArgumentException("You need to be an admin to add an LDM action");
+            if ( !request.getUser().getAdmin()) {
+                throw new IllegalArgumentException(
+                    "You need to be an admin to add an LDM action");
+            }
             monitor.addAction(new LdmAction(getRepository().getGUID()));
         } else {
             System.err.println("unknown type:" + type);
@@ -443,6 +445,7 @@ public class MonitorManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processMonitors(Request request) throws Exception {
+
         if (request.getUser().getAnonymous()) {
             throw new IllegalArgumentException("Cannot access monitors");
         }
@@ -473,23 +476,26 @@ public class MonitorManager extends RepositoryManager {
 
         sb.append(HtmlUtil.br());
         String ldmCreate = "";
-        if(request.getUser().getAdmin()) {
-            ldmCreate = request.form(getRepositoryBase().URL_USER_MONITORS) + 
-                HtmlUtil.submit("LDM Action", ARG_MONITOR_CREATE) + 
-                HtmlUtil.hidden(ARG_MONITOR_TYPE, "ldm") + 
-                HtmlUtil.formClose();
+        if (request.getUser().getAdmin()) {
+            ldmCreate = request.form(getRepositoryBase().URL_USER_MONITORS)
+                        + HtmlUtil.submit("LDM Action", ARG_MONITOR_CREATE)
+                        + HtmlUtil.hidden(ARG_MONITOR_TYPE, "ldm")
+                        + HtmlUtil.formClose();
         }
-            
-        String[] createTypes = {"email","Email Action",
-                                "twitter","Twitter Action",
-                                "copy","Copy Action"};
+
+        String[] createTypes = {
+            "email", "Email Action", "twitter", "Twitter Action", "copy",
+            "Copy Action"
+        };
 
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TR));
-        for(int i=0;i<createTypes.length;i+=2) {
-            String form = request.form(getRepositoryBase().URL_USER_MONITORS) + 
-                HtmlUtil.submit(createTypes[i+1], ARG_MONITOR_CREATE) + 
-                HtmlUtil.hidden(ARG_MONITOR_TYPE, createTypes[i]) + HtmlUtil.formClose();
+        for (int i = 0; i < createTypes.length; i += 2) {
+            String form =
+                request.form(getRepositoryBase().URL_USER_MONITORS)
+                + HtmlUtil.submit(createTypes[i + 1], ARG_MONITOR_CREATE)
+                + HtmlUtil.hidden(ARG_MONITOR_TYPE, createTypes[i])
+                + HtmlUtil.formClose();
             sb.append(HtmlUtil.col(form));
         }
         sb.append(HtmlUtil.col(ldmCreate));
@@ -540,19 +546,25 @@ public class MonitorManager extends RepositoryManager {
             sb.append(HtmlUtil.col(monitor.getActionSummary()));
             sb.append(HtmlUtil.close(HtmlUtil.TAG_TR));
 
-            if(monitor.getLastError()!=null && monitor.getLastError().length()>0) {
-                String msg  = HtmlUtil.makeShowHideBlock(HtmlUtil.span(msg("Error"),HtmlUtil.cssClass("errorlabel")),
-                                                         HtmlUtil.pre(monitor.getLastError()),false);
-                sb.append(HtmlUtil.row(HtmlUtil.colspan(msg,5)));
+            if ((monitor.getLastError() != null)
+                    && (monitor.getLastError().length() > 0)) {
+                String msg = HtmlUtil.makeShowHideBlock(
+                                 HtmlUtil.span(
+                                     msg("Error"),
+                                     HtmlUtil.cssClass(
+                                         "errorlabel")), HtmlUtil.pre(
+                                             monitor.getLastError()), false);
+                sb.append(HtmlUtil.row(HtmlUtil.colspan(msg, 5)));
             }
 
-            sb.append(HtmlUtil.row(HtmlUtil.colspan(HtmlUtil.hr(),5)));
+            sb.append(HtmlUtil.row(HtmlUtil.colspan(HtmlUtil.hr(), 5)));
 
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
 
         return getUserManager().makeResult(request, msg("Entry Monitors"),
                                            sb);
+
     }
 
 

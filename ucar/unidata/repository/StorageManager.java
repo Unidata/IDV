@@ -111,6 +111,7 @@ public class StorageManager extends RepositoryManager {
     /** _more_ */
     private String tmpDir;
 
+    /** _more_ */
     private String anonymousDir;
 
     /** _more_ */
@@ -275,6 +276,11 @@ public class StorageManager extends RepositoryManager {
         return tmpDir;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getAnonymousDir() {
         if (anonymousDir == null) {
             anonymousDir = IOUtil.joinDir(getStorageDir(), "anonymousupload");
@@ -479,20 +485,38 @@ public class StorageManager extends RepositoryManager {
 
 
 
-    public File moveToAnonymousStorage(Request request, File original, String prefix)
-        throws Exception {
-        String            storageDir = getAnonymousDir();
-        File[]files =new File(storageDir).listFiles();
-        long size = 0;
-        for(int i=0;i<files.length;i++) {
-            if(files[i].isHidden()) continue;
-            size+= files[i].length();
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param original _more_
+     * @param prefix _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public File moveToAnonymousStorage(Request request, File original,
+                                       String prefix)
+            throws Exception {
+        String storageDir = getAnonymousDir();
+        File[] files      = new File(storageDir).listFiles();
+        long   size       = 0;
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isHidden()) {
+                continue;
+            }
+            size += files[i].length();
         }
 
-        double sizeThresholdGB = getRepository().getProperty(PROP_UPLOAD_MAXSIZEGB,10.0);
-        if(size+original.length()> sizeThresholdGB*1000*1000*1000) throw new IllegalArgumentException("Anonymous upload area exceeded capacity");
-        String            targetName = prefix + original.getName();
-        File newFile = new File(IOUtil.joinDir(storageDir, targetName));
+        double sizeThresholdGB =
+            getRepository().getProperty(PROP_UPLOAD_MAXSIZEGB, 10.0);
+        if (size + original.length() > sizeThresholdGB * 1000 * 1000 * 1000) {
+            throw new IllegalArgumentException(
+                "Anonymous upload area exceeded capacity");
+        }
+        String targetName = prefix + original.getName();
+        File   newFile    = new File(IOUtil.joinDir(storageDir, targetName));
         IOUtil.moveFile(original, newFile);
         return newFile;
     }

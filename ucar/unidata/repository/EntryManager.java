@@ -21,10 +21,10 @@
 
 package ucar.unidata.repository;
 
-import ucar.unidata.repository.data.*;
-
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.data.*;
 
 
 
@@ -160,7 +160,6 @@ public class EntryManager extends RepositoryManager {
      * @param entry _more_
      */
     protected void clearCache(Entry entry) {
-        //        System.err.println ("Clear cache " + entry.getId());
         synchronized (MUTEX_ENTRY) {
             entryCache.remove(entry.getId());
             if (entry.isGroup()) {
@@ -262,7 +261,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryShow(Request request) throws Exception {
-        if(request.getCheckingAuthMethod()) {
+        if (request.getCheckingAuthMethod()) {
             OutputHandler handler = getRepository().getOutputHandler(request);
             return new Result(handler.getAuthorizationMethod(request));
         }
@@ -289,7 +288,6 @@ return new Result(title, sb);
             throw new IllegalArgumentException("No entry specified");
         }
 
-        //System.err.println (request);
         if (request.get(ARG_NEXT, false)
                 || request.get(ARG_PREVIOUS, false)) {
             boolean next = request.get(ARG_NEXT, false);
@@ -443,7 +441,7 @@ return new Result(title, sb);
                 HtmlUtil.formEntry(
                     msgLabel("Type"),
                     getRepository().makeTypeSelect(
-                        request, false, "", true,null)));
+                        request, false, "", true, null)));
 
             sb.append(
                 HtmlUtil.formEntry(
@@ -454,7 +452,9 @@ return new Result(title, sb);
                                        ? getRepository().getTypeHandler(type)
                                        : entry.getTypeHandler());
 
-            title = (entry==null?msg("Add Entry"):msg("Edit Entry"));
+            title = ((entry == null)
+                     ? msg("Add Entry")
+                     : msg("Edit Entry"));
             String submitButton = HtmlUtil.submit(((entry == null)
                     ? "Add " + typeHandler.getLabel()
                     : msg("Save")));
@@ -481,16 +481,18 @@ return new Result(title, sb);
                             AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD,
                             false);
                     String extra = "";
-                    
+
                     if (metadata != null) {
-                        
-                        String user = metadata.getAttr1();
+
+                        String user  = metadata.getAttr1();
                         String email = metadata.getAttr4();
-                        if(email==null) email = "";
+                        if (email == null) {
+                            email = "";
+                        }
                         extra = "<br><b>From user:</b> "
-                                + metadata.getAttr1() + 
-                            " <b>Email:</b> " + email +
-                            " <b>IP:</b> "   + metadata.getAttr2();
+                                + metadata.getAttr1() + " <b>Email:</b> "
+                                + email + " <b>IP:</b> "
+                                + metadata.getAttr2();
                     }
                     String msg = HtmlUtil.space(2) + msg("Make public?")
                                  + extra;
@@ -502,7 +504,6 @@ return new Result(title, sb);
                 sb.append(HtmlUtil.hidden(ARG_TYPE, type));
                 sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
             }
-            //            System.err.println ("Adding to entry form " + typeHandler + " " + typeHandler.getClass().getName());
             typeHandler.addToEntryForm(request, sb, entry);
             sb.append(HtmlUtil.row(HtmlUtil.colspan(buttons, 2)));
         }
@@ -577,8 +578,8 @@ return new Result(title, sb);
             }
             if ( !getAccessManager().canDoAction(request, entry,
                     Permission.ACTION_EDIT)) {
-                throw new AccessException("Cannot edit:"
-                        + entry.getLabel(),request);
+                throw new AccessException("Cannot edit:" + entry.getLabel(),
+                                          request);
             }
             if (entry.getIsLocalFile()) {
                 return new Result(
@@ -653,8 +654,8 @@ return new Result(title, sb);
                     (forUpload
                      ? Permission.ACTION_UPLOAD
                      : Permission.ACTION_NEW))) {
-                throw new AccessException("Cannot add:"
-                        + entry.getLabel(),request);
+                throw new AccessException("Cannot add:" + entry.getLabel(),
+                                          request);
             }
 
 
@@ -729,7 +730,6 @@ return new Result(title, sb);
                     try {
                         int bytes = IOUtil.writeTo(fromStream, toStream,
                                         actionId, length);
-                        //System.err.println ("getting url " + resource +"\nread " + bytes);
                         if (bytes < 0) {
                             return new Result(
                                 request.entryUrl(
@@ -806,12 +806,15 @@ return new Result(title, sb);
                 if (isFile && !isLocalFile) {
 
 
-                    if(forUpload) {
-                        theResource = getStorageManager().moveToAnonymousStorage(request,
-                                                                                 new File(theResource),"").toString();
+                    if (forUpload) {
+                        theResource =
+                            getStorageManager().moveToAnonymousStorage(
+                                request, new File(theResource),
+                                "").toString();
                     } else {
-                        theResource = getStorageManager().moveToStorage(request,
-                                                                        new File(theResource)).toString();
+                        theResource =
+                            getStorageManager().moveToStorage(request,
+                                new File(theResource)).toString();
                     }
                 }
                 String name = request.getString(ARG_NAME, BLANK);
@@ -833,9 +836,6 @@ return new Result(title, sb);
                             break;
                         }
                     }
-                    //                    System.err.println("format:" + format);
-                    //                    System.err.println("orignName:" + origName);
-                    //                    System.err.println("pattern:" + pattern);
 
                     if (pattern != null) {
                         Pattern datePattern = Pattern.compile(pattern);
@@ -846,10 +846,7 @@ return new Result(title, sb);
                                             format).parse(dateString);
                             theDateRange[0] = dttm;
                             theDateRange[1] = dttm;
-                            //                            System.err.println("got it");
-                        } else {
-                            //                            System.err.println("not found");
-                        }
+                        } else {}
                     }
                 }
 
@@ -920,7 +917,7 @@ return new Result(title, sb);
             entry.setDescription(request.getString(ARG_DESCRIPTION,
                     entry.getDescription()));
 
-            if(isAnonymousUpload(entry)) {
+            if (isAnonymousUpload(entry)) {
                 if (request.get(ARG_PUBLISH, false)) {
                     publishAnonymousEntry(request, entry);
                 }
@@ -932,7 +929,6 @@ return new Result(title, sb);
                         BLANK)));
             }
 
-            //                System.err.println("dateRange:" + dateRange[0] + " " + dateRange[1]);
 
             if (dateRange[0] != null) {
                 entry.setStartDate(dateRange[0].getTime());
@@ -947,7 +943,7 @@ return new Result(title, sb);
             setEntryState(request, entry);
             entries.add(entry);
 
-            
+
 
 
         }
@@ -968,7 +964,7 @@ return new Result(title, sb);
         }
 
         if (newEntry && request.get(ARG_METADATA_ADD, false)) {
-            addInitialMetadata(request, entries,false);
+            addInitialMetadata(request, entries, false);
         }
 
         insertEntries(entries, newEntry);
@@ -1001,45 +997,62 @@ return new Result(title, sb);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param template _more_
+     *
+     * @return _more_
+     */
     public String replaceMacros(Entry entry, String template) {
         Date fromDate = new Date(entry.getStartDate());
-        Date toDate = new Date(entry.getEndDate());
+        Date toDate   = new Date(entry.getEndDate());
 
-        GregorianCalendar fromCal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        GregorianCalendar fromCal =
+            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         fromCal.setTime(fromDate);
-        int      fromDay    = fromCal.get(GregorianCalendar.DAY_OF_MONTH);
-        int      fromMonth  = fromCal.get(GregorianCalendar.MONTH) + 1;
-        int      fromYear   = fromCal.get(GregorianCalendar.YEAR) + 1;
+        int fromDay = fromCal.get(GregorianCalendar.DAY_OF_MONTH);
+        int               fromMonth = fromCal.get(GregorianCalendar.MONTH)
+                                      + 1;
+        int               fromYear  = fromCal.get(GregorianCalendar.YEAR) + 1;
 
 
-        GregorianCalendar toCal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        GregorianCalendar toCal =
+            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         toCal.setTime(toDate);
-        int      toDay    = toCal.get(GregorianCalendar.DAY_OF_MONTH);
-        int      toMonth  = toCal.get(GregorianCalendar.MONTH) + 1;
-        int      toYear   = toCal.get(GregorianCalendar.YEAR) + 1;
+        int toDay   = toCal.get(GregorianCalendar.DAY_OF_MONTH);
+        int toMonth = toCal.get(GregorianCalendar.MONTH) + 1;
+        int toYear  = toCal.get(GregorianCalendar.YEAR) + 1;
 
         String url =
             HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
                          ARG_ENTRYID, entry.getId());
 
         String[] macros = {
-            "fromdate", getRepository().formatDate(fromDate), 
-            "fromday", ((fromDay < 10)   ? "0" : "") + fromDay, 
-            "frommonth", ((fromMonth < 10) ? "0": "") + fromMonth, 
-            "fromyear", "" + fromYear, 
-            "frommonthname",   DateUtil.MONTH_NAMES[fromCal.get(GregorianCalendar.MONTH)], 
-
-            "todate", getRepository().formatDate(toDate), 
-            "today", ((toDay < 10)   ? "0" : "") + toDay, 
-            "tomonth", ((toMonth < 10) ? "0": "") + toMonth, 
-            "toyear", "" + toYear, 
-            "tomonthname",   DateUtil.MONTH_NAMES[toCal.get(GregorianCalendar.MONTH)], 
-            "filename", getStorageManager().getFileTail(entry.getResource().getPath()),
-            "fileextension",IOUtil.getFileExtension(entry.getResource().getPath()),
-            "name", entry.getName(),
-            "fullname", entry.getFullName(),
-            "user",    entry.getUser().getLabel(),            
-            "url",    url
+            "fromdate", getRepository().formatDate(fromDate), "fromday",
+            ((fromDay < 10)
+             ? "0"
+             : "") + fromDay, "frommonth", ((fromMonth < 10)
+                                            ? "0"
+                                            : "") + fromMonth, "fromyear",
+                                                "" + fromYear,
+            "frommonthname",
+            DateUtil.MONTH_NAMES[fromCal.get(GregorianCalendar.MONTH)],
+            "todate", getRepository().formatDate(toDate), "today",
+            ((toDay < 10)
+             ? "0"
+             : "") + toDay, "tomonth", ((toMonth < 10)
+                                        ? "0"
+                                        : "") + toMonth, "toyear",
+                                            "" + toYear, "tomonthname",
+            DateUtil.MONTH_NAMES[toCal.get(GregorianCalendar.MONTH)],
+            "filename",
+            getStorageManager().getFileTail(entry.getResource().getPath()),
+            "fileextension",
+            IOUtil.getFileExtension(entry.getResource().getPath()), "name",
+            entry.getName(), "fullname", entry.getFullName(), "user",
+            entry.getUser().getLabel(), "url", url
         };
         String result = template;
 
@@ -1225,7 +1238,8 @@ return new Result(title, sb);
                           ARG_DELETE_CONFIRM, hidden);
         sb.append(getRepository().question(msgSB.toString(), form));
         sb.append("<ul>");
-        new OutputHandler(getRepository(), "tmp").getBreadcrumbList(request, sb, entries);
+        new OutputHandler(getRepository(), "tmp").getBreadcrumbList(request,
+                          sb, entries);
         sb.append("</ul>");
         return new Result(msg("Delete Confirm"), sb);
     }
@@ -1395,7 +1409,6 @@ return new Result(title, sb);
             String[] tuple = found.get(i);
             String   id    = tuple[0];
             allIds.add(id);
-            //            System.err.println ("id:" + id + " type:" + tuple[1] +" resource:" +tuple[2]);
             deleteCnt++;
             totalDeleteCnt++;
             if ((actionId != null)
@@ -1413,9 +1426,6 @@ return new Result(title, sb);
             getActionManager().setActionMessage(actionId,
                     "Deleted:" + totalDeleteCnt + "/" + found.size()
                     + " entries");
-            if (totalDeleteCnt % 100 == 0) {
-                System.err.println("Deleted:" + deleteCnt);
-            }
             getStorageManager().removeFile(new Resource(new File(tuple[2]),
                     tuple[3]));
 
@@ -1491,17 +1501,20 @@ return new Result(title, sb);
                                            entry));
     }
 
-    /** _more_          */
+    /** _more_ */
     public final static String DATATYPE_UPLOAD = "upload";
 
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @throws Exception _more_
      */
-    private void publishAnonymousEntry(Request request, Entry entry) throws Exception {
+    private void publishAnonymousEntry(Request request, Entry entry)
+            throws Exception {
         Metadata metadata = getMetadataManager().findMetadata(entry,
                                 AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD,
                                 false);
@@ -1517,10 +1530,12 @@ return new Result(title, sb);
         } else {
             entry.setDataType("");
         }
-        entry.setTypeHandler(getRepository().getTypeHandler(TypeHandler.TYPE_FILE));
+        entry.setTypeHandler(
+            getRepository().getTypeHandler(TypeHandler.TYPE_FILE));
 
-        if(entry.isFile()) {
-            File newFile = getStorageManager().moveToStorage(request, entry.getResource().getFile(),"");
+        if (entry.isFile()) {
+            File newFile = getStorageManager().moveToStorage(request,
+                               entry.getResource().getFile(), "");
             entry.getResource().setPath(newFile.toString());
         }
 
@@ -1557,8 +1572,12 @@ return new Result(title, sb);
         entry.setName(HtmlUtil.entityEncode(entry.getName()));
         entry.setDescription(HtmlUtil.entityEncode(entry.getDescription()));
 
-        String fromName = HtmlUtil.entityEncode(request.getString(ARG_CONTRIBUTION_FROMNAME,""));
-        String fromEmail = HtmlUtil.entityEncode(request.getString(ARG_CONTRIBUTION_FROMEMAIL,""));
+        String fromName = HtmlUtil.entityEncode(
+                              request.getString(
+                                  ARG_CONTRIBUTION_FROMNAME, ""));
+        String fromEmail = HtmlUtil.entityEncode(
+                               request.getString(
+                                   ARG_CONTRIBUTION_FROMEMAIL, ""));
         String user = request.getUser().getId();
         if (user.length() == 0) {
             user = fromName;
@@ -1639,15 +1658,17 @@ return new Result(title, sb);
         StringBuffer sb    = new StringBuffer();
         //        sb.append(makeEntryHeader(request, group));
         sb.append(HtmlUtil.p());
-        sb.append(HtmlUtil.href(request.url(getRepository().URL_ENTRY_FORM,
-                                    ARG_GROUP,
-                                    group.getId(),
-                                    ARG_TYPE, TYPE_GROUP), msg("Create a group")));
+        sb.append(
+            HtmlUtil.href(
+                request.url(
+                    getRepository().URL_ENTRY_FORM, ARG_GROUP, group.getId(),
+                    ARG_TYPE, TYPE_GROUP), msg("Create a group")));
         sb.append(HtmlUtil.p());
-        sb.append(HtmlUtil.href(request.url(getRepository().URL_ENTRY_FORM,
-                                    ARG_GROUP,
-                                    group.getId(),
-                                    ARG_TYPE, TYPE_FILE), msg("Upload a file")));
+        sb.append(
+            HtmlUtil.href(
+                request.url(
+                    getRepository().URL_ENTRY_FORM, ARG_GROUP, group.getId(),
+                    ARG_TYPE, TYPE_FILE), msg("Upload a file")));
 
         sb.append(HtmlUtil.p());
 
@@ -1657,7 +1678,8 @@ return new Result(title, sb);
         HashSet<String> exclude = new HashSet<String>();
         exclude.add(TYPE_FILE);
         exclude.add(TYPE_GROUP);
-        sb.append(getRepository().makeTypeSelect(request, false, "", true,exclude));
+        sb.append(getRepository().makeTypeSelect(request, false, "", true,
+                exclude));
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.submit("Go"));
         sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
@@ -1688,7 +1710,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryGet(Request request) throws Exception {
-        if(request.getCheckingAuthMethod()) {
+        if (request.getCheckingAuthMethod()) {
             return new Result(AuthorizationMethod.AUTH_HTTP);
         }
 
@@ -1712,7 +1734,6 @@ return new Result(title, sb);
                     "Cannot download file with id:" + entryId);
             }
         }
-        //        System.err.println("request:" + request);
 
         String path = entry.getResource().getPath();
         String mimeType = getRepository().getMimeTypeFromSuffix(
@@ -1741,8 +1762,8 @@ return new Result(title, sb);
             InputStream inputStream =
                 IOUtil.getInputStream(entry.getResource().getPath(),
                                       getClass());
-            
-            Result result =new Result(BLANK, inputStream, mimeType);
+
+            Result result = new Result(BLANK, inputStream, mimeType);
             result.setCacheOk(true);
             return result;
         }
@@ -1815,6 +1836,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryCopy(Request request) throws Exception {
+
         String      fromIds = request.getString(ARG_FROM, "");
         List<Entry> entries = new ArrayList<Entry>();
         for (String id : StringUtil.split(fromIds, ",", true, true)) {
@@ -1826,8 +1848,7 @@ return new Result(title, sb);
             if (entry.isTopGroup()) {
                 StringBuffer sb = new StringBuffer();
                 sb.append(
-                    getRepository().note(
-                        msg("Cannot copy top-level group")));
+                    getRepository().note(msg("Cannot copy top-level group")));
                 return new Result(msg("Entry Delete"), sb);
             }
             entries.add(entry);
@@ -1844,7 +1865,8 @@ return new Result(title, sb);
                     getRepository().URL_ENTRY_SHOW, entries.get(0)));
         }
 
-        if ( !request.exists(ARG_TO) && !request.exists(ARG_TO+"_hidden") && !request.exists(ARG_TONAME)) {
+        if ( !request.exists(ARG_TO) && !request.exists(ARG_TO + "_hidden")
+                && !request.exists(ARG_TONAME)) {
             StringBuffer sb     = new StringBuffer();
             List<Entry>  cart   = getUserManager().getCart(request);
             boolean      didOne = false;
@@ -1892,31 +1914,34 @@ return new Result(title, sb);
 
             if (didOne) {
                 sb.append("</ul>");
-                sb.append(
-                          header("Or select a group here:"));
+                sb.append(header("Or select a group here:"));
             } else {
-                    sb.append(
-                              header("Please select a destination group:"));
+                sb.append(header("Please select a destination group:"));
             }
 
 
             sb.append(request.formPost(getRepository().URL_ENTRY_COPY));
             sb.append(HtmlUtil.hidden(ARG_FROM, fromIds));
-            String select = getRepository().getHtmlOutputHandler().getSelect(request, ARG_TO,
-                                                                             HtmlUtil.img(getRepository().iconUrl(ICON_FOLDER_OPEN)) +HtmlUtil.space(1)+msg("Select"),false,"");
-            sb.append(HtmlUtil.hidden(ARG_TO+"_hidden","",HtmlUtil.id(ARG_TO+"_hidden")));
-            
+            String select =
+                getRepository().getHtmlOutputHandler().getSelect(request,
+                    ARG_TO,
+                    HtmlUtil.img(getRepository().iconUrl(ICON_FOLDER_OPEN))
+                    + HtmlUtil.space(1) + msg("Select"), false, "");
+            sb.append(HtmlUtil.hidden(ARG_TO + "_hidden", "",
+                                      HtmlUtil.id(ARG_TO + "_hidden")));
+
             sb.append(select);
             sb.append(HtmlUtil.space(1));
-            sb.append(HtmlUtil.disabledInput(ARG_TO,
-                                             "", HtmlUtil.SIZE_60+HtmlUtil.id(ARG_TO)));
+            sb.append(HtmlUtil.disabledInput(ARG_TO, "",
+                                             HtmlUtil.SIZE_60
+                                             + HtmlUtil.id(ARG_TO)));
             sb.append(HtmlUtil.submit(msg("Go")));
             sb.append(HtmlUtil.formClose());
 
             /*
             if(didOne) {
                 sb.append(msgLabel("Or select one here"));
-            } 
+            }
             sb.append(HtmlUtil.br());
             sb.append(getTreeLink(request, getTopGroup(), ""));
             */
@@ -1925,64 +1950,67 @@ return new Result(title, sb);
         }
 
 
-        String toId = request.getString(ARG_TO+"_hidden", (String)null);
-        if(toId == null)
-            toId = request.getString(ARG_TO, (String)null);
+        String toId = request.getString(ARG_TO + "_hidden", (String) null);
+        if (toId == null) {
+            toId = request.getString(ARG_TO, (String) null);
+        }
 
-        String toName = request.getString(ARG_TONAME, (String)null);
-        if (toId == null && toName == null) {
+        String toName = request.getString(ARG_TONAME, (String) null);
+        if ((toId == null) && (toName == null)) {
             throw new IllegalArgumentException(
                 "No destination group specified");
         }
 
 
         Entry toEntry;
-        if(toId!=null) {
+        if (toId != null) {
             toEntry = getEntry(request, toId);
         } else {
-            toEntry = findGroupFromName(toName,request.getUser(),false);
+            toEntry = findGroupFromName(toName, request.getUser(), false);
         }
         if (toEntry == null) {
             throw new RepositoryUtil.MissingEntryException(
-                "Could not find entry " + (toId==null?toName:toId));
+                "Could not find entry " + ((toId == null)
+                                           ? toName
+                                           : toId));
         }
-        boolean isGroup  = toEntry.isGroup();
+        boolean isGroup = toEntry.isGroup();
 
 
         if (request.exists(ARG_ACTION_ASSOCIATE)) {
-            if(entries.size()==1) {
-                return new Result(request.url(
-                                              getRepository().URL_ASSOCIATION_ADD,
-                                              ARG_FROM, entries.get(0).getId(),
-                                              ARG_TO, toEntry.getId()));
+            if (entries.size() == 1) {
+                return new Result(
+                    request.url(
+                        getRepository().URL_ASSOCIATION_ADD, ARG_FROM,
+                        entries.get(0).getId(), ARG_TO, toEntry.getId()));
             }
         }
 
 
         if (request.exists(ARG_ACTION_MOVE)) {
-            if (!isGroup) {
+            if ( !isGroup) {
                 throw new IllegalArgumentException(
-                                                   "Can only copy/move to a group");
+                    "Can only copy/move to a group");
             }
 
             for (Entry fromEntry : entries) {
                 if ( !getAccessManager().canDoAction(request, fromEntry,
                         Permission.ACTION_EDIT)) {
                     throw new AccessException("Cannot move:"
-                            + fromEntry.getLabel(),request);
+                            + fromEntry.getLabel(), request);
                 }
             }
-        } else  if (request.exists(ARG_ACTION_COPY)) {
-            if (!isGroup) {
+        } else if (request.exists(ARG_ACTION_COPY)) {
+            if ( !isGroup) {
                 throw new IllegalArgumentException(
-                                                   "Can only copy/move to a group");
+                    "Can only copy/move to a group");
             }
         }
 
         if ( !getAccessManager().canDoAction(request, toEntry,
                                              Permission.ACTION_NEW)) {
             throw new AccessException("Cannot copy/move to:"
-                    + toEntry.getLabel(),request);
+                                      + toEntry.getLabel(), request);
         }
 
 
@@ -1996,15 +2024,16 @@ return new Result(title, sb);
 
 
         if ( !(request.exists(ARG_ACTION_MOVE)
-               || request.exists(ARG_ACTION_COPY)
-               || request.exists(ARG_ACTION_ASSOCIATE))) {
+                || request.exists(ARG_ACTION_COPY)
+                || request.exists(ARG_ACTION_ASSOCIATE))) {
             StringBuffer sb = new StringBuffer();
-            if(entries.size()>1) {
-                sb.append(msg(
-                                   "What do you want to do with the following entries?"));
+            if (entries.size() > 1) {
+                sb.append(
+                    msg(
+                    "What do you want to do with the following entries?"));
             } else {
-                sb.append(msg(
-                                   "What do you want to do with the following entry?"));
+                sb.append(
+                    msg("What do you want to do with the following entry?"));
             }
             sb.append(HtmlUtil.br());
             StringBuffer fb = new StringBuffer();
@@ -2013,14 +2042,23 @@ return new Result(title, sb);
             fb.append(HtmlUtil.hidden(ARG_FROM, fromIds));
 
             if (isGroup) {
-                fb.append(HtmlUtil.submit((entries.size()>1?"Copy them to the group: ":"Copy it to the group: ") + toEntry.getName(), ARG_ACTION_COPY));
+                fb.append(HtmlUtil.submit(((entries.size() > 1)
+                                           ? "Copy them to the group: "
+                                           : "Copy it to the group: ") + toEntry
+                                           .getName(), ARG_ACTION_COPY));
                 fb.append(HtmlUtil.space(1));
-                fb.append(HtmlUtil.submit((entries.size()>1?"Move them to the group: ":"Move it to the group: ") + toEntry.getName(), ARG_ACTION_MOVE));
+                fb.append(HtmlUtil.submit(((entries.size() > 1)
+                                           ? "Move them to the group: "
+                                           : "Move it to the group: ") + toEntry
+                                           .getName(), ARG_ACTION_MOVE));
                 fb.append(HtmlUtil.space(1));
             }
 
-            if(entries.size()==1) {
-                fb.append(HtmlUtil.submit("Associate it with: " + toEntry.getName(), ARG_ACTION_ASSOCIATE));
+            if (entries.size() == 1) {
+                fb.append(
+                    HtmlUtil.submit(
+                        "Associate it with: " + toEntry.getName(),
+                        ARG_ACTION_ASSOCIATE));
                 fb.append(HtmlUtil.space(1));
             }
 
@@ -2052,16 +2090,16 @@ return new Result(title, sb);
             Group toGroup = (Group) toEntry;
             return processEntryCopy(request, toGroup, entries);
         } else if (request.exists(ARG_ACTION_ASSOCIATE)) {
-            System.err.println ("size:" + entries.size());
-            if(entries.size()==1) {
-                return new Result(request.url(
-                                              getRepository().URL_ASSOCIATION_ADD,
-                                              ARG_FROM, entries.get(0).getId(),
-                                              ARG_TO, toEntry.getId()));
+            if (entries.size() == 1) {
+                return new Result(
+                    request.url(
+                        getRepository().URL_ASSOCIATION_ADD, ARG_FROM,
+                        entries.get(0).getId(), ARG_TO, toEntry.getId()));
             }
         }
 
         return new Result(msg("Move"), new StringBuffer());
+
     }
 
 
@@ -2115,8 +2153,6 @@ return new Result(title, sb);
                             getRepository().getGUID() + "_"
                             + newFileName).toString();
                     newResource.setPath(newFile);
-                    //                    System.err.println("old file: " + oldEntry.getResource());
-                    //                    System.err.println("new file: " + newResource);
                 }
 
 
@@ -2394,7 +2430,7 @@ return new Result(title, sb);
                 if (XmlUtil.getAttribute(node, ATTR_ADDMETADATA, false)) {
                     List<Entry> tmpEntries =
                         (List<Entry>) Misc.newList(entry);
-                    addInitialMetadata(request, tmpEntries,false);
+                    addInitialMetadata(request, tmpEntries, false);
                 }
 
             } else if (node.getTagName().equals(TAG_ASSOCIATION)) {
@@ -2488,14 +2524,14 @@ return new Result(title, sb);
         if (file != null) {
             String tmp = (String) files.get(file);
             if (doAnonymousUpload) {
-                File newFile = getStorageManager().moveToAnonymousStorage(request,
-                                                                          new File(tmp),"");
+                File newFile =
+                    getStorageManager().moveToAnonymousStorage(request,
+                        new File(tmp), "");
 
-                System.err.println("Moved to anonymous:" + newFile);
                 file = newFile.toString();
             } else {
                 File newFile = getStorageManager().moveToStorage(request,
-                                                                 new File(tmp));
+                                   new File(tmp));
                 file = newFile.toString();
             }
         }
@@ -2531,8 +2567,8 @@ return new Result(title, sb);
                     "Only administrators can upload a local file");
             }
             localFileToMove = getStorageManager().moveToStorage(request,
-                                                                    new File(localFileToMove)).toString();
-            
+                    new File(localFileToMove)).toString();
+
             resource = new Resource(localFileToMove,
                                     Resource.TYPE_STOREDFILE);
         } else if (url != null) {
@@ -2637,58 +2673,82 @@ return new Result(title, sb);
         }
 
 
-        String entryUrl =    HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
-                                          ARG_ENTRYID, entry.getId());
+        String entryUrl =
+            HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
+                         ARG_ENTRYID, entry.getId());
         String title = entry.getName();
-        String share = "<script type=\"text/javascript\">var addthis_disable_flash=\"true\" addthis_pub=\"jeffmc\";</script><a href=\"http://www.addthis.com/bookmark.php?v=20\" onmouseover=\"return addthis_open(this, '', '" + entryUrl +"', '" + title+"')\" onmouseout=\"addthis_close()\" onclick=\"return addthis_sendto()\"><img src=\"http://s7.addthis.com/static/btn/lg-share-en.gif\" width=\"125\" height=\"16\" alt=\"Bookmark and Share\" style=\"border:0\"/></a><script type=\"text/javascript\" src=\"http://s7.addthis.com/js/200/addthis_widget.js\"></script>";
+        String share =
+            "<script type=\"text/javascript\">var addthis_disable_flash=\"true\" addthis_pub=\"jeffmc\";</script><a href=\"http://www.addthis.com/bookmark.php?v=20\" onmouseover=\"return addthis_open(this, '', '" + entryUrl + "', '" + title + "')\" onmouseout=\"addthis_close()\" onclick=\"return addthis_sendto()\"><img src=\"http://s7.addthis.com/static/btn/lg-share-en.gif\" width=\"125\" height=\"16\" alt=\"Bookmark and Share\" style=\"border:0\"/></a><script type=\"text/javascript\" src=\"http://s7.addthis.com/js/200/addthis_widget.js\"></script>";
 
         sb.append(share);
 
 
 
-        String key = getRepository().getProperty(PROP_FACEBOOK_CONNECT_KEY, "");
-        boolean haveKey = key.length()>0;
-        boolean doRatings = getRepository().getProperty(PROP_RATINGS_ENABLE,false);
-        if(doRatings) {
+        String key = getRepository().getProperty(PROP_FACEBOOK_CONNECT_KEY,
+                         "");
+        boolean haveKey = key.length() > 0;
+        boolean doRatings = getRepository().getProperty(PROP_RATINGS_ENABLE,
+                                false);
+        if (doRatings) {
             String link = request.url(getRepository().URL_COMMENTS_SHOW,
                                       ARG_ENTRYID, entry.getId());
-            String ratings = HtmlUtil.div("",HtmlUtil.cssClass("js-kit-rating") +
-                                HtmlUtil.attr(HtmlUtil.ATTR_TITLE,entry.getFullName())+
-                                HtmlUtil.attr("permalink",link)) +HtmlUtil.importJS("http://js-kit.com/ratings.js");
+            String ratings = HtmlUtil.div(
+                                 "",
+                                 HtmlUtil.cssClass("js-kit-rating")
+                                 + HtmlUtil.attr(
+                                     HtmlUtil.ATTR_TITLE,
+                                     entry.getFullName()) + HtmlUtil.attr(
+                                         "permalink",
+                                         link)) + HtmlUtil.importJS(
+                                             "http://js-kit.com/ratings.js");
 
-            sb.append(HtmlUtil.table(HtmlUtil.row(HtmlUtil.col(ratings,HtmlUtil.attr(HtmlUtil.ATTR_ALIGN,HtmlUtil.VALUE_RIGHT)),
-                                                  HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,HtmlUtil.VALUE_TOP)),
-                                     HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"100%")));
+            sb.append(
+                HtmlUtil.table(
+                    HtmlUtil.row(
+                        HtmlUtil.col(
+                            ratings,
+                            HtmlUtil.attr(
+                                HtmlUtil.ATTR_ALIGN,
+                                HtmlUtil.VALUE_RIGHT)), HtmlUtil.attr(
+                                    HtmlUtil.ATTR_VALIGN,
+                                    HtmlUtil.VALUE_TOP)), HtmlUtil.attr(
+                                        HtmlUtil.ATTR_WIDTH, "100%")));
         }
 
 
 
 
-        String chat = "<script type='text/javascript' src='http://cache.static.userplane.com/CommunicationSuite/assets/js/flashobject.js'></script><script type='text/javascript' src='http://cache.static.userplane.com/CommunicationSuite/assets/js/userplane.js'></script><div id='myCoolContainer'><strong>You need to upgrade your Flash Player by clicking <a href='http://www.macromedia.com/go/getflash/' target='_blank'>this link</a>.</strong><br><br><strong>If you see this and have already upgraded we suggest you follow <a href='http://www.adobe.com/cfusion/knowledgebase/index.cfm?id=tn_14157' target='_blank'>this link</a>to uninstall Flash and reinstall again.</strong></div><script type='text/javascript'>USERPLANE.config.minichat = {container : 'myCoolContainer',flashcomServer : 'flashcom.public.userplane.com',swfServer: 'swf.userplane.com',domainID : 'public.userplane.com',instanceID : 'up_domain',sessionGUID : 'User1234',width : '50%',height : '50%'};var mc = new USERPLANE.app.Minichat(USERPLANE.config.minichat);mc.render();</script>";
+        String chat =
+            "<script type='text/javascript' src='http://cache.static.userplane.com/CommunicationSuite/assets/js/flashobject.js'></script><script type='text/javascript' src='http://cache.static.userplane.com/CommunicationSuite/assets/js/userplane.js'></script><div id='myCoolContainer'><strong>You need to upgrade your Flash Player by clicking <a href='http://www.macromedia.com/go/getflash/' target='_blank'>this link</a>.</strong><br><br><strong>If you see this and have already upgraded we suggest you follow <a href='http://www.adobe.com/cfusion/knowledgebase/index.cfm?id=tn_14157' target='_blank'>this link</a>to uninstall Flash and reinstall again.</strong></div><script type='text/javascript'>USERPLANE.config.minichat = {container : 'myCoolContainer',flashcomServer : 'flashcom.public.userplane.com',swfServer: 'swf.userplane.com',domainID : 'public.userplane.com',instanceID : 'up_domain',sessionGUID : 'User1234',width : '50%',height : '50%'};var mc = new USERPLANE.app.Minichat(USERPLANE.config.minichat);mc.render();</script>";
 
 
 
 
-        if(haveKey) {
-            sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"100%")));
+        if (haveKey) {
+            sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,
+                                    HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
+                                        "100%")));
             sb.append("<tr valign=\"top\"><td width=\"50%\">");
         }
 
-        if(!doRatings) {
+        if ( !doRatings) {
             sb.append(HtmlUtil.p());
         }
         sb.append(getCommentHtml(request, entry));
-        if(haveKey) {
+        if (haveKey) {
             sb.append("</td><td  width=\"50%\">");
-            String fb  ="\n\n<script src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\" type=\"text/javascript\"></script>\n" +
-            "Comment on Facebook:<br><fb:comments></fb:comments>\n" +
-            "<script type=\"text/javascript\">\n//FB.FBDebug.logLevel=6;\n//FB.FBDebug.isEnabled=1;\nFB.init(\"" + key +"\", \"/repository/xd_receiver.htm\");\n</script>\n\n";
+            String fb =
+                "\n\n<script src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\" type=\"text/javascript\"></script>\n"
+                + "Comment on Facebook:<br><fb:comments></fb:comments>\n"
+                + "<script type=\"text/javascript\">\n//FB.FBDebug.logLevel=6;\n//FB.FBDebug.isEnabled=1;\nFB.init(\""
+                + key
+                + "\", \"/repository/xd_receiver.htm\");\n</script>\n\n";
             sb.append(fb);
             sb.append("</td></tr>");
             sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
         }
 
-        
+
 
 
         return addEntryHeader(request, entry,
@@ -2969,17 +3029,15 @@ return new Result(title, sb);
      * @param request _more_
      * @param entry _more_
      * @param linkText _more_
-     * @param includeIcon _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     protected EntryLink getAjaxLink(Request request, Entry entry,
-                                 String linkText)
+                                    String linkText)
             throws Exception {
-        return getAjaxLink(request, entry, linkText,
-                           null);
+        return getAjaxLink(request, entry, linkText, null);
     }
 
     /**
@@ -2989,14 +3047,14 @@ return new Result(title, sb);
      * @param entry _more_
      * @param linkText _more_
      * @param url _more_
-     * @param includeIcon _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     protected EntryLink getAjaxLink(Request request, Entry entry,
-                                 String linkText, String url)   throws Exception {
+                                    String linkText, String url)
+            throws Exception {
         return getAjaxLink(request, entry, linkText, url, true);
     }
 
@@ -3008,103 +3066,118 @@ return new Result(title, sb);
      * @param entry _more_
      * @param linkText _more_
      * @param url _more_
-     * @param includeIcon _more_
      * @param forTreeNavigation _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected EntryLink getAjaxLink(Request request, 
-                                 Entry entry,
-                                 String linkText, 
-                                 String url,
-                                 boolean forTreeNavigation)
+    protected EntryLink getAjaxLink(Request request, Entry entry,
+                                    String linkText, String url,
+                                    boolean forTreeNavigation)
             throws Exception {
 
-        if(url == null) {
-            url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                   entry);
+        if (url == null) {
+            url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry);
         }
 
-        boolean showLink = request.get(ARG_SHOWLINK,true);
-        StringBuffer sb      = new StringBuffer();
-        String       entryId = entry.getId();
+        boolean      showLink = request.get(ARG_SHOWLINK, true);
+        StringBuffer sb       = new StringBuffer();
+        String       entryId  = entry.getId();
 
-        String       uid     = "link_" + HtmlUtil.blockCnt++;
-        String output = "groupxml";
-        String folderClickUrl = 
-            request.entryUrl(getRepository().URL_ENTRY_SHOW,entry)+
-            "&" + HtmlUtil.arg(ARG_OUTPUT, output) +
-            "&" + HtmlUtil.arg(ARG_SHOWLINK, ""+showLink);
+        String       uid      = "link_" + HtmlUtil.blockCnt++;
+        String       output   = "groupxml";
+        String folderClickUrl =
+            request.entryUrl(getRepository().URL_ENTRY_SHOW, entry) + "&"
+            + HtmlUtil.arg(ARG_OUTPUT, output) + "&"
+            + HtmlUtil.arg(ARG_SHOWLINK, "" + showLink);
 
-        String targetId = "targetspan_" + HtmlUtil.blockCnt++;
+        String  targetId = "targetspan_" + HtmlUtil.blockCnt++;
 
         boolean okToMove = !request.getUser().getAnonymous();
 
 
 
-        String compId = "popup_" + HtmlUtil.blockCnt++;
-        String linkId = "img_" + uid;
-        String prefix = "";
+        String  compId   = "popup_" + HtmlUtil.blockCnt++;
+        String  linkId   = "img_" + uid;
+        String  prefix   = "";
 
-        if(forTreeNavigation) {
-            if (entry.isGroup( )) {
-                prefix = HtmlUtil.img(getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
-                                      msg("Click to open group"), 
-                                      HtmlUtil.id("img_" + uid) + 
-                                      HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
-                                                                          HtmlUtil.comma(
-                                                                                         HtmlUtil.squote(uid),
-                                                                                         HtmlUtil.squote(folderClickUrl),
-                                                                                         HtmlUtil.squote(iconUrl(ICON_TOGGLEARROWDOWN))))));
-            }  else {
-                prefix = HtmlUtil.img(getRepository().iconUrl(ICON_BLANK),"",HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"10"));
+        if (forTreeNavigation) {
+            if (entry.isGroup()) {
+                prefix = HtmlUtil.img(
+                    getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
+                    msg("Click to open group"),
+                    HtmlUtil.id("img_" + uid)
+                    + HtmlUtil.onMouseClick(
+                        HtmlUtil.call(
+                            "folderClick",
+                            HtmlUtil.comma(
+                                HtmlUtil.squote(uid),
+                                HtmlUtil.squote(folderClickUrl),
+                                HtmlUtil.squote(
+                                    iconUrl(ICON_TOGGLEARROWDOWN))))));
+            } else {
+                prefix = HtmlUtil.img(getRepository().iconUrl(ICON_BLANK),
+                                      "",
+                                      HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
+                                          "10"));
             }
-            prefix = HtmlUtil.span(prefix,HtmlUtil.cssClass("arrow"));
+            prefix = HtmlUtil.span(prefix, HtmlUtil.cssClass("arrow"));
 
         }
 
 
-        StringBuffer sourceEvent  = new StringBuffer();
-        StringBuffer targetEvent  = new StringBuffer();
-        String entryIcon = getIconUrl(request, entry);
-        String iconId = "img_" + uid;
+        StringBuffer sourceEvent = new StringBuffer();
+        StringBuffer targetEvent = new StringBuffer();
+        String       entryIcon   = getIconUrl(request, entry);
+        String       iconId      = "img_" + uid;
         if (okToMove) {
-            if(forTreeNavigation) {
-                targetEvent.append(HtmlUtil.onMouseOver(HtmlUtil.call("mouseOverOnEntry",
-                                                                HtmlUtil.comma("event",
-                                                                               HtmlUtil.squote(entry.getId()),
-                                                                               HtmlUtil.squote(targetId)))));
+            if (forTreeNavigation) {
+                targetEvent.append(
+                    HtmlUtil.onMouseOver(
+                        HtmlUtil.call(
+                            "mouseOverOnEntry",
+                            HtmlUtil.comma(
+                                "event", HtmlUtil.squote(entry.getId()),
+                                HtmlUtil.squote(targetId)))));
 
 
-                targetEvent.append(HtmlUtil.onMouseUp(HtmlUtil.call("mouseUpOnEntry",
-                                                                    HtmlUtil.comma("event",
-                                                                                   HtmlUtil.squote(entry.getId()),
-                                                                                   HtmlUtil.squote(targetId)))));
+                targetEvent.append(
+                    HtmlUtil.onMouseUp(
+                        HtmlUtil.call(
+                            "mouseUpOnEntry",
+                            HtmlUtil.comma(
+                                "event", HtmlUtil.squote(entry.getId()),
+                                HtmlUtil.squote(targetId)))));
             }
-            targetEvent.append(HtmlUtil.onMouseOut(HtmlUtil.call("mouseOutOnEntry",
-                                                           HtmlUtil.comma("event", 
-                                                                          HtmlUtil.squote(entry.getId()),
-                                                                          HtmlUtil.squote(targetId)))));
+            targetEvent.append(
+                HtmlUtil.onMouseOut(
+                    HtmlUtil.call(
+                        "mouseOutOnEntry",
+                        HtmlUtil.comma(
+                            "event", HtmlUtil.squote(entry.getId()),
+                            HtmlUtil.squote(targetId)))));
 
-            sourceEvent.append(HtmlUtil.onMouseDown(HtmlUtil.call("mouseDownOnEntry",
-                                                           HtmlUtil.comma("event",
-                                                                          HtmlUtil.squote(entry.getId()),
-                                                                          HtmlUtil.squote(entry.getLabel().replace("'","")),
-                                                                          HtmlUtil.squote(iconId),
-                                                                          HtmlUtil.squote(entryIcon)))));
+            sourceEvent.append(
+                HtmlUtil.onMouseDown(
+                    HtmlUtil.call(
+                        "mouseDownOnEntry",
+                        HtmlUtil.comma(
+                            "event", HtmlUtil.squote(entry.getId()),
+                            HtmlUtil.squote(
+                                entry.getLabel().replace(
+                                    "'", "")), HtmlUtil.squote(iconId),
+                                        HtmlUtil.squote(entryIcon)))));
 
 
 
 
 
         }
-        
-        String img = prefix +HtmlUtil.img(entryIcon,
-                                          (okToMove
-                                            ? msg("Drag to move")
-                                           : ""), HtmlUtil.id(iconId) + sourceEvent);
+
+        String img = prefix + HtmlUtil.img(entryIcon, (okToMove
+                ? msg("Drag to move")
+                : ""), HtmlUtil.id(iconId) + sourceEvent);
 
 
         //        StringBuffer row = new StringBuffer();
@@ -3112,50 +3185,74 @@ return new Result(title, sb);
         sb.append(img);
         sb.append(HtmlUtil.space(1));
         getMetadataManager().decorateEntry(request, entry, sb, true);
-        if(showLink) {
-            sb.append(getTooltipLink(request, entry, linkText,url));
+        if (showLink) {
+            sb.append(getTooltipLink(request, entry, linkText, url));
         } else {
             sb.append(HtmlUtil.span(linkText, targetEvent.toString()));
         }
 
 
-        String link = HtmlUtil.span(sb.toString(), HtmlUtil.id(targetId)+targetEvent);
+        String link = HtmlUtil.span(sb.toString(),
+                                    HtmlUtil.id(targetId) + targetEvent);
 
 
-        String folderBlock = (!forTreeNavigation?"": HtmlUtil.div("",
-                           HtmlUtil.attrs(HtmlUtil.ATTR_STYLE,
-                                          "display:none;visibility:hidden",
-                                          HtmlUtil.ATTR_CLASS, "folderblock",
-                                          HtmlUtil.ATTR_ID, uid)));
+        String folderBlock = ( !forTreeNavigation
+                               ? ""
+                               : HtmlUtil.div("",
+                                   HtmlUtil.attrs(HtmlUtil.ATTR_STYLE,
+                                       "display:none;visibility:hidden",
+                                       HtmlUtil.ATTR_CLASS, "folderblock",
+                                       HtmlUtil.ATTR_ID, uid)));
 
         //        link = link + HtmlUtil.br()
         //        return link;
-        return new EntryLink(link, folderBlock,uid);
+        return new EntryLink(link, folderBlock, uid);
     }
 
 
 
 
 
-    public String getTooltipLink(Request request, Entry entry, 
-                                 String linkText,
-                                 String url) throws Exception {
-        if(url == null) {
-            url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                   entry);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param linkText _more_
+     * @param url _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getTooltipLink(Request request, Entry entry,
+                                 String linkText, String url)
+            throws Exception {
+        if (url == null) {
+            url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry);
         }
 
         String elementId = entry.getId();
         String qid       = HtmlUtil.squote(elementId);
         String linkId    = "link_" + (HtmlUtil.blockCnt++);
         String qlinkId   = HtmlUtil.squote(linkId);
-        String tooltipEvents = HtmlUtil.onMouseOver(HtmlUtil.call("tooltip.onMouseOver",
-                                                                  HtmlUtil.comma("event",qid, qlinkId))) 
-            + HtmlUtil.onMouseOut(HtmlUtil.call("tooltip.onMouseOut",
-                                                HtmlUtil.comma("event", qid, qlinkId))) 
-
-            + HtmlUtil.onMouseMove(HtmlUtil.call("tooltip.onMouseMove", 
-                                                 HtmlUtil.comma("event" ,qid, qlinkId)));
+        String tooltipEvents = HtmlUtil.onMouseOver(
+                                   HtmlUtil.call(
+                                       "tooltip.onMouseOver",
+                                       HtmlUtil.comma(
+                                           "event", qid,
+                                           qlinkId))) + HtmlUtil.onMouseOut(
+                                               HtmlUtil.call(
+                                                   "tooltip.onMouseOut",
+                                                   HtmlUtil.comma(
+                                                       "event", qid,
+                                                       qlinkId))) + HtmlUtil.onMouseMove(
+                                                           HtmlUtil.call(
+                                                               "tooltip.onMouseMove",
+                                                               HtmlUtil.comma(
+                                                                   "event",
+                                                                   qid,
+                                                                   qlinkId)));
 
         return HtmlUtil.href(url, linkText,
                              HtmlUtil.id(linkId) + " " + tooltipEvents);
@@ -3167,8 +3264,6 @@ return new Result(title, sb);
      *
      * @param request _more_
      * @param entry _more_
-     * @param forMenu _more_
-     * @param forHeader _more_
      *
      * @return _more_
      *
@@ -3206,47 +3301,52 @@ return new Result(title, sb);
     protected String getEntryActionsTable(Request request, Entry entry,
                                           int typeMask)
             throws Exception {
-        List<Link> links = getEntryLinks(request, entry);
-        StringBuffer htmlSB=null, nonHtmlSB=null, actionSB=null,fileSB=null;
-        int cnt=0;
+        List<Link>   links  = getEntryLinks(request, entry);
+        StringBuffer
+            htmlSB          = null,
+            nonHtmlSB       = null,
+            actionSB        = null,
+            fileSB          = null;
+        int     cnt         = 0;
         boolean needToAddHr = false;
-        String tableHeader = "<table cellspacing=\"0\" cellpadding=\"0\">";
+        String  tableHeader = "<table cellspacing=\"0\" cellpadding=\"0\">";
         for (Link link : links) {
             StringBuffer sb;
-            if (!link.isType(typeMask)) {
+            if ( !link.isType(typeMask)) {
                 continue;
             }
             if (link.isType(OutputType.TYPE_HTML)) {
-                if(htmlSB==null)  {
-                    htmlSB =  new StringBuffer(tableHeader);
+                if (htmlSB == null) {
+                    htmlSB = new StringBuffer(tableHeader);
                     cnt++;
                 }
                 sb = htmlSB;
             } else if (link.isType(OutputType.TYPE_NONHTML)) {
-                if(nonHtmlSB==null)  {
+                if (nonHtmlSB == null) {
                     cnt++;
-                    nonHtmlSB =  new StringBuffer(tableHeader);
+                    nonHtmlSB = new StringBuffer(tableHeader);
                 }
                 sb = nonHtmlSB;
             } else if (link.isType(OutputType.TYPE_FILE)) {
-                if(fileSB==null)  {
+                if (fileSB == null) {
                     cnt++;
-                    fileSB =  new StringBuffer(tableHeader);
+                    fileSB = new StringBuffer(tableHeader);
                 }
                 sb = fileSB;
             } else {
-                if(actionSB==null) {
+                if (actionSB == null) {
                     cnt++;
-                    actionSB =  new StringBuffer(tableHeader);
+                    actionSB = new StringBuffer(tableHeader);
                 }
                 sb = actionSB;
             }
             //Only add the hr if we have more things in the list
-            if(cnt<2 && needToAddHr) {
-                sb.append("<tr><td colspan=2><hr class=\"menuentryseparator\"></td></tr>");
+            if ((cnt < 2) && needToAddHr) {
+                sb.append(
+                    "<tr><td colspan=2><hr class=\"menuentryseparator\"></td></tr>");
             }
             needToAddHr = link.getHr();
-            if(needToAddHr) {
+            if (needToAddHr) {
                 continue;
             }
             sb.append("<tr class=\"menurow\"><td><div  class=\"menutd\">");
@@ -3264,23 +3364,27 @@ return new Result(title, sb);
         }
         StringBuffer menu = new StringBuffer();
         menu.append("<table cellspacing=\"0\" cellpadding=\"4\">");
-        menu.append(HtmlUtil.open(HtmlUtil.TAG_TR,HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,"top")));
-        if(htmlSB!=null) {
+        menu.append(HtmlUtil.open(HtmlUtil.TAG_TR,
+                                  HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,
+                                      "top")));
+        if (htmlSB != null) {
             htmlSB.append("</table>");
-            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD,"",htmlSB.toString()));
+            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD, "", htmlSB.toString()));
         }
 
-        if(nonHtmlSB!=null) {
+        if (nonHtmlSB != null) {
             nonHtmlSB.append("</table>");
-            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD,"",nonHtmlSB.toString()));
+            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD, "",
+                                     nonHtmlSB.toString()));
         }
-        if(fileSB!=null) {
+        if (fileSB != null) {
             fileSB.append("</table>");
-            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD,"",fileSB.toString()));
+            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD, "", fileSB.toString()));
         }
-        if(actionSB!=null) {
+        if (actionSB != null) {
             actionSB.append("</table>");
-            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD,"",actionSB.toString()));
+            menu.append(HtmlUtil.tag(HtmlUtil.TAG_TD, "",
+                                     actionSB.toString()));
         }
         menu.append(HtmlUtil.close(HtmlUtil.TAG_TR));
         menu.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
@@ -3306,8 +3410,8 @@ return new Result(title, sb);
         List<Link>   links = getEntryLinks(request, entry);
         StringBuffer sb    = new StringBuffer();
         for (Link link : links) {
-            if (link.isType(OutputType.TYPE_TOOLBAR)||
-                link.isType(OutputType.TYPE_ACTION)
+            if (link.isType(OutputType.TYPE_TOOLBAR)
+                    || link.isType(OutputType.TYPE_ACTION)
                     || ( !justActions
                          && (link.isType(OutputType.TYPE_NONHTML)))) {
                 String href = HtmlUtil.href(link.getUrl(),
@@ -3317,7 +3421,7 @@ return new Result(title, sb);
                 sb.append(HtmlUtil.inset(href, 0, 3, 0, 0));
             }
         }
-        return  sb.toString();
+        return sb.toString();
     }
 
     /**
@@ -3334,25 +3438,44 @@ return new Result(title, sb);
             throws Exception {
         StringBuffer fileMenuInner =
             new StringBuffer(getEntryActionsTable(request, entry,
-                                                  OutputType.TYPE_FILE));
+                OutputType.TYPE_FILE));
         StringBuffer editMenuInner =
             new StringBuffer(getEntryActionsTable(request, entry,
-                                                  OutputType.TYPE_EDIT));
+                OutputType.TYPE_EDIT));
         StringBuffer viewMenuInner =
             new StringBuffer(getEntryActionsTable(request, entry,
                 OutputType.TYPE_HTML | OutputType.TYPE_NONHTML));
-        String fileMenu = getRepository().makePopupLink(
-                                                        HtmlUtil.span(msg("File"),HtmlUtil.cssClass("entrymenulink")),
-                              fileMenuInner.toString(), false,true);
+        String fileMenu =
+            getRepository().makePopupLink(
+                HtmlUtil.span(
+                    msg("File"),
+                    HtmlUtil.cssClass(
+                        "entrymenulink")), fileMenuInner.toString(), false,
+                                           true);
 
-        String editMenu = getRepository().makePopupLink(
-                                                        HtmlUtil.span(msg("Edit"),HtmlUtil.cssClass("entrymenulink")),
-                                                        editMenuInner.toString(), false,true);
-        String viewMenu = getRepository().makePopupLink(
-                                                        HtmlUtil.span(msg("View"),HtmlUtil.cssClass("entrymenulink")),                              viewMenuInner.toString(), false,true);
-        String sep = HtmlUtil.div("&nbsp;|&nbsp;",HtmlUtil.cssClass("menuseparator"));
-        return HtmlUtil.div(HtmlUtil.table(HtmlUtil.row(HtmlUtil.cols(fileMenu,sep,editMenu,sep,viewMenu))," cellpadding=0 cellspacing=0 border=0 "),
-                             HtmlUtil.cssClass("entrymenubar"));
+        String editMenu =
+            getRepository().makePopupLink(
+                HtmlUtil.span(
+                    msg("Edit"),
+                    HtmlUtil.cssClass(
+                        "entrymenulink")), editMenuInner.toString(), false,
+                                           true);
+        String viewMenu =
+            getRepository().makePopupLink(
+                HtmlUtil.span(
+                    msg("View"),
+                    HtmlUtil.cssClass(
+                        "entrymenulink")), viewMenuInner.toString(), false,
+                                           true);
+        String sep = HtmlUtil.div("&nbsp;|&nbsp;",
+                                  HtmlUtil.cssClass("menuseparator"));
+        return HtmlUtil
+            .div(HtmlUtil
+                .table(HtmlUtil
+                    .row(HtmlUtil
+                        .cols(fileMenu, sep, editMenu, sep,
+                            viewMenu)), " cellpadding=0 cellspacing=0 border=0 "), HtmlUtil
+                                .cssClass("entrymenubar"));
     }
 
 
@@ -3390,33 +3513,33 @@ return new Result(title, sb);
         if (entry == null) {
             return BLANK;
         }
-        List  breadcrumbs = new ArrayList();
-        Group parent      = findGroup(request, entry.getParentGroupId());
-        int   length      = 0;
-        List<Group> parents = new ArrayList<Group>();
-        int totalNameLength = 0;
+        List        breadcrumbs     = new ArrayList();
+        Group       parent = findGroup(request, entry.getParentGroupId());
+        int         length          = 0;
+        List<Group> parents         = new ArrayList<Group>();
+        int         totalNameLength = 0;
         while (parent != null) {
             parents.add(parent);
             String name = parent.getName();
-            totalNameLength+=name.length();
-            parent = findGroup(request, parent.getParentGroupId());
+            totalNameLength += name.length();
+            parent          = findGroup(request, parent.getParentGroupId());
         }
 
-        boolean needToClip = totalNameLength>80;
-        for(Group ancestor: parents) {
+        boolean needToClip = totalNameLength > 80;
+        for (Group ancestor : parents) {
             if (length > 100) {
                 breadcrumbs.add(0, "...");
                 break;
             }
             String name = ancestor.getName();
-            if (needToClip && name.length() > 20) {
+            if (needToClip && (name.length() > 20)) {
                 name = name.substring(0, 19) + "...";
             }
             length += name.length();
             String link = ((requestUrl == null)
                            ? getTooltipLink(request, ancestor, name, null)
                            : HtmlUtil.href(request.entryUrl(requestUrl,
-                                                            ancestor), name));
+                               ancestor), name));
             breadcrumbs.add(0, link);
         }
         if (requestUrl == null) {
@@ -3442,7 +3565,6 @@ return new Result(title, sb);
      * @param request _more_
      * @param entry _more_
      * @param makeLinkForLastGroup _more_
-     * @param extraArgs _more_
      *
      * @return _more_
      *
@@ -3464,7 +3586,6 @@ return new Result(title, sb);
      * @param request _more_
      * @param entry _more_
      * @param makeLinkForLastGroup _more_
-     * @param extraArgs _more_
      * @param stopAt _more_
      *
      * @return A 2 element array.  First element is the title to use. Second is the links
@@ -3484,12 +3605,12 @@ return new Result(title, sb);
         if (entry == null) {
             return new String[] { BLANK, BLANK };
         }
-        Entry      parent = findGroup(request, entry.getParentGroupId());
-        OutputType output = OutputHandler.OUTPUT_HTML;
-        int        length = 0;
+        Entry       parent = findGroup(request, entry.getParentGroupId());
+        OutputType  output          = OutputHandler.OUTPUT_HTML;
+        int         length          = 0;
 
-        List<Entry> parents = new ArrayList<Entry>();
-        int totalNameLength = 0;
+        List<Entry> parents         = new ArrayList<Entry>();
+        int         totalNameLength = 0;
         while (parent != null) {
             if ((stopAt != null)
                     && parent.getFullName().equals(stopAt.getFullName())) {
@@ -3497,19 +3618,19 @@ return new Result(title, sb);
             }
             parents.add(parent);
             String name = parent.getName();
-            totalNameLength+=name.length();
-            parent = findGroup(request, parent.getParentGroupId());
+            totalNameLength += name.length();
+            parent          = findGroup(request, parent.getParentGroupId());
         }
 
-        boolean needToClip = totalNameLength>80;
-        for(Entry ancestor: parents) {
+        boolean needToClip = totalNameLength > 80;
+        for (Entry ancestor : parents) {
             if (length > 100) {
                 titleList.add(0, "...");
                 breadcrumbs.add(0, "...");
                 break;
             }
             String name = ancestor.getName();
-            if (needToClip && name.length() > 20) {
+            if (needToClip && (name.length() > 20)) {
                 name = name.substring(0, 19) + "...";
             }
             length += name.length();
@@ -3536,7 +3657,7 @@ return new Result(title, sb);
         } else {
             String img = getRepository().makePopupLink(
                              HtmlUtil.img(getIconUrl(request, entry)), links,
-                             true,false);
+                             true, false);
             nav = StringUtil.join(separator, breadcrumbs);
             String toolbar = getEntryToolbar(request, entry, true);
             String menubar = getEntryMenubar(request, entry);
@@ -3549,9 +3670,8 @@ return new Result(title, sb);
                                      + "</td>") + "</table>";
 
             nav = HtmlUtil.div(
-                               menubar+
-                               HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs")) + header,
-                HtmlUtil.cssClass("entryheader"));
+                menubar + HtmlUtil.div(nav, HtmlUtil.cssClass("breadcrumbs"))
+                + header, HtmlUtil.cssClass("entryheader"));
 
         }
         String title = StringUtil.join(HtmlUtil.pad("&gt;"), titleList);
@@ -3560,8 +3680,18 @@ return new Result(title, sb);
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Group getParent(Request request, Entry entry) throws Exception {
-        return (Group)getEntry(request, entry.getParentGroupId());
+        return (Group) getEntry(request, entry.getParentGroupId());
     }
 
 
@@ -3617,7 +3747,7 @@ return new Result(title, sb);
                                  false);
             if (tmp != null) {
                 throw new AccessException(
-                    "You do not have access to this entry",request);
+                    "You do not have access to this entry", request);
             }
             throw new RepositoryUtil.MissingEntryException(
                 "Could not find entry:"
@@ -3928,8 +4058,8 @@ return new Result(title, sb);
             getDatabaseManager().setDate(statement, col + 1,
                                          entry.getEndDate());
         } catch (Exception exc) {
-            System.err.println("Error: Bad date " + entry.getResource() + " "
-                               + new Date(entry.getStartDate()));
+            getRepository().logError("Error: Bad date " + entry.getResource()
+                                     + " " + new Date(entry.getStartDate()));
             getDatabaseManager().setDate(statement, col, new Date());
             getDatabaseManager().setDate(statement, col + 1, new Date());
         }
@@ -4217,7 +4347,7 @@ return new Result(title, sb);
             //            System.err.println("Took:" + (t2 - t1) + "ms to check: "
             //                               + entries.size() + " entries");
         } catch (Exception exc) {
-            log("Processing:" + query, exc);
+            logError("Processing:" + query, exc);
             throw exc;
         }
         return needToAdd;
@@ -4505,18 +4635,35 @@ return new Result(title, sb);
 
 
 
-    public Result addInitialMetadataToEntries(Request request, List<Entry> entries,boolean shortForm)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entries _more_
+     * @param shortForm _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result addInitialMetadataToEntries(Request request,
+            List<Entry> entries, boolean shortForm)
             throws Exception {
         StringBuffer sb = new StringBuffer();
-        List<Entry> changedEntries =  addInitialMetadata(request,  entries, shortForm);
-        if(changedEntries.size()==0) {
+        List<Entry> changedEntries = addInitialMetadata(request, entries,
+                                         shortForm);
+        if (changedEntries.size() == 0) {
             sb.append("No metadata added");
         } else {
-            sb.append(changedEntries.size()+" entries changed");
+            sb.append(changedEntries.size() + " entries changed");
             getEntryManager().insertEntries(changedEntries, false);
         }
-        if(entries.size()>0) {
-            return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, entries.get(0).getParentGroup(), ARG_MESSAGE,sb.toString()));
+        if (entries.size() > 0) {
+            return new Result(
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW,
+                    entries.get(0).getParentGroup(), ARG_MESSAGE,
+                    sb.toString()));
         }
         return new Result("Metadata", sb);
     }
@@ -4527,21 +4674,28 @@ return new Result(title, sb);
      *
      * @param request _more_
      * @param entries _more_
+     * @param shortForm _more_
      *
+     *
+     * @return _more_
      * @throws Exception _more_
      */
-    public List<Entry> addInitialMetadata(Request request, List<Entry> entries,boolean shortForm)
+    public List<Entry> addInitialMetadata(Request request,
+                                          List<Entry> entries,
+                                          boolean shortForm)
             throws Exception {
         List<Entry> changedEntries = new ArrayList<Entry>();
         for (Entry theEntry : entries) {
             if ( !getAccessManager().canDoAction(request, theEntry,
-                                                 Permission.ACTION_EDIT)) {
+                    Permission.ACTION_EDIT)) {
                 continue;
             }
 
             Hashtable extra = new Hashtable();
             getMetadataManager().getMetadata(theEntry);
-            boolean changed =             getMetadataManager().addInitialMetadata(request, theEntry, extra,shortForm);
+            boolean changed =
+                getMetadataManager().addInitialMetadata(request, theEntry,
+                    extra, shortForm);
             if ( !theEntry.hasAreaDefined()
                     && (extra.get(ARG_MINLAT) != null)) {
                 theEntry.setSouth(Misc.getProperty(extra, ARG_MINLAT, 0.0));
@@ -4560,7 +4714,7 @@ return new Result(title, sb);
                 theEntry.setEndDate(((Date) extra.get(ARG_TODATE)).getTime());
                 changed = true;
             }
-            if(changed) {
+            if (changed) {
                 changedEntries.add(theEntry);
             }
         }
@@ -5030,8 +5184,7 @@ return new Result(title, sb);
                 Group g = (Group) e;
                 groups.add(g);
             } catch (Throwable exc) {
-                System.err.println("Error getting top groups:");
-                exc.printStackTrace();
+                logError("Error getting top groups", exc);
             }
         }
         //For now don't check for access control
@@ -5321,9 +5474,8 @@ return new Result(title, sb);
             //            return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
             return new Result(
                 request.entryUrl(
-                                 getRepositoryBase().URL_ENTRY_SHOW, fromEntry,
-                                 ARG_MESSAGE,
-                                 msg("The association has been added")));
+                    getRepositoryBase().URL_ENTRY_SHOW, fromEntry,
+                    ARG_MESSAGE, msg("The association has been added")));
         }
 
         StringBuffer sb = new StringBuffer();

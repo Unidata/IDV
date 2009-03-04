@@ -19,9 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository.monitor;
 
 
@@ -50,7 +47,7 @@ import java.util.List;
  */
 public class Filter implements Constants {
 
-    /** _more_          */
+    /** _more_ */
     public static final String[] FIELD_TYPES = { ARG_TEXT, ARG_TYPE, ARG_USER,
             ARG_FILESUFFIX, ARG_ANCESTOR };
 
@@ -64,7 +61,7 @@ public class Filter implements Constants {
     /** _more_ */
     private boolean doNot = false;
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable properties = new Hashtable();
 
 

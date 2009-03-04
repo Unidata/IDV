@@ -19,7 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository.collab;
 
 
@@ -72,7 +71,7 @@ public class WikiPageOutputHandler extends OutputHandler {
                                                      OutputType.TYPE_HTML,
                                                      "", ICON_WIKI);
 
-    /** _more_          */
+    /** _more_ */
     public static final OutputType OUTPUT_WIKI_HISTORY =
         new OutputType("Wiki History", "wiki.history", OutputType.TYPE_HTML,
                        "", ICON_WIKI);
@@ -99,11 +98,8 @@ public class WikiPageOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param entries _more_
      * @param state _more_
-     * @param types _more_
      * @param links _more_
-     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
@@ -167,36 +163,40 @@ public class WikiPageOutputHandler extends OutputHandler {
             }
         }
 
-        if(request.get(ARG_WIKI_RAW,false)) {
-            StringBuffer sb =new StringBuffer();
+        if (request.get(ARG_WIKI_RAW, false)) {
+            StringBuffer sb = new StringBuffer();
             sb.append(HtmlUtil.form(""));
-            sb.append(HtmlUtil.textArea(ARG_WIKI_TEXT, wikiText, 250,
-                                        60, HtmlUtil.id(ARG_WIKI_TEXT)));
+            sb.append(HtmlUtil.textArea(ARG_WIKI_TEXT, wikiText, 250, 60,
+                                        HtmlUtil.id(ARG_WIKI_TEXT)));
             sb.append(HtmlUtil.formClose());
-            return makeLinksResult(request, msg("Wiki"), sb, new State(entry));
+            return makeLinksResult(request, msg("Wiki"), sb,
+                                   new State(entry));
         }
 
 
 
-        String detailsView = HtmlUtil.href(request.entryUrl(
-                                                            getRepository().URL_ENTRY_SHOW, entry,
-                                                            ARG_WIKI_DETAILS,""+true),msg("Details"));
+        String detailsView =
+            HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                           entry, ARG_WIKI_DETAILS,
+                                           "" + true), msg("Details"));
 
-        String rawLink = HtmlUtil.href(request.entryUrl(
-                                                        getRepository().URL_ENTRY_SHOW, entry,
-                                                        ARG_WIKI_RAW,""+true),msg("Text"));
+        String rawLink =
+            HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                           entry, ARG_WIKI_RAW,
+                                           "" + true), msg("Text"));
 
-        header = HtmlUtil.leftRight(header,HtmlUtil.div(detailsView+" " + rawLink,HtmlUtil.cssClass("smalllink")));
+        header = HtmlUtil.leftRight(header,
+                                    HtmlUtil.div(detailsView + " " + rawLink,
+                                        HtmlUtil.cssClass("smalllink")));
         WikiUtil wikiUtil = new WikiUtil(Misc.newHashtable(new Object[] {
-            OutputHandler.PROP_REQUEST,
+                                OutputHandler.PROP_REQUEST,
                                 request, OutputHandler.PROP_ENTRY, entry }));
         StringBuffer sb = new StringBuffer();
         sb.append(header);
-        sb.append(wikifyEntry(request, entry,
-                              wikiUtil,
-                              wikiText,null,null));
+        sb.append(wikifyEntry(request, entry, wikiUtil, wikiText, null,
+                              null));
         Hashtable links = (Hashtable) wikiUtil.getProperty("wikilinks");
-        if(links !=null) {
+        if (links != null) {
             List<Association> associations =
                 getEntryManager().getAssociations(request, entry);
         }

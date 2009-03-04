@@ -21,9 +21,11 @@
 
 package ucar.unidata.repository.data;
 
+
+import org.w3c.dom.*;
+
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.monitor.LdmAction;
-import org.w3c.dom.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -83,9 +85,9 @@ public class LdmOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_LDM = new OutputType("LDM Insert",
-                                                               "ldm",
-                                                               OutputType.TYPE_FILE,
-                                                               "",ICON_DATA);
+                                                    "ldm",
+                                                    OutputType.TYPE_FILE, "",
+                                                    ICON_DATA);
 
 
     /**
@@ -108,11 +110,8 @@ public class LdmOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param entries _more_
      * @param state _more_
-     * @param types _more_
      * @param links _more_
-     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
@@ -122,10 +121,17 @@ public class LdmOutputHandler extends OutputHandler {
             throws Exception {
 
         //Are we configured to do the LDM
-        if(getRepository().getProperty(PROP_LDM_PQINSERT,"").length()==0) return;
-        if(getRepository().getProperty(PROP_LDM_QUEUE,"").length()==0) return;
+        if (getRepository().getProperty(PROP_LDM_PQINSERT, "").length()
+                == 0) {
+            return;
+        }
+        if (getRepository().getProperty(PROP_LDM_QUEUE, "").length() == 0) {
+            return;
+        }
 
-        if(!request.getUser().getAdmin()) return;
+        if ( !request.getUser().getAdmin()) {
+            return;
+        }
         if (state.entry != null) {
             if ( !state.entry.isFile()) {
                 return;
@@ -133,13 +139,15 @@ public class LdmOutputHandler extends OutputHandler {
         } else {
 
             boolean anyFiles = false;
-            for(Entry entry: state.getAllEntries()) {
-                if(entry.getResource().isFile()) {
+            for (Entry entry : state.getAllEntries()) {
+                if (entry.getResource().isFile()) {
                     anyFiles = true;
                     break;
                 }
             }
-            if(!anyFiles) return;
+            if ( !anyFiles) {
+                return;
+            }
         }
         links.add(makeLink(request, state.getEntry(), OUTPUT_LDM));
 
@@ -158,91 +166,134 @@ public class LdmOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputEntry(Request request, Entry entry) throws Exception {
-        return handleEntries(request, entry, (List<Entry>) Misc.newList(entry));
+        return handleEntries(request, entry,
+                             (List<Entry>) Misc.newList(entry));
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
         return handleEntries(request, group, entries);
     }
 
+    /** _more_          */
     private String lastFeed = "SPARE";
+
+    /** _more_          */
     private String lastProductId = "${filename}";
 
-    private Result handleEntries(Request request, Entry parent, List<Entry> entries) throws Exception {
-        StringBuffer sb  = new StringBuffer();
-        List<Entry> fileEntries = new ArrayList<Entry>();
-        List<String> ids = new ArrayList<String>();
-        for(Entry entry: entries) {
-            if(entry.isFile()) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param parent _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Result handleEntries(Request request, Entry parent,
+                                 List<Entry> entries)
+            throws Exception {
+        StringBuffer sb          = new StringBuffer();
+        List<Entry>  fileEntries = new ArrayList<Entry>();
+        List<String> ids         = new ArrayList<String>();
+        for (Entry entry : entries) {
+            if (entry.isFile()) {
                 fileEntries.add(entry);
                 ids.add(entry.getId());
             }
         }
 
-        String feed = request.getString(PROP_LDM_FEED,lastFeed);
-        String productId = request.getString(PROP_LDM_PRODUCTID,lastProductId);
-        if(!request.defined(PROP_LDM_FEED)) {
+        String feed = request.getString(PROP_LDM_FEED, lastFeed);
+        String productId = request.getString(PROP_LDM_PRODUCTID,
+                                             lastProductId);
+        if ( !request.defined(PROP_LDM_FEED)) {
             String formUrl;
             if (parent.isGroup() && parent.isDummy()) {
-                formUrl  = request.url(getRepository().URL_ENTRY_GETENTRIES);
+                formUrl = request.url(getRepository().URL_ENTRY_GETENTRIES);
                 sb.append(HtmlUtil.form(formUrl));
-                sb.append(HtmlUtil.hidden(ARG_ENTRYIDS,StringUtil.join(",",ids)));
+                sb.append(HtmlUtil.hidden(ARG_ENTRYIDS,
+                                          StringUtil.join(",", ids)));
             } else {
-                formUrl  = request.url(getRepository().URL_ENTRY_SHOW);
+                formUrl = request.url(getRepository().URL_ENTRY_SHOW);
                 sb.append(HtmlUtil.form(formUrl));
-                sb.append(HtmlUtil.hidden(ARG_ENTRYID,parent.getId()));
+                sb.append(HtmlUtil.hidden(ARG_ENTRYID, parent.getId()));
             }
-            sb.append(HtmlUtil.hidden(ARG_OUTPUT,OUTPUT_LDM.getId()));
+            sb.append(HtmlUtil.hidden(ARG_OUTPUT, OUTPUT_LDM.getId()));
             sb.append(HtmlUtil.formTable());
 
-            if(fileEntries.size()==1) {
-                File   f    = fileEntries.get(0).getResource().getFile();
-                String fileTail = getStorageManager().getFileTail(fileEntries.get(0));
+            if (fileEntries.size() == 1) {
+                File f = fileEntries.get(0).getResource().getFile();
+                String fileTail =
+                    getStorageManager().getFileTail(fileEntries.get(0));
                 String size = " (" + f.length() + " bytes)";
-                sb.append(HtmlUtil.formEntry("File:",
-                                             fileTail+size));
+                sb.append(HtmlUtil.formEntry("File:", fileTail + size));
             } else {
                 int size = 0;
-                for(Entry entry: fileEntries) {
-                    size+=entry.getResource().getFile().length();
+                for (Entry entry : fileEntries) {
+                    size += entry.getResource().getFile().length();
                 }
                 sb.append(HtmlUtil.formEntry("Files:",
-                                             fileEntries.size()+" files. Total size:" + size));
+                                             fileEntries.size()
+                                             + " files. Total size:" + size));
             }
-                                         
+
 
             sb.append(HtmlUtil.formEntry("Feed:",
-                                         HtmlUtil.select(PROP_LDM_FEED, Misc.toList(LDM_FEED_TYPES),feed)));
-            String tooltip = "macros: ${fromday}  ${frommonth} ${fromyear} ${frommonthname}  <br>" +
-                "${today}  ${tomonth} ${toyear} ${tomonthname} <br> " +
-                "${filename}  ${fileextension}";
+                                         HtmlUtil.select(PROP_LDM_FEED,
+                                             Misc.toList(LDM_FEED_TYPES),
+                                             feed)));
+            String tooltip =
+                "macros: ${fromday}  ${frommonth} ${fromyear} ${frommonthname}  <br>"
+                + "${today}  ${tomonth} ${toyear} ${tomonthname} <br> "
+                + "${filename}  ${fileextension}";
             sb.append(HtmlUtil.formEntry("Product ID:",
-                                         HtmlUtil.input(PROP_LDM_PRODUCTID, productId,
-                                                        HtmlUtil.SIZE_60+
-                                                        HtmlUtil.title(tooltip))));
+                                         HtmlUtil.input(PROP_LDM_PRODUCTID,
+                                             productId,
+                                             HtmlUtil.SIZE_60
+                                             + HtmlUtil.title(tooltip))));
 
             sb.append(HtmlUtil.formTableClose());
-            if(fileEntries.size()>1) 
+            if (fileEntries.size() > 1) {
                 sb.append(HtmlUtil.submit(msg("Insert files into LDM")));
-            else
+            } else {
                 sb.append(HtmlUtil.submit(msg("Insert file into LDM")));
+            }
         } else {
-            String queue = getRepository().getProperty(PROP_LDM_QUEUE,"");
-            String pqinsert = getRepository().getProperty(PROP_LDM_PQINSERT,"");
-            for(Entry entry: fileEntries) {
-                String id = getRepository().getEntryManager().replaceMacros(entry, productId);
-                LdmAction.insertIntoQueue(pqinsert, queue, feed, id, entry.getResource().getPath());
-                sb.append("Inserted: " + getStorageManager().getFileTail(entry));
+            String queue = getRepository().getProperty(PROP_LDM_QUEUE, "");
+            String pqinsert = getRepository().getProperty(PROP_LDM_PQINSERT,
+                                  "");
+            for (Entry entry : fileEntries) {
+                String id =
+                    getRepository().getEntryManager().replaceMacros(entry,
+                        productId);
+                LdmAction.insertIntoQueue(pqinsert, queue, feed, id,
+                                          entry.getResource().getPath());
+                sb.append("Inserted: "
+                          + getStorageManager().getFileTail(entry));
                 sb.append(HtmlUtil.br());
             }
-            lastFeed = feed;
+            lastFeed      = feed;
             lastProductId = productId;
         }
 
-        return makeLinksResult(request, msg("LDM Insert"), sb, new State(parent));
-    } 
+        return makeLinksResult(request, msg("LDM Insert"), sb,
+                               new State(parent));
+    }
 
 
 

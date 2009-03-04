@@ -90,7 +90,7 @@ public class MetadataHandler extends RepositoryManager {
     private List<Metadata.Type> types = new ArrayList<Metadata.Type>();
 
 
-    /** _more_          */
+    /** _more_ */
     boolean forUser = true;
 
 
@@ -291,10 +291,11 @@ public class MetadataHandler extends RepositoryManager {
      * @param entry _more_
      * @param metadataList _more_
      * @param extra _more_
+     * @param shortForm _more_
      */
     public void getInitialMetadata(Request request, Entry entry,
                                    List<Metadata> metadataList,
-                                   Hashtable extra,boolean shortForm) {}
+                                   Hashtable extra, boolean shortForm) {}
 
 
     /**

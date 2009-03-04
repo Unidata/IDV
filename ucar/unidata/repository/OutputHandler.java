@@ -85,6 +85,7 @@ import java.util.zip.*;
 public class OutputHandler extends RepositoryManager implements WikiUtil
     .WikiPageHandler {
 
+    /** _more_ */
     public static final String LABEL_LINKS = "View &amp; Edit";
 
     /** _more_ */
@@ -200,6 +201,15 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     */
     public boolean showingAll(Request request, List<Group> subGroups,
                               List<Entry> entries) {
         int cnt = subGroups.size() + entries.size();
@@ -207,11 +217,18 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
             return false;
         }
-        return true;        
+        return true;
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     public AuthorizationMethod getAuthorizationMethod(Request request) {
         return AuthorizationMethod.AUTH_HTML;
     }
@@ -245,19 +262,20 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             }
             if (cnt >= max) {
                 toks.add(HtmlUtil.href(request.getUrl(ARG_SKIP) + "&"
-                                        + ARG_SKIP + "="
-                                        + (skip + max), msg("Next...")));
+                                       + ARG_SKIP + "="
+                                       + (skip + max), msg("Next...")));
             }
-            request.put(ARG_MAX,""+(max+100));
-            if(cnt>=max) {
-                toks.add(HtmlUtil.href(request.getUrl(),msg("View More")));
-                request.put(ARG_MAX,""+(max/2));
-                toks.add(HtmlUtil.href(request.getUrl(),msg("View Less")));
+            request.put(ARG_MAX, "" + (max + 100));
+            if (cnt >= max) {
+                toks.add(HtmlUtil.href(request.getUrl(), msg("View More")));
+                request.put(ARG_MAX, "" + (max / 2));
+                toks.add(HtmlUtil.href(request.getUrl(), msg("View Less")));
             }
-            if(toks.size()>0) {
-                sb.append(StringUtil.join(HtmlUtil.span("&nbsp;|&nbsp;",HtmlUtil.cssClass("separator")),toks));
+            if (toks.size() > 0) {
+                sb.append(StringUtil.join(HtmlUtil.span("&nbsp;|&nbsp;",
+                        HtmlUtil.cssClass("separator")), toks));
             }
-            request.put(ARG_MAX,max);
+            request.put(ARG_MAX, max);
         }
 
     }
@@ -268,7 +286,6 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /**
      * _more_
      *
-     * @param request _more_
      *
      * @param output _more_
      *
@@ -470,10 +487,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * _more_
      *
      * @param request _more_
-     * @param entry _more_
      * @param state _more_
      * @param links _more_
-     * @param forHeader _more_
      *
      * @throws Exception _more_
      */
@@ -644,7 +659,6 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * @param elementId _more_
      * @param label _more_
      * @param allEntries _more_
-     * @param append _more_
      * @param type _more_
      *
      * @return _more_
@@ -668,43 +682,47 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * _more_
      *
      * @param request _more_
-     * @param group _more_
      * @param entry _more_
      * @param target _more_
-     * @param allEntries _more_
-     * @param selectType _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected String getSelectLink(Request request, Entry entry, String target) 
-        throws Exception {
+    protected String getSelectLink(Request request, Entry entry,
+                                   String target)
+            throws Exception {
         String       linkText = entry.getLabel();
         StringBuffer sb       = new StringBuffer();
         String       entryId  = entry.getId();
         String       icon     = getEntryManager().getIconUrl(request, entry);
         String       event;
         String       uid = "link_" + HtmlUtil.blockCnt++;
-        String folderClickUrl = 
-            request.entryUrl(getRepository().URL_ENTRY_SHOW,entry)+
-            "&" + HtmlUtil.args(new String[]{
-                ARG_OUTPUT, request.getString(ARG_OUTPUT,"selectxml"),
-                ATTR_TARGET, target,
-                ARG_ALLENTRIES, request.getString(ARG_ALLENTRIES,"true"),
-                ARG_SELECTTYPE,request.getString(ARG_SELECTTYPE,"")});
+        String folderClickUrl =
+            request.entryUrl(getRepository().URL_ENTRY_SHOW, entry) + "&"
+            + HtmlUtil.args(new String[] {
+            ARG_OUTPUT, request.getString(ARG_OUTPUT, "selectxml"),
+            ATTR_TARGET, target, ARG_ALLENTRIES,
+            request.getString(ARG_ALLENTRIES, "true"), ARG_SELECTTYPE,
+            request.getString(ARG_SELECTTYPE, "")
+        });
 
-        String prefix = HtmlUtil.img(getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
-                                     msg("Click to open group"), 
-                                     HtmlUtil.id("img_" + uid) + 
-                                     HtmlUtil.onMouseClick(HtmlUtil.call("folderClick",
-                                                                         HtmlUtil.comma(
-                                                                                        HtmlUtil.squote(uid),
-                                                                                        HtmlUtil.squote(folderClickUrl),
-                                                                                        HtmlUtil.squote(iconUrl(ICON_TOGGLEARROWDOWN))))));
+        String prefix = HtmlUtil.img(
+                            getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
+                            msg("Click to open group"),
+                            HtmlUtil.id("img_" + uid)
+                            + HtmlUtil.onMouseClick(
+                                HtmlUtil.call(
+                                    "folderClick",
+                                    HtmlUtil.comma(
+                                        HtmlUtil.squote(uid),
+                                        HtmlUtil.squote(folderClickUrl),
+                                        HtmlUtil.squote(
+                                            iconUrl(
+                                                ICON_TOGGLEARROWDOWN))))));
 
 
-        String img = prefix +HtmlUtil.img(icon);
+        String img = prefix + HtmlUtil.img(icon);
 
         sb.append(img);
         sb.append(HtmlUtil.space(1));
@@ -715,11 +733,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                             ? ((Group) entry).getFullName()
                             : entry.getName());
         sb.append(HtmlUtil.mouseClickHref(HtmlUtil.call("selectClick",
-                                                        HtmlUtil.comma(
-                                                            HtmlUtil.squote(target),
-                                                            HtmlUtil.squote(entry.getId()),
-                                                            HtmlUtil.squote(value),
-                                                            HtmlUtil.squote(type))), linkText));
+                HtmlUtil.comma(HtmlUtil.squote(target),
+                               HtmlUtil.squote(entry.getId()),
+                               HtmlUtil.squote(value),
+                               HtmlUtil.squote(type))), linkText));
 
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.div("",
@@ -731,9 +748,17 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param contents _more_
+     *
+     * @return _more_
+     */
     public Result makeAjaxResult(Request request, String contents) {
         StringBuffer xml = new StringBuffer("<content>\n");
-        XmlUtil.appendCdata(xml,contents);
+        XmlUtil.appendCdata(xml, contents);
         xml.append("\n</content>");
         return new Result("", xml, "text/xml");
     }
@@ -793,32 +818,52 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     public static int entryCnt = 0;
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     public String getSortLinks(Request request) {
-        StringBuffer sb = new StringBuffer();
-        String oldOrderBy = request.getString(ARG_ORDERBY,"fromdate");
-        String oldAscending = request.getString(ARG_ASCENDING,"false");
-        String[]order = {"name","true",msg("Name") + HtmlUtil.img(getRepository().iconUrl(ICON_UPARROW)),"Sort by name ascending",
-                         "name","false",msg("Name")+ HtmlUtil.img(getRepository().iconUrl(ICON_DOWNARROW)),"Sort by name descending",
-                         "fromdate","true",msg("Date") + HtmlUtil.img(getRepository().iconUrl(ICON_UPARROW)),"Sort by date ascending",
-                         "fromdate","false",msg("Date")+ HtmlUtil.img(getRepository().iconUrl(ICON_DOWNARROW)),"Sort by date descending"};
-                         
+        StringBuffer sb           = new StringBuffer();
+        String       oldOrderBy   = request.getString(ARG_ORDERBY,
+                                        "fromdate");
+        String       oldAscending = request.getString(ARG_ASCENDING, "false");
+        String[]     order        = {
+            "name", "true",
+            msg("Name") + HtmlUtil.img(getRepository().iconUrl(ICON_UPARROW)),
+            "Sort by name ascending", "name", "false",
+            msg("Name")
+            + HtmlUtil.img(getRepository().iconUrl(ICON_DOWNARROW)),
+            "Sort by name descending", "fromdate", "true",
+            msg("Date") + HtmlUtil.img(getRepository().iconUrl(ICON_UPARROW)),
+            "Sort by date ascending", "fromdate", "false",
+            msg("Date")
+            + HtmlUtil.img(getRepository().iconUrl(ICON_DOWNARROW)),
+            "Sort by date descending"
+        };
+
         sb.append(msgLabel("Sort"));
-        for(int i=0;i<order.length;i+=4) {
-            if(Misc.equals(order[i],oldOrderBy) &&
-               Misc.equals(order[i+1],oldAscending)) {
-                sb.append(HtmlUtil.span(order[i+2],HtmlUtil.cssClass("sortlinkon")));
+        for (int i = 0; i < order.length; i += 4) {
+            if (Misc.equals(order[i], oldOrderBy)
+                    && Misc.equals(order[i + 1], oldAscending)) {
+                sb.append(HtmlUtil.span(order[i + 2],
+                                        HtmlUtil.cssClass("sortlinkon")));
             } else {
-                request.put(ARG_ORDERBY,order[i]);
-                request.put(ARG_ASCENDING,order[i+1]);
-                request.put(ARG_SHOWENTRYSELECTFORM,"true");
+                request.put(ARG_ORDERBY, order[i]);
+                request.put(ARG_ASCENDING, order[i + 1]);
+                request.put(ARG_SHOWENTRYSELECTFORM, "true");
                 String url = request.getUrl();
-                sb.append(HtmlUtil.span(HtmlUtil.href(url,order[i+2]),HtmlUtil.title(order[i+3])+HtmlUtil.cssClass("sortlinkoff")));
+                sb.append(HtmlUtil.span(HtmlUtil.href(url, order[i + 2]),
+                                        HtmlUtil.title(order[i + 3])
+                                        + HtmlUtil.cssClass("sortlinkoff")));
             }
         }
 
         request.remove(ARG_SHOWENTRYSELECTFORM);
-        request.put(ARG_ORDERBY,oldOrderBy);
-        request.put(ARG_ASCENDING,oldAscending);
+        request.put(ARG_ORDERBY, oldOrderBy);
+        request.put(ARG_ASCENDING, oldAscending);
         return sb.toString();
 
     }
@@ -829,20 +874,22 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @param request _more_
      * @param entries _more_
+     * @param hideIt _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public String[] getEntryFormStart(Request request, List entries, boolean hideIt)
+    public String[] getEntryFormStart(Request request, List entries,
+                                      boolean hideIt)
             throws Exception {
-        if(hideIt) {
-            hideIt = !request.get(ARG_SHOWENTRYSELECTFORM,false);
+        if (hideIt) {
+            hideIt = !request.get(ARG_SHOWENTRYSELECTFORM, false);
         }
 
 
         String       base   = "toggleentry" + (entryCnt++);
-        String formId = "entryform_" + (HtmlUtil.blockCnt++);
+        String       formId = "entryform_" + (HtmlUtil.blockCnt++);
         StringBuffer formSB = new StringBuffer();
         formSB.append(request.formPost(getRepository().URL_ENTRY_GETENTRIES,
                                        HtmlUtil.id(formId)));
@@ -858,11 +905,11 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 continue;
             }
             String icon = link.getIcon();
-            if(icon == null) {
+            if (icon == null) {
                 icon = getRepository().iconUrl(ICON_BLANK);
             }
             tfos.add(new HtmlUtil.Selector(outputType.getLabel(),
-                                           outputType.getId(),icon));
+                                           outputType.getId(), icon));
         }
 
 
@@ -875,41 +922,33 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         selectSB.append(getSortLinks(request));
 
 
-        String arrowImg =
-            HtmlUtil.img(hideIt?getRepository().iconUrl(ICON_RIGHTDART):
-                         getRepository().iconUrl(ICON_DOWNDART),
-                         msg("Show/Hide Form"), HtmlUtil.id(base + "img"));
+        String arrowImg = HtmlUtil.img(hideIt
+                                       ? getRepository().iconUrl(
+                                           ICON_RIGHTDART)
+                                       : getRepository().iconUrl(
+                                           ICON_DOWNDART), msg(
+                                               "Show/Hide Form"), HtmlUtil.id(
+                                               base + "img"));
         String link = HtmlUtil.space(2)
                       + HtmlUtil.jsLink(HtmlUtil.onMouseClick(base
-                                                              + ".groupToggleVisibility()"), arrowImg);
+                          + ".groupToggleVisibility()"), arrowImg);
         String selectId = base + "select";
         formSB.append(HtmlUtil.span(selectSB.toString(),
-                                    HtmlUtil.cssClass("entrylistform") +
-                                    HtmlUtil.id(selectId)+
-                                    (hideIt?HtmlUtil.style("display:none; visibility:hidden;"):"")));
+                                    HtmlUtil.cssClass("entrylistform")
+                                    + HtmlUtil.id(selectId) + (hideIt
+                ? HtmlUtil.style("display:none; visibility:hidden;")
+                : "")));
         formSB.append(
-                      HtmlUtil.script(HtmlUtil.callln(base +"= new EntryFormList",
-                                                      HtmlUtil.comma(HtmlUtil.squote(formId),
-                                                                     HtmlUtil.squote(base + "img"),
-                                                                     HtmlUtil.squote(selectId),(hideIt?"0":"1")))));
+            HtmlUtil.script(
+                HtmlUtil.callln(
+                    base + "= new EntryFormList",
+                    HtmlUtil.comma(
+                        HtmlUtil.squote(formId),
+                        HtmlUtil.squote(base + "img"),
+                        HtmlUtil.squote(selectId), (hideIt
+                ? "0"
+                : "1")))));
         return new String[] { link, base, formSB.toString() };
-    }
-
-
-    public void addEntryCheckbox(Request request, Entry entry, StringBuffer htmlSB, StringBuffer jsSB) 
-            throws Exception {
-        String rowId = "entryrow_" + (HtmlUtil.blockCnt++);
-        String cbxId = "entry_"  + (HtmlUtil.blockCnt++);
-        String cbxArgId = "entry_" + entry.getId();
-        String cbxWrapperId = "cbx_" + (HtmlUtil.blockCnt++);
-        jsSB.append(HtmlUtil.callln("new EntryRow",HtmlUtil.comma(HtmlUtil.squote(rowId),HtmlUtil.squote(cbxId),HtmlUtil.squote(cbxWrapperId))));
-
-        String cbx =HtmlUtil.checkbox(cbxArgId,
-                                        "true", false,HtmlUtil.id(cbxId)+" " +
-                                        HtmlUtil.attr(HtmlUtil.ATTR_TITLE,msg("Shift-click: select range; Control-click: toggle all"))+
-                                        HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,HtmlUtil.call("entryRowCheckboxClicked",
-                                                                                          HtmlUtil.comma("event",HtmlUtil.squote(cbxId)))));
-        decorateEntryRow(request,entry, htmlSB, getEntryManager().getAjaxLink(request, entry,entry.getLabel()),rowId,cbx);
     }
 
 
@@ -917,7 +956,48 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * _more_
      *
      * @param request _more_
-     * @param base _more_
+     * @param entry _more_
+     * @param htmlSB _more_
+     * @param jsSB _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addEntryCheckbox(Request request, Entry entry,
+                                 StringBuffer htmlSB, StringBuffer jsSB)
+            throws Exception {
+        String rowId        = "entryrow_" + (HtmlUtil.blockCnt++);
+        String cbxId        = "entry_" + (HtmlUtil.blockCnt++);
+        String cbxArgId     = "entry_" + entry.getId();
+        String cbxWrapperId = "cbx_" + (HtmlUtil.blockCnt++);
+        jsSB.append(HtmlUtil.callln("new EntryRow",
+                                    HtmlUtil.comma(HtmlUtil.squote(rowId),
+                                        HtmlUtil.squote(cbxId),
+                                        HtmlUtil.squote(cbxWrapperId))));
+
+        String cbx =
+            HtmlUtil.checkbox(
+                cbxArgId, "true", false,
+                HtmlUtil.id(cbxId) + " "
+                + HtmlUtil.attr(
+                    HtmlUtil.ATTR_TITLE,
+                    msg(
+                    "Shift-click: select range; Control-click: toggle all")) + HtmlUtil.attr(
+                        HtmlUtil.ATTR_ONCLICK,
+                        HtmlUtil.call(
+                            "entryRowCheckboxClicked",
+                            HtmlUtil.comma(
+                                "event", HtmlUtil.squote(cbxId)))));
+        decorateEntryRow(request, entry, htmlSB,
+                         getEntryManager().getAjaxLink(request, entry,
+                             entry.getLabel()), rowId, cbx);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param formId _more_
      *
      * @return _more_
      */
@@ -930,7 +1010,19 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
 
 
-    public String getBreadcrumbList(Request request, StringBuffer sb, List entries)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getBreadcrumbList(Request request, StringBuffer sb,
+                                    List entries)
             throws Exception {
         return getEntriesList(request, sb, entries, true, true, false, true);
     }
@@ -943,63 +1035,80 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * @param sb _more_
      * @param entries _more_
      * @param request _more_
-     * @param doForm _more_
+     * @param doFormOpen _more_
+     * @param doFormClose _more_
+     * @param doCbx _more_
      * @param showCrumbs _more_
      *
      *
      * @return _more_
      * @throws Exception _more_
      */
-    public String getEntriesList(Request request, 
-                                 StringBuffer sb, 
-                                 List entries,
-                                 boolean doFormOpen,
-                                 boolean doFormClose,
-                                 boolean doCbx,
+    public String getEntriesList(Request request, StringBuffer sb,
+                                 List entries, boolean doFormOpen,
+                                 boolean doFormClose, boolean doCbx,
                                  boolean showCrumbs)
             throws Exception {
 
         String link = "";
         String base = "";
         if (doFormOpen) {
-            String[] tuple = getEntryFormStart(request, entries,true);
+            String[] tuple = getEntryFormStart(request, entries, true);
             link = tuple[0];
             base = tuple[1];
             sb.append(tuple[2]);
         }
-        sb.append(HtmlUtil.open(HtmlUtil.TAG_DIV, HtmlUtil.cssClass("folderblock")));
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_DIV,
+                                HtmlUtil.cssClass("folderblock")));
         sb.append("\n\n");
         int          cnt  = 0;
         StringBuffer jsSB = new StringBuffer();
         for (Entry entry : (List<Entry>) entries) {
-            StringBuffer cbxSB = new StringBuffer();
-            String rowId = base + (cnt++);
-            String cbxId = "entry_" + entry.getId();
-            String cbxWrapperId = "checkboxwrapper_" + (cnt++);
-            jsSB.append(HtmlUtil.callln("new EntryRow",HtmlUtil.comma(HtmlUtil.squote(rowId),HtmlUtil.squote(cbxId),HtmlUtil.squote(cbxWrapperId))));
+            StringBuffer cbxSB        = new StringBuffer();
+            String       rowId        = base + (cnt++);
+            String       cbxId        = "entry_" + entry.getId();
+            String       cbxWrapperId = "checkboxwrapper_" + (cnt++);
+            jsSB.append(
+                HtmlUtil.callln(
+                    "new EntryRow",
+                    HtmlUtil.comma(
+                        HtmlUtil.squote(rowId), HtmlUtil.squote(cbxId),
+                        HtmlUtil.squote(cbxWrapperId))));
             if (doCbx) {
                 cbxSB.append(HtmlUtil.hidden("all_" + entry.getId(), "1"));
-                String cbx = HtmlUtil.checkbox(cbxId,
-                                               "true", false,HtmlUtil.id(cbxId)+" " +
-                                               HtmlUtil.style("display:none; visibility:hidden;") +
-                                               HtmlUtil.attr(HtmlUtil.ATTR_TITLE,msg("Shift-click: select range; Control-click: toggle all"))+
-                                               HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,HtmlUtil.call("entryRowCheckboxClicked",
-                                                                                                 HtmlUtil.comma("event",HtmlUtil.squote(cbxId)))));
-                
+                String cbx =
+                    HtmlUtil.checkbox(
+                        cbxId, "true", false,
+                        HtmlUtil.id(cbxId) + " "
+                        + HtmlUtil.style("display:none; visibility:hidden;")
+                        + HtmlUtil.attr(
+                            HtmlUtil.ATTR_TITLE,
+                            msg(
+                            "Shift-click: select range; Control-click: toggle all")) + HtmlUtil.attr(
+                                HtmlUtil.ATTR_ONCLICK,
+                                HtmlUtil.call(
+                                    "entryRowCheckboxClicked",
+                                    HtmlUtil.comma(
+                                        "event", HtmlUtil.squote(cbxId)))));
+
 
                 cbxSB.append(HtmlUtil.span(cbx, HtmlUtil.id(cbxWrapperId)));
             }
 
             if (showCrumbs) {
-                cbxSB.append(HtmlUtil.img(getEntryManager().getIconUrl(request,entry)));
+                cbxSB.append(
+                    HtmlUtil.img(
+                        getEntryManager().getIconUrl(request, entry)));
                 cbxSB.append(HtmlUtil.space(1));
-                cbxSB.append(getEntryManager().getBreadCrumbs(request, entry));
+                cbxSB.append(getEntryManager().getBreadCrumbs(request,
+                        entry));
                 sb.append(cbxSB);
                 sb.append(HtmlUtil.br());
             } else {
-                EntryLink entryLink  = getEntryManager().getAjaxLink(request, entry, entry.getLabel());
+                EntryLink entryLink = getEntryManager().getAjaxLink(request,
+                                          entry, entry.getLabel());
                 entryLink.setLink(cbxSB + entryLink.getLink());
-                decorateEntryRow(request, entry, sb,entryLink,rowId,"");
+                decorateEntryRow(request, entry, sb, entryLink, rowId, "");
             }
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_UL));
@@ -1013,37 +1122,57 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     }
 
 
-    protected void decorateEntryRow(Request request, Entry entry, StringBuffer sb, EntryLink link,String rowId, String extra) {
-        if(rowId==null) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     * @param link _more_
+     * @param rowId _more_
+     * @param extra _more_
+     */
+    protected void decorateEntryRow(Request request, Entry entry,
+                                    StringBuffer sb, EntryLink link,
+                                    String rowId, String extra) {
+        if (rowId == null) {
             rowId = "entryrow_" + (HtmlUtil.blockCnt++);
         }
-        sb.append(HtmlUtil.open(HtmlUtil.TAG_DIV,HtmlUtil.id(rowId) +HtmlUtil.cssClass("entryrow")+ 
-                                HtmlUtil.onMouseOver(HtmlUtil.call("entryRowOver",HtmlUtil.squote(rowId))) +
-                                HtmlUtil.onMouseOut(HtmlUtil.call("entryRowOut",HtmlUtil.squote(rowId)))));
-        sb.append("<table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tr ><td>");
+        sb.append(
+            HtmlUtil.open(
+                HtmlUtil.TAG_DIV,
+                HtmlUtil.id(rowId) + HtmlUtil.cssClass("entryrow")
+                + HtmlUtil.onMouseOver(
+                    HtmlUtil.call(
+                        "entryRowOver",
+                        HtmlUtil.squote(rowId))) + HtmlUtil.onMouseOut(
+                            HtmlUtil.call(
+                                "entryRowOut", HtmlUtil.squote(rowId)))));
+        sb.append(
+            "<table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tr ><td>");
         sb.append(extra);
         sb.append(link.getLink());
         sb.append("</td><td align=right class=entryrowlabel>");
-        if(entry.getResource().isFile()) {
-            File   f    = entry.getResource().getFile();
+        if (entry.getResource().isFile()) {
+            File f = entry.getResource().getFile();
             //            sb.append(formatFileLength(f.length()));
         }
-        sb.append(getRepository().formatDateShort(request, new Date(entry.getStartDate())));
+        sb.append(getRepository().formatDateShort(request,
+                new Date(entry.getStartDate())));
         String userLabel;
-        if(Misc.equals(request.getUser(), entry.getUser())) {
-            userLabel="me";
+        if (Misc.equals(request.getUser(), entry.getUser())) {
+            userLabel = "me";
         } else {
-            userLabel=entry.getUser().getId();
+            userLabel = entry.getUser().getId();
         }
         sb.append("</td><td width=\"1%\" align=right class=entryrowlabel>");
         sb.append(HtmlUtil.space(1));
-            String userSearchLink =
-                HtmlUtil.href(
-                    HtmlUtil.url(
-                        request.url(getRepository().URL_USER_PROFILE),
-                        ARG_USER_ID,
-                        entry.getUser().getId()), userLabel,
-                            "title=\"View user profile\"");
+        String userSearchLink =
+            HtmlUtil.href(
+                HtmlUtil.url(
+                    request.url(getRepository().URL_USER_PROFILE),
+                    ARG_USER_ID, entry.getUser().getId()), userLabel,
+                        "title=\"View user profile\"");
 
         sb.append(userSearchLink);
         sb.append("</td></tr></table>");
@@ -1066,7 +1195,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     protected String getEntryLink(Request request, Entry entry)
             throws Exception {
         return getEntryManager().getTooltipLink(request, entry,
-                                                entry.getLabel(), null);
+                entry.getLabel(), null);
     }
 
 
@@ -1077,7 +1206,6 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @param request _more_
      * @param output _more_
-     * @param outputTypes _more_
      * @param links _more_
      *
      * @return _more_
@@ -1186,7 +1314,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /** _more_ */
     public static final String WIKIPROP_IMPORT = "import";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKIPROP_COMMENTS = "comments";
 
     /** _more_ */
@@ -1329,8 +1457,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             return null;
         }
 
-        return HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
-                            + getStorageManager().getFileTail(entry), ARG_ENTRYID, entry.getId());
+        return HtmlUtil.url(
+            request.url(repository.URL_ENTRY_GET) + "/"
+            + getStorageManager().getFileTail(entry), ARG_ENTRYID,
+                entry.getId());
     }
 
 
@@ -1394,7 +1524,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 return "";
             }
             StringBuffer sb = new StringBuffer();
-            String link = getEntriesList(request, sb, children, true,  true, true, false);
+            String link = getEntriesList(request, sb, children, true, true,
+                                         true, false);
             blockContent = sb.toString();
             blockTitle = Misc.getProperty(props, "title", msg("Groups"))
                          + link;
@@ -1412,7 +1543,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             }
 
             StringBuffer sb = new StringBuffer();
-            String link = getEntriesList(request, sb, children, true, true, true, false);
+            String link = getEntriesList(request, sb, children, true, true,
+                                         true, false);
             blockContent = sb.toString();
             blockTitle = Misc.getProperty(props, "title", msg("Entries"))
                          + link;
@@ -1432,7 +1564,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             if (children.size() == 0) {
                 return "";
             }
-            String link = getEntriesList(request, sb, children, true, true, true, false);
+            String link = getEntriesList(request, sb, children, true, true,
+                                         true, false);
             blockContent = sb.toString();
             blockTitle = Misc.getProperty(props, "title", msg("Children"))
                          + link;
@@ -1459,7 +1592,6 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @param request _more_
      * @param entry _more_
-     * @param sb _more_
      *
      *
      * @return _more_
@@ -1486,7 +1618,6 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * @param wikiUtil _more_
      * @param request _more_
      * @param importEntry _more_
-     * @param property _more_
      * @param tag _more_
      * @param props _more_
      *
@@ -1561,7 +1692,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                   ? theLink.getLabel()
                                   : outputType.getLabel());
                 propertyValue = getEntryManager().getTooltipLink(myRequest,
-                                                                 importEntry, label, url);
+                        importEntry, label, url);
             } else {
                 Result result = getEntryManager().processEntryShow(myRequest,
                                     importEntry);
@@ -1760,8 +1891,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             HtmlUtil.img(iconUrl("/icons/wiki/button_import.png"),
                          "Import Entry Property");
         String importButton = getRepository().makePopupLink(importMenuLabel,
-                                                            HtmlUtil.hbox(importMenu.toString(),
-                                                                          importOutputMenu.toString()));
+                                  HtmlUtil.hbox(importMenu.toString(),
+                                      importOutputMenu.toString()));
         buttons.append(importButton);
         buttons.append(HtmlUtil.space(2));
         buttons.append(select);
@@ -1863,12 +1994,12 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                         request.entryUrl(getRepository().URL_ENTRY_SHOW,
                                          theEntry, ARG_OUTPUT,
                                          WikiPageOutputHandler.OUTPUT_WIKI);
-                    return getEntryManager().getTooltipLink(request, theEntry,
-                                                            label, url);
+                    return getEntryManager().getTooltipLink(request,
+                            theEntry, label, url);
 
                 } else {
-                    return getEntryManager().getTooltipLink(request, theEntry,
-                                                            label,null);
+                    return getEntryManager().getTooltipLink(request,
+                            theEntry, label, null);
                 }
             }
 

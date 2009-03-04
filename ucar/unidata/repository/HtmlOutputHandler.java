@@ -109,7 +109,7 @@ public class HtmlOutputHandler extends OutputHandler {
     public static final OutputType OUTPUT_METADATAXML =
         new OutputType("metadataxml", OutputType.TYPE_INTERNAL);
 
-    /** _more_          */
+    /** _more_ */
     public static final OutputType OUTPUT_LINKSXML =
         new OutputType("linksxml", OutputType.TYPE_INTERNAL);
 
@@ -139,11 +139,8 @@ public class HtmlOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param entries _more_
      * @param state _more_
-     * @param types _more_
      * @param links _more_
-     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
@@ -293,7 +290,6 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entry _more_
-     * @param sb _more_
      *
      *
      * @return _more_
@@ -631,7 +627,6 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entry _more_
-     * @param sb _more_
      * @param decorate _more_
      * @param addLink _more_
      *
@@ -708,7 +703,8 @@ public class HtmlOutputHandler extends OutputHandler {
                                 request.entryUrl(
                                     getRepository().getMetadataManager()
                                         .URL_METADATA_ADDFORM, entry), iconUrl(
-                                            ICON_METADATA_ADD), msg("Add Metadata")));
+                                            ICON_METADATA_ADD), msg(
+                                            "Add Metadata")));
                         if (decorate) {
                             sb.append("</td></tr>");
                         }
@@ -791,23 +787,26 @@ public class HtmlOutputHandler extends OutputHandler {
     public Result getChildrenXml(Request request, Group parent,
                                  List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        StringBuffer sb     = new StringBuffer();
-        String       folder = iconUrl(ICON_FOLDER_CLOSED);
-        boolean showLink = request.get(ARG_SHOWLINK,true);
-        boolean onlyGroups = request.get(ARG_ONLYGROUPS,false);
+        StringBuffer sb         = new StringBuffer();
+        String       folder     = iconUrl(ICON_FOLDER_CLOSED);
+        boolean      showLink   = request.get(ARG_SHOWLINK, true);
+        boolean      onlyGroups = request.get(ARG_ONLYGROUPS, false);
 
-        int cnt = 0;
-        StringBuffer jsSB = new StringBuffer();
-        String rowId;
-        String cbxId;
-        String cbxWrapperId;
+        int          cnt        = 0;
+        StringBuffer jsSB       = new StringBuffer();
+        String       rowId;
+        String       cbxId;
+        String       cbxWrapperId;
 
-        if(!showingAll(request, subGroups, entries)) {
-            sb.append(msgLabel("Showing")+" 1.." +(subGroups.size()+entries.size()));
+        if ( !showingAll(request, subGroups, entries)) {
+            sb.append(msgLabel("Showing") + " 1.."
+                      + (subGroups.size() + entries.size()));
             sb.append(HtmlUtil.space(2));
-            String url = request.getEntryUrl(getRepository().URL_ENTRY_SHOW.toString(), parent);
+            String url = request.getEntryUrl(
+                             getRepository().URL_ENTRY_SHOW.toString(),
+                             parent);
             url = HtmlUtil.url(url, ARG_ENTRYID, parent.getId());
-            sb.append(HtmlUtil.href(url,msg("More...")));
+            sb.append(HtmlUtil.href(url, msg("More...")));
             sb.append(HtmlUtil.br());
         }
 
@@ -817,22 +816,24 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
 
-        if(!onlyGroups) {
+        if ( !onlyGroups) {
             for (Entry entry : entries) {
                 cnt++;
                 addEntryCheckbox(request, entry, sb, jsSB);
             }
         }
 
-        if (cnt==0) {
-            sb.append(HtmlUtil.tag(HtmlUtil.TAG_I,"",msg("No entries in this group")));
+        if (cnt == 0) {
+            sb.append(HtmlUtil.tag(HtmlUtil.TAG_I, "",
+                                   msg("No entries in this group")));
             if (getAccessManager().hasPermissionSet(parent,
                     Permission.ACTION_VIEWCHILDREN)) {
                 if ( !getAccessManager().canDoAction(request, parent,
                         Permission.ACTION_VIEWCHILDREN)) {
                     sb.append(HtmlUtil.space(1));
                     sb.append(
-                              msg("You do not have permission to view the sub-groups of this entry"));
+                        msg(
+                        "You do not have permission to view the sub-groups of this entry"));
                 }
             }
         }
@@ -868,8 +869,8 @@ public class HtmlOutputHandler extends OutputHandler {
     public Result getSelectXml(Request request, List<Group> subGroups,
                                List<Entry> entries)
             throws Exception {
-        String       target     = request.getString(ATTR_TARGET, "");
-        StringBuffer sb         = new StringBuffer();
+        String       target = request.getString(ATTR_TARGET, "");
+        StringBuffer sb     = new StringBuffer();
         for (Group subGroup : subGroups) {
             sb.append(getSelectLink(request, subGroup, target));
         }
@@ -879,8 +880,9 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(getSelectLink(request, entry, target));
             }
         }
-        return makeAjaxResult(request, getRepository().translate(request,
-                                                        sb.toString()));
+        return makeAjaxResult(request,
+                              getRepository().translate(request,
+                                  sb.toString()));
     }
 
 
@@ -895,7 +897,8 @@ public class HtmlOutputHandler extends OutputHandler {
     private void addDescription(Request request, Entry entry,
                                 StringBuffer sb) {
         String desc = entry.getDescription().trim();
-        if ((desc.length() > 0) && !desc.startsWith("<wiki>") && !desc.equals("<nolinks>")) {
+        if ((desc.length() > 0) && !desc.startsWith("<wiki>")
+                && !desc.equals("<nolinks>")) {
             desc = getEntryManager().processText(request, entry, desc);
             StringBuffer descSB =
                 new StringBuffer("\n<div class=\"description\">\n");
@@ -921,8 +924,8 @@ public class HtmlOutputHandler extends OutputHandler {
     public String getInformationTabs(Request request, Entry entry,
                                      boolean fixedHeight)
             throws Exception {
-        String desc       = entry.getDescription();
-        List   tabTitles  = new ArrayList<String>();
+        String desc        = entry.getDescription();
+        List   tabTitles   = new ArrayList<String>();
         List   tabContents = new ArrayList<String>();
         if (desc.length() > 0) {
             //            tabTitles.add("Description");
@@ -1041,14 +1044,18 @@ public class HtmlOutputHandler extends OutputHandler {
         } else {
             if (subGroups.size() > 0) {
                 StringBuffer groupsSB = new StringBuffer();
-                String link = getEntriesList(request, groupsSB, subGroups, true,  (entries.size()==0), true, group.isDummy());
+                String link = getEntriesList(request, groupsSB, subGroups,
+                                             true, (entries.size() == 0),
+                                             true, group.isDummy());
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Groups") + link,
                         groupsSB.toString(), true));
             }
 
             if (entries.size() > 0) {
                 StringBuffer entriesSB = new StringBuffer();
-                String link = getEntriesList(request, entriesSB, entries,  (subGroups.size() == 0),  true, true, group.isDummy());
+                String link = getEntriesList(request, entriesSB, entries,
+                                             (subGroups.size() == 0), true,
+                                             true, group.isDummy());
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Entries") + link,
                         entriesSB.toString(), true));
             }

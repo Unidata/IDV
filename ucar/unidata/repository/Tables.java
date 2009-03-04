@@ -43,60 +43,60 @@ public class Tables {
      */
     public static class ENTRIES {
 
-        /** _more_          */
+        /** _more_ */
         public static final String NAME = "entries";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ID = NAME + ".id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_TYPE = NAME + ".type";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_NAME = NAME + ".name";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_DESCRIPTION = NAME + ".description";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_PARENT_GROUP_ID = NAME
                                                          + ".parent_group_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_USER_ID = NAME + ".user_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_RESOURCE = NAME + ".resource";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_RESOURCE_TYPE = NAME
                                                        + ".resource_type";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_DATATYPE = NAME + ".datatype";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_CREATEDATE = NAME + ".createdate";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_FROMDATE = NAME + ".fromdate";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_TODATE = NAME + ".todate";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_SOUTH = NAME + ".south";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_NORTH = NAME + ".north";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_EAST = NAME + ".east";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_WEST = NAME + ".west";
 
-        /** _more_          */
+        /** _more_ */
         public static final String[] ARRAY = new String[] {
             COL_ID, COL_TYPE, COL_NAME, COL_DESCRIPTION, COL_PARENT_GROUP_ID,
             COL_USER_ID, COL_RESOURCE, COL_RESOURCE_TYPE, COL_DATATYPE,
@@ -104,17 +104,17 @@ public class Tables {
             COL_EAST, COL_WEST
         };
 
-        /** _more_          */
+        /** _more_ */
         public static final String UPDATE = SqlUtil.makeUpdate(NAME, COL_ID,
                                                 ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String INSERT =
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
@@ -131,27 +131,27 @@ public class Tables {
      */
     public static class ANCESTORS {
 
-        /** _more_          */
+        /** _more_ */
         public static final String NAME = "ancestors";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ID = NAME + ".id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ANCESTOR_ID = NAME + ".ancestor_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String[] ARRAY = new String[] { COL_ID,
                 COL_ANCESTOR_ID };
 
 
-        /** _more_          */
+        /** _more_ */
         public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String INSERT =
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
@@ -168,47 +168,47 @@ public class Tables {
      */
     public static class METADATA {
 
-        /** _more_          */
+        /** _more_ */
         public static final String NAME = "metadata";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ID = NAME + ".id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ENTRY_ID = NAME + ".entry_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_TYPE = NAME + ".type";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_INHERITED = NAME + ".inherited";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ATTR1 = NAME + ".attr1";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ATTR2 = NAME + ".attr2";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ATTR3 = NAME + ".attr3";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ATTR4 = NAME + ".attr4";
 
-        /** _more_          */
+        /** _more_ */
         public static final String[] ARRAY = new String[] {
             COL_ID, COL_ENTRY_ID, COL_TYPE, COL_INHERITED, COL_ATTR1,
             COL_ATTR2, COL_ATTR3, COL_ATTR4
         };
 
 
-        /** _more_          */
+        /** _more_ */
         public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String INSERT =
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
@@ -225,41 +225,41 @@ public class Tables {
      */
     public static class COMMENTS {
 
-        /** _more_          */
+        /** _more_ */
         public static final String NAME = "comments";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ID = NAME + ".id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ENTRY_ID = NAME + ".entry_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_USER_ID = NAME + ".user_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_DATE = NAME + ".date";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_SUBJECT = NAME + ".subject";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_COMMENT = NAME + ".comment";
 
-        /** _more_          */
+        /** _more_ */
         public static final String[] ARRAY = new String[] {
             COL_ID, COL_ENTRY_ID, COL_USER_ID, COL_DATE, COL_SUBJECT,
             COL_COMMENT
         };
 
 
-        /** _more_          */
+        /** _more_ */
         public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String INSERT =
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
@@ -276,37 +276,37 @@ public class Tables {
      */
     public static class ASSOCIATIONS {
 
-        /** _more_          */
+        /** _more_ */
         public static final String NAME = "associations";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ID = NAME + ".id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_NAME = NAME + ".name";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_TYPE = NAME + ".type";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_FROM_ENTRY_ID = NAME
                                                        + ".from_entry_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_TO_ENTRY_ID = NAME + ".to_entry_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String[] ARRAY = new String[] { COL_ID, COL_NAME,
                 COL_TYPE, COL_FROM_ENTRY_ID, COL_TO_ENTRY_ID };
 
 
-        /** _more_          */
+        /** _more_ */
         public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String INSERT =
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
@@ -323,50 +323,50 @@ public class Tables {
      */
     public static class USERS {
 
-        /** _more_          */
+        /** _more_ */
         public static final String NAME = "users";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ID = NAME + ".id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_NAME = NAME + ".name";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_EMAIL = NAME + ".email";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_QUESTION = NAME + ".question";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ANSWER = NAME + ".answer";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_PASSWORD = NAME + ".password";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ADMIN = NAME + ".admin";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_LANGUAGE = NAME + ".language";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_TEMPLATE = NAME + ".template";
 
-        /** _more_          */
+        /** _more_ */
         public static final String[] ARRAY = new String[] {
             COL_ID, COL_NAME, COL_EMAIL, COL_QUESTION, COL_ANSWER,
             COL_PASSWORD, COL_ADMIN, COL_LANGUAGE, COL_TEMPLATE
         };
 
 
-        /** _more_          */
+        /** _more_ */
         public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String INSERT =
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
@@ -384,38 +384,38 @@ public class Tables {
      */
     public static class USER_ACTIVITY {
 
-        /** _more_          */
+        /** _more_ */
         public static final String NAME = "user_activity";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_USER_ID = NAME + ".user_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_DATE = NAME + ".date";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_WHAT = NAME + ".what";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_EXTRA = NAME + ".extra";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_IPADDRESS = NAME + ".ipaddress";
 
-        /** _more_          */
+        /** _more_ */
         public static final String[] ARRAY = new String[] { COL_USER_ID,
                 COL_DATE, COL_WHAT, COL_EXTRA, COL_IPADDRESS };
 
 
 
 
-        /** _more_          */
+        /** _more_ */
         public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String INSERT =
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
@@ -433,38 +433,38 @@ public class Tables {
      */
     public static class SESSIONS {
 
-        /** _more_          */
+        /** _more_ */
         public static final String NAME = "sessions";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_SESSION_ID = NAME + ".session_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_USER_ID = NAME + ".user_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_CREATE_DATE = NAME + ".create_date";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_LAST_ACTIVE_DATE =
             NAME + ".last_active_date";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_EXTRA = NAME + ".extra";
 
-        /** _more_          */
+        /** _more_ */
         public static final String[] ARRAY = new String[] { COL_SESSION_ID,
                 COL_USER_ID, COL_CREATE_DATE, COL_LAST_ACTIVE_DATE,
                 COL_EXTRA };
 
 
-        /** _more_          */
+        /** _more_ */
         public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String INSERT =
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
@@ -484,36 +484,36 @@ public class Tables {
      */
     public static class FAVORITES {
 
-        /** _more_          */
+        /** _more_ */
         public static final String NAME = "favorites";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ID = NAME + ".id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_USER_ID = NAME + ".user_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ENTRY_ID = NAME + ".entry_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_NAME = NAME + ".name";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_CATEGORY = NAME + ".category";
 
-        /** _more_          */
+        /** _more_ */
         public static final String[] ARRAY = new String[] { COL_ID,
                 COL_USER_ID, COL_ENTRY_ID, COL_NAME, COL_CATEGORY };
 
 
-        /** _more_          */
+        /** _more_ */
         public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String INSERT =
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
@@ -534,27 +534,27 @@ public class Tables {
      */
     public static class USERROLES {
 
-        /** _more_          */
+        /** _more_ */
         public static final String NAME = "userroles";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_USER_ID = NAME + ".user_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ROLE = NAME + ".role";
 
-        /** _more_          */
+        /** _more_ */
         public static final String[] ARRAY = new String[] { COL_USER_ID,
                 COL_ROLE };
 
 
-        /** _more_          */
+        /** _more_ */
         public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String INSERT =
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
@@ -571,30 +571,30 @@ public class Tables {
      */
     public static class PERMISSIONS {
 
-        /** _more_          */
+        /** _more_ */
         public static final String NAME = "permissions";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ENTRY_ID = NAME + ".entry_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ACTION = NAME + ".action";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ROLE = NAME + ".role";
 
-        /** _more_          */
+        /** _more_ */
         public static final String[] ARRAY = new String[] { COL_ENTRY_ID,
                 COL_ACTION, COL_ROLE };
 
 
-        /** _more_          */
+        /** _more_ */
         public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String INSERT =
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
@@ -611,30 +611,30 @@ public class Tables {
      */
     public static class HARVESTERS {
 
-        /** _more_          */
+        /** _more_ */
         public static final String NAME = "harvesters";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ID = NAME + ".id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_CLASS = NAME + ".class";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_CONTENT = NAME + ".content";
 
-        /** _more_          */
+        /** _more_ */
         public static final String[] ARRAY = new String[] { COL_ID, COL_CLASS,
                 COL_CONTENT };
 
 
-        /** _more_          */
+        /** _more_ */
         public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String INSERT =
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
@@ -651,27 +651,27 @@ public class Tables {
      */
     public static class GLOBALS {
 
-        /** _more_          */
+        /** _more_ */
         public static final String NAME = "globals";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_NAME = NAME + ".name";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_VALUE = NAME + ".value";
 
-        /** _more_          */
+        /** _more_ */
         public static final String[] ARRAY = new String[] { COL_NAME,
                 COL_VALUE };
 
 
-        /** _more_          */
+        /** _more_ */
         public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String INSERT =
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
@@ -688,36 +688,36 @@ public class Tables {
      */
     public static class WIKIPAGEHISTORY {
 
-        /** _more_          */
+        /** _more_ */
         public static final String NAME = "wikipagehistory";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_ENTRY_ID = NAME + ".entry_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_USER_ID = NAME + ".user_id";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_DATE = NAME + ".date";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_DESCRIPTION = NAME + ".description";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_WIKITEXT = NAME + ".wikitext";
 
-        /** _more_          */
+        /** _more_ */
         public static final String[] ARRAY = new String[] { COL_ENTRY_ID,
                 COL_USER_ID, COL_DATE, COL_DESCRIPTION, COL_WIKITEXT };
 
 
-        /** _more_          */
+        /** _more_ */
         public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String INSERT =
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
@@ -734,23 +734,23 @@ public class Tables {
      */
     public static class DUMMY {
 
-        /** _more_          */
+        /** _more_ */
         public static final String NAME = "dummy";
 
-        /** _more_          */
+        /** _more_ */
         public static final String COL_NAME = NAME + ".name";
 
-        /** _more_          */
+        /** _more_ */
         public static final String[] ARRAY = new String[] { COL_NAME };
 
 
-        /** _more_          */
+        /** _more_ */
         public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
 
-        /** _more_          */
+        /** _more_ */
         public static final String INSERT =
             SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
                                SqlUtil.getQuestionMarks(ARRAY.length));
@@ -760,28 +760,57 @@ public class Tables {
     ;
 
 
-public static class MONITORS {
-public static final String NAME = "monitors";
-public static final String COL_MONITOR_ID = NAME + ".monitor_id";
-public static final String COL_NAME     = NAME + ".name";
-public static final String COL_USER_ID = NAME + ".user_id";
-public static final String COL_FROM_DATE = NAME + ".from_date";
-public static final String COL_TO_DATE = NAME + ".to_date";
-public static final String COL_ENCODED_OBJECT = NAME + ".encoded_object";
-public static final String []ARRAY= new String[] {
-COL_MONITOR_ID,COL_NAME,COL_USER_ID,COL_FROM_DATE,COL_TO_DATE,COL_ENCODED_OBJECT
-};
+    /**
+     * Class MONITORS _more_
+     *
+     *
+     * @author IDV Development Team
+     */
+    public static class MONITORS {
+
+        /** _more_ */
+        public static final String NAME = "monitors";
+
+        /** _more_ */
+        public static final String COL_MONITOR_ID = NAME + ".monitor_id";
+
+        /** _more_ */
+        public static final String COL_NAME = NAME + ".name";
+
+        /** _more_ */
+        public static final String COL_USER_ID = NAME + ".user_id";
+
+        /** _more_ */
+        public static final String COL_FROM_DATE = NAME + ".from_date";
+
+        /** _more_ */
+        public static final String COL_TO_DATE = NAME + ".to_date";
+
+        /** _more_ */
+        public static final String COL_ENCODED_OBJECT = NAME
+                                                        + ".encoded_object";
+
+        /** _more_ */
+        public static final String[] ARRAY = new String[] {
+            COL_MONITOR_ID, COL_NAME, COL_USER_ID, COL_FROM_DATE, COL_TO_DATE,
+            COL_ENCODED_OBJECT
+        };
 
 
-public static final String COLUMNS = SqlUtil.comma(ARRAY);
-public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
-public static final String INSERT=
-SqlUtil.makeInsert(
-NAME,
-NODOT_COLUMNS,
-SqlUtil.getQuestionMarks(ARRAY.length));
+        /** _more_ */
+        public static final String COLUMNS = SqlUtil.comma(ARRAY);
 
-};
+        /** _more_ */
+        public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
+
+        /** _more_ */
+        public static final String INSERT =
+            SqlUtil.makeInsert(NAME, NODOT_COLUMNS,
+                               SqlUtil.getQuestionMarks(ARRAY.length));
+
+    }
+
+    ;
 
 
 

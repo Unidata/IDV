@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository.monitor;
 
 
@@ -46,13 +43,13 @@ import java.util.List;
  */
 public abstract class PasswordAction extends MonitorAction {
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ACTION_ID = "action_id";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ACTION_PASSWORD = "action_password";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ACTION_MESSAGE = "action_message";
 
 
@@ -62,7 +59,7 @@ public abstract class PasswordAction extends MonitorAction {
     /** _more_ */
     private String password = "";
 
-    /** _more_          */
+    /** _more_ */
     protected String messageTemplate = null;
 
 
@@ -75,9 +72,6 @@ public abstract class PasswordAction extends MonitorAction {
 
     /**
      * _more_
-     *
-     * @param repository _more_
-     * @param user _more_
      *
      * @param id _more_
      * @param remoteUserId _more_
@@ -103,7 +97,8 @@ public abstract class PasswordAction extends MonitorAction {
                              "${server}",
                              monitor.getRepository().absoluteUrl(
                                  monitor.getRepository().getUrlBase()));
-        return monitor.getRepository().getEntryManager().replaceMacros(entry, message);
+        return monitor.getRepository().getEntryManager().replaceMacros(entry,
+                message);
     }
 
     /**

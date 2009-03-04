@@ -148,7 +148,6 @@ public class SessionManager extends RepositoryManager {
      * @throws Exception _more_
      */
     private void cullSessionsInner() throws Exception {
-        //        System.err.println ("culling sessions");
         List<Session> sessionsToDelete = new ArrayList<Session>();
         long          now              = new Date().getTime();
         Statement stmt = getDatabaseManager().select(Tables.SESSIONS.COLUMNS,
@@ -163,13 +162,10 @@ public class SessionManager extends RepositoryManager {
                 //Check if the last activity was > 24 hours ago
                 if ((now - lastActiveDate.getTime()) > timeDiff) {
                     sessionsToDelete.add(session);
-                } else {
-                    //                    System.err.println ("\tsession ok:" + session.getId() + " " + lastActiveDate);
-                }
+                } else {}
             }
         }
         for (Session session : sessionsToDelete) {
-            //            System.err.println ("\tremoving session:" + session.getId() + " " + session.getLastActivity());
             removeSession(session.getId());
         }
 
@@ -359,7 +355,6 @@ public class SessionManager extends RepositoryManager {
             }
 
             if (auth != null) {
-                System.err.println("got auth:" + auth);
                 auth = auth.trim();
                 //Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
                 if (auth.startsWith("Basic")) {
@@ -369,20 +364,16 @@ public class SessionManager extends RepositoryManager {
                     if (toks.length == 2) {
                         user = getUserManager().findUser(toks[0], false);
                         if (user == null) {
-                            System.err.println("Unknown user in auth request:" + toks[0]);
                             //                            throw new AccessException(
                             //                                msgLabel("Unknown user") + toks[0],request);
-                        } else  if ( !user.getPassword().equals(
-                                                                getUserManager().hashPassword(toks[1]))) {
-                            System.err.println("Wrong password in auth request:" + auth);
+                        } else if ( !user.getPassword().equals(
+                                getUserManager().hashPassword(toks[1]))) {
                             //                            throw new AccessException(
                             //                                msg("Incorrect password"),request);
                             user = null;
-                        } else {
-                            System.err.println("auth OK");
-                        }
+                        } else {}
                     }
-                    if(user!=null) {
+                    if (user != null) {
                         setUserSession(request, user);
                     }
                 }
@@ -461,7 +452,7 @@ public class SessionManager extends RepositoryManager {
 
 
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable sessionMessages;
     //    String sessionMessage;
 

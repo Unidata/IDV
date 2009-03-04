@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.repository.monitor;
 
 
@@ -55,10 +53,6 @@ public class EmailAction extends PasswordAction {
 
     /**
      * _more_
-     *
-     * @param repository _more_
-     * @param user _more_
-     *
      * @param id _more_
      * @param remoteUserId _more_
      */
@@ -79,6 +73,8 @@ public class EmailAction extends PasswordAction {
     /**
      * _more_
      *
+     *
+     * @param entryMonitor _more_
      * @return _more_
      */
     public String getSummary(EntryMonitor entryMonitor) {
@@ -125,11 +121,12 @@ public class EmailAction extends PasswordAction {
             }
 
             try {
-                for(String to: StringUtil.split(getRemoteUserId(),",",true,true)) {
-                        System.err.println("sending mail to: " + to);
-                        String message = getMessage(monitor, entry);
-                        monitor.getRepository().getAdmin().sendEmail(
-                                                                     to, from, "New Entry", message, false);
+                for (String to : StringUtil.split(getRemoteUserId(), ",",
+                        true, true)) {
+                    System.err.println("sending mail to: " + to);
+                    String message = getMessage(monitor, entry);
+                    monitor.getRepository().getAdmin().sendEmail(to, from,
+                            "New Entry", message, false);
                 }
             } catch (Exception exc) {
                 monitor.handleError("Error sending email to "

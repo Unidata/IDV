@@ -114,7 +114,6 @@ public class SearchManager extends RepositoryManager {
      * _more_
      *
      * @param request _more_
-     * @param typeSpecific _more_
      *
      * @return _more_
      *
@@ -276,7 +275,6 @@ public class SearchManager extends RepositoryManager {
      * _more_
      *
      * @param request _more_
-     * @param typeSpecific _more_
      *
      * @return _more_
      *
@@ -307,7 +305,8 @@ public class SearchManager extends RepositoryManager {
     public Result processEntrySearch(Request request) throws Exception {
 
         if (request.get(ARG_WAIT, false)) {
-            return getRepository().getMonitorManager().processEntryListen(request);
+            return getRepository().getMonitorManager().processEntryListen(
+                request);
         }
 
         //        System.err.println("submit:" + request.getString("submit","YYY"));

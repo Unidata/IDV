@@ -21,10 +21,11 @@
 
 package ucar.unidata.repository;
 
-import ucar.unidata.repository.data.*;
-import ucar.unidata.repository.monitor.*;
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.data.*;
+import ucar.unidata.repository.monitor.*;
 
 
 
@@ -78,8 +79,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
-import java.util.Hashtable;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -107,7 +108,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     public static final String MACRO_LINKS = "links";
 
-    /** _more_          */
+    /** _more_ */
     public static final String MACRO_ENTRY_HEADER = "entry.header";
 
     /** _more_ */
@@ -119,7 +120,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     public static final String MACRO_USERLINK = "userlink";
 
-    /** _more_          */
+    /** _more_ */
     public static final String MACRO_FAVORITES = "favorites";
 
 
@@ -135,6 +136,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     public static final String MACRO_ROOT = "root";
 
+    /** _more_ */
     public static final String MACRO_HEADFINAL = "headfinal";
 
 
@@ -173,6 +175,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     };
 
 
+    /** _more_ */
     List<RequestUrl> initializedUrls = new ArrayList<RequestUrl>();
 
     /** _more_ */
@@ -183,24 +186,28 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     public static final OutputType OUTPUT_DELETER =
         new OutputType("Delete Entry", "repository.delete",
-                       OutputType.TYPE_ACTION|OutputType.TYPE_EDIT, "", ICON_DELETE);
+                       OutputType.TYPE_ACTION | OutputType.TYPE_EDIT, "",
+                       ICON_DELETE);
 
 
     /** _more_ */
     public static final OutputType OUTPUT_METADATA_FULL =
         new OutputType("Add full metadata", "repository.metadata.full",
-                       OutputType.TYPE_ACTION|OutputType.TYPE_EDIT, "", ICON_METADATA_ADD);
+                       OutputType.TYPE_ACTION | OutputType.TYPE_EDIT, "",
+                       ICON_METADATA_ADD);
 
     /** _more_ */
     public static final OutputType OUTPUT_METADATA_SHORT =
         new OutputType("Add short metadata", "repository.metadata.short",
-                       OutputType.TYPE_ACTION|OutputType.TYPE_EDIT, "", ICON_METADATA_ADD);
+                       OutputType.TYPE_ACTION | OutputType.TYPE_EDIT, "",
+                       ICON_METADATA_ADD);
 
 
-    /** _more_          */
+    /** _more_ */
     public static final OutputType OUTPUT_COPY =
         new OutputType("Copy/Move Entry", "repository.copy",
-                       OutputType.TYPE_ACTION|OutputType.TYPE_EDIT, "", ICON_MOVE);
+                       OutputType.TYPE_ACTION | OutputType.TYPE_EDIT, "",
+                       ICON_MOVE);
 
 
     /** _more_ */
@@ -210,6 +217,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private Properties properties = new Properties();
 
+    /** _more_ */
     private Properties cmdLineProperties = new Properties();
 
     /** _more_ */
@@ -255,8 +263,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private List<OutputHandler> outputHandlers =
         new ArrayList<OutputHandler>();
 
-    private List<Class> entryMonitorClasses =
-        new ArrayList<Class>();
+    /** _more_ */
+    private List<Class> entryMonitorClasses = new ArrayList<Class>();
 
 
     /** _more_ */
@@ -282,6 +290,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private List<String> outputDefFiles = new ArrayList<String>();
 
+    /** _more_ */
     private List<String> entryMonitorDefFiles = new ArrayList<String>();
 
     /** _more_ */
@@ -313,9 +322,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private UserManager userManager;
 
+    /** _more_ */
     private MonitorManager monitorManager;
 
-    /** _more_          */
+    /** _more_ */
     private SessionManager sessionManager;
 
     /** _more_ */
@@ -367,7 +377,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private List<File> localFilePaths = new ArrayList<File>();
 
 
-    /** _more_          */
+    /** _more_ */
     private List<LogEntry> log = new ArrayList<LogEntry>();
 
 
@@ -379,7 +389,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * _more_
      *
      * @param args _more_
-     * @param hostname _more_
      * @param port _more_
      * @param inTomcat _more_
      *
@@ -411,11 +420,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getPort() {
         String port = getProperty(PROP_PORT, (String) null);
         if (port != null) {
             port = port.trim();
-            if(port.length() > 0) {
+            if (port.length() > 0) {
                 return Integer.decode(port).intValue();
             }
         }
@@ -430,8 +444,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @param request _more_
      * @return _more_
      */
-    public boolean  isSSLEnabled(Request request) {
-        if(request!=null) {
+    public boolean isSSLEnabled(Request request) {
+        if (request != null) {
             if ( !request.get(ARG_SSLOK, true)) {
                 return false;
             }
@@ -477,36 +491,53 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param d _more_
+     *
+     * @return _more_
+     */
     public String formatDateShort(Request request, Date d) {
         if (displaySdf == null) {
-            displaySdf = makeSDF(getProperty(PROP_DATE_SHORTFORMAT, DEFAULT_TIME_SHORTFORMAT));
+            displaySdf = makeSDF(getProperty(PROP_DATE_SHORTFORMAT,
+                                             DEFAULT_TIME_SHORTFORMAT));
         }
         if (d == null) {
             return BLANK;
         }
 
-        Date now  = new Date();
-        long diff = now.getTime()-d.getTime();
-        double minutes = DateUtil.millisToMinutes(diff);
+        Date   now      = new Date();
+        long   diff     = now.getTime() - d.getTime();
+        double minutes  = DateUtil.millisToMinutes(diff);
         String fullDate = formatDate(d);
         String result;
-        if(minutes>0 && minutes<65 && minutes>55) {
+        if ((minutes > 0) && (minutes < 65) && (minutes > 55)) {
             result = "about an hour ago";
-        } else  if(diff>0 &&  diff<DateUtil.minutesToMillis(1)) {
-            result  =(int)(diff/(1000))+" seconds ago";
-        } else if(diff>0 &&  diff<DateUtil.hoursToMillis(1)) {
-            int value = (int)DateUtil.millisToMinutes(diff);
-            result = value +" minute"+(value>1?"s":"")+" ago";
-        } else  if(diff>0 && diff<DateUtil.hoursToMillis(24)) {
-            int value  = (int)(diff/(1000*60*60));
-            result = value+" hour" + (value>1?"s":"")+" ago";
-        } else if(diff>0 && diff<DateUtil.daysToMillis(6)) {
-            int value = (int)(diff/(1000*60*60*24));
-            result = value+" day" + (value>1?"s":"")+" ago";
+        } else if ((diff > 0) && (diff < DateUtil.minutesToMillis(1))) {
+            result = (int) (diff / (1000)) + " seconds ago";
+        } else if ((diff > 0) && (diff < DateUtil.hoursToMillis(1))) {
+            int value = (int) DateUtil.millisToMinutes(diff);
+            result = value + " minute" + ((value > 1)
+                                          ? "s"
+                                          : "") + " ago";
+        } else if ((diff > 0) && (diff < DateUtil.hoursToMillis(24))) {
+            int value = (int) (diff / (1000 * 60 * 60));
+            result = value + " hour" + ((value > 1)
+                                        ? "s"
+                                        : "") + " ago";
+        } else if ((diff > 0) && (diff < DateUtil.daysToMillis(6))) {
+            int value = (int) (diff / (1000 * 60 * 60 * 24));
+            result = value + " day" + ((value > 1)
+                                       ? "s"
+                                       : "") + " ago";
         } else {
             result = displaySdf.format(d);
         }
-        return HtmlUtil.span(result,HtmlUtil.cssClass("time") +HtmlUtil.attr(HtmlUtil.ATTR_TITLE,fullDate));
+        return HtmlUtil.span(result,
+                             HtmlUtil.cssClass("time")
+                             + HtmlUtil.attr(HtmlUtil.ATTR_TITLE, fullDate));
     }
 
 
@@ -874,7 +905,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    public  EntryManager getEntryManager() {
+    public EntryManager getEntryManager() {
         if (entryManager == null) {
             entryManager = doMakeEntryManager();
         }
@@ -1086,7 +1117,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     languages.add(new TwoFacedObject(name, type));
                     languageMap.put(type, properties);
                 } else {
-                    System.err.println("No _type_ found in: " + path);
+                    logError("No _type_ found in: " + path);
                 }
             }
         }
@@ -1100,10 +1131,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     private Object[] parsePhrases(String content) {
-        List<String> lines      = StringUtil.split(content, "\n", true, true);
+        List<String> lines   = StringUtil.split(content, "\n", true, true);
         Properties   phrases = new Properties();
-        String       type       = null;
-        String       name       = null;
+        String       type    = null;
+        String       name    = null;
         for (String line : lines) {
             if (line.startsWith("#")) {
                 continue;
@@ -1223,9 +1254,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         entryIdx++) {
                     String entry = (String) entries.get(entryIdx);
                     if ( !checkFile(entry)) {
-                        System.err.println(
-                            "Don't know how to handle plugin resource:"
-                            + entry + " from plugin:" + plugins[i]);
+                        logError("Don't know how to handle plugin resource:"
+                                 + entry + " from plugin:" + plugins[i]);
                     }
                 }
             } else {
@@ -1327,10 +1357,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @param message _more_
      */
-    public static void debug(String message) {
+    public void debug(String message) {
         if (debug) {
-            System.err.println(message);
-            //            log(message, null);
+            logInfo(message);
         }
     }
 
@@ -1341,8 +1370,30 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @param message _more_
      */
     public void log(Request request, String message) {
-        log("user:" + request.getUser() + " -- " + message);
+        logInfo("user:" + request.getUser() + " -- " + message);
     }
+
+
+    /**
+     * _more_
+     *
+     * @param message _more_
+     */
+    protected void logInfo(String message) {
+        System.err.println(message);
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param message _more_
+     */
+    public void logError(String message) {
+        logError(message, null);
+    }
+
 
 
     /**
@@ -1351,14 +1402,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @param message _more_
      * @param exc _more_
      */
-    public void log(String message, Throwable exc) {
+    public void logError(String message, Throwable exc) {
         System.err.println("Error:" + message);
         Throwable thr = null;
         if (exc != null) {
             //            exc.printStackTrace();
             thr = LogUtil.getInnerException(exc);
-            if(thr instanceof RepositoryUtil.MissingEntryException) {
-                System.err.println("" + thr);                
+            if (thr instanceof RepositoryUtil.MissingEntryException) {
+                System.err.println("" + thr);
             } else {
                 thr.printStackTrace();
             }
@@ -1377,16 +1428,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
     }
 
-
-    /**
-     * _more_
-     *
-     * @param message _more_
-     */
-    public void log(String message) {
-        log(message, null);
-    }
-
     /**
      * _more_
      *
@@ -1399,17 +1440,18 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         //If we have an admin property then it is of the form userid:password
         //and is used to set the password of the admin
-        String adminFromProperties = getProperty(PROP_ADMIN,null);
-        if(adminFromProperties!=null) {
-            List<String>toks = StringUtil.split(adminFromProperties,":");
-            if(toks.size()!=2) {
-                System.err.println ("Error: The " + PROP_ADMIN +" property is incorrect");
+        String adminFromProperties = getProperty(PROP_ADMIN, null);
+        if (adminFromProperties != null) {
+            List<String> toks = StringUtil.split(adminFromProperties, ":");
+            if (toks.size() != 2) {
+                logError("Error: The " + PROP_ADMIN
+                         + " property is incorrect");
                 return;
             }
-            User user = new User(toks.get(0),"", false);
+            User user = new User(toks.get(0), "", false);
             user.setPassword(UserManager.hashPassword(toks.get(1).trim()));
-            getUserManager().makeOrUpdateUser(user, true,true);
-            System.err.println ("Password for:" + user.getId() +" has been updated");
+            getUserManager().makeOrUpdateUser(user, true, true);
+            logInfo("Password for:" + user.getId() + " has been updated");
         }
     }
 
@@ -1443,41 +1485,59 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     ArrayList<ApiMethod> apiMethods = new ArrayList();
+
+    /** _more_ */
     ArrayList<ApiMethod> wildCardApiMethods = new ArrayList();
 
     /** _more_ */
     ArrayList<ApiMethod> topLevelMethods = new ArrayList();
 
+    /**
+     * _more_
+     *
+     * @param requestUrl _more_
+     */
     public void initRequestUrl(RequestUrl requestUrl) {
         try {
             initializedUrls.add(requestUrl);
-            Request request = new Request(this,null, getUrlBase()+requestUrl.getPath());
+            Request request = new Request(this, null,
+                                          getUrlBase()
+                                          + requestUrl.getPath());
             super.initRequestUrl(requestUrl);
             ApiMethod apiMethod = findApiMethod(request);
-            if(apiMethod==null) {
-                System.err.println("Could not find api for: " + requestUrl.getPath());
+            if (apiMethod == null) {
+                logError("Could not find api for: " + requestUrl.getPath());
                 return;
             }
-            if(getProperty("ramadda.sslok",true)) {
-            if(isSSLEnabled(null) && apiMethod.getNeedsSsl()) {
-                //                System.err.println("setting ssl for: " + requestUrl.getPath());
-                requestUrl.setNeedsSsl(true);
+            if (getProperty("ramadda.sslok", true)) {
+                if (isSSLEnabled(null) && apiMethod.getNeedsSsl()) {
+                    requestUrl.setNeedsSsl(true);
+                }
             }
-            }
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
     }
 
-    protected void  reinitializeRequestUrls() {
-        for(RequestUrl requestUrl: initializedUrls) {
+    /**
+     * _more_
+     */
+    protected void reinitializeRequestUrls() {
+        for (RequestUrl requestUrl : initializedUrls) {
             initRequestUrl(requestUrl);
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param requestUrl _more_
+     *
+     * @return _more_
+     */
     public String getUrlPath(RequestUrl requestUrl) {
-        if(requestUrl.getNeedsSsl()) {
+        if (requestUrl.getNeedsSsl()) {
             return httpsUrl(getUrlBase() + requestUrl.getPath());
         }
         return getUrlBase() + requestUrl.getPath();
@@ -1496,21 +1556,23 @@ public class Repository extends RepositoryBase implements RequestHandler {
     protected void addRequest(Element node, Hashtable props,
                               Hashtable handlers, String defaultHandler)
             throws Exception {
+
         String request    = XmlUtil.getAttribute(node,
                                 ApiMethod.ATTR_REQUEST);
-        
+
         String methodName = XmlUtil.getAttribute(node, ApiMethod.ATTR_METHOD);
-        boolean needsSsl = XmlUtil.getAttributeFromTree(node, ApiMethod.ATTR_NEEDS_SSL,
-                                                        false);
-        boolean checkAuthMethod = XmlUtil.getAttributeFromTree(node, ApiMethod.ATTR_CHECKAUTHMETHOD,
-                                                               false);
+        boolean needsSsl = XmlUtil.getAttributeFromTree(node,
+                               ApiMethod.ATTR_NEEDS_SSL, false);
+        boolean checkAuthMethod = XmlUtil.getAttributeFromTree(node,
+                                      ApiMethod.ATTR_CHECKAUTHMETHOD, false);
 
-        String authMethod = XmlUtil.getAttributeFromTree(node, ApiMethod.ATTR_AUTHMETHOD,
-                                                         "");
+        String authMethod = XmlUtil.getAttributeFromTree(node,
+                                ApiMethod.ATTR_AUTHMETHOD, "");
 
-        boolean admin = XmlUtil.getAttributeFromTree(node, ApiMethod.ATTR_ADMIN,
-                                             Misc.getProperty(props,
-                                                 ApiMethod.ATTR_ADMIN, true));
+        boolean admin = XmlUtil.getAttributeFromTree(node,
+                            ApiMethod.ATTR_ADMIN,
+                            Misc.getProperty(props, ApiMethod.ATTR_ADMIN,
+                                             true));
 
         boolean canCache = XmlUtil.getAttributeFromTree(node,
                                ApiMethod.ATTR_CANCACHE,
@@ -1520,9 +1582,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
         String handlerName = XmlUtil.getAttributeFromTree(node,
-                                                          ApiMethod.ATTR_HANDLER,
-                                                          Misc.getProperty(props,
-                                                                           ApiMethod.ATTR_HANDLER, defaultHandler));
+                                 ApiMethod.ATTR_HANDLER,
+                                 Misc.getProperty(props,
+                                     ApiMethod.ATTR_HANDLER, defaultHandler));
 
 
         RequestHandler handler = (RequestHandler) handlers.get(handlerName);
@@ -1575,7 +1637,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
         Method method = Misc.findMethod(handler.getClass(), methodName,
                                         paramTypes);
         if (method == null) {
-            System.err.println("props:" + props);
             throw new IllegalArgumentException("Unknown request method:"
                     + methodName);
         }
@@ -1584,7 +1645,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         ApiMethod apiMethod =
             new ApiMethod(this, handler, request,
                           XmlUtil.getAttribute(node, ApiMethod.ATTR_NAME,
-                              request), method, admin,needsSsl,authMethod,checkAuthMethod, canCache,
+                              request), method, admin, needsSsl, authMethod,
+                                        checkAuthMethod, canCache,
                                         XmlUtil.getAttribute(node,
                                             ApiMethod.ATTR_TOPLEVEL, false));
         List actions = StringUtil.split(XmlUtil.getAttribute(node,
@@ -1602,17 +1664,18 @@ public class Repository extends RepositoryBase implements RequestHandler {
             int index = apiMethods.indexOf(oldMethod);
             apiMethods.remove(index);
             apiMethods.add(index, apiMethod);
-            if(apiMethod.isWildcard()) {
+            if (apiMethod.isWildcard()) {
                 index = wildCardApiMethods.indexOf(oldMethod);
                 wildCardApiMethods.remove(index);
-                wildCardApiMethods.add(index,apiMethod);
+                wildCardApiMethods.add(index, apiMethod);
             }
         } else {
             apiMethods.add(apiMethod);
-            if(apiMethod.isWildcard()) {
+            if (apiMethod.isWildcard()) {
                 wildCardApiMethods.add(apiMethod);
             }
         }
+
     }
 
 
@@ -1715,14 +1778,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
                             node }));
                 } catch (Exception exc) {
                     if ( !required) {
-                        System.err.println(
-                            "Couldn't load optional output handler:"
-                            + XmlUtil.toString(node));
-                        System.err.println ("Warning:" + exc);
-                        //                        exc.printStackTrace();
+                        logError("Couldn't load optional output handler:"
+                                 + XmlUtil.toString(node));
+                        logError("Warning:" + exc);
                     } else {
-                        System.err.println(
-                            "Error loading output handler file:" + file);
+                        logError("Error loading output handler file:" + file,
+                                 exc);
                         throw exc;
                     }
                 }
@@ -1734,9 +1795,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         OutputHandler outputHandler = new OutputHandler(getRepository(),
                                           "Entry Deleter") {
             public boolean canHandleOutput(OutputType output) {
-                return output.equals(OUTPUT_DELETER) ||
-                    output.equals(OUTPUT_METADATA_SHORT) ||
-                    output.equals(OUTPUT_METADATA_FULL);
+                return output.equals(OUTPUT_DELETER)
+                       || output.equals(OUTPUT_METADATA_SHORT)
+                       || output.equals(OUTPUT_METADATA_FULL);
             }
             protected void getEntryLinks(Request request, State state,
                                          List<Link> links)
@@ -1753,7 +1814,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         break;
                     }
                 }
-                if(metadataOk) {
+                if (metadataOk) {
                     links.add(makeLink(request, state.getEntry(),
                                        OUTPUT_METADATA_SHORT));
 
@@ -1769,7 +1830,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         break;
                     }
                 }
-                if(deleteOk) {
+                if (deleteOk) {
                     links.add(makeLink(request, state.getEntry(),
                                        OUTPUT_DELETER));
                 }
@@ -1782,13 +1843,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     throws Exception {
 
                 OutputType output = request.getOutput();
-                if(output.equals(OUTPUT_METADATA_SHORT)) {
-                    return getEntryManager().addInitialMetadataToEntries(request, entries,true);
+                if (output.equals(OUTPUT_METADATA_SHORT)) {
+                    return getEntryManager().addInitialMetadataToEntries(
+                        request, entries, true);
                 }
-                if(output.equals(OUTPUT_METADATA_FULL)) {
-                    return getEntryManager().addInitialMetadataToEntries(request, entries,false);
+                if (output.equals(OUTPUT_METADATA_FULL)) {
+                    return getEntryManager().addInitialMetadataToEntries(
+                        request, entries, false);
                 }
-                
+
                 StringBuffer idBuffer = new StringBuffer();
                 entries.addAll(subGroups);
                 for (Entry entry : entries) {
@@ -1910,7 +1973,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (debug) {
             debug("user:" + request.getUser() + " -- " + request.toString());
         }
-        //        log("request:" + request);
+        //        logInfo("request:" + request);
         try {
             getSessionManager().checkSession(request);
             result = getResult(request);
@@ -1921,43 +1984,42 @@ public class Repository extends RepositoryBase implements RequestHandler {
             }
 
             //TODO: For non-html outputs come up with some error format
-            Throwable inner = LogUtil.getInnerException(exc);
-            boolean badAccess = inner instanceof AccessException;
-            StringBuffer sb = new StringBuffer();
+            Throwable    inner     = LogUtil.getInnerException(exc);
+            boolean      badAccess = inner instanceof AccessException;
+            StringBuffer sb        = new StringBuffer();
             if ( !badAccess) {
                 sb.append(error(msgLabel("An error has occurred")
                                 + HtmlUtil.p() + inner.getMessage()));
             } else {
-                AccessException ae = (AccessException) inner;
-                System.err.println("got bad access " + request);
-                AuthorizationMethod authMethod = AuthorizationMethod.AUTH_HTML;
-                if(request.getApiMethod()!=null) {
+                AccessException     ae         = (AccessException) inner;
+                AuthorizationMethod authMethod =
+                    AuthorizationMethod.AUTH_HTML;
+                if (request.getApiMethod() != null) {
                     ApiMethod apiMethod = request.getApiMethod();
-                    System.err.println("got api method " + apiMethod);
-                    if(apiMethod.getCheckAuthMethod()) {
+                    if (apiMethod.getCheckAuthMethod()) {
                         request.setCheckingAuthMethod(true);
-                        Result authResult = (Result) apiMethod.invoke(request);
+                        Result authResult =
+                            (Result) apiMethod.invoke(request);
                         authMethod = authResult.getAuthorizationMethod();
                     } else {
-                        authMethod = AuthorizationMethod.getMethod(apiMethod.getAuthMethod());
+                        authMethod = AuthorizationMethod.getMethod(
+                            apiMethod.getAuthMethod());
                     }
                 }
-                if(authMethod.equals(AuthorizationMethod.AUTH_HTML)) {
+                if (authMethod.equals(AuthorizationMethod.AUTH_HTML)) {
                     sb.append(error(inner.getMessage()));
                     String redirect =
                         XmlUtil.encodeBase64(request.getUrl().getBytes());
                     sb.append(getUserManager().makeLoginForm(request,
-                                                             HtmlUtil.hidden(ARG_REDIRECT, redirect)));
+                            HtmlUtil.hidden(ARG_REDIRECT, redirect)));
                 } else {
-                    System.err.println("Doing HTTP auth");
                     sb.append(inner.getMessage());
-                    if(!request.getSecure() && isSSLEnabled(null)) {
-                        System.err.println ("Redirecting to ssl: "+ httpsUrl(request.getUrl()));
+                    if ( !request.getSecure() && isSSLEnabled(null)) {
                         result = new Result(httpsUrl(request.getUrl()));
                     } else {
-                        System.err.println ("going clear text");
                         result = new Result("Error", sb);
-                        result.addHttpHeader("WWW-Authenticate","Basic realm=\"Secure Area\"");
+                        result.addHttpHeader("WWW-Authenticate",
+                                             "Basic realm=\"Secure Area\"");
                         result.setResponseCode(Result.RESPONSE_UNAUTHORIZED);
                     }
                     return result;
@@ -1978,8 +2040,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 if (userAgent == null) {
                     userAgent = "Unknown";
                 }
-                log("Error handling request:" + request + " user-agent:"
-                    + userAgent + " ip:" + request.getIp(), exc);
+                logError("Error handling request:" + request + " user-agent:"
+                         + userAgent + " ip:" + request.getIp(), exc);
             }
         }
 
@@ -2043,7 +2105,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             incoming = incoming.substring(0, incoming.length() - 1);
         }
         String urlBase = getUrlBase();
-        if (!incoming.startsWith(urlBase)) {
+        if ( !incoming.startsWith(urlBase)) {
             return null;
         }
         incoming = incoming.substring(urlBase.length());
@@ -2092,25 +2154,30 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     protected Result getResult(Request request) throws Exception {
-        boolean sslEnabled =  isSSLEnabled(request);
-        if(sslEnabled) {
-            if(getProperty(PROP_ACCESS_ALLSSL,false) && !request.getSecure()) {
-                System.err.println ("forced redirect to ssl: "+ httpsUrl(request.getUrl()));
-                return new Result(httpsUrl(request.getUrl()));
-            }
-        }
+        boolean   sslEnabled = isSSLEnabled(request);
 
-        ApiMethod apiMethod = findApiMethod(request);
+        ApiMethod apiMethod  = findApiMethod(request);
         if (apiMethod == null) {
             return getHtdocsFile(request);
         }
 
-        if(sslEnabled) {
-            if(apiMethod.getNeedsSsl() && !request.getSecure()) {
-                System.err.println ("Redirecting to ssl: "+ httpsUrl(request.getUrl()));
+        boolean allSsl = false;
+        if (sslEnabled) {
+            allSsl = getProperty(PROP_ACCESS_ALLSSL, false);
+            if (allSsl && !request.getSecure()) {
                 return new Result(httpsUrl(request.getUrl()));
-            } else if(!apiMethod.getNeedsSsl() && request.getSecure()) {
-                System.err.println ("Redirecting to no ssl "+absoluteUrl(request.getUrl()));
+            }
+        }
+
+
+
+        if (sslEnabled) {
+            if (apiMethod.getNeedsSsl() && !request.getSecure()) {
+                //                System.err.println ("Redirecting to ssl: "+ httpsUrl(request.getUrl()));
+                return new Result(httpsUrl(request.getUrl()));
+            } else if ( !allSsl && !apiMethod.getNeedsSsl()
+                        && request.getSecure()) {
+                //                System.err.println ("Redirecting to no ssl "+absoluteUrl(request.getUrl()));
                 return new Result(absoluteUrl(request.getUrl()));
             }
         }
@@ -2130,7 +2197,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if ( !getUserManager().isRequestOk(request)
                 || !apiMethod.isRequestOk(request, this)) {
             throw new AccessException(
-                msg("You do not have permission to access this page"),request);
+                msg("You do not have permission to access this page"),
+                request);
         }
 
 
@@ -2355,9 +2423,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String favoritesWrapper = getTemplateProperty(request,
                                       "ramadda.template.favorites.wrapper",
                                       "${link}");
-        String favoritesTemplate = getTemplateProperty(request,
-                                       "ramadda.template.favorites",
-                                       "<span class=\"linkslabel\">Favorites:</span>${entries}");
+        String favoritesTemplate =
+            getTemplateProperty(
+                request, "ramadda.template.favorites",
+                "<span class=\"linkslabel\">Favorites:</span>${entries}");
         String favoritesSeparator =
             getTemplateProperty(request,
                                 "ramadda.template.favrorites.separator", "");
@@ -2368,10 +2437,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (favoritesList.size() > 0) {
             List favoriteLinks = new ArrayList();
             for (FavoriteEntry favorite : favoritesList) {
-                Entry  entry   = favorite.getEntry();
-                EntryLink entryLink= getEntryManager().getAjaxLink(request, entry,
-                                                           entry.getLabel(), null, false);
-                String link = favoritesWrapper.replace("${link}", entryLink.toString());
+                Entry entry = favorite.getEntry();
+                EntryLink entryLink = getEntryManager().getAjaxLink(request,
+                                          entry, entry.getLabel(), null,
+                                          false);
+                String link = favoritesWrapper.replace("${link}",
+                                  entryLink.toString());
                 favoriteLinks.add("<nobr>" + link + "<nobr>");
             }
             favorites.append(favoritesTemplate.replace("${entries}",
@@ -2385,9 +2456,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                       "<b>Cart:<b><br>${entries}");
             List cartLinks = new ArrayList();
             for (Entry entry : cartEntries) {
-                EntryLink entryLink = getEntryManager().getAjaxLink(request, entry,
-                                                                          entry.getLabel(), null, false);
-                String link = favoritesWrapper.replace("${link}", entryLink.toString());
+                EntryLink entryLink = getEntryManager().getAjaxLink(request,
+                                          entry, entry.getLabel(), null,
+                                          false);
+                String link = favoritesWrapper.replace("${link}",
+                                  entryLink.toString());
                 cartLinks.add("<nobr>" + link + "<nobr>");
             }
             favorites.append(HtmlUtil.br());
@@ -2401,7 +2474,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             content = note(sessionMessage) + content;
         }
 
-        String head = "<script type=\"text/javascript\" src=\"${root}/shadowbox/adapter/shadowbox-base.js\"></script>\n<script type=\"text/javascript\" src=\"${root}/shadowbox/shadowbox.js\"></script>\n<script type=\"text/javascript\">\nShadowbox.loadSkin('classic', '${root}/shadowbox/skin'); \nShadowbox.loadLanguage('en', '${root}/shadowbox/lang');\nShadowbox.loadPlayer(['img', 'qt'], '${root}/shadowbox/player'); \nwindow.onload = Shadowbox.init;\n</script>";
+        String head =
+            "<script type=\"text/javascript\" src=\"${root}/shadowbox/adapter/shadowbox-base.js\"></script>\n<script type=\"text/javascript\" src=\"${root}/shadowbox/shadowbox.js\"></script>\n<script type=\"text/javascript\">\nShadowbox.loadSkin('classic', '${root}/shadowbox/skin'); \nShadowbox.loadLanguage('en', '${root}/shadowbox/lang');\nShadowbox.loadPlayer(['img', 'qt'], '${root}/shadowbox/player'); \nwindow.onload = Shadowbox.init;\n</script>";
 
         head = "";
 
@@ -2415,10 +2489,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             result.getTitle(), MACRO_BOTTOM, result.getBottomHtml(),
             MACRO_LINKS, linksHtml, MACRO_CONTENT, content + jsContent,
             MACRO_FAVORITES, favorites.toString(), MACRO_ENTRY_HEADER,
-            entryHeader, 
-            MACRO_HEADFINAL,
-            head,MACRO_ROOT, getUrlBase(),
-
+            entryHeader, MACRO_HEADFINAL, head, MACRO_ROOT, getUrlBase(),
         };
 
 
@@ -2426,7 +2497,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
         for (int i = 0; i < macros.length; i += 2) {
-             html = html.replace("${" + macros[i] + "}", macros[i + 1]);
+            html = html.replace("${" + macros[i] + "}", macros[i + 1]);
         }
 
         if (sublinksHtml.length() > 0) {
@@ -2574,13 +2645,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
         List<HtmlTemplate> theTemplates = templates;
         if (theTemplates == null) {
             theTemplates = new ArrayList<HtmlTemplate>();
-            for (String path :  StringUtil.split(
-                                                 getProperty(PROP_HTML_TEMPLATES,
-                                                             "%resourcedir%/template.html"), ";", true, true)) {
+            for (String path : StringUtil.split(
+                    getProperty(
+                        PROP_HTML_TEMPLATES,
+                        "%resourcedir%/template.html"), ";", true, true)) {
                 path = getStorageManager().localizePath(path);
                 try {
                     String resource = IOUtil.readContents(path, getClass());
-                    HtmlTemplate template = new HtmlTemplate(this,path, resource);
+                    HtmlTemplate template = new HtmlTemplate(this, path,
+                                                resource);
                     theTemplates.add(template);
                 } catch (Exception exc) {
                     //noop
@@ -2593,7 +2666,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return theTemplates;
     }
 
-    /** _more_          */
+    /** _more_ */
     private List<HtmlTemplate> templates;
 
     /**
@@ -2604,7 +2677,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public List<TwoFacedObject> getTemplateSelectList() {
         List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
         for (HtmlTemplate template : getTemplates()) {
-            tfos.add(new TwoFacedObject(template.getName(), template.getId()));
+            tfos.add(new TwoFacedObject(template.getName(),
+                                        template.getId()));
         }
         return tfos;
 
@@ -2669,7 +2743,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         //Look at the command line properties first
         if (prop == null) {
-            prop = (String)cmdLineProperties.get(name);
+            prop = (String) cmdLineProperties.get(name);
         }
 
 
@@ -2750,6 +2824,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return dflt;
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public double getProperty(String name, double dflt) {
         String prop = getProperty(name);
         if (prop != null) {
@@ -2877,7 +2959,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *  _more_
      *
      *  @param request _more_
-     *  @param entries _more_
      * @param state _more_
      *
      *  @return _more_
@@ -2947,7 +3028,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         List<Link> okLinks = new ArrayList<Link>();
         for (Link link : links) {
             if (link.isType(OutputType.TYPE_ACTION)
-                || link.isType(OutputType.TYPE_NONHTML)) {
+                    || link.isType(OutputType.TYPE_NONHTML)) {
                 okLinks.add(link);
             }
         }
@@ -3181,8 +3262,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     public TypeHandler getTypeHandler(String type,
-                                         boolean makeNewOneIfNeeded,
-                                         boolean useDefaultIfNotFound)
+                                      boolean makeNewOneIfNeeded,
+                                      boolean useDefaultIfNotFound)
             throws Exception {
         TypeHandler typeHandler = (TypeHandler) theTypeHandlersMap.get(type);
         if (typeHandler == null) {
@@ -3234,16 +3315,29 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return new Result("", sb);
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processInfo(Request request) throws Exception {
         if (request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML)) {
             Document doc = XmlUtil.makeDocument();
-            Element info = XmlUtil.create(doc, TAG_INFO,
-                                     null, new String[] {});
-            XmlUtil.create(doc,TAG_INFO_DESCRIPTION, info, getEntryManager().getTopGroup().getDescription(),null);
-            XmlUtil.create(doc,TAG_INFO_TITLE, info, getProperty(PROP_REPOSITORY_NAME, "Repository"),null);
+            Element info = XmlUtil.create(doc, TAG_INFO, null,
+                                          new String[] {});
+            XmlUtil.create(doc, TAG_INFO_DESCRIPTION, info,
+                           getEntryManager().getTopGroup().getDescription(),
+                           null);
+            XmlUtil.create(doc, TAG_INFO_TITLE, info,
+                           getProperty(PROP_REPOSITORY_NAME, "Repository"),
+                           null);
             String port = getProperty(PROP_SSL_PORT, "");
             if (port.trim().length() == 0) {
-                XmlUtil.create(doc, TAG_INFO_SSLPORT, info,port,null);
+                XmlUtil.create(doc, TAG_INFO_SSLPORT, info, port, null);
             }
 
             /*
@@ -3256,7 +3350,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             return new Result(xml, MIME_XML);
         }
         StringBuffer sb = new StringBuffer("");
-        
+
         return new Result("", sb);
     }
 
@@ -3347,7 +3441,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     public List getListLinks(Request request, String what,
-                                boolean includeExtra)
+                             boolean includeExtra)
             throws Exception {
         List                 links       = new ArrayList();
         TypeHandler          typeHandler = getTypeHandler(request);
@@ -3441,7 +3535,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public List getSubNavLinks(Request request, RequestUrl[] urls,
-                                  String arg) {
+                               String arg) {
         List   links = new ArrayList();
         String type  = request.getRequestPath();
         String onLinkTemplate = getTemplateProperty(request,
@@ -3526,7 +3620,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public int getMax(Request request) {
         if (request.defined(ARG_SKIP)) {
-            return request.get(ARG_SKIP, 0) + request.get(ARG_MAX, DB_MAX_ROWS);
+            return request.get(ARG_SKIP, 0)
+                   + request.get(ARG_MAX, DB_MAX_ROWS);
         }
         return request.get(ARG_MAX, DB_MAX_ROWS);
     }
@@ -3664,6 +3759,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public void createMonthNav(StringBuffer sb, Date date, String url,
                                Hashtable dayLinks) {
+
         GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         cal.setTime(date);
         int[] theDate  = CalendarOutputHandler.getDayMonthYear(cal);
@@ -3680,7 +3776,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
         next.setTime(date);
         next.add(cal.MONTH, 1);
 
-        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,HtmlUtil.attrs(HtmlUtil.ATTR_BORDER,"1",HtmlUtil.ATTR_CELLSPACING,"0",HtmlUtil.ATTR_CELLPADDING,"0")));
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,
+                                HtmlUtil.attrs(HtmlUtil.ATTR_BORDER, "1",
+                                    HtmlUtil.ATTR_CELLSPACING, "0",
+                                    HtmlUtil.ATTR_CELLPADDING, "0")));
         String[] dayNames = {
             "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"
         };
@@ -3692,29 +3791,45 @@ public class Repository extends RepositoryBase implements RequestHandler {
             HtmlUtil.href(url + "&" + CalendarOutputHandler.getUrlArgs(next),
                           HtmlUtil.ENTITY_GT) + HtmlUtil.space(1);
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TR,
-                                HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,HtmlUtil.VALUE_TOP)));        
+                                HtmlUtil.attr(HtmlUtil.ATTR_VALIGN,
+                                    HtmlUtil.VALUE_TOP)));
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TD,
-                                HtmlUtil.attrs(HtmlUtil.ATTR_COLSPAN,"7",HtmlUtil.ATTR_ALIGN,HtmlUtil.VALUE_CENTER,HtmlUtil.ATTR_CLASS,"calnavmonthheader")));
+                                HtmlUtil.attrs(HtmlUtil.ATTR_COLSPAN, "7",
+                                    HtmlUtil.ATTR_ALIGN,
+                                    HtmlUtil.VALUE_CENTER,
+                                    HtmlUtil.ATTR_CLASS,
+                                    "calnavmonthheader")));
 
 
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE,
-                                HtmlUtil.attrs(HtmlUtil.ATTR_CELLSPACING,"0",HtmlUtil.ATTR_CELLPADDING,"0",HtmlUtil.ATTR_WIDTH,"100%")));
+                                HtmlUtil.attrs(HtmlUtil.ATTR_CELLSPACING,
+                                    "0", HtmlUtil.ATTR_CELLPADDING, "0",
+                                    HtmlUtil.ATTR_WIDTH, "100%")));
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TR));
-        sb.append(HtmlUtil.col(prevUrl,HtmlUtil.attrs(HtmlUtil.ATTR_WIDTH,"1",HtmlUtil.ATTR_CLASS,"calnavmonthheader")));
-        sb.append(HtmlUtil.col(
-                               DateUtil.MONTH_NAMES[cal.get(cal.MONTH)]+
-                               HtmlUtil.space(1)+
-                               theYear,
-                               HtmlUtil.attr(HtmlUtil.ATTR_CLASS,"calnavmonthheader")));
+        sb.append(HtmlUtil.col(prevUrl,
+                               HtmlUtil.attrs(HtmlUtil.ATTR_WIDTH, "1",
+                                   HtmlUtil.ATTR_CLASS,
+                                   "calnavmonthheader")));
+        sb.append(
+            HtmlUtil.col(
+                DateUtil.MONTH_NAMES[cal.get(cal.MONTH)] + HtmlUtil.space(1)
+                + theYear, HtmlUtil.attr(
+                    HtmlUtil.ATTR_CLASS, "calnavmonthheader")));
 
 
 
-        sb.append(HtmlUtil.col(nextUrl,HtmlUtil.attrs(HtmlUtil.ATTR_WIDTH,"1",HtmlUtil.ATTR_CLASS,"calnavmonthheader")));
+        sb.append(HtmlUtil.col(nextUrl,
+                               HtmlUtil.attrs(HtmlUtil.ATTR_WIDTH, "1",
+                                   HtmlUtil.ATTR_CLASS,
+                                   "calnavmonthheader")));
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TR));
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TR));
         for (int colIdx = 0; colIdx < 7; colIdx++) {
-            sb.append(HtmlUtil.col(dayNames[colIdx],HtmlUtil.attrs(HtmlUtil.ATTR_WIDTH,"14%",HtmlUtil.ATTR_CLASS,"calnavdayheader")));
+            sb.append(HtmlUtil.col(dayNames[colIdx],
+                                   HtmlUtil.attrs(HtmlUtil.ATTR_WIDTH, "14%",
+                                       HtmlUtil.ATTR_CLASS,
+                                       "calnavdayheader")));
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TR));
         int startDow = cal.get(cal.DAY_OF_WEEK);
@@ -3723,7 +3838,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
             startDow--;
         }
         for (int rowIdx = 0; rowIdx < 6; rowIdx++) {
-            sb.append(HtmlUtil.open(HtmlUtil.TAG_TR,HtmlUtil.attrs(HtmlUtil.ATTR_VALIGN,HtmlUtil.VALUE_TOP)));
+            sb.append(HtmlUtil.open(HtmlUtil.TAG_TR,
+                                    HtmlUtil.attrs(HtmlUtil.ATTR_VALIGN,
+                                        HtmlUtil.VALUE_TOP)));
             for (int colIdx = 0; colIdx < 7; colIdx++) {
                 int    thisDay   = cal.get(cal.DAY_OF_MONTH);
                 int    thisMonth = cal.get(cal.MONTH);
@@ -3765,6 +3882,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             }
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
+
     }
 
 
@@ -3872,7 +3990,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public String makeTypeSelect(Request request, boolean includeAny)
             throws Exception {
-        return makeTypeSelect(request, includeAny, "", false,null);
+        return makeTypeSelect(request, includeAny, "", false, null);
     }
 
     /**
@@ -3882,13 +4000,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @param includeAny _more_
      * @param selected _more_
      * @param checkAddOk _more_
+     * @param exclude _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     public String makeTypeSelect(Request request, boolean includeAny,
-                                 String selected, boolean checkAddOk, HashSet<String> exclude)
+                                 String selected, boolean checkAddOk,
+                                 HashSet<String> exclude)
             throws Exception {
         List<TypeHandler> typeHandlers = getTypeHandlers();
         List              tmp          = new ArrayList();
@@ -3896,8 +4016,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
             if (typeHandler.isAnyHandler() && !includeAny) {
                 continue;
             }
-            if(exclude!=null) {
-                if(exclude.contains(typeHandler.getType())) continue;
+            if (exclude != null) {
+                if (exclude.contains(typeHandler.getType())) {
+                    continue;
+                }
             }
             if (checkAddOk && !typeHandler.canBeCreatedBy(request)) {
                 continue;
@@ -4169,8 +4291,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    public String getQueryOrderAndLimit(Request request,
-                                           boolean addOrderBy) {
+    public String getQueryOrderAndLimit(Request request, boolean addOrderBy) {
         String  order     = " DESC ";
         boolean haveOrder = false;
 
@@ -4178,7 +4299,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         haveOrder = request.exists(ARG_ASCENDING);
 
         if (request.get(ARG_ASCENDING, false)) {
-            order     = " ASC ";
+            order = " ASC ";
         }
         int    skipCnt     = request.get(ARG_SKIP, 0);
         String limitString = BLANK;
@@ -4243,8 +4364,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    public Properties getFieldProperties(String namesFile)
-            throws Exception {
+    public Properties getFieldProperties(String namesFile) throws Exception {
         if (namesFile == null) {
             return null;
         }
@@ -4256,7 +4376,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 names.load(s);
                 namesHolder.put(namesFile, names);
             } catch (Exception exc) {
-                System.err.println("err:" + exc);
+                logError("err:" + exc, exc);
                 throw exc;
             }
         }
@@ -4337,25 +4457,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /**
      * _more_
      *
-     * @param dirs _more_
-     */
-    public void listen(List<FileInfo> dirs) {
-        while (true) {
-            for (FileInfo f : dirs) {
-                if (f.hasChanged()) {
-                    System.err.println("changed:" + f);
-                }
-            }
-            Misc.sleep(1000);
-        }
-    }
-
-
-
-
-    /**
-     * _more_
-     *
      * @param formName _more_
      * @param fieldName _more_
      *
@@ -4364,17 +4465,23 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public String getCalendarSelector(String formName, String fieldName) {
         String anchorName = "anchor." + fieldName;
         String divName    = "div." + fieldName;
-        String call = HtmlUtil.call("selectDate",
-                                    HtmlUtil.comma(HtmlUtil.squote(divName),
-                                                   "document.forms['" + formName + "']." + fieldName,
-                                                   HtmlUtil.squote(anchorName),
-                                                   HtmlUtil.squote("yyyy-MM-dd")))+"return false;";
-        return HtmlUtil.href("#",
-                             HtmlUtil.img(iconUrl(ICON_CALENDAR), " Choose date", HtmlUtil.attr(HtmlUtil.ATTR_BORDER,"0")),
-                             HtmlUtil.onMouseClick(call)+
-                             HtmlUtil.attrs(HtmlUtil.ATTR_NAME, anchorName,HtmlUtil.ATTR_ID,anchorName))+
-            HtmlUtil.div("",HtmlUtil.attrs(HtmlUtil.ATTR_ID, divName,
-                                           HtmlUtil.ATTR_STYLE,"position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"));
+        String call = HtmlUtil.call(
+                          "selectDate", HtmlUtil.comma(
+                              HtmlUtil.squote(divName), "document.forms['"
+                              + formName + "']."
+                              + fieldName, HtmlUtil.squote(
+                                  anchorName), HtmlUtil.squote(
+                                  "yyyy-MM-dd"))) + "return false;";
+        return HtmlUtil
+            .href("#", HtmlUtil
+                .img(iconUrl(ICON_CALENDAR), " Choose date", HtmlUtil
+                    .attr(HtmlUtil.ATTR_BORDER, "0")), HtmlUtil
+                        .onMouseClick(call) + HtmlUtil
+                        .attrs(HtmlUtil.ATTR_NAME, anchorName, HtmlUtil
+                            .ATTR_ID, anchorName)) + HtmlUtil
+                                .div("", HtmlUtil
+                                    .attrs(HtmlUtil.ATTR_ID, divName, HtmlUtil
+                                        .ATTR_STYLE, "position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"));
     }
 
 
@@ -4403,12 +4510,17 @@ public class Repository extends RepositoryBase implements RequestHandler {
                              ? timeArg
                              : timeSdf.format(date));
 
-        return HtmlUtil.input(name, dateString,
-                              HtmlUtil.SIZE_10 + HtmlUtil.title(dateHelp)) + getCalendarSelector(formName, name)
-                                      + " T:"
-                                      + HtmlUtil.input(name + ".time",
-                                                       timeString,
-                                                       HtmlUtil.SIZE_15 + HtmlUtil.attr(HtmlUtil.ATTR_TITLE, timeHelp));
+        return HtmlUtil.input(
+            name, dateString,
+            HtmlUtil.SIZE_10
+            + HtmlUtil.title(dateHelp)) + getCalendarSelector(formName, name)
+                                        + " T:"
+                                        + HtmlUtil.input(
+                                            name + ".time", timeString,
+                                            HtmlUtil.SIZE_15
+                                            + HtmlUtil.attr(
+                                                HtmlUtil.ATTR_TITLE,
+                                                    timeHelp));
     }
 
 
@@ -4453,7 +4565,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (userAgent == null) {
             userAgent = "Mozilla";
         }
-        //        System.err.println ("agent:" + userAgent);
         String mapProvider = MAP_ID_MICROSOFT;
         String mapJS       = MAP_JS_MICROSOFT;
         //        googleMapsKey = "ABQIAAAA-JXA0-ozvUKU42oQp1aOZxT2yXp_ZAY8_ufC3CFXhHIE1NvwkxSig5NmAvzXxoX1Ly0QJZMRxtiLIg";        
@@ -4524,7 +4635,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public String makePopupLink(String link, String menuContents) {
-        return makePopupLink(link, menuContents, false,false);
+        return makePopupLink(link, menuContents, false, false);
     }
 
 
@@ -4534,20 +4645,20 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @param link _more_
      * @param menuContents _more_
      * @param makeClose _more_
+     * @param alignLeft _more_
      *
      * @return _more_
      */
     public String makePopupLink(String link, String menuContents,
-                                boolean makeClose,boolean alignLeft) {
+                                boolean makeClose, boolean alignLeft) {
         String compId   = "menu_" + HtmlUtil.blockCnt++;
         String linkId   = "menulink_" + HtmlUtil.blockCnt++;
         String contents = makePopupDiv(menuContents, compId, makeClose);
         String onClick = HtmlUtil.onMouseClick(HtmlUtil.call("showPopup",
-                                                             HtmlUtil.comma(new String[]{
-                                                                 "event",
-                                                                 HtmlUtil.squote(linkId),
-                                                                 HtmlUtil.squote(compId),
-                                                                 (alignLeft?"1":"0")})));
+                             HtmlUtil.comma(new String[] { "event",
+                HtmlUtil.squote(linkId), HtmlUtil.squote(compId), (alignLeft
+                ? "1"
+                : "0") })));
         String href = HtmlUtil.href("javascript:noop();", link,
                                     onClick + HtmlUtil.id(linkId));
         return href + contents;
@@ -4613,23 +4724,24 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @author IDV Development Team
      */
-    public  class LogEntry {
+    public class LogEntry {
 
-        /** _more_          */
+        /** _more_ */
         User user;
 
-        /** _more_          */
+        /** _more_ */
         Date date;
 
-        /** _more_          */
+        /** _more_ */
         String path;
 
-        /** _more_          */
+        /** _more_ */
         String ip;
 
-        /** _more_          */
+        /** _more_ */
         String userAgent;
 
+        /** _more_ */
         String url;
 
         /**
@@ -4638,17 +4750,17 @@ public class Repository extends RepositoryBase implements RequestHandler {
          * @param request _more_
          */
         public LogEntry(Request request) {
-            this.user      = request.getUser();
-            this.path      = request.getRequestPath();
-            
+            this.user = request.getUser();
+            this.path = request.getRequestPath();
+
             String entryPrefix = URL_ENTRY_SHOW.toString();
-            if(this.path.startsWith(entryPrefix)) {
-                url = request.getUrl();
+            if (this.path.startsWith(entryPrefix)) {
+                url       = request.getUrl();
                 this.path = this.path.substring(entryPrefix.length());
-                if(path.trim().length()==0) {
+                if (path.trim().length() == 0) {
                     path = "/entry/show";
                 }
-                   
+
             }
 
             this.date      = new Date();
@@ -4675,9 +4787,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
             return ip;
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public String getUrl() {
             return url;
         }
+
         /**
          *  Set the UserAgent property.
          *

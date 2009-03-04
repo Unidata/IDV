@@ -197,16 +197,19 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         }
         long t1 = System.currentTimeMillis();
         //        System.err.println("getSynthIds " + parentEntry);
-        File   rootDir     = new File((String) values[0]);
-        if(!rootDir.exists()) throw new RepositoryUtil.MissingEntryException("Could not find entry: " + rootDir);
+        File rootDir = new File((String) values[0]);
+        if ( !rootDir.exists()) {
+            throw new RepositoryUtil.MissingEntryException(
+                "Could not find entry: " + rootDir);
+        }
         String rootDirPath = rootDir.toString();
         File   childPath   = getFileFromId(synthId, rootDir);
         File[] files       = childPath.listFiles();
         //        files = IOUtil.sortFilesOnName(files);
-        boolean descending= !request.get(ARG_ASCENDING,false);
+        boolean descending = !request.get(ARG_ASCENDING, false);
 
 
-        if(request.getString(ARG_ORDERBY,"").equals("name")) {
+        if (request.getString(ARG_ORDERBY, "").equals("name")) {
             //            System.err.println ("by name " + descending);
             files = IOUtil.sortFilesOnName(files, descending);
         } else {

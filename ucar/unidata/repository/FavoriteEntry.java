@@ -53,16 +53,16 @@ import java.util.Properties;
  */
 public class FavoriteEntry {
 
-    /** _more_          */
+    /** _more_ */
     private String id;
 
-    /** _more_          */
+    /** _more_ */
     private Entry entry;
 
-    /** _more_          */
+    /** _more_ */
     private String name;
 
-    /** _more_          */
+    /** _more_ */
     private String category;
 
 

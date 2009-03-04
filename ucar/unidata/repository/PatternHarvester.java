@@ -364,10 +364,10 @@ public class PatternHarvester extends Harvester {
             }
             filePattern = Pattern.compile(pattern.toString());
             if (getTestMode()) {
-                System.err.println("orig pattern:" + "  "
-                                   + filePatternString);
-                System.err.println("pattern:" + "  " + pattern);
-                System.err.println("pattern names:" + patternNames);
+                getRepository().logInfo("orig pattern:" + "  "
+                                        + filePatternString);
+                getRepository().logInfo("pattern:" + "  " + pattern);
+                getRepository().logInfo("pattern names:" + patternNames);
             }
         }
     }
@@ -451,10 +451,12 @@ public class PatternHarvester extends Harvester {
     /**
      * _more_
      *
+     *
+     * @param timestamp _more_
      * @throws Exception _more_
      */
     protected void runInner(int timestamp) throws Exception {
-        if(!canContinueRunning(timestamp)) {
+        if ( !canContinueRunning(timestamp)) {
             return;
         }
 
@@ -475,12 +477,12 @@ public class PatternHarvester extends Harvester {
         for (FileInfo dir : dirs) {
             dirMap.put(dir.getFile(), dir);
         }
-        
+
         int cnt = 0;
 
         while (canContinueRunning(timestamp)) {
             long t1 = System.currentTimeMillis();
-            collectEntries((cnt == 0),timestamp);
+            collectEntries((cnt == 0), timestamp);
             lastRunTime = System.currentTimeMillis();
             long t2 = System.currentTimeMillis();
             cnt++;
@@ -506,11 +508,13 @@ public class PatternHarvester extends Harvester {
      * _more_
      *
      * @param firstTime _more_
+     * @param timestamp _more_
      *
      *
      * @throws Exception _more_
      */
-    private void collectEntries(boolean firstTime, int timestamp) throws Exception {
+    private void collectEntries(boolean firstTime, int timestamp)
+            throws Exception {
 
         long           t1        = System.currentTimeMillis();
         List<Entry>    entries   = new ArrayList<Entry>();
@@ -571,7 +575,7 @@ public class PatternHarvester extends Harvester {
                         if ( !getTestMode()) {
                             if (getAddMetadata()) {
                                 getEntryManager().addInitialMetadata(null,
-                                                                     needToAdd,false);
+                                        needToAdd, false);
                             }
                             getEntryManager().insertEntries(needToAdd, true,
                                     true);
@@ -580,7 +584,7 @@ public class PatternHarvester extends Harvester {
                     }
                 }
                 //                if(true) break;
-                if(!canContinueRunning(timestamp)) {
+                if ( !canContinueRunning(timestamp)) {
                     return;
                 }
                 //                if(true) break;
@@ -593,7 +597,8 @@ public class PatternHarvester extends Harvester {
             needToAdd.addAll(uniqueEntries);
             if (needToAdd.size() > 0) {
                 if (getAddMetadata()) {
-                    getEntryManager().addInitialMetadata(null, needToAdd,false);
+                    getEntryManager().addInitialMetadata(null, needToAdd,
+                            false);
                 }
                 getEntryManager().insertEntries(needToAdd, true, true);
             }
@@ -790,17 +795,18 @@ public class PatternHarvester extends Harvester {
         if (ext.startsWith(".")) {
             ext = ext.substring(1);
         }
-        tag = tag.replace("${extension}", ext);
+        tag       = tag.replace("${extension}", ext);
 
 
         groupName = groupName.replace("${dirgroup}", dirGroup);
 
 
-        groupName  = applyMacros(groupName,  createDate, fromDate,  toDate,f.getName());
-        name  = applyMacros(name,  createDate, fromDate,  toDate,f.getName());
-        desc  = applyMacros(desc,  createDate, fromDate,  toDate,f.getName());
+        groupName = applyMacros(groupName, createDate, fromDate, toDate,
+                                f.getName());
+        name = applyMacros(name, createDate, fromDate, toDate, f.getName());
+        desc = applyMacros(desc, createDate, fromDate, toDate, f.getName());
 
-        desc      = desc.replace("${name}", name);
+        desc = desc.replace("${name}", name);
 
         if (baseGroup != null) {
             groupName = baseGroup.getFullName() + Group.PATHDELIMITER

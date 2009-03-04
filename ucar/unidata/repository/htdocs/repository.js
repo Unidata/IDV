@@ -321,7 +321,7 @@ function moveFloatDiv(x,y) {
             if(draggedEntryIcon) {
                 icon = "<img src=\"" +draggedEntryIcon+"\"/> ";
             }
-            obj.obj.innerHTML = icon +draggedEntryName+"<br>Drag to a group to copy/move";
+            obj.obj.innerHTML = icon +draggedEntryName+"<br>Drag to a group to copy/move/associate";
         }
         obj.style.top = y;
         obj.style.left = x+10;

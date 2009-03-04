@@ -237,7 +237,6 @@ public class RepositoryServlet extends HttpServlet {
             repositoryResult = repository.handleRequest(repositoryRequest);
         } catch (Throwable e) {
             e = LogUtil.getInnerException(e);
-            repository.log("Error:" + e, e);
             logException(e, request);
             response.sendError(response.SC_INTERNAL_SERVER_ERROR,
                                e.getMessage());
@@ -389,11 +388,11 @@ public class RepositoryServlet extends HttpServlet {
                     Map.Entry pairs = (Map.Entry) it.next();
                     String    key   = (String) pairs.getKey();
                     String[]  vals  = (String[]) pairs.getValue();
-                    if (vals.length ==1) {
+                    if (vals.length == 1) {
                         formArgs.put(key, vals[0]);
-                    } else  if (vals.length >1) {
+                    } else if (vals.length > 1) {
                         List values = new ArrayList();
-                        for(int i=0;i<vals.length;i++) {
+                        for (int i = 0; i < vals.length; i++) {
                             values.add(vals[i]);
                         }
                         formArgs.put(key, values);
@@ -495,6 +494,11 @@ public class RepositoryServlet extends HttpServlet {
                 address = request.getRemoteAddr();
             }
             //            logger.logException(logger.getStackTrace(exc), address);
+            if (repository != null) {
+                repository.logError("Error in RepositoryServlet address="
+                                    + address, exc);
+                return;
+            }
             System.err.println("Exception: " + exc);
             exc.printStackTrace();
         } catch (Exception ioe) {

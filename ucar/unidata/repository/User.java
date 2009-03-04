@@ -68,7 +68,7 @@ public class User {
     /** _more_ */
     private List<String> roles;
 
-    /** _more_          */
+    /** _more_ */
     private List<FavoriteEntry> favorites;
 
 
@@ -76,7 +76,7 @@ public class User {
     private String language = "";
 
 
-    /** _more_          */
+    /** _more_ */
     private String template;
 
     /**

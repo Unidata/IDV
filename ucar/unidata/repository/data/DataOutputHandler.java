@@ -21,7 +21,6 @@
 
 package ucar.unidata.repository.data;
 
-import ucar.unidata.repository.*;
 
 import opendap.dap.DAP2Exception;
 
@@ -73,6 +72,8 @@ import ucar.unidata.data.gis.KmlUtil;
 import ucar.unidata.geoloc.LatLonPointImpl;
 
 import ucar.unidata.geoloc.LatLonRect;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.util.Cache;
@@ -297,10 +298,8 @@ public class DataOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param entry _more_
      * @param state _more_
      * @param links _more_
-     * @param forHeader _more_
      *
      * @throws Exception _more_
      */
@@ -314,7 +313,8 @@ public class DataOutputHandler extends OutputHandler {
             return;
         }
 
-        if (!getRepository().getAccessManager().canAccessFile(request,  entry)) {
+        if ( !getRepository().getAccessManager().canAccessFile(request,
+                entry)) {
             return;
         }
 
@@ -545,19 +545,19 @@ public class DataOutputHandler extends OutputHandler {
     }
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_CDM = "cdm";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_GRID = "grid";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_TRAJECTORY = "trajectory";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_POINT = "point";
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable prefixMap;
 
     /**
@@ -700,7 +700,8 @@ public class DataOutputHandler extends OutputHandler {
                     entry, Permission.ACTION_EDIT)) {
                 sb.append(HtmlUtil.p());
                 List<Entry> entries = (List<Entry>) Misc.newList(entry);
-                getEntryManager().addInitialMetadata(request, entries,request.get(ARG_SHORT,false));
+                getEntryManager().addInitialMetadata(request, entries,
+                        request.get(ARG_SHORT, false));
                 getEntryManager().insertEntries(entries, false);
                 sb.append(getRepository().note("Metadata added"));
                 return makeLinksResult(request, "CDL", sb, new State(entry));
@@ -715,11 +716,16 @@ public class DataOutputHandler extends OutputHandler {
         if (getRepository().getAccessManager().canDoAction(request, entry,
                 Permission.ACTION_EDIT)) {
             request.put(ARG_METADATA_ADD, HtmlUtil.VALUE_TRUE);
-            sb.append(HtmlUtil.href(request.getUrl()+"&"+HtmlUtil.arg(ARG_SHORT,HtmlUtil.VALUE_TRUE), msg("Add short metadata")));
+            sb.append(
+                HtmlUtil.href(
+                    request.getUrl() + "&"
+                    + HtmlUtil.arg(ARG_SHORT, HtmlUtil.VALUE_TRUE), msg(
+                        "Add short metadata")));
             sb.append(HtmlUtil.span("&nbsp;|&nbsp;",
                                     HtmlUtil.cssClass("separator")));
-            
-            sb.append(HtmlUtil.href(request.getUrl(), msg("Add full metadata")));
+
+            sb.append(HtmlUtil.href(request.getUrl(),
+                                    msg("Add full metadata")));
         }
         NetcdfDataset dataset =
             getNetcdfDataset(entry.getResource().getFile());
@@ -748,7 +754,6 @@ public class DataOutputHandler extends OutputHandler {
     /**
      * _more_
      *
-     * @param file _more_
      *
      * @param path _more_
      *
@@ -770,7 +775,6 @@ public class DataOutputHandler extends OutputHandler {
     /**
      * _more_
      *
-     * @param file _more_
      *
      * @param path _more_
      *
@@ -849,8 +853,9 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputGridSubset(Request request, Entry entry)
             throws Exception {
 
-        boolean canAdd =getRepository().getAccessManager().canDoAction(request,
-                                                                       entry.getParentGroup(), Permission.ACTION_NEW);
+        boolean canAdd =
+            getRepository().getAccessManager().canDoAction(request,
+                entry.getParentGroup(), Permission.ACTION_NEW);
 
         String       path   = entry.getResource().getPath();
         StringBuffer sb     = new StringBuffer();
@@ -931,7 +936,7 @@ public class DataOutputHandler extends OutputHandler {
                             List<Entry> entries =
                                 (List<Entry>) Misc.newList(newEntry);
                             getEntryManager().addInitialMetadata(request,
-                                                                 entries,request.get(ARG_SHORT,false));
+                                    entries, request.get(ARG_SHORT, false));
                         }
                         getEntryManager().insertEntries(
                             Misc.newList(newEntry), true);
@@ -1014,12 +1019,12 @@ public class DataOutputHandler extends OutputHandler {
                         HtmlUtil.cols(
                             HtmlUtil.checkbox(
                                 ARG_VARIABLE + "." + var.getShortName(),
-                                HtmlUtil.VALUE_TRUE, false) + HtmlUtil.space(1)
-                                    + var.getName() + HtmlUtil.space(1)
-                                    + ((var.getUnitsString() != null)
-                                       ? "(" + var.getUnitsString() + ")"
-                                       : ""), "<i>" + var.getDescription()
-                                       + "</i>")));
+                                HtmlUtil.VALUE_TRUE, false) + HtmlUtil.space(
+                                    1) + var.getName() + HtmlUtil.space(1)
+                                       + ((var.getUnitsString() != null)
+                                          ? "(" + var.getUnitsString() + ")"
+                                          : ""), "<i>" + var.getDescription()
+                                          + "</i>")));
 
             }
 
@@ -1605,10 +1610,16 @@ public class DataOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     public AuthorizationMethod getAuthorizationMethod(Request request) {
         OutputType output = request.getOutput();
-        if (output.equals(OUTPUT_WCS)||
-            output.equals(OUTPUT_OPENDAP)) {
+        if (output.equals(OUTPUT_WCS) || output.equals(OUTPUT_OPENDAP)) {
             return AuthorizationMethod.AUTH_HTTP;
         }
         return super.getAuthorizationMethod(request);
@@ -1630,11 +1641,11 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputEntry(final Request request, Entry entry)
             throws Exception {
 
-        if (!getRepository().getAccessManager().canDoAction(request,
-                                                            entry, Permission.ACTION_FILE)) {
-            throw new AccessException("Cannot access data",request);
+        if ( !getRepository().getAccessManager().canDoAction(request, entry,
+                Permission.ACTION_FILE)) {
+            throw new AccessException("Cannot access data", request);
         }
-                
+
 
 
         OutputType output = request.getOutput();

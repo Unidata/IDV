@@ -188,10 +188,12 @@ public class DirectoryHarvester extends Harvester {
     /**
      * _more_
      *
+     *
+     * @param timestamp _more_
      * @throws Exception _more_
      */
     protected void runInner(int timestamp) throws Exception {
-        if(!canContinueRunning(timestamp)) {
+        if ( !canContinueRunning(timestamp)) {
             return;
         }
         if (baseGroupName.length() == 0) {

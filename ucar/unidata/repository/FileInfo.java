@@ -225,19 +225,19 @@ public class FileInfo {
         long tt1 = System.currentTimeMillis();
         IOUtil.walkDirectory(rootDir, fileViewer);
         long tt2 = System.currentTimeMillis();
-        System.err.println("found:" + dirs.size() + " in:" + (tt2 - tt1)
-                           + " looked at:" + cnt[0]);
+        //        System.err.println("found:" + dirs.size() + " in:" + (tt2 - tt1)
+        //                           + " looked at:" + cnt[0]);
 
         while (true) {
             long t1 = System.currentTimeMillis();
             for (FileInfo fileInfo : dirs) {
                 long oldTime = fileInfo.time;
                 if (fileInfo.hasChanged()) {
-                    System.err.println("Changed:" + fileInfo);
+                    //                    System.err.println("Changed:" + fileInfo);
                     File[] files = fileInfo.file.listFiles();
                     for (int i = 0; i < files.length; i++) {
                         if (files[i].lastModified() > oldTime) {
-                            System.err.println("    " + files[i].getName());
+                            //                            System.err.println("    " + files[i].getName());
                         }
 
                     }

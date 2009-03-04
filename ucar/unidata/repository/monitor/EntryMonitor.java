@@ -19,9 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository.monitor;
 
 
@@ -56,15 +53,16 @@ import java.util.List;
 public class EntryMonitor implements Constants {
 
 
+    /** _more_          */
     public static final String ARG_CLEARERROR = "monitor_clearerror";
 
-    /** _more_          */
+    /** _more_ */
     private String lastError;
 
     /** _more_ */
     private String id;
 
-    /** _more_          */
+    /** _more_ */
     private String name = "";
 
     /** _more_ */
@@ -77,6 +75,7 @@ public class EntryMonitor implements Constants {
     /** _more_ */
     private User user;
 
+    /** _more_          */
     private Request request;
 
     /** _more_ */
@@ -85,7 +84,7 @@ public class EntryMonitor implements Constants {
     /** _more_ */
     private List<Filter> filters = new ArrayList<Filter>();
 
-    /** _more_          */
+    /** _more_ */
     private List<MonitorAction> actions = new ArrayList<MonitorAction>();
 
 
@@ -95,16 +94,16 @@ public class EntryMonitor implements Constants {
     /** _more_ */
     private Date toDate;
 
-    /** _more_          */
+    /** _more_ */
     private boolean editable = true;
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ADD_ACTION = "addaction";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_DELETE_ACTION = "deleteaction";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_DELETE_ACTION_CONFIRM =
         "deleteactionconfirm";
 
@@ -211,7 +210,7 @@ public class EntryMonitor implements Constants {
      */
     public void applyEditForm(Request request) throws Exception {
 
-        if(request.get(ARG_CLEARERROR,false)) {
+        if (request.get(ARG_CLEARERROR, false)) {
             lastError = "";
         }
 
@@ -281,14 +280,18 @@ public class EntryMonitor implements Constants {
         sb.append(HtmlUtil.makeShowHideBlock("Settings", stateSB.toString(),
                                              true));
 
-        if(getLastError()!=null && getLastError().length()>0) {
-            StringBuffer errorSB = new StringBuffer(); 
-            errorSB.append(HtmlUtil.checkbox(ARG_CLEARERROR,"true",true));
+        if ((getLastError() != null) && (getLastError().length() > 0)) {
+            StringBuffer errorSB = new StringBuffer();
+            errorSB.append(HtmlUtil.checkbox(ARG_CLEARERROR, "true", true));
             errorSB.append(" ");
             errorSB.append(getRepository().msg("Clear error"));
             errorSB.append(HtmlUtil.pre(getLastError()));
-            sb.append(HtmlUtil.makeShowHideBlock(HtmlUtil.span(getRepository().msg("Error"),HtmlUtil.cssClass("errorlabel")),
-                                                 errorSB.toString(), true));
+            sb.append(
+                HtmlUtil.makeShowHideBlock(
+                    HtmlUtil.span(
+                        getRepository().msg("Error"),
+                        HtmlUtil.cssClass("errorlabel")), errorSB.toString(),
+                            true));
         }
 
 
@@ -452,7 +455,7 @@ public class EntryMonitor implements Constants {
             Group group =
                 (Group) getRepository().getEntryManager().getEntry(null, id);
 
-            String  select  = OutputHandler.getGroupSelect(getRequest(), what);
+            String select = OutputHandler.getGroupSelect(getRequest(), what);
             sb.append(
                 HtmlUtil.formEntry(
                     getRepository().msgLabel("Ancestor Group"),
@@ -550,6 +553,11 @@ public class EntryMonitor implements Constants {
                 : "") + "= (" + value + ")";
     }
 
+    /**
+     * _more_
+     *
+     * @param dummy _more_
+     */
     public void setRepository(String dummy) {}
 
 
@@ -597,7 +605,8 @@ public class EntryMonitor implements Constants {
      * @param exc _more_
      */
     protected void handleError(String message, Exception exc) {
-        lastError = message + "<br>" +exc +"<br>" +LogUtil.getStackTrace(exc);
+        lastError = message + "<br>" + exc + "<br>"
+                    + LogUtil.getStackTrace(exc);
         System.err.println("Error:" + message + " " + exc);
         exc.printStackTrace();
     }
@@ -658,7 +667,7 @@ public class EntryMonitor implements Constants {
             return false;
         }
 
-        if(filters.size()==0) {
+        if (filters.size() == 0) {
             return false;
         }
 
@@ -760,23 +769,52 @@ public class EntryMonitor implements Constants {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Request getRequest() throws Exception {
-        if(request == null) {
-            request = new Request(repository,getUser());
+        if (request == null) {
+            request = new Request(repository, getUser());
         }
         return request;
     }
 
+    /**
+     * _more_
+     *
+     * @param group _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public boolean okToAddNew(Group group) throws Exception {
-        if(group == null) return false;
+        if (group == null) {
+            return false;
+        }
         return getRepository().getAccessManager().canDoAction(getRequest(),
-                                                              group, Permission.ACTION_NEW);
+                group, Permission.ACTION_NEW);
     }
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public boolean okToView(Entry entry) throws Exception {
-        if(entry == null) return false;
+        if (entry == null) {
+            return false;
+        }
         return getRepository().getAccessManager().canDoAction(getRequest(),
-                                                              entry, Permission.ACTION_VIEW);
+                entry, Permission.ACTION_VIEW);
     }
 
 

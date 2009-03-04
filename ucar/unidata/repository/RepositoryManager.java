@@ -127,25 +127,20 @@ public class RepositoryManager implements RepositorySource, Constants,
 
 
 
-    public static String formatFileLength(double bytes) {
-        if(bytes<1000000) {
-            return ((int)bytes) + " bytes";
-        }
-        bytes = ((int)((bytes*100)/1000000.0))/100.0;
-        return bytes + " MB";
-    }
-
     /**
      * _more_
      *
-     * @param message _more_
-     * @param exc _more_
+     * @param bytes _more_
+     *
+     * @return _more_
      */
-    public void logException(String message, Exception exc) {
-        System.err.println("Error occurred: " + message);
-        exc.printStackTrace();
+    public static String formatFileLength(double bytes) {
+        if (bytes < 1000000) {
+            return ((int) bytes) + " bytes";
+        }
+        bytes = ((int) ((bytes * 100) / 1000000.0)) / 100.0;
+        return bytes + " MB";
     }
-
 
     /**
      * _more_
@@ -169,7 +164,7 @@ public class RepositoryManager implements RepositorySource, Constants,
         return getRepository().iconUrl(url);
     }
 
- 
+
 
 
     /**
@@ -202,6 +197,13 @@ public class RepositoryManager implements RepositorySource, Constants,
         return Repository.msg(msg);
     }
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     *
+     * @return _more_
+     */
     public static String boldMsg(String msg) {
         return HtmlUtil.b(msg(msg));
     }
@@ -492,14 +494,36 @@ public class RepositoryManager implements RepositorySource, Constants,
     }
 
 
+
     /**
      * _more_
      *
      * @param message _more_
      * @param exc _more_
      */
-    protected void log(String message, Throwable exc) {
-        repository.log(message, exc);
+    public void logException(String message, Exception exc) {
+        getRepository().logError(message, exc);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param message _more_
+     * @param exc _more_
+     */
+    protected void logError(String message, Throwable exc) {
+        repository.logError(message, exc);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param message _more_
+     */
+    protected void logInfo(String message) {
+        repository.logInfo(message);
     }
 
 }

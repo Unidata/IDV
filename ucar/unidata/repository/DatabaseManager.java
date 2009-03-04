@@ -468,7 +468,6 @@ public class DatabaseManager extends RepositoryManager {
                     colCnt++;
                 }
                 colNames += ") ";
-                System.err.println("table:" + tableName);
 
                 Statement stmt = execute("select * from " + tableName,
                                          10000000, 0);
@@ -530,7 +529,6 @@ public class DatabaseManager extends RepositoryManager {
                     }
                 }
                 if (valueList.size() > 0) {
-                    System.err.println("\tdoing last bit");
                     if ( !didDelete) {
                         didDelete = true;
                         IOUtil.write(os,
@@ -543,7 +541,6 @@ public class DatabaseManager extends RepositoryManager {
                     IOUtil.write(os, StringUtil.join(",", valueList));
                     IOUtil.write(os, ";\n");
                 }
-                System.err.println("\twrote:" + rowCnt + " rows");
             }
         } finally {
             closeConnection(connection);
@@ -568,17 +565,13 @@ public class DatabaseManager extends RepositoryManager {
         String connectionURL =
             (String) getRepository().getProperty(PROP_DB_URL.replace("${db}",
                 db));
-        //        System.err.println(connectionURL);
         Misc.findClass(
             (String) getRepository().getProperty(
                 PROP_DB_DRIVER.replace("${db}", db)));
 
 
-        //        getRepository().log("making connection:" + connectionURL);
         Connection connection;
         if (userName != null) {
-            //            System.err.println("name:" + userName + ": password:" + password+":");
-
             connection = DriverManager.getConnection(connectionURL, userName,
                     password);
         } else {
@@ -654,16 +647,14 @@ public class DatabaseManager extends RepositoryManager {
 
         long t1 = System.currentTimeMillis();
         try {
-            //            System.err.println("query:" + sql);
             statement.execute(sql);
         } catch (Exception exc) {
-            getRepository().log("Error executing sql:" + sql);
+            getRepository().logError("Error executing sql:" + sql, exc);
             throw exc;
         }
         long t2 = System.currentTimeMillis();
         if (getRepository().debug || (t2 - t1 > 300)) {
-            System.err.println("query:" + sql);
-            System.err.println("query time:" + (t2 - t1));
+            logInfo("query took:" + (t2 - t1) + " " + sql);
         }
         if (t2 - t1 > 2000) {
             //            Misc.printStack("query:" + sql);
@@ -812,7 +803,6 @@ public class DatabaseManager extends RepositoryManager {
                                            ? 1
                                            : 0));
             } else {
-                //                System.err.println ("DB insert value:" + values[i]);
                 stmt.setObject(i + startIdx, values[i]);
             }
         }
@@ -835,8 +825,7 @@ public class DatabaseManager extends RepositoryManager {
             pstmt.executeUpdate();
             close(pstmt);
         } catch (Exception exc) {
-            System.err.println("Error:" + insert);
-            throw exc;
+            logError("Error:" + insert, exc);
         }
     }
 

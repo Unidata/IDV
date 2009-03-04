@@ -19,24 +19,21 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.repository.monitor;
 
 
 import ucar.unidata.repository.*;
+import ucar.unidata.util.HtmlUtil;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 
 import java.io.File;
 import java.io.InputStream;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -51,16 +48,17 @@ import java.util.List;
  */
 public class LdmAction extends MonitorAction {
 
-    /** _more_          */
-    private String queue="";
+    /** _more_ */
+    private String queue = "";
 
-    /** _more_          */
-    private String pqinsert="";
+    /** _more_ */
+    private String pqinsert = "";
 
-    /** _more_          */
+    /** _more_ */
     private String feed = "SPARE";
 
-    private String productId="";
+    /** _more_          */
+    private String productId = "";
 
 
     /**
@@ -90,6 +88,8 @@ public class LdmAction extends MonitorAction {
     /**
      * _more_
      *
+     *
+     * @param entryMonitor _more_
      * @return _more_
      */
     public String getSummary(EntryMonitor entryMonitor) {
@@ -106,10 +106,10 @@ public class LdmAction extends MonitorAction {
      */
     public void applyEditForm(Request request, EntryMonitor monitor) {
         super.applyEditForm(request, monitor);
-        this.pqinsert = request.getString(getArgId(PROP_LDM_PQINSERT), "");
-        this.feed     = request.getString(getArgId(PROP_LDM_FEED), "");
-        this.queue    = request.getString(getArgId(PROP_LDM_QUEUE), "");
-        this.productId    = request.getString(getArgId(PROP_LDM_PRODUCTID), "");
+        this.pqinsert  = request.getString(getArgId(PROP_LDM_PQINSERT), "");
+        this.feed      = request.getString(getArgId(PROP_LDM_FEED), "");
+        this.queue     = request.getString(getArgId(PROP_LDM_QUEUE), "");
+        this.productId = request.getString(getArgId(PROP_LDM_PRODUCTID), "");
     }
 
 
@@ -123,31 +123,43 @@ public class LdmAction extends MonitorAction {
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.colspan("LDM Action", 2));
 
-        String ldmExtra1="";
-        if(pqinsert.length()>0 && !new File(pqinsert).exists()) {
-            ldmExtra1 = HtmlUtil.space(2) + HtmlUtil.span("File does not exist!", HtmlUtil.cssClass("errorlabel"));
+        String ldmExtra1 = "";
+        if ((pqinsert.length() > 0) && !new File(pqinsert).exists()) {
+            ldmExtra1 = HtmlUtil.space(2)
+                        + HtmlUtil.span("File does not exist!",
+                                        HtmlUtil.cssClass("errorlabel"));
         }
-        String ldmExtra2="";
-        if(queue.length()>0 && !new File(queue).exists()) {
-            ldmExtra2 = HtmlUtil.space(2) + HtmlUtil.span("File does not exist!", HtmlUtil.cssClass("errorlabel"));
+        String ldmExtra2 = "";
+        if ((queue.length() > 0) && !new File(queue).exists()) {
+            ldmExtra2 = HtmlUtil.space(2)
+                        + HtmlUtil.span("File does not exist!",
+                                        HtmlUtil.cssClass("errorlabel"));
         }
 
 
-        sb.append(HtmlUtil.formEntry("Path to pqinsert:",
-                                     HtmlUtil.input(getArgId(PROP_LDM_PQINSERT),
-                                         pqinsert, HtmlUtil.SIZE_60)+ldmExtra1));
+        sb.append(
+            HtmlUtil.formEntry(
+                "Path to pqinsert:",
+                HtmlUtil.input(
+                    getArgId(PROP_LDM_PQINSERT), pqinsert,
+                    HtmlUtil.SIZE_60) + ldmExtra1));
         sb.append(HtmlUtil.formEntry("Queue Location:",
                                      HtmlUtil.input(getArgId(PROP_LDM_QUEUE),
-                                         queue, HtmlUtil.SIZE_60)+ldmExtra2));
+                                         queue,
+                                         HtmlUtil.SIZE_60) + ldmExtra2));
         sb.append(HtmlUtil.formEntry("Feed:",
-                                     HtmlUtil.select(getArgId(PROP_LDM_FEED), Misc.toList(LDM_FEED_TYPES),feed)));
-        String tooltip = "macros: ${fromday}  ${frommonth} ${fromyear} ${frommonthname}  <br>" +
-            "${today}  ${tomonth} ${toyear} ${tomonthname} <br> " +
-            "${filename}  ${fileextension}";
-        sb.append(HtmlUtil.formEntry("Product ID:",
-                                     HtmlUtil.input(getArgId(PROP_LDM_PRODUCTID), productId,
-                                         HtmlUtil.SIZE_60+
-                                                    HtmlUtil.title(tooltip))));
+                                     HtmlUtil.select(getArgId(PROP_LDM_FEED),
+                                         Misc.toList(LDM_FEED_TYPES), feed)));
+        String tooltip =
+            "macros: ${fromday}  ${frommonth} ${fromyear} ${frommonthname}  <br>"
+            + "${today}  ${tomonth} ${toyear} ${tomonthname} <br> "
+            + "${filename}  ${fileextension}";
+        sb.append(
+            HtmlUtil.formEntry(
+                "Product ID:",
+                HtmlUtil.input(
+                    getArgId(PROP_LDM_PRODUCTID), productId,
+                    HtmlUtil.SIZE_60 + HtmlUtil.title(tooltip))));
 
         sb.append(HtmlUtil.formTableClose());
     }
@@ -163,37 +175,53 @@ public class LdmAction extends MonitorAction {
     protected void entryMatched(EntryMonitor monitor, Entry entry) {
         try {
             Resource resource = entry.getResource();
-            if(!resource.isFile()) {
-                System.err.println ("Entry is not a file:" + entry);
+            if ( !resource.isFile()) {
+                System.err.println("Entry is not a file:" + entry);
                 return;
             }
             String id = productId.trim();
-            id = monitor.getRepository().getEntryManager().replaceMacros(entry, id);
+            id = monitor.getRepository().getEntryManager().replaceMacros(
+                entry, id);
 
             insertIntoQueue(pqinsert, queue, feed, id, resource.getPath());
-            
+
         } catch (Exception exc) {
             monitor.handleError("Error posting to LDM", exc);
         }
     }
 
-    public static void insertIntoQueue(String pqinsert, String queue, String feed, String productId, String file) throws Exception {
-        if(productId.length()>0) {
-            productId  = " -p \"" + productId  +"\" ";
+    /**
+     * _more_
+     *
+     * @param pqinsert _more_
+     * @param queue _more_
+     * @param feed _more_
+     * @param productId _more_
+     * @param file _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void insertIntoQueue(String pqinsert, String queue,
+                                       String feed, String productId,
+                                       String file)
+            throws Exception {
+        if (productId.length() > 0) {
+            productId = " -p \"" + productId + "\" ";
         }
-        String command = pqinsert+" " +productId +" -f " + feed +" -q " + queue +" " + file;
+        String command = pqinsert + " " + productId + " -f " + feed + " -q "
+                         + queue + " " + file;
         System.err.println("Executing:" + command);
         Process process = Runtime.getRuntime().exec(command);
-        int result = process.waitFor();
-        if(result==0) {
+        int     result  = process.waitFor();
+        if (result == 0) {
             System.err.println("Success");
         } else {
             System.err.println("Failed");
             try {
-                InputStream is = process.getErrorStream();
-                byte[] bytes = IOUtil.readBytes(is);
+                InputStream is    = process.getErrorStream();
+                byte[]      bytes = IOUtil.readBytes(is);
                 System.err.println("Error:" + new String(bytes));
-            } catch(Exception noop) {}
+            } catch (Exception noop) {}
         }
     }
 
@@ -255,21 +283,21 @@ public class LdmAction extends MonitorAction {
     }
 
     /**
-       Set the ProductId property.
-
-       @param value The new value for ProductId
-    **/
-    public void setProductId (String value) {
-	productId = value;
+     *  Set the ProductId property.
+     *
+     *  @param value The new value for ProductId
+     */
+    public void setProductId(String value) {
+        productId = value;
     }
 
     /**
-       Get the ProductId property.
-
-       @return The ProductId
-    **/
-    public String getProductId () {
-	return productId;
+     *  Get the ProductId property.
+     *
+     *  @return The ProductId
+     */
+    public String getProductId() {
+        return productId;
     }
 
 

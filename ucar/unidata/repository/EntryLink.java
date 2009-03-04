@@ -91,70 +91,89 @@ import java.util.zip.*;
  * @version $Revision: 1.3 $
  */
 public class EntryLink {
+
+    /** _more_ */
     private String link;
-    private         String folderBlock;
-    private         String uid;
 
-    public EntryLink(String link, String folderBlock, String uid) {
-        this.link = link;
-        this.folderBlock = folderBlock;
-        this.uid = uid;
-    }
+    /** _more_ */
+    private String folderBlock;
 
-    public String toString() {
-        return  link + HtmlUtil.br() + folderBlock;
-    }
+    /** _more_ */
+    private String uid;
+
     /**
-       Set the Link property.
+     * _more_
+     *
+     * @param link _more_
+     * @param folderBlock _more_
+     * @param uid _more_
+     */
+    public EntryLink(String link, String folderBlock, String uid) {
+        this.link        = link;
+        this.folderBlock = folderBlock;
+        this.uid         = uid;
+    }
 
-       @param value The new value for Link
-    **/
-    public void setLink (String value) {
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String toString() {
+        return link + HtmlUtil.br() + folderBlock;
+    }
+
+    /**
+     *  Set the Link property.
+     *
+     *  @param value The new value for Link
+     */
+    public void setLink(String value) {
         link = value;
     }
 
     /**
-       Get the Link property.
-
-       @return The Link
-    **/
-    public String getLink () {
+     *  Get the Link property.
+     *
+     *  @return The Link
+     */
+    public String getLink() {
         return link;
     }
 
     /**
-       Set the FolderBlock property.
-
-       @param value The new value for FolderBlock
-    **/
-    public void setFolderBlock (String value) {
+     *  Set the FolderBlock property.
+     *
+     *  @param value The new value for FolderBlock
+     */
+    public void setFolderBlock(String value) {
         folderBlock = value;
     }
 
     /**
-       Get the FolderBlock property.
-
-       @return The FolderBlock
-    **/
-    public String getFolderBlock () {
+     *  Get the FolderBlock property.
+     *
+     *  @return The FolderBlock
+     */
+    public String getFolderBlock() {
         return folderBlock;
     }
 
     /**
-       Set the Uid property.
-
-       @param value The new value for Uid
-    **/
-    public void setUid (String value) {
+     *  Set the Uid property.
+     *
+     *  @param value The new value for Uid
+     */
+    public void setUid(String value) {
         uid = value;
     }
 
     /**
-       Get the Uid property.
-
-       @return The Uid
-    **/
-    public String getUid () {
+     *  Get the Uid property.
+     *
+     *  @return The Uid
+     */
+    public String getUid() {
         return uid;
     }
 

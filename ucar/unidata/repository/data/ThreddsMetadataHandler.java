@@ -21,8 +21,6 @@
 
 package ucar.unidata.repository.data;
 
-import ucar.unidata.repository.*;
-
 
 import org.w3c.dom.*;
 
@@ -43,6 +41,8 @@ import ucar.nc2.dataset.NetcdfDataset;
 
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.DateUtil;
@@ -337,16 +337,19 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      * @param entry _more_
      * @param metadataList _more_
      * @param extra _more_
+     * @param shortForm _more_
      */
     public void getInitialMetadata(Request request, Entry entry,
                                    List<Metadata> metadataList,
-                                   Hashtable extra,boolean shortForm) {
+                                   Hashtable extra, boolean shortForm) {
 
         NetcdfDataset dataset = null;
         File          file    = entry.getResource().getFile();
         try {
-            super.getInitialMetadata(request, entry, metadataList, extra,shortForm);
-            if ( !getRepository().getDataOutputHandler().canLoadAsCdm(entry)) {
+            super.getInitialMetadata(request, entry, metadataList, extra,
+                                     shortForm);
+            if ( !getRepository().getDataOutputHandler().canLoadAsCdm(
+                    entry)) {
                 return;
             }
             dataset = NetcdfDataset.openDataset(file.toString());
@@ -379,7 +382,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     continue;
                 }
 
-                if(shortForm) continue;
+                if (shortForm) {
+                    continue;
+                }
                 if (ATTR_KEYWORDS.equals(name)) {
                     for (String keyword : (List<String>) StringUtil.split(
                             value, ";", true, true)) {
@@ -387,7 +392,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                             new Metadata(getRepository().getGUID(),
                                          entry.getId(), TYPE_KEYWORD,
                                          DFLT_INHERITED, keyword, "", "", "");
-                        if(!entry.hasMetadata(metadata)) {
+                        if ( !entry.hasMetadata(metadata)) {
                             metadataList.add(metadata);
                         }
                     }
@@ -400,7 +405,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 Metadata metadata = new Metadata(getRepository().getGUID(),
                                         entry.getId(), TYPE_PROPERTY,
                                         DFLT_INHERITED, name, value, "", "");
-                if(!entry.hasMetadata(metadata)) {
+                if ( !entry.hasMetadata(metadata)) {
                     metadataList.add(metadata);
                 }
             }
@@ -448,14 +453,14 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 }
 
 
-                if(!shortForm) {
+                if ( !shortForm) {
                     String varName = var.getShortName();
-                    Metadata metadata = new Metadata(getRepository().getGUID(),
-                                                     entry.getId(), TYPE_VARIABLE,
-                                                     DFLT_INHERITED, varName,
-                                                     var.getName(), var.getUnitsString(),
-                                                     "");
-                    if(!entry.hasMetadata(metadata)) {
+                    Metadata metadata =
+                        new Metadata(getRepository().getGUID(),
+                                     entry.getId(), TYPE_VARIABLE,
+                                     DFLT_INHERITED, varName, var.getName(),
+                                     var.getUnitsString(), "");
+                    if ( !entry.hasMetadata(metadata)) {
                         metadataList.add(metadata);
                     }
 
@@ -466,11 +471,10 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     if (att != null) {
                         varName = att.getStringValue();
                         metadata = new Metadata(getRepository().getGUID(),
-                                                entry.getId(), TYPE_VARIABLE,
-                                                DFLT_INHERITED, varName,
-                                                var.getName(),
-                                                var.getUnitsString(), "");
-                        if(!entry.hasMetadata(metadata)) {
+                                entry.getId(), TYPE_VARIABLE, DFLT_INHERITED,
+                                varName, var.getName(), var.getUnitsString(),
+                                "");
+                        if ( !entry.hasMetadata(metadata)) {
                             metadataList.add(metadata);
                         }
                     }
@@ -776,7 +780,6 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     /**
      * _more_
      *
-     * @param cols _more_
      *
      * @param request _more_
      * @param entry _more_

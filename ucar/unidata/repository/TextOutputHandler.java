@@ -81,9 +81,9 @@ public class TextOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_TEXT = new OutputType("Annotated Text",
-                                                     "text",
-                                                                OutputType.TYPE_HTML,"",ICON_TEXT);
+    public static final OutputType OUTPUT_TEXT =
+        new OutputType("Annotated Text", "text", OutputType.TYPE_HTML, "",
+                       ICON_TEXT);
 
 
     /**
@@ -106,11 +106,8 @@ public class TextOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param entries _more_
      * @param state _more_
-     * @param types _more_
      * @param links _more_
-     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
@@ -126,12 +123,16 @@ public class TextOutputHandler extends OutputHandler {
         if ( !state.entry.isFile()) {
             return;
         }
-        if (!getRepository().getAccessManager().canAccessFile(request,  state.entry)) {
+        if ( !getRepository().getAccessManager().canAccessFile(request,
+                state.entry)) {
             return;
         }
 
         String   path     = state.entry.getResource().getPath();
-        String[] suffixes = new String[] { ".csv", ".txt", ".java", ".c",".h",".cc",".f90",".cpp",".hh",".cdl",".sh","m4" };
+        String[] suffixes = new String[] {
+            ".csv", ".txt", ".java", ".c", ".h", ".cc", ".f90", ".cpp", ".hh",
+            ".cdl", ".sh", "m4"
+        };
 
         for (int i = 0; i < suffixes.length; i++) {
             if (path.endsWith(suffixes[i])) {
@@ -140,8 +141,8 @@ public class TextOutputHandler extends OutputHandler {
             }
         }
         String suffix = IOUtil.getFileExtension(path);
-        String type = getRepository().getMimeTypeFromSuffix(suffix);
-        if(type!=null && type.startsWith("text/")) {
+        String type   = getRepository().getMimeTypeFromSuffix(suffix);
+        if ((type != null) && type.startsWith("text/")) {
 
             links.add(makeLink(request, state.entry, OUTPUT_TEXT));
         }
@@ -161,8 +162,9 @@ public class TextOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputEntry(Request request, Entry entry) throws Exception {
-        if (!getRepository().getAccessManager().canAccessFile(request,  entry)) {
-            throw new AccessException("Cannot access data",request);
+        if ( !getRepository().getAccessManager().canAccessFile(request,
+                entry)) {
+            throw new AccessException("Cannot access data", request);
         }
 
 

@@ -78,12 +78,19 @@ public class RepositoryClient extends RepositoryBase {
     private String name = "RAMADDA Client";
 
 
+    /** _more_ */
     private String defaultGroupId;
 
+    /** _more_ */
     private String defaultGroupName;
 
+    /** _more_ */
     private String sslPort;
+
+    /** _more_ */
     private String title;
+
+    /** _more_ */
     private String description;
 
     /**
@@ -110,6 +117,11 @@ public class RepositoryClient extends RepositoryBase {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected String getHttpsPort() {
         return sslPort;
     }
@@ -469,7 +481,6 @@ public class RepositoryClient extends RepositoryBase {
     /**
      * _more_
      *
-     * @param groupTreeNode _more_
      *
      * @param parentId _more_
      * @param name _more_
@@ -610,8 +621,13 @@ public class RepositoryClient extends RepositoryBase {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean hasSession() {
-        return sessionId!=null;
+        return sessionId != null;
     }
 
 
@@ -678,20 +694,25 @@ public class RepositoryClient extends RepositoryBase {
 
 
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     private void getInfo() throws Exception {
         String url = HtmlUtil.url(URL_INFO.getFullUrl(),
-                                  new String[] {ARG_RESPONSE,
-                                                RESPONSE_XML});
-        
+                                  new String[] { ARG_RESPONSE,
+                RESPONSE_XML });
+
         String contents = IOUtil.readContents(url, getClass());
         //        System.err.println(contents);
         Element root = XmlUtil.getRoot(contents);
 
-        sslPort = XmlUtil.getGrandChildText(root, TAG_INFO_SSLPORT);
-        title = XmlUtil.getGrandChildText(root, TAG_INFO_TITLE);
+        sslPort     = XmlUtil.getGrandChildText(root, TAG_INFO_SSLPORT);
+        title       = XmlUtil.getGrandChildText(root, TAG_INFO_TITLE);
         description = XmlUtil.getGrandChildText(root, TAG_INFO_DESCRIPTION);
         //        System.err.println (sslPort + "  "+ title +" " + description);
-        if(sslPort!=null) {
+        if (sslPort != null) {
             URL_USER_LOGIN.setNeedsSsl(true);
         } else {
             URL_USER_LOGIN.setNeedsSsl(false);
@@ -792,39 +813,39 @@ public class RepositoryClient extends RepositoryBase {
 
 
     /**
-       Set the DefaultGroup property.
-
-       @param value The new value for DefaultGroup
-    **/
-    public void setDefaultGroupId (String value) {
-	defaultGroupId = value;
+     *  Set the DefaultGroup property.
+     *
+     *  @param value The new value for DefaultGroup
+     */
+    public void setDefaultGroupId(String value) {
+        defaultGroupId = value;
     }
 
     /**
-       Get the DefaultGroup property.
-
-       @return The DefaultGroup
-    **/
-    public String getDefaultGroupId () {
-	return defaultGroupId;
+     *  Get the DefaultGroup property.
+     *
+     *  @return The DefaultGroup
+     */
+    public String getDefaultGroupId() {
+        return defaultGroupId;
     }
 
     /**
-       Set the DefaultGroupName property.
-
-       @param value The new value for DefaultGroupName
-    **/
-    public void setDefaultGroupName (String value) {
-	defaultGroupName = value;
+     *  Set the DefaultGroupName property.
+     *
+     *  @param value The new value for DefaultGroupName
+     */
+    public void setDefaultGroupName(String value) {
+        defaultGroupName = value;
     }
 
     /**
-       Get the DefaultGroupName property.
-
-       @return The DefaultGroupName
-    **/
-    public String getDefaultGroupName () {
-	return defaultGroupName;
+     *  Get the DefaultGroupName property.
+     *
+     *  @return The DefaultGroupName
+     */
+    public String getDefaultGroupName() {
+        return defaultGroupName;
     }
 
 

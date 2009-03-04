@@ -94,15 +94,20 @@ public class OutputType {
     /** _more_ */
     public static final int TYPE_FILE = 1 << 4;
 
+    /** _more_ */
     public static final int TYPE_EDIT = 1 << 5;
 
+    /** _more_ */
     public static final int TYPE_VIEW = 1 << 6;
 
+    /** _more_ */
     public static final int TYPE_TOOLBAR = 1 << 7;
 
 
-    /** _more_          */
-    public static final int TYPE_ALL = TYPE_HTML | TYPE_ACTION | TYPE_NONHTML | TYPE_FILE |TYPE_EDIT |TYPE_VIEW|TYPE_TOOLBAR;
+    /** _more_ */
+    public static final int TYPE_ALL = TYPE_HTML | TYPE_ACTION | TYPE_NONHTML
+                                       | TYPE_FILE | TYPE_EDIT | TYPE_VIEW
+                                       | TYPE_TOOLBAR;
 
 
     /** _more_ */
@@ -147,12 +152,9 @@ public class OutputType {
     /**
      * _more_
      *
-     * @param name _more_
-     * @param output _more_
-     * @param type _more_
-     *
      * @param label _more_
      * @param id _more_
+     * @param type _more_
      */
     public OutputType(String label, String id, int type) {
         this(label, id, type, SUFFIX_NONE, ICON_NULL);
@@ -334,8 +336,15 @@ public class OutputType {
         return type;
     }
 
+    /**
+     * _more_
+     *
+     * @param flag _more_
+     *
+     * @return _more_
+     */
     public boolean isType(int flag) {
-        return (flag&type)!=0;
+        return (flag & type) != 0;
     }
 
     /**
@@ -375,14 +384,29 @@ public class OutputType {
         return isType(TYPE_INTERNAL);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean getIsFile() {
         return isType(TYPE_FILE);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean getIsEdit() {
         return isType(TYPE_EDIT);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean getIsView() {
         return isType(TYPE_VIEW);
     }

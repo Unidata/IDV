@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository.data;
 
 
@@ -35,7 +34,6 @@ import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.WikiUtil;
 
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
@@ -43,6 +41,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.WikiUtil;
 import ucar.unidata.xml.XmlUtil;
 
 import java.sql.PreparedStatement;
@@ -82,17 +81,41 @@ public class OpendapLinkTypeHandler extends GenericTypeHandler {
 
 
 
-    public String xxxgetEntryResourceUrl(Request request, Entry entry) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String xxxgetEntryResourceUrl(Request request, Entry entry)
+            throws Exception {
 
-        String fileTail = IOUtil.stripExtension(getStorageManager().getFileTail(entry))+".html";
-        System.err.println ("getEntry:" + fileTail);
+        String fileTail =
+            IOUtil.stripExtension(getStorageManager().getFileTail(entry))
+            + ".html";
+        System.err.println("getEntry:" + fileTail);
         return HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
                             + fileTail, ARG_ENTRYID, entry.getId());
     }
 
-    public String getResourceUrl(Request request, Entry entry) throws Exception {
-        Resource resource     = entry.getResource();
-        return resource.getPath()+".html";
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getResourceUrl(Request request, Entry entry)
+            throws Exception {
+        Resource resource = entry.getResource();
+        return resource.getPath() + ".html";
     }
 
 }

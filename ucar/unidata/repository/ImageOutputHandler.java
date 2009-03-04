@@ -83,15 +83,18 @@ public class ImageOutputHandler extends OutputHandler {
     /** _more_ */
     public static final OutputType OUTPUT_GALLERY = new OutputType("Gallery",
                                                         "image.gallery",
-                                                                   OutputType.TYPE_HTML,"",ICON_IMAGES);
+                                                        OutputType.TYPE_HTML,
+                                                        "", ICON_IMAGES);
 
     /** _more_ */
     public static final OutputType OUTPUT_PLAYER =
-        new OutputType("Image Player", "image.player", OutputType.TYPE_HTML,"",ICON_IMAGES);
+        new OutputType("Image Player", "image.player", OutputType.TYPE_HTML,
+                       "", ICON_IMAGES);
 
     /** _more_ */
     public static final OutputType OUTPUT_SLIDESHOW =
-        new OutputType("Slideshow", "image.slideshow", OutputType.TYPE_HTML,"",ICON_IMAGES);
+        new OutputType("Slideshow", "image.slideshow", OutputType.TYPE_HTML,
+                       "", ICON_IMAGES);
 
 
 
@@ -116,11 +119,8 @@ public class ImageOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param entries _more_
      * @param state _more_
-     * @param types _more_
      * @param links _more_
-     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
@@ -262,14 +262,16 @@ public class ImageOutputHandler extends OutputHandler {
                 if ( !entry.getResource().isImage()) {
                     continue;
                 }
-                String url =
-                    HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
-                                 + getStorageManager().getFileTail(entry), ARG_ENTRYID,
-                                 entry.getId());
-                String thumburl =
-                    HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
-                                 + getStorageManager().getFileTail(entry), ARG_ENTRYID,
-                                     entry.getId(), ARG_IMAGEWIDTH, "" + 100);
+                String url = HtmlUtil.url(
+                                 request.url(repository.URL_ENTRY_GET) + "/"
+                                 + getStorageManager().getFileTail(
+                                     entry), ARG_ENTRYID, entry.getId());
+                String thumburl = HtmlUtil.url(
+                                      request.url(repository.URL_ENTRY_GET)
+                                      + "/"
+                                      + getStorageManager().getFileTail(
+                                          entry), ARG_ENTRYID, entry.getId(),
+                                              ARG_IMAGEWIDTH, "" + 100);
                 String entryUrl = getEntryLink(request, entry);
                 request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
                 String title = entry.getTypeHandler().getEntryContent(entry,
@@ -310,8 +312,8 @@ public class ImageOutputHandler extends OutputHandler {
                 col++;
 
                 sb.append("<td>");
-                String imgExtra =      XmlUtil.attr(ARG_WIDTH, "400");
-                sb.append(HtmlUtil.img(url, "",imgExtra));
+                String imgExtra = XmlUtil.attr(ARG_WIDTH, "400");
+                sb.append(HtmlUtil.img(url, "", imgExtra));
                 sb.append("<br>\n");
                 sb.append(getEntryLink(request, entry));
                 sb.append(" " + new Date(entry.getStartDate()));
@@ -327,26 +329,31 @@ public class ImageOutputHandler extends OutputHandler {
             String playerTemplate =
                 repository.getResource(PROP_HTML_IMAGEPLAYER);
             String widthAttr = "";
-            int  width = request.get(ARG_WIDTH,600);
-            if(width>0) {
-                widthAttr = HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,""+width);
+            int    width     = request.get(ARG_WIDTH, 600);
+            if (width > 0) {
+                widthAttr = HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "" + width);
             }
-            String imageHtml = "<IMG NAME=\"animation\" BORDER=\"0\" " + widthAttr +HtmlUtil.attr("SRC", firstImage)+" ALT=\"image\">";                                  
+            String imageHtml = "<IMG NAME=\"animation\" BORDER=\"0\" "
+                               + widthAttr + HtmlUtil.attr("SRC", firstImage)
+                               + " ALT=\"image\">";
 
             String tmp = playerTemplate.replace("${imagelist}",
                              sb.toString());
-            tmp = tmp.replace("${imagehtml}",imageHtml);
+            tmp = tmp.replace("${imagehtml}", imageHtml);
             tmp = StringUtil.replace(tmp, "${root}", repository.getUrlBase());
             String fullUrl = "";
-            if(width>0) {
-                request.put(ARG_WIDTH,"0");
-                fullUrl = HtmlUtil.href(request.getUrl(),msg("Use image width"));
+            if (width > 0) {
+                request.put(ARG_WIDTH, "0");
+                fullUrl = HtmlUtil.href(request.getUrl(),
+                                        msg("Use image width"));
             } else {
-                request.put(ARG_WIDTH,"600");
-                fullUrl = HtmlUtil.href(request.getUrl(),msg("Use fixed width"));
+                request.put(ARG_WIDTH, "600");
+                fullUrl = HtmlUtil.href(request.getUrl(),
+                                        msg("Use fixed width"));
             }
-            
-            sb  = new StringBuffer(HtmlUtil.leftRight(getSortLinks(request),fullUrl));
+
+            sb = new StringBuffer(HtmlUtil.leftRight(getSortLinks(request),
+                    fullUrl));
             sb.append(tmp);
         } else if (output.equals(OUTPUT_SLIDESHOW)) {
             String template = repository.getResource(PROP_HTML_SLIDESHOW);

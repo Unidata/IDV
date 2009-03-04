@@ -46,8 +46,14 @@ public class ApiMethod {
 
     /** _more_ */
     public static final String ATTR_REQUEST = "request";
+
+    /** _more_ */
     public static final String ATTR_NEEDS_SSL = "needs_ssl";
+
+    /** _more_ */
     public static final String ATTR_CHECKAUTHMETHOD = "checkauthmethod";
+
+    /** _more_ */
     public static final String ATTR_AUTHMETHOD = "authmethod";
 
     /** _more_ */
@@ -108,9 +114,14 @@ public class ApiMethod {
     /** _more_ */
     private RequestUrl url;
 
-    
+
+    /** _more_ */
     private boolean needsSsl = false;
+
+    /** _more_ */
     private boolean checkAuthMethod = false;
+
+    /** _more_ */
     private String authMethod;
 
 
@@ -125,28 +136,37 @@ public class ApiMethod {
      * @param name _more_
      * @param method _more_
      * @param mustBeAdmin _more_
+     * @param needsSsl _more_
+     * @param authMethod _more_
+     * @param checkAuthMethod _more_
      * @param canCache _more_
      * @param isTopLevel _more_
      */
     public ApiMethod(Repository repository, RequestHandler requestHandler,
                      String request, String name, Method method,
-                     boolean mustBeAdmin, boolean needsSsl, String authMethod,boolean checkAuthMethod, boolean canCache,
-                     boolean isTopLevel) {
-        this.repository     = repository;
-        this.requestHandler = requestHandler;
-        this.request        = request;
-        this.name           = name;
-        this.mustBeAdmin    = mustBeAdmin;
-        this.needsSsl       = needsSsl;
-        this.authMethod     = authMethod;
-        this.checkAuthMethod     = checkAuthMethod;
-        
-        this.method         = method;
-        this.canCache       = canCache;
-        this.isTopLevel     = isTopLevel;
+                     boolean mustBeAdmin, boolean needsSsl,
+                     String authMethod, boolean checkAuthMethod,
+                     boolean canCache, boolean isTopLevel) {
+        this.repository      = repository;
+        this.requestHandler  = requestHandler;
+        this.request         = request;
+        this.name            = name;
+        this.mustBeAdmin     = mustBeAdmin;
+        this.needsSsl        = needsSsl;
+        this.authMethod      = authMethod;
+        this.checkAuthMethod = checkAuthMethod;
+
+        this.method          = method;
+        this.canCache        = canCache;
+        this.isTopLevel      = isTopLevel;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isWildcard() {
         return request.endsWith("/*");
     }
@@ -349,59 +369,59 @@ public class ApiMethod {
     }
 
 
-/**
-Set the NeedsSsl property.
+    /**
+     * Set the NeedsSsl property.
+     *
+     * @param value The new value for NeedsSsl
+     */
+    public void setNeedsSsl(boolean value) {
+        this.needsSsl = value;
+    }
 
-@param value The new value for NeedsSsl
-**/
-public void setNeedsSsl (boolean value) {
-	this.needsSsl = value;
-}
+    /**
+     * Get the NeedsSsl property.
+     *
+     * @return The NeedsSsl
+     */
+    public boolean getNeedsSsl() {
+        return this.needsSsl;
+    }
 
-/**
-Get the NeedsSsl property.
+    /**
+     * Set the CheckAuthMethod property.
+     *
+     * @param value The new value for CheckAuthMethod
+     */
+    public void setCheckAuthMethod(boolean value) {
+        this.checkAuthMethod = value;
+    }
 
-@return The NeedsSsl
-**/
-public boolean getNeedsSsl () {
-	return this.needsSsl;
-}
+    /**
+     * Get the CheckAuthMethod property.
+     *
+     * @return The CheckAuthMethod
+     */
+    public boolean getCheckAuthMethod() {
+        return this.checkAuthMethod;
+    }
 
-/**
-Set the CheckAuthMethod property.
+    /**
+     * Set the AuthMethod property.
+     *
+     * @param value The new value for AuthMethod
+     */
+    public void setAuthMethod(String value) {
+        this.authMethod = value;
+    }
 
-@param value The new value for CheckAuthMethod
-**/
-public void setCheckAuthMethod (boolean value) {
-	this.checkAuthMethod = value;
-}
-
-/**
-Get the CheckAuthMethod property.
-
-@return The CheckAuthMethod
-**/
-public boolean getCheckAuthMethod () {
-	return this.checkAuthMethod;
-}
-
-/**
-Set the AuthMethod property.
-
-@param value The new value for AuthMethod
-**/
-public void setAuthMethod (String value) {
-	this.authMethod = value;
-}
-
-/**
-Get the AuthMethod property.
-
-@return The AuthMethod
-**/
-public String getAuthMethod () {
-	return this.authMethod;
-}
+    /**
+     * Get the AuthMethod property.
+     *
+     * @return The AuthMethod
+     */
+    public String getAuthMethod() {
+        return this.authMethod;
+    }
 
 
 }

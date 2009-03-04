@@ -681,7 +681,7 @@ public class Metadata implements Constants {
         }
         Metadata that = (Metadata) o;
         /*
-        System.err.println(Misc.equals(this.type,  that.type) + " " +
+//        System.err.println(Misc.equals(this.type,  that.type) + " " +
             Misc.equals(this.attr1, that.attr1) + " " +
             Misc.equals(this.attr2, that.attr2) + " " +
             Misc.equals(this.attr3, that.attr3) + " " +

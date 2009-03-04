@@ -49,13 +49,14 @@ import java.util.UUID;
 public class RepositoryBase implements Constants, RepositorySource {
 
 
-    /** _more_          */
+    /** _more_ */
     public final RequestUrl URL_HELP = new RequestUrl(this,
                                            "/help/index.html");
 
-    /** _more_          */
+    /** _more_ */
     public final RequestUrl URL_PING = new RequestUrl(this, "/ping");
 
+    /** _more_ */
     public final RequestUrl URL_INFO = new RequestUrl(this, "/info");
 
     /** _more_ */
@@ -170,7 +171,7 @@ public class RepositoryBase implements Constants, RepositorySource {
     public final RequestUrl URL_ENTRY_NEW = new RequestUrl(this,
                                                 "/entry/new", "New Entry");
 
-    /** _more_          */
+    /** _more_ */
     public final RequestUrl URL_ENTRY_UPLOAD = new RequestUrl(this,
                                                    "/entry/upload",
                                                    "Upload a file");
@@ -190,7 +191,7 @@ public class RepositoryBase implements Constants, RepositorySource {
                                                  "/user/login");
 
 
-    /** _more_          */
+    /** _more_ */
     public final RequestUrl URL_USER_FAVORITE = new RequestUrl(this,
                                                     "/user/favorite");
 
@@ -216,7 +217,7 @@ public class RepositoryBase implements Constants, RepositorySource {
     public final RequestUrl URL_USER_HOME = new RequestUrl(this,
                                                 "/user/home", "User Home");
 
-    /** _more_          */
+    /** _more_ */
     public final RequestUrl URL_USER_PROFILE = new RequestUrl(this,
                                                    "/user/profile",
                                                    "User Profile");
@@ -271,15 +272,23 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
-    public static final String DEFAULT_TIME_SHORTFORMAT = "yyyy/MM/dd HH:mm z";
-    public static final String DEFAULT_TIME_THISYEARFORMAT = "yyyy/MM/dd HH:mm z";
+
+    /** _more_ */
+    public static final String DEFAULT_TIME_SHORTFORMAT =
+        "yyyy/MM/dd HH:mm z";
+
+    /** _more_ */
+    public static final String DEFAULT_TIME_THISYEARFORMAT =
+        "yyyy/MM/dd HH:mm z";
 
 
     /** _more_ */
     protected SimpleDateFormat sdf;
 
+    /** _more_ */
     protected SimpleDateFormat displaySdf;
 
+    /** _more_ */
     protected SimpleDateFormat thisYearSdf;
 
 
@@ -303,7 +312,6 @@ public class RepositoryBase implements Constants, RepositorySource {
     /**
      * _more_
      *
-     * @param hostname _more_
      * @param port _more_
      *
      * @throws Exception _more_
@@ -359,7 +367,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      */
     public String formatDate(Date d) {
         if (sdf == null) {
-            sdf = makeSDF(getProperty(PROP_DATE_FORMAT,DEFAULT_TIME_FORMAT));
+            sdf = makeSDF(getProperty(PROP_DATE_FORMAT, DEFAULT_TIME_FORMAT));
         }
         if (d == null) {
             return BLANK;
@@ -410,16 +418,32 @@ public class RepositoryBase implements Constants, RepositorySource {
 
 
 
-    public void initRequestUrl(RequestUrl requestUrl) {
-    }
+    /**
+     * _more_
+     *
+     * @param requestUrl _more_
+     */
+    public void initRequestUrl(RequestUrl requestUrl) {}
 
+    /**
+     * _more_
+     *
+     * @param requestUrl _more_
+     *
+     * @return _more_
+     */
     public String getUrlPath(RequestUrl requestUrl) {
         return getUrlBase() + requestUrl.getPath();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected String getHttpsPort() {
         return getProperty(PROP_SSL_PORT, "").trim();
-   }
+    }
 
     /**
      * _more_
@@ -429,8 +453,8 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @return _more_
      */
     public String httpsUrl(String url) {
-        String port= getHttpsPort();
-        if (port!=null && port.length() == 0) {
+        String port = getHttpsPort();
+        if ((port != null) && (port.length() == 0)) {
             return "http://" + getHostname() + ":" + getPort() + url;
             //            return url;
             //            throw new IllegalStateException("Do not have ssl port defined");

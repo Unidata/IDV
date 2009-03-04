@@ -56,10 +56,10 @@ public class Group extends Entry {
     private List<Group> children = new ArrayList<Group>();
 
 
-    /** _more_          */
+    /** _more_ */
     List<Group> subGroups;
 
-    /** _more_          */
+    /** _more_ */
     List<Entry> subEntries;
 
     /**

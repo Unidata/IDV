@@ -119,11 +119,8 @@ public class CalendarOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param entries _more_
      * @param state _more_
-     * @param types _more_
      * @param links _more_
-     * @param forHeader _more_
      *
      *
      * @throws Exception _more_
@@ -461,8 +458,9 @@ public class CalendarOutputHandler extends OutputHandler {
                         label = label.substring(0, 19) + "...";
                     }
                     dayList.add(
-                                HtmlUtil.nobr(
-                                              getEntryManager().getAjaxLink(request, entry, label).toString()));
+                        HtmlUtil.nobr(
+                            getEntryManager().getAjaxLink(
+                                request, entry, label).toString()));
                 }
                 didone = true;
             }
@@ -578,7 +576,8 @@ public class CalendarOutputHandler extends OutputHandler {
 
         if (doDay) {
             StringBuffer tmp = new StringBuffer();
-            String link = getEntriesList(request, tmp, dayItems,  true,  true, true, false);
+            String link = getEntriesList(request, tmp, dayItems, true, true,
+                                         true, false);
 
             request.remove(ARG_MONTH);
             request.remove(ARG_YEAR);
@@ -649,9 +648,8 @@ public class CalendarOutputHandler extends OutputHandler {
                     }
                     String dayContents = "&nbsp;";
                     if (inner != null) {
-                        dayContents = HtmlUtil.div(
-                                                   StringUtil.join("", inner),
-                                                   HtmlUtil.cssClass("calcontents"));
+                        dayContents = HtmlUtil.div(StringUtil.join("",
+                                inner), HtmlUtil.cssClass("calcontents"));
                     }
                     content =
                         "<table border=0 cellspacing=\"0\" cellpadding=\"2\" width=100%><tr valign=top><td>"
