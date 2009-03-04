@@ -156,6 +156,11 @@ public class ImageGenerator extends IdvManager {
     /** macro property */
     public static final String PROP_IMAGEPATH = "imagepath";
 
+
+    public static final String PROP_FILE = "file";
+    public static final String PROP_FILETAIL = "filetail";
+    public static final String PROP_FILEPREFIX = "fileprefix";
+
     /** macro property */
     public static final String PROP_CONTENTS = "contents";
 
@@ -228,6 +233,8 @@ public class ImageGenerator extends IdvManager {
 
     /** isl tag */
     public static final String TAG_CLIP = "clip";
+
+    public static final String TAG_PUBLISH = "publish";
 
     /** isl tag */
     public static final String TAG_DISPLAY = "display";
@@ -1434,7 +1441,10 @@ public class ImageGenerator extends IdvManager {
         pushProperties();
         for (int i = 0; i < files.size(); i++) {
             try {
-                putProperty("file", files.get(i).toString());
+                putProperty(PROP_FILE, files.get(i).toString());
+                String tail  = IOUtil.getFileTail(files.get(i).toString());
+                putProperty(PROP_FILETAIL, tail);
+                putProperty(PROP_FILEPREFIX, IOUtil.stripExtension(tail));
                 if ( !processChildren(node)) {
                     return false;
                 }
@@ -3892,6 +3902,9 @@ public class ImageGenerator extends IdvManager {
             } else if (tagName.equals(TAG_WRITE)) {
                 ImageUtils.writeImageToFile(
                     image, getImageFileName(applyMacros(child, ATTR_FILE)));
+
+            } else if (tagName.equals(TAG_PUBLISH)) {
+                getIdv().getPublishManager().publishIslImage(this, node, image);
             } else if (tagName.equals(TAG_CLIP)) {
                 int[] ul;
                 int[] lr;

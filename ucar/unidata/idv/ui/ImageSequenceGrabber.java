@@ -1606,9 +1606,23 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         } else {
                             comp = viewManager.getContents();
                         }
+
+                           
                         Dimension dim   = comp.getSize();
                         Point     loc   = comp.getLocationOnScreen();
-                        Robot     robot = new Robot();
+                        GraphicsConfiguration gc = comp.getGraphicsConfiguration();
+                        Robot robot = new Robot(gc.getDevice());
+                    
+                        System.err.println ("gc:" + gc + " " + gc.getBounds());
+                        if(gc.getBounds().x>0 || gc.getBounds().y>0) {
+                            System.err.println("Offsetting location:" + loc +" by gc bounds: " + gc.getBounds().x + " " + 
+                                               gc.getBounds().y);
+                            loc.x-= gc.getBounds().x;
+                            loc.y-= gc.getBounds().y;
+                            System.err.println("new location:" + loc);
+                        }
+
+                        //                        Robot     robot = new Robot();
                         BufferedImage image =
                             robot.createScreenCapture(new Rectangle(loc.x,
                                 loc.y, dim.width, dim.height));
