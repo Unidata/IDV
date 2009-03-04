@@ -44,6 +44,7 @@ import ucar.unidata.idv.control.drawing.DrawingGlyph;
 import ucar.unidata.idv.control.drawing.FrontGlyph;
 import ucar.unidata.idv.control.drawing.HighLowGlyph;
 
+import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 
@@ -55,7 +56,7 @@ import ucar.unidata.xml.XmlUtil;
 
 
 import ucar.visad.display.FrontDrawer;
-
+import java.text.SimpleDateFormat;
 
 
 import visad.*;
@@ -90,6 +91,9 @@ import javax.swing.event.*;
  * @version $Revision: 1.15 $
  */
 public class FrontDataSource extends FilesDataSource {
+
+
+    private static final String TIME_FORMAT =  "yyyy_MM_dd_HH_mm";
 
 
     /** Property to show the time selection window */
@@ -131,6 +135,9 @@ public class FrontDataSource extends FilesDataSource {
 
     /** When we parse the file this holds any warnings */
     private List warnings;
+
+
+    private  SimpleDateFormat sdf;
 
 
     /** for parsing */
@@ -620,21 +627,31 @@ public class FrontDataSource extends FilesDataSource {
 
         //        sb.append("\tTYPE:" + type +" toks: " + toks+"\n");
         StringBuffer dttms = new StringBuffer();
+
+
         if (validTime != null) {
+            if(sdf == null) {
+                sdf = new SimpleDateFormat();
+                sdf.applyPattern(TIME_FORMAT);
+                sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+            }
+
+
             GregorianCalendar cal = new GregorianCalendar();
             cal.setTime(validTime);
+            dttms.append(" " + DrawingGlyph.ATTR_TIMEFORMAT + "=\"" + TIME_FORMAT+"\" ");
+
             dttms.append(" " + DrawingGlyph.ATTR_TIMES + "=\"");
 
             int delta = (int) (60 * timeWindow / 2);
 
             cal.add(java.util.Calendar.MINUTE, -delta);
-            dttms.append(new DateTime(cal.getTime()).toString());
+            dttms.append(sdf.format(cal.getTime()));
             dttms.append(",");
 
 
             cal.add(java.util.Calendar.MINUTE, 2 * delta);
-            dttms.append(new DateTime(cal.getTime()).toString());
-
+            dttms.append(sdf.format(cal.getTime()));
 
             dttms.append("\" ");
         }
