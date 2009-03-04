@@ -127,6 +127,10 @@ public abstract class IdvPublisher implements Cloneable {
     }
 
 
+    public void publishIslImage(Element tag, Image image) {
+    }
+
+
     public void doPublish() {
     }
 

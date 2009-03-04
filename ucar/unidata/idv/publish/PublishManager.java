@@ -138,6 +138,7 @@ public class PublishManager extends IdvManager {
     }
 
 
+
     public JComboBox makeSelector() {
         if(!isPublishingEnabled()) return null;
         JComboBox cbx = new JComboBox();
@@ -153,6 +154,16 @@ public class PublishManager extends IdvManager {
         IdvPublisher publisher = (IdvPublisher) box.getSelectedItem();
         publisher.publishContent(file, fromViewmanager);
     }
+
+    public void publishIslImage(ImageGenerator imageGenerator, Element tag, Image image) {
+        String id = XmlUtil.getAttribute(tag,"publisherid",(String)null);
+        for(IdvPublisher publisher: publishers) {
+            if(id == null || Misc.equals(id, publisher.getName())) {
+                publisher.publishIslImage(tag, image);
+            }
+        }
+    }
+
 
     private void  updatePublishers(boolean andWrite) {
         if(andWrite) {
