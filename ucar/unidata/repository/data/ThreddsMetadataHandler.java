@@ -344,7 +344,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                    Hashtable extra, boolean shortForm) {
 
         NetcdfDataset dataset = null;
-        File          file    = entry.getResource().getFile();
+        File          file    = entry.getFile();
         try {
             super.getInitialMetadata(request, entry, metadataList, extra,
                                      shortForm);

@@ -763,6 +763,13 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+    public File getFile(Entry entry)  {
+        System.err.println("TypeHandler getFile");
+        return entry.getResource().getTheFile();
+    }
+
+
+
     /**
      * _more_
      *
@@ -864,7 +871,7 @@ public class TypeHandler extends RepositoryManager {
 
                         resourceLink =
                             resourceLink + HtmlUtil.space(2)
-                            + entry.getResource().getFile().length()
+                            + entry.getResource().getFileSize()
                             + HtmlUtil.space(1) + msg("bytes");
 
                     }
@@ -874,7 +881,7 @@ public class TypeHandler extends RepositoryManager {
 
                 if (entry.isFile()) {
                     //                    sb.append(HtmlUtil.formEntry(msgLabel("Size"),
-                    //                            entry.getResource().getFile().length()
+                    //                            entry.getResource().getFileSize()
                     //                            + HtmlUtil.space(1) + msg("bytes")));
                 }
             }

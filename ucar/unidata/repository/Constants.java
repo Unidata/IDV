@@ -1236,6 +1236,9 @@ public interface Constants {
     public static final String PROP_UPLOAD_MAXSIZEGB =
         "ramadda.upload.maxsizegb";
 
+    public static final String PROP_CACHE_MAXSIZEGB =
+        "ramadda.cache.maxsizegb";
+
     /** _more_ */
     public static final String PROP_USER_RESET_ID_SUBJECT =
         "ramadda.user.reset.id.subject";

@@ -167,9 +167,7 @@ public class TextOutputHandler extends OutputHandler {
             throw new AccessException("Cannot access data", request);
         }
 
-
-
-        String contents  = IOUtil.readContents(entry.getResource().getFile());
+        String contents  = IOUtil.readContents(entry.getFile());
         StringBuffer sb  = new StringBuffer();
         int          cnt = 0;
         sb.append("<pre>");

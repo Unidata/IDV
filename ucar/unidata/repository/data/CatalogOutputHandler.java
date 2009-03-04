@@ -533,7 +533,7 @@ public class CatalogOutputHandler extends OutputHandler {
     public void addServices(Entry entry, Request request,
                             CatalogInfo catalogInfo, Element dataset)
             throws Exception {
-        File   f    = entry.getResource().getFile();
+        File   f    = entry.getFile();
         String path = f.toString();
         path = path.replace("\\", "/");
 
@@ -604,7 +604,7 @@ public class CatalogOutputHandler extends OutputHandler {
     public void outputEntry(Entry entry, Request request,
                             CatalogInfo catalogInfo, Element parent)
             throws Exception {
-        File   f    = entry.getResource().getFile();
+        File   f    = entry.getFile();
         String path = f.toString();
         path = path.replace("\\", "/");
         Element dataset = XmlUtil.create(catalogInfo.doc, TAG_DATASET,

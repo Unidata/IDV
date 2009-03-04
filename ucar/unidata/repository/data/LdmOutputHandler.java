@@ -237,7 +237,7 @@ public class LdmOutputHandler extends OutputHandler {
             sb.append(HtmlUtil.formTable());
 
             if (fileEntries.size() == 1) {
-                File f = fileEntries.get(0).getResource().getFile();
+                File f = fileEntries.get(0).getFile();
                 String fileTail =
                     getStorageManager().getFileTail(fileEntries.get(0));
                 String size = " (" + f.length() + " bytes)";
@@ -245,7 +245,7 @@ public class LdmOutputHandler extends OutputHandler {
             } else {
                 int size = 0;
                 for (Entry entry : fileEntries) {
-                    size += entry.getResource().getFile().length();
+                    size += entry.getFile().length();
                 }
                 sb.append(HtmlUtil.formEntry("Files:",
                                              fileEntries.size()

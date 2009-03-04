@@ -1535,7 +1535,7 @@ return new Result(title, sb);
 
         if (entry.isFile()) {
             File newFile = getStorageManager().moveToStorage(request,
-                               entry.getResource().getFile(), "");
+                               entry.getResource().getTheFile(), "");
             entry.getResource().setPath(newFile.toString());
         }
 
@@ -1714,8 +1714,6 @@ return new Result(title, sb);
             return new Result(AuthorizationMethod.AUTH_HTTP);
         }
 
-
-
         String entryId = (String) request.getId((String) null);
 
         if (entryId == null) {
@@ -1736,9 +1734,10 @@ return new Result(title, sb);
         }
 
         String path = entry.getResource().getPath();
+
         String mimeType = getRepository().getMimeTypeFromSuffix(
                               IOUtil.getFileExtension(
-                                  entry.getResource().getPath()));
+                                                      path));
 
 
         if (request.defined(ARG_IMAGEWIDTH) && ImageUtils.isImage(path)) {
@@ -1759,8 +1758,9 @@ return new Result(title, sb);
                               IOUtil.getInputStream(thumb, getClass()),
                               mimeType);
         } else {
+            System.err.println ("getting the file:" +entry.getFile().toString());
             InputStream inputStream =
-                IOUtil.getInputStream(entry.getResource().getPath(),
+                IOUtil.getInputStream(entry.getFile().toString(),
                                       getClass());
 
             Result result = new Result(BLANK, inputStream, mimeType);
@@ -2146,10 +2146,10 @@ return new Result(title, sb);
                 if (newResource.isFile()) {
                     String newFileName =
                         getStorageManager().getFileTail(
-                            oldEntry.getResource().getFile().getName());
+                            oldEntry.getResource().getTheFile().getName());
                     String newFile =
                         getStorageManager().copyToStorage(request,
-                            oldEntry.getResource().getFile(),
+                            oldEntry.getResource().getTheFile(),
                             getRepository().getGUID() + "_"
                             + newFileName).toString();
                     newResource.setPath(newFile);

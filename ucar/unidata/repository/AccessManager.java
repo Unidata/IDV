@@ -415,6 +415,9 @@ public class AccessManager extends RepositoryManager {
         if (entry == null) {
             return false;
         }
+
+
+        //        System.err.println ("type: " + entry.getTypeHandler().getClass().getName());
         if ( !entry.getTypeHandler().canDownload(request, entry)) {
             return false;
         }
@@ -441,7 +444,7 @@ public class AccessManager extends RepositoryManager {
         if ((entry.getResource() != null)
                 && Misc.equals(entry.getResource().getType(),
                                Resource.TYPE_FILE)) {
-            if ( !entry.getResource().getFile().exists()) {
+            if ( !entry.getResource().getTheFile().exists()) {
                 return null;
             }
         }

@@ -403,7 +403,7 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    private boolean canLoadEntry(Entry entry) {
+    private boolean canLoadEntry(Entry entry)  {
         String url = entry.getResource().getPath();
         if (url == null) {
             return false;
@@ -417,8 +417,13 @@ public class DataOutputHandler extends OutputHandler {
         if (entry.isGroup()) {
             return false;
         }
+
+        if (entry.getResource().isRemoteFile()) {
+            return true;
+        }
+
         if (entry.getResource().isFileType()) {
-            return entry.getResource().getFile().exists();
+            return entry.getFile().exists();
         }
         if ( !entry.getResource().isUrl()) {
             return false;
@@ -441,6 +446,7 @@ public class DataOutputHandler extends OutputHandler {
      */
     public boolean canLoadAsCdm(Entry entry) {
         if ( !entry.isFile()) {
+            System.err.println ("CDM: isn't a file");
             return false;
         }
         if (cannotLoad(entry, TYPE_CDM)) {
@@ -453,12 +459,19 @@ public class DataOutputHandler extends OutputHandler {
                 return true;
             }
         }
+
+
+        if(entry.getResource().isRemoteFile()) {
+            String path = entry.getResource().getPath();
+            if(path.endsWith(".nc")) return true;
+        }
+
         Boolean b = (Boolean) cdmEntries.get(entry.getId());
         if (b == null) {
             boolean ok = false;
             if (canLoadEntry(entry)) {
                 try {
-                    String path = entry.getResource().getPath();
+                    String path = entry.getFile().toString();
                     //Exclude zip files becase canOpen tries to unzip them (?)
                     if ( !(path.endsWith(".zip"))) {
                         ok = NetcdfDataset.canOpen(path);
@@ -665,7 +678,7 @@ public class DataOutputHandler extends OutputHandler {
                 ok = false;
             } else {
                 try {
-                    File file = entry.getResource().getFile();
+                    File file = entry.getFile();
                     //TODO: What is the performance hit here? Is this the best way to find out if we can serve this file
                     //Use openFile
                     GridDataset gds = GridDataset.open(file.toString());
@@ -728,7 +741,7 @@ public class DataOutputHandler extends OutputHandler {
                                     msg("Add full metadata")));
         }
         NetcdfDataset dataset =
-            getNetcdfDataset(entry.getResource().getFile());
+            getNetcdfDataset(entry.getFile());
         if (dataset == null) {
             sb.append("Could not open dataset");
         } else {
@@ -1774,8 +1787,10 @@ public class DataOutputHandler extends OutputHandler {
                 throws DAP2Exception, IOException, ParseException {
             HttpServletRequest request = preq.getRequest();
             String             reqPath = entry.getName();
-            String location = entry.getResource().getFile().toString();
+
+            String location = null;
             try {
+                location = entry.getFile().toString();
                 List<Metadata> metadataList =
                     getMetadataManager().getMetadata(entry);
                 for (Metadata metadata : metadataList) {

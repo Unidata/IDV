@@ -149,7 +149,7 @@ public class Resource {
      *
      * @return _more_
      */
-    public File getFile() {
+    public File getTheFile() {
         if (file == null) {
             file = new File(path);
         }
@@ -159,7 +159,7 @@ public class Resource {
 
     public long getFileSize() {
         if(fileSize>=0) return fileSize;
-        return getFile().length();
+        return getTheFile().length();
     }
 
     /**
@@ -168,9 +168,13 @@ public class Resource {
      * @return _more_
      */
     public boolean isFile() {
+        if (type.equals(TYPE_REMOTE_FILE)) {
+            return true;
+        }
+
         if (type.equals(TYPE_FILE) || type.equals(TYPE_STOREDFILE)
                 || type.equals(TYPE_LOCAL_FILE) || type.equals(TYPE_REMOTE_FILE)) {
-            return getFile().exists();
+            return getTheFile().exists();
         }
         return false;
     }
@@ -205,6 +209,10 @@ public class Resource {
      */
     public boolean isUrl() {
         return type.equals(TYPE_URL);
+    }
+
+    public boolean isRemoteFile() {
+        return type.equals(TYPE_REMOTE_FILE);
     }
 
     /**

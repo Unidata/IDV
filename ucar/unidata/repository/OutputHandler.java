@@ -1154,8 +1154,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         sb.append(link.getLink());
         sb.append("</td><td align=right class=entryrowlabel>");
         if (entry.getResource().isFile()) {
-            File f = entry.getResource().getFile();
-            //            sb.append(formatFileLength(f.length()));
+            //            sb.append(formatFileLength(entry.getResource().getFileSize()));
         }
         sb.append(getRepository().formatDateShort(request,
                 new Date(entry.getStartDate())));

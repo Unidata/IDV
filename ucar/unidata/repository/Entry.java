@@ -151,6 +151,10 @@ public class Entry extends Entity {
     }
 
 
+    public File getFile() {
+        return getTypeHandler().getFile(this);
+    }
+
 
 
     /**

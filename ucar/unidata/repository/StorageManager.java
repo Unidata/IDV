@@ -114,6 +114,11 @@ public class StorageManager extends RepositoryManager {
     /** _more_ */
     private String anonymousDir;
 
+    private String cacheDir;
+
+    private long cacheDirSize = -1;
+
+
     /** _more_ */
     private String uploadDir;
 
@@ -288,6 +293,36 @@ public class StorageManager extends RepositoryManager {
         }
         return anonymousDir;
     }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getCacheDir() {
+        if (cacheDir == null) {
+            cacheDir = IOUtil.joinDir(getStorageDir(), "cache");
+            IOUtil.makeDirRecursive(new File(cacheDir));
+        }
+        return cacheDir;
+    }
+
+    private void checkCacheDirSize() {
+        if(cacheDirSize>0) return;
+        File[] files      = new File(storageDir).listFiles();
+        long   size       = 0;
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isHidden()) {
+                continue;
+            }
+            size += files[i].length();
+        }
+        cacheDirSize = size;
+        if(cacheDirSize>xxx
+
+    }
+
 
 
     /**
@@ -619,6 +654,11 @@ public class StorageManager extends RepositoryManager {
         String filePath = entry.getResource().getPath();
         filePath = filePath.replace("\\", "/");
         RepositoryUtil.checkFilePath(filePath);
+
+        if (entry.getResource().isRemoteFile()) {
+            return true;
+        }
+
         if (entry.getIsLocalFile()) {
             return true;
         }
@@ -642,7 +682,7 @@ public class StorageManager extends RepositoryManager {
      */
     public void removeFile(Resource resource) {
         if (resource.isStoredFile()) {
-            resource.getFile().delete();
+            resource.getTheFile().delete();
         }
     }
 
