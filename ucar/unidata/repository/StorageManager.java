@@ -308,20 +308,41 @@ public class StorageManager extends RepositoryManager {
         return cacheDir;
     }
 
-    private void checkCacheDirSize() {
-        if(cacheDirSize>0) return;
-        File[] files      = new File(storageDir).listFiles();
-        long   size       = 0;
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].isHidden()) {
-                continue;
-            }
-            size += files[i].length();
-        }
-        cacheDirSize = size;
-        if(cacheDirSize>xxx
 
+    public void notifyWroteToCache(File f) {
+        File[] files      = null;
+        synchronized(getCacheDir()) {
+            //Calculate the size the first time
+            if(cacheDirSize<0) {
+                files   = new File(getCacheDir()).listFiles();
+                long   size       = 0;
+                for (int i = 0; i < files.length; i++) {
+                    if (files[i].isHidden()) {
+                        continue;
+                    }
+                    size += files[i].length();
+                }
+                cacheDirSize = size;
+            } else {
+                cacheDirSize+=f.length();
+            }
+            double sizeThreshold =
+                getRepository().getProperty(PROP_CACHE_MAXSIZEGB, 10.0)*1000 * 1000 * 1000;
+            if (cacheDirSize > sizeThreshold) {
+                files   = new File(getCacheDir()).listFiles();
+                files =IOUtil.sortFilesOnAge(files, false);
+                for(int i=0;i<files.length;i++) {
+                    cacheDirSize-=files[i].length();
+                    files[i].delete();
+                    if (cacheDirSize < sizeThreshold*0.8) {
+                        break;
+                    }
+                }
+            }
+
+        }
     }
+
 
 
 

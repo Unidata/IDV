@@ -859,6 +859,7 @@ public class TypeHandler extends RepositoryManager {
                 if (entry.getResource().isUrl()) {
                     resourceLink = getResourceUrl(request, entry);
                     resourceLink = HtmlUtil.href(resourceLink, resourceLink);
+                    
                 } else if (entry.getResource().isFile()) {
                     int idx = resourceLink.indexOf("_");
                     if (idx >= 0) {
@@ -869,12 +870,14 @@ public class TypeHandler extends RepositoryManager {
                             HtmlUtil.href(getEntryResourceUrl(request,
                                 entry), resourceLink);
 
-                        resourceLink =
-                            resourceLink + HtmlUtil.space(2)
-                            + entry.getResource().getFileSize()
-                            + HtmlUtil.space(1) + msg("bytes");
-
                     }
+                }
+                if(entry.getResource().getFileSize()>0) {
+                    resourceLink =
+                        resourceLink + HtmlUtil.space(2)
+                        + entry.getResource().getFileSize()
+                        + HtmlUtil.space(1) + msg("bytes");
+
                 }
                 sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
                                              resourceLink));

@@ -446,7 +446,6 @@ public class DataOutputHandler extends OutputHandler {
      */
     public boolean canLoadAsCdm(Entry entry) {
         if ( !entry.isFile()) {
-            System.err.println ("CDM: isn't a file");
             return false;
         }
         if (cannotLoad(entry, TYPE_CDM)) {
