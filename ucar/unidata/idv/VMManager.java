@@ -549,7 +549,7 @@ public class VMManager extends IdvManager {
     /**
      *  Iterate through all of the ViewManager-s and tell each on to setMasterActive
      */
-    protected void setDisplayMastersActive() {
+    public void setDisplayMastersActive() {
         synchronized (viewManagers) {
             for (int i = 0; i < viewManagers.size(); i++) {
                 ((ViewManager) viewManagers.get(i)).setMasterActive(true);
@@ -561,7 +561,7 @@ public class VMManager extends IdvManager {
     /**
      *  Iterate through all of the ViewManager-s and tell each on to setMasterInactive
      */
-    protected void setDisplayMastersInactive() {
+    public void setDisplayMastersInactive() {
         synchronized (viewManagers) {
             for (int i = 0; i < viewManagers.size(); i++) {
                 ((ViewManager) viewManagers.get(i)).setMasterInactive();
