@@ -789,7 +789,6 @@ function checkboxClicked(event, cbxPrefix, id) {
     if(!cbx) return;
     cbx = cbx.obj;
 
-
     var checkBoxes = new Array();
     if(!cbx.form) return;
     var elements = cbx.form.elements;
@@ -817,9 +816,8 @@ function checkboxClicked(event, cbxPrefix, id) {
 		pos1 =pos2;
 		pos2=tmp;
 	    }
-//            alert(pos1 + " " + pos2);
 	    for (i = 0; i < checkBoxes.length; i++) {
-		var top = util.getTop(checkboxes[i]);
+		var top = util.getTop(checkBoxes[i]);
 		if(top>=pos1 && top<=pos2) {
 	                checkBoxes[i].checked = value;
 		}

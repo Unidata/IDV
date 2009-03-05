@@ -1190,6 +1190,8 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_LOCALFILEPATHS = "ramadda.localfilepaths";
 
+    public static final String PROP_LOG_TOSTDERR = "ramadda.log.tostderr";
+
     /** _more_ */
     public static final String PROP_METADATAHANDLERS =
         "ramadda.metadatahandlers";

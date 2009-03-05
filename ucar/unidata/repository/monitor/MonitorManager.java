@@ -313,6 +313,7 @@ public class MonitorManager extends RepositoryManager {
         String listLink =
             HtmlUtil.href(getRepositoryBase().URL_USER_MONITORS.toString(),
                           msg("Monitor List"));
+        sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.center(HtmlUtil.b(listLink)));
 
         sb.append(msgLabel("Monitor"));

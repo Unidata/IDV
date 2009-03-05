@@ -736,7 +736,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         getMetadataManager().initMetadataHandlers(metadataDefFiles);
         initApi();
 
-        initUsers();
+        getUserManager().initUsers(cmdLineUsers);
         getEntryManager().initGroups();
         getHarvesterManager().initHarvesters();
         initLanguages();
@@ -1363,6 +1363,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
     }
 
+
     /**
      * _more_
      *
@@ -1380,9 +1381,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @param message _more_
      */
     protected void logInfo(String message) {
-        System.err.println(message);
+        log(message,null);
     }
-
 
 
     /**
@@ -1403,24 +1403,40 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @param exc _more_
      */
     public void logError(String message, Throwable exc) {
-        System.err.println("Error:" + message);
+        log("Error:" +message,exc);
+    }
+
+
+
+    private void log(String message, Throwable exc) {
         Throwable thr = null;
         if (exc != null) {
-            //            exc.printStackTrace();
             thr = LogUtil.getInnerException(exc);
-            if (thr instanceof RepositoryUtil.MissingEntryException) {
-                System.err.println("" + thr);
-            } else {
-                thr.printStackTrace();
+        }
+
+        if(getProperty(PROP_LOG_TOSTDERR,false)) {
+            System.err.println(message);
+            if (thr!=null) {
+                if (thr instanceof RepositoryUtil.MissingEntryException) {
+                    System.err.println(thr);
+                } else {
+                    thr.printStackTrace();
+                }
             }
         }
+
         try {
             String line = new Date() + " -- " + message;
             logFOS.write(line.getBytes());
             logFOS.write("\n".getBytes());
             if (thr != null) {
-                logFOS.write(LogUtil.getStackTrace(thr).getBytes());
-                logFOS.write("\n".getBytes());
+                if (thr instanceof RepositoryUtil.MissingEntryException) {
+                    logFOS.write(thr.toString().getBytes());
+                    logFOS.write("\n".getBytes());
+                } else {
+                    logFOS.write(LogUtil.getStackTrace(thr).getBytes());
+                    logFOS.write("\n".getBytes());
+                }
             }
             logFOS.flush();
         } catch (Exception exc2) {
@@ -1428,32 +1444,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
     }
 
-    /**
-     * _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void initUsers() throws Exception {
-        for (User user : cmdLineUsers) {
-            getUserManager().makeOrUpdateUser(user, true);
-        }
-
-        //If we have an admin property then it is of the form userid:password
-        //and is used to set the password of the admin
-        String adminFromProperties = getProperty(PROP_ADMIN, null);
-        if (adminFromProperties != null) {
-            List<String> toks = StringUtil.split(adminFromProperties, ":");
-            if (toks.size() != 2) {
-                logError("Error: The " + PROP_ADMIN
-                         + " property is incorrect");
-                return;
-            }
-            User user = new User(toks.get(0), "", false);
-            user.setPassword(UserManager.hashPassword(toks.get(1).trim()));
-            getUserManager().makeOrUpdateUser(user, true, true);
-            logInfo("Password for:" + user.getId() + " has been updated");
-        }
-    }
 
 
 

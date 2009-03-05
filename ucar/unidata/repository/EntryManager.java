@@ -4648,6 +4648,42 @@ return new Result(title, sb);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entries _more_
+     * @param descending _more_
+     *
+     * @return _more_
+     */
+    public List<Entry> doGroupAndNameSort(List<Entry> entries,
+                                        final boolean descending) {
+        Comparator comp = new Comparator() {
+            public int compare(Object o1, Object o2) {
+                Entry e1 = (Entry) o1;
+                Entry e2 = (Entry) o2;
+                int result = 0;
+                if(e1.isGroup()) {
+                    if(e2.isGroup()) result =  e1.getFullName().compareTo(e2.getFullName());
+                    else result = -1;
+                } else  if(e2.isGroup()) {
+                    result = 1;
+                } else {
+                    result =  e1.getFullName().compareTo(e2.getFullName());
+                }
+                if(descending) return -result;
+                return result;
+            }
+            public boolean equals(Object obj) {
+                return obj == this;
+            }
+        };
+        Object[] array = entries.toArray();
+        Arrays.sort(array, comp);
+        return (List<Entry>) Misc.toList(array);
+    }
+
+
 
     /**
      * _more_
