@@ -1527,6 +1527,13 @@ public class ImageGenerator extends IdvManager {
         }
 
 
+        if (XmlUtil.hasAttribute(node, ATTR_TIMES)) {
+            List  timesList = StringUtil.parseIntegerListString(applyMacros(node,
+                                                                            ATTR_TIMES, (String) null));
+            dataSource.setDateTimeSelection(timesList);
+        }
+
+
         Hashtable properties = getProperties(node);
         dataSource.setObjectProperties(properties);
         String id = applyMacros(node, ATTR_ID, (String) null);
@@ -1542,6 +1549,8 @@ public class ImageGenerator extends IdvManager {
                 }
             }
         }
+        //        getIdv().getVMManager().setDisplayMastersActive();
+        updateViewManagers();
 
         return true;
     }
@@ -2370,6 +2379,7 @@ public class ImageGenerator extends IdvManager {
      *
      * @return keep going
      */
+
     protected boolean processTagDisplay(Element node) {
         if ( !processDisplayNode(node, null)) {
             return false;
@@ -2377,6 +2387,7 @@ public class ImageGenerator extends IdvManager {
         if (applyMacros(node, ATTR_WAIT, true)) {
             pause();
         }
+        updateViewManagers();
         return true;
     }
 
