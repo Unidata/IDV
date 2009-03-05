@@ -948,13 +948,17 @@ public abstract class DisplayControlBase extends SharableImpl {
             return Util.labeledReal((Real) level);
         } else if (level instanceof String) {
             String tmp = (String) level;
+            tmp = tmp.trim();
+            if(tmp.startsWith("#")) {
+                tmp = tmp.substring(1);
+            }
             try {
                 double value = Misc.parseValue(tmp);
                 return new TwoFacedObject(tmp, new Real(value));
             } catch (Exception e) {}
         }
         userMessage("Unable to handle a level of type "
-                    + level.getClass().getName());
+                    + level.getClass().getName()+" level=" + level);
         return null;
     }
 
@@ -969,6 +973,8 @@ public abstract class DisplayControlBase extends SharableImpl {
         if (level == null) {
             return (Real) level;
         }
+
+
         if (level instanceof TwoFacedObject) {
             Object lev = ((TwoFacedObject) level).getId();
             if (lev instanceof Real) {
@@ -978,13 +984,19 @@ public abstract class DisplayControlBase extends SharableImpl {
             return (Real) level;
         } else if (level instanceof String) {
             String tmp = (String) level;
+            tmp   = tmp.trim();
+            if(tmp.startsWith("#")) {
+                tmp = tmp.substring(1);
+            }
             try {
                 double value = Misc.parseValue(tmp);
                 return new Real(value);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                System.err.println("error parsing level: " + tmp + " " + e);
+            }
         }
         userMessage("Unable to handle a level of type "
-                    + level.getClass().getName());
+                    + level.getClass().getName()+" level=" + level);
         return null;
     }
 

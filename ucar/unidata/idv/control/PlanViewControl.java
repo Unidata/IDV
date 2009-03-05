@@ -1130,6 +1130,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         if (level == null) {
             return "                                       ";
         }
+
         Real         myLevel = getLevelReal(level);
         StringBuffer buf     = new StringBuffer();
         buf.append(getDisplayConventions().format(myLevel.getValue()));
