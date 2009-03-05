@@ -32,8 +32,6 @@ package ucar.unidata.repository;
 public interface Constants {
 
     //j--
-
-
     /** _more_ */
     public static final String ICON_ACCESS = "ramadda.icon.access";
 
@@ -75,6 +73,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ICON_COMMENTS = "ramadda.icon.comments";
+
+    public static final String ICON_FTP = "ramadda.icon.ftp";
 
     /** _more_ */
     public static final String ICON_CSV = "ramadda.icon.csv";

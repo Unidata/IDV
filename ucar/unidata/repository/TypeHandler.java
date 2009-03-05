@@ -260,7 +260,7 @@ public class TypeHandler extends RepositoryManager {
                                     Group group,
                                     String synthId)
             throws Exception {
-        throw new IllegalArgumentException("getSynthIds  not implemented");
+        throw new IllegalArgumentException("getSynthIds  not implemented in class:" + getClass().getName());
     }
 
     /**
@@ -766,7 +766,6 @@ public class TypeHandler extends RepositoryManager {
 
 
     public File getFile(Entry entry)  {
-        System.err.println("TypeHandler getFile");
         return entry.getResource().getTheFile();
     }
 

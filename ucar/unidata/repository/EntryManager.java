@@ -1758,11 +1758,9 @@ return new Result(title, sb);
                               IOUtil.getInputStream(thumb, getClass()),
                               mimeType);
         } else {
-            System.err.println ("getting the file:" +entry.getFile().toString());
             InputStream inputStream =
                 IOUtil.getInputStream(entry.getFile().toString(),
                                       getClass());
-
             Result result = new Result(BLANK, inputStream, mimeType);
             result.setCacheOk(true);
             return result;
@@ -4501,7 +4499,7 @@ return new Result(title, sb);
                     return ids;
                 }
             }
-            return group.getTypeHandler().getSynthIds(request, 
+            return mainEntry.getTypeHandler().getSynthIds(request, 
                                                       mainEntry,
                                                       group,
                                                       synthId);

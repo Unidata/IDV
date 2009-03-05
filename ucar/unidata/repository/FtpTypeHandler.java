@@ -110,7 +110,10 @@ public class FtpTypeHandler extends GenericTypeHandler {
      */
     public String getIconUrl(Request request, Entry entry) throws Exception {
         if (entry.isGroup()) {
-            return iconUrl(ICON_FOLDER_CLOSED);
+            if(!getEntryManager().isSynthEntry(entry.getId())) {
+                return iconUrl(ICON_FTP);
+            }
+            return iconUrl(ICON_FTP);
         }
         return super.getIconUrl(request, entry);
     }
@@ -184,21 +187,21 @@ public class FtpTypeHandler extends GenericTypeHandler {
                 String cacheFileName =  java.net.URLEncoder.encode("ftp:" + values[COL_SERVER]+":"+path, "UTF-8");
                 File cacheFile = new File(IOUtil.joinDir(getStorageManager().getCacheDir(), cacheFileName));
                 if(cacheFile.exists()) {
-                    System.err.println ("exists in cache:" + cacheFile);
+                    //                    System.err.println ("exists in cache:" + cacheFile);
                     return cacheFile;
                 }
 
-                System.err.println("Fetching:" + path);
+                //                System.err.println("Fetching:" + path);
                 //                System.err.println("writing to:" + cacheFile);
                 OutputStream fos = new FileOutputStream(cacheFile);
                 if (ftpClient.retrieveFile(path, fos)) {
                     fos.flush();
                     fos.close();
-                    System.err.println ("wrote to file cache:" + cacheFile);
+                    //                    System.err.println ("wrote to file cache:" + cacheFile);
                     getStorageManager().notifyWroteToCache(cacheFile);
                     return cacheFile;
                 } 
-                System.err.println ("BAD FILE");
+                //                System.err.println ("BAD FILE");
                 return badFile;
             } finally {
                 if(ftpClient!=null) {
