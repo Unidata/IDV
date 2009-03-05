@@ -1307,7 +1307,7 @@ public class PointObFactory {
         }
 
 
-        Trace.call1("loop-1");
+        Trace.call1("FeatureDatasetPoint: loop-1");
         int varIdx = varIdxBase;
         for (Iterator iter = actualVariables.iterator(); iter.hasNext(); ) {
             VariableSimpleIF var = (VariableSimpleIF) iter.next();
@@ -1338,7 +1338,7 @@ public class PointObFactory {
             }
             varIdx++;
         }
-        Trace.call2("loop-1");
+        Trace.call2("FeatureDatasetPoint: loop-1");
 
 
         String[] shortNames = (String[]) shortNamesList.toArray(
@@ -1360,7 +1360,8 @@ public class PointObFactory {
         if (fc instanceof PointFeatureCollection) {
             collection = (PointFeatureCollection) fc;
         } else if (fc instanceof NestedPointFeatureCollection) {
-            collection = ((NestedPointFeatureCollection)fc).flatten(null, null);
+            NestedPointFeatureCollection npfc = (NestedPointFeatureCollection)  fc;
+            collection = (npfc).flatten(llr, null);
         }
         //System.out.println("number of obs = " + collection.size());
         if (llr != null) {
@@ -1395,7 +1396,7 @@ public class PointObFactory {
 
         //First do spatial subset and collect times
         //First collect times
-        Trace.call1("loop-2");
+        Trace.call1("FeatureDatasetPoint: loop-2");
         while (dataIterator.hasNext()) {
             PointFeature po = (PointFeature) dataIterator.next();
             /*
@@ -1414,7 +1415,7 @@ public class PointObFactory {
                 break;
             }
         }
-        Trace.call2("loop-2");
+        Trace.call2("FeatureDatasetPoint: loop-2");
 
 
         //Bin times
@@ -1423,7 +1424,7 @@ public class PointObFactory {
         StructureMembers.Member member;
         PointOb[]               obs = new PointOb[pos.size()];
         //Make the obs
-        Trace.call1("loop-3");
+        Trace.call1("FeatureDatasetPoint: loop-3");
         int size = pos.size();
 
         for (int i = 0; i < size; i++) {
@@ -1488,7 +1489,7 @@ public class PointObFactory {
             }
         }
 
-        Trace.call2("loop-3");
+        Trace.call2("FeatureDatasetPoint: loop-3");
 
 
         LogUtil.message("Read " + obIdx + " observations");
