@@ -1576,6 +1576,16 @@ public class HtmlUtil {
                          TYPE_PASSWORD, ATTR_NAME, name));
     }
 
+    public static String password(String name, String value,String extra) {
+        return tag(TAG_INPUT,
+                   extra+
+                   attrs(ATTR_VALUE, value,
+                         ATTR_CLASS, CLASS_PASSWORD, ATTR_TYPE,
+                         TYPE_PASSWORD, ATTR_NAME, name));
+    }
+
+
+
 
     /**
      * _more_
