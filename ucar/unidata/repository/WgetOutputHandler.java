@@ -184,6 +184,7 @@ public class WgetOutputHandler extends OutputHandler {
             if(entry.getResource().isUrl()) {
                 sb.append ("wget \"" + entry.getResource().getPath()+"\"");
                 sb.append ("\n");
+                continue;
             } else if ( !getAccessManager().canDownload(request, entry)) {
                 continue;
             }
