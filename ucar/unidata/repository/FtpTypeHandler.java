@@ -585,7 +585,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
                          ? (Entry) new Group(synthId, handler)
                          : new Entry(synthId, handler));
 
-        String  name  = ftpFile.getName();
+        String  name  = IOUtil.getFileTail(ftpFile.getName());
         entry.setIsLocalFile(true);
         Group    parent;
         if (myFtpFile.path.equals(baseDir)) {
