@@ -31,7 +31,6 @@ import ucar.nc2.Attribute;
 
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
-import ucar.nc2.constants.CF;
 import ucar.nc2.dataset.*;
 
 import ucar.nc2.dt.GridCoordSystem;
@@ -305,8 +304,7 @@ public class GeoGridAdapter {
         }
         //if (isLatLon) {
         if (Unit.canConvert(zUnit, CommonUnit.meter) && (vt == null)) {
-            if (CF.POSITIVE_DOWN.equals(
-                    ((CoordinateAxis1D) zAxis).getPositive())) {
+            if (!gcs.isZPositive()) {
                 // negate units if depth
                 zUnit = zUnit.scale(-1);
             }
@@ -535,8 +533,7 @@ public class GeoGridAdapter {
 
                 if (Unit.canConvert(zUnit, CommonUnit.meter)) {
                     // check to see if positive is up
-                    if (CF.POSITIVE_DOWN.equals(
-                            ((CoordinateAxis1D) zAxis).getPositive())) {
+                    if (!gcs.isZPositive()) {
                         // negate units if depth
                         zUnit = zUnit.scale(-1);
                     }
