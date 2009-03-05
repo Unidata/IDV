@@ -935,6 +935,15 @@ public class GeoGridDataSource extends GridDataSource {
             sb.append("</table>\n");
         }
 
+        if(sb!=null && myLevels!=null && myLevels.size()>0) {
+            sb.append("<h2>Levels</h2>");
+            for(Object o: myLevels) {
+                sb.append(""+o);
+                sb.append("<br>");
+            }
+        }
+
+
         if (sb == null) {
             return desc;
         }
@@ -1249,7 +1258,7 @@ public class GeoGridDataSource extends GridDataSource {
                                                 dataSelection, null,
                                                 fromLevelIndex, toLevelIndex);
             if (geoGridAdapter != null) {
-                return geoGridAdapter.getLevels();
+                return myLevels = geoGridAdapter.getLevels();
             }
             return myLevels;
         } catch (VisADException vae) {
@@ -1304,7 +1313,6 @@ public class GeoGridDataSource extends GridDataSource {
         if(fromLevelIndex>=0 && toLevelIndex>=0) {
             numLevels = Math.abs(toLevelIndex-fromLevelIndex)+1;
         }
-
 
 
         GridDataset myDataset = getDataset();
@@ -1415,6 +1423,15 @@ public class GeoGridDataSource extends GridDataSource {
      * @throws VisADException On badness
      */
     private int indexOf(Object o, List levels) throws VisADException {
+        if(o instanceof String) {
+            String s = (String)o;
+            if(s.startsWith("#")) {
+                int index = new Integer(s.substring(1).trim()).intValue();
+                return index;
+            }
+            o = new Real(new Double(s).doubleValue());
+        }
+
         if ((o instanceof Real) && (levels.size() > 0)
                 && (levels.get(0) instanceof Real)) {
             Real r = (Real) o;
@@ -1457,18 +1474,21 @@ public class GeoGridDataSource extends GridDataSource {
 
         Trace.call1("GeoGridDataSource.makeField");
 
-
-
         Object fromLevel      = givenDataSelection.getFromLevel();
         Object toLevel        = givenDataSelection.getToLevel();
         int    fromLevelIndex = -1;
         int    toLevelIndex   = -1;
+
         if ((fromLevel != null) && (toLevel != null)) {
             fromLevelIndex = indexOf(fromLevel, allLevels);
+            //            System.err.println ("fromLevel index:" + fromLevelIndex);
             toLevelIndex   = indexOf(toLevel, allLevels);
+            if(toLevelIndex<0 || fromLevelIndex<0) {
+                System.err.println ("Did not find level indices:   fromLevel:" + fromLevel +  " index:" + fromLevelIndex + " toLevel:" + toLevel +" index:" + toLevelIndex);
+            }
         }
 
-        //        System.err.println ("fromLevel:" + fromLevel +  " index:" + fromLevelIndex + " toLevel:" + toLevel +" index:" + toLevelIndex);
+
 
 
         String      paramName = dataChoice.getStringId();
@@ -1515,9 +1535,13 @@ public class GeoGridDataSource extends GridDataSource {
             }
         }
         Trace.call2("GeoGridDataSource.make times");
-
-
-
+        /*
+        System.err.print("times:");
+        for(int i=0;i<timeIndices.length;i++) {
+            System.err.print(" " + timeIndices[i]);
+        }
+        System.err.println("");
+        */
 
         Trace.call1("GeoGridDataSource.getSequence");
         Object loadId = JobManager.getManager().startLoad("GeoGrid");
