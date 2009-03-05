@@ -94,7 +94,7 @@
   <datasource
      id="NetCDF.POINT"
      factory="ucar.unidata.data.point.NetcdfPointDataSource"
-     patterns="_metar\.nc$,.*metar.*\.nc$,.*_syn\.nc$,.*_buoy\.nc$,.*_sounder_.*\.nc$,Surface_METAR.*\.nc$,\.sao.gem$,\.sb.gem$,\.sfc$"
+     patterns="_metar\.nc$,.*metar.*\.nc$,.*_syn\.nc$,.*_buoy\.nc$,.*_sounder_.*\.nc$,Surface_METAR.*\.nc,\.sfc$,sao\.gem$,sb\.gem$"
      doesmultiples="true"
      fileselection="true"
      label="netCDF/GEMPAK Point Data files"/>
