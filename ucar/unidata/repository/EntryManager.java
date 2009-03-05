@@ -476,14 +476,14 @@ return new Result(title, sb);
             if (entry != null) {
                 sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
                 if (isAnonymousUpload(entry)) {
-                    Metadata metadata =
+                    List<Metadata> metadataList =
                         getMetadataManager().findMetadata(entry,
                             AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD,
                             false);
                     String extra = "";
 
-                    if (metadata != null) {
-
+                    if (metadataList != null) {
+                        Metadata metadata= metadataList.get(0);
                         String user  = metadata.getAttr1();
                         String email = metadata.getAttr4();
                         if (email == null) {
@@ -1515,11 +1515,12 @@ return new Result(title, sb);
      */
     private void publishAnonymousEntry(Request request, Entry entry)
             throws Exception {
-        Metadata metadata = getMetadataManager().findMetadata(entry,
+        List<Metadata> metadataList = getMetadataManager().findMetadata(entry,
                                 AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD,
                                 false);
         //Reset the datatype
-        if (metadata != null) {
+        if (metadataList != null) {
+            Metadata metadata =  metadataList.get(0);
             User newUser = getUserManager().findUser(metadata.getAttr1());
             if (newUser != null) {
                 entry.setUser(newUser);
@@ -1608,6 +1609,18 @@ return new Result(title, sb);
             if (getAdmin().isEmailCapable()) {
                 getAdmin().sendEmail(parentUser.getEmail(), "Uploaded Entry",
                                      contents.toString(), true);
+
+                List<Metadata> metadataList =
+                    getMetadataManager().findMetadata(parentGroup,
+                                                      ContentMetadataHandler.TYPE_CONTACT,
+                                                      false);
+                if(metadataList!=null) {
+                    for(Metadata metadata: metadataList) {
+                        getAdmin().sendEmail(metadata.getAttr2(), "Uploaded Entry",
+                                             contents.toString(), true);
+                        
+                    }
+                }
             }
         }
     }

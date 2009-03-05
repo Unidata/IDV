@@ -75,6 +75,10 @@ public class ContentMetadataHandler extends MetadataHandler {
     public static Metadata.Type TYPE_ATTACHMENT =
         new Metadata.Type("content.attachment", "Attachment");
 
+    /** _more_ */
+    public static Metadata.Type TYPE_CONTACT =
+        new Metadata.Type("content.contact", "Contact");
+
 
     /**
      * _more_
@@ -88,6 +92,7 @@ public class ContentMetadataHandler extends MetadataHandler {
         super(repository, node);
         addType(TYPE_THUMBNAIL);
         addType(TYPE_ATTACHMENT);
+        addType(TYPE_CONTACT);
     }
 
     /**
@@ -96,7 +101,7 @@ public class ContentMetadataHandler extends MetadataHandler {
      * @return _more_
      */
     protected String getHandlerGroupName() {
-        return "Attachments";
+        return "Attachments and Contact";
     }
 
 
@@ -256,12 +261,14 @@ public class ContentMetadataHandler extends MetadataHandler {
      */
     public String getHtml(Request request, Entry entry, Metadata metadata,
                           boolean forLink) {
+        Metadata.Type type  = getType(metadata.getType());
+
+
         File f = getImageFile(entry, metadata);
         if (f == null) {
             return null;
         }
 
-        Metadata.Type type  = getType(metadata.getType());
         String        extra = (forLink
                                ? " "
                                : "");
@@ -326,10 +333,17 @@ public class ContentMetadataHandler extends MetadataHandler {
      * @return _more_
      */
     public String[] getHtml(Request request, Entry entry, Metadata metadata) {
+        Metadata.Type type    = getType(metadata.getType());
+        if(type.equals(TYPE_CONTACT)) {
+            String lbl = msgLabel(TYPE_CONTACT.getLabel());
+            String content = msg("Name")+":" + metadata.getAttr1()+HtmlUtil.space(3)+
+                msg("Email")+":" + metadata.getAttr2();
+            return new String[] { lbl, content };
+        }
+
         if (true) {
             return null;
         }
-        Metadata.Type type    = getType(metadata.getType());
         String        lbl     = msgLabel(type.getLabel());
         String        content = null;
         if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
@@ -431,6 +445,8 @@ public class ContentMetadataHandler extends MetadataHandler {
         if (type == null) {
             return;
         }
+
+
         if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
             if ( !newMetadata) {
                 //TODO: delete the old thumbs file
@@ -519,7 +535,12 @@ public class ContentMetadataHandler extends MetadataHandler {
         String arg1 = ARG_ATTR1 + suffix;
         String arg2 = ARG_ATTR2 + suffix;
         String size = HtmlUtil.SIZE_70;
-        if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
+        if (type.equals(TYPE_CONTACT)) {
+            content = formEntry(new String[] { submit, msgLabel("Name"),
+                    HtmlUtil.input(arg1, metadata.getAttr1(), size),
+                    msgLabel("Email"),
+                    HtmlUtil.input(arg2, metadata.getAttr2(), size) });
+        } else  if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
             String image = (forEdit
                             ? getHtml(request, entry, metadata, false)
                             : "");

@@ -116,7 +116,7 @@ public class WgetOutputHandler extends OutputHandler {
                                  List<Link> links)
             throws Exception {
         if (state.entry != null) {
-            if (getAccessManager().canDownload(request, state.entry)) {
+            if (state.entry.getResource().isUrl() || getAccessManager().canDownload(request, state.entry)) {
                 links.add(
                     makeLink(
                         request, state.entry, OUTPUT_WGET,
@@ -126,7 +126,7 @@ public class WgetOutputHandler extends OutputHandler {
         } else {
             boolean ok = false;
             for (Entry child : state.getAllEntries()) {
-                if (getAccessManager().canDownload(request, child)) {
+                if (child.getResource().isUrl() || getAccessManager().canDownload(request, child)) {
                     ok = true;
                     break;
                 }
@@ -181,7 +181,10 @@ public class WgetOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb = new StringBuffer();
         for (Entry entry : entries) {
-            if ( !getAccessManager().canDownload(request, entry)) {
+            if(entry.getResource().isUrl()) {
+                sb.append ("wget \"" + entry.getResource().getPath()+"\"");
+                sb.append ("\n");
+            } else if ( !getAccessManager().canDownload(request, entry)) {
                 continue;
             }
             String tail = getStorageManager().getFileTail(entry);

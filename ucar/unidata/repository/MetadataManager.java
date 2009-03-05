@@ -190,22 +190,27 @@ public class MetadataManager extends RepositoryManager {
      * @throws Exception _more_
      */
 
-    public Metadata findMetadata(Entry entry, Metadata.Type type,
+    public List<Metadata> findMetadata(Entry entry, Metadata.Type type,
                                  boolean checkInherited)
             throws Exception {
         if (entry == null) {
             return null;
         }
+        List<Metadata> result= new ArrayList<Metadata>();
         for (Metadata metadata : getMetadata(entry)) {
             if (metadata.getType().equals(type.getType())) {
-                return metadata;
+                result.add(metadata);
             }
         }
         if (checkInherited) {
-            return findMetadata(getEntryManager().getParent(null, entry),
-                                type, checkInherited);
+            List<Metadata> fromParent =  findMetadata(getEntryManager().getParent(null, entry),
+                                                  type, checkInherited);
+            if(fromParent!=null) {
+                result.addAll(fromParent);
+            }
         }
-        return null;
+        if(result.size()==0) return null;
+        return result;
     }
 
 
@@ -718,8 +723,8 @@ public class MetadataManager extends RepositoryManager {
         Entry          entry        = getEntryManager().getEntry(request);
         List<Metadata> metadataList = getMetadata(entry);
         Metadata metadata = findMetadata(entry,
-                                         request.getString(ARG_METADATA_ID,
-                                             ""));
+                                               request.getString(ARG_METADATA_ID,
+                                                                 ""));
         if (metadata == null) {
             return new Result("", "Could not find metadata");
         }
