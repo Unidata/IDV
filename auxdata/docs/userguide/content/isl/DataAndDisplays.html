@@ -45,7 +45,7 @@ For example, we have:
 </pre>
 
 
-[isl::tagdef setfiles {Override the files or urls used in a bundle} -attrs {datasource+ {identifier of the data source} file {new file or url path}}]
+[isl::tagdef setfiles {Override the files or urls used in a bundle} -attrs {datasource+ {identifier of the data source} file {new file or url path}  }]
 
 
 
@@ -97,7 +97,7 @@ If you have a data source with multiple files (e.g., radar) you can use an embed
 
 
 
-[isl::tagdef datasource {Create a data source} -attrs {url+ {url or file name to load} type {data source type}}]
+[isl::tagdef datasource {Create a data source} -attrs {url+ {url or file name to load} type {data source type}  times {List of times to use} }]
 The [isl::tag datasource] tag lets you create a new data source and takes the form.
 The [isl::attr url] attribute is required and specifies the file or url to load.
 The [isl::attr type] attribute is optional and defines the data source type
@@ -105,6 +105,8 @@ from the datasources.xml file in the source release.
 For a text listing see <a href="Datasources.html">Datasources.html</a>.
 For now you can only specify a data source that takes
 a single url (or filename). This will change in the future.
+
+The [isl::attr times] attribute works the same as in the [isl::tagref bundle] tag above.
 
 [isl::importxml datasource.isl]
 

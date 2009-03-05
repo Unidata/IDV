@@ -42,12 +42,19 @@
          Or it can have names in it:
 -->
       <property name="contourInfoParams" value="interval=10;base=40;min=-30;max=100;dashed=true;labels=false"/>
+
       <property
          name="legendLabelTemplate"
          value="%datasourcename% - %shortname%"/>
+
+<!-- This sets the level to be 500 hectopascals -->
+<!-- Note: this can also be of the form #<index>, eg. #4 will select the 5th level (this is zero based) -->
+
       <property
          name="dataSelectionLevel"
          value="500[hectopascals]"/>
+
+
     </display>
   </datasource>
 
