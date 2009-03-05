@@ -905,7 +905,7 @@ public class HtmlOutputHandler extends OutputHandler {
             descSB.append(desc);
             descSB.append("</div>\n");
             sb.append(HtmlUtil.makeShowHideBlock(msg("Description"),
-                    descSB.toString(), true));
+                    descSB.toString(), !entry.isGroup()));
         }
     }
 

@@ -270,11 +270,12 @@ public class CatalogTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    public List<String> getSynthIds(Request request, Group parentEntry,
+    public List<String> getSynthIds(Request request, Group mainEntry,
+                                    Group parentEntry,
                                     String id)
             throws Exception {
         if (id == null) {
-            id = parentEntry.getId();
+            id = mainEntry.getId();
         }
         String[]     loc        = parseId(id);
         String       catalogUrl = request.getString(ARG_CATALOG, null);
@@ -282,7 +283,7 @@ public class CatalogTypeHandler extends GenericTypeHandler {
         String       url        = loc[0];
         String       nodeId     = loc[1];
         if ( !id.startsWith("catalog:")) {
-            url    = parentEntry.getResource().getPath();
+            url    = mainEntry.getResource().getPath();
             nodeId = null;
         }
         URL     baseUrl = new URL(url);

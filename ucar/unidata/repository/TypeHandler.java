@@ -255,7 +255,9 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public List<String> getSynthIds(Request request, Group group,
+    public List<String> getSynthIds(Request request, 
+                                    Group mainEntry,
+                                    Group group,
                                     String synthId)
             throws Exception {
         throw new IllegalArgumentException("getSynthIds  not implemented");

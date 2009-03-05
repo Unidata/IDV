@@ -861,6 +861,17 @@ public class Admin extends RepositoryManager {
                         10.0), HtmlUtil.SIZE_10) + " (GBytes)"));
 
 
+        asb.append(HtmlUtil.colspan("Cache Size", 2));
+        asb.append(
+            HtmlUtil.formEntryTop(
+                msgLabel("Size"),
+                HtmlUtil.input(
+                    PROP_CACHE_MAXSIZEGB,
+                    "" + getRepository().getProperty(
+                        PROP_CACHE_MAXSIZEGB,
+                        10.0), HtmlUtil.SIZE_10) + " (GBytes)"));
+
+
 
         asb.append(HtmlUtil.colspan("File Access", 2));
         String fileWidget = HtmlUtil.textArea(PROP_LOCALFILEPATHS,
@@ -1169,6 +1180,11 @@ public class Admin extends RepositoryManager {
 
         getRepository().writeGlobal(PROP_UPLOAD_MAXSIZEGB,
                                     request.getString(PROP_UPLOAD_MAXSIZEGB,
+                                        "10").trim());
+
+
+        getRepository().writeGlobal(PROP_CACHE_MAXSIZEGB,
+                                    request.getString(PROP_CACHE_MAXSIZEGB,
                                         "10").trim());
 
         if (request.exists(PROP_LOCALFILEPATHS)) {

@@ -271,12 +271,14 @@ public class FtpTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    public List<String> getSynthIds(Request request, Group parentEntry,
+    public List<String> getSynthIds(Request request, 
+                                    Group mainEntry,
+                                    Group parentEntry,
                                     String synthId)
             throws Exception {
         List<String> ids       = new ArrayList<String>();
 
-        Object[] values  = parentEntry.getValues();
+        Object[] values  = mainEntry.getValues();
         String   baseDir = (String) values[COL_BASEDIR];
         String   path    = getPathFromId(synthId, baseDir);
 
@@ -286,19 +288,36 @@ public class FtpTypeHandler extends GenericTypeHandler {
         } else {
             files = IOUtil.sortFilesOnAge(files, descending);
             }*/
-        FTPClient    ftpClient = getFtpClient(parentEntry);
+        FTPClient    ftpClient = getFtpClient(mainEntry);
         if (ftpClient == null) {
             return ids;
         }
 
         try {
             boolean isDir = ftpClient.changeWorkingDirectory(path);
-            Hashtable<String, FTPFile> cache = getCache(parentEntry);
+            Hashtable<String, FTPFile> cache = getCache(mainEntry);
             if (isDir) {
                 FTPFile[] files = ftpClient.listFiles(path);
                 for (int i = 0; i < files.length; i++) {
+                    String name = files[i].getName().toLowerCase();
+                    if(name.equals("readme")||
+                       name.equals("readme.txt")) {
+                        try {
+                            InputStream fis = ftpClient.retrieveFileStream(path + "/" + files[i].getName());
+                            if(fis!=null) {
+                                String desc = IOUtil.readContents(fis);
+                                parentEntry.setDescription("<pre>"+desc+"</pre>");
+                                fis.close();
+                                ftpClient.completePendingCommand();
+                            }
+                        } catch(Exception exc) {
+                            //                            exc.printStackTrace();
+                        }
+                    }
+                    
+
                     cache.put(path + "/" + files[i].getName(), files[i]);
-                    ids.add(getSynthId(parentEntry, baseDir, path, files[i]));
+                    ids.add(getSynthId(mainEntry, baseDir, path, files[i]));
                 }
             }
         } finally {

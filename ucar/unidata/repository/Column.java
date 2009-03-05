@@ -401,6 +401,14 @@ public class Column implements Constants {
                 stmt.setDouble(stmtIdx + 1, Entry.NONGEO);
             }
             stmtIdx += 2;
+        } else  if (type.equals(TYPE_PASSWORD)) {
+            if (values[offset] != null) {
+                String value = new String(XmlUtil.encodeBase64(toString(values, offset).getBytes()).getBytes());
+                stmt.setString(stmtIdx, value);
+            } else {
+                stmt.setString(stmtIdx, null);
+            }
+            stmtIdx++;
         } else {
             //            System.err.println("\tset stmt:" + offset + " " + values[offset]);
             if (values[offset] != null) {
@@ -442,6 +450,17 @@ public class Column implements Constants {
             values[offset] = new Double(results.getDouble(valueIdx));
             valueIdx++;
             values[offset + 1] = new Double(results.getDouble(valueIdx));
+            valueIdx++;
+
+        } else if (type.equals(TYPE_PASSWORD)) {
+            String value = results.getString(valueIdx);
+            if(value!=null) {
+                byte[] bytes = XmlUtil.decodeBase64(value);
+                if(bytes!=null) {
+                    value = new String(bytes);
+                }
+            }
+            values[offset] = value;
             valueIdx++;
         } else {
             values[offset] = results.getString(valueIdx);
@@ -745,12 +764,12 @@ public class Column implements Constants {
                 value = "" + toString(values, offset);
             }
             widget = HtmlUtil.input(getFullName(), value, "size=\"10\"");
-            /*        } else if (type.equals(TYPE_PASSWORD)) {
+        } else if (type.equals(TYPE_PASSWORD)) {
             String value = "";
             if (entry != null) {
                 value = "" + toString(values, offset);
             }
-            widget = HtmlUtil.password(getFullName(), value, "size=\"10\"");*/
+            widget = HtmlUtil.password(getFullName(), value, HtmlUtil.SIZE_10);
         } else {
             String value = "";
             if (entry != null) {

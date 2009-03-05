@@ -57,8 +57,8 @@
      <property name="form.show.date" value="false"/>
      <column name="server" group="FTP" type="string"     label="FTP Server" columns="80"  showinhtml="false"/>
      <column name="basedir" group="FTP" type="string"     label="Base Directory" columns="80"  showinhtml="false"/>
-     <column name="ftpuser" group="FTP" type="string"     label="User Name" columns="80"  showinhtml="false"/>
-     <column name="ftppassword" group="FTP" type="password"     label="Password" columns="80"  showinhtml="false"/>
+     <column name="ftpuser" group="FTP" type="string"     label="User Name" columns="20"  showinhtml="false"/>
+     <column name="ftppassword" group="FTP" type="password"     label="Password"  showinhtml="false"/>
      <column name="maxsize" group="FTP" type="double" suffix="(MB)" default="0"   label="Max size to cache" columns="5"  showinhtml="false"/>
  </type>
 

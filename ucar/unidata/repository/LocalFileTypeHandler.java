@@ -187,16 +187,18 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    public List<String> getSynthIds(Request request, Group parentEntry,
+    public List<String> getSynthIds(Request request, 
+                                    Group mainEntry,
+                                    Group parentEntry,
                                     String synthId)
             throws Exception {
         List<String> ids    = new ArrayList<String>();
-        Object[]     values = parentEntry.getValues();
+        Object[]     values = mainEntry.getValues();
         if (values == null) {
             return ids;
         }
         long t1 = System.currentTimeMillis();
-        //        System.err.println("getSynthIds " + parentEntry);
+        //        System.err.println("getSynthIds " + mainEntry);
         File rootDir = new File((String) values[0]);
         if ( !rootDir.exists()) {
             throw new RepositoryUtil.MissingEntryException(
@@ -238,7 +240,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
             if (match(childFile, excludes, false)) {
                 continue;
             }
-            ids.add(getSynthId(parentEntry, rootDirPath, childFile));
+            ids.add(getSynthId(mainEntry, rootDirPath, childFile));
         }
         long t2 = System.currentTimeMillis();
         //        System.err.println ("Time:" + (t2-t1) + " ids:" + ids.size());

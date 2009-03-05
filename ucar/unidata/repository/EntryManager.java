@@ -4490,18 +4490,21 @@ return new Result(title, sb);
 
         boolean      isSynthEntry = isSynthEntry(group.getId());
         if (group.getTypeHandler().isSynthType() || isSynthEntry) {
+            Group mainEntry = group;
             String synthId = null;
             if (isSynthEntry) {
-                String[] pair    = getSynthId(group.getId());
+                String[] pair    = getSynthId(mainEntry.getId());
                 String   entryId = pair[0];
                 synthId = pair[1];
-                group   = (Group) getEntry(request, entryId, false, false);
-                if (group == null) {
+                mainEntry   = (Group) getEntry(request, entryId, false, false);
+                if (mainEntry == null) {
                     return ids;
                 }
             }
-            return group.getTypeHandler().getSynthIds(request, group,
-                    synthId);
+            return group.getTypeHandler().getSynthIds(request, 
+                                                      mainEntry,
+                                                      group,
+                                                      synthId);
         }
 
 
