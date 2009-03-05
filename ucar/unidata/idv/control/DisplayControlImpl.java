@@ -5407,7 +5407,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                  SETTINGS_GROUP_DISPLAY);
         }
 
-        if (checkFlag(FLAG_TEXTUREQUALITY) && (color != null)) {
+        if (checkFlag(FLAG_TEXTUREQUALITY)) {
             dsd.addPropertyValue(new Integer(textureQuality),
                                  "textureQuality", getTextureQualityLabel(),
                                  SETTINGS_GROUP_DISPLAY);
