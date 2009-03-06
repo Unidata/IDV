@@ -419,26 +419,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
         String    user      = (String) values[COL_USER];
         String    password  = (String) values[COL_PASSWORD];
         if(password!=null) {
-            List<String>toks = StringUtil.splitMacros(password);
-            StringBuffer result = new StringBuffer();
-            if(toks.size()>0) {
-                result.append(toks.get(0));
-                for(int i=1;i<toks.size();i++) {
-                    if(2*(i/2)==i) {
-                        result.append(toks.get(i));                        
-                    } else {
-                        String prop = getRepository().getProperty(toks.get(i),(String)null);
-                        if(prop == null) {
-                            throw new IllegalArgumentException("Could not find property:" + toks.get(i)+":");
-                        }
-                        if(prop.startsWith("bsf:")) {
-                            prop = new String(XmlUtil.decodeBase64(prop.substring(4)));
-                        }
-                        result.append(prop);
-                    }
-                }
-            }
-            password = result.toString();
+            password = getRepository().processTemplate(password, false);
         } else {
             password = "";
         }

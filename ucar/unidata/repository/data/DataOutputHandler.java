@@ -1469,6 +1469,67 @@ public class DataOutputHandler extends OutputHandler {
     }
 
 
+    /*
+    public Result outputTrajectoryChart(Request request, Entry entry)
+            throws Exception {
+        TrajectoryObsDataset tod =
+            getTrajectoryDataset(entry.getResource().getPath());
+
+        StringBuffer sb         = new StringBuffer();
+        StringBuffer head = new StringBuffer();
+        head.append("<script type='text/javascript' src='http://www.google.com/jsapi'></script>\n");
+        head.append("<script type='text/javascript'>\n");
+        head.append("google.load('visualization', '1', {'packages':['annotatedtimeline']});\n");
+        head.append("google.setOnLoadCallback(drawChart);\n");
+        head.append("function drawChart() {");
+        head.append("var data = new google.visualization.DataTable();\n");
+        head.append("data.addColumn('date', 'Date');\n");
+        head.append("data.addColumn('number', 'Value');\n");
+        head.append("var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));\n");
+        sb.append("<div id='chart_div' style='width: 700px; height: 240px;'></div>\n");
+
+        StringBuffer values  = new StringBuffer();
+        int numRows = 0;
+        synchronized (tod) {
+            List         trajectories = tod.getTrajectories();
+            List allVariables = tod.getDataVariables();
+            TrajectoryObsDatatype todt =
+                (TrajectoryObsDatatype) trajectories.get(0);
+            float[]      lats     = toFloatArray(todt.getLatitude(null));
+            numRows = lats.length;
+            for (int ptIdx = 0; ptIdx < lats.length; ptIdx++) {
+                StructureData    structure = todt.getData(0);
+                VariableSimpleIF theVar    = null;
+                for (int varIdx = 0; varIdx < allVariables.size(); varIdx++) {
+                    VariableSimpleIF var =
+                        (VariableSimpleIF) allVariables.get(varIdx);
+                    if (var.getRank() != 0) {
+                        continue;
+                    }
+                    theVar = var;
+                    break; 
+               }
+                if (theVar == null) {
+                    continue;
+                }
+                values.append("data.setValue(0, 0, new Date(2008, 1 ,1));\n");
+                values.append("data.setValue(0, 1, 30000);\n");
+            }
+            }
+
+        head.append(values);
+        head.append("data.addRows(" + numRows+");\n");
+        head.append("chart.draw(data, {displayAnnotations: true});\n");
+        head.append("}\n</script>\n");
+
+        Result result =  new Result(msg("Trajectory Time Series"), sb);
+        result.putProperty(PROP_HTML_HEAD,head.toString());
+        return result;
+    }
+    */
+
+
+
 
 
     /**

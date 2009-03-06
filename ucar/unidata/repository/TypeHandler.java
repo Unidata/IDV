@@ -1777,12 +1777,6 @@ public class TypeHandler extends RepositoryManager {
 
             StringBuffer scriptSB = new StringBuffer();
             if (doMap) {
-                scriptSB.append(
-                    "<script type=\"text/javascript\" src=\"${root}/geo.js\" djConfig=\"parseOnLoad: true\"></script>\n");
-                scriptSB.append(
-                    "<script type=\"text/javascript\" src=\"${root}/dojo/dojo.js\" djConfig=\"parseOnLoad: true\"></script>\n");
-                scriptSB.append(
-                    "<script type=\"text/javascript\" src=\"${root}/JazLibrary.js\"></script>\n");
             }
 
             String mapCanvas = (doMap

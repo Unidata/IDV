@@ -646,6 +646,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             String localPropertyFile =
                 IOUtil.joinDir(getStorageManager().getRepositoryDir(),
                                "repository.properties");
+
+
             properties.load(IOUtil.getInputStream(localPropertyFile,
                     getClass()));
         } catch (Exception exc) {}
@@ -2467,8 +2469,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String head =
             "<script type=\"text/javascript\" src=\"${root}/shadowbox/adapter/shadowbox-base.js\"></script>\n<script type=\"text/javascript\" src=\"${root}/shadowbox/shadowbox.js\"></script>\n<script type=\"text/javascript\">\nShadowbox.loadSkin('classic', '${root}/shadowbox/skin'); \nShadowbox.loadLanguage('en', '${root}/shadowbox/lang');\nShadowbox.loadPlayer(['img', 'qt'], '${root}/shadowbox/player'); \nwindow.onload = Shadowbox.init;\n</script>";
 
-        head = "";
-
+        head = (String)result.getProperty(PROP_HTML_HEAD);
+        if(head == null){
+            head = "";
+        }
         String   html   = template;
         String[] macros = new String[] {
             MACRO_HEADER_IMAGE, iconUrl(ICON_HEADER), MACRO_HEADER_TITLE,
@@ -2499,6 +2503,34 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         result.setContent(html.getBytes());
 
+    }
+
+
+    public String processTemplate(String template, boolean ignoreErrors) {
+        List<String>toks = StringUtil.splitMacros(template);
+        StringBuffer result = new StringBuffer();
+        if(toks.size()>0) {
+            result.append(toks.get(0));
+            for(int i=1;i<toks.size();i++) {
+                if(2*(i/2)==i) {
+                    result.append(toks.get(i));                        
+                } else {
+                    String prop = getRepository().getProperty(toks.get(i),(String)null);
+                    if(prop == null) {
+                        if(ignoreErrors) {
+                            prop = "${" + toks.get(i)+"}";
+                        } else {
+                            throw new IllegalArgumentException("Could not find property:" + toks.get(i)+":");
+                        }
+                    }
+                    if(prop.startsWith("bsf:")) {
+                        prop = new String(XmlUtil.decodeBase64(prop.substring(4)));
+                    }
+                    result.append(prop);
+                }
+            }
+        }
+        return result.toString();
     }
 
 

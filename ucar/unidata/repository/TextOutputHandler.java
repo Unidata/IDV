@@ -85,6 +85,11 @@ public class TextOutputHandler extends OutputHandler {
         new OutputType("Annotated Text", "text", OutputType.TYPE_HTML, "",
                        ICON_TEXT);
 
+    /** _more_ */
+    public static final OutputType OUTPUT_WORDCLOUD =
+        new OutputType("Word Cloud", "wordclout", OutputType.TYPE_HTML, "",
+                       ICON_CLOUD);
+
 
     /**
      * _more_
@@ -98,6 +103,7 @@ public class TextOutputHandler extends OutputHandler {
             throws Exception {
         super(repository, element);
         addType(OUTPUT_TEXT);
+        addType(OUTPUT_WORDCLOUD);
     }
 
 
@@ -137,6 +143,7 @@ public class TextOutputHandler extends OutputHandler {
         for (int i = 0; i < suffixes.length; i++) {
             if (path.endsWith(suffixes[i])) {
                 links.add(makeLink(request, state.entry, OUTPUT_TEXT));
+                links.add(makeLink(request, state.entry, OUTPUT_WORDCLOUD));
                 return;
             }
         }
@@ -145,6 +152,7 @@ public class TextOutputHandler extends OutputHandler {
         if ((type != null) && type.startsWith("text/")) {
 
             links.add(makeLink(request, state.entry, OUTPUT_TEXT));
+            links.add(makeLink(request, state.entry, OUTPUT_WORDCLOUD));
         }
 
     }
@@ -167,6 +175,14 @@ public class TextOutputHandler extends OutputHandler {
             throw new AccessException("Cannot access data", request);
         }
 
+        Object output = request.getOutput();
+        if(output.equals(OUTPUT_WORDCLOUD)) {
+            return outputWordCloud(request, entry);
+        }
+        
+
+
+
         String contents  = IOUtil.readContents(entry.getFile());
         StringBuffer sb  = new StringBuffer();
         int          cnt = 0;
@@ -182,6 +198,48 @@ public class TextOutputHandler extends OutputHandler {
         }
         sb.append("</pre>");
         return makeLinksResult(request, msg("Text"), sb, new State(entry));
+    }
+
+
+    public Result outputWordCloud(Request request, Entry entry) throws Exception {
+        String contents  = IOUtil.readContents(entry.getFile());
+        StringBuffer sb  = new StringBuffer();
+
+        StringBuffer head = new StringBuffer();
+        head.append("\n");
+        head.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://visapi-gadgets.googlecode.com/svn/trunk/wordcloud/wc.css\">\n");
+        head.append(HtmlUtil.importJS("http://visapi-gadgets.googlecode.com/svn/trunk/wordcloud/wc.js"));
+        head.append("\n");
+        head.append(HtmlUtil.importJS("http://www.google.com/jsapi"));
+        head.append("\n");
+
+        sb.append("<div id=\"wcdiv\"></div>");
+        sb.append("\n");
+        StringBuffer js = new StringBuffer();
+        js.append("google.load(\"visualization\", \"1\");\n");
+        js.append("google.setOnLoadCallback(draw);\n");
+        js.append("function draw() {\n");
+        js.append("var data = new google.visualization.DataTable();\n");
+        js.append("data.addColumn('string', 'Text1');\n");
+        List<String> lines=(List<String>) StringUtil.split(contents, "\n",
+                                                           false, false); 
+        
+        js.append("data.addRows("+lines.size()+");\n");
+        int     cnt = 0;
+        for (String line : lines) {
+            line = line.replace("\r", "");
+            line = line.replace("'", "\\'");
+            js.append("data.setCell(" + cnt+", 0, '" + line +"');\n");
+            cnt++;
+        }
+        js.append("var outputDiv = document.getElementById('wcdiv');\n");
+        js.append("var wc = new WordCloud(outputDiv);\n");
+        js.append("wc.draw(data, null);\n");
+        js.append("      }");
+        sb.append(HtmlUtil.script(js.toString()));
+        Result result =  makeLinksResult(request, msg("Word Cloud"), sb, new State(entry));
+        result.putProperty(PROP_HTML_HEAD, head.toString());
+        return result;
     }
 
 

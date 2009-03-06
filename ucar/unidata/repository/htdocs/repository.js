@@ -544,6 +544,7 @@ var groupList = new Array();
 
 
 function EntryFormList(formId,img,selectId, initialOn) {
+
     this.entryRows = new Array();
     this.lastEntryRowClicked=null;
     groups[formId] = this;
@@ -692,7 +693,8 @@ function initEntryListForm(formId) {
 }
 
 
-function EntryRow (rowId, cbxId,cbxWrapperId) {
+function EntryRow (entryId, rowId, cbxId,cbxWrapperId) {
+    this.entryId = entryId;
     this.onColor = "#FFFFCC";
     this.overColor = "#f5f5f5";
     this.rowId = rowId;
@@ -736,13 +738,15 @@ function EntryRow (rowId, cbxId,cbxWrapperId) {
         }
     }
 
-    this.mouseOver = function() {
+    this.mouseOver = function(event) {
         this.row.style.backgroundColor = this.overColor;
+        //        mouseOverOnEntry(event, "", rowId);
         //        this.row.style.borderBottom =  "1px #888  solid";
     }
 
-    this.mouseOut = function() {
+    this.mouseOut = function(event) {
         this.setRowColor();
+        //        mouseOutOnEntry(event, "", rowId);
         //        this.row.style.borderBottom =  "1px #fff  solid";
     }
 }
@@ -868,6 +872,7 @@ function folderClick(uid, url, changeImg) {
     if(!block.obj.isOpen) {
 	originalImages[uid] = img.obj.src;
         block.obj.isOpen = 1;
+        //        Effect.SlideDown(block.obj.id, {'duration' : 0.4});
         showObject(block);
         if(img) img.obj.src = icon_progress;
 	util.loadXML( url, handleFolderList,uid);
@@ -879,6 +884,7 @@ function folderClick(uid, url, changeImg) {
                 img.obj.src = icon_folderclosed;
         }
         block.obj.isOpen = 0;
+//        Effect.SlideUp(block.obj.id, {'duration' : 0.5});
         hideObject(block);
     }
 }
@@ -905,21 +911,11 @@ function  handleFolderList(request, uid) {
             }  else {
             }
 	}
-
         if(!html) {
             html = getChildText(xmlDoc);
         }
-        var doScroll = 0;
 	if(html) {
-	    if(doScroll) {
-                block.style.maxHeight=0;
-                block.style.border = "1px #efefef  solid";
-                block.style.overflowY="hidden";
-            }
-            block.obj.innerHTML = html;
-	    if(doScroll) {
-                setTimeout("scrollObject('" + block.id +"',25,1)",1);
-            }
+            block.obj.innerHTML = "<div>"+html+"</div>";
 	}
 	if(script) {
             eval(script);
@@ -1127,9 +1123,9 @@ function hideObject(obj) {
     if(!style) {
         return 0;
     }
-
     style.visibility = "hidden";
     style.display = "none";
+    return 1;
 }
 
 
@@ -1161,7 +1157,6 @@ function showObject(obj, display) {
         return 0;
     }
   
-
     style.visibility = "visible";
     style.display = display;
     return 1;
@@ -1358,3 +1353,5 @@ function insertTagsInner(txtarea, tagOpen, tagClose, sampleText) {
     }
 
 }
+
+

@@ -284,7 +284,6 @@ public class ContentMetadataHandler extends MetadataHandler {
                                     extra);
 
             if (forLink) {
-
                 String bigimg =
                     HtmlUtil
                         .img(request
@@ -305,7 +304,7 @@ public class ContentMetadataHandler extends MetadataHandler {
 
 
                 //                System.err.println(imgUrl);
-                //                img =  HtmlUtil.href(imgUrl,img," rel=\"shadowbox\" ");
+                //img =  HtmlUtil.href(imgUrl,img," dojoType=\"dojox.image.Lightbox\" ");
                 img = getRepository().makePopupLink(img, bigimg, true, false);
             }
             return img;

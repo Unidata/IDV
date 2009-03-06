@@ -970,9 +970,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         String cbxArgId     = "entry_" + entry.getId();
         String cbxWrapperId = "cbx_" + (HtmlUtil.blockCnt++);
         jsSB.append(HtmlUtil.callln("new EntryRow",
-                                    HtmlUtil.comma(HtmlUtil.squote(rowId),
-                                        HtmlUtil.squote(cbxId),
-                                        HtmlUtil.squote(cbxWrapperId))));
+                                    HtmlUtil.comma(HtmlUtil.squote(entry.getId()),
+                                                   HtmlUtil.squote(rowId),
+                                                   HtmlUtil.squote(cbxId),
+                                                   HtmlUtil.squote(cbxWrapperId))));
 
         String cbx =
             HtmlUtil.checkbox(
@@ -1072,6 +1073,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 HtmlUtil.callln(
                     "new EntryRow",
                     HtmlUtil.comma(
+                                   HtmlUtil.squote(entry.getId()),
                         HtmlUtil.squote(rowId), HtmlUtil.squote(cbxId),
                         HtmlUtil.squote(cbxWrapperId))));
             if (doCbx) {

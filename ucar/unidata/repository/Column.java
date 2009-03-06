@@ -296,10 +296,10 @@ public class Column implements Constants {
      */
     private String toString(Object[] values, int idx) {
         if (values == null) {
-            return "";
+            return (dflt!=null?dflt:"");
         }
         if (values[idx] == null) {
-            return "";
+            return (dflt!=null?dflt:"");
         }
         return values[idx].toString();
     }
@@ -314,6 +314,9 @@ public class Column implements Constants {
      */
     private boolean toBoolean(Object[] values, int idx) {
         if (values[idx] == null) {
+            if(dflt!=null) {
+                return new Boolean(dflt).booleanValue();
+            }
             return true;
         }
         return ((Boolean) values[idx]).booleanValue();
@@ -747,31 +750,31 @@ public class Column implements Constants {
             widget = HtmlUtil.select(getFullName(),
                                      Misc.newList("True", "False"), value);
         } else if (type.equals(TYPE_ENUMERATION)) {
-            String value = "";
+            String value = (dflt!=null?dflt:"");
             if (entry != null) {
                 value = (String) toString(values, offset);
             }
             widget = HtmlUtil.select(getFullName(), this.values, value);
         } else if (type.equals(TYPE_INT)) {
-            String value = "";
+            String value = (dflt!=null?dflt:"");
             if (entry != null) {
                 value = "" + toString(values, offset);
             }
-            widget = HtmlUtil.input(getFullName(), value, "size=\"10\"");
+            widget = HtmlUtil.input(getFullName(), value, HtmlUtil.SIZE_10);
         } else if (type.equals(TYPE_DOUBLE)) {
-            String value = "";
+            String value = (dflt!=null?dflt:"");
             if (entry != null) {
                 value = "" + toString(values, offset);
             }
-            widget = HtmlUtil.input(getFullName(), value, "size=\"10\"");
+            widget = HtmlUtil.input(getFullName(), value, HtmlUtil.SIZE_10);
         } else if (type.equals(TYPE_PASSWORD)) {
-            String value = "";
+            String value = (dflt!=null?dflt:"");
             if (entry != null) {
                 value = "" + toString(values, offset);
             }
             widget = HtmlUtil.password(getFullName(), value, HtmlUtil.SIZE_10);
         } else {
-            String value = "";
+            String value = (dflt!=null?dflt:"");
             if (entry != null) {
                 value = toString(values, offset);
             }
@@ -813,7 +816,6 @@ public class Column implements Constants {
 
 
 
-
     /**
      * _more_
      *
@@ -827,23 +829,34 @@ public class Column implements Constants {
             //TODO
         } else if (type.equals(TYPE_BOOLEAN)) {
             String value = request.getString(getFullName(),
-                                             "true").toLowerCase();
+                                             (dflt!=null?dflt:"true")).toLowerCase();
             values[offset] = new Boolean(value);
         } else if (type.equals(TYPE_ENUMERATION)) {
             if (request.exists(getFullName())) {
-                values[offset] = request.getString(getFullName(), "");
+                values[offset] = request.getString(getFullName(), (dflt!=null?dflt:""));
+            } else {
+                values[offset] = dflt;
             }
         } else if (type.equals(TYPE_INT)) {
+            int dfltValue = (dflt!=null?new Integer(dflt).intValue():0);
             if (request.exists(getFullName())) {
-                values[offset] = new Integer(request.get(getFullName(), 0));
+                values[offset] = new Integer(request.get(getFullName(), dfltValue));
+            } else {
+                values[offset] = dfltValue;
             }
         } else if (type.equals(TYPE_DOUBLE)) {
+            double dfltValue = (dflt!=null?new Double(dflt).doubleValue():0);
             if (request.exists(getFullName())) {
-                values[offset] = new Double(request.get(getFullName(), 0.0));
+                values[offset] = new Double(request.get(getFullName(), dfltValue));
+            } else {
+                values[offset] = dfltValue;
+
             }
         } else {
             if (request.exists(getFullName())) {
-                values[offset] = request.getString(getFullName(), "");
+                values[offset] = request.getString(getFullName(), (dflt!=null?dflt:""));
+            } else {
+                values[offset] = dflt;
             }
         }
     }

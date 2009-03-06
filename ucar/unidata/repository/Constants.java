@@ -1130,6 +1130,8 @@ public interface Constants {
     public static final String PROP_HARVESTERS_ACTIVE =
         "ramadda.harvesters.active";
 
+    public static final String PROP_HTML_HEAD ="html.head";
+
     /** _more_ */
     public static final String PROP_HOSTNAME = "ramadda.hostname";
 
