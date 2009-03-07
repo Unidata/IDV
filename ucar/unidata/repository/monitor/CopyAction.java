@@ -178,7 +178,7 @@ public class CopyAction extends MonitorAction {
             sb.append(
                 HtmlUtil.formEntry(
                     "Sub-Group Template:",
-                    HtmlUtil.disabledInput(
+                    HtmlUtil.input(
                         getArgId(ARG_SUBGROUP), subGroup, HtmlUtil.SIZE_60)));
         } catch (Exception exc) {
             throw new RuntimeException(exc);

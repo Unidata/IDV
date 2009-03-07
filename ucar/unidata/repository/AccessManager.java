@@ -202,7 +202,7 @@ public class AccessManager extends RepositoryManager {
             Clause clause = Clause.eq(Tables.ASSOCIATIONS.COL_ID,
                                       request.getString(ARG_ASSOCIATION, ""));
             List<Association> associations =
-                getEntryManager().getAssociations(request, clause);
+                getAssociationManager().getAssociations(request, clause);
             if (associations.size() == 1) {
                 Entry fromEntry = getEntryManager().getEntry(request,
                                       associations.get(0).getFromId());

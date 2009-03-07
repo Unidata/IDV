@@ -331,6 +331,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private EntryManager entryManager;
 
+    private AssociationManager associationManager;
+
     /** _more_ */
     private SearchManager searchManager;
 
@@ -795,6 +797,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
+    protected AssociationManager doMakeAssociationManager() {
+        return new AssociationManager(this);
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected HarvesterManager doMakeHarvesterManager() {
         return new HarvesterManager(this);
     }
@@ -912,6 +923,19 @@ public class Repository extends RepositoryBase implements RequestHandler {
             entryManager = doMakeEntryManager();
         }
         return entryManager;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public AssociationManager getAssociationManager() {
+        if (associationManager == null) {
+            associationManager = doMakeAssociationManager();
+        }
+        return associationManager;
     }
 
     /**
@@ -1601,6 +1625,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 handler = getSearchManager();
             } else if (handlerName.equals("entrymanager")) {
                 handler = getEntryManager();
+            } else if (handlerName.equals("associationmanager")) {
+                handler = getAssociationManager();
             } else if (handlerName.equals("metadatamanager")) {
                 handler = getMetadataManager();
             } else if (handlerName.equals("repository")) {
@@ -2763,7 +2789,17 @@ public class Repository extends RepositoryBase implements RequestHandler {
             } catch (Exception exc) {}
         }
 
-        //Look at the command line properties first
+        String override = "override."+name;
+        //Check if there is an override 
+        if (prop == null) {
+            prop = (String) cmdLineProperties.get(override);
+        }
+
+        if (prop == null) {
+            prop = (String) properties.get(name);
+        }
+
+        //Then look at the command line
         if (prop == null) {
             prop = (String) cmdLineProperties.get(name);
         }

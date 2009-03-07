@@ -202,7 +202,7 @@ public class CsvOutputHandler extends OutputHandler {
         StringBuffer  sb          = new StringBuffer();
         TypeHandler   typeHandler = repository.getTypeHandler(request);
         String[] associations     =
-            getEntryManager().getAssociations(request);
+            getAssociationManager().getAssociations(request);
 
         List<String>  names       = new ArrayList<String>();
         List<Integer> counts      = new ArrayList<Integer>();

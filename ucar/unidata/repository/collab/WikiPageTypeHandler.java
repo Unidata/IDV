@@ -212,14 +212,14 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
 
 
             List<Association> associations =
-                getEntryManager().getAssociations(request, entry);
+                getAssociationManager().getAssociations(request, entry);
             for (Association oldAssociation : (List<Association>) new ArrayList(
                     associations)) {
                 if (oldAssociation.getType().equals(ASSOC_WIKILINK)
                         && oldAssociation.getFromId().equals(entry.getId())) {
                     if ( !newAssociations.contains(oldAssociation)) {
-                        System.err.println("delete:" + oldAssociation);
-                        getEntryManager().deleteAssociation(request,
+                        //                        System.err.println("delete:" + oldAssociation);
+                        getAssociationManager().deleteAssociation(request,
                                 oldAssociation);
                     }
                 }
@@ -227,7 +227,7 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
             for (Association newAssociation : (List<Association>) new ArrayList(
                     newAssociations)) {
                 if ( !associations.contains(newAssociation)) {
-                    getEntryManager().addAssociation(request, newAssociation);
+                    getAssociationManager().addAssociation(request, newAssociation);
                 }
             }
 

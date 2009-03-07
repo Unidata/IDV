@@ -285,81 +285,6 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     *
-     * @return _more_
-     * @throws Exception _more_
-     */
-    public StringBuffer getAssociationBlock(Request request, Entry entry)
-            throws Exception {
-        StringBuffer sb = new StringBuffer();
-        boolean canEdit = getAccessManager().canDoAction(request, entry,
-                              Permission.ACTION_EDIT);
-        List<Association> associations =
-            getEntryManager().getAssociations(request, entry);
-        if (associations.size() == 0) {
-            return sb;
-        }
-        sb.append("<table>");
-        for (Association association : associations) {
-            Entry fromEntry = null;
-            Entry toEntry   = null;
-            if (association.getFromId().equals(entry.getId())) {
-                fromEntry = entry;
-            } else {
-                fromEntry = getEntryManager().getEntry(request,
-                        association.getFromId());
-            }
-            if (association.getToId().equals(entry.getId())) {
-                toEntry = entry;
-            } else {
-                toEntry = getEntryManager().getEntry(request,
-                        association.getToId());
-            }
-            if ((fromEntry == null) || (toEntry == null)) {
-                continue;
-            }
-            sb.append("<tr>");
-            if (canEdit) {
-                sb.append(
-                    HtmlUtil.cols(
-                        HtmlUtil.href(
-                            request.url(
-                                getRepository().URL_ASSOCIATION_DELETE,
-                                ARG_ASSOCIATION,
-                                association.getId()), HtmlUtil.img(
-                                    getRepository().iconUrl(ICON_DELETE),
-                                    msg("Delete association")))));
-            }
-            List args = Misc.newList(ARG_SHOW_ASSOCIATIONS, "true");
-            sb.append("<td>");
-            sb.append(((fromEntry == entry)
-                       ? fromEntry.getLabel()
-                       : getEntryManager().getEntryLink(request, fromEntry,
-                       args)));
-            sb.append("&nbsp;&nbsp;");
-            sb.append("</td><td>");
-            sb.append(HtmlUtil.bold(association.getLabel()));
-            sb.append("</td><td>");
-            sb.append(HtmlUtil.img(getRepository().iconUrl(ICON_ARROW)));
-            sb.append("&nbsp;&nbsp;");
-            sb.append("</td><td>");
-            sb.append(((toEntry == entry)
-                       ? toEntry.getLabel()
-                       : getEntryManager().getEntryLink(request, toEntry,
-                       args)));
-            sb.append("</td></tr>");
-        }
-        sb.append("</table>");
-        return sb;
-    }
-
-
 
     /**
      * _more_
@@ -541,7 +466,7 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append("<ul>");
         }
         TypeHandler typeHandler  = getRepository().getTypeHandler(request);
-        String[]    associations = getEntryManager().getAssociations(request);
+        String[]    associations = getAssociationManager().getAssociations(request);
 
 
         if (associations.length == 0) {
@@ -583,7 +508,7 @@ public class HtmlOutputHandler extends OutputHandler {
             int    count       = counts.get(i).intValue();
             if (output.equals(OUTPUT_HTML)) {
                 sb.append("<li> ");
-                sb.append(getEntryManager().getAssociationLinks(request,
+                sb.append(getAssociationManager().getAssociationLinks(request,
                         association));
                 sb.append(" ");
                 sb.append(association);
@@ -946,8 +871,12 @@ public class HtmlOutputHandler extends OutputHandler {
         }
         tabTitles.add(msg("Comments"));
         tabContents.add(getCommentBlock(request, entry));
-        tabTitles.add(msg("Associations"));
-        tabContents.add(getAssociationBlock(request, entry));
+        if(request.get(ARG_SHOW_ASSOCIATIONS,false)) {
+            tabTitles.add("selected:"+msg("Associations"));
+        } else {
+            tabTitles.add(msg("Associations"));
+        }
+        tabContents.add(getAssociationManager().getAssociationBlock(request, entry));
 
         //        tabTitles.add(msg(LABEL_LINKS));
         //        tabContents.add(getEntryManager().getEntryActionsTable(request, entry,
@@ -1025,7 +954,7 @@ public class HtmlOutputHandler extends OutputHandler {
             String informationBlock = getInformationTabs(request, group,
                                           false);
             sb.append(HtmlUtil.makeShowHideBlock(msg("Information"),
-                    informationBlock, false));
+                    informationBlock,         request.get(ARG_SHOW_ASSOCIATIONS,false)));
 
             StringBuffer metadataSB = new StringBuffer();
             getMetadataManager().decorateEntry(request, group, metadataSB,

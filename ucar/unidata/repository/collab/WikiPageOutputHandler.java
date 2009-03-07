@@ -198,7 +198,7 @@ public class WikiPageOutputHandler extends OutputHandler {
         Hashtable links = (Hashtable) wikiUtil.getProperty("wikilinks");
         if (links != null) {
             List<Association> associations =
-                getEntryManager().getAssociations(request, entry);
+                getAssociationManager().getAssociations(request, entry);
         }
 
         return makeLinksResult(request, msg("Wiki"), sb, new State(entry));

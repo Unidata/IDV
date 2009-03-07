@@ -40,7 +40,7 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.PluginClassLoader;
-
+import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
@@ -146,7 +146,6 @@ public class SearchManager extends RepositoryManager {
         return getRepository().makeResult(request, msg("Search Form"), sb,
                                           getRepository().searchUrls);
     }
-
 
 
 

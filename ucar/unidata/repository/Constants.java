@@ -866,6 +866,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    public static final String ARG_TYPE_FREEFORM = "type.freeform";
+
     /** _more_ */
     public static final String ARG_TYPE_EXCLUDE = "type.exclude";
 

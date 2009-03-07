@@ -193,7 +193,7 @@ public class GraphOutputHandler extends OutputHandler {
                                         StringBuffer sb)
             throws Exception {
         List<Association> associations =
-            getEntryManager().getAssociations(request, id);
+            getAssociationManager().getAssociations(request, id);
         for (Association association : associations) {
             Entry   other  = null;
             boolean isTail = true;

@@ -441,6 +441,10 @@ public class RepositoryManager implements RepositorySource, Constants,
         return repository.getEntryManager();
     }
 
+    protected AssociationManager getAssociationManager() {
+        return repository.getAssociationManager();
+    }
+
     /**
      * _more_
      *

@@ -15,6 +15,29 @@ then on the Login page you should see &quot;Forget you User ID?&quot; and
 
 
 
+
+
+
+
+
+<faqitem cat="Administration"></faqitem>
+
+<faqitem id="ssl" q="How do I configure SSL access to RAMADDA?" >
+RAMADDA itself does not implement SSL, that is up to the web server container (e.g., Tomcat).
+However, once you have SSL enabled you can configure RAMADDA to use  SSL for the connections
+that require it (e.g., login, user settings, admin area).
+On the main Site Administration  page under the &quot;Contact&quot; area you can specify
+the SSL port number on your server. When RAMADDA is configured to use SSL the login form
+and the site administration pages will automatically use SSL.
+</faqitem>
+
+
+<faqitem id="allssl" q="I really screwed up. I turned on SSL and selected &quot;Force all connections to be secure&quot;. SSL isn't working and now I cannot access anything in RAMADDA. What can I do?" >
+The problem is that the SSL property settings are in the database which takes precedence over other properties. One way around this is to run RAMADDA with the command line argument:<pre>-Dramadda.access.allssl=false</pre>
+Alternatively you can put the following in the repository.properties file:<pre>override.ramadda.access.allssl=false</pre>
+The &quot;override.&quot; prefix tells RAMADDA to override the database properties and instead use the property defined in the properties file.
+</faqitem>
+
 <faqitem q="I forgot the administrator password and cannot access RAMADDA. How do I login?" >
 You can specify an administrator user id and password from the command line when starting RAMADDA.
 If you are running RAMADDA stand alone then just provide the arguments:<pre>
@@ -39,17 +62,9 @@ Note: you should remove this entry once you have reset your password.
 </faqitem>
 
 
-<faqitem cat="Administration"></faqitem>
 
-<faqitem q="How do I configure SSL access to RAMADDA?" >
-On the main Site Administration  page under the &quot;Contact&quot; area you can specify
-the SSL port number on your server. When RAMADDA is configured to use SSL the login form
-and the site administration pages will automatically use SSL.
-</faqitem>
-
-
-
-<faqitem q="How do I configure RAMADDA to send email?" >
+<faqitem id="email" q="How do I configure RAMADDA to send email?" >
+RAMADDA can send email for both the password reset process and for monitoring new entries.
 On the main Site Administration  page under the &quot;Contact&quot; area you can specify
 a SMTP server that RAMADDA will use to send email.
 </faqitem>

@@ -25,9 +25,16 @@
       <api request="/entry/comments/show"    method="processCommentsShow"/>
       <api request="/entry/comments/add"     method="processCommentsAdd"      actions="comment"/>
       <api request="/entry/comments/edit"    method="processCommentsEdit"     actions="edit"/>
+      <api request="/catalog"                method="processCatalog"/>
+  </group>
+
+
+  <group handler="associationmanager">
       <api request="/association/add"        method="processAssociationAdd"/>
       <api request="/association/delete"     method="processAssociationDelete"   actions="edit"/>
-      <api request="/catalog"                method="processCatalog"/>
+      <api request="/search/associations/form"    method="processSearchAssociationsForm"      name="Search Associations"/>
+      <api request="/search/associations/do"    method="processSearchAssociations"      name="Search Associations"/>
+
   </group>
 
 

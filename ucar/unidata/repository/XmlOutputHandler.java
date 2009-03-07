@@ -206,7 +206,7 @@ public class XmlOutputHandler extends OutputHandler {
         TypeHandler   typeHandler = repository.getTypeHandler(request);
 
         String[] associations     =
-            getEntryManager().getAssociations(request);
+            getAssociationManager().getAssociations(request);
 
 
         List<String>  names       = new ArrayList<String>();
