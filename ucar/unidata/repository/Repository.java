@@ -4359,12 +4359,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (request.get(ARG_ASCENDING, false)) {
             order = " ASC ";
         }
-        int    skipCnt     = request.get(ARG_SKIP, 0);
         String limitString = BLANK;
-        //        if (request.defined(ARG_SKIP)) {
-        //            if (skipCnt > 0) {
         int max = request.get(ARG_MAX, DB_MAX_ROWS);
-        limitString = getDatabaseManager().getLimitString(skipCnt, max);
+        limitString = getDatabaseManager().getLimitString(request.get(ARG_SKIP, 0), max);
         String orderBy = BLANK;
         if (addOrderBy) {
             orderBy = " ORDER BY " + Tables.ENTRIES.COL_FROMDATE + order;
