@@ -4257,24 +4257,36 @@ public class Misc {
 
 
 
+    public static Runnable getRunnable() {
+        return new Runnable() {
+                public void run() {
+                    int x=0;
+                    int y=0;
+                    while(true) {
+                        for(int i=0;i<100000000;i++) {
+                            y = x;
+                        }
+                        x++;
+                        System.err.print(".");
+                    }
+                }
+            };
+    }
+
     /**
      * Main method for testing
      *
      * @param args  args
      */
     public static void main(String[] args) {
-        //        int[]lengths = {32,32,32,32};
-        int[] lengths = { 7 };
-        int   x       = 5 << (32 - 7);
-        //        printBits(5);
-        //        printBits(x);
-        /*
-        int[] values = { x, 8, 9, 10 };
-        int[] result = unpack(values, lengths);
-        for (int i = 0; i < result.length; i++) {
-            System.err.println("result[" + i + "]=" + result[i]);
-            }*/
+        
+        
+        int nrOfProcessors = Runtime.getRuntime().availableProcessors();
+        System.out.println("Number of processors available to the Java Virtual Machine: " + nrOfProcessors);
+        
 
+        //        Misc.run(getRunnable());
+        //        Misc.run(getRunnable());
     }
 
     /**

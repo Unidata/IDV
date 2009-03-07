@@ -1999,6 +1999,34 @@ public class HtmlUtil {
     }
 
 
+    public static StringBuffer table(List columns, int numCols, String attributes) {
+        if(attributes == null) {
+            attributes = 
+                attrs(ATTR_CELLPADDING, "0", ATTR_CELLSPACING, "0");
+        }
+        StringBuffer sb = new StringBuffer();
+        sb.append(open(TAG_TABLE,attributes));
+        int cols = 0;
+        for(int i=0;i<columns.size();i++) {
+            if(cols==0) {
+                if(i>=1) {
+                    sb.append(close(TAG_TR));
+                }
+                sb.append(open(TAG_TR));
+            }
+            sb.append(col(columns.get(i).toString()));
+            cols++;
+            if(cols>=numCols) {
+                cols = 0;
+            }
+        }
+        sb.append(close(TAG_TR));
+
+        sb.append(close(TAG_TABLE));
+        return sb;
+    }
+
+
     /**
      * _more_
      *
@@ -2446,6 +2474,19 @@ public class HtmlUtil {
 
         idArray.append(")");
 
+        String selectedOne = null;
+        for (int i = 0; i < titles.size(); i++) {
+            String content = contents.get(i).toString();
+            if (skipEmpty && (content.length() == 0)) {
+                continue;
+            }
+            String title = titles.get(i).toString();
+            if(title.startsWith("selected:")) {
+                selectedOne= title;
+                break;
+            }
+        }
+
         boolean didone = false;
         for (int i = 0; i < titles.size(); i++) {
             String content = contents.get(i).toString();
@@ -2455,23 +2496,27 @@ public class HtmlUtil {
             String title = titles.get(i).toString();
             String tabId = id + "_" + i;
             contentSB.append("\n");
+            boolean selected = (selectedOne==null?!didone:Misc.equals(title,selectedOne));
+            if(selected && selectedOne!=null) {
+                title = title.substring("selected:".length());
+            }
             contentSB.append(HtmlUtil.div(content,
                                           HtmlUtil.cssClass(tabContentClass
-                                              + ( !didone
+                                              + (selected
                     ? "_on"
                     : "_off")) + HtmlUtil.id("content_" + tabId)
-                               + HtmlUtil.style("display:" + ( !didone
+                               + HtmlUtil.style("display:" + ( selected
                     ? "block"
-                    : "none") + ";visibility:" + ( !didone
+                    : "none") + ";visibility:" + (selected
                     ? "visible"
                     : "hidden"))));
             String link = HtmlUtil.href("javascript:" + "tabPress("
                                         + HtmlUtil.squote(id) + "," + idArray
                                         + "," + HtmlUtil.squote(tabId)
                                         + ")", title);
-            titleSB.append(HtmlUtil.span(link, (didone
-                    ? HtmlUtil.cssClass("tab_title_off")
-                    : HtmlUtil.cssClass("tab_title_on")) + HtmlUtil.id(
+            titleSB.append(HtmlUtil.span(link, (selected
+                    ? HtmlUtil.cssClass("tab_title_on")
+                    : HtmlUtil.cssClass("tab_title_off")) + HtmlUtil.id(
                         "title_" + tabId)));
             didone = true;
         }
