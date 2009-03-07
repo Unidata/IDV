@@ -496,13 +496,13 @@ public class AssociationManager extends RepositoryManager {
             Clause clause)
             throws Exception {
         int max = request.get(ARG_MAX, DB_MAX_ROWS);
-        String   orderBy = " ORDER BY " + Tables.ASSOCIATIONS.COL_TYPE + " ASC, " +
-             Tables.ASSOCIATIONS.COL_NAME + " ASC ";
+        String   orderBy = " ORDER BY " + Tables.ASSOCIATIONS.COL_TYPE + " ASC ," +
+                                                                                   Tables.ASSOCIATIONS.COL_NAME + " ASC ";
         Statement stmt =
             getDatabaseManager().select(Tables.ASSOCIATIONS.COLUMNS,
                                         Tables.ASSOCIATIONS.NAME, clause,
-                                        getDatabaseManager().getLimitString(request.get(ARG_SKIP, 0), max)+" " 
-                                        + orderBy);
+                                        orderBy + " " +
+                                        getDatabaseManager().getLimitString(request.get(ARG_SKIP, 0), max));
         System.err.println (getRepository().getQueryOrderAndLimit(request,false));
         List<Association> associations = new ArrayList();
         SqlUtil.Iterator  iter         = SqlUtil.getIterator(stmt);

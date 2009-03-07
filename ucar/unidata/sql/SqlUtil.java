@@ -1415,7 +1415,6 @@ public class SqlUtil {
             System.err.println(sb);
         }
         String query = makeSelect(what, tables, sb.toString(), extra);
-        System.err.println(query);
         return connection.prepareStatement(query);
     }
 
