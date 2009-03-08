@@ -122,6 +122,12 @@ a.header  {
 	
 }
 
+.stack {
+  background-color : #eee;
+  border: 1px #666666 solid;
+  margin-left:10px;
+}
+
 .sortlinkon  {
   font-size: 10pt;
   background-color : #eee;

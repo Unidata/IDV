@@ -310,11 +310,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
-    /** _more_ */
-    private File logFile;
+
 
     /** _more_ */
-    private OutputStream logFOS;
+    private OutputStream fullLogFOS;
+
+
+    private OutputStream runLogFOS;
+
 
     /** _more_ */
     public static boolean debug = true;
@@ -381,6 +384,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     private List<LogEntry> log = new ArrayList<LogEntry>();
+
+
 
 
 
@@ -670,11 +675,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             setUrlBase(BLANK);
         }
 
-        logFile =
-            new File(IOUtil.joinDir(getStorageManager().getRepositoryDir(),
-                                    "repository.log"));
-        //TODO: Roll the log file
-        logFOS = new FileOutputStream(logFile, true);
+        fullLogFOS = new FileOutputStream(getStorageManager().getFullLogFile(), true);
+        runLogFOS = new FileOutputStream(getStorageManager().getLogFile(), false);
 
         String derbyHome = (String) properties.get(PROP_DB_DERBY_HOME);
         if (derbyHome != null) {
@@ -754,7 +756,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
         HtmlUtil.setHideShowImage(iconUrl(ICON_MINUS), iconUrl(ICON_PLUS));
-
+        logInfo("RAMADDA started");
     }
 
 
@@ -1444,7 +1446,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             System.err.println(message);
             if (thr!=null) {
                 if (thr instanceof RepositoryUtil.MissingEntryException) {
-                    System.err.println(thr);
+                    System.err.println(thr.getMessage());
                 } else {
                     thr.printStackTrace();
                 }
@@ -1453,18 +1455,25 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         try {
             String line = new Date() + " -- " + message;
-            logFOS.write(line.getBytes());
-            logFOS.write("\n".getBytes());
-            if (thr != null) {
-                if (thr instanceof RepositoryUtil.MissingEntryException) {
-                    logFOS.write(thr.toString().getBytes());
-                    logFOS.write("\n".getBytes());
-                } else {
-                    logFOS.write(LogUtil.getStackTrace(thr).getBytes());
-                    logFOS.write("\n".getBytes());
+            for(FileOutputStream os: (List<FileOutputStream>)Misc.newList(fullLogFOS,runLogFOS)) {
+                synchronized(os) {
+                    os.write(line.getBytes());
+                    os.write("\n".getBytes());
+                    if (thr != null) {
+                        if (thr instanceof RepositoryUtil.MissingEntryException) {
+                            os.write(thr.toString().getBytes());
+                            os.write("\n".getBytes());
+                        } else {
+                            os.write("<stack>".getBytes());
+                            os.write("\n".getBytes());
+                            os.write(LogUtil.getStackTrace(thr).getBytes());
+                            os.write("\n".getBytes());
+                            os.write("</stack>".getBytes());
+                        }
+                    }
+                    os.flush();
                 }
             }
-            logFOS.flush();
         } catch (Exception exc2) {
             System.err.println("Error writing log:" + exc2);
         }
@@ -2058,8 +2067,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 if (userAgent == null) {
                     userAgent = "Unknown";
                 }
-                logError("Error handling request:" + request + " user-agent:"
-                         + userAgent + " ip:" + request.getIp(), exc);
+                logError("Error handling request:" + request + " ip:" + request.getIp(), exc);
             }
         }
 

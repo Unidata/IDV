@@ -456,6 +456,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_AUTH_USER = "auth.user";
 
+    public static final String ARG_BYTES = "bytes";
+
     /** _more_ */
     public static final String ARG_CANCEL = "cancel";
 
@@ -632,6 +634,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_LOCALFILE = "localfile";
+    public static final String ARG_LOG = "log";
 
     /** _more_ */
     public static final String ARG_MAX = "max";

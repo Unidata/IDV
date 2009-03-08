@@ -175,11 +175,20 @@ public class TextOutputHandler extends OutputHandler {
             throw new AccessException("Cannot access data", request);
         }
 
+
+
+
+
         Object output = request.getOutput();
         if(output.equals(OUTPUT_WORDCLOUD)) {
             return outputWordCloud(request, entry);
         }
         
+
+StringBuffer head = new StringBuffer("<link type=\"text/css\" rel=\"stylesheet\" href=\"${root}/javascript/syntaxhighlighter/styles/shCore.css\" />\n<link type=\"text/css\" rel=\"stylesheet\" href=\"${root}/javascript/syntaxhighlighter/styles/shThemeDefault.css\" />\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shCore.js\">\n</script>\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shBrushJScript.js\">\n</script>\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shBrushBash.js\">\n</script>\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shBrushCpp.js\">\n</script>\n");
+
+
+ //<script type="text/javascript">SyntaxHighlighter.all();</script> 
 
 
 

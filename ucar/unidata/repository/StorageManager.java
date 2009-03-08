@@ -295,6 +295,18 @@ public class StorageManager extends RepositoryManager {
     }
 
 
+
+    public File getFullLogFile() {
+        return  new File(IOUtil.joinDir(getRepositoryDir(),
+                                        "fullrepository.log"));
+    }
+
+    public File getLogFile() {
+        return  new File(IOUtil.joinDir(getRepositoryDir(),
+                                        "repository.log"));
+    }
+
+
     /**
      * _more_
      *

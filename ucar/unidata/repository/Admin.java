@@ -136,7 +136,7 @@ public class Admin extends RepositoryManager {
 
     /** _more_ */
     public RequestUrl URL_ADMIN_LOG = new RequestUrl(this, "/admin/log",
-                                          "Log");
+                                          "Logs");
 
 
     /** _more_ */
@@ -244,6 +244,119 @@ public class Admin extends RepositoryManager {
      */
     public Result adminLog(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
+        List<String> header = new ArrayList();
+        String log = request.getString(ARG_LOG,"access");
+        if(log.equals("access")) {
+            header.add(HtmlUtil.bold(msg("Access Log")));
+            header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
+                                                  ARG_LOG,"error"),"Error Log"));
+            header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
+                                                  ARG_LOG,"fullerror"),"Full Error Log"));
+        } else   if(log.equals("error")) {
+            header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
+                                                  ARG_LOG,"access"),"Access"));
+            header.add(HtmlUtil.bold(msg("Error")));
+            header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
+                                                  ARG_LOG,"fullerror"),"Full Error Log"));
+        } else {
+            header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
+                                                  ARG_LOG,"access"),"Access"));
+            header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
+                                                  ARG_LOG,"error"),"Error Log"));
+            header.add(HtmlUtil.bold(msg("Full Error")));
+        }
+
+        sb.append(HtmlUtil.br());
+        sb.append(HtmlUtil.space(10));
+        sb.append(StringUtil.join(HtmlUtil.span("&nbsp;|&nbsp;",
+                                                HtmlUtil.cssClass("separator")), header));
+        sb.append(HtmlUtil.hr());
+
+        if(log.equals("access")) {
+            getAccessLog(request,sb);
+        } else   if(log.equals("error")) {
+            getErrorLog(request,sb,getStorageManager().getLogFile());
+        } else {
+            getErrorLog(request,sb,getStorageManager().getFullLogFile());
+        }
+
+
+        Result result = new Result(msg("Log"), sb);
+        result.putProperty(PROP_NAVSUBLINKS,
+                           getRepository().getSubNavLinks(request,
+                               getAdmin().adminUrls));
+        return result;
+    }
+
+    private void getErrorLog(Request request, StringBuffer sb, File logFile) throws Exception {
+        FileInputStream fis = new FileInputStream(logFile);
+        String log = request.getString(ARG_LOG,"error");
+        int numBytes = request.get(ARG_BYTES,10000);
+        if(numBytes<0) numBytes=100;
+        long length = logFile.length();
+        long offset = length-numBytes;
+        if(numBytes<length)
+            sb.append(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
+                                                 ARG_LOG,log,ARG_BYTES,numBytes+2000),"More..."));
+        sb.append(HtmlUtil.space(2));
+        sb.append(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
+                                             ARG_LOG,log,ARG_BYTES,numBytes-2000),"Less..."));
+
+        sb.append(HtmlUtil.p());
+        if(offset>0) {
+            fis.skip(offset);
+        } else {
+            numBytes = (int)length;
+        }
+        byte[]bytes = new byte[numBytes];
+        fis.read(bytes);
+        String logString = new String(bytes);
+        boolean didOne = false;
+        StringBuffer stackSB = null;
+        boolean lastOneBlank = false;
+        for(String line:StringUtil.split(logString,"\n",false,false)) {
+            if(!didOne) {
+                didOne = true;
+                continue;
+            }
+            line = line.trim();
+            if(line.length()==0) {
+                if(lastOneBlank) continue;
+                lastOneBlank =true;
+            } else {
+                lastOneBlank  =false;
+            }
+            if(line.startsWith("</stack>") && stackSB !=null) {
+                sb.append(HtmlUtil.makeShowHideBlock("Stack trace", HtmlUtil.div(stackSB.toString(),HtmlUtil.cssClass("stack")),
+                                                     false));
+                sb.append("\n");
+                stackSB = null;
+            } else if(stackSB!=null) {
+                line  = HtmlUtil.entityEncode(line);
+                stackSB.append(line);
+                stackSB.append("<br>");
+            } else if(line.startsWith("<stack>")) {
+                stackSB = new StringBuffer();
+            }  else {
+                line  = HtmlUtil.entityEncode(line);
+                sb.append(line);
+                sb.append("<br>");
+                sb.append("\n");
+            }
+        }
+        if(stackSB !=null) {
+            sb.append(HtmlUtil.makeShowHideBlock("Stack trace", HtmlUtil.div(stackSB.toString(),HtmlUtil.cssClass("stack")),
+                                                 false));
+        }
+
+        //        sb.append("</pre>");
+    }
+
+
+    private void getAccessLog(Request request, StringBuffer sb) throws Exception {
+
+
+
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
         sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.b(msg("User")),
                                              HtmlUtil.b(msg("Date")),
@@ -300,15 +413,7 @@ public class Admin extends RepositoryManager {
         }
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
 
-        Result result = new Result(msg("Log"), sb);
-        result.putProperty(PROP_NAVSUBLINKS,
-                           getRepository().getSubNavLinks(request,
-                               getAdmin().adminUrls));
-        return result;
     }
-
-
-
 
     /**
      * _more_
