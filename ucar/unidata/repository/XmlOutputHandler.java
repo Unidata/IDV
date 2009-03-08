@@ -82,7 +82,7 @@ public class XmlOutputHandler extends OutputHandler {
     /** _more_ */
     public static final OutputType OUTPUT_XML = new OutputType("XML",
                                                     "xml.xml",
-                                                    OutputType.TYPE_NONHTML);
+                                                    OutputType.TYPE_NONHTML|OutputType.TYPE_FORSEARCH,"",ICON_XML);
 
 
 

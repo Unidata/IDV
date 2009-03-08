@@ -83,13 +83,13 @@ public class HtmlOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_TIMELINE =
-        new OutputType("Timeline", "default.timeline", OutputType.TYPE_HTML,
+        new OutputType("Timeline", "default.timeline", OutputType.TYPE_HTML|OutputType.TYPE_FORSEARCH,
                        "", ICON_CLOCK);
 
     /** _more_ */
     public static final OutputType OUTPUT_GRAPH = new OutputType("Graph",
                                                       "default.graph",
-                                                      OutputType.TYPE_HTML);
+                                                      OutputType.TYPE_HTML|OutputType.TYPE_FORSEARCH,"",ICON_GRAPH);
 
     /** _more_ */
     public static final OutputType OUTPUT_CLOUD = new OutputType("Cloud",

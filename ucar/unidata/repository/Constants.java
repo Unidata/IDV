@@ -261,6 +261,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_WIKI = "ramadda.icon.wiki";
 
+    public static final String ICON_XML = "ramadda.icon.xml";
     /** _more_ */
     public static final String ICON_ZIP = "ramadda.icon.zip";
 

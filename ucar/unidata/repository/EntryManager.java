@@ -348,7 +348,7 @@ return new Result(title, sb);
             String output = request.getString(ARG_OUTPUT, (String) "");
             request.put(ARG_OUTPUT, output);
             StringBuffer sb = new StringBuffer();
-            if ( !entry.isGroup() || !((Group) entry).isDummy()) {
+            if (!entry.isGroup() || !((Group) entry).isDummy()) {
                 String[] crumbs = getBreadCrumbs(request, entry, false);
                 sb.append(crumbs[1]);
                 //                result.setTitle(result.getTitle() + ": " + crumbs[0]);

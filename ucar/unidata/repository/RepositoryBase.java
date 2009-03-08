@@ -644,6 +644,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @return _more_
      */
     public String iconUrl(String f) {
+        if(f==null) return null;
         String path = getProperty(f, f);
         return urlBase + path;
     }

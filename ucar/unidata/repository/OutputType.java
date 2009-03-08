@@ -103,6 +103,9 @@ public class OutputType {
     /** _more_ */
     public static final int TYPE_TOOLBAR = 1 << 7;
 
+    /** _more_ */
+    public static final int TYPE_FORSEARCH = 1 << 8;
+
 
     /** _more_ */
     public static final int TYPE_ALL = TYPE_HTML | TYPE_ACTION | TYPE_NONHTML
@@ -354,6 +357,15 @@ public class OutputType {
      */
     public boolean getIsHtml() {
         return isType(TYPE_HTML);
+    }
+
+
+    /**
+     *
+     *  @return The IsHtml
+     */
+    public boolean getIsForSearch() {
+        return isType(TYPE_FORSEARCH);
     }
 
     /**

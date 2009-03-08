@@ -99,7 +99,7 @@ public class CatalogOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_CATALOG =
-        new OutputType("Catalog", "thredds.catalog", OutputType.TYPE_NONHTML,
+        new OutputType("Catalog", "thredds.catalog", OutputType.TYPE_NONHTML|OutputType.TYPE_FORSEARCH,
                        "", ICON_CATALOG);
 
 

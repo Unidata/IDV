@@ -235,6 +235,10 @@ public class SearchManager extends RepositoryManager {
                                         false)) + HtmlUtil.space(1)
                                             + msg("ascending");
         outputForm.append(HtmlUtil.formEntry(msgLabel("Order By"), orderBy));
+        outputForm.append(HtmlUtil.formEntry(msgLabel("Output"), HtmlUtil.select(ARG_OUTPUT,
+                                                                                 getOutputHandlerSelectList(),
+                                                                                 request.getString(ARG_OUTPUT,""))));
+
         outputForm.append(HtmlUtil.formTableClose());
 
 
@@ -253,6 +257,18 @@ public class SearchManager extends RepositoryManager {
     }
 
 
+
+    public List getOutputHandlerSelectList() {
+        List tfos = new ArrayList<TwoFacedObject>();
+        for (OutputHandler outputHandler: getRepository().getOutputHandlers()) {
+            for(OutputType type: outputHandler.getTypes()) {
+                if(type.getIsForSearch()) {
+                    tfos.add(new HtmlUtil.Selector(type.getLabel(),type.getId(),getRepository().iconUrl(type.getIcon())));
+                }
+            }
+        }
+        return tfos;
+    }
 
 
     /**
@@ -353,8 +369,10 @@ public class SearchManager extends RepositoryManager {
         if (theGroup == null) {
             theGroup = getEntryManager().getDummyGroup();
         }
-        return getRepository().getOutputHandler(request).outputGroup(request,
+        Result result =  getRepository().getOutputHandler(request).outputGroup(request,
                 theGroup, (List<Group>) pair[0], (List<Entry>) pair[1]);
+        return getEntryManager().addEntryHeader(request, theGroup,
+                                                result);
     }
 
 

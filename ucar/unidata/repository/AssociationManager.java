@@ -682,7 +682,11 @@ public class AssociationManager extends RepositoryManager {
         }
 
         if(name.length()>0) {
-            clauses.add(Clause.like(Tables.ASSOCIATIONS.COL_NAME, name));
+            if(request.get(ARG_EXACT,false)) {
+                clauses.add(Clause.eq(Tables.ASSOCIATIONS.COL_NAME, name));
+            } else {
+                clauses.add(Clause.like(Tables.ASSOCIATIONS.COL_NAME, "%"+name+"%"));
+            }
         }
         List<Association> associations = getAssociationManager().getAssociations(request,
                                                                                  Clause.and(clauses));
@@ -729,7 +733,11 @@ public class AssociationManager extends RepositoryManager {
 
         sb.append(HtmlUtil.formTable());
 
-        sb.append(HtmlUtil.formEntry(msgLabel("Name"), HtmlUtil.input(ARG_NAME,request.getString(ARG_NAME,""), HtmlUtil.SIZE_40)));
+        String searchExact = " "
+                             + HtmlUtil.checkbox(ARG_EXACT, "true",
+                                 request.get(ARG_EXACT, false)) + " "
+                                     + msg("Match exactly");
+        sb.append(HtmlUtil.formEntry(msgLabel("Name"), HtmlUtil.input(ARG_NAME,request.getString(ARG_NAME,""), HtmlUtil.SIZE_40)+ searchExact));
 
 
         List types = getAssociationManager().getTypes();

@@ -123,15 +123,17 @@ a.header  {
 }
 
 .sortlinkon  {
+  font-size: 10pt;
   background-color : #eee;
   font-weight: bold;
-  padding-left:3px;
-  padding-right:3px;
+  padding-left:2px;
+  padding-right:2px;
 }
 
 .sortlinkoff  {
-  padding-left:3px;
-  padding-right:3px;
+  font-size: 10pt;
+  padding-left:2px;
+  padding-right:2px;
 }
 
 .sortlinkoff a {

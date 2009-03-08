@@ -87,12 +87,12 @@ public class CalendarOutputHandler extends OutputHandler {
     /** _more_ */
     public static final OutputType OUTPUT_GRID = new OutputType("Date Grid",
                                                      "calendar.grid",
-                                                     OutputType.TYPE_HTML,
+                                                     OutputType.TYPE_HTML|OutputType.TYPE_FORSEARCH,
                                                      "", ICON_DATEGRID);
 
     /** _more_ */
     public static final OutputType OUTPUT_CALENDAR =
-        new OutputType("Calendar", "calendar.calendar", OutputType.TYPE_HTML,
+        new OutputType("Calendar", "calendar.calendar", OutputType.TYPE_HTML|OutputType.TYPE_FORSEARCH,
                        "", ICON_CALENDAR);
 
 

@@ -118,7 +118,7 @@ public class RssOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_RSS_SUMMARY =
-        new OutputType("RSS Feed", "rss.summary", OutputType.TYPE_NONHTML,
+        new OutputType("RSS Feed", "rss.summary", OutputType.TYPE_NONHTML|OutputType.TYPE_FORSEARCH,
                        "", ICON_RSS);
 
 

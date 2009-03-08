@@ -91,7 +91,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /** _more_ */
     public static final OutputType OUTPUT_HTML = new OutputType("Entry",
                                                      "default.html",
-                                                     OutputType.TYPE_HTML,
+                                                     OutputType.TYPE_HTML|OutputType.TYPE_FORSEARCH,
                                                      "", ICON_INFORMATION);
 
 
@@ -852,7 +852,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             "Sort by date descending"
         };
 
-        sb.append(msgLabel("Sort"));
+        sb.append(HtmlUtil.span(msgLabel("Sort"),HtmlUtil.cssClass("sortlinkoff")));
         for (int i = 0; i < order.length; i += 4) {
             if (Misc.equals(order[i], oldOrderBy)
                     && Misc.equals(order[i + 1], oldAscending)) {
