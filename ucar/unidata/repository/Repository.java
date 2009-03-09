@@ -2196,16 +2196,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
             }
         }
 
-
-
         if (sslEnabled) {
-            if (apiMethod.getNeedsSsl() && !request.getSecure()) {
-                //                System.err.println ("Redirecting to ssl: "+ httpsUrl(request.getUrl()));
-                return new Result(httpsUrl(request.getUrl()));
-            } else if ( !allSsl && !apiMethod.getNeedsSsl()
-                        && request.getSecure()) {
-                //                System.err.println ("Redirecting to no ssl "+absoluteUrl(request.getUrl()));
-                return new Result(absoluteUrl(request.getUrl()));
+            if(!request.get(ARG_NOREDIRECT,false)) {
+                if (apiMethod.getNeedsSsl() && !request.getSecure()) {
+                    //                System.err.println ("Redirecting to ssl: "+ httpsUrl(request.getUrl()));
+                    return new Result(httpsUrl(request.getUrl()));
+                } else if ( !allSsl && !apiMethod.getNeedsSsl()
+                            && request.getSecure()) {
+                    //                System.err.println ("Redirecting to no ssl "+absoluteUrl(request.getUrl()));
+                    return new Result(absoluteUrl(request.getUrl()));
+                }
             }
         }
 
@@ -2330,6 +2330,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 if (path.endsWith(".js") || path.endsWith(".css")) {
                     String js = IOUtil.readContents(is);
                     js = js.replace("${urlroot}", getUrlBase());
+                    //                    js = js.replace("${fullurlroot}", "http://" + getHostname()+":" + getPort()+getUrlBase());
                     is = new ByteArrayInputStream(js.getBytes());
                 }
                 Result result = new Result(BLANK, is, type);

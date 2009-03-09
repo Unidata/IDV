@@ -951,16 +951,21 @@ public class UserManager extends RepositoryManager {
                 StringBuffer msg = new StringBuffer(request.getString(ARG_USER_MESSAGE,""));
                 msg.append("<p>User id: " + id+"<p>");
                 msg.append("Please follow this link to reset your password: ");
-                msg.append(HtmlUtil.href(getRepository().absoluteUrl(HtmlUtil.url(getRepositoryBase().URL_USER_RESETPASSWORD.toString(),
-                                                                                  ARG_USER_NAME,id)),"Password Reset"));
+                String resetUrl = HtmlUtil.url(getRepositoryBase().URL_USER_RESETPASSWORD.toString(),
+                                               ARG_USER_NAME,id);
+
+                if(!resetUrl.startsWith("http"))
+                    resetUrl = getRepository().absoluteUrl(resetUrl);
+                msg.append(HtmlUtil.href(resetUrl,"Password Reset"));
                 msg.append("<p>");
 
                 if(homeGroupId.length()>0) {
                     Group parent = getEntryManager().findGroup(request, homeGroupId);
                     Group home = getEntryManager().makeNewGroup(parent, name, newUser,null);
                     msg.append("A home group has been created for you: ");
-                    msg.append(HtmlUtil.href(getRepository().absoluteUrl(HtmlUtil.url(getRepositoryBase().URL_ENTRY_SHOW.toString(),
-                                                                                      ARG_ENTRYID,home.getId())),home.getFullName()));
+                    String homeUrl = HtmlUtil.url(getRepositoryBase().URL_ENTRY_SHOW.toString(),
+                                                  ARG_ENTRYID,home.getId());
+                    msg.append(HtmlUtil.href(getRepository().absoluteUrl(homeUrl),home.getFullName()));
                     addFavorites(request, newUser, (List<Entry>)Misc.newList(home));
                 }
 

@@ -714,6 +714,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         String folderClickUrl =
             request.entryUrl(getRepository().URL_ENTRY_SHOW, entry) + "&"
             + HtmlUtil.args(new String[] {
+                    ARG_NOREDIRECT,"true",
             ARG_OUTPUT, request.getString(ARG_OUTPUT, "selectxml"),
             ATTR_TARGET, target, ARG_ALLENTRIES,
             request.getString(ARG_ALLENTRIES, "true"), ARG_SELECTTYPE,

@@ -995,7 +995,7 @@ function Selector(event, id, allEntries, selecttype) {
 
     util.setPosition(this.div, x+10,y);
     showObject(this.div);
-    url = "${urlroot}/entry/show?output=selectxml&selecttype=" + this.selecttype+"&allentries=" + this.allEntries+"&target=" + id;
+    url = "${urlroot}/entry/show?output=selectxml&selecttype=" + this.selecttype+"&allentries=" + this.allEntries+"&target=" + id+"&noredirect=true";
     util.loadXML( url, handleSelect,id);
     return false;
 }

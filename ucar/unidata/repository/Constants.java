@@ -728,6 +728,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_NAME = "name";
 
+    public static final String ARG_NOREDIRECT = "noredirect";
+
     /** _more_ */
     public static final String ARG_NEW = "new";
 
