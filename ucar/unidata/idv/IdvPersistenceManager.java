@@ -3371,8 +3371,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 localFileMapping = new ArrayList(fileMapping);
             }
 
+            final visad.util.ThreadUtil threadUtil = new visad.util.ThreadUtil();
             for (int i = 0; i < dataSources.size(); i++) {
-                DataSource dataSource = (DataSource) dataSources.get(i);
+                final DataSource dataSource = (DataSource) dataSources.get(i);
                 //Clear the error flag
                 dataSource.setInError(false);
                 loadDialog.setMessage1("Loading data source " + (i + 1)
@@ -3396,7 +3397,23 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                         }
                     }
                 }
-                dataSource.initAfterUnpersistence();
+                long t1 = System.currentTimeMillis();
+                threadUtil.addRunnable(new visad.util.ThreadUtil.MyRunnable() {
+                        public void run()  throws Exception {
+                            dataSource.initAfterUnpersistence();
+                        }});
+            }
+
+            long t1 = System.currentTimeMillis();
+            //            threadUtil.runAllParallel();
+            threadUtil.runInParallel(false);
+            long t2 = System.currentTimeMillis();
+            //            System.err.println ("time to init data sources:" + (t2-t1));
+            //            threadUtil.clearTimes();
+
+
+            for (int i = 0; i < dataSources.size(); i++) {
+                final DataSource dataSource = (DataSource) dataSources.get(i);
                 if (overrideTimes != null) {
                     dataSource.setDateTimeSelection(overrideTimes);
                 }
@@ -3411,6 +3428,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     loadDialog.addDataSource(dataSource);
                 }
             }
+
+
+
             if ((localFileMapping != null) && (localFileMapping.size() > 0)) {
                 throw new IllegalArgumentException(
                     "Did not find the data source to use for the file override: "
@@ -3550,10 +3570,11 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     //that need to have data bound to them (i.e., those that
                     //were saved without data). Then popup one gui.
 
-                    Hashtable properties = new Hashtable();
+                    final Hashtable properties = new Hashtable();
                     Trace.call1("Decode.init displays");
+                    final visad.util.ThreadUtil displaysThreadUtil = new visad.util.ThreadUtil();
                     for (int i = 0; i < newControls.size(); i++) {
-                        DisplayControl displayControl =
+                        final DisplayControl displayControl =
                             (DisplayControl) newControls.get(i);
                         loadDialog.setMessage1("Loading display " + (i + 1)
                                 + " of " + newControls.size());
@@ -3565,13 +3586,23 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                     displayControl)) {
                             continue;
                         }
-                        displayControl.initAfterUnPersistence(getIdv(),
-                                properties);
+                        displaysThreadUtil.addRunnable(new visad.util.ThreadUtil.MyRunnable() {
+                                public void run()  throws Exception {
+                                    displayControl.initAfterUnPersistence(getIdv(),
+                                                                          properties);
+                                }});
                         loadDialog.addDisplayControl(displayControl);
                         if ( !loadDialog.okToRun()) {
                             return;
                         }
                     }
+                    long tt1 = System.currentTimeMillis();
+                    displaysThreadUtil.runInParallel();
+                    long tt2 = System.currentTimeMillis();
+                    //                    System.err.println ("time to init displays:" + (tt2-tt1));
+                    //                    displaysThreadUtil.clearTimes();
+
+
                     Trace.call2("Decode.init displays");
                 }
                 if ( !fromCollab) {

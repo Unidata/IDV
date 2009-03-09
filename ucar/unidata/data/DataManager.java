@@ -318,11 +318,17 @@ public class DataManager {
                 dataContext.getObjectStore().getUserTmpDirectory(), "nj22/");
         IOUtil.makeDir(nj22TmpFile);
 
+
+
+
         //Set the temp file and the cache policy
         ucar.nc2.util.DiskCache.setRootDirectory(nj22TmpFile);
         ucar.nc2.util.DiskCache.setCachePolicy(true);
         // have to do this since nj2.2.20
         ucar.nc2.iosp.grib.GribServiceProvider.setIndexAlwaysInCache(true);
+
+        visad.util.ThreadUtil.setGlobalMaxThreads(dataContext.getIdv().getMaxThreadCount());
+
 
         AccountManager accountManager = AccountManager.getGlobalAccountManager();
         if(accountManager==null) {

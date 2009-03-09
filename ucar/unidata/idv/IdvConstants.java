@@ -317,10 +317,17 @@ public interface IdvConstants {
     /** Holds the preference for the default bounds for data source holder windows */
     public static final String PROP_DATAHOLDERBOUNDS = "dataholderbounds";
 
+
+
+
     /** Holds the preference for the one instance port */
     public static final String PROP_ONEINSTANCEPORT = "idv.oneinstanceport";
 
+
+
     public static final String PROP_MONITORPORT = "idv.monitorport";
+
+    public static final String PREF_MAXTHREADS = "idv.maxthreads";
 
     /** look and feel preference */
     public static final String PREF_EVENT_MOUSEMAP = "idv.event.mousemap";

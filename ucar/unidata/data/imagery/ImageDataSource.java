@@ -1261,13 +1261,14 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 currentDirs = null;
             }
 
-            ImageSequenceManager sequenceManager = new ImageSequenceManager();
-            ImageSequence        sequence        = null;
+            visad.util.ThreadUtil threadUtil = new visad.util.ThreadUtil();
+            final ImageSequenceManager sequenceManager = new ImageSequenceManager();
             int                  cnt             = 1;
             DataChoice           parent          = dataChoice.getParent();
+            final List<SingleBandedImage>images = new ArrayList<SingleBandedImage>();
             for (Iterator iter =
                     descriptorsToUse.iterator(); iter.hasNext(); ) {
-                AddeImageDescriptor aid = (AddeImageDescriptor) iter.next();
+                final AddeImageDescriptor aid = (AddeImageDescriptor) iter.next();
                 if (currentDirs != null) {
                     int idx =
                         Math.abs(aid.getImageInfo().getDatasetPosition());
@@ -1288,19 +1289,29 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     }
                 }
                 label = label + dataChoice.toString();
-                String readLabel = "Time: " + (cnt++) + "/"
+                final String readLabel = "Time: " + (cnt++) + "/"
                                    + descriptorsToUse.size() + "  " + label;
 
-                try {
-                    SingleBandedImage image = makeImage(aid, true, readLabel);
-                    if (image != null) {
-                        sequence = sequenceManager.addImageToSequence(image);
-                    }
-                } catch (VisADException ve) {
-                    LogUtil.printMessage(ve.toString());
-                }
+                threadUtil.addRunnable(new visad.util.ThreadUtil.MyRunnable() {
+                        public void run() throws Exception {
+                            SingleBandedImage image = makeImage(aid, true, readLabel);
+                            if (image != null) {
+                                synchronized(images) {
+                                    images.add(image);
+                                }
+                            }
+                        }});
             }
-            return sequence;
+
+            long t1 = System.currentTimeMillis();
+            try {
+                threadUtil.runInParallel();
+            } catch (VisADException ve) {
+                LogUtil.printMessage(ve.toString());
+            }
+            long t2 = System.currentTimeMillis();
+            System.err.println ("adde image time:" + (t2-t1));
+            return    sequenceManager.addImagesToSequence(images);
         } catch (Exception exc) {
             throw new ucar.unidata.util.WrapperException(exc);
         }

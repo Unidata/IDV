@@ -2113,6 +2113,11 @@ Misc.run(new Runnable() {
     }
 
 
+    public int getMaxThreadCount() {
+        return getStore().get(PREF_MAXTHREADS,2);
+    }
+
+
     /**
      * Create any default displays defined for the datasource descriptor
      *

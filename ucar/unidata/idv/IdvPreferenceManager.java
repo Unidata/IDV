@@ -370,6 +370,14 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                 continue;
             }
 
+            if (key.equals(PREF_MAXTHREADS)) {
+                int value = (int)Misc.parseNumber(
+                                   (((JTextField) widget).getText().trim()));
+                store.put(key, new Integer(value));
+                visad.util.ThreadUtil.setGlobalMaxThreads(value);
+                continue;
+            }
+
 
             if (key.equals(PREF_MAXIMAGESIZE)
                     || key.equals(PREF_FIELD_CACHETHRESHOLD)) {
@@ -1084,6 +1092,9 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         formatComps.add(GuiUtils.rLabel("Caching:"));
 
 
+
+
+
         JCheckBox cacheCbx = new JCheckBox("Cache Data in Memory",
                                            getStore().get(PREF_DOCACHE,
                                                true));
@@ -1096,10 +1107,18 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             Misc.newList(new JLabel("   Disk Cache Size: "), cacheSizeFld,
                          new JLabel(" (MB)  (for temporary files)"));
         widgets.put(PREF_CACHESIZE, cacheSizeFld);
+
+        JTextField maxThreadsFld = new JTextField(""+getIdv().getMaxThreadCount(),5);
+        widgets.put(PREF_MAXTHREADS, maxThreadsFld);
+
         formatComps.add(GuiUtils.left(cacheCbx));
         formatComps.add(GuiUtils.filler());
         formatComps.add(GuiUtils.left(GuiUtils.hbox(cacheComps)));
 
+
+
+        formatComps.add(GuiUtils.rLabel("Max Thread Count:"));
+        formatComps.add(GuiUtils.left(maxThreadsFld));
 
 
         formatComps.add(GuiUtils.rLabel("Max Image Size:"));

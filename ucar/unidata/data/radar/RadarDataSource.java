@@ -267,43 +267,62 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
         adapters = new ArrayList();
         Hashtable oldAdapterMap = fileToAdapter;
         fileToAdapter = new Hashtable();
-        ArrayList badones          = new ArrayList();
-        Exception lastBadException = null;
-        long      t1               = System.currentTimeMillis();
+
         int cnt = 0;
+
+        final List<String> badFiles          = new ArrayList<String>();
+        final List<Exception> badExceptions = new ArrayList<Exception>();
+
+        final List<RadarAdapter> goodAdapters = new ArrayList<RadarAdapter>();
+        final List<String> goodFiles = new ArrayList<String>();
+        visad.util.ThreadUtil threadUtil = new visad.util.ThreadUtil();
+        LogUtil.message("Initializing radar files");
         for (Iterator iter = files.iterator(); iter.hasNext(); ) {
-            String       filename = iter.next().toString();
-            RadarAdapter adapter  =
-                (RadarAdapter) oldAdapterMap.get(filename);
+            final String       filename = iter.next().toString();
+            RadarAdapter adapter  =(RadarAdapter) oldAdapterMap.get(filename);
             cnt++;
             if (adapter == null) {
-                try {
-                    LogUtil.message("Initializing radar time #" + cnt);
-                    adapter = makeRadarAdapter(filename);
-                    LogUtil.message("");
-                    //                    System.err.println("\tmakeAdapter: "
-                    //                                       + adapter.getBaseTime() + " "
-                    //                                       + filename);
-                } catch (Exception e) {
-                    lastBadException = e;
-                    badones.add(filename);
-                    //System.err.println("Unable to read " + filename);
-                }
+                threadUtil.addRunnable(new visad.util.ThreadUtil.MyRunnable() {
+                        public void run() throws Exception {
+                            try {
+                                RadarAdapter myAdapter = makeRadarAdapter(filename);
+                                synchronized(goodAdapters) {
+                                    goodAdapters.add(myAdapter);
+                                    goodFiles.add(filename);
+                                }
+                            } catch (Exception e) {
+                                synchronized(badExceptions) {
+                                    badExceptions.add(e);
+                                    badFiles.add(filename);
+                                }
+                            }}});
+            }  else {
+                goodAdapters.add(adapter);
+                goodFiles.add(filename);
             }
-            if (adapter != null) {
-                adapters.add(adapter);
-                fileToAdapter.put(filename, adapter);
-            }
+
+        }
+
+        long t1 = System.currentTimeMillis();
+        threadUtil.runInParallel();
+        long t2 = System.currentTimeMillis();
+        System.err.println ("radar init time:" + (t2-t1));
+
+        LogUtil.message("");
+
+        for(int i=0;i<goodAdapters.size();i++) {
+            adapters.add(goodAdapters.get(i));
+            fileToAdapter.put(goodFiles.get(i),goodAdapters.get(i));
         }
 
 
-        if ( !badones.isEmpty()) {
+        if (!badFiles.isEmpty()) {
             StringBuffer buf = new StringBuffer();
-            if (badones.size() < files.size()) {
+            if (badFiles.size() < files.size()) {
                 buf.append("<html>");
                 buf.append("There were problems reading these files:");
                 buf.append("<ul>");
-                for (Iterator iterator = badones.iterator();
+                for (Iterator iterator = badFiles.iterator();
                         iterator.hasNext(); ) {
                     buf.append("<li>");
                     buf.append((String) iterator.next());
@@ -315,14 +334,14 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
                     ucar.unidata.util.GuiUtils.askYesNo("Error reading data",
                         buf.toString());
 
-                lastBadException.printStackTrace();
+                badExceptions.get(0).printStackTrace();
                 if (ok) {
-                    files.removeAll(badones);
+                    files.removeAll(badFiles);
                 } else {
                     throw new VisADException("error reading files");
                 }
             } else {
-                throw lastBadException;
+                throw badExceptions.get(0);
             }
         }
     }
@@ -374,9 +393,9 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
      * @throws RemoteException couldn't create a remote data object
      * @throws VisADException  couldn't create the data
      */
-    protected Data getDataInner(DataChoice dataChoice, DataCategory category,
-                                DataSelection subset,
-                                Hashtable requestProperties)
+    protected Data getDataInner(final DataChoice dataChoice, DataCategory category,
+                                final DataSelection subset,
+                                final Hashtable requestProperties)
             throws VisADException, RemoteException {
         try {
             List times = null;
@@ -423,9 +442,9 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
                 }
             }
             Arrays.sort(dateTimes);
-            Data[]   datas     = new Data[dateTimes.length];
+            final Data[]   datas     = new Data[dateTimes.length];
             int      timeIndex = 0;
-            MathType mt        = null;
+            final MathType[] mt        = {null};
             // create a new field of (Time -> (radar data)).
             // fill in the times array and data array with dates/data
             // only from those adapters which match the selected times.
@@ -434,30 +453,48 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
             // so return null.
             //            System.err.println ("Reading " + adapters.size() + " radar files");
             int cnt = 0;
+            visad.util.ThreadUtil threadUtil = new visad.util.ThreadUtil();
+
             for (Iterator iter = adapters.iterator(); iter.hasNext(); ) {
-                RadarAdapter adapter = (RadarAdapter) iter.next();
+                final RadarAdapter adapter = (RadarAdapter) iter.next();
                 timeIndex = Arrays.binarySearch(dateTimes,
                         adapter.getBaseTime());
                 //              System.err.println ("timeIndex:" + timeIndex);
                 if (timeIndex < 0) {
                     continue;
                 }
-                Trace.call1("RDS.getData");
                 cnt++;
                 LogUtil.message("Time: " + (cnt) + "/" + dateTimes.length
                                 + " From:" + toString());
-                Data d = adapter.getData(dataChoice, subset,
-                                         requestProperties);
-                Trace.call2("RDS.getData");
-                datas[timeIndex] = d;
-                if (d != null) {
-                    mt = d.getType();
-                } else {}
+                final int theTimeIndex = timeIndex;
+                threadUtil.addRunnable(new visad.util.ThreadUtil.MyRunnable() {
+                        public void run() throws Exception {
+                            Trace.call1("RDS.getData");
+                            Data d = adapter.getData(dataChoice, subset,
+                                                     requestProperties);
+                            Trace.call2("RDS.getData");
+                            datas[theTimeIndex] = d;
+                            if (d != null) {
+                                mt[0] = d.getType();
+                            } else {}
+                        }});
             }
-            if (mt == null) {
+
+            long t1 = System.currentTimeMillis();
+            try {
+                threadUtil.runInParallel();
+            } catch (VisADException ve) {
+                LogUtil.printMessage(ve.toString());
+            }
+            long t2 = System.currentTimeMillis();
+            System.err.println ("radar read time:" + (t2-t1));
+
+            if (mt[0] == null) {
                 return null;
             }
-            FunctionType ft        = new FunctionType(RealType.Time, mt);
+
+
+            FunctionType ft        = new FunctionType(RealType.Time, mt[0]);
             SampledSet   domainSet = (dateTimes.length == 1)
                                      ? (SampledSet) new SingletonSet(
                                          new RealTuple(dateTimes))
