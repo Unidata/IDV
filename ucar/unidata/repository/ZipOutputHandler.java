@@ -140,6 +140,7 @@ public class ZipOutputHandler extends OutputHandler {
                     break;
                 }
             }
+
             if (ok) {
                 if (state.group != null) {
                     links.add(
@@ -239,16 +240,16 @@ public class ZipOutputHandler extends OutputHandler {
                 continue;
             }
             String path = entry.getResource().getPath();
-            String name = IOUtil.getFileTail(path);
+            String name = getStorageManager().getFileTail(path);
             int    cnt  = 1;
             while (seen.get(name) != null) {
                 name = (cnt++) + "_" + name;
             }
             seen.put(name, name);
             zos.putNextEntry(new ZipEntry(name));
-            byte[] bytes = IOUtil.readBytes(IOUtil.getInputStream(path,
-                               getClass()));
-            zos.write(bytes, 0, bytes.length);
+            InputStream fileInputStream = new FileInputStream(path);
+            IOUtil.writeTo(fileInputStream,zos);
+            fileInputStream.close();
             zos.closeEntry();
         }
         zos.close();

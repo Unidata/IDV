@@ -105,6 +105,9 @@ public class AccessManager extends RepositoryManager {
     /** _more_ */
     private Object MUTEX_PERMISSIONS = new Object();
 
+    /** _more_ */
+    private Hashtable recentPermissions = new Hashtable();
+
 
     /**
      * _more_
@@ -226,8 +229,7 @@ public class AccessManager extends RepositoryManager {
 
 
 
-    /** _more_ */
-    Hashtable recentPermissions = new Hashtable();
+
 
 
 
@@ -292,7 +294,8 @@ public class AccessManager extends RepositoryManager {
             Date    then = (Date) pastResult[0];
             Boolean ok   = (Boolean) pastResult[1];
             //If we have checked this in the last 60 seconds then return the result
-            if (now.getTime() - then.getTime() < 60000) {
+            //TODO - Do we really need the time threshold
+            if (true || now.getTime() - then.getTime() < 60000) {
                 return ok.booleanValue();
             } else {
                 recentPermissions.remove(key);
@@ -329,6 +332,35 @@ public class AccessManager extends RepositoryManager {
             List permissions = getPermissions(entry);
             List roles       = getRoles(entry, action);
             if (roles != null) {
+                boolean hadIp = false;
+                //                System.err.println ("request IP:" + requestIp);
+                if(requestIp!=null) {
+                    for (int roleIdx = 0; roleIdx < roles.size(); roleIdx++) {
+                        String  role  = (String) roles.get(roleIdx);
+                        boolean doNot = false;
+                        if (role.startsWith("!")) {
+                            doNot = true;
+                            role  = role.substring(1);
+                        } 
+                        //                        System.err.println("role:" + role);
+                        if (role.startsWith("ip:")) {
+                            if(!doNot) {
+                                hadIp = true;
+                            }
+                            String ip  = role.substring(3);
+                            //                            System.err.println (ip+" -- "+ requestIp);
+                            if (requestIp.startsWith(ip)) {
+                                if (doNot) {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    if(hadIp) return false;
+                }
+
                 for (int roleIdx = 0; roleIdx < roles.size(); roleIdx++) {
                     String  role  = (String) roles.get(roleIdx);
                     boolean doNot = false;
@@ -336,16 +368,7 @@ public class AccessManager extends RepositoryManager {
                         doNot = true;
                         role  = role.substring(1);
                     }
-                    if (role.startsWith("ip:")) {
-                        String ip = role.substring(3);
-                        if ((requestIp != null) && requestIp.startsWith(ip)) {
-                            if (doNot) {
-                                return false;
-                            }
-                        } else {
-                            return true;
-                        }
-                    }
+                    if (role.startsWith("ip:")) continue;
                     if (user.isRole(role)) {
                         return !doNot;
                     }
@@ -574,6 +597,7 @@ public class AccessManager extends RepositoryManager {
                                      List<Permission> permissions)
             throws Exception {
         synchronized (MUTEX_PERMISSIONS) {
+            recentPermissions = new Hashtable();
             getDatabaseManager().delete(
                 Tables.PERMISSIONS.NAME,
                 Clause.eq(Tables.PERMISSIONS.COL_ENTRY_ID, entry.getId()));

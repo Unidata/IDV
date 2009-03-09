@@ -907,9 +907,11 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         formSB.append(request.formPost(getRepository().URL_ENTRY_GETENTRIES,
                                        HtmlUtil.id(formId)));
 
+
         List<Link> links = getRepository().getOutputLinks(request,
-                               new State(getEntryManager().getDummyGroup(),
-                                         entries));
+                                                          new State(getEntryManager().getDummyGroup(),
+                                                                    entries));
+
 
         List<HtmlUtil.Selector> tfos = new ArrayList<HtmlUtil.Selector>();
         for (Link link : links) {
@@ -1063,11 +1065,20 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                  boolean doFormClose, boolean doCbx,
                                  boolean showCrumbs)
             throws Exception {
+        return getEntriesList(request,sb,entries,null, doFormOpen, doFormClose, doCbx, showCrumbs);
+    }
+
+
+    public String getEntriesList(Request request, StringBuffer sb,
+                                 List entries, List<Entry> entriesToCheck, boolean doFormOpen,
+                                 boolean doFormClose, boolean doCbx,
+                                 boolean showCrumbs)
+            throws Exception {
 
         String link = "";
         String base = "";
         if (doFormOpen) {
-            String[] tuple = getEntryFormStart(request, entries, true);
+            String[] tuple = getEntryFormStart(request, (entriesToCheck!=null?entriesToCheck:entries), true);
             link = tuple[0];
             base = tuple[1];
             sb.append(tuple[2]);

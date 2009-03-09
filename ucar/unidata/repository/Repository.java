@@ -434,6 +434,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public int getPort() {
         String port = getProperty(PROP_PORT, (String) null);
+
         if (port != null) {
             port = port.trim();
             if (port.length() > 0) {
@@ -2799,14 +2800,17 @@ public class Repository extends RepositoryBase implements RequestHandler {
             } catch (Exception exc) {}
         }
 
+
         String override = "override."+name;
         //Check if there is an override 
         if (prop == null) {
             prop = (String) cmdLineProperties.get(override);
         }
 
+
+
         if (prop == null) {
-            prop = (String) properties.get(name);
+            prop = (String) properties.get(override);
         }
 
         //Then look at the command line

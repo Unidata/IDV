@@ -971,9 +971,14 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append(wikifyEntry(request, group, wikiTemplate, subGroups,
                                   entries));
         } else {
+            List<Entry> allEntries = new ArrayList<Entry>();
+            allEntries.addAll(subGroups);
+            allEntries.addAll(entries);
+
             if (subGroups.size() > 0) {
                 StringBuffer groupsSB = new StringBuffer();
                 String link = getEntriesList(request, groupsSB, subGroups,
+                                             allEntries,
                                              true, (entries.size() == 0),
                                              true, group.isDummy());
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Groups") + link,
@@ -983,6 +988,7 @@ public class HtmlOutputHandler extends OutputHandler {
             if (entries.size() > 0) {
                 StringBuffer entriesSB = new StringBuffer();
                 String link = getEntriesList(request, entriesSB, entries,
+                                             allEntries,
                                              (subGroups.size() == 0), true,
                                              true, group.isDummy());
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Entries") + link,

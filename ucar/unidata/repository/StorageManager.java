@@ -667,9 +667,9 @@ public class StorageManager extends RepositoryManager {
     public String getFileTail(String fileName) {
         int idx = fileName.indexOf("_");
         if (idx >= 0) {
-            return fileName.substring(idx + 1);
+            fileName = fileName.substring(idx + 1);
         }
-        return fileName;
+        return IOUtil.getFileTail(fileName);
     }
 
     /**

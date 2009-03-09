@@ -503,7 +503,7 @@ public class AssociationManager extends RepositoryManager {
                                         Tables.ASSOCIATIONS.NAME, clause,
                                         orderBy + " " +
                                         getDatabaseManager().getLimitString(request.get(ARG_SKIP, 0), max));
-        System.err.println (getRepository().getQueryOrderAndLimit(request,false));
+        //        System.err.println (getRepository().getQueryOrderAndLimit(request,false));
         List<Association> associations = new ArrayList();
         SqlUtil.Iterator  iter         = SqlUtil.getIterator(stmt);
         ResultSet         results;
