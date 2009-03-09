@@ -2114,7 +2114,7 @@ Misc.run(new Runnable() {
 
 
     public int getMaxThreadCount() {
-        return getStore().get(PREF_MAXTHREADS,2);
+        return getStore().get(PREF_MAXTHREADS,Runtime.getRuntime().availableProcessors());
     }
 
 
