@@ -921,6 +921,7 @@ public class UserManager extends RepositoryManager {
             password1 = request.getString(ARG_USER_PASSWORD1, "").trim();
             password2 = request.getString(ARG_USER_PASSWORD2, "").trim();
             admin     = request.get(ARG_USER_ADMIN, false);
+            
             boolean okToAdd = true;
             if (id.length() == 0) {
                 okToAdd = false;
@@ -941,9 +942,35 @@ public class UserManager extends RepositoryManager {
             }
 
             if (okToAdd) {
-                makeOrUpdateUser(new User(id, name, email, "", "",
+                String homeGroupId = request.getString(ARG_USER_HOME+"_hidden","");
+                User newUser = new User(id, name, email, "", "",
                                           hashPassword(password1), admin, "",
-                                          ""), false);
+                                        "");
+                makeOrUpdateUser(newUser,false);
+                
+                StringBuffer msg = new StringBuffer(request.getString(ARG_USER_MESSAGE,""));
+                msg.append("<p>User id: " + id+"<p>");
+                msg.append("Please follow this link to reset your password: ");
+                msg.append(HtmlUtil.href(getRepository().absoluteUrl(HtmlUtil.url(getRepositoryBase().URL_USER_RESETPASSWORD.toString(),
+                                                                                  ARG_USER_NAME,id)),"Password Reset"));
+                msg.append("<p>");
+
+                if(homeGroupId.length()>0) {
+                    Group parent = getEntryManager().findGroup(request, homeGroupId);
+                    Group home = getEntryManager().makeNewGroup(parent, name, newUser,null);
+                    msg.append("A home group has been created for you: ");
+                    msg.append(HtmlUtil.href(getRepository().absoluteUrl(HtmlUtil.url(getRepositoryBase().URL_ENTRY_SHOW.toString(),
+                                                                                      ARG_ENTRYID,home.getId())),home.getFullName()));
+                    addFavorites(request, newUser, (List<Entry>)Misc.newList(home));
+                }
+
+                if(newUser.getEmail().length()>0 && request.get(ARG_USER_SENDMAIL,false) &&   getAdmin().isEmailCapable()) {
+                    getAdmin().sendEmail(newUser.getEmail(), "RAMADDA User Account",
+                                         msg.toString(), true);
+                    
+                }
+
+
                 String userEditLink =
                     request.url(getRepositoryBase().URL_USER_EDIT,
                                 ARG_USER_ID, id);
@@ -958,33 +985,68 @@ public class UserManager extends RepositoryManager {
         }
         sb.append(msgHeader("Create User"));
         sb.append(request.form(getRepositoryBase().URL_USER_NEW));
-        sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.formEntry(msgLabel("ID"),
+        StringBuffer formSB = new StringBuffer();
+        formSB.append(HtmlUtil.formTable());
+        formSB.append(HtmlUtil.formEntry(msgLabel("ID"),
                                      HtmlUtil.input(ARG_USER_ID, id,
                                          HtmlUtil.SIZE_40)));
-        sb.append(HtmlUtil.formEntry(msgLabel("Name"),
+        formSB.append(HtmlUtil.formEntry(msgLabel("Name"),
                                      HtmlUtil.input(ARG_USER_NAME, name,
                                          HtmlUtil.SIZE_40)));
 
 
-        sb.append(HtmlUtil.formEntry(msgLabel("Admin"),
+        formSB.append(HtmlUtil.formEntry(msgLabel("Admin"),
                                      HtmlUtil.checkbox(ARG_USER_ADMIN,
                                          "true", admin)));
 
-        sb.append(HtmlUtil.formEntry(msgLabel("Email"),
+        formSB.append(HtmlUtil.formEntry(msgLabel("Email"),
                                      HtmlUtil.input(ARG_USER_EMAIL, email,
                                          HtmlUtil.SIZE_40)));
 
-        sb.append(HtmlUtil.formEntry(msgLabel("Password"),
+        formSB.append(HtmlUtil.formEntry(msgLabel("Password"),
                                      HtmlUtil.password(ARG_USER_PASSWORD1)));
 
-        sb.append(HtmlUtil.formEntry(msgLabel("Password Again"),
+        formSB.append(HtmlUtil.formEntry(msgLabel("Password Again"),
                                      HtmlUtil.password(ARG_USER_PASSWORD2)));
 
-        sb.append(HtmlUtil.formEntry("",
+
+        String select =
+            getRepository().getHtmlOutputHandler().getSelect(request,
+                                                             ARG_USER_HOME,
+                                                             HtmlUtil.space(1) + msg("Select"), false, "");
+        formSB.append(HtmlUtil.hidden(ARG_USER_HOME + "_hidden", "",
+                                          HtmlUtil.id(ARG_USER_HOME + "_hidden")));
+
+        formSB.append(HtmlUtil.space(1));
+        String groupMsg = "Create a group using the user's name under this group";
+        formSB.append(HtmlUtil.formEntry(msgLabel("Home group"),
+                                             HtmlUtil.disabledInput(ARG_USER_HOME, "",
+                                                                    HtmlUtil.SIZE_40
+                                                                    + HtmlUtil.id(ARG_USER_HOME)) +
+                                             HtmlUtil.space(1) +select+"<br>"+groupMsg));
+
+        formSB.append(HtmlUtil.formEntry("",
                                      HtmlUtil.submit(msg("Create User"),
                                          ARG_USER_NEW)));
-        sb.append(HtmlUtil.formTableClose());
+        formSB.append(HtmlUtil.formTableClose());
+
+
+
+        StringBuffer msgSB = new StringBuffer();
+
+        String msg = "A new RAMADDA account has been created for you.";
+        msgSB.append(HtmlUtil.checkbox(ARG_USER_SENDMAIL,"true",false));
+        msgSB.append(HtmlUtil.space(1));
+        msgSB.append(msg("Send an email to the new user with message:"));
+        msgSB.append(HtmlUtil.br());
+        msgSB.append(HtmlUtil.textArea(ARG_USER_MESSAGE, msg, 5, 50));
+
+        if(getAdmin().isEmailCapable()) {
+            sb.append(HtmlUtil.table(HtmlUtil.rowTop(HtmlUtil.cols(formSB.toString(),
+                                                                   msgSB.toString()))));
+        } else {
+            sb.append(formSB);
+        }
         sb.append(HtmlUtil.formClose());
 
 

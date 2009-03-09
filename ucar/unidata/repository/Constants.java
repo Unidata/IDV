@@ -737,6 +737,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_NODETYPE = "nodetype";
 
+    public static final String ARG_USER_MESSAGE = "usermessage";
+    public static final String ARG_USER_SENDMAIL = "usersendmail";
+    public static final String ARG_USER_HOME = "userhome";
+
     /** _more_ */
     public static final String ARG_NORTH = "north";
 

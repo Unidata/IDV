@@ -957,6 +957,16 @@ function Selector(event, id, allEntries, selecttype) {
     this.textComp = util.getDomObject(id);
     this.hiddenComp = util.getDomObject(id+"_hidden");
 
+    this.clearInput = function() {
+	if(this.hiddenComp) {
+            this.hiddenComp.obj.value =""
+        }
+	if(this.textComp) {
+            this.textComp.obj.value =""
+        }
+    }
+
+
     if (!this.textComp) {
 //	alert("cannot find text comp " + id);
 	return false;
@@ -1031,6 +1041,12 @@ function selectCancel() {
 function selectInitialClick(event, id,allEntries,selecttype) {
     selectors[id] = new Selector(event,id,allEntries,selecttype);
     return false;
+}
+
+
+function clearSelect(id) {
+    selector = selectors[id];
+    if(selector) selector.clearInput();
 }
 
 

@@ -681,9 +681,14 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                      "event," + HtmlUtil.squote(elementId)
                                      + "," + HtmlUtil.squote("" + allEntries)
                                      + "," + HtmlUtil.squote(type));
+        String clearEvent = HtmlUtil.call("clearSelect",
+                                          HtmlUtil.squote(elementId));
         return HtmlUtil.mouseClickHref(event, label,
                                        HtmlUtil.id(elementId
-                                           + ".selectlink"));
+                                           + ".selectlink")) + " "+
+            HtmlUtil.mouseClickHref(clearEvent, "Clear",
+                                    HtmlUtil.id(elementId
+                                                + ".selectlink"));
     }
 
     /**
