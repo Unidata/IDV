@@ -26,24 +26,37 @@
 
 
 
-
-
 package ucar.unidata.data.grid;
 
 
 import org.apache.poi.hssf.usermodel.*;
 
+import ucar.ma2.*;
+
+import ucar.nc2.Attribute;
+import ucar.nc2.Dimension;
+import ucar.nc2.NetcdfFile;
+import ucar.nc2.NetcdfFileWriteable;
+import ucar.nc2.Variable;
+
+import ucar.nc2.dataset.NetcdfDataset;
+
 import ucar.unidata.data.DataUtil;
 
 
 import ucar.unidata.data.point.PointObTuple;
+import ucar.unidata.geoloc.ProjectionImpl;
+import ucar.unidata.geoloc.projection.*;
 import ucar.unidata.util.FileManager;
 
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.Parameter;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
+
+import ucar.visad.ProjectionCoordinateSystem;
 
 import ucar.visad.Util;
 
@@ -76,8 +89,10 @@ import java.io.*;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -3970,14 +3985,14 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * find the indices not contained in the map domian
      *
-     * @param domain _more_
-     * @param map _more_
+     * @param domain grid domain
+     * @param map    map of values
      *
-     * @return _more_
+     * @return  array of indicies
      *
-     * @throws VisADException _more_
+     * @throws VisADException problem getting at the data
      */
     public static int[][] findNotContainedIndices(GriddedSet domain,
             UnionSet map)
@@ -4006,18 +4021,16 @@ public class GridUtil {
     }
 
 
-
-
     /**
-     * _more_
+     * Find the indicies contained inside the map bounds
      *
-     * @param latlon _more_
+     * @param latlon   list of lat/lon points
      * @param map _more_
-     * @param inside _more_
+     * @param inside  true for inside, false for outside
      *
      * @return _more_
      *
-     * @throws VisADException _more_
+     * @throws VisADException  problem getting data from VisAD Object
      */
     private static int[][] findContainedIndices(float[][] latlon,
             UnionSet map, boolean inside)
@@ -4442,6 +4455,367 @@ public class GridUtil {
             JobManager.getManager().stopLoad(loadId);
         }
 
+    }
+
+    /**
+     * Write grid out to a netCDF CF compliant file
+     *
+     * @param grid grid  to write
+     *
+     * @throws Exception  problem writing grid
+     */
+    public static void exportGridToNetcdf(FieldImpl grid) throws Exception {
+        String filename = FileManager.getWriteFile(FileManager.FILTER_XLS,
+                              null);
+        if (filename == null) {
+            return;
+        }
+        exportGridToNetcdf(grid, filename);
+    }
+
+
+    /**
+     * Write grid out to a netCDF CF compliant file
+     *
+     * @param grid grid  to write
+     * @param filename  filename
+     *
+     * @throws Exception  problem writing grid
+     */
+    public static void exportGridToNetcdf(FieldImpl grid, String filename)
+            throws Exception {
+
+        Object loadId =
+            JobManager.getManager().startLoad("Writing grid to CF", true);
+        NetcdfFileWriteable ncfile = NetcdfFileWriteable.createNew(filename,
+                                         true);
+        boolean         isTimeSequence = isTimeSequence(grid);
+        List<Dimension> dims           = new ArrayList<Dimension>();
+        // make variables for the time and xyz axes
+        Set timeSet  = null;
+        int numTimes = 0;
+        if (isTimeSequence) {
+            timeSet = getTimeSet(grid);
+            Unit[] units = timeSet.getSetUnits();
+            numTimes = timeSet.getLength();
+            Dimension timeDim = new Dimension("time", numTimes, true);
+            dims.add(timeDim);
+            ncfile.addDimension(null, timeDim);
+            Variable timeVar = new Variable(ncfile, null, null, "time",
+                                            DataType.DOUBLE, "time");
+            timeVar.addAttribute(new Attribute("units", units[0].toString()));
+            /*
+            Array      varArray = new ArrayDouble.D1(numTimes);
+            double[][] timeVals = timeSet.getDoubles(false);
+            //Misc.printArray("times", timeVals[0]);
+            for (int i = 0; i < numTimes; i++) {
+                ((ArrayDouble.D1) varArray).set(i, timeVals[0][i]);
+            }
+            timeVar.setCachedData(varArray, false);
+            */
+            ncfile.addVariable(null, timeVar);
+        }
+        HashMap<Variable, Array> varData = addSpatialVars(ncfile,
+                                               getSpatialDomain(grid), dims);
+
+        // TODO: figure out a better way to do this
+        Variable      projVar = null;
+        java.util.Set keys    = varData.keySet();
+        for (Iterator it = keys.iterator(); it.hasNext(); ) {
+            Variable v = (Variable) it.next();
+            if (v.findAttribute(ProjectionImpl.ATTR_NAME) != null) {
+                projVar = v;
+                break;
+            }
+        }
+        // make variable for the parameter(s)
+        TupleType  tType  = getParamType(grid);
+        RealType[] rTypes = tType.getRealComponents();
+        for (int i = 0; i < rTypes.length; i++) {
+            RealType rt = rTypes[i];
+            Variable v  = new Variable(ncfile, null, null, getVarName(rt));
+            v.addAttribute(new Attribute("units",
+                                         rt.getDefaultUnit().toString()));
+            if (projVar != null) {
+                v.addAttribute(new Attribute("grid_mapping",
+                                             projVar.getName()));
+            }
+            v.setDataType(DataType.FLOAT);
+            v.setDimensions(dims);
+            ncfile.addVariable(null, v);
+        }
+        ncfile.addGlobalAttribute(new Attribute("Conventions", "CF-1.X"));
+        ncfile.addGlobalAttribute(new Attribute("History",
+                "Translated from VisAD grid to CF-1.X Conventions by IDV\n"
+                + "Original Dataset = " + grid.getType()
+                + "\nTranslation Date = " + new Date()));
+        ncfile.create();
+        System.out.println(ncfile);
+        // fill in the data
+        if (isTimeSequence) {
+            Variable   timeVar  = ncfile.findVariable("time");
+            double[][] timeVals = timeSet.getDoubles(false);
+            Array varArray = Array.factory(DataType.DOUBLE,
+                                           new int[] { numTimes },
+                                           timeVals[0]);
+            ncfile.write(timeVar.getName(), varArray);
+        }
+        for (Iterator it = keys.iterator(); it.hasNext(); ) {
+            Variable v = (Variable) it.next();
+            ncfile.write(v.getName(), varData.get(v));
+        }
+        int numDims = dims.size();
+        if (isTimeSequence) {
+            numDims++;
+        }
+        int[] sizes = new int[numDims];
+        int   index = 0;
+        if (isTimeSequence) {
+            sizes[0] = numTimes;
+            index++;
+        }
+        for (Dimension dim : dims) {
+            sizes[index++] = dim.getLength();
+        }
+        // write the data
+        /*
+        for (int j = 0; j < rTypes.length; j++) {
+            Variable v = ncfile.findVariable(getVarName(rTypes[j]));
+            Array arr = null;
+            if (isTimeSequence) {
+                arr = Array.factory(DataType.FLOAT, sizes);
+                Index idx = Index.factory(sizes);
+                for (int i = 0; i < timeSet.getLength(); i++) {
+                    int[] newSizes = new int[sizes.length];
+                    newSizes[0] = i;
+                    for (int k = 1; k < sizes.length; k++) {
+                       newSizes[k] = 0;
+                    }
+                    Index section = idx.set(newSizes);
+                    FlatField sample = (FlatField) grid.getSample(i, false);
+                    float[][] samples = sample.getFloats(false);
+                    arr.setObject(section, samples[j]);
+                }
+            } else {
+                float[][] samples = ((FlatField)grid).getFloats();
+                arr = Array.factory(DataType.FLOAT, sizes, samples[j]);
+            }
+            ncfile.write(v.getName(), arr);
+        }
+        */
+        // write the file
+        ncfile.close();
+        try {}
+        catch (Exception exc) {
+            LogUtil.logException("Writing grid to netCDF file: " + filename,
+                                 exc);
+        } finally {
+            JobManager.getManager().stopLoad(loadId);
+        }
+    }
+
+    /**
+     * Get a netCDF variable name from a RealType
+     *
+     * @param r  the RealType
+     *
+     * @return  a valid netCDF name
+     */
+    private static String getVarName(RealType r) {
+        return Util.cleanTypeName(r.getName());
+    }
+
+    /**
+     * Add spatial variables to the netCDF file
+     *
+     * @param ncfile  netCDF file
+     * @param domainSet  domain set of the grid
+     * @param dims       list of dimensions to add to
+     *
+     * @return Hashtable of variable to Array
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   Problem accessing VisAD object
+     */
+    private static HashMap<Variable, Array> addSpatialVars(NetcdfFile ncfile,
+            SampledSet domainSet, List<Dimension> dims)
+            throws VisADException, RemoteException {
+        HashMap<Variable, Array> varToArray = new HashMap<Variable, Array>();
+        int                      dim        = domainSet.getDimension();
+        int                      mdim       =
+            domainSet.getManifoldDimension();
+        //System.out.println("dim = " + dim + "; mdim = " + mdim);
+        CoordinateSystem cs    = domainSet.getCoordinateSystem();
+        Unit[]           units = domainSet.getSetUnits();
+        int[]            lens  = ((GriddedSet) domainSet).getLengths();
+        // populate the time and axes values
+        float[][] spatialVals = domainSet.getSamples(false);
+        boolean   is3D        = dim > 2;
+        int       sizeX       = lens[0];
+        int       sizeY       = lens[1];
+        int       sizeZ       = 1;
+        if (is3D && (mdim > 2)) {
+            sizeZ = lens[2];
+        }
+        float[] xVals = new float[sizeX];
+        float[] yVals = new float[sizeY];
+        float[] zVals = new float[sizeZ];
+        if (is3D) {
+            for (int z = 0; z < sizeZ; z++) {
+                zVals[z] = spatialVals[2][sizeX * sizeY * z];
+            }
+            //Misc.printArray("z", zVals);
+        }
+        for (int y = 0; y < sizeY; y++) {
+            yVals[y] = spatialVals[1][sizeX * y];
+        }
+        //Misc.printArray("y", yVals);
+        for (int x = 0; x < sizeX; x++) {
+            xVals[x] = spatialVals[0][x];
+        }
+        //Misc.printArray("x", xVals);
+        if (cs == null) {  // straight lat/lon
+        } else {
+            RealType[] types =
+                ((SetType) domainSet.getType()).getDomain()
+                    .getRealComponents();
+            String    varName = getVarName(types[0]);
+            Dimension xDim    = new Dimension(varName, sizeX, true);
+            ncfile.addDimension(null, xDim);
+            Variable xVar = makeCoordinateVariable(ncfile, varName, units[0],
+                                "x coordinate of projection",
+                                "projection_x_coordinate", varName);
+            Array varArray = Array.factory(DataType.FLOAT,
+                                           new int[] { sizeX }, xVals);
+            varToArray.put(xVar, varArray);
+
+            varName = getVarName(types[1]);
+            Dimension yDim = new Dimension(varName, sizeY, true);
+            ncfile.addDimension(null, yDim);
+            Variable yVar = makeCoordinateVariable(ncfile, varName, units[1],
+                                "y coordinate of projection",
+                                "projection_y_coordinate", varName);
+            varArray = Array.factory(DataType.FLOAT, new int[] { sizeY },
+                                     yVals);
+            varToArray.put(yVar, varArray);
+            Variable zVar = null;
+            if (dim == 3) {
+                varName = getVarName(types[2]);
+                Dimension zDim = new Dimension(varName, sizeZ, true);
+                ncfile.addDimension(null, zDim);
+                dims.add(zDim);
+                zVar = new Variable(ncfile, null, null, varName,
+                                    DataType.FLOAT, varName);
+                zVar.addAttribute(new Attribute("units",
+                        units[2].toString()));
+                String upOrDown = "up";
+                if (Unit.canConvert(units[2], CommonUnits.MILLIBAR)) {
+                    upOrDown = "down";
+                }
+                zVar.addAttribute(new Attribute("positive", upOrDown));
+                varArray = Array.factory(DataType.FLOAT, new int[] { sizeZ },
+                                         zVals);
+                varToArray.put(zVar, varArray);
+                ncfile.addVariable(null, zVar);
+            }
+            dims.add(yDim);
+            dims.add(xDim);
+            // make variable for the projection
+            MapProjection mp      = getNavigation(domainSet);
+            Variable      projVar = makeProjectionVar(ncfile, mp);
+            if (projVar != null) {
+                char[] data = new char[] { 'd' };
+                Array dataArray = Array.factory(DataType.CHAR, new int[0],
+                                      data);
+                varToArray.put(projVar, dataArray);
+            }
+
+        }
+        return varToArray;
+
+    }
+
+    /**
+     * Make a coordinate variable
+     *
+     * @param ncfile  file
+     * @param name    name of the variable
+     * @param unit    unit of the variable
+     * @param desc    description (long_name) of the variable
+     * @param standard_name    CF standard name of the variable
+     * @param dimName    name of the variable dimension
+     *
+     * @return  the Variable
+     */
+    private static Variable makeCoordinateVariable(NetcdfFile ncfile,
+            String name, Unit unit, String desc, String standard_name,
+            String dimName) {
+        Variable v = new Variable(ncfile, null, null, name);
+        v.setDataType(DataType.FLOAT);
+        v.setDimensions(dimName);
+
+        v.addAttribute(new Attribute("units", unit.toString()));
+        v.addAttribute(new Attribute("long_name", desc));
+        v.addAttribute(new Attribute("standard_name", standard_name));
+        ncfile.addVariable(null, v);
+        return v;
+
+    }
+
+    /**
+     * Make a projection varaible
+     *
+     * @param ncfile  the file
+     * @param mp      the MapProjection
+     *
+     * @return the variable or null;
+     */
+    private static Variable makeProjectionVar(NetcdfFile ncfile,
+            MapProjection mp) {
+        List<Attribute> attributes = new ArrayList<Attribute>();
+        Variable        projVar    = null;
+        if (mp instanceof ProjectionCoordinateSystem) {
+            ProjectionImpl proj =
+                ((ProjectionCoordinateSystem) mp).getProjection();
+            List<Parameter> params    = proj.getProjectionParameters();
+            String          grid_name = "not_yet_supported";
+            if (proj instanceof LambertConformal) {
+                grid_name = "lambert_conformal_conic";
+            } else if (proj instanceof Mercator) {
+                grid_name = "mercator";
+            } else if (proj instanceof Stereographic) {
+                grid_name = "polar_stereographic";
+            } else if (proj instanceof VerticalPerspectiveView) {
+                grid_name = "vertical_perspective";
+            }
+            attributes.add(new Attribute(ProjectionImpl.ATTR_NAME,
+                                         grid_name));
+            for (Parameter param : params) {
+                if (param.isString()) {
+                    attributes.add(new Attribute(param.getName(),
+                            param.getStringValue()));
+                } else {
+                    if (param.getLength() == 1) {
+                        attributes.add(new Attribute(param.getName(),
+                                new Double(param.getNumericValue())));
+                    } else {
+                        double[] data = param.getNumericValues();
+                        attributes.add(new Attribute(param.getName(),
+                                Array.factory(DataType.DOUBLE,
+                                    new int[] { param.getLength() }, data)));
+                    }
+                }
+            }
+            projVar = new Variable(ncfile, null, null, grid_name);
+            projVar.setDataType(DataType.CHAR);
+            projVar.setDimensions(new ArrayList());  // scalar
+
+            for (int i = 0; i < attributes.size(); i++) {
+                Attribute att = (Attribute) attributes.get(i);
+                projVar.addAttribute(att);
+            }
+            ncfile.addVariable(null, projVar);
+        }
+        return projVar;
     }
 
     /**
