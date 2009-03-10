@@ -328,7 +328,6 @@ public class DataOutputHandler extends OutputHandler {
             return;
         }
 
-
         if (canLoadAsGrid(entry)) {
             addOutputLink(request, entry, links, OUTPUT_GRIDSUBSET_FORM);
         } else if (canLoadAsPoint(entry)) {
@@ -431,9 +430,9 @@ public class DataOutputHandler extends OutputHandler {
         if (url.indexOf("dods") >= 0) {
             return true;
         }
-        return false;
-
+        return true;
     }
+
 
     /**
      * Can the given entry be served by the tds
@@ -476,6 +475,7 @@ public class DataOutputHandler extends OutputHandler {
                         ok = NetcdfDataset.canOpen(path);
                     }
                 } catch (Exception ignoreThis) {
+                    System.err.println("   error:" + ignoreThis);
                     //                    System.err.println("error:" + ignoreThis);
                 }
             }
@@ -630,7 +630,9 @@ public class DataOutputHandler extends OutputHandler {
                                     "ramadda.data." + types[i] + ".prefixes",
                                     ""), ",", true, true);
                 for (String tok : (List<String>) toks) {
-                    tmp.put(types[i] + "." + tok, "");
+                    if(tok.length()==0 || tok.equals("!")) continue;
+                    String key = types[i] + "." + tok;
+                    tmp.put(key, "");
                 }
             }
             prefixMap = tmp;
