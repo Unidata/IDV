@@ -60,7 +60,7 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-    float[] aodtv72_calcscene(StormADOTInfo.IRData odtcurrent,
+    static float[] aodtv72_calcscene(StormADOTInfo.IRData odtcurrent,
                               int rmwsizeman_v72,
                               StormADOTInfo.DataGrid areadata,
                               float osstr_v72, boolean osearch_v72)
@@ -339,7 +339,7 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-    float[] aodtv72_classify(StormADOTInfo.IRData odtcurrent, int rmwsizeman,
+static     float[] aodtv72_classify(StormADOTInfo.IRData odtcurrent, int rmwsizeman,
                              StormADOTInfo.DataGrid areadata_v72,
                              float osstr_v72, boolean osearch_v72,
                              float alst, float Aaveext, float Estdveye,
@@ -879,7 +879,7 @@ public class StormADOTSceneType {
      */
 
 
-    float[] aodtv72_rmw(StormADOTInfo.IRData odtcurrent,
+static     float[] aodtv72_rmw(StormADOTInfo.IRData odtcurrent,
                         StormADOTInfo.DataGrid areadata)
     /* Determine radius of maximum wind based upon Jim Kossin's
        regression based scheme
@@ -996,7 +996,7 @@ public class StormADOTSceneType {
      * @param areadata_v72
      * @return
      */
-    float[] aodtv72_logspiral(float inlat, float inlon, float searchtemp,
+static     float[] aodtv72_logspiral(float inlat, float inlon, float searchtemp,
                               int searchtype,
                               StormADOTInfo.IRData odtcurrent_v72IR,
                               StormADOTInfo.DataGrid areadata_v72)
@@ -1207,7 +1207,7 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-    float[] aodtv72_calcskew(float[] bin, int nbin)
+static     float[] aodtv72_calcskew(float[] bin, int nbin)
     /* Calculate average, standard deviation, and skew for a given data set.
         Inputs  : bin  - data array
                   nbin - number of points in data array
@@ -1262,7 +1262,7 @@ public class StormADOTSceneType {
      * @param i2 _more_
      * @param ndim _more_
      */
-    void aodtv72_xxsort(float[] x1, float[] x2, float[] i2, int ndim) {
+static     void aodtv72_xxsort(float[] x1, float[] x2, float[] i2, int ndim) {
         int   ih, i;
         float x, top;
 
@@ -1284,7 +1284,7 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-    int aodtv72_fminx(float[] f) {
+static     int aodtv72_fminx(float[] f) {
         int   i;
         int   im;
         int   ndim = f.length;
@@ -1308,7 +1308,7 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-    int aodtv72_fmaxx(float[] f) {
+static     int aodtv72_fmaxx(float[] f) {
         int   i;
         int   im;
         int   ndim = f.length;
@@ -1332,7 +1332,7 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-    float[] aodtv72_fft(float[] cbd) {
+static     float[] aodtv72_fft(float[] cbd) {
         int      ixx, idxc, iok;
         double[] xr, xi, magn;
         double   dx, a, x;
@@ -1388,7 +1388,7 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-    double aodtv72_cmplx_abs(double real, double imag) {
+static     double aodtv72_cmplx_abs(double real, double imag) {
         double temp;
         if (real < 0) {
             real = -real;
@@ -1427,7 +1427,7 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-    int aodtv72_dfft(double[] x, double[] y, int np) {
+static     int aodtv72_dfft(double[] x, double[] y, int np) {
 
         int    i, j, k, m, n, i0, i1, i2, i3, is, id, n1, n2, n4;
         double a, e, a3, cc1, ss1, cc3, ss3, r1, r2, s1, s2, s3, xt;
@@ -1559,7 +1559,7 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-    public StormADOTInfo.IRData aodtv72_gettemps(int keyer,
+static     public StormADOTInfo.IRData aodtv72_gettemps(int keyer,
             StormADOTInfo.DataGrid areadata)
     /* Determine eye and coldest-warmest cloud temperatures.
         Inputs  : keyer      - eye radius (km)
@@ -1635,7 +1635,7 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-    public StormADOTInfo.RingData aodtv72_calceyetemp(int keyer,
+static     public StormADOTInfo.RingData aodtv72_calceyetemp(int keyer,
             float cursortemp, List<StormADOTInfo.RingData> tcircfirst)
     /* Determine eye/warmest temperature by examining the satellite
        data between 0 and 24/75 km from the storm center location.
@@ -1682,7 +1682,7 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-    public float[] aodtv72_calccloudtemp(
+static     public float[] aodtv72_calccloudtemp(
             List<StormADOTInfo.RingData> tcircfirst)
     /* Determine surrounding cloud top region temperature by
        examining the satellite data between kstart_v72(24 km) and
@@ -1750,7 +1750,7 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-    public List<StormADOTInfo.RingData> aodtv72_readcirc(int ixc, int iyc,
+static     public List<StormADOTInfo.RingData> aodtv72_readcirc(int ixc, int iyc,
             StormADOTInfo.DataGrid areadata)
     /* Read array of satellite data temperatures and load array
        containing temperatures and lat/lon positions.
@@ -1804,7 +1804,7 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-    float[] aodtv72_distance(float rrlat, float rrlon, float pplat,
+static     float[] aodtv72_distance(float rrlat, float rrlon, float pplat,
                              float pplon, int iunit)
     /* Calculate distance and angle between two points
        (rrlat,rrlon and pplat,pplon).
@@ -1891,7 +1891,7 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-    float[] aodtv72_distance2(float rlat, float rlon, float xdist, float xang)
+static     float[] aodtv72_distance2(float rlat, float rlon, float xdist, float xang)
     /* Calculate a latitude and longitude position from an
        initial latitude/longitude and distance/angle values.
         Inputs  : rlat - initial latitude
@@ -1962,7 +1962,7 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-    double aodtv72_calctime(int date, int time)
+static     double aodtv72_calctime(int date, int time)
     /* Compute time in xxxxx.yyy units, where xxxxx is the
        day and yyy is the percentage of the day.  This routine
        will also correct for Y2K problems.
@@ -2011,7 +2011,7 @@ public class StormADOTSceneType {
      * @param areadata _more_
      * @return
      */
-    float[] aodtv72_cdoshearcalc(float xlat, float xlon, float tempval,
+static     float[] aodtv72_cdoshearcalc(float xlat, float xlon, float tempval,
                                  int atype, StormADOTInfo.DataGrid areadata)
     /* Determine eye size or shear distance for a given scene.
         Inputs  : xlat    - center latitude of analysis grid
