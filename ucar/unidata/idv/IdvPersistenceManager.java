@@ -3371,7 +3371,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 localFileMapping = new ArrayList(fileMapping);
             }
 
-            final visad.util.ThreadUtil threadUtil = new visad.util.ThreadUtil();
+            final visad.util.ThreadUtil threadUtil = new visad.util.ThreadUtil("Data source initialization");
             for (int i = 0; i < dataSources.size(); i++) {
                 final DataSource dataSource = (DataSource) dataSources.get(i);
                 //Clear the error flag
@@ -3406,7 +3406,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
             long t1 = System.currentTimeMillis();
             //            threadUtil.runAllParallel();
-            threadUtil.runInParallel(false);
+            threadUtil.runInParallel();
             long t2 = System.currentTimeMillis();
             //            System.err.println ("time to init data sources:" + (t2-t1));
             //            threadUtil.clearTimes();
@@ -3572,7 +3572,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
                     final Hashtable properties = new Hashtable();
                     Trace.call1("Decode.init displays");
-                    final visad.util.ThreadUtil displaysThreadUtil = new visad.util.ThreadUtil();
+                    final visad.util.ThreadUtil displaysThreadUtil = new visad.util.ThreadUtil("display initialization");
                     for (int i = 0; i < newControls.size(); i++) {
                         final DisplayControl displayControl =
                             (DisplayControl) newControls.get(i);
@@ -3601,8 +3601,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     long tt2 = System.currentTimeMillis();
                     //                    System.err.println ("time to init displays:" + (tt2-tt1));
                     //                    displaysThreadUtil.clearTimes();
-
-
                     Trace.call2("Decode.init displays");
                 }
                 if ( !fromCollab) {

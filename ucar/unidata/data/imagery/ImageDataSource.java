@@ -1261,7 +1261,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 currentDirs = null;
             }
 
-            visad.util.ThreadUtil threadUtil = new visad.util.ThreadUtil();
+            visad.util.ThreadUtil threadUtil = new visad.util.ThreadUtil("image data reading");
             final ImageSequenceManager sequenceManager = new ImageSequenceManager();
             int                  cnt             = 1;
             DataChoice           parent          = dataChoice.getParent();
@@ -1310,7 +1310,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 LogUtil.printMessage(ve.toString());
             }
             long t2 = System.currentTimeMillis();
-            System.err.println ("adde image time:" + (t2-t1));
             return    sequenceManager.addImagesToSequence(images);
         } catch (Exception exc) {
             throw new ucar.unidata.util.WrapperException(exc);

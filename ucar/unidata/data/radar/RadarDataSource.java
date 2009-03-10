@@ -275,7 +275,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
 
         final List<RadarAdapter> goodAdapters = new ArrayList<RadarAdapter>();
         final List<String> goodFiles = new ArrayList<String>();
-        visad.util.ThreadUtil threadUtil = new visad.util.ThreadUtil();
+        visad.util.ThreadUtil threadUtil = new visad.util.ThreadUtil("radar data reading");
         LogUtil.message("Initializing radar files");
         for (Iterator iter = files.iterator(); iter.hasNext(); ) {
             final String       filename = iter.next().toString();
