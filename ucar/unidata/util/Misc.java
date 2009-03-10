@@ -4276,8 +4276,8 @@ public class Misc {
     public static final void doWork(int amt) {
         long x=0;
         long y=0;
-        //        long work = ((long)amt)*200000L;
-        long work = ((long)amt)*20000L;
+        long work = ((long)amt)*2000000L;
+        //long work = ((long)amt)*20000L;
         for(int i=0;i<work;i++) {
             x++;
         }
@@ -4293,8 +4293,9 @@ public class Misc {
     public static void main(String[] args) throws Exception {
         int numberOfProcessors = Runtime.getRuntime().availableProcessors();
         int myCnt = (args.length>0?new Integer(args[0]).intValue():2);
-        for(int j=0;j<1000;j++) {
+        //        for(int j=0;j<1000;j++) {
         //        for(myCnt=1;myCnt<100;myCnt+=5) {
+        /*
             visad.util.ThreadUtil threadUtil  = new visad.util.ThreadUtil();
             final int amt = 1000;
             //           final int cnt = (args.length>0?new Integer(args[0]).intValue():2);
@@ -4312,8 +4313,9 @@ public class Misc {
             long t2  = System.currentTimeMillis();
             long time = t2-t1;
             System.err.println (cnt +" time:" + time +" *2=" + time*2);
+        */
             //        }
-        }
+            //        }
         //        System.exit(0);
         //        Misc.run(getRunnable());
         //        Misc.run(getRunnable());
