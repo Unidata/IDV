@@ -1336,13 +1336,11 @@ public class GridUtil {
                 newGrid.setSamples(grid.getFloats(false), true);
                 return newGrid;
             }
-            boolean   doMax        = function.equals(FUNC_MAX);
-            boolean   doMin        = function.equals(FUNC_MIN);
+            final boolean   doMax        = function.equals(FUNC_MAX);
+            final boolean   doMin        = function.equals(FUNC_MIN);
             float[][] values       = null;
-            Set       timeDomain   = grid.getDomainSet();
+            final Set       timeDomain   = grid.getDomainSet();
             int       numTimeSteps = timeDomain.getLength();
-
-
             for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength();
                     timeStepIdx++) {
                 FieldImpl sample = (FieldImpl) grid.getSample(timeStepIdx);
@@ -1387,6 +1385,90 @@ public class GridUtil {
             throw new VisADException("RemoteException checking missing data");
         }
 
+    }
+
+
+    public static class Grid2D {
+        float[][]lats;
+        float[][]lons;
+        float[][][]values;
+        public Grid2D(float[][]lats,
+                      float[][]lons,
+                      float[][][]values) {
+            this.lats = lats;
+            this.lons = lons;
+            this.values = values;
+        }
+    };
+
+    public static Grid2D makeGrid2D(FieldImpl grid)
+        throws VisADException,RemoteException {
+        SampledSet domain    = getSpatialDomain(grid);
+        if(!(domain instanceof GriddedSet)) {
+            throw new IllegalArgumentException("Spatial domain is not a griddedset:" + domain.getClass().getName());
+        }
+        GriddedSet griddedSet = (GriddedSet) domain;
+        int []lengths = griddedSet.getLengths();
+        if(lengths.length!=2) {
+            throw new IllegalArgumentException("Spatial domain is not 2D:" + lengths.length);
+        }
+        int latIndex = isLatLonOrder(domain)
+            ? 0
+            : 1;
+        int lonIndex = isLatLonOrder(domain)
+            ? 1
+            : 0;
+        int xCnt = lengths[0];
+        int yCnt = lengths[1];
+        System.err.println("X =" + xCnt +" Y=" + yCnt);
+        float[][] latLons  = getEarthLocationPoints(griddedSet);
+        float[]lats = latLons[latIndex];
+        float[]lons = latLons[lonIndex];
+        float[][] values = grid.getFloats(false);
+        float[][]lat2D = new float[xCnt][yCnt];
+        float[][]lon2D = new float[xCnt][yCnt];
+        int rangeCnt = values.length;
+        float[][][]value2D = new float[rangeCnt][xCnt][yCnt];
+
+        for(int i=0;i<lats.length;i++) {
+            //We need to map the linear idx into the 2d space
+            //Do we know how to do this
+            int xIdx  = i%xCnt;
+            int yIdx  = i/xCnt;
+            lat2D[xIdx][yIdx] = lats[i];
+            lon2D[xIdx][yIdx] = lons[i];
+            for(int rangeIdx=0;rangeIdx<rangeCnt;rangeIdx++) {
+                value2D[rangeIdx][xIdx][yIdx] = values[rangeIdx][i];
+            }
+        }
+
+        for(int yIdx=0;yIdx<yCnt;yIdx++) {
+            for(int xIdx=0;xIdx<xCnt;xIdx++) {
+                System.err.print(" " + lat2D[xIdx][yIdx]+"/"+lon2D[xIdx][yIdx]);
+            }
+            System.err.println("");
+        }
+        return new Grid2D(lat2D,lon2D,value2D);
+
+    }
+
+
+    public static void testIt(FieldImpl grid)
+        throws VisADException,RemoteException {
+        if ( !isTimeSequence(grid)) {
+            Grid2D grid2D = makeGrid2D(grid);
+            return;
+        }
+        float[][] values       = null;
+        final Set       timeDomain   = grid.getDomainSet();
+        int       numTimeSteps = timeDomain.getLength();
+        for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength();
+             timeStepIdx++) {
+            FieldImpl timeStep = (FieldImpl) grid.getSample(timeStepIdx);
+            if(timeStepIdx==0) {
+                Grid2D grid2D =    makeGrid2D(timeStep);
+            }
+        }
     }
 
 
@@ -3216,6 +3298,19 @@ public class GridUtil {
      * @throws  VisADException  invalid subDomain or some other problem
      */
     public static FieldImpl resampleGrid(FieldImpl grid,
+                                         SampledSet subDomain,
+                                         int samplingMode, int errorMode)
+            throws VisADException {
+        long t1 = System.currentTimeMillis();
+        FieldImpl result = resampleGridInner(grid, subDomain, samplingMode, errorMode);
+        long t2 = System.currentTimeMillis();
+        System.err.println("Time:" + (t2-t1));
+        return result;
+    }
+
+
+
+    private static FieldImpl resampleGridInner(FieldImpl grid,
                                          SampledSet subDomain,
                                          int samplingMode, int errorMode)
             throws VisADException {
