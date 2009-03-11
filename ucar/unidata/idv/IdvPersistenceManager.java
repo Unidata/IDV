@@ -3159,7 +3159,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             editableComps.add(widgetContents);
         }
 
-        if (editableComps.size() > 0) {
+        if (!getArgsManager().getIsOffScreen() && editableComps.size() > 0) {
             JComponent panel = GuiUtils.doLayout(editableComps, 1,
                                    GuiUtils.WT_Y, stretchy);
             panel = GuiUtils.inset(

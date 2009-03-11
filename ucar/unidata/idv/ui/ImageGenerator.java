@@ -1821,6 +1821,13 @@ public class ImageGenerator extends IdvManager {
             debug("Loading bundle: " + bundleFile);
             if (bundleFile.endsWith(".jnlp")) {
                 getPersistenceManager().decodeJnlpFile(bundleFile);
+            } else if (getArgsManager().isZidvFile(bundleFile)) {
+                Hashtable properties = new Hashtable();
+                boolean ask = getStore().get(PREF_ZIDV_ASK, true);
+                getStore().put(PREF_ZIDV_ASK, false);
+                getPersistenceManager().decodeXmlFile(bundleFile, "", false,
+                                                      false, properties);
+                getStore().put(PREF_ZIDV_ASK, ask);
             } else {
                 String xml = IOUtil.readContents(bundleFile);
                 xml = applyMacros(xml);
