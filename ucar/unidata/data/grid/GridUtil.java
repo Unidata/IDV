@@ -1399,6 +1399,16 @@ public class GridUtil {
             this.lons = lons;
             this.values = values;
         }
+
+        public float [][] getlons(){
+            return lons;
+        }
+        public float [][] getlats(){
+            return lats;
+        }
+        public float [][][] getvalues(){
+            return values;
+        }
     };
 
     public static Grid2D makeGrid2D(FieldImpl grid)
