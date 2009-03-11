@@ -22,10 +22,6 @@
 
 
 
-
-
-
-
 package ucar.unidata.data.grid;
 
 
@@ -42,7 +38,6 @@ import ucar.nc2.Variable;
 import ucar.nc2.dataset.NetcdfDataset;
 
 import ucar.unidata.data.DataUtil;
-
 
 import ucar.unidata.data.point.PointObTuple;
 import ucar.unidata.geoloc.ProjectionImpl;
@@ -4504,15 +4499,6 @@ public class GridUtil {
             Variable timeVar = new Variable(ncfile, null, null, "time",
                                             DataType.DOUBLE, "time");
             timeVar.addAttribute(new Attribute("units", units[0].toString()));
-            /*
-            Array      varArray = new ArrayDouble.D1(numTimes);
-            double[][] timeVals = timeSet.getDoubles(false);
-            //Misc.printArray("times", timeVals[0]);
-            for (int i = 0; i < numTimes; i++) {
-                ((ArrayDouble.D1) varArray).set(i, timeVals[0][i]);
-            }
-            timeVar.setCachedData(varArray, false);
-            */
             ncfile.addVariable(null, timeVar);
         }
         HashMap<Variable, Array> varData = addSpatialVars(ncfile,
@@ -4550,7 +4536,6 @@ public class GridUtil {
                 + "Original Dataset = " + grid.getType()
                 + "\nTranslation Date = " + new Date()));
         ncfile.create();
-        System.out.println(ncfile);
         // fill in the data
         if (isTimeSequence) {
             Variable   timeVar  = ncfile.findVariable("time");
@@ -4564,45 +4549,38 @@ public class GridUtil {
             Variable v = (Variable) it.next();
             ncfile.write(v.getName(), varData.get(v));
         }
-        int numDims = dims.size();
-        if (isTimeSequence) {
-            numDims++;
-        }
-        int[] sizes = new int[numDims];
-        int   index = 0;
-        if (isTimeSequence) {
-            sizes[0] = numTimes;
-            index++;
-        }
+        int   numDims = dims.size();
+        int[] sizes   = new int[numDims];
+        int   index   = 0;
         for (Dimension dim : dims) {
             sizes[index++] = dim.getLength();
         }
         // write the data
-        /*
-        for (int j = 0; j < rTypes.length; j++) {
-            Variable v = ncfile.findVariable(getVarName(rTypes[j]));
-            Array arr = null;
-            if (isTimeSequence) {
-                arr = Array.factory(DataType.FLOAT, sizes);
-                Index idx = Index.factory(sizes);
-                for (int i = 0; i < timeSet.getLength(); i++) {
-                    int[] newSizes = new int[sizes.length];
-                    newSizes[0] = i;
-                    for (int k = 1; k < sizes.length; k++) {
-                       newSizes[k] = 0;
-                    }
-                    Index section = idx.set(newSizes);
-                    FlatField sample = (FlatField) grid.getSample(i, false);
-                    float[][] samples = sample.getFloats(false);
-                    arr.setObject(section, samples[j]);
-                }
-            } else {
-                float[][] samples = ((FlatField)grid).getFloats();
-                arr = Array.factory(DataType.FLOAT, sizes, samples[j]);
+        Array arr = null;
+        if (isTimeSequence) {
+            sizes[0] = 1;
+            int[] origin = new int[sizes.length];
+            for (int k = 1; k < sizes.length; k++) {
+                origin[k] = 0;
             }
-            ncfile.write(v.getName(), arr);
+            for (int i = 0; i < timeSet.getLength(); i++) {
+                origin[0] = i;
+                FlatField sample  = (FlatField) grid.getSample(i, false);
+                float[][] samples = sample.getFloats(false);
+                for (int j = 0; j < rTypes.length; j++) {
+                    Variable v = ncfile.findVariable(getVarName(rTypes[j]));
+                    arr = Array.factory(DataType.FLOAT, sizes, samples[j]);
+                    ncfile.write(v.getName(), origin, arr);
+                }
+            }
+        } else {
+            float[][] samples = ((FlatField) grid).getFloats();
+            for (int j = 0; j < rTypes.length; j++) {
+                Variable v = ncfile.findVariable(getVarName(rTypes[j]));
+                arr = Array.factory(DataType.FLOAT, sizes, samples[j]);
+                ncfile.write(v.getName(), arr);
+            }
         }
-        */
         // write the file
         ncfile.close();
         try {}
@@ -4643,10 +4621,9 @@ public class GridUtil {
         int                      dim        = domainSet.getDimension();
         int                      mdim       =
             domainSet.getManifoldDimension();
-        //System.out.println("dim = " + dim + "; mdim = " + mdim);
-        CoordinateSystem cs    = domainSet.getCoordinateSystem();
-        Unit[]           units = domainSet.getSetUnits();
-        int[]            lens  = ((GriddedSet) domainSet).getLengths();
+        CoordinateSystem         cs         = domainSet.getCoordinateSystem();
+        Unit[]                   units      = domainSet.getSetUnits();
+        int[]                    lens = ((GriddedSet) domainSet).getLengths();
         // populate the time and axes values
         float[][] spatialVals = domainSet.getSamples(false);
         boolean   is3D        = dim > 2;
@@ -4663,16 +4640,13 @@ public class GridUtil {
             for (int z = 0; z < sizeZ; z++) {
                 zVals[z] = spatialVals[2][sizeX * sizeY * z];
             }
-            //Misc.printArray("z", zVals);
         }
         for (int y = 0; y < sizeY; y++) {
             yVals[y] = spatialVals[1][sizeX * y];
         }
-        //Misc.printArray("y", yVals);
         for (int x = 0; x < sizeX; x++) {
             xVals[x] = spatialVals[0][x];
         }
-        //Misc.printArray("x", xVals);
         if (cs == null) {  // straight lat/lon
         } else {
             RealType[] types =
