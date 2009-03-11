@@ -246,6 +246,35 @@ public class IOUtil {
         return files;
     }
 
+    public static void scour(File dir, int maxCnt, double hours) {
+        System.err.println ("Checking " + dir + " hours:" + hours);
+        maxCnt = 0;
+        File[]files = sortFilesOnAge(dir.listFiles(),
+                                     false);
+        long now = new Date().getTime();
+        int deleteCnt = 0;
+        for(int i=0;i<files.length;i++) {
+            if(files[i].isDirectory()) {
+                scour(files[i], maxCnt, hours);
+            } else {
+                if(files.length-deleteCnt>maxCnt) {
+                    long lastModified = files[i].lastModified();
+                    double ageHours  = DateUtil.millisToHours(now-lastModified);
+                    if(ageHours>hours) {
+                        //files[i].delete();
+                        System.err.println("delete:" + files[i].getName() + " hours old:" + ageHours);
+                        deleteCnt--;
+                    } else {
+                        System.err.println("no delete:" + files[i].getName() + " hours old:" + ageHours);
+                    }
+                }
+            }
+        }
+
+
+    }
+
+
 
     /**
      * _more_
