@@ -499,6 +499,10 @@ public class DateUtil {
         return millis / 1000 / 60;
     }
 
+    public static double millisToHours(double millis) {
+        return millis / 1000 / 60/ 60;
+    }
+
     /**
      * utility to convert a given number of minutes to milliseconds
      *
