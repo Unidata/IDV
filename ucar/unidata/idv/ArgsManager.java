@@ -455,7 +455,7 @@ public class ArgsManager extends IdvManager {
             Runnable runnable = (Runnable) initRunnables.get(i);
             runnable.run();
         }
-        System.exit(0);
+        getIdv().exit(0);
     }
 
 
@@ -600,7 +600,7 @@ public class ArgsManager extends IdvManager {
         String msg = USAGE_MESSAGE;
         msg = msg + "\n" + getUsageMessage();
         LogUtil.userErrorMessage(err + "\n" + msg);
-        System.exit(1);
+        getIdv().exit(0);
     }
 
 
@@ -964,7 +964,7 @@ public class ArgsManager extends IdvManager {
         } else if (arg.equals(ARG_HELP)) {
             System.err.println(USAGE_MESSAGE);
             System.err.println(getUsageMessage());
-            System.exit(1);
+            getIdv().exit(0);
         } else if (arg.equals(ARG_TESTEVAL)) {
             testEval = true;
             testMode = true;
