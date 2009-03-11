@@ -1766,6 +1766,7 @@ return new Result(title, sb);
                 image = ImageUtils.resize(image, width, -1);
                 ImageUtils.waitOnImage(image);
                 ImageUtils.writeImageToFile(image, thumb);
+                getStorageManager().checkScour();
             }
             return new Result(BLANK,
                               IOUtil.getInputStream(thumb, getClass()),
@@ -4067,6 +4068,7 @@ return new Result(title, sb);
                               boolean canBeBatched)
             throws Exception {
 
+
         if (entries.size() == 0) {
             return;
         }
@@ -4639,6 +4641,32 @@ return new Result(title, sb);
 
 
 
+    public Result changeType(Request request,
+                             List<Group> groups, List<Entry> entries)
+            throws Exception {
+        /*
+        if ( !request.getUser().getAdmin()) {
+            return null;
+        }
+        TypeHandler typeHandler =
+            getRepository().getTypeHandler(TypeHandler.TYPE_HOMEPAGE);
+
+
+        List<Entry> changedEntries = new ArrayList<Entry>();
+
+        entries.addAll(groups);
+
+        for(Entry entry: entries) {
+            if(entry.isGroup()) {
+                entry.setTypeHandler(typeHandler);
+                changedEntries.add(entry);
+            }
+        }
+        insertEntries(changedEntries, false);*/
+        return new Result("Metadata", new StringBuffer("OK"));
+    }
+
+
     /**
      * _more_
      *
@@ -5007,9 +5035,16 @@ return new Result(title, sb);
     public Group makeNewGroup(Group parent, String name, User user,
                               Entry template)
             throws Exception {
+        return makeNewGroup(parent, name, user, template,TypeHandler.TYPE_GROUP);
+    }
+
+
+    public Group makeNewGroup(Group parent, String name, User user,
+                              Entry template, String type)
+            throws Exception {
         synchronized (MUTEX_GROUP) {
             TypeHandler typeHandler =
-                getRepository().getTypeHandler(TypeHandler.TYPE_GROUP);
+                getRepository().getTypeHandler(type);
             Group group = new Group(getGroupId(parent), typeHandler);
             if (template != null) {
                 group.initWith(template);

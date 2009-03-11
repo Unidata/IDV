@@ -134,17 +134,7 @@ public class GenericTypeHandler extends TypeHandler {
         setDefaultDataType(XmlUtil.getAttribute(entryNode, ATTR_DATATYPE,
                 (String) null));
 
-        List propertyNodes = XmlUtil.findChildren(entryNode, TAG_PROPERTY);
-        for (int propIdx = 0; propIdx < propertyNodes.size(); propIdx++) {
-            Element propertyNode = (Element) propertyNodes.get(propIdx);
-            if (XmlUtil.hasAttribute(propertyNode, ATTR_VALUE)) {
-                putProperty(XmlUtil.getAttribute(propertyNode, ATTR_NAME),
-                            XmlUtil.getAttribute(propertyNode, ATTR_VALUE));
-            } else {
-                putProperty(XmlUtil.getAttribute(propertyNode, ATTR_NAME),
-                            XmlUtil.getChildText(propertyNode));
-            }
-        }
+        setProperties(entryNode);
 
         this.columns = new ArrayList<Column>();
         colNames     = new ArrayList();

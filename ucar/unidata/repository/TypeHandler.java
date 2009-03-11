@@ -76,6 +76,8 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     public static final String TYPE_GROUP = Constants.TYPE_GROUP;
 
+    public static final String TYPE_HOMEPAGE = "homepage";
+
     /** _more_ */
     public static final String TYPE_CONTRIBUTION = "contribution";
 
@@ -613,6 +615,22 @@ public class TypeHandler extends RepositoryManager {
         return sb;
 
     }
+
+
+    protected void setProperties(Element entryNode) {
+        List propertyNodes = XmlUtil.findChildren(entryNode, TAG_PROPERTY);
+        for (int propIdx = 0; propIdx < propertyNodes.size(); propIdx++) {
+            Element propertyNode = (Element) propertyNodes.get(propIdx);
+            if (XmlUtil.hasAttribute(propertyNode, ATTR_VALUE)) {
+                putProperty(XmlUtil.getAttribute(propertyNode, ATTR_NAME),
+                            XmlUtil.getAttribute(propertyNode, ATTR_VALUE));
+            } else {
+                putProperty(XmlUtil.getAttribute(propertyNode, ATTR_NAME),
+                            XmlUtil.getChildText(propertyNode));
+            }
+        }
+    }
+
 
 
     /**

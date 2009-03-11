@@ -199,6 +199,9 @@ public class DataOutputHandler extends OutputHandler {
     /** _more_ */
     private Cache trajectoryEntries = new Cache(5000);
 
+
+    private String nj22TmpFile;
+
     //TODO: When we close a ncfile some thread might be using it
     //Do we have to actually close it??
 
@@ -242,6 +245,11 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
+
+
+
+
+
     /**
      *     _more_
      *
@@ -254,16 +262,16 @@ public class DataOutputHandler extends OutputHandler {
         super(repository, element);
 
         //TODO: what other global configuration should be done?
-        String nj22TmpFile =
+        nj22TmpFile =
             IOUtil.joinDir(getRepository().getStorageManager().getTmpDir(),
                            "nj22/");
         IOUtil.makeDir(nj22TmpFile);
 
         //Set the temp file and the cache policy
         ucar.nc2.util.DiskCache.setRootDirectory(nj22TmpFile);
-
-
         ucar.nc2.iosp.grib.GribServiceProvider.setIndexAlwaysInCache(true);
+
+
         addType(OUTPUT_OPENDAP);
         addType(OUTPUT_CDL);
         addType(OUTPUT_WCS);
@@ -799,6 +807,7 @@ public class DataOutputHandler extends OutputHandler {
     public GridDataset getGridDataset(String path) throws Exception {
         GridDataset gds = (GridDataset) gridCache.get(path);
         if (gds == null) {
+            getStorageManager().checkScour();
             gridCache.put(path, gds = GridDataset.open(path));
         }
         return gds;
@@ -820,6 +829,7 @@ public class DataOutputHandler extends OutputHandler {
         NetcdfDataset dataset = (NetcdfDataset) ncFileCache.get(path);
         if (dataset == null) {
             dataset = NetcdfDataset.openDataset(path);
+            getStorageManager().checkScour();
             ncFileCache.put(path, dataset);
         }
         return dataset;

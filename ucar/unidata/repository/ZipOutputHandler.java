@@ -230,10 +230,21 @@ public class ZipOutputHandler extends OutputHandler {
      */
     protected Result toZip(Request request, List<Entry> entries)
             throws Exception {
-        File tmpFile =
-            getRepository().getStorageManager().getTmpFile(request, "zip");
-        FileOutputStream fos  = new FileOutputStream(tmpFile);
-        ZipOutputStream  zos  = new ZipOutputStream(fos);
+        OutputStream os;
+        boolean doingFile = false;
+
+        File tmpFile = null;
+        if(request.getHttpServletResponse() !=null) {
+            os = request.getHttpServletResponse().getOutputStream();
+            request.getHttpServletResponse().setContentType(getMimeType(OUTPUT_ZIP));
+        } else {
+            tmpFile =
+                getRepository().getStorageManager().getTmpFile(request, ".zip");
+            os  = new FileOutputStream(tmpFile);
+            doingFile = true;
+        }
+
+        ZipOutputStream  zos  = new ZipOutputStream(os);
         Hashtable        seen = new Hashtable();
         for (Entry entry : entries) {
             if ( !getAccessManager().canDownload(request, entry)) {
@@ -253,9 +264,15 @@ public class ZipOutputHandler extends OutputHandler {
             zos.closeEntry();
         }
         zos.close();
-        fos.close();
-        return new Result("", new FileInputStream(tmpFile),
-                          getMimeType(OUTPUT_ZIP));
+        if(doingFile) {
+            os.close();
+            return new Result("", new FileInputStream(tmpFile),
+                              getMimeType(OUTPUT_ZIP));
+
+        }
+        Result result = new Result();
+        result.setNeedToWrite(false);
+        return result;
     }
 
 

@@ -100,6 +100,10 @@ public class Result {
     /** _more_ */
     private AuthorizationMethod authorizationMethod;
 
+    public Result() {
+    }
+
+
     /**
      * _more_
      *

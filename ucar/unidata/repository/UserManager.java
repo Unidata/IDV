@@ -961,7 +961,7 @@ public class UserManager extends RepositoryManager {
 
                 if(homeGroupId.length()>0) {
                     Group parent = getEntryManager().findGroup(request, homeGroupId);
-                    Group home = getEntryManager().makeNewGroup(parent, name, newUser,null);
+                    Group home = getEntryManager().makeNewGroup(parent, name, newUser,null,TypeHandler.TYPE_HOMEPAGE);
                     msg.append("A home group has been created for you: ");
                     String homeUrl = HtmlUtil.url(getRepositoryBase().URL_ENTRY_SHOW.toString(),
                                                   ARG_ENTRYID,home.getId());

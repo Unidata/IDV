@@ -59,7 +59,7 @@ import java.util.Properties;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class GroupTypeHandler extends TypeHandler {
+public class ExtensibleGroupTypeHandler extends GenericTypeHandler {
 
 
     /**
@@ -69,42 +69,11 @@ public class GroupTypeHandler extends TypeHandler {
      *
      * @throws Exception _more_
      */
-    public GroupTypeHandler(Repository repository) throws Exception {
-        super(repository, TypeHandler.TYPE_GROUP, "Group");
+    public ExtensibleGroupTypeHandler(Repository repository, Element entryNode) throws Exception {
+        super(repository,entryNode);
     }
 
 
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param links _more_
-     *
-     * @throws Exception _more_
-     */
-    protected void getEntryLinks(Request request, Entry entry,
-                                 List<Link> links)
-            throws Exception {
-        super.getEntryLinks(request, entry, links);
-
-
-        if ( !entry.getIsLocalFile()) {
-            /*
-            links.add(
-                new Link(
-                    request.url(
-                        getRepository().URL_SEARCH_FORM, ARG_GROUP,
-                        entry.getId()), getRepository().iconUrl(ICON_SEARCH),
-                                        "Search in Group"));
-            */
-        }
-
-
-
-    }
 
 
     /**

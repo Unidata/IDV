@@ -16,6 +16,9 @@
 
 
 
+  <type name="homepage"  description="Home Page" handler="ucar.unidata.repository.ExtensibleGroupTypeHandler">
+     <property name="icon" value="/icons/user.png"/>
+   </type>
 
 
   <type name="wikipage"  description="Wiki Page" handler="ucar.unidata.repository.collab.WikiPageTypeHandler">

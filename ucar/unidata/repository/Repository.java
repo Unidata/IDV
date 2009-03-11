@@ -191,6 +191,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
     /** _more_ */
+    public static final OutputType OUTPUT_TYPECHANGE =
+        new OutputType("Change Type", "repository.typechange",
+                       OutputType.TYPE_ACTION | OutputType.TYPE_EDIT, "",
+                       null);
+
+
+    /** _more_ */
     public static final OutputType OUTPUT_METADATA_FULL =
         new OutputType("Add full metadata", "repository.metadata.full",
                        OutputType.TYPE_ACTION | OutputType.TYPE_EDIT, "",
@@ -758,6 +765,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         HtmlUtil.setHideShowImage(iconUrl(ICON_MINUS), iconUrl(ICON_PLUS));
         logInfo("RAMADDA started");
+
+        getStorageManager().scourTmpDirectory();
+
     }
 
 
@@ -1824,6 +1834,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                           "Entry Deleter") {
             public boolean canHandleOutput(OutputType output) {
                 return output.equals(OUTPUT_DELETER)
+                    /*                    || output.equals(OUTPUT_TYPECHANGE)*/
                        || output.equals(OUTPUT_METADATA_SHORT)
                        || output.equals(OUTPUT_METADATA_FULL);
             }
@@ -1834,6 +1845,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     return;
                 }
 
+                /*                if(request.getUser().getAdmin()) {
+                    links.add(makeLink(request, state.getEntry(),
+                                       OUTPUT_TYPECHANGE));
+
+                                       }*/
                 boolean metadataOk = true;
                 for (Entry entry : state.getAllEntries()) {
                     if ( !getAccessManager().canDoAction(request, entry,
@@ -1875,6 +1891,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     return getEntryManager().addInitialMetadataToEntries(
                         request, entries, true);
                 }
+
+                /*                if (output.equals(OUTPUT_TYPECHANGE)) {
+                    return getEntryManager().changeType(
+                                                        request, subGroups, entries);
+                                                        }*/
                 if (output.equals(OUTPUT_METADATA_FULL)) {
                     return getEntryManager().addInitialMetadataToEntries(
                         request, entries, false);
@@ -2076,7 +2097,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
         if ((result != null) && (result.getInputStream() == null)
-                && result.isHtml() && result.getShouldDecorate()) {
+                && result.isHtml() && result.getShouldDecorate()&&
+            result.getNeedToWrite()) {
             result.putProperty(PROP_NAVLINKS, getNavLinks(request));
             okToAddCookie = result.getResponseCode() == Result.RESPONSE_OK;
             decorateResult(request, result);

@@ -111,6 +111,9 @@ public class StorageManager extends RepositoryManager {
     /** _more_ */
     private String tmpDir;
 
+    private int tmpFileAccessCnt=0;
+
+
     /** _more_ */
     private String anonymousDir;
 
@@ -281,6 +284,29 @@ public class StorageManager extends RepositoryManager {
         return tmpDir;
     }
 
+
+    public void checkScour() {
+        //only scour every 100 times we've opened a file
+        if(tmpFileAccessCnt++>200) {
+            scourTmpDirectory();
+        }
+    }
+
+
+    protected void scourTmpDirectory()  {
+        Misc.run(new Runnable() {
+                public void run() {
+                    //Keep around either 200 files or files touched in the last 24 hours
+                    tmpFileAccessCnt = 0;
+                    IOUtil.scour(new File(getTmpDir()), 200, 24);
+                }
+            });
+
+    }
+
+
+
+
     /**
      * _more_
      *
@@ -405,6 +431,7 @@ public class StorageManager extends RepositoryManager {
      * @return _more_
      */
     public File getTmpFile(Request request, String name) {
+        checkScour();
         return new File(IOUtil.joinDir(getTmpDir(),
                                        getRepository().getGUID() + "_"
                                        + name));
@@ -454,6 +481,15 @@ public class StorageManager extends RepositoryManager {
             IOUtil.makeDirRecursive(new File(entriesDir));
         }
         File entryDir = new File(IOUtil.joinDir(entriesDir, id));
+        //The old way
+        if(entryDir.exists()) {
+            return entryDir;
+        }
+
+        String dir1 = "entry_" + (id.length()>=2?id.substring(0,2):"");
+        String dir2 = "entry_" + (id.length()>=4?id.substring(2,4):"");
+        entryDir = new File(IOUtil.joinDir(entriesDir, IOUtil.joinDir(dir1,IOUtil.joinDir(dir2, id))));
+        //        System.err.println("entrydir:" + entryDir);
         if (createIfNeeded) {
             IOUtil.makeDirRecursive(entryDir);
         }
