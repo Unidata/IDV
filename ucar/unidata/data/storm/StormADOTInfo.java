@@ -178,9 +178,12 @@ public class StormADOTInfo {
     public ArrayList<RingData> tcircfirst_v72;
 
     /** _more_          */
-    DataGrid areadata_v72;
+   // DataGrid areadata_v72;
 
-   public static class ImgCoeffs {
+
+    public StormADOTInfo() {}
+
+    public static class ImgCoeffs {
        String  sat_id;
        int sat_num;
        int chan;
@@ -222,7 +225,7 @@ public class StormADOTInfo {
      * @author IDV Development Team
      * @version $Revision: 1.1 $
      */
-    public class RingData {
+    public static  class RingData {
 
         /** _more_          */
         float dist;
@@ -251,7 +254,6 @@ public class StormADOTInfo {
             this.temp  = temp;
         }
 
-        ;
 
     }
 
@@ -262,16 +264,16 @@ public class StormADOTInfo {
      * @author IDV Development Team
      * @version $Revision: 1.1 $
      */
-    public class DataGrid {
+
+
+    public static class DataGrid {
+        float[][] temp;
 
         /** _more_          */
-        float[][] temp = new float[500][500];
+        float[][] lat;
 
         /** _more_          */
-        float[][] lat = new float[500][500];
-
-        /** _more_          */
-        float[][] lon = new float[500][500];
+        float[][] lon;
 
         /** _more_          */
         int numx;
@@ -279,21 +281,7 @@ public class StormADOTInfo {
         /** _more_          */
         int numy;
 
-        /**
-         * _more_
-         */
-        DataGrid() {}
-
-        /**
-         * _more_
-         *
-         * @param temp _more_
-         * @param lon _more_
-         * @param lat _more_
-         * @param numx _more_
-         * @param numy _more_
-         */
-        DataGrid(float[][] temp, float[][] lon, float[][] lat, int numx,
+        public DataGrid(float[][] temp, float[][] lon, float[][] lat, int numx,
                  int numy) {
             this.temp = temp;
             this.lat  = lat;
@@ -301,9 +289,15 @@ public class StormADOTInfo {
             this.numx = numx;
             this.numy = numy;
         }
-    }
 
-    ;
+        public float [][] getlons(){
+            return lon;
+        }
+        public float [][] getlats(){
+            return lat;
+        }
+
+    };
 
     /**
      * Class IRData _more_
@@ -312,7 +306,7 @@ public class StormADOTInfo {
      * @author IDV Development Team
      * @version $Revision: 1.1 $
      */
-    public class IRData {
+     public static class IRData {
 
         /** _more_          */
         int date;

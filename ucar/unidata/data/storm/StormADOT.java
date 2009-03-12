@@ -42,10 +42,10 @@ import java.util.List;
 public class StormADOT {
 
     /** _more_ */
-    ucar.unidata.data.storm.StormADOTInfo.IRData odtcurrent_v72IR;
+    StormADOTInfo.IRData odtcurrent_v72IR;
 
     /** _more_ */
-    ucar.unidata.data.storm.StormADOTInfo.DataGrid areadata_v72;
+    StormADOTInfo.DataGrid areadata_v72;
 
 
     /** _more_ */
@@ -187,7 +187,7 @@ public class StormADOT {
          *  init areadata_v72
          */
 
-        iaodt = aodtv72_loadIRimage(temps, g2d1.getlats(), g2d1.getlons(),
+        aodtv72_loadIRimage(temps, g2d1.getlats(), g2d1.getlons(),
                                     numx, numy);
 
         /*
@@ -290,6 +290,7 @@ public class StormADOT {
                 svalues[0][i][j] = values[0][i + startx][j + starty];
             }
         }
+
         return new GridUtil.Grid2D(slats, slons, svalues);
     }
 
@@ -487,7 +488,7 @@ public class StormADOT {
      *
      * @return _more_
      */
-    int aodtv72_loadIRimage(float[][] temps, float[][] lats, float[][] lons,
+    public int aodtv72_loadIRimage(float[][] temps, float[][] lats, float[][] lons,
                             int numx, int numy)
     /* Subroutine to load IR image data grid values (temperatures and positions) into
        data structure for AODT library
@@ -501,8 +502,9 @@ public class StormADOT {
         ucar.unidata.data.storm.StormADOTInfo sinfo =
             new ucar.unidata.data.storm.StormADOTInfo();
         /* allocate space for data */
+       // return new StormADOTInfo.DataGrid(temps, lats, lons, numx, numy);
 
-        areadata_v72 = sinfo.new DataGrid(temps, lats, lons, numx, numy);
+        areadata_v72 = new StormADOTInfo.DataGrid(temps, lats, lons, numx, numy);
 
         return 0;
     }
