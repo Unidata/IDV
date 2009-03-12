@@ -143,6 +143,8 @@ public class GridUtil {
 
 
 
+
+
     /** Default ctor */
     public GridUtil() {}
 
@@ -1265,6 +1267,59 @@ public class GridUtil {
             throws VisADException {
         return applyFunctionOverTime(grid, FUNC_AVERAGE, makeTimes);
     }
+
+
+    /**
+     * This creates a field where D(T) = D(T)-D(T+offset)
+     * Any time steps up to the offset time are set to missing
+     * @param grid   grid to average
+     * @param offset time step offset. e.g., offset=-1 results in D(T)=D(T)-D(T-1)
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl timeStepDifference(FieldImpl grid,int offset)
+        throws VisADException {
+        try {
+            if ( !isTimeSequence(grid)) {
+                return grid;
+            }
+            List<float[][]> arrays = new ArrayList<float[][]>();
+            FieldImpl newGrid = (FieldImpl) grid.clone();
+            float[][] values       = null;
+            float[][] priorValues       = null;
+            Set       timeDomain   = newGrid.getDomainSet();
+            int       numTimeSteps = timeDomain.getLength();
+            for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength();
+                 timeStepIdx++) {
+                FieldImpl sample = (FieldImpl) newGrid.getSample(timeStepIdx);
+                float[][] timeStepValues = sample.getFloats(true);
+                arrays.add(Misc.cloneArray(timeStepValues));
+            }
+            for (int timeStepIdx = arrays.size()-1; timeStepIdx>=0;
+                 timeStepIdx--) {
+                float[][] value = arrays.get(timeStepIdx);
+                System.err.println("A:" + value);
+                if(timeStepIdx+offset>=0 && timeStepIdx+offset< arrays.size()) {
+                    float[][] oldValue = arrays.get(timeStepIdx+offset);
+                    value = Misc.subtractArray(value,oldValue,value);
+                    System.err.println("subtracting");
+                } else {
+                    System.err.println("filling");
+                    Misc.fillArray(value, Float.NaN);
+                }
+                FlatField sample = (FlatField) newGrid.getSample(timeStepIdx);
+                sample.setSamples(value,false);
+                //                newGrid.setSample(timeStepIdx,sample);
+            }
+            return newGrid;
+        } catch (CloneNotSupportedException cnse) {
+            throw new VisADException("Cannot clone field");
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+    }
+
 
 
     /**
@@ -4125,10 +4180,10 @@ public class GridUtil {
      * Find the indicies contained inside the map bounds
      *
      * @param latlon   list of lat/lon points
-     * @param map _more_
+     * @param map collection of polygons
      * @param inside  true for inside, false for outside
      *
-     * @return _more_
+     * @return indices in the domain
      *
      * @throws VisADException  problem getting data from VisAD Object
      */
@@ -4270,15 +4325,15 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * Finds the indices of the values array whose value is in the given range
      *
-     * @param values _more_
-     * @param min _more_
-     * @param max _more_
+     * @param values values
+     * @param min min value
+     * @param max max value
      *
-     * @return _more_
+     * @return indices
      *
-     * @throws VisADException _more_
+     * @throws VisADException On badness
      */
     public static int[][] findIndicesInsideRange(float[][] values, float min,
             float max)
@@ -4288,15 +4343,15 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * Finds the indices of the values array whose value is not in the given range
      *
-     * @param values _more_
-     * @param min _more_
-     * @param max _more_
+     * @param values values
+     * @param min min value
+     * @param max max value
      *
-     * @return _more_
+     * @return indices
      *
-     * @throws VisADException _more_
+     * @throws VisADException On badness
      */
     public static int[][] findIndicesOutsideRange(float[][] values,
             float min, float max)
@@ -4306,16 +4361,17 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * Finds the indices of the values array whose value are either in or out of the given range
+     * depending on the inside flag
      *
-     * @param values _more_
-     * @param min _more_
-     * @param max _more_
-     * @param inside _more_
+     * @param values values
+     * @param min min value
+     * @param max max value
+     * @param inside inside flag
      *
-     * @return _more_
+     * @return indices
      *
-     * @throws VisADException _more_
+     * @throws VisADException On badness
      */
     private static int[][] findIndicesInRange(float[][] values, float min,
             float max, boolean inside)
