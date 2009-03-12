@@ -596,4 +596,48 @@ or
     </categories>
     <operands categories=""/>
   </derived>
+
+
+
+
+
+
+
+  <derived description="Average time steps" formula="averageOverTime(field)" id="Average time steps" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Time Steps"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived description="testfunc" formula="testFunc1000(field)" id="testfunc" isdefault="false" isenduser="true">
+    <categories/>
+    <operands/>
+  </derived>
+  <derived description="Max over time steps" formula="maxOverTime(field)" id="Max over time steps" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Time Steps"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived description="Min over time steps" formula="minOverTime(field)" id="Min over time steps" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Time Steps"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived description="Sum over time steps" formula="sumOverTime(field)" id="Sum over time steps" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Time Steps"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived description="Time step difference (D(T)=D(T)-D(T-1))" formula="timeStepDifference(field,-1)" id="Time step difference" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Time Steps"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+
+
+
 </derived_parameters>
