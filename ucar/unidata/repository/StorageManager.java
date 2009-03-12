@@ -88,6 +88,27 @@ import java.util.zip.*;
  */
 public class StorageManager extends RepositoryManager {
 
+
+    public static final String  FILE_SEPARATOR = "_file_";
+
+    public static final String  FILE_FULLLOG = "fullrepository.log";
+    public static final String FILE_LOG = "repository.log";
+
+    public static final String DIR_ENTRIES = "entries";
+    public static final String DIR_STORAGE = "storage";
+    public static final String DIR_PLUGINS = "plugins";
+    public static final String DIR_THUMBNAILS = "thumbnails";
+
+    public static final String DIR_RESOURCES = "resources";
+    public static final String DIR_HTDOCS = "htdocs";
+    public static final String DIR_REPOSITORY = "repository";
+    public static final String DIR_ANONYMOUSUPLOAD = "anonymousupload";
+    public static final String DIR_LOGS = "logs";
+    public static final String DIR_CACHE = "cache";
+    public static final String DIR_TMP = "tmp";
+    public static final String DIR_UPLOADS = "uploads";
+    public static final String DIR_SCRATCH = "scratch";
+
     /** _more_ */
     public static final String PROP_DIRDEPTH = "ramadda.storage.dirdepth";
 
@@ -111,16 +132,18 @@ public class StorageManager extends RepositoryManager {
     /** _more_ */
     private String tmpDir;
 
-    private int tmpFileAccessCnt=0;
+    private String scratchDir;
 
+    private int tmpFileAccessCnt=0;
 
     /** _more_ */
     private String anonymousDir;
 
     private String cacheDir;
 
-    private long cacheDirSize = -1;
+    private String logDir;
 
+    private long cacheDirSize = -1;
 
     /** _more_ */
     private String uploadDir;
@@ -185,13 +208,13 @@ public class StorageManager extends RepositoryManager {
         if (repositoryDir == null) {
             repositoryDir =
                 IOUtil.joinDir(Misc.getSystemProperty("user.home", "."),
-                               IOUtil.joinDir(".unidata", "repository"));
+                               IOUtil.joinDir(".unidata", DIR_REPOSITORY));
         }
         IOUtil.makeDirRecursive(new File(repositoryDir));
 
-        String htdocsDir = IOUtil.joinDir(repositoryDir, "htdocs");
+        String htdocsDir = IOUtil.joinDir(repositoryDir, DIR_HTDOCS);
         IOUtil.makeDir(htdocsDir);
-        String resourcesDir = IOUtil.joinDir(repositoryDir, "resources");
+        String resourcesDir = IOUtil.joinDir(repositoryDir, DIR_RESOURCES);
         IOUtil.makeDir(resourcesDir);
 
         dirDepth = getRepository().getProperty(PROP_DIRDEPTH, dirDepth);
@@ -256,7 +279,7 @@ public class StorageManager extends RepositoryManager {
      */
     public String getUploadDir() {
         if (uploadDir == null) {
-            uploadDir = IOUtil.joinDir(getRepositoryDir(), "uploads");
+            uploadDir = IOUtil.joinDir(getTmpDir(), DIR_UPLOADS);
             IOUtil.makeDirRecursive(new File(uploadDir));
         }
         return uploadDir;
@@ -271,6 +294,8 @@ public class StorageManager extends RepositoryManager {
         return repositoryDir;
     }
 
+
+
     /**
      * _more_
      *
@@ -278,22 +303,52 @@ public class StorageManager extends RepositoryManager {
      */
     public String getTmpDir() {
         if (tmpDir == null) {
-            tmpDir = IOUtil.joinDir(getRepositoryDir(), "tmp");
+            tmpDir = IOUtil.joinDir(getRepositoryDir(), DIR_TMP);
             IOUtil.makeDirRecursive(new File(tmpDir));
         }
         return tmpDir;
+    }
+
+    public String getScratchDir() {
+        if (scratchDir == null) {
+            scratchDir = IOUtil.joinDir(getTmpDir(), DIR_SCRATCH);
+            IOUtil.makeDirRecursive(new File(scratchDir));
+        }
+        return scratchDir;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getCacheDir() {
+        if (cacheDir == null) {
+            cacheDir = IOUtil.joinDir(getTmpDir(), DIR_CACHE);
+            IOUtil.makeDirRecursive(new File(cacheDir));
+        }
+        return cacheDir;
+    }
+
+    public String getLogDir() {
+        if (logDir == null) {
+            logDir = IOUtil.joinDir(getRepositoryDir(), DIR_LOGS);
+            IOUtil.makeDirRecursive(new File(logDir));
+        }
+        return logDir;
     }
 
 
     public void checkScour() {
         //only scour every 100 times we've opened a file
         if(tmpFileAccessCnt++>200) {
-            scourTmpDirectory();
+            scourTmpDir();
         }
     }
 
 
-    protected void scourTmpDirectory()  {
+    protected void scourTmpDir()  {
         Misc.run(new Runnable() {
                 public void run() {
                     //Keep around either 200 files or files touched in the last 24 hours
@@ -314,7 +369,7 @@ public class StorageManager extends RepositoryManager {
      */
     public String getAnonymousDir() {
         if (anonymousDir == null) {
-            anonymousDir = IOUtil.joinDir(getStorageDir(), "anonymousupload");
+            anonymousDir = IOUtil.joinDir(getStorageDir(), DIR_ANONYMOUSUPLOAD);
             IOUtil.makeDirRecursive(new File(anonymousDir));
         }
         return anonymousDir;
@@ -323,28 +378,17 @@ public class StorageManager extends RepositoryManager {
 
 
     public File getFullLogFile() {
-        return  new File(IOUtil.joinDir(getRepositoryDir(),
-                                        "fullrepository.log"));
+        return  new File(IOUtil.joinDir(getLogDir(),
+                                        FILE_FULLLOG));
     }
+
 
     public File getLogFile() {
-        return  new File(IOUtil.joinDir(getRepositoryDir(),
-                                        "repository.log"));
+        return  new File(IOUtil.joinDir(getLogDir(),
+                                        FILE_LOG));
     }
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String getCacheDir() {
-        if (cacheDir == null) {
-            cacheDir = IOUtil.joinDir(getStorageDir(), "cache");
-            IOUtil.makeDirRecursive(new File(cacheDir));
-        }
-        return cacheDir;
-    }
 
 
     public void notifyWroteToCache(File f) {
@@ -371,7 +415,7 @@ public class StorageManager extends RepositoryManager {
                 files =IOUtil.sortFilesOnAge(files, false);
                 for(int i=0;i<files.length;i++) {
                     cacheDirSize-=files[i].length();
-                    files[i].delete();
+                    deleteFile(files[i]);
                     if (cacheDirSize < sizeThreshold*0.8) {
                         break;
                     }
@@ -391,7 +435,7 @@ public class StorageManager extends RepositoryManager {
      */
     public String getStorageDir() {
         if (storageDir == null) {
-            storageDir = IOUtil.joinDir(getRepositoryDir(), "storage");
+            storageDir = IOUtil.joinDir(getRepositoryDir(), DIR_STORAGE);
             IOUtil.makeDirRecursive(new File(storageDir));
             addDownloadPrefix(storageDir);
         }
@@ -403,8 +447,9 @@ public class StorageManager extends RepositoryManager {
      *
      * @return _more_
      */
+
     public String getPluginsDir() {
-        String dir = IOUtil.joinDir(getRepositoryDir(), "plugins");
+        String dir = IOUtil.joinDir(getRepositoryDir(), DIR_PLUGINS);
         IOUtil.makeDirRecursive(new File(dir));
         return dir;
     }
@@ -416,7 +461,7 @@ public class StorageManager extends RepositoryManager {
      */
     public String getThumbDir() {
         if (thumbDir == null) {
-            thumbDir = IOUtil.joinDir(getTmpDir(), "thumbnails");
+            thumbDir = IOUtil.joinDir(getTmpDir(), DIR_THUMBNAILS);
             IOUtil.makeDir(thumbDir);
         }
         return thumbDir;
@@ -432,8 +477,8 @@ public class StorageManager extends RepositoryManager {
      */
     public File getTmpFile(Request request, String name) {
         checkScour();
-        return new File(IOUtil.joinDir(getTmpDir(),
-                                       getRepository().getGUID() + "_"
+        return new File(IOUtil.joinDir(getScratchDir(),
+                                       getRepository().getGUID() + FILE_SEPARATOR
                                        + name));
     }
 
@@ -477,7 +522,7 @@ public class StorageManager extends RepositoryManager {
     public File getEntryDir(String id, boolean createIfNeeded) {
         id = cleanEntryId(id);
         if (entriesDir == null) {
-            entriesDir = IOUtil.joinDir(getRepositoryDir(), "entries");
+            entriesDir = IOUtil.joinDir(getRepositoryDir(), DIR_ENTRIES);
             IOUtil.makeDirRecursive(new File(entriesDir));
         }
         File entryDir = new File(IOUtil.joinDir(entriesDir, id));
@@ -675,9 +720,10 @@ public class StorageManager extends RepositoryManager {
      */
     public File getUploadFilePath(String fileName) {
         return new File(IOUtil.joinDir(getUploadDir(),
-                                       repository.getGUID() + "_"
+                                       repository.getGUID() + FILE_SEPARATOR
                                        + fileName));
     }
+
 
     /**
      * _more_
@@ -701,9 +747,14 @@ public class StorageManager extends RepositoryManager {
      * @return _more_
      */
     public String getFileTail(String fileName) {
-        int idx = fileName.indexOf("_");
+        int idx = fileName.indexOf("_file_");
         if (idx >= 0) {
-            fileName = fileName.substring(idx + 1);
+            fileName = fileName.substring(idx + "_file_".length());
+        } else {
+            idx = fileName.indexOf("_");
+            if (idx >= 0) {
+                fileName = fileName.substring(idx + 1);
+            }
         }
         return IOUtil.getFileTail(fileName);
     }
@@ -751,9 +802,16 @@ public class StorageManager extends RepositoryManager {
      */
     public void removeFile(Resource resource) {
         if (resource.isStoredFile()) {
-            resource.getTheFile().delete();
+            deleteFile(resource.getTheFile());
         }
     }
+
+
+    public void deleteFile(File f) {
+        f.delete();
+    }
+
+
 
     /**
      * _more_

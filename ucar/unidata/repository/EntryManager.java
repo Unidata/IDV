@@ -2332,7 +2332,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     private Result processEntryXmlCreateInner(Request request)
-            throws Exception {
+        throws Exception {
         String file = request.getUploadedFile(ARG_FILE);
         if (file == null) {
             throw new IllegalArgumentException("No file argument given");
@@ -2340,35 +2340,41 @@ return new Result(title, sb);
         String    entriesXml        = null;
         Hashtable origFileToStorage = new Hashtable();
         //        System.err.println ("\nprocessing");
-        if (file.endsWith(".zip")) {
-            ZipInputStream zin =
-                new ZipInputStream(IOUtil.getInputStream(file));
-            ZipEntry ze;
-            while ((ze = zin.getNextEntry()) != null) {
-                String entryName = ze.getName();
-                //                System.err.println ("ZIP: " + ze.getName());
-                if (entryName.equals("entries.xml")) {
-                    entriesXml = new String(IOUtil.readBytes(zin, null,
-                            false));
-                } else {
-                    String name =
-                        IOUtil.getFileTail(ze.getName().toLowerCase());
-                    File f = getStorageManager().getTmpFile(request, name);
-                    FileOutputStream fos = new FileOutputStream(f);
-                    IOUtil.writeTo(zin, fos);
-                    fos.close();
-                    //                    System.err.println ("orig file:" + ze.getName() + " tmp file:" + f);
-                    origFileToStorage.put(ze.getName(), f.toString());
+        try {
+            InputStream fis = new FileInputStream(file);
+            if (file.endsWith(".zip")) {
+                ZipInputStream zin =  new ZipInputStream(fis);
+                ZipEntry ze;
+                while ((ze = zin.getNextEntry()) != null) {
+                    String entryName = ze.getName();
+                    //                System.err.println ("ZIP: " + ze.getName());
+                    if (entryName.equals("entries.xml")) {
+                        entriesXml = new String(IOUtil.readBytes(zin, null,
+                                                                 false));
+                    } else {
+                        String name =
+                            IOUtil.getFileTail(ze.getName().toLowerCase());
+                        File f = getStorageManager().getTmpFile(request, name);
+                        FileOutputStream fos = new FileOutputStream(f);
+                        IOUtil.writeTo(zin, fos);
+                        fos.close();
+                        //                    System.err.println ("orig file:" + ze.getName() + " tmp file:" + f);
+                        origFileToStorage.put(ze.getName(), f.toString());
+                    }
+                }
+                if (entriesXml == null) {
+                    throw new IllegalArgumentException(
+                                                       "No entries.xml file provided");
                 }
             }
-            if (entriesXml == null) {
-                throw new IllegalArgumentException(
-                    "No entries.xml file provided");
-            }
-        }
 
-        if (entriesXml == null) {
-            entriesXml = IOUtil.readContents(file, getClass());
+            if (entriesXml == null) {
+                entriesXml = IOUtil.readContents(fis);
+            }
+            fis.close();
+
+        } finally {
+            getStorageManager().deleteFile(new File(file));
         }
 
         //        System.err.println ("xml:" + entriesXml);

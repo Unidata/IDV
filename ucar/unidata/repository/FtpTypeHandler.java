@@ -27,7 +27,7 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 import org.apache.commons.net.ftp.*;
 
-
+import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
@@ -301,21 +301,25 @@ public class FtpTypeHandler extends GenericTypeHandler {
             boolean isDir = ftpClient.changeWorkingDirectory(path);
             Hashtable<String, FTPFile> cache = getCache(mainEntry);
             if (isDir) {
+                boolean checkReadme = parentEntry.getDescription().length()==0;
                 FTPFile[] files = ftpClient.listFiles(path);
+
                 for (int i = 0; i < files.length; i++) {
                     String name = files[i].getName().toLowerCase();
-                    if(name.equals("readme")||
-                       name.equals("readme.txt")) {
-                        try {
-                            InputStream fis = ftpClient.retrieveFileStream(path + "/" + files[i].getName());
-                            if(fis!=null) {
-                                String desc = IOUtil.readContents(fis);
-                                parentEntry.setDescription("<pre>"+desc+"</pre>");
-                                fis.close();
-                                ftpClient.completePendingCommand();
+                    if(checkReadme) {
+                        if(name.equals("readme")||
+                           name.equals("readme.txt")) {
+                            try {
+                                InputStream fis = ftpClient.retrieveFileStream(path + "/" + files[i].getName());
+                                if(fis!=null) {
+                                    String desc = HtmlUtil.entityEncode(IOUtil.readContents(fis));
+                                    parentEntry.setDescription("<pre>"+desc+"</pre>");
+                                    fis.close();
+                                    ftpClient.completePendingCommand();
+                                }
+                            } catch(Exception exc) {
+                                //                            exc.printStackTrace();
                             }
-                        } catch(Exception exc) {
-                            //                            exc.printStackTrace();
                         }
                     }
                     

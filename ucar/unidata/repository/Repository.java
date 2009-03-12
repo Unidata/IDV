@@ -766,7 +766,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         HtmlUtil.setHideShowImage(iconUrl(ICON_MINUS), iconUrl(ICON_PLUS));
         logInfo("RAMADDA started");
 
-        getStorageManager().scourTmpDirectory();
+        getStorageManager().scourTmpDir();
 
     }
 
