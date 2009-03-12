@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -808,13 +809,13 @@ public class Misc {
 
 
     /**
-     * _more_
+     * get a double property from the props table
      *
-     * @param props _more_
-     * @param prop _more_
-     * @param dflt _more_
+     * @param props the props
+     * @param prop the prop name
+     * @param dflt the default value if none found
      *
-     * @return _more_
+     * @return the value
      */
     public static double getProperty(Hashtable props, String prop,
                                      double dflt) {
@@ -1507,12 +1508,12 @@ public class Misc {
 
 
     /**
-     * _more_
+     * dummy
      *
-     * @param formals _more_
-     * @param actuals _more_
+     * @param formals dummy
+     * @param actuals dummy
      *
-     * @return _more_
+     * @return dummy
      */
     public static boolean typesMatchx(Class[] formals, Class[] actuals) {
         if (formals.length != actuals.length) {
@@ -3823,11 +3824,11 @@ public class Misc {
 
 
     /**
-     * _more_
+     * figure out how long to wait for
      *
-     * @param minutesDelta _more_
+     * @param minutesDelta time to wait for
      *
-     * @return _more_
+     * @return hummm
      */
     public static long getPauseEveryTime(int minutesDelta) {
         if (minutesDelta <= 0) {
@@ -3878,6 +3879,46 @@ public class Misc {
         }
         return b;
     }
+
+
+    /**
+     * set c=a-b and return c. If c is null then create a new array
+     *
+     * @param a a
+     * @param b b
+     * @param c c
+     *
+     * @return diff
+     */
+    public static float[][] subtractArray(float[][] a, float[][] b,
+                                          float[][] c) {
+        if (c == null) {
+            c = new float[a.length][a[0].length];
+        }
+        for (int i = 0; i < a.length; i++) {
+            for (int j = 0; j < a[i].length; j++) {
+                c[i][j] = a[i][j] - b[i][j];
+            }
+        }
+        return c;
+    }
+
+
+
+    /**
+     * fill array with value
+     *
+     * @param a array
+     * @param value value
+     */
+    public static void fillArray(float[][] a, float value) {
+        for (int i = 0; i < a.length; i++) {
+            for (int j = 0; j < a[i].length; j++) {
+                a[i][j] = value;
+            }
+        }
+    }
+
 
     /**
      * Clone an array of doubles
@@ -4218,7 +4259,7 @@ public class Misc {
      * @param sourceValues  packed integer array
      * @param lengths       lengths of packed bits
      *
-     * @param args _more_
+     * @param args test unpack 
      *
      * @return an array of unpacked integers
      * public static int[] unpack(int[] sourceValues, int[] lengths) {
@@ -4259,66 +4300,18 @@ public class Misc {
 
     public static Runnable getRunnable() {
         return new Runnable() {
-                public void run() {
-                    int x=0;
-                    int y=0;
-                    while(true) {
-                        for(int i=0;i<100000000;i++) {
-                            y = x;
-                        }
-                        x++;
-                        System.err.print(".");
+            public void run() {
+                int x = 0;
+                int y = 0;
+                while (true) {
+                    for (int i = 0; i < 100000000; i++) {
+                        y = x;
                     }
+                    x++;
+                    System.err.print(".");
                 }
-            };
-    }
-
-    public static final void doWork(int amt) {
-        long x=0;
-        long y=0;
-        long work = ((long)amt)*2000000L;
-        //long work = ((long)amt)*20000L;
-        for(int i=0;i<work;i++) {
-            x++;
-        }
-        //        System.err.println(work +" amt:" + amt + "  " +x);
-    }
-
-
-    /**
-     * Main method for testing
-     *
-     * @param args  args
-     */
-    public static void main(String[] args) throws Exception {
-        int numberOfProcessors = Runtime.getRuntime().availableProcessors();
-        int myCnt = (args.length>0?new Integer(args[0]).intValue():2);
-        //        for(int j=0;j<1000;j++) {
-        //        for(myCnt=1;myCnt<100;myCnt+=5) {
-        /*
-            visad.util.ThreadUtil threadUtil  = new visad.util.ThreadUtil();
-            final int amt = 1000;
-            //           final int cnt = (args.length>0?new Integer(args[0]).intValue():2);
-            final int cnt = myCnt;
-            for(int i=0;i<cnt;i++) {
-                threadUtil.addRunnable(new visad.util.ThreadUtil.MyRunnable() {
-                        public void run() throws Exception {
-                            doWork(amt/cnt);
-                        }
-                    });
             }
-            long t1  = System.currentTimeMillis();
-            threadUtil.runInParallel(cnt);
-            //        threadUtil.runSequentially();
-            long t2  = System.currentTimeMillis();
-            long time = t2-t1;
-            System.err.println (cnt +" time:" + time +" *2=" + time*2);
-        */
-            //        }
-            //        }
-        //        System.exit(0);
-        //        Misc.run(getRunnable());
-        //        Misc.run(getRunnable());
+        };
     }
 
     /**
@@ -4375,4 +4368,5 @@ public class Misc {
 
 
 }
+
 
