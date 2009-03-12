@@ -1575,7 +1575,7 @@ static     public StormADOTInfo.IRData aodtv72_gettemps(int keyer,
         float                cursortemp, eyet, cloudt;
         float cursorlat, cursorlon, warmlat, warmlon, eyeangle, eyedist;
         StormADOTInfo        sinfo      = new StormADOTInfo();
-        StormADOTInfo.IRData odtcurrent = sinfo.new IRData();
+        StormADOTInfo.IRData odtcurrent = new StormADOTInfo.IRData();
 
         /* calculate cursorx/cursory from numx/numy... values should be 0.5*numx/y */
         cursorx    = areadata.numx / 2;
@@ -1783,7 +1783,7 @@ static     public List<StormADOTInfo.RingData> aodtv72_readcirc(int ixc, int iyc
                 xangle = outDA[1];
                 if (xdist <= (float) (StormADOTInfo.kend_v72 + 80)) {  /* add 80.0 to allow for correct calculation of annulus temp */
                     count++;
-                    tcirc = sinfo.new RingData(xdist, xangle,
+                    tcirc = new StormADOTInfo.RingData(xdist, xangle,
                             areadata.temp[iyy][ixx]);
                     tcircfirst.add(tcirc);
                     // tcirc.nextrec=NULL; /* make pointer for last record equal to 0 */
