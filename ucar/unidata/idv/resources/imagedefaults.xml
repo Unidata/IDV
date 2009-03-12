@@ -1035,6 +1035,18 @@ Note: we can use place="default", etc., to use the default
      mag="2 2"
      unit="RAIN"/>
   <default
+     pattern="BVEL1"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="VEL"/>
+  <default
+     pattern="BVEL2"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="VEL"/>
+  <default
      pattern="VEL1"
      key="LINELE"
      loc="230 230"
