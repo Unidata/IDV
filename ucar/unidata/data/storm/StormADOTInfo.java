@@ -24,6 +24,7 @@ package ucar.unidata.data.storm;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -178,6 +179,41 @@ public class StormADOTInfo {
 
     /** _more_          */
     DataGrid areadata_v72;
+
+   public static class ImgCoeffs {
+       String  sat_id;
+       int sat_num;
+       int chan;
+       int det;
+       float scal_m;
+       float scal_b;
+       float side;
+       float conv_n;
+       float conv_a;
+       float conv_b;
+       float conv_g;
+
+       public ImgCoeffs(List<String> toks) {
+           sat_id = toks.get(0);
+           sat_num = Integer.parseInt(toks.get(1));
+           chan= Integer.parseInt(toks.get(2));
+           det= Integer.parseInt(toks.get(3));
+           scal_m= Float.parseFloat(toks.get(4));
+           scal_b= Float.parseFloat(toks.get(5));
+           side= Float.parseFloat(toks.get(6));
+           conv_n= Float.parseFloat(toks.get(7));
+           conv_a= Float.parseFloat(toks.get(8));
+           conv_b= Float.parseFloat(toks.get(9));
+           conv_g= Float.parseFloat(toks.get(10));
+
+       }
+
+       public String getSat_id() {
+           return sat_id;
+       }
+
+
+   }
 
     /**
      * Class RingData _more_

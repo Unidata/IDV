@@ -20,16 +20,16 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.storm;
 
 
-import ucar.unidata.idv.control.DisplayControlImpl;
-import ucar.unidata.data.storm.StormADOTInfo;
+import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.StringUtil;
+import visad.FlatField;
 
 import java.util.List;
-
-import visad.georef.EarthLocation;
-import visad.Real;
 
 
 /**
@@ -39,40 +39,47 @@ import visad.Real;
  * Time: 3:09:14 PM
  * To change this template use File | Settings | File Templates.
  */
-public class StormADOT extends DisplayControlImpl {
+public class StormADOT {
 
-    /** _more_          */
+    /** _more_ */
     ucar.unidata.data.storm.StormADOTInfo.IRData odtcurrent_v72IR;
 
-    /** _more_          */
+    /** _more_ */
     ucar.unidata.data.storm.StormADOTInfo.DataGrid areadata_v72;
 
 
-    /** _more_          */
+    /** _more_ */
     boolean lauto = false;
 
-    /** _more_          */
+    /** _more_ */
     int idomain_v72, ixdomain_v72, ifixtype_v72, rmwsizeman_v72;
 
-    /** _more_          */
+    /** _more_ */
     int oland_v72;
 
-    /** _more_          */
+    /** _more_ */
     boolean osearch_v72;
 
-    /** _more_          */
+    /** _more_ */
     int ostartstr_v72;
 
-    /** _more_          */
+    /** _more_ */
     float osstr_v72;
 
-    float cenlat, cenlon;
+    /** _more_          */
+    static double c1 = 1.191066E-5;
 
-    int posm;
+    /** _more_          */
+    static double c2 = 1.438833;
 
     /**
      * _more_
      *
+     *
+     * @param satgrid _more_
+     * @param cenlat _more_
+     * @param cenlon _more_
+     * @param posm _more_
      * @param curdate _more_
      * @param curtime _more_
      * @param cursat _more_
@@ -80,7 +87,9 @@ public class StormADOT extends DisplayControlImpl {
      *
      * @return _more_
      */
-    int aodtv72_drive(int curdate, int curtime, int cursat,  String g_domain) {
+    int aodtv72_drive(FlatField satgrid, float cenlat, float cenlon,
+                      int posm, int curdate, int curtime, int cursat,
+                      String g_domain) {
 
         float ftmps, flats, flons, cenlon2;
 
@@ -94,7 +103,7 @@ public class StormADOT extends DisplayControlImpl {
 
         int eyeSize = -99;
         oland_v72      = 0;        /* allow AODT operation over land */
-        osearch_v72    = false;    /* search for maximum curved band position */
+        osearch_v72    = false;  /* search for maximum curved band position */
         rmwsizeman_v72 = eyeSize;  /* eye size parameter */
 
         /*
@@ -124,7 +133,7 @@ public class StormADOT extends DisplayControlImpl {
         *  Set center location in AODT
         *  positioning method (1=interpolation, 4=extrapolation, 0=error)
         */
-        posm = 1;
+        posm  = 1;
         iaodt = aodtv72_setlocation(cenlat, cenlon, posm);
 
 
@@ -148,19 +157,38 @@ public class StormADOT extends DisplayControlImpl {
         /*
          *  Retrieve temperatures from image. This to be done in IDV
          */
+        GridUtil.Grid2D g2d      = null;
+        float[][]       temps    = null;
+        float[][][]     satimage = null;
+        float[][]       lons     = null;
+        float[][]       lats     = null;
+        int             numx     = 123;
+        int             numy     = 123;
 
-        float[][] temps = null;
-        float[][] lons  = null;
-        float[][] lats  = null;
-        int       numx  = 0;
-        int       numy  = 0;
+        try {
+            g2d  = GridUtil.makeGrid2D(satgrid);
+            lons = g2d.getlons();
+            lats = g2d.getlats();
+            float[][][] tmp = g2d.getvalues();
+
+        } catch (Exception re) {}
+
+        /* now spatial subset numx by numy*/
+        GridUtil.Grid2D g2d1 = spatialSubset(g2d, cenlat, cenlon, numx, numy);
+
+        satimage = g2d1.getvalues();
+        float[][] temp0  = satimage[0];
+        int       imsorc = 1,
+                  imtype = 1;
+        temps = im_gvtota(numx, numy, temp0, imsorc, imtype);
 
         /*
          *  Load the IR imge information in AODT
          *  init areadata_v72
          */
 
-        iaodt = aodtv72_loadIRimage(temps, lats, lons, numx, numy);
+        iaodt = aodtv72_loadIRimage(temps, g2d1.getlats(), g2d1.getlons(),
+                                    numx, numy);
 
         /*
          *  Set eye and cloud temperature values in AODT,
@@ -176,8 +204,9 @@ public class StormADOT extends DisplayControlImpl {
          */
 
         float[] oscen =
-            ucar.unidata.data.storm.StormADOTSceneType.aodtv72_calcscene(odtcurrent_v72IR,
-                rmwsizeman_v72, areadata_v72, osstr_v72, osearch_v72);
+            ucar.unidata.data.storm.StormADOTSceneType.aodtv72_calcscene(
+                odtcurrent_v72IR, rmwsizeman_v72, areadata_v72, osstr_v72,
+                osearch_v72);
 
         odtcurrent_v72IR.eyescene      = (int) oscen[0];
         odtcurrent_v72IR.cloudscene    = (int) oscen[1];
@@ -197,7 +226,6 @@ public class StormADOT extends DisplayControlImpl {
         odtcurrent_v72IR.eyefft        = (int) oscen[13];
         odtcurrent_v72IR.cloudfft      = (int) oscen[14];
 
-
         /*
         *   Determine intensity
         */
@@ -211,36 +239,210 @@ public class StormADOT extends DisplayControlImpl {
          *   Print out all diagnostic messages to screen
          */
         List result =
-            ucar.unidata.data.storm.StormADOTUtil.aodtv72_textscreenoutput(odtcurrent_v72IR,
-                idomain_v72);
+            ucar.unidata.data.storm.StormADOTUtil.aodtv72_textscreenoutput(
+                odtcurrent_v72IR, idomain_v72);
 
         return 0;
 
     }
 
     /**
-     * Get cursor readout
+     * _more_
      *
-     * @param el  earth location
-     * @param animationValue animation value
-     * @param animationStep animation step
+     * @param g2d _more_
+     * @param cenlat _more_
+     * @param cenlon _more_
+     * @param numx _more_
+     * @param numy _more_
      *
-     * @return list of values
-     *
-     * @throws Exception problem getting values
+     * @return _more_
      */
-    protected List getCursorReadoutInner(EarthLocation el,
-                                         Real animationValue,
-                                         int animationStep)
-            throws Exception {
+    GridUtil.Grid2D spatialSubset(GridUtil.Grid2D g2d, float cenlat,
+                                  float cenlon, int numx, int numy) {
+        float[][]   lats    = g2d.getlats();
+        float[][]   lons    = g2d.getlons();
+        float[][][] values  = g2d.getvalues();
+        float[][]   slats   = new float[numx][numy];
+        float[][]   slons   = new float[numx][numy];
+        float[][][] svalues = new float[1][numx][numy];
 
-        cenlat = (float)el.getLatitude().getValue();
-        cenlon = (float)el.getLongitude().getValue();
+        int         ly      = lats[0].length;
+        int         lx      = lats.length;
+        int         ii      = numx / 2,
+                    jj      = numy / 2;
+        for (int j = 0; j < ly; j++) {
+            if ((lats[0][j] < cenlat) && (lats[0][j + 1] > cenlat)) {
+                jj = j;
+            }
+        }
+        for (int i = 0; i < lx; i++) {
+            if ((lons[i][0] < cenlon) && (lons[i + 1][0] > cenlon)) {
+                ii = i;
+            }
+        }
+        int startx = ii - (numx / 2 - 1);
+        int starty = jj - (numy / 2 - 1);
 
-        return null;
+        for (int i = 0; i < numx; i++) {
+            for (int j = 0; j < numy; j++) {
+                slats[i][j]      = lats[i + startx][j + starty];
+                slons[i][j]      = lons[i + startx][j + starty];
+                svalues[0][i][j] = values[0][i + startx][j + starty];
+            }
+        }
+        return new GridUtil.Grid2D(slats, slons, svalues);
     }
 
+    /**
+     * _more_
+     *
+     * @param nx _more_
+     * @param ny _more_
+     * @param gv _more_
+     * @param imsorc _more_
+     * @param imtype _more_
+     *
+     * @return _more_
+     */
+    float[][] im_gvtota(int nx, int ny, float[][] gv, int imsorc, int imtype)
 
+    /**
+     * im_gvtota
+     *
+     * This subroutine converts GVAR counts to actual temperatures
+     * based on the current image set in IM_SIMG.
+     *
+     * im_gvtota ( int *nvals, unsigned int *gv, float *ta, int *iret )
+     *
+     * Input parameters:
+     *      *nvals          int     Number of values to convert
+     *      *gv             int     Array of GVAR count values
+     *
+     * Output parameters:
+     *      *ta             float   Array of actual temperatures
+     *      *iret           int     Return value
+     *                              = -1 - could not open table
+     *                              = -2 - could not find match
+     *
+     *
+     * Log:
+     * D.W.Plummer/NCEP     02/03
+     * D.W.Plummer/NCEP     06/03   Add coeff G for 2nd order poly conv
+     * T. Piper/SAIC         07/06   Added tmpdbl to eliminate warning
+     */
+    {
+        int       ii, ip, chan, found, ier;
+        double    Rad, Teff, tmpdbl;
+        float[][] ta = new float[nx][ny];
+        int       iret;
+        String    fp = "/ucar/unidata/data/storm/ImgCoeffs.tbl";
+
+        iret = 0;
+
+        for (ii = 0; ii < nx; ii++) {
+            for (int jj = 0; jj < ny; jj++) {
+                ta[ii][jj] = Float.NaN;
+            }
+        }
+
+        /*
+         *    Read in coefficient table if necessary.
+         */
+        String s = null;
+        try {
+            s = IOUtil.readContents(fp);
+        } catch (Exception re) {}
+
+
+        int i = 0;
+        StormADOTInfo.ImgCoeffs[] ImageConvInfo =
+            new StormADOTInfo.ImgCoeffs[50];
+        for (String line : StringUtil.split(s, "\n", true, true)) {
+            if (line.startsWith("!")) {
+                continue;
+            }
+            List<String> stoks = StringUtil.split(line, " ", true, true);
+
+            ImageConvInfo[i] = new StormADOTInfo.ImgCoeffs(stoks);;
+            i++;
+        }
+        int nImgRecs = i;
+        found = 0;
+        ii    = 0;
+        while ((ii < nImgRecs) && (found == 0)) {
+
+            tmpdbl = (double) (ImageConvInfo[ii].chan - 1)
+                     * (ImageConvInfo[ii].chan - 1);
+            chan = G_NINT(tmpdbl);
+
+            if ((imsorc == ImageConvInfo[ii].sat_num) && (imtype == chan)) {
+                found = 1;
+            } else {
+                ii++;
+            }
+
+        }
+
+        if (found == 0) {
+            iret = -2;
+            return null;
+        } else {
+
+            ip = ii;
+            for (ii = 0; ii < nx; ii++) {
+                for (int jj = 0; jj < ny; jj++) {
+
+                    /*
+                     *  Convert GVAR count (gv) to Scene Radiance
+                     */
+                    Rad = ((double) gv[ii][jj] - ImageConvInfo[ip].scal_b) /
+                    /*              -------------------------------------                     */
+                    ImageConvInfo[ip].scal_m;
+
+                    Rad = Math.max(Rad, 0.0);
+
+                    /*
+                     *  Convert Scene Radiance to Effective Temperature
+                     */
+                    Teff = (c2 * ImageConvInfo[ip].conv_n) /
+                    /*               -------------------------------------------------------   */
+                    (Math.log(1.0
+                              + (c1 * Math.pow(ImageConvInfo[ip].conv_n,
+                                  3.0)) / Rad));
+
+                    /*
+                     *  Convert Effective Temperature to Temperature
+                     */
+                    ta[ii][jj] = (float) (ImageConvInfo[ip].conv_a
+                                          + ImageConvInfo[ip].conv_b * Teff
+                                          + ImageConvInfo[ip].conv_g * Teff
+                                            * Teff);
+                }
+
+            }
+
+        }
+
+        return ta;
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param x _more_
+     *
+     * @return _more_
+     */
+    public int G_NINT(double x) {
+        return (((x) < 0.0F)
+                ? ((((x) - (float) ((int) (x))) <= -.5f)
+                   ? (int) ((x) - .5f)
+                   : (int) (x))
+                : ((((x) - (float) ((int) (x))) >= .5f)
+                   ? (int) ((x) + .5f)
+                   : (int) (x)));
+    }
 
     /**
      * _more_
@@ -250,7 +452,8 @@ public class StormADOT extends DisplayControlImpl {
      *
      * @return _more_
      */
-    ucar.unidata.data.storm.StormADOTInfo.IRData aodtv72_seteyecloudtemp(int keyerM_v72,
+    ucar.unidata.data.storm.StormADOTInfo.IRData aodtv72_seteyecloudtemp(
+            int keyerM_v72,
             ucar.unidata.data.storm.StormADOTInfo.DataGrid areadata)
     /* Routine to search for, idenfify, and set the eye and cloud temperature values
        for the AODT library.  Temperatuers are set within AODT library.
@@ -261,7 +464,8 @@ public class StormADOT extends DisplayControlImpl {
     */
     {
         ucar.unidata.data.storm.StormADOTInfo.IRData ird =
-            ucar.unidata.data.storm.StormADOTSceneType.aodtv72_gettemps(keyerM_v72, areadata);
+            ucar.unidata.data.storm.StormADOTSceneType.aodtv72_gettemps(
+                keyerM_v72, areadata);
         if (ird == null) {
             throw new IllegalStateException(
                 "eye, CWcloud, or warmest temperature <-100C or >+40C");
@@ -293,8 +497,9 @@ public class StormADOT extends DisplayControlImpl {
        Return : 0 : o.k.
     */
     {
-        int           ixx, iyy;
-        ucar.unidata.data.storm.StormADOTInfo sinfo = new ucar.unidata.data.storm.StormADOTInfo();
+        int ixx, iyy;
+        ucar.unidata.data.storm.StormADOTInfo sinfo =
+            new ucar.unidata.data.storm.StormADOTInfo();
         /* allocate space for data */
 
         areadata_v72 = sinfo.new DataGrid(temps, lats, lons, numx, numy);
@@ -494,8 +699,9 @@ public class StormADOT extends DisplayControlImpl {
      *
      * @return _more_
      */
-    float aodtv72_latbias(float initval, float latitude, float longitude,
-                          ucar.unidata.data.storm.StormADOTInfo.IRData odtcurrent_v72IR)
+    float aodtv72_latbias(
+            float initval, float latitude, float longitude,
+            ucar.unidata.data.storm.StormADOTInfo.IRData odtcurrent_v72IR)
     /* Apply Latitude Bias Adjustment to CI value
         Inputs  : initval  - initial CI value
                   latitude - current latitude of storm
@@ -640,7 +846,9 @@ public class StormADOT extends DisplayControlImpl {
      * @return return value is Raw T#
      */
 
-    float aodtv72_Tnoraw(ucar.unidata.data.storm.StormADOTInfo.IRData odtcurrent, int idomain_v72)
+    float aodtv72_Tnoraw(
+            ucar.unidata.data.storm.StormADOTInfo.IRData odtcurrent,
+            int idomain_v72)
     /* Compute initial Raw T-Number value using original Dvorak rules
         Inputs  : global structure odtcurrent_v72 containing current analysis
         Outputs : return value is Raw T#
@@ -740,16 +948,20 @@ public class StormADOT extends DisplayControlImpl {
 
         for (ixx = 0; ixx < 10; ixx++) {
             /* compute cloud category */
-            if ((cloudtemp <= ucar.unidata.data.storm.StormADOTInfo.ebd_v72[ixx])
-                    && (cloudtemp > ucar.unidata.data.storm.StormADOTInfo.ebd_v72[ixx + 1])) {
+            if ((cloudtemp <= ucar.unidata.data.storm.StormADOTInfo
+                    .ebd_v72[ixx]) && (cloudtemp > ucar.unidata.data.storm
+                    .StormADOTInfo.ebd_v72[ixx + 1])) {
                 cloudcat = ixx;
-                xpart = (float) (cloudtemp - ucar.unidata.data.storm.StormADOTInfo.ebd_v72[cloudcat])
-                        / (float) (StormADOTInfo.ebd_v72[cloudcat + 1]
-                                   - ucar.unidata.data.storm.StormADOTInfo.ebd_v72[cloudcat]);
+                xpart = (float) (cloudtemp
+                        - ucar.unidata.data.storm.StormADOTInfo
+                            .ebd_v72[cloudcat]) / (float) (StormADOTInfo
+                                .ebd_v72[cloudcat + 1] - ucar.unidata.data
+                                    .storm.StormADOTInfo.ebd_v72[cloudcat]);
             }
             /* compute eye category for eye adjustment */
-            if ((eyetemp <= ucar.unidata.data.storm.StormADOTInfo.ebd_v72[ixx])
-                    && (eyetemp > ucar.unidata.data.storm.StormADOTInfo.ebd_v72[ixx + 1])) {
+            if ((eyetemp <= ucar.unidata.data.storm.StormADOTInfo
+                    .ebd_v72[ixx]) && (eyetemp > ucar.unidata.data.storm
+                    .StormADOTInfo.ebd_v72[ixx + 1])) {
                 eyecat = ixx;
             }
             /* eyetemp=Math.min(0.0,eyetemp); */
