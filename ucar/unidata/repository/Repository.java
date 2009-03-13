@@ -392,8 +392,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private List<LogEntry> log = new ArrayList<LogEntry>();
 
-
-
+    private int requestCount = 0;
 
 
 
@@ -2231,6 +2230,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             }
         }
 
+        requestCount++;
         request.setApiMethod(apiMethod);
 
         String userAgent = request.getHeaderArg("User-Agent");
@@ -2309,6 +2309,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
             return new ArrayList<LogEntry>(log);
         }
     }
+
+    public int getRequestCount() {
+        return requestCount;
+    }
+
 
 
     /**

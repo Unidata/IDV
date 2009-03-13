@@ -1726,12 +1726,12 @@ public class DataOutputHandler extends OutputHandler {
         }
 
         if (output.equals(OUTPUT_OPENDAP)) {
-            System.err.println(System.currentTimeMillis() +" [" +request.count +"]" +
-                               " data output.outputEntry start");
+            //            System.err.println(System.currentTimeMillis() +" [" +request.count +"]" +
+            //                               " data output.outputEntry start");
             //            synchronized(mutex) {
             Result result =  outputOpendap(request, entry);
-            System.err.println(System.currentTimeMillis() +" [" +request.count +"]" +
-                               " data output.outputEntry end");
+            //            System.err.println(System.currentTimeMillis() +" [" +request.count +"]" +
+            //                               " data output.outputEntry end");
             return result;
             //            }
         }

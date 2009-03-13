@@ -1446,7 +1446,9 @@ public class Admin extends RepositoryManager {
         statusSB.append(HtmlUtil.formEntry(msgLabel("Up Time"),
                                            fmt.format((double) (uptime / 1000
                                                / 60)) + " "
-                                                   + msg("minutes")));
+                                                   + msg("minutes")+
+                                           HtmlUtil.space(2) +
+                                           "# Requests:" + getRequestCount()));
 
         getEntryManager().addStatusInfo(statusSB);
 
