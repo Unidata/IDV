@@ -84,6 +84,9 @@ public class Entry extends Entity {
     private boolean isLocalFile = false;
 
 
+    private String icon;
+
+
     /**
      * _more_
      */
@@ -593,6 +596,24 @@ public class Entry extends Entity {
      */
     public boolean getIsLocalFile() {
         return isLocalFile;
+    }
+
+    /**
+       Set the Icon property.
+
+       @param value The new value for Icon
+    **/
+    public void setIcon (String value) {
+	icon = value;
+    }
+
+    /**
+       Get the Icon property.
+
+       @return The Icon
+    **/
+    public String getIcon () {
+	return icon;
     }
 
 

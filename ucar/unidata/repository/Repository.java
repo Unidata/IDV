@@ -1418,7 +1418,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @param message _more_
      */
-    protected void logInfo(String message) {
+    public void logInfo(String message) {
         log(message,null);
     }
 

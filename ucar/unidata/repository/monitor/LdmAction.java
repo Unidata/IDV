@@ -176,14 +176,14 @@ public class LdmAction extends MonitorAction {
         try {
             Resource resource = entry.getResource();
             if ( !resource.isFile()) {
-                System.err.println("Entry is not a file:" + entry);
+                monitor.handleError("LdmMonitor:" + this+" Entry is not a file:" + entry,null);
                 return;
             }
             String id = productId.trim();
             id = monitor.getRepository().getEntryManager().replaceMacros(
-                entry, id);
+                                                                         entry, id);
 
-            insertIntoQueue(pqinsert, queue, feed, id, resource.getPath());
+            insertIntoQueue(monitor.getRepository(),pqinsert, queue, feed, id, resource.getPath());
 
         } catch (Exception exc) {
             monitor.handleError("Error posting to LDM", exc);
@@ -201,7 +201,7 @@ public class LdmAction extends MonitorAction {
      *
      * @throws Exception _more_
      */
-    public static void insertIntoQueue(String pqinsert, String queue,
+    public static void insertIntoQueue(Repository repository, String pqinsert, String queue,
                                        String feed, String productId,
                                        String file)
             throws Exception {
@@ -210,18 +210,20 @@ public class LdmAction extends MonitorAction {
         }
         String command = pqinsert + " " + productId + " -f " + feed + " -q "
                          + queue + " " + file;
-        System.err.println("Executing:" + command);
+        //        System.err.println("Executing:" + command);
         Process process = Runtime.getRuntime().exec(command);
         int     result  = process.waitFor();
         if (result == 0) {
-            System.err.println("Success");
+            repository.logInfo("LdmMonitor inserted into queue:" + file);
         } else {
-            System.err.println("Failed");
             try {
                 InputStream is    = process.getErrorStream();
                 byte[]      bytes = IOUtil.readBytes(is);
+                repository.logError("LdmMonitor failed to insert into queue:" + file+"\n"+ new String(bytes));
                 System.err.println("Error:" + new String(bytes));
-            } catch (Exception noop) {}
+            } catch (Exception noop) {
+                repository.logError("LdmMonitor failed to insert into queue:" + file);
+            }
         }
     }
 

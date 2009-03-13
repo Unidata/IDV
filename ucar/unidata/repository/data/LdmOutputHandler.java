@@ -281,7 +281,7 @@ public class LdmOutputHandler extends OutputHandler {
                 String id =
                     getRepository().getEntryManager().replaceMacros(entry,
                         productId);
-                LdmAction.insertIntoQueue(pqinsert, queue, feed, id,
+                LdmAction.insertIntoQueue(getRepository(), pqinsert, queue, feed, id,
                                           entry.getResource().getPath());
                 sb.append("Inserted: "
                           + getStorageManager().getFileTail(entry));

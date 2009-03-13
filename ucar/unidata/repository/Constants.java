@@ -161,6 +161,8 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_LCURVE = "ramadda.icon.lcurve";
 
+    public static final String ICON_SYNTH_FILE = "ramadda.icon.synthfile";
+
     /** _more_ */
     public static final String ICON_LEFT = "ramadda.icon.left";
 

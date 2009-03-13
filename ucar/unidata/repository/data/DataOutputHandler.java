@@ -239,7 +239,13 @@ public class DataOutputHandler extends OutputHandler {
             try {
                 System.err.println("Create gridPool: " + path);
                 getStorageManager().checkScour();
-                return GridDataset.open(path);
+                GridDataset gds =  GridDataset.open(path);
+                if (gds.getGrids().iterator().hasNext()) {
+                    return gds;
+                } else {
+                    gds.close();
+                    return null;
+                }
             } catch(Exception exc) {
                 throw new RuntimeException(exc);
             }
@@ -566,9 +572,7 @@ public class DataOutputHandler extends OutputHandler {
                 ok = false;
             } else {
                 try {
-                    if (pointPool.containsOrCreate(entry.getResource().getPath())) {
-                        ok = true;
-                    }
+                    ok = pointPool.containsOrCreate(entry.getResource().getPath());
                 } catch(Exception ignore) {}
             }
             pointEntries.put(entry.getId(), b = new Boolean(ok));
@@ -601,10 +605,7 @@ public class DataOutputHandler extends OutputHandler {
             boolean ok = false;
             if (canLoadEntry(entry)) {
                 try {
-                    String path = entry.getResource().getPath();
-                    if (trajectoryPool.containsOrCreate(path)) {
-                        ok = true;
-                    }
+                    ok = trajectoryPool.containsOrCreate(entry.getResource().getPath());
                 } catch (Exception ignoreThis) {}
             }
             trajectoryEntries.put(entry.getId(), b = new Boolean(ok));
@@ -734,19 +735,9 @@ public class DataOutputHandler extends OutputHandler {
             if ( !canLoadEntry(entry)) {
                 ok = false;
             } else {
-                File file = entry.getFile();
-                if(gridPool.contains(file.toString())) {
-                    ok = true;
-                } else {
-                    try {
-                        GridDataset gds = GridDataset.open(file.toString());
-                        //Look for the first grid
-                        if (gds.getGrids().iterator().hasNext()) {
-                            ok = true;
-                            gridPool.put(file.toString(),gds);
-                        }
-                    } catch (Exception ignoreThis) {}
-                }
+                try {
+                    ok = gridPool.containsOrCreate(entry.getResource().getPath());
+                } catch (Exception ignoreThis) {}
             }
             b = new Boolean(ok);
             gridEntries.put(entry.getId(), b);
@@ -890,14 +881,12 @@ public class DataOutputHandler extends OutputHandler {
                     getRepository().getStorageManager().getTmpFile(request,
                         "subset.nc");
                 GridDataset gds = gridPool.get(path);
-                synchronized (gds) {
-                    writer.makeFile(f.toString(), gds, varNames, llr,
-                                    ((dates[0] == null)
-                                     ? null
-                                     : new ucar.nc2.units.DateRange(dates[0],
-                                     dates[1])), includeLatLon, hStride,
-                                         zStride, timeStride);
-                }
+                writer.makeFile(f.toString(), gds, varNames, llr,
+                                ((dates[0] == null)
+                                 ? null
+                                 : new ucar.nc2.units.DateRange(dates[0],
+                                                                dates[1])), includeLatLon, hStride,
+                                zStride, timeStride);
                 gridPool.put(path,gds);
 
                 if (request.get(ARG_ADDTOREPOSITORY, false)) {
@@ -976,108 +965,104 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
-
-
         Date[]       dateRange = null;
         List<Date>   dates     = null;
 
-
-        GridDataset  dataset   = gridPool.get(entry.getResource().getPath());
+        GridDataset  dataset   = gridPool.get(path);
         StringBuffer varSB     = new StringBuffer();
-        synchronized (dataset) {
-            for (VariableSimpleIF var : dataset.getDataVariables()) {
-                if (var instanceof CoordinateAxis) {
-                    CoordinateAxis ca       = (CoordinateAxis) var;
-                    AxisType       axisType = ca.getAxisType();
-                    if (axisType == null) {
-                        continue;
-                    }
-                    if (axisType.equals(AxisType.Time)) {
-                        dates = (List<Date>) Misc.sort(
-                            ThreddsMetadataHandler.getDates(var, ca));
-                    }
+        for (VariableSimpleIF var : dataset.getDataVariables()) {
+            if (var instanceof CoordinateAxis) {
+                CoordinateAxis ca       = (CoordinateAxis) var;
+                AxisType       axisType = ca.getAxisType();
+                if (axisType == null) {
                     continue;
                 }
-            }
-            for (GridDatatype grid : sortGrids(dataset)) {
-                VariableEnhanced var = grid.getVariable();
-                varSB.append(
-                    HtmlUtil.row(
-                        HtmlUtil.cols(
-                            HtmlUtil.checkbox(
-                                ARG_VARIABLE + "." + var.getShortName(),
-                                HtmlUtil.VALUE_TRUE, false) + HtmlUtil.space(
-                                    1) + var.getName() + HtmlUtil.space(1)
-                                       + ((var.getUnitsString() != null)
-                                          ? "(" + var.getUnitsString() + ")"
-                                          : ""), "<i>" + var.getDescription()
-                                          + "</i>")));
-
-            }
-
-            if ((dates != null) && (dates.size() > 0)) {
-                List formattedDates = new ArrayList();
-                for (Date date : dates) {
-                    formattedDates.add(getRepository().formatDate(request,
-                            date));
+                if (axisType.equals(AxisType.Time)) {
+                    dates = (List<Date>) Misc.sort(
+                                                   ThreddsMetadataHandler.getDates(var, ca));
                 }
-                String fromDate = request.getUnsafeString(ARG_FROMDATE,
-                                      getRepository().formatDate(request,
-                                          dates.get(0)));
-                String toDate = request.getUnsafeString(ARG_TODATE,
-                                    getRepository().formatDate(request,
-                                        dates.get(dates.size() - 1)));
-                sb.append(
-                    HtmlUtil.formEntry(
-                        msgLabel("Time Range"),
-                        HtmlUtil.checkbox(
-                            ARG_SUBSETTIME, HtmlUtil.VALUE_TRUE,
-                            request.get(
-                                ARG_SUBSETTIME, true)) + HtmlUtil.space(1)
-                                    + HtmlUtil.select(
-                                        ARG_FROMDATE, formattedDates,
-                                        fromDate) + HtmlUtil.img(
-                                            iconUrl(
-                                                ICON_ARROW)) + HtmlUtil.select(
-                                                    ARG_TODATE,
-                                                        formattedDates,
-                                                            toDate)));
+                continue;
             }
-
-
-            /*
-              for (CoordinateSystem coordSys : (List<CoordinateSystem>)dataset
-              .getCoordinateSystems()) {
-              ProjectionImpl proj = coordSys.getProjection();
-              if (proj == null) {
-              continue;
-              }
-              break;
-              }
-            */
-            LatLonRect llr = dataset.getBoundingBox();
-            if (llr != null) {
-                sb.append(
-                    HtmlUtil.formEntryTop(
-                        msgLabel("Subset Spatially"),
-                        "<table cellpadding=0 cellspacing=0><tr valign=top><td>"
-                        + HtmlUtil.checkbox(
-                            ARG_SUBSETAREA, HtmlUtil.VALUE_TRUE,
-                            request.get(ARG_SUBSETAREA, false)) + "</td><td>"
-                                + HtmlUtil.makeLatLonBox(
-                                    ARG_AREA, llr.getLatMin(),
-                                    llr.getLatMax(), llr.getLonMax(),
-                                    llr.getLonMin()) + "</table>"));
-            }
-
-
-            sb.append(HtmlUtil.formEntry(msgLabel("Add Lat/Lon Variables"),
-                                         HtmlUtil.checkbox(ARG_ADDLATLON,
-                                             HtmlUtil.VALUE_TRUE,
-                                             request.get(ARG_ADDLATLON,
-                                                 true))));
+        }
+        for (GridDatatype grid : sortGrids(dataset)) {
+            VariableEnhanced var = grid.getVariable();
+            varSB.append(
+                         HtmlUtil.row(
+                                      HtmlUtil.cols(
+                                                    HtmlUtil.checkbox(
+                                                                      ARG_VARIABLE + "." + var.getShortName(),
+                                                                      HtmlUtil.VALUE_TRUE, false) + HtmlUtil.space(
+                                                                                                                   1) + var.getName() + HtmlUtil.space(1)
+                                                    + ((var.getUnitsString() != null)
+                                                       ? "(" + var.getUnitsString() + ")"
+                                                       : ""), "<i>" + var.getDescription()
+                                                    + "</i>")));
 
         }
+
+        if ((dates != null) && (dates.size() > 0)) {
+            List formattedDates = new ArrayList();
+            for (Date date : dates) {
+                formattedDates.add(getRepository().formatDate(request,
+                                                              date));
+            }
+            String fromDate = request.getUnsafeString(ARG_FROMDATE,
+                                                      getRepository().formatDate(request,
+                                                                                 dates.get(0)));
+            String toDate = request.getUnsafeString(ARG_TODATE,
+                                                    getRepository().formatDate(request,
+                                                                               dates.get(dates.size() - 1)));
+            sb.append(
+                      HtmlUtil.formEntry(
+                                         msgLabel("Time Range"),
+                                         HtmlUtil.checkbox(
+                                                           ARG_SUBSETTIME, HtmlUtil.VALUE_TRUE,
+                                                           request.get(
+                                                                       ARG_SUBSETTIME, true)) + HtmlUtil.space(1)
+                                         + HtmlUtil.select(
+                                                           ARG_FROMDATE, formattedDates,
+                                                           fromDate) + HtmlUtil.img(
+                                                                                    iconUrl(
+                                                                                            ICON_ARROW)) + HtmlUtil.select(
+                                                                                                                           ARG_TODATE,
+                                                                                                                           formattedDates,
+                                                                                                                           toDate)));
+        }
+
+
+        /*
+          for (CoordinateSystem coordSys : (List<CoordinateSystem>)dataset
+          .getCoordinateSystems()) {
+          ProjectionImpl proj = coordSys.getProjection();
+          if (proj == null) {
+          continue;
+          }
+          break;
+          }
+        */
+        LatLonRect llr = dataset.getBoundingBox();
+        if (llr != null) {
+            sb.append(
+                      HtmlUtil.formEntryTop(
+                                            msgLabel("Subset Spatially"),
+                                            "<table cellpadding=0 cellspacing=0><tr valign=top><td>"
+                                            + HtmlUtil.checkbox(
+                                                                ARG_SUBSETAREA, HtmlUtil.VALUE_TRUE,
+                                                                request.get(ARG_SUBSETAREA, false)) + "</td><td>"
+                                            + HtmlUtil.makeLatLonBox(
+                                                                     ARG_AREA, llr.getLatMin(),
+                                                                     llr.getLatMax(), llr.getLonMax(),
+                                                                     llr.getLonMin()) + "</table>"));
+        }
+
+
+        sb.append(HtmlUtil.formEntry(msgLabel("Add Lat/Lon Variables"),
+                                     HtmlUtil.checkbox(ARG_ADDLATLON,
+                                                       HtmlUtil.VALUE_TRUE,
+                                                       request.get(ARG_ADDLATLON,
+                                                                   true))));
+
+
         sb.append("</table>");
         sb.append("<hr>");
         sb.append("Select Variables:<ul>");
@@ -1088,7 +1073,7 @@ public class DataOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.submit("Subset Grid"));
         sb.append(HtmlUtil.formClose());
-        gridPool.put(entry.getResource().getPath(),dataset);
+        gridPool.put(path,dataset);
         return makeLinksResult(request, msg("Grid Subset"), sb,
                                new State(entry));
     }
@@ -1128,175 +1113,166 @@ public class DataOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputPointMap(Request request, Entry entry)
-            throws Exception {
+        throws Exception {
 
         String          mapVarName = "mapstraction" + HtmlUtil.blockCnt++;
-        PointObsDataset pod = pointPool.get(entry.getResource().getPath());
+        String path = entry.getResource().getPath();
+        PointObsDataset pod = pointPool.get(path);
         StringBuffer    sb         = new StringBuffer();
-        synchronized (pod) {
-            List         vars = pod.getDataVariables();
-            int          skip = request.get(ARG_SKIP, 0);
-            int          max  = request.get(ARG_MAX, 200);
+        List         vars = pod.getDataVariables();
+        int          skip = request.get(ARG_SKIP, 0);
+        int          max  = request.get(ARG_MAX, 200);
 
-            StringBuffer js   = new StringBuffer();
-            js.append("var marker;\n");
-            Iterator dataIterator   = pod.getDataIterator(16384);
-            int      cnt            = 0;
-            int      total          = 0;
-            String   icon           = iconUrl("/icons/pointdata.gif");
+        StringBuffer js   = new StringBuffer();
+        js.append("var marker;\n");
+        Iterator dataIterator   = pod.getDataIterator(16384);
+        int      cnt            = 0;
+        int      total          = 0;
+        String   icon           = iconUrl("/icons/pointdata.gif");
 
-            List     columnDataList = new ArrayList();
-            while (dataIterator.hasNext()) {
-                PointObsDatatype po = (PointObsDatatype) dataIterator.next();
-                //                ucar.unidata.geoloc.EarthLocation el = po.getLocation();
-                ucar.unidata.geoloc.EarthLocation el = po.getLocation();
-                if (el == null) {
-                    continue;
-                }
-                double lat = el.getLatitude();
-                double lon = el.getLongitude();
-                if ((lat != lat) || (lon != lon)) {
-                    continue;
-                }
-                if ((lat < -90) || (lat > 90) || (lon < -180)
-                        || (lon > 180)) {
-                    continue;
-                }
-                total++;
-                if (total <= skip) {
-                    continue;
-                }
-                if (total > (max + skip)) {
-                    continue;
-                }
-                cnt++;
-                List          columnData = new ArrayList();
-                StructureData structure  = po.getData();
-                js.append("marker = new Marker("
-                          + llp(el.getLatitude(), el.getLongitude())
-                          + ");\n");
-
-                js.append("marker.setIcon(" + HtmlUtil.quote(icon) + ");\n");
-                StringBuffer info = new StringBuffer("");
-                info.append("<b>Date:</b> " + po.getNominalTimeAsDate()
-                            + "<br>");
-                for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
-                    //{name:\"Ashley\",breed:\"German Shepherd\",age:12}
-                    StructureMembers.Member member =
-                        structure.findMember(var.getShortName());
-                    if ((var.getDataType() == DataType.STRING)
-                            || (var.getDataType() == DataType.CHAR)) {
-                        String value = structure.getScalarString(member);
-                        columnData.add(var.getShortName() + ":"
-                                       + HtmlUtil.quote(value));
-                        info.append("<b>" + var.getName() + ": </b>" + value
-                                    + "</br>");
-
-                    } else {
-                        float value = structure.convertScalarFloat(member);
-                        info.append("<b>" + var.getName() + ": </b>" + value
-                                    + "</br>");
-
-                        columnData.add(var.getShortName() + ":" + value);
-                    }
-                }
-                columnDataList.add("{" + StringUtil.join(",", columnData)
-                                   + "}\n");
-                js.append("marker.setInfoBubble(\"" + info.toString()
-                          + "\");\n");
-                js.append("initMarker(marker," + HtmlUtil.quote("" + cnt)
-                          + "," + mapVarName + ");\n");
+        List     columnDataList = new ArrayList();
+        while (dataIterator.hasNext()) {
+            PointObsDatatype po = (PointObsDatatype) dataIterator.next();
+            //                ucar.unidata.geoloc.EarthLocation el = po.getLocation();
+            ucar.unidata.geoloc.EarthLocation el = po.getLocation();
+            if (el == null) {
+                continue;
             }
+            double lat = el.getLatitude();
+            double lon = el.getLongitude();
+            if ((lat != lat) || (lon != lon)) {
+                continue;
+            }
+            if ((lat < -90) || (lat > 90) || (lon < -180)
+                || (lon > 180)) {
+                continue;
+            }
+            total++;
+            if (total <= skip) {
+                continue;
+            }
+            if (total > (max + skip)) {
+                continue;
+            }
+            cnt++;
+            List          columnData = new ArrayList();
+            StructureData structure  = po.getData();
+            js.append("marker = new Marker("
+                      + llp(el.getLatitude(), el.getLongitude())
+                      + ");\n");
 
-            js.append(mapVarName + ".autoCenterAndZoom();\n");
-            //        js.append(mapVarName+".resizeTo(" + width + "," + height + ");\n");
-
-            StringBuffer yui         = new StringBuffer();
-
-            List         columnDefs  = new ArrayList();
-            List         columnNames = new ArrayList();
+            js.append("marker.setIcon(" + HtmlUtil.quote(icon) + ");\n");
+            StringBuffer info = new StringBuffer("");
+            info.append("<b>Date:</b> " + po.getNominalTimeAsDate()
+                        + "<br>");
             for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
-                columnNames.add(HtmlUtil.quote(var.getShortName()));
-                String label = var.getDescription();
-                //            if(label.trim().length()==0)
-                label = var.getName();
-                columnDefs.add("{key:" + HtmlUtil.quote(var.getShortName())
-                               + "," + "sortable:true," + "label:"
-                               + HtmlUtil.quote(label) + "}");
-            }
+                //{name:\"Ashley\",breed:\"German Shepherd\",age:12}
+                StructureMembers.Member member =
+                    structure.findMember(var.getShortName());
+                if ((var.getDataType() == DataType.STRING)
+                    || (var.getDataType() == DataType.CHAR)) {
+                    String value = structure.getScalarString(member);
+                    columnData.add(var.getShortName() + ":"
+                                   + HtmlUtil.quote(value));
+                    info.append("<b>" + var.getName() + ": </b>" + value
+                                + "</br>");
 
+                } else {
+                    float value = structure.convertScalarFloat(member);
+                    info.append("<b>" + var.getName() + ": </b>" + value
+                                + "</br>");
 
-
-            /*
-              yui.append("YAHOO.example.data = [" + StringUtil.join(",", columnDataList)+"]\n");
-              yui.append("var myDataSource = new YAHOO.util.DataSource(YAHOO.example.data);\n");
-              yui.append("myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;\n");
-              yui.append("myDataSource.responseSchema = {\n    fields: [" + StringUtil.join(",", columnNames) +"]};\n");
-              yui.append("var myColumnDefs = [\n  " + StringUtil.join(",",columnDefs) + "\n];\n");
-              yui.append("var myDataTable = new YAHOO.widget.DataTable(\"datatable\", myColumnDefs, myDataSource);\n");
-            */
-
-            if (total > max) {
-                sb.append((skip + 1) + "-" + (skip + cnt) + " of " + total
-                          + " ");
-            } else {
-                sb.append((skip + 1) + "-" + (skip + cnt));
-            }
-            if (total > max) {
-                boolean didone = false;
-                if (skip > 0) {
-                    sb.append(HtmlUtil.space(2));
-                    sb.append(
-                        HtmlUtil.href(
-                            HtmlUtil.url(
-                                request.getRequestPath(), new String[] {
-                        ARG_OUTPUT, request.getOutput().toString(),
-                        ARG_ENTRYID, entry.getId(), ARG_SKIP,
-                        "" + (skip - max), ARG_MAX, "" + max
-                    }), msg("Previous")));
-                    didone = true;
-                }
-                if (total > (skip + cnt)) {
-                    sb.append(HtmlUtil.space(2));
-                    sb.append(
-                        HtmlUtil.href(
-                            HtmlUtil.url(
-                                request.getRequestPath(), new String[] {
-                        ARG_OUTPUT, request.getOutput().toString(),
-                        ARG_ENTRYID, entry.getId(), ARG_SKIP,
-                        "" + (skip + max), ARG_MAX, "" + max
-                    }), msg("Next")));
-                    didone = true;
-                }
-                //Just come up with some max number
-                if (didone && (total < 2000)) {
-                    sb.append(HtmlUtil.space(2));
-                    sb.append(
-                        HtmlUtil.href(
-                            HtmlUtil.url(
-                                request.getRequestPath(), new String[] {
-                        ARG_OUTPUT, request.getOutput().toString(),
-                        ARG_ENTRYID, entry.getId(), ARG_SKIP, "" + 0, ARG_MAX,
-                        "" + total
-                    }), msg("All")));
-
+                    columnData.add(var.getShortName() + ":" + value);
                 }
             }
-            //        sb.append("<table width=\"100%\"><tr valign=top><td>\n");
-            getRepository().initMap(request, mapVarName, sb,
-                                    request.get(ARG_WIDTH, 800),
-                                    request.get(ARG_HEIGHT, 500), true);
-            /*        sb.append("</td><td>");
-                      sb.append(HtmlUtil.div("",HtmlUtil.id("datatable")+HtmlUtil.cssClass(" yui-skin-sam")));
-                      sb.append("</td></tr></table>");
-                      sb.append("\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://yui.yahooapis.com/2.5.2/build/fonts/fonts-min.css\" />\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://yui.yahooapis.com/2.5.2/build/datatable/assets/skins/sam/datatable.css\" />\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/yahoo-dom-event/yahoo-dom-event.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/dragdrop/dragdrop-min.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/element/element-beta-min.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/datasource/datasource-beta-min.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/datatable/datatable-beta-min.js\"></script>\n");
-
-                      sb.append(HtmlUtil.script(yui.toString()));
-            */
-
-            sb.append(HtmlUtil.script(js.toString()));
-            return new Result(msg("Point Data Map"), sb);
+            columnDataList.add("{" + StringUtil.join(",", columnData)
+                               + "}\n");
+            js.append("marker.setInfoBubble(\"" + info.toString()
+                      + "\");\n");
+            js.append("initMarker(marker," + HtmlUtil.quote("" + cnt)
+                      + "," + mapVarName + ");\n");
         }
+
+        js.append(mapVarName + ".autoCenterAndZoom();\n");
+        //        js.append(mapVarName+".resizeTo(" + width + "," + height + ");\n");
+
+        StringBuffer yui         = new StringBuffer();
+
+        List         columnDefs  = new ArrayList();
+        List         columnNames = new ArrayList();
+        for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
+            columnNames.add(HtmlUtil.quote(var.getShortName()));
+            String label = var.getDescription();
+            //            if(label.trim().length()==0)
+            label = var.getName();
+            columnDefs.add("{key:" + HtmlUtil.quote(var.getShortName())
+                           + "," + "sortable:true," + "label:"
+                           + HtmlUtil.quote(label) + "}");
+        }
+
+
+        if (total > max) {
+            sb.append((skip + 1) + "-" + (skip + cnt) + " of " + total
+                      + " ");
+        } else {
+            sb.append((skip + 1) + "-" + (skip + cnt));
+        }
+        if (total > max) {
+            boolean didone = false;
+            if (skip > 0) {
+                sb.append(HtmlUtil.space(2));
+                sb.append(
+                          HtmlUtil.href(
+                                        HtmlUtil.url(
+                                                     request.getRequestPath(), new String[] {
+                                                         ARG_OUTPUT, request.getOutput().toString(),
+                                                         ARG_ENTRYID, entry.getId(), ARG_SKIP,
+                                                         "" + (skip - max), ARG_MAX, "" + max
+                                                     }), msg("Previous")));
+                didone = true;
+            }
+            if (total > (skip + cnt)) {
+                sb.append(HtmlUtil.space(2));
+                sb.append(
+                          HtmlUtil.href(
+                                        HtmlUtil.url(
+                                                     request.getRequestPath(), new String[] {
+                                                         ARG_OUTPUT, request.getOutput().toString(),
+                                                         ARG_ENTRYID, entry.getId(), ARG_SKIP,
+                                                         "" + (skip + max), ARG_MAX, "" + max
+                                                     }), msg("Next")));
+                didone = true;
+            }
+            //Just come up with some max number
+            if (didone && (total < 2000)) {
+                sb.append(HtmlUtil.space(2));
+                sb.append(
+                          HtmlUtil.href(
+                                        HtmlUtil.url(
+                                                     request.getRequestPath(), new String[] {
+                                                         ARG_OUTPUT, request.getOutput().toString(),
+                                                         ARG_ENTRYID, entry.getId(), ARG_SKIP, "" + 0, ARG_MAX,
+                                                         "" + total
+                                                     }), msg("All")));
+
+            }
+        }
+        //        sb.append("<table width=\"100%\"><tr valign=top><td>\n");
+        getRepository().initMap(request, mapVarName, sb,
+                                request.get(ARG_WIDTH, 800),
+                                request.get(ARG_HEIGHT, 500), true);
+        /*        sb.append("</td><td>");
+                  sb.append(HtmlUtil.div("",HtmlUtil.id("datatable")+HtmlUtil.cssClass(" yui-skin-sam")));
+                  sb.append("</td></tr></table>");
+                  sb.append("\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://yui.yahooapis.com/2.5.2/build/fonts/fonts-min.css\" />\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://yui.yahooapis.com/2.5.2/build/datatable/assets/skins/sam/datatable.css\" />\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/yahoo-dom-event/yahoo-dom-event.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/dragdrop/dragdrop-min.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/element/element-beta-min.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/datasource/datasource-beta-min.js\"></script>\n<script type=\"text/javascript\" src=\"http://yui.yahooapis.com/2.5.2/build/datatable/datatable-beta-min.js\"></script>\n");
+
+                  sb.append(HtmlUtil.script(yui.toString()));
+        */
+
+        sb.append(HtmlUtil.script(js.toString()));
+        pointPool.put(path,pod);
+
+        return new Result(msg("Point Data Map"), sb);
     }
 
 
@@ -1369,77 +1345,78 @@ public class DataOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputTrajectoryMap(Request request, Entry entry)
-            throws Exception {
-        TrajectoryObsDataset tod = trajectoryPool.get(entry.getResource().getPath());
+        throws Exception {
+        String path = entry.getResource().getPath();
+        TrajectoryObsDataset tod = trajectoryPool.get(path);
         StringBuffer sb         = new StringBuffer();
         String       mapVarName = "mapstraction" + HtmlUtil.blockCnt++;
-        synchronized (tod) {
-            StringBuffer js           = new StringBuffer();
-            List         trajectories = tod.getTrajectories();
-            for (int i = 0; i < trajectories.size(); i++) {
-                List allVariables = tod.getDataVariables();
-                TrajectoryObsDatatype todt =
-                    (TrajectoryObsDatatype) trajectories.get(i);
-                float[]      lats     = toFloatArray(todt.getLatitude(null));
-                float[]      lons     = toFloatArray(todt.getLongitude(null));
-                StringBuffer markerSB = new StringBuffer();
-                js.append("line = new Polyline([");
-                for (int ptIdx = 0; ptIdx < lats.length; ptIdx++) {
-                    if (ptIdx > 0) {
-                        js.append(",");
-                        if (ptIdx == lats.length - 1) {
-                            markerSB.append(
-                                "var endMarker = new Marker("
-                                + MapOutputHandler.llp(
-                                    lats[ptIdx], lons[ptIdx]) + ");\n");
-                            markerSB.append(
-                                "endMarker.setInfoBubble(\"End time:"
-                                + todt.getEndDate() + "\");\n");
-                            markerSB.append(
-                                "initMarker(endMarker,\"endMarker\","
-                                + mapVarName + ");\n");
-                        }
-                    } else {
-                        markerSB.append("var startMarker = new Marker("
-                                        + MapOutputHandler.llp(lats[ptIdx],
-                                            lons[ptIdx]) + ");\n");
+        StringBuffer js           = new StringBuffer();
+        List         trajectories = tod.getTrajectories();
+        for (int i = 0; i < trajectories.size(); i++) {
+            List allVariables = tod.getDataVariables();
+            TrajectoryObsDatatype todt =
+                (TrajectoryObsDatatype) trajectories.get(i);
+            float[]      lats     = toFloatArray(todt.getLatitude(null));
+            float[]      lons     = toFloatArray(todt.getLongitude(null));
+            StringBuffer markerSB = new StringBuffer();
+            js.append("line = new Polyline([");
+            for (int ptIdx = 0; ptIdx < lats.length; ptIdx++) {
+                if (ptIdx > 0) {
+                    js.append(",");
+                    if (ptIdx == lats.length - 1) {
                         markerSB.append(
-                            "startMarker.setInfoBubble(\"Start time:"
-                            + todt.getStartDate() + "\");\n");
+                                        "var endMarker = new Marker("
+                                        + MapOutputHandler.llp(
+                                                               lats[ptIdx], lons[ptIdx]) + ");\n");
                         markerSB.append(
-                            "initMarker(startMarker,\"startMarker\","
-                            + mapVarName + ");\n");
+                                        "endMarker.setInfoBubble(\"End time:"
+                                        + todt.getEndDate() + "\");\n");
+                        markerSB.append(
+                                        "initMarker(endMarker,\"endMarker\","
+                                        + mapVarName + ");\n");
                     }
-                    js.append(MapOutputHandler.llp(lats[ptIdx], lons[ptIdx]));
+                } else {
+                    markerSB.append("var startMarker = new Marker("
+                                    + MapOutputHandler.llp(lats[ptIdx],
+                                                           lons[ptIdx]) + ");\n");
+                    markerSB.append(
+                                    "startMarker.setInfoBubble(\"Start time:"
+                                    + todt.getStartDate() + "\");\n");
+                    markerSB.append(
+                                    "initMarker(startMarker,\"startMarker\","
+                                    + mapVarName + ");\n");
                 }
-                js.append("]);\n");
-                js.append("line.setWidth(2);\n");
-                js.append("line.setColor(\"#FF0000\");\n");
-                js.append(mapVarName + ".addPolyline(line);\n");
-                js.append(markerSB);
-                StructureData    structure = todt.getData(0);
-                VariableSimpleIF theVar    = null;
-                for (int varIdx = 0; varIdx < allVariables.size(); varIdx++) {
-                    VariableSimpleIF var =
-                        (VariableSimpleIF) allVariables.get(varIdx);
-                    if (var.getRank() != 0) {
-                        continue;
-                    }
-                    theVar = var;
-                    break;
-                }
-                if (theVar == null) {
+                js.append(MapOutputHandler.llp(lats[ptIdx], lons[ptIdx]));
+            }
+            js.append("]);\n");
+            js.append("line.setWidth(2);\n");
+            js.append("line.setColor(\"#FF0000\");\n");
+            js.append(mapVarName + ".addPolyline(line);\n");
+            js.append(markerSB);
+            StructureData    structure = todt.getData(0);
+            VariableSimpleIF theVar    = null;
+            for (int varIdx = 0; varIdx < allVariables.size(); varIdx++) {
+                VariableSimpleIF var =
+                    (VariableSimpleIF) allVariables.get(varIdx);
+                if (var.getRank() != 0) {
                     continue;
                 }
+                theVar = var;
+                break;
             }
-
-
-
-            js.append(mapVarName + ".autoCenterAndZoom();\n");
-            getRepository().initMap(request, mapVarName, sb, 800, 500, true);
-            sb.append(HtmlUtil.script(js.toString()));
-            return new Result(msg("Trajectory Map"), sb);
+            if (theVar == null) {
+                continue;
+            }
         }
+
+
+
+        js.append(mapVarName + ".autoCenterAndZoom();\n");
+        getRepository().initMap(request, mapVarName, sb, 800, 500, true);
+        sb.append(HtmlUtil.script(js.toString()));
+        trajectoryPool.put(path,tod);
+        return new Result(msg("Trajectory Map"), sb);
+    
 
     }
 
@@ -1531,9 +1508,9 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputPointCsv(Request request, Entry entry)
             throws Exception {
 
-        PointObsDataset pod = pointPool.get(entry.getResource().getPath());
+        String path = entry.getResource().getPath();
+        PointObsDataset pod = pointPool.get(path);
         StringBuffer    sb  = new StringBuffer();
-        synchronized (pod) {
             List     vars         = pod.getDataVariables();
             Iterator dataIterator = pod.getDataIterator(16384);
             int      cnt          = 0;
@@ -1589,9 +1566,9 @@ public class DataOutputHandler extends OutputHandler {
                 }
                 sb.append("\n");
             }
+            pointPool.put(path,pod);
             return new Result(msg("Point Data"), sb,
                               getRepository().getMimeTypeFromSuffix(".csv"));
-        }
     }
 
 
@@ -1608,8 +1585,8 @@ public class DataOutputHandler extends OutputHandler {
      */
     public Result outputPointKml(Request request, Entry entry)
             throws Exception {
-        PointObsDataset pod = pointPool.get(entry.getResource().getPath());
-        synchronized (pod) {
+        String path = entry.getResource().getPath();
+        PointObsDataset pod = pointPool.get(path);
             Element  root         = KmlUtil.kml(entry.getName());
             Element  docNode      = KmlUtil.document(root, entry.getName());
             List     vars         = pod.getDataVariables();
@@ -1650,9 +1627,10 @@ public class DataOutputHandler extends OutputHandler {
                                   info.toString(), lat, lon, alt, null);
             }
             StringBuffer sb = new StringBuffer(XmlUtil.toString(root));
+            pointPool.put(path,pod);
             return new Result(msg("Point Data"), sb,
                               getRepository().getMimeTypeFromSuffix(".kml"));
-        }
+
     }
 
 
@@ -1726,14 +1704,8 @@ public class DataOutputHandler extends OutputHandler {
         }
 
         if (output.equals(OUTPUT_OPENDAP)) {
-            //            System.err.println(System.currentTimeMillis() +" [" +request.count +"]" +
-            //                               " data output.outputEntry start");
-            //            synchronized(mutex) {
             Result result =  outputOpendap(request, entry);
-            //            System.err.println(System.currentTimeMillis() +" [" +request.count +"]" +
-            //                               " data output.outputEntry end");
             return result;
-            //            }
         }
 
         throw new IllegalArgumentException("Unknown output type:" + output);

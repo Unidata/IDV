@@ -255,7 +255,7 @@ public class Column implements Constants {
 
         description = XmlUtil.getAttribute(element, ATTR_DESCRIPTION, label);
         type        = XmlUtil.getAttribute(element, ATTR_TYPE);
-        dflt        = XmlUtil.getAttribute(element, ATTR_DEFAULT, "");
+        dflt        = XmlUtil.getAttribute(element, ATTR_DEFAULT, "").trim();
         isIndex     = XmlUtil.getAttribute(element, ATTR_ISINDEX, false);
         canSearch   = XmlUtil.getAttribute(element, ATTR_CANSEARCH, false);
         canShow     = XmlUtil.getAttribute(element, ATTR_SHOWINHTML, canShow);
@@ -314,7 +314,7 @@ public class Column implements Constants {
      */
     private boolean toBoolean(Object[] values, int idx) {
         if (values[idx] == null) {
-            if(dflt!=null) {
+            if(StringUtil.notEmpty(dflt)) {
                 return new Boolean(dflt).booleanValue();
             }
             return true;
@@ -829,7 +829,7 @@ public class Column implements Constants {
             //TODO
         } else if (type.equals(TYPE_BOOLEAN)) {
             String value = request.getString(getFullName(),
-                                             (dflt!=null?dflt:"true")).toLowerCase();
+                                             (StringUtil.notEmpty(dflt)?dflt:"true")).toLowerCase();
             values[offset] = new Boolean(value);
         } else if (type.equals(TYPE_ENUMERATION)) {
             if (request.exists(getFullName())) {
@@ -838,14 +838,14 @@ public class Column implements Constants {
                 values[offset] = dflt;
             }
         } else if (type.equals(TYPE_INT)) {
-            int dfltValue = (dflt!=null?new Integer(dflt).intValue():0);
+            int dfltValue = (StringUtil.notEmpty(dflt)?new Integer(dflt).intValue():0);
             if (request.exists(getFullName())) {
                 values[offset] = new Integer(request.get(getFullName(), dfltValue));
             } else {
                 values[offset] = dfltValue;
             }
         } else if (type.equals(TYPE_DOUBLE)) {
-            double dfltValue = (dflt!=null?new Double(dflt).doubleValue():0);
+            double dfltValue = (StringUtil.notEmpty(dflt)?new Double(dflt.trim()).doubleValue():0);
             if (request.exists(getFullName())) {
                 values[offset] = new Double(request.get(getFullName(), dfltValue));
             } else {

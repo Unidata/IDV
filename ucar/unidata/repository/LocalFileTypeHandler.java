@@ -105,7 +105,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
      */
     public String getIconUrl(Request request, Entry entry) throws Exception {
         if (entry.isGroup()) {
-            return iconUrl(ICON_FOLDER_CLOSED);
+            return iconUrl(ICON_SYNTH_FILE);
         }
         return super.getIconUrl(request, entry);
     }
@@ -365,6 +365,9 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                                ? (Entry) new Group(synthId, handler)
                                : new Entry(synthId, handler));
 
+        if(entry instanceof Group) {
+            entry.setIcon(ICON_SYNTH_FILE);
+        }
         Entry templateEntry = getEntryManager().getTemplateEntry(targetFile);
         String       name   = null;
         List<String> names  = get(values, COL_NAMES);

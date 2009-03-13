@@ -5352,6 +5352,10 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public String getIconUrl(Request request, Entry entry) throws Exception {
+        if(entry.getIcon()!=null) {
+            return iconUrl(entry.getIcon());
+            
+        }
         if (isAnonymousUpload(entry)) {
             return iconUrl(ICON_ENTRY_UPLOAD);
         }
