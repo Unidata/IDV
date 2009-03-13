@@ -3858,9 +3858,9 @@ public class Misc {
      */
     public static void pauseEvery(int minutesDelta) {
         long sleepTime = getPauseEveryTime(minutesDelta);
-        System.err.println("Sleeping for "
-                           + DateUtil.millisToMinutes(sleepTime)
-                           + " minutes");
+        //        System.err.println("Sleeping for "
+        //                           + DateUtil.millisToMinutes(sleepTime)
+        //                           + " minutes");
         Misc.sleep((long) sleepTime);
     }
 
@@ -4365,6 +4365,7 @@ public class Misc {
         exc.printStackTrace(new PrintStream(baos));
         return baos.toString();
     }
+
 
 
 }

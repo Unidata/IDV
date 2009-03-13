@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.util;
 
 
@@ -33,7 +34,7 @@ import java.util.List;
 
 /**
  * Provides a pool of keyed objects and keeps the total size below a given limit.
- * This maps a key to a list of values. The get method is consumptive, it removes 
+ * This maps a key to a list of values. The get method is consumptive, it removes
  * the returned value from the list. If the total number of list elements exceed the
  * given cache size this will remove the elements from the list on a key based last used
  *  basis
@@ -42,18 +43,19 @@ import java.util.List;
  *
  * @version $Revision: 1.271 $
  */
-public class Pool<KeyType,ValueType> {
+public class Pool<KeyType, ValueType> {
 
-    /** The cache    */
-    private Hashtable<KeyType,List<ValueType>> cache = new Hashtable<KeyType,List<ValueType>>();
+    /** The cache */
+    private Hashtable<KeyType, List<ValueType>> cache =
+        new Hashtable<KeyType, List<ValueType>>();
 
-    /** Keep track of the keys  */
+    /** Keep track of the keys */
     private List<KeyType> keys = new ArrayList<KeyType>();
 
-    /** max cache size  */
+    /** max cache size */
     private int maxSize = 100;
 
-    /** current cache size  */
+    /** current cache size */
     private int size = 0;
 
     /**
@@ -66,9 +68,19 @@ public class Pool<KeyType,ValueType> {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     public synchronized boolean contains(KeyType key) {
-        List<ValueType> list =  cache.get(key);
-        if(list!=null && list.size()>0) {
+        if (key == null) {
+            return false;
+        }
+        List<ValueType> list = cache.get(key);
+        if ((list != null) && (list.size() > 0)) {
             return true;
         }
         return false;
@@ -82,20 +94,37 @@ public class Pool<KeyType,ValueType> {
      *
      * @return _more_
      */
-    public synchronized ValueType get(KeyType key) {
-        List<ValueType> list =  cache.get(key);
-        if(list!=null && list.size()>0) {
-            size--;
-            return list.remove(0);
+    public  ValueType get(KeyType key) {
+        synchronized(this) {
+            if(key == null) return null;
+            List<ValueType> list = cache.get(key);
+            if ((list != null) && (list.size() > 0)) {
+                size--;
+                return list.remove(0);
+            }
         }
         return createValue(key);
     }
 
-    public synchronized boolean containsOrCreate(KeyType key) {
-        if(contains(key)) return true;
-        ValueType value =  createValue(key);
-        if(value == null) return false;
-        put(key,value);
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
+    public  boolean containsOrCreate(KeyType key) {
+        synchronized(this) { 
+            if(key == null) return false;
+            if (contains(key)) {
+                return true;
+            }
+        }
+        ValueType value = createValue(key);
+        if (value == null) {
+            return false;
+        }
+        put(key, value);
         return true;
     }
 
@@ -108,23 +137,26 @@ public class Pool<KeyType,ValueType> {
      * @param value _more_
      */
     public synchronized void put(KeyType key, ValueType value) {
+        if(key == null) return;
         keys.remove(key);
         keys.add(key);
-        while (size >= maxSize-1) {
-            for(KeyType keyToCheck: keys) {
-                List<ValueType> listToCheck =cache.get(keyToCheck);             
-                while(listToCheck.size()>0) {
+        while (size >= maxSize - 1) {
+            for (KeyType keyToCheck : keys) {
+                List<ValueType> listToCheck = cache.get(keyToCheck);
+                while (listToCheck.size() > 0) {
                     ValueType valueToRemove = listToCheck.remove(0);
-                    removeValue(key,valueToRemove);
+                    removeValue(key, valueToRemove);
                     size--;
-                    if(size<maxSize) break;
+                    if (size < maxSize) {
+                        break;
+                    }
                 }
             }
         }
-        List<ValueType> list =  cache.get(key);
-        if(list == null || list.size()==0) {
-            list =  new ArrayList<ValueType>();
-            cache.put(key,list);
+        List<ValueType> list = cache.get(key);
+        if ((list == null) || (list.size() == 0)) {
+            list = new ArrayList<ValueType>();
+            cache.put(key, list);
         }
         list.add(value);
         size++;
@@ -135,17 +167,24 @@ public class Pool<KeyType,ValueType> {
      * Clear the cache
      */
     public synchronized void clear() {
-        for(KeyType key: keys) {
-            for(ValueType value: cache.get(key)) {            
-                removeValue(key,value);
+        for (KeyType key : keys) {
+            for (ValueType value : cache.get(key)) {
+                removeValue(key, value);
             }
         }
-        size = 0;
+        size  = 0;
         cache = new Hashtable();
         keys  = new ArrayList();
     }
 
-    
+
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     protected ValueType createValue(KeyType key) {
         return null;
     }
