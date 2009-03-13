@@ -1448,7 +1448,7 @@ public class Admin extends RepositoryManager {
                                                / 60)) + " "
                                                    + msg("minutes")+
                                            HtmlUtil.space(2) +
-                                           "# Requests:" + getRequestCount()));
+                                           "# Requests:" + getRepository().getRequestCount()));
 
         getEntryManager().addStatusInfo(statusSB);
 
