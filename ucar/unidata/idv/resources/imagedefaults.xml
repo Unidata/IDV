@@ -1017,6 +1017,12 @@ Note: we can use place="default", etc., to use the default
      mag="1 1"
      unit="ECHO"/>
   <default
+     pattern="BREF248"
+     key="LINELE"
+     loc="460 460"
+     mag="1 1"
+     unit="ECHO"/>
+  <default
      pattern="PRE1"
      key="LINELE"
      loc="160 161"
@@ -1024,6 +1030,18 @@ Note: we can use place="default", etc., to use the default
      unit="RAIN"/>
   <default
      pattern="PRE3"
+     key="LINELE"
+     loc="160 161"
+     mag="2 2"
+     unit="RAIN"/>
+  <default
+     pattern="PRECIP1"
+     key="LINELE"
+     loc="160 161"
+     mag="2 2"
+     unit="RAIN"/>
+  <default
+     pattern="PRECIPTOT"
      key="LINELE"
      loc="160 161"
      mag="2 2"
@@ -1042,6 +1060,30 @@ Note: we can use place="default", etc., to use the default
      unit="VEL"/>
   <default
      pattern="BVEL2"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="VEL"/>
+  <default
+     pattern="SRVEL1"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="VEL"/>
+  <default
+     pattern="SRVEL2"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="VEL"/>
+  <default
+     pattern="SRVEL3"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="VEL"/>
+  <default
+     pattern="SRVEL4"
      key="LINELE"
      loc="230 230"
      mag="1 1"
