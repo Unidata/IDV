@@ -77,6 +77,7 @@ import ucar.unidata.repository.*;
 
 
 import ucar.unidata.util.Cache;
+import ucar.unidata.util.Pool;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
@@ -187,17 +188,17 @@ public class DataOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    private Cache cdmEntries = new Cache(5000);
+    private Cache<String,Boolean> cdmEntries = new Cache<String,Boolean>(5000);
 
     /** _more_ */
-    private Cache gridEntries = new Cache(5000);
+    private Cache<String,Boolean> gridEntries = new Cache<String,Boolean>(5000);
 
 
     /** _more_ */
-    private Cache pointEntries = new Cache(5000);
+    private Cache<String,Boolean> pointEntries = new Cache<String,Boolean>(5000);
 
     /** _more_ */
-    private Cache trajectoryEntries = new Cache(5000);
+    private Cache<String,Boolean> trajectoryEntries = new Cache<String,Boolean>(5000);
 
 
     private String nj22TmpFile;
@@ -206,46 +207,93 @@ public class DataOutputHandler extends OutputHandler {
     //Do we have to actually close it??
 
     /** _more_ */
-    private Cache ncFileCache = new Cache(100) {
-        protected void removeValue(Object key, Object value) {
+    private Pool<String,NetcdfDataset> ncFilePool = new Pool<String,NetcdfDataset>(100) {
+        protected void removeValue(String key, NetcdfFile file) {
             try {
-                ((NetcdfFile) value).close();
+                file.close();
             } catch (Exception exc) {}
         }
+
+        protected NetcdfDataset createValue(String path) {
+            try {
+                getStorageManager().checkScour();
+                System.err.println("Create ncFilePool: " + path);
+                return  NetcdfDataset.openDataset(path);
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+        }
+
     };
 
 
     /** _more_ */
-    private Cache gridCache = new Cache(10) {
-        protected void removeValue(Object key, Object value) {
+    private Pool<String,GridDataset> gridPool = new Pool<String,GridDataset>(10) {
+        protected void removeValue(String key, GridDataset value) {
             try {
-                ((NetcdfFile) value).close();
+                value.close();
             } catch (Exception exc) {}
         }
+
+        protected GridDataset createValue(String path) {
+            try {
+                System.err.println("Create gridPool: " + path);
+                getStorageManager().checkScour();
+                return GridDataset.open(path);
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+        }
+
     };
 
 
     /** _more_ */
-    private Cache pointCache = new Cache(10) {
-        protected void removeValue(Object key, Object value) {
+    private Pool<String,PointObsDataset> pointPool = new Pool<String,PointObsDataset>(10) {
+        protected void removeValue(String key, NetcdfFile value) {
             try {
-                ((NetcdfFile) value).close();
+                value.close();
             } catch (Exception exc) {}
         }
+
+        protected PointObsDataset createValue(String path) {
+            try {
+                getStorageManager().checkScour();
+                PointObsDataset dataset =   (PointObsDataset) TypedDatasetFactory.open(
+                                                                   FeatureType.POINT, path, null, new StringBuilder());
+                System.err.println("Create pointPool: " + path);
+                return dataset;
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+        }
+
+
     };
 
     /** _more_ */
-    private Cache trajectoryCache = new Cache(10) {
-        protected void removeValue(Object key, Object value) {
+    private Pool<String,TrajectoryObsDataset> trajectoryPool = new Pool<String,TrajectoryObsDataset>(10) {
+        protected void removeValue(String key, TrajectoryObsDataset value) {
             try {
-                ((NetcdfFile) value).close();
+                value.close();
             } catch (Exception exc) {}
         }
+
+        protected TrajectoryObsDataset createValue(String path) {
+            try {
+                getStorageManager().checkScour();
+                TrajectoryObsDataset dataset = (TrajectoryObsDataset) TypedDatasetFactory.open(
+                                                                        FeatureType.TRAJECTORY, path, null, new StringBuilder());
+
+                System.err.println("Create trajectoryPool: " + path);
+                return dataset;
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+        }
+
+
     };
-
-
-
-
 
 
 
@@ -290,10 +338,12 @@ public class DataOutputHandler extends OutputHandler {
      */
     public void clearCache() {
         super.clearCache();
-        ncFileCache.clear();
-        gridCache.clear();
-        pointCache.clear();
-        trajectoryCache.clear();
+        ncFilePool.clear();
+        gridPool.clear();
+        pointPool.clear();
+        trajectoryPool.clear();
+
+
         cdmEntries.clear();
         gridEntries.clear();
         pointEntries.clear();
@@ -516,12 +566,10 @@ public class DataOutputHandler extends OutputHandler {
                 ok = false;
             } else {
                 try {
-                    StringBuilder buf = new StringBuilder();
-                    if (getPointDataset(entry.getResource().getPath())
-                            != null) {
+                    if (pointPool.containsOrCreate(entry.getResource().getPath())) {
                         ok = true;
                     }
-                } catch (Exception ignoreThis) {}
+                } catch(Exception ignore) {}
             }
             pointEntries.put(entry.getId(), b = new Boolean(ok));
         }
@@ -553,8 +601,8 @@ public class DataOutputHandler extends OutputHandler {
             boolean ok = false;
             if (canLoadEntry(entry)) {
                 try {
-                    if (getTrajectoryDataset(entry.getResource().getPath())
-                            != null) {
+                    String path = entry.getResource().getPath();
+                    if (trajectoryPool.containsOrCreate(path)) {
                         ok = true;
                     }
                 } catch (Exception ignoreThis) {}
@@ -686,16 +734,19 @@ public class DataOutputHandler extends OutputHandler {
             if ( !canLoadEntry(entry)) {
                 ok = false;
             } else {
-                try {
-                    File file = entry.getFile();
-                    //TODO: What is the performance hit here? Is this the best way to find out if we can serve this file
-                    //Use openFile
-                    GridDataset gds = GridDataset.open(file.toString());
-                    //Look for the first grid
-                    if (gds.getGrids().iterator().hasNext()) {
-                        ok = true;
-                    }
-                } catch (Exception ignoreThis) {}
+                File file = entry.getFile();
+                if(gridPool.contains(file.toString())) {
+                    ok = true;
+                } else {
+                    try {
+                        GridDataset gds = GridDataset.open(file.toString());
+                        //Look for the first grid
+                        if (gds.getGrids().iterator().hasNext()) {
+                            ok = true;
+                            gridPool.put(file.toString(),gds);
+                        }
+                    } catch (Exception ignoreThis) {}
+                }
             }
             b = new Boolean(ok);
             gridEntries.put(entry.getId(), b);
@@ -750,15 +801,14 @@ public class DataOutputHandler extends OutputHandler {
                                     msg("Add full metadata")));
         }
         File file = entry.getFile();
-        NetcdfDataset dataset =
-            getNetcdfDataset(file);
+        NetcdfDataset dataset = ncFilePool.get(file.toString());
         if (dataset == null) {
             sb.append("Could not open dataset");
         } else {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ucar.nc2.NCdump.print(dataset, "", bos, null);
             sb.append("<pre>" + bos.toString() + "</pre>");
-            returnNetcdfDataset(file, dataset);
+            ncFilePool.put(file.toString(), dataset);
         }
         return makeLinksResult(request, "CDL", sb, new State(entry));
     }
@@ -774,104 +824,6 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputWcs(Request request, Entry entry) {
         return new Result("", new StringBuffer("TBD"));
     }
-
-    /**
-     * _more_
-     *
-     *
-     * @param path _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public PointObsDataset getPointDataset(String path) throws Exception {
-        PointObsDataset pds = (PointObsDataset) pointCache.get(path);
-        if (pds == null) {
-            pds = (PointObsDataset) TypedDatasetFactory.open(
-                FeatureType.POINT, path, null, new StringBuilder());
-            pointCache.put(path, pds);
-        }
-        return pds;
-    }
-
-
-    /**
-     * _more_
-     *
-     *
-     * @param path _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public GridDataset getGridDataset(String path) throws Exception {
-        GridDataset gds = (GridDataset) gridCache.get(path);
-        if (gds == null) {
-            getStorageManager().checkScour();
-            gridCache.put(path, gds = GridDataset.open(path));
-        }
-        return gds;
-    }
-
-
-
-
-    /**
-     * _more_
-     *
-     * @param file _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public NetcdfDataset getNetcdfDataset(File file) throws Exception {
-        String        path    = file.toString();
-        NetcdfDataset dataset;
-        dataset = (NetcdfDataset) ncFileCache.getAndRemove(path);
-        if (dataset == null) {
-            System.err.println ("making dataset:" + path);
-            dataset = NetcdfDataset.openDataset(path);
-            getStorageManager().checkScour();
-        }
-        return dataset;
-    }
-
-
-    public void returnNetcdfDataset(File file,NetcdfFile ncFile) throws Exception {
-        String        path    = file.toString();
-        System.err.println ("returning:" + path);
-        ncFileCache.put(path, ncFile);
-    }
-
-    /**
-     * _more_
-     *
-     * @param file _more_
-     *
-     * @param path _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public TrajectoryObsDataset getTrajectoryDataset(String path)
-            throws Exception {
-        TrajectoryObsDataset pds =
-            (TrajectoryObsDataset) trajectoryCache.get(path);
-        if (pds == null) {
-            pds = (TrajectoryObsDataset) TypedDatasetFactory.open(
-                FeatureType.TRAJECTORY, path, null, new StringBuilder());
-            if (pds == null) {
-                return null;
-            }
-            trajectoryCache.put(path, pds);
-        }
-        return pds;
-    }
-
 
 
 
@@ -937,7 +889,7 @@ public class DataOutputHandler extends OutputHandler {
                 File f =
                     getRepository().getStorageManager().getTmpFile(request,
                         "subset.nc");
-                GridDataset gds = getGridDataset(path);
+                GridDataset gds = gridPool.get(path);
                 synchronized (gds) {
                     writer.makeFile(f.toString(), gds, varNames, llr,
                                     ((dates[0] == null)
@@ -946,6 +898,7 @@ public class DataOutputHandler extends OutputHandler {
                                      dates[1])), includeLatLon, hStride,
                                          zStride, timeStride);
                 }
+                gridPool.put(path,gds);
 
                 if (request.get(ARG_ADDTOREPOSITORY, false)) {
                     if ( !canAdd) {
@@ -1029,8 +982,7 @@ public class DataOutputHandler extends OutputHandler {
         List<Date>   dates     = null;
 
 
-        GridDataset  dataset   =
-            getGridDataset(entry.getResource().getPath());
+        GridDataset  dataset   = gridPool.get(entry.getResource().getPath());
         StringBuffer varSB     = new StringBuffer();
         synchronized (dataset) {
             for (VariableSimpleIF var : dataset.getDataVariables()) {
@@ -1136,6 +1088,7 @@ public class DataOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.submit("Subset Grid"));
         sb.append(HtmlUtil.formClose());
+        gridPool.put(entry.getResource().getPath(),dataset);
         return makeLinksResult(request, msg("Grid Subset"), sb,
                                new State(entry));
     }
@@ -1178,7 +1131,7 @@ public class DataOutputHandler extends OutputHandler {
             throws Exception {
 
         String          mapVarName = "mapstraction" + HtmlUtil.blockCnt++;
-        PointObsDataset pod = getPointDataset(entry.getResource().getPath());
+        PointObsDataset pod = pointPool.get(entry.getResource().getPath());
         StringBuffer    sb         = new StringBuffer();
         synchronized (pod) {
             List         vars = pod.getDataVariables();
@@ -1417,8 +1370,7 @@ public class DataOutputHandler extends OutputHandler {
      */
     public Result outputTrajectoryMap(Request request, Entry entry)
             throws Exception {
-        TrajectoryObsDataset tod =
-            getTrajectoryDataset(entry.getResource().getPath());
+        TrajectoryObsDataset tod = trajectoryPool.get(entry.getResource().getPath());
         StringBuffer sb         = new StringBuffer();
         String       mapVarName = "mapstraction" + HtmlUtil.blockCnt++;
         synchronized (tod) {
@@ -1495,9 +1447,7 @@ public class DataOutputHandler extends OutputHandler {
     /*
     public Result outputTrajectoryChart(Request request, Entry entry)
             throws Exception {
-        TrajectoryObsDataset tod =
-            getTrajectoryDataset(entry.getResource().getPath());
-
+        TrajectoryObsDataset tod = trajectoryPool.get(entry.getResource().getPath());
         StringBuffer sb         = new StringBuffer();
         StringBuffer head = new StringBuffer();
         head.append("<script type='text/javascript' src='http://www.google.com/jsapi'></script>\n");
@@ -1581,7 +1531,7 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputPointCsv(Request request, Entry entry)
             throws Exception {
 
-        PointObsDataset pod = getPointDataset(entry.getResource().getPath());
+        PointObsDataset pod = pointPool.get(entry.getResource().getPath());
         StringBuffer    sb  = new StringBuffer();
         synchronized (pod) {
             List     vars         = pod.getDataVariables();
@@ -1658,7 +1608,7 @@ public class DataOutputHandler extends OutputHandler {
      */
     public Result outputPointKml(Request request, Entry entry)
             throws Exception {
-        PointObsDataset pod = getPointDataset(entry.getResource().getPath());
+        PointObsDataset pod = pointPool.get(entry.getResource().getPath());
         synchronized (pod) {
             Element  root         = KmlUtil.kml(entry.getName());
             Element  docNode      = KmlUtil.document(root, entry.getName());
@@ -1835,11 +1785,10 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
-        File file = new File(location);
-        NetcdfFile ncFile = getNetcdfDataset(file);
+        NetcdfDataset ncDataset =      ncFilePool.get(location);
 
         //Bridge the ramadda servlet to the opendap servlet
-        NcDODSServlet servlet = new NcDODSServlet(request, entry, ncFile) {
+        NcDODSServlet servlet = new NcDODSServlet(request, entry, ncDataset) {
             public ServletConfig getServletConfig() {
                 return request.getHttpServlet().getServletConfig();
             }
@@ -1865,9 +1814,8 @@ public class DataOutputHandler extends OutputHandler {
         //We have to pass back a result though we set needtowrite to false because the opendap servlet handles the writing
         Result result = new Result("");
         result.setNeedToWrite(false);
-
         
-        returnNetcdfDataset(file,ncFile);
+        ncFilePool.put(location,ncDataset);
 
         return result;
 
