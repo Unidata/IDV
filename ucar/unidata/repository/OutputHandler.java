@@ -1419,7 +1419,11 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             request.putExtraProperty(property, property);
 
             List<String> toks      = StringUtil.splitUpTo(property, " ", 2);
-            String       tag       = toks.get(0);
+            if(toks.size()==0) {
+                return "<b>Incorrect import specification:" + property
+                    + "</b>";
+            }
+            String       tag       = (toks.size()==0?"":toks.get(0));
             String       remainder = "";
             if (toks.size() > 1) {
                 remainder = toks.get(1);

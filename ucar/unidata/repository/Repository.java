@@ -2089,7 +2089,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 if (userAgent == null) {
                     userAgent = "Unknown";
                 }
-                logError("Error handling request:" + request + " ip:" + request.getIp(), exc);
+                logError("Error handling request:" + request + " ip:" + request.getIp(), inner);
             }
         }
 
