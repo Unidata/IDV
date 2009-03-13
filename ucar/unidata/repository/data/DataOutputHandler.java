@@ -206,7 +206,7 @@ public class DataOutputHandler extends OutputHandler {
     //Do we have to actually close it??
 
     /** _more_ */
-    private Cache ncFileCache = new Cache(10) {
+    private Cache ncFileCache = new Cache(100) {
         protected void removeValue(Object key, Object value) {
             try {
                 ((NetcdfFile) value).close();
@@ -749,14 +749,16 @@ public class DataOutputHandler extends OutputHandler {
             sb.append(HtmlUtil.href(request.getUrl(),
                                     msg("Add full metadata")));
         }
+        File file = entry.getFile();
         NetcdfDataset dataset =
-            getNetcdfDataset(entry.getFile());
+            getNetcdfDataset(file);
         if (dataset == null) {
             sb.append("Could not open dataset");
         } else {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ucar.nc2.NCdump.print(dataset, "", bos, null);
             sb.append("<pre>" + bos.toString() + "</pre>");
+            returnNetcdfDataset(file, dataset);
         }
         return makeLinksResult(request, "CDL", sb, new State(entry));
     }
@@ -815,6 +817,7 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
+
     /**
      * _more_
      *
@@ -826,13 +829,21 @@ public class DataOutputHandler extends OutputHandler {
      */
     public NetcdfDataset getNetcdfDataset(File file) throws Exception {
         String        path    = file.toString();
-        NetcdfDataset dataset = (NetcdfDataset) ncFileCache.get(path);
+        NetcdfDataset dataset;
+        dataset = (NetcdfDataset) ncFileCache.getAndRemove(path);
         if (dataset == null) {
+            System.err.println ("making dataset:" + path);
             dataset = NetcdfDataset.openDataset(path);
             getStorageManager().checkScour();
-            ncFileCache.put(path, dataset);
         }
         return dataset;
+    }
+
+
+    public void returnNetcdfDataset(File file,NetcdfFile ncFile) throws Exception {
+        String        path    = file.toString();
+        System.err.println ("returning:" + path);
+        ncFileCache.put(path, ncFile);
     }
 
     /**
@@ -1726,6 +1737,8 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputEntry(final Request request, Entry entry)
             throws Exception {
 
+
+
         if ( !getRepository().getAccessManager().canDoAction(request, entry,
                 Permission.ACTION_FILE)) {
             throw new AccessException("Cannot access data", request);
@@ -1763,13 +1776,20 @@ public class DataOutputHandler extends OutputHandler {
         }
 
         if (output.equals(OUTPUT_OPENDAP)) {
-            return outputOpendap(request, entry);
+            System.err.println(System.currentTimeMillis() +" [" +request.count +"]" +
+                               " data output.outputEntry start");
+            //            synchronized(mutex) {
+            Result result =  outputOpendap(request, entry);
+            System.err.println(System.currentTimeMillis() +" [" +request.count +"]" +
+                               " data output.outputEntry end");
+            return result;
+            //            }
         }
 
         throw new IllegalArgumentException("Unknown output type:" + output);
     }
 
-
+    Object mutex= new Object();
 
     /**
      * _more_
@@ -1783,8 +1803,43 @@ public class DataOutputHandler extends OutputHandler {
      */
     public Result outputOpendap(final Request request, final Entry entry)
             throws Exception {
+
+
+
+
+        String location = null;
+        try {
+            location = entry.getFile().toString();
+            List<Metadata> metadataList =
+                getMetadataManager().getMetadata(entry);
+            for (Metadata metadata : metadataList) {
+                if (metadata.getType().equals(
+                                              ContentMetadataHandler.TYPE_ATTACHMENT)) {
+                    if (metadata.getAttr1().endsWith(".ncml")) {
+                        String ncml = IOUtil.readContents(
+                                                          new File(metadata.getAttr1()));
+                        ncml = ncml.replace("${location}", location);
+                        File ncmlFile = getStorageManager().getTmpFile(
+                                                                       request,
+                                                                       "tmp.ncml");
+                        IOUtil.writeBytes(ncmlFile, ncml.getBytes());
+                        System.err.println("Doing ncml file");
+                        location = ncmlFile.toString();
+                        break;
+                    }
+                }
+            }
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
+        }
+
+
+
+        File file = new File(location);
+        NetcdfFile ncFile = getNetcdfDataset(file);
+
         //Bridge the ramadda servlet to the opendap servlet
-        NcDODSServlet servlet = new NcDODSServlet(request, entry) {
+        NcDODSServlet servlet = new NcDODSServlet(request, entry, ncFile) {
             public ServletConfig getServletConfig() {
                 return request.getHttpServlet().getServletConfig();
             }
@@ -1810,6 +1865,10 @@ public class DataOutputHandler extends OutputHandler {
         //We have to pass back a result though we set needtowrite to false because the opendap servlet handles the writing
         Result result = new Result("");
         result.setNeedToWrite(false);
+
+        
+        returnNetcdfDataset(file,ncFile);
+
         return result;
 
     }
@@ -1829,9 +1888,9 @@ public class DataOutputHandler extends OutputHandler {
         Request repositoryRequest;
 
         /** _more_ */
+        NetcdfFile ncFile;
+
         Entry entry;
-
-
 
         /**
          * _more_
@@ -1839,9 +1898,10 @@ public class DataOutputHandler extends OutputHandler {
          * @param request _more_
          * @param entry _more_
          */
-        public NcDODSServlet(Request request, Entry entry) {
+        public NcDODSServlet(Request request, Entry entry, NetcdfFile ncFile) {
             this.repositoryRequest = request;
-            this.entry             = entry;
+            this.entry              = entry;
+            this.ncFile             = ncFile;
         }
 
         /**
@@ -1860,34 +1920,7 @@ public class DataOutputHandler extends OutputHandler {
             HttpServletRequest request = preq.getRequest();
             String             reqPath = entry.getName();
 
-            String location = null;
             try {
-                location = entry.getFile().toString();
-                List<Metadata> metadataList =
-                    getMetadataManager().getMetadata(entry);
-                for (Metadata metadata : metadataList) {
-                    if (metadata.getType().equals(
-                            ContentMetadataHandler.TYPE_ATTACHMENT)) {
-                        if (metadata.getAttr1().endsWith(".ncml")) {
-                            String ncml = IOUtil.readContents(
-                                              new File(metadata.getAttr1()));
-                            ncml = ncml.replace("${location}", location);
-                            File ncmlFile = getStorageManager().getTmpFile(
-                                                repositoryRequest,
-                                                "tmp.ncml");
-                            IOUtil.writeBytes(ncmlFile, ncml.getBytes());
-                            System.err.println("Doing ncml file");
-                            location = ncmlFile.toString();
-                            break;
-                        }
-                    }
-                }
-            } catch (Exception exc) {
-                throw new RuntimeException(exc);
-            }
-
-            try {
-                NetcdfFile ncFile = getNetcdfDataset(new File(location));
                 GuardedDatasetImpl guardedDataset =
                     new GuardedDatasetImpl(reqPath, ncFile, true);
                 return guardedDataset;

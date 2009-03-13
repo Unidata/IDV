@@ -416,6 +416,8 @@ public class AccessManager extends RepositoryManager {
      */
     public boolean canAccessFile(Request request, Entry entry)
             throws Exception {
+        //Check if its a crawler
+        if(request!=null && request.isSpider()) return false;
         return canDoAction(request, entry, Permission.ACTION_FILE);
     }
 

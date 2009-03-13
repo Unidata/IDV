@@ -217,6 +217,10 @@ public class RssOutputHandler extends OutputHandler {
      */
     public Result outputEntries(Request request, List<Entry> entries)
             throws Exception {
+
+
+
+
         StringBuffer sb = new StringBuffer();
         sb.append(XmlUtil.XML_HEADER + "\n");
         sb.append(XmlUtil.openTag(TAG_RSS_RSS,
@@ -270,6 +274,10 @@ public class RssOutputHandler extends OutputHandler {
         sb.append(XmlUtil.closeTag(TAG_RSS_RSS));
         Result result = new Result("Query Results", sb,
                                    getMimeType(OUTPUT_RSS_SUMMARY));
+
+
+
+
         return result;
 
     }

@@ -83,6 +83,11 @@ import javax.servlet.http.*;
 public class Request implements Constants {
 
 
+    private static int COUNTER = 0;
+
+    public int  count = COUNTER++;
+
+
     /** _more_ */
     private Hashtable fileUploads;
 
@@ -1492,6 +1497,18 @@ public class Request implements Constants {
         return ip;
     }
 
+    public String getUserAgent() {
+        return getHeaderArg("User-Agent");
+    }
+
+    public boolean isSpider() {
+        String userAgent = getUserAgent();
+        if(userAgent==null) return false;
+        userAgent = userAgent.toLowerCase();
+        return  (userAgent.indexOf("googlebot") >= 0 ||
+                 userAgent.indexOf("slurp")>=0 ||
+                 userAgent.indexOf("msnbot")>=0);
+    }
 
 
 

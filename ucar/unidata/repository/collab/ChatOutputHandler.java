@@ -504,6 +504,7 @@ public class ChatOutputHandler extends OutputHandler {
             }
         } catch (Exception exc) {
             System.err.println("Error:" + exc);
+            System.err.println("Port:" + getChatPort());
             exc.printStackTrace();
         }
     }

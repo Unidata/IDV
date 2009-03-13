@@ -4857,7 +4857,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
             this.date      = new Date();
             this.ip        = request.getIp();
-            this.userAgent = request.getHeaderArg("User-Agent");
+            this.userAgent = request.getUserAgent();
         }
 
 
