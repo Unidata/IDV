@@ -31,10 +31,6 @@ import java.util.List;
 
 
 
-
-
-
-
 /**
  * Provides a hashtable cache of key value pairs and keeps the size below a given limit
  *
@@ -42,13 +38,13 @@ import java.util.List;
  *
  * @version $Revision: 1.271 $
  */
-public class Cache {
+public class Cache<KeyType,ValueType> {
 
     /** _more_          */
-    private Hashtable cache = new Hashtable();
+    private Hashtable<KeyType,ValueType> cache = new Hashtable<KeyType,ValueType>();
 
     /** _more_          */
-    private List keys = new ArrayList();
+    private List<KeyType> keys = new ArrayList<KeyType>();
 
     /** _more_          */
     private int cacheSize = 100;
@@ -70,12 +66,12 @@ public class Cache {
      *
      * @return _more_
      */
-    public synchronized Object get(Object key) {
+    public synchronized ValueType get(KeyType key) {
         return cache.get(key);
     }
 
 
-    public synchronized Object getAndRemove(Object key) {
+    public synchronized ValueType getAndRemove(KeyType key) {
         return cache.remove(key);
     }
 
@@ -86,14 +82,14 @@ public class Cache {
      * @param key _more_
      * @param value _more_
      */
-    public synchronized void put(Object key, Object value) {
+    public synchronized void put(KeyType key, ValueType value) {
         //TESTING:
         //        if(true) return;
         keys.remove(key);
         keys.add(key);
         while (keys.size() > cacheSize) {
-            Object keyToRemove   = keys.get(0);
-            Object valueToRemove = cache.get(keyToRemove);
+            KeyType keyToRemove   = keys.get(0);
+            ValueType valueToRemove = cache.get(keyToRemove);
             removeValue(keyToRemove, valueToRemove);
             keys.remove(0);
             cache.remove(keyToRemove);
@@ -106,13 +102,13 @@ public class Cache {
      * _more_
      */
     public synchronized void clear() {
-        for(Object key: keys) {
-            Object value = cache.get(key);            
+        for(KeyType key: keys) {
+            ValueType value = cache.get(key);            
             removeValue(key,value);
         }
 
-        cache = new Hashtable();
-        keys  = new ArrayList();
+        cache = new Hashtable<KeyType,ValueType>();
+        keys  = new ArrayList<KeyType>();
     }
 
 
@@ -122,7 +118,7 @@ public class Cache {
      * @param key _more_
      * @param object _more_
      */
-    protected void removeValue(Object key, Object object) {}
+    protected void removeValue(KeyType key, ValueType object) {}
 
 }
 
