@@ -75,6 +75,11 @@ public class Cache {
     }
 
 
+    public synchronized Object getAndRemove(Object key) {
+        return cache.remove(key);
+    }
+
+
     /**
      * _more_
      *
@@ -101,6 +106,11 @@ public class Cache {
      * _more_
      */
     public synchronized void clear() {
+        for(Object key: keys) {
+            Object value = cache.get(key);            
+            removeValue(key,value);
+        }
+
         cache = new Hashtable();
         keys  = new ArrayList();
     }

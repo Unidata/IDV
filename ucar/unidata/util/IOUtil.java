@@ -247,7 +247,7 @@ public class IOUtil {
     }
 
     public static void scour(File dir, int maxCnt, double hours) {
-        System.err.println ("Checking " + dir + " hours:" + hours);
+        //        System.err.println ("Checking " + dir + " hours:" + hours);
         maxCnt = 0;
         File[]files = sortFilesOnAge(dir.listFiles(),
                                      false);
@@ -262,10 +262,10 @@ public class IOUtil {
                     double ageHours  = DateUtil.millisToHours(now-lastModified);
                     if(ageHours>hours) {
                         //files[i].delete();
-                        System.err.println("delete:" + files[i].getName() + " hours old:" + ageHours);
+                        //                        System.err.println("delete:" + files[i].getName() + " hours old:" + ageHours);
                         deleteCnt--;
                     } else {
-                        System.err.println("no delete:" + files[i].getName() + " hours old:" + ageHours);
+                        //                        System.err.println("no delete:" + files[i].getName() + " hours old:" + ageHours);
                     }
                 }
             }
