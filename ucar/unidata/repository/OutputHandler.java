@@ -859,6 +859,13 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         };
 
         sb.append(HtmlUtil.span(msgLabel("Sort"),HtmlUtil.cssClass("sortlinkoff")));
+        String entryIds = request.getString(ARG_ENTRYIDS,(String)null);
+        //Swap out the long value
+        if(entryIds!=null) {
+            String extraId = getRepository().getGUID();
+            request.put(ARG_ENTRYIDS,getRepository().putSessionExtra(entryIds));
+        }
+
         for (int i = 0; i < order.length; i += 4) {
             if (Misc.equals(order[i], oldOrderBy)
                     && Misc.equals(order[i + 1], oldAscending)) {
@@ -872,7 +879,12 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 sb.append(HtmlUtil.span(HtmlUtil.href(url, order[i + 2]),
                                         HtmlUtil.title(order[i + 3])
                                         + HtmlUtil.cssClass("sortlinkoff")));
+                sb.append(HtmlUtil.formClose());
             }
+        }
+
+        if(entryIds!=null) {
+            request.put(ARG_ENTRYIDS,entryIds);
         }
 
         request.remove(ARG_SHOWENTRYSELECTFORM);

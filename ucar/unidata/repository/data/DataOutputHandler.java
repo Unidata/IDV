@@ -409,9 +409,9 @@ public class DataOutputHandler extends OutputHandler {
 
         Object oldOutput = request.getOutput();
         request.put(ARG_OUTPUT, OUTPUT_OPENDAP);
-        String opendapUrl = request.getRequestPath() + "/"
-                            + request.getPathEmbeddedArgs()
-                            + "/dodsC/entry.das";
+        String opendapUrl = getRepository().URL_ENTRY_SHOW + "/"
+            + request.getPathEmbeddedArgs()
+            + "/dodsC/entry.das";
         links.add(new Link(opendapUrl, getRepository().iconUrl(ICON_OPENDAP),
                            "OpenDAP", OUTPUT_OPENDAP));
         request.put(ARG_OUTPUT, oldOutput);
@@ -572,7 +572,7 @@ public class DataOutputHandler extends OutputHandler {
                 ok = false;
             } else {
                 try {
-                    ok = pointPool.containsOrCreate(entry.getResource().getPath());
+                    ok = pointPool.containsOrCreate(getPath(entry));
                 } catch(Exception ignore) {}
             }
             pointEntries.put(entry.getId(), b = new Boolean(ok));
@@ -605,7 +605,7 @@ public class DataOutputHandler extends OutputHandler {
             boolean ok = false;
             if (canLoadEntry(entry)) {
                 try {
-                    ok = trajectoryPool.containsOrCreate(entry.getResource().getPath());
+                    ok = trajectoryPool.containsOrCreate(getPath(entry));
                 } catch (Exception ignoreThis) {}
             }
             trajectoryEntries.put(entry.getId(), b = new Boolean(ok));
@@ -736,7 +736,7 @@ public class DataOutputHandler extends OutputHandler {
                 ok = false;
             } else {
                 try {
-                    ok = gridPool.containsOrCreate(entry.getResource().getPath());
+                    ok = gridPool.containsOrCreate(getPath(entry));
                 } catch (Exception ignoreThis) {}
             }
             b = new Boolean(ok);
@@ -791,15 +791,15 @@ public class DataOutputHandler extends OutputHandler {
             sb.append(HtmlUtil.href(request.getUrl(),
                                     msg("Add full metadata")));
         }
-        File file = entry.getFile();
-        NetcdfDataset dataset = ncFilePool.get(file.toString());
+        String path = getPath(entry);
+        NetcdfDataset dataset = ncFilePool.get(path);
         if (dataset == null) {
             sb.append("Could not open dataset");
         } else {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ucar.nc2.NCdump.print(dataset, "", bos, null);
             sb.append("<pre>" + bos.toString() + "</pre>");
-            ncFilePool.put(file.toString(), dataset);
+            ncFilePool.put(path,dataset);
         }
         return makeLinksResult(request, "CDL", sb, new State(entry));
     }
@@ -835,7 +835,7 @@ public class DataOutputHandler extends OutputHandler {
             getRepository().getAccessManager().canDoAction(request,
                 entry.getParentGroup(), Permission.ACTION_NEW);
 
-        String       path   = entry.getResource().getPath();
+        String       path   = getPath(entry);
         StringBuffer sb     = new StringBuffer();
         String       prefix = ARG_VARIABLE + ".";
         OutputType   output = request.getOutput();
@@ -1116,7 +1116,7 @@ public class DataOutputHandler extends OutputHandler {
         throws Exception {
 
         String          mapVarName = "mapstraction" + HtmlUtil.blockCnt++;
-        String path = entry.getResource().getPath();
+        String path = getPath(entry);
         PointObsDataset pod = pointPool.get(path);
         StringBuffer    sb         = new StringBuffer();
         List         vars = pod.getDataVariables();
@@ -1346,7 +1346,7 @@ public class DataOutputHandler extends OutputHandler {
      */
     public Result outputTrajectoryMap(Request request, Entry entry)
         throws Exception {
-        String path = entry.getResource().getPath();
+        String path = getPath(entry);
         TrajectoryObsDataset tod = trajectoryPool.get(path);
         StringBuffer sb         = new StringBuffer();
         String       mapVarName = "mapstraction" + HtmlUtil.blockCnt++;
@@ -1508,7 +1508,7 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputPointCsv(Request request, Entry entry)
             throws Exception {
 
-        String path = entry.getResource().getPath();
+        String path = getPath(entry);
         PointObsDataset pod = pointPool.get(path);
         StringBuffer    sb  = new StringBuffer();
             List     vars         = pod.getDataVariables();
@@ -1585,7 +1585,7 @@ public class DataOutputHandler extends OutputHandler {
      */
     public Result outputPointKml(Request request, Entry entry)
             throws Exception {
-        String path = entry.getResource().getPath();
+        String path = getPath(entry);
         PointObsDataset pod = pointPool.get(path);
             Element  root         = KmlUtil.kml(entry.getName());
             Element  docNode      = KmlUtil.document(root, entry.getName());
@@ -1713,6 +1713,33 @@ public class DataOutputHandler extends OutputHandler {
 
     Object mutex= new Object();
 
+
+    private String getPath(Entry entry) throws Exception {
+        String location = entry.getFile().toString();
+        List<Metadata> metadataList =
+            getMetadataManager().findMetadata( entry, ContentMetadataHandler.TYPE_ATTACHMENT,
+                                               true);
+        if(metadataList==null) return location;
+        for (Metadata metadata : metadataList) {
+            if (metadata.getAttr1().endsWith(".ncml")) {
+                File templateNcmlFile =  new File(
+                                                  IOUtil.joinDir(
+                                                                 getRepository().getStorageManager().getEntryDir(
+                                                                                                                 metadata.getEntryId(), false), metadata.getAttr1()));
+                String ncml = IOUtil.readContents(templateNcmlFile);
+                ncml = ncml.replace("${location}", location);
+                File ncmlFile =  new File(IOUtil.joinDir(getStorageManager().getScratchDir(),
+                                                         entry.getId()+"_" + metadata.getId() +".ncml"));
+                IOUtil.writeBytes(ncmlFile, ncml.getBytes());
+                location = ncmlFile.toString();
+                break;
+            }
+        }
+        return location;
+    }
+
+
+
     /**
      * _more_
      *
@@ -1726,37 +1753,7 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputOpendap(final Request request, final Entry entry)
             throws Exception {
 
-
-
-
-        String location = null;
-        try {
-            location = entry.getFile().toString();
-            List<Metadata> metadataList =
-                getMetadataManager().getMetadata(entry);
-            for (Metadata metadata : metadataList) {
-                if (metadata.getType().equals(
-                                              ContentMetadataHandler.TYPE_ATTACHMENT)) {
-                    if (metadata.getAttr1().endsWith(".ncml")) {
-                        String ncml = IOUtil.readContents(
-                                                          new File(metadata.getAttr1()));
-                        ncml = ncml.replace("${location}", location);
-                        File ncmlFile = getStorageManager().getTmpFile(
-                                                                       request,
-                                                                       "tmp.ncml");
-                        IOUtil.writeBytes(ncmlFile, ncml.getBytes());
-                        System.err.println("Doing ncml file");
-                        location = ncmlFile.toString();
-                        break;
-                    }
-                }
-            }
-        } catch (Exception exc) {
-            throw new RuntimeException(exc);
-        }
-
-
-
+        String location =getPath(entry);
         NetcdfDataset ncDataset =      ncFilePool.get(location);
 
         //Bridge the ramadda servlet to the opendap servlet

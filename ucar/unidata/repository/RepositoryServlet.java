@@ -443,7 +443,7 @@ public class RepositoryServlet extends HttpServlet {
                 new File(
                     IOUtil.joinDir(
                         repository.getStorageManager().getUploadDir(),
-                        repository.getGUID() + "_" + fileName));
+                        repository.getGUID() + StorageManager.FILE_SEPARATOR + fileName));
             try {
                 item.write(uploadedFile);
             } catch (Exception e) {

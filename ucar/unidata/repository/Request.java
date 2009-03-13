@@ -1118,7 +1118,12 @@ public class Request implements Constants {
             }
             return (String) l.get(0);
         }
-        return result.toString();
+        String s =  result.toString();
+        if(s.startsWith("${")) {
+            String extra = (String)repository.getSessionExtra(s);
+            if(extra!=null) s=extra;
+        }
+        return s;
     }
 
     /**

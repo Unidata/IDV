@@ -34,6 +34,7 @@ import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
+import ucar.unidata.util.Cache;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
@@ -394,8 +395,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     private int requestCount = 0;
 
-
-
+    private Cache<Object,Object> sessionExtra = new Cache<Object,Object>(5000);
 
 
     /**
@@ -416,6 +416,23 @@ public class Repository extends RepositoryBase implements RequestHandler {
         setHostname(localMachine.getHostName());
         this.inTomcat = inTomcat;
         this.args     = args;
+    }
+
+
+    public String putSessionExtra(Object value) {
+        String id = "${" + getGUID()+"}";
+        putSessionExtra(id,value);
+        return id;
+    }
+
+
+    public void putSessionExtra(Object key, Object value) {
+        sessionExtra.put(key,value);
+    }
+
+
+    public Object getSessionExtra(Object key) {
+        return sessionExtra.get(key);
     }
 
 
