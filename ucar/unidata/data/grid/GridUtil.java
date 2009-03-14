@@ -36,6 +36,7 @@ import ucar.nc2.NetcdfFileWriteable;
 import ucar.nc2.Variable;
 
 import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.iosp.mcidas.McIDASAreaProjection;
 
 import ucar.unidata.data.DataUtil;
 
@@ -63,6 +64,9 @@ import visad.*;
 
 import visad.bom.Radar2DCoordinateSystem;
 import visad.bom.Radar3DCoordinateSystem;
+
+import visad.data.mcidas.AREACoordinateSystem
+;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
@@ -1278,38 +1282,39 @@ public class GridUtil {
      *
      * @throws VisADException  On badness
      */
-    public static FieldImpl timeStepDifference(FieldImpl grid,int offset)
-        throws VisADException {
+    public static FieldImpl timeStepDifference(FieldImpl grid, int offset)
+            throws VisADException {
         try {
             if ( !isTimeSequence(grid)) {
                 return grid;
             }
-            List<float[][]> arrays = new ArrayList<float[][]>();
-            FieldImpl newGrid = (FieldImpl) grid.clone();
-            float[][] values       = null;
-            float[][] priorValues       = null;
-            Set       timeDomain   = newGrid.getDomainSet();
-            int       numTimeSteps = timeDomain.getLength();
+            List<float[][]> arrays       = new ArrayList<float[][]>();
+            FieldImpl       newGrid      = (FieldImpl) grid.clone();
+            float[][]       values       = null;
+            float[][]       priorValues  = null;
+            Set             timeDomain   = newGrid.getDomainSet();
+            int             numTimeSteps = timeDomain.getLength();
             for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength();
-                 timeStepIdx++) {
+                    timeStepIdx++) {
                 FieldImpl sample = (FieldImpl) newGrid.getSample(timeStepIdx);
                 float[][] timeStepValues = sample.getFloats(true);
                 arrays.add(Misc.cloneArray(timeStepValues));
             }
-            for (int timeStepIdx = arrays.size()-1; timeStepIdx>=0;
-                 timeStepIdx--) {
+            for (int timeStepIdx = arrays.size() - 1; timeStepIdx >= 0;
+                    timeStepIdx--) {
                 float[][] value = arrays.get(timeStepIdx);
                 System.err.println("A:" + value);
-                if(timeStepIdx+offset>=0 && timeStepIdx+offset< arrays.size()) {
-                    float[][] oldValue = arrays.get(timeStepIdx+offset);
-                    value = Misc.subtractArray(value,oldValue,value);
+                if ((timeStepIdx + offset >= 0)
+                        && (timeStepIdx + offset < arrays.size())) {
+                    float[][] oldValue = arrays.get(timeStepIdx + offset);
+                    value = Misc.subtractArray(value, oldValue, value);
                     System.err.println("subtracting");
                 } else {
                     System.err.println("filling");
                     Misc.fillArray(value, Float.NaN);
                 }
                 FlatField sample = (FlatField) newGrid.getSample(timeStepIdx);
-                sample.setSamples(value,false);
+                sample.setSamples(value, false);
                 //                newGrid.setSample(timeStepIdx,sample);
             }
             return newGrid;
@@ -1391,11 +1396,11 @@ public class GridUtil {
                 newGrid.setSamples(grid.getFloats(false), true);
                 return newGrid;
             }
-            final boolean   doMax        = function.equals(FUNC_MAX);
-            final boolean   doMin        = function.equals(FUNC_MIN);
-            float[][] values       = null;
-            final Set       timeDomain   = grid.getDomainSet();
-            int       numTimeSteps = timeDomain.getLength();
+            final boolean doMax        = function.equals(FUNC_MAX);
+            final boolean doMin        = function.equals(FUNC_MIN);
+            float[][]     values       = null;
+            final Set     timeDomain   = grid.getDomainSet();
+            int           numTimeSteps = timeDomain.getLength();
             for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength();
                     timeStepIdx++) {
                 FieldImpl sample = (FieldImpl) grid.getSample(timeStepIdx);
@@ -1443,95 +1448,154 @@ public class GridUtil {
     }
 
 
+    /**
+     * Class Grid2D _more_
+     *
+     *
+     * @author IDV Development Team
+     */
     public static class Grid2D {
-        float[][]lats;
-        float[][]lons;
-        float[][][]values;
-        public Grid2D(float[][]lats,
-                      float[][]lons,
-                      float[][][]values) {
-            this.lats = lats;
-            this.lons = lons;
+
+        /** _more_          */
+        float[][] lats;
+
+        /** _more_          */
+        float[][] lons;
+
+        /** _more_          */
+        float[][][] values;
+
+        /**
+         * _more_
+         *
+         * @param lats _more_
+         * @param lons _more_
+         * @param values _more_
+         */
+        public Grid2D(float[][] lats, float[][] lons, float[][][] values) {
+            this.lats   = lats;
+            this.lons   = lons;
             this.values = values;
         }
 
-        public float [][] getlons(){
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public float[][] getlons() {
             return lons;
         }
-        public float [][] getlats(){
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public float[][] getlats() {
             return lats;
         }
-        public float [][][] getvalues(){
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public float[][][] getvalues() {
             return values;
         }
-    };
+    }
 
+    ;
+
+    /**
+     * _more_
+     *
+     * @param grid _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public static Grid2D makeGrid2D(FieldImpl grid)
-        throws VisADException,RemoteException {
-        SampledSet domain    = getSpatialDomain(grid);
-        if(!(domain instanceof GriddedSet)) {
-            throw new IllegalArgumentException("Spatial domain is not a griddedset:" + domain.getClass().getName());
+            throws VisADException, RemoteException {
+        SampledSet domain = getSpatialDomain(grid);
+        if ( !(domain instanceof GriddedSet)) {
+            throw new IllegalArgumentException(
+                "Spatial domain is not a griddedset:"
+                + domain.getClass().getName());
         }
         GriddedSet griddedSet = (GriddedSet) domain;
-        int []lengths = griddedSet.getLengths();
-        if(lengths.length!=2) {
-            throw new IllegalArgumentException("Spatial domain is not 2D:" + lengths.length);
+        int[]      lengths    = griddedSet.getLengths();
+        if (lengths.length != 2) {
+            throw new IllegalArgumentException("Spatial domain is not 2D:"
+                    + lengths.length);
         }
         int latIndex = isLatLonOrder(domain)
-            ? 0
-            : 1;
+                       ? 0
+                       : 1;
         int lonIndex = isLatLonOrder(domain)
-            ? 1
-            : 0;
-        int xCnt = lengths[0];
-        int yCnt = lengths[1];
-        System.err.println("X =" + xCnt +" Y=" + yCnt);
-        float[][] latLons  = getEarthLocationPoints(griddedSet);
-        float[]lats = latLons[latIndex];
-        float[]lons = latLons[lonIndex];
-        float[][] values = grid.getFloats(false);
-        float[][]lat2D = new float[xCnt][yCnt];
-        float[][]lon2D = new float[xCnt][yCnt];
-        int rangeCnt = values.length;
-        float[][][]value2D = new float[rangeCnt][xCnt][yCnt];
+                       ? 1
+                       : 0;
+        int xCnt     = lengths[0];
+        int yCnt     = lengths[1];
+        System.err.println("X =" + xCnt + " Y=" + yCnt);
+        float[][]   latLons  = getEarthLocationPoints(griddedSet);
+        float[]     lats     = latLons[latIndex];
+        float[]     lons     = latLons[lonIndex];
+        float[][]   values   = grid.getFloats(false);
+        float[][]   lat2D    = new float[xCnt][yCnt];
+        float[][]   lon2D    = new float[xCnt][yCnt];
+        int         rangeCnt = values.length;
+        float[][][] value2D  = new float[rangeCnt][xCnt][yCnt];
 
-        for(int i=0;i<lats.length;i++) {
+        for (int i = 0; i < lats.length; i++) {
             //We need to map the linear idx into the 2d space
             //Do we know how to do this
-            int xIdx  = i%xCnt;
-            int yIdx  = i/xCnt;
+            int xIdx = i % xCnt;
+            int yIdx = i / xCnt;
             lat2D[xIdx][yIdx] = lats[i];
             lon2D[xIdx][yIdx] = lons[i];
-            for(int rangeIdx=0;rangeIdx<rangeCnt;rangeIdx++) {
+            for (int rangeIdx = 0; rangeIdx < rangeCnt; rangeIdx++) {
                 value2D[rangeIdx][xIdx][yIdx] = values[rangeIdx][i];
             }
         }
 
-        for(int yIdx=0;yIdx<yCnt;yIdx++) {
-            for(int xIdx=0;xIdx<xCnt;xIdx++) {
-                System.err.print(" " + lat2D[xIdx][yIdx]+"/"+lon2D[xIdx][yIdx]);
+        for (int yIdx = 0; yIdx < yCnt; yIdx++) {
+            for (int xIdx = 0; xIdx < xCnt; xIdx++) {
+                System.err.print(" " + lat2D[xIdx][yIdx] + "/"
+                                 + lon2D[xIdx][yIdx]);
             }
             System.err.println("");
         }
-        return new Grid2D(lat2D,lon2D,value2D);
+        return new Grid2D(lat2D, lon2D, value2D);
 
     }
 
 
+    /**
+     * _more_
+     *
+     * @param grid _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public static void testIt(FieldImpl grid)
-        throws VisADException,RemoteException {
+            throws VisADException, RemoteException {
         if ( !isTimeSequence(grid)) {
             Grid2D grid2D = makeGrid2D(grid);
             return;
         }
         float[][] values       = null;
-        final Set       timeDomain   = grid.getDomainSet();
+        final Set timeDomain   = grid.getDomainSet();
         int       numTimeSteps = timeDomain.getLength();
         for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength();
-             timeStepIdx++) {
+                timeStepIdx++) {
             FieldImpl timeStep = (FieldImpl) grid.getSample(timeStepIdx);
-            if(timeStepIdx==0) {
-                Grid2D grid2D =    makeGrid2D(timeStep);
+            if (timeStepIdx == 0) {
+                Grid2D grid2D = makeGrid2D(timeStep);
             }
         }
     }
@@ -3367,17 +3431,29 @@ public class GridUtil {
                                          int samplingMode, int errorMode)
             throws VisADException {
         long t1 = System.currentTimeMillis();
-        FieldImpl result = resampleGridInner(grid, subDomain, samplingMode, errorMode);
+        FieldImpl result = resampleGridInner(grid, subDomain, samplingMode,
+                                             errorMode);
         long t2 = System.currentTimeMillis();
-        System.err.println("Time:" + (t2-t1));
+        System.err.println("Time:" + (t2 - t1));
         return result;
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param grid _more_
+     * @param subDomain _more_
+     * @param samplingMode _more_
+     * @param errorMode _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
     private static FieldImpl resampleGridInner(FieldImpl grid,
-                                         SampledSet subDomain,
-                                         int samplingMode, int errorMode)
+            SampledSet subDomain, int samplingMode, int errorMode)
             throws VisADException {
 
         Trace.call1("GridUtil.resampleGrid");
@@ -4681,8 +4757,11 @@ public class GridUtil {
         for (int i = 0; i < rTypes.length; i++) {
             RealType rt = rTypes[i];
             Variable v  = new Variable(ncfile, null, null, getVarName(rt));
-            v.addAttribute(new Attribute("units",
-                                         rt.getDefaultUnit().toString()));
+            Unit     u  = rt.getDefaultUnit();
+            if (u != null) {
+                v.addAttribute(new Attribute("units",
+                                             rt.getDefaultUnit().toString()));
+            }
             if (projVar != null) {
                 v.addAttribute(new Attribute("grid_mapping",
                                              projVar.getName()));
@@ -4778,6 +4857,7 @@ public class GridUtil {
     private static HashMap<Variable, Array> addSpatialVars(NetcdfFile ncfile,
             SampledSet domainSet, List<Dimension> dims)
             throws VisADException, RemoteException {
+
         HashMap<Variable, Array> varToArray = new HashMap<Variable, Array>();
         int                      dim        = domainSet.getDimension();
         int                      mdim       =
@@ -4808,64 +4888,85 @@ public class GridUtil {
         for (int x = 0; x < sizeX; x++) {
             xVals[x] = spatialVals[0][x];
         }
-        if (cs == null) {  // straight lat/lon
-        } else {
-            RealType[] types =
-                ((SetType) domainSet.getType()).getDomain()
-                    .getRealComponents();
-            String    varName = getVarName(types[0]);
-            Dimension xDim    = new Dimension(varName, sizeX, true);
-            ncfile.addDimension(null, xDim);
-            Variable xVar = makeCoordinateVariable(ncfile, varName, units[0],
-                                "x coordinate of projection",
-                                "projection_x_coordinate", varName);
-            Array varArray = Array.factory(DataType.FLOAT,
-                                           new int[] { sizeX }, xVals);
-            varToArray.put(xVar, varArray);
+        RealType[] types =
+            ((SetType) domainSet.getType()).getDomain().getRealComponents();
+        String    xName = getVarName(types[0]);
+        Dimension xDim  = new Dimension(xName, sizeX, true);
+        ncfile.addDimension(null, xDim);
 
-            varName = getVarName(types[1]);
-            Dimension yDim = new Dimension(varName, sizeY, true);
-            ncfile.addDimension(null, yDim);
-            Variable yVar = makeCoordinateVariable(ncfile, varName, units[1],
-                                "y coordinate of projection",
-                                "projection_y_coordinate", varName);
-            varArray = Array.factory(DataType.FLOAT, new int[] { sizeY },
-                                     yVals);
-            varToArray.put(yVar, varArray);
-            Variable zVar = null;
-            if (dim == 3) {
-                varName = getVarName(types[2]);
-                Dimension zDim = new Dimension(varName, sizeZ, true);
-                ncfile.addDimension(null, zDim);
-                dims.add(zDim);
-                zVar = new Variable(ncfile, null, null, varName,
-                                    DataType.FLOAT, varName);
-                zVar.addAttribute(new Attribute("units",
-                        units[2].toString()));
-                String upOrDown = "up";
-                if (Unit.canConvert(units[2], CommonUnits.MILLIBAR)) {
-                    upOrDown = "down";
-                }
-                zVar.addAttribute(new Attribute("positive", upOrDown));
-                varArray = Array.factory(DataType.FLOAT, new int[] { sizeZ },
-                                         zVals);
-                varToArray.put(zVar, varArray);
-                ncfile.addVariable(null, zVar);
-            }
-            dims.add(yDim);
-            dims.add(xDim);
+        String    yName = getVarName(types[1]);
+        Dimension yDim  = new Dimension(yName, sizeY, true);
+        ncfile.addDimension(null, yDim);
+        String zName = null;
+        if (dim == 3) {
+            zName = getVarName(types[2]);
+            Dimension zDim = new Dimension(zName, sizeZ, true);
+            ncfile.addDimension(null, zDim);
+            dims.add(zDim);
+        }
+        dims.add(yDim);
+        dims.add(xDim);
+        Variable      xVar = null;
+        Variable      yVar = null;
+        MapProjection mp   = getNavigation(domainSet);
+        //if (cs == null) {  // straight lat/lon(/alt)
+        if (mp instanceof TrivialMapProjection) {  // straight lat/lon(/alt)
+            xVar = makeCoordinateVariable(ncfile, xName, units[0],
+                                          "longitude coordinate",
+                                          "longitude", xName);
+            yVar = makeCoordinateVariable(ncfile, yName, units[1],
+                                          "latitude coordinate", "latitude",
+                                          yName);
+        } else {
+            xVar = makeCoordinateVariable(ncfile, xName, units[0],
+                                          "x coordinate of projection",
+                                          "projection_x_coordinate", xName);
+
+            yVar = makeCoordinateVariable(ncfile, yName, units[1],
+                                          "y coordinate of projection",
+                                          "projection_y_coordinate", yName);
+
             // make variable for the projection
-            MapProjection mp      = getNavigation(domainSet);
-            Variable      projVar = makeProjectionVar(ncfile, mp);
+            //MapProjection mp      = getNavigation(domainSet);
+            Variable projVar = makeProjectionVar(ncfile, mp);
             if (projVar != null) {
                 char[] data = new char[] { 'd' };
                 Array dataArray = Array.factory(DataType.CHAR, new int[0],
                                       data);
                 varToArray.put(projVar, dataArray);
             }
-
         }
+        Array varArray;
+        if (dim == 3) {
+            Variable zVar = new Variable(ncfile, null, null, zName,
+                                         DataType.FLOAT, zName);
+            Unit zUnit = units[2];
+            if (zUnit != null) {
+                zVar.addAttribute(new Attribute("units",
+                        units[2].toString()));
+            }
+            String upOrDown = "up";
+            if (Unit.canConvert(units[2], CommonUnits.MILLIBAR)) {
+                upOrDown = "down";
+            }
+            zVar.addAttribute(new Attribute("positive", upOrDown));
+            if (cs == null) {
+                zVar.addAttribute(new Attribute("long_name",
+                        "altitude (MSL"));
+                zVar.addAttribute(new Attribute("standard_name", "altitude"));
+            }
+            varArray = Array.factory(DataType.FLOAT, new int[] { sizeZ },
+                                     zVals);
+            varToArray.put(zVar, varArray);
+            ncfile.addVariable(null, zVar);
+        }
+        varArray = Array.factory(DataType.FLOAT, new int[] { sizeX }, xVals);
+        varToArray.put(xVar, varArray);
+        varArray = Array.factory(DataType.FLOAT, new int[] { sizeY }, yVals);
+        varToArray.put(yVar, varArray);
+
         return varToArray;
+
 
     }
 
@@ -4888,7 +4989,9 @@ public class GridUtil {
         v.setDataType(DataType.FLOAT);
         v.setDimensions(dimName);
 
-        v.addAttribute(new Attribute("units", unit.toString()));
+        if (unit != null) {
+            v.addAttribute(new Attribute("units", unit.toString()));
+        }
         v.addAttribute(new Attribute("long_name", desc));
         v.addAttribute(new Attribute("standard_name", standard_name));
         ncfile.addVariable(null, v);
@@ -4908,9 +5011,18 @@ public class GridUtil {
             MapProjection mp) {
         List<Attribute> attributes = new ArrayList<Attribute>();
         Variable        projVar    = null;
-        if (mp instanceof ProjectionCoordinateSystem) {
-            ProjectionImpl proj =
-                ((ProjectionCoordinateSystem) mp).getProjection();
+        if ((mp instanceof ProjectionCoordinateSystem)
+                || (mp instanceof AREACoordinateSystem)) {
+            ProjectionImpl proj = null;
+            if (mp instanceof AREACoordinateSystem) {
+                AREACoordinateSystem acs = (AREACoordinateSystem) mp;
+                int[]                dir = acs.getDirBlock();
+                int[]                nav = acs.getNavBlock();
+                int[]                aux = acs.getAuxBlock();
+                proj = new McIDASAreaProjection(dir, nav, aux);
+            } else {
+                proj = ((ProjectionCoordinateSystem) mp).getProjection();
+            }
             List<Parameter> params    = proj.getProjectionParameters();
             String          grid_name = "not_yet_supported";
             if (proj instanceof LambertConformal) {
@@ -4921,6 +5033,8 @@ public class GridUtil {
                 grid_name = "polar_stereographic";
             } else if (proj instanceof VerticalPerspectiveView) {
                 grid_name = "vertical_perspective";
+            } else if (proj instanceof McIDASAreaProjection) {
+                grid_name = McIDASAreaProjection.GRID_MAPPING_NAME;
             }
             attributes.add(new Attribute(ProjectionImpl.ATTR_NAME,
                                          grid_name));
@@ -4949,6 +5063,12 @@ public class GridUtil {
                 projVar.addAttribute(att);
             }
             ncfile.addVariable(null, projVar);
+        } else if (mp instanceof AREACoordinateSystem) {
+            AREACoordinateSystem acs = (AREACoordinateSystem) mp;
+            int[]                dir = acs.getDirBlock();
+            int[]                nav = acs.getNavBlock();
+            int[]                aux = acs.getAuxBlock();
+
         }
         return projVar;
     }
