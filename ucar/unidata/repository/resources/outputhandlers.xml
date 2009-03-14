@@ -1,33 +1,33 @@
 <outputhandlers>
-  <outputhandler class="ucar.unidata.repository.HtmlOutputHandler" name="Default HTML"/>
-  <outputhandler class="ucar.unidata.repository.MapOutputHandler" name="Map"/>
-  <outputhandler class="ucar.unidata.repository.CalendarOutputHandler" name="Calendar"/>
-  <outputhandler class="ucar.unidata.repository.ImageOutputHandler" name="Image"/>
+  <outputhandler class="ucar.unidata.repository.output.HtmlOutputHandler" name="Default HTML"/>
+  <outputhandler class="ucar.unidata.repository.output.MapOutputHandler" name="Map"/>
+  <outputhandler class="ucar.unidata.repository.output.CalendarOutputHandler" name="Calendar"/>
+  <outputhandler class="ucar.unidata.repository.output.ImageOutputHandler" name="Image"/>
 <!--
-  <outputhandler class="ucar.unidata.repository.SoseOutputHandler" name="Sose"/>
+  <outputhandler class="ucar.unidata.repository.output.SoseOutputHandler" name="Sose"/>
 -->
 
 
   <outputhandler class="ucar.unidata.repository.data.CatalogOutputHandler" name="THREDDS Catalog"/>
   <outputhandler class="ucar.unidata.repository.data.DataOutputHandler" name="Data" required="false"/>
-  <outputhandler class="ucar.unidata.repository.RssOutputHandler" name="RSS"/>
-  <outputhandler class="ucar.unidata.repository.XmlOutputHandler" name="XML"/>
+  <outputhandler class="ucar.unidata.repository.output.RssOutputHandler" name="RSS"/>
+  <outputhandler class="ucar.unidata.repository.output.XmlOutputHandler" name="XML"/>
 
 <!--
-  <outputhandler class="ucar.unidata.repository.CsvOutputHandler" name="CSV"/>
+  <outputhandler class="ucar.unidata.repository.output.CsvOutputHandler" name="CSV"/>
 -->
-  <outputhandler class="ucar.unidata.repository.ZipOutputHandler" name="ZIP Files"/>
-  <outputhandler class="ucar.unidata.repository.WgetOutputHandler" name="WGET script"/>
+  <outputhandler class="ucar.unidata.repository.output.ZipOutputHandler" name="ZIP Files"/>
+  <outputhandler class="ucar.unidata.repository.output.WgetOutputHandler" name="WGET script"/>
   <outputhandler class="ucar.unidata.repository.data.LdmOutputHandler" name="LDM Insert"/>
-  <outputhandler class="ucar.unidata.repository.GraphOutputHandler" name="Graph"/>
-  <outputhandler class="ucar.unidata.repository.TextOutputHandler" name="Text"/>
+  <outputhandler class="ucar.unidata.repository.output.GraphOutputHandler" name="Graph"/>
+  <outputhandler class="ucar.unidata.repository.output.TextOutputHandler" name="Text"/>
   <outputhandler class="ucar.unidata.repository.collab.WikiPageOutputHandler" name="Wiki"/>
   <outputhandler class="ucar.unidata.repository.collab.ChatOutputHandler" name="Chat Room"/>
   <outputhandler class="ucar.unidata.repository.idv.IdvOutputHandler"  required="false" name="IDV Preview"/>
   <outputhandler class="ucar.unidata.repository.idv.IdvWebstartOutputHandler"  name="IDV Webstart"/>
 
 <!--
-  <outputhandler class="ucar.unidata.repository.ExampleOutputHandler"  name="Example"/>
+  <outputhandler class="ucar.unidata.repository.output.ExampleOutputHandler"  name="Example"/>
 -->
 
 </outputhandlers>

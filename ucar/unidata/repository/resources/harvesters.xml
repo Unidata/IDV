@@ -3,7 +3,7 @@
 
   <harvester    name="Test Generator"
                 active="false"
-		class="ucar.unidata.repository.TestGenerator"
+		class="ucar.unidata.repository.harvester.TestGenerator"
                 monitor="false"
 		sleep="3"/>
 
@@ -13,7 +13,7 @@
 		grouptemplate = "${dirgroup}"
                 tagtemplate="${extension}"
                 active="false"
-		class="ucar.unidata.repository.PatternHarvester"
+		class="ucar.unidata.repository.harvester.PatternHarvester"
                 xrootdir="c:/cygwin/home/jeffmc/unidata/src/idv/trunk/ucar"
 		rootdir="/home/jeffmc/ucar"
 		basegroup="Files/Source"
@@ -27,7 +27,7 @@
 		grouptemplate = "${dirgroup}"
                 tagtemplate="${extension}"
                 active="false"
-                class="ucar.unidata.repository.PatternHarvester"
+                class="ucar.unidata.repository.harvester.PatternHarvester"
 		xrootdir="c:/cygwin/home/jeffmc/pictures"
 		rootdir="/home/jeffmc/pictures"
 		basegroup="Files/Images"
@@ -39,7 +39,7 @@
 
   <harvester    name="IDD/NIDS"
                 active="false"
-                class="ucar.unidata.repository.PatternHarvester"
+                class="ucar.unidata.repository.harvester.PatternHarvester"
 		xxrootdir="c:/cygwin/home/jeffmc/unidata/data/repository/NIDS"
 		rootdir="/data/ldm/gempak/nexrad/NIDS/FTG/N0R"
 		basegroup="IDD/NIDS"
@@ -54,7 +54,7 @@
 
    <harvester   name="IDD/Craft"
                 active="false"
-                class="ucar.unidata.repository.PatternHarvester"
+                class="ucar.unidata.repository.harvester.PatternHarvester"
 		rootdir="/data/ldm/gempak/nexrad/craft"
 		basegroup="IDD/Craft"
 		filepattern="(station:[^/]+)/[^/]+_(fromdate:\d\d\d\d\d\d\d\d_\d\d\d\d)"
@@ -72,7 +72,7 @@
 
    <harvester   name="IDD/Gempak Grids"
                 active="false"
-                class="ucar.unidata.repository.PatternHarvester"
+                class="ucar.unidata.repository.harvester.PatternHarvester"
 		rootdir="/data/ldm/gempak/model"
 		basegroup="IDD/Gempak Model Grids"
 		filepattern="/(modelgroup:[^/]+)/(fromdate:\d\d\d\d\d\d\d\d\d\d).*_(modelrun:.*)\.gem"
@@ -88,7 +88,7 @@
 
    <harvester   name="IDD/Satellite"
                 active="false"
-                class="ucar.unidata.repository.PatternHarvester"
+                class="ucar.unidata.repository.harvester.PatternHarvester"
 		rootdir="/data/ldm/gempak/images/sat"
 		basegroup="IDD/Satellite"
 		filepattern="(platform:[^/]+)/(resolution:[^/]+)/(product:[^/]+)/[^/]+(fromdate:\d\d\d\d\d\d\d\d_\d\d\d\d)"
