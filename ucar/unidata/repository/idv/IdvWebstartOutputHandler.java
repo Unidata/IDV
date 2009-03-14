@@ -22,7 +22,7 @@
 package ucar.unidata.repository.idv;
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.data.*;
-
+import ucar.unidata.repository.output.*;
 
 import org.w3c.dom.*;
 
@@ -111,7 +111,7 @@ public class IdvWebstartOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getEntryLinks(Request request, State state,
+    public void getEntryLinks(Request request, State state,
                                  List<Link> links)
             throws Exception {
             if(state.entry==null) return;
