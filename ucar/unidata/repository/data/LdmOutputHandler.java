@@ -21,7 +21,7 @@
 
 package ucar.unidata.repository.data;
 
-
+import ucar.unidata.repository.output.*;
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
@@ -116,7 +116,7 @@ public class LdmOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getEntryLinks(Request request, State state,
+    public void getEntryLinks(Request request, State state,
                                  List<Link> links)
             throws Exception {
 

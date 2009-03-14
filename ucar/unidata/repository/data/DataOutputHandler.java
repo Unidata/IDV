@@ -21,6 +21,11 @@
 
 package ucar.unidata.repository.data;
 
+import ucar.unidata.repository.output.*;
+
+import ucar.unidata.util.HtmlUtil;
+
+
 
 import opendap.dap.DAP2Exception;
 
@@ -367,7 +372,7 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getEntryLinks(Request request, State state,
+    public void getEntryLinks(Request request, State state,
                                  List<Link> links)
             throws Exception {
 

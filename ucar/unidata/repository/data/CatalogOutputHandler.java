@@ -20,7 +20,7 @@
  */
 
 package ucar.unidata.repository.data;
-
+import ucar.unidata.repository.output.*;
 
 import org.w3c.dom.*;
 
@@ -307,7 +307,7 @@ public class CatalogOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getEntryLinks(Request request, State state,
+    public void getEntryLinks(Request request, State state,
                                  List<Link> links)
             throws Exception {
         if (state.getEntry() != null) {
