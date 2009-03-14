@@ -19,7 +19,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.output;
+import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
@@ -150,7 +151,7 @@ public class RssOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getEntryLinks(Request request, State state,
+    public void getEntryLinks(Request request, State state,
                                  List<Link> links)
             throws Exception {
 

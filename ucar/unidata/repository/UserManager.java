@@ -22,7 +22,7 @@
 
 package ucar.unidata.repository;
 
-
+import ucar.unidata.repository.output.*;
 import ucar.unidata.sql.Clause;
 
 
@@ -2252,7 +2252,7 @@ public class UserManager extends RepositoryManager {
     protected void initOutputHandlers() throws Exception {
         OutputHandler outputHandler = new OutputHandler(getRepository(),
                                           "Cart") {
-            protected void getEntryLinks(Request request, State state,
+            public void getEntryLinks(Request request, State state,
                                          List<Link> links)
                     throws Exception {
                 if (state.getEntry() != null) {

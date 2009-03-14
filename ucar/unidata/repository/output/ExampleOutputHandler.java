@@ -19,7 +19,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.output;
+import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
@@ -104,7 +105,7 @@ public class ExampleOutputHandler extends OutputHandler {
      *
      * @throws Exception On badness
      */
-    protected void getEntryLinks(Request request, State state,
+    public void getEntryLinks(Request request, State state,
                                  List<Link> links)
             throws Exception {
         //We'll add example1 when we are viewing a group and example2 when viewing a single entry

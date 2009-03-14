@@ -21,7 +21,7 @@
  */
 
 package ucar.unidata.repository;
-
+import ucar.unidata.repository.output.*;
 
 import org.w3c.dom.*;
 
@@ -643,7 +643,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void getEntryLinks(Request request, Entry entry,
+    public void getEntryLinks(Request request, Entry entry,
                                  List<Link> links)
             throws Exception {
 
@@ -1108,7 +1108,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected Statement select(Request request, String what, Clause clause,
+    public Statement select(Request request, String what, Clause clause,
                                String extra)
             throws Exception {
         List<Clause> clauses = new ArrayList<Clause>();
@@ -1129,7 +1129,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected Statement select(Request request, String what,
+    public Statement select(Request request, String what,
                                List<Clause> clauses, String extra)
             throws Exception {
         clauses = new ArrayList<Clause>(clauses);

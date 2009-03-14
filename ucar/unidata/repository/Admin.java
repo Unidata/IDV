@@ -22,7 +22,8 @@
 
 package ucar.unidata.repository;
 
-
+import ucar.unidata.repository.output.*;
+import ucar.unidata.repository.harvester.*;
 import org.w3c.dom.*;
 
 import ucar.unidata.sql.Clause;
@@ -781,7 +782,7 @@ public class Admin extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected Result makeResult(Request request, String title,
+    public Result makeResult(Request request, String title,
                                 StringBuffer sb)
             throws Exception {
         return getRepository().makeResult(request, title, sb, adminUrls);

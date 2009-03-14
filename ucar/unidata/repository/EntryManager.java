@@ -24,8 +24,9 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.repository.output.*;
 import ucar.unidata.repository.data.*;
-
+import ucar.unidata.repository.harvester.*;
 
 
 import ucar.unidata.sql.Clause;
@@ -2742,7 +2743,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected List<Comment> getComments(Request request, Entry entry)
+    public List<Comment> getComments(Request request, Entry entry)
             throws Exception {
         if (entry.getComments() != null) {
             return entry.getComments();
@@ -2973,7 +2974,7 @@ return new Result(title, sb);
      *
      * @return _more_
      */
-    protected String getEntryLink(Request request, Entry entry) {
+    public String getEntryLink(Request request, Entry entry) {
         return getEntryLink(request, entry, new ArrayList());
     }
 
@@ -2986,7 +2987,7 @@ return new Result(title, sb);
      *
      * @return _more_
      */
-    protected String getEntryLink(Request request, Entry entry, List args) {
+    public String getEntryLink(Request request, Entry entry, List args) {
         return HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
                 entry, args), entry.getLabel());
     }
@@ -3006,7 +3007,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected EntryLink getAjaxLink(Request request, Entry entry,
+    public EntryLink getAjaxLink(Request request, Entry entry,
                                     String linkText)
             throws Exception {
         return getAjaxLink(request, entry, linkText, null);
@@ -3024,7 +3025,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected EntryLink getAjaxLink(Request request, Entry entry,
+    public EntryLink getAjaxLink(Request request, Entry entry,
                                     String linkText, String url)
             throws Exception {
         return getAjaxLink(request, entry, linkText, url, true);
@@ -3044,7 +3045,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected EntryLink getAjaxLink(Request request, Entry entry,
+    public EntryLink getAjaxLink(Request request, Entry entry,
                                     String linkText, String url,
                                     boolean forTreeNavigation)
             throws Exception {
@@ -3241,7 +3242,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected List<Link> getEntryLinks(Request request, Entry entry)
+    public List<Link> getEntryLinks(Request request, Entry entry)
             throws Exception {
         List<Link>          links = new ArrayList<Link>();
         OutputHandler.State state = new OutputHandler.State(entry);
@@ -3270,7 +3271,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected String getEntryActionsTable(Request request, Entry entry,
+    public String getEntryActionsTable(Request request, Entry entry,
                                           int typeMask)
             throws Exception {
         List<Link>   links  = getEntryLinks(request, entry);

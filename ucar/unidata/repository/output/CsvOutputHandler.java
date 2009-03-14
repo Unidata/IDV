@@ -19,7 +19,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.output;
+import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
@@ -114,7 +115,7 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getEntryLinks(Request request, State state,
+    public void getEntryLinks(Request request, State state,
                                  List<Link> links)
             throws Exception {
         if (state.entry != null) {
@@ -158,7 +159,7 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected Result listTypes(Request request,
+    public Result listTypes(Request request,
                                List<TypeHandler> typeHandlers)
             throws Exception {
         StringBuffer sb = new StringBuffer();
@@ -197,7 +198,7 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected Result listAssociations(Request request) throws Exception {
+    public Result listAsociations(Request request) throws Exception {
 
         StringBuffer  sb          = new StringBuffer();
         TypeHandler   typeHandler = repository.getTypeHandler(request);

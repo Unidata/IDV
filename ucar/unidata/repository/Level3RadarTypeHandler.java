@@ -82,7 +82,7 @@ public class Level3RadarTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    protected void getEntryLinks(Request request, Entry entry,
+    public void getEntryLinks(Request request, Entry entry,
                                  List<Link> links)
             throws Exception {
         super.getEntryLinks(request, entry, links);

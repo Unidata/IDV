@@ -19,10 +19,11 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.output;
+import ucar.unidata.repository.*;
 
 
-import org.w3c.dom.*;
+import org.w3c.dom.Element;
 
 
 import ucar.unidata.repository.collab.*;
@@ -162,7 +163,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @param type _more_
      */
-    protected void addType(OutputType type) {
+    public void addType(OutputType type) {
         type.setGroupName(name);
         types.add(type);
     }
@@ -459,7 +460,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    protected Result makeLinksResult(Request request, String title,
+    public Result makeLinksResult(Request request, String title,
                                      StringBuffer sb, State state)
             throws Exception {
         Result result = new Result(title, sb);
@@ -476,7 +477,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    protected void addLinks(Request request, Result result, State state)
+    public void addLinks(Request request, Result result, State state)
             throws Exception {
         state.forWhat = State.FOR_HEADER;
         if (state.getEntry().getDescription().indexOf("<nolinks>") >= 0) {
@@ -500,7 +501,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    protected void getEntryLinks(Request request, State state,
+    public void getEntryLinks(Request request, State state,
                                  List<Link> links)
             throws Exception {}
 
@@ -517,7 +518,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    protected Link makeLink(Request request, Entry entry,
+    public Link makeLink(Request request, Entry entry,
                             OutputType outputType)
             throws Exception {
         return makeLink(request, entry, outputType, "");
@@ -535,7 +536,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    protected Link makeLink(Request request, Entry entry,
+    public Link makeLink(Request request, Entry entry,
                             OutputType outputType, String suffix)
             throws Exception {
         String url;
@@ -567,7 +568,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    protected void addOutputLink(Request request, Entry entry,
+    public void addOutputLink(Request request, Entry entry,
                                  List<Link> links, OutputType type)
             throws Exception {
         links.add(new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW,
@@ -702,7 +703,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    protected String getSelectLink(Request request, Entry entry,
+    public String getSelectLink(Request request, Entry entry,
                                    String target)
             throws Exception {
         String       linkText = entry.getLabel();
@@ -1294,7 +1295,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    protected Result listTypes(Request request,
+    public Result listTypes(Request request,
                                List<TypeHandler> typeHandlers)
             throws Exception {
         return notImplemented("listTypes");
@@ -1328,7 +1329,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    protected Result listAssociations(Request request) throws Exception {
+    public Result listAssociations(Request request) throws Exception {
         return notImplemented("listAssociations");
     }
 
@@ -2150,7 +2151,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * @param wikiUtil _more_
      * @param toEntry _more_
      */
-    protected void addWikiLink(WikiUtil wikiUtil, Entry toEntry) {
+    public void addWikiLink(WikiUtil wikiUtil, Entry toEntry) {
         Hashtable links = (Hashtable) wikiUtil.getProperty("wikilinks");
         if (links == null) {
             wikiUtil.putProperty("wikilinks", links = new Hashtable());

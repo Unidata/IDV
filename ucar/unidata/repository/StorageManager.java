@@ -124,9 +124,6 @@ public class StorageManager extends RepositoryManager {
 
 
     /** _more_ */
-    private List<String> downloadPrefixes = new ArrayList<String>();
-
-    /** _more_ */
     private String repositoryDir;
 
     /** _more_ */
@@ -156,6 +153,10 @@ public class StorageManager extends RepositoryManager {
 
     /** _more_ */
     private String thumbDir;
+
+    /** _more_ */
+    private List<String> downloadPrefixes = new ArrayList<String>();
+
 
 
     /**
@@ -222,7 +223,6 @@ public class StorageManager extends RepositoryManager {
         getUploadDir();
     }
 
-
     /**
      * _more_
      *
@@ -233,6 +233,7 @@ public class StorageManager extends RepositoryManager {
         sb.append(HtmlUtil.formEntry("Storage Directory:", getStorageDir()));
     }
 
+
     /**
      * _more_
      *
@@ -242,7 +243,6 @@ public class StorageManager extends RepositoryManager {
         prefix = prefix.replace("\\", "/");
         downloadPrefixes.add(prefix);
     }
-
 
 
 

@@ -19,8 +19,7 @@
  */
 
 package ucar.unidata.repository;
-
-
+import ucar.unidata.repository.output.OutputType;
 import org.w3c.dom.*;
 
 import ucar.unidata.sql.Clause;

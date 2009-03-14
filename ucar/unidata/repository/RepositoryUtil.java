@@ -135,7 +135,7 @@ public class RepositoryUtil {
      *
      * @return _more_
      */
-    protected static String header(String h) {
+    public static String header(String h) {
         return "<div class=\"pageheading\">" + h + "</div>";
     }
 

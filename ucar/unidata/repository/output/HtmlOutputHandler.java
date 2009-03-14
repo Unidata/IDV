@@ -19,7 +19,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.output;
+import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
@@ -145,7 +146,7 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected void getEntryLinks(Request request, State state,
+    public void getEntryLinks(Request request, State state,
                                  List<Link> links)
             throws Exception {
         List<Entry> entries = state.getAllEntries();
@@ -295,7 +296,7 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    protected String getEntryLink(Request request, Entry entry) {
+    public String getEntryLink(Request request, Entry entry) {
         return getEntryManager().getEntryLink(request, entry);
     }
 
@@ -313,7 +314,7 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected Result listTypes(Request request,
+    public Result listTypes(Request request,
                                List<TypeHandler> typeHandlers)
             throws Exception {
         StringBuffer sb     = new StringBuffer();
@@ -353,7 +354,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
     /*
-    protected Result listTags(Request request, List<Tag> tags)
+      public Result listTags(Request request, List<Tag> tags)
             throws Exception {
         StringBuffer sb     = new StringBuffer();
         OutputType      output = request.getOutput();
@@ -457,7 +458,7 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected Result listAssociations(Request request) throws Exception {
+    public Result listAssociations(Request request) throws Exception {
 
         StringBuffer sb     = new StringBuffer();
         OutputType   output = request.getOutput();
@@ -1075,7 +1076,7 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    protected String getTimelineApplet(Request request, List<Entry> entries)
+    public String getTimelineApplet(Request request, List<Entry> entries)
             throws Exception {
         String timelineAppletTemplate =
             getRepository().getResource(PROP_HTML_TIMELINEAPPLET);

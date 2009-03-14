@@ -25,7 +25,7 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.data.*;
-
+import ucar.unidata.repository.output.*;
 
 
 import ucar.unidata.sql.Clause;
@@ -249,7 +249,7 @@ public class AssociationManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected String processAssociationXml(Request request, Element node,
+    public String processAssociationXml(Request request, Element node,
                                            Hashtable entries, Hashtable files)
             throws Exception {
 
@@ -409,7 +409,7 @@ public class AssociationManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected String getAssociationLinks(Request request, String association)
+    public String getAssociationLinks(Request request, String association)
             throws Exception {
         if (true) {
             return BLANK;
@@ -492,7 +492,7 @@ public class AssociationManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected List<Association> getAssociations(Request request,
+    public List<Association> getAssociations(Request request,
             Clause clause)
             throws Exception {
         int max = request.get(ARG_MAX, DB_MAX_ROWS);

@@ -24,7 +24,9 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.repository.output.*;
 import ucar.unidata.repository.data.*;
+import ucar.unidata.repository.harvester.*;
 import ucar.unidata.repository.monitor.*;
 
 
@@ -1350,7 +1352,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected List<String> getResourcePaths(String propertyName) {
+    public List<String> getResourcePaths(String propertyName) {
         List<String> tmp = StringUtil.split(getProperty(propertyName, BLANK),
                                             ";", true, true);
         List<String> paths = new ArrayList<String>();
@@ -1518,7 +1520,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected boolean isAppletEnabled(Request request) {
+    public boolean isAppletEnabled(Request request) {
         if ( !getProperty(PROP_SHOW_APPLET, true)) {
             return false;
         }
@@ -1854,7 +1856,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                        || output.equals(OUTPUT_METADATA_SHORT)
                        || output.equals(OUTPUT_METADATA_FULL);
             }
-            protected void getEntryLinks(Request request, State state,
+                public void getEntryLinks(Request request, State state,
                                          List<Link> links)
                     throws Exception {
                 if ( !state.isDummyGroup()) {
@@ -1937,7 +1939,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             public boolean canHandleOutput(OutputType output) {
                 return output.equals(OUTPUT_COPY);
             }
-            protected void getEntryLinks(Request request, State state,
+            public void getEntryLinks(Request request, State state,
                                          List<Link> links)
                     throws Exception {
                 if ((request.getUser() == null)
@@ -4509,7 +4511,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected String getFieldDescription(String fieldValue, String namesFile,
+    public String getFieldDescription(String fieldValue, String namesFile,
                                          String dflt)
             throws Exception {
         if (namesFile == null) {
@@ -4533,7 +4535,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected String encode(String s) throws Exception {
+    public String encode(String s) throws Exception {
         return java.net.URLEncoder.encode(s, "UTF-8");
     }
 
@@ -4547,7 +4549,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    protected String getTagLinks(Request request, String tag)
+    public String getTagLinks(Request request, String tag)
             throws Exception {
         return BLANK;
 
