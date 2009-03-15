@@ -270,3 +270,8 @@ def writeGridToXls(grid,filename='grid.xls'):
     """Write out the grid data to an excel spreadsheet"""
     GridUtil.writeGridToXls(grid,filename)
     return grid
+
+def exportGridToNetcdf(grid,filename='grid.nc'):
+    """Write out the grid data to CF compliant netCDF file"""
+    GridUtil.exportGridToNetcdf(grid,filename)
+    return grid
