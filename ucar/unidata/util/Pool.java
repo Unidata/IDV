@@ -27,6 +27,7 @@ package ucar.unidata.util;
 
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -167,7 +168,8 @@ public class Pool<KeyType, ValueType> {
      * Clear the cache
      */
     public synchronized void clear() {
-        for (KeyType key : keys) {
+        for(Enumeration<KeyType> keys= cache.keys();keys.hasMoreElements(); ) {
+            KeyType key = keys.nextElement();
             for (ValueType value : cache.get(key)) {
                 removeValue(key, value);
             }
