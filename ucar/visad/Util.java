@@ -2538,7 +2538,7 @@ public final class Util {
      * @throws Throwable On badness
      */
     public static EarthLocation makeEarthLocation(double lat, double lon)
-            throws Throwable {
+            throws Exception {
         return new EarthLocationTuple(new Real(RealType.Latitude, lat),
                                       new Real(RealType.Longitude, lon),
                                       new Real(RealType.Altitude, 0.0));
@@ -2555,7 +2555,7 @@ public final class Util {
      * @throws Throwable On badness
      */
     public static EarthLocation makeEarthLocation(LatLonPoint llp)
-            throws Throwable {
+            throws Exception {
         return ucar.visad.Util.makeEarthLocation(
             llp.getLatitude().getValue(), llp.getLongitude().getValue());
     }
