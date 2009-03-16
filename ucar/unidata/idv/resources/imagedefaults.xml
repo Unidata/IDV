@@ -1017,9 +1017,15 @@ Note: we can use place="default", etc., to use the default
      mag="1 1"
      unit="ECHO"/>
   <default
+     pattern="CREF"
+     key="LINELE"
+     loc="230 230"
+     mag="1 1"
+     unit="ECHO"/>
+  <default
      pattern="BREF248"
      key="LINELE"
-     loc="460 460"
+     loc="230 230"
      mag="1 1"
      unit="ECHO"/>
   <default
