@@ -162,13 +162,15 @@ public class IOUtil {
     private static class FileWrapper implements Comparable {
 
         /** file to wrap */
-        File f;
+        File file;
 
         /** last modified time */
         long modified;
 
         /** flag for youngest first sorting */
         boolean youngestFirst;
+
+        long size=-1;
 
         /**
          * Create a FileWrapper for the file with the appropriate sorting
@@ -177,10 +179,46 @@ public class IOUtil {
          * @param youngestFirst flag for sorting
          */
         public FileWrapper(File f, boolean youngestFirst) {
-            this.f             = f;
+            this.file             = f;
             this.youngestFirst = youngestFirst;
-            modified           = f.lastModified();
+            modified           = file.lastModified();
         }
+
+        public long lastModified() {
+            return modified;
+        }
+
+        public boolean isDirectory() {
+            return file.isDirectory();
+        }
+
+
+        public boolean delete() {
+            return file.delete();
+        }
+
+        public long length() {
+            if(size<0) size = file.length();
+            return size;
+        }
+
+
+        public static FileWrapper[] toArray(File [] files, boolean youngestFirst) {
+            FileWrapper[] fw = new FileWrapper[files.length];
+            for (int i = 0; i < fw.length; i++) {
+                fw[i] = new FileWrapper(files[i], youngestFirst);
+            }
+            return fw;
+        }
+
+        public static FileWrapper[] toArray(List<File> files, boolean youngestFirst) {
+            FileWrapper[] fw = new FileWrapper[files.size()];
+            for (int i = 0; i < fw.length; i++) {
+                fw[i] = new FileWrapper(files.get(i), youngestFirst);
+            }
+            return fw;
+        }
+
 
         /**
          * Compare the object
@@ -202,7 +240,7 @@ public class IOUtil {
                         : -1);
             }
             //Sort on name
-            return that.f.compareTo(this.f);
+            return that.file.compareTo(this.file);
             //            return 0;
 
         }
@@ -241,37 +279,84 @@ public class IOUtil {
         }
         Arrays.sort(fw);
         for (int i = 0; i < fw.length; i++) {
-            files[i] = fw[i].f;
+            files[i] = fw[i].file;
         }
         return files;
     }
 
-    public static void scour(File dir, int maxCnt, double hours) {
-        //        System.err.println ("Checking " + dir + " hours:" + hours);
-        maxCnt = 0;
-        File[]files = sortFilesOnAge(dir.listFiles(),
-                                     false);
-        long now = new Date().getTime();
-        int deleteCnt = 0;
-        for(int i=0;i<files.length;i++) {
-            if(files[i].isDirectory()) {
-                scour(files[i], maxCnt, hours);
-            } else {
-                if(files.length-deleteCnt>maxCnt) {
-                    long lastModified = files[i].lastModified();
-                    double ageHours  = DateUtil.millisToHours(now-lastModified);
-                    if(ageHours>hours) {
-                        //files[i].delete();
-                        //                        System.err.println("delete:" + files[i].getName() + " hours old:" + ageHours);
-                        deleteCnt--;
-                    } else {
-                        //                        System.err.println("no delete:" + files[i].getName() + " hours old:" + ageHours);
-                    }
-                }
+
+    public static FileWrapper[] sortFilesOnAge(FileWrapper[] files) {
+        Arrays.sort(files);
+        return files;
+    }
+
+
+    /**
+     * This deletes the files in the given list.
+     * It will return  a list of those files where file.delete was not successful
+     *
+     * @param files The files to delete
+     * @return List of unsuccessfully deleted files
+     */
+    public static List<File> deleteFiles(List<File> files) {
+        List<File> notDeleted = new ArrayList<File>();
+        for(File f: files) {
+            if(!f.delete()) {
+                notDeleted.add(f);
             }
         }
+        return notDeleted;
+    }
 
+    /**
+     * This finds and returns a list files to scour
+     *
+     */
+    public static List<File> findFilesToScour(File dir, double hours, long maxBytes) {
 
+        List<File> results = new ArrayList<File>();
+
+        long t1 = System.currentTimeMillis();
+        List<File> allFiles = getFiles(dir, true);
+        long t2 = System.currentTimeMillis();
+
+        long t3 = System.currentTimeMillis();
+        FileWrapper[] files = sortFilesOnAge(FileWrapper.toArray(allFiles,false));
+        long t4 = System.currentTimeMillis();
+
+        long now = new Date().getTime();
+
+        long totalSize= 0;
+        long t5 = System.currentTimeMillis();
+        for(int i=0;i<files.length;i++) {
+            totalSize+=files[i].length();
+        }
+        long t6 = System.currentTimeMillis();
+
+        System.err.println ("Scouring  found " + files.length +" in " + (t2-t1) +"ms   sort time:"+(t4-t3) +" size:" + (int)(totalSize/1000.0) +"KB  " + (t6-t5));
+
+        long t7 = System.currentTimeMillis();
+        for(int i=0;i<files.length;i++) {
+            if(files[i].isDirectory()) {
+                continue;
+            } 
+            if(totalSize<=maxBytes) {
+                break;
+            }
+            long lastModified = files[i].lastModified();
+            long fileSize = files[i].length();
+            if(hours>0) {
+                double ageHours  = DateUtil.millisToHours(now-lastModified);
+                if(ageHours<=hours) {
+                    continue;
+                }
+            }
+            results.add(files[i].file);
+            totalSize-= files[i].length();
+        }
+        long t8 = System.currentTimeMillis();
+        System.err.println ("Scour loop time:" + (t8-t7) +" found " + results.size() + " files to delete");
+        return results;
     }
 
 
@@ -1635,7 +1720,7 @@ public class IOUtil {
      *
      * @return List of files
      */
-    public static List getFiles(File dir, boolean recurse) {
+    public static List<File> getFiles(File dir, boolean recurse) {
         return getFiles(new ArrayList(), dir, recurse);
 
     }
@@ -1652,7 +1737,7 @@ public class IOUtil {
      *
      * @return List of files
      */
-    public static List getFiles(List files, File dir, boolean recurse) {
+    public static List<File> getFiles(List files, File dir, boolean recurse) {
         return getFiles(files, dir, recurse, null);
     }
 
@@ -1669,13 +1754,13 @@ public class IOUtil {
      *
      * @return List of files
      */
-    public static List getFiles(List files, File dir, boolean recurse,
+    public static List<File> getFiles(List files, File dir, boolean recurse,
                                 PatternFileFilter filter) {
         if (files == null) {
             files = new ArrayList();
         }
         List dirs = getDirectories(dir, recurse);
-        //        System.err.println ("dirs:" + dirs);
+        dirs.add(0, dir);
         for (int dirIdx = 0; dirIdx < dirs.size(); dirIdx++) {
             File   directory = (File) dirs.get(dirIdx);
             File[] allFiles  = ((filter == null)
@@ -1687,7 +1772,7 @@ public class IOUtil {
                 }
             }
         }
-        return files;
+        return (List<File>)files;
     }
 
 
@@ -1781,7 +1866,7 @@ public class IOUtil {
      *
      * @return List of subdirs (File)
      */
-    public static List getDirectories(File dir, boolean recurse) {
+    public static List<File> getDirectories(File dir, boolean recurse) {
         return getDirectories(Misc.newList(dir), recurse);
     }
 
@@ -1796,7 +1881,7 @@ public class IOUtil {
      *
      * @return List of subdirs (File)
      */
-    public static List getDirectories(List dirs, boolean recurse) {
+    public static List<File> getDirectories(List dirs, boolean recurse) {
         List results = new ArrayList();
         File dir;
         for (int i = 0; i < dirs.size(); i++) {
@@ -1823,7 +1908,7 @@ public class IOUtil {
                 }
             }
         }
-        return results;
+        return (List<File>)results;
     }
 
 
@@ -1964,6 +2049,9 @@ public class IOUtil {
         /** file date */
         long dttm;
 
+
+
+
         /**
          * ctor
          *
@@ -1973,6 +2061,7 @@ public class IOUtil {
             this.f = f;
             dttm   = f.lastModified();
         }
+
 
         /**
          * to string
@@ -2000,6 +2089,10 @@ public class IOUtil {
      * @throws Exception On badness
      */
     public static void main(String[] args) throws Exception {
+        if(true) {
+            findFilesToScour(new File(args[0]),1,1000L);
+            return;
+        }
 
         AccountManager.setGlobalAccountManager(new AccountManager(new File(".")));
 
