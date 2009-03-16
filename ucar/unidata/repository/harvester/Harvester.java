@@ -149,8 +149,11 @@ public class Harvester extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_BASEGROUP = "basegroup";
 
+
     /** _more_ */
     protected String baseGroupName = "";
+
+    protected String baseGroupNameId = "";
 
     /** _more_ */
     protected String groupTemplate = "";
@@ -356,6 +359,8 @@ public class Harvester extends RepositoryManager {
                                              groupTemplate);
         this.baseGroupName = XmlUtil.getAttribute(element, ATTR_BASEGROUP,
                 "");
+
+
 
         nameTemplate = XmlUtil.getAttribute(element, ATTR_NAMETEMPLATE,
                                             nameTemplate);
@@ -904,6 +909,8 @@ public class Harvester extends RepositoryManager {
         /** _more_ */
         String description;
 
+        String baseGroupId;
+
         /** _more_ */
         String group;
 
@@ -916,11 +923,12 @@ public class Harvester extends RepositoryManager {
          * @param group _more_
          */
         public HarvesterEntry(String url, String name, String description,
-                              String group) {
+                              String group, String baseGroupId) {
             this.url         = url;
             this.name        = name;
             this.description = description;
             this.group       = group;
+            this.baseGroupId       = baseGroupId;
 
         }
 
@@ -935,6 +943,7 @@ public class Harvester extends RepositoryManager {
             this.description = XmlUtil.getAttribute(node, ATTR_DESCRIPTION,
                     "");
             this.group = XmlUtil.getAttribute(node, ATTR_GROUP, "");
+            this.baseGroupId = XmlUtil.getAttribute(node, ATTR_BASEGROUP, "");
         }
 
         /**

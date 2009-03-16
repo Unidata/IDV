@@ -89,25 +89,28 @@ import java.util.zip.*;
 public class StorageManager extends RepositoryManager {
 
 
-    public static final String  FILE_SEPARATOR = "_file_";
+    public static final String FILE_SEPARATOR = "_file_";
 
-    public static final String  FILE_FULLLOG = "fullrepository.log";
+    public static final String FILE_FULLLOG = "fullrepository.log";
     public static final String FILE_LOG = "repository.log";
+
+    public static final String DIR_REPOSITORY = "repository";
 
     public static final String DIR_ENTRIES = "entries";
     public static final String DIR_STORAGE = "storage";
     public static final String DIR_PLUGINS = "plugins";
-    public static final String DIR_THUMBNAILS = "thumbnails";
-
     public static final String DIR_RESOURCES = "resources";
     public static final String DIR_HTDOCS = "htdocs";
-    public static final String DIR_REPOSITORY = "repository";
+
     public static final String DIR_ANONYMOUSUPLOAD = "anonymousupload";
-    public static final String DIR_LOGS = "logs";
-    public static final String DIR_CACHE = "cache";
-    public static final String DIR_TMP = "tmp";
+    public static final String DIR_LOGS    = "logs";
+    public static final String DIR_CACHE   = "cache";
+    public static final String DIR_TMP     = "tmp";
     public static final String DIR_UPLOADS = "uploads";
     public static final String DIR_SCRATCH = "scratch";
+    public static final String DIR_THUMBNAILS = "thumbnails";
+
+
 
     /** _more_ */
     public static final String PROP_DIRDEPTH = "ramadda.storage.dirdepth";
@@ -351,15 +354,15 @@ public class StorageManager extends RepositoryManager {
     protected void scourTmpDir()  {
         Misc.run(new Runnable() {
                 public void run() {
-                    //Keep around either 200 files or files touched in the last 24 hours
                     tmpFileAccessCnt = 0;
-                    IOUtil.scour(new File(getTmpDir()), 200, 24);
+                    //1 GB, 24 hours
+                    List<File> filesToScour =    IOUtil.findFilesToScour(new File(getTmpDir()), 1,
+                                                                         1000L*1000L*1000L);
+                    System.err.println ("Found " + filesToScour.size() +" files to scour");
                 }
             });
 
     }
-
-
 
 
     /**
@@ -387,8 +390,6 @@ public class StorageManager extends RepositoryManager {
         return  new File(IOUtil.joinDir(getLogDir(),
                                         FILE_LOG));
     }
-
-
 
 
     public void notifyWroteToCache(File f) {
@@ -421,10 +422,8 @@ public class StorageManager extends RepositoryManager {
                     }
                 }
             }
-
         }
     }
-
 
 
 
@@ -453,6 +452,8 @@ public class StorageManager extends RepositoryManager {
         IOUtil.makeDirRecursive(new File(dir));
         return dir;
     }
+
+    
 
     /**
      * _more_

@@ -21,6 +21,7 @@
 
 package ucar.unidata.repository.data;
 
+import ucar.unidata.repository.*;
 import ucar.unidata.repository.output.*;
 
 import ucar.unidata.util.HtmlUtil;
@@ -78,7 +79,7 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 
 import ucar.unidata.geoloc.LatLonRect;
 
-import ucar.unidata.repository.*;
+
 
 
 import ucar.unidata.util.Cache;
@@ -840,6 +841,9 @@ public class DataOutputHandler extends OutputHandler {
             getRepository().getAccessManager().canDoAction(request,
                 entry.getParentGroup(), Permission.ACTION_NEW);
 
+
+
+
         String       path   = getPath(entry);
         StringBuffer sb     = new StringBuffer();
         String       prefix = ARG_VARIABLE + ".";
@@ -966,8 +970,6 @@ public class DataOutputHandler extends OutputHandler {
                                      HtmlUtil.input(ARG_HSTRIDE,
                                          request.getString(ARG_HSTRIDE, "1"),
                                          HtmlUtil.SIZE_3)));
-
-
 
 
         Date[]       dateRange = null;
@@ -1674,6 +1676,11 @@ public class DataOutputHandler extends OutputHandler {
 
         if ( !getRepository().getAccessManager().canDoAction(request, entry,
                 Permission.ACTION_FILE)) {
+            throw new AccessException("Cannot access data", request);
+        }
+
+        if ( !getRepository().getAccessManager().canAccessFile(request,
+                entry)) {
             throw new AccessException("Cannot access data", request);
         }
 

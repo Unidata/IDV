@@ -189,7 +189,9 @@ public class WebHarvester extends Harvester {
                                           new String[] {
                 ATTR_URL, urlEntry.url, ATTR_NAME, urlEntry.name,
                 ATTR_DESCRIPTION, urlEntry.description, ATTR_GROUP,
-                urlEntry.group
+                urlEntry.group,
+                ATTR_BASEGROUP,
+                urlEntry.baseGroupId
             });
         }
 
@@ -217,6 +219,8 @@ public class WebHarvester extends Harvester {
                 cnt++;
                 continue;
             }
+            String baseGroupId = request.getUnsafeString(ATTR_BASEGROUP + cnt+"_hidden", "");
+
             String groupName = request.getUnsafeString(ATTR_GROUP + cnt, "");
             groupName = groupName.replace(" > ", "/");
             groupName = groupName.replace(">", "/");
@@ -227,7 +231,8 @@ public class WebHarvester extends Harvester {
                     request.getUnsafeString(ATTR_URL + cnt, ""),
                     request.getUnsafeString(ATTR_NAME + cnt, ""),
                     request.getUnsafeString(ATTR_DESCRIPTION + cnt, ""),
-                    groupName));
+                    groupName,
+                    baseGroupId));
             cnt++;
         }
 
@@ -245,9 +250,18 @@ public class WebHarvester extends Harvester {
      */
     public void createEditForm(Request request, StringBuffer formSB)
             throws Exception {
-        super.createEditForm(request, formSB);
         StringBuffer sb = new StringBuffer();
+        StringBuffer superSB = new StringBuffer();
 
+        formSB.append(HtmlUtil.formTableClose());
+        superSB.append(HtmlUtil.formTable());
+        super.createEditForm(request, superSB);
+        superSB.append(HtmlUtil.formTableClose());
+        formSB.append(HtmlUtil.makeShowHideBlock("Basic Information",
+                                                 superSB.toString(),
+                                                 true));
+
+        sb.append(HtmlUtil.hr());
         sb.append("Enter urls and the groups to add them to.");
 
 
@@ -265,12 +279,17 @@ public class WebHarvester extends Harvester {
                     HtmlUtil.img(getRepository().iconUrl(ICON_LINK)),
                     HtmlUtil.attr("target", "_linkpage"));
             }
+            String urlInput = HtmlUtil.input(ATTR_URL + cnt, urlEntry.url,
+                                             HtmlUtil.SIZE_80) + link;
+
             entrySB.append(HtmlUtil.formEntry(msgLabel("Fetch URL"),
-                    HtmlUtil.input(ATTR_URL + cnt, urlEntry.url,
-                                   HtmlUtil.SIZE_80) + link));
+                                              urlInput));
             entrySB.append(
                 RepositoryManager.tableSubHeader(
                     "Then create an entry with"));
+
+
+
             entrySB.append(HtmlUtil.formEntry(msgLabel("Name"),
                     HtmlUtil.input(ATTR_NAME + cnt, urlEntry.name,
                                    HtmlUtil.SIZE_80
@@ -280,23 +299,36 @@ public class WebHarvester extends Harvester {
                                    urlEntry.description,
                                    HtmlUtil.SIZE_80
                                    + HtmlUtil.title(templateHelp))));
+            String baseGroupFieldId = ATTR_BASEGROUP + cnt;
+            Group baseGroup = (urlEntry.baseGroupId.length()==0?null:getEntryManager().findGroup(request, urlEntry.baseGroupId));
+            String baseSelect  = OutputHandler.getGroupSelect(request, baseGroupFieldId);
+            entrySB.append(HtmlUtil.hidden(baseGroupFieldId+"_hidden", urlEntry.baseGroupId,
+                                           HtmlUtil.id(baseGroupFieldId+"_hidden")));
+            entrySB.append(HtmlUtil.formEntry(msgLabel("Base Group"),
+                                              HtmlUtil.disabledInput(baseGroupFieldId, 
+                                                                     (baseGroup!=null?baseGroup.getFullName():""),
+                                                                     HtmlUtil.id(baseGroupFieldId) +
+                                                                     HtmlUtil.SIZE_60)+baseSelect));
+
             String fieldId = ATTR_GROUP + cnt;
             String select  = OutputHandler.getGroupSelect(request, fieldId);
-            entrySB.append(HtmlUtil.formEntry(msgLabel("Group"),
+            entrySB.append(HtmlUtil.formEntry(msgLabel("Sub-Group Template"),
                     HtmlUtil.input(fieldId, urlEntry.group,
                                    HtmlUtil.SIZE_80 + HtmlUtil.id(fieldId)
                                    + HtmlUtil.title(templateHelp)) + select));
             entrySB.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.makeShowHideBlock("URL #" + cnt,
-                    entrySB.toString(), true));
+                                                 entrySB.toString(), true));
+            sb.append(HtmlUtil.hr());
             cnt++;
         }
 
         entrySB = new StringBuffer();
         entrySB.append(HtmlUtil.formTable());
         entrySB.append(HtmlUtil.formEntry(msgLabel("Fetch URL"),
-                                          HtmlUtil.input(ATTR_URL + cnt, "",
-                                              HtmlUtil.SIZE_80)));
+                                          HtmlUtil.input(ATTR_URL + cnt, "", HtmlUtil.SIZE_80)
+                                          ));
+        /*
         entrySB.append(
             RepositoryManager.tableSubHeader("Then create an entry with"));
         entrySB.append(
@@ -313,17 +345,20 @@ public class WebHarvester extends Harvester {
                     HtmlUtil.SIZE_80 + HtmlUtil.title(templateHelp))));
         entrySB.append(
             HtmlUtil.formEntry(
-                msgLabel("Group"),
+                msgLabel("Sub-Group"),
                 HtmlUtil.input(
                     ATTR_GROUP + cnt, "",
                     HtmlUtil.SIZE_80 + HtmlUtil.title(templateHelp))));
+        */
+
         entrySB.append(HtmlUtil.formTableClose());
 
-        sb.append(HtmlUtil.makeShowHideBlock("URL #" + cnt,
+        sb.append(HtmlUtil.makeShowHideBlock("New URL",
                                              entrySB.toString(), true));
 
 
-        formSB.append(HtmlUtil.formTableClose());
+        sb.append(HtmlUtil.p());
+
         formSB.append(sb);
         formSB.append(HtmlUtil.formTable());
     }
