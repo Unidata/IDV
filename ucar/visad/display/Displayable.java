@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.visad.display;
 
 
@@ -730,6 +731,18 @@ public abstract class Displayable {
     }
 
     /**
+     * Sets the manipulable value of this Displayable. This is a no-op and
+     * is here for the CompositeDisplayable 
+     *
+     * @param manipulable value
+     * @throws VisADException     VisAD failure.
+     * @throws RemoteException    Java RMI failure.
+     */    
+    public void setManipulable(boolean manipulable)
+            throws VisADException, RemoteException {}
+
+
+    /**
      * Gets the visibility property.
      *
      * @return                   Whether or not this instance is visible.
@@ -1025,10 +1038,10 @@ public abstract class Displayable {
      */
     protected void firePropertyChange(final PropertyChangeEvent event) {
         Misc.run(new Runnable() {
-                public void run() {
-                    firePropertyChangeInThread(event);
-                }
-            });
+            public void run() {
+                firePropertyChangeInThread(event);
+            }
+        });
     }
 
 

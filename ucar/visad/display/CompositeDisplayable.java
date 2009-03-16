@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.visad.display;
 
 
@@ -490,6 +491,30 @@ public class CompositeDisplayable extends Displayable {
             }
         }
     }
+
+    /**
+     * Sets the manipulable value of this Displayable.
+     *
+     * @param manipulable value
+     * @throws VisADException     VisAD failure.
+     * @throws RemoteException    Java RMI failure.
+     */
+    public void setManipulable(boolean manipulable)
+            throws VisADException, RemoteException {
+        super.setManipulable(manipulable);
+        synchronized (MUTEX) {
+            List local = getDisplayables();
+            for (int index = 0; index < local.size(); index++) {
+                Displayable displayable = (Displayable) local.get(index);
+                if (displayable != null) {
+                    displayable.setManipulable(manipulable);
+                }
+            }
+        }
+
+
+    }
+
 
     /**
      * Sets the visibility of an interval of children.
