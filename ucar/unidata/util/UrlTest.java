@@ -45,71 +45,73 @@ public class UrlTest {
             totalRead+=read;
         }
         inputStream.close();
+        //        System.err.println (totalRead);
+        //        System.exit(0);
         return totalRead;
     }
 
     public static void main(String[] args) throws Exception {
-        if(args.length!=1) {
-            System.err.println("Usage UrlTest <testfile>");
-            return;
-        }
-        final List<String> urls =  StringUtil.split(IOUtil.readContents(new FileInputStream(args[0])),"\n",true,true);
-        final int[] threadsRunning = {0};
-        final int[]nextUrl = {0};
-        final int numReads = 100;
-        for (int threadCnt = 1; threadCnt <= 15;threadCnt++) {
-            ArrayList<Thread> threads = new ArrayList<Thread>();
-            for(int i=0;i<threadCnt;i++) {
-                final int  threadId = i;
-                threads.add(new Thread(new Runnable() {
-                        public void run() {
-                            try {
-                                int totalRead = 0;
-                                for(int i=0;i<numReads;i++) {
-                                    int urlIdx;
-                                    synchronized(nextUrl) {
-                                        nextUrl[0]++;
-                                        if(nextUrl[0]>= urls.size()) 
-                                            nextUrl[0] = 0;
-                                        urlIdx = nextUrl[0];
+        int [] threadCnts = {1,2,3,4,8,12,16,20};
+        for(int argIdx=0;argIdx<args.length;argIdx++) {
+            System.err.println (args[argIdx]);
+            final List<String> urls =  StringUtil.split(IOUtil.readContents(new FileInputStream(args[argIdx])),"\n",true,true);
+            final int[] threadsRunning = {0};
+            final int[]nextUrl = {0};
+            final int numReads = 50;
+            for (int threadCntIdx = 0; threadCntIdx <threadCnts.length;threadCntIdx++) {
+                ArrayList<Thread> threads = new ArrayList<Thread>();
+                for(int i=0;i<threadCnts[threadCntIdx];i++) {
+                    final int  threadId = i;
+                    threads.add(new Thread(new Runnable() {
+                            public void run() {
+                                try {
+                                    int totalRead = 0;
+                                    for(int i=0;i<numReads;i++) {
+                                        int urlIdx;
+                                        synchronized(nextUrl) {
+                                            nextUrl[0]++;
+                                            if(nextUrl[0]>= urls.size()) 
+                                                nextUrl[0] = 0;
+                                            urlIdx = nextUrl[0];
+                                        }
+                                        String url = urls.get(urlIdx);
+                                        totalRead+=readUrl(url);
                                     }
-                                    String url = urls.get(urlIdx);
-                                    totalRead+=readUrl(url);
-                                }
-                            } catch (Exception exc) {
-                                exc.printStackTrace();
-                            } finally {
-                                synchronized (threadsRunning) {
-                                    threadsRunning[0]--;
+                                } catch (Exception exc) {
+                                    exc.printStackTrace();
+                                } finally {
+                                    synchronized (threadsRunning) {
+                                        threadsRunning[0]--;
+                                    }
                                 }
                             }
-                        }
-                    }));
-            }
-
-
-            threadsRunning[0] = 0;
-            for (Thread thread : threads) {
-                synchronized (threadsRunning) {
-                    threadsRunning[0]++;
+                        }));
                 }
-          
-                thread.start();
-            }
-            long t1 = System.currentTimeMillis();
-            while (true) {
-                synchronized (threadsRunning) {
-                    if (threadsRunning[0] <= 0) {
-                        break;
+
+
+                threadsRunning[0] = 0;
+                for (Thread thread : threads) {
+                    synchronized (threadsRunning) {
+                        threadsRunning[0]++;
                     }
+          
+                    thread.start();
                 }
-                try {
-                    Thread.currentThread().sleep(1);
-                } catch (Exception exc) {}
+                long t1 = System.currentTimeMillis();
+                while (true) {
+                    synchronized (threadsRunning) {
+                        if (threadsRunning[0] <= 0) {
+                            break;
+                        }
+                    }
+                    try {
+                        Thread.currentThread().sleep(1);
+                    } catch (Exception exc) {}
+                }
+                long t2 = System.currentTimeMillis();
+                double seconds = (t2-t1)/(double)1000.0;
+                System.err.println("     total time: " + (t2 - t1) + " # threads:" + threadCnts[threadCntIdx] +  "  reads/s:" +(int)((numReads*threadCnts[threadCntIdx])/(seconds)));
             }
-            long t2 = System.currentTimeMillis();
-            double seconds = (t2-t1)/(double)1000.0;
-            System.err.println("     total time: " + (t2 - t1) + " # threads:" + threadCnt +  "  reads/s:" +(int)((numReads*threadCnt)/(seconds)));
         }
         
     }

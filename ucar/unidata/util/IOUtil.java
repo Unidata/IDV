@@ -2089,6 +2089,19 @@ public class IOUtil {
      * @throws Exception On badness
      */
     public static void main(String[] args) throws Exception {
+
+        if(true) {
+            byte[]buffer = new byte[1048748];
+            writeBytes(new File("test0"), buffer);
+            for(int i=0;i<10000;i++) {
+                System.out.println("cp test0 test" + i);
+            }
+            return;
+        }
+
+
+
+
         if(true) {
             findFilesToScour(new File(args[0]),1,1000L);
             return;
