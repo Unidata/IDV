@@ -247,6 +247,17 @@ example:
      displaycategory="Trajectory"
      properties="windowVisible=true;"/>
 
+  <control
+     id="stormintesitydisplay"
+     categories="IMAGE-*-*"
+     class="ucar.unidata.idv.control.storm.StormIntensityControl"
+     label="Storm Intensity"
+     displaycategory="Probe"
+     properties="">
+     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
+
+
 <!--
 Since this is confusing and needs more work lets remove this for now
   <control
