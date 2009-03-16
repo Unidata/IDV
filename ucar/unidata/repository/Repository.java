@@ -3435,6 +3435,37 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return new Result("", sb);
     }
 
+
+    int fileCnt = 0;
+    Object MUTEX = new Object();
+    public Result processTestFileRotate(Request request) throws Exception {
+        File file=null;
+        synchronized(MUTEX) {
+            fileCnt++;
+            file = new File("/home/jeffmc/test/test"+ fileCnt);
+            if(!file.exists()) {
+                fileCnt = 0;
+                file = new File("/home/jeffmc/test/test"+ fileCnt);
+            }
+        }
+        return new Result(BLANK, new BufferedInputStream(new FileInputStream(file)),"application/x-binary");
+    }
+
+
+    public Result processTestFile(Request request) throws Exception {
+        File file= new File("/home/jeffmc/test/test0");
+        return new Result(BLANK, new BufferedInputStream(new FileInputStream(file)),"application/x-binary");
+    }
+
+
+    byte[]buffer = new byte[1048748];
+    public Result processTestMemory(Request request) throws Exception {
+        return new Result(BLANK, new BufferedInputStream(new ByteArrayInputStream(buffer)),"application/x-binary");
+    }
+
+
+
+
     /**
      * _more_
      *
