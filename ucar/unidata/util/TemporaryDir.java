@@ -46,26 +46,26 @@ import java.util.zip.*;
  *
  * @version $Revision: 1.52 $
  */
-public class StorageDir {
+public class TemporaryDir {
 
     private File dir;
     private int  maxFiles = -1;
-    private long maxBytes = -1;
+    private long maxSize = -1;
     private long maxAge = -1;
 
-    public StorageDir(String dir) {
+    public TemporaryDir(String dir) {
         this(new File(dir));
     }
 
 
-    public StorageDir(File dir) {
+    public TemporaryDir(File dir) {
         this.dir = dir;
     }
 
-    public StorageDir(File dir, int maxFiles, long maxBytes, long maxAge) {
+    public TemporaryDir(File dir, int maxFiles, long maxSize, long maxAge) {
         this(dir);
         this.maxFiles = maxFiles;
-        this.maxBytes = maxBytes;
+        this.maxSize = maxSize;
         this.maxAge = maxAge;
     }
 
@@ -75,7 +75,7 @@ public class StorageDir {
         return dir.toString();
     }
 
-    List<File> findFilesToScour() {
+    public List<File> findFilesToScour() {
         List<File> results = new ArrayList<File>();
 
         long t1 = System.currentTimeMillis();
@@ -99,7 +99,7 @@ public class StorageDir {
         }
 
         long t5 = System.currentTimeMillis();
-        if(maxBytes>0) {
+        if(maxSize>0) {
             for(int i=0;i<files.length;i++) {
                 totalSize+=files[i].length();
             }
@@ -114,15 +114,19 @@ public class StorageDir {
                 continue;
             } 
             boolean shouldScour = false;
-            if(maxBytes>0 && totalSize>maxBytes) {
+            if(maxSize>0 && totalSize>maxSize) {
                 shouldScour = true;
-            } else if( maxAge>0) {
+            } 
+            if( maxAge>0) {
                 long lastModified = files[i].lastModified();
                 long age  = now-lastModified;
-                shouldScour = age>maxAge;
-            } else if(maxFiles>0) {
-                shouldScour = numFiles>maxFiles;
+                if(age>maxAge) shouldScour = true;
             } 
+            if(maxFiles>0) {
+                if(numFiles>maxFiles)
+                    shouldScour = true;
+            } 
+
             if(!shouldScour) break;
             long fileSize = files[i].length();
             results.add(files[i].file);
@@ -134,6 +138,12 @@ public class StorageDir {
         return results;
 
     }
+
+
+    public File getDir() {
+        return dir;
+    }
+
 
     /**
        Set the MaxFiles property.
@@ -158,8 +168,8 @@ public class StorageDir {
 
        @param value The new value for MaxBytes
     **/
-    public void setMaxBytes (long value) {
-	this.maxBytes = value;
+    public void setMaxSize (long value) {
+	this.maxSize = value;
     }
 
     /**
@@ -167,8 +177,8 @@ public class StorageDir {
 
        @return The MaxBytes
     **/
-    public long getMaxBytes () {
-	return this.maxBytes;
+    public long getMaxSize () {
+	return this.maxSize;
     }
 
     /**
