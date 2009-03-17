@@ -3597,7 +3597,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                         }
                     }
                     long tt1 = System.currentTimeMillis();
-                    displaysThreadUtil.runInParallel();
+                    displaysThreadUtil.runSequentially();
+                    //                    displaysThreadUtil.runInParallel();
                     long tt2 = System.currentTimeMillis();
                     //                    System.err.println ("time to init displays:" + (tt2-tt1));
                     //                    displaysThreadUtil.clearTimes();
