@@ -159,7 +159,7 @@ public class IOUtil {
      * @author IDV Development Team
      * @version $Revision: 1.52 $
      */
-    private static class FileWrapper implements Comparable {
+    public static class FileWrapper implements Comparable {
 
         /** file to wrap */
         File file;
