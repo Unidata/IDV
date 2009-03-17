@@ -111,6 +111,8 @@ public class TemporaryDir {
         long t6 = System.currentTimeMillis();
 
         System.err.println ("    Found " + files.length +" in " + (t2-t1) +"ms   sort time:"+(t4-t3) +" size:" + totalSize+" " + (t6-t5));
+        System.err.println ("    max age:" + maxAge + " maxSize:" + maxSize +" max # files:"+maxFiles);
+
 
         long t7 = System.currentTimeMillis();
         for(int i=0;i<files.length;i++) {
