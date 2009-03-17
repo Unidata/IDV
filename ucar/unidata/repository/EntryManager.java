@@ -41,6 +41,8 @@ import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
+import ucar.unidata.util.TemporaryDir;
+
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
@@ -1756,21 +1758,18 @@ return new Result(title, sb);
 
         if (request.defined(ARG_IMAGEWIDTH) && ImageUtils.isImage(path)) {
             int    width    = request.get(ARG_IMAGEWIDTH, 75);
-            String thumbDir = getStorageManager().getThumbDir();
-            String thumb =
-                IOUtil.joinDir(thumbDir,
-                               "entry" + IOUtil.cleanFileName(entry.getId())
-                               + "_" + width + IOUtil.getFileExtension(path));
-            if ( !new File(thumb).exists()) {
+            File thumb = getStorageManager().getThumbFile(
+                                                         "entry" + IOUtil.cleanFileName(entry.getId())
+                                                         + "_" + width + IOUtil.getFileExtension(path));
+            if ( !thumb.exists()) {
                 Image image =
                     ImageUtils.readImage(entry.getResource().getPath());
                 image = ImageUtils.resize(image, width, -1);
                 ImageUtils.waitOnImage(image);
                 ImageUtils.writeImageToFile(image, thumb);
-                getStorageManager().checkScour();
             }
             return new Result(BLANK,
-                              IOUtil.getInputStream(thumb, getClass()),
+                              new FileInputStream(thumb),
                               mimeType);
         } else {
             InputStream inputStream =

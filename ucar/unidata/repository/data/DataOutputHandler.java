@@ -25,6 +25,7 @@ import ucar.unidata.repository.*;
 import ucar.unidata.repository.output.*;
 
 import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.util.TemporaryDir;
 
 
 
@@ -207,7 +208,7 @@ public class DataOutputHandler extends OutputHandler {
     private Cache<String,Boolean> trajectoryEntries = new Cache<String,Boolean>(5000);
 
 
-    private String nj22TmpFile;
+    private TemporaryDir nj22Dir;
 
     //TODO: When we close a ncfile some thread might be using it
     //Do we have to actually close it??
@@ -222,8 +223,7 @@ public class DataOutputHandler extends OutputHandler {
 
         protected NetcdfDataset createValue(String path) {
             try {
-                getStorageManager().checkScour();
-                System.err.println("Create ncFilePool: " + path);
+                getStorageManager().dirTouched(nj22Dir);
                 return  NetcdfDataset.openDataset(path);
             } catch(Exception exc) {
                 throw new RuntimeException(exc);
@@ -244,7 +244,7 @@ public class DataOutputHandler extends OutputHandler {
         protected GridDataset createValue(String path) {
             try {
                 System.err.println("Create gridPool: " + path);
-                getStorageManager().checkScour();
+                getStorageManager().dirTouched(nj22Dir);
                 GridDataset gds =  GridDataset.open(path);
                 if (gds.getGrids().iterator().hasNext()) {
                     return gds;
@@ -270,7 +270,7 @@ public class DataOutputHandler extends OutputHandler {
 
         protected PointObsDataset createValue(String path) {
             try {
-                getStorageManager().checkScour();
+                getStorageManager().dirTouched(nj22Dir);
                 PointObsDataset dataset =   (PointObsDataset) TypedDatasetFactory.open(
                                                                    FeatureType.POINT, path, null, new StringBuilder());
                 System.err.println("Create pointPool: " + path);
@@ -293,7 +293,7 @@ public class DataOutputHandler extends OutputHandler {
 
         protected TrajectoryObsDataset createValue(String path) {
             try {
-                getStorageManager().checkScour();
+                getStorageManager().dirTouched(nj22Dir);
                 TrajectoryObsDataset dataset = (TrajectoryObsDataset) TypedDatasetFactory.open(
                                                                         FeatureType.TRAJECTORY, path, null, new StringBuilder());
 
@@ -322,13 +322,11 @@ public class DataOutputHandler extends OutputHandler {
         super(repository, element);
 
         //TODO: what other global configuration should be done?
-        nj22TmpFile =
-            IOUtil.joinDir(getRepository().getStorageManager().getTmpDir(),
-                           "nj22/");
-        IOUtil.makeDir(nj22TmpFile);
+        nj22Dir = getRepository().getStorageManager().addTemporaryDir("nj22");
+        nj22Dir.setMaxFiles(500);
 
         //Set the temp file and the cache policy
-        ucar.nc2.util.DiskCache.setRootDirectory(nj22TmpFile);
+        ucar.nc2.util.DiskCache.setRootDirectory(nj22Dir.getDir().toString());
         ucar.nc2.iosp.grib.GribServiceProvider.setIndexAlwaysInCache(true);
 
 
@@ -1740,8 +1738,8 @@ public class DataOutputHandler extends OutputHandler {
                                                                                                                  metadata.getEntryId(), false), metadata.getAttr1()));
                 String ncml = IOUtil.readContents(templateNcmlFile);
                 ncml = ncml.replace("${location}", location);
-                File ncmlFile =  new File(IOUtil.joinDir(getStorageManager().getScratchDir(),
-                                                         entry.getId()+"_" + metadata.getId() +".ncml"));
+                File ncmlFile =  getStorageManager().getScratchFile(
+                                                                    entry.getId()+"_" + metadata.getId() +".ncml");
                 IOUtil.writeBytes(ncmlFile, ncml.getBytes());
                 location = ncmlFile.toString();
                 break;

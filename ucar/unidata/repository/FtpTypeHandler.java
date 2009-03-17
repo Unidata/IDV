@@ -186,9 +186,8 @@ public class FtpTypeHandler extends GenericTypeHandler {
                     path = path.substring(prefix.length());
                 }
                 String cacheFileName =  java.net.URLEncoder.encode("ftp:" + values[COL_SERVER]+":"+path, "UTF-8");
-                File cacheFile = new File(IOUtil.joinDir(getStorageManager().getCacheDir(), cacheFileName));
+                File cacheFile = getStorageManager().getCacheFile(cacheFileName);
                 if(cacheFile.exists()) {
-                    //                    System.err.println ("exists in cache:" + cacheFile);
                     return cacheFile;
                 }
 
@@ -198,8 +197,6 @@ public class FtpTypeHandler extends GenericTypeHandler {
                 if (ftpClient.retrieveFile(path, fos)) {
                     fos.flush();
                     fos.close();
-                    //                    System.err.println ("wrote to file cache:" + cacheFile);
-                    getStorageManager().notifyWroteToCache(cacheFile);
                     return cacheFile;
                 } 
                 //                System.err.println ("BAD FILE");

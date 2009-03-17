@@ -291,10 +291,9 @@ public class IdvOutputHandler extends OutputHandler {
             return result;
         }
 
-        String thumbDir = getStorageManager().getThumbDir();
-        File image = new File(IOUtil.joinDir(thumbDir,
+        File image = getStorageManager().getThumbFile(
                                              "preview_" + id.replace("/","_")
-                                             + ".gif"));
+                                             + ".gif");
         if (image.exists()) {
             return new Result("preview.gif", new FileInputStream(image),
                               "image/gif");
