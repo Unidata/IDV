@@ -205,6 +205,9 @@ public class StorageManager extends RepositoryManager {
     protected void doFinalInitialization() {
         Misc.run(new Runnable() {
                 public void run() {
+                    getCacheDir();
+                    getScratchDir();
+                    getThumbDir();
                     scourTmpDirs();
                 }
             });
@@ -381,6 +384,7 @@ public class StorageManager extends RepositoryManager {
      * @return _more_
      */
     private TemporaryDir getCacheDir() {
+
         if (cacheDir == null) {
             cacheDir = addTemporaryDir(DIR_CACHE);
             cacheDir.setMaxSize(1000*1000*1000);
