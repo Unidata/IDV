@@ -425,6 +425,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public Repository(String[] args, int port, boolean inTomcat)
             throws Exception {
         super(port);
+        System.err.println("*** New repository");
         LogUtil.setTestMode(true);
         java.net.InetAddress localMachine =
             java.net.InetAddress.getLocalHost();
@@ -593,6 +594,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     protected void init(Properties properties) throws Exception {
+        System.err.println("*** repository.init()");
         initProperties(properties);
         initServer();
     }

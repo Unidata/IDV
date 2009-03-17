@@ -316,7 +316,7 @@ public class StorageManager extends RepositoryManager {
         tmpDirs.add(storageDir);
     }
 
-    public TemporaryDir addTemporaryDir(String dir) {
+    public TemporaryDir makeTemporaryDir(String dir) {
         TemporaryDir tmpDir = new TemporaryDir(IOUtil.joinDir(getTmpDir(),dir));
         IOUtil.makeDirRecursive(tmpDir.getDir());
         addTemporaryDir(tmpDir);
@@ -348,8 +348,8 @@ public class StorageManager extends RepositoryManager {
 
     private TemporaryDir getScratchDir() {
         if (scratchDir == null) {
-            scratchDir = addTemporaryDir(DIR_SCRATCH);
-            cacheDir.setMaxAge(DateUtil.hoursToMillis(1));
+            scratchDir = makeTemporaryDir(DIR_SCRATCH);
+            scratchDir.setMaxAge(DateUtil.hoursToMillis(1));
         }
         return scratchDir;
     }
@@ -366,7 +366,7 @@ public class StorageManager extends RepositoryManager {
      */
     private TemporaryDir getThumbDir() {
         if (thumbDir == null) {
-            thumbDir= addTemporaryDir(DIR_THUMBNAILS);
+            thumbDir= makeTemporaryDir(DIR_THUMBNAILS);
             thumbDir.setMaxFiles(1000);
             thumbDir.setMaxSize(1000*1000*1000);
         }
@@ -386,7 +386,7 @@ public class StorageManager extends RepositoryManager {
     private TemporaryDir getCacheDir() {
 
         if (cacheDir == null) {
-            cacheDir = addTemporaryDir(DIR_CACHE);
+            cacheDir = makeTemporaryDir(DIR_CACHE);
             cacheDir.setMaxSize(1000*1000*1000);
         }
         return cacheDir;
@@ -394,7 +394,7 @@ public class StorageManager extends RepositoryManager {
 
 
     public File getCacheFile(String file) {
-        return getTmpDirFile(getScratchDir(),file);
+        return getTmpDirFile(getCacheDir(),file);
     }
 
 
@@ -410,8 +410,12 @@ public class StorageManager extends RepositoryManager {
     public void dirTouched(final TemporaryDir tmpDir,File f) {
         if(f!=null) {
             f.setLastModified(new Date().getTime());
+            //if the file is already there then don't scour
+            if(f.exists()) return;
         }
         //Run this in 10 seconds
+        if(tmpDir.getTouched()) return;
+        tmpDir.setTouched(true);
         Misc.runInABit(10000, new Runnable() {
                 public void run() {
                     scourTmpDir(tmpDir);
@@ -431,12 +435,13 @@ public class StorageManager extends RepositoryManager {
         synchronized(tmpDir) {
             System.err.println ("scourTmpDir:" + tmpDir.getDir().getName());
             if(!tmpDir.haveChanged()) {
-                System.err.println ("    no change");
                 return;
             }
             List<File> filesToScour =    tmpDir.findFilesToScour();
         }
+        tmpDir.setTouched(false);
     }
+
 
 
     /**

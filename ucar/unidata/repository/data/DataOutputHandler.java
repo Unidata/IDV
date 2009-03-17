@@ -322,7 +322,7 @@ public class DataOutputHandler extends OutputHandler {
         super(repository, element);
 
         //TODO: what other global configuration should be done?
-        nj22Dir = getRepository().getStorageManager().addTemporaryDir("nj22");
+        nj22Dir = getRepository().getStorageManager().makeTemporaryDir("nj22");
         nj22Dir.setMaxFiles(500);
 
         //Set the temp file and the cache policy
