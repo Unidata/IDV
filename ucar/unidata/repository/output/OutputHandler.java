@@ -864,7 +864,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         //Swap out the long value
         if(entryIds!=null) {
             String extraId = getRepository().getGUID();
-            request.put(ARG_ENTRYIDS,getRepository().putSessionExtra(entryIds));
+            request.put(ARG_ENTRYIDS,getRepository().getSessionManager().putSessionExtra(entryIds));
         }
 
         for (int i = 0; i < order.length; i += 4) {

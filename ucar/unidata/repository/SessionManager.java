@@ -29,6 +29,7 @@ import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.DateUtil;
 
+import ucar.unidata.util.Cache;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
@@ -93,6 +94,7 @@ public class SessionManager extends RepositoryManager {
     private List ipUserList = new ArrayList();
 
 
+    private Cache<Object,Object> sessionExtra = new Cache<Object,Object>(5000);
 
 
     /**
@@ -116,6 +118,23 @@ public class SessionManager extends RepositoryManager {
                 cullSessions();
             }
         });
+    }
+
+
+    public String putSessionExtra(Object value) {
+        String id = "${" + getRepository().getGUID()+"}";
+        putSessionExtra(id,value);
+        return id;
+    }
+
+
+    public void putSessionExtra(Object key, Object value) {
+        sessionExtra.put(key,value);
+    }
+
+
+    public Object getSessionExtra(Object key) {
+        return sessionExtra.get(key);
     }
 
 

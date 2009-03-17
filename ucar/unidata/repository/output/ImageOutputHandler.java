@@ -221,7 +221,6 @@ public class ImageOutputHandler extends OutputHandler {
 
         StringBuffer sb         = new StringBuffer();
         OutputType   output     = request.getOutput();
-        boolean      showApplet = repository.isAppletEnabled(request);
         if (entries.size() == 0) {
             sb.append("<b>Nothing Found</b><p>");
             return new Result("Query Results", sb, getMimeType(output));

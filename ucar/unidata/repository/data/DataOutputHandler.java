@@ -223,7 +223,7 @@ public class DataOutputHandler extends OutputHandler {
 
         protected NetcdfDataset createValue(String path) {
             try {
-                getStorageManager().dirTouched(nj22Dir);
+                getStorageManager().dirTouched(nj22Dir,null);
                 return  NetcdfDataset.openDataset(path);
             } catch(Exception exc) {
                 throw new RuntimeException(exc);
@@ -244,7 +244,7 @@ public class DataOutputHandler extends OutputHandler {
         protected GridDataset createValue(String path) {
             try {
                 System.err.println("Create gridPool: " + path);
-                getStorageManager().dirTouched(nj22Dir);
+                getStorageManager().dirTouched(nj22Dir,null);
                 GridDataset gds =  GridDataset.open(path);
                 if (gds.getGrids().iterator().hasNext()) {
                     return gds;
@@ -270,7 +270,7 @@ public class DataOutputHandler extends OutputHandler {
 
         protected PointObsDataset createValue(String path) {
             try {
-                getStorageManager().dirTouched(nj22Dir);
+                getStorageManager().dirTouched(nj22Dir,null);
                 PointObsDataset dataset =   (PointObsDataset) TypedDatasetFactory.open(
                                                                    FeatureType.POINT, path, null, new StringBuilder());
                 System.err.println("Create pointPool: " + path);
@@ -293,7 +293,7 @@ public class DataOutputHandler extends OutputHandler {
 
         protected TrajectoryObsDataset createValue(String path) {
             try {
-                getStorageManager().dirTouched(nj22Dir);
+                getStorageManager().dirTouched(nj22Dir,null);
                 TrajectoryObsDataset dataset = (TrajectoryObsDataset) TypedDatasetFactory.open(
                                                                         FeatureType.TRAJECTORY, path, null, new StringBuilder());
 

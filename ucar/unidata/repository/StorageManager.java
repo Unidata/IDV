@@ -111,7 +111,6 @@ public class StorageManager extends RepositoryManager {
     public static final String DIR_THUMBNAILS = "thumbnails";
 
 
-
     /** _more_ */
     public static final String PROP_DIRDEPTH = "ramadda.storage.dirdepth";
 
@@ -201,6 +200,16 @@ public class StorageManager extends RepositoryManager {
         }
         return resource;
     }
+
+
+    protected void doFinalInitialization() {
+        Misc.run(new Runnable() {
+                public void run() {
+                    scourTmpDirs();
+                }
+            });
+    }
+
 
 
     /**
@@ -298,6 +307,8 @@ public class StorageManager extends RepositoryManager {
     }
 
 
+
+
     public void addTemporaryDir(TemporaryDir storageDir) {
         tmpDirs.add(storageDir);
     }
@@ -310,6 +321,13 @@ public class StorageManager extends RepositoryManager {
     }
 
 
+    public File getTmpDirFile(TemporaryDir tmpDir, String file) {
+        File f =  new File(IOUtil.joinDir(tmpDir.getDir(),
+                                          file));
+        dirTouched(tmpDir, f);
+        return f;
+    }
+
 
 
     /**
@@ -317,7 +335,7 @@ public class StorageManager extends RepositoryManager {
      *
      * @return _more_
      */
-    public String getTmpDir() {
+    private String getTmpDir() {
         if (tmpDir == null) {
             tmpDir = IOUtil.joinDir(getRepositoryDir(), DIR_TMP);
             IOUtil.makeDirRecursive(new File(tmpDir));
@@ -327,20 +345,34 @@ public class StorageManager extends RepositoryManager {
 
     private TemporaryDir getScratchDir() {
         if (scratchDir == null) {
-            addTemporaryDir(scratchDir = new TemporaryDir(new File(IOUtil.joinDir(getTmpDir(), DIR_SCRATCH))));
-            IOUtil.makeDirRecursive(scratchDir.getDir());
-            scratchDir.setMaxAge(DateUtil.hoursToMillis(1));
+            scratchDir = addTemporaryDir(DIR_SCRATCH);
+            cacheDir.setMaxAge(DateUtil.hoursToMillis(1));
         }
         return scratchDir;
     }
 
     public File getScratchFile(String file) {
-        File f = new File(IOUtil.joinDir(getScratchDir().getDir(),
-                                             file));
-        dirTouched(getScratchDir());
-        return f;
+        return getTmpDirFile(getScratchDir(),file);
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    private TemporaryDir getThumbDir() {
+        if (thumbDir == null) {
+            thumbDir= addTemporaryDir(DIR_THUMBNAILS);
+            thumbDir.setMaxFiles(1000);
+            thumbDir.setMaxSize(1000*1000*1000);
+        }
+        return thumbDir;
+    }
+
+    public File getThumbFile(String file) {
+        return getTmpDirFile(getThumbDir(),file);
+    }
 
 
     /**
@@ -350,9 +382,7 @@ public class StorageManager extends RepositoryManager {
      */
     private TemporaryDir getCacheDir() {
         if (cacheDir == null) {
-            addTemporaryDir(cacheDir = new TemporaryDir(IOUtil.joinDir(getTmpDir(), DIR_CACHE)));
-            IOUtil.makeDirRecursive(cacheDir.getDir());
-            //TODO: A GB for now
+            cacheDir = addTemporaryDir(DIR_CACHE);
             cacheDir.setMaxSize(1000*1000*1000);
         }
         return cacheDir;
@@ -360,12 +390,7 @@ public class StorageManager extends RepositoryManager {
 
 
     public File getCacheFile(String file) {
-        File f =  new File(IOUtil.joinDir(getScratchDir().getDir(),
-                                             file));
-        if(!f.exists()) {
-            dirTouched(getCacheDir());
-        }
-        return f;
+        return getTmpDirFile(getScratchDir(),file);
     }
 
 
@@ -378,18 +403,35 @@ public class StorageManager extends RepositoryManager {
     }
 
 
-    public void dirTouched(TemporaryDir tmpDir) {
+    public void dirTouched(final TemporaryDir tmpDir,File f) {
+        if(f!=null) {
+            f.setLastModified(new Date().getTime());
+        }
+        //Run this in 10 seconds
+        Misc.runInABit(10000, new Runnable() {
+                public void run() {
+                    scourTmpDir(tmpDir);
+                }});
+    }
+
+
+    private void scourTmpDirs()  {
+        List<TemporaryDir> tmpTmpDirs = new ArrayList<TemporaryDir>(tmpDirs);
+        for(TemporaryDir tmpDir: tmpTmpDirs) {
+            scourTmpDir(tmpDir);
+        }
     }
 
 
     protected void scourTmpDir(final TemporaryDir tmpDir)  {
-        Misc.run(new Runnable() {
-                public void run() {
-                    //1 GB, 24 hours
-                    List<File> filesToScour =    tmpDir.findFilesToScour();
-                    System.err.println (tmpDir+"\n\tFound " + filesToScour.size() +" files to scour");
-                }
-            });
+        synchronized(tmpDir) {
+            System.err.println ("scourTmpDir:" + tmpDir.getDir().getName());
+            if(!tmpDir.haveChanged()) {
+                System.err.println ("    no change");
+                return;
+            }
+            List<File> filesToScour =    tmpDir.findFilesToScour();
+        }
     }
 
 
@@ -405,7 +447,6 @@ public class StorageManager extends RepositoryManager {
         }
         return anonymousDir;
     }
-
 
 
     public File getFullLogFile() {
@@ -449,30 +490,7 @@ public class StorageManager extends RepositoryManager {
         return dir;
     }
 
-    
 
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    private TemporaryDir getThumbDir() {
-        if (thumbDir == null) {
-            addTemporaryDir(thumbDir = new TemporaryDir(IOUtil.joinDir(getTmpDir(), DIR_THUMBNAILS)));
-            thumbDir.setMaxFiles(1000);
-            //TODO: 
-            thumbDir.setMaxSize(1000*1000*1000);
-            IOUtil.makeDirRecursive(thumbDir.getDir());
-        }
-        return thumbDir;
-    }
-
-    public File getThumbFile(String file) {
-        dirTouched(getThumbDir());
-        return  new File(IOUtil.joinDir(getThumbDir().getDir(),
-                                             file));
-    }
 
 
 
@@ -486,10 +504,9 @@ public class StorageManager extends RepositoryManager {
      * @return _more_
      */
     public File getTmpFile(Request request, String name) {
-        dirTouched(getScratchDir());
-        return  new File(IOUtil.joinDir(getScratchDir().getDir().toString(),
-                                        getRepository().getGUID() + FILE_SEPARATOR
-                                        + name));
+        return getTmpDirFile(getScratchDir(),
+                             getRepository().getGUID() + FILE_SEPARATOR
+                             + name);
     }
 
 

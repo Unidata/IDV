@@ -318,10 +318,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private boolean inTomcat = false;
 
-
-
-
-
     /** _more_ */
     private OutputStream fullLogFOS;
 
@@ -397,7 +393,24 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     private int requestCount = 0;
 
-    private Cache<Object,Object> sessionExtra = new Cache<Object,Object>(5000);
+
+
+
+    /** _more_ */
+    Hashtable<String, ApiMethod> requestMap = new Hashtable();
+
+    /** _more_ */
+    ApiMethod homeApi;
+
+    /** _more_ */
+    ArrayList<ApiMethod> apiMethods = new ArrayList();
+
+    /** _more_ */
+    ArrayList<ApiMethod> wildCardApiMethods = new ArrayList();
+
+    /** _more_ */
+    ArrayList<ApiMethod> topLevelMethods = new ArrayList();
+
 
 
     /**
@@ -421,21 +434,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
-    public String putSessionExtra(Object value) {
-        String id = "${" + getGUID()+"}";
-        putSessionExtra(id,value);
-        return id;
-    }
-
-
-    public void putSessionExtra(Object key, Object value) {
-        sessionExtra.put(key,value);
-    }
-
-
-    public Object getSessionExtra(Object key) {
-        return sessionExtra.get(key);
-    }
 
 
     /**
@@ -784,7 +782,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         HtmlUtil.setHideShowImage(iconUrl(ICON_MINUS), iconUrl(ICON_PLUS));
         logInfo("RAMADDA started");
 
-        //        getStorageManager().scourTmpDir();
+        getStorageManager().doFinalInitialization();
 
     }
 
@@ -798,12 +796,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public Repository getRepository() {
         return this;
     }
-
-
-
-
-
-
 
     /**
      * _more_
@@ -1509,42 +1501,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
-
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     */
-    public boolean isAppletEnabled(Request request) {
-        if ( !getProperty(PROP_SHOW_APPLET, true)) {
-            return false;
-        }
-        if (request != null) {
-            return request.get(ARG_APPLET, true);
-        }
-        return true;
-    }
-
-
-    /** _more_ */
-    Hashtable<String, ApiMethod> requestMap = new Hashtable();
-
-    /** _more_ */
-    ApiMethod homeApi;
-
-    /** _more_ */
-    ArrayList<ApiMethod> apiMethods = new ArrayList();
-
-    /** _more_ */
-    ArrayList<ApiMethod> wildCardApiMethods = new ArrayList();
-
-    /** _more_ */
-    ArrayList<ApiMethod> topLevelMethods = new ArrayList();
 
     /**
      * _more_
