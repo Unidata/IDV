@@ -696,6 +696,19 @@ public class ImageUtils {
      *
      * @throws Exception  problem writing file
      */
+    public static void writeImageToFile(Image image, File saveFile)
+            throws Exception {
+        writeImageToFile(image, saveFile.toString());
+    }
+
+    /**
+     * Write a Buffered image to a file
+     *
+     * @param image   image to write
+     * @param saveFile   file to write to
+     *
+     * @throws Exception  problem writing file
+     */
     public static void writeImageToFile(Image image, String saveFile)
             throws Exception {
         writeImageToFile(image, saveFile, 1.0f);
