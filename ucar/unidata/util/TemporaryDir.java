@@ -110,7 +110,7 @@ public class TemporaryDir {
         }
         long t6 = System.currentTimeMillis();
 
-        System.err.println ("    Found " + files.length +" in " + (t2-t1) +"ms   sort time:"+(t4-t3) +" size:" + (int)(totalSize/1000.0) +"KB  " + (t6-t5));
+        System.err.println ("    Found " + files.length +" in " + (t2-t1) +"ms   sort time:"+(t4-t3) +" size:" + totalSize+" " + (t6-t5));
 
         long t7 = System.currentTimeMillis();
         for(int i=0;i<files.length;i++) {
@@ -141,7 +141,6 @@ public class TemporaryDir {
         System.err.println ("    loop time:" + (t8-t7) +" found " + results.size() + " files to delete");
         currentDirTime=dir.lastModified();
         return results;
-
     }
 
 
