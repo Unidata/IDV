@@ -49,6 +49,7 @@ import java.util.zip.*;
 public class TemporaryDir {
 
     private File dir;
+    long currentDirTime=0;
     private int  maxFiles = -1;
     private long maxSize = -1;
     private long maxAge = -1;
@@ -70,6 +71,9 @@ public class TemporaryDir {
     }
 
 
+    public boolean haveChanged() {
+        return currentDirTime!=dir.lastModified();
+    }
 
     public String toString() {
         return dir.toString();
@@ -106,7 +110,7 @@ public class TemporaryDir {
         }
         long t6 = System.currentTimeMillis();
 
-        System.err.println ("Scouring  found " + files.length +" in " + (t2-t1) +"ms   sort time:"+(t4-t3) +" size:" + (int)(totalSize/1000.0) +"KB  " + (t6-t5));
+        System.err.println ("    Found " + files.length +" in " + (t2-t1) +"ms   sort time:"+(t4-t3) +" size:" + (int)(totalSize/1000.0) +"KB  " + (t6-t5));
 
         long t7 = System.currentTimeMillis();
         for(int i=0;i<files.length;i++) {
@@ -134,7 +138,8 @@ public class TemporaryDir {
             numFiles--;
         }
         long t8 = System.currentTimeMillis();
-        System.err.println ("Scour loop time:" + (t8-t7) +" found " + results.size() + " files to delete");
+        System.err.println ("    loop time:" + (t8-t7) +" found " + results.size() + " files to delete");
+        currentDirTime=dir.lastModified();
         return results;
 
     }
