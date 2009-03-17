@@ -54,6 +54,8 @@ public class TemporaryDir {
     private long maxSize = -1;
     private long maxAge = -1;
 
+    private boolean touched = false;
+
     public TemporaryDir(String dir) {
         this(new File(dir));
     }
@@ -102,19 +104,18 @@ public class TemporaryDir {
             numFiles++;
         }
 
-        long t5 = System.currentTimeMillis();
+
         if(maxSize>0) {
             for(int i=0;i<files.length;i++) {
                 totalSize+=files[i].length();
             }
         }
-        long t6 = System.currentTimeMillis();
-
-        System.err.println ("    Found " + files.length +" in " + (t2-t1) +"ms   sort time:"+(t4-t3) +" size:" + totalSize+" " + (t6-t5));
-        System.err.println ("    max age:" + maxAge + " maxSize:" + maxSize +" max # files:"+maxFiles);
 
 
-        long t7 = System.currentTimeMillis();
+        System.err.println ("    found " + files.length +" in " + (t2-t1) +" size:" + totalSize);
+
+
+
         for(int i=0;i<files.length;i++) {
             if(files[i].isDirectory()) {
                 continue;
@@ -126,11 +127,14 @@ public class TemporaryDir {
             if( maxAge>0) {
                 long lastModified = files[i].lastModified();
                 long age  = now-lastModified;
-                if(age>maxAge) shouldScour = true;
+                if(age>maxAge) {
+                    shouldScour = true;
+                }
             } 
             if(maxFiles>0) {
-                if(numFiles>maxFiles)
+                if(numFiles>maxFiles) {
                     shouldScour = true;
+                }
             } 
 
             if(!shouldScour) break;
@@ -139,8 +143,8 @@ public class TemporaryDir {
             totalSize-= files[i].length();
             numFiles--;
         }
-        long t8 = System.currentTimeMillis();
-        System.err.println ("    loop time:" + (t8-t7) +" found " + results.size() + " files to delete");
+
+        System.err.println ("    found " + results.size() + " files to delete");
         currentDirTime=dir.lastModified();
         return results;
     }
@@ -204,6 +208,24 @@ public class TemporaryDir {
     public long getMaxAge () {
 	return this.maxAge;
     }
+
+/**
+Set the Touched property.
+
+@param value The new value for Touched
+**/
+public void setTouched (boolean value) {
+	touched = value;
+}
+
+/**
+Get the Touched property.
+
+@return The Touched
+**/
+public boolean getTouched () {
+	return touched;
+}
 
 
 
