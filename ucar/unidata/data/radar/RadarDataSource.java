@@ -27,6 +27,7 @@ import ucar.unidata.data.*;
 import ucar.unidata.util.*;
 
 import visad.*;
+import visad.util.ThreadManager;
 
 import java.rmi.RemoteException;
 
@@ -275,14 +276,14 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
 
         final List<RadarAdapter> goodAdapters = new ArrayList<RadarAdapter>();
         final List<String> goodFiles = new ArrayList<String>();
-        visad.util.ThreadUtil threadUtil = new visad.util.ThreadUtil("radar data reading");
+        visad.util.ThreadManager threadManager = new visad.util.ThreadManager("radar data reading");
         LogUtil.message("Initializing radar files");
         for (Iterator iter = files.iterator(); iter.hasNext(); ) {
             final String       filename = iter.next().toString();
             RadarAdapter adapter  =(RadarAdapter) oldAdapterMap.get(filename);
             cnt++;
             if (adapter == null) {
-                threadUtil.addRunnable(new visad.util.ThreadUtil.MyRunnable() {
+                threadManager.addRunnable(new visad.util.ThreadManager.MyRunnable() {
                         public void run() throws Exception {
                             try {
                                 RadarAdapter myAdapter = makeRadarAdapter(filename);
@@ -303,11 +304,8 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
 
         }
 
-        long t1 = System.currentTimeMillis();
-        threadUtil.runInParallel();
-        long t2 = System.currentTimeMillis();
-        System.err.println ("radar init time:" + (t2-t1));
-
+        threadManager.debug = true;
+        threadManager.runInParallel();
         LogUtil.message("");
 
         for(int i=0;i<goodAdapters.size();i++) {
@@ -453,7 +451,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
             // so return null.
             //            System.err.println ("Reading " + adapters.size() + " radar files");
             int cnt = 0;
-            visad.util.ThreadUtil threadUtil = new visad.util.ThreadUtil();
+            ThreadManager threadManager = new visad.util.ThreadManager();
 
             for (Iterator iter = adapters.iterator(); iter.hasNext(); ) {
                 final RadarAdapter adapter = (RadarAdapter) iter.next();
@@ -467,7 +465,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
                 LogUtil.message("Time: " + (cnt) + "/" + dateTimes.length
                                 + " From:" + toString());
                 final int theTimeIndex = timeIndex;
-                threadUtil.addRunnable(new visad.util.ThreadUtil.MyRunnable() {
+                threadManager.addRunnable(new visad.util.ThreadManager.MyRunnable() {
                         public void run() throws Exception {
                             Trace.call1("RDS.getData");
                             Data d = adapter.getData(dataChoice, subset,
@@ -480,14 +478,13 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
                         }});
             }
 
-            long t1 = System.currentTimeMillis();
             try {
-                threadUtil.runInParallel();
+                threadManager.debug = true;
+                threadManager.runInParallel();
             } catch (VisADException ve) {
                 LogUtil.printMessage(ve.toString());
             }
-            long t2 = System.currentTimeMillis();
-            System.err.println ("radar read time:" + (t2-t1));
+
 
             if (mt[0] == null) {
                 return null;
