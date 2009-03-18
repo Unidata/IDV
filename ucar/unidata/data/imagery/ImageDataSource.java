@@ -47,6 +47,7 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.visad.data.AddeImageFlatField;
 
 import visad.*;
+import visad.util.ThreadManager;
 
 import visad.data.mcidas.AreaAdapter;
 
@@ -1261,7 +1262,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 currentDirs = null;
             }
 
-            visad.util.ThreadUtil threadUtil = new visad.util.ThreadUtil("image data reading");
+            ThreadManager threadManager = new ThreadManager("image data reading");
             final ImageSequenceManager sequenceManager = new ImageSequenceManager();
             int                  cnt             = 1;
             DataChoice           parent          = dataChoice.getParent();
@@ -1292,7 +1293,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 final String readLabel = "Time: " + (cnt++) + "/"
                                    + descriptorsToUse.size() + "  " + label;
 
-                threadUtil.addRunnable(new visad.util.ThreadUtil.MyRunnable() {
+                threadManager.addRunnable(new ThreadManager.MyRunnable() {
                         public void run() throws Exception {
                             SingleBandedImage image = makeImage(aid, true, readLabel);
                             if (image != null) {
@@ -1305,7 +1306,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
             long t1 = System.currentTimeMillis();
             try {
-                threadUtil.runInParallel();
+                threadManager.runInParallel();
             } catch (VisADException ve) {
                 LogUtil.printMessage(ve.toString());
             }
