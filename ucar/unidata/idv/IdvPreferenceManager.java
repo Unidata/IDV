@@ -374,7 +374,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                 int value = (int)Misc.parseNumber(
                                    (((JTextField) widget).getText().trim()));
                 store.put(key, new Integer(value));
-                visad.util.ThreadUtil.setGlobalMaxThreads(value);
+                visad.util.ThreadManager.setGlobalMaxThreads(value);
                 continue;
             }
 

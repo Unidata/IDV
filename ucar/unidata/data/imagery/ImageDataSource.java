@@ -1263,6 +1263,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
             }
 
             ThreadManager threadManager = new ThreadManager("image data reading");
+            threadManager.debug = true;
             final ImageSequenceManager sequenceManager = new ImageSequenceManager();
             int                  cnt             = 1;
             DataChoice           parent          = dataChoice.getParent();
@@ -1295,22 +1296,24 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
                 threadManager.addRunnable(new ThreadManager.MyRunnable() {
                         public void run() throws Exception {
-                            SingleBandedImage image = makeImage(aid, true, readLabel);
-                            if (image != null) {
-                                synchronized(images) {
-                                    images.add(image);
+                            try {
+                                SingleBandedImage image = makeImage(aid, true, readLabel);
+                                if (image != null) {
+                                    synchronized(images) {
+                                        images.add(image);
+                                    }
                                 }
+                            } catch (VisADException ve) {
+                                LogUtil.printMessage(ve.toString());
                             }
                         }});
             }
 
-            long t1 = System.currentTimeMillis();
             try {
                 threadManager.runInParallel();
             } catch (VisADException ve) {
                 LogUtil.printMessage(ve.toString());
             }
-            long t2 = System.currentTimeMillis();
             return    sequenceManager.addImagesToSequence(images);
         } catch (Exception exc) {
             throw new ucar.unidata.util.WrapperException(exc);

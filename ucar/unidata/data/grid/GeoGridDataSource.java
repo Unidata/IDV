@@ -833,11 +833,11 @@ public class GeoGridDataSource extends GridDataSource {
         return newFiles;
     }
 
-    public boolean isRemoteServer() {
-        String filepath = getFilePath();
-        return (filepath.startsWith("dods:") ||
-                filepath.startsWith("http:") ||
-                filepath.startsWith("https:"));
+
+
+
+    public boolean isLocalFile() {
+        return new File(getFilePath()).exists();
     }
 
 
@@ -1216,11 +1216,11 @@ public class GeoGridDataSource extends GridDataSource {
                                 DataSelection givenDataSelection,
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
-        synchronized (readLock) {
+        //        synchronized (readLock) {
             //            System.err.println("getData:" + dataChoice);
             return makeFieldImpl(dataChoice, givenDataSelection,
                                  requestProperties);
-        }
+            //        }
     }
 
     /**

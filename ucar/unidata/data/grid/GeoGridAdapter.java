@@ -262,11 +262,6 @@ public class GeoGridAdapter {
             }
         }
         this.readLock = dataSource.readLock;
-        if(dataSource.isRemoteServer()) {
-            this.readLock = new Object();
-        }
-
-
         if (geoGrid == null) {
             throw new IllegalArgumentException(
                 "GeoGridAdapter: geogrid cannot be null");
@@ -1200,7 +1195,9 @@ public class GeoGridAdapter {
             //        Trace.call2("toFloatArray", " length:" + fieldArray[0].length);
             retField = new CachedFlatField(ffType, domainSet, fieldArray);
         } else {
-            GeoGridFlatField ggff = new GeoGridFlatField(geoGrid, readLock,
+            Object readLockToUse= (dataSource.isLocalFile()?readLock:new Object());
+
+            GeoGridFlatField ggff = new GeoGridFlatField(geoGrid, readLockToUse,
                                         timeIndex, domainSet, ffType);
 
             if (dataSource.getCacheDataToDisk() && (cacheFile != null)) {
@@ -1276,6 +1273,7 @@ public class GeoGridAdapter {
             StringBuffer testModeBuffer = null;
 
             ThreadManager threadManager = new ThreadManager("GeoGrid data reading");
+            threadManager.debug = true;
             for (int i = 0; i < times.length; i++) {
                 if ( !JobManager.getManager().canContinue(loadId)) {
                     return null;
@@ -1323,10 +1321,10 @@ public class GeoGridAdapter {
                 }
 
             }
-            if(dataSource.isRemoteServer()) {
-                threadManager.runInParallel();
-            } else {
+            if(dataSource.isLocalFile()) {
                 threadManager.runSequentially();
+            } else {
+                threadManager.runInParallel();
             }
 
             //            System.err.println ("GeoGridAdapter DONE");
