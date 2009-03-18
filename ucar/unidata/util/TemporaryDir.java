@@ -112,7 +112,9 @@ public class TemporaryDir {
         }
 
 
-        System.err.println ("    found " + files.length +" in " + (t2-t1) +" size:" + totalSize);
+        if(files.length>0) {
+            System.err.println ("    found " + files.length +" in " + (t2-t1) +" size:" + totalSize);
+        }
 
 
 
@@ -144,7 +146,9 @@ public class TemporaryDir {
             numFiles--;
         }
 
-        System.err.println ("    found " + results.size() + " files to delete");
+        if(results.size()>0) {
+            System.err.println ("    found " + results.size() + " files to delete");
+        }
         currentDirTime=dir.lastModified();
         return results;
     }
