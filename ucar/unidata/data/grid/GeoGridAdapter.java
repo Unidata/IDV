@@ -262,6 +262,11 @@ public class GeoGridAdapter {
             }
         }
         this.readLock = dataSource.readLock;
+        if(dataSource.isRemoteServer()) {
+            this.readLock = new Object();
+        }
+
+
         if (geoGrid == null) {
             throw new IllegalArgumentException(
                 "GeoGridAdapter: geogrid cannot be null");
@@ -1109,7 +1114,7 @@ public class GeoGridAdapter {
         FunctionType ffType =
             new FunctionType(((SetType) domainSet.getType()).getDomain(),
                              paramType);
-        if (true ||  !makeGeoGridFlatField) {
+        if (!makeGeoGridFlatField) {
             //            System.err.println("making flat field");
             try {
                 LogUtil.message(readLabel);
