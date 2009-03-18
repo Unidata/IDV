@@ -1456,13 +1456,13 @@ public class GridUtil {
      */
     public static class Grid2D {
 
-        /** _more_          */
+        /** _more_ */
         float[][] lats;
 
-        /** _more_          */
+        /** _more_ */
         float[][] lons;
 
-        /** _more_          */
+        /** _more_ */
         float[][][] values;
 
         /**
@@ -4720,7 +4720,7 @@ public class GridUtil {
         Object loadId =
             JobManager.getManager().startLoad("Writing grid to CF", true);
         NetcdfFileWriteable ncfile = NetcdfFileWriteable.createNew(filename,
-                                         true);
+                                         false);
         boolean         isTimeSequence = isTimeSequence(grid);
         List<Dimension> dims           = new ArrayList<Dimension>();
         // make variables for the time and xyz axes
@@ -4738,17 +4738,22 @@ public class GridUtil {
             timeVar.addAttribute(new Attribute("units", units[0].toString()));
             ncfile.addVariable(null, timeVar);
         }
-        HashMap<Variable, Array> varData = addSpatialVars(ncfile,
-                                               getSpatialDomain(grid), dims);
+        GriddedSet domainSet = (GriddedSet) getSpatialDomain(grid);
+        CoordinateSystem cs  = domainSet.getCoordinateSystem();
+        boolean haveEmpirical = cs instanceof EmpiricalCoordinateSystem;
+        HashMap<Variable, Array> varData = addSpatialVars(ncfile, domainSet,
+                                               dims);
 
         // TODO: figure out a better way to do this
         Variable      projVar = null;
         java.util.Set keys    = varData.keySet();
-        for (Iterator it = keys.iterator(); it.hasNext(); ) {
-            Variable v = (Variable) it.next();
-            if (v.findAttribute(ProjectionImpl.ATTR_NAME) != null) {
-                projVar = v;
-                break;
+        if ( !haveEmpirical) {
+            for (Iterator it = keys.iterator(); it.hasNext(); ) {
+                Variable v = (Variable) it.next();
+                if (v.findAttribute(ProjectionImpl.ATTR_NAME) != null) {
+                    projVar = v;
+                    break;
+                }
             }
         }
         // make variable for the parameter(s)
@@ -4765,6 +4770,10 @@ public class GridUtil {
             if (projVar != null) {
                 v.addAttribute(new Attribute("grid_mapping",
                                              projVar.getName()));
+            }
+            if (haveEmpirical) {
+                v.addAttribute(new Attribute("coordinates",
+                                             "latitude longitude"));
             }
             v.setDataType(DataType.FLOAT);
             v.setDimensions(dims);
@@ -4862,7 +4871,9 @@ public class GridUtil {
         int                      dim        = domainSet.getDimension();
         int                      mdim       =
             domainSet.getManifoldDimension();
+
         CoordinateSystem         cs         = domainSet.getCoordinateSystem();
+        boolean haveEmpirical = cs instanceof EmpiricalCoordinateSystem;
         Unit[]                   units      = domainSet.getSetUnits();
         int[]                    lens = ((GriddedSet) domainSet).getLengths();
         // populate the time and axes values
@@ -4890,11 +4901,15 @@ public class GridUtil {
         }
         RealType[] types =
             ((SetType) domainSet.getType()).getDomain().getRealComponents();
-        String    xName = getVarName(types[0]);
+        String    xName = (haveEmpirical)
+                          ? "xc"
+                          : getVarName(types[0]);
         Dimension xDim  = new Dimension(xName, sizeX, true);
         ncfile.addDimension(null, xDim);
 
-        String    yName = getVarName(types[1]);
+        String    yName = (haveEmpirical)
+                          ? "yc"
+                          : getVarName(types[1]);
         Dimension yDim  = new Dimension(yName, sizeY, true);
         ncfile.addDimension(null, yDim);
         String zName = null;
@@ -4904,20 +4919,18 @@ public class GridUtil {
             ncfile.addDimension(null, zDim);
             dims.add(zDim);
         }
-        dims.add(yDim);
-        dims.add(xDim);
         Variable      xVar = null;
         Variable      yVar = null;
-        MapProjection mp   = getNavigation(domainSet);
-        //if (cs == null) {  // straight lat/lon(/alt)
-        if (mp instanceof TrivialMapProjection) {  // straight lat/lon(/alt)
+        Array         varArray;
+        MapProjection mp = getNavigation(domainSet);
+        if ((mp instanceof TrivialMapProjection) && !haveEmpirical) {  // straight lat/lon(/alt)
             xVar = makeCoordinateVariable(ncfile, xName, units[0],
                                           "longitude coordinate",
                                           "longitude", xName);
             yVar = makeCoordinateVariable(ncfile, yName, units[1],
                                           "latitude coordinate", "latitude",
                                           yName);
-        } else {
+        } else if ( !haveEmpirical) {
             xVar = makeCoordinateVariable(ncfile, xName, units[0],
                                           "x coordinate of projection",
                                           "projection_x_coordinate", xName);
@@ -4927,7 +4940,6 @@ public class GridUtil {
                                           "projection_y_coordinate", yName);
 
             // make variable for the projection
-            //MapProjection mp      = getNavigation(domainSet);
             Variable projVar = makeProjectionVar(ncfile, mp);
             if (projVar != null) {
                 char[] data = new char[] { 'd' };
@@ -4935,15 +4947,56 @@ public class GridUtil {
                                       data);
                 varToArray.put(projVar, dataArray);
             }
+        } else {  // have Empirical Coordinate System
+            xVar = makeCoordinateVariable(ncfile, xName, null,
+                                          "x coordinate", "x_coordinate",
+                                          xName);
+
+            yVar = makeCoordinateVariable(ncfile, yName, null,
+                                          "y coordinate", "y_coordinate",
+                                          yName);
+
+            float[] latVals = new float[sizeX * sizeY];
+            float[] lonVals = new float[sizeX * sizeY];
+            int     index   = 0;
+            for (int y = 0; y < sizeY; y++) {
+                yVals[y] = y;
+                for (int x = 0; x < sizeX; x++) {
+                    if (index < sizeX) {
+                        xVals[x] = x;
+                    }
+                    lonVals[index]   = spatialVals[0][x + sizeX * y];
+                    latVals[index++] = spatialVals[1][x + sizeX * y];
+                }
+            }
+
+            Variable latVar = new Variable(ncfile, null, null, "latitude",
+                                           DataType.FLOAT, "yc xc");
+            latVar.addAttribute(new Attribute("units", "degrees_north"));
+            latVar.addAttribute(new Attribute("long_name",
+                    "latitude of points"));
+            ncfile.addVariable(null, latVar);
+            varArray = Array.factory(DataType.FLOAT, new int[] { sizeY,
+                    sizeX }, latVals);
+            varToArray.put(latVar, varArray);
+            Variable lonVar = new Variable(ncfile, null, null, "longitude",
+                                           DataType.FLOAT, "yc xc");
+            lonVar.addAttribute(new Attribute("units", "degrees_east"));
+            lonVar.addAttribute(new Attribute("long_name",
+                    "longitude of points"));
+            ncfile.addVariable(null, lonVar);
+            varArray = Array.factory(DataType.FLOAT, new int[] { sizeY,
+                    sizeX }, lonVals);
+            varToArray.put(lonVar, varArray);
         }
-        Array varArray;
+        dims.add(yDim);
+        dims.add(xDim);
         if (dim == 3) {
             Variable zVar = new Variable(ncfile, null, null, zName,
                                          DataType.FLOAT, zName);
             Unit zUnit = units[2];
             if (zUnit != null) {
-                zVar.addAttribute(new Attribute("units",
-                        units[2].toString()));
+                zVar.addAttribute(new Attribute("units", zUnit.toString()));
             }
             String upOrDown = "up";
             if (Unit.canConvert(units[2], CommonUnits.MILLIBAR)) {
@@ -4959,6 +5012,36 @@ public class GridUtil {
                                      zVals);
             varToArray.put(zVar, varArray);
             ncfile.addVariable(null, zVar);
+
+            if (haveEmpirical) {
+                String dimString = zName + " yc xc";
+                String altName   = "height";
+                Variable altVar = new Variable(ncfile, null, null, altName,
+                                      DataType.FLOAT, dimString);
+                EmpiricalCoordinateSystem ecs =
+                    (EmpiricalCoordinateSystem) cs;
+                GriddedSet refSet   = ecs.getReferenceSet();
+                int[]      refSizes = refSet.getLengths();
+                Unit[]     refUnits = refSet.getSetUnits();
+                Unit       altUnit  = refUnits[2];
+                if (altUnit != null) {
+                    altVar.addAttribute(new Attribute("units",
+                            altUnit.toString()));
+                }
+                altVar.addAttribute(new Attribute("long_name",
+                        "height/depth of " + zName));
+                altVar.addAttribute(new Attribute("standard_name",
+                        "altitude"));
+                altVar.addAttribute(new Attribute("coordinates",
+                        "latitude longitude"));
+                float[] altVals = refSet.getSamples(false)[2];
+                varArray = Array.factory(DataType.FLOAT,
+                                         new int[] { refSizes[2],
+                        refSizes[1], refSizes[0] }, altVals);
+                varToArray.put(altVar, varArray);
+                ncfile.addVariable(null, altVar);
+            }
+
         }
         varArray = Array.factory(DataType.FLOAT, new int[] { sizeX }, xVals);
         varToArray.put(xVar, varArray);
@@ -4966,7 +5049,6 @@ public class GridUtil {
         varToArray.put(yVar, varArray);
 
         return varToArray;
-
 
     }
 
