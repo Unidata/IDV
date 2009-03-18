@@ -433,14 +433,17 @@ public class StorageManager extends RepositoryManager {
 
     protected void scourTmpDir(final TemporaryDir tmpDir)  {
         synchronized(tmpDir) {
-            System.err.println ("scourTmpDir:" + tmpDir.getDir().getName());
+            //            System.err.println ("scourTmpDir:" +  tmpDir.getDir().getName());
             if(!tmpDir.haveChanged()) {
                 return;
             }
             List<File> filesToScour =    tmpDir.findFilesToScour();
+            if(filesToScour.size()>0) {
+                logInfo("StorageManager: scouring " + filesToScour.size() + " file from:" +  tmpDir.getDir().getName());
+            }
             List<File> notDeleted = IOUtil.deleteFiles(filesToScour);
             if(notDeleted.size()>0) {
-                logInfo("Could not scour:" + notDeleted);
+                logInfo("Unable to delete tmp files:" + notDeleted);
             }
         }
         tmpDir.setTouched(false);

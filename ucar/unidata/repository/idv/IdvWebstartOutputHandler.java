@@ -149,17 +149,50 @@ public class IdvWebstartOutputHandler extends OutputHandler {
             jnlp = jnlp.replace("%ARG%","-bundle");
             jnlp = jnlp.replace("%URL%",url);
         } else {
+
+            List<Metadata> metadataList =
+                getMetadataManager().findMetadata( entry, ContentMetadataHandler.TYPE_ATTACHMENT,
+                                                   true);
+
             DataOutputHandler data = (DataOutputHandler) getRepository().getOutputHandler(DataOutputHandler.OUTPUT_OPENDAP);
             if(data !=null && data.canLoadAsCdm(entry)) {
-                jnlp = jnlp.replace("%ARG%","-data");
+                String embeddedBundle = null;
+                String opendapUrl = data.getFullTdsUrl(entry);
+            if(metadataList!=null) {
+                for (Metadata metadata : metadataList) {
+                    if (metadata.getAttr1().endsWith(".xidv")) {
+                        File xidvFile=  new File(
+                                                 IOUtil.joinDir(
+                                                                getRepository().getStorageManager().getEntryDir(
+                                                                                                                metadata.getEntryId(), false), metadata.getAttr1()));
+                        embeddedBundle = IOUtil.readContents(xidvFile);
+                        embeddedBundle = embeddedBundle.replace("${datasource}", opendapUrl);
+                        embeddedBundle =  XmlUtil.encodeBase64(embeddedBundle.getBytes());
+                        break;
+                    }
+                } 
+            } 
+
+            StringBuffer args = new StringBuffer();
+
+            if(embeddedBundle!=null) {
+                args.append("<argument>-b64bundle</argument>\n<argument>");
+                args.append(embeddedBundle);
+                args.append("</argument>\n");
+            } else {
+                args.append("<argument>-data</argument>\n<argument>");
                 String type = "OPENDAP.GRID";
                 if(entry.getDataType()!=null) {
                     if(entry.getDataType().equals("point")) type = "NetCDF.POINT";
                 }
-                jnlp = jnlp.replace("%URL%","type:"+type+":"+data.getFullTdsUrl(entry));
+                args.append("type:"+type+":"+opendapUrl);
+                args.append("</argument>\n");
+                jnlp = jnlp.replace("${args}",args.toString());
+            }
+
             }
         }
-
+ 
 
         return new Result("",new StringBuffer(jnlp),"application/x-java-jnlp-file");
         //        return new Result("",new StringBuffer(jnlp),"text/xml");

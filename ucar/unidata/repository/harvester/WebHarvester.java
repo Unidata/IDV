@@ -211,6 +211,7 @@ public class WebHarvester extends Harvester {
         StringBuffer sb  = new StringBuffer();
         int          cnt = 1;
         urlEntries = new ArrayList<HarvesterEntry>();
+        HarvesterEntry lastEntry=null;
         while (true) {
             if ( !request.exists(ATTR_URL + cnt)) {
                 break;
@@ -226,13 +227,22 @@ public class WebHarvester extends Harvester {
             groupName = groupName.replace(">", "/");
 
 
-            urlEntries.add(
-                new HarvesterEntry(
-                    request.getUnsafeString(ATTR_URL + cnt, ""),
-                    request.getUnsafeString(ATTR_NAME + cnt, ""),
-                    request.getUnsafeString(ATTR_DESCRIPTION + cnt, ""),
-                    groupName,
-                    baseGroupId));
+            if(!request.exists(ATTR_NAME+cnt) && lastEntry!=null) {
+                lastEntry = new HarvesterEntry(
+                                               request.getUnsafeString(ATTR_URL + cnt, ""),
+                                               lastEntry.name,
+                                               lastEntry.description,
+                                               lastEntry.group,
+                                               lastEntry.baseGroupId);
+            } else {
+                lastEntry = new HarvesterEntry(
+                                               request.getUnsafeString(ATTR_URL + cnt, ""),
+                                               request.getUnsafeString(ATTR_NAME + cnt, ""),
+                                               request.getUnsafeString(ATTR_DESCRIPTION + cnt, ""),
+                                               groupName,
+                                               baseGroupId);
+            }
+            urlEntries.add(lastEntry);
             cnt++;
         }
 

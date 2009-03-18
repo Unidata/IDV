@@ -83,7 +83,9 @@ public class RepositoryServlet extends HttpServlet {
     /**
      * _more_
      */
-    public RepositoryServlet() {}
+    public RepositoryServlet() {
+        System.err.println("*** new Sevlet - 1");
+    }
 
     /**
      * _more_
@@ -94,6 +96,7 @@ public class RepositoryServlet extends HttpServlet {
      * @throws Exception _more_
      */
     public RepositoryServlet(String[] args, int port) throws Exception {
+        System.err.println("*** new Sevlet - 2");
         this.args = args;
         createRepository(port, new Properties());
     }
@@ -132,6 +135,7 @@ public class RepositoryServlet extends HttpServlet {
     private synchronized void createRepository(int port,
             Properties webAppProperties)
             throws Exception {
+        if(repository!=null) return;
         Repository tmp = new Repository(getInitParams(), port, true);
         tmp.init(webAppProperties);
         repository = tmp;

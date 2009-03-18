@@ -26,8 +26,7 @@
     <argument>-nodefault</argument>
     <argument>-oneinstanceport</argument>
     <argument>9876</argument>
-    <argument>%ARG%</argument>
-    <argument>%URL%</argument>
+    ${args}
   </application-desc>
   <security>
     <all-permissions/>

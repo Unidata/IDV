@@ -541,7 +541,7 @@ public class Harvester extends RepositoryManager {
         element.setAttribute(ATTR_TYPE, typeHandler.getType());
 
         element.setAttribute(ATTR_SLEEP, sleepMinutes + "");
-        element.setAttribute(ATTR_SLEEP, sleepMinutes + "");
+        element.setAttribute(ATTR_SLEEPUNIT, sleepUnit);
 
         element.setAttribute(ATTR_TAGTEMPLATE, tagTemplate);
         element.setAttribute(ATTR_NAMETEMPLATE, nameTemplate);
@@ -579,6 +579,11 @@ public class Harvester extends RepositoryManager {
         if ((content == null) || (content.trim().length() == 0)) {
             return;
         }
+        content = content.replace("${fromdate}","${from_date}");
+        content = content.replace("${year}","${from_year}");
+        content = content.replace("${month}","${from_month}");
+        content = content.replace("${monthname}","${from_monthname}");
+        content = content.replace("${day}","${from_day}");
         Element root =
             XmlUtil.getRoot(new ByteArrayInputStream(content.getBytes()));
         init(root);

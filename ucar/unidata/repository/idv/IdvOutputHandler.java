@@ -140,6 +140,9 @@ public class IdvOutputHandler extends OutputHandler {
         }
     }
 
+    public DataOutputHandler getDataOutputHandler() throws Exception {
+        return  (DataOutputHandler) getRepository().getOutputHandler(DataOutputHandler.OUTPUT_OPENDAP);
+    } 
 
     public void getEntryLinks(Request request, State state,
                                  List<Link> links)

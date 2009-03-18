@@ -1071,9 +1071,9 @@ return new Result(title, sb);
         int fromMonth = fromCal.get(GregorianCalendar.MONTH) + 1;
         int toMonth = toCal.get(GregorianCalendar.MONTH) + 1;
 
-        int createYear  = createCal.get(GregorianCalendar.YEAR) + 1;
-        int fromYear  = fromCal.get(GregorianCalendar.YEAR) + 1;
-        int toYear  = toCal.get(GregorianCalendar.YEAR) + 1;
+        int createYear  = createCal.get(GregorianCalendar.YEAR);
+        int fromYear  = fromCal.get(GregorianCalendar.YEAR);
+        int toYear  = toCal.get(GregorianCalendar.YEAR);
 
 
 
