@@ -438,6 +438,10 @@ public class StorageManager extends RepositoryManager {
                 return;
             }
             List<File> filesToScour =    tmpDir.findFilesToScour();
+            List<File> notDeleted = IOUtil.deleteFiles(filesToScour);
+            if(notDeleted.size()>0) {
+                logInfo("Could not scour:" + notDeleted);
+            }
         }
         tmpDir.setTouched(false);
     }

@@ -214,15 +214,15 @@ public class LdmAction extends MonitorAction {
         Process process = Runtime.getRuntime().exec(command);
         int     result  = process.waitFor();
         if (result == 0) {
-            repository.logInfo("LdmMonitor inserted into queue:" + file);
+            repository.getLogManager().logInfo("LdmMonitor inserted into queue:" + file);
         } else {
             try {
                 InputStream is    = process.getErrorStream();
                 byte[]      bytes = IOUtil.readBytes(is);
-                repository.logError("LdmMonitor failed to insert into queue:" + file+"\n"+ new String(bytes));
+                repository.getLogManager().logError("LdmMonitor failed to insert into queue:" + file+"\n"+ new String(bytes));
                 System.err.println("Error:" + new String(bytes));
             } catch (Exception noop) {
-                repository.logError("LdmMonitor failed to insert into queue:" + file);
+                repository.getLogManager().logError("LdmMonitor failed to insert into queue:" + file);
             }
         }
     }

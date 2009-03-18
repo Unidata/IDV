@@ -1009,54 +1009,114 @@ return new Result(title, sb);
      * @return _more_
      */
     public String replaceMacros(Entry entry, String template) {
+        Date createDate = new Date(entry.getCreateDate());
         Date fromDate = new Date(entry.getStartDate());
         Date toDate   = new Date(entry.getEndDate());
-
-        GregorianCalendar fromCal =
-            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
-        fromCal.setTime(fromDate);
-        int fromDay = fromCal.get(GregorianCalendar.DAY_OF_MONTH);
-        int               fromMonth = fromCal.get(GregorianCalendar.MONTH)
-                                      + 1;
-        int               fromYear  = fromCal.get(GregorianCalendar.YEAR) + 1;
-
-
-        GregorianCalendar toCal =
-            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
-        toCal.setTime(toDate);
-        int toDay   = toCal.get(GregorianCalendar.DAY_OF_MONTH);
-        int toMonth = toCal.get(GregorianCalendar.MONTH) + 1;
-        int toYear  = toCal.get(GregorianCalendar.YEAR) + 1;
 
         String url =
             HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
                          ARG_ENTRYID, entry.getId());
-
+        //j-
         String[] macros = {
-            "fromdate", getRepository().formatDate(fromDate), "fromday",
-            ((fromDay < 10)
-             ? "0"
-             : "") + fromDay, "frommonth", ((fromMonth < 10)
-                                            ? "0"
-                                            : "") + fromMonth, "fromyear",
-                                                "" + fromYear,
-            "frommonthname",
-            DateUtil.MONTH_NAMES[fromCal.get(GregorianCalendar.MONTH)],
-            "todate", getRepository().formatDate(toDate), "today",
-            ((toDay < 10)
-             ? "0"
-             : "") + toDay, "tomonth", ((toMonth < 10)
-                                        ? "0"
-                                        : "") + toMonth, "toyear",
-                                            "" + toYear, "tomonthname",
-            DateUtil.MONTH_NAMES[toCal.get(GregorianCalendar.MONTH)],
-            "filename",
-            getStorageManager().getFileTail(entry.getResource().getPath()),
-            "fileextension",
-            IOUtil.getFileExtension(entry.getResource().getPath()), "name",
-            entry.getName(), "fullname", entry.getFullName(), "user",
-            entry.getUser().getLabel(), "url", url
+            "filename",    getStorageManager().getFileTail(entry.getResource().getPath()),
+            "fileextension",       IOUtil.getFileExtension(entry.getResource().getPath()), 
+            "name",  entry.getName(), 
+            "fullname", entry.getFullName(), 
+            "user",    entry.getUser().getLabel(), 
+            "url", url
         };
+
+        //j+
+        String result = template;
+
+        for (int i = 0; i < macros.length; i += 2) {
+            String macro = "${" + macros[i] + "}";
+            String value = macros[i + 1];
+            result = result.replace(macro, value);
+        }
+
+        return     replaceMacros(result, createDate,  fromDate,  toDate);
+    }
+
+
+
+    public String replaceMacros(String template, Date createDate, Date fromDate, Date toDate) {
+        GregorianCalendar fromCal =
+            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        fromCal.setTime(fromDate);
+
+        GregorianCalendar createCal =
+            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        createCal.setTime(createDate);
+
+        GregorianCalendar toCal =
+            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        toCal.setTime(toDate);
+
+
+        int createDay = createCal.get(GregorianCalendar.DAY_OF_MONTH);
+        int fromDay = fromCal.get(GregorianCalendar.DAY_OF_MONTH);
+        int toDay   = toCal.get(GregorianCalendar.DAY_OF_MONTH);
+
+        int createWeek = createCal.get(GregorianCalendar.WEEK_OF_MONTH);
+        int fromWeek = fromCal.get(GregorianCalendar.WEEK_OF_MONTH);
+        int toWeek = toCal.get(GregorianCalendar.WEEK_OF_MONTH);
+
+        int createWeekOfYear = createCal.get(GregorianCalendar.WEEK_OF_YEAR);
+        int fromWeekOfYear = fromCal.get(GregorianCalendar.WEEK_OF_YEAR);
+        int toWeekOfYear = toCal.get(GregorianCalendar.WEEK_OF_YEAR);
+
+
+        int createMonth = createCal.get(GregorianCalendar.MONTH) + 1;
+        int fromMonth = fromCal.get(GregorianCalendar.MONTH) + 1;
+        int toMonth = toCal.get(GregorianCalendar.MONTH) + 1;
+
+        int createYear  = createCal.get(GregorianCalendar.YEAR) + 1;
+        int fromYear  = fromCal.get(GregorianCalendar.YEAR) + 1;
+        int toYear  = toCal.get(GregorianCalendar.YEAR) + 1;
+
+
+
+        //j-
+        String[] macros = {
+            "day",    padZero(fromDay),
+            "week",    fromWeek+"",
+            "month",   padZero(fromMonth),
+            "year",    fromYear+"",
+            "date",    getRepository().formatDate(fromDate), 
+            "fromdate",    getRepository().formatDate(fromDate), 
+            "monthname",  DateUtil.MONTH_NAMES[fromMonth-1],
+
+            "create_day",    padZero(createDay),
+            "from_day",    padZero(fromDay),
+            "to_day",    padZero(toDay),
+
+            "create_week", ""+createWeek,
+            "from_week", ""+fromWeek,
+            "to_week", ""+toWeek,
+
+            "create_weekofyear", ""+createWeekOfYear,
+            "from_weekofyear", ""+fromWeekOfYear,
+            "to_weekofyear", ""+toWeekOfYear,
+
+            "create_date",   getRepository().formatDate(createDate), 
+            "from_date",   getRepository().formatDate(fromDate), 
+            "to_date",   getRepository().formatDate(toDate), 
+
+            "create_month", padZero(createMonth),
+            "from_month", padZero(fromMonth),
+            "to_month", padZero(toMonth),
+
+            "create_year",  createYear+"",
+            "from_year",  fromYear+"",
+            "to_year",  toYear+"",
+
+            "create_monthname",    DateUtil.MONTH_NAMES[createMonth-1],
+            "from_monthname",  DateUtil.MONTH_NAMES[fromMonth-1],
+            "to_monthname",    DateUtil.MONTH_NAMES[toMonth-1]
+        };
+
+        //j+
         String result = template;
 
         for (int i = 0; i < macros.length; i += 2) {
@@ -1066,6 +1126,12 @@ return new Result(title, sb);
         }
 
         return result;
+    }
+
+    private String padZero(int v) {
+        return((v < 10)
+             ? "0"
+               : "") + v; 
     }
 
 
@@ -4030,7 +4096,7 @@ return new Result(title, sb);
             getDatabaseManager().setDate(statement, col + 1,
                                          entry.getEndDate());
         } catch (Exception exc) {
-            getRepository().logError("Error: Bad date " + entry.getResource()
+            getLogManager().logError("Error: Bad date " + entry.getResource()
                                      + " " + new Date(entry.getStartDate()));
             getDatabaseManager().setDate(statement, col, new Date());
             getDatabaseManager().setDate(statement, col + 1, new Date());
@@ -4927,6 +4993,29 @@ return new Result(title, sb);
         return getEntry(request, ids[0], false);
     }
 
+
+
+    public Group findGroupUnder(Request request, Group group, String name, User user) 
+            throws Exception {
+        synchronized (MUTEX_GROUP) {
+            List<String> toks = (List<String>) StringUtil.split(name,
+                                    Group.PATHDELIMITER, true, true);
+            for(String tok: toks) {
+                Group theChild = null;
+                for(Entry child:  getChildrenGroups(request, group)) {
+                    if(child.getName().equals(tok)) {
+                        theChild = (Group)child;
+                        break;
+                    }
+                }
+                if(theChild == null) {
+                    theChild = makeNewGroup(group, tok, user);
+                }
+                group = theChild;
+            }
+            return group;
+        }
+    }
 
 
     /**

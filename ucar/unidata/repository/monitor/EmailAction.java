@@ -123,7 +123,7 @@ public class EmailAction extends PasswordAction {
             try {
                 for (String to : StringUtil.split(getRemoteUserId(), ",",
                         true, true)) {
-                    monitor.getRepository().logInfo("Monitor:" + this +" sending mail to: " + to);
+                    monitor.getRepository().getLogManager().logInfo("Monitor:" + this +" sending mail to: " + to);
                     String message = getMessage(monitor, entry);
                     monitor.getRepository().getAdmin().sendEmail(to, from,
                             "New Entry", message, false);

@@ -233,14 +233,14 @@ public class CatalogHarvester extends Harvester {
             metadata.setEntryId(entry.getId());
             try {
                 if (metadata.getAttr1().length() > 10000) {
-                    repository.logError("Too long metadata:"
+                    repository.getLogManager().logError("Too long metadata:"
                                         + metadata.getAttr1().substring(0,
                                             100) + "...");
                     continue;
                 }
                 getMetadataManager().insertMetadata(metadata);
             } catch (Exception exc) {
-                repository.logError("Bad metadata", exc);
+                repository.getLogManager().logError("Bad metadata", exc);
                 System.err.println("metadata attr1" + metadata.getAttr1());
                 System.err.println("metadata attr2" + metadata.getAttr2());
                 System.err.println("metadata attr3" + metadata.getAttr3());

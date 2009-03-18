@@ -297,31 +297,17 @@ public class Harvester extends RepositoryManager {
         if (toDate == null) {
             toDate = fromDate;
         }
-        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
-        cal.setTime(fromDate);
-        int      day    = cal.get(cal.DAY_OF_MONTH);
-        int      month  = (cal.get(cal.MONTH) + 1);
-        int      year   = cal.get(cal.YEAR);
+        s = getEntryManager().replaceMacros(s, createDate,  fromDate,  toDate);
         String[] macros = {
-            "fromdate", getRepository().formatDate(fromDate), "todate",
-            getRepository().formatDate(toDate), "year", "" + year, "month",
-            ((month < 10)
-             ? "0"
-             : "") + month, "monthname",
-            DateUtil.MONTH_NAMES[cal.get(cal.MONTH)], "day", ((day < 10)
-                    ? "0"
-                    : "") + day, "filename", filename
+            "filename", filename,
+            "fileextension",       IOUtil.getFileExtension(filename),
         };
-
 
         for (int i = 0; i < macros.length; i += 2) {
             String macro = "${" + macros[i] + "}";
             String value = macros[i + 1];
             s = s.replace(macro, value);
         }
-
-        s = StringUtil.replaceDate(s, "fromdate", fromDate);
-        s = StringUtil.replaceDate(s, "todate", toDate);
         return s;
     }
 
@@ -708,7 +694,7 @@ public class Harvester extends RepositoryManager {
             setActive(true);
             runInner(++timestamp);
         } catch (Exception exc) {
-            getRepository().logError("In harvester", exc);
+            getRepository().getLogManager().logError("In harvester", exc);
             error = "Error: " + exc + "<br>" + LogUtil.getStackTrace(exc);
         }
         setActive(false);
@@ -984,7 +970,7 @@ public class Harvester extends RepositoryManager {
      */
     public void debug(String msg) {
         if (getTestMode()) {
-            getRepository().logInfo(msg);
+            getRepository().getLogManager().logInfo(msg);
             msg = msg.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
             msg = msg.replace("\n", "<br>");
             status.append(msg);

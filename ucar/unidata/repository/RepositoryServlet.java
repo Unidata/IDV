@@ -495,7 +495,7 @@ public class RepositoryServlet extends HttpServlet {
             }
             //            logger.logException(logger.getStackTrace(exc), address);
             if (repository != null) {
-                repository.logError("Error in RepositoryServlet address="
+                repository.getLogManager().logError("Error in RepositoryServlet address="
                                     + address, exc);
                 return;
             }

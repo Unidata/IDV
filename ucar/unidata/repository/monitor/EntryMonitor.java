@@ -607,7 +607,7 @@ public class EntryMonitor implements Constants {
     protected void handleError(String message, Exception exc) {
         lastError = message + "<br>" + exc + "<br>"
                     + LogUtil.getStackTrace(exc);
-        getRepository().logError(message, exc);
+        getRepository().getLogManager().logError(message, exc);
     }
 
     /**

@@ -427,7 +427,7 @@ public class MetadataManager extends RepositoryManager {
                                            node }));
                 }
             } catch (Exception exc) {
-                getRepository().logError(
+                logError(
                     "Error loading metadata handler file:" + file, exc);
                 throw exc;
             }

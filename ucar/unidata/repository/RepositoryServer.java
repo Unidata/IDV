@@ -264,7 +264,7 @@ public class RepositoryServer extends HttpServer implements Constants {
                 result = repository.handleRequest(request);
             } catch (Throwable exc) {
                 exc = LogUtil.getInnerException(exc);
-                repository.logError("Error:" + exc, exc);
+                repository.getLogManager().logError("Error:" + exc, exc);
                 result = new Result("Error",
                                     new StringBuffer(exc.getMessage() + ""));
                 result.setResponseCode(Result.RESPONSE_INTERNALERROR);
@@ -290,7 +290,7 @@ public class RepositoryServer extends HttpServer implements Constants {
      * @param exc _more_
      */
     protected void handleError(String msg, Exception exc) {
-        repository.logError(msg, exc);
+        repository.getLogManager().logError(msg, exc);
     }
 
 

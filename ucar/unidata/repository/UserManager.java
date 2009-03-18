@@ -144,14 +144,14 @@ public class UserManager extends RepositoryManager {
         if (adminFromProperties != null) {
             List<String> toks = StringUtil.split(adminFromProperties, ":");
             if (toks.size() != 2) {
-                getRepository().logError("Error: The " + PROP_ADMIN
+                getLogManager().logError("Error: The " + PROP_ADMIN
                          + " property is incorrect");
                 return;
             }
             User user = new User(toks.get(0), "", false);
             user.setPassword(UserManager.hashPassword(toks.get(1).trim()));
             makeOrUpdateUser(user, true, true);
-            getRepository().logInfo("Password for:" + user.getId() + " has been updated");
+            logInfo("Password for:" + user.getId() + " has been updated");
         }
     }
 

@@ -318,11 +318,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private boolean inTomcat = false;
 
-    /** _more_ */
-    private OutputStream fullLogFOS;
-
-
-    private OutputStream runLogFOS;
 
 
     /** _more_ */
@@ -336,6 +331,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     private SessionManager sessionManager;
+
+    private LogManager logManager;
 
     /** _more_ */
     private EntryManager entryManager;
@@ -386,12 +383,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     private List<File> localFilePaths = new ArrayList<File>();
-
-
-    /** _more_ */
-    private List<LogEntry> log = new ArrayList<LogEntry>();
-
-    private int requestCount = 0;
 
 
 
@@ -701,8 +692,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             setUrlBase(BLANK);
         }
 
-        fullLogFOS = new FileOutputStream(getStorageManager().getFullLogFile(), true);
-        runLogFOS = new FileOutputStream(getStorageManager().getLogFile(), false);
+
+
 
         String derbyHome = (String) properties.get(PROP_DB_DERBY_HOME);
         if (derbyHome != null) {
@@ -782,7 +773,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
         HtmlUtil.setHideShowImage(iconUrl(ICON_MINUS), iconUrl(ICON_PLUS));
-        logInfo("RAMADDA started");
+        getLogManager().logInfo("RAMADDA started");
 
         getStorageManager().doFinalInitialization();
 
@@ -936,6 +927,24 @@ public class Repository extends RepositoryBase implements RequestHandler {
             sessionManager.init();
         }
         return sessionManager;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public LogManager getLogManager() {
+        if (logManager == null) {
+            logManager = doMakeLogManager();
+            logManager.init();
+        }
+        return logManager;
+    }
+
+    protected LogManager doMakeLogManager() {
+        return new LogManager(this);
     }
 
     /**
@@ -1168,7 +1177,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     languages.add(new TwoFacedObject(name, type));
                     languageMap.put(type, properties);
                 } else {
-                    logError("No _type_ found in: " + path);
+                    getLogManager().logError("No _type_ found in: " + path);
                 }
             }
         }
@@ -1305,7 +1314,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         entryIdx++) {
                     String entry = (String) entries.get(entryIdx);
                     if ( !checkFile(entry)) {
-                        logError("Don't know how to handle plugin resource:"
+                        getLogManager().logError("Don't know how to handle plugin resource:"
                                  + entry + " from plugin:" + plugins[i]);
                     }
                 }
@@ -1403,105 +1412,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param message _more_
-     */
-    public void debug(String message) {
-        if (debug) {
-            logInfo(message);
-        }
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param message _more_
-     */
-    public void log(Request request, String message) {
-        logInfo("user:" + request.getUser() + " -- " + message);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param message _more_
-     */
-    public void logInfo(String message) {
-        log(message,null);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param message _more_
-     */
-    public void logError(String message) {
-        logError(message, null);
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param message _more_
-     * @param exc _more_
-     */
-    public void logError(String message, Throwable exc) {
-        log("Error:" +message,exc);
-    }
-
-
-
-    private void log(String message, Throwable exc) {
-        Throwable thr = null;
-        if (exc != null) {
-            thr = LogUtil.getInnerException(exc);
-        }
-
-        if(getProperty(PROP_LOG_TOSTDERR,false)) {
-            System.err.println(message);
-            if (thr!=null) {
-                if (thr instanceof RepositoryUtil.MissingEntryException) {
-                    System.err.println(thr.getMessage());
-                } else {
-                    thr.printStackTrace();
-                }
-            }
-        }
-
-        try {
-            String line = new Date() + " -- " + message;
-            for(FileOutputStream os: (List<FileOutputStream>)Misc.newList(fullLogFOS,runLogFOS)) {
-                synchronized(os) {
-                    os.write(line.getBytes());
-                    os.write("\n".getBytes());
-                    if (thr != null) {
-                        if (thr instanceof RepositoryUtil.MissingEntryException) {
-                            os.write(thr.toString().getBytes());
-                            os.write("\n".getBytes());
-                        } else {
-                            os.write("<stack>".getBytes());
-                            os.write("\n".getBytes());
-                            os.write(LogUtil.getStackTrace(thr).getBytes());
-                            os.write("\n".getBytes());
-                            os.write("</stack>".getBytes());
-                        }
-                    }
-                    os.flush();
-                }
-            }
-        } catch (Exception exc2) {
-            System.err.println("Error writing log:" + exc2);
-        }
-    }
-
 
 
     /**
@@ -1518,7 +1428,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             super.initRequestUrl(requestUrl);
             ApiMethod apiMethod = findApiMethod(request);
             if (apiMethod == null) {
-                logError("Could not find api for: " + requestUrl.getPath());
+                getLogManager().logError("Could not find api for: " + requestUrl.getPath());
                 return;
             }
             if (getProperty("ramadda.sslok", true)) {
@@ -1792,11 +1702,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
                             node }));
                 } catch (Exception exc) {
                     if ( !required) {
-                        logError("Couldn't load optional output handler:"
+                        getLogManager().logError("Couldn't load optional output handler:"
                                  + XmlUtil.toString(node));
-                        logError("Warning:" + exc);
+                        getLogManager().logError("Warning:" + exc);
                     } else {
-                        logError("Error loading output handler file:" + file,
+                        getLogManager().logError("Error loading output handler file:" + file,
                                  exc);
                         throw exc;
                     }
@@ -1996,7 +1906,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         //        System.err.println("request:" + request);
         if (debug) {
-            debug("user:" + request.getUser() + " -- " + request.toString());
+            getLogManager().debug("user:" + request.getUser() + " -- " + request.toString());
         }
         //        logInfo("request:" + request);
         try {
@@ -2065,7 +1975,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 if (userAgent == null) {
                     userAgent = "Unknown";
                 }
-                logError("Error handling request:" + request + " ip:" + request.getIp(), inner);
+                getLogManager().logError("Error handling request:" + request + " ip:" + request.getIp(), inner);
             }
         }
 
@@ -2208,7 +2118,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
         //        System.out.println(absoluteUrl(request.getUrl()));
-        requestCount++;
+
         request.setApiMethod(apiMethod);
 
         String userAgent = request.getHeaderArg("User-Agent");
@@ -2256,13 +2166,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
 
-        //Keep the size of the log at 200
-        synchronized (log) {
-            while (log.size() > 200) {
-                log.remove(0);
-            }
-            log.add(new LogEntry(request));
-        }
+        getLogManager().logRequest(request);
+
 
         if ((result.getInputStream() == null) && cachingOk
                 && apiMethod.getCanCache()) {
@@ -2276,22 +2181,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         return result;
     }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public List<LogEntry> getLog() {
-        synchronized (log) {
-            return new ArrayList<LogEntry>(log);
-        }
-    }
-
-    public int getRequestCount() {
-        return requestCount;
-    }
-
 
 
     /**
@@ -2307,7 +2196,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String path = request.getRequestPath();
         //        System.err.println("path:" + path);
         if ( !path.startsWith(getUrlBase())) {
-            log(request, "Unknown request" + " \"" + path + "\"");
+            getLogManager().log(request, "Unknown request" + " \"" + path + "\"");
             Result result =
                 new Result(msg("Error"),
                            new StringBuffer(msgLabel("Unknown request")
@@ -2353,7 +2242,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             userAgent = "Unknown";
         }
 
-        log(request,
+        getLogManager().log(request,
             "Unknown request:" + request.getUrl() + " user-agent:"
             + userAgent + " ip:" + request.getIp());
         Result result =
@@ -4482,7 +4371,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 names.load(s);
                 namesHolder.put(namesFile, names);
             } catch (Exception exc) {
-                logError("err:" + exc, exc);
+                getLogManager().logError("err:" + exc, exc);
                 throw exc;
             }
         }
@@ -4823,164 +4712,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return fb.toString();
     }
 
-
-    /**
-     * Class LogEntry _more_
-     *
-     *
-     * @author IDV Development Team
-     */
-    public class LogEntry {
-
-        /** _more_ */
-        User user;
-
-        /** _more_ */
-        Date date;
-
-        /** _more_ */
-        String path;
-
-        /** _more_ */
-        String ip;
-
-        /** _more_ */
-        String userAgent;
-
-        /** _more_ */
-        String url;
-
-        /**
-         * _more_
-         *
-         * @param request _more_
-         */
-        public LogEntry(Request request) {
-            this.user = request.getUser();
-            this.path = request.getRequestPath();
-
-            String entryPrefix = URL_ENTRY_SHOW.toString();
-            if (this.path.startsWith(entryPrefix)) {
-                url       = request.getUrl();
-                this.path = this.path.substring(entryPrefix.length());
-                if (path.trim().length() == 0) {
-                    path = "/entry/show";
-                }
-
-            }
-
-            this.date      = new Date();
-            this.ip        = request.getIp();
-            this.userAgent = request.getUserAgent();
-        }
-
-
-        /**
-         *  Set the Ip property.
-         *
-         *  @param value The new value for Ip
-         */
-        public void setIp(String value) {
-            ip = value;
-        }
-
-        /**
-         *  Get the Ip property.
-         *
-         *  @return The Ip
-         */
-        public String getIp() {
-            return ip;
-        }
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public String getUrl() {
-            return url;
-        }
-
-        /**
-         *  Set the UserAgent property.
-         *
-         *  @param value The new value for UserAgent
-         */
-        public void setUserAgent(String value) {
-            userAgent = value;
-        }
-
-        /**
-         *  Get the UserAgent property.
-         *
-         *  @return The UserAgent
-         */
-        public String getUserAgent() {
-            return userAgent;
-        }
-
-
-
-
-        /**
-         *  Set the User property.
-         *
-         *  @param value The new value for User
-         */
-        public void setUser(User value) {
-            user = value;
-        }
-
-        /**
-         *  Get the User property.
-         *
-         *  @return The User
-         */
-        public User getUser() {
-            return user;
-        }
-
-        /**
-         *  Set the Date property.
-         *
-         *  @param value The new value for Date
-         */
-        public void setDate(Date value) {
-            date = value;
-        }
-
-        /**
-         *  Get the Date property.
-         *
-         *  @return The Date
-         */
-        public Date getDate() {
-            return date;
-        }
-
-        /**
-         *  Set the Path property.
-         *
-         *  @param value The new value for Path
-         */
-        public void setPath(String value) {
-            path = value;
-        }
-
-        /**
-         *  Get the Path property.
-         *
-         *  @return The Path
-         */
-        public String getPath() {
-            return path;
-        }
-
-
-
-
-    }
 
 
 

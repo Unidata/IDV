@@ -211,12 +211,12 @@ public class HarvesterManager extends RepositoryManager {
                         harvesterMap.put(harvester.getId(), harvester);
                     }
                 } catch (Exception exc) {
-                    getRepository().logError("Error loading harvester file:"
+                    logError("Error loading harvester file:"
                                              + file, exc);
                 }
             }
         } catch (Exception exc) {
-            getRepository().logError("Error loading harvester file", exc);
+            logError("Error loading harvester file", exc);
         }
 
 

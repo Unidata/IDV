@@ -366,10 +366,10 @@ public class PatternHarvester extends Harvester {
             }
             filePattern = Pattern.compile(pattern.toString());
             if (getTestMode()) {
-                getRepository().logInfo("orig pattern:" + "  "
+                getRepository().getLogManager().logInfo("orig pattern:" + "  "
                                         + filePatternString);
-                getRepository().logInfo("pattern:" + "  " + pattern);
-                getRepository().logInfo("pattern names:" + patternNames);
+                getRepository().getLogManager().logInfo("pattern:" + "  " + pattern);
+                getRepository().getLogManager().logInfo("pattern names:" + patternNames);
             }
         }
     }

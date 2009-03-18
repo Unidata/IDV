@@ -649,7 +649,7 @@ public class DatabaseManager extends RepositoryManager {
         try {
             statement.execute(sql);
         } catch (Exception exc) {
-            getRepository().logError("Error executing sql:" + sql, exc);
+            logError("Error executing sql:" + sql, exc);
             throw exc;
         }
         long t2 = System.currentTimeMillis();

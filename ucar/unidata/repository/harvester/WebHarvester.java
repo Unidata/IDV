@@ -311,11 +311,10 @@ public class WebHarvester extends Harvester {
                                                                      HtmlUtil.SIZE_60)+baseSelect));
 
             String fieldId = ATTR_GROUP + cnt;
-            String select  = OutputHandler.getGroupSelect(request, fieldId);
             entrySB.append(HtmlUtil.formEntry(msgLabel("Sub-Group Template"),
                     HtmlUtil.input(fieldId, urlEntry.group,
                                    HtmlUtil.SIZE_80 + HtmlUtil.id(fieldId)
-                                   + HtmlUtil.title(templateHelp)) + select));
+                                   + HtmlUtil.title(templateHelp))));
             entrySB.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.makeShowHideBlock("URL #" + cnt,
                                                  entrySB.toString(), true));
@@ -445,8 +444,9 @@ public class WebHarvester extends Harvester {
             if ( !getActive()) {
                 return;
             }
+            Group baseGroup = (urlEntry.baseGroupId.length()==0?null:getEntryManager().findGroup(null, urlEntry.baseGroupId));
             Entry entry = processUrl(urlEntry.url, urlEntry.name,
-                                     urlEntry.description, urlEntry.group);
+                                     urlEntry.description, baseGroup, urlEntry.group);
             if (entry != null) {
                 entries.add(entry);
                 if (statusMessages.size() > 100) {
@@ -480,8 +480,10 @@ public class WebHarvester extends Harvester {
      * @throws Exception _more_
      */
     private Entry processUrl(String url, String name, String desc,
+                             Group baseGroup,
                              String groupName)
             throws Exception {
+        Request request = new Request(getRepository(), getUser());
         String fileName = url;
         String tail     = IOUtil.getFileTail(url);
         File   tmpFile  = getStorageManager().getTmpFile(null, tail);
@@ -507,8 +509,10 @@ public class WebHarvester extends Harvester {
         desc = applyMacros(desc, createDate, fromDate, toDate, fileName);
 
 
-        Group group = getEntryManager().findGroupFromName(groupName,
-                          getUser(), true);
+        Group group = (baseGroup!=null?getEntryManager().findGroupUnder(request,baseGroup, groupName, getUser()):
+                       getEntryManager().findGroupFromName(groupName,
+                                                           getUser(), true));
+        System.err.println ("Group:" + group.getFullName());
         Entry entry = typeHandler.createEntry(repository.getGUID());
         Resource resource = new Resource(newFile.toString(),
                                          Resource.TYPE_STOREDFILE);

@@ -414,6 +414,10 @@ public class RepositoryManager implements RepositorySource, Constants,
         return repository.getSessionManager();
     }
 
+    protected LogManager getLogManager() {
+        return repository.getLogManager();
+    }
+
     /**
      * _more_
      *
@@ -493,7 +497,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      * @param message _more_
      */
     protected void log(Request request, String message) {
-        repository.log(request, message);
+        getRepository().getLogManager().log(request, message);
 
     }
 
@@ -506,7 +510,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      * @param exc _more_
      */
     public void logException(String message, Exception exc) {
-        getRepository().logError(message, exc);
+        getRepository().getLogManager().logError(message, exc);
     }
 
 
@@ -517,7 +521,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      * @param exc _more_
      */
     protected void logError(String message, Throwable exc) {
-        repository.logError(message, exc);
+        getRepository().getLogManager().logError(message, exc);
     }
 
 
@@ -527,7 +531,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      * @param message _more_
      */
     protected void logInfo(String message) {
-        repository.logInfo(message);
+        getRepository().getLogManager().logInfo(message);
     }
 
 }

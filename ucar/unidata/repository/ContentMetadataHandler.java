@@ -165,9 +165,9 @@ public class ContentMetadataHandler extends MetadataHandler {
             } else {
                 String tmpFile = (String) fileMap.get(fileArg);
                 if (tmpFile == null) {
-                    getRepository().logError("No attachment uploaded file:"
+                    getRepository().getLogManager().logError("No attachment uploaded file:"
                                              + fileArg);
-                    getRepository().logError("available files: " + fileMap);
+                    getRepository().getLogManager().logError("available files: " + fileMap);
                     return;
                 }
                 File file = new File(tmpFile);

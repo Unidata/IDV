@@ -364,9 +364,9 @@ public class Admin extends RepositoryManager {
                                              HtmlUtil.b(msg("Path")),
                                              HtmlUtil.b(msg("IP")),
                                              HtmlUtil.b(msg("User agent")))));
-        List<Repository.LogEntry> log = getRepository().getLog();
+        List<LogManager.LogEntry> log = getLogManager().getLog();
         for (int i = log.size() - 1; i >= 0; i--) {
-            Repository.LogEntry logEntry = log.get(i);
+            LogManager.LogEntry logEntry = log.get(i);
             //Encode the path just in case the user does a XSS attack
             String path = logEntry.getPath();
             if (path.length() > 50) {
@@ -1449,7 +1449,7 @@ public class Admin extends RepositoryManager {
                                                / 60)) + " "
                                                    + msg("minutes")+
                                            HtmlUtil.space(2) +
-                                           "# Requests:" + getRepository().getRequestCount()));
+                                           "# Requests:" + getLogManager().getRequestCount()));
 
         getEntryManager().addStatusInfo(statusSB);
 
