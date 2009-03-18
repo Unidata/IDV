@@ -64,6 +64,7 @@ import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
 import ucar.visad.quantities.Gravity;
 
+import visad.util.ThreadManager;
 import visad.CachingCoordinateSystem;
 import visad.CartesianProductCoordinateSystem;
 import visad.CommonUnit;
@@ -1108,11 +1109,16 @@ public class GeoGridAdapter {
         FunctionType ffType =
             new FunctionType(((SetType) domainSet.getType()).getDomain(),
                              paramType);
-        if ( !makeGeoGridFlatField) {
+        if (true ||  !makeGeoGridFlatField) {
+            //            System.err.println("making flat field");
             try {
                 LogUtil.message(readLabel);
                 Trace.call1("GeoGridAdapter.geogrid.readVolumeData");
+                //                synchronized(geoGrid) {
+                System.err.println (System.currentTimeMillis() +" time:" + timeIndex+ " start read");
                 arr = geoGrid.readVolumeData(timeIndex);
+                System.err.println (System.currentTimeMillis() +" time:" + timeIndex+ " end read");
+                //                }
                 Trace.call2("GeoGridAdapter.geogrid.readVolumeData");
                 // 3D grid with one level - slice to 2D grid
                 if ((arr.getRank() > 2) && (domainSet.getDimension() == 2)) {
@@ -1240,7 +1246,7 @@ public class GeoGridAdapter {
 
         Trace.call1("GeoGridAdapter.makeSequence");
         try {
-            TreeMap              gridMap  = new TreeMap();
+            final TreeMap              gridMap  = new TreeMap();
             GridCoordSystem      geoSys   = geoGrid.getCoordinateSystem();
             CoordinateAxis1DTime timeAxis = geoSys.getTimeAxis1D();
             int[]                times;
@@ -1261,8 +1267,10 @@ public class GeoGridAdapter {
             } else {
                 times = timeIndices;
             }
-            Range[]      sampleRanges   = null;
+            final Range[][]      sampleRanges   = {null};
             StringBuffer testModeBuffer = null;
+
+            ThreadManager threadManager = new ThreadManager("GeoGrid data reading");
             for (int i = 0; i < times.length; i++) {
                 if ( !JobManager.getManager().canContinue(loadId)) {
                     return null;
@@ -1288,58 +1296,32 @@ public class GeoGridAdapter {
                     log_.debug("    data time " + time);
 
 
-                    String readLabel = "Time: " + (i + 1) + "/"
+                    final String readLabel = "Time: " + (i + 1) + "/"
                                        + times.length + " " + paramName
                                        + " From: " + dataSource.toString();
+
+
+                    final int theTimeIndex = times[i];
+                    final DateTime theTime = time;
+                    threadManager.addRunnable(new ThreadManager.MyRunnable() {
+                            public void run() throws Exception {
+                                readTimeStep(theTimeIndex,theTime, readLabel, 
+                                             gridMap, sampleRanges,lazyEvaluation );
+                            }
+                        });
                     try {
-                        CachedFlatField sample = getFlatField(times[i],
-                                                     readLabel);
-                        if (sampleRanges == null) {
-                            sampleRanges = sample.getRanges(true);
-                            //Check to see if the sample is valid
-                            if ((sampleRanges != null)
-                                    && (sampleRanges.length > 0)) {
-                                for (int rangeIdx = 0;
-                                        rangeIdx < sampleRanges.length;
-                                        rangeIdx++) {
-                                    Range r = sampleRanges[rangeIdx];
-                                    if (Double.isInfinite(r.getMin())
-                                            || Double.isInfinite(
-                                                r.getMax())) {
-                                        sampleRanges = null;
-                                        //                                        System.err.println("bad sample range");
-                                        break;
-                                    }
-                                }
-                            }
-
-                        } else {
-                            sample.setSampleRanges(sampleRanges);
-                        }
-
-                        if ((sample != null) && !sample.isMissing()) {
-                            if (lazyEvaluation) {
-                                //If we are running under lazy evaluation then
-                                //we don't want to do the fieldMinMax because it
-                                //will force a read of the data
-                                gridMap.put(time, sample);
-                            } else {
-                                Range range = GridUtil.fieldMinMax(sample)[0];
-                                // For now, min and max are flipped if all values were NaN
-                                if ( !(Double.isInfinite(range.getMin())
-                                        && Double.isInfinite(
-                                            range.getMax()))) {
-                                    //When we are testing break after we've read one time.
-                                    gridMap.put(time, sample);
-                                }
-                            }
-                        }
-                    } catch (VisADException ve) {
-                        throw ve;
+                        //                        readTimeStep(times[i],time, readLabel, 
+                                     //                                     gridMap, sampleRanges,lazyEvaluation );
                     } catch (Exception excp) {
                         throw new WrapperException(excp);
                     }
                 }
+
+            }
+            if(dataSource.isRemoteServer()) {
+                threadManager.runInParallel();
+            } else {
+                threadManager.runSequentially();
             }
 
             //            System.err.println ("GeoGridAdapter DONE");
@@ -1383,6 +1365,57 @@ public class GeoGridAdapter {
         Trace.call2("GeoGridAdapter.makeSequence");
         return data;
     }
+
+
+    private void readTimeStep(int timeIndex, DateTime time, String readLabel, 
+                         TreeMap gridMap, Range[][]sampleRanges,boolean lazyEvaluation )  throws Exception {
+
+        CachedFlatField sample = getFlatField(timeIndex,
+                                              readLabel);
+        synchronized(sampleRanges) {
+            if (sampleRanges[0] == null) {
+                sampleRanges[0] = sample.getRanges(true);
+                //Check to see if the sample is valid
+                if ((sampleRanges[0] != null)
+                    && (sampleRanges[0].length > 0)) {
+                    for (int rangeIdx = 0;
+                         rangeIdx < sampleRanges[0].length;
+                         rangeIdx++) {
+                        Range r = sampleRanges[0][rangeIdx];
+                        if (Double.isInfinite(r.getMin())
+                            || Double.isInfinite(
+                                                 r.getMax())) {
+                            sampleRanges[0] = null;
+                            //                                        System.err.println("bad sample range");
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+            
+        sample.setSampleRanges(sampleRanges[0]);
+
+
+        if ((sample != null) && !sample.isMissing()) {
+            if (lazyEvaluation) {
+                //If we are running under lazy evaluation then
+                //we don't want to do the fieldMinMax because it
+                //will force a read of the data
+                gridMap.put(time, sample);
+            } else {
+                Range range = GridUtil.fieldMinMax(sample)[0];
+                // For now, min and max are flipped if all values were NaN
+                if ( !(Double.isInfinite(range.getMin())
+                       && Double.isInfinite(
+                                            range.getMax()))) {
+                    //When we are testing break after we've read one time.
+                    gridMap.put(time, sample);
+                }
+            }
+        }
+    }
+
 
 
     /**

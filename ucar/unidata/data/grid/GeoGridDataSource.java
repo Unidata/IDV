@@ -833,6 +833,14 @@ public class GeoGridDataSource extends GridDataSource {
         return newFiles;
     }
 
+    public boolean isRemoteServer() {
+        String filepath = getFilePath();
+        return (filepath.startsWith("dods:") ||
+                filepath.startsWith("http:") ||
+                filepath.startsWith("https:"));
+    }
+
+
     /**
      *  Overwrite setNewFiles so we clear out the resolverurl
      *
