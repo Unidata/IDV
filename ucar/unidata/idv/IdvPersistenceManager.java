@@ -32,6 +32,7 @@ import ucar.unidata.data.DataManager;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceResults;
 
+import visad.util.ThreadManager;
 
 import ucar.unidata.data.imagery.*;
 
@@ -3371,7 +3372,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 localFileMapping = new ArrayList(fileMapping);
             }
 
-            final visad.util.ThreadUtil threadUtil = new visad.util.ThreadUtil("Data source initialization");
+            final  ThreadManager threadManager = new ThreadManager("Data source initialization");
             for (int i = 0; i < dataSources.size(); i++) {
                 final DataSource dataSource = (DataSource) dataSources.get(i);
                 //Clear the error flag
@@ -3398,18 +3399,20 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     }
                 }
                 long t1 = System.currentTimeMillis();
-                threadUtil.addRunnable(new visad.util.ThreadUtil.MyRunnable() {
+                threadManager.addRunnable(new ThreadManager.MyRunnable() {
                         public void run()  throws Exception {
                             dataSource.initAfterUnpersistence();
                         }});
             }
 
             long t1 = System.currentTimeMillis();
-            //            threadUtil.runAllParallel();
-            threadUtil.runInParallel();
+            //Don't run in parallel for now since it screws up the ordering
+            //of the displays
+            //threadManager.runAllParallel();
+            threadManager.runInParallel();
             long t2 = System.currentTimeMillis();
             //            System.err.println ("time to init data sources:" + (t2-t1));
-            //            threadUtil.clearTimes();
+            //            threadManager.clearTimes();
 
 
             for (int i = 0; i < dataSources.size(); i++) {
@@ -3572,7 +3575,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
                     final Hashtable properties = new Hashtable();
                     Trace.call1("Decode.init displays");
-                    final visad.util.ThreadUtil displaysThreadUtil = new visad.util.ThreadUtil("display initialization");
+                    final visad.util.ThreadManager displaysThreadManager = new visad.util.ThreadManager("display initialization");
                     for (int i = 0; i < newControls.size(); i++) {
                         final DisplayControl displayControl =
                             (DisplayControl) newControls.get(i);
@@ -3586,7 +3589,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                     displayControl)) {
                             continue;
                         }
-                        displaysThreadUtil.addRunnable(new visad.util.ThreadUtil.MyRunnable() {
+                        displaysThreadManager.addRunnable(new visad.util.ThreadManager.MyRunnable() {
                                 public void run()  throws Exception {
                                     displayControl.initAfterUnPersistence(getIdv(),
                                                                           properties);
@@ -3597,11 +3600,11 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                         }
                     }
                     long tt1 = System.currentTimeMillis();
-                    displaysThreadUtil.runSequentially();
-                    //                    displaysThreadUtil.runInParallel();
+                    displaysThreadManager.runSequentially();
+                    //                    displaysThreadManager.runInParallel();
                     long tt2 = System.currentTimeMillis();
                     //                    System.err.println ("time to init displays:" + (tt2-tt1));
-                    //                    displaysThreadUtil.clearTimes();
+                    //                    displaysThreadManager.clearTimes();
                     Trace.call2("Decode.init displays");
                 }
                 if ( !fromCollab) {
