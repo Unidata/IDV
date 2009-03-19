@@ -564,7 +564,7 @@ function EntryFormList(formId,img,selectId, initialOn) {
         if(!this.on) {
             hideObject(entryRow.cbx);
         } else {
-        	showObject(entryRow.cbx,"inline");
+            showObject(entryRow.cbx,"inline");
 	}
     }
 
@@ -648,7 +648,7 @@ function EntryFormList(formId,img,selectId, initialOn) {
         var form = util.getDomObject(this.formId);
         if(form) {
             form = form.obj;
-            for(i=0;i<form.elements.length;i++) {
+            for(i=0;i<form.elements.length;i++) { 
                 if(this.on) {
                     showObject(form.elements[i],"inline");
                 } else {
@@ -658,6 +658,7 @@ function EntryFormList(formId,img,selectId, initialOn) {
                 
             }
         }
+
 
         for(i=0;i<this.entries.length;i++) {
             obj = util.getDomObject(this.entries[i]);
@@ -705,6 +706,7 @@ function EntryRow (entryId, rowId, cbxId,cbxWrapperId) {
     if(this.row) {
         this.row = this.row.obj;
     }
+
 
     if(this.cbx) {
         this.cbx = this.cbx.obj;

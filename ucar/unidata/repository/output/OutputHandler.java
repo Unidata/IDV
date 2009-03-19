@@ -880,7 +880,6 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 sb.append(HtmlUtil.span(HtmlUtil.href(url, order[i + 2]),
                                         HtmlUtil.title(order[i + 3])
                                         + HtmlUtil.cssClass("sortlinkoff")));
-                sb.append(HtmlUtil.formClose());
             }
         }
 
