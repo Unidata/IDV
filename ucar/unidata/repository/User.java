@@ -79,6 +79,8 @@ public class User {
     /** _more_ */
     private String template;
 
+    private boolean isLocal = true;
+
     /**
      * _more_
      */
@@ -469,6 +471,24 @@ public class User {
      */
     public List<FavoriteEntry> getFavorites() {
         return favorites;
+    }
+
+    /**
+       Set the IsLocal property.
+
+       @param value The new value for IsLocal
+    **/
+    public void setIsLocal (boolean value) {
+	this.isLocal = value;
+    }
+
+    /**
+       Get the IsLocal property.
+
+       @return The IsLocal
+    **/
+    public boolean getIsLocal () {
+	return this.isLocal;
     }
 
 

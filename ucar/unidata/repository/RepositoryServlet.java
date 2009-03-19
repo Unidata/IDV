@@ -84,7 +84,6 @@ public class RepositoryServlet extends HttpServlet {
      * _more_
      */
     public RepositoryServlet() {
-        System.err.println("*** new Sevlet - 1");
     }
 
     /**
@@ -96,7 +95,6 @@ public class RepositoryServlet extends HttpServlet {
      * @throws Exception _more_
      */
     public RepositoryServlet(String[] args, int port) throws Exception {
-        System.err.println("*** new Sevlet - 2");
         this.args = args;
         createRepository(port, new Properties());
     }

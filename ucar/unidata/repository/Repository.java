@@ -416,7 +416,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public Repository(String[] args, int port, boolean inTomcat)
             throws Exception {
         super(port);
-        System.err.println("*** New repository");
         LogUtil.setTestMode(true);
         java.net.InetAddress localMachine =
             java.net.InetAddress.getLocalHost();
@@ -585,7 +584,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     protected void init(Properties properties) throws Exception {
-        System.err.println("*** repository.init()");
         initProperties(properties);
         initServer();
     }
@@ -1274,7 +1272,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
          *
          * @throws Exception _more_
          */
-        protected void checkClass(Class c) throws Exception {}
+        protected void checkClass(Class c) throws Exception {
+            if (UserAuthenticator.class.isAssignableFrom(c)) {
+                getLogManager().logInfo("Adding authenticator:" + c.getName());
+                getUserManager().addUserAuthenticator((UserAuthenticator)c.newInstance());
+            }
+        }
 
         /**
          * _more_
@@ -1303,9 +1306,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
             if (plugins[i].isDirectory()) {
                 continue;
             }
-            if (plugins[i].toString().endsWith(".jar")) {
+            String pluginFile = plugins[i].toString();
+            if (pluginFile.endsWith(".jar")) {
                 PluginClassLoader cl =
-                    new MyClassLoader(plugins[i].toString(),
+                    new MyClassLoader(pluginFile,
                                       getClass().getClassLoader());
 
                 Misc.addClassLoader(cl);
@@ -1314,12 +1318,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         entryIdx++) {
                     String entry = (String) entries.get(entryIdx);
                     if ( !checkFile(entry)) {
-                        getLogManager().logError("Don't know how to handle plugin resource:"
-                                 + entry + " from plugin:" + plugins[i]);
+                        //                        getLogManager().logError("Don't know how to handle plugin resource:"
+                        //                                 + entry + " from plugin:" + plugins[i]);
                     }
                 }
             } else {
-                checkFile(plugins[i].toString());
+                checkFile(pluginFile);
             }
         }
     }

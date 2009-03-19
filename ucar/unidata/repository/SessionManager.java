@@ -75,6 +75,7 @@ public class SessionManager extends RepositoryManager {
 
 
 
+
     /** The number of days a session is active in the database */
     private static final double SESSION_DAYS = 1.0;
 

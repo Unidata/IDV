@@ -72,9 +72,6 @@ import java.util.Properties;
  */
 public class UserManager extends RepositoryManager {
 
-
-
-
     /** _more_ */
     public static final OutputType OUTPUT_CART =
         new OutputType("Add to Cart", "user.cart", OutputType.TYPE_NONHTML,
@@ -117,6 +114,9 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     public final User localFileUser = new User("localuser", false);
 
+    private List<UserAuthenticator> userAuthenticators = new ArrayList<UserAuthenticator>();
+
+
     /**
      * _more_
      *
@@ -124,6 +124,11 @@ public class UserManager extends RepositoryManager {
      */
     public UserManager(Repository repository) {
         super(repository);
+    }
+
+
+    protected void addUserAuthenticator(UserAuthenticator userAuthenticator) {
+        userAuthenticators.add(userAuthenticator);
     }
 
 
@@ -434,18 +439,27 @@ public class UserManager extends RepositoryManager {
                              Tables.USERS.NAME,
                              Clause.eq(Tables.USERS.COL_ID, id));
         ResultSet results = stmt.getResultSet();
-        if ( !results.next()) {
-            //            throw new IllegalArgumentException ("Could not find  user id:" + id + " sql:" + query);
-            if (userDefaultIfNotFound) {
-                getDatabaseManager().close(stmt);
-                return getDefaultUser();
-            }
-            getDatabaseManager().close(stmt);
-            return null;
-        } else {
+        if (results.next()) {
             user = getUser(results);
             getDatabaseManager().close(stmt);
+        } else {
+            for(UserAuthenticator userAuthenticator: userAuthenticators) {
+                user = userAuthenticator.findUser(getRepository(),id);
+                if(user!=null) {
+                    user.setIsLocal(false);
+                    break;
+                }
+            }
         }
+        getDatabaseManager().close(stmt);
+
+        if (user == null) {
+            if (userDefaultIfNotFound) {
+                return getDefaultUser();
+            }
+            return null;
+        }
+
 
         userMap.put(user.getId(), user);
         return user;
@@ -2136,6 +2150,16 @@ public class UserManager extends RepositoryManager {
                     user = getUser(results);
                 }
                 stmt.close();
+
+                if(user == null) {
+                    for(UserAuthenticator userAuthenticator: userAuthenticators) {
+                        user = userAuthenticator.authenticateUser(getRepository(),name,password);
+                        if(user!=null) {
+                            user.setIsLocal(false);
+                            break;
+                        }
+                    }
+                }
             }
 
 
@@ -2327,6 +2351,11 @@ public class UserManager extends RepositoryManager {
                     SqlUtil.distinct(Tables.USERROLES.COL_ROLE),
                     Tables.USERROLES.NAME, new Clause()), 1);
         List<String> roles = new ArrayList<String>(Misc.toList(roleArray));
+
+        for(UserAuthenticator userAuthenticator: userAuthenticators) {
+            roles.addAll(userAuthenticator.getAllRoles());
+        }
+
         roles.add(0, ROLE_ANY);
         return roles;
     }
