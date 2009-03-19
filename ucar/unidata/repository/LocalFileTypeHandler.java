@@ -197,6 +197,9 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         if (values == null) {
             return ids;
         }
+        int max = request.get(ARG_MAX,DB_MAX_ROWS);
+        int skip = request.get(ARG_SKIP,0);
+
         long t1 = System.currentTimeMillis();
         //        System.err.println("getSynthIds " + mainEntry);
         File rootDir = new File((String) values[0]);
@@ -226,7 +229,10 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         long age = (long) (1000
                            * (((Double) values[COL_AGE]).doubleValue() * 60));
         long now = System.currentTimeMillis();
-        for (int i = 0; i < files.length; i++) {
+        int start = skip;
+
+        int cnt = 0;
+        for (int i = start; i < files.length; i++) {
             File childFile = files[i];
             if (childFile.isHidden()) {
                 continue;
@@ -241,6 +247,8 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                 continue;
             }
             ids.add(getSynthId(mainEntry, rootDirPath, childFile));
+            cnt++;
+            if(cnt>=max) break;
         }
         long t2 = System.currentTimeMillis();
         //        System.err.println ("Time:" + (t2-t1) + " ids:" + ids.size());
