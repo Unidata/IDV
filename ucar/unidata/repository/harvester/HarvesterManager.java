@@ -432,9 +432,13 @@ public class HarvesterManager extends RepositoryManager {
             formSB.append(HtmlUtil.formTableClose());
 
 
+            String extra = harvester.getExtraInfo();
+            if(extra!=null && extra.length()>0) {
+                extra = HtmlUtil.makeShowHideBlock(msg("Information"),extra,false);
+            }
             sb.append(HtmlUtil.table(new Object[] { formSB,
                     HtmlUtil.br() + harvester.getRunLink(request, true)
-                    + HtmlUtil.br() + harvester.getExtraInfo() }));
+                    +extra }));
             sb.append(buttons);
         }
         sb.append(HtmlUtil.formClose());

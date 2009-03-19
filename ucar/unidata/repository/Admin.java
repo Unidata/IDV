@@ -1562,7 +1562,7 @@ public class Admin extends RepositoryManager {
                   :query),10,100));
         sb.append(HtmlUtil.p());
         sb.append("SQL File: ");
-        sb.append(HtmlUtil.fileInput(ARG_SQLFILE, ""));
+        sb.append(HtmlUtil.fileInput(ARG_SQLFILE, HtmlUtil.SIZE_60));
         sb.append(HtmlUtil.formClose());
         sb.append("<table>");
         if (query == null) {
@@ -1615,7 +1615,7 @@ public class Admin extends RepositoryManager {
                         }
                         sb.append("</tr>");
                     }
-                    sb.append("<tr>");
+                    sb.append("<tr valign=\"top\">");
                     while (colcnt < rsmd.getColumnCount()) {
                         colcnt++;
                         if (rsmd.getColumnType(colcnt)
@@ -1625,8 +1625,15 @@ public class Admin extends RepositoryManager {
                             sb.append(HtmlUtil.col(formatDate(request,
                                     dttm)));
                         } else {
-                            sb.append(
-                                HtmlUtil.col(results.getString(colcnt)));
+                            String s = results.getString(colcnt);
+                            if(s==null) s="_null_";
+                            s = HtmlUtil.entityEncode(s);
+                            if(s.length()>100) {
+                                sb.append(HtmlUtil.col(HtmlUtil.textArea("dummy",s,5,50)));
+                            } else {
+                                sb.append(
+                                          HtmlUtil.col(HtmlUtil.pre(s)));
+                            }
                         }
                     }
                     sb.append("</tr>\n");

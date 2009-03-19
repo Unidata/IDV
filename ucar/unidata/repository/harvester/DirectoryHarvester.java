@@ -176,9 +176,8 @@ public class DirectoryHarvester extends Harvester {
 
         sb.append(
             RepositoryManager.tableSubHeader("Create new groups under"));
-        sb.append(HtmlUtil.formEntry(msgLabel("Base group"),
-                                     HtmlUtil.input(ATTR_BASEGROUP,
-                                         baseGroupName, HtmlUtil.SIZE_60)));
+
+        addBaseGroupSelect(ATTR_BASEGROUP,sb);
 
 
 
@@ -196,12 +195,11 @@ public class DirectoryHarvester extends Harvester {
         if ( !canContinueRunning(timestamp)) {
             return;
         }
-        if (baseGroupName.length() == 0) {
-            baseGroupName = getEntryManager().getTopGroup().getName();
+        Group baseGroup = getBaseGroup();
+        if(baseGroup == null) {
+            baseGroup = getEntryManager().getTopGroup();
         }
-        Group group = getEntryManager().findGroupFromName(baseGroupName,
-                          getUser(), true);
-        walkTree(rootDir, group);
+        walkTree(rootDir, baseGroup);
     }
 
 

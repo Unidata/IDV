@@ -283,14 +283,7 @@ public class PatternHarvester extends Harvester {
                                      HtmlUtil.input(ATTR_DESCTEMPLATE,
                                          descTemplate, HtmlUtil.SIZE_60)));
 
-        String elementId = "harvester.edit." + ATTR_BASEGROUP;
-        String select    = OutputHandler.getGroupSelect(request, elementId);
-
-        sb.append(HtmlUtil.formEntry(msgLabel("Base group"),
-                                     HtmlUtil.input(ATTR_BASEGROUP,
-                                         baseGroupName,
-                                         HtmlUtil.SIZE_60
-                                         + HtmlUtil.id(elementId)) + select));
+        addBaseGroupSelect(ATTR_BASEGROUP,sb);
 
         sb.append(HtmlUtil.formEntry(msgLabel("Group template"),
                                      HtmlUtil.input(ATTR_GROUPTEMPLATE,
@@ -723,16 +716,7 @@ public class PatternHarvester extends Harvester {
                            true);
         //        System.err.println ("file:" +fileName + " " + dirPath +" " + dirToks);
 
-        Group baseGroup = null;
-        if ((baseGroupName != null) && (baseGroupName.length() > 0)) {
-            baseGroup = getEntryManager().findGroupFromName(baseGroupName,
-                    getUser(), true);
-        } else {
-            //            baseGroup =  getEntryManager().findGroupFromName(GROUP_TOP,
-            //                                                      getUser(),
-            //                                                      false);
-        }
-
+        Group baseGroup = getBaseGroup();
         String dirGroup = getDirNames(rootDir, baseGroup, dirToks,
                                       groupTemplate.indexOf("${dirgroup}")
                                       >= 0);
@@ -859,6 +843,7 @@ public class PatternHarvester extends Harvester {
      * _more_
      */
     public void clearCache() {
+        lastRunTime = 0;
         super.clearCache();
     }
 

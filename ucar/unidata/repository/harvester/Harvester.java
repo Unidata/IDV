@@ -22,6 +22,7 @@
 
 package ucar.unidata.repository.harvester;
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.output.OutputHandler;
 
 import org.w3c.dom.*;
 
@@ -150,10 +151,8 @@ public class Harvester extends RepositoryManager {
     public static final String ATTR_BASEGROUP = "basegroup";
 
 
-    /** _more_ */
-    protected String baseGroupName = "";
 
-    protected String baseGroupNameId = "";
+    protected String baseGroupId = "";
 
     /** _more_ */
     protected String groupTemplate = "";
@@ -327,6 +326,37 @@ public class Harvester extends RepositoryManager {
     }
 
 
+    private Request request;
+
+    protected Request getRequest() throws Exception {
+        if(request == null)
+            request = new Request(getRepository(), getUser());
+        return request;
+    }
+
+    public Group getBaseGroup() throws Exception {
+        if(baseGroupId==null || baseGroupId.length()==0) return null;
+        Request request = new Request(getRepository(), getUser());
+        Group g = getEntryManager().findGroup(getRequest(), baseGroupId);
+        if(g!=null) return g;
+        return  getEntryManager().findGroupFromName(baseGroupId, getUser(), false);
+    }
+
+
+
+    protected void addBaseGroupSelect(String selectId, StringBuffer sb) throws Exception {
+        Group baseGroup = getBaseGroup();
+        String baseSelect  = OutputHandler.getGroupSelect(getRequest(), selectId);
+        sb.append(HtmlUtil.hidden(selectId+"_hidden", (baseGroup!=null?baseGroup.getId():""),
+                                  HtmlUtil.id(selectId+"_hidden")));
+        sb.append(HtmlUtil.formEntry(msgLabel("Base Group"),
+                                     HtmlUtil.disabledInput(selectId, 
+                                                            (baseGroup!=null?baseGroup.getFullName():""),
+                                                            HtmlUtil.id(selectId) +
+                                                            HtmlUtil.SIZE_60)+baseSelect));
+    }
+
+
     /**
      * _more_
      *
@@ -343,9 +373,13 @@ public class Harvester extends RepositoryManager {
 
         groupTemplate = XmlUtil.getAttribute(element, ATTR_GROUPTEMPLATE,
                                              groupTemplate);
-        this.baseGroupName = XmlUtil.getAttribute(element, ATTR_BASEGROUP,
+        this.baseGroupId = XmlUtil.getAttribute(element, ATTR_BASEGROUP,
                 "");
 
+        Group baseGroup =getBaseGroup();
+        if(baseGroup!=null) {
+            baseGroupId =  baseGroup.getId();
+        }
 
 
         nameTemplate = XmlUtil.getAttribute(element, ATTR_NAMETEMPLATE,
@@ -412,6 +446,7 @@ public class Harvester extends RepositoryManager {
      * @throws Exception _more_
      */
     public void applyEditForm(Request request) throws Exception {
+        getEntryManager().clearSeenResources();
         rootDir = new File(request.getUnsafeString(ATTR_ROOTDIR,
                 (rootDir != null)
                 ? rootDir.toString()
@@ -436,8 +471,8 @@ public class Harvester extends RepositoryManager {
         nameTemplate = request.getString(ATTR_NAMETEMPLATE, nameTemplate);
         groupTemplate = request.getUnsafeString(ATTR_GROUPTEMPLATE,
                 groupTemplate);
-        baseGroupName = request.getUnsafeString(ATTR_BASEGROUP,
-                baseGroupName);
+
+        baseGroupId = request.getUnsafeString(ATTR_BASEGROUP +"_hidden", "");
 
         descTemplate = request.getUnsafeString(ATTR_DESCTEMPLATE,
                 descTemplate);
@@ -546,7 +581,7 @@ public class Harvester extends RepositoryManager {
         element.setAttribute(ATTR_TAGTEMPLATE, tagTemplate);
         element.setAttribute(ATTR_NAMETEMPLATE, nameTemplate);
         element.setAttribute(ATTR_GROUPTEMPLATE, groupTemplate);
-        element.setAttribute(ATTR_BASEGROUP, baseGroupName);
+        element.setAttribute(ATTR_BASEGROUP, baseGroupId);
         element.setAttribute(ATTR_DESCTEMPLATE, descTemplate);
 
         if (rootDir != null) {

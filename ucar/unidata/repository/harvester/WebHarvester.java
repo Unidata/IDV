@@ -309,6 +309,7 @@ public class WebHarvester extends Harvester {
                                    urlEntry.description,
                                    HtmlUtil.SIZE_80
                                    + HtmlUtil.title(templateHelp))));
+
             String baseGroupFieldId = ATTR_BASEGROUP + cnt;
             Group baseGroup = (urlEntry.baseGroupId.length()==0?null:getEntryManager().findGroup(request, urlEntry.baseGroupId));
             String baseSelect  = OutputHandler.getGroupSelect(request, baseGroupFieldId);
@@ -319,6 +320,7 @@ public class WebHarvester extends Harvester {
                                                                      (baseGroup!=null?baseGroup.getFullName():""),
                                                                      HtmlUtil.id(baseGroupFieldId) +
                                                                      HtmlUtil.SIZE_60)+baseSelect));
+
 
             String fieldId = ATTR_GROUP + cnt;
             entrySB.append(HtmlUtil.formEntry(msgLabel("Sub-Group Template"),
@@ -493,7 +495,8 @@ public class WebHarvester extends Harvester {
                              Group baseGroup,
                              String groupName)
             throws Exception {
-        Request request = new Request(getRepository(), getUser());
+
+
         String fileName = url;
         String tail     = IOUtil.getFileTail(url);
         File   tmpFile  = getStorageManager().getTmpFile(null, tail);
@@ -519,7 +522,7 @@ public class WebHarvester extends Harvester {
         desc = applyMacros(desc, createDate, fromDate, toDate, fileName);
 
 
-        Group group = (baseGroup!=null?getEntryManager().findGroupUnder(request,baseGroup, groupName, getUser()):
+        Group group = (baseGroup!=null?getEntryManager().findGroupUnder(getRequest(),baseGroup, groupName, getUser()):
                        getEntryManager().findGroupFromName(groupName,
                                                            getUser(), true));
         System.err.println ("Group:" + group.getFullName());
