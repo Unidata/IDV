@@ -327,7 +327,9 @@ public interface IdvConstants {
 
     public static final String PROP_MONITORPORT = "idv.monitorport";
 
-    public static final String PREF_MAXTHREADS = "idv.maxthreads";
+    public static final String PREF_THREADS_RENDER = "idv.threads.render.max";
+    public static final String PREF_THREADS_DATA = "idv.threads.render.data";
+
 
     /** look and feel preference */
     public static final String PREF_EVENT_MOUSEMAP = "idv.event.mousemap";

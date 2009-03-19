@@ -70,6 +70,8 @@ public class WmsSelection {
     /** xml attribute name */
     public static final String ATTR_SRS = "srs";
 
+    public static final String ATTR_CRS = "crs";
+
     /** xml attribute name */
     public static final String ATTR_FORMAT = "format";
 
@@ -197,7 +199,8 @@ public class WmsSelection {
 
         return url + "version=" + version + "&request=GetMap" +
         //          "&Exceptions=se_xml" + 
-        "&Styles=" + "" + "&format=" + format + "&SRS=" + srs + "&Layers="
+        "&Styles=" + "" + "&format=" + format + "&SRS=" + srs +
+            "&CRS=" + srs + "&Layers="
                    + layer + "&BBOX=" + bbox + "&width=" + imageWidth
                    + "&height=" + imageHeight+"&reaspect=false";
     }

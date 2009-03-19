@@ -24,6 +24,11 @@
 package ucar.unidata.idv;
 
 
+
+
+
+
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -3409,10 +3414,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             //Don't run in parallel for now since it screws up the ordering
             //of the displays
             //threadManager.runAllParallel();
-            threadManager.runInParallel();
+            threadManager.runInParallel(getIdv().getMaxDataThreadCount());
             long t2 = System.currentTimeMillis();
             //            System.err.println ("time to init data sources:" + (t2-t1));
-            //            threadManager.clearTimes();
 
 
             for (int i = 0; i < dataSources.size(); i++) {

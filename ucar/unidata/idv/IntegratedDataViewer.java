@@ -2113,8 +2113,12 @@ Misc.run(new Runnable() {
     }
 
 
-    public int getMaxThreadCount() {
-        return getStore().get(PREF_MAXTHREADS,Runtime.getRuntime().availableProcessors());
+    public int getMaxRenderThreadCount() {
+        return getStore().get(PREF_THREADS_RENDER,Runtime.getRuntime().availableProcessors());
+    }
+
+    public int getMaxDataThreadCount() {
+        return getStore().get(PREF_THREADS_DATA,4);
     }
 
 

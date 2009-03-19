@@ -1324,7 +1324,7 @@ public class GeoGridAdapter {
             if(dataSource.isLocalFile()) {
                 threadManager.runSequentially();
             } else {
-                threadManager.runInParallel();
+                threadManager.runInParallel(dataSource.getDataContext().getIdv().getMaxDataThreadCount());
             }
 
             //            System.err.println ("GeoGridAdapter DONE");

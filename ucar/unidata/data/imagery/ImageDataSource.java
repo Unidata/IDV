@@ -1310,7 +1310,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
             }
 
             try {
-                threadManager.runInParallel();
+                threadManager.runInParallel(getDataContext().getIdv().getMaxDataThreadCount());
             } catch (VisADException ve) {
                 LogUtil.printMessage(ve.toString());
             }

@@ -276,7 +276,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
 
         final List<RadarAdapter> goodAdapters = new ArrayList<RadarAdapter>();
         final List<String> goodFiles = new ArrayList<String>();
-        visad.util.ThreadManager threadManager = new visad.util.ThreadManager("radar data reading");
+        visad.util.ThreadManager threadManager = new visad.util.ThreadManager("radar data initialization");
         LogUtil.message("Initializing radar files");
         for (Iterator iter = files.iterator(); iter.hasNext(); ) {
             final String       filename = iter.next().toString();
@@ -305,7 +305,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
         }
 
         threadManager.debug = true;
-        threadManager.runInParallel();
+        threadManager.runInParallel(getDataContext().getIdv().getMaxDataThreadCount());
         LogUtil.message("");
 
         for(int i=0;i<goodAdapters.size();i++) {
@@ -451,7 +451,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
             // so return null.
             //            System.err.println ("Reading " + adapters.size() + " radar files");
             int cnt = 0;
-            ThreadManager threadManager = new visad.util.ThreadManager();
+            ThreadManager threadManager = new visad.util.ThreadManager("radar data reading");
 
             for (Iterator iter = adapters.iterator(); iter.hasNext(); ) {
                 final RadarAdapter adapter = (RadarAdapter) iter.next();
@@ -480,7 +480,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
 
             try {
                 threadManager.debug = true;
-                threadManager.runInParallel();
+                threadManager.runInParallel(getDataContext().getIdv().getMaxDataThreadCount());
             } catch (VisADException ve) {
                 LogUtil.printMessage(ve.toString());
             }

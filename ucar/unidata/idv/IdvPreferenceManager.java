@@ -370,11 +370,16 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                 continue;
             }
 
-            if (key.equals(PREF_MAXTHREADS)) {
-                int value = (int)Misc.parseNumber(
-                                   (((JTextField) widget).getText().trim()));
+            if (key.equals(PREF_THREADS_RENDER)) {
+                int value = ((Integer)((JComboBox)widget).getSelectedItem()).intValue();
                 store.put(key, new Integer(value));
                 visad.util.ThreadManager.setGlobalMaxThreads(value);
+                continue;
+            }
+
+            if (key.equals(PREF_THREADS_DATA)) {
+                int value = ((Integer)((JComboBox)widget).getSelectedItem()).intValue();
+                store.put(key, new Integer(value));
                 continue;
             }
 
@@ -1108,8 +1113,24 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                          new JLabel(" (MB)  (for temporary files)"));
         widgets.put(PREF_CACHESIZE, cacheSizeFld);
 
-        JTextField maxThreadsFld = new JTextField(""+getIdv().getMaxThreadCount(),5);
-        widgets.put(PREF_MAXTHREADS, maxThreadsFld);
+        Vector threadCnt = new Vector();
+        for(int i=1;i<=Runtime.getRuntime().availableProcessors();i++) {
+            threadCnt.add(new Integer(i));
+        }
+        JComboBox maxRenderThreadsFld = new JComboBox(threadCnt);
+        maxRenderThreadsFld.setSelectedItem(new Integer(getIdv().getMaxRenderThreadCount()));
+        widgets.put(PREF_THREADS_RENDER, maxRenderThreadsFld);
+
+        Vector threadCnt2 = new Vector();
+        for(int i=1;i<8;i++) {
+            threadCnt2.add(new Integer(i));
+        }
+
+        
+        JComboBox maxDataThreadsFld = new JComboBox(threadCnt2);
+        maxDataThreadsFld.setSelectedItem(new Integer(getIdv().getMaxDataThreadCount()));
+        widgets.put(PREF_THREADS_DATA, maxDataThreadsFld);
+
 
         formatComps.add(GuiUtils.left(cacheCbx));
         formatComps.add(GuiUtils.filler());
@@ -1117,8 +1138,13 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
 
 
-        formatComps.add(GuiUtils.rLabel("Max Thread Count:"));
-        formatComps.add(GuiUtils.left(maxThreadsFld));
+        formatComps.add(GuiUtils.rLabel("Thread Count:"));
+        formatComps.add(GuiUtils.left(
+                                      GuiUtils.hbox(
+                                                    new JLabel("Rendering: "),
+                                                    maxRenderThreadsFld,
+                                                    new JLabel("   Data Reading: "),
+                                                    maxDataThreadsFld)));
 
 
         formatComps.add(GuiUtils.rLabel("Max Image Size:"));
