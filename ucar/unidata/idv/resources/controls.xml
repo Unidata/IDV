@@ -142,6 +142,7 @@ example:
      displaycategory="Radar Displays"
      properties="smoothed=false;allowSmoothing=false"/>
 
+<!--
   <control
      id="radareditor"
      categories="SWEEP-*-*;RADAR-*"
@@ -151,6 +152,7 @@ example:
      displaycategory="Radar Displays"
      properties="windowVisible=true;">
     </control>
+-->
 
 
 
@@ -247,6 +249,7 @@ example:
      displaycategory="Trajectory"
      properties="windowVisible=true;"/>
 
+<!--
   <control
      id="stormintesitydisplay"
      categories="IMAGE-*-*"
@@ -256,6 +259,7 @@ example:
      properties="">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
+-->
 
 
 <!--
@@ -449,6 +453,7 @@ Since this is confusing and needs more work lets remove this for now
      categories="param:ALTITUDE;param:Elevation"
      class="ucar.unidata.idv.control.TopographyControl"
      label="Topography"
+     doeslevels="true"
      icon="/ucar/unidata/idv/images/surface.png"
      displaycategory="3D Surface"
      properties="smoothed=true;isRaster=true">
