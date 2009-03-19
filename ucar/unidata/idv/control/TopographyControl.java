@@ -20,6 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.idv.control;
 
 
@@ -55,22 +57,17 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import javax.swing.JCheckBox;
-
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 
 /**
  * A Display Control with Displayable and controls for
- * one 3D isosurface display of topography.
+ * one 3D surface display of topography.
  *
  * @author Jeff McWhirter
  * @version $Revision: 1.23 $
  */
-public class TopographyControl extends GridDisplayControl {
+public class TopographyControl extends PlanViewControl {
 
     /** The displayable for the topography */
     Grid2DDisplayable gridDisplay;
@@ -84,9 +81,6 @@ public class TopographyControl extends GridDisplayControl {
     /** point size (for point mode) */
     float pointSize = 2f;
 
-    /** RealType for topography */
-    private RealType topoType = null;
-
     /**
      * Construct a new topography control.  Set the attribute flags.
      */
@@ -95,59 +89,44 @@ public class TopographyControl extends GridDisplayControl {
     }
 
     /**
-     * Call to help make this kind of Display Control; also calls code to
-     * made the Displayable (empty of data thus far).
-     * This method is called from inside DisplayControlImpl.init(several args).
+     * Method for creating the <code>DisplayableData</code> object
+     * that is the main depiction for the data controlled by this
+     * <code>PlanViewControl</code>; implemented by each subclass.
      *
-     * @param dataChoice the DataChoice of the moment.
+     * @return <code>DisplayableData</code> for the data depiction.
      *
-     * @return  true if successful
-     *
-     * @throws VisADException  couldn't create the depictor or set data
-     * @throws RemoteException  couldn't create the depictor or set data
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
      */
-    public boolean init(DataChoice dataChoice)
+    public DisplayableData createPlanDisplay()
             throws VisADException, RemoteException {
-        gridDisplay = new Grid2DDisplayable("topo_" + dataChoice, true);
+        gridDisplay = new Grid2DDisplayable("topo_" + paramName, true);
         gridDisplay.setTextureEnable( !isSmoothed);
         gridDisplay.setPolygonMode(polygonMode);
         gridDisplay.setUseDefaultRenderer(true);
-        addDisplayable(gridDisplay, FLAG_COLORTABLE);
-
-        return setData(dataChoice);
+        return gridDisplay;
     }
 
     /**
-     * Set the data in the depiction based on the <code>choice</code>
+     * Wrapper around {@link #addTopographyMap(int)} to allow subclasses
+     * to set their own index.
      *
-     * @param choice  DataChoice that describes the data to be depicted.
-     *
-     * @return true if successful.
-     *
-     * @throws VisADException  couldn't set the data
-     * @throws RemoteException  couldn't set the data
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
      */
-    protected boolean setData(DataChoice choice)
-            throws VisADException, RemoteException {
-        if ( !super.setData(choice)) {
-            return false;
-        }
-        setDisplayInactive();
+    protected void addTopographyMap() throws VisADException, RemoteException {
         addTopographyMap(0);
-        gridDisplay.loadData(getGridDataInstance().getGrid());
-        setDisplayActive();
-        return true;
     }
 
     /**
-     * Method to call if projection changes.  Handle new topography
-     * mappings.
+     * Get the multiple is topography property.  Even though there is
+     * only one field, this is the only way to make sure we get the topography
+     * ScalarMap added.
+     *
+     * @return true
      */
-    public void projectionChanged() {
-        super.projectionChanged();
-        try {
-            addTopographyMap(0);
-        } catch (Exception e) {}
+    public boolean getMultipleIsTopography() {
+        return true;
     }
 
     /**
@@ -158,7 +137,7 @@ public class TopographyControl extends GridDisplayControl {
      * @throws VisADException  couldn't set the data
      * @throws RemoteException  couldn't set the data
      */
-    public void getControlWidgets(List controlWidgets)
+    public void getControlWidgets(List<ControlWidget> controlWidgets)
             throws VisADException, RemoteException {
         super.getControlWidgets(controlWidgets);
         JCheckBox toggle = new JCheckBox("", isSmoothed);
@@ -280,5 +259,15 @@ public class TopographyControl extends GridDisplayControl {
     public float getPointSize() {
         return pointSize;
     }
+
+    /**
+     * Is this a raster display?
+     *
+     * @return  true if raster
+     */
+    public boolean getIsRaster() {
+        return true;
+    }
+
 }
 

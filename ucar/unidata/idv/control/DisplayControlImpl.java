@@ -6963,7 +6963,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @throws RemoteException
      * @throws VisADException
      */
-    public void getControlWidgets(List controlWidgets)
+    public void getControlWidgets(List<ControlWidget> controlWidgets)
             throws VisADException, RemoteException {
         if (checkFlag(FLAG_CONTOUR)) {
             controlWidgets.add(cw = new ContourWidget(this,

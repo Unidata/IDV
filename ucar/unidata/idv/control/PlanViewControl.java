@@ -1239,7 +1239,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      * @throws VisADException   VisAD error
      * @throws RemoteException   RMI error
      */
-    public void getControlWidgets(List controlWidgets)
+    public void getControlWidgets(List<ControlWidget> controlWidgets)
             throws VisADException, RemoteException {
         super.getControlWidgets(controlWidgets);
         //Allow derived classes to turn off the display of the widget
