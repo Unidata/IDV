@@ -1766,6 +1766,7 @@ public class IOUtil {
             File[] allFiles  = ((filter == null)
                                 ? directory.listFiles()
                                 : directory.listFiles((FileFilter) filter));
+            if(allFiles == null) continue;
             for (int fileIdx = 0; fileIdx < allFiles.length; fileIdx++) {
                 if ( !allFiles[fileIdx].isDirectory()) {
                     files.add(allFiles[fileIdx]);
