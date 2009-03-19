@@ -1122,7 +1122,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         widgets.put(PREF_THREADS_RENDER, maxRenderThreadsFld);
 
         Vector threadCnt2 = new Vector();
-        for(int i=1;i<8;i++) {
+        for(int i=1;i<=12;i++) {
             threadCnt2.add(new Integer(i));
         }
 
