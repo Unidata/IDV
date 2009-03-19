@@ -375,6 +375,8 @@ public class MonitorManager extends RepositoryManager {
         } else if (type.equals("twitter")) {
             monitor.addAction(new TwitterAction(getRepository().getGUID(),
                     "", ""));
+        } else if (type.equals("ftp")) {
+            monitor.addAction(new FtpAction(getRepository().getGUID()));
         } else if (type.equals("copy")) {
             monitor.addAction(new CopyAction(getRepository().getGUID()));
         } else if (type.equals("ldm")) {
@@ -486,7 +488,7 @@ public class MonitorManager extends RepositoryManager {
 
         String[] createTypes = {
             "email", "Email Action", "twitter", "Twitter Action", "copy",
-            "Copy Action"
+            "Copy Action","ftp","FTP Action"
         };
 
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));

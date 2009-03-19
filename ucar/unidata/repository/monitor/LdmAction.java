@@ -151,9 +151,9 @@ public class LdmAction extends MonitorAction {
                                      HtmlUtil.select(getArgId(PROP_LDM_FEED),
                                          Misc.toList(LDM_FEED_TYPES), feed)));
         String tooltip =
-            "macros: ${fromday}  ${frommonth} ${fromyear} ${frommonthname}  <br>"
-            + "${today}  ${tomonth} ${toyear} ${tomonthname} <br> "
-            + "${filename}  ${fileextension}";
+            "macros: ${from_day}  ${from_month} ${from_year} ${from_monthname}  <br>"
+            + "${to_day}  ${to_month} ${to_year} ${to_monthname} <br> "
+            + "${filename}  ${fileextension} etc";
         sb.append(
             HtmlUtil.formEntry(
                 "Product ID:",
