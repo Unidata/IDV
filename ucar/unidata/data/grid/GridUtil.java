@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -1939,14 +1940,12 @@ public class GridUtil {
                 && (domainSet.getManifoldDimension() != 2)) {
             throw new VisADException("slice is not 3D with 2D manifold");
         }
-        float[][] samples    = domainSet.getSamples(false);
-        int[]     lengths    = domainSet.getLengths();
-        Unit[]    setUnits   = domainSet.getSetUnits();
-        float[][] newSamples = new float[][] {
+        float[][]     samples    = domainSet.getSamples(false);
+        int[]         lengths    = domainSet.getLengths();
+        Unit[]        setUnits   = domainSet.getSetUnits();
+        float[][]     newSamples = new float[][] {
             samples[0], samples[1]
         };
-        newSamples[0] = samples[0];
-        newSamples[1] = samples[1];
         RealTupleType domainType =
             ((SetType) domainSet.getType()).getDomain();
         RealTupleType newType = null;
@@ -4697,7 +4696,7 @@ public class GridUtil {
      * @throws Exception  problem writing grid
      */
     public static void exportGridToNetcdf(FieldImpl grid) throws Exception {
-        String filename = FileManager.getWriteFile(FileManager.FILTER_XLS,
+        String filename = FileManager.getWriteFile(FileManager.FILTER_NETCDF,
                               null);
         if (filename == null) {
             return;
@@ -4719,121 +4718,124 @@ public class GridUtil {
 
         Object loadId =
             JobManager.getManager().startLoad("Writing grid to CF", true);
-        NetcdfFileWriteable ncfile = NetcdfFileWriteable.createNew(filename,
-                                         false);
-        boolean         isTimeSequence = isTimeSequence(grid);
-        List<Dimension> dims           = new ArrayList<Dimension>();
-        // make variables for the time and xyz axes
-        Set timeSet  = null;
-        int numTimes = 0;
-        if (isTimeSequence) {
-            timeSet = getTimeSet(grid);
-            Unit[] units = timeSet.getSetUnits();
-            numTimes = timeSet.getLength();
-            Dimension timeDim = new Dimension("time", numTimes, true);
-            dims.add(timeDim);
-            ncfile.addDimension(null, timeDim);
-            Variable timeVar = new Variable(ncfile, null, null, "time",
-                                            DataType.DOUBLE, "time");
-            timeVar.addAttribute(new Attribute("units", units[0].toString()));
-            ncfile.addVariable(null, timeVar);
-        }
-        GriddedSet domainSet = (GriddedSet) getSpatialDomain(grid);
-        CoordinateSystem cs  = domainSet.getCoordinateSystem();
-        boolean haveEmpirical = cs instanceof EmpiricalCoordinateSystem;
-        HashMap<Variable, Array> varData = addSpatialVars(ncfile, domainSet,
-                                               dims);
+        try {
+            NetcdfFileWriteable ncfile =
+                NetcdfFileWriteable.createNew(filename, false);
+            boolean         isTimeSequence = isTimeSequence(grid);
+            List<Dimension> dims           = new ArrayList<Dimension>();
+            // make variables for the time and xyz axes
+            Set timeSet  = null;
+            int numTimes = 0;
+            if (isTimeSequence) {
+                timeSet = getTimeSet(grid);
+                Unit[] units = timeSet.getSetUnits();
+                numTimes = timeSet.getLength();
+                Dimension timeDim = new Dimension("time", numTimes, true);
+                dims.add(timeDim);
+                ncfile.addDimension(null, timeDim);
+                Variable timeVar = new Variable(ncfile, null, null, "time",
+                                       DataType.DOUBLE, "time");
+                timeVar.addAttribute(new Attribute("units",
+                        units[0].toString()));
+                ncfile.addVariable(null, timeVar);
+            }
+            GriddedSet domainSet = (GriddedSet) getSpatialDomain(grid);
+            CoordinateSystem cs = domainSet.getCoordinateSystem();
+            boolean haveEmpirical = cs instanceof EmpiricalCoordinateSystem;
+            HashMap<Variable, Array> varData = addSpatialVars(ncfile,
+                                                   domainSet, dims);
 
-        // TODO: figure out a better way to do this
-        Variable      projVar = null;
-        java.util.Set keys    = varData.keySet();
-        if ( !haveEmpirical) {
-            for (Iterator it = keys.iterator(); it.hasNext(); ) {
-                Variable v = (Variable) it.next();
-                if (v.findAttribute(ProjectionImpl.ATTR_NAME) != null) {
-                    projVar = v;
-                    break;
+            // TODO: figure out a better way to do this
+            Variable      projVar = null;
+            java.util.Set keys    = varData.keySet();
+            if ( !haveEmpirical) {
+                for (Iterator it = keys.iterator(); it.hasNext(); ) {
+                    Variable v = (Variable) it.next();
+                    if (v.findAttribute(ProjectionImpl.ATTR_NAME) != null) {
+                        projVar = v;
+                        break;
+                    }
                 }
             }
-        }
-        // make variable for the parameter(s)
-        TupleType  tType  = getParamType(grid);
-        RealType[] rTypes = tType.getRealComponents();
-        for (int i = 0; i < rTypes.length; i++) {
-            RealType rt = rTypes[i];
-            Variable v  = new Variable(ncfile, null, null, getVarName(rt));
-            Unit     u  = rt.getDefaultUnit();
-            if (u != null) {
-                v.addAttribute(new Attribute("units",
-                                             rt.getDefaultUnit().toString()));
+            // make variable for the parameter(s)
+            TupleType  tType  = getParamType(grid);
+            RealType[] rTypes = tType.getRealComponents();
+            for (int i = 0; i < rTypes.length; i++) {
+                RealType rt = rTypes[i];
+                Variable v  = new Variable(ncfile, null, null,
+                                           getVarName(rt));
+                Unit     u  = rt.getDefaultUnit();
+                if (u != null) {
+                    v.addAttribute(new Attribute("units",
+                            rt.getDefaultUnit().toString()));
+                }
+                if (projVar != null) {
+                    v.addAttribute(new Attribute("grid_mapping",
+                            projVar.getName()));
+                }
+                if (haveEmpirical) {
+                    v.addAttribute(new Attribute("coordinates",
+                            "latitude longitude"));
+                }
+                v.setDataType(DataType.FLOAT);
+                v.setDimensions(dims);
+                ncfile.addVariable(null, v);
             }
-            if (projVar != null) {
-                v.addAttribute(new Attribute("grid_mapping",
-                                             projVar.getName()));
+            ncfile.addGlobalAttribute(new Attribute("Conventions", "CF-1.X"));
+            ncfile.addGlobalAttribute(new Attribute("History",
+                    "Translated from VisAD grid to CF-1.X Conventions by IDV\n"
+                    + "Original Dataset = " + grid.getType()
+                    + "\nTranslation Date = " + new Date()));
+            ncfile.create();
+            // fill in the data
+            if (isTimeSequence) {
+                Variable   timeVar  = ncfile.findVariable("time");
+                double[][] timeVals = timeSet.getDoubles(false);
+                Array varArray = Array.factory(DataType.DOUBLE,
+                                     new int[] { numTimes }, timeVals[0]);
+                ncfile.write(timeVar.getName(), varArray);
             }
-            if (haveEmpirical) {
-                v.addAttribute(new Attribute("coordinates",
-                                             "latitude longitude"));
+            for (Iterator it = keys.iterator(); it.hasNext(); ) {
+                Variable v = (Variable) it.next();
+                ncfile.write(v.getName(), varData.get(v));
             }
-            v.setDataType(DataType.FLOAT);
-            v.setDimensions(dims);
-            ncfile.addVariable(null, v);
-        }
-        ncfile.addGlobalAttribute(new Attribute("Conventions", "CF-1.X"));
-        ncfile.addGlobalAttribute(new Attribute("History",
-                "Translated from VisAD grid to CF-1.X Conventions by IDV\n"
-                + "Original Dataset = " + grid.getType()
-                + "\nTranslation Date = " + new Date()));
-        ncfile.create();
-        // fill in the data
-        if (isTimeSequence) {
-            Variable   timeVar  = ncfile.findVariable("time");
-            double[][] timeVals = timeSet.getDoubles(false);
-            Array varArray = Array.factory(DataType.DOUBLE,
-                                           new int[] { numTimes },
-                                           timeVals[0]);
-            ncfile.write(timeVar.getName(), varArray);
-        }
-        for (Iterator it = keys.iterator(); it.hasNext(); ) {
-            Variable v = (Variable) it.next();
-            ncfile.write(v.getName(), varData.get(v));
-        }
-        int   numDims = dims.size();
-        int[] sizes   = new int[numDims];
-        int   index   = 0;
-        for (Dimension dim : dims) {
-            sizes[index++] = dim.getLength();
-        }
-        // write the data
-        Array arr = null;
-        if (isTimeSequence) {
-            sizes[0] = 1;
-            int[] origin = new int[sizes.length];
-            for (int k = 1; k < sizes.length; k++) {
-                origin[k] = 0;
+            int   numDims = dims.size();
+            int[] sizes   = new int[numDims];
+            int   index   = 0;
+            for (Dimension dim : dims) {
+                sizes[index++] = dim.getLength();
             }
-            for (int i = 0; i < timeSet.getLength(); i++) {
-                origin[0] = i;
-                FlatField sample  = (FlatField) grid.getSample(i, false);
-                float[][] samples = sample.getFloats(false);
+            // write the data
+            Array arr = null;
+            if (isTimeSequence) {
+                sizes[0] = 1;
+                int[] origin = new int[sizes.length];
+                for (int k = 1; k < sizes.length; k++) {
+                    origin[k] = 0;
+                }
+                for (int i = 0; i < timeSet.getLength(); i++) {
+                    origin[0] = i;
+                    FlatField sample  = (FlatField) grid.getSample(i, false);
+                    float[][] samples = sample.getFloats(false);
+                    for (int j = 0; j < rTypes.length; j++) {
+                        Variable v =
+                            ncfile.findVariable(getVarName(rTypes[j]));
+                        arr = Array.factory(DataType.FLOAT, sizes,
+                                            samples[j]);
+                        ncfile.write(v.getName(), origin, arr);
+                    }
+                }
+            } else {
+                float[][] samples = ((FlatField) grid).getFloats();
                 for (int j = 0; j < rTypes.length; j++) {
                     Variable v = ncfile.findVariable(getVarName(rTypes[j]));
                     arr = Array.factory(DataType.FLOAT, sizes, samples[j]);
-                    ncfile.write(v.getName(), origin, arr);
+                    ncfile.write(v.getName(), arr);
                 }
             }
-        } else {
-            float[][] samples = ((FlatField) grid).getFloats();
-            for (int j = 0; j < rTypes.length; j++) {
-                Variable v = ncfile.findVariable(getVarName(rTypes[j]));
-                arr = Array.factory(DataType.FLOAT, sizes, samples[j]);
-                ncfile.write(v.getName(), arr);
-            }
-        }
-        // write the file
-        ncfile.close();
-        try {}
-        catch (Exception exc) {
+            // write the file
+            ncfile.close();
+        } catch (Exception exc) {
             LogUtil.logException("Writing grid to netCDF file: " + filename,
                                  exc);
         } finally {
