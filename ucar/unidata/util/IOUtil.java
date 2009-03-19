@@ -369,7 +369,7 @@ public class IOUtil {
      * @return _more_
      */
     public static File[] sortFilesOnName(File[] files) {
-        return  sortFilesOnName(files);
+        return  sortFilesOnName(files,false);
     }
 
     public static File[] sortFilesOnName(File[] files,boolean descending) {
