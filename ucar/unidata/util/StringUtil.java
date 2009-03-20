@@ -804,6 +804,10 @@ public class StringUtil {
     /**
      * Check if the given input String  matches the given pattern String.
      * First see if input.equals (patternString). If true then return true.
+     * Next, if the pattern string is a simple "*" or begins with a "*"
+     * or starts with the prefix "glob:" then is is a glob style pattern
+     * and we convert it to a regexp.
+     *
      * Next if there are no regular expression characters
      * (look for ^, $, *, and +) in the patternString then return false.
      * Else treat the patternString as a regexp and return if it matches
@@ -848,6 +852,15 @@ public class StringUtil {
                 if (patternString.toLowerCase().indexOf("t_") >= 0) {
                     //                    System.err.println ("pattern:" + patternString + " " +StringUtil.containsRegExp(patternString));
                 }
+                //Simple check for  glob style
+                if(patternString.startsWith("*") || patternString.equals("*")) {
+                    patternString = "."+ patternString;
+                }  else if(patternString.startsWith("glob:")) {
+                    patternString = patternString.substring("glob:".length());
+                    patternString = wildcardToRegexp(patternString);
+                    //                    System.err.println("   xxx:" + patternString+ " " +input);
+                } 
+
                 if ( !StringUtil.containsRegExp(patternString)) {
                     return false;
                 }
@@ -2387,8 +2400,10 @@ public class StringUtil {
      * @throws Exception some problem
      */
     public static void main(String[] args) throws Exception {
+        args = new String[]{"*","glob:fo*o","glob:*fo*o*","x.*"};
         for(int i=0;i<args.length;i++) {
-            System.out.println(ucar.unidata.xml.XmlUtil.encodeBase64(args[i].getBytes()));
+            System.err.println("pattern:" + args[i]);
+            System.err.println("   " +stringMatch("foobar", args[i],false,true));
         }
     }
 
