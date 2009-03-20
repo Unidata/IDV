@@ -1571,13 +1571,13 @@ public class StringUtil {
     }
 
     /**
-     * _more_
+     * Split up to a certain number of characters
      *
-     * @param s _more_
-     * @param delimiter _more_
-     * @param cnt _more_
+     * @param s   the string to split
+     * @param delimiter  the delimiter
+     * @param cnt the max number
      *
-     * @return _more_
+     * @return the list of split strings
      */
     public static List<String> splitUpTo(String s, String delimiter,
                                          int cnt) {
@@ -1619,8 +1619,8 @@ public class StringUtil {
      * @param s source string
      * @param macroName macro name_
      * @param date date to use
-     * @param macroPrefix _more_
-     * @param macroSuffix _more_
+     * @param macroPrefix  the macro prefix
+     * @param macroSuffix  the macro suffix
      *
      * @return formatted string
      */
@@ -2111,14 +2111,35 @@ public class StringUtil {
         return null;
     }
 
+    /**
+     * Is the string all upper case?
+     *
+     * @param s  string to check
+     *
+     * @return true if all uppercase
+     */
+    public static boolean isUpperCase(String s) {
+        return s.toUpperCase().equals(s);
+    }
+
+    /**
+     * Is the string all lower case?
+     *
+     * @param s  string to check
+     *
+     * @return true if all characters are lowercase
+     */
+    public static boolean isLowerCase(String s) {
+        return s.toLowerCase().equals(s);
+    }
 
 
     /**
-     * _more_
+     * Camel case a string (eg howard -&gt; Howard)
      *
-     * @param s _more_
+     * @param s  string to camel case
      *
-     * @return _more_
+     * @return the camel cased string
      */
     public static String camelCase(String s) {
         return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
@@ -2295,11 +2316,11 @@ public class StringUtil {
 
 
     /**
-     * _more_
+     * Parse HTML Properties
      *
-     * @param s _more_
+     * @param s  the string
      *
-     * @return _more_
+     * @return a hashtable of properties
      */
     public static Hashtable parseHtmlProperties(String s) {
         //        boolean debug = true;
