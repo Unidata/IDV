@@ -33,6 +33,7 @@ import ucar.unidata.metdata.NamedStationTable;
 import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 
 import visad.*;
 
@@ -242,7 +243,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
             buf.append(station.getID());
             // further refine the search; Major  hack
             String apro = ti.fileExtension;
-            if (apro.length() == 3) {
+            if (apro.length() == 3 && StringUtil.isUpperCase(apro)) {
                 buf.append("&APRO=");
                 buf.append(apro);
             }
@@ -253,6 +254,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
         buf.append(maxCount);
         buf.append("&day=");
         buf.append(endDT[0]);
+        //buf.append("&debug=true");
         return buf.toString();
     }
 
