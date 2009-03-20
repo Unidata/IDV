@@ -1405,7 +1405,9 @@ public class GeoGridAdapter {
                 //If we are running under lazy evaluation then
                 //we don't want to do the fieldMinMax because it
                 //will force a read of the data
-                gridMap.put(time, sample);
+                synchronized(gridMap) {
+                    gridMap.put(time, sample);
+                }
             } else {
                 Range range = GridUtil.fieldMinMax(sample)[0];
                 // For now, min and max are flipped if all values were NaN
@@ -1413,7 +1415,9 @@ public class GeoGridAdapter {
                        && Double.isInfinite(
                                             range.getMax()))) {
                     //When we are testing break after we've read one time.
-                    gridMap.put(time, sample);
+                    synchronized(gridMap) {
+                        gridMap.put(time, sample);
+                    }
                 }
             }
         }
