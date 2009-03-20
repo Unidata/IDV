@@ -501,7 +501,13 @@ public class WebHarvester extends Harvester {
         String tail     = IOUtil.getFileTail(url);
         File   tmpFile  = getStorageManager().getTmpFile(null, tail);
         //        System.err.println ("WebHarvester: " + getName() +" fetching URL: " + url);
-        IOUtil.writeTo(new URL(url), tmpFile, null);
+
+        try {
+            IOUtil.writeTo(new URL(url), tmpFile, null);
+        } catch(Exception exc) {
+            statusMessages.add("Unable to fetch URL: " +url);
+            return null;
+        }
         File newFile = getStorageManager().moveToStorage(null, tmpFile, "");
         //                           getRepository().getGUID() + "_");
         //        System.err.println ("got it " + newFile);
