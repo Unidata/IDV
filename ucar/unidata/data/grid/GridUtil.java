@@ -3433,7 +3433,7 @@ public class GridUtil {
         FieldImpl result = resampleGridInner(grid, subDomain, samplingMode,
                                              errorMode);
         long t2 = System.currentTimeMillis();
-        System.err.println("Time:" + (t2 - t1));
+        //System.err.println("Time:" + (t2 - t1));
         return result;
     }
 
