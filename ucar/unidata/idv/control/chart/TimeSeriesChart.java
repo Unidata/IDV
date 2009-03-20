@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control.chart;
 
 
@@ -111,18 +112,19 @@ public class TimeSeriesChart extends XYChartManager {
     /** format */
     NumberFormat numberFormat;
 
-    /** _more_          */
+    /** _more_ */
     private List sunriseDates;
 
-    /** _more_          */
+    /** _more_ */
     private LatLonPoint sunriseLocation;
 
-    /** _more_          */
+    /** _more_ */
     private Date lastStartDate;
 
-    /** _more_          */
+    /** _more_ */
     private Date lastEndDate;
 
+    /** _more_          */
     private String dateFormat;
 
 
@@ -162,140 +164,143 @@ public class TimeSeriesChart extends XYChartManager {
      * @return The plot_
      */
     public Plot doMakePlot() {
+
         IdvPreferenceManager pref =
             control.getControlContext().getIdv().getPreferenceManager();
         TimeZone   timeZone  = pref.getDefaultTimeZone();
         NumberAxis valueAxis = new FixedWidthNumberAxis("");
-        final SimpleDateFormat sdf =
-            new SimpleDateFormat((dateFormat!=null?dateFormat:pref.getDefaultDateFormat()));
+        final SimpleDateFormat sdf = new SimpleDateFormat(((dateFormat
+                                         != null)
+                ? dateFormat
+                : pref.getDefaultDateFormat()));
         sdf.setTimeZone(timeZone);
         DateAxis timeAxis = new DateAxis("Time (" + timeZone.getID() + ")",
                                          timeZone) {
 
-    protected List xxxxxrefreshTicksHorizontal(Graphics2D g2,
-                                          Rectangle2D dataArea,
-                                          RectangleEdge edge) {
+            protected List xxxxxrefreshTicksHorizontal(Graphics2D g2,
+                    Rectangle2D dataArea, RectangleEdge edge) {
 
-        List ticks = super.refreshTicksHorizontal(g2,
-                                                  dataArea,
-                                                  edge);
-        
-        List result = new java.util.ArrayList();
+                List ticks = super.refreshTicksHorizontal(g2, dataArea, edge);
 
-        Font tickLabelFont = getTickLabelFont();
-        g2.setFont(tickLabelFont);
+                List<Tick> result        = new java.util.ArrayList<Tick>();
 
-        if (isAutoTickUnitSelection()) {
-            selectAutoTickUnit(g2, dataArea, edge);
-        }
+                Font       tickLabelFont = getTickLabelFont();
+                g2.setFont(tickLabelFont);
 
-        DateTickUnit unit = getTickUnit();
-        Date tickDate = calculateLowestVisibleTickValue(unit);
-        Date upperDate = getMaximumDate();
-
-        Date firstDate = null;
-        while (tickDate.before(upperDate)) {
-
-            if (!isHiddenValue(tickDate.getTime())) {
-                // work out the value, label and position
-                String tickLabel;
-                DateFormat formatter = getDateFormatOverride();
-                if(firstDate==null) {
-                    if (formatter != null) {
-                        tickLabel = formatter.format(tickDate);
-                    }  else {
-                        tickLabel = getTickUnit().dateToString(tickDate);
-                    }
-                    firstDate = tickDate;
-                } else {
-                    double msdiff = tickDate.getTime()-firstDate.getTime();
-                    int hours = (int)(msdiff/1000/60/60);
-                    tickLabel = hours+"H";
-                }
-                //                tickLabel = tickLabel;
-                TextAnchor anchor = null;
-                TextAnchor rotationAnchor = null;
-                double angle = 0.0;
-                if (isVerticalTickLabels()) {
-                    anchor = TextAnchor.CENTER_RIGHT;
-                    rotationAnchor = TextAnchor.CENTER_RIGHT;
-                    if (edge == RectangleEdge.TOP) {
-                        angle = Math.PI / 2.0;
-                    }
-                    else {
-                        angle = -Math.PI / 2.0;
-                    }
-                }
-                else {
-                    if (edge == RectangleEdge.TOP) {
-                        anchor = TextAnchor.BOTTOM_CENTER;
-                        rotationAnchor = TextAnchor.BOTTOM_CENTER;
-                    }
-                    else {
-                        anchor = TextAnchor.TOP_CENTER;
-                        rotationAnchor = TextAnchor.TOP_CENTER;
-                    }
+                if (isAutoTickUnitSelection()) {
+                    selectAutoTickUnit(g2, dataArea, edge);
                 }
 
-                Tick tick = new DateTick(tickDate, tickLabel, anchor, 
-                        rotationAnchor, angle);
-                result.add(tick);
-                tickDate = unit.addToDate(tickDate, getTimeZone());
+                DateTickUnit unit      = getTickUnit();
+                Date         tickDate  =
+                    calculateLowestVisibleTickValue(unit);
+                Date         upperDate = getMaximumDate();
+
+                Date         firstDate = null;
+                while (tickDate.before(upperDate)) {
+
+                    if ( !isHiddenValue(tickDate.getTime())) {
+                        // work out the value, label and position
+                        String     tickLabel;
+                        DateFormat formatter = getDateFormatOverride();
+                        if (firstDate == null) {
+                            if (formatter != null) {
+                                tickLabel = formatter.format(tickDate);
+                            } else {
+                                tickLabel =
+                                    getTickUnit().dateToString(tickDate);
+                            }
+                            firstDate = tickDate;
+                        } else {
+                            double msdiff = tickDate.getTime()
+                                            - firstDate.getTime();
+                            int hours = (int) (msdiff / 1000 / 60 / 60);
+                            tickLabel = hours + "H";
+                        }
+                        //                tickLabel = tickLabel;
+                        TextAnchor anchor         = null;
+                        TextAnchor rotationAnchor = null;
+                        double     angle          = 0.0;
+                        if (isVerticalTickLabels()) {
+                            anchor         = TextAnchor.CENTER_RIGHT;
+                            rotationAnchor = TextAnchor.CENTER_RIGHT;
+                            if (edge == RectangleEdge.TOP) {
+                                angle = Math.PI / 2.0;
+                            } else {
+                                angle = -Math.PI / 2.0;
+                            }
+                        } else {
+                            if (edge == RectangleEdge.TOP) {
+                                anchor         = TextAnchor.BOTTOM_CENTER;
+                                rotationAnchor = TextAnchor.BOTTOM_CENTER;
+                            } else {
+                                anchor         = TextAnchor.TOP_CENTER;
+                                rotationAnchor = TextAnchor.TOP_CENTER;
+                            }
+                        }
+
+                        Tick tick = new DateTick(tickDate, tickLabel, anchor,
+                                        rotationAnchor, angle);
+                        result.add(tick);
+                        tickDate = unit.addToDate(tickDate, getTimeZone());
+                    } else {
+                        tickDate = unit.rollDate(tickDate, getTimeZone());
+                        continue;
+                    }
+
+                    // could add a flag to make the following correction optional...
+                    switch (unit.getUnit()) {
+
+                      case (DateTickUnit.MILLISECOND) :
+                      case (DateTickUnit.SECOND) :
+                      case (DateTickUnit.MINUTE) :
+                      case (DateTickUnit.HOUR) :
+                      case (DateTickUnit.DAY) :
+                          break;
+
+                      case (DateTickUnit.MONTH) :
+                          tickDate =
+                              calculateDateForPositionX(new Month(tickDate,
+                                  getTimeZone()), getTickMarkPosition());
+                          break;
+
+                      case (DateTickUnit.YEAR) :
+                          tickDate =
+                              calculateDateForPositionX(new Year(tickDate,
+                                  getTimeZone()), getTickMarkPosition());
+                          break;
+
+                      default :
+                          break;
+
+                    }
+
+                }
+                return result;
+
             }
-            else {
-                tickDate = unit.rollDate(tickDate, getTimeZone());
-                continue;
-            }
 
-            // could add a flag to make the following correction optional...
-            switch (unit.getUnit()) {
+            private Date calculateDateForPositionX(RegularTimePeriod period,
+                    DateTickMarkPosition position) {
 
-                case (DateTickUnit.MILLISECOND) :
-                case (DateTickUnit.SECOND) :
-                case (DateTickUnit.MINUTE) :
-                case (DateTickUnit.HOUR) :
-                case (DateTickUnit.DAY) :
-                    break;
-                case (DateTickUnit.MONTH) :
-                    tickDate = calculateDateForPositionX(new Month(tickDate,
-                            getTimeZone()), getTickMarkPosition());
-                    break;
-                case(DateTickUnit.YEAR) :
-                    tickDate = calculateDateForPositionX(new Year(tickDate, 
-                                                                 getTimeZone()), getTickMarkPosition());
-                    break;
-
-                default: break;
+                if (position == null) {
+                    throw new IllegalArgumentException(
+                        "Null 'position' argument.");
+                }
+                Date result = null;
+                if (position == DateTickMarkPosition.START) {
+                    result = new Date(period.getFirstMillisecond());
+                } else if (position == DateTickMarkPosition.MIDDLE) {
+                    result = new Date(period.getMiddleMillisecond());
+                } else if (position == DateTickMarkPosition.END) {
+                    result = new Date(period.getLastMillisecond());
+                }
+                return result;
 
             }
 
-        }
-        return result;
 
-    }
-
-    private Date calculateDateForPositionX(RegularTimePeriod period, 
-                                          DateTickMarkPosition position) {
-        
-        if (position == null) {
-            throw new IllegalArgumentException("Null 'position' argument.");   
-        }
-        Date result = null;
-        if (position == DateTickMarkPosition.START) {
-            result = new Date(period.getFirstMillisecond());
-        }
-        else if (position == DateTickMarkPosition.MIDDLE) {
-            result = new Date(period.getMiddleMillisecond());
-        }
-        else if (position == DateTickMarkPosition.END) {
-            result = new Date(period.getLastMillisecond());
-        }
-        return result;
-
-    }
-
-
-            };
+        };
         timeAxis.setDateFormatOverride(sdf);
 
         final XYPlot[] xyPlotHolder = { null };
@@ -312,6 +317,7 @@ public class TimeSeriesChart extends XYChartManager {
             xyPlotHolder[0].addAnnotation(animationTimeAnnotation);
         }
         return xyPlotHolder[0];
+
     }
 
     /**
@@ -421,7 +427,7 @@ public class TimeSeriesChart extends XYChartManager {
         rangeAxis.setLabelPaint(Color.black);
         renderer.setSeriesPaint(0, c);
         renderer.setSeriesStroke(0, lineState.getStroke());
-        renderer.setSeriesVisibleInLegend(0,lineState.getVisibleInLegend());
+        renderer.setSeriesVisibleInLegend(0, lineState.getVisibleInLegend());
 
         if ( !lineState.getAxisVisible()) {
             rangeAxis.setVisible(false);
@@ -515,6 +521,7 @@ public class TimeSeriesChart extends XYChartManager {
      */
     public void setProbeSamplesInner()
             throws VisADException, RemoteException {
+
         clearLineStates();
         updatePending = false;
         List<ProbeRowInfo> rowInfos = ((currentProbeData == null)
@@ -530,15 +537,15 @@ public class TimeSeriesChart extends XYChartManager {
                 LineState  dirLineState   = null;
                 Unit       speedUnit      = null;
                 double
-                    speedMin         = 0,
-                    speedMax         = 0;
+                    speedMin              = 0,
+                    speedMax              = 0;
                 double
-                    dirMin         = 0,
-                    dirMax         = 0;
-                boolean polarWind = true;
+                    dirMin                = 0,
+                    dirMax                = 0;
+                boolean polarWind         = true;
 
-                int speedIdx=0;
-                int dirIdx=0;
+                int     speedIdx          = 0;
+                int     dirIdx            = 0;
 
 
                 for (int paramIdx = 0; paramIdx < rowInfos.size();
@@ -556,17 +563,16 @@ public class TimeSeriesChart extends XYChartManager {
                         continue;
                     }
                     lineState.unit = info.getUnit();
-                    lineState.setNameIfNeeded(info.getDataInstance().getParamName());
-                    String  name  =lineState.getName();
-                    String canonical =
-                        DataAlias.aliasToCanonical(name);
+                    lineState.setNameIfNeeded(
+                        info.getDataInstance().getParamName());
+                    String name      = lineState.getName();
+                    String canonical = DataAlias.aliasToCanonical(name);
                     if (info.getLevel() != null) {
-                        name = name+ "@"
-                            + Util.formatReal(info.getLevel())
-                            + info.getLevel().getUnit();
+                        name = name + "@" + Util.formatReal(info.getLevel())
+                               + info.getLevel().getUnit();
                     }
 
-                    
+
                     TimeSeries series = new TimeSeries(name,
                                             Millisecond.class);
 
@@ -606,23 +612,25 @@ public class TimeSeriesChart extends XYChartManager {
 
 
                     synchronized (MUTEX) {
-                        if (Misc.equals(canonical, "U")) {
-                            speedIdx = paramIdx;
-                            speedMin = min;
-                            speedMax = max;
+                        if (Misc.equals(canonical, "U")
+                                || Misc.equals(canonical, "UREL")) {
+                            speedIdx       = paramIdx;
+                            speedMin       = min;
+                            speedMax       = max;
                             speedUnit      = lineState.unit;
                             speedSeries    = series;
                             polarWind      = false;
                             speedLineState = lineState;
                             continue;
                         }
-                        if (Misc.equals(canonical, "V")) {
-                            dirIdx = paramIdx;
+                        if (Misc.equals(canonical, "V")
+                                || Misc.equals(canonical, "VREL")) {
+                            dirIdx       = paramIdx;
                             dirSeries    = series;
                             dirLineState = lineState;
-                            dirMin = min;
-                            dirMax = max;
-                            polarWind      = false;
+                            dirMin       = min;
+                            dirMax       = max;
+                            polarWind    = false;
                             continue;
                         }
                     }
@@ -639,14 +647,15 @@ public class TimeSeriesChart extends XYChartManager {
                     Axis axis = addSeries(speedSeries, speedLineState,
                                           speedIdx, renderer, true);
                     if (speedLineState.getVerticalPosition()
-                        != LineState.VPOS_NONE) {
+                            != LineState.VPOS_NONE) {
                         axis.setVisible(false);
                     }
                     speedSeries = null;
                     dirSeries   = null;
                 }
                 if (speedSeries != null) {
-                    addSeries(speedSeries, speedLineState, speedIdx, null, true);
+                    addSeries(speedSeries, speedLineState, speedIdx, null,
+                              true);
                     addRange(speedMin, speedMax,
                              "Data range from: " + speedLineState.getName());
                 }
@@ -665,6 +674,7 @@ public class TimeSeriesChart extends XYChartManager {
         } finally {
             doneLoadingData();
         }
+
     }
 
 
@@ -688,7 +698,7 @@ public class TimeSeriesChart extends XYChartManager {
                 int paramIdx = 0;
                 initCharts();
                 if ((obs != null) && (obs.size() > 0)) {
-                    List goodVars = new ArrayList();
+                    List<PointParam> goodVars = new ArrayList<PointParam>();
                     for (int varIdx = 0; varIdx < plotVars.size(); varIdx++) {
                         PointParam plotVar =
                             (PointParam) plotVars.get(varIdx);
@@ -737,7 +747,7 @@ public class TimeSeriesChart extends XYChartManager {
                     LineState  speedLineState = null;
                     LineState  dirLineState   = null;
                     Unit       speedUnit      = null;
-                    boolean polarWind = true;
+                    boolean    polarWind      = true;
                     for (int varIdx = 0; varIdx < goodVars.size(); varIdx++) {
                         PointParam plotVar =
                             (PointParam) goodVars.get(varIdx);
@@ -745,8 +755,8 @@ public class TimeSeriesChart extends XYChartManager {
                         if ( !lineState.getVisible()) {
                             continue;
                         }
-                        TimeSeries series   = null;
-                        List       textList = null;
+                        TimeSeries   series   = null;
+                        List<String> textList = null;
                         String canonical =
                             DataAlias.aliasToCanonical(lineState.getName());
                         //                    System.err.println ("var:" + var + " canon:" + canonical);
@@ -769,7 +779,7 @@ public class TimeSeriesChart extends XYChartManager {
                             }
                             if ( !(dataElement instanceof Real)) {
                                 if (textList == null) {
-                                    textList = new ArrayList();
+                                    textList = new ArrayList<String>();
                                 }
                                 try {
                                     series.add(new Millisecond(dttm), 0);
@@ -830,7 +840,7 @@ public class TimeSeriesChart extends XYChartManager {
                                 if (Misc.equals(canonical, "V")) {
                                     dirSeries    = series;
                                     dirLineState = lineState;
-                                    polarWind      = false;
+                                    polarWind    = false;
                                     continue;
                                 }
                                 if (Misc.equals(canonical, "CC")) {
@@ -893,10 +903,7 @@ public class TimeSeriesChart extends XYChartManager {
     /**
      * set chart from track data
      *
-     * @param obs obs
-     * @param plotVars the vars to plot
-     *
-     * @param lines _more_
+     * @param lines  LineStates
      *
      * @throws RemoteException On badness
      * @throws VisADException On badness
@@ -1085,11 +1092,21 @@ public class TimeSeriesChart extends XYChartManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param format _more_
+     */
     public void setDateFormat(String format) {
         dateFormat = format;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getDateFormat() {
         return dateFormat;
     }

@@ -37,6 +37,7 @@ import org.jfree.data.time.*;
 import org.jfree.data.xy.*;
 import org.jfree.ui.*;
 
+import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.grid.GridUtil;
 
 import ucar.unidata.idv.control.DisplayControlImpl;
@@ -251,6 +252,7 @@ public class VerticalProfileChart extends XYChartManager {
      * @throws VisADException  VisAD problem
      */
     private void updateCharts() throws VisADException, RemoteException {
+
         if (profiles == null) {
             return;
         }
@@ -260,6 +262,13 @@ public class VerticalProfileChart extends XYChartManager {
             initCharts();
             if ((profiles != null) && !profiles.isEmpty()) {
 
+                XYSeries  speedSeries    = null;
+                XYSeries  dirSeries      = null;
+                LineState speedLineState = null;
+                LineState dirLineState   = null;
+                Unit      speedUnit      = null;
+                boolean   polarWind      = true;
+                int       lineIdx        = 0;
                 for (int paramIdx = 0; paramIdx < profiles.size();
                         paramIdx++) {
                     VerticalProfileInfo vpInfo =
@@ -284,6 +293,8 @@ public class VerticalProfileChart extends XYChartManager {
                     } else {
                         oneTime = (FlatField) profile;
                     }
+                    String canonical =
+                        DataAlias.aliasToCanonical(lineState.getName());
                     XYSeries series = new XYSeries(lineState.getName());
                     float[] alts =
                         oneTime.getDomainSet().getSamples(false)[0];
@@ -297,13 +308,68 @@ public class VerticalProfileChart extends XYChartManager {
                     for (int i = 0; i < alts.length; i++) {
                         series.add(alts[i], vals[i]);
                     }
-                    addSeries(series, lineState, paramIdx, null, true);
+                    if (series != null) {
+                        synchronized (MUTEX) {
+                            XYItemRenderer renderer = null;
+                            if (Misc.equals(canonical, "SPEED")) {
+                                speedUnit      = lineState.unit;
+                                speedSeries    = series;
+                                speedLineState = lineState;
+                                continue;
+                            }
+                            if (Misc.equals(canonical, "DIR")) {
+                                dirSeries    = series;
+                                dirLineState = lineState;
+                                continue;
+                            }
+                            if (Misc.equals(canonical, "U")
+                                    || Misc.equals(canonical, "UREL")) {
+                                speedUnit      = lineState.unit;
+                                speedSeries    = series;
+                                polarWind      = false;
+                                speedLineState = lineState;
+                                continue;
+                            }
+                            if (Misc.equals(canonical, "V")
+                                    || Misc.equals(canonical, "UREL")) {
+                                dirSeries    = series;
+                                dirLineState = lineState;
+                                polarWind    = false;
+                                continue;
+                            }
+                            addSeries(series, lineState, lineIdx, renderer,
+                                      true);
+                        }
+                        lineIdx++;
+                    }
+                    //addSeries(series, lineState, paramIdx, null, true);
+                }
+                if ((speedSeries != null) && (dirSeries != null)) {
+                    XYItemRenderer renderer =
+                        new WindbarbRenderer(speedLineState, speedSeries,
+                                             dirSeries, speedUnit, polarWind);
+                    Axis axis = addSeries(speedSeries, speedLineState,
+                                          lineIdx++, renderer, true);
+                    if (speedLineState.getVerticalPosition()
+                            != LineState.VPOS_NONE) {
+                        axis.setVisible(false);
+                    }
+                    speedSeries = null;
+                    dirSeries   = null;
+                }
+                if (speedSeries != null) {
+                    addSeries(speedSeries, speedLineState, lineIdx++, null,
+                              true);
+                }
+                if (dirSeries != null) {
+                    addSeries(dirSeries, dirLineState, lineIdx, null, true);
                 }
             }
             updateContents();
         } finally {
             doneLoadingData();
         }
+
     }
 
     /**

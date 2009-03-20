@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.idv.control.chart;
 
 
@@ -668,10 +667,10 @@ public abstract class XYChartManager extends ChartManager {
         WindBarbSymbol.Drawer drawer;
 
         /** speed data */
-        TimeSeries speedSeries;
+        Series speedSeries;
 
         /** direction data */
-        TimeSeries dirSeries;
+        Series dirSeries;
 
         /** unit */
         Unit speedUnit;
@@ -690,8 +689,8 @@ public abstract class XYChartManager extends ChartManager {
          * @param dirSeries dir data
          * @param unit speed unit
          */
-        public WindbarbRenderer(LineState lineState, TimeSeries speedSeries,
-                                TimeSeries dirSeries, Unit unit) {
+        public WindbarbRenderer(LineState lineState, Series speedSeries,
+                                Series dirSeries, Unit unit) {
             this(lineState, speedSeries, dirSeries, unit, true);
         }
 
@@ -705,8 +704,8 @@ public abstract class XYChartManager extends ChartManager {
          * @param unit speed unit
          * @param polarWind true if polar coords
          */
-        public WindbarbRenderer(LineState lineState, TimeSeries speedSeries,
-                                TimeSeries dirSeries, Unit unit,
+        public WindbarbRenderer(LineState lineState, Series speedSeries,
+                                Series dirSeries, Unit unit,
                                 boolean polarWind) {
             this.lineState   = lineState;
             this.speedUnit   = unit;
@@ -729,10 +728,10 @@ public abstract class XYChartManager extends ChartManager {
             path.lineTo(10.f, 10.f);
 
             path.moveTo(0.f, 0.f);
-            path.lineTo(-3.0f, 3.0f);
+            path.lineTo(3.0f, -3.0f);
 
             path.moveTo(3.f, 3.f);
-            path.lineTo(3.f - 2.0f, 3.f + 2.0f);
+            path.lineTo(3.f + 2.0f, 3.f - 2.0f);
             path.closePath();
             LegendItem l = super.getLegendItem(datasetIndex, series);
             l = new LegendItem(l.getLabel(), l.getDescription(),
@@ -777,9 +776,19 @@ public abstract class XYChartManager extends ChartManager {
             if (item >= dirSeries.getItemCount()) {
                 return;
             }
+            double  speed = Double.NaN;
+            double  dir   = Double.NaN;
+            boolean isXY  = speedSeries instanceof XYSeries;
 
-            double speed = speedSeries.getValue(item).doubleValue();
-            double dir   = dirSeries.getValue(item).doubleValue();
+            if (isXY) {
+                // axes are switched in VertProf - X is alt, Y is value
+                speed = ((XYSeries) speedSeries).getY(item).doubleValue();
+                dir   = ((XYSeries) dirSeries).getY(item).doubleValue();
+            } else {
+                speed =
+                    ((TimeSeries) speedSeries).getValue(item).doubleValue();
+                dir = ((TimeSeries) dirSeries).getValue(item).doubleValue();
+            }
             if ( !polarWind) {
                 double u = speed;
                 double v = dir;
@@ -789,45 +798,65 @@ public abstract class XYChartManager extends ChartManager {
                     dir += 360;
                 }
             }
+            //System.err.println("spd/dir = " + speed+ "/" + dir);
 
-            double x = dataset.getXValue(series, item);
+            int    xPos, yPos;
+            double x = (isXY)
+                       ? dataset.getYValue(series, item)
+                       : dataset.getXValue(series, item);
+            //System.out.println("x = " + x);
 
             if (Double.isNaN(x) || Double.isNaN(speed) || Double.isNaN(dir)) {
                 return;
             }
-            int sX = (int) domainAxis.valueToJava2D(x, dataArea,
-                         plot.getDomainAxisEdge());
-            int sY = (int) rangeAxis.valueToJava2D(speed, dataArea,
-                         plot.getRangeAxisEdge());
+            int top    = (int) (dataArea.getY());
+            int bottom = (int) (top + dataArea.getHeight());
+            int left   = (int) (dataArea.getX());
+            int right  = (int) (left + dataArea.getWidth());
+            int midW   = left + (right - left) / 2;
+            int mid    = top + (bottom - top) / 2;
+            int vAnchor;
+            int w      = 20;
+            int w2     = w / 2;
+            int wiggle = 15;
+
+
+            if (isXY) {
+
+                double y = dataset.getXValue(series, item);
+                //xPos = (int) rangeAxis.valueToJava2D(x, dataArea,
+                //             plot.getRangeAxisEdge());
+                xPos = midW;
+                yPos = (int) domainAxis.valueToJava2D(y, dataArea,
+                        plot.getDomainAxisEdge());
+
+            } else {
+
+                int sX = (int) domainAxis.valueToJava2D(x, dataArea,
+                             plot.getDomainAxisEdge());
+                int sY = (int) rangeAxis.valueToJava2D(speed, dataArea,
+                             plot.getRangeAxisEdge());
+                System.out.println("sX/sY = " + sX + "/" + sY);
+
+                int verticalPosition = lineState.getVerticalPosition();
+                if (verticalPosition == LineState.VPOS_TOP) {
+                    vAnchor = top + wiggle;
+                } else if (verticalPosition == LineState.VPOS_MIDDLE) {
+                    vAnchor = mid - w2;
+                } else if (verticalPosition == LineState.VPOS_BOTTOM) {
+                    vAnchor = bottom - w - wiggle;
+                } else {
+                    vAnchor = sY;
+                }
+                xPos = sX - w2;
+                yPos = vAnchor;
+            }
 
             try {
                 speed = CommonUnits.KNOT.toThis(speed, speedUnit);
             } catch (VisADException vex) {
                 System.err.println("error:" + vex);
             }
-
-
-
-
-            int top    = (int) (dataArea.getY());
-            int bottom = (int) (top + dataArea.getHeight());
-            int mid    = top + (bottom - top) / 2;
-            int vAnchor;
-            int w                = 20;
-            int w2               = w / 2;
-            int wiggle           = 15;
-
-            int verticalPosition = lineState.getVerticalPosition();
-            if (verticalPosition == LineState.VPOS_TOP) {
-                vAnchor = top + wiggle;
-            } else if (verticalPosition == LineState.VPOS_MIDDLE) {
-                vAnchor = mid - w2;
-            } else if (verticalPosition == LineState.VPOS_BOTTOM) {
-                vAnchor = bottom - w - wiggle;
-            } else {
-                vAnchor = sY;
-            }
-
 
 
             if (drawer == null) {
@@ -837,7 +866,8 @@ public abstract class XYChartManager extends ChartManager {
             try {
                 g2.setColor(Color.black);
                 g2.setStroke(new BasicStroke());
-                drawer.draw(g2, sX - w2, vAnchor, w, w, speed, dir);
+                //drawer.draw(g2, sX - w2, vAnchor, w, w, speed, dir);
+                drawer.draw(g2, xPos, yPos, w, w, speed, dir);
             } catch (Exception exc) {
                 System.err.println("oops:" + exc);
             }
