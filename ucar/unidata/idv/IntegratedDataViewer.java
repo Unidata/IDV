@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -1996,12 +1997,12 @@ Misc.run(new Runnable() {
 
 
     /**
-     * _more_
+     * Popup a dialog to allows the user to select data  source type
      *
-     * @param definingObject _more_
-     * @param message _more_
+     * @param definingObject the object to create the data source with
+     * @param message message to show the user
      *
-     * @return _more_
+     * @return Selected data source type or null
      */
     public String selectDataType(Object definingObject, String message) {
         JComboBox dataSourcesCbx = IdvChooser.getDataSourcesComponent(false,
@@ -2113,12 +2114,23 @@ Misc.run(new Runnable() {
     }
 
 
+    /**
+     * Get the max number of threads to be used when rendering in visad
+     *
+     * @return max threads for rendering
+     */
     public int getMaxRenderThreadCount() {
-        return getStore().get(PREF_THREADS_RENDER,Runtime.getRuntime().availableProcessors());
+        return getStore().get(PREF_THREADS_RENDER,
+                              Runtime.getRuntime().availableProcessors());
     }
 
+    /**
+     * Get the max number of threads to be used when reading data
+     *
+     * @return max threads for reading data
+     */
     public int getMaxDataThreadCount() {
-        return getStore().get(PREF_THREADS_DATA,4);
+        return getStore().get(PREF_THREADS_DATA, 4);
     }
 
 
