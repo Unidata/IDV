@@ -100,6 +100,10 @@ import java.util.zip.*;
  */
 public class SearchManager extends RepositoryManager {
 
+    private List<ServerInfo> federatedServers;
+
+
+
     /**
      * _more_
      *
@@ -108,6 +112,21 @@ public class SearchManager extends RepositoryManager {
     public SearchManager(Repository repository) {
         super(repository);
     }
+
+
+    public List<ServerInfo> getFederatedServers() {
+        if(federatedServers == null) {
+            List<ServerInfo> tmp =  new ArrayList<ServerInfo>();
+            tmp.add(new ServerInfo("localhost",8080,"locahost@8080",
+                                   "desc 1"));
+            tmp.add(new ServerInfo("localhost",8081,"locahost@8081",
+                                            "desc 2"));
+            federatedServers = tmp;
+        }
+
+        return federatedServers;
+   }
+
 
 
     /**
@@ -144,9 +163,16 @@ public class SearchManager extends RepositoryManager {
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.formClose());
         return getRepository().makeResult(request, msg("Search Form"), sb,
-                                          getRepository().searchUrls);
+                                          getSearchUrls());
     }
 
+
+    public RequestUrl[] getSearchUrls() {
+        if(false && getFederatedServers().size()>0) {
+            return getRepository().federatedSearchUrls;
+        }
+        return getRepository().searchUrls;
+    }
 
 
     /**
@@ -252,7 +278,7 @@ public class SearchManager extends RepositoryManager {
         sb.append(HtmlUtil.formClose());
 
         return getRepository().makeResult(request, msg("Search Form"), sb,
-                                          getRepository().searchUrls);
+                                          getSearchUrls());
 
     }
 
@@ -285,6 +311,19 @@ public class SearchManager extends RepositoryManager {
     }
 
 
+    public Result processFederatedSearchForm(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        return getRepository().makeResult(request, msg("Federated Search"), sb,
+                                          getSearchUrls());
+
+    }
+
+    public Result processFederatedSearch(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        return getRepository().makeResult(request, msg("Federated Search"), sb,
+                                          getSearchUrls());
+
+    }
 
     /**
      * _more_
@@ -301,7 +340,7 @@ public class SearchManager extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         getMetadataManager().addToBrowseSearchForm(request, sb);
         return getRepository().makeResult(request, msg("Search Form"), sb,
-                                          getRepository().searchUrls);
+                                          getSearchUrls());
     }
 
 

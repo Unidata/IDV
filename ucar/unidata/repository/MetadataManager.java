@@ -705,7 +705,7 @@ public class MetadataManager extends RepositoryManager {
 
         return getRepository().makeResult(request,
                                           msg(type.getLabel() + " Cloud"),
-                                          sb, getRepository().searchUrls);
+                                          sb, getSearchManager().getSearchUrls());
 
     }
 

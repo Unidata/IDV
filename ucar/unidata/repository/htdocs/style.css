@@ -446,207 +446,6 @@ a.header-left  {
     overflow-x: automatic;
     background-color:white;
 }
-
-.wikicontent {
-}
-
-
-.mapcanvas {
-	width:200px;
-	height:200px;
-}
-
-.calheader {
-   background-color:#c3d9ff;
-   font-weight: bold;
-}
-
-.calday {
-   font-weight: bold;
-   font-size: 8pt;
-}
-
-.calentry {
-}
-
-.calcontents {
-	max-height: 150px; 
-	overflow-y: auto;
-	overflow-x: hidden;
-}
-
-.calnav {
-}
-
-.calnavmonthheader {
-   text-align:center;
-   background-color:#c3d9ff;
-   font-weight: bold;
-   font-size: 8pt;
-
-}
-
-.calnavdayheader {
-   text-align:center;
-   background-color:#c3d9ff;
-   font-weight: bold;
-   font-size: 8pt;
-}
-
-.calnavday {
-   text-align:right;
-   font-size: 8pt;
-   background-color:#c3d9ff;
-}
-
-.calnavtheday {
-   text-align:right;
-   font-size: 8pt;
-   background-color:white;
-}
-
-.calnavoffday {
-   text-align:right;
-   font-size: 8pt;
-   background-color:#cccccc;
-}
-
-
-
-.browseblock  a {
-   color:#000000;
-}
-
-.listrow1 {
-   padding:4px;
-   padding-bottom:0px;
-}
-
-.listrow2 {
-   background-color:#edf5ff;
-   padding:4px;
-   padding-bottom:0px;
-}
-
-
-.description {
-   margin-left:20px;
-   margin-botton:10px;
-}
-
-
-.browseblock {
-   margin-left:20px;
-   border: 2px #999999 solid; 
-   max-width: 90%; 
-   max-height: 150px; 
-   overflow-y: auto;
-   overflow-x: visible;
-
-}
-
-.scrollablediv {
-   max-height: 350px; 
-   overflow-y: auto;
-}
-
-
-td {
-   font-weight: normal;
-}
-
-.separator {
-   font-size: 11pt;
-   font-weight: bold;
-   color:#666666;
-}
-
-
-ul {
-   margin-top:5px;
-}
-
-.tab_titles {
-   xborder-bottom : 1px #000000 solid;
-   margin:0px;
-   padding:0px;
-}
-
-.tab_contents {
-   border-left : 1px #000000 solid;
-   border-right : 1px #000000 solid;
-   border-bottom : 1px #000000 solid;
-   border-top : 1px #000000 solid;
-   margin:0px;
-   padding:0px;
-}
-
-.tab_contents_noborder {
-   border-top : 1px #000000 solid;
-}
-
-.tab_content_fixedheight_off {
-   min-height: 100px;
-   max-height: 200px; 
-   overflow-y: auto;
-   padding:5;
-}
-
-
-
-.tab_content_fixedheight_on {
-   background-color:#ffffff;
-   min-height: 100px;
-   max-height: 200px; 
-   overflow-y: auto;
-   padding:5;
-}
-
-
-.tab_content_off {
-   padding:5;
-}
-
-.tab_content_on {
-   background-color:#ffffff;
-   padding:5;
-}
-
-
-.tab_title_on {
-   background-color:#ffffff;
-	border: 1px #000000 solid;
-        font-weight: bold;
-	margin-bottom:0px;
-	margin-left:3px;
-	margin-right:3px;
-	padding-bottom:0;
-	padding-top:2;
-	padding-left:6;
-	padding-right:6;
-	border-bottom:2px #ffffff  solid;
-}
-
-.tab_title_off {
-   background-color:#dddddd;
-   border-left: 1px #000000 solid;
-   border-right: 1px #000000 solid;
-   border-top: 1px #000000 solid;
-   font-weight: bold;
-   margin-left:3px;
-   margin-right:3px;
-   margin-bottom:0px;
-   padding-bottom:0;
-   padding-top:2;
-   padding-left:6;
-   padding-right:6;
-   border-bottom:1px #dddddd  solid;
-}
-
-
-
-.tab_title_on a {
-	color:#000000;
 	text-decoration: none;
 }
 
@@ -793,18 +592,19 @@ code.menu {
 
 
 .entrymenubar {
+   background-image:url(${urlroot}/images/gradient.jpg);
    padding-left:10px;
    padding-top:2px;
    padding-bottom:0px;
-   background-color:#ddeeff;
-   border-bottom: 1px #888888 solid; 
+   xbackground-color:#ddeeff;
+   border-bottom: 1px #888 solid; 
    margin-bottom:3px;
 
 }
 
 .entrymenulink {
     font-size: 12pt;
-    color: #000000;
+    color: #000;
     font-weight: bold;
 }
 
@@ -842,7 +642,7 @@ code.menu {
    font-size: 12pt;
    xfont-size: 110%;
    color: #9C9C9C;
-   border-bottom : 1px #666666 solid;
+   border-bottom : 1px #ccc solid;
    margin-bottom:5px;
 }
 

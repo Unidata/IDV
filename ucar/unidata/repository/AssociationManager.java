@@ -709,7 +709,7 @@ public class AssociationManager extends RepositoryManager {
         }
 
         return getRepository().makeResult(request, msg("Search Associations"), sb,
-                                          getRepository().searchUrls);
+                                          getSearchManager().getSearchUrls());
     }
 
 
@@ -719,7 +719,7 @@ public class AssociationManager extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         getAssociationsSearchForm( request,  sb);
         return getRepository().makeResult(request, msg("Search Associations"), sb,
-                                          getRepository().searchUrls);
+                                          getSearchManager().getSearchUrls());
     }
 
 

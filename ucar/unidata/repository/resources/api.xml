@@ -44,6 +44,8 @@
       <api request="/search/form"            method="processEntrySearchForm"         name="Search"/>
       <api request="/search/browse"          method="processEntryBrowseSearchForm"   name="Browse"/>
       <api request="/search/do"              method="processEntrySearch"/>
+      <api request="/search/federated/form"     method="processFederatedSearchForm"         name="Federated Search" />
+      <api request="/search/federated/do"     method="processFederatedSearch"         name="Federated Search" />
    </group>
 
   <group handler="graphmanager">

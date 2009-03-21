@@ -86,6 +86,15 @@ public class RepositoryBase implements Constants, RepositorySource {
                                                     "/search/browse",
                                                     "Browse");
 
+
+    public final RequestUrl URL_SEARCH_FEDERATED_FORM = new RequestUrl(this,
+                                                    "/search/federated/form",
+                                                    "Search Federated Servers");
+
+    public final RequestUrl URL_SEARCH_FEDERATED_DO = new RequestUrl(this,
+                                                    "/search/federated/do",
+                                                    "Search Federated Servers");
+
     /** _more_ */
     public final RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this,
                                                    "/search/do", "Search");
@@ -95,6 +104,13 @@ public class RepositoryBase implements Constants, RepositorySource {
                                              URL_SEARCH_FORM,
                                              URL_SEARCH_BROWSE,
                                              URL_SEARCH_ASSOCIATIONS_FORM };
+
+    /** _more_ */
+    public final RequestUrl[] federatedSearchUrls = { URL_SEARCH_TEXTFORM,
+                                             URL_SEARCH_FORM,
+                                             URL_SEARCH_BROWSE,
+                                                      URL_SEARCH_ASSOCIATIONS_FORM,
+                                                      URL_SEARCH_FEDERATED_FORM};
 
     /** _more_ */
     public final RequestUrl URL_COMMENTS_SHOW = new RequestUrl(this,
