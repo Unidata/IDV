@@ -35,7 +35,7 @@
         <![CDATA[<a href="ftp/idv_%_version%_linux64.sh.MD5">MD5</a>]]>
         </description>
    </file>
-   <file url="ftp/idv_%_version%_macos_installer.dmg" name="IDV %version% Installer for Max OS-X">
+   <file url="ftp/idv_%_version%_macos_installer.dmg" name="IDV %version% Installer for Mac OS-X">
         <description>
         Installer for Mac OS-X.  Separate Java 3D 
         installation needed for Mac OS-X version 10.3.X. See the
