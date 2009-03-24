@@ -2243,6 +2243,9 @@ public class DerivedGridFactory {
             for (int i = 0; i < lats.length; i++) {
                 lats[i] = (float) (Math.sin(Math.toRadians(lats[i]))
                                    * twoOmega);
+                if (Math.abs(lats[i]) < 1.25E-05) {
+                    lats[i] = Float.NaN;
+                }
             }
         }
         latff.setSamples(new float[][] {
@@ -2366,7 +2369,9 @@ public class DerivedGridFactory {
             latCosGrid = (FlatField) latCosGrid.max(
                 new Real(Math.cos(Math.toRadians(89))));
             FlatField factor = (FlatField) latCosGrid.multiply(KM_PER_DEGREE);
+            //visad.python.JPythonMethods.dumpTypes(factor);
             retField = (FlatField) retField.divide(factor);
+            //visad.python.JPythonMethods.dumpTypes(retField);
         } else if (var.equals(RealType.Latitude)
                    || var.getName().toLowerCase().startsWith("lat")) {
             retField = (FlatField) retField.divide(KM_PER_DEGREE);
