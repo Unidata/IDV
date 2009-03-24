@@ -56,6 +56,9 @@ public final class UtcDate {
     /** hour format string (HH) */
     public static final String HH_FORMAT = "HH";
 
+    /** Year-Month-Day format string */
+    public static final String IYD_FORMAT = "yyyyDDD";
+
     /** GMT Timezone */
     public static final TimeZone GMT = DateTime.DEFAULT_TIMEZONE;
 
@@ -164,6 +167,15 @@ public final class UtcDate {
      */
     public static String getUtcDate(DateTime dt) {
         return formatUtcDate(dt, HMS_FORMAT);
+    }
+
+    /**
+     * Get the year.jday (IYD_FORMAT) as a String
+     * @param dt DateTime to use
+     * @return year.jday as a String (yyyyDDD);
+     */
+    public static String getIYD(DateTime dt) {
+        return formatUtcDate(dt, IYD_FORMAT);
     }
 
     /**
