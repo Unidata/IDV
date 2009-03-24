@@ -285,7 +285,7 @@ def dvdx(V):
       DVDX ( V ) = [ DDX (u), DDX (v) ] 
   </div>
   """
-  return ddx(V)
+  return vecr(ddx(ur(V)), ddx(vr(V)))
 
 def dvdy(V):
   """ Partial x derivative of a vector
@@ -293,7 +293,7 @@ def dvdy(V):
       DVDY ( V ) = [ DDY (u), DDY (v) ] 
   </div>
   """
-  return ddy(V)
+  return vecr(ddy(ur(V)), ddy(vr(V)))
 
 def frnt(S,V):
   """  Frontogenesis function from theta and the wind
