@@ -1304,14 +1304,14 @@ public class GridUtil {
             for (int timeStepIdx = arrays.size() - 1; timeStepIdx >= 0;
                     timeStepIdx--) {
                 float[][] value = arrays.get(timeStepIdx);
-                System.err.println("A:" + value);
+                //System.err.println("A:" + value);
                 if ((timeStepIdx + offset >= 0)
                         && (timeStepIdx + offset < arrays.size())) {
                     float[][] oldValue = arrays.get(timeStepIdx + offset);
                     value = Misc.subtractArray(value, oldValue, value);
-                    System.err.println("subtracting");
+                    //System.err.println("subtracting");
                 } else {
-                    System.err.println("filling");
+                    //System.err.println("filling");
                     Misc.fillArray(value, Float.NaN);
                 }
                 FlatField sample = (FlatField) newGrid.getSample(timeStepIdx);
@@ -1541,7 +1541,7 @@ public class GridUtil {
                        : 0;
         int xCnt     = lengths[0];
         int yCnt     = lengths[1];
-        System.err.println("X =" + xCnt + " Y=" + yCnt);
+        //System.err.println("X =" + xCnt + " Y=" + yCnt);
         float[][]   latLons  = getEarthLocationPoints(griddedSet);
         float[]     lats     = latLons[latIndex];
         float[]     lons     = latLons[lonIndex];
@@ -1568,7 +1568,7 @@ public class GridUtil {
                 System.err.print(" " + lat2D[xIdx][yIdx] + "/"
                                  + lon2D[xIdx][yIdx]);
             }
-            System.err.println("");
+            //System.err.println("");
         }
         return new Grid2D(lat2D, lon2D, value2D);
 
@@ -4209,7 +4209,7 @@ public class GridUtil {
         long    t1      = System.currentTimeMillis();
         int[][] indices = findContainedIndices(latlon, map, true);
         long    t2      = System.currentTimeMillis();
-        System.err.println("indices time:" + (t2 - t1));
+        //System.err.println("indices time:" + (t2 - t1));
         return indices;
     }
 
@@ -4246,7 +4246,7 @@ public class GridUtil {
         long    t1      = System.currentTimeMillis();
         int[][] indices = findContainedIndices(latlon, map, false);
         long    t2      = System.currentTimeMillis();
-        System.err.println("indices time:" + (t2 - t1));
+        //System.err.println("indices time:" + (t2 - t1));
         return indices;
     }
 
@@ -4374,8 +4374,8 @@ public class GridUtil {
                 }
             }
         }
-        System.err.println("total pts:" + numPoints + "  points inside box:"
-                           + ptCnt + " # polygon points:" + numPolygonPts);
+        //System.err.println("total pts:" + numPoints + "  points inside box:"
+        //                   + ptCnt + " # polygon points:" + numPolygonPts);
         int[][] indices = new int[sets.length][];
         for (int mapIdx = 0; mapIdx < indexLists.length; mapIdx++) {
             if (indexLists[mapIdx] == null) {
