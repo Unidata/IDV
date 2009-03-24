@@ -142,11 +142,12 @@ public class AddeImageInfo extends AddeImageURL {
         } catch (MalformedURLException mue) {}
     }
 
+    // NB: this was commented out because local Windows ADDE servers
+    // have to have the day in YYYYDDD format.  DRM: 24-Mar-2009
     /**
      * Create a DAY/TIME or POS string.  Override superclass so we can
      * make human readable as opposed to McIDAS formatted dates
      * @param buf  buffer to append to
-     */
     protected void appendDateOrPosString(StringBuffer buf) {
         if ((getStartDate() == null) && (getEndDate() == null)) {
             appendKeyValue(buf, KEY_POS, "" + getDatasetPosition());
@@ -166,20 +167,28 @@ public class AddeImageInfo extends AddeImageURL {
             StringBuffer day  = new StringBuffer();
             StringBuffer time = new StringBuffer();
             if (start != null) {
-                day.append(UtcDate.getYMD(start));
+                day.append(UtcDate.getIYD(start));
                 time.append(UtcDate.getHMS(start));
             }
             day.append(" ");
             time.append(" ");
             if (end != null) {
                 if (getRequestType().equals(REQ_IMAGEDIR)) {
-                    day.append(UtcDate.getYMD(end));
+                    day.append(UtcDate.getIYD(end));
                 }
                 time.append(UtcDate.getHMS(end));
+            } else {
+                time.append(UtcDate.getHMS(start));
             }
+            time.append(" ");
+            time.append(getTimeCoverage());
             appendKeyValue(buf, KEY_DAY, day.toString().trim());
             appendKeyValue(buf, KEY_TIME, time.toString().trim());
         }
     }
-}
+     */
 
+    /*  Uncomment to turn debugging on
+    public boolean getDebug() { return true; }
+    */
+}
