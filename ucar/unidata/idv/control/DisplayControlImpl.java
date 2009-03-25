@@ -3441,6 +3441,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         try {
             String template = applyMacrosToTemplate(getDisplayListTemplate(),
                                   false);
+            if(this instanceof PlanViewControl) 
+                System.err.println("Using:" + template);
+
             Set      s  = getDataTimeSet();
             TextType tt = TextType.getTextType(DISPLAY_LIST_NAME);
             if (s != null) {
@@ -4886,10 +4889,17 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if (animation == null) {
                 continue;
             }
+
+            Displayable.debug = (this instanceof PlanViewControl);
             RealType aniType = animation.getAnimationRealType();
+            Displayable.debug = false;
+
             Set set = displayInfo.getDisplayable().getAnimationSet(aniType,
                           true);
+
             if (set == null) {
+                if(this instanceof PlanViewControl) 
+                    System.err.println ("      no set ");
                 continue;
             }
             aniSet = (aniSet == null)
@@ -10491,7 +10501,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return  true to use fast rendering
      */
     protected boolean getDefaultFastRendering() {
-        return false;
+        return true;
     }
 
     /**
@@ -10875,6 +10885,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param value The new value for DisplayListTemplate
      */
     public void setDisplayListTemplate(String value) {
+        System.err.println("display list template: " + value);
         displayListTemplate = value;
     }
 
