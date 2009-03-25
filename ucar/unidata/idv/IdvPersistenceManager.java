@@ -389,13 +389,19 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             for (int fileIdx = 0; fileIdx < oldFiles.size(); fileIdx++) {
                 didAny = true;
                 File file = (File) oldFiles.get(fileIdx);
-                List categories = fileToCategories(dirs[i].toString(),
-                                      file.getParent().toString());
-                String name = IOUtil.stripExtension(
-                                  IOUtil.getFileTail(file.toString()));
-                File newFile = new File("");
-                SavedBundle savedBundle = new SavedBundle(newFile.toString(),
-                                                          name, categories, null, true,types[i]);
+
+                try {
+                    List categories = fileToCategories(dirs[i].toString(),
+                                                       file.getParent().toString());
+                    String name = IOUtil.stripExtension(
+                                                        IOUtil.getFileTail(file.toString()));
+                    File newFile = new File("");
+                    SavedBundle savedBundle = new SavedBundle(newFile.toString(),
+                                                              name, categories, null, true,types[i]);
+                } catch (Exception exc) {
+                    LogUtil.consoleMessage("Error cleaning up old bundles.\ndir:" + dirs[i] +
+                                           "\nfile:" + file +"\nparent:" + file.getParent()+"\nError:" + exc);  
+                }
                 //              System.err.println (types[i] + " cats:" +savedBundle.getCategories() +" " + savedBundle);
             }
         }
@@ -552,8 +558,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      *
      * @return List of (String) categories
      */
-    public static List fileToCategories(String root, String filename) {
-        return StringUtil.split(filename.substring(root.length() + 1),
+    public static List<String> fileToCategories(String root, String filename) {
+        int idx = root.length() + 1;
+        return StringUtil.split(filename.substring(idx),
                                 File.separator);
     }
 
