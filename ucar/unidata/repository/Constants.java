@@ -356,6 +356,8 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_RSS_VERSION = "version";
 
+    public static final String ATTR_SERVER = "server";
+
     /** _more_ */
     public static final String ATTR_SOUTH = "south";
 
@@ -382,6 +384,9 @@ public interface Constants {
 
     /** _more_ */
     public static final String ATTR_WEST = "west";
+
+
+    public static final String ARG_DECORATE = "decorate";
 
 
     /** _more_ */
@@ -1025,6 +1030,14 @@ public interface Constants {
     /** _more_ */
     public static final String TAG_INFO_SSLPORT = "sslport";
 
+
+    /** _more_ */
+    public static final String TAG_INFO_PORT = "port";
+
+    public static final String TAG_INFO_HOSTNAME = "hostname";    
+
+    public static final String TAG_INFO_BASEPATH = "basepath";
+
     /** _more_ */
     public static final String TAG_INFO_TITLE = "title";
 
@@ -1054,6 +1067,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String TAG_TYPES = "types";
+
 
 
 

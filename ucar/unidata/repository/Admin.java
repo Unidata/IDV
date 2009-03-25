@@ -851,7 +851,7 @@ public class Admin extends RepositoryManager {
 
 
         csb.append(HtmlUtil.formTableClose());
-        sb.append(makeConfigBlock("Contact", csb.toString()));
+
 
 
         StringBuffer dsb = new StringBuffer();
@@ -899,7 +899,7 @@ public class Admin extends RepositoryManager {
 
 
         dsb.append(HtmlUtil.formTableClose());
-        sb.append(makeConfigBlock("Display", dsb.toString()));
+
 
 
         StringBuffer asb = new StringBuffer();
@@ -1024,7 +1024,8 @@ public class Admin extends RepositoryManager {
 
 
         asb.append(HtmlUtil.formTableClose());
-        sb.append(makeConfigBlock("Access", asb.toString()));
+
+
 
         StringBuffer osb = new StringBuffer();
         osb.append(HtmlUtil.formTable());
@@ -1079,21 +1080,12 @@ public class Admin extends RepositoryManager {
 
         osb.append(HtmlUtil.formEntry("&nbsp;<p>", ""));
         osb.append(HtmlUtil.formTableClose());
+
+
+        sb.append(makeConfigBlock("Contact Information", csb.toString()));
+        sb.append(makeConfigBlock("Access",  asb.toString()));
+        sb.append(makeConfigBlock("Display", dsb.toString()));
         sb.append(makeConfigBlock("Available Output Types", osb.toString()));
-
-
-        StringBuffer umsb = new StringBuffer();
-        umsb.append(
-            msgHeader("Enter a message to show one time to all users"));
-        umsb.append(request.form(URL_ADMIN_USERMESSAGE, ""));
-        umsb.append(HtmlUtil.formTable());
-        umsb.append(HtmlUtil.formEntry(msgLabel("Message"),
-                                       HtmlUtil.textArea(ARG_MESSAGE, "", 5,
-                                           60)));
-        umsb.append(HtmlUtil.formTableClose());
-
-
-        //        sb.append(makeConfigBlock("User Message", usmb.toString()));
 
 
         sb.append(HtmlUtil.submit(msg("Change Settings")));

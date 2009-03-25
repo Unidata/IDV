@@ -2289,26 +2289,32 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String sessionMessage =
             getSessionManager().getSessionMessage(request);
 
+        //        System.err.println(request +" DECORATE=" + request.get(ARG_DECORATE, true));
 
-        /*
-//            getMetadataManager().findMetadata((request.getCollectionEntry()
-//                != null)
-//                ? request.getCollectionEntry()
-//                : topGroup, AdminMetadataHandler.TYPE_TEMPLATE, true);
-        */
-        if (metadata != null) {
-            template = metadata.getAttr1();
-            if (template.startsWith("file:")) {
-                template = getStorageManager().localizePath(template.trim());
-                template =
-                    IOUtil.readContents(template.substring("file:".length()),
-                                        getClass());
-            }
-            if (template.indexOf("${content}") < 0) {
-                template = null;
-            }
+        if(!request.get(ARG_DECORATE, true)) {
+            template  = getResource("/ucar/unidata/repository/resources/templates/plain.html");
         }
 
+        /*
+        //            getMetadataManager().findMetadata((request.getCollectionEntry()
+        //                != null)
+        //                ? request.getCollectionEntry()
+        //                : topGroup, AdminMetadataHandler.TYPE_TEMPLATE, true);
+        */
+        if (template == null) {
+            if (metadata != null) {
+                template = metadata.getAttr1();
+                if (template.startsWith("file:")) {
+                    template = getStorageManager().localizePath(template.trim());
+                    template =
+                        IOUtil.readContents(template.substring("file:".length()),
+                                            getClass());
+                }
+                if (template.indexOf("${content}") < 0) {
+                    template = null;
+                }
+            }
+        }
 
         if (template == null) {
             template = getTemplate(request).getTemplate();
@@ -2431,8 +2437,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (sublinksHtml.length() > 0) {
             html = StringUtil.replace(html, "${sublinks}", sublinksHtml);
         } else {
-            html = StringUtil.replace(html, "${sublinks}", BLANK);
-        }
+            html = StringUtil.replace(html, "${sublinks}", BLANK); 
+       }
         html = translate(request, html);
 
         result.setContent(html.getBytes());
@@ -3315,6 +3321,19 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    public ServerInfo getServerInfo() {
+        int sslPort = -1;
+        if(getHttpsPort().trim().length()>0) {
+            sslPort = new Integer(getHttpsPort().trim()).intValue();
+        }
+        return new ServerInfo(getHostname(),
+                              getPort(),
+                              sslPort,
+                              getUrlBase(),
+                              getProperty(PROP_REPOSITORY_NAME, "Repository"),
+                              getEntryManager().getTopGroup().getDescription());
+    }
+
 
 
     /**
@@ -3329,25 +3348,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public Result processInfo(Request request) throws Exception {
         if (request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML)) {
             Document doc = XmlUtil.makeDocument();
-            Element info = XmlUtil.create(doc, TAG_INFO, null,
-                                          new String[] {});
-            XmlUtil.create(doc, TAG_INFO_DESCRIPTION, info,
-                           getEntryManager().getTopGroup().getDescription(),
-                           null);
-            XmlUtil.create(doc, TAG_INFO_TITLE, info,
-                           getProperty(PROP_REPOSITORY_NAME, "Repository"),
-                           null);
-            String port = getProperty(PROP_SSL_PORT, "");
-            if (port.trim().length() == 0) {
-                XmlUtil.create(doc, TAG_INFO_SSLPORT, info, port, null);
-            }
-
-            /*
-            <info >
-            <sslport>...</sslport>
-            </info>
-            */
-
+            Element info = getServerInfo().toXml(doc);
             String xml = XmlUtil.toString(info);
             return new Result(xml, MIME_XML);
         }

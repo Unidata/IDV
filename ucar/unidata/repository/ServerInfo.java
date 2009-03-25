@@ -21,7 +21,10 @@
 
 package ucar.unidata.repository;
 
+import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.xml.XmlUtil;
 
+import org.w3c.dom.*;
 
 /**
  *
@@ -29,7 +32,7 @@ package ucar.unidata.repository;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class ServerInfo {
+public class ServerInfo implements Constants {
     
     private String hostname;
     private int port;
@@ -60,6 +63,58 @@ public class ServerInfo {
         this.description=description;
     }
 
+
+    public String toString() {
+        return getLabel();
+    }
+
+
+    public boolean equals(Object o) {
+        if(!(o instanceof ServerInfo)) return false;
+        ServerInfo that = (ServerInfo) o;
+        return  this.getId().equals(that.getId());
+    }
+
+    public Element toXml(Document doc) throws Exception {
+        Element info = XmlUtil.create(doc, TAG_INFO, null,
+                                      new String[] {});
+        XmlUtil.create(doc, TAG_INFO_DESCRIPTION, info,
+                       description,
+                       null);
+
+        XmlUtil.create(doc, TAG_INFO_TITLE, info,
+                       title,
+                       null);
+        XmlUtil.create(doc, TAG_INFO_HOSTNAME, info, hostname, null);
+        XmlUtil.create(doc, TAG_INFO_BASEPATH, info, basePath, null);
+        XmlUtil.create(doc, TAG_INFO_PORT, info, ""+port, null);
+        if (sslPort>0) {
+            XmlUtil.create(doc, TAG_INFO_SSLPORT, info, ""+sslPort, null);
+        }
+        return info;
+    }
+
+
+    public String getId() {
+        return hostname+":"+port+basePath;
+
+    }
+    public String getHref (String extra) {
+        return HtmlUtil.href("http://" + hostname+":" + port+basePath,
+                             getLabel(),extra);
+    }
+
+    public String getUrl () {
+        return "http://" + hostname+":" + port+basePath;
+    }
+
+
+    public String getLabel () {
+        if(title!=null && title.length()>0) return title;
+        if(port!=80) 
+            return hostname+":" + port;
+        return hostname;
+    }
 
     /**
        Set the Hostname property.
