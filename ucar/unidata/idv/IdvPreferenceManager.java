@@ -852,7 +852,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         Object[][] prefs3 = {
             { "Display Controls:", null },
             { "Show windows when they are created", PREF_SHOWCONTROLWINDOW },
-            { "Use Fast Rendering", PREF_FAST_RENDER, Boolean.FALSE,
+            { "Use Fast Rendering", PREF_FAST_RENDER, Boolean.TRUE,
               "<html>Turn this on for better performance at<br> the risk of having funky displays</html>" },
             { "Auto-select data when loading a template",
               IdvConstants.PREF_AUTOSELECTDATA, Boolean.FALSE,
