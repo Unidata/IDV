@@ -10777,6 +10777,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return Converted range
      */
     public Range convertRange(Range rawRange, Unit rawUnit, Unit outUnit) {
+        return Util.convertRange(rawRange, rawUnit, outUnit);
+        /*
         if ( !Misc.equals(rawUnit, outUnit)) {
             if ((rawUnit != null) && (outUnit != null)) {
                 try {
@@ -10789,6 +10791,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
         }
         return rawRange;
+        */
     }
 
     /**
