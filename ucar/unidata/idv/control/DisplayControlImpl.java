@@ -4890,16 +4890,16 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 continue;
             }
 
-            Displayable.debug = (this instanceof PlanViewControl);
+            //Displayable.debug = (this instanceof PlanViewControl);
             RealType aniType = animation.getAnimationRealType();
-            Displayable.debug = false;
+            //Displayable.debug = false;
 
             Set set = displayInfo.getDisplayable().getAnimationSet(aniType,
                           true);
 
             if (set == null) {
-                if(this instanceof PlanViewControl) 
-                    System.err.println ("      no set ");
+                //if(this instanceof PlanViewControl) 
+                //    System.err.println ("      no set ");
                 continue;
             }
             aniSet = (aniSet == null)
@@ -10885,7 +10885,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param value The new value for DisplayListTemplate
      */
     public void setDisplayListTemplate(String value) {
-        System.err.println("display list template: " + value);
+        //System.err.println("display list template: " + value);
         displayListTemplate = value;
     }
 
