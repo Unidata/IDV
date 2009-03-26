@@ -836,7 +836,7 @@ public abstract class XYChartManager extends ChartManager {
                              plot.getDomainAxisEdge());
                 int sY = (int) rangeAxis.valueToJava2D(speed, dataArea,
                              plot.getRangeAxisEdge());
-                System.out.println("sX/sY = " + sX + "/" + sY);
+                //System.out.println("sX/sY = " + sX + "/" + sY);
 
                 int verticalPosition = lineState.getVerticalPosition();
                 if (verticalPosition == LineState.VPOS_TOP) {
