@@ -28,8 +28,8 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 
 import ucar.unidata.util.DatedObject;
 import ucar.unidata.util.FileManager;
-
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.Range;
 import ucar.unidata.util.TwoFacedObject;
 
 
@@ -3267,6 +3267,31 @@ public final class Util {
         return new ucar.unidata.geoloc.LatLonPointImpl(
             llp.getLatitude().getValue(), llp.getLongitude().getValue());
 
+    }
+
+    /**
+     * Utility to convert the given raw data range into the other units
+     *
+     * @param range data range
+     * @param rangeUnit  the unit for the range
+     * @param outUnit  the converted unit
+     *
+     * @return Converted range
+     */
+    public static Range convertRange(Range range, Unit rangeUnit, Unit outUnit) {
+        if ( range != null && !Misc.equals(rangeUnit, outUnit)) {
+            if ((rangeUnit != null) && (outUnit != null)) {
+                try {
+                    range = new Range(outUnit.toThis(range.getMin(),
+                            rangeUnit), outUnit.toThis(range.getMax(),
+                                rangeUnit));
+                } catch (Exception e) {
+                    // ? why return null and not just the original range?
+                    range = null;
+                }
+            }
+        }
+        return range;
     }
 
 
