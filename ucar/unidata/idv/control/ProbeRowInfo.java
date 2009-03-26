@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -603,7 +604,10 @@ public class ProbeRowInfo {
      * @param value The new value for Unit
      */
     public void setUnit(Unit value) {
+        Unit oldUnit = unit;
         unit = value;
+        lineState.setRange(Util.convertRange(lineState.getRange(), oldUnit,
+                                             value));
     }
 
 
