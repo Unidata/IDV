@@ -3441,8 +3441,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         try {
             String template = applyMacrosToTemplate(getDisplayListTemplate(),
                                   false);
-            if(this instanceof PlanViewControl) 
-                System.err.println("Using:" + template);
+            //if(this instanceof PlanViewControl) 
+            //    System.err.println("Using:" + template);
 
             Set      s  = getDataTimeSet();
             TextType tt = TextType.getTextType(DISPLAY_LIST_NAME);
