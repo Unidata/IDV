@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -672,5 +673,30 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
                ? mp
                : super.getDataProjection();
     }
+
+    /**
+     * Export displayed data to file
+     * @param type  type of data
+     */
+    public void exportDisplayedData(String type) {
+        // HACK for now
+        if ( !((this instanceof CrossSectionControl)
+                || (this instanceof RadarSweepControl))) {
+            try {
+                Data d = getDisplayedData();
+                if (d == null) {
+                    return;
+                }
+                if (d instanceof FieldImpl) {
+                    GridUtil.exportGridToNetcdf((FieldImpl) d);
+                }
+            } catch (Exception e) {
+                logException("Unable to export the data", e);
+            }
+        } else {
+            super.exportDisplayedData(type);
+        }
+    }
+
 }
 
