@@ -370,6 +370,21 @@ using the Edit-&gt;Properties menu of the Display Control for that
 display, or set your system preference back to not use fast rendering.
 </faqitem>
 
+<faqitem q="I have multiple Grib files, each holding a separate time. How do I animate these?" id="aggregatedgrids">
+
+Normally the IDV does not try to merge the separate grid files, 
+it just loads them up individually as separate data sources. You then have to create separate displays for each time step. Furthermore, 
+in the IDV displays with just one timestep are always shown.
+<p>
+What you want to do is to select the multiple set of grib files in the File Chooser  (using control or shift click) 
+and then select &quot;Aggregate Grids by Time&quot; 
+for the Data Source Type. This will try to aggregate the grid files on time and will produce one data source with a set of times.
+<p>
+Note: each grib file needs to be identical in terms of variables, projections, etc. They should only differ by time.
+
+</faqitem>
+
+
 <faqitem q="What is the difference between true wind vectors and regular wind vectors?" id="truewind">
 Some gridded data is produced with the wind components being
 relative to the model grid instead of the earth.  The true wind vectors 
