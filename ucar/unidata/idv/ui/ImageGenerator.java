@@ -1721,6 +1721,11 @@ public class ImageGenerator extends IdvManager {
      */
     public DisplayControlImpl findDisplayControl(String id) {
         List controls = getIdv().getDisplayControls();
+        return findDisplayControl(id, controls);
+    }
+
+
+    public DisplayControlImpl findDisplayControl(String id, List<DisplayControlImpl> controls) {
         for (int i = 0; i < controls.size(); i++) {
             DisplayControlImpl control = (DisplayControlImpl) controls.get(i);
 
@@ -3579,12 +3584,13 @@ public class ImageGenerator extends IdvManager {
             } else if (tagName.equals(TAG_COLORBAR)||tagName.equals(TAG_KML_COLORBAR)) {
                 boolean showLines = applyMacros(child, ATTR_SHOWLINES, false);
 
-                List    controls  = ((viewManager != null)
+                List<DisplayControlImpl>   controls  = (List<DisplayControlImpl>) ((viewManager != null)
                                      ? viewManager.getControls()
                                      : new ArrayList());
 
                 if (XmlUtil.hasAttribute(child, ATTR_DISPLAY)) {
-                    DisplayControlImpl display = findDisplayControl(child);
+                    DisplayControlImpl display = (controls.size()>0?findDisplayControl(XmlUtil.getAttribute(child, ATTR_DISPLAY),controls):
+                                                  findDisplayControl(child));
                     if (display == null) {
                         error("Could not find display:"
                               + XmlUtil.toString(node));
