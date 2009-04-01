@@ -1563,13 +1563,14 @@ public class GridUtil {
             }
         }
 
+        /*
         for (int yIdx = 0; yIdx < yCnt; yIdx++) {
             for (int xIdx = 0; xIdx < xCnt; xIdx++) {
                 System.err.print(" " + lat2D[xIdx][yIdx] + "/"
                                  + lon2D[xIdx][yIdx]);
             }
             //System.err.println("");
-        }
+            }*/
         return new Grid2D(lat2D, lon2D, value2D);
 
     }
