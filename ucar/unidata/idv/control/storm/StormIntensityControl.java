@@ -91,6 +91,10 @@ public class StormIntensityControl extends DisplayControlImpl {
     //    private SelectorPoint probe;
     private PointProbe probe;
     private DataChoice choice ;
+
+    private boolean running = false;
+
+    private JButton adotBtn;
     /**
      * _more_
      */
@@ -199,7 +203,7 @@ public class StormIntensityControl extends DisplayControlImpl {
                     GuiUtils.inset(GuiUtils.left(GuiUtils.label("Scene Type: ",
                     sceneBox)), 5);
 
-        JButton adotBtn = new JButton("Run ADOT");
+        adotBtn = new JButton("Run Analysis");
         adotBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                   doAnalysis(); // Misc.run(this, "doAnalysis");
@@ -226,12 +230,20 @@ public class StormIntensityControl extends DisplayControlImpl {
 
          GuiUtils.tmpInsets = GuiUtils.INSETS_5;
          JComponent widgets = GuiUtils.formLayout(new Component[]{
-                GuiUtils.right(domainComp),  GuiUtils.left(oceanComp),
-                GuiUtils.right(sceneComp),  GuiUtils.left( GuiUtils.wrap(btn))
+                 GuiUtils.rLabel("Location:"),
+                 GuiUtils.left(latlonPanel),
+                 GuiUtils.rLabel("Domain:"),                 
+                 GuiUtils.left(GuiUtils.hbox(domainBox,new JLabel("  Ocean Selection: "),oceanBox)),
+                 GuiUtils.rLabel("Scene Type:"),
+                 GuiUtils.left(sceneBox),
+                 GuiUtils.filler(),
+                 GuiUtils.left(btn)
+
          }) ;
        // JPanel htmlPanel = GuiUtils.hbox( htmlScroller);
 
-        JPanel controls = GuiUtils.topCenterBottom(latlonPanel,widgets,textHolder);
+         //        JPanel controls = GuiUtils.topCenterBottom(latlonPanel,widgets,textHolder);
+        JPanel controls = GuiUtils.topCenter(widgets,textHolder);
 
         return controls;
     }
@@ -372,10 +384,27 @@ public class StormIntensityControl extends DisplayControlImpl {
     }
 
 
+
     /**
      * _more_
      */
-    public void doAnalysis() {
+    private void doAnalysis() {
+        if(running) return;
+        
+        running = true;
+        adotBtn.setEnabled(false);
+        adotBtn.setText("Running");
+        Misc.run(new Runnable() {
+                public void run() {
+                    doAnalysisInner();
+                    running = false;
+                    adotBtn.setEnabled(true);
+                    adotBtn.setText("Run Analysis");
+                }});
+
+    }
+
+    private void doAnalysisInner() {
         FlatField ffield = null;
         StormADOT sint = new StormADOT();
 
