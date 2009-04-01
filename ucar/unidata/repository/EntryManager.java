@@ -1838,10 +1838,11 @@ return new Result(title, sb);
                               new FileInputStream(thumb),
                               mimeType);
         } else {
-            InputStream inputStream =
-                IOUtil.getInputStream(entry.getFile().toString(),
-                                      getClass());
+            File file = entry.getFile();
+            long length  = file.length();
+            InputStream inputStream =new FileInputStream(file);
             Result result = new Result(BLANK, inputStream, mimeType);
+            result.addHttpHeader("Content-Length",""+length);
             result.setCacheOk(true);
             return result;
         }
@@ -3564,6 +3565,8 @@ return new Result(title, sb);
         }
 
         boolean needToClip = totalNameLength > 80;
+        String target = (request.defined(ARG_TARGET)?request.getString(ARG_TARGET,""):null);
+        String targetAttr = (target!=null?HtmlUtil.attr(HtmlUtil.ATTR_TARGET,target):"");
         for (Group ancestor : parents) {
             if (length > 100) {
                 breadcrumbs.add(0, "...");
@@ -3574,18 +3577,30 @@ return new Result(title, sb);
                 name = name.substring(0, 19) + "...";
             }
             length += name.length();
-            String link = ((requestUrl == null)
+            String link =null;
+            if(target!=null) {
+                link = HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                                      ancestor), name,targetAttr);
+            } else {
+                link = (requestUrl == null
                            ? getTooltipLink(request, ancestor, name, null)
                            : HtmlUtil.href(request.entryUrl(requestUrl,
-                               ancestor), name));
+                                                            ancestor), name,targetAttr));
+            }
             breadcrumbs.add(0, link);
         }
-        if (requestUrl == null) {
-            breadcrumbs.add(getTooltipLink(request, entry, entry.getLabel(),
-                                           null));
+        if(target!=null) {
+            breadcrumbs.add(HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                                           entry), entry.getLabel(),targetAttr));
+
         } else {
-            breadcrumbs.add(HtmlUtil.href(request.entryUrl(requestUrl,
-                    entry), entry.getLabel()));
+            if (requestUrl == null) {
+                breadcrumbs.add(getTooltipLink(request, entry, entry.getLabel(),
+                                               null));
+            } else {
+                breadcrumbs.add(HtmlUtil.href(request.entryUrl(requestUrl,
+                                                               entry), entry.getLabel()));
+            }
         }
         //        breadcrumbs.add(HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
         //                entry), entry.getLabel()));
@@ -3638,6 +3653,7 @@ return new Result(title, sb);
             request.setUser(getUserManager().getAnonymousUser());
         }
 
+        String target = (request.defined(ARG_TARGET)?request.getString(ARG_TARGET,""):null);
         List breadcrumbs = new ArrayList();
         List titleList   = new ArrayList();
         if (entry == null) {

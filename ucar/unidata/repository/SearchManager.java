@@ -126,14 +126,11 @@ public class SearchManager extends RepositoryManager {
     public List<ServerInfo> getFederatedServers() {
         if(federatedServers == null) {
             List<ServerInfo> tmp =  new ArrayList<ServerInfo>();
-            /*
             tmp.add(new ServerInfo("motherlode.ucar.edu",80,"Unidata's RAMADDA  Server",
                                    "This is the main RAMADDA server hosted by Unidata"));
 
-            tmp.add(new ServerInfo("localhost",8080,"locahost@8080",
-                                   "desc 1"));
-            tmp.add(new ServerInfo("localhost",8081,"locahost@8081",
-            "desc 2"));*/
+            tmp.add(new ServerInfo("harpo",8080,"harpo@8080",
+                                   "RAMADDA on Harpo"));
             federatedServers = tmp;
         }
 
@@ -534,6 +531,7 @@ public class SearchManager extends RepositoryManager {
         if(servers.size()>0) {
             request.put(ARG_DECORATE,"false");
             request.remove(ATTR_SERVER);
+            request.put(ATTR_TARGET,"_server");
             String url = request.getUrlArgs();
             StringBuffer sb = new StringBuffer();
             for(ServerInfo server: servers) {
@@ -550,11 +548,16 @@ public class SearchManager extends RepositoryManager {
                 sb.append("\n");
             }
             request.remove(ARG_DECORATE);
+            request.remove(ARG_TARGET);
             return new Result("Federated Search Results",sb);
         }
 
 
         String s = searchCriteriaSB.toString();
+        if(request.defined(ARG_TARGET)) {
+            s = "";
+        }
+
         if (s.length() > 0) {
             request.remove("submit");
             String url = request.getUrl(getRepository().URL_SEARCH_FORM);

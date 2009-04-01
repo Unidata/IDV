@@ -243,7 +243,6 @@ public class DataOutputHandler extends OutputHandler {
 
         protected GridDataset createValue(String path) {
             try {
-                System.err.println("Create gridPool: " + path);
                 getStorageManager().dirTouched(nj22Dir,null);
                 GridDataset gds =  GridDataset.open(path);
                 if (gds.getGrids().iterator().hasNext()) {
@@ -271,11 +270,13 @@ public class DataOutputHandler extends OutputHandler {
         protected PointObsDataset createValue(String path) {
             try {
                 getStorageManager().dirTouched(nj22Dir,null);
+                System.err.println ("opening:" + path);
                 PointObsDataset dataset =   (PointObsDataset) TypedDatasetFactory.open(
                                                                    FeatureType.POINT, path, null, new StringBuilder());
-                System.err.println("Create pointPool: " + path);
+                //                System.err.println("Create pointPool: " + path);
                 return dataset;
             } catch(Exception exc) {
+                System.err.println ("FAILED:" + exc);
                 throw new RuntimeException(exc);
             }
         }
@@ -297,7 +298,7 @@ public class DataOutputHandler extends OutputHandler {
                 TrajectoryObsDataset dataset = (TrajectoryObsDataset) TypedDatasetFactory.open(
                                                                         FeatureType.TRAJECTORY, path, null, new StringBuilder());
 
-                System.err.println("Create trajectoryPool: " + path);
+                //                System.err.println("Create trajectoryPool: " + path);
                 return dataset;
             } catch(Exception exc) {
                 throw new RuntimeException(exc);
@@ -327,7 +328,7 @@ public class DataOutputHandler extends OutputHandler {
 
         //Set the temp file and the cache policy
         ucar.nc2.util.DiskCache.setRootDirectory(nj22Dir.getDir().toString());
-        ucar.nc2.iosp.grib.GribServiceProvider.setIndexAlwaysInCache(true);
+        ucar.nc2.iosp.grid.GridServiceProvider.setAlwaysInCache(true);
 
 
         addType(OUTPUT_OPENDAP);
@@ -381,10 +382,12 @@ public class DataOutputHandler extends OutputHandler {
             return;
         }
 
+
         if ( !getRepository().getAccessManager().canAccessFile(request,
                 entry)) {
             return;
         }
+
 
         long t1 = System.currentTimeMillis();
         if ( !canLoadAsCdm(entry)) {
@@ -888,6 +891,8 @@ public class DataOutputHandler extends OutputHandler {
                     getRepository().getStorageManager().getTmpFile(request,
                         "subset.nc");
                 GridDataset gds = gridPool.get(path);
+                System.err.println ("varNames:" + varNames);
+
                 writer.makeFile(f.toString(), gds, varNames, llr,
                                 ((dates[0] == null)
                                  ? null

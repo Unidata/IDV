@@ -1698,16 +1698,18 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 try {
                     Class c = Misc.findClass(XmlUtil.getAttribute(node,
                                   ATTR_CLASS));
+            
                     Constructor ctor = Misc.findConstructor(c,
                                            new Class[] { Repository.class,
                             Element.class });
                     addOutputHandler(
                         (OutputHandler) ctor.newInstance(new Object[] { this,
                             node }));
+
                 } catch (Exception exc) {
                     if ( !required) {
                         getLogManager().logError("Couldn't load optional output handler:"
-                                 + XmlUtil.toString(node));
+                                                 + XmlUtil.toString(node));
                         getLogManager().logError("Warning:" + exc);
                     } else {
                         getLogManager().logError("Error loading output handler file:" + file,

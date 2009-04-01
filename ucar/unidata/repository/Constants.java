@@ -859,6 +859,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TEMPLATE = "template";
 
+    public static final String ARG_TARGET = "target";
+
     /** _more_ */
     public static final String ARG_TEXT = "text";
 
