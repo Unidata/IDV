@@ -262,6 +262,8 @@ public class HtmlUtil {
     /** _more_          */
     public static final String ATTR_TITLE = "title";
 
+    public static final String ATTR_TARGET = "target";
+
     /** _more_          */
     public static final String ATTR_VALUE = "value";
 
