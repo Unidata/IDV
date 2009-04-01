@@ -694,11 +694,12 @@ static     float[] aodtv72_classify(StormADOTInfo.IRData odtcurrent, int rmwsize
                 scenecloud = 2;  /* IRREGULAR CDO */
             } else {
                 cbfound = false;
+                boolean cont = true;
                 // L200:
                 if (cbgray) {
                     /* perform Curved Band analysis */
                     ixx = 4;  /* start with LIGHT GRAY */
-                    while ((ixx >= 2) && ( !cbfound)) {
+                    while ((ixx >= 2) && ( !cbfound) && cont) {
                         tempval = (float) StormADOTInfo.ebd_v72[ixx]
                                   + 273.16f;
                         float[] out0 = aodtv72_logspiral(xlat, xlon, tempval,
@@ -745,6 +746,7 @@ static     float[] aodtv72_classify(StormADOTInfo.IRData odtcurrent, int rmwsize
                                                       xlon, tempval, 3,
                                                       areadata_v72);
                                     eyecdosize = Math.max(4.0f, out[0]);
+                                    cont = false;
                                 } else {
                                     cbfound = true;
                                 }
@@ -770,7 +772,7 @@ static     float[] aodtv72_classify(StormADOTInfo.IRData odtcurrent, int rmwsize
                         }
                     }
                 }
-                if (cbfound) {
+                if (cbfound && cont) {
                     /* found curved band scenes */
                     cbring     = ixx;
                     cbringval  = spiral;
@@ -789,7 +791,7 @@ static     float[] aodtv72_classify(StormADOTInfo.IRData odtcurrent, int rmwsize
                         cbringlatmax = out[1];
                         cbringlonmax = out[2];
                     }
-                } else {
+                } else if(cont){
                     /* did not find curved band scenes, mark as non-eye/eye scene */
                     scenecloud = 0;
                     cbscene    = false;
@@ -811,6 +813,8 @@ static     float[] aodtv72_classify(StormADOTInfo.IRData odtcurrent, int rmwsize
                             && (cloudfft <= 4) && (lasttno12 >= 3.5)) {
                         sceneeye = 1;  /* PINHOLE EYE CHECK */
                     }
+                } else {
+                    scenecloud = 4;  /* SHEAR */
                 }
             }
         } else {
