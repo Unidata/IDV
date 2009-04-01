@@ -72,6 +72,10 @@ public class StormADOT {
     /** _more_          */
     static double c2 = 1.438833;
 
+    public StormADOT() {
+
+    }
+
     /**
      * _more_
      *
@@ -81,14 +85,13 @@ public class StormADOT {
      * @param cenlon _more_
      * @param posm _more_
      * @param curdate _more_
-     * @param curtime _more_
      * @param cursat _more_
      * @param g_domain _more_
      *
      * @return _more_
      */
-    int aodtv72_drive(FlatField satgrid, float cenlat, float cenlon,
-                      int posm, int curdate, int curtime, int cursat,
+    public String aodtv72_drive(FlatField satgrid, float cenlat, float cenlon,
+                      int posm, double curdate, int cursat,
                       String g_domain) {
 
         float ftmps, flats, flons, cenlon2;
@@ -105,7 +108,7 @@ public class StormADOT {
         oland_v72      = 0;        /* allow AODT operation over land */
         osearch_v72    = false;  /* search for maximum curved band position */
         rmwsizeman_v72 = eyeSize;  /* eye size parameter */
-
+        odtcurrent_v72IR = new StormADOTInfo.IRData();
         /*
          *  Set initial classification flag and value in AODT
          */
@@ -118,7 +121,7 @@ public class StormADOT {
          *  Set image date/time info in AODT
          */
 
-        int iaodt = aodtv72_setIRimageinfo(curdate, curtime, cursat);
+        int iaodt = aodtv72_setIRimageinfo(curdate,  cursat);
 
 
         /*
@@ -133,8 +136,8 @@ public class StormADOT {
         *  Set center location in AODT
         *  positioning method (1=interpolation, 4=extrapolation, 0=error)
         */
-        posm  = 1;
-        iaodt = aodtv72_setlocation(cenlat, cenlon, posm);
+        //posm  = 1;
+       aodtv72_setlocation(cenlat, cenlon, posm);
 
 
         /*
@@ -143,10 +146,10 @@ public class StormADOT {
         if (g_domain.equalsIgnoreCase("AUTO")) {
             idomain = 0;
         }
-        if (g_domain.equalsIgnoreCase("ATL")) {
+        if (g_domain.equalsIgnoreCase("Atlantic")) {
             idomain = 1;
         }
-        if (g_domain.equalsIgnoreCase("PAC")) {
+        if (g_domain.equalsIgnoreCase("Pacific")) {
             idomain = 2;
         }
 
@@ -169,7 +172,6 @@ public class StormADOT {
             g2d  = GridUtil.makeGrid2D(satgrid);
             lons = g2d.getlons();
             lats = g2d.getlats();
-            float[][][] tmp = g2d.getvalues();
 
         } catch (Exception re) {}
 
@@ -178,7 +180,7 @@ public class StormADOT {
 
         satimage = g2d1.getvalues();
         float[][] temp0  = satimage[0];
-        int       imsorc = 1,
+        int       imsorc = 74,
                   imtype = 1;
         temps = im_gvtota(numx, numy, temp0, imsorc, imtype);
 
@@ -194,37 +196,49 @@ public class StormADOT {
          *  Set eye and cloud temperature values in AODT,
          *  return position for IR image data read
          */
-
-        odtcurrent_v72IR = aodtv72_seteyecloudtemp(StormADOTInfo.keyerM_v72,
+        StormADOTInfo.IRData tvIR = aodtv72_seteyecloudtemp(StormADOTInfo.keyerM_v72,
                 areadata_v72);
+        odtcurrent_v72IR.warmt = tvIR.warmt;
+        odtcurrent_v72IR.warmlatitude = tvIR.warmlatitude;
+        odtcurrent_v72IR.warmlongitude = tvIR.warmlongitude;
+        odtcurrent_v72IR.eyet = tvIR.eyet;
+        odtcurrent_v72IR.cwcloudt = tvIR.cwcloudt;
+        odtcurrent_v72IR.cwring = tvIR.cwring;
+
 
         /*
          *   Determine scene type
          *   Set scene type
          */
 
-        float[] oscen =
-            ucar.unidata.data.storm.StormADOTSceneType.aodtv72_calcscene(
-                odtcurrent_v72IR, rmwsizeman_v72, areadata_v72, osstr_v72,
-                osearch_v72);
+        float[] oscen = ucar.unidata.data.storm.StormADOTSceneType.aodtv72_calcscene(
+                                     odtcurrent_v72IR, areadata_v72);
 
-        odtcurrent_v72IR.eyescene      = (int) oscen[0];
-        odtcurrent_v72IR.cloudscene    = (int) oscen[1];
+        odtcurrent_v72IR.cloudt = oscen[0];
+        odtcurrent_v72IR.cloudt2 = oscen[1];
+        odtcurrent_v72IR.eyestdv = oscen[2];
+        odtcurrent_v72IR.cloudsymave = oscen[3];
+        odtcurrent_v72IR.eyefft = (int)oscen[4];
+        odtcurrent_v72IR.cloudfft = (int)oscen[5];
+                 // { alst, Aaveext, Estdveye, Aavesym, eyecnt, rngcnt};
+        float[] oscen1 = ucar.unidata.data.storm.StormADOTSceneType.aodtv72_classify(
+                       odtcurrent_v72IR, rmwsizeman_v72, areadata_v72, osstr_v72, osearch_v72);
+
+
+        odtcurrent_v72IR.eyescene      = (int) oscen1[0];
+        odtcurrent_v72IR.cloudscene    = (int) oscen1[1];
         odtcurrent_v72IR.eyesceneold   = -1;
         odtcurrent_v72IR.cloudsceneold = -1;
-        odtcurrent_v72IR.eyecdosize    = oscen[2];
-        odtcurrent_v72IR.ringcb        = (int) oscen[3];
-        odtcurrent_v72IR.ringcbval     = (int) oscen[4];
-        odtcurrent_v72IR.ringcbvalmax  = (int) oscen[5];
-        odtcurrent_v72IR.ringcblatmax  = oscen[6];
-        odtcurrent_v72IR.ringcblonmax  = oscen[7];
-        odtcurrent_v72IR.rmw           = oscen[8];
-        odtcurrent_v72IR.cloudt        = oscen[9];
-        odtcurrent_v72IR.cloudt2       = oscen[10];
-        odtcurrent_v72IR.eyestdv       = oscen[11];
-        odtcurrent_v72IR.cloudsymave   = oscen[12];
-        odtcurrent_v72IR.eyefft        = (int) oscen[13];
-        odtcurrent_v72IR.cloudfft      = (int) oscen[14];
+        odtcurrent_v72IR.eyecdosize    = oscen1[2];
+        odtcurrent_v72IR.ringcb        = (int) oscen1[3];
+        odtcurrent_v72IR.ringcbval     = (int) oscen1[4];
+        odtcurrent_v72IR.ringcbvalmax  = (int) oscen1[5];
+        odtcurrent_v72IR.ringcblatmax  = oscen1[6];
+        odtcurrent_v72IR.ringcblonmax  = oscen1[7];
+        odtcurrent_v72IR.rmw           = oscen1[8];
+
+
+
 
         /*
         *   Determine intensity
@@ -238,11 +252,11 @@ public class StormADOT {
         /*
          *   Print out all diagnostic messages to screen
          */
-        List result =
+        String result =
             ucar.unidata.data.storm.StormADOTUtil.aodtv72_textscreenoutput(
                 odtcurrent_v72IR, idomain_v72);
 
-        return 0;
+        return result;
 
     }
 
@@ -267,21 +281,31 @@ public class StormADOT {
         float[][][] svalues = new float[1][numx][numy];
 
         int         ly      = lats[0].length;
+        int         ly0     = ly/2;
         int         lx      = lats.length;
+        int         lx0     = lx/2;
         int         ii      = numx / 2,
                     jj      = numy / 2;
-        for (int j = 0; j < ly; j++) {
-            if ((lats[0][j] < cenlat) && (lats[0][j + 1] > cenlat)) {
+
+        for (int j = 0; j < ly-1; j++) {
+            if(Float.isNaN(lats[lx0][j])) continue;
+            if(j == 209){
+                System.out.println(j);
+            }
+            if ((lats[lx0][j] > cenlat) && (lats[lx0][j + 1] < cenlat)) {
                 jj = j;
             }
         }
-        for (int i = 0; i < lx; i++) {
-            if ((lons[i][0] < cenlon) && (lons[i + 1][0] > cenlon)) {
+        for (int i = 0; i < lx-1; i++) {
+             if(Float.isNaN(lons[i][ly0])) continue;
+            if ((lons[i][ly0] < cenlon) && (lons[i + 1][ly0] > cenlon)) {
                 ii = i;
             }
         }
         int startx = ii - (numx / 2 - 1);
         int starty = jj - (numy / 2 - 1);
+        if(startx < 0) startx = 0;
+        if(starty < 0) starty = 0;
 
         for (int i = 0; i < numx; i++) {
             for (int j = 0; j < numy; j++) {
@@ -609,13 +633,12 @@ public class StormADOT {
     /**
      * _more_
      *
-     * @param date _more_
-     * @param time _more_
+     * @param datetime _more_
      * @param sat _more_
      *
      * @return _more_
      */
-    int aodtv72_setIRimageinfo(int date, int time, int sat)
+    int aodtv72_setIRimageinfo(double datetime, int sat)
     /* set IR image date/time within AODT library memory
        Inputs : AODT library IR image date/time/satellite information
        Outputs: none
@@ -623,9 +646,8 @@ public class StormADOT {
     */
     {
         /* assign IR image date to AODT library variable */
-        odtcurrent_v72IR.date = date;
-        /* assign IR image time to AODT library variable */
-        odtcurrent_v72IR.time = time;
+        odtcurrent_v72IR.date = datetime;
+
         /* assign IR image satellite type to AODT library variable */
         odtcurrent_v72IR.sattype = sat;
 
@@ -874,7 +896,7 @@ public class StormADOT {
     */
     {
 
-        double eno[][] = {
+        double [][] eno = {
             {
                 1.00, 2.00, 3.25, 4.00, 4.75, 5.50, 5.90, 6.50, 7.00, 7.50,
                 8.00
@@ -884,7 +906,7 @@ public class StormADOT {
                 7.00
             }
         };  /* adjusted based     */
-        double cdo[][] = {
+        double [][] cdo = {
             {
                 2.00, 2.40, 3.25, 3.50, 3.75, 4.00, 4.10, 4.20, 4.30, 4.40,
                 4.70
@@ -893,17 +915,17 @@ public class StormADOT {
                 4.10
             }
         };
-        double curbnd[]    = {
+        double [] curbnd    = {
             1.0, 1.5, 2.5, 3.0, 3.5, 4.0, 4.5
         };
-        double shrdst[]    = {
+        double [] shrdst    = {
             0.0, 35.0, 50.0, 80.0, 110.0, 140.0
         };
-        double shrcat[]    = {
+        double [] shrcat    = {
             3.5, 3.0, 2.5, 2.25, 2.0, 1.5
         };
 
-        double diffchk[][] = {
+        double [][] diffchk = {
             {
                 0.0, 0.5, 1.2, 1.7, 2.2, 2.7, 0.0, 0.0, 0.1, 0.5
             },  /* shear scene types... original Rule 8 rules */
@@ -1099,6 +1121,7 @@ public class StormADOT {
 
         dvorchart = ((float) (int) (ddvor * 10.0f)) / 10.0f;
         //odtcurrent_v72IR.TrawO=dvorchart;
+
 
         return dvorchart;
 

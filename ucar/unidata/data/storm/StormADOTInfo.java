@@ -309,10 +309,10 @@ public class StormADOTInfo {
      public static class IRData {
 
         /** _more_          */
-        int date;
+        double date;
 
         /** _more_          */
-        int time;
+       // int time;
 
         /** _more_          */
         float TrawO;
@@ -444,7 +444,6 @@ public class StormADOTInfo {
          * _more_
          *
          * @param date _more_
-         * @param time _more_
          * @param TrawO _more_
          * @param Traw _more_
          * @param Tfinal _more_
@@ -485,7 +484,7 @@ public class StormADOTInfo {
          * @param rmw _more_
          * @param comment _more_
          */
-        IRData(int date, int time, float TrawO, float Traw, float Tfinal,
+        IRData(double date, float TrawO, float Traw, float Tfinal,
                 float Tfinal3, float CI, float eyet, float warmt,
                 float cloudt, float cloudt2, float cwcloudt, float latitude,
                 float longitude, float warmlatitude, float warmlongitude,
@@ -498,7 +497,7 @@ public class StormADOTInfo {
                 int rapiddiss, float rmw, char[] comment) {
 
             this.date          = date;
-            this.time          = time;
+
             this.TrawO         = TrawO;
             this.Traw          = Traw;
             this.Tfinal        = Tfinal;

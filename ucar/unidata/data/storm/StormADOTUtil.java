@@ -24,9 +24,15 @@ package ucar.unidata.data.storm;
 
 
 import ucar.unidata.data.storm.StormADOTInfo;
+import ucar.unidata.util.DateUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.GregorianCalendar;
+import java.util.Calendar;
+
+import visad.DateTime;
+import visad.VisADException;
 
 
 /**
@@ -47,7 +53,7 @@ public class StormADOTUtil {
      *
      * @return _more_
      */
-    public static List aodtv72_textscreenoutput(
+    public static String aodtv72_textscreenoutput(
             StormADOTInfo.IRData odtcurrent, int domain)
     /* Output information to text screen.
         Inputs  : global structure odtcurrent_v72 containting current image information
@@ -109,8 +115,14 @@ public class StormADOTUtil {
                 + Integer.toString(year);
 
         /* format character string for time output */
+        ctime = null;
+        try{
+            DateTime ddt = new DateTime(odtcurrent.date) ;
+            ctime = ddt.toString();
+        } catch (Exception e) {
 
-        ctime = Integer.toString(odtcurrent.time);
+        }
+       // ctime = Integer.toString();
 
 
         /* convert xx.xxxx latitude format to degree/minute/second format */
@@ -240,56 +252,44 @@ public class StormADOTUtil {
         }
 
 
-        List result = new ArrayList();
+        StringBuffer result = new StringBuffer();
 
         /* send results to the screen */
-        result.add(
+        result.append(
             "<tr><td>"
             + "\n****************************************************\n"
             + "</td></tr>");
-        result.add("<tr><td>" + " ADVANCED DVORAK TECHNIQUE       \n"
+        result.append("<tr><td>" + " ADVANCED DVORAK TECHNIQUE       \n"
                    + "</td></tr>");
-        result.add("<tr><td>"
+        result.append("<tr><td>"
                    + " Tropical Cyclone Intensity Algorithm       \n\n"
                    + "</td></tr>");
-        result.add("<tr><td>" + " ----- Current Analysis ----- \n"
+        result.append("<tr><td>" + " ----- Current Analysis ----- \n"
                    + "</td></tr>");
-        result.add("<tr><td>" + " Date : " + cdate + "Time : " + ctime + "\n"
+        result.append("<tr><td>" + " Date : " + cdate + "Time : " + ctime + "\n"
                    + "</td></tr>");
-        result.add("<tr><td>" + " Lat : " + clat + "Lon : " + clon + "\n"
+        result.append("<tr><td>" + " Lat : " + clat + "Lon : " + clon + "\n"
                    + "</td></tr>");
-        if ((odtcurrent.land == 1)) {
-            result.add("<tr><td>"
-                       + "               TROPICAL CYCLONE OVER LAND\n"
-                       + "</td></tr>");
-            result.add("<tr><td>"
-                       + "               NO ADT ANALYSIS AVAILABLE\n"
-                       + "</td></tr>");
-        } else {
-            result.add("<tr><td>" + " CI# /Pressure/ Vmax\n" + "</td></tr>");
-            result.add("<tr><td>" + odtcurrent.CI + "  "
-                       + (pwip + odtcurrent.CIadjp) + " " + pwiw + "\n"
-                       + "</td></tr>");
 
+        result.append("<tr><td>" + " CI# /Pressure/ Vmax\n" + "</td></tr>");
+        result.append("<tr><td>" + odtcurrent.CI + "  "
+                   + (pwip + odtcurrent.CIadjp) + " " + pwiw + "\n"
+                   + "</td></tr>");
 
-            result.add("<tr><td>" + "Latitude bias adjustment to MSLP : "
-                       + odtcurrent.CIadjp + "\n" + "</td></tr>");
-            result.add("<tr><td>" + " Center Temp : " + odtcurrent.eyet
-                       + "Cloud Region Temp : " + cloudtemp + "\n"
-                       + "</td></tr>");
-            result.add("<tr><td>" + " Scene Type : " + scenetype + "\n"
-                       + "</td></tr>");
+        result.append("<tr><td>" + "Latitude bias adjustment to MSLP : "
+                   + odtcurrent.CIadjp + "\n" + "</td></tr>");
+        result.append("<tr><td>" + " Center Temp : " + odtcurrent.eyet
+                   + "Cloud Region Temp : " + cloudtemp + "\n"
+                   + "</td></tr>");
+        result.append("<tr><td>" + " Scene Type : " + scenetype + "\n"
+                   + "</td></tr>");
 
-
-        }
-
-
-        result.add(
+        result.append(
             "<tr><td>"
             + "\n****************************************************\n"
             + "</td></tr>");
 
-        return result;
+        return result.toString();
 
     }
 
@@ -327,7 +327,7 @@ public class StormADOTUtil {
      *
      * @return _more_
      */
-    public static int[] aodtv72_yddmy(int syd)
+    public static int[] aodtv72_yddmy(double syd)
     /* Convert yyyyddd to dd/mm/yy format.
        Inputs  : syd   - Julian day (yyyyddd)
        Outputs : day   - date
@@ -335,39 +335,29 @@ public class StormADOTUtil {
                  year  - year (yyyy)
     */
     {
-        int[][] dn  = {
-            {
-                0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365
-            }, {
-                0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366
-            }
-        };
-        int     iyy, idd, imm,
-                ily = 0;
+        DateTime dt = null;
+        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        try{
+            dt = new DateTime(syd);
+            cal.setTime(ucar.visad.Util.makeDate(dt));
+        } catch (Exception e) {
 
-        iyy = syd / 1000;
-        if (iyy < 1900) {
-            if (iyy > 70) {
-                iyy = iyy + 1900;
-            } else {
-                iyy = iyy + 2000;
-            }
-        }
-        idd = (syd % 1000);
-        if ((iyy % 4) == 0) {
-            ily = 1;
-        }
-        for (imm = 0; imm < 13; imm++) {
-            if (idd <= dn[ily][imm]) {
-                break;
-            }
         }
 
-        int[] out = { idd - dn[ily][imm - 1], imm, iyy };
+
+        int year = cal.get(Calendar.YEAR);
+        int mon =  cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        int[] out = { day, mon, year };
         return out;
 
     }
 
+    public static int getYear(DateTime dttm) throws VisADException {
+        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        cal.setTime(ucar.visad.Util.makeDate(dttm));
+        return cal.get(Calendar.YEAR);
+    }
     /**
      * _more_
      *

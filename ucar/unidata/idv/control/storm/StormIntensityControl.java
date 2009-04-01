@@ -24,20 +24,29 @@ package ucar.unidata.idv.control.storm;
 
 
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.imagery.AddeImageDescriptor;
+import ucar.unidata.data.imagery.ImageDataSource;
+import ucar.unidata.data.storm.StormADOT;
+import ucar.unidata.data.sounding.TrackDataSource;
+import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.idv.control.DisplayControlImpl;
-import ucar.unidata.idv.control.drawing.DrawingGlyph;
+import ucar.unidata.idv.DisplayInfo;
+import ucar.unidata.idv.DisplayControl;
 
 
 import ucar.unidata.ui.LatLonWidget;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.ObjectListener;
+import ucar.unidata.ui.TextSearcher;
+import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.display.PointProbe;
-import ucar.visad.display.SelectorPoint;
+import ucar.visad.display.Animation;
+import ucar.visad.display.Displayable;
 
 import visad.*;
+import visad.util.DataUtility;
 
 
 import visad.georef.EarthLocation;
@@ -46,16 +55,18 @@ import visad.georef.LatLonPoint;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.ActionListener;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 
 import java.util.List;
+import java.util.Vector;
 
 
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 
 
 /**
@@ -69,14 +80,17 @@ public class StormIntensityControl extends DisplayControlImpl {
 
     /** _more_ */
     private LatLonWidget latLonWidget;
-
+    private JEditorPane htmlComp;
+    private Font htmlFont;
+    private Font fixedFont;
+    private JEditorPane textComp;
     /** _more_ */
     private LatLonPoint probeLocation;
 
     /** the probe */
     //    private SelectorPoint probe;
     private PointProbe probe;
-
+    private DataChoice choice ;
     /**
      * _more_
      */
@@ -102,7 +116,7 @@ public class StormIntensityControl extends DisplayControlImpl {
         if ( !super.init(choice)) {
             return false;
         }
-
+        this.choice = choice;
 
         //        probe = new SelectorPoint ("",new RealTuple(RealTupleType.SpatialEarth3DTuple,
         //                           new double[] {0,0,0}));
@@ -126,8 +140,14 @@ public class StormIntensityControl extends DisplayControlImpl {
     }
 
 
-
-
+    private JComboBox domainBox;
+    private int domainIndex = 0;
+    private JComboBox oceanBox;
+    private int oceanIndex = 0;
+    private JComboBox sceneBox;
+    private int sceneIndex = 0;
+    private String [] ocean = {"Atlantic", "Pacific"} ;
+    private String text;
     /**
      * _more_
      *
@@ -136,7 +156,84 @@ public class StormIntensityControl extends DisplayControlImpl {
     public Container doMakeContents() {
         latLonWidget = new LatLonWidget(GuiUtils.makeActionListener(this,
                 "latLonWidgetChanged", null));
-        return latLonWidget;
+        JPanel latlonPanel = GuiUtils.hbox(Misc.newList(latLonWidget));
+
+        domainBox = new JComboBox(new Vector(Misc.newList("Ocean", "Land")));
+        domainBox.setSelectedIndex(domainIndex);
+        domainBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                domainIndex = domainBox.getSelectedIndex();
+            }
+        });
+        domainBox.setToolTipText("Domain selection for Ocean or Land.");
+
+
+        JComponent domainComp =
+            GuiUtils.inset(GuiUtils.left(GuiUtils.label("Domain Selection: ",
+                domainBox)), 5);
+
+        oceanBox = new JComboBox(new Vector(Misc.newList("Atlantic", "Pacific")));
+                oceanBox.setSelectedIndex(oceanIndex);
+                oceanBox.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        oceanIndex = oceanBox.getSelectedIndex();
+                    }
+                });
+        oceanBox.setToolTipText("Ocean Selection Atlantic or Pacific");
+
+        JPanel oceanComp =
+                 GuiUtils.inset(GuiUtils.left(GuiUtils.label("Ocean Selection: ",
+                         oceanBox)), 5);
+
+
+        sceneBox = new JComboBox(new Vector(Misc.newList(" COMPUTED")));
+                sceneBox.setSelectedIndex(sceneIndex);
+                sceneBox.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        sceneIndex = sceneBox.getSelectedIndex();
+                    }
+                });
+        sceneBox.setToolTipText("Only computed scene type available");
+
+        JComponent sceneComp =
+                    GuiUtils.inset(GuiUtils.left(GuiUtils.label("Scene Type: ",
+                    sceneBox)), 5);
+
+        JButton adotBtn = new JButton("Run ADOT");
+        adotBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                  doAnalysis(); // Misc.run(this, "doAnalysis");
+            }
+        });
+        JComponent btn = GuiUtils.inset(adotBtn, 5);
+        JPanel runHolder =  GuiUtils.doLayout(new Component[] {sceneComp, GuiUtils.wrap(btn)}, 2,
+                          GuiUtils.WT_NYNY, GuiUtils.WT_N);
+
+        textComp = new JEditorPane();
+
+        textComp.setEditable(false);
+        textComp.setContentType("text/html");
+        textComp.setPreferredSize(new Dimension(30,180));
+        //GuiUtils.setFixedWidthFont(textComp);
+        textComp.setEditable(false);
+
+        JScrollPane textScroller = new JScrollPane(textComp);
+
+        textScroller.setVerticalScrollBarPolicy(
+            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+        JComponent textHolder = GuiUtils.topCenter(new JLabel("ADOT Analysis Result: "), textScroller);
+
+         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
+         JComponent widgets = GuiUtils.formLayout(new Component[]{
+                GuiUtils.right(domainComp),  GuiUtils.left(oceanComp),
+                GuiUtils.right(sceneComp),  GuiUtils.left( GuiUtils.wrap(btn))
+         }) ;
+       // JPanel htmlPanel = GuiUtils.hbox( htmlScroller);
+
+        JPanel controls = GuiUtils.topCenterBottom(latlonPanel,widgets,textHolder);
+
+        return controls;
     }
 
 
@@ -162,6 +259,7 @@ public class StormIntensityControl extends DisplayControlImpl {
 
 
     }
+
 
     /**
      * _more_
@@ -266,7 +364,7 @@ public class StormIntensityControl extends DisplayControlImpl {
 
 
             }
-            Misc.run(this, "doAnalysis");
+           // Misc.run(this, "doAnalysis");
 
         } catch (Exception e) {
             logException("Handling probe changed", e);
@@ -278,13 +376,70 @@ public class StormIntensityControl extends DisplayControlImpl {
      * _more_
      */
     public void doAnalysis() {
+        FlatField ffield = null;
+        StormADOT sint = new StormADOT();
+
         if (probeLocation == null) {
             return;
         }
-        //Put your stuff here
+        Set timeset = null;
+        RealTuple timeTuple = null;
+        List sources = new ArrayList();
+        Real tt = null;
+        DateTime dat = null;
+
+      //  choice..getDataSources(sources);
+        try {
+            List infos  = getDisplayInfos();
+            DataInstance de = getDataInstance();
+            DisplayInfo displayInfo = (DisplayInfo) infos.get(0);
+            
+            Animation anime = displayInfo.getViewManager().getAnimation();
+            ffield = DataUtil.getFlatField(de.getData());
+
+            Set timeSet = anime.getSet();
+            int pos     = anime.getCurrent();
+
+            timeTuple = DataUtility.getSample(timeSet, pos);
+            tt = (Real) timeTuple.getComponent(0);
+            dat = new DateTime(tt);
+        } catch (VisADException e){
+           logException("Handling data", e);
+        } catch( RemoteException f) {}
+
+        String shortName    = choice.getName();
+
+        float cenlat = (float)probeLocation.getLatitude().getValue();
+        float cenlon = (float)probeLocation.getLongitude().getValue();
+        double curtime =  dat.getValue();
+
+        String g_domain = ocean[oceanIndex]; //"ATL";
+        int cursat = 0;
+        int posm = 1;
+
+        if(domainIndex == 1) {
+            text = "Storm intensity analysis not available over land";
+            textComp.setText(text);
+            return;
+        }
+
+        text = sint.aodtv72_drive(ffield, cenlat, cenlon, posm, curtime, cursat, g_domain);
+
+        textComp.setText(text);
+
+       //Put your stuff here
     }
 
-
+    protected FlatField getFlatField(FieldImpl data)
+            throws VisADException, RemoteException {
+        FlatField ff = null;
+        if (GridUtil.isSequence(data)) {
+            ff = (FlatField) data.getSample(0);
+        } else {
+            ff = (FlatField) data;
+        }
+        return ff;
+    }
     /**
      * Map the screen x/y of the event to an earth location
      *

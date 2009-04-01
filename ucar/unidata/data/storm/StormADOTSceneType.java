@@ -55,17 +55,12 @@ public class StormADOTSceneType {
      * _more_
      *
      * @param odtcurrent _more_
-     * @param rmwsizeman_v72 _more_
      * @param areadata _more_
-     * @param osstr_v72 _more_
-     * @param osearch_v72 _more_
      *
      * @return _more_
      */
     static float[] aodtv72_calcscene(StormADOTInfo.IRData odtcurrent,
-                              int rmwsizeman_v72,
-                              StormADOTInfo.DataGrid areadata,
-                              float osstr_v72, boolean osearch_v72)
+                                     StormADOTInfo.DataGrid areadata )
     /* Perform Fast Fourier Transform (FFT) analysis and determine
        scene type via empirically defined threshold values.
         Inputs  : global structure odtcurrent_v72 containing current intensity values
@@ -242,8 +237,9 @@ public class StormADOTSceneType {
             //tcirc=tcirc->nextrec;
         }
         alst = alssum / (float) alscnt;
-        // odtcurrent.cloudt=alst;
-        if ((odtcurrent.cloudt < -100.0) || (odtcurrent.cloudt > 40.0)) {
+      //  odtcurrent.cloudt=alst;
+      //  if ((odtcurrent.cloudt < -100.0) || (odtcurrent.cloudt > 40.0)) {
+        if ((alst < -100.0) || (alst > 40.0)) {
             return null;  //return -51;
         }
 
@@ -290,7 +286,7 @@ public class StormADOTSceneType {
         Aaveext  = out[0];
         Astdvext = out[1];
         Askewext = out[2];
-        //odtcurrent.cloudt2=Aaveext;
+       // odtcurrent.cloudt2=Aaveext;
 
         /* these are used to examine symmetry of convection */
         maxsecd2 = maxsec / 2;
@@ -316,11 +312,11 @@ public class StormADOTSceneType {
 
 
         /* assign scenetype value in structure odtcurrent_v72 */
-        return aodtv72_classify(odtcurrent, rmwsizeman_v72, areadata,
-                                osstr_v72, osearch_v72, alst, Aaveext,
-                                Estdveye, Aavesym, eyecnt, rngcnt);
+
+       return new  float [] { alst, Aaveext, Estdveye, Aavesym, eyecnt, rngcnt};
 
 
+      //  return odt;
     }
 
 
@@ -332,20 +328,14 @@ public class StormADOTSceneType {
      * @param areadata_v72 _more_
      * @param osstr_v72 _more_
      * @param osearch_v72 _more_
-     * @param alst _more_
-     * @param Aaveext _more_
-     * @param Estdveye _more_
-     * @param Aavesym _more_
-     * @param eyecnt _more_
-     * @param rngcnt _more_
      *
      * @return _more_
      */
+
 static     float[] aodtv72_classify(StormADOTInfo.IRData odtcurrent, int rmwsizeman,
                              StormADOTInfo.DataGrid areadata_v72,
-                             float osstr_v72, boolean osearch_v72,
-                             float alst, float Aaveext, float Estdveye,
-                             float Aavesym, float eyecnt, float rngcnt)
+                             float osstr_v72, boolean osearch_v72 )
+
     /* Classify scene type based on FFT analysis and histogram temperatures
        using empirically defined threshold values.
         Inputs  : global structure odtcurrent_v72 containing current image analysis
@@ -400,16 +390,19 @@ static     float[] aodtv72_classify(StormADOTInfo.IRData odtcurrent, int rmwsize
 
 
         eyetemp   = odtcurrent.eyet;
-        eyefft    = (int) eyecnt;
-        eyestdv   = Estdveye;
-        cloudtemp = alst;
+        eyefft    = odtcurrent.eyefft;
+        eyestdv   = odtcurrent.eyestdv;
+        cloudtemp = odtcurrent.cloudt;
         cloudcwt  = odtcurrent.cwcloudt;
-        cloudfft  = (int) rngcnt;
-        cloudsyma = Aavesym;
+        cloudfft  = odtcurrent.cloudfft;
+        cloudsyma = odtcurrent.cloudsymave;
         xlat      = odtcurrent.latitude;
         xlon      = odtcurrent.longitude;
 
-
+   // odtcurrent.eyestdv=Estdveye;
+        // odtcurrent.cloudsymave=Aavesym;
+        // odtcurrent.eyefft=(int)eyecnt;
+        // odtcurrent.cloudfft=(int)rngcnt;
 
         for (ixx = 0; ixx < 10; ixx++) {
             /* compute cloud category */
@@ -464,8 +457,8 @@ static     float[] aodtv72_classify(StormADOTInfo.IRData odtcurrent, int rmwsize
         diffeyecloudcat = cloudcat - eyecat;
         diffcat2        = eyetemp - (Math.min(cloudtemp, cloudcwt));
 
-        curtime         = aodtv72_calctime(odtcurrent.date, odtcurrent.time);
-        curtimem12      = curtime - 0.5;
+        curtime         = odtcurrent.date; //aodtv72_calctime(odtcurrent.date, odtcurrent.time);
+        //curtimem12      = curtime - 0.5;
 
         /* determine last Final T# value for curved band/other scene check */
         foundeye     = false;
@@ -864,9 +857,7 @@ static     float[] aodtv72_classify(StormADOTInfo.IRData odtcurrent, int rmwsize
           */
         float[] odt = {
             sceneeye, scenecloud, eyecdosize, cbring, cbringval, cbringvalmax,
-            cbringlatmax, cbringlonmax, odtcurrent_v72IRRMW, alst, Aaveext,
-            Estdveye, Aavesym, eyecnt, rngcnt
-        };
+            cbringlatmax, cbringlonmax, odtcurrent_v72IRRMW};
 
         return odt;
 
@@ -925,7 +916,7 @@ static     float[] aodtv72_rmw(StormADOTInfo.IRData odtcurrent,
             while (areadata.temp[iyc][ix] > tcrit) {
                 ix = ix - 1;
                 if (ix == ixmin) {
-                    return null;
+                    return new float []{-99.9f, -99.9f};
                 }
             }
             idx1 = ix;
@@ -933,7 +924,7 @@ static     float[] aodtv72_rmw(StormADOTInfo.IRData odtcurrent,
             while (areadata.temp[iyc][ix] > tcrit) {
                 ix = ix + 1;
                 if (ix == ixmax) {
-                    return null;
+                     return new float []{-99.9f, -99.9f};
                 }
             }
             idx2 = ix;
@@ -941,7 +932,7 @@ static     float[] aodtv72_rmw(StormADOTInfo.IRData odtcurrent,
             while (areadata.temp[iy][ixc] > tcrit) {
                 iy = iy - 1;
                 if (iy == iymin) {
-                    return null;
+                     return new float []{-99.9f, -99.9f};
                 }
             }
             idy1 = iy;
@@ -949,7 +940,7 @@ static     float[] aodtv72_rmw(StormADOTInfo.IRData odtcurrent,
             while (areadata.temp[iy][ixc] > tcrit) {
                 iy = iy + 1;
                 if (iy == iymax) {
-                    return null;
+                     return new float []{-99.9f, -99.9f};
                 }
             }
             idy2 = iy;
@@ -994,14 +985,14 @@ static     float[] aodtv72_rmw(StormADOTInfo.IRData odtcurrent,
      * @param inlon
      * @param searchtemp
      * @param searchtype
-     * @param odtcurrent_v72IR
-     * @param areadata_v72
+     * @param odtcurrent
+     * @param areadata
      * @return
      */
 static     float[] aodtv72_logspiral(float inlat, float inlon, float searchtemp,
                               int searchtype,
-                              StormADOTInfo.IRData odtcurrent_v72IR,
-                              StormADOTInfo.DataGrid areadata_v72)
+                              StormADOTInfo.IRData odtcurrent,
+                              StormADOTInfo.DataGrid areadata)
     /* Determine storm location using 10^ Log-spiral analysis.
        Algorithm will attempt to match the spiral with the image
        pixels at or below the threshold temperature based on
@@ -1038,11 +1029,11 @@ static     float[] aodtv72_logspiral(float inlat, float inlon, float searchtemp,
         float   bestlon = 0.f;
 
 
-        if (odtcurrent_v72IR.sattype == 5) {
+        if (odtcurrent.sattype == 5) {
             xres = 12.0f;
         }
         /* allocate memory */
-        int nn = areadata_v72.numx * areadata_v72.numy;
+        int nn = areadata.numx * areadata.numy;
         zlat = new float[nn];
         zlon = new float[nn];
 
@@ -1068,11 +1059,11 @@ static     float[] aodtv72_logspiral(float inlat, float inlon, float searchtemp,
 
         /* initialize arrays */
         np = 0;
-        for (ixx = 0; ixx < areadata_v72.numx; ixx++) {
-            for (iyy = 0; iyy < areadata_v72.numy; iyy++) {
-                if (areadata_v72.temp[iyy][ixx] <= searchtemp) {
-                    zlat[np] = areadata_v72.lat[iyy][ixx];
-                    zlon[np] = areadata_v72.lon[iyy][ixx];
+        for (ixx = 0; ixx < areadata.numx; ixx++) {
+            for (iyy = 0; iyy < areadata.numy; iyy++) {
+                if (areadata.temp[iyy][ixx] <= searchtemp) {
+                    zlat[np] = areadata.lat[iyy][ixx];
+                    zlon[np] = areadata.lon[iyy][ixx];
                     np++;
                 }
             }
@@ -1435,12 +1426,14 @@ static     int aodtv72_dfft(double[] x, double[] y, int np) {
         double a, e, a3, cc1, ss1, cc3, ss3, r1, r2, s1, s2, s3, xt;
 
 
-        double px[] = { 0, x[0] };
-        double py[] = { 0, y[0] };
+        double px[] = new double[x.length+1];
+        double py[] = new double[y.length+1];
 
-        for (i = 0; i < 2; i++) {
-            px[i] = x[i] - 1;
-            py[i] = y[i] - 1;
+        px[0] = 0;
+        py[0] = 0;
+        for (i = 0; i < x.length; i++) {
+            px[i+1] = x[i];
+            py[i+1] = y[i];
         }
 
         i = 2;
@@ -1547,7 +1540,10 @@ static     int aodtv72_dfft(double[] x, double[] y, int np) {
         /*
           for (i = 1; i<=16; i++) printf("%d  %g   %gn",i,*(px+i),(py+i));
         */
-
+       for (i = 0; i < x.length -1; i++) {
+            x[i] = px[i+1];
+            y[i] = py[i+1];
+        }
         return (n);
     }
 
@@ -1651,7 +1647,7 @@ static     public StormADOTInfo.RingData aodtv72_calceyetemp(int keyer,
     {
 
         List<StormADOTInfo.RingData> tcirc;
-        StormADOTInfo.RingData       eye = null;
+        StormADOTInfo.RingData       eye = new StormADOTInfo.RingData();
         /* set eye temp to cursor location temperature */
         eye.temp  = cursortemp;
 
