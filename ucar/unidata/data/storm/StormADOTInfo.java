@@ -308,6 +308,8 @@ public class StormADOTInfo {
      */
      public static class IRData {
 
+       int domain;
+
         /** _more_          */
         double date;
 

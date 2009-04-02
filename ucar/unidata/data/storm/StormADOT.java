@@ -90,7 +90,7 @@ public class StormADOT {
      *
      * @return _more_
      */
-    public String aodtv72_drive(FlatField satgrid, float cenlat, float cenlon,
+    public StormADOTInfo.IRData aodtv72_drive(FlatField satgrid, float cenlat, float cenlon,
                       int posm, double curdate, int cursat,
                       String g_domain) {
 
@@ -109,6 +109,8 @@ public class StormADOT {
         osearch_v72    = false;  /* search for maximum curved band position */
         rmwsizeman_v72 = eyeSize;  /* eye size parameter */
         odtcurrent_v72IR = new StormADOTInfo.IRData();
+        odtcurrent_v72IR.domain = idomain_v72;
+
         /*
          *  Set initial classification flag and value in AODT
          */
@@ -198,6 +200,7 @@ public class StormADOT {
          */
         StormADOTInfo.IRData tvIR = aodtv72_seteyecloudtemp(StormADOTInfo.keyerM_v72,
                 areadata_v72);
+
         odtcurrent_v72IR.warmt = tvIR.warmt;
         odtcurrent_v72IR.warmlatitude = tvIR.warmlatitude;
         odtcurrent_v72IR.warmlongitude = tvIR.warmlongitude;
@@ -252,13 +255,15 @@ public class StormADOT {
         /*
          *   Print out all diagnostic messages to screen
          */
-        String result =
-            ucar.unidata.data.storm.StormADOTUtil.aodtv72_textscreenoutput(
-                odtcurrent_v72IR, idomain_v72);
-
-        return result;
-
+        return odtcurrent_v72IR;
     }
+
+
+
+    public static class AdotResult {
+    }
+
+
 
     /**
      * _more_

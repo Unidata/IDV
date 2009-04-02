@@ -25,7 +25,9 @@ package ucar.unidata.data.storm;
 
 import ucar.unidata.data.storm.StormADOTInfo;
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.HtmlUtil;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.GregorianCalendar;
@@ -54,13 +56,14 @@ public class StormADOTUtil {
      * @return _more_
      */
     public static String aodtv72_textscreenoutput(
-            StormADOTInfo.IRData odtcurrent, int domain)
+            StormADOTInfo.IRData odtcurrent,DecimalFormat latLonFormat)
     /* Output information to text screen.
         Inputs  : global structure odtcurrent_v72 containting current image information
         Outputs : none
     */
     {
 
+        int domain = odtcurrent.domain;
         int      day, mon, year, ibasin, iok;
         int      degree, minute, second,
                  xr8  = 0,
@@ -107,23 +110,13 @@ public class StormADOTUtil {
 
         /* convert Julian date/time to day/month/year format */
         int[] out = aodtv72_yddmy(odtcurrent.date);
-        day  = out[0];
-        mon  = out[1];
-        year = out[2];
-        /* format character string for date output */
-        cdate = Integer.toString(day) + "-" + Integer.toString(mon) + "-"
-                + Integer.toString(year);
 
-        /* format character string for time output */
-        ctime = null;
-        try{
+        ctime = "";
+        try {
             DateTime ddt = new DateTime(odtcurrent.date) ;
             ctime = ddt.toString();
         } catch (Exception e) {
-
         }
-       // ctime = Integer.toString();
-
 
         /* convert xx.xxxx latitude format to degree/minute/second format */
         xlat   = odtcurrent.latitude;
@@ -255,43 +248,34 @@ public class StormADOTUtil {
         StringBuffer result = new StringBuffer();
 
         /* send results to the screen */
-        result.append(
-            "<tr><td>"
-            + "\n****************************************************\n"
-            + "</td></tr>");
-        result.append("<tr><td>" + " ADVANCED DVORAK TECHNIQUE       \n"
-                   + "</td></tr>");
-        result.append("<tr><td>"
-                   + " Tropical Cyclone Intensity Algorithm       \n\n"
-                   + "</td></tr>");
-        result.append("<tr><td>" + " ----- Current Analysis ----- \n"
-                   + "</td></tr>");
-        result.append("<tr><td>" + " Date : " + cdate + "Time : " + ctime + "\n"
-                   + "</td></tr>");
-        result.append("<tr><td>" + " Lat : " + clat + "Lon : " + clon + "\n"
-                   + "</td></tr>");
+        result.append("<table>");
+        result.append(HtmlUtil.row(label("Time:")+HtmlUtil.col(ctime)+
+                                   label("Lat:")+HtmlUtil.col(latLonFormat.format(odtcurrent.latitude))
+                                   +label("Lon:")+HtmlUtil.col(latLonFormat.format(odtcurrent.longitude))));
+        result.append("</table>");
+        result.append("<table>");
+        result.append(HtmlUtil.row(HtmlUtil.cols("<b>CI#</b>","<b>Pressure</b>","<b>Vmax</b>")));
+        result.append(HtmlUtil.row(HtmlUtil.cols(""+odtcurrent.CI,  ""+ (pwip + odtcurrent.CIadjp),"" + pwiw)));
+        result.append("</table>");
+        result.append("<hr>");
+        result.append("<table>");
+        result.append(HtmlUtil.row(label("Latitude bias adjustment to MSLP:")+
+                                   HtmlUtil.col(""+odtcurrent.CIadjp)));
 
-        result.append("<tr><td>" + " CI# /Pressure/ Vmax\n" + "</td></tr>");
-        result.append("<tr><td>" + odtcurrent.CI + "  "
-                   + (pwip + odtcurrent.CIadjp) + " " + pwiw + "\n"
-                   + "</td></tr>");
-
-        result.append("<tr><td>" + "Latitude bias adjustment to MSLP : "
-                   + odtcurrent.CIadjp + "\n" + "</td></tr>");
-        result.append("<tr><td>" + " Center Temp : " + odtcurrent.eyet
-                   + "Cloud Region Temp : " + cloudtemp + "\n"
-                   + "</td></tr>");
-        result.append("<tr><td>" + " Scene Type : " + scenetype + "\n"
-                   + "</td></tr>");
-
-        result.append(
-            "<tr><td>"
-            + "\n****************************************************\n"
-            + "</td></tr>");
-
+        result.append("</table>");
+        result.append("<table>");
+        result.append(HtmlUtil.row(label("Center Temp:")+HtmlUtil.col(""+ odtcurrent.eyet)));
+        result.append(HtmlUtil.row(label("Cloud Region Temp:")+HtmlUtil.col(""+ cloudtemp))); 
+        result.append(HtmlUtil.row(label("Scene Type:")+HtmlUtil.col(scenetype)));
+        result.append("</table>");
         return result.toString();
 
     }
+
+    private static String label(String label) {
+        return HtmlUtil.colRight(HtmlUtil.b(label));
+    }
+
 
     /**
      * _more_
