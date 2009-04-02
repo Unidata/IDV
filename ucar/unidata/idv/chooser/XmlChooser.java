@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.chooser;
 
 
@@ -33,8 +34,8 @@ import ucar.unidata.idv.*;
 import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.ui.DatasetUI;
 import ucar.unidata.ui.XmlTree;
-import ucar.unidata.util.FileManager;
 import ucar.unidata.util.CatalogUtil;
+import ucar.unidata.util.FileManager;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
@@ -170,12 +171,20 @@ public class XmlChooser extends IdvChooser implements ActionListener {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private boolean haveHandler() {
-        return (historyIdx>=0 && historyIdx<handlers.size());
+        return ((historyIdx >= 0) && (historyIdx < handlers.size()));
     }
 
+    /**
+     * _more_
+     */
     protected void updateStatus() {
-        if(haveHandler()) {
+        if (haveHandler()) {
             XmlHandler handler = (XmlHandler) handlers.get(historyIdx);
             handler.updateStatus();
         } else {
@@ -183,6 +192,11 @@ public class XmlChooser extends IdvChooser implements ActionListener {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param have _more_
+     */
     public void setHaveData(boolean have) {
         super.setHaveData(have);
         updateStatus();
@@ -301,8 +315,9 @@ public class XmlChooser extends IdvChooser implements ActionListener {
                 makeBlankTree();
             }
         }
-        JPanel navButtons = GuiUtils.doLayout(new Component[] { backBtn,new JLabel(" "),
-                fwdBtn,  new JLabel("  ")}, 4, GuiUtils.WT_N, GuiUtils.WT_N);
+        JPanel navButtons = GuiUtils.doLayout(new Component[] { backBtn,
+                new JLabel(" "), fwdBtn, new JLabel("  ") }, 4,
+                    GuiUtils.WT_N, GuiUtils.WT_N);
 
         GuiUtils.tmpInsets = GRID_INSETS;
         JPanel catPanel = GuiUtils.doLayout(new Component[] {
@@ -355,13 +370,39 @@ public class XmlChooser extends IdvChooser implements ActionListener {
                                          "Could not load url: " + xmlPath));
                     ok = false;
                 }
-                document = XmlUtil.getDocument(xmlContents);
-                //System.out.println ("\n\n**** Root:" + XmlUtil.toString(document.getDocumentElement()));
+                //Check if its xml
+                if (xmlContents.indexOf("<") >= 0) {
+                    document = XmlUtil.getDocument(xmlContents);
+                }
+
+                //If we failed to make an xml document then try to tack on the wms
+                //capabilities request in case this is a wms url without one
+                if ((document == null)
+                        || (document.getDocumentElement() == null)) {
+                    if (xmlPath.indexOf("?") < 0) {
+                        xmlPath = xmlPath
+                                  + "?request=GetCapabilities&service=WMS";
+                    } else {
+                        xmlPath = xmlPath
+                                  + "&request=GetCapabilities&service=WMS";
+                    }
+                    xmlContents = IOUtil.readContents(xmlPath, NULL_STRING);
+                    document = XmlUtil.getDocument(xmlContents);
+                }
+
+                if ((document == null)
+                        || (document.getDocumentElement() == null)) {
+                    throw new IllegalArgumentException(
+                        "Could not process XML from:" + xmlPath);
+                }
                 makeUi(document, document.getDocumentElement(), xmlPath);
             } else {
                 makeUi(null, null, xmlPath);
             }
         } catch (Exception exc) {
+            if (myTimestamp != timestamp) {
+                return false;
+            }
             logException("Creating ui:" + xmlPath, exc);
             return false;
         }
@@ -431,7 +472,7 @@ public class XmlChooser extends IdvChooser implements ActionListener {
      *  Display the document defined in the history list by the current historyIdx.
      */
     private void go() {
-        if(haveHandler()) {
+        if (haveHandler()) {
             XmlHandler handler = (XmlHandler) handlers.get(historyIdx);
             setSelected(handler.getPath());
             addToContents(handler.getContents());
@@ -652,9 +693,7 @@ public class XmlChooser extends IdvChooser implements ActionListener {
     /**
      *  Insert a new ui component into the panel.
      *
-     *  @param innerContents The gui component to insert.
      *  @param handler The handler associated with this component.
-     *  @param url The url where we got the xml.
      */
     private void addToHistory(XmlHandler handler) {
         int howManyToRemove = handlers.size() - historyIdx - 1;
