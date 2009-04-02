@@ -459,7 +459,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
      *                   String that is converted to an image descriptor.
      * @return The image descriptor.
      */
-    private AddeImageDescriptor getDescriptor(Object object) {
+    public AddeImageDescriptor getDescriptor(Object object) {
         if (object == null) {
             return null;
         }
