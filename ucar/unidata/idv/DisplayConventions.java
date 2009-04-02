@@ -266,6 +266,18 @@ public class DisplayConventions extends IdvManager {
     }
 
 
+    /**
+     * get the latlon formatter
+     *
+     * @return the latlon formatter
+     */
+    public DecimalFormat getLatLonFormat() {
+        DecimalFormat fmt = new DecimalFormat(DEFAULT_FORMAT);
+        fmt.applyPattern(getStore().get(PREF_LATLON_FORMAT,
+                DEFAULT_FORMAT));
+        return fmt;
+    }
+
 
     /**
      * Format the given lat or lon using the latLonFormat
@@ -277,7 +289,6 @@ public class DisplayConventions extends IdvManager {
         if (Double.isNaN(d)) {
             return "missing";
         }
-
         latLonFormat.applyPattern(getStore().get(PREF_LATLON_FORMAT,
                 DEFAULT_FORMAT));
         return latLonFormat.format(d);
