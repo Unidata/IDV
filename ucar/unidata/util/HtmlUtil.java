@@ -859,6 +859,12 @@ public class HtmlUtil {
     }
 
 
+
+    public static String colRight(String v1) {
+        return tag(TAG_TD, " " + attr(ATTR_ALIGN,"right") + " ", v1);
+    }
+
+
     /**
      * _more_
      *
