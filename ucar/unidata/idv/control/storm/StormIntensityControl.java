@@ -29,6 +29,9 @@ import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.imagery.AddeImageDescriptor;
 import ucar.unidata.data.imagery.ImageDataSource;
 import ucar.unidata.data.storm.StormADOT;
+import ucar.unidata.data.storm.StormADOTUtil;
+import ucar.unidata.data.storm.StormADOTInfo;
+
 import ucar.unidata.data.sounding.TrackDataSource;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.idv.control.DisplayControlImpl;
@@ -94,7 +97,14 @@ public class StormIntensityControl extends DisplayControlImpl {
 
     private boolean running = false;
 
+    private boolean runOnClick = false;
+
+
     private JButton adotBtn;
+
+
+
+
     /**
      * _more_
      */
@@ -171,11 +181,6 @@ public class StormIntensityControl extends DisplayControlImpl {
         });
         domainBox.setToolTipText("Domain selection for Ocean or Land.");
 
-
-        JComponent domainComp =
-            GuiUtils.inset(GuiUtils.left(GuiUtils.label("Domain Selection: ",
-                domainBox)), 5);
-
         oceanBox = new JComboBox(new Vector(Misc.newList("Atlantic", "Pacific")));
                 oceanBox.setSelectedIndex(oceanIndex);
                 oceanBox.addActionListener(new ActionListener() {
@@ -184,11 +189,6 @@ public class StormIntensityControl extends DisplayControlImpl {
                     }
                 });
         oceanBox.setToolTipText("Ocean Selection Atlantic or Pacific");
-
-        JPanel oceanComp =
-                 GuiUtils.inset(GuiUtils.left(GuiUtils.label("Ocean Selection: ",
-                         oceanBox)), 5);
-
 
         sceneBox = new JComboBox(new Vector(Misc.newList(" COMPUTED")));
                 sceneBox.setSelectedIndex(sceneIndex);
@@ -199,43 +199,36 @@ public class StormIntensityControl extends DisplayControlImpl {
                 });
         sceneBox.setToolTipText("Only computed scene type available");
 
-        JComponent sceneComp =
-                    GuiUtils.inset(GuiUtils.left(GuiUtils.label("Scene Type: ",
-                    sceneBox)), 5);
-
         adotBtn = new JButton("Run Analysis");
         adotBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                  doAnalysis(); // Misc.run(this, "doAnalysis");
+                  doAnalysis(); 
             }
         });
-        JComponent btn = GuiUtils.inset(adotBtn, 5);
-        JPanel runHolder =  GuiUtils.doLayout(new Component[] {sceneComp, GuiUtils.wrap(btn)}, 2,
-                          GuiUtils.WT_NYNY, GuiUtils.WT_N);
+        JComponent btn = GuiUtils.hbox(adotBtn, GuiUtils.makeCheckbox("Run On Click",this,"runOnClick"));
 
         textComp = new JEditorPane();
 
         textComp.setEditable(false);
         textComp.setContentType("text/html");
-        textComp.setPreferredSize(new Dimension(30,180));
+        textComp.setPreferredSize(new Dimension(300,180));
         //GuiUtils.setFixedWidthFont(textComp);
         textComp.setEditable(false);
 
         JScrollPane textScroller = new JScrollPane(textComp);
-
         textScroller.setVerticalScrollBarPolicy(
             JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        textScroller.setPreferredSize(new Dimension(300,180));
 
-        JComponent textHolder = GuiUtils.topCenter(new JLabel("ADOT Analysis Result: "), textScroller);
+        JComponent textHolder = GuiUtils.topCenter(new JLabel("Result:"), textScroller);
 
          GuiUtils.tmpInsets = GuiUtils.INSETS_5;
          JComponent widgets = GuiUtils.formLayout(new Component[]{
                  GuiUtils.rLabel("Location:"),
                  GuiUtils.left(latlonPanel),
                  GuiUtils.rLabel("Domain:"),                 
-                 GuiUtils.left(GuiUtils.hbox(domainBox,new JLabel("  Ocean Selection: "),oceanBox)),
-                 GuiUtils.rLabel("Scene Type:"),
-                 GuiUtils.left(sceneBox),
+                 GuiUtils.left(GuiUtils.hbox(new Component[]{domainBox,new JLabel("Ocean Selection:"),oceanBox,
+                                                             new JLabel("Scene Type:"),sceneBox},5)),
                  GuiUtils.filler(),
                  GuiUtils.left(btn)
 
@@ -329,6 +322,9 @@ public class StormIntensityControl extends DisplayControlImpl {
                 }
                 probeLocation = toEarth(event).getLatLonPoint();
                 updateProbeLocation();
+                if(runOnClick) {
+                    doAnalysis();
+                }
             }
         } catch (Exception e) {
             logException("Handling display event changed", e);
@@ -390,16 +386,15 @@ public class StormIntensityControl extends DisplayControlImpl {
      */
     private void doAnalysis() {
         if(running) return;
-        
         running = true;
         adotBtn.setEnabled(false);
-        adotBtn.setText("Running");
+        //        adotBtn.setText("Running");
         Misc.run(new Runnable() {
                 public void run() {
                     doAnalysisInner();
                     running = false;
                     adotBtn.setEnabled(true);
-                    adotBtn.setText("Run Analysis");
+                    //                    adotBtn.setText("Run Analysis");
                 }});
 
     }
@@ -434,6 +429,7 @@ public class StormIntensityControl extends DisplayControlImpl {
             dat = new DateTime(tt);
         } catch (VisADException e){
            logException("Handling data", e);
+           return;
         } catch( RemoteException f) {}
 
         String shortName    = choice.getName();
@@ -452,12 +448,11 @@ public class StormIntensityControl extends DisplayControlImpl {
             return;
         }
 
-        text = sint.aodtv72_drive(ffield, cenlat, cenlon, posm, curtime, cursat, g_domain);
-
+        StormADOTInfo.IRData result = sint.aodtv72_drive(ffield, cenlat, cenlon, posm, curtime, cursat, g_domain);
+        text =         StormADOTUtil.aodtv72_textscreenoutput(result,getDisplayConventions().getLatLonFormat());
         textComp.setText(text);
-
-       //Put your stuff here
     }
+
 
     protected FlatField getFlatField(FieldImpl data)
             throws VisADException, RemoteException {
@@ -577,6 +572,24 @@ public class StormIntensityControl extends DisplayControlImpl {
         return probeLocation;
     }
 
+
+/**
+Set the RunOnClick property.
+
+@param value The new value for RunOnClick
+**/
+public void setRunOnClick (boolean value) {
+	this.runOnClick = value;
+}
+
+/**
+Get the RunOnClick property.
+
+@return The RunOnClick
+**/
+public boolean getRunOnClick () {
+	return this.runOnClick;
+}
 
 
 
