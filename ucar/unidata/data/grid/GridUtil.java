@@ -146,6 +146,9 @@ public class GridUtil {
     /** function for the applyFunctionOverTime routine */
     public static final String FUNC_MIN = "min";
 
+    /** function for the timeStepFunc routine */
+    public static final String FUNC_DIFFERENCE = "difference";
+
 
 
 
@@ -1285,6 +1288,40 @@ public class GridUtil {
      */
     public static FieldImpl timeStepDifference(FieldImpl grid, int offset)
             throws VisADException {
+        return timeStepFunc(grid,offset,FUNC_DIFFERENCE);
+    }
+
+
+
+    /**
+     * This creates a field where D(T) = D(T)+D(T+offset)
+     * Any time steps up to the offset time are set to missing
+     * @param grid   grid to average
+     * @param offset time step offset. e.g., offset=-1 results in D(T)=D(T)+D(T-1)
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl timeStepSum(FieldImpl grid, int offset)
+            throws VisADException {
+        return timeStepFunc(grid,offset,FUNC_SUM);
+    }
+
+
+    /**
+     * This creates a field where is either D(T) = D(T)-D(T+offset)
+     * or D(T) = D(T)+D(T+offset) depending on the value of the func argument
+     * Any time steps up to the offset time are set to missing
+     * @param grid   grid to average
+     * @param offset time step offset. 
+     * @param func which function to apply, SUM or DIFFERENCE
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+
+    public static FieldImpl timeStepFunc(FieldImpl grid, int offset, String func)
+            throws VisADException {
         try {
             if ( !isTimeSequence(grid)) {
                 return grid;
@@ -1308,8 +1345,12 @@ public class GridUtil {
                 if ((timeStepIdx + offset >= 0)
                         && (timeStepIdx + offset < arrays.size())) {
                     float[][] oldValue = arrays.get(timeStepIdx + offset);
-                    value = Misc.subtractArray(value, oldValue, value);
-                    //System.err.println("subtracting");
+                    if(func.equals(FUNC_DIFFERENCE)) 
+                        value = Misc.subtractArray(value, oldValue, value);
+                    else  if(func.equals(FUNC_SUM)) 
+                        value = Misc.addArray(value, oldValue, value);
+                    else 
+                        throw new IllegalArgumentException("Unknown function:" + func);
                 } else {
                     //System.err.println("filling");
                     Misc.fillArray(value, Float.NaN);
