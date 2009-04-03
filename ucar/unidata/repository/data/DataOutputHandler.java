@@ -221,6 +221,16 @@ public class DataOutputHandler extends OutputHandler {
             } catch (Exception exc) {}
         }
 
+        protected  NetcdfDataset getFromPool(List<NetcdfDataset> list) {
+            NetcdfDataset dataset = super.getFromPool(list);
+            try {
+                dataset.sync();
+                return dataset;
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+        }
+
         protected NetcdfDataset createValue(String path) {
             try {
                 getStorageManager().dirTouched(nj22Dir,null);
@@ -240,6 +250,18 @@ public class DataOutputHandler extends OutputHandler {
                 value.close();
             } catch (Exception exc) {}
         }
+
+        protected  GridDataset getFromPool(List<GridDataset> list) {
+            GridDataset dataset = super.getFromPool(list);
+            try {
+                dataset.sync();
+                return dataset;
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+
+        }
+
 
         protected GridDataset createValue(String path) {
             try {
@@ -267,6 +289,13 @@ public class DataOutputHandler extends OutputHandler {
             } catch (Exception exc) {}
         }
 
+        /*
+        protected  PointObsDataset getFromPool(List<PointObsDataset> list) {
+            PointObsDataset dataset = super.getFromPool(list);
+            dataset.sync();
+            return dataset;
+            }*/
+
         protected PointObsDataset createValue(String path) {
             try {
                 getStorageManager().dirTouched(nj22Dir,null);
@@ -291,6 +320,13 @@ public class DataOutputHandler extends OutputHandler {
                 value.close();
             } catch (Exception exc) {}
         }
+
+        /*
+        protected  TrajectoryObsDataset getFromPool(List<TrajectoryObsDataset> list) {
+            TrajectoryObsDataset dataset = super.getFromPool(list);
+            dataset.sync();
+            return dataset;
+            }*/
 
         protected TrajectoryObsDataset createValue(String path) {
             try {
@@ -891,7 +927,7 @@ public class DataOutputHandler extends OutputHandler {
                     getRepository().getStorageManager().getTmpFile(request,
                         "subset.nc");
                 GridDataset gds = gridPool.get(path);
-                System.err.println ("varNames:" + varNames);
+                //                System.err.println ("varNames:" + varNames);
 
                 writer.makeFile(f.toString(), gds, varNames, llr,
                                 ((dates[0] == null)
