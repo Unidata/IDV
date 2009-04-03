@@ -1057,7 +1057,6 @@ public abstract class PointDataSource extends FilesDataSource {
                 gain = tmp.floatValue();
             }
             tmp = (Float) dataSelection.getProperty(PROP_GRID_SEARCH_RADIUS);
-            System.err.println("got data selection value:" + tmp);
             if (tmp != null) {
                 searchRadius = tmp.floatValue();
             }
