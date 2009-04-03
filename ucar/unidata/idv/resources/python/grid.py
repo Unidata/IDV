@@ -185,6 +185,7 @@ def timeStepDifference(field,offset=-1):
     D(N)= D(N) - D(N+offset)
     where offset should be negative
     """
+    offset = int(offset)
     return GridUtil.timeStepDifference(field,offset);
 
 
