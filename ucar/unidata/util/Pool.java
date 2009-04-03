@@ -101,11 +101,17 @@ public class Pool<KeyType, ValueType> {
             List<ValueType> list = cache.get(key);
             if ((list != null) && (list.size() > 0)) {
                 size--;
-                return list.remove(0);
+                return getFromPool(list);
             }
         }
         return createValue(key);
     }
+
+
+    protected  ValueType getFromPool(List<ValueType> list) {
+        return list.remove(0);
+    }
+
 
     /**
      * _more_
