@@ -530,7 +530,7 @@ public abstract class PointDataSource extends FilesDataSource {
                     dataSelection.putProperty(PROP_GRID_GAIN,
                             new Float(getGridGain()));
                     dataSelection.putProperty(PROP_GRID_SEARCH_RADIUS,
-                            new Float(getGridGain()));
+                                              new Float(getGridSearchRadius()));
                 } else {
                     dataSelection.removeProperty(PROP_GRID_X);
                     dataSelection.removeProperty(PROP_GRID_Y);
@@ -1057,6 +1057,7 @@ public abstract class PointDataSource extends FilesDataSource {
                 gain = tmp.floatValue();
             }
             tmp = (Float) dataSelection.getProperty(PROP_GRID_SEARCH_RADIUS);
+            System.err.println("got data selection value:" + tmp);
             if (tmp != null) {
                 searchRadius = tmp.floatValue();
             }
