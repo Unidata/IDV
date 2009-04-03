@@ -477,8 +477,9 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
     protected JMenuItem makeMenuItem(String label, char mnem,
                                      String command) {
         JMenuItem mi = makeMenuItem(label, command);
-        mi.setMnemonic(mnem);
-        mi.setAccelerator(getKeyStroke(mnem));
+        //Don't add the mnemomic since we already listen for key commands
+        //        mi.setMnemonic(mnem);
+        //        mi.setAccelerator(getKeyStroke(mnem));
         return mi;
     }
 
@@ -753,6 +754,7 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
      */
     public List cloneGlyphs(List from) {
         List to = new ArrayList();
+        if(from == null) return to;
         for (int i = 0; i < from.size(); i++) {
             Glyph o = (Glyph) from.get(i);
             try {
