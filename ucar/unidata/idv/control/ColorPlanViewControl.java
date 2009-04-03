@@ -29,6 +29,7 @@ import ucar.unidata.data.DataChoice;
 
 import ucar.unidata.idv.DisplayConventions;
 
+import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
@@ -47,7 +48,7 @@ import java.rmi.RemoteException;
 
 import java.util.List;
 
-import javax.swing.JCheckBox;
+import javax.swing.*;
 
 
 
@@ -99,6 +100,8 @@ public class ColorPlanViewControl extends PlanViewControl {
                                   + ((datachoice != null)
                                      ? datachoice.toString()
                                      : ""), true);
+        gridDisplay.setPointSize(2f);
+        gridDisplay.setPolygonMode(polygonMode);
         gridDisplay.setTextureEnable( !isSmoothed);
         addAttributedDisplayable(gridDisplay);
         gridDisplay.setUseRGBTypeForSelect(true);
@@ -129,6 +132,12 @@ public class ColorPlanViewControl extends PlanViewControl {
     public void getControlWidgets(List controlWidgets)
             throws VisADException, RemoteException {
         super.getControlWidgets(controlWidgets);
+        JComboBox polyModeCombo = null;
+        if (visad.util.Util.canDoJava3D()) {
+            polyModeCombo = getPolyModeComboBox();
+        }
+
+
         if (getAllowSmoothing()) {
             JCheckBox toggle = new JCheckBox("", isSmoothed);
             toggle.addActionListener(new ActionListener() {
@@ -143,10 +152,25 @@ public class ColorPlanViewControl extends PlanViewControl {
                     }
                 }
             });
-            controlWidgets.add(new WrapperWidget(this,
-                    GuiUtils.rLabel("Shade Colors:"),
-                    GuiUtils.leftCenter(toggle, GuiUtils.filler())));
-        }
+            if(polyModeCombo!=null) {
+                controlWidgets.add(new WrapperWidget(this,
+                                                     GuiUtils.rLabel("Display:"),
+                                                     GuiUtils.left(GuiUtils.hbox(GuiUtils.rLabel("Shade Colors:"),
+                                                                                 toggle, 
+                                                                                 new JLabel("  Mode: "),
+                                                                                 polyModeCombo))));
+            } else {
+                controlWidgets.add(new WrapperWidget(this,
+                                                     GuiUtils.rLabel("Shade Colors:"),
+                                                     GuiUtils.leftCenter(toggle, GuiUtils.filler())));
+            }
+        } else if(polyModeCombo!=null) {
+                controlWidgets.add(new WrapperWidget(this,
+                                                     GuiUtils.rLabel("Display Mode:"),
+                                                     GuiUtils.left(polyModeCombo)));
+
+       }
+
     }
 
 

@@ -41,6 +41,7 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.Util;
 
+import ucar.visad.display.Grid2DDisplayable;
 import ucar.visad.display.Displayable;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.GridDisplayable;
@@ -160,6 +161,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
     private Range levelColorRange;
 
     //    private boolean levelAnimation = false;
+
+    /** polygon mode */
+    int polygonMode = Grid2DDisplayable.POLYGON_FILL;
 
 
     /**
@@ -433,20 +437,62 @@ public abstract class PlanViewControl extends GridDisplayControl {
             addDisplayable(planDisplay, FLAG_COLORTABLE | FLAG_COLORUNIT);
         } else {
             if (shouldShowLevelWidget()) {
-                //                addDisplayable(planDisplay);
-                addDisplayable(planDisplay,getAttributeFlags());
+                addDisplayable(planDisplay);
             } else if (shouldUseZPosition()) {
                 addDisplayable(planDisplay, FLAG_ZPOSITION);
             } else {
-                addDisplayable(planDisplay,getAttributeFlags());
+                addDisplayable(planDisplay);
             }
         }
         Trace.call2("PlanView.init");
         return result;
     }
 
-
     /**
+     * Create a jcombobox for setting the polygon mode.
+     * 
+     * @return polygon mode combo box
+     */
+    protected JComboBox getPolyModeComboBox() {
+            JComboBox polyModeCombo = new JComboBox();
+            TwoFacedObject[] polyModes = { new TwoFacedObject("Solid",
+                                             new Integer(Grid2DDisplayable
+                                                 .POLYGON_FILL)),
+                                           new TwoFacedObject("Mesh",
+                                               new Integer(Grid2DDisplayable
+                                                   .POLYGON_LINE)),
+                                           new TwoFacedObject("Points",
+                                               new Integer(Grid2DDisplayable
+                                                   .POLYGON_POINT)) };
+            GuiUtils.setListData(polyModeCombo, polyModes);
+            polyModeCombo.setSelectedIndex(
+                (getPolygonMode() == Grid2DDisplayable.POLYGON_POINT)
+                ? 2
+                : (getPolygonMode() == Grid2DDisplayable.POLYGON_LINE)
+                  ? 1
+                  : 0);
+            polyModeCombo.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        setPolygonMode(
+                            ((Integer) ((TwoFacedObject) ((JComboBox) e
+                                .getSource()).getSelectedItem()).getId())
+                                    .intValue());
+                        
+                        if(planDisplay!=null && planDisplay instanceof Grid2DDisplayable) {
+                            ((Grid2DDisplayable)planDisplay).setPolygonMode(getPolygonMode());
+                        }
+                    } catch (Exception ve) {
+                        logException("setPolygonMode", ve);
+                    }
+                }
+            });
+            return polyModeCombo;
+
+    }
+
+   /**
+
      * Handle property change
      *
      * @param evt The event
@@ -1394,5 +1440,27 @@ public abstract class PlanViewControl extends GridDisplayControl {
             }
         }
     }
+
+
+
+    /**
+     * Set the type of depiction (solid, line, mesh) for this display
+     *
+     * @param v polygon mode.  Used by XML persistence.
+     */
+    public void setPolygonMode(int v) {
+        polygonMode = v;
+    }
+
+    /**
+     * Return the type of depiction for this display
+     *
+     * @return true if shading is smoothed.
+     */
+    public int getPolygonMode() {
+        return polygonMode;
+    }
+
+
 }
 

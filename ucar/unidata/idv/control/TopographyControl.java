@@ -75,8 +75,6 @@ public class TopographyControl extends PlanViewControl {
     /** flag for smoothing */
     boolean isSmoothed;
 
-    /** polygon mode */
-    int polygonMode = Grid2DDisplayable.POLYGON_FILL;
 
     /** point size (for point mode) */
     float pointSize = 2f;
@@ -102,8 +100,9 @@ public class TopographyControl extends PlanViewControl {
             throws VisADException, RemoteException {
         gridDisplay = new Grid2DDisplayable("topo_" + paramName, true);
         gridDisplay.setTextureEnable( !isSmoothed);
-        gridDisplay.setPolygonMode(polygonMode);
+        gridDisplay.setPolygonMode(getPolygonMode());
         gridDisplay.setUseDefaultRenderer(true);
+        addAttributedDisplayable(gridDisplay);
         return gridDisplay;
     }
 
@@ -155,40 +154,11 @@ public class TopographyControl extends PlanViewControl {
         Component right = toggle;
         if (visad.util.Util.canDoJava3D()) {
             getGridDisplay().setPointSize(pointSize);
-            JComboBox polyModeCombo = new JComboBox();
-            TwoFacedObject[] polyModes = { new TwoFacedObject("Solid",
-                                             new Integer(Grid2DDisplayable
-                                                 .POLYGON_FILL)),
-                                           new TwoFacedObject("Mesh",
-                                               new Integer(Grid2DDisplayable
-                                                   .POLYGON_LINE)),
-                                           new TwoFacedObject("Points",
-                                               new Integer(Grid2DDisplayable
-                                                   .POLYGON_POINT)) };
-            GuiUtils.setListData(polyModeCombo, polyModes);
-            polyModeCombo.setSelectedIndex(
-                (polygonMode == Grid2DDisplayable.POLYGON_POINT)
-                ? 2
-                : (polygonMode == Grid2DDisplayable.POLYGON_LINE)
-                  ? 1
-                  : 0);
-            polyModeCombo.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        polygonMode =
-                            ((Integer) ((TwoFacedObject) ((JComboBox) e
-                                .getSource()).getSelectedItem()).getId())
-                                    .intValue();
-                        getGridDisplay().setPolygonMode(polygonMode);
-                    } catch (Exception ve) {
-                        logException("setPolygonMode", ve);
-                    }
-                }
-            });
+
             Component tmpComp = GuiUtils.hgrid(
                                     Misc.newList(
                                         GuiUtils.rLabel("Display Mode: "),
-                                        polyModeCombo), 0);
+                                        getPolyModeComboBox()), 0);
             right = GuiUtils.left(GuiUtils.hgrid(Misc.newList(toggle,
                     tmpComp), 0));
         }  // end canDoJava3D
@@ -224,23 +194,6 @@ public class TopographyControl extends PlanViewControl {
         return isSmoothed;
     }
 
-    /**
-     * Set the type of depiction (solid, line, mesh) for this display
-     *
-     * @param v polygon mode.  Used by XML persistence.
-     */
-    public void setPolygonMode(int v) {
-        polygonMode = v;
-    }
-
-    /**
-     * Return the type of depiction for this display
-     *
-     * @return true if shading is smoothed.
-     */
-    public int getPolygonMode() {
-        return polygonMode;
-    }
 
     /**
      * Set the size of points if this is displayed as points
