@@ -433,11 +433,12 @@ public abstract class PlanViewControl extends GridDisplayControl {
             addDisplayable(planDisplay, FLAG_COLORTABLE | FLAG_COLORUNIT);
         } else {
             if (shouldShowLevelWidget()) {
-                addDisplayable(planDisplay);
+                //                addDisplayable(planDisplay);
+                addDisplayable(planDisplay,getAttributeFlags());
             } else if (shouldUseZPosition()) {
                 addDisplayable(planDisplay, FLAG_ZPOSITION);
             } else {
-                addDisplayable(planDisplay);
+                addDisplayable(planDisplay,getAttributeFlags());
             }
         }
         Trace.call2("PlanView.init");
