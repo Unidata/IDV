@@ -88,8 +88,6 @@ public abstract class MetSymbol extends RectangleGlyph {
     private RotateInfo rotateZInfo;
 
 
-
-
     /** The canvas we are in */
     protected StationModelCanvas canvas;
 
@@ -198,6 +196,7 @@ public abstract class MetSymbol extends RectangleGlyph {
     public MetSymbol(int x, int y) {
         super(x, y);
     }
+
 
 
     /**
@@ -533,6 +532,18 @@ public abstract class MetSymbol extends RectangleGlyph {
         MetSymbol theClone = (MetSymbol) super.clone();
         //Make sure we clear out the propertiesDialog
         theClone.propertiesDialog = null;
+        if(theClone.paramIds!=null) 
+            theClone.paramIds = (String[])theClone.paramIds.clone();
+        if(theClone.paramDescs!=null) 
+            theClone.paramDescs = (String[])theClone.paramDescs.clone();
+
+        if(theClone.rotateXInfo!=null) 
+            theClone.rotateXInfo = (RotateInfo)theClone.rotateXInfo.doClone();
+        if(theClone.rotateYInfo!=null) 
+           theClone.rotateYInfo = (RotateInfo)theClone.rotateYInfo.doClone();
+        if(theClone.rotateZInfo!=null) 
+            theClone.rotateZInfo = (RotateInfo)theClone.rotateZInfo.doClone();
+
         return theClone;
     }
 

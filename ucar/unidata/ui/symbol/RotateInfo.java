@@ -37,7 +37,7 @@ import visad.Unit;
  * @author IDV Development Team
  * @version $Revision: 1.4 $
  */
-public class RotateInfo {
+public class RotateInfo implements Cloneable {
 
     /** which axis */
     public static final int TYPE_X = 0;
@@ -86,6 +86,10 @@ public class RotateInfo {
         this.type = type;
     }
 
+
+    public RotateInfo doClone() throws CloneNotSupportedException {
+        return (RotateInfo) clone();
+    }
 
     /**
      * Set the Param property.
