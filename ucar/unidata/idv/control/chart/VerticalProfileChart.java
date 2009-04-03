@@ -144,6 +144,7 @@ public class VerticalProfileChart extends XYChartManager {
                 public StringBuffer format(double number,
                                            StringBuffer result,
                                            FieldPosition fieldPosition) {
+
                     String s = control.getDisplayConventions().format(number);
                     result.append(s);
                     return result;
@@ -172,7 +173,9 @@ public class VerticalProfileChart extends XYChartManager {
                 lineState.getRangeIncludesZero());
         }
 
-        rangeAxis.setNumberFormatOverride(numberFormat);
+        //For now lets use the default number formatting for the range
+        //        rangeAxis.setNumberFormatOverride(numberFormat);
+
         rangeAxis.setVisible(rangeVisible);
 
 

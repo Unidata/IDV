@@ -409,7 +409,9 @@ public class TimeSeriesChart extends XYChartManager {
                 lineState.getRangeIncludesZero());
         }
 
-        rangeAxis.setNumberFormatOverride(numberFormat);
+        //For now lets use the default number formatting for the range
+        //        rangeAxis.setNumberFormatOverride(numberFormat);
+
         rangeAxis.setVisible(rangeVisible);
 
 
