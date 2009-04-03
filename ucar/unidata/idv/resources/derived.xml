@@ -638,7 +638,15 @@ or
     </categories>
     <operands categories=""/>
   </derived>
+
   <derived description="Time step difference (D(T)=D(T)-D(T-1))" formula="timeStepDifference(field,-1)" id="Time step difference" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Time Steps"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+
+  <derived description="Time step sum (D(T)=D(T)+D(T-1))" formula="timeStepSum(field,-1)" id="Time step sum" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Grids-Time Steps"/>
     </categories>
