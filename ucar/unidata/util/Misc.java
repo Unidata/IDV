@@ -3904,6 +3904,20 @@ public class Misc {
     }
 
 
+    public static float[][] addArray(float[][] a, float[][] b,
+                                          float[][] c) {
+        if (c == null) {
+            c = new float[a.length][a[0].length];
+        }
+        for (int i = 0; i < a.length; i++) {
+            for (int j = 0; j < a[i].length; j++) {
+                c[i][j] = a[i][j] + b[i][j];
+            }
+        }
+        return c;
+    }
+
+
 
     /**
      * fill array with value
