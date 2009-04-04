@@ -49,6 +49,7 @@ import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
 import visad.georef.EarthLocationTuple;
 
+import java.text.SimpleDateFormat;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -78,6 +79,10 @@ public class TextPointDataSource extends PointDataSource {
 
     /** property id for the header map */
     public static final String PROP_HEADER_MAP = "data.textpoint.map";
+
+    public static final String PROP_DATAPROPERTIES = "data.textpoint.dataproperties";
+
+    public static final String PROP_HEADER_EXTRA = "data.textpoint.extra";
 
     /** property id for the header params */
     public static final String PROP_HEADER_PARAMS = "data.textpoint.params";
@@ -156,6 +161,9 @@ public class TextPointDataSource extends PointDataSource {
     /** last label */
     private String lastLabel = "";
 
+    private Hashtable dataProperties;
+
+
     /**
      * Default constructor
      *
@@ -179,6 +187,9 @@ public class TextPointDataSource extends PointDataSource {
                                String source, Hashtable properties)
             throws VisADException {
         super(descriptor, source, "Text Point Data", properties);
+        if(properties!=null) {
+            this.dataProperties = (Hashtable) properties.get(PROP_DATAPROPERTIES);
+        }
     }
 
 
@@ -245,6 +256,10 @@ public class TextPointDataSource extends PointDataSource {
                 }
             }
         }
+
+        String extra =  getProperty(PROP_HEADER_EXTRA, (String) null);
+        if(extra!=null) {
+        }
         return is;
 
     }
@@ -302,7 +317,6 @@ public class TextPointDataSource extends PointDataSource {
      *
      * @throws Exception On badness
      */
-
     protected FieldImpl makeObs(String contents, String delimiter,
                                 DataSelection subset, LatLonRect bbox,
                                 String trackParam, boolean sampleIt,
@@ -316,6 +330,7 @@ public class TextPointDataSource extends PointDataSource {
         if (obs == null) {
             TextAdapter ta = null;
             try {
+                String extra =  getProperty(PROP_HEADER_EXTRA, (String) null);
                 if ((params == null) || (params.length() == 0)) {
                     params = getProperty(PROP_HEADER_PARAMS, (String) null);
                 }
@@ -331,9 +346,9 @@ public class TextPointDataSource extends PointDataSource {
                         (List) getDataContext().getIdv().decodeObject(blob);
                     applySavedMetaData(metaDataFields);
                 }
-
+                
                 ta = new TextAdapter(getInputStream(contents), delimiter,
-                                     map, params, sampleIt);
+                                     map, params, dataProperties,sampleIt);
             } catch (visad.data.BadFormException bfe) {
                 //Probably don't have the header info
                 //If we already have a map and params then we have problems
@@ -347,10 +362,11 @@ public class TextPointDataSource extends PointDataSource {
                     return null;
                 }
                 ta = new TextAdapter(getInputStream(contents), delimiter,
-                                     map, params, sampleIt);
+                                     map, params, dataProperties,sampleIt);
             }
             try {
                 Data d = ta.getData();
+                if(d==null) throw new IllegalArgumentException("Could not create point data");
                 obs = makePointObs(d, trackParam);
                 if ((fieldsDescription == null) && (obs != null)) {
                     makeFieldDescription(obs);
@@ -385,7 +401,7 @@ public class TextPointDataSource extends PointDataSource {
         try {
             ta = new TextAdapter(
                 new ByteArrayInputStream(contents.getBytes()), delimiter,
-                map, params, false);
+                map, params, dataProperties, false);
         } catch (visad.data.BadFormException bfe) {
             throw bfe;
         }
@@ -1619,6 +1635,12 @@ public class TextPointDataSource extends PointDataSource {
 
 
 
+    private static void usage() {
+        System.err.println(
+                           "Usage: java PointObFactory headerfile <-skip skiplines> <-xlsdateformat dateformat> <-Dproperty=value> <.csv files>");
+        System.err.println("e.g.: java PointObFactory test.hdr -skip 14 -DLatitude.value=41.5 -DLongitude.value=-101.2 -xlsdateformat MM/dd/yyyy foo.csv bar.xls");
+    }
+
 
     /**
      * main
@@ -1629,8 +1651,7 @@ public class TextPointDataSource extends PointDataSource {
      */
     public static void main(String[] args) throws Exception {
         if (args.length == 0) {
-            System.err.println(
-                "Usage: java PointObFactory headerfile <.csv files>");
+            usage();
             return;
         }
         String header = IOUtil.readContents(args[0],
@@ -1641,20 +1662,64 @@ public class TextPointDataSource extends PointDataSource {
             return;
 
         }
-
+        Hashtable dataProperties = new Hashtable();
         Hashtable properties = new Hashtable();
+        properties.put(PROP_DATAPROPERTIES, dataProperties);
+        SimpleDateFormat sdf = null;
+
+        int argIdx = 1;
+        for(argIdx=1;argIdx<args.length;argIdx++) {
+            if(args[argIdx].equals("-skip")) {
+                if(argIdx==args.length-1) {
+                    usage();
+                    return;
+                }
+                properties.put(TextPointDataSource.PROP_HEADER_SKIP, new Integer(args[argIdx+1]));
+                argIdx++;
+            } else  if(args[argIdx].equals("-xlsdateformat")) {
+                if(argIdx==args.length-1) {
+                    usage();
+                    return;
+                }
+                sdf = new  SimpleDateFormat(args[argIdx+1]);
+                argIdx++;
+            } else if(args[argIdx].startsWith("-D")) {
+                List l = StringUtil.split(args[argIdx].substring(2), "=");
+                if (l.size() != 2) {
+                    System.err.println ("Invalid property:" + args[argIdx]);
+                    usage();
+                    return;
+                }
+                dataProperties.put(l.get(0),l.get(1));
+            } else {
+                break;
+            }
+        }
+
         properties.put(TextPointDataSource.PROP_HEADER_MAP, toks.get(0));
         properties.put(TextPointDataSource.PROP_HEADER_PARAMS, toks.get(1));
 
-        for (int i = 1; i < args.length; i++) {
+        for (int i = argIdx; i < args.length; i++) {
             String csvFile = args[i];
+            //            if(csvFile.endsWith(".xls")) {
+            //                contents  = DataUtil.xlsToCsv(csvFile);
+            //            }
             TextPointDataSource dataSource =
                 new TextPointDataSource(new DataSourceDescriptor(), csvFile,
                                         properties);
 
 
-            FieldImpl field = dataSource.makeObs(IOUtil.readContents(args[i],
-                                  TextPointDataSource.class), ",", null,
+            String contents;
+            if(args[i].endsWith(".xls")) {
+                contents  = DataUtil.xlsToCsv(args[i],sdf);
+                //                System.out.println(contents);
+            } else {
+                contents = IOUtil.readContents(args[i],
+                                               TextPointDataSource.class);
+            }
+
+
+            FieldImpl field = dataSource.makeObs(contents, ",", null,
                                       null, null, false, false);
 
 
