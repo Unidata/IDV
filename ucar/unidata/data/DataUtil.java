@@ -25,8 +25,9 @@ package ucar.unidata.data;
 
 
 import org.apache.poi.hssf.usermodel.*;
+import java.util.Date;
 
-
+import java.text.SimpleDateFormat;
 import ucar.ma2.Array;
 import ucar.ma2.Index;
 
@@ -548,6 +549,22 @@ public class DataUtil {
      * @throws Exception On badness
      */
     public static String xlsToCsv(String filename) throws Exception {
+        return xlsToCsv(filename, null);
+    }
+
+
+    /**
+     * Convert excel to csv
+     *
+     * @param filename excel file
+     * @param sdf If non null then use this to format any date cells
+     *
+     * @return csv
+     *
+     * @throws Exception On badness
+     */
+
+    public static String xlsToCsv(String filename,SimpleDateFormat sdf) throws Exception {
         StringBuffer sb    = new StringBuffer();
         InputStream  myxls = IOUtil.getInputStream(filename, DataUtil.class);
         HSSFWorkbook wb    = new HSSFWorkbook(myxls);
@@ -555,16 +572,32 @@ public class DataUtil {
         for (int rowIdx = sheet.getFirstRowNum();
                 rowIdx <= sheet.getLastRowNum(); rowIdx++) {
             HSSFRow row = sheet.getRow(rowIdx);
+            if(row==null) {
+                sb.append("\n");
+                continue;
+            }
             for (short colIdx = row.getFirstCellNum();
                     colIdx < row.getPhysicalNumberOfCells(); colIdx++) {
                 HSSFCell cell = row.getCell(colIdx);
                 if (cell == null) {
                     continue;
                 }
+                String cellValue = null;
+
+                if (sdf!=null && cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+                    if(HSSFDateUtil.isCellDateFormatted(cell)) {
+                        Date date = cell.getDateCellValue();
+                        cellValue = sdf.format(date);
+                    }
+                }
+
+                if(cellValue==null)
+                    cellValue = cell.toString();
+
                 if (colIdx > 0) {
                     sb.append(",");
                 }
-                sb.append(cell.toString());
+                sb.append(cellValue);
                 /*                if(false && comment!=null) {
                     String author = comment.getAuthor();
                     String str = comment.getString().getString();
