@@ -258,24 +258,31 @@ public class WeatherSymbol extends MetSymbol implements ImageObserver {
                      : null;
 
           case SYMBOL_LOWCLOUD :
+              if (code < 1 ||code > WeatherSymbols.LOCLD_NUM) return null;
               return WeatherSymbols.getLowCloudSymbol(code);
 
           case SYMBOL_MIDCLOUD :
+              if (code < 1 ||code > WeatherSymbols.MIDCLD_NUM) return null;
               return WeatherSymbols.getMidCloudSymbol(code);
 
           case SYMBOL_HIGHCLOUD :
+              if (code < 1 ||code > WeatherSymbols.HICLD_NUM) return null;
               return WeatherSymbols.getHighCloudSymbol(code);
 
           case SYMBOL_PRESSURETENDENCY :
+              if (code < 0 || code >= WeatherSymbols.TNDCY_NUM) return null;
               return WeatherSymbols.getPressureTendencySymbol(code);
 
           case SYMBOL_CLOUDCOVERAGE :
+              if (code < 0 || code >= WeatherSymbols.SKY_NUM) return null;
               return WeatherSymbols.getCloudCoverageSymbol(code);
 
           case SYMBOL_ICING :
+              if (code < 0 || code >= WeatherSymbols.ICING_NUM) return null;
               return WeatherSymbols.getIcingSymbol(code);
 
           case SYMBOL_TURBULENCE :
+              if (code < 0 || code >= WeatherSymbols.TURB_NUM) return null;
               return WeatherSymbols.getTurbulenceSymbol(code);
 
           case SYMBOL_LIGHTNING :
