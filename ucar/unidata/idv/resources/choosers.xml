@@ -146,12 +146,11 @@ If using the tree panel you can define components that are displayed when a cate
        place="Center"
        tabnested="true">
       <chooser
-         id="chooser.radar.level3"
-         title="Level III"
-         menutitle="Level III Radar"
+         id="chooser.tdsradar"
+         title="NEXRAD - Remote"
+         menutitle="TDS NEXRAD Radar"
          helppath="idv.data.choosers.radarchooser"
-         showdetails="true"
-         class="ucar.unidata.idv.chooser.adde.AddeRadarChooser"/>
+         class="ucar.unidata.idv.chooser.TDSRadarChooser"/>
       <chooser
          id="chooser.radar.level2"
          title="NEXRAD - Local"
@@ -162,18 +161,12 @@ If using the tree panel you can define components that are displayed when a cate
          class="ucar.unidata.idv.chooser.Level2RadarChooser"
          showdatasourcemenu="false"/>
       <chooser
-         id="chooser.tdsradar"
-         title="NEXRAD - Remote"
-         menutitle="TDS NEXRAD Radar"
+         id="chooser.radar.level3"
+         title="ADDE Level III"
+         menutitle="Level III Radar"
          helppath="idv.data.choosers.radarchooser"
-         class="ucar.unidata.idv.chooser.TDSRadarChooser"/>
-<!--       <chooser
-         id="chooser.tdsradar1"
-         title="NEXRAD - Remote"
-         menutitle="TDS Nexard Radar"
-         helppath="idv.data.choosers.radarchooser"
-         class="ucar.unidata.idv.chooser.TDSRadarChooser1"/>
-        -->
+         showdetails="true"
+         class="ucar.unidata.idv.chooser.adde.AddeRadarChooser"/>
     </tabbedpane>
   </panel>
 
