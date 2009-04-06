@@ -415,6 +415,13 @@ public class Misc {
                 argument = value;
             } else if (paramType.equals(ContourInfo.class)) {
                 argument = new ContourInfo(value);
+            } else if (paramType.equals(Range.class)) {
+                int idx = value.indexOf(":");
+                if (idx >= 0) {
+                    argument = new Range(new Double(value.substring(0,
+                            idx)).doubleValue(), new Double(value.substring(idx
+                            + 1)).doubleValue());
+                }
             } else if (paramType.equals(Double.TYPE)) {
                 argument = new Double(value);
             } else if (paramType.equals(Integer.TYPE)) {
