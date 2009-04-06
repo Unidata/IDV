@@ -1430,11 +1430,20 @@ public class GeoGridDataSource extends GridDataSource {
      */
     private int indexOf(Object o, List levels) throws VisADException {
         if(o instanceof String) {
+            try {
+                o = ucar.visad.Util.toReal(o.toString());
+            } catch(Exception ignoreThis) {
+            }
+        }
+
+
+        if(o instanceof String) {
             String s = (String)o;
             if(s.startsWith("#")) {
                 int index = new Integer(s.substring(1).trim()).intValue();
                 return index;
             }
+            System.err.println ("s:" + s);
             o = new Real(new Double(s).doubleValue());
         }
 
