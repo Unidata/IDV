@@ -1637,7 +1637,7 @@ public class TextPointDataSource extends PointDataSource {
 
     private static void usage() {
         System.err.println(
-                           "Usage: java PointObFactory headerfile <-skip skiplines> <-xlsdateformat dateformat> <-Dproperty=value> <.csv files>");
+                           "Usage: java PointObFactory -header headerfile <-skip skiplines> <-skiptonumber> <-xlsdateformat dateformat> <-Dproperty=value> <.csv files>");
         System.err.println("e.g.: java PointObFactory test.hdr -skip 14 -DLatitude.value=41.5 -DLongitude.value=-101.2 -xlsdateformat MM/dd/yyyy foo.csv bar.xls");
     }
 
@@ -1654,21 +1654,15 @@ public class TextPointDataSource extends PointDataSource {
             usage();
             return;
         }
-        String header = IOUtil.readContents(args[0],
-                                            TextPointDataSource.class);
-        List toks = StringUtil.split(header, "\n", true, true);
-        if (toks.size() != 2) {
-            System.err.println("Bad header");
-            return;
-
-        }
+        String header = null;
         Hashtable dataProperties = new Hashtable();
         Hashtable properties = new Hashtable();
         properties.put(PROP_DATAPROPERTIES, dataProperties);
-        SimpleDateFormat sdf = null;
+        SimpleDateFormat sdf =   new  SimpleDateFormat("MM/dd/yyyy");
+        boolean readToFirstNumeric = false;
 
         int argIdx = 1;
-        for(argIdx=1;argIdx<args.length;argIdx++) {
+        for(argIdx=0;argIdx<args.length;argIdx++) {
             if(args[argIdx].equals("-skip")) {
                 if(argIdx==args.length-1) {
                     usage();
@@ -1676,6 +1670,16 @@ public class TextPointDataSource extends PointDataSource {
                 }
                 properties.put(TextPointDataSource.PROP_HEADER_SKIP, new Integer(args[argIdx+1]));
                 argIdx++;
+            } else       if(args[argIdx].equals("-header")) {
+                if(argIdx==args.length-1) {
+                    usage();
+                    return;
+                }
+                header = IOUtil.readContents(args[argIdx+1],
+                                             TextPointDataSource.class);
+                argIdx++;
+            } else if(args[argIdx].equals("-skiptonumber")) {
+                readToFirstNumeric = true;
             } else  if(args[argIdx].equals("-xlsdateformat")) {
                 if(argIdx==args.length-1) {
                     usage();
@@ -1691,10 +1695,28 @@ public class TextPointDataSource extends PointDataSource {
                     return;
                 }
                 dataProperties.put(l.get(0),l.get(1));
+            } else if(args[argIdx].startsWith("-")) {
+                System.err.println ("Unknown argument:" + args[argIdx]);
+                usage();
+                return;
             } else {
                 break;
             }
         }
+
+        if(header==null) {
+            System.err.println ("No -header specified");
+            usage();
+            return;
+        }
+
+        List toks = StringUtil.split(header, "\n", true, true);
+        if (toks.size() != 2) {
+            System.err.println("Bad header");
+            return;
+
+        }
+
 
         properties.put(TextPointDataSource.PROP_HEADER_MAP, toks.get(0));
         properties.put(TextPointDataSource.PROP_HEADER_PARAMS, toks.get(1));
@@ -1711,8 +1733,7 @@ public class TextPointDataSource extends PointDataSource {
 
             String contents;
             if(args[i].endsWith(".xls")) {
-                contents  = DataUtil.xlsToCsv(args[i],sdf);
-                //                System.out.println(contents);
+                contents  = DataUtil.xlsToCsv(args[i],readToFirstNumeric,sdf);
             } else {
                 contents = IOUtil.readContents(args[i],
                                                TextPointDataSource.class);
