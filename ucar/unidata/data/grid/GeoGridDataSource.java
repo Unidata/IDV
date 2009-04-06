@@ -1858,6 +1858,13 @@ public class GeoGridDataSource extends GridDataSource {
      */
     public static void main(String[] args) throws Exception {
 
+        if(true) {
+            GridDataset gds = GridDataset.open(args[0]);
+            return;
+        }
+
+
+
 
         String leadUrl =
             "dods://lead.unidata.ucar.edu:8080/thredds/dodsC/model/NCEP/NAM/CONUS_80km/NAM_CONUS_80km_20071002_1200.grib1";
