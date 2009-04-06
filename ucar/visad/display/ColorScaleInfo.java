@@ -26,9 +26,13 @@ package ucar.visad.display;
 
 import ucar.unidata.ui.drawing.Glyph;
 
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.GuiUtils;
 
 import java.awt.Color;
 import java.awt.Font;
+
+import java.util.List;
 
 
 /**
@@ -98,14 +102,10 @@ public class ColorScaleInfo {
         this("ColorScaleInfo");
     }
 
-    /**
-     * Construct a new <code>ColorScaleInfo</code> with the given name
-     * and default orientation.
-     * @param name  name for this color scale object.
-     */
     public ColorScaleInfo(String name) {
-        this(name, VERTICAL, LEFT);
+        this.name = name;
     }
+
 
     /**
      * Construct a new <code>ColorScaleInfo</code> with the given name
@@ -209,6 +209,52 @@ public class ColorScaleInfo {
         this.labelColor   = that.labelColor;
         this.labelSide    = that.labelSide;
         this.isVisible    = that.isVisible;
+    }
+
+    /**
+     * Create a color scale information object from the given param string
+     *
+     * @param params the param string.  see getParamStringFormat for details
+     */
+    public ColorScaleInfo(String params, boolean isParamString) {
+        dirty = true;
+        List<String> toks = StringUtil.split(params, ";", true, true);
+        for (String pair: toks) {
+            List subToks = StringUtil.split(pair, "=");
+            if (subToks.size() != 2) {
+                throw new IllegalArgumentException(
+                                                   "Bad color scale info info format: " + params);
+            }
+            String name  = subToks.get(0).toString().trim();
+            String value = subToks.get(1).toString().trim();
+            if(name.equals("visible")) {
+                this.isVisible = new Boolean(value).booleanValue();
+            } else  if(name.equals("name")) {
+                this.name =  name;
+            } else if(name.equals("color")) {
+                this.labelColor   = ucar.unidata.util.GuiUtils.decodeColor(value, this.labelColor);
+            } else if(name.equals("orientation")) {
+                if(value.equals("horizontal"))
+                    this.orient = HORIZONTAL;
+                else if(value.equals("vertical"))
+                    this.orient = VERTICAL;
+                else throw new IllegalArgumentException("Unknown orientation:" + value); 
+            } else if(name.equals("placement")) {
+                if(value.equals("top")) this.placement    = TOP;
+                else if(value.equals("bottom")) this.placement    = BOTTOM;
+                else if(value.equals("left")) this.placement    = LEFT;
+                else if(value.equals("right")) this.placement    = RIGHT;
+                else throw new IllegalArgumentException("Unknown placement:" + value); 
+            } else {
+                throw new IllegalArgumentException("Unknown ColorScaleInfo:" + name); 
+            }
+
+        }
+
+    }
+
+    public static String getParamStringFormat() {
+        return "visible=true|false;color=somecolor;orientation=horizontal|vertical;placement=top|left|bottom|right";
     }
 
     /**
