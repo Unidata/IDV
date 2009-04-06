@@ -201,7 +201,7 @@ public class DisplaySettingsDialog {
     }
 
 
-    private HashSet logSeen = new HashSet();
+    private static HashSet logSeen = new HashSet();
 
     /**
      * Add a property value
@@ -220,7 +220,7 @@ public class DisplaySettingsDialog {
             new PropertyValueWrapper(
                                      propertyValue));
 
-        if(!logSeen.contains(propName)) {
+        if(false && !logSeen.contains(propName)) {
             logSeen.add(propName);
             Object value = propertyValue.getValue();
             String exampleValue = "";
@@ -234,29 +234,34 @@ public class DisplaySettingsDialog {
                     Real r = (Real)value;
                     exampleValue = "Real value, e.g., " + r.getValue()+"[" + r.getUnit()+"]" ;
                 } else if(value instanceof ColorScaleInfo) {
-                    propName = "colorScaleVisible";
-                    exampleValue = "true/false";
+                    //                    propName = "colorScaleVisible";
+                    String fmt  = ColorScaleInfo.getParamStringFormat();
+                    fmt = fmt.replace(";",";<br>");
+                    exampleValue = "semi-colon delimited string:<br>&quot;" +  fmt+"&quot";
                 } else if(value instanceof ContourInfo) {
-                    exampleValue = "semi-colon delimited list:<br>interval=&lt;interval&gt;;<br>"+
-                        "min=&lt;min&gt;;<br>"+
-                        "max=&lt;max&gt;;<br>"+
-                        "base=&lt;base&gt;;<br>"+
-                        "dashed=true/false;<br>"+
-                        "labels=true/false;<br>";
+                    exampleValue = "semi-colon delimited string:<br>&quot;interval=&lt;interval&gt;;<br> "+
+                        "min=&lt;min&gt;;<br> "+
+                        "max=&lt;max&gt;;<br> "+
+                        "base=&lt;base&gt;;<br> "+
+                        "dashed=true/false;<br> "+
+                        "labels=true/false;&quot;";
                 } else  if(value instanceof Boolean) {
-                    exampleValue ="true/false";
+                    exampleValue ="true|false";
                 } else  if(value instanceof String) {
                     exampleValue ="String";
                 } else  if(value instanceof Double) {
                     exampleValue ="double";
                 } else  if(value instanceof Integer) {
                     exampleValue ="integer";
+                } else  if(value instanceof Unit) {
+                    exampleValue ="unit, e.g.," + value.toString();
                 } else {
                     exampleValue ="Unknown type: " + value.getClass().getName();
                 }
             }
-            System.out.print ("<tr><td>"+label+"</td><td><i>" + propName+"</i></td>");
+            System.out.print ("<tr valign=top><td>"+label+"</td><td><i>" + propName+"</i></td>");
             System.out.print ("<td>"+exampleValue+"</td>");
+            System.out.print ("<td><i>&lt;property name=&quot;"+propName+"&quot; value=&quot;&quot;/&gt;</i></td>");
             System.out.println ("</tr>");
         }
 
