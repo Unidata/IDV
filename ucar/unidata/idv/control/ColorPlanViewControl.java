@@ -175,6 +175,18 @@ public class ColorPlanViewControl extends PlanViewControl {
 
 
     /**
+     * Add DisplaySettings appropriate for this display
+     *
+     * @param dsd  the dialog to add to
+     */
+    protected void addDisplaySettings(DisplaySettingsDialog dsd) {
+        super.addDisplaySettings(dsd);
+        dsd.addPropertyValue(new Boolean(isSmoothed), "smoothed", "Colors Shaded",
+                             SETTINGS_GROUP_DISPLAY);
+    }
+
+
+    /**
      * Set whether this display should be smoothed colors or blocky. Used
      * by XML persistence (bundles) for the most part.
      * @param v  true if smoothed.
