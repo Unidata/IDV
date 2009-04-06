@@ -336,6 +336,8 @@ public class ContourInfo {
                     base = new Float(value).floatValue();
                 } else if (name.equals("dashed")) {
                     dashOn = new Boolean(value).booleanValue();
+                } else if (name.equals("width")) {
+                    lineWidth = new Integer(value).intValue();
                 } else if (name.equals("labels")) {
                     isLabeled = new Boolean(value).booleanValue();
                 } else {
