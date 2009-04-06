@@ -549,7 +549,7 @@ public class DataUtil {
      * @throws Exception On badness
      */
     public static String xlsToCsv(String filename) throws Exception {
-        return xlsToCsv(filename, null);
+        return xlsToCsv(filename, false,null);
     }
 
 
@@ -564,11 +564,12 @@ public class DataUtil {
      * @throws Exception On badness
      */
 
-    public static String xlsToCsv(String filename,SimpleDateFormat sdf) throws Exception {
+    public static String xlsToCsv(String filename,boolean skipToFirstNumeric, SimpleDateFormat sdf) throws Exception {
         StringBuffer sb    = new StringBuffer();
         InputStream  myxls = IOUtil.getInputStream(filename, DataUtil.class);
         HSSFWorkbook wb    = new HSSFWorkbook(myxls);
         HSSFSheet    sheet = wb.getSheetAt(0);  // first sheet
+        boolean seenNumber = false;
         for (int rowIdx = sheet.getFirstRowNum();
                 rowIdx <= sheet.getLastRowNum(); rowIdx++) {
             HSSFRow row = sheet.getRow(rowIdx);
@@ -576,12 +577,21 @@ public class DataUtil {
                 sb.append("\n");
                 continue;
             }
+            boolean rowOk = true;
             for (short colIdx = row.getFirstCellNum();
                     colIdx < row.getPhysicalNumberOfCells(); colIdx++) {
                 HSSFCell cell = row.getCell(colIdx);
                 if (cell == null) {
                     continue;
                 }
+                if(skipToFirstNumeric && !seenNumber) {
+                    if (cell.getCellType() != HSSFCell.CELL_TYPE_NUMERIC) {
+                        rowOk = false;
+                        continue;
+                    }
+                    seenNumber = true;
+                }
+
                 String cellValue = null;
 
                 if (sdf!=null && cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
@@ -606,7 +616,9 @@ public class DataUtil {
                     sb.append("("+str+")");
                     }*/
             }
-            sb.append("\n");
+            if(rowOk) {
+                sb.append("\n");
+            }
         }
         return sb.toString();
     }
