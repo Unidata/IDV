@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -142,22 +143,22 @@ import javax.swing.text.JTextComponent;
  */
 public class IdvUIManager extends IdvManager {
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIELDTYPE_TEXT = "text";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIELDTYPE_BOOLEAN = "boolean";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIELDTYPE_CHOICE = "choice";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIELDTYPE_FILE = "file";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIELDTYPE_LOCATION = "location";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIELDTYPE_AREA = "area";
 
 
@@ -590,7 +591,8 @@ public class IdvUIManager extends IdvManager {
             MultiFrame.useDesktopPane(desktopPane);
         }
 
-        if (!getArgsManager().isScriptingMode() && getIdv().getStateManager().getShowDashboardOnStart()) {
+        if ( !getArgsManager().isScriptingMode()
+                && getIdv().getStateManager().getShowDashboardOnStart()) {
             showBasicWindow(true);
             //            doMakeBasicWindows();
         }
@@ -1725,10 +1727,10 @@ public class IdvUIManager extends IdvManager {
 
 
     /**
-     * _more_
+     * Get component group items
      *
-     * @param group _more_
-     * @param items _more_
+     * @param group  the group
+     * @param items  list of items
      */
     public void getComponentGroupMenuItems(final IdvComponentGroup group,
                                            List items) {
@@ -5644,8 +5646,13 @@ public class IdvUIManager extends IdvManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public StringBuffer getSystemInfo() {
-        StringBuffer extra   = new StringBuffer();
+        StringBuffer extra = new StringBuffer();
         extra.append("<h3>OS</h3>\n");
         append(extra, "os.name", System.getProperty("os.name"));
         append(extra, "os.arch", System.getProperty("os.arch"));
@@ -5673,8 +5680,8 @@ public class IdvUIManager extends IdvManager {
     private void showSupportFormInThread(String description,
                                          String stackTrace, JDialog dialog) {
 
-        StringBuffer extra   = getSystemInfo();
-        List         entries = new ArrayList();
+        StringBuffer extra    = getSystemInfo();
+        List         entries  = new ArrayList();
         StringBuffer javaInfo = new StringBuffer();
         javaInfo.append("Java: home: " + System.getProperty("java.home"));
         javaInfo.append(" version: " + System.getProperty("java.version"));
@@ -6115,7 +6122,9 @@ public class IdvUIManager extends IdvManager {
                     EarthLocation el = (EarthLocation) ae.getSource();
                     latLonWidget.setLatLon(
                         Misc.format(el.getLatitude().getValue()),
-                        Misc.format(el.getLongitude().getValue()));
+                        Misc.format(
+                            Misc.normalizeLongitude(
+                                el.getLongitude().getValue())));
                 } catch (Exception exc) {
                     logException("Setting center", exc);
                 }
