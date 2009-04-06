@@ -34,6 +34,7 @@ import ucar.unidata.util.TwoFacedObject;
 
 
 import ucar.visad.data.*;
+import ucar.visad.display.ColorScaleInfo;
 
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.Length;
@@ -2931,6 +2932,8 @@ public final class Util {
             argument = toReal(value.toString());
         } else if (paramType.equals(Unit.class)) {
             argument = parseUnit(value.toString());
+        } else if (paramType.equals(ColorScaleInfo.class)) {
+            argument = new ColorScaleInfo(value.toString(),true);
         }
         if (argument != null) {
             method.invoke(object, new Object[] { argument });
