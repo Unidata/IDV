@@ -54,6 +54,7 @@ import java.awt.event.*;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.HashSet;
 
 import java.util.List;
 import java.util.Vector;
@@ -200,6 +201,8 @@ public class DisplaySettingsDialog {
     }
 
 
+    private HashSet logSeen = new HashSet();
+
     /**
      * Add a property value
      *
@@ -210,9 +213,52 @@ public class DisplaySettingsDialog {
      */
     protected void addPropertyValue(Object object, String propName,
                                     String label, String category) {
+
+        PropertyValue  propertyValue = new PropertyValue(propName, label, object, category);
+
         propertyValues.add(
             new PropertyValueWrapper(
-                new PropertyValue(propName, label, object, category)));
+                                     propertyValue));
+
+        if(!logSeen.contains(propName)) {
+            logSeen.add(propName);
+            Object value = propertyValue.getValue();
+            String exampleValue = "";
+            if(value!=null) {
+                if(value instanceof ColorTable) {
+                    propName = "colorTableName";
+                    exampleValue = ((ColorTable)value).getName();
+                } else if(value instanceof Range) {
+                    exampleValue = "min:max";
+                } else if(value instanceof Real) {
+                    Real r = (Real)value;
+                    exampleValue = "Real value, e.g., " + r.getValue()+"[" + r.getUnit()+"]" ;
+                } else if(value instanceof ColorScaleInfo) {
+                    propName = "colorScaleVisible";
+                    exampleValue = "true/false";
+                } else if(value instanceof ContourInfo) {
+                    exampleValue = "semi-colon delimited list:<br>interval=&lt;interval&gt;;<br>"+
+                        "min=&lt;min&gt;;<br>"+
+                        "max=&lt;max&gt;;<br>"+
+                        "base=&lt;base&gt;;<br>"+
+                        "dashed=true/false;<br>"+
+                        "labels=true/false;<br>";
+                } else  if(value instanceof Boolean) {
+                    exampleValue ="true/false";
+                } else  if(value instanceof String) {
+                    exampleValue ="String";
+                } else  if(value instanceof Double) {
+                    exampleValue ="double";
+                } else  if(value instanceof Integer) {
+                    exampleValue ="integer";
+                } else {
+                    exampleValue ="Unknown type: " + value.getClass().getName();
+                }
+            }
+            System.out.print ("<tr><td>"+label+"</td><td><i>" + propName+"</i></td>");
+            System.out.print ("<td>"+exampleValue+"</td>");
+            System.out.println ("</tr>");
+        }
 
     }
 
