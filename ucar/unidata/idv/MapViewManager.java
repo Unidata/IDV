@@ -191,6 +191,12 @@ public class MapViewManager extends NavigatedViewManager {
     /** Do we reproject when we goto address */
     private static JCheckBox addressReprojectCbx;
 
+    /** For checking if kmz capture is ok */
+    private  JCheckBox fixViewpointCbx;
+
+    /** For checking if kmz capture is ok */
+    private  JCheckBox fixProjectionCbx;
+
     /** rotate button */
     JToggleButton rotateBtn;
 
@@ -409,6 +415,113 @@ public class MapViewManager extends NavigatedViewManager {
         super.displayChanged(de);
     }
 
+
+
+
+    /**
+     * Check if its ok to capture a kmz file
+     *
+     * @return ok to capture kmz
+     */
+    protected boolean checkForKmlImageCapture() {
+        //Assume when we are running isl everything is ok
+        if (getIdv().getArgsManager().getIsOffScreen()) {
+            return true;
+        }
+
+        NavigatedDisplay navDisplay = getMapDisplay();
+        double[] rotMatrix = navDisplay.getRotation();
+        if(rotMatrix[0]!=0 || rotMatrix[1]!=0 || rotMatrix[2]!=0) {
+            if(fixViewpointCbx==null) {
+                fixViewpointCbx = new JCheckBox("Fix it", true);
+            }
+
+            JComponent question = GuiUtils.vbox(
+                                                new JLabel("The viewpoint is not overhead. This will result in an incorrect image capture."),
+                                                GuiUtils.left(fixViewpointCbx));
+            if ( !GuiUtils.askOkCancel("KML Capture", question)) {
+
+                return false;
+            }
+            if(fixViewpointCbx.isSelected()) {
+                try {
+                    navDisplay.resetProjection();
+                } catch(Exception exc) {
+                    throw new RuntimeException(exc);
+                }
+            } else {
+                return true;
+            }
+        }
+
+        int cnt = 0;
+        while(true) {
+            cnt++;
+            Rectangle        sb = navDisplay.getDisplayComponent().getBounds();
+            LatLonPoint ul =
+                getMapDisplay().getEarthLocation(getMapDisplay().getSpatialCoordinatesFromScreen(0, 0)).getLatLonPoint();
+            LatLonPoint ur =
+                getMapDisplay().getEarthLocation(getMapDisplay().getSpatialCoordinatesFromScreen(sb.width, 0)).getLatLonPoint();
+            LatLonPoint lr =
+                getMapDisplay().getEarthLocation(getMapDisplay().getSpatialCoordinatesFromScreen(sb.width, sb.height)).getLatLonPoint();
+            LatLonPoint ll =
+                getMapDisplay().getEarthLocation(getMapDisplay().getSpatialCoordinatesFromScreen(0, sb.height)).getLatLonPoint();
+
+            double width = Math.abs(ul.getLongitude().getValue()-
+                                    ur.getLongitude().getValue());
+
+            double height = Math.abs(ul.getLatitude().getValue()-
+                                     ll.getLatitude().getValue());
+
+
+            boolean ok = true;
+            if(!isClose(width,ul.getLongitude().getValue(),
+                        ll.getLongitude().getValue())) ok = false;
+            if(!isClose(width,ur.getLongitude().getValue(),
+                        lr.getLongitude().getValue())) ok = false;
+            if(!isClose(height,ul.getLatitude().getValue(),
+                        ur.getLatitude().getValue())) ok = false;
+            if(!isClose(height,ll.getLatitude().getValue(),
+                        lr.getLatitude().getValue())) ok = false;
+
+            if(ok) return true;
+
+            if(fixProjectionCbx==null) {
+                fixProjectionCbx = new JCheckBox("Fix it", false);
+            }
+            String msg = (cnt==1?"The projection is not lat/lon. This will result in an incorrect image capture.":
+                          "For some reason the projection is still not lat/lon.");
+            JComponent question = GuiUtils.vbox(
+                                                new JLabel(msg),
+                                                GuiUtils.left(fixProjectionCbx));
+            if ( !GuiUtils.askOkCancel("KML Capture",  question)) {
+                return false;
+            }
+
+            if(!fixProjectionCbx.isSelected()) {
+                return true;
+            }
+
+            if(fixProjectionCbx.isSelected()) {
+                try {
+                    setCurrentAsProjection();
+                } catch(Exception exc) {
+                    throw new RuntimeException(exc);
+                }
+                Misc.sleep(1000);
+            }
+        }
+    }
+
+
+
+
+
+    private boolean isClose(double span, double value1,double value2) {
+        //Check that the difference of the two values is < 1% of the given span value
+        if(Math.abs((value1-value2)/span)>0.01) return false;
+        return true;
+    }
 
 
     /**

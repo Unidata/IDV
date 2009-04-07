@@ -5254,10 +5254,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     }
 
                     if (KmlDataSource.isKmlFile(filename)) {
-                        if ( !GuiUtils.askOkCancel("KML Capture",
-                                "Note: For accuracy the projection should be lat/lon and the viewpoint should be overhead")) {
-                            return;
-                        }
+                        if(!checkForKmlImageCapture()) return;
                         String kmlFilename = filename;
                         String suffix      = ".png";
                         filename = IOUtil.stripExtension(filename) + suffix;
@@ -5310,6 +5307,15 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
     }
 
+
+    /**
+     * Check if its ok to capture a kmz file
+     *
+     * @return ok to capture kmz
+     */
+    protected boolean checkForKmlImageCapture() {
+        return false;
+    }
 
 
     /**
