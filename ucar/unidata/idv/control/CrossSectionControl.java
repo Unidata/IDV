@@ -324,14 +324,13 @@ public abstract class CrossSectionControl extends GridDisplayControl {
 
 
     public ViewManager getViewManagerForCapture(String what) throws Exception {
-        if(Misc.equals(what,"crosssection")) {
-            setMainPanelDimensions();
-            if ( !getIdv().getArgsManager().getIsOffScreen()) {
-                GuiUtils.showComponentInTabs(getMainPanel());
-            }
-            return  getCrossSectionViewManager();
+        //        if(Misc.equals(what,"crosssection")) {
+        setMainPanelDimensions();
+        if ( !getIdv().getArgsManager().getIsOffScreen()) {
+            GuiUtils.showComponentInTabs(getMainPanel());
         }
-        return super.getViewManagerForCapture(what);
+        return  getCrossSectionViewManager();
+        //        return super.getViewManagerForCapture(what);
     }
 
 
@@ -365,7 +364,6 @@ public abstract class CrossSectionControl extends GridDisplayControl {
 
         vcsDisplay.setVisible(true);
         if (crossSectionView != null) {
-            System.err.println ("have XS view");
             //If the ViewManager is non-null it means we have been unpersisted.
             //If so, we initialie the VM with the IDV
             crossSectionView.initAfterUnPersistence(getIdv());
