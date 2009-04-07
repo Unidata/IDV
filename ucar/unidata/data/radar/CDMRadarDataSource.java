@@ -198,14 +198,21 @@ public class CDMRadarDataSource extends RadarDataSource {
                 List allTimes = new ArrayList();
                 List timeSpan = collection.getRadarTimeSpan();
                 Date fromDate =
-                DateUnit.getStandardOrISO((String) timeSpan.get(0));
-                Date toDate = new Date(System.currentTimeMillis()
-                                   + DateUtil.daysToMillis(1));
+                    DateUnit.getStandardOrISO((String) timeSpan.get(0));
+                Date toDate =
+                    DateUnit.getStandardOrISO((String) timeSpan.get(1));
                 List collectionTimes =
                     collection.getRadarStationTimes(query.getStation(),
                         query.getProduct(),
                         fromDate,
                         toDate);
+                if(collectionTimes.size() == 0)  {
+                      collectionTimes =
+                        collection.getRadarStationTimes(query.getStation(),
+                        query.getProduct(),
+                        query.getDateSelection().getStartFixedDate(),
+                        query.getDateSelection().getEndFixedDate());
+                }
 
                 for (int timeIdx = 0; timeIdx < collectionTimes.size();
                         timeIdx++) {
