@@ -62,8 +62,22 @@ public class VerticalXSDisplay extends XSDisplay {
      * @throws VisADException
      */
     public VerticalXSDisplay() throws VisADException, RemoteException {
+        this(false);
+    }
+
+
+    /**
+     * Default cstr with yAxisType of RealType.Altitude, xAxisType of
+     * RealType.XAxis.
+     *
+     * @param offScreen are we in offscreen mode
+     *
+     * @throws RemoteException
+     * @throws VisADException
+     */
+    public VerticalXSDisplay(boolean offScreen) throws VisADException, RemoteException {
         super("Vertical Cross Section", Length.getRealType(),
-              RealType.Altitude);
+              RealType.Altitude,offScreen);
         setAxisParams();
     }
 

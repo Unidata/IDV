@@ -147,7 +147,7 @@ public class CrossSectionViewManager extends ViewManager {
      */
     protected DisplayMaster doMakeDisplayMaster()
             throws VisADException, RemoteException {
-        return new VerticalXSDisplay();
+        return new VerticalXSDisplay(getIdv().getArgsManager().getIsOffScreen());
     }
 
 
