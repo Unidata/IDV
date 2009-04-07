@@ -20,15 +20,17 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.visad.display;
 
 
 
 import visad.*;
 
-import java.rmi.RemoteException;
-
 import java.awt.*;
+
+import java.rmi.RemoteException;
 
 
 /**
@@ -71,19 +73,24 @@ public class XSDisplay extends XYDisplay {
      * @throws VisADException
      */
     public XSDisplay() throws VisADException, RemoteException {
-        this(false);
+        this(false, null);
     }
 
     /**
      * Default cstr with yAxisType of RealType.YAxis, xAxisType of
      * RealType.XAxis.
      *
+     *
+     * @param offScreen Is offscreen
+     * @param dimension Size of display. May be null.
      * @throws RemoteException
      * @throws VisADException
      */
 
-    public XSDisplay(boolean offScreen) throws VisADException, RemoteException {
-        super("Cross section Display", RealType.XAxis, RealType.YAxis,offScreen);
+    public XSDisplay(boolean offScreen, Dimension dimension)
+            throws VisADException, RemoteException {
+        super("Cross section Display", RealType.XAxis, RealType.YAxis,
+              offScreen, dimension);
     }
 
     /**
@@ -99,7 +106,7 @@ public class XSDisplay extends XYDisplay {
      */
     public XSDisplay(String name, RealType xType, RealType yType)
             throws VisADException, RemoteException {
-        this(name,xType,yType,false);
+        this(name, xType, yType, false, null);
     }
 
     /**
@@ -109,13 +116,16 @@ public class XSDisplay extends XYDisplay {
      * @param name  name for this display
      * @param xType  RealType for the X axis
      * @param yType  RealType for the Y axis
+     * @param offScreen Is offscreen
+     * @param dimension Size of display. May be null.
      *
      * @throws RemoteException   Java RMI error
      * @throws VisADException    VisAD error
      */
-    public XSDisplay(String name, RealType xType, RealType yType,boolean offScreen)
+    public XSDisplay(String name, RealType xType, RealType yType,
+                     boolean offScreen, Dimension dimension)
             throws VisADException, RemoteException {
-        super(name, xType, yType,offScreen);
+        super(name, xType, yType, offScreen, dimension);
     }
 
     /**
@@ -168,3 +178,4 @@ public class XSDisplay extends XYDisplay {
     }
 
 }
+

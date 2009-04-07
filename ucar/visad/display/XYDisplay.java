@@ -21,6 +21,9 @@
  */
 
 
+
+
+
 package ucar.visad.display;
 
 
@@ -46,6 +49,8 @@ import visad.VisADException;
 import visad.java2d.*;
 
 import visad.java3d.*;
+
+import java.awt.Dimension;
 
 import java.rmi.RemoteException;
 
@@ -117,13 +122,15 @@ public class XYDisplay extends DisplayMaster {
      * and RealType.YAxis mapped to Display.YAxis and the specified offscreen.
      *
      * @param  offscreen is this display offscreen
+     * @param dimension size of display for off screen rendering. May be null.
      *
      * @throws VisADException  some VisAD error
      * @throws RemoteException  a remote error
      */
-
-    public XYDisplay(boolean offscreen) throws VisADException, RemoteException {
-        this("XYDisplay", RealType.XAxis, RealType.YAxis,offscreen);
+    public XYDisplay(boolean offscreen, Dimension dimension)
+            throws VisADException, RemoteException {
+        this("XYDisplay", RealType.XAxis, RealType.YAxis, offscreen,
+             dimension);
     }
 
     /**
@@ -139,7 +146,7 @@ public class XYDisplay extends DisplayMaster {
     public XYDisplay(String name, RealType xAxisType, RealType yAxisType)
             throws VisADException, RemoteException {
 
-        this(name, xAxisType, yAxisType, false);
+        this(name, xAxisType, yAxisType, false, null);
     }
 
     /**
@@ -148,22 +155,50 @@ public class XYDisplay extends DisplayMaster {
      * @param  name        name for the display
      * @param  xAxisType   a RealType for ScalarMap(yAxisType, Display.XAxis)
      * @param  yAxisType   a RealType for ScalarMap(xAxisType, Display.YAxis)
-     * @param  offscreen is this display offscreen
+     * @param  offScreen is this display offscreen
+     * @param dimension size of display for off screen rendering. May be null.
      *
      * @throws VisADException  some VisAD error
      * @throws RemoteException  a remote error
      */
-    public XYDisplay(String name, RealType xAxisType, RealType yAxisType,boolean offScreen)
+    public XYDisplay(String name, RealType xAxisType, RealType yAxisType,
+                     boolean offScreen, Dimension dimension)
             throws VisADException, RemoteException {
         //super(new DisplayImplJ2D(name);
-        super(new DisplayImplJ3D(name, new TwoDDisplayRendererJ3D()));
-
+        super(makeDisplayImpl(name, offScreen, dimension));
         this.name      = name;
         this.yAxisType = yAxisType;
         this.xAxisType = xAxisType;
 
         initializeClass();
     }
+
+    /**
+     * Make the display
+     *
+     * @param name name
+     * @param offScreen is display offscreen
+     * @param dimension If offscreen this is the size of the display. May be null. If so defaults to 600x300
+     *
+     * @return The display
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    private static DisplayImplJ3D makeDisplayImpl(String name,
+            boolean offScreen, Dimension dimension)
+            throws VisADException, RemoteException {
+        TwoDDisplayRendererJ3D renderer = new TwoDDisplayRendererJ3D();
+        if (dimension == null) {
+            dimension = new Dimension(600, 300);
+        }
+        if (offScreen) {
+            return new DisplayImplJ3D(name, renderer, dimension.width,
+                                      dimension.height);
+        }
+        return new DisplayImplJ3D(name, renderer);
+    }
+
 
     /**
      * Set up the display
