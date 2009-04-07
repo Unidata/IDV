@@ -587,7 +587,7 @@ public class DataUtil {
                 if(skipToFirstNumeric && !seenNumber) {
                     if (cell.getCellType() != HSSFCell.CELL_TYPE_NUMERIC) {
                         rowOk = false;
-                        continue;
+                        break;
                     }
                     seenNumber = true;
                 }
