@@ -96,7 +96,7 @@ public class XYDisplay extends DisplayMaster {
      * @throws RemoteException  a remote error
      */
     public XYDisplay() throws VisADException, RemoteException {
-        this("XYDisplay", RealType.XAxis, RealType.YAxis);
+        this("XYDisplay");
     }
 
     /**
@@ -113,6 +113,20 @@ public class XYDisplay extends DisplayMaster {
     }
 
     /**
+     * Constuctor for display with RealType.XAxis mapped to Display.XAxis
+     * and RealType.YAxis mapped to Display.YAxis and the specified offscreen.
+     *
+     * @param  offscreen is this display offscreen
+     *
+     * @throws VisADException  some VisAD error
+     * @throws RemoteException  a remote error
+     */
+
+    public XYDisplay(boolean offscreen) throws VisADException, RemoteException {
+        this("XYDisplay", RealType.XAxis, RealType.YAxis,offscreen);
+    }
+
+    /**
      * Constructor with RealTypes for the X and Y axes and the given name.
      *
      * @param  name        name for the display
@@ -125,7 +139,22 @@ public class XYDisplay extends DisplayMaster {
     public XYDisplay(String name, RealType xAxisType, RealType yAxisType)
             throws VisADException, RemoteException {
 
+        this(name, xAxisType, yAxisType, false);
+    }
 
+    /**
+     * Constructor with RealTypes for the X and Y axes and the given name.
+     *
+     * @param  name        name for the display
+     * @param  xAxisType   a RealType for ScalarMap(yAxisType, Display.XAxis)
+     * @param  yAxisType   a RealType for ScalarMap(xAxisType, Display.YAxis)
+     * @param  offscreen is this display offscreen
+     *
+     * @throws VisADException  some VisAD error
+     * @throws RemoteException  a remote error
+     */
+    public XYDisplay(String name, RealType xAxisType, RealType yAxisType,boolean offScreen)
+            throws VisADException, RemoteException {
         //super(new DisplayImplJ2D(name);
         super(new DisplayImplJ3D(name, new TwoDDisplayRendererJ3D()));
 

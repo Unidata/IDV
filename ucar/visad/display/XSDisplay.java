@@ -71,7 +71,19 @@ public class XSDisplay extends XYDisplay {
      * @throws VisADException
      */
     public XSDisplay() throws VisADException, RemoteException {
-        super("Cross section Display", RealType.XAxis, RealType.YAxis);
+        this(false);
+    }
+
+    /**
+     * Default cstr with yAxisType of RealType.YAxis, xAxisType of
+     * RealType.XAxis.
+     *
+     * @throws RemoteException
+     * @throws VisADException
+     */
+
+    public XSDisplay(boolean offScreen) throws VisADException, RemoteException {
+        super("Cross section Display", RealType.XAxis, RealType.YAxis,offScreen);
     }
 
     /**
@@ -87,7 +99,23 @@ public class XSDisplay extends XYDisplay {
      */
     public XSDisplay(String name, RealType xType, RealType yType)
             throws VisADException, RemoteException {
-        super(name, xType, yType);
+        this(name,xType,yType,false);
+    }
+
+    /**
+     * Default cstr with yAxisType of RealType.Altitude, xAxisType of
+     * RealType.XAxis.
+     *
+     * @param name  name for this display
+     * @param xType  RealType for the X axis
+     * @param yType  RealType for the Y axis
+     *
+     * @throws RemoteException   Java RMI error
+     * @throws VisADException    VisAD error
+     */
+    public XSDisplay(String name, RealType xType, RealType yType,boolean offScreen)
+            throws VisADException, RemoteException {
+        super(name, xType, yType,offScreen);
     }
 
     /**
