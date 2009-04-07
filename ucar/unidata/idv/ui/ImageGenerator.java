@@ -3354,6 +3354,7 @@ public class ImageGenerator extends IdvManager {
         }
 
 
+        List<ViewManager> viewManagers = null;
         if ((scriptingNode != null)
                 && XmlUtil.hasAttribute(scriptingNode, ATTR_DISPLAY)) {
             DisplayControlImpl display = findDisplayControl(scriptingNode);
@@ -3362,14 +3363,26 @@ public class ImageGenerator extends IdvManager {
                         + XmlUtil.toString(scriptingNode));
             }
             String loopFilename = applyMacros(filename);
-            lastImage = display.getImage(applyMacros(scriptingNode,
-                    ATTR_WHAT, (String) null));
-            lastImage = processImage((BufferedImage) lastImage, loopFilename,
-                                     scriptingNode, getAllProperties(), null,imageProperties);
-            return;
+            String what  = applyMacros(scriptingNode,
+                                       ATTR_WHAT, (String) null);
+
+
+            System.err.println ("calling forcapture:" + display.getClass().getName());
+            ViewManager viewManager = display.getViewManagerForCapture(what);
+            if(viewManager !=null) {
+                viewManagers =(List<ViewManager>)Misc.newList(viewManager);
+            } else {
+                lastImage = display.getImage(what);
+                lastImage = processImage((BufferedImage) lastImage, loopFilename,
+                                         scriptingNode, getAllProperties(), null,imageProperties);
+                return;
+            }
         }
 
-        List viewManagers = getViewManagers(scriptingNode);
+        if(viewManagers == null) {
+            viewManagers = (List<ViewManager>)getViewManagers(scriptingNode);
+        }
+
         if (viewManagers.size() == 0) {
             debug("No views to capture");
         }
@@ -4297,7 +4310,37 @@ public class ImageGenerator extends IdvManager {
             }
         }
 
-        List viewManagers = getViewManagers(scriptingNode);
+        List<ViewManager> viewManagers = null;
+        if ((scriptingNode != null)
+                && XmlUtil.hasAttribute(scriptingNode, ATTR_DISPLAY)) {
+            DisplayControlImpl display = findDisplayControl(scriptingNode);
+            if (display == null) {
+                throw new IllegalArgumentException("Could not find display:"
+                        + XmlUtil.toString(scriptingNode));
+            }
+            String what  = applyMacros(scriptingNode,
+                                       ATTR_WHAT, (String) null);
+
+            ViewManager viewManager=null;
+            try {
+                viewManager= display.getViewManagerForCapture(what);
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+
+            if(viewManager !=null) {
+                viewManagers =(List<ViewManager>)Misc.newList(viewManager);
+            } else {
+                throw new IllegalArgumentException("Cannot capture a movie with display:"
+                        + XmlUtil.toString(scriptingNode));
+            }
+        }
+
+        if(viewManagers == null) {
+            viewManagers = (List<ViewManager>)getViewManagers(scriptingNode);
+        }
+
+
 
         for (int i = 0; i < viewManagers.size(); i++) {
             ViewManager viewManager = (ViewManager) viewManagers.get(i);

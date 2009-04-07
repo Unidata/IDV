@@ -4066,6 +4066,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
 
+    public ViewManager getViewManagerForCapture(String what)  throws Exception {
+        System.err.println ("base for capture:" + getClass().getName());
+        return null;
+    }
+
+
     /**
      * Get the image of "what"
      *

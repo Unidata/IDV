@@ -90,6 +90,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -320,6 +321,22 @@ public abstract class CrossSectionControl extends GridDisplayControl {
         return crossSectionView;
     }
 
+
+
+    public ViewManager getViewManagerForCapture(String what) throws Exception {
+        if(Misc.equals(what,"crosssection")) {
+            setMainPanelDimensions();
+            if ( !getIdv().getArgsManager().getIsOffScreen()) {
+                GuiUtils.showComponentInTabs(getMainPanel());
+            }
+            return  getCrossSectionViewManager();
+        }
+        return super.getViewManagerForCapture(what);
+    }
+
+
+
+
     /**
      * Initialize the control using the data choice
      *
@@ -348,12 +365,14 @@ public abstract class CrossSectionControl extends GridDisplayControl {
 
         vcsDisplay.setVisible(true);
         if (crossSectionView != null) {
+            System.err.println ("have XS view");
             //If the ViewManager is non-null it means we have been unpersisted.
             //If so, we initialie the VM with the IDV
             crossSectionView.initAfterUnPersistence(getIdv());
         } else {
             //We are new (or are unpersisted from an old bundle)
             //Create the new ViewManager
+            System.err.println ("making XS view");
             crossSectionView = new CrossSectionViewManager(getViewContext(),
                     new ViewDescriptor("CrossSectionView"),
                     "showControlLegend=false;showScales=true", animationInfo);
