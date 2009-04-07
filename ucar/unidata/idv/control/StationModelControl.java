@@ -569,6 +569,7 @@ public class StationModelControl extends ObsDisplayControl {
             }
             sideLegendExtra.add(GuiUtils.left(new JLabel("Layout model:"
                     + stationModel.getDisplayName())));
+            List<Object[]> ctComps = new ArrayList<Object[]>();
             for (Iterator iter = stationModel.iterator(); iter.hasNext(); ) {
                 MetSymbol  metSymbol = (MetSymbol) iter.next();
                 ColorTable ct        = metSymbol.getColorTable();
@@ -589,9 +590,19 @@ public class StationModelControl extends ObsDisplayControl {
                         getDisplayConventions());
 
                 preview.setRange(range);
-                sideLegendExtra.add(GuiUtils.left(new JLabel(param + ":")));
-                sideLegendExtra.add(preview.doMakeContents());
+                Rectangle b = metSymbol.getBounds();
+                ctComps.add(new Object[]{
+                        new Integer(b.y),
+                        GuiUtils.topCenter(GuiUtils.left(new JLabel(param + ":")),
+                                           preview.doMakeContents())});
             }
+
+            //Sort the components on height
+            ctComps = (List<Object[]>)Misc.sortTuples(ctComps, true);
+            for(Object[] pair: ctComps) {
+                sideLegendExtra.add((Component)pair[1]);
+            }
+
             GuiUtils.setFontOnTree(sideLegendExtra,
                                    GuiUtils.buttonFont.deriveFont(10.0f));
             sideLegendExtra.validate();
