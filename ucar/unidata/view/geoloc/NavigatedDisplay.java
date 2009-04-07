@@ -1708,6 +1708,21 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
 
+    /**
+     * Get the rotation matrix
+     *
+     * @return rotation matrix
+     */
+    public double[] getRotation() {
+        double[] currentMatrix = getProjectionMatrix();
+        double[] trans         = { 0.0, 0.0, 0.0 };
+        double[] rot           = { 0.0, 0.0, 0.0 };
+        double[] scale         = { 0.0, 0.0, 0.0 };
+        getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
+                                                  currentMatrix);
+        return rot;
+    }
+
 
     /**
      * Change point of view of a 3D VisAD display, using input angles
