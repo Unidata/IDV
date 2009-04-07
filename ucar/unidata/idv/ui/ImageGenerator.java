@@ -3166,7 +3166,7 @@ public class ImageGenerator extends IdvManager {
 
     public void loadBundle(String bundleFile, List setFiles, int width, int height)
             throws Throwable {
-        System.err.println ("width: " + width + " " + height);
+        //        System.err.println ("width: " + width + " " + height);
         StringBuffer extra = new StringBuffer();
         if (setFiles != null) {
             for (int i = 0; i < setFiles.size(); i += 2) {
@@ -3366,10 +3366,9 @@ public class ImageGenerator extends IdvManager {
             String what  = applyMacros(scriptingNode,
                                        ATTR_WHAT, (String) null);
 
-
-            System.err.println ("calling forcapture:" + display.getClass().getName());
             ViewManager viewManager = display.getViewManagerForCapture(what);
             if(viewManager !=null) {
+                viewManager.updateDisplayIfNeeded();
                 viewManagers =(List<ViewManager>)Misc.newList(viewManager);
             } else {
                 lastImage = display.getImage(what);
@@ -3975,7 +3974,7 @@ public class ImageGenerator extends IdvManager {
                         display.getSpatialCoordinates(ulEl, null));
                     lr = display.getScreenCoordinates(
                         display.getSpatialCoordinates(lrEl, null));
-                    System.err.println("ul:" + ulEl + " lr:" + lrEl);
+                    //System.err.println("ul:" + ulEl + " lr:" + lrEl);
                     if (ul[0] > lr[0]) {
                         int tmp = ul[0];
                         ul[0] = lr[0];
