@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -307,7 +308,7 @@ public abstract class NavigatedViewManager extends ViewManager {
         initVerticalRange();
 
 
-        if (getIdv().getInteractiveMode()) {
+        if (isInteractive()) {
             if (readout == null) {
                 readout =
                     new NavigatedDisplayCursorReadout(getNavigatedDisplay(),
@@ -450,16 +451,21 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     protected ViewpointControl getViewpointControl() {
         if (viewpointControl == null) {
-            ViewpointControl tmp =  new ViewpointControl(getNavigatedDisplay()) {
+            ViewpointControl tmp =
+                new ViewpointControl(getNavigatedDisplay()) {
                 public void changePerspectiveView(boolean v) {
-                    if(viewpointControl==null) return;
+                    if (viewpointControl == null) {
+                        return;
+                    }
                     super.changePerspectiveView(v);
                     perspectiveViewChanged(v);
                 }
 
                 protected void applyVerticalScale(VertScaleInfo transfer)
                         throws Exception {
-                    if(viewpointControl==null) return;
+                    if (viewpointControl == null) {
+                        return;
+                    }
                     super.applyVerticalScale(transfer);
                     verticalScaleChanged();
                 }

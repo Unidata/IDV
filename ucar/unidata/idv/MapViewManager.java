@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -192,10 +193,10 @@ public class MapViewManager extends NavigatedViewManager {
     private static JCheckBox addressReprojectCbx;
 
     /** For checking if kmz capture is ok */
-    private  JCheckBox fixViewpointCbx;
+    private JCheckBox fixViewpointCbx;
 
     /** For checking if kmz capture is ok */
-    private  JCheckBox fixProjectionCbx;
+    private JCheckBox fixProjectionCbx;
 
     /** rotate button */
     JToggleButton rotateBtn;
@@ -289,7 +290,9 @@ public class MapViewManager extends NavigatedViewManager {
 
         if (useGlobe) {
             //TODO: Set the dimension
-            GlobeDisplay globeDisplay = new GlobeDisplay(getIdv().getArgsManager().getIsOffScreen(),dimension,null);
+            GlobeDisplay globeDisplay =
+                new GlobeDisplay(getIdv().getArgsManager().getIsOffScreen(),
+                                 dimension, null);
             navDisplay = globeDisplay;
         } else {
             Trace.call1("MapViewManager.doMakeDisplayMaster projection");
@@ -298,7 +301,7 @@ public class MapViewManager extends NavigatedViewManager {
                 mainProjection =
                     new ProjectionCoordinateSystem(dfltProjection);
             }
-            if (getIdv().getInteractiveMode()) {
+            if (isInteractive()) {
                 addProjectionToHistory(mainProjection, "Default");
             }
             Trace.call1("MapViewManager.new MPD");
@@ -424,29 +427,33 @@ public class MapViewManager extends NavigatedViewManager {
      * @return ok to capture kmz
      */
     protected boolean checkForKmlImageCapture() {
+
         //Assume when we are running isl everything is ok
         if (getIdv().getArgsManager().getIsOffScreen()) {
             return true;
         }
 
         NavigatedDisplay navDisplay = getMapDisplay();
-        double[] rotMatrix = navDisplay.getRotation();
-        if(rotMatrix[0]!=0 || rotMatrix[1]!=0 || rotMatrix[2]!=0) {
-            if(fixViewpointCbx==null) {
+        double[]         rotMatrix  = navDisplay.getRotation();
+        if ((rotMatrix[0] != 0) || (rotMatrix[1] != 0)
+                || (rotMatrix[2] != 0)) {
+            if (fixViewpointCbx == null) {
                 fixViewpointCbx = new JCheckBox("Fix it", true);
             }
 
-            JComponent question = GuiUtils.vbox(
-                                                new JLabel("The viewpoint is not overhead. This will result in an incorrect image capture."),
-                                                GuiUtils.left(fixViewpointCbx));
+            JComponent question =
+                GuiUtils
+                    .vbox(new JLabel(
+                        "The viewpoint is not overhead. This will result in an incorrect image capture."), GuiUtils
+                            .left(fixViewpointCbx));
             if ( !GuiUtils.askOkCancel("KML Capture", question)) {
 
                 return false;
             }
-            if(fixViewpointCbx.isSelected()) {
+            if (fixViewpointCbx.isSelected()) {
                 try {
                     navDisplay.resetProjection();
-                } catch(Exception exc) {
+                } catch (Exception exc) {
                     throw new RuntimeException(exc);
                 }
             } else {
@@ -455,71 +462,101 @@ public class MapViewManager extends NavigatedViewManager {
         }
 
         int cnt = 0;
-        while(true) {
+        while (true) {
             cnt++;
-            Rectangle        sb = navDisplay.getDisplayComponent().getBounds();
+            Rectangle sb = navDisplay.getDisplayComponent().getBounds();
             LatLonPoint ul =
-                getMapDisplay().getEarthLocation(getMapDisplay().getSpatialCoordinatesFromScreen(0, 0)).getLatLonPoint();
+                getMapDisplay().getEarthLocation(
+                    getMapDisplay().getSpatialCoordinatesFromScreen(
+                        0, 0)).getLatLonPoint();
             LatLonPoint ur =
-                getMapDisplay().getEarthLocation(getMapDisplay().getSpatialCoordinatesFromScreen(sb.width, 0)).getLatLonPoint();
+                getMapDisplay().getEarthLocation(
+                    getMapDisplay().getSpatialCoordinatesFromScreen(
+                        sb.width, 0)).getLatLonPoint();
             LatLonPoint lr =
-                getMapDisplay().getEarthLocation(getMapDisplay().getSpatialCoordinatesFromScreen(sb.width, sb.height)).getLatLonPoint();
+                getMapDisplay().getEarthLocation(
+                    getMapDisplay().getSpatialCoordinatesFromScreen(
+                        sb.width, sb.height)).getLatLonPoint();
             LatLonPoint ll =
-                getMapDisplay().getEarthLocation(getMapDisplay().getSpatialCoordinatesFromScreen(0, sb.height)).getLatLonPoint();
+                getMapDisplay().getEarthLocation(
+                    getMapDisplay().getSpatialCoordinatesFromScreen(
+                        0, sb.height)).getLatLonPoint();
 
-            double width = Math.abs(ul.getLongitude().getValue()-
-                                    ur.getLongitude().getValue());
+            double width = Math.abs(ul.getLongitude().getValue()
+                                    - ur.getLongitude().getValue());
 
-            double height = Math.abs(ul.getLatitude().getValue()-
-                                     ll.getLatitude().getValue());
+            double height = Math.abs(ul.getLatitude().getValue()
+                                     - ll.getLatitude().getValue());
 
 
             boolean ok = true;
-            if(!isClose(width,ul.getLongitude().getValue(),
-                        ll.getLongitude().getValue())) ok = false;
-            if(!isClose(width,ur.getLongitude().getValue(),
-                        lr.getLongitude().getValue())) ok = false;
-            if(!isClose(height,ul.getLatitude().getValue(),
-                        ur.getLatitude().getValue())) ok = false;
-            if(!isClose(height,ll.getLatitude().getValue(),
-                        lr.getLatitude().getValue())) ok = false;
-
-            if(ok) return true;
-
-            if(fixProjectionCbx==null) {
-                fixProjectionCbx = new JCheckBox("Fix it", false);
+            if ( !isClose(width, ul.getLongitude().getValue(),
+                          ll.getLongitude().getValue())) {
+                ok = false;
             }
-            String msg = (cnt==1?"The projection is not lat/lon. This will result in an incorrect image capture.":
-                          "For some reason the projection is still not lat/lon.");
-            JComponent question = GuiUtils.vbox(
-                                                new JLabel(msg),
-                                                GuiUtils.left(fixProjectionCbx));
-            if ( !GuiUtils.askOkCancel("KML Capture",  question)) {
-                return false;
+            if ( !isClose(width, ur.getLongitude().getValue(),
+                          lr.getLongitude().getValue())) {
+                ok = false;
+            }
+            if ( !isClose(height, ul.getLatitude().getValue(),
+                          ur.getLatitude().getValue())) {
+                ok = false;
+            }
+            if ( !isClose(height, ll.getLatitude().getValue(),
+                          lr.getLatitude().getValue())) {
+                ok = false;
             }
 
-            if(!fixProjectionCbx.isSelected()) {
+            if (ok) {
                 return true;
             }
 
-            if(fixProjectionCbx.isSelected()) {
+            if (fixProjectionCbx == null) {
+                fixProjectionCbx = new JCheckBox("Fix it", false);
+            }
+            String msg = ((cnt == 1)
+                          ? "The projection is not lat/lon. This will result in an incorrect image capture."
+                          : "For some reason the projection is still not lat/lon.");
+            JComponent question = GuiUtils.vbox(new JLabel(msg),
+                                      GuiUtils.left(fixProjectionCbx));
+            if ( !GuiUtils.askOkCancel("KML Capture", question)) {
+                return false;
+            }
+
+            if ( !fixProjectionCbx.isSelected()) {
+                return true;
+            }
+
+            if (fixProjectionCbx.isSelected()) {
                 try {
                     setCurrentAsProjection();
-                } catch(Exception exc) {
+                } catch (Exception exc) {
                     throw new RuntimeException(exc);
                 }
                 Misc.sleep(1000);
             }
         }
+
     }
 
 
 
 
 
-    private boolean isClose(double span, double value1,double value2) {
+    /**
+     * _more_
+     *
+     * @param span _more_
+     * @param value1 _more_
+     * @param value2 _more_
+     *
+     * @return _more_
+     */
+    private boolean isClose(double span, double value1, double value2) {
         //Check that the difference of the two values is < 1% of the given span value
-        if(Math.abs((value1-value2)/span)>0.01) return false;
+        if (Math.abs((value1 - value2) / span) > 0.01) {
+            return false;
+        }
         return true;
     }
 
@@ -1674,22 +1711,23 @@ public class MapViewManager extends NavigatedViewManager {
      */
     public void setCurrentAsProjection() {
         try {
-            NavigatedDisplay display = getMapDisplay();
-            Rectangle screenBounds =  display.getComponent().getBounds();
-            LatLonPoint ulLLP =null;
-            LatLonPoint lrLLP =null;
+            NavigatedDisplay display      = getMapDisplay();
+            Rectangle        screenBounds =
+                display.getComponent().getBounds();
+            LatLonPoint      ulLLP        = null;
+            LatLonPoint      lrLLP        = null;
 
-            int sw = screenBounds.width;            
-            int sh = screenBounds.height;
-            int x=0;
-            int y=0;
+            int              sw           = screenBounds.width;
+            int              sh           = screenBounds.height;
+            int              x            = 0;
+            int              y            = 0;
 
-            while(x<sw&& y<sh) {
-                double[] ulXY =
-                    display.getSpatialCoordinatesFromScreen(x, y);
+            while ((x < sw) && (y < sh)) {
+                double[] ulXY = display.getSpatialCoordinatesFromScreen(x, y);
                 ulLLP =
                     getMapDisplay().getEarthLocation(ulXY).getLatLonPoint();
-                if(!ulLLP.getLatitude().isMissing() && !ulLLP.getLongitude().isMissing()) {
+                if ( !ulLLP.getLatitude().isMissing()
+                        && !ulLLP.getLongitude().isMissing()) {
                     break;
                 }
                 ulLLP = null;
@@ -1697,11 +1735,13 @@ public class MapViewManager extends NavigatedViewManager {
                 y++;
             }
 
-            while(sw>0 && sh>0) {
-                double[] lrXY = display.getSpatialCoordinatesFromScreen(sw,sh);
+            while ((sw > 0) && (sh > 0)) {
+                double[] lrXY = display.getSpatialCoordinatesFromScreen(sw,
+                                    sh);
                 lrLLP =
                     getMapDisplay().getEarthLocation(lrXY).getLatLonPoint();
-                if(!lrLLP.getLatitude().isMissing() && !lrLLP.getLongitude().isMissing()) {
+                if ( !lrLLP.getLatitude().isMissing()
+                        && !lrLLP.getLongitude().isMissing()) {
                     break;
                 }
                 lrLLP = null;
@@ -1709,7 +1749,7 @@ public class MapViewManager extends NavigatedViewManager {
                 sh--;
             }
 
-            if(ulLLP == null || lrLLP == null) {
+            if ((ulLLP == null) || (lrLLP == null)) {
                 LogUtil.userMessage("Could not create a valid projection");
                 return;
             }
@@ -1892,11 +1932,12 @@ public class MapViewManager extends NavigatedViewManager {
 
         Hashtable catMenus = new Hashtable();
         for (int i = 0; i < projections.size(); i++) {
-            ProjectionImpl p        = (ProjectionImpl) projections.get(i);
-            List<String> names = StringUtil.split(p.getName(), ">", true, true);
-            JMenu          theMenu  = projectionsMenu;
-            String         catSoFar = "";
-            int            catIdx   = 0;
+            ProjectionImpl p = (ProjectionImpl) projections.get(i);
+            List<String> names = StringUtil.split(p.getName(), ">", true,
+                                     true);
+            JMenu  theMenu  = projectionsMenu;
+            String catSoFar = "";
+            int    catIdx   = 0;
             for (catIdx = 0; catIdx < names.size() - 1; catIdx++) {
                 String cat = (String) names.get(catIdx);
                 catSoFar += "-" + cat;
@@ -1908,7 +1949,9 @@ public class MapViewManager extends NavigatedViewManager {
                 }
                 theMenu = tmpMenu;
             }
-            String  name      = (catIdx<names.size()? names.get(catIdx):"");
+            String  name      = ((catIdx < names.size())
+                                 ? names.get(catIdx)
+                                 : "");
             boolean isCurrent = Misc.equals(p, currentProjection);
             if (isCurrent) {
                 //              name = "> " + name;
@@ -2169,7 +2212,7 @@ public class MapViewManager extends NavigatedViewManager {
      * @return The flag value
      */
     public boolean getUseProjectionFromData() {
-        if ( !getIdv().getInteractiveMode()) {
+        if ( !isInteractive()) {
             return true;
         }
         return getBp(PREF_PROJ_USEFROMDATA);

@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -3547,7 +3548,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * legends to fill themselves  and updates the display menu.
      */
     protected void fillLegends() {
-        if (getIdv().getInteractiveMode()) {
+        if (shouldDoThingsRightAway()) {
             reallyFillLegends();
         } else {
             dirty = true;
@@ -3562,7 +3563,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     protected void reallyFillLegends() {
         //If we are not loading a bundle then fill the legends right now
         if ( !getStateManager().isLoadingXml()
-                || !getIdv().getInteractiveMode()) {
+                || !shouldDoThingsRightAway()) {
             fillLegendsInner();
         } else {
             //else fill them in about 1 second
@@ -3777,7 +3778,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             displayInfos.add(displayInfo);
         }
         if (master != null) {
-            if (getIdv().getInteractiveMode()) {
+            if (shouldDoThingsRightAway()) {
                 master.addDisplayable(displayInfo.getDisplayable());
             } else {
                 dirty = true;
@@ -3785,7 +3786,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
 
 
-        if (getIdv().getInteractiveMode()) {
+        if (shouldDoThingsRightAway()) {
             fillLegends();
             updateTimelines(true);
             if ( !getStateManager().isLoadingXml()) {
@@ -4162,6 +4163,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * (so we don't get dangling reference/memory leaks).
      */
     public void destroy() {
+
         if (isDestroyed) {
             return;
         }
@@ -4224,7 +4226,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
             } catch (Throwable exp) {
                 //Ignore  any errors when we destroy the DisplayMaster
                 Throwable wrappedExc = LogUtil.getInnerException(exp);
-                LogUtil.consoleMessage("Had an error destroying the DisplayMaster:" + wrappedExc);
+                LogUtil.consoleMessage(
+                    "Had an error destroying the DisplayMaster:"
+                    + wrappedExc);
                 //logException("Destroying the View Manager", exp);
             } finally {}
             master = null;
@@ -4262,6 +4266,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         idv = null;
 
         displayInfos.clear();
+
     }
 
     /**
@@ -4484,6 +4489,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
+    /** _more_          */
     private Object MASTER_MUTEX = new Object();
 
     /**
@@ -4495,7 +4501,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (master == null) {
             try {
                 //we want to synchronize here so we don't make 2 (or more) versions of the displaymaster
-                synchronized(MASTER_MUTEX) {
+                synchronized (MASTER_MUTEX) {
                     // might need these for the display initialization
                     if (initProperties != null) {
                         String tmp = initProperties;
@@ -4510,15 +4516,15 @@ public class ViewManager extends SharableImpl implements ActionListener,
                         initLights((DisplayRendererJ3D) renderer);
                     }
 
-                    if ( !getIdv().getInteractiveMode()) {
+                    if ( !shouldDoThingsRightAway()) {
                         tmpMaster.setDisplayInactive();
                     } else {
                         tmpMaster.setMouseFunctions(
-                                                    getIdv().getPreferenceManager().getMouseMap());
+                            getIdv().getPreferenceManager().getMouseMap());
                         tmpMaster.setKeyboardEventMap(
-                                                      getIdv().getPreferenceManager().getKeyboardMap());
+                            getIdv().getPreferenceManager().getKeyboardMap());
                         tmpMaster.setWheelEventMap(
-                                                   getIdv().getPreferenceManager().getWheelMap());
+                            getIdv().getPreferenceManager().getWheelMap());
                     }
                     GraphicsModeControl gmc =
                         tmpMaster.getDisplay().getGraphicsModeControl();
@@ -4526,13 +4532,15 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     gmc.setMergeGeometries(true);
                     setDisplayMaster(tmpMaster);
 
-                    if (isInteractive()) {
+                    if (shouldDoThingsRightAway()) {
                         Trace.call1("ViewManager.getMaster master.draw");
                         tmpMaster.draw();
                         Trace.call2("ViewManager.getMaster master.draw");
-                        Trace.call1("ViewManager.getMaster updateDisplayList");
+                        Trace.call1(
+                            "ViewManager.getMaster updateDisplayList");
                         updateDisplayList();
-                        Trace.call2("ViewManager.getMaster updateDisplayList");
+                        Trace.call2(
+                            "ViewManager.getMaster updateDisplayList");
                     }
                     master = tmpMaster;
                 }
@@ -4542,6 +4550,19 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
         return master;
     }
+
+
+
+    /**
+     * A hack for when we are running isl and don't want to update the display incrementally
+     * This just returns true for now but is a hook for later
+     *
+     * @return true
+     */
+    public boolean shouldDoThingsRightAway() {
+        return true;
+    }
+
 
 
     /**
@@ -4589,7 +4610,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param master The display master
      */
     protected void setDisplayMaster(DisplayMaster master) {
-        if(this.master!=null) {
+        if (this.master != null) {
             //TODO: How should we handle this?
             //throw new IllegalArgumentException ("Already have one display master set");
         }
@@ -5212,16 +5233,19 @@ public class ViewManager extends SharableImpl implements ActionListener,
                         comp           = getContents();
                         whichComponent = "contents";
                     }
-                    Dimension dim = comp.getSize();
-                    Point     loc = comp.getLocationOnScreen();
-                    GraphicsConfiguration gc = comp.getGraphicsConfiguration();
+                    Dimension             dim = comp.getSize();
+                    Point                 loc = comp.getLocationOnScreen();
+                    GraphicsConfiguration gc =
+                        comp.getGraphicsConfiguration();
                     Robot robot = new Robot(gc.getDevice());
-                    
-                    if(gc.getBounds().x>0 || gc.getBounds().y>0) {
-                        System.err.println("Offsetting location:" + loc +" by gc bounds: " + gc.getBounds().x + " " + 
-                                           gc.getBounds().y);
-                        loc.x-= gc.getBounds().x;
-                        loc.y-= gc.getBounds().y;
+
+                    if ((gc.getBounds().x > 0) || (gc.getBounds().y > 0)) {
+                        System.err.println("Offsetting location:" + loc
+                                           + " by gc bounds: "
+                                           + gc.getBounds().x + " "
+                                           + gc.getBounds().y);
+                        loc.x -= gc.getBounds().x;
+                        loc.y -= gc.getBounds().y;
                         System.err.println("new location:" + loc);
                     }
 
@@ -5254,7 +5278,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     }
 
                     if (KmlDataSource.isKmlFile(filename)) {
-                        if(!checkForKmlImageCapture()) return;
+                        if ( !checkForKmlImageCapture()) {
+                            return;
+                        }
                         String kmlFilename = filename;
                         String suffix      = ".png";
                         filename = IOUtil.stripExtension(filename) + suffix;

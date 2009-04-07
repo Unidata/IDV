@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -147,7 +148,24 @@ public class CrossSectionViewManager extends ViewManager {
      */
     protected DisplayMaster doMakeDisplayMaster()
             throws VisADException, RemoteException {
-        return new VerticalXSDisplay(getIdv().getArgsManager().getIsOffScreen());
+        Dimension dimension = getIdv().getStateManager().getViewSize();
+        if (dimension == null) {
+            if ((getFullScreenWidth() > 0) && (getFullScreenHeight() > 0)) {
+                dimension = new Dimension(getFullScreenWidth(),
+                                          getFullScreenHeight());
+            } else if (displayBounds != null) {
+                dimension = new Dimension(displayBounds.width,
+                                          displayBounds.height);
+            }
+        }
+
+        if ((dimension == null) || (dimension.width == 0)
+                || (dimension.height == 0)) {
+            dimension = null;
+        }
+
+        return new VerticalXSDisplay(
+            getIdv().getArgsManager().getIsOffScreen(), dimension);
     }
 
 
@@ -293,8 +311,9 @@ public class CrossSectionViewManager extends ViewManager {
      * @param titlePart The suffix
      */
     public void setDisplayTitle(String titlePart) {
-        if(csBorderTitle!=null) {
-            csBorderTitle.setTitle(getXSDisplay().getName() + " " + titlePart);
+        if (csBorderTitle != null) {
+            csBorderTitle.setTitle(getXSDisplay().getName() + " "
+                                   + titlePart);
             getContents().repaint();
         }
     }

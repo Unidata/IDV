@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -62,7 +63,7 @@ public class VerticalXSDisplay extends XSDisplay {
      * @throws VisADException
      */
     public VerticalXSDisplay() throws VisADException, RemoteException {
-        this(false);
+        this(false, null);
     }
 
 
@@ -71,13 +72,15 @@ public class VerticalXSDisplay extends XSDisplay {
      * RealType.XAxis.
      *
      * @param offScreen are we in offscreen mode
+     * @param dimension _more_
      *
      * @throws RemoteException
      * @throws VisADException
      */
-    public VerticalXSDisplay(boolean offScreen) throws VisADException, RemoteException {
+    public VerticalXSDisplay(boolean offScreen, Dimension dimension)
+            throws VisADException, RemoteException {
         super("Vertical Cross Section", Length.getRealType(),
-              RealType.Altitude,offScreen);
+              RealType.Altitude, offScreen, dimension);
         setAxisParams();
     }
 

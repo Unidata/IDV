@@ -23,6 +23,8 @@
 
 
 
+
+
 package ucar.unidata.idv;
 
 
@@ -353,6 +355,9 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      * @return is interactive
      */
     public boolean getInteractiveMode() {
+        if (true) {
+            return true;
+        }
         return interactiveMode && !getArgsManager().isScriptingMode();
     }
 
