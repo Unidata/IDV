@@ -274,6 +274,26 @@ public class CachedFlatField extends FlatField {
         this.sampleRanges = sampleRanges;
     }
 
+    /**
+     * Override method so we clear the caches on the cloned object
+     * 
+     * @return the clone
+     */
+    public Object clone() {
+        CachedFlatField ccf = (CachedFlatField) super.clone();
+        ccf.clearCachedRange();
+        return ccf;
+    }
+
+
+    /**
+     * Clear the cached ranges
+     */
+    public void clearCachedRange() {
+        sampleRanges = null;
+        ranges = null;
+    }
+
 
 
 
