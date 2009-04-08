@@ -79,6 +79,8 @@ public class LogUtil {
      */
     private static boolean testMode = false;
 
+    private static boolean showErrorsInGui = true;
+
     /** When in test mode this is the list of exceptions that get thrown */
     private static ArrayList exceptions = new ArrayList();
 
@@ -227,6 +229,28 @@ public class LogUtil {
      */
     public static boolean getTestMode() {
         return testMode;
+    }
+
+    public static boolean showGui() {
+        return !getTestMode() && getShowErrorsInGui();
+    }
+
+    /**
+     * set if we show the errors in the gui
+     *
+     * @param v The test mode flag
+     */
+    public static void setShowErrorsInGui(boolean v) {
+        LogUtil.showErrorsInGui = v;
+    }
+
+    /**
+     * Do we show errors in gui
+     *
+     * @return show errors in gui
+     */
+    public static boolean getShowErrorsInGui() {
+        return showErrorsInGui;
     }
 
     /**
@@ -469,7 +493,7 @@ public class LogUtil {
                          (Throwable) exceptions.get(0));
             return;
         }
-        if (LogUtil.getTestMode()) {
+        if (!showGui()) {
             printExceptionsNoGui(errorMessages, exceptions);
             return;
         }
@@ -871,8 +895,7 @@ public class LogUtil {
         }
 
 
-
-        if ( !LogUtil.getTestMode()) {
+        if (showGui()) {
 
             JDialog tmpDialog;
             final JDialog dialog = GuiUtils.createDialog(getCurrentWindow(),
@@ -962,7 +985,7 @@ public class LogUtil {
 
         //        userErrorMessage(log_, msg);
         exc.printStackTrace(System.err);
-        if (LogUtil.getTestMode()) {
+        if (!showGui()) {
             exceptions.add(exc);
             msgs.add(xmsg);
         }
@@ -1056,7 +1079,7 @@ public class LogUtil {
         if (andLog && (log_ != null)) {
             log_.error(msg);
         }
-        if ( !LogUtil.getTestMode()) {
+        if (showGui()) {
             consoleMessage(msg);
             JLabel label = new JLabel(msg);
             GuiUtils.addModalDialogComponent(label);
@@ -1117,7 +1140,7 @@ public class LogUtil {
         if (log_ != null) {
             log_.error(msg);
         }
-        if ( !LogUtil.getTestMode()) {
+        if (showGui()) {
             consoleMessage(msg);
             JComponent msgComponent = getMessageComponent(msg);
             GuiUtils.addModalDialogComponent(msgComponent);
@@ -1145,7 +1168,7 @@ public class LogUtil {
      * @param msg May be a String or a Component
      */
     public static void userErrorMessage(Object msg) {
-        if ( !LogUtil.getTestMode()) {
+        if (showGui()) {
             if ( !(msg instanceof Component)) {
                 msg = new JLabel(msg.toString());
             }
@@ -1153,6 +1176,8 @@ public class LogUtil {
             javax.swing.JOptionPane.showMessageDialog(getCurrentWindow(),
                     msg, "Error", JOptionPane.ERROR_MESSAGE);
             GuiUtils.removeModalDialogComponent((Component) msg);
+        } else {
+            System.err.println(msg);
         }
     }
 
