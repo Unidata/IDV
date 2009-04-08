@@ -1983,7 +1983,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 }
                 sb.append("<GroundOverlay>\n");
                 sb.append("<name>" + ((dttm == null)
-                                      ? image
+                                      ? tail
                                       : dttm.toString()) + "</name>\n");
                 sb.append(XmlUtil.tag(TAG_VISIBILITY, "", visibility));
                 sb.append("<Icon><href>" + tail + "</href></Icon>\n");

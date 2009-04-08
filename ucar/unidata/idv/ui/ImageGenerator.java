@@ -3422,6 +3422,7 @@ public class ImageGenerator extends IdvManager {
                 lastImage = viewManager.getMaster().getImage(false);
                 //                System.err.println(stack);
                 //                System.err.println("TASK CNT:" + taskCnt);
+                imageProperties = new Hashtable();
                 lastImage = processImage((BufferedImage) lastImage,
                                          loopFilename, scriptingNode,
                                          getAllProperties(), viewManager,imageProperties);
@@ -3886,8 +3887,8 @@ public class ImageGenerator extends IdvManager {
                         if(kmlFiles == null) {
                             kmlFiles = new ArrayList();
                             imageProps.put("kmlfiles", kmlFiles);
-                            kmlFiles.add(tmpImageFile);
                         }
+                        kmlFiles.add(tmpImageFile);
 
                         //                        System.out.println(template);
                         ImageUtils.writeImageToFile(
@@ -4003,7 +4004,7 @@ public class ImageGenerator extends IdvManager {
                         display.getSpatialCoordinates(el1, null));
                     lr = display.getScreenCoordinates(
                         display.getSpatialCoordinates(el2, null));
-                    imageProps.put(ATTR_NORTH, new Double(el1.getLatitude().getValue()));
+                     imageProps.put(ATTR_NORTH, new Double(el1.getLatitude().getValue()));
                     imageProps.put(ATTR_WEST, new Double(el1.getLongitude().getValue()));
                     imageProps.put(ATTR_SOUTH, new Double(el2.getLatitude().getValue()));
                     imageProps.put(ATTR_EAST, new Double(el2.getLongitude().getValue()));
