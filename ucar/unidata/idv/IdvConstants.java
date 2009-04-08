@@ -246,6 +246,9 @@ public interface IdvConstants {
     /** Command line argument for evaluating all data choices when in test mode */
     public static final String ARG_TESTEVAL = "-testeval";
 
+    /** Command line argument for not showing errors in gui */
+    public static final String ARG_NOERRORSINGUI = "-noerrorsingui";
+
     /** Command line argument for  running a test */
     public static final String ARG_TRACE = "-trace";
 

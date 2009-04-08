@@ -671,6 +671,7 @@ public class ArgsManager extends IdvManager {
                + msg(ARG_MSG_DEBUG, "(Turn on language pack debug)")
                + msg(ARG_MSG_RECORD, "<Language pack file to write missing entries to>")
                + msg(ARG_TRACE, "(Print out trace messages)")
+               + msg(ARG_NOERRORSINGUI, "(Don't show errors in gui)")
                + msg(ARG_TRACEONLY, "<trace pattern> (Print out trace messages that match the pattern)");
     }
 
@@ -965,6 +966,8 @@ public class ArgsManager extends IdvManager {
             System.err.println(USAGE_MESSAGE);
             System.err.println(getUsageMessage());
             getIdv().exit(0);
+        } else if(arg.equals(ARG_NOERRORSINGUI)) {
+            LogUtil.setShowErrorsInGui(false);
         } else if (arg.equals(ARG_TESTEVAL)) {
             testEval = true;
             testMode = true;
