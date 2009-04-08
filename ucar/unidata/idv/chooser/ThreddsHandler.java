@@ -796,6 +796,7 @@ public class ThreddsHandler extends XmlHandler {
         String serviceType  = CatalogUtil.getServiceType(serviceNode);
 
         String dataSourceId = chooser.getDataSourceId(dataSourcesCbx);
+        System.err.println (dataSourceId + " " + serviceType + " " + dataType);
         if (dataSourceId != null) {
             properties.put(DataManager.DATATYPE_ID, dataSourceId);
         } else {
@@ -805,6 +806,8 @@ public class ThreddsHandler extends XmlHandler {
                                serviceType + "." + dataType);
             } else if (serviceType != null) {
                 //            properties.put(DataManager.DATATYPE_ID, serviceType);
+            } else if (dataType != null) {
+                //                properties.put(DataManager.DATATYPE_ID, dataType);
             }
         }
         //        System.out.println("xml:" + XmlUtil.toString(XmlUtil.findRoot(datasetNode)));
