@@ -112,7 +112,7 @@
   </datasource>
 
   <datasource
-     id="ImageGrid"
+     id="ImageGrid,opendap.Image"
      factory="ucar.unidata.data.grid.ImageGridDataSource"
      patterns="\.gini$"
      fileselection="true"
