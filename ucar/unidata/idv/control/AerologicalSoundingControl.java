@@ -20,10 +20,12 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
 import ucar.unidata.idv.DisplayConventions;
+import ucar.unidata.idv.HodographViewManager;
 import ucar.unidata.idv.SoundingViewManager;
 import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.idv.ViewManager;
@@ -106,6 +108,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
     /** The view manager for this control */
     protected SoundingViewManager soundingView;
+
+    /** The view manager for this control */
+    protected HodographViewManager hodoView;
 
     /**
      * The Skew-T log p display.
@@ -295,11 +300,31 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 "showControlLegend=false;wireframe=false;aniReadout=false;chartType="
                 + displayType);
         }
+        if (hodoView != null) {
+            //If the ViewManager is non-null it means we have been unpersisted.
+            //If so, we initialie the VM with the IDV
+            hodoView.setHodographDisplay(hodoDisplay);
+            hodoView.initAfterUnPersistence(getIdv());
+        } else {
+            hodoView = new HodographViewManager(
+                getViewContext(), hodoDisplay,
+                new ViewDescriptor("SoundingView"),
+                "showControlLegend=false;wireframe=false;aniReadout=false;");
+        }
+        /*
+            visad.java3d.DisplayRendererJ3D dr =
+                (visad.java3d
+                    .DisplayRendererJ3D) hodoDisplay.getDisplay()
+                        .getDisplayRenderer();
+            visad.java3d.KeyboardBehaviorJ3D kb = new visad.java3d.KeyboardBehaviorJ3D(dr);
+            dr.addKeyboardBehavior((visad.java3d.KeyboardBehaviorJ3D) kb);
+        */
 
         //TODO: For now don't do this because it screws up the image dumping.
         //If and when we put this back we need to not destroy the
         //VM in our doRemove method
         addViewManager(soundingView);
+        addViewManager(hodoView);
         // aeroDisplay.setPointMode(true);  // for debugging
         locLabel   = new JLabel(" ", JLabel.LEFT);
         tempProRef = new DataReferenceImpl("TemperatureProfile");
@@ -915,6 +940,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             System.arraycopy(dewPros, 0, dewProfiles, 0, n);
             System.arraycopy(windPros, 0, windProfiles, 0, n);
         }
+        hodoDisplay.clear();
 
         for (int i = 0; i < n; i++) {
             aeroDisplay.addProfile(i, tempProfiles[i], dewProfiles[i],
@@ -1197,18 +1223,16 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         sp.setViewportBorder(
             BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-        JSplitPane spl = GuiUtils.hsplit(sp, soundingView.getContents(), .35);
-        /*
-        JSplitPane spl =
-            GuiUtils
-                .hsplit(sp, GuiUtils
-                    .hsplit(soundingView.getContents(), hodoDisplay
-                        .getComponent(), .50), .35);
-        */
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.add("Sounding Chart", soundingView.getContents());
+        tabs.add("Hodograph", hodoDisplay.getComponent());
+        GuiUtils.handleHeavyWeightComponentsInTabs(tabs);
+
+        //JSplitPane spl = GuiUtils.hsplit(sp, soundingView.getContents(), .35);
+        JSplitPane spl = GuiUtils.hsplit(sp, tabs, .35);
         spl.setOneTouchExpandable(true);
-        Container contents = GuiUtils.topCenterBottom(locLabel,
-        // GuiUtils.hbox(sp, soundingView.getContents(), hodoDisplay.getComponent()),
-        spl, controlArea);
+        Container contents = GuiUtils.topCenterBottom(locLabel, spl,
+                                 controlArea);
 
         return contents;
     }
@@ -1480,6 +1504,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
     private void resetProfile(int index) {
         try {
             aeroDisplay.setOriginalProfiles(index);
+            hodoDisplay.setOriginalProfile(index);
             setSounding(index);
         } catch (Exception excp) {
             logException("Unable to reset sounding", excp);
