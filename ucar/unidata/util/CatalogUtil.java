@@ -83,6 +83,12 @@ public class CatalogUtil {
     /** Xml attribute name for the data set id */
     public static final String ATTR_DATASETID = "id";
 
+
+    public static final String ATTR_METADATATYPE = "metadataType";
+
+
+
+
     /** Xml attribute name for the data set id */
     public static final String VALUE_ANNOTATIONSERVER = "annotationServer";
 
@@ -139,8 +145,32 @@ public class CatalogUtil {
 
 
 
-    /** Xml tag name for the property tag for a dataset */
-    public static final String TAG_PROPERTY = "property";
+
+
+    /** _more_ */
+    public static final String TAG_NAME = "name";
+
+    /** _more_ */
+    public static final String TAG_CONTACT = "contact";
+
+
+    /** _more_ */
+    public static final String TAG_GEOSPATIALCOVERAGE = "geospatialCoverage";
+
+    /** _more_ */
+    public static final String TAG_TIMECOVERAGE = "timeCoverage";
+
+    /** _more_ */
+    public static final String TAG_START = "start";
+
+    /** _more_ */
+    public static final String TAG_END = "end";
+
+    /** _more_ */
+    public static final String TAG_DATASIZE = "dataSize";
+
+    /** _more_ */
+    public static final String TAG_DATE = "date";
 
 
     /** Tag name for the xml node &quot;access&quot; */
@@ -181,6 +211,12 @@ public class CatalogUtil {
 
     /** Tag name for the xml node &quot;serviceName&quot; */
     public static final String TAG_SERVICENAME = "serviceName";
+
+    /** Attribute name for the xml node &quot;units&quot; */
+    public static final String ATTR_UNITS = "units";
+
+    /** Tag name for the xml node &quot;property&quot; */
+    public static final String TAG_PROPERTY = "property";
 
     /** Attribute name for the xml attribute &quot;action &quot; */
     public static final String ATTR_ACTION = "action";
@@ -579,7 +615,7 @@ public class CatalogUtil {
      *
      * @param datasetNode The dataset node we are looking at.
      * @param root The root of the xml tree
-     * @param version The catalog version
+     * @param version The catalog version<
      * @param firstCall Is this the leaf node
      * @return The name of the service that provides this dataset.
      */
