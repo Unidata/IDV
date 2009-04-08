@@ -707,10 +707,12 @@ public class VerticalProfileControl extends LineProbeControl {
                 "Can't convert position to navigable point");
         }
 
+        List localInfos = new ArrayList(infos);
         List chartInfos = new ArrayList();
-        for (int i = 0; i < infos.size(); i++) {
+        for (int i = 0; i < localInfos.size(); i++) {
 
-            VerticalProfileInfo info = (VerticalProfileInfo) infos.get(i);
+            VerticalProfileInfo info = (VerticalProfileInfo) localInfos.get(i);
+            if(info == null|| info.getDataInstance()==null) continue;
             FieldImpl newFI = GridUtil.getProfileAtLatLonPoint(
                                   info.getDataInstance().getGrid(), llp,
                                   info.getSamplingMode());
