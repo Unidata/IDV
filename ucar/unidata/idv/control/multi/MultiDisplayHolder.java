@@ -1448,7 +1448,7 @@ public class MultiDisplayHolder extends DisplayControlImpl {
      */
     public void setTimeInMainDisplay(double timeValue) {
         try {
-            Animation anime = getAnimation();
+            Animation anime = getSomeAnimation();
             if (anime.getNumSteps() <= 1) {
                 return;
             }

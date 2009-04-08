@@ -1053,7 +1053,7 @@ public abstract class DrawingGlyph {
             return;
         }
 
-        Animation animation = control.getAnimation();
+        Animation animation = control.getSomeAnimation();
         if (animation == null) {
             setVisible(true);
             return;

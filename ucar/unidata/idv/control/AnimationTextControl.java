@@ -120,7 +120,7 @@ public class AnimationTextControl extends DisplayControlImpl implements Hyperlin
     public void initDone() {
         super.initDone();
         try {
-            Animation animation = getAnimation();
+            Animation animation = getViewAnimation();
             if (animation != null) {
                 setTime(animation.getAniValue());
             }

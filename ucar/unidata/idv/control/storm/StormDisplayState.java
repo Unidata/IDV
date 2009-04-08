@@ -416,9 +416,10 @@ public class StormDisplayState {
 
             //            System.err.println ("looking");
             Real animationTime = null;
-            if (stormTrackControl.getAnimation() != null) {
+            Animation animation =stormTrackControl.getViewAnimation();
+            if (animation != null) {
                 animationTime =
-                    stormTrackControl.getAnimation().getAniValue();
+                    animation.getAniValue();
             }
             if (animationTime == null) {
                 //                System.err.println ("no animation");
@@ -1896,7 +1897,7 @@ public class StormDisplayState {
     //        ucar.visad.Util.makeTimeField(List<Data> ranges, List times)
 
     /**
-     *    Animation animation = stormTrackControl.getAnimation();
+     *    Animation animation = stormTrackControl.getViewAnimation();
      *    if (animation == null) {
      *       return;
      *   }

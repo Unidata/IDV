@@ -198,7 +198,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     private boolean listeningForTimes = false;
 
     /** time label animation */
-    private Animation animation;
+    private Animation viewAnimation;
+
+    private Animation internalAnimation;
 
     /** Animation info */
     private AnimationInfo animationInfo;
@@ -1077,14 +1079,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
 
-
         //Force the creation of the animation widget
         if (shouldAddAnimationListener()) {
-            getAnimation();
+            getSomeAnimation();
         }
 
         initDone();
-
 
 
         if (componentHolder != null) {
@@ -2515,8 +2515,16 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public void propertyChange(PropertyChangeEvent evt) {
         if (initializationDone && getActive()
                 && evt.getPropertyName().equals(Animation.ANI_VALUE)) {
-            if (animation != null) {
-                //                System.err.println ("Time changed:" +animation.getAniValue());
+
+            Animation animation  = null;
+            if(evt.getSource()!=null && evt.getSource() instanceof Animation) {
+                animation =(Animation)evt.getSource();
+            }
+            if(animation == null) {
+                animation = (internalAnimation!=null?internalAnimation:viewAnimation);
+            }
+
+            if(animation!=null) {
                 timeChanged(animation.getAniValue());
             }
         }
@@ -5643,11 +5651,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 || hasTimeMacro(extraLabelTemplate)
                 || hasTimeMacro(getDisplayListTemplate())) {
             try {
-                if (animation == null) {
-                    getAnimation();
+                if (internalAnimation == null && viewAnimation==null) {
+                    getSomeAnimation();
                 }
-                if (animation != null) {
-                    timeChanged(animation.getAniValue());
+                if (internalAnimation != null) {
+                    timeChanged(internalAnimation.getAniValue());
+                } else if (viewAnimation != null) {
+                    timeChanged(viewAnimation.getAniValue());
                 }
             } catch (Exception exc) {
                 logException("Getting animation", exc);
@@ -6406,9 +6416,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             myWindow.removeWindowListener(windowListener);
         }
 
-        if (animation != null) {
-            animation.removePropertyChangeListener(this);
-            animation = null;
+        if (viewAnimation != null) {
+            viewAnimation.removePropertyChangeListener(this);
+            viewAnimation = null;
+        }
+
+
+        if (internalAnimation != null) {
+            internalAnimation.removePropertyChangeListener(this);
+            internalAnimation = null;
         }
 
         displayUnit = null;
@@ -7593,8 +7609,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         if (time == null) {
             try {
-                if (getAnimation() != null) {
-                    time = getAnimation().getAniValue();
+                Animation animation = getSomeAnimation();
+                if (animation != null) {
+                    time = animation.getAniValue();
                 }
             } catch (Exception exc) {
                 logException("Getting animation", exc);
@@ -10348,10 +10365,29 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Update the animation for the view manager
      */
     protected void updateAnimation() {
-        if (animation != null) {
-            animation.reCalculateAnimationSet();
+        if (internalAnimation != null) {
+            internalAnimation.reCalculateAnimationSet();
+        }
+        if (viewAnimation != null) {
+            viewAnimation.reCalculateAnimationSet();
         }
     }
+
+
+    /**
+     * Get some animation.
+     *
+     * @return The animation
+     *
+     * @throws RemoteException On Badness
+     * @throws VisADException On Badness
+     */
+    public Animation getSomeAnimation() throws VisADException, RemoteException {
+        return getAnimation();
+
+    }
+
+
 
     /**
      * Get the animation
@@ -10412,24 +10448,97 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected Animation getAnimation(boolean createOurOwn, RealType timeType)
             throws VisADException, RemoteException {
-        if (animation == null) {
-            if ( !createOurOwn) {
-                ViewManager viewManager = getViewManager();
+
+        if(createOurOwn) {
+            return getInternalAnimation(timeType);
+        }
+
+        //For backwards compatability
+        if(internalAnimation !=null) {
+            return internalAnimation;
+        }
+
+        return getViewAnimation();
+    }
+
+
+
+    /**
+     * Get the Animation that is from the view manager for this control
+     *
+     * @return The Animation
+     *
+     * @throws RemoteException On Badness
+     * @throws VisADException On Badness
+     */
+    public Animation getViewAnimation()
+        throws VisADException, RemoteException {
+        if (viewAnimation == null) {
+            ViewManager viewManager = null;
+            //First check for our own ViewManager
+            if(viewManagers!=null && viewManagers.size()>0) {
+                viewManager = (ViewManager) viewManagers.get(0);
+                viewAnimation = viewManager.getAnimation();
+            }
+            if(viewAnimation==null) {
+                viewManager = getViewManager();
                 if (viewManager == null) {
                     return null;
                 }
-                animation = viewManager.getAnimation();
-            } else {
-                if (timeType == null) {
-                    animation = new Animation();
-                } else {
-                    animation = new Animation(timeType);
-                }
+                viewAnimation = viewManager.getAnimation();
             }
-            animation.addPropertyChangeListener(this);
+
+            if(viewAnimation==null) {
+                return null;
+            }
+            viewAnimation.addPropertyChangeListener(this);
         }
-        return animation;
+        return viewAnimation;
     }
+
+
+
+
+
+
+
+    /**
+     * Create if needed and return an Animation
+     *
+     * @return The Animation
+     *
+     * @throws RemoteException On Badness
+     * @throws VisADException On Badness
+     */
+    protected Animation getInternalAnimation()
+            throws VisADException, RemoteException {
+        return getInternalAnimation(null);
+    }
+
+
+    /**
+     * Create if needed and return an Animation
+     *
+     * @return The Animation
+     *
+     * @throws RemoteException On Badness
+     * @throws VisADException On Badness
+     */
+    protected Animation getInternalAnimation(RealType timeType)
+            throws VisADException, RemoteException {
+
+        if(internalAnimation !=null)
+            return internalAnimation;
+        if (timeType == null) {
+            internalAnimation = new Animation();
+        } else {
+            internalAnimation = new Animation(timeType);
+        }
+        internalAnimation.addPropertyChangeListener(this);
+        return internalAnimation;
+    }
+
+
 
 
     /**
@@ -10452,7 +10561,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 }
             }
             animationWidget = new AnimationWidget(null, null, animationInfo);
-            getAnimation(true);
+            Animation animation =  getInternalAnimation();
             animation.setAnimationInfo(animationInfo);
             if ( !initializationDone) {
                 animationWidget.setSharing(false);

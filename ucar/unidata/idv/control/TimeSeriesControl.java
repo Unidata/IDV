@@ -429,7 +429,7 @@ public class TimeSeriesControl extends LineProbeControl {
      */
     private void updateIndicatorPosition()
             throws VisADException, RemoteException {
-        Animation anime = getAnimation();
+        Animation anime = getViewAnimation();
         if (anime == null) {
             return;
         }

@@ -1023,7 +1023,7 @@ public class StationModelControl extends ObsDisplayControl {
         }
         boolean isTimeSequence = GridUtil.isTimeSequence(data);
         if (isTimeSequence) {
-            return (FieldImpl) data.evaluate(getAnimation().getAniValue(),
+            return (FieldImpl) data.evaluate(getViewAnimation().getAniValue(),
                                              Data.NEAREST_NEIGHBOR,
                                              Data.NO_ERRORS);
         }
@@ -1450,7 +1450,7 @@ public class StationModelControl extends ObsDisplayControl {
             Real      startReal = new Real(RealType.Time, timeRange.getMin());
             Real      endReal   = new Real(RealType.Time, timeRange.getMax());
 
-            Animation anime     = getAnimation();
+            Animation anime     = getViewAnimation();
             Real      aniValue  = ((anime != null)
                                    ? anime.getAniValue()
                                    : null);
@@ -1657,7 +1657,7 @@ public class StationModelControl extends ObsDisplayControl {
             Trace.call2("StationModelControl.loadData");
 
             //Force adding a listener to the animation
-            getAnimation();
+            getViewAnimation();
 
             //Anything selected from before
             if ((selectedObId != null) || (selectedObLocation != null)) {

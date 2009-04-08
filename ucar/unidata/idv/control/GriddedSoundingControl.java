@@ -498,9 +498,10 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
                 /*
                  * Set the animation.
                  */
+                Animation animation = getInternalAnimation(timeType);
                 getSoundingView().setExternalAnimation(
-                    getAnimation(timeType), getAnimationWidget());
-                aeroDisplay.addDisplayable(getAnimation(timeType));
+                                                       animation, getAnimationWidget());
+                aeroDisplay.addDisplayable(animation);
                 aeroDisplay.addDisplayable(timesHolder);
 
                 Container container = Box.createHorizontalBox();

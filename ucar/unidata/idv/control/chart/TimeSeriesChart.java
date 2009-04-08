@@ -1051,7 +1051,7 @@ public class TimeSeriesChart extends XYChartManager {
                           ValueAxis domainAxis, ValueAxis rangeAxis,
                           int rendererIndex, PlotRenderingInfo info) {
         try {
-            Animation animation = control.getAnimation();
+            Animation animation = control.getSomeAnimation();
             if (animation == null) {
                 return;
             }

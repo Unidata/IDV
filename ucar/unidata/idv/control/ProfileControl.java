@@ -188,7 +188,7 @@ public class ProfileControl extends LineProbeControl {
         }
 
         profileDisplay.setDisplayables(new Displayable[] { points, line,
-                getAnimation(true) });
+                getInternalAnimation() });
         profileDisplay.draw();
         profileDisplay.getYAxisScale().setSnapToBox(true);
 
@@ -229,8 +229,6 @@ public class ProfileControl extends LineProbeControl {
      */
     public void getControlWidgets(List controlWidgets)
             throws VisADException, RemoteException {
-        //Make our own animation
-        getAnimation(true);
         controlWidgets.add(new WrapperWidget(this,
                                              GuiUtils.rLabel("Parameter:"),
                                              paramLabel));

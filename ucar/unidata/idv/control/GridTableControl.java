@@ -173,7 +173,7 @@ public class GridTableControl extends GridDisplayControl {
     public void timeChanged(Real time) {
         try {
             super.timeChanged(time);
-            int current = getAnimation(true).getCurrent();
+            int current = getInternalAnimation(null).getCurrent();
             if (current >= 0) {
                 cardLayoutPanel.show(current);
             }

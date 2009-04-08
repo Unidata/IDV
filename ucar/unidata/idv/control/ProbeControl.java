@@ -308,7 +308,7 @@ public class ProbeControl extends DisplayControlImpl {
 
 
         timeLabel = new JLabel("   ");
-        getAnimation(true);
+        getInternalAnimation();
         aniWidget = getAnimationWidget().getContents();
 
         probe     = new PointProbe(0.0, 0.0, 0.0);
@@ -792,16 +792,6 @@ public class ProbeControl extends DisplayControlImpl {
         if (myTimes == null) {
             return;
         }
-        /*  We used to merge with main display, not just have our own
-        Animation animation = getAnimation();
-        Set       aniSet    = animation.getSet();
-        if (aniSet == null) {
-            animation.setSet(myTimes);
-        } else if ( !aniSet.equals(myTimes)) {
-            myTimes = aniSet.merge1DSets(myTimes);
-            animation.setSet(myTimes);
-        }
-        */
         getAnimationWidget().setBaseTimes(myTimes);
     }
 
@@ -1835,7 +1825,7 @@ public class ProbeControl extends DisplayControlImpl {
         if ( !getHaveInitialized() || !getActive()) {
             return;
         }
-        Animation animation = getAnimation(true);
+        Animation animation = getInternalAnimation();
         int       step      = (animation != null)
                               ? animation.getCurrent()
                               : 0;
@@ -2453,9 +2443,9 @@ public class ProbeControl extends DisplayControlImpl {
      */
     public void exportCsv() {
         try {
-            Animation animation = getAnimation(true);
+            Animation animation = getInternalAnimation();
             int       step      = animation.getCurrent();
-            Set       aniSet    = getAnimation(true).getSet();
+            Set       aniSet    = animation.getSet();
             Real[]    times     = Animation.getDateTimeArray(aniSet);
             if (times.length == 0) {
                 return;
@@ -2475,7 +2465,8 @@ public class ProbeControl extends DisplayControlImpl {
      */
     public void exportCsvAllTimes() {
         try {
-            Set    aniSet = getAnimation(true).getSet();
+            Animation animation = getInternalAnimation();
+            Set    aniSet = animation.getSet();
             Real[] times  = Animation.getDateTimeArray(aniSet);
             exportToCsv(times);
             paramsTable.repaint();

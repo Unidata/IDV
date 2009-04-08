@@ -262,7 +262,7 @@ public class ChatLogControl extends DisplayControlImpl {
      */
     protected void timeChanged(Real time) {
         try {
-            int theIndex = getAnimation(true).getCurrent();
+            int theIndex = getInternalAnimation(null).getCurrent();
             if (theIndex >= 0) {
                 table.setRowSelectionInterval(theIndex, theIndex);
                 GuiUtils.makeRowVisible(table, theIndex);

@@ -758,7 +758,7 @@ public class JythonControl extends GridDisplayControl {
      * @throws VisADException On badness
      */
     public Real getAnimationTime() throws RemoteException, VisADException {
-        Animation animation = getAnimation(false);
+        Animation animation = getViewAnimation();
         if (animation != null) {
             return animation.getAniValue();
         }
@@ -775,7 +775,7 @@ public class JythonControl extends GridDisplayControl {
      * @throws VisADException On badness
      */
     public List getAnimationTimes() throws RemoteException, VisADException {
-        Animation animation = getAnimation(false);
+        Animation animation = getViewAnimation();
         if (animation != null) {
             Set set = animation.getSet();
             return Util.toList(set);

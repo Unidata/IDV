@@ -1060,7 +1060,7 @@ public class ImageMovieControl extends DisplayControlImpl {
     protected void timeChanged(Real time) {
         super.timeChanged(time);
         try {
-            getImagePanel().setSelectedFile(getAnimation(true).getCurrent());
+            getImagePanel().setSelectedFile(getInternalAnimation().getCurrent());
         } catch (Exception exc) {
             logException("Error setting time", exc);
         }
@@ -1333,9 +1333,9 @@ public class ImageMovieControl extends DisplayControlImpl {
 
             //Make sure we create the animation before we call setAnimationSet
             getImagePanel().setFiles(files);
-            getAnimation(true);
+            Animation animation = getInternalAnimation();
             setAnimationSet(times);
-            getAnimation(true).setCurrent(files.size() - 1);
+            animation.setCurrent(files.size() - 1);
 
             String group = XmlUtil.getAttribute(imageSetRoot, ATTR_GROUP, "");
             String desc  = XmlUtil.getAttribute(imageSetRoot, ATTR_DESC, "");

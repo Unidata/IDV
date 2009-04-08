@@ -283,7 +283,7 @@ public class TrackControl extends GridDisplayControl {
         selectRangeDisplay = new SelectRangeDisplayable();
         addDisplayable(selectRangeDisplay,
                        FLAG_DISPLAYUNIT | FLAG_SELECTRANGE);
-        getAnimation();
+        getViewAnimation();
         indicator = new StationModelDisplayable("indicator");
         indicator.setScale(markerScale);
         indicator.setShouldUseAltitude(true);
@@ -838,7 +838,7 @@ public class TrackControl extends GridDisplayControl {
 
 
 
-            Animation anime    = getAnimation();
+            Animation anime    = getViewAnimation();
             Real      aniValue = ((anime != null)
                                   ? anime.getAniValue()
                                   : null);

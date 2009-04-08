@@ -860,7 +860,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             if (ignoreTimeChanges) {
                 return;
             }
-            int idx = getAnimation().getCurrent();
+            int idx = getInternalAnimation().getCurrent();
             if ((idx >= 0) && (idx < products.size())) {
                 setText(products.get(idx).getContent(), true);
             } else {

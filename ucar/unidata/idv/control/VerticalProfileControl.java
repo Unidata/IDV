@@ -155,7 +155,6 @@ public class VerticalProfileControl extends LineProbeControl {
             }
         };
         latLonWidget = new LatLonWidget("Lat: ", "Lon: ", llListener);
-        getAnimation(true);
         aniWidget = getAnimationWidget().getContents(false);
         setContents(doMakeContents());
         doMakeProbe();
@@ -877,16 +876,6 @@ public class VerticalProfileControl extends LineProbeControl {
         if (myTimes == null) {
             return;
         }
-        /*  We used to merge with main display, not just have our own
-        Animation animation = getAnimation();
-        Set       aniSet    = animation.getSet();
-        if (aniSet == null) {
-            animation.setSet(myTimes);
-        } else if ( !aniSet.equals(myTimes)) {
-            myTimes = aniSet.merge1DSets(myTimes);
-            animation.setSet(myTimes);
-        }
-        */
         getAnimationWidget().setBaseTimes(myTimes);
     }
 

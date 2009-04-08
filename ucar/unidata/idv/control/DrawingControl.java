@@ -374,7 +374,7 @@ public class DrawingControl extends DisplayControlImpl {
         }
         setDisplayActive();
 
-        getAnimation();
+        getViewAnimation();
         checkGlyphTimes();
         if (dataChoice != null) {
             Data data = dataChoice.getData(null);
@@ -2145,7 +2145,7 @@ public class DrawingControl extends DisplayControlImpl {
      */
     public DateTime[] getAllTimes() throws VisADException, RemoteException {
         DateTime[] times     = null;
-        Animation  animation = getAnimation();
+        Animation  animation = getViewAnimation();
         if (animation == null) {
             return times;
         }
@@ -2171,7 +2171,7 @@ public class DrawingControl extends DisplayControlImpl {
      * @throws VisADException On Badness
      */
     public Real getCurrentTime() throws VisADException, RemoteException {
-        Animation animation = getAnimation();
+        Animation animation = getViewAnimation();
         if (animation == null) {
             return null;
         }
@@ -2195,7 +2195,7 @@ public class DrawingControl extends DisplayControlImpl {
      * @throws VisADException On badness
      */
     public Set getAnimationSet() throws VisADException, RemoteException {
-        Animation animation = getAnimation();
+        Animation animation = getViewAnimation();
         if (animation == null) {
             return null;
         }
@@ -2219,7 +2219,7 @@ public class DrawingControl extends DisplayControlImpl {
         if ( !useTimeCbx.isSelected()) {
             return null;
         }
-        Animation animation = getAnimation();
+        Animation animation = getViewAnimation();
         if (animation == null) {
             return null;
         }
