@@ -8,9 +8,9 @@ exec jar -xvf ../thredds.war
 cd WEB-INF/classes
 ##exec rm -r org/apache/log4j
 foreach jar [glob ../lib/*.jar] {
-    if {[regexp log4 $jar]} {
-#        puts "skipping $jar"
-#        continue
+    if {[regexp jfree $jar]} {
+        puts "skipping $jar"
+        continue
     }
     if {[regexp slf4j $jar]} {
         puts "***** skipping $jar"
