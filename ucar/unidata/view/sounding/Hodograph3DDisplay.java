@@ -20,7 +20,19 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.view.sounding;
+
+
+import ucar.visad.display.*;
+import ucar.visad.functiontypes.*;
+import ucar.visad.quantities.*;
+
+import visad.*;
+
+import visad.data.units.DefaultUnitsDB;
+
+import visad.java3d.*;
 
 
 
@@ -36,15 +48,6 @@ import java.util.*;
 import javax.media.j3d.Transform3D;
 
 import javax.swing.*;
-
-import ucar.visad.display.*;
-import ucar.visad.functiontypes.*;
-import ucar.visad.quantities.*;
-
-import visad.*;
-import visad.data.units.DefaultUnitsDB;
-
-import visad.java3d.*;
 
 
 /**
@@ -176,8 +179,9 @@ public class Hodograph3DDisplay extends WindProfileDisplay {
     public Hodograph3DDisplay(Real minZ, Real maxZ, Real maxW)
             throws VisADException, RemoteException {
 
-        super(new DisplayImplJ3D("Hodograph3D", new HodographDisplayRendererJ3D()),
-              minZ, maxZ, 7, Display.ZAxis);
+        super(new DisplayImplJ3D("Hodograph3D",
+                                 new HodographDisplayRendererJ3D()), minZ,
+                                     maxZ, 7, Display.ZAxis);
 
         maxDisplaySpeed = maxW;
         autoscaleSpeed  = true;
@@ -185,9 +189,13 @@ public class Hodograph3DDisplay extends WindProfileDisplay {
         ringIncrement   = maxW;
 
         // Set up the display.  Set projection policy to non-perspective.
-        GraphicsModeControl gmc = getDisplay().getGraphicsModeControl();
-
+        DisplayImpl         display  = (DisplayImpl) getDisplay();
+        GraphicsModeControl gmc      = display.getGraphicsModeControl();
+        DisplayRenderer     dispRend = display.getDisplayRenderer();
         gmc.setProjectionPolicy(0);
+
+        ((DisplayRendererJ3D) dispRend).addKeyboardBehavior(
+            new KeyboardBehaviorJ3D((DisplayRendererJ3D) dispRend));
 
         // Have display fill up the screen.
         {
@@ -300,6 +308,7 @@ public class Hodograph3DDisplay extends WindProfileDisplay {
                 }
             }
         });
+
         setRingSpeeds();
         setWindScalarMapRanges();
         setCenterPoleExtent();
@@ -332,9 +341,8 @@ public class Hodograph3DDisplay extends WindProfileDisplay {
             synchronized (Hodograph3DDisplay.class) {
                 if (defaultMaxSpeed == null) {
                     try {
-                        defaultMaxSpeed =
-                            new Real(Speed.getRealType(), 100,
-                                     DefaultUnitsDB.instance().get("kt"));
+                        defaultMaxSpeed = new Real(Speed.getRealType(), 100,
+                                DefaultUnitsDB.instance().get("kt"));
                     } catch (Exception e) {
                         throw new VisADException(e.getMessage());
                     }
@@ -546,9 +554,12 @@ public class Hodograph3DDisplay extends WindProfileDisplay {
             setDisplayAltitudes(
                 new Linear1DSet(
                     GeopotentialAltitude.getRealType(), min, max,
-                    1 + (int) Math.round(extent / computeIncrement(extent, 5)),
-                    (CoordinateSystem) null, new Unit[]{ unit },
-                    (ErrorEstimate[]) null));
+                    1 + (int) Math.round(
+                        extent
+                        / computeIncrement(
+                            extent, 5)), (CoordinateSystem) null,
+                                         new Unit[] { unit },
+                                         (ErrorEstimate[]) null));
         }
     }
 
@@ -566,7 +577,7 @@ public class Hodograph3DDisplay extends WindProfileDisplay {
         setRingSpeeds(new Linear1DSet(PolarHorizontalWind.getSpeedRealType(),
                                       increment, max,
                                       (int) Math.round(max / increment),
-                                      null, new Unit[]{ spdUnit }, null));
+                                      null, new Unit[] { spdUnit }, null));
     }
 
     /**
@@ -658,6 +669,18 @@ public class Hodograph3DDisplay extends WindProfileDisplay {
     }
 
     /**
+     * Resets the original sounding in the specified sounding.
+     *
+     * @param index             The index of the sounding.
+     * @throws VisADException   VisAD failure.
+     * @throws RemoteException  Java RMI failure.
+     */
+    public void setOriginalProfile(int index)
+            throws VisADException, RemoteException {
+        getWindProfileSet().setOriginalProfile(index);
+    }
+
+    /**
      * Sets the maximum, displayed, wind speed.
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
@@ -673,9 +696,9 @@ public class Hodograph3DDisplay extends WindProfileDisplay {
             if ( !Double.isNaN(spd) && !Double.isInfinite(spd) && (spd > 0)
                     && !Double.isNaN(inc) && !Double.isInfinite(inc)
                     && (inc > 0)) {
-                setMaxDisplaySpeed(new Real(Speed.getRealType(),
-                                            Math.ceil(spd / inc) * inc,
-                                            unit));
+                Real max = new Real(Speed.getRealType(),
+                                    Math.ceil(spd / inc) * inc, unit);
+                setMaxDisplaySpeed(max);
             }
         }
     }
@@ -693,6 +716,9 @@ public class Hodograph3DDisplay extends WindProfileDisplay {
             maxDisplaySpeed = speed;
 
             setWindScalarMapRanges();
+            if (isAutoscaleSpeed()) {
+                setRingIncrement();
+            }
             setRingSpeeds();
         }
     }
@@ -883,10 +909,4 @@ public class Hodograph3DDisplay extends WindProfileDisplay {
         h3d.draw();
     }
 }
-
-
-
-
-
-
 
