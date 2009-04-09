@@ -261,7 +261,7 @@ public class TwoFacedObject implements Comparable {
      * @param id  object to search for
      * @param l   list of TwoFacedObjects objects
      *
-     * @return
+     * @return the label
      */
     public static String findLabel(Object id, List l) {
         if (id == null) {

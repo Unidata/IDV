@@ -4043,7 +4043,6 @@ public class GuiUtils extends LayoutUtil {
      *
      * @param header  a header to prepend to the table
      * @param model The table model to write
-     * @param model The table model to write
      */
     public static void exportAsCsv(String header, TableModel model) {
         exportAsCsv(header, model, false);
