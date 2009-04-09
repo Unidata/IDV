@@ -347,6 +347,8 @@ The [isl::tag write] tag allows you to write out an intermediate image file at a
 }]
 
 
+
+
 [isl::tagdef colorbar {Add a color bar to an image} -attrs {
                display {optional id of display to use. If not defined then this will use all colorbars found}
                width {bar width} 
@@ -383,6 +385,28 @@ That makes:
 [ht::cimg images/colorbar.png]
 
 
+
+
+[isl::tagdef kmlcolorbar {Write a colorbar into the kmz file} -attrs {
+        width {width of color bar image} height {height of color bar image}
+        file {file to write color bar image to} 
+        space {extra padding around image} suffix {label suffix - can include  &quot;%unit%&quot}
+        kml.name {Name used in kml for this image}
+        kml.overlayXY.x {see below} kml.overlayXY.y {see below} kml.overlayXY.xunits {see below} kml.overlayXY.yunits {see below}
+        kml.screenXY.x {see below} kml.screenXY.y {see below} kml.screenXY.xunits {see below} kml.screenXY.yunits {see below}}]
+The [isl::tag kmlcolorbar] tag acts just like the  [isl::tag colorbar] tag but is intended to generate a separate
+color bar image (written to the file specified by the <i>file</i>  attribute) and include it into a KMZ file.
+<p>
+All of the <i>kml.</i> attributes are simply passed into the generated KML file and are used to place the image
+into Google Earth. These attributes are the attributes and tags in the KML.
+For example, the attribute <i>kml.overlayXY.x</i> ends up being the <i>x</i> attribute
+of the <i>overlayXY</i> tag in the KML.
+See here <a href="http://code.google.com/apis/kml/documentation/kmlreference.html#screenoverlay">
+http://code.google.com/apis/kml/documentation/kmlreference.html#screenoverlay</a> for more info on the KML.
+<p>
+Here is an example:
+
+[isl::importxml kmlcolorbar.isl]
 
 
 
