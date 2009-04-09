@@ -100,7 +100,7 @@
      label="netCDF/GEMPAK Point Data files"/>
 
   <datasource
-     id="NetCDF.Grid,HTTPServer.Grid,File.Grid"
+     id="File.Grid,NetCDF.Grid,HTTPServer.Grid"
      factory="ucar.unidata.data.grid.GeoGridDataSource"
      patterns="\.nc$,\.cdf$,.*netCDF.*,\.ncml$,\.wmo$,\.WMO$,\.grb$,\.grib$,\.gr2,\.grib1$,\.grib2$,\.gem$,\.grd,GRID....$"
      fileselection="true"
