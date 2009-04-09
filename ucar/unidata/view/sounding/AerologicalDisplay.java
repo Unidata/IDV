@@ -22,7 +22,6 @@
 
 
 
-
 package ucar.unidata.view.sounding;
 
 
@@ -40,7 +39,6 @@ import visad.*;
 import visad.java2d.*;
 
 import visad.java3d.*;
-
 
 
 import java.awt.Color;
