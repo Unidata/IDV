@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.visad.display;
 
 
@@ -186,7 +187,7 @@ abstract public class DisplayMaster {
     private int[][] wheelEventMap = EventMap.IDV_WHEEL_FUNCTIONS;
 
 
-    /** _more_          */
+    /** maps the mouse function */
     private int[][][] mouseFunctionMap;
 
     /**
@@ -259,6 +260,14 @@ abstract public class DisplayMaster {
     private Animation animation = null;
 
     /**
+     * Parameterless ctor. Note: If you instantiate a DisplayMaster
+     * through this constructor you must also call the init method.
+     */
+    public DisplayMaster() {}
+
+
+
+    /**
      * Constructs from a Display.
      *
      * @param display           The VisAD display.
@@ -269,12 +278,6 @@ abstract public class DisplayMaster {
             throws VisADException, RemoteException {
         this(display, 1);
     }
-
-    /**
-     * Parameterless ctor. Note: If you instantiate a DisplayMaster
-     * through this constructor you must also call the init method.
-     */
-    public DisplayMaster() {}
 
 
     /**
@@ -288,53 +291,28 @@ abstract public class DisplayMaster {
      */
     public DisplayMaster(DisplayImpl display, int initialCapacity)
             throws VisADException, RemoteException {
+
+        this(display, initialCapacity, null);
+    }
+
+
+    /**
+     * Constructs from a VisAD display and an anticipated number of
+     * {@link Displayable}s.
+     *
+     * @param display               The VisAD display.
+     * @param initialCapacity       The anticipated number of Displayable-s.
+     * @param offscreenDimension     Use this to set the dimension of the offscreen component
+     * @throws VisADException       VisAD failure.
+     * @throws RemoteException      Java RMI failure.
+     */
+    public DisplayMaster(DisplayImpl display, int initialCapacity,
+                         Dimension offscreenDimension)
+            throws VisADException, RemoteException {
+        setOffscreenDimension(offscreenDimension);
         init(display, initialCapacity);
     }
 
-
-
-
-    /**
-     * For offscreen rendering
-     *
-     * @param dim The screen dimension
-     */
-    protected void setOffscreenDimension(Dimension dim) {
-        offscreenDimension = dim;
-    }
-
-    /**
-     * Get the off screen dimension
-     *
-     * @return off screen dimension
-     */
-    protected Dimension getOffscreenDimension() {
-        return offscreenDimension;
-    }
-
-
-    /**
-     * Returns the component of the display. If in offscreen mode
-     * returns the offscreenComponent
-     *
-     * @return Display component
-     */
-    public Component getDisplayComponent() {
-        Component comp = display.getComponent();
-        if (comp == null) {
-            comp = offscreenComponent;
-        }
-        return comp;
-    }
-
-    /**
-     * Helper to get the screen bounds
-     *
-     * @return Bounds
-     */
-    public Rectangle getScreenBounds() {
-        return getDisplayComponent().getBounds();
-    }
 
 
     /**
@@ -366,12 +344,7 @@ abstract public class DisplayMaster {
                 }
             });
         } else {
-            offscreenComponent = new JPanel();
-            if (offscreenDimension == null) {
-                offscreenDimension = new Dimension(600, 400);
-            }
-            offscreenComponent.setSize(offscreenDimension);
-            jPanel.add(offscreenComponent);
+            jPanel.add(getOffscreenComponent());
         }
         saveProjection();
         jPanel.setAlignmentX(0.5f);
@@ -414,6 +387,70 @@ abstract public class DisplayMaster {
         changeListeners   = new PropertyChangeSupport(this);
         vetoableListeners = new VetoableChangeSupport(this);
     }
+
+
+
+
+
+    /**
+     * For offscreen rendering
+     *
+     * @param dim The screen dimension
+     */
+    protected void setOffscreenDimension(Dimension dim) {
+        offscreenDimension = dim;
+    }
+
+    /**
+     * Get the off screen dimension
+     *
+     * @return off screen dimension
+     */
+    protected Dimension getOffscreenDimension() {
+        return offscreenDimension;
+    }
+
+
+    /**
+     * Get the offscreen component sized using the offscreenDimension
+     *
+     * @return offscreen component
+     */
+    private Component getOffscreenComponent() {
+        if (offscreenComponent == null) {
+            offscreenComponent = new JPanel();
+            if (offscreenDimension == null) {
+                offscreenDimension = new Dimension(600, 400);
+            }
+            offscreenComponent.setSize(offscreenDimension);
+        }
+        return offscreenComponent;
+    }
+
+
+    /**
+     * Returns the component of the display. If in offscreen mode
+     * returns the offscreenComponent
+     *
+     * @return Display component
+     */
+    public Component getDisplayComponent() {
+        Component comp = display.getComponent();
+        if (comp == null) {
+            comp = getOffscreenComponent();
+        }
+        return comp;
+    }
+
+    /**
+     * Helper to get the screen bounds
+     *
+     * @return Bounds
+     */
+    public Rectangle getScreenBounds() {
+        return getDisplayComponent().getBounds();
+    }
+
 
     /**
      * Destroys this instance, releasing any resources.  This method should be
@@ -465,9 +502,9 @@ abstract public class DisplayMaster {
         displayableDisplayListener    = null;
 
         try {
-        display.destroy();
+            display.destroy();
         } catch (Exception e) {
-            throw new RuntimeException("DisplayMaster.destroy",e);
+            throw new RuntimeException("DisplayMaster.destroy", e);
             //e.printStackTrace();
         }
 
@@ -1133,9 +1170,9 @@ abstract public class DisplayMaster {
 
 
     /**
-     * _more_
+     * mouse funtion map
      *
-     * @return _more_
+     * @return mouse funtion map
      */
     public int[][][] getMouseFunctionMap() {
         return mouseFunctionMap;

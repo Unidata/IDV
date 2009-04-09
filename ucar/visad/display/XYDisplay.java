@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.visad.display;
 
 
@@ -165,11 +166,14 @@ public class XYDisplay extends DisplayMaster {
                      boolean offScreen, Dimension dimension)
             throws VisADException, RemoteException {
         //super(new DisplayImplJ2D(name);
-        super(makeDisplayImpl(name, offScreen, dimension));
+        super(makeDisplayImpl(name, offScreen, dimension), 1, (offScreen
+                ? ((dimension == null)
+                   ?newDimension(600,300)
+                   :dimension)
+                : null));
         this.name      = name;
         this.yAxisType = yAxisType;
         this.xAxisType = xAxisType;
-
         initializeClass();
     }
 
