@@ -496,8 +496,7 @@ public class DataUtil {
      * Write to an excel spreadsheet
      *
      * @param filename file
-     * @param rows data
-     * @param rowsList _more_
+     * @param rowsList data
      * @param names sheet names
      *
      * @throws Exception On badness
