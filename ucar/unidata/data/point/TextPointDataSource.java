@@ -306,7 +306,6 @@ public class TextPointDataSource extends PointDataSource {
      *
      * @param contents The text contents
      * @param delimiter The delimiter
-     * @param dataChoice the data choice
      * @param subset data selection to subset with
      * @param bbox bounding box to subset
      * @param trackParam the parameter to use for thetrack
