@@ -194,6 +194,17 @@ public class FlatFieldTable extends JTable {
             }
         }
 
+        /**
+         * JTable uses this method to determine the default renderer
+         * editor for each cell.
+         * @param c  column number
+         *
+         * @return the Class
+         */
+        public Class getColumnClass(int c) {
+            return getValueAt(0, c).getClass();
+        }
+
 
     }
 

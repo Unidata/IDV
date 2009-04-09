@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -499,8 +500,8 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
                  * Set the animation.
                  */
                 Animation animation = getInternalAnimation(timeType);
-                getSoundingView().setExternalAnimation(
-                                                       animation, getAnimationWidget());
+                getSoundingView().setExternalAnimation(animation,
+                        getAnimationWidget());
                 aeroDisplay.addDisplayable(animation);
                 aeroDisplay.addDisplayable(timesHolder);
 
@@ -618,6 +619,32 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
             logException("getting display list data ", ve);
         } catch (RemoteException re) {}
         return data;
+    }
+
+    /**
+     * Update the location label, subclasses can override.
+     */
+    protected void updateHeaderLabel() {
+        Data d = getDisplayListData();
+        if (d == null) {
+            super.updateHeaderLabel();
+        }
+        Text text = null;
+        if (d instanceof FieldImpl) {
+            int index = getCurrentIndex();
+            if (index >= 0) {
+                try {
+                    text = (Text) ((FieldImpl) d).getSample(index, false);
+                } catch (Exception ve) {}
+            }
+        } else {
+            text = (Text) d;
+        }
+        if (text != null) {
+            headerLabel.setText(text.toString());
+        } else {
+            super.updateHeaderLabel();
+        }
     }
 }
 

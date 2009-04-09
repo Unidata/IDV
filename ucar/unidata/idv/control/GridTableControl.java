@@ -1,7 +1,5 @@
 /*
- * $Id: ThreeDSurfaceControl.java,v 1.106 2007/08/21 11:32:08 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright  1997-2009 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -20,6 +18,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -30,8 +29,6 @@ import ucar.unidata.data.grid.GridDataInstance;
 
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.idv.ControlContext;
-
-import ucar.unidata.idv.DisplayConventions;
 
 import ucar.unidata.util.ColorTable;
 
@@ -158,6 +155,9 @@ public class GridTableControl extends GridDisplayControl {
                 dates.add(dt);
                 FlatFieldTable table = new FlatFieldTable(ff,
                                            showNativeCoordinates);
+                table.setDefaultRenderer(
+                    Number.class,
+                    new TableNumberCellRenderer());
                 cardLayoutPanel.addCard(new JScrollPane(table));
             }
         }

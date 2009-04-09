@@ -21,6 +21,8 @@
  */
 
 
+
+
 package ucar.unidata.idv.control;
 
 
@@ -66,6 +68,7 @@ import visad.DataReference;
 import visad.DataReferenceImpl;
 import visad.ErrorEstimate;
 import visad.Field;
+import visad.FieldImpl;
 import visad.FlowControl;
 import visad.GraphicsModeControl;
 import visad.Gridded1DSet;
@@ -91,6 +94,7 @@ import java.beans.PropertyChangeListener;
 
 import java.rmi.RemoteException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
@@ -98,11 +102,10 @@ import javax.swing.border.BevelBorder;
 
 
 /**
- * Abstract class for displaying an aerological Skew-T log p diagram of an
+ * Abstract class for displaying an aerological diagram (eg, Skew-T log p) of an
  * atmospheric sounding.
  *
  * @author IDV Development Team
- * @version $Revision: 1.30 $Date: 2007/05/23 20:45:24 $
  */
 public abstract class AerologicalSoundingControl extends DisplayControlImpl implements AerologicalDisplayConstants {
 
@@ -122,8 +125,13 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      */
     protected Hodograph3DDisplay hodoDisplay;  // accessed in subclasses
 
+    /**
+     * The sounding table
+     */
+    protected SoundingTable soundingTable;
+
     /** label for the location */
-    private JLabel locLabel;
+    protected JLabel headerLabel;
 
     /** readout panel */
     private JPanel readoutPanel;
@@ -311,25 +319,20 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 new ViewDescriptor("SoundingView"),
                 "showControlLegend=false;wireframe=false;aniReadout=false;");
         }
-        /*
-            visad.java3d.DisplayRendererJ3D dr =
-                (visad.java3d
-                    .DisplayRendererJ3D) hodoDisplay.getDisplay()
-                        .getDisplayRenderer();
-            visad.java3d.KeyboardBehaviorJ3D kb = new visad.java3d.KeyboardBehaviorJ3D(dr);
-            dr.addKeyboardBehavior((visad.java3d.KeyboardBehaviorJ3D) kb);
-        */
 
         //TODO: For now don't do this because it screws up the image dumping.
         //If and when we put this back we need to not destroy the
         //VM in our doRemove method
         addViewManager(soundingView);
         addViewManager(hodoView);
+        soundingTable = new SoundingTable(this);
+        soundingTable.setDefaultRenderer(Number.class,
+                                         new TableNumberCellRenderer());
         // aeroDisplay.setPointMode(true);  // for debugging
-        locLabel   = new JLabel(" ", JLabel.LEFT);
-        tempProRef = new DataReferenceImpl("TemperatureProfile");
-        dewProRef  = new DataReferenceImpl("DewPointProfile");
-        windProRef = new DataReferenceImpl("WindProfile");
+        headerLabel = new JLabel(" ", JLabel.LEFT);
+        tempProRef  = new DataReferenceImpl("TemperatureProfile");
+        dewProRef   = new DataReferenceImpl("DewPointProfile");
+        windProRef  = new DataReferenceImpl("WindProfile");
 
         tempProRef.setData(AirTemperatureProfile.instance().missingData());
         dewProRef.setData(DewPointProfile.instance().missingData());
@@ -670,6 +673,33 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         return true;
     }
 
+    /**
+     * Add the  relevant file menu items into the list
+     *
+     * @param items List of menu items
+     * @param forMenuBar Is this for the menu in the window's menu bar or
+     * for a popup menu in the legend
+     */
+    protected void getSaveMenuItems(List items, boolean forMenuBar) {
+        super.getSaveMenuItems(items, forMenuBar);
+        items.add(GuiUtils.makeMenuItem("Export Sounding Table to File...",
+                                        this, "exportTableToCsv"));
+    }
+
+    /**
+     * Export the sounding table to csv, public by implementation,
+     * don't call directly.
+     */
+    public void exportTableToCsv() {
+        if (soundingTable == null) {
+            return;
+        }
+        String header = "";
+        if (headerLabel != null) {
+            header = headerLabel.getText();
+        }
+        GuiUtils.exportAsCsv(header, soundingTable.getModel(), true);
+    }
 
     /**
      * Handle property change
@@ -716,6 +746,10 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         if (soundingView != null) {
             jtp.add("Sounding Chart", soundingView.getPropertiesComponent());
         }
+
+        if (hodoView != null) {
+            jtp.add("Hodograph", hodoView.getPropertiesComponent());
+        }
     }
 
     /**
@@ -750,7 +784,8 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         */
         aeroDisplay     = null;
         hodoDisplay     = null;
-        locLabel        = null;
+        soundingTable   = null;
+        headerLabel     = null;
         readoutPanel    = null;
         parcelPath      = null;
         parVirtTempPath = null;
@@ -859,6 +894,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 aeroDisplay.setProfileVisible(index, true);
                 hodoDisplay.setProfileVisible(currIndex, false);
                 hodoDisplay.setProfileVisible(index, true);
+                soundingTable.setCurrentSounding(currIndex);
 
                 try {
                     aeroDisplay.setActiveSounding(index);
@@ -895,7 +931,17 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
                 throw ex;
             }
+            updateHeaderLabel();
         }
+    }
+
+    /**
+     * Get the index of the current sounding
+     *
+     * @return _more_
+     */
+    protected int getCurrentIndex() {
+        return currIndex;
     }
 
     /**
@@ -940,16 +986,33 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             System.arraycopy(dewPros, 0, dewProfiles, 0, n);
             System.arraycopy(windPros, 0, windProfiles, 0, n);
         }
+        Field[] tableSoundings = new Field[n];
         hodoDisplay.clear();
 
         for (int i = 0; i < n; i++) {
+            /*
+            if (i == 0 && windProfiles[i] != null) {
+                visad.python.JPythonMethods.dumpTypes(windProfiles[i]);
+            }
+            */
             aeroDisplay.addProfile(i, tempProfiles[i], dewProfiles[i],
                                    windProfiles[i]);
             hodoDisplay.addProfile(i, windProfiles[i]);
+            if (windProfiles[i] == null) {
+                tableSoundings[i] = FieldImpl.combine(new Field[] {
+                    tempProfiles[i],
+                    dewProfiles[i] }, true);
+            } else {
+                tableSoundings[i] = FieldImpl.combine(new Field[] {
+                    tempProfiles[i],
+                    dewProfiles[i], windProfiles[i] }, true);
+            }
         }
 
         aeroDisplay.setProfileVisible(currIndex, true);
         hodoDisplay.setProfileVisible(currIndex, true);
+        soundingTable.setSoundings(tableSoundings);
+        soundingTable.setCurrentSounding(currIndex);
         setSounding(currIndex);
     }
 
@@ -1179,6 +1242,17 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 }
             }
         });
+        List<JCheckBox> lineControls = new ArrayList<JCheckBox>();
+
+        lineControls.add(GuiUtils.makeCheckbox("Dry Adiabats", soundingView,
+                "dryAdiabatVisibility"));
+        lineControls.add(GuiUtils.makeCheckbox("Saturation Adiabats",
+                soundingView, "saturationAdiabatVisibility"));
+        lineControls.add(GuiUtils.makeCheckbox("Mixing Ratio", soundingView,
+                "saturationMixingRatioVisibility"));
+        JPanel lines = GuiUtils.left(GuiUtils.vbox(lineControls));
+        //lines.setBorder(new TitledBorder("Line Visibility"));
+
 
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
         Component comboBoxes = GuiUtils.doLayout(new Component[] {
@@ -1197,24 +1271,23 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
          * Create a 2 column by 2 row GridBagLayout,
          * Don't expand the widgets:
          */
-        Component viewOptions = GuiUtils.doLayout(new Component[] {
-                                    checkBoxes,
-                                    GuiUtils.filler(),
-                                    GuiUtils.top(comboBoxes) }, 3,  //3 columns
-            GuiUtils.WT_N,  //Don't expand the grid horizontally
-            GuiUtils.WT_N   //Don't expand the grid  vertically
-                );
-        Container controlArea    = Box.createHorizontalBox();
+        Component viewOptions = GuiUtils.doLayout(new Component[] { lines,
+                checkBoxes,
+        //GuiUtils.filler(),
+        GuiUtils.top(comboBoxes) }, 3,              //3 columns
+                                    GuiUtils.WT_N,  //Don't expand the grid horizontally
+                                    GuiUtils.WT_N   //Don't expand the grid  vertically
+                                        );
+        //Container controlArea    = Box.createHorizontalBox();
         Component specificWidget = getSpecificWidget();
 
-        if (specificWidget != null) {
-            controlArea.add(GuiUtils.center(specificWidget));
-        }
+        //if (specificWidget != null) {
+        //    controlArea.add(GuiUtils.center(specificWidget));
+        //}
 
-        controlArea.add(GuiUtils.inset(viewOptions, 4));
-
-        //GuiUtils.leftRight(soundingView.getContents (),
-        //hodoDisplay.getComponent()), controlArea);
+        //controlArea.add(GuiUtils.inset(viewOptions, 4));
+        JComponent soundingComp =
+            GuiUtils.centerBottom(soundingView.getContents(), viewOptions);
 
         JScrollPane sp =
             new JScrollPane(
@@ -1223,16 +1296,29 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         sp.setViewportBorder(
             BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        JComponent  left = (specificWidget != null)
+                           ? GuiUtils.centerBottom(sp, specificWidget)
+                           : sp;
         JTabbedPane tabs = new JTabbedPane();
-        tabs.add("Sounding Chart", soundingView.getContents());
-        tabs.add("Hodograph", hodoDisplay.getComponent());
+        tabs.add("Sounding Chart", soundingComp);
+        tabs.add("Hodograph", hodoView.getComponent());
+        JScrollPane tableSP =
+            new JScrollPane(
+                soundingTable,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        tableSP.setViewportBorder(
+            BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        tabs.add("Table", tableSP);
         GuiUtils.handleHeavyWeightComponentsInTabs(tabs);
+        tabs.setSelectedIndex(0);
 
         //JSplitPane spl = GuiUtils.hsplit(sp, soundingView.getContents(), .35);
-        JSplitPane spl = GuiUtils.hsplit(sp, tabs, .35);
+        JSplitPane spl = GuiUtils.hsplit(left, tabs, .35);
         spl.setOneTouchExpandable(true);
-        Container contents = GuiUtils.topCenterBottom(locLabel, spl,
-                                 controlArea);
+        //Container contents = GuiUtils.topCenterBottom(locLabel, spl,
+        //                         controlArea);
+        Container contents = GuiUtils.topCenter(headerLabel, spl);
 
         return contents;
     }
@@ -1286,13 +1372,33 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
         location = loc;
         double lat = loc.getLatitude().getValue();
+        /*
         double lon = loc.getLongitude().getValue();
 
-        locLabel.setText(" Lat: " + getDisplayConventions().format(lat)
+        headerLabel.setText(" Lat: " + getDisplayConventions().format(lat)
                          + "  Long: " + getDisplayConventions().format(lon));
+                         */
         aeroDisplay.setBarbOrientation((lat >= 0)
                                        ? FlowControl.NH_ORIENTATION
                                        : FlowControl.SH_ORIENTATION);
+    }
+
+    /**
+     * Update the location label, subclasses can override.
+     */
+    protected void updateHeaderLabel() {
+        if (location != null) {
+            double lat = location.getLatitude().getValue();
+            double lon = location.getLongitude().getValue();
+
+            headerLabel.setText(" Lat: "
+                                + getDisplayConventions().format(lat)
+                                + "  Lon: "
+                                + getDisplayConventions().format(lon));
+
+        } else {
+            headerLabel.setText("       ");
+        }
     }
 
     /**
@@ -1389,78 +1495,10 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             JMenu svMenu = soundingView.makeViewMenu();
             svMenu.setText("Sounding Chart");
             menus.add(svMenu);
+            JMenu hvMenu = hodoView.makeViewMenu();
+            hvMenu.setText("Hodograph");
+            menus.add(hvMenu);
         }
-        /*
-
-        JMenu items = new JMenu("Customize");
-        if (forMenuBar) {
-            items.setMnemonic(GuiUtils.charToKeyCode("C"));
-        }
-
-        JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem("Dry Adiabats",
-                                     aeroDisplay.getDryAdiabatVisibility());
-        cbmi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    aeroDisplay.setDryAdiabatVisibility(
-                        ((JCheckBoxMenuItem) e.getSource()).isSelected());
-                } catch (Exception excp) {
-                    logException("Dry Adiabat Visibility", excp);
-                }
-            }
-        });
-        items.add(cbmi);
-        cbmi = new JCheckBoxMenuItem(
-            "Saturation Adiabats",
-            aeroDisplay.getSaturationAdiabatVisibility());
-        cbmi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    aeroDisplay.setSaturationAdiabatVisibility(
-                        ((JCheckBoxMenuItem) e.getSource()).isSelected());
-                } catch (Exception excp) {
-                    logException("Saturation Adiabat Visibility", excp);
-                }
-            }
-        });
-        items.add(cbmi);
-        cbmi = new JCheckBoxMenuItem(
-            "Saturation Mixing Ratios",
-            aeroDisplay.getSaturationMixingRatioVisibility());
-        cbmi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    aeroDisplay.setSaturationMixingRatioVisibility(
-                        ((JCheckBoxMenuItem) e.getSource()).isSelected());
-                } catch (Exception excp) {
-                    logException("Saturation Mixing Ratio Visibility", excp);
-                }
-            }
-        });
-        items.add(cbmi);
-
-        items.addSeparator();
-
-        JMenu                displayTypes = new JMenu("Display Type");
-        ButtonGroup          bg           = new ButtonGroup();
-
-        JRadioButtonMenuItem rmi          =
-            makeDisplayTypeMenu(SKEWT_DISPLAY);
-        bg.add(rmi);
-        displayTypes.add(rmi);
-
-        rmi = makeDisplayTypeMenu(STUVE_DISPLAY);
-        bg.add(rmi);
-        displayTypes.add(rmi);
-
-        rmi = makeDisplayTypeMenu(EMAGRAM_DISPLAY);
-        bg.add(rmi);
-        displayTypes.add(rmi);
-
-        items.add(displayTypes);
-
-        menus.add(items);
-        */
     }
 
     /**
@@ -1634,6 +1672,24 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      */
     public SoundingViewManager getSoundingView() {
         return soundingView;
+    }
+
+    /**
+     *  Set the HodographView property.
+     *
+     *  @param value The new value for HodographView
+     */
+    public void setHodographView(HodographViewManager value) {
+        hodoView = value;
+    }
+
+    /**
+     *  Get the HodographView property.
+     *
+     *  @return The HodographView
+     */
+    public HodographViewManager getHodographView() {
+        return hodoView;
     }
 
 }

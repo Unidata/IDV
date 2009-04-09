@@ -382,5 +382,17 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
         }
         return data;
     }
+
+    /**
+     * Update the location label, subclasses can override.
+     */
+    protected void updateHeaderLabel() {
+        int  index = getSelectedStationIndex();
+        if (index >= 0) {
+            headerLabel.setText(stationIds[index]);
+        } else {
+            super.updateHeaderLabel();
+        }
+    }
 }
 
