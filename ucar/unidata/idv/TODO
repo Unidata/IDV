@@ -46,6 +46,9 @@ New Development:
     
     - Full support for GeoTIFF
     
+
+
+
     - support for multibanded images
     
     - support for isentropic coordinates
@@ -76,6 +79,8 @@ New Development:
 
     - change default orientation of cross section selector to N/S instead
       of E/W?
+
+      -When the center mouse button is pressed over a Weather Radar Image the value at that point is noted (dBZ, vel, spectrum width). It would be useful if the beam center height was also returned.
 
     - Color bar in display for displays with COLORTABLE attribute.
 
