@@ -92,7 +92,8 @@ public class StormADOT {
      */
     public StormADOTInfo.IRData aodtv72_drive(FlatField satgrid, float cenlat, float cenlon,
                       int posm, double curdate, int cursat,
-                      String g_domain) {
+                      String g_domain, int satId, int satChannel,
+                      boolean isTemperature) {
 
         float ftmps, flats, flons, cenlon2;
 
@@ -182,9 +183,13 @@ public class StormADOT {
 
         satimage = g2d1.getvalues();
         float[][] temp0  = satimage[0];
-        int       imsorc = 74,
-                  imtype = 1;
-        temps = im_gvtota(numx, numy, temp0, imsorc, imtype);
+        int       imsorc = satId,
+                  imtype = satChannel;
+
+        if(isTemperature)
+            temps = temp0;
+        else
+            temps = im_gvtota(numx, numy, temp0, imsorc, imtype);
 
         /*
          *  Load the IR imge information in AODT

@@ -23,30 +23,26 @@
 package ucar.unidata.idv.control.storm;
 
 
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataUtil;
-import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.*;
 import ucar.unidata.data.imagery.AddeImageDescriptor;
 import ucar.unidata.data.imagery.ImageDataSource;
 import ucar.unidata.data.storm.StormADOT;
 import ucar.unidata.data.storm.StormADOTUtil;
 import ucar.unidata.data.storm.StormADOTInfo;
 
-import ucar.unidata.data.sounding.TrackDataSource;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.DisplayInfo;
-import ucar.unidata.idv.DisplayControl;
 
 
 import ucar.unidata.ui.LatLonWidget;
-import ucar.unidata.ui.TextSearcher;
 import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.display.PointProbe;
 import ucar.visad.display.Animation;
-import ucar.visad.display.Displayable;
+import ucar.visad.Util;
+import ucar.visad.quantities.AirTemperature;
 
 import visad.*;
 import visad.util.DataUtility;
@@ -69,7 +65,8 @@ import java.util.Vector;
 
 
 import javax.swing.*;
-import javax.swing.text.JTextComponent;
+
+import edu.wisc.ssec.mcidas.AreaDirectory;
 
 
 /**
@@ -388,7 +385,8 @@ public class StormIntensityControl extends DisplayControlImpl {
         if(running) return;
         running = true;
         adotBtn.setEnabled(false);
-        //        adotBtn.setText("Running");
+        adotBtn.setText("Running");
+
         Misc.run(new Runnable() {
                 public void run() {
                     doAnalysisInner();
@@ -402,28 +400,39 @@ public class StormIntensityControl extends DisplayControlImpl {
     private void doAnalysisInner() {
         FlatField ffield = null;
         StormADOT sint = new StormADOT();
+        int sid = 0;
+        int channel= 0;
 
         if (probeLocation == null) {
             return;
         }
-        Set timeset = null;
+        //Set timeset = null;
         RealTuple timeTuple = null;
         List sources = new ArrayList();
         Real tt = null;
         DateTime dat = null;
-
-      //  choice..getDataSources(sources);
+        boolean isTemp = false;
+        choice.getDataSources(sources);
         try {
             List infos  = getDisplayInfos();
             DataInstance de = getDataInstance();
             DisplayInfo displayInfo = (DisplayInfo) infos.get(0);
             
             Animation anime = displayInfo.getViewManager().getAnimation();
-            ffield = DataUtil.getFlatField(de.getData());
-
             Set timeSet = anime.getSet();
             int pos     = anime.getCurrent();
+            ffield = DataUtil.getFlatField(de.getData());
 
+            ImageDataSource dds = (ImageDataSource)sources.get(0);
+            List imageLists =      dds.getImageList();
+
+            AddeImageDescriptor aid =  (AddeImageDescriptor)imageLists.get(pos);
+            AreaDirectory ad = aid.getDirectory();
+            sid = ad.getSensorID();
+            int [] bands = ad.getBands();
+            channel = bands[0];
+
+            isTemp = Util.isCompatible(ffield, AirTemperature.getRealType());
             timeTuple = DataUtility.getSample(timeSet, pos);
             tt = (Real) timeTuple.getComponent(0);
             dat = new DateTime(tt);
@@ -448,7 +457,8 @@ public class StormIntensityControl extends DisplayControlImpl {
             return;
         }
 
-        StormADOTInfo.IRData result = sint.aodtv72_drive(ffield, cenlat, cenlon, posm, curtime, cursat, g_domain);
+        StormADOTInfo.IRData result =
+                sint.aodtv72_drive(ffield, cenlat, cenlon, posm, curtime, cursat, g_domain, sid, channel, isTemp);
         text =         StormADOTUtil.aodtv72_textscreenoutput(result,getDisplayConventions().getLatLonFormat());
         textComp.setText(text);
     }
