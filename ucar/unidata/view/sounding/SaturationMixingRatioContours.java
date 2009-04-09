@@ -20,20 +20,20 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.view.sounding;
 
-
-
-import java.rmi.RemoteException;
-
-import java.util.*;
-
-import visad.*;
 
 import ucar.visad.Util;
 import ucar.visad.VisADMath;
 import ucar.visad.display.*;
 import ucar.visad.quantities.*;
+
+import visad.*;
+
+import java.rmi.RemoteException;
+
+import java.util.*;
 
 
 /**
@@ -122,7 +122,8 @@ public final class SaturationMixingRatioContours extends BackgroundContours {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    public SaturationMixingRatioContours(AerologicalCoordinateSystem coordinateSystem)
+    public SaturationMixingRatioContours(
+            AerologicalCoordinateSystem coordinateSystem)
             throws VisADException, RemoteException {
 
         super("SaturationMixingRatioContours",
@@ -132,11 +133,12 @@ public final class SaturationMixingRatioContours extends BackgroundContours {
             .001f, .005f, .01f, .025f, .05f, .1f, .2f, .4f, .6f, .8f, 1, 1.5f,
             2, 2.5f, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 28, 32,
             36, 40, 44, 48, 52, 56, 60, 68, 76
-        }, new ScaledUnit(.001)), Float.POSITIVE_INFINITY),  // will cause dashed lines
+        }, new ScaledUnit(.001)), Float.POSITIVE_INFINITY, true),  // will cause dashed lines
         getRangeType());
 
         coordinateSystemChange(coordinateSystem);
-        setHSV(new float[]{ 120f, .5f, .9f });  // unsaturated green
+        setHSV(new float[] { 120f, .5f, .9f });  // unsaturated green
+        setLabeling(true);
     }
 
     /**
@@ -145,7 +147,8 @@ public final class SaturationMixingRatioContours extends BackgroundContours {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    protected SaturationMixingRatioContours(SaturationMixingRatioContours that)
+    protected SaturationMixingRatioContours(
+            SaturationMixingRatioContours that)
             throws RemoteException, VisADException {
 
         super(that);
@@ -173,7 +176,8 @@ public final class SaturationMixingRatioContours extends BackgroundContours {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    protected void coordinateSystemChange(AerologicalCoordinateSystem coordinateSystem)
+    protected void coordinateSystemChange(
+            AerologicalCoordinateSystem coordinateSystem)
             throws TypeException, RemoteException, VisADException {
 
         try {
@@ -182,19 +186,18 @@ public final class SaturationMixingRatioContours extends BackgroundContours {
                     new FunctionType(
                         RealTupleType.SpatialCartesian2DTuple,
                         new RealTupleType(
-                            (RealType) coordinateSystem.getMinimumPressure()
-                                .getType(), (RealType) coordinateSystem
-                                .getMinimumTemperature()
-                                .getType(), coordinateSystem, (visad
-                                    .Set) null)), VisADMath.newFlatField(
-                                        new Linear2DSet(
-                                            RealTupleType.SpatialCartesian2DTuple,
-                                            coordinateSystem.getMinimumX().getValue(),
-                                            coordinateSystem.getMaximumX().getValue(),
-                                            40,
-                                            coordinateSystem.getMinimumY().getValue(),
-                                            coordinateSystem.getMaximumY().getValue(),
-                                            40)));
+                            (RealType) coordinateSystem.getMinimumPressure().getType(),
+                            (RealType) coordinateSystem.getMinimumTemperature().getType(),
+                            coordinateSystem,
+                            (visad.Set) null)), VisADMath.newFlatField(
+                                new Linear2DSet(
+                                    RealTupleType.SpatialCartesian2DTuple,
+                                    coordinateSystem.getMinimumX().getValue(),
+                                    coordinateSystem.getMaximumX().getValue(),
+                                    40,
+                                    coordinateSystem.getMinimumY().getValue(),
+                                    coordinateSystem.getMaximumY().getValue(),
+                                    40)));
 
             field = (FlatField) Util.ensureMathType(
                 SaturationMixingRatio.create(
@@ -208,17 +211,17 @@ public final class SaturationMixingRatioContours extends BackgroundContours {
             rangeMinimum = (float) ((Real) field.evaluate(
                 new RealTuple(
                     RealTupleType.SpatialCartesian2DTuple,
-                    new Real[]{ coordinateSystem.getMinimumX(),
-                                coordinateSystem
-                                    .getMaximumY() }, (CoordinateSystem) null)))
-                                        .getValue(tempUnit);
+                    new Real[] { coordinateSystem.getMinimumX(),
+                                 coordinateSystem
+                                 .getMaximumY() }, (CoordinateSystem) null)))
+                                     .getValue(tempUnit);
             rangeMaximum = (float) ((Real) field.evaluate(
                 new RealTuple(
                     RealTupleType.SpatialCartesian2DTuple,
-                    new Real[]{ coordinateSystem.getMaximumX(),
-                                coordinateSystem
-                                    .getMaximumY() }, (CoordinateSystem) null)))
-                                        .getValue(tempUnit);
+                    new Real[] { coordinateSystem.getMaximumX(),
+                                 coordinateSystem
+                                 .getMaximumY() }, (CoordinateSystem) null)))
+                                     .getValue(tempUnit);
         } catch (UnimplementedException e) {}  // ignore because the above is known to work
     }
 
@@ -238,10 +241,4 @@ public final class SaturationMixingRatioContours extends BackgroundContours {
         return rangeMaximum;
     }
 }
-
-
-
-
-
-
 
