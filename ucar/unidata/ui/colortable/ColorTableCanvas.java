@@ -24,6 +24,7 @@
 package ucar.unidata.ui.colortable;
 
 
+import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.Command;
 import ucar.unidata.ui.CommandManager;
 
@@ -212,6 +213,8 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
     /** Drawing mode */
     private int currentMode = MODE_NONE;
 
+    private boolean mouseInBox = false;
+
     /** Something used when drawing */
     private double activePercent;
 
@@ -244,6 +247,13 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
 
     /** color slot base */
     private int colorSlotBase = 1;
+
+    /** The normal cursor_ */
+    public static final Cursor normalCursor =
+        Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+
+    public static Cursor paintCursor;
+
 
     /**
      * Create me
@@ -1108,7 +1118,9 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      *
      * @param e The event
      */
-    public void mouseMoved(MouseEvent e) {}
+    public void mouseMoved(MouseEvent e) {
+        checkCursor(e);
+    }
 
     /**
      * Noop
@@ -1117,6 +1129,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      */
     public void mouseEntered(MouseEvent e) {
         requestFocus();
+        checkCursor(e);
     }
 
     /**
@@ -1124,7 +1137,48 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      *
      * @param e The event
      */
-    public void mouseExited(MouseEvent e) {}
+    public void mouseExited(MouseEvent e) {
+        
+    }
+
+    /**
+     * Get the paint brush cursor
+     *
+     * @return paint brush cursor
+     */
+    public Cursor getPaintCursor() {
+        if(paintCursor == null) {
+            Image image = GuiUtils.getImage("/auxdata/ui/icons/paintbrush.png",getClass(),true);
+            paintCursor = Toolkit.getDefaultToolkit().createCustomCursor(image,new Point(0,0),"paintcursor");
+        }
+        return paintCursor;
+    }
+
+
+
+    /**
+     * set the cursor
+     *
+     * @param e event
+     */
+    public void checkCursor(MouseEvent e) {
+        if(isInBox(e)) {
+            setCursor(getPaintCursor());
+        } else {
+            setCursor(normalCursor);
+        }
+    } 
+
+    /**
+     * Is the mouse in the color box
+     *
+     * @param event event
+     * @return is in box
+     */
+    public boolean isInBox(MouseEvent event) {
+        Rectangle box = getColorBox();
+        return box.contains(new Point(event.getX(),event.getY()));
+    }
 
 
     /**
@@ -1136,8 +1190,13 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         if ( !SwingUtilities.isLeftMouseButton(event)) {
             return;
         }
-        if ( !selectBreakpoint(event)) {
-            return;
+
+        mouseInBox = isInBox(event);
+
+        if(!mouseInBox) {
+            if (!selectBreakpoint(event)) {
+                return;
+            }
         }
 
         switch (currentMode) {
@@ -1149,7 +1208,11 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
           default :
               activePercent = xToPercent(event.getX());
               prepColorChange();
-              activeColor      = getBreakpointColor(currentBP);
+              if(mouseInBox) {
+                  activeColor = colorChooser.getColor();
+              } else {
+                  activeColor      = getBreakpointColor(currentBP);
+              }
               activeColorIndex =
                   percentToColorIndex(xToPercent(event.getX()));
               priorColors = (ArrayList) colorList.clone();
@@ -1163,16 +1226,25 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      * @param event The event
      */
     public void mouseDragged(MouseEvent event) {
-        if ( !haveBreakpointSelected()) {
+        checkCursor(event);
+
+        int x=0;
+        if(!mouseInBox) {
+            if ( !haveBreakpointSelected()) {
+                return;
+            }
+            if ((currentBP != null) && currentBP.getLocked()) {
+                return;
+            }
+            currentBP.setValue(xToPercent(event.getX()));
+            x = getBreakpointX(currentBP);
+            repaint();
             return;
+        } else {
+            x = event.getX();
         }
-        if ((currentBP != null) && currentBP.getLocked()) {
-            return;
-        }
-        currentBP.setValue(xToPercent(event.getX()));
 
         if (currentMode != MODE_NONE) {
-            int x = getBreakpointX(currentBP);
             colorList = (ArrayList) priorColors.clone();
             int   startColorIndex = activeColorIndex;
             Color startColor      = activeColor;
@@ -1685,6 +1757,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         if (currentBP == null) {
             return;
         }
+        if(true) return;
         double percent = currentBP.getValue();
         int    index   = percentToColorIndex(percent);
         Color  current = (Color) colorList.get(index);
