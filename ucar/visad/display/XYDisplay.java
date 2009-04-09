@@ -168,7 +168,7 @@ public class XYDisplay extends DisplayMaster {
         //super(new DisplayImplJ2D(name);
         super(makeDisplayImpl(name, offScreen, dimension), 1, (offScreen
                 ? ((dimension == null)
-                   ?newDimension(600,300)
+                   ?new Dimension(600,300)
                    :dimension)
                 : null));
         this.name      = name;
