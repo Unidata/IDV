@@ -370,7 +370,6 @@ public abstract class CrossSectionControl extends GridDisplayControl {
         } else {
             //We are new (or are unpersisted from an old bundle)
             //Create the new ViewManager
-            System.err.println ("making XS view");
             crossSectionView = new CrossSectionViewManager(getViewContext(),
                     new ViewDescriptor("CrossSectionView"),
                     "showControlLegend=false;showScales=true", animationInfo);
