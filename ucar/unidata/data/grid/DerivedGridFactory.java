@@ -190,8 +190,7 @@ public class DerivedGridFactory {
      *
      * @param grid     grid of data
      * @param value1   level of first
-     * @param value1   level of first
-     * @param value2 _more_
+     * @param value2   level of second
      * @param levelUnit  unit for level
      *
      * @return computed layer difference

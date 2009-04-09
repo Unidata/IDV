@@ -1373,10 +1373,9 @@ public class GridUtil {
      * Sum each grid point
      *
      * @param grid   grid to analyze
-     *
-     * @param grid   grid to average
-     * @param makeTimes If true then make a time field with the range being the same computed value
-     * If false then just return a single field of the computed values
+     * @param makeTimes If true then make a time field with the range 
+     *                  being the same computed value. If false then just 
+     *                  return a single field of the computed values
      * @return the new field
      *
      * @throws VisADException  On badness
@@ -1390,8 +1389,9 @@ public class GridUtil {
      * Take the min value at each grid point
      *
      * @param grid   grid to analyze
-     * @param makeTimes If true then make a time field with the range being the same computed value
-     * If false then just return a single field of the computed values
+     * @param makeTimes If true then make a time field with the range 
+     *                  being the same computed value. If false then just 
+     *                  return a single field of the computed values
      * @return the new field
      *
      * @throws VisADException  On badness
@@ -1405,8 +1405,9 @@ public class GridUtil {
      * Take the max value at each grid point
      *
      * @param grid   grid to analyze
-     * @param makeTimes If true then make a time field with the range being the same computed value
-     * If false then just return a single field of the computed values
+     * @param makeTimes If true then make a time field with the range 
+     *                  being the same computed value. If false then just 
+     *                  return a single field of the computed values
      * @return the new field
      *
      * @throws VisADException  On badness
@@ -1422,8 +1423,9 @@ public class GridUtil {
      *
      * @param grid   grid to average
      * @param function One of the FUNC_ enums
-     * @param makeTimes If true then make a time field with the range being the same computed value
-     * If false then just return a single field of the computed values
+     * @param makeTimes If true then make a time field with the range 
+     *                  being the same computed value. If false then just 
+     *                  return a single field of the computed values
      * @return the new field
      *
      * @throws VisADException  On badness
