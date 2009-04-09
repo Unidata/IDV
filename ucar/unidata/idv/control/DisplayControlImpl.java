@@ -7127,6 +7127,20 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (newUnit == null) {
             return true;
         }
+
+        System.err.println("setNewDisplayUnit:" + getHaveInitialized());
+
+        //If we haven't initialized yet just set the unit and return
+        if(!getHaveInitialized()) {
+            /*            if (isDisplayUnitAlsoColorUnit()) {
+                if ( !setNewColorUnit(newUnit, false)) {
+                    return false;
+                }
+                }*/
+            setDisplayUnit(newUnit);
+            return true;
+        }
+
         Unit oldUnit = getDisplayUnit();
         try {
             //Do this first because it uses displayUnit as the old unit
@@ -7205,6 +7219,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (newUnit == null) {
             return true;
         }
+        //        System.err.println ("setNewColorUnit:" + getHaveInitialized());
+        if(!getHaveInitialized()) {
+            setUnitForColor(newUnit);
+            return true;
+        }
+
         Unit oldUnit = getUnitForColor();
         try {
             setUnitForColor(newUnit);
