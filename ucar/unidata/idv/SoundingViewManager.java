@@ -21,6 +21,8 @@
  */
 
 
+
+
 package ucar.unidata.idv;
 
 
@@ -146,11 +148,6 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
         showControlMenu = false;
         super.initializeViewMenu(viewMenu);
         viewMenu.add(makeColorMenu());
-        /*  Let people get to this through the property dialog
-        viewMenu.addSeparator();
-        viewMenu.add(GuiUtils.makeMenuItem("Properties", this,
-                                           "showPropertiesDialog"));
-        */
     }
 
 
@@ -164,7 +161,6 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
      */
     protected DisplayMaster doMakeDisplayMaster()
             throws VisADException, RemoteException {
-        Misc.printStack("making dm");
         AerologicalDisplay display =
             AerologicalDisplay.getInstance(chartType);
         setLineVisibility(display);
@@ -219,9 +215,9 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
      * @param tabbedPane  the pane to add
      */
     protected void addPropertiesComponents(JTabbedPane tabbedPane) {
-        AerologicalDisplay soundingDisplay = (AerologicalDisplay) getMaster();
+        AerologicalDisplay soundingDisplay = getAerologicalDisplay();
 
-        List               chartTypes      = new ArrayList();
+        List<JRadioButton> chartTypes      = new ArrayList<JRadioButton>();
 
         ButtonGroup        bg              = new ButtonGroup();
 
@@ -239,7 +235,7 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
         JPanel types = GuiUtils.left(GuiUtils.vbox(chartTypes));
         types.setBorder(new TitledBorder("Display Types"));
 
-        List lineControls = new ArrayList();
+        List<JCheckBox> lineControls = new ArrayList<JCheckBox>();
 
         lineControls.add(GuiUtils.makeCheckbox("Dry Adiabats", this,
                 "dryAdiabatVisibility"));
@@ -289,9 +285,8 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
 
         try {
 
-            ((AerologicalDisplay) getMaster()).setCoordinateSystem(
-                getChartType());
-            setLineVisibility((AerologicalDisplay) getMaster());
+            getAerologicalDisplay().setCoordinateSystem(getChartType());
+            setLineVisibility(getAerologicalDisplay());
         } catch (Exception excp) {
             return false;
         }
@@ -308,6 +303,9 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
      */
     private void setLineVisibility(AerologicalDisplay aeroDisplay)
             throws VisADException, RemoteException {
+        if (aeroDisplay == null) {
+            return;
+        }
         aeroDisplay.setSaturationMixingRatioVisibility(
             saturationMixingRatioVisibility);
         aeroDisplay.setSaturationAdiabatVisibility(
@@ -372,6 +370,11 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
      */
     public void setSaturationAdiabatVisibility(boolean value) {
         saturationAdiabatVisibility = value;
+        if (getHaveInitialized()) {
+            try {
+                setLineVisibility(getAerologicalDisplay());
+            } catch (Exception ignore) {}
+        }
     }
 
     /**
@@ -388,6 +391,11 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
      */
     public void setDryAdiabatVisibility(boolean value) {
         dryAdiabatVisibility = value;
+        if (getHaveInitialized()) {
+            try {
+                setLineVisibility(getAerologicalDisplay());
+            } catch (Exception ignore) {}
+        }
     }
 
     /**
@@ -404,6 +412,11 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
      */
     public void setSaturationMixingRatioVisibility(boolean value) {
         saturationMixingRatioVisibility = value;
+        if (getHaveInitialized()) {
+            try {
+                setLineVisibility(getAerologicalDisplay());
+            } catch (Exception ignore) {}
+        }
     }
 
     /**
@@ -412,7 +425,16 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
      * @return  CoordinateSystem or null
      */
     public CoordinateSystem getDisplayCoordinateSystem() {
-        return ((AerologicalDisplay) getMaster()).getCoordinateSystem();
+        return getAerologicalDisplay().getCoordinateSystem();
+    }
+
+    /**
+     * Get the display, casting it to an AerologicalDisplay
+     *
+     * @return _more_
+     */
+    private AerologicalDisplay getAerologicalDisplay() {
+        return (AerologicalDisplay) getMaster();
     }
 }
 
