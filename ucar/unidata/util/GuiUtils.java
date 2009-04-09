@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -637,7 +638,7 @@ public class GuiUtils extends LayoutUtil {
         }
 
         /**
-         * _more_
+         * Show the color chooser
          */
         private void showColorChooser() {
             Color         oldColor    = this.getBackground();
@@ -1355,11 +1356,11 @@ public class GuiUtils extends LayoutUtil {
 
 
     /**
-     * _more_
+     * Layout as a 2 column form
      *
-     * @param objects _more_
+     * @param objects  objects to lay out
      *
-     * @return _more_
+     * @return  the form
      */
     public static JComponent formLayout(List objects) {
         Component[] comps = new Component[objects.size()];
@@ -2142,9 +2143,8 @@ public class GuiUtils extends LayoutUtil {
     /**
      * popup a menu to select strides
      *
-     * @param e mouse click
      * @param list JList
-     * @param items _more_
+     * @param items menu items
      */
     public static void getConfigureStepSelectionItems(final JList list,
             List items) {
@@ -2473,7 +2473,7 @@ public class GuiUtils extends LayoutUtil {
      * @return New JLabel showing image
      */
     public static JLabel getImageLabel(String icon) {
-        return new JLabel(getImageIcon(icon,GuiUtils.class));
+        return new JLabel(getImageIcon(icon, GuiUtils.class));
     }
 
 
@@ -3352,7 +3352,7 @@ public class GuiUtils extends LayoutUtil {
         }
 
         if (icon != null) {
-            menuItem.setIcon(getImageIcon(icon,GuiUtils.class));
+            menuItem.setIcon(getImageIcon(icon, GuiUtils.class));
         }
         if (id != null) {
             menuItems.put(id, menuItem);
@@ -3989,9 +3989,30 @@ public class GuiUtils extends LayoutUtil {
      * @return CSV representation of the given table model
      */
     public static String toCsv(TableModel model) {
+        return toCsv(model, false);
+    }
+
+    /**
+     * Convert the given table model to comma separated string
+     *
+     * @param model The table model to write
+     * @param includeColumnNames  true to include the column names
+     *
+     * @return CSV representation of the given table model
+     */
+    public static String toCsv(TableModel model, boolean includeColumnNames) {
         StringBuffer sb   = new StringBuffer();
         int          rows = model.getRowCount();
         int          cols = model.getColumnCount();
+        if (includeColumnNames) {
+            for (int col = 0; col < cols; col++) {
+                if (col > 0) {
+                    sb.append(",");
+                }
+                sb.append(model.getColumnName(col));
+            }
+            sb.append("\n");
+        }
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 if (col > 0) {
@@ -4013,7 +4034,7 @@ public class GuiUtils extends LayoutUtil {
      * @param model The table model to write
      */
     public static void exportAsCsv(TableModel model) {
-        exportAsCsv("", model);
+        exportAsCsv("", model, false);
     }
 
     /**
@@ -4022,15 +4043,29 @@ public class GuiUtils extends LayoutUtil {
      *
      * @param header  a header to prepend to the table
      * @param model The table model to write
+     * @param model The table model to write
      */
     public static void exportAsCsv(String header, TableModel model) {
+        exportAsCsv(header, model, false);
+    }
+
+    /**
+     * Write out the given table model as a comma separated value (CSV) file
+     * prepending the header.
+     *
+     * @param header  a header to prepend to the table
+     * @param model The table model to write
+     * @param includeColumnNames  true to include the column names
+     */
+    public static void exportAsCsv(String header, TableModel model,
+                                   boolean includeColumnNames) {
         String filename =
             FileManager.getWriteFile(Misc.newList(FileManager.FILTER_CSV,
                 FileManager.FILTER_XLS), FileManager.SUFFIX_CSV);
         if (filename == null) {
             return;
         }
-        exportAsCsv(header, model, filename);
+        exportAsCsv(header, model, filename, includeColumnNames);
     }
 
     /**
@@ -4042,6 +4077,20 @@ public class GuiUtils extends LayoutUtil {
      */
     public static void exportAsCsv(String header, TableModel model,
                                    String filename) {
+        exportAsCsv(header, model, filename, false);
+    }
+
+    /**
+     * Export a table as csv
+     *
+     * @param header   header for the output
+     * @param model    table model
+     * @param filename  file name to export to
+     * @param includeColumnNames  true to include the column names
+     */
+    public static void exportAsCsv(String header, TableModel model,
+                                   String filename,
+                                   boolean includeColumnNames) {
         if (filename.toLowerCase().endsWith(".xls")) {
             //A hack
             try {
@@ -4049,14 +4098,16 @@ public class GuiUtils extends LayoutUtil {
                 Method method = Misc.findMethod(c, "writeXls",
                                     new Class[] { String.class,
                         List.class });
-                List rows     = new ArrayList();
-                int  numRows  = model.getRowCount();
-                int  numCols  = model.getColumnCount();
-                List colNames = new ArrayList();
-                for (int i = 0; i < model.getColumnCount(); i++) {
-                    colNames.add(model.getColumnName(i));
+                List rows    = new ArrayList();
+                int  numRows = model.getRowCount();
+                int  numCols = model.getColumnCount();
+                if (includeColumnNames) {
+                    List colNames = new ArrayList();
+                    for (int i = 0; i < model.getColumnCount(); i++) {
+                        colNames.add(model.getColumnName(i));
+                    }
+                    rows.add(colNames);
                 }
-                rows.add(colNames);
                 for (int row = 0; row < numRows; row++) {
                     List cols = new ArrayList();
                     rows.add(cols);
@@ -4070,7 +4121,7 @@ public class GuiUtils extends LayoutUtil {
             }
             return;
         }
-        String csv = GuiUtils.toCsv(model);
+        String csv = GuiUtils.toCsv(model, includeColumnNames);
         if (csv == null) {
             return;
         }
@@ -4080,7 +4131,7 @@ public class GuiUtils extends LayoutUtil {
         try {
             String output = ((header == null) || header.equals(""))
                             ? csv
-                            : header + csv;
+                            : header + "\n" + csv;
             IOUtil.writeFile(filename, output);
         } catch (Exception exc) {
             LogUtil.logException("Exporting data", exc);
@@ -6152,6 +6203,7 @@ public class GuiUtils extends LayoutUtil {
     }
 
 }
+
 
 
 
