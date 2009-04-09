@@ -143,7 +143,7 @@ public class HodographViewManager extends ViewManager {
     /**
      * Set the hodograph display
      *
-     * @param ad  the hodograph display
+     * @param hd  the hodograph display
      */
     public void setHodographDisplay(Hodograph3DDisplay hd) {
         setDisplayMaster(hd);

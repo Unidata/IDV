@@ -2574,7 +2574,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * Get the component that holds the side legend
      *
      * @return side legend container
-     * @deprecate No longer called sideLegendContainer
+     * @deprecated No longer called sideLegendContainer
      */
     public JSplitPane getSideLegendContainer() {
         return mainSplitPane;
