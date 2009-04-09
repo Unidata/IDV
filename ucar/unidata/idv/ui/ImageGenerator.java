@@ -3863,7 +3863,7 @@ public class ImageGenerator extends IdvManager {
                         baseY += height + 30;
                     }
                     if(forKml) {
-                        String tmpImageFile = applyMacros(child,ATTR_FILE,getIdv().getStore().getTmpFile("testcolorbar.png"));
+                        String tmpImageFile = applyMacros(child,ATTR_FILE,getIdv().getStore().getTmpFile("testcolorbar${viewindex}.png"));
                         String template  ="<ScreenOverlay><name>${kml.name}</name><Icon><href>${icon}</href></Icon>\n"+
                             "<overlayXY x=\"${kml.overlayXY.x}\" y=\"${kml.overlayXY.y}\" xunits=\"${kml.overlayXY.xunits}\" yunits=\"${kml.overlayXY.yunits}\"/>\n" +
                             "<screenXY x=\"${kml.screenXY.x}\" y=\"${kml.screenXY.y}\" xunits=\"${kml.screenXY.xunits}\" yunits=\"${kml.screenXY.yunits}\"/>\n" +
