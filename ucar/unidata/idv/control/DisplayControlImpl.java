@@ -6011,8 +6011,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                               + displayCnt + ".png";
                     displayCnt++;
                     System.err.println("Writing image:" + displayImageFile);
-                    ((ViewManager) viewManagers.get(i)).writeImage(
-                        displayImageFile, true);
+                    ViewManager viewManager =   ((ViewManager) viewManagers.get(i));
+                    GuiUtils.showComponentInTabs(viewManager.getComponent());
+                    viewManager.writeImage(displayImageFile, true);
                 }
             }
             if (displayMasters != null) {
