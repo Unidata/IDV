@@ -13,8 +13,8 @@ foreach jar [glob ../lib/*.jar] {
         continue
     }
     if {[regexp slf4j $jar]} {
-        puts "***** skipping $jar"
-        continue
+#        puts "***** skipping $jar"
+#        continue
     }
     puts "Unjarring $jar"
     exec jar -xvf $jar

@@ -155,7 +155,7 @@ public class CatalogTypeHandler extends GenericTypeHandler {
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
             if ( !child.getTagName().equals(
-                    CatalogOutputHandler.TAG_DATASET)) {
+                    CatalogUtil.TAG_DATASET)) {
                 continue;
             }
             ids.put(getId(child), child);
@@ -294,7 +294,7 @@ public class CatalogTypeHandler extends GenericTypeHandler {
                     + url);
         }
         Element dataset = (Element) XmlUtil.findChild(root,
-                              CatalogOutputHandler.TAG_DATASET);
+                              CatalogUtil.TAG_DATASET);
         if (dataset != null) {
             root = dataset;
         }
@@ -315,7 +315,7 @@ public class CatalogTypeHandler extends GenericTypeHandler {
         NodeList elements = XmlUtil.getElements(dataset);
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
-            if (child.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
+            if (child.getTagName().equals(CatalogUtil.TAG_DATASET)) {
                 String datasetId = getId(child);
                 String entryId   = getCatalogId(url + ":id:" + datasetId);
                 childIdToParent.put(entryId, parentId);
@@ -422,7 +422,7 @@ public class CatalogTypeHandler extends GenericTypeHandler {
                     + url);
         }
         Element child = (Element) XmlUtil.findChild(root,
-                            CatalogOutputHandler.TAG_DATASET);
+                            CatalogUtil.TAG_DATASET);
 
         if (child != null) {
             root = child;
@@ -443,14 +443,14 @@ public class CatalogTypeHandler extends GenericTypeHandler {
             resource = new Resource("", Resource.TYPE_URL);
         } else {
             String urlPath = XmlUtil.getAttribute(root,
-                                 CatalogOutputHandler.ATTR_URLPATH,
+                                 CatalogUtil.ATTR_URLPATH,
                                  (String) null);
             if (urlPath == null) {
                 Element accessNode = XmlUtil.findChild(root,
-                                         CatalogOutputHandler.TAG_ACCESS);
+                                         CatalogUtil.TAG_ACCESS);
                 if (accessNode != null) {
                     urlPath = XmlUtil.getAttribute(accessNode,
-                            CatalogOutputHandler.ATTR_URLPATH);
+                            CatalogUtil.ATTR_URLPATH);
                 }
             }
 

@@ -30,6 +30,7 @@ import ucar.unidata.repository.data.*;
 
 import ucar.unidata.sql.SqlUtil;
 
+
 import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
@@ -281,14 +282,14 @@ public class CatalogHarvester extends Harvester {
                                  IOUtil.getFileTail(catalogUrlPath));
         NodeList elements = XmlUtil.getElements(node);
         String urlPath = XmlUtil.getAttribute(node,
-                             CatalogOutputHandler.ATTR_URLPATH,
+                             CatalogUtil.ATTR_URLPATH,
                              (String) null);
         if (urlPath == null) {
             Element accessNode = XmlUtil.findChild(node,
-                                     CatalogOutputHandler.TAG_ACCESS);
+                                     CatalogUtil.TAG_ACCESS);
             if (accessNode != null) {
                 urlPath = XmlUtil.getAttribute(accessNode,
-                        CatalogOutputHandler.ATTR_URLPATH);
+                        CatalogUtil.ATTR_URLPATH);
             }
         }
 
@@ -296,7 +297,7 @@ public class CatalogHarvester extends Harvester {
         boolean haveChildDatasets = false;
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
-            if (child.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
+            if (child.getTagName().equals(CatalogUtil.TAG_DATASET)) {
                 haveChildDatasets = true;
                 break;
             }

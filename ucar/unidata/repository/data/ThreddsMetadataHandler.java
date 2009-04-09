@@ -45,6 +45,7 @@ import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.repository.*;
 
 import ucar.unidata.sql.SqlUtil;
+import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -598,10 +599,10 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                           "icon" });
         } else if (type.equals(TYPE_PUBLISHER) || type.equals(TYPE_CREATOR)) {
             Element node = XmlUtil.create(doc, getTag(type), datasetNode);
-            XmlUtil.create(doc, CatalogOutputHandler.TAG_NAME, node,
+            XmlUtil.create(doc, CatalogUtil.TAG_NAME, node,
                            metadata.getAttr1(), new String[] { ATTR_ROLE,
                     metadata.getAttr2() });
-            XmlUtil.create(doc, CatalogOutputHandler.TAG_CONTACT, node,
+            XmlUtil.create(doc, CatalogUtil.TAG_CONTACT, node,
                            new String[] { ATTR_EMAIL,
                                           metadata.getAttr3(), ATTR_URL,
                                           metadata.getAttr4() });
@@ -958,14 +959,14 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                 "", "");
         } else if (isTag(tag, TYPE_PUBLISHER) || isTag(tag, TYPE_CREATOR)) {
             Element nameNode = XmlUtil.findChild(child,
-                                   CatalogOutputHandler.TAG_NAME);
+                                   CatalogUtil.TAG_NAME);
             String name = XmlUtil.getChildText(nameNode).trim();
             String vocabulary = XmlUtil.getAttribute(nameNode,
                                     ATTR_VOCABULARY, "");
             String email = "";
             String url   = "";
             Element contactNode = XmlUtil.findChild(child,
-                                      CatalogOutputHandler.TAG_CONTACT);
+                                      CatalogUtil.TAG_CONTACT);
             if (contactNode != null) {
                 email = XmlUtil.getAttribute(contactNode, ATTR_EMAIL, "");
                 url   = XmlUtil.getAttribute(contactNode, ATTR_URL, "");

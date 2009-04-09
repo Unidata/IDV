@@ -34,6 +34,7 @@ import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
+import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -239,7 +240,7 @@ return new Result(title, sb);
         NodeList elements = XmlUtil.getElements(node);
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
-            if (child.getTagName().equals(CatalogOutputHandler.TAG_DATASET)) {
+            if (child.getTagName().equals(CatalogUtil.TAG_DATASET)) {
                 String name = XmlUtil.getAttribute(child, ATTR_NAME, "");
                 sb.append("<li>");
                 sb.append(name);
