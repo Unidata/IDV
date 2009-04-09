@@ -1215,9 +1215,10 @@ public class GeoGridDataSource extends GridDataSource {
                                 Hashtable requestProperties)
             throws VisADException, RemoteException {
         //        synchronized (readLock) {
-            //            System.err.println("getData:" + dataChoice);
-            return makeFieldImpl(dataChoice, givenDataSelection,
+        //        System.err.println("getData:" + getFilePath() +" field="+dataChoice);
+        Data data =  makeFieldImpl(dataChoice, givenDataSelection,
                                  requestProperties);
+        return data;
             //        }
     }
 
@@ -1580,7 +1581,7 @@ public class GeoGridDataSource extends GridDataSource {
             if ( !JobManager.getManager().canContinue(loadId)) {
                 return null;
             }
-            LogUtil.userMessage(log_, "Unable to load field: " + paramName,
+            LogUtil.userMessage(log_, "Unable to load field: " + paramName +" from:" + getFilePath(),
                                 true);
             return null;
         }

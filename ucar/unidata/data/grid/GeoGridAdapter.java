@@ -1273,7 +1273,7 @@ public class GeoGridAdapter {
             StringBuffer testModeBuffer = null;
 
             ThreadManager threadManager = new ThreadManager("GeoGrid data reading");
-            threadManager.debug = true;
+            //            threadManager.debug = true;
             for (int i = 0; i < times.length; i++) {
                 if ( !JobManager.getManager().canContinue(loadId)) {
                     return null;

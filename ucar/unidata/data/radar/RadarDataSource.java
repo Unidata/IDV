@@ -304,7 +304,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
 
         }
 
-        threadManager.debug = true;
+        //        threadManager.debug = true;
         threadManager.runInParallel(getDataContext().getIdv().getMaxDataThreadCount());
         LogUtil.message("");
 
