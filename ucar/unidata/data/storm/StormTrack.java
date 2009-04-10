@@ -82,6 +82,8 @@ public class StormTrack implements Comparable {
 
     private static final int DIAMOND_MISSING_VALUE = 9999;
 
+    private boolean isEdited = false;
+
     /**
      * _more_
      *
@@ -228,6 +230,32 @@ public class StormTrack implements Comparable {
         return way.isObservation();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isEdited() {
+        return isEdited;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public void setIsEdited(boolean isEdited) {
+        this.isEdited = isEdited;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsEdited() {
+        return this.isEdited;
+    }
 
     /**
      * _more_
