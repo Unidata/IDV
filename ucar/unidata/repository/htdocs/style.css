@@ -33,6 +33,10 @@ body {
   border :none;
 }
 
+.logo {
+   margin: 5px;
+}
+
 .errorlabel {
     color:#F00;
     font-weight: bold;

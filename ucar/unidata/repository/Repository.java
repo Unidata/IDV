@@ -110,6 +110,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     public static final String MACRO_LINKS = "links";
+    public static final String MACRO_LOGO_URL = "logo.url";
+    public static final String MACRO_LOGO_IMAGE = "logo.image";
+
+
 
     /** _more_ */
     public static final String MACRO_ENTRY_HEADER = "entry.header";
@@ -2415,8 +2419,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if(head == null){
             head = "";
         }
+        String logoImage = getProperty(PROP_LOGO_IMAGE,"").trim();
+        if(logoImage.length()==0) {
+            logoImage  = "${root}/images/logo.png";
+        }
         String   html   = template;
         String[] macros = new String[] {
+            MACRO_LOGO_URL,getProperty(PROP_LOGO_URL,""),
+            MACRO_LOGO_IMAGE,logoImage,
             MACRO_HEADER_IMAGE, iconUrl(ICON_HEADER), MACRO_HEADER_TITLE,
             getProperty(PROP_REPOSITORY_NAME, "Repository"), MACRO_USERLINK,
             getUserManager().getUserLinks(request), MACRO_REPOSITORY_NAME,
@@ -2912,6 +2922,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
         writeGlobal(name, BLANK + value);
     }
 
+    protected void writeGlobal(Request request, String propName) throws Exception {
+        writeGlobal(propName,
+                    request.getString(propName,
+                                      getProperty(propName,"")));
+    }
 
 
     /**

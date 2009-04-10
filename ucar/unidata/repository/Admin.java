@@ -460,7 +460,7 @@ public class Admin extends RepositoryManager {
             title = "Installation";
             sb.append(HtmlUtil.formTable());
             sb.append(
-                "Here is the local file system directory where data is stored and the database information.<br>Now would be a good time to change these settings and restart RAMADDA if this is not what you want.<br>See <a target=\"other\" href=\"http://www.unidata.ucar.edu/software/ramadda/docs/userguide/installing.html\">here</a> for installation instructions.");
+                "<p>Thank you for installing the RAMADDA Repository. <p>Here is the local file system directory where data is stored and the database information.<br>Now would be a good time to change these settings and restart RAMADDA if this is not what you want.<br>See <a target=\"other\" href=\"http://www.unidata.ucar.edu/software/ramadda/docs/developer/installing.html\">here</a> for installation instructions.");
             getStorageManager().addInfo(sb);
             getDatabaseManager().addInfo(sb);
             sb.append(HtmlUtil.formEntry("", HtmlUtil.submit(msg("Next"))));
@@ -475,6 +475,7 @@ public class Admin extends RepositoryManager {
             title = "Administrator";
             String  id        = "";
             String  name      = "";
+
             boolean triedOnce = false;
             if (request.exists(UserManager.ARG_USER_ID)) {
                 triedOnce = true;
@@ -506,12 +507,39 @@ public class Admin extends RepositoryManager {
 
 
                 if (okToAdd) {
-                    getUserManager().makeOrUpdateUser(new User(id, name, "",
+                    getUserManager().makeOrUpdateUser(new User(id, name, 
+                                                               request.getString(UserManager.ARG_USER_EMAIL,"").trim(),
                             "", "", getUserManager().hashPassword(password1),
                             true, "", ""), false);
                     didIt(ARG_ADMIN_ADMINCREATED);
                     didIt(ARG_ADMIN_INSTALLCOMPLETE);
-                    sb.append(msg("Site administrator created"));
+
+                    if(request.defined(PROP_HOSTNAME)) {
+                        getRepository().writeGlobal(PROP_HOSTNAME,
+                                                    request.getString(PROP_HOSTNAME,
+                                                                      "").trim());
+                    }
+
+                    if(request.defined(PROP_PORT)) {
+                        getRepository().writeGlobal(PROP_PORT,
+                                                    request.getString(PROP_PORT,
+                                                                      "").trim());
+                    }
+
+                    if(request.defined(PROP_REPOSITORY_NAME)) {
+
+                        getRepository().writeGlobal(PROP_REPOSITORY_NAME,
+                                                    request.getString(PROP_REPOSITORY_NAME,
+                                                                      ""));
+                    }
+                    if(request.defined(UserManager.ARG_USER_EMAIL)) {
+                        getRepository().writeGlobal(PROP_ADMIN_EMAIL,
+                                                    request.getString(UserManager.ARG_USER_EMAIL,""));
+                    }
+
+
+
+                    sb.append(getRepository().note(msg("Site administrator created")));
                     sb.append(HtmlUtil.p());
                     sb.append(getUserManager().makeLoginForm(request));
                     return new Result("", sb);
@@ -522,12 +550,10 @@ public class Admin extends RepositoryManager {
                 sb.append(HtmlUtil.p());
             }
 
-
-            sb.append(
-                msg("Please enter a site administrator name and password"));
-            sb.append(HtmlUtil.p());
+            sb.append(msg("Please enter the following information"));
             sb.append(request.form(getRepository().URL_DUMMY));
             sb.append(HtmlUtil.formTable());
+            sb.append(HtmlUtil.colspan(msgHeader("Administrator Login"), 2));
             sb.append(
                 HtmlUtil.formEntry(
                     msgLabel("ID"),
@@ -536,20 +562,45 @@ public class Admin extends RepositoryManager {
                 HtmlUtil.formEntry(
                     msgLabel("Name"),
                     HtmlUtil.input(UserManager.ARG_USER_NAME, name)));
-
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Email"),
+                    HtmlUtil.input(UserManager.ARG_USER_EMAIL, request.getString(UserManager.ARG_USER_EMAIL,""))));
             sb.append(
                 HtmlUtil.formEntry(
                     msgLabel("Password"),
                     HtmlUtil.password(UserManager.ARG_USER_PASSWORD1)));
-
             sb.append(
                 HtmlUtil.formEntry(
                     msgLabel("Password Again"),
                     HtmlUtil.password(UserManager.ARG_USER_PASSWORD2)));
 
+
+            sb.append(HtmlUtil.colspan(msgHeader("Server Information"), 2));
+            String hostname = "";
+            String port = "";
+            if(request.getHttpServletRequest()!=null) {
+                hostname = request.getHttpServletRequest().getServerName();
+                port = ""+request.getHttpServletRequest().getServerPort();
+            }
+            hostname = request.getString(PROP_HOSTNAME,hostname);
+            port = request.getString(PROP_PORT,port);
+
+            sb.append(HtmlUtil.formEntry(msgLabel("Repository Title"),HtmlUtil.input(PROP_REPOSITORY_NAME,
+                                                        request.getString(PROP_REPOSITORY_NAME,
+                                                                          getRepository().getProperty(PROP_REPOSITORY_NAME,
+                                                                          "RAMADDA Repository")), HtmlUtil.SIZE_60)));
             sb.append(
                 HtmlUtil.formEntry(
-                    "", HtmlUtil.submit(msg("Make Administrator"))));
+                    msgLabel("Hostname"),
+                    HtmlUtil.input(PROP_HOSTNAME,hostname,HtmlUtil.SIZE_60)));
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Port"),
+                    HtmlUtil.input(PROP_PORT,port,HtmlUtil.SIZE_10)));
+            sb.append(HtmlUtil.formTableClose());
+            sb.append(HtmlUtil.p());
+            sb.append(HtmlUtil.submit(msg("Initialize Server")));
         }
 
         StringBuffer finalSB = new StringBuffer();
@@ -850,6 +901,37 @@ public class Admin extends RepositoryManager {
                             + msg("For sending password reset messages")));
 
 
+
+        csb.append(HtmlUtil.colspan(msgHeader("Site Information"), 2));
+        csb.append(HtmlUtil.formEntry(msgLabel("Hostname"),
+                                      HtmlUtil.input(PROP_HOSTNAME,
+                                          getProperty(PROP_HOSTNAME, ""),
+                                          HtmlUtil.SIZE_40)));
+
+        csb.append(HtmlUtil.formEntry(msgLabel("HTTP Port"),
+                                      HtmlUtil.input(PROP_PORT,
+                                          getProperty(PROP_PORT, ""),
+                                          HtmlUtil.SIZE_5)));
+
+
+        String allSslCbx =
+            HtmlUtil.space(3)
+            + HtmlUtil.checkbox(
+                PROP_ACCESS_ALLSSL, "true",
+                getProperty(PROP_ACCESS_ALLSSL, false)) + " "
+                    + msg("Force all connections to be secure");
+        csb.append(
+            HtmlUtil.formEntry(
+                msgLabel("SSL Port"),
+                HtmlUtil.input(
+                    PROP_SSL_PORT, getProperty(PROP_SSL_PORT, ""),
+                    HtmlUtil.SIZE_5) + HtmlUtil.space(1)
+                                     + msg("Port number for SSL access.")
+                                     + HtmlUtil.space(1) + allSslCbx));
+
+
+
+
         csb.append(HtmlUtil.formTableClose());
 
 
@@ -865,6 +947,16 @@ public class Admin extends RepositoryManager {
                                          HtmlUtil.textArea(PROP_HTML_FOOTER,
                                              getProperty(PROP_HTML_FOOTER,
                                                  ""), 5, 60)));
+
+        dsb.append(HtmlUtil.formEntry(msgLabel("Logo Image Location"),
+                                      HtmlUtil.input(PROP_LOGO_IMAGE,
+                                          getProperty(PROP_LOGO_IMAGE,
+                                              ""), size)));
+        dsb.append(HtmlUtil.formEntry(msgLabel("Logo URL"),
+                                      HtmlUtil.input(PROP_LOGO_URL,
+                                          getProperty(PROP_LOGO_URL,
+                                              ""), size)));
+
 
 
 
@@ -906,36 +998,7 @@ public class Admin extends RepositoryManager {
         asb.append(HtmlUtil.formTable());
 
 
-
-        asb.append(HtmlUtil.colspan("Site Information", 2));
-        asb.append(HtmlUtil.formEntry(msgLabel("Hostname"),
-                                      HtmlUtil.input(PROP_HOSTNAME,
-                                          getProperty(PROP_HOSTNAME, ""),
-                                          HtmlUtil.SIZE_40)));
-
-        asb.append(HtmlUtil.formEntry(msgLabel("HTTP Port"),
-                                      HtmlUtil.input(PROP_PORT,
-                                          getProperty(PROP_PORT, ""),
-                                          HtmlUtil.SIZE_5)));
-
-
-        String allSslCbx =
-            HtmlUtil.space(3)
-            + HtmlUtil.checkbox(
-                PROP_ACCESS_ALLSSL, "true",
-                getProperty(PROP_ACCESS_ALLSSL, false)) + " "
-                    + msg("Force all connections to be secure");
-        asb.append(
-            HtmlUtil.formEntry(
-                msgLabel("SSL Port"),
-                HtmlUtil.input(
-                    PROP_SSL_PORT, getProperty(PROP_SSL_PORT, ""),
-                    HtmlUtil.SIZE_5) + HtmlUtil.space(1)
-                                     + msg("Port number for SSL access.")
-                                     + HtmlUtil.space(1) + allSslCbx));
-
-
-        asb.append(HtmlUtil.colspan("Site Access", 2));
+        asb.append(HtmlUtil.colspan(msgHeader("Site Access"), 2));
         asb.append(
             HtmlUtil.formEntry(
                 "",
@@ -956,7 +1019,7 @@ public class Admin extends RepositoryManager {
 
 
 
-        asb.append(HtmlUtil.colspan("Anonymous Uploads", 2));
+        asb.append(HtmlUtil.colspan(msgHeader("Anonymous Uploads"), 2));
         asb.append(
             HtmlUtil.formEntryTop(
                 msgLabel("Max directory size"),
@@ -967,7 +1030,7 @@ public class Admin extends RepositoryManager {
                         10.0), HtmlUtil.SIZE_10) + " (GBytes)"));
 
 
-        asb.append(HtmlUtil.colspan("Cache Size", 2));
+        asb.append(HtmlUtil.colspan(msgHeader("Cache Size"), 2));
         asb.append(
             HtmlUtil.formEntryTop(
                 msgLabel("Size"),
@@ -979,11 +1042,13 @@ public class Admin extends RepositoryManager {
 
 
 
-        asb.append(HtmlUtil.colspan("File Access", 2));
+        asb.append(HtmlUtil.colspan(msgHeader("File Access"), 2));
         String fileWidget = HtmlUtil.textArea(PROP_LOCALFILEPATHS,
                                 getProperty(PROP_LOCALFILEPATHS, ""), 5, 40);
         String fileLabel =
-            msg("Enter one server file system directory per line.");
+            msg("Enter one server file system directory per line.")+
+            HtmlUtil.br()+
+            msg("These are the directories that you can create local file view entries under.");
         asb.append(HtmlUtil.formEntryTop(msgLabel("File system access"),
                                          "<table><tr valign=top><td>"
                                          + fileWidget + "</td><td>"
@@ -1082,7 +1147,7 @@ public class Admin extends RepositoryManager {
         osb.append(HtmlUtil.formTableClose());
 
 
-        sb.append(makeConfigBlock("Contact Information", csb.toString()));
+        sb.append(makeConfigBlock("Site and Contact Information", csb.toString()));
         sb.append(makeConfigBlock("Access",  asb.toString()));
         sb.append(makeConfigBlock("Display", dsb.toString()));
         sb.append(makeConfigBlock("Available Output Types", osb.toString()));
@@ -1197,69 +1262,20 @@ public class Admin extends RepositoryManager {
      */
     public Result adminSettingsDo(Request request) throws Exception {
 
-        getRepository().writeGlobal(PROP_ADMIN_EMAIL,
-                                    request.getString(PROP_ADMIN_EMAIL,
-                                        "").trim());
-        getRepository().writeGlobal(PROP_ADMIN_SMTP,
-                                    request.getString(PROP_ADMIN_SMTP,
-                                        "").trim());
-
-        getRepository().writeGlobal(PROP_LDM_PQINSERT,
-                                    request.getString(PROP_LDM_PQINSERT,
-                                        "").trim());
-        getRepository().writeGlobal(PROP_LDM_QUEUE,
-                                    request.getString(PROP_LDM_QUEUE,
-                                        "").trim());
-
-
-        if (request.exists(PROP_REPOSITORY_NAME)) {
-            getRepository().writeGlobal(
-                PROP_REPOSITORY_NAME,
-                request.getString(PROP_REPOSITORY_NAME, ""));
-        }
-
-        if (request.exists(PROP_ADMIN_PHRASES)) {
-            getRepository().writeGlobal(PROP_ADMIN_PHRASES,
-                                        request.getString(PROP_ADMIN_PHRASES,
-                                            ""));
-        }
-
-        if (request.exists(PROP_HTML_FOOTER)) {
-            getRepository().writeGlobal(PROP_HTML_FOOTER,
-                                        request.getString(PROP_HTML_FOOTER,
-                                            ""));
-        }
-
-        if (request.exists(PROP_GOOGLEAPIKEYS)) {
-            getRepository().writeGlobal(PROP_GOOGLEAPIKEYS,
-                                        request.getString(PROP_GOOGLEAPIKEYS,
-                                            ""));
-        }
-
-        if (request.exists(PROP_FACEBOOK_CONNECT_KEY)) {
-            getRepository().writeGlobal(
-                PROP_FACEBOOK_CONNECT_KEY,
-                request.getString(PROP_FACEBOOK_CONNECT_KEY, ""));
-        }
-
-        if (request.exists(PROP_RATINGS_ENABLE)) {
-            getRepository().writeGlobal(PROP_RATINGS_ENABLE,
-                                        request.get(PROP_RATINGS_ENABLE,
-                                            false));
-        }
-
-
-
-
-        getRepository().writeGlobal(PROP_HOSTNAME,
-                                    request.getString(PROP_HOSTNAME,
-                                        getProperty(PROP_HOSTNAME, "")));
-
-
-        getRepository().writeGlobal(PROP_PORT,
-                                    request.getString(PROP_PORT,
-                                        getProperty(PROP_PORT, "")));
-
+        getRepository().writeGlobal(request,PROP_ADMIN_EMAIL);
+        getRepository().writeGlobal(request,PROP_ADMIN_SMTP);
+        getRepository().writeGlobal(request,PROP_LDM_PQINSERT);
+        getRepository().writeGlobal(request,PROP_LDM_QUEUE);
+        getRepository().writeGlobal(request,PROP_LOGO_URL);
+        getRepository().writeGlobal(request,PROP_LOGO_IMAGE);
+        getRepository().writeGlobal(request, PROP_REPOSITORY_NAME);
+        getRepository().writeGlobal(request,PROP_ADMIN_PHRASES);
+        getRepository().writeGlobal(request,PROP_HTML_FOOTER);
+        getRepository().writeGlobal(request,PROP_GOOGLEAPIKEYS);
+        getRepository().writeGlobal(request, PROP_FACEBOOK_CONNECT_KEY);
+        getRepository().writeGlobal(request,PROP_RATINGS_ENABLE);
+        getRepository().writeGlobal(request,PROP_HOSTNAME);
+        getRepository().writeGlobal(request,PROP_PORT);
 
         String oldSsl = getProperty(PROP_SSL_PORT, "");
         String newSsl;

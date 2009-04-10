@@ -126,11 +126,13 @@ public class SearchManager extends RepositoryManager {
     public List<ServerInfo> getFederatedServers() {
         if(federatedServers == null) {
             List<ServerInfo> tmp =  new ArrayList<ServerInfo>();
+            /*
             tmp.add(new ServerInfo("motherlode.ucar.edu",80,"Unidata's RAMADDA  Server",
                                    "This is the main RAMADDA server hosted by Unidata"));
 
             tmp.add(new ServerInfo("harpo",8080,"harpo@8080",
                                    "RAMADDA on Harpo"));
+            */
             federatedServers = tmp;
         }
 
