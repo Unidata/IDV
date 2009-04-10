@@ -4489,7 +4489,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
-    /** _more_          */
+    /** a mutex for accessing the display master          */
     private Object MASTER_MUTEX = new Object();
 
     /**
@@ -6508,4 +6508,5 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
 }
+
 

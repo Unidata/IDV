@@ -115,10 +115,10 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 public class MapViewManager extends NavigatedViewManager {
 
-    /** _more_ */
+    /** preference id for the list of addresses in the geocode dialog */
     public static final String PREF_ADDRESS_LIST = "view.address.list";
 
-    /** _more_ */
+    /** do we reproject when we go to an address */
     public static final String PREF_ADDRESS_REPROJECT =
         "view.address.reproject";
 
@@ -544,13 +544,13 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * are the 2 values close
      *
-     * @param span _more_
-     * @param value1 _more_
-     * @param value2 _more_
+     * @param span the range
+     * @param value1 value 1
+     * @param value2 value 2
      *
-     * @return _more_
+     * @return are the 2 values close
      */
     private boolean isClose(double span, double value1, double value2) {
         //Check that the difference of the two values is < 1% of the given span value
@@ -1482,11 +1482,11 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     /**
-     * _more_
+     * can this viewmanager import the given display control
      *
-     * @param control _more_
+     * @param control the control
      *
-     * @return _more_
+     * @return ok to import
      */
     public boolean okToImportDisplay(DisplayControl control) {
         //Base class method checks for non-null and class equality
@@ -2284,4 +2284,5 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 }
+
 

@@ -72,7 +72,7 @@ public class VerticalXSDisplay extends XSDisplay {
      * RealType.XAxis.
      *
      * @param offScreen are we in offscreen mode
-     * @param dimension _more_
+     * @param dimension the offscreen dimension. may be null
      *
      * @throws RemoteException
      * @throws VisADException
@@ -152,4 +152,5 @@ public class VerticalXSDisplay extends XSDisplay {
         }
     }
 }
+
 

@@ -431,10 +431,11 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
     /**
      * Get the display, casting it to an AerologicalDisplay
      *
-     * @return _more_
+     * @return get the aerological display
      */
     private AerologicalDisplay getAerologicalDisplay() {
         return (AerologicalDisplay) getMaster();
     }
 }
+
 

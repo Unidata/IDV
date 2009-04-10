@@ -133,7 +133,7 @@ public class JythonManager extends IdvManager implements ActionListener {
     /** The path to the editor executable */
     public static final String PROP_JYTHON_EDITOR = "idv.jython.editor";
 
-    /** _more_ */
+    /** color to use for diabled editors */
     private static final Color COLOR_DISABLED = new Color(210, 210, 210);
 
     /** any errors */
@@ -143,7 +143,7 @@ public class JythonManager extends IdvManager implements ActionListener {
     private String tmpJython = "";
 
 
-    /** _more_ */
+    /** the jtree on the left that lists the different python files */
     private TreePanel treePanel;
 
 
@@ -174,7 +174,7 @@ public class JythonManager extends IdvManager implements ActionListener {
     private PythonInterpreter uiInterpreter = null;
 
 
-    /** _more_          */
+    /** the text searching widget          */
     private TextSearcher textSearcher;
 
     /**
@@ -235,7 +235,7 @@ public class JythonManager extends IdvManager implements ActionListener {
     }
 
     /**
-     * _more_
+     * write out the jython library
      */
     private void writeJythonLib() {
         try {
@@ -639,7 +639,7 @@ public class JythonManager extends IdvManager implements ActionListener {
      *
      *
      *
-     * @param editable _more_
+     * @param editable is this editor editable
      * @param label label
      * @param path file
      * @param text text
@@ -1084,9 +1084,9 @@ public class JythonManager extends IdvManager implements ActionListener {
 
 
     /**
-     * _more_
+     * show the help 
      *
-     * @param help _more_
+     * @param help the help id
      */
     public void showHelp(String help) {
         getIdvUIManager().showHelp(help);
@@ -1203,9 +1203,9 @@ public class JythonManager extends IdvManager implements ActionListener {
     }
 
     /**
-     * _more_
+     * initialize the interp
      *
-     * @param interpreter _more_
+     * @param interpreter the interp to initi
      */
     private static void doBasicImports(PythonInterpreter interpreter) {
         interpreter.exec("import sys");
@@ -2063,10 +2063,10 @@ public class JythonManager extends IdvManager implements ActionListener {
     }
 
     /**
-     * _more_
+     * show the formula dialog
      *
-     * @param descriptor _more_
-     * @param isNew _more_
+     * @param descriptor the formula
+     * @param isNew is this a new one or are we just changing it
      */
     public void showFormulaDialog(DerivedDataDescriptor descriptor,
                                   boolean isNew) {
@@ -2405,10 +2405,10 @@ public class JythonManager extends IdvManager implements ActionListener {
      */
     public static class LibHolder extends TextSearcher.TextWrapper {
 
-        /** _more_ */
+        /** the jython manager */
         JythonManager jythonManager;
 
-        /** _more_ */
+        /** am I editable */
         private boolean editable;
 
         /** functions in lib */
@@ -2441,8 +2441,8 @@ public class JythonManager extends IdvManager implements ActionListener {
          *
          *
          *
-         * @param editable _more_
-         * @param jythonManager _more_
+         * @param editable am I editable
+         * @param jythonManager the jytyon manager
          * @param label lable
          * @param editor editor
          * @param filePath lib file
@@ -2577,7 +2577,7 @@ public class JythonManager extends IdvManager implements ActionListener {
     }
 
     /**
-     * Class MyPythonEditor _more_
+     * Class MyPythonEditor the editor class
      *
      *
      * @author IDV Development Team
@@ -2586,16 +2586,16 @@ public class JythonManager extends IdvManager implements ActionListener {
     private static class MyPythonEditor extends JPythonEditor {
 
         /**
-         * _more_
+         * ctor
          *
-         * @throws VisADException _more_
+         * @throws VisADException on badness
          */
         public MyPythonEditor() throws VisADException {}
 
         /**
-         * _more_
+         * get the component that shows the line numbers
          *
-         * @return _more_
+         * @return line number component
          */
         public JTextComponent getLineNumberComponent() {
             return lineNumbers;
@@ -2605,4 +2605,5 @@ public class JythonManager extends IdvManager implements ActionListener {
 
 
 }
+
 

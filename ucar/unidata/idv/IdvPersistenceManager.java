@@ -118,7 +118,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     public static final String PROP_ZIDVPATH = "idv.zidvpath";
 
 
-    /** _more_          */
+    /** property id          */
     public static final String PROP_TIMESLIST = "idv.timeslist";
 
 
@@ -196,7 +196,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
     private JComboBox saveJythonBox;
 
-    /** _more_          */
+    /** lists the publishers          */
     private JComboBox publishCbx;
 
     /** JCheckBox for saving all of the jython library */
@@ -3192,9 +3192,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
 
     /**
-     * _more_
+     * change data
      *
-     * @param input _more_
+     * @param input the input
      */
     public void changeData(Object[] input) {
         DataSource dataSource = (DataSource) input[0];
@@ -3205,23 +3205,23 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     }
 
     /**
-     * _more_
+     * n/a
      *
-     * @param dataSource _more_
+     * @param dataSource the data source
      *
-     * @return _more_
+     * @return n/a
      */
     public boolean changeState(DataSource dataSource) {
         return changeState(dataSource, true);
     }
 
     /**
-     * _more_
+     * n/a
      *
-     * @param dataSource _more_
-     * @param andReload _more_
+     * @param dataSource the data source
+     * @param andReload and reload the data
      *
-     * @return _more_
+     * @return n/a
      */
     public boolean changeState(DataSource dataSource, boolean andReload) {
         List choosers = new ArrayList();
@@ -3820,4 +3820,5 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
 
 }
+
 

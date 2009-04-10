@@ -145,12 +145,12 @@ public class DisplayConventions extends IdvManager {
     }
 
     /**
-     * _more_
+     * format the latlon point
      *
-     * @param llp _more_
-     * @param includeLabel _more_
+     * @param llp the llp
+     * @param includeLabel include the label
      *
-     * @return _more_
+     * @return formatted point
      */
     public String formatLatLonPoint(LatLonPoint llp, boolean includeLabel) {
 
@@ -194,13 +194,13 @@ public class DisplayConventions extends IdvManager {
 
 
     /**
-     * _more_
+     * format the earth location
      *
-     * @param el _more_
-     * @param includeAlt _more_
-     * @param includeLabel _more_
+     * @param el the earth location
+     * @param includeAlt include the altitude
+     * @param includeLabel include that lat/lon label
      *
-     * @return _more_
+     * @return formatted earth location
      */
     public String formatEarthLocation(EarthLocation el, boolean includeAlt,
                                       boolean includeLabel) {
@@ -905,4 +905,5 @@ public class DisplayConventions extends IdvManager {
     }
 
 }
+
 

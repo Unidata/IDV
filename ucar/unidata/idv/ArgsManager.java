@@ -522,11 +522,11 @@ public class ArgsManager extends IdvManager {
     }
 
     /**
-     * _more_
+     * Is the given file a bindle
      *
-     * @param name _more_
+     * @param name the file to check
      *
-     * @return _more_
+     * @return is a bundle or not
      */
     public boolean isBundleFile(String name) {
         return isXidvFile(name) || isZidvFile(name);
@@ -1236,4 +1236,5 @@ public class ArgsManager extends IdvManager {
 
 
 }
+
 
