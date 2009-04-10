@@ -247,9 +247,9 @@ example:
      canstandalone="false"
      label="Storm Track"
      displaycategory="Trajectory"
-     properties="windowVisible=true;"/>
+     properties="showInTabs=false;windowVisible=true;"/>
 
-<!--
+
   <control
      id="stormintesitydisplay"
      categories="IMAGE-*-*"
@@ -259,7 +259,7 @@ example:
      properties="">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
--->
+
 
 
 <!--
