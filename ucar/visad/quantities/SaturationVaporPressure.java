@@ -1,6 +1,4 @@
 /*
- * $Id: SaturationVaporPressure.java,v 1.16 2005/05/13 18:35:43 jeffmc Exp $
- *
  * Copyright  1997-2004 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
@@ -20,43 +18,27 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad.quantities;
 
 
-
-import java.rmi.RemoteException;
-
-import ucar.visad.VisADMath;
 import ucar.visad.Util;
-
+import ucar.visad.VisADMath;
 import visad.CommonUnit;
-
 import visad.Data;
-
 import visad.DerivedUnit;
-
 import visad.Real;
-
 import visad.RealTupleType;
-
 import visad.RealType;
-
 import visad.SI;
-
 import visad.Set;
-
 import visad.TypeException;
-
-import visad.Unit;
-
-import visad.UnitException;
-
 import visad.UnimplementedException;
-
+import visad.Unit;
+import visad.UnitException;
 import visad.VisADException;
 
-import visad.data.netcdf.Quantity;
-import visad.data.netcdf.QuantityDBManager;
+import java.rmi.RemoteException;
 
 
 /**
@@ -65,7 +47,6 @@ import visad.data.netcdf.QuantityDBManager;
  * Instances are immutable.
  *
  * @author Steven R. Emmerson
- * @version $Id: SaturationVaporPressure.java,v 1.16 2005/05/13 18:35:43 jeffmc Exp $
  */
 public class SaturationVaporPressure extends Pressure {
 
@@ -219,8 +200,8 @@ public class SaturationVaporPressure extends Pressure {
         if (temperatureConstant2 == null) {
             synchronized (SaturationVaporPressure.class) {
                 if (temperatureConstant2 == null) {
-                    temperatureConstant2 = new Real(Temperature.getRealType(),
-                                                    29.66, SI.kelvin);
+                    temperatureConstant2 =
+                        new Real(Temperature.getRealType(), 29.66, SI.kelvin);
                 }
             }
         }
@@ -281,8 +262,9 @@ public class SaturationVaporPressure extends Pressure {
         if (temperatureConstant1 == null) {
             synchronized (SaturationVaporPressure.class) {
                 if (temperatureConstant1 == null) {
-                    temperatureConstant1 = new Real(Temperature.getRealType(),
-                                                    273.16, SI.kelvin);
+                    temperatureConstant1 =
+                        new Real(Temperature.getRealType(), 273.16,
+                                 SI.kelvin);
                 }
             }
         }
@@ -370,10 +352,11 @@ public class SaturationVaporPressure extends Pressure {
                     VisADMath.multiply(
                         getTemperatureMultiplier(),
                         VisADMath.divide(
-                            VisADMath.subtract(temperature, getTemperatureConstant1()),
                             VisADMath.subtract(
                                 temperature,
-                                getTemperatureConstant2()))))), getRealType());
+                                getTemperatureConstant1()), VisADMath.subtract(
+                                    temperature,
+                                    getTemperatureConstant2()))))), getRealType());
     }
 
     /**
@@ -396,15 +379,55 @@ public class SaturationVaporPressure extends Pressure {
                    VisADException, RemoteException {
 
         Real tempDiff = (Real) VisADMath.subtract(temperature,
-                                                  getTemperatureConstant2());
+                            getTemperatureConstant2());
+
+        return Util
+            .clone(VisADMath
+                .multiply(VisADMath
+                    .multiply(getTemperatureMultiplier(),
+                        create(temperature)), VisADMath
+                            .divide(getTemperatureConstantDifference(),
+                                VisADMath
+                                    .multiply(tempDiff,
+                                        tempDiff))), getTemperatureDerivativeRealType());
+    }
+
+    /**
+     * Creates a temperature data object from a saturation water vapor pressure
+     * data object.  The algorithm is based on Bolton's 1980 variation of
+     * Teten's 1930 formula for saturation vapor pressure (see "An Introduction
+     * to Boundary Layer Meteorology" by Roland B. Stull (1988) equation
+     * 7.5.2d).
+     *
+     * @param eSat              Saturation water vapor pressure data object.
+     * @param outputType        the RealType of the values
+     * @return                  Temperature data object computed from saturation
+     *                          water vapor pressures data object.  The type of
+     *                          the object will be that of the arguments after
+     *                          standard promotion.
+     * @see ucar.visad.VisADMath
+     * @throws TypeException    Argument has wrong type.
+     * @throws UnitException    Inappropriate unit argument.
+     * @throws VisADException   Couldn't create necessary VisAD object.
+     * @throws RemoteException  Java RMI failure.
+     */
+    public static Data createTemperature(Data eSat, RealType outputType)
+            throws TypeException, UnitException, VisADException,
+                   RemoteException {
+
+        Util.vetType(getRealType(), eSat);
+        if (outputType == null) {
+            outputType = AirTemperature.getRealType();
+        }
+
+        Data log = VisADMath.log(VisADMath.divide(eSat, getESat0()));
 
         return Util.clone(
-            VisADMath.multiply(
-                VisADMath.multiply(
-                    getTemperatureMultiplier(), create(
-                        temperature)), VisADMath.divide(
-                            getTemperatureConstantDifference(), VisADMath.multiply(
-                                tempDiff, tempDiff))), getTemperatureDerivativeRealType());
+            VisADMath.divide(
+                VisADMath.subtract(
+                    VisADMath.multiply(getTemperatureConstant2(), log),
+                    getConstantProduct()), VisADMath.subtract(
+                        log, getTemperatureMultiplier())), outputType);
     }
 
     /**
@@ -428,23 +451,8 @@ public class SaturationVaporPressure extends Pressure {
     public static Data createTemperature(Data eSat)
             throws TypeException, UnitException, VisADException,
                    RemoteException {
-
-        Util.vetType(getRealType(), eSat);
-
-        Data log = VisADMath.log(VisADMath.divide(eSat, getESat0()));
-
-        return Util.clone(
-            VisADMath.divide(
-                VisADMath.subtract(
-                    VisADMath.multiply(
-                        getTemperatureConstant2(), log), getConstantProduct()), VisADMath
-                            .subtract(
-                                log, getTemperatureMultiplier())), AirTemperature
-                                    .getRealType());
+        return createTemperature(eSat, null);
     }
+
 }
-
-
-
-
 
