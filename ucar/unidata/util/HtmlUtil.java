@@ -2559,7 +2559,6 @@ public class HtmlUtil {
     /**
      * _more_
      *
-     * @param id _more_
      * @param label _more_
      * @param content _more_
      * @param visible _more_
