@@ -334,9 +334,8 @@ public class STIStormDataSource extends StormDataSource {
 
 
     /**
-     * _more_
+     * constructor of sti storm data source
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */
@@ -627,8 +626,7 @@ public class STIStormDataSource extends StormDataSource {
 
     /**
      * If d is a missing value return  NaN. Else return d
-     * @param d The value
-     * @param d if d is missing else d
+     * @param d is checked if not missing return same value
      * @param name _more_
      *
      * @return _more_
