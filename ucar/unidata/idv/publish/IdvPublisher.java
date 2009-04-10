@@ -59,7 +59,7 @@ import org.w3c.dom.NodeList;
  * <b>Note:  This framework is very much in flux</b>
  * <p>
  * Right no we just have a single concrete derived
- * class, {@link InfoceteraBlogger}, that publishes
+ * class, InfoceteraBlogger, that publishes
  * weblog content to an Infocetera web log.
  * <p>
  * The idea is that we might a variety of publishing
