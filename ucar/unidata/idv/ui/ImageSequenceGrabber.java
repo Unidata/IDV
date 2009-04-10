@@ -1869,7 +1869,6 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      *
      * @param movieFile file name
      * @param images list of images
-     * @param size image size
      * @param scriptingNode isl node
      */
     public void createKmz(String movieFile, List<ImageWrapper> images, 
