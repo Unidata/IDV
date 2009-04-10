@@ -2,11 +2,23 @@
 See the installation docs at:
 http://www.unidata.ucar.edu/software/ramadda/docs/developer/
 
+
+Look at the ramadda.sh to see how to run RAMADDA stand-alone
+When you first start up ramadda you can complete the initialization and configuration at:
+http://localhost:8080/repository
+
+
+Once logged in go to:
+http://localhost:8080/repository/admin/settings
+to do any further configurations
+
+
+################# Information for the source distribution  #################
+If you have installed the source distribution
 To build and run ramadda just do:
 ant compile runserver
 
-This compiles the local ramadda source and runs the server on
-port 8080
+This compiles the local ramadda source and runs the server on port 8080
 
 
 

@@ -179,6 +179,12 @@
     </target>
 
 
+    <target name="zip" depends="init">
+        <zip destfile="${libsdir}/repository.zip">
+          <zipfileset dir="${releasedir}" prefix="repository"/>
+        </zip>
+     </target>
+
     <target name="repositorytar" depends="init">
         <mkdir dir="${releasedir}"/>
         <delete includeemptydirs="true">
@@ -192,6 +198,13 @@
         <copy  file="${libsdir}/repositorytds.jar" todir="${releasedir}"/>
         <copy  file="${libsdir}/servlet-api.jar" todir="${releasedir}"/>
         <delete file="${libsdir}/repository.tar"/>
+        <delete file="${libsdir}/repository.zip"/>
+        <zip destfile="${libsdir}/repository.zip">
+          <zipfileset dir="${releasedir}" prefix="repository"/>
+        </zip>
+
+
+<!--
         <tar 
             destfile="${libsdir}/repository.tar">
           <tarfileset dir="${releasedir}"
@@ -200,6 +213,10 @@
          </tarfileset>
 
         </tar>
+
+-->
+
+
 <!--
         <delete includeemptydirs="true">
             <fileset dir="${releasedir}" includes="**/*"/>
