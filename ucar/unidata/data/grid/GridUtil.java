@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -1288,7 +1289,7 @@ public class GridUtil {
      */
     public static FieldImpl timeStepDifference(FieldImpl grid, int offset)
             throws VisADException {
-        return timeStepFunc(grid,offset,FUNC_DIFFERENCE);
+        return timeStepFunc(grid, offset, FUNC_DIFFERENCE);
     }
 
 
@@ -1304,7 +1305,7 @@ public class GridUtil {
      */
     public static FieldImpl timeStepSum(FieldImpl grid, int offset)
             throws VisADException {
-        return timeStepFunc(grid,offset,FUNC_SUM);
+        return timeStepFunc(grid, offset, FUNC_SUM);
     }
 
 
@@ -1313,14 +1314,15 @@ public class GridUtil {
      * or D(T) = D(T)+D(T+offset) depending on the value of the func argument
      * Any time steps up to the offset time are set to missing
      * @param grid   grid to average
-     * @param offset time step offset. 
+     * @param offset time step offset.
      * @param func which function to apply, SUM or DIFFERENCE
      * @return the new field
      *
      * @throws VisADException  On badness
      */
 
-    public static FieldImpl timeStepFunc(FieldImpl grid, int offset, String func)
+    public static FieldImpl timeStepFunc(FieldImpl grid, int offset,
+                                         String func)
             throws VisADException {
         try {
             if ( !isTimeSequence(grid)) {
@@ -1345,12 +1347,14 @@ public class GridUtil {
                 if ((timeStepIdx + offset >= 0)
                         && (timeStepIdx + offset < arrays.size())) {
                     float[][] oldValue = arrays.get(timeStepIdx + offset);
-                    if(func.equals(FUNC_DIFFERENCE)) 
+                    if (func.equals(FUNC_DIFFERENCE)) {
                         value = Misc.subtractArray(value, oldValue, value);
-                    else  if(func.equals(FUNC_SUM)) 
+                    } else if (func.equals(FUNC_SUM)) {
                         value = Misc.addArray(value, oldValue, value);
-                    else 
-                        throw new IllegalArgumentException("Unknown function:" + func);
+                    } else {
+                        throw new IllegalArgumentException(
+                            "Unknown function:" + func);
+                    }
                 } else {
                     //System.err.println("filling");
                     Misc.fillArray(value, Float.NaN);
@@ -1373,8 +1377,8 @@ public class GridUtil {
      * Sum each grid point
      *
      * @param grid   grid to analyze
-     * @param makeTimes If true then make a time field with the range 
-     *                  being the same computed value. If false then just 
+     * @param makeTimes If true then make a time field with the range
+     *                  being the same computed value. If false then just
      *                  return a single field of the computed values
      * @return the new field
      *
@@ -1389,8 +1393,8 @@ public class GridUtil {
      * Take the min value at each grid point
      *
      * @param grid   grid to analyze
-     * @param makeTimes If true then make a time field with the range 
-     *                  being the same computed value. If false then just 
+     * @param makeTimes If true then make a time field with the range
+     *                  being the same computed value. If false then just
      *                  return a single field of the computed values
      * @return the new field
      *
@@ -1405,8 +1409,8 @@ public class GridUtil {
      * Take the max value at each grid point
      *
      * @param grid   grid to analyze
-     * @param makeTimes If true then make a time field with the range 
-     *                  being the same computed value. If false then just 
+     * @param makeTimes If true then make a time field with the range
+     *                  being the same computed value. If false then just
      *                  return a single field of the computed values
      * @return the new field
      *
@@ -1423,8 +1427,8 @@ public class GridUtil {
      *
      * @param grid   grid to average
      * @param function One of the FUNC_ enums
-     * @param makeTimes If true then make a time field with the range 
-     *                  being the same computed value. If false then just 
+     * @param makeTimes If true then make a time field with the range
+     *                  being the same computed value. If false then just
      *                  return a single field of the computed values
      * @return the new field
      *
@@ -1493,28 +1497,28 @@ public class GridUtil {
 
 
     /**
-     * Class Grid2D _more_
+     * Class Grid2D holds a 2d lat/lon and value array
      *
      *
      * @author IDV Development Team
      */
     public static class Grid2D {
 
-        /** _more_ */
+        /** the lats */
         float[][] lats;
 
-        /** _more_ */
+        /** the lons */
         float[][] lons;
 
-        /** _more_ */
+        /** the values*/
         float[][][] values;
 
         /**
-         * _more_
+         * ctor
          *
-         * @param lats _more_
-         * @param lons _more_
-         * @param values _more_
+         * @param lats lats
+         * @param lons lons
+         * @param values values
          */
         public Grid2D(float[][] lats, float[][] lons, float[][][] values) {
             this.lats   = lats;
@@ -1523,27 +1527,27 @@ public class GridUtil {
         }
 
         /**
-         * _more_
+         * get the lons
          *
-         * @return _more_
+         * @return the lons
          */
         public float[][] getlons() {
             return lons;
         }
 
         /**
-         * _more_
+         * get the lats
          *
-         * @return _more_
+         * @return the lats
          */
         public float[][] getlats() {
             return lats;
         }
 
         /**
-         * _more_
+         * get the values
          *
-         * @return _more_
+         * @return the values
          */
         public float[][][] getvalues() {
             return values;
@@ -1553,14 +1557,14 @@ public class GridUtil {
     ;
 
     /**
-     * _more_
+     * rectangulrize the given field, making a grid2d out of its spatial domain and values
      *
-     * @param grid _more_
+     * @param grid the grid
      *
-     * @return _more_
+     * @return the grid2d
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     public static Grid2D makeGrid2D(FieldImpl grid)
             throws VisADException, RemoteException {
@@ -1620,12 +1624,12 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * test
      *
-     * @param grid _more_
+     * @param grid test
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
      */
     public static void testIt(FieldImpl grid)
             throws VisADException, RemoteException {
@@ -3484,16 +3488,20 @@ public class GridUtil {
 
 
     /**
-     * _more_
+     * Resample the grid at the positions defined by a SampledSet.
      *
-     * @param grid _more_
-     * @param subDomain _more_
-     * @param samplingMode _more_
-     * @param errorMode _more_
+     * @param  grid   grid to resample (must be a valid 3D grid)
+     * @param  subDomain  set of points to sample on.  It must be compatible
+     *         with the spatial domain of the grid.
+     * @param  samplingMode sampling method to use for slicing
+     * @param  errorMode  error method to use for error propagation
      *
-     * @return _more_
+     * @return  a FieldImpl the grid representing the values
+     *          of the original grid at the
+     *          points defined by subDomain.  If this is a sequence of grids
+     *          it will be a sequence of the subsets.
      *
-     * @throws VisADException _more_
+     * @throws  VisADException  invalid subDomain or some other problem
      */
     private static FieldImpl resampleGridInner(FieldImpl grid,
             SampledSet subDomain, int samplingMode, int errorMode)
@@ -4222,6 +4230,9 @@ public class GridUtil {
     }
 
 
+
+
+
     /**
      * Find the indices of the domain values contained in the map
      *
@@ -4295,6 +4306,31 @@ public class GridUtil {
     }
 
 
+
+    /**
+     * Recursively find all of the Gridded2DSets held by the map
+     *
+     * @param map the map
+     * @param allSets all sets
+     *
+     * @throws VisADException On badness
+     */
+    private static void collectGriddedSets(UnionSet map,
+                                           List<Gridded2DSet> allSets)
+            throws VisADException {
+        SampledSet[] sets = map.getSets();
+        for (int j = 0; j < sets.length; j++) {
+            if (sets[j] instanceof UnionSet) {
+                collectGriddedSets((UnionSet) sets[j], allSets);
+            } else if (sets[j] instanceof Gridded2DSet) {
+                allSets.add((Gridded2DSet) sets[j]);
+            } else {
+                //                System.err.println("Unknown polygon type:" + sets[j].getClass().getName());
+            }
+        }
+    }
+
+
     /**
      * Find the indicies contained inside the map bounds
      *
@@ -4319,35 +4355,35 @@ public class GridUtil {
             return indices;
         }
 
-        long         t1            = System.currentTimeMillis();
-        SampledSet[] sets          = map.getSets();
-        List[]       indexLists    = new List[sets.length];
-        List         pts           = new ArrayList();
-        float[]      lonLow        = new float[sets.length];
-        float[]      lonHi         = new float[sets.length];
-        float[]      latLow        = new float[sets.length];
-        float[]      latHi         = new float[sets.length];
+        List<Gridded2DSet> allSets = new ArrayList<Gridded2DSet>();
+        collectGriddedSets(map, allSets);
 
-        boolean      latLonOrder   = isLatLonOrder(map);
-        int          numPolygonPts = 0;
-        for (int j = 0; j < sets.length; j++) {
-            Gridded2DSet g   = (Gridded2DSet) sets[j];
+        long    t1          = System.currentTimeMillis();
+        int     numPolygons = allSets.size();
+        List    pts         = new ArrayList();
+        List[]  indexLists  = new List[numPolygons];
+        float[] lonLow      = new float[numPolygons];
+        float[] lonHi       = new float[numPolygons];
+        float[] latLow      = new float[numPolygons];
+        float[] latHi       = new float[numPolygons];
+        boolean latLonOrder = isLatLonOrder(map);
+        for (int polygonIdx = 0; polygonIdx < numPolygons; polygonIdx++) {
+            Gridded2DSet g   = allSets.get(polygonIdx);
             float[]      low = g.getLow();
             float[]      hi  = g.getHi();
-            lonLow[j] = (latLonOrder
-                         ? low[1]
-                         : low[0]);
-            latLow[j] = (latLonOrder
-                         ? low[0]
-                         : low[1]);
-            lonHi[j]  = (latLonOrder
-                         ? hi[1]
-                         : hi[0]);
-            latHi[j]  = (latLonOrder
-                         ? hi[0]
-                         : hi[1]);
+            lonLow[polygonIdx] = (latLonOrder
+                                  ? low[1]
+                                  : low[0]);
+            latLow[polygonIdx] = (latLonOrder
+                                  ? low[0]
+                                  : low[1]);
+            lonHi[polygonIdx]  = (latLonOrder
+                                  ? hi[1]
+                                  : hi[0]);
+            latHi[polygonIdx]  = (latLonOrder
+                                  ? hi[0]
+                                  : hi[1]);
             float[][] sample = g.getSamples(false);
-            numPolygonPts = sample[0].length;
             pts.add(sample);
         }
 
@@ -4360,7 +4396,7 @@ public class GridUtil {
             if ((lon != lon) || (lat != lat)) {
                 continue;
             }
-            for (int mapIdx = 0; mapIdx < sets.length; mapIdx++) {
+            for (int mapIdx = 0; mapIdx < numPolygons; mapIdx++) {
                 if (inside) {
                     if ((lon < lonLow[mapIdx]) || (lon > lonHi[mapIdx])
                             || (lat < latLow[mapIdx])
@@ -4380,6 +4416,7 @@ public class GridUtil {
                 }
 
                 ptCnt++;
+
                 /*
                 boolean pointInside =
                     DelaunayCustom.inside((float[][]) pts.get(mapIdx),
@@ -4390,7 +4427,6 @@ public class GridUtil {
                         : lat));
                 */
 
-
                 boolean pointInside2 =
                     DataUtil.pointInside((float[][]) pts.get(mapIdx),
                                          (latLonOrder
@@ -4398,10 +4434,9 @@ public class GridUtil {
                                           : lon), (latLonOrder
                         ? lon
                         : lat));
-                /*
-                if(pointInside!=pointInside2) {
-                    System.err.println("bad point:" + lon + " " + lat);
-                    }*/
+                //                if(pointInside!=pointInside2) {
+                //                    System.err.println("bad point:" + lon + " " + lat);
+                //                }
 
                 boolean pointInside = pointInside2;
 
@@ -4420,7 +4455,7 @@ public class GridUtil {
         }
         //System.err.println("total pts:" + numPoints + "  points inside box:"
         //                   + ptCnt + " # polygon points:" + numPolygonPts);
-        int[][] indices = new int[sets.length][];
+        int[][] indices = new int[numPolygons][];
         for (int mapIdx = 0; mapIdx < indexLists.length; mapIdx++) {
             if (indexLists[mapIdx] == null) {
                 indices[mapIdx] = new int[0];
