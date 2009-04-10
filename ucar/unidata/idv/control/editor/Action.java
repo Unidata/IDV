@@ -59,7 +59,7 @@ public  class Action {
      *
      * @param name _more_
      * @param function _more_
-     * @param inside _more_
+     * @param selector _more_
      */
     public Action(String name, String function, Selector selector) {
         this(name, function,null, selector);
