@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -234,6 +235,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
     /** How many get data calls are we currently waiting on */
     private static int outstandingGetDataCalls = 0;
+
+    /** mutex used when accessing the outstanding getdata calls counter     */
+    private static Object MUTEX_OUTSTANDINGGETDATACALLS = new Object();
 
 
     /** properties widget */
@@ -2016,14 +2020,18 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * Increment the static count of get data calls
      */
     public static void incrOutstandingGetDataCalls() {
-        outstandingGetDataCalls++;
+        synchronized (MUTEX_OUTSTANDINGGETDATACALLS) {
+            outstandingGetDataCalls++;
+        }
     }
 
     /**
      * Decrement the static count of get data calls
      */
     public static void decrOutstandingGetDataCalls() {
-        outstandingGetDataCalls--;
+        synchronized (MUTEX_OUTSTANDINGGETDATACALLS) {
+            outstandingGetDataCalls--;
+        }
     }
 
     /**
@@ -2104,17 +2112,15 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                            ? (Data) getCache(cacheKey)
                            : null);
         if (cachedData == null) {
-            outstandingGetDataCalls++;
+            incrOutstandingGetDataCalls();
             try {
                 LogUtil.message("Data: " + toStringTruncated() + ": "
                                 + dataChoice);
-                //              Trace.startTrace();
                 cachedData = getDataInner(dataChoice, category, selection,
                                           requestProperties);
-                //              Trace.stopTrace();
                 LogUtil.message("");
             } finally {
-                outstandingGetDataCalls--;
+                decrOutstandingGetDataCalls();
             }
             if ((cacheKey != null) && (cachedData != null)
                     && shouldCache(cachedData)) {
@@ -2522,7 +2528,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      */
     protected Object beginWritingDataToLocalDisk(String msg) {
         final Object loadId = JobManager.getManager().startLoad(msg, true,
-                                                                false);
+                                  false);
         return loadId;
     }
 
