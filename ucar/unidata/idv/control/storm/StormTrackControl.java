@@ -828,8 +828,6 @@ public class StormTrackControl extends DisplayControlImpl {
     /**
      * _more_
      *
-     * @param
-     *
      * @param param _more_
      *
      * @return _more_

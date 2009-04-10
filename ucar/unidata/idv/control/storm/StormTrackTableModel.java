@@ -209,7 +209,6 @@ public class StormTrackTableModel extends AbstractTableModel {
      *
      * @param aValue _more_
      * @param rowIndex _more_
-     * @param columnIndex _more_
      * @param column _more_
      */
     public void setValueAt(Object aValue, int rowIndex, int column) {
