@@ -77,8 +77,7 @@ public class SoundingTable extends JTable {
      * Create a new sounding table
      * @param display  the associated DisplayControl
      */
-    public SoundingTable(DisplayControlImpl display) {
-    }
+    public SoundingTable(DisplayControlImpl display) {}
 
     /**
      * Set the soundings shown in this table
@@ -172,7 +171,7 @@ public class SoundingTable extends JTable {
             sorter.setTableHeader(getTableHeader());
             setModel(model);
             setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-            //setPreferredScrollableViewportSize(new Dimension(400, 200));
+            setPreferredScrollableViewportSize(new Dimension(400, 200));
             getTableHeader().setReorderingAllowed(false);
         }
         model.fireTableStructureChanged();
@@ -259,3 +258,4 @@ public class SoundingTable extends JTable {
 
     }
 }
+

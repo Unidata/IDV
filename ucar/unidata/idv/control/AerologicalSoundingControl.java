@@ -21,8 +21,6 @@
  */
 
 
-
-
 package ucar.unidata.idv.control;
 
 
@@ -226,7 +224,11 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
     /** location */
     private LatLonPoint location;
 
+    /** winds or not? */
+    private boolean haveWinds = false;
+
     /**
+     *
      * Class ParcelModeInfo
      */
     private static class ParcelModeInfo {
@@ -892,13 +894,19 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             try {
                 aeroDisplay.setProfileVisible(currIndex, false);
                 aeroDisplay.setProfileVisible(index, true);
-                hodoDisplay.setProfileVisible(currIndex, false);
-                hodoDisplay.setProfileVisible(index, true);
+                if (haveWinds) {
+                    hodoDisplay.setProfileVisible(currIndex, false);
+                }
+                if (haveWinds) {
+                    hodoDisplay.setProfileVisible(index, true);
+                }
                 soundingTable.setCurrentSounding(currIndex);
 
                 try {
                     aeroDisplay.setActiveSounding(index);
-                    hodoDisplay.setActiveWindProfile(index);
+                    if (haveWinds) {
+                        hodoDisplay.setActiveWindProfile(index);
+                    }
                     // need to get the actual data for manipulation
                     Sounding s = aeroDisplay.getActiveSounding();
                     setSounding(s.getTemperatureField(),
@@ -907,12 +915,16 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                     currIndex = index;
                 } catch (VisADException ex) {
                     aeroDisplay.setProfileVisible(index, false);
-                    hodoDisplay.setProfileVisible(index, false);
+                    if (haveWinds) {
+                        hodoDisplay.setProfileVisible(index, false);
+                    }
 
                     throw ex;
                 } catch (RemoteException ex) {
                     aeroDisplay.setProfileVisible(index, false);
-                    hodoDisplay.setProfileVisible(index, false);
+                    if (haveWinds) {
+                        hodoDisplay.setProfileVisible(index, false);
+                    }
 
                     throw ex;
                 }
@@ -938,7 +950,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
     /**
      * Get the index of the current sounding
      *
-     * @return _more_
+     * @return the current index
      */
     protected int getCurrentIndex() {
         return currIndex;
@@ -990,15 +1002,17 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         hodoDisplay.clear();
 
         for (int i = 0; i < n; i++) {
-            /*
-            if (i == 0 && windProfiles[i] != null) {
-                visad.python.JPythonMethods.dumpTypes(windProfiles[i]);
+            if ((i == 0) && (windProfiles[i] != null)) {
+                // assumes that if the first one is null, they are all null
+                haveWinds = true;
+                //visad.python.JPythonMethods.dumpTypes(windProfiles[i]);
             }
-            */
             aeroDisplay.addProfile(i, tempProfiles[i], dewProfiles[i],
                                    windProfiles[i]);
-            hodoDisplay.addProfile(i, windProfiles[i]);
-            if (windProfiles[i] == null) {
+            if (haveWinds) {
+                hodoDisplay.addProfile(i, windProfiles[i]);
+            }
+            if ( !haveWinds) {
                 tableSoundings[i] = FieldImpl.combine(new Field[] {
                     tempProfiles[i],
                     dewProfiles[i] }, true);
@@ -1010,7 +1024,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         }
 
         aeroDisplay.setProfileVisible(currIndex, true);
-        hodoDisplay.setProfileVisible(currIndex, true);
+        if (haveWinds) {
+            hodoDisplay.setProfileVisible(currIndex, true);
+        }
         soundingTable.setSoundings(tableSoundings);
         soundingTable.setCurrentSounding(currIndex);
         setSounding(currIndex);
@@ -1542,7 +1558,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
     private void resetProfile(int index) {
         try {
             aeroDisplay.setOriginalProfiles(index);
-            hodoDisplay.setOriginalProfile(index);
+            if (haveWinds) {
+                hodoDisplay.setOriginalProfile(index);
+            }
             setSounding(index);
         } catch (Exception excp) {
             logException("Unable to reset sounding", excp);
