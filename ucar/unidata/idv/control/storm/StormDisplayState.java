@@ -112,6 +112,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.tree.*;
 import javax.swing.event.*;
 
 import javax.swing.table.*;
@@ -2017,7 +2018,33 @@ public class StormDisplayState {
      * @return _more_
      */
     private JComponent getTrackTable() {
-        tableTreePanel = new TreePanel(true, 150);
+        final Font boldFont = new Font("Dialog", Font.BOLD, 10);
+        final Font plainFont = new Font("Dialog", Font.PLAIN, 10);
+        tableTreePanel = new TreePanel(true, 150) {
+                public  DefaultTreeCellRenderer doMakeTreeCellRenderer() {
+                    return new DefaultTreeCellRenderer() {
+                            public Component getTreeCellRendererComponent(JTree theTree,
+                                                                          Object value, boolean sel, boolean expanded,
+                                                                          boolean leaf, int row, boolean hasFocus) {
+                                super.getTreeCellRendererComponent(theTree, value, sel,
+                                                                   expanded, leaf, row, hasFocus);
+                                if ( !(value instanceof TreePanel.MyTreeNode)) {
+                                    return this;
+                                }
+                                TreePanel.MyTreeNode node = (TreePanel.MyTreeNode) value;
+                                StormTrack track = (StormTrack) node.getObject();
+                                if(track.getIsEdited()) {
+                                    this.setFont(boldFont);
+                                    this.setForeground(Color.red);
+                                } else {
+                                    this.setFont(plainFont);
+                                    this.setForeground(Color.black);
+                                }
+                                return this;
+                            }};
+                }
+            };
+
         int width  = 400;
         int height = 400;
         for (StormTrack track : trackCollection.getTracks()) {
@@ -2046,7 +2073,7 @@ public class StormDisplayState {
 
             tableTreePanel.addComponent(contents, track.getWay().toString(),
                                         track.getStartTime().toString(),
-                                        null);
+                                        null,track);
         }
 
 
