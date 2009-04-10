@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -226,6 +227,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
     /** winds or not? */
     private boolean haveWinds = false;
+
+    /** tabbed pane for skewt, hodo and table */
+    private JTabbedPane viewTabs;
 
     /**
      *
@@ -1029,6 +1033,10 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         }
         soundingTable.setSoundings(tableSoundings);
         soundingTable.setCurrentSounding(currIndex);
+        if (viewTabs != null) {
+            viewTabs.setEnabledAt(viewTabs.indexOfTab(HODOGRAPH_DISPLAY),
+                                  haveWinds);
+        }
         setSounding(currIndex);
     }
 
@@ -1312,12 +1320,12 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         sp.setViewportBorder(
             BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-        JComponent  left = (specificWidget != null)
-                           ? GuiUtils.centerBottom(sp, specificWidget)
-                           : sp;
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.add("Sounding Chart", soundingComp);
-        tabs.add("Hodograph", hodoView.getComponent());
+        JComponent left = (specificWidget != null)
+                          ? GuiUtils.centerBottom(sp, specificWidget)
+                          : sp;
+        viewTabs = new JTabbedPane();
+        viewTabs.add("Sounding Chart", soundingComp);
+        viewTabs.add(HODOGRAPH_DISPLAY, hodoView.getComponent());
         JScrollPane tableSP =
             new JScrollPane(
                 soundingTable,
@@ -1325,12 +1333,14 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         tableSP.setViewportBorder(
             BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-        tabs.add("Table", tableSP);
-        GuiUtils.handleHeavyWeightComponentsInTabs(tabs);
-        tabs.setSelectedIndex(0);
+        viewTabs.add("Table", tableSP);
+        GuiUtils.handleHeavyWeightComponentsInTabs(viewTabs);
+        viewTabs.setSelectedIndex(0);
+        viewTabs.setEnabledAt(viewTabs.indexOfTab(HODOGRAPH_DISPLAY),
+                              haveWinds);
 
         //JSplitPane spl = GuiUtils.hsplit(sp, soundingView.getContents(), .35);
-        JSplitPane spl = GuiUtils.hsplit(left, tabs, .35);
+        JSplitPane spl = GuiUtils.hsplit(left, viewTabs, .35);
         spl.setOneTouchExpandable(true);
         //Container contents = GuiUtils.topCenterBottom(locLabel, spl,
         //                         controlArea);
