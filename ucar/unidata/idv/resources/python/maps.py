@@ -28,7 +28,7 @@ def  subsetFromMap(field, mapSets, fillValue=java.lang.Float.NaN,inverse=0):
             rangeObject = subsetRangeFromMap(field.getSample(timeStep), timeStep, mapSets, fillValue, inverse); 
             newData.setSample(timeStep,rangeObject)
         return newData
-    return subsetRangeFromMap(field, 0, map, fillValue, inverse);    
+    return subsetRangeFromMap(field, 0, mapSets, fillValue, inverse);    
 
 
 def  subsetRangeFromMap(range, timeStep, mapSets, fillValue=java.lang.Float.NaN,inverse=0):
