@@ -1694,6 +1694,7 @@ public class StormDisplayState {
                     trackModel.fireTableStructureChanged();
                     Component comp = (Component) track.getTemporaryProperty(
                                          PROP_TRACK_TABLE);
+                    track.setIsEdited(true);
                     if (comp != null) {
                         tableTreePanel.show(comp);
                         tableTreePanel.showPath(comp);
@@ -2099,13 +2100,19 @@ public class StormDisplayState {
                     waysToUse.add(track.getWay());
                 }
                 tracks.add(track);
-                if (track.getWay().isObservation()) {
-                    if (obsCbx.isSelected()) {
+                if(editedCbx.isSelected()) {
+                    if( track.getIsEdited())
                         tracksToWrite.add(track);
-                    }
                 } else {
-                    if (forecastCbx.isSelected()) {
-                        tracksToWrite.add(track);
+                    if (track.getWay().isObservation()) {
+                        if (obsCbx.isSelected()) {
+                            tracksToWrite.add(track);
+                        }
+                    } else {
+                        if (forecastCbx.isSelected()) {
+                            tracksToWrite.add(track);
+                        }
+
                     }
                 }
 
