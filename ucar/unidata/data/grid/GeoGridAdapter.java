@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -64,7 +65,6 @@ import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
 import ucar.visad.quantities.Gravity;
 
-import visad.util.ThreadManager;
 import visad.CachingCoordinateSystem;
 import visad.CartesianProductCoordinateSystem;
 import visad.CommonUnit;
@@ -100,6 +100,8 @@ import visad.data.in.ArithProg;
 import visad.data.in.LonArithProg;
 
 import visad.jmet.MetUnits;
+
+import visad.util.ThreadManager;
 
 import java.io.IOException;
 
@@ -305,7 +307,7 @@ public class GeoGridAdapter {
         }
         //if (isLatLon) {
         if (Unit.canConvert(zUnit, CommonUnit.meter) && (vt == null)) {
-            if (!gcs.isZPositive()) {
+            if ( !gcs.isZPositive()) {
                 // negate units if depth
                 zUnit = zUnit.scale(-1);
             }
@@ -337,6 +339,30 @@ public class GeoGridAdapter {
     }
 
 
+
+
+
+    /**
+     * Wrapper around a synchronized call to getSpatialDomainSet
+     *
+     * @param geogrid  object that contains the metadata used to create
+     *                 the set.
+     * @param timeIndex  time index for time dependent grids
+     *
+     * @return GriddedSet that represents the geolocation of the data.
+     *         Set is cached so all GeoGrids with the same transforms
+     *         use the identical, immutable set.
+     *
+     * @throws VisADException  a problem creating the domain set
+     */
+    private GriddedSet getSpatialDomainSet(GeoGrid geogrid, int timeIndex)
+            throws VisADException {
+        synchronized (dataSource.DOMAIN_SET_MUTEX) {
+            return getSpatialDomainSetInner(geogrid, timeIndex);
+        }
+    }
+
+
     /**
      * ugly, long method to create VisAD Set from a geogrid. The
      * Set can take on a variety of forms (2D or 3D, linear or gridded)
@@ -353,7 +379,8 @@ public class GeoGridAdapter {
      *
      * @throws VisADException  a problem creating the domain set
      */
-    private GriddedSet getSpatialDomainSet(GeoGrid geogrid, int timeIndex)
+    private GriddedSet getSpatialDomainSetInner(GeoGrid geogrid,
+            int timeIndex)
             throws VisADException {
 
         GridCoordSystem   gcs   = geogrid.getCoordinateSystem();
@@ -534,7 +561,7 @@ public class GeoGridAdapter {
 
                 if (Unit.canConvert(zUnit, CommonUnit.meter)) {
                     // check to see if positive is up
-                    if (!gcs.isZPositive()) {
+                    if ( !gcs.isZPositive()) {
                         // negate units if depth
                         zUnit = zUnit.scale(-1);
                     }
@@ -604,7 +631,8 @@ public class GeoGridAdapter {
             ProjectionImpl project = gcs.getProjection();
             CoordinateSystem pCS = new CachingCoordinateSystem(
                                        new ProjectionCoordinateSystem(
-                                           project, new Unit[] {xUnit, yUnit}));
+                                           project, new Unit[] { xUnit,
+                    yUnit }));
             // make the proper RealTypes
             xType = makeRealType(xAxis.getName(), xUnit);
             yType = makeRealType(yAxis.getName(), yUnit);
@@ -1109,15 +1137,17 @@ public class GeoGridAdapter {
         FunctionType ffType =
             new FunctionType(((SetType) domainSet.getType()).getDomain(),
                              paramType);
-        if (!makeGeoGridFlatField) {
+        if ( !makeGeoGridFlatField) {
             //            System.err.println("making flat field");
             try {
                 LogUtil.message(readLabel);
                 Trace.call1("GeoGridAdapter.geogrid.readVolumeData");
                 //                synchronized(geoGrid) {
-                System.err.println (System.currentTimeMillis() +" time:" + timeIndex+ " start read");
+                System.err.println(System.currentTimeMillis() + " time:"
+                                   + timeIndex + " start read");
                 arr = geoGrid.readVolumeData(timeIndex);
-                System.err.println (System.currentTimeMillis() +" time:" + timeIndex+ " end read");
+                System.err.println(System.currentTimeMillis() + " time:"
+                                   + timeIndex + " end read");
                 //                }
                 Trace.call2("GeoGridAdapter.geogrid.readVolumeData");
                 // 3D grid with one level - slice to 2D grid
@@ -1195,10 +1225,13 @@ public class GeoGridAdapter {
             //        Trace.call2("toFloatArray", " length:" + fieldArray[0].length);
             retField = new CachedFlatField(ffType, domainSet, fieldArray);
         } else {
-            Object readLockToUse= (dataSource.isLocalFile()?readLock:new Object());
+            Object readLockToUse = (dataSource.isLocalFile()
+                                    ? readLock
+                                    : new Object());
 
-            GeoGridFlatField ggff = new GeoGridFlatField(geoGrid, readLockToUse,
-                                        timeIndex, domainSet, ffType);
+            GeoGridFlatField ggff = new GeoGridFlatField(geoGrid,
+                                        readLockToUse, timeIndex, domainSet,
+                                        ffType);
 
             if (dataSource.getCacheDataToDisk() && (cacheFile != null)) {
                 ggff.setCacheFile(filename);
@@ -1248,7 +1281,7 @@ public class GeoGridAdapter {
 
         Trace.call1("GeoGridAdapter.makeSequence");
         try {
-            final TreeMap              gridMap  = new TreeMap();
+            final TreeMap        gridMap  = new TreeMap();
             GridCoordSystem      geoSys   = geoGrid.getCoordinateSystem();
             CoordinateAxis1DTime timeAxis = geoSys.getTimeAxis1D();
             int[]                times;
@@ -1269,10 +1302,13 @@ public class GeoGridAdapter {
             } else {
                 times = timeIndices;
             }
-            final Range[][]      sampleRanges   = {null};
-            StringBuffer testModeBuffer = null;
+            final Range[][] sampleRanges   = {
+                null
+            };
+            StringBuffer    testModeBuffer = null;
 
-            ThreadManager threadManager = new ThreadManager("GeoGrid data reading");
+            ThreadManager threadManager =
+                new ThreadManager("GeoGrid data reading");
             //            threadManager.debug = true;
             for (int i = 0; i < times.length; i++) {
                 if ( !JobManager.getManager().canContinue(loadId)) {
@@ -1300,31 +1336,35 @@ public class GeoGridAdapter {
 
 
                     final String readLabel = "Time: " + (i + 1) + "/"
-                                       + times.length + " " + paramName
-                                       + " From: " + dataSource.toString();
+                                             + times.length + " " + paramName
+                                             + " From: "
+                                             + dataSource.toString();
 
 
-                    final int theTimeIndex = times[i];
-                    final DateTime theTime = time;
+                    final int      theTimeIndex = times[i];
+                    final DateTime theTime      = time;
                     threadManager.addRunnable(new ThreadManager.MyRunnable() {
-                            public void run() throws Exception {
-                                readTimeStep(theTimeIndex,theTime, readLabel, 
-                                             gridMap, sampleRanges,lazyEvaluation );
-                            }
-                        });
+                        public void run() throws Exception {
+                            readTimeStep(theTimeIndex, theTime, readLabel,
+                                         gridMap, sampleRanges,
+                                         lazyEvaluation);
+                        }
+                    });
                     try {
                         //                        readTimeStep(times[i],time, readLabel, 
-                                     //                                     gridMap, sampleRanges,lazyEvaluation );
+                        //                                     gridMap, sampleRanges,lazyEvaluation );
                     } catch (Exception excp) {
                         throw new WrapperException(excp);
                     }
                 }
 
             }
-            if(dataSource.isLocalFile()) {
+            if (dataSource.isLocalFile()) {
                 threadManager.runSequentially();
             } else {
-                threadManager.runInParallel(dataSource.getDataContext().getIdv().getMaxDataThreadCount());
+                threadManager
+                    .runInParallel(dataSource.getDataContext().getIdv()
+                        .getMaxDataThreadCount());
             }
 
             //            System.err.println ("GeoGridAdapter DONE");
@@ -1370,24 +1410,35 @@ public class GeoGridAdapter {
     }
 
 
-    private void readTimeStep(int timeIndex, DateTime time, String readLabel, 
-                         TreeMap gridMap, Range[][]sampleRanges,boolean lazyEvaluation )  throws Exception {
+    /**
+     * Read the given time step from the GeoGrid
+     *
+     * @param timeIndex the time index
+     * @param time The time
+     * @param readLabel What to show in the status bar
+     * @param gridMap where to store the grid 
+     * @param sampleRanges sample ranges
+     * @param lazyEvaluation Are we using the CachedFlatField
+     *
+     * @throws Exception On badness
+     */
+    private void readTimeStep(int timeIndex, DateTime time, String readLabel,
+                              TreeMap gridMap, Range[][] sampleRanges,
+                              boolean lazyEvaluation)
+            throws Exception {
 
-        CachedFlatField sample = getFlatField(timeIndex,
-                                              readLabel);
-        synchronized(sampleRanges) {
+        CachedFlatField sample = getFlatField(timeIndex, readLabel);
+        synchronized (sampleRanges) {
             if (sampleRanges[0] == null) {
                 sampleRanges[0] = sample.getRanges(true);
                 //Check to see if the sample is valid
                 if ((sampleRanges[0] != null)
-                    && (sampleRanges[0].length > 0)) {
-                    for (int rangeIdx = 0;
-                         rangeIdx < sampleRanges[0].length;
-                         rangeIdx++) {
+                        && (sampleRanges[0].length > 0)) {
+                    for (int rangeIdx = 0; rangeIdx < sampleRanges[0].length;
+                            rangeIdx++) {
                         Range r = sampleRanges[0][rangeIdx];
                         if (Double.isInfinite(r.getMin())
-                            || Double.isInfinite(
-                                                 r.getMax())) {
+                                || Double.isInfinite(r.getMax())) {
                             sampleRanges[0] = null;
                             //                                        System.err.println("bad sample range");
                             break;
@@ -1396,7 +1447,7 @@ public class GeoGridAdapter {
                 }
             }
         }
-            
+
         sample.setSampleRanges(sampleRanges[0]);
 
 
@@ -1405,17 +1456,16 @@ public class GeoGridAdapter {
                 //If we are running under lazy evaluation then
                 //we don't want to do the fieldMinMax because it
                 //will force a read of the data
-                synchronized(gridMap) {
+                synchronized (gridMap) {
                     gridMap.put(time, sample);
                 }
             } else {
                 Range range = GridUtil.fieldMinMax(sample)[0];
                 // For now, min and max are flipped if all values were NaN
                 if ( !(Double.isInfinite(range.getMin())
-                       && Double.isInfinite(
-                                            range.getMax()))) {
+                        && Double.isInfinite(range.getMax()))) {
                     //When we are testing break after we've read one time.
-                    synchronized(gridMap) {
+                    synchronized (gridMap) {
                         gridMap.put(time, sample);
                     }
                 }

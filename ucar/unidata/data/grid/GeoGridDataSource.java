@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -43,13 +44,13 @@ import ucar.nc2.dt.grid.*;
 
 
 import ucar.unidata.data.*;
-import ucar.unidata.ui.TextSearcher;
 
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
 
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IdvConstants;
+import ucar.unidata.ui.TextSearcher;
 
 import ucar.unidata.util.CacheManager;
 
@@ -128,6 +129,10 @@ import javax.swing.*;
 public class GeoGridDataSource extends GridDataSource {
 
 
+    /** Used to synchronize the geogridadapter     */
+    protected final Object DOMAIN_SET_MUTEX = new Object();
+
+    /** Throw an error when loading a grid bigger than this   */
     private static final int SIZE_THRESHOLD = 500000000;
 
     /** The prefix we hack onto the u and v  variables */
@@ -409,7 +414,7 @@ public class GeoGridDataSource extends GridDataSource {
         */
 
 
-        JTextArea dumpText = new JTextArea();
+        JTextArea    dumpText = new JTextArea();
         TextSearcher searcher = new TextSearcher(dumpText);
         dumpText.setFont(Font.decode("monospaced"));
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -423,7 +428,9 @@ public class GeoGridDataSource extends GridDataSource {
                                    height);
         scroller.setPreferredSize(new Dimension(width, height));
         scroller.setMinimumSize(new Dimension(width, height));
-        tabbedPane.add("Metadata", GuiUtils.inset(GuiUtils.centerBottom(scroller,searcher), 5));
+        tabbedPane.add("Metadata",
+                       GuiUtils.inset(GuiUtils.centerBottom(scroller,
+                           searcher), 5));
     }
 
 
@@ -622,9 +629,14 @@ public class GeoGridDataSource extends GridDataSource {
 
     /**
      * Overwrite this method so we don't show the loading dialog
+     *
+     * @param msg The msg to show in the dialog
+     *
+     * @return The jobmanager loadid
      */
     protected Object beginWritingDataToLocalDisk(String msg) {
-        final Object loadId = JobManager.getManager().startLoad(msg, false, false);
+        final Object loadId = JobManager.getManager().startLoad(msg, false,
+                                  false);
         return loadId;
     }
 
@@ -723,7 +735,7 @@ public class GeoGridDataSource extends GridDataSource {
             }
         });
         List        catComps = new ArrayList();
-        JTabbedPane   tab = new JTabbedPane(JTabbedPane.LEFT);
+        JTabbedPane tab      = new JTabbedPane(JTabbedPane.LEFT);
 
         for (int i = 0; i < categories.size(); i++) {
             List comps = (List) catMap.get(categories.get(i));
@@ -746,8 +758,8 @@ public class GeoGridDataSource extends GridDataSource {
                 GuiUtils.leftRight(
                     new JLabel("Select the fields to download"),
                     allCbx), 5), contents);
-        JLabel label  = new JLabel(getNameForDataSource(this,50,true));
-        contents = GuiUtils.topCenter(label,contents);
+        JLabel label = new JLabel(getNameForDataSource(this, 50, true));
+        contents = GuiUtils.topCenter(label, contents);
         contents = GuiUtils.inset(contents, 5);
         if ( !GuiUtils.showOkCancelDialog(null, "", contents, null)) {
             return null;
@@ -798,7 +810,8 @@ public class GeoGridDataSource extends GridDataSource {
         NetcdfCFWriter writer = new NetcdfCFWriter();
 
         //Start the load, showing the dialog
-        loadId = JobManager.getManager().startLoad("Copying data", true, true);
+        loadId = JobManager.getManager().startLoad("Copying data", true,
+                true);
         try {
             writer.makeFile(path, dataset, varNames, llr, /*dateRange*/ null,
                             includeLatLon, hStride, zStride, timeStride);
@@ -836,6 +849,11 @@ public class GeoGridDataSource extends GridDataSource {
 
 
 
+    /**
+     * Are we a local file
+     *
+     * @return is a local file
+     */
     public boolean isLocalFile() {
         return new File(getFilePath()).exists();
     }
@@ -913,7 +931,7 @@ public class GeoGridDataSource extends GridDataSource {
                              + sizeEntry + "</td><td>");
                 if (timeSize != null) {
                     int times = timeSize.intValue();
-                    if(times>0) {
+                    if (times > 0) {
                         total *= timeSize.intValue();
                         theSb.append("" + timeSize);
                     }
@@ -939,14 +957,14 @@ public class GeoGridDataSource extends GridDataSource {
         if (sb3d != null) {
             sb.append(sb3d);
         }
-        if (sb!=null) {
+        if (sb != null) {
             sb.append("</table>\n");
         }
 
-        if(sb!=null && myLevels!=null && myLevels.size()>0) {
+        if ((sb != null) && (myLevels != null) && (myLevels.size() > 0)) {
             sb.append("<h2>Levels</h2>");
-            for(Object o: myLevels) {
-                sb.append(""+o);
+            for (Object o : myLevels) {
+                sb.append("" + o);
                 sb.append("<br>");
             }
         }
@@ -1007,9 +1025,13 @@ public class GeoGridDataSource extends GridDataSource {
             for (int i = 0; i < sources.size(); i++) {
                 String s = sources.get(i).toString();
                 try {
-                    sb.append(XmlUtil.tag("netcdf", XmlUtil.attrs("location",
-                                                                  IOUtil.getURL(s, getClass()).toString(),
-                                                                  "enhance","true"),""));
+                    sb.append(
+                        XmlUtil.tag(
+                            "netcdf",
+                            XmlUtil.attrs(
+                                "location",
+                                IOUtil.getURL(s, getClass()).toString(),
+                                "enhance", "true"), ""));
                 } catch (IOException ioe) {
                     setInError(true);
                     throw new WrapperException(
@@ -1159,11 +1181,9 @@ public class GeoGridDataSource extends GridDataSource {
 
         //Check if we found any grids
         if (cnt == 0) {
-            if (LogUtil.getInteractiveMode() && GuiUtils.showOkCancelDialog(
-                    null, "No Gridded Data",
-                    GuiUtils.inset(
-                        new JLabel(
-                            "<html>No gridded data found for:<br><br>&nbsp;&nbsp;<i>"
+            if (LogUtil.getInteractiveMode()
+                    && GuiUtils.showOkCancelDialog(null, "No Gridded Data",
+                        GuiUtils.inset(new JLabel("<html>No gridded data found for:<br><br>&nbsp;&nbsp;<i>"
                             + this
                             + "</i><br><br>Do you want to try to load this as another data type?</html>"), 5), null)) {
                 getDataContext().getIdv().getDataManager()
@@ -1216,10 +1236,10 @@ public class GeoGridDataSource extends GridDataSource {
             throws VisADException, RemoteException {
         //        synchronized (readLock) {
         //        System.err.println("getData:" + getFilePath() +" field="+dataChoice);
-        Data data =  makeFieldImpl(dataChoice, givenDataSelection,
-                                 requestProperties);
+        Data data = makeFieldImpl(dataChoice, givenDataSelection,
+                                  requestProperties);
         return data;
-            //        }
+        //        }
     }
 
     /**
@@ -1316,9 +1336,9 @@ public class GeoGridDataSource extends GridDataSource {
             throws VisADException {
 
         boolean readingFullGrid = true;
-        int numLevels = -1;
-        if(fromLevelIndex>=0 && toLevelIndex>=0) {
-            numLevels = Math.abs(toLevelIndex-fromLevelIndex)+1;
+        int     numLevels       = -1;
+        if ((fromLevelIndex >= 0) && (toLevelIndex >= 0)) {
+            numLevels = Math.abs(toLevelIndex - fromLevelIndex) + 1;
         }
 
 
@@ -1380,29 +1400,32 @@ public class GeoGridDataSource extends GridDataSource {
             } else if (levelRange != null) {
                 extraCacheKey = levelRange;
                 //                System.out.println("level range(2):  " + levelRange);
-                geoGrid       = geoGrid.subset(null, levelRange, null, null);
+                geoGrid = geoGrid.subset(null, levelRange, null, null);
             }
         } catch (InvalidRangeException ire) {
             throw new IllegalArgumentException("Invalid range:" + ire);
         }
 
 
-        if(readingFullGrid) {
+        if (readingFullGrid) {
             ThreeDSize size =
                 (ThreeDSize) dataChoice.getProperty(PROP_GRIDSIZE);
             if (size != null) {
-                long    total     = size.getSizeY() * size.getSizeX();
+                long total = size.getSizeY() * size.getSizeX();
                 if (size.getSizeZ() > 1) {
-                    if(numLevels>0) {
+                    if (numLevels > 0) {
                         total *= numLevels;
                     } else {
                         total *= size.getSizeZ();
                     }
                 }
-                if(total>SIZE_THRESHOLD) {
-                    double mb = (total*4);
-                    mb = (mb/1000000.0);
-                    throw new BadDataException("You are requesting a grid with "+ total +" points which is " + Misc.format(mb) +" (MB) of data.\nPlease subset the grid"); 
+                if (total > SIZE_THRESHOLD) {
+                    double mb = (total * 4);
+                    mb = (mb / 1000000.0);
+                    throw new BadDataException(
+                        "You are requesting a grid with " + total
+                        + " points which is " + Misc.format(mb)
+                        + " (MB) of data.\nPlease subset the grid");
                 }
             }
         }
@@ -1430,21 +1453,20 @@ public class GeoGridDataSource extends GridDataSource {
      * @throws VisADException On badness
      */
     private int indexOf(Object o, List levels) throws VisADException {
-        if(o instanceof String) {
+        if (o instanceof String) {
             try {
                 o = ucar.visad.Util.toReal(o.toString());
-            } catch(Exception ignoreThis) {
-            }
+            } catch (Exception ignoreThis) {}
         }
 
 
-        if(o instanceof String) {
-            String s = (String)o;
-            if(s.startsWith("#")) {
+        if (o instanceof String) {
+            String s = (String) o;
+            if (s.startsWith("#")) {
                 int index = new Integer(s.substring(1).trim()).intValue();
                 return index;
             }
-            System.err.println ("s:" + s);
+            System.err.println("s:" + s);
             o = new Real(new Double(s).doubleValue());
         }
 
@@ -1498,9 +1520,12 @@ public class GeoGridDataSource extends GridDataSource {
         if ((fromLevel != null) && (toLevel != null)) {
             fromLevelIndex = indexOf(fromLevel, allLevels);
             //            System.err.println ("fromLevel index:" + fromLevelIndex);
-            toLevelIndex   = indexOf(toLevel, allLevels);
-            if(toLevelIndex<0 || fromLevelIndex<0) {
-                System.err.println ("Did not find level indices:   fromLevel:" + fromLevel +  " index:" + fromLevelIndex + " toLevel:" + toLevel +" index:" + toLevelIndex);
+            toLevelIndex = indexOf(toLevel, allLevels);
+            if ((toLevelIndex < 0) || (fromLevelIndex < 0)) {
+                System.err.println("Did not find level indices:   fromLevel:"
+                                   + fromLevel + " index:" + fromLevelIndex
+                                   + " toLevel:" + toLevel + " index:"
+                                   + toLevelIndex);
             }
         }
 
@@ -1581,8 +1606,9 @@ public class GeoGridDataSource extends GridDataSource {
             if ( !JobManager.getManager().canContinue(loadId)) {
                 return null;
             }
-            LogUtil.userMessage(log_, "Unable to load field: " + paramName +" from:" + getFilePath(),
-                                true);
+            LogUtil.userMessage(log_,
+                                "Unable to load field: " + paramName
+                                + " from:" + getFilePath(), true);
             return null;
         }
 
@@ -1868,7 +1894,7 @@ public class GeoGridDataSource extends GridDataSource {
      */
     public static void main(String[] args) throws Exception {
 
-        if(true) {
+        if (true) {
             GridDataset gds = GridDataset.open(args[0]);
             return;
         }
