@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.view.sounding;
 
 
@@ -45,4 +46,8 @@ public interface AerologicalDisplayConstants {
     /** Emagram display type */
     public static final String EMAGRAM_DISPLAY = "emagram";
 
+    /** Hodograph display type */
+    public static final String HODOGRAPH_DISPLAY = "Hodograph";
+
 }
+
