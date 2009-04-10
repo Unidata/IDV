@@ -1549,7 +1549,8 @@ public class DerivedGridFactory {
         // when the temperature is at the dewpoint.
         // Compute the temperature at which the vapor pressure e is the
         // Saturation vapor pressure. (grid of e values is eFF)
-        return (FlatField) SaturationVaporPressure.createTemperature(eFF);
+        return (FlatField) SaturationVaporPressure.createTemperature(eFF,
+                DewPoint.getRealType());
     }
 
 
