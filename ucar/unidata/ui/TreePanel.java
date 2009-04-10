@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.ui;
 
 
@@ -71,6 +72,7 @@ import javax.swing.tree.*;
 
 public class TreePanel extends JPanel implements TreeSelectionListener {
 
+    /** _more_          */
     public static final String CATEGORY_DELIMITER = ">";
 
     /** the tree */
@@ -117,21 +119,36 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
      * @author IDV Development Team
      * @version $Revision: 1.6 $
      */
-    private static class MyTreeNode extends DefaultMutableTreeNode {
+    public static class MyTreeNode extends DefaultMutableTreeNode {
 
         /** icon */
         public ImageIcon icon;
+
+        /** _more_          */
+        public Object object;
 
         /**
          * ctor
          *
          * @param o object
          * @param icon icon
+         * @param object _more_
          */
-        public MyTreeNode(Object o, ImageIcon icon) {
+        public MyTreeNode(Object o, ImageIcon icon, Object object) {
             super(o);
-            this.icon = icon;
+            this.icon   = icon;
+            this.object = object;
         }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public Object getObject() {
+            return object;
+        }
+
     }
 
 
@@ -158,25 +175,7 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
         tree      = new JTree(treeModel);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
-        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {
-            public Component getTreeCellRendererComponent(JTree theTree,
-                    Object value, boolean sel, boolean expanded,
-                    boolean leaf, int row, boolean hasFocus) {
-
-                super.getTreeCellRendererComponent(theTree, value, sel,
-                        expanded, leaf, row, hasFocus);
-                if ( !(value instanceof MyTreeNode)) {
-                    return this;
-                }
-                MyTreeNode node = (MyTreeNode) value;
-                if (node.icon != null) {
-                    setIcon(node.icon);
-                } else {
-                    setIcon(null);
-                }
-                return this;
-            }
-        };
+        DefaultTreeCellRenderer renderer = doMakeTreeCellRenderer();
         renderer.setIcon(null);
         renderer.setOpenIcon(null);
         renderer.setClosedIcon(null);
@@ -216,6 +215,40 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public DefaultTreeCellRenderer doMakeTreeCellRenderer() {
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {
+            public Component getTreeCellRendererComponent(JTree theTree,
+                    Object value, boolean sel, boolean expanded,
+                    boolean leaf, int row, boolean hasFocus) {
+                super.getTreeCellRendererComponent(theTree, value, sel,
+                        expanded, leaf, row, hasFocus);
+                if ( !(value instanceof MyTreeNode)) {
+                    return this;
+                }
+                MyTreeNode node = (MyTreeNode) value;
+                if (node.icon != null) {
+                    setIcon(node.icon);
+                } else {
+                    setIcon(null);
+                }
+                return this;
+            }
+        };
+        return renderer;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Component getVisibleComponent() {
         return panel.getVisibleComponent();
     }
@@ -263,10 +296,15 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
     }
 
 
-    public void setIcon(Component comp,ImageIcon icon) {
-        MyTreeNode node =
-            (MyTreeNode) compToNode.get(comp);
-        if(node!=null) {
+    /**
+     * _more_
+     *
+     * @param comp _more_
+     * @param icon _more_
+     */
+    public void setIcon(Component comp, ImageIcon icon) {
+        MyTreeNode node = (MyTreeNode) compToNode.get(comp);
+        if (node != null) {
             node.icon = icon;
             tree.repaint();
         }
@@ -283,13 +321,29 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
      */
     public void addComponent(JComponent component, String category,
                              String label, ImageIcon icon) {
+        addComponent(component, category, label, icon, "");
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param component _more_
+     * @param category _more_
+     * @param label _more_
+     * @param icon _more_
+     * @param object _more_
+     */
+    public void addComponent(JComponent component, String category,
+                             String label, ImageIcon icon, Object object) {
         TwoFacedObject         tfo = new TwoFacedObject(label, component);
-        DefaultMutableTreeNode panelNode = new MyTreeNode(tfo, icon);
+        DefaultMutableTreeNode panelNode = new MyTreeNode(tfo, icon, object);
         compToNode.put(component, panelNode);
         if (category == null) {
             root.add(panelNode);
         } else {
-            List toks = StringUtil.split(category, CATEGORY_DELIMITER, true, true);
+            List toks = StringUtil.split(category, CATEGORY_DELIMITER, true,
+                                         true);
             String                 catSoFar = "";
             DefaultMutableTreeNode catNode  = root;
             for (int i = 0; i < toks.size(); i++) {
@@ -312,6 +366,9 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
     }
 
 
+    /**
+     * _more_
+     */
     private void treeChanged() {
         Hashtable stuff = GuiUtils.initializeExpandedPathsBeforeChange(tree,
                               root);
@@ -351,6 +408,11 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param component _more_
+     */
     public void show(Component component) {
         panel.show(component);
     }
