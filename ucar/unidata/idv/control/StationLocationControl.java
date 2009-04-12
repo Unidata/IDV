@@ -47,6 +47,9 @@ import ucar.unidata.ui.TableSorter;
 
 import ucar.unidata.ui.symbol.*;
 
+import ucar.unidata.util.PatternFileFilter;
+import ucar.unidata.util.FileManager;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 
@@ -71,6 +74,8 @@ import visad.georef.EarthLocation;
 import visad.georef.NamedLocation;
 import visad.georef.NamedLocationTuple;
 
+
+import java.io.File;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -1940,6 +1945,47 @@ public class StationLocationControl extends StationModelControl {
         updateDisplayable();
     }
 
+
+    /**
+     * Add the  relevant file menu items into the list
+     *
+     * @param items List of menu items
+     * @param forMenuBar Is this for the menu in the window's menu bar or
+     * for a popup menu in the legend
+     */
+    protected void getSaveMenuItems(List items, boolean forMenuBar) {
+
+        super.getSaveMenuItems(items, forMenuBar);
+        List namedStations = getStationList();
+        if ((namedStations != null) && (namedStations.size() > 0)) {
+            items.add(GuiUtils.makeMenuItem("Export Locations...",
+                                            this, "exportLocations"));
+        }
+    }
+
+    /**
+     * Write out the locations as an xml file
+     */
+    public void exportLocations() {
+        PatternFileFilter xmlFilter =
+            new PatternFileFilter(
+                                  ".+\\.xml", "Location XML Format",
+                                  ".xml");
+    
+        String filename =
+            FileManager.getWriteFile(xmlFilter, ".xml");
+        if (filename == null) {
+            return;
+        }
+        try {
+            List stations = getStationList();
+            String xml= NamedStationTable.getStationXml(IOUtil.getFileTail(filename),null, stations);
+            IOUtil.writeFile(new File(filename), xml);
+        } catch(Exception exc) {
+            logException("Writing locations", exc);
+        }
+
+    }
 
     /**
      * Add the  relevant edit menu items into the list
