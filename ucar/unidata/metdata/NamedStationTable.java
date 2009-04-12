@@ -265,6 +265,8 @@ public class NamedStationTable extends StationTableImpl {
                 : "Table " + counter++);
     }
 
+
+
     /**
      * Add the given root element to the list of roots
      *
@@ -359,11 +361,14 @@ public class NamedStationTable extends StationTableImpl {
     public static String getStationXml(String name, String category,
                                        List stations) {
         StringBuffer sb    = new StringBuffer();
+        sb.append(XmlUtil.XML_HEADER);
+        sb.append("\n");
         String       attrs = XmlUtil.attr(ATTR_NAME, name);
         if (category != null) {
             attrs = attrs + XmlUtil.attr(ATTR_CATEGORY, category);
         }
         sb.append(XmlUtil.openTag(TAG_STATIONTABLE, attrs));
+        sb.append("\n");
         for (int i = 0; i < stations.size(); i++) {
             NamedStationImpl station = (NamedStationImpl) stations.get(i);
             sb.append(XmlUtil.tag(TAG_STATION,
@@ -375,8 +380,10 @@ public class NamedStationTable extends StationTableImpl {
                                           ATTR_ELEV,
                                           station.getAltitude() + "")));
 
+            sb.append("\n");
         }
         sb.append(XmlUtil.closeTag(TAG_STATIONTABLE));
+        sb.append("\n");
         return sb.toString();
     }
 
