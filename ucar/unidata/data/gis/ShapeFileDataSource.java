@@ -35,6 +35,7 @@ import ucar.unidata.util.JobManager;
 import ucar.unidata.util.Misc;
 
 import ucar.visad.ShapefileAdapter;
+import ucar.visad.MapFamily;
 
 
 
@@ -64,6 +65,8 @@ import java.util.List;
  * @version $Revision: 1.28 $ $Date: 2007/04/16 20:34:52 $
  */
 public class ShapeFileDataSource extends FilesDataSource {
+
+    private static MapFamily mapFamily = new MapFamily("IDV maps");
 
     /** Property id for the dbfile */
     public static final String PROP_DBFILE = "PROP_DBFILE";
@@ -217,6 +220,26 @@ public class ShapeFileDataSource extends FilesDataSource {
         byte[] bytes    = null;
         try {
             if (shapefileData == null) {
+
+                //If its not a shp or zip file then try it with the mapFamily
+                if (!IOUtil.hasSuffix(filename,".shp") &&
+                    !IOUtil.hasSuffix(filename,".zip")) {
+                    try {
+                        URL url = IOUtil.getURL(filename, getClass());
+                        shapefileData = (url == null)
+                            ? (SampledSet) mapFamily.open(filename)
+                            : (SampledSet) mapFamily.open(url);
+                        
+                        return shapefileData;
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                    }
+                }
+                
+
+
+
+
                 if (getProperty(PROP_CACHEABLE, false)) {
                     bytes = CacheManager.getCachedFile("ShapeFileDataSource",
                             filename);
@@ -224,7 +247,7 @@ public class ShapeFileDataSource extends FilesDataSource {
 
                 if (bytes == null) {
                     Object loadId =
-                        JobManager.getManager().startLoad("ShapeFile");
+                        JobManager.getManager().startLoad("Map File");
                     bytes = IOUtil.readBytes(IOUtil.getInputStream(filename,
                             getClass()), loadId);
                     JobManager.getManager().stopLoad(loadId);
@@ -234,6 +257,7 @@ public class ShapeFileDataSource extends FilesDataSource {
                     return null;
                 }
 
+
                 ShapefileAdapter sfa =
                     new ShapefileAdapter(new ByteArrayInputStream(bytes, 0,
                         bytes.length), filename);
@@ -241,7 +265,7 @@ public class ShapeFileDataSource extends FilesDataSource {
 
                 dbFile = sfa.getDbFile();
                 //If this is a .shp file then try to read in the dbf file
-                if ((dbFile == null) && filename.endsWith(".shp")) {
+                if ((dbFile == null) && IOUtil.hasSuffix(filename,".shp")) {
                     InputStream dbfInputStream = null;
                     try {
                         String dbFilename = IOUtil.stripExtension(filename)
