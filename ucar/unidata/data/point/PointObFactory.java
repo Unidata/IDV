@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.point;
 
 
@@ -45,8 +46,8 @@ import ucar.nc2.dt.StationObsDatatype;
 import ucar.nc2.dt.point.*;
 import ucar.nc2.ft.FeatureCollection;
 import ucar.nc2.ft.FeatureDatasetPoint;
-import ucar.nc2.ft.PointFeature;
 import ucar.nc2.ft.NestedPointFeatureCollection;
+import ucar.nc2.ft.PointFeature;
 import ucar.nc2.ft.PointFeatureCollection;
 import ucar.nc2.ft.PointFeatureIterator;
 import ucar.nc2.ft.point.*;
@@ -55,8 +56,8 @@ import ucar.nc2.ft.point.writer.CFPointObWriter;
 import ucar.nc2.ft.point.writer.PointObVar;
 
 import ucar.unidata.data.DataAlias;
-import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.GeoLocationInfo;
 
@@ -64,13 +65,13 @@ import ucar.unidata.data.grid.GridUtil;
 
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.Station;
+import ucar.unidata.util.IOUtil;
 
 import ucar.unidata.util.JobManager;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 
@@ -1322,7 +1323,7 @@ public class PointObFactory {
                     + var.getShortName(), var.getShortName()));
 
             //            System.err.println("param "  + var.getShortName());
-            
+
             // now make types
             if (isVarNumeric[varIdx]) {  // RealType
                 Unit unit = DataUtil.parseUnit(var.getUnitsString());
@@ -1355,12 +1356,13 @@ public class PointObFactory {
             throw new IllegalArgumentException(
                 "Can't handle point data with multiple collections");
         }
-        FeatureCollection fc = collectionList.get(0);
+        FeatureCollection      fc         = collectionList.get(0);
         PointFeatureCollection collection = null;
         if (fc instanceof PointFeatureCollection) {
             collection = (PointFeatureCollection) fc;
         } else if (fc instanceof NestedPointFeatureCollection) {
-            NestedPointFeatureCollection npfc = (NestedPointFeatureCollection)  fc;
+            NestedPointFeatureCollection npfc =
+                (NestedPointFeatureCollection) fc;
             collection = (npfc).flatten(llr, null);
         }
         //System.out.println("number of obs = " + collection.size());
@@ -1716,7 +1718,7 @@ public class PointObFactory {
                                    int numPasses)
             throws VisADException, RemoteException {
         return barnes(pointObs, type, xSpacing, ySpacing, numPasses, 10f,
-                      1.0f, null);
+                      1.0f, null, null);
     }
 
     /**
@@ -1730,6 +1732,7 @@ public class PointObFactory {
      * @param gain      grid convergence/pass
      * @param scaleLength  search radius
      * @param params       analysis parameters - used to pass back computed vals
+     * @param firstGuessField The data to use for a first guess. May be null.
      *
      * @return  Grid of objectively analyzed data
      *
@@ -1740,7 +1743,8 @@ public class PointObFactory {
                                    float xSpacing, float ySpacing,
                                    int numPasses, float gain,
                                    float scaleLength,
-                                   Barnes.AnalysisParameters params)
+                                   Barnes.AnalysisParameters params,
+                                   Data firstGuessField)
             throws VisADException, RemoteException {
         FieldImpl retFI = null;
         // System.err.println("xspacing: " + xSpacing+" ySpacing:" + ySpacing);

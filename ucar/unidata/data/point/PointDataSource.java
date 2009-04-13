@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.point;
 
 
@@ -71,6 +72,11 @@ public abstract class PointDataSource extends FilesDataSource {
     /** logging category */
     static LogUtil.LogCategory log_ =
         LogUtil.getLogInstance(PointDataSource.class.getName());
+
+    /** property id for the first guess field */
+    public static final String PROP_FIRSTGUESS = "prop.firstguess";
+
+
 
     /** dataselection property for grid x spacing */
     public static final String PROP_GRID_X = "prop.grid.x";
@@ -530,7 +536,7 @@ public abstract class PointDataSource extends FilesDataSource {
                     dataSelection.putProperty(PROP_GRID_GAIN,
                             new Float(getGridGain()));
                     dataSelection.putProperty(PROP_GRID_SEARCH_RADIUS,
-                                              new Float(getGridSearchRadius()));
+                            new Float(getGridSearchRadius()));
                 } else {
                     dataSelection.removeProperty(PROP_GRID_X);
                     dataSelection.removeProperty(PROP_GRID_Y);
@@ -894,48 +900,58 @@ public abstract class PointDataSource extends FilesDataSource {
                                     ? getSample(choice)
                                     : null);
                 if (sample != null) {
-                    Hashtable seenFields = new Hashtable();
-                    if (ucar.unidata.data.grid.GridUtil.isTimeSequence(
-                            sample)) {
-                        sample = (FieldImpl) sample.getSample(0);
-                    }
-                    PointOb             ob = (PointOb) sample.getSample(0);
-                    Tuple               tuple = (Tuple) ob.getData();
-                    TupleType tupleType = (TupleType) tuple.getType();
-                    MathType[]          types = tupleType.getComponents();
-                    CompositeDataChoice compositeDataChoice = null;
-                    for (int typeIdx = 0; typeIdx < types.length; typeIdx++) {
-                        if ( !(types[typeIdx] instanceof RealType)) {
-                            continue;
+                    for (int dataChoiceType = 0; dataChoiceType < 2;
+                            dataChoiceType++) {
+                        Hashtable seenFields = new Hashtable();
+                        if (ucar.unidata.data.grid.GridUtil.isTimeSequence(
+                                sample)) {
+                            sample = (FieldImpl) sample.getSample(0);
                         }
-                        RealType type = (RealType) types[typeIdx];
-                        if ( !canCreateGrid(type)) {
-                            continue;
-                        }
-                        //                        List gridCategories = 
-                        //                            DataCategory.parseCategories("OA Fields;GRID-2D-TIME;");
-                        List gridCategories =
-                            DataCategory.parseCategories("GRID-2D-TIME;",
-                                false);
-                        if (compositeDataChoice == null) {
-                            compositeDataChoice =
-                                new CompositeDataChoice(this, "",
+                        PointOb             ob =
+                            (PointOb) sample.getSample(0);
+                        Tuple               tuple = (Tuple) ob.getData();
+                        TupleType tupleType = (TupleType) tuple.getType();
+                        MathType[]          types = tupleType.getComponents();
+                        CompositeDataChoice compositeDataChoice = null;
+                        for (int typeIdx = 0; typeIdx < types.length;
+                                typeIdx++) {
+                            if ( !(types[typeIdx] instanceof RealType)) {
+                                continue;
+                            }
+                            RealType type = (RealType) types[typeIdx];
+                            if ( !canCreateGrid(type)) {
+                                continue;
+                            }
+                            //                        List gridCategories = 
+                            //                            DataCategory.parseCategories("OA Fields;GRID-2D-TIME;");
+                            List gridCategories =
+                                DataCategory.parseCategories("GRID-2D-TIME;",
+                                    false);
+                            if (compositeDataChoice == null) {
+                                compositeDataChoice = new CompositeDataChoice(
+                                    this, "",
                                     "Grid Fields from Objective Analysis",
-                                    "Gridded Fields",
-                                    Misc.newList(DataCategory.NONE_CATEGORY),
-                                    null);
-                            addDataChoice(compositeDataChoice);
+                                    "Gridded Fields " + ((dataChoiceType == 0)
+                                        ? ""
+                                        : "(with first guess)"), Misc
+                                            .newList(DataCategory
+                                                .NONE_CATEGORY), null);
+                                addDataChoice(compositeDataChoice);
+                            }
+                            String name = type.toString();
+                            if (seenFields.get(name) != null) {
+                                continue;
+                            }
+                            seenFields.put(name, name);
+                            List idList = Misc.newList(new Integer(i), type);
+                            if (dataChoiceType == 1) {
+                                idList.add(new Boolean(true));
+                            }
+                            DataChoice gridChoice =
+                                new DirectDataChoice(this, idList, name,
+                                    name, gridCategories, (Hashtable) null);
+                            compositeDataChoice.addDataChoice(gridChoice);
                         }
-                        String name = type.toString();
-                        if (seenFields.get(name) != null) {
-                            continue;
-                        }
-                        seenFields.put(name, name);
-                        DataChoice gridChoice =
-                            new DirectDataChoice(this,
-                                Misc.newList(new Integer(i), type), name,
-                                name, gridCategories, (Hashtable) null);
-                        compositeDataChoice.addDataChoice(gridChoice);
                     }
                 }
             } catch (Exception exc) {
@@ -1014,12 +1030,49 @@ public abstract class PointDataSource extends FilesDataSource {
         Object id = dataChoice.getId();
         //If it is a list then we are doing a grid field
         if (id instanceof List) {
-            Integer   i          = (Integer) ((List) id).get(0);
-            RealType  type       = (RealType) ((List) id).get(1);
+            List      idList     = (List) id;
+            Integer   i          = (Integer) idList.get(0);
+            RealType  type       = (RealType) idList.get(1);
             Hashtable properties = dataChoice.getProperties();
             if (properties == null) {
                 properties = new Hashtable();
             }
+
+            Data    firstGuessData    = null;
+            boolean doFirstGuessField = false;
+            if (idList.size() > 2) {
+                doFirstGuessField = ((Boolean) idList.get(2)).booleanValue();
+            }
+
+            if (doFirstGuessField) {
+                DataChoice firstGuessDataChoice =
+                    (DataChoice) dataChoice.getProperty(PROP_FIRSTGUESS);
+                if (firstGuessDataChoice == null) {
+                    List operands = new ArrayList();
+                    List categories = DataCategory.parseCategories(
+                                          "GRID-2D-TIME;GRID-3D-TIME", false);
+                    operands.add(new DataOperand("First Guess Field",
+                            "First Guess Field", categories, false));
+                    List userValues =
+                        getDataContext().selectDataChoices(operands);
+                    if (userValues == null) {
+                        return null;
+                    }
+
+                    firstGuessDataChoice = (DataChoice) userValues.get(0);
+                    dataChoice.setObjectProperty(PROP_FIRSTGUESS,
+                            firstGuessDataChoice);
+                }
+
+
+                if (firstGuessDataChoice != null) {
+                    firstGuessData = firstGuessDataChoice.getData(null);
+                    if (firstGuessData == null) {
+                        return null;
+                    }
+                }
+            }
+
             properties.put(PROP_GRID_PARAM, type);
             DataChoice choice = new DirectDataChoice(this, i, "", "",
                                     dataChoice.getCategories(), properties);
@@ -1088,7 +1141,8 @@ public abstract class PointDataSource extends FilesDataSource {
 
             LogUtil.message("Doing Barnes Analysis");
             FieldImpl fi = PointObFactory.barnes(pointObs, type, degreesX,
-                               degreesY, passes, gain, searchRadius, ap);
+                               degreesY, passes, gain, searchRadius, ap,
+                               firstGuessData);
             if (ap.getGridXArray() != null) {
                 log_.debug("Analysis params: X = "
                            + ap.getGridXArray().length + " Y = "
