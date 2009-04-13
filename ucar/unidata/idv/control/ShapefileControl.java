@@ -1032,7 +1032,7 @@ public class ShapefileControl extends DisplayControlImpl {
      * @param  sets   array of SampledSet-s
      * @return  a bounding rectangle
      */
-    private Rectangle2D.Float getBounds(SampledSet[] sets) {
+    private Rectangle2D.Float getBounds(SampledSet[] sets) throws VisADException {
         if (sets.length == 0) {
             return null;
         }
@@ -1040,6 +1040,8 @@ public class ShapefileControl extends DisplayControlImpl {
         double minY = Double.POSITIVE_INFINITY;
         double maxX = Double.NEGATIVE_INFINITY;
         double maxY = Double.NEGATIVE_INFINITY;
+
+        boolean flipRect = false;
 
         for (int i = 0; i < sets.length; i++) {
             float[] hi  = sets[i].getHi();
@@ -1055,10 +1057,22 @@ public class ShapefileControl extends DisplayControlImpl {
                 maxX = Math.max(maxX, hi[0]);
                 maxY = Math.max(maxY, hi[1]);
             }
+            if(GridUtil.isLatLonOrder(sets[i])) {
+                flipRect = true;
+            }
         }
-        return new Rectangle2D.Float((float) minX, (float) minY,
+        Rectangle2D.Float rect = new Rectangle2D.Float((float) minX, (float) minY,
                                      (float) (maxX - minX),
                                      (float) (maxY - minY));
+        if(flipRect) {
+            float tmp = rect.x;
+            rect.x = rect.y;
+            rect.y = tmp;
+            tmp = rect.width;
+            rect.width = rect.height;
+            rect.height = tmp;
+        }
+        return rect;
     }
 
 
