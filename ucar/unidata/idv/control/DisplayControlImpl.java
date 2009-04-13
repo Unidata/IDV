@@ -7129,7 +7129,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             return true;
         }
 
-        System.err.println("setNewDisplayUnit:" + getHaveInitialized());
 
         //If we haven't initialized yet just set the unit and return
         if(!getHaveInitialized()) {
