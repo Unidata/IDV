@@ -964,6 +964,8 @@ public class MapDisplayControl extends DisplayControlImpl {
 
         ImageIcon removeIcon =
             GuiUtils.getImageIcon("/auxdata/ui/icons/Delete16.gif");
+        ImageIcon addIcon =
+            GuiUtils.getImageIcon("/auxdata/ui/icons/Add16.gif");
 
 
         int       colCnt = 0;
@@ -984,6 +986,17 @@ public class MapDisplayControl extends DisplayControlImpl {
             }
             MapPanel mapPanel = new MapPanel(mapState);
             mapState.mapPanel = mapPanel;
+
+            JButton addBtn = new JButton(addIcon);
+            addBtn.setContentAreaFilled(false);
+            addBtn.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+            addBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        loadMapAsDataSource(listIndex);
+                }
+            });
+            addBtn.setToolTipText("Load this map as a data source");
+            
 
             JButton removeBtn = new JButton(removeIcon);
             removeBtn.setContentAreaFilled(false);
@@ -1023,9 +1036,11 @@ public class MapDisplayControl extends DisplayControlImpl {
                                      moveUpBtn,
                                      moveDownBtn }, 1, GuiUtils.WT_N,
                                          GuiUtils.WT_N);
-            mapPanels.add(removeBtn);
-            mapPanels.add(upDownPanel);
+
             mapPanels.addAll(mapPanel.getGuiComponents());
+            mapPanels.add(upDownPanel);
+            mapPanels.add(removeBtn);
+            mapPanels.add(addBtn);
             if (i == 0) {
                 colCnt = mapPanels.size();
             }
@@ -1048,7 +1063,7 @@ public class MapDisplayControl extends DisplayControlImpl {
             GuiUtils.tmpInsets = new Insets(3, 3, 3, 3);
             final JPanel catPanel =
                 GuiUtils.inset(GuiUtils.doLayout(mapPanels, colCnt,
-                    GuiUtils.WT_NNY, GuiUtils.WT_N), new Insets(0, 10, 0, 0));
+                    GuiUtils.WT_YN, GuiUtils.WT_N), new Insets(0, 10, 0, 0));
 
             final JToggleButton cbx = new JToggleButton(openIcon, true);
             cbxs.add(cbx);
@@ -1088,6 +1103,23 @@ public class MapDisplayControl extends DisplayControlImpl {
         contents.validate();
         updateLegendLabel();
 
+    }
+
+
+    /** 
+     * Load the map file at the given index as a data source
+     *
+     * @param index The map index
+     */
+    private void loadMapAsDataSource(int index) {
+        try {
+            MapState    mapState = (MapState) mapStates.get(index);
+            getIdv().makeDataSource(mapState.getSource(),"file.mapfile",
+                                    new Hashtable());
+            getIdv().getIdvUIManager().showDataSelector();
+        } catch (Exception exc) {
+            logException("Removing map", exc);
+        }
     }
 
 
