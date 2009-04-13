@@ -526,21 +526,23 @@ public class StormTrack implements Comparable {
 
 
 
-    static public StringBuffer toDiamond7( List<StormTrack> sts ) throws VisADException {
+    static public StringBuffer toDiamond7( List<StormTrack> sts, String id ) throws VisADException {
         StringBuffer sb = new StringBuffer();
-        sb.append("header\n");
+        sb.append("diamond 7 " + id + " Tropical Cyclone Track"+ "\n");
         for(StormTrack st : sts) {
-            st.toDiamond7(sb);
+            st.toDiamond7(sb, id);
         }
         return sb;
     }
 
 
 
-    public void toDiamond7(StringBuffer sb) throws VisADException {
+    public void toDiamond7(StringBuffer sb, String id) throws VisADException {
         Calendar cal = Calendar.getInstance();
-        sb.append("header\n");
-        for (StormTrackPoint stp : getTrackPoints()) {
+        List<StormTrackPoint> tpoints = getTrackPoints();
+
+        sb.append("Name " + id + " " + way+ " " + tpoints.size()+ "\n");
+        for (StormTrackPoint stp : tpoints) {
             Date dttm = null;
 
             try {
