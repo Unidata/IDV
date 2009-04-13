@@ -761,7 +761,7 @@ Since this is confusing and needs more work lets remove this for now
      categories="GIS-SHAPEFILE"
      class="ucar.unidata.idv.control.ShapefileControl"
      canstandalone="false"
-     label="Shapefile Display"
+     label="Map Display"
      displaycategory="GIS"
      properties="windowVisible=false;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
