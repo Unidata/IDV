@@ -2050,6 +2050,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
             incoming = incoming.substring(0, incoming.length() - 1);
         }
         String urlBase = getUrlBase();
+        if(incoming.equals("/") || incoming.equals("")) {
+            incoming = urlBase;
+        }
+
         if ( !incoming.startsWith(urlBase)) {
             return null;
         }
@@ -2104,6 +2108,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
         ApiMethod apiMethod  = findApiMethod(request);
         if (apiMethod == null) {
             return getHtdocsFile(request);
+        }
+
+        
+
+        if(!request.exists(ARG_ENTRYID) &&
+           Misc.equals(apiMethod.getUrl().getBasePath(), URL_ENTRY_SHOW.getBasePath())) {
+            String prefix =  URL_ENTRY_SHOW.toString();
+            String suffix = request.getRequestPath().substring(prefix.length());
+            //Entry entry =  getEntryManager().getEntryFromCache(suffix,false);
+            //if(entry!=null) request.put(ARG_ENTRYID, entry.getId());
         }
 
         boolean allSsl = false;

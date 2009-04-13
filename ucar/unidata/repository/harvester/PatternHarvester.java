@@ -718,6 +718,7 @@ public class PatternHarvester extends Harvester {
 
         Group baseGroup = getBaseGroup();
         String dirGroup = getDirNames(rootDir, baseGroup, dirToks,
+                                      !getTestMode() &&
                                       groupTemplate.indexOf("${dirgroup}")
                                       >= 0);
         //        String dirGroup = StringUtil.join(Group.PATHDELIMITER, dirToks);
@@ -798,18 +799,20 @@ public class PatternHarvester extends Harvester {
             groupName = baseGroup.getFullName() + Group.PATHDELIMITER
                         + groupName;
         }
-        Group group = getEntryManager().findGroupFromName(groupName,
-                          getUser(), true);
         if (getTestMode()) {
-            debug("\tname: " + name + "\n\tgroup:" + group.getFullName()
+            debug("\tname: " + name + "\n\tgroup:" + groupName
                   + "\n\tfromdate:" + getRepository().formatDate(fromDate));
             if (values != null) {
                 for (int i = 0; i < values.length; i++) {
                     debug("\tvalue: " + values[i]);
                 }
             }
+            return null;
         }
 
+
+        Group group = getEntryManager().findGroupFromName(groupName,
+                          getUser(), !getTestMode());
         Entry    entry = typeHandler.createEntry(getRepository().getGUID());
         Resource resource;
         if (moveToStorage) {

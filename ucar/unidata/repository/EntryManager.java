@@ -99,15 +99,10 @@ import java.util.zip.*;
  */
 public class EntryManager extends RepositoryManager {
 
-    /** _more_ */
-    private Hashtable entryCache = new Hashtable();
 
     /** _more_ */
     private Object MUTEX_ENTRY = new Object();
 
-
-    /** _more_ */
-    public Object MUTEX_GROUP = new Object();
 
     /** _more_ */
     private static final String GROUP_TOP = "Top";
@@ -120,10 +115,7 @@ public class EntryManager extends RepositoryManager {
 
 
     /** _more_ */
-    public Hashtable<String, Group> groupCache = new Hashtable<String,
-                                                     Group>();
-
-
+    private Hashtable<String,Entry> entryCache = new Hashtable<String,Entry>();
 
 
     /**
@@ -150,11 +142,48 @@ public class EntryManager extends RepositoryManager {
      * _more_
      */
     protected void clearCache() {
-        entryCache = new Hashtable();
-        groupCache = new Hashtable();
+        entryCache = new Hashtable<String,Entry>();
         topGroups  = null;
     }
 
+
+    protected void cacheGroup(Group entry) {
+        cacheEntry(entry);
+    }
+
+    protected void cacheEntry(Entry entry) {
+        synchronized(MUTEX_ENTRY) {
+            if (entryCache.size() > ENTRY_CACHE_LIMIT) {
+                entryCache = new Hashtable();
+            }
+            entryCache.put(entry.getId(), entry);
+            entryCache.put(entry.getFullName(), entry);
+        }
+    }
+
+    protected Entry getEntryFromCache(String entryId) {
+        return getEntryFromCache(entryId,true);
+    }
+
+    protected Entry getEntryFromCache(String entryId, boolean isId) {
+        synchronized(MUTEX_ENTRY) {
+            return  entryCache.get(entryId);
+        }
+    }
+
+
+    protected Group getGroupFromCache(String groupId) {
+        return getGroupFromCache(groupId, true);
+    }
+
+    protected Group getGroupFromCache(String groupId,boolean isId) {
+        Entry entry =  getEntryFromCache(groupId,isId);
+        if(entry == null) return  null;
+        if (entry instanceof Group) {
+            return (Group) entry;
+        }
+        return null;
+    }
 
 
 
@@ -166,11 +195,7 @@ public class EntryManager extends RepositoryManager {
     protected void clearCache(Entry entry) {
         synchronized (MUTEX_ENTRY) {
             entryCache.remove(entry.getId());
-            if (entry.isGroup()) {
-                Group group = (Group) entry;
-                groupCache.remove(group.getId());
-                groupCache.remove(group.getFullName());
-            }
+            entryCache.remove(entry.getFullName());
         }
     }
 
@@ -3840,7 +3865,7 @@ return new Result(title, sb);
         }
 
         synchronized (MUTEX_ENTRY) {
-            Entry entry = (Entry) entryCache.get(entryId);
+            Entry entry = getEntryFromCache(entryId);
             if (entry != null) {
                 if ( !andFilter) {
                     return entry;
@@ -3887,10 +3912,7 @@ return new Result(title, sb);
 
             }
             if ( !abbreviated && (entry != null)) {
-                if (entryCache.size() > ENTRY_CACHE_LIMIT) {
-                    entryCache = new Hashtable();
-                }
-                entryCache.put(entryId, entry);
+                cacheEntry(entry);
             }
 
             if (andFilter) {
@@ -3954,13 +3976,13 @@ return new Result(title, sb);
                     continue;
                 }
                 String id    = results.getString(1);
-                Entry  entry = (Entry) entryCache.get(id);
+                Entry  entry = getEntryFromCache(id);
                 if (entry == null) {
                     //id,type,name,desc,group,user,file,createdata,fromdate,todate
                     TypeHandler localTypeHandler =
                         getRepository().getTypeHandler(results.getString(2));
                     entry = localTypeHandler.getEntry(results);
-                    entryCache.put(entry.getId(), entry);
+                    cacheEntry(entry);
                 }
                 if (seen.get(entry.getId()) != null) {
                     continue;
@@ -4932,7 +4954,7 @@ return new Result(title, sb);
         if ((id == null) || (id.length() == 0)) {
             return null;
         }
-        Group group = groupCache.get(id);
+        Group group = getGroupFromCache(id);
         if (group != null) {
             return group;
         }
@@ -4956,65 +4978,9 @@ return new Result(title, sb);
 
 
 
-    /**
-     * _more_
-     *
-     * @param name _more_
-     * @param user _more_
-     * @param createIfNeeded _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Group findGroupFromName(String name, User user,
-                                   boolean createIfNeeded)
-            throws Exception {
-        return findGroupFromName(name, user, createIfNeeded, false);
-    }
-
-
-    /**
-     * _more_
-     *
-     *
-     * @param request _more_
-     * @param parent _more_
-     * @param name _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Entry findEntryWithName(Request request, Group parent, String name)
-            throws Exception {
-        String groupName = ((parent == null)
-                            ? ""
-                            : parent.getFullName()) + Group.IDDELIMITER
-                                + name;
-        Group group = groupCache.get(groupName);
-        if (group != null) {
-            return group;
-        }
-        String[] ids = SqlUtil.readString(
-                           getDatabaseManager().select(
-                               Tables.ENTRIES.COL_ID, Tables.ENTRIES.NAME,
-                               Clause.and(
-                                   Clause.eq(
-                                       Tables.ENTRIES.COL_PARENT_GROUP_ID,
-                                       parent.getId()), Clause.eq(
-                                           Tables.ENTRIES.COL_NAME, name))));
-        if (ids.length == 0) {
-            return null;
-        }
-        return getEntry(request, ids[0], false);
-    }
-
-
-
     public Group findGroupUnder(Request request, Group group, String name, User user) 
             throws Exception {
-        synchronized (MUTEX_GROUP) {
+        synchronized (MUTEX_ENTRY) {
             List<String> toks = (List<String>) StringUtil.split(name,
                                     Group.PATHDELIMITER, true, true);
             for(String tok: toks) {
@@ -5035,6 +5001,74 @@ return new Result(title, sb);
     }
 
 
+
+
+
+    /**
+     * _more_
+     *
+     *
+     * @param request _more_
+     * @param parent _more_
+     * @param name _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry findEntryWithName(Request request, Group parent, String name)
+            throws Exception {
+        String groupName = ((parent == null)
+                            ? ""
+                            : parent.getFullName()) + Group.IDDELIMITER
+                                + name;
+        Group group = getGroupFromCache(groupName,false);
+        if (group != null) {
+            return group;
+        }
+        String[] ids = SqlUtil.readString(
+                           getDatabaseManager().select(
+                               Tables.ENTRIES.COL_ID, Tables.ENTRIES.NAME,
+                               Clause.and(
+                                   Clause.eq(
+                                       Tables.ENTRIES.COL_PARENT_GROUP_ID,
+                                       parent.getId()), Clause.eq(
+                                           Tables.ENTRIES.COL_NAME, name))));
+        if (ids.length == 0) {
+            return null;
+        }
+        return getEntry(request, ids[0], false);
+    }
+
+
+    public Group findGroupFromName(String name, User user,
+                                   boolean createIfNeeded)
+            throws Exception {
+        Entry entry =  findEntryFromName(name, user, createIfNeeded, true, false);
+        if(entry!=null && entry instanceof Group) return (Group) entry;
+        return null;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param user _more_
+     * @param createIfNeeded _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry findEntryFromName(String name, User user,
+                                   boolean createIfNeeded)
+            throws Exception {
+        return findEntryFromName(name, user, createIfNeeded, false, false);
+    }
+
+
+
     /**
      * _more_
      *
@@ -5047,10 +5081,12 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    private Group findGroupFromName(String name, User user,
-                                    boolean createIfNeeded, boolean isTop)
+    private Entry findEntryFromName(String name, User user,
+                                    boolean createIfNeeded, 
+                                    boolean isGroup,
+                                    boolean isTop)
             throws Exception {
-        synchronized (MUTEX_GROUP) {
+        synchronized (MUTEX_ENTRY) {
             String topGroupName = ((topGroup != null)
                                    ? topGroup.getName()
                                    : GROUP_TOP);
@@ -5058,7 +5094,7 @@ return new Result(title, sb);
                     && !name.startsWith(topGroupName + Group.PATHDELIMITER)) {
                 name = topGroupName + Group.PATHDELIMITER + name;
             }
-            Group group = groupCache.get(name);
+            Group group = getGroupFromCache(name,false);
             if (group != null) {
                 return group;
             }
@@ -5107,8 +5143,7 @@ return new Result(title, sb);
                 }
                 return makeNewGroup(parent, lastName, user);
             }
-            groupCache.put(group.getId(), group);
-            groupCache.put(group.getFullName(), group);
+            cacheGroup(group);
             return group;
         }
     }
@@ -5154,7 +5189,7 @@ return new Result(title, sb);
     public Group makeNewGroup(Group parent, String name, User user,
                               Entry template, String type)
             throws Exception {
-        synchronized (MUTEX_GROUP) {
+        synchronized (MUTEX_ENTRY) {
             TypeHandler typeHandler =
                 getRepository().getTypeHandler(type);
             Group group = new Group(getGroupId(parent), typeHandler);
@@ -5168,8 +5203,7 @@ return new Result(title, sb);
             group.setParentGroup(parent);
             group.setUser(user);
             addNewEntry(group);
-            groupCache.put(group.getId(), group);
-            groupCache.put(group.getFullName(), group);
+            cacheGroup(group);
             return group;
         }
     }
@@ -5380,21 +5414,18 @@ return new Result(title, sb);
             while (results.next()) {
                 Group group = (Group) typeHandler.getEntry(results);
                 groups.add(group);
-                groupCache.put(group.getId(), group);
+                cacheGroup(group);
             }
         }
         for (Group group : groups) {
             if (group.getParentGroupId() != null) {
-                Group parentGroup =
-                    (Group) groupCache.get(group.getParentGroupId());
+                Group parentGroup =getGroupFromCache(group.getParentGroupId());
                 group.setParentGroup(parentGroup);
             }
-            groupCache.put(group.getFullName(), group);
+            cacheGroup(group);
         }
 
-        if (groupCache.size() > ENTRY_CACHE_LIMIT) {
-            groupCache = new Hashtable();
-        }
+
         return groups;
     }
 
@@ -5406,10 +5437,7 @@ return new Result(title, sb);
      */
     protected void addStatusInfo(StringBuffer sb) {
         sb.append(HtmlUtil.formEntry(msgLabel("Entry Cache"),
-                                     entryCache.size() + ""));
-        sb.append(HtmlUtil.formEntry(msgLabel("Group Cache"),
-                                     groupCache.size() + ""));
-
+                                     entryCache.size()/2 + ""));
     }
 
     /**
@@ -5501,7 +5529,6 @@ return new Result(title, sb);
 
 
 
-
         List<Group> groups = readGroups(statement);
         if (groups.size() > 0) {
             topGroup = groups.get(0);
@@ -5509,10 +5536,7 @@ return new Result(title, sb);
 
         //Make the top group if needed
         if (topGroup == null) {
-            topGroup = findGroupFromName(GROUP_TOP,
-                                         getUserManager().getDefaultUser(),
-                                         true, true);
-
+            topGroup = makeNewGroup(null, GROUP_TOP, getUserManager().getDefaultUser());
             getAccessManager().initTopGroup(topGroup);
         }
     }

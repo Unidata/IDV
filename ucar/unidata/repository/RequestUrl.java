@@ -37,6 +37,8 @@ public class RequestUrl {
     /** _more_ */
     private String path = "foo";
 
+    private String basePath;
+
     /** _more_ */
     private String label = null;
 
@@ -56,6 +58,11 @@ public class RequestUrl {
     public RequestUrl(RepositorySource repositorySource, String path) {
         this.repositorySource = repositorySource;
         this.path             = path;
+        if(path.endsWith("*")) {
+            basePath = path.substring(0,path.length()-2);
+        } else {
+            basePath = path;
+        }
     }
 
     /**
@@ -174,6 +181,11 @@ public class RequestUrl {
     public String getLabel() {
         return label;
     }
+
+    public String getBasePath() {
+        return basePath;
+    }
+
 
     /**
      * _more_
