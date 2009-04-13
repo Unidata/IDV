@@ -796,7 +796,6 @@ public class ThreddsHandler extends XmlHandler {
         String serviceType  = CatalogUtil.getServiceType(serviceNode);
 
         String dataSourceId = chooser.getDataSourceId(dataSourcesCbx);
-        System.err.println (dataSourceId + " " + serviceType + " " + dataType);
         if (dataSourceId != null) {
             properties.put(DataManager.DATATYPE_ID, dataSourceId);
         } else {
