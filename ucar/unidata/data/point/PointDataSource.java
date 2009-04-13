@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -1142,7 +1143,7 @@ public abstract class PointDataSource extends FilesDataSource {
             LogUtil.message("Doing Barnes Analysis");
             FieldImpl fi = PointObFactory.barnes(pointObs, type, degreesX,
                                degreesY, passes, gain, searchRadius, ap,
-                               firstGuessData);
+                               (FieldImpl) firstGuessData);
             if (ap.getGridXArray() != null) {
                 log_.debug("Analysis params: X = "
                            + ap.getGridXArray().length + " Y = "

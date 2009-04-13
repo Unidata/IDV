@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -1744,17 +1745,35 @@ public class PointObFactory {
                                    int numPasses, float gain,
                                    float scaleLength,
                                    Barnes.AnalysisParameters params,
-                                   Data firstGuessField)
+                                   FieldImpl firstGuessField)
             throws VisADException, RemoteException {
         FieldImpl retFI = null;
         // System.err.println("xspacing: " + xSpacing+" ySpacing:" + ySpacing);
+        boolean haveGuess = firstGuessField != null;
+        boolean guessIsTime = (firstGuessField != null)
+                              && GridUtil.isTimeSequence(firstGuessField);
+        if (haveGuess && guessIsTime && GridUtil.isTimeSequence(pointObs)) {
+            firstGuessField =
+                (FieldImpl) firstGuessField.resample(pointObs.getDomainSet(),
+                    Data.NEAREST_NEIGHBOR, Data.NO_ERRORS);
+        }
+        FlatField guessField = null;
+
         if (GridUtil.isTimeSequence(pointObs)) {
             Set timeSet = GridUtil.getTimeSet(pointObs);
             for (int i = 0; i < timeSet.getLength(); i++) {
+                if (haveGuess) {
+                    if (guessIsTime) {
+                        guessField = (FlatField) firstGuessField.getSample(i,
+                                false);
+                    } else {
+                        guessField = (FlatField) firstGuessField;
+                    }
+                }
                 FieldImpl oneTime =
                     barnesOneTime((FieldImpl) pointObs.getSample(i), type,
                                   xSpacing, ySpacing, numPasses, gain,
-                                  scaleLength, params);
+                                  scaleLength, params, guessField);
                 if ((retFI == null) && (oneTime != null)) {
                     FunctionType ft =
                         new FunctionType(
@@ -1767,8 +1786,17 @@ public class PointObFactory {
                 }
             }
         } else {
+            if (haveGuess) {
+                if (guessIsTime) {
+                    guessField = (FlatField) firstGuessField.getSample(0,
+                            false);
+                } else {
+                    guessField = (FlatField) firstGuessField;
+                }
+            }
             retFI = barnesOneTime(pointObs, type, xSpacing, ySpacing,
-                                  numPasses, gain, scaleLength, params);
+                                  numPasses, gain, scaleLength, params,
+                                  guessField);
         }
         return retFI;
     }
@@ -1819,6 +1847,36 @@ public class PointObFactory {
                                           int numPasses, float gain,
                                           float scaleLength,
                                           Barnes.AnalysisParameters params)
+            throws VisADException, RemoteException {
+        return barnesOneTime(pointObs, type, xSpacing, ySpacing, numPasses,
+                             gain, scaleLength, params, null);
+    }
+
+    /**
+     * Do the analysis on the single time.  Should be of the structure:
+     *  (index -> PointOb)
+     *
+     * @param pointObs Observations to analyze
+     * @param type  RealTypes of parameter
+     * @param xSpacing  x spacing (degrees)
+     * @param ySpacing  y spacing (degrees)
+     * @param numPasses number of passes
+     * @param gain      grid convergence/pass
+     * @param scaleLength  search radius
+     * @param params       analysis parameters - used to pass back computed vals
+     * @param firstGuess   analysis parameters - used to pass back computed vals
+     *
+     * @return  Grid of objectively analyzed data
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException problem getting the data
+     */
+    public static FlatField barnesOneTime(FieldImpl pointObs, RealType type,
+                                          float xSpacing, float ySpacing,
+                                          int numPasses, float gain,
+                                          float scaleLength,
+                                          Barnes.AnalysisParameters params,
+                                          FlatField firstGuess)
             throws VisADException, RemoteException {
 
         int       numObs  = pointObs.getLength();
@@ -1899,19 +1957,56 @@ public class PointObFactory {
                    + lonMin + " " + lonMax);
         float[] faGridX = null;
         float[] faGridY = null;
-        if ((xSpacing == OA_GRID_DEFAULT) || (ySpacing == OA_GRID_DEFAULT)) {
-            Barnes.AnalysisParameters ap =
-                Barnes.getRecommendedParameters(lonMin, latMin, lonMax,
-                    latMax, new float[][] {
-                obVals[0], obVals[1]
-            });
-            faGridX     = ap.getGridXArray();
-            faGridY     = ap.getGridYArray();
-            scaleLength = (float) ap.getScaleLengthGU();
-            log_.debug("random data spacing = " + ap.getRandomDataSpacing());
-        } else {
-            faGridX = Barnes.getRecommendedGridX(lonMin, lonMax, xSpacing);
-            faGridY = Barnes.getRecommendedGridY(latMin, latMax, ySpacing);
+        if (firstGuess == null) {
+            if ((xSpacing == OA_GRID_DEFAULT)
+                    || (ySpacing == OA_GRID_DEFAULT)) {
+                Barnes.AnalysisParameters ap =
+                    Barnes.getRecommendedParameters(lonMin, latMin, lonMax,
+                        latMax, new float[][] {
+                    obVals[0], obVals[1]
+                });
+                faGridX     = ap.getGridXArray();
+                faGridY     = ap.getGridYArray();
+                scaleLength = (float) ap.getScaleLengthGU();
+                log_.debug("random data spacing = "
+                           + ap.getRandomDataSpacing());
+            } else {
+                faGridX = Barnes.getRecommendedGridX(lonMin, lonMax,
+                        xSpacing);
+                faGridY = Barnes.getRecommendedGridY(latMin, latMax,
+                        ySpacing);
+            }
+        } else {  // figure out XY, convert units
+            GriddedSet domainSet =
+                (GriddedSet) GridUtil.getSpatialDomain(firstGuess);
+            CoordinateSystem refCS = domainSet.getCoordinateSystem();
+            float[]          his   = domainSet.getHi();
+            float[]          lows  = domainSet.getLow();
+            int[]            sizes = domainSet.getLengths();
+            faGridX = Barnes.getRecommendedGridX(lows[0], his[0],
+                    (his[0] - lows[0]) / (sizes[0] - 1));
+            faGridY = Barnes.getRecommendedGridX(lows[1], his[1],
+                    (his[1] - lows[1]) / (sizes[1] - 1));
+            if (refCS != null) {
+                float[][] transformedXY =
+                    new float[domainSet.getDimension()][];
+                if (GridUtil.isLatLonOrder(firstGuess)) {
+                    transformedXY[0] = obVals[1];
+                    transformedXY[1] = obVals[0];
+                } else {
+                    transformedXY[0] = obVals[0];
+                    transformedXY[1] = obVals[1];
+                }
+                if (transformedXY.length == 3) {
+                    transformedXY[2] = new float[obVals[0].length];
+                }
+                transformedXY = refCS.fromReference(transformedXY);
+                obVals[0]     = transformedXY[0];
+                obVals[1]     = transformedXY[1];
+            }
+            obVals[2] =
+                firstGuess.getDefaultRangeUnits()[0].toThis(obVals[2],
+                    type.getDefaultUnit(), false);
         }
         if (params != null) {
             params.setGridXArray(faGridX);
@@ -1922,33 +2017,52 @@ public class PointObFactory {
                    + faGridY.length + " scaleLength = " + scaleLength
                    + " gain = " + gain);
 
-        float[][] griddedData = Barnes.point2grid(faGridX, faGridY, obVals,
-                                    scaleLength, gain, numPasses);
 
-        float[][] faaDomainSet =
-            new float[2][faGridX.length * faGridY.length];
+        float[][] griddedData = null;
+
+        if (firstGuess != null) {
+            float[][] gridVals =
+                GridUtil.makeGrid2D(firstGuess).getvalues()[0];
+            griddedData = Barnes.point2grid(faGridX, faGridY, obVals,
+                                            gridVals, scaleLength, gain,
+                                            numPasses);
+        } else {
+            griddedData = Barnes.point2grid(faGridX, faGridY, obVals,
+                                            scaleLength, gain, numPasses);
+        }
+
+
         float[][] faaGridValues3 =
             new float[1][faGridX.length * faGridY.length];
 
         int m = 0;
         for (int j = 0; j < faGridY.length; j++) {
             for (int i = 0; i < faGridX.length; i++) {
-                faaDomainSet[0][m]   = faGridY[j];
-                faaDomainSet[1][m]   = faGridX[i];
                 faaGridValues3[0][m] = (float) griddedData[i][j];
                 m++;
             }
         }
 
-        Gridded2DSet g2ddsSet =
-            new Gridded2DSet(RealTupleType.LatitudeLongitudeTuple,
-                             faaDomainSet, faGridX.length, faGridY.length,
-                             (CoordinateSystem) null, (Unit[]) null,
-                             (ErrorEstimate[]) null, false);
+        GriddedSet    gdsSet  = null;
+        RealTupleType gdsType = null;
+        if (firstGuess == null) {
+            Linear1DSet xSet = new Linear1DSet(RealType.Longitude,
+                                   faGridX[0], faGridX[faGridX.length - 1],
+                                   faGridX.length);
+            Linear1DSet ySet = new Linear1DSet(RealType.Latitude, faGridY[0],
+                                   faGridY[faGridY.length - 1],
+                                   faGridY.length);
+            gdsSet = new Linear2DSet(RealTupleType.SpatialEarth2DTuple,
+                                     new Linear1DSet[] { xSet,
+                    ySet }, (CoordinateSystem) null, (Unit[]) null,
+                            (ErrorEstimate[]) null, true);
+        } else {
+            gdsSet = (GriddedSet) GridUtil.getSpatialDomain(firstGuess);
+        }
         FunctionType ftLatLon2Param =
-            new FunctionType(RealTupleType.LatitudeLongitudeTuple,
+            new FunctionType(((SetType) gdsSet.getType()).getDomain(),
                              new RealTupleType(type));
-        FlatField retData = new FlatField(ftLatLon2Param, g2ddsSet);
+        FlatField retData = new FlatField(ftLatLon2Param, gdsSet);
         retData.setSamples(faaGridValues3, false);
         return retData;
 
