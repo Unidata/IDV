@@ -1,0 +1,161 @@
+[ht::head {Harvesters}]
+
+<%nochildlist%>
+
+
+If you are a site administrator you can create entry harvesters that will
+scan either the server file system or will fetch web-based resources and 
+automatically ingest them into the repository.
+<p> 
+
+Go to the <i>Harvesters</i> tab under the Admin page. This lists all of the Harvesters that are created
+and allows you to create new Harvesters.
+Enter a Name for a new Harvester, select a type (e.g., &quot;Local Files&quot; for a File Harvester) 
+and press Create and you will be taken to the Edit form for the new Harvester.
+From the main Harvesters tab you can always bring up this edit form for existing Harvesters.
+
+<p>
+
+The File Harvester lets you specify a directory root on the server file system and a regular expression
+pattern that is used to match file names. Any files that are found are then added to the repository.
+The repository is checked so as to not add duplicate files.
+
+
+
+<subhead  id="run"  intoc="false">Run Settings</subhead>
+The form has  settings for running the harvester. When you are first creating a harvester sometimes it
+may takes some time to figure out just what you are harvesting and the name and group settings for the repository
+entry. So, its good to turn on test mode. This will result in entries not being added to the repository when you run
+the harvester. Rather, when in test mode, up to &quot;Count&quot; number of files will be found and the results will be
+listed in the &quot;Information&quot; section of the harvester page.
+<p>
+The &quot;Active on startup&quot; flag, when set, results in the harvester being started when the repository
+starts up. The &quot;Run continually&quot; flag has the harvester continually run. It uses the &quot;Every&quot; setting
+to determine the pauses between runs. You can choose Absolute time to pause every N minutes. Or, you can choose
+&quot;Minutes&quot; or &quot;Hourly&quot; to have it run relative to the hour or the day, e.g. &quot;3 hourly&quot;
+will run at 0Z, 3Z, 6Z, 9Z, etc.\
+<p>
+For example, if you know you are getting data files  in real-time that are coming in every 30 minutes you could set your harvester
+to run in &quot;Absolute&quot; mode every 15 minutes. If you had a Web harvester that is fetching images
+you might want to use an &quot;Hourly&quot; setting to get the image at some fixed interval (e.g., 0Z, 6Z, 12Z, 18Z, etc).
+
+
+<subhead  id="files" intoc="false">Files Settings</subhead>
+Under &quot; Look for files&quot; you specify a directory on the server file system to scan and a regular expression to
+match on the file name.
+The repository will recursively scan the directory tree and any files it finds that matches the pattern it will
+add to the repository. <p>
+The regular expressions used are somewhat extended in that you can specify subsets of the regular expression
+and use the result text for metadata and other information when creating the entry in the repository.
+For example, a very common case is to have a date/time embedded in the filename. So, you could have in your regular 
+expression something of the form:
+<pre>
+.*data(fromdate:\\d\\d\\d\\d\\d\\d\\d\\d_\\d\\d\\d\\d)\\.nc
+</pre>
+
+This would  match any files of the form:<pre>
+data_yyyymmdd_hhmm.nc
+</pre>
+The &quot;(&quot; and &quot;)&quot; define the sub-expression (just like normal regular expression). But the
+&quot;fromdate:&quot; is the special extension that tells the harvester that that sub-expression
+is used to create the repository entry fromdate field.
+<p>
+The date format that is used is defined in the Date Format field and follows the
+Java <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/text/SimpleDateFormat.html">date format</a> conventions.
+
+
+
+
+
+
+<subhead  id="entry" intoc="false">Entry Creation</subhead>
+
+
+When creating an entry we need to know the group to put it under, its name and description.
+You specify templates for these that can contain a set of macros (see below).
+Note: this is where the Test mode described above is useful. Sometimes it takes a while to figure
+just what you want in terms of group structure and entry names.
+
+<p>
+
+To define the group you need to select an existing base group and then optionally specify 
+a group template. The group template is used to automatically create a new group if needed.
+So for example, if your base group was: <i>Top/Data</i> and your Group Template was: <i>Ingested/Satellite</i>
+then the result group would be:<pre>
+<i>Top/Data/Ingested/Satellite</i>
+</pre>
+
+The Harvester would create the <i>Ingested</i> and the <i>Satellite</i> groups as needed.
+
+<p>
+
+The name, description and group templates all can contain the following macros.
+Note: The different date fields (e.g., create_, from_ and to) refer to
+the create date/time, the from data time (which defaults to the create date
+unless specified in the pattern) and the to data time.
+
+<p>
+
+<table>
+<tr><td><i>${filename}</i></td><td>The file name (not the full path)</td></tr>
+<tr><td><i>${fileextension}</i></td><td>The file extension</td></tr>
+<tr><td><i>${dirgroup}</i></td><td>See below</td></tr>
+<tr><td>            <i>${create_date}</i>,<i>${from_date}</i>, <i>${to_date}</i></td><td>The full formatted date string</td></tr>
+<tr><td>            <i>${create_day}</i>, <i>${from_day}</i>, <i>${to_day}</i></td><td>The numeric day of the month</td></tr>
+<tr><td>            <i>${create_week}</i>,   <i>${from_week}</i>,  <i>${to_week}</i></td><td>The numeric week of the month</td></tr>
+<tr><td>            <i>${create_weekofyear}</i>, <i>${from_weekofyear}</i>,  <i>${to_weekofyear}</i></td><td>The numeric week of the year</td></tr>
+<tr><td>            <i>${create_month}</i>,<i>${from_month}</i>, <i>${to_month}</i></td><td>Numeric month of the year</td></tr>
+<tr><td>            <i>${create_monthname}</i>,<i>${from_monthname}</i>,  <i>${to_monthname}</i></td><td>Month name</td></tr>
+<tr><td>            <i>${create_year}</i>, <i>${from_year}</i>, <i>${to_year}</i></td><td>Numeric year</td></tr>
+</table>
+p
+<p>
+
+
+The dirgroup macro  is the parent directories of the
+data file up to but not including the main directory path we are searching under.
+For example, if you are looking under a directory called "/data/idd" and that directory held sub-dirs:<pre>
+/data/idd/dir1/data1.nc
+/data/idd/dir1/dir2/data2.nc
+</pre>
+
+Then when ingesting the data1.nc file its dirgroup value would be:
+<pre>
+dir1
+</pre>
+
+When ingesting the data2.nc file its dirgroup value would be:
+<pre>
+dir1/dir2
+</pre>
+
+Another  common  way of defining the group is to use the date macros. For example a group template of the form:<pre>
+${from_year}/${from_monthname}/Week ${from_week}
+</pre>
+
+Would result in groups like:
+<pre>
+2009/January/Week 1
+2009/January/Week 2
+...
+2009/March/Week 1
+2009/March/Week 2
+</pre>
+
+
+
+You can also name the entrys using the macros. So, using the above date based group template you could then have a Name template that incorporates the formatted date:<pre>
+Gridded data - ${from_date}
+</pre>
+
+
+
+<subhead  id="web"  intoc="false">Web Harvesters</subhead>
+The Web Harvesters work the same way as the File Harvesters but they fetch a URL (e.g., an image) every time they
+run. You can also define more that one URLS to fetch . The basic Run settings, Group and entry creation mechanisms
+are the same as described above.
+
+
+
+
+[ht::foot]

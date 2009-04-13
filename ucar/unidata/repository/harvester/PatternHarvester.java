@@ -257,10 +257,10 @@ public class PatternHarvester extends Harvester {
         String extraLabel = "";
         if ((rootDir != null) && !rootDir.exists()) {
             extraLabel = HtmlUtil.space(2)
-                         + HtmlUtil.bold("Directory does not exist");
+                + HtmlUtil.bold("Directory does not exist");
         }
-        sb.append(RepositoryManager.tableSubHeader("Look for files"));
-        sb.append(HtmlUtil.formEntry(msgLabel("In directory"),
+            sb.append(HtmlUtil.colspan(msgHeader("Look for files"),2));
+        sb.append(HtmlUtil.formEntry(msgLabel("Under directory"),
                                      HtmlUtil.input(ATTR_ROOTDIR, root,
                                          HtmlUtil.SIZE_60) + extraLabel));
         sb.append(HtmlUtil.formEntry(msgLabel("That match pattern"),
@@ -268,13 +268,19 @@ public class PatternHarvester extends Harvester {
                                          filePatternString,
                                          HtmlUtil.SIZE_60)));
 
-        sb.append(
-            RepositoryManager.tableSubHeader("Then create an entry with"));
+        sb.append(HtmlUtil.colspan(msgHeader("Then create an entry with"+HtmlUtil.space(2) +
+                                             HtmlUtil.href(getRepository().getUrlBase()+"/help/harvesters.html","(Help)"," target=_HELP")),2));
 
 
         //        sb.append(
         //HtmlUtil.formEntry("",
         //msgLabel("Then create an entry with")));
+
+        addBaseGroupSelect(ATTR_BASEGROUP,sb);
+
+        sb.append(HtmlUtil.formEntry(msgLabel("Group template"),
+                                     HtmlUtil.input(ATTR_GROUPTEMPLATE,
+                                         groupTemplate, HtmlUtil.SIZE_60)));
 
         sb.append(HtmlUtil.formEntry(msgLabel("Name template"),
                                      HtmlUtil.input(ATTR_NAMETEMPLATE,
@@ -283,11 +289,8 @@ public class PatternHarvester extends Harvester {
                                      HtmlUtil.input(ATTR_DESCTEMPLATE,
                                          descTemplate, HtmlUtil.SIZE_60)));
 
-        addBaseGroupSelect(ATTR_BASEGROUP,sb);
 
-        sb.append(HtmlUtil.formEntry(msgLabel("Group template"),
-                                     HtmlUtil.input(ATTR_GROUPTEMPLATE,
-                                         groupTemplate, HtmlUtil.SIZE_60)));
+
 
         sb.append(HtmlUtil.formEntry(msgLabel("Date format"),
                                      HtmlUtil.input(ATTR_DATEFORMAT,
@@ -718,9 +721,11 @@ public class PatternHarvester extends Harvester {
 
         Group baseGroup = getBaseGroup();
         String dirGroup = getDirNames(rootDir, baseGroup, dirToks,
+                                      false && 
                                       !getTestMode() &&
                                       groupTemplate.indexOf("${dirgroup}")
                                       >= 0);
+        System.err.println ("dirgroup:" + dirGroup);
         //        String dirGroup = StringUtil.join(Group.PATHDELIMITER, dirToks);
         dirGroup = SqlUtil.cleanUp(dirGroup);
         dirGroup = dirGroup.replace("\\", "/");
@@ -756,9 +761,6 @@ public class PatternHarvester extends Harvester {
         }
 
 
-
-
-
         //        System.err.println("values:");
         //        System.err.println("map:" + map);
         Object[] values     = typeHandler.makeValues(map);
@@ -783,8 +785,6 @@ public class PatternHarvester extends Harvester {
             ext = ext.substring(1);
         }
         tag       = tag.replace("${extension}", ext);
-
-
         groupName = groupName.replace("${dirgroup}", dirGroup);
 
 

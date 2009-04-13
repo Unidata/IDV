@@ -2110,8 +2110,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             return getHtdocsFile(request);
         }
 
-        
-
+        /*
         if(!request.exists(ARG_ENTRYID) &&
            Misc.equals(apiMethod.getUrl().getBasePath(), URL_ENTRY_SHOW.getBasePath())) {
             String prefix =  URL_ENTRY_SHOW.toString();
@@ -2119,6 +2118,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             //Entry entry =  getEntryManager().getEntryFromCache(suffix,false);
             //if(entry!=null) request.put(ARG_ENTRYID, entry.getId());
         }
+        */
 
         boolean allSsl = false;
         if (sslEnabled) {
