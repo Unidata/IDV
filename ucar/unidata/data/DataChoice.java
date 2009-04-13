@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -887,11 +888,22 @@ public abstract class DataChoice {
      * @param name           Property name.
      * @param propertyValue  String property value
      */
-    public void setProperty(String name, String propertyValue) {
+    public void setObjectProperty(String name, Object propertyValue) {
         if (properties == null) {
             properties = new Hashtable();
         }
         properties.put(name, propertyValue);
+    }
+
+
+    /**
+     * Set the property.
+     *
+     * @param name           Property name.
+     * @param propertyValue  String property value
+     */
+    public void setProperty(String name, String propertyValue) {
+        setObjectProperty(name, propertyValue);
     }
 
     /**
