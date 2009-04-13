@@ -2147,12 +2147,10 @@ public class StormDisplayState {
 
 
             if (filename.endsWith(".dat")) {
-                StringBuffer sb = StormTrack.toDiamond7(tracksToWrite);
+                StringBuffer sb = StormTrack.toDiamond7(tracksToWrite, stormInfo.getStormId());
                 IOUtil.writeFile(filename, sb.toString());
                 return;
             }
-
-
 
 
             Hashtable    sheetNames = new Hashtable();
@@ -2186,6 +2184,7 @@ public class StormDisplayState {
             stormTrackControl.logException("Writing spreadsheet", exc);
         }
     }
+
 
     /**
      * _more_
@@ -2244,9 +2243,6 @@ public class StormDisplayState {
             }
         }
     }
-
-
-
 
 
     /**
