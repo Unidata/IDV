@@ -3,14 +3,15 @@
 <%nochildlist%>
 
 Once an entry is created you can edit its name, description, time range
-and lat/lon bounding box with the edit icon in the toolbar:
-<img src="images/edit.gif">
-which takes you to the entry edit form:
+and lat/lon bounding box with the Edit Entry link in the Edit menu:<br>
+[ht::cimg images/editmenu.gif {} {border=0}]
+<p>
 
-[ht::cimg images/editform.jpg {Entry Edit Form} {border=0 width=600}]
+Which takes you to the Entry Edit form:
 
-Along the top are other edit links that allow you to
-view, edit and add metadata and define access control to this entry.
+[ht::cimg images/editform.gif {Entry Edit Form} {border=0 width=600}]
+
+
 <p>
 If the description of an entry begins with &quot;<wiki>&quot;
 then RAMADDA uses the description text as a wiki page
@@ -19,19 +20,21 @@ See <a href="wiki.html">here</a> for  more information
 on wiki text in RAMADDA.
 
 
+
+
 <subhead intoc="false" id="metadata">Adding Metadata</subhead>
 In RAMADDA entries have some basic metadata that can be edited in
 the edit form, e.g., name, description, lat/lon bounding box, time range, etc.
 One can also add any number of other metadata elements to an entry.
 <p>
-Clicking on the &quot;Add Metadata&quot; link takes you to the
+Clicking on the &quot;Edit Menu -&gt; Add Metadata&quot; link takes you to the
 Add Metadata form where you can select the type of metadata to add.
 e.g., Tag:
 
 [ht::cimg images/addmetadata1.gif {Add Metadata Form} {border=0 width=600}]
 
 
-You can then specify the metadata value or values:
+Select the type of metadat to add, e.g., &qout;Tag&quot;:
 
 [ht::cimg images/addmetadata2.gif {Add Tag Metadata Form} {border=0 width=600}]
 
@@ -48,6 +51,35 @@ Clicking on a thumbnail image will display the full size image:
 [ht::cimg images/thumbnailexpanded.gif {Expanded Thumbnail} {border=0 width=600}]
 
 
+
+<subhead intoc="false" id="editmetadata">Editing Metadata</subhead>
+Selecting the &quot;Edit -&gt; Edit Metadata&quot; menu link allows you to edit and delete the metadata
+elements of an entry:
+
+[ht::cimg images/editmetadata.gif {Edit Metadata} {border=0 width=600}]
+
+You can change any of the values of the metadata and press &quot;Change&quot; or
+you can select one or more metadata elements and delete them.
+
+<p>
+Note: In RAMADDA when there is a collection of checkboxes in a form selecting one and then
+selecting another with a Shift-Click toggles the range of checkboxes between the first the second
+checkbox clicked. Doing a Control-Click on a checkbox toggles all of them on or off.
+<p>
+The &quot;Add select to parent group&quot; button allows you to select some metadata elements and copy
+them into the parent group. For example, you may have a large number of data files one or more of which
+have metadata (see <a href="#autometadata">Automatic Metadata Harvesting</a> for more information).
+Instead of laboriously adding metadata to the parent group you can just copy it from one of the 
+children data entries.
+
+
+<subhead intoc="false" id="autometadata">Automatic Metadata Harvesting</subhead>
+If there is a data file that RAMADDA can open using the NetCDF/CDM library (e.g., gridded data, point data,
+radar, etc.) then there will be a &quot;CDL&quot; view link in the View menu for that entry. On that page
+there will be a &quot;Add short metadata&quot; and &quot;Add full metadata&quot; links shown.
+Adding  short metadata will just try to determine the geospatial bounds and the time range of
+the data file and set those properties. Adding full metadata will also add as metadata elements
+the netcdf varbiables and all of the netcdf global attributes found.
 
 
 

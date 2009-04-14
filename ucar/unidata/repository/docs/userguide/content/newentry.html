@@ -3,33 +3,39 @@
 <%nochildlist%>
 
 When you are logged in and you have the access to create a new group or
-entry under the group that you are viewing there will be a &quot;New Entry or Group&quot; icon button
-shown in the toolbar: <img src="images/new.gif">
+entry under the group that you are viewing there will be a set of links under the File menu
+that allows you to create a new File, Group or some other Entry type:
+
+[ht::cimg images/filemenu.gif {}  {border=0}]
 
 
-[ht::cimg images/newentrytoolbar.gif {} {border=0}]
+Choosing &quot;New Entry&quot; takes you to this page:
 
-Clicking on this icon will take you to a form where you can choose
-what you want to create:
+[ht::cimg images/createentry.gif {}  {border=0}]
 
-[ht::cimg images/creategroup.gif {}  {border=0}]
+You can directly create a group, upload a file or select a specific entry type in the form.
 
-Selecting &quot;Group&quot; and pressing Go will take you to the
+
+<p>
+
+Selecting the &quot;Create a group&quot; link will take you to the
 create group form:
 
-[ht::cimg images/newgroupform.gif {} {border=0}]
+[ht::cimg images/newgroupform.gif {} {border=0 width=600}]
 
 Enter a name and an optional description, date range and lat/lon bounding box.
 
 
 <subhead intoc="false" id="createentry">Uploading Files</subhead>
 To upload a file to a RAMADDA repository you create a new Entry.
-Go back to the original form and select &quot;File&quot;:
-[ht::cimg images/createentry.gif {}  {border=0}]
+From the File menu select  &quot;New File&quot;.
 
-The Create Entry form allows you to upload a file or specify a URL:
 
-[ht::cimg images/newentryform.gif {} {border=0}]
+The Create Entry form allows you to upload a file or specify a URL.
+If you are a site administrator you can also specify a path to
+a file on the server machine.
+
+[ht::cimg images/newentryform.gif {} {border=0 width=600}]
 
 The minimal you need to enter here is the file or URL. The other fields
 are optional. If you do not enter a name then the file name is used.
@@ -42,6 +48,8 @@ e.g., grib, radar, area file, etc) checking &quot;Add Metadata&quot;
 will have RAMADDA crack open the file and harvest the time range, lat/lon
 bounding box, global attributes and variables and add them as Metadata of
 this Entry.
+See the section on <a href="editing.html#autometadata">metadata</a>  for more information.
+
 <p>
 The &quot;Data Type&quot; is an optional and arbitrary data type  that can 
 be used to search for entries of this type.
@@ -49,6 +57,18 @@ be used to search for entries of this type.
 The &quot;Date Pattern&quot; can be used to match on the file name to automatically 
 figure out the date of this entry. 
 
+
+
+<subhead intoc="false" id="importcatalog">Importing a THREDDS Catalog</subhead>
+
+If you are a site administrator the New Entry page will also show a form that allows you to import  a
+THREDDS catalog from an external server:
+[ht::cimg images/catalogimport.gif {}  {border=0}]
+Enter a URL to a THREDDS catalog. The Recurse  checkbox determines whether catalog references
+will be followed. If you select Download URLS RAMADDA will try to download the files if possible.
+<p>
+This create a special <a href="harvesters.html"> THREDDS Catalog Harvester</a> that can be monitored
+from the Admin Harvesters page.
 
 
 
