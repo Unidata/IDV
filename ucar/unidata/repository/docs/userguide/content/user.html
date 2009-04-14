@@ -1,19 +1,58 @@
-[ht::head {Logging in and Your User Settings}]
+[ht::head {Logging in and User Settings}]
 
 <%nochildlist%>
 
 If you have an account on a RAMADDA server you can login by following the
 login link:
 
-[ht::cimg images/login.jpg {} {width=600}]
+[ht::cimg images/login.jpg {} {width=700}]
 
 If you have forgotten your user name or password and if the RAMADDA server has been configured to send email there will be links shown to send you a reminder of your user name and to reset your password.
 <p>
 
 Once logged in there is a link with your name shown on the left which 
-will take you to your user settings page:
+will take you to your user settings page.
 
-[ht::cimg images/userhome.jpg {} {width=600}]
+<subhead  id="favorites"  intoc="false">User Favorites</subhead>
+
+[ht::cimg images/userhome.jpg {} {width=700}]
+
+
+
+The initial tag lists all of your &quot;favorite&quot; entries.
+These are kind of like bookmarks in a web browser and, when they exist,
+always show on every page in the left column. Whenever you are viewing an
+entry you can add it as a favorite with the <img src="images/favorite.gif"> icon
+shown in the upper right toolbar.
+
+<subhead  id="settings"  intoc="false">User Settings</subhead>
+This tab allows you to change your user settings and your password.
+The Page Template is a user interface skin and allows you to change the overall 
+look and feel of the user interface. If language translations are define then
+RAMADDA also supports a per-user language setting which provides translations of phrases
+in the user interface.
+
+
+<subhead  id="datacart"  intoc="false">Data Cart</subhead>
+The Data Cart facility allows you to add entries into it and serves as a wayy to make a group of entries 
+for further use (e.g., download, copy/move, delete, catalogs, etc).
+The Data Cart is not persistent and is only valid for a given user session.
+<p>
+Any time you see an entry you can add it to your cart with the <img src="images/cart_add.png"> icon
+shown in the upper right toolbar.
+
+
+<subhead  id="monitors"  intoc="false">Monitors</subhead>
+RAMADDA has a facility to define a monitor for new entries. 
+A monitor consists of a set of search criteria and an action.
+When a new entry is added into the repository all of the monitors are
+checked. If a monitor's search criteria matches the new entry then the action is
+performed. The supported actions include sending an email and sending a notification
+via <a href="http://www.twitter.com">Twitter</a>.
+<p>
+We are currently working on an FTP action (doing a FTP put), a Copy action (copy the new entry
+somewhere else into the repository) and a LDM action  (inserting the entry's file into a LDM queue).
+
 
 
 [ht::foot]

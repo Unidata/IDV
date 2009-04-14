@@ -646,14 +646,12 @@ public class UserManager extends RepositoryManager {
         user.setName(request.getString(ARG_USER_NAME, user.getName()));
         user.setEmail(request.getString(ARG_USER_EMAIL, user.getEmail()));
         user.setTemplate(request.getString(ARG_TEMPLATE, user.getTemplate()));
-
-
-        user.setLanguage(request.getString(ARG_USER_LANGUAGE,
-                                           user.getLanguage()));
+        user.setLanguage(request.getString(ARG_USER_LANGUAGE, user.getLanguage()));
         user.setQuestion(request.getString(ARG_USER_QUESTION,
                                            user.getQuestion()));
         user.setAnswer(request.getString(ARG_USER_ANSWER, user.getAnswer()));
         if (doAdmin) {
+            if(!request.getUser().getAdmin()) throw new IllegalArgumentException("Need to be admin");
             if ( !request.defined(ARG_USER_ADMIN)) {
                 user.setAdmin(false);
             } else {
@@ -748,6 +746,7 @@ public class UserManager extends RepositoryManager {
                 + HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
             sb.append(buttons);
             makeUserForm(request, user, sb, true);
+            makePasswordForm(request, user, sb);
             sb.append(buttons);
         }
         sb.append(HtmlUtil.formClose());
@@ -778,6 +777,7 @@ public class UserManager extends RepositoryManager {
                                      HtmlUtil.input(ARG_USER_NAME,
                                          user.getName(), HtmlUtil.SIZE_40)));
         if (includeAdmin) {
+            if(!request.getUser().getAdmin()) throw new IllegalArgumentException("Need to be admin");
             sb.append(HtmlUtil.formEntry(msgLabel("Admin"),
                                          HtmlUtil.checkbox(ARG_USER_ADMIN,
                                              "true", user.getAdmin())));
@@ -819,9 +819,14 @@ public class UserManager extends RepositoryManager {
         sb.append(HtmlUtil.formEntry(msgLabel("Language"),
                                      HtmlUtil.select(ARG_USER_LANGUAGE,
                                          languages, user.getLanguage())));
+        sb.append(HtmlUtil.formTableClose());
+    }
 
-        sb.append(HtmlUtil.formEntry("&nbsp;<p>", ""));
 
+
+    private void makePasswordForm(Request request, User user, StringBuffer sb) 
+            throws Exception {
+        sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry(msgLabel("Password"),
                                      HtmlUtil.password(ARG_USER_PASSWORD1)));
 
@@ -2499,11 +2504,19 @@ public class UserManager extends RepositoryManager {
         }
 
         if (request.exists(ARG_USER_CHANGE)) {
-            boolean okToChangeUser = checkPasswords(request, user);
-            if ( !okToChangeUser) {
-                sb.append(
-                    getRepository().warning(msg("Incorrect passwords")));
-            } else {
+            boolean settingsOk = true;
+            String message;
+            if (request.exists(ARG_USER_PASSWORD1)) {
+                settingsOk = checkPasswords(request, user);
+                if ( !settingsOk) {
+                    sb.append(
+                              getRepository().warning(msg("Incorrect passwords")));
+                } 
+                message = "Your password has been changed";
+            }  else {
+                message = "Your settings have been changed";
+            }
+            if(settingsOk) {
                 applyState(request, user, false);
                 String redirect;
                 //If we are under ssl then redirect to non-ssl
@@ -2515,7 +2528,7 @@ public class UserManager extends RepositoryManager {
                         getRepositoryBase().URL_USER_SETTINGS.toString();
                 }
                 return new Result(HtmlUtil.url(redirect, ARG_MESSAGE,
-                        msg("User settings changed")));
+                                               msg(message)));
             }
         }
 
@@ -2526,10 +2539,16 @@ public class UserManager extends RepositoryManager {
         }
 
         sb.append(HtmlUtil.p());
+
         sb.append(request.form(getRepositoryBase().URL_USER_SETTINGS));
-        sb.append(HtmlUtil.submit(msg("Change Settings"), ARG_USER_CHANGE));
         makeUserForm(request, user, sb, false);
         sb.append(HtmlUtil.submit(msg("Change Settings"), ARG_USER_CHANGE));
+        sb.append(HtmlUtil.formClose());
+
+        sb.append(HtmlUtil.p());
+        sb.append(request.form(getRepositoryBase().URL_USER_SETTINGS));
+        makePasswordForm(request, user, sb);
+        sb.append(HtmlUtil.submit(msg("Change Password"), ARG_USER_CHANGE));
         sb.append(HtmlUtil.formClose());
 
         sb.append(HtmlUtil.formTable());

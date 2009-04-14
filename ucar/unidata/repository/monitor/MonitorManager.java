@@ -486,9 +486,14 @@ public class MonitorManager extends RepositoryManager {
                         + HtmlUtil.formClose();
         }
 
-        String[] createTypes = {
+        String[] createTypesxxx = {
             "email", "Email Action", "twitter", "Twitter Action", "copy",
             "Copy Action","ftp","FTP Action"
+        };
+
+
+        String[] createTypes = {
+            "email", "Email Action", "twitter", "Twitter Action"
         };
 
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));

@@ -1,0 +1,50 @@
+[ht::head {Misc Admin Settings}]
+
+<%nochildlist%>
+There are a number of other site administation tabs available.
+
+<subhead  id="statistics"  intoc="false">Statistics/subhead>
+This shows statistics of the system and the database. Note: if there seems to be
+memory usage problems (e.g., excessive memory use from a memory leak) you can simply
+add a URL argument to any URL:<pre>
+...?gc=true
+(I know its a bit of a hack)
+</pre> 
+and the caches will be cleared and Java  garbage collector will run. Then, you can revisit the statistics
+page and see if that has affected the memory usage (it should).
+
+
+<subhead  id="access"  intoc="false">Access</subhead>
+This tab just shows an overview of all of the entry access control settings.
+
+<subhead  id="logs"  intoc="false">Logs</subhead>
+You can view the last 200 accesses to the repository. Because the googlebot is so
+voracious we show its (and other bots) accesses highlighted.
+<p>
+This tab also provides access to the current error log and the full error log.
+These two log files are in &lt;ramadda home&gt;/logs. The current log is the log
+file for just this current run of the repository. The full log file is a concatenation
+of all of the logging.
+<p>
+This view shows the last N lines of the log file. You cann show more or less of the log.
+Also, Java stack traces are shown hidden and can be expanded.
+
+
+<subhead  id="cleanup"  intoc="false">Clean Up</subhead>
+This still needs work but the Clean Up facility will go through the
+resository database and remove all entries that are file used and the
+file does not exist. For example, if you are harvesting a real-time
+data archive and adding the entries into the database the files in the archive
+may be removed from some external process (e.g., scouring). In this case these
+entries will not be shown to a user (RAMADDA checks for that) but they will not
+be deleted from the database.
+<p>
+We are intending to do this automatically in the future.
+
+<subhead  id="usermessage"  intoc="false">User Message</subhead>
+You can enter a message that is shown to all users one time in this tab.
+For example, you could announce that the repository will be unavailable
+for a certain time, etc.
+
+
+[ht::foot]

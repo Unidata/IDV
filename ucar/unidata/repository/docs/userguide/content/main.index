@@ -5,7 +5,13 @@ index.html
 >user.html
 >newentry.html
 >editing.html
+>access.html
 >wiki.html
 >idvpublisher.html
->harvesters.html
 >faq.html
+
+>title:Site Administration:These pages are intended for Site Administrators
+>>admin.html
+>>adminmisc.html
+>>harvesters.html
+
