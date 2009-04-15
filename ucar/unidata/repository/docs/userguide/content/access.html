@@ -2,6 +2,71 @@
 
 <%nochildlist%>
 
+You can define access control settings under the &quot;Edit -&gt; Access&quot; menu.
+
+
+
+[ht::cimg images/access.png {Entry Access Control} {border=0 width=600}]
+
+The access control mechanism in RAMADDA is centered around a set of access types (e.g., viewing, new, edit)
+and a set of roles and/or users that have permissions to do those tasks.
+On the left of this form lists each of the access types. Under each access type
+is a field where you can enter a user role (one per line).
+<p>
+On the right shows a summary table for the paricular entry we are viewing. This shows the access control
+settings for all of the ancestor groups of the entry and allows the user to see just what access settings
+are applicable to the entry.
+
+
+<subhead intoc="false" id="accesstypes">Access Types</subhead>
+
+The different access types are:
+<ul>
+<li> View - Can a user view the entry. If a user does not have view access they will simply not
+see the entry and cannot access any aspect of the entry.
+
+<li> View Children - This is used for a group where a user without permission can see that the group exists (e.g., "Unidata Only")
+but cannot see any of the details of the group or any of the children entry of the group.
+
+<li> File - This allows users to see the information about an entry but they cannot access the file. i.e., they cannot download the
+file or access any of the content of the file (e.g., through OpenDAP).
+
+<li> Edit - Can a user edit the entry.
+
+<li> New - Can a user create a new sub-group or sub-entry. Note: when users have this permission they
+also need Edit permission.
+
+<li> Upload - This provides anonymous upload capability. For example, we use this
+to provide an <a href="http://motherlode.ucar.edu/repository/entry/show/Top/IDV+Community+Resources/Contributions?entryid=bfc82cf9-8548-4393-af10-20ec2274ceb9">area </a> for IDV users to upload shared content.
+When a file is uploaded it is marked so that only administrators or owners of the Group can access it. The owner
+of the group will receive an email (if email is configured) notifying them of the uploaded file.
+In the Edit page for the uploaded Entry the owner can "bless" the entry to make it available to others.
+<p>
+If you want more people than the owner to receive notification simply add  a "Contact" metadata element to the group
+that contains the other recipient's email.
+
+<li> Delete - Can  a user delete an entry.
+
+<li> Comment - Can a user comment on an entry.
+
+</ul>
+
+<subhead intoc="false" id="roles">Roles</subhead>
+
+Each access type form entry can contain any number of roles (one per line). 
+<ul>
+<li> User roles - All users can have one or more roles. This is set by the site administrator 
+when editing the user. They are just string names.
+<li> Self identity role - If you enter a role in the form as <i>user:someuserid</i> this grants 
+access to that specific user.
+<li> <i>any</i> - this is a special role and says that anyone can do the action.
+<li> <i>none</i> - nobody (except admins) can do the action.
+<li> <i>ip:ip address</i>  - This format grants access to incoming requests with the given ip address or ip address suffix.
+For example, <i>ip:128.117</i> would grant access to any request coming from UCAR's network.
+
+<li> <i>!some role</i> - Prefixing a role with &quot;!&quot; is a way to deny specific access to a user, role, or ip address.
+For example, <i>!ip:128.117</i> would deny access to any request coming from UCAR's network.
+</ul>
 
 
 [ht::foot]
