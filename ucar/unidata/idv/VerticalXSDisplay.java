@@ -104,6 +104,14 @@ public class VerticalXSDisplay extends XSDisplay {
             zscale.setSnapToBox(true);
             zscale.setColor(Color.blue);
             zscale.setAutoComputeTicks(true);
+
+            RealType yAxisType= getYAxisType();
+            if(yAxisType!=null) {
+                Unit unit =  yAxisType.getDefaultUnit();
+                if(unit!=null) {
+                    zscale.setTitle(yAxisType.toString()+" (" + unit +")");
+                }
+            }                
         }
     }
 
