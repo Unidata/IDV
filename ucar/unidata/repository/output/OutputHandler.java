@@ -747,6 +747,9 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         String value     = (entry.isGroup()
                             ? ((Group) entry).getFullName()
                             : entry.getName());
+        value = value.replace("'","\\'");
+
+
         sb.append(HtmlUtil.mouseClickHref(HtmlUtil.call("selectClick",
                 HtmlUtil.comma(HtmlUtil.squote(target),
                                HtmlUtil.squote(entry.getId()),
