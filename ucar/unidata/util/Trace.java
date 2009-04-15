@@ -628,10 +628,12 @@ public class Trace {
      * @param name _more_
      */
     public static void accum1(String name) {
+        if(true) return;
         if ( !displayMsg) {
             return;
         }
-        Long l = new Long(System.currentTimeMillis());
+        //        Long l = new Long(System.currentTimeMillis());
+        Long l = new Long(System.nanoTime());
         accum1Table.put(name, l);
     }
 
@@ -641,10 +643,12 @@ public class Trace {
      * @param name _more_
      */
     public static void accum2(String name) {
+        if(true) return;
         if ( !displayMsg) {
             return;
         }
-        long time = System.currentTimeMillis();
+        //        long time = System.currentTimeMillis();
+        long time = System.nanoTime();
         Long l    = (Long) accum1Table.get(name);
         if (l == null) {
             msg("Cannot find accum:" + name);
@@ -677,7 +681,8 @@ public class Trace {
             String  name  = (String) accumList.get(i);
             Long    total = (Long) accumTable.get(name);
             Integer cnt   = (Integer) accumCntTable.get(name);
-            msg(name + " Time:" + total + " count:" + cnt);
+            long nanos = total.longValue();
+            msg(name + " Time:" + (nanos/1000000) + " count:" + cnt);
         }
         accumList     = new ArrayList();
         accum1Table   = new Hashtable();
