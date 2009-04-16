@@ -326,6 +326,7 @@ public class DataManager {
         ucar.nc2.util.DiskCache.setCachePolicy(true);
         // have to do this since nj2.2.20
         ucar.nc2.iosp.grib.GribServiceProvider.setIndexAlwaysInCache(true);
+        ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(true);
 
         visad.util.ThreadManager.setGlobalMaxThreads(dataContext.getIdv().getMaxRenderThreadCount());
 
