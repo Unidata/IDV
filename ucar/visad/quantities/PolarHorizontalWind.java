@@ -1,7 +1,5 @@
 /*
- * $Id: PolarHorizontalWind.java,v 1.13 2005/05/13 18:35:41 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright  1997-2009 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -20,13 +18,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad.quantities;
 
 
+import visad.*;
 
 import java.rmi.RemoteException;
-
-import visad.*;
 
 
 /**
@@ -35,7 +33,6 @@ import visad.*;
  * CoordinateSystem.
  *
  * @author Steven R. Emmerson
- * @version $Id: PolarHorizontalWind.java,v 1.13 2005/05/13 18:35:41 jeffmc Exp $
  */
 public final class PolarHorizontalWind extends HorizontalWind {
 
@@ -50,7 +47,7 @@ public final class PolarHorizontalWind extends HorizontalWind {
      */
     private PolarHorizontalWind() throws VisADException {
 
-        super(new RealType[]{ getSpeedRealType(), getDirectionRealType() },
+        super(new RealType[] { getSpeedRealType(), getDirectionRealType() },
               new PolarCoordinateSystem(
                   getSpeedRealType().getDefaultUnit(),
                   getDirectionRealType().getDefaultUnit()));
@@ -120,10 +117,9 @@ public final class PolarHorizontalWind extends HorizontalWind {
         direction = dirType.getDefaultUnit().toThis(direction, SI.radian);
 
         return new RealTuple(getRealTupleType(),
-                             new Real[]{ new Real(spdType, speed),
-                                         new Real(
-                                             dirType,
-                                             direction) }, (CoordinateSystem) null);
+                             new Real[] { new Real(spdType, speed),
+                                          new Real(dirType,
+                                          direction) }, (CoordinateSystem) null);
     }
 
     /**
@@ -152,13 +148,27 @@ public final class PolarHorizontalWind extends HorizontalWind {
          */
         public PolarCoordinateSystem(Unit speedUnit, Unit directionUnit)
                 throws VisADException {
+            this(CartesianHorizontalWind.getRealTupleType(), speedUnit,
+                 directionUnit);
+        }
 
-            super(CartesianHorizontalWind.getRealTupleType(),
-                  new Unit[]{ speedUnit,
-                              directionUnit });
+        /**
+         * Constructs from units for speed and direction.
+         *
+         *
+         * @param refType               The reference type
+         * @param speedUnit             The unit for speed.
+         * @param directionUnit         The unit for direction.
+         * @throws VisADException       Couldn't create necessary VisAD object.
+         */
+        public PolarCoordinateSystem(RealTupleType refType, Unit speedUnit,
+                                     Unit directionUnit)
+                throws VisADException {
+
+            super(refType, new Unit[] { speedUnit, directionUnit });
 
             internalUnits =
-                new Unit[]{
+                new Unit[] {
                     ((RealType) CartesianHorizontalWind.getRealTupleType()
                         .getComponent(0)).getDefaultUnit(),
                     SI.radian };
@@ -316,8 +326,3 @@ public final class PolarHorizontalWind extends HorizontalWind {
         }
     }
 }
-
-
-
-
-
