@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.idv.control;
 
 
@@ -62,6 +61,7 @@ import ucar.visad.quantities.CartesianHorizontalWind;
 import ucar.visad.quantities.PolarHorizontalWind;
 
 import visad.ActionImpl;
+import visad.CommonUnit;
 import visad.CoordinateSystem;
 import visad.DataReference;
 import visad.DataReferenceImpl;
@@ -82,6 +82,8 @@ import visad.VisADException;
 
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
+
+import visad.util.DataUtility;
 
 
 import java.awt.*;
@@ -134,6 +136,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
     /** readout panel */
     private JPanel readoutPanel;
+
+    /** show U and V winds checkbox */
+    private JCheckBox showUVCbx;
 
     /** the parcel path */
     private PseudoAdiabaticDisplayable parcelPath;
@@ -227,6 +232,12 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
     /** winds or not? */
     private boolean haveWinds = false;
+
+    /** winds as U and V? */
+    private boolean haveUAndVWinds = false;
+
+    /** show winds as U and V? */
+    private boolean showUAndVWinds = false;
 
     /** tabbed pane for skewt, hodo and table */
     private JTabbedPane viewTabs;
@@ -334,6 +345,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         soundingTable = new SoundingTable(this);
         soundingTable.setDefaultRenderer(Number.class,
                                          new TableNumberCellRenderer());
+        soundingTable.setShowUVComps(showUAndVWinds);
         // aeroDisplay.setPointMode(true);  // for debugging
         headerLabel = new JLabel(" ", JLabel.LEFT);
         tempProRef  = new DataReferenceImpl("TemperatureProfile");
@@ -1009,7 +1021,19 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             if ((i == 0) && (windProfiles[i] != null)) {
                 // assumes that if the first one is null, they are all null
                 haveWinds = true;
+                RealTupleType windTuple =
+                    DataUtility.getFlatRangeType(windProfiles[i]);
+                if (Unit.canConvert(((RealType) windTuple.getComponent(0))
+                        .getDefaultUnit(), CommonUnit.meterPerSecond) && Unit
+                            .canConvert(((RealType) windTuple.getComponent(1))
+                                .getDefaultUnit(), CommonUnit
+                                .meterPerSecond)) {
+                    haveUAndVWinds = true;
+                }
                 //visad.python.JPythonMethods.dumpTypes(windProfiles[i]);
+            }
+            if (showUVCbx != null) {
+                showUVCbx.setEnabled(haveWinds);
             }
             aeroDisplay.addProfile(i, tempProfiles[i], dewProfiles[i],
                                    windProfiles[i]);
@@ -1333,7 +1357,12 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         tableSP.setViewportBorder(
             BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-        viewTabs.add("Table", tableSP);
+        showUVCbx = GuiUtils.makeCheckbox("Show U and V", this,
+                                          "showUAndVWinds");
+        showUVCbx.setEnabled(haveWinds);
+        JComponent tableComp = GuiUtils.topCenter(GuiUtils.right(showUVCbx),
+                                   tableSP);
+        viewTabs.add("Table", tableComp);
         GuiUtils.handleHeavyWeightComponentsInTabs(viewTabs);
         viewTabs.setSelectedIndex(0);
         viewTabs.setEnabledAt(viewTabs.indexOfTab(HODOGRAPH_DISPLAY),
@@ -1720,5 +1749,25 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         return hodoView;
     }
 
+
+    /**
+     * Are the winds shown as U and V?
+     * @return true if winds are shown as U/V components
+     */
+    public boolean getShowUAndVWinds() {
+        return showUAndVWinds;
+    }
+
+    /**
+     * Set the show u and v property
+     *
+     * @param show  true to show winds as u and v
+     */
+    public void setShowUAndVWinds(boolean show) {
+        showUAndVWinds = show;
+        if (soundingTable != null) {
+            soundingTable.setShowUVComps(show);
+        }
+    }
 }
 

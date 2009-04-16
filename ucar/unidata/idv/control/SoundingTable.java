@@ -26,6 +26,9 @@ import ucar.unidata.ui.TableSorter;
 import ucar.unidata.util.Misc;
 
 import ucar.visad.Util;
+import ucar.visad.quantities.Direction;
+import ucar.visad.quantities.PolarHorizontalWind;
+import ucar.visad.quantities.Speed;
 
 import visad.*;
 
@@ -56,7 +59,7 @@ public class SoundingTable extends JTable {
     private Field[] soundings;
 
     /** The range data from the flat field */
-    private double[][] rangeData;
+    private float[][] rangeData;
 
     /** The domain */
     private float[][] domainData;
@@ -72,6 +75,21 @@ public class SoundingTable extends JTable {
 
     /** sounding index */
     private int currSounding = 0;
+
+    /** show winds as U and V */
+    private boolean showUAndV = false;
+
+    /** is the data UV */
+    private boolean haveUV = false;
+
+    /** flag for tranforming winds */
+    private boolean transformWinds = false;
+
+    /** CoordinateSystem for transforming winds */
+    private CoordinateSystem windTransform = null;
+
+    /** units of the input to the cs */
+    private Unit[] csUnits;
 
     /**
      * Create a new sounding table
@@ -90,7 +108,10 @@ public class SoundingTable extends JTable {
     public void setSoundings(Field[] soundings)
             throws VisADException, RemoteException {
         this.soundings = soundings;
-        setSounding(soundings[currSounding]);
+        if (soundings != null) {
+            setupTable(soundings[0]);
+            setSounding(soundings[currSounding]);
+        }
     }
 
     /**
@@ -124,17 +145,72 @@ public class SoundingTable extends JTable {
             throws VisADException, RemoteException {
         domainData = null;
 
-        rangeData  = sounding.getValues(false);
+        // domain values
+        Set              domain     = sounding.getDomainSet();
+        CoordinateSystem cs         = domain.getCoordinateSystem();
+
+        float[][]        domSamples = domain.getSamples(false);
+        if ((cs != null)) {
+            float[][] refData = cs.toReference(Set.copyFloats(domSamples));
+            domainData = new float[][] {
+                domSamples[0], refData[0]
+            };
+        }
+        // range values
+        RealType[] rangeComps =
+            ((FunctionType) sounding.getType()).getRealComponents();
+        rangeData = sounding.getFloats(false);
+
+        // wind
+        if (rangeComps.length > 2) {
+            transformWinds = (showUAndV && !haveUV)
+                             || ( !showUAndV && haveUV);
+            if ( !transformWinds) {
+                for (int i = 2; i < 4; i++) {
+                    columnNames[numDomainCols + i] =
+                        makeColumnName(rangeComps[i],
+                                       rangeComps[i].getDefaultUnit());
+                }
+            } else {
+                RealTupleType refType  = windTransform.getReference();
+                Unit[]        refUnits = windTransform.getReferenceUnits();
+                for (int i = 0; i < 2; i++) {
+                    columnNames[numDomainCols + i + 2] =
+                        makeColumnName((RealType) refType.getComponent(i),
+                                       refUnits[i]);
+                }
+                float[][] newVals =
+                    windTransform.toReference(Set.copyFloats(new float[][] {
+                    rangeData[2], rangeData[3]
+                }));
+                rangeData[2] = newVals[0];
+                rangeData[3] = newVals[1];
+            }
+        }
+        model.fireTableStructureChanged();
+    }
+
+    /**
+     * Set the sounding in the table
+     *
+     * @param sounding  the sounding
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  problem dissecting data
+     */
+    private void setupTable(Field sounding)
+            throws VisADException, RemoteException {
 
         Set              domain = sounding.getDomainSet();
         CoordinateSystem cs     = domain.getCoordinateSystem();
 
-        domainData    = domain.getSamples(true);
-        numDomainCols = domainData.length;
+        numDomainCols = domain.getDimension();
         if (cs != null) {
             numDomainCols++;
         }
-        numRangeCols = rangeData.length;
+        RealType[] rangeComps =
+            ((FunctionType) sounding.getType()).getRealComponents();
+        numRangeCols = rangeComps.length;
         columnNames  = new String[numDomainCols + numRangeCols];
 
         SetType       t     = (SetType) domain.getType();
@@ -146,21 +222,38 @@ public class SoundingTable extends JTable {
             RealTupleType refType  = cs.getReference();
             RealType[]    refComps = refType.getRealComponents();
             Unit[]        refUnits = cs.getReferenceUnits();
-            float[][]     refData =
-                cs.toReference(Set.copyFloats(domainData));
             columnNames[1] = makeColumnName(refComps[0], refUnits[0]);
-            domainData     = new float[][] {
-                domainData[0], refData[0]
-            };
         }
 
-
-
-        RealType[] rangeComps =
-            ((FunctionType) sounding.getType()).getRealComponents();
+        // set for default
         for (int i = 0; i < rangeComps.length; i++) {
             columnNames[numDomainCols + i] = makeColumnName(rangeComps[i],
                     rangeComps[i].getDefaultUnit());
+        }
+        // wind
+        if (rangeComps.length > 2) {
+            csUnits = new Unit[] { rangeComps[2].getDefaultUnit(),
+                                   rangeComps[3].getDefaultUnit() };
+            haveUV = (Unit.canConvert(csUnits[0], CommonUnit.meterPerSecond)
+                      && Unit.canConvert(csUnits[1],
+                                         CommonUnit.meterPerSecond));
+            if (haveUV) {
+                windTransform =
+                    new InverseCoordinateSystem(
+                        new RealTupleType(
+                            Speed.getRealType(),
+                            Direction.getRealType()), new PolarHorizontalWind
+                                .PolarCoordinateSystem(
+                                    new RealTupleType(
+                                        rangeComps[2],
+                                        rangeComps[3]), CommonUnit
+                                            .meterPerSecond, CommonUnit
+                                            .degree));
+            } else {
+                windTransform =
+                    new PolarHorizontalWind.PolarCoordinateSystem(csUnits[0],
+                        csUnits[1]);
+            }
         }
         if (model == null) {
             model = new SoundingTableModel();
@@ -174,7 +267,6 @@ public class SoundingTable extends JTable {
             setPreferredScrollableViewportSize(new Dimension(400, 200));
             getTableHeader().setReorderingAllowed(false);
         }
-        model.fireTableStructureChanged();
     }
 
     /**
@@ -185,6 +277,17 @@ public class SoundingTable extends JTable {
      */
     private String makeColumnName(RealType rt, Unit unit) {
         return Util.cleanTypeName(rt) + " [" + unit + "]";
+    }
+
+    /**
+     * Set a flag to show the wind values as U and V
+     * @param showUV  true to show winds as U and V
+     */
+    public void setShowUVComps(boolean showUV) {
+        showUAndV = showUV;
+        try {
+            setCurrentSounding(currSounding);
+        } catch (Exception ignore) {}
     }
 
     /**
