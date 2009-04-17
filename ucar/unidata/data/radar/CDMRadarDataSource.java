@@ -201,7 +201,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                     DateUnit.getStandardOrISO((String) timeSpan.get(0));
                 Date toDate =
                     DateUnit.getStandardOrISO((String) timeSpan.get(1));
-                System.out.println("dataset dates: from = " + fromDate + " to = " + toDate);
+                //System.out.println("dataset dates: from = " + fromDate + " to = " + toDate);
                 /*
                 List collectionTimes =
                     collection.getRadarStationTimes(query.getStation(),
