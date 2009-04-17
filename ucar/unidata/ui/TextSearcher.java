@@ -353,6 +353,7 @@ public class TextSearcher extends JPanel {
             String t = textComp.getText();
             if ( !doCase) {
                 t = t.toLowerCase();
+                what = what.toLowerCase();
             }
             int start = 0;
             start = lastIndex + 1;
