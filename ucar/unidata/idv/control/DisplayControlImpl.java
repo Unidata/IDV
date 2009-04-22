@@ -4669,19 +4669,20 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if ( !items.isEmpty()) {
             items.add(GuiUtils.MENU_SEPARATOR);
         }
-        JMenuItem mi;
         if (canSaveDataInCache()) {
-            items.add(mi = GuiUtils.makeMenuItem("Save Data in Cache...",
+            items.add(GuiUtils.makeMenuItem("Save Data in Cache...",
                     this, "saveDataChoiceInCache"));
         }
         if (canExportData()) {
-            items.add(mi = GuiUtils.makeMenuItem("Export Displayed Data...",
+            items.add(GuiUtils.makeMenuItem("Export Displayed Data...",
                     this, "exportDisplayedData", FileManager.SUFFIX_NETCDF));
         }
-        if (haveParameterDefaults() && (myDataChoices.size() == 1)) {
+        if (myDataChoices!=null && 
+            haveParameterDefaults() && 
+            (myDataChoices.size() == 1)) {
             items.add(GuiUtils.makeMenuItem("Save As Parameter Defaults",
                                             this, "saveAsParameterDefaults"));
-
+            
         }
         items.addAll(GuiUtils.makeMenuItems(this, new String[][] {
             { "Save Display as Favorite...", "saveAsFavorite", null,
