@@ -1499,7 +1499,7 @@ public class GeoGridAdapter {
     private Unit getUnit(String uString) {
         Unit r = null;
         try {
-            r = Util.parseUnit(uString);
+            r = DataUtil.parseUnit(uString);
         } catch (Exception excp) {
             System.err.println("Unknown unit " + uString);
             r = null;
@@ -1656,7 +1656,7 @@ public class GeoGridAdapter {
         Attribute a = v.findAttribute("units");
         try {
             unit = (a != null)
-                   ? Util.parseUnit(a.getStringValue())
+                   ? DataUtil.parseUnit(a.getStringValue())
                    : rt.getDefaultUnit();
             Array array = v.read();
             value = array.getDouble(array.getIndex());

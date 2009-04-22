@@ -89,7 +89,7 @@ public class DerivedGridFactory {
             EARTH_RADIUS = new Real(Length.getRealType(), 6371000, SI.meter);
             EARTH_TWO_OMEGA = new Real(DataUtil.makeRealType("frequency",
                     SI.second.pow(-1)), 0.00014584, SI.second.pow(-1));
-            Unit kmPerDegree = Util.parseUnit("km/degree");
+            Unit kmPerDegree = DataUtil.parseUnit("km/degree");
             KM_PER_DEGREE = new Real(DataUtil.makeRealType("kmPerDegree",
                     kmPerDegree), 111.0, kmPerDegree);
             GRAVITY      = Gravity.newReal();
@@ -158,7 +158,7 @@ public class DerivedGridFactory {
         return createLayerDifference(grid, Misc.parseNumber(value1),
                                      Misc.parseNumber(value2),
                                      (levelUnit != null)
-                                     ? Util.parseUnit(levelUnit)
+                                     ? DataUtil.parseUnit(levelUnit)
                                      : (Unit) null);
     }
 
@@ -279,7 +279,7 @@ public class DerivedGridFactory {
         return createLayerAverage(grid, Misc.parseNumber(value1),
                                   Misc.parseNumber(value2),
                                   (levelUnit != null)
-                                  ? Util.parseUnit(levelUnit)
+                                  ? DataUtil.parseUnit(levelUnit)
                                   : (Unit) null);
     }
 
