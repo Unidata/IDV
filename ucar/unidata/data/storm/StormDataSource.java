@@ -197,7 +197,7 @@ public abstract class StormDataSource extends DataSourceImpl {
         try {
             alias = alias + "[unit:" + ((unit == null)
                                         ? "null"
-                                        : Util.cleanName(unit.toString())) + "]";
+                                        : DataUtil.cleanName(unit.toString())) + "]";
             return ucar.visad.Util.makeRealType(id, alias, unit);
         } catch(VisADException exc) {
             throw new RuntimeException(exc);
@@ -237,7 +237,7 @@ public abstract class StormDataSource extends DataSourceImpl {
                 new StormParam(Util.makeRealType("stormcategory",
                     "Storm_Category", null));
             PARAM_MINPRESSURE = new StormParam(makeRealType("minpressure",
-                    "Min_Pressure", Util.parseUnit("mb")));
+                    "Min_Pressure", DataUtil.parseUnit("mb")));
             //  PARAM_DISTANCEERROR =
             //      new StormParam(Util.makeRealType("forecastlocationerror",
             //           "Distance_Error", Util.parseUnit("km")), true,
@@ -245,7 +245,7 @@ public abstract class StormDataSource extends DataSourceImpl {
             PARAM_MAXWINDSPEED_KTS =
                 new StormParam(makeRealType("maxwindspeedkts",
                                             "Max_Windspeed",
-                                            Util.parseUnit("kts")));
+                                            DataUtil.parseUnit("kts")));
 
         }
     }

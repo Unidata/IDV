@@ -368,11 +368,11 @@ public class STIStormDataSource extends StormDataSource {
             PARAM_RADIUSMODERATEGALE =
                 new StormParam(makeRealType("radiusmoderategale",
                                             "Radius_of_Beaufort_Scale7",
-                                            Util.parseUnit("km")));
+                                            DataUtil.parseUnit("km")));
             PARAM_RADIUSWHOLEGALE =
                 new StormParam(makeRealType("radiuswholegale",
                                             "Radius_of_Beaufort_Scale10",
-                                            Util.parseUnit("km")));
+                                            DataUtil.parseUnit("km")));
             PARAM_MOVEDIRECTION =
                 new StormParam(makeRealType("movedirection",
                                             "Storm_Direction",
@@ -383,57 +383,57 @@ public class STIStormDataSource extends StormDataSource {
             PARAM_PROBABILITY10RADIUS =
                 new StormParam(makeRealType("probabilityradius10",
                                             "Probability_10%_Radius",
-                                            Util.parseUnit("km")), true,
+                                            DataUtil.parseUnit("km")), true,
                                                 false, false);
             PARAM_PROBABILITY20RADIUS =
                 new StormParam(makeRealType("probabilityradius20",
                                             "Probability_20%_Radius",
-                                            Util.parseUnit("km")), true,
+                                            DataUtil.parseUnit("km")), true,
                                                 false, false);
             PARAM_PROBABILITY30RADIUS =
                 new StormParam(makeRealType("probabilityradius30",
                                             "Probability_30%_Radius",
-                                            Util.parseUnit("km")), true,
+                                            DataUtil.parseUnit("km")), true,
                                                 false, false);
             PARAM_PROBABILITY40RADIUS =
                 new StormParam(makeRealType("probabilityradius40",
                                             "Probability_40%_Radius",
-                                            Util.parseUnit("km")), true,
+                                            DataUtil.parseUnit("km")), true,
                                                 false, false);
             PARAM_PROBABILITY50RADIUS =
                 new StormParam(makeRealType("probabilityradius50",
                                             "Probability_50%_Radius",
-                                            Util.parseUnit("km")), true,
+                                            DataUtil.parseUnit("km")), true,
                                                 false, false);
             PARAM_PROBABILITY60RADIUS =
                 new StormParam(makeRealType("probabilityradius60",
                                             "Probability_60%_Radius",
-                                            Util.parseUnit("km")), true,
+                                            DataUtil.parseUnit("km")), true,
                                                 false, false);
             PARAM_PROBABILITY70RADIUS =
                 new StormParam(makeRealType("probabilityradius70",
                                             "Probability_70%_Radius",
-                                            Util.parseUnit("km")), true,
+                                            DataUtil.parseUnit("km")), true,
                                                 false, false);
             PARAM_PROBABILITY80RADIUS =
                 new StormParam(makeRealType("probabilityradius80",
                                             "Probability_80%_Radius",
-                                            Util.parseUnit("km")), true,
+                                            DataUtil.parseUnit("km")), true,
                                                 false, false);
             PARAM_PROBABILITY90RADIUS =
                 new StormParam(makeRealType("probabilityradius90",
                                             "Probability_90%_Radius",
-                                            Util.parseUnit("km")), true,
+                                            DataUtil.parseUnit("km")), true,
                                                 false, false);
             PARAM_PROBABILITY100RADIUS =
                 new StormParam(makeRealType("probabilityradius100",
                                             "Probability_100%_Radius",
-                                            Util.parseUnit("km")), true,
+                                            DataUtil.parseUnit("km")), true,
                                                 false, false);
             PARAM_DISTANCE_ERROR =
                 new StormParam(makeRealType("meanDistanceError",
                                             "Mean_Distance_Error",
-                                            Util.parseUnit("km")), true,
+                                            DataUtil.parseUnit("km")), true,
                                                 false, false);
         } catch (Exception exc) {
             System.err.println("Error creating storm params:" + exc);
