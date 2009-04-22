@@ -26,6 +26,7 @@ package ucar.unidata.data.sounding;
 
 import ucar.netcdf.*;
 
+import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.sounding.RAOB;
 import ucar.unidata.data.sounding.SoundingOb;
 import ucar.unidata.data.sounding.SoundingStation;
@@ -1055,11 +1056,7 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
         Unit      u = null;
         Attribute a = v.getAttribute("units");
         if (a != null) {
-            try {
-                u = Util.parseUnit(a.getStringValue());
-            } catch (Exception e) {
-                u = null;
-            }
+            u = DataUtil.parseUnit(a.getStringValue());
         }
         return u;
     }

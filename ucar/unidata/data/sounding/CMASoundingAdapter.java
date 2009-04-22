@@ -43,8 +43,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-
 import java.util.StringTokenizer;
+
+import ucar.unidata.data.DataUtil;
 
 
 /**
@@ -70,7 +71,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
 
     static {
         try {
-            GEOPOTENTIAL_UNIT = Util.parseUnit("m2/s2");
+            GEOPOTENTIAL_UNIT = DataUtil.parseUnit("m2/s2");
         } catch (Exception ex) {
             throw new ExceptionInInitializerError(ex.toString());
         }

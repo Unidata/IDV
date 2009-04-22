@@ -726,7 +726,7 @@ public abstract class TrackInfo {
                     value.getValue(CommonUnit.secondsSinceTheEpoch);
                 int years = (int) (sinceEpoch / (365 * 24 * 3600));
                 int year  = 1970 + (years);
-                Unit timeUnit = Util.parseUnit("seconds since " + year
+                Unit timeUnit = DataUtil.parseUnit("seconds since " + year
                                     + "-1-1 0:00:00 0:00");
                 varType = RealType.getRealType(DataUtil.cleanName(TIME_TYPE
                         + "_" + timeUnit), timeUnit);
@@ -1063,7 +1063,7 @@ public abstract class TrackInfo {
                 PolarHorizontalWind.getSpeedRealType().getDefaultUnit(),
                 samples[wspdIndex],
                 PolarHorizontalWind.getDirectionRealType().getDefaultUnit(),
-                samples[wdirIndex], Util.parseUnit("gpm"), samples[altIndex]);
+                samples[wdirIndex], DataUtil.parseUnit("gpm"), samples[altIndex]);
 
         raob.setMandatoryPressureProfile(mpp);
 

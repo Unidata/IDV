@@ -25,14 +25,12 @@ package ucar.unidata.data.sounding;
 
 import edu.wisc.ssec.mcidas.McIDASUtil;
 import edu.wisc.ssec.mcidas.adde.AddeException;
-
-
-
 import edu.wisc.ssec.mcidas.adde.AddePointDataReader;
 
 import ucar.unidata.beans.InvisiblePropertiedBean;
 import ucar.unidata.beans.NonVetoableProperty;
 
+import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.sounding.RAOB;
 import ucar.unidata.data.sounding.SoundingOb;
 import ucar.unidata.data.sounding.SoundingStation;
@@ -51,18 +49,11 @@ import ucar.visad.quantities.GeopotentialAltitude;
 
 import visad.DateTime;
 import visad.Unit;
-
 import visad.VisADException;
-import visad.VisADException;
-
-import visad.data.units.Parser;
-
-import visad.jmet.MetUnits;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import java.util.StringTokenizer;
 
 
@@ -798,17 +789,14 @@ public class AddeSoundingAdapter extends SoundingAdapterImpl implements Sounding
 
     /**
      * Gets the units of the variable.  Now just a passthrough to
-     * ucar.visad.Util.
+     * ucar.unidata.data.DataUtil.parseUnit.
      *
      * @param unitName   unit name
      * @return  corresponding Unit or null if can't be decoded
-     * @see ucar.visad.Util#parseUnit(String)
+     * @see ucar.unidata.data.DataUtil#parseUnit(String)
      */
     private Unit getUnit(String unitName) {
-        try {
-            return Util.parseUnit(unitName);
-        } catch (Exception e) {}
-        return null;
+        return DataUtil.parseUnit(unitName);
     }
 
     /**

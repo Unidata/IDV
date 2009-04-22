@@ -297,7 +297,7 @@ public class CdmTrackInfo extends TrackInfo {
      * @throws Exception On badness
      */
     protected Unit getTimeUnit() throws Exception {
-        return Util.parseUnit(todt.getTimeUnitsIdentifier());
+        return DataUtil.parseUnit(todt.getTimeUnitsIdentifier());
     }
 
     /**
