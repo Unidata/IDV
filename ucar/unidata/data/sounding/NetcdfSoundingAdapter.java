@@ -1050,7 +1050,7 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
      * @param v variable to check
      *
      * @return  corresponding Unit or null if can't be decoded
-     * @see ucar.visad.Util#parseUnit(String)
+     * @see ucar.unidata.data.DataUtil#parseUnit(String)
      */
     private Unit getUnit(Variable v) {
         Unit      u = null;
