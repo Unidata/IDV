@@ -51,7 +51,7 @@ public abstract class GlyphCreatorCommand extends DrawingCommand {
     public static final DrawingCommand CMD_SMOOTHPOLYGON =
         new GlyphCreatorCommand("Create a polygon",
                                 "Click and drag: create a polygon",
-                                "/auxdata/ui/icons/SmoothPoly16.gif",DrawingControl.FLAG_STRAIGHT) {
+                                "/auxdata/ui/icons/SmoothPoly16.gif",DrawingControl.FLAG_FILLED|DrawingControl.FLAG_STRAIGHT) {
         public DrawingGlyph createGlyph(DrawingControl control,
                                         DisplayEvent event)
                 throws VisADException, RemoteException {

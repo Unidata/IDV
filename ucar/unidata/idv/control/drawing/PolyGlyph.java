@@ -123,6 +123,7 @@ public class PolyGlyph extends LineGlyph {
             throws VisADException, RemoteException {
         super(control, event);
         this.smooth = smooth;
+        setFilled(control.getFilled());
     }
 
 
@@ -313,10 +314,15 @@ public class PolyGlyph extends LineGlyph {
         //      double[][]dv = Set.floatToDouble(lineVals);
         Data theData = new Gridded3DDoubleSet(mathType, lineVals,
                            points.size());
-        //        try {
-        //            Data filledData = tryToFill(Misc.toFloat(lineVals), theData);
-        //            if(filledData!=null) theData = filledData;
-        //        } catch(Exception exc) {}
+        try {
+            Data filledData = tryToFill(Misc.toFloat(lineVals), theData);
+            if(filledData!=null) {
+                theData = filledData;
+            } 
+        } catch(Exception exc) {
+            exc.printStackTrace();
+        }
+
         if (lineDisplayable != null) {
             lineDisplayable.setData(theData);
         }
