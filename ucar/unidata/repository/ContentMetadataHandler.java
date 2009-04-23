@@ -19,6 +19,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -80,6 +81,12 @@ public class ContentMetadataHandler extends MetadataHandler {
         new Metadata.Type("content.contact", "Contact");
 
 
+    /** _more_          */
+    public static Metadata.Type TYPE_SORT = new Metadata.Type("content.sort",
+                                                "Sort Order");
+
+
+
     /**
      * _more_
      *
@@ -92,7 +99,25 @@ public class ContentMetadataHandler extends MetadataHandler {
         super(repository, node);
         addType(TYPE_THUMBNAIL);
         addType(TYPE_ATTACHMENT);
-        addType(TYPE_CONTACT);
+
+        MetadataType sortType = new MetadataType("content.sort",
+                                    "Sort Order");
+        sortType.addElement(
+            new MetadataElement(
+                MetadataElement.TYPE_ENUMERATION, "Field",
+                Misc.newList("fromdate", "todate", "createdate", "name")));
+
+        sortType.addElement(new MetadataElement(MetadataElement.TYPE_BOOLEAN,
+                "Ascending"));
+
+        MetadataType contactType = new MetadataType("content.contact",
+                                       "Contact");
+        contactType.addElement(
+            new MetadataElement(MetadataElement.TYPE_STRING, "Name"));
+        contactType.addElement(
+            new MetadataElement(MetadataElement.TYPE_STRING, "Email"));
+        addMetadataType(contactType);
+        addMetadataType(sortType);
     }
 
     /**
@@ -157,7 +182,6 @@ public class ContentMetadataHandler extends MetadataHandler {
         if (getType(type).equals(TYPE_THUMBNAIL)
                 || getType(type).equals(TYPE_ATTACHMENT)) {
             String fileArg  = XmlUtil.getAttribute(node, ATTR_ATTR1, "");
-
             String fileName = null;
 
             if (internal) {
@@ -165,9 +189,10 @@ public class ContentMetadataHandler extends MetadataHandler {
             } else {
                 String tmpFile = (String) fileMap.get(fileArg);
                 if (tmpFile == null) {
-                    getRepository().getLogManager().logError("No attachment uploaded file:"
-                                             + fileArg);
-                    getRepository().getLogManager().logError("available files: " + fileMap);
+                    getRepository().getLogManager().logError(
+                        "No attachment uploaded file:" + fileArg);
+                    getRepository().getLogManager().logError(
+                        "available files: " + fileMap);
                     return;
                 }
                 File file = new File(tmpFile);
@@ -229,7 +254,7 @@ public class ContentMetadataHandler extends MetadataHandler {
             throws Exception {
         Metadata.Type type = getType(metadata.getType());
         if (type.equals(TYPE_THUMBNAIL)) {
-            String html = getHtml(request, entry, metadata, forLink);
+            String html = getFileHtml(request, entry, metadata, forLink);
             if (html != null) {
                 sb.append(HtmlUtil.space(1));
                 sb.append(html);
@@ -238,7 +263,7 @@ public class ContentMetadataHandler extends MetadataHandler {
         }
 
         if ( !forLink && type.equals(TYPE_ATTACHMENT)) {
-            String html = getHtml(request, entry, metadata, false);
+            String html = getFileHtml(request, entry, metadata, false);
             if (html != null) {
                 sb.append(HtmlUtil.space(1));
                 sb.append(html);
@@ -259,19 +284,19 @@ public class ContentMetadataHandler extends MetadataHandler {
      *
      * @return _more_
      */
-    public String getHtml(Request request, Entry entry, Metadata metadata,
-                          boolean forLink) {
-        Metadata.Type type  = getType(metadata.getType());
+    public String getFileHtml(Request request, Entry entry,
+                              Metadata metadata, boolean forLink) {
+        Metadata.Type type = getType(metadata.getType());
 
 
-        File f = getImageFile(entry, metadata);
+        File          f    = getImageFile(entry, metadata);
         if (f == null) {
             return null;
         }
 
-        String        extra = (forLink
-                               ? " "
-                               : "");
+        String extra = (forLink
+                        ? " "
+                        : "");
         if (ImageUtils.isImage(f.toString())) {
             String img =
                 HtmlUtil
@@ -332,26 +357,11 @@ public class ContentMetadataHandler extends MetadataHandler {
      * @return _more_
      */
     public String[] getHtml(Request request, Entry entry, Metadata metadata) {
-        Metadata.Type type    = getType(metadata.getType());
-        if(type.equals(TYPE_CONTACT)) {
-            String lbl = msgLabel(TYPE_CONTACT.getLabel());
-            String content = msg("Name")+":" + metadata.getAttr1()+HtmlUtil.space(3)+
-                msg("Email")+":" + metadata.getAttr2();
-            return new String[] { lbl, content };
+        String[] result = super.getHtml(request, entry, metadata);
+        if (result != null) {
+            return result;
         }
-
-        if (true) {
-            return null;
-        }
-        String        lbl     = msgLabel(type.getLabel());
-        String        content = null;
-        if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
-            content = getHtml(request, entry, metadata, false);
-        }
-        if (content == null) {
-            return null;
-        }
-        return new String[] { lbl, content };
+        return null;
     }
 
 
@@ -514,6 +524,12 @@ public class ContentMetadataHandler extends MetadataHandler {
     public String[] getForm(Request request, Entry entry, Metadata metadata,
                             boolean forEdit)
             throws Exception {
+        String[] result = super.getForm(request, entry, metadata, forEdit);
+        if (result != null) {
+            return result;
+        }
+
+
         Metadata.Type type    = getType(metadata.getType());
         String        lbl     = msgLabel(type.getLabel());
         String        content = null;
@@ -522,7 +538,6 @@ public class ContentMetadataHandler extends MetadataHandler {
         if (id.length() > 0) {
             suffix = "." + id;
         }
-
 
         String submit = HtmlUtil.submit(msg("Add") + HtmlUtil.space(1)
                                         + type.getLabel());
@@ -534,14 +549,9 @@ public class ContentMetadataHandler extends MetadataHandler {
         String arg1 = ARG_ATTR1 + suffix;
         String arg2 = ARG_ATTR2 + suffix;
         String size = HtmlUtil.SIZE_70;
-        if (type.equals(TYPE_CONTACT)) {
-            content = formEntry(new String[] { submit, msgLabel("Name"),
-                    HtmlUtil.input(arg1, metadata.getAttr1(), size),
-                    msgLabel("Email"),
-                    HtmlUtil.input(arg2, metadata.getAttr2(), size) });
-        } else  if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
+        if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
             String image = (forEdit
-                            ? getHtml(request, entry, metadata, false)
+                            ? getFileHtml(request, entry, metadata, false)
                             : "");
             if (image == null) {
                 image = "";

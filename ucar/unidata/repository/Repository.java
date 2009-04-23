@@ -19,15 +19,17 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
 import org.w3c.dom.*;
 
-import ucar.unidata.repository.output.*;
 import ucar.unidata.repository.data.*;
 import ucar.unidata.repository.harvester.*;
 import ucar.unidata.repository.monitor.*;
+
+import ucar.unidata.repository.output.*;
 
 
 
@@ -110,7 +112,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     public static final String MACRO_LINKS = "links";
+
+    /** _more_          */
     public static final String MACRO_LOGO_URL = "logo.url";
+
+    /** _more_          */
     public static final String MACRO_LOGO_IMAGE = "logo.image";
 
 
@@ -336,11 +342,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private SessionManager sessionManager;
 
+    /** _more_          */
     private LogManager logManager;
 
     /** _more_ */
     private EntryManager entryManager;
 
+    /** _more_          */
     private AssociationManager associationManager;
 
     /** _more_ */
@@ -945,6 +953,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return logManager;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected LogManager doMakeLogManager() {
         return new LogManager(this);
     }
@@ -1278,8 +1291,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
          */
         protected void checkClass(Class c) throws Exception {
             if (UserAuthenticator.class.isAssignableFrom(c)) {
-                getLogManager().logInfo("Adding authenticator:" + c.getName());
-                getUserManager().addUserAuthenticator((UserAuthenticator)c.newInstance());
+                getLogManager().logInfo("Adding authenticator:"
+                                        + c.getName());
+                getUserManager().addUserAuthenticator(
+                    (UserAuthenticator) c.newInstance());
             }
         }
 
@@ -1312,9 +1327,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             }
             String pluginFile = plugins[i].toString();
             if (pluginFile.endsWith(".jar")) {
-                PluginClassLoader cl =
-                    new MyClassLoader(pluginFile,
-                                      getClass().getClassLoader());
+                PluginClassLoader cl = new MyClassLoader(pluginFile,
+                                           getClass().getClassLoader());
 
                 Misc.addClassLoader(cl);
                 List entries = cl.getEntryNames();
@@ -1436,7 +1450,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             super.initRequestUrl(requestUrl);
             ApiMethod apiMethod = findApiMethod(request);
             if (apiMethod == null) {
-                getLogManager().logError("Could not find api for: " + requestUrl.getPath());
+                getLogManager().logError("Could not find api for: "
+                                         + requestUrl.getPath());
                 return;
             }
             if (getProperty("ramadda.sslok", true)) {
@@ -1702,7 +1717,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 try {
                     Class c = Misc.findClass(XmlUtil.getAttribute(node,
                                   ATTR_CLASS));
-            
+
                     Constructor ctor = Misc.findConstructor(c,
                                            new Class[] { Repository.class,
                             Element.class });
@@ -1712,12 +1727,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
                 } catch (Exception exc) {
                     if ( !required) {
-                        getLogManager().logError("Couldn't load optional output handler:"
-                                                 + XmlUtil.toString(node));
+                        getLogManager().logError(
+                            "Couldn't load optional output handler:"
+                            + XmlUtil.toString(node));
                         getLogManager().logError("Warning:" + exc);
                     } else {
-                        getLogManager().logError("Error loading output handler file:" + file,
-                                 exc);
+                        getLogManager().logError(
+                            "Error loading output handler file:" + file, exc);
                         throw exc;
                     }
                 }
@@ -1730,12 +1746,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                           "Entry Deleter") {
             public boolean canHandleOutput(OutputType output) {
                 return output.equals(OUTPUT_DELETER)
-                    /*                    || output.equals(OUTPUT_TYPECHANGE)*/
-                       || output.equals(OUTPUT_METADATA_SHORT)
-                       || output.equals(OUTPUT_METADATA_FULL);
+                /*                    || output.equals(OUTPUT_TYPECHANGE)*/
+                || output.equals(OUTPUT_METADATA_SHORT) || output.equals(
+                    OUTPUT_METADATA_FULL);
             }
-                public void getEntryLinks(Request request, State state,
-                                         List<Link> links)
+            public void getEntryLinks(Request request, State state,
+                                      List<Link> links)
                     throws Exception {
                 if ( !state.isDummyGroup()) {
                     return;
@@ -1818,7 +1834,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 return output.equals(OUTPUT_COPY);
             }
             public void getEntryLinks(Request request, State state,
-                                         List<Link> links)
+                                      List<Link> links)
                     throws Exception {
                 if ((request.getUser() == null)
                         || request.getUser().getAnonymous()) {
@@ -1916,7 +1932,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         //        System.err.println("request:" + request);
         if (debug) {
-            getLogManager().debug("user:" + request.getUser() + " -- " + request.toString());
+            getLogManager().debug("user:" + request.getUser() + " -- "
+                                  + request.toString());
         }
         //        logInfo("request:" + request);
         try {
@@ -1985,7 +2002,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 if (userAgent == null) {
                     userAgent = "Unknown";
                 }
-                getLogManager().logError("Error handling request:" + request + " ip:" + request.getIp(), inner);
+                getLogManager().logError("Error handling request:" + request
+                                         + " ip:" + request.getIp(), inner);
             }
         }
 
@@ -1993,8 +2011,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
         if ((result != null) && (result.getInputStream() == null)
-                && result.isHtml() && result.getShouldDecorate()&&
-            result.getNeedToWrite()) {
+                && result.isHtml() && result.getShouldDecorate()
+                && result.getNeedToWrite()) {
             result.putProperty(PROP_NAVLINKS, getNavLinks(request));
             okToAddCookie = result.getResponseCode() == Result.RESPONSE_OK;
             decorateResult(request, result);
@@ -2050,7 +2068,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             incoming = incoming.substring(0, incoming.length() - 1);
         }
         String urlBase = getUrlBase();
-        if(incoming.equals("/") || incoming.equals("")) {
+        if (incoming.equals("/") || incoming.equals("")) {
             incoming = urlBase;
         }
 
@@ -2103,6 +2121,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     protected Result getResult(Request request) throws Exception {
+
         boolean   sslEnabled = isSSLEnabled(request);
 
         ApiMethod apiMethod  = findApiMethod(request);
@@ -2129,7 +2148,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
         if (sslEnabled) {
-            if(!request.get(ARG_NOREDIRECT,false)) {
+            if ( !request.get(ARG_NOREDIRECT, false)) {
                 if (apiMethod.getNeedsSsl() && !request.getSecure()) {
                     //                System.err.println ("Redirecting to ssl: "+ httpsUrl(request.getUrl()));
                     return new Result(httpsUrl(request.getUrl()));
@@ -2204,6 +2223,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
         return result;
+
     }
 
 
@@ -2220,7 +2240,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String path = request.getRequestPath();
         //        System.err.println("path:" + path);
         if ( !path.startsWith(getUrlBase())) {
-            getLogManager().log(request, "Unknown request" + " \"" + path + "\"");
+            getLogManager().log(request,
+                                "Unknown request" + " \"" + path + "\"");
             Result result =
                 new Result(msg("Error"),
                            new StringBuffer(msgLabel("Unknown request")
@@ -2267,8 +2288,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
         getLogManager().log(request,
-            "Unknown request:" + request.getUrl() + " user-agent:"
-            + userAgent + " ip:" + request.getIp());
+                            "Unknown request:" + request.getUrl()
+                            + " user-agent:" + userAgent + " ip:"
+                            + request.getIp());
         Result result =
             new Result(msg("Error"),
                        new StringBuffer(msgLabel("Unknown request") + path));
@@ -2311,8 +2333,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         //        System.err.println(request +" DECORATE=" + request.get(ARG_DECORATE, true));
 
-        if(!request.get(ARG_DECORATE, true)) {
-            template  = getResource("/ucar/unidata/repository/resources/templates/plain.html");
+        if ( !request.get(ARG_DECORATE, true)) {
+            template = getResource(
+                "/ucar/unidata/repository/resources/templates/plain.html");
         }
 
         /*
@@ -2325,10 +2348,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
             if (metadata != null) {
                 template = metadata.getAttr1();
                 if (template.startsWith("file:")) {
-                    template = getStorageManager().localizePath(template.trim());
                     template =
-                        IOUtil.readContents(template.substring("file:".length()),
-                                            getClass());
+                        getStorageManager().localizePath(template.trim());
+                    template = IOUtil.readContents(
+                        template.substring("file:".length()), getClass());
                 }
                 if (template.indexOf("${content}") < 0) {
                     template = null;
@@ -2429,19 +2452,19 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String head =
             "<script type=\"text/javascript\" src=\"${root}/shadowbox/adapter/shadowbox-base.js\"></script>\n<script type=\"text/javascript\" src=\"${root}/shadowbox/shadowbox.js\"></script>\n<script type=\"text/javascript\">\nShadowbox.loadSkin('classic', '${root}/shadowbox/skin'); \nShadowbox.loadLanguage('en', '${root}/shadowbox/lang');\nShadowbox.loadPlayer(['img', 'qt'], '${root}/shadowbox/player'); \nwindow.onload = Shadowbox.init;\n</script>";
 
-        head = (String)result.getProperty(PROP_HTML_HEAD);
-        if(head == null){
+        head = (String) result.getProperty(PROP_HTML_HEAD);
+        if (head == null) {
             head = "";
         }
-        String logoImage = getProperty(PROP_LOGO_IMAGE,"").trim();
-        if(logoImage.length()==0) {
-            logoImage  = "${root}/images/logo.png";
+        String logoImage = getProperty(PROP_LOGO_IMAGE, "").trim();
+        if (logoImage.length() == 0) {
+            logoImage = "${root}/images/logo.png";
         }
         String   html   = template;
         String[] macros = new String[] {
-            MACRO_LOGO_URL,getProperty(PROP_LOGO_URL,""),
-            MACRO_LOGO_IMAGE,logoImage,
-            MACRO_HEADER_IMAGE, iconUrl(ICON_HEADER), MACRO_HEADER_TITLE,
+            MACRO_LOGO_URL, getProperty(PROP_LOGO_URL, ""), MACRO_LOGO_IMAGE,
+            logoImage, MACRO_HEADER_IMAGE, iconUrl(ICON_HEADER),
+            MACRO_HEADER_TITLE,
             getProperty(PROP_REPOSITORY_NAME, "Repository"), MACRO_USERLINK,
             getUserManager().getUserLinks(request), MACRO_REPOSITORY_NAME,
             getProperty(PROP_REPOSITORY_NAME, "Repository"), MACRO_FOOTER,
@@ -2463,8 +2486,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (sublinksHtml.length() > 0) {
             html = StringUtil.replace(html, "${sublinks}", sublinksHtml);
         } else {
-            html = StringUtil.replace(html, "${sublinks}", BLANK); 
-       }
+            html = StringUtil.replace(html, "${sublinks}", BLANK);
+        }
         html = translate(request, html);
 
         result.setContent(html.getBytes());
@@ -2472,25 +2495,37 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param template _more_
+     * @param ignoreErrors _more_
+     *
+     * @return _more_
+     */
     public String processTemplate(String template, boolean ignoreErrors) {
-        List<String>toks = StringUtil.splitMacros(template);
+        List<String> toks   = StringUtil.splitMacros(template);
         StringBuffer result = new StringBuffer();
-        if(toks.size()>0) {
+        if (toks.size() > 0) {
             result.append(toks.get(0));
-            for(int i=1;i<toks.size();i++) {
-                if(2*(i/2)==i) {
-                    result.append(toks.get(i));                        
+            for (int i = 1; i < toks.size(); i++) {
+                if (2 * (i / 2) == i) {
+                    result.append(toks.get(i));
                 } else {
-                    String prop = getRepository().getProperty(toks.get(i),(String)null);
-                    if(prop == null) {
-                        if(ignoreErrors) {
-                            prop = "${" + toks.get(i)+"}";
+                    String prop = getRepository().getProperty(toks.get(i),
+                                      (String) null);
+                    if (prop == null) {
+                        if (ignoreErrors) {
+                            prop = "${" + toks.get(i) + "}";
                         } else {
-                            throw new IllegalArgumentException("Could not find property:" + toks.get(i)+":");
+                            throw new IllegalArgumentException(
+                                "Could not find property:" + toks.get(i)
+                                + ":");
                         }
                     }
-                    if(prop.startsWith("bsf:")) {
-                        prop = new String(XmlUtil.decodeBase64(prop.substring(4)));
+                    if (prop.startsWith("bsf:")) {
+                        prop = new String(
+                            XmlUtil.decodeBase64(prop.substring(4)));
                     }
                     result.append(prop);
                 }
@@ -2732,7 +2767,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
 
-        String override = "override."+name;
+        String override = "override." + name;
         //Check if there is an override 
         if (prop == null) {
             prop = (String) cmdLineProperties.get(override);
@@ -2936,10 +2971,18 @@ public class Repository extends RepositoryBase implements RequestHandler {
         writeGlobal(name, BLANK + value);
     }
 
-    protected void writeGlobal(Request request, String propName) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param propName _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void writeGlobal(Request request, String propName)
+            throws Exception {
         writeGlobal(propName,
-                    request.getString(propName,
-                                      getProperty(propName,"")));
+                    request.getString(propName, getProperty(propName, "")));
     }
 
 
@@ -3324,45 +3367,87 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    /** _more_          */
     int fileCnt = 0;
+
+    /** _more_          */
     Object MUTEX = new Object();
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processTestFileRotate(Request request) throws Exception {
-        File file=null;
-        synchronized(MUTEX) {
+        File file = null;
+        synchronized (MUTEX) {
             fileCnt++;
-            file = new File("/home/jeffmc/test/test"+ fileCnt);
-            if(!file.exists()) {
+            file = new File("/home/jeffmc/test/test" + fileCnt);
+            if ( !file.exists()) {
                 fileCnt = 0;
-                file = new File("/home/jeffmc/test/test"+ fileCnt);
+                file    = new File("/home/jeffmc/test/test" + fileCnt);
             }
         }
-        return new Result(BLANK, new BufferedInputStream(new FileInputStream(file)),"application/x-binary");
+        return new Result(BLANK,
+                          new BufferedInputStream(new FileInputStream(file)),
+                          "application/x-binary");
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processTestFile(Request request) throws Exception {
-        File file= new File("/home/jeffmc/test/test0");
-        return new Result(BLANK, new BufferedInputStream(new FileInputStream(file)),"application/x-binary");
+        File file = new File("/home/jeffmc/test/test0");
+        return new Result(BLANK,
+                          new BufferedInputStream(new FileInputStream(file)),
+                          "application/x-binary");
     }
 
 
-    byte[]buffer = new byte[1048748];
+    /** _more_          */
+    byte[] buffer = new byte[1048748];
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processTestMemory(Request request) throws Exception {
-        return new Result(BLANK, new BufferedInputStream(new ByteArrayInputStream(buffer)),"application/x-binary");
+        return new Result(
+            BLANK, new BufferedInputStream(new ByteArrayInputStream(buffer)),
+            "application/x-binary");
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public ServerInfo getServerInfo() {
         int sslPort = -1;
-        if(getHttpsPort().trim().length()>0) {
+        if (getHttpsPort().trim().length() > 0) {
             sslPort = new Integer(getHttpsPort().trim()).intValue();
         }
-        return new ServerInfo(getHostname(),
-                              getPort(),
-                              sslPort,
-                              getUrlBase(),
-                              getProperty(PROP_REPOSITORY_NAME, "Repository"),
-                              getEntryManager().getTopGroup().getDescription());
+        return new ServerInfo(
+            getHostname(), getPort(), sslPort, getUrlBase(),
+            getProperty(PROP_REPOSITORY_NAME, "Repository"),
+            getEntryManager().getTopGroup().getDescription());
     }
 
 
@@ -3378,9 +3463,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public Result processInfo(Request request) throws Exception {
         if (request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML)) {
-            Document doc = XmlUtil.makeDocument();
-            Element info = getServerInfo().toXml(doc);
-            String xml = XmlUtil.toString(info);
+            Document doc  = XmlUtil.makeDocument();
+            Element  info = getServerInfo().toXml(doc);
+            String   xml  = XmlUtil.toString(info);
             return new Result(xml, MIME_XML);
         }
         StringBuffer sb = new StringBuffer("");
@@ -4326,24 +4411,63 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public String getQueryOrderAndLimit(Request request, boolean addOrderBy) {
-        String  order     = " DESC ";
-        boolean haveOrder = false;
+        return getQueryOrderAndLimit(request, addOrderBy, null);
+    }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param addOrderBy _more_
+     * @param forEntry _more_
+     *
+     * @return _more_
+     */
+    public String getQueryOrderAndLimit(Request request, boolean addOrderBy,
+                                        Entry forEntry) {
 
-        haveOrder = request.exists(ARG_ASCENDING);
+        List<Metadata> metadataList = null;
 
-        if (request.get(ARG_ASCENDING, false)) {
-            order = " ASC ";
+        Metadata       sortMetadata = null;
+        if (forEntry != null) {
+            try {
+                metadataList = getMetadataManager().findMetadata(forEntry,
+                        ContentMetadataHandler.TYPE_SORT, true);
+                if ((metadataList != null) && (metadataList.size() > 0)) {
+                    sortMetadata = metadataList.get(0);
+                }
+            } catch (Exception ignore) {}
         }
+
+        String  order     = " DESC ";
+        boolean haveOrder = request.exists(ARG_ASCENDING);
+        String  by        = null;
+        if (sortMetadata != null) {
+            haveOrder = true;
+            if (Misc.equals(sortMetadata.getAttr2(), "true")) {
+                order = " ASC ";
+            } else {
+                order = " DESC ";
+            }
+            by = sortMetadata.getAttr1();
+        } else {
+            by = request.getString(ARG_ORDERBY, (String) null);
+            if (request.get(ARG_ASCENDING, false)) {
+                order = " ASC ";
+            }
+        }
+
         String limitString = BLANK;
-        int max = request.get(ARG_MAX, DB_MAX_ROWS);
-        limitString = getDatabaseManager().getLimitString(request.get(ARG_SKIP, 0), max);
+        int    max         = request.get(ARG_MAX, DB_MAX_ROWS);
+        limitString =
+            getDatabaseManager().getLimitString(request.get(ARG_SKIP, 0),
+                max);
+
         String orderBy = BLANK;
         if (addOrderBy) {
             orderBy = " ORDER BY " + Tables.ENTRIES.COL_FROMDATE + order;
         }
-        if (request.defined(ARG_ORDERBY)) {
-            String by = request.getString(ARG_ORDERBY, BLANK);
+        if (by != null) {
             if (by.equals("fromdate")) {
                 orderBy = " ORDER BY " + Tables.ENTRIES.COL_FROMDATE + order;
             } else if (by.equals("todate")) {
@@ -4427,7 +4551,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     public String getFieldDescription(String fieldValue, String namesFile,
-                                         String dflt)
+                                      String dflt)
             throws Exception {
         if (namesFile == null) {
             return dflt;
@@ -4464,8 +4588,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    public String getTagLinks(Request request, String tag)
-            throws Exception {
+    public String getTagLinks(Request request, String tag) throws Exception {
         return BLANK;
 
     }

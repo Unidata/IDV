@@ -1087,6 +1087,13 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_ADMIN = "ramadda.admin";
 
+    public static final String PROP_CLEARINGHOUSE_ENABLED = "ramadda.clearinghouse.enabled";
+
+    //    public static final String PROP_CLEARINGHOUSE_ENABLED = "ramadda.clearinghouse.enabled";
+
+
+
+
     /** _more_ */
     public static final String PROP_ADMIN_EMAIL = "ramadda.admin.email";
 

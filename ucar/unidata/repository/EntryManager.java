@@ -19,14 +19,16 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
 import org.w3c.dom.*;
 
-import ucar.unidata.repository.output.*;
 import ucar.unidata.repository.data.*;
 import ucar.unidata.repository.harvester.*;
+
+import ucar.unidata.repository.output.*;
 
 
 import ucar.unidata.sql.Clause;
@@ -42,9 +44,9 @@ import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
-import ucar.unidata.util.TemporaryDir;
-
 import ucar.unidata.util.StringUtil;
+
+import ucar.unidata.util.TemporaryDir;
 import ucar.unidata.xml.XmlUtil;
 
 import java.awt.Image;
@@ -115,7 +117,8 @@ public class EntryManager extends RepositoryManager {
 
 
     /** _more_ */
-    private Hashtable<String,Entry> entryCache = new Hashtable<String,Entry>();
+    private Hashtable<String, Entry> entryCache = new Hashtable<String,
+                                                      Entry>();
 
 
     /**
@@ -142,17 +145,27 @@ public class EntryManager extends RepositoryManager {
      * _more_
      */
     protected void clearCache() {
-        entryCache = new Hashtable<String,Entry>();
+        entryCache = new Hashtable<String, Entry>();
         topGroups  = null;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     */
     protected void cacheGroup(Group entry) {
         cacheEntry(entry);
     }
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     */
     protected void cacheEntry(Entry entry) {
-        synchronized(MUTEX_ENTRY) {
+        synchronized (MUTEX_ENTRY) {
             if (entryCache.size() > ENTRY_CACHE_LIMIT) {
                 entryCache = new Hashtable();
             }
@@ -161,24 +174,56 @@ public class EntryManager extends RepositoryManager {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param entryId _more_
+     *
+     * @return _more_
+     */
     protected Entry getEntryFromCache(String entryId) {
-        return getEntryFromCache(entryId,true);
+        return getEntryFromCache(entryId, true);
     }
 
+    /**
+     * _more_
+     *
+     * @param entryId _more_
+     * @param isId _more_
+     *
+     * @return _more_
+     */
     protected Entry getEntryFromCache(String entryId, boolean isId) {
-        synchronized(MUTEX_ENTRY) {
-            return  entryCache.get(entryId);
+        synchronized (MUTEX_ENTRY) {
+            return entryCache.get(entryId);
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param groupId _more_
+     *
+     * @return _more_
+     */
     protected Group getGroupFromCache(String groupId) {
         return getGroupFromCache(groupId, true);
     }
 
-    protected Group getGroupFromCache(String groupId,boolean isId) {
-        Entry entry =  getEntryFromCache(groupId,isId);
-        if(entry == null) return  null;
+    /**
+     * _more_
+     *
+     * @param groupId _more_
+     * @param isId _more_
+     *
+     * @return _more_
+     */
+    protected Group getGroupFromCache(String groupId, boolean isId) {
+        Entry entry = getEntryFromCache(groupId, isId);
+        if (entry == null) {
+            return null;
+        }
         if (entry instanceof Group) {
             return (Group) entry;
         }
@@ -377,7 +422,7 @@ return new Result(title, sb);
             String output = request.getString(ARG_OUTPUT, (String) "");
             request.put(ARG_OUTPUT, output);
             StringBuffer sb = new StringBuffer();
-            if (!entry.isGroup() || !((Group) entry).isDummy()) {
+            if ( !entry.isGroup() || !((Group) entry).isDummy()) {
                 String[] crumbs = getBreadCrumbs(request, entry, false);
                 sb.append(crumbs[1]);
                 //                result.setTitle(result.getTitle() + ": " + crumbs[0]);
@@ -512,9 +557,9 @@ return new Result(title, sb);
                     String extra = "";
 
                     if (metadataList != null) {
-                        Metadata metadata= metadataList.get(0);
-                        String user  = metadata.getAttr1();
-                        String email = metadata.getAttr4();
+                        Metadata metadata = metadataList.get(0);
+                        String   user     = metadata.getAttr1();
+                        String   email    = metadata.getAttr4();
                         if (email == null) {
                             email = "";
                         }
@@ -1036,20 +1081,20 @@ return new Result(title, sb);
      */
     public String replaceMacros(Entry entry, String template) {
         Date createDate = new Date(entry.getCreateDate());
-        Date fromDate = new Date(entry.getStartDate());
-        Date toDate   = new Date(entry.getEndDate());
+        Date fromDate   = new Date(entry.getStartDate());
+        Date toDate     = new Date(entry.getEndDate());
 
         String url =
             HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
                          ARG_ENTRYID, entry.getId());
         //j-
         String[] macros = {
-            "filename",    getStorageManager().getFileTail(entry.getResource().getPath()),
-            "fileextension",       IOUtil.getFileExtension(entry.getResource().getPath()), 
-            "name",  entry.getName(), 
-            "fullname", entry.getFullName(), 
-            "user",    entry.getUser().getLabel(), 
-            "url", url
+            "filename",
+            getStorageManager().getFileTail(entry.getResource().getPath()),
+            "fileextension",
+            IOUtil.getFileExtension(entry.getResource().getPath()), "name",
+            entry.getName(), "fullname", entry.getFullName(), "user",
+            entry.getUser().getLabel(), "url", url
         };
 
         //j+
@@ -1061,12 +1106,23 @@ return new Result(title, sb);
             result = result.replace(macro, value);
         }
 
-        return     replaceMacros(result, createDate,  fromDate,  toDate);
+        return replaceMacros(result, createDate, fromDate, toDate);
     }
 
 
 
-    public String replaceMacros(String template, Date createDate, Date fromDate, Date toDate) {
+    /**
+     * _more_
+     *
+     * @param template _more_
+     * @param createDate _more_
+     * @param fromDate _more_
+     * @param toDate _more_
+     *
+     * @return _more_
+     */
+    public String replaceMacros(String template, Date createDate,
+                                Date fromDate, Date toDate) {
         GregorianCalendar fromCal =
             new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         fromCal.setTime(fromDate);
@@ -1080,66 +1136,50 @@ return new Result(title, sb);
         toCal.setTime(toDate);
 
 
-        int createDay = createCal.get(GregorianCalendar.DAY_OF_MONTH);
-        int fromDay = fromCal.get(GregorianCalendar.DAY_OF_MONTH);
-        int toDay   = toCal.get(GregorianCalendar.DAY_OF_MONTH);
+        int createDay        = createCal.get(GregorianCalendar.DAY_OF_MONTH);
+        int fromDay          = fromCal.get(GregorianCalendar.DAY_OF_MONTH);
+        int toDay            = toCal.get(GregorianCalendar.DAY_OF_MONTH);
 
-        int createWeek = createCal.get(GregorianCalendar.WEEK_OF_MONTH);
-        int fromWeek = fromCal.get(GregorianCalendar.WEEK_OF_MONTH);
-        int toWeek = toCal.get(GregorianCalendar.WEEK_OF_MONTH);
+        int createWeek       = createCal.get(GregorianCalendar.WEEK_OF_MONTH);
+        int fromWeek         = fromCal.get(GregorianCalendar.WEEK_OF_MONTH);
+        int toWeek           = toCal.get(GregorianCalendar.WEEK_OF_MONTH);
 
         int createWeekOfYear = createCal.get(GregorianCalendar.WEEK_OF_YEAR);
-        int fromWeekOfYear = fromCal.get(GregorianCalendar.WEEK_OF_YEAR);
-        int toWeekOfYear = toCal.get(GregorianCalendar.WEEK_OF_YEAR);
+        int fromWeekOfYear   = fromCal.get(GregorianCalendar.WEEK_OF_YEAR);
+        int toWeekOfYear     = toCal.get(GregorianCalendar.WEEK_OF_YEAR);
 
 
-        int createMonth = createCal.get(GregorianCalendar.MONTH) + 1;
-        int fromMonth = fromCal.get(GregorianCalendar.MONTH) + 1;
-        int toMonth = toCal.get(GregorianCalendar.MONTH) + 1;
+        int createMonth      = createCal.get(GregorianCalendar.MONTH) + 1;
+        int fromMonth        = fromCal.get(GregorianCalendar.MONTH) + 1;
+        int toMonth          = toCal.get(GregorianCalendar.MONTH) + 1;
 
-        int createYear  = createCal.get(GregorianCalendar.YEAR);
-        int fromYear  = fromCal.get(GregorianCalendar.YEAR);
-        int toYear  = toCal.get(GregorianCalendar.YEAR);
+        int createYear       = createCal.get(GregorianCalendar.YEAR);
+        int fromYear         = fromCal.get(GregorianCalendar.YEAR);
+        int toYear           = toCal.get(GregorianCalendar.YEAR);
 
 
 
         //j-
         String[] macros = {
-            "day",    padZero(fromDay),
-            "week",    fromWeek+"",
-            "month",   padZero(fromMonth),
-            "year",    fromYear+"",
-            "date",    getRepository().formatDate(fromDate), 
-            "fromdate",    getRepository().formatDate(fromDate), 
-            "monthname",  DateUtil.MONTH_NAMES[fromMonth-1],
-
-            "create_day",    padZero(createDay),
-            "from_day",    padZero(fromDay),
-            "to_day",    padZero(toDay),
-
-            "create_week", ""+createWeek,
-            "from_week", ""+fromWeek,
-            "to_week", ""+toWeek,
-
-            "create_weekofyear", ""+createWeekOfYear,
-            "from_weekofyear", ""+fromWeekOfYear,
-            "to_weekofyear", ""+toWeekOfYear,
-
-            "create_date",   getRepository().formatDate(createDate), 
-            "from_date",   getRepository().formatDate(fromDate), 
-            "to_date",   getRepository().formatDate(toDate), 
-
-            "create_month", padZero(createMonth),
-            "from_month", padZero(fromMonth),
-            "to_month", padZero(toMonth),
-
-            "create_year",  createYear+"",
-            "from_year",  fromYear+"",
-            "to_year",  toYear+"",
-
-            "create_monthname",    DateUtil.MONTH_NAMES[createMonth-1],
-            "from_monthname",  DateUtil.MONTH_NAMES[fromMonth-1],
-            "to_monthname",    DateUtil.MONTH_NAMES[toMonth-1]
+            "day", padZero(fromDay), "week", fromWeek + "", "month",
+            padZero(fromMonth), "year", fromYear + "", "date",
+            getRepository().formatDate(fromDate), "fromdate",
+            getRepository().formatDate(fromDate), "monthname",
+            DateUtil.MONTH_NAMES[fromMonth - 1], "create_day",
+            padZero(createDay), "from_day", padZero(fromDay), "to_day",
+            padZero(toDay), "create_week", "" + createWeek, "from_week",
+            "" + fromWeek, "to_week", "" + toWeek, "create_weekofyear",
+            "" + createWeekOfYear, "from_weekofyear", "" + fromWeekOfYear,
+            "to_weekofyear", "" + toWeekOfYear, "create_date",
+            getRepository().formatDate(createDate), "from_date",
+            getRepository().formatDate(fromDate), "to_date",
+            getRepository().formatDate(toDate), "create_month",
+            padZero(createMonth), "from_month", padZero(fromMonth),
+            "to_month", padZero(toMonth), "create_year", createYear + "",
+            "from_year", fromYear + "", "to_year", toYear + "",
+            "create_monthname", DateUtil.MONTH_NAMES[createMonth - 1],
+            "from_monthname", DateUtil.MONTH_NAMES[fromMonth - 1],
+            "to_monthname", DateUtil.MONTH_NAMES[toMonth - 1]
         };
 
         //j+
@@ -1154,10 +1194,17 @@ return new Result(title, sb);
         return result;
     }
 
+    /**
+     * _more_
+     *
+     * @param v _more_
+     *
+     * @return _more_
+     */
     private String padZero(int v) {
-        return((v < 10)
-             ? "0"
-               : "") + v; 
+        return ((v < 10)
+                ? "0"
+                : "") + v;
     }
 
 
@@ -1610,13 +1657,14 @@ return new Result(title, sb);
      */
     private void publishAnonymousEntry(Request request, Entry entry)
             throws Exception {
-        List<Metadata> metadataList = getMetadataManager().findMetadata(entry,
-                                AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD,
-                                false);
+        List<Metadata> metadataList =
+            getMetadataManager().findMetadata(entry,
+                AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD, false);
         //Reset the datatype
         if (metadataList != null) {
-            Metadata metadata =  metadataList.get(0);
-            User newUser = getUserManager().findUser(metadata.getAttr1());
+            Metadata metadata = metadataList.get(0);
+            User     newUser  =
+                getUserManager().findUser(metadata.getAttr1());
             if (newUser != null) {
                 entry.setUser(newUser);
             } else {
@@ -1707,13 +1755,13 @@ return new Result(title, sb);
 
                 List<Metadata> metadataList =
                     getMetadataManager().findMetadata(parentGroup,
-                                                      ContentMetadataHandler.TYPE_CONTACT,
-                                                      false);
-                if(metadataList!=null) {
-                    for(Metadata metadata: metadataList) {
-                        getAdmin().sendEmail(metadata.getAttr2(), "Uploaded Entry",
+                        ContentMetadataHandler.TYPE_CONTACT, false);
+                if (metadataList != null) {
+                    for (Metadata metadata : metadataList) {
+                        getAdmin().sendEmail(metadata.getAttr2(),
+                                             "Uploaded Entry",
                                              contents.toString(), true);
-                        
+
                     }
                 }
             }
@@ -1844,15 +1892,14 @@ return new Result(title, sb);
         String path = entry.getResource().getPath();
 
         String mimeType = getRepository().getMimeTypeFromSuffix(
-                              IOUtil.getFileExtension(
-                                                      path));
+                              IOUtil.getFileExtension(path));
 
 
         if (request.defined(ARG_IMAGEWIDTH) && ImageUtils.isImage(path)) {
-            int    width    = request.get(ARG_IMAGEWIDTH, 75);
-            File thumb = getStorageManager().getThumbFile(
-                                                         "entry" + IOUtil.cleanFileName(entry.getId())
-                                                         + "_" + width + IOUtil.getFileExtension(path));
+            int width = request.get(ARG_IMAGEWIDTH, 75);
+            File thumb = getStorageManager().getThumbFile("entry"
+                             + IOUtil.cleanFileName(entry.getId()) + "_"
+                             + width + IOUtil.getFileExtension(path));
             if ( !thumb.exists()) {
                 Image image =
                     ImageUtils.readImage(entry.getResource().getPath());
@@ -1860,15 +1907,14 @@ return new Result(title, sb);
                 ImageUtils.waitOnImage(image);
                 ImageUtils.writeImageToFile(image, thumb);
             }
-            return new Result(BLANK,
-                              new FileInputStream(thumb),
-                              mimeType);
+            return new Result(BLANK, new FileInputStream(thumb), mimeType);
         } else {
-            File file = entry.getFile();
-            long length  = file.length();
-            InputStream inputStream =new FileInputStream(file);
-            Result result = new Result(BLANK, inputStream, mimeType);
-            result.addHttpHeader("Content-Length",""+length);
+            File        file        = entry.getFile();
+            long        length      = file.length();
+            InputStream inputStream = new FileInputStream(file);
+            Result      result      = new Result(BLANK, inputStream,
+                                          mimeType);
+            result.addHttpHeader("Content-Length", "" + length);
             result.setCacheOk(true);
             return result;
         }
@@ -2292,6 +2338,17 @@ return new Result(title, sb);
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param toGroup _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private Result processEntryMove(Request request, Group toGroup,
                                     List<Entry> entries)
             throws Exception {
@@ -2425,7 +2482,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     private Result processEntryXmlCreateInner(Request request)
-        throws Exception {
+            throws Exception {
         String file = request.getUploadedFile(ARG_FILE);
         if (file == null) {
             throw new IllegalArgumentException("No file argument given");
@@ -2436,18 +2493,19 @@ return new Result(title, sb);
         try {
             InputStream fis = new FileInputStream(file);
             if (file.endsWith(".zip")) {
-                ZipInputStream zin =  new ZipInputStream(fis);
-                ZipEntry ze;
+                ZipInputStream zin = new ZipInputStream(fis);
+                ZipEntry       ze;
                 while ((ze = zin.getNextEntry()) != null) {
                     String entryName = ze.getName();
                     //                System.err.println ("ZIP: " + ze.getName());
                     if (entryName.equals("entries.xml")) {
                         entriesXml = new String(IOUtil.readBytes(zin, null,
-                                                                 false));
+                                false));
                     } else {
                         String name =
                             IOUtil.getFileTail(ze.getName().toLowerCase());
-                        File f = getStorageManager().getTmpFile(request, name);
+                        File f = getStorageManager().getTmpFile(request,
+                                     name);
                         FileOutputStream fos = new FileOutputStream(f);
                         IOUtil.writeTo(zin, fos);
                         fos.close();
@@ -2457,7 +2515,7 @@ return new Result(title, sb);
                 }
                 if (entriesXml == null) {
                     throw new IllegalArgumentException(
-                                                       "No entries.xml file provided");
+                        "No entries.xml file provided");
                 }
             }
 
@@ -2499,8 +2557,9 @@ return new Result(title, sb);
                 }
 
             } else if (node.getTagName().equals(TAG_ASSOCIATION)) {
-                String id = getAssociationManager().processAssociationXml(request, node, entries,
-                                origFileToStorage);
+                String id =
+                    getAssociationManager().processAssociationXml(request,
+                        node, entries, origFileToStorage);
                 XmlUtil.create(resultDoc, TAG_ASSOCIATION, resultRoot,
                                new String[] { ATTR_ID,
                         id });
@@ -3100,7 +3159,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public EntryLink getAjaxLink(Request request, Entry entry,
-                                    String linkText)
+                                 String linkText)
             throws Exception {
         return getAjaxLink(request, entry, linkText, null);
     }
@@ -3118,7 +3177,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public EntryLink getAjaxLink(Request request, Entry entry,
-                                    String linkText, String url)
+                                 String linkText, String url)
             throws Exception {
         return getAjaxLink(request, entry, linkText, url, true);
     }
@@ -3138,8 +3197,8 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public EntryLink getAjaxLink(Request request, Entry entry,
-                                    String linkText, String url,
-                                    boolean forTreeNavigation)
+                                 String linkText, String url,
+                                 boolean forTreeNavigation)
             throws Exception {
 
         if (url == null) {
@@ -3364,7 +3423,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public String getEntryActionsTable(Request request, Entry entry,
-                                          int typeMask)
+                                       int typeMask)
             throws Exception {
         List<Link>   links  = getEntryLinks(request, entry);
         StringBuffer
@@ -3591,8 +3650,12 @@ return new Result(title, sb);
         }
 
         boolean needToClip = totalNameLength > 80;
-        String target = (request.defined(ARG_TARGET)?request.getString(ARG_TARGET,""):null);
-        String targetAttr = (target!=null?HtmlUtil.attr(HtmlUtil.ATTR_TARGET,target):"");
+        String  target     = (request.defined(ARG_TARGET)
+                              ? request.getString(ARG_TARGET, "")
+                              : null);
+        String  targetAttr = ((target != null)
+                              ? HtmlUtil.attr(HtmlUtil.ATTR_TARGET, target)
+                              : "");
         for (Group ancestor : parents) {
             if (length > 100) {
                 breadcrumbs.add(0, "...");
@@ -3603,29 +3666,33 @@ return new Result(title, sb);
                 name = name.substring(0, 19) + "...";
             }
             length += name.length();
-            String link =null;
-            if(target!=null) {
-                link = HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                                      ancestor), name,targetAttr);
+            String link = null;
+            if (target != null) {
+                link = HtmlUtil.href(
+                    request.entryUrl(
+                        getRepository().URL_ENTRY_SHOW, ancestor), name,
+                            targetAttr);
             } else {
-                link = (requestUrl == null
-                           ? getTooltipLink(request, ancestor, name, null)
-                           : HtmlUtil.href(request.entryUrl(requestUrl,
-                                                            ancestor), name,targetAttr));
+                link = ((requestUrl == null)
+                        ? getTooltipLink(request, ancestor, name, null)
+                        : HtmlUtil.href(request.entryUrl(requestUrl,
+                        ancestor), name, targetAttr));
             }
             breadcrumbs.add(0, link);
         }
-        if(target!=null) {
-            breadcrumbs.add(HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                                           entry), entry.getLabel(),targetAttr));
+        if (target != null) {
+            breadcrumbs.add(
+                HtmlUtil.href(
+                    request.entryUrl(getRepository().URL_ENTRY_SHOW, entry),
+                    entry.getLabel(), targetAttr));
 
         } else {
             if (requestUrl == null) {
-                breadcrumbs.add(getTooltipLink(request, entry, entry.getLabel(),
-                                               null));
+                breadcrumbs.add(getTooltipLink(request, entry,
+                        entry.getLabel(), null));
             } else {
                 breadcrumbs.add(HtmlUtil.href(request.entryUrl(requestUrl,
-                                                               entry), entry.getLabel()));
+                        entry), entry.getLabel()));
             }
         }
         //        breadcrumbs.add(HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
@@ -3679,9 +3746,11 @@ return new Result(title, sb);
             request.setUser(getUserManager().getAnonymousUser());
         }
 
-        String target = (request.defined(ARG_TARGET)?request.getString(ARG_TARGET,""):null);
-        List breadcrumbs = new ArrayList();
-        List titleList   = new ArrayList();
+        String target      = (request.defined(ARG_TARGET)
+                              ? request.getString(ARG_TARGET, "")
+                              : null);
+        List   breadcrumbs = new ArrayList();
+        List   titleList   = new ArrayList();
         if (entry == null) {
             return new String[] { BLANK, BLANK };
         }
@@ -4568,21 +4637,19 @@ return new Result(title, sb);
 
         boolean      isSynthEntry = isSynthEntry(group.getId());
         if (group.getTypeHandler().isSynthType() || isSynthEntry) {
-            Group mainEntry = group;
-            String synthId = null;
+            Group  mainEntry = group;
+            String synthId   = null;
             if (isSynthEntry) {
                 String[] pair    = getSynthId(mainEntry.getId());
                 String   entryId = pair[0];
-                synthId = pair[1];
-                mainEntry   = (Group) getEntry(request, entryId, false, false);
+                synthId   = pair[1];
+                mainEntry = (Group) getEntry(request, entryId, false, false);
                 if (mainEntry == null) {
                     return ids;
                 }
             }
-            return mainEntry.getTypeHandler().getSynthIds(request, 
-                                                      mainEntry,
-                                                      group,
-                                                      synthId);
+            return mainEntry.getTypeHandler().getSynthIds(request, mainEntry,
+                    group, synthId);
         }
 
 
@@ -4594,12 +4661,16 @@ return new Result(title, sb);
         }
         where.add(Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
                             group.getId()));
+
+
+
+        String orderBy = getRepository().getQueryOrderAndLimit(request, true,
+                             group);
+
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
         int         skipCnt     = request.get(ARG_SKIP, 0);
-        Statement statement =
-            typeHandler.select(request, Tables.ENTRIES.COL_ID, where,
-                               getRepository().getQueryOrderAndLimit(request,
-                                   true));
+        Statement statement = typeHandler.select(request,
+                                  Tables.ENTRIES.COL_ID, where, orderBy);
         SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
         ResultSet        results;
         boolean canDoSelectOffset = getDatabaseManager().canDoSelectOffset();
@@ -4724,21 +4795,26 @@ return new Result(title, sb);
      * @return _more_
      */
     public List<Entry> doGroupAndNameSort(List<Entry> entries,
-                                        final boolean descending) {
+                                          final boolean descending) {
         Comparator comp = new Comparator() {
             public int compare(Object o1, Object o2) {
-                Entry e1 = (Entry) o1;
-                Entry e2 = (Entry) o2;
-                int result = 0;
-                if(e1.isGroup()) {
-                    if(e2.isGroup()) result =  e1.getFullName().compareTo(e2.getFullName());
-                    else result = -1;
-                } else  if(e2.isGroup()) {
+                Entry e1     = (Entry) o1;
+                Entry e2     = (Entry) o2;
+                int   result = 0;
+                if (e1.isGroup()) {
+                    if (e2.isGroup()) {
+                        result = e1.getFullName().compareTo(e2.getFullName());
+                    } else {
+                        result = -1;
+                    }
+                } else if (e2.isGroup()) {
                     result = 1;
                 } else {
-                    result =  e1.getFullName().compareTo(e2.getFullName());
+                    result = e1.getFullName().compareTo(e2.getFullName());
                 }
-                if(descending) return -result;
+                if (descending) {
+                    return -result;
+                }
                 return result;
             }
             public boolean equals(Object obj) {
@@ -4752,8 +4828,19 @@ return new Result(title, sb);
 
 
 
-    public Result changeType(Request request,
-                             List<Group> groups, List<Entry> entries)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param groups _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result changeType(Request request, List<Group> groups,
+                             List<Entry> entries)
             throws Exception {
         /*
         if ( !request.getUser().getAdmin()) {
@@ -4978,20 +5065,33 @@ return new Result(title, sb);
 
 
 
-    public Group findGroupUnder(Request request, Group group, String name, User user) 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param name _more_
+     * @param user _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Group findGroupUnder(Request request, Group group, String name,
+                                User user)
             throws Exception {
         synchronized (MUTEX_ENTRY) {
             List<String> toks = (List<String>) StringUtil.split(name,
                                     Group.PATHDELIMITER, true, true);
-            for(String tok: toks) {
+            for (String tok : toks) {
                 Group theChild = null;
-                for(Entry child:  getChildrenGroups(request, group)) {
-                    if(child.getName().equals(tok)) {
-                        theChild = (Group)child;
+                for (Entry child : getChildrenGroups(request, group)) {
+                    if (child.getName().equals(tok)) {
+                        theChild = (Group) child;
                         break;
                     }
                 }
-                if(theChild == null) {
+                if (theChild == null) {
                     theChild = makeNewGroup(group, tok, user);
                 }
                 group = theChild;
@@ -5022,7 +5122,7 @@ return new Result(title, sb);
                             ? ""
                             : parent.getFullName()) + Group.IDDELIMITER
                                 + name;
-        Group group = getGroupFromCache(groupName,false);
+        Group group = getGroupFromCache(groupName, false);
         if (group != null) {
             return group;
         }
@@ -5041,11 +5141,25 @@ return new Result(title, sb);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param user _more_
+     * @param createIfNeeded _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Group findGroupFromName(String name, User user,
                                    boolean createIfNeeded)
             throws Exception {
-        Entry entry =  findEntryFromName(name, user, createIfNeeded, true, false);
-        if(entry!=null && entry instanceof Group) return (Group) entry;
+        Entry entry = findEntryFromName(name, user, createIfNeeded, true,
+                                        false);
+        if ((entry != null) && (entry instanceof Group)) {
+            return (Group) entry;
+        }
         return null;
     }
 
@@ -5075,6 +5189,7 @@ return new Result(title, sb);
      * @param name _more_
      * @param user _more_
      * @param createIfNeeded _more_
+     * @param isGroup _more_
      * @param isTop _more_
      *
      * @return _more_
@@ -5082,8 +5197,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     private Entry findEntryFromName(String name, User user,
-                                    boolean createIfNeeded, 
-                                    boolean isGroup,
+                                    boolean createIfNeeded, boolean isGroup,
                                     boolean isTop)
             throws Exception {
         synchronized (MUTEX_ENTRY) {
@@ -5094,7 +5208,7 @@ return new Result(title, sb);
                     && !name.startsWith(topGroupName + Group.PATHDELIMITER)) {
                 name = topGroupName + Group.PATHDELIMITER + name;
             }
-            Group group = getGroupFromCache(name,false);
+            Group group = getGroupFromCache(name, false);
             if (group != null) {
                 return group;
             }
@@ -5182,17 +5296,30 @@ return new Result(title, sb);
     public Group makeNewGroup(Group parent, String name, User user,
                               Entry template)
             throws Exception {
-        return makeNewGroup(parent, name, user, template,TypeHandler.TYPE_GROUP);
+        return makeNewGroup(parent, name, user, template,
+                            TypeHandler.TYPE_GROUP);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param name _more_
+     * @param user _more_
+     * @param template _more_
+     * @param type _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Group makeNewGroup(Group parent, String name, User user,
                               Entry template, String type)
             throws Exception {
         synchronized (MUTEX_ENTRY) {
-            TypeHandler typeHandler =
-                getRepository().getTypeHandler(type);
-            Group group = new Group(getGroupId(parent), typeHandler);
+            TypeHandler typeHandler = getRepository().getTypeHandler(type);
+            Group       group = new Group(getGroupId(parent), typeHandler);
             if (template != null) {
                 group.initWith(template);
                 getRepository().getMetadataManager().newEntry(group);
@@ -5419,7 +5546,8 @@ return new Result(title, sb);
         }
         for (Group group : groups) {
             if (group.getParentGroupId() != null) {
-                Group parentGroup =getGroupFromCache(group.getParentGroupId());
+                Group parentGroup =
+                    getGroupFromCache(group.getParentGroupId());
                 group.setParentGroup(parentGroup);
             }
             cacheGroup(group);
@@ -5437,7 +5565,7 @@ return new Result(title, sb);
      */
     protected void addStatusInfo(StringBuffer sb) {
         sb.append(HtmlUtil.formEntry(msgLabel("Entry Cache"),
-                                     entryCache.size()/2 + ""));
+                                     entryCache.size() / 2 + ""));
     }
 
     /**
@@ -5486,9 +5614,9 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public String getIconUrl(Request request, Entry entry) throws Exception {
-        if(entry.getIcon()!=null) {
+        if (entry.getIcon() != null) {
             return iconUrl(entry.getIcon());
-            
+
         }
         if (isAnonymousUpload(entry)) {
             return iconUrl(ICON_ENTRY_UPLOAD);
@@ -5536,7 +5664,8 @@ return new Result(title, sb);
 
         //Make the top group if needed
         if (topGroup == null) {
-            topGroup = makeNewGroup(null, GROUP_TOP, getUserManager().getDefaultUser());
+            topGroup = makeNewGroup(null, GROUP_TOP,
+                                    getUserManager().getDefaultUser());
             getAccessManager().initTopGroup(topGroup);
         }
     }

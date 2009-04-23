@@ -90,6 +90,8 @@ public class MetadataHandler extends RepositoryManager {
     private List<Metadata.Type> types = new ArrayList<Metadata.Type>();
 
 
+    private List<MetadataType> metadataTypes = new ArrayList<MetadataType>();
+
     /** _more_ */
     boolean forUser = true;
 
@@ -105,6 +107,12 @@ public class MetadataHandler extends RepositoryManager {
             throws Exception {
         super(repository);
     }
+
+    public void addMetadataType(MetadataType type) {
+        metadataTypes.add(type);
+        addType(new Metadata.Type(type.getId(), type.getName()));
+    }
+
 
     /**
      * _more_
@@ -379,6 +387,12 @@ public class MetadataHandler extends RepositoryManager {
      * @return _more_
      */
     public String[] getHtml(Request request, Entry entry, Metadata metadata) {
+        Metadata.Type type    = getType(metadata.getType());
+        for(MetadataType metadataType: metadataTypes) {
+            if(metadataType.getId().equals(type.getType())) {
+                return metadataType.getHtml(this, request,entry, metadata);
+            }
+        }
         return null;
     }
 
@@ -398,6 +412,14 @@ public class MetadataHandler extends RepositoryManager {
     public String[] getForm(Request request, Entry entry, Metadata metadata,
                             boolean forEdit)
             throws Exception {
+        Metadata.Type type    = getType(metadata.getType());
+        for(MetadataType metadataType: metadataTypes) {
+            if(metadataType.getId().equals(type.getType())) {
+                return metadataType.getForm(this, request,entry, metadata,forEdit);
+            }
+        }
+
+
         return null;
     }
 
@@ -710,6 +732,9 @@ public class MetadataHandler extends RepositoryManager {
                            boolean newMetadata)
             throws Exception {
         String type = request.getString(ARG_TYPE + suffix, "");
+
+
+
         if ( !canHandle(type)) {
             return;
         }
@@ -722,6 +747,7 @@ public class MetadataHandler extends RepositoryManager {
         if (request.defined(ARG_ATTR2 + suffix + ".select")) {
             attr2 = request.getString(ARG_ATTR2 + suffix + ".select", "");
         }
+
 
         String attr3 = request.getString(ARG_ATTR3 + suffix, "");
         if (request.defined(ARG_ATTR3 + suffix + ".select")) {

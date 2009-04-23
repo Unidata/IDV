@@ -535,7 +535,7 @@ public class MetadataManager extends RepositoryManager {
 
             if (request.exists(ARG_METADATA_DELETE)) {
                 Hashtable args = request.getArgs();
-                for (Enumeration keys =
+                 for (Enumeration keys =
                         args.keys(); keys.hasMoreElements(); ) {
                     String arg = (String) keys.nextElement();
                     if ( !arg.startsWith(ARG_METADATA_ID + SUFFIX_SELECT)) {
