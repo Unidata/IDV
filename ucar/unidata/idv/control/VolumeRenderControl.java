@@ -18,6 +18,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -347,5 +348,15 @@ public class VolumeRenderControl extends GridDisplayControl {
     public boolean getUseTexture3D() {
         return useTexture3D;
     }
+
+    /**
+     * Is this a raster display
+     *
+     * @return true
+     */
+    public boolean getIsRaster() {
+        return true;
+    }
+
 }
 
