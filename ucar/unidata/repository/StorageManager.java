@@ -776,10 +776,13 @@ public class StorageManager extends RepositoryManager {
      * @return _more_
      */
     public String getFileTail(Entry entry) {
+        String tail;
         if (entry.getIsLocalFile()) {
-            return IOUtil.getFileTail(entry.getResource().getPath());
+            tail =  IOUtil.getFileTail(entry.getResource().getPath());
+        } else {
+            tail =  getFileTail(entry.getResource().getPath());
         }
-        return getFileTail(entry.getResource().getPath());
+        return tail;
     }
 
     /**
@@ -799,7 +802,13 @@ public class StorageManager extends RepositoryManager {
                 fileName = fileName.substring(idx + 1);
             }
         }
-        return IOUtil.getFileTail(fileName);
+        //Check for Rich's problem
+        idx =  fileName.lastIndexOf("\\");
+        if(idx>=0) {
+            fileName = fileName.substring(idx+1);
+        }
+        String tail =  IOUtil.getFileTail(fileName);
+        return tail;
     }
 
     /**

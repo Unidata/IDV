@@ -434,6 +434,19 @@ public class RepositoryServlet extends HttpServlet {
             if ((fileName == null) || (fileName.trim().length() == 0)) {
                 return;
             }
+
+            //Look for full path names and get the tail
+            int idx =  fileName.lastIndexOf("\\");
+            if(idx>=0) {
+                fileName = fileName.substring(idx+1);
+            }
+
+            idx =  fileName.lastIndexOf("/");
+            if(idx>=0) {
+                fileName = fileName.substring(idx+1);
+            }
+
+
             try {
                 RepositoryUtil.checkFilePath(fileName);
             } catch (Exception e) {
