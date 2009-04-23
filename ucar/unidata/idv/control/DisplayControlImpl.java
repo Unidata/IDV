@@ -6678,6 +6678,19 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 
+    
+    /**
+     * Set the view manager for this control to use.
+     * Note: This is only for use when some code is directly
+     * creating a display control and wants to place it in a specific viewmanager.
+     * Use this after the control has been created but before the init method has been called
+     *
+     * @param viewManager The viewmanager to use
+     */
+    public void setDefaultViewManager(ViewManager viewManager) {
+        defaultViewManager = viewManager;
+    }
+
 
     /**
      * Return the name  of the first {@link ucar.unidata.idv.ViewManager} found
