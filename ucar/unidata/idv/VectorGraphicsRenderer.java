@@ -246,6 +246,7 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
 
             //capture the image of the rasters and write it into the graphics
             BufferedImage image = viewManager.getMaster().getImage(false);
+            //            GuiUtils.showOkCancelDialog(null,"",new JLabel(new ImageIcon(image)),null);
             graphics.drawImage(image, 0, 0, null);
 
             //Now,  turn off rasters and turn on all non-raster
