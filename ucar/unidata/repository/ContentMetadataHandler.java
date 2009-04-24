@@ -69,21 +69,16 @@ public class ContentMetadataHandler extends MetadataHandler {
 
 
     /** _more_ */
-    public static Metadata.Type TYPE_THUMBNAIL =
-        new Metadata.Type("content.thumbnail", "Thumbnail Image");
+    public static final String  TYPE_THUMBNAIL ="content.thumbnail";
 
     /** _more_ */
-    public static Metadata.Type TYPE_ATTACHMENT =
-        new Metadata.Type("content.attachment", "Attachment");
+    public static final String  TYPE_ATTACHMENT = "content.attachment";
 
     /** _more_ */
-    public static Metadata.Type TYPE_CONTACT =
-        new Metadata.Type("content.contact", "Contact");
-
+    public static final String TYPE_CONTACT ="content.contact";
 
     /** _more_          */
-    public static Metadata.Type TYPE_SORT = new Metadata.Type("content.sort",
-                                                "Sort Order");
+    public static final String TYPE_SORT = "content.sort";
 
 
 
@@ -97,8 +92,9 @@ public class ContentMetadataHandler extends MetadataHandler {
     public ContentMetadataHandler(Repository repository, Element node)
             throws Exception {
         super(repository, node);
-        addType(TYPE_THUMBNAIL);
-        addType(TYPE_ATTACHMENT);
+        addMetadataType(new MetadataType(TYPE_THUMBNAIL,"Thumbnail Image"));
+        addMetadataType(new MetadataType(TYPE_ATTACHMENT,"File Attachment"));
+
 
         MetadataType sortType = new MetadataType("content.sort",
                                     "Sort Order");
@@ -145,8 +141,7 @@ public class ContentMetadataHandler extends MetadataHandler {
                                      Metadata metadata, Document doc,
                                      Element datasetNode)
             throws Exception {
-        Metadata.Type type = getType(metadata.getType());
-        if (type.equals(TYPE_THUMBNAIL)) {
+        if (metadata.getType().equals(TYPE_THUMBNAIL)) {
             XmlUtil.create(
                 doc,
                 ThreddsMetadataHandler.getTag(
@@ -178,9 +173,9 @@ public class ContentMetadataHandler extends MetadataHandler {
     public void processMetadataXml(Entry entry, Element node,
                                    Hashtable fileMap, boolean internal)
             throws Exception {
-        String type = XmlUtil.getAttribute(node, ATTR_TYPE);
-        if (getType(type).equals(TYPE_THUMBNAIL)
-                || getType(type).equals(TYPE_ATTACHMENT)) {
+        MetadataType type = findType(XmlUtil.getAttribute(node, ATTR_TYPE));
+        if (type.isType(TYPE_THUMBNAIL)
+                || type.isType(TYPE_ATTACHMENT)) {
             String fileArg  = XmlUtil.getAttribute(node, ATTR_ATTR1, "");
             String fileName = null;
 
@@ -224,8 +219,7 @@ public class ContentMetadataHandler extends MetadataHandler {
      * @throws Exception _more_
      */
     public void newEntry(Metadata metadata, Entry entry) throws Exception {
-        Metadata.Type type = getType(metadata.getType());
-        if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
+        if (metadata.getType().equals(TYPE_THUMBNAIL) || metadata.getType().equals(TYPE_ATTACHMENT)) {
             String fileArg = metadata.getAttr1();
             if ( !entry.getIsLocalFile()) {
                 fileArg =
@@ -252,8 +246,7 @@ public class ContentMetadataHandler extends MetadataHandler {
     public void decorateEntry(Request request, Entry entry, StringBuffer sb,
                               Metadata metadata, boolean forLink)
             throws Exception {
-        Metadata.Type type = getType(metadata.getType());
-        if (type.equals(TYPE_THUMBNAIL)) {
+        if (metadata.getType().equals(TYPE_THUMBNAIL)) {
             String html = getFileHtml(request, entry, metadata, forLink);
             if (html != null) {
                 sb.append(HtmlUtil.space(1));
@@ -262,7 +255,7 @@ public class ContentMetadataHandler extends MetadataHandler {
             }
         }
 
-        if ( !forLink && type.equals(TYPE_ATTACHMENT)) {
+        if ( !forLink && metadata.getType().equals(TYPE_ATTACHMENT)) {
             String html = getFileHtml(request, entry, metadata, false);
             if (html != null) {
                 sb.append(HtmlUtil.space(1));
@@ -286,9 +279,6 @@ public class ContentMetadataHandler extends MetadataHandler {
      */
     public String getFileHtml(Request request, Entry entry,
                               Metadata metadata, boolean forLink) {
-        Metadata.Type type = getType(metadata.getType());
-
-
         File          f    = getImageFile(entry, metadata);
         if (f == null) {
             return null;
@@ -403,8 +393,8 @@ public class ContentMetadataHandler extends MetadataHandler {
      */
     public Result processView(Request request, Entry entry, Metadata metadata)
             throws Exception {
-        Metadata.Type type = getType(metadata.getType());
-        if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
+
+        if (metadata.getType().equals(TYPE_THUMBNAIL) || metadata.getType().equals(TYPE_ATTACHMENT)) {
             File f = getImageFile(entry, metadata);
             if (f == null) {
                 return new Result("", "Thumbnail does not exist");
@@ -449,13 +439,7 @@ public class ContentMetadataHandler extends MetadataHandler {
                            String suffix, List<Metadata> metadataList,
                            boolean newMetadata)
             throws Exception {
-        Metadata.Type type = getType(request.getString(ARG_TYPE + suffix,
-                                 ""));
-        if (type == null) {
-            return;
-        }
-
-
+        String type =  request.getString(ARG_TYPE + suffix);
         if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
             if ( !newMetadata) {
                 //TODO: delete the old thumbs file
@@ -529,8 +513,8 @@ public class ContentMetadataHandler extends MetadataHandler {
             return result;
         }
 
-
-        Metadata.Type type    = getType(metadata.getType());
+        MetadataType type = findType(metadata.getType());
+        if(type == null) return null;
         String        lbl     = msgLabel(type.getLabel());
         String        content = null;
         String        id      = metadata.getId();
@@ -540,7 +524,7 @@ public class ContentMetadataHandler extends MetadataHandler {
         }
 
         String submit = HtmlUtil.submit(msg("Add") + HtmlUtil.space(1)
-                                        + type.getLabel());
+                                        + lbl);
         String cancel = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
         if (forEdit) {
             submit = "";
@@ -549,7 +533,7 @@ public class ContentMetadataHandler extends MetadataHandler {
         String arg1 = ARG_ATTR1 + suffix;
         String arg2 = ARG_ATTR2 + suffix;
         String size = HtmlUtil.SIZE_70;
-        if (type.equals(TYPE_THUMBNAIL) || type.equals(TYPE_ATTACHMENT)) {
+        if (type.isType(TYPE_THUMBNAIL) || type.isType(TYPE_ATTACHMENT)) {
             String image = (forEdit
                             ? getFileHtml(request, entry, metadata, false)
                             : "");
@@ -559,7 +543,7 @@ public class ContentMetadataHandler extends MetadataHandler {
                 image = "<br>" + image;
             }
             content = formEntry(new String[] { submit,
-                    msgLabel((type.equals(TYPE_THUMBNAIL)
+                    msgLabel((type.isType(TYPE_THUMBNAIL)
                               ? "Thumbnail"
                               : "Attachment")), HtmlUtil.fileInput(arg1,
                               size) + image,
@@ -572,7 +556,7 @@ public class ContentMetadataHandler extends MetadataHandler {
         }
         String argtype = ARG_TYPE + suffix;
         String argid   = ARG_METADATAID + suffix;
-        content = content + HtmlUtil.hidden(argtype, type.getType())
+        content = content + HtmlUtil.hidden(argtype, type)
                   + HtmlUtil.hidden(argid, metadata.getId());
         if (cancel.length() > 0) {
             content = content + HtmlUtil.row(HtmlUtil.colspan(cancel, 2));

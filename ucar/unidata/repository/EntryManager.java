@@ -1729,7 +1729,7 @@ return new Result(title, sb);
         entry.addMetadata(
             new Metadata(
                 getRepository().getGUID(), entry.getId(),
-                AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD.getType(), false,
+                AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD, false,
                 user, request.getIp(), ((oldType != null)
                                         ? oldType
                                         : ""), fromEmail));
@@ -4633,7 +4633,6 @@ return new Result(title, sb);
                                     List<Clause> where)
             throws Exception {
         List<String> ids          = new ArrayList<String>();
-
 
         boolean      isSynthEntry = isSynthEntry(group.getId());
         if (group.getTypeHandler().isSynthType() || isSynthEntry) {

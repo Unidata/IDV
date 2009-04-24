@@ -68,11 +68,10 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
     public static final String TYPE_TAG = "enum_tag";
 
     /** _more_ */
-    private Metadata.Type TYPE_ENUM;
+    private MetadataType TYPE_ENUM;
 
     /** _more_ */
     private List predefinedValues;
-
 
 
     /**
@@ -91,9 +90,9 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
             predefinedValues = StringUtil.split(tagValues, "\n", true, true);
         }
 
-        TYPE_ENUM = new Metadata.Type(XmlUtil.getAttribute(node, ATTR_TYPE),
+        TYPE_ENUM = new MetadataType(XmlUtil.getAttribute(node, ATTR_TYPE),
                                       XmlUtil.getAttribute(node, ATTR_NAME));
-        addType(TYPE_ENUM);
+        addMetadataType(TYPE_ENUM);
     }
 
 
@@ -122,8 +121,8 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
                                      Metadata metadata, Document doc,
                                      Element datasetNode)
             throws Exception {
-        Metadata.Type type = getType(metadata.getType());
-        if (type.equals(TYPE_ENUM)) {
+        MetadataType type = getType(metadata.getType());
+        if (type.isType(TYPE_ENUM.getType())) {
             XmlUtil.create(doc,
                            ThreddsMetadataHandler.TYPE_KEYWORD.toString(),
                            datasetNode, metadata.getAttr1());
@@ -236,7 +235,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
     public String[] getForm(Request request, Entry entry, Metadata metadata,
                             boolean forEdit)
             throws Exception {
-        Metadata.Type type   = TYPE_ENUM;
+        MetadataType type   = TYPE_ENUM;
         String        lbl    = msgLabel(type.getLabel());
 
         String        id     = metadata.getId();

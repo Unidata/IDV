@@ -591,9 +591,9 @@ public class HtmlOutputHandler extends OutputHandler {
                 if (html == null) {
                     continue;
                 }
-                Metadata.Type type =
+                MetadataType type =
                     metadataHandler.findType(metadata.getType());
-                String cat = type.getCategory();
+                String cat = type.getDisplayCategory();
                 if ( !decorate) {
                     cat = "Metadata";
                 }

@@ -60,7 +60,6 @@ public class MetadataHandler extends RepositoryManager {
     public static String ATTR_FORUSER = "foruser";
 
 
-
     /** _more_ */
     public static String ARG_TYPE = "type";
 
@@ -84,10 +83,7 @@ public class MetadataHandler extends RepositoryManager {
 
 
     /** _more_ */
-    protected Hashtable typeMap = new Hashtable();
-
-    /** _more_ */
-    private List<Metadata.Type> types = new ArrayList<Metadata.Type>();
+    protected Hashtable<String,MetadataType> typeMap = new Hashtable<String,MetadataType>();
 
 
     private List<MetadataType> metadataTypes = new ArrayList<MetadataType>();
@@ -110,7 +106,7 @@ public class MetadataHandler extends RepositoryManager {
 
     public void addMetadataType(MetadataType type) {
         metadataTypes.add(type);
-        addType(new Metadata.Type(type.getId(), type.getName()));
+        typeMap.put(type.getType(), type);
     }
 
 
@@ -260,25 +256,10 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public Metadata.Type findType(String stringType) {
-        for (Metadata.Type type : types) {
-            if (type.getType().equals(stringType)) {
-                return type;
-            }
-        }
-        return null;
+    public MetadataType findType(String stringType) {
+        return typeMap.get(stringType);
     }
 
-
-    /**
-     * _more_
-     *
-     * @param type _more_
-     */
-    public void addType(Metadata.Type type) {
-        types.add(type);
-        typeMap.put(type.getType(), type);
-    }
 
     /**
      * _more_
@@ -287,8 +268,8 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public Metadata.Type getType(String type) {
-        return (Metadata.Type) typeMap.get(type);
+    public MetadataType getType(String type) {
+        return  typeMap.get(type);
     }
 
 
@@ -387,12 +368,8 @@ public class MetadataHandler extends RepositoryManager {
      * @return _more_
      */
     public String[] getHtml(Request request, Entry entry, Metadata metadata) {
-        Metadata.Type type    = getType(metadata.getType());
-        for(MetadataType metadataType: metadataTypes) {
-            if(metadataType.getId().equals(type.getType())) {
-                return metadataType.getHtml(this, request,entry, metadata);
-            }
-        }
+        MetadataType type    = getType(metadata.getType());
+        if(type!=null) return type.getHtml(this, request,entry, metadata);
         return null;
     }
 
@@ -412,14 +389,10 @@ public class MetadataHandler extends RepositoryManager {
     public String[] getForm(Request request, Entry entry, Metadata metadata,
                             boolean forEdit)
             throws Exception {
-        Metadata.Type type    = getType(metadata.getType());
-        for(MetadataType metadataType: metadataTypes) {
-            if(metadataType.getId().equals(type.getType())) {
-                return metadataType.getForm(this, request,entry, metadata,forEdit);
-            }
+        MetadataType type    = getType(metadata.getType());
+        if(type!=null) {
+            return type.getForm(this, request,entry, metadata,forEdit);
         }
-
-
         return null;
     }
 
@@ -435,7 +408,7 @@ public class MetadataHandler extends RepositoryManager {
      */
     public void makeAddForm(Request request, Entry entry, StringBuffer sb)
             throws Exception {
-        for (Metadata.Type type : types) {
+        for (MetadataType type : metadataTypes) {
             makeAddForm(request, entry, type, sb);
         }
     }
@@ -475,22 +448,22 @@ public class MetadataHandler extends RepositoryManager {
      * @return _more_
      */
     public String getSearchUrl(Request request, Metadata metadata) {
-        Metadata.Type type = findType(metadata.getType());
+        MetadataType type = findType(metadata.getType());
         List          args = new ArrayList();
-        args.add(ARG_METADATA_TYPE + "." + type);
+        args.add(ARG_METADATA_TYPE + "." + type.getType());
         args.add(type.toString());
-        args.add(ARG_METADATA_ATTR1 + "." + type);
+        args.add(ARG_METADATA_ATTR1 + "." + type.getType());
         args.add(metadata.getAttr1());
         if (type.isAttr2Searchable()) {
-            args.add(ARG_METADATA_ATTR2 + "." + type);
+            args.add(ARG_METADATA_ATTR2 + "." + type.getType());
             args.add(metadata.getAttr2());
         }
         if (type.isAttr3Searchable()) {
-            args.add(ARG_METADATA_ATTR3 + "." + type);
+            args.add(ARG_METADATA_ATTR3 + "." + type.getType());
             args.add(metadata.getAttr3());
         }
         if (type.isAttr4Searchable()) {
-            args.add(ARG_METADATA_ATTR4 + "." + type);
+            args.add(ARG_METADATA_ATTR4 + "." + type.getType());
             args.add(metadata.getAttr4());
         }
         return HtmlUtil.url(request.url(getRepository().URL_ENTRY_SEARCH),
@@ -506,12 +479,12 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public String getSearchUrl(Request request, Metadata.Type type,
+    public String getSearchUrl(Request request, MetadataType type,
                                String value) {
         List args = new ArrayList();
-        args.add(ARG_METADATA_TYPE + "." + type);
+        args.add(ARG_METADATA_TYPE + "." + type.getType());
         args.add(type.toString());
-        args.add(ARG_METADATA_ATTR1 + "." + type);
+        args.add(ARG_METADATA_ATTR1 + "." + type.getType());
         args.add(value);
         return HtmlUtil.url(request.url(getRepository().URL_ENTRY_SEARCH),
                             args);
@@ -547,7 +520,7 @@ public class MetadataHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public void addToBrowseSearchForm(Request request, StringBuffer sb,
-                                      Metadata.Type type, boolean doSelect)
+                                      MetadataType type, boolean doSelect)
             throws Exception {
 
         String cloudLink =
@@ -567,9 +540,9 @@ public class MetadataHandler extends RepositoryManager {
         int rowNum = 1;
         for (int i = 0; i < values.length; i++) {
             String browseUrl = HtmlUtil.url(url,
-                                            ARG_METADATA_TYPE + "." + type,
-                                            type.toString(),
-                                            ARG_METADATA_ATTR1 + "." + type,
+                                            ARG_METADATA_TYPE + "." + type.getType(),
+                                            type.getType(),
+                                            ARG_METADATA_ATTR1 + "." + type.getType(),
                                             values[i]);
             String value = values[i].trim();
             if (value.length() == 0) {
@@ -624,7 +597,7 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void makeAddForm(Request request, Entry entry, Metadata.Type type,
+    public void makeAddForm(Request request, Entry entry, MetadataType type,
                             StringBuffer sb)
             throws Exception {
         if (type == null) {
@@ -655,7 +628,7 @@ public class MetadataHandler extends RepositoryManager {
      */
     public void makeSearchForm(Request request, StringBuffer sb)
             throws Exception {
-        for (Metadata.Type type : types) {
+        for (MetadataType type : metadataTypes) {
             //            makeAddForm(entry, types.get(i).toString(), sb);
         }
     }
@@ -668,8 +641,8 @@ public class MetadataHandler extends RepositoryManager {
      * @param entry _more_
      * @return _more_
      */
-    public List<Metadata.Type> getTypes(Request request, Entry entry) {
-        return types;
+    public List<MetadataType> getTypes(Request request, Entry entry) {
+        return metadataTypes;
     }
 
 
@@ -732,7 +705,6 @@ public class MetadataHandler extends RepositoryManager {
                            boolean newMetadata)
             throws Exception {
         String type = request.getString(ARG_TYPE + suffix, "");
-
 
 
         if ( !canHandle(type)) {

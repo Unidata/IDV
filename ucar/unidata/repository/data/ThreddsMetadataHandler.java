@@ -110,65 +110,50 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
     /** _more_ */
-    public static final Metadata.Type TYPE_CREATOR =
-        new Metadata.Type("thredds.creator", "Creator");
+    public static final String TYPE_CREATOR ="thredds.creator";
 
     /** _more_ */
-    public static final Metadata.Type TYPE_LINK =
-        new Metadata.Type("thredds.link", "Link");
+    public static final String TYPE_LINK ="thredds.link";
 
     /** _more_ */
-    public static final Metadata.Type TYPE_DATAFORMAT =
-        new Metadata.Type("thredds.dataFormat", "Data Format");
+    public static final String TYPE_DATAFORMAT ="thredds.dataFormat";
 
     /** _more_ */
-    public static final Metadata.Type TYPE_DATATYPE =
-        new Metadata.Type("thredds.dataType", "Data Type");
+    public static final String TYPE_DATATYPE = "thredds.dataType";
 
     /** _more_ */
-    public static final Metadata.Type TYPE_AUTHORITY =
-        new Metadata.Type("thredds.authority", "Authority");
+    public static final String TYPE_AUTHORITY ="thredds.authority";
 
     /** _more_ */
-    public static final Metadata.Type TYPE_VARIABLES =
-        new Metadata.Type("thredds.variables", "Variables");
+    public static final String TYPE_VARIABLES ="thredds.variables";
 
 
     /** _more_ */
-    public static final Metadata.Type TYPE_VARIABLE =
-        new Metadata.Type("thredds.variable", "Variable", "Variables");
+    public static final String TYPE_VARIABLE ="thredds.variable";
 
     /** _more_ */
-    public static final Metadata.Type TYPE_PUBLISHER =
-        new Metadata.Type("thredds.publisher", "Publisher");
+    public static final String TYPE_PUBLISHER ="thredds.publisher";
 
     /** _more_ */
-    public static final Metadata.Type TYPE_PROJECT =
-        new Metadata.Type("thredds.project", "Project");
+    public static final String TYPE_PROJECT = "thredds.project";
 
     /** _more_ */
-    public static final Metadata.Type TYPE_KEYWORD =
-        new Metadata.Type("thredds.keyword", "Keyword");
+    public static final String TYPE_KEYWORD ="thredds.keyword";
 
     /** _more_ */
-    public static final Metadata.Type TYPE_CONTRIBUTOR =
-        new Metadata.Type("thredds.contributor", "Contributor");
+    public static final String TYPE_CONTRIBUTOR ="thredds.contributor";
 
     /** _more_ */
-    public static final Metadata.Type TYPE_PROPERTY =
-        new Metadata.Type("thredds.property", "Property");
+    public static final String TYPE_PROPERTY ="thredds.property";
 
     /** _more_ */
-    public static final Metadata.Type TYPE_DOCUMENTATION =
-        new Metadata.Type("thredds.documentation", "Documentation");
+    public static final String TYPE_DOCUMENTATION ="thredds.documentation";
 
     /** _more_ */
-    public static final Metadata.Type TYPE_ICON =
-        new Metadata.Type("thredds.icon", "Icon");
+    public static final String TYPE_ICON ="thredds.icon";
 
     /** _more_ */
-    public static final Metadata.Type TYPE_CDL =
-        new Metadata.Type("thredds.cdl", "CDL", "CDL");
+    public static final String TYPE_CDL ="thredds.cdl";
 
 
     /** _more_ */
@@ -185,24 +170,24 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     public ThreddsMetadataHandler(Repository repository, Element node)
             throws Exception {
         super(repository, node);
-        TYPE_LINK.setSearchableMask(Metadata.Type.SEARCHABLE_ATTR1
-                                    | Metadata.Type.SEARCHABLE_ATTR2);
-        TYPE_PROPERTY.setSearchableMask(Metadata.Type.SEARCHABLE_ATTR1
-                                        | Metadata.Type.SEARCHABLE_ATTR2);
-        addType(TYPE_DOCUMENTATION);
-        addType(TYPE_PROPERTY);
-        addType(TYPE_LINK);
-        addType(TYPE_KEYWORD);
-        addType(TYPE_ICON);
-        addType(TYPE_PUBLISHER);
-        addType(TYPE_CREATOR);
-        addType(TYPE_CONTRIBUTOR);
-        addType(TYPE_PROJECT);
-        addType(TYPE_AUTHORITY);
-        addType(TYPE_DATATYPE);
-        addType(TYPE_DATAFORMAT);
-        //        addType(TYPE_VARIABLES);
-        addType(TYPE_VARIABLE);
+        //        TYPE_LINK.setSearchableMask(Metadata.Type.SEARCHABLE_ATTR1
+        //                                    | Metadata.Type.SEARCHABLE_ATTR2);
+        //        TYPE_PROPERTY.setSearchableMask(Metadata.Type.SEARCHABLE_ATTR1
+        //                                        | Metadata.Type.SEARCHABLE_ATTR2);
+        addMetadataType(new MetadataType(TYPE_DOCUMENTATION,"Documentation"));
+        addMetadataType(new MetadataType(TYPE_PROPERTY,"Property"));
+        addMetadataType(new MetadataType(TYPE_LINK,"Link"));
+        addMetadataType(new MetadataType(TYPE_KEYWORD,"Keyword"));
+        addMetadataType(new MetadataType(TYPE_ICON,"Icon"));
+        addMetadataType(new MetadataType(TYPE_PUBLISHER,"Publisher"));
+        addMetadataType(new MetadataType(TYPE_CREATOR,"Creator"));
+        addMetadataType(new MetadataType(TYPE_CONTRIBUTOR,"Contributor"));
+        addMetadataType(new MetadataType(TYPE_PROJECT,"Project"));
+        addMetadataType(new MetadataType(TYPE_AUTHORITY,"Authority"));
+        addMetadataType(new MetadataType(TYPE_DATATYPE,"Data Type"));
+        addMetadataType(new MetadataType(TYPE_DATAFORMAT,"Data Format"));
+        //        addMetadataType(new MetadataType(TYPE_VARIABLES,"Variables"));
+        addMetadataType(new MetadataType(TYPE_VARIABLE,"Variable"));
     }
 
 
@@ -526,12 +511,16 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      *
      * @return _more_
      */
-    public static String getTag(Metadata.Type type) {
-        int idx = type.getType().indexOf(".");
+    public static String getTag(MetadataType type) {
+        return getTag(type.getType());
+    }
+
+    public static String getTag(String type) {
+        int idx = type.indexOf(".");
         if (idx < 0) {
-            return type.getType();
+            return type;
         }
-        return type.getType().substring(idx + 1);
+        return type.substring(idx + 1);
     }
 
     /**
@@ -558,31 +547,31 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                      Metadata metadata, Document doc,
                                      Element datasetNode)
             throws Exception {
-        Metadata.Type type = getType(metadata.getType());
-        if (type.equals(TYPE_LINK)) {
+        MetadataType type = getType(metadata.getType());
+        if (type.isType(TYPE_LINK)) {
             XmlUtil.create(doc, getTag(TYPE_DOCUMENTATION), datasetNode,
                            new String[] { "xlink:href",
                                           metadata.getAttr2(), "xlink:title",
                                           metadata.getAttr1() });
-        } else if (type.equals(TYPE_DOCUMENTATION)) {
+        } else if (type.isType(TYPE_DOCUMENTATION)) {
             //            System.err.println ("tag:" +  getTag(TYPE_DOCUMENTATION));
             XmlUtil.create(doc, getTag(TYPE_DOCUMENTATION), datasetNode,
                            metadata.getAttr2(), new String[] { ATTR_TYPE,
                     metadata.getAttr1() });
-        } else if (type.equals(TYPE_PROPERTY)) {
+        } else if (type.isType(TYPE_PROPERTY)) {
             XmlUtil.create(doc, getTag(TYPE_PROPERTY), datasetNode,
                            new String[] { ATTR_NAME,
                                           metadata.getAttr1(), ATTR_VALUE,
                                           metadata.getAttr2() });
-        } else if (type.equals(TYPE_KEYWORD)) {
+        } else if (type.isType(TYPE_KEYWORD)) {
             XmlUtil.create(doc, getTag(TYPE_KEYWORD), datasetNode,
                            metadata.getAttr1());
-        } else if (type.equals(TYPE_CONTRIBUTOR)) {
+        } else if (type.isType(TYPE_CONTRIBUTOR)) {
             XmlUtil.create(doc, getTag(TYPE_DOCUMENTATION), datasetNode,
                            metadata.getAttr1(), new String[] { ATTR_ROLE,
                     metadata.getAttr2() });
 
-        } else if (type.equals(TYPE_VARIABLE)) {
+        } else if (type.isType(TYPE_VARIABLE)) {
             Element variablesNode = XmlUtil.getElement(datasetNode,
                                         TAG_VARIABLES);
             if (variablesNode == null) {
@@ -592,12 +581,12 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             XmlUtil.create(doc, getTag(TYPE_VARIABLE), variablesNode,
                            metadata.getAttr2(), new String[] { ATTR_NAME,
                     metadata.getAttr1(), ATTR_UNITS, metadata.getAttr3() });
-        } else if (type.equals(TYPE_ICON)) {
+        } else if (type.isType(TYPE_ICON)) {
             XmlUtil.create(doc, getTag(TYPE_DOCUMENTATION), datasetNode,
                            new String[] { "xlink:href",
                                           metadata.getAttr1(), "xlink:title",
                                           "icon" });
-        } else if (type.equals(TYPE_PUBLISHER) || type.equals(TYPE_CREATOR)) {
+        } else if (type.isType(TYPE_PUBLISHER) || type.isType(TYPE_CREATOR)) {
             Element node = XmlUtil.create(doc, getTag(type), datasetNode);
             XmlUtil.create(doc, CatalogUtil.TAG_NAME, node,
                            metadata.getAttr1(), new String[] { ATTR_ROLE,
@@ -637,25 +626,25 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      * @return _more_
      */
     public String[] getHtml(Request request, Entry entry, Metadata metadata) {
-        Metadata.Type type    = getType(metadata.getType());
+        MetadataType type    = getType(metadata.getType());
         String        lbl     = msgLabel(type.getLabel());
         String        content = null;
-        if (type.equals(TYPE_LINK)) {
+        if (type.isType(TYPE_LINK)) {
             content = getSearchLink(request, metadata)
                       + HtmlUtil.href(metadata.getAttr2(),
                                       metadata.getAttr1());
-        } else if (type.equals(TYPE_DOCUMENTATION)) {
+        } else if (type.isType(TYPE_DOCUMENTATION)) {
             if (metadata.getAttr1().length() > 0) {
                 lbl = msgLabel(getLabel(metadata.getAttr1()));
             }
             content = metadata.getAttr2();
-        } else if (type.equals(TYPE_PROPERTY)) {
+        } else if (type.isType(TYPE_PROPERTY)) {
             lbl     = msgLabel(getLabel(metadata.getAttr1()));
             content = getSearchLink(request, metadata) + metadata.getAttr2();
-        } else if (type.equals(TYPE_ICON)) {
+        } else if (type.isType(TYPE_ICON)) {
             lbl     = "";
             content = HtmlUtil.img(metadata.getAttr1());
-        } else if (type.equals(TYPE_PUBLISHER) || type.equals(TYPE_CREATOR)) {
+        } else if (type.isType(TYPE_PUBLISHER) || type.isType(TYPE_CREATOR)) {
             content = getSearchLink(request, metadata) + metadata.getAttr1();
             if (metadata.getAttr3().length() > 0) {
                 content += HtmlUtil.br() + msgLabel("Email")
@@ -670,14 +659,14 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                            metadata.getAttr4());
             }
 
-        } else if (type.equals(TYPE_VARIABLE)) {
+        } else if (type.isType(TYPE_VARIABLE)) {
             content = getSearchLink(request, metadata) + metadata.getAttr1()
                       + HtmlUtil.space(1) + "(" + metadata.getAttr3() + ")"
                       + HtmlUtil.space(2) + metadata.getAttr2();
 
-        } else if (type.equals(TYPE_PROJECT)) {
+        } else if (type.isType(TYPE_PROJECT)) {
             content = getSearchLink(request, metadata) + metadata.getAttr1();
-        } else if (type.equals(TYPE_KEYWORD)) {
+        } else if (type.isType(TYPE_KEYWORD)) {
             content = getSearchLink(request, metadata) + metadata.getAttr1();
         } else {
             content = metadata.getAttr1();
@@ -703,7 +692,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      * @throws Exception _more_
      */
     public void addToSearchForm(Request request, StringBuffer sb,
-                                Metadata.Type type, boolean doSelect)
+                                MetadataType type, boolean doSelect)
             throws Exception {
         sb.append(HtmlUtil.hidden(ARG_METADATA_TYPE + "." + type,
                                   type.toString()));
@@ -749,13 +738,13 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      */
     public void addToSearchForm(Request request, StringBuffer sb)
             throws Exception {
-        addToSearchForm(request, sb, TYPE_DOCUMENTATION, false);
-        addToSearchForm(request, sb, TYPE_KEYWORD, true);
-        addToSearchForm(request, sb, TYPE_PROJECT, true);
-        addToSearchForm(request, sb, TYPE_CREATOR, true);
-        addToSearchForm(request, sb, TYPE_CONTRIBUTOR, true);
-        addToSearchForm(request, sb, TYPE_PUBLISHER, true);
-        addToSearchForm(request, sb, TYPE_VARIABLE, true);
+        addToSearchForm(request, sb, findType(TYPE_DOCUMENTATION), false);
+        addToSearchForm(request, sb, findType(TYPE_KEYWORD), true);
+        addToSearchForm(request, sb, findType(TYPE_PROJECT), true);
+        addToSearchForm(request, sb, findType(TYPE_CREATOR), true);
+        addToSearchForm(request, sb, findType(TYPE_CONTRIBUTOR), true);
+        addToSearchForm(request, sb, findType(TYPE_PUBLISHER), true);
+        addToSearchForm(request, sb, findType(TYPE_VARIABLE), true);
     }
 
 
@@ -769,12 +758,12 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      */
     public void addToBrowseSearchForm(Request request, StringBuffer sb)
             throws Exception {
-        addToBrowseSearchForm(request, sb, TYPE_KEYWORD, true);
-        addToBrowseSearchForm(request, sb, TYPE_PROJECT, true);
-        addToBrowseSearchForm(request, sb, TYPE_CREATOR, true);
-        addToBrowseSearchForm(request, sb, TYPE_CONTRIBUTOR, true);
-        addToBrowseSearchForm(request, sb, TYPE_PUBLISHER, true);
-        addToBrowseSearchForm(request, sb, TYPE_VARIABLE, true);
+        addToBrowseSearchForm(request, sb, findType(TYPE_KEYWORD), true);
+        addToBrowseSearchForm(request, sb, findType(TYPE_PROJECT), true);
+        addToBrowseSearchForm(request, sb, findType(TYPE_CREATOR), true);
+        addToBrowseSearchForm(request, sb, findType(TYPE_CONTRIBUTOR), true);
+        addToBrowseSearchForm(request, sb, findType(TYPE_PUBLISHER), true);
+        addToBrowseSearchForm(request, sb, findType(TYPE_VARIABLE), true);
     }
 
 
@@ -808,7 +797,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     public String[] getForm(Request request, Entry entry, Metadata metadata,
                             boolean forEdit)
             throws Exception {
-        Metadata.Type type    = getType(metadata.getType());
+        MetadataType type    = getType(metadata.getType());
         String        lbl     = msgLabel(type.getLabel());
         String        content = null;
         String        id      = metadata.getId();
@@ -831,15 +820,15 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         String arg4 = ARG_ATTR4 + suffix;
         String size = HtmlUtil.SIZE_70;
 
-        if (type.equals(TYPE_LINK)) {
+        if (type.isType(TYPE_LINK)) {
             content = formEntry(new String[] { submit, msgLabel("Label"),
                     HtmlUtil.input(arg1, metadata.getAttr1(), size),
                     msgLabel("Url"),
                     HtmlUtil.input(arg2, metadata.getAttr2(), size) });
-        } else if (type.equals(TYPE_ICON)) {
+        } else if (type.isType(TYPE_ICON)) {
             content = formEntry(new String[] { submit, msgLabel("URL"),
                     HtmlUtil.input(arg1, metadata.getAttr1(), size) });
-        } else if (type.equals(TYPE_DOCUMENTATION)) {
+        } else if (type.isType(TYPE_DOCUMENTATION)) {
             List types = Misc.toList(new Object[] {
                 new TwoFacedObject(msg("Summary"), "summary"),
                 new TwoFacedObject(msg("Funding"), "funding"),
@@ -854,12 +843,12 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     HtmlUtil.select(arg1, types, metadata.getAttr1()),
                     msgLabel("Value"),
                     HtmlUtil.textArea(arg2, metadata.getAttr2(), 5, 50) });
-        } else if (type.equals(TYPE_CONTRIBUTOR)) {
+        } else if (type.isType(TYPE_CONTRIBUTOR)) {
             content = formEntry(new String[] { submit, msgLabel("Name"),
                     HtmlUtil.input(arg1, metadata.getAttr1(), size),
                     msgLabel("Role"),
                     HtmlUtil.input(arg2, metadata.getAttr2(), size) });
-        } else if (type.equals(TYPE_VARIABLE)) {
+        } else if (type.isType(TYPE_VARIABLE)) {
             content = formEntry(new String[] {
                 submit, msgLabel("Variable"),
                 HtmlUtil.input(arg1, metadata.getAttr1(), size),
@@ -868,13 +857,13 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 msgLabel("Units"),
                 HtmlUtil.input(arg3, metadata.getAttr3(), size)
             });
-        } else if (type.equals(TYPE_PROPERTY)) {
+        } else if (type.isType(TYPE_PROPERTY)) {
             content = formEntry(new String[] { submit, msgLabel("Name"),
                     HtmlUtil.input(arg1, metadata.getAttr1(), size),
                     msgLabel("Value"),
                     HtmlUtil.input(arg2, metadata.getAttr2(), size) });
 
-        } else if (type.equals(TYPE_KEYWORD)) {
+        } else if (type.isType(TYPE_KEYWORD)) {
             content = formEntry(new String[] { submit, msgLabel("Value"),
                     HtmlUtil.input(arg1,
                                    metadata.getAttr1().replace("\n", ""),
@@ -882,7 +871,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     msgLabel("Vocabulary"),
                     HtmlUtil.input(arg2, metadata.getAttr2(), size) });
 
-        } else if (type.equals(TYPE_PUBLISHER) || type.equals(TYPE_CREATOR)) {
+        } else if (type.isType(TYPE_PUBLISHER) || type.isType(TYPE_CREATOR)) {
             content = formEntry(new String[] {
                 submit, msgLabel("Organization"),
                 HtmlUtil.input(arg1, metadata.getAttr1(), size),
@@ -917,8 +906,12 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      *
      * @return _more_
      */
-    public boolean isTag(String tag, Metadata.Type type) {
-        return ("thredds." + tag).toLowerCase().equals(type.getType());
+    public boolean isTag(String tag, MetadataType type) {
+        return isTag(tag, type.getType());
+    }
+
+    public boolean isTag(String tag, String type) {
+        return ("thredds." + tag).toLowerCase().equals(type);
     }
 
 

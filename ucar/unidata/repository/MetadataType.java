@@ -27,6 +27,7 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.util.Misc;
 
 
 import ucar.unidata.xml.XmlUtil;
@@ -64,25 +65,55 @@ public class MetadataType implements Constants {
     public static String ARG_METADATAID = "metadataid";
 
     /** _more_ */
-    private String id;
+    private String type;
 
     /** _more_          */
     private String name;
 
+    private String displayCategory = "Metadata";
+
+    private boolean showInHtml = true;
+
+    private boolean adminOnly = false;
+
     /** _more_ */
     private List<MetadataElement> elements = new ArrayList<MetadataElement>();
+
+    private MetadataHandler handler;
+
+
+        /** _more_ */
+        public static final int SEARCHABLE_ATTR1 = 1 << 0;
+
+        /** _more_ */
+        public static final int SEARCHABLE_ATTR2 = 1 << 1;
+
+        /** _more_ */
+        public static final int SEARCHABLE_ATTR3 = 1 << 3;
+
+        /** _more_ */
+        public static final int SEARCHABLE_ATTR4 = 1 << 4;
+
+        /** _more_ */
+        public int searchableMask = 0;
+
+
 
     /**
      * _more_
      *
-     * @param id _more_
+     * @param type _more_
      * @param name _more_
      */
-    public MetadataType(String id, String name) {
-        this.id   = id;
+    public MetadataType(String type, String name) {
+        this.type   = type;
         this.name = name;
     }
 
+
+    public String toString() {
+        return type;
+    }
 
     /**
      * _more_
@@ -112,6 +143,7 @@ public class MetadataType implements Constants {
      */
     public String[] getHtml(MetadataHandler handler, Request request,
                             Entry entry, Metadata metadata) {
+        if(!showInHtml) return null;
         String       lbl     = handler.msgLabel(name);
         StringBuffer content = new StringBuffer();
         for (MetadataElement element : elements) {
@@ -172,7 +204,7 @@ public class MetadataType implements Constants {
 
         String argtype = ARG_TYPE + suffix;
         String argid   = ARG_METADATAID + suffix;
-        sb.append(HtmlUtil.hidden(argtype, id)
+        sb.append(HtmlUtil.hidden(argtype, type)
                   + HtmlUtil.hidden(argid, metadata.getId()));
 
         if ( !forEdit) {
@@ -196,21 +228,67 @@ public class MetadataType implements Constants {
 
 
     /**
-     *  Set the Id property.
+     *  Set the Type property.
      *
-     *  @param value The new value for Id
+     *  @param value The new value for Type
      */
-    public void setId(String value) {
-        id = value;
+    public void setType(String value) {
+        type = value;
     }
 
+    public boolean isType(String type) {
+        return Misc.equals(this.type, type);
+    }
+
+        public boolean isSearchable(int mask) {
+            return (searchableMask & mask) != 0;
+        }
+
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public boolean isAttr1Searchable() {
+            return isSearchable(SEARCHABLE_ATTR1);
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public boolean isAttr2Searchable() {
+            return isSearchable(SEARCHABLE_ATTR2);
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public boolean isAttr3Searchable() {
+            return isSearchable(SEARCHABLE_ATTR3);
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public boolean isAttr4Searchable() {
+            return isSearchable(SEARCHABLE_ATTR4);
+        }
+
+
     /**
-     *  Get the Id property.
+     *  Get the Type property.
      *
-     *  @return The Id
+     *  @return The Type
      */
-    public String getId() {
-        return id;
+    public String getType() {
+        return type;
     }
 
     /**
@@ -230,6 +308,83 @@ public class MetadataType implements Constants {
     public String getName() {
         return name;
     }
+
+    public String getLabel() {
+        return name;
+    }
+
+/**
+Set the ShowInHtml property.
+
+@param value The new value for ShowInHtml
+**/
+public void setShowInHtml (boolean value) {
+	this.showInHtml = value;
+}
+
+/**
+Get the ShowInHtml property.
+
+@return The ShowInHtml
+**/
+public boolean getShowInHtml () {
+	return this.showInHtml;
+}
+
+/**
+Set the DisplayCategory property.
+
+@param value The new value for DisplayCategory
+**/
+public void setDisplayCategory (String value) {
+	this.displayCategory = value;
+}
+
+/**
+Get the DisplayCategory property.
+
+@return The DisplayCategory
+**/
+public String getDisplayCategory () {
+	return this.displayCategory;
+}
+
+/**
+Set the AdminOnly property.
+
+@param value The new value for AdminOnly
+**/
+public void setAdminOnly (boolean value) {
+	this.adminOnly = value;
+}
+
+/**
+Get the AdminOnly property.
+
+@return The AdminOnly
+**/
+public boolean getAdminOnly () {
+	return this.adminOnly;
+}
+
+
+/**
+Set the Handler property.
+
+@param value The new value for Handler
+**/
+public void setHandler (MetadataHandler value) {
+	this.handler = value;
+}
+
+/**
+Get the Handler property.
+
+@return The Handler
+**/
+public MetadataHandler getHandler () {
+	return this.handler;
+}
 
 
 

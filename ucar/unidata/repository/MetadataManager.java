@@ -189,8 +189,7 @@ public class MetadataManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-
-    public List<Metadata> findMetadata(Entry entry, Metadata.Type type,
+    public List<Metadata> findMetadata(Entry entry, String type,
                                  boolean checkInherited)
             throws Exception {
         if (entry == null) {
@@ -198,7 +197,7 @@ public class MetadataManager extends RepositoryManager {
         }
         List<Metadata> result= new ArrayList<Metadata>();
         for (Metadata metadata : getMetadata(entry)) {
-            if (metadata.getType().equals(type.getType())) {
+            if (metadata.getType().equals(type)) {
                 result.add(metadata);
             }
         }
@@ -626,7 +625,7 @@ public class MetadataManager extends RepositoryManager {
         sb.append(HtmlUtil.hr());
         MetadataHandler handler =
             findMetadataHandler(request.getString(ARG_METADATA_TYPE, ""));
-        Metadata.Type type =
+        MetadataType type =
             handler.findType(request.getString(ARG_METADATA_TYPE, ""));
         String[] values = getDistinctValues(request, handler, type);
         int[]    cnt    = new int[values.length];
@@ -842,6 +841,7 @@ public class MetadataManager extends RepositoryManager {
         StringBuffer sb    = new StringBuffer();
         Entry        entry = getEntryManager().getEntry(request);
         sb.append(HtmlUtil.p());
+
         if ( !request.exists(ARG_TYPE)) {
             makeAddList(request, entry, sb);
         } else {
@@ -877,7 +877,7 @@ public class MetadataManager extends RepositoryManager {
         for (MetadataHandler handler : metadataHandlers) {
             String       name    = handler.getHandlerGroupName();
             StringBuffer groupSB = null;
-            for (Metadata.Type type : handler.getTypes(request, entry)) {
+            for (MetadataType type : handler.getTypes(request, entry)) {
                 if (groupSB == null) {
                     groupSB = (StringBuffer) groupMap.get(name);
                     if (groupSB == null) {
@@ -957,7 +957,7 @@ public class MetadataManager extends RepositoryManager {
      */
     public String[] getDistinctValues(Request request,
                                       MetadataHandler handler,
-                                      Metadata.Type type)
+                                      MetadataType type)
             throws Exception {
         Hashtable myDistinctMap = distinctMap;
         String[]  values        = (String[]) ((myDistinctMap == null)

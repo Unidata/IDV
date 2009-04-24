@@ -2172,7 +2172,7 @@ public class TypeHandler extends RepositoryManager {
                 MetadataHandler handler =
                     getRepository().getMetadataManager().findMetadataHandler(
                         type);
-                Metadata.Type metadataType = handler.findType(type);
+                MetadataType metadataType = handler.findType(type);
                 if (metadataType != null) {
                     addCriteria(searchCriteria,
                                 metadataType.getLabel() + "=", tmp);

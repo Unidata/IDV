@@ -54,22 +54,16 @@ public class AdminMetadataHandler extends MetadataHandler {
 
 
     /** _more_ */
-    public static Metadata.Type TYPE_TEMPLATE =
-        new Metadata.Type("admin.template", "Page Template");
+    public static final String  TYPE_TEMPLATE ="admin.template";
 
     /** _more_ */
-    public static Metadata.Type TYPE_CONTENTTEMPLATE =
-        new Metadata.Type("admin.contenttemplate", "Content Template");
+    public static final String  TYPE_CONTENTTEMPLATE ="admin.contenttemplate";
 
     /** _more_ */
-    public static Metadata.Type TYPE_LOCALFILE_PATTERN =
-        new Metadata.Type("admin.localfile.pattern", "Local File Pattern");
-
-    //TODO:
+    public static final String  TYPE_LOCALFILE_PATTERN ="admin.localfile.pattern";
 
     /** _more_ */
-    public static Metadata.Type TYPE_ANONYMOUS_UPLOAD =
-        new Metadata.Type("admin.anonymousupload", "Anonymous Upload");
+    public static final String TYPE_ANONYMOUS_UPLOAD ="admin.anonymousupload";
 
 
 
@@ -83,22 +77,23 @@ public class AdminMetadataHandler extends MetadataHandler {
     public AdminMetadataHandler(Repository repository, Element node)
             throws Exception {
         super(repository, node);
-        addType(TYPE_TEMPLATE);
-        nonLocalTypes.add(TYPE_TEMPLATE);
-        addType(TYPE_LOCALFILE_PATTERN);
-        addType(TYPE_ANONYMOUS_UPLOAD);
+        MetadataType templateType = new MetadataType(TYPE_TEMPLATE,"Page Template");
+        addMetadataType(templateType);
+        nonLocalTypes.add(templateType);
+        addMetadataType(new MetadataType(TYPE_LOCALFILE_PATTERN,"Local File Pattern"));
+        addMetadataType(new MetadataType(TYPE_ANONYMOUS_UPLOAD,"Anonyous Upload"));
 
-        //        addType(TYPE_CONTENTTEMPLATE);
+
     }
 
 
     /** _more_ */
-    private List<Metadata.Type> dummyTypeList =
-        new ArrayList<Metadata.Type>();
+    private List<MetadataType> dummyTypeList =
+        new ArrayList<MetadataType>();
 
     /** _more_ */
-    private List<Metadata.Type> nonLocalTypes =
-        new ArrayList<Metadata.Type>();
+    private List<MetadataType> nonLocalTypes =
+        new ArrayList<MetadataType>();
 
     /**
      * _more_
@@ -108,7 +103,7 @@ public class AdminMetadataHandler extends MetadataHandler {
      *
      * @return _more_
      */
-    public List<Metadata.Type> getTypes(Request request, Entry entry) {
+    public List<MetadataType> getTypes(Request request, Entry entry) {
         if (request.getUser().getAdmin()) {
             if (entry.getIsLocalFile()) {
                 return super.getTypes(request, entry);
@@ -140,19 +135,20 @@ public class AdminMetadataHandler extends MetadataHandler {
      * @return _more_
      */
     public String[] getHtml(Request request, Entry entry, Metadata metadata) {
-        Metadata.Type type = getType(metadata.getType());
+        MetadataType type = findType(metadata.getType());
+        if(type == null) return null;
         String        lbl  = msgLabel(type.getLabel());
-        if (type.equals(TYPE_TEMPLATE) || type.equals(TYPE_CONTENTTEMPLATE)) {
+        if (type.isType(TYPE_TEMPLATE) || type.isType(TYPE_CONTENTTEMPLATE)) {
             return new String[] { lbl, "Has template" };
         }
 
-        if (type.equals(TYPE_ANONYMOUS_UPLOAD)) {
+        if (type.isType(TYPE_ANONYMOUS_UPLOAD)) {
             return new String[] { lbl,
                                   "From:" + metadata.getAttr1() + " IP: "
                                   + metadata.getAttr2() };
         }
 
-        if (type.equals(TYPE_LOCALFILE_PATTERN)) {
+        if (type.isType(TYPE_LOCALFILE_PATTERN)) {
             return new String[] { lbl, "Local File Pattern" };
         }
 
@@ -180,7 +176,7 @@ public class AdminMetadataHandler extends MetadataHandler {
     public String[] getForm(Request request, Entry entry, Metadata metadata,
                             boolean forEdit)
             throws Exception {
-        Metadata.Type type   = getType(metadata.getType());
+        MetadataType type = findType(metadata.getType());
         String        lbl    = msgLabel(type.getLabel());
         String        id     = metadata.getId();
         String        suffix = "";
@@ -196,7 +192,7 @@ public class AdminMetadataHandler extends MetadataHandler {
                           : HtmlUtil.submit(msg("Cancel"), ARG_CANCEL));
         String arg1    = ARG_ATTR1 + suffix;
         String content = "";
-        if (type.equals(TYPE_TEMPLATE)) {
+        if (type.isType(TYPE_TEMPLATE)) {
             String value = metadata.getAttr1();
             if ( !forEdit || (value == null)) {
                 value = getRepository().getResource(PROP_HTML_TEMPLATE);
@@ -214,7 +210,7 @@ public class AdminMetadataHandler extends MetadataHandler {
                                      "Note: must contain macro ${content}"
                                      + "<br>" + textarea);
         }
-        if (type.equals(TYPE_LOCALFILE_PATTERN)) {
+        if (type.isType(TYPE_LOCALFILE_PATTERN)) {
             if ((metadata.getEntry() == null)
                     || !metadata.getEntry().getIsLocalFile()) {
                 return null;
@@ -224,7 +220,7 @@ public class AdminMetadataHandler extends MetadataHandler {
             content = HtmlUtil.row(HtmlUtil.colspan(submit, 2))
                       + HtmlUtil.formEntry(lbl, input);
         }
-        if (type.equals(TYPE_ANONYMOUS_UPLOAD)) {
+        if (type.isType(TYPE_ANONYMOUS_UPLOAD)) {
             content = "From:" + metadata.getAttr1() + " IP: "
                       + metadata.getAttr2();
         }

@@ -137,7 +137,7 @@ public class Metadata implements Constants {
      *
      * @param type _more_
      */
-    public Metadata(Type type) {
+    public Metadata(MetadataType type) {
         this("", "", type, false, "", "", "", "");
     }
 
@@ -154,7 +154,7 @@ public class Metadata implements Constants {
      * @param attr3 _more_
      * @param attr4 _more_
      */
-    public Metadata(String id, String entryId, Type type, boolean inherited,
+    public Metadata(String id, String entryId, MetadataType type, boolean inherited,
                     String attr1, String attr2, String attr3, String attr4) {
         this(id, entryId, type.getType(), inherited, attr1, attr2, attr3,
              attr4);
