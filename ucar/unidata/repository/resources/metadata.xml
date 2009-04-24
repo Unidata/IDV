@@ -1,0 +1,125 @@
+
+<metadata>
+
+  <type type="enum_tag" name="Tag" handler="ucar.unidata.repository.EnumeratedMetadataHandler">
+       <element type="string" label="Tag Value"/>
+  </type>
+
+  <type type="wikicategory" name="Wiki Category" handler="ucar.unidata.repository.EnumeratedMetadataHandler">
+       <element type="string" label="Wiki Category"/>
+  </type>
+
+  <type type="enum_gcmdkeyword" name="GCMD Science Keyword" handler="ucar.unidata.repository.EnumeratedMetadataHandler">
+       <element type="enumeration" label="Keyword" values="file:/ucar/unidata/repository/resources/gcmdkeywords.txt"/>
+  </type>
+
+
+
+  <type type="content.thumbnail" name="Thumbnail Image" category="Content" handler="ucar.unidata.repository.ContentMetadataHandler">
+  </type>
+
+  <type type="content.attachment" name="File Attachment"  category="Content" handler="ucar.unidata.repository.ContentMetadataHandler">
+  </type>
+
+
+  <type type="content.contact" name="Contact"  handler="ucar.unidata.repository.ContentMetadataHandler" >
+    <element type="string" label="Name"/>
+    <element type="string" label="Email"/>
+  </type>
+
+
+  <type type="content.sort" name="Sort Order"  handler="ucar.unidata.repository.ContentMetadataHandler">
+    <element type="enumeration" label="Field" default="fromdate" values="fromdate,todate,createdate,name"/>
+    <element type="boolean" label="Ascending" default="true"/>
+  </type>
+
+
+  <type type="admin.template" name="Page Template" handler="ucar.unidata.repository.AdminMetadataHandler" adminonly="true">
+  </type>
+
+  <type type="admin.localfile.pattern" name="Local File Pattern" handler="ucar.unidata.repository.AdminMetadataHandler" adminonly="true">
+  </type>
+
+  <type type="admin.anonymousupload" name="Anonymous Upload" handler="ucar.unidata.repository.AdminMetadataHandler" adminonly="true">
+  </type>
+
+
+
+  <type type="thredds.creator" name="Creator" handler="ucar.unidata.repository.data.ThreddsMetadataHandler">
+    <element type="string" label="Organization"/>
+    <element type="skip" label=""/>
+    <element type="email" label="Email"/>
+    <element type="url" label="URL"/>
+  </type>
+
+  <type type="thredds.publisher" name="Publisher" handler="ucar.unidata.repository.data.ThreddsMetadataHandler">
+    <element type="string" label="Organization"/>
+    <element type="skip" label=""/>
+    <element type="email" label="Email"/>
+    <element type="url" label="URL"/>
+  </type>
+
+
+  <type type="thredds.link" name="Link" handler="ucar.unidata.repository.data.ThreddsMetadataHandler">
+    <element type="string" label="Label"/>
+    <element type="url" label="URL"/>
+    <htmltemplate><![CDATA[<a href="${attr2}">${attr1}</a>]]></htmltemplate>
+  </type>
+
+  <type type="thredds.project" name="Project" handler="ucar.unidata.repository.data.ThreddsMetadataHandler">
+    <element type="string" label="Value"/>
+  </type>
+
+  <type type="thredds.keyword" name="Keyword" handler="ucar.unidata.repository.data.ThreddsMetadataHandler">
+    <element type="string" label="Value"/>
+  </type>
+
+  <type type="thredds.contributor" name="Contributor" handler="ucar.unidata.repository.data.ThreddsMetadataHandler">
+    <element type="string" label="Name"/>
+    <element type="string" label="Role"/>
+  </type>
+
+  <type type="thredds.property" name="Property" handler="ucar.unidata.repository.data.ThreddsMetadataHandler">
+    <element type="string" label="Name"/>
+    <element type="string" label="Value"/>
+  </type>
+
+  <type type="thredds.documentation" name="Documentation" handler="ucar.unidata.repository.data.ThreddsMetadataHandler">
+    <element type="enumeration" label="Type" values="summary,funding,history,language,processing_level,rights"/>
+    <element type="string" label="Value" rows="6"/>
+  </type>
+
+
+
+  <type type="thredds.dataFormat" name="Dataformat" handler="ucar.unidata.repository.data.ThreddsMetadataHandler">
+    <element type="string" label="Value"/>
+  </type>
+
+  <type type="thredds.dataType" name="Datatype" handler="ucar.unidata.repository.data.ThreddsMetadataHandler">
+    <element type="string" label="Value"/>
+  </type>
+
+  <type type="thredds.authority" name="Authority" handler="ucar.unidata.repository.data.ThreddsMetadataHandler">
+    <element type="string" label="Value"/>
+  </type>
+
+<!--
+  <type type="thredds.variables" name="Variables" handler="ucar.unidata.repository.data.ThreddsMetadataHandler">
+  </type>
+-->
+
+  <type type="thredds.variable" displaycategory="Variables" name="Variable" handler="ucar.unidata.repository.data.ThreddsMetadataHandler">
+    <htmltemplate><![CDATA[${attr1} (${attr3}) ${attr2}]]></htmltemplate>
+    <element type="string" label="Variable"/>
+    <element type="string" label="Long Name"/>
+    <element type="string" label="Units" columns="10"/>
+  </type>
+
+
+  <type type="thredds.icon" name="Icon" handler="ucar.unidata.repository.data.ThreddsMetadataHandler">
+    <element type="url" label="URL"/>
+  </type>
+
+
+  
+</metadata>

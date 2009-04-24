@@ -160,6 +160,12 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     public static final String NCATTR_STANDARD_NAME = "standard_name";
 
 
+    public ThreddsMetadataHandler(Repository repository)
+            throws Exception {
+        super(repository);
+    }
+
+
     /**
      * _more_
      *
@@ -174,20 +180,6 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         //                                    | Metadata.Type.SEARCHABLE_ATTR2);
         //        TYPE_PROPERTY.setSearchableMask(Metadata.Type.SEARCHABLE_ATTR1
         //                                        | Metadata.Type.SEARCHABLE_ATTR2);
-        addMetadataType(new MetadataType(TYPE_DOCUMENTATION,"Documentation"));
-        addMetadataType(new MetadataType(TYPE_PROPERTY,"Property"));
-        addMetadataType(new MetadataType(TYPE_LINK,"Link"));
-        addMetadataType(new MetadataType(TYPE_KEYWORD,"Keyword"));
-        addMetadataType(new MetadataType(TYPE_ICON,"Icon"));
-        addMetadataType(new MetadataType(TYPE_PUBLISHER,"Publisher"));
-        addMetadataType(new MetadataType(TYPE_CREATOR,"Creator"));
-        addMetadataType(new MetadataType(TYPE_CONTRIBUTOR,"Contributor"));
-        addMetadataType(new MetadataType(TYPE_PROJECT,"Project"));
-        addMetadataType(new MetadataType(TYPE_AUTHORITY,"Authority"));
-        addMetadataType(new MetadataType(TYPE_DATATYPE,"Data Type"));
-        addMetadataType(new MetadataType(TYPE_DATAFORMAT,"Data Format"));
-        //        addMetadataType(new MetadataType(TYPE_VARIABLES,"Variables"));
-        addMetadataType(new MetadataType(TYPE_VARIABLE,"Variable"));
     }
 
 
@@ -615,71 +607,6 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param metadata _more_
-     *
-     * @return _more_
-     */
-    public String[] getHtml(Request request, Entry entry, Metadata metadata) {
-        MetadataType type    = getType(metadata.getType());
-        String        lbl     = msgLabel(type.getLabel());
-        String        content = null;
-        if (type.isType(TYPE_LINK)) {
-            content = getSearchLink(request, metadata)
-                      + HtmlUtil.href(metadata.getAttr2(),
-                                      metadata.getAttr1());
-        } else if (type.isType(TYPE_DOCUMENTATION)) {
-            if (metadata.getAttr1().length() > 0) {
-                lbl = msgLabel(getLabel(metadata.getAttr1()));
-            }
-            content = metadata.getAttr2();
-        } else if (type.isType(TYPE_PROPERTY)) {
-            lbl     = msgLabel(getLabel(metadata.getAttr1()));
-            content = getSearchLink(request, metadata) + metadata.getAttr2();
-        } else if (type.isType(TYPE_ICON)) {
-            lbl     = "";
-            content = HtmlUtil.img(metadata.getAttr1());
-        } else if (type.isType(TYPE_PUBLISHER) || type.isType(TYPE_CREATOR)) {
-            content = getSearchLink(request, metadata) + metadata.getAttr1();
-            if (metadata.getAttr3().length() > 0) {
-                content += HtmlUtil.br() + msgLabel("Email")
-                           + HtmlUtil.space(1)
-                           + HtmlUtil.href("mailto:" + metadata.getAttr3(),
-                                           metadata.getAttr3());
-            }
-            if (metadata.getAttr4().length() > 0) {
-                content += HtmlUtil.br() + msgLabel("URL")
-                           + HtmlUtil.space(1)
-                           + HtmlUtil.href(metadata.getAttr4(),
-                                           metadata.getAttr4());
-            }
-
-        } else if (type.isType(TYPE_VARIABLE)) {
-            content = getSearchLink(request, metadata) + metadata.getAttr1()
-                      + HtmlUtil.space(1) + "(" + metadata.getAttr3() + ")"
-                      + HtmlUtil.space(2) + metadata.getAttr2();
-
-        } else if (type.isType(TYPE_PROJECT)) {
-            content = getSearchLink(request, metadata) + metadata.getAttr1();
-        } else if (type.isType(TYPE_KEYWORD)) {
-            content = getSearchLink(request, metadata) + metadata.getAttr1();
-        } else {
-            content = metadata.getAttr1();
-        }
-        if (content == null) {
-            return null;
-        }
-        return new String[] { lbl, content };
-    }
-
-
-
-
 
     /**
      * _more_
@@ -764,137 +691,6 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         addToBrowseSearchForm(request, sb, findType(TYPE_CONTRIBUTOR), true);
         addToBrowseSearchForm(request, sb, findType(TYPE_PUBLISHER), true);
         addToBrowseSearchForm(request, sb, findType(TYPE_VARIABLE), true);
-    }
-
-
-    /**
-     * _more_
-     *
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param metadata _more_
-     * @param forEdit _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-
-
-    /**
-     * _more_
-     *
-     *
-     * @param request _more_
-     * @param metadata _more_
-     * @param forEdit _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public String[] getForm(Request request, Entry entry, Metadata metadata,
-                            boolean forEdit)
-            throws Exception {
-        MetadataType type    = getType(metadata.getType());
-        String        lbl     = msgLabel(type.getLabel());
-        String        content = null;
-        String        id      = metadata.getId();
-        String        suffix  = "";
-        if (id.length() > 0) {
-            suffix = "." + id;
-        }
-
-
-        String submit = HtmlUtil.submit(msg("Add") + HtmlUtil.space(1)
-                                        + type.getLabel());
-        String cancel = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
-        if (forEdit) {
-            submit = "";
-            cancel = "";
-        }
-        String arg1 = ARG_ATTR1 + suffix;
-        String arg2 = ARG_ATTR2 + suffix;
-        String arg3 = ARG_ATTR3 + suffix;
-        String arg4 = ARG_ATTR4 + suffix;
-        String size = HtmlUtil.SIZE_70;
-
-        if (type.isType(TYPE_LINK)) {
-            content = formEntry(new String[] { submit, msgLabel("Label"),
-                    HtmlUtil.input(arg1, metadata.getAttr1(), size),
-                    msgLabel("Url"),
-                    HtmlUtil.input(arg2, metadata.getAttr2(), size) });
-        } else if (type.isType(TYPE_ICON)) {
-            content = formEntry(new String[] { submit, msgLabel("URL"),
-                    HtmlUtil.input(arg1, metadata.getAttr1(), size) });
-        } else if (type.isType(TYPE_DOCUMENTATION)) {
-            List types = Misc.toList(new Object[] {
-                new TwoFacedObject(msg("Summary"), "summary"),
-                new TwoFacedObject(msg("Funding"), "funding"),
-                new TwoFacedObject(msg("History"), "history"),
-                new TwoFacedObject(msg("Language"), "language"),
-                new TwoFacedObject(msg("Processing Level"),
-                                   "processing_level"),
-                new TwoFacedObject(msg("Rights"), "rights")
-            });;
-
-            content = formEntry(new String[] { submit, msgLabel("Type"),
-                    HtmlUtil.select(arg1, types, metadata.getAttr1()),
-                    msgLabel("Value"),
-                    HtmlUtil.textArea(arg2, metadata.getAttr2(), 5, 50) });
-        } else if (type.isType(TYPE_CONTRIBUTOR)) {
-            content = formEntry(new String[] { submit, msgLabel("Name"),
-                    HtmlUtil.input(arg1, metadata.getAttr1(), size),
-                    msgLabel("Role"),
-                    HtmlUtil.input(arg2, metadata.getAttr2(), size) });
-        } else if (type.isType(TYPE_VARIABLE)) {
-            content = formEntry(new String[] {
-                submit, msgLabel("Variable"),
-                HtmlUtil.input(arg1, metadata.getAttr1(), size),
-                msgLabel("Long Name"),
-                HtmlUtil.input(arg2, metadata.getAttr2(), size),
-                msgLabel("Units"),
-                HtmlUtil.input(arg3, metadata.getAttr3(), size)
-            });
-        } else if (type.isType(TYPE_PROPERTY)) {
-            content = formEntry(new String[] { submit, msgLabel("Name"),
-                    HtmlUtil.input(arg1, metadata.getAttr1(), size),
-                    msgLabel("Value"),
-                    HtmlUtil.input(arg2, metadata.getAttr2(), size) });
-
-        } else if (type.isType(TYPE_KEYWORD)) {
-            content = formEntry(new String[] { submit, msgLabel("Value"),
-                    HtmlUtil.input(arg1,
-                                   metadata.getAttr1().replace("\n", ""),
-                                   size),
-                    msgLabel("Vocabulary"),
-                    HtmlUtil.input(arg2, metadata.getAttr2(), size) });
-
-        } else if (type.isType(TYPE_PUBLISHER) || type.isType(TYPE_CREATOR)) {
-            content = formEntry(new String[] {
-                submit, msgLabel("Organization"),
-                HtmlUtil.input(arg1, metadata.getAttr1(), size),
-                msgLabel("Email"),
-                HtmlUtil.input(arg3, metadata.getAttr3(), size),
-                msgLabel("URL"),
-                HtmlUtil.input(arg4, metadata.getAttr4(), size)
-            });
-        } else {
-            content = formEntry(new String[] { submit, msgLabel("Value"),
-                    HtmlUtil.input(arg1, metadata.getAttr1(), size) });
-        }
-        if (content == null) {
-            return null;
-        }
-        String argtype = ARG_TYPE + suffix;
-        String argid   = ARG_METADATAID + suffix;
-        content = content + HtmlUtil.hidden(argtype, type.getType())
-                  + HtmlUtil.hidden(argid, metadata.getId());
-        if (cancel.length() > 0) {
-            content = content + HtmlUtil.row(HtmlUtil.colspan(cancel, 2));
-        }
-        return new String[] { lbl, content };
     }
 
 

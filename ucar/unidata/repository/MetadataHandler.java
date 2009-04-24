@@ -92,6 +92,11 @@ public class MetadataHandler extends RepositoryManager {
     boolean forUser = true;
 
 
+    public MetadataHandler(Repository repository) {
+        super(repository);
+    }
+
+
     /**
      * _more_
      *
@@ -104,10 +109,14 @@ public class MetadataHandler extends RepositoryManager {
         super(repository);
     }
 
+
     public void addMetadataType(MetadataType type) {
+        type.setHandler(this);
         metadataTypes.add(type);
         typeMap.put(type.getType(), type);
+        getMetadataManager().addMetadataType(type);
     }
+
 
 
     /**
@@ -369,8 +378,8 @@ public class MetadataHandler extends RepositoryManager {
      */
     public String[] getHtml(Request request, Entry entry, Metadata metadata) {
         MetadataType type    = getType(metadata.getType());
-        if(type!=null) return type.getHtml(this, request,entry, metadata);
-        return null;
+        if(type == null || !type.hasElements()) return null;
+        return type.getHtml(this, request,entry, metadata);
     }
 
     /**
@@ -390,10 +399,8 @@ public class MetadataHandler extends RepositoryManager {
                             boolean forEdit)
             throws Exception {
         MetadataType type    = getType(metadata.getType());
-        if(type!=null) {
-            return type.getForm(this, request,entry, metadata,forEdit);
-        }
-        return null;
+        if(type == null || !type.hasElements()) return null;
+        return type.getForm(this, request,entry, metadata,forEdit);
     }
 
 
@@ -633,17 +640,6 @@ public class MetadataHandler extends RepositoryManager {
         }
     }
 
-    /**
-     * _more_
-     *
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @return _more_
-     */
-    public List<MetadataType> getTypes(Request request, Entry entry) {
-        return metadataTypes;
-    }
 
 
     /**

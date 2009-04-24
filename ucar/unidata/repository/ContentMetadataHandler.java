@@ -81,40 +81,11 @@ public class ContentMetadataHandler extends MetadataHandler {
     public static final String TYPE_SORT = "content.sort";
 
 
-
-    /**
-     * _more_
-     *
-     * @param repository _more_
-     * @param node _more_
-     * @throws Exception _more_
-     */
-    public ContentMetadataHandler(Repository repository, Element node)
+    public ContentMetadataHandler(Repository repository)
             throws Exception {
-        super(repository, node);
-        addMetadataType(new MetadataType(TYPE_THUMBNAIL,"Thumbnail Image"));
-        addMetadataType(new MetadataType(TYPE_ATTACHMENT,"File Attachment"));
-
-
-        MetadataType sortType = new MetadataType("content.sort",
-                                    "Sort Order");
-        sortType.addElement(
-            new MetadataElement(
-                MetadataElement.TYPE_ENUMERATION, "Field",
-                Misc.newList("fromdate", "todate", "createdate", "name")));
-
-        sortType.addElement(new MetadataElement(MetadataElement.TYPE_BOOLEAN,
-                "Ascending"));
-
-        MetadataType contactType = new MetadataType("content.contact",
-                                       "Contact");
-        contactType.addElement(
-            new MetadataElement(MetadataElement.TYPE_STRING, "Name"));
-        contactType.addElement(
-            new MetadataElement(MetadataElement.TYPE_STRING, "Email"));
-        addMetadataType(contactType);
-        addMetadataType(sortType);
+        super(repository);
     }
+
 
     /**
      * _more_
@@ -333,25 +304,6 @@ public class ContentMetadataHandler extends MetadataHandler {
                     metadata.getId()), name);
         }
         return "";
-    }
-
-
-    /**
-     * _more_
-     *
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param metadata _more_
-     *
-     * @return _more_
-     */
-    public String[] getHtml(Request request, Entry entry, Metadata metadata) {
-        String[] result = super.getHtml(request, entry, metadata);
-        if (result != null) {
-            return result;
-        }
-        return null;
     }
 
 

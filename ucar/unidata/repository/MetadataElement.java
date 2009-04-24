@@ -42,7 +42,10 @@ import java.util.List;
 public class MetadataElement implements Constants {
 
     /** _more_ */
+    public static final String TYPE_SKIP = "skip";
     public static final String TYPE_STRING = "string";
+    public static final String TYPE_URL = "url";
+    public static final String TYPE_EMAIL = "email";
 
     /** _more_ */
     public static final String TYPE_BOOLEAN = "boolean";
@@ -63,7 +66,7 @@ public class MetadataElement implements Constants {
     private int columns = 60;
 
     /** _more_ */
-    private List<Object> values;
+    private List values;
 
     /** _more_          */
     private String dflt = "";
@@ -112,6 +115,26 @@ public class MetadataElement implements Constants {
         this.values  = values;
     }
 
+
+    private boolean isString(String type) {
+        return type.equals(TYPE_STRING) || type.equals(TYPE_EMAIL)|| type.equals(TYPE_URL);
+    }
+
+
+    public void getHtml(MetadataHandler handler, StringBuffer sb, String value) {
+        if(type.equals(TYPE_SKIP)) {
+            return;
+        }
+        if(type.equals(TYPE_EMAIL)) {
+            sb.append(HtmlUtil.href("mailto:"+value,value));
+        } else if(type.equals(TYPE_URL)) {
+            sb.append(HtmlUtil.href(value,value));
+            } else {
+            sb.append(value);
+        }
+        sb.append(HtmlUtil.br());
+    }
+
     /**
      * _more_
      *
@@ -121,10 +144,19 @@ public class MetadataElement implements Constants {
      * @return _more_
      */
     public String getForm(String arg, String value) {
-        value = ((value == null)
+        if(type.equals(TYPE_SKIP)) {
+            return "";
+        }
+
+        value = ((value == null || value.length()==0)
                  ? dflt
                  : value);
-        if (type.equals(TYPE_STRING)) {
+        if (isString(type)) {
+            if(rows>1) {
+            return HtmlUtil.textArea(arg, value,
+                                     rows,columns);
+            } 
+
             return HtmlUtil.input(arg, value,
                                   HtmlUtil.attr(HtmlUtil.ATTR_SIZE,
                                       "" + columns));
@@ -216,7 +248,7 @@ public class MetadataElement implements Constants {
      *
      * @param value The new value for Values
      */
-    public void setValues(List<Object> value) {
+    public void setValues(List value) {
         values = value;
     }
 
@@ -225,7 +257,7 @@ public class MetadataElement implements Constants {
      *
      * @return The Values
      */
-    public List<Object> getValues() {
+    public List getValues() {
         return values;
     }
 
@@ -235,7 +267,7 @@ public class MetadataElement implements Constants {
      *
      * @param value The new value for Dflt
      */
-    public void setDflt(String value) {
+    public void setDefault(String value) {
         dflt = value;
     }
 
@@ -244,7 +276,7 @@ public class MetadataElement implements Constants {
      *
      * @return The Dflt
      */
-    public String getDflt() {
+    public String getDefault() {
         return dflt;
     }
 

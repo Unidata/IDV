@@ -136,8 +136,17 @@ public class MetadataManager extends RepositoryManager {
     protected Hashtable distinctMap = new Hashtable();
 
     /** _more_ */
-    private List<MetadataHandler> metadataHandlers =
-        new ArrayList<MetadataHandler>();
+    private List<MetadataHandler> metadataHandlers =   new ArrayList<MetadataHandler>();
+
+    private Hashtable<Class,MetadataHandler> metadataHandlerMap  = new Hashtable<Class,MetadataHandler>();
+
+
+    /** _more_ */
+    protected Hashtable<String,MetadataType> typeMap = new Hashtable<String,MetadataType>();
+
+
+    private List<MetadataType> metadataTypes = new ArrayList<MetadataType>();
+
 
 
 
@@ -156,6 +165,12 @@ public class MetadataManager extends RepositoryManager {
 
     /** _more_ */
     MetadataHandler dfltMetadataHandler;
+
+
+    public void addMetadataType(MetadataType type) {
+        metadataTypes.add(type);
+        typeMap.put(type.getType(), type);
+    }
 
 
     /**
@@ -389,6 +404,26 @@ public class MetadataManager extends RepositoryManager {
     }
 
 
+    public MetadataHandler getHandler(Class c) throws Exception {
+        MetadataHandler handler = metadataHandlerMap.get(c);
+        if(handler==null) {
+            Constructor ctor = Misc.findConstructor(c,
+                                                    new Class[] { Repository.class});
+            if (ctor == null) {
+                throw new IllegalStateException(
+                                                "Could not find constructor for MetadataHandler:"
+                                                + c.getName());
+            }
+            
+            handler =  (MetadataHandler) ctor.newInstance(new Object[] { getRepository()});
+            
+            metadataHandlers.add(handler);
+            metadataHandlerMap.put(c,handler);
+        }
+        return handler;
+    }
+
+
     /**
      * _more_
      *
@@ -397,7 +432,7 @@ public class MetadataManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void initMetadataHandlers(List<String> metadataDefFiles)
-            throws Exception {
+        throws Exception {
         for (String file : metadataDefFiles) {
             try {
                 file = getStorageManager().localizePath(file);
@@ -405,26 +440,7 @@ public class MetadataManager extends RepositoryManager {
                 if (root == null) {
                     continue;
                 }
-                List children = XmlUtil.findChildren(root,
-                                    TAG_METADATAHANDLER);
-                for (int i = 0; i < children.size(); i++) {
-                    Element node = (Element) children.get(i);
-                    Class c = Misc.findClass(XmlUtil.getAttribute(node,
-                                  ATTR_CLASS));
-                    Constructor ctor = Misc.findConstructor(c,
-                                           new Class[] { Repository.class,
-                            Element.class });
-                    if (ctor == null) {
-                        throw new IllegalStateException(
-                            "Could not find constructor for MetadataHandler:"
-                            + c.getName());
-                    }
-
-                    metadataHandlers.add(
-                        (MetadataHandler) ctor.newInstance(
-                            new Object[] { getRepository(),
-                                           node }));
-                }
+                MetadataType.parse(root, this);
             } catch (Exception exc) {
                 logError(
                     "Error loading metadata handler file:" + file, exc);
@@ -874,28 +890,29 @@ public class MetadataManager extends RepositoryManager {
         List<String> groups   = new ArrayList<String>();
         Hashtable    groupMap = new Hashtable();
 
-        for (MetadataHandler handler : metadataHandlers) {
-            String       name    = handler.getHandlerGroupName();
-            StringBuffer groupSB = null;
-            for (MetadataType type : handler.getTypes(request, entry)) {
-                if (groupSB == null) {
-                    groupSB = (StringBuffer) groupMap.get(name);
-                    if (groupSB == null) {
-                        groupMap.put(name, groupSB = new StringBuffer());
-                        groups.add(name);
-                    }
-                }
-                groupSB.append(request.uploadForm(URL_METADATA_ADDFORM));
-                groupSB.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
-                groupSB.append(HtmlUtil.hidden(ARG_TYPE, type.getType()));
-                groupSB.append(HtmlUtil.submit(msg("Add")));
-                groupSB.append(HtmlUtil.space(1)
-                               + HtmlUtil.bold(type.getLabel()));
-                groupSB.append(HtmlUtil.formClose());
-                groupSB.append(HtmlUtil.p());
-                groupSB.append(NEWLINE);
+
+        
+        for (MetadataType type: metadataTypes) {
+            if(type.getAdminOnly() && !request.getUser().getAdmin()) {
+                continue;
             }
+            String       name    = type.getCategory();
+            StringBuffer groupSB = (StringBuffer) groupMap.get(name);
+            if (groupSB == null) {
+                groupMap.put(name, groupSB = new StringBuffer());
+                groups.add(name);
+            }
+            groupSB.append(request.uploadForm(URL_METADATA_ADDFORM));
+            groupSB.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
+            groupSB.append(HtmlUtil.hidden(ARG_TYPE, type.getType()));
+            groupSB.append(HtmlUtil.submit(msg("Add")));
+            groupSB.append(HtmlUtil.space(1)
+                           + HtmlUtil.bold(type.getLabel()));
+            groupSB.append(HtmlUtil.formClose());
+            groupSB.append(HtmlUtil.p());
+            groupSB.append(NEWLINE);
         }
+
         for (String name : groups) {
             //                sb.append(header(name));
             StringBuffer tmp = new StringBuffer();

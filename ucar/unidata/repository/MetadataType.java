@@ -27,6 +27,8 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
 
@@ -44,6 +46,26 @@ import java.util.List;
  * @version $Revision: 1.3 $
  */
 public class MetadataType implements Constants {
+
+    public static final String TAG_TYPE = "type";
+    public static final String TAG_ELEMENT = "element";
+    public static final String TAG_HTMLTEMPLATE = "htmltemplate";
+
+    public static final String ATTR_ROWS = "rows";
+    public static final String ATTR_COLUMNS = "columns";
+    public static final String ATTR_SHOWINHTML = "showinhtml";
+    public static final String ATTR_HANDLER = "handler";
+    public static final String ATTR_TYPE = "type";
+    public static final String ATTR_ADMINONLY = "adminonly";
+    public static final String ATTR_LABEL = "label";
+    public static final String ATTR_DEFAULT = "default";
+    public static final String ATTR_VALUES = "values";
+    public static final String ATTR_NAME = "name";
+    public static final String ATTR_DISPLAYCATEGORY = "displaycategory";
+    public static final String ATTR_CATEGORY = "category";
+    public static final String ATTR_ = "";
+
+
 
     /** _more_ */
     public static String ARG_TYPE = "type";
@@ -72,6 +94,8 @@ public class MetadataType implements Constants {
 
     private String displayCategory = "Metadata";
 
+    private String category = "Metadata";
+
     private boolean showInHtml = true;
 
     private boolean adminOnly = false;
@@ -81,24 +105,26 @@ public class MetadataType implements Constants {
 
     private MetadataHandler handler;
 
+    private String htmlTemplate;
 
-        /** _more_ */
-        public static final int SEARCHABLE_ATTR1 = 1 << 0;
+    /** _more_ */
+    public static final int SEARCHABLE_ATTR1 = 1 << 0;
 
-        /** _more_ */
-        public static final int SEARCHABLE_ATTR2 = 1 << 1;
+    /** _more_ */
+    public static final int SEARCHABLE_ATTR2 = 1 << 1;
 
-        /** _more_ */
-        public static final int SEARCHABLE_ATTR3 = 1 << 3;
+    /** _more_ */
+    public static final int SEARCHABLE_ATTR3 = 1 << 3;
 
-        /** _more_ */
-        public static final int SEARCHABLE_ATTR4 = 1 << 4;
+    /** _more_ */
+    public static final int SEARCHABLE_ATTR4 = 1 << 4;
 
-        /** _more_ */
-        public int searchableMask = 0;
+    /** _more_ */
+    public int searchableMask = 0;
 
 
 
+    
     /**
      * _more_
      *
@@ -115,6 +141,10 @@ public class MetadataType implements Constants {
         return type;
     }
 
+    public boolean hasElements() {
+        return elements.size()>0;
+    }
+
     /**
      * _more_
      *
@@ -124,8 +154,56 @@ public class MetadataType implements Constants {
      * @return _more_
      */
     public static List<MetadataType> parse(Element root,
-                                           Repository repository) {
+                                           MetadataManager manager) 
+        throws Exception {
         List<MetadataType> types = new ArrayList<MetadataType>();
+
+        List children = XmlUtil.findChildren(root,
+                                             MetadataType.TAG_TYPE);
+        for (int i = 0; i < children.size(); i++) {
+            Element node = (Element) children.get(i);
+            Class c = Misc.findClass(XmlUtil.getAttribute(node,
+                                                          ATTR_HANDLER,"ucar.unidata.repository.MetadataHandler"));
+
+            MetadataHandler handler = manager.getHandler(c);
+            String type  = XmlUtil.getAttribute(node, ATTR_TYPE);
+            MetadataType metadataType = new MetadataType(type,XmlUtil.getAttribute(node,ATTR_NAME,type));
+            metadataType.htmlTemplate = XmlUtil.getGrandChildText(node, TAG_HTMLTEMPLATE);
+
+
+            handler.addMetadataType(metadataType);
+            types.add(metadataType);
+            metadataType.setAdminOnly(XmlUtil.getAttribute(node,ATTR_ADMINONLY,false));
+            metadataType.setDisplayCategory(XmlUtil.getAttribute(node,ATTR_DISPLAYCATEGORY,"Metadata"));
+            metadataType.setCategory(XmlUtil.getAttribute(node,ATTR_CATEGORY,handler.getHandlerGroupName()));
+
+            List elements = XmlUtil.findChildren(node,
+                                             MetadataType.TAG_ELEMENT);
+            
+            for (int j = 0; j < elements.size(); j++) {
+                //    <element type="string" label="Name"/>
+                Element elementNode = (Element) elements.get(j);
+
+                String elementType = XmlUtil.getAttribute(elementNode,ATTR_TYPE);
+                String dflt= XmlUtil.getAttribute(elementNode,ATTR_DEFAULT,"");
+                MetadataElement element = new MetadataElement(elementType,  XmlUtil.getAttribute(elementNode,ATTR_LABEL),
+                                                              XmlUtil.getAttribute(elementNode,ATTR_ROWS,1),
+                                                              XmlUtil.getAttribute(elementNode,ATTR_COLUMNS,60),null);
+                element.setDefault(dflt);
+                if(elementType.equals(MetadataElement.TYPE_ENUMERATION)) {
+                    String values= XmlUtil.getAttribute(elementNode,ATTR_VALUES);
+                    List<String> enumValues=null;
+                    if(values.startsWith("file:")) {
+                        String tagValues = IOUtil.readContents(values.substring(5), MetadataType.class);
+                        enumValues = (List<String>)StringUtil.split(tagValues, "\n", true, true);
+                    } else {
+                        enumValues = (List<String>)StringUtil.split(values,",",true,true);
+                    }
+                    element.setValues(enumValues);
+               }
+                metadataType.addElement(element);
+            }
+        }
         return types;
     }
 
@@ -146,9 +224,18 @@ public class MetadataType implements Constants {
         if(!showInHtml) return null;
         String       lbl     = handler.msgLabel(name);
         StringBuffer content = new StringBuffer();
-        for (MetadataElement element : elements) {
-            content.append(element.getLabel() + ":" + metadata.getAttr1()
-                           + HtmlUtil.space(3));
+        if(htmlTemplate!=null) {
+            String html = htmlTemplate;
+            for(int attr=1;attr<=4;attr++) {
+                html = html.replace("${attr" + attr+"}",metadata.getAttr(attr));
+            }
+            content.append(html);
+        } else {
+            int cnt =1;
+            for (MetadataElement element : elements) {
+                element.getHtml(handler,content,metadata.getAttr(cnt));
+                cnt++;
+            }
         }
         return new String[] { lbl, content.toString() };
     }
@@ -169,7 +256,7 @@ public class MetadataType implements Constants {
      */
     public String[] getForm(MetadataHandler handler, Request request,
                             Entry entry, Metadata metadata, boolean forEdit)
-            throws Exception {
+        throws Exception {
 
         String lbl    = handler.msgLabel(name);
         String suffix = "";
@@ -194,7 +281,10 @@ public class MetadataType implements Constants {
         for (MetadataElement element : elements) {
             String elementLbl = handler.msgLabel(element.getLabel());
             String widget     = element.getForm(args[cnt], values[cnt]);
-            sb.append(HtmlUtil.formEntry(elementLbl, widget));
+            if(widget==null || widget.length()==0) {
+            } else {
+                sb.append(HtmlUtil.formEntry(elementLbl, widget));
+            }
             cnt++;
         }
 
@@ -240,46 +330,46 @@ public class MetadataType implements Constants {
         return Misc.equals(this.type, type);
     }
 
-        public boolean isSearchable(int mask) {
-            return (searchableMask & mask) != 0;
-        }
+    public boolean isSearchable(int mask) {
+        return (searchableMask & mask) != 0;
+    }
 
 
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public boolean isAttr1Searchable() {
-            return isSearchable(SEARCHABLE_ATTR1);
-        }
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isAttr1Searchable() {
+        return isSearchable(SEARCHABLE_ATTR1);
+    }
 
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public boolean isAttr2Searchable() {
-            return isSearchable(SEARCHABLE_ATTR2);
-        }
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isAttr2Searchable() {
+        return isSearchable(SEARCHABLE_ATTR2);
+    }
 
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public boolean isAttr3Searchable() {
-            return isSearchable(SEARCHABLE_ATTR3);
-        }
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isAttr3Searchable() {
+        return isSearchable(SEARCHABLE_ATTR3);
+    }
 
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public boolean isAttr4Searchable() {
-            return isSearchable(SEARCHABLE_ATTR4);
-        }
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isAttr4Searchable() {
+        return isSearchable(SEARCHABLE_ATTR4);
+    }
 
 
     /**
@@ -313,78 +403,101 @@ public class MetadataType implements Constants {
         return name;
     }
 
-/**
-Set the ShowInHtml property.
+    /**
+       Set the ShowInHtml property.
 
-@param value The new value for ShowInHtml
-**/
-public void setShowInHtml (boolean value) {
+       @param value The new value for ShowInHtml
+    **/
+    public void setShowInHtml (boolean value) {
 	this.showInHtml = value;
-}
+    }
 
-/**
-Get the ShowInHtml property.
+    /**
+       Get the ShowInHtml property.
 
-@return The ShowInHtml
-**/
-public boolean getShowInHtml () {
+       @return The ShowInHtml
+    **/
+    public boolean getShowInHtml () {
 	return this.showInHtml;
-}
+    }
 
-/**
-Set the DisplayCategory property.
 
-@param value The new value for DisplayCategory
-**/
-public void setDisplayCategory (String value) {
+    /**
+       Set the Category property.
+
+       @param value The new value for Category
+    **/
+    public void setCategory (String value) {
+	category = value;
+    }
+
+    /**
+       Get the Category property.
+
+       @return The Category
+    **/
+    public String getCategory () {
+	return category;
+    }
+
+
+
+
+
+    /**
+       Set the DisplayCategory property.
+
+       @param value The new value for DisplayCategory
+    **/
+    public void setDisplayCategory (String value) {
 	this.displayCategory = value;
-}
+    }
 
-/**
-Get the DisplayCategory property.
+    /**
+       Get the DisplayCategory property.
 
-@return The DisplayCategory
-**/
-public String getDisplayCategory () {
+       @return The DisplayCategory
+    **/
+    public String getDisplayCategory () {
 	return this.displayCategory;
-}
+    }
 
-/**
-Set the AdminOnly property.
+    /**
+       Set the AdminOnly property.
 
-@param value The new value for AdminOnly
-**/
-public void setAdminOnly (boolean value) {
+       @param value The new value for AdminOnly
+    **/
+    public void setAdminOnly (boolean value) {
 	this.adminOnly = value;
-}
+    }
 
-/**
-Get the AdminOnly property.
+    /**
+       Get the AdminOnly property.
 
-@return The AdminOnly
-**/
-public boolean getAdminOnly () {
+       @return The AdminOnly
+    **/
+    public boolean getAdminOnly () {
 	return this.adminOnly;
-}
+    }
 
 
-/**
-Set the Handler property.
+    /**
+       Set the Handler property.
 
-@param value The new value for Handler
-**/
-public void setHandler (MetadataHandler value) {
+       @param value The new value for Handler
+    **/
+    public void setHandler (MetadataHandler value) {
 	this.handler = value;
-}
+    }
 
-/**
-Get the Handler property.
+    /**
+       Get the Handler property.
 
-@return The Handler
-**/
-public MetadataHandler getHandler () {
+       @return The Handler
+    **/
+    public MetadataHandler getHandler () {
 	return this.handler;
-}
+    }
 
 
 

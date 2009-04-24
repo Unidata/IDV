@@ -66,27 +66,6 @@ public class AdminMetadataHandler extends MetadataHandler {
     public static final String TYPE_ANONYMOUS_UPLOAD ="admin.anonymousupload";
 
 
-
-    /**
-     * _more_
-     *
-     * @param repository _more_
-     * @param node _more_
-     * @throws Exception _more_
-     */
-    public AdminMetadataHandler(Repository repository, Element node)
-            throws Exception {
-        super(repository, node);
-        MetadataType templateType = new MetadataType(TYPE_TEMPLATE,"Page Template");
-        addMetadataType(templateType);
-        nonLocalTypes.add(templateType);
-        addMetadataType(new MetadataType(TYPE_LOCALFILE_PATTERN,"Local File Pattern"));
-        addMetadataType(new MetadataType(TYPE_ANONYMOUS_UPLOAD,"Anonyous Upload"));
-
-
-    }
-
-
     /** _more_ */
     private List<MetadataType> dummyTypeList =
         new ArrayList<MetadataType>();
@@ -95,23 +74,14 @@ public class AdminMetadataHandler extends MetadataHandler {
     private List<MetadataType> nonLocalTypes =
         new ArrayList<MetadataType>();
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     */
-    public List<MetadataType> getTypes(Request request, Entry entry) {
-        if (request.getUser().getAdmin()) {
-            if (entry.getIsLocalFile()) {
-                return super.getTypes(request, entry);
-            }
-            return nonLocalTypes;
-        }
-        return dummyTypeList;
+
+
+    public AdminMetadataHandler(Repository repository)
+            throws Exception {
+        super(repository);
     }
+
+
 
     /**
      * _more_

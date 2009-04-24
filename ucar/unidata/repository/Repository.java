@@ -1361,7 +1361,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             typeDefFiles.add(file);
         } else if (file.indexOf("outputhandlers.xml") >= 0) {
             outputDefFiles.add(file);
-        } else if (file.indexOf("metadatahandlers.xml") >= 0) {
+        } else if (file.indexOf("metadata.xml") >= 0) {
             metadataDefFiles.add(file);
         } else {
             return false;

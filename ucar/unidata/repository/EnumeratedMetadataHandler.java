@@ -67,11 +67,16 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
     /** _more_ */
     public static final String TYPE_TAG = "enum_tag";
 
-    /** _more_ */
-    private MetadataType TYPE_ENUM;
 
     /** _more_ */
     private List predefinedValues;
+
+
+    public EnumeratedMetadataHandler(Repository repository)
+            throws Exception {
+        super(repository);
+    }
+
 
 
     /**
@@ -90,9 +95,9 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
             predefinedValues = StringUtil.split(tagValues, "\n", true, true);
         }
 
-        TYPE_ENUM = new MetadataType(XmlUtil.getAttribute(node, ATTR_TYPE),
-                                      XmlUtil.getAttribute(node, ATTR_NAME));
-        addMetadataType(TYPE_ENUM);
+        //        TYPE_ENUM = new MetadataType(XmlUtil.getAttribute(node, ATTR_TYPE),
+        //                                      XmlUtil.getAttribute(node, ATTR_NAME));
+        //        addMetadataType(TYPE_ENUM);
     }
 
 
@@ -122,29 +127,9 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
                                      Element datasetNode)
             throws Exception {
         MetadataType type = getType(metadata.getType());
-        if (type.isType(TYPE_ENUM.getType())) {
-            XmlUtil.create(doc,
-                           ThreddsMetadataHandler.TYPE_KEYWORD.toString(),
-                           datasetNode, metadata.getAttr1());
-        }
-    }
-
-
-    /**
-     * _more_
-     *
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param metadata _more_
-     *
-     * @return _more_
-     */
-    public String[] getHtml(Request request, Entry entry, Metadata metadata) {
-        String lbl = msgLabel(TYPE_ENUM.getLabel());
-        String content = getSearchLink(request, metadata)
-                         + metadata.getAttr1();
-        return new String[] { lbl, content };
+        XmlUtil.create(doc,
+                       ThreddsMetadataHandler.TYPE_KEYWORD.toString(),
+                       datasetNode, metadata.getAttr1());
     }
 
 
@@ -157,6 +142,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      *
      * @throws Exception _more_
      */
+    /*
     public void addToSearchForm(Request request, StringBuffer sb)
             throws Exception {
         List<String> l = (List<String>) getValues(request, true);
@@ -180,6 +166,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
                                          100) + inheritedCbx));
 
     }
+    */
 
     /**
      * _more_
@@ -189,11 +176,12 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      *
      * @throws Exception _more_
      */
+    /*
     public void addToBrowseSearchForm(Request request, StringBuffer sb)
             throws Exception {
         addToBrowseSearchForm(request, sb, TYPE_ENUM, true);
     }
-
+    */
 
 
     /**
@@ -206,6 +194,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      *
      * @throws Exception _more_
      */
+    /*
     private List getValues(Request request, boolean justTheOnesInTheDatabase)
             throws Exception {
         if ( !justTheOnesInTheDatabase && (predefinedValues != null)) {
@@ -218,6 +207,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
         }
         return Misc.toList(values);
     }
+    */
 
     /**
      * _more_
@@ -232,6 +222,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
      *
      * @throws Exception _more_
      */
+    /*
     public String[] getForm(Request request, Entry entry, Metadata metadata,
                             boolean forEdit)
             throws Exception {
@@ -290,6 +281,7 @@ public class EnumeratedMetadataHandler extends MetadataHandler {
                   + HtmlUtil.hidden(argid, metadata.getId());
         return new String[] { lbl, content };
     }
+    */
 
 
 
