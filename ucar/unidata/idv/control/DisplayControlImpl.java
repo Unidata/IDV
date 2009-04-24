@@ -6687,7 +6687,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @param viewManager The viewmanager to use
      */
-    public void setDefaultViewManager(ViewManager viewManager) {
+    public void setInitialViewManager(ViewManager viewManager) {
         defaultViewManager = viewManager;
     }
 
