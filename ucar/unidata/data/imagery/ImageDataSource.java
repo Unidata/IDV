@@ -1140,6 +1140,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
                 timeMap.put(aid.getSource(), aa.getImageStartTime());
                 result = aa.getImage();
+                aa = null;
             }
             putCache(source, result);
             return result;
@@ -1263,7 +1264,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
             }
 
             ThreadManager threadManager = new ThreadManager("image data reading");
-            threadManager.debug = true;
+            //threadManager.debug = true;
             final ImageSequenceManager sequenceManager = new ImageSequenceManager();
             int                  cnt             = 1;
             DataChoice           parent          = dataChoice.getParent();
