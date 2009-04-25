@@ -479,7 +479,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
             }
 
             try {
-                threadManager.debug = true;
+                //threadManager.debug = true;
                 threadManager.runInParallel(getDataContext().getIdv().getMaxDataThreadCount());
             } catch (VisADException ve) {
                 LogUtil.printMessage(ve.toString());
