@@ -32,6 +32,7 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceImpl;
+import ucar.unidata.data.DataUtil;
 
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -544,12 +545,7 @@ public class NetcdfSweepfileAdapter implements RadarAdapter {
         } else {
             System.out.println("no unit for variable " + v);
         }
-        Unit u = null;
-        try {
-            u = Util.parseUnit(unitName);
-        } catch (Exception pe) {
-            ;
-        }
+        Unit u = DataUtil.parseUnit(unitName);
         return u;
     }
 }
