@@ -45,6 +45,7 @@ import java.util.Formatter;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.swing.JTabbedPane;
 
 /**
  * A data source for netCDF or CDM point data
@@ -323,6 +324,31 @@ public class NetcdfPointDataSource extends PointDataSource {
         return obs;
     }
 
+    /**
+     * Gets called by the {@link DataManager} when this DataSource has
+     * been removed.
+     */
+    public void doRemove() {
+        super.doRemove();
+        if (dataset != null) {
+            try {
+                dataset.close();
+            } catch (java.io.IOException ioe) {
+                LogUtil.consoleMessage(ioe.getMessage());
+            }
+        }
+        dataset   = null;
+    }
+
+    /**
+     * Add any extra tabs into the properties tab
+     *
+     * @param tabbedPane The properties tab
+    public void addPropertiesTabs(JTabbedPane tabbedPane) {
+        super.addPropertiesTabs(tabbedPane);
+        addNCDumpPropertiesTab(tabbedPane, getDataset().getNetcdfFile(), "Metadata");
+    }
+     */
 
     /**
      * test

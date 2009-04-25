@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -78,6 +79,7 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.Util;
 import ucar.visad.quantities.CommonUnits;
+import ucar.visad.quantities.GeopotentialAltitude;
 
 import visad.*;
 
@@ -1361,18 +1363,13 @@ public class PointObFactory {
         PointFeatureCollection collection = null;
         if (fc instanceof PointFeatureCollection) {
             collection = (PointFeatureCollection) fc;
-        } else if (fc instanceof NestedPointFeatureCollection) {
+            if (llr != null) collection = collection.subset(llr, null);
             NestedPointFeatureCollection npfc =
                 (NestedPointFeatureCollection) fc;
-            collection = (npfc).flatten(llr, null);
+            if (llr != null) npfc = npfc.subset(llr);
+            collection = npfc.flatten(llr, null);
         }
         //System.out.println("number of obs = " + collection.size());
-        if (llr != null) {
-            log_.debug("subsetting to: " + llr);
-            collection = collection.subset(llr, null);
-            //System.out.println("new number of obs = " + collection.size());
-        }
-        //        System.err.println("#obs:" + total +" #vars:" +  numVars);
         int total = collection.size();
         PointFeatureIterator dataIterator =
             collection.getPointFeatureIterator(16384);
@@ -2004,9 +2001,17 @@ public class PointObFactory {
                 obVals[0]     = transformedXY[0];
                 obVals[1]     = transformedXY[1];
             }
-            obVals[2] =
-                firstGuess.getDefaultRangeUnits()[0].toThis(obVals[2],
-                    type.getDefaultUnit(), false);
+            // HACK for grids in gpm!
+            Unit guessUnits = firstGuess.getDefaultRangeUnits()[0];
+            if (guessUnits
+                    .equals(GeopotentialAltitude
+                        .getGeopotentialMeter()) && Unit
+                            .canConvert(type.getDefaultUnit(), CommonUnit
+                                .meter)) {
+                guessUnits = CommonUnit.meter;
+            }
+            obVals[2] = guessUnits.toThis(obVals[2], type.getDefaultUnit(),
+                                          false);
         }
         if (params != null) {
             params.setGridXArray(faGridX);
