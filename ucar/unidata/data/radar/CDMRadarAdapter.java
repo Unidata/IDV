@@ -21,8 +21,6 @@
  */
 
 
-
-
 package ucar.unidata.data.radar;
 
 
@@ -2490,8 +2488,8 @@ public class CDMRadarAdapter implements RadarAdapter {
         GridCoordSystem  gcs   = geod.getCoordinateSystem();
         CoordinateAxis1D yaxis = (CoordinateAxis1D) gcs.getYHorizAxis();
 
-        Unit             xUnit = Util.parseUnit(xAxis.getUnitsString());
-        Unit             yUnit = Util.parseUnit(yAxis.getUnitsString());
+        Unit             xUnit = DataUtil.parseUnit(xAxis.getUnitsString());
+        Unit             yUnit = DataUtil.parseUnit(yAxis.getUnitsString());
 
 
         RealType         xType;
@@ -2873,19 +2871,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             System.out.println("no unit for variable " + v);
         }
 
-        if (unitName.equalsIgnoreCase("dbZ")) {
-            return null;
-        }
-
-        Unit u;
-
-        try {
-            u = Util.parseUnit(unitName);
-        } catch (Exception pe) {
-            // System.err.println("Warning: could not parse unit:" + unitName);
-            u = null;
-            //            pe.printStackTrace();
-        }
+        Unit u = DataUtil.parseUnit(unitName);
 
         return u;
     }
@@ -2907,20 +2893,10 @@ public class CDMRadarAdapter implements RadarAdapter {
             System.out.println("no unit for variable ");
         }
 
-        if (unitName.equalsIgnoreCase("dbZ")) {
-            return null;
-        }
         if (unitName.equalsIgnoreCase("MetersPerSecond")) {
             unitName = "m/s";
         }
-        Unit u;
-
-        try {
-            u = Util.parseUnit(unitName);
-        } catch (Exception pe) {
-            u = null;
-            pe.printStackTrace();
-        }
+        Unit u = DataUtil.parseUnit(unitName);
 
         return u;
     }
