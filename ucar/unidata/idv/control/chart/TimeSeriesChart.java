@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.control.chart;
 
 
@@ -124,7 +125,7 @@ public class TimeSeriesChart extends XYChartManager {
     /** _more_ */
     private Date lastEndDate;
 
-    /** _more_          */
+    /** _more_ */
     private String dateFormat;
 
 
@@ -573,11 +574,6 @@ public class TimeSeriesChart extends XYChartManager {
                         name = name + "@" + Util.formatReal(info.getLevel())
                                + info.getLevel().getUnit();
                     }
-
-
-                    TimeSeries series = new TimeSeries(name,
-                                            Millisecond.class);
-
                     Set        timeSet   = field.getDomainSet();
                     Unit[]     timeUnits = timeSet.getSetUnits();
                     double[][] times     = timeSet.getDoubles();
@@ -585,61 +581,100 @@ public class TimeSeriesChart extends XYChartManager {
                     if (values == null) {
                         continue;
                     }
-                    double[] valueArray = values[0];
-                    Unit rawUnit =
-                        ucar.visad.Util.getDefaultRangeUnits(field)[0];
-                    if ((lineState.unit != null) && (rawUnit != null)) {
-                        valueArray = lineState.unit.toThis(valueArray,
-                                rawUnit);
-                    }
-                    int    numTimes = times[0].length;
-                    double
-                        min         = 0,
-                        max         = 0;
-                    for (int i = 0; i < numTimes; i++) {
-                        if (valueArray[i] != valueArray[i]) {
+                    Unit[] rawUnits =
+                        ucar.visad.Util.getDefaultRangeUnits(field);
+                    boolean haveWinds =
+                        (values.length > 1) && Unit
+                            .canConvert(rawUnits[0], CommonUnit
+                                .meterPerSecond) && Unit
+                                    .canConvert(rawUnits[1], CommonUnit
+                                        .meterPerSecond);
+                    for (int j = 0; j < values.length; j++) {
+                        // if not winds, don't process more than one param
+                        if ((j > 0) && !haveWinds) {
                             continue;
                         }
-                        Date date = Util.makeDate(new DateTime(times[0][i],
-                                        timeUnits[0]));
-                        if ((i == 0) || (valueArray[i] > max)) {
-                            max = valueArray[i];
+                        // only handle U & V
+                        if ((j > 1) && haveWinds) {
+                            break;
                         }
-                        if ((i == 0) || (valueArray[i] < min)) {
-                            min = valueArray[i];
+                        if (haveWinds) {
+                            canonical = (j == 0)
+                                        ? "U"
+                                        : "V";
                         }
-                        series.addOrUpdate(new Millisecond(date),
-                                           valueArray[i]);
+
+
+
+
+
+                        TimeSeries series = new TimeSeries(name,
+                                                Millisecond.class);
+
+                        //Set        timeSet   = field.getDomainSet();
+                        //Unit[]     timeUnits = timeSet.getSetUnits();
+                        //double[][] times     = timeSet.getDoubles();
+                        //double[][] values    = field.getValues(false);
+                        //if (values == null) {
+                        //    continue;
+                        //}
+                        double[] valueArray = values[j];
+                        Unit     rawUnit    = rawUnits[j];
+                        //ucar.visad.Util.getDefaultRangeUnits(field)[i];
+                        if ((lineState.unit != null) && (rawUnit != null)) {
+                            valueArray = lineState.unit.toThis(valueArray,
+                                    rawUnit);
+                        }
+                        int    numTimes = times[0].length;
+                        double
+                            min         = 0,
+                            max         = 0;
+                        for (int i = 0; i < numTimes; i++) {
+                            if (valueArray[i] != valueArray[i]) {
+                                continue;
+                            }
+                            Date date =
+                                Util.makeDate(new DateTime(times[0][i],
+                                    timeUnits[0]));
+                            if ((i == 0) || (valueArray[i] > max)) {
+                                max = valueArray[i];
+                            }
+                            if ((i == 0) || (valueArray[i] < min)) {
+                                min = valueArray[i];
+                            }
+                            series.addOrUpdate(new Millisecond(date),
+                                    valueArray[i]);
+                        }
+
+
+                        synchronized (MUTEX) {
+                            if (Misc.equals(canonical, "U")
+                                    || Misc.equals(canonical, "UREL")) {
+                                speedIdx       = paramIdx;
+                                speedMin       = min;
+                                speedMax       = max;
+                                speedUnit      = lineState.unit;
+                                speedSeries    = series;
+                                polarWind      = false;
+                                speedLineState = lineState;
+                                continue;
+                            }
+                            if (Misc.equals(canonical, "V")
+                                    || Misc.equals(canonical, "VREL")) {
+                                dirIdx       = paramIdx;
+                                dirSeries    = series;
+                                dirLineState = lineState;
+                                dirMin       = min;
+                                dirMax       = max;
+                                polarWind    = false;
+                                continue;
+                            }
+                        }
+
+                        addSeries(series, lineState, paramIdx, null, true);
+                        addRange(min, max,
+                                 "Data range from: " + lineState.getName());
                     }
-
-
-                    synchronized (MUTEX) {
-                        if (Misc.equals(canonical, "U")
-                                || Misc.equals(canonical, "UREL")) {
-                            speedIdx       = paramIdx;
-                            speedMin       = min;
-                            speedMax       = max;
-                            speedUnit      = lineState.unit;
-                            speedSeries    = series;
-                            polarWind      = false;
-                            speedLineState = lineState;
-                            continue;
-                        }
-                        if (Misc.equals(canonical, "V")
-                                || Misc.equals(canonical, "VREL")) {
-                            dirIdx       = paramIdx;
-                            dirSeries    = series;
-                            dirLineState = lineState;
-                            dirMin       = min;
-                            dirMax       = max;
-                            polarWind    = false;
-                            continue;
-                        }
-                    }
-
-                    addSeries(series, lineState, paramIdx, null, true);
-                    addRange(min, max,
-                             "Data range from: " + lineState.getName());
                 }
 
                 if ((speedSeries != null) && (dirSeries != null)) {

@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv.control.chart;
 
 
@@ -74,15 +75,35 @@ public class LineState {
     public static final int VPOS_NONE = 3;
 
 
+    /** horizontal position value */
+    public static final int HPOS_LEFT = 0;
+
+    /** horizontal position value */
+    public static final int HPOS_MIDDLE = 1;
+
+    /** horizontal position value */
+    public static final int HPOS_RIGHT = 2;
+
+    /** horizontal position value */
+    public static final int HPOS_NONE = 3;
+
+
 
     /** vertical positions */
     public static int[] VPOS_VALUES = { VPOS_TOP, VPOS_MIDDLE, VPOS_BOTTOM,
                                         VPOS_NONE };
 
-    /** vertical position labels */
+    /** horizontal position labels */
     public static String[] VPOS_LABELS = { "Top", "Middle", "Bottom",
                                            "None (Use data if possible)" };
 
+    /** horizontal positions */
+    public static int[] HPOS_VALUES = { HPOS_LEFT, HPOS_MIDDLE, HPOS_RIGHT,
+                                        HPOS_NONE };
+
+    /** vertical position labels */
+    public static String[] HPOS_LABELS = { "Left", "Middle", "Right",
+                                           "None (Use data if possible)" };
 
     /** line type */
     public static final int LINETYPE_SHAPES = 1;
@@ -248,6 +269,9 @@ public class LineState {
     JComboBox verticalPositionCbx;
 
     /** for gui */
+    JComboBox horizontalPositionCbx;
+
+    /** for gui */
     JRadioButton linearRangeBtn;
 
     /** for gui */
@@ -262,6 +286,7 @@ public class LineState {
     /** for gui */
     JComboBox chartNameBox;
 
+    /** _more_          */
     JTextField nameField;
 
     /** for gui */
@@ -288,8 +313,11 @@ public class LineState {
     /** line type */
     private int lineType = LINETYPE_LINES;
 
-    /** vert pos tyupe */
+    /** vert position */
     private int verticalPosition = VPOS_BOTTOM;
+
+    /** horizontal position */
+    private int horizontalPosition = HPOS_MIDDLE;
 
 
     /** the name of the chart we draw in */
@@ -298,7 +326,7 @@ public class LineState {
     /** my name */
     private String name;
 
-    /** _more_          */
+    /** _more_ */
     private String axisLabel;
 
     /** index */
@@ -307,7 +335,11 @@ public class LineState {
     /** display unit */
     protected Unit unit;
 
+    /** flag for visible in legend property */
     private boolean visibleInLegend = true;
+
+    /** flag for use vertical for positions */
+    private boolean useVertical = true;
 
     /**
      * Default ctor
@@ -423,10 +455,10 @@ public class LineState {
     }
 
 
-    /** _more_          */
+    /** _more_ */
     private List<DateTime> times;
 
-    /** _more_          */
+    /** _more_ */
     private List<Real> values;
 
     /**
@@ -481,10 +513,10 @@ public class LineState {
                     5)));
         } else {}
 
-        nameField = new JTextField(name,30);
+        nameField = new JTextField(name, 30);
         comps.add(GuiUtils.rLabel("Name:"));
         comps.add(GuiUtils.left(nameField));
-        
+
         if (chartNames != null) {
             chartNameBox = new JComboBox(new Vector(chartNames));
             if (chartName != null) {
@@ -581,10 +613,17 @@ public class LineState {
 
 
         if (full) {
-            comps.add(GuiUtils.rLabel("Vertical Position:"));
-            comps.add(GuiUtils.left(verticalPositionCbx =
-                GuiUtils.makeComboBox(VPOS_VALUES, VPOS_LABELS,
-                                      verticalPosition)));
+            if (getUseVertical()) {
+                comps.add(GuiUtils.rLabel("Vertical Position:"));
+                comps.add(GuiUtils.left(verticalPositionCbx =
+                    GuiUtils.makeComboBox(VPOS_VALUES, VPOS_LABELS,
+                                          verticalPosition)));
+            } else {
+                comps.add(GuiUtils.rLabel("Horizontal Position:"));
+                comps.add(GuiUtils.left(horizontalPositionCbx =
+                    GuiUtils.makeComboBox(HPOS_VALUES, HPOS_LABELS,
+                                          horizontalPosition)));
+            }
         }
 
 
@@ -639,6 +678,10 @@ public class LineState {
         }
         if (verticalPositionCbx != null) {
             verticalPosition = GuiUtils.getValueFromBox(verticalPositionCbx);
+        }
+        if (horizontalPositionCbx != null) {
+            horizontalPosition =
+                GuiUtils.getValueFromBox(horizontalPositionCbx);
         }
         if (shapeBox != null) {
             shape = GuiUtils.getValueFromBox(shapeBox);
@@ -997,8 +1040,15 @@ public class LineState {
         return chartName;
     }
 
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
     public void setNameIfNeeded(String value) {
-        if(name==null || name.length() == 0) setName(value);
+        if ((name == null) || (name.length() == 0)) {
+            setName(value);
+        }
     }
 
     /**
@@ -1036,6 +1086,24 @@ public class LineState {
      */
     public int getVerticalPosition() {
         return verticalPosition;
+    }
+
+    /**
+     * Set the HorizontalPosition property.
+     *
+     * @param value The new value for HorizontalPosition
+     */
+    public void setHorizontalPosition(int value) {
+        horizontalPosition = value;
+    }
+
+    /**
+     * Get the HorizontalPosition property.
+     *
+     * @return The HorizontalPosition
+     */
+    public int getHorizontalPosition() {
+        return horizontalPosition;
     }
 
     /**
@@ -1112,21 +1180,39 @@ public class LineState {
 
 
     /**
-       Set the VisibleInLegend property.
-
-       @param value The new value for VisibleInLegend
-    **/
-    public void setVisibleInLegend (boolean value) {
-	visibleInLegend = value;
+     *  Set the VisibleInLegend property.
+     *
+     *  @param value The new value for VisibleInLegend
+     */
+    public void setVisibleInLegend(boolean value) {
+        visibleInLegend = value;
     }
 
     /**
-       Get the VisibleInLegend property.
+     *  Get the VisibleInLegend property.
+     *
+     *  @return The VisibleInLegend
+     */
+    public boolean getVisibleInLegend() {
+        return visibleInLegend;
+    }
 
-       @return The VisibleInLegend
-    **/
-    public boolean getVisibleInLegend () {
-	return visibleInLegend;
+    /**
+     *  Set the UseVertical property.
+     *
+     *  @param value The new value for UseVertical
+     */
+    public void setUseVertical(boolean value) {
+        useVertical = value;
+    }
+
+    /**
+     *  Get the UseVertical property.
+     *
+     *  @return The UseVertical
+     */
+    public boolean getUseVertical() {
+        return useVertical;
     }
 
 

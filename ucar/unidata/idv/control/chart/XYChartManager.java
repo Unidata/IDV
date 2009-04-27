@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control.chart;
 
 
@@ -816,6 +817,7 @@ public abstract class XYChartManager extends ChartManager {
             int midW   = left + (right - left) / 2;
             int mid    = top + (bottom - top) / 2;
             int vAnchor;
+            int hAnchor;
             int w      = 20;
             int w2     = w / 2;
             int wiggle = 15;
@@ -826,7 +828,17 @@ public abstract class XYChartManager extends ChartManager {
                 double y = dataset.getXValue(series, item);
                 //xPos = (int) rangeAxis.valueToJava2D(x, dataArea,
                 //             plot.getRangeAxisEdge());
-                xPos = midW;
+                int horizontalPosition = lineState.getHorizontalPosition();
+                if (horizontalPosition == LineState.HPOS_LEFT) {
+                    hAnchor = left + wiggle;
+                } else if (horizontalPosition == LineState.HPOS_MIDDLE) {
+                    hAnchor = midW;
+                } else if (horizontalPosition == LineState.HPOS_RIGHT) {
+                    hAnchor = right - wiggle;
+                } else {
+                    hAnchor = midW;
+                }
+                xPos = hAnchor;
                 yPos = (int) domainAxis.valueToJava2D(y, dataArea,
                         plot.getDomainAxisEdge());
 

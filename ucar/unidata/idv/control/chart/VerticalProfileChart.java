@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control.chart;
 
 
@@ -277,6 +278,7 @@ public class VerticalProfileChart extends XYChartManager {
                     VerticalProfileInfo vpInfo =
                         (VerticalProfileInfo) profiles.get(paramIdx);
                     LineState lineState = vpInfo.getLineState();
+                    lineState.setUseVertical(false);
                     addLineState(lineState);
                     lineState.setName(
                         vpInfo.getDataInstance().getParamName());
@@ -298,54 +300,81 @@ public class VerticalProfileChart extends XYChartManager {
                     }
                     String canonical =
                         DataAlias.aliasToCanonical(lineState.getName());
-                    XYSeries series = new XYSeries(lineState.getName());
                     float[] alts =
                         oneTime.getDomainSet().getSamples(false)[0];
-                    float[] vals = oneTime.getFloats(true)[0];
-                    Unit rawUnit =
-                        ucar.visad.Util.getDefaultRangeUnits(oneTime)[0];
-                    if ((lineState.unit != null)
-                            && Unit.canConvert(lineState.unit, rawUnit)) {
-                        vals = lineState.unit.toThis(vals, rawUnit);
-                    }
-                    for (int i = 0; i < alts.length; i++) {
-                        series.add(alts[i], vals[i]);
-                    }
-                    if (series != null) {
-                        synchronized (MUTEX) {
-                            XYItemRenderer renderer = null;
-                            if (Misc.equals(canonical, "SPEED")) {
-                                speedUnit      = lineState.unit;
-                                speedSeries    = series;
-                                speedLineState = lineState;
-                                continue;
-                            }
-                            if (Misc.equals(canonical, "DIR")) {
-                                dirSeries    = series;
-                                dirLineState = lineState;
-                                continue;
-                            }
-                            if (Misc.equals(canonical, "U")
-                                    || Misc.equals(canonical, "UREL")) {
-                                speedUnit      = lineState.unit;
-                                speedSeries    = series;
-                                polarWind      = false;
-                                speedLineState = lineState;
-                                continue;
-                            }
-                            if (Misc.equals(canonical, "V")
-                                    || Misc.equals(canonical, "UREL")) {
-                                dirSeries    = series;
-                                dirLineState = lineState;
-                                polarWind    = false;
-                                continue;
-                            }
-                            addSeries(series, lineState, lineIdx, renderer,
-                                      true);
+                    float[][] values = oneTime.getFloats(true);
+                    Unit[] rawUnits =
+                        ucar.visad.Util.getDefaultRangeUnits(oneTime);
+                    boolean haveWinds =
+                        (values.length > 1) && Unit
+                            .canConvert(rawUnits[0], CommonUnit
+                                .meterPerSecond) && Unit
+                                    .canConvert(rawUnits[1], CommonUnit
+                                        .meterPerSecond);
+                    for (int j = 0; j < values.length; j++) {
+                        // if not winds, don't process more than one param
+                        if ((j > 0) && !haveWinds) {
+                            continue;
                         }
-                        lineIdx++;
+                        // only handle U & V
+                        if ((j > 1) && haveWinds) {
+                            break;
+                        }
+                        if (haveWinds) {
+                            canonical = (j == 0)
+                                        ? "U"
+                                        : "V";
+                        }
+                        XYSeries series = new XYSeries(lineState.getName());
+
+
+                        //float[] vals = oneTime.getFloats(true)[0];
+                        float[] vals    = values[j];
+                        Unit    rawUnit = rawUnits[j];
+                        //ucar.visad.Util.getDefaultRangeUnits(oneTime)[0];
+                        if ((lineState.unit != null)
+                                && Unit.canConvert(lineState.unit, rawUnit)) {
+                            vals = lineState.unit.toThis(vals, rawUnit);
+                        }
+                        for (int i = 0; i < alts.length; i++) {
+                            series.add(alts[i], vals[i]);
+                        }
+                        if (series != null) {
+                            synchronized (MUTEX) {
+                                XYItemRenderer renderer = null;
+                                if (Misc.equals(canonical, "SPEED")) {
+                                    speedUnit      = lineState.unit;
+                                    speedSeries    = series;
+                                    speedLineState = lineState;
+                                    continue;
+                                }
+                                if (Misc.equals(canonical, "DIR")) {
+                                    dirSeries    = series;
+                                    dirLineState = lineState;
+                                    continue;
+                                }
+                                if (Misc.equals(canonical, "U")
+                                        || Misc.equals(canonical, "UREL")) {
+                                    speedUnit      = lineState.unit;
+                                    speedSeries    = series;
+                                    polarWind      = false;
+                                    speedLineState = lineState;
+                                    continue;
+                                }
+                                if (Misc.equals(canonical, "V")
+                                        || Misc.equals(canonical, "VREL")) {
+                                    dirSeries    = series;
+                                    dirLineState = lineState;
+                                    polarWind    = false;
+                                    continue;
+                                }
+                                addSeries(series, lineState, lineIdx,
+                                          renderer, true);
+                            }
+                            lineIdx++;
+                        }
+                        //addSeries(series, lineState, paramIdx, null, true);
                     }
-                    //addSeries(series, lineState, paramIdx, null, true);
                 }
                 if ((speedSeries != null) && (dirSeries != null)) {
                     XYItemRenderer renderer =
