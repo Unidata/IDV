@@ -770,7 +770,7 @@ public abstract class XmlUtil {
      */
     public static void setAttributes(Element node, String[] attrs) {
         for (int i = 0; i < attrs.length; i += 2) {
-            node.setAttribute(attrs[i], attrs[i + 1]);
+            node.setAttribute(attrs[i], encodeString(attrs[i + 1]));
         }
     }
 
@@ -1807,7 +1807,7 @@ public abstract class XmlUtil {
               if (nnm != null) {
                   for (int i = 0; i < nnm.getLength(); i++) {
                       Attr attr = (Attr) nnm.item(i);
-                      if (prettifyAttrs && (nnm.getLength() > 1)) {
+                      if (prettifyAttrs && (nnm.getLength() > 2)) {
                           xml.append("\n");
                           xml.append(attrTab);
                       }
