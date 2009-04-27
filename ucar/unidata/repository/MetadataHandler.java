@@ -19,6 +19,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -85,15 +86,22 @@ public class MetadataHandler extends RepositoryManager {
 
 
     /** _more_ */
-    protected Hashtable<String,MetadataType> typeMap = new Hashtable<String,MetadataType>();
+    protected Hashtable<String, MetadataType> typeMap = new Hashtable<String,
+                                                            MetadataType>();
 
 
+    /** _more_          */
     private List<MetadataType> metadataTypes = new ArrayList<MetadataType>();
 
     /** _more_ */
     boolean forUser = true;
 
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     */
     public MetadataHandler(Repository repository) {
         super(repository);
     }
@@ -112,6 +120,11 @@ public class MetadataHandler extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     */
     public void addMetadataType(MetadataType type) {
         type.setHandler(this);
         metadataTypes.add(type);
@@ -148,7 +161,10 @@ public class MetadataHandler extends RepositoryManager {
                                              ATTR_ATTR4, ""));
 
         MetadataType metadataType = findType(type);
-        if(!metadataType.processMetadataXml(entry, node, metadata, fileMap, internal)) return;
+        if ( !metadataType.processMetadataXml(entry, node, metadata, fileMap,
+                internal)) {
+            return;
+        }
         entry.addMetadata(metadata);
     }
 
@@ -182,7 +198,7 @@ public class MetadataHandler extends RepositoryManager {
                               Metadata metadata, boolean forLink)
             throws Exception {
         MetadataType type = getType(metadata.getType());
-        type.decorateEntry(request, entry, sb,metadata,forLink);
+        type.decorateEntry(request, entry, sb, metadata, forLink);
     }
 
 
@@ -197,7 +213,8 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public Result xxxprocessView(Request request, Entry entry, Metadata metadata)
+    public Result xxxprocessView(Request request, Entry entry,
+                                 Metadata metadata)
             throws Exception {
         return new Result("", "Cannot process view");
     }
@@ -310,7 +327,7 @@ public class MetadataHandler extends RepositoryManager {
      * @return _more_
      */
     public MetadataType getType(String type) {
-        return  typeMap.get(type);
+        return typeMap.get(type);
     }
 
 
@@ -412,9 +429,11 @@ public class MetadataHandler extends RepositoryManager {
      * @return _more_
      */
     public String[] getHtml(Request request, Entry entry, Metadata metadata) {
-        MetadataType type    = getType(metadata.getType());
-        if(type == null || !type.hasElements()) return null;
-        return type.getHtml(this, request,entry, metadata);
+        MetadataType type = getType(metadata.getType());
+        if ((type == null) || !type.hasElements()) {
+            return null;
+        }
+        return type.getHtml(this, request, entry, metadata);
     }
 
     /**
@@ -433,9 +452,11 @@ public class MetadataHandler extends RepositoryManager {
     public String[] getForm(Request request, Entry entry, Metadata metadata,
                             boolean forEdit)
             throws Exception {
-        MetadataType type    = getType(metadata.getType());
-        if(type == null || !type.hasElements()) return null;
-        return type.getForm(this, request,entry, metadata,forEdit);
+        MetadataType type = getType(metadata.getType());
+        if ((type == null) || !type.hasElements()) {
+            return null;
+        }
+        return type.getForm(this, request, entry, metadata, forEdit);
     }
 
 
@@ -466,7 +487,7 @@ public class MetadataHandler extends RepositoryManager {
      */
     public String getSearchUrl(Request request, Metadata metadata) {
         MetadataType type = findType(metadata.getType());
-        List          args = new ArrayList();
+        List         args = new ArrayList();
         args.add(ARG_METADATA_TYPE + "." + type.getType());
         args.add(type.toString());
         args.add(ARG_METADATA_ATTR1 + "." + type.getType());
@@ -526,6 +547,15 @@ public class MetadataHandler extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     * @param type _more_
+     *
+     * @throws Exception _more_
+     */
     public void addToSearchForm(Request request, StringBuffer sb,
                                 MetadataType type)
             throws Exception {
@@ -593,10 +623,10 @@ public class MetadataHandler extends RepositoryManager {
         int rowNum = 1;
         for (int i = 0; i < values.length; i++) {
             String browseUrl = HtmlUtil.url(url,
-                                            ARG_METADATA_TYPE + "." + type.getType(),
-                                            type.getType(),
-                                            ARG_METADATA_ATTR1 + "." + type.getType(),
-                                            values[i]);
+                                            ARG_METADATA_TYPE + "."
+                                            + type.getType(), type.getType(),
+                                                ARG_METADATA_ATTR1 + "."
+                                                + type.getType(), values[i]);
             String value = values[i].trim();
             if (value.length() == 0) {
                 value = "-blank-";
@@ -710,13 +740,15 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @param request _more_
      * @param entry _more_
+     * @param existingMetadata _more_
      * @param metadataList _more_
      *
      * @throws Exception _more_
      */
-    public void handleFormSubmit(Request request, Entry entry,
-                                 Hashtable<String,Metadata> existingMetadata,
-                                 List<Metadata> metadataList)
+    public void handleFormSubmit(
+            Request request, Entry entry,
+            Hashtable<String, Metadata> existingMetadata,
+            List<Metadata> metadataList)
             throws Exception {
         Hashtable args = request.getArgs();
         for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
@@ -726,7 +758,8 @@ public class MetadataHandler extends RepositoryManager {
             }
             String id     = request.getString(arg, "");
             String suffix = "." + id;
-            handleForm(request, entry, id, suffix, existingMetadata, metadataList, false);
+            handleForm(request, entry, id, suffix, existingMetadata,
+                       metadataList, false);
         }
     }
 
@@ -738,15 +771,16 @@ public class MetadataHandler extends RepositoryManager {
      * @param entry _more_
      * @param id _more_
      * @param suffix _more_
+     * @param existingMetadata _more_
      * @param metadataList _more_
      * @param newMetadata _more_
      *
      * @throws Exception _more_
      */
     public void handleForm(Request request, Entry entry, String id,
-                           String suffix, Hashtable<String,Metadata> existingMetadata,
-                           List<Metadata> metadataList,
-                           boolean newMetadata)
+                           String suffix,
+                           Hashtable<String, Metadata> existingMetadata,
+                           List<Metadata> metadataList, boolean newMetadata)
             throws Exception {
         String type = request.getString(ARG_TYPE + suffix, "");
         if ( !canHandle(type)) {
@@ -777,7 +811,11 @@ public class MetadataHandler extends RepositoryManager {
                                          attr4, newMetadata);
         if (metadata != null) {
             MetadataType metadataType = getType(metadata.getType());
-            metadataType.handleForm(request, entry, metadata, suffix,(existingMetadata==null?null:existingMetadata.get(id)),newMetadata);
+            metadataType.handleForm(request, entry, metadata, suffix,
+                                    ((existingMetadata == null)
+                                     ? null
+                                     : existingMetadata.get(
+                                         id)), newMetadata);
             metadataList.add(metadata);
         }
     }

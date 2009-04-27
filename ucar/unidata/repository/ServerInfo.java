@@ -24,6 +24,7 @@ package ucar.unidata.repository;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.xml.XmlUtil;
 
+import java.net.URL;
 import org.w3c.dom.*;
 
 /**
@@ -41,6 +42,14 @@ public class ServerInfo implements Constants {
     private String title;
     private String description;
 
+
+    public ServerInfo(URL url, String title, String description) {
+        this.hostname=url.getHost();
+        this.port=url.getPort();
+        this.basePath=url.getPath();
+        this.title=title;
+        this.description=description;
+    }
 
     public ServerInfo(String hostname,
                       int port,

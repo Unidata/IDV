@@ -19,6 +19,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -54,21 +55,29 @@ public class AdminMetadataHandler extends MetadataHandler {
 
 
     /** _more_ */
-    public static final String  TYPE_TEMPLATE ="admin.template";
+    public static final String TYPE_TEMPLATE = "admin.template";
 
     /** _more_ */
-    public static final String  TYPE_CONTENTTEMPLATE ="admin.contenttemplate";
+    public static final String TYPE_CONTENTTEMPLATE = "admin.contenttemplate";
 
     /** _more_ */
-    public static final String  TYPE_LOCALFILE_PATTERN ="admin.localfile.pattern";
+    public static final String TYPE_LOCALFILE_PATTERN =
+        "admin.localfile.pattern";
 
     /** _more_ */
-    public static final String TYPE_ANONYMOUS_UPLOAD ="admin.anonymousupload";
+    public static final String TYPE_ANONYMOUS_UPLOAD =
+        "admin.anonymousupload";
 
 
 
-    public AdminMetadataHandler(Repository repository)
-            throws Exception {
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     *
+     * @throws Exception _more_
+     */
+    public AdminMetadataHandler(Repository repository) throws Exception {
         super(repository);
     }
 
@@ -86,11 +95,15 @@ public class AdminMetadataHandler extends MetadataHandler {
      * @return _more_
      */
     public String[] getHtml(Request request, Entry entry, Metadata metadata) {
-        String[]result = super.getHtml(request, entry, metadata);
-        if(result!=null) return result;
+        String[] result = super.getHtml(request, entry, metadata);
+        if (result != null) {
+            return result;
+        }
         MetadataType type = findType(metadata.getType());
-        if(type == null) return null;
-        String        lbl  = msgLabel(type.getLabel());
+        if (type == null) {
+            return null;
+        }
+        String lbl = msgLabel(type.getLabel());
         if (type.isType(TYPE_TEMPLATE) || type.isType(TYPE_CONTENTTEMPLATE)) {
             return new String[] { lbl, "Has template" };
         }
@@ -124,10 +137,10 @@ public class AdminMetadataHandler extends MetadataHandler {
     public String[] getForm(Request request, Entry entry, Metadata metadata,
                             boolean forEdit)
             throws Exception {
-        MetadataType type = findType(metadata.getType());
-        String        lbl    = msgLabel(type.getLabel());
-        String        id     = metadata.getId();
-        String        suffix = "";
+        MetadataType type   = findType(metadata.getType());
+        String       lbl    = msgLabel(type.getLabel());
+        String       id     = metadata.getId();
+        String       suffix = "";
         if (id.length() > 0) {
             suffix = "." + id;
         }

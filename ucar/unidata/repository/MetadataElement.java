@@ -21,6 +21,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -43,9 +44,17 @@ public class MetadataElement implements Constants {
 
     /** _more_ */
     public static final String TYPE_SKIP = "skip";
+
+    /** _more_          */
     public static final String TYPE_STRING = "string";
+
+    /** _more_          */
     public static final String TYPE_URL = "url";
+
+    /** _more_          */
     public static final String TYPE_EMAIL = "email";
+
+    /** _more_          */
     public static final String TYPE_FILE = "file";
 
     /** _more_ */
@@ -69,80 +78,111 @@ public class MetadataElement implements Constants {
     /** _more_ */
     private List values;
 
-    /** _more_          */
+    /** _more_ */
     private String dflt = "";
 
+    /** _more_          */
     private boolean thumbnail = false;
 
+    /** _more_          */
     private int index;
 
-    private MetadataType metadataType; 
+    /** _more_          */
+    private MetadataType metadataType;
 
 
     /**
      * _more_
      *
+     *
+     * @param metadataType _more_
+     * @param index _more_
      * @param type _more_
      * @param label _more_
      * @param rows _more_
      * @param columns _more_
      * @param values _more_
      */
-    public MetadataElement(MetadataType metadataType, int index, String type, String label, int rows, int columns,
+    public MetadataElement(MetadataType metadataType, int index, String type,
+                           String label, int rows, int columns,
                            List<Object> values) {
         this.metadataType = metadataType;
-        this.index = index;
-        this.type    = type;
-        this.label   = label;
-        this.rows    = rows;
-        this.columns = columns;
-        this.values  = values;
+        this.index        = index;
+        this.type         = type;
+        this.label        = label;
+        this.rows         = rows;
+        this.columns      = columns;
+        this.values       = values;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     *
+     * @return _more_
+     */
     private boolean isString(String type) {
-        return type.equals(TYPE_STRING) || type.equals(TYPE_EMAIL)|| type.equals(TYPE_URL);
+        return type.equals(TYPE_STRING) || type.equals(TYPE_EMAIL)
+               || type.equals(TYPE_URL);
     }
 
 
-    public void getHtml(MetadataHandler handler, StringBuffer sb, String value) {
-        if(type.equals(TYPE_SKIP)) {
-            return;
+    /**
+     * _more_
+     *
+     * @param handler _more_
+     * @param sb _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
+    public boolean getHtml(MetadataHandler handler, StringBuffer sb,
+                           String value) {
+        if (type.equals(TYPE_SKIP)) {
+            return false;
         }
-        if(type.equals(TYPE_FILE)) {
-            return;
-        } 
-        if(type.equals(TYPE_EMAIL)) {
-            sb.append(HtmlUtil.href("mailto:"+value,value));
-        } else if(type.equals(TYPE_URL)) {
-            sb.append(HtmlUtil.href(value,value));
-            } else {
+        if (type.equals(TYPE_FILE)) {
+            return false;
+        }
+        if (type.equals(TYPE_EMAIL)) {
+            sb.append(HtmlUtil.href("mailto:" + value, value));
+        } else if (type.equals(TYPE_URL)) {
+            sb.append(HtmlUtil.href(value, value));
+        } else {
             sb.append(value);
-        } 
+        }
         sb.append(HtmlUtil.br());
+        return true;
     }
 
     /**
      * _more_
      *
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param metadata _more_
      * @param arg _more_
      * @param value _more_
+     * @param forEdit _more_
      *
      * @return _more_
      */
-    public String getForm(Request request, Entry entry, Metadata metadata, String arg, String value,boolean forEdit) {
-        if(type.equals(TYPE_SKIP)) {
+    public String getForm(Request request, Entry entry, Metadata metadata,
+                          String arg, String value, boolean forEdit) {
+        if (type.equals(TYPE_SKIP)) {
             return "";
         }
 
-        value = ((value == null || value.length()==0)
+        value = (((value == null) || (value.length() == 0))
                  ? dflt
                  : value);
         if (isString(type)) {
-            if(rows>1) {
-            return HtmlUtil.textArea(arg, value,
-                                     rows,columns);
-            } 
+            if (rows > 1) {
+                return HtmlUtil.textArea(arg, value, rows, columns);
+            }
 
             return HtmlUtil.input(arg, value,
                                   HtmlUtil.attr(HtmlUtil.ATTR_SIZE,
@@ -151,18 +191,19 @@ public class MetadataElement implements Constants {
             return HtmlUtil.checkbox(arg, "true", Misc.equals(value, "true"));
         } else if (type.equals(TYPE_ENUMERATION)) {
             return HtmlUtil.select(arg, values, value);
-        } else if(type.equals(TYPE_FILE)) {
+        } else if (type.equals(TYPE_FILE)) {
             String image = (forEdit
-                            ? metadataType.getFileHtml(request, entry, metadata, this, false)
+                            ? metadataType.getFileHtml(request, entry,
+                                metadata, this, false)
                             : "");
             if (image == null) {
                 image = "";
             } else {
                 image = "<br>" + image;
             }
-            return  HtmlUtil.fileInput(arg, HtmlUtil.SIZE_70) + image+"<br>"  +
-                "Or download URL:" +
-                HtmlUtil.input(arg+".url", "", HtmlUtil.SIZE_70);
+            return HtmlUtil.fileInput(arg, HtmlUtil.SIZE_70) + image + "<br>"
+                   + "Or download URL:"
+                   + HtmlUtil.input(arg + ".url", "", HtmlUtil.SIZE_70);
         } else {
             return null;
         }
@@ -279,41 +320,41 @@ public class MetadataElement implements Constants {
         return dflt;
     }
 
-/**
-Set the Thumbnail property.
+    /**
+     * Set the Thumbnail property.
+     *
+     * @param value The new value for Thumbnail
+     */
+    public void setThumbnail(boolean value) {
+        this.thumbnail = value;
+    }
 
-@param value The new value for Thumbnail
-**/
-public void setThumbnail (boolean value) {
-	this.thumbnail = value;
-}
+    /**
+     * Get the Thumbnail property.
+     *
+     * @return The Thumbnail
+     */
+    public boolean getThumbnail() {
+        return this.thumbnail;
+    }
 
-/**
-Get the Thumbnail property.
+    /**
+     * Set the Index property.
+     *
+     * @param value The new value for Index
+     */
+    public void setIndex(int value) {
+        this.index = value;
+    }
 
-@return The Thumbnail
-**/
-public boolean getThumbnail () {
-	return this.thumbnail;
-}
-
-/**
-Set the Index property.
-
-@param value The new value for Index
-**/
-public void setIndex (int value) {
-	this.index = value;
-}
-
-/**
-Get the Index property.
-
-@return The Index
-**/
-public int getIndex () {
-	return this.index;
-}
+    /**
+     * Get the Index property.
+     *
+     * @return The Index
+     */
+    public int getIndex() {
+        return this.index;
+    }
 
 
 }

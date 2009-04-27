@@ -109,7 +109,7 @@
          label="Value"
          rows="6"
          type="string"/>
-      <catalogtemplate><![CDATA[<documentation type="${attr2}">${attr1.cdata}</documentation>]]></catalogtemplate>
+      <catalogtemplate><![CDATA[<documentation type="${attr1}">${attr2.cdata}</documentation>]]></catalogtemplate>
     </type>
     <type name="Dataformat" type="thredds.dataFormat">
       <element label="Value" type="string"/>

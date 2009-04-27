@@ -19,6 +19,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -154,8 +155,9 @@ public class Metadata implements Constants {
      * @param attr3 _more_
      * @param attr4 _more_
      */
-    public Metadata(String id, String entryId, MetadataType type, boolean inherited,
-                    String attr1, String attr2, String attr3, String attr4) {
+    public Metadata(String id, String entryId, MetadataType type,
+                    boolean inherited, String attr1, String attr2,
+                    String attr3, String attr4) {
         this(id, entryId, type.getType(), inherited, attr1, attr2, attr3,
              attr4);
     }
@@ -265,7 +267,13 @@ public class Metadata implements Constants {
 
 
 
-    public void setAttr(int idx,String value) {
+    /**
+     * _more_
+     *
+     * @param idx _more_
+     * @param value _more_
+     */
+    public void setAttr(int idx, String value) {
         if (idx == 1) {
             attr1 = value;
         }
@@ -276,7 +284,7 @@ public class Metadata implements Constants {
             attr3 = value;
         }
         if (idx == 4) {
-            attr4= value;
+            attr4 = value;
         }
     }
 

@@ -813,6 +813,28 @@ public class Tables {
     ;
 
 
+public static class SERVERREGISTRY {
+public static final String NAME = "serverregistry";
+public static final String COL_URL = NAME + ".url";
+public static final String COL_TITLE = NAME + ".title";
+public static final String COL_DESCRIPTION = NAME + ".description";
+public static final String []ARRAY= new String[] {
+COL_URL,COL_TITLE,COL_DESCRIPTION
+};
+
+
+public static final String COLUMNS = SqlUtil.comma(ARRAY);
+public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
+public static final String INSERT=
+SqlUtil.makeInsert(
+NAME,
+NODOT_COLUMNS,
+SqlUtil.getQuestionMarks(ARRAY.length));
+
+};
+
+
+
 
 
 }

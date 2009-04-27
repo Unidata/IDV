@@ -19,6 +19,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -31,8 +32,14 @@ package ucar.unidata.repository;
  */
 public class EnumeratedMetadataHandler extends MetadataHandler {
 
-    public EnumeratedMetadataHandler(Repository repository)
-            throws Exception {
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     *
+     * @throws Exception _more_
+     */
+    public EnumeratedMetadataHandler(Repository repository) throws Exception {
         super(repository);
     }
 

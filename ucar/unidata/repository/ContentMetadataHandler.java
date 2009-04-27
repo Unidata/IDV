@@ -20,6 +20,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -69,20 +70,26 @@ public class ContentMetadataHandler extends MetadataHandler {
 
 
     /** _more_ */
-    public static final String  TYPE_THUMBNAIL ="content.thumbnail";
+    public static final String TYPE_THUMBNAIL = "content.thumbnail";
 
     /** _more_ */
-    public static final String  TYPE_ATTACHMENT = "content.attachment";
+    public static final String TYPE_ATTACHMENT = "content.attachment";
 
     /** _more_ */
-    public static final String TYPE_CONTACT ="content.contact";
+    public static final String TYPE_CONTACT = "content.contact";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_SORT = "content.sort";
 
 
-    public ContentMetadataHandler(Repository repository)
-            throws Exception {
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     *
+     * @throws Exception _more_
+     */
+    public ContentMetadataHandler(Repository repository) throws Exception {
         super(repository);
     }
 

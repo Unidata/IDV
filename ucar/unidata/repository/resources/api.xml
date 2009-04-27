@@ -66,6 +66,13 @@
   </group>
 
 
+  <group handler="registrymanager">
+      <api request="/registry/add"       method="processRegistryAdd"/>
+      <api request="/registry/info"      method="processRegistryInfo"/>
+      <api request="/registry/list"      method="processRegistryList" toplevel="true" name="Repositories"/>
+  </group>
+
+
   <group handler="metadatamanager">
       <api request="/metadata/list"       method="processMetadataList"/>
       <api request="/metadata/view/*"       method="processMetadataView"/>

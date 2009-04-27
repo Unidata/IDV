@@ -932,6 +932,9 @@ public class Admin extends RepositoryManager {
 
 
 
+        getRepository().getRegistryManager().addAdminConfig(request, csb);
+
+
         csb.append(HtmlUtil.formTableClose());
 
 
@@ -1261,6 +1264,9 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminSettingsDo(Request request) throws Exception {
+
+        getRepository().getRegistryManager().applyAdminConfig(request);
+
 
         getRepository().writeGlobal(request,PROP_ADMIN_EMAIL);
         getRepository().writeGlobal(request,PROP_ADMIN_SMTP);

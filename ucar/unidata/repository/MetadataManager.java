@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -136,15 +137,20 @@ public class MetadataManager extends RepositoryManager {
     protected Hashtable distinctMap = new Hashtable();
 
     /** _more_ */
-    private List<MetadataHandler> metadataHandlers =   new ArrayList<MetadataHandler>();
+    private List<MetadataHandler> metadataHandlers =
+        new ArrayList<MetadataHandler>();
 
-    private Hashtable<Class,MetadataHandler> metadataHandlerMap  = new Hashtable<Class,MetadataHandler>();
+    /** _more_          */
+    private Hashtable<Class, MetadataHandler> metadataHandlerMap =
+        new Hashtable<Class, MetadataHandler>();
 
 
     /** _more_ */
-    protected Hashtable<String,MetadataType> typeMap = new Hashtable<String,MetadataType>();
+    protected Hashtable<String, MetadataType> typeMap = new Hashtable<String,
+                                                            MetadataType>();
 
 
+    /** _more_          */
     private List<MetadataType> metadataTypes = new ArrayList<MetadataType>();
 
 
@@ -167,10 +173,22 @@ public class MetadataManager extends RepositoryManager {
     MetadataHandler dfltMetadataHandler;
 
 
+    /**
+     * _more_
+     *
+     * @param stringType _more_
+     *
+     * @return _more_
+     */
     public MetadataType findType(String stringType) {
         return typeMap.get(stringType);
     }
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     */
     public void addMetadataType(MetadataType type) {
         metadataTypes.add(type);
         typeMap.put(type.getType(), type);
@@ -209,25 +227,28 @@ public class MetadataManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public List<Metadata> findMetadata(Entry entry, String type,
-                                 boolean checkInherited)
+                                       boolean checkInherited)
             throws Exception {
         if (entry == null) {
             return null;
         }
-        List<Metadata> result= new ArrayList<Metadata>();
+        List<Metadata> result = new ArrayList<Metadata>();
         for (Metadata metadata : getMetadata(entry)) {
             if (metadata.getType().equals(type)) {
                 result.add(metadata);
             }
         }
         if (checkInherited) {
-            List<Metadata> fromParent =  findMetadata(getEntryManager().getParent(null, entry),
-                                                  type, checkInherited);
-            if(fromParent!=null) {
+            List<Metadata> fromParent =
+                findMetadata(getEntryManager().getParent(null, entry), type,
+                             checkInherited);
+            if (fromParent != null) {
                 result.addAll(fromParent);
             }
         }
-        if(result.size()==0) return null;
+        if (result.size() == 0) {
+            return null;
+        }
         return result;
     }
 
@@ -408,21 +429,31 @@ public class MetadataManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param c _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public MetadataHandler getHandler(Class c) throws Exception {
         MetadataHandler handler = metadataHandlerMap.get(c);
-        if(handler==null) {
+        if (handler == null) {
             Constructor ctor = Misc.findConstructor(c,
-                                                    new Class[] { Repository.class});
+                                   new Class[] { Repository.class });
             if (ctor == null) {
                 throw new IllegalStateException(
-                                                "Could not find constructor for MetadataHandler:"
-                                                + c.getName());
+                    "Could not find constructor for MetadataHandler:"
+                    + c.getName());
             }
-            
-            handler =  (MetadataHandler) ctor.newInstance(new Object[] { getRepository()});
-            
+
+            handler = (MetadataHandler) ctor.newInstance(new Object[] {
+                getRepository() });
+
             metadataHandlers.add(handler);
-            metadataHandlerMap.put(c,handler);
+            metadataHandlerMap.put(c, handler);
         }
         return handler;
     }
@@ -436,7 +467,7 @@ public class MetadataManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected void initMetadataHandlers(List<String> metadataDefFiles)
-        throws Exception {
+            throws Exception {
         for (String file : metadataDefFiles) {
             try {
                 file = getStorageManager().localizePath(file);
@@ -446,8 +477,7 @@ public class MetadataManager extends RepositoryManager {
                 }
                 MetadataType.parse(root, this);
             } catch (Exception exc) {
-                logError(
-                    "Error loading metadata handler file:" + file, exc);
+                logError("Error loading metadata handler file:" + file, exc);
                 throw exc;
             }
 
@@ -468,8 +498,10 @@ public class MetadataManager extends RepositoryManager {
      */
     public StringBuffer addToSearchForm(Request request, StringBuffer sb)
             throws Exception {
-        for (MetadataType type: metadataTypes) {
-            if(!type.getSearchable()) continue;
+        for (MetadataType type : metadataTypes) {
+            if ( !type.getSearchable()) {
+                continue;
+            }
             type.getHandler().addToSearchForm(request, sb, type);
         }
         return sb;
@@ -489,8 +521,10 @@ public class MetadataManager extends RepositoryManager {
     public StringBuffer addToBrowseSearchForm(Request request,
             StringBuffer sb)
             throws Exception {
-        for (MetadataType type: metadataTypes) {
-            if(!type.getBrowsable()) continue;
+        for (MetadataType type : metadataTypes) {
+            if ( !type.getBrowsable()) {
+                continue;
+            }
             type.getHandler().addToBrowseSearchForm(request, sb, type);
         }
         return sb;
@@ -553,7 +587,7 @@ public class MetadataManager extends RepositoryManager {
 
             if (request.exists(ARG_METADATA_DELETE)) {
                 Hashtable args = request.getArgs();
-                 for (Enumeration keys =
+                for (Enumeration keys =
                         args.keys(); keys.hasMoreElements(); ) {
                     String arg = (String) keys.nextElement();
                     if ( !arg.startsWith(ARG_METADATA_ID + SUFFIX_SELECT)) {
@@ -564,15 +598,17 @@ public class MetadataManager extends RepositoryManager {
                                       request.getString(arg, BLANK)));
                 }
             } else {
-                List<Metadata> newMetadataList = new ArrayList<Metadata>();
+                List<Metadata> newMetadataList  = new ArrayList<Metadata>();
                 List<Metadata> existingMetadata = getMetadata(entry);
-                Hashtable<String,Metadata> map = new Hashtable<String,Metadata>();
-                for(Metadata metadata:existingMetadata) {
+                Hashtable<String, Metadata> map = new Hashtable<String,
+                                                      Metadata>();
+                for (Metadata metadata : existingMetadata) {
                     map.put(metadata.getId(), metadata);
                 }
 
                 for (MetadataHandler handler : metadataHandlers) {
-                    handler.handleFormSubmit(request, entry, map,newMetadataList);
+                    handler.handleFormSubmit(request, entry, map,
+                                             newMetadataList);
                 }
 
                 if (canEditParent
@@ -729,7 +765,8 @@ public class MetadataManager extends RepositoryManager {
 
         return getRepository().makeResult(request,
                                           msg(type.getLabel() + " Cloud"),
-                                          sb, getSearchManager().getSearchUrls());
+                                          sb,
+                                          getSearchManager().getSearchUrls());
 
     }
 
@@ -747,8 +784,8 @@ public class MetadataManager extends RepositoryManager {
         Entry          entry        = getEntryManager().getEntry(request);
         List<Metadata> metadataList = getMetadata(entry);
         Metadata metadata = findMetadata(entry,
-                                               request.getString(ARG_METADATA_ID,
-                                                                 ""));
+                                         request.getString(ARG_METADATA_ID,
+                                             ""));
         if (metadata == null) {
             return new Result("", "Could not find metadata");
         }
@@ -900,12 +937,12 @@ public class MetadataManager extends RepositoryManager {
         Hashtable    groupMap = new Hashtable();
 
 
-        
-        for (MetadataType type: metadataTypes) {
-            if(type.getAdminOnly() && !request.getUser().getAdmin()) {
+
+        for (MetadataType type : metadataTypes) {
+            if (type.getAdminOnly() && !request.getUser().getAdmin()) {
                 continue;
             }
-            if(!type.getForUser()) {
+            if ( !type.getForUser()) {
                 continue;
             }
             String       name    = type.getCategory();

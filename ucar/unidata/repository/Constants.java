@@ -1091,11 +1091,12 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_ADMIN = "ramadda.admin";
 
-    public static final String PROP_CLEARINGHOUSE_ENABLED = "ramadda.clearinghouse.enabled";
+
+    public static final String PROP_REGISTRY_ENABLED = "ramadda.registry.enabled";
+
+    public static final String PROP_REGISTRY_SERVERS = "ramadda.registry.servers";
 
     //    public static final String PROP_CLEARINGHOUSE_ENABLED = "ramadda.clearinghouse.enabled";
-
-
 
 
     /** _more_ */

@@ -229,9 +229,22 @@ CREATE INDEX WIKIPAGEHISTORY_INDEX_ENTRY_ID ON wikipagehistory (ENTRY_ID);
 
 
 
+
+
+-----------------------------------------------------------------------
+--- for storing the list of servers when acting as a registry
+-----------------------------------------------------------------------
+CREATE TABLE  serverregistry (
+        url varchar(1000),
+        title varchar(1000),
+        description varchar(10000));
+
+
+
 -----------------------------------------------------------------------
 --- just here so ramadda knows if the db has been created
 -----------------------------------------------------------------------
 CREATE TABLE  dummy (name varchar(500));
+
 
 

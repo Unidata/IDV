@@ -370,6 +370,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private MetadataManager metadataManager;
 
+    private RegistryManager registryManager;
+
     /** _more_ */
     private StorageManager storageManager;
 
@@ -772,6 +774,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         initOutputHandlers();
         getMetadataManager().initMetadataHandlers(metadataDefFiles);
         initApi();
+        getRegistryManager().checkApi();
 
         getUserManager().initUsers(cmdLineUsers);
         getEntryManager().initGroups();
@@ -789,7 +792,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         HtmlUtil.setHideShowImage(iconUrl(ICON_MINUS), iconUrl(ICON_PLUS));
         getLogManager().logInfo("RAMADDA started");
 
+
         getStorageManager().doFinalInitialization();
+        getRegistryManager().doFinalInitialization();
 
     }
 
@@ -1092,6 +1097,32 @@ public class Repository extends RepositoryBase implements RequestHandler {
             metadataManager = doMakeMetadataManager();
         }
         return metadataManager;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected RegistryManager doMakeRegistryManager() {
+        return new RegistryManager(this);
+    }
+
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public RegistryManager getRegistryManager() {
+        if (registryManager == null) {
+            registryManager = doMakeRegistryManager();
+        }
+        return registryManager;
     }
 
 
@@ -1562,6 +1593,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 handler = getAssociationManager();
             } else if (handlerName.equals("metadatamanager")) {
                 handler = getMetadataManager();
+            } else if (handlerName.equals("registrymanager")) {
+                handler = getRegistryManager();
             } else if (handlerName.equals("repository")) {
                 handler = this;
             } else {
@@ -2114,6 +2147,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
         return apiMethod;
     }
+
+
+    public ApiMethod getApiMethod(String path) {
+        return requestMap.get(path);
+    }
+
 
     /**
      * _more_
@@ -3473,6 +3512,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML)) {
             Document doc  = XmlUtil.makeDocument();
             Element  info = getServerInfo().toXml(doc);
+            info.setAttribute(ATTR_CODE, CODE_OK);
             String   xml  = XmlUtil.toString(info);
             return new Result(xml, MIME_XML);
         }
@@ -3717,6 +3757,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         for (ApiMethod apiMethod : topLevelMethods) {
             if (apiMethod.getMustBeAdmin() && !isAdmin) {
+                continue;
+            }
+            if (!apiMethod.getIsTopLevel()) {
                 continue;
             }
             String url;
