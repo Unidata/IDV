@@ -1,0 +1,82 @@
+
+<html>
+<head>
+  <title>RAMADDA Registry Services</title>
+  <link rel="stylesheet" type="text/css" href="ramadda.css" title="Style">
+</head>
+
+<body>
+
+
+To address the problem of discovery of RAMADDA data servers we have developed a
+server registry facility within RAMADDA.
+<p>
+
+A RAMADDA server can be enabled to be a registry for other servers. 
+We term this a "registry server". (Note: This configuration is done through the
+<i>Admin-&gt;Settings-&gt;Site and Contact Information</i> page).
+<p>
+Likewise, a RAMADDA server can be configured to have 0 or more 
+servers that it registers itself with. In this case, a RAMADDA server
+that is registering itself with a registry server is known as a "client
+server". By default a RAMADDA server
+comes with an initial registry server:<br>
+<i>http://motherlode.ucar.edu/repository</i>
+<p>
+
+
+A registry server stores a list of client server information (base URL, title, description) in the database.
+At start-up and at certain intervals a registry server will run through its list of client servers
+and attempt to connect to the URL:<br>
+<i>http://clientserver/repository/registry/info?registry.server=http://registryserver/repository</i>
+<br>
+passing its base URL in as an argument. It does this to keep its list of client servers up to date.
+<p>
+
+The client server, on receipt of this request, will check if the given registry server is in its list
+of registry servers. If it is then it responds with an xml listing of its server information including
+its title (the repository title) and description (the description of its top-level group).
+<p>
+If the requesting registry server is not in the list of servers held by a client then an error
+is returned. On a failed request the registry server will remove the client server listing from
+the database.
+
+
+<p>
+On start-up or when the repository configuration has changed a client server will notify each of its registry
+servers at:<br>
+<i>http://registryserver/repository/registry/add?registry.client=http://registryclient/repository</i>
+<p>
+Passing its base public URL as an argument. The registry server on receipt of this request will go through the
+above described verification process. If successfull the new client server information will be added into the database.
+
+<p>
+A registry server provides a listing of its known client servers at:<br>
+<a href="http://motherlode.ucar.edu/repository/registry/list">http://motherlode.ucar.edu/repository/registry/list</a>
+
+
+<h3>Federated Searches</h3>
+We intend to use this basic registry service as a way in which RAMADDA servers can support aggregated search.
+A client server will, on successful registration with a registry server, request the collection
+of client servers available from its registry server and store these in its database.
+The administrator of the client server will be able to select which of the other servers
+should be made available for federated search.
+<p>
+When there is such a collection of servers selected the Advanced Search form will have an entry
+listing the servers and will allow the end user to select which, if any, of the external servers
+should also be searched. When the search request is sent to the initial server if there are external
+servers selected that search will also be applied to those servers.
+<p>
+The big question is how to display those search results. The easy way is simply to show an html iframe
+for each of the remote search servers. There are many cases where this will be effective for the end user.
+However, we also want to be able to aggregate the results in the context of the original server and
+display the results as on collection (e.g., as a THREDDS catalog, an RSS feed, etc.) In this case the original
+server would launch each search request in a separate thread with the result output type being set to
+the internal RAMADDA xml format (as opposed to getting HTML back). The XML results would then be
+turned into RAMADDA's internal data model structures and then be displayed accordingly.
+
+
+
+
+</body>
+</html>
