@@ -21,6 +21,8 @@
  */
 
 
+
+
 package ucar.unidata.data.point;
 
 
@@ -49,7 +51,6 @@ import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
 import visad.georef.EarthLocationTuple;
 
-import java.text.SimpleDateFormat;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -57,6 +58,8 @@ import java.io.*;
 
 
 import java.rmi.RemoteException;
+
+import java.text.SimpleDateFormat;
 
 
 import java.util.ArrayList;
@@ -80,8 +83,11 @@ public class TextPointDataSource extends PointDataSource {
     /** property id for the header map */
     public static final String PROP_HEADER_MAP = "data.textpoint.map";
 
-    public static final String PROP_DATAPROPERTIES = "data.textpoint.dataproperties";
+    /** _more_ */
+    public static final String PROP_DATAPROPERTIES =
+        "data.textpoint.dataproperties";
 
+    /** _more_ */
     public static final String PROP_HEADER_EXTRA = "data.textpoint.extra";
 
     /** property id for the header params */
@@ -120,9 +126,15 @@ public class TextPointDataSource extends PointDataSource {
     /** variables for time */
     private String[] timeVars = {
         "time_nominal", "time_Nominal", "timeNominal", "timeObs",
-        "reportTime", "time", "nominal_time", "Time"
+        "reportTime", "time", "nominal_time", "Time", "observation_time"
     };
 
+
+    /** variables for latitude */
+    private String[] latVars = { "Latitude", "latitude", "lat" };
+
+    /** variables for longitude */
+    private String[] lonVars = { "Longitude", "longitude", "lon" };
 
 
     /** variables for index */
@@ -161,8 +173,14 @@ public class TextPointDataSource extends PointDataSource {
     /** last label */
     private String lastLabel = "";
 
+    /** _more_ */
     private Hashtable dataProperties;
 
+    /** for the metadata gui */
+    JLabel lineLbl;
+
+    /** for the metadata gui */
+    List lines;
 
     /**
      * Default constructor
@@ -187,8 +205,9 @@ public class TextPointDataSource extends PointDataSource {
                                String source, Hashtable properties)
             throws VisADException {
         super(descriptor, source, "Text Point Data", properties);
-        if(properties!=null) {
-            this.dataProperties = (Hashtable) properties.get(PROP_DATAPROPERTIES);
+        if (properties != null) {
+            this.dataProperties =
+                (Hashtable) properties.get(PROP_DATAPROPERTIES);
         }
     }
 
@@ -257,9 +276,8 @@ public class TextPointDataSource extends PointDataSource {
             }
         }
 
-        String extra =  getProperty(PROP_HEADER_EXTRA, (String) null);
-        if(extra!=null) {
-        }
+        String extra = getProperty(PROP_HEADER_EXTRA, (String) null);
+        if (extra != null) {}
         return is;
 
     }
@@ -329,7 +347,7 @@ public class TextPointDataSource extends PointDataSource {
         if (obs == null) {
             TextAdapter ta = null;
             try {
-                String extra =  getProperty(PROP_HEADER_EXTRA, (String) null);
+                String extra = getProperty(PROP_HEADER_EXTRA, (String) null);
                 if ((params == null) || (params.length() == 0)) {
                     params = getProperty(PROP_HEADER_PARAMS, (String) null);
                 }
@@ -341,13 +359,18 @@ public class TextPointDataSource extends PointDataSource {
                 }
                 String blob = getProperty(PROP_HEADER_BLOB, (String) null);
                 if ((blob != null) && (metaDataFields.size() == 0)) {
-                    metaDataFields =
-                        (List) getDataContext().getIdv().decodeObject(blob);
-                    applySavedMetaData(metaDataFields);
+                    Object object =
+                        getDataContext().getIdv().decodeObject(blob);
+                    if (object instanceof List) {
+                        object = new Metadata(-1, (List) object);
+                    }
+                    Metadata metadata = (Metadata) object;
+                    metaDataFields = metadata.getItems();
+                    applySavedMetaData(metadata);
                 }
-                
+
                 ta = new TextAdapter(getInputStream(contents), delimiter,
-                                     map, params, dataProperties,sampleIt);
+                                     map, params, dataProperties, sampleIt);
             } catch (visad.data.BadFormException bfe) {
                 //Probably don't have the header info
                 //If we already have a map and params then we have problems
@@ -361,11 +384,14 @@ public class TextPointDataSource extends PointDataSource {
                     return null;
                 }
                 ta = new TextAdapter(getInputStream(contents), delimiter,
-                                     map, params, dataProperties,sampleIt);
+                                     map, params, dataProperties, sampleIt);
             }
             try {
                 Data d = ta.getData();
-                if(d==null) throw new IllegalArgumentException("Could not create point data");
+                if (d == null) {
+                    throw new IllegalArgumentException(
+                        "Could not create point data");
+                }
                 obs = makePointObs(d, trackParam);
                 if ((fieldsDescription == null) && (obs != null)) {
                     makeFieldDescription(obs);
@@ -547,7 +573,7 @@ public class TextPointDataSource extends PointDataSource {
         }
 
 
-        applySavedMetaData(metaDataFields);
+        applySavedMetaData(new Metadata(skipRows, metaDataFields));
         GuiUtils.tmpInsets = new Insets(5, 5, 0, 0);
         double[]   stretch = { 0.0, 1.0, 0.5, 0.0, 0.5 };
         JComponent panel = GuiUtils.doLayout(comps, 5, stretch,
@@ -556,6 +582,7 @@ public class TextPointDataSource extends PointDataSource {
         JScrollPane widgetSP =
             GuiUtils.makeScrollPane(GuiUtils.top(GuiUtils.inset(panel, 5)),
                                     200, 200);
+        widgetSP.setPreferredSize(new Dimension(200, 200));
         widgetPanel.add(BorderLayout.CENTER, widgetSP);
     }
 
@@ -593,7 +620,7 @@ public class TextPointDataSource extends PointDataSource {
                                            new InputStreamReader(
                                                new ByteArrayInputStream(
                                                    contents.getBytes())));
-            final List lines = new ArrayList();
+            lines = new ArrayList();
             for (int i = 0; i < 100; i++) {
                 String line = bis.readLine();
                 if (line == null) {
@@ -605,7 +632,7 @@ public class TextPointDataSource extends PointDataSource {
             }
 
 
-            final JLabel lineLbl = new JLabel(" ");
+            lineLbl = new JLabel(" ");
             lineLbl.setVerticalAlignment(SwingConstants.TOP);
             lineLbl.setPreferredSize(new Dimension(700, 150));
             applyNamesBtn =
@@ -669,7 +696,6 @@ public class TextPointDataSource extends PointDataSource {
                         lbl, GuiUtils.right(wrapper))), widgetPanel);
             metaDataComp = GuiUtils.inset(metaDataComp, 5);
             setLineText(lineLbl, skipRows, lines);
-
         }
         return metaDataComp;
 
@@ -681,12 +707,22 @@ public class TextPointDataSource extends PointDataSource {
      *
      * @return preference mapping
      */
-    private Hashtable getMetaDataMap() {
-        Hashtable pointMetaDataMap =
+    private Hashtable<String, Metadata> getMetaDataMap() {
+        Hashtable tmp =
             (Hashtable) getDataContext().getIdv().getStore().getEncodedFile(
                 PREF_METADATAMAP);
-        if (pointMetaDataMap == null) {
-            pointMetaDataMap = new Hashtable();
+        if (tmp == null) {
+            tmp = new Hashtable();
+        }
+        Hashtable<String, Metadata> pointMetaDataMap = new Hashtable<String,
+                                                           Metadata>();
+        for (Enumeration keys = tmp.keys(); keys.hasMoreElements(); ) {
+            String key   = (String) keys.nextElement();
+            Object value = tmp.get(key);
+            if (value instanceof List) {
+                value = new Metadata(-1, (List) value);
+            }
+            pointMetaDataMap.put(key, (Metadata) value);
         }
         return pointMetaDataMap;
     }
@@ -698,7 +734,7 @@ public class TextPointDataSource extends PointDataSource {
      * @param key key
      */
     public void deleteMetaData(String key) {
-        Hashtable pointMetaDataMap = getMetaDataMap();
+        Hashtable<String, Metadata> pointMetaDataMap = getMetaDataMap();
         pointMetaDataMap.remove(key);
         getDataContext().getIdv().getStore().putEncodedFile(PREF_METADATAMAP,
                 pointMetaDataMap);
@@ -737,7 +773,8 @@ public class TextPointDataSource extends PointDataSource {
                 PROP_HEADER_MAP, tmp[0], PROP_HEADER_PARAMS, tmp[1],
                 PROP_HEADER_SKIP, "" + skipRows, "dataistrajectory",
                 trajectory, PROP_HEADER_BLOB,
-                getDataContext().getIdv().encodeObject(metaDataFields, false)
+                getDataContext().getIdv().encodeObject(new Metadata(skipRows,
+                    metaDataFields), false)
             }));
             getDataContext().getIdv().getPluginManager().addText(xml,
                     lastType + "datasource.xml");
@@ -779,16 +816,16 @@ public class TextPointDataSource extends PointDataSource {
         items.add(GuiUtils.makeMenuItem("Write Header", this, "writeHeader"));
         items.add(GuiUtils.makeMenuItem("Write Data Source Plugin", this,
                                         "writePlugin"));
-        Hashtable pointMetaDataMap = getMetaDataMap();
+        Hashtable<String, Metadata> pointMetaDataMap = getMetaDataMap();
         if (pointMetaDataMap.size() > 0) {
             List delitems = new ArrayList();
             items.add(GuiUtils.MENU_SEPARATOR);
             for (Enumeration keys = pointMetaDataMap.keys();
                     keys.hasMoreElements(); ) {
-                String     key  = (String) keys.nextElement();
-                final List list = (List) pointMetaDataMap.get(key);
+                String   key      = (String) keys.nextElement();
+                Metadata metadata = (Metadata) pointMetaDataMap.get(key);
                 items.add(GuiUtils.makeMenuItem(key, this,
-                        "applySavedMetaData", list));
+                        "applySavedMetaDataFromUI", metadata));
                 delitems.add(GuiUtils.makeMenuItem(key, this,
                         "deleteMetaData", key));
             }
@@ -801,8 +838,8 @@ public class TextPointDataSource extends PointDataSource {
      * Save the meta data
      */
     public void saveMetaDataMap() {
-        Hashtable pointMetaDataMap = getMetaDataMap();
-        Vector    items            = new Vector();
+        Hashtable<String, Metadata> pointMetaDataMap = getMetaDataMap();
+        Vector                      items            = new Vector();
         items.add("");
         for (Enumeration keys = pointMetaDataMap.keys();
                 keys.hasMoreElements(); ) {
@@ -824,7 +861,8 @@ public class TextPointDataSource extends PointDataSource {
             ParamRow paramRow = (ParamRow) paramRows.get(i);
             paramRow.addToMetaData(metaDataFields);
         }
-        pointMetaDataMap.put(prefname, metaDataFields);
+        pointMetaDataMap.put(prefname,
+                             new Metadata(skipRows, metaDataFields));
         getDataContext().getIdv().getStore().putEncodedFile(PREF_METADATAMAP,
                 pointMetaDataMap);
     }
@@ -1001,13 +1039,28 @@ public class TextPointDataSource extends PointDataSource {
     }
 
 
+    /**
+     * THis gets called from the Preferences menu and sets the metadata and also updates the skipRows
+     *
+     * @param metadata The metadata
+     */
+    public void applySavedMetaDataFromUI(Metadata metadata) {
+        applySavedMetaData(metadata);
+        setLineText(lineLbl, skipRows, lines);
+    }
 
     /**
      * Init the widgets
      *
-     * @param fieldList widgets
+     *
+     * @param metadata The metadata
      */
-    public void applySavedMetaData(List fieldList) {
+    public void applySavedMetaData(Metadata metadata) {
+        List fieldList = metadata.getItems();
+        if (metadata.getSkipRows() >= 0) {
+            skipRows = metadata.getSkipRows();
+        }
+
         for (int tokIdx = 0;
                 (tokIdx < paramRows.size()) && (tokIdx < fieldList.size());
                 tokIdx++) {
@@ -1253,6 +1306,27 @@ public class TextPointDataSource extends PointDataSource {
             int latIndex = type.getIndex(RealType.Latitude);
             int lonIndex = type.getIndex(RealType.Longitude);
             int altIndex = type.getIndex(RealType.Altitude);
+
+            if (latIndex < 0) {
+                for (int i = 0; i < latVars.length; i++) {
+                    latIndex = type.getIndex(latVars[i]);
+                    if (latIndex > -1) {
+                        break;
+                    }
+                }
+            }
+
+
+
+            if (lonIndex < 0) {
+                for (int i = 0; i < lonVars.length; i++) {
+                    lonIndex = type.getIndex(lonVars[i]);
+                    if (lonIndex > -1) {
+                        break;
+                    }
+                }
+            }
+
 
             if (altIndex >= 0) {
                 varNames.add("Altitude");
@@ -1634,10 +1708,14 @@ public class TextPointDataSource extends PointDataSource {
 
 
 
+    /**
+     * usage message
+     */
     private static void usage() {
         System.err.println(
-                           "Usage: java PointObFactory -header headerfile <-skip skiplines> <-skiptonumber> <-xlsdateformat dateformat> <-Dproperty=value> <.csv files>");
-        System.err.println("e.g.: java PointObFactory test.hdr -skip 14 -DLatitude.value=41.5 -DLongitude.value=-101.2 -xlsdateformat MM/dd/yyyy foo.csv bar.xls");
+            "Usage: java PointObFactory -header headerfile <-skip skiplines> <-skiptonumber> <-xlsdateformat dateformat> <-Dproperty=value> <.csv files>");
+        System.err.println(
+            "e.g.: java PointObFactory test.hdr -skip 14 -DLatitude.value=41.5 -DLongitude.value=-101.2 -xlsdateformat MM/dd/yyyy foo.csv bar.xls");
     }
 
 
@@ -1649,53 +1727,55 @@ public class TextPointDataSource extends PointDataSource {
      * @throws Exception on badness
      */
     public static void main(String[] args) throws Exception {
+
         if (args.length == 0) {
             usage();
             return;
         }
-        String header = null;
+        String    header         = null;
         Hashtable dataProperties = new Hashtable();
-        Hashtable properties = new Hashtable();
+        Hashtable properties     = new Hashtable();
         properties.put(PROP_DATAPROPERTIES, dataProperties);
-        SimpleDateFormat sdf =   new  SimpleDateFormat("MM/dd/yyyy");
-        boolean readToFirstNumeric = false;
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        boolean          readToFirstNumeric = false;
 
-        int argIdx = 1;
-        for(argIdx=0;argIdx<args.length;argIdx++) {
-            if(args[argIdx].equals("-skip")) {
-                if(argIdx==args.length-1) {
+        int              argIdx             = 1;
+        for (argIdx = 0; argIdx < args.length; argIdx++) {
+            if (args[argIdx].equals("-skip")) {
+                if (argIdx == args.length - 1) {
                     usage();
                     return;
                 }
-                properties.put(TextPointDataSource.PROP_HEADER_SKIP, new Integer(args[argIdx+1]));
+                properties.put(TextPointDataSource.PROP_HEADER_SKIP,
+                               new Integer(args[argIdx + 1]));
                 argIdx++;
-            } else       if(args[argIdx].equals("-header")) {
-                if(argIdx==args.length-1) {
+            } else if (args[argIdx].equals("-header")) {
+                if (argIdx == args.length - 1) {
                     usage();
                     return;
                 }
-                header = IOUtil.readContents(args[argIdx+1],
+                header = IOUtil.readContents(args[argIdx + 1],
                                              TextPointDataSource.class);
                 argIdx++;
-            } else if(args[argIdx].equals("-skiptonumber")) {
+            } else if (args[argIdx].equals("-skiptonumber")) {
                 readToFirstNumeric = true;
-            } else  if(args[argIdx].equals("-xlsdateformat")) {
-                if(argIdx==args.length-1) {
+            } else if (args[argIdx].equals("-xlsdateformat")) {
+                if (argIdx == args.length - 1) {
                     usage();
                     return;
                 }
-                sdf = new  SimpleDateFormat(args[argIdx+1]);
+                sdf = new SimpleDateFormat(args[argIdx + 1]);
                 argIdx++;
-            } else if(args[argIdx].startsWith("-D")) {
+            } else if (args[argIdx].startsWith("-D")) {
                 List l = StringUtil.split(args[argIdx].substring(2), "=");
                 if (l.size() != 2) {
-                    System.err.println ("Invalid property:" + args[argIdx]);
+                    System.err.println("Invalid property:" + args[argIdx]);
                     usage();
                     return;
                 }
-                dataProperties.put(l.get(0),l.get(1));
-            } else if(args[argIdx].startsWith("-")) {
-                System.err.println ("Unknown argument:" + args[argIdx]);
+                dataProperties.put(l.get(0), l.get(1));
+            } else if (args[argIdx].startsWith("-")) {
+                System.err.println("Unknown argument:" + args[argIdx]);
                 usage();
                 return;
             } else {
@@ -1703,8 +1783,8 @@ public class TextPointDataSource extends PointDataSource {
             }
         }
 
-        if(header==null) {
-            System.err.println ("No -header specified");
+        if (header == null) {
+            System.err.println("No -header specified");
             usage();
             return;
         }
@@ -1731,16 +1811,17 @@ public class TextPointDataSource extends PointDataSource {
 
 
             String contents;
-            if(args[i].endsWith(".xls")) {
-                contents  = DataUtil.xlsToCsv(args[i],readToFirstNumeric,sdf);
+            if (args[i].endsWith(".xls")) {
+                contents = DataUtil.xlsToCsv(args[i], readToFirstNumeric,
+                                             sdf);
             } else {
                 contents = IOUtil.readContents(args[i],
-                                               TextPointDataSource.class);
+                        TextPointDataSource.class);
             }
 
 
-            FieldImpl field = dataSource.makeObs(contents, ",", null,
-                                      null, null, false, false);
+            FieldImpl field = dataSource.makeObs(contents, ",", null, null,
+                                  null, false, false);
 
 
             String ncFile = IOUtil.stripExtension(args[i]) + ".nc";
@@ -1748,6 +1829,7 @@ public class TextPointDataSource extends PointDataSource {
             PointObFactory.writeToNetcdf(new File(ncFile), field);
 
         }
+
 
     }
 
@@ -1884,8 +1966,9 @@ public class TextPointDataSource extends PointDataSource {
          */
         public ParamRow() {
             if (boxNames == null) {
-                boxNames = new Vector(Misc.newList("", "Time", "Latitude",
-                        "Longitude", "Altitude"));
+                boxNames = new Vector(Misc.toList(new Object[] {
+                    "", "Time", "Latitude", "Longitude", "Altitude", "IDN"
+                }));
                 String unitStr =
                     ";celsius;kelvin;fahrenheit;deg;degrees west;feet;km;meters;m;miles;kts;yyyy-MM-dd HH:mm:ss";
                 unitNames = new Vector(StringUtil.split(unitStr, ";", false,
@@ -1960,6 +2043,29 @@ public class TextPointDataSource extends PointDataSource {
                 nameBox = new JComboBox(boxNames);
                 nameBox.setEditable(true);
                 nameBox.setPreferredSize(new Dimension(40, 10));
+                //Listen for changes and set the unitFld to be degrees if the name is lat or long
+                nameBox.addItemListener(new ItemListener() {
+                    public void itemStateChanged(ItemEvent event) {
+                        String name = nameBox.getSelectedItem() + "";
+                        /*
+                        if(name.equals("latitude")) {
+                            nameBox.setSelectedItem("Latitude");
+                            return;
+                        }
+
+                        if(name.equals("longitude")) {
+                            nameBox.setSelectedItem("Longitude");
+                            return;
+                            }*/
+
+                        if (name.toLowerCase().equals("latitude")
+                                || name.toLowerCase().equals("longitude")) {
+                            if (unitFld.getText().trim().length() == 0) {
+                                unitFld.setText("degrees");
+                            }
+                        }
+                    }
+                });
                 extraFld = new JTextField("", 5);
                 extraFld.setToolTipText(
                     "<html>Extra attributes, e.g.:<br>colspan=&quot;some column span&quot;<br>Note:Values must be quoted.</html>");
@@ -1978,7 +2084,19 @@ public class TextPointDataSource extends PointDataSource {
             }
             sample.setText(StringUtil.shorten(toks.get(tokIdx).toString(),
                     25));
-            comps.add(sample);
+            JButton applyNameBtn =
+                GuiUtils.getImageButton("/auxdata/ui/icons/HorArrow16.gif",
+                                        getClass());
+            applyNameBtn.setToolTipText("Use column value as the field name");
+            applyNameBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    nameBox.setSelectedItem(sample.getText());
+                }
+            });
+
+
+            comps.add(GuiUtils.leftRight(sample, applyNameBtn));
+            //            comps.add(sample);
             comps.add(nameBox);
             comps.add(GuiUtils.centerRight(unitFld, popupBtn));
             comps.add(missingFld);
@@ -2014,5 +2132,77 @@ public class TextPointDataSource extends PointDataSource {
 
 
     }
+
+
+    /**
+     * Class Metadata holds the skipRows and the list of metadata items
+     *
+     *
+     * @author IDV Development Team
+     */
+    public static class Metadata {
+
+        /** Number of rows to skip */
+        private int skipRows = -1;
+
+        /** metadata items */
+        private List items;
+
+        /**
+         * ctor
+         */
+        public Metadata() {}
+
+        /**
+         * ctor
+         *
+         * @param rows rows to skip
+         * @param items metadata items
+         */
+        public Metadata(int rows, List items) {
+            this.skipRows = rows;
+            this.items    = items;
+        }
+
+        /**
+         *  Set the SkipRows property.
+         *
+         *  @param value The new value for SkipRows
+         */
+        public void setSkipRows(int value) {
+            skipRows = value;
+        }
+
+        /**
+         *  Get the SkipRows property.
+         *
+         *  @return The SkipRows
+         */
+        public int getSkipRows() {
+            return skipRows;
+        }
+
+        /**
+         *  Set the Items property.
+         *
+         *  @param value The new value for Items
+         */
+        public void setItems(List value) {
+            items = value;
+        }
+
+        /**
+         *  Get the Items property.
+         *
+         *  @return The Items
+         */
+        public List getItems() {
+            return items;
+        }
+
+
+    }
+
+
 }
 
