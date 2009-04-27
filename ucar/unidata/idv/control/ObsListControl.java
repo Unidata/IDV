@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -29,7 +30,6 @@ import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.grid.GridUtil;
 
 
-
 import ucar.unidata.data.point.*;
 
 import ucar.unidata.gis.SpatialGrid;
@@ -37,19 +37,14 @@ import ucar.unidata.gis.SpatialGrid;
 import ucar.unidata.ui.TableSorter;
 import ucar.unidata.ui.symbol.*;
 
-import ucar.unidata.ui.symbol.StationModelManager;
-
 
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
 
 import ucar.visad.Util;
-
-
 
 import visad.*;
 
@@ -57,11 +52,6 @@ import visad.georef.EarthLocation;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Rectangle2D;
-
-import java.beans.PropertyChangeEvent;
-
-import java.beans.PropertyChangeListener;
 
 import java.rmi.RemoteException;
 
@@ -70,8 +60,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
-
 
 import javax.swing.*;
 import javax.swing.table.*;
@@ -270,7 +258,7 @@ public class ObsListControl extends ObsDisplayControl {
         synchronized (TABLE_MUTEX) {
             tableRows = new ArrayList(tmpRows);
             colNames  = new ArrayList(tmpColNames);
-            if(obsModel!=null) {
+            if (obsModel != null) {
                 obsModel.fireTableStructureChanged();
             }
         }
@@ -382,10 +370,11 @@ public class ObsListControl extends ObsDisplayControl {
      * @return The real formatted
      */
     private Object formatReal(Real r) {
-        if (true || getShowDataRaw()) {
+        if (getShowDataRaw()) {
             return new Double(r.getValue());
         } else {
-            return new RealWrapper(Util.formatReal(r), r);
+            return new RealWrapper(
+                getDisplayConventions().format(r.getValue()), r);
         }
     }
 

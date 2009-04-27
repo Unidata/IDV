@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -36,10 +37,8 @@ import ucar.unidata.ui.TableSorter;
 import ucar.unidata.ui.TwoListPanel;
 import ucar.unidata.ui.symbol.*;
 
-import ucar.unidata.ui.symbol.StationModelManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
 
@@ -58,13 +57,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
 
-import java.beans.PropertyChangeEvent;
-
-import java.beans.PropertyChangeListener;
-
 import java.rmi.RemoteException;
-
-import java.text.DecimalFormat;
 
 import java.text.DecimalFormat;
 
@@ -214,7 +207,7 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
         }
         try {
             Real r = (Real) data;
-            if (showDataRaw) {
+            if (getShowDataRaw()) {
                 return new Double(r.getValue());
             }
             double value;
@@ -226,7 +219,8 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
 
             //Is this a nan
             if ( !(value == value)) {
-                return new Double(value);
+                return new RealWrapper(getDisplayConventions().format(value),
+                                       r);
             } else if (useFormatPref) {
                 String valueStr = null;
                 if ((displayUnit != null)
@@ -256,7 +250,8 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
                 }
                 return new RealWrapper(valueStr, r);
             } else {
-                return new Double(getDisplayConventions().format(value));
+                return new RealWrapper(getDisplayConventions().format(value),
+                                       r);
             }
         } catch (Exception exc) {
             return "error:" + exc;
@@ -571,7 +566,9 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
         for (int i = 0; i < l.size(); i++) {
             String name = l.get(i).toString();
             //A hack to make sure we don't pick up a param labeled "time" instead of the pointob time
-            if(name.equals(PointOb.PARAM_TIME)) return PointOb.BAD_INDEX;
+            if (name.equals(PointOb.PARAM_TIME)) {
+                return PointOb.BAD_INDEX;
+            }
 
             // first check to see if the name is good before aliases
             int index = Util.getIndex(tType, name);
