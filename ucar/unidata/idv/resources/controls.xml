@@ -550,7 +550,7 @@ Since this is confusing and needs more work lets remove this for now
 
   <control
      id="vprofile"
-     categories="GRID-3D-*"
+     categories="GRID-3D-*;*-flowvector-*"
      class="ucar.unidata.idv.control.VerticalProfileControl"
      label="Vertical Profile"
      displaycategory="Probes"
@@ -580,7 +580,7 @@ Since this is confusing and needs more work lets remove this for now
 
   <control
      id="probe"
-     categories="*-3D-*;*-2D-*;IMAGE-BAND-*;RGBIMAGE;POINT;StationPlot;PointPlot"
+     categories="*-3D-*;*-2D-*;IMAGE-BAND-*;RGBIMAGE;POINT;StationPlot;PointPlot;*-flowvector-*"
      class="ucar.unidata.idv.control.ProbeControl"
      label="Data Probe/Time Series"
      displaycategory="Probes"
