@@ -96,6 +96,7 @@ public class RegistryManager extends RepositoryManager {
 
 
     public static final String ARG_REGISTRY_SERVER = "registry.server";
+    public static final String ARG_REGISTRY_CLIENT = "registry.client";
 
 
     /**
@@ -325,8 +326,7 @@ public class RegistryManager extends RepositoryManager {
     public void registerWithServer(String url) {
         ServerInfo serverInfo = getRepository().getServerInfo();
         url = url + getRepository().URL_REGISTRY_ADD.getPath();
-        System.err.println("registering with:" + url);
-        url = HtmlUtil.url(url, ARG_URL, serverInfo.getUrl());
+        url = HtmlUtil.url(url, ARG_REGISTRY_CLIENT, serverInfo.getUrl());
         try {
             String contents = IOUtil.readContents(url, getClass());
             Element root     = XmlUtil.getRoot(contents);
@@ -367,7 +367,7 @@ public class RegistryManager extends RepositoryManager {
         }
 
 
-        String     baseUrl    = request.getString(ARG_URL, "");
+        String     baseUrl    = request.getString(ARG_REGISTRY_CLIENT, "");
 
         ServerInfo serverInfo = new ServerInfo(new URL(baseUrl), "", "");
 
