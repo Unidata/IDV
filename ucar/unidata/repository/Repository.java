@@ -123,6 +123,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     public static final String MACRO_ENTRY_HEADER = "entry.header";
+    public static final String MACRO_ENTRY_BREADCRUMBS = "entry.breadcrumbs";
+
+
+
 
     /** _more_ */
     public static final String MACRO_HEADER_IMAGE = "header.image";
@@ -692,7 +696,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         apiDefFiles.addAll(0, getResourcePaths(PROP_API));
         typeDefFiles.addAll(0, getResourcePaths(PROP_TYPES));
         outputDefFiles.addAll(0, getResourcePaths(PROP_OUTPUTHANDLERS));
-        metadataDefFiles.addAll(0, getResourcePaths(PROP_METADATAHANDLERS));
+        metadataDefFiles.addAll(0, getResourcePaths(PROP_METADATA));
 
         debug = getProperty(PROP_DEBUG, false);
         //        System.err.println ("debug:" + debug);
@@ -2382,6 +2386,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (entryHeader == null) {
             entryHeader = "";
         }
+        String entryBreadcrumbs = (String) result.getProperty(PROP_ENTRY_BREADCRUMBS);
+        if (entryBreadcrumbs == null) {
+            entryBreadcrumbs = "";
+        }
         List   sublinks     = (List) result.getProperty(PROP_NAVSUBLINKS);
         String sublinksHtml = "";
         if (sublinks != null) {
@@ -2472,7 +2480,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             result.getTitle(), MACRO_BOTTOM, result.getBottomHtml(),
             MACRO_LINKS, linksHtml, MACRO_CONTENT, content + jsContent,
             MACRO_FAVORITES, favorites.toString(), MACRO_ENTRY_HEADER,
-            entryHeader, MACRO_HEADFINAL, head, MACRO_ROOT, getUrlBase(),
+            entryHeader, MACRO_ENTRY_BREADCRUMBS, entryBreadcrumbs,MACRO_HEADFINAL, head, MACRO_ROOT, getUrlBase(),
         };
 
 

@@ -10,7 +10,7 @@
  * your option) any later version.
  *
  * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * WITHOUT ANY WARRANTYP; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
  *
@@ -503,10 +503,6 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      *
      * @return _more_
      */
-    public static String getTag(MetadataType type) {
-        return getTag(type.getType());
-    }
-
     public static String getTag(String type) {
         int idx = type.indexOf(".");
         if (idx < 0) {
@@ -515,14 +511,6 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         return type.substring(idx + 1);
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    protected String getHandlerGroupName() {
-        return "Thredds";
-    }
 
     /**
      * _more_
@@ -539,31 +527,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                      Metadata metadata, Document doc,
                                      Element datasetNode)
             throws Exception {
-        MetadataType type = getType(metadata.getType());
-        if (type.isType(TYPE_LINK)) {
-            XmlUtil.create(doc, getTag(TYPE_DOCUMENTATION), datasetNode,
-                           new String[] { "xlink:href",
-                                          metadata.getAttr2(), "xlink:title",
-                                          metadata.getAttr1() });
-        } else if (type.isType(TYPE_DOCUMENTATION)) {
-            //            System.err.println ("tag:" +  getTag(TYPE_DOCUMENTATION));
-            XmlUtil.create(doc, getTag(TYPE_DOCUMENTATION), datasetNode,
-                           metadata.getAttr2(), new String[] { ATTR_TYPE,
-                    metadata.getAttr1() });
-        } else if (type.isType(TYPE_PROPERTY)) {
-            XmlUtil.create(doc, getTag(TYPE_PROPERTY), datasetNode,
-                           new String[] { ATTR_NAME,
-                                          metadata.getAttr1(), ATTR_VALUE,
-                                          metadata.getAttr2() });
-        } else if (type.isType(TYPE_KEYWORD)) {
-            XmlUtil.create(doc, getTag(TYPE_KEYWORD), datasetNode,
-                           metadata.getAttr1());
-        } else if (type.isType(TYPE_CONTRIBUTOR)) {
-            XmlUtil.create(doc, getTag(TYPE_DOCUMENTATION), datasetNode,
-                           metadata.getAttr1(), new String[] { ATTR_ROLE,
-                    metadata.getAttr2() });
-
-        } else if (type.isType(TYPE_VARIABLE)) {
+        if (metadata.getType().equals(TYPE_VARIABLE)) {
             Element variablesNode = XmlUtil.getElement(datasetNode,
                                         TAG_VARIABLES);
             if (variablesNode == null) {
@@ -573,125 +537,13 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             XmlUtil.create(doc, getTag(TYPE_VARIABLE), variablesNode,
                            metadata.getAttr2(), new String[] { ATTR_NAME,
                     metadata.getAttr1(), ATTR_UNITS, metadata.getAttr3() });
-        } else if (type.isType(TYPE_ICON)) {
-            XmlUtil.create(doc, getTag(TYPE_DOCUMENTATION), datasetNode,
-                           new String[] { "xlink:href",
-                                          metadata.getAttr1(), "xlink:title",
-                                          "icon" });
-        } else if (type.isType(TYPE_PUBLISHER) || type.isType(TYPE_CREATOR)) {
-            Element node = XmlUtil.create(doc, getTag(type), datasetNode);
-            XmlUtil.create(doc, CatalogUtil.TAG_NAME, node,
-                           metadata.getAttr1(), new String[] { ATTR_ROLE,
-                    metadata.getAttr2() });
-            XmlUtil.create(doc, CatalogUtil.TAG_CONTACT, node,
-                           new String[] { ATTR_EMAIL,
-                                          metadata.getAttr3(), ATTR_URL,
-                                          metadata.getAttr4() });
-        }
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param type _more_
-     *
-     * @return _more_
-     */
-    public boolean xxcanHandle(String type) {
-        if (super.canHandle(type)) {
-            return true;
-        }
-        //For now
-        return super.canHandle("thredds." + type);
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param sb _more_
-     * @param type _more_
-     * @param doSelect _more_
-     *
-     * @throws Exception _more_
-     */
-    public void addToSearchForm(Request request, StringBuffer sb,
-                                MetadataType type, boolean doSelect)
-            throws Exception {
-        sb.append(HtmlUtil.hidden(ARG_METADATA_TYPE + "." + type,
-                                  type.toString()));
-        String inheritedCbx = HtmlUtil.checkbox(ARG_METADATA_INHERITED + "."
-                                  + type, "true", false) + HtmlUtil.space(1)
-                                      + "inherited";
-        inheritedCbx = "";
-
-        if (doSelect) {
-            String[] values = getMetadataManager().getDistinctValues(request,
-                                  this, type);
-            if ((values == null) || (values.length == 0)) {
-                return;
-            }
-            List l = trimValues((List<String>) Misc.toList(values));
-            l.add(0, new TwoFacedObject(msg("-all-"), ""));
-            String argName = ARG_METADATA_ATTR1 + "." + type;
-            String value   = request.getString(argName, "");
-            sb.append(HtmlUtil.formEntry(msgLabel(type.getLabel()),
-                                         HtmlUtil.select(argName, l, value,
-                                             100) + inheritedCbx));
         } else {
-            sb.append(
-                HtmlUtil.formEntry(
-                    msgLabel(type.getLabel()),
-                    HtmlUtil.input(ARG_METADATA_ATTR1 + "." + type, "")
-                    + inheritedCbx));
+            super.addMetadataToCatalog(request,  entry,
+                                       metadata, doc, datasetNode);
+
         }
-
     }
 
-
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param sb _more_
-     *
-     * @throws Exception _more_
-     */
-    public void addToSearchForm(Request request, StringBuffer sb)
-            throws Exception {
-        addToSearchForm(request, sb, findType(TYPE_DOCUMENTATION), false);
-        addToSearchForm(request, sb, findType(TYPE_KEYWORD), true);
-        addToSearchForm(request, sb, findType(TYPE_PROJECT), true);
-        addToSearchForm(request, sb, findType(TYPE_CREATOR), true);
-        addToSearchForm(request, sb, findType(TYPE_CONTRIBUTOR), true);
-        addToSearchForm(request, sb, findType(TYPE_PUBLISHER), true);
-        addToSearchForm(request, sb, findType(TYPE_VARIABLE), true);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param sb _more_
-     *
-     * @throws Exception _more_
-     */
-    public void addToBrowseSearchForm(Request request, StringBuffer sb)
-            throws Exception {
-        addToBrowseSearchForm(request, sb, findType(TYPE_KEYWORD), true);
-        addToBrowseSearchForm(request, sb, findType(TYPE_PROJECT), true);
-        addToBrowseSearchForm(request, sb, findType(TYPE_CREATOR), true);
-        addToBrowseSearchForm(request, sb, findType(TYPE_CONTRIBUTOR), true);
-        addToBrowseSearchForm(request, sb, findType(TYPE_PUBLISHER), true);
-        addToBrowseSearchForm(request, sb, findType(TYPE_VARIABLE), true);
-    }
 
 
     /**
@@ -702,10 +554,6 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      *
      * @return _more_
      */
-    public boolean isTag(String tag, MetadataType type) {
-        return isTag(tag, type.getType());
-    }
-
     public boolean isTag(String tag, String type) {
         return ("thredds." + tag).toLowerCase().equals(type);
     }

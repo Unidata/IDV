@@ -66,31 +66,12 @@ public class AdminMetadataHandler extends MetadataHandler {
     public static final String TYPE_ANONYMOUS_UPLOAD ="admin.anonymousupload";
 
 
-    /** _more_ */
-    private List<MetadataType> dummyTypeList =
-        new ArrayList<MetadataType>();
-
-    /** _more_ */
-    private List<MetadataType> nonLocalTypes =
-        new ArrayList<MetadataType>();
-
-
 
     public AdminMetadataHandler(Repository repository)
             throws Exception {
         super(repository);
     }
 
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    protected String getHandlerGroupName() {
-        return "Admin";
-    }
 
 
 
@@ -105,6 +86,8 @@ public class AdminMetadataHandler extends MetadataHandler {
      * @return _more_
      */
     public String[] getHtml(Request request, Entry entry, Metadata metadata) {
+        String[]result = super.getHtml(request, entry, metadata);
+        if(result!=null) return result;
         MetadataType type = findType(metadata.getType());
         if(type == null) return null;
         String        lbl  = msgLabel(type.getLabel());
@@ -112,11 +95,6 @@ public class AdminMetadataHandler extends MetadataHandler {
             return new String[] { lbl, "Has template" };
         }
 
-        if (type.isType(TYPE_ANONYMOUS_UPLOAD)) {
-            return new String[] { lbl,
-                                  "From:" + metadata.getAttr1() + " IP: "
-                                  + metadata.getAttr2() };
-        }
 
         if (type.isType(TYPE_LOCALFILE_PATTERN)) {
             return new String[] { lbl, "Local File Pattern" };

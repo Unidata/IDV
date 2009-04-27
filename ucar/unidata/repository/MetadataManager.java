@@ -167,6 +167,10 @@ public class MetadataManager extends RepositoryManager {
     MetadataHandler dfltMetadataHandler;
 
 
+    public MetadataType findType(String stringType) {
+        return typeMap.get(stringType);
+    }
+
     public void addMetadataType(MetadataType type) {
         metadataTypes.add(type);
         typeMap.put(type.getType(), type);
@@ -464,11 +468,9 @@ public class MetadataManager extends RepositoryManager {
      */
     public StringBuffer addToSearchForm(Request request, StringBuffer sb)
             throws Exception {
-        for (MetadataHandler handler : metadataHandlers) {
-            if ( !handler.getForUser()) {
-                continue;
-            }
-            handler.addToSearchForm(request, sb);
+        for (MetadataType type: metadataTypes) {
+            if(!type.getSearchable()) continue;
+            type.getHandler().addToSearchForm(request, sb, type);
         }
         return sb;
     }
@@ -487,8 +489,9 @@ public class MetadataManager extends RepositoryManager {
     public StringBuffer addToBrowseSearchForm(Request request,
             StringBuffer sb)
             throws Exception {
-        for (MetadataHandler handler : metadataHandlers) {
-            handler.addToBrowseSearchForm(request, sb);
+        for (MetadataType type: metadataTypes) {
+            if(!type.getBrowsable()) continue;
+            type.getHandler().addToBrowseSearchForm(request, sb, type);
         }
         return sb;
     }
@@ -562,8 +565,14 @@ public class MetadataManager extends RepositoryManager {
                 }
             } else {
                 List<Metadata> newMetadataList = new ArrayList<Metadata>();
+                List<Metadata> existingMetadata = getMetadata(entry);
+                Hashtable<String,Metadata> map = new Hashtable<String,Metadata>();
+                for(Metadata metadata:existingMetadata) {
+                    map.put(metadata.getId(), metadata);
+                }
+
                 for (MetadataHandler handler : metadataHandlers) {
-                    handler.handleFormSubmit(request, entry, newMetadataList);
+                    handler.handleFormSubmit(request, entry, map,newMetadataList);
                 }
 
                 if (canEditParent
@@ -894,6 +903,9 @@ public class MetadataManager extends RepositoryManager {
         
         for (MetadataType type: metadataTypes) {
             if(type.getAdminOnly() && !request.getUser().getAdmin()) {
+                continue;
+            }
+            if(!type.getForUser()) {
                 continue;
             }
             String       name    = type.getCategory();

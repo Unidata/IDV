@@ -582,81 +582,77 @@ public class HtmlOutputHandler extends OutputHandler {
 
         boolean didone = false;
         for (Metadata metadata : metadataList) {
-            for (MetadataHandler metadataHandler : metadataHandlers) {
-                if ( !metadataHandler.canHandle(metadata)) {
-                    continue;
-                }
-                String[] html = metadataHandler.getHtml(request, entry,
-                                    metadata);
-                if (html == null) {
-                    continue;
-                }
-                MetadataType type =
-                    metadataHandler.findType(metadata.getType());
-                String cat = type.getDisplayCategory();
-                if ( !decorate) {
-                    cat = "Metadata";
-                }
-                Object[] blob     = (Object[]) catMap.get(cat);
-                boolean  firstOne = false;
-                if (blob == null) {
-                    firstOne = true;
-                    blob = new Object[] { new StringBuffer(),
-                                          new Integer(1) };
-                    catMap.put(cat, blob);
-                    cats.add(cat);
-                }
-                StringBuffer sb     = (StringBuffer) blob[0];
-                int          rowNum = ((Integer) blob[1]).intValue();
-
-                if (firstOne) {
-                    if (decorate) {
-                        sb.append(
-                            "<table width=\"100%\" border=0 cellspacing=\"0\" cellpadding=\"3\">\n");
-                    }
-                    if (addLink && canEdit) {
-                        if (decorate) {
-                            sb.append("<tr><td></td><td>");
-                        }
-                        sb.append(
-                            new Link(
-                                request.entryUrl(
-                                    getMetadataManager().URL_METADATA_FORM,
-                                    entry), iconUrl(ICON_METADATA_EDIT),
-                                            msg("Edit Metadata")));
-                        sb.append(
-                            new Link(
-                                request.entryUrl(
-                                    getRepository().getMetadataManager()
-                                        .URL_METADATA_ADDFORM, entry), iconUrl(
-                                            ICON_METADATA_ADD), msg(
-                                            "Add Metadata")));
-                        if (decorate) {
-                            sb.append("</td></tr>");
-                        }
-                    }
-                }
-                String theClass = HtmlUtil.cssClass("listrow" + rowNum);
-                if (decorate) {
-                    String row =
-                        " <tr  " + theClass
-                        + " valign=\"top\"><td width=\"10%\" align=\"right\" valign=\"top\" class=\"formlabel\"><nobr>"
-                        + html[0] + "</nobr></td><td>" + html[1]
-                        + "</td></tr>";
-                    sb.append(row);
-                } else {
-                    String row =
-                        " <tr  valign=\"top\"><td width=\"10%\" align=\"right\" valign=\"top\" class=\"formlabel\"><nobr>"
-                        + html[0] + "</nobr></td><td>" + html[1]
-                        + "</td></tr>";
-                    sb.append(row);
-                }
-                if (++rowNum > 2) {
-                    rowNum = 1;
-                }
-                blob[1] = new Integer(rowNum);
+            MetadataType type =
+                getRepository().getMetadataManager().findType(metadata.getType());
+            if(type ==null) continue;
+            MetadataHandler metadataHandler  = type.getHandler();
+            String[] html = metadataHandler.getHtml(request, entry,
+                                                    metadata);
+            if (html == null)  continue;
+            String cat = type.getDisplayCategory();
+            if (!decorate) {
+                cat = "Metadata";
             }
+            Object[] blob     = (Object[]) catMap.get(cat);
+            boolean  firstOne = false;
+            if (blob == null) {
+                firstOne = true;
+                blob = new Object[] { new StringBuffer(),
+                                      new Integer(1) };
+                catMap.put(cat, blob);
+                cats.add(cat);
+            }
+            StringBuffer sb     = (StringBuffer) blob[0];
+            int          rowNum = ((Integer) blob[1]).intValue();
+
+            if (firstOne) {
+                if (decorate) {
+                    sb.append(
+                              "<table width=\"100%\" border=0 cellspacing=\"0\" cellpadding=\"3\">\n");
+                }
+                if (addLink && canEdit) {
+                    if (decorate) {
+                        sb.append("<tr><td></td><td>");
+                    }
+                    sb.append(
+                              new Link(
+                                       request.entryUrl(
+                                                        getMetadataManager().URL_METADATA_FORM,
+                                                        entry), iconUrl(ICON_METADATA_EDIT),
+                                       msg("Edit Metadata")));
+                    sb.append(
+                              new Link(
+                                       request.entryUrl(
+                                                        getRepository().getMetadataManager()
+                                                        .URL_METADATA_ADDFORM, entry), iconUrl(
+                                                                                               ICON_METADATA_ADD), msg(
+                                                                                                                       "Add Metadata")));
+                    if (decorate) {
+                        sb.append("</td></tr>");
+                    }
+                }
+            }
+            String theClass = HtmlUtil.cssClass("listrow" + rowNum);
+            if (decorate) {
+                String row =
+                    " <tr  " + theClass
+                    + " valign=\"top\"><td width=\"10%\" align=\"right\" valign=\"top\" class=\"formlabel\"><nobr>"
+                    + html[0] + "</nobr></td><td>" + html[1]
+                    + "</td></tr>";
+                sb.append(row);
+            } else {
+                String row =
+                    " <tr  valign=\"top\"><td width=\"10%\" align=\"right\" valign=\"top\" class=\"formlabel\"><nobr>"
+                    + html[0] + "</nobr></td><td>" + html[1]
+                    + "</td></tr>";
+                sb.append(row);
+            }
+            if (++rowNum > 2) {
+                rowNum = 1;
+            }
+            blob[1] = new Integer(rowNum);
         }
+
 
         for (String cat : cats) {
             Object[]     blob = (Object[]) catMap.get(cat);

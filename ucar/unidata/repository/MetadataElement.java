@@ -46,6 +46,7 @@ public class MetadataElement implements Constants {
     public static final String TYPE_STRING = "string";
     public static final String TYPE_URL = "url";
     public static final String TYPE_EMAIL = "email";
+    public static final String TYPE_FILE = "file";
 
     /** _more_ */
     public static final String TYPE_BOOLEAN = "boolean";
@@ -71,30 +72,11 @@ public class MetadataElement implements Constants {
     /** _more_          */
     private String dflt = "";
 
+    private boolean thumbnail = false;
 
+    private int index;
 
-    /**
-     * _more_
-     *
-     * @param type _more_
-     * @param label _more_
-     * @param values _more_
-     */
-    public MetadataElement(String type, String label, List<Object> values) {
-        this(type, label, 1, 60, values);
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param type _more_
-     * @param label _more_
-     */
-    public MetadataElement(String type, String label) {
-        this(type, label, 1, 60, null);
-    }
+    private MetadataType metadataType; 
 
 
     /**
@@ -106,8 +88,10 @@ public class MetadataElement implements Constants {
      * @param columns _more_
      * @param values _more_
      */
-    public MetadataElement(String type, String label, int rows, int columns,
+    public MetadataElement(MetadataType metadataType, int index, String type, String label, int rows, int columns,
                            List<Object> values) {
+        this.metadataType = metadataType;
+        this.index = index;
         this.type    = type;
         this.label   = label;
         this.rows    = rows;
@@ -125,13 +109,16 @@ public class MetadataElement implements Constants {
         if(type.equals(TYPE_SKIP)) {
             return;
         }
+        if(type.equals(TYPE_FILE)) {
+            return;
+        } 
         if(type.equals(TYPE_EMAIL)) {
             sb.append(HtmlUtil.href("mailto:"+value,value));
         } else if(type.equals(TYPE_URL)) {
             sb.append(HtmlUtil.href(value,value));
             } else {
             sb.append(value);
-        }
+        } 
         sb.append(HtmlUtil.br());
     }
 
@@ -143,7 +130,7 @@ public class MetadataElement implements Constants {
      *
      * @return _more_
      */
-    public String getForm(String arg, String value) {
+    public String getForm(Request request, Entry entry, Metadata metadata, String arg, String value,boolean forEdit) {
         if(type.equals(TYPE_SKIP)) {
             return "";
         }
@@ -164,6 +151,18 @@ public class MetadataElement implements Constants {
             return HtmlUtil.checkbox(arg, "true", Misc.equals(value, "true"));
         } else if (type.equals(TYPE_ENUMERATION)) {
             return HtmlUtil.select(arg, values, value);
+        } else if(type.equals(TYPE_FILE)) {
+            String image = (forEdit
+                            ? metadataType.getFileHtml(request, entry, metadata, this, false)
+                            : "");
+            if (image == null) {
+                image = "";
+            } else {
+                image = "<br>" + image;
+            }
+            return  HtmlUtil.fileInput(arg, HtmlUtil.SIZE_70) + image+"<br>"  +
+                "Or download URL:" +
+                HtmlUtil.input(arg+".url", "", HtmlUtil.SIZE_70);
         } else {
             return null;
         }
@@ -279,6 +278,42 @@ public class MetadataElement implements Constants {
     public String getDefault() {
         return dflt;
     }
+
+/**
+Set the Thumbnail property.
+
+@param value The new value for Thumbnail
+**/
+public void setThumbnail (boolean value) {
+	this.thumbnail = value;
+}
+
+/**
+Get the Thumbnail property.
+
+@return The Thumbnail
+**/
+public boolean getThumbnail () {
+	return this.thumbnail;
+}
+
+/**
+Set the Index property.
+
+@param value The new value for Index
+**/
+public void setIndex (int value) {
+	this.index = value;
+}
+
+/**
+Get the Index property.
+
+@return The Index
+**/
+public int getIndex () {
+	return this.index;
+}
 
 
 }

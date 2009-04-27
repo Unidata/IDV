@@ -265,6 +265,22 @@ public class Metadata implements Constants {
 
 
 
+    public void setAttr(int idx,String value) {
+        if (idx == 1) {
+            attr1 = value;
+        }
+        if (idx == 2) {
+            attr2 = value;
+        }
+        if (idx == 3) {
+            attr3 = value;
+        }
+        if (idx == 4) {
+            attr4= value;
+        }
+    }
+
+
     /**
      * Set the Attr1 property.
      *

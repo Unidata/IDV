@@ -428,6 +428,7 @@ return new Result(title, sb);
                 //                result.setTitle(result.getTitle() + ": " + crumbs[0]);
                 //                result.setTitle(result.getTitle());
                 result.putProperty(PROP_ENTRY_HEADER, sb.toString());
+                result.putProperty(PROP_ENTRY_BREADCRUMBS, crumbs[0]);
             }
         }
         return result;

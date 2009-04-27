@@ -272,6 +272,9 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_ADDMETADATA = "addmetadata";
 
+    public static final String ATTR_ATTR = "attr";
+
+
     /** _more_ */
     public static final String ATTR_ATTR1 = "attr1";
 
@@ -532,6 +535,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_EAST = "east";
+    public static final String ARG_ELEMENT = "element";
 
     /** _more_ */
     public static final String ARG_EDIT_METADATA = "edit.metadata";
@@ -1153,6 +1157,7 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_ENTRY_HEADER = "ramadda.entryheader";
 
+    public static final String PROP_ENTRY_BREADCRUMBS = "ramadda.entry.breadcrumbs";
     /** _more_ */
     public static final String PROP_FACEBOOK_CONNECT_KEY =
         "ramadda.facebook.connect.key";
@@ -1235,8 +1240,8 @@ public interface Constants {
     public static final String PROP_LOG_TOSTDERR = "ramadda.log.tostderr";
 
     /** _more_ */
-    public static final String PROP_METADATAHANDLERS =
-        "ramadda.metadatahandlers";
+    public static final String PROP_METADATA =
+        "ramadda.metadata";
 
     /** _more_ */
     public static final String PROP_NAVLINKS = "ramadda.navlinks";
