@@ -5728,10 +5728,11 @@ public class IdvUIManager extends IdvManager {
         entries.add(new HttpFormEntry(HttpFormEntry.TYPE_INPUT, "subject",
                                       "Subject:"));
 
+        String nag = "<html><h3>In order for us to provide an effective response to your problem <font color=\"red\"><i>we need to have as much information as possible</i></font>.<br> Please provide a <i>thorough</i> description of the problem you encountered, including a description of what you were<br> trying to do, what data you were accessing, etc.</h3></html>" ;
         entries.add(
             new HttpFormEntry(
                 HttpFormEntry.TYPE_LABEL, "",
-                "<html>Please provide a <i>thorough</i> description of the problem you encountered:</html>"));
+                nag));
         entries.add(descriptionEntry =
             new HttpFormEntry(HttpFormEntry.TYPE_AREA, "description",
                               "Description:", description, 5, 30, true));
@@ -5767,7 +5768,7 @@ public class IdvUIManager extends IdvManager {
 
 
         JCheckBox includeBundleCbx =
-            new JCheckBox("Include Current State as Bundle", false);
+            new JCheckBox("Include Current State as Bundle", true);
 
         boolean alreadyHaveDialog = true;
         if (dialog == null) {
