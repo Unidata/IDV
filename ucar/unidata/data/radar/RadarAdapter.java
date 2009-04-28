@@ -51,6 +51,9 @@ public interface RadarAdapter extends RadarConstants {
     public static RealType ELEVATION_ANGLE_TYPE =
         RealType.getRealType(ELEVATION_ANGLE, CommonUnit.degree);
 
+    /** RealType for Azimuth angle */
+    public static RealType AZIMUTH_ANGLE_TYPE =
+        RealType.getRealType(AZIMUTH_ANGLE, CommonUnit.degree);
     /**
      * Get the data for the given DataChoice and selection criteria.
      * @param dataChoice         DataChoice for selection

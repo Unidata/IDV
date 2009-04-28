@@ -35,6 +35,8 @@ public interface RadarConstants {
     /** Azimuth value property */
     public static final String PROP_AZIMUTH = "Level2RadarDataSource.azimuth";
 
+    public static final String PROP_AZIMUTHS = "Level2RadarDataSource.azimuths";
+
     /** Elevation angles property */
     public static final String PROP_ANGLES = "Level2RadarDataSource.angles";
 
@@ -102,6 +104,9 @@ public interface RadarConstants {
 
     /** Elevation Angle Identifier */
     public static final String ELEVATION_ANGLE = "Elevation_Angle";
+
+    /** Azimuth Angle Identifier */
+    public static final String AZIMUTH_ANGLE = "Azimuth_Angle";
 
     /** Reflectivity name */
     public static final String REFLECTIVITY_NAME = "Reflectivity";

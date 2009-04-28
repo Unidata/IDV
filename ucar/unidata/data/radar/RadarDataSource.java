@@ -51,6 +51,8 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
     public static final DataCategory CATEGORY_RHI =
         DataCategory.parseCategory("RHI", false);
 
+    public static final DataCategory CATEGORY_RHISWEEP =
+        DataCategory.parseCategory("RHISWEEP", false);
 
     /**
      * Radar data appropriate for CAPPIE

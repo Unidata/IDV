@@ -133,6 +133,8 @@ public class CDMRadarAdapter implements RadarAdapter {
     /** PI */
     private double M_PI = 3.14159265358979323846;
 
+    /** flag for a RHI file */
+    private boolean isRHI;
     /**
      * Zero-argument constructor for construction via unpersistence.
      */
@@ -306,6 +308,13 @@ public class CDMRadarAdapter implements RadarAdapter {
                 vcp = "unknown";
             }
             Attribute attr = rds.findGlobalAttributeIgnoreCase("isRadial");
+
+
+            if(sweepMode != null){
+                int mode = sweepMode.getNumericValue().intValue();
+                if(mode == 3) isRHI = true;
+            }
+
             if (attr != null) {
                 int isR = attr.getNumericValue().intValue();
                 if (isR == 3) {
@@ -404,11 +413,15 @@ public class CDMRadarAdapter implements RadarAdapter {
                     paramTypes[p] = RealType.getRealType(radVar.getName(), u,
                             null);
                     angles = new double[nsweep];
-
-                    for (int i = 0; i < nsweep; i++) {
-                        angles[i] = radVar.getSweep(i).getMeanElevation();
+                    if(isRHI){
+                        for (int i = 0; i < nsweep; i++) {
+                            angles[i] = getMeanAzimuth(radVar.getSweep(i).getAzimuth());
+                        }
+                    } else {
+                        for (int i = 0; i < nsweep; i++) {
+                            angles[i] = radVar.getSweep(i).getMeanElevation();
+                        }
                     }
-
                     if (id != 0) {
                         vcpAngles = getVCPAngles(id, angles);
                         anglesMap.put(radVar.getName(), vcpAngles);
@@ -431,7 +444,19 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
 
+    private double getMeanAzimuth(float [] azimuths){
+        int size = azimuths.length;
 
+        int total = 0;
+        float all = 0;
+        for(int i = 0; i < size; i++){
+            if(!Float.isNaN(azimuths[i])) {
+                total++;
+                all = all + azimuths[i];
+            }
+        }
+        return (float)all/total;
+    }
 
 
     /**
@@ -1583,6 +1608,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         Object      choiceId = dataChoice.getId();
         String      vn;
+        String      vrhi;
         ObjectArray choiceAttrs;
         Trace.call1("CDMRA:getData");
 
@@ -1610,7 +1636,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         Object  momentObj = choiceAttrs.getObject1();
         int     moment    = Integer.parseInt(momentObj.toString());
         boolean volume;
-        if (isRaster()) {
+        if (isRaster() || isRHI()) {
             volume = false;
         } else {
             volume = VALUE_VOLUME.equals(Misc.getProperty(requestProperties,
@@ -1665,7 +1691,67 @@ public class CDMRadarAdapter implements RadarAdapter {
                 }
             }
         } else {
-            if (isRaster()) {
+            if(isRHI()) {
+                try {
+                    double value = Double.NaN;
+                    //System.out.println("AZIMUTH angle is :" );
+                    Double fromProperties;
+                    fromProperties =
+                             (Double) requestProperties.get(PROP_AZIMUTH);
+                     if (fromProperties != null) {
+                            value = (fromProperties).doubleValue();
+                     }
+                     if (Double.isNaN(value) && subset != null) {
+                        Object o = subset.getFromLevel();
+                        if (o != null) {
+                            Object newO = o;
+                            if (o instanceof TwoFacedObject) {
+                                newO = ((TwoFacedObject) o).getId();
+                            }
+                            if (newO instanceof Real) {
+                                value = ((Real) newO).getValue();
+                            }
+                        }
+                    }
+                    if (Double.isNaN(value)) {
+                        fromProperties =
+                            (Double) requestProperties.get(PROP_AZIMUTH);
+                        if (choiceAttrs.getObject2()
+                                   instanceof Double ) {
+                            value =
+                                ((Double) choiceAttrs.getObject2())
+                                    .doubleValue();
+                        }
+                        
+                        if(value == -1.0){
+                            value =
+                                ((Double) choiceAttrs.getObject2())
+                                    .doubleValue();
+                        }
+                    }
+                    // check one more time.
+                    if (Double.isNaN(value)) {
+                        throw new IllegalArgumentException(
+                            "No angle specified");
+                    }
+                    Object s      = dataChoice.getProperty(PROP_AZIMUTH);
+                    int    sIndex = 0;
+                    if (s == null) {
+                        if (anglesMap.get(vn) == null) {
+                            return null;
+                        }
+                        sIndex = getAngleIdx((double[]) anglesMap.get(vn),
+                                             value);
+                    } else {
+                        sIndex = (int) new Double(s.toString()).doubleValue();
+                    }
+                    //System.out.println("AZIMUTH angle is :" + value);
+                    fi = getRHISweep(moment, value, vn, sIndex, true);
+                } catch (IOException ex) {
+                    LogUtil.logException("getRhiSweep", ex);
+                }
+            }
+            else if (isRaster()) {
                 try {
                     fi = getRaster(moment, vn);
                 } catch (IOException ex) {
@@ -2618,6 +2704,164 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException Java RMI problem
      * @throws VisADException  Couldn't create VisAD Object
      */
+
+    public FieldImpl  getRHISweep(int moment, double elevation, String varName,
+                              int idx,
+                              boolean want3D) throws VisADException,
+                                  RemoteException, IOException {
+        Trace.call1(" getRHiSweep " + elevation);
+
+        int sweepNum = idx;  //getSweepNumber(varName, elevation);
+        if (sweepNum < 0) {
+            // System.out.println("couldn't find sweep at " + elevation);
+            Trace.call2(" getSweep " + elevation);
+            return null;
+        }
+        RadialDatasetSweep.RadialVariable sweepVar =
+            (RadialDatasetSweep.RadialVariable) rds.getDataVariable(varName);
+        RadialDatasetSweep.Sweep varSweep   = sweepVar.getSweep(sweepNum);
+        int                      numRadials = varSweep.getRadialNumber();
+        int                      numGates   = varSweep.getGateNumber();
+        double                   range_step = varSweep.getGateSize();
+        double range_to_first_gate = varSweep.getRangeToFirstGate()
+                                     + 0.5f * range_step;
+        float[]   elevations;                    //new float[numRadials];
+        float[]   azimuths;                      //  = new float[numRadials];
+       // int npix = (numRadials + 2) * numGates;  // add two additional rays
+        float[][] values = new float[numRadials][numGates];
+
+        //  for (int azi = 0; azi < numRadials; azi++) {
+        azimuths = varSweep.getAzimuth();  //.getAzimuth(azi);
+        //  }
+        float[] _azimuths = azimuths;
+
+        for (int rayIdx = 0; rayIdx < numRadials; rayIdx++) {
+            float azimuth = azimuths[rayIdx];
+            if (Float.isNaN(azimuth)) {
+                azimuth = 361.f;
+            }
+            _azimuths[rayIdx] = azimuth;
+        }
+
+        //calulate the total azi
+        float azis   = 0;
+        float preAzi = azimuths[0];
+        for (int rayIdx = 0; rayIdx < numRadials; rayIdx++) {
+            float dif = Math.abs(azimuths[rayIdx] - preAzi);
+            if (dif < 1.5) {
+                azis = azis + dif;
+            }
+
+            preAzi = azimuths[rayIdx];
+        }
+        //int[] sortedAzs = QuickSort.sort(azimuths);
+
+        int[] sortedAzs;
+        if (azis >= 300) {
+            sortedAzs = QuickSort.sort(azimuths);
+        } else {
+            sortedAzs = new int[azimuths.length];
+            for (int i = 0; i < azimuths.length; i++) {
+                sortedAzs[i] = i;
+            }
+        }
+        // for (int eli = 0; eli < numRadials; eli++) {
+        elevations = varSweep.getElevation();  //.getElevation(eli);
+        //  }
+        for (int eli = 0; eli < numRadials; eli++) {
+             values[eli] = varSweep.readData(eli);
+        }
+
+        //float[] rawValues = varSweep.readData();
+
+        FlatField retField;
+        FieldImpl fi = null;
+        int bincounter = numGates;
+        int tiltcounter = numRadials -1;
+        float rhiAz = (float)elevation;
+        int[] tiltindices = new int[numRadials];
+        double halfBeamWidth = 0.95 / 2;;
+        double[][] ranges      = new double[numRadials][bincounter];
+
+        for (int ti = 0; ti < numRadials; ti++) {
+
+            ranges[ti][0]  = (range_to_first_gate + range_step / 2);
+
+            for (int bi = 1; bi < bincounter; bi++) {
+                //values[ti][bi] = data[bi];
+                ranges[ti][bi] = ranges[ti][bi - 1] + range_step;
+            }
+            tiltindices[ti] = ti;
+        }
+
+        for (int tc = 0; tc < tiltcounter; tc++) {
+            float[][] domainVals = new float[3][bincounter * 2];
+            float[][] signalVals = new float[1][bincounter * 2];
+            int       ti         = tiltindices[tc];
+            float     lowerElev  = elevations[ti] - (float) halfBeamWidth + 0.5f;
+            
+            for (int bi = 0; bi < bincounter; bi++) {
+                domainVals[0][bi] = (float) ranges[ti][bi];
+                domainVals[1][bi] = rhiAz;
+                domainVals[2][bi] = lowerElev;
+                signalVals[0][bi] = values[ti][bi];
+            }
+
+            float upperElev = elevations[ti] + (float) halfBeamWidth + 0.5f;
+
+            for (int bi = 0; bi < bincounter; bi++) {
+                domainVals[0][bi + bincounter] = (float) ranges[ti][bi];
+                domainVals[1][bi + bincounter] =  rhiAz;
+                domainVals[2][bi + bincounter] = upperElev;
+                signalVals[0][bi + bincounter] = values[ti][bi];
+            }
+
+            RealTupleType radarDomainType = makeDomainType3D();
+            GriddedSet domainSet = new Gridded3DSet(radarDomainType,
+                                       domainVals, bincounter, 2,
+                                       radarDomainType.getCoordinateSystem(),
+                                       new Unit[] {
+                                           CommonUnit.meter,
+                                           CommonUnit.degree,
+                                           CommonUnit.degree }, null, false);
+            FunctionType functionType = new FunctionType(radarDomainType,
+                                            getMomentType(varName));
+
+            retField = new FlatField(functionType, domainSet,
+                                     (CoordinateSystem) null, (Set[]) null,
+                                     (Unit[]) null);
+            retField.setSamples(signalVals, false);
+
+            if (tc == 0) {
+                RealType indexType = RealType.getRealType("integer_index");
+                FunctionType fiFunction = new FunctionType(indexType,
+                                              retField.getType());
+                Integer1DSet intSet = new Integer1DSet(tiltcounter);
+
+                fi = new FieldImpl(fiFunction, intSet);
+                fi.setSample(0, retField, false, true);
+            } else {
+                fi.setSample(tc, retField, false, false);
+            }
+        }
+
+        return fi;
+    }
+    /**
+     * Makes a field of all data from one common data model radar adapter;
+     *
+     * @param moment moment
+     * @param elevation  elevation angle
+     * @param varName    variable name
+     * @param idx _more_
+     * @param want3D     true if should return a 3D field
+     *
+     * @return sweep as a FieldImpl
+     *
+     * @throws IOException     Problem reading data
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  Couldn't create VisAD Object
+     */
     public FlatField getSweep(int moment, double elevation, String varName,
                               int idx,
                               boolean want3D) throws VisADException,
@@ -3218,7 +3462,15 @@ public class CDMRadarAdapter implements RadarAdapter {
         return this.isVolume;
     }
 
-
+    /**
+     * Get the parameters for this adapter
+     *
+     * @return parameters
+     */
+    public boolean isRHI() {
+        return this.isRHI;
+    }
+    
     /**
      * utility caching method
      *
