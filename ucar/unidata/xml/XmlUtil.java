@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.xml;
 
 
@@ -372,8 +373,17 @@ public abstract class XmlUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param element _more_
+     * @param name _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public static boolean getAttributeFromTree(Node element, String name,
-                                           boolean dflt) {
+            boolean dflt) {
         if (element == null) {
             return dflt;
         }
@@ -1496,6 +1506,27 @@ public abstract class XmlUtil {
      *
      *  @param parent The xml node to search its chidlren.
      * @param childTag _more_
+     * @param dflt _more_
+     *  @return The text values contained by the children of the given parent.
+     */
+    public static String getGrandChildText(Node parent, String childTag,
+                                           String dflt) {
+        String text = getGrandChildText(parent, childTag);
+        if (text == null) {
+            return dflt;
+        }
+        if (text.length() == 0) {
+            return dflt;
+        }
+        return text;
+    }
+
+
+    /**
+     * Finds the child node with the given tag name. Then gets the child text from that node if it is non-null.
+     *
+     *  @param parent The xml node to search its chidlren.
+     * @param childTag _more_
      *  @return The text values contained by the children of the given parent.
      */
     public static String getGrandChildText(Node parent, String childTag) {
@@ -1542,14 +1573,26 @@ public abstract class XmlUtil {
      * @return _more_
      */
     public static CDATASection makeCDataNode(Document doc, String text) {
-        return makeCDataNode(doc,text,true);
+        return makeCDataNode(doc, text, true);
     }
 
-    public static CDATASection makeCDataNode(Document doc, String text, boolean andEncode) {
-        if(andEncode) 
-            return doc.createCDATASection(XmlUtil.encodeBase64(text.getBytes()));
-        else
+    /**
+     * _more_
+     *
+     * @param doc _more_
+     * @param text _more_
+     * @param andEncode _more_
+     *
+     * @return _more_
+     */
+    public static CDATASection makeCDataNode(Document doc, String text,
+                                             boolean andEncode) {
+        if (andEncode) {
+            return doc.createCDATASection(
+                XmlUtil.encodeBase64(text.getBytes()));
+        } else {
             return doc.createCDATASection(text);
+        }
     }
 
 
