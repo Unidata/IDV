@@ -450,7 +450,7 @@ Since this is confusing and needs more work lets remove this for now
 
   <control
      id="topography"
-     categories="param:ALTITUDE;param:Elevation"
+     categories="param:ALTITUDE;param:Elevation;param:Z;"
      class="ucar.unidata.idv.control.TopographyControl"
      label="Topography"
      doeslevels="true"

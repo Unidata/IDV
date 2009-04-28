@@ -92,7 +92,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="Z"
      label="Z"
-     aliases="z,Z,Geopotential_height,HGHT,HGTM,HGTK,HGTD,HGFT,HGFK,HGML,HGHT_PRES,HGHT_THTA"/>
+     aliases="z,Z,Geopotential_height,HGHT,HGTM,HGTK,HGTD,HGFT,HGFK,HGML,HGHT_PRES,HGHT_THTA,thickness_1000_500,Anythickness"/>
   <alias
      name="GP"
      label="Geopotential"
