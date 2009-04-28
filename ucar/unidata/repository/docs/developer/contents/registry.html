@@ -13,45 +13,56 @@ server registry facility within RAMADDA.
 <p>
 
 A RAMADDA server can be enabled to be a registry for other servers. 
-We term this a "registry server". (Note: This configuration is done through the
-<i>Admin-&gt;Settings-&gt;Site and Contact Information</i> page).
-<p>
+We term this a "registry server".  This configuration is done through the
+<i>Admin-&gt;Settings-&gt;Site and Contact Information</i> page:
+
+[ht::cimg images/registryadmin.jpg {} {border=0 width=700}]
+
 Likewise, a RAMADDA server can be configured to have 0 or more 
 servers that it registers itself with. In this case, a RAMADDA server
-that is registering itself with a registry server is known as a "client
-server". By default a RAMADDA server
-comes with an initial registry server:<br>
+that is registering itself with a registry server is known as a "registry client". 
+By default a RAMADDA server comes with an initial registry server:<br>
 <i>http://motherlode.ucar.edu/repository</i>
-<p>
 
 
-A registry server stores a list of client server information (base URL, title, description) in the database.
-At start-up and at certain intervals a registry server will run through its list of client servers
-and attempt to connect to the URL:<br>
+<h3>Registry Process</h3>
+
+The following diagram shows the basic sequence of the registration process.
+
+[ht::cimg images/uml/registry.jpg {} {border=0}]
+
+When a client starts up or when its configuration has changed the client  will notify each of its registry
+servers passing its base URL as an argument:
+<blockquote>
+<i>http://registryserver/repository/registry/add?registry.client=http://registryclient/repository</i>
+</blockquote>
+
+The registry server will attempt to connect back to the client 
+passing its base URL as an argument:
+<blockquote>
 <i>http://clientserver/repository/registry/info?registry.server=http://registryserver/repository</i>
-<br>
-passing its base URL in as an argument. It does this to keep its list of client servers up to date.
-<p>
+</blockquote>
 
-The client server, on receipt of this request, will check if the given registry server is in its list
+The client, on receipt of this request, will check if the given registry server is in its list
 of registry servers. If it is then it responds with an xml listing of its server information including
 its title (the repository title) and description (the description of its top-level group).
+On a successful  response from the client
+the server will store the new client information into its database.
 <p>
 If the requesting registry server is not in the list of servers held by a client then an error
-is returned. On a failed request the registry server will remove the client server listing from
+is returned. On a failed request the registry server will remove the client listing from
 the database.
 
+<p>
+A registry server stores a list of client information (base URL, title, description) in the database.
+At start-up and at certain intervals a registry server will run through its list of clients, executing the
+above registry process. It does this to keep its listing up to date and to remove any clients that are no
+longer running.  If, after removal of a client, the client starts up again it will run through its registry
+process (as described above) to be reinserted into the server list.
+
 
 <p>
-On start-up or when the repository configuration has changed a client server will notify each of its registry
-servers at:<br>
-<i>http://registryserver/repository/registry/add?registry.client=http://registryclient/repository</i>
-<p>
-Passing its base public URL as an argument. The registry server on receipt of this request will go through the
-above described verification process. If successfull the new client server information will be added into the database.
-
-<p>
-A registry server provides a listing of its known client servers at:<br>
+A registry server provides a listing of its known clients at:<br>
 <a href="http://motherlode.ucar.edu/repository/registry/list">http://motherlode.ucar.edu/repository/registry/list</a>
 
 
