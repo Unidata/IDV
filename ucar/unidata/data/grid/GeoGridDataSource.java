@@ -1525,7 +1525,7 @@ public class GeoGridDataSource extends GridDataSource {
                 System.err.println("Did not find level indices:   fromLevel:"
                                    + fromLevel + " index:" + fromLevelIndex
                                    + " toLevel:" + toLevel + " index:"
-                                   + toLevelIndex);
+                                   + toLevelIndex+"\nLevels:" + allLevels);
             }
         }
 
@@ -1893,13 +1893,29 @@ public class GeoGridDataSource extends GridDataSource {
      * @throws Exception  some error occurred
      */
     public static void main(String[] args) throws Exception {
+        /*
 
         if (true) {
-            GridDataset gds = GridDataset.open(args[0]);
+            int j=0;
+            //            int []bufferSizes = {100,250,500,750,1000,5000,8092};
+            int []bufferSizes = {500,500,500,500};
+            for(int i=0;i<100;i++) {
+                //                for(j=0;j<2;j++) {
+                    ucar.grib.grib2.Grib2BitMapSection.SKIPIT = (j==0);
+                    for(String arg: args) {
+                        //                        ucar.unidata.io.RandomAccessFile.BUFFERSIZE = bufferSizes[i];
+                        ucar.unidata.io.RandomAccessFile.BUFFERSIZE = 500;
+                        GridDataset gds = GridDataset.open(arg);
+                        gds.close();
+                        File gbxFile = new File(arg+".gbx");
+                        gbxFile.delete();
+                    }
+                    //                }
+            }
             return;
         }
 
-
+        */
 
 
         String leadUrl =
