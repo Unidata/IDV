@@ -132,6 +132,14 @@ example:
      displaycategory="Radar Displays"
      properties="smoothed=false;windowVisible=true;allowSmoothing=false,setAutoScaleYAxis=false"/>
   <control
+     id="rhisweep3d"
+     categories="RHISWEEP"
+     doeslevels="true"
+     class="ucar.unidata.idv.control.RadarRhiControl"
+     label="RHI Sweep View"
+     displaycategory="Radar Displays"
+     properties="smoothed=false;use3D=true;allowSmoothing=false"/>
+  <control
      id="level2CAPPI"
      categories="RADAR_VOLUME"
      class="ucar.unidata.idv.control.CappiControl"
