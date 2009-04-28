@@ -278,7 +278,7 @@ public class VerticalProfileChart extends XYChartManager {
                     VerticalProfileInfo vpInfo =
                         (VerticalProfileInfo) profiles.get(paramIdx);
                     LineState lineState = vpInfo.getLineState();
-                    lineState.setUseVertical(false);
+                    lineState.setUseVerticalPosition(false);
                     addLineState(lineState);
                     lineState.setName(
                         vpInfo.getDataInstance().getParamName());

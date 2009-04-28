@@ -113,19 +113,19 @@ public class TimeSeriesChart extends XYChartManager {
     /** format */
     NumberFormat numberFormat;
 
-    /** _more_ */
+    /** sunrise dates */
     private List sunriseDates;
 
-    /** _more_ */
+    /** sunrise location */
     private LatLonPoint sunriseLocation;
 
-    /** _more_ */
+    /** last start date */
     private Date lastStartDate;
 
-    /** _more_ */
+    /** last end date */
     private Date lastEndDate;
 
-    /** _more_ */
+    /** date format */
     private String dateFormat;
 
 
@@ -1019,9 +1019,9 @@ public class TimeSeriesChart extends XYChartManager {
 
 
     /**
-     * _more_
+     * Set the location for this chart
      *
-     * @param llp _more_
+     * @param llp  the location
      */
     public void setLocation(LatLonPoint llp) {
         sunriseLocation = llp;
@@ -1031,11 +1031,11 @@ public class TimeSeriesChart extends XYChartManager {
 
 
     /**
-     * _more_
+     * Draw the sunrise/sunset curves
      *
-     * @param g2 _more_
-     * @param plot _more_
-     * @param dataArea _more_
+     * @param g2  the graphics area
+     * @param plot   the plot
+     * @param dataArea  the date range
      */
     private void drawSunriseSunset(Graphics2D g2, XYPlot plot,
                                    Rectangle2D dataArea) {
@@ -1130,9 +1130,9 @@ public class TimeSeriesChart extends XYChartManager {
 
 
     /**
-     * _more_
+     * Set the date format
      *
-     * @param format _more_
+     * @param format  the date format
      */
     public void setDateFormat(String format) {
         dateFormat = format;
@@ -1140,9 +1140,9 @@ public class TimeSeriesChart extends XYChartManager {
 
 
     /**
-     * _more_
+     * Get the date format
      *
-     * @return _more_
+     * @return  the date format
      */
     public String getDateFormat() {
         return dateFormat;

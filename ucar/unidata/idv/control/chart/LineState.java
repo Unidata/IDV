@@ -286,7 +286,7 @@ public class LineState {
     /** for gui */
     JComboBox chartNameBox;
 
-    /** _more_          */
+    /** name field */
     JTextField nameField;
 
     /** for gui */
@@ -326,7 +326,7 @@ public class LineState {
     /** my name */
     private String name;
 
-    /** _more_ */
+    /** axis label */
     private String axisLabel;
 
     /** index */
@@ -339,7 +339,7 @@ public class LineState {
     private boolean visibleInLegend = true;
 
     /** flag for use vertical for positions */
-    private boolean useVertical = true;
+    private boolean useVerticalPosition = true;
 
     /**
      * Default ctor
@@ -455,35 +455,35 @@ public class LineState {
     }
 
 
-    /** _more_ */
+    /** list of times */
     private List<DateTime> times;
 
-    /** _more_ */
+    /** list of values */
     private List<Real> values;
 
     /**
-     * _more_
+     * Get the list of times
      *
-     * @return _more_
+     * @return the list of times
      */
     public List<DateTime> getTimes() {
         return times;
     }
 
     /**
-     * _more_
+     * Get the list of values
      *
-     * @return _more_
+     * @return the list of values
      */
     public List<Real> getValues() {
         return values;
     }
 
     /**
-     * _more_
+     * Set the track with a list of times and values
      *
-     * @param times _more_
-     * @param values _more_
+     * @param times  the times
+     * @param values the values
      */
     public void setTrack(List<DateTime> times, List<Real> values) {
         this.times  = times;
@@ -613,7 +613,7 @@ public class LineState {
 
 
         if (full) {
-            if (getUseVertical()) {
+            if (getUseVerticalPosition()) {
                 comps.add(GuiUtils.rLabel("Vertical Position:"));
                 comps.add(GuiUtils.left(verticalPositionCbx =
                     GuiUtils.makeComboBox(VPOS_VALUES, VPOS_LABELS,
@@ -1041,9 +1041,9 @@ public class LineState {
     }
 
     /**
-     * _more_
+     * Set the name if needed
      *
-     * @param value _more_
+     * @param value true to set the name
      */
     public void setNameIfNeeded(String value) {
         if ((name == null) || (name.length() == 0)) {
@@ -1202,8 +1202,8 @@ public class LineState {
      *
      *  @param value The new value for UseVertical
      */
-    public void setUseVertical(boolean value) {
-        useVertical = value;
+    public void setUseVerticalPosition(boolean value) {
+        useVerticalPosition = value;
     }
 
     /**
@@ -1211,8 +1211,8 @@ public class LineState {
      *
      *  @return The UseVertical
      */
-    public boolean getUseVertical() {
-        return useVertical;
+    public boolean getUseVerticalPosition() {
+        return useVerticalPosition;
     }
 
 
