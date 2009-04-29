@@ -1499,6 +1499,73 @@ public class StringUtil {
     }
 
     /**
+     * tokenize the given string on spaces. Respect double quotes
+     *
+     * @param s The string to tokenize
+     * @return the list of tokens
+     */
+    public static List<String> splitWithQuotes(String s) {
+        ArrayList<String> list = new ArrayList();
+        if (s == null) {
+            return list;
+        }
+        //        System.err.println ("S:" + s);
+        while(true) {
+            s = s.trim();
+            int qidx1 = s.indexOf("\"");
+            int qidx2 = s.indexOf("\"",qidx1+1);
+            int sidx1 = 0;
+            int sidx2 = s.indexOf(" ",sidx1+1);                
+            if(qidx1<0 && sidx2<0) {
+                if(s.length()>0) {
+                    list.add(s);
+                }
+                break;
+            }
+            if(qidx1>=0 && (sidx2==-1 || qidx1<sidx2)) {
+                if(qidx1>=qidx2) {
+                    //Malformed string. Add the rest of the line and break
+                    if(qidx1==0) {
+                        s = s.substring(qidx1+1);
+                    } else if(qidx1>0) {
+                        s = s.substring(0,qidx1);
+                    }
+                    if(s.length()>0) {
+                        list.add(s);
+                    }
+                    break;
+                }
+                if(qidx2<0) {
+                    //Malformed string. Add the rest of the line and break
+                    s = s.substring(1);
+                    list.add(s);
+                    break;
+                }
+                String tok = s.substring(qidx1+1,qidx2);
+                if(tok.length()>0) {
+                    list.add(tok);
+                }
+                s = s.substring(qidx2+1);
+                //                System.err.println ("qtok:" + tok);
+            } else {
+                if(sidx2<0) {
+                    list.add(s);
+                    break;
+                }
+                String tok = s.substring(sidx1,sidx2);
+                if(tok.length()>0) {
+                    list.add(tok);
+                }
+                s = s.substring(sidx2);
+                //                System.err.println ("stok:" + tok);
+            }
+        }
+        return list;
+    }
+
+
+
+    /**
      * Tokenize the toString value of the given source object, splitting
      * on the given delimiter. If trim is true the string trim each token.
      *
@@ -2421,6 +2488,16 @@ public class StringUtil {
      * @throws Exception some problem
      */
     public static void main(String[] args) throws Exception {
+        System.err.println (splitWithQuotes(" single  again \"hello there\" another couple of toks  \"how are you\" I am fine \"and you"));
+
+        System.err.println (splitWithQuotes("text1 text2"));
+        System.err.println (splitWithQuotes("hello"));
+        System.err.println (splitWithQuotes("\"hello"));
+        System.err.println (splitWithQuotes("\"hello\""));
+        System.err.println (splitWithQuotes("hello\""));
+        if(true) return;
+
+
         args = new String[]{"*","glob:fo*o","glob:*fo*o*","x.*"};
         for(int i=0;i<args.length;i++) {
             System.err.println("pattern:" + args[i]);
