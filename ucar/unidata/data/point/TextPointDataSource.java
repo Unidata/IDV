@@ -1056,8 +1056,8 @@ public class TextPointDataSource extends PointDataSource {
      * @param metadata The metadata
      */
     public void applySavedMetaDataFromUIInner(Metadata metadata) {
-        applySavedMetaData(metadata);
         setLineText(lineLbl, skipRows, lines);
+        applySavedMetaData(metadata);
     }
 
     /**
