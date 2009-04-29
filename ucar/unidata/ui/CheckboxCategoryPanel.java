@@ -20,6 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.ui;
 
 
@@ -45,7 +47,7 @@ import javax.swing.event.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class CheckboxCategoryPanel extends JPanel {
+public class CheckboxCategoryPanel extends JPanel implements ChangeListener {
 
     /** Toggle icon used to show open categories and legend details */
     public static ImageIcon categoryOpenIcon;
@@ -61,16 +63,23 @@ public class CheckboxCategoryPanel extends JPanel {
             Resource.getImage("/auxdata/ui/icons/CategoryClosed.gif"));
     }
 
-
+    /** Are we currently in checkVisCbx   */
+    private boolean checking = false;
 
     /** The list of checkboxes */
-    private List items = new ArrayList();
+    private List<JCheckBox> items = new ArrayList<JCheckBox>();
 
     /** The visibility checkbox */
     private JCheckBox visCbx;
 
     /** The toggle button */
     private JButton toggleBtn;
+
+    /** font         */
+    private Font normalFont;
+
+    /** font used when we have at least one child box on but not all of them on    */
+    private Font specialFont;
 
     /**
      * Create me
@@ -101,6 +110,8 @@ public class CheckboxCategoryPanel extends JPanel {
                 toggleAll(visCbx.isSelected());
             }
         });
+        normalFont  = visCbx.getFont();
+        specialFont = normalFont.deriveFont(Font.ITALIC | Font.BOLD);
     }
 
     /**
@@ -110,7 +121,19 @@ public class CheckboxCategoryPanel extends JPanel {
      */
     public void addItem(JCheckBox box) {
         items.add(box);
+        box.addChangeListener(this);
+        checkVisCbx();
     }
+
+    /**
+     * handle change event
+     *
+     * @param e event_
+     */
+    public void stateChanged(ChangeEvent e) {
+        checkVisCbx();
+    }
+
 
     /**
      * Create and return the top panel. That is, the one that holds
@@ -139,21 +162,32 @@ public class CheckboxCategoryPanel extends JPanel {
      * Turn on the vis checkbox if all sub elements are on
      */
     public void checkVisCbx() {
-        boolean allOn  = true;
-        boolean allOff = true;
-        for (int i = 0; i < items.size(); i++) {
-            if (((JCheckBox) items.get(i)).isSelected()) {
-                allOff = false;
+        if (checking) {
+            return;
+        }
+        checking = true;
+        boolean anyOn = false;
+        boolean allOn = true;
+
+        for (JCheckBox cbx : items) {
+            if (cbx.isSelected()) {
+                anyOn = true;
             } else {
                 allOn = false;
             }
         }
-        if (allOn) {
-            visCbx.setSelected(true);
+
+        visCbx.setSelected(anyOn);
+        if (anyOn) {
+            if (allOn) {
+                visCbx.setFont(normalFont);
+            } else {
+                visCbx.setFont(specialFont);
+            }
+        } else {
+            visCbx.setFont(normalFont);
         }
-        if (allOff) {
-            visCbx.setSelected(false);
-        }
+        checking = false;
     }
 
 }
