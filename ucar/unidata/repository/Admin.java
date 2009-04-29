@@ -542,6 +542,7 @@ public class Admin extends RepositoryManager {
                     sb.append(getRepository().note(msg("Site administrator created")));
                     sb.append(HtmlUtil.p());
                     sb.append(getUserManager().makeLoginForm(request));
+                    getRegistryManager().doFinalInitialization();
                     return new Result("", sb);
                 }
                 sb.append(msg("Error"));

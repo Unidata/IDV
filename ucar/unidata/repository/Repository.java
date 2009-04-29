@@ -794,7 +794,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
         getStorageManager().doFinalInitialization();
-        getRegistryManager().doFinalInitialization();
+        if (!getInstallationComplete()) {
+            getRegistryManager().doFinalInitialization();
+        }
 
     }
 
@@ -2154,6 +2156,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    public boolean getInstallationComplete() {
+        return getDbProperty(ARG_ADMIN_INSTALLCOMPLETE, false);
+    }
+
+
     /**
      * _more_
      *
@@ -2213,7 +2220,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
         //        System.err.println(request + " user-agent:" + userAgent +" ip:" + request.getIp());
 
-        if ( !getDbProperty(ARG_ADMIN_INSTALLCOMPLETE, false)) {
+        if (!getInstallationComplete()) {
             return getAdmin().doInitialization(request);
         }
 
