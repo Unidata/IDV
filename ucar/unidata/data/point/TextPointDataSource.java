@@ -1045,6 +1045,17 @@ public class TextPointDataSource extends PointDataSource {
      * @param metadata The metadata
      */
     public void applySavedMetaDataFromUI(Metadata metadata) {
+        Misc.run(this,"applySavedMetaDataFromUIInner", metadata);
+    }
+
+
+
+   /**
+     * This gets called in a thread from the applySavedMetaDataFromUI method
+     *
+     * @param metadata The metadata
+     */
+    public void applySavedMetaDataFromUIInner(Metadata metadata) {
         applySavedMetaData(metadata);
         setLineText(lineLbl, skipRows, lines);
     }
