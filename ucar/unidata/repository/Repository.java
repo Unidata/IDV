@@ -2175,6 +2175,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         boolean   sslEnabled = isSSLEnabled(request);
 
         ApiMethod apiMethod  = findApiMethod(request);
+
         if (apiMethod == null) {
             return getHtdocsFile(request);
         }
@@ -2289,7 +2290,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     protected Result getHtdocsFile(Request request) throws Exception {
         String path = request.getRequestPath();
         //        System.err.println("path:" + path);
-        if ( !path.startsWith(getUrlBase())) {
+        if (!path.startsWith(getUrlBase())) {
             getLogManager().log(request,
                                 "Unknown request" + " \"" + path + "\"");
             Result result =
@@ -2323,9 +2324,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     is = new ByteArrayInputStream(js.getBytes());
                 }
                 Result result = new Result(BLANK, is, type);
-
-
-
                 result.setCacheOk(true);
                 return result;
             } catch (IOException fnfe) {
@@ -2336,6 +2334,17 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (userAgent == null) {
             userAgent = "Unknown";
         }
+
+        String alias = path.substring(1);
+        Entry entry = getEntryManager().getEntryFromAlias(request, alias);
+        if(entry!=null) {
+            return new Result(request.url(URL_ENTRY_SHOW,
+                                          ARG_ENTRYID, entry.getId()));
+        }
+        
+
+
+
 
         getLogManager().log(request,
                             "Unknown request:" + request.getUrl()

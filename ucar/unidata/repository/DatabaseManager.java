@@ -1001,6 +1001,7 @@ public class DatabaseManager extends RepositoryManager {
                             String extra, int max)
             throws Exception {
         Connection connection = getConnection();
+
         Statement stmt = SqlUtil.select(connection, what, tables, clause,
                                         extra, max);
         releaseConnection(connection);

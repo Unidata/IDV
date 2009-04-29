@@ -46,6 +46,12 @@
          label="Ascending"
          type="boolean"/>
     </type>
+    <type
+       name="Alias"
+       type="content.alias">
+      <element label="Alias" type="string"/>
+      <template type="html"><![CDATA[<a href="${root}/${attr1}">${attr1}</a>]]></template>
+    </type>
   </handler>
 
   <handler adminonly="true" class="ucar.unidata.repository.AdminMetadataHandler" category="Admin">

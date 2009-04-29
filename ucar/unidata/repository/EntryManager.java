@@ -141,6 +141,30 @@ public class EntryManager extends RepositoryManager {
 
 
 
+    public Entry getEntryFromAlias(Request request, String alias) throws Exception {
+
+        Statement statement =
+            getDatabaseManager().select(Tables.ENTRIES.COL_ID, Misc.newList(Tables.ENTRIES.NAME,Tables.METADATA.NAME),
+                                        Clause.and(new Clause[]{
+                                                Clause.join(Tables.ENTRIES.COL_ID, Tables.METADATA.COL_ENTRY_ID),
+                                                Clause.eq(Tables.METADATA.COL_ATTR1, alias),
+                                                Clause.eq(Tables.METADATA.COL_TYPE, ContentMetadataHandler.TYPE_ALIAS)}),
+                                        "", 1);
+
+        SqlUtil.Iterator iter     = SqlUtil.getIterator(statement);
+        List<Comment>    comments = new ArrayList();
+        ResultSet        results;
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                String id = results.getString(1);
+                statement.close();
+                return getEntry(request, id);
+            }
+        }
+        return null;
+    }
+
+
     /**
      * _more_
      */

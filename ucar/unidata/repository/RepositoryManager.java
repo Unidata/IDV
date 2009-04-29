@@ -351,6 +351,11 @@ public class RepositoryManager implements RepositorySource, Constants,
     }
 
 
+    public RegistryManager getRegistryManager() {
+        return repository.getRegistryManager();
+    }
+
+
     /**
      * _more_
      *

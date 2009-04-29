@@ -579,6 +579,9 @@ public class MetadataType implements Constants {
         if ((template == null) || (template.length() == 0)) {
             return;
         }
+        template = template.replace("${root}",
+                                    handler.getRepository().getUrlBase());
+
         for (int attr = 1; attr <= 4; attr++) {
             template = template.replace("${attr" + attr + "}",
                                         metadata.getAttr(attr));
@@ -821,8 +824,10 @@ public class MetadataType implements Constants {
         if (htmlTemplate != null) {
             String html = htmlTemplate;
             for (int attr = 1; attr <= 4; attr++) {
+                String value =      metadata.getAttr(attr);
+                if(value == null) value = "null";
                 html = html.replace("${attr" + attr + "}",
-                                    metadata.getAttr(attr));
+                                    value);
             }
             content.append(html);
         } else {

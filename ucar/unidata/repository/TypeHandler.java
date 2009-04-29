@@ -1143,6 +1143,7 @@ public class TypeHandler extends RepositoryManager {
         boolean didEntries = false;
         boolean didOther   = false;
         boolean didMeta    = false;
+        
         for (int i = 0; i < tableNames.length; i++) {
             String pattern = ".*[, =\\(]+" + tableNames[i] + "\\..*";
             //            System.out.println("pattern:" + pattern);
@@ -1208,7 +1209,7 @@ public class TypeHandler extends RepositoryManager {
                                        getTableName() + ".id"));
         }
 
-        //        System.err.println("tables:" + tables);
+
         return getDatabaseManager().select(what, tables, Clause.and(clauses),
                                            extra,
                                            getRepository().getMax(request));

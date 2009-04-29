@@ -81,6 +81,8 @@ public class ContentMetadataHandler extends MetadataHandler {
     /** _more_ */
     public static final String TYPE_SORT = "content.sort";
 
+    public static final String TYPE_ALIAS = "content.alias";
+
 
     /**
      * _more_
