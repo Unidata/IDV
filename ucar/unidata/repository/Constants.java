@@ -1027,25 +1027,6 @@ public interface Constants {
     /** _more_ */
     public static final String TAG_GROUPS = "groups";
 
-    /** _more_ */
-    public static final String TAG_INFO = "info";
-
-    /** _more_ */
-    public static final String TAG_INFO_DESCRIPTION = "description";
-
-    /** _more_ */
-    public static final String TAG_INFO_SSLPORT = "sslport";
-
-
-    /** _more_ */
-    public static final String TAG_INFO_PORT = "port";
-
-    public static final String TAG_INFO_HOSTNAME = "hostname";    
-
-    public static final String TAG_INFO_BASEPATH = "basepath";
-
-    /** _more_ */
-    public static final String TAG_INFO_TITLE = "title";
 
     /** _more_ */
     public static final String TAG_METADATA = "metadata";

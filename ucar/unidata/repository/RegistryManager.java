@@ -280,9 +280,10 @@ public class RegistryManager extends RepositoryManager {
                 URL    url   = new URL(results.getString(1));
                 String title = results.getString(2);
                 String desc  = results.getString(3);
-
+                String email  = results.getString(4);
+                
                 servers.add(new ServerInfo(url.getHost(), url.getPort(), -1,
-                                           url.getPath(), title, desc));
+                                           url.getPath(), title, desc,email));
             }
         }
         return servers;
@@ -419,16 +420,19 @@ public class RegistryManager extends RepositoryManager {
             String  contents = IOUtil.readContents(serverUrl, getClass());
             Element root     = XmlUtil.getRoot(contents);
             if(responseOk(root)) {
-                String  title = XmlUtil.getGrandChildText(root, TAG_INFO_TITLE);
+                String  title = XmlUtil.getGrandChildText(root, ServerInfo.TAG_INFO_TITLE,"");
                 String description = XmlUtil.getGrandChildText(root,
-                                                               TAG_INFO_DESCRIPTION);
+                                                               ServerInfo.TAG_INFO_DESCRIPTION,"");
+
+                String email = XmlUtil.getGrandChildText(root,
+                                                         ServerInfo.TAG_INFO_EMAIL,"");
                 getDatabaseManager().delete(
                                             Tables.SERVERREGISTRY.NAME,
                                             Clause.eq(
                                                       Tables.SERVERREGISTRY.COL_URL, serverInfo.getUrl()));
                 getDatabaseManager().executeInsert(Tables.SERVERREGISTRY.INSERT,
                                                    new Object[] { serverInfo.getUrl(),
-                                                                  title, description });
+                                                                  title, description,email });
                 return true;
             } else {
                 System.err.println("Response is not ok:" + contents);
@@ -457,10 +461,29 @@ public class RegistryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processRegistryList(Request request) throws Exception {
+        boolean responseAsXml = request.getString(ARG_RESPONSE,
+                                                  "").equals(RESPONSE_XML);
+
+        List<ServerInfo> servers = getRegistererServers();
+
+        if(responseAsXml) {
+            Document  resultDoc  = XmlUtil.makeDocument();
+            Element resultRoot = XmlUtil.create(resultDoc, TAG_RESPONSE, null,
+                                                new String[] { ATTR_CODE,
+                                                               CODE_OK });
+
+
+            for (ServerInfo serverInfo : servers) {
+                resultRoot.appendChild(serverInfo.toXml(getRepository(), resultDoc));
+            }
+            return new Result(XmlUtil.toString(resultRoot,false),
+                              MIME_XML);
+        } 
+
+        
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("Registered Servers"));
         sb.append("<ul>");
-        List<ServerInfo> servers = getRegistererServers();
         for (ServerInfo serverInfo : servers) {
             sb.append("<li> ");
             sb.append(serverInfo.getLabel());

@@ -818,8 +818,9 @@ public static final String NAME = "serverregistry";
 public static final String COL_URL = NAME + ".url";
 public static final String COL_TITLE = NAME + ".title";
 public static final String COL_DESCRIPTION = NAME + ".description";
+public static final String COL_EMAIL = NAME + ".email";
 public static final String []ARRAY= new String[] {
-COL_URL,COL_TITLE,COL_DESCRIPTION
+COL_URL,COL_TITLE,COL_DESCRIPTION,COL_EMAIL
 };
 
 
@@ -832,7 +833,6 @@ NODOT_COLUMNS,
 SqlUtil.getQuestionMarks(ARRAY.length));
 
 };
-
 
 
 

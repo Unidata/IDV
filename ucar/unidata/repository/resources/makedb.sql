@@ -229,16 +229,16 @@ CREATE INDEX WIKIPAGEHISTORY_INDEX_ENTRY_ID ON wikipagehistory (ENTRY_ID);
 
 
 
-
-
 -----------------------------------------------------------------------
 --- for storing the list of servers when acting as a registry
 -----------------------------------------------------------------------
 CREATE TABLE  serverregistry (
         url varchar(1000),
         title varchar(1000),
-        description varchar(10000));
+        description varchar(10000),
+        email varchar(200));
 
+alter table serverregistry add column email varchar(200);
 
 
 -----------------------------------------------------------------------

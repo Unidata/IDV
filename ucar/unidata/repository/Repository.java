@@ -3494,7 +3494,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return new ServerInfo(
             getHostname(), getPort(), sslPort, getUrlBase(),
             getProperty(PROP_REPOSITORY_NAME, "Repository"),
-            getEntryManager().getTopGroup().getDescription());
+            getEntryManager().getTopGroup().getDescription(),
+            getProperty(PROP_ADMIN_EMAIL, ""));
     }
 
 
@@ -3511,7 +3512,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public Result processInfo(Request request) throws Exception {
         if (request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML)) {
             Document doc  = XmlUtil.makeDocument();
-            Element  info = getServerInfo().toXml(doc);
+            Element  info = getServerInfo().toXml(this,doc);
             info.setAttribute(ATTR_CODE, CODE_OK);
             String   xml  = XmlUtil.toString(info);
             return new Result(xml, MIME_XML);

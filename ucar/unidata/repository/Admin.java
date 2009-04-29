@@ -888,6 +888,7 @@ public class Admin extends RepositoryManager {
         sb.append(HtmlUtil.br());
         StringBuffer csb = new StringBuffer();
         csb.append(HtmlUtil.formTable());
+        csb.append(HtmlUtil.row(HtmlUtil.colspan(msgHeader("Email"), 2)));
         csb.append(HtmlUtil.formEntry(msgLabel("Administrator Email"),
                                       HtmlUtil.input(PROP_ADMIN_EMAIL,
                                           getProperty(PROP_ADMIN_EMAIL, ""),
@@ -902,7 +903,7 @@ public class Admin extends RepositoryManager {
 
 
 
-        csb.append(HtmlUtil.colspan(msgHeader("Site Information"), 2));
+        csb.append(HtmlUtil.row(HtmlUtil.colspan(msgHeader("Site Information"), 2)));
         csb.append(HtmlUtil.formEntry(msgLabel("Hostname"),
                                       HtmlUtil.input(PROP_HOSTNAME,
                                           getProperty(PROP_HOSTNAME, ""),
@@ -1001,7 +1002,7 @@ public class Admin extends RepositoryManager {
         asb.append(HtmlUtil.formTable());
 
 
-        asb.append(HtmlUtil.colspan(msgHeader("Site Access"), 2));
+        asb.append(HtmlUtil.row(HtmlUtil.colspan(msgHeader("Site Access"), 2)));
         asb.append(
             HtmlUtil.formEntry(
                 "",

@@ -35,12 +35,37 @@ import org.w3c.dom.*;
  */
 public class ServerInfo implements Constants {
     
+    /** _more_ */
+    public static final String TAG_INFO_REPOSITORY = "repositoryinfo";
+
+    /** _more_ */
+    public static final String TAG_INFO_DESCRIPTION = "description";
+
+    /** _more_ */
+    public static final String TAG_INFO_SSLPORT = "sslport";
+
+
+    /** _more_ */
+    public static final String TAG_INFO_PORT = "port";
+
+    public static final String TAG_INFO_HOSTNAME = "hostname";    
+
+    public static final String TAG_INFO_BASEPATH = "basepath";
+
+    /** _more_ */
+    public static final String TAG_INFO_TITLE = "title";
+
+    public static final String TAG_INFO_EMAIL = "email";
+
+
+
     private String hostname;
     private int port;
-    private int sslPort;
+    private int sslPort=-1;
     private String basePath;
     private String title;
     private String description;
+    private String email;
 
 
     public ServerInfo(URL url, String title, String description) {
@@ -54,7 +79,22 @@ public class ServerInfo implements Constants {
     public ServerInfo(String hostname,
                       int port,
                       String title,String description) {
-        this(hostname, port,-1,"/repository",title, description);
+        this(hostname, port,-1,"/repository",title, description,"");
+    }
+
+
+    public ServerInfo(Element element) {
+        this.hostname=XmlUtil.getGrandChildText(element, TAG_INFO_DESCRIPTION,"");
+        this.port=Integer.parseInt(XmlUtil.getGrandChildText(element, TAG_INFO_PORT,"80"));
+
+        String sslPortString  = XmlUtil.getGrandChildText(element, TAG_INFO_SSLPORT,null);
+    
+        if(sslPortString!=null) 
+            this.sslPort=Integer.parseInt(sslPortString);
+        this.basePath=XmlUtil.getGrandChildText(element, TAG_INFO_BASEPATH,"/repository");
+        this.title=XmlUtil.getGrandChildText(element, TAG_INFO_TITLE,"");
+        this.description=XmlUtil.getGrandChildText(element, TAG_INFO_DESCRIPTION,"");
+        this.email=XmlUtil.getGrandChildText(element, TAG_INFO_EMAIL,"");
     }
 
 
@@ -63,18 +103,25 @@ public class ServerInfo implements Constants {
                       int sslPort,
                       String basePath,
                       String title,
-                      String description) {
+                      String description,
+                      String email) {
         this.hostname=hostname;
         this.port=port;
         this.sslPort=sslPort;
         this.basePath=basePath;
         this.title=title;
         this.description=description;
+        this.email =email;
     }
 
 
     public String toString() {
         return getLabel();
+    }
+
+
+    public int hashCode() {
+        return getId().hashCode();
     }
 
 
@@ -84,8 +131,8 @@ public class ServerInfo implements Constants {
         return  this.getId().equals(that.getId());
     }
 
-    public Element toXml(Document doc) throws Exception {
-        Element info = XmlUtil.create(doc, TAG_INFO, null,
+    public Element toXml(Repository repository, Document doc) throws Exception {
+        Element info = XmlUtil.create(doc, TAG_INFO_REPOSITORY, null,
                                       new String[] {});
         XmlUtil.create(doc, TAG_INFO_DESCRIPTION, info,
                        description,
@@ -96,6 +143,7 @@ public class ServerInfo implements Constants {
                        null);
         XmlUtil.create(doc, TAG_INFO_HOSTNAME, info, hostname, null);
         XmlUtil.create(doc, TAG_INFO_BASEPATH, info, basePath, null);
+        XmlUtil.create(doc, TAG_INFO_EMAIL, info, repository.getProperty(PROP_ADMIN_EMAIL, ""), null);
         XmlUtil.create(doc, TAG_INFO_PORT, info, ""+port, null);
         if (sslPort>0) {
             XmlUtil.create(doc, TAG_INFO_SSLPORT, info, ""+sslPort, null);
@@ -232,6 +280,26 @@ public class ServerInfo implements Constants {
     public String getDescription () {
 	return this.description;
     }
+
+
+/**
+Set the Email property.
+
+@param value The new value for Email
+**/
+public void setEmail (String value) {
+	email = value;
+}
+
+/**
+Get the Email property.
+
+@return The Email
+**/
+public String getEmail () {
+	return email;
+}
+
 
 
 }

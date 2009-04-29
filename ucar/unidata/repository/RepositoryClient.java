@@ -708,9 +708,9 @@ public class RepositoryClient extends RepositoryBase {
         //        System.err.println(contents);
         Element root = XmlUtil.getRoot(contents);
 
-        sslPort     = XmlUtil.getGrandChildText(root, TAG_INFO_SSLPORT);
-        title       = XmlUtil.getGrandChildText(root, TAG_INFO_TITLE);
-        description = XmlUtil.getGrandChildText(root, TAG_INFO_DESCRIPTION);
+        sslPort     = XmlUtil.getGrandChildText(root, ServerInfo.TAG_INFO_SSLPORT);
+        title       = XmlUtil.getGrandChildText(root, ServerInfo.TAG_INFO_TITLE);
+        description = XmlUtil.getGrandChildText(root, ServerInfo.TAG_INFO_DESCRIPTION);
         //        System.err.println (sslPort + "  "+ title +" " + description);
         if (sslPort != null) {
             URL_USER_LOGIN.setNeedsSsl(true);
