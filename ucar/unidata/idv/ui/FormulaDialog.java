@@ -405,9 +405,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
             cbxToCdMap.put(cbx, cd);
             catPanel.add(GuiUtils.inset(cbx, new Insets(0, 20, 0, 0)));
         }
-        for (int i = 0; i < catPanels.size(); i++) {
-            ((CheckboxCategoryPanel) catPanels.get(i)).checkVisCbx();
-        }
+
 
         final JPanel cdPanel = GuiUtils.vbox(cdList);
         JScrollPane cdScroll = GuiUtils.makeScrollPane(GuiUtils.top(cdPanel),

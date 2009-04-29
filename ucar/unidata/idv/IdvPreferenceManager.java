@@ -484,9 +484,6 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             //            compList.add(cb);
         }
 
-        for (int i = 0; i < catPanels.size(); i++) {
-            ((CheckboxCategoryPanel) catPanels.get(i)).checkVisCbx();
-        }
 
         final JButton allOn = new JButton("All on");
         allOn.addActionListener(new ActionListener() {
