@@ -327,7 +327,11 @@ public class CDMRadarDataSource extends RadarDataSource {
                         categories = Misc.newList(CATEGORY_RASTER_2D_TIME);
                     }
                 } else {
-                    if (haveTimes) {
+                    if (da.isRHI())  {
+                        categories = Misc.newList(CATEGORY_RHISWEEP );
+
+                    }
+                    else if (haveTimes) {
                         categories = Misc.newList(CATEGORY_SWEEP_2D_TIME,
                                 CATEGORY_SWEEP_3D_TIME);
                     } else {

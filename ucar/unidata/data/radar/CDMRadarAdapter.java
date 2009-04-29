@@ -314,6 +314,9 @@ public class CDMRadarAdapter implements RadarAdapter {
                 int mode = sweepMode.getNumericValue().intValue();
                 if(mode == 3) isRHI = true;
             }
+            if(vcp.equalsIgnoreCase("RHI")) {
+                isRHI = true;
+            }
 
             if (attr != null) {
                 int isR = attr.getNumericValue().intValue();
@@ -1728,6 +1731,11 @@ public class CDMRadarAdapter implements RadarAdapter {
                                 ((Double) choiceAttrs.getObject2())
                                     .doubleValue();
                         }
+                    }
+                    if (Double.isNaN(value)) {
+                        List levelsList1 = dataChoice.getAllLevels();
+                        String azim = levelsList1.get(0).toString();
+                        value = Float.parseFloat(azim);
                     }
                     // check one more time.
                     if (Double.isNaN(value)) {
