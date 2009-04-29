@@ -624,9 +624,11 @@ public class RadarRhiControl extends ColorCrossSectionControl {
         if ( !getHaveInitialized() || (lastLoadedAz == currentAngle)) {
             return;
         }
-        getGridDataInstance().reInitialize();
-        getGridDataInstance().putRequestProperty(RadarConstants.PROP_AZIMUTH,
+        getRequestProperties().put(RadarConstants.PROP_AZIMUTH,
                 new Double(currentAngle));
+        getGridDataInstance().reInitialize();
+        //getGridDataInstance().putRequestProperty(RadarConstants.PROP_AZIMUTH,
+        //        new Double(currentAngle));
 
         FieldImpl grid = getGridDataInstance().getGrid();
         if (grid == null) {
