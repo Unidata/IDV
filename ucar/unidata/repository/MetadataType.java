@@ -71,12 +71,15 @@ public class MetadataType implements Constants {
     public static final String TAG_ELEMENT = "element";
 
     /** _more_          */
-    public static final String TAG_HTMLTEMPLATE = "htmltemplate";
+    public static final String TAG_TEMPLATE = "template";
 
     /** _more_          */
-    public static final String TAG_CATALOGTEMPLATE = "catalogtemplate";
+    public static final String TEMPLATETYPE_THREDDSCATALOG="threddscatalog";
+    public static final String TEMPLATETYPE_HTML="html";
 
-    /** _more_          */
+
+   /** _more_          */
+
     public static final String TAG_HANDLER = "handler";
 
     /** _more_          */
@@ -191,11 +194,7 @@ public class MetadataType implements Constants {
     /** _more_          */
     private MetadataHandler handler;
 
-    /** _more_          */
-    private String htmlTemplate;
-
-    /** _more_          */
-    private String catalogTemplate;
+    private Hashtable<String,String> templates = new Hashtable<String,String>();
 
     /** _more_ */
     public static final int SEARCHABLE_ATTR1 = 1 << 0;
@@ -293,11 +292,15 @@ public class MetadataType implements Constants {
             MetadataType metadataType = new MetadataType(type,
                                             XmlUtil.getAttribute(node,
                                                 ATTR_NAME, type));
-            metadataType.htmlTemplate = XmlUtil.getGrandChildText(node,
-                    TAG_HTMLTEMPLATE);
-            metadataType.catalogTemplate = XmlUtil.getGrandChildText(node,
-                    TAG_CATALOGTEMPLATE);
 
+            List templateElements = XmlUtil.findChildren(node,
+                                MetadataType.TAG_TEMPLATE);
+
+            for (int j = 0; j < templateElements.size(); j++) {
+                Element templateNode = (Element) templateElements.get(j);
+                metadataType.templates.put(XmlUtil.getAttribute(templateNode,ATTR_TYPE),
+                                           XmlUtil.getChildText(templateNode));
+            }
 
             handler.addMetadataType(metadataType);
             types.add(metadataType);
@@ -572,7 +575,7 @@ public class MetadataType implements Constants {
 
 
 
-        String template = getCatalogTemplate();
+        String template = getTemplate(TEMPLATETYPE_THREDDSCATALOG);
         if ((template == null) || (template.length() == 0)) {
             return;
         }
@@ -814,6 +817,7 @@ public class MetadataType implements Constants {
         }
 
         String lbl = handler.msgLabel(name);
+        String htmlTemplate = getTemplate(TEMPLATETYPE_HTML);
         if (htmlTemplate != null) {
             String html = htmlTemplate;
             for (int attr = 1; attr <= 4; attr++) {
@@ -1173,39 +1177,12 @@ public class MetadataType implements Constants {
     }
 
     /**
-     * Set the CatalogTemplate property.
-     *
-     * @param value The new value for CatalogTemplate
-     */
-    public void setCatalogTemplate(String value) {
-        this.catalogTemplate = value;
-    }
-
-    /**
      * Get the CatalogTemplate property.
      *
      * @return The CatalogTemplate
      */
-    public String getCatalogTemplate() {
-        return this.catalogTemplate;
-    }
-
-    /**
-     * Set the HtmlTemplate property.
-     *
-     * @param value The new value for HtmlTemplate
-     */
-    public void setHtmlTemplate(String value) {
-        this.htmlTemplate = value;
-    }
-
-    /**
-     * Get the HtmlTemplate property.
-     *
-     * @return The HtmlTemplate
-     */
-    public String getHtmlTemplate() {
-        return this.htmlTemplate;
+    public String getTemplate(String type) {
+        return templates.get(type);
     }
 
 
