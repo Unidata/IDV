@@ -255,7 +255,7 @@ public class RadarRhiControl extends ColorCrossSectionControl {
 
         List levelsList1 = choice.getAllLevels(tmpSelection);
 
-        if (levelsList1.size() > 1) {
+        if (levelsList1.size() >= 1) {
             String azim = levelsList1.get(0).toString();
             currentAngle = Float.parseFloat(azim);
         }
