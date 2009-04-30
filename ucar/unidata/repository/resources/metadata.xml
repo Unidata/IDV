@@ -110,6 +110,7 @@
       <element label="Name" type="string"/>
       <element label="Value" type="string"/>
       <template type="threddscatalog"><![CDATA[<property name="${attr1}" value="${attr2}"/>]]></template>
+      <template type="html"><![CDATA[ ${attr1}=${attr2}]]></template>
     </type>
     <type name="Documentation" type="thredds.documentation"  searchable="true">
       <element
@@ -134,7 +135,7 @@
     <type
        displaycategory="Variables"
        name="Variable"
-       type="thredds.variable">
+       type="thredds.variable" searchable="true">
       <template type="html"><![CDATA[${attr1} (${attr3}) ${attr2}]]></template>
       <element label="Variable" type="string"/>
       <element label="Long Name" type="string"/>

@@ -815,11 +815,20 @@ public class MetadataType implements Constants {
         }
 
         StringBuffer content = new StringBuffer();
-        if (getBrowsable()) {
+        if (getSearchable()) {
             content.append(handler.getSearchLink(request, metadata));
         }
 
-        String lbl = handler.msgLabel(name);
+        String nameString = name;
+        for (int attr = 1; attr <= 4; attr++) {
+            String value =      metadata.getAttr(attr);
+            if(value == null) value = "";
+            nameString  = nameString.replace("${attr" + attr + "}",
+                                    value);
+        }
+        
+
+        String lbl = handler.msgLabel(nameString);
         String htmlTemplate = getTemplate(TEMPLATETYPE_HTML);
         if (htmlTemplate != null) {
             String html = htmlTemplate;
