@@ -299,13 +299,13 @@ public class DataOutputHandler extends OutputHandler {
         protected PointObsDataset createValue(String path) {
             try {
                 getStorageManager().dirTouched(nj22Dir,null);
-                System.err.println ("opening:" + path);
+                //                System.err.println ("opening:" + path);
                 PointObsDataset dataset =   (PointObsDataset) TypedDatasetFactory.open(
                                                                    FeatureType.POINT, path, null, new StringBuilder());
                 //                System.err.println("Create pointPool: " + path);
                 return dataset;
             } catch(Exception exc) {
-                System.err.println ("FAILED:" + exc);
+                //                System.err.println ("FAILED:" + exc);
                 throw new RuntimeException(exc);
             }
         }
@@ -551,11 +551,13 @@ public class DataOutputHandler extends OutputHandler {
      * @return Can the given entry be served by the tds
      */
     public boolean canLoadAsCdm(Entry entry) {
-        if ( !entry.isFile()) {
-            return false;
-        }
-        if (cannotLoad(entry, TYPE_CDM)) {
-            return false;
+        if(!entry.getType().equals(OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
+            if ( !entry.isFile()) {
+                return false;
+            }
+            if (cannotLoad(entry, TYPE_CDM)) {
+                return false;
+            }
         }
 
         String[] types = { TYPE_CDM, TYPE_GRID, TYPE_TRAJECTORY, TYPE_POINT };
@@ -564,6 +566,8 @@ public class DataOutputHandler extends OutputHandler {
                 return true;
             }
         }
+
+
 
 
         if(entry.getResource().isRemoteFile()) {
@@ -706,6 +710,7 @@ public class DataOutputHandler extends OutputHandler {
      * @return _more_
      */
     private boolean canLoad(Entry entry, String type) {
+        //        System.err.println ("can load:" + type+ " " +hasPrefixForType(entry, type, false));        
         return hasPrefixForType(entry, type, false);
     }
 
@@ -741,6 +746,12 @@ public class DataOutputHandler extends OutputHandler {
         if (url == null) {
             return false;
         }
+        if(entry.getType().equals(OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
+            //TODO:            url = url+".das";
+        }
+
+
+
         String ext    = IOUtil.getFileExtension(url).toLowerCase();
         String key    = type + "." + ext;
         String notKey = type + ".!" + ext;
@@ -1766,7 +1777,14 @@ public class DataOutputHandler extends OutputHandler {
 
 
     private String getPath(Entry entry) throws Exception {
-        String location = entry.getFile().toString();
+        String location;
+        if(entry.getType().equals(OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
+            Resource resource = entry.getResource();
+            location =resource.getPath()+".das";
+        } else {
+            location = entry.getFile().toString();
+        }
+
         List<Metadata> metadataList =
             getMetadataManager().findMetadata( entry, ContentMetadataHandler.TYPE_ATTACHMENT,
                                                true);
