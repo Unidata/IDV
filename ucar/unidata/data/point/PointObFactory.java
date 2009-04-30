@@ -37,7 +37,6 @@ import ucar.ma2.StructureData;
 import ucar.ma2.StructureMembers;
 
 import ucar.nc2.Attribute;
-
 import ucar.nc2.VariableSimpleIF;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dt.PointObsDataset;
@@ -1946,7 +1945,8 @@ public class PointObFactory {
             obVals[2][cnt] = (float) obVal;
             cnt++;
         }
-        if (cnt <= 4) {
+        // need at least 3 obs for analysis
+        if (cnt <= 3) {
             return null;
         }
         //  System.out.println("cnt = " + cnt + " num obs = " + numObs + " missing = " + numMissing);
