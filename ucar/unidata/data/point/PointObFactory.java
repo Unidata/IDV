@@ -22,7 +22,6 @@
 
 
 
-
 package ucar.unidata.data.point;
 
 
@@ -1363,10 +1362,14 @@ public class PointObFactory {
         PointFeatureCollection collection = null;
         if (fc instanceof PointFeatureCollection) {
             collection = (PointFeatureCollection) fc;
-            if (llr != null) collection = collection.subset(llr, null);
+            if (llr != null) {
+                collection = collection.subset(llr, null);
+            }
             NestedPointFeatureCollection npfc =
                 (NestedPointFeatureCollection) fc;
-            if (llr != null) npfc = npfc.subset(llr);
+            if (llr != null) {
+                npfc = npfc.subset(llr);
+            }
             collection = npfc.flatten(llr, null);
         }
         //System.out.println("number of obs = " + collection.size());
@@ -1876,7 +1879,10 @@ public class PointObFactory {
                                           FlatField firstGuess)
             throws VisADException, RemoteException {
 
-        int       numObs  = pointObs.getLength();
+        int numObs = pointObs.getLength();
+        if (numObs < 4) {
+            return null;
+        }
         float[][] obVals  = new float[3][numObs];
         PointOb   firstOb = (PointOb) pointObs.getSample(0);
         // TODO: May not be a tuple
@@ -1939,6 +1945,9 @@ public class PointObFactory {
             obVals[1][cnt] = lat;
             obVals[2][cnt] = (float) obVal;
             cnt++;
+        }
+        if (cnt <= 4) {
+            return null;
         }
         //  System.out.println("cnt = " + cnt + " num obs = " + numObs + " missing = " + numMissing);
         if (cnt != numObs) {
