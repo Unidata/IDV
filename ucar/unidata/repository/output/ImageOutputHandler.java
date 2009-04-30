@@ -228,7 +228,11 @@ public class ImageOutputHandler extends OutputHandler {
 
         if (output.equals(OUTPUT_GALLERY)) {
             sb.append("<table>");
-        } else if (output.equals(OUTPUT_PLAYER)) {}
+        } else if (output.equals(OUTPUT_PLAYER)) {
+            if(!request.exists(ARG_ASCENDING)) {
+                entries = getEntryManager().sortEntriesOnDate(entries, false);
+            }
+        }
 
 
         int    col        = 0;
