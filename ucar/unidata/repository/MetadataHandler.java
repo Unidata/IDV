@@ -198,6 +198,7 @@ public class MetadataHandler extends RepositoryManager {
                               Metadata metadata, boolean forLink)
             throws Exception {
         MetadataType type = getType(metadata.getType());
+        if(type==null) return;
         type.decorateEntry(request, entry, sb, metadata, forLink);
     }
 
@@ -234,6 +235,7 @@ public class MetadataHandler extends RepositoryManager {
     public Result processView(Request request, Entry entry, Metadata metadata)
             throws Exception {
         MetadataType type = getType(metadata.getType());
+        if(type==null) return null;
         return type.processView(request, entry, metadata);
     }
 
@@ -361,6 +363,7 @@ public class MetadataHandler extends RepositoryManager {
                                      Element datasetNode)
             throws Exception {
         MetadataType type = getType(metadata.getType());
+        if(type==null) return;
         type.addMetadataToCatalog(request, entry, metadata, doc, datasetNode);
     }
 
@@ -487,6 +490,7 @@ public class MetadataHandler extends RepositoryManager {
      */
     public String getSearchUrl(Request request, Metadata metadata) {
         MetadataType type = findType(metadata.getType());
+        if(type==null) return null;
         List         args = new ArrayList();
         args.add(ARG_METADATA_TYPE + "." + type.getType());
         args.add(type.toString());
