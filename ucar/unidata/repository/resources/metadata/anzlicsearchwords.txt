@@ -1,0 +1,153 @@
+AGRICULTURE non-specific
+AGRICULTURE Crops
+AGRICULTURE Horticulture
+AGRICULTURE Irrigation
+AGRICULTURE Livestock
+ATMOSPHERE non-specific
+ATMOSPHERE Air Quality
+ATMOSPHERE Greenhouse
+ATMOSPHERE Ozone
+ATMOSPHERE Pressure
+BOUNDARIES non-specific
+BOUNDARIES Administrative
+BOUNDARIES Biophysical
+BOUNDARIES Cultural
+CLIMATE AND WEATHER
+CLIMATE AND WEATHER Climate change
+CLIMATE AND WEATHER Drought
+CLIMATE AND WEATHER El Nino
+CLIMATE AND WEATHER Extreme weather events
+CLIMATE AND WEATHER Meteorology
+CLIMATE AND WEATHER Radiation
+CLIMATE AND WEATHER Rainfall
+CLIMATE AND WEATHER Temperature
+DEMOGRAPHY non-specific
+DISEASE non-specific
+ECOLOGY non-specific
+ECOLOGY Community
+ECOLOGY Ecosystem
+ECOLOGY Habitat
+ECOLOGY Landscape
+ENERGY non-specific
+ENERGY Coal
+ENERGY Electricity
+ENERGY Petroleum
+ENERGY Renewable
+ENERGY Use
+FAUNA non-specific
+FAUNA Exotic
+FAUNA Insects
+FAUNA Invertebrates
+FAUNA Native
+FAUNA Vertebrates
+FISHERIES non-specific
+FISHERIES Aquaculture
+FISHERIES Freshwater
+FISHERIES Marine
+FISHERIES Recreational
+FLORA non-specific
+FLORA Exotic
+FLORA Native
+FORESTS non-specific
+FORESTS Agriforestry
+FORESTS Natural
+FORESTS Plantation
+GEOSCIENCES non-specific
+GEOSCIENCES Geochemistry
+GEOSCIENCES Geology
+GEOSCIENCES Geomorphology
+GEOSCIENCES Geophysics
+GEOSCIENCES Hydrogeology
+HAZARDS non-specific
+HAZARDS Cyclones
+HAZARDS Drought
+HAZARDS Earthquake
+HAZARDS Fire
+HAZARDS Flood
+HAZARDS Landslip
+HAZARDS Manmade
+HAZARDS Pests
+HAZARDS Severe local storms
+HAZARDS Tsunamis
+HEALTH non-specific
+HERITAGE non-specific
+HERITAGE Aboriginal
+HERITAGE Architectural
+HERITAGE Natural
+HERITAGE World
+HUMAN ENVIRONMENT
+HUMAN ENVIRONMENT Economics
+HUMAN ENVIRONMENT Housing
+HUMAN ENVIRONMENT Livability
+HUMAN ENVIRONMENT Planning
+HUMAN ENVIRONMENT Structures and Facilities
+HUMAN ENVIRONMENT Urban Design
+INDUSTRY non-specific
+INDUSTRY Manufacturing
+INDUSTRY Mining
+INDUSTRY Other
+INDUSTRY Primary
+INDUSTRY Service
+LAND non-specific
+LAND Cadastre
+LAND Cover
+LAND Geodesy
+LAND Geography
+LAND Ownership
+LAND Topography
+LAND Use
+LAND Valuation
+MARINE non-specific
+MARINE Biology
+MARINE Coasts
+MARINE Estuaries
+MARINE Geology and Geophysics
+MARINE Human Impacts
+MARINE Meteorology
+MARINE Reefs
+MINERALS non-specific
+MOLECULAR BIOLOGY
+MOLECULAR BIOLOGY Genetics
+OCEANOGRAPHY non-specific
+OCEANOGRAPHY Chemical
+OCEANOGRAPHY Physical
+PHOTOGRAPHY AND IMAGERY
+PHOTOGRAPHY AND IMAGERY Aerial
+PHOTOGRAPHY AND IMAGERY Remote Sensing
+PHOTOGRAPHY AND IMAGERY Satellite
+POLLUTION non-specific
+POLLUTION Air
+POLLUTION Noise
+POLLUTION Soil
+POLLUTION Water
+SOIL non-specific
+SOIL Biology
+SOIL Chemistry
+SOIL Erosion
+SOIL Physics
+TRANSPORTATION non-specific
+TRANSPORTATION Air
+TRANSPORTATION Land
+TRANSPORTATION Marine
+UTILITIES non-specific
+VEGETATION non-specific
+VEGETATION Floristic
+VEGETATION Structural
+WASTE non-specific
+WASTE Greenhouse gas
+WASTE Heat
+WASTE Liquid
+WASTE Sewage
+WASTE Solid
+WASTE Toxic
+WATER non-specific
+WATER Groundwater
+WATER Hydrochemistry
+WATER Hydrology
+WATER Lakes
+WATER Quality
+WATER Rivers
+WATER Salinity
+WATER Supply
+WATER Surface
+WATER Wetlands

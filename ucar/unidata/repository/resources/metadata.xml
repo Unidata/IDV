@@ -15,9 +15,19 @@
       <element
          label="Keyword"
          type="enumeration"
-         values="file:/ucar/unidata/repository/resources/gcmdkeywords.txt"/>
+         values="file:/ucar/unidata/repository/resources/metadata/gcmdkeywords.txt"/>
       <template type="threddscatalog"><![CDATA[<keyword>${attr1}</keyword>]]></template>
     </type>
+
+    <type name="ANZLIC Search Word" type="enum_anzlic_search_words" searchable="true" browsable="true">
+      <element
+         label="Search Word"
+         type="enumeration"
+         values="file:/ucar/unidata/repository/resources/metadata/anzlicsearchwords.txt"/>
+      <template type="threddscatalog"><![CDATA[<keyword>${attr1}</keyword>]]></template>
+    </type>
+
+
   </handler>
 
   <handler class="ucar.unidata.repository.ContentMetadataHandler"        category="Attachments, Contact, Etc.">
