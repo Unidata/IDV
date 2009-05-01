@@ -813,7 +813,7 @@
         <scriptLines />
       </installerScript>
     </unixInstaller>
-    <unixInstaller name="Linux64 Installer" id="117" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_linux64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="linux-amd64-1.6.0_11_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+    <unixInstaller name="Linux64 Installer" id="117" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_linux64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="linux-amd64-1.6.0_13_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
       <excludedLaunchers>
         <launcher id="7" />
         <launcher id="9" />
@@ -867,7 +867,7 @@
       </exclude>
       <variables />
     </macosFolder>
-    <unixInstaller name="Solaris x86" id="56" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-x86_intel_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="solaris-x86-1.6.0_11_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+    <unixInstaller name="Solaris x86" id="56" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-x86_intel_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="solaris-x86-1.6.0_13_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
       <excludedLaunchers>
         <launcher id="7" />
         <launcher id="9" />
@@ -887,7 +887,7 @@
         <scriptLines />
       </installerScript>
     </unixInstaller>
-    <unixInstaller name="Solaris SPARC" id="61" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-sparc_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="solaris-sparc-1.6.0_11_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+    <unixInstaller name="Solaris SPARC" id="61" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-sparc_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="solaris-sparc-1.6.0_13_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="~" createUninstallIcon="true" contentFilesType="1" downloadURL="">
       <excludedLaunchers>
         <launcher id="7" />
         <launcher id="9" />
