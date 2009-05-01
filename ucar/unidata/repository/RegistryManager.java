@@ -21,13 +21,12 @@
  */
 
 
+
+
 package ucar.unidata.repository;
 
 
 import org.w3c.dom.*;
-
-
-
 
 import ucar.unidata.sql.Clause;
 
@@ -95,8 +94,33 @@ import java.util.zip.*;
 public class RegistryManager extends RepositoryManager {
 
 
+    /** _more_          */
+    private Object REMOTE_MUTEX = new Object();
+
+    /** _more_ */
+    public static final String ARG_REGISTRY_RELOAD = "registry.reload";
+
+    /** _more_          */
     public static final String ARG_REGISTRY_SERVER = "registry.server";
+
+    /** _more_          */
+    public static final String ARG_REGISTRY_SELECTED = "registry.selected";
+
+    /** _more_ */
     public static final String ARG_REGISTRY_CLIENT = "registry.client";
+
+
+    /** _more_          */
+    public RequestUrl URL_REGISTRY_REMOTESERVERS =
+        new RequestUrl(this, "/admin/remoteservers", "Remote Servers");
+
+
+
+    /** _more_          */
+    private List<ServerInfo> remoteServers;
+
+    /** _more_          */
+    private Hashtable<String, ServerInfo> remoteServerMap;
 
 
     /**
@@ -111,23 +135,145 @@ public class RegistryManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processAdminRemoteServers(Request request)
+            throws Exception {
+        StringBuffer sb = new StringBuffer();
+        if (request.exists(ARG_REGISTRY_RELOAD)) {
+            for (String server : getServersToRegisterWith()) {
+                loadRemoteServers(server);
+            }
+            checkApi();
+        } else if (request.exists(ARG_SUBMIT)) {
+            List allIds = request.get(ARG_REGISTRY_SERVER, new ArrayList());
+            List selectedIds = request.get(ARG_REGISTRY_SELECTED,
+                                           new ArrayList());
+            Hashtable selected = new Hashtable();
+            for (String id : (List<String>) selectedIds) {
+                selected.put(id, id);
+            }
 
-    protected void addToInstallForm(Request request, StringBuffer sb) throws Exception {
+            for (String id : (List<String>) allIds) {
+                boolean isSelected = (selected.get(id) != null);
+                getDatabaseManager().update(
+                    Tables.REMOTESERVERS.NAME, Tables.REMOTESERVERS.COL_URL,
+                    id, new String[] { Tables.REMOTESERVERS.COL_SELECTED },
+                    new Object[] { new Boolean(isSelected) });
+
+            }
+            clearRemoteServers();
+            checkApi();
+        } else if (request.exists(ARG_DELETE)) {
+            List selectedIds = request.get(ARG_REGISTRY_SELECTED,
+                                           new ArrayList());
+            for (String id : (List<String>) selectedIds) {
+                getDatabaseManager().delete(
+                    Tables.REMOTESERVERS.NAME,
+                    Clause.eq(Tables.REMOTESERVERS.COL_URL, id));
+            }
+            clearRemoteServers();
+            checkApi();
+        }
+
+
+        sb.append(HtmlUtil.p());
+        sb.append(msg("Select remote servers to search on"));
+        sb.append(HtmlUtil.p());
+        sb.append(request.form(URL_REGISTRY_REMOTESERVERS, ""));
+        sb.append(HtmlUtil.submit("Change Selected", ARG_SUBMIT));
+        sb.append(HtmlUtil.submit("Delete Selected", ARG_DELETE));
+        sb.append(HtmlUtil.submit("Reload from Registry Servers",
+                                  ARG_REGISTRY_RELOAD));
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_UL));
+        sb.append(HtmlUtil.br());
+        List<ServerInfo> remoteServers = getRemoteServers();
+        if (remoteServers.size() == 0) {
+            sb.append(msg("No remote servers"));
+        }
+        sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
+        int idCnt = 0;
+        for (ServerInfo serverInfo : remoteServers) {
+            sb.append(HtmlUtil.hidden(ARG_REGISTRY_SERVER,
+                                      serverInfo.getId()));
+            String cbxId = ARG_REGISTRY_SELECTED + "_" + (idCnt++);
+            String call = HtmlUtil.attr(
+                              HtmlUtil.ATTR_ONCLICK,
+                              HtmlUtil.call(
+                                  "checkboxClicked",
+                                  HtmlUtil.comma(
+                                      "event",
+                                      HtmlUtil.squote(ARG_REGISTRY_SELECTED),
+                                      HtmlUtil.squote(cbxId))));
+
+
+            sb.append(
+                HtmlUtil.row(
+                    HtmlUtil.cols(
+                        HtmlUtil.checkbox(
+                            ARG_REGISTRY_SELECTED, serverInfo.getId(),
+                            serverInfo.getSelected(),
+                            HtmlUtil.id(cbxId)
+                            + call) + serverInfo.getLabel(), HtmlUtil.space(
+                                4), HtmlUtil.href(
+                                serverInfo.getUrl(), serverInfo.getUrl()))));
+        }
+
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
+        sb.append(HtmlUtil.close(HtmlUtil.TAG_UL));
+        sb.append(HtmlUtil.submit("Change Selected", ARG_SUBMIT));
+        sb.append(HtmlUtil.submit("Delete Selected", ARG_DELETE));
+        sb.append(HtmlUtil.submit("Reload from Registry Servers",
+                                  ARG_REGISTRY_RELOAD));
+        sb.append(HtmlUtil.formClose());
+
+
+        return getAdmin().makeResult(request, msg("Remote Servers"), sb);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void addToInstallForm(Request request, StringBuffer sb)
+            throws Exception {
         sb.append(
             HtmlUtil.formEntry(
-                               msgLabel("Registry Servers"),
+                msgLabel("Registry Servers"),
                 HtmlUtil.textArea(
                     PROP_REGISTRY_SERVERS,
                     getRepository().getProperty(
                         PROP_REGISTRY_SERVERS,
-                        "http://motherlode.ucar.edu/repository"), 5, 60)));
+                        getRepository().getProperty(
+                            PROP_REGISTRY_DEFAULTSERVER,
+                            "http://motherlode.ucar.edu/repository")), 5,
+                                60)));
     }
 
-    protected void applyInstallForm(Request request) throws Exception  {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void applyInstallForm(Request request) throws Exception {
         List<String> newList =
             StringUtil.split(request.getUnsafeString(PROP_REGISTRY_SERVERS,
                 ""), "\n", true, true);
-        
+
 
         getRepository().writeGlobal(PROP_REGISTRY_SERVERS,
                                     StringUtil.join("\n", newList));
@@ -171,7 +317,7 @@ public class RegistryManager extends RepositoryManager {
             return;
         }
         try {
-            List<ServerInfo> servers = getRegistererServers();
+            List<ServerInfo> servers = getRegisteredServers();
             for (ServerInfo serverInfo : servers) {
                 checkServer(serverInfo, true);
             }
@@ -195,14 +341,22 @@ public class RegistryManager extends RepositoryManager {
     }
 
 
+
+
+
     /**
      * _more_
+     *
+     * @throws Exception _more_
      */
-    public void checkApi() {
+    public void checkApi() throws Exception {
         ApiMethod apiMethod = getRepository().getApiMethod("/registry/list");
         if (apiMethod != null) {
-            apiMethod.setIsTopLevel(isEnabledAsServer());
+            apiMethod.setIsTopLevel(isEnabledAsServer()
+                                    || (getSelectedRemoteServers().size()
+                                        > 0));
         }
+
     }
 
 
@@ -251,7 +405,7 @@ public class RegistryManager extends RepositoryManager {
         List<String> newList =
             StringUtil.split(request.getUnsafeString(PROP_REGISTRY_SERVERS,
                 ""), "\n", true, true);
-        
+
 
         getRepository().writeGlobal(PROP_REGISTRY_SERVERS,
                                     StringUtil.join("\n", newList));
@@ -259,7 +413,7 @@ public class RegistryManager extends RepositoryManager {
                                     request.get(PROP_REGISTRY_ENABLED, false)
                                     + "");
         checkApi();
-        if(!newList.equals(oldList)) {
+        if ( !newList.equals(oldList)) {
             for (String url : oldList) {
                 newList.remove(url);
                 Misc.run(this, "registerWithServer", url);
@@ -287,27 +441,157 @@ public class RegistryManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public List<ServerInfo> getRegistererServers() throws Exception {
+    public List<ServerInfo> getRegisteredServers() throws Exception {
         List<ServerInfo> servers = new ArrayList<ServerInfo>();
 
         Statement stmt =
             getDatabaseManager().select(Tables.SERVERREGISTRY.COLUMNS,
                                         Tables.SERVERREGISTRY.NAME,
-                                        (Clause) null);
+                                        (Clause) null,
+                                        " order by "
+                                        + Tables.SERVERREGISTRY.COL_URL);
         SqlUtil.Iterator iter     = SqlUtil.getIterator(stmt);
         List<Comment>    comments = new ArrayList();
         ResultSet        results;
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                URL    url   = new URL(results.getString(1));
-                String title = results.getString(2);
-                String desc  = results.getString(3);
-                String email  = results.getString(4);
-                boolean isRegistry = results.getInt(5)!=0;
+                URL     url        = new URL(results.getString(1));
+                String  title      = results.getString(2);
+                String  desc       = results.getString(3);
+                String  email      = results.getString(4);
+                boolean isRegistry = results.getInt(5) != 0;
                 servers.add(new ServerInfo(url.getHost(), url.getPort(), -1,
-                                           url.getPath(), title, desc,email,isRegistry));
+                                           url.getPath(), title, desc, email,
+                                           isRegistry, false));
             }
         }
+        return servers;
+    }
+
+
+    /**
+     * _more_
+     */
+    private void clearRemoteServers() {
+        remoteServers   = null;
+        remoteServerMap = null;
+
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public ServerInfo findRemoteServer(String id) throws Exception {
+        if (id.equals(ServerInfo.ID_THIS)) {
+            ServerInfo serverInfo = getRepository().getServerInfo();
+            serverInfo.setSelected(true);
+            return serverInfo;
+        }
+        return getRemoteServerMap().get(id);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List<ServerInfo> getSelectedRemoteServers() throws Exception {
+        List<ServerInfo> selected = new ArrayList<ServerInfo>();
+        for (ServerInfo serverInfo : getRemoteServers()) {
+            if (serverInfo.getSelected()) {
+                selected.add(serverInfo);
+            }
+        }
+        return selected;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Hashtable<String, ServerInfo> getRemoteServerMap()
+            throws Exception {
+        Hashtable<String, ServerInfo> map = remoteServerMap;
+        while (map == null) {
+            getRemoteServers();
+            map = remoteServerMap;
+        }
+        return map;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param results _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private ServerInfo makeRemoteServer(ResultSet results) throws Exception {
+        URL     url        = new URL(results.getString(1));
+        String  title      = results.getString(2);
+        String  desc       = results.getString(3);
+        String  email      = results.getString(4);
+        boolean isRegistry = results.getInt(5) != 0;
+        boolean isSelected = results.getInt(6) != 0;
+        ServerInfo serverInfo = new ServerInfo(url.getHost(), url.getPort(),
+                                    -1, url.getPath(), title, desc, email,
+                                    isRegistry, isSelected);
+        return serverInfo;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List<ServerInfo> getRemoteServers() throws Exception {
+        List<ServerInfo> servers = remoteServers;
+        if (servers != null) {
+            return servers;
+        }
+        servers = new ArrayList<ServerInfo>();
+        Hashtable<String, ServerInfo> map = new Hashtable<String,
+                                                ServerInfo>();
+
+        Statement stmt =
+            getDatabaseManager().select(Tables.REMOTESERVERS.COLUMNS,
+                                        Tables.REMOTESERVERS.NAME,
+                                        (Clause) null,
+                                        " order by "
+                                        + Tables.REMOTESERVERS.COL_URL);
+        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        ResultSet        results;
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+
+                ServerInfo serverInfo = makeRemoteServer(results);
+                map.put(serverInfo.getId(), serverInfo);
+                servers.add(serverInfo);
+            }
+        }
+        remoteServerMap = map;
+        remoteServers   = servers;
         return servers;
     }
 
@@ -351,9 +635,9 @@ public class RegistryManager extends RepositoryManager {
         url = url + getRepository().URL_REGISTRY_ADD.getPath();
         url = HtmlUtil.url(url, ARG_REGISTRY_CLIENT, serverInfo.getUrl());
         try {
-            String contents = IOUtil.readContents(url, getClass());
+            String  contents = IOUtil.readContents(url, getClass());
             Element root     = XmlUtil.getRoot(contents);
-            if(!responseOk(root)) {
+            if ( !responseOk(root)) {
                 logInfo("Failed to register with:" + url);
                 logInfo(XmlUtil.getChildText(root).trim());
             } else {
@@ -366,6 +650,13 @@ public class RegistryManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param root _more_
+     *
+     * @return _more_
+     */
     public boolean responseOk(Element root) {
         return XmlUtil.getAttribute(root, ATTR_CODE).equals(CODE_OK);
     }
@@ -406,16 +697,93 @@ public class RegistryManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processRegistryInfo(Request request) throws Exception {
-        String server = request.getString(ARG_REGISTRY_SERVER,"");
-        if(!getServersToRegisterWith().contains(server)) {
-            logInfo("Was asked to register with a server that is not in our list:" + server);
+        final String server = request.getString(ARG_REGISTRY_SERVER, "");
+        if ( !getServersToRegisterWith().contains(server)) {
+            logInfo(
+                "Was asked to register with a server that is not in our list:"
+                + server);
             return new Result(
                 XmlUtil.tag(
                     TAG_RESPONSE, XmlUtil.attr(ATTR_CODE, CODE_ERROR),
                     "Not registering with you"), MIME_XML);
         }
+        Misc.run(new Runnable() {
+            public void run() {
+                try {
+                    loadRemoteServers(server);
+                } catch (Exception exc) {
+                    logError("Loading servers from:" + server, exc);
+                }
+            }
+        });
+
         return getRepository().processInfo(request);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param serverUrl _more_
+     *
+     * @throws Exception _more_
+     */
+    private void loadRemoteServers(String serverUrl) throws Exception {
+        serverUrl = serverUrl + getRepository().URL_REGISTRY_LIST.getPath();
+        serverUrl = HtmlUtil.url(serverUrl, ARG_RESPONSE, RESPONSE_XML);
+        String  contents = IOUtil.readContents(serverUrl, getClass());
+        Element root     = XmlUtil.getRoot(contents);
+
+        if ( !responseOk(root)) {
+            logInfo("Bad response from " + serverUrl);
+            return;
+        }
+        List<ServerInfo> servers  = new ArrayList<ServerInfo>();
+        ServerInfo       me       = getRepository().getServerInfo();
+        NodeList         children = XmlUtil.getElements(root);
+        for (int i = 0; i < children.getLength(); i++) {
+            Element node = (Element) children.item(i);
+            servers.add(new ServerInfo(node));
+        }
+
+
+        Hashtable<String, ServerInfo> map = getRemoteServerMap();
+        for (ServerInfo serverInfo : servers) {
+            if (serverInfo.equals(me)) {
+                continue;
+            } else {}
+            ServerInfo oldServer = map.get(serverInfo.getId());
+            if (oldServer != null) {
+                getDatabaseManager().delete(
+                    Tables.REMOTESERVERS.NAME,
+                    Clause.eq(
+                        Tables.REMOTESERVERS.COL_URL, serverInfo.getUrl()));
+                clearRemoteServers();
+                serverInfo.setSelected(oldServer.getSelected());
+            }
+            //            System.err.println("added remote server " + serverInfo);
+            getDatabaseManager().executeInsert(Tables.REMOTESERVERS.INSERT,
+                    new Object[] {
+                serverInfo.getUrl(), serverInfo.getTitle(),
+                serverInfo.getDescription(), serverInfo.getEmail(),
+                new Boolean(serverInfo.getIsRegistry()),
+                new Boolean(serverInfo.getSelected())
+            });
+
+        }
+
+        clearRemoteServers();
+
     }
 
 
@@ -426,42 +794,49 @@ public class RegistryManager extends RepositoryManager {
      * @param deleteOnFailure _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
     private boolean checkServer(ServerInfo serverInfo,
-                                boolean deleteOnFailure) throws Exception {
+                                boolean deleteOnFailure)
+            throws Exception {
 
         String serverUrl =
-            HtmlUtil.url(serverInfo.getUrl()
-                         + getRepository().URL_REGISTRY_INFO.getPath(), new String[] {
-                             ARG_RESPONSE,
-                             RESPONSE_XML,
-                             ARG_REGISTRY_SERVER,getRepository().getServerInfo().getUrl() });
+            HtmlUtil.url(
+                serverInfo.getUrl()
+                + getRepository().URL_REGISTRY_INFO.getPath(), new String[] {
+                    ARG_RESPONSE,
+                    RESPONSE_XML, ARG_REGISTRY_SERVER,
+                    getRepository().getServerInfo().getUrl() });
 
         try {
             //TODO: check if the response is OK
             String  contents = IOUtil.readContents(serverUrl, getClass());
             Element root     = XmlUtil.getRoot(contents);
-            if(responseOk(root)) {
+            if (responseOk(root)) {
                 ServerInfo clientServer = new ServerInfo(root);
-                if(clientServer.equals(serverInfo)) {
-                    getDatabaseManager().delete(
-                                                Tables.SERVERREGISTRY.NAME,
-                                                Clause.eq(
-                                                          Tables.SERVERREGISTRY.COL_URL, serverInfo.getUrl()));
-                    getDatabaseManager().executeInsert(Tables.SERVERREGISTRY.INSERT,
-                                                       new Object[] { clientServer.getUrl(),
-                                                                      clientServer.getTitle(), clientServer.getDescription(),
-                                                                      clientServer.getEmail(),
-                                                                      new Boolean(clientServer.getIsRegistry())});
+                if (clientServer.equals(serverInfo)) {
+                    getDatabaseManager().delete(Tables.SERVERREGISTRY.NAME,
+                            Clause.eq(Tables.SERVERREGISTRY.COL_URL,
+                                      serverInfo.getUrl()));
+                    getDatabaseManager().executeInsert(
+                        Tables.SERVERREGISTRY.INSERT,
+                        new Object[] { clientServer.getUrl(),
+                                       clientServer.getTitle(),
+                                       clientServer.getDescription(),
+                                       clientServer.getEmail(),
+                                       new Boolean(
+                                           clientServer.getIsRegistry()) });
                     return true;
                 } else {
-                    System.err.println("not equals:" + serverInfo.getId() + " " + clientServer.getId());
+                    //                    System.err.println("not equals:" + serverInfo.getId()
+                    //                                       + " " + clientServer.getId());
 
                 }
             }
-            System.err.println("Client response is not ok:" + contents);
+            //            System.err.println("Client response is not ok:" + contents);
         } catch (Exception exc) {
-            logError("Checking server:" + serverInfo,exc);
+            logError("Checking server:" + serverInfo, exc);
         }
         if (deleteOnFailure) {
             logInfo("Deleting server:" + serverInfo.getUrl());
@@ -485,48 +860,60 @@ public class RegistryManager extends RepositoryManager {
      */
     public Result processRegistryList(Request request) throws Exception {
         boolean responseAsXml = request.getString(ARG_RESPONSE,
-                                                  "").equals(RESPONSE_XML);
+                                    "").equals(RESPONSE_XML);
 
-        List<ServerInfo> servers = getRegistererServers();
+
+
+
+        List<ServerInfo> servers = (isEnabledAsServer()
+                                    ? getRegisteredServers()
+                                    : getSelectedRemoteServers());
 
         //Add myself to the list
-        servers.add(0,getRepository().getServerInfo());
-        if(responseAsXml) {
-            Document  resultDoc  = XmlUtil.makeDocument();
-            Element resultRoot = XmlUtil.create(resultDoc, TAG_RESPONSE, null,
-                                                new String[] { ATTR_CODE,
-                                                               CODE_OK });
+        servers.add(0, getRepository().getServerInfo());
+        if (responseAsXml) {
+            Document resultDoc = XmlUtil.makeDocument();
+            Element resultRoot = XmlUtil.create(resultDoc, TAG_RESPONSE,
+                                     null, new String[] { ATTR_CODE,
+                    CODE_OK });
 
 
             for (ServerInfo serverInfo : servers) {
-                resultRoot.appendChild(serverInfo.toXml(getRepository(), resultDoc));
+                resultRoot.appendChild(serverInfo.toXml(getRepository(),
+                        resultDoc));
             }
-            return new Result(XmlUtil.toString(resultRoot,false),
-                              MIME_XML);
-        } 
+            return new Result(XmlUtil.toString(resultRoot, false), MIME_XML);
+        }
 
-        
+
         StringBuffer sb = new StringBuffer();
-        sb.append(msgHeader("Registered Servers"));
+        if (isEnabledAsServer()) {
+            sb.append(msgHeader("Registered Servers"));
+        } else {
+            sb.append(msgHeader("Remote Servers"));
+        }
         sb.append("<table cellspacing=\"0\" cellpadding=\"4\">");
-        sb.append(HtmlUtil.row(HtmlUtil.headerCols(new String[]{
+        sb.append(HtmlUtil.row(HtmlUtil.headerCols(new String[] {
             msg("Repository"),
-            msg("URL"),
-            msg("Is Registry?")
-        })));
+            msg("URL"), msg("Is Registry?") })));
         boolean evenRow = true;
         for (ServerInfo serverInfo : servers) {
-            sb.append(HtmlUtil.row(HtmlUtil.cols(new String[]{
+            sb.append(HtmlUtil.row(HtmlUtil.cols(new String[] {
                 serverInfo.getLabel(),
-                HtmlUtil.href(serverInfo.getUrl(),
-                              serverInfo.getUrl()),
-                (serverInfo.getIsRegistry()?msg("Yes"):msg("No"))}),
-                      HtmlUtil.cssClass(evenRow?"listrow1":"listrow2")));
+                HtmlUtil.href(serverInfo.getUrl(), serverInfo.getUrl()),
+                (serverInfo.getIsRegistry()
+                 ? msg("Yes")
+                 : msg("No")) }), HtmlUtil.cssClass(evenRow
+                    ? "listrow1"
+                    : "listrow2")));
             String desc = serverInfo.getDescription();
-            if(desc!=null && desc.trim().length()>0) {
-                desc = HtmlUtil.makeShowHideBlock(msg("Description"),
-                                                  desc, false);
-                sb.append(HtmlUtil.row(HtmlUtil.colspan(desc,3),HtmlUtil.cssClass(evenRow?"listrow1":"listrow2")));
+            if ((desc != null) && (desc.trim().length() > 0)) {
+                desc = HtmlUtil.makeShowHideBlock(msg("Description"), desc,
+                        false);
+                sb.append(HtmlUtil.row(HtmlUtil.colspan(desc, 3),
+                                       HtmlUtil.cssClass(evenRow
+                        ? "listrow1"
+                        : "listrow2")));
             }
             evenRow = !evenRow;
         }

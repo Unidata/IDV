@@ -44,8 +44,8 @@
       <api request="/search/form"            method="processEntrySearchForm"         name="Search"/>
       <api request="/search/browse"          method="processEntryBrowseSearchForm"   name="Browse"/>
       <api request="/search/do"              method="processEntrySearch"/>
-      <api request="/search/federated/form"     method="processFederatedSearchForm"         name="Federated Search" />
-      <api request="/search/federated/do"     method="processFederatedSearch"         name="Federated Search" />
+      <api request="/search/remote/form"     method="processRemoteSearchForm"         name="Remote Search" />
+      <api request="/search/remote/do"     method="processRemoteSearch"         name="Remote Search" />
    </group>
 
   <group handler="graphmanager">
@@ -71,7 +71,9 @@
       <api request="/registry/add"       method="processRegistryAdd"/>
       <api request="/registry/info"      method="processRegistryInfo"/>
       <api request="/registry/list"      method="processRegistryList" toplevel="true" name="Repositories"/>
+      <api request="/admin/remoteservers"      method="processAdminRemoteServers"  name="Remote Servers" admin="true"/>
   </group>
+
 
 
   <group handler="metadatamanager">

@@ -522,13 +522,13 @@ a.header-left  {
 }
 
 .listrow1 {
-   padding:4px;
+   padding:2px;
    padding-bottom:0px;
 }
 
 .listrow2 {
    background-color:#edf5ff;
-   padding:4px;
+   padding:2px;
    padding-bottom:0px;
 }
 
@@ -881,7 +881,7 @@ code.menu {
 }
 
 .block {
-   margin-top:5px;
+   margin-top:2px;
 }
 
 

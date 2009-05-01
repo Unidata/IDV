@@ -3520,7 +3520,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             getProperty(PROP_REPOSITORY_NAME, "Repository"),
             getDescription(),
             getProperty(PROP_ADMIN_EMAIL, ""),
-            getRegistryManager().isEnabledAsServer());
+            getRegistryManager().isEnabledAsServer(),false);
     }
 
 

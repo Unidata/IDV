@@ -243,7 +243,19 @@ public class DatabaseManager extends RepositoryManager {
                                            names);
         PreparedStatement stmt       = connection.prepareStatement(query);
         for (int i = 0; i < values.length; i++) {
-            SqlUtil.setValue(stmt, values[i], i + 1);
+            Object value = values[i];
+            if (value==null) {
+                stmt.setNull(i + 1, java.sql.Types.VARCHAR);
+            } else if (value instanceof Date) {
+                setDate(stmt, i + 1, (Date) value);
+            } else if (value instanceof Boolean) {
+                boolean b = ((Boolean) value).booleanValue();
+                stmt.setInt(i + 1, (b
+                                           ? 1
+                                           : 0));
+            } else {
+                stmt.setObject(i + 1, value);
+            }
         }
         stmt.setString(values.length + 1, id);
         stmt.execute();

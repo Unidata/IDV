@@ -527,6 +527,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_DELETE = "delete";
 
+    public static final String ARG_DOFRAMES = "doframes";
+
     /** _more_ */
     public static final String ARG_DELETE_CONFIRM = "delete.confirm";
 
@@ -1072,6 +1074,8 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_ADMIN = "ramadda.admin";
 
+
+    public static final String PROP_REGISTRY_DEFAULTSERVER= "ramadda.registry.defaultserver";
 
     public static final String PROP_REGISTRY_ENABLED = "ramadda.registry.enabled";
 

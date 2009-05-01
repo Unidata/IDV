@@ -2557,13 +2557,13 @@ return new Result(title, sb);
 
         List      newEntries = new ArrayList();
         Hashtable entries    = new Hashtable();
-        Element   root       = XmlUtil.getRoot(entriesXml);
-        NodeList  children   = XmlUtil.getElements(root);
-
         Document  resultDoc  = XmlUtil.makeDocument();
         Element resultRoot = XmlUtil.create(resultDoc, TAG_RESPONSE, null,
                                             new String[] { ATTR_CODE,
                 CODE_OK });
+
+        Element   root       = XmlUtil.getRoot(entriesXml);
+        NodeList  children   = XmlUtil.getElements(root);
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
             if (node.getTagName().equals(TAG_ENTRY)) {
@@ -2629,7 +2629,35 @@ return new Result(title, sb);
                                     Hashtable entries, Hashtable files,
                                     boolean checkAccess, boolean internal)
             throws Exception {
+        String parentId = XmlUtil.getAttribute(node, ATTR_PARENT,
+                              getTopGroup().getId());
+        Group parentGroup = (Group) entries.get(parentId);
+        if (parentGroup == null) {
+            parentGroup = (Group) getEntry(request, parentId);
+            if (parentGroup == null) {
+                throw new RepositoryUtil.MissingEntryException(
+                    "Could not find parent:" + parentId);
+            }
+        }
+        Entry entry = processEntryXml(request, node, parentGroup, files, checkAccess, internal);
 
+        String      tmpid = XmlUtil.getAttribute(node, ATTR_ID,
+                                                 (String) null);
+
+        if (tmpid != null) {
+            entries.put(tmpid, entry);
+        }
+        return entry;
+    }
+
+
+
+    protected Entry processEntryXml(Request request, Element node,
+                                    Group parentGroup, Hashtable files,
+                                    boolean checkAccess, boolean internal)
+            throws Exception {
+
+        boolean doAnonymousUpload = false;
         String name = XmlUtil.getAttribute(node, ATTR_NAME);
         String type = XmlUtil.getAttribute(node, ATTR_TYPE,
                                            TypeHandler.TYPE_FILE);
@@ -2643,17 +2671,6 @@ return new Result(title, sb);
             description = "";
         }
 
-        String parentId = XmlUtil.getAttribute(node, ATTR_PARENT,
-                              getTopGroup().getId());
-        Group parentGroup = (Group) entries.get(parentId);
-        if (parentGroup == null) {
-            parentGroup = (Group) getEntry(request, parentId);
-            if (parentGroup == null) {
-                throw new RepositoryUtil.MissingEntryException(
-                    "Could not find parent:" + parentId);
-            }
-        }
-        boolean doAnonymousUpload = false;
 
         if (checkAccess) {
             if ( !getAccessManager().canDoAction(request, parentGroup,
@@ -2663,7 +2680,7 @@ return new Result(title, sb);
                     doAnonymousUpload = true;
                 } else {
                     throw new IllegalArgumentException(
-                        "Cannot add to parent group:" + parentId);
+                        "Cannot add to parent group");
                 }
             }
         }
@@ -2671,7 +2688,7 @@ return new Result(title, sb);
 
         String file = XmlUtil.getAttribute(node, ATTR_FILE, (String) null);
         if (file != null) {
-            String tmp = (String) files.get(file);
+            String tmp = (files==null?null:(String) files.get(file));
             if (doAnonymousUpload) {
                 File newFile =
                     getStorageManager().moveToAnonymousStorage(request,
@@ -2689,8 +2706,6 @@ return new Result(title, sb);
                                (String) null);
         String localFileToMove = XmlUtil.getAttribute(node,
                                      ATTR_LOCALFILETOMOVE, (String) null);
-        String      tmpid = XmlUtil.getAttribute(node, ATTR_ID,
-                                (String) null);
 
         TypeHandler typeHandler = getRepository().getTypeHandler(type);
         if (typeHandler == null) {
@@ -2774,9 +2789,7 @@ return new Result(title, sb);
         entry.getTypeHandler().initializeEntry(request, entry, node);
 
 
-        if (tmpid != null) {
-            entries.put(tmpid, entry);
-        }
+
         return entry;
 
     }

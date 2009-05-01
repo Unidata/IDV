@@ -20,11 +20,15 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
-import ucar.unidata.repository.output.*;
-import ucar.unidata.repository.harvester.*;
+
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.harvester.*;
+
+import ucar.unidata.repository.output.*;
 
 import ucar.unidata.sql.Clause;
 
@@ -145,6 +149,7 @@ public class Admin extends RepositoryManager {
         URL_ADMIN_SETTINGS, getRepositoryBase().URL_USER_LIST,
         URL_ADMIN_STATS, URL_ADMIN_ACCESS,
         getHarvesterManager().URL_HARVESTERS_LIST,
+        getRegistryManager().URL_REGISTRY_REMOTESERVERS,
         /*URL_ADMIN_STARTSTOP,*/
         /*URL_ADMIN_TABLES, */
         URL_ADMIN_LOG, URL_ADMIN_SQL, URL_ADMIN_CLEANUP, URL_ADMIN_USERMESSAGE
@@ -244,41 +249,41 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminLog(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb     = new StringBuffer();
         List<String> header = new ArrayList();
-        String log = request.getString(ARG_LOG,"access");
-        if(log.equals("access")) {
+        String       log    = request.getString(ARG_LOG, "access");
+        if (log.equals("access")) {
             header.add(HtmlUtil.bold(msg("Access Log")));
             header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                                                  ARG_LOG,"error"),"Error Log"));
+                    ARG_LOG, "error"), "Error Log"));
             header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                                                  ARG_LOG,"fullerror"),"Full Error Log"));
-        } else   if(log.equals("error")) {
+                    ARG_LOG, "fullerror"), "Full Error Log"));
+        } else if (log.equals("error")) {
             header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                                                  ARG_LOG,"access"),"Access"));
+                    ARG_LOG, "access"), "Access"));
             header.add(HtmlUtil.bold(msg("Error")));
             header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                                                  ARG_LOG,"fullerror"),"Full Error Log"));
+                    ARG_LOG, "fullerror"), "Full Error Log"));
         } else {
             header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                                                  ARG_LOG,"access"),"Access"));
+                    ARG_LOG, "access"), "Access"));
             header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                                                  ARG_LOG,"error"),"Error Log"));
+                    ARG_LOG, "error"), "Error Log"));
             header.add(HtmlUtil.bold(msg("Full Error")));
         }
 
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.space(10));
         sb.append(StringUtil.join(HtmlUtil.span("&nbsp;|&nbsp;",
-                                                HtmlUtil.cssClass("separator")), header));
+                HtmlUtil.cssClass("separator")), header));
         sb.append(HtmlUtil.hr());
 
-        if(log.equals("access")) {
-            getAccessLog(request,sb);
-        } else   if(log.equals("error")) {
-            getErrorLog(request,sb,getStorageManager().getLogFile());
+        if (log.equals("access")) {
+            getAccessLog(request, sb);
+        } else if (log.equals("error")) {
+            getErrorLog(request, sb, getStorageManager().getLogFile());
         } else {
-            getErrorLog(request,sb,getStorageManager().getFullLogFile());
+            getErrorLog(request, sb, getStorageManager().getFullLogFile());
         }
 
 
@@ -289,72 +294,99 @@ public class Admin extends RepositoryManager {
         return result;
     }
 
-    private void getErrorLog(Request request, StringBuffer sb, File logFile) throws Exception {
-        FileInputStream fis = new FileInputStream(logFile);
-        String log = request.getString(ARG_LOG,"error");
-        int numBytes = request.get(ARG_BYTES,10000);
-        if(numBytes<0) numBytes=100;
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     * @param logFile _more_
+     *
+     * @throws Exception _more_
+     */
+    private void getErrorLog(Request request, StringBuffer sb, File logFile)
+            throws Exception {
+        FileInputStream fis      = new FileInputStream(logFile);
+        String          log      = request.getString(ARG_LOG, "error");
+        int             numBytes = request.get(ARG_BYTES, 10000);
+        if (numBytes < 0) {
+            numBytes = 100;
+        }
         long length = logFile.length();
-        long offset = length-numBytes;
-        if(numBytes<length)
+        long offset = length - numBytes;
+        if (numBytes < length) {
             sb.append(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                                                 ARG_LOG,log,ARG_BYTES,numBytes+2000),"More..."));
+                    ARG_LOG, log, ARG_BYTES, numBytes + 2000), "More..."));
+        }
         sb.append(HtmlUtil.space(2));
         sb.append(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                                             ARG_LOG,log,ARG_BYTES,numBytes-2000),"Less..."));
+                                             ARG_LOG, log, ARG_BYTES,
+                                             numBytes - 2000), "Less..."));
 
         sb.append(HtmlUtil.p());
-        if(offset>0) {
+        if (offset > 0) {
             fis.skip(offset);
         } else {
-            numBytes = (int)length;
+            numBytes = (int) length;
         }
-        byte[]bytes = new byte[numBytes];
+        byte[] bytes = new byte[numBytes];
         fis.read(bytes);
-        String logString = new String(bytes);
-        boolean didOne = false;
-        StringBuffer stackSB = null;
-        boolean lastOneBlank = false;
-        for(String line:StringUtil.split(logString,"\n",false,false)) {
-            if(!didOne) {
+        String       logString    = new String(bytes);
+        boolean      didOne       = false;
+        StringBuffer stackSB      = null;
+        boolean      lastOneBlank = false;
+        for (String line : StringUtil.split(logString, "\n", false, false)) {
+            if ( !didOne) {
                 didOne = true;
                 continue;
             }
             line = line.trim();
-            if(line.length()==0) {
-                if(lastOneBlank) continue;
-                lastOneBlank =true;
+            if (line.length() == 0) {
+                if (lastOneBlank) {
+                    continue;
+                }
+                lastOneBlank = true;
             } else {
-                lastOneBlank  =false;
+                lastOneBlank = false;
             }
-            if(line.startsWith("</stack>") && stackSB !=null) {
-                sb.append(HtmlUtil.makeShowHideBlock("Stack trace", HtmlUtil.div(stackSB.toString(),HtmlUtil.cssClass("stack")),
-                                                     false));
+            if (line.startsWith("</stack>") && (stackSB != null)) {
+                sb.append(HtmlUtil.makeShowHideBlock("Stack trace",
+                        HtmlUtil.div(stackSB.toString(),
+                                     HtmlUtil.cssClass("stack")), false));
                 sb.append("\n");
                 stackSB = null;
-            } else if(stackSB!=null) {
-                line  = HtmlUtil.entityEncode(line);
+            } else if (stackSB != null) {
+                line = HtmlUtil.entityEncode(line);
                 stackSB.append(line);
                 stackSB.append("<br>");
-            } else if(line.startsWith("<stack>")) {
+            } else if (line.startsWith("<stack>")) {
                 stackSB = new StringBuffer();
-            }  else {
-                line  = HtmlUtil.entityEncode(line);
+            } else {
+                line = HtmlUtil.entityEncode(line);
                 sb.append(line);
                 sb.append("<br>");
                 sb.append("\n");
             }
         }
-        if(stackSB !=null) {
-            sb.append(HtmlUtil.makeShowHideBlock("Stack trace", HtmlUtil.div(stackSB.toString(),HtmlUtil.cssClass("stack")),
-                                                 false));
+        if (stackSB != null) {
+            sb.append(HtmlUtil.makeShowHideBlock("Stack trace",
+                    HtmlUtil.div(stackSB.toString(),
+                                 HtmlUtil.cssClass("stack")), false));
         }
 
         //        sb.append("</pre>");
     }
 
 
-    private void getAccessLog(Request request, StringBuffer sb) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    private void getAccessLog(Request request, StringBuffer sb)
+            throws Exception {
 
 
 
@@ -507,45 +539,50 @@ public class Admin extends RepositoryManager {
 
 
                 if (okToAdd) {
-                    getUserManager().makeOrUpdateUser(new User(id, name, 
-                                                               request.getString(UserManager.ARG_USER_EMAIL,"").trim(),
-                            "", "", getUserManager().hashPassword(password1),
-                            true, "", ""), false);
+                    getUserManager().makeOrUpdateUser(
+                        new User(
+                            id, name,
+                            request.getString(
+                                UserManager.ARG_USER_EMAIL, "").trim(), "",
+                                    "",
+                                    getUserManager().hashPassword(password1),
+                                    true, "", ""), false);
                     didIt(ARG_ADMIN_ADMINCREATED);
                     didIt(ARG_ADMIN_INSTALLCOMPLETE);
 
-                    if(request.defined(PROP_HOSTNAME)) {
+                    if (request.defined(PROP_HOSTNAME)) {
                         getRepository().writeGlobal(PROP_HOSTNAME,
-                                                    request.getString(PROP_HOSTNAME,
-                                                                      "").trim());
+                                request.getString(PROP_HOSTNAME, "").trim());
                     }
 
-                    if(request.defined(PROP_PORT)) {
+                    if (request.defined(PROP_PORT)) {
                         getRepository().writeGlobal(PROP_PORT,
-                                                    request.getString(PROP_PORT,
-                                                                      "").trim());
+                                request.getString(PROP_PORT, "").trim());
                     }
 
-                    if(request.defined(PROP_REPOSITORY_NAME)) {
+                    if (request.defined(PROP_REPOSITORY_NAME)) {
                         getRepository().writeGlobal(PROP_REPOSITORY_NAME,
-                                                    request.getString(PROP_REPOSITORY_NAME,
-                                                                      ""));
+                                request.getString(PROP_REPOSITORY_NAME, ""));
                     }
-                    if(request.defined(PROP_REPOSITORY_DESCRIPTION)) {
-                    getRepository().writeGlobal(PROP_REPOSITORY_DESCRIPTION,
-                                                request.getString(PROP_REPOSITORY_DESCRIPTION,
-                                                                  ""));
+                    if (request.defined(PROP_REPOSITORY_DESCRIPTION)) {
+                        getRepository().writeGlobal(
+                            PROP_REPOSITORY_DESCRIPTION,
+                            request.getString(
+                                PROP_REPOSITORY_DESCRIPTION, ""));
                     }
 
-                    if(request.defined(UserManager.ARG_USER_EMAIL)) {
+                    if (request.defined(UserManager.ARG_USER_EMAIL)) {
                         getRepository().writeGlobal(PROP_ADMIN_EMAIL,
-                                                    request.getString(UserManager.ARG_USER_EMAIL,""));
+                                request.getString(UserManager.ARG_USER_EMAIL,
+                                    ""));
                     }
 
                     getRegistryManager().applyInstallForm(request);
 
 
-                    sb.append(getRepository().note(msg("Site administrator created")));
+                    sb.append(
+                        getRepository().note(
+                            msg("Site administrator created")));
                     sb.append(HtmlUtil.p());
                     sb.append(getUserManager().makeLoginForm(request));
                     getRegistryManager().doFinalInitialization();
@@ -572,7 +609,9 @@ public class Admin extends RepositoryManager {
             sb.append(
                 HtmlUtil.formEntry(
                     msgLabel("Email"),
-                    HtmlUtil.input(UserManager.ARG_USER_EMAIL, request.getString(UserManager.ARG_USER_EMAIL,""))));
+                    HtmlUtil.input(
+                        UserManager.ARG_USER_EMAIL,
+                        request.getString(UserManager.ARG_USER_EMAIL, ""))));
             sb.append(
                 HtmlUtil.formEntry(
                     msgLabel("Password"),
@@ -585,33 +624,40 @@ public class Admin extends RepositoryManager {
 
             sb.append(HtmlUtil.colspan(msgHeader("Server Information"), 2));
             String hostname = "";
-            String port = "";
-            if(request.getHttpServletRequest()!=null) {
+            String port     = "";
+            if (request.getHttpServletRequest() != null) {
                 hostname = request.getHttpServletRequest().getServerName();
-                port = ""+request.getHttpServletRequest().getServerPort();
+                port = "" + request.getHttpServletRequest().getServerPort();
             }
-            hostname = request.getString(PROP_HOSTNAME,hostname);
-            port = request.getString(PROP_PORT,port);
-
-            sb.append(HtmlUtil.formEntry(msgLabel("Repository Title"),HtmlUtil.input(PROP_REPOSITORY_NAME,
-                                                        request.getString(PROP_REPOSITORY_NAME,
-                                                                          getRepository().getProperty(PROP_REPOSITORY_NAME,
-                                                                          "RAMADDA Repository")), HtmlUtil.SIZE_60)));
-            sb.append(HtmlUtil.formEntryTop(msgLabel("Description"),
-                                            HtmlUtil.textArea(PROP_REPOSITORY_DESCRIPTION,
-                                                              getProperty(PROP_REPOSITORY_DESCRIPTION,
-                                                                          ""), 5, 60)));
+            hostname = request.getString(PROP_HOSTNAME, hostname);
+            port     = request.getString(PROP_PORT, port);
 
             sb.append(
                 HtmlUtil.formEntry(
-                    msgLabel("Hostname"),
-                    HtmlUtil.input(PROP_HOSTNAME,hostname,HtmlUtil.SIZE_60)));
+                    msgLabel("Repository Title"),
+                    HtmlUtil.input(
+                        PROP_REPOSITORY_NAME,
+                        request.getString(
+                            PROP_REPOSITORY_NAME,
+                            getRepository().getProperty(
+                                PROP_REPOSITORY_NAME,
+                                "RAMADDA Repository")), HtmlUtil.SIZE_60)));
             sb.append(
-                HtmlUtil.formEntry(
-                    msgLabel("Port"),
-                    HtmlUtil.input(PROP_PORT,port,HtmlUtil.SIZE_10)));
+                HtmlUtil.formEntryTop(
+                    msgLabel("Description"),
+                    HtmlUtil.textArea(
+                        PROP_REPOSITORY_DESCRIPTION,
+                        getProperty(PROP_REPOSITORY_DESCRIPTION, ""), 5,
+                        60)));
 
-            getRegistryManager().addToInstallForm(request,sb);
+            sb.append(HtmlUtil.formEntry(msgLabel("Hostname"),
+                                         HtmlUtil.input(PROP_HOSTNAME,
+                                             hostname, HtmlUtil.SIZE_60)));
+            sb.append(HtmlUtil.formEntry(msgLabel("Port"),
+                                         HtmlUtil.input(PROP_PORT, port,
+                                             HtmlUtil.SIZE_10)));
+
+            getRegistryManager().addToInstallForm(request, sb);
 
 
             sb.append(HtmlUtil.formTableClose());
@@ -849,8 +895,7 @@ public class Admin extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public Result makeResult(Request request, String title,
-                                StringBuffer sb)
+    public Result makeResult(Request request, String title, StringBuffer sb)
             throws Exception {
         return getRepository().makeResult(request, title, sb, adminUrls);
     }
@@ -919,7 +964,8 @@ public class Admin extends RepositoryManager {
 
 
 
-        csb.append(HtmlUtil.row(HtmlUtil.colspan(msgHeader("Site Information"), 2)));
+        csb.append(
+            HtmlUtil.row(HtmlUtil.colspan(msgHeader("Site Information"), 2)));
         csb.append(HtmlUtil.formEntry(msgLabel("Hostname"),
                                       HtmlUtil.input(PROP_HOSTNAME,
                                           getProperty(PROP_HOSTNAME, ""),
@@ -963,10 +1009,12 @@ public class Admin extends RepositoryManager {
                                       HtmlUtil.input(PROP_REPOSITORY_NAME,
                                           getProperty(PROP_REPOSITORY_NAME,
                                               "Repository"), size)));
-        dsb.append(HtmlUtil.formEntryTop(msgLabel("Description"),
-                                         HtmlUtil.textArea(PROP_REPOSITORY_DESCRIPTION,
-                                             getProperty(PROP_REPOSITORY_DESCRIPTION,
-                                                 ""), 5, 60)));
+        dsb.append(
+            HtmlUtil.formEntryTop(
+                msgLabel("Description"),
+                HtmlUtil.textArea(
+                    PROP_REPOSITORY_DESCRIPTION,
+                    getProperty(PROP_REPOSITORY_DESCRIPTION, ""), 5, 60)));
 
         dsb.append(HtmlUtil.formEntryTop(msgLabel("Footer"),
                                          HtmlUtil.textArea(PROP_HTML_FOOTER,
@@ -975,12 +1023,12 @@ public class Admin extends RepositoryManager {
 
         dsb.append(HtmlUtil.formEntry(msgLabel("Logo Image Location"),
                                       HtmlUtil.input(PROP_LOGO_IMAGE,
-                                          getProperty(PROP_LOGO_IMAGE,
-                                              ""), size)));
+                                          getProperty(PROP_LOGO_IMAGE, ""),
+                                          size)));
         dsb.append(HtmlUtil.formEntry(msgLabel("Logo URL"),
                                       HtmlUtil.input(PROP_LOGO_URL,
-                                          getProperty(PROP_LOGO_URL,
-                                              ""), size)));
+                                          getProperty(PROP_LOGO_URL, ""),
+                                          size)));
 
 
 
@@ -1023,7 +1071,8 @@ public class Admin extends RepositoryManager {
         asb.append(HtmlUtil.formTable());
 
 
-        asb.append(HtmlUtil.row(HtmlUtil.colspan(msgHeader("Site Access"), 2)));
+        asb.append(HtmlUtil.row(HtmlUtil.colspan(msgHeader("Site Access"),
+                2)));
         asb.append(
             HtmlUtil.formEntry(
                 "",
@@ -1071,9 +1120,9 @@ public class Admin extends RepositoryManager {
         String fileWidget = HtmlUtil.textArea(PROP_LOCALFILEPATHS,
                                 getProperty(PROP_LOCALFILEPATHS, ""), 5, 40);
         String fileLabel =
-            msg("Enter one server file system directory per line.")+
-            HtmlUtil.br()+
-            msg("These are the directories that you can create local file view entries under.");
+            msg("Enter one server file system directory per line.")
+            + HtmlUtil.br()
+            + msg("These are the directories that you can create local file view entries under.");
         asb.append(HtmlUtil.formEntryTop(msgLabel("File system access"),
                                          "<table><tr valign=top><td>"
                                          + fileWidget + "</td><td>"
@@ -1172,8 +1221,9 @@ public class Admin extends RepositoryManager {
         osb.append(HtmlUtil.formTableClose());
 
 
-        sb.append(makeConfigBlock("Site and Contact Information", csb.toString()));
-        sb.append(makeConfigBlock("Access",  asb.toString()));
+        sb.append(makeConfigBlock("Site and Contact Information",
+                                  csb.toString()));
+        sb.append(makeConfigBlock("Access", asb.toString()));
         sb.append(makeConfigBlock("Display", dsb.toString()));
         sb.append(makeConfigBlock("Available Output Types", osb.toString()));
 
@@ -1290,21 +1340,21 @@ public class Admin extends RepositoryManager {
         getRepository().getRegistryManager().applyAdminConfig(request);
 
 
-        getRepository().writeGlobal(request,PROP_ADMIN_EMAIL);
-        getRepository().writeGlobal(request,PROP_ADMIN_SMTP);
-        getRepository().writeGlobal(request,PROP_LDM_PQINSERT);
-        getRepository().writeGlobal(request,PROP_LDM_QUEUE);
-        getRepository().writeGlobal(request,PROP_LOGO_URL);
-        getRepository().writeGlobal(request,PROP_LOGO_IMAGE);
+        getRepository().writeGlobal(request, PROP_ADMIN_EMAIL);
+        getRepository().writeGlobal(request, PROP_ADMIN_SMTP);
+        getRepository().writeGlobal(request, PROP_LDM_PQINSERT);
+        getRepository().writeGlobal(request, PROP_LDM_QUEUE);
+        getRepository().writeGlobal(request, PROP_LOGO_URL);
+        getRepository().writeGlobal(request, PROP_LOGO_IMAGE);
         getRepository().writeGlobal(request, PROP_REPOSITORY_NAME);
         getRepository().writeGlobal(request, PROP_REPOSITORY_DESCRIPTION);
-        getRepository().writeGlobal(request,PROP_ADMIN_PHRASES);
-        getRepository().writeGlobal(request,PROP_HTML_FOOTER);
-        getRepository().writeGlobal(request,PROP_GOOGLEAPIKEYS);
+        getRepository().writeGlobal(request, PROP_ADMIN_PHRASES);
+        getRepository().writeGlobal(request, PROP_HTML_FOOTER);
+        getRepository().writeGlobal(request, PROP_GOOGLEAPIKEYS);
         getRepository().writeGlobal(request, PROP_FACEBOOK_CONNECT_KEY);
-        getRepository().writeGlobal(request,PROP_RATINGS_ENABLE);
-        getRepository().writeGlobal(request,PROP_HOSTNAME);
-        getRepository().writeGlobal(request,PROP_PORT);
+        getRepository().writeGlobal(request, PROP_RATINGS_ENABLE);
+        getRepository().writeGlobal(request, PROP_HOSTNAME);
+        getRepository().writeGlobal(request, PROP_PORT);
 
         String oldSsl = getProperty(PROP_SSL_PORT, "");
         String newSsl;
@@ -1481,12 +1531,12 @@ public class Admin extends RepositoryManager {
                                            fmt.format(usedMemory) + " (MB)"));
 
         long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
-        statusSB.append(HtmlUtil.formEntry(msgLabel("Up Time"),
-                                           fmt.format((double) (uptime / 1000
-                                               / 60)) + " "
-                                                   + msg("minutes")+
-                                           HtmlUtil.space(2) +
-                                           "# Requests:" + getLogManager().getRequestCount()));
+        statusSB.append(
+            HtmlUtil.formEntry(
+                msgLabel("Up Time"),
+                fmt.format((double) (uptime / 1000 / 60)) + " "
+                + msg("minutes") + HtmlUtil.space(2) + "# Requests:"
+                + getLogManager().getRequestCount()));
 
         getEntryManager().addStatusInfo(statusSB);
 
@@ -1663,13 +1713,17 @@ public class Admin extends RepositoryManager {
                                     dttm)));
                         } else {
                             String s = results.getString(colcnt);
-                            if(s==null) s="_null_";
+                            if (s == null) {
+                                s = "_null_";
+                            }
                             s = HtmlUtil.entityEncode(s);
-                            if(s.length()>100) {
-                                sb.append(HtmlUtil.col(HtmlUtil.textArea("dummy",s,5,50)));
-                            } else {
+                            if (s.length() > 100) {
                                 sb.append(
-                                          HtmlUtil.col(HtmlUtil.pre(s)));
+                                    HtmlUtil.col(
+                                        HtmlUtil.textArea(
+                                            "dummy", s, 5, 50)));
+                            } else {
+                                sb.append(HtmlUtil.col(HtmlUtil.pre(s)));
                             }
                         }
                     }

@@ -333,14 +333,14 @@ public class XmlOutputHandler extends OutputHandler {
     private Element getGroupTag(Request request, Group group, Document doc,
                                 Element parent)
             throws Exception {
+        Element node  = getEntryTag(group, doc, parent);
         boolean canDoNew = getAccessManager().canDoAction(request, group,
                                Permission.ACTION_NEW);
         boolean canDoUpload = getAccessManager().canDoAction(request, group,
                                   Permission.ACTION_UPLOAD);
-        return XmlUtil.create(doc, TAG_GROUP, parent, new String[] {
-            ATTR_NAME, group.getName(), ATTR_ID, group.getId(), ATTR_CANDONEW,
-            "" + canDoNew, ATTR_CANDOUPLOAD, "" + canDoUpload
-        });
+        node.setAttribute(ATTR_CANDONEW,""+canDoNew);
+        node.setAttribute(ATTR_CANDOUPLOAD,""+canDoUpload);
+        return node;
 
     }
 

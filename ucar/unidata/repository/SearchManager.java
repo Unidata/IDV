@@ -19,10 +19,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
-import ucar.unidata.repository.output.*;
+
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.output.*;
 
 
 import ucar.unidata.sql.Clause;
@@ -39,8 +42,8 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.PluginClassLoader;
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.xml.XmlUtil;
@@ -99,9 +102,6 @@ import java.util.zip.*;
  */
 public class SearchManager extends RepositoryManager {
 
-    private List<ServerInfo> federatedServers;
-
-
 
     /**
      * _more_
@@ -112,32 +112,6 @@ public class SearchManager extends RepositoryManager {
         super(repository);
     }
 
-
-    public ServerInfo findFederatedServer(String id) {
-        if(id.equals("this")) {
-            return getRepository().getServerInfo();
-        }
-        for(ServerInfo server: getFederatedServers()) {
-            if(server.getId().equals(id)) return server;
-        }
-        return null;
-    }
-
-    public List<ServerInfo> getFederatedServers() {
-        if(federatedServers == null) {
-            List<ServerInfo> tmp =  new ArrayList<ServerInfo>();
-            /*
-            tmp.add(new ServerInfo("motherlode.ucar.edu",80,"Unidata's RAMADDA  Server",
-                                   "This is the main RAMADDA server hosted by Unidata"));
-
-            tmp.add(new ServerInfo("harpo",8080,"harpo@8080",
-                                   "RAMADDA on Harpo"));
-            */
-            federatedServers = tmp;
-        }
-
-        return federatedServers;
-   }
 
 
 
@@ -179,10 +153,17 @@ public class SearchManager extends RepositoryManager {
     }
 
 
-    public RequestUrl[] getSearchUrls() {
-        //        if(getFederatedServers().size()>0) {
-            //            return getRepository().federatedSearchUrls;
-        //        }
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public RequestUrl[] getSearchUrls() throws Exception {
+        if (getRegistryManager().getSelectedRemoteServers().size() > 0) {
+            return getRepository().remoteSearchUrls;
+        }
         return getRepository().searchUrls;
     }
 
@@ -273,49 +254,58 @@ public class SearchManager extends RepositoryManager {
                                         false)) + HtmlUtil.space(1)
                                             + msg("ascending");
         outputForm.append(HtmlUtil.formEntry(msgLabel("Order By"), orderBy));
-        outputForm.append(HtmlUtil.formEntry(msgLabel("Output"), HtmlUtil.select(ARG_OUTPUT,
-                                                                                 getOutputHandlerSelectList(),
-                                                                                 request.getString(ARG_OUTPUT,""))));
+        outputForm.append(
+            HtmlUtil.formEntry(
+                msgLabel("Output"),
+                HtmlUtil.select(
+                    ARG_OUTPUT, getOutputHandlerSelectList(),
+                    request.getString(ARG_OUTPUT, ""))));
 
         outputForm.append(HtmlUtil.formTableClose());
 
 
-        List<ServerInfo> servers   = getFederatedServers();
-        if(servers.size()>0) {
-            StringBuffer serverSB = new StringBuffer();
-            int serverCnt = 0;
-            String cbxId;
-            String call;
+        List<ServerInfo> servers =
+            getRegistryManager().getSelectedRemoteServers();
+        if (servers.size() > 0) {
+            StringBuffer serverSB  = new StringBuffer();
+            int          serverCnt = 0;
+            String       cbxId;
+            String       call;
 
-            cbxId = ATTR_SERVER+(serverCnt++);
-            call =HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,HtmlUtil.call(
-                          "checkboxClicked",
-                          HtmlUtil.comma(
-                                         "event", HtmlUtil.squote(ATTR_SERVER),
+            cbxId = ATTR_SERVER + (serverCnt++);
+            call = HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,
+                                 HtmlUtil.call("checkboxClicked",
+                                     HtmlUtil.comma("event",
+                                         HtmlUtil.squote(ATTR_SERVER),
                                          HtmlUtil.squote(cbxId))));
 
+            serverSB.append(HtmlUtil.checkbox(ARG_DOFRAMES, "true",
+                    request.get(ARG_DOFRAMES, false)));
+            serverSB.append(msg("Do frames"));
+            serverSB.append(HtmlUtil.br());
             serverSB.append(HtmlUtil.checkbox(ATTR_SERVER,
-                                              "this",true,HtmlUtil.id(cbxId) +
-                                                  call));
+                    ServerInfo.ID_THIS, false, HtmlUtil.id(cbxId) + call));
             serverSB.append(msg("Include this repository"));
             serverSB.append(HtmlUtil.br());
-            for(ServerInfo server: servers) { 
-                cbxId = ATTR_SERVER+(serverCnt++);
-                call =HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,HtmlUtil.call(
-                                    "checkboxClicked",
-                                    HtmlUtil.comma(
-                                                   "event", HtmlUtil.squote(ATTR_SERVER),
-                                                   HtmlUtil.squote(cbxId))));
+            for (ServerInfo server : servers) {
+                cbxId = ATTR_SERVER + (serverCnt++);
+                call = HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,
+                                     HtmlUtil.call("checkboxClicked",
+                                         HtmlUtil.comma("event",
+                                             HtmlUtil.squote(ATTR_SERVER),
+                                             HtmlUtil.squote(cbxId))));
                 serverSB.append(HtmlUtil.checkbox(ATTR_SERVER,
-                                                  server.getId(),true,HtmlUtil.id(cbxId) +
-                                                  call));
+                        server.getId(), false, HtmlUtil.id(cbxId) + call));
                 serverSB.append(HtmlUtil.space(1));
                 serverSB.append(server.getHref(" target=\"server\" "));
                 serverSB.append(HtmlUtil.br());
             }
-            sb.append(HtmlUtil.makeShowHideBlock(msg("Search Other Repositories"),
-                                                 HtmlUtil.div(serverSB.toString(),HtmlUtil.cssClass("serverblock")),
-                                                 false));
+            sb.append(
+                HtmlUtil.makeShowHideBlock(
+                    msg("Search Other Repositories"),
+                    HtmlUtil.div(
+                        serverSB.toString(),
+                        HtmlUtil.cssClass("serverblock")), false));
         }
 
 
@@ -337,12 +327,20 @@ public class SearchManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List getOutputHandlerSelectList() {
         List tfos = new ArrayList<TwoFacedObject>();
-        for (OutputHandler outputHandler: getRepository().getOutputHandlers()) {
-            for(OutputType type: outputHandler.getTypes()) {
-                if(type.getIsForSearch()) {
-                    tfos.add(new HtmlUtil.Selector(type.getLabel(),type.getId(),getRepository().iconUrl(type.getIcon())));
+        for (OutputHandler outputHandler : getRepository()
+                .getOutputHandlers()) {
+            for (OutputType type : outputHandler.getTypes()) {
+                if (type.getIsForSearch()) {
+                    tfos.add(new HtmlUtil.Selector(type.getLabel(),
+                            type.getId(),
+                            getRepository().iconUrl(type.getIcon())));
                 }
             }
         }
@@ -364,25 +362,36 @@ public class SearchManager extends RepositoryManager {
     }
 
 
-    public Result processFederatedSearchForm(Request request) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processRemoteSearchForm(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         sb.append(
             HtmlUtil.form(
-                request.url(
-                            getRepository().URL_SEARCH_FEDERATED_DO), HtmlUtil.attr(HtmlUtil.ATTR_NAME,"searchform")));
+                request.url(getRepository().URL_SEARCH_REMOTE_DO),
+                HtmlUtil.attr(HtmlUtil.ATTR_NAME, "searchform")));
 
         sb.append(HtmlUtil.p());
-        sb.append(header(msg("Select Servers to Search")));
+        sb.append(header(msg("Select Remote Servers to Search")));
         StringBuffer serverSB = new StringBuffer();
 
-        for(ServerInfo server: getFederatedServers()) { 
-            serverSB.append(HtmlUtil.checkbox(ATTR_SERVER,
-                                              server.getId(),true));
+        for (ServerInfo server : getRegistryManager()
+                .getSelectedRemoteServers()) {
+            serverSB.append(HtmlUtil.checkbox(ATTR_SERVER, server.getId(),
+                    true));
             serverSB.append(HtmlUtil.space(1));
             serverSB.append(server.getHref(" target=\"server\" "));
             serverSB.append(HtmlUtil.br());
         }
-        sb.append(HtmlUtil.div(serverSB.toString(),HtmlUtil.cssClass("serverblock")));
+        sb.append(HtmlUtil.div(serverSB.toString(),
+                               HtmlUtil.cssClass("serverblock")));
         sb.append(HtmlUtil.p());
         sb.append(header(msg("Search Criteria")));
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
@@ -394,17 +403,33 @@ public class SearchManager extends RepositoryManager {
 
         sb.append(HtmlUtil.submit(msg("Search"), "submit"));
         sb.append(HtmlUtil.formClose());
-        return getRepository().makeResult(request, msg("Federated Search"), sb,
+        return getRepository().makeResult(request, msg("Remote Search"), sb,
                                           getSearchUrls());
 
     }
 
-    public List<ServerInfo> findServers(Request request, boolean includeThis) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param includeThis _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List<ServerInfo> findServers(Request request, boolean includeThis)
+            throws Exception {
         List<ServerInfo> servers = new ArrayList<ServerInfo>();
-        for(String id: (List<String>)request.get(ATTR_SERVER, new ArrayList())) {
-            if(id.equals("this") && !includeThis) continue;
-            ServerInfo server = findFederatedServer(id);
-            if(server==null) continue;
+        for (String id : (List<String>) request.get(ATTR_SERVER,
+                new ArrayList())) {
+            if (id.equals(ServerInfo.ID_THIS) && !includeThis) {
+                continue;
+            }
+            ServerInfo server = getRegistryManager().findRemoteServer(id);
+            if (server == null) {
+                continue;
+            }
             servers.add(server);
         }
         return servers;
@@ -412,19 +437,30 @@ public class SearchManager extends RepositoryManager {
 
 
 
-    public Result processFederatedSearch(Request request) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processRemoteSearch(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        List<String> servers = (List<String>)request.get(ATTR_SERVER, new ArrayList());
-        System.err.println("servers:" + servers);
+        List<String> servers = (List<String>) request.get(ATTR_SERVER,
+                                   new ArrayList());
         sb.append(HtmlUtil.p());
         request.remove(ATTR_SERVER);
 
-        boolean didone = false;
+        boolean      didone   = false;
         StringBuffer serverSB = new StringBuffer();
-        for(String id: servers) {
-            ServerInfo server = findFederatedServer(id);
-            if(server==null) continue;
-            if(!didone) {
+        for (String id : servers) {
+            ServerInfo server = getRegistryManager().findRemoteServer(id);
+            if (server == null) {
+                continue;
+            }
+            if ( !didone) {
                 sb.append(header(msg("Selected Servers")));
             }
             serverSB.append(server.getHref(" target=\"server\" "));
@@ -432,15 +468,16 @@ public class SearchManager extends RepositoryManager {
             didone = true;
         }
 
-        if(!didone) {
+        if ( !didone) {
             sb.append(getRepository().note(msg("No servers selected")));
         } else {
-            sb.append(HtmlUtil.div(serverSB.toString(),HtmlUtil.cssClass("serverblock")));
+            sb.append(HtmlUtil.div(serverSB.toString(),
+                                   HtmlUtil.cssClass("serverblock")));
             sb.append(HtmlUtil.p());
         }
         sb.append(HtmlUtil.p());
         sb.append(header(msg("Search Results")));
-        return getRepository().makeResult(request, msg("Federated Search"), sb,
+        return getRepository().makeResult(request, msg("Remote Search"), sb,
                                           getSearchUrls());
 
     }
@@ -504,25 +541,118 @@ public class SearchManager extends RepositoryManager {
         }
 
 
-        StringBuffer searchCriteriaSB = new StringBuffer();
-        boolean searchThis = true;
-        List<ServerInfo> servers = findServers(request, true);
-        ServerInfo thisServer = getRepository().getServerInfo();
-        
-        if(request.defined(ATTR_SERVER)) {
-            //            searchThis = servers.contains(thisServer);
-            //            servers.remove(thisServer);
+        StringBuffer     searchCriteriaSB = new StringBuffer();
+        boolean          searchThis       = true;
+        List<ServerInfo> servers          = findServers(request, true);
+        ServerInfo       thisServer       = getRepository().getServerInfo();
+
+        boolean          doFrames         = request.get(ARG_DOFRAMES, false);
+        if (request.defined(ATTR_SERVER)) {
+
+            searchThis = servers.contains(thisServer);
+            if ( !doFrames) {
+                servers.remove(thisServer);
+            }
         }
 
-        List<Group> groups = new ArrayList<Group>();
+        List<Group> groups  = new ArrayList<Group>();
         List<Entry> entries = new ArrayList<Entry>();
 
-        Group  theGroup         = null;
-        if(searchThis) {
-            List[] pair = getEntryManager().getEntries(request, searchCriteriaSB);
-            groups.addAll((List<Group>)pair[0]);
-            entries.addAll((List<Entry>)pair[1]);
+        if (searchThis) {
+            List[] pair = getEntryManager().getEntries(request,
+                              searchCriteriaSB);
+            groups.addAll((List<Group>) pair[0]);
+            entries.addAll((List<Entry>) pair[1]);
         }
+
+
+
+        if (servers.size() > 0) {
+            request.remove(ATTR_SERVER);
+
+            if (doFrames) {
+                String linkUrl = request.getUrlArgs();
+                request.put(ARG_DECORATE, "false");
+                request.put(ATTR_TARGET, "_server");
+                String       embeddedUrl = request.getUrlArgs();
+                StringBuffer sb          = new StringBuffer();
+                sb.append(msgHeader("Remote Server Search Results"));
+                for (ServerInfo server : servers) {
+                    String remoteSearchUrl =
+                        server.getUrl()
+                        + getRepository().URL_ENTRY_SEARCH.getPath() + "?"
+                        + linkUrl;
+                    sb.append("\n");
+                    sb.append(HtmlUtil.p());
+                    String link = HtmlUtil.href(remoteSearchUrl,
+                                      server.getUrl());
+                    String fullUrl =
+                        server.getUrl()
+                        + getRepository().URL_ENTRY_SEARCH.getPath() + "?"
+                        + embeddedUrl;
+                    String content =
+                        HtmlUtil.tag(
+                            HtmlUtil.TAG_IFRAME,
+                            HtmlUtil.attrs(
+                                HtmlUtil.ATTR_WIDTH, "100%",
+                                HtmlUtil.ATTR_HEIGHT, "200",
+                                HtmlUtil.ATTR_SRC,
+                                fullUrl), "need to have iframe support");
+                    sb.append(HtmlUtil.makeShowHideBlock(server.getLabel()
+                            + HtmlUtil.space(2) + link, content, true));
+
+                    sb.append("\n");
+                }
+                request.remove(ARG_DECORATE);
+                request.remove(ARG_TARGET);
+                return new Result("Remote Search Results", sb);
+            }
+
+            String output = request.getString(ARG_OUTPUT, "");
+            request.put(ARG_OUTPUT, XmlOutputHandler.OUTPUT_XML);
+            String linkUrl     = request.getUrlArgs();
+            Group  parentGroup = getEntryManager().getDummyGroup();
+            for (ServerInfo server : servers) {
+                if (server.equals(thisServer)) {
+                    continue;
+                }
+                String remoteSearchUrl =
+                    server.getUrl()
+                    + getRepository().URL_ENTRY_SEARCH.getPath() + "?"
+                    + linkUrl;
+                String entriesXml = IOUtil.readContents(remoteSearchUrl,
+                                        getClass());
+                Element  root     = XmlUtil.getRoot(entriesXml);
+                NodeList children = XmlUtil.getElements(root);
+                for (int i = 0; i < children.getLength(); i++) {
+                    Element node = (Element) children.item(i);
+                    //                    if (!node.getTagName().equals(TAG_ENTRY)) {continue;}
+                    Entry entry = getEntryManager().processEntryXml(request,
+                                      node, parentGroup, new Hashtable(),
+                                      false, false);
+
+                    entry.setIsRemoteEntry(true);
+                    entry.setRemoteServer(server.getUrl());
+                    if (entry.isGroup()) {
+                        groups.add((Group) entry);
+                    } else {
+                        entries.add((Group) entry);
+                    }
+                }
+            }
+            request.put(ARG_OUTPUT, output);
+            Result result = getRepository().getOutputHandler(
+                                request).outputGroup(
+                                request, parentGroup, groups, entries);
+            return result;
+
+        }
+
+
+
+
+
+        Group theGroup = null;
 
         if (request.defined(ARG_GROUP)) {
             String groupId = (String) request.getString(ARG_GROUP, "").trim();
@@ -530,33 +660,10 @@ public class SearchManager extends RepositoryManager {
             theGroup = getEntryManager().findGroup(request, groupId);
         }
 
-        if(servers.size()>0) {
-            request.put(ARG_DECORATE,"false");
-            request.remove(ATTR_SERVER);
-            request.put(ATTR_TARGET,"_server");
-            String url = request.getUrlArgs();
-            StringBuffer sb = new StringBuffer();
-            for(ServerInfo server: servers) {
-                System.err.println ("SERVER:" + server);
-                sb.append("\n");
-                sb.append(HtmlUtil.p());
-                sb.append(HtmlUtil.makeShowHideBlock(server.getHref(" target=\"server\" "),
-                                                     HtmlUtil.tag("iframe",
-                                                                  HtmlUtil.attrs("width","100%", "height",
-                                                                                 "200",
-                                                                                 "src",
-                                                                                 server.getUrl()+getRepository().URL_ENTRY_SEARCH.getPath()+"?"+url),"need to have iframe support"),true));
-                
-                sb.append("\n");
-            }
-            request.remove(ARG_DECORATE);
-            request.remove(ARG_TARGET);
-            return new Result("Federated Search Results",sb);
-        }
 
 
         String s = searchCriteriaSB.toString();
-        if(request.defined(ARG_TARGET)) {
+        if (request.defined(ARG_TARGET)) {
             s = "";
         }
 
@@ -574,10 +681,10 @@ public class SearchManager extends RepositoryManager {
         if (theGroup == null) {
             theGroup = getEntryManager().getDummyGroup();
         }
-        Result result =  getRepository().getOutputHandler(request).outputGroup(request,
-                theGroup, groups, entries);
-        return getEntryManager().addEntryHeader(request, theGroup,
-                                                result);
+        Result result =
+            getRepository().getOutputHandler(request).outputGroup(request,
+                                             theGroup, groups, entries);
+        return getEntryManager().addEntryHeader(request, theGroup, result);
     }
 
 

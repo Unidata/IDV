@@ -96,13 +96,13 @@ public class RepositoryBase implements Constants, RepositorySource {
                                                     "Browse");
 
 
-    public final RequestUrl URL_SEARCH_FEDERATED_FORM = new RequestUrl(this,
-                                                    "/search/federated/form",
-                                                    "Search Federated Servers");
+    public final RequestUrl URL_SEARCH_REMOTE_FORM = new RequestUrl(this,
+                                                    "/search/remote/form",
+                                                    "Search Remote Servers");
 
-    public final RequestUrl URL_SEARCH_FEDERATED_DO = new RequestUrl(this,
-                                                    "/search/federated/do",
-                                                    "Search Federated Servers");
+    public final RequestUrl URL_SEARCH_REMOTE_DO = new RequestUrl(this,
+                                                    "/search/remote/do",
+                                                    "Search Remote Servers");
 
     /** _more_ */
     public final RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this,
@@ -115,11 +115,11 @@ public class RepositoryBase implements Constants, RepositorySource {
                                              URL_SEARCH_ASSOCIATIONS_FORM };
 
     /** _more_ */
-    public final RequestUrl[] federatedSearchUrls = { URL_SEARCH_TEXTFORM,
+    public final RequestUrl[] remoteSearchUrls = { URL_SEARCH_TEXTFORM,
                                              URL_SEARCH_FORM,
                                              URL_SEARCH_BROWSE,
                                                       URL_SEARCH_ASSOCIATIONS_FORM,
-                                                      URL_SEARCH_FEDERATED_FORM};
+                                                      URL_SEARCH_REMOTE_FORM};
 
     /** _more_ */
     public final RequestUrl URL_COMMENTS_SHOW = new RequestUrl(this,

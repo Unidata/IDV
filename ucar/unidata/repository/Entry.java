@@ -83,6 +83,9 @@ public class Entry extends Entity {
     /** _more_ */
     private boolean isLocalFile = false;
 
+    private boolean isRemoteEntry = false;
+
+    private String remoteServer;
 
     private String icon;
 
@@ -616,6 +619,42 @@ public class Entry extends Entity {
 	return icon;
     }
 
+
+/**
+Set the IsRemoteEntry property.
+
+@param value The new value for IsRemoteEntry
+**/
+public void setIsRemoteEntry (boolean value) {
+	isRemoteEntry = value;
+}
+
+/**
+Get the IsRemoteEntry property.
+
+@return The IsRemoteEntry
+**/
+public boolean getIsRemoteEntry () {
+	return isRemoteEntry;
+}
+
+/**
+Set the RemoteServer property.
+
+@param value The new value for RemoteServer
+**/
+public void setRemoteServer (String value) {
+	remoteServer = value;
+}
+
+/**
+Get the RemoteServer property.
+
+@return The RemoteServer
+**/
+public String getRemoteServer () {
+	return remoteServer;
+}
 
 
 

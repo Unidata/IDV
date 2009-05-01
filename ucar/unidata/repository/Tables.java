@@ -34,7 +34,6 @@ import ucar.unidata.sql.SqlUtil;
  * @version $Revision: 1.3 $
  */
 public class Tables {
-
 public static class ENTRIES {
 public static final String NAME = "entries";
 public static final String COL_ID = NAME + ".id";
@@ -395,6 +394,29 @@ SqlUtil.getQuestionMarks(ARRAY.length));
 
 };
 
+public static class REMOTESERVERS {
+public static final String NAME = "remoteservers";
+public static final String COL_URL = NAME + ".url";
+public static final String COL_TITLE = NAME + ".title";
+public static final String COL_DESCRIPTION = NAME + ".description";
+public static final String COL_EMAIL = NAME + ".email";
+public static final String COL_ISREGISTRY = NAME + ".isregistry";
+public static final String COL_SELECTED = NAME + ".selected";
+public static final String []ARRAY= new String[] {
+    COL_URL,COL_TITLE,COL_DESCRIPTION,COL_EMAIL,COL_ISREGISTRY, COL_SELECTED
+};
+
+
+public static final String COLUMNS = SqlUtil.comma(ARRAY);
+public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
+public static final String INSERT=
+SqlUtil.makeInsert(
+NAME,
+NODOT_COLUMNS,
+SqlUtil.getQuestionMarks(ARRAY.length));
+
+};
+
 public static class DUMMY {
 public static final String NAME = "dummy";
 public static final String COL_NAME = NAME + ".name";
@@ -412,7 +434,6 @@ NODOT_COLUMNS,
 SqlUtil.getQuestionMarks(ARRAY.length));
 
 };
-
 
 
 }

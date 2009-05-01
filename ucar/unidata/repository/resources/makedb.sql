@@ -243,6 +243,18 @@ alter table serverregistry add column email varchar(200);
 alter table serverregistry add column isregistry int;
 
 
+
+CREATE TABLE  remoteservers (
+        url varchar(1000),
+        title varchar(1000),
+        description varchar(10000),
+        email varchar(200),
+	isregistry int,
+        selected int);
+
+alter table remoteservers add column isregistry int;
+
+
 -----------------------------------------------------------------------
 --- just here so ramadda knows if the db has been created
 -----------------------------------------------------------------------
