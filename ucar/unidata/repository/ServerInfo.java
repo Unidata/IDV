@@ -22,6 +22,7 @@
 package ucar.unidata.repository;
 
 import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.util.Misc;
 import ucar.unidata.xml.XmlUtil;
 
 import java.net.URL;
@@ -57,6 +58,8 @@ public class ServerInfo implements Constants {
 
     public static final String TAG_INFO_EMAIL = "email";
 
+    public static final String TAG_INFO_ISREGISTRY = "isregistry";
+
 
 
     private String hostname;
@@ -66,7 +69,7 @@ public class ServerInfo implements Constants {
     private String title;
     private String description;
     private String email;
-
+    private boolean isRegistry = false;
 
     public ServerInfo(URL url, String title, String description) {
         this.hostname=url.getHost();
@@ -79,22 +82,27 @@ public class ServerInfo implements Constants {
     public ServerInfo(String hostname,
                       int port,
                       String title,String description) {
-        this(hostname, port,-1,"/repository",title, description,"");
+        this(hostname, port,-1,"/repository",title, description,"",false);
     }
 
 
     public ServerInfo(Element element) {
-        this.hostname=XmlUtil.getGrandChildText(element, TAG_INFO_DESCRIPTION,"");
+        //        System.err.println("server:" + XmlUtil.toString(element));
+        this.hostname=XmlUtil.getGrandChildText(element, TAG_INFO_HOSTNAME,"");
         this.port=Integer.parseInt(XmlUtil.getGrandChildText(element, TAG_INFO_PORT,"80"));
 
         String sslPortString  = XmlUtil.getGrandChildText(element, TAG_INFO_SSLPORT,null);
     
         if(sslPortString!=null) 
             this.sslPort=Integer.parseInt(sslPortString);
+        else
+            this.sslPort=-1;
         this.basePath=XmlUtil.getGrandChildText(element, TAG_INFO_BASEPATH,"/repository");
         this.title=XmlUtil.getGrandChildText(element, TAG_INFO_TITLE,"");
         this.description=XmlUtil.getGrandChildText(element, TAG_INFO_DESCRIPTION,"");
         this.email=XmlUtil.getGrandChildText(element, TAG_INFO_EMAIL,"");
+        String tmp  =XmlUtil.getGrandChildText(element, TAG_INFO_ISREGISTRY,"false");
+        isRegistry = Misc.equals(tmp,"true");
     }
 
 
@@ -104,7 +112,7 @@ public class ServerInfo implements Constants {
                       String basePath,
                       String title,
                       String description,
-                      String email) {
+                      String email, boolean isRegistry) {
         this.hostname=hostname;
         this.port=port;
         this.sslPort=sslPort;
@@ -112,6 +120,7 @@ public class ServerInfo implements Constants {
         this.title=title;
         this.description=description;
         this.email =email;
+        this.isRegistry = isRegistry;
     }
 
 
@@ -148,6 +157,7 @@ public class ServerInfo implements Constants {
         if (sslPort>0) {
             XmlUtil.create(doc, TAG_INFO_SSLPORT, info, ""+sslPort, null);
         }
+        XmlUtil.create(doc, TAG_INFO_ISREGISTRY, info, ""+isRegistry, null);
         return info;
     }
 
@@ -298,6 +308,24 @@ Get the Email property.
 **/
 public String getEmail () {
 	return email;
+}
+
+/**
+Set the IsRegistry property.
+
+@param value The new value for IsRegistry
+**/
+public void setIsRegistry (boolean value) {
+	this.isRegistry = value;
+}
+
+/**
+Get the IsRegistry property.
+
+@return The IsRegistry
+**/
+public boolean getIsRegistry () {
+	return this.isRegistry;
 }
 
 

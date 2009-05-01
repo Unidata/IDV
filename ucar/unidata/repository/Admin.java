@@ -527,11 +527,16 @@ public class Admin extends RepositoryManager {
                     }
 
                     if(request.defined(PROP_REPOSITORY_NAME)) {
-
                         getRepository().writeGlobal(PROP_REPOSITORY_NAME,
                                                     request.getString(PROP_REPOSITORY_NAME,
                                                                       ""));
                     }
+                    if(request.defined(PROP_REPOSITORY_DESCRIPTION)) {
+                    getRepository().writeGlobal(PROP_REPOSITORY_DESCRIPTION,
+                                                request.getString(PROP_REPOSITORY_DESCRIPTION,
+                                                                  ""));
+                    }
+
                     if(request.defined(UserManager.ARG_USER_EMAIL)) {
                         getRepository().writeGlobal(PROP_ADMIN_EMAIL,
                                                     request.getString(UserManager.ARG_USER_EMAIL,""));
@@ -553,7 +558,7 @@ public class Admin extends RepositoryManager {
             }
 
             sb.append(msg("Please enter the following information"));
-            sb.append(request.form(getRepository().URL_DUMMY));
+            sb.append(request.form(getRepository().URL_INSTALL));
             sb.append(HtmlUtil.formTable());
             sb.append(HtmlUtil.colspan(msgHeader("Administrator Login"), 2));
             sb.append(
@@ -592,6 +597,11 @@ public class Admin extends RepositoryManager {
                                                         request.getString(PROP_REPOSITORY_NAME,
                                                                           getRepository().getProperty(PROP_REPOSITORY_NAME,
                                                                           "RAMADDA Repository")), HtmlUtil.SIZE_60)));
+            sb.append(HtmlUtil.formEntryTop(msgLabel("Description"),
+                                            HtmlUtil.textArea(PROP_REPOSITORY_DESCRIPTION,
+                                                              getProperty(PROP_REPOSITORY_DESCRIPTION,
+                                                                          ""), 5, 60)));
+
             sb.append(
                 HtmlUtil.formEntry(
                     msgLabel("Hostname"),
@@ -610,7 +620,7 @@ public class Admin extends RepositoryManager {
         }
 
         StringBuffer finalSB = new StringBuffer();
-        finalSB.append(request.form(getRepository().URL_DUMMY));
+        finalSB.append(request.form(getRepository().URL_INSTALL));
         finalSB.append(msgHeader(title));
         finalSB.append(sb);
         finalSB.append(HtmlUtil.formClose());
@@ -953,6 +963,11 @@ public class Admin extends RepositoryManager {
                                       HtmlUtil.input(PROP_REPOSITORY_NAME,
                                           getProperty(PROP_REPOSITORY_NAME,
                                               "Repository"), size)));
+        dsb.append(HtmlUtil.formEntryTop(msgLabel("Description"),
+                                         HtmlUtil.textArea(PROP_REPOSITORY_DESCRIPTION,
+                                             getProperty(PROP_REPOSITORY_DESCRIPTION,
+                                                 ""), 5, 60)));
+
         dsb.append(HtmlUtil.formEntryTop(msgLabel("Footer"),
                                          HtmlUtil.textArea(PROP_HTML_FOOTER,
                                              getProperty(PROP_HTML_FOOTER,
@@ -1282,6 +1297,7 @@ public class Admin extends RepositoryManager {
         getRepository().writeGlobal(request,PROP_LOGO_URL);
         getRepository().writeGlobal(request,PROP_LOGO_IMAGE);
         getRepository().writeGlobal(request, PROP_REPOSITORY_NAME);
+        getRepository().writeGlobal(request, PROP_REPOSITORY_DESCRIPTION);
         getRepository().writeGlobal(request,PROP_ADMIN_PHRASES);
         getRepository().writeGlobal(request,PROP_HTML_FOOTER);
         getRepository().writeGlobal(request,PROP_GOOGLEAPIKEYS);

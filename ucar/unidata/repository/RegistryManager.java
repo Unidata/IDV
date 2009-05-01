@@ -139,6 +139,7 @@ public class RegistryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public void doFinalInitialization() throws Exception {
+        //        Misc.printStack("doFinal");
         if (isEnabledAsServer()) {
             Misc.run(new Runnable() {
                 public void run() {
@@ -302,9 +303,9 @@ public class RegistryManager extends RepositoryManager {
                 String title = results.getString(2);
                 String desc  = results.getString(3);
                 String email  = results.getString(4);
-                
+                boolean isRegistry = results.getInt(5)!=0;
                 servers.add(new ServerInfo(url.getHost(), url.getPort(), -1,
-                                           url.getPath(), title, desc,email));
+                                           url.getPath(), title, desc,email,isRegistry));
             }
         }
         return servers;
@@ -353,7 +354,7 @@ public class RegistryManager extends RepositoryManager {
             String contents = IOUtil.readContents(url, getClass());
             Element root     = XmlUtil.getRoot(contents);
             if(!responseOk(root)) {
-                logInfo("Failed to registered with:" + url);
+                logInfo("Failed to register with:" + url);
                 logInfo(XmlUtil.getChildText(root).trim());
             } else {
                 logInfo("Registered with:" + url);
@@ -441,23 +442,24 @@ public class RegistryManager extends RepositoryManager {
             String  contents = IOUtil.readContents(serverUrl, getClass());
             Element root     = XmlUtil.getRoot(contents);
             if(responseOk(root)) {
-                String  title = XmlUtil.getGrandChildText(root, ServerInfo.TAG_INFO_TITLE,"");
-                String description = XmlUtil.getGrandChildText(root,
-                                                               ServerInfo.TAG_INFO_DESCRIPTION,"");
+                ServerInfo clientServer = new ServerInfo(root);
+                if(clientServer.equals(serverInfo)) {
+                    getDatabaseManager().delete(
+                                                Tables.SERVERREGISTRY.NAME,
+                                                Clause.eq(
+                                                          Tables.SERVERREGISTRY.COL_URL, serverInfo.getUrl()));
+                    getDatabaseManager().executeInsert(Tables.SERVERREGISTRY.INSERT,
+                                                       new Object[] { clientServer.getUrl(),
+                                                                      clientServer.getTitle(), clientServer.getDescription(),
+                                                                      clientServer.getEmail(),
+                                                                      new Boolean(clientServer.getIsRegistry())});
+                    return true;
+                } else {
+                    System.err.println("not equals:" + serverInfo.getId() + " " + clientServer.getId());
 
-                String email = XmlUtil.getGrandChildText(root,
-                                                         ServerInfo.TAG_INFO_EMAIL,"");
-                getDatabaseManager().delete(
-                                            Tables.SERVERREGISTRY.NAME,
-                                            Clause.eq(
-                                                      Tables.SERVERREGISTRY.COL_URL, serverInfo.getUrl()));
-                getDatabaseManager().executeInsert(Tables.SERVERREGISTRY.INSERT,
-                                                   new Object[] { serverInfo.getUrl(),
-                                                                  title, description,email });
-                return true;
-            } else {
-                System.err.println("Response is not ok:" + contents);
+                }
             }
+            System.err.println("Client response is not ok:" + contents);
         } catch (Exception exc) {
             logError("Checking server:" + serverInfo,exc);
         }
@@ -487,6 +489,8 @@ public class RegistryManager extends RepositoryManager {
 
         List<ServerInfo> servers = getRegistererServers();
 
+        //Add myself to the list
+        servers.add(0,getRepository().getServerInfo());
         if(responseAsXml) {
             Document  resultDoc  = XmlUtil.makeDocument();
             Element resultRoot = XmlUtil.create(resultDoc, TAG_RESPONSE, null,
@@ -504,18 +508,29 @@ public class RegistryManager extends RepositoryManager {
         
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("Registered Servers"));
-        sb.append("<ul>");
+        sb.append("<table cellspacing=\"0\" cellpadding=\"4\">");
+        sb.append(HtmlUtil.row(HtmlUtil.headerCols(new String[]{
+            msg("Repository"),
+            msg("URL"),
+            msg("Is Registry?")
+        })));
+        boolean evenRow = true;
         for (ServerInfo serverInfo : servers) {
-            sb.append("<li> ");
-            sb.append(serverInfo.getLabel());
-            sb.append(HtmlUtil.space(1));
-            sb.append(HtmlUtil.href(serverInfo.getUrl(),
-                                    serverInfo.getUrl()));
-            sb.append(HtmlUtil.br());
-            sb.append(serverInfo.getDescription());
+            sb.append(HtmlUtil.row(HtmlUtil.cols(new String[]{
+                serverInfo.getLabel(),
+                HtmlUtil.href(serverInfo.getUrl(),
+                              serverInfo.getUrl()),
+                (serverInfo.getIsRegistry()?msg("Yes"):msg("No"))}),
+                      HtmlUtil.cssClass(evenRow?"listrow1":"listrow2")));
+            String desc = serverInfo.getDescription();
+            if(desc!=null && desc.trim().length()>0) {
+                desc = HtmlUtil.makeShowHideBlock(msg("Description"),
+                                                  desc, false);
+                sb.append(HtmlUtil.row(HtmlUtil.colspan(desc,3),HtmlUtil.cssClass(evenRow?"listrow1":"listrow2")));
+            }
+            evenRow = !evenRow;
         }
-
-        sb.append("</ul>");
+        sb.append("</table>");
         if (servers.size() == 0) {
             sb.append(msg("No servers are registered"));
         }

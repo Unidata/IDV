@@ -794,7 +794,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
         getStorageManager().doFinalInitialization();
-        if (!getInstallationComplete()) {
+        if (getInstallationComplete()) {
             getRegistryManager().doFinalInitialization();
         }
 
@@ -3501,6 +3501,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
             "application/x-binary");
     }
 
+    public String getDescription() {
+        return getProperty(PROP_REPOSITORY_DESCRIPTION,"");
+    }
 
     /**
      * _more_
@@ -3515,8 +3518,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return new ServerInfo(
             getHostname(), getPort(), sslPort, getUrlBase(),
             getProperty(PROP_REPOSITORY_NAME, "Repository"),
-            getEntryManager().getTopGroup().getDescription(),
-            getProperty(PROP_ADMIN_EMAIL, ""));
+            getDescription(),
+            getProperty(PROP_ADMIN_EMAIL, ""),
+            getRegistryManager().isEnabledAsServer());
     }
 
 
