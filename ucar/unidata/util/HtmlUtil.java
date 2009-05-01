@@ -102,6 +102,7 @@ public class HtmlUtil {
     /** _more_          */
     public static final String TAG_B = "b";
 
+
     /** _more_          */
     public static final String TAG_BR = "br";
 
@@ -134,6 +135,8 @@ public class HtmlUtil {
 
     /** _more_          */
     public static final String TAG_INPUT = "input";
+
+    public static final String TAG_IFRAME = "iframe";
 
     /** _more_          */
     public static final String TAG_LI = "li";
@@ -210,6 +213,8 @@ public class HtmlUtil {
 
     /** _more_          */
     public static final String ATTR_HREF = "href";
+
+    public static final String ATTR_HEIGHT = "height";
 
     /** _more_          */
     public static final String ATTR_ID = "id";
