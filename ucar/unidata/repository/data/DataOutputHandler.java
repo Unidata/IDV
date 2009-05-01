@@ -364,7 +364,8 @@ public class DataOutputHandler extends OutputHandler {
 
         //Set the temp file and the cache policy
         ucar.nc2.util.DiskCache.setRootDirectory(nj22Dir.getDir().toString());
-        ucar.nc2.iosp.grid.GridServiceProvider.setAlwaysInCache(true);
+        ucar.nc2.iosp.grib.GribServiceProvider.setIndexAlwaysInCache(true);
+        ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(true);
 
 
         addType(OUTPUT_OPENDAP);
