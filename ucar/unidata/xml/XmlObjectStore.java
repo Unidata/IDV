@@ -750,8 +750,19 @@ public class XmlObjectStore implements PersistentStore {
             if ( !userDirectoryOk()) {
                 return;
             }
+            String encodedString = getEncoder().toXml(table);
+            File file = new File(resources.getWritable());
+            if(encodedString==null || encodedString.trim().length()==0) {
+                System.err.println("Error: trying to write 0 bytes to:" + file);
+                inNeedOfSaving = false;
+                return;
+            }
+            File bakFile = new File(resources.getWritable()+".bak");
+            if(file.exists()) {
+                IOUtil.copyFile(file,bakFile);
+            }
             IOUtil.writeFile(resources.getWritable(),
-                             getEncoder().toXml(table));
+                             encodedString);
             inNeedOfSaving = false;
         } catch (Exception exc) {
             System.out.println("XmlObjectStore save failed writing to:"
