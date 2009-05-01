@@ -112,6 +112,27 @@ public class RegistryManager extends RepositoryManager {
 
 
 
+    protected void addToInstallForm(Request request, StringBuffer sb) throws Exception {
+        sb.append(
+            HtmlUtil.formEntry(
+                               msgLabel("Registry Servers"),
+                HtmlUtil.textArea(
+                    PROP_REGISTRY_SERVERS,
+                    getRepository().getProperty(
+                        PROP_REGISTRY_SERVERS,
+                        "http://motherlode.ucar.edu/repository"), 5, 60)));
+    }
+
+    protected void applyInstallForm(Request request) throws Exception  {
+        List<String> newList =
+            StringUtil.split(request.getUnsafeString(PROP_REGISTRY_SERVERS,
+                ""), "\n", true, true);
+        
+
+        getRepository().writeGlobal(PROP_REGISTRY_SERVERS,
+                                    StringUtil.join("\n", newList));
+    }
+
     /**
      * _more_
      *

@@ -301,12 +301,38 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public Metadata makeMetadata(String id, String entryId, String type,
+    public  Metadata makeMetadata(String id, String entryId, String type,
                                  boolean inherited, String attr1,
                                  String attr2, String attr3, String attr4) {
         return new Metadata(id, entryId, type, inherited, attr1, attr2,
                             attr3, attr4);
     }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param id _more_
+     * @param entry _more_
+     * @param type _more_
+     * @param inherited _more_
+     * @param attr1 _more_
+     * @param attr2 _more_
+     * @param attr3 _more_
+     * @param attr4 _more_
+     * @param newMetadata _more_
+     *
+     * @return _more_
+     */
+    protected final Metadata makeMetadata(Request request, String id, Entry entry,
+                                    String type, boolean inherited,
+                                    String attr1, String attr2, String attr3,
+                                    String attr4, boolean newMetadata) {
+        return new Metadata(id, entry.getId(), type, inherited, attr1, attr2,
+                            attr3, attr4);
+    }
+
 
 
     /**
@@ -786,68 +812,26 @@ public class MetadataHandler extends RepositoryManager {
                            Hashtable<String, Metadata> existingMetadata,
                            List<Metadata> metadataList, boolean newMetadata)
             throws Exception {
+
         String type = request.getString(ARG_TYPE + suffix, "");
         if ( !canHandle(type)) {
             return;
         }
-        String attr1 = request.getString(ARG_ATTR1 + suffix, "");
-        if (request.defined(ARG_ATTR1 + suffix + ".select")) {
-            attr1 = request.getString(ARG_ATTR1 + suffix + ".select", "");
+        MetadataType metadataType = getType(type);
+        if(metadataType==null) {
+            return;
         }
 
-        String attr2 = request.getString(ARG_ATTR2 + suffix, "");
-        if (request.defined(ARG_ATTR2 + suffix + ".select")) {
-            attr2 = request.getString(ARG_ATTR2 + suffix + ".select", "");
-        }
-
-
-        String attr3 = request.getString(ARG_ATTR3 + suffix, "");
-        if (request.defined(ARG_ATTR3 + suffix + ".select")) {
-            attr3 = request.getString(ARG_ATTR3 + suffix + ".select", "");
-        }
-
-        String attr4 = request.getString(ARG_ATTR4 + suffix, "");
-        if (request.defined(ARG_ATTR4 + suffix + ".select")) {
-            attr4 = request.getString(ARG_ATTR4 + suffix + ".select", "");
-        }
-        Metadata metadata = makeMetadata(request, id, entry, type,
-                                         DFLT_INHERITED, attr1, attr2, attr3,
-                                         attr4, newMetadata);
-        if (metadata != null) {
-            MetadataType metadataType = getType(metadata.getType());
-            metadataType.handleForm(request, entry, metadata, suffix,
-                                    ((existingMetadata == null)
-                                     ? null
-                                     : existingMetadata.get(
-                                         id)), newMetadata);
+        Metadata metadata= metadataType.handleForm(request, entry, id, suffix,
+                                ((existingMetadata == null)
+                                 ? null
+                                 : existingMetadata.get(
+                                                        id)), newMetadata);
+        if(metadata!=null) {
             metadataList.add(metadata);
         }
     }
 
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param id _more_
-     * @param entry _more_
-     * @param type _more_
-     * @param inherited _more_
-     * @param attr1 _more_
-     * @param attr2 _more_
-     * @param attr3 _more_
-     * @param attr4 _more_
-     * @param newMetadata _more_
-     *
-     * @return _more_
-     */
-    protected Metadata makeMetadata(Request request, String id, Entry entry,
-                                    String type, boolean inherited,
-                                    String attr1, String attr2, String attr3,
-                                    String attr4, boolean newMetadata) {
-        return new Metadata(id, entry.getId(), type, inherited, attr1, attr2,
-                            attr3, attr4);
-    }
 
 
 

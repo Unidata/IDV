@@ -229,27 +229,35 @@ public class MetadataManager extends RepositoryManager {
     public List<Metadata> findMetadata(Entry entry, String type,
                                        boolean checkInherited)
             throws Exception {
-        if (entry == null) {
+        List<Metadata> result = new ArrayList<Metadata>();
+        findMetadata(entry, type, result, checkInherited, true);
+        if (result.size() == 0) {
             return null;
         }
-        List<Metadata> result = new ArrayList<Metadata>();
+        return result;
+    }
+
+
+    private void findMetadata(Entry entry, String type,
+                              List<Metadata> result,
+                              boolean checkInherited, boolean firstTime)
+        throws Exception {
+
+        if (entry == null) {
+            return;
+        }
         for (Metadata metadata : getMetadata(entry)) {
+            if(!firstTime && !metadata.getInherited()) {
+                continue;
+            }
             if (metadata.getType().equals(type)) {
                 result.add(metadata);
             }
         }
         if (checkInherited) {
-            List<Metadata> fromParent =
-                findMetadata(getEntryManager().getParent(null, entry), type,
-                             checkInherited);
-            if (fromParent != null) {
-                result.addAll(fromParent);
-            }
+            findMetadata(getEntryManager().getParent(null, entry), type, result,
+                             checkInherited,false);
         }
-        if (result.size() == 0) {
-            return null;
-        }
-        return result;
     }
 
 
@@ -855,6 +863,7 @@ public class MetadataManager extends RepositoryManager {
                 if (html == null) {
                     continue;
                 }
+                 
                 String cbxId = "cbx_" + metadata.getId();
                 String cbx =
                     HtmlUtil.checkbox(

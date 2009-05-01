@@ -2335,11 +2335,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
             userAgent = "Unknown";
         }
 
-        String alias = path.substring(1);
-        Entry entry = getEntryManager().getEntryFromAlias(request, alias);
-        if(entry!=null) {
-            return new Result(request.url(URL_ENTRY_SHOW,
-                                          ARG_ENTRYID, entry.getId()));
+        if(path.startsWith("/alias/")) {
+            String alias = path.substring("/alias/".length());
+            if(alias.endsWith("/")) {
+                alias = alias.substring(0,alias.length()-1);
+            }
+            Entry entry = getEntryManager().getEntryFromAlias(request, alias);
+            if(entry!=null) {
+                return new Result(request.url(URL_ENTRY_SHOW,
+                                              ARG_ENTRYID, entry.getId()));
+            }
         }
         
 
@@ -4500,7 +4505,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (forEntry != null) {
             try {
                 metadataList = getMetadataManager().findMetadata(forEntry,
-                        ContentMetadataHandler.TYPE_SORT, true);
+                                                                 ContentMetadataHandler.TYPE_SORT, true);
                 if ((metadataList != null) && (metadataList.size() > 0)) {
                     sortMetadata = metadataList.get(0);
                 }

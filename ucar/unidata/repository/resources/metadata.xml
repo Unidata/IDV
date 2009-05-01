@@ -60,7 +60,7 @@
        name="Alias"
        type="content.alias">
       <element label="Alias" type="string"/>
-      <template type="html"><![CDATA[<a href="${root}/${attr1}">${attr1}</a>]]></template>
+      <template type="html"><![CDATA[<a href="${root}/alias/${attr1}">${attr1}</a>]]></template>
     </type>
   </handler>
 

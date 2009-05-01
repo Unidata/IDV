@@ -1780,7 +1780,7 @@ return new Result(title, sb);
 
                 List<Metadata> metadataList =
                     getMetadataManager().findMetadata(parentGroup,
-                        ContentMetadataHandler.TYPE_CONTACT, false);
+                        ContentMetadataHandler.TYPE_CONTACT, true);
                 if (metadataList != null) {
                     for (Metadata metadata : metadataList) {
                         getAdmin().sendEmail(metadata.getAttr2(),
@@ -3968,6 +3968,7 @@ return new Result(title, sb);
             }
 
             //catalog:url:dataset:datasetid
+            try {
             if (entryId.startsWith("catalog:")) {
                 CatalogTypeHandler typeHandler =
                     (CatalogTypeHandler) getRepository().getTypeHandler(
@@ -4005,11 +4006,16 @@ return new Result(title, sb);
                 entryStmt.close();
 
             }
+            } catch(Exception exc) {
+                logError("creating entry:" + entryId,exc);
+                return null;
+            }
+
             if ( !abbreviated && (entry != null)) {
                 cacheEntry(entry);
             }
 
-            if (andFilter) {
+            if (andFilter && entry!=null) {
                 entry = getAccessManager().filterEntry(request, entry);
             }
 

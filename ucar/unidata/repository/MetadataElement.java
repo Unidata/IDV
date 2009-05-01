@@ -28,7 +28,15 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
+
+import java.net.URL;
+import java.net.URLConnection;
+
+import java.io.InputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -156,6 +164,80 @@ public class MetadataElement implements Constants {
         sb.append(HtmlUtil.br());
         return true;
     }
+
+    public void handleForm(Request request, MetadataType type, Entry entry,
+                           Metadata newMetadata, 
+                           Metadata oldMetadata,                           
+                           String suffix)
+            throws Exception {
+
+        String arg = MetadataType.ARG_ATTR + getIndex() + suffix;
+
+        if (getType().equals(TYPE_BOOLEAN)) {
+            boolean value  = request.get(arg, false);
+            newMetadata.setAttr(getIndex(), ""+value);
+            return;
+        }
+
+
+        String attr = request.getString(arg, "");
+        if (request.defined(arg + ".select")) {
+            attr = request.getString(arg + ".select", "");
+        }
+        newMetadata.setAttr(getIndex(), attr);
+
+        if ( !getType().equals(TYPE_FILE)) {
+            return;
+        }
+
+
+        if (oldMetadata != null) {
+            newMetadata.setAttr(getIndex(),
+                             oldMetadata.getAttr(getIndex()));
+        }
+
+        String url = request.getString(arg + ".url", "");
+        String theFile = null;
+        if (url.length() > 0) {
+            String tail = IOUtil.getFileTail(url);
+            File tmpFile =
+                type.getHandler().getStorageManager().getTmpFile(request, tail);
+                RepositoryUtil.checkFilePath(tmpFile.toString());
+                URL              fromUrl    = new URL(url);
+                URLConnection    connection = fromUrl.openConnection();
+                InputStream      fromStream = connection.getInputStream();
+                FileOutputStream toStream   = new FileOutputStream(tmpFile);
+                try {
+                    int bytes = IOUtil.writeTo(fromStream, toStream);
+                    if (bytes < 0) {
+                        throw new IllegalArgumentException(
+                            "Could not download url:" + url);
+                    }
+                } catch (Exception ioe) {
+                    throw new IllegalArgumentException(
+                        "Could not download url:" + url);
+                } finally {
+                    try {
+                        toStream.close();
+                        fromStream.close();
+                    } catch (Exception exc) {}
+                }
+                theFile = tmpFile.toString();
+            } else {
+                String fileArg = request.getUploadedFile(arg);
+                if (fileArg == null) {
+                    return;
+                }
+                theFile = fileArg;
+            }
+            theFile =
+                type.getHandler().getRepository().getStorageManager().moveToEntryDir(
+                    entry, new File(theFile)).getName();
+            newMetadata.setAttr(getIndex(), theFile);
+
+
+    }
+
 
     /**
      * _more_

@@ -537,6 +537,7 @@ public class Admin extends RepositoryManager {
                                                     request.getString(UserManager.ARG_USER_EMAIL,""));
                     }
 
+                    getRegistryManager().applyInstallForm(request);
 
 
                     sb.append(getRepository().note(msg("Site administrator created")));
@@ -599,6 +600,10 @@ public class Admin extends RepositoryManager {
                 HtmlUtil.formEntry(
                     msgLabel("Port"),
                     HtmlUtil.input(PROP_PORT,port,HtmlUtil.SIZE_10)));
+
+            getRegistryManager().addToInstallForm(request,sb);
+
+
             sb.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.p());
             sb.append(HtmlUtil.submit(msg("Initialize Server")));

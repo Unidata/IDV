@@ -118,6 +118,11 @@ public class Metadata implements Constants {
     }
 
 
+    public Metadata(String id, String entryId, String type, boolean inherited) {
+        this(id, entryId, type, inherited, "", "", "", "");
+    }
+
+
     /**
      * _more_
      *

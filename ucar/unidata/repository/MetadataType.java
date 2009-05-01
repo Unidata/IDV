@@ -21,7 +21,6 @@
 
 
 
-
 package ucar.unidata.repository;
 
 
@@ -468,60 +467,16 @@ public class MetadataType implements Constants {
      * 
      *  @throws Exception _more_
      */
-    public void handleForm(Request request, Entry entry, Metadata metadata,
+    public Metadata handleForm(Request request, Entry entry, String id,
                            String suffix, Metadata oldMetadata,
                            boolean newMetadata)
             throws Exception {
+        boolean inherited = request.get(ARG_METADATA_INHERITED+suffix,false);
+        Metadata metadata = new Metadata(id, entry.getId(), getType(), inherited);
         for (MetadataElement element : elements) {
-            if ( !element.getType().equals(element.TYPE_FILE)) {
-                continue;
-            }
-            if (oldMetadata != null) {
-                metadata.setAttr(element.getIndex(),
-                                 oldMetadata.getAttr(element.getIndex()));
-            }
-
-            String url = request.getString(ARG_ATTR + element.getIndex()
-                                           + suffix + ".url", "");
-            String theFile = null;
-            if (url.length() > 0) {
-                String tail = IOUtil.getFileTail(url);
-                File tmpFile =
-                    handler.getStorageManager().getTmpFile(request, tail);
-                RepositoryUtil.checkFilePath(tmpFile.toString());
-                URL              fromUrl    = new URL(url);
-                URLConnection    connection = fromUrl.openConnection();
-                InputStream      fromStream = connection.getInputStream();
-                FileOutputStream toStream   = new FileOutputStream(tmpFile);
-                try {
-                    int bytes = IOUtil.writeTo(fromStream, toStream);
-                    if (bytes < 0) {
-                        throw new IllegalArgumentException(
-                            "Could not download url:" + url);
-                    }
-                } catch (Exception ioe) {
-                    throw new IllegalArgumentException(
-                        "Could not download url:" + url);
-                } finally {
-                    try {
-                        toStream.close();
-                        fromStream.close();
-                    } catch (Exception exc) {}
-                }
-                theFile = tmpFile.toString();
-            } else {
-                String fileArg = request.getUploadedFile(ARG_ATTR
-                                     + element.getIndex() + suffix);
-                if (fileArg == null) {
-                    continue;
-                }
-                theFile = fileArg;
-            }
-            theFile =
-                handler.getRepository().getStorageManager().moveToEntryDir(
-                    entry, new File(theFile)).getName();
-            metadata.setAttr(element.getIndex(), theFile);
+            element.handleForm(request,this, entry, metadata,oldMetadata, suffix);
         }
+        return metadata;
     }
 
 
@@ -905,7 +860,7 @@ public class MetadataType implements Constants {
             cnt++;
         }
 
-
+        sb.append(HtmlUtil.formEntry(handler.msgLabel("Inherited"),HtmlUtil.checkbox(ARG_METADATA_INHERITED+suffix,"true",metadata.getInherited())));
 
 
 
