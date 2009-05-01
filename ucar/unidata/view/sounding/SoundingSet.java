@@ -20,7 +20,16 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.view.sounding;
+
+
+import ucar.unidata.beans.*;
+
+import ucar.visad.display.*;
+import ucar.visad.quantities.*;
+
+import visad.*;
 
 
 
@@ -29,13 +38,6 @@ import java.beans.*;
 import java.rmi.RemoteException;
 
 import java.util.*;
-
-import ucar.unidata.beans.*;
-
-import ucar.visad.display.*;
-import ucar.visad.quantities.*;
-
-import visad.*;
 
 
 /**
@@ -183,6 +185,9 @@ public class SoundingSet extends CompositeDisplayable {
                    VisADException {
 
         Sounding sounding = (Sounding) getDisplayable(index);
+        if (sounding == null) {
+            return;
+        }
 
         if (sounding == activeSounding) {
             removeListeners(sounding);
@@ -205,7 +210,10 @@ public class SoundingSet extends CompositeDisplayable {
      */
     public void setOriginalProfiles(int index)
             throws VisADException, RemoteException {
-        ((Sounding) getDisplayable(index)).setOriginalProfiles();
+        Sounding sounding = (Sounding) getDisplayable(index);
+        if (sounding != null) {
+            sounding.setOriginalProfiles();
+        }
     }
 
     /**
@@ -363,6 +371,9 @@ public class SoundingSet extends CompositeDisplayable {
     protected synchronized void setActiveSounding(Sounding sounding)
             throws VisADException, RemoteException {
 
+        if (sounding == null) {
+            sounding = missingSounding;
+        }
         Sounding old = activeSounding;
 
         sounding.setPressure(pressure);
@@ -433,15 +444,9 @@ public class SoundingSet extends CompositeDisplayable {
     private void removeListeners(Sounding sounding) {
 
         sounding.removePropertyChangeListener(Sounding.TEMPERATURE,
-                                              temperatureListener);
+                temperatureListener);
         sounding.removePropertyChangeListener(Sounding.DEW_POINT,
-                                              dewPointListener);
+                dewPointListener);
     }
 }
-
-
-
-
-
-
 

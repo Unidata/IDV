@@ -20,7 +20,18 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.view.sounding;
+
+
+import ucar.unidata.beans.*;
+
+import ucar.visad.display.*;
+import ucar.visad.functiontypes.*;
+import ucar.visad.quantities.*;
+
+import visad.*;
 
 
 
@@ -29,14 +40,6 @@ import java.beans.*;
 import java.rmi.RemoteException;
 
 import java.util.*;
-
-import ucar.unidata.beans.*;
-
-import ucar.visad.display.*;
-import ucar.visad.quantities.*;
-import ucar.visad.functiontypes.*;
-
-import visad.*;
 
 
 /**
@@ -172,7 +175,8 @@ public class WindProfileSet extends CompositeDisplayable {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    public WindProfileSet(WindProfile missingWindProfile, LocalDisplay display)
+    public WindProfileSet(WindProfile missingWindProfile,
+                          LocalDisplay display)
             throws VisADException, RemoteException {
 
         super(display);
@@ -204,7 +208,8 @@ public class WindProfileSet extends CompositeDisplayable {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    public synchronized void addWindProfile(int index, WindProfile windProfile)
+    public synchronized void addWindProfile(int index,
+                                            WindProfile windProfile)
             throws RemoteException, VisADException {
 
         setDisplayable(index, windProfile);
@@ -232,6 +237,9 @@ public class WindProfileSet extends CompositeDisplayable {
                    VisADException {
 
         WindProfile windProfile = (WindProfile) getDisplayable(index);
+        if (windProfile == null) {
+            return;
+        }
 
         if (windProfile == activeWindProfile) {
             removeListeners(windProfile);
@@ -256,9 +264,13 @@ public class WindProfileSet extends CompositeDisplayable {
     public void setActiveWindProfile(int index)
             throws RemoteException, VisADException {
 
-        setActiveWindProfile((index < 0)
+        WindProfile active = (index < 0)
                              ? missingWindProfile
-                             : (WindProfile) getDisplayable(index));
+                             : (WindProfile) getDisplayable(index);
+        if (active == null) {
+            active = missingWindProfile;
+        }
+        setActiveWindProfile(active);
     }
 
     /**
@@ -270,6 +282,9 @@ public class WindProfileSet extends CompositeDisplayable {
     protected void setActiveWindProfile(WindProfile profile)
             throws RemoteException, VisADException {
 
+        if (profile == null) {
+            profile = missingWindProfile;
+        }
         removeListeners(activeWindProfile);
 
         WindProfile old = activeWindProfile;
@@ -304,7 +319,10 @@ public class WindProfileSet extends CompositeDisplayable {
      */
     public void setOriginalProfile(int index)
             throws VisADException, RemoteException {
-        ((WindProfile) getDisplayable(index)).setOriginalProfile();
+        WindProfile profile = (WindProfile) getDisplayable(index);
+        if (profile != null) {
+            profile.setOriginalProfile();
+        }
     }
 
     /**
@@ -347,7 +365,7 @@ public class WindProfileSet extends CompositeDisplayable {
 
         setGeopotentialAltitudeExtent(
             new RealTuple(
-                new Real[]{
+                new Real[] {
                     (Real) altitudeExtent.getComponent(0).min(
                         thisExtent.getComponent(0)),
                     (Real) altitudeExtent.getComponent(1).max(
@@ -386,7 +404,9 @@ public class WindProfileSet extends CompositeDisplayable {
             throws VisADException, RemoteException {
         for (int i = 0; i < displayableCount(); ++i) {
             WindProfile windProfile = (WindProfile) getDisplayable(i);
-            windProfile.setWindLevels(levels);
+            if (windProfile != null) {
+                windProfile.setWindLevels(levels);
+            }
         }
     }
 
@@ -523,9 +543,9 @@ public class WindProfileSet extends CompositeDisplayable {
     private void addListeners(WindProfile windProfile) {
 
         windProfile.addPropertyChangeListener(WindProfile.SPEED,
-                                              speedListener);
+                speedListener);
         windProfile.addPropertyChangeListener(WindProfile.DIRECTION,
-                                              directionListener);
+                directionListener);
     }
 
     /**
@@ -536,8 +556,9 @@ public class WindProfileSet extends CompositeDisplayable {
     private void removeListeners(WindProfile windProfile) {
 
         windProfile.removePropertyChangeListener(WindProfile.SPEED,
-                                                 speedListener);
+                speedListener);
         windProfile.removePropertyChangeListener(WindProfile.DIRECTION,
-                                                 directionListener);
+                directionListener);
     }
 }
+
