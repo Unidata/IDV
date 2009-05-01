@@ -1196,6 +1196,15 @@ public class HtmlUtil {
                + cols(s6);
     }
 
+    public static String headerCols(Object[] columns) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < columns.length; i++) {
+            sb.append(cols(HtmlUtil.b(columns[i].toString())));
+        }
+        return sb.toString();
+    }
+
+
     /**
      * _more_
      *
