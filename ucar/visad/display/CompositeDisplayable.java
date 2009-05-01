@@ -263,6 +263,7 @@ public class CompositeDisplayable extends Displayable {
             throws IndexOutOfBoundsException {
         synchronized (MUTEX) {
             List displayables = getDisplayables();
+            if(index<0 || index>=displayables.size()) return null;
             return (Displayable) displayables.get(index);
         }
     }
@@ -482,9 +483,7 @@ public class CompositeDisplayable extends Displayable {
             throws RemoteException, VisADException {
         super.setVisible(visible);
         synchronized (MUTEX) {
-            List local = getDisplayables();
-            for (int index = 0; index < local.size(); index++) {
-                Displayable displayable = (Displayable) local.get(index);
+            for (Displayable displayable:getDisplayables()) {
                 if (displayable != null) {
                     displayable.setVisible(visible);
                 }
@@ -502,13 +501,9 @@ public class CompositeDisplayable extends Displayable {
     public void setManipulable(boolean manipulable)
             throws VisADException, RemoteException {
         super.setManipulable(manipulable);
-        synchronized (MUTEX) {
-            List local = getDisplayables();
-            for (int index = 0; index < local.size(); index++) {
-                Displayable displayable = (Displayable) local.get(index);
-                if (displayable != null) {
-                    displayable.setManipulable(manipulable);
-                }
+        for (Displayable displayable:getDisplayables()) {
+            if (displayable != null) {
+                displayable.setManipulable(manipulable);
             }
         }
 
@@ -929,9 +924,9 @@ public class CompositeDisplayable extends Displayable {
      *
      * @return  the List of Displayables
      */
-    private List getDisplayables() {
+    private List<Displayable> getDisplayables() {
         synchronized (MUTEX) {
-            return new ArrayList(displayables);
+            return new ArrayList<Displayable>((List<Displayable>)displayables);
         }
     }
 
