@@ -304,9 +304,11 @@ public class CDMRadarAdapter implements RadarAdapter {
 
             if (vcpAttr != null) {
                 vcp = vcpAttr.getStringValue();
-            } else {
+            }// else {
+            if (vcp == null) {
                 vcp = "unknown";
             }
+            //System.out.println("vcp = " + vcp);
             Attribute attr = rds.findGlobalAttributeIgnoreCase("isRadial");
 
 
