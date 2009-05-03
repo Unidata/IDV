@@ -2690,6 +2690,45 @@ public class HtmlUtil {
     }
 
 
+
+    public static String makeToggleInline(String label, String content,
+                                          boolean visible) {
+
+        String hideImg = blockHideImageUrl;
+        String showImg = blockShowImageUrl;
+        String       id  = "block_" + (blockCnt++);
+        StringBuffer sb  = new StringBuffer();
+        String       img = "";
+        if ((showImg != null) && (showImg.length() > 0)) {
+            img = HtmlUtil.img(visible
+                               ? hideImg
+                               : showImg, "",
+                                          " id='" + id
+                                          + "img' ") + HtmlUtil.space(1);
+        }
+        String link =
+            HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleInlineVisibility('"
+                + id + "','" + id + "img','" + hideImg + "','" + showImg
+                + "')"), img + label,
+                         HtmlUtil.cssClass("pagesubheadinglink"));
+
+        //        sb.append(RepositoryManager.tableSubHeader(link));
+        sb.append(link);
+        sb.append("<span " + HtmlUtil.cssClass("hideshowblock")
+                  + HtmlUtil.id(id)
+                  + HtmlUtil.style("display:inline;visibility:visible") + ">");
+        if ( !visible) {
+            sb.append(HtmlUtil.script(HtmlUtil.call("hide",
+                    HtmlUtil.squote(id))));
+        }
+
+
+        sb.append(content.toString());
+        sb.append(close(TAG_SPAN));
+        return sb.toString();
+    }
+
+
     /**
      * _more_
      *
