@@ -255,6 +255,9 @@ public class Request implements Constants {
                 //                url = url + "/" + entry.getFullName();
             } catch (Exception ignore) {}
         }
+        if(entry.getIsRemoteEntry()) {
+            return entry.getRemoteServer()+url;
+        }
 
         return url;
     }

@@ -622,6 +622,7 @@ public class SearchManager extends RepositoryManager {
                     + linkUrl;
                 String entriesXml = IOUtil.readContents(remoteSearchUrl,
                                         getClass());
+                //                System.err.println (remoteSearchUrl+"\n"+entriesXml);
                 Element  root     = XmlUtil.getRoot(entriesXml);
                 NodeList children = XmlUtil.getElements(root);
                 for (int i = 0; i < children.getLength(); i++) {

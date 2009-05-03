@@ -310,7 +310,7 @@ public class XmlOutputHandler extends OutputHandler {
 
         if ((entry.getDescription() != null)
                 && (entry.getDescription().length() > 0)) {
-            XmlUtil.create(doc, TAG_DESCRIPTION, parent,
+            XmlUtil.create(doc, TAG_DESCRIPTION, node,
                            entry.getDescription(), null);
         }
         return node;
