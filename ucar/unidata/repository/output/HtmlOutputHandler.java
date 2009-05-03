@@ -977,7 +977,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 String link = getEntriesList(request, groupsSB, subGroups,
                                              allEntries,
                                              true, (entries.size() == 0),
-                                             true, group.isDummy());
+                                             true, group.isDummy(), group.isDummy());
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Groups") + link,
                         groupsSB.toString(), true));
             }
@@ -987,7 +987,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 String link = getEntriesList(request, entriesSB, entries,
                                              allEntries,
                                              (subGroups.size() == 0), true,
-                                             true, group.isDummy());
+                                             true, group.isDummy(),group.isDummy());
                 sb.append(HtmlUtil.makeShowHideBlock(msg("Entries") + link,
                         entriesSB.toString(), true));
             }

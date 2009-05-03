@@ -3672,9 +3672,18 @@ return new Result(title, sb);
     public String getBreadCrumbs(Request request, Entry entry,
                                  RequestUrl requestUrl)
             throws Exception {
+
+        return getBreadCrumbs(request, entry, requestUrl, 80);
+    }
+
+
+    public String getBreadCrumbs(Request request, Entry entry,
+                                 RequestUrl requestUrl, int lengthLimit)
+            throws Exception {
         if (entry == null) {
             return BLANK;
         }
+
         List        breadcrumbs     = new ArrayList();
         Group       parent = findGroup(request, entry.getParentGroupId());
         int         length          = 0;
@@ -3687,7 +3696,7 @@ return new Result(title, sb);
             parent          = findGroup(request, parent.getParentGroupId());
         }
 
-        boolean needToClip = totalNameLength > 80;
+        boolean needToClip = totalNameLength > lengthLimit;
         String  target     = (request.defined(ARG_TARGET)
                               ? request.getString(ARG_TARGET, "")
                               : null);
@@ -3695,7 +3704,7 @@ return new Result(title, sb);
                               ? HtmlUtil.attr(HtmlUtil.ATTR_TARGET, target)
                               : "");
         for (Group ancestor : parents) {
-            if (length > 100) {
+            if (length > lengthLimit) {
                 breadcrumbs.add(0, "...");
                 break;
             }
@@ -3780,8 +3789,7 @@ return new Result(title, sb);
                                    boolean makeLinkForLastGroup, Group stopAt)
             throws Exception {
         if (request == null) {
-            request = new Request(getRepository(), "", new Hashtable());
-            request.setUser(getUserManager().getAnonymousUser());
+            request = getRepository().getTmpRequest();
         }
 
         String target      = (request.defined(ARG_TARGET)

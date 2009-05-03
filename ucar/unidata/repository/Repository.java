@@ -708,9 +708,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
             setUrlBase(BLANK);
         }
 
-
-
-
         String derbyHome = (String) properties.get(PROP_DB_DERBY_HOME);
         if (derbyHome != null) {
             derbyHome = getStorageManager().localizePath(derbyHome);
@@ -3820,6 +3817,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
                    + request.get(ARG_MAX, DB_MAX_ROWS);
         }
         return request.get(ARG_MAX, DB_MAX_ROWS);
+    }
+
+
+    public Request getTmpRequest() throws Exception {
+        Request request = new Request(getRepository(), "", new Hashtable());
+        request.setUser(getUserManager().getAnonymousUser());
+        return request;
     }
 
 

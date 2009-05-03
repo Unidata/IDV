@@ -1081,14 +1081,15 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                  boolean doFormClose, boolean doCbx,
                                  boolean showCrumbs)
             throws Exception {
-        return getEntriesList(request,sb,entries,null, doFormOpen, doFormClose, doCbx, showCrumbs);
+        return getEntriesList(request,sb,entries,null, doFormOpen, doFormClose, doCbx, showCrumbs,false);
     }
 
 
     public String getEntriesList(Request request, StringBuffer sb,
                                  List entries, List<Entry> entriesToCheck, boolean doFormOpen,
                                  boolean doFormClose, boolean doCbx,
-                                 boolean showCrumbs)
+                                 boolean showCrumbs,
+                                 boolean hideParents)
             throws Exception {
 
         String link = "";
@@ -1142,8 +1143,16 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                     HtmlUtil.img(
                         getEntryManager().getIconUrl(request, entry)));
                 cbxSB.append(HtmlUtil.space(1));
-                cbxSB.append(getEntryManager().getBreadCrumbs(request,
-                        entry));
+
+                String crumbs = getEntryManager().getBreadCrumbs(request,
+                                                                 (hideParents?entry.getParentGroup():entry),null,60);
+                if(hideParents) {
+                    cbxSB.append(HtmlUtil.makeToggleInline("",crumbs+HtmlUtil.pad("&gt;"),false));
+                    cbxSB.append(getEntryManager().getTooltipLink(request, entry,
+                                                                   entry.getLabel(), null));
+                } else {
+                    cbxSB.append(crumbs);
+                }
                 sb.append(cbxSB);
                 sb.append(HtmlUtil.br());
             } else {

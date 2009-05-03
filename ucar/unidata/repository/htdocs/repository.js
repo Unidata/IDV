@@ -843,7 +843,17 @@ function checkboxClicked(event, cbxPrefix, id) {
 
 function toggleBlockVisibility(id, imgid, showimg, hideimg) {
     var img = util.getDomObject(imgid);
-    if(toggleVisibility(id)) {
+    if(toggleVisibility(id,'block')) {
+        if(img) img.obj.src = showimg;
+    } else {
+        if(img) img.obj.src = hideimg;
+    }
+}
+
+
+function toggleInlineVisibility(id, imgid, showimg, hideimg) {
+    var img = util.getDomObject(imgid);
+    if(toggleVisibility(id,'inline')) {
         if(img) img.obj.src = showimg;
     } else {
         if(img) img.obj.src = hideimg;
@@ -1073,10 +1083,10 @@ function  getChildText(node) {
 }
 
 
-
-function toggleVisibility(id) {
+function toggleVisibility(id,style) {
+    if(!style) style='block';
     var obj = util.getDomObject(id);
-    return toggleVisibilityOnObject(obj,'block');
+    return toggleVisibilityOnObject(obj,style);
 }
 
 
