@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 1997-2004 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
@@ -45,346 +45,349 @@ public class HtmlUtil {
 
     //j-
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_3 = "  size=\"3\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_5 = "  size=\"5\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_8 = "  size=\"8\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_10 = "  size=\"10\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_20 = "  size=\"20\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_15 = "  size=\"15\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_25 = "  size=\"25\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_30 = "  size=\"30\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_40 = "  size=\"40\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_50 = "  size=\"50\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_60 = "  size=\"60\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_70 = "  size=\"70\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_80 = "  size=\"80\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SIZE_90 = "  size=\"90\" ";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ENTITY_NBSP = "&nbsp;";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ENTITY_GT = "&gt;";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ENTITY_LT = "&lt;";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_A = "a";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_B = "b";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_BR = "br";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_CENTER = "center";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DIV = "div";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_FORM = "form";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_HR = "hr";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_H1 = "h1";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_H2 = "h2";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_H3 = "h3";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_I = "i";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_IMG = "img";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_INPUT = "input";
 
+    /** _more_          */
     public static final String TAG_IFRAME = "iframe";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_LI = "li";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_NOBR = "nobr";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_OPTION = "option";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_P = "p";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_PRE = "pre";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SCRIPT = "script";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SPAN = "span";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SELECT = "select";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TABLE = "table";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TD = "td";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TR = "tr";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TEXTAREA = "textarea";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_UL = "ul";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ACTION = "action";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ALIGN = "align";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ALT = "alt";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_BORDER = "border";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_BGCOLOR = "bgcolor";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CELLSPACING = "cellspacing";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CELLPADDING = "cellpadding";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CLASS = "class";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_COLS = "cols";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_COLSPAN = "colspan";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ENCTYPE = "enctype";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_HREF = "href";
 
+    /** _more_          */
     public static final String ATTR_HEIGHT = "height";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ID = "id";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_METHOD = "method";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ONMOUSEMOVE = "onmousemove";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ONMOUSEOVER = "onmouseover";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ONMOUSEUP = "onmouseup";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ONMOUSEOUT = "onmouseout";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ONMOUSEDOWN = "onmousedown";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ONCLICK = "onClick";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_READONLY = "READONLY";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ROWS = "rows";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SELECTED = "selected";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SIZE = "size";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SRC = "src";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_STYLE = "style";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TITLE = "title";
 
+    /** _more_          */
     public static final String ATTR_TARGET = "target";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VALUE = "value";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VALIGN = "valign";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_WIDTH = "width";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_BLOCK = "block";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_CHECKBOX = "checkbox";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_DISABLEDINPUT = "disabledinput";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_ERRORLABEL = "errorlabel";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_FILEINPUT = "fileinput";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_FORMLABEL = "formlabel";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_HIDDENINPUT = "hiddeninput";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_INPUT = "input";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_PASSWORD = "password";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_RADIO = "radio";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_SELECT = "select";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_SUBMIT = "submit";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_SUBMITIMAGE = "submitimage";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_TAB_CONTENT = "tab_content";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_TAB_CONTENTS = "tab_contents";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CLASS_TEXTAREA = "textarea";
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_FILE = "file";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_PASSWORD = "password";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_SUBMIT = "submit";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_IMAGE = "image";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_RADIO = "radio";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_INPUT = "input";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_TEXTAREA = "textarea";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_CHECKBOX = "checkbox";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_HIDDEN = "hidden";
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String VALUE_BOTTOM = "bottom";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VALUE_CENTER = "center";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VALUE_FALSE = "false";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VALUE_LEFT = "left";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VALUE_MULTIPART = "multipart/form-data";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VALUE_POST = "post";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VALUE_RIGHT = "right";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VALUE_SELECTED = "selected";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VALUE_TOP = "top";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VALUE_TRUE = "true";
 
     //j+
@@ -555,7 +558,8 @@ public class HtmlUtil {
         return tag(TAG_INPUT,
                    extra
                    + attrs(ATTR_TYPE, TYPE_HIDDEN, ATTR_NAME, name,
-                           ATTR_VALUE, "" + value, ATTR_CLASS, CLASS_HIDDENINPUT));
+                           ATTR_VALUE, "" + value, ATTR_CLASS,
+                           CLASS_HIDDENINPUT));
     }
 
 
@@ -865,8 +869,15 @@ public class HtmlUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param v1 _more_
+     *
+     * @return _more_
+     */
     public static String colRight(String v1) {
-        return tag(TAG_TD, " " + attr(ATTR_ALIGN,"right") + " ", v1);
+        return tag(TAG_TD, " " + attr(ATTR_ALIGN, "right") + " ", v1);
     }
 
 
@@ -1201,6 +1212,13 @@ public class HtmlUtil {
                + cols(s6);
     }
 
+    /**
+     * _more_
+     *
+     * @param columns _more_
+     *
+     * @return _more_
+     */
     public static String headerCols(Object[] columns) {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < columns.length; i++) {
@@ -1598,12 +1616,20 @@ public class HtmlUtil {
                          TYPE_PASSWORD, ATTR_NAME, name));
     }
 
-    public static String password(String name, String value,String extra) {
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
+    public static String password(String name, String value, String extra) {
         return tag(TAG_INPUT,
-                   extra+
-                   attrs(ATTR_VALUE, value,
-                         ATTR_CLASS, CLASS_PASSWORD, ATTR_TYPE,
-                         TYPE_PASSWORD, ATTR_NAME, name));
+                   extra
+                   + attrs(ATTR_VALUE, value, ATTR_CLASS, CLASS_PASSWORD,
+                           ATTR_TYPE, TYPE_PASSWORD, ATTR_NAME, name));
     }
 
 
@@ -1801,13 +1827,13 @@ public class HtmlUtil {
      */
     public static class Selector {
 
-        /** _more_          */
+        /** _more_ */
         String label;
 
-        /** _more_          */
+        /** _more_ */
         String id;
 
-        /** _more_          */
+        /** _more_ */
         String icon;
 
         /**
@@ -2021,24 +2047,33 @@ public class HtmlUtil {
     }
 
 
-    public static StringBuffer table(List columns, int numCols, String attributes) {
-        if(attributes == null) {
-            attributes = 
-                attrs(ATTR_CELLPADDING, "0", ATTR_CELLSPACING, "0");
+    /**
+     * _more_
+     *
+     * @param columns _more_
+     * @param numCols _more_
+     * @param attributes _more_
+     *
+     * @return _more_
+     */
+    public static StringBuffer table(List columns, int numCols,
+                                     String attributes) {
+        if (attributes == null) {
+            attributes = attrs(ATTR_CELLPADDING, "0", ATTR_CELLSPACING, "0");
         }
         StringBuffer sb = new StringBuffer();
-        sb.append(open(TAG_TABLE,attributes));
+        sb.append(open(TAG_TABLE, attributes));
         int cols = 0;
-        for(int i=0;i<columns.size();i++) {
-            if(cols==0) {
-                if(i>=1) {
+        for (int i = 0; i < columns.size(); i++) {
+            if (cols == 0) {
+                if (i >= 1) {
                     sb.append(close(TAG_TR));
                 }
                 sb.append(open(TAG_TR));
             }
             sb.append(col(columns.get(i).toString()));
             cols++;
-            if(cols>=numCols) {
+            if (cols >= numCols) {
                 cols = 0;
             }
         }
@@ -2503,8 +2538,8 @@ public class HtmlUtil {
                 continue;
             }
             String title = titles.get(i).toString();
-            if(title.startsWith("selected:")) {
-                selectedOne= title;
+            if (title.startsWith("selected:")) {
+                selectedOne = title;
                 break;
             }
         }
@@ -2518,8 +2553,10 @@ public class HtmlUtil {
             String title = titles.get(i).toString();
             String tabId = id + "_" + i;
             contentSB.append("\n");
-            boolean selected = (selectedOne==null?!didone:Misc.equals(title,selectedOne));
-            if(selected && selectedOne!=null) {
+            boolean selected = ((selectedOne == null)
+                                ? !didone
+                                : Misc.equals(title, selectedOne));
+            if (selected && (selectedOne != null)) {
                 title = title.substring("selected:".length());
             }
             contentSB.append(HtmlUtil.div(content,
@@ -2527,7 +2564,7 @@ public class HtmlUtil {
                                               + (selected
                     ? "_on"
                     : "_off")) + HtmlUtil.id("content_" + tabId)
-                               + HtmlUtil.style("display:" + ( selected
+                               + HtmlUtil.style("display:" + (selected
                     ? "block"
                     : "none") + ";visibility:" + (selected
                     ? "visible"
@@ -2556,15 +2593,35 @@ public class HtmlUtil {
     /** _more_ */
     private static String blockShowImageUrl;
 
+
+    /** _more_          */
+    private static String inlineHideImageUrl;
+
+    /** _more_ */
+    private static String inlineShowImageUrl;
+
     /**
      * _more_
      *
      * @param hideImg _more_
      * @param showImg _more_
      */
-    public static void setHideShowImage(String hideImg, String showImg) {
+    public static void setBlockHideShowImage(String hideImg, String showImg) {
         blockHideImageUrl = hideImg;
         blockShowImageUrl = showImg;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param hideImg _more_
+     * @param showImg _more_
+     */
+    public static void setInlineHideShowImage(String hideImg,
+            String showImg) {
+        inlineHideImageUrl = hideImg;
+        inlineShowImageUrl = showImg;
     }
 
 
@@ -2691,11 +2748,26 @@ public class HtmlUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param label _more_
+     * @param content _more_
+     * @param visible _more_
+     *
+     * @return _more_
+     */
     public static String makeToggleInline(String label, String content,
                                           boolean visible) {
 
-        String hideImg = blockHideImageUrl;
-        String showImg = blockShowImageUrl;
+        String hideImg = inlineHideImageUrl;
+        String showImg = inlineShowImageUrl;
+        if (hideImg == null) {
+            hideImg = blockHideImageUrl;
+        }
+        if (showImg == null) {
+            showImg = blockShowImageUrl;
+        }
         String       id  = "block_" + (blockCnt++);
         StringBuffer sb  = new StringBuffer();
         String       img = "";
@@ -2716,7 +2788,8 @@ public class HtmlUtil {
         sb.append(link);
         sb.append("<span " + HtmlUtil.cssClass("hideshowblock")
                   + HtmlUtil.id(id)
-                  + HtmlUtil.style("display:inline;visibility:visible") + ">");
+                  + HtmlUtil.style("display:inline;visibility:visible")
+                  + ">");
         if ( !visible) {
             sb.append(HtmlUtil.script(HtmlUtil.call("hide",
                     HtmlUtil.squote(id))));
