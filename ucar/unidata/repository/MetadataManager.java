@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -140,7 +141,7 @@ public class MetadataManager extends RepositoryManager {
     private List<MetadataHandler> metadataHandlers =
         new ArrayList<MetadataHandler>();
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<Class, MetadataHandler> metadataHandlerMap =
         new Hashtable<Class, MetadataHandler>();
 
@@ -150,7 +151,7 @@ public class MetadataManager extends RepositoryManager {
                                                             MetadataType>();
 
 
-    /** _more_          */
+    /** _more_ */
     private List<MetadataType> metadataTypes = new ArrayList<MetadataType>();
 
 
@@ -238,16 +239,27 @@ public class MetadataManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param type _more_
+     * @param result _more_
+     * @param checkInherited _more_
+     * @param firstTime _more_
+     *
+     * @throws Exception _more_
+     */
     private void findMetadata(Entry entry, String type,
-                              List<Metadata> result,
-                              boolean checkInherited, boolean firstTime)
-        throws Exception {
+                              List<Metadata> result, boolean checkInherited,
+                              boolean firstTime)
+            throws Exception {
 
         if (entry == null) {
             return;
         }
         for (Metadata metadata : getMetadata(entry)) {
-            if(!firstTime && !metadata.getInherited()) {
+            if ( !firstTime && !metadata.getInherited()) {
                 continue;
             }
             if (metadata.getType().equals(type)) {
@@ -255,8 +267,8 @@ public class MetadataManager extends RepositoryManager {
             }
         }
         if (checkInherited) {
-            findMetadata(getEntryManager().getParent(null, entry), type, result,
-                             checkInherited,false);
+            findMetadata(getEntryManager().getParent(null, entry), type,
+                         result, checkInherited, false);
         }
     }
 
@@ -863,7 +875,7 @@ public class MetadataManager extends RepositoryManager {
                 if (html == null) {
                     continue;
                 }
-                 
+
                 String cbxId = "cbx_" + metadata.getId();
                 String cbx =
                     HtmlUtil.checkbox(

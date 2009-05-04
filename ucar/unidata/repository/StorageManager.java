@@ -106,6 +106,7 @@ public class StorageManager extends RepositoryManager {
     public static final String DIR_LOGS    = "logs";
     public static final String DIR_CACHE   = "cache";
     public static final String DIR_TMP     = "tmp";
+    public static final String DIR_ICONS   = "icons";
     public static final String DIR_UPLOADS = "uploads";
     public static final String DIR_SCRATCH = "scratch";
     public static final String DIR_THUMBNAILS = "thumbnails";
@@ -130,6 +131,11 @@ public class StorageManager extends RepositoryManager {
 
     /** _more_ */
     private String tmpDir;
+
+
+    private String htdocsDir;
+
+    private String iconsDir;
 
     private List<TemporaryDir> tmpDirs = new ArrayList<TemporaryDir>();
 
@@ -229,7 +235,7 @@ public class StorageManager extends RepositoryManager {
         }
         IOUtil.makeDirRecursive(new File(repositoryDir));
 
-        String htdocsDir = IOUtil.joinDir(repositoryDir, DIR_HTDOCS);
+        htdocsDir = IOUtil.joinDir(repositoryDir, DIR_HTDOCS);
         IOUtil.makeDir(htdocsDir);
         String resourcesDir = IOUtil.joinDir(repositoryDir, DIR_RESOURCES);
         IOUtil.makeDir(resourcesDir);
@@ -238,6 +244,10 @@ public class StorageManager extends RepositoryManager {
         dirRange = getRepository().getProperty(PROP_DIRRANGE, dirRange);
         getUploadDir();
     }
+
+
+
+
 
     /**
      * _more_
@@ -332,6 +342,21 @@ public class StorageManager extends RepositoryManager {
     }
 
 
+    public File getIconsDirFile(String file) {
+        return  new File(IOUtil.joinDir(getIconsDir(),
+                                        file));
+    }
+
+
+    private String getIconsDir() {
+        if (iconsDir == null) {
+            iconsDir = IOUtil.joinDir(htdocsDir, DIR_ICONS);
+            IOUtil.makeDirRecursive(new File(iconsDir));
+        }
+        return iconsDir;
+    }
+
+
 
     /**
      * _more_
@@ -374,6 +399,12 @@ public class StorageManager extends RepositoryManager {
     }
 
     public File getThumbFile(String file) {
+        return getTmpDirFile(getThumbDir(),file);
+    }
+
+
+
+    public File getIconFile(String file) {
         return getTmpDirFile(getThumbDir(),file);
     }
 

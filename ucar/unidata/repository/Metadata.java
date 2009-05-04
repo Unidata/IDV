@@ -20,6 +20,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -118,7 +119,16 @@ public class Metadata implements Constants {
     }
 
 
-    public Metadata(String id, String entryId, String type, boolean inherited) {
+    /**
+     * _more_
+     *
+     * @param id _more_
+     * @param entryId _more_
+     * @param type _more_
+     * @param inherited _more_
+     */
+    public Metadata(String id, String entryId, String type,
+                    boolean inherited) {
         this(id, entryId, type, inherited, "", "", "", "");
     }
 

@@ -786,7 +786,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             fos.close();
         }
 
-        HtmlUtil.setHideShowImage(iconUrl(ICON_MINUS), iconUrl(ICON_PLUS));
+        HtmlUtil.setBlockHideShowImage(iconUrl(ICON_MINUS), iconUrl(ICON_PLUS));
+        HtmlUtil.setInlineHideShowImage(iconUrl(ICON_MINUS), iconUrl(ICON_ELLIPSIS));
         getLogManager().logInfo("RAMADDA started");
 
 

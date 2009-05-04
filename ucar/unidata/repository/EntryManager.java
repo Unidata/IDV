@@ -20,6 +20,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -35,7 +36,9 @@ import ucar.unidata.sql.Clause;
 
 import ucar.unidata.sql.SqlUtil;
 
+
 import ucar.unidata.ui.ImageUtils;
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
@@ -49,7 +52,9 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TemporaryDir;
 import ucar.unidata.xml.XmlUtil;
 
-import java.awt.Image;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import javax.swing.ImageIcon;
 
 
 
@@ -141,15 +146,32 @@ public class EntryManager extends RepositoryManager {
 
 
 
-    public Entry getEntryFromAlias(Request request, String alias) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param alias _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry getEntryFromAlias(Request request, String alias)
+            throws Exception {
 
         Statement statement =
-            getDatabaseManager().select(Tables.ENTRIES.COL_ID, Misc.newList(Tables.ENTRIES.NAME,Tables.METADATA.NAME),
-                                        Clause.and(new Clause[]{
-                                                Clause.join(Tables.ENTRIES.COL_ID, Tables.METADATA.COL_ENTRY_ID),
-                                                Clause.eq(Tables.METADATA.COL_ATTR1, alias),
-                                                Clause.eq(Tables.METADATA.COL_TYPE, ContentMetadataHandler.TYPE_ALIAS)}),
-                                        "", 1);
+            getDatabaseManager().select(
+                Tables.ENTRIES.COL_ID,
+                Misc.newList(Tables.ENTRIES.NAME, Tables.METADATA.NAME),
+                Clause.and(
+                    new Clause[] {
+                        Clause.join(
+                            Tables.ENTRIES.COL_ID,
+                            Tables.METADATA.COL_ENTRY_ID),
+                        Clause.eq(Tables.METADATA.COL_ATTR1, alias),
+                        Clause.eq(Tables.METADATA.COL_TYPE,
+                                  ContentMetadataHandler.TYPE_ALIAS) }), "",
+                                      1);
 
         SqlUtil.Iterator iter     = SqlUtil.getIterator(statement);
         List<Comment>    comments = new ArrayList();
@@ -1754,10 +1776,10 @@ return new Result(title, sb);
         entry.addMetadata(
             new Metadata(
                 getRepository().getGUID(), entry.getId(),
-                AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD, false,
-                user, request.getIp(), ((oldType != null)
-                                        ? oldType
-                                        : ""), fromEmail));
+                AdminMetadataHandler.TYPE_ANONYMOUS_UPLOAD, false, user,
+                request.getIp(), ((oldType != null)
+                                  ? oldType
+                                  : ""), fromEmail));
         User parentUser = parentGroup.getUser();
         if (true || getAdmin().isEmailCapable()) {
             StringBuffer contents =
@@ -2562,8 +2584,8 @@ return new Result(title, sb);
                                             new String[] { ATTR_CODE,
                 CODE_OK });
 
-        Element   root       = XmlUtil.getRoot(entriesXml);
-        NodeList  children   = XmlUtil.getElements(root);
+        Element  root     = XmlUtil.getRoot(entriesXml);
+        NodeList children = XmlUtil.getElements(root);
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
             if (node.getTagName().equals(TAG_ENTRY)) {
@@ -2639,10 +2661,10 @@ return new Result(title, sb);
                     "Could not find parent:" + parentId);
             }
         }
-        Entry entry = processEntryXml(request, node, parentGroup, files, checkAccess, internal);
+        Entry entry = processEntryXml(request, node, parentGroup, files,
+                                      checkAccess, internal);
 
-        String      tmpid = XmlUtil.getAttribute(node, ATTR_ID,
-                                                 (String) null);
+        String tmpid = XmlUtil.getAttribute(node, ATTR_ID, (String) null);
 
         if (tmpid != null) {
             entries.put(tmpid, entry);
@@ -2652,13 +2674,27 @@ return new Result(title, sb);
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param node _more_
+     * @param parentGroup _more_
+     * @param files _more_
+     * @param checkAccess _more_
+     * @param internal _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected Entry processEntryXml(Request request, Element node,
                                     Group parentGroup, Hashtable files,
                                     boolean checkAccess, boolean internal)
             throws Exception {
 
         boolean doAnonymousUpload = false;
-        String name = XmlUtil.getAttribute(node, ATTR_NAME);
+        String  name              = XmlUtil.getAttribute(node, ATTR_NAME);
         String type = XmlUtil.getAttribute(node, ATTR_TYPE,
                                            TypeHandler.TYPE_FILE);
         String dataType = XmlUtil.getAttribute(node, ATTR_DATATYPE, "");
@@ -2688,7 +2724,9 @@ return new Result(title, sb);
 
         String file = XmlUtil.getAttribute(node, ATTR_FILE, (String) null);
         if (file != null) {
-            String tmp = (files==null?null:(String) files.get(file));
+            String tmp = ((files == null)
+                          ? null
+                          : (String) files.get(file));
             if (doAnonymousUpload) {
                 File newFile =
                     getStorageManager().moveToAnonymousStorage(request,
@@ -3416,8 +3454,17 @@ return new Result(title, sb);
                                                                    qid,
                                                                    qlinkId)));
 
+        String target     = (request.defined(ARG_TARGET)
+                             ? request.getString(ARG_TARGET, "")
+                             : null);
+        String targetAttr = ((target != null)
+                             ? HtmlUtil.attr(HtmlUtil.ATTR_TARGET, target)
+                             : "");
+
+
         return HtmlUtil.href(url, linkText,
-                             HtmlUtil.id(linkId) + " " + tooltipEvents);
+                             HtmlUtil.id(linkId) + " " + tooltipEvents
+                             + targetAttr);
     }
 
 
@@ -3677,6 +3724,18 @@ return new Result(title, sb);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param requestUrl _more_
+     * @param lengthLimit _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public String getBreadCrumbs(Request request, Entry entry,
                                  RequestUrl requestUrl, int lengthLimit)
             throws Exception {
@@ -3703,6 +3762,7 @@ return new Result(title, sb);
         String  targetAttr = ((target != null)
                               ? HtmlUtil.attr(HtmlUtil.ATTR_TARGET, target)
                               : "");
+
         for (Group ancestor : parents) {
             if (length > lengthLimit) {
                 breadcrumbs.add(0, "...");
@@ -3990,45 +4050,46 @@ return new Result(title, sb);
 
             //catalog:url:dataset:datasetid
             try {
-            if (entryId.startsWith("catalog:")) {
-                CatalogTypeHandler typeHandler =
-                    (CatalogTypeHandler) getRepository().getTypeHandler(
-                        TypeHandler.TYPE_CATALOG);
-                entry = typeHandler.makeSynthEntry(request, null, entryId);
-            } else if (isSynthEntry(entryId)) {
-                String[] pair          = getSynthId(entryId);
-                String   parentEntryId = pair[0];
-                Entry parentEntry = getEntry(request, parentEntryId,
-                                             andFilter, abbreviated);
-                if (parentEntry == null) {
-                    return null;
-                }
-                TypeHandler typeHandler = parentEntry.getTypeHandler();
-                entry = typeHandler.makeSynthEntry(request, parentEntry,
-                        pair[1]);
-                if (entry == null) {
-                    return null;
-                }
-            } else {
-                Statement entryStmt =
-                    getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
-                        Tables.ENTRIES.NAME,
-                        Clause.eq(Tables.ENTRIES.COL_ID, entryId));
+                if (entryId.startsWith("catalog:")) {
+                    CatalogTypeHandler typeHandler =
+                        (CatalogTypeHandler) getRepository().getTypeHandler(
+                            TypeHandler.TYPE_CATALOG);
+                    entry = typeHandler.makeSynthEntry(request, null,
+                            entryId);
+                } else if (isSynthEntry(entryId)) {
+                    String[] pair          = getSynthId(entryId);
+                    String   parentEntryId = pair[0];
+                    Entry parentEntry = getEntry(request, parentEntryId,
+                                            andFilter, abbreviated);
+                    if (parentEntry == null) {
+                        return null;
+                    }
+                    TypeHandler typeHandler = parentEntry.getTypeHandler();
+                    entry = typeHandler.makeSynthEntry(request, parentEntry,
+                            pair[1]);
+                    if (entry == null) {
+                        return null;
+                    }
+                } else {
+                    Statement entryStmt =
+                        getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
+                            Tables.ENTRIES.NAME,
+                            Clause.eq(Tables.ENTRIES.COL_ID, entryId));
 
-                ResultSet results = entryStmt.getResultSet();
-                if ( !results.next()) {
+                    ResultSet results = entryStmt.getResultSet();
+                    if ( !results.next()) {
+                        entryStmt.close();
+                        return null;
+                    }
+
+                    TypeHandler typeHandler =
+                        getRepository().getTypeHandler(results.getString(2));
+                    entry = typeHandler.getEntry(results, abbreviated);
                     entryStmt.close();
-                    return null;
+
                 }
-
-                TypeHandler typeHandler =
-                    getRepository().getTypeHandler(results.getString(2));
-                entry = typeHandler.getEntry(results, abbreviated);
-                entryStmt.close();
-
-            }
-            } catch(Exception exc) {
-                logError("creating entry:" + entryId,exc);
+            } catch (Exception exc) {
+                logError("creating entry:" + entryId, exc);
                 return null;
             }
 
@@ -4036,7 +4097,7 @@ return new Result(title, sb);
                 cacheEntry(entry);
             }
 
-            if (andFilter && entry!=null) {
+            if (andFilter && (entry != null)) {
                 entry = getAccessManager().filterEntry(request, entry);
             }
 
@@ -5650,6 +5711,8 @@ return new Result(title, sb);
 
 
 
+    private Image remoteImage;
+
     /**
      * _more_
      *
@@ -5662,9 +5725,48 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public String getIconUrl(Request request, Entry entry) throws Exception {
+        String iconPath = getIconUrlInner(request, entry);
+        if(iconPath==null) return null;
+        //        System.err.println ("getIconUrl: "+entry.getIsRemoteEntry() + " " + entry);
+        if(entry.getIsRemoteEntry()) {
+            String iconFile = IOUtil.getFileTail(iconPath);
+            String ext = IOUtil.getFileExtension(iconFile);
+            String newIcon = IOUtil.stripExtension(iconFile) +"_remote" + ext;
+            File newIconFile = getStorageManager().getIconsDirFile(newIcon);
+            try {
+                if(!newIconFile.exists()) {
+                    if(remoteImage==null) {
+                        remoteImage = ImageUtils.readImage("/ucar/unidata/repository/htdocs/icons/arrow.png");
+                    }
+                    //                    System.err.println("    icon path:" + iconFile);
+                    Image originalImage = ImageUtils.readImage("/ucar/unidata/repository/htdocs/icons/"+iconFile);
+                    if(originalImage!=null) {
+                        int w = originalImage.getWidth(null);
+                        int h = originalImage.getHeight(null);
+                        BufferedImage newImage = new BufferedImage(w, h,
+                                                                   BufferedImage.TYPE_INT_ARGB);
+                        Graphics newG = newImage.getGraphics();
+                        newG.drawImage(originalImage,0,0,null);
+                        newG.drawImage(remoteImage,w-remoteImage.getWidth(null)-0,h-remoteImage.getHeight(null)-0, null);
+                        ImageUtils.writeImageToFile(newImage, newIconFile.toString());
+                        //                        System.err.println("    /repository/icons/" + newIconFile.getName());
+                    }
+                }
+                return "/repository/icons/" + newIconFile.getName();
+            } catch(Exception exc) {
+                logError("Error reading icon:" + iconPath,exc);
+                return iconPath;
+            }
+        }
+        return iconPath;
+    }
+
+
+
+
+    private  String getIconUrlInner(Request request, Entry entry) throws Exception {
         if (entry.getIcon() != null) {
             return iconUrl(entry.getIcon());
-
         }
         if (isAnonymousUpload(entry)) {
             return iconUrl(ICON_ENTRY_UPLOAD);

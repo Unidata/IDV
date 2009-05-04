@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -31,12 +32,13 @@ import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
-import java.net.URL;
-import java.net.URLConnection;
-
-import java.io.InputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+
+import java.io.InputStream;
+
+import java.net.URL;
+import java.net.URLConnection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,16 +55,16 @@ public class MetadataElement implements Constants {
     /** _more_ */
     public static final String TYPE_SKIP = "skip";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_STRING = "string";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_URL = "url";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_EMAIL = "email";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_FILE = "file";
 
     /** _more_ */
@@ -89,15 +91,16 @@ public class MetadataElement implements Constants {
     /** _more_ */
     private String dflt = "";
 
-    /** _more_          */
+    /** _more_ */
     private boolean thumbnail = false;
 
+    /** _more_          */
     private boolean searchable = false;
 
-    /** _more_          */
+    /** _more_ */
     private int index;
 
-    /** _more_          */
+    /** _more_ */
     private MetadataType metadataType;
 
 
@@ -167,17 +170,28 @@ public class MetadataElement implements Constants {
         return true;
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param type _more_
+     * @param entry _more_
+     * @param newMetadata _more_
+     * @param oldMetadata _more_
+     * @param suffix _more_
+     *
+     * @throws Exception _more_
+     */
     public void handleForm(Request request, MetadataType type, Entry entry,
-                           Metadata newMetadata, 
-                           Metadata oldMetadata,                           
+                           Metadata newMetadata, Metadata oldMetadata,
                            String suffix)
             throws Exception {
 
         String arg = ARG_METADATA_ATTR + getIndex() + suffix;
 
         if (getType().equals(TYPE_BOOLEAN)) {
-            boolean value  = request.get(arg, false);
-            newMetadata.setAttr(getIndex(), ""+value);
+            boolean value = request.get(arg, false);
+            newMetadata.setAttr(getIndex(), "" + value);
             return;
         }
 
@@ -194,48 +208,48 @@ public class MetadataElement implements Constants {
 
 
         if (oldMetadata != null) {
-            newMetadata.setAttr(getIndex(),
-                             oldMetadata.getAttr(getIndex()));
+            newMetadata.setAttr(getIndex(), oldMetadata.getAttr(getIndex()));
         }
 
-        String url = request.getString(arg + ".url", "");
+        String url     = request.getString(arg + ".url", "");
         String theFile = null;
         if (url.length() > 0) {
             String tail = IOUtil.getFileTail(url);
             File tmpFile =
-                type.getHandler().getStorageManager().getTmpFile(request, tail);
-                RepositoryUtil.checkFilePath(tmpFile.toString());
-                URL              fromUrl    = new URL(url);
-                URLConnection    connection = fromUrl.openConnection();
-                InputStream      fromStream = connection.getInputStream();
-                FileOutputStream toStream   = new FileOutputStream(tmpFile);
-                try {
-                    int bytes = IOUtil.writeTo(fromStream, toStream);
-                    if (bytes < 0) {
-                        throw new IllegalArgumentException(
-                            "Could not download url:" + url);
-                    }
-                } catch (Exception ioe) {
+                type.getHandler().getStorageManager().getTmpFile(request,
+                    tail);
+            RepositoryUtil.checkFilePath(tmpFile.toString());
+            URL              fromUrl    = new URL(url);
+            URLConnection    connection = fromUrl.openConnection();
+            InputStream      fromStream = connection.getInputStream();
+            FileOutputStream toStream   = new FileOutputStream(tmpFile);
+            try {
+                int bytes = IOUtil.writeTo(fromStream, toStream);
+                if (bytes < 0) {
                     throw new IllegalArgumentException(
                         "Could not download url:" + url);
-                } finally {
-                    try {
-                        toStream.close();
-                        fromStream.close();
-                    } catch (Exception exc) {}
                 }
-                theFile = tmpFile.toString();
-            } else {
-                String fileArg = request.getUploadedFile(arg);
-                if (fileArg == null) {
-                    return;
-                }
-                theFile = fileArg;
+            } catch (Exception ioe) {
+                throw new IllegalArgumentException("Could not download url:"
+                        + url);
+            } finally {
+                try {
+                    toStream.close();
+                    fromStream.close();
+                } catch (Exception exc) {}
             }
-            theFile =
-                type.getHandler().getRepository().getStorageManager().moveToEntryDir(
-                    entry, new File(theFile)).getName();
-            newMetadata.setAttr(getIndex(), theFile);
+            theFile = tmpFile.toString();
+        } else {
+            String fileArg = request.getUploadedFile(arg);
+            if (fileArg == null) {
+                return;
+            }
+            theFile = fileArg;
+        }
+        theFile =
+            type.getHandler().getRepository().getStorageManager()
+                .moveToEntryDir(entry, new File(theFile)).getName();
+        newMetadata.setAttr(getIndex(), theFile);
 
 
     }
@@ -440,23 +454,23 @@ public class MetadataElement implements Constants {
         return this.index;
     }
 
-/**
-Set the Searchable property.
+    /**
+     * Set the Searchable property.
+     *
+     * @param value The new value for Searchable
+     */
+    public void setSearchable(boolean value) {
+        this.searchable = value;
+    }
 
-@param value The new value for Searchable
-**/
-public void setSearchable (boolean value) {
-	this.searchable = value;
-}
-
-/**
-Get the Searchable property.
-
-@return The Searchable
-**/
-public boolean getSearchable () {
-	return this.searchable;
-}
+    /**
+     * Get the Searchable property.
+     *
+     * @return The Searchable
+     */
+    public boolean getSearchable() {
+        return this.searchable;
+    }
 
 
 }

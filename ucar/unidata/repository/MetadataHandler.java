@@ -20,6 +20,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -90,7 +91,7 @@ public class MetadataHandler extends RepositoryManager {
                                                             MetadataType>();
 
 
-    /** _more_          */
+    /** _more_ */
     private List<MetadataType> metadataTypes = new ArrayList<MetadataType>();
 
     /** _more_ */
@@ -198,7 +199,9 @@ public class MetadataHandler extends RepositoryManager {
                               Metadata metadata, boolean forLink)
             throws Exception {
         MetadataType type = getType(metadata.getType());
-        if(type==null) return;
+        if (type == null) {
+            return;
+        }
         type.decorateEntry(request, entry, sb, metadata, forLink);
     }
 
@@ -235,7 +238,9 @@ public class MetadataHandler extends RepositoryManager {
     public Result processView(Request request, Entry entry, Metadata metadata)
             throws Exception {
         MetadataType type = getType(metadata.getType());
-        if(type==null) return null;
+        if (type == null) {
+            return null;
+        }
         return type.processView(request, entry, metadata);
     }
 
@@ -301,7 +306,7 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public  Metadata makeMetadata(String id, String entryId, String type,
+    public Metadata makeMetadata(String id, String entryId, String type,
                                  boolean inherited, String attr1,
                                  String attr2, String attr3, String attr4) {
         return new Metadata(id, entryId, type, inherited, attr1, attr2,
@@ -325,10 +330,11 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    protected final Metadata makeMetadata(Request request, String id, Entry entry,
-                                    String type, boolean inherited,
-                                    String attr1, String attr2, String attr3,
-                                    String attr4, boolean newMetadata) {
+    protected final Metadata makeMetadata(Request request, String id,
+                                          Entry entry, String type,
+                                          boolean inherited, String attr1,
+                                          String attr2, String attr3,
+                                          String attr4, boolean newMetadata) {
         return new Metadata(id, entry.getId(), type, inherited, attr1, attr2,
                             attr3, attr4);
     }
@@ -389,7 +395,9 @@ public class MetadataHandler extends RepositoryManager {
                                      Element datasetNode)
             throws Exception {
         MetadataType type = getType(metadata.getType());
-        if(type==null) return;
+        if (type == null) {
+            return;
+        }
         type.addMetadataToCatalog(request, entry, metadata, doc, datasetNode);
     }
 
@@ -516,7 +524,9 @@ public class MetadataHandler extends RepositoryManager {
      */
     public String getSearchUrl(Request request, Metadata metadata) {
         MetadataType type = findType(metadata.getType());
-        if(type==null) return null;
+        if (type == null) {
+            return null;
+        }
         return type.getSearchUrl(request, metadata);
     }
 
@@ -800,16 +810,16 @@ public class MetadataHandler extends RepositoryManager {
             return;
         }
         MetadataType metadataType = getType(type);
-        if(metadataType==null) {
+        if (metadataType == null) {
             return;
         }
 
-        Metadata metadata= metadataType.handleForm(request, entry, id, suffix,
-                                ((existingMetadata == null)
-                                 ? null
-                                 : existingMetadata.get(
-                                                        id)), newMetadata);
-        if(metadata!=null) {
+        Metadata metadata = metadataType.handleForm(request, entry, id,
+                                suffix, ((existingMetadata == null)
+                                         ? null
+                                         : existingMetadata.get(
+                                             id)), newMetadata);
+        if (metadata != null) {
             metadataList.add(metadata);
         }
     }

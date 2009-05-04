@@ -2226,65 +2226,72 @@ public class TypeHandler extends RepositoryManager {
 
 
 
-        String name = (String) request.getString(ARG_TEXT, "").trim();
-        if (name.length() > 0) {
-            List<String> nameToks = StringUtil.splitWithQuotes(name);
-            boolean doLike = false;
-            if ( !request.get(ARG_EXACT, false)) {
-                addCriteria(searchCriteria, "Text like", name);
-                List tmp = StringUtil.split(name, ",", true, true);
-                name   = "%" + StringUtil.join("%,%", tmp) + "%";
-                doLike = true;
-            } else {
-                addCriteria(searchCriteria, "Text =", name);
-            }
-            //            System.err.println (doLike +" toks:" + nameToks);
-            List<Clause> ands       = new ArrayList<Clause>();
-            boolean searchMetadata = request.get(ARG_SEARCHMETADATA, false);
-            String [] attrCols = {
-                Tables.METADATA.COL_ATTR1,
-                Tables.METADATA.COL_ATTR2,
-                Tables.METADATA.COL_ATTR3,
-                Tables.METADATA.COL_ATTR4};
-            for(String nameTok: nameToks) {
-                if(doLike) nameTok = "%"+nameTok+"%";
-                List<Clause> ors       = new ArrayList<Clause>();
-                if (searchMetadata) {
-                    List<Clause> metadataOrs = new ArrayList<Clause>();
-                    for(String attrCol: attrCols) {
-                        if(doLike) {
-                            metadataOrs.add(Clause.like(attrCol, nameTok));
-                        } else {
-                            metadataOrs.add(Clause.eq(attrCol, nameTok));
-                        }
-                    }
-                    ors.add(Clause.and(Clause.or(metadataOrs),
-                                       Clause.join(Tables.METADATA.COL_ENTRY_ID, 
-                                                  Tables.ENTRIES.COL_ID)));
-                } 
-                if(doLike) {
-                    ors.add(Clause.like(Tables.ENTRIES.COL_NAME, nameTok));
-                    ors.add(Clause.like(Tables.ENTRIES.COL_DESCRIPTION,
-                                               nameTok));
+        String textToSearch = (String) request.getString(ARG_TEXT, "").trim();
+        if (textToSearch.length() > 0) {
+            List<Clause> textOrs = new ArrayList<Clause>();
+            for(String textTok: (List<String>)StringUtil.split(textToSearch,",",true,true)) {
+                List<String> nameToks = StringUtil.splitWithQuotes(textTok);
+                boolean doLike = false;
+                if ( !request.get(ARG_EXACT, false)) {
+                    addCriteria(searchCriteria, "Text like", textTok);
+                    List tmp = StringUtil.split(textTok, ",", true, true);
+                    textTok   = "%" + StringUtil.join("%,%", tmp) + "%";
+                    doLike = true;
                 } else {
-                    ors.add(Clause.eq(Tables.ENTRIES.COL_NAME, nameTok));
-                    ors.add(Clause.eq(Tables.ENTRIES.COL_DESCRIPTION,
-                                               nameTok));
-
+                    addCriteria(searchCriteria, "Text =", textToSearch);
                 }
-                ands.add(Clause.or(ors));
-            }
-            if(ands.size()>1) {
-                //                System.err.println ("ands:" + ands);
-                where.add(Clause.and(ands));
-            } else if(ands.size()==1) {
-                //                System.err.println ("ors:" + ands.get(0));
-                where.add(ands.get(0));
-            }
-            //            where.add("(" + StringUtil.join(" OR ", ors) + ")");
-        }
-        //        System.err.println("where:" + where);
+                //            System.err.println (doLike +" toks:" + nameToks);
+                List<Clause> ands       = new ArrayList<Clause>();
+                boolean searchMetadata = request.get(ARG_SEARCHMETADATA, false);
+                String [] attrCols = {
+                    Tables.METADATA.COL_ATTR1,
+                    Tables.METADATA.COL_ATTR2,
+                    Tables.METADATA.COL_ATTR3,
+                    Tables.METADATA.COL_ATTR4};
+                for(String nameTok: nameToks) {
+                    if(doLike) nameTok = "%"+nameTok+"%";
+                    List<Clause> ors       = new ArrayList<Clause>();
+                    if (searchMetadata) {
+                        List<Clause> metadataOrs = new ArrayList<Clause>();
+                        for(String attrCol: attrCols) {
+                            if(doLike) {
+                                metadataOrs.add(Clause.like(attrCol, nameTok));
+                            } else {
+                                metadataOrs.add(Clause.eq(attrCol, nameTok));
+                            }
+                        }
+                        ors.add(Clause.and(Clause.or(metadataOrs),
+                                           Clause.join(Tables.METADATA.COL_ENTRY_ID, 
+                                                       Tables.ENTRIES.COL_ID)));
+                    } 
+                    if(doLike) {
+                        ors.add(Clause.like(Tables.ENTRIES.COL_NAME, nameTok));
+                        ors.add(Clause.like(Tables.ENTRIES.COL_DESCRIPTION,
+                                            nameTok));
+                    } else {
+                        ors.add(Clause.eq(Tables.ENTRIES.COL_NAME, nameTok));
+                        ors.add(Clause.eq(Tables.ENTRIES.COL_DESCRIPTION,
+                                          nameTok));
 
+                    }
+                    ands.add(Clause.or(ors));
+                }
+                if(ands.size()>1) {
+                    //                System.err.println ("ands:" + ands);
+                    textOrs.add(Clause.and(ands));
+                } else if(ands.size()==1) {
+                    //                System.err.println ("ors:" + ands.get(0));
+                    textOrs.add(ands.get(0));
+                }
+            }
+            if(textOrs.size()>1) {
+                where.add(Clause.or(textOrs));
+            } else if(textOrs.size()==1) {
+                where.add(textOrs.get(0));
+            }
+
+
+        }
         return where;
 
     }

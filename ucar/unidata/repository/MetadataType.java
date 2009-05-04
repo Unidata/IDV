@@ -21,6 +21,7 @@
 
 
 
+
 package ucar.unidata.repository;
 
 
@@ -63,76 +64,78 @@ import java.util.List;
  */
 public class MetadataType implements Constants {
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_ELEMENT = "element";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TEMPLATE = "template";
 
+    /** _more_ */
+    public static final String TEMPLATETYPE_THREDDSCATALOG = "threddscatalog";
+
     /** _more_          */
-    public static final String TEMPLATETYPE_THREDDSCATALOG="threddscatalog";
-    public static final String TEMPLATETYPE_HTML="html";
+    public static final String TEMPLATETYPE_HTML = "html";
 
 
-   /** _more_          */
+    /** _more_ */
 
     public static final String TAG_HANDLER = "handler";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ROWS = "rows";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CLASS = "class";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_COLUMNS = "columns";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SHOWINHTML = "showinhtml";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_HANDLER = "handler";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ADMINONLY = "adminonly";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_FORUSER = "foruser";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LABEL = "label";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DEFAULT = "default";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VALUES = "values";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DISPLAYCATEGORY = "displaycategory";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CATEGORY = "category";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SEARCHABLE = "searchable";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_BROWSABLE = "browsable";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_THUMBNAIL = "thumbnail";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ = "";
 
 
@@ -150,34 +153,36 @@ public class MetadataType implements Constants {
     /** _more_ */
     private String name;
 
-    /** _more_          */
+    /** _more_ */
     private String displayCategory = "Metadata";
 
-    /** _more_          */
+    /** _more_ */
     private String category = "Metadata";
 
-    /** _more_          */
+    /** _more_ */
     private boolean showInHtml = true;
 
-    /** _more_          */
+    /** _more_ */
     private boolean adminOnly = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean searchable = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean browsable = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean forUser = true;
 
     /** _more_ */
     private List<MetadataElement> elements = new ArrayList<MetadataElement>();
 
-    /** _more_          */
+    /** _more_ */
     private MetadataHandler handler;
 
-    private Hashtable<String,String> templates = new Hashtable<String,String>();
+    /** _more_          */
+    private Hashtable<String, String> templates = new Hashtable<String,
+                                                      String>();
 
     /** _more_ */
     public static final int SEARCHABLE_ATTR1 = 1 << 0;
@@ -258,6 +263,7 @@ public class MetadataType implements Constants {
     private static void parse(Element root, MetadataManager manager,
                               List<MetadataType> types)
             throws Exception {
+
         NodeList children = XmlUtil.getElements(root);
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
@@ -277,12 +283,12 @@ public class MetadataType implements Constants {
                                                 ATTR_NAME, type));
 
             List templateElements = XmlUtil.findChildren(node,
-                                MetadataType.TAG_TEMPLATE);
+                                        MetadataType.TAG_TEMPLATE);
 
             for (int j = 0; j < templateElements.size(); j++) {
                 Element templateNode = (Element) templateElements.get(j);
-                metadataType.templates.put(XmlUtil.getAttribute(templateNode,ATTR_TYPE),
-                                           XmlUtil.getChildText(templateNode));
+                metadataType.templates.put(XmlUtil.getAttribute(templateNode,
+                        ATTR_TYPE), XmlUtil.getChildText(templateNode));
             }
 
             handler.addMetadataType(metadataType);
@@ -320,7 +326,7 @@ public class MetadataType implements Constants {
                         XmlUtil.getAttribute(elementNode, ATTR_COLUMNS, 60),
                         null);
                 element.setSearchable(XmlUtil.getAttribute(elementNode,
-                                                           ATTR_SEARCHABLE,false));
+                        ATTR_SEARCHABLE, false));
                 element.setThumbnail(XmlUtil.getAttribute(elementNode,
                         ATTR_THUMBNAIL, false));
                 element.setDefault(dflt);
@@ -359,6 +365,7 @@ public class MetadataType implements Constants {
                 metadataType.addElement(element);
             }
         }
+
     }
 
 
@@ -441,7 +448,7 @@ public class MetadataType implements Constants {
 
     /**
      *  _more_
-     * 
+     *
      *  @param request _more_
      *  @param entry _more_
      *  @param id _more_
@@ -450,17 +457,22 @@ public class MetadataType implements Constants {
      *  @param metadataList _more_
      * @param oldMetadata _more_
      *  @param newMetadata _more_
-     * 
+     *
+     *
+     * @return _more_
      *  @throws Exception _more_
      */
     public Metadata handleForm(Request request, Entry entry, String id,
-                           String suffix, Metadata oldMetadata,
-                           boolean newMetadata)
+                               String suffix, Metadata oldMetadata,
+                               boolean newMetadata)
             throws Exception {
-        boolean inherited = request.get(ARG_METADATA_INHERITED+suffix,false);
-        Metadata metadata = new Metadata(id, entry.getId(), getType(), inherited);
+        boolean inherited = request.get(ARG_METADATA_INHERITED + suffix,
+                                        false);
+        Metadata metadata = new Metadata(id, entry.getId(), getType(),
+                                         inherited);
         for (MetadataElement element : elements) {
-            element.handleForm(request,this, entry, metadata,oldMetadata, suffix);
+            element.handleForm(request, this, entry, metadata, oldMetadata,
+                               suffix);
         }
         return metadata;
     }
@@ -735,28 +747,41 @@ public class MetadataType implements Constants {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param metadata _more_
+     *
+     * @return _more_
+     */
     public String getSearchUrl(Request request, Metadata metadata) {
-        if(!getSearchable()) return null;
+        if ( !getSearchable()) {
+            return null;
+        }
 
-        List         args = new ArrayList();
+        List args = new ArrayList();
         args.add(ARG_METADATA_TYPE + "." + getType());
         args.add(this.toString());
 
 
         for (MetadataElement element : elements) {
-            if(!element.getSearchable()) continue;
-            args.add(ARG_METADATA_ATTR+element.getIndex() + "." + getType());
+            if ( !element.getSearchable()) {
+                continue;
+            }
+            args.add(ARG_METADATA_ATTR + element.getIndex() + "."
+                     + getType());
             args.add(metadata.getAttr(element.getIndex()));
         }
 
         //by default search on attr1 if none are set above
-        if(args.size()==2) {
+        if (args.size() == 2) {
             args.add(ARG_METADATA_ATTR1 + "." + getType());
             args.add(metadata.getAttr1());
         }
 
-        return HtmlUtil.url(request.url(handler.getRepository().URL_ENTRY_SEARCH),
-                            args);
+        return HtmlUtil.url(
+            request.url(handler.getRepository().URL_ENTRY_SEARCH), args);
     }
 
 
@@ -785,22 +810,24 @@ public class MetadataType implements Constants {
 
         String nameString = name;
         for (int attr = 1; attr <= 4; attr++) {
-            String value =      metadata.getAttr(attr);
-            if(value == null) value = "";
-            nameString  = nameString.replace("${attr" + attr + "}",
-                                    value);
+            String value = metadata.getAttr(attr);
+            if (value == null) {
+                value = "";
+            }
+            nameString = nameString.replace("${attr" + attr + "}", value);
         }
-        
 
-        String lbl = handler.msgLabel(nameString);
+
+        String lbl          = handler.msgLabel(nameString);
         String htmlTemplate = getTemplate(TEMPLATETYPE_HTML);
         if (htmlTemplate != null) {
             String html = htmlTemplate;
             for (int attr = 1; attr <= 4; attr++) {
-                String value =      metadata.getAttr(attr);
-                if(value == null) value = "null";
-                html = html.replace("${attr" + attr + "}",
-                                    value);
+                String value = metadata.getAttr(attr);
+                if (value == null) {
+                    value = "null";
+                }
+                html = html.replace("${attr" + attr + "}", value);
             }
             content.append(html);
         } else {
@@ -848,8 +875,10 @@ public class MetadataType implements Constants {
                                         + HtmlUtil.space(1) + name);
         String cancel = HtmlUtil.submit(handler.msg("Cancel"), ARG_CANCEL);
 
-        String[] args = { ARG_METADATA_ATTR1 + suffix, ARG_METADATA_ATTR2 + suffix,
-                          ARG_METADATA_ATTR3 + suffix, ARG_METADATA_ATTR4 + suffix };
+        String[] args = { ARG_METADATA_ATTR1 + suffix,
+                          ARG_METADATA_ATTR2 + suffix,
+                          ARG_METADATA_ATTR3 + suffix,
+                          ARG_METADATA_ATTR4 + suffix };
 
         String[] values = { metadata.getAttr1(), metadata.getAttr2(),
                             metadata.getAttr3(), metadata.getAttr4() };
@@ -869,7 +898,10 @@ public class MetadataType implements Constants {
             cnt++;
         }
 
-        sb.append(HtmlUtil.formEntry(handler.msgLabel("Inherited"),HtmlUtil.checkbox(ARG_METADATA_INHERITED+suffix,"true",metadata.getInherited())));
+        sb.append(HtmlUtil.formEntry(handler.msgLabel("Inherited"),
+                                     HtmlUtil.checkbox(ARG_METADATA_INHERITED
+                                         + suffix, "true",
+                                             metadata.getInherited())));
 
 
 
@@ -1157,6 +1189,8 @@ public class MetadataType implements Constants {
     /**
      * Get the CatalogTemplate property.
      *
+     *
+     * @param type _more_
      * @return The CatalogTemplate
      */
     public String getTemplate(String type) {

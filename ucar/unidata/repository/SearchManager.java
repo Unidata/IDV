@@ -20,6 +20,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -566,6 +567,9 @@ public class SearchManager extends RepositoryManager {
         }
 
 
+        if(servers.size()>100) {
+            throw new IllegalArgumentException("Too many remote servers:" + servers.size());
+        }
 
         if (servers.size() > 0) {
             request.remove(ATTR_SERVER);
@@ -608,57 +612,16 @@ public class SearchManager extends RepositoryManager {
                 return new Result("Remote Search Results", sb);
             }
 
-            String output = request.getString(ARG_OUTPUT, "");
-            request.put(ARG_OUTPUT, XmlOutputHandler.OUTPUT_XML);
-            String linkUrl     = request.getUrlArgs();
+
             Group  tmpGroup = getEntryManager().getDummyGroup();
-            for (ServerInfo server : servers) {
-                if (server.equals(thisServer)) {
-                    continue;
-                }
-                Group  parentGroup = new Group(getRepository().getGroupTypeHandler(),
-                                               true);
-                parentGroup.setId("");
-                parentGroup.setRemoteServer(server.getUrl());
-                parentGroup.setIsRemoteEntry(true);
-                parentGroup.setUser(getUserManager().getAnonymousUser());
-                parentGroup.setParentGroup(tmpGroup);
-                parentGroup.setName(server.getUrl());
+            doDistributedSearch(request, servers, tmpGroup, groups, entries);
 
-                String remoteSearchUrl =
-                    server.getUrl()
-                    + getRepository().URL_ENTRY_SEARCH.getPath() + "?"
-                    + linkUrl;
-                String entriesXml = IOUtil.readContents(remoteSearchUrl,
-                                        getClass());
-                //                System.err.println (remoteSearchUrl+"\n"+entriesXml);
-                Element  root     = XmlUtil.getRoot(entriesXml);
-                NodeList children = XmlUtil.getElements(root);
-                for (int i = 0; i < children.getLength(); i++) {
-                    Element node = (Element) children.item(i);
-                    //                    if (!node.getTagName().equals(TAG_ENTRY)) {continue;}
-                    Entry entry = getEntryManager().processEntryXml(request,
-                                      node, parentGroup, new Hashtable(),
-                                      false, false);
-
-                    entry.setId(XmlUtil.getAttribute(node, ATTR_ID));
-                    entry.setIsRemoteEntry(true);
-                    entry.setRemoteServer(server.getUrl());
-                    if (entry.isGroup()) {
-                        groups.add((Group) entry);
-                    } else {
-                        entries.add((Group) entry);
-                    }
-                    }
-            }
-            request.put(ARG_OUTPUT, output);
             Result result = getRepository().getOutputHandler(
                                 request).outputGroup(
                                 request, tmpGroup, groups, entries);
             return result;
 
         }
-
 
 
 
@@ -700,6 +663,110 @@ public class SearchManager extends RepositoryManager {
 
 
 
+
+    private void doDistributedSearch(final Request request, List<ServerInfo>servers,Group tmpGroup, final List<Group> groups, final List<Entry> entries) throws Exception {
+        String output = request.getString(ARG_OUTPUT, "");
+        request.put(ARG_OUTPUT, XmlOutputHandler.OUTPUT_XML);
+        final String linkUrl  = request.getUrlArgs();
+        ServerInfo       thisServer       = getRepository().getServerInfo();
+        final int[]runnableCnt={0};
+        final boolean[]running = {true};
+        //TODO: We need to cap the number of servers we're searching on
+        List<Runnable> runnables = new ArrayList<Runnable>();
+        for (ServerInfo server : servers) {
+            if (server.equals(thisServer)) {
+                continue;
+            }
+            final Group parentGroup =
+                new Group(getRepository().getGroupTypeHandler(), true);
+            parentGroup.setId("");
+            parentGroup.setRemoteServer(server.getUrl());
+            parentGroup.setIsRemoteEntry(true);
+            parentGroup.setUser(getUserManager().getAnonymousUser());
+            parentGroup.setParentGroup(tmpGroup);
+            parentGroup.setName(server.getUrl());
+
+            final ServerInfo theServer = server;
+            Runnable runnable = new Runnable() {
+                    public void run() {
+                        String remoteSearchUrl =
+                            theServer.getUrl()
+                            + getRepository().URL_ENTRY_SEARCH.getPath() + "?"
+                            + linkUrl;
+
+                        try {
+                            String entriesXml = IOUtil.readContents(remoteSearchUrl,
+                                                                    getClass());
+                            //                            System.err.println(entriesXml);
+                            if(!running[0]) return;
+                            Element  root     = XmlUtil.getRoot(entriesXml);
+                            NodeList children = XmlUtil.getElements(root);
+                            //Synchronize on the groups list so only one thread at  a time adds its entries to it
+                            synchronized(groups) {
+                                for (int i = 0; i < children.getLength(); i++) {
+                                    Element node = (Element) children.item(i);
+                                    //                    if (!node.getTagName().equals(TAG_ENTRY)) {continue;}
+                                    Entry entry = getEntryManager().processEntryXml(request,
+                                                                                    node, parentGroup, new Hashtable(),
+                                                                                    false, false);
+
+                                    entry.setResource(new Resource("remote:" + XmlUtil.getAttribute(node, ATTR_RESOURCE,""),
+                                                                   Resource.TYPE_REMOTE_FILE));
+                                    entry.setId(XmlUtil.getAttribute(node, ATTR_ID));
+                                    entry.setIsRemoteEntry(true);
+                                    entry.setRemoteServer(theServer.getUrl());
+                                    if (entry.isGroup()) {
+                                        groups.add((Group) entry);
+                                    } else {
+                                        entries.add((Entry) entry);
+                                    }
+                                }
+                            }
+                        } catch(Exception exc) {
+                            logException("Error doing search:" + remoteSearchUrl,exc);
+                        } finally {
+                            synchronized(runnableCnt) {
+                                runnableCnt[0]--;
+                            }
+                        }
+                    }
+
+                    public String toString() {
+                        return "Runnable:" + theServer.getUrl();
+                    }
+                };
+            runnables.add(runnable);
+        }
+
+
+        runnableCnt[0] = runnables.size();
+        for(Runnable runnable: runnables) {
+            Misc.runInABit(0,runnable);
+        }
+
+
+        //Wait at most 10 seconds for all of the thread to finish
+        long t1 = System.currentTimeMillis();
+        while(true) {
+            synchronized(runnableCnt) {                            
+                if(runnableCnt[0]<=0) break;
+            }
+            //Busy loop
+            Misc.sleep(100);
+            long t2 = System.currentTimeMillis();
+            //Wait at most 10 seconds
+            if((t2-t1)>10000) {
+                logInfo("Remote search waited too long");
+                break;
+            }
+        }
+        running[0]  = false;
+
+
+
+        request.put(ARG_OUTPUT, output);
+
+    }
 
     /**
      * _more_

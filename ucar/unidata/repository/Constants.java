@@ -38,6 +38,8 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_ADD = "ramadda.icon.add";
 
+    public static final String ICON_ELLIPSIS = "ramadda.icon.ellipsis";
+
     /** _more_ */
     public static final String ICON_ARROW = "ramadda.icon.arrow";
 
