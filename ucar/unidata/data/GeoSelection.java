@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -212,6 +213,20 @@ public class GeoSelection {
      */
     public boolean getHasValidState() {
         return (boundingBox != null) || hasStride();
+    }
+
+
+    /**
+     * Does this selection have any stride other than NONE and BASE
+     *
+     * @return has a stride defined other than NONE or BASE
+     */
+    public boolean getHasNonOneStride() {
+        return hasStride()
+               && (((xStride != STRIDE_NONE) && (xStride != STRIDE_BASE))
+                   || ((yStride != STRIDE_NONE) && (yStride != STRIDE_BASE))
+                   || ((zStride != STRIDE_NONE) && (zStride != STRIDE_BASE)));
+
     }
 
 
