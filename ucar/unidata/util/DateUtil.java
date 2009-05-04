@@ -124,6 +124,31 @@ public class DateUtil {
     }
 
 
+    /**
+     * Get the minimum of the 2 dates
+     * 
+     * @param date1 date1
+     * @param date2 date2
+     *
+     * @return The minimum of the 2 dates
+     */
+    public static Date min(Date date1, Date date2) {
+        if(date1.getTime()<date2.getTime()) return date1;
+        return date2;
+    }
+
+    /**
+     * Get the maximum of the 2 dates
+     * 
+     * @param date1 date1
+     * @param date2 date2
+     *
+     * @return The maximum of the 2 dates
+     */
+    public static Date max(Date date1, Date date2) {
+        if(date1.getTime()>date2.getTime()) return date1;
+        return date2;
+    }
 
     /**
      * format time
