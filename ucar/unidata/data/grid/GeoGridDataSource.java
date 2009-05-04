@@ -48,6 +48,9 @@ import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.ui.TextSearcher;
 
 import ucar.unidata.util.CacheManager;
+import ucar.unidata.util.TwoFacedObject;
+
+
 import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.FileManager;
@@ -901,7 +904,7 @@ public class GeoGridDataSource extends GridDataSource {
             Integer timeSize =
                 (Integer) dataChoice.getProperty(PROP_TIMESIZE);
             if (size != null) {
-                int          total     = size.getSizeY() * size.getSizeX();
+                long          total     = size.getSizeY() * size.getSizeX();
                 StringBuffer theSb     = null;
                 String       sizeEntry = null;
                 if (size.getSizeZ() > 1) {
@@ -1264,19 +1267,25 @@ public class GeoGridDataSource extends GridDataSource {
             int    fromLevelIndex = -1;
             int    toLevelIndex   = -1;
             if ((fromLevel != null) && (toLevel != null)) {
+               long t1 = System.currentTimeMillis();
                 List allLevels =
                     getAllLevels(dataChoice,
                                  new DataSelection(GeoSelection.STRIDE_BASE));
 
 
+                long t2 = System.currentTimeMillis();
+                //                System.err.println("time 1:" + (t2-t1));
                 fromLevelIndex = indexOf(fromLevel, allLevels);
                 toLevelIndex   = indexOf(toLevel, allLevels);
             }
 
 
+            long t1 = System.currentTimeMillis();
             GeoGridAdapter geoGridAdapter = makeGeoGridAdapter(dataChoice,
                                                 dataSelection, null,
                                                 fromLevelIndex, toLevelIndex);
+            long t2 = System.currentTimeMillis();
+            //            System.err.println("time 2:" + (t2-t1));
             if (geoGridAdapter != null) {
                 List tmpLevels = geoGridAdapter.getLevels();
                 myLevels = tmpLevels;
@@ -1366,7 +1375,7 @@ public class GeoGridDataSource extends GridDataSource {
                 filename.append("_r_" + fromLevelIndex + "_" + toLevelIndex);
             }
 
-            if ((geoSelection != null) && geoSelection.getHasValidState()) {
+            if ((geoSelection != null) && geoSelection.getHasValidState() && geoSelection.getHasNonOneStride()) {
                 //TODO: We should determine the size of the subset grid and use that.
                 readingFullGrid = false;
                 //System.err.println("subsetting using:" + geoSelection.getLatLonRect());
@@ -1448,6 +1457,11 @@ public class GeoGridDataSource extends GridDataSource {
      * @throws VisADException On badness
      */
     private int indexOf(Object o, List levels) throws VisADException {
+        if (o instanceof TwoFacedObject) {
+            o = ((TwoFacedObject)o).getId();
+        }
+
+
         if (o instanceof String) {
             try {
                 o = ucar.visad.Util.toReal(o.toString());
