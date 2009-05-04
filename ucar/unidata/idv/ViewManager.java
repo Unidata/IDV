@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -1639,6 +1640,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     protected void initWithInner(ViewManager that, boolean ignoreWindow)
             throws VisADException, RemoteException {
         if (that != this) {
+            this.aspectRatio = that.aspectRatio;
             List newAliases = that.aliases;
             for (int aliasIdx = 0; aliasIdx < newAliases.size(); aliasIdx++) {
                 ViewDescriptor vd = (ViewDescriptor) newAliases.get(aliasIdx);
@@ -4489,7 +4491,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
-    /** a mutex for accessing the display master          */
+    /** a mutex for accessing the display master */
     private Object MASTER_MUTEX = new Object();
 
     /**
@@ -6275,6 +6277,28 @@ public class ViewManager extends SharableImpl implements ActionListener,
         aspectRatio = value;
     }
 
+    /** _more_          */
+    static int xxx = 0;
+
+    /** _more_          */
+    int xmycnt = xxx++;
+
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     */
+    public void printAspect(String msg) {
+        if (aspectRatio == null) {
+            System.err.println(xmycnt + " " + msg + " aspect is null");
+        } else {
+            System.err.println(xmycnt + " " + msg + " aspect: "
+                               + aspectRatio[0] + " " + aspectRatio[1] + " "
+                               + aspectRatio[2]);
+        }
+    }
+
+
     /**
      * Get the AspectRatio property.
      *
@@ -6508,5 +6532,4 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
 }
-
 
