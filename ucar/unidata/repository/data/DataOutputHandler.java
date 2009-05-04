@@ -747,11 +747,6 @@ public class DataOutputHandler extends OutputHandler {
         if (url == null) {
             return false;
         }
-        if(entry.getType().equals(OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
-            //TODO:            url = url+".das";
-        }
-
-
 
         String ext    = IOUtil.getFileExtension(url).toLowerCase();
         String key    = type + "." + ext;
@@ -823,9 +818,12 @@ public class DataOutputHandler extends OutputHandler {
                         request.get(ARG_SHORT, false));
                 getEntryManager().insertEntries(entries, false);
                 sb.append(getRepository().note("Metadata added"));
-                return makeLinksResult(request, "CDL", sb, new State(entry));
+                sb.append(getRepository().getHtmlOutputHandler().getInformationTabs(request,  entry,
+                                                                                    false));
+
+            } else {
+                sb.append("You cannot add metadata");
             }
-            sb.append("You cannot add metadata");
             return makeLinksResult(request, "CDL", sb, new State(entry));
         }
 
@@ -839,7 +837,7 @@ public class DataOutputHandler extends OutputHandler {
                 HtmlUtil.href(
                     request.getUrl() + "&"
                     + HtmlUtil.arg(ARG_SHORT, HtmlUtil.VALUE_TRUE), msg(
-                        "Add short metadata")));
+                        "Add time/spatial metadata")));
             sb.append(HtmlUtil.span("&nbsp;|&nbsp;",
                                     HtmlUtil.cssClass("separator")));
 
@@ -1774,14 +1772,16 @@ public class DataOutputHandler extends OutputHandler {
         throw new IllegalArgumentException("Unknown output type:" + output);
     }
 
-    Object mutex= new Object();
 
-
-    private String getPath(Entry entry) throws Exception {
+    public String getPath(Entry entry) throws Exception {
         String location;
         if(entry.getType().equals(OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
             Resource resource = entry.getResource();
-            location =resource.getPath()+".das";
+            location =resource.getPath();
+            String ext = IOUtil.getFileExtension(location).toLowerCase();
+            if(ext.equals(".html")||ext.equals(".das")||ext.equals(".dds")) {
+                location = IOUtil.stripExtension(location);
+            }
         } else {
             location = entry.getFile().toString();
         }

@@ -255,10 +255,6 @@ public class Request implements Constants {
                 //                url = url + "/" + entry.getFullName();
             } catch (Exception ignore) {}
         }
-        if(entry.getIsRemoteEntry()) {
-            return entry.getRemoteServer()+url;
-        }
-
         return url;
     }
 
@@ -273,6 +269,15 @@ public class Request implements Constants {
      * @return _more_
      */
     public String entryUrl(RequestUrl theUrl, Entry entry, String arg) {
+        if(entry.getIsRemoteEntry()) {
+            String id = entry.getId(); 
+            if(id.length()==0) 
+                return entry.getRemoteServer()+theUrl.getPath();
+            return HtmlUtil.url(entry.getRemoteServer()+theUrl.getPath(), arg, entry.getId());
+        }
+
+
+
         String url = getEntryUrl(theUrl.toString(), entry);
         if (entry.isTopGroup()) {
             return HtmlUtil.url(url, arg, entry.getId());

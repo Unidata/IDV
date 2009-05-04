@@ -4986,10 +4986,7 @@ return new Result(title, sb);
                 theEntry.trimAreaResolution();
                 changed = true;
             }
-            if ((extra.get(ARG_FROMDATE) != null)
-                    && (theEntry.getStartDate()
-                        == theEntry.getCreateDate())) {
-                //                System.err.println ("got dttm:" + extra.get(ARG_FROMDATE));
+            if (extra.get(ARG_FROMDATE) != null) {
                 theEntry.setStartDate(
                     ((Date) extra.get(ARG_FROMDATE)).getTime());
                 theEntry.setEndDate(((Date) extra.get(ARG_TODATE)).getTime());

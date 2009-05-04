@@ -611,11 +611,20 @@ public class SearchManager extends RepositoryManager {
             String output = request.getString(ARG_OUTPUT, "");
             request.put(ARG_OUTPUT, XmlOutputHandler.OUTPUT_XML);
             String linkUrl     = request.getUrlArgs();
-            Group  parentGroup = getEntryManager().getDummyGroup();
+            Group  tmpGroup = getEntryManager().getDummyGroup();
             for (ServerInfo server : servers) {
                 if (server.equals(thisServer)) {
                     continue;
                 }
+                Group  parentGroup = new Group(getRepository().getGroupTypeHandler(),
+                                               true);
+                parentGroup.setId("");
+                parentGroup.setRemoteServer(server.getUrl());
+                parentGroup.setIsRemoteEntry(true);
+                parentGroup.setUser(getUserManager().getAnonymousUser());
+                parentGroup.setParentGroup(tmpGroup);
+                parentGroup.setName(server.getUrl());
+
                 String remoteSearchUrl =
                     server.getUrl()
                     + getRepository().URL_ENTRY_SEARCH.getPath() + "?"
@@ -632,6 +641,7 @@ public class SearchManager extends RepositoryManager {
                                       node, parentGroup, new Hashtable(),
                                       false, false);
 
+                    entry.setId(XmlUtil.getAttribute(node, ATTR_ID));
                     entry.setIsRemoteEntry(true);
                     entry.setRemoteServer(server.getUrl());
                     if (entry.isGroup()) {
@@ -639,12 +649,12 @@ public class SearchManager extends RepositoryManager {
                     } else {
                         entries.add((Group) entry);
                     }
-                }
+                    }
             }
             request.put(ARG_OUTPUT, output);
             Result result = getRepository().getOutputHandler(
                                 request).outputGroup(
-                                request, parentGroup, groups, entries);
+                                request, tmpGroup, groups, entries);
             return result;
 
         }

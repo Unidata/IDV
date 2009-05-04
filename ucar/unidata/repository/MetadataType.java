@@ -140,22 +140,6 @@ public class MetadataType implements Constants {
     /** _more_ */
     public static String ARG_TYPE = "type";
 
-    /** _more_          */
-    public static String ARG_ATTR = "attr";
-
-
-    /** _more_ */
-    public static String ARG_ATTR1 = "attr1";
-
-    /** _more_ */
-    public static String ARG_ATTR2 = "attr2";
-
-    /** _more_ */
-    public static String ARG_ATTR3 = "attr3";
-
-    /** _more_ */
-    public static String ARG_ATTR4 = "attr4";
-
 
     /** _more_ */
     public static String ARG_METADATAID = "metadataid";
@@ -335,6 +319,8 @@ public class MetadataType implements Constants {
                         XmlUtil.getAttribute(elementNode, ATTR_ROWS, 1),
                         XmlUtil.getAttribute(elementNode, ATTR_COLUMNS, 60),
                         null);
+                element.setSearchable(XmlUtil.getAttribute(elementNode,
+                                                           ATTR_SEARCHABLE,false));
                 element.setThumbnail(XmlUtil.getAttribute(elementNode,
                         ATTR_THUMBNAIL, false));
                 element.setDefault(dflt);
@@ -749,6 +735,29 @@ public class MetadataType implements Constants {
 
 
 
+    public String getSearchUrl(Request request, Metadata metadata) {
+        if(!getSearchable()) return null;
+
+        List         args = new ArrayList();
+        args.add(ARG_METADATA_TYPE + "." + getType());
+        args.add(this.toString());
+
+
+        for (MetadataElement element : elements) {
+            if(!element.getSearchable()) continue;
+            args.add(ARG_METADATA_ATTR+element.getIndex() + "." + getType());
+            args.add(metadata.getAttr(element.getIndex()));
+        }
+
+        //by default search on attr1 if none are set above
+        if(args.size()==2) {
+            args.add(ARG_METADATA_ATTR1 + "." + getType());
+            args.add(metadata.getAttr1());
+        }
+
+        return HtmlUtil.url(request.url(handler.getRepository().URL_ENTRY_SEARCH),
+                            args);
+    }
 
 
 
@@ -839,8 +848,8 @@ public class MetadataType implements Constants {
                                         + HtmlUtil.space(1) + name);
         String cancel = HtmlUtil.submit(handler.msg("Cancel"), ARG_CANCEL);
 
-        String[] args = { ARG_ATTR1 + suffix, ARG_ATTR2 + suffix,
-                          ARG_ATTR3 + suffix, ARG_ATTR4 + suffix };
+        String[] args = { ARG_METADATA_ATTR1 + suffix, ARG_METADATA_ATTR2 + suffix,
+                          ARG_METADATA_ATTR3 + suffix, ARG_METADATA_ATTR4 + suffix };
 
         String[] values = { metadata.getAttr1(), metadata.getAttr2(),
                             metadata.getAttr3(), metadata.getAttr4() };

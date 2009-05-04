@@ -517,25 +517,7 @@ public class MetadataHandler extends RepositoryManager {
     public String getSearchUrl(Request request, Metadata metadata) {
         MetadataType type = findType(metadata.getType());
         if(type==null) return null;
-        List         args = new ArrayList();
-        args.add(ARG_METADATA_TYPE + "." + type.getType());
-        args.add(type.toString());
-        args.add(ARG_METADATA_ATTR1 + "." + type.getType());
-        args.add(metadata.getAttr1());
-        if (type.isAttr2Searchable()) {
-            args.add(ARG_METADATA_ATTR2 + "." + type.getType());
-            args.add(metadata.getAttr2());
-        }
-        if (type.isAttr3Searchable()) {
-            args.add(ARG_METADATA_ATTR3 + "." + type.getType());
-            args.add(metadata.getAttr3());
-        }
-        if (type.isAttr4Searchable()) {
-            args.add(ARG_METADATA_ATTR4 + "." + type.getType());
-            args.add(metadata.getAttr4());
-        }
-        return HtmlUtil.url(request.url(getRepository().URL_ENTRY_SEARCH),
-                            args);
+        return type.getSearchUrl(request, metadata);
     }
 
     /**

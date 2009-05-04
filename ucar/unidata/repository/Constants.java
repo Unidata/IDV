@@ -671,6 +671,9 @@ public interface Constants {
     public static final String ARG_METADATA_ADDTOPARENT =
         "metadata.addtoparent";
 
+    public static final String ARG_METADATA_ATTR = "metadata.attr";
+
+
     /** _more_ */
     public static final String ARG_METADATA_ATTR1 = "metadata.attr1";
 

@@ -117,8 +117,8 @@
       <template type="threddscatalog"><![CDATA[<contributor role="${attr2}">${attr1}</contributor>]]></template>
     </type>
     <type name="Property" type="thredds.property"  searchable="true" browsable="true">
-      <element label="Name" type="string"/>
-      <element label="Value" type="string"/>
+      <element label="Name" type="string" searchable="true"/>
+      <element label="Value" type="string" searchable="true"/>
       <template type="threddscatalog"><![CDATA[<property name="${attr1}" value="${attr2}"/>]]></template>
       <template type="html"><![CDATA[ ${attr1}=${attr2}]]></template>
     </type>

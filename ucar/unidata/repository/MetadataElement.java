@@ -92,6 +92,8 @@ public class MetadataElement implements Constants {
     /** _more_          */
     private boolean thumbnail = false;
 
+    private boolean searchable = false;
+
     /** _more_          */
     private int index;
 
@@ -171,7 +173,7 @@ public class MetadataElement implements Constants {
                            String suffix)
             throws Exception {
 
-        String arg = MetadataType.ARG_ATTR + getIndex() + suffix;
+        String arg = ARG_METADATA_ATTR + getIndex() + suffix;
 
         if (getType().equals(TYPE_BOOLEAN)) {
             boolean value  = request.get(arg, false);
@@ -437,6 +439,24 @@ public class MetadataElement implements Constants {
     public int getIndex() {
         return this.index;
     }
+
+/**
+Set the Searchable property.
+
+@param value The new value for Searchable
+**/
+public void setSearchable (boolean value) {
+	this.searchable = value;
+}
+
+/**
+Get the Searchable property.
+
+@return The Searchable
+**/
+public boolean getSearchable () {
+	return this.searchable;
+}
 
 
 }

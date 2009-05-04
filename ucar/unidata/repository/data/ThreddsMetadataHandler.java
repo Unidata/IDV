@@ -322,15 +322,15 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                    Hashtable extra, boolean shortForm) {
 
         NetcdfDataset dataset = null;
-        File          file    = entry.getFile();
         try {
+            DataOutputHandler dataOutputHandler = getRepository().getDataOutputHandler();
             super.getInitialMetadata(request, entry, metadataList, extra,
                                      shortForm);
-            if ( !getRepository().getDataOutputHandler().canLoadAsCdm(
-                    entry)) {
+            if ( !dataOutputHandler.canLoadAsCdm(entry)) {
                 return;
             }
-            dataset = NetcdfDataset.openDataset(file.toString());
+            String path =     dataOutputHandler.getPath(entry);
+            dataset = NetcdfDataset.openDataset(path);
             boolean         haveBounds = false;
             List<Attribute> attrs      = dataset.getGlobalAttributes();
             for (Attribute attr : attrs) {
@@ -422,10 +422,19 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                         haveBounds = true;
                     } else if (axisType.equals(AxisType.Time)) {
                         Date[] dates = getMinMaxDates(var, ca);
+                        Date minDate = (Date)  extra.get(ARG_FROMDATE);
+                        Date maxDate = (Date)  extra.get(ARG_TODATE);
+                        if(minDate!=null) {
+                            dates[0] = DateUtil.min(dates[0],minDate);
+                        }
+                        if(maxDate!=null) {
+                            dates[1] = DateUtil.max(dates[1],maxDate);
+                        }
+
                         extra.put(ARG_FROMDATE, dates[0]);
                         extra.put(ARG_TODATE, dates[1]);
                     } else {
-                        //                        System.err.println("unknown axis:" + axisType + " for var:" + var.getName());
+                        // System.err.println("unknown axis:" + axisType + " for var:" + var.getName());
                     }
                     continue;
                 }
@@ -483,7 +492,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 }
             }
         } catch (Exception exc) {
-            System.out.println("Error reading metadata:" + file);
+            System.out.println("Error reading metadata:" + entry.getResource());
             System.out.println("Error:" + exc);
             //            exc.printStackTrace();
         } finally {
