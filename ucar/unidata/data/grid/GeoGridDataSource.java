@@ -1,7 +1,5 @@
 /**
- * $Id: GeoGridDataSource.java,v 1.179 2007/06/18 22:28:35 dmurray Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright  1997-2009 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -21,13 +19,10 @@
  */
 
 
-
 package ucar.unidata.data.grid;
 
 
 import org.w3c.dom.Document;
-
-
 import org.w3c.dom.Element;
 
 import ucar.ma2.Array;
@@ -53,7 +48,6 @@ import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.ui.TextSearcher;
 
 import ucar.unidata.util.CacheManager;
-
 import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.FileManager;
@@ -123,16 +117,15 @@ import javax.swing.*;
  * Handles gridded files
  *
  * @author IDV Development Team
- * @version $Revision: 1.179 $
  */
 
 public class GeoGridDataSource extends GridDataSource {
 
 
-    /** Used to synchronize the geogridadapter     */
+    /** Used to synchronize the geogridadapter */
     protected final Object DOMAIN_SET_MUTEX = new Object();
 
-    /** Throw an error when loading a grid bigger than this   */
+    /** Throw an error when loading a grid bigger than this */
     private static final int SIZE_THRESHOLD = 500000000;
 
     /** The prefix we hack onto the u and v  variables */
@@ -1285,7 +1278,9 @@ public class GeoGridDataSource extends GridDataSource {
                                                 dataSelection, null,
                                                 fromLevelIndex, toLevelIndex);
             if (geoGridAdapter != null) {
-                return myLevels = geoGridAdapter.getLevels();
+                List tmpLevels = geoGridAdapter.getLevels();
+                myLevels = tmpLevels;
+                return tmpLevels;
             }
             return myLevels;
         } catch (VisADException vae) {
@@ -1525,7 +1520,16 @@ public class GeoGridDataSource extends GridDataSource {
                 System.err.println("Did not find level indices:   fromLevel:"
                                    + fromLevel + " index:" + fromLevelIndex
                                    + " toLevel:" + toLevel + " index:"
-                                   + toLevelIndex+"\nLevels:" + allLevels);
+                                   + toLevelIndex + "\nLevels:" + allLevels);
+                if ((allLevels != null) && !allLevels.isEmpty()) {
+                    System.err.println("fromLevel is a "
+                                       + fromLevel.getClass().getName()
+                                       + ", toLevel is a "
+                                       + toLevel.getClass().getName());
+                    System.err.println(
+                        "levels are "
+                        + allLevels.get(0).getClass().getName());
+                }
             }
         }
 
@@ -1893,6 +1897,7 @@ public class GeoGridDataSource extends GridDataSource {
      * @throws Exception  some error occurred
      */
     public static void main(String[] args) throws Exception {
+
         /*
 
         if (true) {
@@ -2134,6 +2139,7 @@ public class GeoGridDataSource extends GridDataSource {
          *
          * System.exit(0);
          */
+
     }
 
 
