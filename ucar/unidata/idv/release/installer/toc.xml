@@ -23,6 +23,12 @@
         <![CDATA[<a href="ftp/idv_%_version%_windows_installer.exe.MD5">MD5</a>]]>
         </description>
    </file>
+   <file url="ftp/idv_%_version%_windows_x64_installer.exe" name="IDV %version% Installer for 64-bit Windows XP/Vista">
+        <description>
+        Installer for IDV under 64-bit Windows XP/Vista.
+        <![CDATA[<a href="ftp/idv_%_version%_windows_x64_installer.exe.MD5">MD5</a>]]>
+        </description>
+   </file>
    <file url="ftp/idv_%_version%_linux-i386_installer.sh" name="IDV %version% Installer for Linux/x86 (32 bit)">
         <description>
         Installer for IDV under Linux/x86 (32 bit).

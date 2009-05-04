@@ -927,9 +927,24 @@
         <scriptLines />
       </installerScript>
     </unixInstaller>
+    <win32 name="Windows64" id="580" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_windows64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" requires64bit="true" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="windows-amd64-1.6.0_13_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="" runAsAdmin="false">
+      <excludedLaunchers>
+        <launcher id="2" />
+        <launcher id="4" />
+        <launcher id="49" />
+      </excludedLaunchers>
+      <excludedComponents>
+        <component id="230" />
+        <component id="295" />
+      </excludedComponents>
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude />
+      <variables />
+    </win32>
   </mediaSets>
   <buildIds buildAll="true">
-    <mediaSet refId="12" />
+    <mediaSet refId="580" />
   </buildIds>
 </install4j>
 
