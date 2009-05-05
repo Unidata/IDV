@@ -1475,7 +1475,6 @@ public class GeoGridDataSource extends GridDataSource {
                 int index = new Integer(s.substring(1).trim()).intValue();
                 return index;
             }
-            System.err.println("s:" + s);
             o = new Real(new Double(s).doubleValue());
         }
 

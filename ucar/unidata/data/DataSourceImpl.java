@@ -2083,6 +2083,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         getAllDateTimes();
 
 
+        System.err.println("data source data selection:" +getDataSelection());
+        System.err.println("incoming data selection:" +incomingDataSelection);
+
         DataSelection selection = DataSelection.merge(incomingDataSelection,
                                       getDataSelection());
         Object baseCacheKey = createCacheKey(dataChoice, selection,
@@ -3026,6 +3029,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             if ( !geoSelectionPanel.applyProperties(geoSubset)) {
                 return false;
             }
+            System.err.println("data selection:" +getDataSelection());
         }
 
 

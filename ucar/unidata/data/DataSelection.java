@@ -350,9 +350,9 @@ public class DataSelection {
      * @return a string representation of this DataSelection
      */
     public String toString() {
-        return super.toString() + " " + times;
+        //        return super.toString() + " " + times;
         //        return "data selection:" + fromLevel;
-        //        return "data selection:" + geoSelection;
+        return "data selection:" + geoSelection;
 
     }
 
