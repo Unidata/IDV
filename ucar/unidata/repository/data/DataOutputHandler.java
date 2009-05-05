@@ -233,9 +233,11 @@ public class DataOutputHandler extends OutputHandler {
 
         protected NetcdfDataset createValue(String path) {
             try {
+                System.err.println("nc:" + path);
                 getStorageManager().dirTouched(nj22Dir,null);
                 return  NetcdfDataset.openDataset(path);
             } catch(Exception exc) {
+                System.err.println("failed:" + path);
                 throw new RuntimeException(exc);
             }
         }
@@ -567,7 +569,6 @@ public class DataOutputHandler extends OutputHandler {
                 return true;
             }
         }
-
 
 
 

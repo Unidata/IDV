@@ -230,7 +230,7 @@ public class ImageOutputHandler extends OutputHandler {
             sb.append("<table>");
         } else if (output.equals(OUTPUT_PLAYER)) {
             if(!request.exists(ARG_ASCENDING)) {
-                entries = getEntryManager().sortEntriesOnDate(entries, false);
+                entries = getEntryManager().sortEntriesOnDate(entries, true);
             }
         }
 

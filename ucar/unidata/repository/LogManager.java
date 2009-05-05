@@ -161,7 +161,7 @@ public class LogManager extends RepositoryManager {
             thr = LogUtil.getInnerException(exc);
         }
 
-        if(true || getProperty(PROP_LOG_TOSTDERR,false)) {
+        if(getProperty(PROP_LOG_TOSTDERR,false)) {
             System.err.println(message);
             if (thr!=null) {
                 if (thr instanceof RepositoryUtil.MissingEntryException) {

@@ -685,7 +685,6 @@ public class SearchManager extends RepositoryManager {
             parentGroup.setUser(getUserManager().getAnonymousUser());
             parentGroup.setParentGroup(tmpGroup);
             parentGroup.setName(server.getUrl());
-
             final ServerInfo theServer = server;
             Runnable runnable = new Runnable() {
                     public void run() {

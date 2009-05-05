@@ -120,8 +120,11 @@ public class RegistryManager extends RepositoryManager {
 
 
 
+    private List<ServerInfo> registeredServers;
     /** _more_          */
     private List<ServerInfo> remoteServers;
+    private List<ServerInfo> selectedRemoteServers;
+
 
     /** _more_          */
     private Hashtable<String, ServerInfo> remoteServerMap;
@@ -391,7 +394,8 @@ public class RegistryManager extends RepositoryManager {
     public void checkApi() throws Exception {
         ApiMethod apiMethod = getRepository().getApiMethod("/registry/list");
         if (apiMethod != null) {
-            apiMethod.setIsTopLevel(isEnabledAsServer()
+            apiMethod.setIsTopLevel((isEnabledAsServer() &&
+                                     getRegisteredServers().size()>0)
                                     || (getSelectedRemoteServers().size()
                                         > 0));
         }
@@ -481,7 +485,9 @@ public class RegistryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public List<ServerInfo> getRegisteredServers() throws Exception {
-        List<ServerInfo> servers = new ArrayList<ServerInfo>();
+        List<ServerInfo> servers = registeredServers;
+        if(servers!=null) return servers;
+        servers = new ArrayList<ServerInfo>();
 
         Statement stmt =
             getDatabaseManager().select(Tables.SERVERREGISTRY.COLUMNS,
@@ -504,7 +510,14 @@ public class RegistryManager extends RepositoryManager {
                                            isRegistry, false));
             }
         }
+        registeredServers = servers;
         return servers;
+    }
+
+
+
+    private void clearRegisteredServers() {
+        registeredServers = null;
     }
 
 
@@ -512,6 +525,7 @@ public class RegistryManager extends RepositoryManager {
      * _more_
      */
     private void clearRemoteServers() {
+        selectedRemoteServers = null;
         remoteServers   = null;
         remoteServerMap = null;
 
@@ -546,12 +560,15 @@ public class RegistryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public List<ServerInfo> getSelectedRemoteServers() throws Exception {
-        List<ServerInfo> selected = new ArrayList<ServerInfo>();
+        List<ServerInfo> selected = selectedRemoteServers;
+        if(selected!=null) return selected;
+        selected = new ArrayList<ServerInfo>();
         for (ServerInfo serverInfo : getRemoteServers()) {
             if (serverInfo.getSelected()) {
                 selected.add(serverInfo);
             }
         }
+        selectedRemoteServers = selected;
         return selected;
     }
 
@@ -624,12 +641,12 @@ public class RegistryManager extends RepositoryManager {
         ResultSet        results;
         while ((results = iter.next()) != null) {
             while (results.next()) {
-
                 ServerInfo serverInfo = makeRemoteServer(results);
                 map.put(serverInfo.getId(), serverInfo);
                 servers.add(serverInfo);
             }
         }
+        clearRemoteServers();
         remoteServerMap = map;
         remoteServers   = servers;
         return servers;
@@ -679,7 +696,7 @@ public class RegistryManager extends RepositoryManager {
             Element root     = XmlUtil.getRoot(contents);
             if ( !responseOk(root)) {
                 logInfo("registerWithServer: Failed to register with:" + url);
-                logInfo(XmlUtil.getChildText(root).trim());
+                //                logInfo(XmlUtil.getChildText(root).trim());
             } else {
                 logInfo("registerWithServer: Registered with:" + url);
             }
@@ -818,8 +835,6 @@ public class RegistryManager extends RepositoryManager {
                                         Tables.REMOTESERVERS.NAME,
                                         Clause.eq(
                                                   Tables.REMOTESERVERS.COL_URL, serverInfo.getUrl()));
-            clearRemoteServers();
-
         }
 
         
@@ -874,6 +889,7 @@ public class RegistryManager extends RepositoryManager {
                                        clientServer.getEmail(),
                                        new Boolean(
                                            clientServer.getIsRegistry()) });
+                    clearRegisteredServers();
                     return true;
                 } else {
                     logInfo("checkServer: not equals:" + serverInfo.getId()
@@ -892,6 +908,7 @@ public class RegistryManager extends RepositoryManager {
                 Tables.SERVERREGISTRY.NAME,
                 Clause.eq(
                     Tables.SERVERREGISTRY.COL_URL, serverInfo.getUrl()));
+            clearRegisteredServers();
         }
         return false;
     }
@@ -909,8 +926,6 @@ public class RegistryManager extends RepositoryManager {
     public Result processRegistryList(Request request) throws Exception {
         boolean responseAsXml = request.getString(ARG_RESPONSE,
                                     "").equals(RESPONSE_XML);
-
-
 
         List<ServerInfo> registeredServers =  getRegisteredServers();
         List<ServerInfo> remoteServers =   getSelectedRemoteServers();
