@@ -208,6 +208,12 @@ public class Clause {
     }
 
 
+    public static Clause eq(String column, Object value,boolean not) {
+        if(not) return neq(column,value);
+        return eq(column,value);
+    }
+
+
     /**
      * _more_
      *
@@ -306,6 +312,13 @@ public class Clause {
     public static Clause neq(String column, Object value) {
         return new Clause(column, EXPR_NOTEQUALS, value);
     }
+
+
+    public static Clause like(String column, Object value, boolean not) {
+        if(not) return notLike(column,value);
+        return like(column,value);
+    }
+
 
 
     /**
