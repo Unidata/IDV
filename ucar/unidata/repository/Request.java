@@ -230,6 +230,18 @@ public class Request implements Constants {
         return entryUrl(theUrl, entry, ARG_ENTRYID);
     }
 
+    public boolean useFullUrl() {
+        return get(ARG_FULLURL,false);
+    }
+
+
+    public String checkUrl(String url) {
+        if(useFullUrl() && !url.startsWith("http"))  
+            return repository.absoluteUrl(url);
+        return url;
+    }
+
+
     /**
      * _more_
      *
@@ -255,7 +267,7 @@ public class Request implements Constants {
                 //                url = url + "/" + entry.getFullName();
             } catch (Exception ignore) {}
         }
-        return url;
+        return checkUrl(url);
     }
 
 
@@ -271,20 +283,21 @@ public class Request implements Constants {
      */
     public String entryUrl(RequestUrl theUrl, Entry entry, String arg) {
         if(entry.getIsRemoteEntry()) {
-            String id = entry.getId(); 
-            if(id.length()==0) 
+            String id = repository.getEntryManager().getRemoteEntryInfo(entry.getId())[1]; 
+            if(id.length()==0)  {
                 return entry.getRemoteServer()+theUrl.getPath();
-            return HtmlUtil.url(entry.getRemoteServer()+theUrl.getPath(), arg, entry.getId());
+            }
+            return HtmlUtil.url(entry.getRemoteServer()+theUrl.getPath(), arg, id);
         }
 
 
 
         String url = getEntryUrl(theUrl.toString(), entry);
         if (entry.isTopGroup()) {
-            return HtmlUtil.url(url, arg, entry.getId());
+            return checkUrl(HtmlUtil.url(url, arg, entry.getId()));
         }
         if (entry.getIsLocalFile()) {
-            return HtmlUtil.url(url, arg, entry.getId());
+            return checkUrl(HtmlUtil.url(url, arg, entry.getId()));
         }
 
         //        Group collectionGroup = entry.getCollectionGroup();
@@ -302,7 +315,7 @@ public class Request implements Constants {
 
 
         //        return url(theUrl, arg, entry.getId());
-        return HtmlUtil.url(url, arg, entry.getId());
+        return checkUrl(HtmlUtil.url(url, arg, entry.getId()));
 
 
         //        return url(theUrl, arg, entry.getId());
@@ -320,7 +333,7 @@ public class Request implements Constants {
      */
     public String entryUrl(RequestUrl theUrl, Entry entry, String arg1,
                            Object value1) {
-        return HtmlUtil.url(entryUrl(theUrl, entry), arg1, value1);
+        return checkUrl(HtmlUtil.url(entryUrl(theUrl, entry), arg1, value1));
     }
 
 
@@ -335,7 +348,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public String entryUrl(RequestUrl theUrl, Entry entry, List args) {
-        return HtmlUtil.url(entryUrl(theUrl, entry), args);
+        return checkUrl(HtmlUtil.url(entryUrl(theUrl, entry), args));
     }
 
     /**
@@ -352,8 +365,8 @@ public class Request implements Constants {
      */
     public String entryUrl(RequestUrl theUrl, Entry entry, String arg1,
                            Object value1, String arg2, Object value2) {
-        return HtmlUtil.url(entryUrl(theUrl, entry), arg1, value1, arg2,
-                            value2);
+        return checkUrl(HtmlUtil.url(entryUrl(theUrl, entry), arg1, value1, arg2,
+                                   value2));
     }
 
 
@@ -373,7 +386,7 @@ public class Request implements Constants {
                 repository.getPathFromEntry(collectionEntry);
             return theUrl.getUrl(collectionPath);
             }*/
-        return theUrl.toString();
+        return checkUrl(theUrl.toString());
     }
 
     /**
@@ -460,7 +473,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public String url(RequestUrl theUrl, String arg1, Object value1) {
-        return HtmlUtil.url(url(theUrl), arg1, value1);
+        return checkUrl(HtmlUtil.url(url(theUrl), arg1, value1));
     }
 
     /**
@@ -476,7 +489,7 @@ public class Request implements Constants {
      */
     public String url(RequestUrl theUrl, String arg1, Object value1,
                       String arg2, Object value2) {
-        return HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2);
+        return checkUrl(HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2));
     }
 
     /**
@@ -495,8 +508,8 @@ public class Request implements Constants {
     public String url(RequestUrl theUrl, String arg1, Object value1,
                       String arg2, Object value2, String arg3,
                       Object value3) {
-        return HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2, arg3,
-                            value3);
+        return checkUrl(HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2, arg3,
+                                   value3));
     }
 
     /**
@@ -517,8 +530,8 @@ public class Request implements Constants {
     public String url(RequestUrl theUrl, String arg1, Object value1,
                       String arg2, Object value2, String arg3, Object value3,
                       String arg4, Object value4) {
-        return HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2, arg3,
-                            value3, arg4, value4);
+        return checkUrl(HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2, arg3,
+                                   value3, arg4, value4));
     }
 
 
@@ -576,7 +589,7 @@ public class Request implements Constants {
      * @return _more_
      */
     public String getUrl() {
-        return getRequestPath() + "?" + getUrlArgs();
+        return checkUrl(getRequestPath() + "?" + getUrlArgs());
     }
 
     /**

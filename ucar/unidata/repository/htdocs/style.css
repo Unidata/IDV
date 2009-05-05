@@ -554,6 +554,13 @@ a.header-left  {
    overflow-y: auto;
 }
 
+.serverdiv {
+   max-height: 350px; 
+   overflow-y: auto;
+   margin-left:20px;
+
+}
+
 
 td {
    font-weight: normal;

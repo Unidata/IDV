@@ -86,6 +86,11 @@ public class XmlOutputHandler extends OutputHandler {
                                                     OutputType.TYPE_NONHTML|OutputType.TYPE_FORSEARCH,"",ICON_XML);
 
 
+    public static final OutputType OUTPUT_XMLENTRY = new OutputType("XML Entry",
+                                                    "xml.xmlentry",
+                                                    OutputType.TYPE_NONHTML|OutputType.TYPE_FORSEARCH,"",ICON_XML);
+
+
 
     /**
      * _more_
@@ -98,6 +103,7 @@ public class XmlOutputHandler extends OutputHandler {
             throws Exception {
         super(repository, element);
         addType(OUTPUT_XML);
+        addType(OUTPUT_XMLENTRY);
     }
 
 
@@ -132,9 +138,8 @@ public class XmlOutputHandler extends OutputHandler {
                                       theTypeHandler.getType())));
         }
         sb.append(XmlUtil.closeTag(TAG_TYPES));
-        return new Result("", sb, getMimeType(output));
+        return new Result("", sb, repository.getMimeTypeFromSuffix(".xml"));
     }
-
 
 
 
@@ -183,7 +188,7 @@ public class XmlOutputHandler extends OutputHandler {
      * @return _more_
      */
     public String getMimeType(OutputType output) {
-        if (output.equals(OUTPUT_XML)) {
+        if (output.equals(OUTPUT_XML) || output.equals(OUTPUT_XMLENTRY)) {
             return repository.getMimeTypeFromSuffix(".xml");
         }
         return super.getMimeType(output);
@@ -248,11 +253,17 @@ public class XmlOutputHandler extends OutputHandler {
 
         String pageTitle = "";
         sb.append(XmlUtil.closeTag(TAG_ASSOCIATIONS));
-        return new Result(pageTitle, sb, getMimeType(output));
+        return new Result(pageTitle, sb, repository.getMimeTypeFromSuffix(".xml"));
 
     }
 
 
+    public Result outputEntry(Request request, Entry entry) throws Exception {
+        Document   doc    = XmlUtil.makeDocument();
+        Element    root   = getEntryTag(entry, doc, null);
+        StringBuffer sb = new StringBuffer(XmlUtil.toString(root));
+        return new Result("", sb, repository.getMimeTypeFromSuffix(".xml"));
+    }
 
 
 
@@ -272,6 +283,11 @@ public class XmlOutputHandler extends OutputHandler {
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
         OutputType output = request.getOutput();
+
+        if(output.equals(OUTPUT_XMLENTRY)) {
+            return outputEntry(request, group);
+        }
+
         Document   doc    = XmlUtil.makeDocument();
         Element    root   = getGroupTag(request, group, doc, null);
         for (Group subgroup : subGroups) {
@@ -281,10 +297,15 @@ public class XmlOutputHandler extends OutputHandler {
             getEntryTag(entry, doc, root);
         }
         StringBuffer sb = new StringBuffer(XmlUtil.toString(root));
-        return new Result("", sb, getMimeType(output));
+        return new Result("", sb, repository.getMimeTypeFromSuffix(".xml"));
     }
 
 
+
+
+    private void addMetadata(Entry entry,  Document doc, Element parent)
+        throws Exception {
+    }
 
 
     /**
@@ -305,14 +326,19 @@ public class XmlOutputHandler extends OutputHandler {
             entry.getResource().getPath(), ATTR_RESOURCE_TYPE,
             entry.getResource().getType(), ATTR_GROUP,
             entry.getParentGroupId(), ATTR_TYPE,
-            entry.getTypeHandler().getType()
+            entry.getTypeHandler().getType(),
+            ATTR_FROMDATE, getRepository().formatDate(new Date(entry.getStartDate())),
+            ATTR_TODATE, getRepository().formatDate(new Date(entry.getEndDate())),
+            ATTR_CREATEDATE, getRepository().formatDate(new Date(entry.getCreateDate()))
         });
+
 
         if ((entry.getDescription() != null)
                 && (entry.getDescription().length() > 0)) {
             XmlUtil.create(doc, TAG_DESCRIPTION, node,
                            entry.getDescription(), null);
         }
+        addMetadata(entry, doc, node);
         return node;
     }
 

@@ -103,6 +103,10 @@ import java.util.zip.*;
  */
 public class SearchManager extends RepositoryManager {
 
+    public static final String ARG_SEARCH_SUBMIT = "search.submit";
+    public static final String ARG_SEARCH_SUBSET = "search.subset";
+    public static final String ARG_SEARCH_SERVERS = "search.servers";
+
 
     /**
      * _more_
@@ -138,10 +142,10 @@ public class SearchManager extends RepositoryManager {
 
         //Put in an empty submit button so when the user presses return 
         //it acts like a regular submit (not a submit to change the type)
-        sb.append(HtmlUtil.submitImage(iconUrl(ICON_BLANK), "submit"));
+        sb.append(HtmlUtil.submitImage(iconUrl(ICON_BLANK), ARG_SEARCH_SUBMIT));
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
         OutputType  output      = request.getOutput(BLANK);
-        String      buttons     = HtmlUtil.submit(msg("Search"), "submit");
+        String      buttons     = HtmlUtil.submit(msg("Search"), ARG_SEARCH_SUBMIT);
         sb.append("<table width=\"90%\" border=0><tr><td>");
         typeHandler.addTextSearch(request, sb);
         sb.append("</table>");
@@ -194,7 +198,7 @@ public class SearchManager extends RepositoryManager {
 
         //Put in an empty submit button so when the user presses return 
         //it acts like a regular submit (not a submit to change the type)
-        sb.append(HtmlUtil.submitImage(iconUrl(ICON_BLANK), "submit"));
+        sb.append(HtmlUtil.submitImage(iconUrl(ICON_BLANK), ARG_SEARCH_SUBMIT));
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
 
         String      what        = (String) request.getWhat(BLANK);
@@ -203,11 +207,19 @@ public class SearchManager extends RepositoryManager {
         }
 
 
+        List<ServerInfo> servers =
+            getRegistryManager().getSelectedRemoteServers();
 
-        String buttons =
-            RepositoryUtil.buttons(HtmlUtil.submit(msg("Search"), "submit"),
-                                   HtmlUtil.submit(msg("Search Subset"),
-                                       "submit_subset"));
+        String buttons;
+
+
+        if(servers.size()>0) {
+            buttons=  RepositoryUtil.buttons(HtmlUtil.submit(msg("Search this Repository"), ARG_SEARCH_SUBMIT), 
+                                             HtmlUtil.submit(msg("Search Remote Repositories"),
+                                                             ARG_SEARCH_SERVERS));
+        } else {
+            buttons=  HtmlUtil.submit(msg("Search"),ARG_SEARCH_SUBMIT);
+        }
 
         sb.append(HtmlUtil.p());
         sb.append(buttons);
@@ -265,8 +277,7 @@ public class SearchManager extends RepositoryManager {
         outputForm.append(HtmlUtil.formTableClose());
 
 
-        List<ServerInfo> servers =
-            getRegistryManager().getSelectedRemoteServers();
+
         if (servers.size() > 0) {
             StringBuffer serverSB  = new StringBuffer();
             int          serverCnt = 0;
@@ -303,10 +314,10 @@ public class SearchManager extends RepositoryManager {
             }
             sb.append(
                 HtmlUtil.makeShowHideBlock(
-                    msg("Search Other Repositories"),
+                    msg("Remote Search Settings"),
                     HtmlUtil.div(
                         serverSB.toString(),
-                        HtmlUtil.cssClass("serverblock")), false));
+                        HtmlUtil.cssClass("serverdiv")), false));
         }
 
 
@@ -363,51 +374,6 @@ public class SearchManager extends RepositoryManager {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processRemoteSearchForm(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        sb.append(
-            HtmlUtil.form(
-                request.url(getRepository().URL_SEARCH_REMOTE_DO),
-                HtmlUtil.attr(HtmlUtil.ATTR_NAME, "searchform")));
-
-        sb.append(HtmlUtil.p());
-        sb.append(header(msg("Select Remote Servers to Search")));
-        StringBuffer serverSB = new StringBuffer();
-
-        for (ServerInfo server : getRegistryManager()
-                .getSelectedRemoteServers()) {
-            serverSB.append(HtmlUtil.checkbox(ATTR_SERVER, server.getId(),
-                    true));
-            serverSB.append(HtmlUtil.space(1));
-            serverSB.append(server.getHref(" target=\"server\" "));
-            serverSB.append(HtmlUtil.br());
-        }
-        sb.append(HtmlUtil.div(serverSB.toString(),
-                               HtmlUtil.cssClass("serverblock")));
-        sb.append(HtmlUtil.p());
-        sb.append(header(msg("Search Criteria")));
-        TypeHandler typeHandler = getRepository().getTypeHandler(request);
-
-
-        typeHandler.addToSearchForm(request, sb, null, true);
-
-        sb.append(HtmlUtil.p());
-
-        sb.append(HtmlUtil.submit(msg("Search"), "submit"));
-        sb.append(HtmlUtil.formClose());
-        return getRepository().makeResult(request, msg("Remote Search"), sb,
-                                          getSearchUrls());
-
-    }
 
     /**
      * _more_
@@ -524,7 +490,7 @@ public class SearchManager extends RepositoryManager {
 
         //        System.err.println("submit:" + request.getString("submit","YYY"));
         if (request.defined("submit_type.x")
-                || request.defined("submit_subset")) {
+                || request.defined(ARG_SEARCH_SUBSET)) {
             request.remove(ARG_OUTPUT);
             return processEntrySearchForm(request);
         }
@@ -544,17 +510,33 @@ public class SearchManager extends RepositoryManager {
 
         StringBuffer     searchCriteriaSB = new StringBuffer();
         boolean          searchThis       = true;
-        List<ServerInfo> servers          = findServers(request, true);
+        List<ServerInfo> servers=null;
+
         ServerInfo       thisServer       = getRepository().getServerInfo();
-
         boolean          doFrames         = request.get(ARG_DOFRAMES, false);
-        if (request.defined(ATTR_SERVER)) {
 
-            searchThis = servers.contains(thisServer);
-            if ( !doFrames) {
-                servers.remove(thisServer);
+        if (request.exists(ARG_SEARCH_SERVERS)) {
+            servers = findServers(request, true);
+            if(servers.size()==0) {
+                servers=getRegistryManager().getSelectedRemoteServers();
+            }
+            if (request.defined(ATTR_SERVER)) {
+                searchThis = servers.contains(thisServer);
+                if (!doFrames) {
+                    servers.remove(thisServer);
+                }
+            }
+            if(servers.size()>100) {
+                throw new IllegalArgumentException("Too many remote servers:" + servers.size());
             }
         }
+
+
+
+
+
+
+
 
         List<Group> groups  = new ArrayList<Group>();
         List<Entry> entries = new ArrayList<Entry>();
@@ -567,12 +549,10 @@ public class SearchManager extends RepositoryManager {
         }
 
 
-        if(servers.size()>100) {
-            throw new IllegalArgumentException("Too many remote servers:" + servers.size());
-        }
 
-        if (servers.size() > 0) {
+        if (servers!=null && servers.size() > 0) {
             request.remove(ATTR_SERVER);
+            request.remove(ARG_SEARCH_SERVERS);
 
             if (doFrames) {
                 String linkUrl = request.getUrlArgs();
@@ -642,7 +622,7 @@ public class SearchManager extends RepositoryManager {
         }
 
         if (s.length() > 0) {
-            request.remove("submit");
+            request.remove(ARG_SEARCH_SUBMIT);
             String url = request.getUrl(getRepository().URL_SEARCH_FORM);
             s = "<table>" + s + "</table>";
             String header = HtmlUtil.href(
@@ -679,7 +659,8 @@ public class SearchManager extends RepositoryManager {
             }
             final Group parentGroup =
                 new Group(getRepository().getGroupTypeHandler(), true);
-            parentGroup.setId("");
+            parentGroup.setId(getEntryManager().getRemoteEntryId(server.getUrl(),""));
+            getEntryManager().cacheEntry(parentGroup);
             parentGroup.setRemoteServer(server.getUrl());
             parentGroup.setIsRemoteEntry(true);
             parentGroup.setUser(getUserManager().getAnonymousUser());
@@ -711,9 +692,10 @@ public class SearchManager extends RepositoryManager {
 
                                     entry.setResource(new Resource("remote:" + XmlUtil.getAttribute(node, ATTR_RESOURCE,""),
                                                                    Resource.TYPE_REMOTE_FILE));
-                                    entry.setId(XmlUtil.getAttribute(node, ATTR_ID));
+                                    entry.setId(getEntryManager().getRemoteEntryId(theServer.getUrl(),XmlUtil.getAttribute(node, ATTR_ID)));
                                     entry.setIsRemoteEntry(true);
                                     entry.setRemoteServer(theServer.getUrl());
+                                    getEntryManager().cacheEntry(entry);
                                     if (entry.isGroup()) {
                                         groups.add((Group) entry);
                                     } else {
@@ -755,7 +737,7 @@ public class SearchManager extends RepositoryManager {
             long t2 = System.currentTimeMillis();
             //Wait at most 10 seconds
             if((t2-t1)>10000) {
-                logInfo("Remote search waited too long");
+                logInfo("Remote search waited too long" );
                 break;
             }
         }

@@ -2249,15 +2249,21 @@ public class TypeHandler extends RepositoryManager {
                     Tables.METADATA.COL_ATTR3,
                     Tables.METADATA.COL_ATTR4};
                 for(String nameTok: nameToks) {
+                    boolean doNot = nameTok.startsWith("!");
+                    if(doNot) {
+                        nameTok  = nameTok.substring(1);
+                    }
+
+
                     if(doLike) nameTok = "%"+nameTok+"%";
                     List<Clause> ors       = new ArrayList<Clause>();
                     if (searchMetadata) {
                         List<Clause> metadataOrs = new ArrayList<Clause>();
                         for(String attrCol: attrCols) {
                             if(doLike) {
-                                metadataOrs.add(Clause.like(attrCol, nameTok));
+                                metadataOrs.add(Clause.like(attrCol, nameTok,doNot));
                             } else {
-                                metadataOrs.add(Clause.eq(attrCol, nameTok));
+                                metadataOrs.add(Clause.eq(attrCol, nameTok,doNot));
                             }
                         }
                         ors.add(Clause.and(Clause.or(metadataOrs),
@@ -2265,13 +2271,13 @@ public class TypeHandler extends RepositoryManager {
                                                        Tables.ENTRIES.COL_ID)));
                     } 
                     if(doLike) {
-                        ors.add(Clause.like(Tables.ENTRIES.COL_NAME, nameTok));
+                        ors.add(Clause.like(Tables.ENTRIES.COL_NAME, nameTok,doNot));
                         ors.add(Clause.like(Tables.ENTRIES.COL_DESCRIPTION,
-                                            nameTok));
+                                            nameTok,doNot));
                     } else {
-                        ors.add(Clause.eq(Tables.ENTRIES.COL_NAME, nameTok));
+                        ors.add(Clause.eq(Tables.ENTRIES.COL_NAME, nameTok,doNot));
                         ors.add(Clause.eq(Tables.ENTRIES.COL_DESCRIPTION,
-                                          nameTok));
+                                          nameTok,doNot));
 
                     }
                     ands.add(Clause.or(ors));

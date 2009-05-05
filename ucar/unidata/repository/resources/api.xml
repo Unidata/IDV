@@ -44,7 +44,6 @@
       <api request="/search/form"            method="processEntrySearchForm"         name="Search"/>
       <api request="/search/browse"          method="processEntryBrowseSearchForm"   name="Browse"/>
       <api request="/search/do"              method="processEntrySearch"/>
-      <api request="/search/remote/form"     method="processRemoteSearchForm"         name="Remote Search" />
       <api request="/search/remote/do"     method="processRemoteSearch"         name="Remote Search" />
    </group>
 

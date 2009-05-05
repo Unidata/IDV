@@ -118,7 +118,7 @@ public class EntryManager extends RepositoryManager {
     private Group topGroup;
 
 
-
+    public  static final String ID_PREFIX_REMOTE = "remote:";
 
 
     /** _more_ */
@@ -381,15 +381,22 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryShow(Request request) throws Exception {
+        //        System.err.println ("processEntryShow " + request);
+
         if (request.getCheckingAuthMethod()) {
             OutputHandler handler = getRepository().getOutputHandler(request);
             return new Result(handler.getAuthorizationMethod(request));
         }
 
 
-        Entry entry;
+        Entry entry=null;
         if (request.defined(ARG_ENTRYID)) {
-            entry = getEntry(request);
+            try {
+                entry = getEntry(request);
+            } catch(Exception exc) {
+                logError("",exc);
+                throw exc;
+            }
             if (entry == null) {
                 Entry tmp = getEntry(request,
                                      request.getString(ARG_ENTRYID, BLANK),
@@ -407,6 +414,22 @@ return new Result(title, sb);
         if (entry == null) {
             throw new IllegalArgumentException("No entry specified");
         }
+
+        if(entry.getIsRemoteEntry()) {
+            String redirectUrl  = entry.getRemoteServer()+getRepository().URL_ENTRY_SHOW.getPath();
+            String[]tuple  = getRemoteEntryInfo(entry.getId());
+            request.put(ARG_ENTRYID, tuple[1]);
+            request.put(ARG_FULLURL, "true");
+
+
+            redirectUrl = redirectUrl + "?" +request.getUrlArgs();
+            //            System.err.println("routing remote request:" + redirectUrl);
+            URL url = new URL(redirectUrl);
+            URLConnection    connection = url.openConnection();
+            InputStream      is         = connection.getInputStream();
+            return new Result("", is, connection.getContentType());
+        }
+
 
         if (request.get(ARG_NEXT, false)
                 || request.get(ARG_PREVIOUS, false)) {
@@ -2781,6 +2804,10 @@ return new Result(title, sb);
         Date createDate = new Date();
         Date fromDate   = createDate;
         //        System.err.println("node:" + XmlUtil.toString(node));
+        if (XmlUtil.hasAttribute(node, ATTR_CREATEDATE)) {
+            createDate = getRepository().parseDate(XmlUtil.getAttribute(node,
+                    ATTR_CREATEDATE));
+        }
         if (XmlUtil.hasAttribute(node, ATTR_FROMDATE)) {
             fromDate = getRepository().parseDate(XmlUtil.getAttribute(node,
                     ATTR_FROMDATE));
@@ -4014,6 +4041,33 @@ return new Result(title, sb);
 
 
 
+    public  String getRemoteEntryId(String server, String id) {
+        return ID_PREFIX_REMOTE+
+            XmlUtil.encodeBase64(server.getBytes())+":" +
+            id;
+    }
+
+
+    public  String[] getRemoteEntryInfo(String id) {
+        if(id.length()==0) return new String[]{"",""};
+        id = id.substring(ID_PREFIX_REMOTE.length());
+        String[] pair = StringUtil.split(id, ":", 2);
+        if(pair==null) return new String[]{"",""};
+        pair[0] = new String(XmlUtil.decodeBase64(pair[0]));
+        return pair;
+    }
+
+
+    public Entry getRemoteEntry(Request request, String server, String id) throws Exception {
+        String remoteUrl =
+            server
+            + getRepository().URL_ENTRY_SHOW.getPath();
+        remoteUrl = HtmlUtil.url(remoteUrl, ARG_ENTRYID, id, ARG_OUTPUT,XmlOutputHandler.OUTPUT_XMLENTRY);
+        String entriesXml = IOUtil.readContents(remoteUrl, getClass());
+        System.err.println ("XML:" + entriesXml);
+        return null;
+    }
+
 
     /**
      * _more_
@@ -4050,7 +4104,10 @@ return new Result(title, sb);
 
             //catalog:url:dataset:datasetid
             try {
-                if (entryId.startsWith("catalog:")) {
+                if (entryId.startsWith(ID_PREFIX_REMOTE)) {
+                    String[]tuple  = getRemoteEntryInfo(entryId);
+                    return getRemoteEntry(request, tuple[0],tuple[1]);
+                } else   if (entryId.startsWith("catalog:")) {
                     CatalogTypeHandler typeHandler =
                         (CatalogTypeHandler) getRepository().getTypeHandler(
                             TypeHandler.TYPE_CATALOG);

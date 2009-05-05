@@ -378,6 +378,8 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_TODATE = "todate";
 
+    public static final String ATTR_CREATEDATE = "createdate";
+
     /** _more_ */
     public static final String ATTR_TOOLTIP = "tooltip";
 
@@ -392,6 +394,8 @@ public interface Constants {
 
 
     public static final String ARG_DECORATE = "decorate";
+
+    public static final String ARG_FULLURL = "fullurl";
 
 
     /** _more_ */

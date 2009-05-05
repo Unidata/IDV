@@ -96,9 +96,6 @@ public class RepositoryBase implements Constants, RepositorySource {
                                                     "Browse");
 
 
-    public final RequestUrl URL_SEARCH_REMOTE_FORM = new RequestUrl(this,
-                                                    "/search/remote/form",
-                                                    "Search Remote Servers");
 
     public final RequestUrl URL_SEARCH_REMOTE_DO = new RequestUrl(this,
                                                     "/search/remote/do",
@@ -116,10 +113,10 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public final RequestUrl[] remoteSearchUrls = { URL_SEARCH_TEXTFORM,
-                                             URL_SEARCH_FORM,
-                                             URL_SEARCH_BROWSE,
-                                                      URL_SEARCH_ASSOCIATIONS_FORM,
-                                                      URL_SEARCH_REMOTE_FORM};
+                                                   URL_SEARCH_FORM,
+                                                   URL_SEARCH_BROWSE,
+                                                   URL_SEARCH_ASSOCIATIONS_FORM
+                                                   };
 
     /** _more_ */
     public final RequestUrl URL_COMMENTS_SHOW = new RequestUrl(this,
