@@ -1375,7 +1375,7 @@ public class GeoGridDataSource extends GridDataSource {
                 filename.append("_r_" + fromLevelIndex + "_" + toLevelIndex);
             }
 
-            if ((geoSelection != null) && geoSelection.getHasValidState() && geoSelection.getHasNonOneStride()) {
+            if (geoSelection != null && (geoSelection.hasSpatialSubset() || geoSelection.getHasNonOneStride())) {
                 //TODO: We should determine the size of the subset grid and use that.
                 readingFullGrid = false;
                 //System.err.println("subsetting using:" + geoSelection.getLatLonRect());

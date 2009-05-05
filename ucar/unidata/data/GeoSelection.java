@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data;
 
 
@@ -212,9 +213,18 @@ public class GeoSelection {
      * @return Has anything to subset
      */
     public boolean getHasValidState() {
-        return (boundingBox != null) || hasStride();
+        return hasSpatialSubset() || hasStride();
     }
 
+
+    /**
+     * Is there a spatial subset defined
+     *
+     * @return Has spatial subset
+     */
+    public boolean hasSpatialSubset() {
+        return boundingBox != null;
+    }
 
     /**
      * Does this selection have any stride other than NONE and BASE
