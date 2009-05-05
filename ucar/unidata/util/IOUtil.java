@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -75,7 +76,7 @@ public class IOUtil {
             return true;
         }
 
-        if(fileOrUrl.indexOf("." + suffix +"?")>=0) {
+        if (fileOrUrl.indexOf("." + suffix + "?") >= 0) {
             return true;
         }
 
@@ -170,7 +171,8 @@ public class IOUtil {
         /** flag for youngest first sorting */
         boolean youngestFirst;
 
-        long size=-1;
+        /** _more_          */
+        long size = -1;
 
         /**
          * Create a FileWrapper for the file with the appropriate sorting
@@ -179,31 +181,62 @@ public class IOUtil {
          * @param youngestFirst flag for sorting
          */
         public FileWrapper(File f, boolean youngestFirst) {
-            this.file             = f;
+            this.file          = f;
             this.youngestFirst = youngestFirst;
             modified           = file.lastModified();
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public long lastModified() {
             return modified;
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean isDirectory() {
             return file.isDirectory();
         }
 
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean delete() {
             return file.delete();
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public long length() {
-            if(size<0) size = file.length();
+            if (size < 0) {
+                size = file.length();
+            }
             return size;
         }
 
 
-        public static FileWrapper[] toArray(File [] files, boolean youngestFirst) {
+        /**
+         * _more_
+         *
+         * @param files _more_
+         * @param youngestFirst _more_
+         *
+         * @return _more_
+         */
+        public static FileWrapper[] toArray(File[] files,
+                                            boolean youngestFirst) {
             FileWrapper[] fw = new FileWrapper[files.length];
             for (int i = 0; i < fw.length; i++) {
                 fw[i] = new FileWrapper(files[i], youngestFirst);
@@ -211,7 +244,16 @@ public class IOUtil {
             return fw;
         }
 
-        public static FileWrapper[] toArray(List<File> files, boolean youngestFirst) {
+        /**
+         * _more_
+         *
+         * @param files _more_
+         * @param youngestFirst _more_
+         *
+         * @return _more_
+         */
+        public static FileWrapper[] toArray(List<File> files,
+                                            boolean youngestFirst) {
             FileWrapper[] fw = new FileWrapper[files.size()];
             for (int i = 0; i < fw.length; i++) {
                 fw[i] = new FileWrapper(files.get(i), youngestFirst);
@@ -285,6 +327,13 @@ public class IOUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param files _more_
+     *
+     * @return _more_
+     */
     public static FileWrapper[] sortFilesOnAge(FileWrapper[] files) {
         Arrays.sort(files);
         return files;
@@ -300,8 +349,8 @@ public class IOUtil {
      */
     public static List<File> deleteFiles(List<File> files) {
         List<File> notDeleted = new ArrayList<File>();
-        for(File f: files) {
-            if(!f.delete()) {
+        for (File f : files) {
+            if ( !f.delete()) {
                 notDeleted.add(f);
             }
         }
@@ -311,51 +360,63 @@ public class IOUtil {
     /**
      * This finds and returns a list files to scour
      *
+     *
+     * @param dir _more_
+     * @param hours _more_
+     * @param maxBytes _more_
+     *
+     * @return _more_
      */
-    public static List<File> findFilesToScour(File dir, double hours, long maxBytes) {
+    public static List<File> findFilesToScour(File dir, double hours,
+            long maxBytes) {
 
-        List<File> results = new ArrayList<File>();
+        List<File> results  = new ArrayList<File>();
 
-        long t1 = System.currentTimeMillis();
+        long       t1       = System.currentTimeMillis();
         List<File> allFiles = getFiles(dir, true);
-        long t2 = System.currentTimeMillis();
+        long       t2       = System.currentTimeMillis();
 
-        long t3 = System.currentTimeMillis();
-        FileWrapper[] files = sortFilesOnAge(FileWrapper.toArray(allFiles,false));
-        long t4 = System.currentTimeMillis();
+        long       t3       = System.currentTimeMillis();
+        FileWrapper[] files = sortFilesOnAge(FileWrapper.toArray(allFiles,
+                                  false));
+        long t4        = System.currentTimeMillis();
 
-        long now = new Date().getTime();
+        long now       = new Date().getTime();
 
-        long totalSize= 0;
-        long t5 = System.currentTimeMillis();
-        for(int i=0;i<files.length;i++) {
-            totalSize+=files[i].length();
+        long totalSize = 0;
+        long t5        = System.currentTimeMillis();
+        for (int i = 0; i < files.length; i++) {
+            totalSize += files[i].length();
         }
         long t6 = System.currentTimeMillis();
 
-        System.err.println ("Scouring  found " + files.length +" in " + (t2-t1) +"ms   sort time:"+(t4-t3) +" size:" + (int)(totalSize/1000.0) +"KB  " + (t6-t5));
+        System.err.println("Scouring  found " + files.length + " in "
+                           + (t2 - t1) + "ms   sort time:" + (t4 - t3)
+                           + " size:" + (int) (totalSize / 1000.0) + "KB  "
+                           + (t6 - t5));
 
         long t7 = System.currentTimeMillis();
-        for(int i=0;i<files.length;i++) {
-            if(files[i].isDirectory()) {
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isDirectory()) {
                 continue;
-            } 
-            if(totalSize<=maxBytes) {
+            }
+            if (totalSize <= maxBytes) {
                 break;
             }
             long lastModified = files[i].lastModified();
-            long fileSize = files[i].length();
-            if(hours>0) {
-                double ageHours  = DateUtil.millisToHours(now-lastModified);
-                if(ageHours<=hours) {
+            long fileSize     = files[i].length();
+            if (hours > 0) {
+                double ageHours = DateUtil.millisToHours(now - lastModified);
+                if (ageHours <= hours) {
                     continue;
                 }
             }
             results.add(files[i].file);
-            totalSize-= files[i].length();
+            totalSize -= files[i].length();
         }
         long t8 = System.currentTimeMillis();
-        System.err.println ("Scour loop time:" + (t8-t7) +" found " + results.size() + " files to delete");
+        System.err.println("Scour loop time:" + (t8 - t7) + " found "
+                           + results.size() + " files to delete");
         return results;
     }
 
@@ -369,10 +430,18 @@ public class IOUtil {
      * @return _more_
      */
     public static File[] sortFilesOnName(File[] files) {
-        return  sortFilesOnName(files,false);
+        return sortFilesOnName(files, false);
     }
 
-    public static File[] sortFilesOnName(File[] files,boolean descending) {
+    /**
+     * _more_
+     *
+     * @param files _more_
+     * @param descending _more_
+     *
+     * @return _more_
+     */
+    public static File[] sortFilesOnName(File[] files, boolean descending) {
         List tuples = new ArrayList();
         for (int i = 0; i < files.length; i++) {
             tuples.add(new Object[] { files[i].getName(), files[i] });
@@ -470,6 +539,22 @@ public class IOUtil {
     public static void write(OutputStream to, String s) throws Exception {
         to.write(s.getBytes());
     }
+
+    /**
+     * _more_
+     *
+     * @param url _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static String readContents(URL url) throws Exception {
+        URLConnection connection = url.openConnection();
+        InputStream   is         = connection.getInputStream();
+        return readContents(is);
+    }
+
 
     /**
      * Write to the file from the URL stream
@@ -901,7 +986,8 @@ public class IOUtil {
             to = new File(joinDir(to, getFileTail(from.toString())));
         }
         if ( !from.renameTo(to)) {
-            throw new IllegalStateException("Could not move file:" + from +" to:" + to);
+            throw new IllegalStateException("Could not move file:" + from
+                                            + " to:" + to);
         }
         //        copyFile(from, to);
         //        from.delete();
@@ -1106,24 +1192,39 @@ public class IOUtil {
             if (url != null) {
                 URLConnection connection = url.openConnection();
                 connection.setAllowUserInteraction(true);
-                if(connection instanceof HttpURLConnection) {
-                    HttpURLConnection huc = (HttpURLConnection)connection;
-                    if(huc.getResponseCode()==401) {
-                        String 	auth = connection.getHeaderField("WWW-Authenticate"); 
-                        if(auth!=null) {
-                            AccountManager accountManager = AccountManager.getGlobalAccountManager();
-                            if(accountManager!=null) {
+                if (connection instanceof HttpURLConnection) {
+                    HttpURLConnection huc = (HttpURLConnection) connection;
+                    if (huc.getResponseCode() == 401) {
+                        String auth =
+                            connection.getHeaderField("WWW-Authenticate");
+                        if (auth != null) {
+                            AccountManager accountManager =
+                                AccountManager.getGlobalAccountManager();
+                            if (accountManager != null) {
 
-                                while(true) {
-                                    url = new URL(url.toString());
-                                    connection =  url.openConnection();
+                                while (true) {
+                                    url        = new URL(url.toString());
+                                    connection = url.openConnection();
                                     huc = (HttpURLConnection) connection;
-                                    String host  = url.getHost();
-                                    UserInfo userInfo = accountManager.getUserNamePassword(host+":"+auth,"<html>The server: <i>" + host +"<i> requires a username/password</html>");
-                                    if(userInfo==null) break;
-                                    String authReturn = "Basic " + ucar.unidata.xml.XmlUtil.encodeBase64(new String(userInfo.getUserId()+":" + userInfo.getPassword()).getBytes());
-                                    huc.addRequestProperty("Authorization", authReturn);
-                                    if(huc.getResponseCode()!=401) {
+                                    String host = url.getHost();
+                                    UserInfo userInfo =
+                                        accountManager.getUserNamePassword(
+                                            host + ":" + auth,
+                                            "<html>The server: <i>" + host
+                                            + "<i> requires a username/password</html>");
+                                    if (userInfo == null) {
+                                        break;
+                                    }
+                                    String authReturn =
+                                        "Basic "
+                                        + ucar.unidata.xml.XmlUtil
+                                            .encodeBase64(new String(userInfo
+                                                .getUserId() + ":"
+                                                    + userInfo.getPassword())
+                                                        .getBytes());
+                                    huc.addRequestProperty("Authorization",
+                                            authReturn);
+                                    if (huc.getResponseCode() != 401) {
                                         break;
                                     }
                                 }
@@ -1175,8 +1276,7 @@ public class IOUtil {
                 URL           dataUrl    = new URL(encodedUrl);
                 URLConnection connection = dataUrl.openConnection();
                 s = connection.getInputStream();
-            } catch (Exception exc) {
-            }
+            } catch (Exception exc) {}
         }
 
 
@@ -1248,8 +1348,7 @@ public class IOUtil {
         String encodedUrl = StringUtil.replace(filename, " ", "%20");
         try {
             return new URL(encodedUrl);
-        } catch (Exception exc) {
-        }
+        } catch (Exception exc) {}
 
 
         List classLoaders = Misc.getClassLoaders();
@@ -1441,10 +1540,17 @@ public class IOUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @return _more_
+     */
     public static boolean isZipFile(String file) {
         file = file.toLowerCase();
-        return file.endsWith(".zip") || file.endsWith(".jar") ||
-            file.endsWith(".zidv");
+        return file.endsWith(".zip") || file.endsWith(".jar")
+               || file.endsWith(".zidv");
     }
 
     /**
@@ -1494,6 +1600,8 @@ public class IOUtil {
         }
         return bytes;
     }
+
+
 
 
 
@@ -1755,7 +1863,7 @@ public class IOUtil {
      * @return List of files
      */
     public static List<File> getFiles(List files, File dir, boolean recurse,
-                                PatternFileFilter filter) {
+                                      PatternFileFilter filter) {
         if (files == null) {
             files = new ArrayList();
         }
@@ -1766,14 +1874,16 @@ public class IOUtil {
             File[] allFiles  = ((filter == null)
                                 ? directory.listFiles()
                                 : directory.listFiles((FileFilter) filter));
-            if(allFiles == null) continue;
+            if (allFiles == null) {
+                continue;
+            }
             for (int fileIdx = 0; fileIdx < allFiles.length; fileIdx++) {
                 if ( !allFiles[fileIdx].isDirectory()) {
                     files.add(allFiles[fileIdx]);
                 }
             }
         }
-        return (List<File>)files;
+        return (List<File>) files;
     }
 
 
@@ -1848,7 +1958,7 @@ public class IOUtil {
                 return false;
             }
             if (what == FileViewer.DO_CONTINUE) {
-                if (!walkDirectory(children[i], fileViewer, level + 1)) {
+                if ( !walkDirectory(children[i], fileViewer, level + 1)) {
                     return false;
                 }
             }
@@ -1909,7 +2019,7 @@ public class IOUtil {
                 }
             }
         }
-        return (List<File>)results;
+        return (List<File>) results;
     }
 
 
@@ -2091,10 +2201,10 @@ public class IOUtil {
      */
     public static void main(String[] args) throws Exception {
 
-        if(true) {
-            byte[]buffer = new byte[1048748];
+        if (true) {
+            byte[] buffer = new byte[1048748];
             writeBytes(new File("test0"), buffer);
-            for(int i=0;i<10000;i++) {
+            for (int i = 0; i < 10000; i++) {
                 System.out.println("cp test0 test" + i);
             }
             return;
@@ -2103,24 +2213,26 @@ public class IOUtil {
 
 
 
-        if(true) {
-            findFilesToScour(new File(args[0]),1,1000L);
+        if (true) {
+            findFilesToScour(new File(args[0]), 1, 1000L);
             return;
         }
 
-        AccountManager.setGlobalAccountManager(new AccountManager(new File(".")));
+        AccountManager.setGlobalAccountManager(
+            new AccountManager(new File(".")));
 
-        String url ="http://delllaptop:8080/repository/entry/show/Projects/PRIVATE?entryid=441dce70-b70c-4993-a514-f5b50d3234bf&output=thredds.catalog";
+        String url =
+            "http://delllaptop:8080/repository/entry/show/Projects/PRIVATE?entryid=441dce70-b70c-4993-a514-f5b50d3234bf&output=thredds.catalog";
         InputStream is = getInputStream(url, IOUtil.class);
-        if(is==null) {
+        if (is == null) {
             is = getInputStream(url, IOUtil.class);
         }
-        if(is==null) {
+        if (is == null) {
             is = getInputStream(url, IOUtil.class);
         }
 
-        if(is!=null) {
-            System.err.println (new String(readBytes(is)));
+        if (is != null) {
+            System.err.println(new String(readBytes(is)));
         }
     }
 
