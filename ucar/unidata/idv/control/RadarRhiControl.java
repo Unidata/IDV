@@ -197,11 +197,11 @@ public class RadarRhiControl extends ColorCrossSectionControl {
             }
             //xScale.setTitle("Distance along ground (" + unitlabel + ")");
             // Do we need this here or is it already done in setData?
-
+            csSelector.clearDisplayables();
         } catch (Exception e) {
             logException("Initializing the csSelector", e);
         }
-        csSelector.addPropertyChangeListener(this);
+       // csSelector.addPropertyChangeListener(this);
     }
 
     /**
