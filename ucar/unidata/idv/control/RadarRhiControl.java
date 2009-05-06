@@ -26,6 +26,7 @@ package ucar.unidata.idv.control;
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.radar.RadarConstants;
 import ucar.unidata.util.GuiUtils;
@@ -129,7 +130,8 @@ public class RadarRhiControl extends ColorCrossSectionControl {
                 setVerticalAxisRange(new Range(0, 20000));
             }
             updateAxisLabels();
-            List          choices      = getDataChoices();
+
+      /*      List          choices      = getDataChoices();
             DataSelection tmpSelection =
                 new DataSelection(getDataSelection());
             tmpSelection.setFromLevel(null);
@@ -137,7 +139,7 @@ public class RadarRhiControl extends ColorCrossSectionControl {
             DataChoice dc          = (DataChoice) choices.get(0);
             List       levelsList1 = dc.getAllLevels(tmpSelection);
 
-            GuiUtils.setListData(azimuthSelector, levelsList1);
+            GuiUtils.setListData(azimuthSelector, levelsList1);  */
             //DataChoice dc = (DataChoice)choices.get(0);
             //List levels = dc.getAllLevels();
             //GuiUtils.setListData(azimuthSelector, levels);
@@ -249,22 +251,38 @@ public class RadarRhiControl extends ColorCrossSectionControl {
     protected boolean setData(DataChoice choice) throws VisADException,
             RemoteException {
 
+        currentLevel = getDataSelection().getFromLevel();
+        if (currentLevel == null) {
+            List levelsList = choice.getAllLevels(getDataSelection());
+            if ((levelsList != null) && (levelsList.size() > 0)) {
+                currentLevel = levelsList.get(0);
+            }
+        }
+
+
+        Real c = (Real) currentLevel;
+        currentAngle = (float)c.getValue();
+        getDataSelection().setLevel(currentLevel);
+
         DataSelection tmpSelection = new DataSelection(getDataSelection());
         tmpSelection.setFromLevel(null);
         tmpSelection.setToLevel(null);
 
         List levelsList1 = choice.getAllLevels(tmpSelection);
 
-        if (levelsList1.size() >= 1) {
+
+ /*        if (levelsList1.size() >= 1) {
             String azim = levelsList1.get(0).toString();
             currentAngle = Float.parseFloat(azim);
-        }
+        }   */
         setRequestProperties();
 
         if ( !super.setData(choice)) {
             return false;
         }
-        azimuthSelector = new JComboBox();;
+        azimuthSelector = new JComboBox();
+        GuiUtils.setListData(azimuthSelector, levelsList1);
+        azimuthSelector.setSelectedItem(currentLevel);
         azimuthSelector.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 try {
@@ -275,7 +293,7 @@ public class RadarRhiControl extends ColorCrossSectionControl {
                                       azimuthSelector.getSelectedItem());
                     currentAngle = Float.parseFloat(azim);
                     setRequestProperties();
-                    //applyNewAngle(currentAngle);
+
                     crossSectionChanged();
                 } catch (Exception ve) {
                     logException(" change azimath ", ve);
@@ -332,6 +350,7 @@ public class RadarRhiControl extends ColorCrossSectionControl {
                 getCrossSectionViewManager().setNewDisplayTitle(
                     ((DataChoice) choices.get(0)).getName() + " Azimuth "
                     + getDisplayConventions().formatAngle(currentAngle));
+                updateLegendLabel();
             }
             doShare(SHARE_XSLINE, this);
 
@@ -342,35 +361,7 @@ public class RadarRhiControl extends ColorCrossSectionControl {
 
 
 
-
-    /**
-     * We got a new angle or sweep tilt - from the user.
-     *
-     * @param newAngle   new sweep angle
-     */
-    private void applyNewAngle(float newAngle) {
-
-        if ((newAngle != lastLoadedAz) && !Float.isNaN(lastLoadedAz)) {
-            lastLoadedAz = newAngle;
-            //  currentAngle = newAngle;
-            getRequestProperties().put(RadarConstants.PROP_AZIMUTH,
-                                       new Double(currentAngle));
-            //updateLegendAndList();
-            crossSectionChanged();
-            try {
-                resetData();
-                doShare(SHARE_ANGLE, new Double(currentAngle));
-            } catch (Exception exc) {
-                logException("Getting new angle", exc);
-            }
-        }
-    }
-
-
-
-
-
-    /**
+     /**
      * Put one end of the rhi control line on the radar position (centered);
      * leave other end where it is.
      *
