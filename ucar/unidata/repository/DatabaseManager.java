@@ -1009,13 +1009,32 @@ public class DatabaseManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public Statement select(String what, List tables, Clause clause,
-                            String extra, int max)
+    public Statement select(final String what, final List tables, final Clause clause,
+                            final String extra, final  int max)
             throws Exception {
         Connection connection = getConnection();
 
+        final boolean[] done = {false};
+
         Statement stmt = SqlUtil.select(connection, what, tables, clause,
                                         extra, max);
+        Misc.run(new Runnable() {
+                public void run() {
+                    //Wait 20 seconds
+                    Misc.sleep(1000*20);
+                    if(!done[0]) {
+                        System.err.println("Select is taking too long\nwhat:" + what + "\ntables:" +
+                                           tables +
+                                           "\nclause:" + clause +
+                                           "\nextra:" + extra+
+                                           + "max:" + max);
+                        Misc.printStack("select",20);
+                    }
+                }
+            });
+
+
+        done[0] = true;
         releaseConnection(connection);
         return stmt;
     }

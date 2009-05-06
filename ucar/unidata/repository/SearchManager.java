@@ -131,30 +131,7 @@ public class SearchManager extends RepositoryManager {
      */
     public Result processEntryTextSearchForm(Request request)
             throws Exception {
-
-        StringBuffer sb = new StringBuffer();
-        sb.append(
-            HtmlUtil.form(
-                request.url(
-                    getRepository().URL_ENTRY_SEARCH, ARG_NAME,
-                    WHAT_ENTRIES), " name=\"searchform\" "));
-
-
-        //Put in an empty submit button so when the user presses return 
-        //it acts like a regular submit (not a submit to change the type)
-        sb.append(HtmlUtil.submitImage(iconUrl(ICON_BLANK), ARG_SEARCH_SUBMIT));
-        TypeHandler typeHandler = getRepository().getTypeHandler(request);
-        OutputType  output      = request.getOutput(BLANK);
-        String      buttons     = HtmlUtil.submit(msg("Search"), ARG_SEARCH_SUBMIT);
-        sb.append("<table width=\"90%\" border=0><tr><td>");
-        typeHandler.addTextSearch(request, sb);
-        sb.append("</table>");
-        sb.append(HtmlUtil.p());
-        sb.append(buttons);
-        sb.append(HtmlUtil.p());
-        sb.append(HtmlUtil.formClose());
-        return getRepository().makeResult(request, msg("Search Form"), sb,
-                                          getSearchUrls());
+        return makeSearchForm(request, true, false);
     }
 
 
@@ -173,21 +150,13 @@ public class SearchManager extends RepositoryManager {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param typeSpecific _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result xprocessEntrySearchForm(Request request,
-                                          boolean typeSpecific)
-            throws Exception {
 
+
+    public Result makeSearchForm (Request request, boolean justText,
+                                  boolean typeSpecific)
+        throws Exception {
         StringBuffer sb = new StringBuffer();
+        TypeHandler typeHandler = getRepository().getTypeHandler(request);
 
         sb.append(
             HtmlUtil.form(
@@ -199,7 +168,6 @@ public class SearchManager extends RepositoryManager {
         //Put in an empty submit button so when the user presses return 
         //it acts like a regular submit (not a submit to change the type)
         sb.append(HtmlUtil.submitImage(iconUrl(ICON_BLANK), ARG_SEARCH_SUBMIT));
-        TypeHandler typeHandler = getRepository().getTypeHandler(request);
 
         String      what        = (String) request.getWhat(BLANK);
         if (what.length() == 0) {
@@ -220,12 +188,19 @@ public class SearchManager extends RepositoryManager {
         } else {
             buttons=  HtmlUtil.submit(msg("Search"),ARG_SEARCH_SUBMIT);
         }
-
         sb.append(HtmlUtil.p());
-        sb.append(buttons);
-        sb.append(HtmlUtil.p());
-        sb.append("<table width=\"90%\" border=0><tr><td>");
+        if(!justText) {
+            sb.append(buttons);
+            sb.append(HtmlUtil.p());
+        }
 
+
+        if(justText) {
+            sb.append("<table width=\"100%\" border=\"0\"><tr><td width=\"60\">");
+            typeHandler.addTextSearch(request, sb);
+            sb.append("</table>");
+            sb.append(HtmlUtil.p());
+        } else {
         Object       oldValue = request.remove(ARG_RELATIVEDATE);
         List<Clause> where    = typeHandler.assembleWhereClause(request);
         if (oldValue != null) {
@@ -278,6 +253,12 @@ public class SearchManager extends RepositoryManager {
 
 
 
+
+        sb.append(HtmlUtil.makeShowHideBlock(msg("Output"),
+                                             outputForm.toString(), false));
+
+        }
+
         if (servers.size() > 0) {
             StringBuffer serverSB  = new StringBuffer();
             int          serverCnt = 0;
@@ -320,12 +301,8 @@ public class SearchManager extends RepositoryManager {
                         HtmlUtil.cssClass("serverdiv")), false));
         }
 
+        
 
-
-
-
-        sb.append(HtmlUtil.makeShowHideBlock(msg("Output"),
-                                             outputForm.toString(), false));
 
         sb.append(HtmlUtil.p());
         sb.append(buttons);
@@ -370,7 +347,7 @@ public class SearchManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processEntrySearchForm(Request request) throws Exception {
-        return xprocessEntrySearchForm(request, false);
+        return makeSearchForm(request, false, false);
     }
 
 
@@ -736,7 +713,7 @@ public class SearchManager extends RepositoryManager {
             Misc.sleep(100);
             long t2 = System.currentTimeMillis();
             //Wait at most 10 seconds
-            if((t2-t1)>10000) {
+            if((t2-t1)>20000) {
                 logInfo("Remote search waited too long" );
                 break;
             }

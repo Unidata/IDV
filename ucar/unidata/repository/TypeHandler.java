@@ -1537,17 +1537,11 @@ public class TypeHandler extends RepositoryManager {
                              + HtmlUtil.checkbox(ARG_EXACT, "true",
                                  request.get(ARG_EXACT, false)) + " "
                                      + msg("Match exactly");
-        if (true || (name.trim().length() == 0)) {
-            sb.append(HtmlUtil.formEntry(msgLabel("Text"),
-                                         HtmlUtil.input(ARG_TEXT, name)
-                                         + searchExact + searchMetaData));
-        } else {
-            HtmlUtil.hidden(ARG_TEXT, name);
-            sb.append(HtmlUtil.formEntry(msgLabel("Name"),
-                                         name + searchExact
-                                         + searchMetaData));
-        }
-
+        String extra = searchExact + searchMetaData;
+        extra =  HtmlUtil.makeToggleInline("<b>...</b>",extra,false);
+        sb.append(HtmlUtil.formEntry(msgLabel("Text"),
+                                     HtmlUtil.input(ARG_TEXT, name,HtmlUtil.SIZE_50)
+                                     + " " +extra));
     }
 
 
