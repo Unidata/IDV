@@ -73,8 +73,10 @@ CREATE TABLE  metadata (id varchar(200),
                         attr1 varchar(10000),
                         attr2 varchar(10000),
                         attr3 varchar(10000),
-                        attr4 varchar(10000)
-			);
+                        attr4 varchar(10000),
+		        blob ramadda.bigclob);
+
+alter table metadata add column blob ramadda.bigclob;
 
 
 CREATE INDEX METADATA_INDEX_ID ON metadata (ID);

@@ -2125,7 +2125,8 @@ public class TypeHandler extends RepositoryManager {
                     request.getString(ARG_METADATA_ATTR1 + "." + type, ""),
                     request.getString(ARG_METADATA_ATTR2 + "." + type, ""),
                     request.getString(ARG_METADATA_ATTR3 + "." + type, ""),
-                    request.getString(ARG_METADATA_ATTR4 + "." + type, ""));
+                    request.getString(ARG_METADATA_ATTR4 + "." + type, ""),
+                    "");
 
             metadata.setInherited(request.get(ARG_METADATA_INHERITED + "."
                     + type, false));

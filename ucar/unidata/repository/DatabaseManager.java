@@ -854,13 +854,15 @@ public class DatabaseManager extends RepositoryManager {
             sql = sql.replace("ramadda.double", "double");
             sql = sql.replace("ramadda.datetime", "datetime");
             sql = sql.replace("ramadda.clob", "mediumtext");
+            sql = sql.replace("ramadda.bigclob", "longtext");
             //sql = sql.replace("ramadda.datetime", "timestamp");
         } else if (db.equals(DB_DERBY)) {
             sql = sql.replace("ramadda.double", "double");
             sql = sql.replace("ramadda.datetime", "timestamp");
             sql = sql.replace("ramadda.clob", "clob(64000)");
+            sql = sql.replace("ramadda.bigclob", "clob(256000)");
         } else if (db.equals(DB_POSTGRES)) {
-            //TODO: handle ramadda.clob
+            //TODO: handle ramadda.clob and ramadda.bigclob
             sql = sql.replace("ramadda.double", "float8");
             sql = sql.replace("ramadda.datetime", "timestamp");
         }

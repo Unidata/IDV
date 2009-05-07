@@ -473,7 +473,7 @@ public class CatalogTypeHandler extends GenericTypeHandler {
         metadataList.add(new Metadata(repository.getGUID(), entry.getId(),
                                       ThreddsMetadataHandler.TYPE_LINK,
                                       DFLT_INHERITED,
-                                      "Imported from catalog", url, "", ""));
+                                      "Imported from catalog", url, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,Metadata.DFLT_BLOB));
         for (Metadata metadata : metadataList) {
             metadata.setEntryId(entry.getId());
             entry.addMetadata(metadata);

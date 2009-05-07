@@ -79,7 +79,15 @@ import java.util.zip.*;
  * @version $Revision: 1.3 $
  */
 public class Metadata implements Constants {
+    public static String TAG_BLOB = "blob";
+    public static String TAG_ATTRIBUTES = "attributes";
 
+    public static String ATTR_INDEX = "index";
+
+    public static final String DFLT_BLOB = "";
+    public static final String DFLT_ATTR = "";
+    public static final String DFLT_ID = "";
+    public static final String DFLT_ENTRYID = "";
 
     /** _more_ */
     private Entry entry;
@@ -106,6 +114,9 @@ public class Metadata implements Constants {
     /** _more_ */
     private String attr4;
 
+    private String blob;
+    private Hashtable<Integer,String> blobMap;
+
     /** _more_ */
     private boolean inherited = false;
 
@@ -115,7 +126,7 @@ public class Metadata implements Constants {
      * @param type _more_
      */
     public Metadata(String type) {
-        this("", "", type, false, "", "", "", "");
+        this(DFLT_ID, DFLT_ENTRYID, type, false, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_BLOB);
     }
 
 
@@ -129,7 +140,7 @@ public class Metadata implements Constants {
      */
     public Metadata(String id, String entryId, String type,
                     boolean inherited) {
-        this(id, entryId, type, inherited, "", "", "", "");
+        this(id, entryId, type, inherited, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_BLOB);
     }
 
 
@@ -143,8 +154,8 @@ public class Metadata implements Constants {
      * @param attr4 _more_
      */
     public Metadata(String type, String attr1, String attr2, String attr3,
-                    String attr4) {
-        this("", "", type, false, attr1, attr2, attr3, attr4);
+                    String attr4,String blob) {
+        this(DFLT_ID, DFLT_ENTRYID, type, false, attr1, attr2, attr3, attr4,blob);
     }
 
 
@@ -154,7 +165,7 @@ public class Metadata implements Constants {
      * @param type _more_
      */
     public Metadata(MetadataType type) {
-        this("", "", type, false, "", "", "", "");
+        this(DFLT_ID, DFLT_ENTRYID, type, false, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR,DFLT_BLOB);
     }
 
 
@@ -172,9 +183,9 @@ public class Metadata implements Constants {
      */
     public Metadata(String id, String entryId, MetadataType type,
                     boolean inherited, String attr1, String attr2,
-                    String attr3, String attr4) {
+                    String attr3, String attr4,String blob) {
         this(id, entryId, type.getType(), inherited, attr1, attr2, attr3,
-             attr4);
+             attr4,blob);
     }
 
 
@@ -192,7 +203,7 @@ public class Metadata implements Constants {
      */
     public Metadata(String id, String entryId, String type,
                     boolean inherited, String attr1, String attr2,
-                    String attr3, String attr4) {
+                    String attr3, String attr4,String blob) {
         this.id        = id;
         this.entryId   = entryId;
         this.type      = type;
@@ -201,6 +212,8 @@ public class Metadata implements Constants {
         this.attr2     = attr2;
         this.attr3     = attr3;
         this.attr4     = attr4;
+        this.blob      = blob;
+        if(this.blob ==null) this.blob = "";
     }
 
     /**
@@ -219,6 +232,8 @@ public class Metadata implements Constants {
         this.attr2     = that.attr2;
         this.attr3     = that.attr3;
         this.attr4     = that.attr4;
+        this.blob      = that.blob;
+        if(this.blob ==null) this.blob = "";
     }
 
     /**
@@ -301,6 +316,9 @@ public class Metadata implements Constants {
         if (idx == 4) {
             attr4 = value;
         }
+        Hashtable<Integer,String> blobMap = getBlobMap();
+        blobMap.put(new Integer(idx), value);
+        this.blob = null;
     }
 
 
@@ -429,7 +447,12 @@ public class Metadata implements Constants {
         if (idx == 4) {
             return attr4;
         }
-        throw new IllegalArgumentException("Bad attr idx:" + idx);
+        Hashtable<Integer,String> blobMap = getBlobMap();
+        return blobMap.get(new Integer(idx));
+        //        throw new IllegalArgumentException("Bad attr idx:" + idx);
+        
+
+
     }
 
 
@@ -732,6 +755,7 @@ public class Metadata implements Constants {
                && Misc.equals(this.attr2, that.attr2)
                && Misc.equals(this.attr3, that.attr3)
                && Misc.equals(this.attr4, that.attr4)
+               && Misc.equals(this.blob,  that.blob)
                && Misc.equals(this.entryId, that.entryId);
     }
 
@@ -756,6 +780,69 @@ public class Metadata implements Constants {
     public Entry getEntry() {
         return entry;
     }
+
+/**
+Set the Blob property.
+
+@param value The new value for Blob
+**/
+public void setBlob (String value) {
+	this.blob = value;
+}
+
+/**
+Get the Blob property.
+
+@return The Blob
+**/
+public String getBlob () {
+    if(this.blob == null) {
+        if(blobMap==null) return null;
+        try {
+    Document doc   = XmlUtil.makeDocument();
+        Element  root  = XmlUtil.create(doc, TAG_ATTRIBUTES, (Element)null);
+        for (Enumeration keys =
+                 blobMap.keys(); keys.hasMoreElements(); ) {
+            Integer index = (Integer) keys.nextElement();
+            String blob = blobMap.get(index);
+            XmlUtil.create(doc,TAG_BLOB,root,blob,new String[]{
+                ATTR_INDEX,index.toString()});
+        }
+        this.blob = XmlUtil.toString(root,false);
+        } catch(Exception exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+    return this.blob;
+}
+
+
+    public Hashtable<Integer,String> getBlobMap () {
+    if(blobMap!=null) return blobMap;
+    Hashtable<Integer,String> tmp = new Hashtable<Integer,String>();
+    if(blob != null && blob.length()>0) {
+        try {
+        Element root = XmlUtil.getRoot(blob);
+        if (root != null) {
+            List elements = XmlUtil.findChildren(root,
+                                                 TAG_BLOB);
+
+            for (int j = 0; j < elements.size(); j++) {
+                Element blobNode = (Element) elements.get(j);
+                int index = XmlUtil.getAttribute(blobNode, ATTR_INDEX,-1);
+                String text = XmlUtil.getChildText(blobNode);
+                if(text==null) text="";
+                tmp.put(new Integer(index),text);
+            }
+        }
+        } catch(Exception exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+    blobMap = tmp;
+    blob = null;
+    return tmp;
+}
 
 
 

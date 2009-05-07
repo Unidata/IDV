@@ -315,6 +315,7 @@ public class CatalogOutputHandler extends OutputHandler {
                           ? entries.get(0).getName()
                           : group.getFullName());
         Document doc   = XmlUtil.makeDocument();
+
         Element  root  = XmlUtil.create(doc, CatalogUtil.TAG_CATALOG, null, new String[] {
             "xmlns",
             "http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0",

@@ -185,20 +185,19 @@ public class DifHarvester extends Harvester {
     <Location_Type>Arctic</Location_Type>
   </Location>
 
-  <Quality>The relationship between freeze/thaw depth and freezing and thawing indices has been demonstrated in several places. For example, Brown et al. (2000) review the relationship between thaw depth and the annual thawing index. Romanovsky and Osterkamp (1995), Zhang et al. (1997), Nelson et al. (1998), Klene et al. (2001), and Hinkel and Nelson (2003) all demonstrate the general validity of the approach. Nelson et al. (1997) used the approach to map to map active layer depth for the Kuparuk River Basin in Alaska. Zhang et al. (2005b) also use the approach to map active layer depth in the Ob, Yenisey, and Lena River Basins of Russia.
+  <>The relationship between freeze/thaw depth and freezing and thawing indices has been demonstrated in several places. For example, Brown et al. (2000) review the relationship between thaw depth and the annual thawing index. Romanovsky and Osterkamp (1995), Zhang et al. (1997), Nelson et al. (1998), Klene et al. (2001), and Hinkel and Nelson (2003) all demonstrate the general validity of the approach. Nelson et al. (1997) used dthe apData_Set_LanguageQualityproach to map to map active layer depth for the Kuparuk River Basin in Alaska. Zhang et al. (2005b) also use the approach to map active layer depth in the Ob, Yenisey, and Lena River Basins of Russia.
 
-The quality of the input freezing and thawing indices is described in Frauenfeld, et al. (submitted) and in the documentation for the data set. The investigators conclude they are adequate for broad scale analysis. The difficulty lies in calculating the edaphic factors. There is some uncertainty in the estimation of the edaphic factors as discussed in Zhang et al. (2005b). Overall this approach is reasonable for broad scale calculations and for estimating the response of freeze and thaw depth to different climatological factors.</Quality>
-  <Data_Set_Language>English</Data_Set_Language>
-  <Originating_Center>NSIDC_FGDC</Originating_Center>
+The quality of the input freezing and thawing indices is described in Frauenfeld, et al. (submitted) and in the documentation for the data set. The investigators conclude they are adequate for broad scale analysis. The difficulty lies in calculating the edaphic factors. There is some uncertainty in the estimation of the edaphic factors as discussed in Zhang et al. (2005b). Overall this approach is reasonable for broad scale calculations and for estimating the response of freeze and thaw depth to different climatological factors.</Quality>Data_Center
+  <>English</Data_Set_Language>
+  <>NSIDC_FGDC</Originating_Center>
   <Data_Center>
     <Data_Center_Name>
       <Short_Name>NSIDC_FGDC</Short_Name>
       <Long_Name>NSIDC Frozen Ground Data Center</Long_Name>
-
     </Data_Center_Name>
     <Data_Center_URL>http://nsidc.org/fgdc/</Data_Center_URL>
     <Data_Set_ID>GGD651</Data_Set_ID>
-    <Personnel>
+    <Personnel>Originating_Center
       <Role>Data Center Contact</Role>
       <First_Name>NSIDC FGDC</First_Name>
       <Last_Name>User Services</Last_Name>
@@ -276,6 +275,7 @@ Zhang, T., O. W. Frauenfeld, J. McCreight, and R. G. Barry. 2005a. Northern Hemi
 Zhang, T., O. W. Frauenfeld, M. C. Serreze, A. Etringer, C. Oelke, J. McCreight, R. G. Barry, D. Gilichinsky, D. Yang, H. Ye, F. Ling, and S. Chudinova. 2005b. Spatial and temporal variability in active layer thickness over the Russian Arctic drainage basin. J Geophysical Research, Vol. 110, D16101. doi:10.1029/2004JD005642.
 
 Zhang, T., T. E. Osterkamp, and K. Stamnes. 1997. Effects of climate on the active layer and permafrost on the north slope of Alaska, U.S.A. Permafrost Periglacial Proc., 8, 45-67.</Reference>
+
   <Summary>This data set contains mean, median, minimum and maximum freeze and thaw depths for each year from  1901 to 2002 on the 25 km resolution Equal-Area Scalable Earth Grid (EASE-Grid) for areas north of 50  deg. Freeze and thaw depths are estimated using a variant of the Stefan solution using an edaphic factor  and freezing or thawing indices as inputs. The edaphic factor is estimated based on different land surface  types; the freezing and thawing indices are from Northern Hemisphere EASE-Grid annual freezing  and thawing indices, 1901 - 2002 (Zhang, et al. 2005).
 
 Two ASCII files are available for each year for freeze depth and thaw depth, respectively. Each file is  approximately 25.6 MB in size. In addition, there is one 10.5 MB ASCII file defining the latitude and longitude coordinates for each grid point. The data set is available via FTP as three compressed files.</Summary>

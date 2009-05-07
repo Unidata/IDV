@@ -191,7 +191,7 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
             for (String cat : (List<String>) categories) {
                 Metadata metadata = new Metadata(getRepository().getGUID(),
                                         entry.getId(), "wikicategory", false,
-                                        cat, "", "", "");
+                                        cat, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,Metadata.DFLT_BLOB);
                 //                getMetadataManager().insertMetadata(metadata);
                 metadataList.add(metadata);
             }

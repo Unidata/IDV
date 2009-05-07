@@ -328,12 +328,14 @@ public class MetadataManager extends RepositoryManager {
                 int             col     = 1;
                 String          type    = results.getString(3);
                 MetadataHandler handler = findMetadataHandler(type);
+                
                 metadataList.add(
                     handler.makeMetadata(
                         results.getString(col++), results.getString(col++),
                         results.getString(col++), results.getInt(col++) == 1,
                         results.getString(col++), results.getString(col++),
-                        results.getString(col++), results.getString(col++)));
+                        results.getString(col++), results.getString(col++),
+                        results.getString(col++)));
             }
         }
 
@@ -1084,7 +1086,7 @@ public class MetadataManager extends RepositoryManager {
             new Integer(metadata.getInherited()
                         ? 1
                         : 0), metadata.getAttr1(), metadata.getAttr2(),
-            metadata.getAttr3(), metadata.getAttr4()
+            metadata.getAttr3(), metadata.getAttr4(), metadata.getBlob()
         });
     }
 

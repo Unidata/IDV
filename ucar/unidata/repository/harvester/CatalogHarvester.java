@@ -332,7 +332,7 @@ public class CatalogHarvester extends Harvester {
             if (ext.length() > 0) {
                 entry.addMetadata(new Metadata(repository.getGUID(),
                         entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,
-                        DFLT_INHERITED, ext, "", "", ""));
+                        DFLT_INHERITED, ext, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,Metadata.DFLT_BLOB));
             }
             Resource resource = null;
             if (download
@@ -381,7 +381,7 @@ public class CatalogHarvester extends Harvester {
                                           ThreddsMetadataHandler.TYPE_LINK,
                                           DFLT_INHERITED,
                                           "Imported from catalog",
-                                          catalogUrlPath, "", ""));
+                                          catalogUrlPath, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,Metadata.DFLT_BLOB));
             for (Metadata metadata : metadataList) {
                 metadata.setEntryId(entry.getId());
                 entry.addMetadata(metadata);
@@ -413,7 +413,7 @@ public class CatalogHarvester extends Harvester {
                                           ThreddsMetadataHandler.TYPE_LINK,
                                           DFLT_INHERITED,
                                           "Imported from catalog",
-                                          catalogUrlPath, "", ""));
+                                          catalogUrlPath, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,Metadata.DFLT_BLOB));
 
             insertMetadata(group, metadataList);
             String crumbs = getEntryManager().getBreadCrumbs(null, group,

@@ -546,7 +546,7 @@ public class WebHarvester extends Harvester {
             for (int i = 0; i < tags.size(); i++) {
                 entry.addMetadata(new Metadata(repository.getGUID(),
                         entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,
-                        DFLT_INHERITED, (String) tags.get(i), "", "", ""));
+                        DFLT_INHERITED, (String) tags.get(i),Metadata.DFLT_ATTR, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,Metadata.DFLT_BLOB));
             }
 
         }

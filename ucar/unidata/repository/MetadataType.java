@@ -85,6 +85,8 @@ public class MetadataType implements Constants {
     public static final String TAG_HANDLER = "handler";
 
     /** _more_ */
+    public static final String ATTR_INDEX = "index";
+
     public static final String ATTR_ROWS = "rows";
 
     /** _more_ */
@@ -184,21 +186,6 @@ public class MetadataType implements Constants {
     private Hashtable<String, String> templates = new Hashtable<String,
                                                       String>();
 
-    /** _more_ */
-    public static final int SEARCHABLE_ATTR1 = 1 << 0;
-
-    /** _more_ */
-    public static final int SEARCHABLE_ATTR2 = 1 << 1;
-
-    /** _more_ */
-    public static final int SEARCHABLE_ATTR3 = 1 << 3;
-
-    /** _more_ */
-    public static final int SEARCHABLE_ATTR4 = 1 << 4;
-
-    /** _more_ */
-    public int searchableMask = 0;
-
 
 
 
@@ -277,7 +264,7 @@ public class MetadataType implements Constants {
                           "ucar.unidata.repository.MetadataHandler"));
 
             MetadataHandler handler = manager.getHandler(c);
-            String          type    = XmlUtil.getAttribute(node, ATTR_TYPE);
+            String          type    = XmlUtil.getAttribute(node, ATTR_TYPE,MetadataElement.TYPE_STRING);
             MetadataType metadataType = new MetadataType(type,
                                             XmlUtil.getAttribute(node,
                                                 ATTR_NAME, type));
@@ -310,6 +297,7 @@ public class MetadataType implements Constants {
             List elements = XmlUtil.findChildren(node,
                                 MetadataType.TAG_ELEMENT);
 
+            int lastIndex = 0;
             for (int j = 0; j < elements.size(); j++) {
                 //    <element type="string" label="Name"/>
                 Element elementNode = (Element) elements.get(j);
@@ -318,9 +306,14 @@ public class MetadataType implements Constants {
                                          ATTR_TYPE);
                 String dflt = XmlUtil.getAttribute(elementNode, ATTR_DEFAULT,
                                   "");
+                int index = lastIndex+1;
+                if(XmlUtil.hasAttribute(elementNode, ATTR_INDEX)) {
+                    index = XmlUtil.getAttribute(elementNode, ATTR_INDEX, index);
+                }
+                lastIndex = index;
                 MetadataElement element =
                     new MetadataElement(
-                        metadataType, j + 1, elementType,
+                        metadataType, lastIndex, elementType,
                         XmlUtil.getAttribute(elementNode, ATTR_LABEL),
                         XmlUtil.getAttribute(elementNode, ATTR_ROWS, 1),
                         XmlUtil.getAttribute(elementNode, ATTR_COLUMNS, 60),
@@ -535,11 +528,11 @@ public class MetadataType implements Constants {
         template = template.replace("${root}",
                                     handler.getRepository().getUrlBase());
 
-        for (int attr = 1; attr <= 4; attr++) {
-            template = template.replace("${attr" + attr + "}",
-                                        metadata.getAttr(attr));
-            template = template.replace("${attr" + attr + ".cdata}",
-                                        "[CDATA[" + metadata.getAttr(attr)
+        for (MetadataElement element : elements) {
+            template = template.replace("${attr" + element.getIndex() + "}",
+                                        metadata.getAttr(element.getIndex()));
+            template = template.replace("${attr" + element.getIndex() + ".cdata}",
+                                        "[CDATA[" + metadata.getAttr(element.getIndex())
                                         + "]]");
         }
         template = "<tmp>" + template + "</tmp>";
@@ -809,12 +802,13 @@ public class MetadataType implements Constants {
         }
 
         String nameString = name;
-        for (int attr = 1; attr <= 4; attr++) {
-            String value = metadata.getAttr(attr);
+
+        for (MetadataElement element : elements) {
+            String value = metadata.getAttr(element.getIndex());
             if (value == null) {
                 value = "";
             }
-            nameString = nameString.replace("${attr" + attr + "}", value);
+            nameString = nameString.replace("${attr" + element.getIndex() + "}", value);
         }
 
 
@@ -822,12 +816,12 @@ public class MetadataType implements Constants {
         String htmlTemplate = getTemplate(TEMPLATETYPE_HTML);
         if (htmlTemplate != null) {
             String html = htmlTemplate;
-            for (int attr = 1; attr <= 4; attr++) {
-                String value = metadata.getAttr(attr);
+            for (MetadataElement element : elements) {
+                String value = metadata.getAttr(element.getIndex());
                 if (value == null) {
                     value = "null";
                 }
-                html = html.replace("${attr" + attr + "}", value);
+                html = html.replace("${attr" + element.getIndex() + "}", value);
             }
             content.append(html);
         } else {
@@ -875,27 +869,19 @@ public class MetadataType implements Constants {
                                         + HtmlUtil.space(1) + name);
         String cancel = HtmlUtil.submit(handler.msg("Cancel"), ARG_CANCEL);
 
-        String[] args = { ARG_METADATA_ATTR1 + suffix,
-                          ARG_METADATA_ATTR2 + suffix,
-                          ARG_METADATA_ATTR3 + suffix,
-                          ARG_METADATA_ATTR4 + suffix };
-
-        String[] values = { metadata.getAttr1(), metadata.getAttr2(),
-                            metadata.getAttr3(), metadata.getAttr4() };
-
 
         StringBuffer sb  = new StringBuffer();
 
-        int          cnt = 0;
+
         for (MetadataElement element : elements) {
             String elementLbl = handler.msgLabel(element.getLabel());
             String widget = element.getForm(request, entry, metadata,
-                                            args[cnt], values[cnt], forEdit);
+                                            ARG_METADATA_ATTR+element.getIndex()+suffix, 
+                                            metadata.getAttr(element.getIndex()), forEdit);
             if ((widget == null) || (widget.length() == 0)) {}
             else {
                 sb.append(HtmlUtil.formEntry(elementLbl, widget));
             }
-            cnt++;
         }
 
         sb.append(HtmlUtil.formEntry(handler.msgLabel("Inherited"),
@@ -950,53 +936,6 @@ public class MetadataType implements Constants {
         return Misc.equals(this.type, type);
     }
 
-    /**
-     * _more_
-     *
-     * @param mask _more_
-     *
-     * @return _more_
-     */
-    public boolean isSearchable(int mask) {
-        return (searchableMask & mask) != 0;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean isAttr1Searchable() {
-        return isSearchable(SEARCHABLE_ATTR1);
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean isAttr2Searchable() {
-        return isSearchable(SEARCHABLE_ATTR2);
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean isAttr3Searchable() {
-        return isSearchable(SEARCHABLE_ATTR3);
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean isAttr4Searchable() {
-        return isSearchable(SEARCHABLE_ATTR4);
-    }
 
 
     /**

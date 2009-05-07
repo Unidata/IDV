@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<metadata>
+
+  <handler category="ucar.unidata.repository.data.DifMetadataHandler">
+
+<type name="dif.entry_title" type="dif.entry_title" searchable="true">
+      <element label="Title"/>
+</type>
+
+<type name="dif.data_set_citation" type="dif.data_set_citation" searchable="true">
+</type>
+
+<type name="dif.personnel" type="dif.personnel" searchable="true">
+</type>
+
+<type name="dif.parameters" type="dif.parameters" searchable="true">
+</type>
+
+<type name="dif.iso_topic_category" type="dif.iso_topic_category" searchable="true">
+</type>
+
+<type name="dif.keyword" type="dif.keyword" searchable="true">
+</type>
+
+<type name="dif.data_set_progress" type="dif.data_set_progress" searchable="true">
+</type>
+
+<type name="dif.location" type="dif.location" searchable="true">
+</type>
+
+<type name="dif.quality" type="dif.quality" searchable="true">
+</type>
+
+<type name="dif.data_set_language" type="dif.data_set_language" searchable="true">
+</type>
+
+<type name="dif.originating_center" type="dif.originating_center" searchable="true">
+</type>
+
+<type name="dif.data_center" type="dif.data_center" searchable="true">
+</type>
+
+<type name="dif.distribution" type="dif.distribution" searchable="true">
+</type>
+
+<type name="dif.reference" type="dif.reference" searchable="true">
+</type>
+
+<type name="dif.summary" type="dif.summary" searchable="true">
+</type>
+
+<type name="dif.related_url" type="dif.related_url" searchable="true">
+</type>
+
+<type name="dif.metadata_name" type="dif.metadata_name" searchable="true">
+</type>
+
+<type name="dif.metadata_version" type="dif.metadata_version" searchable="true">
+</type>
+
+
+  </handler>
+
+</metadata>
