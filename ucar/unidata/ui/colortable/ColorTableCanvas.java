@@ -143,6 +143,11 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
     /** Tracks if the color table has been changed on a mouse drag. */
     private boolean needToPropagateChanges = false;
 
+    private Color selectedColor;
+
+    private boolean cursorOver = false;
+    private int cursorPosition = 0;
+
     /** Allows us to not propagate during the mouse drag */
     private boolean okToPropagateChangesNow = true;
 
@@ -221,6 +226,8 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
 
     /** Use trans. mode */
     private JRadioButton modeTransparencyBtn;
+
+    private JComponent colorSwatch;
 
     /** Use trans. mode */
     private JRadioButton modeBrightnessBtn;
@@ -375,10 +382,14 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         colorChooser.getSelectionModel().addChangeListener(
             new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                selectedColor = colorChooser.getColor();
+                colorSwatch.setBackground(selectedColor);
                 if (inPaint) {
                     return;
                 }
-                setColor(colorChooser.getColor());
+                if(currentMode == MODE_FILL) {
+                    setColor(selectedColor);
+                }
             }
         });
 
@@ -432,6 +443,10 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
 
         ButtonGroup modeGroup = new ButtonGroup();
         List        modeBtns  = Misc.newList(new JLabel("Edit mode: "));
+        colorSwatch = GuiUtils.filler(30,20);
+        colorSwatch.setSize(new Dimension(30,20));
+        //        colorSwatch.setBorder(BorderFactory.createEtchedBorder());
+        colorSwatch.setBorder(BorderFactory.createLineBorder(Color.black));
         for (int i = 0; i < modes.length; i++) {
             JRadioButton rb = new JRadioButton(modeNames[i], (i == 0));
             modeGroup.add(rb);
@@ -443,6 +458,12 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
                     }
                 }
             });
+
+            //Add in the color swatch after the fill
+            if (modes[i] == MODE_FILL) {
+                modeBtns.add(GuiUtils.wrap(colorSwatch));
+            }
+
             //Add in the transparency box after the
             if (modes[i] == MODE_TRANSPARENCY) {
                 modeBtns.add(GuiUtils.left(GuiUtils.wrap(transBox)));
@@ -1162,11 +1183,21 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      * @param e event
      */
     public void checkCursor(MouseEvent e) {
-        if(isInBox(e)) {
+        if(cursorOver == isInBox(e)) {
+            if(cursorPosition != e.getX()) {
+                cursorPosition = e.getX();
+                repaint();
+            }
+            return;
+        }
+        cursorOver = !cursorOver;
+        cursorPosition = e.getX();
+        if(cursorOver) {
             setCursor(getPaintCursor());
         } else {
             setCursor(normalCursor);
         }
+        repaint();
     } 
 
     /**
@@ -1205,6 +1236,10 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
               saveCurrentBreakpoints();
               break;
 
+          
+             
+              
+
           default :
               activePercent = xToPercent(event.getX());
               prepColorChange();
@@ -1216,6 +1251,13 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
               activeColorIndex =
                   percentToColorIndex(xToPercent(event.getX()));
               priorColors = (ArrayList) colorList.clone();
+              if(mouseInBox && currentMode == MODE_FILL && selectedColor!=null && activeColorIndex>=0) {
+                  colorList.set(activeColorIndex, selectedColor);
+                  tableChanged();
+                  repaint();
+              }
+
+
         }
     }
 
@@ -1754,10 +1796,11 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      * @param c The color
      */
     public void setColor(Color c) {
+        
         if (currentBP == null) {
             return;
         }
-        if(true) return;
+        //        if(true) return;
         double percent = currentBP.getValue();
         int    index   = percentToColorIndex(percent);
         Color  current = (Color) colorList.get(index);
@@ -2465,6 +2508,20 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         g.drawString(maxLabel,
                      MARGIN_H + box.width - fm.stringWidth(maxLabel) / 2,
                      lineHeight + MARGIN_V + box.height);
+
+
+        if(cursorOver) {
+            double percent = xToPercent(cursorPosition);
+            int    index   = percentToColorIndex(percent);
+            String value = Misc.format(percentToValue(percent));
+            g.setColor(Color.gray);
+            g.drawLine(cursorPosition,box.y,cursorPosition,box.y+box.height);
+            g.drawString(value,
+                     cursorPosition,
+                     lineHeight + MARGIN_V + box.height);
+        }
+
+
     }
 
 
