@@ -1,0 +1,66 @@
+Online Internet (HTTP)
+Online FTP
+E-mail
+Various Online Data Transfer method
+CD-ROM
+DVD
+3.5 in. Diskette Macintosh Format
+3.5 in. Diskette IBM Format
+5.25 in. Floppy Disk
+8 in. Floppy Disk
+8 mm DAT Tape
+4 mm DAT Tape
+IBM 3480 Tape
+Cassette Tape
+6-Track Tape
+8-Track Tape
+9-Track Tape
+Various track Tape
+Ditto Tape
+QTR Tape
+QIC Tape
+Travan Tape
+Jaz Disk
+LS-120 Disk
+Aquidneck Optical Disk
+5 in. Magneto Optical Disk
+Sony Formatted Optical Disk
+Vax Formatted Optical Disk
+Syquest Optical Disk
+Bernoulli Optical Disk
+Zip Disk
+Verbatim TR Minicartridge
+Fuji DLT Compactape Cartridge
+Removable Hard Drive
+External Hard Drive
+ROM Chip
+ROM Card
+11x14 in. HCMM Encoded
+AudioTape
+Video Tape
+Printed Book/Volume
+Manuscript (handwritten) book/journal
+Series/Collection of printed books or manuscripts
+Printed looseleaf pages bound
+Printed looseleaf pages unbound
+Computer printer printout
+Difax printout
+Computer punchcards
+Plotter printout
+Black & White transparencies
+Color transparencies
+Black & White slides
+Color slides
+Black & White prints
+Black & White positives
+Black & White negatives
+Color prints
+Color positives
+Color negatives
+Black & White Microfiche Cards
+Color Microfiche Cards
+Black & White Microfilm
+Color Microfilm
+Black & White Motion Picture film
+Color Motion Picture film
+            

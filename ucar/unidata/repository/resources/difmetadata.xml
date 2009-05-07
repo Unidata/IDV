@@ -3,20 +3,147 @@
 
   <handler category="ucar.unidata.repository.data.DifMetadataHandler">
 
-<type name="dif.entry_title" type="dif.entry_title" searchable="true">
+<type name="Entry Title" type="dif.entry_title" searchable="true">
       <element label="Title"/>
 </type>
 
-<type name="dif.data_set_citation" type="dif.data_set_citation" searchable="true">
+<type name="Parameters" type="dif.parameters" searchable="true">
+      <element label="Category" type="enumeration" 
+         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
+      <element label="Topic" type="enumeration" 
+         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
+      <element label="Term" type="enumeration" 
+         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
+      <element label="Variable Level 1" type="enumeration" 
+         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
+      <element label="Variable Level 2" type="enumeration" 
+         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
+      <element label="Variable Level 3" type="enumeration" 
+         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
+      <element label="Detailed Variable"/>
 </type>
 
-<type name="dif.personnel" type="dif.personnel" searchable="true">
+<type name="ISO Topic Category" type="dif.iso_topic_category" searchable="true">
+      <element label="Category" type="enumeration" 
+         values="file:/ucar/unidata/repository/resources/metadata/dif/isotopiccategories.txt"/>>
 </type>
 
-<type name="dif.parameters" type="dif.parameters" searchable="true">
+<type name="Data Center" type="dif.data_center" searchable="true">
+      <element label="Short Name"/>      
+      <element label="Long Name"/>      
+      <element label="URL"type="url"/>      
+      <element label="Set ID"/>      
+      <element label="Personnel-Role"  group="Personnel"/>      
+      <element label="Personnel-First Name"  group="Personnel"/>      
+      <element label="Personnel-Middle Name"  group="Personnel"/>      
+      <element label="Personnel-Last Name"  group="Personnel"/>      
+      <element label="Personnel-Email" type="email"  group="Personnel"/>      
+      <element label="Personnel-Phone"  group="Personnel"/>
+      <element label="Personnel-Fax"  group="Personnel"/>
+      <element label="Personnel-Address" rows="3"  group="Personnel"/>
+      <element label="Personnel-City"  group="Personnel"/>
+      <element label="Personnel-State or Province"  group="Personnel"/>
+      <element label="Personnel-Postal Code"  group="Personnel"/>
+      <element label="Personnel-Country"  group="Personnel"/>
 </type>
 
-<type name="dif.iso_topic_category" type="dif.iso_topic_category" searchable="true">
+
+<type name="Summary" type="dif.summary" searchable="true">
+      <element label="Summary" rows="5"/>
+
+</type>
+
+<type name="Quality" type="dif.quality" searchable="true">
+      <element label="Quality" rows="5"/>
+
+</type>
+
+<type name="Metadata Name" type="dif.metadata_name" searchable="true">
+      <element label="Name" default="CEOS IDN DIF"/>
+</type>
+
+<type name="Metadata Version" type="dif.metadata_version" >
+      <element label="Version" default="9.7"/>
+</type>
+
+
+<type name="Data Set Citation" type="dif.data_set_citation" searchable="true">
+      <element label="Dataset Creator"/>
+      <element label="Dataset Title"/>
+      <element label="Dataset Series Name"/>
+      <element label="Dataset Release Date"/>
+      <element label="Dataset Release Place"/>
+      <element label="Dataset Publisher"/>
+      <element label="Version"/>
+      <element label="Issue Identification"/>
+      <element label="Data Presentation Form"/>
+      <element label="Other Citation Details"/>
+      <element label="Online Resource"/>
+
+</type>
+
+<type name="Personnel" type="dif.personnel" searchable="true" >searchable="true"
+      <element label="Role" searchable="true"/>      
+      <element label="First Name"/>      
+      <element label="Middle Name"/>      
+      <element label="Last Name" searchable="true"/>      
+      <element label="Email" type="email"/>      
+      <element label="Phone"/>
+      <element label="Fax"/>
+      <element label="Address" rows="3" group="Address"/>
+      <element label="City" group="Address"/>
+      <element label="State or Province" group="Address"/>
+      <element label="Postal Code" group="Address"/>
+      <element label="Country" group="Address"/>
+</type>
+
+
+<type name="Instrument" type="dif.instrument" searchable="true">
+      <element label="Short Name"/>      
+      <element label="Long Name"/>      
+</type>
+
+
+<type name="Platform" type="dif.platform" searchable="true">
+      <element label="Short Name"/>      
+      <element label="Long Name"/>      
+</type>
+
+
+<type name="Project" type="dif.project" searchable="true">
+      <element label="Short Name"/>      
+      <element label="Long Name"/>      
+</type>
+
+<type name="Paleo Temporal Coverage" type="dif.paleotemporalcoverage">
+      <element label="Start Date"/>      
+      <element label="End Date"/>      
+      <element label="Eon"/>      
+      <element label="Era"/>      
+      <element label="Period"/>      
+      <element label="Epoch"/>      
+      <element label="Stage"/>      
+</type>
+
+
+<type name="Location" type="dif.location" searchable="true">
+      <element label="Category" type="enumeration" values="continent:Continent,ocean:Ocean,geographicregion:Geographic Region,solidearth:Solid Earth,space:Space,verticallocation:Vertical Location"/>      
+      <element label="Type"/>      
+      <element label="Sub-Region 1"/>      
+      <element label="Sub-Region 2"/>      
+      <element label="Sub-Region 3"/>      
+      <element label="Detailed Location"/>      
+</type>
+
+
+<type name="Data Resolution" type="dif.dataresolution" searchable="true">
+      <element label="Latitude Resolution"/>      
+      <element label="Longitude Resolution"/>      
+      <element label="Horizontal Resolution Range"/>      
+      <element label="Vertical Resolution"/>      
+      <element label="Vertical Resolution Range"/>      
+      <element label="Temporal Resolution"/>      
+      <element label="Temporal Resolution Range"/>      
 </type>
 
 <type name="dif.keyword" type="dif.keyword" searchable="true">
@@ -25,11 +152,27 @@
 <type name="dif.data_set_progress" type="dif.data_set_progress" searchable="true">
 </type>
 
-<type name="dif.location" type="dif.location" searchable="true">
+
+
+<type name="Access Constraints" type="dif.accesscontraints" searchable="true">
+      <element label="Constraints" rows="5"/>      
 </type>
 
-<type name="dif.quality" type="dif.quality" searchable="true">
+<type name="Use Constraints" type="dif.usecontraints" searchable="true">
+      <element label="Constraints" rows="5"/>      
 </type>
+
+<type name="Distribution" type="dif.distribution" searchable="true">
+      <element label="Media" type="enumeration" 
+         values="file:/ucar/unidata/repository/resources/metadata/mediatypes.txt"/>
+      <element label="Size" />      
+      <element label="Format" />      
+      <element label="Fees" />      
+</type>
+
+
+
+
 
 <type name="dif.data_set_language" type="dif.data_set_language" searchable="true">
 </type>
@@ -37,8 +180,7 @@
 <type name="dif.originating_center" type="dif.originating_center" searchable="true">
 </type>
 
-<type name="dif.data_center" type="dif.data_center" searchable="true">
-</type>
+
 
 <type name="dif.distribution" type="dif.distribution" searchable="true">
 </type>
@@ -46,17 +188,13 @@
 <type name="dif.reference" type="dif.reference" searchable="true">
 </type>
 
-<type name="dif.summary" type="dif.summary" searchable="true">
-</type>
 
 <type name="dif.related_url" type="dif.related_url" searchable="true">
 </type>
 
-<type name="dif.metadata_name" type="dif.metadata_name" searchable="true">
-</type>
 
-<type name="dif.metadata_version" type="dif.metadata_version" searchable="true">
-</type>
+
+
 
 
   </handler>
