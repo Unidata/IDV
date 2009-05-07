@@ -1027,7 +1027,7 @@ public class DatabaseManager extends RepositoryManager {
                                            tables +
                                            "\nclause:" + clause +
                                            "\nextra:" + extra+
-                                           + "max:" + max);
+                                           "max:" + max);
                         Misc.printStack("select",20);
                     }
                 }
