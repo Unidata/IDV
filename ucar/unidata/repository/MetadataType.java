@@ -95,6 +95,8 @@ public class MetadataType implements Constants {
     /** _more_ */
     public static final String ATTR_COLUMNS = "columns";
 
+    public static final String ATTR_DEPENDS = "depends";
+
     /** _more_ */
     public static final String ATTR_SHOWINHTML = "showinhtml";
 

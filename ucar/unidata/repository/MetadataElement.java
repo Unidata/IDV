@@ -73,6 +73,12 @@ public class MetadataElement implements Constants {
     /** _more_ */
     public static final String TYPE_ENUMERATION = "enumeration";
 
+    public static final String TYPE_ENUMERATIONPLUS = "enumerationplus";
+
+
+    public static final String TYPE_DEPENDENTENUMERATION = "dependentenumeration";
+
+
     /** _more_ */
     private String type = TYPE_STRING;
 
@@ -288,6 +294,9 @@ public class MetadataElement implements Constants {
         } else if (type.equals(TYPE_BOOLEAN)) {
             return HtmlUtil.checkbox(arg, "true", Misc.equals(value, "true"));
         } else if (type.equals(TYPE_ENUMERATION)) {
+            return HtmlUtil.select(arg, values, value);
+
+        } else if (type.equals(TYPE_ENUMERATIONPLUS)) {
             return HtmlUtil.select(arg, values, value);
         } else if (type.equals(TYPE_FILE)) {
             String image = (forEdit
