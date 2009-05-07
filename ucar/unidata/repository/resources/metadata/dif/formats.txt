@@ -1,0 +1,65 @@
+ACC
+ARCE:	 ARC/INFO Export
+ARCG
+ASCII:	 American Standard Code for Information Interchange
+BIL:	 Band Interleaved by Line
+BIP:	 Band Interleaved by Pixel
+BSQ:	 Band Sequential
+EXCEL:	 Microsoft Excel
+CDF:	 Common Data Format
+CFF
+COORD
+DBF:	 Database File
+DEM:	 Digital Elevation Model
+DFAD	
+DGN
+DIF
+DIGEST
+DLG:	 Digital Line Graph
+DOC:	 Document
+DTED
+DWG
+DX90
+DXF
+EPS:	 Encapsulated Postscript
+ERDAS:	 Erdas
+FW
+GEOTIFF
+GIF:	 Graphics Interchange Format
+GRA
+GRASS:	 Geographical Resources Analysis Support System
+HDF:		 Hierarchical Data Format
+HTML:	 HyperText Markup Language
+IGDS
+IGES:	 Initial Graphics Exchange Standard
+JPEG:	 Joint Photographic Experts Group
+MS Word:  Microsoft Word
+MOSS
+MPEG:	 Motion Picture Experts Group
+Native Format
+netCDF:	 NETwork Common Data Format
+NITF:	 National Imagery Transmission Format
+PBM
+PDF:	 Portable Document Format
+PLT
+PNG:	 Portable Network Graphics
+PS:		 Postscript
+QP
+RPD
+RPF
+RVC
+RVF
+SDTS:	 Spatial Data Transfer Standard
+SHP:	 ArcView Shapefile
+SIF
+SLF
+SPLUS:	 Splus statistical software
+TIFF:	 Tagged Image File Format
+TGRLN:	 Tiger Line File
+VPF
+WK1:	 Lotus Worksheet
+WKS:	   Lotus Worksheet
+WP:	     WordPerfect
+WMS:	 Web Map Service
+WCS:	 Web Coverage Service
+WFS:	 Web Feature Service
