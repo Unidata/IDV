@@ -257,7 +257,7 @@ example:
      displaycategory="Trajectory"
      properties="showInTabs=false;windowVisible=true;"/>
 
-
+ <!--
   <control
      id="stormintesitydisplay"
      categories="IMAGE-*-*"
@@ -267,7 +267,7 @@ example:
      properties="">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
-
+  -->
 
 
 <!--
