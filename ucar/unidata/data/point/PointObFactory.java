@@ -1364,13 +1364,18 @@ public class PointObFactory {
             if (llr != null) {
                 collection = collection.subset(llr, null);
             }
+        } else if (fc instanceof NestedPointFeatureCollection) {
             NestedPointFeatureCollection npfc =
                 (NestedPointFeatureCollection) fc;
             if (llr != null) {
                 npfc = npfc.subset(llr);
             }
             collection = npfc.flatten(llr, null);
+        } else {
+            throw new IllegalArgumentException(
+                "Can't handle collection of type " + fc.getClass().getName());
         }
+            
         //System.out.println("number of obs = " + collection.size());
         int total = collection.size();
         PointFeatureIterator dataIterator =
