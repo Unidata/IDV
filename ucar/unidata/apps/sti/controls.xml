@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<controls>
+
+<control
+   id="stormintesitydisplay"
+   categories="IMAGE-*-*"
+   class="ucar.unidata.idv.control.storm.StormIntensityControl"
+   label="Storm Intensity"
+   displaycategory="Probe"
+   properties="">
+   <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+</control>
+
+</controls>
