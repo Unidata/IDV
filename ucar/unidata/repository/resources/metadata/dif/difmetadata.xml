@@ -8,44 +8,46 @@
 </type>
 
 <type name="Parameters" type="dif.parameters" searchable="true">
-      <element label="Category" type="enumeration" 
+      <element label="Category" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element label="Topic" type="enumeration" 
+      <element label="Topic" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element label="Term" type="enumeration" 
+      <element label="Term" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element label="Variable Level 1" type="enumeration" 
+      <element label="Variable Level 1" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element label="Variable Level 2" type="enumeration" 
+      <element label="Variable Level 2" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element label="Variable Level 3" type="enumeration" 
+      <element label="Variable Level 3" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
       <element label="Detailed Variable"/>
 </type>
 
 <type name="ISO Topic Category" type="dif.iso_topic_category" searchable="true">
-      <element label="Category" type="enumeration" 
+      <element label="Category" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/isotopiccategories.txt"/>>
 </type>
 
 <type name="Data Center" type="dif.data_center" searchable="true">
       <element label="Short Name"/>      
       <element label="Long Name"/>      
-      <element label="URL" type="url"/>      
+      <element label="URL" datatype="url"/>      
       <element label="Set ID"/>      
-      <element label="Role"  group="Personnel" type="enumeratedplus" 
-      values="investigator:Investigator,technicalcontact,Technical Contact,difauthor:DIF Author"/>      
-      <element label="First Name"  group="Personnel"/>      
-      <element label="Middle Name"  group="Personnel"/>      
-      <element label="Last Name"  group="Personnel"/>      
-      <element label="Email" type="email"  group="Personnel"/>      
-      <element label="Phone"  group="Personnel"/>
-      <element label="Fax"  group="Personnel"/>
-      <element label="Address" rows="3"  group="Personnel"/>
-      <element label="City"  group="Personnel"/>
-      <element label="State or Province"  group="Personnel"/>
-      <element label="Postal Code"  columns="20" group="Personnel"/>
-      <element label="Country"  group="Personnel"/>
+      <element label="Personnel" datatype="group">
+            <element label="Role"   datatype="enumeratedplus" 
+	             values="investigator:Investigator,technicalcontact,Technical Contact,difauthor:DIF Author"/>      
+            <element label="First Name"  />      
+	    <element label="Middle Name"  />      
+            <element label="Last Name"  />      
+            <element label="Email" datatype="email"  />      
+            <element label="Phone"  />
+            <element label="Fax"  />
+	    <element label="Address" rows="3"  />
+            <element label="City"  />
+            <element label="State or Province"  />
+            <element label="Postal Code"  columns="20" />
+            <element label="Country"  />
+      </element>
 </type>
 
 
@@ -88,7 +90,7 @@
       <element label="First Name"/>      
       <element label="Middle Name"/>      
       <element label="Last Name" searchable="true"/>      
-      <element label="Email" type="email"/>      
+      <element label="Email" datatype="email"/>      
       <element label="Phone"/>
       <element label="Fax"/>
       <element label="Address" rows="3" group="Address"/>
@@ -128,7 +130,7 @@
 
 
 <type name="Location" type="dif.location" searchable="true">
-      <element label="Category" type="enumeration" values="continent:Continent,ocean:Ocean,geographicregion:Geographic Region,solidearth:Solid Earth,space:Space,verticallocation:Vertical Location"/>      
+      <element label="Category" datatype="enumeration" values="continent:Continent,ocean:Ocean,geographicregion:Geographic Region,solidearth:Solid Earth,space:Space,verticallocation:Vertical Location"/>      
       <element label="Type"/>      
       <element label="Sub-Region 1"/>      
       <element label="Sub-Region 2"/>      
@@ -158,10 +160,10 @@
 </type>
 
 <type name="Distribution" type="dif.distribution" searchable="true">
-      <element label="Media" type="enumerationplus" 
+      <element label="Media" datatype="enumerationplus" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/media.txt"/>
       <element label="Size" columns="6" />      
-      <element label="Format" type="enumerationplus" 
+      <element label="Format" datatype="enumerationplus" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/formats.txt"/>
       <element label="Fees" />      
 </type>
@@ -171,19 +173,19 @@
 
 
 <type name="Language" type="dif.data_set_language" searchable="true">
-      <element label="Language" type="enumerationplus" 
+      <element label="Language" datatype="enumerationplus" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/languages.txt"/>      
 </type>
 
 
 
 <type name="Data Set Progress" type="dif.data_set_progress" searchable="true">
-      <element label="Progress" type="enumeration" 
+      <element label="Progress" datatype="enumeration" 
          values="planned:Planned,inwork:In Work,complete:Complete"/>      
 </type>
 
 <type name="Related URL" type="dif.related_url" searchable="true">
-      <element label="URL" type="url"/>      
+      <element label="URL" datatype="url"/>      
       <element label="Description"/>      
       <element label="Type"/>      
       <element label="Sub Type"/>      
@@ -208,7 +210,7 @@
 
 <type name="Multimedia Sample" type="dif.multimedia_sample">
       <element label="File" />      
-      <element label="URL" type="url" />      
+      <element label="URL" datatype="url" />      
       <element label="Format" columns="20" />      
       <element label="Caption" />      
       <element label="Description" rows="2" />      
@@ -240,7 +242,7 @@
 
 
 <type name="Privacy Status" type="dif.privacy_status" >
-      <element label="Private" type="boolean" default="false"/>      
+      <element label="Private" datatype="boolean" default="false"/>      
 </type>
 
 

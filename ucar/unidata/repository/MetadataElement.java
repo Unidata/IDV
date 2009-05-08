@@ -10,7 +10,7 @@
  * your option) any later version.
  *
  * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * WITHOUT ANY WARRANTYP; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
  *
@@ -92,7 +92,7 @@ public class MetadataElement implements Constants {
     public static final String ATTR_DEPENDS = "depends";
 
     /** _more_ */
-    public static final String ATTR_TYPE = "type";
+    public static final String ATTR_DATATYPE = "datatype";
     public static final String ATTR_GROUP = "group";
 
     /** _more_ */
@@ -116,7 +116,7 @@ public class MetadataElement implements Constants {
     public static final String ATTR_INDEX = "index";
 
     /** _more_ */
-    private String type = TYPE_STRING;
+    private String dataType = TYPE_STRING;
 
     /** _more_ */
     private String label = "";
@@ -172,8 +172,8 @@ public class MetadataElement implements Constants {
         setLabel(XmlUtil.getAttribute(node, ATTR_LABEL));
         setRows(XmlUtil.getAttribute(node, ATTR_ROWS, 1));
         setColumns(XmlUtil.getAttribute(node, ATTR_COLUMNS, 60));
-        setType(XmlUtil.getAttribute(node,
-                                     ATTR_TYPE,MetadataElement.TYPE_STRING));
+        setDataType(XmlUtil.getAttribute(node,
+                                     ATTR_DATATYPE,MetadataElement.TYPE_STRING));
         setDefault(XmlUtil.getAttribute(node, ATTR_DEFAULT,
                                         ""));
 
@@ -182,8 +182,8 @@ public class MetadataElement implements Constants {
                                            ATTR_SEARCHABLE, false));
         setThumbnail(XmlUtil.getAttribute(node,
                                           ATTR_THUMBNAIL, false));
-        if (type.equals(MetadataElement.TYPE_ENUMERATION)||
-            type.equals(MetadataElement.TYPE_ENUMERATIONPLUS)) {
+        if (dataType.equals(MetadataElement.TYPE_ENUMERATION)||
+            dataType.equals(MetadataElement.TYPE_ENUMERATIONPLUS)) {
             String values = XmlUtil.getAttribute(node,
                                                  ATTR_VALUES);
             List<String> tmpValues = null;
@@ -218,7 +218,7 @@ public class MetadataElement implements Constants {
         }
 
 
-        if(type.equals(TYPE_GROUP)) {
+        if(dataType.equals(TYPE_GROUP)) {
             List elements = XmlUtil.findChildren(node,
                                 MetadataType.TAG_ELEMENT);
             children = new ArrayList<MetadataElement>();
@@ -247,8 +247,8 @@ public class MetadataElement implements Constants {
      * @return _more_
      */
     private boolean isString(String type) {
-        return type.equals(TYPE_STRING) || type.equals(TYPE_EMAIL)
-               || type.equals(TYPE_URL);
+        return dataType.equals(TYPE_STRING) || dataType.equals(TYPE_EMAIL)
+               || dataType.equals(TYPE_URL);
     }
 
 
@@ -263,15 +263,15 @@ public class MetadataElement implements Constants {
      */
     public boolean getHtml(MetadataHandler handler, StringBuffer sb,
                            String value) {
-        if (type.equals(TYPE_SKIP)) {
+        if (dataType.equals(TYPE_SKIP)) {
             return false;
         }
-        if (type.equals(TYPE_FILE)) {
+        if (dataType.equals(TYPE_FILE)) {
             return false;
         }
-        if (type.equals(TYPE_EMAIL)) {
+        if (dataType.equals(TYPE_EMAIL)) {
             sb.append(HtmlUtil.href("mailto:" + value, value));
-        } else if (type.equals(TYPE_URL)) {
+        } else if (dataType.equals(TYPE_URL)) {
             sb.append(HtmlUtil.href(value, value));
         } else {
             sb.append(value);
@@ -299,13 +299,13 @@ public class MetadataElement implements Constants {
 
         String arg = ARG_METADATA_ATTR + getIndex() + suffix;
 
-        if (getType().equals(TYPE_BOOLEAN)) {
+        if (getDataType().equals(TYPE_BOOLEAN)) {
             boolean value = request.get(arg, false);
             return ""+value;
         }
 
 
-        if (getType().equals(TYPE_GROUP)) {
+        if (getDataType().equals(TYPE_GROUP)) {
             List<Hashtable<Integer,String>> entries =   entries = new ArrayList<Hashtable<Integer,String>>();
             int groupCnt=0;
             while(true) {
@@ -343,7 +343,7 @@ public class MetadataElement implements Constants {
 
         //        newMetadata.setAttr(getIndex(), attr);
 
-        if ( !getType().equals(TYPE_FILE)) {
+        if ( !getDataType().equals(TYPE_FILE)) {
             return attr;
         }
 
@@ -411,7 +411,7 @@ public class MetadataElement implements Constants {
                           MetadataType metadataType,
                           Metadata metadata,
                           String suffix, String value, boolean forEdit) throws Exception {
-        if (type.equals(TYPE_SKIP)) {
+        if (dataType.equals(TYPE_SKIP)) {
             return "";
         }
         String arg = ARG_METADATA_ATTR + getIndex() + suffix;
@@ -419,25 +419,25 @@ public class MetadataElement implements Constants {
         value = (((value == null) || (value.length() == 0))
                  ? dflt
                  : value);
-        if (isString(type)) {
+        if (isString(dataType)) {
             if (rows > 1) {
                 return HtmlUtil.textArea(arg, value, rows, columns);
             }
             return HtmlUtil.input(arg, value,
                                   HtmlUtil.attr(HtmlUtil.ATTR_SIZE,
                                       "" + columns));
-        } else if (type.equals(TYPE_BOOLEAN)) {
+        } else if (dataType.equals(TYPE_BOOLEAN)) {
             return HtmlUtil.checkbox(arg, "true", Misc.equals(value, "true"));
-        } else if (type.equals(TYPE_ENUMERATION)) {
+        } else if (dataType.equals(TYPE_ENUMERATION)) {
             return HtmlUtil.select(arg, values, value);
 
-        } else if (type.equals(TYPE_ENUMERATIONPLUS)) {
+        } else if (dataType.equals(TYPE_ENUMERATIONPLUS)) {
             boolean contains = values.contains(value);
             return HtmlUtil.select(arg, values, value) +
                 HtmlUtil.br() +
                 metadataType.getHandler().msgLabel("Or") +
                 HtmlUtil.input(arg+".input", (contains?"":value),HtmlUtil.SIZE_30);
-        } else if (type.equals(TYPE_FILE)) {
+        } else if (dataType.equals(TYPE_FILE)) {
             String image = (forEdit
                             ? metadataType.getFileHtml(request, entry,
                                 metadata, this, false)
@@ -450,7 +450,7 @@ public class MetadataElement implements Constants {
             return HtmlUtil.fileInput(arg, HtmlUtil.SIZE_70) + image + "<br>"
                    + "Or download URL:"
                    + HtmlUtil.input(arg + ".url", "", HtmlUtil.SIZE_70);
-        } else if (type.equals(TYPE_GROUP)) {
+        } else if (dataType.equals(TYPE_GROUP)) {
             /**
                <collection>
                   <entry index="1">
@@ -478,7 +478,7 @@ public class MetadataElement implements Constants {
                         lastGroup = element.getGroup();
                         groupSB.append(HtmlUtil.row(HtmlUtil.colspan(metadataType.getHandler().header(lastGroup),2)));
                     }
-                    String elementLbl = .msgLabel(element.getLabel());
+                    String elementLbl = metadataType.getHandler().msgLabel(element.getLabel());
                     String subValue  = map.get(new Integer(element.getIndex()));
                     if(subValue == null) subValue = "";
                     String widget = element.getForm(request, entry,  metadataType, metadata,
@@ -515,8 +515,8 @@ public class MetadataElement implements Constants {
      *
      *  @param value The new value for Type
      */
-    public void setType(String value) {
-        type = value;
+    public void setDataType(String value) {
+        dataType = value;
     }
 
     /**
@@ -524,8 +524,8 @@ public class MetadataElement implements Constants {
      *
      *  @return The Type
      */
-    public String getType() {
-        return type;
+    public String getDataType() {
+        return dataType;
     }
 
     /**

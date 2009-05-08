@@ -4,35 +4,35 @@
   <handler class="ucar.unidata.repository.data.ThreddsMetadataHandler" category="THREDDS">
 
     <type name="Project" type="thredds.project"  searchable="true" browsable="true">
-      <element label="Value" type="string"/>
+      <element label="Value" />
     </type>
 
     <type name="Keyword" type="thredds.keyword"  searchable="true" browsable="true">
-      <element label="Value" type="string"/>
+      <element label="Value" />
       <template type="threddscatalog"><![CDATA[<keyword>${attr1}</keyword>]]></template>
     </type>
 
 
     <type name="Link" type="thredds.link">
-      <element label="Label" type="string"/>
-      <element label="URL" type="url"/>
+      <element label="Label" />
+      <element label="URL" datatype="url"/>
       <template type="html"><![CDATA[<a href="${attr2}">${attr1}</a>]]></template>
       <template type="threddscatalog"><![CDATA[<documentation xlink:href="${attr2}" xlink:title="${attr1}"/>]]></template>
     </type>
 
 
     <type name="Creator" type="thredds.creator" searchable="true" browsable="true">
-      <element label="Organization" type="string"/>
-      <element label="" type="skip"/>
-      <element label="Email" type="email"/>
-      <element label="URL" type="url"/>
+      <element label="Organization" />
+      <element label="" datatype="skip"/>
+      <element label="Email" datatype="email"/>
+      <element label="URL" datatype="url"/>
     </type>
 
     <type name="Publisher" type="thredds.publisher"  searchable="true" browsable="true">
-      <element label="Organization" type="string"/>
-      <element label="" type="skip"/>
-      <element label="Email" type="email"/>
-      <element label="URL" type="url"/>
+      <element label="Organization" />
+      <element label="" datatype="skip"/>
+      <element label="Email" datatype="email"/>
+      <element label="URL" datatype="url"/>
       <template type="threddscatalog"><![CDATA[<publisher><name role="${attr2}">${attr1}</name>
  <contact email="${attr3}" url="${attr4}"/></publisher>]]></template>
     </type>
@@ -40,36 +40,36 @@
 
 
     <type name="Contributor" type="thredds.contributor"  searchable="true" browsable="true">
-      <element label="Name" type="string"/>
-      <element label="Role" type="string"/>
+      <element label="Name" />
+      <element label="Role" />
       <template type="threddscatalog"><![CDATA[<contributor role="${attr2}">${attr1}</contributor>]]></template>
     </type>
     <type name="Property" type="thredds.property"  searchable="true" browsable="true">
-      <element label="Name" type="string" searchable="true"/>
-      <element label="Value" type="string" searchable="true"/>
+      <element label="Name"  searchable="true"/>
+      <element label="Value"  searchable="true"/>
       <template type="threddscatalog"><![CDATA[<property name="${attr1}" value="${attr2}"/>]]></template>
       <template type="html"><![CDATA[ ${attr1}=${attr2}]]></template>
     </type>
     <type name="Documentation" type="thredds.documentation"  searchable="true">
       <element
          label="Type"
-         type="enumeration"
+         datatype="enumeration"
          values="summary:Summary,funding:Funding,history:History,language:Language,processing_level:Processing Level,rights:Access Rights"/>
       <element
          label="Value"
          rows="6"
-         type="string"/>
+         />
       <template type="threddscatalog"><![CDATA[<documentation type="${attr1}">${attr2.cdata}</documentation>]]></template>
     </type>
     <type name="Dataformat" type="thredds.dataFormat">
-      <element label="Value" type="string"/>
+      <element label="Value" />
     </type>
     <type name="Datatype" type="thredds.dataType">
-      <element label="Value" type="string"/>
+      <element label="Value" />
     </type>
 
     <type name="Authority" type="thredds.authority">
-      <element label="Value" type="string"/>
+      <element label="Value" />
     </type>
 
     <type
@@ -77,15 +77,15 @@
        name="Variable"
        type="thredds.variable" searchable="true">
       <template type="html"><![CDATA[${attr1} (${attr3}) ${attr2}]]></template>
-      <element label="Variable" type="string"/>
-      <element label="Long Name" type="string"/>
+      <element label="Variable" />
+      <element label="Long Name" />
       <element
          columns="10"
          label="Units"
-         type="string"/>
+         />
     </type>
     <type name="Icon" type="thredds.icon">
-      <element label="URL" type="url"/>
+      <element label="URL" datatype="url"/>
       <template type="threddscatalog"><![CDATA[<documentation xlink:href="${attr1}" xlink:title="icon"/>]]></template>
     </type>
   </handler>

@@ -307,7 +307,7 @@ public class MetadataType implements Constants {
      */
     public void newEntry(Metadata metadata, Entry entry) throws Exception {
         for (MetadataElement element : elements) {
-            if (element.getType().equals(element.TYPE_FILE)) {
+            if (element.getDataType().equals(element.TYPE_FILE)) {
                 String fileArg = metadata.getAttr(element.getIndex());
                 if ((fileArg == null) || (fileArg.length() == 0)) {
                     continue;
@@ -342,7 +342,7 @@ public class MetadataType implements Constants {
                                       boolean internal)
             throws Exception {
         for (MetadataElement element : elements) {
-            if ( !element.getType().equals(element.TYPE_FILE)) {
+            if ( !element.getDataType().equals(element.TYPE_FILE)) {
                 continue;
             }
             String fileArg = XmlUtil.getAttribute(node,
@@ -427,7 +427,7 @@ public class MetadataType implements Constants {
                                      Element datasetNode)
             throws Exception {
         for (MetadataElement element : elements) {
-            if ( !element.getType().equals(element.TYPE_FILE)) {
+            if ( !element.getDataType().equals(element.TYPE_FILE)) {
                 continue;
             }
             File f = getFile(entry, metadata, element);
@@ -529,7 +529,7 @@ public class MetadataType implements Constants {
                               Metadata metadata, boolean forLink)
             throws Exception {
         for (MetadataElement element : elements) {
-            if ( !element.getType().equals(element.TYPE_FILE)) {
+            if ( !element.getDataType().equals(element.TYPE_FILE)) {
                 continue;
             }
             if (element.getThumbnail()) {
@@ -575,7 +575,7 @@ public class MetadataType implements Constants {
             return new Result("", "Cannot process view");
         }
         MetadataElement element = elements.get(elementIndex);
-        if ( !element.getType().equals(element.TYPE_FILE)) {
+        if ( !element.getDataType().equals(element.TYPE_FILE)) {
             return new Result("", "Cannot process view");
         }
         File f = getFile(entry, metadata, element);
