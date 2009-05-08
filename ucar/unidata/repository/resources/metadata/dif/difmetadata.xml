@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <metadata>
 
-  <handler category="ucar.unidata.repository.data.DifMetadataHandler">
+  <handler class="ucar.unidata.repository.data.DifMetadataHandler" category="DIF">
 
 <type name="Entry Title" type="dif.entry_title" searchable="true">
       <element label="Title"/>
@@ -31,20 +31,21 @@
 <type name="Data Center" type="dif.data_center" searchable="true">
       <element label="Short Name"/>      
       <element label="Long Name"/>      
-      <element label="URL"type="url"/>      
+      <element label="URL" type="url"/>      
       <element label="Set ID"/>      
-      <element label="Personnel-Role"  group="Personnel"/>      
-      <element label="Personnel-First Name"  group="Personnel"/>      
-      <element label="Personnel-Middle Name"  group="Personnel"/>      
-      <element label="Personnel-Last Name"  group="Personnel"/>      
-      <element label="Personnel-Email" type="email"  group="Personnel"/>      
-      <element label="Personnel-Phone"  group="Personnel"/>
-      <element label="Personnel-Fax"  group="Personnel"/>
-      <element label="Personnel-Address" rows="3"  group="Personnel"/>
-      <element label="Personnel-City"  group="Personnel"/>
-      <element label="Personnel-State or Province"  group="Personnel"/>
-      <element label="Personnel-Postal Code"  group="Personnel"/>
-      <element label="Personnel-Country"  group="Personnel"/>
+      <element label="Role"  group="Personnel" type="enumeratedplus" 
+      values="investigator:Investigator,technicalcontact,Technical Contact,difauthor:DIF Author"/>      
+      <element label="First Name"  group="Personnel"/>      
+      <element label="Middle Name"  group="Personnel"/>      
+      <element label="Last Name"  group="Personnel"/>      
+      <element label="Email" type="email"  group="Personnel"/>      
+      <element label="Phone"  group="Personnel"/>
+      <element label="Fax"  group="Personnel"/>
+      <element label="Address" rows="3"  group="Personnel"/>
+      <element label="City"  group="Personnel"/>
+      <element label="State or Province"  group="Personnel"/>
+      <element label="Postal Code"  columns="20" group="Personnel"/>
+      <element label="Country"  group="Personnel"/>
 </type>
 
 
@@ -146,12 +147,6 @@
       <element label="Temporal Resolution Range"/>      
 </type>
 
-<type name="dif.keyword" type="dif.keyword" searchable="true">
-</type>
-
-<type name="dif.data_set_progress" type="dif.data_set_progress" searchable="true">
-</type>
-
 
 
 <type name="Access Constraints" type="dif.accesscontraints" searchable="true">
@@ -164,8 +159,8 @@
 
 <type name="Distribution" type="dif.distribution" searchable="true">
       <element label="Media" type="enumerationplus" 
-         values="file:/ucar/unidata/repository/resources/metadata/dif/mediatypes.txt"/>
-      <element label="Size" />      
+         values="file:/ucar/unidata/repository/resources/metadata/dif/media.txt"/>
+      <element label="Size" columns="6" />      
       <element label="Format" type="enumerationplus" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/formats.txt"/>
       <element label="Fees" />      
@@ -184,7 +179,7 @@
 
 <type name="Data Set Progress" type="dif.data_set_progress" searchable="true">
       <element label="Progress" type="enumeration" 
-         values="Planned,In Work,Complete"/>      
+         values="planned:Planned,inwork:In Work,complete:Complete"/>      
 </type>
 
 <type name="Related URL" type="dif.related_url" searchable="true">
@@ -195,24 +190,58 @@
 </type>
 
 
-<type name="dif.originating_center" type="dif.originating_center" searchable="true">
-      <element label="Language" />      
+<type name="Revision History" type="dif.revision_history" >
+      <element label="History" />      
+</type>
+
+<type name="Keyword" type="dif.keyword" searchable="true">
+      <element label="Keyword" />      
+</type>
+
+
+<type name="Originating Center" type="dif.originating_center" searchable="true">
+      <element label="Center" />      
 </type>
 
 
 
-<type name="dif.distribution" type="dif.distribution" searchable="true">
+
+<type name="Multimedia Sample" type="dif.multimedia_sample">
+      <element label="File" />      
+      <element label="URL" type="url" />      
+      <element label="Format" columns="20" />      
+      <element label="Caption" />      
+      <element label="Description" rows="2" />      
+
 </type>
 
-<type name="dif.reference" type="dif.reference" searchable="true">
+
+<type name="Reference" type="dif.reference" >
+      <element label="Reference" rows="4"/>      
 </type>
 
 
-<type name="dif.related_url" type="dif.related_url" searchable="true">
+<type name="Parent DIF" type="dif.parent_dif" >
+      <element label="Parent DIF ID" columns="10"/>      
 </type>
 
 
+<type name="DIF Creation Date" type="dif.creation_date">
+      <element label="Creation Date" columns="10"/>      
+</type>
 
+<type name="Last DIF Revision Date" type="dif.last_dif_revision_date">
+      <element label="Revision Date" columns="10"/>      
+</type>
+
+<type name="Future DIF Review Date" type="dif.future_dif_review_date">
+      <element label="Review Date" columns="10"/>      
+</type>
+
+
+<type name="Privacy Status" type="dif.privacy_status" >
+      <element label="Private" type="boolean" default="false"/>      
+</type>
 
 
 

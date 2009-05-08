@@ -109,6 +109,7 @@ public class MetadataElement implements Constants {
     /** _more_ */
     private MetadataType metadataType;
 
+    private String group;
 
     /**
      * _more_
@@ -206,6 +207,10 @@ public class MetadataElement implements Constants {
         if (request.defined(arg + ".select")) {
             attr = request.getString(arg + ".select", "");
         }
+        if (request.defined(arg + ".input")) {
+            attr = request.getString(arg + ".input", "");
+        }
+
         newMetadata.setAttr(getIndex(), attr);
 
         if ( !getType().equals(TYPE_FILE)) {
@@ -297,7 +302,11 @@ public class MetadataElement implements Constants {
             return HtmlUtil.select(arg, values, value);
 
         } else if (type.equals(TYPE_ENUMERATIONPLUS)) {
-            return HtmlUtil.select(arg, values, value);
+            boolean contains = values.contains(value);
+            return HtmlUtil.select(arg, values, value) +
+                HtmlUtil.space(2) +
+                " or: " +
+                HtmlUtil.input(arg+".input", (contains?"":value),HtmlUtil.SIZE_30);
         } else if (type.equals(TYPE_FILE)) {
             String image = (forEdit
                             ? metadataType.getFileHtml(request, entry,
@@ -481,6 +490,24 @@ public class MetadataElement implements Constants {
         return this.searchable;
     }
 
+
+    /**
+       Set the Group property.
+
+       @param value The new value for Group
+    **/
+    public void setGroup (String value) {
+	this.group = value;
+    }
+
+    /**
+       Get the Group property.
+
+       @return The Group
+    **/
+    public String getGroup () {
+	return this.group;
+    }
 
 }
 

@@ -105,6 +105,7 @@ public class MetadataType implements Constants {
 
     /** _more_ */
     public static final String ATTR_TYPE = "type";
+    public static final String ATTR_GROUP = "group";
 
     /** _more_ */
     public static final String ATTR_ADMINONLY = "adminonly";
@@ -266,7 +267,7 @@ public class MetadataType implements Constants {
                           "ucar.unidata.repository.MetadataHandler"));
 
             MetadataHandler handler = manager.getHandler(c);
-            String          type    = XmlUtil.getAttribute(node, ATTR_TYPE,MetadataElement.TYPE_STRING);
+            String          type    = XmlUtil.getAttribute(node, ATTR_TYPE);
             MetadataType metadataType = new MetadataType(type,
                                             XmlUtil.getAttribute(node,
                                                 ATTR_NAME, type));
@@ -305,7 +306,7 @@ public class MetadataType implements Constants {
                 Element elementNode = (Element) elements.get(j);
 
                 String elementType = XmlUtil.getAttribute(elementNode,
-                                         ATTR_TYPE);
+                                         ATTR_TYPE,MetadataElement.TYPE_STRING);
                 String dflt = XmlUtil.getAttribute(elementNode, ATTR_DEFAULT,
                                   "");
                 int index = lastIndex+1;
@@ -320,12 +321,14 @@ public class MetadataType implements Constants {
                         XmlUtil.getAttribute(elementNode, ATTR_ROWS, 1),
                         XmlUtil.getAttribute(elementNode, ATTR_COLUMNS, 60),
                         null);
+                element.setGroup(XmlUtil.getAttribute(elementNode, ATTR_GROUP,(String) null));
                 element.setSearchable(XmlUtil.getAttribute(elementNode,
                         ATTR_SEARCHABLE, false));
                 element.setThumbnail(XmlUtil.getAttribute(elementNode,
                         ATTR_THUMBNAIL, false));
                 element.setDefault(dflt);
-                if (elementType.equals(MetadataElement.TYPE_ENUMERATION)) {
+                if (elementType.equals(MetadataElement.TYPE_ENUMERATION)||
+                    elementType.equals(MetadataElement.TYPE_ENUMERATIONPLUS)) {
                     String values = XmlUtil.getAttribute(elementNode,
                                         ATTR_VALUES);
                     List<String> tmpValues = null;
@@ -341,6 +344,7 @@ public class MetadataType implements Constants {
                                 ",", true, true);
                     }
 
+
                     List enumValues = new ArrayList();
                     for (String tok : tmpValues) {
                         int idx = tok.indexOf(":");
@@ -355,6 +359,7 @@ public class MetadataType implements Constants {
                         }
                         enumValues.add(new TwoFacedObject(toks[1], toks[0]));
                     }
+                    enumValues.add(0,"");
                     element.setValues(enumValues);
                 }
                 metadataType.addElement(element);
@@ -867,6 +872,7 @@ public class MetadataType implements Constants {
             suffix = "." + metadata.getId();
         }
 
+        
         String submit = HtmlUtil.submit(handler.msg("Add")
                                         + HtmlUtil.space(1) + name);
         String cancel = HtmlUtil.submit(handler.msg("Cancel"), ARG_CANCEL);
@@ -874,8 +880,15 @@ public class MetadataType implements Constants {
 
         StringBuffer sb  = new StringBuffer();
 
-
+        if(!forEdit) 
+            sb.append(handler.header("Add: "+ name));
+        sb.append(HtmlUtil.br());
+        String lastGroup = null;
         for (MetadataElement element : elements) {
+            if(element.getGroup()!=null && !Misc.equals(element.getGroup(),lastGroup)) {
+                lastGroup = element.getGroup();
+                sb.append(HtmlUtil.row(HtmlUtil.colspan(handler.header(lastGroup),2)));
+            }
             String elementLbl = handler.msgLabel(element.getLabel());
             String widget = element.getForm(request, entry, metadata,
                                             ARG_METADATA_ATTR+element.getIndex()+suffix, 

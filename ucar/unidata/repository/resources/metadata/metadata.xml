@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<metadata>
+
+  <handler category="Tags">
+
+<!--
+    <type name="Test" type="test" searchable="true" browsable="true">
+      <element label="attr1" type="string"/>
+      <element label="attr2" type="string"/>
+      <element label="attr3" type="string"/>
+      <element label="attr4" type="string"/>
+      <element label="attr5" type="string"/>
+      <element label="attr6" type="string"/>
+      <template type="html"><![CDATA[${attr1},${attr2},${attr3},${attr4},${attr5},${attr6}]]></template>
+    </type>
+-->
+
+
+    <type name="Tag" type="enum_tag" searchable="true" browsable="true">
+      <element label="Tag Value" type="string"/>
+      <template type="threddscatalog"><![CDATA[<keyword>${attr1}</keyword>]]></template>
+    </type>
+
+    <type name="Wiki Category" type="wikicategory" foruser="false">
+      <element label="Wiki Category" type="string"/>
+    </type>
+
+    <type name="GCMD Science Keyword" type="enum_gcmdkeyword" searchable="true" browsable="true">
+      <element
+         label="Keyword"
+         type="enumeration"
+         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>
+      <template type="threddscatalog"><![CDATA[<keyword>${attr1}</keyword>]]></template>
+    </type>
+
+<!--
+    <type name="ANZLIC Search Word" type="enum_anzlic_search_words" searchable="true" browsable="true">
+      <element
+         label="Search Word"
+         type="enumeration"
+         values="file:/ucar/unidata/repository/resources/metadata/anzlicsearchwords.txt"/>
+      <template type="threddscatalog"><![CDATA[<keyword>${attr1}</keyword>]]></template>
+    </type>
+-->
+
+  </handler>
+
+  <handler class="ucar.unidata.repository.ContentMetadataHandler"        category="Attachments, Contact, Etc.">
+    <type
+       name="Thumbnail Image"
+       type="content.thumbnail">
+      <element label="Thumbnail File" type="file" thumbnail="true"/>
+    </type>
+    <type
+       name="File Attachment"
+       type="content.attachment">
+      <element label="File" type="file" thumbnail="false"/>
+    </type>
+    <type name="Contact" type="content.contact">
+      <element label="Name" type="string"/>
+      <element label="Email" type="string"/>
+    </type>
+    <type name="Sort Order" type="content.sort">
+      <element
+         default="fromdate"
+         label="Field"
+         type="enumeration"
+         values="fromdate:From Date,todate:To Date,createdate:Create Date,name:Name"/>
+      <element
+         default="true"
+         label="Ascending"
+         type="boolean"/>
+    </type>
+    <type
+       name="Alias"
+       type="content.alias">
+      <element label="Alias" type="string"/>
+      <template type="html"><![CDATA[<a href="${root}/alias/${attr1}">${attr1}</a>]]></template>
+    </type>
+  </handler>
+
+  <handler adminonly="true" class="ucar.unidata.repository.AdminMetadataHandler" category="Admin">
+    <type name="Page Template" type="admin.template"/>
+    <type name="Local File Pattern" type="admin.localfile.pattern"/>
+    <type name="Anonymous Upload" type="admin.anonymousupload">
+      <element label="From" type="string"/>
+      <element label="IP" type="string"/>
+    </type>
+  </handler>
+
+  <handler class="ucar.unidata.repository.data.ThreddsMetadataHandler" category="THREDDS">
+
+    <type name="Project" type="thredds.project"  searchable="true" browsable="true">
+      <element label="Value" type="string"/>
+    </type>
+
+    <type name="Keyword" type="thredds.keyword"  searchable="true" browsable="true">
+      <element label="Value" type="string"/>
+      <template type="threddscatalog"><![CDATA[<keyword>${attr1}</keyword>]]></template>
+    </type>
+
+
+    <type name="Link" type="thredds.link">
+      <element label="Label" type="string"/>
+      <element label="URL" type="url"/>
+      <template type="html"><![CDATA[<a href="${attr2}">${attr1}</a>]]></template>
+      <template type="threddscatalog"><![CDATA[<documentation xlink:href="${attr2}" xlink:title="${attr1}"/>]]></template>
+    </type>
+
+
+    <type name="Creator" type="thredds.creator" searchable="true" browsable="true">
+      <element label="Organization" type="string"/>
+      <element label="" type="skip"/>
+      <element label="Email" type="email"/>
+      <element label="URL" type="url"/>
+    </type>
+
+    <type name="Publisher" type="thredds.publisher"  searchable="true" browsable="true">
+      <element label="Organization" type="string"/>
+      <element label="" type="skip"/>
+      <element label="Email" type="email"/>
+      <element label="URL" type="url"/>
+      <template type="threddscatalog"><![CDATA[<publisher><name role="${attr2}">${attr1}</name>
+ <contact email="${attr3}" url="${attr4}"/></publisher>]]></template>
+    </type>
+
+
+
+    <type name="Contributor" type="thredds.contributor"  searchable="true" browsable="true">
+      <element label="Name" type="string"/>
+      <element label="Role" type="string"/>
+      <template type="threddscatalog"><![CDATA[<contributor role="${attr2}">${attr1}</contributor>]]></template>
+    </type>
+    <type name="Property" type="thredds.property"  searchable="true" browsable="true">
+      <element label="Name" type="string" searchable="true"/>
+      <element label="Value" type="string" searchable="true"/>
+      <template type="threddscatalog"><![CDATA[<property name="${attr1}" value="${attr2}"/>]]></template>
+      <template type="html"><![CDATA[ ${attr1}=${attr2}]]></template>
+    </type>
+    <type name="Documentation" type="thredds.documentation"  searchable="true">
+      <element
+         label="Type"
+         type="enumeration"
+         values="summary:Summary,funding:Funding,history:History,language:Language,processing_level:Processing Level,rights:Access Rights"/>
+      <element
+         label="Value"
+         rows="6"
+         type="string"/>
+      <template type="threddscatalog"><![CDATA[<documentation type="${attr1}">${attr2.cdata}</documentation>]]></template>
+    </type>
+    <type name="Dataformat" type="thredds.dataFormat">
+      <element label="Value" type="string"/>
+    </type>
+    <type name="Datatype" type="thredds.dataType">
+      <element label="Value" type="string"/>
+    </type>
+    <type name="Authority" type="thredds.authority">
+      <element label="Value" type="string"/>
+    </type>
+    <type
+       displaycategory="Variables"
+       name="Variable"
+       type="thredds.variable" searchable="true">
+      <template type="html"><![CDATA[${attr1} (${attr3}) ${attr2}]]></template>
+      <element label="Variable" type="string"/>
+      <element label="Long Name" type="string"/>
+      <element
+         columns="10"
+         label="Units"
+         type="string"/>
+    </type>
+    <type name="Icon" type="thredds.icon">
+      <element label="URL" type="url"/>
+      <template type="threddscatalog"><![CDATA[<documentation xlink:href="${attr1}" xlink:title="icon"/>]]></template>
+    </type>
+  </handler>
+
+</metadata>
