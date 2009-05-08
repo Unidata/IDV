@@ -33,6 +33,15 @@
          name="default"
          value="true"/>
     </resource>
+    <resource
+       label="bbq"
+       location="%IDVPATH%/skins/bbq.xml">
+      <property
+         name="view_class"
+         value="ucar.unidata.idv.MapViewManager"/>
+    </resource>
+
+
 
     <resource
        skinid="idv.skin.oneview.map"

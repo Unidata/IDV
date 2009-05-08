@@ -1086,7 +1086,7 @@ public class MetadataManager extends RepositoryManager {
             new Integer(metadata.getInherited()
                         ? 1
                         : 0), metadata.getAttr1(), metadata.getAttr2(),
-            metadata.getAttr3(), metadata.getAttr4(), metadata.getBlob()
+            metadata.getAttr3(), metadata.getAttr4(), metadata.getExtra()
         });
     }
 

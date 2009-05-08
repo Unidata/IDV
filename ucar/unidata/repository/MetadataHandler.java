@@ -150,8 +150,8 @@ public class MetadataHandler extends RepositoryManager {
             throws Exception {
         forUser = XmlUtil.getAttribute(node, ATTR_FORUSER, true);
         String type = XmlUtil.getAttribute(node, ATTR_TYPE);
-        //TODO: Handle the blob attributes
-        String blob = XmlUtil.getGrandChildText(node,Metadata.TAG_BLOB,"");
+        //TODO: Handle the extra attributes
+        String extra = XmlUtil.getGrandChildText(node,Metadata.TAG_EXTRA,"");
         Metadata metadata =
             new Metadata(getRepository().getGUID(), entry.getId(), type,
                          XmlUtil.getAttribute(node, ATTR_INHERITED,
@@ -161,7 +161,7 @@ public class MetadataHandler extends RepositoryManager {
                                      ""), XmlUtil.getAttribute(node,
                                          ATTR_ATTR3,
                                          ""), XmlUtil.getAttribute(node,
-                                             ATTR_ATTR4, ""),blob);
+                                             ATTR_ATTR4, ""),extra);
 
         MetadataType metadataType = findType(type);
         if ( !metadataType.processMetadataXml(entry, node, metadata, fileMap,
@@ -310,9 +310,9 @@ public class MetadataHandler extends RepositoryManager {
      */
     public Metadata makeMetadata(String id, String entryId, String type,
                                  boolean inherited, String attr1,
-                                 String attr2, String attr3, String attr4,String blob) {
+                                 String attr2, String attr3, String attr4,String extra) {
         return new Metadata(id, entryId, type, inherited, attr1, attr2,
-                            attr3, attr4,blob);
+                            attr3, attr4,extra);
     }
 
 
@@ -336,9 +336,9 @@ public class MetadataHandler extends RepositoryManager {
                                           Entry entry, String type,
                                           boolean inherited, String attr1,
                                           String attr2, String attr3,
-                                          String attr4, String blob, boolean newMetadata) {
+                                          String attr4, String extra, boolean newMetadata) {
         return new Metadata(id, entry.getId(), type, inherited, attr1, attr2,
-                            attr3, attr4,blob);
+                            attr3, attr4,extra);
     }
 
 

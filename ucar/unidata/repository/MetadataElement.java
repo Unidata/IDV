@@ -100,6 +100,8 @@ public class MetadataElement implements Constants {
     /** _more_ */
     public static final String ATTR_LABEL = "label";
 
+    public static final String ATTR_SUBLABEL = "sublabel";
+
     /** _more_ */
     public static final String ATTR_DEFAULT = "default";
 
@@ -122,6 +124,8 @@ public class MetadataElement implements Constants {
 
     /** _more_ */
     private String label = "";
+
+    private String subLabel = "";
 
     /** _more_ */
     private int rows = 1;
@@ -174,6 +178,7 @@ public class MetadataElement implements Constants {
 
     private void init(Element node) throws Exception {
         setLabel(XmlUtil.getAttribute(node, ATTR_LABEL));
+        subLabel = XmlUtil.getAttribute(node, ATTR_SUBLABEL,"");
         setRows(XmlUtil.getAttribute(node, ATTR_ROWS, 1));
         setColumns(XmlUtil.getAttribute(node, ATTR_COLUMNS, 60));
         setDataType(XmlUtil.getAttribute(node,
@@ -185,7 +190,7 @@ public class MetadataElement implements Constants {
         setSearchable(XmlUtil.getAttribute(node,
                                            ATTR_SEARCHABLE, false));
         required = XmlUtil.getAttribute(node,
-                                          ATTR_REQUIRED, false));
+                                          ATTR_REQUIRED, false);
         setThumbnail(XmlUtil.getAttribute(node,
                                           ATTR_THUMBNAIL, false));
         if (dataType.equals(MetadataElement.TYPE_ENUMERATION)||
@@ -440,7 +445,7 @@ public class MetadataElement implements Constants {
         } else if (dataType.equals(TYPE_ENUMERATIONPLUS)) {
             boolean contains = values.contains(value);
             return HtmlUtil.select(arg, values, value) +
-                HtmlUtil.br() +
+                HtmlUtil.space(2) +
                 metadataType.getHandler().msgLabel("Or") +
                 HtmlUtil.input(arg+".input", (contains?"":value),HtmlUtil.SIZE_30);
         } else if (dataType.equals(TYPE_FILE)) {
@@ -457,13 +462,6 @@ public class MetadataElement implements Constants {
                    + "Or download URL:"
                    + HtmlUtil.input(arg + ".url", "", HtmlUtil.SIZE_70);
         } else if (dataType.equals(TYPE_GROUP)) {
-            /**
-               <collection>
-                  <entry index="1">
-                  blobcdata
-                  </entry>
-               </collection>
-             **/
             List<Hashtable<Integer,String>> entries =(List<Hashtable<Integer,String>>)
                 (value!=null && value.length()>0?XmlEncoder.decodeXml(value):null);
             if(entries==null) {
@@ -475,42 +473,56 @@ public class MetadataElement implements Constants {
             String lastGroup = null;
 
             int groupCnt = 0;
+
+            //sb.append(HtmlUtil.formTable());
+            //            sb.append("<table border=1>");
+            StringBuffer entriesSB = new StringBuffer();
             for(Hashtable<Integer,String> map: entries) {
+                StringBuffer groupSB = new StringBuffer("<table border=0>");
                 String subArg = arg+".group" +groupCnt+".";
-                StringBuffer groupSB = new StringBuffer();
-                groupSB.append(HtmlUtil.formTable());
                 for(MetadataElement element: children) {
                     if(element.getGroup()!=null && !Misc.equals(element.getGroup(),lastGroup)) {
                         lastGroup = element.getGroup();
                         groupSB.append(HtmlUtil.row(HtmlUtil.colspan(metadataType.getHandler().header(lastGroup),2)));
                     }
-                    String elementLbl = metadataType.getHandler().msgLabel(element.getLabel());
+
+                    String elementLbl = element.getLabel();
+                    if(elementLbl.length()>0) {
+                        elementLbl = metadataType.getHandler().msgLabel(elementLbl);
+                    }
                     String subValue  = map.get(new Integer(element.getIndex()));
                     if(subValue == null) subValue = "";
                     String widget = element.getForm(request, entry,  metadataType, metadata,
                                                     subArg, 
                                                     subValue, forEdit);
                     if ((widget == null) || (widget.length() == 0)) {continue;}
-                    groupSB.append(HtmlUtil.formEntry(elementLbl, widget));
+                    groupSB.append(HtmlUtil.formEntryTop(elementLbl, widget));
                     groupSB.append(HtmlUtil.hidden(subArg+".group","true"));
                 }
-                groupSB.append(HtmlUtil.formTableClose());
+                
                 if(entries.size()>1 && groupCnt==entries.size()-1) {
                     String newCbx =HtmlUtil.checkbox(subArg+".new","true",false)+" " + metadataType.getHandler().msg("Add new")+
                         HtmlUtil.hidden(subArg+".lastone","true");
+                    groupSB.append(HtmlUtil.formEntry("",newCbx));
+                } else if(entries.size()>1) {
+                    groupSB.append(HtmlUtil.formEntry("",HtmlUtil.checkbox(subArg+".delete","true",false)+" " + metadataType.getHandler().msg("Delete")));
+                } 
+                groupSB.append("</table>");
 
-                    sb.append(HtmlUtil.formEntry("",HtmlUtil.checkbox(subArg+".new","true",false)));
-                    sb.append(HtmlUtil.formEntry("",HtmlUtil.makeShowHideBlock("New",
-                                                                               newCbx+HtmlUtil.br()+
-                                                                               groupSB.toString(),false)));
+                if(entries.size()>1 && groupCnt==entries.size()-1) {
+                    entriesSB.append(HtmlUtil.makeShowHideBlock("Add new " + subLabel,groupSB.toString(),false));
                 } else {
-                    sb.append(HtmlUtil.formEntry("",HtmlUtil.checkbox(subArg+".delete","true",false)+" " + metadataType.getHandler().msg("Delete")));
-                    sb.append(HtmlUtil.formEntry("",groupSB.toString()));
+                    if(entries.size()>1) {
+                    } 
+                    entriesSB.append(HtmlUtil.makeShowHideBlock(subLabel,groupSB.toString(),true));
                 }
+
                 groupCnt++;
             }
+            sb.append(HtmlUtil.makeShowHideBlock("Hide/Show " + label, HtmlUtil.div(entriesSB.toString(),HtmlUtil.cssClass("metadatagroup")),true));
             return sb.toString();
         } else {
+            System.err.println("Unknown data type:" + dataType);
             return null;
         }
     }

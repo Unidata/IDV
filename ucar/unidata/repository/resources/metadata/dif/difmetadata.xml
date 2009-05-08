@@ -33,20 +33,20 @@
       <element label="Long Name"/>      
       <element label="URL" datatype="url"/>      
       <element label="Set ID"/>      
-      <element label="Personnel" datatype="group">
-          <element label="Roles">
-               <element label="Role"   datatype="enumeratedplus" 
+      <element label="Personnel" datatype="group" sublabel="Personnel">
+          <element label="Roles" datatype="group" sublabel="Role">
+               <element label=""   datatype="enumerationplus" 
                         values="investigator:Investigator,technicalcontact,Technical Contact,difauthor:DIF Author"/>      
           </element>
           <element label="First Name"  />      
           <element label="Middle Name"  />      
           <element label="Last Name"  />      
           <element label="Email" datatype="email"  />      
-          <element label="Phone Numbers"  datatype="group"/>
-              <element label="Phone"  />
+          <element label="Phone Numbers"  datatype="group" sublabel="Phone Number">
+              <element label=""  />
           </element>
-          <element label="Fax Numbers"  datatype="group"/>
-              <element label="Fax"  />
+          <element label="Fax Numbers"  datatype="group" sublabel="Fax Number">
+              <element label=""  />
           </element>
           <element label="Address" rows="3"  />
           <element label="City"  />
@@ -92,19 +92,19 @@
 </type>
 
 <type name="Personnel" type="dif.personnel" searchable="true" >searchable="true"
-      <element label="Roles">
-            <element label="Role"   datatype="enumeratedplus" 
-	             values="investigator:Investigator,technicalcontact,Technical Contact,difauthor:DIF Author"/>      
+      <element label="Roles" datatype="group" sublabel="Role">
+            <element label=""   datatype="enumerationplus" 
+	             values="investigator:Investigator,technicalcontact:Technical Contact,difauthor:DIF Author"/>      
       </element>
       <element label="First Name"/>      
       <element label="Middle Name"/>      
       <element label="Last Name" searchable="true"/>      
       <element label="Email" datatype="email"/>      
-      <element label="Phone Numbers"  datatype="group"/>
-         <element label="Phone"/>
+      <element label="Phone Numbers"  datatype="group" sublabel="Phone Number">
+         <element label=""/>
       </element>
-      <element label="Fax Numbers"  datatype="group"/>
-         <element label="Fax"/>
+      <element label="Fax Numbers"  datatype="group" sublabel="Fax Number">
+         <element label=""/>
       </element>
       <element label="Address" rows="3" group="Address"/>
       <element label="City" group="Address"/>

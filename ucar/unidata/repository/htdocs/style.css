@@ -10,6 +10,8 @@ body {
   border : 1px #888888 solid;
 }
 
+
+
 //.input, .password, .fileinput,.textarea {
 //  background: #eff8ff;
 //}
@@ -189,6 +191,13 @@ a.header  {
    font-weight: bold;
    color: black;
 }
+
+.metadatagroup {
+  border : 1px #888888 solid;
+  background-color : #eeeeee;
+}
+
+
 
 
 ################################################################################
@@ -1049,6 +1058,7 @@ form {
 	border: 0;
 	margin: .2em 0 .2em 0;
 }
+
 
 
 

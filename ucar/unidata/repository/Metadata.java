@@ -79,12 +79,12 @@ import java.util.zip.*;
  * @version $Revision: 1.3 $
  */
 public class Metadata implements Constants {
-    public static String TAG_BLOB = "blob";
+    public static String TAG_EXTRA = "extra";
     public static String TAG_ATTRIBUTES = "attributes";
 
     public static String ATTR_INDEX = "index";
 
-    public static final String DFLT_BLOB = "";
+    public static final String DFLT_EXTRA = "";
     public static final String DFLT_ATTR = "";
     public static final String DFLT_ID = "";
     public static final String DFLT_ENTRYID = "";
@@ -114,8 +114,8 @@ public class Metadata implements Constants {
     /** _more_ */
     private String attr4;
 
-    private String blob;
-    private Hashtable<Integer,String> blobMap;
+    private String extra;
+    private Hashtable<Integer,String> extraMap;
 
     /** _more_ */
     private boolean inherited = false;
@@ -126,7 +126,7 @@ public class Metadata implements Constants {
      * @param type _more_
      */
     public Metadata(String type) {
-        this(DFLT_ID, DFLT_ENTRYID, type, false, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_BLOB);
+        this(DFLT_ID, DFLT_ENTRYID, type, false, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_EXTRA);
     }
 
 
@@ -140,7 +140,7 @@ public class Metadata implements Constants {
      */
     public Metadata(String id, String entryId, String type,
                     boolean inherited) {
-        this(id, entryId, type, inherited, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_BLOB);
+        this(id, entryId, type, inherited, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_EXTRA);
     }
 
 
@@ -154,8 +154,8 @@ public class Metadata implements Constants {
      * @param attr4 _more_
      */
     public Metadata(String type, String attr1, String attr2, String attr3,
-                    String attr4,String blob) {
-        this(DFLT_ID, DFLT_ENTRYID, type, false, attr1, attr2, attr3, attr4,blob);
+                    String attr4,String extra) {
+        this(DFLT_ID, DFLT_ENTRYID, type, false, attr1, attr2, attr3, attr4,extra);
     }
 
 
@@ -165,7 +165,7 @@ public class Metadata implements Constants {
      * @param type _more_
      */
     public Metadata(MetadataType type) {
-        this(DFLT_ID, DFLT_ENTRYID, type, false, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR,DFLT_BLOB);
+        this(DFLT_ID, DFLT_ENTRYID, type, false, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR,DFLT_EXTRA);
     }
 
 
@@ -183,9 +183,9 @@ public class Metadata implements Constants {
      */
     public Metadata(String id, String entryId, MetadataType type,
                     boolean inherited, String attr1, String attr2,
-                    String attr3, String attr4,String blob) {
+                    String attr3, String attr4,String extra) {
         this(id, entryId, type.getType(), inherited, attr1, attr2, attr3,
-             attr4,blob);
+             attr4,extra);
     }
 
 
@@ -203,7 +203,7 @@ public class Metadata implements Constants {
      */
     public Metadata(String id, String entryId, String type,
                     boolean inherited, String attr1, String attr2,
-                    String attr3, String attr4,String blob) {
+                    String attr3, String attr4,String extra) {
         this.id        = id;
         this.entryId   = entryId;
         this.type      = type;
@@ -212,8 +212,8 @@ public class Metadata implements Constants {
         this.attr2     = attr2;
         this.attr3     = attr3;
         this.attr4     = attr4;
-        this.blob      = blob;
-        if(this.blob ==null) this.blob = "";
+        this.extra      = extra;
+        if(this.extra ==null) this.extra = "";
     }
 
     /**
@@ -232,8 +232,8 @@ public class Metadata implements Constants {
         this.attr2     = that.attr2;
         this.attr3     = that.attr3;
         this.attr4     = that.attr4;
-        this.blob      = that.blob;
-        if(this.blob ==null) this.blob = "";
+        this.extra      = that.extra;
+        if(this.extra ==null) this.extra = "";
     }
 
     /**
@@ -316,9 +316,9 @@ public class Metadata implements Constants {
         if (idx == 4) {
             attr4 = value;
         }
-        Hashtable<Integer,String> blobMap = getBlobMap();
-        blobMap.put(new Integer(idx), value);
-        this.blob = null;
+        Hashtable<Integer,String> extraMap = getExtraMap();
+        extraMap.put(new Integer(idx), value);
+        this.extra = null;
     }
 
 
@@ -447,8 +447,8 @@ public class Metadata implements Constants {
         if (idx == 4) {
             return attr4;
         }
-        Hashtable<Integer,String> blobMap = getBlobMap();
-        return blobMap.get(new Integer(idx));
+        Hashtable<Integer,String> extraMap = getExtraMap();
+        return extraMap.get(new Integer(idx));
         //        throw new IllegalArgumentException("Bad attr idx:" + idx);
         
 
@@ -755,7 +755,7 @@ public class Metadata implements Constants {
                && Misc.equals(this.attr2, that.attr2)
                && Misc.equals(this.attr3, that.attr3)
                && Misc.equals(this.attr4, that.attr4)
-               && Misc.equals(this.blob,  that.blob)
+               && Misc.equals(this.extra,  that.extra)
                && Misc.equals(this.entryId, that.entryId);
     }
 
@@ -782,53 +782,53 @@ public class Metadata implements Constants {
     }
 
     /**
-       Set the Blob property.
+       Set the Extra property.
 
-       @param value The new value for Blob
+       @param value The new value for Extra
     **/
-    public void setBlob (String value) {
-	this.blob = value;
+    public void setExtra (String value) {
+	this.extra = value;
     }
 
     /**
-       Get the Blob property.
+       Get the Extra property.
 
-       @return The Blob
+       @return The Extra
     **/
-    public String getBlob () {
-        String tmp = this.blob;
+    public String getExtra () {
+        String tmp = this.extra;
         if(tmp == null) {
-            if(blobMap==null) return null;
-            tmp =mapToBlob(blobMap); 
-            this.blob = tmp;
+            if(extraMap==null) return null;
+            tmp =mapToExtra(extraMap); 
+            this.extra = tmp;
         }
         return tmp;
     }
 
 
-    public Hashtable<Integer,String> getBlobMap () {
-        if(blobMap!=null) return blobMap;
-        Hashtable<Integer,String> tmp = blobToMap(blob);
-        blobMap = tmp;
-        blob = null;
+    public Hashtable<Integer,String> getExtraMap () {
+        if(extraMap!=null) return extraMap;
+        Hashtable<Integer,String> tmp = extraToMap(extra);
+        extraMap = tmp;
+        extra = null;
         return tmp;
     }
 
 
 
-    public static Hashtable<Integer,String> blobToMap (String blob) {
+    public static Hashtable<Integer,String> extraToMap (String extra) {
         Hashtable<Integer,String> tmp = new Hashtable<Integer,String>();
-        if(blob != null && blob.length()>0) {
+        if(extra != null && extra.length()>0) {
             try {
-                Element root = XmlUtil.getRoot(blob);
+                Element root = XmlUtil.getRoot(extra);
                 if (root != null) {
                     List elements = XmlUtil.findChildren(root,
-                                                         TAG_BLOB);
+                                                         TAG_EXTRA);
 
                     for (int j = 0; j < elements.size(); j++) {
-                        Element blobNode = (Element) elements.get(j);
-                        int index = XmlUtil.getAttribute(blobNode, ATTR_INDEX,-1);
-                        String text = XmlUtil.getChildText(blobNode);
+                        Element extraNode = (Element) elements.get(j);
+                        int index = XmlUtil.getAttribute(extraNode, ATTR_INDEX,-1);
+                        String text = XmlUtil.getChildText(extraNode);
                         if(text==null) text="";
                         tmp.put(new Integer(index),text);
                     }
@@ -842,15 +842,15 @@ public class Metadata implements Constants {
 
 
 
-    public static String mapToBlob (Hashtable<Integer,String> map) {
+    public static String mapToExtra (Hashtable<Integer,String> map) {
         try {
             Document doc   = XmlUtil.makeDocument();
             Element  root  = XmlUtil.create(doc, TAG_ATTRIBUTES, (Element)null);
             for (Enumeration keys =
                      map.keys(); keys.hasMoreElements(); ) {
                 Integer index = (Integer) keys.nextElement();
-                String blob = map.get(index);
-                XmlUtil.create(doc,TAG_BLOB,root,blob,new String[]{
+                String extra = map.get(index);
+                XmlUtil.create(doc,TAG_EXTRA,root,extra,new String[]{
                     ATTR_INDEX,index.toString()});
             }
             return  XmlUtil.toString(root,false);

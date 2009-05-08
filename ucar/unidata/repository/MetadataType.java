@@ -796,8 +796,6 @@ public class MetadataType implements Constants {
             throws Exception {
 
         String lbl    = handler.msgLabel(name);
-        System.err.println("type.getForm:" + suffix);
-        
         String submit = HtmlUtil.submit(handler.msg("Add")
                                         + HtmlUtil.space(1) + name);
         String cancel = HtmlUtil.submit(handler.msg("Cancel"), ARG_CANCEL);
@@ -820,7 +818,7 @@ public class MetadataType implements Constants {
                                             metadata.getAttr(element.getIndex()), forEdit);
             if ((widget == null) || (widget.length() == 0)) {}
             else {
-                sb.append(HtmlUtil.formEntry(elementLbl, widget));
+                sb.append(HtmlUtil.formEntryTop(elementLbl, widget));
             }
         }
 

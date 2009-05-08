@@ -927,8 +927,10 @@ public class SqlUtil {
             } catch (Exception exc) {
 
                 //                if(command.indexOf("wiki")>=0) {
+                //                if(command.toLowerCase().indexOf("metadata")>=0) {
                 //                    System.err.println("Bad sql:" + command); 
                 //                    System.err.println(exc);
+                //                }
                 //                }
                 if ( !ignoreErrors) {
 

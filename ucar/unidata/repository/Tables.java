@@ -97,9 +97,9 @@ public static final String COL_ATTR1 = NAME + ".attr1";
 public static final String COL_ATTR2 = NAME + ".attr2";
 public static final String COL_ATTR3 = NAME + ".attr3";
 public static final String COL_ATTR4 = NAME + ".attr4";
-public static final String COL_BLOB = NAME + ".blob";
+public static final String COL_EXTRA = NAME + ".extra";
 public static final String []ARRAY= new String[] {
-COL_ID,COL_ENTRY_ID,COL_TYPE,COL_INHERITED,COL_ATTR1,COL_ATTR2,COL_ATTR3,COL_ATTR4,COL_BLOB
+COL_ID,COL_ENTRY_ID,COL_TYPE,COL_INHERITED,COL_ATTR1,COL_ATTR2,COL_ATTR3,COL_ATTR4,COL_EXTRA
 };
 
 

@@ -10,6 +10,7 @@ argument -Dfoo=bar) -->
 
     <import file="../../../build.xml"/>
 
+
     <target name="sti" depends="init">
         <javac
             classpath="${classpath}"
@@ -22,9 +23,11 @@ argument -Dfoo=bar) -->
             srcdir="${srcdir}"
         >
         <include name="ucar/unidata/apps/sti/**"/>
+        <include name="ucar/unidata/data/storm/*ADOT*.java"/>
+        <include name="ucar/unidata/idv/control/storm/*ADOT*.java"/>
+        <include name="ucar/unidata/idv/control/storm/StormIntensityControl.java"/>
         </javac>
     </target>
-
 <!--
             manifest="${srcdir}/ucar/unidata/apps/sti/sti.manifest"
 -->
@@ -39,6 +42,9 @@ argument -Dfoo=bar) -->
             >
             <include name="ucar/unidata/apps/sti/**"/>
             <include name="ucar/unidata/apps/sti/maps/**"/>
+            <include name="ucar/unidata/data/storm/*ADOT*.class"/>
+            <include name="ucar/unidata/idv/control/storm/*ADOT*.class"/>
+            <include name="ucar/unidata/idv/control/storm/StormIntensityControl*.class"/>
         </jar>
     </target>
 
