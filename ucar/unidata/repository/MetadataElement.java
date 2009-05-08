@@ -85,6 +85,8 @@ public class MetadataElement implements Constants {
     public static final String TYPE_DEPENDENTENUMERATION = "dependentenumeration";
 
 
+    public static final String ATTR_REQUIRED = "required";
+
     public static final String ATTR_ROWS = "rows";
     /** _more_ */
     public static final String ATTR_COLUMNS = "columns";
@@ -136,6 +138,8 @@ public class MetadataElement implements Constants {
     /** _more_ */
     private boolean thumbnail = false;
 
+    private boolean required = false;
+
     /** _more_          */
     private boolean searchable = false;
 
@@ -180,6 +184,8 @@ public class MetadataElement implements Constants {
         setGroup(XmlUtil.getAttribute(node, ATTR_GROUP,(String) null));
         setSearchable(XmlUtil.getAttribute(node,
                                            ATTR_SEARCHABLE, false));
+        required = XmlUtil.getAttribute(node,
+                                          ATTR_REQUIRED, false));
         setThumbnail(XmlUtil.getAttribute(node,
                                           ATTR_THUMBNAIL, false));
         if (dataType.equals(MetadataElement.TYPE_ENUMERATION)||

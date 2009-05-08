@@ -34,19 +34,25 @@
       <element label="URL" datatype="url"/>      
       <element label="Set ID"/>      
       <element label="Personnel" datatype="group">
-            <element label="Role"   datatype="enumeratedplus" 
-	             values="investigator:Investigator,technicalcontact,Technical Contact,difauthor:DIF Author"/>      
-            <element label="First Name"  />      
-	    <element label="Middle Name"  />      
-            <element label="Last Name"  />      
-            <element label="Email" datatype="email"  />      
-            <element label="Phone"  />
-            <element label="Fax"  />
-	    <element label="Address" rows="3"  />
-            <element label="City"  />
-            <element label="State or Province"  />
-            <element label="Postal Code"  columns="20" />
-            <element label="Country"  />
+          <element label="Roles">
+               <element label="Role"   datatype="enumeratedplus" 
+                        values="investigator:Investigator,technicalcontact,Technical Contact,difauthor:DIF Author"/>      
+          </element>
+          <element label="First Name"  />      
+          <element label="Middle Name"  />      
+          <element label="Last Name"  />      
+          <element label="Email" datatype="email"  />      
+          <element label="Phone Numbers"  datatype="group"/>
+              <element label="Phone"  />
+          </element>
+          <element label="Fax Numbers"  datatype="group"/>
+              <element label="Fax"  />
+          </element>
+          <element label="Address" rows="3"  />
+          <element label="City"  />
+      <element label="State or Province"  />
+      <element label="Postal Code"  columns="20" />
+      <element label="Country"  />
       </element>
 </type>
 
@@ -86,13 +92,20 @@
 </type>
 
 <type name="Personnel" type="dif.personnel" searchable="true" >searchable="true"
-      <element label="Role" searchable="true"/>      
+      <element label="Roles">
+            <element label="Role"   datatype="enumeratedplus" 
+	             values="investigator:Investigator,technicalcontact,Technical Contact,difauthor:DIF Author"/>      
+      </element>
       <element label="First Name"/>      
       <element label="Middle Name"/>      
       <element label="Last Name" searchable="true"/>      
       <element label="Email" datatype="email"/>      
-      <element label="Phone"/>
-      <element label="Fax"/>
+      <element label="Phone Numbers"  datatype="group"/>
+         <element label="Phone"/>
+      </element>
+      <element label="Fax Numbers"  datatype="group"/>
+         <element label="Fax"/>
+      </element>
       <element label="Address" rows="3" group="Address"/>
       <element label="City" group="Address"/>
       <element label="State or Province" group="Address"/>
@@ -121,11 +134,13 @@
 <type name="Paleo Temporal Coverage" type="dif.paleotemporalcoverage">
       <element label="Start Date"/>      
       <element label="End Date"/>      
-      <element label="Eon"/>      
-      <element label="Era"/>      
-      <element label="Period"/>      
-      <element label="Epoch"/>      
-      <element label="Stage"/>      
+      <element label="Chronostratigraphic Unit" datatype="group">
+         <element label="Eon"/>      
+         <element label="Era"/>      
+         <element label="Period"/>      
+         <element label="Epoch"/>      
+         <element label="Stage"/>      
+     </element>
 </type>
 
 
