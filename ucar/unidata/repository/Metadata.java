@@ -781,69 +781,83 @@ public class Metadata implements Constants {
         return entry;
     }
 
-/**
-Set the Blob property.
+    /**
+       Set the Blob property.
 
-@param value The new value for Blob
-**/
-public void setBlob (String value) {
+       @param value The new value for Blob
+    **/
+    public void setBlob (String value) {
 	this.blob = value;
-}
-
-/**
-Get the Blob property.
-
-@return The Blob
-**/
-public String getBlob () {
-    if(this.blob == null) {
-        if(blobMap==null) return null;
-        try {
-    Document doc   = XmlUtil.makeDocument();
-        Element  root  = XmlUtil.create(doc, TAG_ATTRIBUTES, (Element)null);
-        for (Enumeration keys =
-                 blobMap.keys(); keys.hasMoreElements(); ) {
-            Integer index = (Integer) keys.nextElement();
-            String blob = blobMap.get(index);
-            XmlUtil.create(doc,TAG_BLOB,root,blob,new String[]{
-                ATTR_INDEX,index.toString()});
-        }
-        this.blob = XmlUtil.toString(root,false);
-        } catch(Exception exc) {
-            throw new RuntimeException(exc);
-        }
     }
-    return this.blob;
-}
+
+    /**
+       Get the Blob property.
+
+       @return The Blob
+    **/
+    public String getBlob () {
+        String tmp = this.blob;
+        if(tmp == null) {
+            if(blobMap==null) return null;
+            tmp =mapToBlob(blobMap); 
+            this.blob = tmp;
+        }
+        return tmp;
+    }
 
 
     public Hashtable<Integer,String> getBlobMap () {
-    if(blobMap!=null) return blobMap;
-    Hashtable<Integer,String> tmp = new Hashtable<Integer,String>();
-    if(blob != null && blob.length()>0) {
-        try {
-        Element root = XmlUtil.getRoot(blob);
-        if (root != null) {
-            List elements = XmlUtil.findChildren(root,
-                                                 TAG_BLOB);
+        if(blobMap!=null) return blobMap;
+        Hashtable<Integer,String> tmp = blobToMap(blob);
+        blobMap = tmp;
+        blob = null;
+        return tmp;
+    }
 
-            for (int j = 0; j < elements.size(); j++) {
-                Element blobNode = (Element) elements.get(j);
-                int index = XmlUtil.getAttribute(blobNode, ATTR_INDEX,-1);
-                String text = XmlUtil.getChildText(blobNode);
-                if(text==null) text="";
-                tmp.put(new Integer(index),text);
+
+
+    public static Hashtable<Integer,String> blobToMap (String blob) {
+        Hashtable<Integer,String> tmp = new Hashtable<Integer,String>();
+        if(blob != null && blob.length()>0) {
+            try {
+                Element root = XmlUtil.getRoot(blob);
+                if (root != null) {
+                    List elements = XmlUtil.findChildren(root,
+                                                         TAG_BLOB);
+
+                    for (int j = 0; j < elements.size(); j++) {
+                        Element blobNode = (Element) elements.get(j);
+                        int index = XmlUtil.getAttribute(blobNode, ATTR_INDEX,-1);
+                        String text = XmlUtil.getChildText(blobNode);
+                        if(text==null) text="";
+                        tmp.put(new Integer(index),text);
+                    }
+                }
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
             }
         }
+        return tmp;
+    }
+
+
+
+    public static String mapToBlob (Hashtable<Integer,String> map) {
+        try {
+            Document doc   = XmlUtil.makeDocument();
+            Element  root  = XmlUtil.create(doc, TAG_ATTRIBUTES, (Element)null);
+            for (Enumeration keys =
+                     map.keys(); keys.hasMoreElements(); ) {
+                Integer index = (Integer) keys.nextElement();
+                String blob = map.get(index);
+                XmlUtil.create(doc,TAG_BLOB,root,blob,new String[]{
+                    ATTR_INDEX,index.toString()});
+            }
+            return  XmlUtil.toString(root,false);
         } catch(Exception exc) {
             throw new RuntimeException(exc);
         }
     }
-    blobMap = tmp;
-    blob = null;
-    return tmp;
-}
-
 
 
 }

@@ -3,6 +3,14 @@
 
   <handler category="Tags">
 
+    <type name="Group Test" type="grouptest" searchable="true" browsable="true">
+      <element label="Group" type="group">
+            <element label="attr1" type="string"/>
+	    <element label="attr2" type="eumeration"  values="apples,bananas,cherries"/>
+      </element>
+   </type>
+
+
 <!--
     <type name="Test" type="test" searchable="true" browsable="true">
       <element label="attr1" type="string"/>

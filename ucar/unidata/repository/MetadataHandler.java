@@ -495,7 +495,11 @@ public class MetadataHandler extends RepositoryManager {
         if ((type == null) || !type.hasElements()) {
             return null;
         }
-        return type.getForm(this, request, entry, metadata, forEdit);
+        String suffix = "";
+        if (metadata.getId().length() > 0) {
+            suffix = "." + metadata.getId();
+        }
+        return type.getForm(this, request, entry, metadata, suffix, forEdit);
     }
 
 

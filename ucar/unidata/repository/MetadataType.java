@@ -84,18 +84,12 @@ public class MetadataType implements Constants {
 
     public static final String TAG_HANDLER = "handler";
 
-    /** _more_ */
-    public static final String ATTR_INDEX = "index";
 
-    public static final String ATTR_ROWS = "rows";
+
 
     /** _more_ */
     public static final String ATTR_CLASS = "class";
 
-    /** _more_ */
-    public static final String ATTR_COLUMNS = "columns";
-
-    public static final String ATTR_DEPENDS = "depends";
 
     /** _more_ */
     public static final String ATTR_SHOWINHTML = "showinhtml";
@@ -103,27 +97,12 @@ public class MetadataType implements Constants {
     /** _more_ */
     public static final String ATTR_HANDLER = "handler";
 
-    /** _more_ */
-    public static final String ATTR_TYPE = "type";
-    public static final String ATTR_GROUP = "group";
 
     /** _more_ */
     public static final String ATTR_ADMINONLY = "adminonly";
 
     /** _more_ */
     public static final String ATTR_FORUSER = "foruser";
-
-    /** _more_ */
-    public static final String ATTR_LABEL = "label";
-
-    /** _more_ */
-    public static final String ATTR_DEFAULT = "default";
-
-    /** _more_ */
-    public static final String ATTR_VALUES = "values";
-
-    /** _more_ */
-    public static final String ATTR_NAME = "name";
 
     /** _more_ */
     public static final String ATTR_DISPLAYCATEGORY = "displaycategory";
@@ -137,8 +116,7 @@ public class MetadataType implements Constants {
     /** _more_ */
     public static final String ATTR_BROWSABLE = "browsable";
 
-    /** _more_ */
-    public static final String ATTR_THUMBNAIL = "thumbnail";
+
 
     /** _more_ */
     public static final String ATTR_ = "";
@@ -304,64 +282,13 @@ public class MetadataType implements Constants {
             for (int j = 0; j < elements.size(); j++) {
                 //    <element type="string" label="Name"/>
                 Element elementNode = (Element) elements.get(j);
-
-                String elementType = XmlUtil.getAttribute(elementNode,
-                                         ATTR_TYPE,MetadataElement.TYPE_STRING);
-                String dflt = XmlUtil.getAttribute(elementNode, ATTR_DEFAULT,
-                                  "");
                 int index = lastIndex+1;
-                if(XmlUtil.hasAttribute(elementNode, ATTR_INDEX)) {
-                    index = XmlUtil.getAttribute(elementNode, ATTR_INDEX, index);
+                if(XmlUtil.hasAttribute(elementNode, MetadataElement.ATTR_INDEX)) {
+                    index = XmlUtil.getAttribute(elementNode, MetadataElement.ATTR_INDEX, index);
                 }
                 lastIndex = index;
                 MetadataElement element =
-                    new MetadataElement(
-                        metadataType, lastIndex, elementType,
-                        XmlUtil.getAttribute(elementNode, ATTR_LABEL),
-                        XmlUtil.getAttribute(elementNode, ATTR_ROWS, 1),
-                        XmlUtil.getAttribute(elementNode, ATTR_COLUMNS, 60),
-                        null);
-                element.setGroup(XmlUtil.getAttribute(elementNode, ATTR_GROUP,(String) null));
-                element.setSearchable(XmlUtil.getAttribute(elementNode,
-                        ATTR_SEARCHABLE, false));
-                element.setThumbnail(XmlUtil.getAttribute(elementNode,
-                        ATTR_THUMBNAIL, false));
-                element.setDefault(dflt);
-                if (elementType.equals(MetadataElement.TYPE_ENUMERATION)||
-                    elementType.equals(MetadataElement.TYPE_ENUMERATIONPLUS)) {
-                    String values = XmlUtil.getAttribute(elementNode,
-                                        ATTR_VALUES);
-                    List<String> tmpValues = null;
-                    if (values.startsWith("file:")) {
-                        String tagValues =
-                            IOUtil.readContents(values.substring(5),
-                                MetadataType.class);
-                        tmpValues =
-                            (List<String>) StringUtil.split(tagValues, "\n",
-                                true, true);
-                    } else {
-                        tmpValues = (List<String>) StringUtil.split(values,
-                                ",", true, true);
-                    }
-
-
-                    List enumValues = new ArrayList();
-                    for (String tok : tmpValues) {
-                        int idx = tok.indexOf(":");
-                        if (idx < 0) {
-                            enumValues.add(tok);
-                            continue;
-                        }
-                        String[] toks = StringUtil.split(tok, ":", 2);
-                        if (toks == null) {
-                            enumValues.add(tok);
-                            continue;
-                        }
-                        enumValues.add(new TwoFacedObject(toks[1], toks[0]));
-                    }
-                    enumValues.add(0,"");
-                    element.setValues(enumValues);
-                }
+                    new MetadataElement(metadataType, lastIndex, elementNode);
                 metadataType.addElement(element);
             }
         }
@@ -466,13 +393,15 @@ public class MetadataType implements Constants {
                                String suffix, Metadata oldMetadata,
                                boolean newMetadata)
             throws Exception {
+        System.err.println("type.handleForm:" + suffix);
         boolean inherited = request.get(ARG_METADATA_INHERITED + suffix,
                                         false);
         Metadata metadata = new Metadata(id, entry.getId(), getType(),
                                          inherited);
         for (MetadataElement element : elements) {
-            element.handleForm(request, this, entry, metadata, oldMetadata,
-                               suffix);
+            String value =  element.handleForm(request, this, entry, metadata, oldMetadata,
+                                               suffix);
+            metadata.setAttr(element.getIndex(), value);
         }
         return metadata;
     }
@@ -863,15 +792,11 @@ public class MetadataType implements Constants {
      * @throws Exception _more_
      */
     public String[] getForm(MetadataHandler handler, Request request,
-                            Entry entry, Metadata metadata, boolean forEdit)
+                            Entry entry, Metadata metadata, String suffix,boolean forEdit)
             throws Exception {
 
         String lbl    = handler.msgLabel(name);
-        String suffix = "";
-        if (metadata.getId().length() > 0) {
-            suffix = "." + metadata.getId();
-        }
-
+        System.err.println("type.getForm:" + suffix);
         
         String submit = HtmlUtil.submit(handler.msg("Add")
                                         + HtmlUtil.space(1) + name);
@@ -890,8 +815,8 @@ public class MetadataType implements Constants {
                 sb.append(HtmlUtil.row(HtmlUtil.colspan(handler.header(lastGroup),2)));
             }
             String elementLbl = handler.msgLabel(element.getLabel());
-            String widget = element.getForm(request, entry, metadata,
-                                            ARG_METADATA_ATTR+element.getIndex()+suffix, 
+            String widget = element.getForm(request, entry,  this, metadata,
+                                            suffix, 
                                             metadata.getAttr(element.getIndex()), forEdit);
             if ((widget == null) || (widget.length() == 0)) {}
             else {
