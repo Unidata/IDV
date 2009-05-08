@@ -342,8 +342,6 @@ public class MetadataElement implements Constants {
         }
 
 
-        System.err.println("handle form:" + arg);
-
         String attr = request.getString(arg, "");
         if (request.defined(arg + ".select")) {
             attr = request.getString(arg + ".select", "");
@@ -360,7 +358,7 @@ public class MetadataElement implements Constants {
 
 
 
-        String oldValue = oldMetadata.getAttr(getIndex());
+        String oldValue = (oldMetadata==null?"":oldMetadata.getAttr(getIndex()));
 
 
         String url     = request.getString(arg + ".url", "");
