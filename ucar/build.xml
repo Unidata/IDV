@@ -298,6 +298,34 @@ argument -Dfoo=bar) -->
     </target>
 
 
+
+    <target name="fullidv" depends="init">
+        <javac
+            classpath="${classpath}"
+            debug="true"
+            source="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            srcdir="${srcdir}"
+            fork="${fork}"
+            memoryMaximumSize="${maxmemory}"
+        >
+            <include name="ucar/unidata/idv/**"/>
+            <include name="ucar/unidata/data/**"/>
+            <include name="ucar/unidata/util/**"/>
+            <include name="ucar/unidata/ui/symbol/**"/>
+            <include name="ucar/unidata/apps/**"/>
+            <exclude name="ucar/unidata/io/**"/>
+            <exclude name="ucar/unidata/apps/lead/**"/>
+            <exclude name="ucar/util/prefs/**"/>
+            <exclude name="ucar/nc2/**"/>
+            <exclude name="ucar/ma2/**"/>
+            <exclude name="ucar/grib/**"/>
+        </javac>
+    </target>
+
+
     <target name="docs" depends="init,docs_userguide_forweb,docs_workshop,docs_developer">
 <!--
         <antcall target="javadoc"/>
