@@ -638,7 +638,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 String row =
                     " <tr  " + theClass
                     + " valign=\"top\"><td width=\"10%\" align=\"right\" valign=\"top\" class=\"formlabel\"><nobr>"
-                    + html[0] + "</nobr></td><td>" + html[1]
+                    + html[0] + "</nobr></td><td>" + HtmlUtil.makeToggleInline("",html[1],true)
                     + "</td></tr>";
                 sb.append(row);
             } else {

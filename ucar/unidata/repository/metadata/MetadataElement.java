@@ -87,6 +87,8 @@ public class MetadataElement extends MetadataTypeBase {
 
     public static final String ATTR_REQUIRED = "required";
 
+    public static final String ATTR_MAX = "max";
+
     public static final String ATTR_ROWS = "rows";
     /** _more_ */
     public static final String ATTR_COLUMNS = "columns";
@@ -98,7 +100,7 @@ public class MetadataElement extends MetadataTypeBase {
     public static final String ATTR_GROUP = "group";
 
 
-    public static final String ATTR_SUBLABEL = "sublabel";
+    public static final String ATTR_SUBNAME = "subname";
 
     /** _more_ */
     public static final String ATTR_DEFAULT = "default";
@@ -119,7 +121,9 @@ public class MetadataElement extends MetadataTypeBase {
     private String dataType = TYPE_STRING;
 
 
-    private String subLabel = "";
+    private String subName = "";
+
+    private int max = -1;
 
     /** _more_ */
     private int rows = 1;
@@ -129,6 +133,8 @@ public class MetadataElement extends MetadataTypeBase {
 
     /** _more_ */
     private List values;
+
+    private Hashtable<String,String> valueMap = new Hashtable<String,String>();
 
     /** _more_ */
     private String dflt = "";
@@ -159,7 +165,8 @@ public class MetadataElement extends MetadataTypeBase {
 
     public void init(Element node) throws Exception {
         super.init(node);
-        subLabel = XmlUtil.getAttribute(node, ATTR_SUBLABEL,"");
+        subName = XmlUtil.getAttribute(node, ATTR_SUBNAME,"");
+        max = XmlUtil.getAttribute(node, ATTR_MAX,max);
         setRows(XmlUtil.getAttribute(node, ATTR_ROWS, 1));
         setColumns(XmlUtil.getAttribute(node, ATTR_COLUMNS, 60));
         setDataType(XmlUtil.getAttribute(node,
@@ -195,14 +202,17 @@ public class MetadataElement extends MetadataTypeBase {
             for (String tok : tmpValues) {
                 int idx = tok.indexOf(":");
                 if (idx < 0) {
+                    valueMap.put(tok,tok);
                     enumValues.add(tok);
                     continue;
                 }
                 String[] toks = StringUtil.split(tok, ":", 2);
                 if (toks == null) {
+                    valueMap.put(tok,tok);
                     enumValues.add(tok);
                     continue;
                 }
+                valueMap.put(toks[0],toks[1]);
                 enumValues.add(new TwoFacedObject(toks[1], toks[0]));
             }
             enumValues.add(0,"");
@@ -242,30 +252,63 @@ public class MetadataElement extends MetadataTypeBase {
         if (dataType.equals(TYPE_FILE)) {
             return false;
         }
+        String html =null;
         if (getDataType().equals(TYPE_GROUP)) {
+            StringBuffer entriesSB =  new StringBuffer();
+            entriesSB.append("<table border=0 width=100% cellpadding=2 cellspacing=2>");
             List<Hashtable<Integer,String>> entries =(List<Hashtable<Integer,String>>)
                 (value!=null && value.length()>0?XmlEncoder.decodeXml(value):null);
             if(entries==null) return false;
+            boolean justOne = getChildren().size()==1;
             for(Hashtable<Integer,String> map: entries) {
+                if(subName.length()>0) {
+                    entriesSB.append("<tr valign=\"top\"><td align=center colspan=2><b>" + subName+"</td></tr>");
+                }
                 for(MetadataElement element: getChildren()) {
                     String subValue = map.get(new Integer(element.getIndex()));
                     if(subValue==null) continue;
-                    element.getHtml(sb, subValue);
+                    entriesSB.append("<tr valign=\"top\"><td></td><td>\n");
+                    //                    entriesSB.append("<table width=100% cellpadding=0 cellspacing=0>");
+                    element.getHtml(entriesSB, subValue);
+                    //                    entriesSB.append("</table>");
+                    entriesSB.append("</td></tr>\n");
+                }
+                if(!justOne) {
+                    entriesSB.append("<tr><td colspan=2><hr></td></tr>\n");
                 }
             }
-        }
+            entriesSB.append("</table>");
+            html = HtmlUtil.makeToggleInline("",
+                                             HtmlUtil.div(entriesSB.toString(),HtmlUtil.cssClass("metadatagroup")),true);
 
-
-
-        if (dataType.equals(TYPE_EMAIL)) {
-            sb.append(HtmlUtil.href("mailto:" + value, value));
+        } else if(dataType.equals(TYPE_ENUMERATION) ||
+                  dataType.equals(TYPE_ENUMERATIONPLUS)) {
+            String label = valueMap.get(value);
+            if(label==null) {
+                label = value;
+            }
+            html = label;
+        } else if (dataType.equals(TYPE_EMAIL)) {
+            html =HtmlUtil.href("mailto:" + value, value);
         } else if (dataType.equals(TYPE_URL)) {
-            sb.append(HtmlUtil.href(value, value));
+            html = HtmlUtil.href(value, value);
         } else {
-            sb.append(value);
+            html=value;
         }
-        sb.append(HtmlUtil.br());
-        return true;
+        if(html!=null) {
+            String name = getName();
+            if(name.length()>0) 
+                name = msgLabel(name);
+            else 
+                name=HtmlUtil.space(1);
+            sb.append(HtmlUtil.formEntryTop(name,html));
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isGroup() {
+        return getDataType().equals(TYPE_GROUP);
     }
 
     /**
@@ -480,16 +523,16 @@ public class MetadataElement extends MetadataTypeBase {
                 groupSB.append(HtmlUtil.formTableClose());
 
                 if(entries.size()>1 && groupCnt==entries.size()-1) {
-                    entriesSB.append(HtmlUtil.makeShowHideBlock("New " + subLabel,groupSB.toString(),false));
+                    entriesSB.append(HtmlUtil.makeShowHideBlock("New " + subName,groupSB.toString(),false));
                 } else {
                     if(entries.size()>1) {
                     } 
-                    entriesSB.append(HtmlUtil.makeShowHideBlock(subLabel,groupSB.toString(),true));
+                    entriesSB.append(HtmlUtil.makeShowHideBlock(subName,groupSB.toString(),true));
                 }
 
                 groupCnt++;
             }
-            sb.append(HtmlUtil.makeShowHideBlock("Hide/Show " + getName(), HtmlUtil.div(entriesSB.toString(),HtmlUtil.cssClass("metadatagroup")),true));
+            sb.append(HtmlUtil.makeToggleInline("", HtmlUtil.div(entriesSB.toString(),HtmlUtil.cssClass("metadatagroup")),true));
             return sb.toString();
         } else {
             System.err.println("Unknown data type:" + dataType);

@@ -3,11 +3,11 @@
 
   <handler class="ucar.unidata.repository.metadata.DifMetadataHandler" category="DIF">
 
-<type name="Entry Title" type="dif.entry_title" searchable="true">
+<type name="Entry Title" type="dif.entry_title" searchable="false">
       <element name="Title"/>
 </type>
 
-<type name="Parameters" type="dif.parameters" searchable="true">
+<type name="Parameters" type="dif.parameters" searchable="false">
       <element name="Category" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
       <element name="Topic" datatype="enumeration" 
@@ -23,30 +23,30 @@
       <element name="Detailed Variable"/>
 </type>
 
-<type name="ISO Topic Category" type="dif.iso_topic_category" searchable="true">
+<type name="ISO Topic Category" type="dif.iso_topic_category" searchable="false">
       <element name="Category" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/isotopiccategories.txt"/>>
 </type>
 
-<type name="Data Center" type="dif.data_center" searchable="true">
+<type name="Data Center" type="dif.data_center" searchable="false">
       <element name="Short Name"/>      
       <element name="Long Name"/>      
       <element name="URL" datatype="url"/>      
       <element name="Set ID"/>      
-      <element name="Personnel" datatype="group" subname="Personnel">
-          <element name="Roles" datatype="group" subname="Role">
-               <element name=""   datatype="enumerationplus" 
-                        values="investigator:Investigator,technicalcontact,Technical Contact,difauthor:DIF Author"/>      
+      <element name="Personnel" datatype="group" subname="Personnel Record">
+          <element name="Roles" datatype="group" subname="">
+               <element name="Role"   datatype="enumerationplus" 
+                        values="investigator:Investigator,technicalcontact:Technical Contact,difauthor:DIF Author"/>      
           </element>
           <element name="First Name"  />      
           <element name="Middle Name"  />      
           <element name="Last Name"  />      
           <element name="Email" datatype="email"  />      
-          <element name="Phone Numbers"  datatype="group" subname="Phone Number">
-              <element name=""  />
+          <element name="Phone Numbers"  datatype="group" subname="">
+              <element name="Phone Number"  />
           </element>
-          <element name="Fax Numbers"  datatype="group" subname="Fax Number">
-              <element name=""  />
+          <element name="Fax Numbers"  datatype="group" >
+              <element name="Fax Number"  />
           </element>
           <element name="Address" rows="3"  />
           <element name="City"  />
@@ -57,17 +57,17 @@
 </type>
 
 
-<type name="Summary" type="dif.summary" searchable="true">
+<type name="Summary" type="dif.summary" searchable="false">
       <element name="Summary" rows="5"/>
 
 </type>
 
-<type name="Quality" type="dif.quality" searchable="true">
+<type name="Quality" type="dif.quality" searchable="false">
       <element name="Quality" rows="5"/>
 
 </type>
 
-<type name="Metadata Name" type="dif.metadata_name" searchable="true">
+<type name="Metadata Name" type="dif.metadata_name" searchable="false">
       <element name="Name" default="CEOS IDN DIF"/>
 </type>
 
@@ -76,7 +76,7 @@
 </type>
 
 
-<type name="Data Set Citation" type="dif.data_set_citation" searchable="true">
+<type name="Data Set Citation" type="dif.data_set_citation" searchable="false">
       <element name="Dataset Creator"/>
       <element name="Dataset Title"/>
       <element name="Dataset Series Name"/>
@@ -91,14 +91,14 @@
 
 </type>
 
-<type name="Personnel" type="dif.personnel" searchable="true" >searchable="true"
-      <element name="Roles" datatype="group" subname="Role">
-            <element name=""   datatype="enumerationplus" 
+<type name="Personnel" type="dif.personnel"  searchable="false">
+      <element name="Roles" datatype="group" subname="">
+            <element name="Role"   datatype="enumerationplus" 
 	             values="investigator:Investigator,technicalcontact:Technical Contact,difauthor:DIF Author"/>      
       </element>
       <element name="First Name"/>      
       <element name="Middle Name"/>      
-      <element name="Last Name" searchable="true"/>      
+      <element name="Last Name" searchable="false"/>      
       <element name="Email" datatype="email"/>      
       <element name="Phone Numbers"  datatype="group" subname="Phone Number">
          <element name=""/>
@@ -114,19 +114,19 @@
 </type>
 
 
-<type name="Instrument" type="dif.instrument" searchable="true">
+<type name="Instrument" type="dif.instrument" searchable="false">
       <element name="Short Name"/>      
       <element name="Long Name"/>      
 </type>
 
 
-<type name="Platform" type="dif.platform" searchable="true">
+<type name="Platform" type="dif.platform" searchable="false">
       <element name="Short Name"/>      
       <element name="Long Name"/>      
 </type>
 
 
-<type name="Project" type="dif.project" searchable="true">
+<type name="Project" type="dif.project" searchable="false">
       <element name="Short Name"/>      
       <element name="Long Name"/>      
 </type>
@@ -144,7 +144,7 @@
 </type>
 
 
-<type name="Location" type="dif.location" searchable="true">
+<type name="Location" type="dif.location" searchable="false">
       <element name="Category" datatype="enumeration" values="continent:Continent,ocean:Ocean,geographicregion:Geographic Region,solidearth:Solid Earth,space:Space,verticallocation:Vertical Location"/>      
       <element name="Type"/>      
       <element name="Sub-Region 1"/>      
@@ -154,7 +154,7 @@
 </type>
 
 
-<type name="Data Resolution" type="dif.dataresolution" searchable="true">
+<type name="Data Resolution" type="dif.dataresolution" searchable="false">
       <element name="Latitude Resolution"/>      
       <element name="Longitude Resolution"/>      
       <element name="Horizontal Resolution Range"/>      
@@ -166,15 +166,15 @@
 
 
 
-<type name="Access Constraints" type="dif.accesscontraints" searchable="true">
+<type name="Access Constraints" type="dif.accesscontraints" searchable="false">
       <element name="Constraints" rows="5"/>      
 </type>
 
-<type name="Use Constraints" type="dif.usecontraints" searchable="true">
+<type name="Use Constraints" type="dif.usecontraints" searchable="false">
       <element name="Constraints" rows="5"/>      
 </type>
 
-<type name="Distribution" type="dif.distribution" searchable="true">
+<type name="Distribution" type="dif.distribution" searchable="false">
       <element name="Media" datatype="enumerationplus" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/media.txt"/>
       <element name="Size" columns="6" />      
@@ -187,19 +187,19 @@
 
 
 
-<type name="Language" type="dif.data_set_language" searchable="true">
+<type name="Language" type="dif.data_set_language" searchable="false">
       <element name="Language" datatype="enumerationplus" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/languages.txt"/>      
 </type>
 
 
 
-<type name="Data Set Progress" type="dif.data_set_progress" searchable="true">
+<type name="Data Set Progress" type="dif.data_set_progress" searchable="false">
       <element name="Progress" datatype="enumeration" 
          values="planned:Planned,inwork:In Work,complete:Complete"/>      
 </type>
 
-<type name="Related URL" type="dif.related_url" searchable="true">
+<type name="Related URL" type="dif.related_url" searchable="false">
       <element name="URL" datatype="url"/>      
       <element name="Description"/>      
       <element name="Type"/>      
@@ -211,12 +211,12 @@
       <element name="History" />      
 </type>
 
-<type name="Keyword" type="dif.keyword" searchable="true">
+<type name="Keyword" type="dif.keyword" searchable="false">
       <element name="Keyword" />      
 </type>
 
 
-<type name="Originating Center" type="dif.originating_center" searchable="true">
+<type name="Originating Center" type="dif.originating_center" searchable="false">
       <element name="Center" />      
 </type>
 
