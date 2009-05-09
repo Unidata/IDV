@@ -22,8 +22,8 @@
 
 
 
-
-package ucar.unidata.repository;
+package ucar.unidata.repository.metadata;
+import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
@@ -343,7 +343,7 @@ public class MetadataElement extends MetadataTypeBase {
         if (url.length() > 0) {
             String tail = IOUtil.getFileTail(url);
             File tmpFile =
-                getHandler().getStorageManager().getTmpFile(request,
+                getStorageManager().getTmpFile(request,
                     tail);
             RepositoryUtil.checkFilePath(tmpFile.toString());
             URL              fromUrl    = new URL(url);

@@ -22,6 +22,7 @@
 
 
 package ucar.unidata.repository;
+import ucar.unidata.repository.metadata.*;
 
 
 import org.w3c.dom.*;

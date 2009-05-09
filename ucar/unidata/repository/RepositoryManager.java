@@ -21,6 +21,7 @@
  */
 
 package ucar.unidata.repository;
+import ucar.unidata.repository.metadata.*;
 
 
 import org.w3c.dom.*;
@@ -388,7 +389,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
-    protected String header(String h) {
+    public String header(String h) {
         return RepositoryUtil.header(h);
     }
 
@@ -397,7 +398,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
-    protected Admin getAdmin() {
+    public Admin getAdmin() {
         return repository.getAdmin();
     }
 
@@ -406,7 +407,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
-    protected UserManager getUserManager() {
+    public UserManager getUserManager() {
         return repository.getUserManager();
     }
 
@@ -415,11 +416,11 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
-    protected SessionManager getSessionManager() {
+    public SessionManager getSessionManager() {
         return repository.getSessionManager();
     }
 
-    protected LogManager getLogManager() {
+    public LogManager getLogManager() {
         return repository.getLogManager();
     }
 
@@ -428,7 +429,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
-    protected ActionManager getActionManager() {
+    public ActionManager getActionManager() {
         return repository.getActionManager();
     }
 
@@ -437,7 +438,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
-    protected AccessManager getAccessManager() {
+    public AccessManager getAccessManager() {
         return repository.getAccessManager();
     }
 
@@ -446,15 +447,15 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
-    protected EntryManager getEntryManager() {
+    public EntryManager getEntryManager() {
         return repository.getEntryManager();
     }
 
-    protected SearchManager getSearchManager() {
+    public SearchManager getSearchManager() {
         return repository.getSearchManager();
     }
 
-    protected AssociationManager getAssociationManager() {
+    public AssociationManager getAssociationManager() {
         return repository.getAssociationManager();
     }
 
@@ -463,7 +464,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
-    protected MetadataManager getMetadataManager() {
+    public MetadataManager getMetadataManager() {
         return repository.getMetadataManager();
     }
 
@@ -473,7 +474,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
-    protected HarvesterManager getHarvesterManager() {
+    public HarvesterManager getHarvesterManager() {
         return repository.getHarvesterManager();
     }
 
@@ -483,7 +484,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
-    protected StorageManager getStorageManager() {
+    public StorageManager getStorageManager() {
         return repository.getStorageManager();
     }
 

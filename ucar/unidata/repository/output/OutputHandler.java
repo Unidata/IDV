@@ -21,6 +21,7 @@
 
 package ucar.unidata.repository.output;
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.metadata.*;
 
 
 import org.w3c.dom.Element;
@@ -56,7 +57,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 

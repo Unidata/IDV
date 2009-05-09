@@ -19,7 +19,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository.data;
+package ucar.unidata.repository.metadatadata;
 
 
 import org.w3c.dom.*;

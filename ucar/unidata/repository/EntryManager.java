@@ -26,6 +26,7 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.data.*;
 import ucar.unidata.repository.harvester.*;
 
@@ -1509,7 +1510,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected Result makeEntryEditResult(Request request, Entry entry,
+    public Result makeEntryEditResult(Request request, Entry entry,
                                          String title, StringBuffer sb)
             throws Exception {
         Result result = new Result(title, sb);
