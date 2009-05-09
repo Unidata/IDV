@@ -486,7 +486,7 @@ public class MetadataManager extends RepositoryManager {
      * @param metadataDefFiles _more_
      * @throws Exception _more_
      */
-    protected void initMetadataHandlers(List<String> metadataDefFiles)
+    public void initMetadataHandlers(List<String> metadataDefFiles)
             throws Exception {
         for (String file : metadataDefFiles) {
             try {

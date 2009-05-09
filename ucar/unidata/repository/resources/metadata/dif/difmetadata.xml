@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <metadata>
 
-  <handler class="ucar.unidata.repository.data.DifMetadataHandler" category="DIF">
+  <handler class="ucar.unidata.repository.metadata.DifMetadataHandler" category="DIF">
 
 <type name="Entry Title" type="dif.entry_title" searchable="true">
       <element name="Title"/>

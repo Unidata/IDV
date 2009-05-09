@@ -196,7 +196,7 @@ public class MetadataType extends MetadataTypeBase {
 
             Class c = Misc.findClass(XmlUtil.getAttributeFromTree(node,
                           ATTR_CLASS,
-                          "ucar.unidata.repository.MetadataHandler"));
+                          "ucar.unidata.repository.metadata.MetadataHandler"));
 
             MetadataHandler handler = manager.getHandler(c);
             String          type    = XmlUtil.getAttribute(node, ATTR_TYPE);

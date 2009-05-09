@@ -19,37 +19,16 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository.metadatadata;
-
+package ucar.unidata.repository.metadata;
 
 import org.w3c.dom.*;
 
 
-import ucar.ma2.*;
-
-import ucar.nc2.Attribute;
-import ucar.nc2.Variable;
-
-
-import ucar.nc2.VariableSimpleIF;
-import ucar.nc2.constants.AxisType;
-import ucar.nc2.dataset.CoordinateAxis;
-
-import ucar.nc2.dataset.CoordinateSystem;
-import ucar.nc2.dataset.NetcdfDataset;
-
-
-import ucar.unidata.geoloc.LatLonRect;
-import ucar.unidata.geoloc.ProjectionImpl;
 
 import ucar.unidata.repository.*;
 
-import ucar.unidata.sql.SqlUtil;
-import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.Misc;
 
 
 
