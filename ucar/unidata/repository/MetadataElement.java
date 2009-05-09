@@ -55,7 +55,7 @@ import java.util.List;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class MetadataElement implements Constants {
+public class MetadataElement extends MetadataTypeBase {
 
     /** _more_ */
     public static final String TYPE_SKIP = "skip";
@@ -97,8 +97,6 @@ public class MetadataElement implements Constants {
     public static final String ATTR_DATATYPE = "datatype";
     public static final String ATTR_GROUP = "group";
 
-    /** _more_ */
-    public static final String ATTR_LABEL = "label";
 
     public static final String ATTR_SUBLABEL = "sublabel";
 
@@ -108,8 +106,6 @@ public class MetadataElement implements Constants {
     /** _more_ */
     public static final String ATTR_VALUES = "values";
 
-    /** _more_ */
-    public static final String ATTR_NAME = "name";
 
     public static final String ATTR_SEARCHABLE = "searchable";
 
@@ -122,8 +118,6 @@ public class MetadataElement implements Constants {
     /** _more_ */
     private String dataType = TYPE_STRING;
 
-    /** _more_ */
-    private String label = "";
 
     private String subLabel = "";
 
@@ -151,33 +145,20 @@ public class MetadataElement implements Constants {
     private int index;
 
     /** _more_ */
-    private MetadataType metadataType;
+    private MetadataTypeBase parent;
 
     private String group;
 
-    private List<MetadataElement> children;
-
-    /**
-     * _more_
-     *
-     *
-     * @param metadataType _more_
-     * @param index _more_
-     * @param type _more_
-     * @param label _more_
-     * @param rows _more_
-     * @param columns _more_
-     * @param values _more_
-     */
-    public MetadataElement(MetadataType metadataType, int index, Element node) throws Exception {
-        this.metadataType = metadataType;
+    public MetadataElement(MetadataHandler handler, MetadataTypeBase parent, int index, Element node) throws Exception {
+        super(handler);
+        this.parent = parent;
         this.index        = index;
         init(node);
     }
 
 
-    private void init(Element node) throws Exception {
-        setLabel(XmlUtil.getAttribute(node, ATTR_LABEL));
+    public void init(Element node) throws Exception {
+        super.init(node);
         subLabel = XmlUtil.getAttribute(node, ATTR_SUBLABEL,"");
         setRows(XmlUtil.getAttribute(node, ATTR_ROWS, 1));
         setColumns(XmlUtil.getAttribute(node, ATTR_COLUMNS, 60));
@@ -227,25 +208,6 @@ public class MetadataElement implements Constants {
             enumValues.add(0,"");
             setValues(enumValues);
         }
-
-
-        if(dataType.equals(TYPE_GROUP)) {
-            List elements = XmlUtil.findChildren(node,
-                                MetadataType.TAG_ELEMENT);
-            children = new ArrayList<MetadataElement>();
-            int lastIndex = 0;
-            for (int j = 0; j < elements.size(); j++) {
-                Element elementNode = (Element) elements.get(j);
-                int index = lastIndex+1;
-                if(XmlUtil.hasAttribute(elementNode, ATTR_INDEX)) {
-                    index = XmlUtil.getAttribute(elementNode, ATTR_INDEX, index);
-                }
-                lastIndex = index;
-                MetadataElement element =
-                    new MetadataElement(metadataType, lastIndex, elementNode);
-                children.add(element);
-            }
-        }
     }
 
 
@@ -272,14 +234,29 @@ public class MetadataElement implements Constants {
      *
      * @return _more_
      */
-    public boolean getHtml(MetadataHandler handler, StringBuffer sb,
-                           String value) {
+    public boolean getHtml(StringBuffer sb,
+                           String value) throws Exception {
         if (dataType.equals(TYPE_SKIP)) {
             return false;
         }
         if (dataType.equals(TYPE_FILE)) {
             return false;
         }
+        if (getDataType().equals(TYPE_GROUP)) {
+            List<Hashtable<Integer,String>> entries =(List<Hashtable<Integer,String>>)
+                (value!=null && value.length()>0?XmlEncoder.decodeXml(value):null);
+            if(entries==null) return false;
+            for(Hashtable<Integer,String> map: entries) {
+                for(MetadataElement element: getChildren()) {
+                    String subValue = map.get(new Integer(element.getIndex()));
+                    if(subValue==null) continue;
+                    element.getHtml(sb, subValue);
+                }
+            }
+        }
+
+
+
         if (dataType.equals(TYPE_EMAIL)) {
             sb.append(HtmlUtil.href("mailto:" + value, value));
         } else if (dataType.equals(TYPE_URL)) {
@@ -303,7 +280,7 @@ public class MetadataElement implements Constants {
      *
      * @throws Exception _more_
      */
-    public String handleForm(Request request, MetadataType type, Entry entry,
+    public String handleForm(Request request,  Entry entry,
                            Metadata newMetadata, Metadata oldMetadata,
                            String suffix)
             throws Exception {
@@ -317,7 +294,7 @@ public class MetadataElement implements Constants {
 
 
         if (getDataType().equals(TYPE_GROUP)) {
-            List<Hashtable<Integer,String>> entries =   entries = new ArrayList<Hashtable<Integer,String>>();
+            List<Hashtable<Integer,String>> entries = new ArrayList<Hashtable<Integer,String>>();
             int groupCnt=0;
             while(true) {
                 String subArg = arg+".group" +groupCnt+".";
@@ -330,8 +307,8 @@ public class MetadataElement implements Constants {
                         }
                     }
                     Hashtable<Integer,String> map = new Hashtable<Integer,String>();
-                    for(MetadataElement element: children) {
-                        String subValue = element.handleForm(request, type, entry, newMetadata, oldMetadata, subArg);
+                    for(MetadataElement element: getChildren()) {
+                        String subValue = element.handleForm(request, entry, newMetadata, oldMetadata, subArg);
                         map.put(new Integer(element.getIndex()), subValue);
                     }
                     entries.add(map);
@@ -366,7 +343,7 @@ public class MetadataElement implements Constants {
         if (url.length() > 0) {
             String tail = IOUtil.getFileTail(url);
             File tmpFile =
-                type.getHandler().getStorageManager().getTmpFile(request,
+                getHandler().getStorageManager().getTmpFile(request,
                     tail);
             RepositoryUtil.checkFilePath(tmpFile.toString());
             URL              fromUrl    = new URL(url);
@@ -396,9 +373,7 @@ public class MetadataElement implements Constants {
             }
             theFile = fileArg;
         }
-        theFile =
-            type.getHandler().getRepository().getStorageManager()
-                .moveToEntryDir(entry, new File(theFile)).getName();
+        theFile =   getStorageManager().moveToEntryDir(entry, new File(theFile)).getName();
         return  theFile;
     }
 
@@ -417,7 +392,6 @@ public class MetadataElement implements Constants {
      * @return _more_
      */
     public String getForm(Request request, Entry entry, 
-                          MetadataType metadataType,
                           Metadata metadata,
                           String suffix, String value, boolean forEdit) throws Exception {
         if (dataType.equals(TYPE_SKIP)) {
@@ -444,12 +418,12 @@ public class MetadataElement implements Constants {
             boolean contains = values.contains(value);
             return HtmlUtil.select(arg, values, value) +
                 HtmlUtil.space(2) +
-                metadataType.getHandler().msgLabel("Or") +
+                msgLabel("Or") +
                 HtmlUtil.input(arg+".input", (contains?"":value),HtmlUtil.SIZE_30);
         } else if (dataType.equals(TYPE_FILE)) {
             String image = (forEdit
-                            ? metadataType.getFileHtml(request, entry,
-                                metadata, this, false)
+                            ? getFileHtml(request, entry,
+                                          metadata, this, false)
                             : "");
             if (image == null) {
                 image = "";
@@ -471,26 +445,24 @@ public class MetadataElement implements Constants {
             String lastGroup = null;
 
             int groupCnt = 0;
-
-            //sb.append(HtmlUtil.formTable());
-            //            sb.append("<table border=1>");
             StringBuffer entriesSB = new StringBuffer();
             for(Hashtable<Integer,String> map: entries) {
-                StringBuffer groupSB = new StringBuffer("<table border=0>");
+                StringBuffer groupSB = new StringBuffer();
+                groupSB.append(HtmlUtil.formTable());
                 String subArg = arg+".group" +groupCnt+".";
-                for(MetadataElement element: children) {
+                for(MetadataElement element: getChildren()) {
                     if(element.getGroup()!=null && !Misc.equals(element.getGroup(),lastGroup)) {
                         lastGroup = element.getGroup();
-                        groupSB.append(HtmlUtil.row(HtmlUtil.colspan(metadataType.getHandler().header(lastGroup),2)));
+                        groupSB.append(HtmlUtil.row(HtmlUtil.colspan(header(lastGroup),2)));
                     }
 
-                    String elementLbl = element.getLabel();
+                    String elementLbl = element.getName();
                     if(elementLbl.length()>0) {
-                        elementLbl = metadataType.getHandler().msgLabel(elementLbl);
+                        elementLbl = msgLabel(elementLbl);
                     }
                     String subValue  = map.get(new Integer(element.getIndex()));
                     if(subValue == null) subValue = "";
-                    String widget = element.getForm(request, entry,  metadataType, metadata,
+                    String widget = element.getForm(request, entry,   metadata,
                                                     subArg, 
                                                     subValue, forEdit);
                     if ((widget == null) || (widget.length() == 0)) {continue;}
@@ -499,16 +471,16 @@ public class MetadataElement implements Constants {
                 }
                 
                 if(entries.size()>1 && groupCnt==entries.size()-1) {
-                    String newCbx =HtmlUtil.checkbox(subArg+".new","true",false)+" " + metadataType.getHandler().msg("Add new")+
+                    String newCbx =HtmlUtil.checkbox(subArg+".new","true",false)+" " + msg("Create New")+
                         HtmlUtil.hidden(subArg+".lastone","true");
                     groupSB.append(HtmlUtil.formEntry("",newCbx));
                 } else if(entries.size()>1) {
-                    groupSB.append(HtmlUtil.formEntry("",HtmlUtil.checkbox(subArg+".delete","true",false)+" " + metadataType.getHandler().msg("Delete")));
+                    groupSB.append(HtmlUtil.formEntry("",HtmlUtil.checkbox(subArg+".delete","true",false)+" " + msg("Delete")));
                 } 
-                groupSB.append("</table>");
+                groupSB.append(HtmlUtil.formTableClose());
 
                 if(entries.size()>1 && groupCnt==entries.size()-1) {
-                    entriesSB.append(HtmlUtil.makeShowHideBlock("Add new " + subLabel,groupSB.toString(),false));
+                    entriesSB.append(HtmlUtil.makeShowHideBlock("New " + subLabel,groupSB.toString(),false));
                 } else {
                     if(entries.size()>1) {
                     } 
@@ -517,7 +489,7 @@ public class MetadataElement implements Constants {
 
                 groupCnt++;
             }
-            sb.append(HtmlUtil.makeShowHideBlock("Hide/Show " + label, HtmlUtil.div(entriesSB.toString(),HtmlUtil.cssClass("metadatagroup")),true));
+            sb.append(HtmlUtil.makeShowHideBlock("Hide/Show " + getName(), HtmlUtil.div(entriesSB.toString(),HtmlUtil.cssClass("metadatagroup")),true));
             return sb.toString();
         } else {
             System.err.println("Unknown data type:" + dataType);
@@ -544,23 +516,6 @@ public class MetadataElement implements Constants {
         return dataType;
     }
 
-    /**
-     *  Set the Label property.
-     *
-     *  @param value The new value for Label
-     */
-    public void setLabel(String value) {
-        label = value;
-    }
-
-    /**
-     *  Get the Label property.
-     *
-     *  @return The Label
-     */
-    public String getLabel() {
-        return label;
-    }
 
     /**
      *  Set the Rows property.

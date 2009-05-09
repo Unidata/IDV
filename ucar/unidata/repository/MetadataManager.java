@@ -864,7 +864,8 @@ public class MetadataManager extends RepositoryManager {
                         msg("Add selected to parent group"),
                         ARG_METADATA_ADDTOPARENT));
             }
-            sb.append(HtmlUtil.formTable());
+            //            sb.append(HtmlUtil.formTable());
+            sb.append(HtmlUtil.br());
             for (Metadata metadata : metadataList) {
                 metadata.setEntry(entry);
                 MetadataHandler metadataHandler =
@@ -895,10 +896,13 @@ public class MetadataManager extends RepositoryManager {
                                         "event", HtmlUtil.squote("cbx_"),
                                         HtmlUtil.squote(cbxId)))));
 
-                sb.append(HtmlUtil.rowTop(HtmlUtil.cols(cbx + html[0],
-                        html[1])));
+                StringBuffer metadataEntry = new StringBuffer();
+                metadataEntry.append(HtmlUtil.formTable());
+                metadataEntry.append(html[1]);
+                metadataEntry.append(HtmlUtil.formTableClose());
+                sb.append(HtmlUtil.makeShowHideBlock(cbx + html[0],HtmlUtil.div(metadataEntry.toString(),HtmlUtil.cssClass("metadatagroup")),false));
             }
-            sb.append(HtmlUtil.formTableClose());
+            sb.append(HtmlUtil.p());
             sb.append(HtmlUtil.submit(msg("Change")));
             sb.append(HtmlUtil.space(2));
             sb.append(HtmlUtil.submit(msg("Delete Selected"),

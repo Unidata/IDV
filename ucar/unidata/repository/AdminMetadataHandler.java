@@ -94,7 +94,7 @@ public class AdminMetadataHandler extends MetadataHandler {
      *
      * @return _more_
      */
-    public String[] getHtml(Request request, Entry entry, Metadata metadata) {
+    public String[] getHtml(Request request, Entry entry, Metadata metadata) throws Exception {
         String[] result = super.getHtml(request, entry, metadata);
         if (result != null) {
             return result;

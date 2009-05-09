@@ -467,12 +467,12 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public String[] getHtml(Request request, Entry entry, Metadata metadata) {
+    public String[] getHtml(Request request, Entry entry, Metadata metadata) throws Exception {
         MetadataType type = getType(metadata.getType());
         if ((type == null) || !type.hasElements()) {
             return null;
         }
-        return type.getHtml(this, request, entry, metadata);
+        return type.getHtml(request, entry, metadata);
     }
 
     /**

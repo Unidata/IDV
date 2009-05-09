@@ -4,38 +4,38 @@
   <handler category="Tags">
 
     <type name="Group Test" type="grouptest" searchable="true" browsable="true">
-      <element label="Group" datatype="group">
-            <element label="attr1" />
-	    <element label="attr2" datatype="enumeration"  values="apples,bananas,cherries"/>
+      <element name="Group" datatype="group">
+            <element name="attr1" />
+	    <element name="attr2" datatype="enumeration"  values="apples,bananas,cherries"/>
       </element>
    </type>
 
 
 <!--
     <type name="Test" type="test" searchable="true" browsable="true">
-      <element label="attr1" />
-      <element label="attr2" />
-      <element label="attr3" />
-      <element label="attr4" />
-      <element label="attr5" />
-      <element label="attr6" />
+      <element name="attr1" />
+      <element name="attr2" />
+      <element name="attr3" />
+      <element name="attr4" />
+      <element name="attr5" />
+      <element name="attr6" />
       <template type="html"><![CDATA[${attr1},${attr2},${attr3},${attr4},${attr5},${attr6}]]></template>
     </type>
 -->
 
 
     <type name="Tag" type="enum_tag" searchable="true" browsable="true">
-      <element label="Tag Value" />
+      <element name="Tag Value" />
       <template type="threddscatalog"><![CDATA[<keyword>${attr1}</keyword>]]></template>
     </type>
 
     <type name="Wiki Category" type="wikicategory" foruser="false">
-      <element label="Wiki Category" />
+      <element name="Wiki Category" />
     </type>
 
     <type name="GCMD Science Keyword" type="enum_gcmdkeyword" searchable="true" browsable="true">
       <element
-         label="Keyword"
+         name="Keyword"
          datatype="enumeration"
          values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>
       <template type="threddscatalog"><![CDATA[<keyword>${attr1}</keyword>]]></template>
@@ -44,7 +44,7 @@
 <!--
     <type name="ANZLIC Search Word" type="enum_anzlic_search_words" searchable="true" browsable="true">
       <element
-         label="Search Word"
+         name="Search Word"
          datatype="enumeration"
          values="file:/ucar/unidata/repository/resources/metadata/anzlicsearchwords.txt"/>
       <template type="threddscatalog"><![CDATA[<keyword>${attr1}</keyword>]]></template>
@@ -57,32 +57,32 @@
     <type
        name="Thumbnail Image"
        type="content.thumbnail">
-      <element label="Thumbnail File" datatype="file" thumbnail="true"/>
+      <element name="Thumbnail File" datatype="file" thumbnail="true"/>
     </type>
     <type
        name="File Attachment"
        type="content.attachment">
-      <element label="File" datatype="file" thumbnail="false"/>
+      <element name="File" datatype="file" thumbnail="false"/>
     </type>
     <type name="Contact" type="content.contact">
-      <element label="Name" />
-      <element label="Email" />
+      <element name="Name" />
+      <element name="Email" />
     </type>
     <type name="Sort Order" type="content.sort">
       <element
          default="fromdate"
-         label="Field"
+         name="Field"
          datatype="enumeration"
          values="fromdate:From Date,todate:To Date,createdate:Create Date,name:Name"/>
       <element
          default="true"
-         label="Ascending"
+         name="Ascending"
          datatype="boolean"/>
     </type>
     <type
        name="Alias"
        type="content.alias">
-      <element label="Alias" />
+      <element name="Alias" />
       <template type="html"><![CDATA[<a href="${root}/alias/${attr1}">${attr1}</a>]]></template>
     </type>
   </handler>
@@ -91,8 +91,8 @@
     <type name="Page Template" type="admin.template"/>
     <type name="Local File Pattern" type="admin.localfile.pattern"/>
     <type name="Anonymous Upload" type="admin.anonymousupload">
-      <element label="From" />
-      <element label="IP" />
+      <element name="From" />
+      <element name="IP" />
     </type>
   </handler>
 

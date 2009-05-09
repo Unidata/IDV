@@ -4,183 +4,183 @@
   <handler class="ucar.unidata.repository.data.DifMetadataHandler" category="DIF">
 
 <type name="Entry Title" type="dif.entry_title" searchable="true">
-      <element label="Title"/>
+      <element name="Title"/>
 </type>
 
 <type name="Parameters" type="dif.parameters" searchable="true">
-      <element label="Category" datatype="enumeration" 
+      <element name="Category" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element label="Topic" datatype="enumeration" 
+      <element name="Topic" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element label="Term" datatype="enumeration" 
+      <element name="Term" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element label="Variable Level 1" datatype="enumeration" 
+      <element name="Variable Level 1" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element label="Variable Level 2" datatype="enumeration" 
+      <element name="Variable Level 2" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element label="Variable Level 3" datatype="enumeration" 
+      <element name="Variable Level 3" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element label="Detailed Variable"/>
+      <element name="Detailed Variable"/>
 </type>
 
 <type name="ISO Topic Category" type="dif.iso_topic_category" searchable="true">
-      <element label="Category" datatype="enumeration" 
+      <element name="Category" datatype="enumeration" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/isotopiccategories.txt"/>>
 </type>
 
 <type name="Data Center" type="dif.data_center" searchable="true">
-      <element label="Short Name"/>      
-      <element label="Long Name"/>      
-      <element label="URL" datatype="url"/>      
-      <element label="Set ID"/>      
-      <element label="Personnel" datatype="group" sublabel="Personnel">
-          <element label="Roles" datatype="group" sublabel="Role">
-               <element label=""   datatype="enumerationplus" 
+      <element name="Short Name"/>      
+      <element name="Long Name"/>      
+      <element name="URL" datatype="url"/>      
+      <element name="Set ID"/>      
+      <element name="Personnel" datatype="group" subname="Personnel">
+          <element name="Roles" datatype="group" subname="Role">
+               <element name=""   datatype="enumerationplus" 
                         values="investigator:Investigator,technicalcontact,Technical Contact,difauthor:DIF Author"/>      
           </element>
-          <element label="First Name"  />      
-          <element label="Middle Name"  />      
-          <element label="Last Name"  />      
-          <element label="Email" datatype="email"  />      
-          <element label="Phone Numbers"  datatype="group" sublabel="Phone Number">
-              <element label=""  />
+          <element name="First Name"  />      
+          <element name="Middle Name"  />      
+          <element name="Last Name"  />      
+          <element name="Email" datatype="email"  />      
+          <element name="Phone Numbers"  datatype="group" subname="Phone Number">
+              <element name=""  />
           </element>
-          <element label="Fax Numbers"  datatype="group" sublabel="Fax Number">
-              <element label=""  />
+          <element name="Fax Numbers"  datatype="group" subname="Fax Number">
+              <element name=""  />
           </element>
-          <element label="Address" rows="3"  />
-          <element label="City"  />
-      <element label="State or Province"  />
-      <element label="Postal Code"  columns="20" />
-      <element label="Country"  />
+          <element name="Address" rows="3"  />
+          <element name="City"  />
+      <element name="State or Province"  />
+      <element name="Postal Code"  columns="20" />
+      <element name="Country"  />
       </element>
 </type>
 
 
 <type name="Summary" type="dif.summary" searchable="true">
-      <element label="Summary" rows="5"/>
+      <element name="Summary" rows="5"/>
 
 </type>
 
 <type name="Quality" type="dif.quality" searchable="true">
-      <element label="Quality" rows="5"/>
+      <element name="Quality" rows="5"/>
 
 </type>
 
 <type name="Metadata Name" type="dif.metadata_name" searchable="true">
-      <element label="Name" default="CEOS IDN DIF"/>
+      <element name="Name" default="CEOS IDN DIF"/>
 </type>
 
 <type name="Metadata Version" type="dif.metadata_version" >
-      <element label="Version" default="9.7"/>
+      <element name="Version" default="9.7"/>
 </type>
 
 
 <type name="Data Set Citation" type="dif.data_set_citation" searchable="true">
-      <element label="Dataset Creator"/>
-      <element label="Dataset Title"/>
-      <element label="Dataset Series Name"/>
-      <element label="Dataset Release Date"/>
-      <element label="Dataset Release Place"/>
-      <element label="Dataset Publisher"/>
-      <element label="Version"/>
-      <element label="Issue Identification"/>
-      <element label="Data Presentation Form"/>
-      <element label="Other Citation Details"/>
-      <element label="Online Resource"/>
+      <element name="Dataset Creator"/>
+      <element name="Dataset Title"/>
+      <element name="Dataset Series Name"/>
+      <element name="Dataset Release Date"/>
+      <element name="Dataset Release Place"/>
+      <element name="Dataset Publisher"/>
+      <element name="Version"/>
+      <element name="Issue Identification"/>
+      <element name="Data Presentation Form"/>
+      <element name="Other Citation Details"/>
+      <element name="Online Resource"/>
 
 </type>
 
 <type name="Personnel" type="dif.personnel" searchable="true" >searchable="true"
-      <element label="Roles" datatype="group" sublabel="Role">
-            <element label=""   datatype="enumerationplus" 
+      <element name="Roles" datatype="group" subname="Role">
+            <element name=""   datatype="enumerationplus" 
 	             values="investigator:Investigator,technicalcontact:Technical Contact,difauthor:DIF Author"/>      
       </element>
-      <element label="First Name"/>      
-      <element label="Middle Name"/>      
-      <element label="Last Name" searchable="true"/>      
-      <element label="Email" datatype="email"/>      
-      <element label="Phone Numbers"  datatype="group" sublabel="Phone Number">
-         <element label=""/>
+      <element name="First Name"/>      
+      <element name="Middle Name"/>      
+      <element name="Last Name" searchable="true"/>      
+      <element name="Email" datatype="email"/>      
+      <element name="Phone Numbers"  datatype="group" subname="Phone Number">
+         <element name=""/>
       </element>
-      <element label="Fax Numbers"  datatype="group" sublabel="Fax Number">
-         <element label=""/>
+      <element name="Fax Numbers"  datatype="group" subname="Fax Number">
+         <element name=""/>
       </element>
-      <element label="Address" rows="3" group="Address"/>
-      <element label="City" group="Address"/>
-      <element label="State or Province" group="Address"/>
-      <element label="Postal Code" group="Address"/>
-      <element label="Country" group="Address"/>
+      <element name="Address" rows="3" group="Address"/>
+      <element name="City" group="Address"/>
+      <element name="State or Province" group="Address"/>
+      <element name="Postal Code" group="Address"/>
+      <element name="Country" group="Address"/>
 </type>
 
 
 <type name="Instrument" type="dif.instrument" searchable="true">
-      <element label="Short Name"/>      
-      <element label="Long Name"/>      
+      <element name="Short Name"/>      
+      <element name="Long Name"/>      
 </type>
 
 
 <type name="Platform" type="dif.platform" searchable="true">
-      <element label="Short Name"/>      
-      <element label="Long Name"/>      
+      <element name="Short Name"/>      
+      <element name="Long Name"/>      
 </type>
 
 
 <type name="Project" type="dif.project" searchable="true">
-      <element label="Short Name"/>      
-      <element label="Long Name"/>      
+      <element name="Short Name"/>      
+      <element name="Long Name"/>      
 </type>
 
 <type name="Paleo Temporal Coverage" type="dif.paleotemporalcoverage">
-      <element label="Start Date"/>      
-      <element label="End Date"/>      
-      <element label="Chronostratigraphic Unit" datatype="group">
-         <element label="Eon"/>      
-         <element label="Era"/>      
-         <element label="Period"/>      
-         <element label="Epoch"/>      
-         <element label="Stage"/>      
+      <element name="Start Date"/>      
+      <element name="End Date"/>      
+      <element name="Chronostratigraphic Unit" datatype="group">
+         <element name="Eon"/>      
+         <element name="Era"/>      
+         <element name="Period"/>      
+         <element name="Epoch"/>      
+         <element name="Stage"/>      
      </element>
 </type>
 
 
 <type name="Location" type="dif.location" searchable="true">
-      <element label="Category" datatype="enumeration" values="continent:Continent,ocean:Ocean,geographicregion:Geographic Region,solidearth:Solid Earth,space:Space,verticallocation:Vertical Location"/>      
-      <element label="Type"/>      
-      <element label="Sub-Region 1"/>      
-      <element label="Sub-Region 2"/>      
-      <element label="Sub-Region 3"/>      
-      <element label="Detailed Location"/>      
+      <element name="Category" datatype="enumeration" values="continent:Continent,ocean:Ocean,geographicregion:Geographic Region,solidearth:Solid Earth,space:Space,verticallocation:Vertical Location"/>      
+      <element name="Type"/>      
+      <element name="Sub-Region 1"/>      
+      <element name="Sub-Region 2"/>      
+      <element name="Sub-Region 3"/>      
+      <element name="Detailed Location"/>      
 </type>
 
 
 <type name="Data Resolution" type="dif.dataresolution" searchable="true">
-      <element label="Latitude Resolution"/>      
-      <element label="Longitude Resolution"/>      
-      <element label="Horizontal Resolution Range"/>      
-      <element label="Vertical Resolution"/>      
-      <element label="Vertical Resolution Range"/>      
-      <element label="Temporal Resolution"/>      
-      <element label="Temporal Resolution Range"/>      
+      <element name="Latitude Resolution"/>      
+      <element name="Longitude Resolution"/>      
+      <element name="Horizontal Resolution Range"/>      
+      <element name="Vertical Resolution"/>      
+      <element name="Vertical Resolution Range"/>      
+      <element name="Temporal Resolution"/>      
+      <element name="Temporal Resolution Range"/>      
 </type>
 
 
 
 <type name="Access Constraints" type="dif.accesscontraints" searchable="true">
-      <element label="Constraints" rows="5"/>      
+      <element name="Constraints" rows="5"/>      
 </type>
 
 <type name="Use Constraints" type="dif.usecontraints" searchable="true">
-      <element label="Constraints" rows="5"/>      
+      <element name="Constraints" rows="5"/>      
 </type>
 
 <type name="Distribution" type="dif.distribution" searchable="true">
-      <element label="Media" datatype="enumerationplus" 
+      <element name="Media" datatype="enumerationplus" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/media.txt"/>
-      <element label="Size" columns="6" />      
-      <element label="Format" datatype="enumerationplus" 
+      <element name="Size" columns="6" />      
+      <element name="Format" datatype="enumerationplus" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/formats.txt"/>
-      <element label="Fees" />      
+      <element name="Fees" />      
 </type>
 
 
@@ -188,76 +188,76 @@
 
 
 <type name="Language" type="dif.data_set_language" searchable="true">
-      <element label="Language" datatype="enumerationplus" 
+      <element name="Language" datatype="enumerationplus" 
          values="file:/ucar/unidata/repository/resources/metadata/dif/languages.txt"/>      
 </type>
 
 
 
 <type name="Data Set Progress" type="dif.data_set_progress" searchable="true">
-      <element label="Progress" datatype="enumeration" 
+      <element name="Progress" datatype="enumeration" 
          values="planned:Planned,inwork:In Work,complete:Complete"/>      
 </type>
 
 <type name="Related URL" type="dif.related_url" searchable="true">
-      <element label="URL" datatype="url"/>      
-      <element label="Description"/>      
-      <element label="Type"/>      
-      <element label="Sub Type"/>      
+      <element name="URL" datatype="url"/>      
+      <element name="Description"/>      
+      <element name="Type"/>      
+      <element name="Sub Type"/>      
 </type>
 
 
 <type name="Revision History" type="dif.revision_history" >
-      <element label="History" />      
+      <element name="History" />      
 </type>
 
 <type name="Keyword" type="dif.keyword" searchable="true">
-      <element label="Keyword" />      
+      <element name="Keyword" />      
 </type>
 
 
 <type name="Originating Center" type="dif.originating_center" searchable="true">
-      <element label="Center" />      
+      <element name="Center" />      
 </type>
 
 
 
 
 <type name="Multimedia Sample" type="dif.multimedia_sample">
-      <element label="File" />      
-      <element label="URL" datatype="url" />      
-      <element label="Format" columns="20" />      
-      <element label="Caption" />      
-      <element label="Description" rows="2" />      
+      <element name="File" />      
+      <element name="URL" datatype="url" />      
+      <element name="Format" columns="20" />      
+      <element name="Caption" />      
+      <element name="Description" rows="2" />      
 
 </type>
 
 
 <type name="Reference" type="dif.reference" >
-      <element label="Reference" rows="4"/>      
+      <element name="Reference" rows="4"/>      
 </type>
 
 
 <type name="Parent DIF" type="dif.parent_dif" >
-      <element label="Parent DIF ID" columns="10"/>      
+      <element name="Parent DIF ID" columns="10"/>      
 </type>
 
 
 <type name="DIF Creation Date" type="dif.creation_date">
-      <element label="Creation Date" columns="10"/>      
+      <element name="Creation Date" columns="10"/>      
 </type>
 
 <type name="Last DIF Revision Date" type="dif.last_dif_revision_date">
-      <element label="Revision Date" columns="10"/>      
+      <element name="Revision Date" columns="10"/>      
 </type>
 
 <type name="Future DIF Review Date" type="dif.future_dif_review_date">
-      <element label="Review Date" columns="10"/>      
+      <element name="Review Date" columns="10"/>      
 </type>
 
 
 <type name="Privacy Status" type="dif.privacy_status" >
-      <element label="Private" datatype="boolean" default="false"/>      
+      <element name="Private" datatype="boolean" default="false"/>      
 </type>
 
 
