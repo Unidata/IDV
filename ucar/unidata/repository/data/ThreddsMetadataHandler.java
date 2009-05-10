@@ -536,7 +536,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
         if (metadata.getType().equals(TYPE_VARIABLE) &&
-            xmlType.equals(MetadataTypeBase.TEMPLATETYPE_THREDDSCATALOG)) {
+            xmlType.equals(MetadataTypeBase.TEMPLATETYPE_THREDDS)) {
             Element variablesNode = XmlUtil.getElement(datasetNode,
                                         TAG_VARIABLES);
             if (variablesNode == null) {

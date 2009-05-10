@@ -208,14 +208,13 @@ public class MetadataTypeBase extends RepositoryManager {
                                                   metadata.getAttr(element.getIndex()), parent);
 
             template = applyMacros(template, element, value);
-
         }
         return template;
     }
 
 
     public String applyMacros(String template,
-                              Element element,
+                              MetadataElement element,
                               String value) {
         if(value == null) {
             value = "";
