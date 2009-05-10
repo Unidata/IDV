@@ -1,82 +1,164 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <metadata>
+  <handler category="DIF" class="ucar.unidata.repository.metadata.DifMetadataHandler">
 
-  <handler class="ucar.unidata.repository.metadata.DifMetadataHandler" category="DIF">
-
-<type name="Entry Title" type="dif.entry_title" searchable="false">
+    <type
+       name="Entry Title"
+       searchable="false"
+       type="dif.entry_title">
       <element name="Title"/>
-</type>
+      <template type="dif"><![CDATA[<Entry_Title>${Title}</Entry_Title>]]></template>
+    </type>
 
-<type name="Parameters" type="dif.parameters" searchable="false">
-      <element name="Category" datatype="enumeration" 
-         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element name="Topic" datatype="enumeration" 
-         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element name="Term" datatype="enumeration" 
-         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element name="Variable Level 1" datatype="enumeration" 
-         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element name="Variable Level 2" datatype="enumeration" 
-         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element name="Variable Level 3" datatype="enumeration" 
-         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>>
-      <element name="Detailed Variable"/>
-</type>
+    <type
+       name="Parameters"
+       searchable="false"
+       type="dif.parameters">
+      <element
+         datatype="enumeration"
+         name="Category"
+         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>
+      <element
+         datatype="enumeration"
+         name="Topic"
+         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>
+      <element
+         datatype="enumeration"
+         name="Term"
+         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>
+       <element
+         datatype="enumeration"
+         name="Variable Level 1"
+         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>
+       <element
+         datatype="enumeration"
+         name="Variable Level 2"
+         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>
+       <element
+         datatype="enumeration"
+         name="Variable Level 3"
+         values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>
+       <element name="Detailed Variable"/>
+      <template type="dif"><![CDATA[
+<Parameters>
+<Category>${Category}</Category>
+<Topic>${Topic}</Topic>
+<Term>${Term}</Term>
+<Variable_Level_1>${Variable_Level_1}</Variable_Level_1>
+<Variable_Level_2>${Variable_Level_2}</Variable_Level_2>
+<Variable_Level_3>${Variable_Level_3}</Variable_Level_3>
+<Detailed_Variable>${Detailed_Variable}</Detailed_Variable>
+</Parameters> 
+]]></template>
+    </type>
 
-<type name="ISO Topic Category" type="dif.iso_topic_category" searchable="false">
-      <element name="Category" datatype="enumeration" 
-         values="file:/ucar/unidata/repository/resources/metadata/dif/isotopiccategories.txt"/>>
-</type>
+    <type
+       name="ISO Topic Category"
+       searchable="false"
+       type="dif.iso_topic_category">
+      <element
+         datatype="enumeration"
+         name="Category"
+         values="file:/ucar/unidata/repository/resources/metadata/dif/isotopiccategories.txt"/>
+      <template type="dif"><![CDATA[<ISO_Topic_Category>${Category}</ISO_Topic_Category>]]></template>
+     </type>
 
-<type name="Data Center" type="dif.data_center" searchable="false">
-      <element name="Short Name"/>      
-      <element name="Long Name"/>      
-      <element name="URL" datatype="url"/>      
-      <element name="Set ID"/>      
-      <element name="Personnel" datatype="group" subname="Personnel Record">
-          <element name="Roles" datatype="group" subname="">
-               <element name="Role"   datatype="enumerationplus" 
-                        values="investigator:Investigator,technicalcontact:Technical Contact,difauthor:DIF Author"/>      
-          </element>
-          <element name="First Name"  />      
-          <element name="Middle Name"  />      
-          <element name="Last Name"  />      
-          <element name="Email" datatype="email"  />      
-          <element name="Phone Numbers"  datatype="group" subname="">
-              <element name="Phone Number"  />
-          </element>
-          <element name="Fax Numbers"  datatype="group" >
-              <element name="Fax Number"  />
-          </element>
-          <element name="Address" rows="3"  />
-          <element name="City"  />
-      <element name="State or Province"  />
-      <element name="Postal Code"  columns="20" />
-      <element name="Country"  />
+    <type       name="Data Center"       searchable="false"       type="dif.data_center">
+      <element name="Short Name"/>
+      <element name="Long Name"/>
+      <element datatype="url" name="URL"/>
+      <element name="Set ID"/>
+      <element
+         datatype="group"
+         name="Personnel"
+         subname="Personnel Record">
+      <element  datatype="group"         name="Roles"         subname="">
+        <element datatype="enumerationplus"           name="Role"
+           values="investigator:Investigator,technicalcontact:Technical Contact,difauthor:DIF Author"/>
+      <template type="dif"><![CDATA[<Role>${Role.label}</Role>]]></template>
       </element>
-</type>
+      <element name="First Name"/>
+      <element name="Middle Name"/>
+      <element name="Last Name" searchable="false"/>
+      <element datatype="email" name="Email"/>
+      <element  datatype="group"         name="Phone Numbers"  subname="Phone Number">
+        <element name="" id="number"/>
+	<template type="dif"><![CDATA[<Phone>${number}</Phone>]]></template>
+      </element>
+      <element  datatype="group"         name="Fax Numbers"         subname="Fax Number">
+        <element name="" id="number"/>
+        <template type="dif"><![CDATA[<Fax>${number}</Fax>]]></template>
+      </element>
+      <element group="Address" name="Address"         rows="3"/>
+      <element group="Address" name="City"/>
+      <element group="Address" name="State or Province"/>
+      <element group="Address" name="Postal Code"/>
+      <element group="Address" name="Country"/>
+      <template type="dif"><![CDATA[
+<Personnel>
+        <First_Name>${First_Name}</First_Name>
+        <Middle_Name>${Middle_Name}</Middle_Name>
+        <Last_Name>${Last_Name}</Last_Name>
+        <Email>${Email}</Email>
+${Phone_Numbers}
+${Fax_Numbers}
+        <Contact_Address>
+            <Address>${Address}</Address>
+            <City>${City}</City>
+            <Province_or_State>${state_or_province}</Province_or_State>
+            <Postal_Code>${Postal_Code}</Postal_Code>
+            <Country>${Country}</Country>
+        </Contact_Address>
+    </Personnel>
+]]></template>
+</element>
 
+<template type="dif"><![CDATA[
+<Data_Center>
+<Data_Center_Name><Short_Name>${Short_Name}</Short_Name>
+<Long_Name>${Long_Name}</Long_Name>
+<Data_Center_URL>${URL}</Data_Center_URL>
+<Data_Set_ID>${Set_ID}</Data_Set_ID>
+</Data_Center_Name>
+${Personnel}
+</Data_Center>
+]]></template>
+    </type>
 
-<type name="Summary" type="dif.summary" searchable="false">
+<!--
+    <type
+       name="Summary"
+       searchable="false"
+       type="dif.summary">
       <element name="Summary" rows="5"/>
-
-</type>
-
-<type name="Quality" type="dif.quality" searchable="false">
+      <template type="dif"><![CDATA[]]></template>
+    </type>
+-->
+    <type
+       name="Quality"
+       searchable="false"
+       type="dif.quality">
       <element name="Quality" rows="5"/>
+      <template type="dif"><![CDATA[<Quality>${Quality}</Quality>]]></template>
+    </type>
 
-</type>
+    <type
+       name="Metadata Name"
+       searchable="false"
+       type="dif.metadata_name">
+      <element default="CEOS IDN DIF" name="Name"/>
+      <template type="dif"><![CDATA[<Metadata_Name>${Metadata_Name}</Metadata_Name>]]></template>
+    </type>
 
-<type name="Metadata Name" type="dif.metadata_name" searchable="false">
-      <element name="Name" default="CEOS IDN DIF"/>
-</type>
+    <type name="Metadata Version" type="dif.metadata_version">
+      <element default="9.7" name="Version"/>
+      <template type="dif"><![CDATA[<Metadata_Version>${Metadata_Version}</Metadata_Version>]]></template>
+    </type>
 
-<type name="Metadata Version" type="dif.metadata_version" >
-      <element name="Version" default="9.7"/>
-</type>
-
-
-<type name="Data Set Citation" type="dif.data_set_citation" searchable="false">
+    <type
+       name="Data Set Citation"
+       searchable="false"
+       type="dif.data_set_citation">
       <element name="Dataset Creator"/>
       <element name="Dataset Title"/>
       <element name="Dataset Series Name"/>
@@ -88,180 +170,345 @@
       <element name="Data Presentation Form"/>
       <element name="Other Citation Details"/>
       <element name="Online Resource"/>
+      <template type="dif"><![CDATA[
+    <Data_Set_Citation>
+        <Dataset_Creator>${Dataset_Creator}</Dataset_Creator>
+        <Dataset_Title>${Dataset_Title}</Dataset_Title>
+        <Dataset_Series_Name>${Dataset_Series_Name}</Dataset_Series_Name>
+        <Dataset_Release_Date>${Dataset_Release_Date}</Dataset_Release_Date>
+        <Dataset_Release_Place>${Dataset_Release_Place}</Dataset_Release_Place>
+        <Dataset_Publisher>${Dataset_Publisher}</Dataset_Publisher>
+        <Version>${Version}</Version>
+        <Issue_Identification>${Issue_Identification}</Issue_Identification>
+        <Data_Presentation_Form>${Data_Presentation_Form}</Data_Presentation_Form>
+        <Other_Citation_Details>${Other_Citation_Details}</Other_Citation_Details>
+        <Online_Resource>${Online_Resource}</Online_Resource>    
+    </Data_Set_Citation>
+]]></template>
+    </type>
 
-</type>
-
-<type name="Personnel" type="dif.personnel"  searchable="false">
-      <element name="Roles" datatype="group" subname="">
-            <element name="Role"   datatype="enumerationplus" 
-	             values="investigator:Investigator,technicalcontact:Technical Contact,difauthor:DIF Author"/>      
+    <type  name="Personnel"       searchable="false"       type="dif.personnel">
+      <element  datatype="group"         name="Roles"         subname="">
+        <element datatype="enumerationplus"           name="Role"
+           values="investigator:Investigator,technicalcontact:Technical Contact,difauthor:DIF Author"/>
+      <template type="dif"><![CDATA[<Role>${Role.label}</Role>]]></template>
       </element>
-      <element name="First Name"/>      
-      <element name="Middle Name"/>      
-      <element name="Last Name" searchable="false"/>      
-      <element name="Email" datatype="email"/>      
-      <element name="Phone Numbers"  datatype="group" subname="Phone Number">
-         <element name=""/>
+      <element name="First Name"/>
+      <element name="Middle Name"/>
+      <element name="Last Name" searchable="false"/>
+      <element datatype="email" name="Email"/>
+      <element  datatype="group"         name="Phone Numbers"  subname="Phone Number">
+        <element name="" id="number"/>
+	<template type="dif"><![CDATA[<Phone>${number}</Phone>]]></template>
       </element>
-      <element name="Fax Numbers"  datatype="group" subname="Fax Number">
-         <element name=""/>
+      <element  datatype="group"         name="Fax Numbers"         subname="Fax Number">
+        <element name="" id="number"/>
+        <template type="dif"><![CDATA[<Fax>${number}</Fax>]]></template>
       </element>
-      <element name="Address" rows="3" group="Address"/>
-      <element name="City" group="Address"/>
-      <element name="State or Province" group="Address"/>
-      <element name="Postal Code" group="Address"/>
-      <element name="Country" group="Address"/>
-</type>
+      <element group="Address"         name="Address"         rows="3"/>
+      <element group="Address" name="City"/>
+      <element group="Address" name="State or Province"/>
+      <element group="Address" name="Postal Code"/>
+      <element group="Address" name="Country"/>
+      <template type="dif"><![CDATA[
+<Personnel>
+${Roles}
+        <First_Name>${First_Name}</First_Name>
+        <Middle_Name>${Middle_Name}</Middle_Name>
+        <Last_Name>${Last_Name}</Last_Name>
+        <Email>${Email}</Email>
+${Phone_Numbers}
+${Fax_Numbers}
+        <Contact_Address>
+            <Address>${Address}</Address>
+            <City>${City}</City>
+            <Province_or_State>${state_or_province}</Province_or_State>
+            <Postal_Code>${Postal_Code}</Postal_Code>
+            <Country>${Country}</Country>
+        </Contact_Address>
+    </Personnel>
+]]></template>
 
+    </type>
 
-<type name="Instrument" type="dif.instrument" searchable="false">
-      <element name="Short Name"/>      
-      <element name="Long Name"/>      
-</type>
+    <type
+       name="Instrument"
+       searchable="false"
+       type="dif.instrument">
+      <element name="Short Name"/>
+      <element name="Long Name"/>
+      <template type="dif"><![CDATA[<Sensor_Name>
+<Short_Name>${Short_Name}</Short_Name>
+<Long_Name>${Long_Name}</Long_Name>
+</Sensor_Name> ]]></template>
+    </type>
 
+    <type
+       name="Platform"
+       searchable="false"
+       type="dif.platform">
+      <element name="Short Name"/>
+      <element name="Long Name"/>
+      <template type="dif"><![CDATA[<Source_Name>
+<Short_Name>${Short_Name}</Short_Name>
+<Long_Name>${Long_Name}</Long_Name>
+</Source_Name>]]></template>
+    </type>
 
-<type name="Platform" type="dif.platform" searchable="false">
-      <element name="Short Name"/>      
-      <element name="Long Name"/>      
-</type>
+    <type
+       name="Project"
+       searchable="false"
+       type="dif.project">
+      <element name="Short Name"/>
+      <element name="Long Name"/>
+      <template type="dif"><![CDATA[<Project>
+<Short_Name>${Short_Name}</Short_Name>
+<Long_Name>${Long_Name}</Long_Name>
+</Project>]]></template>
+    </type>
 
+    <type name="Paleo Temporal Coverage" type="dif.paleotemporalcoverage">
+      <element name="Start Date"/>
+      <element name="End Date"/>
+      <element datatype="group" name="Chronostratigraphic Unit">
+        <element name="Eon"/>
+        <element name="Era"/>
+        <element name="Period"/>
+        <element name="Epoch"/>
+        <element name="Stage"/>
+      <template type="dif"><![CDATA[
+<Chronostratigraphic_Unit>
+<Eon>${Eon}</Eon>
+<Era>${Era}</Era>
+<Period>${Period}</Period>
+<Epoch>${Epoch}<Epoch> 
+<Stage>${Stage}<Stage> 
+</Chronostratigraphic_Unit>
+]]></template>
 
-<type name="Project" type="dif.project" searchable="false">
-      <element name="Short Name"/>      
-      <element name="Long Name"/>      
-</type>
+      </element>
 
-<type name="Paleo Temporal Coverage" type="dif.paleotemporalcoverage">
-      <element name="Start Date"/>      
-      <element name="End Date"/>      
-      <element name="Chronostratigraphic Unit" datatype="group">
-         <element name="Eon"/>      
-         <element name="Era"/>      
-         <element name="Period"/>      
-         <element name="Epoch"/>      
-         <element name="Stage"/>      
-     </element>
-</type>
+      <template type="dif"><![CDATA[
+<Paleo_Temporal_Coverage>
+<Paleo_Start_Date>${Start_Date}</Paleo_Start_Date>
+<Paleo_Stop_Date>${End_Date}</Paleo_Stop_Date>
+${Chronostratigraphic_Unit}
+</Paleo_Temporal_Coverage>
+]]></template>
+    </type>
 
+    <type
+       name="Location"
+       searchable="false"
+       type="dif.location">
+      <element
+         datatype="enumeration"
+         name="Category"
+         values="continent:Continent,ocean:Ocean,geographicregion:Geographic Region,solidearth:Solid Earth,space:Space,verticallocation:Vertical Location"/>
+      <element name="Type"/>
+      <element name="Sub-Region 1" id="subregion1"/>
+      <element name="Sub-Region 2" id="subregion2"/>
+      <element name="Sub-Region 3" id="subregion3"/>
+      <element name="Detailed Location"/>
+      <template type="dif"><![CDATA[
+<Location>
+   <Location_Category>${Location_Category}</Location_Category>
+   <Location_Type>${Location_Type}</Location_Type>
+   <Location_Subregion1>${subregion1}</Location_Subregion1>
+   <Location_Subregion2>${subregion2}</Location_Subregion2>
+   <Location_Subregion3>${subregion3}</Location_Subregion3>
+   <Detailed_Location>${Detailed_Location}</Detailed_Location>
+</Location>
+]]></template>
+    </type>
 
-<type name="Location" type="dif.location" searchable="false">
-      <element name="Category" datatype="enumeration" values="continent:Continent,ocean:Ocean,geographicregion:Geographic Region,solidearth:Solid Earth,space:Space,verticallocation:Vertical Location"/>      
-      <element name="Type"/>      
-      <element name="Sub-Region 1"/>      
-      <element name="Sub-Region 2"/>      
-      <element name="Sub-Region 3"/>      
-      <element name="Detailed Location"/>      
-</type>
+    <type
+       name="Data Resolution"
+       searchable="false"
+       type="dif.dataresolution">
+      <element name="Latitude Resolution"/>
+      <element name="Longitude Resolution"/>
+      <element name="Horizontal Resolution Range"/>
+      <element name="Vertical Resolution"/>
+      <element name="Vertical Resolution Range"/>
+      <element name="Temporal Resolution"/>
+      <element name="Temporal Resolution Range"/>
+      <template type="dif"><![CDATA[
+<Data_Resolution>
+    <Latitude_Resolution>${Latitude_Resolution}</Latitude_Resolution>
+    <Longitude_Resolution>${Longitude_Resolution}</Longitude_Resolution>
+    <Horizontal_Resolution_Range>${Horizontal_Resolution_Range}</Horizontal_Resolution_Range>
+    <Vertical_Resolution>${Vertical_Resolution}</Vertical_Resolution>
+    <Vertical_Resolution_Range>${Vertical_Resolution_Range}</Vertical_Resolution_Range
+    <Temporal_Resolution>${Temporal_Resolution}</Temporal_Resolution>
+    <Temporal_Resolution_Range>${Temporal_Resolution_Range}</Temporal_Resolution_Range>
+</Data_Resolution> 
+]]></template>
+    </type>
 
+    <type
+       name="Access Constraints"
+       searchable="false"
+       type="dif.accesscontraints">
+      <element name="Constraints" rows="5"/>
+      <template type="dif"><![CDATA[
+<Access_Constraints>${Constraints}</Access_Constraints>
+]]></template>
+    </type>
 
-<type name="Data Resolution" type="dif.dataresolution" searchable="false">
-      <element name="Latitude Resolution"/>      
-      <element name="Longitude Resolution"/>      
-      <element name="Horizontal Resolution Range"/>      
-      <element name="Vertical Resolution"/>      
-      <element name="Vertical Resolution Range"/>      
-      <element name="Temporal Resolution"/>      
-      <element name="Temporal Resolution Range"/>      
-</type>
+    <type
+       name="Use Constraints"
+       searchable="false"
+       type="dif.usecontraints">
+      <element name="Constraints" rows="5"/>
+      <template type="dif"><![CDATA[
+<Use_Constraints>${Constraints}</Use_Constraints>
+]]></template>
+    </type>
 
-
-
-<type name="Access Constraints" type="dif.accesscontraints" searchable="false">
-      <element name="Constraints" rows="5"/>      
-</type>
-
-<type name="Use Constraints" type="dif.usecontraints" searchable="false">
-      <element name="Constraints" rows="5"/>      
-</type>
-
-<type name="Distribution" type="dif.distribution" searchable="false">
-      <element name="Media" datatype="enumerationplus" 
+    <type
+       name="Distribution"
+       searchable="false"
+       type="dif.distribution">
+      <element
+         datatype="enumerationplus"
+         name="Media"
          values="file:/ucar/unidata/repository/resources/metadata/dif/media.txt"/>
-      <element name="Size" columns="6" />      
-      <element name="Format" datatype="enumerationplus" 
+      <element columns="6" name="Size"/>
+      <element
+         datatype="enumerationplus"
+         name="Format"
          values="file:/ucar/unidata/repository/resources/metadata/dif/formats.txt"/>
-      <element name="Fees" />      
-</type>
+      <element name="Fees"/>
+      <template type="dif"><![CDATA[
+<Distribution>
+    <Distribution_Media>${Media}</Distribution_Media>
+    <Distribution_Size>${Size}</Distribution_Size>
+    <Distribution_Format>${Format}</Distribution_Format>
+    <Fees>${Fees}</Fees>
+</Distribution> 
+]]></template>
+    </type>
 
+    <type
+       name="Language"
+       searchable="false"
+       type="dif.data_set_language">
+      <element
+         datatype="enumerationplus"
+         name="Language"
+         values="file:/ucar/unidata/repository/resources/metadata/dif/languages.txt"/>
+      <template type="dif"><![CDATA[
+<Data_Set_Language>${Language}</Data_Set_Language>
+]]></template>
+    </type>
 
+    <type
+       name="Data Set Progress"
+       searchable="false"
+       type="dif.data_set_progress">
+      <element
+         datatype="enumeration"
+         name="Progress"
+         values="planned:Planned,inwork:In Work,complete:Complete"/>
+      <template type="dif"><![CDATA[
+<Data_Set_Progress>${Progress.label}</Data_Set_Progress>
+]]></template>
+    </type>
 
+    <type
+       name="Related URL"
+       searchable="false"
+       type="dif.related_url">
+      <element datatype="url" name="URL"/>
+      <element name="Description"/>
+      <element name="Type"/>
+      <element name="Sub Type"/>
+      <template type="dif"><![CDATA[
+<Related_URL><URL_Content_Type>
+      <Type>${Type}</Type>
+      <Subtype>${Sub_Type}</Subtype>
+    </URL_Content_Type>
+    <URL>${URL}</URL>
+    <Description>${Description.cdata}</Description>
+  </Related_URL>
+]]></template>
+    </type>
 
+    <type name="Revision History" type="dif.revision_history">
+      <element name="History"/>
+      <template type="dif"><![CDATA[
+<DIF_Revision_History>${History.cdata}</DIF_Revision_History>
+]]></template>
+    </type>
 
-<type name="Language" type="dif.data_set_language" searchable="false">
-      <element name="Language" datatype="enumerationplus" 
-         values="file:/ucar/unidata/repository/resources/metadata/dif/languages.txt"/>      
-</type>
+    <type
+       name="Keyword"
+       searchable="false"
+       type="dif.keyword">
+      <element name="Keyword"/>
+      <template type="dif"><![CDATA[<Keyword>${Keyword}</Keyword>]]></template>
+      <template type="thredds"><![CDATA[<keyword>${Keyword}</keyword>]]></template>
+    </type>
 
+    <type
+       name="Originating Center"
+       searchable="false"
+       type="dif.originating_center">
+      <element name="Center"/>
+      <template type="dif"><![CDATA[
+<Originating_Center>${Center.cdata}</Originating_Center>]]></template>
+    </type>
 
+    <type name="Multimedia Sample" type="dif.multimedia_sample">
+      <element name="File"/>
+      <element datatype="url" name="URL"/>
+      <element columns="20" name="Format"/>
+      <element name="Caption"/>
+      <element name="Description" rows="2"/>
+      <template type="dif"><![CDATA[
+<Multimedia_Sample>
+   <File>${File}</File>
+   <URL>${URL}</URL>
+   <Format>${Format}</Format>
+   <Caption>${Caption.cdata}</Caption>
+   <Description>{$Description.cdata}</Description>
+</Multimedia_Sample>
+]]></template>
+    </type>
 
-<type name="Data Set Progress" type="dif.data_set_progress" searchable="false">
-      <element name="Progress" datatype="enumeration" 
-         values="planned:Planned,inwork:In Work,complete:Complete"/>      
-</type>
+    <type name="Reference" type="dif.reference">
+      <element name="Reference" rows="4"/>
+      <template type="dif"><![CDATA[<Reference>${Reference.cdata}</Reference>]]></template>
+    </type>
 
-<type name="Related URL" type="dif.related_url" searchable="false">
-      <element name="URL" datatype="url"/>      
-      <element name="Description"/>      
-      <element name="Type"/>      
-      <element name="Sub Type"/>      
-</type>
+    <type name="Parent DIF" type="dif.parent_dif">
+      <element columns="10" name="Parent DIF ID" id="parent"/>
+      <template type="dif"><![CDATA[<Parent_DIF>${parent}</Parent_DIF>]]></template>
+    </type>
 
+    <type name="DIF Creation Date" type="dif.creation_date">
+      <element columns="10" name="Creation Date"/>
+      <template type="dif"><![CDATA[<DIF_Creation_Date>${Creation_Date}</DIF_Creation_Date>]]></template>
+    </type>
 
-<type name="Revision History" type="dif.revision_history" >
-      <element name="History" />      
-</type>
+    <type name="Last DIF Revision Date" type="dif.last_dif_revision_date">
+      <element columns="10" name="Revision Date"/>
+      <template type="dif"><![CDATA[<Last_DIF_Revision_Date>${Revision Date}</Last_DIF_Revision_Date > ]]></template>
+    </type>
 
-<type name="Keyword" type="dif.keyword" searchable="false">
-      <element name="Keyword" />      
-</type>
+    <type name="Future DIF Review Date" type="dif.future_dif_review_date">
+      <element columns="10" name="Review Date"/>
+      <template type="dif"><![CDATA[<Last_DIF_Revision_Date>${Review Date}</Last_DIF_Revision_Date > ]]></template>
+    </type>
 
-
-<type name="Originating Center" type="dif.originating_center" searchable="false">
-      <element name="Center" />      
-</type>
-
-
-
-
-<type name="Multimedia Sample" type="dif.multimedia_sample">
-      <element name="File" />      
-      <element name="URL" datatype="url" />      
-      <element name="Format" columns="20" />      
-      <element name="Caption" />      
-      <element name="Description" rows="2" />      
-
-</type>
-
-
-<type name="Reference" type="dif.reference" >
-      <element name="Reference" rows="4"/>      
-</type>
-
-
-<type name="Parent DIF" type="dif.parent_dif" >
-      <element name="Parent DIF ID" columns="10"/>      
-</type>
-
-
-<type name="DIF Creation Date" type="dif.creation_date">
-      <element name="Creation Date" columns="10"/>      
-</type>
-
-<type name="Last DIF Revision Date" type="dif.last_dif_revision_date">
-      <element name="Revision Date" columns="10"/>      
-</type>
-
-<type name="Future DIF Review Date" type="dif.future_dif_review_date">
-      <element name="Review Date" columns="10"/>      
-</type>
-
-
-<type name="Privacy Status" type="dif.privacy_status" >
-      <element name="Private" datatype="boolean" default="false"/>      
-</type>
-
-
+    <type name="Privacy Status" type="dif.privacy_status">
+      <element
+         datatype="boolean"
+         default="false"
+         name="Private"/>
+      <template type="dif"><![CDATA[<Private>${Private}<Private>]]></template>
+    </type>
 
   </handler>
-
 </metadata>

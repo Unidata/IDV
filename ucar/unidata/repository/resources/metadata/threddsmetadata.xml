@@ -5,19 +5,25 @@
 
     <type name="Project" type="thredds.project"  searchable="true" browsable="true">
       <element name="Value" />
+      <template type="thredds"><![CDATA[<project>${Value}</project>]]></template>
+      <template type="dif"><![CDATA[ <Project><Short_Name></Short_Name><Long_Name>${Value}</Long_Name></Project>]]></template>
     </type>
 
     <type name="Keyword" type="thredds.keyword"  searchable="true" browsable="true">
       <element name="Value" />
-      <template type="threddscatalog"><![CDATA[<keyword>${attr1}</keyword>]]></template>
+      <template type="thredds"><![CDATA[<keyword>${Value}</keyword>]]></template>
+
     </type>
 
 
     <type name="Link" type="thredds.link">
       <element name="Label" />
       <element name="URL" datatype="url"/>
-      <template type="html"><![CDATA[<a href="${attr2}">${attr1}</a>]]></template>
-      <template type="threddscatalog"><![CDATA[<documentation xlink:href="${attr2}" xlink:title="${attr1}"/>]]></template>
+      <template type="html"><![CDATA[<a href="${URL}">${Label}</a>]]></template>
+      <template type="thredds"><![CDATA[<documentation xlink:href="${URL}" xlink:title="${Label}"/>]]></template>
+      <template type="dif"><![CDATA[<Related_URL><URL_Content_Type><Type>GET</Type></URL_Content_Type>
+   <URL>${URL}</URL>
+   <Description>${Label}</Description></Related_URL>]]></template>
     </type>
 
 
@@ -33,23 +39,24 @@
       <element name="" datatype="skip"/>
       <element name="Email" datatype="email"/>
       <element name="URL" datatype="url"/>
-      <template type="threddscatalog"><![CDATA[<publisher><name role="${attr2}">${attr1}</name>
- <contact email="${attr3}" url="${attr4}"/></publisher>]]></template>
+      <template type="thredds"><![CDATA[<publisher><name role="${attr2}">${Organization}</name>
+ <contact email="${Email}" url="${URL}"/></publisher>]]></template>
     </type>
-
 
 
     <type name="Contributor" type="thredds.contributor"  searchable="true" browsable="true">
       <element name="Name" />
       <element name="Role" />
-      <template type="threddscatalog"><![CDATA[<contributor role="${attr2}">${attr1}</contributor>]]></template>
+      <template type="thredds"><![CDATA[<contributor role="${Role}">${Name}</contributor>]]></template>
     </type>
+
     <type name="Property" type="thredds.property"  searchable="true" browsable="true">
       <element name="Name"  searchable="true"/>
       <element name="Value"  searchable="true"/>
-      <template type="threddscatalog"><![CDATA[<property name="${attr1}" value="${attr2}"/>]]></template>
-      <template type="html"><![CDATA[ ${attr1}=${attr2}]]></template>
+      <template type="thredds"><![CDATA[<property name="${Name}" value="${Value}"/>]]></template>
+      <template type="html"><![CDATA[ ${Name}=${Value}]]></template>
     </type>
+
     <type name="Documentation" type="thredds.documentation"  searchable="true">
       <element
          name="Type"
@@ -59,24 +66,30 @@
          name="Value"
          rows="6"
          />
-      <template type="threddscatalog"><![CDATA[<documentation type="${attr1}">${attr2.cdata}</documentation>]]></template>
+      <template type="thredds"><![CDATA[<documentation type="${Type}">${Value.cdata}</documentation>]]></template>
+      <template type="dif"><![CDATA[<Summary>${Value.cdata}</Summary>]]></template>
     </type>
+
     <type name="Dataformat" type="thredds.dataFormat">
       <element name="Value" />
+      <template type="thredds"><![CDATA[<dataFormat>${Value}</dataFormat>]]></template>
     </type>
+
     <type name="Datatype" type="thredds.dataType">
       <element name="Value" />
+      <template type="thredds"><![CDATA[<dataType>${Value}</dataType>]]></template>
     </type>
 
     <type name="Authority" type="thredds.authority">
       <element name="Value" />
+      <template type="thredds"><![CDATA[<authority>${Value}</authority>]]></template>
     </type>
 
     <type
        displaycategory="Variables"
        name="Variable"
        type="thredds.variable" searchable="true">
-      <template type="html"><![CDATA[${attr1} (${attr3}) ${attr2}]]></template>
+      <template type="html"><![CDATA[${Variable} (${Units}) ${Long_Name}]]></template>
       <element name="Variable" />
       <element name="Long Name" />
       <element
@@ -84,9 +97,10 @@
          name="Units"
          />
     </type>
+
     <type name="Icon" type="thredds.icon">
       <element name="URL" datatype="url"/>
-      <template type="threddscatalog"><![CDATA[<documentation xlink:href="${attr1}" xlink:title="icon"/>]]></template>
+      <template type="thredds"><![CDATA[<documentation xlink:href="${URL}" xlink:title="icon"/>]]></template>
     </type>
   </handler>
 

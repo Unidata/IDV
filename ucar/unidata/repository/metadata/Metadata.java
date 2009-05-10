@@ -103,22 +103,26 @@ public class Metadata implements Constants {
 
 
     /** _more_ */
-    private String attr1;
+    private String attr1="";
 
     /** _more_ */
-    private String attr2;
+    private String attr2="";
 
     /** _more_ */
-    private String attr3;
+    private String attr3="";
 
     /** _more_ */
-    private String attr4;
+    private String attr4="";
 
     private String extra;
+
     private Hashtable<Integer,String> extraMap;
 
     /** _more_ */
     private boolean inherited = false;
+
+    public Metadata() {
+    }
 
     /**
      * _more_

@@ -193,6 +193,9 @@ public class MetadataType extends MetadataTypeBase {
                 parse(node, manager, types);
                 continue;
             }
+            if (!node.getTagName().equals(TAG_TYPE)) {
+                manager.logError("Unknown metadata xml tag:" + node.getTagName(),null);
+            }
 
             Class c = Misc.findClass(XmlUtil.getAttributeFromTree(node,
                           ATTR_CLASS,
@@ -336,78 +339,32 @@ public class MetadataType extends MetadataTypeBase {
     }
 
 
-
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param metadata _more_
-     * @param doc _more_
-     * @param datasetNode _more_
-     *
-     * @throws Exception _more_
-     */
-    public void addMetadataToCatalog(Request request, Entry entry,
-                                     Metadata metadata, Document doc,
-                                     Element datasetNode)
+    public void addMetadataToXml(Request request, String templateType,
+                                 Entry entry,
+                                 Metadata metadata, 
+                                 Element parent)
             throws Exception {
-        for (MetadataElement element : getChildren()) {
-            if ( !element.getDataType().equals(element.TYPE_FILE)) {
-                continue;
-            }
-            File f = getFile(entry, metadata, element);
-            if (f == null) {
-                continue;
-            }
-            String tail =
-                getStorageManager().getFileTail(f.toString());
-            String path =
-                handler.getRepository().getMetadataManager().URL_METADATA_VIEW
-                    .getFullUrl("/" + tail);
-            String url = HtmlUtil.url(path, ARG_ELEMENT,
-                                      element.getIndex() + "", ARG_ENTRYID,
-                                      metadata.getEntryId(), ARG_METADATA_ID,
-                                      metadata.getId());
-            XmlUtil.create(
-                doc,
-                ThreddsMetadataHandler.getTag(
-                    ThreddsMetadataHandler.TYPE_PROPERTY), datasetNode,
-                        new String[] { ThreddsMetadataHandler.ATTR_NAME,
-                                       (element.getThumbnail()
-                                        ? "thumbnail"
-                                        : "attachment"), ThreddsMetadataHandler
-                                            .ATTR_VALUE, url });
 
+
+        String xml = applyTemplate(templateType,
+                                   entry,
+                                   metadata,
+                                   parent);
+        if(xml==null || xml.length()==0) return;
+        xml =  "<tmp>" + xml + "</tmp>";
+        Element root=null;
+        try {
+            root =
+                XmlUtil.getRoot(new ByteArrayInputStream(xml.getBytes()));
+        } catch(Exception exc) {
+            throw new IllegalStateException("XML Error:" + exc+"\nCould not create xml:" + xml);
         }
-
-
-
-        String template = getTemplate(TEMPLATETYPE_THREDDSCATALOG);
-        if ((template == null) || (template.length() == 0)) {
-            return;
-        }
-        template = template.replace("${root}",
-                                    handler.getRepository().getUrlBase());
-
-        for (MetadataElement element : getChildren()) {
-            template = template.replace("${attr" + element.getIndex() + "}",
-                                        metadata.getAttr(element.getIndex()));
-            template = template.replace("${attr" + element.getIndex() + ".cdata}",
-                                        "[CDATA[" + metadata.getAttr(element.getIndex())
-                                        + "]]");
-        }
-        template = "<tmp>" + template + "</tmp>";
-        Element root =
-            XmlUtil.getRoot(new ByteArrayInputStream(template.getBytes()));
+        if(root==null) throw new IllegalStateException("Could not create xml:" + xml);
         NodeList children = XmlUtil.getElements(root);
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
-            node = (Element) doc.importNode(node, true);
-            datasetNode.appendChild(node);
+            node = (Element) parent.getOwnerDocument().importNode(node, true);
+            parent.appendChild(node);
         }
     }
 
@@ -592,7 +549,7 @@ public class MetadataType extends MetadataTypeBase {
                 if (value == null) {
                     value = "null";
                 }
-                html = html.replace("${attr" + element.getIndex() + "}", value);
+                html = applyMacros(html, element, value);
             }
             content.append(html);
         } else {

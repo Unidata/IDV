@@ -84,6 +84,8 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_DATA = "ramadda.icon.data";
 
+    public static final String ICON_DIF =   "ramadda.icon.data";
+
     /** _more_ */
     public static final String ICON_DATEGRID = "ramadda.icon.dategrid";
 

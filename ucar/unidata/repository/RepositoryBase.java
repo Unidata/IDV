@@ -351,7 +351,11 @@ public class RepositoryBase implements Constants, RepositorySource {
 
 
 
-    /**
+    public String formatYYYYMMDD(Date date) {
+        return dateSdf.format(date);
+    }
+
+/**
      * _more_
      *
      * @return _more_

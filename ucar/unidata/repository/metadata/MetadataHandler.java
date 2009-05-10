@@ -387,7 +387,7 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addMetadataToCatalog(Request request, Entry entry,
+    public void addMetadataToXml(Request request, String xmlType,Entry entry,
                                      Metadata metadata, Document doc,
                                      Element datasetNode)
             throws Exception {
@@ -395,7 +395,8 @@ public class MetadataHandler extends RepositoryManager {
         if (type == null) {
             return;
         }
-        type.addMetadataToCatalog(request, entry, metadata, doc, datasetNode);
+        type.addMetadataToXml(request, xmlType,
+                              entry, metadata, datasetNode);
     }
 
 

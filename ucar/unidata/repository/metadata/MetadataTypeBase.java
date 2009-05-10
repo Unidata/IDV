@@ -85,7 +85,9 @@ public class MetadataTypeBase extends RepositoryManager {
 
 
     /** _more_ */
-    public static final String TEMPLATETYPE_THREDDSCATALOG = "threddscatalog";
+    public static final String TEMPLATETYPE_THREDDS = "thredds";
+
+    public static final String TEMPLATETYPE_DIF = "dif";
 
     /** _more_          */
     public static final String TEMPLATETYPE_HTML = "html";
@@ -151,6 +153,94 @@ public class MetadataTypeBase extends RepositoryManager {
     }
 
 
+    protected void checkFileXml(String templateType, 
+                                Entry entry,
+                                Metadata metadata,
+                                Element parent) throws Exception {
+        for (MetadataElement element : getChildren()) {
+            if ( !element.getDataType().equals(element.TYPE_FILE)) {
+                continue;
+            }
+            File f = getFile(entry, metadata, element);
+            if (f == null) {
+                continue;
+            }
+            String tail =
+                getStorageManager().getFileTail(f.toString());
+            String path =
+                handler.getRepository().getMetadataManager().URL_METADATA_VIEW
+                    .getFullUrl("/" + tail);
+            String url = HtmlUtil.url(path, ARG_ELEMENT,
+                                      element.getIndex() + "", ARG_ENTRYID,
+                                      metadata.getEntryId(), ARG_METADATA_ID,
+                                      metadata.getId());
+            if(templateType.equals(TEMPLATETYPE_THREDDS)) {
+                XmlUtil.create(
+                               parent.getOwnerDocument(),
+                               ThreddsMetadataHandler.getTag(
+                                                             ThreddsMetadataHandler.TYPE_PROPERTY), parent,
+                               new String[] { ThreddsMetadataHandler.ATTR_NAME,
+                                              (element.getThumbnail()
+                                               ? "thumbnail"
+                                               : "attachment"), ThreddsMetadataHandler
+                                              .ATTR_VALUE, url });
+            }
+        }
+    }
+
+
+
+    public String applyTemplate(String templateType,
+                                Entry entry,
+                                Metadata metadata, Element parent) throws Exception {
+        checkFileXml(templateType,  entry,
+                     metadata,      parent);
+
+        String template = getTemplate(templateType);
+        if ((template == null) || (template.length() == 0)) {
+            return null;
+        }
+        template = template.replace("${root}",
+                                    getRepository().getUrlBase());
+
+        for (MetadataElement element : getChildren()) {
+            String value = element.getValueForXml(templateType, entry, metadata,
+                                                  metadata.getAttr(element.getIndex()), parent);
+
+            template = applyMacros(template, element, value);
+
+        }
+        return template;
+    }
+
+
+    public String applyMacros(String template,
+                              Element element,
+                              String value) {
+        if(value == null) {
+            value = "";
+        }
+        String label   = element.getLabel(value);
+        String name = element.getName();
+        String []keys = {"attr" + element.getIndex(),
+                         name,
+                         name.toLowerCase(),
+                         name.replace(" ","_"),
+                         name.toLowerCase().replace(" ","_"),
+                         element.getId()};
+        for(String key: keys) {
+            if(key==null) continue;
+            //                System.err.println("key: " + key);
+            template = template.replace("${" + key + "}",
+                                        value);
+            template = template.replace("${" + key + ".label}",
+                                        label);
+            template = template.replace("${" + key + ".cdata}",
+                                        "[CDATA[" + value
+                                        + "]]");
+        }
+        return template;
+    }
 
     /**
      * _more_
@@ -169,11 +259,18 @@ public class MetadataTypeBase extends RepositoryManager {
                                            ATTR_SHOWINHTML, true));
         setSearchable(XmlUtil.getAttributeFromTree(node,
                                                    ATTR_SEARCHABLE, false));
-        List templateElements = XmlUtil.findChildren(node, TAG_TEMPLATE);
-        for (int j = 0; j < templateElements.size(); j++) {
-            Element templateNode = (Element) templateElements.get(j);
-            templates.put(XmlUtil.getAttribute(templateNode,
-                                               ATTR_TYPE), XmlUtil.getChildText(templateNode));
+
+
+        NodeList children = XmlUtil.getElements(node);
+        for (int i = 0; i < children.getLength(); i++) {
+            Element childNode = (Element) children.item(i);
+            if (childNode.getTagName().equals(TAG_TEMPLATE)) {
+                templates.put(XmlUtil.getAttribute(childNode,
+                                                   ATTR_TYPE), XmlUtil.getChildText(childNode));
+            } else if (childNode.getTagName().equals(TAG_ELEMENT)) {
+            } else {
+                logError("Unknown metadata xml tag:" + childNode.getTagName(),null);
+            }
         }
 
         List childrenElements = XmlUtil.findChildren(node, TAG_ELEMENT);
@@ -189,7 +286,6 @@ public class MetadataTypeBase extends RepositoryManager {
                 new MetadataElement(getHandler(), this, lastIndex, elementNode);
             addElement(element);
         }
-
 
     }
 

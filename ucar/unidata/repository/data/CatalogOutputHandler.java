@@ -283,7 +283,8 @@ public class CatalogOutputHandler extends OutputHandler {
         for (Metadata metadata : metadataList) {
             for (MetadataHandler metadataHandler : metadataHandlers) {
                 if (metadataHandler.canHandle(metadata)) {
-                    metadataHandler.addMetadataToCatalog(request, entry,
+                    metadataHandler.addMetadataToXml(request, MetadataTypeBase.TEMPLATETYPE_THREDDS,
+                                                     entry,
                             metadata, catalogInfo.doc, datasetNode);
                     break;
                 }
@@ -316,7 +317,6 @@ public class CatalogOutputHandler extends OutputHandler {
                           ? entries.get(0).getName()
                           : group.getFullName());
         Document doc   = XmlUtil.makeDocument();
-
         Element  root  = XmlUtil.create(doc, CatalogUtil.TAG_CATALOG, null, new String[] {
             "xmlns",
             "http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0",

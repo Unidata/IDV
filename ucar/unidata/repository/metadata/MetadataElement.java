@@ -45,6 +45,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -89,6 +90,8 @@ public class MetadataElement extends MetadataTypeBase {
 
     public static final String ATTR_MAX = "max";
 
+    public static final String ATTR_ID = "id";
+
     public static final String ATTR_ROWS = "rows";
     /** _more_ */
     public static final String ATTR_COLUMNS = "columns";
@@ -120,6 +123,8 @@ public class MetadataElement extends MetadataTypeBase {
     /** _more_ */
     private String dataType = TYPE_STRING;
 
+
+    private String id = null;
 
     private String subName = "";
 
@@ -166,6 +171,7 @@ public class MetadataElement extends MetadataTypeBase {
     public void init(Element node) throws Exception {
         super.init(node);
         subName = XmlUtil.getAttribute(node, ATTR_SUBNAME,"");
+        id =  XmlUtil.getAttribute(node, ATTR_ID,(String)null);
         max = XmlUtil.getAttribute(node, ATTR_MAX,max);
         setRows(XmlUtil.getAttribute(node, ATTR_ROWS, 1));
         setColumns(XmlUtil.getAttribute(node, ATTR_COLUMNS, 60));
@@ -235,6 +241,23 @@ public class MetadataElement extends MetadataTypeBase {
     }
 
 
+    private List<Metadata> getGroupData(String value) throws Exception {
+        List<Metadata> result = new ArrayList<Metadata>();
+        List<Hashtable<Integer,String>> entries =(List<Hashtable<Integer,String>>)
+            (value!=null && value.length()>0?XmlEncoder.decodeXml(value):null);
+        if(entries==null) return result;
+        for(Hashtable<Integer,String> map: entries) {
+            Metadata metadata = new Metadata();
+            result.add(metadata);
+            for (Enumeration keys = map.keys(); keys.hasMoreElements(); ) {
+                Integer index = (Integer) keys.nextElement();
+                metadata.setAttr(index.intValue(), map.get(index));
+            }
+        }
+        return result;
+    }
+
+
     /**
      * _more_
      *
@@ -256,16 +279,15 @@ public class MetadataElement extends MetadataTypeBase {
         if (getDataType().equals(TYPE_GROUP)) {
             StringBuffer entriesSB =  new StringBuffer();
             entriesSB.append("<table border=0 width=100% cellpadding=2 cellspacing=2>");
-            List<Hashtable<Integer,String>> entries =(List<Hashtable<Integer,String>>)
-                (value!=null && value.length()>0?XmlEncoder.decodeXml(value):null);
-            if(entries==null) return false;
+            List<Metadata> groupMetadata = getGroupData(value);
+            if(groupMetadata.size()==0) return false;
             boolean justOne = getChildren().size()==1;
-            for(Hashtable<Integer,String> map: entries) {
+            for(Metadata metadata: groupMetadata) {
                 if(subName.length()>0) {
                     entriesSB.append("<tr valign=\"top\"><td align=center colspan=2><b>" + subName+"</td></tr>");
                 }
                 for(MetadataElement element: getChildren()) {
-                    String subValue = map.get(new Integer(element.getIndex()));
+                    String subValue = metadata.getAttr(element.getIndex());
                     if(subValue==null) continue;
                     entriesSB.append("<tr valign=\"top\"><td></td><td>\n");
                     //                    entriesSB.append("<table width=100% cellpadding=0 cellspacing=0>");
@@ -283,10 +305,7 @@ public class MetadataElement extends MetadataTypeBase {
 
         } else if(dataType.equals(TYPE_ENUMERATION) ||
                   dataType.equals(TYPE_ENUMERATIONPLUS)) {
-            String label = valueMap.get(value);
-            if(label==null) {
-                label = value;
-            }
+            String label = getLabel(value);
             html = label;
         } else if (dataType.equals(TYPE_EMAIL)) {
             html =HtmlUtil.href("mailto:" + value, value);
@@ -306,6 +325,17 @@ public class MetadataElement extends MetadataTypeBase {
         }
         return false;
     }
+
+
+    public String getLabel(String value) {
+        if(valueMap==null) return value;
+        String label = valueMap.get(value);
+        if(label==null) {
+            label = value;
+        }
+        return label;
+    }
+
 
     public boolean isGroup() {
         return getDataType().equals(TYPE_GROUP);
@@ -421,6 +451,28 @@ public class MetadataElement extends MetadataTypeBase {
     }
 
 
+    public String getValueForXml(String templateType,
+                                 Entry entry,
+                                 Metadata metadata, 
+                                 String value, Element parent)   throws Exception {
+
+        if (!dataType.equals(TYPE_GROUP)) {
+            //            System.err.println("\traw;" + value);
+            return value;
+        }
+
+        String template = getTemplate(templateType);
+        if(template==null) return null;
+        StringBuffer xml = new StringBuffer();
+        List<Metadata> groupMetadata = getGroupData(value);
+        for(Metadata subMetadata: groupMetadata) {
+            xml.append(applyTemplate(templateType, entry, subMetadata,parent));
+        }
+        return xml.toString();
+    }
+
+
+
     /**
      * _more_
      *
@@ -456,7 +508,6 @@ public class MetadataElement extends MetadataTypeBase {
             return HtmlUtil.checkbox(arg, "true", Misc.equals(value, "true"));
         } else if (dataType.equals(TYPE_ENUMERATION)) {
             return HtmlUtil.select(arg, values, value);
-
         } else if (dataType.equals(TYPE_ENUMERATIONPLUS)) {
             boolean contains = values.contains(value);
             return HtmlUtil.select(arg, values, value) +
@@ -477,19 +528,13 @@ public class MetadataElement extends MetadataTypeBase {
                    + "Or download URL:"
                    + HtmlUtil.input(arg + ".url", "", HtmlUtil.SIZE_70);
         } else if (dataType.equals(TYPE_GROUP)) {
-            List<Hashtable<Integer,String>> entries =(List<Hashtable<Integer,String>>)
-                (value!=null && value.length()>0?XmlEncoder.decodeXml(value):null);
-            if(entries==null) {
-                entries = new ArrayList<Hashtable<Integer,String>>();
-            }
-            entries.add(new Hashtable<Integer,String>());
-
             StringBuffer sb  = new StringBuffer();
             String lastGroup = null;
-
             int groupCnt = 0;
+            List<Metadata> groupMetadata = getGroupData(value);
+            groupMetadata.add(new Metadata());
             StringBuffer entriesSB = new StringBuffer();
-            for(Hashtable<Integer,String> map: entries) {
+            for(Metadata subMetadata: groupMetadata) {
                 StringBuffer groupSB = new StringBuffer();
                 groupSB.append(HtmlUtil.formTable());
                 String subArg = arg+".group" +groupCnt+".";
@@ -503,7 +548,7 @@ public class MetadataElement extends MetadataTypeBase {
                     if(elementLbl.length()>0) {
                         elementLbl = msgLabel(elementLbl);
                     }
-                    String subValue  = map.get(new Integer(element.getIndex()));
+                    String subValue  = subMetadata.getAttr(element.getIndex());
                     if(subValue == null) subValue = "";
                     String widget = element.getForm(request, entry,   metadata,
                                                     subArg, 
@@ -513,19 +558,19 @@ public class MetadataElement extends MetadataTypeBase {
                     groupSB.append(HtmlUtil.hidden(subArg+".group","true"));
                 }
                 
-                if(entries.size()>1 && groupCnt==entries.size()-1) {
+                if(groupMetadata.size()>1 && groupCnt==groupMetadata.size()-1) {
                     String newCbx =HtmlUtil.checkbox(subArg+".new","true",false)+" " + msg("Create New")+
                         HtmlUtil.hidden(subArg+".lastone","true");
                     groupSB.append(HtmlUtil.formEntry("",newCbx));
-                } else if(entries.size()>1) {
+                } else if(groupMetadata.size()>1) {
                     groupSB.append(HtmlUtil.formEntry("",HtmlUtil.checkbox(subArg+".delete","true",false)+" " + msg("Delete")));
                 } 
                 groupSB.append(HtmlUtil.formTableClose());
 
-                if(entries.size()>1 && groupCnt==entries.size()-1) {
+                if(groupMetadata.size()>1 && groupCnt==groupMetadata.size()-1) {
                     entriesSB.append(HtmlUtil.makeShowHideBlock("New " + subName,groupSB.toString(),false));
                 } else {
-                    if(entries.size()>1) {
+                    if(groupMetadata.size()>1) {
                     } 
                     entriesSB.append(HtmlUtil.makeShowHideBlock(subName,groupSB.toString(),true));
                 }
@@ -706,6 +751,26 @@ public class MetadataElement extends MetadataTypeBase {
     public String getGroup () {
 	return this.group;
     }
+/**
+Set the Id property.
+
+@param value The new value for Id
+**/
+public void setId (String value) {
+	this.id = value;
+}
+
+/**
+Get the Id property.
+
+@return The Id
+**/
+public String getId () {
+	return this.id;
+}
+
+
+
 
 }
 

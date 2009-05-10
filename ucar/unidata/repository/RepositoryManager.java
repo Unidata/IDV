@@ -530,7 +530,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      * @param message _more_
      * @param exc _more_
      */
-    protected void logError(String message, Throwable exc) {
+    public void logError(String message, Throwable exc) {
         getRepository().getLogManager().logError(message, exc);
     }
 
@@ -540,7 +540,7 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @param message _more_
      */
-    protected void logInfo(String message) {
+    public void logInfo(String message) {
         getRepository().getLogManager().logInfo(message);
     }
 

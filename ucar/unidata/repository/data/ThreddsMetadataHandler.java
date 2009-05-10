@@ -528,11 +528,15 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      *
      * @throws Exception _more_
      */
-    public void addMetadataToCatalog(Request request, Entry entry,
-                                     Metadata metadata, Document doc,
-                                     Element datasetNode)
+    public void addMetadataToXml(Request request, String xmlType,
+                                 Entry entry,
+                                 Metadata metadata, Document doc,
+                                 Element datasetNode)
             throws Exception {
-        if (metadata.getType().equals(TYPE_VARIABLE)) {
+
+
+        if (metadata.getType().equals(TYPE_VARIABLE) &&
+            xmlType.equals(MetadataTypeBase.TEMPLATETYPE_THREDDSCATALOG)) {
             Element variablesNode = XmlUtil.getElement(datasetNode,
                                         TAG_VARIABLES);
             if (variablesNode == null) {
@@ -543,7 +547,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                            metadata.getAttr2(), new String[] { ATTR_NAME,
                     metadata.getAttr1(), ATTR_UNITS, metadata.getAttr3() });
         } else {
-            super.addMetadataToCatalog(request,  entry,
+            super.addMetadataToXml(request,  xmlType, entry, 
                                        metadata, doc, datasetNode);
 
         }
