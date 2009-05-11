@@ -335,6 +335,8 @@ public class CatalogHarvester extends Harvester {
                         entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,
                         DFLT_INHERITED, ext, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,Metadata.DFLT_EXTRA));
             }
+
+
             Resource resource = null;
             if (download
                     && (urlPath.startsWith("http:")
@@ -372,6 +374,8 @@ public class CatalogHarvester extends Harvester {
                             createDate.getTime(), createDate.getTime(),
                             createDate.getTime(), null);
             entries.add(entry);
+
+
             typeHandler.initializeNewEntry(entry);
 
             List<Metadata> metadataList = new ArrayList<Metadata>();
@@ -387,6 +391,17 @@ public class CatalogHarvester extends Harvester {
                 metadata.setEntryId(entry.getId());
                 entry.addMetadata(metadata);
             }
+
+
+            if(isOpendap && getAddMetadata()) {
+                getEntryManager().addInitialMetadata(null,
+                                                     (List<Entry>)Misc.newList(entry), true, false);
+                
+            }
+
+            if(true)
+                return;
+
 
             if (entries.size() > 100) {
                 getEntryManager().processEntries(this, null, entries, false);

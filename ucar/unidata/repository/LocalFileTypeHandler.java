@@ -208,6 +208,8 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                 "Could not find entry: " + rootDir);
         }
         String rootDirPath = rootDir.toString();
+        getRepository().checkLocalFile(rootDir);
+
         File   childPath   = getFileFromId(synthId, rootDir);
         File[] files       = childPath.listFiles();
         //        files = IOUtil.sortFilesOnName(files);

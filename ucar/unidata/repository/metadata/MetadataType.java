@@ -557,7 +557,7 @@ public class MetadataType extends MetadataTypeBase {
         } else {
             int     cnt    = 1;
             boolean didOne = false;
-            content.append("<table xxwidth=100% cellpadding=2 cellspacing=2>");
+            content.append("<table cellpadding=2 cellspacing=2>");
             for (MetadataElement element : getChildren()) {
                 if (element.getHtml(content,
                                     metadata.getAttr(cnt))) {

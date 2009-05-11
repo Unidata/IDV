@@ -278,28 +278,33 @@ public class MetadataElement extends MetadataTypeBase {
         String html =null;
         if (getDataType().equals(TYPE_GROUP)) {
             StringBuffer entriesSB =  new StringBuffer();
-            entriesSB.append("<table border=0 width=100% cellpadding=2 cellspacing=2>");
+            //            entriesSB.append("<table border=0 width=100% cellpadding=2 cellspacing=2>");
             List<Metadata> groupMetadata = getGroupData(value);
             if(groupMetadata.size()==0) return false;
             boolean justOne = getChildren().size()==1;
+            int entryCnt=0;
             for(Metadata metadata: groupMetadata) {
+                entryCnt++;
+                StringBuffer subEntrySB = new StringBuffer();
+                subEntrySB.append("<table border=0 width=100% cellpadding=2 cellspacing=2>");
                 if(subName.length()>0) {
-                    entriesSB.append("<tr valign=\"top\"><td align=center colspan=2><b>" + subName+"</td></tr>");
+                    //                    subEntrySB.append("<tr valign=\"top\"><td align=center colspan=2><b>" + subName+"</td></tr>");
                 }
                 for(MetadataElement element: getChildren()) {
                     String subValue = metadata.getAttr(element.getIndex());
                     if(subValue==null) continue;
-                    entriesSB.append("<tr valign=\"top\"><td></td><td>\n");
-                    //                    entriesSB.append("<table width=100% cellpadding=0 cellspacing=0>");
-                    element.getHtml(entriesSB, subValue);
-                    //                    entriesSB.append("</table>");
-                    entriesSB.append("</td></tr>\n");
+                    subEntrySB.append("<tr valign=\"top\"><td></td><td>\n");
+                    //                    subEntrySB.append("<table width=100% cellpadding=0 cellspacing=0>");
+                    element.getHtml(subEntrySB, subValue);
+                    //                    subEntrySB.append("</table>");
+                    subEntrySB.append("</td></tr>\n");
                 }
                 if(!justOne) {
-                    entriesSB.append("<tr><td colspan=2><hr></td></tr>\n");
+                    subEntrySB.append("<tr><td colspan=2><hr></td></tr>\n");
                 }
+                subEntrySB.append("</table>");
+                entriesSB.append(HtmlUtil.makeShowHideBlock(entryCnt+") " +subName,subEntrySB.toString(),true));
             }
-            entriesSB.append("</table>");
             html = HtmlUtil.makeToggleInline("",
                                              HtmlUtil.div(entriesSB.toString(),HtmlUtil.cssClass("metadatagroup")),true);
 

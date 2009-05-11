@@ -539,6 +539,7 @@ public class HarvesterManager extends RepositoryManager {
     public Result processImportCatalog(Request request) throws Exception {
         Group        group    = getEntryManager().findGroup(request);
         boolean      recurse  = request.get(ARG_RECURSE, false);
+        boolean      addMetadata = request.get(ATTR_ADDMETADATA, false);
         boolean      download = request.get(ARG_RESOURCE_DOWNLOAD, false);
         StringBuffer sb       = new StringBuffer();
         //        sb.append(getEntryManager().makeEntryHeader(request, group));
@@ -549,9 +550,19 @@ public class HarvesterManager extends RepositoryManager {
         sb.append(HtmlUtil.submit(msgLabel("Import catalog")));
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.input(ARG_CATALOG, catalog, " size=\"75\""));
+
         sb.append(HtmlUtil.checkbox(ARG_RECURSE, "true", recurse));
         sb.append(HtmlUtil.space(1));
         sb.append(msg("Recurse"));
+
+
+
+        sb.append(HtmlUtil.checkbox(ATTR_ADDMETADATA, "true", addMetadata));
+        sb.append(HtmlUtil.space(1));
+        sb.append(msg("Add Metadata"));
+
+
+
         sb.append(HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD, "true", download));
         sb.append(HtmlUtil.space(1));
         sb.append(msg("Download URLs"));
@@ -560,6 +571,7 @@ public class HarvesterManager extends RepositoryManager {
             CatalogHarvester harvester =
                 new CatalogHarvester(getRepository(), group, catalog,
                                      request.getUser(), recurse, download);
+            harvester.setAddMetadata(addMetadata);
             harvesters.add(harvester);
             Misc.run(harvester, "run");
         }

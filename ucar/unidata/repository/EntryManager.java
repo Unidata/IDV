@@ -1109,7 +1109,7 @@ return new Result(title, sb);
         }
 
         if (newEntry && request.get(ARG_METADATA_ADD, false)) {
-            addInitialMetadata(request, entries, false);
+            addInitialMetadata(request, entries,newEntry, false);
         }
 
         insertEntries(entries, newEntry);
@@ -2482,7 +2482,11 @@ return new Result(title, sb);
                 HtmlUtil.formEntry(
                     "",
                     HtmlUtil.checkbox(ARG_RECURSE, "true", false)
-                    + HtmlUtil.space(1) + msg("Recurse") + HtmlUtil.space(1)
+                    + HtmlUtil.space(1) + msg("Recurse") + HtmlUtil.space(1) +
+                    HtmlUtil.checkbox(ATTR_ADDMETADATA, "true", false) +
+                    HtmlUtil.space(1) +
+                    msg("Add Metadata")+
+                    HtmlUtil.space(1)
                     + HtmlUtil.checkbox(ARG_RESOURCE_DOWNLOAD, "true", false)
                     + HtmlUtil.space(1) + msg("Download URLS")));
             sb.append(HtmlUtil.formEntry("", HtmlUtil.submit(msg("Go"))));
@@ -2624,7 +2628,7 @@ return new Result(title, sb);
                 if (XmlUtil.getAttribute(node, ATTR_ADDMETADATA, false)) {
                     List<Entry> tmpEntries =
                         (List<Entry>) Misc.newList(entry);
-                    addInitialMetadata(request, tmpEntries, false);
+                    addInitialMetadata(request, tmpEntries, true, false);
                 }
 
             } else if (node.getTagName().equals(TAG_ASSOCIATION)) {
@@ -4527,6 +4531,7 @@ return new Result(title, sb);
                     metadataStmt.setString(col++, metadata.getAttr2());
                     metadataStmt.setString(col++, metadata.getAttr3());
                     metadataStmt.setString(col++, metadata.getAttr4());
+                    metadataStmt.setString(col++, metadata.getExtra());
                     metadataStmt.addBatch();
                     batchCnt++;
 
@@ -5050,7 +5055,7 @@ return new Result(title, sb);
             List<Entry> entries, boolean shortForm)
             throws Exception {
         StringBuffer sb = new StringBuffer();
-        List<Entry> changedEntries = addInitialMetadata(request, entries,
+        List<Entry> changedEntries = addInitialMetadata(request, entries, false,
                                          shortForm);
         if (changedEntries.size() == 0) {
             sb.append("No metadata added");
@@ -5082,11 +5087,12 @@ return new Result(title, sb);
      */
     public List<Entry> addInitialMetadata(Request request,
                                           List<Entry> entries,
+                                          boolean newEntries,
                                           boolean shortForm)
             throws Exception {
         List<Entry> changedEntries = new ArrayList<Entry>();
         for (Entry theEntry : entries) {
-            if ( !getAccessManager().canDoAction(request, theEntry,
+            if (!newEntries &&  !getAccessManager().canDoAction(request, theEntry,
                     Permission.ACTION_EDIT)) {
                 continue;
             }

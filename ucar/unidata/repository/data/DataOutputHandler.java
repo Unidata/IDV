@@ -817,7 +817,8 @@ public class DataOutputHandler extends OutputHandler {
                 sb.append(HtmlUtil.p());
                 List<Entry> entries = (List<Entry>) Misc.newList(entry);
                 getEntryManager().addInitialMetadata(request, entries,
-                        request.get(ARG_SHORT, false));
+                                                     false,
+                                                     request.get(ARG_SHORT, false));
                 getEntryManager().insertEntries(entries, false);
                 sb.append(getRepository().note("Metadata added"));
                 sb.append(getRepository().getHtmlOutputHandler().getInformationTabs(request,  entry,
@@ -973,7 +974,7 @@ public class DataOutputHandler extends OutputHandler {
                             List<Entry> entries =
                                 (List<Entry>) Misc.newList(newEntry);
                             getEntryManager().addInitialMetadata(request,
-                                    entries, request.get(ARG_SHORT, false));
+                                                                 entries, false, request.get(ARG_SHORT, false));
                         }
                         getEntryManager().insertEntries(
                             Misc.newList(newEntry), true);

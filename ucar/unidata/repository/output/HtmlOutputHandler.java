@@ -934,8 +934,10 @@ public class HtmlOutputHandler extends OutputHandler {
         showNext(request, subGroups, entries, sb);
 
 
+        boolean hasChildren = (subGroups.size()!=0 || entries.size()!=0);
+
         if (group.isDummy()) {
-            if ((subGroups.size() == 0) && (entries.size() == 0)) {
+            if (!hasChildren) {
                 sb.append(getRepository().note(msg("No entries found")));
             }
         }
@@ -952,7 +954,8 @@ public class HtmlOutputHandler extends OutputHandler {
             String informationBlock = getInformationTabs(request, group,
                                           false);
             sb.append(HtmlUtil.makeShowHideBlock(msg("Information"),
-                    informationBlock,         request.get(ARG_SHOW_ASSOCIATIONS,false)));
+                    informationBlock,         
+                                                 request.get(ARG_SHOW_ASSOCIATIONS,!hasChildren)));
 
             StringBuffer metadataSB = new StringBuffer();
             getMetadataManager().decorateEntry(request, group, metadataSB,

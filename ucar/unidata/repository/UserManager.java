@@ -948,6 +948,11 @@ public class UserManager extends RepositoryManager {
                 errorBuffer.append(HtmlUtil.br());
             }
 
+            if(password1.length()==0 && password2.length()==0) {
+                password1 = password2 = getRepository().getGUID() +"."+Math.random();
+            }
+
+
             if ((password1.length() == 0) || !password1.equals(password2)) {
                 okToAdd = false;
                 errorBuffer.append(msg("Invalid password"));
@@ -965,7 +970,13 @@ public class UserManager extends RepositoryManager {
                 User newUser = new User(id, name, email, "", "",
                                           hashPassword(password1), admin, "",
                                         "");
+                List<String> newUserRoles =
+                    StringUtil.split(request.getString(ARG_USER_ROLES, ""), "\n",
+                                     true, true);
+
+                newUser.setRoles(newUserRoles);
                 makeOrUpdateUser(newUser,false);
+                setRoles(request, newUser);
                 
                 StringBuffer msg = new StringBuffer(request.getString(ARG_USER_MESSAGE,""));
                 msg.append("<p>User id: " + id+"<p>");
@@ -1064,6 +1075,10 @@ public class UserManager extends RepositoryManager {
         msgSB.append(msg("Send an email to the new user with message:"));
         msgSB.append(HtmlUtil.br());
         msgSB.append(HtmlUtil.textArea(ARG_USER_MESSAGE, msg, 5, 50));
+        msgSB.append(HtmlUtil.p());
+        msgSB.append(msgLabel("User Roles"));
+        msgSB.append(HtmlUtil.br());
+        msgSB.append(HtmlUtil.textArea(ARG_USER_ROLES, request.getString(ARG_USER_ROLES,""), 5, 50));
 
         if(getAdmin().isEmailCapable()) {
             sb.append(HtmlUtil.table(HtmlUtil.rowTop(HtmlUtil.cols(formSB.toString(),

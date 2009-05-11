@@ -574,7 +574,7 @@ public class PatternHarvester extends Harvester {
                         if ( !getTestMode()) {
                             if (getAddMetadata()) {
                                 getEntryManager().addInitialMetadata(null,
-                                        needToAdd, false);
+                                                                     needToAdd, true, false);
                             }
                             getEntryManager().insertEntries(needToAdd, true,
                                     true);
@@ -597,7 +597,7 @@ public class PatternHarvester extends Harvester {
             if (needToAdd.size() > 0) {
                 if (getAddMetadata()) {
                     getEntryManager().addInitialMetadata(null, needToAdd,
-                            false);
+                                                         true, false);
                 }
                 getEntryManager().insertEntries(needToAdd, true, true);
             }
