@@ -853,6 +853,9 @@ public class FileManager {
     /** Suffix for Quicktime files */
     public static final String SUFFIX_MOV = ".mov";
 
+    /** Suffix for CSV files */
+    public static final String SUFFIX_TXT = ".txt";
+
     /** Suffix for log files */
     public static final String SUFFIX_LOG = ".log";
 
@@ -883,6 +886,13 @@ public class FileManager {
         new PatternFileFilter(".+\\.csv",
                               "Comma-Separated Values (CSV) files (*.csv)",
                               SUFFIX_CSV);
+
+
+    /** Filter for Text files */
+    public static final PatternFileFilter FILTER_TXT =
+        new PatternFileFilter(".+\\.txt",
+                              "Text Files (*.txt)",
+                              SUFFIX_TXT);
 
 
     /** Filter for xls files */
