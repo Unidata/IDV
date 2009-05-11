@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -83,11 +84,11 @@ public class TextPointDataSource extends PointDataSource {
     /** property id for the header map */
     public static final String PROP_HEADER_MAP = "data.textpoint.map";
 
-    /** _more_ */
+    /** Property identifier for the hashtable of properties */
     public static final String PROP_DATAPROPERTIES =
         "data.textpoint.dataproperties";
 
-    /** _more_ */
+    /** Property identifier for the */
     public static final String PROP_HEADER_EXTRA = "data.textpoint.extra";
 
     /** property id for the header params */
@@ -173,7 +174,7 @@ public class TextPointDataSource extends PointDataSource {
     /** last label */
     private String lastLabel = "";
 
-    /** _more_ */
+    /** Can pass in properties to the parser with this */
     private Hashtable dataProperties;
 
     /** for the metadata gui */
@@ -381,6 +382,8 @@ public class TextPointDataSource extends PointDataSource {
                     return null;
                 }
                 if ( !showAttributeGui(contents)) {
+                    //If user hits Cancel then we are in error and this datasource should get removed
+                    setInError(true, false, "");
                     return null;
                 }
                 ta = new TextAdapter(getInputStream(contents), delimiter,
@@ -783,13 +786,14 @@ public class TextPointDataSource extends PointDataSource {
         }
     }
 
+
     /**
      * write the header text to a file
      */
     public void writeHeader() {
         try {
             String filename =
-                FileManager.getWriteFile(FileManager.FILTER_CSV, null);
+                FileManager.getWriteFile(FileManager.FILTER_TXT, null);
             if (filename == null) {
                 return;
             }
@@ -879,9 +883,8 @@ public class TextPointDataSource extends PointDataSource {
      */
     private boolean showAttributeGui(String contents) throws IOException {
         //        Misc.printStack("meta");
-
-
         JComponent metaDataComp = getMetaDataComponent(contents);
+
 
         boolean ok = GuiUtils.showOkCancelDialog(null, "Point Data",
                          metaDataComp, null);
@@ -1045,15 +1048,15 @@ public class TextPointDataSource extends PointDataSource {
      * @param metadata The metadata
      */
     public void applySavedMetaDataFromUI(Metadata metadata) {
-        Misc.run(this,"applySavedMetaDataFromUIInner", metadata);
+        Misc.run(this, "applySavedMetaDataFromUIInner", metadata);
     }
 
 
 
-   /**
-     * This gets called in a thread from the applySavedMetaDataFromUI method
-     *
-     * @param metadata The metadata
+    /**
+     *  This gets called in a thread from the applySavedMetaDataFromUI method
+     * 
+     *  @param metadata The metadata
      */
     public void applySavedMetaDataFromUIInner(Metadata metadata) {
         setLineText(lineLbl, skipRows, lines);
