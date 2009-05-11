@@ -521,7 +521,7 @@ public class XmlEncoder extends XmlUtil {
     }
 
     public static String encodeObject(Object object) throws Exception {
-        return new XmlEncoder().toXml(object);
+        return new XmlEncoder().toXml(object,false);
     }
 
 

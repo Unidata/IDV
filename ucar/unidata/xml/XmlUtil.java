@@ -1152,8 +1152,10 @@ public abstract class XmlUtil {
                                  String text, String[] attrs)
             throws Exception {
         Element child    = create(doc, tag, parent, attrs);
-        Text    textNode = doc.createTextNode(text);
-        child.appendChild(textNode);
+        if(text!=null) {
+            Text    textNode = doc.createTextNode(text);
+            child.appendChild(textNode);
+        }
         return child;
     }
 
@@ -1912,7 +1914,8 @@ public abstract class XmlUtil {
 
           case Node.TEXT_NODE : {
               //Trim whitespace
-              String v = node.getNodeValue().trim();
+              String v = node.getNodeValue();
+              if(v==null) break;
               xml.append(encodeString(v));
               break;
           }
@@ -1929,6 +1932,69 @@ public abstract class XmlUtil {
         }
 
     }
+
+
+
+    public static void toHtml(StringBuffer html, Node node) {
+        switch (node.getNodeType()) {
+          case Node.ELEMENT_NODE : {
+              NodeList children    = node.getChildNodes();
+              int      numChildren = children.getLength();
+              html.append("<b>"+node.getNodeName().replace("_", " ")+"</b>");
+              html.append(": ");
+
+              for (int i = 0; i < numChildren; i++) {
+                  Node child = children.item(i);
+                  if(((child.getNodeType() == Node.TEXT_NODE)
+                             || (child.getNodeType()
+                                 == Node.CDATA_SECTION_NODE))) {
+                      String v = child.getNodeValue();
+                      if(v==null) continue;
+                      if(v.trim().length()==0) continue;
+                      html.append(v);
+                      html.append(" ");
+                  }
+              }
+              boolean didone = false;
+              NamedNodeMap nnm     = node.getAttributes();
+              if (nnm != null) {
+                  for (int i = 0; i < nnm.getLength(); i++) {
+                      Attr attr = (Attr) nnm.item(i);
+                      String attrName=  attr.getNodeName();
+                      if(attrName.startsWith("xmlns") ||
+                         attrName.startsWith("xsi:")) continue;
+                      if(!didone) {
+                          html.append("<ul>");
+                          didone  = true;
+                      }
+                      html.append(attrName.replace("_", " ")+"="+ attr.getNodeValue());
+                      html.append("<br>\n");
+                 }
+              }
+              int      cnt         = 0;
+              for (int i = 0; i < numChildren; i++) {
+                  Node child = children.item(i);
+                  if(((child.getNodeType() == Node.TEXT_NODE)
+                             || (child.getNodeType()
+                                 == Node.CDATA_SECTION_NODE))) continue;
+                  if(!didone) {
+                      html.append("<ul>");
+                      didone  = true;
+                  }
+                  if (cnt > 0) {
+                      html.append("<br>");
+                  }
+                  toHtml(html, child);
+                  cnt++;
+              }
+              if(didone)
+                  html.append("</ul>");
+              break;
+          }
+        }
+    }
+
+
 
     /**
      *  Do a simple conversion  of special characters to their encoding.
