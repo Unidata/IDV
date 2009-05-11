@@ -2726,8 +2726,9 @@ public class HtmlUtil {
         String link =
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleBlockVisibility('"
                 + id + "','" + id + "img','" + hideImg + "','" + showImg
-                + "')"), img + label,
+                                                  + "')"), img/* + label*/,
                          HtmlUtil.cssClass("pagesubheadinglink"));
+        link = link + label;
 
         //        sb.append(RepositoryManager.tableSubHeader(link));
         sb.append("<div  " + blockExtra + ">");

@@ -277,6 +277,17 @@ public class TwoFacedObject implements Comparable {
     }
 
 
+    public static boolean  contains(List objects, Object value) {
+        for (Object o:objects) {
+            if(o instanceof TwoFacedObject) {
+                o = ((TwoFacedObject)o).getId();
+            }
+            if(Misc.equals(o, value)) return true;
+        }
+        return false;
+    }
+
+
 
     /**
      * Get a String representation for the objects in te lsit
