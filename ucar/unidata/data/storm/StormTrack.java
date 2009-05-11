@@ -585,15 +585,16 @@ public class StormTrack implements Comparable {
             appendDiamondValue(sb, stp.getAttribute(STIStormDataSource.PARAM_MINPRESSURE));
             appendDiamondValue(sb, stp.getAttribute(STIStormDataSource.PARAM_RADIUSMODERATEGALE));
             appendDiamondValue(sb, stp.getAttribute(STIStormDataSource.PARAM_RADIUSWHOLEGALE));
-            appendDiamondValue(sb, stp.getAttribute(STIStormDataSource.PARAM_MOVEDIRECTION));
             appendDiamondValue(sb,stp.getAttribute(STIStormDataSource.PARAM_MOVESPEED));
+            appendDiamondValue(sb, stp.getAttribute(STIStormDataSource.PARAM_MOVEDIRECTION));
+                  
             sb.append("\n");
         }
     }
 
 
     private void appendDiamondValue(StringBuffer sb,Real r) {
-        if(r == null)
+        if(r == null || Double.isNaN(r.getValue()))
             sb.append(DIAMOND_MISSING_VALUE);
         else
             sb.append(r.getValue());
