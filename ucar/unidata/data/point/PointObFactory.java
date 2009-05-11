@@ -219,6 +219,7 @@ public class PointObFactory {
                 }
             }
             DateTime dttm = ob.getDateTime();
+            if (dttm.isMissing()) continue;
             if (lumpMinutes > 0) {
                 double seconds = dttm.getValue();
                 seconds = seconds - seconds % (lumpMinutes * 60);
@@ -1375,6 +1376,8 @@ public class PointObFactory {
             throw new IllegalArgumentException(
                 "Can't handle collection of type " + fc.getClass().getName());
         }
+        //System.out.println("collection times = " + collection.getDateRange());
+        //System.out.println("collection bbox = " + collection.getBoundingBox());
             
         //System.out.println("number of obs = " + collection.size());
         int total = collection.size();
@@ -1426,7 +1429,9 @@ public class PointObFactory {
 
 
         //Bin times
+        Trace.call1("FeatureDatasetPoint: binTimes");
         times = binTimes(times, binRoundTo, binWidth);
+        Trace.call2("FeatureDatasetPoint: binTimes");
 
         StructureMembers.Member member;
         PointOb[]               obs = new PointOb[pos.size()];
