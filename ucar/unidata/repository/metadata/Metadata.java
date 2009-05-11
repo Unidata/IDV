@@ -188,7 +188,7 @@ public class Metadata implements Constants {
     public Metadata(String id, String entryId, MetadataType type,
                     boolean inherited, String attr1, String attr2,
                     String attr3, String attr4,String extra) {
-        this(id, entryId, type.getType(), inherited, attr1, attr2, attr3,
+        this(id, entryId, type.getId(), inherited, attr1, attr2, attr3,
              attr4,extra);
     }
 

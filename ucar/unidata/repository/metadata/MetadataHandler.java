@@ -124,7 +124,7 @@ public class MetadataHandler extends RepositoryManager {
     public void addMetadataType(MetadataType type) {
         type.setHandler(this);
         metadataTypes.add(type);
-        typeMap.put(type.getType(), type);
+        typeMap.put(type.getId(), type);
         getMetadataManager().addMetadataType(type);
     }
 
@@ -544,9 +544,9 @@ public class MetadataHandler extends RepositoryManager {
     public String getSearchUrl(Request request, MetadataType type,
                                String value) {
         List args = new ArrayList();
-        args.add(ARG_METADATA_TYPE + "." + type.getType());
+        args.add(ARG_METADATA_TYPE + "." + type.getId());
         args.add(type.toString());
-        args.add(ARG_METADATA_ATTR1 + "." + type.getType());
+        args.add(ARG_METADATA_ATTR1 + "." + type.getId());
         args.add(value);
         return HtmlUtil.url(request.url(getRepository().URL_ENTRY_SEARCH),
                             args);
@@ -648,9 +648,9 @@ public class MetadataHandler extends RepositoryManager {
         for (int i = 0; i < values.length; i++) {
             String browseUrl = HtmlUtil.url(url,
                                             ARG_METADATA_TYPE + "."
-                                            + type.getType(), type.getType(),
+                                            + type.getId(), type.getId(),
                                                 ARG_METADATA_ATTR1 + "."
-                                                + type.getType(), values[i]);
+                                                + type.getId(), values[i]);
             String value = values[i].trim();
             if (value.length() == 0) {
                 value = "-blank-";

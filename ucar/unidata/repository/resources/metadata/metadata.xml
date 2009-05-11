@@ -3,72 +3,43 @@
 
   <handler category="Tags">
 
-    <type name="Group Test" type="grouptest" searchable="true" browsable="true">
-      <element name="Group" datatype="group">
-            <element name="attr1" />
-	    <element name="attr2" datatype="enumeration"  values="apples,bananas,cherries"/>
-      </element>
-   </type>
 
-
-<!--
-    <type name="Test" type="test" searchable="true" browsable="true">
-      <element name="attr1" />
-      <element name="attr2" />
-      <element name="attr3" />
-      <element name="attr4" />
-      <element name="attr5" />
-      <element name="attr6" />
-      <template type="html"><![CDATA[${attr1},${attr2},${attr3},${attr4},${attr5},${attr6}]]></template>
-    </type>
--->
-
-
-    <type name="Tag" type="enum_tag" searchable="true" browsable="true">
+    <type name="Tag" id="enum_tag" searchable="true" browsable="true">
       <element name="Tag Value" />
-      <template type="threddscatalog"><![CDATA[<keyword>${attr1}</keyword>]]></template>
+      <template type="thredds"><![CDATA[<keyword>${attr1}</keyword>]]></template>
     </type>
 
-    <type name="Wiki Category" type="wikicategory" foruser="false">
+    <type name="Wiki Category" id="wikicategory" foruser="false">
       <element name="Wiki Category" />
     </type>
 
-    <type name="GCMD Science Keyword" type="enum_gcmdkeyword" searchable="true" browsable="true">
+    <type name="GCMD Science Keyword" id="enum_gcmdkeyword" searchable="true" browsable="true">
       <element
          name="Keyword"
          datatype="enumeration"
          values="file:/ucar/unidata/repository/resources/metadata/dif/gcmdkeywords.txt"/>
-      <template type="threddscatalog"><![CDATA[<keyword>${attr1}</keyword>]]></template>
+      <template type="thredds"><![CDATA[<keyword>${attr1}</keyword>]]></template>
     </type>
 
-<!--
-    <type name="ANZLIC Search Word" type="enum_anzlic_search_words" searchable="true" browsable="true">
-      <element
-         name="Search Word"
-         datatype="enumeration"
-         values="file:/ucar/unidata/repository/resources/metadata/anzlicsearchwords.txt"/>
-      <template type="threddscatalog"><![CDATA[<keyword>${attr1}</keyword>]]></template>
-    </type>
--->
 
   </handler>
 
   <handler class="ucar.unidata.repository.metadata.ContentMetadataHandler"        category="Attachments, Contact, Etc.">
     <type
        name="Thumbnail Image"
-       type="content.thumbnail">
+       id="content.thumbnail">
       <element name="Thumbnail File" datatype="file" thumbnail="true"/>
     </type>
     <type
        name="File Attachment"
-       type="content.attachment">
+       id="content.attachment">
       <element name="File" datatype="file" thumbnail="false"/>
     </type>
-    <type name="Contact" type="content.contact">
+    <type name="Contact" id="content.contact">
       <element name="Name" />
       <element name="Email" />
     </type>
-    <type name="Sort Order" type="content.sort">
+    <type name="Sort Order" id="content.sort">
       <element
          default="fromdate"
          name="Field"
@@ -81,16 +52,16 @@
     </type>
     <type
        name="Alias"
-       type="content.alias">
+       id="content.alias">
       <element name="Alias" />
       <template type="html"><![CDATA[<a href="${root}/alias/${attr1}">${attr1}</a>]]></template>
     </type>
   </handler>
 
   <handler adminonly="true" class="ucar.unidata.repository.metadata.AdminMetadataHandler" category="Admin">
-    <type name="Page Template" type="admin.template"/>
-    <type name="Local File Pattern" type="admin.localfile.pattern"/>
-    <type name="Anonymous Upload" type="admin.anonymousupload">
+    <type name="Page Template" id="admin.template"/>
+    <type name="Local File Pattern" id="admin.localfile.pattern"/>
+    <type name="Anonymous Upload" id="admin.anonymousupload">
       <element name="From" />
       <element name="IP" />
     </type>

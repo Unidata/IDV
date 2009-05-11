@@ -192,7 +192,7 @@ public class AdminMetadataHandler extends MetadataHandler {
         }
         String argtype = ARG_TYPE + suffix;
         String argid   = ARG_METADATAID + suffix;
-        content = content + HtmlUtil.hidden(argtype, type.getType())
+        content = content + HtmlUtil.hidden(argtype, type.getId())
                   + HtmlUtil.hidden(argid, metadata.getId());
         return new String[] { lbl, content };
     }

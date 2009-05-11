@@ -73,7 +73,6 @@ import java.util.Properties;
  */
 public class DifHarvester extends Harvester {
     /*
-
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
 <DIF>
   <Entry_ID>
@@ -341,5 +340,20 @@ Two ASCII files are available for each year for freeze depth and thaw depth, res
         
 
     }
+
+    public static void ingestDif(String url) throws Exception {
+        
+        
+    }
+    
+    public static void main(String[]args) {
+        try {
+            ingestDif("http://nsidc.org/cgi-bin/get_metadata.pl?id=G02169&format=DIF&style=XML");
+        } catch(Exception exc) {
+
+        }
+    }
+
+
 
 }

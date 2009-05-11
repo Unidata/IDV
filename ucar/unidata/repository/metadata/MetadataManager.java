@@ -190,7 +190,7 @@ public class MetadataManager extends RepositoryManager {
      */
     public void addMetadataType(MetadataType type) {
         metadataTypes.add(type);
-        typeMap.put(type.getType(), type);
+        typeMap.put(type.getId(), type);
     }
 
 
@@ -720,7 +720,7 @@ public class MetadataManager extends RepositoryManager {
                                  Clause.and(
                                      Clause.eq(
                                          Tables.METADATA.COL_TYPE,
-                                         type.getType()), Clause.eq(
+                                         type.getId()), Clause.eq(
                                              Tables.METADATA.COL_ATTR1,
                                              value)));
             ResultSet results = stmt.getResultSet();
@@ -978,7 +978,7 @@ public class MetadataManager extends RepositoryManager {
             }
             groupSB.append(request.uploadForm(URL_METADATA_ADDFORM));
             groupSB.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
-            groupSB.append(HtmlUtil.hidden(ARG_TYPE, type.getType()));
+            groupSB.append(HtmlUtil.hidden(ARG_TYPE, type.getId()));
             groupSB.append(HtmlUtil.submit(msg("Add")));
             groupSB.append(HtmlUtil.space(1)
                            + HtmlUtil.bold(type.getLabel()));
@@ -1053,7 +1053,7 @@ public class MetadataManager extends RepositoryManager {
         Hashtable myDistinctMap = distinctMap;
         String[]  values        = (String[]) ((myDistinctMap == null)
                 ? null
-                : myDistinctMap.get(type.getType()));
+                : myDistinctMap.get(type.getId()));
 
         if (values == null) {
             Statement stmt = getDatabaseManager().select(
@@ -1061,11 +1061,11 @@ public class MetadataManager extends RepositoryManager {
                                  Tables.METADATA.NAME,
                                  Clause.eq(
                                      Tables.METADATA.COL_TYPE,
-                                     type.getType()));
+                                     type.getId()));
             values = SqlUtil.readString(stmt, 1);
             getDatabaseManager().close(stmt);
             if (myDistinctMap != null) {
-                myDistinctMap.put(type.getType(), values);
+                myDistinctMap.put(type.getId(), values);
             }
         }
         return values;

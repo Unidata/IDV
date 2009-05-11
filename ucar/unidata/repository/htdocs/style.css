@@ -26,6 +26,11 @@ body {
 }
 
 
+.plain {
+    font-size:10px;
+    font-weight: normal;
+}
+
 .hidden {
    visibility: hidden; 
    display:none;

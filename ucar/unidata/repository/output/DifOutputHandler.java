@@ -60,10 +60,14 @@ public class DifOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_DIF =
-        new OutputType("Dif", "dif", OutputType.TYPE_NONHTML|OutputType.TYPE_FORSEARCH,
+    public static final OutputType OUTPUT_DIF_XML =
+        new OutputType("Dif-XML", "dif.xml", OutputType.TYPE_NONHTML|OutputType.TYPE_FORSEARCH,
                        "", ICON_DIF);
 
+
+    public static final OutputType OUTPUT_DIF_TEXT =
+        new OutputType("Dif-Text", "dif.text", OutputType.TYPE_NONHTML|OutputType.TYPE_FORSEARCH,
+                       "", ICON_DIF);
 
 
     /**
@@ -76,7 +80,8 @@ public class DifOutputHandler extends OutputHandler {
     public DifOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
-        addType(OUTPUT_DIF);
+        addType(OUTPUT_DIF_XML);
+        addType(OUTPUT_DIF_TEXT);
     }
 
 
@@ -95,25 +100,11 @@ public class DifOutputHandler extends OutputHandler {
             throws Exception {
         if(state.isDummyGroup()) return;
         if (state.getEntry() != null) {
-            links.add(makeLink(request, state.getEntry(), OUTPUT_DIF));
+            links.add(makeLink(request, state.getEntry(), OUTPUT_DIF_XML));
+            links.add(makeLink(request, state.getEntry(), OUTPUT_DIF_TEXT));
         }
     }
 
-
-    /**
-     * _more_
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public String getMimeType(OutputType output) {
-        if (output.equals(OUTPUT_DIF)) {
-            return repository.getMimeTypeFromSuffix(".xml");
-        } else {
-            return super.getMimeType(output);
-        }
-    }
 
 
     public Result outputGroup(Request request, Group group,
@@ -172,9 +163,15 @@ public class DifOutputHandler extends OutputHandler {
         }
 
 
-        StringBuffer sb = new StringBuffer(XmlUtil.XML_HEADER);
-        sb.append(XmlUtil.toString(root));
-        return new Result("dif", sb, "text/xml");
+        StringBuffer sb = new StringBuffer();
+        if(request.getOutput().equals(OUTPUT_DIF_TEXT)) {
+            XmlUtil.toHtml(sb,root);
+            return new Result("DIF-Text", sb);
+        } else {
+            sb.append(XmlUtil.XML_HEADER);
+            sb.append(XmlUtil.toString(root));
+            return new Result("dif", sb, "text/xml");
+        }
     }
 
 }

@@ -72,6 +72,12 @@ public class MetadataTypeBase extends RepositoryManager {
     /** _more_ */
     public static final String TAG_TEMPLATE = "template";
 
+    public static final String ATTR_FILE = "file";
+
+    public static final String ATTR_TYPE = "type";
+
+
+
     /** _more_ */
     public static final String ATTR_NAME = "name";
 
@@ -264,8 +270,15 @@ public class MetadataTypeBase extends RepositoryManager {
         for (int i = 0; i < children.getLength(); i++) {
             Element childNode = (Element) children.item(i);
             if (childNode.getTagName().equals(TAG_TEMPLATE)) {
-                templates.put(XmlUtil.getAttribute(childNode,
-                                                   ATTR_TYPE), XmlUtil.getChildText(childNode));
+                String templateType = XmlUtil.getAttribute(childNode,
+                                                           ATTR_TYPE);
+                if(XmlUtil.hasAttribute(childNode, ATTR_FILE)) {
+                    templates.put(templateType, 
+                                  IOUtil.readContents(XmlUtil.getAttribute(childNode,ATTR_FILE),
+                                                      MetadataTypeBase.class));
+                } else {
+                    templates.put(templateType, XmlUtil.getChildText(childNode));
+                }
             } else if (childNode.getTagName().equals(TAG_ELEMENT)) {
             } else {
                 logError("Unknown metadata xml tag:" + childNode.getTagName(),null);

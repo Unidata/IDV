@@ -1,0 +1,15 @@
+<Personnel>
+        <First_Name>${First_Name}</First_Name>
+        <Middle_Name>${Middle_Name}</Middle_Name>
+        <Last_Name>${Last_Name}</Last_Name>
+        <Email>${Email}</Email>
+${Phone_Numbers}
+${Fax_Numbers}
+        <Contact_Address>
+            <Address>${Address}</Address>
+            <City>${City}</City>
+            <Province_or_State>${state_or_province}</Province_or_State>
+            <Postal_Code>${Postal_Code}</Postal_Code>
+            <Country>${Country}</Country>
+        </Contact_Address>
+</Personnel>

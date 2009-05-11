@@ -147,6 +147,7 @@
         <include name="ucar/unidata/repository/*.java"/>
         <include name="ucar/unidata/repository/output/*.java"/>
         <include name="ucar/unidata/repository/data/*.java"/>
+        <include name="ucar/unidata/repository/metadata/*.java"/>
         <include name="ucar/unidata/repository/harvester/*.java"/>
         <include name="ucar/unidata/repository/collab/*.java"/>
         <include name="ucar/unidata/repository/monitor/*.java"/>

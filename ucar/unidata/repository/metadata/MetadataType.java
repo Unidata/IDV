@@ -80,6 +80,8 @@ public class MetadataType extends MetadataTypeBase {
     /** _more_ */
     public static final String ATTR_HANDLER = "handler";
 
+    public static final String ATTR_ID = "id";
+
 
     /** _more_ */
     public static final String ATTR_ADMINONLY = "adminonly";
@@ -112,7 +114,7 @@ public class MetadataType extends MetadataTypeBase {
     public static String ARG_METADATAID = "metadataid";
 
     /** _more_ */
-    private String type;
+    private String id;
 
 
     /** _more_ */
@@ -138,9 +140,9 @@ public class MetadataType extends MetadataTypeBase {
      * @param type _more_
      * @param name _more_
      */
-    public MetadataType(String type,MetadataHandler handler) {
+    public MetadataType(String id,MetadataHandler handler) {
         super(handler);
-        this.type = type;
+        this.id = id;
     }
 
 
@@ -150,7 +152,7 @@ public class MetadataType extends MetadataTypeBase {
      * @return _more_
      */
     public String toString() {
-        return type;
+        return id;
     }
 
 
@@ -202,8 +204,8 @@ public class MetadataType extends MetadataTypeBase {
                           "ucar.unidata.repository.metadata.MetadataHandler"));
 
             MetadataHandler handler = manager.getHandler(c);
-            String          type    = XmlUtil.getAttribute(node, ATTR_TYPE);
-            MetadataType metadataType = new MetadataType(type,handler);
+            String          id    = XmlUtil.getAttribute(node, ATTR_ID);
+            MetadataType metadataType = new MetadataType(id,handler);
             metadataType.init(node);
             handler.addMetadataType(metadataType);
             types.add(metadataType);
@@ -328,7 +330,7 @@ public class MetadataType extends MetadataTypeBase {
             throws Exception {
         boolean inherited = request.get(ARG_METADATA_INHERITED + suffix,
                                         false);
-        Metadata metadata = new Metadata(id, entry.getId(), getType(),
+        Metadata metadata = new Metadata(id, entry.getId(), getId(),
                                          inherited);
         for (MetadataElement element : getChildren()) {
             String value =  element.handleForm(request,  entry, metadata, oldMetadata,
@@ -482,7 +484,7 @@ public class MetadataType extends MetadataTypeBase {
         }
 
         List args = new ArrayList();
-        args.add(ARG_METADATA_TYPE + "." + getType());
+        args.add(ARG_METADATA_TYPE + "." + getId());
         args.add(this.toString());
 
 
@@ -491,13 +493,13 @@ public class MetadataType extends MetadataTypeBase {
                 continue;
             }
             args.add(ARG_METADATA_ATTR + element.getIndex() + "."
-                     + getType());
+                     + getId());
             args.add(metadata.getAttr(element.getIndex()));
         }
 
         //by default search on attr1 if none are set above
         if (args.size() == 2) {
-            args.add(ARG_METADATA_ATTR1 + "." + getType());
+            args.add(ARG_METADATA_ATTR1 + "." + getId());
             args.add(metadata.getAttr1());
         }
 
@@ -625,7 +627,7 @@ public class MetadataType extends MetadataTypeBase {
 
         String argtype = ARG_TYPE + suffix;
         String argid   = ARG_METADATAID + suffix;
-        sb.append(HtmlUtil.hidden(argtype, type)
+        sb.append(HtmlUtil.hidden(argtype, getId())
                   + HtmlUtil.hidden(argid, metadata.getId()));
 
         if ( !forEdit) {
@@ -640,14 +642,7 @@ public class MetadataType extends MetadataTypeBase {
 
 
 
-    /**
-     *  Set the Type property.
-     *
-     *  @param value The new value for Type
-     */
-    public void setType(String value) {
-        type = value;
-    }
+
 
     /**
      * _more_
@@ -656,19 +651,19 @@ public class MetadataType extends MetadataTypeBase {
      *
      * @return _more_
      */
-    public boolean isType(String type) {
-        return Misc.equals(this.type, type);
+    public boolean isType(String id) {
+        return Misc.equals(this.id, id);
     }
 
 
 
     /**
-     *  Get the Type property.
+     *  Get the ID property.
      *
-     *  @return The Type
+     *  @return The Id
      */
-    public String getType() {
-        return type;
+    public String getId() {
+        return id;
     }
 
 

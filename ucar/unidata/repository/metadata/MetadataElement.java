@@ -371,22 +371,21 @@ public class MetadataElement extends MetadataTypeBase {
             int groupCnt=0;
             while(true) {
                 String subArg = arg+".group" +groupCnt+".";
-                if(!request.exists(subArg+".group")) break;
-                if(!request.get(subArg+".delete",false)) {
-                    if(request.get(subArg+".lastone",false)) {
-                        if(!request.get(subArg+".new",false)) {
-                            groupCnt++;
-                            continue;
-                        }
-                    }
-                    Hashtable<Integer,String> map = new Hashtable<Integer,String>();
-                    for(MetadataElement element: getChildren()) {
-                        String subValue = element.handleForm(request, entry, newMetadata, oldMetadata, subArg);
-                        map.put(new Integer(element.getIndex()), subValue);
-                    }
-                    entries.add(map);
-                }
                 groupCnt++;
+                if(!request.exists(subArg+".group")) break;
+                if(request.get(subArg+".delete",false)) {continue;}
+                if(request.get(subArg+".lastone",false)) {
+                    if(!request.get(subArg+".new",false)) {
+                        continue;
+                    }
+                }
+                Hashtable<Integer,String> map = new Hashtable<Integer,String>();
+                for(MetadataElement element: getChildren()) {
+                    String subValue = element.handleForm(request, entry, newMetadata, oldMetadata, subArg);
+                    if(subValue==null) continue;
+                    map.put(new Integer(element.getIndex()), subValue);
+                }
+                entries.add(map);
             }
             return XmlEncoder.encodeObject(entries);
         }
@@ -509,7 +508,7 @@ public class MetadataElement extends MetadataTypeBase {
         } else if (dataType.equals(TYPE_ENUMERATION)) {
             return HtmlUtil.select(arg, values, value);
         } else if (dataType.equals(TYPE_ENUMERATIONPLUS)) {
-            boolean contains = values.contains(value);
+            boolean contains = TwoFacedObject.contains(values,value);
             return HtmlUtil.select(arg, values, value) +
                 HtmlUtil.space(2) +
                 msgLabel("Or") +
@@ -532,12 +531,22 @@ public class MetadataElement extends MetadataTypeBase {
             String lastGroup = null;
             int groupCnt = 0;
             List<Metadata> groupMetadata = getGroupData(value);
+            boolean hadAny = groupMetadata.size()>0;
             groupMetadata.add(new Metadata());
             StringBuffer entriesSB = new StringBuffer();
             for(Metadata subMetadata: groupMetadata) {
                 StringBuffer groupSB = new StringBuffer();
                 groupSB.append(HtmlUtil.formTable());
                 String subArg = arg+".group" +groupCnt+".";
+                boolean lastOne = (groupMetadata.size()>1 && groupCnt==groupMetadata.size()-1);
+                if(lastOne) {
+                    String newCbx =HtmlUtil.checkbox(subArg+".new","true",false)+" " + msg("Click here to add a new record")+
+                        HtmlUtil.hidden(subArg+".lastone","true");
+                    //                    groupSB.append(HtmlUtil.formEntry("",newCbx));
+                } else if(hadAny) {
+                    //                    groupSB.append(HtmlUtil.formEntry(msgLabel("Delete"),HtmlUtil.checkbox(subArg+".delete","true",false)));
+                } 
+
                 for(MetadataElement element: getChildren()) {
                     if(element.getGroup()!=null && !Misc.equals(element.getGroup(),lastGroup)) {
                         lastGroup = element.getGroup();
@@ -557,24 +566,20 @@ public class MetadataElement extends MetadataTypeBase {
                     groupSB.append(HtmlUtil.formEntryTop(elementLbl, widget));
                     groupSB.append(HtmlUtil.hidden(subArg+".group","true"));
                 }
-                
-                if(groupMetadata.size()>1 && groupCnt==groupMetadata.size()-1) {
-                    String newCbx =HtmlUtil.checkbox(subArg+".new","true",false)+" " + msg("Create New")+
-                        HtmlUtil.hidden(subArg+".lastone","true");
-                    groupSB.append(HtmlUtil.formEntry("",newCbx));
-                } else if(groupMetadata.size()>1) {
-                    groupSB.append(HtmlUtil.formEntry("",HtmlUtil.checkbox(subArg+".delete","true",false)+" " + msg("Delete")));
-                } 
+               
+
                 groupSB.append(HtmlUtil.formTableClose());
 
-                if(groupMetadata.size()>1 && groupCnt==groupMetadata.size()-1) {
-                    entriesSB.append(HtmlUtil.makeShowHideBlock("New " + subName,groupSB.toString(),false));
+                if(lastOne) {
+                    String newCbx =HtmlUtil.checkbox(subArg+".new","true",false)+
+                        HtmlUtil.hidden(subArg+".lastone","true");
+                    entriesSB.append(HtmlUtil.makeShowHideBlock(newCbx +" Add New " + subName,
+                                                                groupSB.toString(),false));
                 } else {
-                    if(groupMetadata.size()>1) {
-                    } 
-                    entriesSB.append(HtmlUtil.makeShowHideBlock(subName,groupSB.toString(),true));
+                    String deleteCbx  = (!hadAny?"":" - " +HtmlUtil.checkbox(subArg+".delete","true",false)+" " + msg("delete"));
+                    entriesSB.append(HtmlUtil.makeShowHideBlock((groupCnt+1)+") " + subName+deleteCbx,
+                                                                groupSB.toString(),true));
                 }
-
                 groupCnt++;
             }
             sb.append(HtmlUtil.makeToggleInline("", HtmlUtil.div(entriesSB.toString(),HtmlUtil.cssClass("metadatagroup")),true));
