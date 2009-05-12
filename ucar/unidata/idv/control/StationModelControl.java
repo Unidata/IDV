@@ -1885,8 +1885,13 @@ public class StationModelControl extends ObsDisplayControl {
      */
     public void projectionChanged() {
         super.projectionChanged();
+        try {
+            setScaleOnDisplayable();
+        } catch(Exception exc) {}
+
         loadDataInThread();
     }
+
 
     /**
      * Method called when a transect  changes.
