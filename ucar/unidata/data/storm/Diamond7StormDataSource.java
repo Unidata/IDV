@@ -260,8 +260,6 @@ public class Diamond7StormDataSource extends StormDataSource {
             StormTrack            sTrack    = null;
             for (String line : StringUtil.split(s, "\n", true, true)) {
                 if (line.startsWith("diamond")) {
-                    List toks = StringUtil.split(line, " ", true);
-                    sid = (String) toks.get(2);
                     lcn = 1;
                 } else if (line.startsWith("Name")) {
                     if ((sInfo != null) && (pts.size() > 0)) {
@@ -270,6 +268,7 @@ public class Diamond7StormDataSource extends StormDataSource {
                         stormTracks.add(sTrack);
                     }
                     List toks = StringUtil.split(line, " ", true);
+                    sid = (String) toks.get(1);
                     sway     = (String) toks.get(2);
                     trackWay = new Way(sway);
                     pts      = new ArrayList();
