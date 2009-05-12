@@ -53,6 +53,11 @@ A.faq-question-link:hover {
     text-decoration: underline;
 }
 
+.footer  {
+    text-align:center;
+    font-style:italic;
+}
+
 .faq-category-title {
     margin-top:10px;
     color: #8080C0;
