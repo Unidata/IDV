@@ -127,11 +127,7 @@ public class Diamond7StormDataSource extends StormDataSource {
     /** the stormInfo and track */
     private List<StormTrack> stormTracks;
 
-
-    /** _more_ */
-    private HashMap<String, float[]> wayfhourToRadius;
-
-
+    private HashMap<String, Way> stormWays;
 
     /**
      * constructor of sti storm data source
@@ -210,13 +206,12 @@ public class Diamond7StormDataSource extends StormDataSource {
 
         obsParams = new StormParam[] {
             PARAM_MAXWINDSPEED, PARAM_MINPRESSURE, PARAM_RADIUSMODERATEGALE,
-            PARAM_RADIUSWHOLEGALE, PARAM_MOVEDIRECTION, PARAM_MOVESPEED
+            PARAM_RADIUSWHOLEGALE, PARAM_MOVESPEED, PARAM_MOVEDIRECTION
         };
 
         forecastParams = new StormParam[] {
             PARAM_MAXWINDSPEED, PARAM_MINPRESSURE, PARAM_RADIUSMODERATEGALE,
-            PARAM_RADIUSWHOLEGALE, PARAM_MOVEDIRECTION,
-            PARAM_MOVESPEED,  //PARAM_DISTANCEERROR,
+            PARAM_RADIUSWHOLEGALE, PARAM_MOVESPEED, PARAM_MOVEDIRECTION
         };
     }
 
@@ -241,6 +236,7 @@ public class Diamond7StormDataSource extends StormDataSource {
         try {
             stormInfos  = new ArrayList<StormInfo>();
             stormTracks = new ArrayList<StormTrack>();
+            stormWays = new HashMap<String, Way>();
             String s = IOUtil.readContents(fileName);
             /*
 
@@ -257,46 +253,53 @@ public class Diamond7StormDataSource extends StormDataSource {
             Way                   trackWay  = null;
             StormInfo             sInfo     = null;
             List<StormTrackPoint> pts       = null;
+            List<StormTrackPoint> obsPts       = new ArrayList();
             StormTrack            sTrack    = null;
-            for (String line : StringUtil.split(s, "\n", true, true)) {
-                if (line.startsWith("diamond")) {
-                    lcn = 1;
-                } else if (line.startsWith("Name")) {
-                    if ((sInfo != null) && (pts.size() > 0)) {
-                        sTrack = new StormTrack(sInfo, trackWay, pts,
-                                forecastParams);
-                        stormTracks.add(sTrack);
-                    }
-                    List toks = StringUtil.split(line, " ", true);
-                    sid = (String) toks.get(1);
-                    sway     = (String) toks.get(2);
-                    trackWay = new Way(sway);
-                    pts      = new ArrayList();
-                } else {
-                    List   toks        = StringUtil.split(line, " ", true);
-                    String year        = (String) toks.get(0);
-                    String mon         = (String) toks.get(1);
-                    String day         = (String) toks.get(2);
-                    String hr          = (String) toks.get(3);
-                    String fhr         = (String) toks.get(4);
-                    String lon         = (String) toks.get(5);
-                    String lat         = (String) toks.get(6);
-                    String maxwindsp   = (String) toks.get(7);
-                    String minpress    = (String) toks.get(8);
-                    String radiusmgale = (String) toks.get(9);
-                    String radiuswgale = (String) toks.get(10);
-                    String mspd        = (String) toks.get(11);
-                    String mdir        = (String) toks.get(12);
+            List<String> lines = StringUtil.split(s, "\n", true, true);
+            int currentIndex = 0;
+            String headerLine1 = lines.get(currentIndex++);
+            double minTime= Double.MAX_VALUE;
+            DateTime minDate=null;
 
-                    if (lcn == 1) {
-                        DateTime dt = getDateTime(Integer.parseInt(year),
-                                          Integer.parseInt(mon),
-                                          Integer.parseInt(day),
-                                          Integer.parseInt(hr));
-                        sInfo = new StormInfo(sid, dt);
-                        stormInfos.add(sInfo);
-                        lcn = 0;
-                    }
+            while(currentIndex < lines.size()) {
+
+                String headerLine2 = lines.get(currentIndex++);
+                List<String> toks = StringUtil.split(headerLine2, " ", true, true);
+                sid = toks.get(1);
+                sway     =  toks.get(2);
+                int numberPts = Integer.parseInt(toks.get(3));
+                trackWay = new Way(sway);
+                stormWays.put(sway, trackWay);
+                if(trackWay.isObservation()) hasObservation = true;
+                if(sInfo==null) {
+                    sInfo = new StormInfo(sid, new DateTime(new Date()));
+                    stormInfos.add(sInfo);
+                }
+
+                pts      = new ArrayList();
+                /*  */
+                int endPtsIndex = currentIndex + numberPts;
+
+                System.out.println("endPtsIndex "+ endPtsIndex);
+                while( currentIndex < endPtsIndex ) {
+
+                    //System.out.println("currentIndex "+ currentIndex);
+                    String line = lines.get(currentIndex++);
+                    toks        = StringUtil.split(line, " ", true, true);
+                    String year        =   toks.get(0);
+                    String mon         =   toks.get(1);
+                    String day         =   toks.get(2);
+                    String hr          =   toks.get(3);
+                    String fhr         =   toks.get(4);
+                    String lon         =   toks.get(5);
+                    String lat         =   toks.get(6);
+                    String maxwindsp   =   toks.get(7);
+                    String minpress    =   toks.get(8);
+                    String radiusmgale =   toks.get(9);
+                    String radiuswgale =   toks.get(10);
+                    String mspd        =   toks.get(11);
+                    String mdir        =   toks.get(12);
+                     
                     DateTime dtt = getDateTime(Integer.parseInt(year),
                                        Integer.parseInt(mon),
                                        Integer.parseInt(day),
@@ -304,6 +307,8 @@ public class Diamond7StormDataSource extends StormDataSource {
                     double latitude  = Double.parseDouble(lat);
                     double longitude = Double.parseDouble(lon);
                     Real   altReal   = new Real(RealType.Altitude, 0);
+                    int fhour = Integer.parseInt(fhr);
+
                     EarthLocation elt =
                         new EarthLocationLite(new Real(RealType.Latitude,
                             latitude), new Real(RealType.Longitude,
@@ -325,18 +330,61 @@ public class Diamond7StormDataSource extends StormDataSource {
                     attributes.add(PARAM_MOVESPEED.getReal(getDouble(mspd)));
 
                     StormTrackPoint stp = new StormTrackPoint(elt, dtt,
-                                              Integer.parseInt(fhr),
+                                              fhour,
                                               attributes);
+
+                   // System.out.println("fhour "+ fhour);
+                    if(fhour == 0 && !trackWay.isObservation()) {
+                        obsPts.add(stp);
+                    }
+                    if(fhour == 0 && pts.size() > 0 && !trackWay.isObservation()){
+                        //System.out.println("fhours "+ pts.size());
+                        DateTime trackStartTime = pts.get(0).getTime();
+                        if(trackStartTime.getValue() < minTime) {
+                                minTime = trackStartTime.getValue();
+                                minDate = trackStartTime;
+                        }
+                        sTrack = new StormTrack(sInfo, trackWay, pts,
+                                forecastParams);
+                        stormTracks.add(sTrack);
+                        pts      = new ArrayList();
+                    }
                     pts.add(stp);
-
                 }
-
+                if(trackWay.isObservation()) {
+                    DateTime trackStartTime = pts.get(0).getTime();
+                    if(trackStartTime.getValue() < minTime) {
+                            minTime = trackStartTime.getValue();
+                            minDate = trackStartTime;
+                    }
+                    sTrack = new StormTrack(sInfo, trackWay, pts,
+                            obsParams);
+                    stormTracks.add(sTrack);
+                    pts      = new ArrayList();
+                }
+                if (pts.size() > 0 && !trackWay.isObservation()) {
+                    DateTime trackStartTime = pts.get(0).getTime();
+                    if(trackStartTime.getValue() < minTime) {
+                            minTime = trackStartTime.getValue();
+                            minDate = trackStartTime;
+                    }
+                    sTrack = new StormTrack(sInfo, trackWay, pts,
+                            forecastParams);
+                    stormTracks.add(sTrack);
+                    pts      = new ArrayList();
+                }
 
             }
             /* last track */
-            if ((sInfo != null) && (pts.size() > 0)) {
-                sTrack = new StormTrack(sInfo, trackWay, pts, forecastParams);
+            if (sInfo != null && minDate!=null) {
+                    sInfo.setStartTime(minDate);
+            }
+            /* obs */
+            if(!hasObservation && obsPts.size() > 0) {
+                sTrack = new StormTrack(sInfo, DEFAULT_OBSERVATION_WAY, obsPts,
+                            obsParams);
                 stormTracks.add(sTrack);
+                stormWays.put("Observation", DEFAULT_OBSERVATION_WAY);
             }
 
         } catch (Exception exc) {
@@ -387,7 +435,7 @@ public class Diamond7StormDataSource extends StormDataSource {
 
     /** _more_ */
     private static final Way DEFAULT_OBSERVATION_WAY = new Way("Observation");
-
+    private boolean hasObservation = false;
     /**
      * _more_
      *
@@ -772,18 +820,15 @@ public class Diamond7StormDataSource extends StormDataSource {
     protected List<Way> getForecastWays(
             StormInfo stormInfo) throws Exception {
 
-        Iterator  iter = stormTracks.iterator();
-        String    sid  = stormInfo.getStormId();
         List<Way> ways = new ArrayList();
+
+        Collection wc = stormWays.values();
+        Iterator  iter = wc.iterator();
+
         while (iter.hasNext()) {
-            StormTrack strack = (StormTrack) iter.next();
-            String     aid    = strack.getStormInfo().getStormId();
-            if (aid.equalsIgnoreCase(sid)) {
-                Way way = strack.getWay();
-                if ( !way.isObservation()) {
-                    ways.add(way);
-                }
-            }
+            Way way = (Way)iter.next();
+            if(!way.isObservation())
+                ways.add(way);
         }
 
         //        System.err.println ("ways:" + forecastWays);
