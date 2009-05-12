@@ -100,7 +100,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="ALTITUDE"
      label="Altitude"
-     aliases="Z_sfc, Altitude, altitude, Elevation, elevation, topo, Geopotential_height_surface,HGT,HGHT,height"/>
+     aliases="Z_sfc, Altitude, altitude, Elevation, elevation, topo, Geopotential_height_surface,HGT,HGHT,height,.*Band.*_ELEV"/>
   <alias
      name="LOWCLOUD"
      label="Low Cloud Type"
