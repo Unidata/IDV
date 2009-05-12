@@ -528,7 +528,7 @@ public class StormTrack implements Comparable {
 
     static public StringBuffer toDiamond7( List<StormTrack> sts, String id ) throws VisADException {
         StringBuffer sb = new StringBuffer();
-        sb.append("diamond 7 " + id + " Tropical Cyclone Track"+ "\n");
+        sb.append("diamond 7 " + id + "TropicalCycloneTrack"+ "\n");
         for(StormTrack st : sts) {
             st.toDiamond7(sb, id);
         }
