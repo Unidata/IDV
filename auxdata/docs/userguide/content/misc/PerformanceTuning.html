@@ -100,8 +100,10 @@ or set your system preference back to not use fast rendering.
 
 <subhead id="multicores" xintoc="false" desc="Parallel Rendering and Data Reading">Parallel Rendering and Data Reading</subhead>
 
-If you are running the IDV on  a mulit-core machine you can configure the IDV 
-to render individual time steps in parallel. You can also do remote data reads in parallel as well. This typically results in a 50% reduction in overall data readings and rendering time.
+If you are running the IDV on  a multi-core machine you can configure the IDV 
+to render individual time steps in parallel. You can also do remote data reads 
+in parallel. This typically results in a 50% reduction in overall data 
+reading and rendering time.
 <p>
 There are 2  preferences in the Preferences-&gt;Data &amp; Format tab.
 One is the number of threads used for rendering. This defaults to the number
@@ -112,16 +114,15 @@ data reading. This defaults to 4.
 For rendering the IDV will render each time step in parallel.
 Note: since the rendering processes can allocate temporary memory it is 
 possible to exhaust the available memory if too many threads are running
-concurrently.
-While we do not get linear speedup with the number of
+concurrently.  While we do not get linear speedup with the number of
 cores available for rendering (probably due to memory contention issues)
 we do see 40%-50% performance improvements for complex rendering tasks (e.g., contouring).
 
 <p>
 The second preference is used when reading individual time steps of data
 from remote ADDE and OpenDAP servers. This parallelization takes advantage 
-of the multiple cores available on the remote server and somewhat the available
-bandwidth on the network.
+of the multiple cores available on the remote server and somewhat the 
+available bandwidth on the network.
 We do see a linear speed up in accessing remote data based on the 
 number of cores on the remote server (ADDE or OpenDAP).
 However, we've seen that if you load the server too much your performance 
