@@ -261,12 +261,6 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
     private CommandManager commands = new CommandManager(5000);
 
 
-    /** color slot width */
-    private int colorSlotWidth = 1;
-
-    /** color slot base */
-    private int colorSlotBase = 1;
-
     /** The normal cursor_ */
     public static final Cursor normalCursor =
         Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
@@ -1839,6 +1833,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         if (currentBP == null) {
             return;
         }
+
         //        if(true) return;
         double percent = currentBP.getValue();
         int    index   = percentToColorIndex(percent);
@@ -2395,7 +2390,8 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      * @return Color index
      */
     public int percentToColorIndex(double percent) {
-        return Math.min(Math.max(0, (int) (percent * colorList.size())),
+        double index = percent*colorList.size();
+        return Math.min(Math.max(0, (int)index),
                         colorList.size() - 1);
     }
 
@@ -2447,13 +2443,13 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         int     width       = (int) dWidth;
         double  extraPerBox = dWidth - width;
         int     x           = box.x;
-        colorSlotBase = x;
         double remainderWidth = 0.0;
         for (int i = 0; i < length; i++) {
             float bright = ((Float) scales.get(i)).floatValue();
             Color c      = applyBrightness((Color) colorList.get(i), bright);
             g.setColor(c);
             int extraWidth = 0;
+            remainderWidth += extraPerBox;
             if (remainderWidth > 1.0) {
                 extraWidth     = (int) remainderWidth;
                 remainderWidth -= extraWidth;
@@ -2461,7 +2457,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
             if (i == length - 1) {
                 extraWidth = box.width - (x - box.x) - width + 1;
             }
-            remainderWidth += extraPerBox;
+
             g.fillRect(x, box.y, width + extraWidth, box.height);
             if (doLines) {
                 g.setColor(g.getColor().darker());
@@ -2469,8 +2465,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
                     g.drawLine(x, box.y, x, box.y + box.height - 1);
                 }
             }
-            x              += width + extraWidth;
-            colorSlotWidth = width + extraWidth;
+            x  += width + extraWidth;
         }
 
     }
@@ -2554,9 +2549,10 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
             int    index   = percentToColorIndex(percent);
             String value   = Misc.format(percentToValue(percent));
             g.setColor(Color.gray);
-            g.drawLine(cursorPosition, box.y, cursorPosition,
+            int lineX = cursorPosition;
+            g.drawLine(lineX, box.y, lineX,
                        box.y + box.height);
-            g.drawString(value, cursorPosition,
+            g.drawString(value, lineX,
                          lineHeight + MARGIN_V + box.height);
         }
 
