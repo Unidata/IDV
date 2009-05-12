@@ -127,7 +127,7 @@ argument -Dfoo=bar) -->
         <unjar src="${libsrc}/numericalMethods.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/sunrisesunset.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/Jama-1.0.2.jar" dest="${tmpjardir}"/>
-        <unjar src="${libsrc}/jnumeric-0.1a3.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/jnumeric22.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/jcommon.jar" dest="${tmpjardir}"/>
 
         <unjar src="${libsdir}/commons-net-1.4.1.jar" dest="${tmpjardir}"/>
