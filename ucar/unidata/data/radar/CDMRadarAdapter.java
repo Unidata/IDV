@@ -21,12 +21,16 @@
  */
 
 
+
+
 package ucar.unidata.data.radar;
 
 
 import ucar.atd.dorade.DoradePARM;
 import ucar.atd.dorade.DoradeSweep;
+
 import ucar.ma2.InvalidRangeException;
+
 import ucar.nc2.Attribute;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateAxis1D;
@@ -37,6 +41,7 @@ import ucar.nc2.dt.TypedDatasetFactory;
 import ucar.nc2.dt.grid.GeoGrid;
 import ucar.nc2.dt.grid.GridCoordSys;
 import ucar.nc2.units.DateUnit;
+
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSourceImpl;
@@ -44,20 +49,26 @@ import ucar.unidata.data.DataUtil;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.util.*;
+
 import ucar.visad.RadarMapProjection;
 import ucar.visad.Util;
 import ucar.visad.data.CachedFlatField;
+
 import visad.*;
 import visad.Set;
+
 import visad.bom.Radar2DCoordinateSystem;
 import visad.bom.Radar3DCoordinateSystem;
+
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
 import visad.georef.EarthLocationTuple;
 import visad.georef.NamedLocation;
 
 import java.io.IOException;
+
 import java.rmi.RemoteException;
+
 import java.util.*;
 
 
@@ -135,6 +146,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     /** flag for a RHI file */
     private boolean isRHI;
+
     /**
      * Zero-argument constructor for construction via unpersistence.
      */
@@ -148,8 +160,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      *
      * @throws VisADException problem creating data
      */
-    public CDMRadarAdapter(DataSourceImpl source,
-                           String fileName) throws VisADException {
+    public CDMRadarAdapter(DataSourceImpl source, String fileName)
+            throws VisADException {
         swpFileName     = fileName;
         this.dataSource = source;
         if (dataSource != null) {
@@ -304,7 +316,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
             if (vcpAttr != null) {
                 vcp = vcpAttr.getStringValue();
-            }// else {
+            }  // else {
             if (vcp == null) {
                 vcp = "unknown";
             }
@@ -312,11 +324,13 @@ public class CDMRadarAdapter implements RadarAdapter {
             Attribute attr = rds.findGlobalAttributeIgnoreCase("isRadial");
 
 
-            if(sweepMode != null){
+            if (sweepMode != null) {
                 int mode = sweepMode.getNumericValue().intValue();
-                if(mode == 3) isRHI = true;
+                if (mode == 3) {
+                    isRHI = true;
+                }
             }
-            if(vcp.equalsIgnoreCase("RHI")) {
+            if (vcp.equalsIgnoreCase("RHI")) {
                 isRHI = true;
             }
 
@@ -361,8 +375,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                                              "units"));
 
                             paramTypes[0] =
-                                RealType.getRealType(gedVar.getName(), u,
-                                    null);
+                                DataUtil.makeRealType(gedVar.getName(), u);
                             angles    = new double[1];
                             angles[0] = 0.0;
                             anglesMap.put(gedVar.getName(), angles);
@@ -415,12 +428,13 @@ public class CDMRadarAdapter implements RadarAdapter {
 
                     Unit u = getUnit(radVar);
 
-                    paramTypes[p] = RealType.getRealType(radVar.getName(), u,
-                            null);
+                    paramTypes[p] = DataUtil.makeRealType(radVar.getName(),
+                            u);
                     angles = new double[nsweep];
-                    if(isRHI){
+                    if (isRHI) {
                         for (int i = 0; i < nsweep; i++) {
-                            angles[i] = getMeanAzimuth(radVar.getSweep(i).getAzimuth());
+                            angles[i] = getMeanAzimuth(
+                                radVar.getSweep(i).getAzimuth());
                         }
                     } else {
                         for (int i = 0; i < nsweep; i++) {
@@ -449,18 +463,25 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
 
-    private double getMeanAzimuth(float [] azimuths){
-        int size = azimuths.length;
+    /**
+     * _more_
+     *
+     * @param azimuths _more_
+     *
+     * @return _more_
+     */
+    private double getMeanAzimuth(float[] azimuths) {
+        int   size  = azimuths.length;
 
-        int total = 0;
-        float all = 0;
-        for(int i = 0; i < size; i++){
-            if(!Float.isNaN(azimuths[i])) {
+        int   total = 0;
+        float all   = 0;
+        for (int i = 0; i < size; i++) {
+            if ( !Float.isNaN(azimuths[i])) {
                 total++;
                 all = all + azimuths[i];
             }
         }
-        return (float)all/total;
+        return (float) all / total;
     }
 
 
@@ -500,9 +521,9 @@ public class CDMRadarAdapter implements RadarAdapter {
      *
      *  @throws VisADException unable to create VisAD object
      */
-    private RealTupleType makeDomainType2D(
-            float cellSpacing,
-            float centerOfFirstCell) throws VisADException {
+    private RealTupleType makeDomainType2D(float cellSpacing,
+                                           float centerOfFirstCell)
+            throws VisADException {
         CoordinateSystem cs = (radarLocation == null)
                               ? null
                               : new Radar2DCoordinateSystem((float) radarLocation
@@ -556,9 +577,9 @@ public class CDMRadarAdapter implements RadarAdapter {
      *
      * @throws VisADException unable to create VisAD object
      */
-    private RealTupleType makeDomainType3D(
-            float cellSpacing,
-            float centerOfFirstCell) throws VisADException {
+    private RealTupleType makeDomainType3D(float cellSpacing,
+                                           float centerOfFirstCell)
+            throws VisADException {
         CoordinateSystem cs = (radarLocation == null)
                               ? null
                               : new Radar3DCoordinateSystem(
@@ -579,9 +600,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      *
      * @throws VisADException unable to create VisAD object
      */
-    private void makeDomainTypes(
-            float cellSpacing,
-            float centerOfFirstCell) throws VisADException {
+    private void makeDomainTypes(float cellSpacing, float centerOfFirstCell)
+            throws VisADException {
         radarDomain2d = makeDomainType2D(cellSpacing, centerOfFirstCell);
         radarDomain3d = makeDomainType3D(cellSpacing, centerOfFirstCell);
     }
@@ -694,9 +714,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException   problem with Java RMI
      * @throws VisADException    problem creating VisAD object
      */
-    private FieldImpl getCAPPIOld(int moment, String varName,
-                                  Real level) throws VisADException,
-                                      RemoteException, IOException {
+    private FieldImpl getCAPPIOld(int moment, String varName, Real level)
+            throws VisADException, RemoteException, IOException {
 
         Trace.call1("   getCAPPI", level.longString());
         ObjectPair cacheKey =
@@ -888,9 +907,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException   problem with Java RMI
      * @throws VisADException    problem creating VisAD object
      */
-    public FieldImpl getCAPPI(int moment, String varName,
-                              Real level) throws VisADException,
-                                  RemoteException, IOException {
+    public FieldImpl getCAPPI(int moment, String varName, Real level)
+            throws VisADException, RemoteException, IOException {
 
         Trace.call1("   rsl_getCAPPI", level.longString());
         ObjectPair cacheKey =
@@ -1088,7 +1106,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws IOException  problem reading data
      */
     float[][][] getRayData(RadialDatasetSweep.RadialVariable sweepVar,
-                           int numberOfRay, int numBin) throws IOException {
+                           int numberOfRay, int numBin)
+            throws IOException {
 
         Object[] cut            = getCutIdx(sweepVar);
         int      numberOfSweeps = cut.length;
@@ -1606,10 +1625,9 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException couldn't create a remote data object
      * @throws VisADException  couldn't create the data
      */
-    public DataImpl getData(
-            DataChoice dataChoice, DataSelection subset,
-            Hashtable requestProperties) throws VisADException,
-                RemoteException {
+    public DataImpl getData(DataChoice dataChoice, DataSelection subset,
+                            Hashtable requestProperties)
+            throws VisADException, RemoteException {
 
         Object      choiceId = dataChoice.getId();
         String      vn;
@@ -1641,9 +1659,9 @@ public class CDMRadarAdapter implements RadarAdapter {
         Object  momentObj = choiceAttrs.getObject1();
         int     moment    = Integer.parseInt(momentObj.toString());
         boolean volume;
-        if (isRaster() ){
-           volume = false; 
-        } else if(isRHI) {
+        if (isRaster()) {
+            volume = false;
+        } else if (isRHI) {
             volume = VALUE_VOLUME.equals(Misc.getProperty(requestProperties,
                     PROP_AZIMUTH, VALUE_VOLUME));
         } else {
@@ -1699,17 +1717,17 @@ public class CDMRadarAdapter implements RadarAdapter {
                 }
             }
         } else {
-            if(isRHI()) {
+            if (isRHI()) {
                 try {
                     double value = Double.NaN;
                     //System.out.println("AZIMUTH angle is :" );
                     Double fromProperties;
                     fromProperties =
-                             (Double) requestProperties.get(PROP_AZIMUTH);
-                     if (fromProperties != null) {
-                            value = (fromProperties).doubleValue();
-                     }
-                     if (Double.isNaN(value) && subset != null) {
+                        (Double) requestProperties.get(PROP_AZIMUTH);
+                    if (fromProperties != null) {
+                        value = (fromProperties).doubleValue();
+                    }
+                    if (Double.isNaN(value) && (subset != null)) {
                         Object o = subset.getFromLevel();
                         if (o != null) {
                             Object newO = o;
@@ -1724,22 +1742,21 @@ public class CDMRadarAdapter implements RadarAdapter {
                     if (Double.isNaN(value)) {
                         fromProperties =
                             (Double) requestProperties.get(PROP_AZIMUTH);
-                        if (choiceAttrs.getObject2()
-                                   instanceof Double ) {
+                        if (choiceAttrs.getObject2() instanceof Double) {
                             value =
                                 ((Double) choiceAttrs.getObject2())
                                     .doubleValue();
                         }
-                        
-                        if(value == -1.0){
+
+                        if (value == -1.0) {
                             value =
                                 ((Double) choiceAttrs.getObject2())
                                     .doubleValue();
                         }
                     }
                     if (Double.isNaN(value)) {
-                        List levelsList1 = dataChoice.getAllLevels();
-                        String azim = levelsList1.get(0).toString();
+                        List   levelsList1 = dataChoice.getAllLevels();
+                        String azim        = levelsList1.get(0).toString();
                         value = Float.parseFloat(azim);
                     }
                     // check one more time.
@@ -1763,8 +1780,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                 } catch (IOException ex) {
                     LogUtil.logException("getRhiSweep", ex);
                 }
-            }
-            else if (isRaster()) {
+            } else if (isRaster()) {
                 try {
                     fi = getRaster(moment, vn);
                 } catch (IOException ex) {
@@ -1905,9 +1921,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException Java RMI problem
      * @throws VisADException  Couldn't create VisAD Object
      */
-    public FieldImpl getRHIOld(int moment, String varName,
-                               double rhiAz) throws VisADException,
-                                   RemoteException, IOException {
+    public FieldImpl getRHIOld(int moment, String varName, double rhiAz)
+            throws VisADException, RemoteException, IOException {
 
         Trace.call1("   getRHI");
         Trace.call1("   getRHI.setup");
@@ -2113,9 +2128,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException Java RMI problem
      * @throws VisADException  Couldn't create VisAD Object
      */
-    public FieldImpl getRHI(int moment, String varName,
-                            double rhiAz) throws VisADException,
-                                RemoteException, IOException {
+    public FieldImpl getRHI(int moment, String varName, double rhiAz)
+            throws VisADException, RemoteException, IOException {
 
         if (rhiAz > 359.5) {
             rhiAz = 0.0;
@@ -2324,8 +2338,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      *
      * @throws IOException _more_
      */
-    private void getRHIData(
-            RadialDatasetSweep.RadialVariable sweepVar) throws IOException {
+    private void getRHIData(RadialDatasetSweep.RadialVariable sweepVar)
+            throws IOException {
 
         Object[] cut            = getCutIdx(sweepVar);
         int      numberOfSweeps = cut.length;
@@ -2515,8 +2529,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws VisADException  couldn't create VisAD object
      * @throws RemoteException  couldn't create remote object
      */
-    public void setStationLocation(EarthLocation el) throws VisADException,
-            RemoteException {
+    public void setStationLocation(EarthLocation el)
+            throws VisADException, RemoteException {
         radarLocation = el;
         if (el instanceof NamedLocation) {
             stationID =
@@ -2556,10 +2570,9 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException Java RMI problem
      * @throws VisADException   problem creating domain
      */
-    public FlatField getRaster(int moment,
-                               String varName) throws VisADException,
-                                   RemoteException, IOException,
-                                   InvalidRangeException {
+    public FlatField getRaster(int moment, String varName)
+            throws VisADException, RemoteException, IOException,
+                   InvalidRangeException {
 
         //List cacheKey = Misc.newList(varName, baseTime, stationName);
         ObjectPair cacheKey =
@@ -2690,7 +2703,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws VisADException Couldn't create VisAD Object
      */
     private Linear1DSet makeLinear1DSet(CoordinateAxis1D axis, RealType type,
-                                        Unit u) throws VisADException {
+                                        Unit u)
+            throws VisADException {
         Trace.call1("GeoGridAdapter.makeLinear1DSet");
 
         Linear1DSet result =
@@ -2718,10 +2732,10 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws VisADException  Couldn't create VisAD Object
      */
 
-    public FieldImpl  getRHISweep(int moment, double azimus, String varName,
-                              int idx,
-                              boolean want3D) throws VisADException,
-                                  RemoteException, IOException {
+    public FieldImpl getRHISweep(int moment, double azimus, String varName,
+                                 int idx, boolean want3D)
+            throws VisADException, RemoteException, IOException {
+
         Trace.call1(" getRHiSweep " + azimus);
 
         int sweepNum = idx;  //getSweepNumber(varName, elevation);
@@ -2738,74 +2752,77 @@ public class CDMRadarAdapter implements RadarAdapter {
         double                   range_step = varSweep.getGateSize();
         double range_to_first_gate = varSweep.getRangeToFirstGate()
                                      + 0.5f * range_step;
-        float[]   elevations;                    //new float[numRadials];
-       // float[]   azimuths;                      //  = new float[numRadials];
-       // int npix = (numRadials + 2) * numGates;  // add two additional rays
+        float[] elevations;  //new float[numRadials];
+        // float[]   azimuths;                      //  = new float[numRadials];
+        // int npix = (numRadials + 2) * numGates;  // add two additional rays
         float[][] values = new float[numRadials][numGates];
 
         //  for (int azi = 0; azi < numRadials; azi++) {
-       // azimuths = varSweep.getAzimuth();  //.getAzimuth(azi);
+        // azimuths = varSweep.getAzimuth();  //.getAzimuth(azi);
         //  }
-     //   float[] _azimuths = azimuths;
+        //   float[] _azimuths = azimuths;
 
-   //     for (int rayIdx = 0; rayIdx < numRadials; rayIdx++) {
-    //        float azimuth = azimuths[rayIdx];
-    //        if (Float.isNaN(azimuth)) {
-    //            azimuth = 361.f;
-   //         }
-   //         _azimuths[rayIdx] = azimuth;
-   //     }
+        //     for (int rayIdx = 0; rayIdx < numRadials; rayIdx++) {
+        //        float azimuth = azimuths[rayIdx];
+        //        if (Float.isNaN(azimuth)) {
+        //            azimuth = 361.f;
+        //         }
+        //         _azimuths[rayIdx] = azimuth;
+        //     }
 
         //calulate the total azi
-   //     float azis   = 0;
-  //      float preAzi = azimuths[0];
-  /*      for (int rayIdx = 0; rayIdx < numRadials; rayIdx++) {
-            float dif = Math.abs(azimuths[rayIdx] - preAzi);
-            if (dif < 1.5) {
-                azis = azis + dif;
-            }
+        //     float azis   = 0;
+        //      float preAzi = azimuths[0];
+        /*      for (int rayIdx = 0; rayIdx < numRadials; rayIdx++) {
+                  float dif = Math.abs(azimuths[rayIdx] - preAzi);
+                  if (dif < 1.5) {
+                      azis = azis + dif;
+                  }
 
-            preAzi = azimuths[rayIdx];
-        }
-        //int[] sortedAzs = QuickSort.sort(azimuths);
+                  preAzi = azimuths[rayIdx];
+              }
+              //int[] sortedAzs = QuickSort.sort(azimuths);
 
-        int[] sortedAzs;
-        if (azis >= 300) {
-            sortedAzs = QuickSort.sort(azimuths);
-        } else {
-            sortedAzs = new int[azimuths.length];
-            for (int i = 0; i < azimuths.length; i++) {
-                sortedAzs[i] = i;
-            }
-        }    */
+              int[] sortedAzs;
+              if (azis >= 300) {
+                  sortedAzs = QuickSort.sort(azimuths);
+              } else {
+                  sortedAzs = new int[azimuths.length];
+                  for (int i = 0; i < azimuths.length; i++) {
+                      sortedAzs[i] = i;
+                  }
+              }    */
         // for (int eli = 0; eli < numRadials; eli++) {
         elevations = varSweep.getElevation();  //.getElevation(eli);
-        if(Float.isNaN(elevations[0])) elevations[0] = 0.0f;
+        if (Float.isNaN(elevations[0])) {
+            elevations[0] = 0.0f;
+        }
         for (int rayIdx = 1; rayIdx < numRadials; rayIdx++) {
-            if(Float.isNaN(elevations[rayIdx]))
-                elevations[rayIdx] = elevations[rayIdx-1] + 0.2f;
+            if (Float.isNaN(elevations[rayIdx])) {
+                elevations[rayIdx] = elevations[rayIdx - 1] + 0.2f;
+            }
         }
         int[] sortedEle = QuickSort.sort(elevations);
 
         //  }
         for (int eli = 0; eli < numRadials; eli++) {
-             values[eli] = varSweep.readData(eli);
+            values[eli] = varSweep.readData(eli);
         }
 
         //float[] rawValues = varSweep.readData();
 
-        FlatField retField;
-        FieldImpl fi = null;
-        int bincounter = numGates;
-        int tiltcounter = numRadials -1;
-        float rhiAz = (float)azimus;
-        int[] tiltindices = new int[numRadials];
-        double halfBeamWidth = 0.95 / 2;;
-        double[][] ranges      = new double[numRadials][bincounter];
+        FlatField  retField;
+        FieldImpl  fi            = null;
+        int        bincounter    = numGates;
+        int        tiltcounter   = numRadials - 1;
+        float      rhiAz         = (float) azimus;
+        int[]      tiltindices   = new int[numRadials];
+        double     halfBeamWidth = 0.95 / 2;;
+        double[][] ranges        = new double[numRadials][bincounter];
 
         for (int ti = 0; ti < numRadials; ti++) {
 
-            ranges[ti][0]  = (range_to_first_gate + range_step / 2);
+            ranges[ti][0] = (range_to_first_gate + range_step / 2);
 
             for (int bi = 1; bi < bincounter; bi++) {
                 //values[ti][bi] = data[bi];
@@ -2815,11 +2832,11 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
 
         for (int tc = 0; tc < tiltcounter; tc++) {
-            int ti = sortedEle[tc];
+            int       ti         = sortedEle[tc];
             float[][] domainVals = new float[3][bincounter * 2];
             float[][] signalVals = new float[1][bincounter * 2];
-          //  int       ti         = tiltindices[tc];
-            float     lowerElev  = elevations[tc] - (float) halfBeamWidth;
+            //  int       ti         = tiltindices[tc];
+            float lowerElev = elevations[tc] - (float) halfBeamWidth;
             //System.out.println("low " + lowerElev);
             for (int bi = 0; bi < bincounter; bi++) {
                 domainVals[0][bi] = (float) ranges[ti][bi];
@@ -2832,7 +2849,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             //System.out.println("up " + upperElev);
             for (int bi = 0; bi < bincounter; bi++) {
                 domainVals[0][bi + bincounter] = (float) ranges[ti][bi];
-                domainVals[1][bi + bincounter] =  rhiAz;
+                domainVals[1][bi + bincounter] = rhiAz;
                 domainVals[2][bi + bincounter] = upperElev;
                 signalVals[0][bi + bincounter] = values[ti][bi];
             }
@@ -2841,10 +2858,8 @@ public class CDMRadarAdapter implements RadarAdapter {
             GriddedSet domainSet = new Gridded3DSet(radarDomainType,
                                        domainVals, bincounter, 2,
                                        radarDomainType.getCoordinateSystem(),
-                                       new Unit[] {
-                                           CommonUnit.meter,
-                                           CommonUnit.degree,
-                                           CommonUnit.degree }, null, false);
+                                       new Unit[] { CommonUnit.meter,
+                    CommonUnit.degree, CommonUnit.degree }, null, false);
             FunctionType functionType = new FunctionType(radarDomainType,
                                             getMomentType(varName));
 
@@ -2867,7 +2882,9 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
 
         return fi;
+
     }
+
     /**
      * Makes a field of all data from one common data model radar adapter;
      *
@@ -2884,9 +2901,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws VisADException  Couldn't create VisAD Object
      */
     public FlatField getSweep(int moment, double elevation, String varName,
-                              int idx,
-                              boolean want3D) throws VisADException,
-                                  RemoteException, IOException {
+                              int idx, boolean want3D)
+            throws VisADException, RemoteException, IOException {
 
         Trace.call1(" getSweep " + elevation);
 
@@ -3180,7 +3196,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         int       spNum    = sweepVar.getNumSweeps();
         ArrayList eleArray = new ArrayList();
         float     eleLast  = 0.0f;
-        if(!isRHI) {
+        if ( !isRHI) {
             for (int i = 0; i < spNum; i++) {
                 RadialDatasetSweep.Sweep sp  = sweepVar.getSweep(i);
                 float                    ele = sp.getMeanElevation();
@@ -3190,17 +3206,14 @@ public class CDMRadarAdapter implements RadarAdapter {
                 }
 
             }
-        }
-        else {
+        } else {
             for (int i = 0; i < spNum; i++) {
                 RadialDatasetSweep.Sweep sp  = sweepVar.getSweep(i);
-                float azi = 0.f;
-                try{
-                    azi = (float)getMeanAzimuth(sp.getAzimuth());
-                } catch (java.io.IOException ex) {
-
-                }
-                if ((azi!= eleLast) && Math.abs(azi - eleLast) > 0.2) {
+                float                    azi = 0.f;
+                try {
+                    azi = (float) getMeanAzimuth(sp.getAzimuth());
+                } catch (java.io.IOException ex) {}
+                if ((azi != eleLast) && (Math.abs(azi - eleLast) > 0.2)) {
                     eleArray.add(i);
                     eleLast = azi;
                 }
@@ -3247,12 +3260,13 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException Java RMI problem
      * @throws VisADException  Couldn't create VisAD Object
      */
-    public FlatField getVolume(int moment,
-                               String varName) throws VisADException,
-                                   RemoteException, IOException {
+    public FlatField getVolume(int moment, String varName)
+            throws VisADException, RemoteException, IOException {
 
         //        Trace.call1("volume preamble");
-        if(isRHI) return  getRHIVolume(moment, varName);
+        if (isRHI) {
+            return getRHIVolume(moment, varName);
+        }
 
         ObjectPair cacheKey =
             new ObjectPair(new ObjectPair(radarLocation, baseTime),
@@ -3480,9 +3494,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @throws RemoteException Java RMI problem
      * @throws VisADException  Couldn't create VisAD Object
      */
-    public FlatField getRHIVolume(int moment,
-                               String varName) throws VisADException,
-                                   RemoteException, IOException {
+    public FlatField getRHIVolume(int moment, String varName)
+            throws VisADException, RemoteException, IOException {
 
         //        Trace.call1("volume preamble");
         ObjectPair cacheKey =
@@ -3507,8 +3520,8 @@ public class CDMRadarAdapter implements RadarAdapter {
         numberOfSweeps = cut.length;
 
 
-      //  float[][] aziArray    = new float[numberOfSweeps][];
-       // int[][]   aziArrayIdx = new int[numberOfSweeps][];
+        //  float[][] aziArray    = new float[numberOfSweeps][];
+        // int[][]   aziArrayIdx = new int[numberOfSweeps][];
         float[][] eleArray    = new float[numberOfSweeps][];
         int[][]   eleArrayIdx = new int[numberOfSweeps][];
         float[]   meanEle     = new float[numberOfSweeps];
@@ -3517,12 +3530,12 @@ public class CDMRadarAdapter implements RadarAdapter {
         for (int b = 0; b < numberOfSweeps; b++) {
             int                      sb = Integer.parseInt(cut[b].toString());
             RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(sb);
-        //    aziArray[b]    = getAzimuth(s1);
-        //    aziArrayIdx[b] = QuickSort.sort(aziArray[b]);
+            //    aziArray[b]    = getAzimuth(s1);
+            //    aziArrayIdx[b] = QuickSort.sort(aziArray[b]);
             meanEle[b]     = s1.getMeanElevation();
             eleArray[b]    = s1.getElevation();
             eleArrayIdx[b] = QuickSort.sort(eleArray[b]);
-            meanAzi[b]     = (float)getMeanAzimuth(s1.getAzimuth());
+            meanAzi[b]     = (float) getMeanAzimuth(s1.getAzimuth());
         }
 
         cutIdx = QuickSort.sort(meanAzi);
@@ -3576,11 +3589,11 @@ public class CDMRadarAdapter implements RadarAdapter {
         int[]   rNum        = new int[numberOfSweeps];
 
         for (int sweepIdx = 0; sweepIdx < numberOfSweeps; sweepIdx++) {
-            int sb = cutIdx[sweepIdx];
+            int                      sb    = cutIdx[sweepIdx];
             RadialDatasetSweep.Sweep sweep = sweepVar.getSweep(sb);
             float                    f     = sweep.getBeamWidth() / 2;
             rNum[sweepIdx] = sweep.getRadialNumber();
-           // float[] azs = getAzimuth(sweep);
+            // float[] azs = getAzimuth(sweep);
             float[] els = sweep.getElevation();
             for (int rayIdx = 0; rayIdx < numberOfRay; rayIdx++) {
                 float rhiAz = rayIdx;
@@ -3621,16 +3634,16 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         for (int sweepIdx = 0; sweepIdx < numberOfSweeps; sweepIdx++) {
             //  float[]                  _azimuth2    = azimuth2[sweepIdx];
-            int       sb      = cutIdx[sweepIdx];
+            int       sb          = cutIdx[sweepIdx];
             float[]   _elevation2 = eleArray[sb];
-            float     _azimuth2 = meanAzi[sb];
+            float     _azimuth2   = meanAzi[sb];
             double[]  _ranges     = ranges[sb];
             float[][] _data2      = data2[sb];
 
             for (int rayIdx = 0; rayIdx < numberOfRay; rayIdx++) {
-                float   __azimuth = rayIdx;  //_azimuth2[rayIdx];
-                float[] __data2   = _data2[rayIdx];
-                float  __elevation = _elevation2[rayIdx];
+                float   __azimuth   = rayIdx;  //_azimuth2[rayIdx];
+                float[] __data2     = _data2[rayIdx];
+                float   __elevation = _elevation2[rayIdx];
                 for (int gateIdx = 0; gateIdx < gates; gateIdx++) {
                     domainVals2[k]   = __elevation;
                     domainVals1[k]   = _azimuth2;
@@ -3719,7 +3732,7 @@ public class CDMRadarAdapter implements RadarAdapter {
     public boolean isRHI() {
         return this.isRHI;
     }
-    
+
     /**
      * utility caching method
      *

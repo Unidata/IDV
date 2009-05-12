@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.data.radar;
 
 
@@ -47,6 +44,8 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectArray;
+
+import ucar.visad.Util;
 
 import visad.CommonUnit;
 import visad.DateTime;
@@ -95,7 +94,9 @@ public class CDMRadarDataSource extends RadarDataSource {
     /** station */
     private NamedStation namedStation = null;
 
+    /** _more_          */
     private boolean isRHI = false;
+
     /**
      * Zero-argument constructor for construction via unpersistence.
      */
@@ -202,7 +203,8 @@ public class CDMRadarDataSource extends RadarDataSource {
                     DateUnit.getStandardOrISO((String) timeSpan.get(0));
                 Date toDate =
                     DateUnit.getStandardOrISO((String) timeSpan.get(1));
-                //System.out.println("dataset dates: from = " + fromDate + " to = " + toDate);
+                System.out.println("dataset dates: from = " + fromDate
+                                   + " to = " + toDate);
                 /*
                 List collectionTimes =
                     collection.getRadarStationTimes(query.getStation(),
@@ -211,8 +213,8 @@ public class CDMRadarDataSource extends RadarDataSource {
                         toDate);
                 if(collectionTimes.size() == 0)  {
                 */
-                      List collectionTimes =
-                        collection.getRadarStationTimes(query.getStation(),
+                List collectionTimes =
+                    collection.getRadarStationTimes(query.getStation(),
                         query.getProduct(),
                         query.getDateSelection().getStartFixedDate(),
                         query.getDateSelection().getEndFixedDate());
@@ -279,11 +281,14 @@ public class CDMRadarDataSource extends RadarDataSource {
         }
         EarthLocation rdLocation = da.getStationLocation();
         setName(makeName(da));
-        String ids = stationID.length() > 3 ? stationID.substring(1) : stationID.toString();
-        if (namedStation == null || (namedStation.getID().equalsIgnoreCase(ids))) {
+        String ids = (stationID.length() > 3)
+                     ? stationID.substring(1)
+                     : stationID.toString();
+        if ((namedStation == null)
+                || (namedStation.getID().equalsIgnoreCase(ids))) {
             try {
-                namedStation = new NamedStationImpl(ids,
-                        stationName, rdLocation.getLatitude().getValue(),
+                namedStation = new NamedStationImpl(ids, stationName,
+                        rdLocation.getLatitude().getValue(),
                         rdLocation.getLongitude().getValue(),
                         rdLocation.getAltitude().getValue(),
                         CommonUnit.meter);
@@ -297,18 +302,19 @@ public class CDMRadarDataSource extends RadarDataSource {
         //
         try {
             for (int i = 0; i < paramTypes.length; i++) {
-                String  paramName = paramTypes[i].getName();
+                String paramName =
+                    Util.cleanTypeName(paramTypes[i].getName());
                 Integer momentObj = new Integer(i);
 
                 // String  momentName = moments[i];
                 if (da.isVolume()) {
-                    if(da.isRHI()){
+                    if (da.isRHI()) {
                         categories = Misc.newList(CATEGORY_RHISWEEP,
                                 CATEGORY_ISOSURFACE, CATEGORY_VOLUME);
-                    }
-                    else {
-                        categories = Misc.newList(CATEGORY_RHI, CATEGORY_CAPPI,
-                                CATEGORY_ISOSURFACE, CATEGORY_VOLUME);
+                    } else {
+                        categories = Misc.newList(CATEGORY_RHI,
+                                CATEGORY_CAPPI, CATEGORY_ISOSURFACE,
+                                CATEGORY_VOLUME);
                         //categories.add(CATEGORY_SWEEP_3D);
                         if (haveTimes) {
                             categories.add(CATEGORY_SWEEP_3D_TIME);
@@ -327,11 +333,10 @@ public class CDMRadarDataSource extends RadarDataSource {
                         categories = Misc.newList(CATEGORY_RASTER_2D_TIME);
                     }
                 } else {
-                    if (da.isRHI())  {
-                        categories = Misc.newList(CATEGORY_RHISWEEP );
+                    if (da.isRHI()) {
+                        categories = Misc.newList(CATEGORY_RHISWEEP);
 
-                    }
-                    else if (haveTimes) {
+                    } else if (haveTimes) {
                         categories = Misc.newList(CATEGORY_SWEEP_2D_TIME,
                                 CATEGORY_SWEEP_3D_TIME);
                     } else {
@@ -344,47 +349,41 @@ public class CDMRadarDataSource extends RadarDataSource {
 
                 // addDataChoice(new DirectDataChoice(this, paramTypes[i], stationName, paramName,
                 // sweepCategories, DataChoice.NULL_PROPERTIES));
-                double[] angles = da.getAngles(paramName);
-                Hashtable compositeProperties;
+                double[]            angles = da.getAngles(paramName);
+                Hashtable           compositeProperties;
                 CompositeDataChoice momentChoice;
 
-                if(da.isRHI()){
-                    compositeProperties =
-                        Misc.newHashtable(PROP_AZIMUTHS, angles, STATION_LOCATION,
-                                      namedStation);
+                if (da.isRHI()) {
+                    compositeProperties = Misc.newHashtable(PROP_AZIMUTHS,
+                            angles, STATION_LOCATION, namedStation);
 
                     compositeProperties.put(DataChoice.PROP_ICON,
-                                        "/auxdata/ui/icons/Radar.gif");
+                                            "/auxdata/ui/icons/Radar.gif");
 
-                    momentChoice =
-                        new CompositeDataChoice(
-                            this, new ObjectArray(
-                                momentObj, paramName, paramName, RadarConstants
+                    momentChoice = new CompositeDataChoice(
+                        this, new ObjectArray(
+                            momentObj, paramName, paramName, RadarConstants
                                 .VALUE_3D), stationID + " "
                                     + paramName, paramName, categories, compositeProperties);
-                }
-                else {
-                    compositeProperties =
-                        Misc.newHashtable(PROP_ANGLES, angles, STATION_LOCATION,
-                                      namedStation, PROP_VOLUMEORSWEEP,
-                                      VALUE_VOLUME);
+                } else {
+                    compositeProperties = Misc.newHashtable(PROP_ANGLES,
+                            angles, STATION_LOCATION, namedStation,
+                            PROP_VOLUMEORSWEEP, VALUE_VOLUME);
 
                     compositeProperties.put(DataChoice.PROP_ICON,
-                                        "/auxdata/ui/icons/Radar.gif");
+                                            "/auxdata/ui/icons/Radar.gif");
 
-                    momentChoice =
-                        new CompositeDataChoice(
-                            this, new ObjectArray(
-                                momentObj, paramName, paramName, RadarConstants
+                    momentChoice = new CompositeDataChoice(
+                        this, new ObjectArray(
+                            momentObj, paramName, paramName, RadarConstants
                                 .VALUE_3D), stationID + " "
                                     + paramName, paramName, categories, compositeProperties);
                 }
                 // make a DirectDataChoice for 2D plots
                 // for every tilt ("angle") above horizontal;
-                if(da.isRHI()) {
+                if (da.isRHI()) {
                     categories2D = Misc.newList(CATEGORY_RHISWEEP);
-                }
-                else if (da.isRaster()) {
+                } else if (da.isRaster()) {
                     categories2D = (haveTimes)
                                    ? Misc.newList(CATEGORY_RASTER_2D_TIME)
                                    : Misc.newList(CATEGORY_RASTER_2D);
@@ -399,48 +398,51 @@ public class CDMRadarDataSource extends RadarDataSource {
                     // categories2D = Misc.newList(CATEGORY_SWEEP_2D,
                     //         CATEGORY_SWEEP_3D);
                 }
-                if(da.isRHI()) {
-                     for (int j = 0; j < angles.length; j++) {
-                        String name = "Azimuth Angle " + Misc.format(angles[j]);
-                        Hashtable dataChoiceProperties =
-                            Misc.newHashtable(new Object[] {
-                            PROP_AZIMUTHS, new double[] { angles[j] }, PROP_AZIMUTH,
-                            new Double(j), PROP_VOLUMEORSWEEP, VALUE_3D
-                        });
-
-                        dataChoiceProperties.put(STATION_LOCATION, namedStation);
-                        dataChoiceProperties.put(
-                            DataChoice.PROP_ICON,
-                            "/auxdata/ui/icons/RadarAngle.gif");
-                        momentChoice.addDataChoice(
-                            new DirectDataChoice(
-                                this, new ObjectArray(
-                                    momentObj, new Double(
-                                        angles[j]), paramName, RadarConstants.VALUE_2D), stationID
-                                            + " " + paramName, paramName + " "
-                                                + name, categories2D, dataChoiceProperties));
-                    }
-                }
-                else {
+                if (da.isRHI()) {
                     for (int j = 0; j < angles.length; j++) {
-                        String name = "Elevation Angle " + Misc.format(angles[j]);
+                        String name = "Azimuth Angle "
+                                      + Misc.format(angles[j]);
                         Hashtable dataChoiceProperties =
                             Misc.newHashtable(new Object[] {
-                            PROP_ANGLES, new double[] { angles[j] }, PROP_ANGLE,
-                            new Double(j), PROP_VOLUMEORSWEEP, VALUE_SWEEP
+                            PROP_AZIMUTHS, new double[] { angles[j] },
+                            PROP_AZIMUTH, new Double(j), PROP_VOLUMEORSWEEP,
+                            VALUE_3D
                         });
 
-                        dataChoiceProperties.put(STATION_LOCATION, namedStation);
-                        dataChoiceProperties.put(
-                            DataChoice.PROP_ICON,
-                            "/auxdata/ui/icons/RadarAngle.gif");
+                        dataChoiceProperties.put(STATION_LOCATION,
+                                namedStation);
+                        dataChoiceProperties.put(DataChoice.PROP_ICON,
+                                "/auxdata/ui/icons/RadarAngle.gif");
                         momentChoice.addDataChoice(
                             new DirectDataChoice(
                                 this, new ObjectArray(
                                     momentObj, new Double(
                                         angles[j]), paramName, RadarConstants.VALUE_2D), stationID
-                                            + " " + paramName, paramName + " "
-                                                + name, categories2D, dataChoiceProperties));
+                                            + " " + paramName, paramName
+                                                + " " + name, categories2D, dataChoiceProperties));
+                    }
+                } else {
+                    for (int j = 0; j < angles.length; j++) {
+                        String name = "Elevation Angle "
+                                      + Misc.format(angles[j]);
+                        Hashtable dataChoiceProperties =
+                            Misc.newHashtable(new Object[] {
+                            PROP_ANGLES, new double[] { angles[j] },
+                            PROP_ANGLE, new Double(j), PROP_VOLUMEORSWEEP,
+                            VALUE_SWEEP
+                        });
+
+                        dataChoiceProperties.put(STATION_LOCATION,
+                                namedStation);
+                        dataChoiceProperties.put(DataChoice.PROP_ICON,
+                                "/auxdata/ui/icons/RadarAngle.gif");
+                        momentChoice.addDataChoice(
+                            new DirectDataChoice(
+                                this, new ObjectArray(
+                                    momentObj, new Double(
+                                        angles[j]), paramName, RadarConstants.VALUE_2D), stationID
+                                            + " " + paramName, paramName
+                                                + " " + name, categories2D, dataChoiceProperties));
                     }
                 }
                 addDataChoice(momentChoice);
@@ -562,8 +564,9 @@ public class CDMRadarDataSource extends RadarDataSource {
             }
             if (namedStation != null) {
                 int selected = 0;
-                for(int i=0; i< items.size(); i++){
-                    if(Misc.equals(namedStation.getID(),((NamedStation)items.get(i)).getID())){
+                for (int i = 0; i < items.size(); i++) {
+                    if (Misc.equals(namedStation.getID(),
+                                    ((NamedStation) items.get(i)).getID())) {
                         selected = i;
                         break;
                     }
@@ -668,7 +671,7 @@ public class CDMRadarDataSource extends RadarDataSource {
 
         List      levels = new ArrayList();
         Hashtable props  = dataChoice.getProperties();
-        if(isRHI) {
+        if (isRHI) {
             if ((props == null) || (props.get(PROP_AZIMUTHS) == null)) {
                 return levels;
             }
