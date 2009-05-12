@@ -1127,7 +1127,7 @@ public class StormDisplayState {
             }
             if (params.get(ID_FORECAST_CONE) == null) {
                 params.put(ID_FORECAST_CONE,
-                           Misc.newList(obsRadiusParams.get(0)));
+                           Misc.newList(forecastRadiusParams.get(0)));
             }
         }
 
