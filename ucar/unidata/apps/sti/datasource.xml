@@ -5,5 +5,11 @@
      fileselection="true"
      factory="ucar.unidata.data.storm.STIStormDataSource"
      label="STI Storm Data"/>
+ <datasource
+     id="STORM.DIAMOND7"
+     fileselection="true"
+     standalone="true"
+     factory="ucar.unidata.data.storm.Diamond7StormDataSource"
+     label="Diamond 7 Tropical Storm Data"/>
 
 </datasources>
