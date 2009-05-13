@@ -21,10 +21,12 @@
  */
 
 
+
 package ucar.unidata.idv.ui;
 
 
 import ucar.unidata.data.CompositeDataChoice;
+import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataCategory;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataContext;
@@ -283,6 +285,54 @@ public class DataTree extends DataSourceHolder {
 
 
     /**
+     * Handle right click
+     *
+     * @param e mouse event
+     */
+    private void handleTreeMouseEvent(MouseEvent e) {
+        if ( !SwingUtilities.isRightMouseButton(e)) {
+            return;
+        }
+        List<DataChoice> choices = getSelectedDataChoices();
+        if ((choices == null) || (choices.size() == 0)) {
+            return;
+        }
+        final DataChoice dataChoice = choices.get(0);
+        JPopupMenu       popup      = new JPopupMenu();
+        String           name       = dataChoice.getName();
+        JMenu            menu = new JMenu("Add \"" + name
+                                          + "\" as alias for");
+
+        for (DataAlias alias : (List<DataAlias>) Misc.sort(
+                DataAlias.getDataAliasList())) {
+            String aliasName = alias.getName();
+            if (alias.getLabel().length() > 0) {
+                aliasName += " - " + alias.getLabel();
+            }
+            menu.add(GuiUtils.makeMenuItem(aliasName, this, "addAsAlias",
+                                           new Object[] { name,
+                    alias }));
+
+        }
+        GuiUtils.limitMenuSize(menu, "Canonical Name", 15);
+        popup.add(menu);
+        popup.show((Component) e.getSource(), e.getX(), e.getY());
+
+    }
+
+    /**
+     * The pair contains a dataalias and a alias name
+     * Call AliasEditor.addAsAlias
+     *
+     * @param pair Holds a DataAlias and a alias name
+     */
+    public void addAsAlias(Object[] pair) {
+        String    name  = (String) pair[0];
+        DataAlias alias = (DataAlias) pair[1];
+        getIdv().getAliasEditor().addAsAlias(alias, name);
+    }
+
+    /**
      * Initialize this DataTree with the given list of
      * {@link ucar.unidata.data.DataSource}-s
      *
@@ -292,6 +342,14 @@ public class DataTree extends DataSourceHolder {
         //      this.tree = this;
         showIcons = idv.getProperty("idv.ui.datatree.showicons", true);
         this.tree = new MyTree(this);
+        this.tree.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                handleTreeMouseEvent(e);
+            }
+        });
+
+
+
         ToolTipManager.sharedInstance().registerComponent(getTree());
         DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {
             public Component getTreeCellRendererComponent(JTree theTree,

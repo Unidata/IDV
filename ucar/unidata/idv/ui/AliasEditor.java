@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -100,7 +101,8 @@ public class AliasEditor extends IdvManager {
     private List tableModels = new ArrayList();
 
     /** list of table models */
-    private List<AliasTableModel> displayedTableModels = new ArrayList<AliasTableModel>();
+    private List<AliasTableModel> displayedTableModels =
+        new ArrayList<AliasTableModel>();
 
     /** The list of JTable-s, one for each resource */
     private List tables = new ArrayList();
@@ -133,6 +135,38 @@ public class AliasEditor extends IdvManager {
 
 
     /**
+     * Add the alias to the dataalias. Find the existing alias and popup the edit dialog
+     *
+     * @param dataAlias data alias
+     * @param alias new alias
+     */
+    public void addAsAlias(DataAlias dataAlias, String alias) {
+        boolean         first = true;
+        AliasTableModel to    = getTableModel(0);
+        for (AliasTableModel model : displayedTableModels) {
+            int index = model.indexOfName(dataAlias.getName());
+            if (index >= 0) {
+                if (first) {
+                    model.addAlias(index, alias);
+                    editEntry(model, index, false);
+                    return;
+                }
+                String aliases = (String) model.aliases.get(index);
+                aliases += "," + alias;
+                to.add(dataAlias.getName(), dataAlias.getLabel(), aliases);
+                //                tabbedPane.setSelectedIndex(0);
+                editEntry(to, to.getRowCount() - 1, true);
+                return;
+            }
+            first = false;
+        }
+
+        //        tabbedPane.setSelectedIndex(0);
+        editEntry(null, 0, true, dataAlias.getName(), alias);
+    }
+
+
+    /**
      * Create a new alias
      */
     public void newAlias() {
@@ -140,13 +174,18 @@ public class AliasEditor extends IdvManager {
         editEntry(null, 0, true);
     }
 
+    /**
+     * get the list of resources
+     *
+     * @return resources
+     */
     public List getResources() {
         List aliases = new ArrayList();
-        for(AliasTableModel model: displayedTableModels) {
-            for(DataAlias dataAlias: (List<DataAlias>)model.aliases) {
-                aliases.add(new ResourceViewer.ResourceWrapper(dataAlias, dataAlias.toString(),
-                                                               model.label,
-                                                               isEditableResource(model.resourceIdx)));
+        for (AliasTableModel model : displayedTableModels) {
+            for (DataAlias dataAlias : (List<DataAlias>) model.aliases) {
+                aliases.add(new ResourceViewer.ResourceWrapper(dataAlias,
+                        dataAlias.toString(), model.label,
+                        isEditableResource(model.resourceIdx)));
             }
         }
         return aliases;
@@ -173,7 +212,7 @@ public class AliasEditor extends IdvManager {
                                              resourceIdx);
 
 
-            tableModel.label = ""+resources.get(resourceIdx);
+            tableModel.label = "" + resources.get(resourceIdx);
             tableModels.add(tableModel);
             if (root != null) {
                 List dataAliases = DataAlias.createDataAliases(root);
@@ -341,7 +380,7 @@ public class AliasEditor extends IdvManager {
             });
             popup.add(mi);
         } else {
-            mi = new JMenuItem("Copy to User Table");
+            mi = new JMenuItem("Edit Alias");
             mi.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     copyEntry(resourceIdx, row);
@@ -363,11 +402,27 @@ public class AliasEditor extends IdvManager {
      */
     private void editEntry(AliasTableModel tableModel, int row,
                            boolean deleteOnCancel) {
+        editEntry(tableModel, row, deleteOnCancel, "", "");
+    }
+
+    /**
+     * Popup the edit dialog for the given resource and alias
+     *
+     * @param tableModel The table model to edit
+     * @param row The row to edit
+     * @param deleteOnCancel delete entry if cancel is pressed
+     * @param name The name to use if this is a new one
+     * @param aliases The aliases to use if new
+     */
+    private void editEntry(AliasTableModel tableModel, int row,
+                           boolean deleteOnCancel, String name,
+                           String aliases) {
+
+
         boolean newEntry = tableModel == null;
 
-        String  name     = "",
-                label    = "",
-                aliases  = "";
+        String  label    = "";
+
         if ( !newEntry) {
             name    = tableModel.getName(row);
             label   = tableModel.getLabel(row);
@@ -545,8 +600,9 @@ public class AliasEditor extends IdvManager {
      */
     private static class AliasTableModel extends AbstractTableModel {
 
+        /** _more_          */
         String label;
- 
+
         /** The names of the data aliases */
         List names = new ArrayList();
 
@@ -590,6 +646,19 @@ public class AliasEditor extends IdvManager {
             this.labels.add(label);
             this.aliases.add(aliases);
             fireTableStructureChanged();
+        }
+
+
+        /**
+         * _more_
+         *
+         * @param row _more_
+         * @param alias _more_
+         */
+        public void addAlias(int row, String alias) {
+            String aliases = (String) this.aliases.get(row);
+            aliases = aliases + "," + alias;
+            this.aliases.set(row, aliases);
         }
 
 
@@ -702,6 +771,17 @@ public class AliasEditor extends IdvManager {
             fireTableStructureChanged();
         }
 
+
+        /**
+         * _more_
+         *
+         * @param name _more_
+         *
+         * @return _more_
+         */
+        public int indexOfName(String name) {
+            return names.indexOf(name);
+        }
 
         /**
          * Create and write out the collection of {@link ucar.uinidata.data.DataAlias}-s
