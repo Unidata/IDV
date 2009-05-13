@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -62,7 +63,7 @@ import java.util.List;
  * @version $Revision: 1.39 $
  */
 
-public class DataAlias {
+public class DataAlias implements Comparable {
 
     /** Xml tag for canonical name */
     public static final String TAG_ALIAS = "alias";
@@ -269,6 +270,23 @@ public class DataAlias {
         }
         return aliases;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     */
+    public int compareTo(Object o) {
+        if ( !(o instanceof DataAlias)) {
+            return 0;
+        }
+        DataAlias that = (DataAlias) o;
+        return this.name.compareTo(that.name);
+    }
+
 
 
     /**
