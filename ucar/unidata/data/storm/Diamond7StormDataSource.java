@@ -662,8 +662,10 @@ public class Diamond7StormDataSource extends StormDataSource {
         List<DateTime> startDates = new ArrayList<DateTime>();
         while (iter.hasNext()) {
             StormTrack track = (StormTrack) iter.next();
-            DateTime   dt    = track.getStartTime();
-            startDates.add(dt);
+            if(!track.getWay().isObservation()) {
+                DateTime   dt    = track.getStartTime();
+                startDates.add(dt);
+            }
         }
         return startDates;
     }
