@@ -92,10 +92,10 @@ public class UrlChooser extends IdvChooser implements ActionListener {
 
 
     /** Holds the combo box */
-    private JPanel urlPanel;
+    private JComponent urlPanel;
 
     /** Holds the text area */
-    private JPanel textPanel;
+    private JComponent textPanel;
 
     /** Are we showing the combo box */
     private boolean showBox = true;
@@ -105,6 +105,9 @@ public class UrlChooser extends IdvChooser implements ActionListener {
 
     /** panel */
     private GuiUtils.CardLayoutPanel cardLayoutPanel;
+
+    private JLabel urlLabel;
+
 
     /**
      * Create the <code>UrlChooser</code>
@@ -145,8 +148,8 @@ public class UrlChooser extends IdvChooser implements ActionListener {
      */
     protected JComponent doMakeContents() {
         JComponent dsComp = getDataSourcesComponent();
-        dsComp = GuiUtils.inset(GuiUtils.label("Data Source Type: ", dsComp),
-                                4);
+        //        dsComp = GuiUtils.inset(GuiUtils.label("Data Source Type: ", dsComp),
+        //                                4);
 
 
 
@@ -163,11 +166,10 @@ public class UrlChooser extends IdvChooser implements ActionListener {
                                 GuiUtils.WT_Y, GuiUtils.WT_N);
         boxWrapper.setPreferredSize(new Dimension(200, 40));
         //        GuiUtils.setHFill();
-        urlPanel =
-            GuiUtils.top(GuiUtils.leftCenter(GuiUtils.rLabel("URL:  "),
-                                             boxWrapper));
-        textPanel = GuiUtils.leftCenter(GuiUtils.rLabel("URLS:  "),
-                                        textScroller);
+        urlLabel = GuiUtils.rLabel("URL:");
+
+        urlPanel = GuiUtils.top(boxWrapper);
+        textPanel = textScroller;
         switchBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/DownDown.gif", this,
                                      "switchFields");
@@ -179,18 +181,17 @@ public class UrlChooser extends IdvChooser implements ActionListener {
 
 
 
-        JComponent mainContents;
-        if (dsComp != null) {
-            mainContents =
-                GuiUtils.vbox(GuiUtils.left(dsComp),
-                              GuiUtils.centerRight(cardLayoutPanel,
-                                  GuiUtils.top(switchBtn)), urlButtons);
-        } else {
-            mainContents =
-                GuiUtils.vbox(GuiUtils.centerRight(cardLayoutPanel,
-                    GuiUtils.top(switchBtn)), urlButtons);
+        JComponent widgetPanel = GuiUtils.centerRight(cardLayoutPanel,
+                                                      GuiUtils.top(switchBtn));
 
-        }
+        JComponent mainContents  = GuiUtils.formLayout(new Component[]{
+                GuiUtils.rLabel("Data Source Type:"),
+                GuiUtils.left(dsComp),
+                GuiUtils.top(GuiUtils.inset(urlLabel,new Insets(10,0,0,0))),
+                widgetPanel
+            });
+
+        mainContents = GuiUtils.vbox(mainContents, urlButtons);
         mainContents = GuiUtils.inset(mainContents,5);
         setHaveData(true);
         return GuiUtils.top(mainContents);
@@ -203,10 +204,12 @@ public class UrlChooser extends IdvChooser implements ActionListener {
     public void switchFields() {
         showBox = !showBox;
         if (showBox) {
+            urlLabel.setText("URL:");
             cardLayoutPanel.show(urlPanel);
             switchBtn.setIcon(
                 GuiUtils.getImageIcon("/auxdata/ui/icons/DownDown.gif"));
         } else {
+            urlLabel.setText("URLS:");
             cardLayoutPanel.show(textPanel);
             switchBtn.setIcon(
                 GuiUtils.getImageIcon("/auxdata/ui/icons/UpUp.gif"));

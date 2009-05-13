@@ -275,7 +275,7 @@ public class TDSRadarChooser extends TimesChooser {
             }
 
         });
-        productLabel = addLevel3ServerComp(GuiUtils.rLabel("Product" + ":"));
+        productLabel = addLevel3ServerComp(GuiUtils.rLabel("Product: "));
         productComboBox = new JComboBox();
         productComboBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
@@ -300,30 +300,22 @@ public class TDSRadarChooser extends TimesChooser {
 
 
 
-        JPanel top = GuiUtils.doLayout(new Component[] {
+        JComponent top = GuiUtils.formLayout(new Component[] {
                          GuiUtils.rLabel("Catalog:"),
-                         urlBox, }, 2, GuiUtils.WT_NYNY, GuiUtils.WT_N);
-
-        JPanel topb = GuiUtils.doLayout(new Component[] {
-                          GuiUtils.rLabel("Collections:"),
-                          GuiUtils.hbox(collectionSelector,
-                                        GuiUtils.filler()),
-                          GuiUtils.hbox(productLabel, GuiUtils.filler()),
-                          GuiUtils.hbox(productComboBox,
-                                        GuiUtils.filler()) }, 4,
-                                            GuiUtils.WT_NYNY, GuiUtils.WT_N);
+                         urlBox, 
+                         GuiUtils.rLabel("Collections:"),
+                         GuiUtils.leftRight(collectionSelector,
+                                            GuiUtils.hbox(productLabel,productComboBox))});
 
         GuiUtils.tmpInsets = new Insets(0, 2, 0, 2);
-
         stationMap.setPreferredSize(new Dimension(230, 200));
         stationMap = registerStatusComp("stations", stationMap);
         timesPanel = registerStatusComp("timepanel", timesPanel);
         addServerComp(stationMap);
         addServerComp(timesPanel);
-        JComponent contents = GuiUtils.doLayout(new Component[] { top, topb,
-                stationMap, timesPanel }, 1, GuiUtils.WT_Y,
-                                          new double[] { 0.5,
-                0.25, 4.0, 1.0 });
+        JComponent contents = GuiUtils.doLayout(new Component[] { top, 
+                                                                  stationMap, timesPanel }, 1, GuiUtils.WT_Y,
+            new double[] { 0.0, 4.0, 1.0 });
 
         contents = GuiUtils.inset(contents, 5);
         GuiUtils.enableComponents(compsThatNeedServer, false);
