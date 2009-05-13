@@ -21,7 +21,7 @@
  */
 
 package ucar.unidata.repository.harvester;
-
+import ucar.unidata.repository.metadata.*;
 
 import org.w3c.dom.*;
 
@@ -341,16 +341,39 @@ Two ASCII files are available for each year for freeze depth and thaw depth, res
 
     }
 
-    public static void ingestDif(String url) throws Exception {
-        
-        
+    public static Metadata makeMetadata(Element difNode) throws Exception {
+        Metadata metadata = null;
+        String tag = difNode.getTagName();
+
+        MetadataType type = null;
+
+        if(type==null) return null;
+
+
+        return metadata;
+    }
+
+    public static List<Metadata> ingestDif(String url) throws Exception {
+        List<Metadata> results = new ArrayList<Metadata>();
+        Element root = XmlUtil.getRoot(url, DifHarvester.class);
+        if (root == null) {
+            throw new IllegalArgumentException("Could not parse xml:" + url);
+        }
+        NodeList children = XmlUtil.getElements(root);
+        for (int i = 0; i < children.getLength(); i++) {
+            Element node = (Element) children.item(i);
+            Metadata metadata = makeMetadata(node);
+            if(metadata==null) continue;
+            results.add(metadata);
+        }
+        return results;
     }
     
     public static void main(String[]args) {
         try {
             ingestDif("http://nsidc.org/cgi-bin/get_metadata.pl?id=G02169&format=DIF&style=XML");
         } catch(Exception exc) {
-
+            exc.printStackTrace();
         }
     }
 

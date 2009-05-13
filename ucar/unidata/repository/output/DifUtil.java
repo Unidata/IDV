@@ -32,9 +32,11 @@ public class DifUtil {
     public static final String HEADER_ARGS = "xmlns=\"\"\nxmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\nxsi:schemaLocation=\"http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/ http://gcmd.nasa.gov/Aboutus/xml/dif/dif_v9.7.1.xsd\">\n";
 
 
-public static final String TAG_DIF  = "DIF";
+    public static final String TAG_DIF  = "DIF";
     public static final String TAG_Entry_ID = "Entry_ID";
     public static final String TAG_Entry_Title = "Entry_Title";
+    public static final String TAG_ISO_Topic_Category = "ISO_Topic_Category";
+
     public static final String TAG_Data_Set_Citation = "Data_Set_Citation";
     public static final String TAG_Dataset_Creator = "Dataset_Creator";
     public static final String TAG_Dataset_Title = "Dataset_Title";
@@ -82,7 +84,7 @@ public static final String TAG_DIF  = "DIF";
     public static final String TAG_Detailed_Variable = "Detailed_Variable";
 
     
-    public static final String TAG_ISO_Topic_Category = "ISO_Topic_Category";
+
     public static final String TAG_Keyword = "Keyword";
     public static final String TAG_Sensor_Name = "Sensor_Name";
     public static final String TAG_Short_Name = "Short_Name";

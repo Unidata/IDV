@@ -74,8 +74,9 @@ public class MetadataTypeBase extends RepositoryManager {
 
     public static final String ATTR_FILE = "file";
 
-    public static final String ATTR_TYPE = "type";
+    public static final String ATTR_TAG = "tag";
 
+    public static final String ATTR_TYPE = "type";
 
 
     /** _more_ */
@@ -118,6 +119,9 @@ public class MetadataTypeBase extends RepositoryManager {
 
     /** _more_ */
     private boolean searchable = false;
+
+    private Hashtable<String,String> tags = new Hashtable<String,String>();
+
 
     /**
      * _more_
@@ -257,6 +261,10 @@ public class MetadataTypeBase extends RepositoryManager {
     }
 
 
+    public String getTag(String what) {
+        return tags.get(what+".tag");
+    }
+
     public void init(Element node) throws Exception {
         setName(XmlUtil.getAttribute(node,
                                      ATTR_NAME, ""));
@@ -265,6 +273,16 @@ public class MetadataTypeBase extends RepositoryManager {
         setSearchable(XmlUtil.getAttributeFromTree(node,
                                                    ATTR_SEARCHABLE, false));
 
+        NamedNodeMap nnm     = node.getAttributes();
+        if (nnm != null) {
+            for (int i = 0; i < nnm.getLength(); i++) {
+                Attr attr = (Attr) nnm.item(i);
+                String attrName=  attr.getNodeName();
+                if(attrName.endsWith(".tag")) {
+                    tags.put(attrName, attr.getNodeValue());
+                }
+            }
+        }
 
         NodeList children = XmlUtil.getElements(node);
         for (int i = 0; i < children.getLength(); i++) {

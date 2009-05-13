@@ -980,13 +980,13 @@ public class UserManager extends RepositoryManager {
                 
                 StringBuffer msg = new StringBuffer(request.getString(ARG_USER_MESSAGE,""));
                 msg.append("<p>User id: " + id+"<p>");
-                msg.append("Please follow this link to reset your password: ");
+                msg.append("Click on this link to send a password reset link to your registered email address:<br>");
                 String resetUrl = HtmlUtil.url(getRepositoryBase().URL_USER_RESETPASSWORD.toString(),
                                                ARG_USER_NAME,id);
 
                 if(!resetUrl.startsWith("http"))
                     resetUrl = getRepository().absoluteUrl(resetUrl);
-                msg.append(HtmlUtil.href(resetUrl,"Password Reset"));
+                msg.append(HtmlUtil.href(resetUrl,"Send Password Reset Message"));
                 msg.append("<p>");
 
                 if(homeGroupId.length()>0) {
@@ -2058,10 +2058,13 @@ public class UserManager extends RepositoryManager {
         String subject = getProperty(PROP_USER_RESET_PASSWORD_SUBJECT,
                                      "Your RAMADDA Password");
         getAdmin().sendEmail(toUser, subject, template, true);
-        String message =
-            "Instructions on how to reset your password have been sent to your registered email address";
-        return new Result(request.url(getRepositoryBase().URL_USER_LOGIN,
-                                      ARG_MESSAGE, message));
+        StringBuffer message = new StringBuffer();
+        message.append(getRepository().note("Instructions on how to reset your password have been sent to your registered email address.")); 
+        return new Result("Password Reset",message);
+
+
+        //        return new Result(request.url(getRepositoryBase().URL_USER_LOGIN,
+        //                                      ARG_MESSAGE, message));
         /*
         sb.append(
             getRepository().note(
