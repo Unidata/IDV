@@ -541,6 +541,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public String formatDateShort(Request request, Date d) {
+        return formatDateShort(request,d,"");
+    }
+
+    public String formatDateShort(Request request, Date d, String extraAlt) {
         if (displaySdf == null) {
             displaySdf = makeSDF(getProperty(PROP_DATE_SHORTFORMAT,
                                              DEFAULT_TIME_SHORTFORMAT));
@@ -578,7 +582,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
         return HtmlUtil.span(result,
                              HtmlUtil.cssClass("time")
-                             + HtmlUtil.attr(HtmlUtil.ATTR_TITLE, fullDate));
+                             + HtmlUtil.attr(HtmlUtil.ATTR_TITLE, fullDate+extraAlt));
     }
 
 

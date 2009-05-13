@@ -1204,27 +1204,28 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         sb.append(extra);
         sb.append(link.getLink());
         sb.append("</td><td align=right class=entryrowlabel>");
+        StringBuffer  extraAlt  = new StringBuffer();
+        String userLabel="";
+        extraAlt.append(", ");
+        extraAlt.append(entry.getUser().getId());
         if (entry.getResource().isFile()) {
-            //            sb.append(formatFileLength(entry.getResource().getFileSize()));
-        }
+            extraAlt.append(", ");
+            extraAlt.append(formatFileLength(entry.getResource().getFileSize()));
+
+       }
+
         sb.append(getRepository().formatDateShort(request,
-                new Date(entry.getStartDate())));
-        String userLabel;
-        if (Misc.equals(request.getUser(), entry.getUser())) {
-            userLabel = "me";
-        } else {
-            userLabel = entry.getUser().getId();
-        }
+                                                  new Date(entry.getStartDate()),extraAlt.toString()));
         sb.append("</td><td width=\"1%\" align=right class=entryrowlabel>");
         sb.append(HtmlUtil.space(1));
-        String userSearchLink =
+        /*        String userSearchLink =
             HtmlUtil.href(
                 HtmlUtil.url(
                     request.url(getRepository().URL_USER_PROFILE),
                     ARG_USER_ID, entry.getUser().getId()), userLabel,
                         "title=\"View user profile\"");
 
-        sb.append(userSearchLink);
+                        sb.append(userSearchLink);*/
         sb.append("</td></tr></table>");
         sb.append(HtmlUtil.close(HtmlUtil.TAG_DIV));
         sb.append(link.getFolderBlock());
