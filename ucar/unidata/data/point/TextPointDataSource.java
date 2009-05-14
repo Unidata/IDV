@@ -1043,7 +1043,8 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
-     * THis gets called from the Preferences menu and sets the metadata and also updates the skipRows
+     * THis gets called from the Preferences menu and sets the 
+     * metadata and also updates the skipRows
      *
      * @param metadata The metadata
      */
@@ -1059,6 +1060,9 @@ public class TextPointDataSource extends PointDataSource {
      *  @param metadata The metadata
      */
     public void applySavedMetaDataFromUIInner(Metadata metadata) {
+        if (metadata.getSkipRows() >= 0) {
+            skipRows = metadata.getSkipRows();
+        }
         setLineText(lineLbl, skipRows, lines);
         applySavedMetaData(metadata);
     }
@@ -1081,6 +1085,7 @@ public class TextPointDataSource extends PointDataSource {
             ParamRow paramRow = (ParamRow) paramRows.get(tokIdx);
             paramRow.applyMetaData((List) fieldList.get(tokIdx));
         }
+        metaDataComp.validate();
     }
 
     /**
