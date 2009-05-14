@@ -1000,7 +1000,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      * @throws VisADException  if a VisAD failure occurs.
      * @throws RemoteException if a Java RMI failure occurs.
      */
-    void setSoundings(Field[] tempPros, Field[] dewPros, Field[] windPros)
+    protected synchronized void setSoundings(Field[] tempPros, Field[] dewPros, Field[] windPros)
             throws VisADException, RemoteException {
 
         int n = tempPros.length;
