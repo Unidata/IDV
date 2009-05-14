@@ -22,8 +22,6 @@
 
 
 
-
-
 package ucar.unidata.data.grid;
 
 
@@ -149,8 +147,6 @@ public class GridUtil {
 
     /** function for the timeStepFunc routine */
     public static final String FUNC_DIFFERENCE = "difference";
-
-
 
 
 
@@ -493,14 +489,15 @@ public class GridUtil {
      *
      * @throws VisADException   problem determining this
      */
-    public static List getDateTimeList(FieldImpl grid) throws VisADException {
+    public static List<DateTime> getDateTimeList(FieldImpl grid)
+            throws VisADException {
         SampledSet timeSet = (SampledSet) getTimeSet(grid);
         if (timeSet == null) {
             return null;
         }
-        double[][] times    = timeSet.getDoubles(false);
-        Unit       timeUnit = timeSet.getSetUnits()[0];
-        List       result   = new ArrayList();
+        double[][]     times    = timeSet.getDoubles(false);
+        Unit           timeUnit = timeSet.getSetUnits()[0];
+        List<DateTime> result   = new ArrayList<DateTime>();
         for (int i = 0; i < timeSet.getLength(); i++) {
             result.add(new DateTime(times[0][i], timeUnit));
         }
@@ -1136,6 +1133,28 @@ public class GridUtil {
     public static FieldImpl sliceAtLevel(FieldImpl grid, Real level,
                                          int samplingMode)
             throws VisADException {
+        return sliceAtLevel(grid, level, samplingMode, DEFAULT_ERROR_MODE);
+    }
+
+    /**
+     * Slice the grid at the vertical level indictated.
+     *
+     * @param  grid   grid to slice (must be a valid 3D grid)
+     * @param  level  level to slice at.  level must have units
+     *         convertible with the vertial coordinate of the spatial
+     *         domain or it's reference if there is a CoordinateSystem
+     *         associated with the domain.
+     * @param  samplingMode Data.WEIGHTED_AVERAGE or Data.NEAREST_NEIGHBOR
+     * @param  errorMode Data.NO_ERRORS, Data.DEPENDENT, Data.INDEPENDENT
+     *
+     * @return  spatial slice at level.  If this is a sequence of grids
+     *          it will be a sequence of the slices.
+     *
+     * @throws  VisADException  problem in resampling
+     */
+    public static FieldImpl sliceAtLevel(FieldImpl grid, Real level,
+                                         int samplingMode, int errorMode)
+            throws VisADException {
 
         FieldImpl fi = grid;
         if ((getTimeSet(grid) == null) || isConstantSpatialDomain(grid)) {
@@ -1143,7 +1162,7 @@ public class GridUtil {
                 grid,
                 makeSliceFromLevel(
                     (GriddedSet) getSpatialDomain(grid),
-                    level), samplingMode);
+                    level), samplingMode, errorMode);
         } else {
             try {
                 Set timeSet = getTimeSet(grid);
@@ -1157,7 +1176,7 @@ public class GridUtil {
                             ff,
                             makeSliceFromLevel(
                                 (GriddedSet) getSpatialDomain(grid, i),
-                                level), samplingMode);
+                                level), samplingMode, errorMode);
                     }
                     if (i == 0) {
                         fi = new FieldImpl(
@@ -1510,7 +1529,7 @@ public class GridUtil {
         /** the lons */
         float[][] lons;
 
-        /** the values*/
+        /** the values */
         float[][][] values;
 
         /**
@@ -1729,7 +1748,29 @@ public class GridUtil {
     public static FieldImpl getProfileAtLatLonPoint(FieldImpl grid,
             LatLonPoint point, int samplingMode)
             throws VisADException {
-        return sliceAlongLatLonLine(grid, point, point, samplingMode);
+        return getProfileAtLatLonPoint(grid, point, samplingMode,
+                                       DEFAULT_ERROR_MODE);
+    }
+
+    /**
+     * Returns a vertical profile of a grid at a Lat/Lon point.  Returns
+     * <code>null</code> if no such profile could be created.
+     *
+     * @param  grid   grid to slice (must be a valid 3D grid)
+     * @param  point  LatLonPoint to sample at.
+     * @param  samplingMode Data.WEIGHTED_AVERAGE or NEAREST_NEIGHBOR
+     * @param  errorMode Data.NO_ERRORS, Data.DEPENDENT, Data.INDEPENDENT
+     *
+     * @return  vertical slice at point or <code>null</code>.  If this is a
+     *          sequence of grids it will be a sequence of the slices.
+     *
+     * @throws  VisADException  problem in resampling
+     */
+    public static FieldImpl getProfileAtLatLonPoint(FieldImpl grid,
+            LatLonPoint point, int samplingMode, int errorMode)
+            throws VisADException {
+        return sliceAlongLatLonLine(grid, point, point, samplingMode,
+                                    errorMode);
     }
 
     /**
@@ -1756,7 +1797,7 @@ public class GridUtil {
      * @param  grid   grid to slice (must be a valid 2D or 3D grid)
      * @param  start  starting LatLonPoint of the line
      * @param  end    starting LatLonPoint of the line
-     * @param samplingMode mode for sampling
+     * @param  samplingMode Data.WEIGHTED_AVERAGE or NEAREST_NEIGHBOR
      *
      * @return  spatial slice along the line.  If this is a sequence of grids
      *          it will be a sequence of the slices.
@@ -1765,6 +1806,28 @@ public class GridUtil {
      */
     public static FieldImpl sliceAlongLatLonLine(FieldImpl grid,
             LatLonPoint start, LatLonPoint end, int samplingMode)
+            throws VisADException {
+        return sliceAlongLatLonLine(grid, start, end, samplingMode,
+                                    DEFAULT_ERROR_MODE);
+    }
+
+    /**
+     * Slice the grid along the line specified by the two LatLonPoint-s
+     *
+     * @param  grid   grid to slice (must be a valid 2D or 3D grid)
+     * @param  start  starting LatLonPoint of the line
+     * @param  end    starting LatLonPoint of the line
+     * @param samplingMode mode for sampling
+     * @param  errorMode Data.NO_ERRORS, Data.DEPENDENT, Data.INDEPENDENT
+     *
+     * @return  spatial slice along the line.  If this is a sequence of grids
+     *          it will be a sequence of the slices.
+     *
+     * @throws  VisADException  problem in resampling
+     */
+    public static FieldImpl sliceAlongLatLonLine(FieldImpl grid,
+            LatLonPoint start, LatLonPoint end, int samplingMode,
+            int errorMode)
             throws VisADException {
         FieldImpl fi = grid;
         if (isSinglePointDomain(grid)) {
@@ -1775,7 +1838,7 @@ public class GridUtil {
                 grid,
                 makeSliceFromLatLonPoints(
                     (GriddedSet) getSpatialDomain(grid), start,
-                    end), samplingMode);
+                    end), samplingMode, errorMode);
         } else {
             try {
                 Set timeSet = getTimeSet(grid);
@@ -1789,7 +1852,7 @@ public class GridUtil {
                             ff,
                             makeSliceFromLatLonPoints(
                                 (GriddedSet) getSpatialDomain(grid, i),
-                                start, end), samplingMode);
+                                start, end), samplingMode, errorMode);
                     }
                     if (i == 0) {
                         fi = new FieldImpl(
@@ -1824,7 +1887,6 @@ public class GridUtil {
 
     /**
      * Sample the grid at the position defined by the EarthLocation
-     * with the VisAD resampling method given.
      *
      * @param  grid   grid to sample (must be a valid 3D grid)
      * @param  location  EarthLocation to sample at.
@@ -1838,6 +1900,27 @@ public class GridUtil {
      */
     public static FieldImpl sample(FieldImpl grid, EarthLocation location,
                                    int samplingMode)
+            throws VisADException {
+        return sample(grid, location, samplingMode, DEFAULT_ERROR_MODE);
+    }
+
+    /**
+     * Sample the grid at the position defined by the EarthLocation
+     * with the VisAD resampling method given.
+     *
+     * @param  grid   grid to sample (must be a valid 3D grid)
+     * @param  location  EarthLocation to sample at.
+     * @param  samplingMode Data.WEIGHTED_AVERAGE or NEAREST_NEIGHBOR
+     * @param  errorMode Data.NO_ERRORS, Data.DEPENDENT, Data.INDEPENDENT
+     *
+     * @return  grid representing the values of the original grid at the
+     *          point defined by location.  If this is a sequence of grids
+     *          it will be a sequence of the values.
+     *
+     * @throws  VisADException  invalid point or some other problem
+     */
+    public static FieldImpl sample(FieldImpl grid, EarthLocation location,
+                                   int samplingMode, int errorMode)
             throws VisADException {
         SampledSet spatialSet = getSpatialDomain(grid);
         if ( !isNavigated(spatialSet)) {
@@ -1858,7 +1941,7 @@ public class GridUtil {
         } catch (RemoteException re) {
             throw new VisADException("Can't get position from point");
         }
-        return sampleAtPoint(grid, point, samplingMode);
+        return sampleAtPoint(grid, point, samplingMode, errorMode);
     }
 
     /**
@@ -1894,6 +1977,26 @@ public class GridUtil {
     public static FieldImpl sample(FieldImpl grid, LatLonPoint point,
                                    int samplingMode)
             throws VisADException {
+        return sample(grid, point, samplingMode, DEFAULT_ERROR_MODE);
+    }
+
+    /**
+     * Sample the grid at the position defined by the LatLonPoint
+     *
+     * @param  grid   grid to sample (must be a valid 3D grid)
+     * @param  point  LatLonPoint to sample at.
+     * @param  samplingMode Data.WEIGHTED_AVERAGE or NEAREST_NEIGHBOR
+     * @param  errorMode Data.NO_ERRORS, Data.DEPENDENT, Data.INDEPENDENT
+     *
+     * @return  grid representing the values of the original grid at the
+     *          point defined by point.  If this is a sequence of grids
+     *          it will be a sequence of the values.
+     *
+     * @throws  VisADException  invalid point or some other problem
+     */
+    public static FieldImpl sample(FieldImpl grid, LatLonPoint point,
+                                   int samplingMode, int errorMode)
+            throws VisADException {
         SampledSet spatialSet = getSpatialDomain(grid);
         if ( !isNavigated(spatialSet)) {
             throw new IllegalArgumentException("Domain is not georeferenced");
@@ -1914,7 +2017,7 @@ public class GridUtil {
         } catch (RemoteException re) {
             throw new VisADException("Can't get position from point");
         }
-        return sampleAtPoint(grid, location, samplingMode);
+        return sampleAtPoint(grid, location, samplingMode, errorMode);
     }
 
     /**
@@ -1954,7 +2057,29 @@ public class GridUtil {
     public static FieldImpl slice(FieldImpl grid, SampledSet slice,
                                   int samplingMode)
             throws VisADException {
-        return resampleGrid(grid, slice, samplingMode);
+        return slice(grid, slice, samplingMode, DEFAULT_ERROR_MODE);
+    }
+
+    /**
+     * Slice the grid at the positions defined by a SampledSet.
+     *
+     * @param  grid   grid to slice (must be a valid 3D grid)
+     * @param  slice  set of points to sample on.  It must be compatible
+     *         with the spatial domain of the grid.
+     * @param  samplingMode Data.WEIGHTED_AVERAGE or NEAREST_NEIGHBOR
+     * @param  errorMode Data.NO_ERRORS, Data.DEPENDENT, Data.INDEPENDENT
+     *
+     * @return  a FieldImpl the grid representing the values
+     *          of the original grid at the
+     *          points defined by slice.  If this is a sequence of grids
+     *          it will be a sequence of the slices.
+     *
+     * @throws  VisADException  invalid slice or some other problem
+     */
+    public static FieldImpl slice(FieldImpl grid, SampledSet slice,
+                                  int samplingMode, int errorMode)
+            throws VisADException {
+        return resampleGrid(grid, slice, samplingMode, errorMode);
     }
 
     /**
@@ -3167,12 +3292,29 @@ public class GridUtil {
     private static FieldImpl sampleAtPoint(FieldImpl grid, RealTuple point,
                                            int samplingMode)
             throws VisADException {
+        return sampleAtPoint(grid, point, samplingMode, DEFAULT_ERROR_MODE);
+    }
+
+    /**
+     * sample the grid at this point using "method' provided, one of
+     * NEAREST_NEIGHBOR or WEIGHTED_AVERAGE; errors not considered.
+     *
+     * @param grid      grid to sample
+     * @param point     point to sample at
+     * @param samplingMode   sampling mode
+     * @param  errorMode Data.NO_ERRORS, Data.DEPENDENT, Data.INDEPENDENT
+     * @return   sampled grid
+     *
+     * @throws VisADException   problem sampling
+     */
+    private static FieldImpl sampleAtPoint(FieldImpl grid, RealTuple point,
+                                           int samplingMode, int errorMode)
+            throws VisADException {
         FieldImpl sampledFI = null;
         // System.out.println("sampling at " + point);
         try {
             if ( !isSequence(grid)) {
-                Data value = grid.evaluate(point, samplingMode,
-                                           DEFAULT_ERROR_MODE);
+                Data value = grid.evaluate(point, samplingMode, errorMode);
                 RealType index = RealType.getRealType("index");
                 SingletonSet ss = new SingletonSet(new RealTuple(new Real[] {
                                       new Real(index, 0) }));
@@ -3185,7 +3327,7 @@ public class GridUtil {
                 for (int i = 0; i < sequenceDomain.getLength(); i++) {
                     Data sample =
                         ((FlatField) grid.getSample(i)).evaluate(point,
-                            samplingMode, DEFAULT_ERROR_MODE);
+                            samplingMode, errorMode);
                     if (i == 0) {  // set up the functiontype
                         FunctionType sampledType =
                             new FunctionType(((SetType) sequenceDomain
@@ -4358,15 +4500,15 @@ public class GridUtil {
         List<Gridded2DSet> allSets = new ArrayList<Gridded2DSet>();
         collectGriddedSets(map, allSets);
 
-        long    t1          = System.currentTimeMillis();
-        int     numPolygons = allSets.size();
-        List    pts         = new ArrayList();
-        List[]  indexLists  = new List[numPolygons];
-        float[] lonLow      = new float[numPolygons];
-        float[] lonHi       = new float[numPolygons];
-        float[] latLow      = new float[numPolygons];
-        float[] latHi       = new float[numPolygons];
-        boolean latLonOrder = isLatLonOrder(map);
+        long            t1          = System.currentTimeMillis();
+        int             numPolygons = allSets.size();
+        List            pts         = new ArrayList();
+        List<Integer>[] indexLists  = new List[numPolygons];
+        float[]         lonLow      = new float[numPolygons];
+        float[]         lonHi       = new float[numPolygons];
+        float[]         latLow      = new float[numPolygons];
+        float[]         latHi       = new float[numPolygons];
+        boolean         latLonOrder = isLatLonOrder(map);
         for (int polygonIdx = 0; polygonIdx < numPolygons; polygonIdx++) {
             Gridded2DSet g   = allSets.get(polygonIdx);
             float[]      low = g.getLow();
@@ -4446,7 +4588,7 @@ public class GridUtil {
                                        : !pointInside);
                 if (ok) {
                     if (indexLists[mapIdx] == null) {
-                        indexLists[mapIdx] = new ArrayList();
+                        indexLists[mapIdx] = new ArrayList<Integer>();
                     }
                     indexLists[mapIdx].add(new Integer(i));
                     break;
@@ -4640,10 +4782,10 @@ public class GridUtil {
         Object loadId =
             JobManager.getManager().startLoad("Writing grid to xls", true);
         try {
-            HSSFWorkbook wb = new HSSFWorkbook();
-            HSSFRow      row;
-            int          sheetIdx = -1;
-            List         sheets   = new ArrayList();
+            HSSFWorkbook    wb = new HSSFWorkbook();
+            HSSFRow         row;
+            int             sheetIdx = -1;
+            List<HSSFSheet> sheets   = new ArrayList<HSSFSheet>();
             OutputStream fileOut =
                 new BufferedOutputStream(new FileOutputStream(filename),
                                          1000000);
@@ -5219,7 +5361,7 @@ public class GridUtil {
             }
             projVar = new Variable(ncfile, null, null, grid_name);
             projVar.setDataType(DataType.CHAR);
-            projVar.setDimensions(new ArrayList());  // scalar
+            projVar.setDimensions(new ArrayList<Dimension>());  // scalar
 
             for (int i = 0; i < attributes.size(); i++) {
                 Attribute att = (Attribute) attributes.get(i);
