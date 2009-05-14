@@ -22,7 +22,6 @@
 
 
 
-
 package ucar.unidata.data.radar;
 
 
@@ -375,7 +374,9 @@ public class CDMRadarAdapter implements RadarAdapter {
                                              "units"));
 
                             paramTypes[0] =
-                                DataUtil.makeRealType(gedVar.getName(), u);
+                            //RealType.getRealType(gedVar.getName(), u);
+                            DataUtil.makeRealType(gedVar.getName(), u);
+                            //System.out.println("param = " + paramTypes[0].prettyString() + " unit: " + paramTypes[0].getDefaultUnit());
                             angles    = new double[1];
                             angles[0] = 0.0;
                             anglesMap.put(gedVar.getName(), angles);
@@ -428,8 +429,10 @@ public class CDMRadarAdapter implements RadarAdapter {
 
                     Unit u = getUnit(radVar);
 
-                    paramTypes[p] = DataUtil.makeRealType(radVar.getName(),
-                            u);
+                    paramTypes[p] =
+                    //RealType.getRealType(radVar.getName(), u);
+                    DataUtil.makeRealType(radVar.getName(), u);
+                    //System.out.println("param = " + paramTypes[p].prettyString() + " unit: " + paramTypes[p].getDefaultUnit());
                     angles = new double[nsweep];
                     if (isRHI) {
                         for (int i = 0; i < nsweep; i++) {
@@ -729,7 +732,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
 
         RadialDatasetSweep.RadialVariable sweepVar =
-            (RadialDatasetSweep.RadialVariable) rds.getDataVariable(varName);
+            getRadialVariable(varName);
         int    numberOfSweeps = sweepVar.getNumSweeps();
         int    numberOfRay    = getRayNumber(sweepVar);
         double levelInMeters  = level.getValue(CommonUnit.meter);
@@ -872,8 +875,9 @@ public class CDMRadarAdapter implements RadarAdapter {
                                           new Unit[] {
                                               CommonUnit.meter.scale(1000),
                 CommonUnit.degree }, null, false, true);
-        FunctionType sweepType = new FunctionType(tt, getMomentType(varName));
-        Unit         u         = getUnit(sweepVar);
+        Unit u = getUnit(sweepVar);
+        FunctionType sweepType = new FunctionType(tt,
+                                     getMomentType(varName, u));
         FlatField ff = new FlatField(sweepType, set, (CoordinateSystem) null,
                                      (Set[]) null, new Unit[] { u });
 
@@ -922,7 +926,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
 
         RadialDatasetSweep.RadialVariable sweepVar =
-            (RadialDatasetSweep.RadialVariable) rds.getDataVariable(varName);
+            getRadialVariable(varName);
 
 
         Object[] cut = getCutIdx(sweepVar);
@@ -1066,8 +1070,9 @@ public class CDMRadarAdapter implements RadarAdapter {
                                           new Unit[] {
                                               CommonUnit.meter.scale(1),
                 CommonUnit.degree }, null, false, true);
-        FunctionType sweepType = new FunctionType(tt, getMomentType(varName));
-        Unit         u         = getUnit(sweepVar);
+        Unit u = getUnit(sweepVar);
+        FunctionType sweepType = new FunctionType(tt,
+                                     getMomentType(varName, u));
         FlatField ff = new FlatField(sweepType, set, (CoordinateSystem) null,
                                      (Set[]) null, new Unit[] { u });
 
@@ -1630,6 +1635,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             throws VisADException, RemoteException {
 
         Object      choiceId = dataChoice.getId();
+        String      rn;  // RealType name
         String      vn;
         String      vrhi;
         ObjectArray choiceAttrs;
@@ -1644,7 +1650,9 @@ public class CDMRadarAdapter implements RadarAdapter {
                                 ((ObjectArray) choiceId).getObject3(),
                                 RadarConstants.VALUE_3D);
             */
-            vn = choiceAttrs.getObject3().toString();
+            rn = choiceAttrs.getObject3().toString();
+            vn = Util.cleanTypeName(rn);
+            //System.out.println("looking for rt " + rn + " var " + vn);
         } else {
             throw new IllegalStateException("Unknown choice data:"
                                             + choiceId.getClass().getName());
@@ -1695,7 +1703,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                 }
 
                 try {
-                    fi = getCAPPI(moment, vn, level);
+                    fi = getCAPPI(moment, rn, level);
                 } catch (IOException ex) {
                     LogUtil.logException("getCAPPI", ex);
                 }
@@ -1705,13 +1713,13 @@ public class CDMRadarAdapter implements RadarAdapter {
                 //System.out.println("getting rhi at azimuth " + rhiAzimuth);
 
                 try {
-                    fi = getRHI(moment, vn, rhiAzimuth);
+                    fi = getRHI(moment, rn, rhiAzimuth);
                 } catch (IOException ex) {
                     LogUtil.logException("getRHI", ex);
                 }
             } else {
                 try {
-                    fi = getVolume(moment, vn);
+                    fi = getVolume(moment, rn);
                 } catch (IOException ex) {
                     LogUtil.logException("getVolume", ex);
                 }
@@ -1776,13 +1784,13 @@ public class CDMRadarAdapter implements RadarAdapter {
                         sIndex = (int) new Double(s.toString()).doubleValue();
                     }
                     //System.out.println("AZIMUTH angle is :" + value);
-                    fi = getRHISweep(moment, value, vn, sIndex, true);
+                    fi = getRHISweep(moment, value, rn, sIndex, true);
                 } catch (IOException ex) {
                     LogUtil.logException("getRhiSweep", ex);
                 }
             } else if (isRaster()) {
                 try {
-                    fi = getRaster(moment, vn);
+                    fi = getRaster(moment, rn);
                 } catch (IOException ex) {
                     LogUtil.logException("getRaster", ex);
                 } catch (InvalidRangeException ed) {
@@ -1834,7 +1842,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                     } else {
                         sIndex = (int) new Double(s.toString()).doubleValue();
                     }
-                    fi = getSweep(moment, value, vn, sIndex, !in2D);
+                    fi = getSweep(moment, value, rn, sIndex, !in2D);
                 } catch (IOException ex) {
                     LogUtil.logException("getSweep", ex);
                 }
@@ -1880,14 +1888,29 @@ public class CDMRadarAdapter implements RadarAdapter {
     /**
      * Get the data for the given DataChoice and selection criteria.
      * @param vname
+     * @param u _more_
+     * @return  the real type of request variable
+     * private RealTupleType getMomentType(String vname) throws VisADException {
+     *   //        return RealType.getRealType(vname);
+     *   return getMomentType(vname, null);
+     *   //return new RealTupleType(RealType.getRealType(vname));
+     * }
+     *
+     * @throws VisADException _more_
+     */
+
+    /**
+     * Get the data for the given DataChoice and selection criteria.
+     * @param vname
      * @return  the real type of request variable
      *
      *
      * @throws VisADException _more_
      */
-    private RealTupleType getMomentType(String vname) throws VisADException {
+    private RealTupleType getMomentType(String vname, Unit u)
+            throws VisADException {
         //        return RealType.getRealType(vname);
-        return new RealTupleType(RealType.getRealType(vname));
+        return new RealTupleType(DataUtil.makeRealType(vname, u));
     }
 
     /**
@@ -1927,7 +1950,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         Trace.call1("   getRHI");
         Trace.call1("   getRHI.setup");
         RadialDatasetSweep.RadialVariable sweepVar =
-            (RadialDatasetSweep.RadialVariable) rds.getDataVariable(varName);
+            getRadialVariable(varName);
         int       numberOfSweeps = sweepVar.getNumSweeps();
         int       numberOfRay    = getRayNumber(sweepVar);
 
@@ -2076,6 +2099,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                 domainVals[2][bi + bincounter] = upperElev;
                 signalVals[0][bi + bincounter] = values[ti][bi];
             }
+            Unit          u               = getUnit(sweepVar);
 
             RealTupleType radarDomainType = makeDomainType3D();
             GriddedSet domainSet = new Gridded3DSet(radarDomainType,
@@ -2086,14 +2110,11 @@ public class CDMRadarAdapter implements RadarAdapter {
                                            CommonUnit.degree,
                                            CommonUnit.degree }, null, false);
             FunctionType functionType = new FunctionType(radarDomainType,
-                                            getMomentType(varName));
+                                            getMomentType(varName, u));
 
             retField = new FlatField(functionType, domainSet,
                                      (CoordinateSystem) null, (Set[]) null,
-                                     (moment != REFLECTIVITY)
-                                     ? new Unit[] {
-                                         CommonUnit.meterPerSecond }
-                                     : (Unit[]) null);
+                                     new Unit[] { u });
             retField.setSamples(signalVals, false);
 
             if (tc == 0) {
@@ -2137,7 +2158,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         Trace.call1("   getRHI");
         Trace.call1("   getRHI.setup");
         RadialDatasetSweep.RadialVariable sweepVar =
-            (RadialDatasetSweep.RadialVariable) rds.getDataVariable(varName);
+            getRadialVariable(varName);
 
         Object[] cut            = getCutIdx(sweepVar);
         int      numberOfSweeps = cut.length;
@@ -2291,6 +2312,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                 domainVals[2][bi + bincounter] = upperElev;
                 signalVals[0][bi + bincounter] = values[ti][bi];
             }
+            Unit          u               = getUnit(sweepVar);
 
             RealTupleType radarDomainType = makeDomainType3D();
             GriddedSet domainSet = new Gridded3DSet(radarDomainType,
@@ -2301,14 +2323,11 @@ public class CDMRadarAdapter implements RadarAdapter {
                                            CommonUnit.degree,
                                            CommonUnit.degree }, null, false);
             FunctionType functionType = new FunctionType(radarDomainType,
-                                            getMomentType(varName));
+                                            getMomentType(varName, u));
 
             retField = new FlatField(functionType, domainSet,
                                      (CoordinateSystem) null, (Set[]) null,
-                                     (moment != REFLECTIVITY)
-                                     ? new Unit[] {
-                                         CommonUnit.meterPerSecond }
-                                     : (Unit[]) null);
+                                     new Unit[] { u });
             retField.setSamples(signalVals, false);
 
             if (tc == 0) {
@@ -2745,7 +2764,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             return null;
         }
         RadialDatasetSweep.RadialVariable sweepVar =
-            (RadialDatasetSweep.RadialVariable) rds.getDataVariable(varName);
+            getRadialVariable(varName);
         RadialDatasetSweep.Sweep varSweep   = sweepVar.getSweep(sweepNum);
         int                      numRadials = varSweep.getRadialNumber();
         int                      numGates   = varSweep.getGateNumber();
@@ -2853,6 +2872,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                 domainVals[2][bi + bincounter] = upperElev;
                 signalVals[0][bi + bincounter] = values[ti][bi];
             }
+            Unit          u               = getUnit(sweepVar);
 
             RealTupleType radarDomainType = makeDomainType3D();
             GriddedSet domainSet = new Gridded3DSet(radarDomainType,
@@ -2861,11 +2881,11 @@ public class CDMRadarAdapter implements RadarAdapter {
                                        new Unit[] { CommonUnit.meter,
                     CommonUnit.degree, CommonUnit.degree }, null, false);
             FunctionType functionType = new FunctionType(radarDomainType,
-                                            getMomentType(varName));
+                                            getMomentType(varName, u));
 
             retField = new FlatField(functionType, domainSet,
                                      (CoordinateSystem) null, (Set[]) null,
-                                     (Unit[]) null);
+                                     new Unit[] { u });
             retField.setSamples(signalVals, false);
 
             if (tc == 0) {
@@ -2931,7 +2951,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             return null;
         }
         RadialDatasetSweep.RadialVariable sweepVar =
-            (RadialDatasetSweep.RadialVariable) rds.getDataVariable(varName);
+            getRadialVariable(varName);
         RadialDatasetSweep.Sweep varSweep   = sweepVar.getSweep(sweepNum);
         int                      numRadials = varSweep.getRadialNumber();
         int                      numGates   = varSweep.getGateNumber();
@@ -3099,7 +3119,8 @@ public class CDMRadarAdapter implements RadarAdapter {
                                 numGates, numRadials + 2,
                                 tt.getCoordinateSystem(), domUnits2d,
                                 (ErrorEstimate[]) null, false, false);
-        FunctionType sweepType = new FunctionType(tt, getMomentType(varName));
+        FunctionType sweepType = new FunctionType(tt,
+                                     getMomentType(varName, u));
 
         retField = new FlatField(sweepType, set, (CoordinateSystem) null,
                                  (Set[]) null, new Unit[] { u });
@@ -3281,7 +3302,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         // String varName = pType.getName();
         RadialDatasetSweep.RadialVariable sweepVar =
-            (RadialDatasetSweep.RadialVariable) rds.getDataVariable(varName);
+            getRadialVariable(varName);
         int      numberOfSweeps;  //= sweepVar.getNumSweeps();
         int      numberOfRay = getRayNumber(sweepVar);
         int      gates       = getGateNumber(sweepVar);
@@ -3455,6 +3476,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         // sorting all data as azimuths should start from small to large
         //        Trace.call1("making gridded3d set");
         Unit u = getUnit(sweepVar);
+        //System.out.println("unit = " + u);
 
         // radarDomain3d  = makeDomainType3D((float)range_step, (float)range_to_first_gate);
 
@@ -3467,7 +3489,8 @@ public class CDMRadarAdapter implements RadarAdapter {
         GriddedSet set = new Gridded3DSet(tt, domainVals, gates, numberOfRay,
                                           numberOfSweeps, null, domUnits3d,
                                           null, false, false);
-        FunctionType sweepType = new FunctionType(tt, getMomentType(varName));
+        FunctionType sweepType = new FunctionType(tt,
+                                     getMomentType(varName, u));
 
         retField = new CachedFlatField(sweepType, set,
                                        (CoordinateSystem) null, (Set[]) null,
@@ -3511,7 +3534,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         // String varName = pType.getName();
         RadialDatasetSweep.RadialVariable sweepVar =
-            (RadialDatasetSweep.RadialVariable) rds.getDataVariable(varName);
+            getRadialVariable(varName);
         int      numberOfSweeps;  //= sweepVar.getNumSweeps();
         int      numberOfRay = getRayNumber(sweepVar);
         int      gates       = getGateNumber(sweepVar);
@@ -3675,7 +3698,8 @@ public class CDMRadarAdapter implements RadarAdapter {
         GriddedSet set = new Gridded3DSet(tt, domainVals, gates, numberOfRay,
                                           numberOfSweeps, null, domUnits3d,
                                           null, false, false);
-        FunctionType sweepType = new FunctionType(tt, getMomentType(varName));
+        FunctionType sweepType = new FunctionType(tt,
+                                     getMomentType(varName, u));
 
         retField = new CachedFlatField(sweepType, set,
                                        (CoordinateSystem) null, (Set[]) null,
@@ -3822,7 +3846,16 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     }
 
-
+    /**
+     * Get the radial variable from the name
+     * @param varName either the RealType name or the variable name
+     * @return the name or null
+     */
+    private RadialDatasetSweep.RadialVariable getRadialVariable(
+            String varName) {
+        return (RadialDatasetSweep.RadialVariable) rds.getDataVariable(
+            Util.cleanTypeName(varName));
+    }
 
 
 

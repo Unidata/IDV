@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.radar;
 
 
@@ -94,7 +95,7 @@ public class CDMRadarDataSource extends RadarDataSource {
     /** station */
     private NamedStation namedStation = null;
 
-    /** _more_          */
+    /** _more_ */
     private boolean isRHI = false;
 
     /**
@@ -205,9 +206,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                     DateUnit.getStandardOrISO((String) timeSpan.get(1));
                 List collectionTimes =
                     collection.getRadarStationTimes(query.getStation(),
-                        query.getProduct(),
-                        fromDate,
-                        toDate);
+                        query.getProduct(), fromDate, toDate);
                 /*
                 if(collectionTimes.size() == 0)  {
                     List collectionTimes =
@@ -300,8 +299,10 @@ public class CDMRadarDataSource extends RadarDataSource {
         //
         try {
             for (int i = 0; i < paramTypes.length; i++) {
-                String paramName =
-                    Util.cleanTypeName(paramTypes[i].getName());
+                // internally used name
+                String rtName = paramTypes[i].getName();
+                //  what the user sees
+                String  paramName = Util.cleanTypeName(rtName);
                 Integer momentObj = new Integer(i);
 
                 // String  momentName = moments[i];
@@ -360,7 +361,7 @@ public class CDMRadarDataSource extends RadarDataSource {
 
                     momentChoice = new CompositeDataChoice(
                         this, new ObjectArray(
-                            momentObj, paramName, paramName, RadarConstants
+                            momentObj, paramName, rtName, RadarConstants
                                 .VALUE_3D), stationID + " "
                                     + paramName, paramName, categories, compositeProperties);
                 } else {
@@ -373,7 +374,7 @@ public class CDMRadarDataSource extends RadarDataSource {
 
                     momentChoice = new CompositeDataChoice(
                         this, new ObjectArray(
-                            momentObj, paramName, paramName, RadarConstants
+                            momentObj, paramName, rtName, RadarConstants
                                 .VALUE_3D), stationID + " "
                                     + paramName, paramName, categories, compositeProperties);
                 }
@@ -415,7 +416,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                             new DirectDataChoice(
                                 this, new ObjectArray(
                                     momentObj, new Double(
-                                        angles[j]), paramName, RadarConstants.VALUE_2D), stationID
+                                        angles[j]), rtName, RadarConstants.VALUE_2D), stationID
                                             + " " + paramName, paramName
                                                 + " " + name, categories2D, dataChoiceProperties));
                     }
@@ -438,7 +439,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                             new DirectDataChoice(
                                 this, new ObjectArray(
                                     momentObj, new Double(
-                                        angles[j]), paramName, RadarConstants.VALUE_2D), stationID
+                                        angles[j]), rtName, RadarConstants.VALUE_2D), stationID
                                             + " " + paramName, paramName
                                                 + " " + name, categories2D, dataChoiceProperties));
                     }
