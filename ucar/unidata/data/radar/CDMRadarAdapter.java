@@ -1671,7 +1671,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             volume = false;
         } else if (isRHI) {
             volume = VALUE_VOLUME.equals(Misc.getProperty(requestProperties,
-                    PROP_AZIMUTH, VALUE_VOLUME));
+                    PROP_AZIMUTH, VALUE_SWEEP));
         } else {
             volume = VALUE_VOLUME.equals(Misc.getProperty(requestProperties,
                     PROP_VOLUMEORSWEEP, VALUE_VOLUME));
