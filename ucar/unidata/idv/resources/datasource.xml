@@ -114,10 +114,10 @@
   <datasource
      id="ImageGrid,opendap.Image"
      factory="ucar.unidata.data.grid.ImageGridDataSource"
-     patterns="\.gini$"
+     patterns="\.gini$,\.awx$"
      fileselection="true"
      doesmultiples="true"
-     label="Image files (AREA/GINI)">
+     label="Image Files (GINI/AWX)">
   </datasource>
 
   <datasource
