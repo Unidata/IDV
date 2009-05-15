@@ -48,7 +48,6 @@ import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.ui.TextSearcher;
 
 import ucar.unidata.util.CacheManager;
-import ucar.unidata.util.TwoFacedObject;
 
 
 import ucar.unidata.util.CatalogUtil;
@@ -63,6 +62,7 @@ import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.ThreeDSize;
 import ucar.unidata.util.Trace;
+import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.WrapperException;
 
 import ucar.unidata.xml.*;
@@ -904,7 +904,7 @@ public class GeoGridDataSource extends GridDataSource {
             Integer timeSize =
                 (Integer) dataChoice.getProperty(PROP_TIMESIZE);
             if (size != null) {
-                long          total     = size.getSizeY() * size.getSizeX();
+                long         total     = size.getSizeY() * size.getSizeX();
                 StringBuffer theSb     = null;
                 String       sizeEntry = null;
                 if (size.getSizeZ() > 1) {
@@ -1267,7 +1267,7 @@ public class GeoGridDataSource extends GridDataSource {
             int    fromLevelIndex = -1;
             int    toLevelIndex   = -1;
             if ((fromLevel != null) && (toLevel != null)) {
-               long t1 = System.currentTimeMillis();
+                long t1 = System.currentTimeMillis();
                 List allLevels =
                     getAllLevels(dataChoice,
                                  new DataSelection(GeoSelection.STRIDE_BASE));
@@ -1375,7 +1375,9 @@ public class GeoGridDataSource extends GridDataSource {
                 filename.append("_r_" + fromLevelIndex + "_" + toLevelIndex);
             }
 
-            if (geoSelection != null && (geoSelection.hasSpatialSubset() || geoSelection.getHasNonOneStride())) {
+            if ((geoSelection != null)
+                    && (geoSelection.hasSpatialSubset()
+                        || geoSelection.getHasNonOneStride())) {
                 //TODO: We should determine the size of the subset grid and use that.
                 readingFullGrid = false;
                 //System.err.println("subsetting using:" + geoSelection.getLatLonRect());
@@ -1387,7 +1389,9 @@ public class GeoGridDataSource extends GridDataSource {
                 filename.append("_y_" + geoSelection.getYStrideToUse());
                 filename.append("_z_" + geoSelection.getZStrideToUse());
                 if (geoSelection.getLatLonRect() != null) {
-                    filename.append("_rect_" + geoSelection.getLatLonRect());
+                    filename.append(
+                        "_rect_"
+                        + cleanBBoxName(geoSelection.getLatLonRect()));
                 }
                 // Z stride is ignored if
                 if ((levelRange != null) && geoSelection.hasZStride()
@@ -1444,6 +1448,20 @@ public class GeoGridDataSource extends GridDataSource {
         return adapter;
     }
 
+    /**
+     * Clean up the bounding box name so it can be used in a file name.
+     * change : and + and any other strange chars to _
+     *
+     * @param bbox  bounding box
+     *
+     * @return  cleaned up name
+     */
+    private String cleanBBoxName(LatLonRect bbox) {
+        String name = Util.cleanName(bbox.toString());
+        name = name.replaceAll(":", "_");
+        name = name.replaceAll("\\+", "_");
+        return name;
+    }
 
     /**
      * Find the index of the given object in the list of levels. If its
@@ -1458,7 +1476,7 @@ public class GeoGridDataSource extends GridDataSource {
      */
     private int indexOf(Object o, List levels) throws VisADException {
         if (o instanceof TwoFacedObject) {
-            o = ((TwoFacedObject)o).getId();
+            o = ((TwoFacedObject) o).getId();
         }
 
 
