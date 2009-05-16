@@ -483,7 +483,7 @@ public class AddePointDataChooser extends AddeChooser {
     /**
      * Set the list of available times.
      */
-    protected void readTimes() {
+    public void readTimes() {
         clearTimesList();
         SortedSet uniqueTimes =
             Collections.synchronizedSortedSet(new TreeSet());

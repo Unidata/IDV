@@ -164,7 +164,7 @@ public class TDSRadarChooser extends TimesChooser {
      */
     public void doUpdate() {
         if ((serverUrl == null) || (datasetList == null)
-                || (datasetList.size() == 0) || ( !haveSelectedProduct())) {
+                || (datasetList.size() == 0) || ( isLevel3 && !haveSelectedProduct())) {
             if (urlBox != null) {
                 setServer((String) urlBox.getSelectedItem());
             }
@@ -211,6 +211,7 @@ public class TDSRadarChooser extends TimesChooser {
      * @return true if we have a product and it's not the SELECT one
      */
     private boolean haveSelectedProduct() {
+        if (!isLevel3) return true;
         return (selectedProduct != null)
                && !selectedProduct.equals(SELECT_OBJECT);
     }
@@ -358,11 +359,11 @@ public class TDSRadarChooser extends TimesChooser {
      * @param s the server URL
      */
     private void setServer(String s) {
-        datasetList = new ArrayList();
         serverUrl   = s;
+        datasetList = new ArrayList();
         try {
-            List collections = getRadarCollections(serverUrl);
-            GuiUtils.setListData(collectionSelector, collections);
+            datasetList = getRadarCollections(serverUrl);
+            GuiUtils.setListData(collectionSelector, datasetList);
         } catch (Exception e) {
             GuiUtils.setListData(collectionSelector, new ArrayList());
         }
@@ -628,11 +629,12 @@ public class TDSRadarChooser extends TimesChooser {
      *  Do what needs to be done to read in the times.  Subclasses
      *  need to implement this.
      */
-    protected void readTimes() {
+    public void readTimes() {
         Vector<DateTime> times = new Vector<DateTime>();
-        if ((( !isLevel3 && (selectedStation != null))
+        if (getDoAbsoluteTimes()) {
+        if (( !isLevel3 && (selectedStation != null))
                 || (isLevel3 && (selectedStation != null)
-                    && (haveSelectedProduct()))) && getDoAbsoluteTimes()) {
+                    && (haveSelectedProduct()))) {
             List timeSpan = collection.getRadarTimeSpan();
             Date fromDate =
                 DateUnit.getStandardOrISO((String) timeSpan.get(0));
@@ -685,6 +687,7 @@ public class TDSRadarChooser extends TimesChooser {
                 showNormalCursor();
                 return;
             }
+        }
         }
         setAbsoluteTimes(times);
     }

@@ -213,7 +213,7 @@ public class AddeProfilerDataChooser extends AddeChooser {
      * Set the list of available times;
      * use adde request to a station to find times of data available now.
      */
-    protected void readTimes() {
+    public void readTimes() {
         setState(STATE_CONNECTING);
         StringBuffer buf = getGroupUrl(REQ_POINTDATA, GROUP);
 

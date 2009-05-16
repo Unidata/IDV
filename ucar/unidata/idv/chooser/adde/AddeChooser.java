@@ -1110,7 +1110,7 @@ public class AddeChooser extends TimesChooser {
      *  Do what needs to be done to read in the times.  Subclasses
      *  need to implement this.
      */
-    protected void readTimes() {}
+    public void readTimes() {}
 
 
     /**

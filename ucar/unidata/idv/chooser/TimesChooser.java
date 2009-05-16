@@ -334,9 +334,9 @@ public class TimesChooser extends IdvChooser {
 
     /**
      *  Do what needs to be done to read in the times.  Subclasses
-     *  need to implement this.
+     *  need to implement this.  This is public by implementation only
      */
-    protected void readTimes() {}
+    public void readTimes() {}
 
 
     /**
@@ -444,7 +444,7 @@ public class TimesChooser extends IdvChooser {
                 }
                 doAbsoluteTimes = currentAbs;
                 if (doAbsoluteTimes && !haveAnyTimes()) {
-                    readTimes();
+                    Misc.run(TimesChooser.this, "readTimes");
                 } 
                 updateStatus();
                 enableWidgets();

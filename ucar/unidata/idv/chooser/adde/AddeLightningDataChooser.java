@@ -177,7 +177,7 @@ public class AddeLightningDataChooser extends AddePointDataChooser {
     /**
      * Set the list of available times.
      */
-    protected void readTimes() {
+    public void readTimes() {
         clearTimesList();
         ArrayList uniqueTimes = new ArrayList();
 
@@ -187,7 +187,7 @@ public class AddeLightningDataChooser extends AddePointDataChooser {
             int      numTimes   = (int) (24f / hours);
             DateTime currentDay = new DateTime(new Date());
             int day = Integer.parseInt(UtcDate.formatUtcDate(currentDay,
-                          "yyyyMMdd"));
+                          "yyyyDDD"));
             for (int i = 0; i < numTimes; i++) {
                 int hour = McIDASUtil.mcDoubleToPackedInteger(i * hours);
                 try {
