@@ -5,11 +5,22 @@
      fileselection="true"
      factory="ucar.unidata.data.storm.STIStormDataSource"
      label="STI Storm Data"/>
+
  <datasource
      id="STORM.DIAMOND7"
      fileselection="true"
      standalone="true"
      factory="ucar.unidata.data.storm.Diamond7StormDataSource"
      label="Diamond 7 Tropical Storm Data"/>
+
+<datasource
+     id="ImageGrid.AWX"
+     factory="ucar.unidata.data.grid.ImageGridDataSource"
+     patterns="\.AWX$, \.awx$"
+     fileselection="true"
+     doesmultiples="true"
+     label="AWX Image files (AWX)"/>
+
+
 
 </datasources>
