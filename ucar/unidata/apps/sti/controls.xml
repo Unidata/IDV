@@ -2,8 +2,8 @@
 <controls>
 
 <control
-   id="stormintesitydisplay"
-   categories="IMAGE-*-*"
+   id="stormintensitydisplay"
+   categories="IMAGE-2D-*"
    class="ucar.unidata.idv.control.storm.StormIntensityControl"
    label="Storm Intensity"
    displaycategory="Probe"
