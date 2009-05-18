@@ -26,6 +26,7 @@ package ucar.unidata.idv.control.storm;
 import ucar.unidata.data.*;
 import ucar.unidata.data.imagery.AddeImageDescriptor;
 import ucar.unidata.data.imagery.ImageDataSource;
+import ucar.unidata.data.imagery.AddeImageDataSource;
 import ucar.unidata.data.storm.StormADOT;
 import ucar.unidata.data.storm.StormADOTUtil;
 import ucar.unidata.data.storm.StormADOTInfo;
@@ -422,17 +423,30 @@ public class StormIntensityControl extends DisplayControlImpl {
             Set timeSet = anime.getSet();
             int pos     = anime.getCurrent();
             ffield = DataUtil.getFlatField(de.getData());
+            DataSourceImpl dsi = (DataSourceImpl) sources.get(0);
 
-            ImageDataSource dds = (ImageDataSource)sources.get(0);
-            List imageLists =      dds.getImageList();
+            if(dsi instanceof AddeImageDataSource)   {
+                ImageDataSource dds = (ImageDataSource)sources.get(0);
+                List imageLists =      dds.getImageList();
 
-            AddeImageDescriptor aid =  (AddeImageDescriptor)imageLists.get(pos);
-            AreaDirectory ad = aid.getDirectory();
-            sid = ad.getSensorID();
-            int [] bands = ad.getBands();
-            channel = bands[0];
+                AddeImageDescriptor aid =  (AddeImageDescriptor)imageLists.get(pos);
+                AreaDirectory ad = aid.getDirectory();
+                sid = ad.getSensorID();
+                int [] bands = ad.getBands();
+                channel = bands[0];
 
-            isTemp = Util.isCompatible(ffield, AirTemperature.getRealType());
+                isTemp = Util.isCompatible(ffield, AirTemperature.getRealType());
+            } else {
+                channel = 4;
+                sid = 70;
+                String name = ffield.getSample(0).getType().prettyString();
+                if(!name.contains("IR")) {
+                    text = "Storm intensity analysis only running over Infrared field";
+                    textComp.setText(text);
+                    return;
+                }
+            }
+
             timeTuple = DataUtility.getSample(timeSet, pos);
             tt = (Real) timeTuple.getComponent(0);
             dat = new DateTime(tt);
