@@ -324,12 +324,18 @@ public class CDMRadarAdapter implements RadarAdapter {
 
 
             if (sweepMode != null) {
-                int mode = sweepMode.getNumericValue().intValue();
-                if (mode == 3) {
-                    isRHI = true;
+                Number nmode = sweepMode.getNumericValue();
+                String smode = sweepMode.getStringValue();
+                if(nmode != null) {
+                    int mode = sweepMode.getNumericValue().intValue();
+                    if (mode == 3) {
+                        isRHI = true;
+                    }
+                } else if (smode != null) {
+                    if(smode.equals("3") )
+                        isRHI = true;
                 }
-            }
-            if (vcp.equalsIgnoreCase("RHI")) {
+            } else if (vcp.equalsIgnoreCase("RHI")) {
                 isRHI = true;
             }
 
