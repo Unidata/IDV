@@ -64,4 +64,9 @@
        p1="GridRelative_u_fhg"
        p2="GridRelative_v_fhg"/>
   </paramgroup>
+  <paramgroup name="speed_and_dir">
+    <params
+       p1="SPEED"
+       p2="DIR"/>
+  </paramgroup>
 </paramgroups>

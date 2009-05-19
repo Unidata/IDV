@@ -148,6 +148,7 @@ or
     </categories>
     <operands categories="GRID-2D-*;GRID-3D-*;">
       <paramgroup name="u_and_v"/>
+      <paramgroup name="speed_and_dir"/>
     </operands>
   </derived>
   <derived
