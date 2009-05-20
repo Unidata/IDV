@@ -43,10 +43,7 @@ type analyses.
 
 {{Search Radius} {
 Set the search radius (in grid units) for the weighting of points in
-determining the value at a specific grid point. Should be in the range 
-0.2 to 1.0. Data are fitted more closely with a gain of 0.2 
-(at the expense of less overall accuracy over the entire grid); larger
-values smooth more.
+determining the value at a specific grid point. 
 }}
 
 
@@ -57,6 +54,13 @@ fitted more closely with a gain of 0.2 (at the expense
 of less overall accuracy over the entire grid); larger
 values smooth more. Suggested default: 1.0f
 Set the gain for each pass after the first.
+}}
+
+{{First Guess Field} {
+You can use a model grid as a first guess field for the analysis.
+Select the &quot;Grid Parameters (with first guess)&quot; field
+and you will be prompted to select the gridded field to use for the
+first guess.
 }}
 
 {{References} {
