@@ -177,7 +177,7 @@ def lav(S,level1,level2):
   return layerAverage(S,level1,level2);
 
 def ldf(S,level1,level2):
-  """ Layer Average 
+  """ Layer Difference 
   <div class=jython>
       LDF ( S ) = S (level1) - S (level2)
   </div>
