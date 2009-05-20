@@ -128,7 +128,7 @@ public class ChooserPanel extends JPanel implements ActionListener {
     /** _more_ */
     protected boolean simpleMode = false;
 
-
+    private String messageTemplate;
 
     /**
      * Construct an object for selecting a data source from
@@ -137,6 +137,17 @@ public class ChooserPanel extends JPanel implements ActionListener {
     public ChooserPanel() {
         changeListeners = new PropertyChangeSupport(this);
     }
+
+
+
+    public  void setMessageTemplate(String template) {
+        this.messageTemplate = template;
+    }
+
+    protected String getMessageTemplate() {
+        return messageTemplate;
+    }
+
 
     /**
      * Adds a PropertyChangeListener.
@@ -219,6 +230,10 @@ public class ChooserPanel extends JPanel implements ActionListener {
      * @param compId _more_
      */
     public void setStatus(String msg, String compId) {
+        String template = getMessageTemplate();
+        if(template!=null) {
+            msg = template.replace("${message}",msg);
+        }
         getStatusLabel().setText(msg);
         if ( !getSimpleMode()) {
             return;
@@ -256,8 +271,19 @@ public class ChooserPanel extends JPanel implements ActionListener {
 
         }
         statusLabel.setOpaque(true);
-        statusLabel.setBackground(new Color(255, 255, 204));
+        statusLabel.setForeground(getStatusLabelForeground());
+        statusLabel.setBackground(getStatusLabelBackground());
         return statusLabel;
+    }
+
+
+    public Color getStatusLabelBackground() {
+        return new Color(255, 255, 204);
+    }
+
+
+    public Color getStatusLabelForeground() {
+        return Color.BLACK;
     }
 
 
@@ -269,8 +295,9 @@ public class ChooserPanel extends JPanel implements ActionListener {
     protected JComponent getStatusComponent() {
         if (statusComp == null) {
             JLabel statusLabel = getStatusLabel();
-            statusComp = GuiUtils.inset(statusLabel, 2);
-            statusComp.setBackground(new Color(255, 255, 204));
+            statusComp = GuiUtils.inset(statusLabel, new Insets(3,2,1,0));
+            statusComp.setBackground(getStatusLabelBackground());
+            statusComp = GuiUtils.inset(statusComp, new Insets(2,2,2,2));
         }
         return statusComp;
     }
