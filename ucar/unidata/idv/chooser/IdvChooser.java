@@ -293,6 +293,8 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
         buttons =  decorateButtons(buttons);
         buttons = GuiUtils.right(buttons);
         buttons = GuiUtils.vbox(GuiUtils.right(GuiUtils.inset(getStatusComponent(), new Insets(0,0,0,5))), buttons);
+
+        //        buttons = GuiUtils.vbox(GuiUtils.inset(getStatusComponent(), new Insets(0,0,0,5)), buttons);
         return buttons;
     }
 
