@@ -41,7 +41,7 @@
         <idv.choosers  title="Data Choosers" icon="/auxdata/ui/icons/DataChooser24.gif" intabs="false" usepref="true"/>
 -->
 
-        <idv.choosers  title="Data Choosers" icon="/auxdata/ui/icons/DataChooser24.gif" intabs="true" usepref="true"/>
+        <idv.choosers  title="Data Choosers" icon="/auxdata/ui/icons/DataChooser24.gif"  usepref="true"/>
         <idv.dataselector title="Field Selector" icon="/auxdata/ui/icons/FieldSelector24.gif" id="idv.dataselector" usepref="true"/>
         <idv.viewpanel title="Displays" icon="/auxdata/ui/icons/Displays24.gif" usepref="true" /> 
 
