@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.view.sounding;
 
 
@@ -119,7 +120,9 @@ public class SoundingFileBrowser {
         propertySet.addProperty(soundingAdapterProperty =
             new NonVetoableProperty(this, "soundingAdapter"));
 
-        File selectedFile = new File(directoryName);
+        File selectedFile = new File((directoryName != null)
+                                     ? directoryName
+                                     : ".");
 
 
         selectedFileDisplay = new JTextField(30);

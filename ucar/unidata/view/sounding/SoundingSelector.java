@@ -24,7 +24,11 @@
 
 
 
+
 package ucar.unidata.view.sounding;
+
+
+import org.w3c.dom.Element;
 
 
 import ucar.unidata.beans.NonVetoableProperty;
@@ -38,15 +42,15 @@ import ucar.unidata.data.sounding.SoundingStation;
 
 import ucar.unidata.gis.mcidasmap.McidasMap;
 
-import ucar.unidata.idv.chooser.IdvChooser;
+import ucar.unidata.idv.chooser.*;
+import ucar.unidata.idv.chooser.adde.AddeChooser;
+import ucar.unidata.idv.chooser.adde.AddeServer;
 
 import ucar.unidata.metdata.Station;
 
 
 
 import ucar.unidata.ui.ChooserPanel;
-import ucar.unidata.idv.chooser.adde.AddeChooser;
-import ucar.unidata.idv.chooser.adde.AddeServer;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
@@ -55,11 +59,11 @@ import ucar.unidata.util.PreferenceList;
 import ucar.unidata.view.CompositeRenderer;
 import ucar.unidata.view.geoloc.NavigatedPanel;
 import ucar.unidata.view.station.StationLocationMap;
+import ucar.unidata.xml.XmlUtil;
 
 import visad.DateTime;
 
 import visad.FlatField;
-
 
 
 import java.awt.*;
@@ -100,7 +104,7 @@ import javax.swing.event.ListSelectionListener;
  *  @author Don Murray Unidata/UCAR
  *  @version $Id: SoundingSelector.java,v 1.59 2007/07/05 18:46:15 jeffmc Exp $
  */
-public class SoundingSelector extends ChooserPanel {
+public class SoundingSelector extends IdvChooser {
 
     /** _more_ */
     private IdvChooser idvChooser;
@@ -142,8 +146,9 @@ public class SoundingSelector extends ChooserPanel {
     private SoundingFileBrowser fileBrowser = null;
 
 
-    /** _more_          */
+    /** _more_ */
     AddeChooser addeChooser;
+
 
     /** dataset group selector */
     private JComboBox groupSelector;
@@ -165,6 +170,26 @@ public class SoundingSelector extends ChooserPanel {
 
     /** flag for server vs. file */
     private boolean showMainHoursOnly = true;
+
+
+    /**
+     * _more_
+     *
+     * @param idvChooser _more_
+     * @param mgr _more_
+     * @param chooserNode _more_
+     */
+    public SoundingSelector(IdvChooser idvChooser, IdvChooserManager mgr,
+                            Element chooserNode) {
+        super(mgr, chooserNode);
+        this.idvChooser = idvChooser;
+        this.servers =
+            idvChooser.getPreferenceList(idvChooser.PREF_ADDESERVERS);
+        this.forServer = XmlUtil.getAttribute(chooserNode,
+                RaobChooser.ATTR_SHOWSERVER, true);
+        this.multipleSelect = true;
+    }
+
 
 
     /**
@@ -245,6 +270,8 @@ public class SoundingSelector extends ChooserPanel {
              multipleSelect);
     }
 
+    /** _more_          */
+    private String directoryName;
 
     /**
      * Construct an object for selecting sounding files starting at
@@ -261,21 +288,62 @@ public class SoundingSelector extends ChooserPanel {
     public SoundingSelector(IdvChooser idvChooser, PreferenceList servers,
                             String directoryName, String serverName,
                             boolean forServer, boolean multipleSelect) {
-
+        super(idvChooser.getIdv(), idvChooser.getXmlNode());
+        this.directoryName  = directoryName;
         this.idvChooser     = idvChooser;
         this.forServer      = forServer;
         this.servers        = servers;
         this.multipleSelect = multipleSelect;
-        fileBrowser         = new SoundingFileBrowser(directoryName);
-        fileBrowser.addPropertyChangeListener("soundingAdapter",
-                new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                setSoundingAdapter((SoundingAdapter) evt.getNewValue());
-            }
-        });
-
-
     }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    private SoundingFileBrowser getFileBrowser() {
+        if (fileBrowser == null) {
+            fileBrowser = new SoundingFileBrowser(directoryName);
+            fileBrowser.addPropertyChangeListener("soundingAdapter",
+                    new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent evt) {
+                    setSoundingAdapter((SoundingAdapter) evt.getNewValue());
+                }
+            });
+        }
+        return fileBrowser;
+    }
+
+
+    /**
+     * _more_
+     */
+    public void updateStatus() {
+        if (getHaveData()) {
+            setStatus("Press \"" + CMD_LOAD
+                      + "\" to load the selected sounding data", "buttons");
+            return;
+        }
+
+        if (forServer) {
+            if (soundingAdapter == null) {
+                setStatus("Please connect to the server");
+            } else {
+                setStatus("Select one or more soundings");
+            }
+
+        } else {
+            if (soundingAdapter == null) {
+                setStatus("Select a sounding file");
+            } else {
+                setStatus("Select one or more soundings");
+            }
+
+
+        }
+    }
+
 
     /**
      * _more_
@@ -291,7 +359,14 @@ public class SoundingSelector extends ChooserPanel {
         List servers =
             idvChooser.getIdv().getIdvChooserManager().getAddeServers(
                 AddeServer.TYPE_ANY);
-        addeChooser = new AddeChooser(idvChooser.getIdv().getIdvChooserManager(),null);
+        addeChooser =
+            new AddeChooser(idvChooser.getIdv().getIdvChooserManager(),
+                            null) {
+            public void setStatus(String message, String from) {
+                System.err.println("status:" + message);
+                SoundingSelector.this.setStatus(message, from);
+            }
+        };
         groupSelector = GuiUtils.getEditableBox(Misc.newList("RTPTSRC"),
                 null);
 
@@ -318,7 +393,7 @@ public class SoundingSelector extends ChooserPanel {
             });
         } else {
             selectorPanel = GuiUtils.hbox(GuiUtils.rLabel("File: "),
-                                          fileBrowser.getContents());
+                                          getFileBrowser().getContents());
         }
         selectorPanel = GuiUtils.inset(GuiUtils.leftCenter(selectorPanel,
                 GuiUtils.filler()), 4);
@@ -397,13 +472,10 @@ public class SoundingSelector extends ChooserPanel {
         */
         middlePanel.add(stationMap, BorderLayout.CENTER);
         JComponent buttons = getDefaultButtons();
-        if (idvChooser != null) {
-            buttons = idvChooser.decorateButtons(buttons);
-        }
-
+        //        if (idvChooser != null) {
+        //            buttons = idvChooser.decorateButtons(buttons);
+        //        }
         return GuiUtils.topCenterBottom(topPanel, middlePanel, buttons);
-
-
     }
 
 
@@ -450,6 +522,7 @@ public class SoundingSelector extends ChooserPanel {
      */
     private void checkLoadData() {
         setHaveData(obsList.getModel().getSize() > 0);
+        updateStatus();
     }
 
     /**
@@ -588,6 +661,7 @@ public class SoundingSelector extends ChooserPanel {
                 showWaitCursor();
                 try {
                     if (forceNewAdapter) {
+                        setStatus("Connecting to the server: " + getServer());
                         AddeSoundingAdapter newAdapter =
                             new AddeSoundingAdapter(getServer(),
                                 getMandatoryDataset(), getSigLevelDataset(),
@@ -597,7 +671,8 @@ public class SoundingSelector extends ChooserPanel {
                         }
                         soundingAdapter = null;
                         setSoundingAdapter(newAdapter);
-                    } else if(soundingAdapter!=null) {
+                    } else if (soundingAdapter != null) {
+                        setStatus("Connecting to the server: " + getServer());
                         List times = getSelectedTimes();
                         soundingAdapter.update();
                         setStations();
@@ -605,6 +680,8 @@ public class SoundingSelector extends ChooserPanel {
                     }
                 } catch (Exception exc) {
                     LogUtil.logException("Updating sounding data", exc);
+                } finally {
+                    updateStatus();
                 }
                 showNormalCursor();
             }
