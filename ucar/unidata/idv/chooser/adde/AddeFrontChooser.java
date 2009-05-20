@@ -140,8 +140,14 @@ public class AddeFrontChooser extends AddeChooser {
 
         JComponent buttons = getDefaultButtons();
         setHaveData(true);
-        return GuiUtils.topLeft(GuiUtils.vbox(GuiUtils.doLayout(comps, 2, GuiUtils.WT_NY,
-                GuiUtils.WT_N), buttons));
+        JComponent contents = GuiUtils.formLayout(comps);
+        return GuiUtils.topLeft(GuiUtils.vbox(contents, buttons));
+    }
+
+
+    public void setStatus(String msg, String what) {
+        super.setStatus("Press \"" + CMD_LOAD
+                        + "\" to load the selected front data", "buttons");
     }
 
 

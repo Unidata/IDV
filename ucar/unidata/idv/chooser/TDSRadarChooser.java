@@ -322,9 +322,12 @@ public class TDSRadarChooser extends TimesChooser {
         GuiUtils.enableComponents(compsThatNeedServer, false);
         GuiUtils.enableComponents(level3CompsThatNeedServer, false);
         showProductWidgets(false);
-        outerContents =
+        /*        outerContents =
             GuiUtils.center(GuiUtils.topCenterBottom(getStatusComponent(),
-                contents, buttons));
+            contents, buttons));*/
+
+        outerContents =
+            GuiUtils.center(GuiUtils.centerBottom(contents, buttons));
         return outerContents;
     }
 

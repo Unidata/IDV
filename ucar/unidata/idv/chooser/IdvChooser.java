@@ -95,6 +95,11 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     /** Where we get the maps       */
     public static final String PROP_CHOOSER_MAPS = "idv.chooser.maps";
 
+    public static final String PROP_STATUS_FOREGROUND = "idv.chooser.status.foreground";
+    public static final String PROP_STATUS_BACKGROUND = "idv.chooser.status.background";
+    public static final String PROP_STATUS_TEMPLATE = "idv.chooser.status.template";
+
+
     /** Where we get the projection bounds       */
     public static final String PROP_CHOOSER_PROJECTION_BOUNDS =
         "idv.chooser.projection.bounds";
@@ -248,6 +253,7 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
             id = "noid";
         }
 
+        setMessageTemplate(this.idv.getProperty(PROP_STATUS_TEMPLATE,(String)null));
         init();
 
     }
@@ -284,7 +290,10 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      */
     public JComponent getDefaultButtons(ActionListener listener) {
         JComponent buttons = super.getDefaultButtons(listener);
-        return decorateButtons(buttons);
+        buttons =  decorateButtons(buttons);
+        buttons = GuiUtils.right(buttons);
+        buttons = GuiUtils.vbox(GuiUtils.right(GuiUtils.inset(getStatusComponent(), new Insets(0,0,0,5))), buttons);
+        return buttons;
     }
 
     /**
@@ -1177,6 +1186,18 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
         return prefList;
 
     }
+
+    public Color getStatusLabelBackground() {
+        return getIdv().getColorProperty(PROP_STATUS_BACKGROUND, super.getStatusLabelBackground());
+    }
+
+
+    public Color getStatusLabelForeground() {
+        return getIdv().getColorProperty(PROP_STATUS_FOREGROUND, super.getStatusLabelForeground());
+    }
+
+
+
 
 
 }

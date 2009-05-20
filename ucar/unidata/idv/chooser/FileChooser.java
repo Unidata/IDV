@@ -334,6 +334,7 @@ public class FileChooser extends IdvChooser {
         JComponent topComp = GuiUtils.doLayout(topComps, 2, GuiUtils.WT_N,
                                  GuiUtils.WT_N);
         topComp = GuiUtils.left(topComp);
+        setStatus("Please select a file");
         return GuiUtils.topCenter(topComp, filePanel);
     }
 
@@ -480,6 +481,19 @@ public class FileChooser extends IdvChooser {
                            || (selectedFiles.length == 0)));
         }
     }
+
+
+    public void setHaveData(boolean haveData) {
+        super.setHaveData(haveData);
+        if(haveData) {
+            setStatus("Press \"" + CMD_LOAD
+                              + "\" to load the selected file", "buttons");
+        } else {
+            setStatus("Please select a file");
+        }
+            
+    }
+
 
     /**
      * Should show the recent (time relative) component

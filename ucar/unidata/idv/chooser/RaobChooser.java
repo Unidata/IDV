@@ -25,6 +25,8 @@ package ucar.unidata.idv.chooser;
 
 import org.w3c.dom.Element;
 
+
+
 import ucar.unidata.data.sounding.RaobDataSet;
 
 import ucar.unidata.idv.*;
@@ -114,8 +116,8 @@ public class RaobChooser extends IdvChooser {
         boolean showServer = XmlUtil.getAttribute(chooserNode,
                                  ATTR_SHOWSERVER, true);
         soundingChooser = new SoundingSelector(this,
-                getPreferenceList(PREF_ADDESERVERS), showServer,
-                true /*multiple selection*/) {
+                                               chooserManager,
+                                               chooserNode) {
             public void doLoad() {
                 RaobChooser.this.doLoad();
             }
@@ -123,10 +125,9 @@ public class RaobChooser extends IdvChooser {
             public void doCancel() {
                 //                closeChooser();
             }
-
-        };
+            };
         initChooserPanel(soundingChooser);
-        return GuiUtils.left(soundingChooser.getContents());
+        return soundingChooser.getContents();
     }
 
 
