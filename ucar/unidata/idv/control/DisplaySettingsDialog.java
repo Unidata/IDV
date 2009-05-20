@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -53,8 +54,8 @@ import java.awt.event.*;
 
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.HashSet;
+import java.util.Hashtable;
 
 import java.util.List;
 import java.util.Vector;
@@ -81,7 +82,8 @@ public class DisplaySettingsDialog {
     private DisplayControlImpl display;
 
     /** The property values */
-    private List<PropertyValueWrapper> propertyValues = new ArrayList<PropertyValueWrapper>();
+    private List<PropertyValueWrapper> propertyValues =
+        new ArrayList<PropertyValueWrapper>();
 
     /** apply button */
     private JButton applyBtn;
@@ -102,7 +104,10 @@ public class DisplaySettingsDialog {
     private JComponent contents;
 
 
+    /** list of dipslays       */
     private JList displaysList;
+
+    /** list of saved settings     */
     private JList displaySettingsList;
 
     /**
@@ -197,10 +202,15 @@ public class DisplaySettingsDialog {
         if (dialog != null) {
             dialog.setTitle("Display Settings -- " + display.getTitle());
         }
+        if ((display != null) && (displaysList != null)) {
+            displaysList.setSelectedValue(display, true);
+        }
+
         updatePropertiesComponent();
     }
 
 
+    /** _more_          */
     private static HashSet logSeen = new HashSet();
 
     /**
@@ -214,55 +224,59 @@ public class DisplaySettingsDialog {
     protected void addPropertyValue(Object object, String propName,
                                     String label, String category) {
 
-        PropertyValue  propertyValue = new PropertyValue(propName, label, object, category);
+        PropertyValue propertyValue = new PropertyValue(propName, label,
+                                          object, category);
 
-        propertyValues.add(
-            new PropertyValueWrapper(
-                                     propertyValue));
+        propertyValues.add(new PropertyValueWrapper(propertyValue));
 
-        if(false && !logSeen.contains(propName)) {
+        if (false && !logSeen.contains(propName)) {
             logSeen.add(propName);
-            Object value = propertyValue.getValue();
+            Object value        = propertyValue.getValue();
             String exampleValue = "";
-            if(value!=null) {
-                if(value instanceof ColorTable) {
-                    propName = "colorTableName";
-                    exampleValue = ((ColorTable)value).getName();
-                } else if(value instanceof Range) {
+            if (value != null) {
+                if (value instanceof ColorTable) {
+                    propName     = "colorTableName";
+                    exampleValue = ((ColorTable) value).getName();
+                } else if (value instanceof Range) {
                     exampleValue = "min:max";
-                } else if(value instanceof Real) {
-                    Real r = (Real)value;
-                    exampleValue = "Real value, e.g., " + r.getValue()+"[" + r.getUnit()+"]" ;
-                } else if(value instanceof ColorScaleInfo) {
+                } else if (value instanceof Real) {
+                    Real r = (Real) value;
+                    exampleValue = "Real value, e.g., " + r.getValue() + "["
+                                   + r.getUnit() + "]";
+                } else if (value instanceof ColorScaleInfo) {
                     //                    propName = "colorScaleVisible";
-                    String fmt  = ColorScaleInfo.getParamStringFormat();
-                    fmt = fmt.replace(";",";<br>");
-                    exampleValue = "semi-colon delimited string:<br>&quot;" +  fmt+"&quot";
-                } else if(value instanceof ContourInfo) {
-                    exampleValue = "semi-colon delimited string:<br>&quot;interval=&lt;interval&gt;;<br> "+
-                        "min=&lt;min&gt;;<br> "+
-                        "max=&lt;max&gt;;<br> "+
-                        "base=&lt;base&gt;;<br> "+
-                        "dashed=true/false;<br> "+
-                        "labels=true/false;&quot;";
-                } else  if(value instanceof Boolean) {
-                    exampleValue ="true|false";
-                } else  if(value instanceof String) {
-                    exampleValue ="String";
-                } else  if(value instanceof Double) {
-                    exampleValue ="double";
-                } else  if(value instanceof Integer) {
-                    exampleValue ="integer";
-                } else  if(value instanceof Unit) {
-                    exampleValue ="unit, e.g.," + value.toString();
+                    String fmt = ColorScaleInfo.getParamStringFormat();
+                    fmt = fmt.replace(";", ";<br>");
+                    exampleValue = "semi-colon delimited string:<br>&quot;"
+                                   + fmt + "&quot";
+                } else if (value instanceof ContourInfo) {
+                    exampleValue =
+                        "semi-colon delimited string:<br>&quot;interval=&lt;interval&gt;;<br> "
+                        + "min=&lt;min&gt;;<br> " + "max=&lt;max&gt;;<br> "
+                        + "base=&lt;base&gt;;<br> "
+                        + "dashed=true/false;<br> "
+                        + "labels=true/false;&quot;";
+                } else if (value instanceof Boolean) {
+                    exampleValue = "true|false";
+                } else if (value instanceof String) {
+                    exampleValue = "String";
+                } else if (value instanceof Double) {
+                    exampleValue = "double";
+                } else if (value instanceof Integer) {
+                    exampleValue = "integer";
+                } else if (value instanceof Unit) {
+                    exampleValue = "unit, e.g.," + value.toString();
                 } else {
-                    exampleValue ="Unknown type: " + value.getClass().getName();
+                    exampleValue = "Unknown type: "
+                                   + value.getClass().getName();
                 }
             }
-            System.out.print ("<tr valign=top><td>"+label+"</td><td><i>" + propName+"</i></td>");
-            System.out.print ("<td>"+exampleValue+"</td>");
-            System.out.print ("<td><i>&lt;property name=&quot;"+propName+"&quot; value=&quot;&quot;/&gt;</i></td>");
-            System.out.println ("</tr>");
+            System.out.print("<tr valign=top><td>" + label + "</td><td><i>"
+                             + propName + "</i></td>");
+            System.out.print("<td>" + exampleValue + "</td>");
+            System.out.print("<td><i>&lt;property name=&quot;" + propName
+                             + "&quot; value=&quot;&quot;/&gt;</i></td>");
+            System.out.println("</tr>");
         }
 
     }
@@ -309,7 +323,6 @@ public class DisplaySettingsDialog {
         /**
          * ctor
          *
-         * @param dci The display
          *
          * @param display the display
          */
@@ -318,6 +331,11 @@ public class DisplaySettingsDialog {
             cbx      = new JCheckBox(dci.getTitle());
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public String toString() {
             return dci.getLabel();
         }
@@ -330,6 +348,7 @@ public class DisplaySettingsDialog {
      * @return the gui
      */
     private JComponent doMakeContents() {
+
         displayWrappers = new ArrayList<DisplayWrapper>();
         List      viewLabels = new ArrayList();
         Hashtable viewMap    = new Hashtable();
@@ -388,93 +407,182 @@ public class DisplaySettingsDialog {
         });
 
         applyBtn = GuiUtils.makeButton("Apply>>", this, "doApply");
-        JButton   okBtn     = GuiUtils.makeButton("OK", this, "doOk");
-        JButton   cancelBtn = GuiUtils.makeButton("Cancel", this, "doCancel");
-        JButton   saveBtn   = GuiUtils.makeButton("Save", this, "doSave");
+        JButton okBtn     = GuiUtils.makeButton("OK", this, "doOk");
+        JButton cancelBtn = GuiUtils.makeButton("Close", this, "doCancel");
+        JButton saveBtn   = GuiUtils.makeButton("Save", this, "doSave");
 
         propertiesHolder = new JPanel(new BorderLayout());
 
 
-        int listHeight=250;
-        int listWidth=200;
+        int listHeight = 250;
+        int listWidth  = 200;
         displaysList = new JList(new Vector(displays));
         displaysList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         displaysList.setBackground(null);
-        JComponent displaysSP = GuiUtils.makeScrollPane(GuiUtils.top(displaysList), listWidth,
-                                                        listHeight);
+        JComponent displaysSP =
+            GuiUtils.makeScrollPane(GuiUtils.top(displaysList), listWidth,
+                                    listHeight);
+
         displaysSP.setPreferredSize(new Dimension(listWidth, listHeight));
-        if(display!=null) {
-            displaysList.setSelectedValue(display,true);
+        if (display != null) {
+            displaysList.setSelectedValue(display, true);
         }
         displaysList.addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    DisplayControlImpl display = (DisplayControlImpl) displaysList.getSelectedValue();
-                    if(display!=null) {
-                        displaySettingsList.clearSelection();
-                        setDisplay(display);
-                    }
+            public void valueChanged(ListSelectionEvent e) {
+                DisplayControlImpl display =
+                    (DisplayControlImpl) displaysList.getSelectedValue();
+                if (display != null) {
+                    displaySettingsList.clearSelection();
+                    setDisplay(display);
                 }
-            });
+            }
+        });
 
 
-        displaySettingsList = new JList(new Vector(idv.getResourceManager().getDisplaySettings()));
+        displaySettingsList = new JList(
+            new Vector(idv.getResourceManager().getDisplaySettings()));
         displaySettingsList.setBackground(null);
-        displaySettingsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JComponent displaySettingsSP = GuiUtils.makeScrollPane(GuiUtils.top(displaySettingsList), listWidth,
-                                                        listHeight);
-        displaySettingsSP.setPreferredSize(new Dimension(listWidth, listHeight));
-        displaySettingsList.addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    DisplaySetting displaySetting = (DisplaySetting) displaySettingsList.getSelectedValue();
-                    if(displaySetting!=null) {
-                        displaysList.clearSelection();
-                        applyDisplaySetting(displaySetting);
+        displaySettingsList.setSelectionMode(
+            ListSelectionModel.SINGLE_SELECTION);
+        JComponent displaySettingsSP =
+            GuiUtils.makeScrollPane(GuiUtils.top(displaySettingsList),
+                                    listWidth, listHeight);
+        displaySettingsSP.setPreferredSize(new Dimension(listWidth,
+                listHeight));
+        displaySettingsList.addListSelectionListener(
+            new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                DisplaySetting displaySetting =
+                    (DisplaySetting) displaySettingsList.getSelectedValue();
+                if (displaySetting != null) {
+                    displaysList.clearSelection();
+                    applyDisplaySetting(displaySetting);
 
-                    }
                 }
-            });
+            }
+        });
 
 
 
 
         JComponent propertiesComp = GuiUtils.inset(propertiesHolder, 5);
-        propertiesSP = GuiUtils.makeScrollPane(GuiUtils.top(propertiesComp), 300,
-                                         300);
+        propertiesSP = GuiUtils.makeScrollPane(GuiUtils.top(propertiesComp),
+                300, 300);
         JScrollPane rightSP =
             GuiUtils.makeScrollPane(GuiUtils.top(displaysComp), 300, 300);
         propertiesSP.setPreferredSize(new Dimension(300, 300));
         rightSP.setPreferredSize(new Dimension(300, 300));
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-        JComponent buttons = GuiUtils.doLayout(new Component[] { saveBtn,
+        /*        JComponent buttons = GuiUtils.doLayout(new Component[] { saveBtn,
                                                                  cancelBtn }, 4, GuiUtils.WT_N,
                                                GuiUtils.WT_N);
+        */
+        JComponent buttons = cancelBtn;
 
         JComponent sourceComp = GuiUtils.topCenter(new JLabel("Source"),
-                                                   GuiUtils.doLayout(
-                                                                     new Component[]{
-                                                                         new JLabel("Displays"),
-                                                                         displaysSP,
-                                                                         new JLabel("Saved Settings"),
-                                                                         displaySettingsSP},
-                                                                     1,
-                                                                     GuiUtils.WT_Y,
-                                                                     GuiUtils.WT_NYNY));
+                                    GuiUtils.doLayout(new Component[] {
+                                        new JLabel("Displays"),
+                                        displaysSP,
+                                        new JLabel("Saved Settings"),
+                                        displaySettingsSP }, 1,
+                                            GuiUtils.WT_Y, GuiUtils.WT_NYNY));
+
+        JTabbedPane sourcePane = new JTabbedPane();
+        sourcePane.addTab("Displays", displaysSP);
+        sourcePane.addTab("Saved Settings", displaySettingsSP);
+
+
+        sourceComp = GuiUtils.topCenter(new JLabel("Source"), sourcePane);
         JComponent propComp = GuiUtils.topCenter(new JLabel("Properties"),
-                                                 propertiesSP);
+                                  propertiesSP);
 
-        JComponent targetComp = GuiUtils.topCenter(new JLabel("Target Displays"),
-                                                 rightSP);
+        JComponent targetComp =
+            GuiUtils.topCenter(new JLabel("Target Displays"), rightSP);
 
-        JComponent applyContents = 
-            GuiUtils.doLayout(new Component[] {
-                    sourceComp, propComp,GuiUtils.wrap(applyBtn), targetComp},
-                4,  new double[]{1,1.25,0,1}, GuiUtils.WT_Y);
+        JComponent applyContents = GuiUtils.doLayout(new Component[] {
+                                       sourceComp,
+                                       propComp, GuiUtils.wrap(applyBtn),
+                                       targetComp }, 4, new double[] { 1,
+                1.25, 0, 1 }, GuiUtils.WT_Y);
 
         applyContents = GuiUtils.centerBottom(applyContents,
                 GuiUtils.wrap(buttons));
         applyContents = GuiUtils.inset(applyContents, 5);
+
+        List  menus    = new ArrayList();
+        JMenu fileMenu = new JMenu("File");
+        JMenu editMenu = GuiUtils.makeDynamicMenu("Select", this,
+                             "showSelectMenu");
+        menus.add(fileMenu);
+        menus.add(editMenu);
+        fileMenu.add(GuiUtils.makeMenuItem("Save Selected Properties", this,
+                                           "doSave"));
+        JMenuBar menuBar = GuiUtils.makeMenuBar(menus);
+        applyContents = GuiUtils.topCenter(menuBar, applyContents);
         return applyContents;
+
     }
+
+    /**
+     * Add items to the Select menu
+     *
+     * @param menu select menu
+     */
+    public void showSelectMenu(JMenu menu) {
+        ControlDescriptor cd =
+            idv.getControlDescriptor(display.getDisplayId());
+
+        List   dataSources    = display.getDataSources();
+        String dataSourceName = "";
+        String dataSourceKey  = null;
+        if ((dataSources != null) && (dataSources.size() > 0)) {
+            dataSourceName = DataSourceImpl.getNameForDataSource(
+                (DataSource) dataSources.get(0), 20, true);
+            dataSourceKey = DisplayControlBase.FIND_WITHTHISDATA;
+        }
+
+
+        String[] keys = {
+            DisplayControlBase.FIND_THIS, DisplayControlBase.FIND_ALL,
+            DisplayControlBase.FIND_CLASS + display.getClass().getName(),
+            DisplayControlBase.FIND_CATEGORY + display.getDisplayCategory(),
+            dataSourceKey, ((display.getShortParamName() != null)
+                            ? DisplayControlBase.FIND_WITHTHISFIELD
+                            : null), DisplayControlBase.FIND_WITHDATA,
+            DisplayControlBase.FIND_WITHTHISVIEW,
+            DisplayControlBase.FIND_SPECIAL
+        };
+
+        String[] labels = {
+            "This display", "All displays",
+            "Displays of type: " + cd.getDescription(),
+            "Displays with category: " + display.getDisplayCategory(),
+            "Displays with data source: " + dataSourceName,
+            "Displays with this field: " + display.getShortParamName(),
+            "Displays with any data", "Displays in view", "Special displays",
+        };
+
+
+        for (int i = 0; i < keys.length; i++) {
+            final String key = keys[i];
+            if (key == null) {
+                continue;
+            }
+            JMenuItem mi = new JMenuItem(labels[i]);
+            menu.add(mi);
+            mi.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    List selected = display.findDisplays(key, displays);
+                    for (int i = 0; i < displays.size(); i++) {
+                        DisplayWrapper dw =
+                            (DisplayWrapper) displayWrappers.get(i);
+                        dw.cbx.setSelected(selected.contains(dw.dci));
+                    }
+                }
+            });
+        }
+    }
+
 
     /**
      * Show the display selection group menu
@@ -579,7 +687,8 @@ public class DisplaySettingsDialog {
         propertiesHolder.validate();
         propertiesHolder.repaint();
         propertiesSP.validate();
-        propertiesSP.getViewport().scrollRectToVisible(new Rectangle(0, 0, 1, 1));
+        propertiesSP.getViewport().scrollRectToVisible(new Rectangle(0, 0, 1,
+                1));
     }
 
 
@@ -603,10 +712,11 @@ public class DisplaySettingsDialog {
 
         DisplaySetting.doSave(idv, dialog, propList, display);
         Object selected = displaySettingsList.getSelectedValue();
-        displaySettingsList.setListData(new Vector(idv.getResourceManager().getDisplaySettings()));
-        if(selected!=null) {
-            displaySettingsList.setSelectedValue(selected,true);
-            
+        displaySettingsList.setListData(
+            new Vector(idv.getResourceManager().getDisplaySettings()));
+        if (selected != null) {
+            displaySettingsList.setSelectedValue(selected, true);
+
         }
     }
 
@@ -620,7 +730,8 @@ public class DisplaySettingsDialog {
         if (dialog != null) {
             dialog.setTitle("Display Settings -- " + displaySetting);
         }
-        List<PropertyValue> newProps = new ArrayList<PropertyValue>(displaySetting.getPropertyValues());
+        List<PropertyValue> newProps =
+            new ArrayList<PropertyValue>(displaySetting.getPropertyValues());
         for (int propIdx = 0; propIdx < propertyValues.size(); propIdx++) {
             PropertyValueWrapper oldProp =
                 (PropertyValueWrapper) propertyValues.get(propIdx);
@@ -667,8 +778,9 @@ public class DisplaySettingsDialog {
      *
      * @return Items
      */
-    public static List makeDisplaySettingsMenuItems(List<DisplaySetting> displaySettings,
-            Object object, String method, String labelPrefix) {
+    public static List makeDisplaySettingsMenuItems(
+            List<DisplaySetting> displaySettings, Object object,
+            String method, String labelPrefix) {
         List      items    = new ArrayList();
         Hashtable catMenus = new Hashtable();
         for (int i = 0; i < displaySettings.size(); i++) {
