@@ -190,12 +190,17 @@ public class UrlChooser extends IdvChooser implements ActionListener {
         mainContents = GuiUtils.vbox(mainContents, urlButtons);
         mainContents = GuiUtils.inset(mainContents,5);
         setHaveData(true);
-
         setStatus("Press \"" + CMD_LOAD
                   + "\" to load the URL", "buttons");
-
-
         return GuiUtils.top(mainContents);
+    }
+
+
+
+
+    public void setStatus(String msg, String what) {
+        super.setStatus("Press \"" + CMD_LOAD
+                        + "\" to load the URL", "buttons");
     }
 
 
