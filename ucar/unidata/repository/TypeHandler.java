@@ -1342,8 +1342,9 @@ public class TypeHandler extends RepositoryManager {
                                    datePatterns) + " ("
                                        + msg("use file name") + ")";
 
-                String extra = addMetadata + HtmlUtil.space(3) + unzip;
+                String extra = HtmlUtil.makeToggleInline("More...", addMetadata + HtmlUtil.space(3) + unzip,false);
 
+                
                 if (tabTitles.size() > 1) {
                     sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
                             HtmlUtil.makeTabs(tabTitles, tabContent, true,
