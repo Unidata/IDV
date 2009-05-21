@@ -662,12 +662,26 @@ public class ColorRhiControl extends ColorCrossSectionControl {
      *
      * @return Display tab component
      */
-    protected JComponent getDisplayTabComponent() {
+    protected JComponent getDisplayTabComponent_old() {
         JComponent comp = super.getDisplayTabComponent();
         return GuiUtils.centerBottom(
             comp, GuiUtils.left(GuiUtils.label("Station: ", stationLabel)));
     }
 
+    private Container viewContents;
+    protected JComponent getDisplayTabComponent() {
+
+        viewContents = crossSectionView.getContents();
+        //If foreground is not null  then this implies we have been unpersisted
+        //We do this here because the CrossSectionViewManager sets the default black on white
+        //colors in its init method which might nor be called until we ask for its contents
+
+
+        crossSectionView.setContentsBorder(null);
+        return GuiUtils.centerBottom(
+            viewContents,
+            GuiUtils.left(GuiUtils.label("Station: ", stationLabel)));
+    }
 
 
 
@@ -774,7 +788,7 @@ public class ColorRhiControl extends ColorCrossSectionControl {
                 logException("receiveShareData:" + dataId, e);
             }
             return;
-        }
+        }  
         super.receiveShareData(from, dataId, data);
     }
 
