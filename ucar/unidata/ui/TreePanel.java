@@ -101,7 +101,9 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
     private JPanel emptyPanel;
 
     /** _more_ */
-    private Hashtable catComponents = new Hashtable();
+    private Hashtable<Object,JComponent> catComponents = new Hashtable<Object,JComponent>();
+
+    private Hashtable<Object,List<JComponent>> buttonsForCategory = new Hashtable<Object,List<JComponent>>();
 
     /** Maps categories to tree node */
     private Hashtable catToNode = new Hashtable();
@@ -279,16 +281,26 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
                         new JPanel(new BorderLayout()));
                 }
             }
+            emptyPanel.removeAll();
             if (node.getUserObject() instanceof TwoFacedObject) {
                 TwoFacedObject tfo = (TwoFacedObject) node.getUserObject();
-                JComponent interior =
-                    (JComponent) catComponents.get(tfo.getId());
+                JComponent interior = catComponents.get(tfo.getId());
                 if (interior != null) {
                     if ( !panel.contains(interior)) {
                         panel.addCard(interior);
                     }
                     panel.show(interior);
                     return;
+                }
+                List<JComponent> buttons = buttonsForCategory.get(tfo.getId());
+                if(buttons!=null) {
+                    emptyPanel.add(GuiUtils.top(GuiUtils.doLayout(new Component[]{GuiUtils.filler(50,5),
+                                                              GuiUtils.vbox(buttons),
+                                                              GuiUtils.filler(50,5)},
+                                                                  3, GuiUtils.WT_Y,GuiUtils.WT_N)));
+                    emptyPanel.invalidate();
+                    emptyPanel.validate();
+                    emptyPanel.repaint();
                 }
             }
             panel.show(emptyPanel);
@@ -342,7 +354,7 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
         if (category == null) {
             root.add(panelNode);
         } else {
-            List toks = StringUtil.split(category, CATEGORY_DELIMITER, true,
+            List<String> toks = StringUtil.split(category, CATEGORY_DELIMITER, true,
                                          true);
             String                 catSoFar = "";
             DefaultMutableTreeNode catNode  = root;
@@ -360,6 +372,15 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
                 catNode = node;
             }
             catNode.add(panelNode);
+            List<JComponent> comps = buttonsForCategory.get(catSoFar);
+            if(comps==null) {
+                comps = new ArrayList<JComponent>();
+                buttonsForCategory.put(catSoFar,comps);
+            }
+            if(toks.size()>0) {
+                comps.add(GuiUtils.makeButton(label,
+                                              this,"show", component));
+            }
         }
         panel.addCard(component);
         treeChanged();
