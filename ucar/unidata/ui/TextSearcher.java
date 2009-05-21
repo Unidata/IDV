@@ -162,6 +162,7 @@ public class TextSearcher extends JPanel {
      */
     private void searchFor(String text, boolean next) {
         TextWrapper holder = getTextWrapper();
+        if(holder==null) return;
         if ( !holder.find(text, highlightAllBtn.isSelected(),
                           caseCbx.isSelected(), next)) {
             findFld.setBackground(COLOR_BADSEARCH);
