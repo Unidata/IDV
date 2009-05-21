@@ -735,12 +735,10 @@ public class AddeChooser extends TimesChooser {
      * @param extra The components after the server box if non-null.
      */
     protected void addTopComponents(List comps, Component extra) {
-        comps.add(GuiUtils.rLabel(""));
-        comps.add(getStatusComponent());
-        comps.add(GuiUtils.rLabel(LABEL_SERVER));
         if (extra == null) {
             extra = GuiUtils.filler();
         }
+        comps.add(GuiUtils.rLabel(LABEL_SERVER));
         GuiUtils.tmpInsets = GRID_INSETS;
         JPanel right = GuiUtils.doLayout(new Component[] { serverSelector,
                 extra, getConnectButton() }, 3, GuiUtils.WT_YN,
@@ -1091,6 +1089,11 @@ public class AddeChooser extends TimesChooser {
 
 
 
+    public boolean canDoCancel() {
+        return false;
+    }
+
+
 
     /**
      * Create the 'Connect' button.
@@ -1101,7 +1104,17 @@ public class AddeChooser extends TimesChooser {
         JButton connectBtn = new JButton("Connect");
         connectBtn.setActionCommand(CMD_CONNECT);
         connectBtn.addActionListener(this);
-        return registerStatusComp("connect", connectBtn);
+        JComponent buttonComp = connectBtn;
+        registerStatusComp("connect", buttonComp);
+        if(canDoCancel()) {
+            cancelButton = GuiUtils.getImageButton("/auxdata/ui/icons/Exit16.gif",getClass());
+            cancelButton.setEnabled(false);
+            cancelButton.setActionCommand(GuiUtils.CMD_CANCEL);
+            cancelButton.addActionListener(this);
+            buttonComp = GuiUtils.hbox(buttonComp, cancelButton);
+        }
+
+        return buttonComp;
         //        return connectBtn;
     }
 

@@ -274,8 +274,7 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
                                        true));
             autoCreateDisplayCbx.setToolTipText(
                 "Automatically create a display when data is loaded");
-            buttons = GuiUtils.flow(new Component[] { buttons,
-                                                      autoCreateDisplayCbx });
+            buttons = GuiUtils.leftRight(autoCreateDisplayCbx,buttons);
         }
         return buttons;
     }

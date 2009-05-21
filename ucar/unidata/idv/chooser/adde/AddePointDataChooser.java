@@ -196,14 +196,11 @@ public class AddePointDataChooser extends AddeChooser {
         JPanel timesComp = makeTimesPanel();
         allComps.add(
             GuiUtils.top(addServerComp(GuiUtils.rLabel(LABEL_TIMES))));
-        allComps.add(GuiUtils.left(addServerComp(timesComp)));
-        allComps.add(addServerComp(GuiUtils.rLabel("Layout Model: ")));
+        allComps.add(addServerComp(timesComp));
+        allComps.add(addServerComp(GuiUtils.rLabel("Layout Model:")));
         allComps.add(addServerComp(GuiUtils.left(lastPanel)));
-
-        GuiUtils.tmpInsets = GRID_INSETS;
-        JComponent top = GuiUtils.doLayout(allComps, 2, GuiUtils.WT_NN,
-                                           GuiUtils.WT_N);
-        return GuiUtils.topLeft(GuiUtils.centerBottom(top, getDefaultButtons()));
+        JComponent top = GuiUtils.formLayout(allComps);                                           
+        return GuiUtils.top(GuiUtils.centerBottom(top, getDefaultButtons()));
     }
 
     /**
@@ -271,7 +268,7 @@ public class AddePointDataChooser extends AddeChooser {
      *
      * @return a widget that can be selected for more options
      */
-    protected JComponent getExtraTimeComponent() {
+    protected JComponent getExtraRelativeTimeComponent() {
         ActionListener listener = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 JComboBox box = (JComboBox) ae.getSource();
@@ -300,10 +297,10 @@ public class AddePointDataChooser extends AddeChooser {
         //            relTimeIncBox.setPreferredSize(new Dimension(20,prefSize.height));
         //        }
         relTimeIncComp =
-            GuiUtils.vbox(new JLabel("Relative Time Increment:"),
-                          GuiUtils.hbox(relTimeIncBox,
-                                        GuiUtils.lLabel(" hours")));
-        return relTimeIncComp;
+            GuiUtils.hbox(new JLabel("Increment: "),
+                          relTimeIncBox,
+                          GuiUtils.lLabel(" hours"));
+        return GuiUtils.left(relTimeIncComp);
     }
 
     /**

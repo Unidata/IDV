@@ -446,8 +446,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
      * @return array of button names
      */
     protected String[] getButtonLabels() {
-        return new String[] { getLoadCommandName(), GuiUtils.CMD_UPDATE,
-                              GuiUtils.CMD_HELP, GuiUtils.CMD_CANCEL };
+        return new String[] { GuiUtils.CMD_HELP, GuiUtils.CMD_UPDATE, getLoadCommandName() };
     }
 
 
@@ -764,6 +763,9 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     }
 
 
+
+
+
     /**
      * Connect to the server.
      */
@@ -788,6 +790,12 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             descList.saveState(groupSelector);
         }
         ignoreStateChangedEvents = false;
+    }
+
+
+
+    public boolean canDoCancel() {
+        return true;
     }
 
 
@@ -1330,19 +1338,18 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
      *
      * @return  a widget for selecing the day
      */
-    protected JComponent getExtraTimeComponent() {
+    protected JComponent getExtraAbsoluteTimeComponent() {
         //        JButton archiveDayBtn =
         //            GuiUtils.makeImageButton("/auxdata/ui/icons/clock.gif", this,
         //                                     "getArchiveDay");
-
 
         JButton archiveDayBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/Archive.gif", this,
                                      "getArchiveDay", null, true);
         archiveDayBtn.setToolTipText("Select a day for archive datasets");
         archiveDayLabel     = new JLabel("");
-        archiveDayComponent = GuiUtils.hbox(archiveDayBtn, archiveDayLabel);
-        return GuiUtils.top(archiveDayComponent);
+        archiveDayComponent = GuiUtils.hbox(archiveDayLabel, archiveDayBtn);
+        return GuiUtils.right(archiveDayComponent);
     }
 
 

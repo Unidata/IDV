@@ -165,7 +165,7 @@ public class PollingFileChooser extends FileChooser {
                                             GuiUtils.WT_N);
         contents = GuiUtils.left(contents);
         setHaveData(true);
-        return GuiUtils.topLeft(GuiUtils.vbox(contents, getDefaultButtons()));
+        return GuiUtils.top(GuiUtils.vbox(contents, getDefaultButtons()));
     }
 
 
@@ -203,13 +203,8 @@ public class PollingFileChooser extends FileChooser {
     public void doUpdate() {}
 
 
-    /**
-     * Get the names for the buttons.
-     *
-     * @return array of button names
-     */
-    protected String[] getButtonLabels() {
-        return new String[] { getLoadCommandName(), GuiUtils.CMD_HELP};
+    public boolean canDoUpdate() {
+        return false;
     }
 
 

@@ -234,7 +234,7 @@ public class AddeRadarChooser extends AddeImageChooser {
         getComponents(comps);
         GuiUtils.tmpInsets = GRID_INSETS;
         JPanel imagePanel = GuiUtils.doLayout(comps, 2, GuiUtils.WT_NY,
-                                GuiUtils.WT_NNYN);
+                                GuiUtils.WT_NYN);
         /*
 
         JScrollPane sp =

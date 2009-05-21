@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -1497,7 +1498,8 @@ public class GuiUtils extends LayoutUtil {
      * arrays. Add the buttons into a new JPanel  and return it.
      *
      * @param l Listener
-     * @param labels  Button labels
+     * @param labels  Button labels. If a label starts with icon: then we make an image button, the image path
+     * is the rest of the label
      * @param cmds Button action commands
      * @param tooltips If non-null then set te tooltip on the button
      * @param buttonMap If non-null will hold a mapping from (String) command to JButton
@@ -1523,8 +1525,15 @@ public class GuiUtils extends LayoutUtil {
             if (label == null) {
                 label = cmd;
             }
-            JButton button = makeJButton(label, new Object[] { "-listener", l,
-                    "-command", cmd });
+            JButton button;
+            if (label.startsWith("icon:")) {
+                button = getImageButton(label.substring(5), GuiUtils.class);
+                button.addActionListener(l);
+                button.setActionCommand(cmd);
+            } else {
+                button = makeJButton(label, new Object[] { "-listener", l,
+                        "-command", cmd });
+            }
             /*
               int keyCode = charToKeyCode(label);
               if(keyCode!=-1)
@@ -6202,6 +6211,7 @@ public class GuiUtils extends LayoutUtil {
     }
 
 }
+
 
 
 

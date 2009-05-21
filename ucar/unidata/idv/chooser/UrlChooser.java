@@ -121,14 +121,10 @@ public class UrlChooser extends IdvChooser implements ActionListener {
     }
 
 
-    /**
-     * Override base class method so we don't show the Update button.
-     *
-     * @return The array of button names.
-     */
-    protected String[] getButtonLabels() {
-        return new String[] { getLoadCommandName(), GuiUtils.CMD_HELP};
+    public boolean canDoUpdate() {
+        return false;
     }
+
 
     /**
      * Get the tooltip for the load button
@@ -194,6 +190,11 @@ public class UrlChooser extends IdvChooser implements ActionListener {
         mainContents = GuiUtils.vbox(mainContents, urlButtons);
         mainContents = GuiUtils.inset(mainContents,5);
         setHaveData(true);
+
+        setStatus("Press \"" + CMD_LOAD
+                  + "\" to load the URL", "buttons");
+
+
         return GuiUtils.top(mainContents);
     }
 

@@ -453,11 +453,13 @@ public class TimesChooser extends IdvChooser {
 
 
         JComponent timesExtra = getExtraTimeComponent();
+        JComponent absoluteExtra = getExtraAbsoluteTimeComponent();
+        JComponent relativeExtra = getExtraRelativeTimeComponent();
         timesCardPanel     = new GuiUtils.CardLayoutPanel();
         timesContainer     = GuiUtils.center(timesCardPanel);
         timesTab           = GuiUtils.getNestedTabbedPane();
         this.usingTimeline = useTimeLine;
-        timesTab.add("Relative", getRelativeTimesList().getScroller());
+        timesTab.add("Relative", GuiUtils.centerBottom(getRelativeTimesList().getScroller(),relativeExtra));
         if (useTimeLine) {
             //                timesTab.add("Timeline", timeline.getContents(false));
             timesList.getScroller().setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -467,14 +469,15 @@ public class TimesChooser extends IdvChooser {
             timesList.setFont(f);
             JSplitPane splitter  = GuiUtils.hsplit(timeline.getContents(false), timesList.getScroller(),0.75);
             splitter.setOneTouchExpandable(true);
-            timesTab.add("Absolute", splitter);
+            timesTab.add("Absolute", GuiUtils.centerBottom(splitter,GuiUtils.leftRight(absTimesLbl,absoluteExtra)));
             timesTab.setPreferredSize(new Dimension(400, 120));
         } else {
-            timesTab.add("Absolute", timesList.getScroller());
+            timesTab.add("Absolute", GuiUtils.centerBottom(timesList.getScroller(), absoluteExtra));
             timesTab.setPreferredSize(new Dimension(200, 120));
         }
 
-        JPanel panel = GuiUtils.centerBottom(timesTab,absTimesLbl);
+
+        JPanel panel = GuiUtils.center(timesTab);
         if (includeExtra) {
             panel = GuiUtils.doLayout(new Component[] { panel,
                     GuiUtils.top(timesExtra) }, 2, GuiUtils.WT_YN,
@@ -832,6 +835,16 @@ public class TimesChooser extends IdvChooser {
 
 
 
+    protected JComponent getExtraAbsoluteTimeComponent() {
+        return new JPanel();
+    }
+
+    protected JComponent getExtraRelativeTimeComponent() {
+        return new JPanel();
+    }
+
+
+
     /**
      * Get the extra time widget.  Subclasses can add their own time
      * widgets.
@@ -839,7 +852,6 @@ public class TimesChooser extends IdvChooser {
      * @return a widget that can be selected for more options
      */
     protected JComponent getExtraTimeComponent() {
-
         JComponent timesExtra;
         if (false) {
             final JButton timesExtraBtn =

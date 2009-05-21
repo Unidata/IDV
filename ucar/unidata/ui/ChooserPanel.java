@@ -355,29 +355,41 @@ public class ChooserPanel extends JPanel implements ActionListener {
     public JComponent getDefaultButtons(ActionListener listener) {
         Hashtable buttonMap   = new Hashtable();
         String[]  commands    = getButtonLabels();
+        String[]  labels     = new String[commands.length];
         String    loadCommand = getLoadCommandName();
         String[]  tooltips    = new String[commands.length];
         for (int i = 0; i < commands.length; i++) {
+            labels[i] = commands[i];
             if (commands[i].equals(loadCommand)) {
                 tooltips[i] = getLoadToolTip();
             } else if (commands[i].equals(GuiUtils.CMD_UPDATE)) {
                 tooltips[i] = getUpdateToolTip();
+                labels[i] = "icon:/auxdata/ui/icons/Refresh24.gif";
             } else if (commands[i].equals(GuiUtils.CMD_HELP)) {
                 tooltips[i] = "Show help for this chooser";
+                labels[i] = "icon:/auxdata/ui/icons/Help24.gif";
             } else if (commands[i].equals(GuiUtils.CMD_CANCEL)) {
                 tooltips[i] = "Cancel choosing and close the window";
             }
         }
-        JPanel comp = GuiUtils.makeButtons(listener, commands, commands,
+        JPanel comp = GuiUtils.makeButtons(listener, labels, commands,
                                            tooltips, buttonMap);
         loadButton = (JButton) buttonMap.get(getLoadCommandName());
-        cancelButton = (JButton) buttonMap.get(GuiUtils.CMD_CANCEL);
-        if(cancelButton!=null) cancelButton.setEnabled(false);
+        JButton tmpButton  = (JButton) buttonMap.get(GuiUtils.CMD_CANCEL);
+        if(tmpButton!=null) {
+            cancelButton = tmpButton;
+            cancelButton.setEnabled(false);
+        }
         setHaveData(haveData);
         return registerStatusComp("buttons", comp);
         //        return comp;
     }
 
+
+
+    public boolean canDoUpdate() {
+        return true;
+    }
 
 
     /**
@@ -386,8 +398,11 @@ public class ChooserPanel extends JPanel implements ActionListener {
      * @return array of button names
      */
     protected String[] getButtonLabels() {
-        return new String[] { getLoadCommandName(), GuiUtils.CMD_UPDATE,
-                              GuiUtils.CMD_HELP};
+        if(canDoUpdate())
+            return new String[] { GuiUtils.CMD_UPDATE,
+                                  GuiUtils.CMD_HELP,getLoadCommandName()};
+        else 
+            return new String[] { GuiUtils.CMD_HELP,getLoadCommandName()};
     }
 
 
