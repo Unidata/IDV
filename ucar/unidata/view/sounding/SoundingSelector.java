@@ -370,7 +370,7 @@ public class SoundingSelector extends IdvChooser {
         groupSelector = GuiUtils.getEditableBox(Misc.newList("RTPTSRC"),
                 null);
 
-        JPanel selectorPanel;
+        JComponent selectorPanel;
         if (forServer) {
             JButton connectBtn = new JButton("Connect");
             connectBtn.addActionListener(this);
@@ -387,18 +387,20 @@ public class SoundingSelector extends IdvChooser {
                 }
             });
             selectorPanel = GuiUtils.hbox(new Component[] {
-                GuiUtils.rLabel("Server: "), addeChooser.getServerSelector(),
+                addeChooser.getServerSelector(),
                 GuiUtils.rLabel(" Group: "), groupSelector, GuiUtils.filler(),
-                connectBtn, GuiUtils.filler(), mainHoursCbx
-            });
+                connectBtn, GuiUtils.filler(), mainHoursCbx  });
+            selectorPanel = GuiUtils.formLayout(new Component[]{
+                GuiUtils.rLabel("Server:"), selectorPanel});
         } else {
-            selectorPanel = GuiUtils.hbox(GuiUtils.rLabel("File: "),
-                                          getFileBrowser().getContents());
+            selectorPanel = GuiUtils.formLayout(new Component[]{
+                GuiUtils.rLabel("File: "),
+                getFileBrowser().getContents()});
         }
         selectorPanel = GuiUtils.inset(GuiUtils.leftCenter(selectorPanel,
                 GuiUtils.filler()), 4);
 
-        JPanel topPanel = selectorPanel;
+        JComponent topPanel = selectorPanel;
 
 
 
@@ -427,7 +429,6 @@ public class SoundingSelector extends IdvChooser {
 
         // Add the station display panel
         JPanel p = new JPanel();
-
         p.setBorder(BorderFactory.createTitledBorder("Available Stations"));
         p.setLayout(new BorderLayout());
 
@@ -436,9 +437,6 @@ public class SoundingSelector extends IdvChooser {
         mapRenderer.addRenderer(new McidasMap("/auxdata/maps/OUTLSUPU"));
         mapRenderer.setColor(MAP_COLOR);
         stationMap = new StationLocationMap(multipleSelect, mapRenderer);
-
-
-
 
         stationMap.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent pe) {
@@ -451,30 +449,8 @@ public class SoundingSelector extends IdvChooser {
                 }
             }
         });
-
-        /*
-          NavigatedPanel np = stationMap.getNavigatedPanel();
-          np.setPreferredSize(new Dimension(400, 300));
-          JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-          JCheckBox declutCheck = createDeclutterCheckBox();
-          toolPanel.add(declutCheck);
-          JToolBar toolBar = np.getToolBar();
-          toolPanel.add(toolBar);
-          JPanel statusPanel = new JPanel(new BorderLayout());
-          statusPanel.setBorder(new EtchedBorder());
-          JLabel positionLabel = new JLabel("position");
-          statusPanel.add(positionLabel, BorderLayout.CENTER);
-          np.setPositionLabel(positionLabel);
-          p.add(toolPanel, BorderLayout.NORTH);
-          p.add(np, BorderLayout.CENTER);
-          p.add(statusPanel, BorderLayout.SOUTH);
-          middlePanel.add(p, BorderLayout.CENTER);
-        */
         middlePanel.add(stationMap, BorderLayout.CENTER);
         JComponent buttons = getDefaultButtons();
-        //        if (idvChooser != null) {
-        //            buttons = idvChooser.decorateButtons(buttons);
-        //        }
         return GuiUtils.topCenterBottom(topPanel, middlePanel, buttons);
     }
 
