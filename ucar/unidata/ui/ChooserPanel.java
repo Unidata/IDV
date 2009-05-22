@@ -117,7 +117,7 @@ public class ChooserPanel extends JPanel implements ActionListener {
     private PropertyChangeSupport changeListeners;
 
     /** Shows the status */
-    private JLabel statusLabel;
+    protected JLabel statusLabel;
 
     /** _more_ */
     private JComponent statusComp;
@@ -255,6 +255,8 @@ public class ChooserPanel extends JPanel implements ActionListener {
 
     }
 
+
+
     /**
      * Create (if needed) and return the JLabel that shows the status messages.
      *
@@ -263,16 +265,10 @@ public class ChooserPanel extends JPanel implements ActionListener {
     protected JLabel getStatusLabel() {
         if (statusLabel == null) {
             statusLabel = new JLabel();
-            //            statusLabel.setBorder(new FineLineBorder(BevelBorder.LOWERED));
-            /*        statusComp.setBorder(
-                BorderFactory.createCompoundBorder(
-                new FineLineBorder(BevelBorder.
-                BorderFactory.createEmptyBorder(2, 2, 0, 0)));*/
-
+            statusLabel.setOpaque(true);
+            statusLabel.setForeground(getStatusLabelForeground());
+            statusLabel.setBackground(getStatusLabelBackground());
         }
-        statusLabel.setOpaque(true);
-        statusLabel.setForeground(getStatusLabelForeground());
-        statusLabel.setBackground(getStatusLabelBackground());
         return statusLabel;
     }
 
@@ -399,11 +395,11 @@ public class ChooserPanel extends JPanel implements ActionListener {
      */
     protected String[] getButtonLabels() {
         if(canDoUpdate())
-            return new String[] { GuiUtils.CMD_HELP,
+            return new String[] { getLoadCommandName(),
                                   GuiUtils.CMD_UPDATE,
-                                  getLoadCommandName()};
+                                  GuiUtils.CMD_HELP};
         else 
-            return new String[] { GuiUtils.CMD_HELP,getLoadCommandName()};
+            return new String[] { getLoadCommandName(), GuiUtils.CMD_HELP};
     }
 
 
