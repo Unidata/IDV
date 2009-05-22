@@ -130,12 +130,12 @@ public class ColorTableManager extends ResourceManager {
 
     /** File filter used for Gempak color tables */
     public static final PatternFileFilter FILTER_GEM =
-        new PatternFileFilter(".+\\.tbl", "Gempak color table (*.tbl)",
+        new PatternFileFilter(".+\\.tbl", "GEMPAK color table (*.tbl)",
                               ".tbl");
 
     /** File filter used for McIdas color tables */
     public static final PatternFileFilter FILTER_MCI =
-        new PatternFileFilter(".+\\.et", "Mcidas color table (*.et)", ".et");
+        new PatternFileFilter(".+\\.et", "McIDAS color table (*.et)", ".et");
 
 
     /** File filter used for PAL color tables */
