@@ -371,6 +371,7 @@ public class SoundingSelector extends IdvChooser {
                 null);
 
         JComponent selectorPanel;
+        JComponent extraTimeComp = null;
         if (forServer) {
             JButton connectBtn = new JButton("Connect");
             connectBtn.addActionListener(this);
@@ -386,10 +387,11 @@ public class SoundingSelector extends IdvChooser {
                     }
                 }
             });
+            extraTimeComp = mainHoursCbx;
             selectorPanel = GuiUtils.hbox(new Component[] {
                 addeChooser.getServerSelector(),
                 GuiUtils.rLabel(" Group: "), groupSelector, GuiUtils.filler(),
-                connectBtn, GuiUtils.filler(), mainHoursCbx  });
+                connectBtn });
             selectorPanel = GuiUtils.formLayout(new Component[]{
                 GuiUtils.rLabel("Server:"), selectorPanel});
         } else {
@@ -420,8 +422,16 @@ public class SoundingSelector extends IdvChooser {
         JScrollPane timesPane = new JScrollPane(createTimesList());
         timesPane.setPreferredSize(new Dimension(175, 50));
 
+        
+
+
+        JComponent timeLabel = new JLabel("Available Times:");
+        if(extraTimeComp!=null) {
+            timeLabel = GuiUtils.vbox(timeLabel, extraTimeComp);
+        }
+
         JPanel left = GuiUtils.doLayout(new Component[] {
-                          new JLabel("Available Times:"),
+                timeLabel,
                           timesPane, new JLabel("Selected Soundings:"),
                           obsPane }, 1, GuiUtils.WT_N, GuiUtils.WT_NYNY);
 
