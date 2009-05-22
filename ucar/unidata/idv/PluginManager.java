@@ -2398,7 +2398,7 @@ public class PluginManager extends IdvManager {
             } else if (plugin.installed) {
                 String extra = "";
                 if (plugin.hasOriginal) {
-                    extra = installHtml + HtmlUtil.img("idvresource:/auxdata/ui/icons/Refresh16.gif");
+                    extra = installHtml + HtmlUtil.img("idvresource:/auxdata/ui/icons/Refresh16.gif")+"</a>";
                 }
                 addDelete.append(
                     "<a href=\"jython:idv.getPluginManager().removePlugin('"
