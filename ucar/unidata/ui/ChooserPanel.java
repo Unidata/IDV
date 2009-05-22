@@ -71,7 +71,7 @@ import javax.swing.event.ListSelectionListener;
 public class ChooserPanel extends JPanel implements ActionListener {
 
     /** The spacing used in the grid layout */
-    protected static final int GRID_SPACING = 3;
+    protected static final int GRID_SPACING = 5;
 
     /** Used by derived classes when they do a GuiUtils.doLayout */
     protected static final Insets GRID_INSETS = new Insets(GRID_SPACING,
@@ -399,8 +399,9 @@ public class ChooserPanel extends JPanel implements ActionListener {
      */
     protected String[] getButtonLabels() {
         if(canDoUpdate())
-            return new String[] { GuiUtils.CMD_UPDATE,
-                                  GuiUtils.CMD_HELP,getLoadCommandName()};
+            return new String[] { GuiUtils.CMD_HELP,
+                                  GuiUtils.CMD_UPDATE,
+                                  getLoadCommandName()};
         else 
             return new String[] { GuiUtils.CMD_HELP,getLoadCommandName()};
     }
@@ -477,6 +478,10 @@ public class ChooserPanel extends JPanel implements ActionListener {
                 getContents(),
                 Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         }
+    }
+
+    public JComponent padLabel(String s) {
+        return GuiUtils.inset(new JLabel(s),new Insets(0,5,0,5));
     }
 
     /**
