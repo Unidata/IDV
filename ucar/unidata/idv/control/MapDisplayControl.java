@@ -610,7 +610,7 @@ public class MapDisplayControl extends DisplayControlImpl {
 
         super.getFileMenuItems(items, forMenuBar);
         JMenu     defaultMenu = new JMenu("Default Maps");
-        JMenuItem mi = new JMenuItem("Save as the Default Map Preference");
+        JMenuItem mi = new JMenuItem("Save as the Default Map Set");
         mi.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 saveAsPreference();
