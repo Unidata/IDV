@@ -7998,6 +7998,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         /** Is mouse in */
         boolean mouseIn = false;
 
+        Color color;
+
         /**
          * Ctor
          *
@@ -8008,7 +8010,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                String text) {
             super(text);
             this.myControl = displayControl;
-            setForeground(Color.blue);
+            //            setForeground(Color.blue);
+
+            color= GuiUtils.decodeColor("#005aff",Color.red);
+            setForeground(color);
             addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent event) {
                     //Don't do anything if it is the right mouse button
@@ -8033,7 +8038,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
                 public void mouseEntered(MouseEvent e) {
                     mouseIn = true;
-                    setForeground(Color.blue);
+                    setForeground(color);
                     oldCursor = getCursor();
                     setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     repaint();
@@ -8066,8 +8071,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 //                g.setColor(Color.white);
                 //                g.drawRect(0,0,b.width-1,b.height-1);
             }
+            g.setColor(color);
             super.paint(g);
-            g.setColor(Color.blue);
+
 
 
             String      text = getText();
