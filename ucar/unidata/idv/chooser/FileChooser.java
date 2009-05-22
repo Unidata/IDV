@@ -150,9 +150,9 @@ public class FileChooser extends IdvChooser {
 
 
     protected String[] getButtonLabels() {
-        return new String[] { GuiUtils.CMD_HELP,
+        return new String[] { getLoadCommandName(),
                               GuiUtils.CMD_UPDATE,
-                              getLoadCommandName()};
+                              GuiUtils.CMD_HELP};
     }
 
 

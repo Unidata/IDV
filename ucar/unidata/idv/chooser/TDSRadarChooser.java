@@ -321,7 +321,6 @@ public class TDSRadarChooser extends TimesChooser {
                                            GuiUtils.WT_NY,
                                            new double[]{0,0,1,0});
 
-        contents = GuiUtils.inset(contents, 5);
         GuiUtils.enableComponents(compsThatNeedServer, false);
         GuiUtils.enableComponents(level3CompsThatNeedServer, false);
         showProductWidgets(false);

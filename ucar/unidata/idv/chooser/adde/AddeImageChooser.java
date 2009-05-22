@@ -309,6 +309,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     /** _more_ */
     private JToggleButton lockBtn;
 
+    private JButton fullResBtn;
+
     /** Label used for the line center */
     private JLabel centerLineLbl;
 
@@ -446,7 +448,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
      * @return array of button names
      */
     protected String[] getButtonLabels() {
-        return new String[] { GuiUtils.CMD_HELP, GuiUtils.CMD_UPDATE, getLoadCommandName() };
+        return new String[] {  getLoadCommandName(), GuiUtils.CMD_UPDATE, GuiUtils.CMD_HELP };
     }
 
 
@@ -970,9 +972,18 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 centerLineFld    = new JTextField("", 3);
                 centerElementFld = new JTextField("", 3);
 
+
+
+                fullResBtn=
+                    GuiUtils.makeImageButton("/auxdata/ui/icons/arrow_out.png", this, "setToFullResolution");
+                fullResBtn.setContentAreaFilled(false);
+                fullResBtn.setToolTipText("Set to full resolution" );
+
+
                 lockBtn =
-                    GuiUtils.getToggleImageButton(IdvUIManager.ICON_UNLOCK,
-                        IdvUIManager.ICON_LOCK, 0, 0, true);
+                    GuiUtils.getToggleImageButton("/auxdata/ui/icons/Linked.gif", 
+                                                  "/auxdata/ui/icons/Unlinked.gif",
+                                                  0, 0, true);
                 lockBtn.setContentAreaFilled(false);
                 lockBtn.setSelected(true);
                 lockBtn.setToolTipText(
@@ -1050,6 +1061,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                         elementMagSliderChanged(true);
                     }
                 };
+
                 JComponent[] lineMagComps =
                     GuiUtils.makeSliderPopup(-SLIDER_MAX, SLIDER_MAX, 0,
                                              lineListener);
@@ -1136,8 +1148,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 JPanel sizePanel =
                     GuiUtils.left(GuiUtils.doLayout(new Component[] {
                         numLinesFld,
-                        new JLabel(" X "), numElementsFld, lockBtn,  /*new JLabel(" "),*/
-                        sizeLbl }, 5, GuiUtils.WT_N, GuiUtils.WT_N));
+                        new JLabel(" X "), numElementsFld, lockBtn,  GuiUtils.filler(10,1),fullResBtn, /*new JLabel(" "),*/
+                        sizeLbl }, 7, GuiUtils.WT_N, GuiUtils.WT_N));
                 addPropComp(PROP_SIZE, propComp = sizePanel);
             }
 
@@ -1155,6 +1167,24 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     }
 
 
+
+    public void setToFullResolution(){
+
+        if(propertiesAD==null) return;
+        amSettingProperties = true;
+        numLinesFld.setText(""   +propertiesAD.getLines());
+        numElementsFld.setText(""+propertiesAD.getElements());
+        changePlace(PLACE_CENTER);
+        if(useLatLon()) {
+            locationPanel.flip();
+        }
+        centerLineFld.setText(""+(propertiesAD.getLines()/2));
+        centerElementFld.setText(""+(propertiesAD.getElements()/2));
+
+        setMagSliders(1,1);
+        amSettingProperties = false;
+
+    }
 
     /**
      * Cycle the place

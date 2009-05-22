@@ -260,6 +260,24 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
 
 
     /**
+     * Create (if needed) and return the JLabel that shows the status messages.
+     *
+     * @return The status label
+     */
+    protected JLabel getStatusLabel() {
+        if (statusLabel == null) {
+            statusLabel = GuiUtils.cLabel(" ");
+            statusLabel.setOpaque(true);
+            statusLabel.setForeground(getStatusLabelForeground());
+            statusLabel.setBackground(getStatusLabelBackground());
+        }
+        return statusLabel;
+    }
+
+
+
+
+    /**
      * Add extra components to "decorate" the button panel
      *
      * @param buttons  button panel
@@ -267,35 +285,40 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      * @return decorated buttons
      */
     public JComponent decorateButtons(JComponent buttons) {
-        String displayType = getDefaultDisplayType();
-        if (displayType != null) {
-            autoCreateDisplayCbx = new JCheckBox("Create display",
-                    idv.getStore().get("idv." + getId() + ".autocreate",
-                                       true));
-            autoCreateDisplayCbx.setToolTipText(
-                "Automatically create a display when data is loaded");
-            buttons = GuiUtils.leftRight(autoCreateDisplayCbx,buttons);
-        }
         return buttons;
     }
 
 
-    /**
-     * Get the default buttons. (Override the default method)
-     *
-     * @param listener Listener for the buttons
-     *
-     * @return buttons plus class specific addons
-     */
     public JComponent getDefaultButtons(ActionListener listener) {
         JComponent buttons = super.getDefaultButtons(listener);
         buttons =  decorateButtons(buttons);
-        buttons = GuiUtils.right(buttons);
-        buttons = GuiUtils.vbox(GuiUtils.right(GuiUtils.inset(getStatusComponent(), new Insets(0,0,0,5))), buttons);
+        JComponent extra = GuiUtils.filler(100,1);
+        String displayType = getDefaultDisplayType();
+        if (displayType != null) {
+            String id = "idv." + getId() + ".autocreate";
+            boolean createDisplay =   idv.getStore().get(id,
+                                                         true);
 
-        //        buttons = GuiUtils.vbox(GuiUtils.inset(getStatusComponent(), new Insets(0,0,0,5)), buttons);
+            autoCreateDisplayCbx = new JCheckBox("Create display", createDisplay);
+            autoCreateDisplayCbx.setToolTipText(
+                "Automatically create a display when data is loaded");
+            extra = GuiUtils.vbox(extra,autoCreateDisplayCbx);
+        }
+
+
+        buttons = GuiUtils.leftCenterRight(
+                                           GuiUtils.filler(100,1),
+                                           GuiUtils.doLayout(new Component[]{
+                        getStatusComponent(),
+                        buttons},
+                                               1,GuiUtils.WT_Y,GuiUtils.WT_N),
+                                           GuiUtils.bottom(GuiUtils.right(extra)));
+
+        buttons.setBorder(BorderFactory.createEmptyBorder(5,0,0,0));
         return buttons;
     }
+
+
 
     /**
      * Get the default display type
@@ -314,7 +337,7 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     protected void getDataSourceProperties(Hashtable ht) {
         if (autoCreateDisplayCbx != null) {
             String id = "idv." + getId() + ".autocreate";
-            boolean current = idv.getStore().get(id,autoCreateDisplayCbx.isSelected());
+            boolean current = idv.getStore().get(id,true);
             if(current !=autoCreateDisplayCbx.isSelected()) {
                 idv.getStore().put(id,
                                    autoCreateDisplayCbx.isSelected());

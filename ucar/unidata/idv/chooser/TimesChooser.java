@@ -477,11 +477,11 @@ public class TimesChooser extends IdvChooser {
         }
 
 
-        JPanel panel = GuiUtils.center(timesTab);
+        JPanel panel;
         if (includeExtra) {
-            panel = GuiUtils.doLayout(new Component[] { panel,
-                    GuiUtils.top(timesExtra) }, 2, GuiUtils.WT_YN,
-                    GuiUtils.WT_Y);
+            panel = GuiUtils.centerBottom(timesTab, GuiUtils.left(timesExtra));
+        } else {
+            panel = GuiUtils.center(timesTab);
         }
 
         timesTab.addChangeListener(listener);
