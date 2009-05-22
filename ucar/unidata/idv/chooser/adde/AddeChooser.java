@@ -723,7 +723,7 @@ public class AddeChooser extends TimesChooser {
     protected void addTopComponents(List comps, String label,
                                     JComponent extra) {
         addTopComponents(comps,
-                         GuiUtils.hbox(new JLabel(label), extra,
+                         GuiUtils.hbox(padLabel(label), extra,
                                        GRID_SPACING));
     }
 

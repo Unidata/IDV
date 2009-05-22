@@ -965,9 +965,7 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     public final JComponent getContents() {
         if (contents == null) {
             Component innerContents = doMakeContents();
-            //            innerContents = GuiUtils.topCenter(getStatusComponent(),
-            //                                               innerContents);
-            //            setStatus(" ");
+            innerContents = GuiUtils.inset(innerContents,5);
 
             JPanel    topPanel      = new JPanel(new BorderLayout()) {
                 public void paint(Graphics g) {
@@ -978,7 +976,6 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
             topPanel.add(BorderLayout.CENTER, innerContents);
             this.setLayout(new BorderLayout());
             this.add(BorderLayout.CENTER, topPanel);
-            //            contents = topPanel;
             contents = this;
             updateStatus();
         }

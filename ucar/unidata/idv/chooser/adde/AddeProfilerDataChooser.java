@@ -178,22 +178,21 @@ public class AddeProfilerDataChooser extends AddeChooser {
         getStationMap().setPreferredSize(new Dimension(200, 200));
         clearOnChange(dataIntervalBox);
         addTopComponents(allComps, LABEL_DATAINTERVAL, dataIntervalBox);
+        JComponent timesPanel  = makeTimesPanel();
+
+
+        JComponent stationMap = getStationMap();
+        stationMap.setPreferredSize(new Dimension(230, 180));
+        allComps.add(GuiUtils.valignLabel("Stations:"));
+        allComps.add(stationMap);
+        allComps.add(GuiUtils.valignLabel("Times:"));
+        allComps.add(addServerComp(timesPanel));
 
         GuiUtils.tmpInsets = GRID_INSETS;
         JComponent top = GuiUtils.doLayout(allComps, 2, GuiUtils.WT_NY,
-                                GuiUtils.WT_N);
+                                GuiUtils.WT_NYN);
 
-        JComponent timesPanel  = makeTimesPanel();
-        allComps = new ArrayList();
-        JComponent stationMap = getStationMap();
-        stationMap.setPreferredSize(new Dimension(230, 180));
-        allComps.add(stationMap);
-        allComps.add(addServerComp(timesPanel));
-        GuiUtils.tmpInsets = new Insets(0, 0, 0, 0);
-        JComponent center = GuiUtils.doLayout(allComps, 2, GuiUtils.WT_YN,
-                                GuiUtils.WT_Y);
-
-        contents = GuiUtils.topCenterBottom(top, center, getDefaultButtons());
+        contents = GuiUtils.centerBottom(top, getDefaultButtons());
         updateStatus();
     }
 

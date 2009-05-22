@@ -211,13 +211,10 @@ public class AddeRadarChooser extends AddeImageChooser {
         JComponent timesPanel = addServerComp(makeTimesPanel(false,
                                                              true));
 
-        JComponent panel = GuiUtils.centerRight(stationMap,  GuiUtils.topCenter(GuiUtils.filler(300,1), GuiUtils.top(extra)));
-        comps.add(
-            GuiUtils.top(addServerComp(GuiUtils.rLabel(LABEL_STATIONS))));
+        JComponent panel = GuiUtils.centerRight(stationMap,  GuiUtils.topCenter(GuiUtils.filler(250,1), GuiUtils.top(extra)));
+        comps.add(addServerComp(GuiUtils.valignLabel(LABEL_STATIONS)));
         comps.add(panel);
-        //        comps.add(stationMap);
-
-        comps.add(new JLabel(""));
+        comps.add(GuiUtils.valignLabel("Times:"));
         comps.add(timesPanel);
 
     }
@@ -235,16 +232,6 @@ public class AddeRadarChooser extends AddeImageChooser {
         GuiUtils.tmpInsets = GRID_INSETS;
         JPanel imagePanel = GuiUtils.doLayout(comps, 2, GuiUtils.WT_NY,
                                 GuiUtils.WT_NYN);
-        /*
-
-        JScrollPane sp =
-            new JScrollPane(
-                            imagePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        JViewport vp = sp.getViewport();
-        vp.setViewSize(new Dimension(200, 400));
-        sp.setPreferredSize(new Dimension(200, 400));
-        */
         return GuiUtils.centerBottom(imagePanel, getDefaultButtons(this));
     }
 

@@ -276,7 +276,7 @@ public class TDSRadarChooser extends TimesChooser {
             }
 
         });
-        productLabel = addLevel3ServerComp(GuiUtils.rLabel("Product: "));
+        productLabel = addLevel3ServerComp(padLabel("Product: "));
         productComboBox = new JComboBox();
         productComboBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
@@ -297,35 +297,34 @@ public class TDSRadarChooser extends TimesChooser {
         JComponent stationMap = getStationMap();
         JComponent buttons    = getDefaultButtons();
         JComponent timesPanel = makeTimesPanel(true, true);
-        GuiUtils.tmpInsets = GRID_INSETS;
 
 
 
-        JComponent top = GuiUtils.formLayout(new Component[] {
-                         GuiUtils.rLabel("Catalog:"),
-                         urlBox, 
-                         GuiUtils.rLabel("Collections:"),
-                         GuiUtils.leftRight(collectionSelector,
-                                            GuiUtils.hbox(productLabel,productComboBox))});
-
-        GuiUtils.tmpInsets = new Insets(0, 2, 0, 2);
         stationMap.setPreferredSize(new Dimension(230, 200));
         stationMap = registerStatusComp("stations", stationMap);
         timesPanel = registerStatusComp("timepanel", timesPanel);
         addServerComp(stationMap);
         addServerComp(timesPanel);
-        JComponent contents = GuiUtils.doLayout(new Component[] { top, 
-                                                                  stationMap, timesPanel }, 1, GuiUtils.WT_Y,
-            new double[] { 0.0, 4.0, 1.0 });
+
+        GuiUtils.tmpInsets = GRID_INSETS;
+        JComponent contents = GuiUtils.doLayout(new Component[] {
+                         GuiUtils.rLabel("Catalog:"),
+                         urlBox, 
+                         GuiUtils.rLabel("Collections:"),
+                         GuiUtils.leftRight(collectionSelector,
+                                            GuiUtils.hbox(productLabel,productComboBox)),
+                         GuiUtils.valignLabel("Stations:"),
+                         stationMap,
+                         GuiUtils.valignLabel("Times:"),
+                         timesPanel},
+                                           2,
+                                           GuiUtils.WT_NY,
+                                           new double[]{0,0,1,0});
 
         contents = GuiUtils.inset(contents, 5);
         GuiUtils.enableComponents(compsThatNeedServer, false);
         GuiUtils.enableComponents(level3CompsThatNeedServer, false);
         showProductWidgets(false);
-        /*        outerContents =
-            GuiUtils.center(GuiUtils.topCenterBottom(getStatusComponent(),
-            contents, buttons));*/
-
         outerContents =
             GuiUtils.center(GuiUtils.centerBottom(contents, buttons));
         return outerContents;

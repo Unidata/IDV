@@ -194,11 +194,10 @@ public class AddePointDataChooser extends AddeChooser {
         clearOnChange(dataTypes);
         addTopComponents(allComps, LABEL_DATATYPE, dataTypes);
         JPanel timesComp = makeTimesPanel();
-        allComps.add(
-            GuiUtils.top(addServerComp(GuiUtils.rLabel(LABEL_TIMES))));
+        allComps.add(addServerComp(GuiUtils.valignLabel(LABEL_TIMES)));
         allComps.add(addServerComp(timesComp));
-        allComps.add(addServerComp(GuiUtils.rLabel("Layout Model:")));
-        allComps.add(addServerComp(GuiUtils.left(lastPanel)));
+        //        allComps.add(addServerComp(GuiUtils.rLabel("Layout Model:")));
+        //        allComps.add(addServerComp(GuiUtils.left(lastPanel)));
         JComponent top = GuiUtils.formLayout(allComps);                                           
         return GuiUtils.top(GuiUtils.centerBottom(top, getDefaultButtons()));
     }

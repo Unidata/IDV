@@ -188,7 +188,6 @@ public class UrlChooser extends IdvChooser implements ActionListener {
             });
 
         mainContents = GuiUtils.vbox(mainContents, urlButtons);
-        mainContents = GuiUtils.inset(mainContents,5);
         setHaveData(true);
         setStatus("Press \"" + CMD_LOAD
                   + "\" to load the URL", "buttons");

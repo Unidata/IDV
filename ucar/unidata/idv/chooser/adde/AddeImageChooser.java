@@ -955,9 +955,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
                     propComp =
                         GuiUtils.hbox(propComp,
-                                      GuiUtils.inset(new JLabel("Channel:"),
-                                          new Insets(0, 10, 0,
-                                              5)), bandComboBox, 5);
+                                      padLabel("Channel:"), bandComboBox, 5);
                 }
             } else if (prop.equals(PROP_BAND)) {
                 //Moved to PROP_UNIT
@@ -1326,7 +1324,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
      * @param comps  List to add to
      */
     protected void addTimesComponent(List comps) {
-        comps.add(GuiUtils.top(addServerComp(GuiUtils.rLabel("Times:"))));
+        comps.add(addServerComp(GuiUtils.valignLabel("Times:")));
         comps.add(addServerComp(makeTimesPanel(true)));
 
     }
