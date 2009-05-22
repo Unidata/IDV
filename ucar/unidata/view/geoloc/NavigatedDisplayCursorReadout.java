@@ -116,6 +116,11 @@ public class NavigatedDisplayCursorReadout extends JPanel {
         setLayout(new FlowLayout(FlowLayout.LEFT));
         if (label != null) {
             myOwnLabel = true;
+            Font   lblFont = label.getFont();
+            Font monoFont = new Font("Monospaced", lblFont.getStyle(),
+                                     lblFont.getSize());
+
+            label.setFont(monoFont);
         } else {
             myOwnLabel = false;
         }
@@ -255,6 +260,19 @@ public class NavigatedDisplayCursorReadout extends JPanel {
         setLabelText();
     }
 
+    private String pad(String s) {
+        s = StringUtil.padRight(s,7);
+        return s;
+    }
+
+    private String format(double v) {
+        if(v!=v) return pad("NA");
+        String s = formatter.format(v);
+        if(v>=0) s = " " + s;
+        return pad(s);
+    }
+
+
     /**
      * Set the label text
      */
@@ -262,45 +280,32 @@ public class NavigatedDisplayCursorReadout extends JPanel {
         if ( !active) {
             return;
         }
+        String SPACE =  " ";
         StringBuffer buf = new StringBuffer();
-        buf.append(" Latitude: ");
+        buf.append("Latitude: ");
         if (latitude != null) {
-            if (Double.isNaN(latitude.getValue())) {
-                buf.append("NA");
-            } else {
-                try {
-                    buf.append(
-                        StringUtil.padLeft(
-                            formatter.format(
-                                latitude.getValue(CommonUnit.degree)), 6));
-                } catch (Exception e) {}
-            }
+            try {
+                buf.append(format(latitude.getValue(CommonUnit.degree)));
+            } catch (Exception e) {}
         }
-        buf.append(" Longitude: ");
+        buf.append(SPACE);
+        buf.append("Longitude: ");
         if (longitude != null) {
-            if (Double.isNaN(longitude.getValue())) {
-                buf.append("NA");
-            } else {
-                try {
-                    buf.append(
-                        StringUtil.padLeft(
-                            formatter.format(
-                                longitude.getValue(CommonUnit.degree)), 6));
-                } catch (Exception e) {}
-            }
+            try {
+                buf.append(format(longitude.getValue(CommonUnit.degree)));
+            } catch (Exception e) {}
         }
         if (navDisplay.getDisplayMode() == NavigatedDisplay.MODE_3D) {
-            buf.append(" Altitude: ");
+            buf.append(SPACE);
+            buf.append("Altitude: ");
             if (altitude != null) {
                 if (Double.isNaN(altitude.getValue())) {
-                    buf.append("NA");
+                    buf.append(pad("NA"));
                 } else {
                     try {
-                        buf.append(
-                            StringUtil.padLeft(
-                                formatter.format(altitude.getValue()), 6));
-                        buf.append(" ");
-                        buf.append(altitude.getUnit().toString());
+                        String altText = formatter.format(altitude.getValue())+" " +
+                            altitude.getUnit().toString();
+                        buf.append(pad(altText));
                     } catch (Exception e) {}
                 }
             }
