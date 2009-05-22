@@ -1357,6 +1357,18 @@ public class GuiUtils extends LayoutUtil {
 
 
     /**
+     * This makes a component that contains a jlabel.  The jlabel is inset with some padding at the top and the outer component is aligned to the top. It is intended to be used when doing a form layout and the 
+     * component on the right it a tall one
+     *
+     * @param s The string to create the label with
+     *
+     * @return the component
+     */
+    public static JComponent valignLabel(String s) {
+        return GuiUtils.top(inset(GuiUtils.rLabel(s),new Insets(7,0,0,0)));
+    }
+
+    /**
      * Layout as a 2 column form
      *
      * @param objects  objects to lay out
