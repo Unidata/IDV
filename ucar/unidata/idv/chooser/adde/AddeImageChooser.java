@@ -980,14 +980,6 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 fullResBtn.setToolTipText("Set to full resolution" );
 
 
-                lockBtn =
-                    GuiUtils.getToggleImageButton("/auxdata/ui/icons/Linked.gif", 
-                                                  "/auxdata/ui/icons/Unlinked.gif",
-                                                  0, 0, true);
-                lockBtn.setContentAreaFilled(false);
-                lockBtn.setSelected(true);
-                lockBtn.setToolTipText(
-                    "Unlock to automatically change size when changing magnification");
 
                 final JButton centerPopupBtn =
                     GuiUtils.getImageButton(
@@ -1049,7 +1041,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                         if (amSettingProperties) {
                             return;
                         }
-                        lineMagSliderChanged( !lockBtn.isSelected());
+                        lineMagSliderChanged( !getLockButton().isSelected());
                     }
                 };
                 ChangeListener elementListener = new ChangeListener() {
@@ -1083,32 +1075,23 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 lineMagSlider.setToolTipText(
                     "Slide to set line magnification factor");
                 lineMagLbl =
-                    GuiUtils.getFixedWidthLabel(StringUtil.padLeft("1", 4));
+                    GuiUtils.getFixedWidthLabel(StringUtil.padLeft("1", 3));
                 elementMagSlider.setToolTipText(
                     "Slide to set element magnification factor");
                 elementMagLbl =
-                    GuiUtils.getFixedWidthLabel(StringUtil.padLeft("1", 4));
+                    GuiUtils.getFixedWidthLabel(StringUtil.padLeft("1", 3));
                 amSettingProperties = oldAmSettingProperties;
 
 
-                GuiUtils.tmpInsets  = dfltGridSpacing;
-                /*
-                JPanel magPanel = GuiUtils.doLayout(new Component[] {
-                    GuiUtils.rLabel("Line:" + dfltLblSpacing), lineMagLbl,
-                    GuiUtils.inset(lineMagComps[0], new Insets(0, 4, 0, 0)),
-                    GuiUtils.rLabel("   Element:" + dfltLblSpacing),
-                    elementMagLbl,
-                    GuiUtils.inset(elementMagComps[0],
-                                   new Insets(0, 4, 0, 0)),
-                                   }, 6, GuiUtils.WT_N, GuiUtils.WT_N);*/
-
+                GuiUtils.tmpInsets  = new Insets(0,0,0,0);
                 JPanel magPanel = GuiUtils.doLayout(new Component[] {
                                       lineMagLbl,
                                       GuiUtils.inset(lineMagComps[0],
                                           new Insets(0, 4, 0, 0)),
-                                      new JLabel("    X "), elementMagLbl,
+                                      new JLabel("    X"), elementMagLbl,
                                       GuiUtils.inset(elementMagComps[0],
-                                          new Insets(0, 4, 0, 0)), }, 6,
+                                          new Insets(0, 4, 0, 0)), 
+                                      GuiUtils.inset(getLockButton(), new Insets(0,10,0,0))}, 7,
                                               GuiUtils.WT_N, GuiUtils.WT_N);
 
                 addPropComp(PROP_MAG, propComp = magPanel);
@@ -1148,7 +1131,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 JPanel sizePanel =
                     GuiUtils.left(GuiUtils.doLayout(new Component[] {
                         numLinesFld,
-                        new JLabel(" X "), numElementsFld, lockBtn,  GuiUtils.filler(10,1),fullResBtn, /*new JLabel(" "),*/
+                        new JLabel(" X "), numElementsFld/*, lockBtn*/,  GuiUtils.filler(10,1),fullResBtn, /*new JLabel(" "),*/
                         sizeLbl }, 7, GuiUtils.WT_N, GuiUtils.WT_N));
                 addPropComp(PROP_SIZE, propComp = sizePanel);
             }
@@ -1166,6 +1149,21 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         enableWidgets();
     }
 
+
+    private JToggleButton getLockButton() {
+        if(lockBtn==null) {
+            lockBtn =
+                GuiUtils.getToggleImageButton("/auxdata/ui/icons/Linked.gif", 
+                                              "/auxdata/ui/icons/Unlinked.gif",
+                                              0, 0, true);
+            lockBtn.setContentAreaFilled(false);
+            lockBtn.setSelected(true);
+            lockBtn.setToolTipText(
+                                   "Unlock to automatically change size when changing magnification");
+        } 
+        return lockBtn;
+
+    }
 
 
     public void setToFullResolution(){
@@ -1227,8 +1225,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             }
         }
         //System.out.println(" changelistener: linesToElements = " + linesToElements);
-        elementMagLbl.setText(StringUtil.padLeft("" + value, 4));
-        if ( !lockBtn.isSelected()) {
+        elementMagLbl.setText(StringUtil.padLeft("" + value, 3));
+        if ( !getLockButton().isSelected()) {
             if (value > 0) {
                 numElementsFld.setText("" + (int) (baseNumElements * value));
             } else {
@@ -1248,7 +1246,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     private void lineMagSliderChanged(boolean autoSetSize) {
         try {
             int value = getLineMagValue();
-            lineMagLbl.setText(StringUtil.padLeft("" + value, 4));
+            lineMagLbl.setText(StringUtil.padLeft("" + value, 3));
             if (autoSetSize) {
                 if (value > 0) {
                     numLinesFld.setText("" + (int) (baseNumLines * value));
@@ -2707,9 +2705,9 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
             lineMagSlider.setValue(lineValue);
             elementMagSlider.setValue(elementValue);
-            lineMagLbl.setText(StringUtil.padLeft("" + getLineMagValue(), 4));
+            lineMagLbl.setText(StringUtil.padLeft("" + getLineMagValue(), 3));
             elementMagLbl.setText(StringUtil.padLeft(""
-                    + getElementMagValue(), 4));
+                    + getElementMagValue(), 3));
             linesToElements = Math.abs(lineValue / (double) elementValue);
             if (Double.isNaN(linesToElements)) {
                 linesToElements = 1.0;

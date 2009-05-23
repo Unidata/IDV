@@ -198,7 +198,7 @@ public class AddePointDataChooser extends AddeChooser {
         allComps.add(addServerComp(timesComp));
         //        allComps.add(addServerComp(GuiUtils.rLabel("Layout Model:")));
         //        allComps.add(addServerComp(GuiUtils.left(lastPanel)));
-        JComponent top = GuiUtils.formLayout(allComps);                                           
+        JComponent top = GuiUtils.formLayout(allComps,GRID_INSETS);                                           
         return GuiUtils.top(GuiUtils.centerBottom(top, getDefaultButtons()));
     }
 

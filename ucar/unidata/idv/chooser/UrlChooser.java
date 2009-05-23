@@ -185,7 +185,7 @@ public class UrlChooser extends IdvChooser implements ActionListener {
                 GuiUtils.left(dsComp),
                 GuiUtils.top(GuiUtils.inset(urlLabel,new Insets(10,0,0,0))),
                 widgetPanel
-            });
+            },GRID_INSETS);
 
         mainContents = GuiUtils.vbox(mainContents, urlButtons);
         setHaveData(true);
