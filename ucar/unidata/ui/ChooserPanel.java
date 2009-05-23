@@ -1,5 +1,5 @@
 /*
- * $Id: ChooserPanel.java,v 1.34 2007/07/27 13:52:12 jeffmc Exp $
+a * $Id: ChooserPanel.java,v 1.34 2007/07/27 13:52:12 jeffmc Exp $
  *
  * Copyright  1997-2004 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
@@ -360,10 +360,10 @@ public class ChooserPanel extends JPanel implements ActionListener {
                 tooltips[i] = getLoadToolTip();
             } else if (commands[i].equals(GuiUtils.CMD_UPDATE)) {
                 tooltips[i] = getUpdateToolTip();
-                labels[i] = "icon:/auxdata/ui/icons/Refresh24.gif";
+                labels[i] = "icon:/auxdata/ui/icons/view-refresh22.png";
             } else if (commands[i].equals(GuiUtils.CMD_HELP)) {
                 tooltips[i] = "Show help for this chooser";
-                labels[i] = "icon:/auxdata/ui/icons/Help24.gif";
+                labels[i] = "icon:/auxdata/ui/icons/show-help22.png";
             } else if (commands[i].equals(GuiUtils.CMD_CANCEL)) {
                 tooltips[i] = "Cancel choosing and close the window";
             }
