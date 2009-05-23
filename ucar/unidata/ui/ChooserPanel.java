@@ -72,12 +72,14 @@ public class ChooserPanel extends JPanel implements ActionListener {
 
     /** The spacing used in the grid layout */
     protected static final int GRID_SPACING = 5;
+    protected static final int GRID_SPACING_V = 3;
+    protected static final int GRID_SPACING_H = 5;
 
     /** Used by derived classes when they do a GuiUtils.doLayout */
-    protected static final Insets GRID_INSETS = new Insets(GRID_SPACING,
-                                                    GRID_SPACING,
-                                                    GRID_SPACING,
-                                                    GRID_SPACING);
+    protected static final Insets GRID_INSETS = new Insets(GRID_SPACING_V,
+                                                    GRID_SPACING_H,
+                                                    GRID_SPACING_V,
+                                                    GRID_SPACING_H);
 
 
 
