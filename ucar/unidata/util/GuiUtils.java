@@ -79,7 +79,7 @@ import javax.swing.tree.*;
 public class GuiUtils extends LayoutUtil {
 
     /** missing image path */
-    public static String MISSING_IMAGE = "/ucar/undiata/util/scream.gif";
+    public static String MISSING_IMAGE = "/ucar/unidata/util/scream.gif";
 
     /** xml attribute name */
     public static final String ATTR_ACTION = "action";
@@ -885,7 +885,7 @@ public class GuiUtils extends LayoutUtil {
         if (c == null) {
             c = GuiUtils.class;
         }
-        Image image = getImage(file, c, cache);
+        Image image = getImage(file, c, cache,false);
         if (image == null) {
             return null;
         }
@@ -1009,9 +1009,11 @@ public class GuiUtils extends LayoutUtil {
             }
             System.err.println(exc + " getting image ");
         }
+
         System.err.println("Unable to find image:" + file);
         URL url = Misc.getURL(MISSING_IMAGE, GuiUtils.class);
         if (url == null) {
+            System.err.println("Whoah, could not load missing image:" + MISSING_IMAGE);
             return null;
         }
         return Toolkit.getDefaultToolkit().createImage(url);
