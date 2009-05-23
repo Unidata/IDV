@@ -1378,6 +1378,11 @@ public class GuiUtils extends LayoutUtil {
      * @return  the form
      */
     public static JComponent formLayout(List objects) {
+        return formLayout(objects, INSETS_5);
+    }
+
+
+    public static JComponent formLayout(List objects, Insets insets) {
         Component[] comps = new Component[objects.size()];
         for (int i = 0; i < objects.size(); i++) {
             Component comp   = null;
@@ -1390,11 +1395,25 @@ public class GuiUtils extends LayoutUtil {
             comps[i] = comp;
         }
 
-        LayoutUtil.tmpInsets = INSETS_5;
+        LayoutUtil.tmpInsets = insets;
         return doLayout(comps, 2, WT_NY, WT_N);
 
 
     }
+
+
+    /**
+     * This does a doLayout with 2 columns. If any of the objects are not a Component
+     * then it creates a rLabel(object.toString)
+     *
+     * @param objects array of components to layout
+     * @return component
+     */
+    public static JComponent formLayout(Object[] objects, Insets insets) {
+        return formLayout(Misc.toList(objects), insets);
+    }
+
+
 
 
     /**
@@ -2325,6 +2344,7 @@ public class GuiUtils extends LayoutUtil {
     public static JComponent formLayout(List comps, double[] widths,
                                         double[] heights,
                                         boolean rightAlignFirstColumn) {
+
         if (rightAlignFirstColumn) {
             for (int i = 0; i < comps.size(); i += 2) {
                 JComponent comp = (JComponent) comps.get(i);
