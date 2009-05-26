@@ -311,15 +311,19 @@ public class TDSRadarChooser extends TimesChooser {
                          GuiUtils.rLabel("Catalog:"),
                          urlBox, 
                          GuiUtils.rLabel("Collections:"),
-                         GuiUtils.leftRight(collectionSelector,
-                                            GuiUtils.hbox(productLabel,productComboBox)),
+                         GuiUtils.left(collectionSelector),
+                         /*                         GuiUtils.leftRight(collectionSelector,
+                                                    GuiUtils.hbox(productLabel,productComboBox)),*/
+                         
+                         GuiUtils.right(productLabel),
+                         GuiUtils.left(productComboBox),
                          GuiUtils.valignLabel("Stations:"),
                          stationMap,
                          GuiUtils.valignLabel("Times:"),
                          timesPanel},
                                            2,
                                            GuiUtils.WT_NY,
-                                           new double[]{0,0,1,0});
+            new double[]{0,0,0,1,0.2});
 
         GuiUtils.enableComponents(compsThatNeedServer, false);
         GuiUtils.enableComponents(level3CompsThatNeedServer, false);
@@ -408,10 +412,12 @@ public class TDSRadarChooser extends TimesChooser {
      */
     private void showProductWidgets(boolean show) {
         if (productLabel != null) {
-            productLabel.setVisible(show);
+            productLabel.setEnabled(show);
+            //            productLabel.setVisible(show);
         }
         if (productComboBox != null) {
-            productComboBox.setVisible(show);
+            productComboBox.setEnabled(show);
+            //            productComboBox.setVisible(show);
         }
     }
 
