@@ -923,11 +923,21 @@ public class SqlUtil {
                     statement.execute(command);
                     //                    if(!ignoreErrors)
                     //                        System.err.println ("OK:" + command);
+                    if(command.toLowerCase().indexOf("metadata")>=0) {
+                        //                        System.err.println("\n*********************************************");
+                        //                        System.err.println("SQL OK:" + command);                         
+                        //System.err.println("********************************************\n");
+                    }
                 }
             } catch (Exception exc) {
 
                 //                if(command.indexOf("wiki")>=0) {
-                if(command.toLowerCase().indexOf("metadata")>=0) {
+                String msg = exc.toString().toLowerCase();
+                if(msg.indexOf("duplicate")<0 && 
+                   msg.indexOf("already exists")<0 && 
+                   msg.indexOf("can't drop")<0 &&
+                   msg.indexOf("doesn't exist")<0 &&
+                   msg.indexOf("is not a column in table")<0) {
                     System.err.println("\n*********************************************");
                     System.err.println("Bad sql:" + command); 
                     System.err.println(exc);
