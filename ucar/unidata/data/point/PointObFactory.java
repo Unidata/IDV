@@ -472,25 +472,26 @@ public class PointObFactory {
             Data[]   data  = tuple.getComponents();
             for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
                 if (isText[fieldIdx]) {
-                    svals[scnt++] = ((Text) data[fieldIdx]).getValue();
+                    String s = ((Text) data[fieldIdx]).getValue();
+                    s = StringUtil.padLeft(s, lengths[fieldIdx]);
+                    svals[scnt++] = s;
                     //                    System.err.println(fieldIdx + ":" + svals[scnt - 1]);
                 } else {
                     dvals[dcnt++] = ((Real) data[fieldIdx]).getValue();
                 }
             }
 
-
-            /*
-            int xxx=1;
-            for(PointObVar pov:dataVars) {
-                System.out.println ("var #" + xxx+" "+pov.getName() + " " + pov.getDataType() + " unit:" + pov.getUnits());
-                xxx++;
-            }
-            if(true) break;
-            */
-
+            //            int xxx=1;
+            //            for(PointObVar pov:dataVars) {
+                //                System.out.println ("var #" + xxx+" "+pov.getName() + " " + pov.getDataType() + " unit:" + pov.getUnits() + " length:" + pov.getLen());
+                //                xxx++;
+            //            }
             //            System.out.println ("#dvals:" + dvals.length + " #svals:" + svals.length);
-
+            //            if(true) break;
+            
+            //            for(String s: svals) {
+            //                System.err.println ("sval=" +s+":");
+            //            }
             writer.addPoint(llp.getLatitude().getValue(CommonUnit.degree),
                             llp.getLongitude().getValue(CommonUnit.degree),
                             ((alt != null)
