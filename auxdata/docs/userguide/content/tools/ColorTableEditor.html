@@ -8,16 +8,18 @@
 <%childlist%>
 
 
-[ht::cimg images/colortable/Main.jpeg]
   
 
 <subhead intoc="false" id="intro">Introduction</subhead>
 
 
-The Color Table Editor supports editing existing color tables
-and creating new ones.
-A color table is an ordered collection of colors
+The Integrated Data Viewer provides a  Color Table Editor which 
+supports editing existing color tables
+and creating new ones. A color table is an ordered collection of colors
 that is used to color a display according to a range of data values. 
+
+
+[ht::cimg images/colortable/Main.jpeg]
 
 
 <subhead intoc="false" id="starting">Starting the Color Table Editor</subhead>
@@ -57,29 +59,30 @@ If [ug::button Auto Update] is checked the change takes place without further ac
 you, as soon as you select a new color table.
 
 
-<subhead intoc="false" id="legend">Color Legend and Setting Colors</subhead>
-
-[ht::cimg images/colortable/Legend.gif]
+<subhead intoc="false" id="legend">Color Legend</subhead>
 
 
 The color table is shown in the bar of color across the
 window, the color legend.  How many colors are in the
-table is shown in a label in the lower center, such as "210 colors."  
+table is shown in a label in the upper center, such as "70 colors."  
 You can reduce or increase the number of colors by clicking on the
 <b>-/+</b> choices near the left and right ends of the
 legend. New colors are added or removed 
 at each end of the legend with the same color as the end color.
+Pressing Shift-Click on any of these buttons will add/remove 10 color 
+slots at a time.
 
 <p>
 
-Under the color legend is a black and white checker board to help show
+Underneath the color legend is a black and white checker board pattern to help show
 the degree of transparency. Most color tables have zero transparency and
 the checker board is not visible.
 
 <p>
 
 The <b>History</b> undo/redo buttons in the upper left allow you to 
-step forward and backward through the  changes you have made.
+step forward and backward through the  changes you have made. Shift-clicking
+on these buttons will step forward/back 10 changes.
 
 <p>
 
@@ -93,6 +96,32 @@ If the Color Table Editor is being used in conjunction with a display
 then when you change the range that range is applied to the display as well.
 
 
+<subhead intoc="false" id="painting">Changing Colors</subhead>
+
+
+<p>
+You can "paint" in the color bar by just dragging the mouse within it. When
+your mouse is over the color bar the cursor will change to  a paintbrush and
+a gray line is drawn to indicate the position of the cursor.
+<p>
+The type of painting is specified by the Paint Mode buttons.
+<ul>
+<li> [ug::button Fill]. When you drag
+it will fill the color table with the currently chosen
+color in the color chooser.  
+<li> [ug::button Interpolate]. Apply  a linear interpolation 
+from where you started dragging the breakpoint to the color value of 
+where the breakpoint is currently  at while dragging. 
+<li> [ug::button Transparency]. Apply the given transparency
+value (in the editable pull down menu) to the color table where
+you are dragging the breakpoint.
+</ul>
+
+<p>
+
+
+
+
 <p>
 
 The editor uses &quot;breakpoints&quot; indicated along the top of the 
@@ -102,8 +131,7 @@ in <b>bold</b> characters.  There is only one active
 breakpoint at a time. Making a new breakpoint makes the new breakpoint active.
 <p>
 Breakpoints are used for a number of things: showing the data value at a point
-along the color table and changing the colors (fill, interpolation or transparency)
-directly below the breakpoint by dragging the breakpoint and changing
+along the color table and and changing
 colors through a popup menu.
 
 <p>
@@ -128,23 +156,10 @@ item  [ug::menu {Change Breakpoint}] .
 
 <p>
 
-To change colors by directly moving a breakpoint select the type
-of change you want with the [ug::button Edit mode] buttons:
-<ul>
-<li> [ug::button Fill]. When you drag
-a breakpoint it will fill the color table with the currently chosen
-color in the color chooser.  Note: no matter  what the edit mode
+
+Note: no matter  what the edit mode
 is when you change colors in the color chooser that color will be applied
 to the active breakpoint.
-<li> [ug::button Interpolate]. Apply  a linear interpolation 
-from where you started dragging the breakpoint to the color value of 
-where the breakpoint is currently  at while dragging. 
-<li> [ug::button Transparency]. Apply the given transparency
-value (in the editable pull down menu) to the color table where
-you are dragging the breakpoint.
-</ul>
-
-<p>
 
 
 You can also change colors and manipulate breakpoints 
@@ -212,7 +227,7 @@ or modified color table can be saved for future use.
 <p>
 
 To save a new or modified color table simply select the
-the [ug::menu File Save]  menu item or [ug::button Save] button.
+the [ug::menu File Save]  menu item.
 To save a modified color table as a new color table, select
 [ug::menu File {Save As}]  and enter the new name in the dialog box that
 appears. This new color table will now be permanently saved in your
