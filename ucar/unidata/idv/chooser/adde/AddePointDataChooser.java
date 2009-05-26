@@ -184,18 +184,16 @@ public class AddePointDataChooser extends AddeChooser {
      */
     protected JComponent doMakeContents() {
 
-        JComponent lastPanel = stationModelBox;
-        if (canDoLevels()) {
-            lastPanel = GuiUtils.hbox(Misc.newList(stationModelBox,
-                    new JLabel("   Level: "), levelBox), GRID_SPACING);
-        }
-
         List allComps = new ArrayList();
         clearOnChange(dataTypes);
         addTopComponents(allComps, LABEL_DATATYPE, dataTypes);
         JPanel timesComp = makeTimesPanel();
         allComps.add(addServerComp(GuiUtils.valignLabel(LABEL_TIMES)));
         allComps.add(addServerComp(timesComp));
+        if (canDoLevels()) {
+            allComps.add(addServerComp(GuiUtils.rLabel("Level:")));
+            allComps.add(addServerComp(GuiUtils.left(levelBox)));
+        }
         //        allComps.add(addServerComp(GuiUtils.rLabel("Layout Model:")));
         //        allComps.add(addServerComp(GuiUtils.left(lastPanel)));
         JComponent top = GuiUtils.formLayout(allComps,GRID_INSETS);                                           
