@@ -726,8 +726,8 @@ public class TimesChooser extends IdvChooser {
      * @return List of DatedThings
      *
      */
-    protected  List makeDatedObjects(List items) {
-        List datedThings = new ArrayList();
+    protected  List<DatedThing> makeDatedObjects(List items) {
+        List<DatedThing> datedThings = new ArrayList<DatedThing>();
         try {
             for (int i = 0; i < items.size(); i++) {
                 Object object = items.get(i);

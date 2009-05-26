@@ -631,8 +631,10 @@ public class TDSRadarChooser extends TimesChooser {
      *  need to implement this.
      */
     public void readTimes() {
-        Vector<DateTime> times = new Vector<DateTime>();
+        List<DateTime> times = new Vector<DateTime>();
         if (getDoAbsoluteTimes()) {
+        ucar.unidata.util.Trace.call1("TDSRadarChooser.readTimes");
+
         if (( !isLevel3 && (selectedStation != null))
                 || (isLevel3 && (selectedStation != null)
                     && (haveSelectedProduct()))) {
@@ -657,9 +659,11 @@ public class TDSRadarChooser extends TimesChooser {
                     pid = TwoFacedObject.getIdString(
                         productComboBox.getSelectedItem());
                 }
-                List allTimes =
+                ucar.unidata.util.Trace.call1("TDSRadarChooser.getRadarStation");
+                List<Date> allTimes =
                     collection.getRadarStationTimes(selectedStation.getID(),
                         pid, fromDate, toDate);
+                ucar.unidata.util.Trace.call2("TDSRadarChooser.getRadarStation");
 
                 //   if(allTimes.size() == 0) {
                 //       toDate = new Date(System.currentTimeMillis()
@@ -668,7 +672,11 @@ public class TDSRadarChooser extends TimesChooser {
                 //       collection.getRadarStationTimes(selectedStation.getID(),
                 //           pid, fromDate, toDate);
                 //   }
+                for (Date date : allTimes) {
+                    times.add(new DateTime(date));
+                }
 
+                /*
                 for (int timeIdx = 0; timeIdx < allTimes.size(); timeIdx++) {
                     Object timeObj = allTimes.get(timeIdx);
                     Date   date;
@@ -679,6 +687,7 @@ public class TDSRadarChooser extends TimesChooser {
                     }
                     times.add(new DateTime(date));
                 }
+                */
                 //                LogUtil.message("");
                 showNormalCursor();
             } catch (Exception exc) {
@@ -689,6 +698,7 @@ public class TDSRadarChooser extends TimesChooser {
                 return;
             }
         }
+        ucar.unidata.util.Trace.call2("TDSRadarChooser.readTimes");
         }
         setAbsoluteTimes(times);
     }
@@ -735,8 +745,18 @@ public class TDSRadarChooser extends TimesChooser {
             List<String> urls = new ArrayList<String>();
 
             if (getDoAbsoluteTimes()) {
+                Trace.msg("TDSRadarChoocer:getting absolute times");
                 List<Date> times = new ArrayList<Date>();
-                List selected = makeDatedObjects(getSelectedAbsoluteTimes());
+                List<DatedThing> selected = 
+                    makeDatedObjects(getSelectedAbsoluteTimes());
+                for (DatedThing datedThing : selected) {
+                    times.add(datedThing.getDate());
+                }
+                if (times.isEmpty()) {
+                    LogUtil.userMessage("No times selected");
+                    return;
+                }
+                /*
                 for (int i = 0; i < selected.size(); i++) {
                     DatedThing datedThing = (DatedThing) selected.get(i);
                     Date       date       = datedThing.getDate();
@@ -755,7 +775,9 @@ public class TDSRadarChooser extends TimesChooser {
                     LogUtil.userMessage("No times selected");
                     return;
                 }
+                */
                 dateSelection.setTimes(times);
+                Trace.msg("TDSRadarChoocer:getting absolute times.end");
             } else {
                 int count = getRelativeTimesList().getSelectedIndex() + 1;
                 if (count == 0) {
