@@ -16,17 +16,37 @@ internal code from temperature and relative humidity grids.
 </ul>
 
 
-To load sounding data see
-<a href="../data/choosers/RaobChooser.html">Choosing a RAOB  Data Source from a Remote Server</a> and 
-<a href="../data/choosers/CatalogChooser.html">Choosing a Gridded Data Source from a Remote Server</a>.
-The IDV sounding display includes an aerological (thermodynamic)
-diagram (e.g., skew-T, Stuve, Emagram) and a table
-of related aerological parameters, and appears in a
-separate window.
+To load sounding data see <a
+href="../data/choosers/RaobChooser.html">Choosing
+a RAOB Data Source from a Remote Server</a> and <a
+href="../data/choosers/CatalogChooser.html">Choosing a Gridded Data
+Source from a Remote Server</a>.
+
+<p>
+
+The IDV Sounding Display includes an aerological (thermodynamic)
+diagram (e.g., Skew-T, Stuve, Emagram), a table of related aerological
+parameters, a hodograph and a table readout of the data.
 
 
 [ht::cimg images/GridSkewTControlGui.gif {The Grid Sounding Control with a Skew-T}]
 
+
+<p>
+
+The hodograph display is enabled if the plotted data includes
+wind fields.  You can rotate the display to see the vertical
+structure as well as the horizontal structure of the winds.
+
+[ht::cimg images/GridSoundingHodographGui.gif {The Hodograph View}]
+
+<p>
+
+The Table tab shows the data in table form:
+
+[ht::cimg images/GridSoundingTableGui.gif {The Sounding Table View}]
+
+<p>
 
 
 A label at the top of the sounding window shows the latitude-longitude
@@ -39,17 +59,15 @@ by dragging the selector point with the left button.
 
 <p>
 
-When displaying a sounding diagram made from gridded numerical weather
-model output, there is a pull-down selector menu of the model output
-valid times in the upper right corner.
+When displaying a sounding diagram made from model output, you can use the
+time animation control to step through the time sequence.
+
+[ht::cimg images/AnimationControls.gif]
+
+See more about the animation control in 
+<a href="../ui/Animation.html">Animation Control</a>.
 
 <p>
-
-The <a href="../ui/Animation.html">animation control</a> buttons are available in either case:
-
-[ht::cimg images/AnimButtons.gif ]
-
-
 To increase precision using the sounding diagram, enlarge the window
 by dragging on the edges. You can zoom the sounding diagram by holding
 down the Shift key and dragging the right button upwards; drag downwards
