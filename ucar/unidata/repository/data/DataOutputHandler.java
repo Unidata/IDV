@@ -19,14 +19,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository.data;
-
-import ucar.unidata.repository.*;
-import ucar.unidata.repository.output.*;
-import ucar.unidata.repository.metadata.*;
-
-import ucar.unidata.util.HtmlUtil;
-import ucar.unidata.util.TemporaryDir;
 
 
 
@@ -65,8 +59,9 @@ import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dataset.VariableDS;
 import ucar.nc2.dataset.VariableEnhanced;
 import ucar.nc2.dt.GridDatatype;
-import ucar.nc2.dt.PointObsDataset;
-import ucar.nc2.dt.PointObsDatatype;
+
+//import ucar.nc2.dt.PointObsDataset;
+//import ucar.nc2.dt.PointObsDatatype;
 
 import ucar.nc2.dt.TrajectoryObsDataset;
 import ucar.nc2.dt.TrajectoryObsDatatype;
@@ -76,20 +71,38 @@ import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.dt.grid.NetcdfCFWriter;
 import ucar.nc2.dt.trajectory.TrajectoryObsDatasetFactory;
 
+import ucar.nc2.ft.FeatureCollection;
+import ucar.nc2.ft.FeatureDatasetPoint;
+import ucar.nc2.ft.NestedPointFeatureCollection;
+import ucar.nc2.ft.PointFeature;
+import ucar.nc2.ft.PointFeatureCollection;
+import ucar.nc2.ft.PointFeatureIterator;
+import ucar.nc2.ft.point.*;
+
+import ucar.nc2.ft.FeatureDatasetFactoryManager;
+import ucar.nc2.ft.FeatureDatasetPoint;
+
 import ucar.unidata.data.gis.KmlUtil;
 import ucar.unidata.geoloc.LatLonPointImpl;
 
 import ucar.unidata.geoloc.LatLonRect;
 
+import ucar.unidata.repository.*;
+import ucar.unidata.repository.metadata.*;
+import ucar.unidata.repository.output.*;
+
 
 
 
 import ucar.unidata.util.Cache;
-import ucar.unidata.util.Pool;
+
+import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.Pool;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TemporaryDir;
 import ucar.unidata.util.WrapperException;
 import ucar.unidata.xml.XmlUtil;
 
@@ -107,6 +120,8 @@ import java.sql.Statement;
 
 
 import java.text.SimpleDateFormat;
+
+import java.util.Formatter;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -196,49 +211,53 @@ public class DataOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    private Cache<String,Boolean> cdmEntries = new Cache<String,Boolean>(5000);
+    private Cache<String, Boolean> cdmEntries = new Cache<String,
+                                                    Boolean>(5000);
 
     /** _more_ */
-    private Cache<String,Boolean> gridEntries = new Cache<String,Boolean>(5000);
+    private Cache<String, Boolean> gridEntries = new Cache<String,
+                                                     Boolean>(5000);
 
 
     /** _more_ */
-    private Cache<String,Boolean> pointEntries = new Cache<String,Boolean>(5000);
+    private Cache<String, Boolean> pointEntries = new Cache<String,
+                                                      Boolean>(5000);
 
     /** _more_ */
-    private Cache<String,Boolean> trajectoryEntries = new Cache<String,Boolean>(5000);
+    private Cache<String, Boolean> trajectoryEntries = new Cache<String,
+                                                           Boolean>(5000);
 
 
+    /** _more_          */
     private TemporaryDir nj22Dir;
 
     //TODO: When we close a ncfile some thread might be using it
     //Do we have to actually close it??
 
     /** _more_ */
-    private Pool<String,NetcdfDataset> ncFilePool = new Pool<String,NetcdfDataset>(100) {
+    private Pool<String, NetcdfDataset> ncFilePool = new Pool<String,
+                                                         NetcdfDataset>(100) {
         protected void removeValue(String key, NetcdfFile file) {
             try {
                 file.close();
             } catch (Exception exc) {}
         }
 
-        protected  NetcdfDataset getFromPool(List<NetcdfDataset> list) {
+        protected NetcdfDataset getFromPool(List<NetcdfDataset> list) {
             NetcdfDataset dataset = super.getFromPool(list);
             try {
                 dataset.sync();
                 return dataset;
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
         }
 
         protected NetcdfDataset createValue(String path) {
             try {
-                System.err.println("nc:" + path);
-                getStorageManager().dirTouched(nj22Dir,null);
-                return  NetcdfDataset.openDataset(path);
-            } catch(Exception exc) {
-                System.err.println("failed:" + path);
+                getStorageManager().dirTouched(nj22Dir, null);
+                return NetcdfDataset.openDataset(path);
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
         }
@@ -247,19 +266,20 @@ public class DataOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    private Pool<String,GridDataset> gridPool = new Pool<String,GridDataset>(10) {
+    private Pool<String, GridDataset> gridPool = new Pool<String,
+                                                     GridDataset>(10) {
         protected void removeValue(String key, GridDataset value) {
             try {
                 value.close();
             } catch (Exception exc) {}
         }
 
-        protected  GridDataset getFromPool(List<GridDataset> list) {
+        protected GridDataset getFromPool(List<GridDataset> list) {
             GridDataset dataset = super.getFromPool(list);
             try {
                 dataset.sync();
                 return dataset;
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
 
@@ -268,15 +288,15 @@ public class DataOutputHandler extends OutputHandler {
 
         protected GridDataset createValue(String path) {
             try {
-                getStorageManager().dirTouched(nj22Dir,null);
-                GridDataset gds =  GridDataset.open(path);
+                getStorageManager().dirTouched(nj22Dir, null);
+                GridDataset gds = GridDataset.open(path);
                 if (gds.getGrids().iterator().hasNext()) {
                     return gds;
                 } else {
                     gds.close();
                     return null;
                 }
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
         }
@@ -285,7 +305,8 @@ public class DataOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    private Pool<String,PointObsDataset> pointPool = new Pool<String,PointObsDataset>(10) {
+    private Pool<String, FeatureDatasetPoint> pointPool =
+        new Pool<String, FeatureDatasetPoint>(10) {
         protected void removeValue(String key, NetcdfFile value) {
             try {
                 value.close();
@@ -293,22 +314,28 @@ public class DataOutputHandler extends OutputHandler {
         }
 
         /*
-        protected  PointObsDataset getFromPool(List<PointObsDataset> list) {
-            PointObsDataset dataset = super.getFromPool(list);
+        protected  FeatureDatasetPoint getFromPool(List<FeatureDatasetPoint> list) {
+            FeatureDatasetPoint dataset = super.getFromPool(list);
             dataset.sync();
             return dataset;
             }*/
 
-        protected PointObsDataset createValue(String path) {
+        protected FeatureDatasetPoint createValue(String path) {
             try {
-                getStorageManager().dirTouched(nj22Dir,null);
-                //                System.err.println ("opening:" + path);
-                PointObsDataset dataset =   (PointObsDataset) TypedDatasetFactory.open(
-                                                                   FeatureType.POINT, path, null, new StringBuilder());
-                //                System.err.println("Create pointPool: " + path);
-                return dataset;
-            } catch(Exception exc) {
-                //                System.err.println ("FAILED:" + exc);
+                Formatter buf = new Formatter();
+                getStorageManager().dirTouched(nj22Dir, null);
+
+                FeatureDatasetPoint pods =
+                    (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
+                        ucar.nc2.constants.FeatureType.POINT, path, null,
+                        buf);
+                if (pods == null) {  // try as ANY_POINT
+                    pods = (FeatureDatasetPoint) FeatureDatasetFactoryManager
+                        .open(ucar.nc2.constants.FeatureType.ANY_POINT, path,
+                              null, buf);
+                }
+                return pods;
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
         }
@@ -317,7 +344,8 @@ public class DataOutputHandler extends OutputHandler {
     };
 
     /** _more_ */
-    private Pool<String,TrajectoryObsDataset> trajectoryPool = new Pool<String,TrajectoryObsDataset>(10) {
+    private Pool<String, TrajectoryObsDataset> trajectoryPool =
+        new Pool<String, TrajectoryObsDataset>(10) {
         protected void removeValue(String key, TrajectoryObsDataset value) {
             try {
                 value.close();
@@ -333,13 +361,15 @@ public class DataOutputHandler extends OutputHandler {
 
         protected TrajectoryObsDataset createValue(String path) {
             try {
-                getStorageManager().dirTouched(nj22Dir,null);
-                TrajectoryObsDataset dataset = (TrajectoryObsDataset) TypedDatasetFactory.open(
-                                                                        FeatureType.TRAJECTORY, path, null, new StringBuilder());
+                getStorageManager().dirTouched(nj22Dir, null);
+                TrajectoryObsDataset dataset =
+                    (TrajectoryObsDataset) TypedDatasetFactory.open(
+                        FeatureType.TRAJECTORY, path, null,
+                        new StringBuilder());
 
                 //                System.err.println("Create trajectoryPool: " + path);
                 return dataset;
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
         }
@@ -362,7 +392,8 @@ public class DataOutputHandler extends OutputHandler {
         super(repository, element);
 
         //TODO: what other global configuration should be done?
-        nj22Dir = getRepository().getStorageManager().makeTemporaryDir("nj22");
+        nj22Dir =
+            getRepository().getStorageManager().makeTemporaryDir("nj22");
         nj22Dir.setMaxFiles(500);
 
         //Set the temp file and the cache policy
@@ -412,8 +443,7 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
 
 
@@ -457,8 +487,8 @@ public class DataOutputHandler extends OutputHandler {
         Object oldOutput = request.getOutput();
         request.put(ARG_OUTPUT, OUTPUT_OPENDAP);
         String opendapUrl = getRepository().URL_ENTRY_SHOW + "/"
-            + request.getPathEmbeddedArgs()
-            + "/dodsC/entry.das";
+                            + request.getPathEmbeddedArgs()
+                            + "/dodsC/entry.das";
         links.add(new Link(opendapUrl, getRepository().iconUrl(ICON_OPENDAP),
                            "OpenDAP", OUTPUT_OPENDAP));
         request.put(ARG_OUTPUT, oldOutput);
@@ -513,7 +543,7 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    private boolean canLoadEntry(Entry entry)  {
+    private boolean canLoadEntry(Entry entry) {
         String url = entry.getResource().getPath();
         if (url == null) {
             return false;
@@ -555,7 +585,8 @@ public class DataOutputHandler extends OutputHandler {
      * @return Can the given entry be served by the tds
      */
     public boolean canLoadAsCdm(Entry entry) {
-        if(!entry.getType().equals(OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
+        if ( !entry.getType().equals(
+                OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
             if ( !entry.isFile()) {
                 return false;
             }
@@ -573,9 +604,11 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
-        if(entry.getResource().isRemoteFile()) {
+        if (entry.getResource().isRemoteFile()) {
             String path = entry.getResource().getPath();
-            if(path.endsWith(".nc")) return true;
+            if (path.endsWith(".nc")) {
+                return true;
+            }
         }
 
         Boolean b = (Boolean) cdmEntries.get(entry.getId());
@@ -589,7 +622,7 @@ public class DataOutputHandler extends OutputHandler {
                         ok = NetcdfDataset.canOpen(path);
                     }
                 } catch (Exception ignoreThis) {
-                    System.err.println("   error:" + ignoreThis);
+                    //                    System.err.println("   error:" + ignoreThis);
                     //                    System.err.println("error:" + ignoreThis);
                 }
             }
@@ -623,7 +656,7 @@ public class DataOutputHandler extends OutputHandler {
             } else {
                 try {
                     ok = pointPool.containsOrCreate(getPath(entry));
-                } catch(Exception ignore) {}
+                } catch (Exception ignore) {}
             }
             pointEntries.put(entry.getId(), b = new Boolean(ok));
         }
@@ -738,7 +771,9 @@ public class DataOutputHandler extends OutputHandler {
                                     "ramadda.data." + types[i] + ".prefixes",
                                     ""), ",", true, true);
                 for (String tok : (List<String>) toks) {
-                    if(tok.length()==0 || tok.equals("!")) continue;
+                    if ((tok.length() == 0) || tok.equals("!")) {
+                        continue;
+                    }
                     String key = types[i] + "." + tok;
                     tmp.put(key, "");
                 }
@@ -816,13 +851,13 @@ public class DataOutputHandler extends OutputHandler {
                     entry, Permission.ACTION_EDIT)) {
                 sb.append(HtmlUtil.p());
                 List<Entry> entries = (List<Entry>) Misc.newList(entry);
-                getEntryManager().addInitialMetadata(request, entries,
-                                                     false,
-                                                     request.get(ARG_SHORT, false));
+                getEntryManager().addInitialMetadata(request, entries, false,
+                        request.get(ARG_SHORT, false));
                 getEntryManager().insertEntries(entries, false);
                 sb.append(getRepository().note("Metadata added"));
-                sb.append(getRepository().getHtmlOutputHandler().getInformationTabs(request,  entry,
-                                                                                    false));
+                sb.append(
+                    getRepository().getHtmlOutputHandler().getInformationTabs(
+                        request, entry, false));
 
             } else {
                 sb.append("You cannot add metadata");
@@ -847,7 +882,7 @@ public class DataOutputHandler extends OutputHandler {
             sb.append(HtmlUtil.href(request.getUrl(),
                                     msg("Add full metadata")));
         }
-        String path = getPath(entry);
+        String        path    = getPath(entry);
         NetcdfDataset dataset = ncFilePool.get(path);
         if (dataset == null) {
             sb.append("Could not open dataset");
@@ -855,7 +890,7 @@ public class DataOutputHandler extends OutputHandler {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ucar.nc2.NCdump.print(dataset, "", bos, null);
             sb.append("<pre>" + bos.toString() + "</pre>");
-            ncFilePool.put(path,dataset);
+            ncFilePool.put(path, dataset);
         }
         return makeLinksResult(request, "CDL", sb, new State(entry));
     }
@@ -946,9 +981,9 @@ public class DataOutputHandler extends OutputHandler {
                                 ((dates[0] == null)
                                  ? null
                                  : new ucar.nc2.units.DateRange(dates[0],
-                                                                dates[1])), includeLatLon, hStride,
-                                zStride, timeStride);
-                gridPool.put(path,gds);
+                                 dates[1])), includeLatLon, hStride, zStride,
+                                             timeStride);
+                gridPool.put(path, gds);
 
                 if (request.get(ARG_ADDTOREPOSITORY, false)) {
                     if ( !canAdd) {
@@ -974,7 +1009,8 @@ public class DataOutputHandler extends OutputHandler {
                             List<Entry> entries =
                                 (List<Entry>) Misc.newList(newEntry);
                             getEntryManager().addInitialMetadata(request,
-                                                                 entries, false, request.get(ARG_SHORT, false));
+                                    entries, false,
+                                    request.get(ARG_SHORT, false));
                         }
                         getEntryManager().insertEntries(
                             Misc.newList(newEntry), true);
@@ -1038,7 +1074,7 @@ public class DataOutputHandler extends OutputHandler {
                 }
                 if (axisType.equals(AxisType.Time)) {
                     dates = (List<Date>) Misc.sort(
-                                                   ThreddsMetadataHandler.getDates(var, ca));
+                        ThreddsMetadataHandler.getDates(var, ca));
                 }
                 continue;
             }
@@ -1046,46 +1082,42 @@ public class DataOutputHandler extends OutputHandler {
         for (GridDatatype grid : sortGrids(dataset)) {
             VariableEnhanced var = grid.getVariable();
             varSB.append(
-                         HtmlUtil.row(
-                                      HtmlUtil.cols(
-                                                    HtmlUtil.checkbox(
-                                                                      ARG_VARIABLE + "." + var.getShortName(),
-                                                                      HtmlUtil.VALUE_TRUE, false) + HtmlUtil.space(
-                                                                                                                   1) + var.getName() + HtmlUtil.space(1)
-                                                    + ((var.getUnitsString() != null)
-                                                       ? "(" + var.getUnitsString() + ")"
-                                                       : ""), "<i>" + var.getDescription()
-                                                    + "</i>")));
+                HtmlUtil.row(
+                    HtmlUtil.cols(
+                        HtmlUtil.checkbox(
+                            ARG_VARIABLE + "." + var.getShortName(),
+                            HtmlUtil.VALUE_TRUE, false) + HtmlUtil.space(1)
+                                + var.getName() + HtmlUtil.space(1)
+                                + ((var.getUnitsString() != null)
+                                   ? "(" + var.getUnitsString() + ")"
+                                   : ""), "<i>" + var.getDescription()
+                                          + "</i>")));
 
         }
 
         if ((dates != null) && (dates.size() > 0)) {
             List formattedDates = new ArrayList();
             for (Date date : dates) {
-                formattedDates.add(getRepository().formatDate(request,
-                                                              date));
+                formattedDates.add(getRepository().formatDate(request, date));
             }
             String fromDate = request.getUnsafeString(ARG_FROMDATE,
-                                                      getRepository().formatDate(request,
-                                                                                 dates.get(0)));
+                                  getRepository().formatDate(request,
+                                      dates.get(0)));
             String toDate = request.getUnsafeString(ARG_TODATE,
-                                                    getRepository().formatDate(request,
-                                                                               dates.get(dates.size() - 1)));
+                                getRepository().formatDate(request,
+                                    dates.get(dates.size() - 1)));
             sb.append(
-                      HtmlUtil.formEntry(
-                                         msgLabel("Time Range"),
-                                         HtmlUtil.checkbox(
-                                                           ARG_SUBSETTIME, HtmlUtil.VALUE_TRUE,
-                                                           request.get(
-                                                                       ARG_SUBSETTIME, true)) + HtmlUtil.space(1)
-                                         + HtmlUtil.select(
-                                                           ARG_FROMDATE, formattedDates,
-                                                           fromDate) + HtmlUtil.img(
-                                                                                    iconUrl(
-                                                                                            ICON_ARROW)) + HtmlUtil.select(
-                                                                                                                           ARG_TODATE,
-                                                                                                                           formattedDates,
-                                                                                                                           toDate)));
+                HtmlUtil.formEntry(
+                    msgLabel("Time Range"),
+                    HtmlUtil.checkbox(
+                        ARG_SUBSETTIME, HtmlUtil.VALUE_TRUE,
+                        request.get(ARG_SUBSETTIME, true)) + HtmlUtil.space(
+                            1) + HtmlUtil.select(
+                            ARG_FROMDATE, formattedDates,
+                            fromDate) + HtmlUtil.img(iconUrl(ICON_ARROW))
+                                      + HtmlUtil.select(
+                                          ARG_TODATE, formattedDates,
+                                          toDate)));
         }
 
 
@@ -1102,24 +1134,23 @@ public class DataOutputHandler extends OutputHandler {
         LatLonRect llr = dataset.getBoundingBox();
         if (llr != null) {
             sb.append(
-                      HtmlUtil.formEntryTop(
-                                            msgLabel("Subset Spatially"),
-                                            "<table cellpadding=0 cellspacing=0><tr valign=top><td>"
-                                            + HtmlUtil.checkbox(
-                                                                ARG_SUBSETAREA, HtmlUtil.VALUE_TRUE,
-                                                                request.get(ARG_SUBSETAREA, false)) + "</td><td>"
-                                            + HtmlUtil.makeLatLonBox(
-                                                                     ARG_AREA, llr.getLatMin(),
-                                                                     llr.getLatMax(), llr.getLonMax(),
-                                                                     llr.getLonMin()) + "</table>"));
+                HtmlUtil.formEntryTop(
+                    msgLabel("Subset Spatially"),
+                    "<table cellpadding=0 cellspacing=0><tr valign=top><td>"
+                    + HtmlUtil.checkbox(
+                        ARG_SUBSETAREA, HtmlUtil.VALUE_TRUE,
+                        request.get(ARG_SUBSETAREA, false)) + "</td><td>"
+                            + HtmlUtil.makeLatLonBox(
+                                ARG_AREA, llr.getLatMin(), llr.getLatMax(),
+                                llr.getLonMax(),
+                                llr.getLonMin()) + "</table>"));
         }
 
 
         sb.append(HtmlUtil.formEntry(msgLabel("Add Lat/Lon Variables"),
                                      HtmlUtil.checkbox(ARG_ADDLATLON,
-                                                       HtmlUtil.VALUE_TRUE,
-                                                       request.get(ARG_ADDLATLON,
-                                                                   true))));
+                                         HtmlUtil.VALUE_TRUE,
+                                         request.get(ARG_ADDLATLON, true))));
 
 
         sb.append("</table>");
@@ -1132,7 +1163,7 @@ public class DataOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.submit("Subset Grid"));
         sb.append(HtmlUtil.formClose());
-        gridPool.put(path,dataset);
+        gridPool.put(path, dataset);
         return makeLinksResult(request, msg("Grid Subset"), sb,
                                new State(entry));
     }
@@ -1161,6 +1192,36 @@ public class DataOutputHandler extends OutputHandler {
     }
 
 
+
+
+
+
+    private PointFeatureIterator getPointIterator(FeatureDatasetPoint input) throws Exception {
+        List<FeatureCollection> collectionList =
+            input.getPointFeatureCollectionList();
+        if (collectionList.size() > 1) {
+            throw new IllegalArgumentException(
+                "Can't handle point data with multiple collections");
+        }
+        FeatureCollection      fc         = collectionList.get(0);
+        PointFeatureCollection collection = null;
+        if (fc instanceof PointFeatureCollection) {
+            collection = (PointFeatureCollection) fc;
+        } else if (fc instanceof NestedPointFeatureCollection) {
+            NestedPointFeatureCollection npfc =
+                (NestedPointFeatureCollection) fc;
+            collection = npfc.flatten(null, null);
+        } else {
+            throw new IllegalArgumentException(
+                "Can't handle collection of type " + fc.getClass().getName());
+        }
+        return 
+            collection.getPointFeatureIterator(16384);
+    }
+
+
+
+
     /**
      * _more_
      *
@@ -1172,26 +1233,27 @@ public class DataOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputPointMap(Request request, Entry entry)
-        throws Exception {
+            throws Exception {
 
-        String          mapVarName = "mapstraction" + HtmlUtil.blockCnt++;
-        String path = getPath(entry);
-        PointObsDataset pod = pointPool.get(path);
-        StringBuffer    sb         = new StringBuffer();
-        List         vars = pod.getDataVariables();
-        int          skip = request.get(ARG_SKIP, 0);
-        int          max  = request.get(ARG_MAX, 200);
+        String              mapVarName = "mapstraction" + HtmlUtil.blockCnt++;
+        String              path       = getPath(entry);
+        FeatureDatasetPoint pod        = pointPool.get(path);
 
-        StringBuffer js   = new StringBuffer();
+        StringBuffer        sb         = new StringBuffer();
+        List                vars       = pod.getDataVariables();
+        int                 skip       = request.get(ARG_SKIP, 0);
+        int                 max        = request.get(ARG_MAX, 200);
+
+        StringBuffer        js         = new StringBuffer();
         js.append("var marker;\n");
-        Iterator dataIterator   = pod.getDataIterator(16384);
         int      cnt            = 0;
         int      total          = 0;
         String   icon           = iconUrl("/icons/pointdata.gif");
 
+        PointFeatureIterator dataIterator = getPointIterator(pod);
         List     columnDataList = new ArrayList();
         while (dataIterator.hasNext()) {
-            PointObsDatatype po = (PointObsDatatype) dataIterator.next();
+            PointFeature po = (PointFeature) dataIterator.next();
             //                ucar.unidata.geoloc.EarthLocation el = po.getLocation();
             ucar.unidata.geoloc.EarthLocation el = po.getLocation();
             if (el == null) {
@@ -1202,8 +1264,7 @@ public class DataOutputHandler extends OutputHandler {
             if ((lat != lat) || (lon != lon)) {
                 continue;
             }
-            if ((lat < -90) || (lat > 90) || (lon < -180)
-                || (lon > 180)) {
+            if ((lat < -90) || (lat > 90) || (lon < -180) || (lon > 180)) {
                 continue;
             }
             total++;
@@ -1217,19 +1278,17 @@ public class DataOutputHandler extends OutputHandler {
             List          columnData = new ArrayList();
             StructureData structure  = po.getData();
             js.append("marker = new Marker("
-                      + llp(el.getLatitude(), el.getLongitude())
-                      + ");\n");
+                      + llp(el.getLatitude(), el.getLongitude()) + ");\n");
 
             js.append("marker.setIcon(" + HtmlUtil.quote(icon) + ");\n");
             StringBuffer info = new StringBuffer("");
-            info.append("<b>Date:</b> " + po.getNominalTimeAsDate()
-                        + "<br>");
+            info.append("<b>Date:</b> " + po.getNominalTimeAsDate() + "<br>");
             for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
                 //{name:\"Ashley\",breed:\"German Shepherd\",age:12}
                 StructureMembers.Member member =
                     structure.findMember(var.getShortName());
                 if ((var.getDataType() == DataType.STRING)
-                    || (var.getDataType() == DataType.CHAR)) {
+                        || (var.getDataType() == DataType.CHAR)) {
                     String value = structure.getScalarString(member);
                     columnData.add(var.getShortName() + ":"
                                    + HtmlUtil.quote(value));
@@ -1246,10 +1305,9 @@ public class DataOutputHandler extends OutputHandler {
             }
             columnDataList.add("{" + StringUtil.join(",", columnData)
                                + "}\n");
-            js.append("marker.setInfoBubble(\"" + info.toString()
-                      + "\");\n");
-            js.append("initMarker(marker," + HtmlUtil.quote("" + cnt)
-                      + "," + mapVarName + ");\n");
+            js.append("marker.setInfoBubble(\"" + info.toString() + "\");\n");
+            js.append("initMarker(marker," + HtmlUtil.quote("" + cnt) + ","
+                      + mapVarName + ");\n");
         }
 
         js.append(mapVarName + ".autoCenterAndZoom();\n");
@@ -1264,15 +1322,14 @@ public class DataOutputHandler extends OutputHandler {
             String label = var.getDescription();
             //            if(label.trim().length()==0)
             label = var.getName();
-            columnDefs.add("{key:" + HtmlUtil.quote(var.getShortName())
-                           + "," + "sortable:true," + "label:"
+            columnDefs.add("{key:" + HtmlUtil.quote(var.getShortName()) + ","
+                           + "sortable:true," + "label:"
                            + HtmlUtil.quote(label) + "}");
         }
 
 
         if (total > max) {
-            sb.append((skip + 1) + "-" + (skip + cnt) + " of " + total
-                      + " ");
+            sb.append((skip + 1) + "-" + (skip + cnt) + " of " + total + " ");
         } else {
             sb.append((skip + 1) + "-" + (skip + cnt));
         }
@@ -1281,38 +1338,34 @@ public class DataOutputHandler extends OutputHandler {
             if (skip > 0) {
                 sb.append(HtmlUtil.space(2));
                 sb.append(
-                          HtmlUtil.href(
-                                        HtmlUtil.url(
-                                                     request.getRequestPath(), new String[] {
-                                                         ARG_OUTPUT, request.getOutput().toString(),
-                                                         ARG_ENTRYID, entry.getId(), ARG_SKIP,
-                                                         "" + (skip - max), ARG_MAX, "" + max
-                                                     }), msg("Previous")));
+                    HtmlUtil.href(
+                        HtmlUtil.url(request.getRequestPath(), new String[] {
+                    ARG_OUTPUT, request.getOutput().toString(), ARG_ENTRYID,
+                    entry.getId(), ARG_SKIP, "" + (skip - max), ARG_MAX,
+                    "" + max
+                }), msg("Previous")));
                 didone = true;
             }
             if (total > (skip + cnt)) {
                 sb.append(HtmlUtil.space(2));
                 sb.append(
-                          HtmlUtil.href(
-                                        HtmlUtil.url(
-                                                     request.getRequestPath(), new String[] {
-                                                         ARG_OUTPUT, request.getOutput().toString(),
-                                                         ARG_ENTRYID, entry.getId(), ARG_SKIP,
-                                                         "" + (skip + max), ARG_MAX, "" + max
-                                                     }), msg("Next")));
+                    HtmlUtil.href(
+                        HtmlUtil.url(request.getRequestPath(), new String[] {
+                    ARG_OUTPUT, request.getOutput().toString(), ARG_ENTRYID,
+                    entry.getId(), ARG_SKIP, "" + (skip + max), ARG_MAX,
+                    "" + max
+                }), msg("Next")));
                 didone = true;
             }
             //Just come up with some max number
             if (didone && (total < 2000)) {
                 sb.append(HtmlUtil.space(2));
                 sb.append(
-                          HtmlUtil.href(
-                                        HtmlUtil.url(
-                                                     request.getRequestPath(), new String[] {
-                                                         ARG_OUTPUT, request.getOutput().toString(),
-                                                         ARG_ENTRYID, entry.getId(), ARG_SKIP, "" + 0, ARG_MAX,
-                                                         "" + total
-                                                     }), msg("All")));
+                    HtmlUtil.href(
+                        HtmlUtil.url(request.getRequestPath(), new String[] {
+                    ARG_OUTPUT, request.getOutput().toString(), ARG_ENTRYID,
+                    entry.getId(), ARG_SKIP, "" + 0, ARG_MAX, "" + total
+                }), msg("All")));
 
             }
         }
@@ -1329,7 +1382,7 @@ public class DataOutputHandler extends OutputHandler {
         */
 
         sb.append(HtmlUtil.script(js.toString()));
-        pointPool.put(path,pod);
+        pointPool.put(path, pod);
 
         return new Result(msg("Point Data Map"), sb);
     }
@@ -1404,13 +1457,14 @@ public class DataOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputTrajectoryMap(Request request, Entry entry)
-        throws Exception {
-        String path = getPath(entry);
-        TrajectoryObsDataset tod = trajectoryPool.get(path);
-        StringBuffer sb         = new StringBuffer();
-        String       mapVarName = "mapstraction" + HtmlUtil.blockCnt++;
-        StringBuffer js           = new StringBuffer();
-        List         trajectories = tod.getTrajectories();
+            throws Exception {
+        String               path         = getPath(entry);
+        TrajectoryObsDataset tod          = trajectoryPool.get(path);
+        StringBuffer         sb           = new StringBuffer();
+        String               mapVarName = "mapstraction"
+                                          + HtmlUtil.blockCnt++;
+        StringBuffer         js           = new StringBuffer();
+        List                 trajectories = tod.getTrajectories();
         for (int i = 0; i < trajectories.size(); i++) {
             List allVariables = tod.getDataVariables();
             TrajectoryObsDatatype todt =
@@ -1423,26 +1477,21 @@ public class DataOutputHandler extends OutputHandler {
                 if (ptIdx > 0) {
                     js.append(",");
                     if (ptIdx == lats.length - 1) {
-                        markerSB.append(
-                                        "var endMarker = new Marker("
-                                        + MapOutputHandler.llp(
-                                                               lats[ptIdx], lons[ptIdx]) + ");\n");
-                        markerSB.append(
-                                        "endMarker.setInfoBubble(\"End time:"
+                        markerSB.append("var endMarker = new Marker("
+                                        + MapOutputHandler.llp(lats[ptIdx],
+                                            lons[ptIdx]) + ");\n");
+                        markerSB.append("endMarker.setInfoBubble(\"End time:"
                                         + todt.getEndDate() + "\");\n");
-                        markerSB.append(
-                                        "initMarker(endMarker,\"endMarker\","
+                        markerSB.append("initMarker(endMarker,\"endMarker\","
                                         + mapVarName + ");\n");
                     }
                 } else {
                     markerSB.append("var startMarker = new Marker("
                                     + MapOutputHandler.llp(lats[ptIdx],
-                                                           lons[ptIdx]) + ");\n");
-                    markerSB.append(
-                                    "startMarker.setInfoBubble(\"Start time:"
+                                        lons[ptIdx]) + ");\n");
+                    markerSB.append("startMarker.setInfoBubble(\"Start time:"
                                     + todt.getStartDate() + "\");\n");
-                    markerSB.append(
-                                    "initMarker(startMarker,\"startMarker\","
+                    markerSB.append("initMarker(startMarker,\"startMarker\","
                                     + mapVarName + ");\n");
                 }
                 js.append(MapOutputHandler.llp(lats[ptIdx], lons[ptIdx]));
@@ -1473,9 +1522,9 @@ public class DataOutputHandler extends OutputHandler {
         js.append(mapVarName + ".autoCenterAndZoom();\n");
         getRepository().initMap(request, mapVarName, sb, 800, 500, true);
         sb.append(HtmlUtil.script(js.toString()));
-        trajectoryPool.put(path,tod);
+        trajectoryPool.put(path, tod);
         return new Result(msg("Trajectory Map"), sb);
-    
+
 
     }
 
@@ -1516,7 +1565,7 @@ public class DataOutputHandler extends OutputHandler {
                         continue;
                     }
                     theVar = var;
-                    break; 
+                    break;
                }
                 if (theVar == null) {
                     continue;
@@ -1567,67 +1616,66 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputPointCsv(Request request, Entry entry)
             throws Exception {
 
-        String path = getPath(entry);
-        PointObsDataset pod = pointPool.get(path);
-        StringBuffer    sb  = new StringBuffer();
-            List     vars         = pod.getDataVariables();
-            Iterator dataIterator = pod.getDataIterator(16384);
-            int      cnt          = 0;
-            while (dataIterator.hasNext()) {
-                PointObsDatatype po = (PointObsDatatype) dataIterator.next();
-                ucar.unidata.geoloc.EarthLocation el = po.getLocation();
-                if (el == null) {
-                    continue;
-                }
-                cnt++;
+        String              path         = getPath(entry);
+        FeatureDatasetPoint pod          = pointPool.get(path);
+        StringBuffer        sb           = new StringBuffer();
+        List                vars         = pod.getDataVariables();
+        PointFeatureIterator dataIterator = getPointIterator(pod);
+        int                 cnt          = 0;
+        while (dataIterator.hasNext()) {
+            PointFeature po = (PointFeature) dataIterator.next();
+            ucar.unidata.geoloc.EarthLocation el = po.getLocation();
+            if (el == null) {
+                continue;
+            }
+            cnt++;
 
-                double        lat       = el.getLatitude();
-                double        lon       = el.getLongitude();
-                StructureData structure = po.getData();
+            double        lat       = el.getLatitude();
+            double        lon       = el.getLongitude();
+            StructureData structure = po.getData();
 
-                if (cnt == 1) {
-                    sb.append(HtmlUtil.quote("Time"));
-                    sb.append(",");
-                    sb.append(HtmlUtil.quote("Latitude"));
-                    sb.append(",");
-                    sb.append(HtmlUtil.quote("Longitude"));
-                    for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
-                        sb.append(",");
-                        String unit = var.getUnitsString();
-                        if (unit != null) {
-                            sb.append(HtmlUtil.quote(var.getShortName()
-                                    + " (" + unit + ")"));
-                        } else {
-                            sb.append(HtmlUtil.quote(var.getShortName()));
-                        }
-                    }
-                    sb.append("\n");
-                }
-
-                sb.append(HtmlUtil.quote("" + po.getNominalTimeAsDate()));
+            if (cnt == 1) {
+                sb.append(HtmlUtil.quote("Time"));
                 sb.append(",");
-                sb.append(el.getLatitude());
+                sb.append(HtmlUtil.quote("Latitude"));
                 sb.append(",");
-                sb.append(el.getLongitude());
-
+                sb.append(HtmlUtil.quote("Longitude"));
                 for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
-                    StructureMembers.Member member =
-                        structure.findMember(var.getShortName());
                     sb.append(",");
-                    if ((var.getDataType() == DataType.STRING)
-                            || (var.getDataType() == DataType.CHAR)) {
-                        sb.append(
-                            HtmlUtil.quote(
-                                structure.getScalarString(member)));
+                    String unit = var.getUnitsString();
+                    if (unit != null) {
+                        sb.append(HtmlUtil.quote(var.getShortName() + " ("
+                                + unit + ")"));
                     } else {
-                        sb.append(structure.convertScalarFloat(member));
+                        sb.append(HtmlUtil.quote(var.getShortName()));
                     }
                 }
                 sb.append("\n");
             }
-            pointPool.put(path,pod);
-            return new Result(msg("Point Data"), sb,
-                              getRepository().getMimeTypeFromSuffix(".csv"));
+
+            sb.append(HtmlUtil.quote("" + po.getNominalTimeAsDate()));
+            sb.append(",");
+            sb.append(el.getLatitude());
+            sb.append(",");
+            sb.append(el.getLongitude());
+
+            for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
+                StructureMembers.Member member =
+                    structure.findMember(var.getShortName());
+                sb.append(",");
+                if ((var.getDataType() == DataType.STRING)
+                        || (var.getDataType() == DataType.CHAR)) {
+                    sb.append(
+                        HtmlUtil.quote(structure.getScalarString(member)));
+                } else {
+                    sb.append(structure.convertScalarFloat(member));
+                }
+            }
+            sb.append("\n");
+        }
+        pointPool.put(path, pod);
+        return new Result(msg("Point Data"), sb,
+                          getRepository().getMimeTypeFromSuffix(".csv"));
     }
 
 
@@ -1644,51 +1692,50 @@ public class DataOutputHandler extends OutputHandler {
      */
     public Result outputPointKml(Request request, Entry entry)
             throws Exception {
-        String path = getPath(entry);
-        PointObsDataset pod = pointPool.get(path);
-            Element  root         = KmlUtil.kml(entry.getName());
-            Element  docNode      = KmlUtil.document(root, entry.getName());
-            List     vars         = pod.getDataVariables();
-            Iterator dataIterator = pod.getDataIterator(16384);
-            while (dataIterator.hasNext()) {
-                PointObsDatatype po = (PointObsDatatype) dataIterator.next();
-                ucar.unidata.geoloc.EarthLocation el = po.getLocation();
-                if (el == null) {
-                    continue;
-                }
-                double lat = el.getLatitude();
-                double lon = el.getLongitude();
-                double alt = 0;
-                if ((lat != lat) || (lon != lon)) {
-                    continue;
-                }
+        String              path         = getPath(entry);
+        FeatureDatasetPoint pod          = pointPool.get(path);
+        Element             root         = KmlUtil.kml(entry.getName());
+        Element             docNode = KmlUtil.document(root, entry.getName());
+        List                vars         = pod.getDataVariables();
+        PointFeatureIterator dataIterator = getPointIterator(pod);
 
-                StructureData structure = po.getData();
-                StringBuffer  info      = new StringBuffer("");
-                info.append("<b>Date:</b> " + po.getNominalTimeAsDate()
-                            + "<br>");
-                for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
-                    StructureMembers.Member member =
-                        structure.findMember(var.getShortName());
-                    if ((var.getDataType() == DataType.STRING)
-                            || (var.getDataType() == DataType.CHAR)) {
-                        info.append("<b>" + var.getName() + ": </b>"
-                                    + structure.getScalarString(member)
-                                    + "<br>");
-                    } else {
-                        info.append("<b>" + var.getName() + ": </b>"
-                                    + structure.convertScalarFloat(member)
-                                    + "<br>");
-
-                    }
-                }
-                KmlUtil.placemark(docNode, "" + po.getNominalTimeAsDate(),
-                                  info.toString(), lat, lon, alt, null);
+        while (dataIterator.hasNext()) {
+            PointFeature po = (PointFeature) dataIterator.next();
+            ucar.unidata.geoloc.EarthLocation el = po.getLocation();
+            if (el == null) {
+                continue;
             }
-            StringBuffer sb = new StringBuffer(XmlUtil.toString(root));
-            pointPool.put(path,pod);
-            return new Result(msg("Point Data"), sb,
-                              getRepository().getMimeTypeFromSuffix(".kml"));
+            double lat = el.getLatitude();
+            double lon = el.getLongitude();
+            double alt = 0;
+            if ((lat != lat) || (lon != lon)) {
+                continue;
+            }
+
+            StructureData structure = po.getData();
+            StringBuffer  info      = new StringBuffer("");
+            info.append("<b>Date:</b> " + po.getNominalTimeAsDate() + "<br>");
+            for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
+                StructureMembers.Member member =
+                    structure.findMember(var.getShortName());
+                if ((var.getDataType() == DataType.STRING)
+                        || (var.getDataType() == DataType.CHAR)) {
+                    info.append("<b>" + var.getName() + ": </b>"
+                                + structure.getScalarString(member) + "<br>");
+                } else {
+                    info.append("<b>" + var.getName() + ": </b>"
+                                + structure.convertScalarFloat(member)
+                                + "<br>");
+
+                }
+            }
+            KmlUtil.placemark(docNode, "" + po.getNominalTimeAsDate(),
+                              info.toString(), lat, lon, alt, null);
+        }
+        StringBuffer sb = new StringBuffer(XmlUtil.toString(root));
+        pointPool.put(path, pod);
+        return new Result(msg("Point Data"), sb,
+                          getRepository().getMimeTypeFromSuffix(".kml"));
 
     }
 
@@ -1768,7 +1815,7 @@ public class DataOutputHandler extends OutputHandler {
         }
 
         if (output.equals(OUTPUT_OPENDAP)) {
-            Result result =  outputOpendap(request, entry);
+            Result result = outputOpendap(request, entry);
             return result;
         }
 
@@ -1776,13 +1823,23 @@ public class DataOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public String getPath(Entry entry) throws Exception {
         String location;
-        if(entry.getType().equals(OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
+        if (entry.getType().equals(OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
             Resource resource = entry.getResource();
-            location =resource.getPath();
+            location = resource.getPath();
             String ext = IOUtil.getFileExtension(location).toLowerCase();
-            if(ext.equals(".html")||ext.equals(".das")||ext.equals(".dds")) {
+            if (ext.equals(".html") || ext.equals(".das")
+                    || ext.equals(".dds")) {
                 location = IOUtil.stripExtension(location);
             }
         } else {
@@ -1790,19 +1847,24 @@ public class DataOutputHandler extends OutputHandler {
         }
 
         List<Metadata> metadataList =
-            getMetadataManager().findMetadata( entry, ContentMetadataHandler.TYPE_ATTACHMENT,
-                                               true);
-        if(metadataList==null) return location;
+            getMetadataManager().findMetadata(entry,
+                ContentMetadataHandler.TYPE_ATTACHMENT, true);
+        if (metadataList == null) {
+            return location;
+        }
         for (Metadata metadata : metadataList) {
             if (metadata.getAttr1().endsWith(".ncml")) {
-                File templateNcmlFile =  new File(
-                                                  IOUtil.joinDir(
-                                                                 getRepository().getStorageManager().getEntryDir(
-                                                                                                                 metadata.getEntryId(), false), metadata.getAttr1()));
+                File templateNcmlFile =
+                    new File(
+                        IOUtil.joinDir(
+                            getRepository().getStorageManager().getEntryDir(
+                                metadata.getEntryId(),
+                                false), metadata.getAttr1()));
                 String ncml = IOUtil.readContents(templateNcmlFile);
                 ncml = ncml.replace("${location}", location);
-                File ncmlFile =  getStorageManager().getScratchFile(
-                                                                    entry.getId()+"_" + metadata.getId() +".ncml");
+                File ncmlFile =
+                    getStorageManager().getScratchFile(entry.getId() + "_"
+                        + metadata.getId() + ".ncml");
                 IOUtil.writeBytes(ncmlFile, ncml.getBytes());
                 location = ncmlFile.toString();
                 break;
@@ -1826,8 +1888,8 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputOpendap(final Request request, final Entry entry)
             throws Exception {
 
-        String location =getPath(entry);
-        NetcdfDataset ncDataset =      ncFilePool.get(location);
+        String        location  = getPath(entry);
+        NetcdfDataset ncDataset = ncFilePool.get(location);
 
         //Bridge the ramadda servlet to the opendap servlet
         NcDODSServlet servlet = new NcDODSServlet(request, entry, ncDataset) {
@@ -1856,8 +1918,8 @@ public class DataOutputHandler extends OutputHandler {
         //We have to pass back a result though we set needtowrite to false because the opendap servlet handles the writing
         Result result = new Result("");
         result.setNeedToWrite(false);
-        
-        ncFilePool.put(location,ncDataset);
+
+        ncFilePool.put(location, ncDataset);
 
         return result;
 
@@ -1880,6 +1942,7 @@ public class DataOutputHandler extends OutputHandler {
         /** _more_ */
         NetcdfFile ncFile;
 
+        /** _more_          */
         Entry entry;
 
         /**
@@ -1887,11 +1950,13 @@ public class DataOutputHandler extends OutputHandler {
          *
          * @param request _more_
          * @param entry _more_
+         * @param ncFile _more_
          */
-        public NcDODSServlet(Request request, Entry entry, NetcdfFile ncFile) {
+        public NcDODSServlet(Request request, Entry entry,
+                             NetcdfFile ncFile) {
             this.repositoryRequest = request;
-            this.entry              = entry;
-            this.ncFile             = ncFile;
+            this.entry             = entry;
+            this.ncFile            = ncFile;
         }
 
         /**

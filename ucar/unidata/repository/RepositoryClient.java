@@ -187,6 +187,7 @@ public class RepositoryClient extends RepositoryBase {
         System.err.println(msg);
         System.err.println(
             "Usage: RepositoryClient <server url> <user id> <password> <arguments>");
+        System.exit(1);
     }
 
 
@@ -298,6 +299,33 @@ public class RepositoryClient extends RepositoryBase {
                 entryNode.setAttribute(ATTR_FILE,
                                        IOUtil.getFileTail(args[i]));
                 files.add(f);
+            } else if (arg.equals("-addmetadata")) {
+                if(entryNode==null) {
+                    usage("Need to specify a -file first");
+                }
+                entryNode.setAttribute(ATTR_ADDMETADATA,"true");
+            } else if (arg.equals("-attach")) {
+                if (i == args.length) {
+                    usage("Bad -file argument");
+                }
+                i++;
+                File f = new File(args[i]);
+                if ( !f.exists()) {
+                    usage("File does not exist:" + args[i]);
+                }
+                if(entryNode==null) {
+                    usage("Need to specify a -file first");
+                }
+                if (root == null) {
+                    doc = XmlUtil.makeDocument();
+                    root = XmlUtil.create(doc, TAG_ENTRIES, null,
+                                          new String[] {});
+                    entryNode.setAttribute(ATTR_NAME,
+                                           IOUtil.getFileTail(args[i]));
+                }
+
+                addAttachment(entryNode, IOUtil.getFileTail(f.toString()));
+                files.add(f);
             } else {
                 if ( !new File(args[i]).exists()) {
                     usage("Unknown argument:" + args[i]);
@@ -350,7 +378,7 @@ public class RepositoryClient extends RepositoryBase {
 
         String  body     = XmlUtil.getChildText(response).trim();
         if (responseOk(response)) {
-            System.err.println("OK:" + body);
+            System.err.println("OK:" +body);
         } else {
             System.err.println("Error:" + body);
         }

@@ -2857,9 +2857,6 @@ return new Result(title, sb);
             }
         }
         entry.getTypeHandler().initializeEntry(request, entry, node);
-
-
-
         return entry;
 
     }
