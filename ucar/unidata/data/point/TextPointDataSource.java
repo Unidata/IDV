@@ -1803,27 +1803,30 @@ public class TextPointDataSource extends PointDataSource {
         }
 
         if (header == null) {
-            System.err.println("No -header specified");
-            usage();
-            return;
+            //            System.err.println("No -header specified");
+            //            usage();
+            //            return;
         }
 
-        List toks = StringUtil.split(header, "\n", true, true);
-        if (toks.size() != 2) {
-            System.err.println("Bad header");
-            return;
+        if(header!=null) {
+            List toks = StringUtil.split(header, "\n", true, true);
+            if (toks.size() != 2) {
+                System.err.println("Bad header");
+                return;
+
+            }
+
+            properties.put(TextPointDataSource.PROP_HEADER_MAP, toks.get(0));
+            properties.put(TextPointDataSource.PROP_HEADER_PARAMS, toks.get(1));
 
         }
-
-
-        properties.put(TextPointDataSource.PROP_HEADER_MAP, toks.get(0));
-        properties.put(TextPointDataSource.PROP_HEADER_PARAMS, toks.get(1));
 
         for (int i = argIdx; i < args.length; i++) {
             String csvFile = args[i];
             //            if(csvFile.endsWith(".xls")) {
             //                contents  = DataUtil.xlsToCsv(csvFile);
             //            }
+            System.err.println("File:" + csvFile);
             TextPointDataSource dataSource =
                 new TextPointDataSource(new DataSourceDescriptor(), csvFile,
                                         properties);
@@ -1849,6 +1852,7 @@ public class TextPointDataSource extends PointDataSource {
 
         }
 
+        System.exit(0);
 
     }
 
