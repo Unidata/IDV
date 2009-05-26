@@ -628,7 +628,6 @@ public class Trace {
      * @param name _more_
      */
     public static void accum1(String name) {
-        if(true) return;
         if ( !displayMsg) {
             return;
         }
@@ -643,7 +642,6 @@ public class Trace {
      * @param name _more_
      */
     public static void accum2(String name) {
-        if(true) return;
         if ( !displayMsg) {
             return;
         }
