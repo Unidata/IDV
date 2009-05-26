@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -418,9 +419,9 @@ public class Misc {
             } else if (paramType.equals(Range.class)) {
                 int idx = value.indexOf(":");
                 if (idx >= 0) {
-                    argument = new Range(new Double(value.substring(0,
-                            idx)).doubleValue(), new Double(value.substring(idx
-                            + 1)).doubleValue());
+                    argument = new Range(
+                        new Double(value.substring(0, idx)).doubleValue(),
+                        new Double(value.substring(idx + 1)).doubleValue());
                 }
             } else if (paramType.equals(Double.TYPE)) {
                 argument = new Double(value);
@@ -3911,8 +3912,16 @@ public class Misc {
     }
 
 
-    public static float[][] addArray(float[][] a, float[][] b,
-                                          float[][] c) {
+    /**
+     * _more_
+     *
+     * @param a _more_
+     * @param b _more_
+     * @param c _more_
+     *
+     * @return _more_
+     */
+    public static float[][] addArray(float[][] a, float[][] b, float[][] c) {
         if (c == null) {
             c = new float[a.length][a[0].length];
         }
@@ -4280,7 +4289,7 @@ public class Misc {
      * @param sourceValues  packed integer array
      * @param lengths       lengths of packed bits
      *
-     * @param args test unpack 
+     * @param args test unpack
      *
      * @return an array of unpacked integers
      * public static int[] unpack(int[] sourceValues, int[] lengths) {
@@ -4388,7 +4397,49 @@ public class Misc {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param args _more_
+     */
+    public static void main(String[] args) {
+        List<String> test = new ArrayList<String>();
+
+
+        for (int i = 0; i < 1000000; i++) {
+            test.add("test string " + i);
+        }
+        int  size = test.size();
+
+
+        long t1, t2;
+
+        System.err.println("size:" + size);
+        t1 = System.currentTimeMillis();
+        for (int i = 0; i < test.size(); i++) {
+            String s = test.get(i);
+        }
+        t2 = System.currentTimeMillis();
+        System.err.println("time 1:" + (t2 - t1));
+
+        t1 = System.currentTimeMillis();
+        for (int i = 0; i < size; i++) {
+            String s = test.get(i);
+        }
+        t2 = System.currentTimeMillis();
+        System.err.println("time 2:" + (t2 - t1));
+
+
+        t1 = System.currentTimeMillis();
+        for (String s : test) {}
+        t2 = System.currentTimeMillis();
+        System.err.println("time 3:" + (t2 - t1));
+
+
+
+
+    }
+
 
 }
-
 
