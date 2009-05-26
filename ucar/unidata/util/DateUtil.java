@@ -660,9 +660,17 @@ public class DateUtil {
      * @throws Exception On badness
      */
     public static void main(String[] args) throws Exception {
+
+        long t1 =  System.currentTimeMillis();
         SimpleDateFormat fmt  = new SimpleDateFormat("yyyy-mm-dd HH");
-        Date             dttm = fmt.parse("2007-12-01 00.65");
-        System.err.println("dttm:" + dttm);
+        for(int i=0;i<1000000;i++) {
+            Date             dttm = fmt.parse("2007-12-01 00.65");
+        }
+        long t2 = System.currentTimeMillis();
+        System.err.println("time 1:" + (t2 - t1));
+
+
+        //        System.err.println("dttm:" + dttm);
         if (true) {
             return;
         }
