@@ -856,10 +856,10 @@ public abstract class XmlUtil {
     public static List findChildren(Node parent, String tag) {
         ArrayList found    = new ArrayList();
         NodeList  children = parent.getChildNodes();
+        boolean doAll = ((tag == null) || tag.equals("*"));
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
-            if ((tag == null) || tag.equals("*")
-                    || child.getNodeName().equals(tag)) {
+            if (doAll || child.getNodeName().equals(tag)) {
                 found.add(child);
             }
         }
@@ -2193,8 +2193,11 @@ public abstract class XmlUtil {
                 }
 
                 Element root      = getRoot(buff.toString());
-                String  xmlString = toStringWithHeader(root, "  ", "\n",
-                                        true);
+                //                String  xmlString = toStringWithHeader(root, "  ", "\n",
+                //                                        true);
+
+                String  xmlString = toStringWithHeader(root, "", "",
+                                        false);
                 IOUtil.writeFile(new java.io.File(args[i]), xmlString);
             } catch (Exception exc) {
                 System.err.println("Error processing:" + args[i]);
