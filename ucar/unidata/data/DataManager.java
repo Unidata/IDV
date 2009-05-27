@@ -1227,8 +1227,16 @@ public class DataManager {
             return null;
         }
 
+        //First check identifiedBy
         for (DataSource dataSource : dataSources) {
             if (dataSource.identifiedBy(name)) {
+                return dataSource;
+            }
+        }
+
+        //next  check identifiedByName
+        for (DataSource dataSource : dataSources) {
+            if (dataSource.identifiedByName(name)) {
                 return dataSource;
             }
         }
