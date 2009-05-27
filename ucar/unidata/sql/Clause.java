@@ -170,6 +170,7 @@ public class Clause {
      * @return _more_
      */
     public static Clause or(Clause[] clauses) {
+        if(clauses == null || clauses.length==0) return null;
         return new Clause(EXPR_OR, clauses);
     }
 
@@ -181,6 +182,7 @@ public class Clause {
      * @return _more_
      */
     public static Clause and(Clause[] clauses) {
+        if(clauses == null || clauses.length==0) return null;
         return new Clause(EXPR_AND, clauses);
     }
 

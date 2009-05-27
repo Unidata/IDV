@@ -857,7 +857,7 @@ public class SqlUtil {
         return "SELECT " + what + " FROM " + tableClause
                + ((where.trim().length() > 0)
                   ? " \nWHERE " + where
-                  : "") + " " + extra;
+                  : "") + (extra==null?"":" " + extra);
     }
 
 
@@ -1470,6 +1470,14 @@ public class SqlUtil {
                                    List tables, Clause clause, String extra,
                                    int max)
             throws Exception {
+
+        return select(connection, what, tables, clause, extra, max,0);
+    }
+
+    public static Statement select(Connection connection, String what,
+                                   List tables, Clause clause, String extra,
+                                   int max, int timeout)
+            throws Exception {
         PreparedStatement stmt = getSelectStatement(connection, what, tables,
                                      clause, extra);
         if (max > 0) {
@@ -1479,6 +1487,9 @@ public class SqlUtil {
             clause.setValue(stmt, 1);
         }
         //        System.err.println ("stmt: " + stmt);
+        if(timeout>0) {
+            stmt.setQueryTimeout(timeout);
+        }
         stmt.execute();
         return stmt;
     }
