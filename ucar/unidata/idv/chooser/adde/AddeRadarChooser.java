@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.chooser.adde;
 
 
@@ -114,6 +115,7 @@ public class AddeRadarChooser extends AddeImageChooser {
     /** Am I currently reading the stations */
     private boolean readingStations = false;
 
+    /** read station object */
     private Object readStationTask;
 
     /** station table */
@@ -169,9 +171,9 @@ public class AddeRadarChooser extends AddeImageChooser {
     }
 
     /**
-     * _more_
+     * Get the descriptor label
      *
-     * @return _more_
+     * @return  the label
      */
     public String getDescriptorLabel() {
         return "Product";
@@ -195,7 +197,7 @@ public class AddeRadarChooser extends AddeImageChooser {
      * @param comps The list to add to.
      */
     protected void getComponents(List comps) {
-        List extraComps  = new ArrayList();
+        List extraComps = new ArrayList();
         super.getComponents(extraComps);
         extraComps.addAll(processPropertyComponents());
         GuiUtils.tmpInsets = GRID_INSETS;
@@ -208,10 +210,11 @@ public class AddeRadarChooser extends AddeImageChooser {
         stationMap = registerStatusComp("stations", stationMap);
         addServerComp(stationMap);
 
-        JComponent timesPanel = addServerComp(makeTimesPanel(false,
-                                                             true));
+        JComponent timesPanel = addServerComp(makeTimesPanel(false, true));
 
-        JComponent panel = GuiUtils.centerRight(stationMap,  GuiUtils.topCenter(GuiUtils.filler(250,1), GuiUtils.top(extra)));
+        JComponent panel = GuiUtils.centerRight(stationMap,
+                               GuiUtils.topCenter(GuiUtils.filler(250, 1),
+                                   GuiUtils.top(extra)));
         comps.add(addServerComp(GuiUtils.valignLabel(LABEL_STATIONS)));
         comps.add(panel);
         comps.add(GuiUtils.valignLabel("Times:"));
@@ -302,11 +305,11 @@ public class AddeRadarChooser extends AddeImageChooser {
         if (getState() != STATE_CONNECTED) {
             clearStations();
         }
-        if (readStationTask!=null) {
-            if(taskOk(readStationTask)) {
+        if (readStationTask != null) {
+            if (taskOk(readStationTask)) {
                 setStatus("Reading available stations from server");
             } else {
-                readStationTask  = null;
+                readStationTask = null;
                 setState(STATE_UNCONNECTED);
             }
         }
@@ -323,6 +326,16 @@ public class AddeRadarChooser extends AddeImageChooser {
         descriptorChanged();
     }
 
+    /**
+     * Respond to a change in the descriptor list.
+     */
+    protected void descriptorChanged() {
+        if ( !getHaveStations()) {  // handle archive case
+            setAvailableStations();
+        }
+        super.descriptorChanged();
+    }
+
 
     /**
      *  Generate a list of radar ids for the id list.
@@ -331,21 +344,26 @@ public class AddeRadarChooser extends AddeImageChooser {
         readStationTask = startTask();
         clearSelectedStations();
         updateStatus();
-        List stations = readStations();
-        if(stopTaskAndIsOk(readStationTask)) {
-            readStationTask = null;
-            if (stations != null) {
-                getStationMap().setStations(stations);
-            } else {
-                clearStations();
+        Misc.run(new Runnable() {
+            public void run() {
+                showWaitCursor();
+                List stations = readStations();
+                if (stopTaskAndIsOk(readStationTask)) {
+                    readStationTask = null;
+                    if (stations != null) {
+                        getStationMap().setStations(stations);
+                    } else {
+                        clearStations();
+                    }
+                    updateStatus();
+                    revalidate();
+                } else {
+                    //User pressed cancel
+                    setState(STATE_UNCONNECTED);
+                }
+                showNormalCursor();
             }
-            updateStatus();
-            revalidate();
-        } else {
-            //User pressed cancel
-            setState(STATE_UNCONNECTED);
-            return;
-        }
+        });
 
     }
 
@@ -374,6 +392,9 @@ public class AddeRadarChooser extends AddeImageChooser {
             appendKeyValue(buff, PROP_DESCR,
                            getDescriptorFromSelection(descrForIds));
             appendKeyValue(buff, PROP_ID, VALUE_LIST);
+            if (archiveDay != null) {
+                appendKeyValue(buff, PROP_DAY, archiveDay);
+            }
             Hashtable         seen    = new Hashtable();
             AreaDirectoryList dirList =
                 new AreaDirectoryList(buff.toString());
@@ -398,11 +419,11 @@ public class AddeRadarChooser extends AddeImageChooser {
                     "no images meet the selection criteria") >= 0) {
                 LogUtil.userErrorMessage(
                     "No stations could be found on the server");
+                stations = new ArrayList();
+                setState(STATE_UNCONNECTED);
             } else {
                 handleConnectionError(e);
             }
-            stations = new ArrayList();
-            setState(STATE_UNCONNECTED);
         }
         return stations;
     }
@@ -427,6 +448,9 @@ public class AddeRadarChooser extends AddeImageChooser {
         return null;
     }
 
+    /**
+     * Do the cancel
+     */
     public void doCancel() {
         readStationTask = null;
         super.doCancel();

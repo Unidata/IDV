@@ -1,6 +1,4 @@
 /**
- * $Id: AddeImageChooser.java,v 1.16 2007/08/14 18:32:09 dmurray Exp $
- *
  * Copyright  1997-2004 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
@@ -19,8 +17,6 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 
 package ucar.unidata.idv.chooser.adde;
@@ -104,7 +100,7 @@ import javax.swing.event.*;
 public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     .imagery.ImageSelector {
 
-    /** _more_ */
+    /** size threshold */
     private static final int SIZE_THRESHOLD = 30;
 
 
@@ -212,7 +208,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     private Object readTimesTask;
 
     /** archive date */
-    private String archiveDay = null;
+    protected String archiveDay = null;
 
     /** List of descriptors */
     private PreferenceList descList;
@@ -306,9 +302,10 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     /** Widget for the element  center point in the advanced section */
     protected JTextField centerElementFld;
 
-    /** _more_ */
+    /** lock button */
     private JToggleButton lockBtn;
 
+    /** full resolution button */
     private JButton fullResBtn;
 
     /** Label used for the line center */
@@ -448,7 +445,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
      * @return array of button names
      */
     protected String[] getButtonLabels() {
-        return new String[] {  getLoadCommandName(), GuiUtils.CMD_UPDATE, GuiUtils.CMD_HELP };
+        return new String[] { getLoadCommandName(), GuiUtils.CMD_UPDATE,
+                              GuiUtils.CMD_HELP };
     }
 
 
@@ -796,6 +794,11 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
 
 
+    /**
+     * Can we cancel
+     *
+     * @return  true
+     */
     public boolean canDoCancel() {
         return true;
     }
@@ -814,14 +817,15 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         JPanel imagePanel = GuiUtils.doLayout(allComps, 2, GuiUtils.WT_NY,
                                 GuiUtils.WT_N);
 
-        return GuiUtils.top(GuiUtils.centerBottom(imagePanel, getDefaultButtons(this)));
+        return GuiUtils.top(GuiUtils.centerBottom(imagePanel,
+                getDefaultButtons(this)));
     }
 
 
     /**
-     * _more_
+     * Process server components
      *
-     * @return _more_
+     * @return  the list of components
      */
     protected List processServerComponents() {
         if (groupSelector != null) {
@@ -853,9 +857,9 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
 
     /**
-     * _more_
+     * Process the property components
      *
-     * @return _more_
+     * @return the property components
      */
     protected List processPropertyComponents() {
         List bottomComps = new ArrayList();
@@ -942,7 +946,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             if (prop.equals(PROP_UNIT)) {
                 unitComboBox = new JComboBox();
                 addPropComp(PROP_UNIT, propComp = unitComboBox);
-                GuiUtils. setPreferredWidth(unitComboBox, 100);
+                GuiUtils.setPreferredWidth(unitComboBox, 100);
                 if (haveBand) {
                     bandComboBox = new JComboBox();
                     bandComboBox.addActionListener(new ActionListener() {
@@ -955,9 +959,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
 
 
-                    propComp =
-                        GuiUtils.hbox(propComp,
-                                      padLabel("Channel:"), bandComboBox, 5);
+                    propComp = GuiUtils.hbox(propComp, padLabel("Channel:"),
+                                             bandComboBox, 5);
                 }
             } else if (prop.equals(PROP_BAND)) {
                 //Moved to PROP_UNIT
@@ -974,10 +977,11 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
 
 
-                fullResBtn=
-                    GuiUtils.makeImageButton("/auxdata/ui/icons/arrow_out.png", this, "setToFullResolution");
+                fullResBtn = GuiUtils.makeImageButton(
+                    "/auxdata/ui/icons/arrow_out.png", this,
+                    "setToFullResolution");
                 fullResBtn.setContentAreaFilled(false);
-                fullResBtn.setToolTipText("Set to full resolution" );
+                fullResBtn.setToolTipText("Set to full resolution");
 
 
 
@@ -1083,16 +1087,15 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 amSettingProperties = oldAmSettingProperties;
 
 
-                GuiUtils.tmpInsets  = new Insets(0,0,0,0);
+                GuiUtils.tmpInsets  = new Insets(0, 0, 0, 0);
                 JPanel magPanel = GuiUtils.doLayout(new Component[] {
-                                      lineMagLbl,
-                                      GuiUtils.inset(lineMagComps[0],
-                                          new Insets(0, 4, 0, 0)),
-                                      new JLabel("    X"), elementMagLbl,
-                                      GuiUtils.inset(elementMagComps[0],
-                                          new Insets(0, 4, 0, 0)), 
-                                      GuiUtils.inset(getLockButton(), new Insets(0,10,0,0))}, 7,
-                                              GuiUtils.WT_N, GuiUtils.WT_N);
+                    lineMagLbl,
+                    GuiUtils.inset(lineMagComps[0], new Insets(0, 4, 0, 0)),
+                    new JLabel("    X"), elementMagLbl,
+                    GuiUtils.inset(elementMagComps[0],
+                                   new Insets(0, 4, 0, 0)),
+                    GuiUtils.inset(getLockButton(), new Insets(0, 10, 0, 0))
+                }, 7, GuiUtils.WT_N, GuiUtils.WT_N);
 
                 addPropComp(PROP_MAG, propComp = magPanel);
                 if (haveNav) {
@@ -1130,9 +1133,11 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
                 JPanel sizePanel =
                     GuiUtils.left(GuiUtils.doLayout(new Component[] {
-                        numLinesFld,
-                        new JLabel(" X "), numElementsFld/*, lockBtn*/,  GuiUtils.filler(10,1),fullResBtn, /*new JLabel(" "),*/
-                        sizeLbl }, 7, GuiUtils.WT_N, GuiUtils.WT_N));
+                    numLinesFld, new JLabel(" X "),
+                    numElementsFld /*, lockBtn*/, GuiUtils.filler(10, 1),
+                    fullResBtn,  /*new JLabel(" "),*/
+                    sizeLbl
+                }, 7, GuiUtils.WT_N, GuiUtils.WT_N));
                 addPropComp(PROP_SIZE, propComp = sizePanel);
             }
 
@@ -1150,36 +1155,45 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     }
 
 
+    /**
+     * Get the "lock" button
+     *
+     * @return  the lock button
+     */
     private JToggleButton getLockButton() {
-        if(lockBtn==null) {
+        if (lockBtn == null) {
             lockBtn =
-                GuiUtils.getToggleImageButton("/auxdata/ui/icons/Linked.gif", 
-                                              "/auxdata/ui/icons/Unlinked.gif",
-                                              0, 0, true);
+                GuiUtils.getToggleImageButton("/auxdata/ui/icons/Linked.gif",
+                    "/auxdata/ui/icons/Unlinked.gif", 0, 0, true);
             lockBtn.setContentAreaFilled(false);
             lockBtn.setSelected(true);
             lockBtn.setToolTipText(
-                                   "Unlock to automatically change size when changing magnification");
-        } 
+                "Unlock to automatically change size when changing magnification");
+        }
         return lockBtn;
 
     }
 
 
-    public void setToFullResolution(){
+    /**
+     * Set to full resolution
+     */
+    public void setToFullResolution() {
 
-        if(propertiesAD==null) return;
+        if (propertiesAD == null) {
+            return;
+        }
         amSettingProperties = true;
-        numLinesFld.setText(""   +propertiesAD.getLines());
-        numElementsFld.setText(""+propertiesAD.getElements());
+        numLinesFld.setText("" + propertiesAD.getLines());
+        numElementsFld.setText("" + propertiesAD.getElements());
         changePlace(PLACE_CENTER);
-        if(useLatLon()) {
+        if (useLatLon()) {
             locationPanel.flip();
         }
-        centerLineFld.setText(""+(propertiesAD.getLines()/2));
-        centerElementFld.setText(""+(propertiesAD.getElements()/2));
+        centerLineFld.setText("" + (propertiesAD.getLines() / 2));
+        centerElementFld.setText("" + (propertiesAD.getElements() / 2));
 
-        setMagSliders(1,1);
+        setMagSliders(1, 1);
         amSettingProperties = false;
 
     }
@@ -1210,9 +1224,9 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
 
     /**
-     * _more_
+     * Handle changes to the element/line mag sliders
      *
-     * @param recomputeLineEleRatio _more_
+     * @param recomputeLineEleRatio  true to recompute the ratio
      */
     private void elementMagSliderChanged(boolean recomputeLineEleRatio) {
         int value = getElementMagValue();
@@ -1240,8 +1254,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     /**
      * Handle the line mag slider changed event
      *
-     *
-     * @param autoSetSize _more_
+     * @param autoSetSize  true to automatically set the size
      */
     private void lineMagSliderChanged(boolean autoSetSize) {
         try {
@@ -1327,7 +1340,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         if ( !getDoAbsoluteTimes()) {
             return;
         }
-        if(getIdv().getProperty("idv.chooser.addeimage.updateontimechange", true)) {
+        if (getIdv().getProperty("idv.chooser.addeimage.updateontimechange",
+                                 true)) {
             setPropertiesState(getASelectedTime(), false);
         }
     }
@@ -1642,7 +1656,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
 
     /**
-     * _more_
+     * Handle a cancel
      */
     public void doCancel() {
         readTimesTask = null;
@@ -2495,11 +2509,11 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     }
 
     /**
-     * _more_
+     * Get the size for the area directory
      *
-     * @param ad _more_
+     * @param ad  the area directory
      *
-     * @return _more_
+     * @return  an array of lines,elements
      */
     protected int[] getSize(AreaDirectory ad) {
         baseNumLines    = ad.getLines();
@@ -3253,6 +3267,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
      *
      */
     public void doLoadInThread() {
+
         if ( !checkForValidValues()) {
             return;
         }
@@ -3295,7 +3310,9 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 public void stateChanged(ChangeEvent evt) {
                     //A hack so we don't respond to the first event that we get from the slider when
                     //the dialog is first shown
-                    if(System.currentTimeMillis()-timeNow<500) return;
+                    if (System.currentTimeMillis() - timeNow < 500) {
+                        return;
+                    }
                     JSlider slider = (JSlider) evt.getSource();
                     int pixelsPerImage = 1000000 * slider.getValue()
                                          / listHolder[0].size() / 4;
@@ -3352,6 +3369,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
         makeDataSource(ids, "ADDE.IMAGE", ht);
         saveServerState();
+
     }
 
 

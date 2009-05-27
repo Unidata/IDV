@@ -20,10 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.chooser;
-
-
-import org.w3c.dom.Element;
 
 
 import org.w3c.dom.Element;
@@ -47,18 +45,20 @@ import ucar.unidata.metdata.NamedStationTable;
 import ucar.unidata.metdata.Station;
 
 import ucar.unidata.ui.ChooserPanel;
+
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.JobManager;
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.PreferenceList;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
+
 import ucar.unidata.view.CompositeRenderer;
 import ucar.unidata.view.Renderer;
 import ucar.unidata.view.station.StationLocationMap;
+
 import ucar.unidata.xml.XmlUtil;
 
 import visad.DateTime;
@@ -74,7 +74,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.*;
 
@@ -92,15 +91,23 @@ import javax.swing.*;
 
 public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
 
-    /** Where we get the maps       */
+    /** Where we get the maps */
     public static final String PROP_CHOOSER_MAPS = "idv.chooser.maps";
 
-    public static final String PROP_STATUS_FOREGROUND = "idv.chooser.status.foreground";
-    public static final String PROP_STATUS_BACKGROUND = "idv.chooser.status.background";
-    public static final String PROP_STATUS_TEMPLATE = "idv.chooser.status.template";
+    /** status foreground color */
+    public static final String PROP_STATUS_FOREGROUND =
+        "idv.chooser.status.foreground";
+
+    /** status background color */
+    public static final String PROP_STATUS_BACKGROUND =
+        "idv.chooser.status.background";
+
+    /** status template */
+    public static final String PROP_STATUS_TEMPLATE =
+        "idv.chooser.status.template";
 
 
-    /** Where we get the projection bounds       */
+    /** Where we get the projection bounds */
     public static final String PROP_CHOOSER_PROJECTION_BOUNDS =
         "idv.chooser.projection.bounds";
 
@@ -208,6 +215,7 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     private List selectedStations = new ArrayList();
 
 
+    /** data source listener */
     private ActionListener dataSourceListener;
 
     /**
@@ -253,7 +261,8 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
             id = "noid";
         }
 
-        setMessageTemplate(this.idv.getProperty(PROP_STATUS_TEMPLATE,(String)null));
+        setMessageTemplate(this.idv.getProperty(PROP_STATUS_TEMPLATE,
+                (String) null));
         init();
 
     }
@@ -289,32 +298,39 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     }
 
 
+    /**
+     * Get the default buttons
+     *
+     * @param listener  the listener
+     *
+     * @return the button component
+     */
     public JComponent getDefaultButtons(ActionListener listener) {
         JComponent buttons = super.getDefaultButtons(listener);
-        buttons =  decorateButtons(buttons);
-        JComponent extra = GuiUtils.filler(100,1);
-        String displayType = getDefaultDisplayType();
+        buttons = decorateButtons(buttons);
+        JComponent extra       = GuiUtils.filler(100, 1);
+        String     displayType = getDefaultDisplayType();
         if (displayType != null) {
-            String id = "idv." + getId() + ".autocreate";
-            boolean createDisplay =   idv.getStore().get(id,
-                                                         true);
+            String  id            = "idv." + getId() + ".autocreate";
+            boolean createDisplay = idv.getStore().get(id, true);
 
-            autoCreateDisplayCbx = new JCheckBox("Create display", createDisplay);
+            autoCreateDisplayCbx = new JCheckBox("Create display",
+                    createDisplay);
             autoCreateDisplayCbx.setToolTipText(
                 "Automatically create a display when data is loaded");
-            extra = GuiUtils.vbox(extra,autoCreateDisplayCbx);
+            extra = GuiUtils.vbox(extra, autoCreateDisplayCbx);
         }
 
 
-        buttons = GuiUtils.leftCenterRight(
-                                           GuiUtils.filler(100,1),
-                                           GuiUtils.doLayout(new Component[]{
-                        getStatusComponent(),
-                        buttons},
-                                               1,GuiUtils.WT_Y,GuiUtils.WT_N),
-                                           GuiUtils.bottom(GuiUtils.right(extra)));
+        buttons =
+            GuiUtils.leftCenterRight(GuiUtils.filler(100, 1),
+                                     GuiUtils.doLayout(new Component[] {
+                                         getStatusComponent(),
+                                         buttons }, 1, GuiUtils.WT_Y,
+                                         GuiUtils.WT_N), GuiUtils.bottom(
+                                             GuiUtils.right(extra)));
 
-        buttons.setBorder(BorderFactory.createEmptyBorder(5,0,0,0));
+        buttons.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
         return buttons;
     }
 
@@ -336,11 +352,10 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      */
     protected void getDataSourceProperties(Hashtable ht) {
         if (autoCreateDisplayCbx != null) {
-            String id = "idv." + getId() + ".autocreate";
-            boolean current = idv.getStore().get(id,true);
-            if(current !=autoCreateDisplayCbx.isSelected()) {
-                idv.getStore().put(id,
-                                   autoCreateDisplayCbx.isSelected());
+            String  id      = "idv." + getId() + ".autocreate";
+            boolean current = idv.getStore().get(id, true);
+            if (current != autoCreateDisplayCbx.isSelected()) {
+                idv.getStore().put(id, autoCreateDisplayCbx.isSelected());
                 idv.getStore().save();
             }
             if (autoCreateDisplayCbx.isSelected()) {
@@ -472,7 +487,7 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     protected StationLocationMap getStationMap() {
         if (stationMap == null) {
             stationMap = createStationMap();
-            registerStatusComp("stationmap",stationMap);
+            registerStatusComp("stationmap", stationMap);
             initStationMap(stationMap);
             stationMap.setPreferredSize(new Dimension(300, 250));
             stationMap.addPropertyChangeListener(
@@ -531,6 +546,19 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
         if (stationMap != null) {
             stationMap.setStations(new ArrayList());
         }
+    }
+
+    /**
+     * Do we have stations
+     *
+     * @return true if there is a station map and there are stations set
+     */
+    protected boolean getHaveStations() {
+        if (stationMap != null) {
+            List stations = stationMap.getStations();
+            return ((stations != null) && !stations.isEmpty());
+        }
+        return false;
     }
 
 
@@ -837,6 +865,11 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
         return makeDataSource(definingObject, null, properties);
     }
 
+    /**
+     * Set the data source listener
+     *
+     * @param listener  the listener
+     */
     public void setDataSourceListener(ActionListener listener) {
         this.dataSourceListener = listener;
     }
@@ -863,8 +896,10 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      */
     protected boolean makeDataSource(Object definingObject, String dataType,
                                      Hashtable properties) {
-        if(dataSourceListener!=null) {
-            dataSourceListener.actionPerformed(new ActionEvent(new Object[]{definingObject,properties},1,""));
+        if (dataSourceListener != null) {
+            dataSourceListener.actionPerformed(new ActionEvent(new Object[] {
+                definingObject,
+                properties }, 1, ""));
             return true;
         }
 
@@ -880,21 +915,45 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     }
 
 
+    /**
+     * Start the task
+     *
+     * @return the task id
+     */
     protected Object startTask() {
         Object taskId = JobManager.getManager().startLoad("chooser");
         return taskId;
     }
 
+    /**
+     * Stop the task
+     *
+     * @param taskId  the task id
+     */
     protected void stopTask(Object taskId) {
         JobManager.getManager().stopLoad(taskId);
     }
 
+    /**
+     * See if we can stop the task and it's okay
+     *
+     * @param taskId  the task id
+     *
+     * @return  true if ok
+     */
     protected boolean stopTaskAndIsOk(Object taskId) {
-        boolean ok =  JobManager.getManager().canContinue(taskId);
+        boolean ok = JobManager.getManager().canContinue(taskId);
         stopTask(taskId);
         return ok;
     }
 
+    /**
+     * Is the task ok?
+     *
+     * @param taskId  the task id
+     *
+     * @return  true if ok
+     */
     protected boolean taskOk(Object taskId) {
         return JobManager.getManager().canContinue(taskId);
     }
@@ -906,7 +965,9 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     public void showWaitCursor() {
         super.showWaitCursor();
         idv.getIdvUIManager().showWaitCursor();
-        if(cancelButton!=null) cancelButton.setEnabled(true);
+        if (cancelButton != null) {
+            cancelButton.setEnabled(true);
+        }
     }
 
     /**
@@ -915,7 +976,9 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     public void showNormalCursor() {
         super.showNormalCursor();
         idv.getIdvUIManager().showNormalCursor();
-        if(cancelButton!=null) cancelButton.setEnabled(false);
+        if (cancelButton != null) {
+            cancelButton.setEnabled(false);
+        }
     }
 
     /**
@@ -925,10 +988,15 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
         closeChooser();
     }
 
+    /**
+     * Handle a cancel
+     */
     public void doCancel() {
         super.doCancel();
         getIdv().clearWaitCursor();
-        if(cancelButton!=null) cancelButton.setEnabled(false);
+        if (cancelButton != null) {
+            cancelButton.setEnabled(false);
+        }
         updateStatus();
     }
 
@@ -937,7 +1005,7 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      * Close the chooser window
      */
     protected void closeChooser() {
-        if(dataSourceListener!=null) {
+        if (dataSourceListener != null) {
             return;
         }
         if (chooserManager != null) {
@@ -988,9 +1056,9 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     public final JComponent getContents() {
         if (contents == null) {
             Component innerContents = doMakeContents();
-            innerContents = GuiUtils.inset(innerContents,5);
+            innerContents = GuiUtils.inset(innerContents, 5);
 
-            JPanel    topPanel      = new JPanel(new BorderLayout()) {
+            JPanel topPanel = new JPanel(new BorderLayout()) {
                 public void paint(Graphics g) {
                     contentsPainted();
                     super.paint(g);
@@ -1005,10 +1073,14 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
         return contents;
     }
 
+    /**
+     * Update the status
+     */
     protected void updateStatus() {
         super.updateStatus();
-        if(getHaveData()) {
-            setStatus("Press \"" + CMD_LOAD + "\" to load the selected data", "buttons");
+        if (getHaveData()) {
+            setStatus("Press \"" + CMD_LOAD + "\" to load the selected data",
+                      "buttons");
         }
     }
 
@@ -1208,18 +1280,26 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
 
     }
 
+    /**
+     * get the status label background color
+     *
+     * @return the status label background color
+     */
     public Color getStatusLabelBackground() {
-        return getIdv().getColorProperty(PROP_STATUS_BACKGROUND, super.getStatusLabelBackground());
+        return getIdv().getColorProperty(PROP_STATUS_BACKGROUND,
+                                         super.getStatusLabelBackground());
     }
 
 
+    /**
+     * Get the status label foreground color
+     *
+     * @return the status label foreground color
+     */
     public Color getStatusLabelForeground() {
-        return getIdv().getColorProperty(PROP_STATUS_FOREGROUND, super.getStatusLabelForeground());
+        return getIdv().getColorProperty(PROP_STATUS_FOREGROUND,
+                                         super.getStatusLabelForeground());
     }
-
-
-
-
 
 }
 
