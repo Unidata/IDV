@@ -637,7 +637,6 @@ public class TDSRadarChooser extends TimesChooser {
         updateStatus();
     }
 
-    static boolean oldWay = true;
 
     /**
      *  Do what needs to be done to read in the times.  Subclasses
@@ -674,23 +673,24 @@ public class TDSRadarChooser extends TimesChooser {
                         pid = TwoFacedObject.getIdString(
                                                          productComboBox.getSelectedItem());
                     }
-                    Trace.startTrace();
-                    //                    Trace.call1("TDSRadarChooser.getRadarStation");
+                    //                    Trace.startTrace();
                     List<Date> allTimes;
-
-                    oldWay = !oldWay;
-
-                    Misc.gc();
-                    Trace.call1("new way");
-
+                    //                    Misc.gc();
+                    //                    Trace.call1("new way");
                     URI uri = collection.getQueryRadarStationURI(selectedStation.getID(),
                                                                  pid, fromDate, toDate);
 
 
                     //                    Trace.call1("getXml");
-                    String xml  = IOUtil.readContents(uri.toString(), getClass());
+                    LogUtil.message("Reading radar catalog from server");
+                    String xml;
+                    try {
+                        xml  = IOUtil.readContents(uri.toString(), getClass());
+                    } finally {
+                        LogUtil.message("");
+                    }
+                    //                    LogUtil.message("Processing radar catalog");
                     //                    Trace.call2("getXml"," xml.length=" + xml.length());
-
 
                     //                    Trace.call1("getRoot");
                     Element root = XmlUtil.getRoot(xml);
@@ -709,28 +709,21 @@ public class TDSRadarChooser extends TimesChooser {
                         Element child = (Element) children.get(i);
                         String dttmTxt = XmlUtil.getGrandChildText(child, CatalogUtil.TAG_DATE,(String)null);
                         if(dttmTxt == null) {
-                            //                            System.err.println("null");
                             continue;
                         }
                         allTimes.add(sdf.parse(dttmTxt));
                     }
-                    //                    Trace.call2("parse");
-                    //                    System.err.println ("got:" + allTimes.size());
-
-                    Trace.call2("new way");
 
 
-                    Misc.gc();
+                    //                    Trace.call2("new way");
 
-                    Trace.call1("old way");
-                    allTimes = collection.getRadarStationTimes(selectedStation.getID(),
-                                                               pid, fromDate, toDate);
-                    Trace.call2("old way");
+                    //                    Misc.gc();
+                    //                    Trace.call1("old way");
+                    //                    allTimes = collection.getRadarStationTimes(selectedStation.getID(),
+                    //                                                               pid, fromDate, toDate);
+                    //                    Trace.call2("old way");
+                    //                    Trace.stopTrace();
 
-
-
-
-                    Trace.stopTrace();
 
                     //   if(allTimes.size() == 0) {
                     //       toDate = new Date(System.currentTimeMillis()
