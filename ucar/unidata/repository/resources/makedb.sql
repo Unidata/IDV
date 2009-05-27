@@ -76,7 +76,7 @@ CREATE TABLE  metadata (id varchar(200),
                         attr4 varchar(10000),
 		        extra ramadda.bigclob);
 
-alter table metadata add column extra ramadda.bigclob;
+ALTER table metadata add column extra ramadda.bigclob;
 
 
 CREATE INDEX METADATA_INDEX_ID ON metadata (ID);

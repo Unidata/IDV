@@ -91,6 +91,8 @@ import java.util.TimeZone;
  */
 public class DatabaseManager extends RepositoryManager {
 
+    private static final int TIMEOUT = 5000;
+
     /** _more_ */
     private String db;
 
@@ -627,6 +629,7 @@ public class DatabaseManager extends RepositoryManager {
             throws Exception {
         Connection connection = getConnection();
         Statement  stmt       = execute(connection, sql, max, timeout);
+
         releaseConnection(connection);
         return stmt;
     }
@@ -988,14 +991,9 @@ public class DatabaseManager extends RepositoryManager {
     public Statement select(String what, String table, Clause clause,
                             String extra)
             throws Exception {
-        Connection connection = getConnection();
-        Statement stmt = SqlUtil.select(connection, what,
-                                        Misc.newList(table), ((clause == null)
-                ? null
-                : new Clause[] { clause }), extra);
-        releaseConnection(connection);
-        return stmt;
+        return select(what, Misc.newList(table),clause, extra,-1);
     }
+
 
 
     /**
@@ -1015,15 +1013,11 @@ public class DatabaseManager extends RepositoryManager {
                             final String extra, final  int max)
             throws Exception {
         Connection connection = getConnection();
-
         final boolean[] done = {false};
-
-        Statement stmt = SqlUtil.select(connection, what, tables, clause,
-                                        extra, max);
         Misc.run(new Runnable() {
                 public void run() {
                     //Wait 20 seconds
-                    Misc.sleep(1000*20);
+                    Misc.sleep(1000*10);
                     if(!done[0]) {
                         System.err.println("Select is taking too long\nwhat:" + what + "\ntables:" +
                                            tables +
@@ -1035,6 +1029,9 @@ public class DatabaseManager extends RepositoryManager {
                 }
             });
 
+
+        Statement stmt = SqlUtil.select(connection, what, tables, clause,
+                                        extra, max,TIMEOUT);
 
         done[0] = true;
         releaseConnection(connection);
@@ -1094,7 +1091,6 @@ public class DatabaseManager extends RepositoryManager {
         return select(what, Misc.newList(table), Clause.toArray(clauses));
     }
 
-
     /**
      * _more_
      *
@@ -1108,11 +1104,9 @@ public class DatabaseManager extends RepositoryManager {
      */
     public Statement select(String what, List tables, Clause[] clauses)
             throws Exception {
-        Connection connection = getConnection();
-        Statement  stmt = SqlUtil.select(connection, what, tables, clauses);
-        releaseConnection(connection);
-        return stmt;
+        return select(what, tables, Clause.and(clauses),null, -1);
     }
+
 
 
 

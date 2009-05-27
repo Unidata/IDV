@@ -51,8 +51,6 @@ import java.lang.management.*;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -1673,7 +1671,7 @@ public class Admin extends RepositoryManager {
         } else {
             Statement statement = null;
             try {
-                statement = getDatabaseManager().execute(query, -1, 0);
+                statement = getDatabaseManager().execute(query, -1, 10000);
             } catch (Exception exc) {
                 exc.printStackTrace();
                 throw exc;
