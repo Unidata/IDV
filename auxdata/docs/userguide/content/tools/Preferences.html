@@ -197,6 +197,19 @@ The IDV normally tries to cache data that it loads in memory. You can turn this 
 [ug::preference  {Disk Cache Size}]
 The IDV will cache some data sets to disk to eliminate network latency.  Specify the maximum amount of disk size with this preference.
 
+[ug::preference  {Thread Count}]
+The IDV can do processing in multiple threads. This allows one to take advantage of mulitple core chip architectures.
+One can set both the thread count for rendering and for data reading. 
+For rendering, each time step for each display is rendered separately.
+We suggest that for rendering running with 2 threads is optimal. We have not seen large improvements
+with a higher number of threads (due to memory issues). Also, it is easy to exceed the maximum memory
+amount if one is rendering in a large number of threads.
+<p>
+The data reading thread count is how many parallel reads (e.g., per time step) there are when accessing data
+on remote servers (e.g., THREDDS/OpenDAP, ADDE).
+There is no optimal thread count for data reading because it depends on the configuration of the server machine.
+We have found that 4 works well.
+
 
 [ug::preference {Max Image Size}]
 This field allows you to set a maximum image size (in pixels) that is to be displayed.
