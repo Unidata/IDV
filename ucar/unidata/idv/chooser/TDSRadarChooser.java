@@ -24,6 +24,11 @@
 package ucar.unidata.idv.chooser;
 
 
+import org.w3c.dom.*;
+
+import ucar.unidata.xml.XmlUtil;
+
+
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
@@ -33,7 +38,7 @@ import org.w3c.dom.Element;
 
 import thredds.catalog.XMLEntityResolver;
 
-import ucar.nc2.thredds.TDSRadarDatasetCollection;
+//import ucar.nc2.thredds.TDSRadarDatasetCollection;
 import ucar.nc2.units.DateUnit;
 
 import ucar.unidata.data.radar.RadarQuery;
@@ -45,6 +50,7 @@ import ucar.unidata.util.*;
 import visad.CommonUnit;
 import visad.DateTime;
 
+import java.text.SimpleDateFormat;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -86,7 +92,7 @@ public class TDSRadarChooser extends TimesChooser {
     private JComponent outerContents;
 
     /** The collection */
-    private TDSRadarDatasetCollection collection;
+    private IdvRadarDatasetCollection collection;
 
     /** The currently selected station */
     private NamedStation selectedStation;
@@ -527,7 +533,7 @@ public class TDSRadarChooser extends TimesChooser {
         try {
             StringBuffer errlog = new StringBuffer();
             try {
-                collection = TDSRadarDatasetCollection.factory("test", url,
+                collection = IdvRadarDatasetCollection.factory("test", url,
                         errlog);
             } catch (Exception exc) {
                 userMessage("Invalid catalog");
@@ -574,7 +580,7 @@ public class TDSRadarChooser extends TimesChooser {
         try {
             StringBuffer errlog = new StringBuffer();
             try {
-                collection = TDSRadarDatasetCollection.factory("test", url,
+                collection = IdvRadarDatasetCollection.factory("test", url,
                         errlog);
             } catch (Exception exc) {
                 userMessage("Invalid catalog");
@@ -631,6 +637,7 @@ public class TDSRadarChooser extends TimesChooser {
         updateStatus();
     }
 
+    static boolean oldWay = true;
 
     /**
      *  Do what needs to be done to read in the times.  Subclasses
@@ -638,73 +645,127 @@ public class TDSRadarChooser extends TimesChooser {
      */
     public void readTimes() {
         List<DateTime> times = new Vector<DateTime>();
-        if (getDoAbsoluteTimes()) {
-        ucar.unidata.util.Trace.call1("TDSRadarChooser.readTimes");
 
-        if (( !isLevel3 && (selectedStation != null))
+        if (getDoAbsoluteTimes()) {
+            //            ucar.unidata.util.Trace.call1("TDSRadarChooser.readTimes");
+
+            if (( !isLevel3 && (selectedStation != null))
                 || (isLevel3 && (selectedStation != null)
                     && (haveSelectedProduct()))) {
-            List timeSpan = collection.getRadarTimeSpan();
-            Date fromDate =
-                DateUnit.getStandardOrISO((String) timeSpan.get(0));
-            Date toDate = DateUnit.getStandardOrISO((String) timeSpan.get(1));
-         //   Date toDate = new Date(System.currentTimeMillis()
-          //                         + DateUtil.daysToMillis(1));
-            //Go back 10 years (or so)
-            //Date fromDate = new Date(System.currentTimeMillis()
-            //                         - DateUtil.daysToMillis(365 * 10));
-            try {
-                showWaitCursor();
-                setAbsoluteTimes(new ArrayList());
-                setStatus("Reading times for station: " + selectedStation,
-                          "");
-                //                LogUtil.message("Reading times for station: "
-                //                                + selectedStation);
-                String pid = null;
-                if (isLevel3) {
-                    pid = TwoFacedObject.getIdString(
-                        productComboBox.getSelectedItem());
-                }
-                ucar.unidata.util.Trace.call1("TDSRadarChooser.getRadarStation");
-                List<Date> allTimes =
-                    collection.getRadarStationTimes(selectedStation.getID(),
-                        pid, fromDate, toDate);
-                ucar.unidata.util.Trace.call2("TDSRadarChooser.getRadarStation");
 
-                //   if(allTimes.size() == 0) {
-                //       toDate = new Date(System.currentTimeMillis()
-                //                + DateUtil.daysToMillis(1));
-                //       allTimes =
-                //       collection.getRadarStationTimes(selectedStation.getID(),
-                //           pid, fromDate, toDate);
-                //   }
-                for (Date date : allTimes) {
-                    times.add(new DateTime(date));
-                }
-
-                /*
-                for (int timeIdx = 0; timeIdx < allTimes.size(); timeIdx++) {
-                    Object timeObj = allTimes.get(timeIdx);
-                    Date   date;
-                    if (timeObj instanceof Date) {
-                        date = (Date) timeObj;
-                    } else {
-                        date = DateUnit.getStandardOrISO(timeObj.toString());
+                List timeSpan = collection.getRadarTimeSpan();
+                Date fromDate =
+                    DateUnit.getStandardOrISO((String) timeSpan.get(0));
+                Date toDate = DateUnit.getStandardOrISO((String) timeSpan.get(1));
+                //   Date toDate = new Date(System.currentTimeMillis()
+                //                         + DateUtil.daysToMillis(1));
+                //Go back 10 years (or so)
+                //Date fromDate = new Date(System.currentTimeMillis()
+                //                         - DateUtil.daysToMillis(365 * 10));
+                try {
+                    showWaitCursor();
+                    setAbsoluteTimes(new ArrayList());
+                    setStatus("Reading times for station: " + selectedStation,
+                              "");
+                    //                LogUtil.message("Reading times for station: "
+                    //                                + selectedStation);
+                    String pid = null;
+                    if (isLevel3) {
+                        pid = TwoFacedObject.getIdString(
+                                                         productComboBox.getSelectedItem());
                     }
-                    times.add(new DateTime(date));
+                    Trace.startTrace();
+                    //                    Trace.call1("TDSRadarChooser.getRadarStation");
+                    List<Date> allTimes;
+
+                    oldWay = !oldWay;
+
+                    Misc.gc();
+                    Trace.call1("new way");
+
+                    URI uri = collection.getQueryRadarStationURI(selectedStation.getID(),
+                                                                 pid, fromDate, toDate);
+
+
+                    //                    Trace.call1("getXml");
+                    String xml  = IOUtil.readContents(uri.toString(), getClass());
+                    //                    Trace.call2("getXml"," xml.length=" + xml.length());
+
+
+                    //                    Trace.call1("getRoot");
+                    Element root = XmlUtil.getRoot(xml);
+                    //                    Trace.call2("getRoot");
+
+
+                    Element topDatasetNode = XmlUtil.findChild(root,CatalogUtil.TAG_DATASET);
+                    if(topDatasetNode==null) throw new IllegalStateException("Could not find dataset node in radar catalog");
+
+                    //                    Trace.call1("parse");
+
+                    List children = XmlUtil.findChildren(topDatasetNode, CatalogUtil.TAG_DATASET);
+                    allTimes = new ArrayList<Date>();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                    for(int i=0;i<children.size();i++) {
+                        Element child = (Element) children.get(i);
+                        String dttmTxt = XmlUtil.getGrandChildText(child, CatalogUtil.TAG_DATE,(String)null);
+                        if(dttmTxt == null) {
+                            //                            System.err.println("null");
+                            continue;
+                        }
+                        allTimes.add(sdf.parse(dttmTxt));
+                    }
+                    //                    Trace.call2("parse");
+                    //                    System.err.println ("got:" + allTimes.size());
+
+                    Trace.call2("new way");
+
+
+                    Misc.gc();
+
+                    Trace.call1("old way");
+                    allTimes = collection.getRadarStationTimes(selectedStation.getID(),
+                                                               pid, fromDate, toDate);
+                    Trace.call2("old way");
+
+
+
+
+                    Trace.stopTrace();
+
+                    //   if(allTimes.size() == 0) {
+                    //       toDate = new Date(System.currentTimeMillis()
+                    //                + DateUtil.daysToMillis(1));
+                    //       allTimes =
+                    //       collection.getRadarStationTimes(selectedStation.getID(),
+                    //           pid, fromDate, toDate);
+                    //   }
+                    for (Date date : allTimes) {
+                        times.add(new DateTime(date));
+                    }
+
+                    /*
+                      for (int timeIdx = 0; timeIdx < allTimes.size(); timeIdx++) {
+                      Object timeObj = allTimes.get(timeIdx);
+                      Date   date;
+                      if (timeObj instanceof Date) {
+                      date = (Date) timeObj;
+                      } else {
+                      date = DateUnit.getStandardOrISO(timeObj.toString());
+                      }
+                      times.add(new DateTime(date));
+                      }
+                    */
+                    //                LogUtil.message("");
+                    showNormalCursor();
+                } catch (Exception exc) {
+                    userMessage("Error reading times for station: "
+                                + selectedStation);
+                    setStatus("Select a different collection", "collections");
+                    showNormalCursor();
+                    return;
                 }
-                */
-                //                LogUtil.message("");
-                showNormalCursor();
-            } catch (Exception exc) {
-                userMessage("Error reading times for station: "
-                            + selectedStation);
-                setStatus("Select a different collection", "collections");
-                showNormalCursor();
-                return;
             }
-        }
-        ucar.unidata.util.Trace.call2("TDSRadarChooser.readTimes");
+            //            ucar.unidata.util.Trace.call2("TDSRadarChooser.readTimes");
         }
         setAbsoluteTimes(times);
     }
