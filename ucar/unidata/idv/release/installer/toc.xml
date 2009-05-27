@@ -1,4 +1,4 @@
-<!DOCTYPE toc SYSTEM "/downloads/toc.dtd">
+<!DOCTYPE toc SYSTEM "/content/downloads/toc.dtd">
 <toc title="IDV Download and Installation">
   <property name="%version%" value="@IDV_VERSION@" />
   <property name="%_version%" value="@IDV_VERSION_UNDER@" />
