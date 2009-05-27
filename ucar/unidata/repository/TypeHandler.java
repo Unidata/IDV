@@ -2240,11 +2240,12 @@ public class TypeHandler extends RepositoryManager {
                 //            System.err.println (doLike +" toks:" + nameToks);
                 List<Clause> ands       = new ArrayList<Clause>();
                 boolean searchMetadata = request.get(ARG_SEARCHMETADATA, false);
+                searchMetadata = false;
                 String [] attrCols = {
-                    Tables.METADATA.COL_ATTR1,
+                    Tables.METADATA.COL_ATTR1/*,
                     Tables.METADATA.COL_ATTR2,
                     Tables.METADATA.COL_ATTR3,
-                    Tables.METADATA.COL_ATTR4};
+                    Tables.METADATA.COL_ATTR4*/};
                 for(String nameTok: nameToks) {
                     boolean doNot = nameTok.startsWith("!");
                     if(doNot) {
