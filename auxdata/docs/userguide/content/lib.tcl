@@ -16,8 +16,8 @@ gen::addHandler {controls/.*\.html} ug::handleControls
 gen::setDoChildOverview 0
 
 ##We use this for referencing install anywhere file names
-gen::defineMacro {<%idv.version%>} {2.6}
-gen::defineMacro {<%idv.under.version%>} {2_6}
+gen::defineMacro {<%idv.version%>} {2.7}
+gen::defineMacro {<%idv.under.version%>} {2_7}
 gen::defineMacro {<%release.date%>} [clock format [clock seconds] -format {%B %d, %Y}]
 
 
@@ -472,11 +472,29 @@ button,  which brings up the
 }
 
 proc ug::datarange {} {
-    list {Visible Range} {
+    list {Visible Range} { 
 The [ug::button Visible Range] allows you to set the range 
 that determines what parts of the data is actually shown.  Check
 the box to enable the widget and use the [ug::button Change] button
 to set the data range.
+}
+}
+
+proc ug::texture {control} {
+    list {Texture Quality} { 
+The [ug::button Texture Quality] allows you to set the quality of
+the displayed texture of $control.  A higher
+quality will take longer to render and use more memory.  Move
+the slider to select the quality you want.
+}
+}
+
+proc ug::displaymode {control} {
+    list {Mode} {
+The [ug::button Mode] selector allows you to set the way
+the texture is displayed.  You can select Solid, Mesh,
+or points.  This is useful for looking at the structure
+of the underlying data used to create the $control.
 }
 }
 
