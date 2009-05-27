@@ -481,21 +481,21 @@ to set the data range.
 }
 
 proc ug::texture {control} {
-    list {Texture Quality} { 
+    list {Texture Quality} " 
 The [ug::button Texture Quality] allows you to set the quality of
 the displayed texture of $control.  A higher
 quality will take longer to render and use more memory.  Move
 the slider to select the quality you want.
-}
+"
 }
 
 proc ug::displaymode {control} {
-    list {Mode} {
+    list {Mode} "
 The [ug::button Mode] selector allows you to set the way
 the texture is displayed.  You can select Solid, Mesh,
 or points.  This is useful for looking at the structure
 of the underlying data used to create the $control.
-}
+"
 }
 
 
