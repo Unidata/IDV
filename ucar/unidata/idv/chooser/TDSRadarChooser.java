@@ -705,13 +705,15 @@ public class TDSRadarChooser extends TimesChooser {
                     List children = XmlUtil.findChildren(topDatasetNode, CatalogUtil.TAG_DATASET);
                     allTimes = new ArrayList<Date>();
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                    sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
                     for(int i=0;i<children.size();i++) {
                         Element child = (Element) children.get(i);
                         String dttmTxt = XmlUtil.getGrandChildText(child, CatalogUtil.TAG_DATE,(String)null);
                         if(dttmTxt == null) {
                             continue;
                         }
-                        allTimes.add(sdf.parse(dttmTxt));
+                        Date dttm  = sdf.parse(dttmTxt);
+                        allTimes.add(dttm);
                     }
 
 
