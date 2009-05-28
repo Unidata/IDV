@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -312,11 +313,12 @@ public class MapViewManager extends NavigatedViewManager {
 
 
             double[] aspect = getAspectRatio();
-            if(aspect == null) {
-                aspect = new double[]{ 1.0, 1.0, 0.4 };
+            if (aspect == null) {
+                aspect = new double[] { 1.0, 1.0, 0.4 };
             }
             mapDisplay.setDisplayAspect((mode == NavigatedDisplay.MODE_2D)
-                                        ? new double[] {aspect[0], aspect[1] }
+                                        ? new double[] { aspect[0],
+                    aspect[1] }
                                         : aspect);
 
             navDisplay = mapDisplay;
@@ -663,12 +665,13 @@ public class MapViewManager extends NavigatedViewManager {
         MapProjection  thatProjection = mvm.getMainProjection();
         this.setAspectRatio(that.getAspectRatio());
 
-        boolean setProjection  =false;
+        boolean setProjection = false;
         if (thatProjection != null) {
-            setProjection = setMapProjection(thatProjection, false, mvm.mainProjectionName);
-        } 
+            setProjection = setMapProjection(thatProjection, false,
+                                             mvm.mainProjectionName);
+        }
 
-        if(!setProjection) {
+        if ( !setProjection) {
             if (getAspectRatio() != null) {
                 getMapDisplay().setDisplayAspect(getAspectRatio());
             }
@@ -1050,6 +1053,19 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
+
+    /**
+     * _more_
+     *
+     * @param viewpointInfo _more_
+     */
+    public void setViewpointInfo(ViewpointInfo viewpointInfo) {
+        getViewpointControl().setViewpointInfo(viewpointInfo);
+    }
+
+
+
+
     /**
      * Dynamically initialize the view menu
      *
@@ -1345,9 +1361,11 @@ public class MapViewManager extends NavigatedViewManager {
      * @param fromWidget  true if this was from a widget (ie. widget or
      *                    menu item)
      * @param name        name to put in the history list (may be null)
+     *
+     * @return _more_
      */
     public boolean setMapProjection(MapProjection projection,
-                                 boolean fromWidget, String name) {
+                                    boolean fromWidget, String name) {
         return setMapProjection(projection, fromWidget, name, false);
     }
 
@@ -1360,11 +1378,14 @@ public class MapViewManager extends NavigatedViewManager {
      * @param name        name to put in the history list (may be null)
      * @param checkDefault  if true, check to see if we
      *                    should call getUseProjectionFromData()
+     *
+     * @return _more_
      */
     public boolean setMapProjection(MapProjection projection,
-                                 boolean fromWidget, String name,
-                                 boolean checkDefault) {
-        return setMapProjection(projection, fromWidget, name, checkDefault, true);
+                                    boolean fromWidget, String name,
+                                    boolean checkDefault) {
+        return setMapProjection(projection, fromWidget, name, checkDefault,
+                                true);
     }
 
 
@@ -1379,13 +1400,15 @@ public class MapViewManager extends NavigatedViewManager {
      * @param checkDefault  if true, check to see if we
      *                    should call getUseProjectionFromData()
      * @param addToCommandHistory Add this projection to the command history
+     *
+     * @return _more_
      */
     public boolean setMapProjection(MapProjection projection,
-                                 boolean fromWidget, String name,
-                                 boolean checkDefault,
-                                 boolean addToCommandHistory) {
+                                    boolean fromWidget, String name,
+                                    boolean checkDefault,
+                                    boolean addToCommandHistory) {
         return setMapProjection(projection, fromWidget, name, checkDefault,
-                         addToCommandHistory, false);
+                                addToCommandHistory, false);
     }
 
 
@@ -1400,12 +1423,14 @@ public class MapViewManager extends NavigatedViewManager {
      *                    should call getUseProjectionFromData()
      * @param addToCommandHistory Add this projection to the command history
      * @param maintainViewpoint  maintain the viewpoint
+     *
+     * @return _more_
      */
     public boolean setMapProjection(MapProjection projection,
-                                 boolean fromWidget, String name,
-                                 boolean checkDefault,
-                                 boolean addToCommandHistory,
-                                 boolean maintainViewpoint) {
+                                    boolean fromWidget, String name,
+                                    boolean checkDefault,
+                                    boolean addToCommandHistory,
+                                    boolean maintainViewpoint) {
 
 
         IdvUIManager.startTime = System.currentTimeMillis();
@@ -2295,5 +2320,4 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 }
-
 
