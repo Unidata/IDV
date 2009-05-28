@@ -155,6 +155,17 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
 
     /**
+     * Handle when this data source gets new files to use at runtime (e.g., from isl)
+     *
+     * @param files List of files
+     *
+     */
+    public void setNewFiles(List files) {
+        setImageList(makeImageDescriptors(Misc.listToStringArray(files)));
+    }
+
+
+    /**
      * Create a new ImageDataSource with a list of (String) images. These
      * can either be AREA files or ADDE URLs.
      *
@@ -416,6 +427,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
         }
         return descriptors;
     }
+
 
 
 
