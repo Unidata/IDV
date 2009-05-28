@@ -1634,8 +1634,8 @@ public class ImageGenerator extends IdvManager {
         for(int i=0;i<vms.size();i++) {
             ViewManager vm = (ViewManager)vms.get(i);
             if(XmlUtil.hasAttribute(node, ATTR_AZIMUTH) || XmlUtil.hasAttribute(node, ATTR_TILT)) {
-                viewpointInfo = new ViewpointInfo(XmlUtil.getAttribute(node, ATTR_AZIMUTH,0.0),
-                                                  XmlUtil.getAttribute(node, ATTR_TILT,0.0));
+                viewpointInfo = new ViewpointInfo(toDouble(node, ATTR_AZIMUTH,0.0),
+                                                  toDouble(node, ATTR_TILT,0.0));
                 if(!(vm instanceof MapViewManager)) continue;
                 MapViewManager mvm = (MapViewManager) vm;
                 mvm.setViewpointInfo(viewpointInfo);
@@ -1646,9 +1646,9 @@ public class ImageGenerator extends IdvManager {
                XmlUtil.hasAttribute(node, ATTR_ASPECTZ)) {
                 double[] a = vm.getMaster().getDisplayAspect();
                 a =    new double[] {
-                    XmlUtil.getAttribute(node, ATTR_ASPECTX, a[0]),
-                    XmlUtil.getAttribute(node, ATTR_ASPECTY, a[1]),
-                    XmlUtil.getAttribute(node, ATTR_ASPECTZ, a[2])};
+                    toDouble(node, ATTR_ASPECTX, a[0]),
+                    toDouble(node, ATTR_ASPECTY, a[1]),
+                    toDouble(node, ATTR_ASPECTZ, a[2])};
                     vm.getMaster().setDisplayAspect(a);
                     vm.setAspectRatio(a);
             }
@@ -1668,15 +1668,15 @@ public class ImageGenerator extends IdvManager {
                 MouseBehavior mb = vm.getMaster().getMouseBehavior();
                 mb.instance_unmake_matrix(rot, scale, trans,currentMatrix);
                 double [] matrix = mb.make_matrix(
-                                                  XmlUtil.getAttribute(node,ATTR_ROTX, rot[0]),
-                                                  XmlUtil.getAttribute(node,ATTR_ROTY, rot[1]),
-                                                  XmlUtil.getAttribute(node,ATTR_ROTZ, rot[2]),
-                                                  XmlUtil.getAttribute(node,ATTR_SCALE, scale[0])*a[0],
-                                                  XmlUtil.getAttribute(node,ATTR_SCALE, scale[0])*a[1],
-                                                  XmlUtil.getAttribute(node,ATTR_SCALE, scale[0])*a[2],
-                                                  XmlUtil.getAttribute(node,ATTR_TRANSX, trans[0]),
-                                                  XmlUtil.getAttribute(node,ATTR_TRANSY, trans[1]),
-                                                  XmlUtil.getAttribute(node,ATTR_TRANSZ,trans[2]));
+                                                  toDouble(node,ATTR_ROTX, rot[0]),
+                                                  toDouble(node,ATTR_ROTY, rot[1]),
+                                                  toDouble(node,ATTR_ROTZ, rot[2]),
+                                                  toDouble(node,ATTR_SCALE, scale[0])*a[0],
+                                                  toDouble(node,ATTR_SCALE, scale[0])*a[1],
+                                                  toDouble(node,ATTR_SCALE, scale[0])*a[2],
+                                                  toDouble(node,ATTR_TRANSX, trans[0]),
+                                                  toDouble(node,ATTR_TRANSY, trans[1]),
+                                                  toDouble(node,ATTR_TRANSZ,trans[2]));
                 vm.setDisplayMatrix(matrix);
             }
         }
