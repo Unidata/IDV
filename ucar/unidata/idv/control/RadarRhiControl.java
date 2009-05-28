@@ -48,7 +48,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
-import java.util.List;
+import java.util.List;import java.util.ArrayList;
 
 
 /**
@@ -269,7 +269,16 @@ public class RadarRhiControl extends ColorCrossSectionControl {
         tmpSelection.setToLevel(null);
 
         List levelsList1 = choice.getAllLevels(tmpSelection);
-
+        List<TwoFacedObject> levels = new ArrayList();
+        if(levelsList1.size() >= 1) {
+            for(int i = 0; i < levelsList1.size() ; i++) {
+                String azim = levelsList1.get(i).toString();
+                String as = getDisplayConventions().formatAngle(Float.parseFloat(azim));
+                //System.out.println("azimath " + as);
+                TwoFacedObject tobj = new TwoFacedObject(as, azim);
+                levels.add(tobj);
+            }
+        }
 
  /*        if (levelsList1.size() >= 1) {
             String azim = levelsList1.get(0).toString();
@@ -281,7 +290,7 @@ public class RadarRhiControl extends ColorCrossSectionControl {
             return false;
         }
         azimuthSelector = new JComboBox();
-        GuiUtils.setListData(azimuthSelector, levelsList1);
+        GuiUtils.setListData(azimuthSelector, levels);
         azimuthSelector.setSelectedItem(currentLevel);
         azimuthSelector.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
