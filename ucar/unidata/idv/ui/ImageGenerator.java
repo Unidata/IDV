@@ -64,7 +64,7 @@ import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
-import ucar.unidata.view.geoloc.NavigatedDisplay;
+import ucar.unidata.view.geoloc.*;
 
 
 import ucar.unidata.xml.XmlUtil;
@@ -275,6 +275,23 @@ public class ImageGenerator extends IdvManager {
     public static final String TAG_TRANSPARENT = "transparent";
 
     public static final String TAG_BGTRANSPARENT = "backgroundtransparent";
+
+    public static final String ATTR_AZIMUTH = "azimuth";
+    public static final String ATTR_TILT = "tilt";
+
+    public static final String ATTR_ASPECTX="aspectx";
+    public static final String ATTR_ASPECTY="aspecty";
+    public static final String ATTR_ASPECTZ="aspectz";
+
+
+    public static final String ATTR_ROTX="rotx";
+    public static final String ATTR_ROTY="roty";
+    public static final String ATTR_ROTZ="rotz";
+    public static final String ATTR_SCALE="scale";
+    public static final String ATTR_TRANSX="transx";
+    public static final String ATTR_TRANSY = "transy";
+    public static final String ATTR_TRANSZ = "transz";
+
 
     public static final String ATTR_SUFFIX = "suffix";
 
@@ -1601,6 +1618,66 @@ public class ImageGenerator extends IdvManager {
                     int   width    = theImage.getWidth(null);
                     int   height   = theImage.getHeight(null);
                 }
+            }
+        }
+        return true;
+    }
+
+    protected boolean processTagViewpoint(Element node) throws Throwable {
+        List vms = getViewManagers(node);
+        if(vms.size()==0) debug("Could not find view managers processing:" + XmlUtil.toString(node));
+        ViewpointInfo viewpointInfo = null;
+
+
+
+
+        for(int i=0;i<vms.size();i++) {
+            ViewManager vm = (ViewManager)vms.get(i);
+            if(XmlUtil.hasAttribute(node, ATTR_AZIMUTH) || XmlUtil.hasAttribute(node, ATTR_TILT)) {
+                viewpointInfo = new ViewpointInfo(XmlUtil.getAttribute(node, ATTR_AZIMUTH,0.0),
+                                                  XmlUtil.getAttribute(node, ATTR_TILT,0.0));
+                if(!(vm instanceof MapViewManager)) continue;
+                MapViewManager mvm = (MapViewManager) vm;
+                mvm.setViewpointInfo(viewpointInfo);
+            }  
+
+            if(XmlUtil.hasAttribute(node, ATTR_ASPECTX) ||
+               XmlUtil.hasAttribute(node, ATTR_ASPECTY)||
+               XmlUtil.hasAttribute(node, ATTR_ASPECTZ)) {
+                double[] a = vm.getMaster().getDisplayAspect();
+                a =    new double[] {
+                    XmlUtil.getAttribute(node, ATTR_ASPECTX, a[0]),
+                    XmlUtil.getAttribute(node, ATTR_ASPECTY, a[1]),
+                    XmlUtil.getAttribute(node, ATTR_ASPECTZ, a[2])};
+                    vm.getMaster().setDisplayAspect(a);
+                    vm.setAspectRatio(a);
+            }
+
+            if(XmlUtil.hasAttribute(node, ATTR_ROTX) ||
+               XmlUtil.hasAttribute(node, ATTR_ROTY) ||
+               XmlUtil.hasAttribute(node, ATTR_ROTZ) ||
+               XmlUtil.hasAttribute(node, ATTR_TRANSX) ||
+               XmlUtil.hasAttribute(node, ATTR_TRANSY) ||
+               XmlUtil.hasAttribute(node, ATTR_TRANSZ) ||
+               XmlUtil.hasAttribute(node, ATTR_SCALE)) {
+                double[] a = vm.getMaster().getDisplayAspect();
+                double[] currentMatrix = vm.getDisplayMatrix();
+                double[] trans         = { 0.0, 0.0, 0.0 };
+                double[] rot           = { 0.0, 0.0, 0.0 };
+                double[] scale         = { 0.0, 0.0, 0.0 };
+                MouseBehavior mb = vm.getMaster().getMouseBehavior();
+                mb.instance_unmake_matrix(rot, scale, trans,currentMatrix);
+                double [] matrix = mb.make_matrix(
+                                                  XmlUtil.getAttribute(node,ATTR_ROTX, rot[0]),
+                                                  XmlUtil.getAttribute(node,ATTR_ROTY, rot[1]),
+                                                  XmlUtil.getAttribute(node,ATTR_ROTZ, rot[2]),
+                                                  XmlUtil.getAttribute(node,ATTR_SCALE, scale[0])*a[0],
+                                                  XmlUtil.getAttribute(node,ATTR_SCALE, scale[0])*a[1],
+                                                  XmlUtil.getAttribute(node,ATTR_SCALE, scale[0])*a[2],
+                                                  XmlUtil.getAttribute(node,ATTR_TRANSX, trans[0]),
+                                                  XmlUtil.getAttribute(node,ATTR_TRANSY, trans[1]),
+                                                  XmlUtil.getAttribute(node,ATTR_TRANSZ,trans[2]));
+                vm.setDisplayMatrix(matrix);
             }
         }
         return true;
