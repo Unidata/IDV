@@ -407,17 +407,32 @@ The logarithmic coordinate system uses the following equations:
 so can be used for heights above 80 km.  
 </faqitem>
 
+<faqitem q="Can I view WRF model output in the IDV?" id="wrf">
+The Weather Research and Forecasting (WRF) Model output can be
+viewed in the IDV.  You have several options for displaying
+the data.  The IDV will read the native, staggered netCDF output
+from WRF, however we recommend that you post-process the data 
+first.  Using the native format is computationally and memory
+expensive, since the IDV has to transform the data on the fly.
+It is <b>strongly</b> recommended that you use one of the available
+WRF post process programs (e.g., ARWPost, WRFPost) to destagger
+the grids and compute the standard meteorological variables on
+pressure or height coordinates.  The IDV can read the GRIB 
+(1 &amp; 2), GEMPAK and Vis5D output from these 
+post-process routines.
+</faqitem>
+
 <faqitem q="Can I view Level III Radar data in the IDV?" id="level3">
-The IDV can load Level III radar products through the 
-<b>Radar-&gt;Level III</b> chooser which connects to an ADDE
-server.  Starting with the 2.0 release, the IDV can read
-some Level III products from local disk or a THREDDS Data Server (TDS).
-At present, this is limited to radial products only.
+The IDV can load Level III radar products from remote ADDE
+and TDS servers using the Radar Choosers provided in the
+reference application.  It can also read many of the Level III
+products (radial and raster) from disk using the Radar Files
+chooser.
 </faqitem>
 
 <faqitem q="Can I view Level II Radar data in the IDV?" id="level2">
 
-The IDV can be used to create displays of WSR-88D Archive Level II
+The IDV can be used to create displays of WSR-88D Level II
 radar data.  The Level II data is supplied as volume-scan files,                each file having all data from one WSR-88D radar                        
 for all sweeps for one &quot;time&quot;. Unidata                        
 Community sites can receive Level II data using the <a                  
@@ -454,12 +469,6 @@ In some cases, the files do not have any location information in
 them.  The Level II data chooser allows you to associated a station
 location with the data file, using the directory name as a first
 guess.</li>
-
-<li><b>You are trying to load Level III raster products</b>
-The IDV only handles the Level III data that is stored in
-radial format (Base Reflectivity, Storm Relative Velocity,
-Base Velocity, 1 and 3 hour precipitation, Echo Tops).
-</li>
 
 </ol>
 </faqitem>
