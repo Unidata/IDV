@@ -421,7 +421,7 @@ public class ChooserPanel extends JPanel implements ActionListener {
      * @return The tooltip for the update button
      */
     protected String getUpdateToolTip() {
-        return "Update the chooser";
+        return "Refresh content shown in this Chooser";
     }
 
 
