@@ -328,7 +328,7 @@ public class XmlOutputHandler extends OutputHandler {
             entry.getParentGroupId(), ATTR_TYPE,
             entry.getTypeHandler().getType(),
             ATTR_ISGROUP,
-            ""+entry.getIsGroup(),
+            ""+entry.isGroup(),
             ATTR_FROMDATE, getRepository().formatDate(new Date(entry.getStartDate())),
             ATTR_TODATE, getRepository().formatDate(new Date(entry.getEndDate())),
             ATTR_CREATEDATE, getRepository().formatDate(new Date(entry.getCreateDate()))
