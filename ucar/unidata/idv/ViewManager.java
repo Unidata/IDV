@@ -49,6 +49,7 @@ import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.Timeline;
 import ucar.unidata.ui.drawing.Glyph;
 
+import java.text.DecimalFormat;
 
 import ucar.unidata.util.BooleanProperty;
 import ucar.unidata.util.DatedObject;
@@ -576,7 +577,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** properties dialog */
     JDialog propertiesDialog;
 
+    boolean propertiesDialogShown = false;
 
+    JLabel matrixLabel;
+
+    DecimalFormat fmt =  new DecimalFormat("####0.0###");
 
     /** the view menu */
     JMenu viewMenu;
@@ -1126,6 +1131,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 if (cmd.equals(GuiUtils.CMD_OK)
                         || cmd.equals(GuiUtils.CMD_CANCEL)) {
                     propertiesDialog.dispose();
+                    propertiesDialogShown = false;
                     //                    propertiesDialog = null;
                 }
             }
@@ -1144,11 +1150,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
         propertiesDialog.getContentPane().removeAll();
         propertiesDialog.getContentPane().add(comp);
         propertiesDialog.pack();
+        setMatrixLabel(true);
         if (newOne) {
             GuiUtils.showDialogNearSrc(viewMenu, propertiesDialog);
         } else {
             propertiesDialog.show();
         }
+        propertiesDialogShown = true;
         //        propertiesDialog.show();
     }
 
@@ -1477,6 +1485,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
             GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
             JComponent contents = GuiUtils.doLayout(comps, 2, GuiUtils.WT_NY,
                                       GuiUtils.WT_N);
+
+
+            matrixLabel = new JLabel("<html></html>");
+            matrixLabel.setBorder(BorderFactory.createTitledBorder("Display Matrix Settings"));
+            setMatrixLabel(true);
+            contents = GuiUtils.centerBottom(contents, GuiUtils.inset(matrixLabel, new Insets(20,0,0,0)));
             return contents;
         } catch (Exception exc) {
             logException("Creating aspect dialog", exc);
@@ -1485,7 +1499,33 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
+    private void setMatrixLabel(boolean force) {
+        if(matrixLabel==null) return;
+        if(!force && !propertiesDialogShown) return;
+        if(!force) {
+            try {
+                matrixLabel.getLocationOnScreen();
+            } catch (Exception exc) {
+                return;
+            }
+        }
+        double[] currentMatrix = getDisplayMatrix();
+        double[] trans         = { 0.0, 0.0, 0.0 };
+        double[] rot           = { 0.0, 0.0, 0.0 };
+        double[] scale         = { 0.0, 0.0, 0.0 };
+        getMaster().getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
+                                                              currentMatrix);
 
+        matrixLabel.setText("<html><table width=100%><tr><td width=33%></td><td width=33%>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=33%>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Y&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Z&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>" +
+                            "<tr><td align=right>Rotation:</td><td align=right>" + fmt(rot[0])+"</td><td align=right>"+fmt(rot[1])+"</td><td align=right>" + fmt(rot[2])+"</td></tr>" +
+                            "<tr><td align=right>Translation:</td><td align=right>" + fmt(trans[0])+"</td><td align=right>"+fmt(trans[1])+"</td><td align=right>"+fmt(trans[2]) +"</td></tr>" +
+                            "<tr><td align=right>Scale:</td><td align=right>" + fmt(scale[0])+"</td></tr></table></html>");
+    }
+
+    private String fmt(double d) {
+        if(d== -0.0) d = 0.0;
+        return fmt.format(d);
+    }
 
 
     /**
@@ -4677,7 +4717,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
      *
      * @param e the event.
      */
-    protected void handleControlChanged(ControlEvent e) {}
+    protected void handleControlChanged(ControlEvent e) {
+        //Set the matrix label in the properties dialog
+        setMatrixLabel(false);
+    }
 
 
     /**
