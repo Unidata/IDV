@@ -81,9 +81,10 @@
         </javac>
         <jar 
             basedir="${compiledir}"
+            update="false"
             compress="true"
             jarfile="${jars_dest}/ramaddaplugin.jar">
-            <include name="ucar/unidata/repository/**/*.class"/>
+            <include name="ucar/unidata/repository/**/*.class"/> 
             <include name="ucar/unidata/repository/idv/publishertypes.xml"/>
             <include name="ucar/unidata/repository/idv/publishers.xml"/>
             <include name="ucar/unidata/repository/htdocs/icons/folderopen.png"/>
@@ -120,6 +121,7 @@
         </javac>
         <jar 
             basedir="${compiledir}"
+            update="false"
             compress="true"
             jarfile="${jars_dest}/repositoryclient.jar">
             <include name="ucar/**/*.class"/>

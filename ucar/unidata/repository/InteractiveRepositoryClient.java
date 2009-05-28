@@ -376,18 +376,21 @@ public class InteractiveRepositoryClient extends RepositoryClient {
 
                 Element root = XmlUtil.getRoot(xml);
                 for (Element child : (List<Element>) XmlUtil.findChildren(
-                        root, TAG_GROUP)) {
-                    GroupNode childNode =
-                        new GroupNode(XmlUtil.getAttribute(child, ATTR_NAME),
-                                      XmlUtil.getAttribute(child, ATTR_ID),
-                                      XmlUtil.getAttribute(child,
-                                          ATTR_CANDONEW,
-                                          false), XmlUtil.getAttribute(child,
-                                              ATTR_CANDOUPLOAD, false));
+                        root, TAG_ENTRY)) {
+                    if(XmlUtil.getAttribute(child, ATTR_TYPE,"").equals(TYPE_GROUP)||
+                       XmlUtil.getAttribute(child, ATTR_ISGROUP,false)) {
+                        GroupNode childNode =
+                            new GroupNode(XmlUtil.getAttribute(child, ATTR_NAME),
+                                          XmlUtil.getAttribute(child, ATTR_ID),
+                                          XmlUtil.getAttribute(child,
+                                                               ATTR_CANDONEW,
+                                                               false), XmlUtil.getAttribute(child,
+                                                                                            ATTR_CANDOUPLOAD, false));
 
-                    childNode.add(
-                        new DefaultMutableTreeNode("Please wait..."));
-                    this.add(childNode);
+                        childNode.add(
+                                      new DefaultMutableTreeNode("Please wait..."));
+                        this.add(childNode);
+                    }
                 }
                 treeModel.nodeStructureChanged(this);
             } catch (Exception exc) {

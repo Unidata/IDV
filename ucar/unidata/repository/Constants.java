@@ -388,6 +388,8 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_TYPE = "type";
 
+    public static final String ATTR_ISGROUP = "isgroup";
+
     /** _more_ */
     public static final String ATTR_URL = "url";
 
