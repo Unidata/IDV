@@ -1183,7 +1183,7 @@ abstract public class DisplayMaster {
      *
      * @return mouse behavior
      */
-    protected MouseBehavior getMouseBehavior() {
+    public MouseBehavior getMouseBehavior() {
         return getDisplay().getDisplayRenderer().getMouseBehavior();
     }
 
