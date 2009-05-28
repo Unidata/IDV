@@ -236,7 +236,7 @@ public class ServerInfo implements Constants {
      *
      * @throws Exception _more_
      */
-    public Element toXml(Repository repository, Document doc)
+    public Element toXml(RepositoryBase repository, Document doc)
             throws Exception {
         Element info = XmlUtil.create(doc, TAG_INFO_REPOSITORY, null,
                                       new String[] {});
