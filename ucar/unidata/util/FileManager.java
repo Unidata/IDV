@@ -206,7 +206,7 @@ public class FileManager {
         System.setSecurityManager(null);
         try {
 
-            chooser = new javax.swing.JFileChooser(defaultDirectory);
+            chooser = new MyFileChooser(defaultDirectory);
             chooser.setFileHidingEnabled(getFileHidingEnabled());
             if (title != null) {
                 chooser.setDialogTitle(title);
@@ -1008,6 +1008,29 @@ public class FileManager {
     }
 
     /**
+     * Have our own class here so it can put the hook in
+     * to fix the lock up problem on windows.
+     */
+    public static class MyFileChooser extends JFileChooser {
+        public MyFileChooser(File dir) {
+            super(dir);
+        }
+
+        public MyFileChooser(String path) {
+            super(path);
+        }
+
+        public MyFileChooser() {
+        }
+
+        public void updateUI() {
+            putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
+            super.updateUI();
+        }
+    }
+
+
+    /**
      * _more_
      *
      * @param dfltDir _more_
@@ -1023,8 +1046,8 @@ public class FileManager {
         }
 
         JFileChooser chooser = (dfltDir != null)
-                               ? new javax.swing.JFileChooser(dfltDir)
-                               : new javax.swing.JFileChooser();
+                               ? new MyFileChooser(dfltDir)
+                               : new MyFileChooser();
 
         chooser.setApproveButtonText("Save");
         if (accessory != null) {
