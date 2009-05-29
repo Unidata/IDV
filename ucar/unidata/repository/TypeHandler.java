@@ -1528,12 +1528,12 @@ public class TypeHandler extends RepositoryManager {
      */
     public void addTextSearch(Request request, StringBuffer sb) {
         String name = (String) request.getString(ARG_TEXT, "");
-        String searchMetaData = " "
-                                + HtmlUtil.checkbox(ARG_SEARCHMETADATA,
+        String searchMetaData = " ";
+        /*HtmlUtil.checkbox(ARG_SEARCHMETADATA,
                                     "true",
                                     request.get(ARG_SEARCHMETADATA,
-                                        false)) + " "
-                                            + msg("Search metadata");
+                                    false)) + " "
+                                    + msg("Search metadata");*/
 
         String searchExact = " "
                              + HtmlUtil.checkbox(ARG_EXACT, "true",
@@ -2240,7 +2240,7 @@ public class TypeHandler extends RepositoryManager {
                 //            System.err.println (doLike +" toks:" + nameToks);
                 List<Clause> ands       = new ArrayList<Clause>();
                 boolean searchMetadata = request.get(ARG_SEARCHMETADATA, false);
-                searchMetadata = false;
+                searchMetadata =false;
                 String [] attrCols = {
                     Tables.METADATA.COL_ATTR1/*,
                     Tables.METADATA.COL_ATTR2,
