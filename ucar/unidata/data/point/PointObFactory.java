@@ -451,6 +451,7 @@ public class PointObFactory {
                         continue;
                     }
                     PointObVar pointObVar = new PointObVar();
+                    lengths[fieldIdx] = Math.max(lengths[fieldIdx],2);
                     //                    System.err.println("idx:" + fieldIdx + "   name:"
                     //                                       + Util.cleanTypeName(types[fieldIdx])
                     //                                       + " length:" + lengths[fieldIdx]);
@@ -481,23 +482,27 @@ public class PointObFactory {
                 }
             }
 
-            //            int xxx=1;
-            //            for(PointObVar pov:dataVars) {
-                //                System.out.println ("var #" + xxx+" "+pov.getName() + " " + pov.getDataType() + " unit:" + pov.getUnits() + " length:" + pov.getLen());
-                //                xxx++;
-            //            }
-            //            System.out.println ("#dvals:" + dvals.length + " #svals:" + svals.length);
-            //            if(true) break;
-            
-            //            for(String s: svals) {
-            //                System.err.println ("sval=" +s+":");
-            //            }
+
+            try {
             writer.addPoint(llp.getLatitude().getValue(CommonUnit.degree),
                             llp.getLongitude().getValue(CommonUnit.degree),
                             ((alt != null)
                              ? alt.getValue(CommonUnit.meter)
                              : 0.0), ucar.visad.Util.makeDate(
                                  ob.getDateTime()), dvals, svals);
+            } catch(Exception exc) {
+                int xxx=1;
+                for(PointObVar pov:dataVars) {
+                    System.out.println ("var #" + xxx+" "+pov.getName() + " " + pov.getDataType() + " unit:" + pov.getUnits() + " length:" + pov.getLen());
+                    xxx++;
+                }
+                System.out.println ("#dvals:" + dvals.length + " #svals:" + svals.length);
+            
+                for(String s: svals) {
+                    System.err.println ("sval=" +s+":");
+                }
+                throw new RuntimeException(exc);
+            }
         }
 
 
