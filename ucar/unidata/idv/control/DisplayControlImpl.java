@@ -4003,7 +4003,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         name = name + ".jpg";
         JTextField nameFld = new JTextField(name, 15);
         nameFld.setCaretPosition(0);
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = new FileManager.MyFileChooser();
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setAccessory(GuiUtils.top(GuiUtils.hbox(new JLabel("Name:"),
                 nameFld, 5)));
