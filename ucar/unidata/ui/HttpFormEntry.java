@@ -310,7 +310,7 @@ public class HttpFormEntry {
      */
     public void browse(JTextField fld) {
         String       f       = fld.getText();
-        JFileChooser chooser = new JFileChooser(f);
+        JFileChooser chooser = new FileManager.MyFileChooser(f);
         if (chooser.showOpenDialog(fld) == JFileChooser.APPROVE_OPTION) {
             fld.setText(chooser.getSelectedFile().toString());
         }
