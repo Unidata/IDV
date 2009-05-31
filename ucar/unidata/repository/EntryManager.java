@@ -1052,10 +1052,10 @@ return new Result(title, sb);
 
 
             if (entry.isGroup()) {
-                if (newName.indexOf(Group.IDDELIMITER) >= 0) {
-                    throw new IllegalArgumentException(
-                        "Cannot have a '/' in group name:" + newName);
-                }
+                //                if (newName.indexOf(Group.IDDELIMITER) >= 0) {
+                //                    throw new IllegalArgumentException(
+                //                        "Cannot have a '/' in group name:" + newName);
+                //                }
             }
 
             entry.setName(newName);

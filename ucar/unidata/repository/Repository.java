@@ -739,6 +739,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         sdf = RepositoryUtil.makeDateFormat(getProperty(PROP_DATEFORMAT,
                 DEFAULT_TIME_FORMAT));
+        defaultTimeZone = TimeZone.getDefault();
+        TimeZone.setDefault(DateUtil.TIMEZONE_GMT);
+
+
         TimeZone.setDefault(DateUtil.TIMEZONE_GMT);
 
 

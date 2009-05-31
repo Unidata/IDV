@@ -395,7 +395,7 @@ public class RepositoryBase implements Constants, RepositorySource {
             if(timezone==null) {
                 sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
             } else {
-                if(timezone.equals("") || timezone.equals("default")) {
+                if(defaultTimeZone!=null && (timezone.equals("") || timezone.equals("default"))) {
                     sdf.setTimeZone(defaultTimeZone);
                 } else {
                     sdf.setTimeZone(TimeZone.getTimeZone(timezone));
