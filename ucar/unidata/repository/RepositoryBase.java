@@ -379,6 +379,8 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     private Hashtable<String,SimpleDateFormat> dateFormats= new Hashtable<String,SimpleDateFormat>();
 
+    TimeZone defaultTimeZone;
+
 
     protected SimpleDateFormat getSDF(String format, String timezone) {
         String key;
@@ -393,7 +395,11 @@ public class RepositoryBase implements Constants, RepositorySource {
             if(timezone==null) {
                 sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
             } else {
-                sdf.setTimeZone(TimeZone.getTimeZone(timezone));
+                if(timezone.equals("") || timezone.equals("default")) {
+                    sdf.setTimeZone(defaultTimeZone);
+                } else {
+                    sdf.setTimeZone(TimeZone.getTimeZone(timezone));
+                }
             }
             dateFormats.put(key, sdf);
         }
