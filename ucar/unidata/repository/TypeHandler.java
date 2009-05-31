@@ -1257,12 +1257,14 @@ public class TypeHandler extends RepositoryManager {
                 sb.append(HtmlUtil.hidden(ARG_NAME, nameDefault));
             }
         }
-        int rows = getProperty("form.rows.desc", 3);
+
         if (okToShowInForm(ARG_DESCRIPTION)) {
             String desc    = "";
             String buttons = "";
+            int rows = getProperty("form.rows.desc", 3);
             if (entry != null) {
                 desc = entry.getDescription();
+                if(desc.length()>100) rows = rows*2;
                 if (desc.startsWith("<wiki>")) {
                     rows = 20;
                     buttons =
