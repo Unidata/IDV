@@ -5037,6 +5037,21 @@ return new Result(title, sb);
     }
 
 
+    public String getTimezone(Entry entry)  {
+        try {
+        List<Metadata> metadataList = getMetadataManager().findMetadata(entry,
+                                                                        ContentMetadataHandler.TYPE_TIMEZONE, true);
+        if ((metadataList != null) && (metadataList.size() > 0)) {
+            Metadata metadata = metadataList.get(0);
+            return metadata.getAttr1();
+        }
+        } catch(Exception exc) {
+            logError("getting timezone",exc);
+        }
+        return null;
+    }
+
+
     /**
      * _more_
      *

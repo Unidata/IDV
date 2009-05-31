@@ -82,6 +82,9 @@ public class ContentMetadataHandler extends MetadataHandler {
     /** _more_ */
     public static final String TYPE_SORT = "content.sort";
 
+    /** _more_ */
+    public static final String TYPE_TIMEZONE = "content.timezone";
+
     public static final String TYPE_ALIAS = "content.alias";
 
 

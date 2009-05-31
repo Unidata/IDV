@@ -1215,7 +1215,9 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
        }
 
         sb.append(getRepository().formatDateShort(request,
-                                                  new Date(entry.getStartDate()),extraAlt.toString()));
+                                                  new Date(entry.getStartDate()),
+                                                  getEntryManager().getTimezone(entry),
+                                                  extraAlt.toString()));
         sb.append("</td><td width=\"1%\" align=right class=entryrowlabel>");
         sb.append(HtmlUtil.space(1));
         /*        String userSearchLink =

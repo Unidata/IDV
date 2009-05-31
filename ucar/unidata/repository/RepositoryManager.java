@@ -329,6 +329,11 @@ public class RepositoryManager implements RepositorySource, Constants,
         return getRepository().formatDate(request, d);
     }
 
+    public String formatDate(Request request, Date d, Entry entry) {
+        return getRepository().formatDate(request, d,getEntryManager().getTimezone(entry));
+    }
+
+
     /**
      * _more_
      *
@@ -341,6 +346,10 @@ public class RepositoryManager implements RepositorySource, Constants,
         return getRepository().formatDate(request, ms);
     }
 
+
+    public String formatDate(Request request, long ms, Entry entry) {
+        return getRepository().formatDate(request, ms,getEntryManager().getTimezone(entry));
+    }
 
     /**
      * _more_

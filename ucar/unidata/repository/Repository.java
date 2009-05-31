@@ -517,6 +517,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return formatDate(new Date(ms));
     }
 
+
+    public String formatDate(Request request, long ms, String timezone) {
+        return formatDate(new Date(ms),timezone);
+    }
+
     /**
      * _more_
      *
@@ -530,6 +535,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    public String formatDate(Request request, Date d, String timezone) {
+        return formatDate(d,timezone);
+    }
 
 
     /**
@@ -540,15 +548,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    public String formatDateShort(Request request, Date d) {
-        return formatDateShort(request,d,"");
+    public String formatDateShort(Request request, Date d, String timezone) {
+        return formatDateShort(request,d,timezone, "");
     }
 
-    public String formatDateShort(Request request, Date d, String extraAlt) {
-        if (displaySdf == null) {
-            displaySdf = makeSDF(getProperty(PROP_DATE_SHORTFORMAT,
-                                             DEFAULT_TIME_SHORTFORMAT));
-        }
+    public String formatDateShort(Request request, Date d, String timezone, String extraAlt) {
+        SimpleDateFormat sdf = getSDF(getProperty(PROP_DATE_SHORTFORMAT,
+                                                  DEFAULT_TIME_SHORTFORMAT), timezone);
         if (d == null) {
             return BLANK;
         }
@@ -556,7 +562,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         Date   now      = new Date();
         long   diff     = now.getTime() - d.getTime();
         double minutes  = DateUtil.millisToMinutes(diff);
-        String fullDate = formatDate(d);
+        String fullDate = formatDate(d,timezone);
         String result;
         if ((minutes > 0) && (minutes < 65) && (minutes > 55)) {
             result = "about an hour ago";
@@ -578,7 +584,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                        ? "s"
                                        : "") + " ago";
         } else {
-            result = displaySdf.format(d);
+            result = sdf.format(d);
         }
         return HtmlUtil.span(result,
                              HtmlUtil.cssClass("time")

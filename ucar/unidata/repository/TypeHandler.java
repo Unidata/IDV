@@ -542,11 +542,11 @@ public class TypeHandler extends RepositoryManager {
         html = html.replace("${" + ARG_DESCRIPTION + "}",
                             entry.getDescription());
         html = html.replace("${" + ARG_CREATEDATE + "}",
-                            formatDate(request, entry.getCreateDate()));
+                            formatDate(request, entry.getCreateDate(), entry));
         html = html.replace("${" + ARG_FROMDATE + "}",
-                            formatDate(request, entry.getStartDate()));
+                            formatDate(request, entry.getStartDate(), entry));
         html = html.replace("${" + ARG_TODATE + "}",
-                            formatDate(request, entry.getEndDate()));
+                            formatDate(request, entry.getEndDate(), entry));
         html = html.replace("${" + ARG_CREATOR + "}",
                             entry.getUser().getLabel());
 
@@ -871,7 +871,7 @@ public class TypeHandler extends RepositoryManager {
             sb.append(HtmlUtil.formEntry(msgLabel("Created by"),
                                          userSearchLink + " @ "
                                          + formatDate(request,
-                                             entry.getCreateDate())));
+                                             entry.getCreateDate(), entry)));
 
             Resource resource     = entry.getResource();
             String   resourceLink = resource.getPath();
@@ -932,7 +932,7 @@ public class TypeHandler extends RepositoryManager {
                             + HtmlUtil.space(1) + endDate));
                 } else {
                     sb.append(HtmlUtil.formEntry(msgLabel("Date"),
-                            formatDate(request, entry.getStartDate())));
+                            formatDate(request, entry.getStartDate(), entry)));
                 }
             }
             String typeDesc = entry.getTypeHandler().getDescription();

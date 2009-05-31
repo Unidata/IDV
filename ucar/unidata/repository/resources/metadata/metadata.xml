@@ -39,6 +39,14 @@
       <element name="Name" />
       <element name="Email" />
     </type>
+
+    <type name="Display Timezone" id="content.timezone">
+      <element
+         default="GMT"
+         name="Timezone"/>
+    </type>
+
+
     <type name="Sort Order" id="content.sort">
       <element
          default="fromdate"

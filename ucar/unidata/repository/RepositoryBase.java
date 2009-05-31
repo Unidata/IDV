@@ -377,6 +377,31 @@ public class RepositoryBase implements Constants, RepositorySource {
     }
 
 
+    private Hashtable<String,SimpleDateFormat> dateFormats= new Hashtable<String,SimpleDateFormat>();
+
+
+    protected SimpleDateFormat getSDF(String format, String timezone) {
+        String key;
+        if(timezone != null)
+            key =  format+"-"+timezone;
+        else
+            key =  format;
+        SimpleDateFormat sdf = dateFormats.get(key);
+        if(sdf == null) {
+            sdf = new SimpleDateFormat();
+            sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+            sdf.applyPattern(format);
+            if(timezone==null) {
+                sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+            } else {
+                sdf.setTimeZone(TimeZone.getTimeZone(timezone));
+            }
+            dateFormats.put(key, sdf);
+        }
+        return sdf;
+    }
+
+
     /**
      * _more_
      *
@@ -385,10 +410,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @return _more_
      */
     protected SimpleDateFormat makeSDF(String format) {
-        SimpleDateFormat sdf = new SimpleDateFormat();
-        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
-        sdf.applyPattern(format);
-        return sdf;
+        return getSDF(format, null);
     }
 
     /**
@@ -399,13 +421,18 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @return _more_
      */
     public String formatDate(Date d) {
+        return formatDate(d,null);
+    }
+
+    public String formatDate(Date d, String timezone) {
         if (sdf == null) {
             sdf = makeSDF(getProperty(PROP_DATE_FORMAT, DEFAULT_TIME_FORMAT));
         }
+        SimpleDateFormat dateFormat  = (timezone==null?sdf:getSDF(getProperty(PROP_DATE_FORMAT, DEFAULT_TIME_FORMAT),timezone));
         if (d == null) {
             return BLANK;
         }
-        return sdf.format(d);
+        return dateFormat.format(d);
     }
 
 
