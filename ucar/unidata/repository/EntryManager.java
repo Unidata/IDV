@@ -6010,7 +6010,7 @@ return new Result(title, sb);
                    + HtmlUtil.id(divId) + ">" + second + "<br>" + "<a href="
                    + HtmlUtil.quote(lessLink) + ">...Less</a>" + "</div>";
         }
-        text = text.replace("\n\n","<p>");
+        text = text.replaceAll("\r\n\r\n", "<p>");
         text = text.replace("\n\n","<p>");
         return text;
     }
