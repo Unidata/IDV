@@ -1412,6 +1412,8 @@ public class TypeHandler extends RepositoryManager {
                          ? formatDate(request, new Date(entry.getEndDate()))
                          : BLANK);*/
 
+        String timezone = (entry==null?null:getEntryManager().getTimezone(entry));
+
         Date fromDate = ((entry != null)
                          ? new Date(entry.getStartDate())
                          : null);
@@ -1426,7 +1428,7 @@ public class TypeHandler extends RepositoryManager {
                     HtmlUtil.formEntry(
                         "Date:",
                         getRepository().makeDateInput(
-                            request, ARG_FROMDATE, "entryform", fromDate)));
+                            request, ARG_FROMDATE, "entryform", fromDate,timezone)));
 
             } else {
                 sb.append(
@@ -1434,12 +1436,12 @@ public class TypeHandler extends RepositoryManager {
                         "Date Range:",
                         getRepository().makeDateInput(
                             request, ARG_FROMDATE, "entryform",
-                            fromDate) + HtmlUtil.space(1)
+                            fromDate,timezone) + HtmlUtil.space(1)
                                       + HtmlUtil.img(iconUrl(ICON_RANGE))
                                       + HtmlUtil.space(1) +
                 //                        " <b>--</b> " +
                 getRepository().makeDateInput(request, ARG_TODATE,
-                        "entryform", toDate) + HtmlUtil.space(2)));
+                        "entryform", toDate,timezone) + HtmlUtil.space(2)));
             }
 
         }

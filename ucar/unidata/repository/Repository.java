@@ -4747,6 +4747,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public String makeDateInput(Request request, String name,
                                 String formName, Date date) {
+        return makeDateInput(request, name, formName, date, null);
+    }
+
+    public String makeDateInput(Request request, String name,
+                                String formName, Date date, String timezone) {
         String dateHelp   = "e.g., yyyy-mm-dd,  now, -1 week, +3 days, etc.";
         String timeHelp   = "hh:mm:ss Z, e.g. 20:15:00 MST";
 
@@ -4755,9 +4760,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String dateString = ((date == null)
                              ? dateArg
                              : dateSdf.format(date));
+        SimpleDateFormat timeFormat = (timezone==null?timeSdf:getSDF("HH:mm:ss z",timezone));
         String timeString = ((date == null)
                              ? timeArg
-                             : timeSdf.format(date));
+                             : timeFormat.format(date));
 
         return HtmlUtil.input(
             name, dateString,
