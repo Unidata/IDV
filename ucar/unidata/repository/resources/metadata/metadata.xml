@@ -47,10 +47,9 @@
     </type>
 
 
-    <type name="Biography" id="content.biography">
-      <element
-         default=""
-         name="Name"/>
+    <type name="Biography" id="content.biography"       displaycategory="Biography">
+
+      <element  name="Name"/>
       <element
          default=""
          name="Bio"
