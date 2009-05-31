@@ -389,7 +389,6 @@ public class RepositoryBase implements Constants, RepositorySource {
         SimpleDateFormat sdf = dateFormats.get(key);
         if(sdf == null) {
             sdf = new SimpleDateFormat();
-            sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
             sdf.applyPattern(format);
             if(timezone==null) {
                 sdf.setTimeZone(DateUtil.TIMEZONE_GMT);

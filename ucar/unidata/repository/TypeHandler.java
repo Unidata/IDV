@@ -910,8 +910,8 @@ public class TypeHandler extends RepositoryManager {
                     || (entry.getCreateDate() != entry.getEndDate())) {
                 if (entry.getEndDate() != entry.getStartDate()) {
                     String startDate = formatDate(request,
-                                           entry.getStartDate());
-                    String endDate = formatDate(request, entry.getEndDate());
+                                           entry.getStartDate(),entry);
+                    String endDate = formatDate(request, entry.getEndDate(),entry);
                     String searchUrl =
                         HtmlUtil.url(
                             request.url(getRepository().URL_ENTRY_SEARCH),
