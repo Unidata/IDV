@@ -47,6 +47,14 @@
     </type>
 
 
+    <type name="Biography" id="content.biography">
+      <element
+         default=""
+         name="Bio"
+	 rows="10"/>
+    </type>
+
+
     <type name="Sort Order" id="content.sort">
       <element
          default="fromdate"
