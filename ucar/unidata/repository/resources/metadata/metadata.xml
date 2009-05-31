@@ -50,6 +50,10 @@
     <type name="Biography" id="content.biography">
       <element
          default=""
+         name="Name"
+	 rows=""/>
+      <element
+         default=""
          name="Bio"
 	 rows="10"/>
     </type>
