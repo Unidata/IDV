@@ -248,6 +248,8 @@ public class MetadataTypeBase extends RepositoryManager {
                                         "[CDATA[" + value
                                         + "]]");
         }
+        template = template.replaceAll("\r\n\r\n", "<p>");
+        template = template.replace("\n\n","<p>");
         return template;
     }
 
