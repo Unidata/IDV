@@ -50,8 +50,7 @@
     <type name="Biography" id="content.biography">
       <element
          default=""
-         name="Name"
-	 rows=""/>
+         name="Name"/>
       <element
          default=""
          name="Bio"
