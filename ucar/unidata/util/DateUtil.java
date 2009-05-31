@@ -166,12 +166,42 @@ public class DateUtil {
     }
 
 
+    //j--
     /** A set of common date formats */
     private static final String[] formats = {
-        "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss", "yyyy/MM/dd HH:mm:ss",
-        "yyyyMMdd'T'HHmmss", "yyyy-MM-dd", "yyyy/MM/dd",
-        "EEE MMM dd HH:mm:ss Z yyyy", "yyyy-MM", "yyyy/MM", "yyyy"
+        "yyyy-MM-dd'T'HH:mm:ss Z", 
+        "yyyyMMdd'T'HHmmss Z", 
+        "yyyy/MM/dd HH:mm:ss Z",
+        "yyyy-MM-dd HH:mm:ss Z", 
+        "EEE MMM dd HH:mm:ss Z yyyy", 
+
+        "yyyy-MM-dd'T'HH:mm:ss", 
+        "yyyyMMdd'T'HHmmss", 
+        "yyyy/MM/dd HH:mm:ss",
+        "yyyy-MM-dd HH:mm:ss", 
+
+        "yyyy-MM-dd'T'HH:mm Z", 
+        "yyyyMMdd'T'HHmm Z", 
+        "yyyy/MM/dd HH:mm Z", 
+        "yyyy-MM-dd HH:mm Z", 
+
+        "yyyy-MM-dd'T'HH:mm", 
+        "yyyyMMdd'T'HHmm", 
+        "yyyy/MM/dd HH:mm", 
+        "yyyy-MM-dd HH:mm", 
+
+
+        "yyyy-MM-dd", 
+        "yyyy/MM/dd", 
+        "yyyyMMdd", 
+
+
+        "yyyy-MM", 
+        "yyyyMM", 
+        "yyyy/MM", 
+        "yyyy"
     };
+    //j++
 
     /** The SimpleDateFormat objects we make from the above formats */
     private static SimpleDateFormat[] sdfs;
@@ -228,8 +258,9 @@ public class DateUtil {
 
         for (int i = 0; i < formats.length; i++) {
             try {
-                sdfs[i].parse(dateString);
+                Date dttm = sdfs[i].parse(dateString);
                 lastSdf = sdfs[i];
+                System.err.println ("got one:" + formats[i] + " " +  dttm);
                 return sdfs[i];
             } catch (ParseException pe) {}
         }
@@ -660,6 +691,12 @@ public class DateUtil {
      * @throws Exception On badness
      */
     public static void main(String[] args) throws Exception {
+
+        if(true) {
+            parse(args[0]);
+            return;
+        }
+
 
         long t1 =  System.currentTimeMillis();
         SimpleDateFormat fmt  = new SimpleDateFormat("yyyy-mm-dd HH");
