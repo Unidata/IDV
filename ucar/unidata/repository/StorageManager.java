@@ -758,6 +758,11 @@ public class StorageManager extends RepositoryManager {
      */
     public File copyToStorage(Request request, File original, String newName)
             throws Exception {
+        return copyToStorage(request, new FileInputStream(original), newName);
+    }
+
+    public File copyToStorage(Request request, InputStream original, String newName)
+            throws Exception {
         String            targetName = newName;
         String            storageDir = getStorageDir();
 

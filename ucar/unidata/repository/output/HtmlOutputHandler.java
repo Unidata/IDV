@@ -265,7 +265,7 @@ public class HtmlOutputHandler extends OutputHandler {
         if (wikiTemplate != null) {
             sb.append(wikifyEntry(request, entry, wikiTemplate));
         } else {
-            addDescription(request, entry, sb);
+            addDescription(request, entry, sb,true);
             String informationBlock = getInformationTabs(request, entry,
                                           false);
             sb.append(HtmlUtil.makeShowHideBlock(msg("Information"),
@@ -818,7 +818,8 @@ public class HtmlOutputHandler extends OutputHandler {
      * @param sb _more_
      */
     private void addDescription(Request request, Entry entry,
-                                StringBuffer sb) {
+                                StringBuffer sb,
+                                boolean open) {
         String desc = entry.getDescription().trim();
         if ((desc.length() > 0) && !desc.startsWith("<wiki>")
                 && !desc.equals("<nolinks>")) {
@@ -828,7 +829,7 @@ public class HtmlOutputHandler extends OutputHandler {
             descSB.append(desc);
             descSB.append("</div>\n");
             sb.append(HtmlUtil.makeShowHideBlock(msg("Description"),
-                    descSB.toString(), !entry.isGroup()));
+                    descSB.toString(), open));
         }
     }
 
@@ -950,7 +951,7 @@ public class HtmlOutputHandler extends OutputHandler {
             allEntries.addAll(subGroups);
             sb.append(getTimelineApplet(request, allEntries));
         } else if ((wikiTemplate == null) && !group.isDummy()) {
-            addDescription(request, group, sb);
+            addDescription(request, group, sb,!hasChildren);
             String informationBlock = getInformationTabs(request, group,
                                           false);
             sb.append(HtmlUtil.makeShowHideBlock(msg("Information"),

@@ -78,6 +78,12 @@ public class FtpTypeHandler extends GenericTypeHandler {
         super(repository, entryNode);
     }
 
+
+    public TypeHandler getTypeHandlerForCopy(Entry entry) throws Exception {
+        return getRepository().getTypeHandler(
+                                              TypeHandler.TYPE_FILE);
+    }
+
     /**
      * _more_
      *
@@ -154,7 +160,6 @@ public class FtpTypeHandler extends GenericTypeHandler {
                 System.err.println("Could not find main entry");
                 return badFile;
             }
-
             Object[] values  = parent.getValues();
             if(values == null) {
                 System.err.println("no values");

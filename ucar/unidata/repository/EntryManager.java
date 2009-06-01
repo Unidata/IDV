@@ -2371,7 +2371,7 @@ return new Result(title, sb);
                             oldEntry.getResource().getTheFile().getName());
                     String newFile =
                         getStorageManager().copyToStorage(request,
-                            oldEntry.getResource().getTheFile(),
+                                                          oldEntry.getTypeHandler().getResourceInputStream(oldEntry),
                             getRepository().getGUID() + "_"
                             + newFileName).toString();
                     newResource.setPath(newFile);
@@ -4348,13 +4348,13 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    protected void setStatement(Entry entry, PreparedStatement statement,
-                                boolean isNew)
+    private void setStatement(Entry entry, PreparedStatement statement,
+                                boolean isNew, TypeHandler typeHandler)
             throws Exception {
         int col = 1;
         //id,type,name,desc,group,user,file,createdata,fromdate,todate
         statement.setString(col++, entry.getId());
-        statement.setString(col++, entry.getType());
+        statement.setString(col++, typeHandler.getType());
         statement.setString(col++, entry.getName());
         statement.setString(col++, entry.getDescription());
         statement.setString(col++, entry.getParentGroupId());
@@ -4485,6 +4485,7 @@ return new Result(title, sb);
             //                getTopGroup()s = null;
             //                }
             TypeHandler typeHandler = entry.getTypeHandler();
+            typeHandler = typeHandler.getTypeHandlerForCopy(entry);
             String      sql         = typeHandler.getInsertSql(isNew);
             //            System.err.println("sql:" + sql);
             PreparedStatement typeStatement = null;
@@ -4496,7 +4497,7 @@ return new Result(title, sb);
                 }
             }
             //           System.err.println ("entry: " + entry.getId());
-            setStatement(entry, entryStmt, isNew);
+            setStatement(entry, entryStmt, isNew, typeHandler);
             batchCnt++;
             entryStmt.addBatch();
 

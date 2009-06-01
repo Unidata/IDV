@@ -42,6 +42,8 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.FileInputStream;
 
 import java.sql.PreparedStatement;
 
@@ -200,6 +202,14 @@ public class TypeHandler extends RepositoryManager {
         this.description = description;
     }
 
+
+    public TypeHandler getTypeHandlerForCopy(Entry entry) throws Exception {
+        return this;
+    }
+
+    public InputStream getResourceInputStream(Entry entry) throws Exception {
+        return new FileInputStream(getFile(entry));
+    }
 
     /**
      * _more_
