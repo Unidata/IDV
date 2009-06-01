@@ -80,8 +80,10 @@ public class FtpTypeHandler extends GenericTypeHandler {
 
 
     public TypeHandler getTypeHandlerForCopy(Entry entry) throws Exception {
-        return getRepository().getTypeHandler(
-                                              TypeHandler.TYPE_FILE);
+        if(getEntryManager().isSynthEntry(entry.getId())) 
+            return getRepository().getTypeHandler(
+                                                  TypeHandler.TYPE_FILE);
+        return this;
     }
 
     /**
