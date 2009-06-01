@@ -4485,9 +4485,7 @@ return new Result(title, sb);
             //                getTopGroup()s = null;
             //                }
             TypeHandler typeHandler = entry.getTypeHandler();
-            if(!isNew) {
-                typeHandler = typeHandler.getTypeHandlerForCopy(entry);
-            }
+            typeHandler = typeHandler.getTypeHandlerForCopy(entry);
 
             String      sql         = typeHandler.getInsertSql(isNew);
             //            System.err.println("sql:" + sql);
