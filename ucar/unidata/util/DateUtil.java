@@ -693,7 +693,12 @@ public class DateUtil {
     public static void main(String[] args) throws Exception {
 
         if(true) {
-            parse(args[0]);
+            System.err.println(TimeZone.getTimeZone(args[0]));
+            System.err.println(TimeZone.getDefault());
+            String[]ids = TimeZone.getAvailableIDs();
+            for(int i=0;i<ids.length;i++) {
+                System.out.println(ids[i] + " " + TimeZone.getTimeZone(ids[i]));
+            }
             return;
         }
 

@@ -1006,14 +1006,34 @@ public class IOUtil {
      */
     public static void copyFile(File from, File to)
             throws FileNotFoundException, IOException {
+
         if (to.isDirectory()) {
             to = new File(joinDir(to, getFileTail(from.toString())));
         }
-        FileInputStream  fis = new FileInputStream(from);
+        FileInputStream fis = new FileInputStream(from);
+        copyFile(fis, to);
+    }
+
+
+    /**
+     * Copy from inputstream to to file
+     *
+     * @param fis source
+     * @param to The destination
+     *
+     * @throws FileNotFoundException When we cannot find the file
+     * @throws IOException When something untoward happens
+     */
+
+    public static void copyFile(InputStream fis, File to)
+            throws FileNotFoundException, IOException {
         FileOutputStream fos = new FileOutputStream(to);
         writeTo(fis, fos);
-        fis.close();
+
         fos.close();
+        try {
+            fis.close();
+        } catch(Exception exc) {}
     }
 
 
