@@ -44,6 +44,7 @@ import ucar.unidata.xml.XmlUtil;
 import java.io.File;
 import java.io.InputStream;
 import java.io.FileInputStream;
+import java.io.BufferedInputStream;
 
 import java.sql.PreparedStatement;
 
@@ -208,7 +209,7 @@ public class TypeHandler extends RepositoryManager {
     }
 
     public InputStream getResourceInputStream(Entry entry) throws Exception {
-        return new FileInputStream(getFile(entry));
+        return new BufferedInputStream(new FileInputStream(getFile(entry)));
     }
 
     /**
