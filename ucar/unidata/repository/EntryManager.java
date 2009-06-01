@@ -2354,7 +2354,9 @@ return new Result(title, sb);
                 String   id       = tuple[0];
                 Entry    oldEntry = getEntry(request, id);
                 String   newId    = getRepository().getGUID();
-                Entry newEntry = oldEntry.getTypeHandler().createEntry(newId);
+                TypeHandler typeHandler = oldEntry.getTypeHandler();
+                typeHandler = typeHandler.getTypeHandlerForCopy(oldEntry);
+                Entry newEntry = typeHandler.createEntry(newId);
                 oldIdToNewEntry.put(oldEntry.getId(), newEntry);
                 //(String name, String description, Group group,User user, Resource resource, String dataType,
                 //                          long createDate, long startDate, long endDate, Object[] values) {
