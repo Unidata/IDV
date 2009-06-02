@@ -58,6 +58,9 @@ import javax.swing.filechooser.*;
  */
 public class FileManager {
 
+    private static boolean fixFileLockup = false;
+
+
 
     /** List of listeners to notify when the list of directories changes */
     static List directoryHistoryListeners = new ArrayList();
@@ -245,6 +248,18 @@ public class FileManager {
     }
 
     private static boolean fileHidingEnabled = true;
+
+
+    /**
+     * Do we set the FileChooser.useShellFolder=false
+     * This fixes the occasional problemo of a system lockup running under windows
+     *
+     * @param b value
+     */
+    public static void setFixFileLockup(boolean b) {
+        fixFileLockup = b;
+    }
+
 
     public static boolean getFileHidingEnabled() {
         return fileHidingEnabled;
@@ -1024,7 +1039,8 @@ public class FileManager {
         }
 
         public void updateUI() {
-            putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
+            if(fixFileLockup) 
+                putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
             super.updateUI();
         }
     }
