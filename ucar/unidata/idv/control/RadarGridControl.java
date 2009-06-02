@@ -499,7 +499,7 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
     protected void getEditMenuItems(List items, boolean forMenuBar) {
         ObjectListener listener = new ObjectListener("") {
             public void actionPerformed(ActionEvent ae, Object obj) {
-                stationTableName = ((NamedStationTable) obj).getName();
+                stationTableName = ((NamedStationTable) obj).getFullName();
                 stationIdx       = 0;
                 setStations();
             }
