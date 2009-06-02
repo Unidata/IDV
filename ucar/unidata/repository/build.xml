@@ -100,6 +100,46 @@
 
 
 
+
+    <target name="workshopplugin" depends="init,clean">
+        <property name="pluginclasspath" value="${libsdir}/idv.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/ncIdv.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar:${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar:${libsdir}/servlet-api.jar"/>
+        <javac
+            verbose="false"
+            classpath="${pluginclasspath}"
+            debug="true"
+            source="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            nowarn="true"
+            srcdir="${srcdir}"
+            fork="true"
+            memoryMaximumSize="256m"
+           target="1.5"
+        >
+        <include name="ucar/unidata/repository/idv/RamaddaPublisher.java"/>
+        </javac>
+        <jar 
+            basedir="${compiledir}"
+            update="false"
+            compress="true"
+            jarfile="${jars_dest}/usersworkshop.jar">
+            <include name="ucar/unidata/repository/**/*.class"/> 
+            <include name="ucar/unidata/repository/idv/publishertypes.xml"/>
+            <include name="ucar/unidata/repository/idv/workshoppublishers.xml"/>
+            <include name="ucar/unidata/repository/htdocs/icons/folderopen.png"/>
+            <include name="ucar/unidata/repository/htdocs/icons/folderclosed.png"/>
+	    </jar>
+
+        <copy overwrite="true"  todir="${user.home}/.unidata/idv/DefaultIdv/plugins">
+             <fileset file="${jars_dest}/usersworkshop.jar"/>
+        </copy>
+
+
+    </target>
+
+
+
     <target name="clientjar" depends="init,clean">
         <property name="xclasspath" value="${libsdir}/external.jar"/>
         <property name="clientclasspath" value="${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar"/>

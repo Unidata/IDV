@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<object class="java.util.ArrayList">
+    <method name="add">
+        <object class="ucar.unidata.repository.idv.RamaddaPublisher">
+            <property name="RepositoryClient">
+                <object class="ucar.unidata.repository.InteractiveRepositoryClient">
+                    <property name="User">
+                        <string><![CDATA[workshop]]></string>
+                    </property>
+                    <property name="Tmp">
+                        <parray class="byte" length="12">100,50,57,121,97,51,78,111,98,51,65,61</parray>
+                    </property>
+                    <property name="Hostname">
+                        <string><![CDATA[motherlode.ucar.edu]]></string>
+                    </property>
+                    <property name="InitialGroup">
+                        <string><![CDATA[21d48da6-9b34-41cd-bdee-1b73b68ae32f]]></string>
+                    </property>
+                    <property name="InitialGroupName">
+                        <string><![CDATA[User's Workshop]]></string>
+                    </property>
+                </object>
+            </property>
+            <property name="Name">
+                <string><![CDATA[workshop@ramadda]]></string>
+            </property>
+            <property name="Local">
+                <boolean>true</boolean>
+            </property>
+        </object>
+    </method>
+</object>

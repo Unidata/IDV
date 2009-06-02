@@ -64,6 +64,8 @@ public class InteractiveRepositoryClient extends RepositoryClient {
     /** _more_ */
     GroupNode treeRoot;
 
+    String initialGroup;
+    String initialGroupName="Top";
 
     /**
      * _more_
@@ -187,7 +189,7 @@ public class InteractiveRepositoryClient extends RepositoryClient {
      * _more_
      */
     private void doMakeGroupTree() {
-        treeRoot  = new GroupNode("Top", "", true, false);
+        treeRoot  = new GroupNode(initialGroupName, (initialGroup!=null?initialGroup:""), true, false);
         treeModel = new DefaultTreeModel(treeRoot);
         groupTree = new GroupTree(treeModel);
         groupTree.setToolTipText(
@@ -506,9 +508,6 @@ public class InteractiveRepositoryClient extends RepositoryClient {
 
 
 
-
-
-
     /**
      *     _more_
      *
@@ -532,6 +531,43 @@ public class InteractiveRepositoryClient extends RepositoryClient {
             return showConfigDialog();
         }
         return true;
+    }
+
+    /**
+       Set the InitialGroup property.
+
+       @param value The new value for InitialGroup
+    **/
+    public void setInitialGroup (String value) {
+	this.initialGroup = value;
+    }
+
+    /**
+       Get the InitialGroup property.
+
+       @return The InitialGroup
+    **/
+    public String getInitialGroup () {
+	return this.initialGroup;
+    }
+
+
+    /**
+       Set the InitialGroupName property.
+
+       @param value The new value for InitialGroupName
+    **/
+    public void setInitialGroupName (String value) {
+	this.initialGroupName = value;
+    }
+
+    /**
+       Get the InitialGroupName property.
+
+       @return The InitialGroupName
+    **/
+    public String getInitialGroupName () {
+	return this.initialGroupName;
     }
 
 
