@@ -1030,6 +1030,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         CacheManager.remove(dataCacheKey);
     }
 
+
+
     /**
      * Put an object in the cache.
      *
@@ -1057,6 +1059,18 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      */
     public void removeCache(Object key) {
         CacheManager.remove(dataCacheKey, key);
+    }
+
+
+    /**
+     * See if this DataSource should cache or not
+     *
+     * @param dataChoice The data choice we got this data from
+     * @param data   Data to cache
+     * @return  true
+     */
+    protected boolean shouldCache(DataChoice dataChoice, Data data) {
+        return shouldCache(data);
     }
 
 
@@ -2126,7 +2140,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                 decrOutstandingGetDataCalls();
             }
             if ((cacheKey != null) && (cachedData != null)
-                    && shouldCache(cachedData)) {
+                && shouldCache(dataChoice, cachedData)) {
                 putCache(cacheKey, cachedData);
             }
         } else {}

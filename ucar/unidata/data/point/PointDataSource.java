@@ -77,8 +77,6 @@ public abstract class PointDataSource extends FilesDataSource {
     /** property id for the first guess field */
     public static final String PROP_FIRSTGUESS = "prop.firstguess";
 
-
-
     /** dataselection property for grid x spacing */
     public static final String PROP_GRID_X = "prop.grid.x";
 
@@ -818,6 +816,9 @@ public abstract class PointDataSource extends FilesDataSource {
     }
 
 
+
+
+
     /**
      * Is it ok to create a grid field for the parameter with the given real type
      *
@@ -1008,6 +1009,27 @@ public abstract class PointDataSource extends FilesDataSource {
         return POINT_DATA;
     }
 
+
+
+    /**
+     * See if this DataSource should cache or not
+     *
+     * @param dataChoice The data choice we got this data from
+     * @param data   Data to cache
+     * @return  true
+     */
+    protected boolean shouldCache(DataChoice dataChoice, Data data) {
+        Object id = dataChoice.getId();
+        if (id instanceof List) {
+            List      idList     = (List) id;
+            //Check if its a first guess field
+            if(idList.size()>2) {
+                boolean doFirstGuessField = ((Boolean) idList.get(2)).booleanValue();
+                return !doFirstGuessField;
+            }
+        }
+        return super.shouldCache(dataChoice,data);
+    }
 
 
     /**
