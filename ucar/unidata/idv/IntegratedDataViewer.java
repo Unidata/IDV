@@ -342,6 +342,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
         //Set the default directory property
         FileManager.setStore(getStore(), PREF_FILEWRITEDIR, PREF_FILEREADDIR);
+        FileManager.setFixFileLockup(getProperty(PROP_FIXFILELOCKUP, false));
 
         startMonitor();
         getJythonManager();
