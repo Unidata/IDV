@@ -39,6 +39,7 @@
 <plugin version="2.2" name="China Maps" description="Map" size="3883648" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/chinamaps.jar" category="Maps"/>
 <plugin version="2.2" name="Mexico Map" description="Map" size="13806" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/mexico.jar" category="Maps"/>
 <plugin version="2.2" name="Mongolia Maps" description="Various maps of Mongolia" size="2859237" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/mongoliamaps_maps.jar" category="Maps"/>
+<plugin  name="Greenland Weather Locations" url="http://www.unidata.ucar.edu/software/idv/plugins/greenlandlocations.xml" category="Maps"/>
 
 <!-- Misc -->
 <plugin name="Collaboration Menu" url="http://www.unidata.ucar.edu/software/idv/plugins/collaboration.jar" description="Adds the Collaboration menu" category="Miscellaneous"/>
