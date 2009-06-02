@@ -4544,6 +4544,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
             try {
                 //we want to synchronize here so we don't make 2 (or more) versions of the displaymaster
                 synchronized (MASTER_MUTEX) {
+                    //If we had been blocked by another thread creating the DisplayMaste
+                    //check if we have a master
+                    if(master!=null) return master;
                     // might need these for the display initialization
                     if (initProperties != null) {
                         String tmp = initProperties;
