@@ -141,7 +141,10 @@ public abstract class DataChoice {
      */
     public DataChoice(DataChoice other) {
         this.id          = other.id;
-        this.properties  = other.properties;
+        if(other.properties!=null) {
+            this.properties  = new Hashtable();
+            this.properties.putAll(other.properties);
+        }
         this.name        = other.name;
         this.description = other.description;
         this.categories  = new ArrayList(other.categories);
