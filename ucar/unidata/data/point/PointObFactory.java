@@ -1776,6 +1776,7 @@ public class PointObFactory {
 
         if (GridUtil.isTimeSequence(pointObs)) {
             Set timeSet = GridUtil.getTimeSet(pointObs);
+            int errorCount = 0;
             for (int i = 0; i < timeSet.getLength(); i++) {
                 if (haveGuess) {
                     if (guessIsTime) {
@@ -1783,6 +1784,13 @@ public class PointObFactory {
                                 false);
                     } else {
                         guessField = (FlatField) firstGuessField;
+                    }
+                    if (guessField.isMissing()) {
+                        if (errorCount == 0) {
+                            LogUtil.userMessage(log_, "Unable to find matching time for first guess");
+                        }
+                        guessField = null;
+                        errorCount++;
                     }
                 }
                 FieldImpl oneTime =
