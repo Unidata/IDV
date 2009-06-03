@@ -940,7 +940,8 @@ public abstract class PointDataSource extends FilesDataSource {
                                                 .NONE_CATEGORY), null);
                                 addDataChoice(compositeDataChoice);
                             }
-                            String name = type.toString();
+                            String name = ucar.visad.Util.cleanTypeName(
+                                              type.toString());
                             if (seenFields.get(name) != null) {
                                 continue;
                             }
@@ -1021,14 +1022,15 @@ public abstract class PointDataSource extends FilesDataSource {
     protected boolean shouldCache(DataChoice dataChoice, Data data) {
         Object id = dataChoice.getId();
         if (id instanceof List) {
-            List      idList     = (List) id;
+            List idList = (List) id;
             //Check if its a first guess field
-            if(idList.size()>2) {
-                boolean doFirstGuessField = ((Boolean) idList.get(2)).booleanValue();
+            if (idList.size() > 2) {
+                boolean doFirstGuessField =
+                    ((Boolean) idList.get(2)).booleanValue();
                 return !doFirstGuessField;
             }
         }
-        return super.shouldCache(dataChoice,data);
+        return super.shouldCache(dataChoice, data);
     }
 
 
