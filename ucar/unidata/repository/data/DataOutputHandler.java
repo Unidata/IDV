@@ -1842,7 +1842,7 @@ public class DataOutputHandler extends OutputHandler {
                 location = IOUtil.stripExtension(location);
             }
         } else {
-            location = entry.getTypeHandler().getFile(entry);
+            location = entry.getTypeHandler().getFile(entry).toString();
         }
 
         List<Metadata> metadataList =
