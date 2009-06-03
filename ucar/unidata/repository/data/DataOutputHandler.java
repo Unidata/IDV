@@ -587,7 +587,7 @@ public class DataOutputHandler extends OutputHandler {
     public boolean canLoadAsCdm(Entry entry) {
         if ( !entry.getType().equals(
                 OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
-            if ( !entry.isFile()) {
+            if (!entry.isFile()) {
                 return false;
             }
             if (cannotLoad(entry, TYPE_CDM)) {
@@ -601,7 +601,6 @@ public class DataOutputHandler extends OutputHandler {
                 return true;
             }
         }
-
 
 
         if (entry.getResource().isRemoteFile()) {
@@ -1843,7 +1842,7 @@ public class DataOutputHandler extends OutputHandler {
                 location = IOUtil.stripExtension(location);
             }
         } else {
-            location = entry.getFile().toString();
+            location = entry.getTypeHandler().getFile(entry);
         }
 
         List<Metadata> metadataList =
