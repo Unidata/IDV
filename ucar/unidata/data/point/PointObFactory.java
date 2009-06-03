@@ -1366,6 +1366,7 @@ public class PointObFactory {
         }
         FeatureCollection      fc         = collectionList.get(0);
         PointFeatureCollection collection = null;
+        // System.out.println("llr = " + llr);
         if (fc instanceof PointFeatureCollection) {
             collection = (PointFeatureCollection) fc;
             if (llr != null) {
@@ -1415,16 +1416,6 @@ public class PointObFactory {
         Trace.call1("FeatureDatasetPoint: loop-2");
         while (dataIterator.hasNext()) {
             PointFeature po = (PointFeature) dataIterator.next();
-            /*
-            ucar.nc2.ft.EarthLocation el = po.getLocation();
-            if (el == null) {
-                continue;
-            }
-            if ((llr != null)
-                    && !llr.contains(el.getLatitude(), el.getLongitude())) {
-                continue;
-            }
-            */
             pos.add(po);
             times.add(new DateTime(po.getNominalTimeAsDate()));
             if (sample) {
