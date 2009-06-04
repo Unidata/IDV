@@ -118,6 +118,8 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
     public static final String CMD_SPACE_H =  CMD_ALIGN_PREFIX+"spaceh";
     public static final String CMD_SPACE_V =  CMD_ALIGN_PREFIX+"spacev";
 
+    public static final String CMD_SNAP =  "cmd.snap";
+
 
     /** _more_ */
     private boolean selectionSticky = false;
@@ -561,17 +563,7 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
                     CMD_EDIT_UNGROUP, hasSelection));
         }
 
-        editMenu.addSeparator();
-        JMenu gridMenu = new JMenu("Grid");
-        editMenu.add(gridMenu);
-        gridMenu.add(GuiUtils.makeCheckboxMenuItem("Show",
-                                                   this,"showGrid",null));
 
-        gridMenu.add(GuiUtils.makeMenuItem("Snap to grid",this,"snapToGrid"));
-        gridMenu.add(GuiUtils.makeMenuItem("Increase",this,"increaseGridSpacing"));
-        gridMenu.add(GuiUtils.makeMenuItem("Decrease",this,"decreaseGridSpacing"));
-        gridMenu.add(GuiUtils.makeMenuItem("Space Vertically",this,"spaceV"));
-        gridMenu.add(GuiUtils.makeMenuItem("Space Horizontally",this,"spaceH"));
 
 
 
@@ -605,8 +597,20 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
         viewMenu.add(mi = makeMenuItem("Zoom in", '=', CMD_ZOOMIN));
         viewMenu.add(mi = makeMenuItem("Zoom out", '-', CMD_ZOOMOUT));
         viewMenu.add(mi = makeMenuItem("Zoom reset", '0', CMD_ZOOMRESET));
+
+        JMenu gridMenu = new JMenu("Grid");
+        viewMenu.add(gridMenu);
+        gridMenu.add(GuiUtils.makeCheckboxMenuItem("Show",
+                                                   this,"showGrid",null));
+
+        gridMenu.add(GuiUtils.makeMenuItem("Increase",this,"increaseGridSpacing"));
+        gridMenu.add(GuiUtils.makeMenuItem("Decrease",this,"decreaseGridSpacing"));
+
+
         return viewMenu;
     }
+
+
 
 
 
@@ -670,6 +674,8 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
             group();
         } else if (action.equals(CMD_EDIT_UNGROUP)) {
             unGroup();
+        } else if (action.equals(CMD_SNAP)) {
+            snapToGrid();
         } else if (action.startsWith(CMD_ALIGN_PREFIX)) {
             doAlign(action);
         }
@@ -1216,15 +1222,16 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
         }
         String[] cmds = {
             CMD_ALIGN_TOP, CMD_ALIGN_CENTER, CMD_ALIGN_BOTTOM, null,
-            CMD_ALIGN_LEFT, CMD_ALIGN_MIDDLE, CMD_ALIGN_RIGHT
+            CMD_ALIGN_LEFT, CMD_ALIGN_MIDDLE, CMD_ALIGN_RIGHT,CMD_SPACE_H,CMD_SPACE_V,CMD_SNAP
         };
         String[] icons = {
             "aligntop.gif", "aligncenter.gif", "alignbottom.gif", "",
-            "alignleft.gif", "alignmiddle.gif", "alignright.gif"
+            "alignleft.gif", "alignmiddle.gif", "alignright.gif","spaceh.gif","spacev.gif","snaptogrid.gif"
         };
         String[] tips = {
             "Align top", "Align center", "Align bottom", "", "Align left",
-            "Align middle", "Align right"
+            "Align middle", "Align right", "Space Horizontally",
+            "Space Vertically","Snap to Grid"
         };
 
 
@@ -1389,7 +1396,6 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
      */
     public boolean mousePressedInner(MouseEvent e) {
         int x   = transformInputX(e.getX());
-
         int y   = transformInputY(e.getY());
         int idx = -1;
         for (int i = 0; (idx < 0) && (i < shapeGroup.size()); i++) {
@@ -1411,7 +1417,7 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
 
         List            shapeDescriptors = getShapeDescriptors();
         ShapeDescriptor sd = (ShapeDescriptor) shapeDescriptors.get(idx);
-        Glyph           glyph            = createGlyph(sd.className, x, y);
+        Glyph           glyph            = createGlyph(sd.className, snap(x), snap(y));
         if (glyph != null) {
             sd.initializeGlyph(glyph);
             glyph.initDone();

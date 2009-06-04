@@ -183,6 +183,15 @@ public class DisplayCanvas extends JPanel {
         return contents;
     }
 
+    public int snap(int p) {
+        if(getShowGrid ()) {
+            int dx =p%gridSpacing;
+            p-=dx;
+        }
+        return p;
+    }
+
+
     /**
        Set the ShowGrid property.
 
@@ -237,7 +246,7 @@ public class DisplayCanvas extends JPanel {
                             BasicStroke.CAP_BUTT,
                             BasicStroke.JOIN_BEVEL,
                             0,
-                            new float[] {8,4}, 
+                            new float[] {4,4}, 
                             0
                             );
         g2d.setStroke(stroke);

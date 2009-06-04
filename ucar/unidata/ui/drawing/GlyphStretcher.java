@@ -104,6 +104,9 @@ class GlyphStretcher extends CanvasCommand {
      * @return _more_
      */
     public CanvasCommand doMouseDragged(MouseEvent e, int x, int y) {
+        x = canvas.snap(x);
+        y = canvas.snap(y);
+
         if (theGlyph == null) {
             return null;
         }
