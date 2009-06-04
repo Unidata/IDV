@@ -303,7 +303,7 @@ public class StationModelControl extends ObsDisplayControl {
     private float displayableScale = 1.0f;
 
     /** decluttering filter factor */
-    private float declutterFilter = 1.0f;
+    private float declutterFilter = 0.8f;
 
 
     /** label for which station model is being shown */
