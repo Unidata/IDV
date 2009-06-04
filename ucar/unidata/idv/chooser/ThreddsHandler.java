@@ -273,16 +273,16 @@ public class ThreddsHandler extends XmlHandler {
                 public ImageIcon getIconForNode(Element node) {
                     List propertyNodes = XmlUtil.findChildren(node,
                                                               CatalogUtil.TAG_PROPERTY);
-                    for (Element propertyNode : (List<Element>) propertyNodes) {
-                        String name = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_NAME,"");
-                        String []  ids = {"thumbnail","icon"};
-                        for(String id:ids) {
+                    String []  ids = {"thumbnail","icon"};
+                    for(String id:ids) {
+                        for (Element propertyNode : (List<Element>) propertyNodes) {
+                            String name = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_NAME,"");
                             if(name.equals(id)) {
                                 String value = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_VALUE,"");
                                 ImageIcon icon = thumbnails.get(value);
                                 if(icon == null) {
                                     Image image = ImageUtils.readImage(value);
-                                    if(id.equals("thubnail"))  {
+                                    if(id.equals("thumbnail"))  {
                                         image = ImageUtils.resize(image, 100,-1);
                                         ImageUtils.waitOnImage(image);
                                     }
