@@ -2367,8 +2367,8 @@ public class StationModelControl extends ObsDisplayControl {
         ActionListener scaleListener = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 try {
-                    System.err.println("display scale = "
-                                       + getDisplayScale());
+                    //System.err.println("display scale = "
+                    //                   + getDisplayScale());
                     setDisplayableScale(
                         (float) Misc.parseNumber(scaleField.getText()));
                 } catch (Exception nfe) {
