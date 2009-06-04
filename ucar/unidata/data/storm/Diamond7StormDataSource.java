@@ -280,7 +280,7 @@ public class Diamond7StormDataSource extends StormDataSource {
                 /*  */
                 int endPtsIndex = currentIndex + numberPts;
 
-                System.out.println("endPtsIndex "+ endPtsIndex);
+                //System.out.println("endPtsIndex "+ endPtsIndex);
                 while( currentIndex < endPtsIndex ) {
 
                     //System.out.println("currentIndex "+ currentIndex);
@@ -299,8 +299,10 @@ public class Diamond7StormDataSource extends StormDataSource {
                     String radiuswgale =   toks.get(10);
                     String mspd        =   toks.get(11);
                     String mdir        =   toks.get(12);
-                     
-                    DateTime dtt = getDateTime(Integer.parseInt(year),
+                    int yy = Integer.parseInt(year);
+                    if(yy < 20) yy = 2000 + yy;
+                    else if(yy > 50 && yy < 99 ) yy = 1900 + yy;
+                    DateTime dtt = getDateTime(yy,
                                        Integer.parseInt(mon),
                                        Integer.parseInt(day),
                                        Integer.parseInt(hr));
