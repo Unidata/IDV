@@ -242,6 +242,8 @@ public class ThreddsHandler extends XmlHandler {
     }
 
     private Hashtable<String,ImageIcon> thumbnails = new Hashtable();
+    private ImageIcon remoteIcon;
+    private ImageIcon datasetIcon;
 
     /**
      * Create the  UI
@@ -269,8 +271,15 @@ public class ThreddsHandler extends XmlHandler {
 
 
         tree = new XmlTree(root, true, path) {
-
                 public ImageIcon getIconForNode(Element node) {
+                    if(remoteIcon==null) {
+                        datasetIcon = GuiUtils.getImageIcon("/auxdata/ui/icons/folderclosed.png");
+                        remoteIcon = GuiUtils.getImageIcon("/auxdata/ui/icons/folderclosed_remote.png");
+                    }
+                    if(node.getTagName().equals(CatalogUtil.TAG_CATALOGREF)) {
+                        return remoteIcon;
+                    }
+
                     List propertyNodes = XmlUtil.findChildren(node,
                                                               CatalogUtil.TAG_PROPERTY);
                     String []  ids = {"thumbnail","icon"};
@@ -293,6 +302,17 @@ public class ThreddsHandler extends XmlHandler {
                             }
                         }
                     }            
+
+                    NodeList elements = XmlUtil.getElements(node);
+                    for(int i=0;i<elements.getLength();i++) {
+                        Element child = (Element)elements.item(i);
+                        String tag = child.getTagName();
+                        if(tag.equals(CatalogUtil.TAG_DATASET)|| tag.equals(CatalogUtil.TAG_CATALOGREF)) {
+                            return datasetIcon;
+                        }
+                    }
+
+
                     return super.getIconForNode(node);
                 }
 
@@ -387,7 +407,7 @@ public class ThreddsHandler extends XmlHandler {
                     XmlTree.XlinkTreeNode xn = (XmlTree.XlinkTreeNode) node;
                     if (xn.getHaveLoaded()) {
                         String href = xn.getHref();
-                        href = theTree.expandRelativeUrl(href);
+                        href = theTree.expandRelativeUrl(node, href);
                         chooser.makeUiFromPath(href);
                     }
                     return;
@@ -412,7 +432,7 @@ public class ThreddsHandler extends XmlHandler {
                                      XmlTree.XmlTreeNode node,
                                      Element element, MouseEvent event) {
                 JPopupMenu popup = new JPopupMenu();
-                if (makePopupMenu(theTree, element, popup)) {
+                if (makePopupMenu(theTree, element, popup,node)) {
                     popup.show((Component) event.getSource(), event.getX(),
                                event.getY());
                 }
@@ -476,7 +496,7 @@ public class ThreddsHandler extends XmlHandler {
      * @return Did we add any items into the menu
      */
     private boolean makePopupMenu(final XmlTree theTree, final Element node,
-                                  JPopupMenu popup) {
+                                  JPopupMenu popup,final XmlTree.XmlTreeNode treeNode) {
         String    tagName = node.getTagName();
 
 
@@ -518,7 +538,7 @@ public class ThreddsHandler extends XmlHandler {
                 mi.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent ae) {
                         chooser.makeUiFromPath(
-                            theTree.expandRelativeUrl(href));
+                                               theTree.expandRelativeUrl(treeNode, href));
                     }
                 });
                 popup.add(mi);
