@@ -34,6 +34,7 @@ import ucar.unidata.util.Misc;
 import java.lang.reflect.*;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.event.*;
 
 import javax.swing.*;
@@ -91,6 +92,12 @@ public class DisplayCanvas extends JPanel {
     /** _more_ */
     public static final Cursor NW_CURSOR =
         new Cursor(Cursor.NW_RESIZE_CURSOR);
+
+
+    public int gridSpacing = 20;
+
+    public boolean showGrid = false;
+
 
 
     /** The scaling */
@@ -177,12 +184,76 @@ public class DisplayCanvas extends JPanel {
     }
 
     /**
+       Set the ShowGrid property.
+
+       @param value The new value for ShowGrid
+    **/
+    public void setShowGrid (boolean value) {
+	this.showGrid = value;
+        repaint();
+    }
+
+    /**
+       Get the ShowGrid property.
+
+       @return The ShowGrid
+    **/
+    public boolean getShowGrid () {
+	return this.showGrid;
+    }
+
+
+
+    public void increaseGridSpacing() {
+        gridSpacing+=2;
+        repaint();
+    }
+
+
+    public void decreaseGridSpacing() {
+        gridSpacing-=2;
+        if(gridSpacing<2) gridSpacing = 2;
+        repaint();
+    }
+
+    /**
      * _more_
      * @return _more_
      */
     protected Component doMakeContents() {
         return this;
     }
+
+    public void paintGrid(Graphics g) {
+        if(!showGrid) { return;}
+        Graphics2D g2d = (Graphics2D)g;
+        AffineTransform at = g2d.getTransform();
+        double tx = at.getTranslateX();
+        double  ty = at.getTranslateY();
+        Rectangle b = getBounds();
+        Stroke oldStroke =  g2d.getStroke();
+        Stroke stroke = 
+            new BasicStroke(1, 
+                            BasicStroke.CAP_BUTT,
+                            BasicStroke.JOIN_BEVEL,
+                            0,
+                            new float[] {8,4}, 
+                            0
+                            );
+        g2d.setStroke(stroke);
+        g2d.setColor(Color.lightGray);
+        //        g2d.translate(-tx,-ty);
+        for(int i=0;i<b.width;i+=gridSpacing) {
+            g.drawLine(i,0,i,b.height);
+        }
+        for(int i=0;i<b.height;i+=gridSpacing) {
+            g.drawLine(0,i,b.width,i);
+        }
+        //        g2d.translate(tx,ty);
+        g2d.setStroke(oldStroke);
+
+    }
+
 
     /**
      * _more_
@@ -191,7 +262,6 @@ public class DisplayCanvas extends JPanel {
      */
     public void paint(Graphics g) {
         //       super.paint(g);
-
         Rectangle clip = g.getClipBounds();
         if (clip != null) {
             clip.x      -= 2;
@@ -208,6 +278,7 @@ public class DisplayCanvas extends JPanel {
         if (g instanceof Graphics2D) {
             ((Graphics2D) g).scale(scaleFactor, scaleFactor);
         }
+
 
         for (int i = 0; i < glyphs.size(); i++) {
             Glyph     glyph = (Glyph) glyphs.get(i);

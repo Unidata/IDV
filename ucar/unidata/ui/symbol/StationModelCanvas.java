@@ -789,7 +789,7 @@ public class StationModelCanvas extends EditCanvas {
         Rectangle b = getBounds();
         g.setColor(canvasBg);
         g.fillRect(0, 0, b.width, b.height);
-
+        paintGrid(g);
 
         Point center = getCenter();
         if (g instanceof Graphics2D) {

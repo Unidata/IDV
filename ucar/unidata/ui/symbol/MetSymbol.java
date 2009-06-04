@@ -140,11 +140,8 @@ public abstract class MetSymbol extends RectangleGlyph {
     /** displayUnitName */
     private String displayUnitName = null;
 
-
-
     /** default scale */
     private double scale = 1.0;
-
 
     /** scale parameter */
     private String scaleParam;
@@ -863,7 +860,11 @@ public abstract class MetSymbol extends RectangleGlyph {
      *  @param value The new value for ColorTableRange
      */
     public void setColorTableRange(Range value) {
-        colorTableRange = value;
+        if(value!=null) {
+            colorTableRange = new Range(value);
+        } else {
+            colorTableRange = value;
+        }
     }
 
     /**

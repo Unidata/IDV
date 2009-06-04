@@ -115,6 +115,9 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
     /** _more_ */
     public static final String CMD_ALIGN_RIGHT = CMD_ALIGN_PREFIX + "right";
 
+    public static final String CMD_SPACE_H =  CMD_ALIGN_PREFIX+"spaceh";
+    public static final String CMD_SPACE_V =  CMD_ALIGN_PREFIX+"spacev";
+
 
     /** _more_ */
     private boolean selectionSticky = false;
@@ -557,6 +560,21 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
             editMenu.add(makeSelectionMenuItem("Ungroup", 'u',
                     CMD_EDIT_UNGROUP, hasSelection));
         }
+
+        editMenu.addSeparator();
+        JMenu gridMenu = new JMenu("Grid");
+        editMenu.add(gridMenu);
+        gridMenu.add(GuiUtils.makeCheckboxMenuItem("Show",
+                                                   this,"showGrid",null));
+
+        gridMenu.add(GuiUtils.makeMenuItem("Snap to grid",this,"snapToGrid"));
+        gridMenu.add(GuiUtils.makeMenuItem("Increase",this,"increaseGridSpacing"));
+        gridMenu.add(GuiUtils.makeMenuItem("Decrease",this,"decreaseGridSpacing"));
+        gridMenu.add(GuiUtils.makeMenuItem("Space Vertically",this,"spaceV"));
+        gridMenu.add(GuiUtils.makeMenuItem("Space Horizontally",this,"spaceH"));
+
+
+
         return editMenu;
     }
 
@@ -587,14 +605,13 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
         viewMenu.add(mi = makeMenuItem("Zoom in", '=', CMD_ZOOMIN));
         viewMenu.add(mi = makeMenuItem("Zoom out", '-', CMD_ZOOMOUT));
         viewMenu.add(mi = makeMenuItem("Zoom reset", '0', CMD_ZOOMRESET));
-
         return viewMenu;
     }
 
 
 
 
-    /**
+    /*
      * _more_
      * @return _more_
      */
@@ -835,6 +852,13 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
     }
 
 
+    public void spaceH() {
+        doAlign(CMD_SPACE_H);
+    }
+
+    public void spaceV() {
+        doAlign(CMD_SPACE_V);
+    }
 
     /**
      *  Align the set of selected glyphs with the given command
@@ -850,6 +874,7 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
         int hmid   = Integer.MIN_VALUE;
         int right  = Integer.MIN_VALUE;
 
+        List<Glyph> glyphs = new ArrayList<Glyph>();
         for (int i = 0; i < selectionSet.size(); i++) {
             Glyph     g = (Glyph) selectionSet.get(i);
             Rectangle b = g.getBounds();
@@ -859,9 +884,36 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
             right  = Math.max(b.x + b.width, right);
             vmid   = Math.max(b.y + b.height / 2, vmid);
             hmid   = Math.max(b.x + b.width / 2, hmid);
+            int size = glyphs.size();
+            if (cmd.equals(CMD_SPACE_H)) {
+                for(int j=0;j<glyphs.size();j++) {
+                    Glyph other =  glyphs.get(j);
+                    Rectangle ob = other.getBounds();
+                    if(b.x<ob.x) {
+                        glyphs.add(j,g);
+                        break;
+                    }
+                }
+                if(glyphs.size() == size) glyphs.add(g);
+            }  else if (cmd.equals(CMD_SPACE_V)) {
+                for(int j=0;j<glyphs.size();j++) {
+                    Glyph other =  glyphs.get(j);
+                    Rectangle ob = other.getBounds();
+                    if(b.y<ob.y) {
+                        glyphs.add(j,g);
+                        break;
+                    }
+                }
+                if(glyphs.size() == size) glyphs.add(g);
+            } else {
+                glyphs.add(g);
+            }
         }
-        for (int i = 0; i < selectionSet.size(); i++) {
-            Glyph     g = (Glyph) selectionSet.get(i);
+
+        if(glyphs.size()==0) return;
+        int delta;
+        int cnt=0;
+        for (Glyph g: glyphs) {
             Rectangle b = g.getBounds();
             if (cmd.equals(CMD_ALIGN_TOP)) {
                 g.moveBy(0, top - b.y);
@@ -875,11 +927,36 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
                 g.moveBy(hmid - (b.x + b.width / 2), 0);
             } else if (cmd.equals(CMD_ALIGN_RIGHT)) {
                 g.moveBy(right - (b.x + b.width), 0);
+            } else if (cmd.equals(CMD_SPACE_H)) {
+                int dx = (right-left)/glyphs.size();
+                int newX = left+dx*cnt;
+                g.moveBy(newX-b.x,0);
+            } else if (cmd.equals(CMD_SPACE_V)) {
+                int dy = (bottom-top)/glyphs.size();
+                int newY = top+dy*cnt;
+                g.moveBy(0,newY-b.y);
             }
+            cnt++;
             notifyGlyphMoveComplete(g);
         }
         repaint();
     }
+
+
+    public void snapToGrid() {
+        for (int i = 0; i < selectionSet.size(); i++) {
+            Glyph     g = (Glyph) selectionSet.get(i);
+            Rectangle b = g.getBounds();
+            int dx =b.x%gridSpacing;
+            int dy =b.y%gridSpacing;
+            g.moveBy(-dx, -dy);
+       }
+        repaint();
+    }
+
+
+    /**
+
 
 
     /**
