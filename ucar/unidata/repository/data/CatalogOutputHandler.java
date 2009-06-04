@@ -372,6 +372,12 @@ public class CatalogOutputHandler extends OutputHandler {
                                             CatalogUtil.TAG_DATASET, null,
                                             new String[] { CatalogUtil.ATTR_NAME,
                         "Latest OpenDAP Data" });
+                XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_PROPERTY, latestDataset,
+                               new String[] { CatalogUtil.ATTR_NAME,
+                                              "icon", CatalogUtil.ATTR_VALUE,
+                                              getRepository().absoluteUrl(getRepository().iconUrl(ICON_OPENDAP))});
+
+
                 topDataset.insertBefore(latestDataset, firstChild);
                 Element service = XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_ACCESS,
                                       latestDataset,
@@ -542,6 +548,14 @@ public class CatalogOutputHandler extends OutputHandler {
         Element dataset = XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_DATASET,
                                          parent, new String[] { CatalogUtil.ATTR_NAME,
                 entry.getName() });
+
+        String iconUrl = getRepository().absoluteUrl(getEntryManager().getIconUrl(request, entry));
+
+        XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_PROPERTY, dataset,
+                       new String[] { CatalogUtil.ATTR_NAME,
+                                      "icon", CatalogUtil.ATTR_VALUE,
+                                      iconUrl });
+
 
         XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_PROPERTY, dataset,
                        new String[] { CatalogUtil.ATTR_NAME,
