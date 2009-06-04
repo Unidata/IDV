@@ -276,7 +276,7 @@ public class XmlChooser extends IdvChooser implements ActionListener {
 
         backBtn = GuiUtils.getImageButton(
             GuiUtils.getImageIcon(
-                "/auxdata/ui/icons/Undo16.gif", getClass()));
+                "/auxdata/ui/icons/Left16.gif", getClass()));
         backBtn.setToolTipText("View previous selection");
         GuiUtils.makeMouseOverBorder(backBtn);
         backBtn.addActionListener(new ActionListener() {
@@ -287,7 +287,7 @@ public class XmlChooser extends IdvChooser implements ActionListener {
 
         fwdBtn = GuiUtils.getImageButton(
             GuiUtils.getImageIcon(
-                "/auxdata/ui/icons/Redo16.gif", getClass()));
+                "/auxdata/ui/icons/Right16.gif", getClass()));
         GuiUtils.makeMouseOverBorder(fwdBtn);
         fwdBtn.setToolTipText("View next selection");
         fwdBtn.addActionListener(new ActionListener() {
@@ -317,16 +317,14 @@ public class XmlChooser extends IdvChooser implements ActionListener {
                 makeBlankTree();
             }
         }
-        JPanel navButtons = GuiUtils.doLayout(new Component[] { backBtn,
-                new JLabel(" "), fwdBtn, new JLabel("  ") }, 4,
-                    GuiUtils.WT_N, GuiUtils.WT_N);
+        JPanel navButtons = GuiUtils.hbox(backBtn,fwdBtn);
 
         GuiUtils.tmpInsets = GRID_INSETS;
         JPanel catPanel = GuiUtils.doLayout(new Component[] {
                               new JLabel("Catalogs:"),
                               catListPanel, browseButton }, 3,
                                   GuiUtils.WT_NYN, GuiUtils.WT_N);
-        JPanel topPanel = GuiUtils.centerRight(catPanel,navButtons);
+        JPanel topPanel = GuiUtils.leftCenter(navButtons,catPanel);
         myContents = GuiUtils.topCenterBottom(topPanel, handlerHolder,
                 bottomButtons);
         //        myContents = GuiUtils.topCenter(getStatusComponent(), myContents);

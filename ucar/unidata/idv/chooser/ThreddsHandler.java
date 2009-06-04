@@ -274,7 +274,7 @@ public class ThreddsHandler extends XmlHandler {
                 public ImageIcon getIconForNode(Element node) {
                     if(remoteIcon==null) {
                         datasetIcon = GuiUtils.getImageIcon("/auxdata/ui/icons/folderclosed.png");
-                        remoteIcon = GuiUtils.getImageIcon("/auxdata/ui/icons/folderclosed_remote.png");
+                        remoteIcon = GuiUtils.getImageIcon("/auxdata/ui/icons/remotecatalog.png");
                     }
                     if(node.getTagName().equals(CatalogUtil.TAG_CATALOGREF)) {
                         return remoteIcon;
