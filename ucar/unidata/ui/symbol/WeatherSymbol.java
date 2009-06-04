@@ -250,66 +250,73 @@ public class WeatherSymbol extends MetSymbol implements ImageObserver {
      * @see #getLines(int, int)
      */
     public static VisADLineArray getLines(int symbolType, int code) {
-        switch (symbolType) {
+        try {
+            switch (symbolType) {
 
-          case SYMBOL_PRESENTWEATHER :
-              return (code > 3)
-                     ? WeatherSymbols.getPresentWeatherSymbol(code)
-                     : null;
+            case SYMBOL_PRESENTWEATHER :
+                return (code > 3)
+                    ? WeatherSymbols.getPresentWeatherSymbol(code)
+                    : null;
 
-          case SYMBOL_LOWCLOUD :
-              if (code < 1 ||code > WeatherSymbols.LOCLD_NUM) return null;
-              return WeatherSymbols.getLowCloudSymbol(code);
+            case SYMBOL_LOWCLOUD :
+                if (code < 1 ||code > WeatherSymbols.LOCLD_NUM) return null;
+                return WeatherSymbols.getLowCloudSymbol(code);
 
-          case SYMBOL_MIDCLOUD :
-              if (code < 1 ||code > WeatherSymbols.MIDCLD_NUM) return null;
-              return WeatherSymbols.getMidCloudSymbol(code);
+            case SYMBOL_MIDCLOUD :
+                if (code < 1 ||code > WeatherSymbols.MIDCLD_NUM) return null;
+                return WeatherSymbols.getMidCloudSymbol(code);
 
-          case SYMBOL_HIGHCLOUD :
-              if (code < 1 ||code > WeatherSymbols.HICLD_NUM) return null;
-              return WeatherSymbols.getHighCloudSymbol(code);
+            case SYMBOL_HIGHCLOUD :
+                if (code < 1 ||code > WeatherSymbols.HICLD_NUM) return null;
+                return WeatherSymbols.getHighCloudSymbol(code);
 
-          case SYMBOL_PRESSURETENDENCY :
-              if (code < 0 || code >= WeatherSymbols.TNDCY_NUM) return null;
-              return WeatherSymbols.getPressureTendencySymbol(code);
+            case SYMBOL_PRESSURETENDENCY :
+                if (code < 0 || code >= WeatherSymbols.TNDCY_NUM) return null;
+                return WeatherSymbols.getPressureTendencySymbol(code);
 
-          case SYMBOL_CLOUDCOVERAGE :
-              if (code < 0 || code >= WeatherSymbols.SKY_NUM) return null;
-              return WeatherSymbols.getCloudCoverageSymbol(code);
+            case SYMBOL_CLOUDCOVERAGE :
+                if (code < 0 || code >= WeatherSymbols.SKY_NUM) return null;
+                return WeatherSymbols.getCloudCoverageSymbol(code);
 
-          case SYMBOL_ICING :
-              if (code < 0 || code >= WeatherSymbols.ICING_NUM) return null;
-              return WeatherSymbols.getIcingSymbol(code);
+            case SYMBOL_ICING :
+                if (code < 0 || code >= WeatherSymbols.ICING_NUM) return null;
+                return WeatherSymbols.getIcingSymbol(code);
 
-          case SYMBOL_TURBULENCE :
-              if (code < 0 || code >= WeatherSymbols.TURB_NUM) return null;
-              return WeatherSymbols.getTurbulenceSymbol(code);
+            case SYMBOL_TURBULENCE :
+                if (code < 0 || code >= WeatherSymbols.TURB_NUM) return null;
+                return WeatherSymbols.getTurbulenceSymbol(code);
 
-          case SYMBOL_LIGHTNING :
-              return (code >= 0)
-                        ? WeatherSymbols.getLightningSymbol(0)
-                        : WeatherSymbols.getLightningSymbol(1);
+            case SYMBOL_LIGHTNING :
+                return (code >= 0)
+                    ? WeatherSymbols.getLightningSymbol(0)
+                    : WeatherSymbols.getLightningSymbol(1);
 
-          case SYMBOL_MISC :
-              if (code < 0) {
-                  return null;
-              }
-              //            if(code < 0)
-              //          return WeatherSymbols.getMiscSymbol (0);
-              return WeatherSymbols.getMiscSymbol(code);
+            case SYMBOL_MISC :
+                if (code < 0) {
+                    return null;
+                }
+                //            if(code < 0)
+                //          return WeatherSymbols.getMiscSymbol (0);
+                return WeatherSymbols.getMiscSymbol(code);
 
-          case SYMBOL_ALL : {
-              VisADLineArray[] vla = WeatherSymbols.getAllMetSymbols();
-              if ((code < 0) || (code >= vla.length)) {
-                  return null;
-              }
-              return vla[code];
-          }
+            case SYMBOL_ALL : {
+                VisADLineArray[] vla = WeatherSymbols.getAllMetSymbols();
+                if ((code < 0) || (code >= vla.length)) {
+                    return null;
+                }
+                return vla[code];
+            }
 
-          default :
-              throw new IllegalStateException("Unknown symbol type:"
-                      + symbolType);
+            default :
+                throw new IllegalStateException("Unknown symbol type:"
+                                                + symbolType);
+            }
+
+        } catch(IllegalArgumentException iae) {
+            //degrade a bit gracefully
+            System.err.println("bad value: " + code +" for symbol:" + symbolType);
         }
+        return null;
     }
 
 
