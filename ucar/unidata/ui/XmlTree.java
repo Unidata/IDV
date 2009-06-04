@@ -820,7 +820,6 @@ public class XmlTree extends JTree {
          * @param name The label to use
          * @param baseLocation Where the xml came from. May be null.
          */
-
         public XmlTreeNode(Element node, String name, String baseLocation) {
             super(name);
             this.xmlNode      = node;
@@ -928,6 +927,15 @@ public class XmlTree extends JTree {
         }
 
     }
+
+    public String expandRelativeUrl(XmlTreeNode node,String href) {
+        String base = node.getBaseLocation();
+        if(base!=null) {
+            return expandRelativeUrl(href, base);
+        }
+        return expandRelativeUrl(href);
+    }
+
 
 
     /**
