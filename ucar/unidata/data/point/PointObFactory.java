@@ -1255,6 +1255,34 @@ public class PointObFactory {
         boolean needToAddStationId = false;
         String  stationFieldName   = null;
 
+        // make sure we can read this kind of data
+        List<FeatureCollection> collectionList =
+            input.getPointFeatureCollectionList();
+        if (collectionList.size() > 1) {
+            throw new IllegalArgumentException(
+                "Can't handle point data with multiple collections");
+        }
+        FeatureCollection      fc         = collectionList.get(0);
+        PointFeatureCollection collection = null;
+        // System.out.println("llr = " + llr);
+        if (fc instanceof PointFeatureCollection) {
+            collection = (PointFeatureCollection) fc;
+            if (llr != null) {
+                collection = collection.subset(llr, null);
+            }
+        } else if (fc instanceof NestedPointFeatureCollection) {
+            NestedPointFeatureCollection npfc =
+                (NestedPointFeatureCollection) fc;
+            if (llr != null) {
+                npfc = npfc.subset(llr);
+            }
+            collection = npfc.flatten(llr, null);
+        } else {
+            throw new IllegalArgumentException(
+                "Can't handle collection of type " + fc.getClass().getName());
+        }
+        //System.out.println("collection = " + collection.getClass().getName());
+
         //Is this station data
         if (input instanceof StationObsDataset) {
             //TODO: Get the variable name used for the station id:
@@ -1298,9 +1326,9 @@ public class PointObFactory {
 
 
 
-        List         numericTypes = new ArrayList();
-        List         numericUnits = new ArrayList();
-        List         stringTypes  = new ArrayList();
+        List<ScalarType>         numericTypes = new ArrayList<ScalarType>();
+        List<Unit>         numericUnits = new ArrayList<Unit>();
+        List<ScalarType>         stringTypes  = new ArrayList<ScalarType>();
 
         //If we really have a StationObsDataset then we need to add in the station id
         //into the data fields 
@@ -1316,7 +1344,7 @@ public class PointObFactory {
         }
 
 
-        Trace.call1("FeatureDatasetPoint: loop-1");
+        Trace.call1("FeatureDatasetPoint: getting variable info");
         int varIdx = varIdxBase;
         for (Iterator iter = actualVariables.iterator(); iter.hasNext(); ) {
             VariableSimpleIF var = (VariableSimpleIF) iter.next();
@@ -1347,7 +1375,7 @@ public class PointObFactory {
             }
             varIdx++;
         }
-        Trace.call2("FeatureDatasetPoint: loop-1");
+        Trace.call2("FeatureDatasetPoint: getting variable info");
 
 
         String[] shortNames = (String[]) shortNamesList.toArray(
@@ -1356,38 +1384,7 @@ public class PointObFactory {
 
         int    numReals   = numericTypes.size();
         int    numStrings = stringTypes.size();
-        Data[] firstTuple = null;
         int    obIdx      = 0;
-        List<FeatureCollection> collectionList =
-            input.getPointFeatureCollectionList();
-        if (collectionList.size() > 1) {
-            throw new IllegalArgumentException(
-                "Can't handle point data with multiple collections");
-        }
-        FeatureCollection      fc         = collectionList.get(0);
-        PointFeatureCollection collection = null;
-        // System.out.println("llr = " + llr);
-        if (fc instanceof PointFeatureCollection) {
-            collection = (PointFeatureCollection) fc;
-            if (llr != null) {
-                collection = collection.subset(llr, null);
-            }
-        } else if (fc instanceof NestedPointFeatureCollection) {
-            NestedPointFeatureCollection npfc =
-                (NestedPointFeatureCollection) fc;
-            if (llr != null) {
-                npfc = npfc.subset(llr);
-            }
-            collection = npfc.flatten(llr, null);
-        } else {
-            throw new IllegalArgumentException(
-                "Can't handle collection of type " + fc.getClass().getName());
-        }
-        //System.out.println("collection times = " + collection.getDateRange());
-        //System.out.println("collection bbox = " + collection.getBoundingBox());
-            
-        //System.out.println("number of obs = " + collection.size());
-        int total = collection.size();
         PointFeatureIterator dataIterator =
             collection.getPointFeatureIterator(16384);
         int       NUM          = 500;
@@ -1408,36 +1405,18 @@ public class PointObFactory {
         EarthLocationLite elt;
         TupleType         finalTT = null;
         PointObTuple      pot     = null;
-        List              pos     = new ArrayList(100000);
-        List              times   = new ArrayList(100000);
-
-        //First do spatial subset and collect times
-        //First collect times
-        Trace.call1("FeatureDatasetPoint: loop-2");
-        while (dataIterator.hasNext()) {
-            PointFeature po = (PointFeature) dataIterator.next();
-            pos.add(po);
-            times.add(new DateTime(po.getNominalTimeAsDate()));
-            if (sample) {
-                break;
-            }
-        }
-        Trace.call2("FeatureDatasetPoint: loop-2");
-
-
-        //Bin times
-        Trace.call1("FeatureDatasetPoint: binTimes");
-        times = binTimes(times, binRoundTo, binWidth);
-        Trace.call2("FeatureDatasetPoint: binTimes");
+        List<Tuple>       pos     = new ArrayList<Tuple>(100000);
+        List<DateTime>    times   = new ArrayList<DateTime>(100000);
+        List<EarthLocationLite> elts    = new ArrayList<EarthLocationLite>(100000);
 
         StructureMembers.Member member;
-        PointOb[]               obs = new PointOb[pos.size()];
-        //Make the obs
-        Trace.call1("FeatureDatasetPoint: loop-3");
-        int size = pos.size();
-
-        for (int i = 0; i < size; i++) {
-            PointFeature                      po = (PointFeature) pos.get(i);
+        Trace.call1("FeatureDatasetPoint: iterating on PointFeatures");
+        int missing = 0;
+        String svalue;
+        float  value;
+        while (dataIterator.hasNext()) {
+            PointFeature po = (PointFeature) dataIterator.next();
+            obIdx++;
             ucar.unidata.geoloc.EarthLocation el = po.getLocation();
             elt = new EarthLocationLite(lat.cloneButValue(el.getLatitude()),
                                         lon.cloneButValue(el.getLongitude()),
@@ -1455,17 +1434,23 @@ public class PointObFactory {
                 StationObsDatatype sod = (StationObsDatatype) po;
                 stringArray[stringCnt++] = sod.getStation().getName();
             }
+            boolean allMissing = true;
             for (varIdx = varIdxBase; varIdx < numVars; varIdx++) {
                 member = structure.findMember((String) shortNames[varIdx]);
                 if ( !isVarNumeric[varIdx]) {
-                    stringArray[stringCnt++] =
-                        structure.getScalarString(member);
+                    svalue = structure.getScalarString(member);
+                    if (svalue.length() != 0) allMissing = false;
+                    stringArray[stringCnt++] = svalue;
                 } else {
-                    realArray[realCnt++] =
-                        structure.convertScalarFloat(member);
+                    value = structure.convertScalarFloat(member);
+                    if (value == value) allMissing = false;
+                    realArray[realCnt++] = value;
                 }
             }
-
+            if (allMissing) {
+                missing++;
+                continue;
+            }
 
             Tuple tuple = (allReals
                            ? (Tuple) new DoubleTuple(
@@ -1474,36 +1459,53 @@ public class PointObFactory {
                            : new DoubleStringTuple(allTupleType, realArray,
                                stringArray, allUnits));
 
+            pos.add(tuple);
+            times.add(new DateTime(po.getNominalTimeAsDate()));
+            elts.add(elt);
 
-            if (finalTT == null) {
-                pot = new PointObTuple(elt, (DateTime) times.get(i), tuple);
-                finalTT = Tuple.buildTupleType(pot.getComponents());
-            } else {
-                pot = new PointObTuple(elt, (DateTime) times.get(i), tuple,
-                                       finalTT, false);
 
+            if (sample) {
+                break;
             }
-            obs[obIdx++] = pot;
             if (obIdx % NUM == 0) {
                 if ( !JobManager.getManager().canContinue(loadId)) {
                     LogUtil.message("");
                     return null;
                 }
-                if (llr == null) {
-                    LogUtil.message("Read " + obIdx + "/" + total
-                                    + " observations");
-                } else {
+                //if (llr == null) {
+                //    LogUtil.message("Read " + obIdx + "/" + total
+                //                    + " observations");
+                //} else {
                     LogUtil.message("Read " + obIdx + " observations");
-                }
+                //}
             }
         }
+        Trace.call2("FeatureDatasetPoint: iterating on PointFeatures", "found " + missing + " missing out of " + obIdx);
 
-        Trace.call2("FeatureDatasetPoint: loop-3");
+        //Bin times
+        Trace.call1("FeatureDatasetPoint: binTimes");
+        times = binTimes(times, binRoundTo, binWidth);
+        Trace.call2("FeatureDatasetPoint: binTimes");
+
+       
+        Trace.call1("FeatureDatasetPoint: making PointObTuples");
+        PointOb[]               obs = new PointOb[pos.size()];
+        int size = pos.size();
+        for (int i = 0; i < size; i++) {
+
+            if (finalTT == null) {
+                pot = new PointObTuple(elts.get(i), (DateTime) times.get(i), pos.get(i));
+                finalTT = Tuple.buildTupleType(pot.getComponents());
+            } else {
+                pot = new PointObTuple(elts.get(i), (DateTime) times.get(i), pos.get(i), finalTT, false);
+
+            }
+            obs[i] = pot;
+        }
+        Trace.call2("FeatureDatasetPoint: making PointObTuples");
 
 
         LogUtil.message("Read " + obIdx + " observations");
-
-
         LogUtil.message("Done processing point data");
 
         Integer1DSet indexSet =
