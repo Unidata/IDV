@@ -206,6 +206,25 @@ public class StormTrackPoint implements Comparable {
     }
 
     /**
+     * _more_
+     *
+     *
+     * @param real _more_
+     *
+     * @return _more_
+     */
+    public void setAttribute(Real real) {
+        for (Real attr : attributes) {
+            if (attr.getType().equals(real.getType())) {
+               // attr.(real)
+                attributes.remove(attr);
+                attributes.add(real);
+            }
+        }
+
+    }
+
+    /**
      *  _more_
      *
      *  @param attr _more_
