@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skin embedded="true">
+  <ui>
+    <panel
+       layout="border"
+       bgcolor="red">
+      <idv.menubar place="North"/>
+      <panel
+         layout="border"
+         place="Center">
+        <panel
+           layout="flow"
+           place="North">
+          <idv.toolbar
+             id="idv.toolbar"
+             place="West"/>
+          <panel
+             id="idv.favoritesbar"
+             place="North"/>
+        </panel>
+        <splitpane
+	   embeddednode="true"
+	   resizeweight="0.5"
+           onetouchexpandable="true"
+           orientation="h"
+           bgcolor="blue"
+           layout="grid"
+           cols="2"
+           place="Center">
+          <idv.view
+             class="${left_view_class}"
+             viewid="viewleft%version%"
+             id="viewleft"
+             properties="clickToFocus=true;shareViews=true;showControlLegend=false;initialSplitPaneLocation=0.2;legendOnLeft=true;size=300:400;shareGroup=view%versionuid%;use3D=false;"/>
+          <idv.view
+             class="${right_view_class}"
+             viewid="viewright%version%"
+             id="viewright"
+             properties="clickToFocus=true;showToolBars=true;shareViews=true;showControlLegend=false;size=300:400;shareGroup=view%versionuid%;use3D=false;"/>
+        </splitpane>
+      </panel>
+      <component idref="bottom_bar"/>
+    </panel>
+  </ui>
+  <styles>
+    <style
+       class="iconbtn"
+       space="2"
+       mouse_enter="ui.setText(idv.messagelabel,prop:tooltip);ui.setBorder(this,etched);"
+       mouse_exit="ui.setText(idv.messagelabel,);ui.setBorder(this,button);"/>
+    <style
+       class="textbtn"
+       space="2"
+       mouse_enter="ui.setText(idv.messagelabel,prop:tooltip)"
+       mouse_exit="ui.setText(idv.messagelabel,)"/>
+  </styles>
+  <components>
+    <idv.statusbar place="South"        id="bottom_bar"/>
+  </components>
+  <properties>
+    <property
+       name="icon.wait.wait"
+       value="/ucar/unidata/idv/images/wait.gif"/>
+  </properties>
+</skin>
