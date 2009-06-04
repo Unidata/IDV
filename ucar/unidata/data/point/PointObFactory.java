@@ -1480,6 +1480,7 @@ public class PointObFactory {
                 //}
             }
         }
+        dataIterator.finish();
         Trace.call2("FeatureDatasetPoint: iterating on PointFeatures", "found " + missing + " missing out of " + obIdx);
 
         //Bin times
