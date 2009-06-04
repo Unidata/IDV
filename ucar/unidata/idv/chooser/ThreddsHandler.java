@@ -275,17 +275,22 @@ public class ThreddsHandler extends XmlHandler {
                                                               CatalogUtil.TAG_PROPERTY);
                     for (Element propertyNode : (List<Element>) propertyNodes) {
                         String name = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_NAME,"");
-                        if(name.equals("thumbnail")) {
-                            String value = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_VALUE,"");
-                            ImageIcon icon = thumbnails.get(value);
-                            if(icon == null) {
-                                Image image = ImageUtils.readImage(value);
-                                image = ImageUtils.resize(image, 100,-1);
-                                ImageUtils.waitOnImage(image);
-                                icon = new ImageIcon(image);
-                                thumbnails.put(value,icon);
+                        String []  ids = {"thumbnail","icon"};
+                        for(String id:ids) {
+                            if(name.equals(id)) {
+                                String value = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_VALUE,"");
+                                ImageIcon icon = thumbnails.get(value);
+                                if(icon == null) {
+                                    Image image = ImageUtils.readImage(value);
+                                    if(id.equals("thubnail"))  {
+                                        image = ImageUtils.resize(image, 100,-1);
+                                        ImageUtils.waitOnImage(image);
+                                    }
+                                    icon = new ImageIcon(image);
+                                    thumbnails.put(value,icon);
+                                }
+                                return icon;
                             }
-                            return icon;
                         }
                     }            
                     return super.getIconForNode(node);
