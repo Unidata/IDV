@@ -82,8 +82,12 @@ public final class UtcDate {
      * @return true if it contains the macro
      */
     public static boolean containsTimeMacro(String s) {
+        return containsTimeMacro(s,"%");
+    }
+
+    public static boolean containsTimeMacro(String s, String prefix) {
         return (s.indexOf(MACRO_TIMESTAMP) >= 0)
-               || (s.indexOf("%time:") >= 0);
+               || (s.indexOf(prefix+"time:") >= 0);
     }
 
     /**
@@ -109,6 +113,12 @@ public final class UtcDate {
      */
     public static String applyTimeMacro(String template, DateTime dttm,
                                         String noTimeLabel) {
+
+        return applyTimeMacro(template, dttm, noTimeLabel, "%","%");
+    }
+
+    public static String applyTimeMacro(String template, DateTime dttm,
+                                        String noTimeLabel,String prefix, String suffix) {
         if (dttm != null) {
             template = StringUtil.replace(template, MACRO_TIMESTAMP,
                                           dttm.toString());
@@ -116,16 +126,19 @@ public final class UtcDate {
             template = StringUtil.replace(template, MACRO_TIMESTAMP,
                                           noTimeLabel);
         }
-        int idx1 = template.indexOf("%time:");
+        prefix = prefix+"time:";
+        int prefixLength = prefix.length();
+        int suffixLength = suffix.length();
+        int idx1 = template.indexOf(prefix);
         if (idx1 >= 0) {
-            int idx2 = template.indexOf("%", idx1 + 1);
+            int idx2 = template.indexOf(suffix, idx1 + suffixLength);
             if (idx2 > idx1) {
-                String formatString = template.substring(idx1 + 6, idx2);
+                String formatString = template.substring(idx1 + prefixLength, idx2);
                 String tmp          = ((dttm == null)
                                        ? noTimeLabel
                                        : formatUtcDate(dttm, formatString));
                 template = StringUtil.replace(template,
-                        "%time:" + formatString + "%", tmp);
+                        prefix+ formatString + suffix, tmp);
             }
 
         }
