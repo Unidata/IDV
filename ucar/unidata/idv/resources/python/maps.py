@@ -109,6 +109,7 @@ def  applyToIndices(function, range, timeStep, indices):
     rangeObject = range.clone();
     originalValues = rangeObject.getFloats(0)
     newValues = cloneArray(originalValues);
+    function = function+"(originalValues,newValues,indexArray)"
     for mapIdx in xrange(len(indices)):
         indexArray = indices[mapIdx]
 	eval(function);
@@ -116,8 +117,11 @@ def  applyToIndices(function, range, timeStep, indices):
     return rangeObject;
 
 
+def averageFromMap(field,mapSets):
+	return mapsApplyToField('mapsAverage', field, mapSets,1);
 
-
+def averageFromMapAndClip(field,mapSets):
+	return subsetFromMap(mapsApplyToField('mapsAverage', field, mapSets,1), mapSets);
     
 
 def  mapsAverage(originalValues, newValues, indexArray):
