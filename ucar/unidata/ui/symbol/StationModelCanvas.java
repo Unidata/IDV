@@ -373,6 +373,8 @@ public class StationModelCanvas extends EditCanvas {
         return super.makeEditMenu(editMenu);
     }
 
+    private MetSymbol highlightedMetSymbol;
+
     /**
      * initialize the symbols menu
      *
@@ -381,9 +383,30 @@ public class StationModelCanvas extends EditCanvas {
     public void initSymbolsMenu(JMenu m) {
         m.removeAll();
         for (int i = 0; i < glyphs.size(); i++) {
-            MetSymbol metSymbol = (MetSymbol) glyphs.get(i);
-            m.add(GuiUtils.makeMenuItem(metSymbol.getLabel(), this,
-                                        "showProperties", metSymbol));
+            final MetSymbol metSymbol = (MetSymbol) glyphs.get(i);
+            JMenuItem mi = GuiUtils.makeMenuItem(metSymbol.getLabel(), this,
+                                        "showProperties", metSymbol);
+            mi.addMouseListener(new MouseAdapter() {
+                    public void  mousePressed(MouseEvent e) {
+                        highlightedMetSymbol = null;
+                        StationModelCanvas.this.repaint();
+                    }
+
+                    public void  mouseReleased(MouseEvent e) {
+                        highlightedMetSymbol = null;
+                        StationModelCanvas.this.repaint();
+                    }
+
+                    public void  mouseEntered(MouseEvent e) {
+                        highlightedMetSymbol = metSymbol;
+                        StationModelCanvas.this.repaint();
+                    }
+                    public void  mouseExited(MouseEvent e) {
+                        highlightedMetSymbol = null;
+                        StationModelCanvas.this.repaint();
+                    }
+                });
+            m.add(mi);
         }
     }
 
@@ -802,6 +825,14 @@ public class StationModelCanvas extends EditCanvas {
         g.setColor(Color.gray);
         g.drawLine(0, -10 * b.height, 0, 10 * b.height);
         g.drawLine(-10 * b.width, 0, 10 * b.width, 0);
+
+
+        MetSymbol tmp = highlightedMetSymbol;
+        if(tmp != null) {
+            Rectangle tb = tmp.getBounds();
+            g.setColor(Color.red);
+            g.drawRect(tb.x-2,tb.y-2,tb.width+4,tb.height+4);
+        }
     }
 
 

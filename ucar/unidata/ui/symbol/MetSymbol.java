@@ -498,7 +498,11 @@ public abstract class MetSymbol extends RectangleGlyph {
      * @return <code>String</code> representation.
      */
     public String toString() {
-        return super.toString() + " " + paramIds;
+        StringBuffer sb = new StringBuffer(super.toString());
+        for(String s:paramIds) {
+            sb.append(" param:" + s);
+        }
+        return  sb.toString();
     }
 
     /**
