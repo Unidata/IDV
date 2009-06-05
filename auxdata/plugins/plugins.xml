@@ -39,17 +39,19 @@
 <plugin version="2.2" name="China Maps" description="Map" size="3883648" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/chinamaps.jar" category="Maps"/>
 <plugin version="2.2" name="Mexico Map" description="Map" size="13806" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/mexico.jar" category="Maps"/>
 <plugin version="2.2" name="Mongolia Maps" description="Various maps of Mongolia" size="2859237" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/mongoliamaps_maps.jar" category="Maps"/>
-<plugin  name="Greenland Weather Locations" url="http://www.unidata.ucar.edu/software/idv/plugins/greenlandlocations.xml" category="Maps"/>
+
 
 <!-- Misc -->
-<plugin name="Collaboration Menu" url="http://www.unidata.ucar.edu/software/idv/plugins/collaboration.jar" description="Adds the Collaboration menu" category="Miscellaneous"/>
 <plugin name="Collaboration Menu" url="http://www.unidata.ucar.edu/software/idv/plugins/collaboration.jar" description="Adds the Collaboration menu" category="Miscellaneous"/>
 <plugin name="Test Menu" url="http://www.unidata.ucar.edu/software/idv/plugins/testmenu.jar" description="Adds the Test menu for debugging" category="Miscellaneous"/>
 <plugin name="Jython Dev. Control" url="http://www.unidata.ucar.edu/software/idv/plugins/jythoncontrol.jar" description="Contains the Jython Display Control for developers" category="Miscellaneous"/>
 <plugin name="RAMADDA Publisher" url="http://www.unidata.ucar.edu/software/idv/plugins/ramaddaplugin.jar" description="Supports publishing to a RAMADDA data repository" category="Miscellaneous"/>
 
+<plugin  name="Greenland Layout Models" url="http://www.unidata.ucar.edu/software/idv/plugins/greenland.jar" category="Miscellaneous"/>
+
 <!-- Data Helpers -->
 <plugin version="2.6"  category="Data Sources" name="PAM NetCDF Enhancement" description="NcML needed to read Portable Automated Mesonet (PAM) netCDF files"  url="http://www.unidata.ucar.edu/software/idv/plugins/pam.jar"/>
+<plugin version="2.6"  category="Data Sources" name="SSEC Lightning Data" description="NcML needed to read a lightning point data format"  url="http://www.unidata.ucar.edu/software/idv/plugins/sseclightning.jar"/>
 
 <!--
 <plugin version="2.2"  category="Language Packs" name="French Language Pack" description="Contains French translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/fr.pack"/>
