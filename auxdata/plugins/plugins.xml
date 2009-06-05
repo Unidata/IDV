@@ -14,6 +14,7 @@
 
 <!-- Displays -->
 <plugin name="User Interface Skins" url="http://www.unidata.ucar.edu/software/idv/plugins/skins.jar" description="Adds a number of different window configurations" category="Displays"/>
+<plugin name="2D Multipane UI Skins" url="http://www.unidata.ucar.edu/software/idv/plugins/skin2d.jar" description="Adds a number of different 2D window configurations" category="Displays"/>
 <plugin name="Miscellaneous Controls" url="http://www.unidata.ucar.edu/software/idv/plugins/misccontrols.jar" description="Adds a couple of extra display controls" category="Displays"/>
 <plugin name="VGEE" url="http://www.unidata.ucar.edu/software/idv/plugins/vgee.jar" description="A set of animation displays from the VGEE project" category="Displays"/>
 
