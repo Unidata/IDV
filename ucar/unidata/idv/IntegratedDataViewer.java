@@ -343,6 +343,14 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         //Set the default directory property
         FileManager.setStore(getStore(), PREF_FILEWRITEDIR, PREF_FILEREADDIR);
         FileManager.setFixFileLockup(getProperty(PROP_FIXFILELOCKUP, false));
+        long minFrameCycleTime = (long)getProperty(PROP_MINIMUMFRAMECYCLETIME,0);
+        if(minFrameCycleTime!=0) {
+            System.err.println("Setting minFrameCycleTime to:" +minFrameCycleTime);
+            visad.java3d.UniverseBuilderJ3D.setMinimumFrameCycleTime(minFrameCycleTime);
+        }
+
+
+
 
         startMonitor();
         getJythonManager();
@@ -609,6 +617,9 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         //The args manager needs to go first
         getIdvUIManager().initDone();
         getArgsManager().initDone();
+
+
+
 
         if ( !getArgsManager().getIsOffScreen()) {
             //checkVersion();
