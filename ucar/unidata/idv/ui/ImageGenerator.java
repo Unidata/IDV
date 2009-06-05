@@ -3081,15 +3081,9 @@ public class ImageGenerator extends IdvManager {
         Date animationTime  = getAnimationTime();
         if(animationTime==null) animationTime = now;
         if (doTime) {
-            try {
-                if (UtcDate.containsTimeMacro(s,"${")) {
-                    s= UtcDate.applyTimeMacro(s, new DateTime(animationTime),"","${","}");
-                }
-            } catch(Exception exc) {
-                throw new RuntimeException(exc);
-            }
             s = StringUtil.replaceDate(s,"anim:",animationTime);
             s = StringUtil.replaceDate(s,"time:",animationTime);
+            s = StringUtil.replaceDate(s,"now:",now);
         }
         s = StringUtil.applyMacros(s, props, false);
         //Now use the idv properties
