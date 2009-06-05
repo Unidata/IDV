@@ -211,6 +211,20 @@ public final class SpecialMathFunction extends Object {
         return Math.log(x) / 2.30258509299404568401;
     }
 
+  /**
+   * Get the log base 2 of a number
+   * @param x a double value
+   * @return The log<sub>2</sub> of x
+   * @throws ArithmeticException if (x < 0)
+   */
+  static public double log2(double x) throws ArithmeticException {
+    if (x <= 0.0)
+      throw new ArithmeticException("range exception");
+    return Math.log(x) / log2;
+  }
+  private static double log2 = Math.log(2);
+
+
 
     /**
      * @param x a double value
