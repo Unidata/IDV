@@ -3129,9 +3129,13 @@ public class CDMRadarAdapter implements RadarAdapter {
         FunctionType sweepType = new FunctionType(tt,
                                      getMomentType(varName, u));
 
-        retField = new FlatField(sweepType, set, (CoordinateSystem) null,
-                                 (Set[]) null, new Unit[] { u });
-        retField.setSamples(values, null, false);
+        //retField = new FlatField(sweepType, set, (CoordinateSystem) null,
+        //                         (Set[]) null, new Unit[] { u });
+        //retField.setSamples(values, null, false);
+        retField = new CachedFlatField(sweepType, set,
+                                       (CoordinateSystem) null, (Set[]) null,
+                                       new Unit[] { u }, values);
+
 
         putCache(cacheKey, retField);
 
