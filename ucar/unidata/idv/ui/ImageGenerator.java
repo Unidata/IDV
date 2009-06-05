@@ -69,6 +69,7 @@ import ucar.unidata.view.geoloc.*;
 
 import ucar.unidata.xml.XmlUtil;
 
+import ucar.visad.UtcDate;
 import ucar.visad.display.Animation;
 
 import ucar.visad.display.DisplayMaster;
@@ -1912,7 +1913,7 @@ public class ImageGenerator extends IdvManager {
                 getStore().put(PREF_ZIDV_ASK, ask);
             } else {
                 String xml = IOUtil.readContents(bundleFile);
-                xml = applyMacros(xml);
+                xml = applyMacros(xml,null,false);
                 getPersistenceManager().decodeXml(xml, false, bundleFile,
                         null, false, true, bundleProperties, false, false);
                 //                getPersistenceManager().decodeXmlFile(bundleFile, false,
@@ -2155,7 +2156,9 @@ public class ImageGenerator extends IdvManager {
     protected boolean processTagIsl(Element node) throws Throwable {
         debug = applyMacros(node, ATTR_DEBUG, false);
         boolean offScreen = applyMacros(node, ATTR_OFFSCREEN, true);
+        System.err.println ("offscreen:" + offScreen);
         if ( !getIdv().getArgsManager().getIslInteractive()) {
+            System.err.println ("setting offscreen:" + offScreen);
             getIdv().getArgsManager().setIsOffScreen(offScreen);
         }
         putProperty(PROP_OFFSCREEN,
@@ -3021,6 +3024,10 @@ public class ImageGenerator extends IdvManager {
      * @return The expanded string
      */
     private String applyMacros(String s, Hashtable props) {
+        return applyMacros(s,props,true);
+    }
+
+    private String applyMacros(String s, Hashtable props, boolean doTime) {
         if (s == null) {
             return null;
         }
@@ -3069,14 +3076,21 @@ public class ImageGenerator extends IdvManager {
             }
             }*/
 
-        s = StringUtil.replaceDate(s,"now:",now);
 
+        s = StringUtil.replaceDate(s,"now:",now);
         Date animationTime  = getAnimationTime();
         if(animationTime==null) animationTime = now;
-        s = StringUtil.replaceDate(s,"anim:",animationTime);
-        s = StringUtil.replaceDate(s,"time:",animationTime);
-
-
+        if (doTime) {
+            try {
+                if (UtcDate.containsTimeMacro(s,"${")) {
+                    s= UtcDate.applyTimeMacro(s, new DateTime(animationTime),"","${","}");
+                }
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+            s = StringUtil.replaceDate(s,"anim:",animationTime);
+            s = StringUtil.replaceDate(s,"time:",animationTime);
+        }
         s = StringUtil.applyMacros(s, props, false);
         //Now use the idv properties
         s = StringUtil.applyMacros(s, getStateManager().getProperties(),
