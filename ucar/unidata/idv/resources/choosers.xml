@@ -154,7 +154,7 @@ If using the tree panel you can define components that are displayed when a cate
       <chooser
          id="chooser.radar.level2"
          title="NEXRAD - Local"
-         menutitle="NEXRAD Radar"
+         menutitle="NEXRAD Radar Files"
          helppath="idv.data.choosers.level2chooser"
          xxx.idv.chooser.projection.bounds="50,-100,50,20"
          xxx.idv.chooser.maps="semi-colon delimited list of maps, e.g., /auxdata/maps/OUTLUSAM"
@@ -163,7 +163,7 @@ If using the tree panel you can define components that are displayed when a cate
       <chooser
          id="chooser.radar.level3"
          title="ADDE Level III"
-         menutitle="Level III Radar"
+         menutitle="ADDE Level III Radar"
          helppath="idv.data.choosers.radarchooser"
          showdetails="true"
          class="ucar.unidata.idv.chooser.adde.AddeRadarChooser"/>
