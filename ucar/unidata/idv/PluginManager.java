@@ -1734,11 +1734,13 @@ public class PluginManager extends IdvManager {
             String prefix   = jarFilePath + "!/";
             PluginClassLoader cl = new PluginClassLoader(jarFilePath,
                                        getClass().getClassLoader()) {
+
                 protected void handleError(String msg, Throwable exc) {
                     PluginManager.this.addError(msg, exc);
                 }
 
                 protected void checkClass(Class c) throws Exception {
+                    System.out.println ("loaded class:" + c.getName() + " from:" + toString());
                     IdvBase.addPluginClass(c);
                     if (java.text.DateFormat.class.isAssignableFrom(c)) {
                         visad.DateTime.setDateFormatClass(c);
