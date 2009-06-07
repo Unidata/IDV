@@ -35,6 +35,18 @@ argument -Dfoo=bar) -->
             manifest="${srcdir}/ucar/unidata/apps/trex/trex.manifest">
             <include name="ucar/unidata/apps/trex/**"/>
             <include name="ucar/unidata/apps/trex/sensors/*.xml"/>
+
+<!--  excludes for the user workshop -->
+            <exclude name="ucar/unidata/apps/trex/trex.properties"/>
+            <exclude name="ucar/unidata/apps/trex/backgroundwms.xml"/>
+            <exclude name="ucar/unidata/apps/trex/imagedefaults.xml"/>
+            <exclude name="ucar/unidata/apps/trex/choosers.xml"/>
+            <exclude name="ucar/unidata/apps/trex/trex.rbi"/>
+            <exclude name="ucar/unidata/apps/trex/*.class"/>
+            <exclude name="ucar/unidata/apps/trex/*.class"/>
+
+<!--  excludes for the user workshop -->
+
             <exclude name="ucar/unidata/apps/trex/scratch/**"/>
             <exclude name="ucar/unidata/apps/trex/sensors/**"/>
             <exclude name="ucar/unidata/apps/trex/data/sensors/*.shp"/>
