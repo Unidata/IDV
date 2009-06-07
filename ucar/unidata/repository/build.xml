@@ -36,7 +36,9 @@
       <java classname="ucar.unidata.repository.RepositoryServer" maxmemory="512mb">
           <arg value="-port"/>
           <arg value="8080"/>
+<!--
           <arg value="-Dramadda.db=mysql"/>
+-->
           <arg value="-Dramadda.cacheresources=false"/>
           <arg value="-Dramadda.log.tostderr=true"/>
 
@@ -125,6 +127,8 @@
             compress="true"
             jarfile="${jars_dest}/usersworkshop.jar">
             <include name="ucar/unidata/repository/**/*.class"/> 
+            <include name="ucar/unidata/repository/idv/workshop.properties"/>
+            <include name="ucar/unidata/repository/idv/workshoplogo.jpg"/>
             <include name="ucar/unidata/repository/idv/publishertypes.xml"/>
             <include name="ucar/unidata/repository/idv/workshoppublishers.xml"/>
             <include name="ucar/unidata/repository/htdocs/icons/folderopen.png"/>
