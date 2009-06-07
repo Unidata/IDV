@@ -362,14 +362,17 @@ public class DataOutputHandler extends OutputHandler {
         protected TrajectoryObsDataset createValue(String path) {
             try {
                 getStorageManager().dirTouched(nj22Dir, null);
+                //                System.err.println("track:" + path);
                 TrajectoryObsDataset dataset =
                     (TrajectoryObsDataset) TypedDatasetFactory.open(
                         FeatureType.TRAJECTORY, path, null,
                         new StringBuilder());
 
                 //                System.err.println("Create trajectoryPool: " + path);
+                //                System.err.println("got it? " + (dataset!=null));
                 return dataset;
             } catch (Exception exc) {
+                //                System.err.println("oops");
                 throw new RuntimeException(exc);
             }
         }
@@ -471,6 +474,8 @@ public class DataOutputHandler extends OutputHandler {
 
         if (canLoadAsGrid(entry)) {
             addOutputLink(request, entry, links, OUTPUT_GRIDSUBSET_FORM);
+        } else if (canLoadAsTrajectory(entry)) {
+            addOutputLink(request, entry, links, OUTPUT_TRAJECTORY_MAP);
         } else if (canLoadAsPoint(entry)) {
             addOutputLink(request, entry, links, OUTPUT_POINT_MAP);
             links.add(makeLink(request, entry, OUTPUT_POINT_CSV,
@@ -480,8 +485,6 @@ public class DataOutputHandler extends OutputHandler {
             links.add(makeLink(request, entry, OUTPUT_POINT_KML,
                                "/" + IOUtil.stripExtension(entry.getName())
                                + ".kml"));
-        } else if (canLoadAsTrajectory(entry)) {
-            addOutputLink(request, entry, links, OUTPUT_TRAJECTORY_MAP);
         }
 
         Object oldOutput = request.getOutput();
@@ -1848,11 +1851,15 @@ public class DataOutputHandler extends OutputHandler {
         List<Metadata> metadataList =
             getMetadataManager().findMetadata(entry,
                 ContentMetadataHandler.TYPE_ATTACHMENT, true);
+        //        System.err.println("getPath");
         if (metadataList == null) {
             return location;
         }
+        //        System.err.println("nd:" + metadataList);
         for (Metadata metadata : metadataList) {
+
             if (metadata.getAttr1().endsWith(".ncml")) {
+                System.err.println("got file");
                 File templateNcmlFile =
                     new File(
                         IOUtil.joinDir(
@@ -1861,6 +1868,7 @@ public class DataOutputHandler extends OutputHandler {
                                 false), metadata.getAttr1()));
                 String ncml = IOUtil.readContents(templateNcmlFile);
                 ncml = ncml.replace("${location}", location);
+                System.err.println("ncml:" + ncml);
                 File ncmlFile =
                     getStorageManager().getScratchFile(entry.getId() + "_"
                         + metadata.getId() + ".ncml");
@@ -1888,6 +1896,7 @@ public class DataOutputHandler extends OutputHandler {
             throws Exception {
 
         String        location  = getPath(entry);
+        System.err.println ("location:" + location);
         NetcdfDataset ncDataset = ncFilePool.get(location);
 
         //Bridge the ramadda servlet to the opendap servlet
