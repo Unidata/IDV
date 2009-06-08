@@ -126,6 +126,7 @@ public class IdvMonitor extends HttpServer {
         protected void handleRequest(String path, Hashtable formArgs,
                                      Hashtable httpArgs, String content)
                 throws Exception {
+            System.err.println("handleRequest start:" + path);
             if(path.equals("/stack.html")) {
                 StringBuffer stack = LogUtil.getStackDump(true);
                 decorateHtml(stack);
@@ -146,6 +147,7 @@ public class IdvMonitor extends HttpServer {
             } else{
                 decorateHtml(new StringBuffer("Unknown url:" + path));
             }
+            System.err.println("handleRequest end:" + path);
         }
     }
 
