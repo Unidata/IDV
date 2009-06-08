@@ -5406,7 +5406,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                             zos.write(imageBytes, 0, imageBytes.length);
                             zos.close();
                             getIdv().getPublishManager().publishContent(
-                                filename, this, publishCbx);
+                                                                        kmlFilename, this, publishCbx);
                             return;
                         }
                     }
