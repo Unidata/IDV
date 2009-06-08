@@ -324,7 +324,7 @@ public class HttpServer {
                     System.err.println("done readLine:");
                     return sb.toString().trim();
                 }
-                System.err.println("readLine:" + ((int)c)+ " " +getSocket());
+                System.err.println("readLine:" + ((int)c)+ " defined:" +(Character.isDefined(c))+" " + getSocket() );
                 sb.append(c);
             }
         }
