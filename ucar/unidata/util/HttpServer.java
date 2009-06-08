@@ -321,9 +321,11 @@ public class HttpServer {
             while (true) {
                 char c = (char) input.read();
                 if ((c == -1) || (c == LF)) {
+                    System.err.println("done readLine:");
                     return sb.toString().trim();
                 }
-                sb.append(c + "");
+                System.err.println("readLine:" + c+ " " +getSocket());
+                sb.append(c);
             }
         }
 
