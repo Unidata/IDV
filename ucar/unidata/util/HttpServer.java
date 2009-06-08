@@ -318,14 +318,20 @@ public class HttpServer {
          */
         private String readLine() throws Exception {
             StringBuffer sb = new StringBuffer();
+            int lineLength = 0;
             while (true) {
                 char c = (char) input.read();
                 if ((c == -1) || (c == LF)) {
-                    System.err.println("done readLine:");
                     return sb.toString().trim();
                 }
-                System.err.println("readLine:" + ((int)c)+ " defined:" +(Character.isDefined(c))+" " + getSocket() );
-                sb.append(c);
+                if(!Character.isDefined(c)) {
+                    return sb.toString().trim();
+                }
+                sb.append(c+"");
+                if(lineLength++>1000) {
+                    Misc.sleep(1000);
+                    throw new IllegalArgumentException("bad line");
+                }
             }
         }
 
@@ -337,9 +343,13 @@ public class HttpServer {
         private void processRequest() throws Exception {
             String    firstLine = null;
             Hashtable props     = new Hashtable();
-
+            int lineCnt = 0;
             while (true) {
                 String headerLine = readLine();
+                if(lineCnt++>500) {
+                    Misc.sleep(1000);
+                    throw new IllegalArgumentException("bad header");
+                }
                 if (headerLine.equals(CRLF) || headerLine.equals("")) {
                     break;
                 }
