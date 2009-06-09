@@ -893,7 +893,6 @@ public class NavigatedPanel extends JPanel implements MouseListener,
             Rectangle2D screenRect = navigate.worldToScreen(selectedRegion);
             g.setColor(Color.cyan);
             Stroke stroke = g.getStroke();
-
             g.setStroke(new BasicStroke(2.0f));
             g.draw(screenRect);
             g.setStroke(stroke);
@@ -1132,6 +1131,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         startX          = e.getX();
         startY          = e.getY();
         regionDragPoint = null;
+
         if (shouldSelectRegion(e)) {
             if (selectedRegion == null) {
                 screenRegion = new Rectangle2D.Double(startX - 2, startY - 2,
@@ -1192,7 +1192,9 @@ public class NavigatedPanel extends JPanel implements MouseListener,
     /**
      * Handle the selected region changed.  Subclasses should implement
      */
-    protected void selectedRegionChanged() {}
+    protected void selectedRegionChanged() {
+        repaint();
+    }
 
 
     /**
