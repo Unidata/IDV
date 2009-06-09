@@ -2614,8 +2614,14 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
 
         GriddedSet domainSet;
-        GeoGrid    geod = gcd.findGridByName(varName);
+        GeoGrid    geod = null; //gcd.getGrids().findGridByName(varName);
         //NetcdfDataset nds = gcd.getNetcdfDataset();
+        List grids = gcd.getGrids();
+        for (Object ggi : grids) {
+            GeoGrid gi = (GeoGrid)ggi;
+            if (varName.contains(gi.getName()))
+                geod = gi;
+        }
 
         // LOOK! this assumes a product set
         CoordinateAxis xAxis =
