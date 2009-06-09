@@ -157,6 +157,7 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
         } else {
             statusLbl.setText("");
         }
+        statusLbl.repaint();
         double clat = (llr.getLatMin()+(llr.getLatMax()-llr.getLatMin())/2);        
         double clon = (llr.getLonMin()+(llr.getLonMax()-llr.getLonMin())/2);
         points.add(new LatLonPointImpl(clat+radii, clon-radii));
