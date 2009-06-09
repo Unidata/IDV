@@ -36,6 +36,7 @@ import ucar.unidata.idv.*;
 
 import ucar.unidata.ui.DateTimePicker;
 import ucar.unidata.ui.ChooserPanel;
+import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.Misc;
@@ -54,6 +55,7 @@ import java.util.TimeZone;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.*;
 
 import java.beans.PropertyChangeEvent;
 
@@ -70,8 +72,12 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 
+import ucar.unidata.view.geoloc.NavigatedMapPanel;
 
-
+import ucar.unidata.view.station.StationLocationMap;
+import ucar.unidata.geoloc.*;
+import ucar.unidata.view.geoloc.*;
+import ucar.unidata.view.geoloc.NavigatedMapPanel;
 
 
 /**
@@ -99,6 +105,7 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
     private JTextField clonFld;
     private JComboBox radiiCbx;
     private DateTimePicker dateTimePicker;
+    private NavigatedMapPanel map;
 
     /**
      * Create the <code>UrlChooser</code>
@@ -128,12 +135,77 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
 
 
 
+    private void doAnnotateMap(Graphics2D g) {
+        NavigatedPanel np = map.getNavigatedPanel();
+        List<LatLonPoint> points  = new ArrayList<LatLonPoint>();
+        LatLonRect llr = np.getSelectedEarthRegion();
+        if(llr == null) {
+            return;
+        }
+        double width  = llr.getWidth();
+        double radii = Math.min(5,width/2);
+        double clat = (llr.getLatMin()+(llr.getLatMax()-llr.getLatMin())/2);        
+        double clon = (llr.getLonMin()+(llr.getLonMax()-llr.getLonMin())/2);
+        points.add(new LatLonPointImpl(clat+radii, clon-radii));
+        points.add(new LatLonPointImpl(clat+radii, clon+radii));
+        points.add(new LatLonPointImpl(clat-radii, clon+radii));
+        points.add(new LatLonPointImpl(clat-radii, clon-radii));
+
+        g.setStroke(new BasicStroke(2.0f));
+        g.setColor(Color.red);
+        g.fillRect(0,0,1000,1000);
+        //        g.drawLine(0,0,1000,1000);
+        GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD,
+                                           points.size());
+        for (int i = 0; i <= points.size(); i++) {
+            ProjectionPoint ppi;
+            LatLonPoint     llp;
+            if (i >= points.size()) {
+                llp =  points.get(0);
+            } else {
+                llp =  points.get(i);
+            }
+            Point2D p=  np.earthToScreen(llp);
+            //            System.err.println ("\t" + p);
+            if (i == 0) {
+                path.moveTo((float) p.getX(), (float) p.getY());
+            } else {
+                path.lineTo((float) p.getX(), (float) p.getY());
+            }
+        }
+        g.setColor(Color.red);
+        g.draw(path);
+    }
+
+
     /**
      * Create the GUI
      *
      * @return The GUI
      */
     protected JComponent doMakeContents() {
+        map = new NavigatedMapPanel(true,true) {
+                protected void annotateMap(Graphics2D g) {
+                    super.annotateMap(g);
+                    doAnnotateMap(g);
+                }
+            };
+        NavigatedPanel np = map.getNavigatedPanel();
+        np.setSelectRegionMode(true);
+        np.setSelectedRegion(new LatLonRect(new LatLonPointImpl(39,-110),
+                                            new LatLonPointImpl(43,-114)));
+
+        try {
+
+        ProjectionImpl proj = (ProjectionImpl)getIdv().decodeObject("<object class=\"ucar.unidata.geoloc.projection.LatLonProjection\"><property name=\"CenterLon\"><double>-109</double></property><property name=\"Name\"><string><![CDATA[US>States>West>Colorado]]></string></property><property name=\"DefaultMapArea\"><object class=\"ucar.unidata.geoloc.ProjectionRect\"><constructor><double>-124</double><double>31</double><double>-100</double><double>47</double></constructor></object></property></object>");
+
+        np.setProjectionImpl(proj);
+        } catch(Exception exc) {
+            throw new RuntimeException(exc);
+        }
+
+        np.setPreferredSize(new Dimension(400,400));
+        //        StationLocationMap map = getStationMap();
         dateTimePicker = new DateTimePicker();
 
         clatFld = new JTextField("",5);
@@ -149,11 +221,14 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
                                   GuiUtils.left(clatFld),
                                   GuiUtils.rLabel("Analysis Center Longitude:"),
                                   GuiUtils.left(clonFld));
-        comps.add(GuiUtils.rLabel("Analysis Domain Radius:"));
-        comps.add(GuiUtils.left(radiiCbx));
-
+        comps = new ArrayList();
         comps.add(GuiUtils.rLabel("Date/Time:"));
         comps.add(GuiUtils.left(dateTimePicker));
+        comps = Misc.newList(GuiUtils.rLabel("Location:"),   GuiUtils.centerBottom(np,GuiUtils.left(np.getNavToolBar())));
+        //        comps.add(GuiUtils.rLabel("Analysis Domain Radius:"));
+        //        comps.add(GuiUtils.left(radiiCbx));
+
+
 
         JComponent mainContents = GuiUtils.formLayout(comps,true);
         JComponent urlButtons = getDefaultButtons();
@@ -176,7 +251,6 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
         Hashtable properties   = new Hashtable();
         String    dataSourceId = "FILE.POINTTEXT";
         properties.put(DataManager.DATATYPE_ID, dataSourceId);
-        String radii = TwoFacedObject.getIdString(radiiCbx.getSelectedItem());
         Date date = dateTimePicker.getDate();
         GregorianCalendar cal = new GregorianCalendar(DateTimePicker.getDefaultTimeZone());
         cal.setTime(date);
@@ -186,17 +260,28 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
         String month = StringUtil.padLeft(""+(cal.get(Calendar.MONTH)+1),2,"0");
         String year = ""+cal.get(Calendar.YEAR);
 
-        System.err.println("day = " + day + " month = " + month);
+        NavigatedPanel np = map.getNavigatedPanel();
+        LatLonRect llr = np.getSelectedEarthRegion();
+        if(llr == null) {
+            LogUtil.userErrorMessage("You need to select a region");
+            return;
+        }
+
+        double width  = llr.getWidth();
+        double centerLon = llr.getCenterLon();
+        //        System.out.println("llr:" + llr);
+        //        System.out.println("minmax" + llr.getLatMin() +  " " + llr.getLatMax() + " " +llr.getLonMin() + " " + llr.getLonMax());
+        double radii = Math.min(5,width/2);
         String url = HtmlUtil.url(BASEURL,
             new String[]{
-                ARG_CLAT, clatFld.getText().trim(),
-                ARG_CLON, clonFld.getText().trim(),
-                ARG_BOXRAD,  radii,
+                ARG_CLAT, (llr.getLatMin()+(llr.getLatMax()-llr.getLatMin())/2)+"",
+                ARG_CLON, (llr.getLonMin()+(llr.getLonMax()-llr.getLonMin())/2)+"",
+                ARG_BOXRAD,  radii+"",
                 ARG_HOUR1,hour,
                 ARG_DAY1,day,
                 ARG_MONTH1,month,
                 ARG_YEAR1,year});
-        System.out.println(url);
+        //        System.out.println(url);
 
         if(makeDataSource(url, dataSourceId, properties)) {
             closeChooser();
