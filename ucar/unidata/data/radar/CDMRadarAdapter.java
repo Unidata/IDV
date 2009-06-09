@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.radar;
 
 
@@ -326,14 +327,15 @@ public class CDMRadarAdapter implements RadarAdapter {
             if (sweepMode != null) {
                 Number nmode = sweepMode.getNumericValue();
                 String smode = sweepMode.getStringValue();
-                if(nmode != null) {
+                if (nmode != null) {
                     int mode = sweepMode.getNumericValue().intValue();
                     if (mode == 3) {
                         isRHI = true;
                     }
                 } else if (smode != null) {
-                    if(smode.equals("3") )
+                    if (smode.equals("3")) {
                         isRHI = true;
+                    }
                 }
             } else if (vcp.equalsIgnoreCase("RHI")) {
                 isRHI = true;
@@ -2266,10 +2268,11 @@ public class CDMRadarAdapter implements RadarAdapter {
 
             ranges[ti][0]  = (range_to_first_gate + range_step / 2);
 
-            if(number_of_bins < bincounter)
+            if (number_of_bins < bincounter) {
                 System.arraycopy(rdata[ti], 0, values[ti], 0, number_of_bins);
-            else
+            } else {
                 System.arraycopy(rdata[ti], 0, values[ti], 0, bincounter);
+            }
 
             value_counter++;
 
@@ -2614,13 +2617,10 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
 
         GriddedSet domainSet;
-        GeoGrid    geod = null; //gcd.getGrids().findGridByName(varName);
+        GeoGrid    geod = gcd.findGridByName(varName);
         //NetcdfDataset nds = gcd.getNetcdfDataset();
-        List grids = gcd.getGrids();
-        for (Object ggi : grids) {
-            GeoGrid gi = (GeoGrid)ggi;
-            if (varName.contains(gi.getName()))
-                geod = gi;
+        if (geod == null) {
+            throw new VisADException("unable to find variable " + varName);
         }
 
         // LOOK! this assumes a product set
@@ -2973,8 +2973,8 @@ public class CDMRadarAdapter implements RadarAdapter {
         double                   range_step = varSweep.getGateSize();
         double range_to_first_gate = varSweep.getRangeToFirstGate()
                                      + 0.5f * range_step;
-        float[]   elevations;                    //new float[numRadials];
-        float[]   azimuths;                      //  = new float[numRadials];
+        float[] elevations;  //new float[numRadials];
+        float[] azimuths;    //  = new float[numRadials];
 
 
         //  for (int azi = 0; azi < numRadials; azi++) {
@@ -3018,18 +3018,18 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         float[] rawValues = varSweep.readData();
 
-        int       l            = 0;
+        int     l         = 0;
         // additional radial at the begining
         int   ray0 = 0;
         float az0  = azimuths[ray0];
-        int   rayN = getRayNumber(azimuths); //numRadials - 1;
-        float azN  = azimuths[rayN-1];
+        int   rayN = getRayNumber(azimuths);  //numRadials - 1;
+        float azN  = azimuths[rayN - 1];
 
-                // add two additional radials at the begin and the end of each sweep
+        // add two additional radials at the begin and the end of each sweep
         float[][] domainVals3d = new float[3][(rayN + 2) * numGates];
         float[][] domainVals2d = new float[2][];
-        int npix = (rayN + 2) * numGates;  // add two additional rays
-        float[][] values = new float[1][npix];
+        int       npix = (rayN + 2) * numGates;  // add two additional rays
+        float[][] values       = new float[1][npix];
         // extend to 0 if first radial is between 0 and 1 degree.
         if ((az0 >= 0) && (az0 <= 1.0)) {
             for (int cell = 0; cell < numGates; cell++) {
@@ -3042,12 +3042,12 @@ public class CDMRadarAdapter implements RadarAdapter {
         } else if (az0 > 1.0) {
             if ((azN >= 360.0) && (azN <= 361.0)) {
                 for (int cell = 0; cell < numGates; cell++) {
-                    int elem = sortedAzs[rayN-1] * numGates + cell;
+                    int elem = sortedAzs[rayN - 1] * numGates + cell;
                     domainVals3d[0][l] = cell;
                     domainVals3d[1][l] = ((azN - 360 - 0.5f < 0)
                                           ? 0
                                           : azN - 360 - 0.5f);
-                    domainVals3d[2][l] = elevations[sortedAzs[rayN-1]];
+                    domainVals3d[2][l] = elevations[sortedAzs[rayN - 1]];
                     values[0][l++]     = rawValues[elem];
                 }
 
@@ -3076,27 +3076,27 @@ public class CDMRadarAdapter implements RadarAdapter {
         // additional radial at the end of the sweep
         if ((azN >= 359) && (azN <= 360)) {
             for (int cell = 0; cell < numGates; cell++) {
-                int elem = sortedAzs[rayN-1] * numGates + cell;
+                int elem = sortedAzs[rayN - 1] * numGates + cell;
                 domainVals3d[0][l] = cell;
                 domainVals3d[1][l] = 360;
-                domainVals3d[2][l] = elevations[sortedAzs[rayN-1]];
+                domainVals3d[2][l] = elevations[sortedAzs[rayN - 1]];
                 values[0][l++]     = rawValues[elem];
             }
 
         } else if (azN < 359) {
             for (int cell = 0; cell < numGates; cell++) {
-                int elem = sortedAzs[rayN-1] * numGates + cell;
+                int elem = sortedAzs[rayN - 1] * numGates + cell;
                 domainVals3d[0][l] = cell;
                 domainVals3d[1][l] = azN + 0.5f;
-                domainVals3d[2][l] = elevations[sortedAzs[rayN-1]];
+                domainVals3d[2][l] = elevations[sortedAzs[rayN - 1]];
                 values[0][l++]     = rawValues[elem];
             }
         } else if ((azN > 360) && (azN <= 361)) {
             for (int cell = 0; cell < numGates; cell++) {
-                int elem = sortedAzs[rayN-1] * numGates + cell;
+                int elem = sortedAzs[rayN - 1] * numGates + cell;
                 domainVals3d[0][l] = cell;
                 domainVals3d[1][l] = 360;
-                domainVals3d[2][l] = elevations[sortedAzs[rayN-1]];
+                domainVals3d[2][l] = elevations[sortedAzs[rayN - 1]];
                 values[0][l++]     = rawValues[elem];
             }
         }
@@ -3125,13 +3125,12 @@ public class CDMRadarAdapter implements RadarAdapter {
                             : radarDomain2d;
         GriddedSet    set = (want3D)
                             ? (GriddedSet) new Gridded3DSet(tt, domainVals3d,
-                                numGates, rayN + 2,
-                                (CoordinateSystem) null, domUnits3d,
-                                (ErrorEstimate[]) null, false)
+                                numGates, rayN + 2, (CoordinateSystem) null,
+                                domUnits3d, (ErrorEstimate[]) null, false)
                             : (GriddedSet) new Gridded2DSet(tt, domainVals2d,
-                                numGates, rayN + 2,
-                                tt.getCoordinateSystem(), domUnits2d,
-                                (ErrorEstimate[]) null, false, false);
+                                numGates, rayN + 2, tt.getCoordinateSystem(),
+                                domUnits2d, (ErrorEstimate[]) null, false,
+                                false);
         FunctionType sweepType = new FunctionType(tt,
                                      getMomentType(varName, u));
 
@@ -3151,13 +3150,21 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     }
 
-    int getRayNumber(float [] azimuths) {
+    /**
+     * _more_
+     *
+     * @param azimuths _more_
+     *
+     * @return _more_
+     */
+    int getRayNumber(float[] azimuths) {
         int azn = azimuths.length;
-        while(azimuths[azn-1] >= 361){
-           azn--;
+        while (azimuths[azn - 1] >= 361) {
+            azn--;
         }
         return azn;
     }
+
     /**
      * Get the sweep number for the particular variable and elevation angle
      *
