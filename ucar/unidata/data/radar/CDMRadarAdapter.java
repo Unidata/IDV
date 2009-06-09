@@ -1796,7 +1796,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                 }
             } else if (isRaster()) {
                 try {
-                    fi = getRaster(moment, rn);
+                    fi = getRaster(moment, vn);
                 } catch (IOException ex) {
                     LogUtil.logException("getRaster", ex);
                 } catch (InvalidRangeException ed) {
