@@ -489,8 +489,10 @@ public class DataOutputHandler extends OutputHandler {
 
         Object oldOutput = request.getOutput();
         request.put(ARG_OUTPUT, OUTPUT_OPENDAP);
+        
         String opendapUrl = getRepository().URL_ENTRY_SHOW + "/"
                             + request.getPathEmbeddedArgs()
+                            + getStorageManager().getFileTail(entry)
                             + "/dodsC/entry.das";
         links.add(new Link(opendapUrl, getRepository().iconUrl(ICON_OPENDAP),
                            "OpenDAP", OUTPUT_OPENDAP));
@@ -520,6 +522,7 @@ public class DataOutputHandler extends OutputHandler {
         return "/" + ARG_OUTPUT + ":"
                + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ENTRYID
                + ":" + Request.encodeEmbedded(entry.getId())
+               + getStorageManager().getFileTail(entry)
                + "/dodsC/entry.das";
     }
 
@@ -535,6 +538,7 @@ public class DataOutputHandler extends OutputHandler {
         return getRepository().URL_ENTRY_SHOW.getFullUrl() + "/" + ARG_OUTPUT
                + ":" + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/"
                + ARG_ENTRYID + ":" + Request.encodeEmbedded(entry.getId())
+               + getStorageManager().getFileTail(entry)
                + "/dodsC/entry.das";
     }
 
@@ -1857,7 +1861,6 @@ public class DataOutputHandler extends OutputHandler {
         }
         //        System.err.println("nd:" + metadataList);
         for (Metadata metadata : metadataList) {
-
             if (metadata.getAttr1().endsWith(".ncml")) {
                 System.err.println("got file");
                 File templateNcmlFile =
@@ -1894,9 +1897,7 @@ public class DataOutputHandler extends OutputHandler {
      */
     public Result outputOpendap(final Request request, final Entry entry)
             throws Exception {
-
         String        location  = getPath(entry);
-        System.err.println ("location:" + location);
         NetcdfDataset ncDataset = ncFilePool.get(location);
 
         //Bridge the ramadda servlet to the opendap servlet

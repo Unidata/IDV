@@ -227,7 +227,12 @@ public class InteractiveRepositoryClient extends RepositoryClient {
                         expanded, leaf, row, hasFocus);
                 if (value instanceof GroupNode) {
                     GroupNode node = (GroupNode) value;
-                    setEnabled(node.canDoNew || node.canDoUpload);
+                    if(node.canDoNew || node.canDoUpload) {
+                        setForeground(Color.black);                    
+                    } else {
+                        setForeground(Color.gray);                    
+                    }
+
                     if (node.canDoNew) {
                         if (newFont == null) {
                             newFont = getFont().deriveFont(Font.BOLD);
