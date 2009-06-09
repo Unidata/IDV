@@ -274,9 +274,12 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
         super.init();
 
         try {
+            filename = filename.replace("http","dods");
+            //            System.err.println ("filename:" + filename);
             URL url = new URL(filename);
             nc = new NetcdfFile(url);
         } catch (MalformedURLException e) {
+            //            System.err.println ("oops filename:" + filename);
             nc = new NetcdfFile(filename, /*readonly=*/ true);
         }
 
