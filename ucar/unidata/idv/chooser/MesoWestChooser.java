@@ -106,6 +106,7 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
     private JComboBox radiiCbx;
     private DateTimePicker dateTimePicker;
     private NavigatedMapPanel map;
+    private JLabel statusLbl;
 
     /**
      * Create the <code>UrlChooser</code>
@@ -137,13 +138,25 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
 
     private void doAnnotateMap(Graphics2D g) {
         NavigatedPanel np = map.getNavigatedPanel();
+        ProjectionImpl project =  np.getProjectionImpl();
         List<LatLonPoint> points  = new ArrayList<LatLonPoint>();
         LatLonRect llr = np.getSelectedEarthRegion();
         if(llr == null) {
             return;
         }
         double width  = llr.getWidth();
-        double radii = Math.min(5,width/2);
+        double radii = width/2;
+        boolean maxedOut = false;
+        if(radii>5) {
+            radii = 5;
+            maxedOut  =true;
+        }
+
+        if(maxedOut) {
+            statusLbl.setText("Bounds radius > 5 degrees");
+        } else {
+            statusLbl.setText("");
+        }
         double clat = (llr.getLatMin()+(llr.getLatMax()-llr.getLatMin())/2);        
         double clon = (llr.getLonMin()+(llr.getLonMax()-llr.getLonMin())/2);
         points.add(new LatLonPointImpl(clat+radii, clon-radii));
@@ -151,32 +164,39 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
         points.add(new LatLonPointImpl(clat-radii, clon+radii));
         points.add(new LatLonPointImpl(clat-radii, clon-radii));
 
-        g.setStroke(new BasicStroke(2.0f));
-        g.setColor(Color.red);
-        g.fillRect(0,0,1000,1000);
-        //        g.drawLine(0,0,1000,1000);
+        g.setStroke(new BasicStroke(0.1f));  // default stroke size is one pixel
         GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD,
                                            points.size());
+
         for (int i = 0; i <= points.size(); i++) {
-            ProjectionPoint ppi;
             LatLonPoint     llp;
             if (i >= points.size()) {
                 llp =  points.get(0);
             } else {
                 llp =  points.get(i);
             }
+            ProjectionPoint ppi =
+                (ProjectionPoint) project.latLonToProj(llp,
+                                                       new ProjectionPointImpl());
             Point2D p=  np.earthToScreen(llp);
             //            System.err.println ("\t" + p);
             if (i == 0) {
-                path.moveTo((float) p.getX(), (float) p.getY());
+                path.moveTo((float) ppi.getX(), (float) ppi.getY());
+                if(maxedOut) {
+                    //                    g.drawString("-- max width 5 degrees --",(float)ppi.getX(),(float)ppi.getY());
+                }
             } else {
-                path.lineTo((float) p.getX(), (float) p.getY());
+                path.lineTo((float) ppi.getX(), (float) ppi.getY());
             }
         }
-        g.setColor(Color.red);
+        g.setColor(Color.gray);
         g.draw(path);
     }
 
+
+    private void selectionChanged() {
+        map.redraw();
+    }
 
     /**
      * Create the GUI
@@ -184,10 +204,19 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
      * @return The GUI
      */
     protected JComponent doMakeContents() {
+        statusLbl = new JLabel("");
         map = new NavigatedMapPanel(true,true) {
                 protected void annotateMap(Graphics2D g) {
                     super.annotateMap(g);
                     doAnnotateMap(g);
+                }
+                protected NavigatedPanel doMakeMapPanel() {
+                    return new NavigatedPanel() {
+                            protected void selectedRegionChanged() {
+                                super.selectedRegionChanged();
+                                selectionChanged();
+                            }
+                        };
                 }
             };
         NavigatedPanel np = map.getNavigatedPanel();
@@ -195,8 +224,8 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
         np.setSelectedRegion(new LatLonRect(new LatLonPointImpl(39,-110),
                                             new LatLonPointImpl(43,-114)));
 
+        map.repaint();
         try {
-
         ProjectionImpl proj = (ProjectionImpl)getIdv().decodeObject("<object class=\"ucar.unidata.geoloc.projection.LatLonProjection\"><property name=\"CenterLon\"><double>-109</double></property><property name=\"Name\"><string><![CDATA[US>States>West>Colorado]]></string></property><property name=\"DefaultMapArea\"><object class=\"ucar.unidata.geoloc.ProjectionRect\"><constructor><double>-124</double><double>31</double><double>-100</double><double>47</double></constructor></object></property></object>");
 
         np.setProjectionImpl(proj);
@@ -208,29 +237,17 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
         //        StationLocationMap map = getStationMap();
         dateTimePicker = new DateTimePicker();
 
-        clatFld = new JTextField("",5);
-        clonFld = new JTextField("",5);
-        List<TwoFacedObject> radii = new ArrayList<TwoFacedObject>();
-        radii.add(new TwoFacedObject("1 deg","1"));
-        radii.add(new TwoFacedObject("2 deg","2"));
-        radii.add(new TwoFacedObject("3 deg","3"));
-        radii.add(new TwoFacedObject("4 deg","4"));
-        radii.add(new TwoFacedObject("5 deg","5"));
-        radiiCbx = new JComboBox(new Vector(radii));
-        List comps = Misc.newList(GuiUtils.rLabel("Analysis Center Latitude:"),
-                                  GuiUtils.left(clatFld),
-                                  GuiUtils.rLabel("Analysis Center Longitude:"),
-                                  GuiUtils.left(clonFld));
-        comps = new ArrayList();
+        List comps = new ArrayList();
         comps.add(GuiUtils.rLabel("Date/Time:"));
         comps.add(GuiUtils.left(dateTimePicker));
-        comps = Misc.newList(GuiUtils.rLabel("Location:"),   GuiUtils.centerBottom(np,GuiUtils.left(np.getNavToolBar())));
-        //        comps.add(GuiUtils.rLabel("Analysis Domain Radius:"));
-        //        comps.add(GuiUtils.left(radiiCbx));
+        comps.add(GuiUtils.rLabel("Location:"));   
+        comps.add(GuiUtils.centerBottom(np,GuiUtils.left(np.getNavToolBar())));
+        comps.add(GuiUtils.filler());
+        comps.add(GuiUtils.left(statusLabel));
 
-
-
-        JComponent mainContents = GuiUtils.formLayout(comps,true);
+        JComponent mainContents = GuiUtils.doLayout(comps,2,
+                                                    GuiUtils.WT_NY,
+                                                    GuiUtils.WT_NYN);
         JComponent urlButtons = getDefaultButtons();
         setHaveData(true);
         return GuiUtils.top(GuiUtils.vbox(mainContents,urlButtons));
@@ -271,7 +288,12 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
         double centerLon = llr.getCenterLon();
         //        System.out.println("llr:" + llr);
         //        System.out.println("minmax" + llr.getLatMin() +  " " + llr.getLatMax() + " " +llr.getLonMin() + " " + llr.getLonMax());
-        double radii = Math.min(5,width/2);
+        double radii = width/2;
+        boolean maxedOut = false;
+        if(radii>5) {
+            radii = 5;
+            maxedOut  =true;
+        }
         String url = HtmlUtil.url(BASEURL,
             new String[]{
                 ARG_CLAT, (llr.getLatMin()+(llr.getLatMax()-llr.getLatMin())/2)+"",
