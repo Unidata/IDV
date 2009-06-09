@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -722,33 +723,49 @@ public class DerivedGridFactory {
             } else {
                 topoRef = ((SetType) topoDomain.getType()).getDomain();
             }
-            // System.err.println("paramRef = " + paramRef);
-            // System.err.println("topoRef = " + topoRef);
+            //System.err.println("paramRef = " + paramRef);
+            //System.err.println("topoRef = " + topoRef);
             // lat/lon over lon/lat (or vice versa)
-            // TODO:  handle a time sequence topography
+            // TODO:  handle a time sequence topography or topo with CS
             if ( !GridUtil.isTimeSequence(topoGrid)) {
                 if ( !paramRef.equals(topoRef)) {
                     GriddedSet newSet = null;
-                    if (topoDomain instanceof Linear2DSet) {
-                        newSet = new Linear2DSet(new Linear1DSet[] {
-                            ((Linear2DSet) topoDomain).getY(),
-                            ((Linear2DSet) topoDomain).getX() });
-                    } else if ((topoDomain.getCoordinateSystem() == null)
-                               && (topoDomain instanceof Gridded2DSet)) {
-                        int[] lengths =
-                            ((GriddedSet) topoDomain).getLengths();
-                        Unit[] units =
-                            ((GriddedSet) topoDomain).getSetUnits();
-                        ErrorEstimate[] errors =
-                            ((GriddedSet) topoDomain).getSetErrors();
-                        float[][] topoVals = topoDomain.getSamples(false);
-                        newSet = new Gridded2DSet(paramRef, new float[][] {
-                            topoVals[1], topoVals[0]
-                        }, lengths[1], lengths[0], (CoordinateSystem) null,
-                           new Unit[] { units[1],
-                                        units[0] }, new ErrorEstimate[] {
-                                            errors[1],
-                                            errors[0] });
+                    if (topoDomain.getCoordinateSystem() == null) {
+                        if (topoDomain instanceof Linear2DSet) {
+                            Unit[] setUnits = topoDomain.getSetUnits();
+                            RealTupleType rtt =
+                                ((SetType) topoDomain.getType()).getDomain();
+                            if (rtt.equals(
+                                    RealTupleType.SpatialEarth2DTuple)) {
+                                rtt = RealTupleType.LatitudeLongitudeTuple;
+                            } else {
+                                rtt = RealTupleType.SpatialEarth2DTuple;
+                            }
+                            newSet = new Linear2DSet(rtt,
+                                    new Linear1DSet[] {
+                                        ((Linear2DSet) topoDomain).getY(),
+                                        ((Linear2DSet) topoDomain)
+                                        .getX() }, (CoordinateSystem) null,
+                                            new Unit[] { setUnits[1],
+                                    setUnits[0] }, (ErrorEstimate[]) null,
+                                    true);
+                        } else if (topoDomain instanceof Gridded2DSet) {
+                            int[] lengths =
+                                ((GriddedSet) topoDomain).getLengths();
+                            Unit[] units =
+                                ((GriddedSet) topoDomain).getSetUnits();
+                            ErrorEstimate[] errors =
+                                ((GriddedSet) topoDomain).getSetErrors();
+                            float[][] topoVals = topoDomain.getSamples(false);
+                            newSet = new Gridded2DSet(paramRef,
+                                    new float[][] {
+                                topoVals[1], topoVals[0]
+                            }, lengths[1], lengths[0],
+                               (CoordinateSystem) null, new Unit[] { units[1],
+                                    units[0] }, new ErrorEstimate[] {
+                                        errors[1],
+                                        errors[0] });
+                        }
                     }
                     if (newSet != null) {
                         // System.out.println("newSet = " + newSet);
@@ -785,10 +802,12 @@ public class DerivedGridFactory {
             isFlowUnits = (u == null)
                           || Unit.canConvert(u, CommonUnit.meterPerSecond);
             if ( !isFlowUnits) {
+                //System.out.println("not flow units");
                 break;
             }
         }
         if (isFlowUnits) {
+            //System.out.println("making earth vector type");
             TupleType paramType = GridUtil.getParamType(uvGrid);
             RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
                                    CommonUnit.meterPerSecond);
