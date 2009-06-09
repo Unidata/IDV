@@ -491,7 +491,7 @@ public class DataOutputHandler extends OutputHandler {
         request.put(ARG_OUTPUT, OUTPUT_OPENDAP);
         
         String opendapUrl = getRepository().URL_ENTRY_SHOW + "/"
-                            + request.getPathEmbeddedArgs()
+                            + request.getPathEmbeddedArgs()+"/"
                             + getStorageManager().getFileTail(entry)
                             + "/dodsC/entry.das";
         links.add(new Link(opendapUrl, getRepository().iconUrl(ICON_OPENDAP),
@@ -521,7 +521,7 @@ public class DataOutputHandler extends OutputHandler {
     public String getTdsUrl(Entry entry) {
         return "/" + ARG_OUTPUT + ":"
                + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ENTRYID
-               + ":" + Request.encodeEmbedded(entry.getId())
+               + ":" + Request.encodeEmbedded(entry.getId())            +"/"
                + getStorageManager().getFileTail(entry)
                + "/dodsC/entry.das";
     }
@@ -538,6 +538,7 @@ public class DataOutputHandler extends OutputHandler {
         return getRepository().URL_ENTRY_SHOW.getFullUrl() + "/" + ARG_OUTPUT
                + ":" + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/"
                + ARG_ENTRYID + ":" + Request.encodeEmbedded(entry.getId())
+               +"/"
                + getStorageManager().getFileTail(entry)
                + "/dodsC/entry.das";
     }
