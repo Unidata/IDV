@@ -708,6 +708,7 @@ return new Result(title, sb);
                                         Object actionId)
             throws Exception {
 
+        User user = request.getUser();
         boolean     download    = request.get(ARG_RESOURCE_DOWNLOAD, false);
         Entry       entry       = null;
         TypeHandler typeHandler = null;
@@ -816,13 +817,15 @@ return new Result(title, sb);
             }
 
 
-            List<String> resources     = new ArrayList();
-            List<String> origNames     = new ArrayList();
+            List<String> resources     = new ArrayList<String>();
+            List<Group> parents        = new ArrayList<Group>();
+            List<String> origNames     = new ArrayList<String>();
 
             String       resource      = request.getString(ARG_URL, BLANK);
             String       filename      = request.getUploadedFile(ARG_FILE);
             String       localFilename = null;
             boolean      unzipArchive  = false;
+            boolean      preserveArchiveDirectory  = false;
 
             boolean      isFile        = false;
             boolean      isLocalFile   = false;
@@ -830,7 +833,7 @@ return new Result(title, sb);
 
             if (request.defined(ARG_LOCALFILE)) {
                 filename = request.getString(ARG_LOCALFILE, (String) null);
-                if ( !request.getUser().getAdmin()) {
+                if ( !user.getAdmin()) {
                     throw new IllegalArgumentException(
                         "Only administrators can add a local file");
                 }
@@ -844,6 +847,8 @@ return new Result(title, sb);
             }
 
             unzipArchive = request.get(ARG_FILE_UNZIP, false);
+            preserveArchiveDirectory = request.get(ARG_FILE_PRESERVEDIRECTORY, false);
+
 
             if (isLocalFile) {
                 isFile   = true;
@@ -902,6 +907,11 @@ return new Result(title, sb);
                 }
             }
 
+            if (request.exists(ARG_CANCEL)) {
+                return new Result(
+                    request.entryUrl(
+                        getRepository().URL_ENTRY_SHOW, parentGroup));
+            }
 
             if (unzipArchive && !IOUtil.isZipFile(resource)) {
                 unzipArchive = false;
@@ -910,7 +920,9 @@ return new Result(title, sb);
             if ( !unzipArchive) {
                 resources.add(resource);
                 origNames.add(resourceName);
+                parents.add(parentGroup);
             } else {
+                Hashtable<String,Group>  nameToGroup = new Hashtable<String,Group>();
                 ZipInputStream zin =
                     new ZipInputStream(new FileInputStream(resource));
                 ZipEntry ze = null;
@@ -918,24 +930,39 @@ return new Result(title, sb);
                     if (ze.isDirectory()) {
                         continue;
                     }
-                    String name =
-                        IOUtil.getFileTail(ze.getName().toLowerCase());
+                    String path = ze.getName();
+                    String name = IOUtil.getFileTail(path);
+                    if(name.equals("MANIFEST.MF")) continue;
+                    Group parent = parentGroup;
+                    if(preserveArchiveDirectory) {
+                        List<String>toks = StringUtil.split(path,"/",true,true);
+                        String ancestors = "";
+                        if(toks.size()>1) {
+                            toks.remove(toks.size()-1);
+                        }
+                        for(String parentName: toks) {
+                            ancestors = ancestors+"/" + parentName;
+                            Group group = nameToGroup.get(ancestors); 
+                            if(group == null) {
+                                Request tmpRequest = getRepository().getTmpRequest();
+                                tmpRequest.setUser(user);
+                                group = findGroupUnder(tmpRequest, parent, parentName,user);
+                                nameToGroup.put(ancestors,group);
+                            }
+                            parent = group;
+                        }
+                    }
                     File f = getStorageManager().getTmpFile(request, name);
                     RepositoryUtil.checkFilePath(f.toString());
                     FileOutputStream fos = new FileOutputStream(f);
-
                     IOUtil.writeTo(zin, fos);
                     fos.close();
+                    parents.add(parent);
                     resources.add(f.toString());
                     origNames.add(name);
                 }
             }
 
-            if (request.exists(ARG_CANCEL)) {
-                return new Result(
-                    request.entryUrl(
-                        getRepository().URL_ENTRY_SHOW, parentGroup));
-            }
 
 
             String description = request.getString(ARG_DESCRIPTION, BLANK);
@@ -953,11 +980,9 @@ return new Result(title, sb);
             }
 
 
-
-
-
             for (int resourceIdx = 0; resourceIdx < resources.size();
                     resourceIdx++) {
+                Group parent = parents.get(resourceIdx);
                 String theResource = (String) resources.get(resourceIdx);
                 String origName    = (String) origNames.get(resourceIdx);
                 if (isFile && !isLocalFile) {
@@ -1029,14 +1054,14 @@ return new Result(title, sb);
 
                 entry = typeHandler.createEntry(id);
 
-                entry.initEntry(name, description, parentGroup,
+                entry.initEntry(name, description, parent,
                                 request.getUser(),
                                 new Resource(theResource, resourceType),
                                 dataType, createDate.getTime(),
                                 theDateRange[0].getTime(),
                                 theDateRange[1].getTime(), null);
                 if (forUpload) {
-                    initUploadedEntry(request, entry, parentGroup);
+                    initUploadedEntry(request, entry, parent);
                 }
 
                 setEntryState(request, entry);
@@ -4097,7 +4122,7 @@ return new Result(title, sb);
             + getRepository().URL_ENTRY_SHOW.getPath();
         remoteUrl = HtmlUtil.url(remoteUrl, ARG_ENTRYID, id, ARG_OUTPUT,XmlOutputHandler.OUTPUT_XMLENTRY);
         String entriesXml = IOUtil.readContents(remoteUrl, getClass());
-        System.err.println ("XML:" + entriesXml);
+        //        System.err.println ("XML:" + entriesXml);
         return null;
     }
 
@@ -4839,7 +4864,6 @@ return new Result(title, sb);
                                     List<Clause> where)
             throws Exception {
         List<String> ids          = new ArrayList<String>();
-
         boolean      isSynthEntry = isSynthEntry(group.getId());
         if (group.getTypeHandler().isSynthType() || isSynthEntry) {
             Group  mainEntry = group;
@@ -4858,7 +4882,6 @@ return new Result(title, sb);
         }
 
 
-
         if (where != null) {
             where = new ArrayList<Clause>(where);
         } else {
@@ -4866,7 +4889,6 @@ return new Result(title, sb);
         }
         where.add(Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
                             group.getId()));
-
 
 
         String orderBy = getRepository().getQueryOrderAndLimit(request, true,
@@ -4881,10 +4903,11 @@ return new Result(title, sb);
         boolean canDoSelectOffset = getDatabaseManager().canDoSelectOffset();
         while ((results = iter.next()) != null) {
             while (results.next()) {
+                String id = results.getString(1);
                 if ( !canDoSelectOffset && (skipCnt-- > 0)) {
                     continue;
                 }
-                ids.add(results.getString(1));
+                ids.add(id);
             }
         }
 
@@ -5335,10 +5358,11 @@ return new Result(title, sb);
         synchronized (MUTEX_ENTRY) {
             List<String> toks = (List<String>) StringUtil.split(name,
                                     Group.PATHDELIMITER, true, true);
+
             for (String tok : toks) {
                 Group theChild = null;
                 for (Entry child : getChildrenGroups(request, group)) {
-                    if (child.getName().equals(tok)) {
+                    if (child.isGroup() && child.getName().equals(tok)) {
                         theChild = (Group) child;
                         break;
                     }

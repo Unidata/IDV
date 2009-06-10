@@ -1189,10 +1189,6 @@ public class TypeHandler extends RepositoryManager {
 
         int metadataCnt = 0;
 
-
-
-
-
         while (true) {
             String subTable = Tables.METADATA.NAME + "_" + metadataCnt;
             metadataCnt++;
@@ -1357,6 +1353,8 @@ public class TypeHandler extends RepositoryManager {
 
                 String unzip = HtmlUtil.checkbox(ARG_FILE_UNZIP)
                                + HtmlUtil.space(1) + msg("Unzip archive")
+                               + HtmlUtil.checkbox(ARG_FILE_PRESERVEDIRECTORY)
+                               + HtmlUtil.space(1) + msg("Make groups from archive")
                                + HtmlUtil.space(3) + msgLabel("Date Pattern")
                                + HtmlUtil.space(1)
                                + HtmlUtil.select(ARG_DATE_PATTERN,
