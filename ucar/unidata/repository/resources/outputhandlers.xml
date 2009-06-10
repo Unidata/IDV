@@ -22,6 +22,7 @@
   <outputhandler class="ucar.unidata.repository.data.LdmOutputHandler" name="LDM Insert"/>
   <outputhandler class="ucar.unidata.repository.output.GraphOutputHandler" name="Graph"/>
   <outputhandler class="ucar.unidata.repository.output.TextOutputHandler" name="Text"/>
+  <outputhandler class="ucar.unidata.repository.output.ZipFileOutputHandler" name="Zip/Jar Listing"/>
   <outputhandler class="ucar.unidata.repository.collab.WikiPageOutputHandler" name="Wiki"/>
   <outputhandler class="ucar.unidata.repository.collab.ChatOutputHandler" name="Chat Room"/>
   <outputhandler class="ucar.unidata.repository.idv.IdvOutputHandler"  required="false" name="IDV Preview"/>

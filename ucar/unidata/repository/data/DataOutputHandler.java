@@ -1086,14 +1086,24 @@ public class DataOutputHandler extends OutputHandler {
                 continue;
             }
         }
+        int varCnt = 0;
+
         for (GridDatatype grid : sortGrids(dataset)) {
+            String cbxId = "varcbx_" + (varCnt++);
+            String call = HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,
+                                 HtmlUtil.call("checkboxClicked",
+                                     HtmlUtil.comma("event",
+                                         HtmlUtil.squote(ARG_VARIABLE),
+                                         HtmlUtil.squote(cbxId))));
+
+
             VariableEnhanced var = grid.getVariable();
             varSB.append(
                 HtmlUtil.row(
                     HtmlUtil.cols(
                         HtmlUtil.checkbox(
                             ARG_VARIABLE + "." + var.getShortName(),
-                            HtmlUtil.VALUE_TRUE, false) + HtmlUtil.space(1)
+                            HtmlUtil.VALUE_TRUE, false, HtmlUtil.id(cbxId) + call) + HtmlUtil.space(1)
                                 + var.getName() + HtmlUtil.space(1)
                                 + ((var.getUnitsString() != null)
                                    ? "(" + var.getUnitsString() + ")"
