@@ -1,6 +1,4 @@
 /*
- * $Id: DataTransectControl.java,v 1.31 2006/12/01 20:16:32 jeffmc Exp $
- *
  * Copyright  1997-2004 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
@@ -19,6 +17,8 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
+
 
 package ucar.unidata.idv.control;
 
@@ -40,6 +40,8 @@ import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.Length;
 
 import visad.*;
+
+import visad.util.DataUtility;
 
 
 import java.awt.*;
@@ -363,25 +365,18 @@ public class DataTransectControl extends CrossSectionControl {
     }
 
     /**
-     * Make a FieldImpl suitable for the plain 2D vert cross section display;
-     * of form (time -> ((x) -> parm));
-     * new x axis positions are in distance along cross section from one end.
-     * override from superclass since we are dealing only with 2D data.
+     * Make the domain for the 2D grid
      *
-     * @param xsectSequence    the time sequence of cross section data
-     * @return  xsectSequence transformed to 2D
+     * @param domainSet   the domain to be 2D'ized
+     *
+     * @return  the 2D ized grid
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    protected FieldImpl make2DData(FieldImpl xsectSequence)
+    protected GriddedSet make2DDomainSet(GriddedSet domainSet)
             throws VisADException, RemoteException {
 
-        // from the input Field of fome (time->((a,b,c) -> parm)
-        // get the (a,b,c) part
-        GriddedSet domainSet =
-            (GriddedSet) GridUtil.getSpatialDomain(xsectSequence);
-        //System.out.println("domainSet = " + domainSet);
         int sizeX = domainSet.getLengths()[0];
 
         // get its coordinate tranform
@@ -430,9 +425,11 @@ public class DataTransectControl extends CrossSectionControl {
                              plane[0].length, (CoordinateSystem) null,
                              new Unit[] { CommonUnits.KILOMETER },
                              (ErrorEstimate[]) null);
+        //System.out.println("csDS = " + csDS);
+        return csDS;
 
-        return GridUtil.setSpatialDomain(xsectSequence, csDS);
     }
+
 
     /**
      * Set the line width property.  Used by persistence

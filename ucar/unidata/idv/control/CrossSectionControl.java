@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -65,13 +66,17 @@ import ucar.visad.quantities.*;  // for AirPressure CoordinateSystem
 
 import visad.*;
 
-
 import visad.data.units.Parser;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
 import visad.georef.MapProjection;
+
+import visad.util.DataUtility;
+
+
+import java.awt.*;
 
 
 import java.awt.Color;
@@ -89,8 +94,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-
-import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -323,13 +326,23 @@ public abstract class CrossSectionControl extends GridDisplayControl {
 
 
 
-    public ViewManager getViewManagerForCapture(String what) throws Exception {
+    /**
+     * Get the view manager for capture
+     *
+     * @param what  the name
+     *
+     * @return  the ViewManager to use
+     *
+     * @throws Exception  problem getting the view manager
+     */
+    public ViewManager getViewManagerForCapture(String what)
+            throws Exception {
         //        if(Misc.equals(what,"crosssection")) {
         setMainPanelDimensions();
         if ( !getIdv().getArgsManager().getIsOffScreen()) {
             GuiUtils.showComponentInTabs(getMainPanel());
         }
-        return  getCrossSectionViewManager();
+        return getCrossSectionViewManager();
         //        return super.getViewManagerForCapture(what);
     }
 
@@ -1475,20 +1488,12 @@ public abstract class CrossSectionControl extends GridDisplayControl {
 
     /**
      * Make a FieldImpl suitable for the plain 2D vert cross section display;
-     * of form (time -> ((x,z) -> parm)).  New x axis positions are in
-     * distance along cross section from one end (origin) in km:
-     * <pre>
-     * Assumptions:
-     *   - incoming xsectSequence has a lat/lon/alt reference or is
-     *     lat/lon/alt   (lat/lon order doesn't matter).
-     *   - that the grid will be regular and manifold dimension is one
-     *     less than grid dimension (i.e., 3D grid on 2D manifold or
-     *     2D grid on 1D manifold)
-     * </pre>
+     * of form (time -> ((x) -> parm));
+     * new x axis positions are in distance along cross section from one end.
+     * override from superclass since we are dealing only with 2D data.
      *
-     * @param xsectSequence  cross section sequence or grid
-     *
-     * @return  new FieldImpl in the form specified above.
+     * @param xsectSequence    the time sequence of cross section data
+     * @return  xsectSequence transformed to 2D
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
@@ -1496,10 +1501,53 @@ public abstract class CrossSectionControl extends GridDisplayControl {
     protected FieldImpl make2DData(FieldImpl xsectSequence)
             throws VisADException, RemoteException {
 
+        FieldImpl grid2D = null;
         // from the input Field of fome (time->((a,b,c) -> parm)
         // get the (a,b,c) part
-        GriddedSet domainSet =
-            (GriddedSet) GridUtil.getSpatialDomain(xsectSequence);
+        GriddedSet domainSet;
+        if (GridUtil.isConstantSpatialDomain(xsectSequence)) {
+            domainSet = (GriddedSet) GridUtil.getSpatialDomain(xsectSequence);
+            GriddedSet newDomain = make2DDomainSet(domainSet);
+            grid2D = GridUtil.setSpatialDomain(xsectSequence, newDomain);
+        } else {
+            Set          timeSet    = GridUtil.getTimeSet(xsectSequence);
+            int          numTimes   = timeSet.getLength();
+            FieldImpl[]  newSamples = new FieldImpl[numTimes];
+            FunctionType newType    = null;
+            for (int i = 0; i < numTimes; i++) {
+                FieldImpl sample = (FieldImpl) xsectSequence.getSample(i);
+                if (sample.isMissing()) {
+                    continue;
+                }
+                domainSet = (GriddedSet) GridUtil.getSpatialDomain(sample);
+                GriddedSet newDomain = make2DDomainSet(domainSet);
+                newSamples[i] = GridUtil.setSpatialDomain(sample, newDomain);
+                if (newType == null) {
+                    newType =
+                        new FunctionType(DataUtility.getDomainType(timeSet),
+                                         newSamples[i].getType());
+                }
+            }
+            if (newType != null) {
+                grid2D = new FieldImpl(newType, timeSet);
+                grid2D.setSamples(newSamples, false, false);
+            }
+        }
+        return grid2D;
+    }
+
+    /**
+     * Make the domain for the 2D grid
+     *
+     * @param domainSet   the domain to be 2D'ized
+     *
+     * @return  the 2D ized grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD error
+     */
+    protected GriddedSet make2DDomainSet(GriddedSet domainSet)
+            throws VisADException, RemoteException {
 
         int[] lengths = domainSet.getLengths();
 
@@ -1589,8 +1637,9 @@ public abstract class CrossSectionControl extends GridDisplayControl {
                                     new Unit[] { CommonUnits.KILOMETER,
                 CommonUnit.meter }, (ErrorEstimate[]) null, false, false)
                                 : new Gridded2DSet(xzRTT, plane, sizeX);
+        return vcsG2DS;
 
-        return GridUtil.setSpatialDomain(xsectSequence, vcsG2DS);
+        //return GridUtil.setSpatialDomain(xsectSequence, vcsG2DS);
     }
 
     /**
