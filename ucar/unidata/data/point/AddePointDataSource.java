@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.point;
 
 
@@ -100,12 +101,27 @@ public class AddePointDataSource extends PointDataSource {
     public AddePointDataSource(DataSourceDescriptor descriptor,
                                String source, Hashtable properties)
             throws VisADException {
-        super(descriptor, source, (properties != null)
-                                  ? (String) properties
-                                      .get(ucar.unidata.idv.chooser.adde
-                                          .AddeChooser.DATASET_NAME_KEY)
-                                  : "Adde Point Data", properties);
+        super(descriptor, source, makeDatasetName(properties), properties);
         setName(getDescription());
+    }
+
+    /**
+     * Get the name from the hashtable
+     * @param properties  Hashtable of properties (may be null)
+     * @return a name
+     */
+    private static String makeDatasetName(Hashtable properties) {
+        String name = "Adde Point Data";
+        if (properties != null) {
+            String possible =
+                (String) properties
+                    .get(ucar.unidata.idv.chooser.adde.AddeChooser
+                        .DATASET_NAME_KEY);
+            if (possible != null) {
+                name = possible;
+            }
+        }
+        return name;
     }
 
     /** list of excluded params for objective analysis */
