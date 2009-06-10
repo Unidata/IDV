@@ -743,6 +743,18 @@ return new Result(title, sb);
             }
 
 
+            if (entry!=null && isAnonymousUpload(entry)) {
+                if (request.get(ARG_JUSTPUBLISH, false)) {
+                    publishAnonymousEntry(request, entry);
+                    List<Entry> entries = new ArrayList<Entry>();
+                    entries.add(entry);
+                    insertEntries(entries, newEntry);
+                    return new Result(request.entryUrl(getRepository().URL_ENTRY_FORM, entry));
+                }
+            }
+
+
+
             if (request.exists(ARG_DELETE_CONFIRM)) {
                 if (entry.isTopGroup()) {
                     return new Result(
@@ -3406,10 +3418,27 @@ return new Result(title, sb);
 
         }
 
+
+        String imgText = (okToMove?msg("Drag to move")+"; ":"");
+        String imgUrl = null;
+        if (entry.getResource().isUrl()) {
+            imgUrl = entry.getTypeHandler().getResourceUrl(request, entry);
+            imgText += msg("Click to view URL");
+        } else if (entry.getResource().isFile()) {
+            if (getAccessManager().canDownload(request, entry)) {
+                imgUrl = entry.getTypeHandler().getEntryResourceUrl(request, entry);
+                imgText += msg("Click to download file");
+            }
+        }
+
+
         String img = prefix + HtmlUtil.img(entryIcon, (okToMove
-                ? msg("Drag to move")
+                ? imgText
                 : ""), HtmlUtil.id(iconId) + sourceEvent);
 
+        if(imgUrl!=null) {
+            img = HtmlUtil.href(imgUrl, img);
+        }
 
         //        StringBuffer row = new StringBuffer();
 
@@ -5054,6 +5083,40 @@ return new Result(title, sb);
         }
         return null;
     }
+
+
+    public Result publishEntries(Request request,
+            List<Entry> entries)
+            throws Exception {
+        StringBuffer sb = new StringBuffer();        
+        List<Entry> publishedEntries = new ArrayList<Entry>();
+        boolean didone = false;
+        for(Entry entry: entries) {
+            if (!getAccessManager().canDoAction(request, entry,
+                                               Permission.ACTION_EDIT)) {
+                continue;
+            }
+
+            if (!isAnonymousUpload(entry)) {
+                continue;
+            }
+            publishAnonymousEntry(request, entry);
+            publishedEntries.add(entry);
+            if(!didone) {
+                sb.append(msgHeader("Published Entries"));
+                didone = true;
+            }
+            sb.append(HtmlUtil.href(request.entryUrl(
+                                                     getRepository().URL_ENTRY_SHOW, entry),entry.getName()));
+            sb.append(HtmlUtil.br());
+        }
+        if(!didone) {
+            sb.append(getRepository().note(msg("No entries to publish")));
+        }
+        insertEntries(publishedEntries, false);
+        return new Result("Publish Entries", sb);
+    }
+
 
 
     /**

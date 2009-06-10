@@ -104,6 +104,8 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_ENTRY_ADD = "ramadda.icon.entry_add";
 
+    public static final String ICON_PUBLISH = "ramadda.icon.publish";
+
     /** _more_ */
     public static final String ICON_ENTRY_UPLOAD =
         "ramadda.icon.entry_upload";
@@ -792,6 +794,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_PUBLISH = "publish";
+    public static final String ARG_JUSTPUBLISH = "justpublish";
 
     /** _more_ */
     public static final String ARG_QUERY = "query";

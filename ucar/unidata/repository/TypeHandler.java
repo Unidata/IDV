@@ -710,6 +710,14 @@ public class TypeHandler extends RepositoryManager {
                     getRepository().iconUrl(ICON_EDIT), msg("Edit Entry"),
                     OutputType.TYPE_EDIT | OutputType.TYPE_TOOLBAR));
 
+            if (getEntryManager().isAnonymousUpload(entry)) {
+                links.add(
+                          new Link(
+                                   request.entryUrl(getRepository().URL_ENTRY_CHANGE, entry,ARG_JUSTPUBLISH,"true"),
+                                   getRepository().iconUrl(ICON_EDIT), msg("Make Entry Public"),
+                                   OutputType.TYPE_EDIT | OutputType.TYPE_TOOLBAR));
+            }
+
             links.add(
                 new Link(
                     request.entryUrl(

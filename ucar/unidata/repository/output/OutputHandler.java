@@ -1139,9 +1139,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             }
 
             if (showCrumbs) {
-                cbxSB.append(
+                String img = 
                     HtmlUtil.img(
-                        getEntryManager().getIconUrl(request, entry)));
+                                 getEntryManager().getIconUrl(request, entry));
+                cbxSB.append(img);
                 cbxSB.append(HtmlUtil.space(1));
 
                 String crumbs = getEntryManager().getBreadCrumbs(request,

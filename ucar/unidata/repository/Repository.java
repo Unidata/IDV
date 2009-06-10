@@ -214,6 +214,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
                        OutputType.TYPE_ACTION | OutputType.TYPE_EDIT, "",
                        null);
 
+    /** _more_ */
+    public static final OutputType OUTPUT_PUBLISH =
+        new OutputType("Make Public", "repository.makepublic",
+                       OutputType.TYPE_ACTION | OutputType.TYPE_EDIT, "",
+                       ICON_PUBLISH);
+
 
     /** _more_ */
     public static final OutputType OUTPUT_METADATA_FULL =
@@ -1796,11 +1802,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         OutputHandler outputHandler = new OutputHandler(getRepository(),
                                           "Entry Deleter") {
+
             public boolean canHandleOutput(OutputType output) {
                 return output.equals(OUTPUT_DELETER)
                 /*                    || output.equals(OUTPUT_TYPECHANGE)*/
-                || output.equals(OUTPUT_METADATA_SHORT) || output.equals(
-                    OUTPUT_METADATA_FULL);
+                || output.equals(OUTPUT_METADATA_SHORT) 
+                || output.equals(OUTPUT_PUBLISH) 
+                || output.equals(OUTPUT_METADATA_FULL);
             }
             public void getEntryLinks(Request request, State state,
                                       List<Link> links)
@@ -1814,6 +1822,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                        OUTPUT_TYPECHANGE));
 
                                        }*/
+                for (Entry entry : state.getAllEntries()) {
+                    if (getAccessManager().canDoAction(request, entry,
+                                                       Permission.ACTION_EDIT)) {
+                        if(getEntryManager().isAnonymousUpload(entry)) {
+                            links.add(makeLink(request, state.getEntry(),
+                                               OUTPUT_PUBLISH));
+                            break;
+                        }
+                    }
+                }
                 boolean metadataOk = true;
                 for (Entry entry : state.getAllEntries()) {
                     if ( !getAccessManager().canDoAction(request, entry,
@@ -1851,6 +1869,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     throws Exception {
 
                 OutputType output = request.getOutput();
+                if (output.equals(OUTPUT_PUBLISH)) {
+                    return getEntryManager().publishEntries(
+                        request, entries);
+                }
+
+
                 if (output.equals(OUTPUT_METADATA_SHORT)) {
                     return getEntryManager().addInitialMetadataToEntries(
                         request, entries, true);
