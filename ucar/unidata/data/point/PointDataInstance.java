@@ -45,9 +45,6 @@ import java.util.Hashtable;
 
 /**
  * Utility class to wrap a Point Data Choice
- *
- * @author MetApps Development Team
- * @version $Revision: 1.23 $ $Date: 2006/12/01 20:42:34 $
  */
 public class PointDataInstance extends DataInstance {
 

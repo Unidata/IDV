@@ -1,6 +1,4 @@
 /*
- * $Id: AddePointDataSource.java,v 1.76 2007/07/05 18:46:10 jeffmc Exp $
- *
  * Copyright  1997-2004 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
@@ -228,22 +226,9 @@ public class AddePointDataSource extends PointDataSource {
         source = temp.getSelectClause();
         if (sampleIt) {
             if (source.indexOf(AddeUtil.LEVEL) >= 0) {
-                String level         = "";
-                Object selectedLevel = null;
-                if (subset != null) {
-                    selectedLevel = subset.getFromLevel();
-                }
-                if (selectedLevel == null) {
-                    List   levels = getLevels();
-                    Object defLev = ((levels == null) || levels.isEmpty())
-                                    ? selectedLevel
-                                    : levels.get(0);
-                    selectedLevel =
-                        getProperty(ucar.unidata.idv.chooser.adde
-                            .AddePointDataChooser.SELECTED_LEVEL, defLev);
-                }
-                if (selectedLevel != null) {
-                    level = "'LEV " + selectedLevel.toString() + "'";
+                String level = makeLevelString(subset);
+                if (level.length() > 0) {
+                    level = "'" + level + "'";
                 }
                 temp.setSelectClause(level);
             } else {
@@ -273,24 +258,7 @@ public class AddePointDataSource extends PointDataSource {
                 source = source.replaceAll(AddeUtil.LATLON_BOX, llb);
             }
             if (source.indexOf(AddeUtil.LEVEL) >= 0) {
-                String level         = "";
-                Object selectedLevel = null;
-                if (subset != null) {
-                    selectedLevel = subset.getFromLevel();
-                }
-                if (selectedLevel == null) {
-                    List   levels = getLevels();
-                    Object defLev = ((levels == null) || levels.isEmpty())
-                                    ? selectedLevel
-                                    : levels.get(0);
-                    selectedLevel =
-                        getProperty(ucar.unidata.idv.chooser.adde
-                            .AddePointDataChooser.SELECTED_LEVEL, defLev);
-                }
-                if (selectedLevel != null) {
-                    level = "LEV " + selectedLevel.toString();
-                }
-                log_.debug("level = " + level);
+                String level = makeLevelString(subset);
                 source = source.replaceAll(AddeUtil.LEVEL, level);
             }
             if ((choice != null)
@@ -306,6 +274,61 @@ public class AddePointDataSource extends PointDataSource {
         //return source;
         return temp.getURLString();
 
+    }
+
+    /**
+     * _more_
+     *
+     * @param subset _more_
+     *
+     * @return _more_
+     */
+    private String makeLevelString(DataSelection subset) {
+        String level         = "";
+        Object selectedLevel = null;
+        if (subset != null) {
+            selectedLevel = subset.getFromLevel();
+            //if (selectedLevel != null) System.out.println("from subset " + selectedLevel + " " + selectedLevel.getClass().getName());
+        }
+        if (selectedLevel == null) {
+            List   levels = getLevels();
+            Object defLev = ((levels == null) || levels.isEmpty())
+                            ? selectedLevel
+                            : levels.get(0);
+            //System.out.println("devLev = " + defLev);
+            selectedLevel =
+                getProperty(ucar.unidata.idv.chooser.adde.AddePointDataChooser
+                    .SELECTED_LEVEL, defLev);
+            //System.out.println("selectedLevel from property = " + selectedLevel);
+        }
+        if (selectedLevel != null) {
+            String levelString = selectedLevel.toString();
+            // HACK for upper air levels
+            if (selectedLevel instanceof Real) {
+                int value = (int) ((Real) selectedLevel).getValue();
+                switch (value) {
+
+                  case 1001 :
+                      levelString = "SFC";
+                      break;
+
+                  case 0 :
+                      levelString = "TRO";
+                      break;
+
+                  case 1013 :
+                      levelString = "MSL";
+                      break;
+
+                  default :
+                      levelString = "" + value;
+                      break;
+                }
+            }
+            level = "LEV " + levelString;
+        }
+        log_.debug("level = " + level);
+        return level;
     }
 
     /**
