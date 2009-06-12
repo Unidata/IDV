@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad;
 
 
@@ -424,8 +425,10 @@ public class GeoUtils {
      * @return adjusted value.
      */
     public static double normalizeLongitude(double lonValue) {
-        while ((lonValue < -180.) || (lonValue > 180.)) {
-            lonValue = Math.IEEEremainder(lonValue, 360.0);
+        if (lonValue == lonValue) {
+            while ((lonValue < -180.) || (lonValue > 180.)) {
+                lonValue = Math.IEEEremainder(lonValue, 360.0);
+            }
         }
         return lonValue;
     }
@@ -465,8 +468,10 @@ public class GeoUtils {
      * @return adjusted value.
      */
     public static double normalizeLongitude360(double lonValue) {
-        while ((lonValue < 0.) || (lonValue > 360.)) {
-            lonValue = 180. + Math.IEEEremainder(lonValue - 180., 360.0);
+        if (lonValue == lonValue) {
+            while ((lonValue < 0.) || (lonValue > 360.)) {
+                lonValue = 180. + Math.IEEEremainder(lonValue - 180., 360.0);
+            }
         }
         return lonValue;
     }
