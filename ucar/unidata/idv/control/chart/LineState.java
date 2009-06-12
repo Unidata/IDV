@@ -326,6 +326,9 @@ public class LineState {
     /** my name */
     private String name;
 
+    /** my name */
+    private String nameMacro;
+
     /** axis label */
     private String axisLabel;
 
@@ -513,7 +516,13 @@ public class LineState {
                     5)));
         } else {}
 
-        nameField = new JTextField(name, 30);
+        String nameToShow= name;
+        if(nameMacro!=null && nameMacro.length()>0) {
+            nameToShow = nameMacro;
+        }
+
+        nameField = new JTextField(nameToShow, 30);
+        nameField.setToolTipText("Name of chart entry. Use \"" +TimeSeriesChart.MACRO_PARAMETER +"\" for parameter name");
         comps.add(GuiUtils.rLabel("Name:"));
         comps.add(GuiUtils.left(nameField));
 
@@ -687,7 +696,11 @@ public class LineState {
             shape = GuiUtils.getValueFromBox(shapeBox);
         }
 
-        name = nameField.getText().trim();
+        if(nameMacro!=null) {
+            nameMacro = nameField.getText().trim();
+        } else {
+            name = nameField.getText().trim();
+        }
 
         if (chartNameBox != null) {
             chartName = (String) chartNameBox.getSelectedItem();
@@ -1051,6 +1064,14 @@ public class LineState {
         }
     }
 
+    public boolean hasName() {
+        if(name == null || name.length()==0) {
+            return false;
+        }
+        return true;
+    }
+
+
     /**
      * Set the Name property.
      *
@@ -1068,6 +1089,26 @@ public class LineState {
     public String getName() {
         return name;
     }
+
+
+    /**
+       Set the NameMacro property.
+
+       @param value The new value for NameMacro
+    **/
+    public void setNameMacro (String value) {
+	this.nameMacro = value;
+    }
+
+    /**
+       Get the NameMacro property.
+
+       @return The NameMacro
+    **/
+    public String getNameMacro () {
+	return this.nameMacro;
+    }
+
 
 
     /**

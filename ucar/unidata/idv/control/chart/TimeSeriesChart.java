@@ -101,6 +101,8 @@ import javax.swing.*;
 
 public class TimeSeriesChart extends XYChartManager {
 
+    public static final String MACRO_PARAMETER = "%parameter%";
+
     /** Shows time */
     private XYAnnotation animationTimeAnnotation;
 
@@ -367,8 +369,15 @@ public class TimeSeriesChart extends XYChartManager {
                              int paramIdx, XYItemRenderer renderer,
                              boolean rangeVisible) {
 
+        return addSeries(series, lineState, paramIdx, renderer, rangeVisible, true);
+    }
 
-        if (lineState.getRange() != null) {
+    protected Axis addSeries(TimeSeries series, LineState lineState,
+                             int paramIdx, XYItemRenderer renderer,
+                             boolean rangeVisible, boolean addAxis) {
+
+
+        if (addAxis && lineState.getRange() != null) {
             addRange(lineState.getRange().getMin(),
                      lineState.getRange().getMax(),
                      "Fixed range from: " + lineState.getName());
@@ -393,6 +402,7 @@ public class TimeSeriesChart extends XYChartManager {
         TimeSeriesCollection dataset = new TimeSeriesCollection();
         dataset.setDomainIsPointsInTime(true);
         dataset.addSeries(series);
+
 
         String axisLabel = lineState.getAxisLabel();
         if (axisLabel == null) {
@@ -423,7 +433,7 @@ public class TimeSeriesChart extends XYChartManager {
         }
 
         if (renderer == null) {
-            renderer = getRenderer(lineState);
+            renderer = getRenderer(lineState,addAxis);
         }
 
         Paint c = lineState.getColor(paramIdx);
@@ -434,6 +444,8 @@ public class TimeSeriesChart extends XYChartManager {
 
         if ( !lineState.getAxisVisible()) {
             rangeAxis.setVisible(false);
+        } else {
+            rangeAxis.setVisible(addAxis);
         }
 
         ChartHolder  chartHolder = getChartHolder(lineState);
@@ -566,8 +578,34 @@ public class TimeSeriesChart extends XYChartManager {
                         continue;
                     }
                     lineState.unit = info.getUnit();
-                    lineState.setNameIfNeeded(
-                        info.getDataInstance().getParamName());
+                    if(info.isPoint()) {
+                        if(!lineState.hasName()) {
+                            lineState.setNameMacro(MACRO_PARAMETER);
+                        }
+                        String pointParam = info.getPointParameterName();
+                        if(lineState.getNameMacro()!=null) {
+                            String macro = lineState.getNameMacro();
+                            macro = macro.replace(MACRO_PARAMETER, pointParam);
+                            lineState.setName(macro);
+                        } else {
+                            lineState.setName(pointParam);
+                        }
+                    } else {
+                        if(!lineState.hasName()) {
+                            lineState.setNameMacro(MACRO_PARAMETER);
+                        }
+                        String paramName = info.getDataInstance().getParamName();
+                        if(lineState.getNameMacro()!=null) {
+                            String macro = lineState.getNameMacro();
+                            macro = macro.replace(MACRO_PARAMETER, paramName);
+                            lineState.setName(macro);
+                        } else {
+                            lineState.setNameIfNeeded(paramName);
+                        }
+
+
+
+                    }
                     String name      = lineState.getName();
                     String canonical = DataAlias.aliasToCanonical(name);
                     if (info.getLevel() != null) {
@@ -607,6 +645,7 @@ public class TimeSeriesChart extends XYChartManager {
 
 
 
+                        List<TimeSeries> timeSeriesList = new ArrayList<TimeSeries>();
 
                         TimeSeries series = new TimeSeries(name,
                                                 Millisecond.class);
@@ -630,20 +669,38 @@ public class TimeSeriesChart extends XYChartManager {
                             min         = 0,
                             max         = 0;
                         for (int i = 0; i < numTimes; i++) {
-                            if (valueArray[i] != valueArray[i]) {
-                                continue;
-                            }
                             Date date =
                                 Util.makeDate(new DateTime(times[0][i],
                                     timeUnits[0]));
+
+                            if (valueArray[i] != valueArray[i]) {
+                                //If is winds then ignore the ignore missing
+                                if (Misc.equals(canonical, "U")
+                                    || Misc.equals(canonical, "UREL") ||
+                                    Misc.equals(canonical, "V") 
+                                    || Misc.equals(canonical, "VREL")) {
+                                } else {
+                                //MISSING
+                                //                                continue;
+                                    if(series!=null) {
+                                        timeSeriesList.add(series);
+                                        series= null;
+                                    }
+                                    continue;
+                                }
+                            }
+                            if(series == null) {
+                                series = new TimeSeries(name,
+                                                        Millisecond.class);
+                            }
+                            series.addOrUpdate(new Millisecond(date),
+                                    valueArray[i]);
                             if ((i == 0) || (valueArray[i] > max)) {
                                 max = valueArray[i];
                             }
                             if ((i == 0) || (valueArray[i] < min)) {
                                 min = valueArray[i];
                             }
-                            series.addOrUpdate(new Millisecond(date),
-                                    valueArray[i]);
                         }
 
 
@@ -671,7 +728,12 @@ public class TimeSeriesChart extends XYChartManager {
                             }
                         }
 
-                        addSeries(series, lineState, paramIdx, null, true);
+                        timeSeriesList.add(series);
+                        boolean first = true;
+                        for(TimeSeries tmp: timeSeriesList) { 
+                            addSeries(tmp, lineState, paramIdx, null, true,first);
+                            first = false;
+                        }
                         addRange(min, max,
                                  "Data range from: " + lineState.getName());
                     }

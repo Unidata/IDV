@@ -175,19 +175,23 @@ public abstract class XYChartManager extends ChartManager {
      * @return renderer
      */
     protected XYItemRenderer getRenderer(LineState lineState) {
+        return getRenderer(lineState, true);
+    }
+
+    protected XYItemRenderer getRenderer(LineState lineState, boolean showLegend) {
         int            lineType = lineState.getLineType();
         XYItemRenderer renderer = null;
         if (lineType == LineState.LINETYPE_BAR) {
             return new MyXYBarRenderer();
         } else if (lineType == LineState.LINETYPE_SHAPES) {
-            renderer = new MyXYAreaRenderer(lineState, XYAreaRenderer.SHAPES);
+            renderer = new MyXYAreaRenderer(lineState, XYAreaRenderer.SHAPES,showLegend);
         } else if (lineType == LineState.LINETYPE_LINES) {
-            return new MyXYAreaRenderer(lineState, XYAreaRenderer.LINES);
+            return new MyXYAreaRenderer(lineState, XYAreaRenderer.LINES,showLegend);
         } else if (lineType == LineState.LINETYPE_AREA) {
-            return new MyXYAreaRenderer(lineState, XYAreaRenderer.AREA);
+            return new MyXYAreaRenderer(lineState, XYAreaRenderer.AREA,showLegend);
         } else if (lineType == LineState.LINETYPE_AREA_AND_SHAPES) {
             renderer = new MyXYAreaRenderer(lineState,
-                                            XYAreaRenderer.AREA_AND_SHAPES);
+                                            XYAreaRenderer.AREA_AND_SHAPES,showLegend);
         } else {
             renderer = new MyXYAreaRenderer(lineState,
                                             XYAreaRenderer.SHAPES_AND_LINES);
@@ -224,6 +228,8 @@ public abstract class XYChartManager extends ChartManager {
         /** Do we have a shape to draw */
         boolean hasShape;
 
+        boolean showLegend = true;
+
         /**
          * ctor
          *
@@ -231,7 +237,12 @@ public abstract class XYChartManager extends ChartManager {
          * @param type type
          */
         public MyXYAreaRenderer(LineState lineState, int type) {
+            this(lineState, type, true);
+        }
+
+        public MyXYAreaRenderer(LineState lineState, int type, boolean showLegend) {
             super(type);
+            this.showLegend = showLegend;
             this.lineState = lineState;
             shape          = lineState.getPaintShape();
             int lineType = lineState.getLineType();
@@ -239,6 +250,7 @@ public abstract class XYChartManager extends ChartManager {
                        || (lineType == LineState.LINETYPE_AREA_AND_SHAPES)
                        || (lineType == LineState.LINETYPE_SHAPES_AND_LINES);
         }
+
 
         /**
          * Get item for legend
@@ -249,6 +261,9 @@ public abstract class XYChartManager extends ChartManager {
          * @return legend item
          */
         public LegendItem getLegendItem(int datasetIndex, int series) {
+           if(!showLegend) {
+                return null;
+            }
             LegendItem l = super.getLegendItem(datasetIndex, series);
             if ( !hasShape) {
                 return l;

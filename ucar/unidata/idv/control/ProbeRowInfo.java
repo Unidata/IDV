@@ -27,6 +27,7 @@ package ucar.unidata.idv.control;
 import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
@@ -654,7 +655,7 @@ public class ProbeRowInfo {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public void setStationName(PointOb ob)
+    public void setStationName(PointOb ob, DisplayControlImpl control)
             throws VisADException, RemoteException {
         Tuple  t     = (Tuple) ob.getData();
         Data[] comps = t.getComponents();
@@ -663,15 +664,15 @@ public class ProbeRowInfo {
                 String name =
                     StringUtil.replace(comps[i].getType().toString(),
                                        "(Text)", "").toLowerCase();
-                if (name.equals("id") || name.equals("idn")
-                        || name.startsWith("station")) {
+                String canon = DataAlias.aliasToCanonical(name);
+                if (canon!=null && (canon.equals("IDN")  ||
+                                    canon.equals("ID"))) {
                     stationName = comps[i].toString();
                     return;
                 }
             }
         }
-
-
+       stationName = control.getDisplayConventions().formatLatLonPoint(ob.getEarthLocation().getLatLonPoint());
     }
 
 

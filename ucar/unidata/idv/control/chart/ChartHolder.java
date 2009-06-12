@@ -627,6 +627,13 @@ public class ChartHolder {
         paramCount = 0;
     }
 
+    Hashtable<Integer,Boolean> legendVisible = new Hashtable<Integer,Boolean>();
+    private boolean isLegendVisible(int param) {
+        Boolean b = legendVisible.get(param);
+        if(b!=null) return b.booleanValue();
+        return true;
+    }
+
 
     /**
      * add data set

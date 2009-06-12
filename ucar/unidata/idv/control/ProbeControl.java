@@ -1119,7 +1119,7 @@ public class ProbeControl extends DisplayControlImpl {
                                 name }));
                     }
                     if (subItems.size() > 0) {
-                        paramMenu.add(GuiUtils.makeMenu("Point Parameter",
+                        paramMenu.add(GuiUtils.makeMenu("Select Point Parameter",
                                 subItems));
                     }
                 }
@@ -1137,6 +1137,7 @@ public class ProbeControl extends DisplayControlImpl {
                 copyParameter(row);
             }
         });
+
 
         paramMenu.add(GuiUtils.makeMenuItem("Chart Properties",
                                             ProbeControl.this,
@@ -1354,24 +1355,29 @@ public class ProbeControl extends DisplayControlImpl {
         paramsTable.addMouseListener(new MouseAdapter() {
 
             public void mousePressed(MouseEvent e) {
-
-                if ( !SwingUtilities.isRightMouseButton(e)) {
-                    return;
-                }
                 final int row = paramsTable.rowAtPoint(e.getPoint());
                 if ((row < 0) || (row >= getDataChoices().size())) {
                     return;
                 }
+                ProbeRowInfo rowInfo = getRowInfo(row);
 
-
+                if ( !SwingUtilities.isRightMouseButton(e)) {
+                    if(e.getClickCount()>1 && rowInfo!=null) {
+                        showLineProperties(rowInfo);
+                    }
+                    return;
+                }
 
                 List       choices   = getDataChoices();
                 JPopupMenu popupMenu = new JPopupMenu();
                 JMenuItem  jmi       = doMakeChangeParameterMenuItem();
                 popupMenu.add(jmi);
                 popupMenu.addSeparator();
-                List items = getParameterMenuItems(row);
-                GuiUtils.makePopupMenu(popupMenu, items);
+                
+                for (int rowIdx = 0; rowIdx < infos.size(); rowIdx++) {
+                    List items = getParameterMenuItems(rowIdx);
+                    GuiUtils.makePopupMenu(popupMenu, items);
+                }
                 /*
                 JMenu moveMenu = JMenu("Order");
                 popupMenu.add(moveMenu);
@@ -1396,10 +1402,10 @@ public class ProbeControl extends DisplayControlImpl {
 
 
                 // Display choices
-                JMenu dataChoiceMenu =
-                    getControlContext().doMakeDataChoiceMenu(
-                        getDataChoiceAtRow(row));
-                popupMenu.add(dataChoiceMenu);
+                //                JMenu dataChoiceMenu =
+                //                    getControlContext().doMakeDataChoiceMenu(
+                //                        getDataChoiceAtRow(row));
+                //                popupMenu.add(dataChoiceMenu);
                 popupMenu.show(paramsTable, e.getX(), e.getY());
 
             }
@@ -1660,8 +1666,12 @@ public class ProbeControl extends DisplayControlImpl {
     String getFieldName(int row) {
         ProbeRowInfo rowInfo = getRowInfo(row);
         if (rowInfo.isPoint()) {
-            return rowInfo.getPointParameter() + "@"
-                   + rowInfo.getStationName();
+            String stationName = rowInfo.getStationName();
+            if(stationName!=null && stationName.length()>0) {
+                return rowInfo.getPointParameter() + "@"
+                    + stationName;
+            }
+            return rowInfo.getPointParameter();
         }
         if (rowInfo.getLineState().getName() != null) {
             return rowInfo.getLineState().getName();
@@ -2181,7 +2191,7 @@ public class ProbeControl extends DisplayControlImpl {
             sample = PointObFactory.makeTimeSequenceOfPointObs(obs, 0,
                     info.getPointIndex());
             if (useRowInfoCache) {
-                info.setStationName((PointOb) obs.get(0));
+                info.setStationName((PointOb) obs.get(0), this);
                 info.setPointSample(sample, elt);
                 setTimesForAnimation();
             }
