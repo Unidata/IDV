@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.view.geoloc;
 
 
@@ -1118,9 +1117,10 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                 minLon    = r2d2.getX();
                 maxLon    = minLon + r2d2.getWidth();
                 centerLon = minLon + r2d2.getWidth() / 2;
-                isLatLon  = true;
-            // TODO:  figure out this a little more.
+                // TODO:  figure out this a little more.
             } else if (mp instanceof AREACoordinateSystem) {
+                //minLon    = -180;
+                //maxLon    = 180.;
                 adjustLons = false;
             }
             // TODO:  figure out what we should be doing here.
