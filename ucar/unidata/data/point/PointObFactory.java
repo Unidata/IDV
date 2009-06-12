@@ -19,7 +19,6 @@
  */
 
 
-
 package ucar.unidata.data.point;
 
 
@@ -73,8 +72,9 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 
-import ucar.visad.Util;
 import ucar.visad.GeoUtils;
+
+import ucar.visad.Util;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
 
@@ -217,7 +217,9 @@ public class PointObFactory {
                 }
             }
             DateTime dttm = ob.getDateTime();
-            if (dttm.isMissing()) continue;
+            if (dttm.isMissing()) {
+                continue;
+            }
             if (lumpMinutes > 0) {
                 double seconds = dttm.getValue();
                 seconds = seconds - seconds % (lumpMinutes * 60);
@@ -449,7 +451,7 @@ public class PointObFactory {
                         continue;
                     }
                     PointObVar pointObVar = new PointObVar();
-                    lengths[fieldIdx] = Math.max(lengths[fieldIdx],2);
+                    lengths[fieldIdx] = Math.max(lengths[fieldIdx], 2);
                     //                    System.err.println("idx:" + fieldIdx + "   name:"
                     //                                       + Util.cleanTypeName(types[fieldIdx])
                     //                                       + " length:" + lengths[fieldIdx]);
@@ -472,7 +474,7 @@ public class PointObFactory {
             for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
                 if (isText[fieldIdx]) {
                     String s = ((Text) data[fieldIdx]).getValue();
-                    s = StringUtil.padLeft(s, lengths[fieldIdx]);
+                    s             = StringUtil.padLeft(s, lengths[fieldIdx]);
                     svals[scnt++] = s;
                     //                    System.err.println(fieldIdx + ":" + svals[scnt - 1]);
                 } else {
@@ -482,22 +484,27 @@ public class PointObFactory {
 
 
             try {
-            writer.addPoint(llp.getLatitude().getValue(CommonUnit.degree),
-                            llp.getLongitude().getValue(CommonUnit.degree),
-                            ((alt != null)
-                             ? alt.getValue(CommonUnit.meter)
-                             : 0.0), ucar.visad.Util.makeDate(
-                                 ob.getDateTime()), dvals, svals);
-            } catch(Exception exc) {
-                int xxx=1;
-                for(PointObVar pov:dataVars) {
-                    System.out.println ("var #" + xxx+" "+pov.getName() + " " + pov.getDataType() + " unit:" + pov.getUnits() + " length:" + pov.getLen());
+                writer.addPoint(
+                    llp.getLatitude().getValue(CommonUnit.degree),
+                    llp.getLongitude().getValue(CommonUnit.degree),
+                    ((alt != null)
+                     ? alt.getValue(CommonUnit.meter)
+                     : 0.0), ucar.visad.Util.makeDate(ob.getDateTime()),
+                             dvals, svals);
+            } catch (Exception exc) {
+                int xxx = 1;
+                for (PointObVar pov : dataVars) {
+                    System.out.println("var #" + xxx + " " + pov.getName()
+                                       + " " + pov.getDataType() + " unit:"
+                                       + pov.getUnits() + " length:"
+                                       + pov.getLen());
                     xxx++;
                 }
-                System.out.println ("#dvals:" + dvals.length + " #svals:" + svals.length);
-            
-                for(String s: svals) {
-                    System.err.println ("sval=" +s+":");
+                System.out.println("#dvals:" + dvals.length + " #svals:"
+                                   + svals.length);
+
+                for (String s : svals) {
+                    System.err.println("sval=" + s + ":");
                 }
                 throw new RuntimeException(exc);
             }
@@ -1322,16 +1329,16 @@ public class PointObFactory {
         List shortNamesList = new ArrayList();
 
         log_.debug("number of data variables = " + numVars);
-        boolean[]    isVarNumeric = new boolean[numVars];
-        boolean      allReals     = true;
-        ScalarType[] types        = new ScalarType[numVars];
-        Unit[]       varUnits     = new Unit[numVars];
+        boolean[]        isVarNumeric = new boolean[numVars];
+        boolean          allReals     = true;
+        ScalarType[]     types        = new ScalarType[numVars];
+        Unit[]           varUnits     = new Unit[numVars];
 
 
 
-        List<ScalarType>         numericTypes = new ArrayList<ScalarType>();
-        List<Unit>         numericUnits = new ArrayList<Unit>();
-        List<ScalarType>         stringTypes  = new ArrayList<ScalarType>();
+        List<ScalarType> numericTypes = new ArrayList<ScalarType>();
+        List<Unit>       numericUnits = new ArrayList<Unit>();
+        List<ScalarType> stringTypes  = new ArrayList<ScalarType>();
 
         //If we really have a StationObsDataset then we need to add in the station id
         //into the data fields 
@@ -1350,9 +1357,9 @@ public class PointObFactory {
         Trace.call1("FeatureDatasetPoint: getting variable info");
         int varIdx = varIdxBase;
         for (Iterator iter = actualVariables.iterator(); iter.hasNext(); ) {
-            VariableSimpleIF var = (VariableSimpleIF) iter.next();
-            String shortName = var.getShortName();
-            if  (shortName.equals("_isMissing")) {
+            VariableSimpleIF var       = (VariableSimpleIF) iter.next();
+            String           shortName = var.getShortName();
+            if (shortName.equals("_isMissing")) {
                 numVars--;
                 continue;
             }
@@ -1390,9 +1397,9 @@ public class PointObFactory {
                                   new String[shortNamesList.size()]);
 
 
-        int    numReals   = numericTypes.size();
-        int    numStrings = stringTypes.size();
-        int    obIdx      = 0;
+        int numReals   = numericTypes.size();
+        int numStrings = stringTypes.size();
+        int obIdx      = 0;
         PointFeatureIterator dataIterator =
             collection.getPointFeatureIterator(16384);
         int       NUM          = 500;
@@ -1413,13 +1420,14 @@ public class PointObFactory {
         EarthLocationLite elt;
         TupleType         finalTT = null;
         PointObTuple      pot     = null;
-        List<Tuple>       tuples     = new ArrayList<Tuple>(100000);
+        List<Tuple>       tuples  = new ArrayList<Tuple>(100000);
         List<DateTime>    times   = new ArrayList<DateTime>(100000);
-        List<EarthLocationLite> elts    = new ArrayList<EarthLocationLite>(100000);
+        List<EarthLocationLite> elts =
+            new ArrayList<EarthLocationLite>(100000);
 
         StructureMembers.Member member;
         Trace.call1("FeatureDatasetPoint: iterating on PointFeatures");
-        int missing = 0;
+        int    missing = 0;
         String svalue;
         float  value;
         while (dataIterator.hasNext()) {
@@ -1447,11 +1455,15 @@ public class PointObFactory {
                 member = structure.findMember((String) shortNames[varIdx]);
                 if ( !isVarNumeric[varIdx]) {
                     svalue = structure.getScalarString(member);
-                    if (svalue.length() != 0) allMissing = false;
+                    if (svalue.length() != 0) {
+                        allMissing = false;
+                    }
                     stringArray[stringCnt++] = svalue;
                 } else {
                     value = structure.convertScalarFloat(member);
-                    if (value == value) allMissing = false;
+                    if (value == value) {
+                        allMissing = false;
+                    }
                     realArray[realCnt++] = value;
                 }
             }
@@ -1484,29 +1496,32 @@ public class PointObFactory {
                 //    LogUtil.message("Read " + obIdx + "/" + total
                 //                    + " observations");
                 //} else {
-                    LogUtil.message("Read " + obIdx + " observations");
+                LogUtil.message("Read " + obIdx + " observations");
                 //}
             }
         }
         dataIterator.finish();
-        Trace.call2("FeatureDatasetPoint: iterating on PointFeatures", "found " + missing + " missing out of " + obIdx);
+        Trace.call2("FeatureDatasetPoint: iterating on PointFeatures",
+                    "found " + missing + " missing out of " + obIdx);
 
         //Bin times
         Trace.call1("FeatureDatasetPoint: binTimes");
         times = binTimes(times, binRoundTo, binWidth);
         Trace.call2("FeatureDatasetPoint: binTimes");
 
-       
+
         Trace.call1("FeatureDatasetPoint: making PointObTuples");
-        PointOb[]               obs = new PointOb[tuples.size()];
-        int size = tuples.size();
+        PointOb[] obs  = new PointOb[tuples.size()];
+        int       size = tuples.size();
         for (int i = 0; i < size; i++) {
 
             if (finalTT == null) {
-                pot = new PointObTuple(elts.get(i), (DateTime) times.get(i), tuples.get(i));
+                pot = new PointObTuple(elts.get(i), (DateTime) times.get(i),
+                                       tuples.get(i));
                 finalTT = Tuple.buildTupleType(pot.getComponents());
             } else {
-                pot = new PointObTuple(elts.get(i), (DateTime) times.get(i), tuples.get(i), finalTT, false);
+                pot = new PointObTuple(elts.get(i), (DateTime) times.get(i),
+                                       tuples.get(i), finalTT, false);
 
             }
             obs[i] = pot;
@@ -1777,7 +1792,7 @@ public class PointObFactory {
         FlatField guessField = null;
 
         if (GridUtil.isTimeSequence(pointObs)) {
-            Set timeSet = GridUtil.getTimeSet(pointObs);
+            Set timeSet    = GridUtil.getTimeSet(pointObs);
             int errorCount = 0;
             for (int i = 0; i < timeSet.getLength(); i++) {
                 if (haveGuess) {
@@ -1789,7 +1804,9 @@ public class PointObFactory {
                     }
                     if (guessField.isMissing()) {
                         if (errorCount == 0) {
-                            LogUtil.userMessage(log_, "Unable to find matching time for first guess");
+                            LogUtil.userMessage(
+                                log_,
+                                "Unable to find matching time for first guess");
                         }
                         guessField = null;
                         errorCount++;
@@ -1917,13 +1934,13 @@ public class PointObFactory {
         if (typeIndex == -1) {
             return null;
         }
-        float latMin     = 90;
-        float lonMin     = 180;
-        float latMax     = -90;
-        float lonMax     = -180;
-        int   cnt        = 0;
-        int   numMissing = 0;
-        Unit outputUnits = type.getDefaultUnit();
+        float latMin      = 90;
+        float lonMin      = 180;
+        float latMax      = -90;
+        float lonMax      = -180;
+        int   cnt         = 0;
+        int   numMissing  = 0;
+        Unit  outputUnits = type.getDefaultUnit();
         for (int i = 0; i < numObs; i++) {
             PointOb po     = (PointOb) pointObs.getSample(i);
             Tuple   obData = (Tuple) po.getData();
@@ -2040,15 +2057,15 @@ public class PointObFactory {
                 // check for 0-360 in domain
                 float low, hi;
                 if (GridUtil.isLatLonOrder(firstGuess)) {
-                     low = lows[1];
-                     hi = his[1];
+                    low = lows[1];
+                    hi  = his[1];
                 } else {
-                     low = lows[0];
-                     hi = his[0];
+                    low = lows[0];
+                    hi  = his[0];
                 }
-                if (hi > 180 || low < -180) {
-                     //System.out.println("normalizing longitudes to 0-360");
-                     obVals[0] = GeoUtils.normalizeLongitude360(obVals[0]);
+                if ((hi > 180) || (low < -180)) {
+                    //System.out.println("normalizing longitudes to 0-360");
+                    obVals[0] = GeoUtils.normalizeLongitude360(obVals[0]);
                 }
             }
             // HACK for grids in gpm!
@@ -2110,7 +2127,7 @@ public class PointObFactory {
                                    faGridY[faGridY.length - 1],
                                    faGridY.length);
             gdsSet = new LinearLatLonSet(RealTupleType.SpatialEarth2DTuple,
-                                     new Linear1DSet[] { xSet,
+                                         new Linear1DSet[] { xSet,
                     ySet }, (CoordinateSystem) null, (Unit[]) null,
                             (ErrorEstimate[]) null, true);
         } else {
@@ -2120,8 +2137,9 @@ public class PointObFactory {
             new FunctionType(((SetType) gdsSet.getType()).getDomain(),
                              new RealTupleType(type));
         FlatField retData = new FlatField(ftLatLon2Param, gdsSet,
-                             (CoordinateSystem) null,
-                             (Set[]) null, new Unit[] {outputUnits});
+                                          (CoordinateSystem) null,
+                                          (Set[]) null,
+                                          new Unit[] { outputUnits });
         retData.setSamples(faaGridValues3, false);
         return retData;
 
