@@ -1057,7 +1057,12 @@ public class TimesChooser extends IdvChooser {
             JMenuItem menuItem = new JMenuItem("Show Timeline");
             menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent ae) {
-                        showTimelineDialog(list,timeline);
+                        Misc.runInABit(1,
+                                 new Runnable() {
+                                     public void run() {
+                                         showTimelineDialog(list,timeline);
+                                     }});
+
                     }
                 });
             items.add(menuItem);
