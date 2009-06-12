@@ -728,7 +728,9 @@ public class TimeSeriesChart extends XYChartManager {
                             }
                         }
 
-                        timeSeriesList.add(series);
+                        if(series!=null) {
+                            timeSeriesList.add(series);
+                        }
                         boolean first = true;
                         for(TimeSeries tmp: timeSeriesList) { 
                             addSeries(tmp, lineState, paramIdx, null, true,first);
