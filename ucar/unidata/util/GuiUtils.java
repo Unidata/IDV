@@ -2182,6 +2182,45 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    private static JTextField intervalStepFld  = new JTextField("1", 4);
+    private static  JTextField intervalStartFld = new JTextField("1", 4);
+
+    public static void showIntervalSelectionDialog(JList list) {
+        tmpInsets = INSETS_5;
+        JComponent contents = doLayout(new Component[] {
+            rLabel("Start Index:"),
+            intervalStartFld, rLabel("Interval:"),
+            intervalStepFld }, 2, WT_NN, WT_N);
+        contents = vbox(new JLabel("Choose Selection Interval"),
+                        contents);
+        contents = inset(contents, 5);
+        final int size   = list.getModel().getSize();
+
+        while (true) {
+            if (!showOkCancelDialog(null, "Selection Interval",
+                                    contents, list)) {
+                return;
+            }
+            try {
+                int start =
+                    new Integer(intervalStartFld.getText().trim()).intValue()
+                    - 1;
+                int step =
+                    new Integer(intervalStepFld.getText().trim()).intValue();
+                list.clearSelection();
+                for (int idx = start; idx < size; idx += step) {
+                    list.addSelectionInterval(idx, idx);
+                }
+                return;
+            } catch (NumberFormatException nfe) {
+                LogUtil.userErrorMessage("Bad input value");
+            }
+        }
+    }
+
+
+
+
     /**
      * popup a menu to select strides
      *
@@ -2221,39 +2260,13 @@ public class GuiUtils extends LayoutUtil {
         JMenuItem selectStrideMenuItem = new JMenuItem("Choose Interval");
         selectStrideMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                JTextField stepFld  = new JTextField("1", 4);
-                JTextField startFld = new JTextField("1", 4);
-                tmpInsets = INSETS_5;
-                JComponent contents = doLayout(new Component[] {
-                                          rLabel("Start Index:"),
-                                          startFld, rLabel("Interval:"),
-                                          stepFld }, 2, WT_NN, WT_N);
-                contents = vbox(new JLabel("Choose Selection Interval"),
-                                contents);
-                contents = inset(contents, 5);
-
-                while (true) {
-                    if ( !showOkCancelDialog(null, "Selection Interval",
-                                             contents, list)) {
-                        return;
-                    }
-                    try {
-                        int start =
-                            new Integer(startFld.getText().trim()).intValue()
-                            - 1;
-                        int step =
-                            new Integer(stepFld.getText().trim()).intValue();
-                        list.clearSelection();
-                        for (int idx = start; idx < size; idx += step) {
-                            list.addSelectionInterval(idx, idx);
+                final JList theList = list;
+                Misc.run(new Runnable() {
+                        public void run() {
+                            showIntervalSelectionDialog(theList);
                         }
-                        return;
-                    } catch (NumberFormatException nfe) {
-                        LogUtil.userErrorMessage("Bad input value");
-                    }
-                }
-            }
-        });
+                    });
+            }});
         items.add(MENU_SEPARATOR);
         items.add(selectStrideMenuItem);
         items.add(MENU_SEPARATOR);
@@ -2264,7 +2277,7 @@ public class GuiUtils extends LayoutUtil {
             final int step = steps[i];
             JMenuItem item = new JMenuItem("Select " + labels[i]);
             item.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
+                    public void actionPerformed(ActionEvent ae) {
                     list.clearSelection();
                     for (int idx = 0; idx < size; idx += step) {
                         list.addSelectionInterval(idx, idx);
