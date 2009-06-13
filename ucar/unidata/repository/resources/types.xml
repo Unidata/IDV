@@ -31,6 +31,14 @@
      <column name="category" type="string"  label="Wiki Page Category" cansearch="true" isindex="true" searchtype="select" showinhtml="false"/>
 </type>
 
+  <type name="emaillist"  description="Email List" handler="ucar.unidata.repository.collab.EmailListTypeHandler">
+     <property name="icon" value="/icons/email.png"/>
+     <property name="form.show.date" value="false"/>
+     <property name="form.show.area" value="false"/>
+     <property name="form.show.resource" value="false"/>
+     <column name="emaillist" type="clob" size="256000" label="Mail List"  showinhtml="false" columns="80" rows="40" suffix="One address per line:&lt;br&gt;&lt;i&gt;johndoe@email.com,John Doe&lt;/i&gt;"/>
+  </type>
+
 
   <type name="opendaplink"  description="OpenDAP Link" handler="ucar.unidata.repository.data.OpendapLinkTypeHandler">
      <property name="icon" value="/icons/opendap.gif"/>

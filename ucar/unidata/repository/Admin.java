@@ -68,6 +68,7 @@ import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.Transport;
+import javax.mail.Address;
 import javax.mail.internet.InternetAddress;
 
 
@@ -1297,6 +1298,15 @@ public class Admin extends RepositoryManager {
     public void sendEmail(String to, String from, String subject,
                           String contents, boolean asHtml)
             throws Exception {
+        sendEmail((List<Address>)Misc.newList(new InternetAddress(to)),
+                  new InternetAddress(from), subject, contents, false, asHtml);
+    }
+
+
+    public void sendEmail(List<Address> to, 
+                          InternetAddress from, String subject,
+                          String contents, boolean bcc, boolean asHtml)
+            throws Exception {
         if ( !isEmailCapable()) {
             throw new IllegalStateException(
                 "This RAMADDA server has not been configured to send email");
@@ -1309,12 +1319,16 @@ public class Admin extends RepositoryManager {
 
         Properties props = new Properties();
         props.put("mail.smtp.host", smtpServer);
-        props.put("mail.from", from);
+        props.put("mail.from", from.getAddress());
         javax.mail.Session session = javax.mail.Session.getInstance(props,
                                          null);
         MimeMessage msg = new MimeMessage(session);
-        msg.setFrom(new InternetAddress(from));
-        msg.setRecipients(Message.RecipientType.TO, to);
+        msg.setFrom(from);
+        Address[]array = new Address[to.size()];
+        for(int i=0;i<to.size();i++) {
+            array[i] = to.get(i);
+        }
+        msg.setRecipients((bcc?Message.RecipientType.BCC:Message.RecipientType.TO), array);
         msg.setSubject(subject);
         msg.setSentDate(new Date());
         msg.setContent(contents, (asHtml
