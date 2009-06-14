@@ -97,12 +97,13 @@ public class ThreddsHandler extends XmlHandler {
 
 
 
-
     /** for gui */
     private JComboBox dataSourcesCbx;
 
     /** for gui */
     private JCheckBox loadIndividuallyCbx;
+
+    private JCheckBox showThumbsCbx;
 
     /**
      * Create the handler
@@ -251,7 +252,13 @@ public class ThreddsHandler extends XmlHandler {
      *  @return The UI component
      */
     protected JComponent doMakeContents() {
-
+        showThumbsCbx = new JCheckBox("Show Thumbnail Images",true);
+        showThumbsCbx.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    tree.updateUI();
+                    tree.repaint();
+                }
+            });
         double version = CatalogUtil.getVersion(root);
         shuffleDocNodes(root, chooser.getDocument());
 
@@ -269,7 +276,6 @@ public class ThreddsHandler extends XmlHandler {
         //                                                       loadIndividuallyCbx, 5),5);
 
 
-
         tree = new XmlTree(root, true, path) {
                 public ImageIcon getIconForNode(Element node) {
                     if(remoteIcon==null) {
@@ -279,10 +285,13 @@ public class ThreddsHandler extends XmlHandler {
                     if(node.getTagName().equals(CatalogUtil.TAG_CATALOGREF)) {
                         return remoteIcon;
                     }
-
+                    
                     List propertyNodes = XmlUtil.findChildren(node,
                                                               CatalogUtil.TAG_PROPERTY);
-                    String []  ids = {"thumbnail","icon"};
+                    String []  ids;
+                    if(showThumbsCbx.isSelected()) ids = new String[]{"thumbnail","icon"};
+                    else ids = new String[]{"icon"};
+
                     for(String id:ids) {
                         for (Element propertyNode : (List<Element>) propertyNodes) {
                             String name = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_NAME,"");
@@ -302,6 +311,7 @@ public class ThreddsHandler extends XmlHandler {
                             }
                         }
                     }            
+
 
                     NodeList elements = XmlUtil.getElements(node);
                     for(int i=0;i<elements.getLength();i++) {
@@ -379,14 +389,14 @@ public class ThreddsHandler extends XmlHandler {
                                     break;
                                 }
                             }
-                            if(thumbnail!=null) {
+                            
+                            if(showThumbsCbx.isSelected() && thumbnail!=null) {
                                 return "<html>"  + "Url: " + pa.action +"<br>" + thumbnail +"</html>";
                             }
                             return "Url: " + pa.action;
                         }
                     }
                 }
-
                 return super.getToolTipText(n);
             }
 
@@ -475,8 +485,8 @@ public class ThreddsHandler extends XmlHandler {
          *       getClass()), CatalogUtil.TAG_DOCPARENT);
          */
         JComponent ui =
-            GuiUtils.inset(GuiUtils.topCenter(GuiUtils.left(dsComp),
-                tree.getScroller()), 5);
+            GuiUtils.inset(GuiUtils.topCenterBottom(GuiUtils.left(dsComp),
+                tree.getScroller(),GuiUtils.right(showThumbsCbx)), 5);
         return ui;
     }
 
