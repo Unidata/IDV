@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -96,15 +97,31 @@ public abstract class Poller implements Runnable {
         if (debug) {
             System.err.println("Poller.run interval=" + interval);
         }
+        int subTime = 5000;
         //Sleep  first then poll
+        //        System.err.println("Poller.run" + " interval:" + interval);
         while (running) {
-            Misc.sleep(interval);
-            if ( !running) {
+            //We will loop and sleep for 5 seconds and keep checking whether we are running
+            long timeSlept = 0;
+            while (timeSlept < interval-subTime && running) {
+                Misc.sleep(subTime);
+                timeSlept += subTime;
+                //                System.err.println("    running:" + running+ " time slept:" + timeSlept );
+            }
+
+            if (running && timeSlept < interval) {
+                //                System.err.println ("    sleeping a bit longer: "+ (interval - timeSlept));
+                Misc.sleep(interval - timeSlept);
+            }
+            if (!running) {
                 break;
             }
+
+
             if (debug) {
                 //                System.err.println("doPoll");
             }
+            //            System.err.println ("polling");
             doPoll();
         }
         listener = null;
