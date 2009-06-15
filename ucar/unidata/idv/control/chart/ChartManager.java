@@ -200,13 +200,17 @@ public abstract class ChartManager implements ImageObserver {
      * Save the image
      */
     public void saveImage() {
+        JComboBox publishCbx = control.getIdv().getPublishManager().getSelector("nc.export");
         String filename = FileManager.getWriteFile(FileManager.FILTER_IMAGE,
-                              FileManager.SUFFIX_JPG);
+                                                   FileManager.SUFFIX_JPG,
+                                                   (publishCbx!=null?GuiUtils.top(publishCbx):null));
         if (filename == null) {
             return;
         }
         try {
             ImageUtils.writeImageToFile(getContents(), filename);
+            control.getIdv().getPublishManager().publishContent(filename,
+                                                        null, publishCbx);
         } catch (Exception exc) {
             LogUtil.logException("Capturing image", exc);
         }

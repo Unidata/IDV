@@ -36,6 +36,7 @@ import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.DisplayInfo;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.util.ColorTable;
+import ucar.unidata.util.FileManager;
 
 //begin control imports
 import ucar.unidata.util.ContourInfo;
@@ -688,8 +689,17 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
                     return;
                 }
                 if (d instanceof FieldImpl) {
-                    GridUtil.exportGridToNetcdf((FieldImpl) d);
+                    JComboBox publishCbx = getIdv().getPublishManager().getSelector("nc.export");
+                    String filename = FileManager.getWriteFile(FileManager.FILTER_NETCDF,FileManager.SUFFIX_NETCDF,
+                                                               (publishCbx!=null?GuiUtils.top(publishCbx):null));
+                    if (filename == null) {
+                        return;
+                    }
+                    GridUtil.exportGridToNetcdf((FieldImpl) d, filename);
+                    getIdv().getPublishManager().publishContent(filename,
+                                                                null, publishCbx);
                 }
+
             } catch (Exception e) {
                 logException("Unable to export the data", e);
             }

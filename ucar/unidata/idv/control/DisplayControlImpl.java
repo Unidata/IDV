@@ -4675,7 +4675,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         if (canExportData()) {
             items.add(GuiUtils.makeMenuItem("Export Displayed Data...",
-                    this, "exportDisplayedData", FileManager.SUFFIX_NETCDF));
+                                            this, "exportDisplayedData", FileManager.SUFFIX_NETCDF,true));
         }
         if (myDataChoices!=null && 
             haveParameterDefaults() && 
@@ -11200,6 +11200,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return null;
     }
 
+
     /**
      * Export displayed data to file
      * @param type  type of data
@@ -11210,7 +11211,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if (d == null) {
                 return;
             }
-            if (Util.exportAsNetcdf(getDisplayedData())) {
+            if (Util.exportAsNetcdf(d)) {
                 userMessage(
                     "<html>The displayed data has been exported.<p>Note: this facility is experimental. The exported NetCDF file is not CF compliant and cannot be used within the IDV</html>");
             }
