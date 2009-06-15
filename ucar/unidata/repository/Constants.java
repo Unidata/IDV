@@ -837,6 +837,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SESSIONID = "sessionid";
 
+    public static final String ARG_REMOVESESSIONID = "removesessionid";
+
     /** _more_ */
     public static final String ARG_SHORT = "short";
 
@@ -846,6 +848,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_SHOWLINK = "showlink";
+
+    public static final String ARG_SHOWTAB = "showtab";
 
     /** _more_ */
     public static final String ARG_SHOWMETADATA = "showmetadata";

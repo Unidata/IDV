@@ -1138,6 +1138,12 @@ public class UserManager extends RepositoryManager {
      */
     public Result adminUserList(Request request) throws Exception {
 
+        if(request.exists(ARG_REMOVESESSIONID)) {
+            getSessionManager().removeSession(request.getString(ARG_REMOVESESSIONID));
+            return new Result(request.url(getRepositoryBase().URL_USER_LIST,ARG_SHOWTAB,"2"));
+        }
+
+
         Hashtable<String, StringBuffer> rolesMap = new Hashtable<String,
                                                        StringBuffer>();
         List<String> rolesList = new ArrayList<String>();
@@ -1236,6 +1242,7 @@ public class UserManager extends RepositoryManager {
         List         tabTitles  = new ArrayList();
         List         tabContent = new ArrayList();
 
+        int showTab = request.get(ARG_SHOWTAB,0);
         tabTitles.add(msg("User List"));
         tabContent.add(usersHtml.toString());
 
@@ -1252,7 +1259,7 @@ public class UserManager extends RepositoryManager {
         tabContent.add(getUserActivities(request, null));
 
 
-
+        tabTitles.set(showTab, "selected:"+tabTitles.get(showTab));
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.makeTabs(tabTitles, tabContent, true));
 

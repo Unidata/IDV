@@ -589,9 +589,12 @@ public class SessionManager extends RepositoryManager {
                     HtmlUtil.bold(msg("User")), HtmlUtil.bold(msg("Since")),
                     HtmlUtil.bold(msg("Last Activity")))));
         for (Session session : sessions) {
+            String url = request.url(getRepositoryBase().URL_USER_LIST,ARG_REMOVESESSIONID, session.getId());
             sessionHtml.append(
                 HtmlUtil.row(
                     HtmlUtil.cols(
+                                  HtmlUtil.href(url,HtmlUtil.img(iconUrl(ICON_DELETE)))+
+                                   " " +
                         session.user.getLabel(),
                         formatDate(request, session.createDate),
                         formatDate(request, session.getLastActivity()))));
