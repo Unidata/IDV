@@ -96,7 +96,7 @@ public class ImageGlyph extends DrawingGlyph {
     public static final String ATTR_UPDATE = "update";
 
     /** Used to load in images */
-    private GIFForm form = new GIFForm();
+    //    private GIFForm form = new GIFForm();
 
 
     /** Holds the image data */
@@ -608,7 +608,7 @@ public class ImageGlyph extends DrawingGlyph {
                     //              lbl = new JLabel(new ImageIcon(theImage));
                     //GuiUtils.showOkCancelDialog(null,"",lbl1,null);
                 }
-                imageData = DataUtility.makeField(theImage);
+                imageData = (FlatField) ucar.visad.Util.makeField(theImage,true);
             }
         } catch (java.io.IOException ioe) {}
         if (imageData == null) {
