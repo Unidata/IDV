@@ -1631,5 +1631,17 @@ public abstract class ImageDataSource extends DataSourceImpl {
     private boolean hasBandInfo(DataChoice dataChoice) {
         return dataChoice.getId() instanceof BandInfo;
     }
+
+    /**
+     * Called when Datasource is removed.
+     */
+    public void doRemove() {
+        super.doRemove();
+        myDataChoices   = null;
+        myCompositeDataChoice = null;
+        imageTimes = null;
+    }
+
+
 }
 
