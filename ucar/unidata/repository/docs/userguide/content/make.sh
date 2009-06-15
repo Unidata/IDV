@@ -1,1 +1,1 @@
-tclsh ../../../../../../auxdata/docs/build/generate.tcl
+tclsh ../../../../../../auxdata/docs/build/generate.tcl -clean

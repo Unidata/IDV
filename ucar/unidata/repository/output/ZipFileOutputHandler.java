@@ -131,7 +131,7 @@ public class ZipFileOutputHandler extends OutputHandler {
             return;
         }
         String path =state.entry.getResource().getPath().toLowerCase();
-        if(path.endsWith(".zip") || path.endsWith(".jar")) {
+        if(path.endsWith(".zip") || path.endsWith(".jar") || path.endsWith(".zidv")) {
             links.add(makeLink(request, state.entry, OUTPUT_LIST));
         }
 
