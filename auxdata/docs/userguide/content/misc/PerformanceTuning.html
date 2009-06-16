@@ -70,6 +70,16 @@ turn off data caching by unchecking the [ht::command {Cache data in memory}]
 checkbox on the [ht::command {Data &amp; Formats}] tab of
 the user preferences (accessible from the [ht::menu Edit Preferences] menu).
 
+
+<subhead id="cachetodisk" xintoc="false" desc="Data source field caching">Caching to disk</subhead>
+For grids and images you can specify that the data for each time step is cached to disk. From the data source properties
+dialog select &quot;Always cache to disk&quot;. Using this there will be some processing overhead because the IDV, after reading a grid
+or image timestep, will write the data to disk. However, the advantage is that only one time step's worth of data will be held in memory at a time.
+The &quot;Delay&quot; field allows you to specify a delay before the data is removed from memory. For example, if you are doing an interactive data probe
+then every time you move the probe the IDV needs to access the data in memory. If there was no delay then the IDV would have to read the data from
+disk at every probe movement.
+
+
 <subhead id="maxsize" xintoc="false" desc="Reducing the maximum
 size of a display can reduce the memory used">Maximum grid/image size</subhead>
 
