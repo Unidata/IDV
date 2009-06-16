@@ -238,7 +238,15 @@ public class UserManager extends RepositoryManager {
                     String name     = results.getString(col++);
                     String category = results.getString(col++);
                     if (entry == null) {
-                        //TODO: delete it from the list of favorites
+                         getDatabaseManager().delete(
+                                 Tables.FAVORITES.NAME,
+                                 Clause.and(
+                                            Clause.eq(
+                                                      Tables.FAVORITES.COL_USER_ID,
+                                                      user.getId()),
+                                            Clause.eq(
+                                                      Tables.FAVORITES.COL_ID,
+                                                      id)));
                         continue;
                     }
                     favorites.add(new FavoriteEntry(id, entry, name,

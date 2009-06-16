@@ -472,6 +472,7 @@ public class AccessManager extends RepositoryManager {
                 && Misc.equals(entry.getResource().getType(),
                                Resource.TYPE_FILE)) {
             if ( !entry.getResource().getTheFile().exists()) {
+                getEntryManager().entryFileIsMissing(entry);
                 return null;
             }
         }

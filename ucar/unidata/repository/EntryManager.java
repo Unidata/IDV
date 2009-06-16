@@ -3241,7 +3241,6 @@ return new Result(title, sb);
                             + HtmlUtil.space(1) + deleteLink;
             //            content.append(HtmlUtil.formEntry("By:",
             //                                         ));
-            //            System.err.println("Comment: " + comment.getComment());
             content.append(HtmlUtil.formEntryTop("", comment.getComment()));
             content.append("</table>");
             sb.append(
@@ -4122,7 +4121,6 @@ return new Result(title, sb);
             + getRepository().URL_ENTRY_SHOW.getPath();
         remoteUrl = HtmlUtil.url(remoteUrl, ARG_ENTRYID, id, ARG_OUTPUT,XmlOutputHandler.OUTPUT_XMLENTRY);
         String entriesXml = IOUtil.readContents(remoteUrl, getClass());
-        //        System.err.println ("XML:" + entriesXml);
         return null;
     }
 
@@ -4143,7 +4141,6 @@ return new Result(title, sb);
                           boolean abbreviated)
             throws Exception {
 
-
         if (entryId == null) {
             return null;
         }
@@ -4157,7 +4154,8 @@ return new Result(title, sb);
                 if ( !andFilter) {
                     return entry;
                 }
-                return getAccessManager().filterEntry(request, entry);
+                entry =  getAccessManager().filterEntry(request, entry);
+                return entry;
             }
 
             //catalog:url:dataset:datasetid
@@ -4201,7 +4199,6 @@ return new Result(title, sb);
                         getRepository().getTypeHandler(results.getString(2));
                     entry = typeHandler.getEntry(results, abbreviated);
                     entryStmt.close();
-
                 }
             } catch (Exception exc) {
                 logError("creating entry:" + entryId, exc);
@@ -4901,6 +4898,7 @@ return new Result(title, sb);
         SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
         ResultSet        results;
         boolean canDoSelectOffset = getDatabaseManager().canDoSelectOffset();
+
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 String id = results.getString(1);
@@ -4910,7 +4908,6 @@ return new Result(title, sb);
                 ids.add(id);
             }
         }
-
         group.addChildrenIds(ids);
         return ids;
     }
@@ -4942,7 +4939,6 @@ return new Result(title, sb);
             List<String> ids = getChildIds(request, group, where);
             for (String id : ids) {
                 Entry entry = getEntry(request, id);
-
                 if (entry == null) {
                     continue;
                 }
@@ -4968,6 +4964,7 @@ return new Result(title, sb);
 
         group.setSubEntries(entries);
         group.setSubGroups(subGroups);
+
         Result result = outputHandler.outputGroup(request, group, subGroups,
                             entries);
 
@@ -5929,6 +5926,9 @@ return new Result(title, sb);
     }
 
 
+    public void entryFileIsMissing(Entry entry) {
+
+    }
 
 
     private  String getIconUrlInner(Request request, Entry entry) throws Exception {

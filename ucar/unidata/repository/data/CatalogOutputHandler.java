@@ -309,6 +309,10 @@ public class CatalogOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
+
+
+
+
         boolean justOneEntry = group.isDummy() && (entries.size() == 1)
                                && (subGroups.size() == 0);
 
@@ -354,8 +358,36 @@ public class CatalogOutputHandler extends OutputHandler {
                                         new String[] { CatalogUtil.ATTR_NAME,
                     title });
             addMetadata(request, group, catalogInfo, topDataset);
+            int cnt = subGroups.size() + entries.size();
+            int max = request.get(ARG_MAX, DB_MAX_ROWS);
+            int skip = Math.max(0, request.get(ARG_SKIP, 0));
+            System.err.println ("entries:" + entries.size() + " groups:" + subGroups.size()+ " max:" + max+" skip:" + skip);
+ 
             toCatalogInner(request, group, subGroups, catalogInfo,
                            topDataset);
+            if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
+                if (cnt >= max) {
+                    String skipArg=  request.getString(ARG_SKIP,null);
+                    request.remove(ARG_SKIP);
+                    String url = 
+                        request.url(repository.URL_ENTRY_SHOW, ARG_ENTRYID,
+                                    group.getId(), ARG_OUTPUT, OUTPUT_CATALOG,
+                                    ARG_SKIP,""+ (skip + max),ARG_MAX,""+max);
+
+                    Element ref = XmlUtil.create(catalogInfo.doc,
+                                                 CatalogUtil.TAG_CATALOGREF, topDataset,
+                                                 new String[] {
+                                                     CatalogUtil.ATTR_XLINK_TITLE,
+                                                     "More...",
+                                                     CatalogUtil.ATTR_XLINK_HREF,
+                                                     url });
+
+                    if(skipArg!=null) {
+                        request.put(ARG_SKIP,skipArg);
+                    }
+                }
+            }
+
             toCatalogInner(request, group, entries, catalogInfo, topDataset);
             if ( !group.isDummy()
                     && (catalogInfo.serviceMap.get(SERVICE_OPENDAP)
