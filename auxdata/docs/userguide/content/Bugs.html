@@ -18,36 +18,18 @@ please see the User's Guide page
 
 <faqitem cat="General"></faqitem>
 
-<faqitem q="Message in console about &quot;In paintImmediately null graphics&quot;">
-You may see a message like:
-<pre>
-java.lang.NullPointerException
-	 at javax.swing.JComponent._paintImmediately(JComponent.java:4845)
-	 at javax.swing.JComponent.paintImmediately(JComponent.java:4666)
-	 at javax.swing.RepaintManager.paintDirtyRegions(RepaintManager.java:451)
-	 at javax.swing.SystemEventQueueUtilities$ComponentWorkRequest.run(SystemEventQueueUtilities.java:114)
-	 at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:209)
-	 at java.awt.EventQueue.dispatchEvent(EventQueue.java:461)
-	 at java.awt.EventDispatchThread.pumpOneEventForHierarchy(EventDispatchThread.java:242)
-	 at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:163)
-	 at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:157)
-	 at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:149)
-	 at java.awt.EventDispatchThread.run(EventDispatchThread.java:110)
- In paintImmediately null graphics
-</pre>
-in the console window from which you started the IDV.  This is a harmless
-message from deep inside Java and can be ignored. 
-</faqitem>
 
 <faqitem cat="Displays"></faqitem>
 
 <faqitem q="Incorrect data display" id="dataprojection">
 Sometimes data depictions display incorrectly or not at all when 
 re-projected from native data projections.  They should always
-display correctly in their naive projections.  Before you display the 
+display correctly in their native projections.  Before you display the 
 data, choose the [ug::menu Projections {Auto-Set Projection}] menu.
-Alternatively, you can try turning on Fast Rendering for the display
-which does not account for projection seams.
+If you display the data in a non-native projection and Use Fast Rendering
+is set (the default) and the data does not correctly display, turn
+off Use Fast Rendering through the [ug::menu Edit Properties] menu
+of the display control to account for projection seams.
 </faqitem>
 
 <faqitem q="Irregular animation loop" id="irregular_animation">

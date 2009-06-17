@@ -93,11 +93,11 @@ the user preferences (accessible from the [ht::menu Edit Preferences] menu).
 <subhead id="fastrender" xintoc="false" desc="Fast rendering reduces memory
 and time at the expense of accuracy">Fast Rendering</subhead>
 
-By default, the IDV will try to adjust the data renderings to account
+By default, the IDV will NOT try to adjust the data renderings to account
 for projection seams. This is computationally intensive in some cases
-and slows down the display of data. When you set your preference to
+and slows down the display of data.  When the preference
 "Use Fast Rendering" (under the [ht::command General] tab of the user
-preferences ([ht::menu Edit Preferences] menu)), the IDV will not try
+preferences ([ht::menu Edit Preferences] menu)) is set, the IDV will not try
 to account for the projection seams. If you are displaying data in
 its native projection, this will result in faster rendering of the
 data depiction. However, if you have several displays of data, each
