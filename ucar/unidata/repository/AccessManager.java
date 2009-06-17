@@ -328,57 +328,62 @@ public class AccessManager extends RepositoryManager {
                                      String action, User user,
                                      String requestIp)
             throws Exception {
+
+        //        System.err.println ("checking entry:" + entry);
         while (entry != null) {
             List permissions = getPermissions(entry);
-            List roles       = getRoles(entry, action);
+            List<String> roles       = (List<String>)getRoles(entry, action);
             if (roles != null) {
-                boolean hadIp = false;
-                //                System.err.println ("request IP:" + requestIp);
                 if(requestIp!=null) {
-                    for (int roleIdx = 0; roleIdx < roles.size(); roleIdx++) {
-                        String  role  = (String) roles.get(roleIdx);
-                        boolean doNot = false;
+                    System.err.println ("IP:" + requestIp);
+                    boolean hadIp = false;
+                    for (String role:roles) {
+                        boolean negated = false;
                         if (role.startsWith("!")) {
-                            doNot = true;
+                            negated = true;
                             role  = role.substring(1);
                         } 
-                        //                        System.err.println("role:" + role);
-                        if (role.startsWith("ip:")) {
-                            if(!doNot) {
-                                hadIp = true;
-                            }
-                            String ip  = role.substring(3);
-                            //                            System.err.println (ip+" -- "+ requestIp);
-                            if (requestIp.startsWith(ip)) {
-                                if (doNot) {
-                                    return false;
-                                } else {
-                                    return true;
-                                }
+                        if (!role.startsWith("ip:")) {
+                            continue;
+                        }
+                        if(!negated) {
+                            hadIp = true;
+                        }
+                        String ip  = role.substring(3);
+                        if (requestIp.startsWith(ip)) {
+                            if (negated) {
+                                return false;
+                            } else {
+                                return true;
                             }
                         }
                     }
                     if(hadIp) return false;
                 }
 
-                for (int roleIdx = 0; roleIdx < roles.size(); roleIdx++) {
-                    String  role  = (String) roles.get(roleIdx);
-                    boolean doNot = false;
+                boolean hadRole = false;
+                for (String role:roles) {
+                    boolean negated = false;
                     if (role.startsWith("!")) {
-                        doNot = true;
+                        negated = true;
                         role  = role.substring(1);
                     }
-                    if (role.startsWith("ip:")) continue;
+                    if (role.startsWith("ip:")) {
+                        continue;
+                    }
+                    hadRole = true;
                     if (user.isRole(role)) {
-                        return !doNot;
+                        return !negated;
                     }
                 }
-                break;
+                //If there were any roles 
+                if(hadRole) return false;
             }
             //LOOK: make sure we pass in false here which says do not check for access control
             entry = getEntryManager().getEntry(request,
                     entry.getParentGroupId(), false);
         }
+
         return false;
     }
 
