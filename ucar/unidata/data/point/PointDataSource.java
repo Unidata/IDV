@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.data.point;
 
 
@@ -406,8 +405,11 @@ public abstract class PointDataSource extends FilesDataSource {
             super("Grid Parameters");
             this.pointDataSource = pointDataSource;
             gridXFld = new JTextField("" + pointDataSource.gridX, 4);
+            gridXFld.setToolTipText("X spacing in spacing units");
             gridYFld = new JTextField("" + pointDataSource.gridY, 4);
-            gridUnitCmbx         = new JComboBox();
+            gridYFld.setToolTipText("Y spacing in spacing units");
+            gridUnitCmbx = new JComboBox();
+            gridUnitCmbx.setToolTipText("Set grid spacing option");
             tfos = TwoFacedObject.createList(SPACING_IDS, SPACING_NAMES);
             GuiUtils.setListData(gridUnitCmbx, tfos);
             gridUnitCmbx.setSelectedItem(
@@ -423,13 +425,16 @@ public abstract class PointDataSource extends FilesDataSource {
                     }
                 }
             });
-            gainComp = new ValueSliderComponent(pointDataSource, 0, 1,
-                    "gridGain", "Gain", 10, false);
+            gainComp = new ValueSliderComponent(
+                pointDataSource, 0, 1, "gridGain", "Gain", 10, false,
+                "Factor by which scaleLength is reduced for the second pass");
             searchComp = new ValueSliderComponent(pointDataSource, 0, 20,
-                    "gridSearchRadius", "Search Radius", 1, false);
-
+                    "gridSearchRadius", "Search Radius", 1, false,
+                    "Search radius in grid units for weighting");
             numGridPassesFld = new JTextField(""
                     + pointDataSource.numGridPasses, 4);
+            numGridPassesFld.setToolTipText(
+                "Set the number of passes for the Barnes analysis");
             comps.add(GuiUtils.rLabel("Spacing:"));
             comps.add(GuiUtils.left(gridUnitCmbx));
             comps.add(GuiUtils.rLabel("Grid Size:"));
