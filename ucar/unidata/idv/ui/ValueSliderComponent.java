@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.idv.ui;
 
 
@@ -92,6 +91,9 @@ public class ValueSliderComponent {
     /** flag for calling set method */
     private boolean useSetMethod = true;
 
+    /** flag for calling set method */
+    private String toolTipText;
+
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(
@@ -124,6 +126,24 @@ public class ValueSliderComponent {
      */
     public ValueSliderComponent(Object co, int min, int max, String property,
                                 String label, float scale, boolean andSet) {
+        this(co, min, max, property, label, scale, andSet, null);
+    }
+
+    /**
+     * Create a ValueSliderComponent
+     *
+     * @param co  calling object
+     * @param min minimum slider value
+     * @param max maximum slider value
+     * @param property DisplayControl property to set
+     * @param label  label for the widget
+     * @param scale  scale factor for the values
+     * @param andSet  set the property on the calling object if true
+     * @param tip  tool tip text for the widget
+     */
+    public ValueSliderComponent(Object co, int min, int max, String property,
+                                String label, float scale, boolean andSet,
+                                String tip) {
         callingObject = co;
         propertyName  = property;
         labelText     = label;
@@ -131,6 +151,7 @@ public class ValueSliderComponent {
         sliderMax     = max;
         scaleFactor   = scale;
         useSetMethod  = andSet;
+        toolTipText   = tip;
         init();
     }
 
@@ -207,6 +228,9 @@ public class ValueSliderComponent {
         valueReadout =
             new JTextField(getDisplayConventions().format(initialValue
                 / scaleFactor), 3);
+        if (toolTipText != null) {
+            valueReadout.setToolTipText(toolTipText);
+        }
 
         valueReadout.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
