@@ -7,12 +7,15 @@ index.html
 >editing.html
 >entries.html
 >access.html
+>configuration.html
 >wiki.html
 >idvpublisher.html
 >faq.html
 
 >title:Site Administration:These pages are intended for Site Administrators
 >>admin.html
+>>adminusers.html
+>>remoteservers.html
 >>adminmisc.html
 >>harvesters.html
 

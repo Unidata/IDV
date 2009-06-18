@@ -7,9 +7,33 @@ of every page. This takes you to a set of Site Administration pages.
 <p>
 The main admin settings page consists of:
 
-<subhead  id="contact"  intoc="false">Site and Contact</subhead>
+<subhead  id="contact"  intoc="false">Site and Contact Information</subhead>
+
+Specify the RAMADDA administator email for when RAMADDA sends email to users.
+The Mail Server is the smtp mail server that RAMADDA can use to send email.
+If this is not defined then user's cannot reset their passwords via email.
+<p>
+The Hostname and HTTP port should be set. RAMADDA uses these when it creates an absolute URL in some content  (e.g.,
+a generated THREDDS catalog).
+For information regarding SSL see the <a href="faq.html#ssl">FAQ</a>.
+<p>
+For information on the Server Registry settings  see <a href="remoteservers.html">remoteservers.html</a>.
+
 
 <subhead  id="access"  intoc="false">Access</subhead>
+Under Site Access you can specify that only registered users are allowe to access the site or only site Administrators.
+<p>
+The anonymous uploads Max Directory Size is the maximum size of the files that are uploaded through
+the anonymous upload facility. This cap keeps rogue users from filling up the disk via anonymous uploads.
+<p>
+The Cache Size is the size of the cached files that RAMADDA generates (e.g., ftp files).
+The cache is in: &lt;ramadda home&gt;/tmp/cache
+<p>
+The File System Access is the list of server directories that can be used
+for the <a href="configuration.html#localfiles">Local File View</a> entries.
+<p>
+If you are running the <a href="http://www.unidata.ucar.edu/software/ldm/">Unidata LDM system</a> on the server machine you 
+can allow RAMADDA services to inject files into the LDM queue by specifying the path to the pqinsert program and the queue location.
 
 <subhead  id="display"  intoc="false">Display</subhead>
 

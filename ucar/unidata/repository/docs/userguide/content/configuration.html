@@ -1,0 +1,51 @@
+[ht::head {Populating your RAMADDA server}]
+
+<%nochildlist%>
+
+So, you have your RAMADDA server installed, now you may ask how do I get go about populating it with data and other content.
+We covered how to make groups and upload files (or archives of files) through the web interface. However, RAMADDA also supports
+ways of providing access to the files that are already on the server machine.
+
+
+
+<subhead  id="harvesting"  intoc="false">Harvesting files</subhead>
+RAMADDA provides a harvester facility (see <a href="harvesters.html">harvesters.html</a> for more details)
+that allows an administrator to scan the local file system on the server and add entries into the database for
+those files.
+Here is an example of a harvester that walks a directory tree (/data/ldm/pub/casestudies/july18_2002) add adds group and file entries
+under the main RAMADDA group RAMADDA/Case Studies/Test.
+
+[ht::cimg images/harvesterlocalfiles.gif {Harvesting files} {border=0 width=700}]
+
+Simply create the harvester, specify the file path to look under, specify a pattern to match (.* is match all files) and specify
+the RAMADDA group to add the new group under.
+See the above link for more details.
+
+
+<subhead  id="localfiles"  intoc="false">Serving up local files</subhead>
+If the server machine you have RAMADDA running on has a large collection of data files then you can
+very easily provide RAMADDA access to those files with the &quot;Local File View&quot; entry type. 
+This provides a view of the file system. The Groups and Entries it creates are not in the database but
+they provide a way to access the data through all of the RAMADDA services.
+<p>
+For example, on Unidata's motherlode server we have a large archive (10's of millions of files)
+of real time data from Unidata's Internet Data Distribution system (IDD). This would be too large
+to harvest into the database. Instead, on our RAMADDA server we have a Local File View entry:
+<a href="http://motherlode.ucar.edu/repository/entry/show/RAMADDA/Data/IDD+Data?entryid=a136862d-1253-4096-b864-ac53028253d7">IDD Data</a>
+that provides a synthetic view of this large directory tree.
+
+<p>
+You create one of these entry  types through the File->New Entry menu. The create form looks like:
+[ht::cimg images/localfileviewedit.gif {Creating a Local File View Entry} {border=0 width=700}]
+
+You specify a directory path on the server machine (e.g,. /data/ldm/pub) and other configuration options (e.g., what to show, what not to show, etc.)<p>
+ <b>Note: for security reasons the local file path that is specified has to be a subdirectory of one of the directory
+paths specified in the Site Administration page under Settings-&gt;Access-&gt;File System Access</a></b>
+<p>
+
+You end up then with a view of that directory that looks like:
+
+[ht::cimg images/localfileviewexample.gif {Local File View Example} {border=0 width=700}]
+
+
+[ht::foot]
