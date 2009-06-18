@@ -850,15 +850,8 @@ public class TDSRadarChooser extends TimesChooser {
                 Date fromDate =
                     DateUnit.getStandardOrISO((String) timeSpan.get(0));
                 Date toDate = DateUnit.getStandardOrISO((String) timeSpan.get(1));
-
-           //     Date toDate = new Date(System.currentTimeMillis()
-           //                             + DateUtil.daysToMillis(365 * 100));
-                //Go back 10 years (or so)
-           //     Date fromDate = new Date(System.currentTimeMillis()
-           //                              - DateUtil.daysToMillis(365 * 10));
-
-                dateSelection.setStartFixedTime(fromDate);
-                dateSelection.setEndFixedTime(toDate);
+                dateSelection.setStartMode(DateSelection.TIMEMODE_DATA);
+                dateSelection.setStartMode(DateSelection.TIMEMODE_DATA);
                 dateSelection.setCount(count);
             }
             makeDataSource(radarQuery, "FILE.RADAR", ht);
