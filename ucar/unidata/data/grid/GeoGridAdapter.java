@@ -1240,8 +1240,8 @@ public class GeoGridAdapter {
             }
             ggff.setReadLabel(readLabel);
             retField = ggff;
-            ggff.unpackFloats(false);
-
+            //Not sure why we had this here since this forces a data read
+            //            ggff.unpackFloats(false);
         }
 
         dataSource.putCache(cacheKey, retField);
