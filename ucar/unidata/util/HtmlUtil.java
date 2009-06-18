@@ -45,6 +45,20 @@ public class HtmlUtil {
 
     //j-
 
+    /** _more_          */
+    public static final String HTTP_CONTENT_LENGTH = "Content-Length";
+
+    /** _more_          */
+    public static final String HTTP_CONTENT_DESCRIPTION =
+        "Content-Description";
+
+    /** _more_          */
+    public static final String HTTP_WWW_AUTHENTICATE = "WWW-Authenticate";
+
+    /** _more_          */
+    public static final String HTTP_SET_COOKIE = "Set-Cookie";
+
+
     /** _more_ */
     public static final String SIZE_3 = "  size=\"3\" ";
 
@@ -136,7 +150,7 @@ public class HtmlUtil {
     /** _more_ */
     public static final String TAG_INPUT = "input";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_IFRAME = "iframe";
 
     /** _more_ */
@@ -215,7 +229,7 @@ public class HtmlUtil {
     /** _more_ */
     public static final String ATTR_HREF = "href";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_HEIGHT = "height";
 
     /** _more_ */
@@ -269,7 +283,7 @@ public class HtmlUtil {
     /** _more_ */
     public static final String ATTR_TITLE = "title";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TARGET = "target";
 
     /** _more_ */
@@ -2594,7 +2608,7 @@ public class HtmlUtil {
     private static String blockShowImageUrl;
 
 
-    /** _more_          */
+    /** _more_ */
     private static String inlineHideImageUrl;
 
     /** _more_ */
@@ -2726,7 +2740,7 @@ public class HtmlUtil {
         String link =
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("toggleBlockVisibility('"
                 + id + "','" + id + "img','" + hideImg + "','" + showImg
-                                                  + "')"), img/* + label*/,
+                + "')"), img /* + label*/,
                          HtmlUtil.cssClass("pagesubheadinglink"));
         link = link + label;
 
