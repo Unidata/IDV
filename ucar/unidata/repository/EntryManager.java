@@ -399,10 +399,13 @@ return new Result(title, sb);
                 throw exc;
             }
             if (entry == null) {
+                String entryId = request.getString(ARG_ENTRYID, BLANK);
                 Entry tmp = getEntry(request,
-                                     request.getString(ARG_ENTRYID, BLANK),
+                                     entryId,
                                      false);
                 if (tmp != null) {
+                    logInfo("Cannot access entry:" + entryId+ "  IP:" + request.getIp());
+                    logInfo("Request:" + request);                
                     throw new IllegalArgumentException(
                         "You do not have access to this entry");
                 }
@@ -604,6 +607,9 @@ return new Result(title, sb);
                     ? "Add " + typeHandler.getLabel()
                     : msg("Save")));
 
+            String nextButton = (entry == null?"":HtmlUtil.submit("Save & Next",ARG_SAVENEXT));
+
+
             String deleteButton = (((entry != null) && entry.isTopGroup())
                                    ? ""
                                    : HtmlUtil.submit(msg("Delete"),
@@ -708,7 +714,10 @@ return new Result(title, sb);
                                         Object actionId)
             throws Exception {
 
+
         User user = request.getUser();
+        if(forUpload)
+            logInfo ("upload doProcessEntryChange user = " +user);
         boolean     download    = request.get(ARG_RESOURCE_DOWNLOAD, false);
         Entry       entry       = null;
         TypeHandler typeHandler = null;
@@ -801,17 +810,30 @@ return new Result(title, sb);
         }
 
 
+        if(forUpload)
+            logInfo ("upload entry:" + entry);
         if (entry == null) {
+            if(forUpload)
+                logInfo ("creating a new entry");
             String groupId = request.getString(ARG_GROUP, (String) null);
             if (groupId == null) {
                 throw new IllegalArgumentException(
                     "You must specify a parent group");
             }
             Group parentGroup = findGroup(request);
-            if ( !getAccessManager().canDoAction(request, parentGroup,
-                    (forUpload
-                     ? Permission.ACTION_UPLOAD
-                     : Permission.ACTION_NEW))) {
+
+            if(forUpload)
+                logInfo ("checking access");
+            //            System.err.println ("checking access");
+            boolean okToCreateNewEntry = getAccessManager().canDoAction(request, parentGroup,
+                                                                        (forUpload
+                                                                         ? Permission.ACTION_UPLOAD
+                                                                         : Permission.ACTION_NEW));
+
+            if(forUpload)
+                logInfo ("is ok to create:" + okToCreateNewEntry);
+            //            System.err.println ("Creating new entry:" +okToCreateNewEntry);
+            if ( !okToCreateNewEntry) {
                 throw new AccessException("Cannot add:" + entry.getLabel(),
                                           request);
             }
@@ -986,8 +1008,6 @@ return new Result(title, sb);
                 String theResource = (String) resources.get(resourceIdx);
                 String origName    = (String) origNames.get(resourceIdx);
                 if (isFile && !isLocalFile) {
-
-
                     if (forUpload) {
                         theResource =
                             getStorageManager().moveToAnonymousStorage(
@@ -1918,6 +1938,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryNew(Request request) throws Exception {
+
         Group        group = findGroup(request);
         StringBuffer sb    = new StringBuffer();
         //        sb.append(makeEntryHeader(request, group));
@@ -2017,12 +2038,20 @@ return new Result(title, sb);
             }
             return new Result(BLANK, new FileInputStream(thumb), mimeType);
         } else {
+
+
             File        file        = entry.getFile();
             long        length      = file.length();
+            if(request.isHeadRequest()) {
+                Result result  = new Result("",new StringBuffer());
+                result.addHttpHeader(HtmlUtil.HTTP_CONTENT_LENGTH, "" + length);
+                return result;
+            }
+
             InputStream inputStream = new FileInputStream(file);
             Result      result      = new Result(BLANK, inputStream,
                                           mimeType);
-            result.addHttpHeader("Content-Length", "" + length);
+            result.addHttpHeader(HtmlUtil.HTTP_CONTENT_LENGTH, "" + length);
             result.setCacheOk(true);
             return result;
         }
@@ -4085,8 +4114,11 @@ return new Result(title, sb);
                                  request.getString(ARG_ENTRYID, BLANK),
                                  false);
             if (tmp != null) {
+                logInfo("Cannot access entry:" + entryId+ "  IP:" + request.getIp());
+
+                logInfo("Request:" + request);                
                 throw new AccessException(
-                    "You do not have access to this entry", request);
+                                          "You do not have access to this entry", request);
             }
             throw new RepositoryUtil.MissingEntryException(
                 "Could not find entry:"

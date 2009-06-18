@@ -198,7 +198,9 @@ public class AccessManager extends RepositoryManager {
                 throw new IllegalArgumentException("Could not find group:"
                         + request.getString(ARG_GROUP, ""));
             }
-            return canDoAction(request, group, action);
+            boolean canDo= canDoAction(request, group, action);
+            //            System.err.println ("action:" + action +" found group:" + group + " canDo:" + canDo);
+            return canDo;
         }
 
         if (request.exists(ARG_ASSOCIATION)) {
@@ -260,6 +262,15 @@ public class AccessManager extends RepositoryManager {
         }
 
 
+        
+        
+        if(!action.equals(Permission.ACTION_VIEW)) {
+            boolean okToView = canDoAction(request, entry, Permission.ACTION_VIEW);
+            //            System.err.println("action isn't view viwe ok:"+ okToView);
+            if(!okToView) return false;
+        }
+
+
         String requestIp = null;
         User   user      = null;
         if (request == null) {
@@ -277,11 +288,13 @@ public class AccessManager extends RepositoryManager {
 
         //The admin can do anything
         if (user.getAdmin()) {
+            //            System.err.println("user is admin");
             return true;
         }
 
         //If user is owner then they can do anything
         if ( !user.getAnonymous() && Misc.equals(user, entry.getUser())) {
+            //            System.err.println("user is owner of entry");
             return true;
         }
 
@@ -335,7 +348,6 @@ public class AccessManager extends RepositoryManager {
             List<String> roles       = (List<String>)getRoles(entry, action);
             if (roles != null) {
                 if(requestIp!=null) {
-                    System.err.println ("IP:" + requestIp);
                     boolean hadIp = false;
                     for (String role:roles) {
                         boolean negated = false;
@@ -346,14 +358,18 @@ public class AccessManager extends RepositoryManager {
                         if (!role.startsWith("ip:")) {
                             continue;
                         }
+                        logInfo("action:" + action +" checking IP:" + requestIp + " against:" + (negated?"!":"") +role);
                         if(!negated) {
                             hadIp = true;
                         }
                         String ip  = role.substring(3);
                         if (requestIp.startsWith(ip)) {
                             if (negated) {
+                                logInfo ("   returning  false");
                                 return false;
+
                             } else {
+                                logInfo ("   returning  true");
                                 return true;
                             }
                         }

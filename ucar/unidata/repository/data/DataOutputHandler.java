@@ -1831,7 +1831,14 @@ public class DataOutputHandler extends OutputHandler {
             return outputPointKml(request, entry);
         }
 
+
         if (output.equals(OUTPUT_OPENDAP)) {
+            //If its a head request then just return the content description
+            if(request.isHeadRequest()) {
+                Result result  = new Result("",new StringBuffer());
+                result.addHttpHeader(HtmlUtil.HTTP_CONTENT_DESCRIPTION,"dods-dds");
+                return result;
+            }
             Result result = outputOpendap(request, entry);
             return result;
         }

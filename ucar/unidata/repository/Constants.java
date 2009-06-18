@@ -884,6 +884,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SUBMIT = "submit";
 
+    public static final String ARG_SAVENEXT = "savenext";
+
     /** _more_ */
     public static final String ARG_TEMPLATE = "template";
 

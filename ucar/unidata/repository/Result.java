@@ -21,6 +21,8 @@
 package ucar.unidata.repository;
 
 
+import ucar.unidata.util.HtmlUtil;
+
 import java.io.InputStream;
 
 import java.util.ArrayList;
@@ -499,7 +501,7 @@ public class Result {
      * @param value _more_
      */
     public void addCookie(String name, String value) {
-        addHttpHeader("Set-Cookie", name + "=" + value);
+        addHttpHeader(HtmlUtil.HTTP_SET_COOKIE, name + "=" + value);
     }
 
     /**

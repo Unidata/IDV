@@ -83,6 +83,8 @@ public class ApiMethod {
     /** _more_ */
     public static final String ATTR_ISHOME = "ishome";
 
+    public static final String ATTR_HANDLESHEAD = "head";
+
     /** _more_ */
     private String request;
 
@@ -124,6 +126,7 @@ public class ApiMethod {
     /** _more_ */
     private String authMethod;
 
+    private boolean handlesHead = false;
 
     /**
      * _more_

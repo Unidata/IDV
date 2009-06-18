@@ -219,7 +219,7 @@ public class RepositoryServlet extends HttpServlet {
             // need to support HTTP HEAD request since we are overriding HttpServlet doGet   
             if (request.getMethod().equals("HEAD")) {
                 //                System.err.println("head:" +  request.getRequestURI());
-                return;
+                //                return;
             }
 
             // create a ucar.unidata.repository.Request object from the relevant info from the HttpServletRequest object

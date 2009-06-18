@@ -2056,7 +2056,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         result = new Result(httpsUrl(request.getUrl()));
                     } else {
                         result = new Result("Error", sb);
-                        result.addHttpHeader("WWW-Authenticate",
+                        result.addHttpHeader(HtmlUtil.HTTP_WWW_AUTHENTICATE,
                                              "Basic realm=\"Secure Area\"");
                         result.setResponseCode(Result.RESPONSE_UNAUTHORIZED);
                     }
@@ -2071,7 +2071,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             result = new Result(msg("Error"), sb);
             if (badAccess) {
                 result.setResponseCode(Result.RESPONSE_UNAUTHORIZED);
-                //                result.addHttpHeader("WWW-Authenticate","Basic realm=\"repository\"");
+                //                result.addHttpHeader(HtmlUtil.HTTP_WWW_AUTHENTICATE,"Basic realm=\"repository\"");
             } else {
                 result.setResponseCode(Result.RESPONSE_INTERNALERROR);
                 String userAgent = request.getHeaderArg("User-Agent");
@@ -2226,6 +2226,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             //if(entry!=null) request.put(ARG_ENTRYID, entry.getId());
         }
         */
+
 
         boolean allSsl = false;
         if (sslEnabled) {

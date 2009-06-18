@@ -1541,6 +1541,12 @@ public class Request implements Constants {
 
 
 
+    public boolean isHeadRequest() {
+        if(httpServletRequest!=null) return httpServletRequest.getMethod().equals("HEAD");
+        return false;
+    }
+
+
     /**
      *  Get the HttpServletRequest property.
      *
