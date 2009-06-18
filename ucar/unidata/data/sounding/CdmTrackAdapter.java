@@ -120,9 +120,7 @@ public class CdmTrackAdapter extends TrackAdapter {
         TrajectoryObsDataset tod = null;
         StringBuilder         buf = new StringBuilder();
         try {
-            filename = filename.replace("http:","dods:");
             //tod = TrajectoryObsDatasetFactory.open(filename);
-            System.err.println ("filename:" +filename);
             tod = (TrajectoryObsDataset) TypedDatasetFactory.open(
                 FeatureType.TRAJECTORY, filename, null, buf);
         } catch (java.io.FileNotFoundException fnfe) {
