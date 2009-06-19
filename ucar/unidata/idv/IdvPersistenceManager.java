@@ -1,7 +1,5 @@
 /**
- * $Id: IdvPersistenceManager.java,v 1.177 2007/08/07 09:52:26 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2009 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -21,11 +19,8 @@
  */
 
 
+
 package ucar.unidata.idv;
-
-
-
-
 
 
 
@@ -36,8 +31,6 @@ import org.w3c.dom.Node;
 import ucar.unidata.data.DataManager;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceResults;
-
-import visad.util.ThreadManager;
 
 import ucar.unidata.data.imagery.*;
 
@@ -79,6 +72,8 @@ import ucar.unidata.xml.*;
 
 import ucar.unidata.xml.XmlUtil;
 
+import visad.util.ThreadManager;
+
 
 import java.awt.*;
 import java.awt.event.*;
@@ -118,7 +113,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     public static final String PROP_ZIDVPATH = "idv.zidvpath";
 
 
-    /** property id          */
+    /** property id */
     public static final String PROP_TIMESLIST = "idv.timeslist";
 
 
@@ -196,7 +191,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
     private JComboBox saveJythonBox;
 
-    /** lists the publishers          */
+    /** lists the publishers */
     private JComboBox publishCbx;
 
     /** JCheckBox for saving all of the jython library */
@@ -392,15 +387,18 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
                 try {
                     List categories = fileToCategories(dirs[i].toString(),
-                                                       file.getParent().toString());
+                                          file.getParent().toString());
                     String name = IOUtil.stripExtension(
-                                                        IOUtil.getFileTail(file.toString()));
+                                      IOUtil.getFileTail(file.toString()));
                     File newFile = new File("");
-                    SavedBundle savedBundle = new SavedBundle(newFile.toString(),
-                                                              name, categories, null, true,types[i]);
+                    SavedBundle savedBundle =
+                        new SavedBundle(newFile.toString(), name, categories,
+                                        null, true, types[i]);
                 } catch (Exception exc) {
-                    LogUtil.consoleMessage("Error cleaning up old bundles.\ndir:" + dirs[i] +
-                                           "\nfile:" + file +"\nparent:" + file.getParent()+"\nError:" + exc);  
+                    LogUtil.consoleMessage(
+                        "Error cleaning up old bundles.\ndir:" + dirs[i]
+                        + "\nfile:" + file + "\nparent:" + file.getParent()
+                        + "\nError:" + exc);
                 }
                 //              System.err.println (types[i] + " cats:" +savedBundle.getCategories() +" " + savedBundle);
             }
@@ -476,7 +474,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                             saveDisplaysCbx,
                                             saveDataSourcesCbx);
         fileAccessories.add(GuiUtils.left(GuiUtils.inset(saveJythonBox,
-                                                         new Insets(0, 3, 0, 0))));
+                new Insets(0, 3, 0, 0))));
         fileAccessories.add(GuiUtils.filler(1, 10));
         fileAccessories.add(makeDataRelativeCbx);
         //fileAccessories.add(makeDataEditableCbx);
@@ -489,10 +487,10 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             fileAccessories.add(publishCbx);
         }
         return GuiUtils.top(
-                            GuiUtils.vbox(
-                                          Misc.newList(
-                                                       new JLabel("What should be saved?"),
-                                                       GuiUtils.vbox(fileAccessories))));
+            GuiUtils.vbox(
+                Misc.newList(
+                    new JLabel("What should be saved?"),
+                    GuiUtils.vbox(fileAccessories))));
     }
 
 
@@ -507,8 +505,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @param categories Categories for the SavedBundle objects
      * @param file Where to look
      */
-    private void loadBundlesInDirectory(List<SavedBundle> allBundles, List categories,
-                                        File file) {
+    private void loadBundlesInDirectory(List<SavedBundle> allBundles,
+                                        List categories, File file) {
         String[] localBundles =
             file.list(getArgsManager().getXidvZidvFileFilter());
         for (int i = 0; i < localBundles.length; i++) {
@@ -517,7 +515,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             allBundles.add(
                 new SavedBundle(
                     filename, IOUtil.stripExtension(localBundles[i]),
-                    categories, null, true,SavedBundle.TYPE_FAVORITE));
+                    categories, null, true, SavedBundle.TYPE_FAVORITE));
         }
     }
 
@@ -558,10 +556,10 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      *
      * @return List of (String) categories
      */
-    public static List<String> fileToCategories(String root, String filename) {
+    public static List<String> fileToCategories(String root,
+            String filename) {
         int idx = root.length() + 1;
-        return StringUtil.split(filename.substring(idx),
-                                File.separator);
+        return StringUtil.split(filename.substring(idx), File.separator);
     }
 
 
@@ -578,7 +576,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                       boolean includeCategoryInUrl) {
         Document doc  = XmlUtil.makeDocument();
         Element  root = doc.createElement(SavedBundle.TAG_BUNDLES);
-        for (SavedBundle savedBundle: bundles) {
+        for (SavedBundle savedBundle : bundles) {
             savedBundle.toXml(doc, root, includeCategoryInUrl);
         }
         return XmlUtil.toString(root);
@@ -619,9 +617,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         }
         List<SavedBundle> subset = new ArrayList<SavedBundle>();
 
-        for(SavedBundle savedBundle: bundlesFromXml) {
-            if ((type == BUNDLES_ALL)
-                || savedBundle.getType() == type) {
+        for (SavedBundle savedBundle : bundlesFromXml) {
+            if ((type == BUNDLES_ALL) || (savedBundle.getType() == type)) {
                 subset.add(savedBundle);
             }
         }
@@ -918,7 +915,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @return Full path to the selected file.
      */
     private String getCategorizedFile(String title, String filename,
-                                      List<SavedBundle> bundles, final String topDir,
+                                      List<SavedBundle> bundles,
+                                      final String topDir,
                                       List defaultCategories, String suffix,
                                       boolean showSubsetPanel) {
 
@@ -945,7 +943,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         });
         final JComboBox fileBox = new JComboBox();
         fileBox.setEditable(true);
-        fileBox.addItem(filename);
+        //fileBox.addItem(filename);
         List tails = new ArrayList();
 
         if (bundles != null) {
@@ -954,10 +952,15 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 if (new File(bundle.getUrl()).canWrite()) {
                     String tail = IOUtil.stripExtension(
                                       IOUtil.getFileTail(bundle.getUrl()));
-                    fileBox.addItem(new TwoFacedObject(tail, bundle));
+                    //fileBox.addItem(new TwoFacedObject(tail, bundle));
+                    tails.add(new TwoFacedObject(tail, bundle));
                 }
             }
+            java.util.Collections.sort(tails);
+
         }
+        tails.add(0, filename);
+        GuiUtils.setListData(fileBox, tails);
         fileBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 Object selected = fileBox.getSelectedItem();
@@ -1388,13 +1391,15 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
             if (doZidv) {
                 GuiUtils.ProgressDialog dialog =
-                    new GuiUtils.ProgressDialog("Creating Zipped Bundle", true);
+                    new GuiUtils.ProgressDialog("Creating Zipped Bundle",
+                        true);
                 dialog.setText("Writing " + filename);
                 String tail =
                     IOUtil.stripExtension(IOUtil.getFileTail(filename));
                 ZipOutputStream zos =
                     new ZipOutputStream(new FileOutputStream(filename));
-                String fileSuffix = getArgsManager().getXidvFileFilter().getPreferredSuffix();
+                String fileSuffix =
+                    getArgsManager().getXidvFileFilter().getPreferredSuffix();
                 zos.putNextEntry(new ZipEntry(tail + fileSuffix));
                 byte[] bytes = xml.getBytes();
                 zos.write(bytes, 0, bytes.length);
@@ -1785,9 +1790,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @return List of saved bundles
      */
     public List<SavedBundle> getLocalBundles() {
-        List<SavedBundle>   allBundles = new ArrayList<SavedBundle>();
-        List   bundleDirs = Misc.newList(getStore().getLocalBundlesDir());
-        String sitePath   = getResourceManager().getSitePath();
+        List<SavedBundle> allBundles = new ArrayList<SavedBundle>();
+        List bundleDirs = Misc.newList(getStore().getLocalBundlesDir());
+        String            sitePath   = getResourceManager().getSitePath();
 
         //If we have a site path then add the bundles subdir
         if (sitePath != null) {
@@ -1832,7 +1837,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                           file.toString());
                     String name = IOUtil.stripExtension(templateFiles[i]);
                     dataSourceBundles.add(new SavedBundle(filename, name,
-                                                          categories, null, true,SavedBundle.TYPE_DATA));
+                            categories, null, true, SavedBundle.TYPE_DATA));
                 }
             }
 
@@ -1867,7 +1872,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                           file.toString());
                     String name = IOUtil.stripExtension(templateFiles[i]);
                     displayTemplates.add(new SavedBundle(filename, name,
-                                                         categories, dc, true,SavedBundle.TYPE_DISPLAY));
+                            categories, dc, true, SavedBundle.TYPE_DISPLAY));
                 }
             }
             displayTemplates.addAll(getXmlBundles(BUNDLES_DISPLAY));
@@ -3172,7 +3177,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             editableComps.add(widgetContents);
         }
 
-        if (!getArgsManager().getIsOffScreen() && editableComps.size() > 0) {
+        if ( !getArgsManager().getIsOffScreen()
+                && (editableComps.size() > 0)) {
             JComponent panel = GuiUtils.doLayout(editableComps, 1,
                                    GuiUtils.WT_Y, stretchy);
             panel = GuiUtils.inset(
@@ -3384,7 +3390,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 localFileMapping = new ArrayList(fileMapping);
             }
 
-            final  ThreadManager threadManager = new ThreadManager("Data source initialization");
+            final ThreadManager threadManager =
+                new ThreadManager("Data source initialization");
             for (int i = 0; i < dataSources.size(); i++) {
                 final DataSource dataSource = (DataSource) dataSources.get(i);
                 //Clear the error flag
@@ -3412,9 +3419,10 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 }
                 long t1 = System.currentTimeMillis();
                 threadManager.addRunnable(new ThreadManager.MyRunnable() {
-                        public void run()  throws Exception {
-                            dataSource.initAfterUnpersistence();
-                        }});
+                    public void run() throws Exception {
+                        dataSource.initAfterUnpersistence();
+                    }
+                });
             }
 
             long t1 = System.currentTimeMillis();
@@ -3586,7 +3594,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
                     final Hashtable properties = new Hashtable();
                     Trace.call1("Decode.init displays");
-                    final visad.util.ThreadManager displaysThreadManager = new visad.util.ThreadManager("display initialization");
+                    final visad.util.ThreadManager displaysThreadManager =
+                        new visad.util.ThreadManager(
+                            "display initialization");
                     for (int i = 0; i < newControls.size(); i++) {
                         final DisplayControl displayControl =
                             (DisplayControl) newControls.get(i);
@@ -3600,11 +3610,13 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                     displayControl)) {
                             continue;
                         }
-                        displaysThreadManager.addRunnable(new visad.util.ThreadManager.MyRunnable() {
-                                public void run()  throws Exception {
-                                    displayControl.initAfterUnPersistence(getIdv(),
-                                                                          properties);
-                                }});
+                        displaysThreadManager.addRunnable(
+                            new visad.util.ThreadManager.MyRunnable() {
+                            public void run() throws Exception {
+                                displayControl.initAfterUnPersistence(
+                                    getIdv(), properties);
+                            }
+                        });
                         loadDialog.addDisplayControl(displayControl);
                         if ( !loadDialog.okToRun()) {
                             return;
@@ -3820,5 +3832,4 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
 
 }
-
 
