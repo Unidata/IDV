@@ -2886,6 +2886,9 @@ Misc.run(new Runnable() {
         if (dataManager != null) {
             dataManager.initEncoder(encoder, forRead);
         }
+        //For now put this here
+        encoder.registerNewClassName("ucar.unidata.repository.InteractiveRepositoryClient",
+                                     "ucar.unidata.repository.client.InteractiveRepositoryClient");
         VisADPersistence.init(encoder);
         initEncoder(encoder, forRead);
         return encoder;
