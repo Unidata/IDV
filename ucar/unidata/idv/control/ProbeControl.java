@@ -759,8 +759,8 @@ public class ProbeControl extends DisplayControlImpl {
     }
 
     /**
-     * Reset the data. 
-     * 
+     * Reset the data.
+     *
      * @param clearCache If true then clear the cached data in the rows
      *
      * @throws RemoteException  Java RMI error
@@ -914,10 +914,14 @@ public class ProbeControl extends DisplayControlImpl {
                 Set set = GridUtil.getTimeSet((FieldImpl) data);*/
                 Set set = info.getTimeSet();
                 if (set != null) {
-                    if (newSet == null) {
-                        newSet = set;
-                    } else {
-                        newSet = newSet.merge1DSets(set);
+                    RealTupleType setType =
+                        ((SetType) set.getType()).getDomain();
+                    if (setType.equals(RealTupleType.Time1DTuple)) {
+                        if (newSet == null) {
+                            newSet = set;
+                        } else {
+                            newSet = newSet.merge1DSets(set);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -1119,8 +1123,9 @@ public class ProbeControl extends DisplayControlImpl {
                                 name }));
                     }
                     if (subItems.size() > 0) {
-                        paramMenu.add(GuiUtils.makeMenu("Select Point Parameter",
-                                subItems));
+                        paramMenu.add(
+                            GuiUtils.makeMenu(
+                                "Select Point Parameter", subItems));
                     }
                 }
             } catch (Exception exc) {
@@ -1362,7 +1367,7 @@ public class ProbeControl extends DisplayControlImpl {
                 ProbeRowInfo rowInfo = getRowInfo(row);
 
                 if ( !SwingUtilities.isRightMouseButton(e)) {
-                    if(e.getClickCount()>1 && rowInfo!=null) {
+                    if ((e.getClickCount() > 1) && (rowInfo != null)) {
                         showLineProperties(rowInfo);
                     }
                     return;
@@ -1373,7 +1378,7 @@ public class ProbeControl extends DisplayControlImpl {
                 JMenuItem  jmi       = doMakeChangeParameterMenuItem();
                 popupMenu.add(jmi);
                 popupMenu.addSeparator();
-                
+
                 for (int rowIdx = 0; rowIdx < infos.size(); rowIdx++) {
                     List items = getParameterMenuItems(rowIdx);
                     GuiUtils.makePopupMenu(popupMenu, items);
@@ -1667,9 +1672,8 @@ public class ProbeControl extends DisplayControlImpl {
         ProbeRowInfo rowInfo = getRowInfo(row);
         if (rowInfo.isPoint()) {
             String stationName = rowInfo.getStationName();
-            if(stationName!=null && stationName.length()>0) {
-                return rowInfo.getPointParameter() + "@"
-                    + stationName;
+            if ((stationName != null) && (stationName.length() > 0)) {
+                return rowInfo.getPointParameter() + "@" + stationName;
             }
             return rowInfo.getPointParameter();
         }
@@ -2476,8 +2480,8 @@ public class ProbeControl extends DisplayControlImpl {
     public void exportCsvAllTimes() {
         try {
             Animation animation = getInternalAnimation();
-            Set    aniSet = animation.getSet();
-            Real[] times  = Animation.getDateTimeArray(aniSet);
+            Set       aniSet    = animation.getSet();
+            Real[]    times     = Animation.getDateTimeArray(aniSet);
             exportToCsv(times);
             paramsTable.repaint();
         } catch (Exception exc) {
