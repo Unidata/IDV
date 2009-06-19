@@ -325,7 +325,10 @@ public class XmlEncoder extends XmlUtil {
     /**
      *  A mapping from an old (perhaps no longer in existence) class name to the new Class that handles it.
      */
-    private Hashtable classNameToClass = new Hashtable();
+    private Hashtable<String,Class> classNameToClass = new Hashtable<String,Class>();
+
+
+    private Hashtable<String,String> newClassNames = new Hashtable<String,String>();
 
 
     /**
@@ -1059,6 +1062,12 @@ public class XmlEncoder extends XmlUtil {
         classNameToClass.put(theName, theClass);
     }
 
+
+    public void registerNewClassName(String oldName, String newName) {
+        newClassNames.put(oldName, newName);
+    }
+
+
     /**
      *  Find the Class that corresponds to the given className. Lookup in the classNameToClass table
      *  to see if we have a different Class. If not then just used Class.forName (className);
@@ -1073,6 +1082,13 @@ public class XmlEncoder extends XmlUtil {
         if (type != null) {
             return type;
         }
+
+        String newClassName = newClassNames.get(className);
+        if(newClassName!=null) {
+            className = newClassName;
+        }
+
+
         type = (Class) classNameToClass.get(className);
         if (type != null) {
             return type;
