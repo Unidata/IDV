@@ -194,8 +194,7 @@ public class MetadataElement extends MetadataTypeBase {
             List<String> tmpValues = null;
             if (values.startsWith("file:")) {
                 String tagValues =
-                    IOUtil.readContents(values.substring(5),
-                                        MetadataType.class);
+                    getStorageManager().readSystemResource(values.substring(5));
                 tmpValues =
                     (List<String>) StringUtil.split(tagValues, "\n",
                                                     true, true);
@@ -426,7 +425,7 @@ public class MetadataElement extends MetadataTypeBase {
             URL              fromUrl    = new URL(url);
             URLConnection    connection = fromUrl.openConnection();
             InputStream      fromStream = connection.getInputStream();
-            FileOutputStream toStream   = new FileOutputStream(tmpFile);
+            FileOutputStream toStream   = getStorageManager().getFileOutputStream(tmpFile);
             try {
                 int bytes = IOUtil.writeTo(fromStream, toStream);
                 if (bytes < 0) {

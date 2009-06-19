@@ -55,8 +55,6 @@
       <api request="/message"                method="processMessage"    cancache="false" />
       <api request="/dummy"                  method="processDummy"/>
       <api request="/install"                method="processDummy"/>
-      <api request="/test/file"              method="processTestFile"/>
-      <api request="/test/filerotate"        method="processTestFileRotate"/>
       <api request="/test/memory"            method="processTestMemory"/>
   </group>
 

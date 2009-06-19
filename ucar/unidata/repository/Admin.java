@@ -304,7 +304,7 @@ public class Admin extends RepositoryManager {
      */
     private void getErrorLog(Request request, StringBuffer sb, File logFile)
             throws Exception {
-        FileInputStream fis      = new FileInputStream(logFile);
+        FileInputStream fis      = getStorageManager().getFileInputStream(logFile);
         String          log      = request.getString(ARG_LOG, "error");
         int             numBytes = request.get(ARG_BYTES, 10000);
         if (numBytes < 0) {
@@ -456,9 +456,7 @@ public class Admin extends RepositoryManager {
      */
     private StringBuffer getLicenseForm() throws Exception {
         StringBuffer sb = new StringBuffer();
-        String license =
-            IOUtil.readContents(
-                "/ucar/unidata/repository/resources/license.txt", getClass());
+        String license = getStorageManager().readSystemResource("/ucar/unidata/repository/resources/license.txt");
         sb.append(HtmlUtil.textArea("", license, 20, 50));
         sb.append("<p>");
         sb.append(HtmlUtil.checkbox("agree", "1"));
@@ -1627,7 +1625,7 @@ public class Admin extends RepositoryManager {
         String  sqlFile  = request.getUploadedFile(ARG_SQLFILE);
         if ((sqlFile != null) && (sqlFile.length() > 0)
                 && new File(sqlFile).exists()) {
-            query = IOUtil.readContents(sqlFile, getClass());
+            query = getStorageManager().readSystemResource(sqlFile);
             if ((query != null) && (query.trim().length() > 0)) {
                 bulkLoad = true;
             }
@@ -1636,8 +1634,7 @@ public class Admin extends RepositoryManager {
             query = (String) request.getUnsafeString(ARG_QUERY,
                     (String) null);
             if ((query != null) && query.trim().startsWith("file:")) {
-                query = IOUtil.readContents(query.trim().substring(5),
-                                            getClass());
+                query = getStorageManager().readSystemResource(query.trim().substring(5));
                 bulkLoad = true;
             }
         }

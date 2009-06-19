@@ -1027,7 +1027,7 @@ public class DataOutputHandler extends OutputHandler {
                     }
                 } else {
                     return new Result(entry.getName() + ".nc",
-                                      new FileInputStream(f),
+                                      getStorageManager().getFileInputStream(f),
                                       "application/x-netcdf");
                 }
             }
@@ -1887,7 +1887,7 @@ public class DataOutputHandler extends OutputHandler {
                             getRepository().getStorageManager().getEntryDir(
                                 metadata.getEntryId(),
                                 false), metadata.getAttr1()));
-                String ncml = IOUtil.readContents(templateNcmlFile);
+                String ncml = getStorageManager().readSystemResource(templateNcmlFile);
                 ncml = ncml.replace("${location}", location);
                 System.err.println("ncml:" + ncml);
                 File ncmlFile =

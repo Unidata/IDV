@@ -189,7 +189,7 @@ public class FtpAction extends MonitorAction {
             String filename = monitor.getRepository().getEntryManager().replaceMacros(
                                                                          entry, fileTemplate);
 
-            InputStream is = new BufferedInputStream(new FileInputStream(new File(resource.getPath())));
+            InputStream is = new BufferedInputStream(monitor.getRepository().getStorageManager().getFileInputStream(new File(resource.getPath())));
             boolean ok = ftpClient.storeUniqueFile(filename, is);
             is.close();
             if(ok) {

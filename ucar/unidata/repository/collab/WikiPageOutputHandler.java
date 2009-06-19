@@ -366,21 +366,6 @@ public class WikiPageOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        String       s1 = IOUtil.readContents(new java.io.File(args[0]));
-        String       s2 = IOUtil.readContents(new java.io.File(args[1]));
-        StringBuffer sb = new StringBuffer();
-
-        sb.append("<html>");
-        sb.append(
-            "<link rel=\"stylesheet\" href=\"style.css\" type=\"text/css\">");
-        sb.append("<table width=100% border=0 cellspacing=5 xcellpadding=4>");
-        //        sb.append(HtmlUtil.row( HtmlUtil.cols(lbl1,lbl2)));
-
-        getDiff(s1, s2, sb);
-        sb.append("</table>");
-        System.out.println(sb);
-
-
     }
 
 

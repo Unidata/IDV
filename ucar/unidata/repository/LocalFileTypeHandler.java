@@ -140,7 +140,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
             throw new IllegalArgumentException("Bad file path:" + subPath);
         }
 
-        getRepository().checkLocalFile(file);
+        getStorageManager().checkLocalFile(file);
 
         return file;
     }
@@ -208,7 +208,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                 "Could not find entry: " + rootDir);
         }
         String rootDirPath = rootDir.toString();
-        getRepository().checkLocalFile(rootDir);
+        getStorageManager().checkLocalFile(rootDir);
 
         File   childPath   = getFileFromId(synthId, rootDir);
         File[] files       = childPath.listFiles();

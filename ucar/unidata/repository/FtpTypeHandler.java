@@ -200,7 +200,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
 
                 //                System.err.println("Fetching:" + path);
                 //                System.err.println("writing to:" + cacheFile);
-                OutputStream fos = new FileOutputStream(cacheFile);
+                OutputStream fos = getStorageManager().getFileOutputStream(cacheFile);
                 if (ftpClient.retrieveFile(path, fos)) {
                     fos.flush();
                     fos.close();
@@ -316,7 +316,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
                             try {
                                 InputStream fis = ftpClient.retrieveFileStream(path + "/" + files[i].getName());
                                 if(fis!=null) {
-                                    String desc = HtmlUtil.entityEncode(IOUtil.readContents(fis));
+                                    String desc = HtmlUtil.entityEncode(IOUtil.readInputStream(fis));
                                     parentEntry.setDescription("<pre>"+desc+"</pre>");
                                     fis.close();
                                     ftpClient.completePendingCommand();

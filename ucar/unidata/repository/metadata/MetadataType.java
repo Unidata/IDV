@@ -44,7 +44,7 @@ import java.awt.Image;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+
 import java.io.InputStream;
 
 import java.net.URL;
@@ -459,7 +459,7 @@ public class MetadataType extends MetadataTypeBase {
         }
 
         Result result = new Result("thumbnail",
-                                   IOUtil.readBytes(new FileInputStream(f),
+                                   IOUtil.readBytes(getStorageManager().getFileInputStream(f),
                                        null, true), mimeType);
         result.setShouldDecorate(false);
         return result;

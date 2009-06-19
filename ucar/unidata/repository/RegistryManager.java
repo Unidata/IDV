@@ -162,7 +162,7 @@ public class RegistryManager extends RepositoryManager {
                                                              RESPONSE_XML }));
 
                 try {
-                    String contents = IOUtil.readContents(fullUrl.toString(), getClass());
+                    String contents = getStorageManager().readSystemResource(fullUrl.toString());
                     Element root = XmlUtil.getRoot(contents);
                     if(!responseOk(root)) {
                         sb.append(getRepository().error("Failed to read information from:" + fullUrl));
@@ -687,22 +687,22 @@ public class RegistryManager extends RepositoryManager {
      *
      * @param url _more_
      */
-    public void registerWithServer(String url) {
+    public void registerWithServer(String url) throws Exception {
         ServerInfo serverInfo = getRepository().getServerInfo();
         url = url + getRepository().URL_REGISTRY_ADD.getPath();
-        url = HtmlUtil.url(url, ARG_REGISTRY_CLIENT, serverInfo.getUrl());
+        URL theUrl = new URL(HtmlUtil.url(url, ARG_REGISTRY_CLIENT, serverInfo.getUrl()));
         try {
-            String  contents = IOUtil.readContents(url, getClass());
+            String  contents = getStorageManager().readSystemResource(theUrl);
             Element root     = XmlUtil.getRoot(contents);
             if ( !responseOk(root)) {
-                logInfo("registerWithServer: Failed to register with:" + url);
+                logInfo("registerWithServer: Failed to register with:" + theUrl);
                 //                logInfo(XmlUtil.getChildText(root).trim());
             } else {
-                logInfo("registerWithServer: Registered with:" + url);
+                logInfo("registerWithServer: Registered with:" + theUrl);
             }
 
         } catch (Exception exc) {
-            logError("Error registering with:" + url, exc);
+            logError("Error registering with:" + theUrl, exc);
         }
     }
 
@@ -799,7 +799,7 @@ public class RegistryManager extends RepositoryManager {
     private void fetchRemoteServers(String serverUrl) throws Exception {
         serverUrl = serverUrl + getRepository().URL_REGISTRY_LIST.getPath();
         serverUrl = HtmlUtil.url(serverUrl, ARG_RESPONSE, RESPONSE_XML);
-        String  contents = IOUtil.readContents(serverUrl, getClass());
+        String  contents = getStorageManager().readSystemResource(new URL(serverUrl));
         Element root     = XmlUtil.getRoot(contents);
 
         if ( !responseOk(root)) {
@@ -872,7 +872,7 @@ public class RegistryManager extends RepositoryManager {
                     getRepository().getServerInfo().getUrl() });
 
         try {
-            String  contents = IOUtil.readContents(serverUrl, getClass());
+            String  contents = getStorageManager().readSystemResource(new URL(serverUrl));
             Element root     = XmlUtil.getRoot(contents);
             if (responseOk(root)) {
                 ServerInfo clientServer = new ServerInfo(root);

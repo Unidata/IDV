@@ -859,7 +859,7 @@ return new Result(title, sb);
                     throw new IllegalArgumentException(
                         "Only administrators can add a local file");
                 }
-                getRepository().checkLocalFile(new File(filename));
+                getStorageManager().checkLocalFile(new File(filename));
                 isLocalFile = true;
             }
 
@@ -910,7 +910,7 @@ return new Result(title, sb);
                                 msg("Downloading") + " " + length + " "
                                 + msg("bytes"));
                     }
-                    FileOutputStream toStream = new FileOutputStream(newFile);
+                    FileOutputStream toStream = getStorageManager().getFileOutputStream(newFile);
                     try {
                         int bytes = IOUtil.writeTo(fromStream, toStream,
                                         actionId, length);
@@ -946,7 +946,7 @@ return new Result(title, sb);
             } else {
                 Hashtable<String,Group>  nameToGroup = new Hashtable<String,Group>();
                 ZipInputStream zin =
-                    new ZipInputStream(new FileInputStream(resource));
+                    new ZipInputStream(getStorageManager().getFileInputStream(resource));
                 ZipEntry ze = null;
                 while ((ze = zin.getNextEntry()) != null) {
                     if (ze.isDirectory()) {
@@ -976,7 +976,7 @@ return new Result(title, sb);
                     }
                     File f = getStorageManager().getTmpFile(request, name);
                     RepositoryUtil.checkFilePath(f.toString());
-                    FileOutputStream fos = new FileOutputStream(f);
+                    FileOutputStream fos = getStorageManager().getFileOutputStream(f);
                     IOUtil.writeTo(zin, fos);
                     fos.close();
                     parents.add(parent);
@@ -2036,7 +2036,7 @@ return new Result(title, sb);
                 ImageUtils.waitOnImage(image);
                 ImageUtils.writeImageToFile(image, thumb);
             }
-            return new Result(BLANK, new FileInputStream(thumb), mimeType);
+            return new Result(BLANK, getStorageManager().getFileInputStream(thumb), mimeType);
         } else {
 
 
@@ -2048,7 +2048,7 @@ return new Result(title, sb);
                 return result;
             }
 
-            InputStream inputStream = new FileInputStream(file);
+            InputStream inputStream = getStorageManager().getFileInputStream(file);
             Result      result      = new Result(BLANK, inputStream,
                                           mimeType);
             result.addHttpHeader(HtmlUtil.HTTP_CONTENT_LENGTH, "" + length);
@@ -2634,7 +2634,7 @@ return new Result(title, sb);
         Hashtable origFileToStorage = new Hashtable();
         //        System.err.println ("\nprocessing");
         try {
-            InputStream fis = new FileInputStream(file);
+            InputStream fis = getStorageManager().getFileInputStream(file);
             if (file.endsWith(".zip")) {
                 ZipInputStream zin = new ZipInputStream(fis);
                 ZipEntry       ze;
@@ -2649,7 +2649,7 @@ return new Result(title, sb);
                             IOUtil.getFileTail(ze.getName().toLowerCase());
                         File f = getStorageManager().getTmpFile(request,
                                      name);
-                        FileOutputStream fos = new FileOutputStream(f);
+                        FileOutputStream fos = getStorageManager().getFileOutputStream(f);
                         IOUtil.writeTo(zin, fos);
                         fos.close();
                         //                    System.err.println ("orig file:" + ze.getName() + " tmp file:" + f);
@@ -2663,7 +2663,7 @@ return new Result(title, sb);
             }
 
             if (entriesXml == null) {
-                entriesXml = IOUtil.readContents(fis);
+                entriesXml = IOUtil.readInputStream(fis);
             }
             fis.close();
 
@@ -4152,8 +4152,26 @@ return new Result(title, sb);
             server
             + getRepository().URL_ENTRY_SHOW.getPath();
         remoteUrl = HtmlUtil.url(remoteUrl, ARG_ENTRYID, id, ARG_OUTPUT,XmlOutputHandler.OUTPUT_XMLENTRY);
-        String entriesXml = IOUtil.readContents(remoteUrl, getClass());
+        String entriesXml = getStorageManager().readSystemResource(remoteUrl);
         return null;
+    }
+
+
+    private void checkEntryFileTime(Entry entry) throws Exception {
+        if(!entry.isFile()) return;
+        File f = entry.getResource().getTheFile();
+        if(f ==null || !f.exists()) return;
+        long fileTime = f.lastModified();
+        if(fileTime == entry.getCreateDate()) return;
+        boolean dateRangeSame = (fileTime == entry.getStartDate() &&
+                                 fileTime == entry.getEndDate());
+        entry.setCreateDate(fileTime);
+        if(dateRangeSame) {
+            entry.setStartDate(fileTime);
+            entry.setEndDate(fileTime);
+        }
+        updateEntry(entry);
+        
     }
 
 
@@ -4526,6 +4544,18 @@ return new Result(title, sb);
     }
 
 
+    private void updateEntry(Entry entry) throws Exception {
+        Connection connection = getDatabaseManager().getConnection();
+        PreparedStatement entryStmt   = connection.prepareStatement(
+                                                                    Tables.ENTRIES.UPDATE);
+        setStatement(entry, entryStmt, false, entry.getTypeHandler());
+        entryStmt.addBatch();
+        entryStmt.executeBatch();
+        entryStmt.close();
+        getDatabaseManager().releaseConnection(connection);
+    }
+
+
     /**
      * _more_
      *
@@ -4669,6 +4699,9 @@ return new Result(title, sb);
                 //                 + "/second");
             }
         }
+
+
+
 
 
         entryStmt.close();
@@ -5271,7 +5304,7 @@ return new Result(title, sb);
      */
     public Entry parseEntryXml(File xmlFile, boolean internal)
             throws Exception {
-        Element root = XmlUtil.getRoot(IOUtil.readContents(xmlFile));
+        Element root = XmlUtil.getRoot(getStorageManager().readSystemResource(xmlFile));
         return processEntryXml(
             new Request(getRepository(), getUserManager().getDefaultUser()),
             root, new Hashtable(), new Hashtable(), false, internal);

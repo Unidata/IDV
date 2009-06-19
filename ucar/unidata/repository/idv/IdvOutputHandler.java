@@ -35,6 +35,8 @@ import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.idv.IdvServer;
 
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.data.*;
+
 import ucar.unidata.ui.ImageUtils;
 
 import ucar.unidata.util.CacheManager;
@@ -298,7 +300,7 @@ public class IdvOutputHandler extends OutputHandler {
                                              "preview_" + id.replace("/","_")
                                              + ".gif");
         if (image.exists()) {
-            return new Result("preview.gif", new FileInputStream(image),
+            return new Result("preview.gif", getStorageManager().getFileInputStream(image),
                               "image/gif");
         }
 
@@ -356,7 +358,7 @@ public class IdvOutputHandler extends OutputHandler {
         isl.append("</isl>\n");
         //        System.out.println(isl);
         idvServer.evaluateIsl(isl);
-        return new Result("preview.png", new FileInputStream(image),
+        return new Result("preview.png", getStorageManager().getFileInputStream(image),
                           "image/png");
     }
 

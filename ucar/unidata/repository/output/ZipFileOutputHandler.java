@@ -157,7 +157,7 @@ public class ZipFileOutputHandler extends OutputHandler {
         StringBuffer sb = new StringBuffer();
 
         ZipInputStream zin =
-            new ZipInputStream(new FileInputStream(entry.getResource().getPath()));
+            new ZipInputStream(getStorageManager().getFileInputStream(entry.getResource().getPath()));
         ZipEntry ze = null;
         sb.append("<ul>");
         String fileToFetch = request.getString(ARG_FILE,null);

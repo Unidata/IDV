@@ -294,8 +294,7 @@ public class MetadataTypeBase extends RepositoryManager {
                                                            ATTR_TYPE);
                 if(XmlUtil.hasAttribute(childNode, ATTR_FILE)) {
                     templates.put(templateType, 
-                                  IOUtil.readContents(XmlUtil.getAttribute(childNode,ATTR_FILE),
-                                                      MetadataTypeBase.class));
+                                  getStorageManager().readSystemResource(XmlUtil.getAttribute(childNode,ATTR_FILE)));
                 } else {
                     templates.put(templateType, XmlUtil.getChildText(childNode));
                 }

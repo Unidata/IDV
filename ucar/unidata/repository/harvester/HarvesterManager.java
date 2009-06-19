@@ -223,8 +223,7 @@ public class HarvesterManager extends RepositoryManager {
         for (Harvester harvester : harvesters) {
             File rootDir = harvester.getRootDir();
             if (rootDir != null) {
-                getStorageManager().addDownloadPrefix(
-                    rootDir.toString().replace("\\", "/") + "/");
+                getStorageManager().addDownloadDirectory(rootDir);
             }
             if ( !okToStart) {
                 harvester.setActive(false);
@@ -258,7 +257,7 @@ public class HarvesterManager extends RepositoryManager {
                     request, msg("New Harvester"),
                     new StringBuffer("You must specify a file"));
             }
-            String xml = IOUtil.readContents(file, getClass());
+            String xml = getStorageManager().readSystemResource(file);
             List<Harvester> harvesters =
                 Harvester.createHarvesters(getRepository(),
                                            XmlUtil.getRoot(xml));
@@ -597,7 +596,7 @@ public class HarvesterManager extends RepositoryManager {
         String          filepath    = request.getUnsafeString(ARG_FILE,
                                           BLANK);
         //Check to  make sure we can access this file
-        if ( !getStorageManager().isInDownloadArea(filepath)) {
+        if ( !getStorageManager().isInDownloadArea(new File(filepath))) {
             return new Result(BLANK,
                               new StringBuffer("Cannot load file:"
                                   + filepath), "text/plain");
@@ -613,6 +612,8 @@ public class HarvesterManager extends RepositoryManager {
         return new Result(BLANK, new StringBuffer("Could not create entry"),
                           "text/plain");
     }
+
+
 
 
 

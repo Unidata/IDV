@@ -647,7 +647,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         properties = new Properties();
         properties.load(
-            IOUtil.getInputStream(
+                        IOUtil.getInputStream(
                 "/ucar/unidata/repository/resources/repository.properties",
                 getClass()));
 
@@ -776,7 +776,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         initSchema();
 
         for (String sqlFile : (List<String>) loadFiles) {
-            String     sql        = IOUtil.readContents(sqlFile, getClass());
+            String     sql        = getStorageManager().readUncheckedSystemResource(sqlFile);
             Connection connection = getDatabaseManager().getNewConnection();
             connection.setAutoCommit(false);
             Statement statement = connection.createStatement();
@@ -1229,8 +1229,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 if ( !path.endsWith(".pack")) {
                     continue;
                 }
-                String content = IOUtil.readContents(path, getClass(),
-                                     (String) null);
+                String content = getStorageManager().readUncheckedSystemResource(path, (String) null);
                 if (content == null) {
                     continue;
                 }
@@ -2354,9 +2353,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
             //Make sure no one is trying to access other files
             RepositoryUtil.checkFilePath(fullPath);
             try {
-                InputStream is = IOUtil.getInputStream(fullPath, getClass());
+                InputStream is = getStorageManager().getInputStream(fullPath);
                 if (path.endsWith(".js") || path.endsWith(".css")) {
-                    String js = IOUtil.readContents(is);
+                    String js = IOUtil.readInputStream(is);
                     js = js.replace("${urlroot}", getUrlBase());
                     //                    js = js.replace("${fullurlroot}", "http://" + getHostname()+":" + getPort()+getUrlBase());
                     is = new ByteArrayInputStream(js.getBytes());
@@ -2452,8 +2451,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 if (template.startsWith("file:")) {
                     template =
                         getStorageManager().localizePath(template.trim());
-                    template = IOUtil.readContents(
-                        template.substring("file:".length()), getClass());
+                    template = getStorageManager().readSystemResource(
+                                                                      template.substring("file:".length()));
                 }
                 if (template.indexOf("${content}") < 0) {
                     template = null;
@@ -2780,7 +2779,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         "%resourcedir%/template.html"), ";", true, true)) {
                 path = getStorageManager().localizePath(path);
                 try {
-                    String resource = IOUtil.readContents(path, getClass());
+                    String resource = getStorageManager().readSystemResource(path);
                     HtmlTemplate template = new HtmlTemplate(this, path,
                                                 resource);
                     theTemplates.add(template);
@@ -3025,8 +3024,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     protected void initSchema() throws Exception {
         //Force a connection
         getDatabaseManager().init();
-        String sql = IOUtil.readContents(getProperty(PROP_DB_SCRIPT),
-                                         getClass());
+        String sql = getStorageManager().readUncheckedSystemResource(getProperty(PROP_DB_SCRIPT));
         sql = getDatabaseManager().convertSql(sql);
 
         Statement statement = getDatabaseManager().createStatement();
@@ -3479,46 +3477,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_          */
     Object MUTEX = new Object();
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processTestFileRotate(Request request) throws Exception {
-        File file = null;
-        synchronized (MUTEX) {
-            fileCnt++;
-            file = new File("/home/jeffmc/test/test" + fileCnt);
-            if ( !file.exists()) {
-                fileCnt = 0;
-                file    = new File("/home/jeffmc/test/test" + fileCnt);
-            }
-        }
-        return new Result(BLANK,
-                          new BufferedInputStream(new FileInputStream(file)),
-                          "application/x-binary");
-    }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processTestFile(Request request) throws Exception {
-        File file = new File("/home/jeffmc/test/test0");
-        return new Result(BLANK,
-                          new BufferedInputStream(new FileInputStream(file)),
-                          "application/x-binary");
-    }
+
 
 
     /** _more_          */
@@ -3608,7 +3569,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         RepositoryUtil.checkFilePath(path);
         Result result = null;
         if (path.endsWith(".html")) {
-            String helpText = IOUtil.readContents(path);
+            String helpText = getStorageManager().readSystemResource(path);
             //            Pattern pattern  = Pattern.compile(".*<body>(.*)</body>.*");
 
             //Pull out the body if we can
@@ -3619,7 +3580,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             }
             result = new Result(BLANK, new StringBuffer(helpText));
         } else {
-            InputStream inputStream = IOUtil.getInputStream(path, getClass());
+            InputStream inputStream = getStorageManager().getInputStream(path);
             result = new Result(BLANK, inputStream,
                                 IOUtil.getFileExtension(path));
 
@@ -4190,7 +4151,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             List<String> paths = getResourcePaths(id);
             for (String path : paths) {
                 try {
-                    resource = IOUtil.readContents(path, getClass());
+                    resource = getStorageManager().readSystemResource(path);
                 } catch (Exception exc) {
                     //noop
                 }
@@ -4200,9 +4161,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             }
         } else {
             try {
-                resource =
-                    IOUtil.readContents(getStorageManager().localizePath(id),
-                                        getClass());
+                resource =getStorageManager().readSystemResource(getStorageManager().localizePath(id));
             } catch (Exception exc) {
                 if ( !ignoreErrors) {
                     throw exc;
@@ -4497,33 +4456,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
         return localFilePaths;
     }
 
-    /**
-     * _more_
-     *
-     * @param file _more_
-     *
-     * @throws Exception _more_
-     */
-    public void checkLocalFile(File file) throws Exception {
-        boolean ok = false;
-        for (File parent : getLocalFilePaths()) {
-            if (IOUtil.isADescendent(parent, file)) {
-                ok = true;
-                break;
-            }
-        }
-        if ( !ok) {
-            //            if (getLocalFilePaths().size() == 0) {
-            //                throw new IllegalArgumentException(
-            //                    "For security you must specify the allowable  file paths in the Administration screen");
-            //            }
-            throw new AccessException(
-                                      "The specified file is not under one of the allowable file system directories<br>These need to be set by the site administrator",null);
-            //            throw new IllegalArgumentException(
-            //                "The specified file is not under one of the allowable file system directories");
-        }
-    }
-
 
 
     /**
@@ -4651,7 +4583,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (names == null) {
             try {
                 names = new Properties();
-                InputStream s = IOUtil.getInputStream(namesFile, getClass());
+                InputStream s = getStorageManager().getInputStream(namesFile);
                 names.load(s);
                 namesHolder.put(namesFile, names);
             } catch (Exception exc) {

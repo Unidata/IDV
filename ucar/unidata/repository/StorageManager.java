@@ -158,13 +158,13 @@ public class StorageManager extends RepositoryManager {
     private String entriesDir;
 
     /** _more_ */
-    private String storageDir;
+    private File storageDir;
 
     /** _more_ */
     private TemporaryDir thumbDir;
 
     /** _more_ */
-    private List<String> downloadPrefixes = new ArrayList<String>();
+    private List<File> downloadDirs = new ArrayList<File>();
 
 
 
@@ -265,9 +265,10 @@ public class StorageManager extends RepositoryManager {
      *
      * @param prefix _more_
      */
-    public void addDownloadPrefix(String prefix) {
-        prefix = prefix.replace("\\", "/");
-        downloadPrefixes.add(prefix);
+    public void addDownloadDirectory(File dir) {
+        if(!downloadDirs.contains(dir)) {
+            downloadDirs.add(dir);
+        }
     }
 
 
@@ -518,11 +519,11 @@ public class StorageManager extends RepositoryManager {
      */
     public String getStorageDir() {
         if (storageDir == null) {
-            storageDir = IOUtil.joinDir(getRepositoryDir(), DIR_STORAGE);
-            IOUtil.makeDirRecursive(new File(storageDir));
-            addDownloadPrefix(storageDir);
+            storageDir = new File(IOUtil.joinDir(getRepositoryDir(), DIR_STORAGE));
+            IOUtil.makeDirRecursive(storageDir);
+            addDownloadDirectory(storageDir);
         }
-        return storageDir;
+        return storageDir.toString();
     }
 
     /**
@@ -758,7 +759,7 @@ public class StorageManager extends RepositoryManager {
      */
     public File copyToStorage(Request request, File original, String newName)
             throws Exception {
-        return copyToStorage(request, new FileInputStream(original), newName);
+        return copyToStorage(request, getFileInputStream(original), newName);
     }
 
     public File copyToStorage(Request request, InputStream original, String newName)
@@ -859,18 +860,29 @@ public class StorageManager extends RepositoryManager {
      */
     public boolean canDownload(Request request, Entry entry)
             throws Exception {
-        String filePath = entry.getResource().getPath();
-        filePath = filePath.replace("\\", "/");
+        Resource resource = entry.getResource();
+        if(!resource.isFile()) return false;
+        File file =resource.getTheFile();
+        String filePath = file.toString();
         RepositoryUtil.checkFilePath(filePath);
 
-        if (entry.getResource().isRemoteFile()) {
+        //This is for the FtpTypeHandler where it caches the file
+        if (resource.isRemoteFile()) {
             return true;
         }
 
-        if (entry.getIsLocalFile()) {
+        //Check if its in the storage dir or under of the harvester dirs
+        if(isInDownloadArea(file)) {
             return true;
         }
-        return isInDownloadArea(filePath);
+
+        //Check if its under one of the local file dirs defined by the admin
+        if(isLocalFileOk(file)) {
+            return true;
+        }
+
+
+        return false;
     }
 
 
@@ -910,18 +922,135 @@ public class StorageManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public boolean isInDownloadArea(String filePath) throws Exception {
+    public boolean isInDownloadArea(File file) throws Exception {
         //Force the creation of the storage dir
         getStorageDir();
-        filePath = filePath.replace("\\", "/");
-        for (String prefix : downloadPrefixes) {
-            if (filePath.startsWith(prefix)) {
+        for (File dir: downloadDirs) {
+            if (IOUtil.isADescendent(dir, file)) {
                 return true;
             }
         }
         return false;
     }
 
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @throws Exception _more_
+     */
+    public void checkLocalFile(File file) throws Exception {
+        if(!isLocalFileOk(file)) {
+            throw new AccessException(
+                                      "The specified file is not under one of the allowable file system directories<br>These need to be set by the site administrator",null);
+        }
+    }
+
+
+    public boolean isLocalFileOk(File file) throws Exception {
+        boolean ok = false;
+        for (File parent : getRepository().getLocalFilePaths()) {
+            if (IOUtil.isADescendent(parent, file)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+    public void checkFile(File file) throws Exception {
+        //check if its in an allowable area for access
+        if(isLocalFileOk(file)) return;
+        getStorageDir();
+        //Check if its in the storage dir
+        if (IOUtil.isADescendent(storageDir, file)) {
+            return;
+        }
+        throw new IllegalArgumentException(
+                                  "The specified file is not under one of the allowable file system directories",null);
+
+    }
+
+    /**
+     */
+    private void checkPath(String path) throws Exception {
+        //Path can be a file, a URL, a file URL or a system resource
+        File f  = new File(path);
+        if(f.exists()) {
+            checkFile(f);
+            return;
+        }
+
+        if(path.toLowerCase().trim().startsWith("file:")) {
+            f = new File(path.substring("file:".length()));
+            checkFile(f);
+            return;
+        }
+
+        //Should be ok here. Its either a url or a system resource
+    }
+
+
+
+    public String readUncheckedSystemResource(String path) throws Exception {
+        checkPath(path);
+        return IOUtil.readContents(
+                                   path, getClass());
+    }
+
+    public String readUncheckedSystemResource(String path, String dflt ) throws Exception{
+        checkPath(path);
+        return IOUtil.readContents(
+                                   path, getClass(),dflt);
+    }
+
+
+
+    public String readSystemResource(URL url) throws Exception{
+        checkPath(url.toString());
+        return IOUtil.readContents(url.toString(), getClass());
+    }
+
+
+    public String readSystemResource(File file) throws Exception{
+        checkFile(file);
+        return IOUtil.readContents(file);
+    }
+
+
+    public String readSystemResource(String path) throws Exception{
+        checkPath(path);
+        return IOUtil.readContents(
+                                   path, getClass());
+    }
+
+
+    public InputStream getInputStream(String path) throws Exception {
+        checkPath(path);
+        return  IOUtil.getInputStream(path, getClass());
+    }
+
+
+    public FileInputStream getFileInputStream(String path) throws Exception {
+        return getFileInputStream(new File(path));
+    }
+
+    public FileInputStream getFileInputStream(File file) throws Exception {
+        checkFile(file);
+        return new FileInputStream(file);
+    }
+
+    public FileOutputStream getFileOutputStream(File file) throws Exception {
+        checkFile(file);
+        return new FileOutputStream(file);
+    }
 
 
 

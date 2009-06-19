@@ -316,7 +316,7 @@ public class LdmListener {
      */
     private void writeToBuffer(File f) throws Exception {
         if (bufferOS == null) {
-            bufferOS = new FileOutputStream(bufferFile, true);
+            bufferOS = new  FileOutputStream(bufferFile, true);
         }
         String s = type + ":" + f + "\n";
         bufferOS.write(s.getBytes());
@@ -351,7 +351,7 @@ public class LdmListener {
                 URL           url        = new URL(urlString);
                 URLConnection connection = url.openConnection();
                 InputStream   s          = connection.getInputStream();
-                String        results    = IOUtil.readContents(s);
+                String        results    = IOUtil.readInputStream(s);
                 if ( !results.equals("OK")) {
                     addFile(f);
                     if (debug) {

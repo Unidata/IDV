@@ -265,8 +265,8 @@ public class Column implements Constants {
         if (type.equals(TYPE_ENUMERATION)) {
             String valueString = XmlUtil.getAttribute(element, ATTR_VALUES);
             if (valueString.startsWith("file:")) {
-                valueString = IOUtil.readContents(
-                    valueString.substring("file:".length()), getClass());
+                valueString = typeHandler.getStorageManager().readSystemResource(
+                                                                             valueString.substring("file:".length()));
                 values = StringUtil.split(valueString, "\n", true, true);
             } else {
                 values = StringUtil.split(valueString, ",", true, true);

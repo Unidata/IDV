@@ -192,7 +192,7 @@ StringBuffer head = new StringBuffer("<link type=\"text/css\" rel=\"stylesheet\"
 
 
 
-        String contents  = IOUtil.readContents(entry.getFile());
+        String contents  = getStorageManager().readSystemResource(entry.getFile());
         StringBuffer sb  = new StringBuffer();
         int          cnt = 0;
         sb.append("<pre>");
@@ -211,7 +211,7 @@ StringBuffer head = new StringBuffer("<link type=\"text/css\" rel=\"stylesheet\"
 
 
     public Result outputWordCloud(Request request, Entry entry) throws Exception {
-        String contents  = IOUtil.readContents(entry.getFile());
+        String contents  = getStorageManager().readSystemResource(entry.getFile());
         StringBuffer sb  = new StringBuffer();
 
         StringBuffer head = new StringBuffer();

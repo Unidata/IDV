@@ -166,7 +166,7 @@ public class IdvWebstartOutputHandler extends OutputHandler {
                                                      IOUtil.joinDir(
                                                                     getRepository().getStorageManager().getEntryDir(
                                                                                                                     metadata.getEntryId(), false), metadata.getAttr1()));
-                            embeddedBundle = IOUtil.readContents(xidvFile);
+                            embeddedBundle = getStorageManager().readSystemResource(xidvFile);
                             embeddedBundle = embeddedBundle.replace("${datasource}", opendapUrl);
                             embeddedBundle =  XmlUtil.encodeBase64(embeddedBundle.getBytes());
                             break;

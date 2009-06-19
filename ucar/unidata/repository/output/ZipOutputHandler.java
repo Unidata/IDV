@@ -239,7 +239,7 @@ public class ZipOutputHandler extends OutputHandler {
         } else {
             tmpFile =
                 getRepository().getStorageManager().getTmpFile(request, ".zip");
-            os  = new FileOutputStream(tmpFile);
+            os  = getStorageManager().getFileOutputStream(tmpFile);
             doingFile = true;
         }
 
@@ -257,7 +257,7 @@ public class ZipOutputHandler extends OutputHandler {
             }
             seen.put(name, name);
             zos.putNextEntry(new ZipEntry(name));
-            InputStream fileInputStream = new FileInputStream(path);
+            InputStream fileInputStream = getStorageManager().getFileInputStream(path);
             IOUtil.writeTo(fileInputStream,zos);
             fileInputStream.close();
             zos.closeEntry();
@@ -265,7 +265,7 @@ public class ZipOutputHandler extends OutputHandler {
         zos.close();
         if(doingFile) {
             os.close();
-            return new Result("", new FileInputStream(tmpFile),
+            return new Result("", getStorageManager().getFileInputStream(tmpFile),
                               getMimeType(OUTPUT_ZIP));
 
         }

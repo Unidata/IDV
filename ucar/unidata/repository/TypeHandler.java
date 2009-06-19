@@ -209,7 +209,7 @@ public class TypeHandler extends RepositoryManager {
     }
 
     public InputStream getResourceInputStream(Entry entry) throws Exception {
-        return new BufferedInputStream(new FileInputStream(getFile(entry)));
+        return new BufferedInputStream(getStorageManager().getFileInputStream(getFile(entry)));
     }
 
     /**
