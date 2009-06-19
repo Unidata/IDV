@@ -1640,6 +1640,23 @@ public class IOUtil {
     }
 
 
+
+    /**
+     * Read in the bytes from the given InputStream
+     * and construct and return a String.
+     * Closes the InputStream argument.
+     *
+     * @param is   InputStream to read from
+     * @return  contents as a String
+     *
+     * @throws IOException  problem reading contents
+     */
+
+    public static String readInputStream(InputStream is) throws IOException {
+        return new String(readBytes(is));
+    }
+
+
     /**
      * Read in the bytes from the given InputStream
      * Closes the InputStream argument.
