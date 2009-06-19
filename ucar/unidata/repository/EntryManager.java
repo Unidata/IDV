@@ -4147,6 +4147,7 @@ return new Result(title, sb);
     }
 
 
+
     public Entry getRemoteEntry(Request request, String server, String id) throws Exception {
         String remoteUrl =
             server

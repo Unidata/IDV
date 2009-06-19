@@ -5,7 +5,10 @@ file mkdir thredds
 cd thredds
 puts "Unjarring thredds.war"
 exec jar -xvf ../thredds.war
+
+
 cd WEB-INF/classes
+if {1} {
 ##exec rm -r org/apache/log4j
 foreach jar [glob ../lib/*.jar] {
     if {[regexp jfree $jar]} {
@@ -28,6 +31,15 @@ foreach file [glob *] {
     append files " "
     append files "\{[file tail $file]\}"
 }
+
+}
+
+puts [exec pwd]
+foreach f [glob  ../../../../ucar/unidata/util/DateUtil*class] {
+    puts "File:$f"
+    file copy -force $f ucar/unidata/util
+}
+
 
 set execLine "jar -cvf ../../../repositorytds.jar $files"
 eval exec $execLine

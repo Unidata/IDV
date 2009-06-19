@@ -674,12 +674,10 @@ public class EntryMonitor implements Constants {
             return false;
         }
 
-        System.err.println(getName() + " checking entry:" + entry.getName());
-
-
+        //        System.err.println(getName() + " checking entry:" + entry.getName());
 
         if ( !okToView(entry)) {
-            System.err.println("can't view");
+            //            System.err.println("can't view");
             return false;
         }
 
@@ -688,7 +686,7 @@ public class EntryMonitor implements Constants {
         for (Filter filter : filters) {
             boolean ok = checkEntry(filter, entry);
             if ( !ok) {
-                System.err.println("filter not OK");
+                //                System.err.println("filter not OK");
                 return false;
             }
         }

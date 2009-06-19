@@ -1333,7 +1333,10 @@ public class Request implements Constants {
             }
             toDate = "now";
         }
-        return DateUtil.getDateRange(fromDate, toDate, dflt);
+
+        Date[] range = DateUtil.getDateRange(fromDate, toDate, dflt);
+        //        System.err.println("dateRange:" + fromDate + " date:" + range[0]);
+        return range;
     }
 
 

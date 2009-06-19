@@ -511,7 +511,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
         }
 
 
-        System.err.println("getFileFromId path=" + path);
+        //        System.err.println("getFileFromId path=" + path);
         try {
             boolean isDir = ftpClient.changeWorkingDirectory(path);
             if (isDir) {
