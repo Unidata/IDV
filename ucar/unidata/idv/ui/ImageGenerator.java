@@ -2156,9 +2156,9 @@ public class ImageGenerator extends IdvManager {
     protected boolean processTagIsl(Element node) throws Throwable {
         debug = applyMacros(node, ATTR_DEBUG, false);
         boolean offScreen = applyMacros(node, ATTR_OFFSCREEN, true);
-        System.err.println ("offscreen:" + offScreen);
+        //        System.err.println ("offscreen:" + offScreen);
         if ( !getIdv().getArgsManager().getIslInteractive()) {
-            System.err.println ("setting offscreen:" + offScreen);
+            //            System.err.println ("setting offscreen:" + offScreen);
             getIdv().getArgsManager().setIsOffScreen(offScreen);
         }
         putProperty(PROP_OFFSCREEN,
