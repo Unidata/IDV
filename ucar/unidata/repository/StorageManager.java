@@ -1037,7 +1037,6 @@ public class StorageManager extends RepositoryManager {
         return  IOUtil.getInputStream(path, getClass());
     }
 
-
     public FileInputStream getFileInputStream(String path) throws Exception {
         return getFileInputStream(new File(path));
     }
@@ -1048,6 +1047,12 @@ public class StorageManager extends RepositoryManager {
     }
 
     public FileOutputStream getFileOutputStream(File file) throws Exception {
+        getStorageDir();
+        //Check if its in the storage dir
+        if (!IOUtil.isADescendent(storageDir, file)) {
+            throw new IllegalArgumentException("Bad file");
+        }
+
         checkFile(file);
         return new FileOutputStream(file);
     }

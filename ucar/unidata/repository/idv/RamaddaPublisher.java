@@ -36,7 +36,7 @@ import ucar.unidata.idv.*;
 
 import ucar.unidata.idv.publish.IdvPublisher;
 
-import ucar.unidata.repository.client.InteractiveRepositoryClient;
+import ucar.unidata.repository.InteractiveRepositoryClient;
 
 import ucar.unidata.ui.DateTimePicker;
 import ucar.unidata.ui.HttpFormEntry;
