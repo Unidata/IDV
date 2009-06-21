@@ -345,12 +345,10 @@ public class CatalogHarvester extends Harvester {
                 String tail    = IOUtil.getFileTail(urlPath);
                 File   newFile = getStorageManager().getTmpFile(null, tail);
                 try {
-                    RepositoryUtil.checkFilePath(newFile.toString());
                     URL              fromUrl    = new URL(urlPath);
                     URLConnection    connection = fromUrl.openConnection();
                     InputStream      fromStream = connection.getInputStream();
-                    FileOutputStream toStream = new FileOutputStream(newFile);
-                    //                    System.err.println("writing to " + newFile);
+                    OutputStream toStream = getStorageManager().getFileOutputStream(newFile);
                     int bytes = IOUtil.writeTo(fromStream, toStream);
                     toStream.close();
                     fromStream.close();

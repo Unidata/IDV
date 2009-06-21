@@ -447,18 +447,22 @@ public class RepositoryServlet extends HttpServlet {
             }
 
 
-            try {
-                RepositoryUtil.checkFilePath(fileName);
-            } catch (Exception e) {
-                logException(e, request);
-                return;
-            }
             String contentType = item.getContentType();
             File uploadedFile =
                 new File(
                     IOUtil.joinDir(
                         repository.getStorageManager().getUploadDir(),
                         repository.getGUID() + StorageManager.FILE_SEPARATOR + fileName));
+
+            try {
+                //Check to make sure its safe
+                uploadedFile = repository.getStorageManager().checkWriteFile(uploadedFile);
+            } catch (Exception e) {
+                logException(e, request);
+                return;
+            }
+
+
             try {
                 item.write(uploadedFile);
             } catch (Exception e) {

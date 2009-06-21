@@ -37,9 +37,9 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
 import java.io.File;
-import java.io.FileOutputStream;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import java.net.URL;
 import java.net.URLConnection;
@@ -75,6 +75,9 @@ public class MetadataElement extends MetadataTypeBase {
 
     /** _more_ */
     public static final String TYPE_BOOLEAN = "boolean";
+
+    /** _more_ */
+    public static final String TYPE_INT = "int";
 
     /** _more_ */
     public static final String TYPE_ENUMERATION = "enumeration";
@@ -421,11 +424,10 @@ public class MetadataElement extends MetadataTypeBase {
             File tmpFile =
                 getStorageManager().getTmpFile(request,
                     tail);
-            RepositoryUtil.checkFilePath(tmpFile.toString());
             URL              fromUrl    = new URL(url);
             URLConnection    connection = fromUrl.openConnection();
             InputStream      fromStream = connection.getInputStream();
-            FileOutputStream toStream   = getStorageManager().getFileOutputStream(tmpFile);
+            OutputStream toStream   = getStorageManager().getFileOutputStream(tmpFile);
             try {
                 int bytes = IOUtil.writeTo(fromStream, toStream);
                 if (bytes < 0) {
@@ -440,6 +442,7 @@ public class MetadataElement extends MetadataTypeBase {
                     toStream.close();
                     fromStream.close();
                 } catch (Exception exc) {}
+
             }
             theFile = tmpFile.toString();
         } else {
@@ -509,6 +512,8 @@ public class MetadataElement extends MetadataTypeBase {
                                       "" + columns));
         } else if (dataType.equals(TYPE_BOOLEAN)) {
             return HtmlUtil.checkbox(arg, "true", Misc.equals(value, "true"));
+        } else if (dataType.equals(TYPE_INT)) {
+            return HtmlUtil.input(arg,value,HtmlUtil.SIZE_10);
         } else if (dataType.equals(TYPE_ENUMERATION)) {
             return HtmlUtil.select(arg, values, value);
         } else if (dataType.equals(TYPE_ENUMERATIONPLUS)) {

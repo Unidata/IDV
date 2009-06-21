@@ -233,7 +233,6 @@ public class ImageOutputHandler extends OutputHandler {
             }
         }
 
-
         int    col        = 0;
         String firstImage = "";
         if (output.equals(OUTPUT_PLAYER)) {
@@ -366,6 +365,9 @@ public class ImageOutputHandler extends OutputHandler {
             sb = new StringBuffer(template);
         }
         StringBuffer finalSB = new StringBuffer();
+        showNext(request, new ArrayList<Group>(),
+                 entries, finalSB);
+
         finalSB.append(HtmlUtil.p());
         finalSB.append(sb);
         return new Result(group.getName(), finalSB, getMimeType(output));

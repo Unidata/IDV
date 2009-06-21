@@ -96,17 +96,6 @@ public class RepositoryUtil {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param path _more_
-     */
-    public static void checkFilePath(String path) {
-        if (path.indexOf("..") >= 0) {
-            throw new IllegalArgumentException("bad file path:" + path);
-        }
-    }
-
 
     /**
      * Class MissingEntryException _more_

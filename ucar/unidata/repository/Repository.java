@@ -2350,14 +2350,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
         for (String root : htdocRoots) {
             root = getStorageManager().localizePath(root);
             String fullPath = root + path;
-            //Make sure no one is trying to access other files
-            RepositoryUtil.checkFilePath(fullPath);
             try {
                 InputStream is = getStorageManager().getInputStream(fullPath);
                 if (path.endsWith(".js") || path.endsWith(".css")) {
                     String js = IOUtil.readInputStream(is);
                     js = js.replace("${urlroot}", getUrlBase());
-                    //                    js = js.replace("${fullurlroot}", "http://" + getHostname()+":" + getPort()+getUrlBase());
                     is = new ByteArrayInputStream(js.getBytes());
                 }
                 Result result = new Result(BLANK, is, type);
@@ -2367,7 +2364,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 //noop
             }
         }
-        String userAgent = request.getHeaderArg("User-Agent");
+        String userAgent = request.getHeaderArg(HtmlUtil.HTTP_USER_AGENT);
         if (userAgent == null) {
             userAgent = "Unknown";
         }
@@ -3566,7 +3563,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
             path = "/index.html";
         }
         path = "/ucar/unidata/repository/docs/userguide/processed" + path;
-        RepositoryUtil.checkFilePath(path);
         Result result = null;
         if (path.endsWith(".html")) {
             String helpText = getStorageManager().readSystemResource(path);
@@ -4498,6 +4494,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String  order     = " DESC ";
         boolean haveOrder = request.exists(ARG_ASCENDING);
         String  by        = null;
+        int    max         = request.get(ARG_MAX, DB_MAX_ROWS);
         if (sortMetadata != null) {
             haveOrder = true;
             if (Misc.equals(sortMetadata.getAttr2(), "true")) {
@@ -4506,6 +4503,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 order = " DESC ";
             }
             by = sortMetadata.getAttr1();
+            /*            String tmp = sortMetadata.getAttr3();
+            if(tmp!=null && tmp.length()>0) {
+                max = Integer.parseInt(tmp.trim());
+                }*/
         } else {
             by = request.getString(ARG_ORDERBY, (String) null);
             if (request.get(ARG_ASCENDING, false)) {
@@ -4514,7 +4515,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
         String limitString = BLANK;
-        int    max         = request.get(ARG_MAX, DB_MAX_ROWS);
+
+
+
+
+
         limitString =
             getDatabaseManager().getLimitString(request.get(ARG_SKIP, 0),
                 max);

@@ -893,7 +893,6 @@ return new Result(title, sb);
                     String tail = IOUtil.getFileTail(resource);
                     File newFile = getStorageManager().getTmpFile(request,
                                        tail);
-                    RepositoryUtil.checkFilePath(newFile.toString());
                     resourceName = tail;
                     resource     = newFile.toString();
                     URL           fromUrl    = new URL(url);
@@ -975,7 +974,6 @@ return new Result(title, sb);
                         }
                     }
                     File f = getStorageManager().getTmpFile(request, name);
-                    RepositoryUtil.checkFilePath(f.toString());
                     FileOutputStream fos = getStorageManager().getFileOutputStream(f);
                     IOUtil.writeTo(zin, fos);
                     fos.close();

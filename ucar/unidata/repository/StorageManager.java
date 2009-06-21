@@ -339,7 +339,7 @@ public class StorageManager extends RepositoryManager {
         File f =  new File(IOUtil.joinDir(tmpDir.getDir(),
                                           file));
         dirTouched(tmpDir, f);
-        return f;
+        return checkFile(f);
     }
 
 
@@ -799,9 +799,9 @@ public class StorageManager extends RepositoryManager {
      * @return _more_
      */
     public File getUploadFilePath(String fileName) {
-        return new File(IOUtil.joinDir(getUploadDir(),
+        return checkFile(new File(IOUtil.joinDir(getUploadDir(),
                                        repository.getGUID() + FILE_SEPARATOR
-                                       + fileName));
+                                       + fileName)));
     }
 
 
@@ -863,8 +863,6 @@ public class StorageManager extends RepositoryManager {
         Resource resource = entry.getResource();
         if(!resource.isFile()) return false;
         File file =resource.getTheFile();
-        String filePath = file.toString();
-        RepositoryUtil.checkFilePath(filePath);
 
         //This is for the FtpTypeHandler where it caches the file
         if (resource.isRemoteFile()) {
@@ -953,7 +951,7 @@ public class StorageManager extends RepositoryManager {
     }
 
 
-    public boolean isLocalFileOk(File file) throws Exception {
+    public boolean isLocalFileOk(File file)  {
         boolean ok = false;
         for (File parent : getRepository().getLocalFilePaths()) {
             if (IOUtil.isADescendent(parent, file)) {
@@ -965,18 +963,33 @@ public class StorageManager extends RepositoryManager {
 
 
 
-    public void checkFile(File file) throws Exception {
+    private void throwBadFile() {
+        throw new IllegalArgumentException(
+                                  "The specified file is not under one of the allowable file system directories",null);
+    }
+
+    public File checkWriteFile(File file)  {
+        getStorageDir();
+        if (IOUtil.isADescendent(storageDir, file)) {
+            return file;
+        }
+        throwBadFile();
+        return null;
+    }
+
+
+    public File checkFile(File file)  {
         //check if its in an allowable area for access
-        if(isLocalFileOk(file)) return;
+        if(isLocalFileOk(file)) return file;
         getStorageDir();
         //Check if its in the storage dir
         if (IOUtil.isADescendent(storageDir, file)) {
-            return;
+            return file;
         }
-        throw new IllegalArgumentException(
-                                  "The specified file is not under one of the allowable file system directories",null);
-
+        throwBadFile();
+        return null;
     }
+
 
     /**
      */
@@ -1012,7 +1025,6 @@ public class StorageManager extends RepositoryManager {
     }
 
 
-
     public String readSystemResource(URL url) throws Exception{
         checkPath(url.toString());
         return IOUtil.readContents(url.toString(), getClass());
@@ -1020,15 +1032,12 @@ public class StorageManager extends RepositoryManager {
 
 
     public String readSystemResource(File file) throws Exception{
-        checkFile(file);
-        return IOUtil.readContents(file);
+        return IOUtil.readInputStream(getFileInputStream(file));
     }
 
 
     public String readSystemResource(String path) throws Exception{
-        checkPath(path);
-        return IOUtil.readContents(
-                                   path, getClass());
+        return IOUtil.readInputStream(getInputStream(path));
     }
 
 
@@ -1047,13 +1056,7 @@ public class StorageManager extends RepositoryManager {
     }
 
     public FileOutputStream getFileOutputStream(File file) throws Exception {
-        getStorageDir();
-        //Check if its in the storage dir
-        if (!IOUtil.isADescendent(storageDir, file)) {
-            throw new IllegalArgumentException("Bad file");
-        }
-
-        checkFile(file);
+        checkWriteFile(file);
         return new FileOutputStream(file);
     }
 
