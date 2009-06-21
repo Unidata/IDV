@@ -715,6 +715,26 @@ public class ImageUtils {
     }
 
 
+    public static BufferedImage rotate90(BufferedImage img, boolean left) {
+        int w = img.getWidth(null);
+        int h = img.getHeight(null);
+        double angle = (left?-90:90);
+        BufferedImage rotatedImage = new BufferedImage(h, w, BufferedImage.TYPE_INT_RGB);
+        AffineTransform trans = new AffineTransform();
+        trans.rotate( Math.toRadians(angle) );
+        if(left) {
+            trans.translate(-w,0);
+        } else {
+            trans.translate(0,-h);
+        }
+        Graphics2D g = rotatedImage.createGraphics();
+        //        g.rotate(Math.toRadians(angle),w/2,h/2);
+        //        g.drawImage(img, null, 0,0);
+        g.drawImage(img, trans,null);
+        return rotatedImage;
+    }
+
+
     /**
      * Convert an image to a new type
      *
@@ -903,7 +923,7 @@ public class ImageUtils {
         double w = component.getWidth();
         double h = component.getHeight();
         BufferedImage image = new BufferedImage((int) w, (int) h,
-                                  BufferedImage.TYPE_INT_RGB);
+                                                BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D) image.getGraphics();
         component.paint(g);
 
@@ -1124,23 +1144,56 @@ public class ImageUtils {
      * @throws Exception  problem with this
      */
     public static void main(String[] args) throws Exception {
-        int width = 200;
+        int width = 400;
         System.err.println ("reading");
         Image image = readImage(args[0]);
         System.err.println ("cvrting");
         BufferedImage bimage = toBufferedImage(image,
                                   BufferedImage.TYPE_INT_ARGB);
         System.err.println ("resizing");
-        BufferedImage resizedImage =
-            ImageUtils.toBufferedImage(bimage.getScaledInstance(width, -1,
-                Image.SCALE_AREA_AVERAGING), BufferedImage.TYPE_INT_RGB);
+        //        BufferedImage resizedImage =
+        //            ImageUtils.toBufferedImage(bimage.getScaledInstance(width, -1,
+        //                Image.SCALE_AREA_AVERAGING), BufferedImage.TYPE_INT_RGB);
 
+        BufferedImage resizedImage =      toBufferedImage(resize(bimage, width,-1));
         waitOnImage(resizedImage);
 
+        Image newImage = resizedImage;
+
+
+        JLabel lbl1;
+        JLabel lbl2;
+
+
+
+        newImage = ImageUtils.rotate90(toBufferedImage(resizedImage),false);
+        lbl1 = new JLabel(new ImageIcon(resizedImage));
+        lbl2 = new JLabel(new ImageIcon(newImage));
+        GuiUtils.showOkCancelDialog(null, "",GuiUtils.hbox(lbl1,lbl2), null);
+        newImage = ImageUtils.rotate90(toBufferedImage(newImage),false);
+        lbl1 = new JLabel(new ImageIcon(resizedImage));
+        lbl2 = new JLabel(new ImageIcon(newImage));
+        GuiUtils.showOkCancelDialog(null, "",GuiUtils.hbox(lbl1,lbl2), null);
+
+
+        newImage = ImageUtils.rotate90(toBufferedImage(resizedImage),true);
+        lbl1 = new JLabel(new ImageIcon(resizedImage));
+        lbl2 = new JLabel(new ImageIcon(newImage));
+        GuiUtils.showOkCancelDialog(null, "",GuiUtils.hbox(lbl1,lbl2), null);
+
+
+        newImage = ImageUtils.rotate90(toBufferedImage(newImage),true);
+        lbl1 = new JLabel(new ImageIcon(resizedImage));
+        lbl2 = new JLabel(new ImageIcon(newImage));
+        GuiUtils.showOkCancelDialog(null, "",GuiUtils.hbox(lbl1,lbl2), null);
+
+
+        /*
         String ext  = IOUtil.getFileExtension(args[0]);
         String tail = IOUtil.stripExtension(args[0]);
         System.err.println ("writing");
         writeImageToFile(resizedImage, tail + "_thumb" + width + ".png");
+        */
         System.exit(0);
     }
 
