@@ -37,6 +37,8 @@ import ucar.unidata.util.LogUtil;
 
 import ucar.unidata.util.Misc;
 
+import java.text.SimpleDateFormat;
+
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.WrapperException;
 
@@ -68,6 +70,12 @@ import javax.servlet.http.*;
  * @version $Revision: 1.3 $
  */
 public class RepositoryServlet extends HttpServlet {
+
+    //                                   "Tue, 20 Jan 2009 01:45:54 GMT");
+    private SimpleDateFormat sdf = RepositoryUtil.makeDateFormat(
+                                                                 "E, d M yyyy HH:m Z");
+
+
 
     /** _more_ */
     private String[] args;
@@ -258,12 +266,20 @@ public class RepositoryServlet extends HttpServlet {
                 }
             }
 
+            Date lastModified = repositoryResult.getLastModified();
+            if(lastModified!=null) {
+                //                System.err.println ("modified:" + sdf.format(lastModified));
+                response.setHeader("Last-Modified",
+                                   sdf.format(lastModified));
+            }
             if (repositoryResult.getCacheOk()) {
                 response.setHeader("Cache-Control", "public,max-age=259200");
                 response.setHeader("Expires",
                                    "Tue, 08 Jan 2019 07:41:19 GMT");
-                response.setHeader("Last-Modified",
-                                   "Tue, 20 Jan 2009 01:45:54 GMT");
+                if(lastModified==null) {
+                    response.setHeader("Last-Modified",
+                                       "Tue, 20 Jan 2009 01:45:54 GMT");
+                }
             }
 
             if (repositoryResult.getRedirectUrl() != null) {

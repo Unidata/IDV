@@ -855,11 +855,19 @@ public class TypeHandler extends RepositoryManager {
                                              boolean linkToDownload)
             throws Exception {
 
+        boolean showImage = false;
+        if (showResource && entry.getResource().isImage()) {
+            if (entry.getResource().isFile()
+                && getAccessManager().canDownload(request, entry)) {
+                showImage = true;
+            }
+        }
+
         StringBuffer sb = new StringBuffer();
         if (true || output.equals(OutputHandler.OUTPUT_HTML)) {
             OutputHandler outputHandler =
                 getRepository().getOutputHandler(request);
-            String nextPrev = StringUtil.join(HtmlUtil.space(1),
+            String nextPrev = StringUtil.join("",
                                   outputHandler.getNextPrevLinks(request,
                                       entry, output));
 
@@ -915,6 +923,18 @@ public class TypeHandler extends RepositoryManager {
                         + HtmlUtil.space(1) + msg("bytes");
 
                 }
+                if(showImage) {
+                    /*                    String nextPrev = HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                                                     entry, ARG_PREVIOUS,
+                                                                     "true"), iconUrl(ICON_LEFT),
+                                                    msg("View Previous")) +
+                        HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                                       entry, ARG_NEXT,
+                                                       "true"), iconUrl(ICON_LEFT),
+                                                       msg("View Next"));*/
+                    resourceLink = nextPrev+HtmlUtil.space(1) + resourceLink;
+
+               }
                 sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
                                              resourceLink));
 
@@ -958,7 +978,9 @@ public class TypeHandler extends RepositoryManager {
             if ((typeDesc == null) || (typeDesc.trim().length() == 0)) {
                 typeDesc = entry.getTypeHandler().getType();
             }
-            sb.append(HtmlUtil.formEntry(msgLabel("Type"), typeDesc));
+            if(!showImage) {
+                sb.append(HtmlUtil.formEntry(msgLabel("Type"), typeDesc));
+            }
 
             String datatype = entry.getDataType();
             if ( !entry.getTypeHandler().hasDefaultDataType()

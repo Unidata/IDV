@@ -42,6 +42,8 @@ import java.io.*;
 
 import java.io.File;
 import java.io.InputStream;
+import java.awt.Image;
+import java.awt.image.*;
 
 
 
@@ -78,7 +80,11 @@ import java.util.zip.*;
  */
 public class ImageOutputHandler extends OutputHandler {
 
-
+    public static final String ARG_IMAGE_EDIT = "image.edit";
+    public static final String ARG_IMAGE_EDIT_RESIZE = "image.edit.resize";
+    public static final String ARG_IMAGE_EDIT_WIDTH = "image.edit.width";
+    public static final String ARG_IMAGE_EDIT_ROTATE_LEFT = "image.edit.rotate.left";
+    public static final String ARG_IMAGE_EDIT_ROTATE_RIGHT = "image.edit.rotate.right";
 
     /** _more_ */
     public static final OutputType OUTPUT_GALLERY = new OutputType("Gallery",
@@ -97,6 +103,12 @@ public class ImageOutputHandler extends OutputHandler {
                        "", ICON_IMAGES);
 
 
+    /** _more_ */
+    public static final OutputType OUTPUT_EDIT =
+        new OutputType("Edit Image", "image.edit", OutputType.TYPE_HTML,
+                       "", ICON_IMAGES);
+
+
 
     /**
      * _more_
@@ -112,6 +124,7 @@ public class ImageOutputHandler extends OutputHandler {
         addType(OUTPUT_GALLERY);
         addType(OUTPUT_PLAYER);
         addType(OUTPUT_SLIDESHOW);
+        addType(OUTPUT_EDIT);
     }
 
 
@@ -131,9 +144,19 @@ public class ImageOutputHandler extends OutputHandler {
             throws Exception {
 
         //If its a single entry then punt
+
         if (state.entry != null) {
+            if(getAccessManager().canDoAction(request, state.entry, Permission.ACTION_EDIT)) {
+                File f =state.entry.getFile();
+                if(f!=null && f.canWrite()) {
+                    Link link = makeLink(request, state.getEntry(), OUTPUT_EDIT);
+                    link.setLinkType(OutputType.TYPE_EDIT);
+                    links.add(link);
+                }
+            }
             return;
         }
+
 
         List<Entry> entries = state.getAllEntries();
         if (entries.size() == 0) {
@@ -162,6 +185,74 @@ public class ImageOutputHandler extends OutputHandler {
 
 
 
+
+    private Hashtable<String,Image> imageCache = new Hashtable<String,Image>();
+
+    private Image getImage(Entry entry) {
+        Image image = imageCache.get(entry.getId());
+        if(image == null) {
+            image =ImageUtils.readImage(entry.getResource().getPath());
+            //Keep the cache size low
+            if(imageCache.size()>5) {
+                imageCache = new Hashtable<String,Image>();
+            }
+            imageCache.put(entry.getId(),image);
+        }
+        return image;
+    }
+
+    private void putImage(Entry entry,Image image) {
+        imageCache.put(entry.getId(), image);
+    }
+
+
+    public Result outputEntry(Request request, Entry  entry) 
+            throws Exception {
+        if(!getAccessManager().canDoAction(request, entry, Permission.ACTION_EDIT)) {
+            throw new AccessException ("Cannot edit image", null);
+        }
+
+        StringBuffer sb = new StringBuffer();
+        String url = getImageUrl(request, entry);
+        Image image = getImage(entry);
+        int imageWidth = image.getWidth(null);
+        int imageHeight = image.getHeight(null);
+        Image newImage = null;
+        if(request.exists(ARG_IMAGE_EDIT_RESIZE)) {
+            newImage  = ImageUtils.resize(image, request.get(ARG_IMAGE_EDIT_WIDTH, imageWidth),-1);
+            request.remove(ARG_IMAGE_EDIT_RESIZE);
+        }  else if(request.exists(ARG_IMAGE_EDIT_ROTATE_LEFT)) {
+            newImage = ImageUtils.rotate90(ImageUtils.toBufferedImage(image), true);
+            request.remove(ARG_IMAGE_EDIT_ROTATE_LEFT);
+        }  else if(request.exists(ARG_IMAGE_EDIT_ROTATE_RIGHT)) {
+            newImage = ImageUtils.rotate90(ImageUtils.toBufferedImage(image), false);
+            request.remove(ARG_IMAGE_EDIT_ROTATE_RIGHT);
+        }
+        if(newImage!=null) {
+            ImageUtils.waitOnImage(newImage);
+            putImage(entry, newImage);
+            File f =entry.getFile();
+            getStorageManager().checkFile(f);
+            if(f!=null && f.canWrite()) {
+                ImageUtils.writeImageToFile(newImage, f);
+            }
+            return new Result(request.getUrl());
+        }
+        sb.append(request.formPost(getRepository().URL_ENTRY_SHOW));
+        sb.append(HtmlUtil.hidden(ARG_ENTRYID,entry.getId()));
+        sb.append(HtmlUtil.hidden(ARG_OUTPUT,OUTPUT_EDIT));
+        sb.append(HtmlUtil.submit(msg("Change width:"),ARG_IMAGE_EDIT_RESIZE));
+        sb.append(HtmlUtil.input(ARG_IMAGE_EDIT_WIDTH,""+imageWidth,HtmlUtil.SIZE_5));
+        sb.append(HtmlUtil.space(2));
+        sb.append(HtmlUtil.submit(msg("Rotate left"),ARG_IMAGE_EDIT_ROTATE_LEFT));
+        sb.append(HtmlUtil.space(2));
+        sb.append(HtmlUtil.submit(msg("Rotate right"),ARG_IMAGE_EDIT_ROTATE_RIGHT));
+        sb.append(HtmlUtil.formClose());
+
+        
+        sb.append(HtmlUtil.img(url));
+        return new Result("Image Edit", sb);
+    }
 
 
     /**

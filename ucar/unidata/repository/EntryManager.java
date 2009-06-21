@@ -443,33 +443,20 @@ return new Result(title, sb);
                             findGroup(request, entry.getParentGroupId()),
                             new ArrayList<Clause>());
             String nextId = null;
-            for (int i = 0; (i < ids.size()) && (nextId == null); i++) {
-                String id = ids.get(i);
-                if (id.equals(entry.getId())) {
-                    if (next) {
-                        if (i == ids.size() - 1) {
-                            nextId = ids.get(0);
-                        } else {
-                            nextId = ids.get(i + 1);
-                        }
-                    } else {
-                        if (i == 0) {
-                            nextId = ids.get(ids.size() - 1);
-                        } else {
-                            nextId = ids.get(i - 1);
-                        }
-                    }
-                }
+            int index = ids.indexOf(entry.getId());
+            if(index>=0) {
+                if(next) index++;
+                else index--;
+                if(index<0) index = ids.size()-1;
+                else if(index>=ids.size()) index=0;
+                nextId = ids.get(index);
             }
             //Do a redirect
             if (nextId != null) {
-                return new Result(
-                    request.url(
-                        getRepository().URL_ENTRY_SHOW, ARG_ENTRYID, nextId,
-                        ARG_OUTPUT,
-                        request.getString(
-                            ARG_OUTPUT,
-                            OutputHandler.OUTPUT_HTML.getId().toString())));
+                request.put(ARG_ENTRYID, nextId);
+                request.remove(ARG_NEXT);
+                request.remove(ARG_PREVIOUS);
+                return new Result(request.getUrl());
             }
         }
         return addEntryHeader(request, entry,
@@ -2027,7 +2014,7 @@ return new Result(title, sb);
             File thumb = getStorageManager().getThumbFile("entry"
                              + IOUtil.cleanFileName(entry.getId()) + "_"
                              + width + IOUtil.getFileExtension(path));
-            if ( !thumb.exists()) {
+            if (!thumb.exists()) {
                 Image image =
                     ImageUtils.readImage(entry.getResource().getPath());
                 image = ImageUtils.resize(image, width, -1);
@@ -2036,8 +2023,6 @@ return new Result(title, sb);
             }
             return new Result(BLANK, getStorageManager().getFileInputStream(thumb), mimeType);
         } else {
-
-
             File        file        = entry.getFile();
             long        length      = file.length();
             if(request.isHeadRequest()) {
@@ -2050,7 +2035,11 @@ return new Result(title, sb);
             Result      result      = new Result(BLANK, inputStream,
                                           mimeType);
             result.addHttpHeader(HtmlUtil.HTTP_CONTENT_LENGTH, "" + length);
-            result.setCacheOk(true);
+            result.setLastModified(new Date(file.lastModified()));
+            //TODO: set the date, etc
+            //            result.setCacheOk(true);
+            //            response.setHeader("Last-Modified",
+            //                               "Tue, 20 Jan 2009 01:45:54 GMT");
             return result;
         }
 

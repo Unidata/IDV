@@ -26,6 +26,7 @@ import ucar.unidata.util.HtmlUtil;
 import java.io.InputStream;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 
 import java.util.Hashtable;
@@ -85,6 +86,9 @@ public class Result {
 
     /** _more_ */
     private boolean cacheOk = false;
+
+    private Date lastModified;
+
 
     /** _more_ */
     private int responseCode = RESPONSE_OK;
@@ -538,6 +542,24 @@ public class Result {
      */
     public AuthorizationMethod getAuthorizationMethod() {
         return this.authorizationMethod;
+    }
+
+    /**
+       Set the LastModified property.
+
+       @param value The new value for LastModified
+    **/
+    public void setLastModified (Date value) {
+	this.lastModified = value;
+    }
+
+    /**
+       Get the LastModified property.
+
+       @return The LastModified
+    **/
+    public Date getLastModified () {
+	return this.lastModified;
     }
 
 

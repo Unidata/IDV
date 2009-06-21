@@ -800,13 +800,13 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                          "true"), iconUrl(ICON_LEFT),
                                              msg("View Previous Entry"));
 
-        link.setLinkType(OutputType.TYPE_NONHTML);
+        link.setLinkType(OutputType.TYPE_TOOLBAR);
         links.add(link);
         link = new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW,
                                          entry, ARG_OUTPUT, output, ARG_NEXT,
                                          "true"), iconUrl(ICON_RIGHT),
                                              msg("View Next Entry"));
-        link.setLinkType(OutputType.TYPE_NONHTML);
+        link.setLinkType(OutputType.TYPE_TOOLBAR);
         links.add(link);
         return links;
     }
