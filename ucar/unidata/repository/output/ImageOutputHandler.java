@@ -154,7 +154,7 @@ public class ImageOutputHandler extends OutputHandler {
         }
 
         if (state.getEntry() != null) {
-            links.add(makeLink(request, state.getEntry(), OUTPUT_SLIDESHOW));
+            //            links.add(makeLink(request, state.getEntry(), OUTPUT_SLIDESHOW));
             links.add(makeLink(request, state.getEntry(), OUTPUT_GALLERY));
             links.add(makeLink(request, state.getEntry(), OUTPUT_PLAYER));
         }
