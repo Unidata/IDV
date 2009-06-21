@@ -45,6 +45,8 @@ public class HtmlUtil {
 
     //j-
 
+    public static final String HTTP_USER_AGENT = "User-Agent";
+
     /** _more_          */
     public static final String HTTP_CONTENT_LENGTH = "Content-Length";
 
