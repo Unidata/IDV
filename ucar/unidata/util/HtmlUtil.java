@@ -1533,7 +1533,7 @@ public class HtmlUtil {
      */
     public static String submitImage(String img, String name) {
         return tag(TAG_INPUT,
-                   attrs(ATTR_CLASS, CLASS_SUBMITIMAGE, ATTR_NAME, name)
+                   attrs(ATTR_CLASS, CLASS_SUBMITIMAGE, ATTR_NAME, name,ATTR_VALUE,name)
                    + attrs(ATTR_BORDER, "0", ATTR_SRC, img, ATTR_TYPE,
                            TYPE_IMAGE));
 
@@ -1551,7 +1551,7 @@ public class HtmlUtil {
      */
     public static String submitImage(String img, String name, String alt) {
         return tag(TAG_INPUT,
-                   attrs(ATTR_NAME, name, ATTR_BORDER, "0", ATTR_SRC, img)
+                   attrs(ATTR_NAME, name, ATTR_BORDER, "0", ATTR_SRC, img,ATTR_VALUE,name)
                    + attrs(ATTR_CLASS, CLASS_SUBMITIMAGE, ATTR_TITLE, alt,
                            ATTR_ALT, alt, ATTR_TYPE, TYPE_IMAGE));
     }
