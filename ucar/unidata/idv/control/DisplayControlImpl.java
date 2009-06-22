@@ -5455,7 +5455,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                              SETTINGS_GROUP_FLAGS);
 
         dsd.addPropertyValue(new Boolean(getDoCursorReadout()),
-                             "doCursorReadout", "Include in cursor readout",
+                             "doCursorReadout", "Include In Cursor Readout",
                              SETTINGS_GROUP_FLAGS);
         dsd.addPropertyValue(new Boolean(getCanDoRemoveAll()),
                              "canDoRemoveAll", "Remove on Remove All",
