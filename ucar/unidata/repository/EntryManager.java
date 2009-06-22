@@ -797,11 +797,10 @@ return new Result(title, sb);
         }
 
 
-        if(forUpload)
-            logInfo ("upload entry:" + entry);
+
         if (entry == null) {
             if(forUpload)
-                logInfo ("creating a new entry");
+                logInfo ("Upload:creating a new entry");
             String groupId = request.getString(ARG_GROUP, (String) null);
             if (groupId == null) {
                 throw new IllegalArgumentException(
@@ -810,15 +809,15 @@ return new Result(title, sb);
             Group parentGroup = findGroup(request);
 
             if(forUpload)
-                logInfo ("checking access");
+                logInfo ("Upload:checking access");
             //            System.err.println ("checking access");
             boolean okToCreateNewEntry = getAccessManager().canDoAction(request, parentGroup,
                                                                         (forUpload
                                                                          ? Permission.ACTION_UPLOAD
-                                                                         : Permission.ACTION_NEW));
+                                                                         : Permission.ACTION_NEW),forUpload);
 
             if(forUpload)
-                logInfo ("is ok to create:" + okToCreateNewEntry);
+                logInfo ("Upload:is ok to create:" + okToCreateNewEntry);
             //            System.err.println ("Creating new entry:" +okToCreateNewEntry);
             if ( !okToCreateNewEntry) {
                 throw new AccessException("Cannot add:" + entry.getLabel(),

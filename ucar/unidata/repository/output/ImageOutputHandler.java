@@ -81,8 +81,16 @@ import java.util.zip.*;
 public class ImageOutputHandler extends OutputHandler {
 
     public static final String ARG_IMAGE_EDIT = "image.edit";
+    public static final String ARG_IMAGE_UNDO = "image.undo";
     public static final String ARG_IMAGE_EDIT_RESIZE = "image.edit.resize";
     public static final String ARG_IMAGE_EDIT_WIDTH = "image.edit.width";
+    public static final String ARG_IMAGE_EDIT_CROP = "image.edit.crop";
+
+    public static final String ARG_IMAGE_CROPX1 = "image.edit.cropx1";
+    public static final String ARG_IMAGE_CROPY1 = "image.edit.cropy1";
+    public static final String ARG_IMAGE_CROPX2 = "image.edit.cropx2";
+    public static final String ARG_IMAGE_CROPY2 = "image.edit.cropy2";
+
     public static final String ARG_IMAGE_EDIT_ROTATE_LEFT = "image.edit.rotate.left";
     public static final String ARG_IMAGE_EDIT_ROTATE_RIGHT = "image.edit.rotate.right";
 
@@ -218,12 +226,34 @@ public class ImageOutputHandler extends OutputHandler {
         int imageWidth = image.getWidth(null);
         int imageHeight = image.getHeight(null);
         Image newImage = null;
-        if(request.exists(ARG_IMAGE_EDIT_RESIZE)) {
+        if(request.exists(ARG_IMAGE_UNDO)) {
+            File f =entry.getFile();
+            if(f!=null && f.canWrite()) {
+                File entryDir = getStorageManager().getEntryDir(entry.getId(), true);
+                File original = new File(entryDir+"/"+ "originalimage");
+                if(original.exists()) {
+                    imageCache.remove(entry.getId());
+                    IOUtil.copyFile(original,f);
+                    request.remove(ARG_IMAGE_UNDO);
+                    return new Result(request.getUrl());
+                }
+            }
+        } else  if(request.exists(ARG_IMAGE_EDIT_RESIZE)) {
             newImage  = ImageUtils.resize(image, request.get(ARG_IMAGE_EDIT_WIDTH, imageWidth),-1);
             request.remove(ARG_IMAGE_EDIT_RESIZE);
         }  else if(request.exists(ARG_IMAGE_EDIT_ROTATE_LEFT)) {
             newImage = ImageUtils.rotate90(ImageUtils.toBufferedImage(image), true);
             request.remove(ARG_IMAGE_EDIT_ROTATE_LEFT);
+
+        }  else if(request.exists(ARG_IMAGE_EDIT_CROP)) {
+            int x1= request.get(ARG_IMAGE_CROPX1,0);            
+            int y1= request.get(ARG_IMAGE_CROPY1,0);
+            int x2= request.get(ARG_IMAGE_CROPX2,0);            
+            int y2= request.get(ARG_IMAGE_CROPY2,0);
+            if(x1<x2 && y1<y2) {
+                newImage = ImageUtils.clip(ImageUtils.toBufferedImage(image), new int[]{x1,y1},new int[]{x2,y2});
+            }
+            request.remove(ARG_IMAGE_EDIT_CROP);
         }  else if(request.exists(ARG_IMAGE_EDIT_ROTATE_RIGHT)) {
             newImage = ImageUtils.rotate90(ImageUtils.toBufferedImage(image), false);
             request.remove(ARG_IMAGE_EDIT_ROTATE_RIGHT);
@@ -234,6 +264,11 @@ public class ImageOutputHandler extends OutputHandler {
             File f =entry.getFile();
             getStorageManager().checkFile(f);
             if(f!=null && f.canWrite()) {
+                File entryDir = getStorageManager().getEntryDir(entry.getId(), true);
+                File original = new File(entryDir+"/"+ "originalimage");
+                if(!original.exists()) {
+                    IOUtil.copyFile(f, original);
+                }
                 ImageUtils.writeImageToFile(newImage, f);
             }
             return new Result(request.getUrl());
@@ -244,13 +279,35 @@ public class ImageOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.submit(msg("Change width:"),ARG_IMAGE_EDIT_RESIZE));
         sb.append(HtmlUtil.input(ARG_IMAGE_EDIT_WIDTH,""+imageWidth,HtmlUtil.SIZE_5));
         sb.append(HtmlUtil.space(2));
+
+        sb.append(HtmlUtil.submit(msg("Crop"),ARG_IMAGE_EDIT_CROP));
+        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPX1,"",HtmlUtil.SIZE_3+HtmlUtil.id(ARG_IMAGE_CROPX1)));
+        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPY1,"",HtmlUtil.SIZE_3+HtmlUtil.id(ARG_IMAGE_CROPY1)));
+        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPX2,"",HtmlUtil.SIZE_3+HtmlUtil.id(ARG_IMAGE_CROPX2)));
+        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPY2,"",HtmlUtil.SIZE_3+HtmlUtil.id(ARG_IMAGE_CROPY2)));
+        sb.append(HtmlUtil.div("",HtmlUtil.cssClass("image_edit_box")+HtmlUtil.id("image_edit_box")));
+
+        sb.append(HtmlUtil.space(2));
         sb.append(HtmlUtil.submit(msg("Rotate left"),ARG_IMAGE_EDIT_ROTATE_LEFT));
         sb.append(HtmlUtil.space(2));
         sb.append(HtmlUtil.submit(msg("Rotate right"),ARG_IMAGE_EDIT_ROTATE_RIGHT));
+        File entryDir = getStorageManager().getEntryDir(entry.getId(), false);
+        File original = new File(entryDir+"/"+ "originalimage");
+        if(original.exists()) {
+            sb.append(HtmlUtil.space(2));
+            sb.append(HtmlUtil.submit(msg("Undo all edits"),ARG_IMAGE_UNDO));
+        }
         sb.append(HtmlUtil.formClose());
 
-        
-        sb.append(HtmlUtil.img(url));
+
+        String clickParams = "event,'imgid',"+
+            HtmlUtil.comma(HtmlUtil.squote(ARG_IMAGE_CROPX1),
+                           HtmlUtil.squote(ARG_IMAGE_CROPY1),
+                           HtmlUtil.squote(ARG_IMAGE_CROPX2),
+                           HtmlUtil.squote(ARG_IMAGE_CROPY2));
+
+        String call = HtmlUtil.onMouseClick(HtmlUtil.call("editImageClick",clickParams));
+        sb.append(HtmlUtil.img(url,"",HtmlUtil.id("imgid")+call));
         return new Result("Image Edit", sb);
     }
 

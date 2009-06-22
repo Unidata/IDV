@@ -760,6 +760,17 @@ a.menulink {
 }
 
 
+.image_edit_box {
+   border : 3px red solid;
+   #padding:10px;
+   #margin:10px;
+   #background-color : black;
+   position: absolute; 
+   visibility: hidden; 
+   z-index: 1;
+}
+
+
 code.menu {
          font-size: 11pt;
          font-family: SansSerif, Arial, Helvetica, sans-serif;       

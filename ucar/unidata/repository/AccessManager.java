@@ -248,6 +248,12 @@ public class AccessManager extends RepositoryManager {
      */
     public boolean canDoAction(Request request, Entry entry, String action)
             throws Exception {
+        return canDoAction(request, entry, action, false);
+    }
+
+
+    public boolean canDoAction(Request request, Entry entry, String action,boolean log)
+            throws Exception {
         if (entry == null) {
             return false;
         }
@@ -261,11 +267,11 @@ public class AccessManager extends RepositoryManager {
             }
         }
 
-
-        
+        if(log) logInfo("Upload:canDoAction:"+ action);
         
         if(!action.equals(Permission.ACTION_VIEW)) {
             boolean okToView = canDoAction(request, entry, Permission.ACTION_VIEW);
+            if(log) logInfo("Upload:action isn't view. view permission="+ okToView);
             //            System.err.println("action isn't view viwe ok:"+ okToView);
             if(!okToView) return false;
         }
@@ -288,19 +294,20 @@ public class AccessManager extends RepositoryManager {
 
         //The admin can do anything
         if (user.getAdmin()) {
+            if(log) logInfo("Upload:user is admin");
             //            System.err.println("user is admin");
             return true;
         }
 
         //If user is owner then they can do anything
         if ( !user.getAnonymous() && Misc.equals(user, entry.getUser())) {
+            if(log) logInfo("Upload:user is owner");
             //            System.err.println("user is owner of entry");
             return true;
         }
 
-
-        String key = "a:" + action + "_u:" + user.getId() + "_e:"
-                     + entry.getId();
+        String key = "a:" + action + "_u:" + user.getId() + "_ip:" + requestIp +
+            "_e:"+ entry.getId();
         Object[] pastResult = (Object[]) recentPermissions.get(key);
         Date     now        = new Date();
         if (pastResult != null) {
@@ -309,6 +316,7 @@ public class AccessManager extends RepositoryManager {
             //If we have checked this in the last 60 seconds then return the result
             //TODO - Do we really need the time threshold
             if (true || now.getTime() - then.getTime() < 60000) {
+                if(log) logInfo("Upload:getting result from cache");
                 return ok.booleanValue();
             } else {
                 recentPermissions.remove(key);
