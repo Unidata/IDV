@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -43,7 +44,7 @@ import java.util.TimeZone;
  */
 public class DateUtil {
 
-    /** _more_          */
+    /** _more_ */
     public static final String[] MONTH_NAMES = {
         "January", "February", "March", "April", "May", "June", "July",
         "August", "September", "October", "November", "December"
@@ -126,27 +127,31 @@ public class DateUtil {
 
     /**
      * Get the minimum of the 2 dates
-     * 
+     *
      * @param date1 date1
      * @param date2 date2
      *
      * @return The minimum of the 2 dates
      */
     public static Date min(Date date1, Date date2) {
-        if(date1.getTime()<date2.getTime()) return date1;
+        if (date1.getTime() < date2.getTime()) {
+            return date1;
+        }
         return date2;
     }
 
     /**
      * Get the maximum of the 2 dates
-     * 
+     *
      * @param date1 date1
      * @param date2 date2
      *
      * @return The maximum of the 2 dates
      */
     public static Date max(Date date1, Date date2) {
-        if(date1.getTime()>date2.getTime()) return date1;
+        if (date1.getTime() > date2.getTime()) {
+            return date1;
+        }
         return date2;
     }
 
@@ -167,39 +172,17 @@ public class DateUtil {
 
 
     //j--
+
     /** A set of common date formats */
     private static final String[] formats = {
-        "yyyy-MM-dd'T'HH:mm:ss Z", 
-        "yyyyMMdd'T'HHmmss Z", 
-        "yyyy/MM/dd HH:mm:ss Z",
-        "yyyy-MM-dd HH:mm:ss Z", 
-        "EEE MMM dd HH:mm:ss Z yyyy", 
-
-        "yyyy-MM-dd'T'HH:mm:ss", 
-        "yyyyMMdd'T'HHmmss", 
-        "yyyy/MM/dd HH:mm:ss",
-        "yyyy-MM-dd HH:mm:ss", 
-
-        "yyyy-MM-dd'T'HH:mm Z", 
-        "yyyyMMdd'T'HHmm Z", 
-        "yyyy/MM/dd HH:mm Z", 
-        "yyyy-MM-dd HH:mm Z", 
-
-        "yyyy-MM-dd'T'HH:mm", 
-        "yyyyMMdd'T'HHmm", 
-        "yyyy/MM/dd HH:mm", 
-        "yyyy-MM-dd HH:mm", 
-
-
-        "yyyy-MM-dd", 
-        "yyyy/MM/dd", 
-        "yyyyMMdd", 
-
-
-        "yyyy-MM", 
-        "yyyyMM", 
-        "yyyy/MM", 
-        "yyyy"
+        "yyyy-MM-dd'T'HH:mm:ss Z", "yyyyMMdd'T'HHmmss Z",
+        "yyyy/MM/dd HH:mm:ss Z", "yyyy-MM-dd HH:mm:ss Z",
+        "EEE MMM dd HH:mm:ss Z yyyy", "yyyy-MM-dd'T'HH:mm:ss",
+        "yyyyMMdd'T'HHmmss", "yyyy/MM/dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss",
+        "yyyy-MM-dd'T'HH:mm Z", "yyyyMMdd'T'HHmm Z", "yyyy/MM/dd HH:mm Z",
+        "yyyy-MM-dd HH:mm Z", "yyyy-MM-dd'T'HH:mm", "yyyyMMdd'T'HHmm",
+        "yyyy/MM/dd HH:mm", "yyyy-MM-dd HH:mm", "yyyy-MM-dd", "yyyy/MM/dd",
+        "yyyyMMdd", "yyyy-MM", "yyyyMM", "yyyy/MM", "yyyy"
     };
     //j++
 
@@ -260,7 +243,6 @@ public class DateUtil {
             try {
                 Date dttm = sdfs[i].parse(dateString);
                 lastSdf = sdfs[i];
-                System.err.println ("got one:" + formats[i] + " " +  dttm);
                 return sdfs[i];
             } catch (ParseException pe) {}
         }
@@ -555,8 +537,15 @@ public class DateUtil {
         return millis / 1000 / 60;
     }
 
+    /**
+     * _more_
+     *
+     * @param millis _more_
+     *
+     * @return _more_
+     */
     public static double millisToHours(double millis) {
-        return millis / 1000 / 60/ 60;
+        return millis / 1000 / 60 / 60;
     }
 
     /**
@@ -692,21 +681,22 @@ public class DateUtil {
      */
     public static void main(String[] args) throws Exception {
 
-        if(true) {
+        if (true) {
             System.err.println(TimeZone.getTimeZone(args[0]));
             System.err.println(TimeZone.getDefault());
-            String[]ids = TimeZone.getAvailableIDs();
-            for(int i=0;i<ids.length;i++) {
-                System.out.println(ids[i] + " " + TimeZone.getTimeZone(ids[i]));
+            String[] ids = TimeZone.getAvailableIDs();
+            for (int i = 0; i < ids.length; i++) {
+                System.out.println(ids[i] + " "
+                                   + TimeZone.getTimeZone(ids[i]));
             }
             return;
         }
 
 
-        long t1 =  System.currentTimeMillis();
-        SimpleDateFormat fmt  = new SimpleDateFormat("yyyy-mm-dd HH");
-        for(int i=0;i<1000000;i++) {
-            Date             dttm = fmt.parse("2007-12-01 00.65");
+        long             t1  = System.currentTimeMillis();
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-mm-dd HH");
+        for (int i = 0; i < 1000000; i++) {
+            Date dttm = fmt.parse("2007-12-01 00.65");
         }
         long t2 = System.currentTimeMillis();
         System.err.println("time 1:" + (t2 - t1));
