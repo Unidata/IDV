@@ -95,19 +95,28 @@ public class ArrowGlyph extends FrontGlyph {
      *
      * @param control The control I'm in.
      * @param event The display event.
+     * @param smooth is the line smooth or segmented
      *
      * @throws RemoteException When bad things happen
      * @throws VisADException When bad things happen
      */
-    public ArrowGlyph(DrawingControl control, DisplayEvent event, boolean smooth)
+    public ArrowGlyph(DrawingControl control, DisplayEvent event,
+                      boolean smooth)
             throws VisADException, RemoteException {
-        super(control, event, FrontDrawer.TYPE_UPPER_LEVEL_JET,smooth);
+        super(control, event, FrontDrawer.TYPE_UPPER_LEVEL_JET, smooth);
     }
 
+    /**
+     * make the frontDrawer
+     *
+     * @return the frontdrawer
+     *
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
+     */
     protected FrontDrawer doMakeFrontDrawer()
-        throws VisADException, RemoteException {
-        return new  FrontDrawer(8, FrontDrawer.TYPE_UPPER_LEVEL_JET,
-                                   false);
+            throws VisADException, RemoteException {
+        return new FrontDrawer(8, FrontDrawer.TYPE_UPPER_LEVEL_JET, false);
     }
 
 
@@ -129,6 +138,14 @@ public class ArrowGlyph extends FrontGlyph {
 
 
 
+    /**
+     * create the line
+     *
+     * @return the curve
+     *
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
+     */
     protected float[][] getCurve() throws VisADException, RemoteException {
         float[][] curve  = getLatLons(points);
         int       length = curve[0].length;
@@ -143,10 +160,20 @@ public class ArrowGlyph extends FrontGlyph {
     }
 
 
+    /**
+     * should add properties for the fronts
+     *
+     * @return add front properties
+     */
     protected boolean shouldAddFrontProperties() {
         return false;
     }
 
+    /**
+     * show the color selector in the properties
+     *
+     * @return show the color selector in the properties
+     */
     protected boolean shouldShowColorSelector() {
         return true;
     }
@@ -171,4 +198,5 @@ public class ArrowGlyph extends FrontGlyph {
     }
 
 }
+
 

@@ -20,9 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.idv.control.chart;
 
 
@@ -516,13 +513,15 @@ public class LineState {
                     5)));
         } else {}
 
-        String nameToShow= name;
-        if(nameMacro!=null && nameMacro.length()>0) {
+        String nameToShow = name;
+        if ((nameMacro != null) && (nameMacro.length() > 0)) {
             nameToShow = nameMacro;
         }
 
         nameField = new JTextField(nameToShow, 30);
-        nameField.setToolTipText("Name of chart entry. Use \"" +TimeSeriesChart.MACRO_PARAMETER +"\" for parameter name");
+        nameField.setToolTipText("Name of chart entry. Use \""
+                                 + TimeSeriesChart.MACRO_PARAMETER
+                                 + "\" for parameter name");
         comps.add(GuiUtils.rLabel("Name:"));
         comps.add(GuiUtils.left(nameField));
 
@@ -696,7 +695,7 @@ public class LineState {
             shape = GuiUtils.getValueFromBox(shapeBox);
         }
 
-        if(nameMacro!=null) {
+        if (nameMacro != null) {
             nameMacro = nameField.getText().trim();
         } else {
             name = nameField.getText().trim();
@@ -1064,8 +1063,13 @@ public class LineState {
         }
     }
 
+    /**
+     * Does this linestate have a name defined
+     *
+     * @return has a name
+     */
     public boolean hasName() {
-        if(name == null || name.length()==0) {
+        if ((name == null) || (name.length() == 0)) {
             return false;
         }
         return true;
@@ -1092,21 +1096,21 @@ public class LineState {
 
 
     /**
-       Set the NameMacro property.
-
-       @param value The new value for NameMacro
-    **/
-    public void setNameMacro (String value) {
-	this.nameMacro = value;
+     *  Set the NameMacro property.
+     *
+     *  @param value The new value for NameMacro
+     */
+    public void setNameMacro(String value) {
+        this.nameMacro = value;
     }
 
     /**
-       Get the NameMacro property.
-
-       @return The NameMacro
-    **/
-    public String getNameMacro () {
-	return this.nameMacro;
+     *  Get the NameMacro property.
+     *
+     *  @return The NameMacro
+     */
+    public String getNameMacro() {
+        return this.nameMacro;
     }
 
 
@@ -1258,4 +1262,5 @@ public class LineState {
 
 
 }
+
 

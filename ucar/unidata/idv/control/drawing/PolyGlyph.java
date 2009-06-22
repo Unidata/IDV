@@ -99,6 +99,7 @@ public class PolyGlyph extends LineGlyph {
     /** Last point */
     private Object lastPoint = null;
 
+    /** is this polygon closed          */
     private boolean closed = false;
 
 
@@ -153,8 +154,16 @@ public class PolyGlyph extends LineGlyph {
          */
     }
 
+    /**
+     * delete the point closest to the event
+     *
+     * @param event the event
+     *
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
+     */
     public void doDeletePoint(DisplayEvent event)
-        throws VisADException, RemoteException {
+            throws VisADException, RemoteException {
         if ((stretchIndex < 0) || (stretchIndex >= points.size())) {
             return;
         }
@@ -316,10 +325,10 @@ public class PolyGlyph extends LineGlyph {
                            points.size());
         try {
             Data filledData = tryToFill(Misc.toFloat(lineVals), theData);
-            if(filledData!=null) {
+            if (filledData != null) {
                 theData = filledData;
-            } 
-        } catch(Exception exc) {
+            }
+        } catch (Exception exc) {
             exc.printStackTrace();
         }
 
@@ -373,15 +382,28 @@ public class PolyGlyph extends LineGlyph {
         return this;
     }
 
+    /**
+     * handle the mouse event
+     *
+     * @param event event
+     *
+     * @return this
+     *
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
+     */
     public DrawingGlyph handleMouseReleased(DisplayEvent event)
             throws VisADException, RemoteException {
-        if(closed && points.size()>0) {
+        if (closed && (points.size() > 0)) {
             points.add(points.get(0));
             updateLocation();
         }
         return super.handleMouseReleased(event);
     }
 
+    /**
+     * this glyph is done being created
+     */
     public void doneBeingCreated() {
         super.doneBeingCreated();
     }
@@ -470,25 +492,26 @@ public class PolyGlyph extends LineGlyph {
 
 
 
-/**
-Set the Closed property.
+    /**
+     * Set the Closed property.
+     *
+     * @param value The new value for Closed
+     */
+    public void setClosed(boolean value) {
+        closed = value;
+    }
 
-@param value The new value for Closed
-**/
-public void setClosed (boolean value) {
-	closed = value;
+    /**
+     * Get the Closed property.
+     *
+     * @return The Closed
+     */
+    public boolean getClosed() {
+        return closed;
+    }
+
+
+
 }
 
-/**
-Get the Closed property.
-
-@return The Closed
-**/
-public boolean getClosed () {
-	return closed;
-}
-
-
-
-}
 

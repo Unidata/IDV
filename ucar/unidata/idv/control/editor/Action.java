@@ -20,32 +20,31 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control.editor;
 
 
 
 
 /**
- * Class Action _more_
+ * Class Action some class
  *
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public  class Action {
+public class Action {
 
-    /** _more_          */
+    /** _more_ */
     private String name;
 
-    /** _more_          */
+    /** _more_ */
     private String function;
 
 
-    /** _more_          */
+    /** _more_ */
     private String jython;
 
-    /** _more_          */
+    /** _more_ */
     private Selector selector;
 
 
@@ -62,32 +61,41 @@ public  class Action {
      * @param selector _more_
      */
     public Action(String name, String function, Selector selector) {
-        this(name, function,null, selector);
+        this(name, function, null, selector);
     }
 
-    public Action(String name, String function, String jython, Selector selector) {
-        this.name       = name;
-        this.function   = function;
-        this.jython = jython;
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param function _more_
+     * @param jython _more_
+     * @param selector _more_
+     */
+    public Action(String name, String function, String jython,
+                  Selector selector) {
+        this.name     = name;
+        this.function = function;
+        this.jython   = jython;
         this.selector = selector;
     }
 
     /**
-       Set the Selector property.
-
-       @param value The new value for Selector
-    **/
-    public void setSelector (Selector value) {
-	selector = value;
+     *  Set the Selector property.
+     *
+     *  @param value The new value for Selector
+     */
+    public void setSelector(Selector value) {
+        selector = value;
     }
 
     /**
-       Get the Selector property.
-
-       @return The Selector
-    **/
-    public Selector getSelector () {
-	return selector;
+     *  Get the Selector property.
+     *
+     *  @return The Selector
+     */
+    public Selector getSelector() {
+        return selector;
     }
 
 
@@ -141,20 +149,20 @@ public  class Action {
     }
 
     /**
-       Set the Jython property.
-
-       @param value The new value for Jython
-    **/
-    public void setJython (String value) {
+     *  Set the Jython property.
+     *
+     *  @param value The new value for Jython
+     */
+    public void setJython(String value) {
         jython = value;
     }
 
     /**
-       Get the Jython property.
-
-       @return The Jython
-    **/
-    public String getJython () {
+     *  Get the Jython property.
+     *
+     *  @return The Jython
+     */
+    public String getJython() {
         return jython;
     }
 
@@ -163,4 +171,5 @@ public  class Action {
 
 
 }
+
 

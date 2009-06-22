@@ -18,12 +18,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
-import ucar.unidata.ui.symbol.StationModel;
 import ucar.unidata.idv.ui.PlotModelComponent;
+
+
+import ucar.unidata.ui.symbol.StationModel;
 
 
 /**

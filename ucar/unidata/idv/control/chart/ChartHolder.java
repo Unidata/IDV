@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.control.chart;
 
 
@@ -627,10 +625,22 @@ public class ChartHolder {
         paramCount = 0;
     }
 
-    Hashtable<Integer,Boolean> legendVisible = new Hashtable<Integer,Boolean>();
+    /** keeps track of which legend is visible          */
+    Hashtable<Integer, Boolean> legendVisible = new Hashtable<Integer,
+                                                    Boolean>();
+
+    /**
+     * is the given legend visible
+     *
+     * @param param which legend
+     *
+     * @return is visible
+     */
     private boolean isLegendVisible(int param) {
         Boolean b = legendVisible.get(param);
-        if(b!=null) return b.booleanValue();
+        if (b != null) {
+            return b.booleanValue();
+        }
         return true;
     }
 
@@ -862,4 +872,5 @@ public class ChartHolder {
 
 
 }
+
 

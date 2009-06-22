@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.idv.control.drawing;
 
 
@@ -94,7 +90,7 @@ public class FrontGlyph extends PolyGlyph
     /** Xml attribute name */
     public static final String ATTR_FRONTTYPE = "fronttype";
 
-    /** _more_ */
+    /** xml attribute for the scale for the front */
     public static final String ATTR_FRONTSCALE = "frontscale";
 
 
@@ -110,7 +106,7 @@ public class FrontGlyph extends PolyGlyph
     /** for changing type */
     private JComboBox typeBox;
 
-    /** _more_ */
+    /** scale properties widget */
     private JTextField scaleFld;
 
     /** for flipping orientation */
@@ -119,7 +115,7 @@ public class FrontGlyph extends PolyGlyph
     /** for flipping orientation */
     private boolean flipIt = false;
 
-    /** _more_ */
+    /** the front scale */
     private double frontScale = 1.0;
 
 
@@ -149,7 +145,7 @@ public class FrontGlyph extends PolyGlyph
      * @param control The control I'm in.
      * @param event The display event.
      * @param type Front type
-     * @param smooth _more_
+     * @param smooth is the front smooth or segmented
      *
      * @throws RemoteException When bad things happen
      * @throws VisADException When bad things happen
@@ -163,9 +159,9 @@ public class FrontGlyph extends PolyGlyph
     }
 
     /**
-     * _more_
+     * get the frontDrawer
      *
-     * @return _more_
+     * @return the frontDrawer
      */
     protected FrontDrawer getFrontDrawer() {
         return frontDrawer;
@@ -196,12 +192,12 @@ public class FrontGlyph extends PolyGlyph
 
 
     /**
-     * _more_
+     * make the frontDrawer
      *
-     * @return _more_
+     * @return the frontDrawer
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
      */
     protected FrontDrawer doMakeFrontDrawer()
             throws VisADException, RemoteException {
@@ -303,27 +299,27 @@ public class FrontGlyph extends PolyGlyph
     }
 
     /**
-     * _more_
+     * create the displayable
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
      */
     protected void createDisplayable()
             throws VisADException, RemoteException {}
 
     /**
-     * _more_
+     * should add properties for the front
      *
-     * @return _more_
+     * @return should add properties for the front
      */
     protected boolean shouldAddFrontProperties() {
         return getCreatedByUser();
     }
 
     /**
-     * _more_
+     * show the color selector in the properties dialog
      *
-     * @return _more_
+     * @return show the color selector in the properties dialog
      */
     protected boolean shouldShowColorSelector() {
         return false;
@@ -472,7 +468,7 @@ public class FrontGlyph extends PolyGlyph
     /**
      * Get the default Z position for  the glyph.
      *
-     * @return _more_
+     * @return where to put this glyph in Z
      */
     protected float getDefaultZPosition() {
         return (control == null)
@@ -503,12 +499,12 @@ public class FrontGlyph extends PolyGlyph
     }
 
     /**
-     * _more_
+     * get the curve data
      *
-     * @return _more_
+     * @return curve data
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
      */
     protected float[][] getCurve() throws VisADException, RemoteException {
         return getPointValues();
@@ -684,4 +680,5 @@ public class FrontGlyph extends PolyGlyph
 
 
 }
+
 

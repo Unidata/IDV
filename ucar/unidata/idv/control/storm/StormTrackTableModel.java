@@ -166,9 +166,9 @@ public class StormTrackTableModel extends AbstractTableModel {
      * @return _more_
      */
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-      //  if (true) {
-      //      return false;
-      //  }
+        //  if (true) {
+        //      return false;
+        //  }
         if (columnIndex == 0) {
             return false;
         }
@@ -225,12 +225,10 @@ public class StormTrackTableModel extends AbstractTableModel {
             double     newValue = new Double(aValue.toString()).doubleValue();
             //Set the value
             Real rr = null;
-            try{
+            try {
                 rr = r.cloneButValue(newValue);
 
-            } catch(VisADException ep) {
-
-            }
+            } catch (VisADException ep) {}
 
             stp.setAttribute(rr);
         }
@@ -299,4 +297,5 @@ public class StormTrackTableModel extends AbstractTableModel {
 
 
 }
+
 

@@ -20,15 +20,17 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control.editor;
+
 
 import ucar.unidata.idv.control.drawing.*;
 
 import ucar.unidata.ui.CommandManager;
 
 import ucar.visad.display.*;
+
 import visad.*;
+
 import java.rmi.RemoteException;
 
 
@@ -42,13 +44,13 @@ import java.rmi.RemoteException;
  */
 public class FieldCommand extends ucar.unidata.ui.Command {
 
-    /** _more_          */
+    /** _more_ */
     RadarEditor editor;
 
-    /** _more_          */
+    /** _more_ */
     FieldImpl oldSlice;
 
-    /** _more_          */
+    /** _more_ */
     FieldImpl newSlice;
 
     /**
@@ -91,8 +93,5 @@ public class FieldCommand extends ucar.unidata.ui.Command {
     }
 
 }
-
-
-
 
 

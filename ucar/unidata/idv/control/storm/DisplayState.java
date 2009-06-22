@@ -43,30 +43,30 @@ import javax.swing.event.*;
 
 public class DisplayState {
 
-    /** _more_ */
+    /** the way display state */
     private WayDisplayState wayDisplayState;
 
-    /** _more_ */
+    /** for gui */
     private JCheckBox cbx;
 
-    /** _more_ */
+    /** is this visible */
     private boolean visible;
 
-    /** _more_ */
+    /** the name */
     private String name;
 
     /**
-     * _more_
+     * ctor
      */
     public DisplayState() {}
 
     /**
-     * _more_
+     * ctor
      *
      *
-     * @param wayDisplayState _more_
-     * @param name _more_
-     * @param visible _more_
+     * @param wayDisplayState the way display state
+     * @param name the name
+     * @param visible is this visible
      */
     public DisplayState(WayDisplayState wayDisplayState, String name,
                         boolean visible) {
@@ -77,19 +77,19 @@ public class DisplayState {
 
 
     /**
-     * _more_
+     * set background color
      *
-     * @param c _more_
+     * @param c color
      */
     protected void setBackground(Color c) {
         getCheckBox().setBackground(c);
     }
 
     /**
-     * _more_
+     * make the checkbox
      *
      *
-     * @return _more_
+     * @return the checkbox
      */
     public JCheckBox getCheckBox() {
         if (cbx == null) {
@@ -170,4 +170,5 @@ public class DisplayState {
 
 
 }
+
 

@@ -14,7 +14,7 @@
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -25,30 +25,38 @@ package ucar.unidata.idv.control;
 
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.radar.RadarConstants;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.TwoFacedObject;
+
 import ucar.visad.display.CrossSectionSelector;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.Grid2DDisplayable;
 import ucar.visad.display.XSDisplay;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.Length;
+
 import visad.*;
+
 import visad.bom.Radar3DCoordinateSystem;
+
 import visad.georef.EarthLocation;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+
 import java.rmi.RemoteException;
+
+import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.*;
 
 
 /**
@@ -60,7 +68,7 @@ import java.util.List;import java.util.ArrayList;
  */
 public class RadarRhiControl extends ColorCrossSectionControl {
 
-    /** _more_          */
+    /** identified when sharing the rhi angle */
     public static final String SHARE_ANGLE = "RadarRhiControl.SHARE_ANGLE";
 
     /** the azimuth */
@@ -82,6 +90,7 @@ public class RadarRhiControl extends ColorCrossSectionControl {
      */
     private double defaultLen       = 1.0,
                    currentCSLineLen = 0.2;
+
     /** Component to hold collections */
     JComboBox azimuthSelector;
 
@@ -107,7 +116,7 @@ public class RadarRhiControl extends ColorCrossSectionControl {
     }
 
     /**
-     * _more_
+     * add the zposition slider
      *
      * @return _more_
      */
@@ -131,15 +140,15 @@ public class RadarRhiControl extends ColorCrossSectionControl {
             }
             updateAxisLabels();
 
-      /*      List          choices      = getDataChoices();
-            DataSelection tmpSelection =
-                new DataSelection(getDataSelection());
-            tmpSelection.setFromLevel(null);
-            tmpSelection.setToLevel(null);
-            DataChoice dc          = (DataChoice) choices.get(0);
-            List       levelsList1 = dc.getAllLevels(tmpSelection);
+            /*      List          choices      = getDataChoices();
+                  DataSelection tmpSelection =
+                      new DataSelection(getDataSelection());
+                  tmpSelection.setFromLevel(null);
+                  tmpSelection.setToLevel(null);
+                  DataChoice dc          = (DataChoice) choices.get(0);
+                  List       levelsList1 = dc.getAllLevels(tmpSelection);
 
-            GuiUtils.setListData(azimuthSelector, levelsList1);  */
+                  GuiUtils.setListData(azimuthSelector, levelsList1);  */
             //DataChoice dc = (DataChoice)choices.get(0);
             //List levels = dc.getAllLevels();
             //GuiUtils.setListData(azimuthSelector, levels);
@@ -203,7 +212,7 @@ public class RadarRhiControl extends ColorCrossSectionControl {
         } catch (Exception e) {
             logException("Initializing the csSelector", e);
         }
-       // csSelector.addPropertyChangeListener(this);
+        // csSelector.addPropertyChangeListener(this);
     }
 
     /**
@@ -248,8 +257,8 @@ public class RadarRhiControl extends ColorCrossSectionControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    protected boolean setData(DataChoice choice) throws VisADException,
-            RemoteException {
+    protected boolean setData(DataChoice choice)
+            throws VisADException, RemoteException {
 
         currentLevel = getDataSelection().getFromLevel();
         if (currentLevel == null) {
@@ -261,29 +270,30 @@ public class RadarRhiControl extends ColorCrossSectionControl {
 
 
         Real c = (Real) currentLevel;
-        currentAngle = (float)c.getValue();
+        currentAngle = (float) c.getValue();
         getDataSelection().setLevel(currentLevel);
 
         DataSelection tmpSelection = new DataSelection(getDataSelection());
         tmpSelection.setFromLevel(null);
         tmpSelection.setToLevel(null);
 
-        List levelsList1 = choice.getAllLevels(tmpSelection);
-        List<TwoFacedObject> levels = new ArrayList();
-        if(levelsList1.size() >= 1) {
-            for(int i = 0; i < levelsList1.size() ; i++) {
+        List                 levelsList1 = choice.getAllLevels(tmpSelection);
+        List<TwoFacedObject> levels      = new ArrayList();
+        if (levelsList1.size() >= 1) {
+            for (int i = 0; i < levelsList1.size(); i++) {
                 String azim = levelsList1.get(i).toString();
-                String as = getDisplayConventions().formatAngle(Float.parseFloat(azim));
+                String as = getDisplayConventions().formatAngle(
+                                Float.parseFloat(azim));
                 //System.out.println("azimath " + as);
                 TwoFacedObject tobj = new TwoFacedObject(as, azim);
                 levels.add(tobj);
             }
         }
 
- /*        if (levelsList1.size() >= 1) {
-            String azim = levelsList1.get(0).toString();
-            currentAngle = Float.parseFloat(azim);
-        }   */
+        /*        if (levelsList1.size() >= 1) {
+                   String azim = levelsList1.get(0).toString();
+                   currentAngle = Float.parseFloat(azim);
+               }   */
         setRequestProperties();
 
         if ( !super.setData(choice)) {
@@ -370,15 +380,15 @@ public class RadarRhiControl extends ColorCrossSectionControl {
 
 
 
-     /**
+    /**
      * Put one end of the rhi control line on the radar position (centered);
      * leave other end where it is.
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    protected void centerLinePosition() throws VisADException,
-            RemoteException {
+    protected void centerLinePosition()
+            throws VisADException, RemoteException {
         // center location in visad box is -
 
         // change title on display control box
@@ -400,8 +410,8 @@ public class RadarRhiControl extends ColorCrossSectionControl {
      * @throws VisADException  unable to create depictor
      * @throws RemoteException  unable to create depictor (shouldn't happen)
      */
-    protected DisplayableData createXSDisplay() throws VisADException,
-            RemoteException {
+    protected DisplayableData createXSDisplay()
+            throws VisADException, RemoteException {
         Grid2DDisplayable display = new Grid2DDisplayable("vcs_col"
                                         + paramName, true);
         display.setTextureEnable(true);
@@ -418,8 +428,8 @@ public class RadarRhiControl extends ColorCrossSectionControl {
      * @throws VisADException  unable to create depictor
      * @throws RemoteException  unable to create depictor (shouldn't happen)
      */
-    protected DisplayableData createVCSDisplay() throws VisADException,
-            RemoteException {
+    protected DisplayableData createVCSDisplay()
+            throws VisADException, RemoteException {
         Grid2DDisplayable display = new Grid2DDisplayable("vcs_" + paramName,
                                         true);
         display.setTextureEnable(true);
@@ -455,8 +465,8 @@ public class RadarRhiControl extends ColorCrossSectionControl {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    public void getControlWidgets(List controlWidgets) throws VisADException,
-            RemoteException {
+    public void getControlWidgets(List controlWidgets)
+            throws VisADException, RemoteException {
         super.getControlWidgets(controlWidgets);
 
         controlWidgets.add(new WrapperWidget(this,
@@ -538,8 +548,8 @@ public class RadarRhiControl extends ColorCrossSectionControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    protected void createCrossSectionSelector() throws VisADException,
-            RemoteException {
+    protected void createCrossSectionSelector()
+            throws VisADException, RemoteException {
 
         // make a Selector line there
         csSelector = new CrossSectionSelector();
@@ -625,7 +635,7 @@ public class RadarRhiControl extends ColorCrossSectionControl {
             return;
         }
         getRequestProperties().put(RadarConstants.PROP_AZIMUTH,
-                new Double(currentAngle));
+                                   new Double(currentAngle));
         getGridDataInstance().reInitialize();
         //getGridDataInstance().putRequestProperty(RadarConstants.PROP_AZIMUTH,
         //        new Double(currentAngle));
@@ -672,8 +682,8 @@ public class RadarRhiControl extends ColorCrossSectionControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    protected FieldImpl make2DData(
-            FieldImpl inputfieldImpl) throws VisADException, RemoteException {
+    protected FieldImpl make2DData(FieldImpl inputfieldImpl)
+            throws VisADException, RemoteException {
         FieldImpl fi             = null;
         boolean   istimeSequence = GridUtil.isTimeSequence(inputfieldImpl);
         if (istimeSequence) {
@@ -715,8 +725,8 @@ public class RadarRhiControl extends ColorCrossSectionControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */
-    private FieldImpl make2DDataAtOneTime(
-            FieldImpl inputfieldImpl) throws VisADException, RemoteException {
+    private FieldImpl make2DDataAtOneTime(FieldImpl inputfieldImpl)
+            throws VisADException, RemoteException {
         FieldImpl fi       = null;
         FlatField testff   = null;
         Set       indexSet = null;
@@ -833,4 +843,5 @@ public class RadarRhiControl extends ColorCrossSectionControl {
 
 
 }
+
 

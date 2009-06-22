@@ -46,14 +46,14 @@ import ucar.unidata.ui.PropertyFilter;
 import ucar.unidata.ui.TableSorter;
 
 import ucar.unidata.ui.symbol.*;
-
-import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.FileManager;
-import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.ObjectListener;
+
+import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 
@@ -74,12 +74,12 @@ import visad.georef.EarthLocation;
 import visad.georef.NamedLocation;
 import visad.georef.NamedLocationTuple;
 
-
-import java.io.File;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
+
+
+import java.io.File;
 
 import java.rmi.RemoteException;
 
@@ -1958,8 +1958,8 @@ public class StationLocationControl extends StationModelControl {
         super.getSaveMenuItems(items, forMenuBar);
         List namedStations = getStationList();
         if ((namedStations != null) && (namedStations.size() > 0)) {
-            items.add(GuiUtils.makeMenuItem("Export Locations...",
-                                            this, "exportLocations"));
+            items.add(GuiUtils.makeMenuItem("Export Locations...", this,
+                                            "exportLocations"));
         }
     }
 
@@ -1967,21 +1967,20 @@ public class StationLocationControl extends StationModelControl {
      * Write out the locations as an xml file
      */
     public void exportLocations() {
-        PatternFileFilter xmlFilter =
-            new PatternFileFilter(
-                                  ".+\\.xml", "Location XML Format",
-                                  ".xml");
-    
-        String filename =
-            FileManager.getWriteFile(xmlFilter, ".xml");
+        PatternFileFilter xmlFilter = new PatternFileFilter(".+\\.xml",
+                                          "Location XML Format", ".xml");
+
+        String filename = FileManager.getWriteFile(xmlFilter, ".xml");
         if (filename == null) {
             return;
         }
         try {
             List stations = getStationList();
-            String xml= NamedStationTable.getStationXml(IOUtil.getFileTail(filename),null, stations);
+            String xml =
+                NamedStationTable.getStationXml(IOUtil.getFileTail(filename),
+                    null, stations);
             IOUtil.writeFile(new File(filename), xml);
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             logException("Writing locations", exc);
         }
 

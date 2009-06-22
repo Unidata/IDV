@@ -112,10 +112,10 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.*;
-import javax.swing.tree.*;
 import javax.swing.event.*;
 
 import javax.swing.table.*;
+import javax.swing.tree.*;
 
 
 
@@ -130,7 +130,7 @@ import javax.swing.table.*;
 public class StormDisplayState {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_TRACK_TABLE = "prop.track.table";
 
     /** _more_ */
@@ -183,11 +183,11 @@ public class StormDisplayState {
     /** _more_ */
     private List<StormTrackChart> charts = new ArrayList<StormTrackChart>();
 
-    /** _more_          */
+    /** _more_ */
     private List<StormTrackTableModel> tableModels =
         new ArrayList<StormTrackTableModel>();
 
-    /** _more_          */
+    /** _more_ */
     private TreePanel tableTreePanel;
 
     /** _more_ */
@@ -416,11 +416,10 @@ public class StormDisplayState {
             me.add(this);
 
             //            System.err.println ("looking");
-            Real animationTime = null;
-            Animation animation =stormTrackControl.getViewAnimation();
+            Real      animationTime = null;
+            Animation animation     = stormTrackControl.getViewAnimation();
             if (animation != null) {
-                animationTime =
-                    animation.getAniValue();
+                animationTime = animation.getAniValue();
             }
             if (animationTime == null) {
                 //                System.err.println ("no animation");
@@ -2018,32 +2017,35 @@ public class StormDisplayState {
      * @return _more_
      */
     private JComponent getTrackTable() {
-        final Font boldFont = new Font("Dialog", Font.BOLD, 10);
+        final Font boldFont  = new Font("Dialog", Font.BOLD, 10);
         final Font plainFont = new Font("Dialog", Font.PLAIN, 10);
         tableTreePanel = new TreePanel(true, 150) {
-                public  DefaultTreeCellRenderer doMakeTreeCellRenderer() {
-                    return new DefaultTreeCellRenderer() {
-                            public Component getTreeCellRendererComponent(JTree theTree,
-                                                                          Object value, boolean sel, boolean expanded,
-                                                                          boolean leaf, int row, boolean hasFocus) {
-                                super.getTreeCellRendererComponent(theTree, value, sel,
-                                                                   expanded, leaf, row, hasFocus);
-                                if ( !(value instanceof TreePanel.MyTreeNode)) {
-                                    return this;
-                                }
-                                TreePanel.MyTreeNode node = (TreePanel.MyTreeNode) value;
-                                StormTrack track = (StormTrack) node.getObject();
-                                if(track.getIsEdited()) {
-                                    this.setFont(boldFont);
-                                    this.setForeground(Color.red);
-                                } else {
-                                    this.setFont(plainFont);
-                                    this.setForeground(Color.black);
-                                }
-                                return this;
-                            }};
-                }
-            };
+            public DefaultTreeCellRenderer doMakeTreeCellRenderer() {
+                return new DefaultTreeCellRenderer() {
+                    public Component getTreeCellRendererComponent(
+                            JTree theTree, Object value, boolean sel,
+                            boolean expanded, boolean leaf, int row,
+                            boolean hasFocus) {
+                        super.getTreeCellRendererComponent(theTree, value,
+                                sel, expanded, leaf, row, hasFocus);
+                        if ( !(value instanceof TreePanel.MyTreeNode)) {
+                            return this;
+                        }
+                        TreePanel.MyTreeNode node =
+                            (TreePanel.MyTreeNode) value;
+                        StormTrack track = (StormTrack) node.getObject();
+                        if (track.getIsEdited()) {
+                            this.setFont(boldFont);
+                            this.setForeground(Color.red);
+                        } else {
+                            this.setFont(plainFont);
+                            this.setForeground(Color.black);
+                        }
+                        return this;
+                    }
+                };
+            }
+        };
 
         int width  = 400;
         int height = 400;
@@ -2073,7 +2075,7 @@ public class StormDisplayState {
 
             tableTreePanel.addComponent(contents, track.getWay().toString(),
                                         track.getStartTime().toString(),
-                                        null,track);
+                                        null, track);
         }
 
 
@@ -2082,20 +2084,20 @@ public class StormDisplayState {
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final PatternFileFilter FILTER_DAT =
         new PatternFileFilter(".+\\.dat", "Diamond Format (*.dat)", ".dat");
 
-    /** _more_          */
+    /** _more_ */
     JCheckBox obsCbx = new JCheckBox("Observation", true);
 
-    /** _more_          */
+    /** _more_ */
     JCheckBox forecastCbx = new JCheckBox("Forecast", true);
 
-    /** _more_          */
+    /** _more_ */
     JCheckBox mostRecentCbx = new JCheckBox("Most Recent Forecasts", false);
 
-    /** _more_          */
+    /** _more_ */
     JCheckBox editedCbx = new JCheckBox("Edited Tracks", false);
 
 
@@ -2127,9 +2129,10 @@ public class StormDisplayState {
                     waysToUse.add(track.getWay());
                 }
                 tracks.add(track);
-                if(editedCbx.isSelected()) {
-                    if( track.getIsEdited())
+                if (editedCbx.isSelected()) {
+                    if (track.getIsEdited()) {
                         tracksToWrite.add(track);
+                    }
                 } else {
                     if (track.getWay().isObservation()) {
                         if (obsCbx.isSelected()) {
@@ -2147,7 +2150,8 @@ public class StormDisplayState {
 
 
             if (filename.endsWith(".dat")) {
-                StringBuffer sb = StormTrack.toDiamond7(tracksToWrite, stormInfo.getStormId());
+                StringBuffer sb = StormTrack.toDiamond7(tracksToWrite,
+                                      stormInfo.getStormId());
                 IOUtil.writeFile(filename, sb.toString());
                 return;
             }
@@ -2575,4 +2579,5 @@ public class StormDisplayState {
 
 
 }
+
 

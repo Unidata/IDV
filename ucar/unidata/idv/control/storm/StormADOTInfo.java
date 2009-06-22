@@ -37,44 +37,44 @@ public class StormADOTInfo {
 
     /* various constants */
 
-    /** _more_          */
+    /** _more_ */
     static public int kstart_v72 = 24;  /* inner cloud region analysis radius (km) */
 
-    /** _more_          */
+    /** _more_ */
     static public int kend_v72 = 136;  /* outer cloud region analysis radius (km) */
 
-    /** _more_          */
+    /** _more_ */
     static public int kenda_v72 = 190;  /* automated cursor position analysis radius (km) */
 
-    /** _more_          */
+    /** _more_ */
     static public int keyerM_v72 = 24;  /* outer eye region search radius (km) - Manual position */
 
-    /** _more_          */
+    /** _more_ */
     static public int keyerA_v72 = 75;  /* outer eye region search radius (km) - Auto position */
 
-    /** _more_          */
+    /** _more_ */
     static public int kres_v72 = 4;  /* width of the cloud region analysis rings */
 
-    /** _more_          */
+    /** _more_ */
     static public int arfd_v72;  /* the FILE id for the image in question */
 
     /* global variables */
     /* char   eyetype_v72[7][20]={ "EYE","PINHOLE EYE","LARGE EYE","LARGE RAGGED","RAGGED","OBSCURED","NONE" }; */
 
-    /** _more_          */
+    /** _more_ */
     static public String eyetype_v72[] = { "EYE", "PINHOLE EYE", "LARGE EYE",
                                            "NONE" };
 
-    /** _more_          */
+    /** _more_ */
     static public String cloudtype_v72[] = {
         "UNIFORM CDO", "EMBEDDED CENTER", "IRREGULAR CDO", "CURVED BAND",
         "SHEAR", "EYE"
     };
 
-    /** _more_          */
+    /** _more_ */
     static public String cbasin_v72[] = { "ATLANTIC", "PACIFIC " };
 
-    /** _more_          */
+    /** _more_ */
     static public String cmon_v72[] = {
         "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT",
         "NOV", "DEC"
@@ -82,7 +82,7 @@ public class StormADOTInfo {
     /* T#-Pressure/Wind relationships (Atlantic and Pacific) */
     /* increased from 73 to 83 to allow for >8.0 storms */
 
-    /** _more_          */
+    /** _more_ */
     static public double tno_v72[] = {
         -9999., -8888., 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0,
         2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0, 3.1, 3.2, 3.3, 3.4,
@@ -92,7 +92,7 @@ public class StormADOTInfo {
         7.7, 7.8, 7.9, 8.0, 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9, 9.0
     };
 
-    /** _more_          */
+    /** _more_ */
     static public double pres_v72[][] = {
         /* Atlantic pressure relationship values */
         {
@@ -124,7 +124,7 @@ public class StormADOTInfo {
 
     /* Atlantic/Pacific pressure relationship values */
 
-    /** _more_          */
+    /** _more_ */
     static public double wind_v72[] = {
         -9999.0, -8888.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 26.0, 27.0,
         28.0, 29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 37.0, 39.0, 41.0,
@@ -137,7 +137,7 @@ public class StormADOTInfo {
     };
     /* BD curve break points */
 
-    /** _more_          */
+    /** _more_ */
     static public double ebd_v72[] = {
         30.0, 9.0, -30.0, -42.0, -54.0, -64.0, -70.0, -76.0, -80.0, -84.0,
         -100.0
@@ -145,38 +145,38 @@ public class StormADOTInfo {
 
     /* AODT library global variables */
 
-    /** _more_          */
+    /** _more_ */
     boolean odt_v72, olist_v72, oautomode_v72, override_v72;
 
-    /** _more_          */
+    /** _more_ */
     boolean ostartstr_v72, oland_v72, osearch_v72;
 
 
-    /** _more_          */
+    /** _more_ */
     float[][] spiralband_v72 = new float[2][37];
 
-    /** _more_          */
+    /** _more_ */
     float fcstlat_v72, fcstlon_v72;
 
-    /** _more_          */
+    /** _more_ */
     double fcsttime_v72, starttime_v72, endtime_v72;
 
-    /** _more_          */
+    /** _more_ */
     String hfile_v72, fixfile_v72;
 
-    /** _more_          */
+    /** _more_ */
     String diagnostics_v72;
 
-    /** _more_          */
+    /** _more_ */
     IRData odthistoryfirst_v72;
 
-    /** _more_          */
+    /** _more_ */
     IRData odtcurrent_v72;
 
-    /** _more_          */
+    /** _more_ */
     public ArrayList<RingData> tcircfirst_v72;
 
-    /** _more_          */
+    /** _more_ */
     DataGrid areadata_v72;
 
     /**
@@ -188,13 +188,13 @@ public class StormADOTInfo {
      */
     public class RingData {
 
-        /** _more_          */
+        /** _more_ */
         float dist;
 
-        /** _more_          */
+        /** _more_ */
         float angle;
 
-        /** _more_          */
+        /** _more_ */
         float temp;
 
         /**
@@ -228,19 +228,19 @@ public class StormADOTInfo {
      */
     public class DataGrid {
 
-        /** _more_          */
+        /** _more_ */
         float[][] temp = new float[500][500];
 
-        /** _more_          */
+        /** _more_ */
         float[][] lat = new float[500][500];
 
-        /** _more_          */
+        /** _more_ */
         float[][] lon = new float[500][500];
 
-        /** _more_          */
+        /** _more_ */
         int numx;
 
-        /** _more_          */
+        /** _more_ */
         int numy;
 
         /**
@@ -278,131 +278,131 @@ public class StormADOTInfo {
      */
     public class IRData {
 
-        /** _more_          */
+        /** _more_ */
         int date;
 
-        /** _more_          */
+        /** _more_ */
         int time;
 
-        /** _more_          */
+        /** _more_ */
         float TrawO;
 
-        /** _more_          */
+        /** _more_ */
         float Traw;
 
-        /** _more_          */
+        /** _more_ */
         float Tfinal;
 
-        /** _more_          */
+        /** _more_ */
         float Tfinal3;
 
-        /** _more_          */
+        /** _more_ */
         float CI;
 
-        /** _more_          */
+        /** _more_ */
         float eyet;
 
-        /** _more_          */
+        /** _more_ */
         float warmt;
 
-        /** _more_          */
+        /** _more_ */
         float cloudt;
 
-        /** _more_          */
+        /** _more_ */
         float cloudt2;
 
-        /** _more_          */
+        /** _more_ */
         float cwcloudt;
 
-        /** _more_          */
+        /** _more_ */
         float latitude;
 
-        /** _more_          */
+        /** _more_ */
         float longitude;
 
-        /** _more_          */
+        /** _more_ */
         float warmlatitude;
 
-        /** _more_          */
+        /** _more_ */
         float warmlongitude;
 
-        /** _more_          */
+        /** _more_ */
         float eyecdosize;
 
-        /** _more_          */
+        /** _more_ */
         float eyestdv;
 
-        /** _more_          */
+        /** _more_ */
         float cloudsymave;
 
-        /** _more_          */
+        /** _more_ */
         int sattype;
 
-        /** _more_          */
+        /** _more_ */
         int eyescene;
 
-        /** _more_          */
+        /** _more_ */
         int cloudscene;
 
-        /** _more_          */
+        /** _more_ */
         int eyesceneold;
 
-        /** _more_          */
+        /** _more_ */
         int cloudsceneold;
 
-        /** _more_          */
+        /** _more_ */
         int rule9;
 
-        /** _more_          */
+        /** _more_ */
         int rule8;
 
-        /** _more_          */
+        /** _more_ */
         int land;
 
-        /** _more_          */
+        /** _more_ */
         int eyefft;
 
-        /** _more_          */
+        /** _more_ */
         int cloudfft;
 
-        /** _more_          */
+        /** _more_ */
         int cwring;
 
-        /** _more_          */
+        /** _more_ */
         int ringcb;
 
-        /** _more_          */
+        /** _more_ */
         int ringcbval;
 
-        /** _more_          */
+        /** _more_ */
         int ringcbvalmax;
 
-        /** _more_          */
+        /** _more_ */
         float ringcblatmax;
 
-        /** _more_          */
+        /** _more_ */
         float ringcblonmax;
 
-        /** _more_          */
+        /** _more_ */
         float CIadjp;
         /*float sst;*/
         /*float TIEraw;*/
         /*float TIEavg;*/
         /*int   TIEflag;*/
 
-        /** _more_          */
+        /** _more_ */
         int autopos;
 
-        /** _more_          */
+        /** _more_ */
         int LBflag;
 
-        /** _more_          */
+        /** _more_ */
         int rapiddiss;
 
-        /** _more_          */
+        /** _more_ */
         float rmw;
 
-        /** _more_          */
+        /** _more_ */
         char[] comment = new char[50];
 
         /**
@@ -516,4 +516,5 @@ public class StormADOTInfo {
     }
 
 }
+
 

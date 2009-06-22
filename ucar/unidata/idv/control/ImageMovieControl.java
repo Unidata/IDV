@@ -1060,7 +1060,8 @@ public class ImageMovieControl extends DisplayControlImpl {
     protected void timeChanged(Real time) {
         super.timeChanged(time);
         try {
-            getImagePanel().setSelectedFile(getInternalAnimation().getCurrent());
+            getImagePanel().setSelectedFile(
+                getInternalAnimation().getCurrent());
         } catch (Exception exc) {
             logException("Error setting time", exc);
         }

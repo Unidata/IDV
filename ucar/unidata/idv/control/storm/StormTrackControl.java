@@ -203,7 +203,7 @@ public class StormTrackControl extends DisplayControlImpl {
     /** _more_ */
     private JCheckBox mostRecentCbx;
 
-    /** _more_          */
+    /** _more_ */
     private JCheckBox editedCbx;
 
 
@@ -240,7 +240,7 @@ public class StormTrackControl extends DisplayControlImpl {
     private List<JRadioButton> obsWayRadioButtons;
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean editMode = false;
 
     /**
@@ -2570,4 +2570,5 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 }
+
 

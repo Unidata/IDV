@@ -20,14 +20,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
 import ucar.unidata.collab.Sharable;
+import ucar.unidata.data.DataAlias;
 
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
@@ -651,6 +650,7 @@ public class ProbeRowInfo {
      * Set the station name
      *
      * @param ob  the point observation
+     * @param control The display control this is part of
      *
      * @throws RemoteException On badness
      * @throws VisADException On badness
@@ -665,14 +665,15 @@ public class ProbeRowInfo {
                     StringUtil.replace(comps[i].getType().toString(),
                                        "(Text)", "").toLowerCase();
                 String canon = DataAlias.aliasToCanonical(name);
-                if (canon!=null && (canon.equals("IDN")  ||
-                                    canon.equals("ID"))) {
+                if ((canon != null)
+                        && (canon.equals("IDN") || canon.equals("ID"))) {
                     stationName = comps[i].toString();
                     return;
                 }
             }
         }
-       stationName = control.getDisplayConventions().formatLatLonPoint(ob.getEarthLocation().getLatLonPoint());
+        stationName = control.getDisplayConventions().formatLatLonPoint(
+            ob.getEarthLocation().getLatLonPoint());
     }
 
 
@@ -856,4 +857,5 @@ public class ProbeRowInfo {
 
 
 }
+
 

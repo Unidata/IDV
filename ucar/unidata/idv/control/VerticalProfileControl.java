@@ -155,7 +155,7 @@ public class VerticalProfileControl extends LineProbeControl {
             }
         };
         latLonWidget = new LatLonWidget("Lat: ", "Lon: ", llListener);
-        aniWidget = getAnimationWidget().getContents(false);
+        aniWidget    = getAnimationWidget().getContents(false);
         setContents(doMakeContents());
         doMakeProbe();
         return true;
@@ -711,8 +711,11 @@ public class VerticalProfileControl extends LineProbeControl {
         List chartInfos = new ArrayList();
         for (int i = 0; i < localInfos.size(); i++) {
 
-            VerticalProfileInfo info = (VerticalProfileInfo) localInfos.get(i);
-            if(info == null|| info.getDataInstance()==null) continue;
+            VerticalProfileInfo info =
+                (VerticalProfileInfo) localInfos.get(i);
+            if ((info == null) || (info.getDataInstance() == null)) {
+                continue;
+            }
             FieldImpl newFI = GridUtil.getProfileAtLatLonPoint(
                                   info.getDataInstance().getGrid(), llp,
                                   info.getSamplingMode());

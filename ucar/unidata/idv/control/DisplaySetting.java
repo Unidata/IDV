@@ -144,7 +144,8 @@ public class DisplaySetting {
      * @param display The display
      */
     public static void doSave(IntegratedDataViewer idv, JDialog dialog,
-                              List<PropertyValue> propList, DisplayControlImpl display) {
+                              List<PropertyValue> propList,
+                              DisplayControlImpl display) {
 
         ControlDescriptor cd = null;
         if (display != null) {

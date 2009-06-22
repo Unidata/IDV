@@ -40,10 +40,10 @@ import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.Util;
-
-import ucar.visad.display.Grid2DDisplayable;
 import ucar.visad.display.Displayable;
 import ucar.visad.display.DisplayableData;
+
+import ucar.visad.display.Grid2DDisplayable;
 import ucar.visad.display.GridDisplayable;
 import ucar.visad.display.SelectorDisplayable;
 import ucar.visad.display.ZSelector;
@@ -450,52 +450,54 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
     /**
      * Create a jcombobox for setting the polygon mode.
-     * 
+     *
      * @return polygon mode combo box
      */
     protected JComboBox getPolyModeComboBox() {
-            JComboBox polyModeCombo = new JComboBox();
-            TwoFacedObject[] polyModes = { new TwoFacedObject("Solid",
-                                             new Integer(Grid2DDisplayable
-                                                 .POLYGON_FILL)),
-                                           new TwoFacedObject("Mesh",
-                                               new Integer(Grid2DDisplayable
-                                                   .POLYGON_LINE)),
-                                           new TwoFacedObject("Points",
-                                               new Integer(Grid2DDisplayable
-                                                   .POLYGON_POINT)) };
-            GuiUtils.setListData(polyModeCombo, polyModes);
-            polyModeCombo.setSelectedIndex(
-                (getPolygonMode() == Grid2DDisplayable.POLYGON_POINT)
-                ? 2
-                : (getPolygonMode() == Grid2DDisplayable.POLYGON_LINE)
-                  ? 1
-                  : 0);
-            polyModeCombo.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        setPolygonMode(
-                            ((Integer) ((TwoFacedObject) ((JComboBox) e
-                                .getSource()).getSelectedItem()).getId())
-                                    .intValue());
-                        
-                        if(planDisplay!=null && planDisplay instanceof Grid2DDisplayable) {
-                            ((Grid2DDisplayable)planDisplay).setPolygonMode(getPolygonMode());
-                        }
-                    } catch (Exception ve) {
-                        logException("setPolygonMode", ve);
+        JComboBox polyModeCombo = new JComboBox();
+        TwoFacedObject[] polyModes = { new TwoFacedObject(
+                                         "Solid",
+                                         new Integer(
+                                             Grid2DDisplayable.POLYGON_FILL)),
+                                       new TwoFacedObject("Mesh",
+                                           new Integer(Grid2DDisplayable
+                                               .POLYGON_LINE)),
+                                       new TwoFacedObject("Points",
+                                           new Integer(Grid2DDisplayable
+                                               .POLYGON_POINT)) };
+        GuiUtils.setListData(polyModeCombo, polyModes);
+        polyModeCombo.setSelectedIndex((getPolygonMode()
+                                        == Grid2DDisplayable.POLYGON_POINT)
+                                       ? 2
+                                       : (getPolygonMode()
+                                          == Grid2DDisplayable.POLYGON_LINE)
+                                         ? 1
+                                         : 0);
+        polyModeCombo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    setPolygonMode(((Integer) ((TwoFacedObject) ((JComboBox) e
+                        .getSource()).getSelectedItem()).getId()).intValue());
+
+                    if ((planDisplay != null)
+                            && (planDisplay instanceof Grid2DDisplayable)) {
+                        ((Grid2DDisplayable) planDisplay).setPolygonMode(
+                            getPolygonMode());
                     }
+                } catch (Exception ve) {
+                    logException("setPolygonMode", ve);
                 }
-            });
-            return polyModeCombo;
+            }
+        });
+        return polyModeCombo;
 
     }
 
-   /**
-
-     * Handle property change
+    /**
      *
-     * @param evt The event
+     *  Handle property change
+     * 
+     *  @param evt The event
      */
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(
@@ -908,7 +910,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         if ((getDataSelection().getFromLevel() != null)
                 && Misc.equals(getDataSelection().getFromLevel(),
                                getDataSelection().getToLevel())) {
-            Real realLevel    = getLevelReal(pl);
+            Real realLevel = getLevelReal(pl);
             getDataSelection().setLevel(realLevel);
             getDataInstance().setDataSelection(getDataSelection());
         }

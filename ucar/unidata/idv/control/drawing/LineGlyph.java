@@ -247,7 +247,7 @@ public abstract class LineGlyph extends DrawingGlyph {
      * @param compMap Holds mapping of attribute name to widget
      */
     protected void getPropertiesComponents(List comps, Hashtable compMap) {
-        if(lineDisplayable!=null) {
+        if (lineDisplayable != null) {
             JComboBox box = control.doMakeLineWidthBox((int) lineWidth);
             comps.add(GuiUtils.rLabel("Line Width:"));
             comps.add(GuiUtils.left(box));

@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
@@ -104,10 +103,10 @@ public class DisplaySettingsDialog {
     private JComponent contents;
 
 
-    /** list of dipslays       */
+    /** list of dipslays */
     private JList displaysList;
 
-    /** list of saved settings     */
+    /** list of saved settings */
     private JList displaySettingsList;
 
     /**
@@ -210,7 +209,7 @@ public class DisplaySettingsDialog {
     }
 
 
-    /** _more_          */
+    /** not used */
     private static HashSet logSeen = new HashSet();
 
     /**
@@ -332,9 +331,9 @@ public class DisplaySettingsDialog {
         }
 
         /**
-         * _more_
+         * to string
          *
-         * @return _more_
+         * @return to string
          */
         public String toString() {
             return dci.getLabel();
@@ -1216,4 +1215,5 @@ public class DisplaySettingsDialog {
 
 
 }
+
 

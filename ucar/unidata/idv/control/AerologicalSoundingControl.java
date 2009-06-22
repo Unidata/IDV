@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
@@ -1000,7 +999,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      * @throws VisADException  if a VisAD failure occurs.
      * @throws RemoteException if a Java RMI failure occurs.
      */
-    protected synchronized void setSoundings(Field[] tempPros, Field[] dewPros, Field[] windPros)
+    protected synchronized void setSoundings(Field[] tempPros,
+                                             Field[] dewPros,
+                                             Field[] windPros)
             throws VisADException, RemoteException {
 
         int n = tempPros.length;

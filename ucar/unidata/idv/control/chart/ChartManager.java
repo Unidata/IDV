@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.idv.control.chart;
 
 
@@ -156,6 +152,7 @@ public abstract class ChartManager implements ImageObserver {
     /** flag for showing the thumbnail */
     private boolean showThumb = false;
 
+    /** will we be updating the thumbnail image          */
     private boolean thumbUpdatePending = false;
 
 
@@ -200,17 +197,19 @@ public abstract class ChartManager implements ImageObserver {
      * Save the image
      */
     public void saveImage() {
-        JComboBox publishCbx = control.getIdv().getPublishManager().getSelector("nc.export");
+        JComboBox publishCbx =
+            control.getIdv().getPublishManager().getSelector("nc.export");
         String filename = FileManager.getWriteFile(FileManager.FILTER_IMAGE,
-                                                   FileManager.SUFFIX_JPG,
-                                                   (publishCbx!=null?GuiUtils.top(publishCbx):null));
+                              FileManager.SUFFIX_JPG, ((publishCbx != null)
+                ? GuiUtils.top(publishCbx)
+                : null));
         if (filename == null) {
             return;
         }
         try {
             ImageUtils.writeImageToFile(getContents(), filename);
             control.getIdv().getPublishManager().publishContent(filename,
-                                                        null, publishCbx);
+                    null, publishCbx);
         } catch (Exception exc) {
             LogUtil.logException("Capturing image", exc);
         }
@@ -333,7 +332,7 @@ public abstract class ChartManager implements ImageObserver {
      */
     protected List getPlots() {
         List plots = new ArrayList();
-        for (ChartHolder chartHolder:  chartHolders) {
+        for (ChartHolder chartHolder : chartHolders) {
             plots.add(chartHolder.getPlot());
         }
         return plots;
@@ -348,21 +347,31 @@ public abstract class ChartManager implements ImageObserver {
      */
     public void updateThumb() {
         updateThumb(false);
-        
+
     }
 
+    /**
+     * update the thumbnail
+     *
+     * @param force if true then always update the thumb
+     */
     private void updateThumb(boolean force) {
-        if(force) {
+        if (force) {
             updateThumbInner();
             return;
         }
-        if(thumbUpdatePending) return;
+        if (thumbUpdatePending) {
+            return;
+        }
         thumbUpdatePending = true;
         //In 500 ms update the thumbnail image
-        Misc.runInABit(500, this,"updateThumbInner", null);
+        Misc.runInABit(500, this, "updateThumbInner", null);
     }
 
 
+    /**
+     * actually update the thumbnail image
+     */
     public void updateThumbInner() {
         try {
             if ( !showThumb) {
@@ -391,7 +400,7 @@ public abstract class ChartManager implements ImageObserver {
                     height,
                     Image.SCALE_AREA_AVERAGING), BufferedImage.TYPE_INT_RGB);
             boolean chartsShowingSomething = false;
-            for (ChartHolder chartHolder:  chartHolders) {
+            for (ChartHolder chartHolder : chartHolders) {
                 if (chartHolder.getBeingShown()
                         && chartHolder.hasParameters()) {
                     chartsShowingSomething = true;
@@ -509,7 +518,7 @@ public abstract class ChartManager implements ImageObserver {
      * Tell the chart holds that something changed
      */
     public void signalChartChanged() {
-        for (ChartHolder chartHolder:  chartHolders) {
+        for (ChartHolder chartHolder : chartHolders) {
             if (chartHolder.getChartPanel() != null) {
                 chartHolder.getChartPanel().chartChanged(
                     new ChartChangeEvent(this));
@@ -521,7 +530,7 @@ public abstract class ChartManager implements ImageObserver {
      * refresh chart holders
      */
     private void setRefresh() {
-        for (ChartHolder chartHolder:  chartHolders) {
+        for (ChartHolder chartHolder : chartHolders) {
             chartHolder.getChartPanel().setRefreshBuffer(true);
         }
     }
@@ -676,7 +685,7 @@ public abstract class ChartManager implements ImageObserver {
      */
     private List getLocations() {
         List locations = new ArrayList();
-        for (ChartHolder chartHolder:  chartHolders) {
+        for (ChartHolder chartHolder : chartHolders) {
             if ( !chartHolder.getBeingShown()) {
                 continue;
             }
@@ -755,7 +764,7 @@ public abstract class ChartManager implements ImageObserver {
         }
 
         items.add(GuiUtils.MENU_SEPARATOR);
-        for (ChartHolder chartHolder:  chartHolders) {
+        for (ChartHolder chartHolder : chartHolders) {
             if ( !chartHolder.getBeingShown()) {
                 continue;
             }
@@ -839,7 +848,7 @@ public abstract class ChartManager implements ImageObserver {
      * @return anything to show
      */
     public boolean hasStuff() {
-        for (ChartHolder chartHolder:  chartHolders) {
+        for (ChartHolder chartHolder : chartHolders) {
             if (chartHolder.hasParameters()) {
                 return true;
             }
@@ -871,7 +880,7 @@ public abstract class ChartManager implements ImageObserver {
      */
     public List getPlotNames() {
         List names = new ArrayList();
-        for (ChartHolder chartHolder:  chartHolders) {
+        for (ChartHolder chartHolder : chartHolders) {
             names.add(chartHolder.getName());
         }
         return names;
@@ -907,7 +916,7 @@ public abstract class ChartManager implements ImageObserver {
      * @return the chart or null if none found
      */
     protected ChartHolder findChartHolder(String name) {
-        for (ChartHolder tmp:  chartHolders) {
+        for (ChartHolder tmp : chartHolders) {
             //If no name then use first chart
             if ((name == null) || Misc.equals(name, tmp.getName())) {
                 return tmp;
@@ -969,7 +978,7 @@ public abstract class ChartManager implements ImageObserver {
     }
 
     /**
-     * _more_
+     * make the chart
      */
     protected void makeInitialChart() {
         getChartHolder(getDefaultChartName());
@@ -1008,9 +1017,9 @@ public abstract class ChartManager implements ImageObserver {
         List    comps        = new ArrayList();
         int     tabIndex     = 0;
         boolean needToUpdate = false;
-        int goodCharts = 0;
+        int     goodCharts   = 0;
 
-        for (ChartHolder chartHolder:  chartHolders) {
+        for (ChartHolder chartHolder : chartHolders) {
             if (chartHolder.hasParameters()) {
                 goodCharts++;
             }
@@ -1018,7 +1027,8 @@ public abstract class ChartManager implements ImageObserver {
 
         for (int plotIdx = 0; plotIdx < chartHolders.size(); plotIdx++) {
             ChartHolder chartHolder = (ChartHolder) chartHolders.get(plotIdx);
-            if (chartHolder.hasParameters() || (plotIdx==0 && goodCharts==0)) {
+            if (chartHolder.hasParameters()
+                    || ((plotIdx == 0) && (goodCharts == 0))) {
                 if ( !chartHolder.getBeingShown()) {
                     needToUpdate = true;
                 }
@@ -1044,16 +1054,16 @@ public abstract class ChartManager implements ImageObserver {
         }
 
 
-        for (ChartHolder chartHolder:  chartHolders) {
+        for (ChartHolder chartHolder : chartHolders) {
             chartHolder.resetChartPanel();
         }
 
         for (int plotIdx = 0; plotIdx < chartHolders.size(); plotIdx++) {
             ChartHolder chartHolder = (ChartHolder) chartHolders.get(plotIdx);
-            if (plotIdx==0 && goodCharts==0) {
+            if ((plotIdx == 0) && (goodCharts == 0)) {
                 //if we don't have any charts then always show the first one
             } else {
-                if (!chartHolder.hasParameters()) {
+                if ( !chartHolder.hasParameters()) {
                     chartHolder.setBeingShown(false);
                     continue;
                 }
@@ -1211,4 +1221,5 @@ public abstract class ChartManager implements ImageObserver {
 
 
 }
+
 

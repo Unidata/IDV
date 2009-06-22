@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.control.chart;
 
 
@@ -97,12 +95,13 @@ public class PointParam {
     }
 
     /**
-     * _more_
+     * tostring
      *
-     * @return _more_
+     * @return tostring
      */
     public String toString() {
         return getName();
     }
 }
+
 

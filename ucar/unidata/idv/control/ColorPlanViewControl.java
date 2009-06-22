@@ -20,19 +20,17 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.control;
 
 
 import ucar.unidata.data.DataChoice;
 
 import ucar.unidata.idv.DisplayConventions;
-
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
+
+import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.Grid2DDisplayable;
@@ -152,24 +150,25 @@ public class ColorPlanViewControl extends PlanViewControl {
                     }
                 }
             });
-            if(polyModeCombo!=null) {
-                controlWidgets.add(new WrapperWidget(this,
-                                                     GuiUtils.rLabel("Display:"),
-                                                     GuiUtils.left(GuiUtils.hbox(GuiUtils.rLabel("Shade Colors:"),
-                                                                                 toggle, 
-                                                                                 new JLabel("  Mode: "),
-                                                                                 polyModeCombo))));
+            if (polyModeCombo != null) {
+                controlWidgets.add(
+                    new WrapperWidget(
+                        this, GuiUtils.rLabel("Display:"),
+                        GuiUtils.left(
+                            GuiUtils.hbox(
+                                GuiUtils.rLabel("Shade Colors:"), toggle,
+                                new JLabel("  Mode: "), polyModeCombo))));
             } else {
                 controlWidgets.add(new WrapperWidget(this,
-                                                     GuiUtils.rLabel("Shade Colors:"),
-                                                     GuiUtils.leftCenter(toggle, GuiUtils.filler())));
+                        GuiUtils.rLabel("Shade Colors:"),
+                        GuiUtils.leftCenter(toggle, GuiUtils.filler())));
             }
-        } else if(polyModeCombo!=null) {
-                controlWidgets.add(new WrapperWidget(this,
-                                                     GuiUtils.rLabel("Display Mode:"),
-                                                     GuiUtils.left(polyModeCombo)));
+        } else if (polyModeCombo != null) {
+            controlWidgets.add(new WrapperWidget(this,
+                    GuiUtils.rLabel("Display Mode:"),
+                    GuiUtils.left(polyModeCombo)));
 
-       }
+        }
 
     }
 
@@ -181,8 +180,8 @@ public class ColorPlanViewControl extends PlanViewControl {
      */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         super.addDisplaySettings(dsd);
-        dsd.addPropertyValue(new Boolean(isSmoothed), "smoothed", "Colors Shaded",
-                             SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Boolean(isSmoothed), "smoothed",
+                             "Colors Shaded", SETTINGS_GROUP_DISPLAY);
     }
 
 

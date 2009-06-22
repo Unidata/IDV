@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
@@ -411,9 +410,8 @@ public class StationModelControl extends ObsDisplayControl {
                                        (String) null);
 
             if (getDataSelection() != null) {
-                String sm =
-                    (String) getDataSelection().getProperty(
-                        PointDataSource.PROP_STATIONMODELNAME);
+                String sm = (String) getDataSelection().getProperty(
+                                PointDataSource.PROP_STATIONMODELNAME);
                 if (sm != null) {
                     tmpStationModelName = sm;
                 }
@@ -591,16 +589,18 @@ public class StationModelControl extends ObsDisplayControl {
 
                 preview.setRange(range);
                 Rectangle b = metSymbol.getBounds();
-                ctComps.add(new Object[]{
-                        new Integer(b.y),
-                        GuiUtils.topCenter(GuiUtils.left(new JLabel(param + ":")),
-                                           preview.doMakeContents())});
+                ctComps.add(new Object[] { new Integer(b.y),
+                                           GuiUtils
+                                           .topCenter(GuiUtils
+                                               .left(new JLabel(param
+                                                   + ":")), preview
+                                                       .doMakeContents()) });
             }
 
             //Sort the components on height
-            ctComps = (List<Object[]>)Misc.sortTuples(ctComps, true);
-            for(Object[] pair: ctComps) {
-                sideLegendExtra.add((Component)pair[1]);
+            ctComps = (List<Object[]>) Misc.sortTuples(ctComps, true);
+            for (Object[] pair : ctComps) {
+                sideLegendExtra.add((Component) pair[1]);
             }
 
             GuiUtils.setFontOnTree(sideLegendExtra,
@@ -1023,9 +1023,9 @@ public class StationModelControl extends ObsDisplayControl {
         }
         boolean isTimeSequence = GridUtil.isTimeSequence(data);
         if (isTimeSequence) {
-            return (FieldImpl) data.evaluate(getViewAnimation().getAniValue(),
-                                             Data.NEAREST_NEIGHBOR,
-                                             Data.NO_ERRORS);
+            return (FieldImpl) data.evaluate(
+                getViewAnimation().getAniValue(), Data.NEAREST_NEIGHBOR,
+                Data.NO_ERRORS);
         }
         return data;
     }
@@ -1887,7 +1887,7 @@ public class StationModelControl extends ObsDisplayControl {
         super.projectionChanged();
         try {
             setScaleOnDisplayable();
-        } catch(Exception exc) {}
+        } catch (Exception exc) {}
 
         loadDataInThread();
     }
@@ -2831,9 +2831,9 @@ public class StationModelControl extends ObsDisplayControl {
         }
 
         PointDataInstance pdi = (PointDataInstance) getDataInstance();
-        if(pdi!=null) {
-            items.add(GuiUtils.makeMenuItem("Export to NetCDF...",
-                                            this, "exportAsNetcdf",null,true));
+        if (pdi != null) {
+            items.add(GuiUtils.makeMenuItem("Export to NetCDF...", this,
+                                            "exportAsNetcdf", null, true));
         }
 
         if ((table != null) && (table.getModel().getRowCount() > 0)) {

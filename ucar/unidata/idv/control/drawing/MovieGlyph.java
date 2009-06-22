@@ -179,6 +179,11 @@ public class MovieGlyph extends DrawingGlyph {
     }
 
 
+    /**
+     * is this glyph a raster
+     *
+     * @return is raster
+     */
     public boolean getIsRaster() {
         return true;
     }
@@ -719,4 +724,5 @@ public class MovieGlyph extends DrawingGlyph {
 
 
 }
+
 

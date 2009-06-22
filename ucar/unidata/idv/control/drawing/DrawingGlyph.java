@@ -20,11 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
-
 package ucar.unidata.idv.control.drawing;
 
 
@@ -64,6 +59,8 @@ import java.awt.event.*;
 
 import java.rmi.RemoteException;
 
+import java.text.SimpleDateFormat;
+
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -73,8 +70,6 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-
-import java.text.SimpleDateFormat;
 
 
 /**
@@ -134,6 +129,7 @@ public abstract class DrawingGlyph {
     /** xml attribute name */
     public static final String ATTR_TIMES = "times";
 
+    /** xml attribute for time format          */
     public static final String ATTR_TIMEFORMAT = "timeformat";
 
     /** xml attribute name */
@@ -197,7 +193,7 @@ public abstract class DrawingGlyph {
     /** Is this glyph visible */
     private boolean visibleFlag = true;
 
-    /** _more_ */
+    /** flag */
     public boolean oldVisibility;
 
 
@@ -471,7 +467,7 @@ public abstract class DrawingGlyph {
         String timeAttr = XmlUtil.getAttribute(node, ATTR_TIMES,
                               (String) null);
         String timeFormat = XmlUtil.getAttribute(node, ATTR_TIMEFORMAT,
-                              (String) null);
+                                (String) null);
         SimpleDateFormat sdf = null;
         if (timeAttr != null) {
             List timeStrings = StringUtil.split(timeAttr, ",", true, true);
@@ -487,15 +483,15 @@ public abstract class DrawingGlyph {
                         timeValues.add(
                             new DateTime(Double.POSITIVE_INFINITY));
                     } else {
-                        if(timeFormat!=null) {
-                            if(sdf == null) {
+                        if (timeFormat != null) {
+                            if (sdf == null) {
                                 sdf = new SimpleDateFormat();
                                 sdf.applyPattern(timeFormat);
                                 sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
                             }
                             try {
                                 timeValues.add(new DateTime(sdf.parse(s)));
-                            } catch(Exception exc) {
+                            } catch (Exception exc) {
                                 throw new RuntimeException(exc);
 
                             }
@@ -886,28 +882,39 @@ public abstract class DrawingGlyph {
     }
 
 
-    public String getAreaString()  throws Exception {
-        double squareFeet = getArea();
-        double acres = squareFeet/43560.0;
-        double hectares = acres*0.404685642;
-        double squareKM = acres*0.00404685642;
-        double squareMiles = squareFeet/ 27878400.0;
+    /**
+     * get string representation of the area for showing the user
+     *
+     * @return area label
+     *
+     * @throws Exception on badness
+     */
+    public String getAreaString() throws Exception {
+        double       squareFeet  = getArea();
+        double       acres       = squareFeet / 43560.0;
+        double       hectares    = acres * 0.404685642;
+        double       squareKM    = acres * 0.00404685642;
+        double       squareMiles = squareFeet / 27878400.0;
 
-        StringBuffer desc     = new StringBuffer();
+        StringBuffer desc        = new StringBuffer();
         desc.append("  ");
-        if(squareKM>1.0) {
-            desc.append(control.getDisplayConventions().formatDistance(squareKM));
+        if (squareKM > 1.0) {
+            desc.append(
+                control.getDisplayConventions().formatDistance(squareKM));
             desc.append("[km^2] ");
         } else {
-            desc.append(control.getDisplayConventions().formatDistance(hectares));
+            desc.append(
+                control.getDisplayConventions().formatDistance(hectares));
             desc.append("[hectares] ");
         }
         desc.append("  ");
-        if(squareMiles>1.0) {
-            desc.append(control.getDisplayConventions().formatDistance(squareMiles));
+        if (squareMiles > 1.0) {
+            desc.append(
+                control.getDisplayConventions().formatDistance(squareMiles));
             desc.append("[miles^2] ");
         } else {
-            desc.append(control.getDisplayConventions().formatDistance(acres));
+            desc.append(
+                control.getDisplayConventions().formatDistance(acres));
             desc.append("[acres] ");
         }
         return desc.toString();
@@ -922,7 +929,7 @@ public abstract class DrawingGlyph {
     public String getExtraDescription() {
         if (canShowArea()) {
             try {
-                Real   distance = getDistance();
+                Real         distance = getDistance();
                 StringBuffer desc     = new StringBuffer();
                 if (distance != null) {
                     desc.append(control.formatDistance(distance));
@@ -1842,9 +1849,16 @@ public abstract class DrawingGlyph {
         updateLocation();
     }
 
+    /**
+     * delete the point nearest the event
+     *
+     * @param event the event
+     *
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
+     */
     public void doDeletePoint(DisplayEvent event)
-        throws VisADException, RemoteException {
-    }
+            throws VisADException, RemoteException {}
 
 
 
@@ -1994,10 +2008,17 @@ public abstract class DrawingGlyph {
 
 
 
+    /**
+     * get the points as an array of lat/lons
+     *
+     * @return latlons
+     *
+     * @throws Exception on badness
+     */
     public float[][] getLatLons() throws Exception {
-        return  getLatLons(((actualPoints != null)
-                            ? actualPoints
-                            : points));
+        return getLatLons(((actualPoints != null)
+                           ? actualPoints
+                           : points));
     }
 
     /**
@@ -3011,9 +3032,9 @@ public abstract class DrawingGlyph {
 
 
     /**
-     * _more_
+     * is this glyph a raster thing
      *
-     * @return _more_
+     * @return is raster
      */
     public boolean getIsRaster() {
         return false;
@@ -3041,4 +3062,5 @@ public abstract class DrawingGlyph {
 
 
 }
+
 

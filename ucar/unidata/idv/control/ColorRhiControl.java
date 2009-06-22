@@ -668,7 +668,14 @@ public class ColorRhiControl extends ColorCrossSectionControl {
             comp, GuiUtils.left(GuiUtils.label("Station: ", stationLabel)));
     }
 
+    /** _more_          */
     private Container viewContents;
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected JComponent getDisplayTabComponent() {
 
         viewContents = crossSectionView.getContents();
@@ -788,7 +795,7 @@ public class ColorRhiControl extends ColorCrossSectionControl {
                 logException("receiveShareData:" + dataId, e);
             }
             return;
-        }  
+        }
         super.receiveShareData(from, dataId, data);
     }
 
@@ -1062,4 +1069,5 @@ public class ColorRhiControl extends ColorCrossSectionControl {
     }
 
 }
+
 

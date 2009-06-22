@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control.editor;
 
 
@@ -34,9 +33,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import ucar.unidata.collab.Sharable;
-import ucar.unidata.data.gis.MapMaker;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.gis.MapMaker;
 import ucar.unidata.data.gis.Transect;
 import ucar.unidata.data.grid.GridDataInstance;
 
@@ -53,7 +52,6 @@ import ucar.unidata.ui.CommandManager;
 
 import ucar.unidata.ui.colortable.ColorTableDefaults;
 import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
@@ -61,6 +59,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.PatternFileFilter;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.xml.XmlUtil;
@@ -109,65 +108,113 @@ import javax.swing.table.*;
  * @version $Revision: 1.3 $
  */
 public class Selector {
-    /** _more_          */
+
+    /** _more_ */
     public static final String TYPE_FIELD = "field";
-        
-    /** _more_          */
+
+    /** _more_ */
     public static final String TYPE_REGION_ALL = "region.all";
-        
-    /** _more_          */
+
+    /** _more_ */
     public static final String TYPE_REGION_SELECTED = "region.selected";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_RANGE = "range";
 
 
+    /** _more_          */
     private String type;
 
-    private boolean inside=true;
+    /** _more_          */
+    private boolean inside = true;
 
-    private float min=0;
-    private float max=0;
+    /** _more_          */
+    private float min = 0;
 
-    public Selector() {
-    }
+    /** _more_          */
+    private float max = 0;
 
+    /**
+     * _more_
+     */
+    public Selector() {}
+
+    /**
+     * _more_
+     *
+     * @param type _more_
+     * @param inside _more_
+     */
     public Selector(String type, boolean inside) {
-        this.type = type;
-        this.inside =  inside;
+        this.type   = type;
+        this.inside = inside;
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isRegion() {
         return isRegion(type);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     *
+     * @return _more_
+     */
     public static boolean isRegion(String type) {
-        return type.equals(TYPE_REGION_SELECTED) || type.equals(TYPE_REGION_ALL);
+        return type.equals(TYPE_REGION_SELECTED)
+               || type.equals(TYPE_REGION_ALL);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isRange() {
         return isRange(type);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param type _more_
+     *
+     * @return _more_
+     */
     public static boolean isRange(String type) {
         return type.equals(TYPE_RANGE);
     }
 
-        
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
-        if(type.equals(TYPE_FIELD))
-            return  "entire field";
-        if(type.equals(TYPE_REGION_ALL))
+        if (type.equals(TYPE_FIELD)) {
+            return "entire field";
+        }
+        if (type.equals(TYPE_REGION_ALL)) {
             return "all regions";
-        if(type.equals(TYPE_REGION_SELECTED))
+        }
+        if (type.equals(TYPE_REGION_SELECTED)) {
             return "selected regions";
-        if(type.equals(TYPE_RANGE)) 
-            return "within range (" + min +","+max+")";
+        }
+        if (type.equals(TYPE_RANGE)) {
+            return "within range (" + min + "," + max + ")";
+        }
         return "???";
     }
 
@@ -213,38 +260,38 @@ public class Selector {
 
 
     /**
-       Set the Min property.
-
-       @param value The new value for Min
-    **/
-    public void setMin (float value) {
+     *  Set the Min property.
+     *
+     *  @param value The new value for Min
+     */
+    public void setMin(float value) {
         min = value;
     }
 
     /**
-       Get the Min property.
-
-       @return The Min
-    **/
-    public float getMin () {
+     *  Get the Min property.
+     *
+     *  @return The Min
+     */
+    public float getMin() {
         return min;
     }
 
     /**
-       Set the Max property.
-
-       @param value The new value for Max
-    **/
-    public void setMax (float value) {
+     *  Set the Max property.
+     *
+     *  @param value The new value for Max
+     */
+    public void setMax(float value) {
         max = value;
     }
 
     /**
-       Get the Max property.
-
-       @return The Max
-    **/
-    public float getMax () {
+     *  Get the Max property.
+     *
+     *  @return The Max
+     */
+    public float getMax() {
         return max;
     }
 
@@ -252,6 +299,3 @@ public class Selector {
 }
 
 
-
-
-    

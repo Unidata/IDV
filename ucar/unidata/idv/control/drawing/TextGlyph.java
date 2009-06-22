@@ -242,6 +242,11 @@ public class TextGlyph extends DrawingGlyph {
         this.text = text;
     }
 
+    /**
+     * is this glyph a raster
+     *
+     * @return is raster
+     */
     public boolean getIsRaster() {
         return true;
     }
@@ -1355,4 +1360,5 @@ public class TextGlyph extends DrawingGlyph {
 
 
 }
+
 

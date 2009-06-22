@@ -497,8 +497,7 @@ abstract class Grid3DSoundingDataNode extends SoundingDataNode {
                 throws VisADException, RemoteException {
 
             //FlatField field = new FlatField(AirTemperatureProfile.instance(),
-            FlatField field = new FlatField(funcType,
-                                            outDom,
+            FlatField field = new FlatField(funcType, outDom,
                                             (CoordinateSystem[]) null,
                                             (Set[]) null, rangeUnits);
 

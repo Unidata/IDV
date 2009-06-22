@@ -27,14 +27,15 @@ import ucar.unidata.idv.control.DrawingControl;
 
 import ucar.visad.display.FrontDrawer;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import visad.*;
+
 import java.awt.*;
 import java.awt.event.*;
 
-import visad.*;
-
 import java.rmi.RemoteException;
+
+import javax.swing.*;
+import javax.swing.event.*;
 
 
 /**
@@ -51,7 +52,9 @@ public abstract class GlyphCreatorCommand extends DrawingCommand {
     public static final DrawingCommand CMD_SMOOTHPOLYGON =
         new GlyphCreatorCommand("Create a polygon",
                                 "Click and drag: create a polygon",
-                                "/auxdata/ui/icons/SmoothPoly16.gif",DrawingControl.FLAG_FILLED|DrawingControl.FLAG_STRAIGHT) {
+                                "/auxdata/ui/icons/SmoothPoly16.gif",
+                                DrawingControl.FLAG_FILLED
+                                | DrawingControl.FLAG_STRAIGHT) {
         public DrawingGlyph createGlyph(DrawingControl control,
                                         DisplayEvent event)
                 throws VisADException, RemoteException {
@@ -59,14 +62,17 @@ public abstract class GlyphCreatorCommand extends DrawingCommand {
         }
     };
 
+    /** command to create a closed polygon          */
     public static final DrawingCommand CMD_CLOSEDPOLYGON =
         new GlyphCreatorCommand("Create a closed polygon",
                                 "Click and drag: create a closed polygon",
-                                "/auxdata/ui/icons/ClosedPoly16.gif",DrawingControl.FLAG_STRAIGHT) {
+                                "/auxdata/ui/icons/ClosedPoly16.gif",
+                                DrawingControl.FLAG_STRAIGHT) {
         public DrawingGlyph createGlyph(DrawingControl control,
                                         DisplayEvent event)
                 throws VisADException, RemoteException {
-            PolyGlyph glyph =  new PolyGlyph(control, event, !control.getStraight());
+            PolyGlyph glyph = new PolyGlyph(control, event,
+                                            !control.getStraight());
             glyph.setClosed(true);
             return glyph;
         }
@@ -77,7 +83,8 @@ public abstract class GlyphCreatorCommand extends DrawingCommand {
         new GlyphCreatorCommand(
             "Create a polygon",
             "Click and drag: create a polygon. Space key to add points",
-            "/auxdata/ui/icons/Poly16.gif", DrawingControl.FLAG_FILLED|DrawingControl.FLAG_STRAIGHT) {
+            "/auxdata/ui/icons/Poly16.gif",
+            DrawingControl.FLAG_FILLED | DrawingControl.FLAG_STRAIGHT) {
         public DrawingGlyph createGlyph(DrawingControl control,
                                         DisplayEvent event)
                 throws VisADException, RemoteException {
@@ -99,8 +106,7 @@ public abstract class GlyphCreatorCommand extends DrawingCommand {
 
     /** command */
     public static final DrawingCommand CMD_SYMBOL =
-        new GlyphCreatorCommand("Create a symbol",
-                                "Click to create symbol",
+        new GlyphCreatorCommand("Create a symbol", "Click to create symbol",
                                 "/auxdata/ui/icons/Symbol16.gif") {
         public DrawingGlyph createGlyph(DrawingControl control,
                                         DisplayEvent event)
@@ -139,7 +145,8 @@ public abstract class GlyphCreatorCommand extends DrawingCommand {
     public static final DrawingCommand CMD_ARROW =
         new GlyphCreatorCommand("Create an arrow",
                                 "Click and drag: create an arrow",
-                                "/auxdata/ui/icons/Arrow16.gif",DrawingControl.FLAG_STRAIGHT) {
+                                "/auxdata/ui/icons/Arrow16.gif",
+                                DrawingControl.FLAG_STRAIGHT) {
         public DrawingGlyph createGlyph(DrawingControl control,
                                         DisplayEvent event)
                 throws VisADException, RemoteException {
@@ -375,4 +382,5 @@ public abstract class GlyphCreatorCommand extends DrawingCommand {
 
 
 }
+
 

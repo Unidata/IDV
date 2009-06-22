@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
@@ -949,7 +948,7 @@ public abstract class DisplayControlBase extends SharableImpl {
         } else if (level instanceof String) {
             String tmp = (String) level;
             tmp = tmp.trim();
-            if(tmp.startsWith("#")) {
+            if (tmp.startsWith("#")) {
                 tmp = tmp.substring(1);
             }
             try {
@@ -958,7 +957,7 @@ public abstract class DisplayControlBase extends SharableImpl {
             } catch (Exception e) {}
         }
         userMessage("Unable to handle a level of type "
-                    + level.getClass().getName()+" level=" + level);
+                    + level.getClass().getName() + " level=" + level);
         return null;
     }
 
@@ -984,8 +983,8 @@ public abstract class DisplayControlBase extends SharableImpl {
             return (Real) level;
         } else if (level instanceof String) {
             String tmp = (String) level;
-            tmp   = tmp.trim();
-            if(tmp.startsWith("#")) {
+            tmp = tmp.trim();
+            if (tmp.startsWith("#")) {
                 tmp = tmp.substring(1);
             }
             try {
@@ -996,7 +995,7 @@ public abstract class DisplayControlBase extends SharableImpl {
             }
         }
         userMessage("Unable to handle a level of type "
-                    + level.getClass().getName()+" level=" + level);
+                    + level.getClass().getName() + " level=" + level);
         return null;
     }
 

@@ -20,11 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control.editor;
 
-import ucar.unidata.idv.control.DrawingControl;
-import ucar.unidata.idv.control.RadarSweepControl;
 
 import org.python.core.*;
 import org.python.util.*;
@@ -34,15 +31,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import ucar.unidata.collab.Sharable;
-import ucar.unidata.data.gis.MapMaker;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.gis.MapMaker;
 import ucar.unidata.data.gis.Transect;
 import ucar.unidata.data.grid.GridDataInstance;
 
 import ucar.unidata.data.radar.RadarConstants;
 
 import ucar.unidata.geoloc.LatLonPointImpl;
+
+import ucar.unidata.idv.control.DrawingControl;
+import ucar.unidata.idv.control.RadarSweepControl;
 
 
 
@@ -53,7 +53,6 @@ import ucar.unidata.ui.CommandManager;
 
 import ucar.unidata.ui.colortable.ColorTableDefaults;
 import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
@@ -61,6 +60,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.PatternFileFilter;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.xml.XmlUtil;
@@ -110,36 +110,37 @@ public class RadarEditor extends DrawingControl {
 
 
 
-    /** _more_          */
+    /** _more_ */
     private MyRadarSweepControl radarSweepControl;
 
-    /** _more_          */
+    /** _more_ */
     private PythonInterpreter interpreter;
 
-    /** _more_          */
+    /** _more_ */
     private JTextField maxFld;
 
-    /** _more_          */
+    /** _more_ */
     private JTextField minFld;
 
+    /** _more_          */
     private JTextArea exprFld;
 
-    /** _more_          */
+    /** _more_ */
     private JComboBox regionModeCbx;
 
-    /** _more_          */
+    /** _more_ */
     private JComboBox insideCbx;
 
-    /** _more_          */
+    /** _more_ */
     private JTextArea commandsTextArea;
 
-    /** _more_          */
+    /** _more_ */
     private CommandManager commandManager = new CommandManager(10);
 
-    /** _more_          */
+    /** _more_ */
     private List<Action> actions = new ArrayList<Action>();
 
-    /** _more_          */
+    /** _more_ */
     private JList actionList;
 
     /**
@@ -159,6 +160,7 @@ public class RadarEditor extends DrawingControl {
      * @version $Revision: 1.3 $
      */
     public static class MyRadarSweepControl extends RadarSweepControl {
+
         /**
          * _more_
          */
@@ -173,10 +175,24 @@ public class RadarEditor extends DrawingControl {
             return false;
         }
 
+        /**
+         * _more_
+         *
+         * @param slice _more_
+         *
+         * @throws Exception _more_
+         */
         protected void setCurrentSlice(FieldImpl slice) throws Exception {
             super.setCurrentSlice(slice);
         }
-        
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         *
+         * @throws Exception _more_
+         */
         protected FieldImpl getCurrentSlice() throws Exception {
             return super.getCurrentSlice();
         }
@@ -198,6 +214,13 @@ public class RadarEditor extends DrawingControl {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param field _more_
+     *
+     * @throws Exception _more_
+     */
     protected void setField(FieldImpl field) throws Exception {
         radarSweepControl.getGridDisplayable().loadData(field);
         radarSweepControl.setCurrentSlice(field);
@@ -294,17 +317,18 @@ public class RadarEditor extends DrawingControl {
         commandsTextArea = new JTextArea("", 5, 40);
         regionModeCbx = new JComboBox(new Object[] {
             new TwoFacedObject("All Regions", Selector.TYPE_REGION_ALL),
-            new TwoFacedObject("Selected Regions", Selector.TYPE_REGION_SELECTED),
+            new TwoFacedObject("Selected Regions",
+                               Selector.TYPE_REGION_SELECTED),
             new TwoFacedObject("Entire Field", Selector.TYPE_FIELD) });
         insideCbx = new JComboBox(new String[] { "Inside Region",
                 "Outside Region" });
         JTabbedPane tabbedPane = new JTabbedPane();
-        maxFld = new JTextField("0", 5);
-        minFld = new JTextField("0", 5);
-        exprFld  = new JTextArea("",3,30);
+        maxFld  = new JTextField("0", 5);
+        minFld  = new JTextField("0", 5);
+        exprFld = new JTextArea("", 3, 30);
         exprFld.setToolTipText("e.g, value = value*4;");
         JComponent regionComp = GuiUtils.hbox(regionModeCbx, insideCbx, 5);
-        List       comps   = new ArrayList();
+        List       comps      = new ArrayList();
         comps.add(GuiUtils.rLabel("History:"));
         comps.add(GuiUtils.left(commandManager.getContents(false)));
         comps.add(GuiUtils.rLabel("Apply To:"));
@@ -312,38 +336,39 @@ public class RadarEditor extends DrawingControl {
 
 
         List actionComps = new ArrayList();
-        actionComps.add(GuiUtils.left(GuiUtils.hbox(
-                                                    GuiUtils.makeButton("Average", this, "doAverage"),
-                                                    GuiUtils.makeButton("Absolute value", this, "doAbsoluteValue"),5)));
         actionComps.add(
             GuiUtils.left(
-                          GuiUtils.hbox(
-                                        GuiUtils.hbox(
-                                                      GuiUtils.makeButton(
-                                                                          "Max", this,
-                                                                          "doMax"), maxFld, 2),
-                                        GuiUtils.left(GuiUtils.hbox(
-                                                                    GuiUtils.makeButton(
-                                                                                        "Min", this,
-                                                                                        "doMin"), minFld, 2)),5)));
+                GuiUtils.hbox(
+                    GuiUtils.makeButton("Average", this, "doAverage"),
+                    GuiUtils.makeButton(
+                        "Absolute value", this, "doAbsoluteValue"), 5)));
+        actionComps.add(
+            GuiUtils.left(
+                GuiUtils.hbox(
+                    GuiUtils.hbox(
+                        GuiUtils.makeButton("Max", this, "doMax"), maxFld,
+                        2), GuiUtils.left(
+                            GuiUtils.hbox(
+                                GuiUtils.makeButton("Min", this, "doMin"),
+                                minFld, 2)), 5)));
 
         actionComps.add(
             GuiUtils.left(
                 GuiUtils.hbox(
-                    GuiUtils.makeButton(
-                        "Expression", this,
-                        "doExpr"), exprFld, 2)));
+                    GuiUtils.makeButton("Expression", this, "doExpr"),
+                    exprFld, 2)));
 
 
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
-        JComponent actionComp = GuiUtils.doLayout(actionComps,1,GuiUtils.WT_N,GuiUtils.WT_N);
+        JComponent actionComp = GuiUtils.doLayout(actionComps, 1,
+                                    GuiUtils.WT_N, GuiUtils.WT_N);
 
-        
+
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
         comps.add(GuiUtils.rLabel("Actions:"));
         comps.add(actionComp);
         JComponent topComp = GuiUtils.doLayout(comps, 2, GuiUtils.WT_N,
-                                               GuiUtils.WT_N);
+                                 GuiUtils.WT_N);
 
 
         JComponent execButtons =
@@ -352,8 +377,8 @@ public class RadarEditor extends DrawingControl {
                     "clearActions"), 5);
         JComponent actionsComp =
             GuiUtils.inset(GuiUtils.topCenter(GuiUtils.left(execButtons),
-                                              new JScrollPane(actionList)),new Insets(5,0,0,0));
-        JComponent commandsPanel = GuiUtils.topCenter(topComp,  actionsComp);
+                new JScrollPane(actionList)), new Insets(5, 0, 0, 0));
+        JComponent commandsPanel = GuiUtils.topCenter(topComp, actionsComp);
         //        JComponent commandsPanel  = GuiUtils.topCenter(buttons, new JLabel(""));
 
 
@@ -371,18 +396,21 @@ public class RadarEditor extends DrawingControl {
      * _more_
      *
      *
+     *
+     * @param selector _more_
      * @return _more_
      *
      * @throws Exception _more_
      */
     private UnionSet getMapLines(Selector selector) throws Exception {
-        if (!selector.isRegion()) {
+        if ( !selector.isRegion()) {
             return null;
         }
 
-        List glyphsToUse = (selector.getType().equals(Selector.TYPE_REGION_ALL)
-                            ? glyphs
-                            : selectedGlyphs);
+        List glyphsToUse =
+            (selector.getType().equals(Selector.TYPE_REGION_ALL)
+             ? glyphs
+             : selectedGlyphs);
         if (glyphsToUse.size() == 0) {
             return null;
         }
@@ -396,29 +424,42 @@ public class RadarEditor extends DrawingControl {
     }
 
 
-    private String getMapLinesJython(Selector selector, StringBuffer sb) throws Exception {
+    /**
+     * _more_
+     *
+     * @param selector _more_
+     * @param sb _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private String getMapLinesJython(Selector selector, StringBuffer sb)
+            throws Exception {
         String var = "regions_" + (exprCnt++);
-        if (!selector.isRegion()) {
-            sb.append (var +"=None;\n"); 
+        if ( !selector.isRegion()) {
+            sb.append(var + "=None;\n");
             return var;
         }
 
-        List glyphsToUse = (selector.getType().equals(Selector.TYPE_REGION_ALL)
-                            ? glyphs
-                            : selectedGlyphs);
+        List glyphsToUse =
+            (selector.getType().equals(Selector.TYPE_REGION_ALL)
+             ? glyphs
+             : selectedGlyphs);
         if (glyphsToUse.size() == 0) {
-            sb.append (var +"=None;\n"); 
+            sb.append(var + "=None;\n");
             return var;
         }
 
-        sb.append (var +"=MapMaker();\n"); 
+        sb.append(var + "=MapMaker();\n");
         MapMaker mapMaker = new MapMaker();
         for (DrawingGlyph glyph : (List<DrawingGlyph>) glyphsToUse) {
-            float[][]latLons = glyph.getLatLons();
-            sb.append(var+".addMap(array([");
-            for(int i=0;i<latLons[0].length;i++) {
-                if(i>0)
+            float[][] latLons = glyph.getLatLons();
+            sb.append(var + ".addMap(array([");
+            for (int i = 0; i < latLons[0].length; i++) {
+                if (i > 0) {
                     sb.append(",");
+                }
                 sb.append(latLons[0][i]);
                 sb.append(",");
                 sb.append(latLons[1][i]);
@@ -502,32 +543,32 @@ public class RadarEditor extends DrawingControl {
     public void applyAction(Action action) {
         try {
             UnionSet mapLines = getMapLines(action.getSelector());
-            if (mapLines == null
-                && action.getSelector().isRegion()) {
+            if ((mapLines == null) && action.getSelector().isRegion()) {
                 userMessage("No regions defined");
                 return;
             }
 
-            long t1 = System.currentTimeMillis();
-            FieldImpl oldSlice = radarSweepControl.getCurrentSlice();
-            StringBuffer sb = new StringBuffer();
+            long         t1       = System.currentTimeMillis();
+            FieldImpl    oldSlice = radarSweepControl.getCurrentSlice();
+            StringBuffer sb       = new StringBuffer();
             //            getMapLinesJython(action.getSelector(),  sb);
             //            getInterpreter().exec(sb.toString());
 
 
             getInterpreter().set("field", oldSlice);
-            if(action.getJython()!=null) {
+            if (action.getJython() != null) {
                 getInterpreter().exec(action.getJython());
             }
 
-            if(action.getSelector().isRegion()) {
+            if (action.getSelector().isRegion()) {
                 getInterpreter().set("mapLines", mapLines);
                 getInterpreter().exec("newField = mapsApplyToField('"
-                                      + action.getFunction() + "',field,mapLines,"
+                                      + action.getFunction()
+                                      + "',field,mapLines,"
                                       + (action.getSelector().getInside()
                                          ? "1"
                                          : "0") + ")");
-            } 
+            }
             long t2 = System.currentTimeMillis();
             System.err.println("Time:" + (t2 - t1));
             PyObject  obj      = interpreter.get("newField");
@@ -551,13 +592,19 @@ public class RadarEditor extends DrawingControl {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private Selector getSelector() {
-            return new Selector(getRegionMode(),insideCbx.getSelectedIndex() == 0);
+        return new Selector(getRegionMode(),
+                            insideCbx.getSelectedIndex() == 0);
     }
 
 
 
-    
+
 
 
     /**
@@ -570,21 +617,28 @@ public class RadarEditor extends DrawingControl {
 
 
 
-    private    int exprCnt = 0;
+    /** _more_          */
+    private int exprCnt = 0;
 
     /**
      * _more_
      */
     public void doExpr() {
-        String expr = exprFld.getText();
+        String expr     = exprFld.getText();
         String funcName = "exprFunction" + (exprCnt++);
-        Action action = new Action("Expression " + expr.replace("\n",""), funcName+"(originalValues,newValues,indexArray)", getSelector());
+        Action action =
+            new Action("Expression " + expr.replace("\n", ""),
+                       funcName + "(originalValues,newValues,indexArray)",
+                       getSelector());
 
-        StringBuffer jython = new StringBuffer("def " + funcName+"(originalValues,newValues,indexArray):\n");
+        StringBuffer jython =
+            new StringBuffer("def " + funcName
+                             + "(originalValues,newValues,indexArray):\n");
         jython.append("\tfor i in xrange(len(indexArray)):\n");
         jython.append("\t\tindex=indexArray[i];\n");
         jython.append("\t\tvalue=originalValues[0][index];\n");
-        for(String line: (List<String>)StringUtil.split(expr,"\n",false,false)) {
+        for (String line : (List<String>) StringUtil.split(expr, "\n", false,
+                false)) {
             jython.append("\t\t");
             jython.append(line);
             jython.append("\n");
@@ -609,8 +663,8 @@ public class RadarEditor extends DrawingControl {
     public void doMax() {
         String value = maxFld.getText();
         addAction("Max (" + value + ")",
-                  "mapsMax(originalValues, newValues, indexArray,"
-                  + value + ")");
+                  "mapsMax(originalValues, newValues, indexArray," + value
+                  + ")");
     }
 
     /**
@@ -619,8 +673,8 @@ public class RadarEditor extends DrawingControl {
     public void doMin() {
         String value = minFld.getText();
         addAction("Min (" + value + ")",
-                  "mapsMin(originalValues, newValues, indexArray,"
-                  + value + ")");
+                  "mapsMin(originalValues, newValues, indexArray," + value
+                  + ")");
     }
 
 
@@ -648,11 +702,12 @@ public class RadarEditor extends DrawingControl {
         //        shapes.add(GlyphCreatorCommand.CMD_RECTANGLE);
         ButtonGroup bg = new ButtonGroup();
         widgets.add(GuiUtils.rLabel("Mode:"));
-        if(straightCbx==null)
-            straightCbx   = new JCheckBox("Straight", getStraight());
+        if (straightCbx == null) {
+            straightCbx = new JCheckBox("Straight", getStraight());
+        }
 
         widgets.add(GuiUtils.left(GuiUtils.hbox(makeButtonPanel(shapes, bg),
-                                                makeButtonPanel(commands, bg), straightCbx, enabledCbx)));
+                makeButtonPanel(commands, bg), straightCbx, enabledCbx)));
 
     }
 
@@ -707,13 +762,13 @@ public class RadarEditor extends DrawingControl {
      */
     public static class FieldCommand extends ucar.unidata.ui.Command {
 
-        /** _more_          */
+        /** _more_ */
         RadarEditor editor;
 
-        /** _more_          */
+        /** _more_ */
         FieldImpl oldSlice;
 
-        /** _more_          */
+        /** _more_ */
         FieldImpl newSlice;
 
         /**
@@ -724,7 +779,7 @@ public class RadarEditor extends DrawingControl {
          * @param newSlice _more_
          */
         public FieldCommand(RadarEditor editor, FieldImpl oldSlice,
-                           FieldImpl newSlice) {
+                            FieldImpl newSlice) {
             this.editor   = editor;
             this.oldSlice = oldSlice;
             this.newSlice = newSlice;
@@ -765,4 +820,5 @@ public class RadarEditor extends DrawingControl {
 
 
 }
+
 

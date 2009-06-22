@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.control.chart;
 
 
@@ -178,20 +176,33 @@ public abstract class XYChartManager extends ChartManager {
         return getRenderer(lineState, true);
     }
 
-    protected XYItemRenderer getRenderer(LineState lineState, boolean showLegend) {
+    /**
+     * Get the renderer for the given line
+     *
+     * @param lineState The line
+     * @param showLegend And show the legend
+     *
+     * @return renderer
+     */
+    protected XYItemRenderer getRenderer(LineState lineState,
+                                         boolean showLegend) {
         int            lineType = lineState.getLineType();
         XYItemRenderer renderer = null;
         if (lineType == LineState.LINETYPE_BAR) {
             return new MyXYBarRenderer();
         } else if (lineType == LineState.LINETYPE_SHAPES) {
-            renderer = new MyXYAreaRenderer(lineState, XYAreaRenderer.SHAPES,showLegend);
+            renderer = new MyXYAreaRenderer(lineState, XYAreaRenderer.SHAPES,
+                                            showLegend);
         } else if (lineType == LineState.LINETYPE_LINES) {
-            return new MyXYAreaRenderer(lineState, XYAreaRenderer.LINES,showLegend);
+            return new MyXYAreaRenderer(lineState, XYAreaRenderer.LINES,
+                                        showLegend);
         } else if (lineType == LineState.LINETYPE_AREA) {
-            return new MyXYAreaRenderer(lineState, XYAreaRenderer.AREA,showLegend);
+            return new MyXYAreaRenderer(lineState, XYAreaRenderer.AREA,
+                                        showLegend);
         } else if (lineType == LineState.LINETYPE_AREA_AND_SHAPES) {
             renderer = new MyXYAreaRenderer(lineState,
-                                            XYAreaRenderer.AREA_AND_SHAPES,showLegend);
+                                            XYAreaRenderer.AREA_AND_SHAPES,
+                                            showLegend);
         } else {
             renderer = new MyXYAreaRenderer(lineState,
                                             XYAreaRenderer.SHAPES_AND_LINES);
@@ -228,6 +239,7 @@ public abstract class XYChartManager extends ChartManager {
         /** Do we have a shape to draw */
         boolean hasShape;
 
+        /** _more_          */
         boolean showLegend = true;
 
         /**
@@ -240,11 +252,19 @@ public abstract class XYChartManager extends ChartManager {
             this(lineState, type, true);
         }
 
-        public MyXYAreaRenderer(LineState lineState, int type, boolean showLegend) {
+        /**
+         * _more_
+         *
+         * @param lineState _more_
+         * @param type _more_
+         * @param showLegend _more_
+         */
+        public MyXYAreaRenderer(LineState lineState, int type,
+                                boolean showLegend) {
             super(type);
             this.showLegend = showLegend;
-            this.lineState = lineState;
-            shape          = lineState.getPaintShape();
+            this.lineState  = lineState;
+            shape           = lineState.getPaintShape();
             int lineType = lineState.getLineType();
             hasShape = (lineType == LineState.LINETYPE_SHAPES)
                        || (lineType == LineState.LINETYPE_AREA_AND_SHAPES)
@@ -261,7 +281,7 @@ public abstract class XYChartManager extends ChartManager {
          * @return legend item
          */
         public LegendItem getLegendItem(int datasetIndex, int series) {
-           if(!showLegend) {
+            if ( !showLegend) {
                 return null;
             }
             LegendItem l = super.getLegendItem(datasetIndex, series);
@@ -1008,4 +1028,5 @@ public abstract class XYChartManager extends ChartManager {
 
 
 }
+
 

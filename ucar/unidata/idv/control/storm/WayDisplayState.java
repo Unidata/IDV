@@ -494,7 +494,7 @@ public class WayDisplayState {
                         FieldImpl pointField;
                         pointField =
                             PointObFactory.makeTimeSequenceOfPointObs(
-                                                                      allPointObs, -1, -1);
+                                allPointObs, -1, -1);
 
                         FieldImpl pointField1 = doDeclutter(pointField, sm);
                         getObsPointDisplay().setStationData(pointField1);
@@ -1071,8 +1071,8 @@ public class WayDisplayState {
         //Use a local list to hold the point obs so we don't run into a race condition
         List<PointOb> localPointObs    = new ArrayList<PointOb>();
         List<PointOb> localAllPointObs = new ArrayList<PointOb>();
-        Data[] datas = new Data[tracks.size()];
-        int    i     = 0;
+        Data[]        datas            = new Data[tracks.size()];
+        int           i                = 0;
         for (StormTrack track : tracks) {
             FieldImpl field =
                 stormDisplayState.getStormTrackControl().makeTrackField(
@@ -1090,7 +1090,7 @@ public class WayDisplayState {
             }
         }
 
-        pointObs = localPointObs;
+        pointObs    = localPointObs;
         allPointObs = localAllPointObs;
 
         if (fields.size() == 0) {
@@ -2547,4 +2547,5 @@ public class WayDisplayState {
 
 
 }
+
 

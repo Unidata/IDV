@@ -1031,15 +1031,18 @@ public class ShapefileControl extends DisplayControlImpl {
      * Get a bounding rectangle for the sampled sets.
      * @param  sets   array of SampledSet-s
      * @return  a bounding rectangle
+     *
+     * @throws VisADException on badness
      */
-    private Rectangle2D.Float getBounds(SampledSet[] sets) throws VisADException {
+    private Rectangle2D.Float getBounds(SampledSet[] sets)
+            throws VisADException {
         if (sets.length == 0) {
             return null;
         }
-        double minX = Double.POSITIVE_INFINITY;
-        double minY = Double.POSITIVE_INFINITY;
-        double maxX = Double.NEGATIVE_INFINITY;
-        double maxY = Double.NEGATIVE_INFINITY;
+        double  minX     = Double.POSITIVE_INFINITY;
+        double  minY     = Double.POSITIVE_INFINITY;
+        double  maxX     = Double.NEGATIVE_INFINITY;
+        double  maxY     = Double.NEGATIVE_INFINITY;
 
         boolean flipRect = false;
 
@@ -1057,19 +1060,19 @@ public class ShapefileControl extends DisplayControlImpl {
                 maxX = Math.max(maxX, hi[0]);
                 maxY = Math.max(maxY, hi[1]);
             }
-            if(GridUtil.isLatLonOrder(sets[i])) {
+            if (GridUtil.isLatLonOrder(sets[i])) {
                 flipRect = true;
             }
         }
-        Rectangle2D.Float rect = new Rectangle2D.Float((float) minX, (float) minY,
-                                     (float) (maxX - minX),
+        Rectangle2D.Float rect = new Rectangle2D.Float((float) minX,
+                                     (float) minY, (float) (maxX - minX),
                                      (float) (maxY - minY));
-        if(flipRect) {
+        if (flipRect) {
             float tmp = rect.x;
-            rect.x = rect.y;
-            rect.y = tmp;
-            tmp = rect.width;
-            rect.width = rect.height;
+            rect.x      = rect.y;
+            rect.y      = tmp;
+            tmp         = rect.width;
+            rect.width  = rect.height;
             rect.height = tmp;
         }
         return rect;
@@ -1077,4 +1080,5 @@ public class ShapefileControl extends DisplayControlImpl {
 
 
 }
+
 

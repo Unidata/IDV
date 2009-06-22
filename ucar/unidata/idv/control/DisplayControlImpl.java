@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.control;
 
 
@@ -200,6 +198,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** time label animation */
     private Animation viewAnimation;
 
+    /** The animation held solely by this display control          */
     private Animation internalAnimation;
 
     /** Animation info */
@@ -2516,15 +2515,18 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (initializationDone && getActive()
                 && evt.getPropertyName().equals(Animation.ANI_VALUE)) {
 
-            Animation animation  = null;
-            if(evt.getSource()!=null && evt.getSource() instanceof Animation) {
-                animation =(Animation)evt.getSource();
+            Animation animation = null;
+            if ((evt.getSource() != null)
+                    && (evt.getSource() instanceof Animation)) {
+                animation = (Animation) evt.getSource();
             }
-            if(animation == null) {
-                animation = (internalAnimation!=null?internalAnimation:viewAnimation);
+            if (animation == null) {
+                animation = ((internalAnimation != null)
+                             ? internalAnimation
+                             : viewAnimation);
             }
 
-            if(animation!=null) {
+            if (animation != null) {
                 timeChanged(animation.getAniValue());
             }
         }
@@ -2854,11 +2856,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             throws VisADException, RemoteException {
         boolean ok;
         if ((myDataChoices != null) && (myDataChoices.size() > 0)) {
-            ok= setData((DataChoice) myDataChoices.get(0));
+            ok = setData((DataChoice) myDataChoices.get(0));
         } else {
             ok = setData((DataChoice) null);
         }
-        if(ok) {
+        if (ok) {
             //We used to null these out in case the user selected new data with different units
             //However, this resets what the user has set and screws things up
             //            displayUnit = null;
@@ -4081,8 +4083,18 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
 
-    public ViewManager getViewManagerForCapture(String what)  throws Exception {
-        System.err.println ("base for capture:" + getClass().getName());
+    /**
+     * Allows a derived class to provide its own viewmanager wehn capturing an image of the display from isl
+     *
+     * @param what The specification of the viewmanager (from the isl)
+     *
+     * @return the viewmanager or null
+     *
+     * @throws Exception on badness
+     */
+    public ViewManager getViewManagerForCapture(String what)
+            throws Exception {
+        System.err.println("base for capture:" + getClass().getName());
         return null;
     }
 
@@ -4677,19 +4689,19 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             items.add(GuiUtils.MENU_SEPARATOR);
         }
         if (canSaveDataInCache()) {
-            items.add(GuiUtils.makeMenuItem("Save Data in Cache...",
-                    this, "saveDataChoiceInCache"));
+            items.add(GuiUtils.makeMenuItem("Save Data in Cache...", this,
+                                            "saveDataChoiceInCache"));
         }
         if (canExportData()) {
-            items.add(GuiUtils.makeMenuItem("Export Displayed Data...",
-                                            this, "exportDisplayedData", FileManager.SUFFIX_NETCDF,true));
+            items.add(GuiUtils.makeMenuItem("Export Displayed Data...", this,
+                                            "exportDisplayedData",
+                                            FileManager.SUFFIX_NETCDF, true));
         }
-        if (myDataChoices!=null && 
-            haveParameterDefaults() && 
-            (myDataChoices.size() == 1)) {
+        if ((myDataChoices != null) && haveParameterDefaults()
+                && (myDataChoices.size() == 1)) {
             items.add(GuiUtils.makeMenuItem("Save As Parameter Defaults",
                                             this, "saveAsParameterDefaults"));
-            
+
         }
         items.addAll(GuiUtils.makeMenuItems(this, new String[][] {
             { "Save Display as Favorite...", "saveAsFavorite", null,
@@ -5659,7 +5671,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 || hasTimeMacro(extraLabelTemplate)
                 || hasTimeMacro(getDisplayListTemplate())) {
             try {
-                if (internalAnimation == null && viewAnimation==null) {
+                if ((internalAnimation == null) && (viewAnimation == null)) {
                     getSomeAnimation();
                 }
                 if (internalAnimation != null) {
@@ -6019,7 +6031,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                               + displayCnt + ".png";
                     displayCnt++;
                     System.err.println("Writing image:" + displayImageFile);
-                    ViewManager viewManager =   ((ViewManager) viewManagers.get(i));
+                    ViewManager viewManager =
+                        ((ViewManager) viewManagers.get(i));
                     GuiUtils.showComponentInTabs(viewManager.getComponent());
                     viewManager.writeImage(displayImageFile, true);
                 }
@@ -6686,7 +6699,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 
-    
+
     /**
      * Set the view manager for this control to use.
      * Note: This is only for use when some code is directly
@@ -7153,7 +7166,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
         //If we haven't initialized yet just set the unit and return
-        if(!getHaveInitialized()) {
+        if ( !getHaveInitialized()) {
             /*            if (isDisplayUnitAlsoColorUnit()) {
                 if ( !setNewColorUnit(newUnit, false)) {
                     return false;
@@ -7242,7 +7255,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             return true;
         }
         //        System.err.println ("setNewColorUnit:" + getHaveInitialized());
-        if(!getHaveInitialized()) {
+        if ( !getHaveInitialized()) {
             setUnitForColor(newUnit);
             return true;
         }
@@ -8006,6 +8019,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         /** Is mouse in */
         boolean mouseIn = false;
 
+        /** the foreground color          */
         Color color;
 
         /**
@@ -8020,7 +8034,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             this.myControl = displayControl;
             //            setForeground(Color.blue);
 
-            color= GuiUtils.decodeColor("#005aff",Color.red);
+            color = GuiUtils.decodeColor("#005aff", Color.red);
             setForeground(color);
             addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent event) {
@@ -10430,7 +10444,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @throws RemoteException On Badness
      * @throws VisADException On Badness
      */
-    public Animation getSomeAnimation() throws VisADException, RemoteException {
+    public Animation getSomeAnimation()
+            throws VisADException, RemoteException {
         return getAnimation();
 
     }
@@ -10497,12 +10512,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     protected Animation getAnimation(boolean createOurOwn, RealType timeType)
             throws VisADException, RemoteException {
 
-        if(createOurOwn) {
+        if (createOurOwn) {
             return getInternalAnimation(timeType);
         }
 
         //For backwards compatability
-        if(internalAnimation !=null) {
+        if (internalAnimation != null) {
             return internalAnimation;
         }
 
@@ -10520,15 +10535,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @throws VisADException On Badness
      */
     public Animation getViewAnimation()
-        throws VisADException, RemoteException {
+            throws VisADException, RemoteException {
         if (viewAnimation == null) {
             ViewManager viewManager = null;
             //First check for our own ViewManager
-            if(viewManagers!=null && viewManagers.size()>0) {
-                viewManager = (ViewManager) viewManagers.get(0);
+            if ((viewManagers != null) && (viewManagers.size() > 0)) {
+                viewManager   = (ViewManager) viewManagers.get(0);
                 viewAnimation = viewManager.getAnimation();
             }
-            if(viewAnimation==null) {
+            if (viewAnimation == null) {
                 viewManager = getViewManager();
                 if (viewManager == null) {
                     return null;
@@ -10536,7 +10551,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 viewAnimation = viewManager.getAnimation();
             }
 
-            if(viewAnimation==null) {
+            if (viewAnimation == null) {
                 return null;
             }
             viewAnimation.addPropertyChangeListener(this);
@@ -10567,6 +10582,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /**
      * Create if needed and return an Animation
      *
+     *
+     * @param timeType The realtype of the time set
      * @return The Animation
      *
      * @throws RemoteException On Badness
@@ -10575,8 +10592,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     protected Animation getInternalAnimation(RealType timeType)
             throws VisADException, RemoteException {
 
-        if(internalAnimation !=null)
+        if (internalAnimation != null) {
             return internalAnimation;
+        }
         if (timeType == null) {
             internalAnimation = new Animation();
         } else {
@@ -10609,7 +10627,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 }
             }
             animationWidget = new AnimationWidget(null, null, animationInfo);
-            Animation animation =  getInternalAnimation();
+            Animation animation = getInternalAnimation();
             animation.setAnimationInfo(animationInfo);
             if ( !initializationDone) {
                 animationWidget.setSharing(false);
@@ -11412,4 +11430,5 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 }
+
 

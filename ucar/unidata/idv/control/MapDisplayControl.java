@@ -308,10 +308,11 @@ public class MapDisplayControl extends DisplayControlImpl {
                 }
             }
 
-            if(latLonHolder!=null) {
+            if (latLonHolder != null) {
                 latLonHolder.clearDisplayables();
             } else {
-                latLonHolder = new CompositeDisplayable("latlonholder " + mycnt);
+                latLonHolder = new CompositeDisplayable("latlonholder "
+                        + mycnt);
                 theHolder.addDisplayable(latLonHolder);
             }
             latLonHolder.addDisplayable(latState.getLatLonLines());
@@ -610,7 +611,7 @@ public class MapDisplayControl extends DisplayControlImpl {
 
         super.getFileMenuItems(items, forMenuBar);
         JMenu     defaultMenu = new JMenu("Default Maps");
-        JMenuItem mi = new JMenuItem("Save as the Default Map Set");
+        JMenuItem mi          = new JMenuItem("Save as the Default Map Set");
         mi.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 saveAsPreference();
@@ -823,7 +824,7 @@ public class MapDisplayControl extends DisplayControlImpl {
 
         try {
             //xxxx
-            if(latLonHolder.displayableCount()==0) {
+            if (latLonHolder.displayableCount() == 0) {
                 latLonHolder.addDisplayable(latState.getLatLonLines());
                 latLonHolder.addDisplayable(lonState.getLatLonLines());
             }
@@ -991,12 +992,12 @@ public class MapDisplayControl extends DisplayControlImpl {
             addBtn.setContentAreaFilled(false);
             addBtn.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
             addBtn.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        loadMapAsDataSource(listIndex);
+                public void actionPerformed(ActionEvent ae) {
+                    loadMapAsDataSource(listIndex);
                 }
             });
             addBtn.setToolTipText("Load this map as a data source");
-            
+
 
             JButton removeBtn = new JButton(removeIcon);
             removeBtn.setContentAreaFilled(false);
@@ -1106,15 +1107,15 @@ public class MapDisplayControl extends DisplayControlImpl {
     }
 
 
-    /** 
+    /**
      * Load the map file at the given index as a data source
      *
      * @param index The map index
      */
     private void loadMapAsDataSource(int index) {
         try {
-            MapState    mapState = (MapState) mapStates.get(index);
-            getIdv().makeDataSource(mapState.getSource(),"file.mapfile",
+            MapState mapState = (MapState) mapStates.get(index);
+            getIdv().makeDataSource(mapState.getSource(), "file.mapfile",
                                     new Hashtable());
             getIdv().getIdvUIManager().showDataSelector();
         } catch (Exception exc) {
@@ -1352,6 +1353,11 @@ public class MapDisplayControl extends DisplayControlImpl {
             ignoreStateChange = false;
         }
 
+        /**
+         * to string
+         *
+         * @return to string
+         */
         public String toString() {
             return "map state " + getVisible();
         }
@@ -1693,4 +1699,5 @@ public class MapDisplayControl extends DisplayControlImpl {
     }
 
 }
+
 

@@ -35,29 +35,29 @@ import java.util.List;
  */
 public class StormADOT {
 
-    /** _more_          */
+    /** _more_ */
     StormADOTInfo.IRData odtcurrent_v72IR;
 
-    /** _more_          */
+    /** _more_ */
     StormADOTInfo.DataGrid areadata_v72;
 
 
-    /** _more_          */
+    /** _more_ */
     boolean lauto = false;
 
-    /** _more_          */
+    /** _more_ */
     int idomain_v72, ixdomain_v72, ifixtype_v72, rmwsizeman_v72;
 
-    /** _more_          */
+    /** _more_ */
     int oland_v72;
 
-    /** _more_          */
+    /** _more_ */
     boolean osearch_v72;
 
-    /** _more_          */
+    /** _more_ */
     int ostartstr_v72;
 
-    /** _more_          */
+    /** _more_ */
     float osstr_v72;
 
 
@@ -866,4 +866,5 @@ public class StormADOT {
 
 
 }
+
 

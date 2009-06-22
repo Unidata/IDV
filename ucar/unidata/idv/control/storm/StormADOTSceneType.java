@@ -1,20 +1,20 @@
 /*
  * $Id: IDV-Style.xjs,v 1.1 2006/05/03 21:43:47 dmurray Exp $
- * 
+ *
  * Copyright 1997-2006 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -39,13 +39,13 @@ public class StormADOTSceneType {
 
     // List<StormADOTInfo.RingData> tcircfirst_v72;
 
-    /** _more_          */
+    /** _more_ */
     static int maxsec = 24;
 
-    /** _more_          */
+    /** _more_ */
     static int maxsecA = 2000;
 
-    /** _more_          */
+    /** _more_ */
     static double PI = 3.14159265358979323846;
 
 
@@ -61,9 +61,9 @@ public class StormADOTSceneType {
      * @return _more_
      */
     static float[] aodtv72_calcscene(StormADOTInfo.IRData odtcurrent,
-                              int rmwsizeman_v72,
-                              StormADOTInfo.DataGrid areadata,
-                              float osstr_v72, boolean osearch_v72)
+                                     int rmwsizeman_v72,
+                                     StormADOTInfo.DataGrid areadata,
+                                     float osstr_v72, boolean osearch_v72)
     /* Perform Fast Fourier Transform (FFT) analysis and determine
        scene type via empirically defined threshold values.
         Inputs  : global structure odtcurrent_v72 containing current intensity values
@@ -339,11 +339,13 @@ public class StormADOTSceneType {
      *
      * @return _more_
      */
-static     float[] aodtv72_classify(StormADOTInfo.IRData odtcurrent, int rmwsizeman,
-                             StormADOTInfo.DataGrid areadata_v72,
-                             float osstr_v72, boolean osearch_v72,
-                             float alst, float Aaveext, float Estdveye,
-                             float Aavesym, float eyecnt, float rngcnt)
+    static float[] aodtv72_classify(StormADOTInfo.IRData odtcurrent,
+                                    int rmwsizeman,
+                                    StormADOTInfo.DataGrid areadata_v72,
+                                    float osstr_v72, boolean osearch_v72,
+                                    float alst, float Aaveext,
+                                    float Estdveye, float Aavesym,
+                                    float eyecnt, float rngcnt)
     /* Classify scene type based on FFT analysis and histogram temperatures
        using empirically defined threshold values.
         Inputs  : global structure odtcurrent_v72 containing current image analysis
@@ -879,8 +881,8 @@ static     float[] aodtv72_classify(StormADOTInfo.IRData odtcurrent, int rmwsize
      */
 
 
-static     float[] aodtv72_rmw(StormADOTInfo.IRData odtcurrent,
-                        StormADOTInfo.DataGrid areadata)
+    static float[] aodtv72_rmw(StormADOTInfo.IRData odtcurrent,
+                               StormADOTInfo.DataGrid areadata)
     /* Determine radius of maximum wind based upon Jim Kossin's
        regression based scheme
         Inputs  : ix0     - element location of center point
@@ -996,10 +998,10 @@ static     float[] aodtv72_rmw(StormADOTInfo.IRData odtcurrent,
      * @param areadata_v72
      * @return
      */
-static     float[] aodtv72_logspiral(float inlat, float inlon, float searchtemp,
-                              int searchtype,
-                              StormADOTInfo.IRData odtcurrent_v72IR,
-                              StormADOTInfo.DataGrid areadata_v72)
+    static float[] aodtv72_logspiral(float inlat, float inlon,
+                                     float searchtemp, int searchtype,
+                                     StormADOTInfo.IRData odtcurrent_v72IR,
+                                     StormADOTInfo.DataGrid areadata_v72)
     /* Determine storm location using 10^ Log-spiral analysis.
        Algorithm will attempt to match the spiral with the image
        pixels at or below the threshold temperature based on
@@ -1207,7 +1209,7 @@ static     float[] aodtv72_logspiral(float inlat, float inlon, float searchtemp,
      *
      * @return _more_
      */
-static     float[] aodtv72_calcskew(float[] bin, int nbin)
+    static float[] aodtv72_calcskew(float[] bin, int nbin)
     /* Calculate average, standard deviation, and skew for a given data set.
         Inputs  : bin  - data array
                   nbin - number of points in data array
@@ -1262,7 +1264,7 @@ static     float[] aodtv72_calcskew(float[] bin, int nbin)
      * @param i2 _more_
      * @param ndim _more_
      */
-static     void aodtv72_xxsort(float[] x1, float[] x2, float[] i2, int ndim) {
+    static void aodtv72_xxsort(float[] x1, float[] x2, float[] i2, int ndim) {
         int   ih, i;
         float x, top;
 
@@ -1284,7 +1286,7 @@ static     void aodtv72_xxsort(float[] x1, float[] x2, float[] i2, int ndim) {
      *
      * @return _more_
      */
-static     int aodtv72_fminx(float[] f) {
+    static int aodtv72_fminx(float[] f) {
         int   i;
         int   im;
         int   ndim = f.length;
@@ -1308,7 +1310,7 @@ static     int aodtv72_fminx(float[] f) {
      *
      * @return _more_
      */
-static     int aodtv72_fmaxx(float[] f) {
+    static int aodtv72_fmaxx(float[] f) {
         int   i;
         int   im;
         int   ndim = f.length;
@@ -1332,7 +1334,7 @@ static     int aodtv72_fmaxx(float[] f) {
      *
      * @return _more_
      */
-static     float[] aodtv72_fft(float[] cbd) {
+    static float[] aodtv72_fft(float[] cbd) {
         int      ixx, idxc, iok;
         double[] xr, xi, magn;
         double   dx, a, x;
@@ -1388,7 +1390,7 @@ static     float[] aodtv72_fft(float[] cbd) {
      *
      * @return _more_
      */
-static     double aodtv72_cmplx_abs(double real, double imag) {
+    static double aodtv72_cmplx_abs(double real, double imag) {
         double temp;
         if (real < 0) {
             real = -real;
@@ -1427,7 +1429,7 @@ static     double aodtv72_cmplx_abs(double real, double imag) {
      *
      * @return _more_
      */
-static     int aodtv72_dfft(double[] x, double[] y, int np) {
+    static int aodtv72_dfft(double[] x, double[] y, int np) {
 
         int    i, j, k, m, n, i0, i1, i2, i3, is, id, n1, n2, n4;
         double a, e, a3, cc1, ss1, cc3, ss3, r1, r2, s1, s2, s3, xt;
@@ -1559,7 +1561,7 @@ static     int aodtv72_dfft(double[] x, double[] y, int np) {
      *
      * @return _more_
      */
-static     public StormADOTInfo.IRData aodtv72_gettemps(int keyer,
+    static public StormADOTInfo.IRData aodtv72_gettemps(int keyer,
             StormADOTInfo.DataGrid areadata)
     /* Determine eye and coldest-warmest cloud temperatures.
         Inputs  : keyer      - eye radius (km)
@@ -1635,7 +1637,7 @@ static     public StormADOTInfo.IRData aodtv72_gettemps(int keyer,
      *
      * @return _more_
      */
-static     public StormADOTInfo.RingData aodtv72_calceyetemp(int keyer,
+    static public StormADOTInfo.RingData aodtv72_calceyetemp(int keyer,
             float cursortemp, List<StormADOTInfo.RingData> tcircfirst)
     /* Determine eye/warmest temperature by examining the satellite
        data between 0 and 24/75 km from the storm center location.
@@ -1682,7 +1684,7 @@ static     public StormADOTInfo.RingData aodtv72_calceyetemp(int keyer,
      *
      * @return _more_
      */
-static     public float[] aodtv72_calccloudtemp(
+    static public float[] aodtv72_calccloudtemp(
             List<StormADOTInfo.RingData> tcircfirst)
     /* Determine surrounding cloud top region temperature by
        examining the satellite data between kstart_v72(24 km) and
@@ -1750,8 +1752,8 @@ static     public float[] aodtv72_calccloudtemp(
      *
      * @return _more_
      */
-static     public List<StormADOTInfo.RingData> aodtv72_readcirc(int ixc, int iyc,
-            StormADOTInfo.DataGrid areadata)
+    static public List<StormADOTInfo.RingData> aodtv72_readcirc(int ixc,
+            int iyc, StormADOTInfo.DataGrid areadata)
     /* Read array of satellite data temperatures and load array
        containing temperatures and lat/lon positions.
         Inputs  : ixc   - element location of center point
@@ -1804,8 +1806,8 @@ static     public List<StormADOTInfo.RingData> aodtv72_readcirc(int ixc, int iyc
      *
      * @return _more_
      */
-static     float[] aodtv72_distance(float rrlat, float rrlon, float pplat,
-                             float pplon, int iunit)
+    static float[] aodtv72_distance(float rrlat, float rrlon, float pplat,
+                                    float pplon, int iunit)
     /* Calculate distance and angle between two points
        (rrlat,rrlon and pplat,pplon).
        Inputs  : rrlat - latitude of starting point
@@ -1891,7 +1893,8 @@ static     float[] aodtv72_distance(float rrlat, float rrlon, float pplat,
      *
      * @return _more_
      */
-static     float[] aodtv72_distance2(float rlat, float rlon, float xdist, float xang)
+    static float[] aodtv72_distance2(float rlat, float rlon, float xdist,
+                                     float xang)
     /* Calculate a latitude and longitude position from an
        initial latitude/longitude and distance/angle values.
         Inputs  : rlat - initial latitude
@@ -1962,7 +1965,7 @@ static     float[] aodtv72_distance2(float rlat, float rlon, float xdist, float 
      *
      * @return _more_
      */
-static     double aodtv72_calctime(int date, int time)
+    static double aodtv72_calctime(int date, int time)
     /* Compute time in xxxxx.yyy units, where xxxxx is the
        day and yyy is the percentage of the day.  This routine
        will also correct for Y2K problems.
@@ -2011,8 +2014,9 @@ static     double aodtv72_calctime(int date, int time)
      * @param areadata _more_
      * @return
      */
-static     float[] aodtv72_cdoshearcalc(float xlat, float xlon, float tempval,
-                                 int atype, StormADOTInfo.DataGrid areadata)
+    static float[] aodtv72_cdoshearcalc(float xlat, float xlon,
+                                        float tempval, int atype,
+                                        StormADOTInfo.DataGrid areadata)
     /* Determine eye size or shear distance for a given scene.
         Inputs  : xlat    - center latitude of analysis grid
                   xlon    - center longitude of analysis grid
@@ -2159,4 +2163,5 @@ static     float[] aodtv72_cdoshearcalc(float xlat, float xlon, float tempval,
 
 
 }
+
 

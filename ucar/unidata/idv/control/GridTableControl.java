@@ -18,7 +18,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
@@ -155,9 +154,8 @@ public class GridTableControl extends GridDisplayControl {
                 dates.add(dt);
                 FlatFieldTable table = new FlatFieldTable(ff,
                                            showNativeCoordinates);
-                table.setDefaultRenderer(
-                    Number.class,
-                    new TableNumberCellRenderer());
+                table.setDefaultRenderer(Number.class,
+                                         new TableNumberCellRenderer());
                 cardLayoutPanel.addCard(new JScrollPane(table));
             }
         }

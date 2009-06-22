@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.control.drawing;
 
 
@@ -73,25 +71,25 @@ import javax.swing.event.ChangeEvent;
  */
 public class SymbolGlyph extends DrawingGlyph {
 
-    /** _more_          */
+    /** the symbol */
     private static String defaultSymbol = ShapeUtility.CROSS;
 
-    /** _more_          */
+    /** the scale */
     private static float defaultScale = 1.0f;
 
-    /** _more_ */
+    /** xml attr */
     public static final String ATTR_SCALE = "scale";
 
-    /** _more_ */
+    /** xml attr */
     public static final String ATTR_SYMBOL = "symbol";
 
-    /** _more_ */
+    /** the displayable */
     private ShapeDisplayable shapeDisplayable;
 
-    /** _more_ */
+    /** the symbol */
     private String symbol = defaultSymbol;
 
-    /** _more_ */
+    /** the scale */
     private float scale = defaultScale;
 
 
@@ -168,14 +166,14 @@ public class SymbolGlyph extends DrawingGlyph {
     }
 
     /**
-     * _more_
+     * create the glyph
      *
-     * @param event _more_
+     * @param event event
      *
-     * @return _more_
+     * @return the glyph
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
      */
     public DrawingGlyph handleCreation(DisplayEvent event)
             throws VisADException, RemoteException {
@@ -186,14 +184,14 @@ public class SymbolGlyph extends DrawingGlyph {
 
 
     /**
-     * _more_
+     * handle event
      *
-     * @param event _more_
+     * @param event event
      *
-     * @return _more_
+     * @return this
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
      */
     public DrawingGlyph handleMousePressed(DisplayEvent event)
             throws VisADException, RemoteException {
@@ -203,14 +201,14 @@ public class SymbolGlyph extends DrawingGlyph {
 
 
     /**
-     * _more_
+     * apply the properties from the dialog
      *
-     * @param compMap _more_
+     * @param compMap components
      *
-     * @return _more_
+     * @return ok
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
      */
     protected boolean applyProperties(Hashtable compMap)
             throws VisADException, RemoteException {
@@ -238,23 +236,23 @@ public class SymbolGlyph extends DrawingGlyph {
     }
 
 
-    /** _more_          */
+    /** for gui */
     private TwoFacedObject selectedSymbol;
 
-    /** _more_          */
+    /** for gui */
     private JLabel symbolLabel;
 
-    /** _more_          */
+    /** for gui */
     private JComboBox symbolBox;
 
-    /** _more_          */
+    /** for gui */
     private JTextField scaleFld;
 
-    /** _more_          */
+    /** for gui */
     private JButton symbolBtn;
 
     /**
-     * _more_
+     * popup list of symbols
      */
     public void showSymbolPopup() {
         List items = new ArrayList();
@@ -293,9 +291,9 @@ public class SymbolGlyph extends DrawingGlyph {
 
 
     /**
-     * _more_
+     * set the symbol
      *
-     * @param tfo _more_
+     * @param tfo tfo
      */
     public void setPropertySymbol(TwoFacedObject tfo) {
         selectedSymbol = tfo;
@@ -529,4 +527,5 @@ public class SymbolGlyph extends DrawingGlyph {
 
 
 }
+
 

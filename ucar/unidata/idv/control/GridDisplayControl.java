@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.idv.control;
 
 
@@ -36,10 +35,10 @@ import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.DisplayInfo;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.FileManager;
 
 //begin control imports
 import ucar.unidata.util.ContourInfo;
+import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -689,15 +688,19 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
                     return;
                 }
                 if (d instanceof FieldImpl) {
-                    JComboBox publishCbx = getIdv().getPublishManager().getSelector("nc.export");
-                    String filename = FileManager.getWriteFile(FileManager.FILTER_NETCDF,FileManager.SUFFIX_NETCDF,
-                                                               (publishCbx!=null?GuiUtils.top(publishCbx):null));
+                    JComboBox publishCbx =
+                        getIdv().getPublishManager().getSelector("nc.export");
+                    String filename =
+                        FileManager.getWriteFile(FileManager.FILTER_NETCDF,
+                            FileManager.SUFFIX_NETCDF, ((publishCbx != null)
+                            ? GuiUtils.top(publishCbx)
+                            : null));
                     if (filename == null) {
                         return;
                     }
                     GridUtil.exportGridToNetcdf((FieldImpl) d, filename);
                     getIdv().getPublishManager().publishContent(filename,
-                                                                null, publishCbx);
+                            null, publishCbx);
                 }
 
             } catch (Exception e) {

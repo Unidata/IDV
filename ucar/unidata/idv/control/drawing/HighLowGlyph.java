@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.idv.control.drawing;
 
 
@@ -130,7 +126,7 @@ public class HighLowGlyph extends DrawingGlyph {
      */
     public String getExtraDescription() {
         return (high
-                ? "High " +pressure
+                ? "High " + pressure
                 : "Low " + pressure);
     }
 

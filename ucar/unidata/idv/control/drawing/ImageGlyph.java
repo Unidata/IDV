@@ -145,6 +145,11 @@ public class ImageGlyph extends DrawingGlyph {
         this.image = image;
     }
 
+    /**
+     * is this glyph a raster
+     *
+     * @return is raster (true)
+     */
     public boolean getIsRaster() {
         return true;
     }
@@ -608,7 +613,8 @@ public class ImageGlyph extends DrawingGlyph {
                     //              lbl = new JLabel(new ImageIcon(theImage));
                     //GuiUtils.showOkCancelDialog(null,"",lbl1,null);
                 }
-                imageData = (FlatField) ucar.visad.Util.makeField(theImage,true);
+                imageData = (FlatField) ucar.visad.Util.makeField(theImage,
+                        true);
             }
         } catch (java.io.IOException ioe) {}
         if (imageData == null) {
@@ -734,4 +740,5 @@ public class ImageGlyph extends DrawingGlyph {
 
 
 }
+
 
