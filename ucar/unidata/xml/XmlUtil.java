@@ -2193,11 +2193,11 @@ public abstract class XmlUtil {
                 }
 
                 Element root      = getRoot(buff.toString());
-                //                String  xmlString = toStringWithHeader(root, "  ", "\n",
-                //                                        true);
+                                String  xmlString = toStringWithHeader(root, "  ", "\n",
+                                                        true);
 
-                String  xmlString = toStringWithHeader(root, "", "",
-                                        false);
+                //                String  xmlString = toStringWithHeader(root, "", "",
+                //                                        false);
                 IOUtil.writeFile(new java.io.File(args[i]), xmlString);
             } catch (Exception exc) {
                 System.err.println("Error processing:" + args[i]);
