@@ -2832,6 +2832,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         setData(myDataChoices);
 
         if (needToInstantiateAttributes) {
+            //If we need to reinstantiate the attributes then clear out the units, etc.
+            displayUnit = null;
+            colorUnit   = null;
+            colorRange  = null;
+            selectRange = null;
             instantiateAttributes();
         }
         updateLegendAndList();
