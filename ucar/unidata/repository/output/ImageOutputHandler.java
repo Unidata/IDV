@@ -85,6 +85,7 @@ public class ImageOutputHandler extends OutputHandler {
     public static final String ARG_IMAGE_EDIT_RESIZE = "image.edit.resize";
     public static final String ARG_IMAGE_EDIT_WIDTH = "image.edit.width";
     public static final String ARG_IMAGE_EDIT_CROP = "image.edit.crop";
+    public static final String ARG_IMAGE_EDIT_REDEYE = "image.edit.redeye";
 
     public static final String ARG_IMAGE_CROPX1 = "image.edit.cropx1";
     public static final String ARG_IMAGE_CROPY1 = "image.edit.cropy1";
@@ -199,7 +200,7 @@ public class ImageOutputHandler extends OutputHandler {
     private Image getImage(Entry entry) {
         Image image = imageCache.get(entry.getId());
         if(image == null) {
-            image =ImageUtils.readImage(entry.getResource().getPath());
+            image =ImageUtils.readImage(entry.getResource().getPath(),false);
             //Keep the cache size low
             if(imageCache.size()>5) {
                 imageCache = new Hashtable<String,Image>();
@@ -244,7 +245,15 @@ public class ImageOutputHandler extends OutputHandler {
         }  else if(request.exists(ARG_IMAGE_EDIT_ROTATE_LEFT)) {
             newImage = ImageUtils.rotate90(ImageUtils.toBufferedImage(image), true);
             request.remove(ARG_IMAGE_EDIT_ROTATE_LEFT);
-
+        }  else if(request.exists(ARG_IMAGE_EDIT_REDEYE)) {
+            int x1= request.get(ARG_IMAGE_CROPX1,0);            
+            int y1= request.get(ARG_IMAGE_CROPY1,0);
+            int x2= request.get(ARG_IMAGE_CROPX2,0);            
+            int y2= request.get(ARG_IMAGE_CROPY2,0);
+            if(x1<x2 && y1<y2) {
+                newImage = ImageUtils.removeRedeye(image, x1, y1,  x2,  y2);
+            }
+            request.remove(ARG_IMAGE_EDIT_REDEYE);
         }  else if(request.exists(ARG_IMAGE_EDIT_CROP)) {
             int x1= request.get(ARG_IMAGE_CROPX1,0);            
             int y1= request.get(ARG_IMAGE_CROPY1,0);
@@ -281,6 +290,7 @@ public class ImageOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.space(2));
 
         sb.append(HtmlUtil.submit(msg("Crop"),ARG_IMAGE_EDIT_CROP));
+        sb.append(HtmlUtil.submit(msg("Remove Redeye"),ARG_IMAGE_EDIT_REDEYE));
         sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPX1,"",HtmlUtil.SIZE_3+HtmlUtil.id(ARG_IMAGE_CROPX1)));
         sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPY1,"",HtmlUtil.SIZE_3+HtmlUtil.id(ARG_IMAGE_CROPY1)));
         sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPX2,"",HtmlUtil.SIZE_3+HtmlUtil.id(ARG_IMAGE_CROPX2)));
@@ -288,9 +298,9 @@ public class ImageOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.div("",HtmlUtil.cssClass("image_edit_box")+HtmlUtil.id("image_edit_box")));
 
         sb.append(HtmlUtil.space(2));
-        sb.append(HtmlUtil.submit(msg("Rotate left"),ARG_IMAGE_EDIT_ROTATE_LEFT));
+        sb.append(HtmlUtil.submitImage(iconUrl(ICON_ANTIROTATE),ARG_IMAGE_EDIT_ROTATE_LEFT));
         sb.append(HtmlUtil.space(2));
-        sb.append(HtmlUtil.submit(msg("Rotate right"),ARG_IMAGE_EDIT_ROTATE_RIGHT));
+        sb.append(HtmlUtil.submitImage(iconUrl(ICON_ROTATE),ARG_IMAGE_EDIT_ROTATE_LEFT));
         File entryDir = getStorageManager().getEntryDir(entry.getId(), false);
         File original = new File(entryDir+"/"+ "originalimage");
         if(original.exists()) {

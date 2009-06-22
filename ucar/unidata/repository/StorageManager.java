@@ -130,7 +130,7 @@ public class StorageManager extends RepositoryManager {
     private String repositoryDir;
 
     /** _more_ */
-    private String tmpDir;
+    private File tmpDir;
 
 
     private String htdocsDir;
@@ -187,7 +187,7 @@ public class StorageManager extends RepositoryManager {
     public String resourceFromDB(String resource) {
         if (resource != null) {
             resource = resource.replace("${ramadda.storagedir}",
-                                        getStorageDir());
+                                        getStorageDir().toString());
         }
         return resource;
     }
@@ -201,7 +201,7 @@ public class StorageManager extends RepositoryManager {
      */
     public String resourceToDB(String resource) {
         if (resource != null) {
-            resource = resource.replace(getStorageDir(),
+            resource = resource.replace(getStorageDir().toString(),
                                         "${ramadda.storagedir}");
         }
         return resource;
@@ -256,7 +256,7 @@ public class StorageManager extends RepositoryManager {
      */
     protected void addInfo(StringBuffer sb) {
         sb.append(HtmlUtil.formEntry("Home Directory:", getRepositoryDir()));
-        sb.append(HtmlUtil.formEntry("Storage Directory:", getStorageDir()));
+        sb.append(HtmlUtil.formEntry("Storage Directory:", getStorageDir().toString()));
     }
 
 
@@ -321,8 +321,6 @@ public class StorageManager extends RepositoryManager {
     }
 
 
-
-
     public void addTemporaryDir(TemporaryDir storageDir) {
         tmpDirs.add(storageDir);
     }
@@ -364,10 +362,10 @@ public class StorageManager extends RepositoryManager {
      *
      * @return _more_
      */
-    private String getTmpDir() {
+    private File getTmpDir() {
         if (tmpDir == null) {
-            tmpDir = IOUtil.joinDir(getRepositoryDir(), DIR_TMP);
-            IOUtil.makeDirRecursive(new File(tmpDir));
+            tmpDir = new File(IOUtil.joinDir(getRepositoryDir(), DIR_TMP));
+            IOUtil.makeDirRecursive(tmpDir);
         }
         return tmpDir;
     }
@@ -963,9 +961,9 @@ public class StorageManager extends RepositoryManager {
 
 
 
-    private void throwBadFile() {
+    private void throwBadFile(File f) {
         throw new IllegalArgumentException(
-                                  "The specified file is not under one of the allowable file system directories",null);
+                                  "The file:" + f+" is not under one of the allowable file system directories",null);
     }
 
     public File checkWriteFile(File file)  {
@@ -973,20 +971,29 @@ public class StorageManager extends RepositoryManager {
         if (IOUtil.isADescendent(storageDir, file)) {
             return file;
         }
-        throwBadFile();
+        if (IOUtil.isADescendent(getTmpDir(), file)) {
+            return file;
+        }
+        throwBadFile(file);
         return null;
     }
 
 
     public File checkFile(File file)  {
         //check if its in an allowable area for access
-        if(isLocalFileOk(file)) return file;
+        if(isLocalFileOk(file)) {
+            return file;
+        }
         getStorageDir();
         //Check if its in the storage dir
         if (IOUtil.isADescendent(storageDir, file)) {
             return file;
         }
-        throwBadFile();
+        
+        if (IOUtil.isADescendent(getTmpDir(), file)) {
+            return file;
+        }
+        throwBadFile(file);
         return null;
     }
 

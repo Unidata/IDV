@@ -40,6 +40,10 @@ public interface Constants {
 
     public static final String ICON_ELLIPSIS = "ramadda.icon.ellipsis";
 
+    public static final String ICON_ROTATE = "ramadda.icon.rotate";
+
+    public static final String ICON_ANTIROTATE = "ramadda.icon.antirotate";
+
     /** _more_ */
     public static final String ICON_ARROW = "ramadda.icon.arrow";
 
