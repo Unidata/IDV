@@ -150,8 +150,22 @@ public class ImageUtils {
      * @return  the Image
      */
     public static Image readImage(String imagePath) {
+        return readImage(imagePath, true);
+    }
+
+
+    /**
+     * Read and image
+     *
+     * @param imagePath  the path to the image
+     * @param cache Cache the image
+     *
+     * @return  the Image
+     */
+
+    public static Image readImage(String imagePath, boolean cache) {
         //System.err.println ("getImage");
-        Image image = GuiUtils.getImage(imagePath);
+        Image image = GuiUtils.getImage(imagePath,ImageUtils.class,cache);
         //System.err.println ("waiting");
         image = waitOnImage(image);
         //System.err.println ("done waiting");
@@ -373,6 +387,36 @@ public class ImageUtils {
         ImageProducer ip = new FilteredImageSource(im.getSource(), filter);
         im = Toolkit.getDefaultToolkit().createImage(ip);
         //      GuiUtils.showDialog("writing image", new JLabel(new ImageIcon(im)));
+        BufferedImage bim = toBufferedImage(im);
+        return bim;
+    }
+
+
+
+    public static BufferedImage removeRedeye(Image im, final int x1, final int y1, final int x2, final int y2) {
+        ImageFilter filter = new RGBImageFilter() {
+            public final int filterRGB(int x, int y, int rgb) {
+                if(x<x1 || x>x2 || y<y1 || y>y2) return rgb;
+                int threshold = 0;
+                int r   = (rgb >> 16) & 0xff;
+                int g = (rgb >> 8) & 0xff;
+                int b  = (rgb) & 0xff;
+                double rbrite = r * 0.5133333;
+		double gbrite = g;
+		double bbrite = b * 0.1933333;
+		if (rbrite >= gbrite - threshold
+		  &&  rbrite >= bbrite - threshold)  {
+		    rbrite = (gbrite + bbrite) / 2;
+		    r = (int)(rbrite / 0.51333333);
+                    return (0xFF00FFFF & rgb)|(r<<16);
+                }
+                return rgb;
+
+            }
+        };
+        ImageProducer ip = new FilteredImageSource(im.getSource(), filter);
+        im = Toolkit.getDefaultToolkit().createImage(ip);
+        //        GuiUtils.showDialog("writing image", new JLabel(new ImageIcon(im)));
         BufferedImage bim = toBufferedImage(im);
         return bim;
     }
@@ -1147,6 +1191,12 @@ public class ImageUtils {
         int width = 400;
         System.err.println ("reading");
         Image image = readImage(args[0]);
+
+
+        removeRedeye(image, 10,10,1000,1000);
+        if(true) return;
+
+
         System.err.println ("cvrting");
         BufferedImage bimage = toBufferedImage(image,
                                   BufferedImage.TYPE_INT_ARGB);
