@@ -2852,15 +2852,22 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected boolean setData(List newChoices)
             throws VisADException, RemoteException {
-        displayUnit = null;
-        colorUnit   = null;
-        colorRange  = null;
-        selectRange = null;
+        boolean ok;
         if ((myDataChoices != null) && (myDataChoices.size() > 0)) {
-            return setData((DataChoice) myDataChoices.get(0));
+            ok= setData((DataChoice) myDataChoices.get(0));
         } else {
-            return setData((DataChoice) null);
+            ok = setData((DataChoice) null);
         }
+        if(ok) {
+            //We used to null these out in case the user selected new data with different units
+            //However, this resets what the user has set and screws things up
+            //            displayUnit = null;
+            //            colorUnit   = null;
+            //            colorRange  = null;
+            //            selectRange = null;
+        }
+
+        return ok;
     }
 
 
@@ -6428,6 +6435,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             internalAnimation.removePropertyChangeListener(this);
             internalAnimation = null;
         }
+
 
         displayUnit = null;
         colorUnit   = null;
