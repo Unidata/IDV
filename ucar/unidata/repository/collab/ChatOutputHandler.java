@@ -247,10 +247,9 @@ public class ChatOutputHandler extends OutputHandler {
             try {
                 Element node = XmlUtil.getRoot(s);
                 String  type = XmlUtil.getAttribute(node, ATTR_TYPE);
-                //                System.err.println("handleMessage:" + s);
                 if (session == null) {
                     String tmpSession = XmlUtil.getAttribute(node,
-                                            ATTR_SESSIONID);
+                                                             ATTR_SESSIONID,"");
                     SessionManager.Session session =
                         getSessionManager().getSession(tmpSession);
                     if (session == null) {
@@ -261,7 +260,7 @@ public class ChatOutputHandler extends OutputHandler {
                         user = session.getUser();
                     }
                     String tmpEntryId = XmlUtil.getAttribute(node,
-                                            ATTR_CHANNEL);
+                                                             ATTR_CHANNEL,"");
                     entry = getEntryManager().getEntry(null, tmpEntryId);
                     if (entry == null) {
                         //                        entry = getRepository().getEntryManager().getTopGroup();

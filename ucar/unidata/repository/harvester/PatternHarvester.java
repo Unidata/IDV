@@ -726,12 +726,8 @@ public class PatternHarvester extends Harvester {
                                       !getTestMode() &&
                                       groupTemplate.indexOf("${dirgroup}")
                                       >= 0);
-        System.err.println ("dirgroup:" + dirGroup);
-        //        String dirGroup = StringUtil.join(Group.PATHDELIMITER, dirToks);
         dirGroup = SqlUtil.cleanUp(dirGroup);
         dirGroup = dirGroup.replace("\\", "/");
-
-
 
 
         Hashtable map       = new Hashtable();
@@ -765,7 +761,8 @@ public class PatternHarvester extends Harvester {
         //        System.err.println("values:");
         //        System.err.println("map:" + map);
         Object[] values     = typeHandler.makeValues(map);
-        Date     createDate = new Date();
+        //        Date     createDate = new Date();
+        Date     createDate = new Date(f.lastModified());
         if (fromDate == null) {
             fromDate = toDate;
         }
