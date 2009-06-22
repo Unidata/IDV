@@ -215,6 +215,8 @@ public class ImageOutputHandler extends OutputHandler {
     }
 
 
+
+
     public Result outputEntry(Request request, Entry  entry) 
             throws Exception {
         if(!getAccessManager().canDoAction(request, entry, Permission.ACTION_EDIT)) {
@@ -222,7 +224,9 @@ public class ImageOutputHandler extends OutputHandler {
         }
 
         StringBuffer sb = new StringBuffer();
-        String url = getImageUrl(request, entry);
+
+
+        String url = getImageUrl(request, entry,true);
         Image image = getImage(entry);
         int imageWidth = image.getWidth(null);
         int imageHeight = image.getHeight(null);
@@ -242,9 +246,6 @@ public class ImageOutputHandler extends OutputHandler {
         } else  if(request.exists(ARG_IMAGE_EDIT_RESIZE)) {
             newImage  = ImageUtils.resize(image, request.get(ARG_IMAGE_EDIT_WIDTH, imageWidth),-1);
             request.remove(ARG_IMAGE_EDIT_RESIZE);
-        }  else if(request.exists(ARG_IMAGE_EDIT_ROTATE_LEFT)) {
-            newImage = ImageUtils.rotate90(ImageUtils.toBufferedImage(image), true);
-            request.remove(ARG_IMAGE_EDIT_ROTATE_LEFT);
         }  else if(request.exists(ARG_IMAGE_EDIT_REDEYE)) {
             int x1= request.get(ARG_IMAGE_CROPX1,0);            
             int y1= request.get(ARG_IMAGE_CROPY1,0);
@@ -263,6 +264,9 @@ public class ImageOutputHandler extends OutputHandler {
                 newImage = ImageUtils.clip(ImageUtils.toBufferedImage(image), new int[]{x1,y1},new int[]{x2,y2});
             }
             request.remove(ARG_IMAGE_EDIT_CROP);
+        }  else if(request.exists(ARG_IMAGE_EDIT_ROTATE_LEFT)) {
+            newImage = ImageUtils.rotate90(ImageUtils.toBufferedImage(image), true);
+            request.remove(ARG_IMAGE_EDIT_ROTATE_LEFT);
         }  else if(request.exists(ARG_IMAGE_EDIT_ROTATE_RIGHT)) {
             newImage = ImageUtils.rotate90(ImageUtils.toBufferedImage(image), false);
             request.remove(ARG_IMAGE_EDIT_ROTATE_RIGHT);
@@ -300,7 +304,7 @@ public class ImageOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.space(2));
         sb.append(HtmlUtil.submitImage(iconUrl(ICON_ANTIROTATE),ARG_IMAGE_EDIT_ROTATE_LEFT));
         sb.append(HtmlUtil.space(2));
-        sb.append(HtmlUtil.submitImage(iconUrl(ICON_ROTATE),ARG_IMAGE_EDIT_ROTATE_LEFT));
+        sb.append(HtmlUtil.submitImage(iconUrl(ICON_ROTATE),ARG_IMAGE_EDIT_ROTATE_RIGHT));
         File entryDir = getStorageManager().getEntryDir(entry.getId(), false);
         File original = new File(entryDir+"/"+ "originalimage");
         if(original.exists()) {

@@ -22,6 +22,7 @@
 package ucar.unidata.repository;
 
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.Misc;
 
 import java.util.ArrayList;
@@ -156,16 +157,19 @@ public class LogManager extends RepositoryManager {
 
 
     private void log(String message, Throwable exc) {
+        message = encode(message);
+
         Throwable thr = null;
         if (exc != null) {
             thr = LogUtil.getInnerException(exc);
         }
 
-        if(true || getProperty(PROP_LOG_TOSTDERR,false)) {
+
+        if(getProperty(PROP_LOG_TOSTDERR,false)) {
             System.err.println(message);
             if (thr!=null) {
                 if (thr instanceof RepositoryUtil.MissingEntryException) {
-                    System.err.println(thr.getMessage());
+                    System.err.println(encode(thr.getMessage()));
                 } else {
                     thr.printStackTrace();
                 }
@@ -180,12 +184,12 @@ public class LogManager extends RepositoryManager {
                     os.write("\n".getBytes());
                     if (thr != null) {
                         if (thr instanceof RepositoryUtil.MissingEntryException) {
-                            os.write(thr.toString().getBytes());
+                            os.write(encode(thr.toString()).getBytes());
                             os.write("\n".getBytes());
                         } else {
                             os.write("<stack>".getBytes());
                             os.write("\n".getBytes());
-                            os.write(LogUtil.getStackTrace(thr).getBytes());
+                            os.write(encode(LogUtil.getStackTrace(thr)).getBytes());
                             os.write("\n".getBytes());
                             os.write("</stack>".getBytes());
                         }
@@ -198,6 +202,13 @@ public class LogManager extends RepositoryManager {
         }
     }
 
+
+
+    private String encode(String s) {
+        s = s.replace("<","&lt;");
+        s = s.replace(">","&gt;");
+        return s;
+    }
 
 
     /**

@@ -869,6 +869,7 @@ return new Result(title, sb);
                     unzipArchive = false;
                 } else {
                     String url = resource;
+                    //                    getStorageManager().checkPath(url);
                     if ( !url.startsWith("http:")
                             && !url.startsWith("https:")
                             && !url.startsWith("ftp:")) {
@@ -986,9 +987,11 @@ return new Result(title, sb);
             }
 
 
+  
             for (int resourceIdx = 0; resourceIdx < resources.size();
                     resourceIdx++) {
                 Group parent = parents.get(resourceIdx);
+                resourceName = (String) resources.get(resourceIdx);
                 String theResource = (String) resources.get(resourceIdx);
                 String origName    = (String) origNames.get(resourceIdx);
                 if (isFile && !isLocalFile) {
@@ -1008,6 +1011,11 @@ return new Result(title, sb);
 
                 if (name.trim().length() == 0) {
                     name = IOUtil.getFileTail(origName);
+                }
+
+
+                if (name.trim().length() == 0) {
+                    name = IOUtil.getFileTail(resourceName);
                 }
 
                 Date[] theDateRange = { dateRange[0], dateRange[1] };
@@ -1944,7 +1952,7 @@ return new Result(title, sb);
         sb.append(request.form(getRepository().URL_ENTRY_FORM));
         sb.append(msgLabel("Or create a"));
         sb.append(HtmlUtil.space(1));
-        HashSet<String> exclude = new HashSet<String>();
+       HashSet<String> exclude = new HashSet<String>();
         exclude.add(TYPE_FILE);
         exclude.add(TYPE_GROUP);
         sb.append(getRepository().makeTypeSelect(request, false, "", true,
@@ -1952,6 +1960,7 @@ return new Result(title, sb);
         sb.append(HtmlUtil.space(1));
         sb.append(HtmlUtil.submit("Go"));
         sb.append(HtmlUtil.hidden(ARG_GROUP, group.getId()));
+
         sb.append(HtmlUtil.formClose());
         sb.append(makeNewGroupForm(request, group, BLANK));
 
@@ -2035,8 +2044,7 @@ return new Result(title, sb);
                                           mimeType);
             result.addHttpHeader(HtmlUtil.HTTP_CONTENT_LENGTH, "" + length);
             result.setLastModified(new Date(file.lastModified()));
-            //TODO: set the date, etc
-            //            result.setCacheOk(true);
+            result.setCacheOk(true);
             //            response.setHeader("Last-Modified",
             //                               "Tue, 20 Jan 2009 01:45:54 GMT");
             return result;
@@ -4145,7 +4153,7 @@ return new Result(title, sb);
 
 
     private void checkEntryFileTime(Entry entry) throws Exception {
-        if(!entry.isFile()) return;
+        if(entry==null || !entry.isFile()) return;
         File f = entry.getResource().getTheFile();
         if(f ==null || !f.exists()) return;
         long fileTime = f.lastModified();
@@ -4188,6 +4196,7 @@ return new Result(title, sb);
         synchronized (MUTEX_ENTRY) {
             Entry entry = getEntryFromCache(entryId);
             if (entry != null) {
+                checkEntryFileTime(entry);
                 if ( !andFilter) {
                     return entry;
                 }
@@ -4236,6 +4245,7 @@ return new Result(title, sb);
                         getRepository().getTypeHandler(results.getString(2));
                     entry = typeHandler.getEntry(results, abbreviated);
                     entryStmt.close();
+                    checkEntryFileTime(entry);
                 }
             } catch (Exception exc) {
                 logError("creating entry:" + entryId, exc);

@@ -1,17 +1,45 @@
 
-<h3>Web API</h3>
-All access into RAMADDA is defined through an api.xml file. This file allows for the specification of access control to the entry point urls. So, for example, all access to the admin area is checked up front to ensure that the user is a site administrator.
+<h3>Files</h3> 
+RAMADDA writes and reads a large number of files in a variety of places within the code. Possible exploits here include reading files from the server file system (e.g., /etc/passwrd) and/or writing files to areas within the server file system. To prevent this *all* file access is accomplished through a small number of methods in the class StorageManager. e.g.:
 
-<p>
-The access control mechanism around the data model (i.e., the entries) also makes use of this facility in that for a particular api access there can be a specification of the access rights to the entry (e.g., view, edit, delete, new, etc).
+<pre>
+    public String readSystemResource(URL url);
+    public String readSystemResource(File file);
+    public String readSystemResource(String path);
+    public InputStream getInputStream(String path);
+    public FileInputStream getFileInputStream(String path);
+    public FileInputStream getFileInputStream(File file);
+    public FileOutputStream getFileOutputStream(File file);
+</pre>
+
+
+One of the tricky cases is for URLS. Because a URL can point to the local file system RAMADDA needs to check that it is not a "file:" URL. It does this with the following code:
+<pre>
+...
+        if (path.toLowerCase().trim().startsWith("file:")) {
+            f = new File(path.substring("file:".length()));
+            checkFile(f);
+            return;
+        }
+</pre>
+
+
+ This also includes when RAMADDA reads a URL. The exploit to watch for with respect to URL reading is a URL that is a file URL, e.g.:
+file:/etc/passwrd
+
+
+
 
 <h3>Database</h3> - SQL injection attacks are often an avenue for compromising a web application.  RAMADDA addresses this issue by using a Clause class for all (well, most) database queries. RAMADDA never assembles a sql string directly from user input. Instead data base queries are formed using the Clause class which uses the Java PreparedStatement.  
 
 <p>
 The exception to the above is in a few places where the database access is done by a admin user.
 
-<h3>Files</h3> 
-RAMADDA writes and reads a large number of files in a variety of places within the code. Possible exploits here include reading files from the server file system (e.g., /etc/passwrd) and/or writing files to areas within the server file system. To prevent this *all* file access is accomplished through a small number of methods in the class StorageManager. This also includes when RAMADDA reads a URL. The exploit to watch for with respect to URL reading is a URL that is a file URL, e.g.:
-file:/etc/passwrd
 
 
+
+<h3>Web API</h3>
+All access into RAMADDA is defined through an api.xml file. This file allows for the specification of access control to the entry point urls. So, for example, all access to the admin area is checked up front to ensure that the user is a site administrator.
+
+<p>
+The access control mechanism around the data model (i.e., the entries) also makes use of this facility in that for a particular api access there can be a specification of the access rights to the entry (e.g., view, edit, delete, new, etc). Furthermore, when creating the internal Entry data structures RAMADDA checks if the user requesting the entry has view permissons.

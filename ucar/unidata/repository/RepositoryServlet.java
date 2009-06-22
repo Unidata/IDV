@@ -268,9 +268,8 @@ public class RepositoryServlet extends HttpServlet {
 
             Date lastModified = repositoryResult.getLastModified();
             if(lastModified!=null) {
-                //                System.err.println ("modified:" + sdf.format(lastModified));
-                response.setHeader("Last-Modified",
-                                   sdf.format(lastModified));
+                response.addDateHeader("Last-Modified",
+                                       lastModified.getTime());
             }
             if (repositoryResult.getCacheOk()) {
                 response.setHeader("Cache-Control", "public,max-age=259200");

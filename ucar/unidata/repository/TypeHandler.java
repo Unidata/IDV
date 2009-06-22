@@ -714,7 +714,7 @@ public class TypeHandler extends RepositoryManager {
                 links.add(
                           new Link(
                                    request.entryUrl(getRepository().URL_ENTRY_CHANGE, entry,ARG_JUSTPUBLISH,"true"),
-                                   getRepository().iconUrl(ICON_EDIT), msg("Make Entry Public"),
+                                   getRepository().iconUrl(ICON_PUBLISH), msg("Make Entry Public"),
                                    OutputType.TYPE_EDIT | OutputType.TYPE_TOOLBAR));
             }
 

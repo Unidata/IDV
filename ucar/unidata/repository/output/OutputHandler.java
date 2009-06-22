@@ -1500,6 +1500,12 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * @return _more_
      */
     public String getImageUrl(Request request, Entry entry) {
+        return getImageUrl(request, entry, false);
+    }
+
+
+    private static int imageVersionCnt = 0;
+    public String getImageUrl(Request request, Entry entry,boolean addVersion) {
         if ( !entry.getResource().isImage()) {
             if (true) {
                 return null;
@@ -1516,8 +1522,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         }
 
         return HtmlUtil.url(
-            request.url(repository.URL_ENTRY_GET) + "/"
-            + getStorageManager().getFileTail(entry), ARG_ENTRYID,
+                            request.url(repository.URL_ENTRY_GET) + "/" +(addVersion?("v" +(imageVersionCnt++)):"") +
+                            getStorageManager().getFileTail(entry), ARG_ENTRYID,
                 entry.getId());
     }
 

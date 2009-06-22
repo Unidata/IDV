@@ -59,8 +59,11 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
+import visad.data.units.NoSuchUnitException;
 
+import visad.jmet.MetUnits;
 import visad.Unit;
+import visad.UnitException;
 
 import java.io.File;
 
@@ -196,8 +199,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                      Unit toUnit)
             throws Exception {
         MAMath.MinMax minmax = MAMath.getMinMax(a);
-        Unit fromUnit        =
-            ucar.visad.Util.parseUnit(var.getUnitsString());
+        Unit fromUnit        =parseUnit(var.getUnitsString(),var.getUnitsString());
         /*
         System.out.println(var.getName());
         System.out.println("\tminmax:" + minmax.min + " " + minmax.max + " " + fromUnit);
@@ -209,6 +211,44 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                                              fromUnit) };
         return result;
     }
+
+
+    public static Unit parseUnit(String unitIdentifier, String unitName)
+            throws Exception {
+
+        if (unitIdentifier == null) {
+            return null;
+        }
+        if (unitName == null) {
+            unitName = unitIdentifier;
+        }
+        Unit u = null;
+        // clean up ** and replace with nothing
+        unitIdentifier = unitIdentifier.replaceAll("\\*\\*", "");
+        try {
+
+            try {
+                String realUnitName = MetUnits.makeSymbol(unitIdentifier);
+                u = visad.data.units.Parser.parse(realUnitName);
+            } catch (NoSuchUnitException nsu) {
+                if (unitIdentifier.indexOf("_") >= 0) {
+                    unitIdentifier = unitIdentifier.replace('_', ' ');
+                    String realUnitName = MetUnits.makeSymbol(unitIdentifier);
+                    u = visad.data.units.Parser.parse(realUnitName);
+                } else {
+                    throw new IllegalArgumentException("No such unit:" + nsu);
+                }
+            }
+        } catch (Exception exc) {
+            throw new IllegalArgumentException("Error parsing unit:" + exc);
+        }
+        try {
+            u = u.clone(unitName);
+        } catch (UnitException ue) {}
+        return u;
+    }
+
+
 
 
     /**
@@ -223,8 +263,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      */
     public static List<Date> getDates(VariableSimpleIF var, CoordinateAxis ca)
             throws Exception {
-        Unit fromUnit        =
-            ucar.visad.Util.parseUnit(var.getUnitsString());
+        Unit fromUnit        =parseUnit(var.getUnitsString(),var.getUnitsString());
         Unit          toUnit = visad.CommonUnit.secondsSinceTheEpoch;
         List<Date>    dates  = new ArrayList<Date>();
         Array         a      = ca.read();

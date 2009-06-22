@@ -227,6 +227,7 @@ public class MetadataTypeBase extends RepositoryManager {
         if(value == null) {
             value = "";
         }
+        value = XmlUtil.encodeString(value);
         String label   = element.getLabel(value);
         String name = element.getName();
         String []keys = {"attr" + element.getIndex(),

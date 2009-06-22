@@ -1221,7 +1221,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         List sourcePaths =
             Misc.newList(
                 getStorageManager().getSystemResourcePath() + "/languages",
-                getStorageManager().getRepositoryDir());
+                getStorageManager().getRepositoryDir().toString());
         for (int i = 0; i < sourcePaths.size(); i++) {
             String       dir     = (String) sourcePaths.get(i);
             List<String> listing = IOUtil.getListing(dir, getClass());
