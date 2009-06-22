@@ -316,6 +316,7 @@ public class SoundingTable extends JTable {
          * @return Number of rows
          */
         public int getRowCount() {
+            if(domainData==null) return 0;
             return domainData[0].length;
         }
 
