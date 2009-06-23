@@ -220,10 +220,10 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
     public static boolean force2D = false;
 
     /** use 0-360 for longitude range */
-    private static boolean use360 = true;
+    private boolean use360 = true;
 
     /** flag for adjusting lons or not */
-    private static boolean adjustLons = false;
+    private boolean adjustLons = false;
 
     /**
      * Initializes an instance with the specified MapProjection
@@ -1417,7 +1417,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * lat/lon to Display.DisplaySpatialCartesianTuple (XYZ).
      * Altitude (z) values are held constant.
      */
-    protected static class MapProjection3DAdapter extends CoordinateSystem {
+    protected class MapProjection3DAdapter extends CoordinateSystem {
 
         /** map projection for xy -> lat/lon transformations */
         private final MapProjection mapProjection;
