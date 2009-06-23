@@ -148,11 +148,11 @@ public class GraphOutputHandler extends OutputHandler {
         }
         String html =
             StringUtil.replace(graphAppletTemplate, "${id}",
-                               getRepository().encode(entry.getId()));
+                               HtmlUtil.urlEncode(entry.getId()));
         html = StringUtil.replace(html, "${root}",
                                   getRepository().getUrlBase());
         html = StringUtil.replace(html, "${type}",
-                                  getRepository().encode(type));
+                                  HtmlUtil.urlEncode(type));
         StringBuffer sb = new StringBuffer();
         sb.append(html);
         Result result = new Result(msg("Graph"), sb);

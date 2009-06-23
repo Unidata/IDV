@@ -2064,7 +2064,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             }
 
             if ((request.getUser() != null) && request.getUser().getAdmin()) {
-                sb.append(HtmlUtil.pre(getSafeString(LogUtil.getStackTrace(inner))));
+                sb.append(HtmlUtil.pre(HtmlUtil.entityEncode(LogUtil.getStackTrace(inner))));
             }
 
             result = new Result(msg("Error"), sb);
@@ -4625,18 +4625,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
-    /**
-     * _more_
-     *
-     * @param s _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public String encode(String s) throws Exception {
-        return java.net.URLEncoder.encode(s, "UTF-8");
-    }
 
     /**
      * _more_

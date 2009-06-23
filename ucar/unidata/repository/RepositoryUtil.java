@@ -128,5 +128,20 @@ public class RepositoryUtil {
         return "<div class=\"pageheading\">" + h + "</div>";
     }
 
+
+    public static final String encodeInput(String s) {
+        s= HtmlUtil.urlEncode(s);
+        s = s.replace("+"," ");
+        return s;
+    }
+
+
+    public static void main(String []args) {
+        for(String s:args) {
+            System.err.println(encodeInput(s));
+        }
+    }
+
+
 }
 

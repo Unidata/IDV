@@ -418,7 +418,7 @@ public class AssociationManager extends RepositoryManager {
                             request.url(
                                 getRepository().URL_SEARCH_FORM,
                                 ARG_ASSOCIATION,
-                                getRepository().encode(
+                                HtmlUtil.urlEncode(
                                     association)), HtmlUtil.img(
                                         iconUrl(ICON_SEARCH),
                                         msg("Search in association")));

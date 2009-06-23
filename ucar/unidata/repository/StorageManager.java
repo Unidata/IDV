@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.repository;
 
 
@@ -90,55 +91,55 @@ import java.util.zip.*;
 public class StorageManager extends RepositoryManager {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String FILE_SEPARATOR = "_file_";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FILE_FULLLOG = "fullrepository.log";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FILE_LOG = "repository.log";
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_REPOSITORY = "repository";
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_ENTRIES = "entries";
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_STORAGE = "storage";
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_PLUGINS = "plugins";
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_RESOURCES = "resources";
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_HTDOCS = "htdocs";
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_ANONYMOUSUPLOAD = "anonymousupload";
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_LOGS = "logs";
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_CACHE = "cache";
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_TMP = "tmp";
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_ICONS = "icons";
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_UPLOADS = "uploads";
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_SCRATCH = "scratch";
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_THUMBNAILS = "thumbnails";
 
 
@@ -163,29 +164,29 @@ public class StorageManager extends RepositoryManager {
     private File tmpDir;
 
 
-    /** _more_          */
+    /** _more_ */
     private String htdocsDir;
 
-    /** _more_          */
+    /** _more_ */
     private String iconsDir;
 
-    /** _more_          */
+    /** _more_ */
     private List<TemporaryDir> tmpDirs = new ArrayList<TemporaryDir>();
 
-    /** _more_          */
+    /** _more_ */
     private TemporaryDir scratchDir;
 
 
     /** _more_ */
     private String anonymousDir;
 
-    /** _more_          */
+    /** _more_ */
     private TemporaryDir cacheDir;
 
-    /** _more_          */
+    /** _more_ */
     private String logDir;
 
-    /** _more_          */
+    /** _more_ */
     private long cacheDirSize = -1;
 
     /** _more_ */
@@ -266,8 +267,8 @@ public class StorageManager extends RepositoryManager {
      *
      */
     protected void init() {
-        String repositoryDirProperty = getRepository().getProperty(PROP_REPOSITORY_HOME,
-                (String) null);
+        String repositoryDirProperty =
+            getRepository().getProperty(PROP_REPOSITORY_HOME, (String) null);
         if (repositoryDirProperty == null) {
             repositoryDirProperty =
                 IOUtil.joinDir(Misc.getSystemProperty("user.home", "."),
@@ -297,7 +298,8 @@ public class StorageManager extends RepositoryManager {
      * @param sb _more_
      */
     protected void addInfo(StringBuffer sb) {
-        sb.append(HtmlUtil.formEntry("Home Directory:", getRepositoryDir().toString()));
+        sb.append(HtmlUtil.formEntry("Home Directory:",
+                                     getRepositoryDir().toString()));
         sb.append(HtmlUtil.formEntry("Storage Directory:",
                                      getStorageDir().toString()));
     }
@@ -796,7 +798,7 @@ public class StorageManager extends RepositoryManager {
     public File moveToEntryDir(Entry entry, File original) throws Exception {
         File newFile = new File(IOUtil.joinDir(getEntryDir(entry.getId(),
                            true), original.getName()));
-        IOUtil.moveFile(original, newFile);
+        moveFile(original, newFile);
         return newFile;
     }
 
@@ -851,7 +853,7 @@ public class StorageManager extends RepositoryManager {
         }
 
         File newFile = new File(IOUtil.joinDir(storageDir, targetName));
-        IOUtil.moveFile(original, newFile);
+        moveFile(original, newFile);
         return newFile;
     }
 
@@ -889,13 +891,10 @@ public class StorageManager extends RepositoryManager {
         }
 
         String fileName = original.getName();
-        fileName = fileName.replace(".","_DOT_");
-        fileName = HtmlUtil.entityEncode(fileName);
-        fileName = fileName.replace("_DOT_",".");
+        fileName = HtmlUtil.urlEncode(fileName);
         String targetName = prefix + fileName;
         File   newFile    = new File(IOUtil.joinDir(storageDir, targetName));
-        checkFile(newFile);
-        IOUtil.moveFile(original, newFile);
+        moveFile(original, newFile);
         return newFile;
     }
 
@@ -1234,6 +1233,19 @@ public class StorageManager extends RepositoryManager {
         checkPath(path);
         return IOUtil.readContents(path, getClass());
     }
+
+    /**
+     * _more_
+     *
+     * @param from _more_
+     * @param to _more_
+     */
+    public void moveFile(File from, File to) throws Exception {
+        checkFile(from);
+        checkWriteFile(to);
+        IOUtil.moveFile(from, to);
+    }
+
 
     /**
      * _more_

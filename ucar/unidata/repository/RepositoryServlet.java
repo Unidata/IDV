@@ -462,6 +462,10 @@ public class RepositoryServlet extends HttpServlet {
             }
 
 
+            //TODO: what should we do with the fileName to ensure against XSS
+            //            fileName = HtmlUtil.encode(fileName);
+
+
             String contentType = item.getContentType();
             File uploadedFile =
                 new File(

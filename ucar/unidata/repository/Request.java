@@ -1028,6 +1028,7 @@ public class Request implements Constants {
     public String getEncodedString(String key, String dflt) {
         String s = getString(key, dflt);
         if (s != null) {
+            //            s = RepositoryUtil.encodeInput(s);
             s = HtmlUtil.entityEncode(s);
         }
         return s;
@@ -1038,7 +1039,7 @@ public class Request implements Constants {
 
     public void appendMessage(StringBuffer sb) {
         if (defined(ARG_MESSAGE)) {
-            String message = getEncodedString(ARG_MESSAGE, "");
+            String message = HtmlUtil.entityEncode(getUnsafeString(ARG_MESSAGE, ""));
             sb.append(repository.showDialogNote(message));
             remove(ARG_MESSAGE);
         }

@@ -361,7 +361,7 @@ public class CatalogOutputHandler extends OutputHandler {
             int cnt = subGroups.size() + entries.size();
             int max = request.get(ARG_MAX, DB_MAX_ROWS);
             int skip = Math.max(0, request.get(ARG_SKIP, 0));
-            System.err.println ("entries:" + entries.size() + " groups:" + subGroups.size()+ " max:" + max+" skip:" + skip);
+            //            System.err.println ("entries:" + entries.size() + " groups:" + subGroups.size()+ " max:" + max+" skip:" + skip);
  
             toCatalogInner(request, group, subGroups, catalogInfo,
                            topDataset);

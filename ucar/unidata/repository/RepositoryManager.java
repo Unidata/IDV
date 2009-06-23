@@ -128,6 +128,12 @@ public class RepositoryManager implements RepositorySource, Constants,
 
 
 
+    public void fatalError(Request request, String message) {
+        throw new IllegalArgumentException(message);
+    }
+
+
+
     /**
      * _more_
      *

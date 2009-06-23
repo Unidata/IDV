@@ -1275,7 +1275,9 @@ public class TypeHandler extends RepositoryManager {
 
         String size = HtmlUtil.SIZE_70;
 
-        if ((entry == null) && getType().equals(TYPE_CONTRIBUTION)) {
+        boolean forUpload = (entry == null) && getType().equals(TYPE_CONTRIBUTION);
+
+        if (forUpload) {
             sb.append(
                 HtmlUtil.formEntry(
                     msgLabel("Your Name"),
@@ -1288,7 +1290,7 @@ public class TypeHandler extends RepositoryManager {
 
 
 
-        if (okToShowInForm(ARG_NAME)) {
+        if (!forUpload && okToShowInForm(ARG_NAME)) {
             sb.append(HtmlUtil.formEntry(msgLabel("Name"),
                                          HtmlUtil.input(ARG_NAME,
                                              ((entry != null)
@@ -1335,7 +1337,7 @@ public class TypeHandler extends RepositoryManager {
 
         boolean showFile      = okToShowInForm(ARG_FILE);
         boolean showLocalFile = showFile && request.getUser().getAdmin();
-        boolean showUrl       = okToShowInForm(ARG_URL);
+        boolean showUrl       = (forUpload?false:okToShowInForm(ARG_URL));
         if (okToShowInForm(ARG_RESOURCE)) {
             List<String> tabTitles  = new ArrayList<String>();
             List<String> tabContent = new ArrayList<String>();
@@ -1390,7 +1392,7 @@ public class TypeHandler extends RepositoryManager {
                                        + msg("use file name") + ")";
 
                 String extra = HtmlUtil.makeToggleInline("More...", addMetadata + HtmlUtil.space(3) + unzip,false);
-
+                if(forUpload) extra = "";
                 
                 if (tabTitles.size() > 1) {
                     sb.append(HtmlUtil.formEntry(msgLabel("Resource"),
