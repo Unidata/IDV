@@ -18,7 +18,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-// $Id: StringUtil.java,v 1.53 2007/06/01 17:02:44 jeffmc Exp $
 
 
 package ucar.unidata.util;
@@ -38,8 +37,6 @@ import java.util.regex.*;
 
 /**
  * String utilities
- * @author John Caron
- * @version $Id: StringUtil.java,v 1.53 2007/06/01 17:02:44 jeffmc Exp $
  */
 
 public class StringUtil {
@@ -853,13 +850,14 @@ public class StringUtil {
                     //                    System.err.println ("pattern:" + patternString + " " +StringUtil.containsRegExp(patternString));
                 }
                 //Simple check for  glob style
-                if(patternString.startsWith("*") || patternString.equals("*")) {
-                    patternString = "."+ patternString;
-                }  else if(patternString.startsWith("glob:")) {
+                if (patternString.startsWith("*")
+                        || patternString.equals("*")) {
+                    patternString = "." + patternString;
+                } else if (patternString.startsWith("glob:")) {
                     patternString = patternString.substring("glob:".length());
                     patternString = wildcardToRegexp(patternString);
                     //                    System.err.println("   xxx:" + patternString+ " " +input);
-                } 
+                }
 
                 if ( !StringUtil.containsRegExp(patternString)) {
                     return false;
@@ -1510,50 +1508,50 @@ public class StringUtil {
             return list;
         }
         //        System.err.println ("S:" + s);
-        while(true) {
+        while (true) {
             s = s.trim();
             int qidx1 = s.indexOf("\"");
-            int qidx2 = s.indexOf("\"",qidx1+1);
+            int qidx2 = s.indexOf("\"", qidx1 + 1);
             int sidx1 = 0;
-            int sidx2 = s.indexOf(" ",sidx1+1);                
-            if(qidx1<0 && sidx2<0) {
-                if(s.length()>0) {
+            int sidx2 = s.indexOf(" ", sidx1 + 1);
+            if ((qidx1 < 0) && (sidx2 < 0)) {
+                if (s.length() > 0) {
                     list.add(s);
                 }
                 break;
             }
-            if(qidx1>=0 && (sidx2==-1 || qidx1<sidx2)) {
-                if(qidx1>=qidx2) {
+            if ((qidx1 >= 0) && ((sidx2 == -1) || (qidx1 < sidx2))) {
+                if (qidx1 >= qidx2) {
                     //Malformed string. Add the rest of the line and break
-                    if(qidx1==0) {
-                        s = s.substring(qidx1+1);
-                    } else if(qidx1>0) {
-                        s = s.substring(0,qidx1);
+                    if (qidx1 == 0) {
+                        s = s.substring(qidx1 + 1);
+                    } else if (qidx1 > 0) {
+                        s = s.substring(0, qidx1);
                     }
-                    if(s.length()>0) {
+                    if (s.length() > 0) {
                         list.add(s);
                     }
                     break;
                 }
-                if(qidx2<0) {
+                if (qidx2 < 0) {
                     //Malformed string. Add the rest of the line and break
                     s = s.substring(1);
                     list.add(s);
                     break;
                 }
-                String tok = s.substring(qidx1+1,qidx2);
-                if(tok.length()>0) {
+                String tok = s.substring(qidx1 + 1, qidx2);
+                if (tok.length() > 0) {
                     list.add(tok);
                 }
-                s = s.substring(qidx2+1);
+                s = s.substring(qidx2 + 1);
                 //                System.err.println ("qtok:" + tok);
             } else {
-                if(sidx2<0) {
+                if (sidx2 < 0) {
                     list.add(s);
                     break;
                 }
-                String tok = s.substring(sidx1,sidx2);
-                if(tok.length()>0) {
+                String tok = s.substring(sidx1, sidx2);
+                if (tok.length() > 0) {
                     list.add(tok);
                 }
                 s = s.substring(sidx2);
@@ -1784,7 +1782,9 @@ public class StringUtil {
      */
     public static String replace(String string, String pattern,
                                  String value) {
-        if(pattern.length()==0) return string;
+        if (pattern.length() == 0) {
+            return string;
+        }
         StringBuffer returnValue   = new StringBuffer();
         int          patternLength = pattern.length();
         while (true) {
@@ -2394,7 +2394,9 @@ public class StringUtil {
         boolean   debug      = false;
         Hashtable properties = new Hashtable();
         //        debug = true;
-        if(debug) System.err.println("Source:" + s);
+        if (debug) {
+            System.err.println("Source:" + s);
+        }
 
         while (true) {
             if (debug) {
@@ -2462,8 +2464,9 @@ public class StringUtil {
             }
 
         }
-        if(debug)
+        if (debug) {
             System.err.println("props:" + properties);
+        }
 
 
 
@@ -2488,20 +2491,25 @@ public class StringUtil {
      * @throws Exception some problem
      */
     public static void main(String[] args) throws Exception {
-        System.err.println (splitWithQuotes(" single  again \"hello there\" another couple of toks  \"how are you\" I am fine \"and you"));
+        System.err.println(
+            splitWithQuotes(
+                " single  again \"hello there\" another couple of toks  \"how are you\" I am fine \"and you"));
 
-        System.err.println (splitWithQuotes("text1 text2"));
-        System.err.println (splitWithQuotes("hello"));
-        System.err.println (splitWithQuotes("\"hello"));
-        System.err.println (splitWithQuotes("\"hello\""));
-        System.err.println (splitWithQuotes("hello\""));
-        if(true) return;
+        System.err.println(splitWithQuotes("text1 text2"));
+        System.err.println(splitWithQuotes("hello"));
+        System.err.println(splitWithQuotes("\"hello"));
+        System.err.println(splitWithQuotes("\"hello\""));
+        System.err.println(splitWithQuotes("hello\""));
+        if (true) {
+            return;
+        }
 
 
-        args = new String[]{"*","glob:fo*o","glob:*fo*o*","x.*"};
-        for(int i=0;i<args.length;i++) {
+        args = new String[] { "*", "glob:fo*o", "glob:*fo*o*", "x.*" };
+        for (int i = 0; i < args.length; i++) {
             System.err.println("pattern:" + args[i]);
-            System.err.println("   " +stringMatch("foobar", args[i],false,true));
+            System.err.println("   "
+                               + stringMatch("foobar", args[i], false, true));
         }
     }
 
@@ -2545,7 +2553,7 @@ public class StringUtil {
      */
     public static List<String> splitMacros(String s) {
         List<String> tokens = new ArrayList<String>();
-        int  idx1   = s.indexOf("${");
+        int          idx1   = s.indexOf("${");
         while (idx1 >= 0) {
             int idx2 = s.indexOf("}", idx1);
             if (idx2 < 0) {
