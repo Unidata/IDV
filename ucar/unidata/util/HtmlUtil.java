@@ -1093,14 +1093,6 @@ public class HtmlUtil {
     }
 
 
-    public static String encode(String s) {
-        try {
-            return java.net.URLEncoder.encode(s, "UTF-8");
-        } catch (Exception exc) {
-            System.err.println("error encoding arg:" + s + " " + exc);
-            return "";
-        }
-    }
 
 
     /**
@@ -2869,6 +2861,15 @@ public class HtmlUtil {
 
 
 
+    public static String urlEncode(String s) {
+        try {
+            return java.net.URLEncoder.encode(s, "UTF-8");
+        } catch (Exception exc) {
+            System.err.println("error encoding arg:" + s + " " + exc);
+            return "";
+        }
+    }
+
 
 
     /**
@@ -2902,6 +2903,13 @@ public class HtmlUtil {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
+        for(String a: args) {
+            System.err.println(a+":" + entityEncode(a));
+            System.err.println(a+":" +urlEncode(a));
+        }
+        if(true) return;
+ 
+
         System.err.println(java.net.URLEncoder.encode("&", "UTF-8"));
         System.err.println(java.net.URLEncoder.encode("?", "UTF-8"));
         if (true) {
