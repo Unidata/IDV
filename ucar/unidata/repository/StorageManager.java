@@ -887,8 +887,14 @@ public class StorageManager extends RepositoryManager {
             throw new IllegalArgumentException(
                 "Anonymous upload area exceeded capacity");
         }
-        String targetName = prefix + original.getName();
+
+        String fileName = original.getName();
+        fileName = fileName.replace(".","_DOT_");
+        fileName = HtmlUtil.entityEncode(fileName);
+        fileName = fileName.replace("_DOT_",".");
+        String targetName = prefix + fileName;
         File   newFile    = new File(IOUtil.joinDir(storageDir, targetName));
+        checkFile(newFile);
         IOUtil.moveFile(original, newFile);
         return newFile;
     }

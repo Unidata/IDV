@@ -679,8 +679,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_MESSAGE = "message";
 
-    /** _more_ */
-    public static final String ARG_MESSAGELEFT = "messageleft";
+    public static final String ARG_SESSION_MESSAGE = "session.message";
 
     /** _more_ */
     public static final String ARG_METADATA_ADD = "metadata.add";
@@ -1464,6 +1463,10 @@ public interface Constants {
 
     //j++
 
+
+    public static final String MSG_ACCESS_CHANGED =  "Access Changed";
+
+    public static final String MSG_ASSOCIATION_ADDED = "The association has been added";
 
 
 }

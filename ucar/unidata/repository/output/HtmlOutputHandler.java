@@ -926,12 +926,7 @@ public class HtmlOutputHandler extends OutputHandler {
         boolean      showApplet = output.equals(OUTPUT_TIMELINE);
 
         StringBuffer sb         = new StringBuffer();
-        if (request.exists(ARG_MESSAGE)) {
-            sb.append(
-                getRepository().note(
-                    request.getUnsafeString(ARG_MESSAGE, "")));
-            request.remove(ARG_MESSAGE);
-        }
+        request.appendMessage(sb);
         showNext(request, subGroups, entries, sb);
 
 
@@ -939,7 +934,7 @@ public class HtmlOutputHandler extends OutputHandler {
 
         if (group.isDummy()) {
             if (!hasChildren) {
-                sb.append(getRepository().note(msg("No entries found")));
+                sb.append(getRepository().showDialogNote(msg("No entries found")));
             }
         }
 
@@ -1004,7 +999,7 @@ public class HtmlOutputHandler extends OutputHandler {
                     if ( !getAccessManager().canDoAction(request, group,
                             Permission.ACTION_VIEWCHILDREN)) {
                         sb.append(
-                            getRepository().warning(
+                            getRepository().showDialogWarning(
                                 "You do not have permission to view the sub-groups of this entry"));
                     }
                 }

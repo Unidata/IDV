@@ -1298,8 +1298,6 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
 
 
-
-
     /**
      * _more_
      *

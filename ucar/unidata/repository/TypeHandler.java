@@ -209,8 +209,9 @@ public class TypeHandler extends RepositoryManager {
     }
 
     public InputStream getResourceInputStream(Entry entry) throws Exception {
-        return new BufferedInputStream(getStorageManager().getFileInputStream(getFile(entry)));
+        return new BufferedInputStream(getStorageManager().getFileInputStream(getFileForEntry(entry)));
     }
+
 
     /**
      * _more_
@@ -803,7 +804,12 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
-    public File getFile(Entry entry)  {
+    public String getPathForEntry(Entry entry)  {
+        return entry.getResource().getPath();
+    }
+
+
+    public  File getFileForEntry(Entry entry)  {
         return entry.getResource().getTheFile();
     }
 

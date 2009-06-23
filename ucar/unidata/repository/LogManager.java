@@ -205,6 +205,8 @@ public class LogManager extends RepositoryManager {
 
 
     private String encode(String s) {
+        //If we do an entityEncode then the log can only be shown through the web
+        s = s.replaceAll("([sS][cC][rR][iI][pP][tT])","_$1_");
         s = s.replace("<","&lt;");
         s = s.replace(">","&gt;");
         return s;

@@ -297,7 +297,7 @@ public class MonitorManager extends RepositoryManager {
             return new Result(
                 request.url(
                     getRepositoryBase().URL_USER_MONITORS, ARG_MESSAGE,
-                    "Monitor deleted"));
+                    getRepository().translate(request,"Monitor deleted")));
         }
 
         if (request.exists(ARG_MONITOR_CHANGE)) {
@@ -332,7 +332,7 @@ public class MonitorManager extends RepositoryManager {
                     HtmlUtil.submit(msg("OK"), ARG_MONITOR_DELETE_CONFIRM),
                     HtmlUtil.submit(msg("Cancel"), ARG_CANCEL)));
             sb.append(
-                getRepository().question(
+                getRepository().showDialogQuestion(
                     msg("Are you sure you want to delete the monitor?"),
                     fb.toString()));
             sb.append(HtmlUtil.formClose());

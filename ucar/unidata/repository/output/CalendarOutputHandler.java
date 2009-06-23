@@ -373,7 +373,7 @@ public class CalendarOutputHandler extends OutputHandler {
             throws Exception {
 
         if (entries.size() == 0) {
-            sb.append(getRepository().note(msg("No entries found")));
+            sb.append(getRepository().showDialogNote(msg("No entries found")));
         }
         boolean hadDateArgs = request.defined(ARG_YEAR)
                               || request.defined(ARG_MONTH)

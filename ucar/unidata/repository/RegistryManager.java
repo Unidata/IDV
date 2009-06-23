@@ -165,7 +165,7 @@ public class RegistryManager extends RepositoryManager {
                     String contents = getStorageManager().readSystemResource(fullUrl.toString());
                     Element root = XmlUtil.getRoot(contents);
                     if(!responseOk(root)) {
-                        sb.append(getRepository().error("Failed to read information from:" + fullUrl));
+                        sb.append(getRepository().showDialogError("Failed to read information from:" + fullUrl));
                     } else{
                         ServerInfo serverInfo = new ServerInfo(root);
                         serverInfo.setSelected(true);
@@ -173,7 +173,7 @@ public class RegistryManager extends RepositoryManager {
                         return new Result(request.url(URL_REGISTRY_REMOTESERVERS));
                     }
                 } catch(Exception exc) {
-                    sb.append(getRepository().error("Failed to read information from:" + fullUrl));
+                    sb.append(getRepository().showDialogError("Failed to read information from:" + fullUrl));
                 }
             }
 

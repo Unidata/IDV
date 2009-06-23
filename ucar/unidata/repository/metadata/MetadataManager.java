@@ -652,7 +652,7 @@ public class MetadataManager extends RepositoryManager {
                     parent.setMetadata(null);
                     return new Result(request.url(URL_METADATA_FORM,
                             ARG_ENTRYID, parent.getId(), ARG_MESSAGE,
-                            cnt + " " + msg("metadata items added")));
+                            cnt + " " + getRepository().translate(request,"metadata items added")));
 
                 }
 
@@ -827,11 +827,7 @@ public class MetadataManager extends RepositoryManager {
     public Result processMetadataForm(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
 
-        if (request.exists(ARG_MESSAGE)) {
-            sb.append(
-                getRepository().note(
-                    request.getUnsafeString(ARG_MESSAGE, BLANK)));
-        }
+        request.appendMessage(sb);
 
         Entry entry = getEntryManager().getEntry(request);
         boolean canEditParent = getAccessManager().canDoAction(request,
@@ -844,7 +840,7 @@ public class MetadataManager extends RepositoryManager {
         sb.append(HtmlUtil.p());
         if (metadataList.size() == 0) {
             sb.append(
-                getRepository().note(msg("No metadata defined for entry")));
+                getRepository().showDialogNote(msg("No metadata defined for entry")));
             sb.append(msgLabel("Add new metadata"));
             makeAddList(request, entry, sb);
         } else {

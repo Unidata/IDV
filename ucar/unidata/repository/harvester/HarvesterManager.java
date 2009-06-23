@@ -390,7 +390,7 @@ public class HarvesterManager extends RepositoryManager {
             return new Result(request.url(URL_HARVESTERS_LIST));
         } else if (request.exists(ARG_DELETE)) {
             sb.append(
-                getRepository().question(
+                getRepository().showDialogQuestion(
                     msg("Are you sure you want to delete the harvester"),
                     RepositoryUtil.buttons(
                         HtmlUtil.submit(msg("Yes"), ARG_DELETE_CONFIRM),

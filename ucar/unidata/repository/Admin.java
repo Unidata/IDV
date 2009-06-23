@@ -214,9 +214,9 @@ public class Admin extends RepositoryManager {
      */
     public Result adminUserMessage(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        if (request.exists(ARG_MESSAGE)) {
+        if (request.exists(ARG_SESSION_MESSAGE)) {
             getSessionManager().setSessionMessage(
-                request.getString(ARG_MESSAGE, ""));
+                request.getString(ARG_SESSION_MESSAGE, ""));
             sb.append(msg("Message set"));
         } else {
             sb.append(
@@ -224,7 +224,7 @@ public class Admin extends RepositoryManager {
             sb.append(request.form(URL_ADMIN_USERMESSAGE, ""));
             sb.append(HtmlUtil.formTable());
             sb.append(HtmlUtil.formEntry(msgLabel("Message"),
-                                         HtmlUtil.textArea(ARG_MESSAGE, "",
+                                         HtmlUtil.textArea(ARG_SESSION_MESSAGE, "",
                                              5, 60)));
             sb.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.submit(msg("Set user message")));
@@ -387,8 +387,6 @@ public class Admin extends RepositoryManager {
     private void getAccessLog(Request request, StringBuffer sb)
             throws Exception {
 
-
-
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
         sb.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.b(msg("User")),
                                              HtmlUtil.b(msg("Date")),
@@ -421,7 +419,7 @@ public class Admin extends RepositoryManager {
                 int    idx  = userAgent.indexOf("(");
                 if (idx > 0) {
                     userAgent = userAgent.substring(0, idx);
-                    userAgent = HtmlUtil.makeShowHideBlock(userAgent, full,
+                    userAgent = HtmlUtil.makeShowHideBlock(HtmlUtil.entityEncode(userAgent), full,
                             false);
                 }
 
@@ -578,7 +576,7 @@ public class Admin extends RepositoryManager {
 
 
                     sb.append(
-                        getRepository().note(
+                        getRepository().showDialogNote(
                             msg("Site administrator created")));
                     sb.append(HtmlUtil.p());
                     sb.append(getUserManager().makeLoginForm(request));

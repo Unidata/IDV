@@ -414,7 +414,7 @@ public class SearchManager extends RepositoryManager {
         }
 
         if ( !didone) {
-            sb.append(getRepository().note(msg("No servers selected")));
+            sb.append(getRepository().showDialogNote(msg("No servers selected")));
         } else {
             sb.append(HtmlUtil.div(serverSB.toString(),
                                    HtmlUtil.cssClass("serverblock")));

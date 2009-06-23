@@ -2025,7 +2025,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             boolean      badAccess = inner instanceof AccessException;
             StringBuffer sb        = new StringBuffer();
             if ( !badAccess) {
-                sb.append(error(msgLabel("An error has occurred")
+                sb.append(showDialogError(translate(request,"An error has occurred")+":"
                                 + HtmlUtil.p() + inner.getMessage()));
             } else {
                 AccessException     ae         = (AccessException) inner;
@@ -2044,7 +2044,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     }
                 }
                 if (authMethod.equals(AuthorizationMethod.AUTH_HTML)) {
-                    sb.append(error(inner.getMessage()));
+                    sb.append(showDialogError(inner.getMessage()));
                     String redirect =
                         XmlUtil.encodeBase64(request.getUrl().getBytes());
                     sb.append(getUserManager().makeLoginForm(request,
@@ -2064,7 +2064,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             }
 
             if ((request.getUser() != null) && request.getUser().getAdmin()) {
-                sb.append(HtmlUtil.pre(LogUtil.getStackTrace(inner)));
+                sb.append(HtmlUtil.pre(getSafeString(LogUtil.getStackTrace(inner))));
             }
 
             result = new Result(msg("Error"), sb);
@@ -2548,7 +2548,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         String content = new String(result.getContent());
         if (sessionMessage != null) {
-            content = note(sessionMessage) + content;
+            content = showDialogNote(sessionMessage) + content;
         }
 
         String head =
@@ -3596,10 +3596,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     public Result processMessage(Request request) throws Exception {
-        return new Result(
-            BLANK,
-            new StringBuffer(
-                note(request.getUnsafeString(ARG_MESSAGE, BLANK))));
+        StringBuffer sb = new StringBuffer();
+        request.appendMessage(sb);
+        return new Result(BLANK, sb);
     }
 
     /**

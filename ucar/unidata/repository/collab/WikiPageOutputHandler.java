@@ -152,7 +152,7 @@ public class WikiPageOutputHandler extends OutputHandler {
                     "Could not find wiki history");
             }
             wikiText = wph.getText();
-            header = getRepository().note(
+            header = getRepository().showDialogNote(
                 msgLabel("Text from version")
                 + getRepository().formatDate(wph.getDate()));
         } else {

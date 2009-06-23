@@ -134,7 +134,7 @@ public class EmailListTypeHandler extends GenericTypeHandler {
                     request.getString(ARG_EMAIL_MESSAGE,""),
                     request.get(ARG_EMAIL_BCC,false),
                     false);
-        sb.append(getRepository().note(msg("Message Sent")));
+        sb.append(getRepository().showDialogNote(msg("Message Sent")));
         return showList(request, entry, sb);
     }
 

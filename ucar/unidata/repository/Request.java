@@ -1036,6 +1036,14 @@ public class Request implements Constants {
 
 
 
+    public void appendMessage(StringBuffer sb) {
+        if (defined(ARG_MESSAGE)) {
+            String message = getEncodedString(ARG_MESSAGE, "");
+            sb.append(repository.showDialogNote(message));
+            remove(ARG_MESSAGE);
+        }
+    }
+
 
     /**
      * _more_
@@ -1051,13 +1059,12 @@ public class Request implements Constants {
         if (v == null) {
             return dflt;
         }
-        /*
-        for(int i=0;i<v.length();i++) {
-            String tmp = v.substring(0,i);
-            Matcher xx = pattern.matcher(tmp);
-            if ( !xx.find()) {
-            }
-            }*/
+
+        //If the user is anonymous then replace all "script" strings with "_script_"
+        if(isAnonymous()) {
+            v = v.replaceAll("([sS][cC][rR][iI][pP][tT])","_$1_");
+        }
+
 
         Matcher matcher = pattern.matcher(v);
         if ( !matcher.find()) {
@@ -1510,6 +1517,10 @@ public class Request implements Constants {
         return user;
     }
 
+    public boolean isAnonymous() {
+        if(user == null || user.getAnonymous()) return true;
+        return false;
+    }
 
     /**
      * Set the Ip property.

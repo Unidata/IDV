@@ -366,18 +366,18 @@ public class AccessManager extends RepositoryManager {
                         if (!role.startsWith("ip:")) {
                             continue;
                         }
-                        logInfo("action:" + action +" checking IP:" + requestIp + " against:" + (negated?"!":"") +role);
+                        //logInfo("action:" + action +" checking IP:" + requestIp + " against:" + (negated?"!":"") +role);
                         if(!negated) {
                             hadIp = true;
                         }
                         String ip  = role.substring(3);
                         if (requestIp.startsWith(ip)) {
                             if (negated) {
-                                logInfo ("   returning  false");
+                                //                                logInfo ("   returning  false");
                                 return false;
 
                             } else {
-                                logInfo ("   returning  true");
+                                //                                logInfo ("   returning  true");
                                 return true;
                             }
                         }
@@ -736,11 +736,7 @@ public class AccessManager extends RepositoryManager {
         StringBuffer sb    = new StringBuffer();
         Entry        entry = getEntryManager().getEntry(request);
         //        sb.append(getEntryManager().makeEntryHeader(request, entry));
-        if (request.exists(ARG_MESSAGE)) {
-            sb.append(
-                getRepository().note(
-                    request.getUnsafeString(ARG_MESSAGE, "")));
-        }
+        request.appendMessage(sb);
 
         StringBuffer currentAccess = new StringBuffer();
         currentAccess.append(
@@ -828,7 +824,7 @@ public class AccessManager extends RepositoryManager {
         synchronized (MUTEX_PERMISSIONS) {
             Entry            entry       =
                 getEntryManager().getEntry(request);
-            String           message     = "Access Changed";
+
 
             List<Permission> permissions = new ArrayList<Permission>();
 
@@ -846,8 +842,8 @@ public class AccessManager extends RepositoryManager {
 
 
             return new Result(request.url(URL_ACCESS_FORM, ARG_ENTRYID,
-                                          entry.getId(), ARG_MESSAGE,
-                                          message));
+                                          entry.getId(), 
+                                          ARG_MESSAGE, getRepository().translate(request,MSG_ACCESS_CHANGED)));
         }
     }
 

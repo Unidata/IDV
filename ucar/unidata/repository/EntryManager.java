@@ -726,8 +726,8 @@ return new Result(title, sb);
             if (entry.getIsLocalFile()) {
                 return new Result(
                     request.entryUrl(
-                        getRepository().URL_ENTRY_SHOW, entry, ARG_MESSAGE,
-                        "Cannot edit local files"));
+                        getRepository().URL_ENTRY_SHOW, entry, 
+                        ARG_MESSAGE, getRepository().translate(request,"Cannot edit local files")));
 
             }
 
@@ -757,7 +757,7 @@ return new Result(title, sb);
                     return new Result(
                         request.entryUrl(
                             getRepository().URL_ENTRY_SHOW, entry,
-                            ARG_MESSAGE, "Cannot delete top-level group"));
+                            ARG_MESSAGE, getRepository().translate(request,"Cannot delete top-level group")));
                 }
 
                 List<Entry> entries = new ArrayList<Entry>();
@@ -766,8 +766,8 @@ return new Result(title, sb);
                 Group group = findGroup(request, entry.getParentGroupId());
                 return new Result(
                     request.entryUrl(
-                        getRepository().URL_ENTRY_SHOW, group, ARG_MESSAGE,
-                        "Entry is deleted"));
+                        getRepository().URL_ENTRY_SHOW, group, 
+                        ARG_MESSAGE, getRepository().translate(request,"Entry is deleted")));
             }
 
             if (request.exists(ARG_DELETE)) {
@@ -1169,7 +1169,7 @@ return new Result(title, sb);
             return new Result(
                 request.entryUrl(
                     getRepository().URL_ENTRY_SHOW, entry.getParentGroup(),
-                    ARG_MESSAGE, "File has been uploaded"));
+                    ARG_MESSAGE, getRepository().translate(request,"File has been uploaded")));
         }
 
         if (entries.size() == 1) {
@@ -1181,8 +1181,7 @@ return new Result(title, sb);
             return new Result(
                 request.entryUrl(
                     getRepository().URL_ENTRY_SHOW, entry.getParentGroup(),
-                    ARG_MESSAGE,
-                    entries.size() + HtmlUtil.pad(msg("files uploaded"))));
+                    ARG_MESSAGE,  entries.size() + HtmlUtil.pad(getRepository().translate(request,"files uploaded"))));
         } else {
             return new Result(BLANK,
                               new StringBuffer(msg("No entries created")));
@@ -1362,7 +1361,7 @@ return new Result(title, sb);
         StringBuffer sb    = new StringBuffer();
         //        sb.append(makeEntryHeader(request, entry));
         if (entry.isTopGroup()) {
-            sb.append(getRepository().note("Cannot delete top-level group"));
+            sb.append(getRepository().showDialogNote("Cannot delete top-level group"));
             return makeEntryEditResult(request, entry, "Delete Entry", sb);
         }
 
@@ -1407,7 +1406,7 @@ return new Result(title, sb);
                     ARG_CANCEL)));
         fb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
         fb.append(HtmlUtil.formClose());
-        sb.append(getRepository().question(inner.toString(), fb.toString()));
+        sb.append(getRepository().showDialogQuestion(inner.toString(), fb.toString()));
         sb.append(getBreadCrumbs(request, entry));
 
 
@@ -1439,7 +1438,7 @@ return new Result(title, sb);
             if (entry.isTopGroup()) {
                 StringBuffer sb = new StringBuffer();
                 sb.append(
-                    getRepository().note(
+                    getRepository().showDialogNote(
                         msg("Cannot delete top-level group")));
                 return new Result(msg("Entry Delete"), sb);
             }
@@ -1482,7 +1481,7 @@ return new Result(title, sb);
             return new Result(
                 "",
                 new StringBuffer(
-                    getRepository().warning(msg("No entries selected"))));
+                    getRepository().showDialogWarning(msg("No entries selected"))));
         }
 
         StringBuffer msgSB    = new StringBuffer();
@@ -1498,7 +1497,7 @@ return new Result(title, sb);
         String form = Repository.makeOkCancelForm(request,
                           getRepository().URL_ENTRY_DELETELIST,
                           ARG_DELETE_CONFIRM, hidden);
-        sb.append(getRepository().question(msgSB.toString(), form));
+        sb.append(getRepository().showDialogQuestion(msgSB.toString(), form));
         sb.append("<ul>");
         new OutputHandler(getRepository(), "tmp").getBreadcrumbList(request,
                           sb, entries);
@@ -2053,6 +2052,9 @@ return new Result(title, sb);
     }
 
 
+    public File getFileForEntry(Entry entry) throws Exception {
+        return entry.getTypeHandler().getFileForEntry(entry);
+    }
 
 
     /**
@@ -2130,7 +2132,7 @@ return new Result(title, sb);
             if (entry.isTopGroup()) {
                 StringBuffer sb = new StringBuffer();
                 sb.append(
-                    getRepository().note(msg("Cannot copy top-level group")));
+                    getRepository().showDialogNote(msg("Cannot copy top-level group")));
                 return new Result(msg("Entry Delete"), sb);
             }
             entries.add(entry);
@@ -2252,7 +2254,7 @@ return new Result(title, sb);
         }
         if (toEntry == null) {
             throw new RepositoryUtil.MissingEntryException(
-                "Could not find entry " + ((toId == null)
+                "Could not find entry: " + ((toId == null)
                                            ? toName
                                            : toId));
         }
@@ -2348,7 +2350,7 @@ return new Result(title, sb);
             fb.append(HtmlUtil.submit("Cancel", ARG_CANCEL));
             fb.append(HtmlUtil.formClose());
             StringBuffer contents =
-                new StringBuffer(getRepository().question(sb.toString(),
+                new StringBuffer(getRepository().showDialogQuestion(sb.toString(),
                     fb.toString()));
             contents.append(fromList);
             return new Result(msg("Move confirm"), contents);
@@ -2359,7 +2361,7 @@ return new Result(title, sb);
             if ( !okToMove(fromEntry, toEntry)) {
                 StringBuffer sb = new StringBuffer();
                 sb.append(
-                    getRepository().error(
+                    getRepository().showDialogError(
                         msg("Cannot move a group to its descendent")));
                 return addEntryHeader(request, fromEntry, new Result("", sb));
             }
@@ -2461,7 +2463,7 @@ return new Result(title, sb);
             insertEntries(newEntries, true);
             return new Result(request.url(getRepository().URL_ENTRY_SHOW,
                                           ARG_ENTRYID, toGroup.getId(),
-                                          ARG_MESSAGE, "Entries copied"));
+                                          ARG_MESSAGE, getRepository().translate(request,"Entries copied")));
         } finally {
             try {
                 connection.close();
@@ -2808,7 +2810,7 @@ return new Result(title, sb);
                     throw new IllegalArgumentException(
                         "Cannot add to parent group");
                 }
-            }
+           }
         }
 
 
@@ -2957,13 +2959,7 @@ return new Result(title, sb);
     public Result processCommentsShow(Request request) throws Exception {
         Entry        entry = getEntry(request);
         StringBuffer sb    = new StringBuffer();
-        if (request.exists(ARG_MESSAGE)) {
-            sb.append(
-                getRepository().note(
-                    request.getUnsafeString(ARG_MESSAGE, BLANK)));
-        }
-
-
+        request.appendMessage(sb);
         String entryUrl =
             HtmlUtil.url(getRepository().URL_ENTRY_SHOW.getFullUrl(),
                          ARG_ENTRYID, entry.getId());
@@ -3116,7 +3112,7 @@ return new Result(title, sb);
         entry.setComments(null);
         return new Result(request.url(getRepository().URL_COMMENTS_SHOW,
                                       ARG_ENTRYID, entry.getId(),
-                                      ARG_MESSAGE, "Comment deleted"));
+                                      ARG_MESSAGE, getRepository().translate(request,"Comment deleted")));
     }
 
 
@@ -3139,11 +3135,8 @@ return new Result(title, sb);
 
         StringBuffer sb = new StringBuffer();
         //        sb.append(makeEntryHeader(request, entry));
-        if (request.exists(ARG_MESSAGE)) {
-            sb.append(
-                getRepository().note(
-                    request.getUnsafeString(ARG_MESSAGE, BLANK)));
-        }
+        request.appendMessage(sb);
+
 
 
         String subject = BLANK;
@@ -3151,7 +3144,7 @@ return new Result(title, sb);
         subject = request.getEncodedString(ARG_SUBJECT, BLANK).trim();
         comment = request.getEncodedString(ARG_COMMENT, BLANK).trim();
         if (comment.length() == 0) {
-            sb.append(getRepository().warning(msg("Please enter a comment")));
+            sb.append(getRepository().showDialogWarning(msg("Please enter a comment")));
         } else {
             getDatabaseManager().executeInsert(Tables.COMMENTS.INSERT,
                     new Object[] {
@@ -3165,7 +3158,7 @@ return new Result(title, sb);
                 new Result(
                     request.url(
                         getRepository().URL_COMMENTS_SHOW, ARG_ENTRYID,
-                        entry.getId(), ARG_MESSAGE, "Comment added")));
+                        entry.getId(), ARG_MESSAGE, getRepository().translate(request,"Comment added"))));
         }
 
         sb.append(msgLabel("Add comment for") + getEntryLink(request, entry));
@@ -5012,8 +5005,7 @@ return new Result(title, sb);
             }
         } catch (Exception exc) {
             exc.printStackTrace();
-            request.put(ARG_MESSAGE,
-                        "Error finding children:" + exc.getMessage());
+            request.put(ARG_MESSAGE, getRepository().translate(request,"Error finding children") +":" + exc.getMessage());
         }
 
         if (doLatest) {
@@ -5193,7 +5185,7 @@ return new Result(title, sb);
             sb.append(HtmlUtil.br());
         }
         if(!didone) {
-            sb.append(getRepository().note(msg("No entries to publish")));
+            sb.append(getRepository().showDialogNote(msg("No entries to publish")));
         }
         insertEntries(publishedEntries, false);
         return new Result("Publish Entries", sb);
@@ -5219,17 +5211,16 @@ return new Result(title, sb);
         List<Entry> changedEntries = addInitialMetadata(request, entries, false,
                                          shortForm);
         if (changedEntries.size() == 0) {
-            sb.append("No metadata added");
+            sb.append(getRepository().translate(request,"No metadata added"));
         } else {
-            sb.append(changedEntries.size() + " entries changed");
+            sb.append(changedEntries.size() + " " + getRepository().translate(request,"entries changed"));
             getEntryManager().insertEntries(changedEntries, false);
         }
         if (entries.size() > 0) {
             return new Result(
                 request.entryUrl(
                     getRepository().URL_ENTRY_SHOW,
-                    entries.get(0).getParentGroup(), ARG_MESSAGE,
-                    sb.toString()));
+                    entries.get(0).getParentGroup(), ARG_MESSAGE,  sb.toString()));
         }
         return new Result("Metadata", sb);
     }

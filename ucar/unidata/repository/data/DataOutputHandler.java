@@ -861,7 +861,7 @@ public class DataOutputHandler extends OutputHandler {
                 getEntryManager().addInitialMetadata(request, entries, false,
                         request.get(ARG_SHORT, false));
                 getEntryManager().insertEntries(entries, false);
-                sb.append(getRepository().note("Metadata added"));
+                sb.append(getRepository().showDialogNote("Metadata added"));
                 sb.append(
                     getRepository().getHtmlOutputHandler().getInformationTabs(
                         request, entry, false));
@@ -973,9 +973,9 @@ public class DataOutputHandler extends OutputHandler {
             if ((dates[0] != null) && (dates[1] != null)
                     && (dates[0].getTime() > dates[1].getTime())) {
                 sb.append(
-                    getRepository().warning("From date is after to date"));
+                    getRepository().showDialogWarning("From date is after to date"));
             } else if (varNames.size() == 0) {
-                sb.append(getRepository().warning("No variables selected"));
+                sb.append(getRepository().showDialogWarning("No variables selected"));
             } else {
                 NetcdfCFWriter writer = new NetcdfCFWriter();
                 File f =
@@ -1867,8 +1867,10 @@ public class DataOutputHandler extends OutputHandler {
                 location = IOUtil.stripExtension(location);
             }
         } else {
-            location = entry.getTypeHandler().getFile(entry).toString();
+            File file =  getEntryManager().getFileForEntry(entry);
+            location = file.toString();
         }
+        getStorageManager().checkPath(location);
 
         List<Metadata> metadataList =
             getMetadataManager().findMetadata(entry,

@@ -154,7 +154,8 @@ public class FtpTypeHandler extends GenericTypeHandler {
     }
 
 
-    public File getFile(Entry entry)  {
+
+    public File getFileForEntry(Entry entry)  {
         try {
             File badFile=  new File("badfile");
             Entry parent = getMainEntry(entry.getId());
