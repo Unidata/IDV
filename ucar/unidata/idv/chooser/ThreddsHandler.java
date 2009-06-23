@@ -649,7 +649,8 @@ public class ThreddsHandler extends XmlHandler {
             doc = StringUtil.breakText(doc, "<br>", 50);
         }
         try {
-            System.err.println("doc:" + doc);
+            //Some html docs have a head tag which seems to screw up the html rendering
+            doc = doc.replaceAll("(?s)<head>.*</head>","");
             GuiUtils.showHtmlDialog(doc, title, null);
         } catch (Exception exc) {
             chooser.logException("Showing documentation", exc);
@@ -658,6 +659,8 @@ public class ThreddsHandler extends XmlHandler {
 
 
     }
+
+
 
 
     /**
@@ -1128,7 +1131,18 @@ public class ThreddsHandler extends XmlHandler {
      *
      * @param args Command line args
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        
+
+        String doc = IOUtil.readContents("test.html",ThreddsHandler.class);
+        doc = "hello<head>\nxxx</head>";
+        doc = doc.replaceAll("(?s)<head>.+</head>","");
+        System.err.println("doc:" + doc);
+
+
+        if(true) return;
+
+
         LogUtil.configure();
         LogUtil.setTestMode(true);
         String catalog =
