@@ -34,9 +34,7 @@
       <category
          display="true"
          value="Grids"/>
-      <category value="display:planviewflow"/>
-      <category value="display:streamlines"/>
-      <category value="display:windbarbplan"/>
+      <category value="*-flowvector-*"/>
       <category value="display:flowxs"/>
       <category value="display:windbarbxs"/>
     </categories>
