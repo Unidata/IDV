@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.ui;
 
 
@@ -165,7 +166,7 @@ public class ImageUtils {
 
     public static Image readImage(String imagePath, boolean cache) {
         //System.err.println ("getImage");
-        Image image = GuiUtils.getImage(imagePath,ImageUtils.class,cache);
+        Image image = GuiUtils.getImage(imagePath, ImageUtils.class, cache);
         //System.err.println ("waiting");
         image = waitOnImage(image);
         //System.err.println ("done waiting");
@@ -291,9 +292,9 @@ public class ImageUtils {
                 //                System.err.println (id + "\timageUpdate-ABORT");
                 badImage = true;
             }
-                if (debug) {
-                    //                    System.err.println("all bits:" + allBits + " badImage:" + badImage);
-                }
+            if (debug) {
+                //                    System.err.println("all bits:" + allBits + " badImage:" + badImage);
+            }
 
             return !(allBits || badImage);
         }
@@ -393,22 +394,37 @@ public class ImageUtils {
 
 
 
-    public static BufferedImage removeRedeye(Image im, final int x1, final int y1, final int x2, final int y2) {
+    /**
+     * Remove the brighter red from the image
+     *
+     * @param im image
+     * @param x1 bounds
+     * @param y1 bounds
+     * @param x2 bounds
+     * @param y2 bounds
+     *
+     * @return new image
+     */
+    public static BufferedImage removeRedeye(Image im, final int x1,
+                                             final int y1, final int x2,
+                                             final int y2) {
         ImageFilter filter = new RGBImageFilter() {
             public final int filterRGB(int x, int y, int rgb) {
-                if(x<x1 || x>x2 || y<y1 || y>y2) return rgb;
-                int threshold = 0;
-                int r   = (rgb >> 16) & 0xff;
-                int g = (rgb >> 8) & 0xff;
-                int b  = (rgb) & 0xff;
-                double rbrite = r * 0.5133333;
-		double gbrite = g;
-		double bbrite = b * 0.1933333;
-		if (rbrite >= gbrite - threshold
-		  &&  rbrite >= bbrite - threshold)  {
-		    rbrite = (gbrite + bbrite) / 2;
-		    r = (int)(rbrite / 0.51333333);
-                    return (0xFF00FFFF & rgb)|(r<<16);
+                if ((x < x1) || (x > x2) || (y < y1) || (y > y2)) {
+                    return rgb;
+                }
+                int    threshold = 0;
+                int    r         = (rgb >> 16) & 0xff;
+                int    g         = (rgb >> 8) & 0xff;
+                int    b         = (rgb) & 0xff;
+                double rbrite    = r * 0.5133333;
+                double gbrite    = g;
+                double bbrite    = b * 0.1933333;
+                if ((rbrite >= gbrite - threshold)
+                        && (rbrite >= bbrite - threshold)) {
+                    rbrite = (gbrite + bbrite) / 2;
+                    r      = (int) (rbrite / 0.51333333);
+                    return (0xFF00FFFF & rgb) | (r << 16);
                 }
                 return rgb;
 
@@ -427,37 +443,43 @@ public class ImageUtils {
      * Change the transparency percentage into an int alpha value
      *
      * @param percent the percent transparent 0-1.0
-     * 
+     *
      * @return the alpha value
      */
     public static int toAlpha(double percent) {
-        percent = 1.0-percent;
-        return  (int)(0xFF*percent);
+        percent = 1.0 - percent;
+        return (int) (0xFF * percent);
     }
 
 
     /**
      * Set the alpha channel to the given transparency percent
+     *
+     * @param im image
      * @param percent Percent transparent 0-1.0
      *
      * @return munged image
      */
     public static BufferedImage setAlpha(Image im, double percent) {
-        int t = toAlpha(percent);
-        final int  mask = 0x00FFFFFF | (t<<24);
-        if(im==null) return null;
+        int       t    = toAlpha(percent);
+        final int mask = 0x00FFFFFF | (t << 24);
+        if (im == null) {
+            return null;
+        }
         BufferedImage image = toBufferedImage(im,
-                                              BufferedImage.TYPE_INT_ARGB);
+                                  BufferedImage.TYPE_INT_ARGB);
         int w = image.getWidth(null);
         int h = image.getHeight(null);
-        for(int x=0;x<w;x++) {
-            for(int y=0;y<h;y++) {
-                int rgb = image.getRGB(x,y);
-                rgb&=mask;
-                image.setRGB(x,y,rgb);
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                int rgb = image.getRGB(x, y);
+                rgb &= mask;
+                image.setRGB(x, y, rgb);
             }
         }
-        if(true) return image;
+        if (true) {
+            return image;
+        }
 
         /*
         ImageFilter filter = new RGBImageFilter() {
@@ -535,11 +557,19 @@ public class ImageUtils {
      * @return  a buffered image
      */
     public static BufferedImage toBufferedImage(Image image) {
-        return toBufferedImage(image,false);
+        return toBufferedImage(image, false);
     }
 
+    /**
+     * This method returns a buffered image with the contents of an image
+     *
+     * @param image  the image
+     * @param force If false then just return the image argument if its a BufferedImage
+     *
+     * @return  a buffered image
+     */
     public static BufferedImage toBufferedImage(Image image, boolean force) {
-        if (!force && (image instanceof BufferedImage)) {
+        if ( !force && (image instanceof BufferedImage)) {
             return (BufferedImage) image;
         }
 
@@ -607,33 +637,38 @@ public class ImageUtils {
      * @param images list of images
      * @param space space between images
      * @param bg background color
+     * @param columns number of columns
      *
      * @return  merged image
      */
-    public static Image gridImages(List images, int space, Color bg, int columns) {
+    public static Image gridImages(List images, int space, Color bg,
+                                   int columns) {
         if (images.size() == 1) {
             return (Image) images.get(0);
         }
-        
+
         int maxHeight = 0;
         int maxWidth  = 0;
-        int rows = (int)(images.size()/(double)columns+1);
-        if(rows == 0) rows = 1;
+        int rows      = (int) (images.size() / (double) columns + 1);
+        if (rows == 0) {
+            rows = 1;
+        }
         for (int i = 0; i < images.size(); i++) {
-            Image image = (Image) images.get(i);
-            int imageWidth = image.getWidth(null);
-            int imageHeight = image.getHeight(null);
+            Image image       = (Image) images.get(i);
+            int   imageWidth  = image.getWidth(null);
+            int   imageHeight = image.getHeight(null);
             maxHeight = Math.max(maxHeight, imageHeight);
-            maxWidth = Math.max(maxWidth, imageWidth);
+            maxWidth  = Math.max(maxWidth, imageWidth);
         }
 
-        if(columns>images.size()) {
+        if (columns > images.size()) {
             columns = images.size();
         }
-        
-        BufferedImage bImage = new BufferedImage(maxWidth*columns + (columns-1)*space, 
-                                                 maxHeight*rows + (rows-1)*space,
-                                   BufferedImage.TYPE_INT_RGB);
+
+        BufferedImage bImage = new BufferedImage(maxWidth * columns
+                                   + (columns - 1) * space, maxHeight * rows
+                                       + (rows - 1)
+                                         * space, BufferedImage.TYPE_INT_RGB);
 
         Graphics g = bImage.getGraphics();
 
@@ -647,10 +682,11 @@ public class ImageUtils {
         int rowCnt = 0;
         for (int i = 0; i < images.size(); i++) {
             Image image = (Image) images.get(i);
-            g.drawImage(image, colCnt*(maxWidth+space), rowCnt*(maxHeight+space), null);
+            g.drawImage(image, colCnt * (maxWidth + space),
+                        rowCnt * (maxHeight + space), null);
             colCnt++;
-            if(colCnt>=columns) {
-                colCnt=0;
+            if (colCnt >= columns) {
+                colCnt = 0;
                 rowCnt++;
             }
         }
@@ -759,22 +795,73 @@ public class ImageUtils {
     }
 
 
+    /**
+     * Flip the image horizontally
+     * From: Josiah Hester - http://www.javalobby.org/articles/ultimate-image
+     *
+     * @param img image
+     *
+     * @return flipped image
+     */
+    public static BufferedImage horizontalflip(BufferedImage img) {
+        int           w    = img.getWidth();
+        int           h    = img.getHeight();
+        BufferedImage dimg = new BufferedImage(w, h, img.getType());
+        Graphics2D    g    = dimg.createGraphics();
+        g.drawImage(img, 0, 0, w, h, w, 0, 0, h, null);
+        g.dispose();
+        return dimg;
+    }
+
+
+    /**
+     * Flip the image vertically
+     * From: Josiah Hester - http://www.javalobby.org/articles/ultimate-image
+     *
+     * @param img image
+     *
+     * @return flipped image
+     */
+    public static BufferedImage verticalflip(BufferedImage img) {
+        int w = img.getWidth();
+        int h = img.getHeight();
+        BufferedImage dimg = dimg = new BufferedImage(w, h,
+                                 img.getColorModel().getTransparency());
+        Graphics2D g = dimg.createGraphics();
+        g.drawImage(img, 0, 0, w, h, 0, h, w, 0, null);
+        g.dispose();
+        return dimg;
+    }
+
+
+
+    /**
+     * Rotate the image 90 degrees
+     *
+     * @param img image
+     * @param left rotate counter clockwise
+     *
+     * @return rotated image
+     */
     public static BufferedImage rotate90(BufferedImage img, boolean left) {
-        int w = img.getWidth(null);
-        int h = img.getHeight(null);
-        double angle = (left?-90:90);
-        BufferedImage rotatedImage = new BufferedImage(h, w, BufferedImage.TYPE_INT_RGB);
+        int    w     = img.getWidth(null);
+        int    h     = img.getHeight(null);
+        double angle = (left
+                        ? -90
+                        : 90);
+        BufferedImage rotatedImage = new BufferedImage(h, w,
+                                         BufferedImage.TYPE_INT_RGB);
         AffineTransform trans = new AffineTransform();
-        trans.rotate( Math.toRadians(angle) );
-        if(left) {
-            trans.translate(-w,0);
+        trans.rotate(Math.toRadians(angle));
+        if (left) {
+            trans.translate(-w, 0);
         } else {
-            trans.translate(0,-h);
+            trans.translate(0, -h);
         }
         Graphics2D g = rotatedImage.createGraphics();
         //        g.rotate(Math.toRadians(angle),w/2,h/2);
         //        g.drawImage(img, null, 0,0);
-        g.drawImage(img, trans,null);
+        g.drawImage(img, trans, null);
         return rotatedImage;
     }
 
@@ -809,14 +896,23 @@ public class ImageUtils {
      *
      * @throws Exception  problem writing file
      */
-   public static void writeImageToFile(Image image, String saveFile,
-                                       float quality)
+    public static void writeImageToFile(Image image, String saveFile,
+                                        float quality)
             throws Exception {
-       writeImageToFile(image, saveFile, null, quality);
-   }
+        writeImageToFile(image, saveFile, null, quality);
+    }
 
-    public static void writeImageToFile(Image image, String saveFile, OutputStream os,
-                                       float quality)
+    /**
+     * Write a Buffered image to a file at a particular quality
+     *
+     * @param image      image to write
+     * @param os output stream
+     * @param quality    image quality (if supported)
+     *
+     * @throws Exception  problem writing file
+     */
+    public static void writeImageToFile(Image image, String saveFile,
+                                        OutputStream os, float quality)
             throws Exception {
         RenderedImage renderedImage = null;
         File          file          = new File(saveFile);
@@ -843,10 +939,10 @@ public class ImageUtils {
         // Prepare output file
         //        ImageOutputStream ios = ImageIO.createImageOutputStream(file);
         ImageOutputStream ios;
-        if(os!=null) {
-            ios= ImageIO.createImageOutputStream(os);
+        if (os != null) {
+            ios = ImageIO.createImageOutputStream(os);
         } else {
-            ios= ImageIO.createImageOutputStream(file);
+            ios = ImageIO.createImageOutputStream(file);
         }
         writer.setOutput(ios);
 
@@ -891,12 +987,17 @@ public class ImageUtils {
     }
 
 
+    /**
+     * Is the file name an image
+     *
+     * @param file file
+     *
+     * @return is image
+     */
     public static boolean isImage(String file) {
         file = file.toLowerCase();
-        return file.endsWith(".jpg") ||
-            file.endsWith(".jpeg") ||
-            file.endsWith(".gif") ||
-            file.endsWith(".png");
+        return file.endsWith(".jpg") || file.endsWith(".jpeg")
+               || file.endsWith(".gif") || file.endsWith(".png");
     }
 
     /**
@@ -967,7 +1068,7 @@ public class ImageUtils {
         double w = component.getWidth();
         double h = component.getHeight();
         BufferedImage image = new BufferedImage((int) w, (int) h,
-                                                BufferedImage.TYPE_INT_RGB);
+                                  BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D) image.getGraphics();
         component.paint(g);
 
@@ -980,7 +1081,7 @@ public class ImageUtils {
      *
      * @param imageFiles   list of files
      * @param frameRateInFPS frame rate
-     * @param outFile  output file 
+     * @param outFile  output file
      *
      * @throws IOException problem writing AVI
      */
@@ -1030,14 +1131,14 @@ public class ImageUtils {
 
 
     /**
-     * _more_
+     * Get an image from the component
      *
-     * @param editor _more_
-     * @param transparentColor _more_
+     * @param editor component
+     * @param transparentColor if non null then set this color to be transparent
      *
-     * @return _more_
+     * @return image
      *
-     * @throws Exception _more_
+     * @throws Exception on badness
      */
     public static Image getImage(JEditorPane editor, Color transparentColor)
             throws Exception {
@@ -1050,16 +1151,17 @@ public class ImageUtils {
 
 
     /**
-     * _more_
+     * Render the given html and return an image
      *
-     * @param html _more_
-     * @param width _more_
-     * @param transparentColor _more_
-     * @param font _more_
+     * @param html html to render
+     * @param width image width
+     * @param transparentColor if non null set this color in the image to be transparent
+     * @param font font to render with
      *
-     * @return _more_
+
+     * @return image
      *
-     * @throws Exception _more_
+     * @throws Exception on badness
      */
     public static Image renderHtml(String html, int width,
                                    Color transparentColor, Font font)
@@ -1073,16 +1175,16 @@ public class ImageUtils {
 
 
     /**
-     * _more_
+     * Make a editor pane from the html
      *
-     * @param html _more_
-     * @param width _more_
-     * @param transparentColor _more_
-     * @param font _more_
+     * @param html html
+     * @param width width
+     * @param transparentColor what color to set as transparent
+     * @param font font
      *
-     * @return _more_
+     * @return editor pane
      *
-     * @throws Exception _more_
+     * @throws Exception on badness
      */
     public static JEditorPane getEditor(String html, int width,
                                         Color transparentColor, Font font)
@@ -1092,17 +1194,17 @@ public class ImageUtils {
 
 
     /**
-     * _more_
+     * Make a editor pane from the html
      *
-     * @param editor _more_
-     * @param html _more_
-     * @param width _more_
-     * @param transparentColor _more_
-     * @param font _more_
+     * @param editor Initial editor
+     * @param html html
+     * @param width width
+     * @param transparentColor what color to set as transparent
+     * @param font font
      *
-     * @return _more_
+     * @return editor pane
      *
-     * @throws Exception _more_
+     * @throws Exception on badness
      */
     public static JEditorPane getEditor(JEditorPane editor, String html,
                                         int width, Color transparentColor,
@@ -1136,12 +1238,12 @@ public class ImageUtils {
     }
 
     /**
-     * _more_
+     * test code
      *
-     * @param out _more_
-     * @param comp _more_
+     * @param out test
+     * @param comp test
      *
-     * @throws IOException _more_
+     * @throws IOException test
      */
     public static void writePDF(OutputStream out, JComponent comp)
             throws IOException {
@@ -1189,26 +1291,29 @@ public class ImageUtils {
      */
     public static void main(String[] args) throws Exception {
         int width = 400;
-        System.err.println ("reading");
+        System.err.println("reading");
         Image image = readImage(args[0]);
 
 
-        removeRedeye(image, 10,10,1000,1000);
-        if(true) return;
+        removeRedeye(image, 10, 10, 1000, 1000);
+        if (true) {
+            return;
+        }
 
 
-        System.err.println ("cvrting");
+        System.err.println("cvrting");
         BufferedImage bimage = toBufferedImage(image,
-                                  BufferedImage.TYPE_INT_ARGB);
-        System.err.println ("resizing");
+                                   BufferedImage.TYPE_INT_ARGB);
+        System.err.println("resizing");
         //        BufferedImage resizedImage =
         //            ImageUtils.toBufferedImage(bimage.getScaledInstance(width, -1,
         //                Image.SCALE_AREA_AVERAGING), BufferedImage.TYPE_INT_RGB);
 
-        BufferedImage resizedImage =      toBufferedImage(resize(bimage, width,-1));
+        BufferedImage resizedImage = toBufferedImage(resize(bimage, width,
+                                         -1));
         waitOnImage(resizedImage);
 
-        Image newImage = resizedImage;
+        Image  newImage = resizedImage;
 
 
         JLabel lbl1;
@@ -1216,26 +1321,30 @@ public class ImageUtils {
 
 
 
-        newImage = ImageUtils.rotate90(toBufferedImage(resizedImage),false);
-        lbl1 = new JLabel(new ImageIcon(resizedImage));
-        lbl2 = new JLabel(new ImageIcon(newImage));
-        GuiUtils.showOkCancelDialog(null, "",GuiUtils.hbox(lbl1,lbl2), null);
-        newImage = ImageUtils.rotate90(toBufferedImage(newImage),false);
-        lbl1 = new JLabel(new ImageIcon(resizedImage));
-        lbl2 = new JLabel(new ImageIcon(newImage));
-        GuiUtils.showOkCancelDialog(null, "",GuiUtils.hbox(lbl1,lbl2), null);
+        newImage = ImageUtils.rotate90(toBufferedImage(resizedImage), false);
+        lbl1     = new JLabel(new ImageIcon(resizedImage));
+        lbl2     = new JLabel(new ImageIcon(newImage));
+        GuiUtils.showOkCancelDialog(null, "", GuiUtils.hbox(lbl1, lbl2),
+                                    null);
+        newImage = ImageUtils.rotate90(toBufferedImage(newImage), false);
+        lbl1     = new JLabel(new ImageIcon(resizedImage));
+        lbl2     = new JLabel(new ImageIcon(newImage));
+        GuiUtils.showOkCancelDialog(null, "", GuiUtils.hbox(lbl1, lbl2),
+                                    null);
 
 
-        newImage = ImageUtils.rotate90(toBufferedImage(resizedImage),true);
-        lbl1 = new JLabel(new ImageIcon(resizedImage));
-        lbl2 = new JLabel(new ImageIcon(newImage));
-        GuiUtils.showOkCancelDialog(null, "",GuiUtils.hbox(lbl1,lbl2), null);
+        newImage = ImageUtils.rotate90(toBufferedImage(resizedImage), true);
+        lbl1     = new JLabel(new ImageIcon(resizedImage));
+        lbl2     = new JLabel(new ImageIcon(newImage));
+        GuiUtils.showOkCancelDialog(null, "", GuiUtils.hbox(lbl1, lbl2),
+                                    null);
 
 
-        newImage = ImageUtils.rotate90(toBufferedImage(newImage),true);
-        lbl1 = new JLabel(new ImageIcon(resizedImage));
-        lbl2 = new JLabel(new ImageIcon(newImage));
-        GuiUtils.showOkCancelDialog(null, "",GuiUtils.hbox(lbl1,lbl2), null);
+        newImage = ImageUtils.rotate90(toBufferedImage(newImage), true);
+        lbl1     = new JLabel(new ImageIcon(resizedImage));
+        lbl2     = new JLabel(new ImageIcon(newImage));
+        GuiUtils.showOkCancelDialog(null, "", GuiUtils.hbox(lbl1, lbl2),
+                                    null);
 
 
         /*
