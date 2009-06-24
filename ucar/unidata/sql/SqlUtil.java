@@ -1404,6 +1404,13 @@ public class SqlUtil {
     }
 
 
+    public static String cleanName(String value) {
+        value = value.replaceAll(" ","_");
+        value = value.replaceAll("\\.","_");
+        return value;
+    }
+
+
     /**
      * _more_
      *
