@@ -460,6 +460,11 @@ public class ObsListControl extends ObsDisplayControl {
                                 value = ((RowData) value).getValue();
                                 rowData.set(column, value);
                             }
+                            if(exportingToCsv) {
+                                if(Misc.equals("missing",value.toString())) {
+                                    return "NaN";
+                                }
+                            }
                             return value;
                         }
                     }
@@ -639,6 +644,7 @@ public class ObsListControl extends ObsDisplayControl {
 
     /** used in save as dialog */
     JCheckBox includeHeaderCbx;
+    private boolean   exportingToCsv = false;
 
     /**
      * Export table as csv
@@ -656,9 +662,11 @@ public class ObsListControl extends ObsDisplayControl {
         if (filename == null) {
             return;
         }
+        exportingToCsv = true;
         GuiUtils.exportAsCsv(includeHeaderCbx.isSelected()
                              ? makeFileHeader(sorter)
                              : "", sorter, filename);
+        exportingToCsv = false;
     }
 
 
