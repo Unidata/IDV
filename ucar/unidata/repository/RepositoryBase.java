@@ -648,12 +648,12 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @return _more_
      */
     public String showDialogError(String h) {
-        h = getErrorString(h);
+        h = getDialogString(h);
         return getMessage(h, Constants.ICON_ERROR, true);
     }
 
 
-    private String getErrorString(String s) {
+    public static String getDialogString(String s) {
         s = HtmlUtil.entityEncode(s);
         s = s.replace("&#60;msg&#32;","<msg ");
         s = s.replace("&#32;msg&#62;"," msg>");        

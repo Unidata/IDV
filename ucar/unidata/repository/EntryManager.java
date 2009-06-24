@@ -3471,15 +3471,14 @@ return new Result(title, sb);
         }
 
 
-        String img = prefix + HtmlUtil.img(entryIcon, (okToMove
+        String img =  HtmlUtil.img(entryIcon, (okToMove
                 ? imgText
                 : ""), HtmlUtil.id(iconId) + sourceEvent);
 
         if(imgUrl!=null) {
             img = HtmlUtil.href(imgUrl, img);
         }
-
-        //        StringBuffer row = new StringBuffer();
+        img =  prefix + img;
 
         sb.append(img);
         sb.append(HtmlUtil.space(1));

@@ -436,6 +436,30 @@ SqlUtil.getQuestionMarks(ARRAY.length));
 
 };
 
+public static class POINTDATAMETADATA {
+public static final String NAME = "pointdatametadata";
+public static final String COL_TABLENAME = NAME + ".tablename";
+public static final String COL_COLUMNNAME = NAME + ".columnname";
+public static final String COL_COLUMNNUMBER = NAME + ".columnnumber";
+public static final String COL_SHORTNAME = NAME + ".shortname";
+public static final String COL_LONGNAME = NAME + ".longname";
+public static final String COL_UNIT = NAME + ".unit";
+public static final String COL_VARTYPE = NAME + ".vartype";
+public static final String []ARRAY= new String[] {
+COL_TABLENAME,COL_COLUMNNAME,COL_COLUMNNUMBER,COL_SHORTNAME,COL_LONGNAME,COL_UNIT,COL_VARTYPE
+};
+
+
+public static final String COLUMNS = SqlUtil.comma(ARRAY);
+public static final String NODOT_COLUMNS = SqlUtil.commaNoDot(ARRAY);
+public static final String INSERT=
+SqlUtil.makeInsert(
+NAME,
+NODOT_COLUMNS,
+SqlUtil.getQuestionMarks(ARRAY.length));
+
+};
+
 
 }
 

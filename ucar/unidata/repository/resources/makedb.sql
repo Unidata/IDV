@@ -263,4 +263,17 @@ alter table remoteservers add column isregistry int;
 CREATE TABLE  dummy (name varchar(500));
 
 
+-----------------------------------------------------------------------
+--- holds information about the point databases
+-----------------------------------------------------------------------
+CREATE TABLE  pointdatametadata (
+       tablename varchar(1000),
+       columnname varchar(1000),
+       columnnumber int,
+       shortname varchar(1000),
+       longname varchar(1000),
+       unit varchar(100),
+       vartype varchar(100));
 
+
+CREATE INDEX POINTDATAMETADATA_INDEX_TABLENAME ON pointdatametadata (TABLENAME);

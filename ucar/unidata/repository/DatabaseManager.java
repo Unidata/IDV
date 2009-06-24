@@ -625,7 +625,7 @@ public class DatabaseManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected Statement execute(String sql, int max, int timeout)
+    public Statement execute(String sql, int max, int timeout)
             throws Exception {
         Connection connection = getConnection();
         Statement  stmt       = execute(connection, sql, max, timeout);
@@ -852,7 +852,7 @@ public class DatabaseManager extends RepositoryManager {
      *
      * @return _more_
      */
-    protected String convertSql(String sql) {
+    public String convertSql(String sql) {
         if (db.equals(DB_MYSQL)) {
             sql = sql.replace("ramadda.double", "double");
             sql = sql.replace("ramadda.datetime", "datetime");
@@ -996,6 +996,30 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
+    private static class SelectInfo {
+        long time;
+        String what;
+        List tables;
+        Clause clause;
+        String extra;
+        int max;
+
+        public SelectInfo(String what,
+                          List tables,
+                          Clause clause,
+                          String extra,
+                          int max) {
+            time=System.currentTimeMillis();
+            this.what=what;
+            this.tables=tables;
+            this.clause=clause;
+            this.extra=extra;
+            this.max=max;
+        }
+        
+    }
+
+
     /**
      * _more_
      *
@@ -1013,7 +1037,9 @@ public class DatabaseManager extends RepositoryManager {
                             final String extra, final  int max)
             throws Exception {
         Connection connection = getConnection();
+        SelectInfo selectInfo = new SelectInfo(what, tables, clause, extra, max);
         final boolean[] done = {false};
+        /*
         Misc.run(new Runnable() {
                 public void run() {
                     //Wait 20 seconds
@@ -1028,7 +1054,7 @@ public class DatabaseManager extends RepositoryManager {
                     }
                 }
             });
-
+        */
 
         Statement stmt = SqlUtil.select(connection, what, tables, clause,
                                         extra, max,TIMEOUT);

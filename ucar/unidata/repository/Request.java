@@ -1039,7 +1039,9 @@ public class Request implements Constants {
 
     public void appendMessage(StringBuffer sb) {
         if (defined(ARG_MESSAGE)) {
-            String message = HtmlUtil.entityEncode(getUnsafeString(ARG_MESSAGE, ""));
+            String message =  getUnsafeString(ARG_MESSAGE, "");
+            //            message = HtmlUtil.entityEncode(getUnsafeString(ARG_MESSAGE, "");
+            message = RepositoryBase.getDialogString(message);
             sb.append(repository.showDialogNote(message));
             remove(ARG_MESSAGE);
         }
@@ -1062,8 +1064,11 @@ public class Request implements Constants {
         }
 
         //If the user is anonymous then replace all "script" strings with "_script_"
+        //encode < and >
         if(isAnonymous()) {
             v = v.replaceAll("([sS][cC][rR][iI][pP][tT])","_$1_");
+            v = v.replaceAll("<","&lt;");
+            v = v.replaceAll(">","&gt;");
         }
 
 

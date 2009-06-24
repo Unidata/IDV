@@ -1213,7 +1213,7 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
-    private PointFeatureIterator getPointIterator(FeatureDatasetPoint input) throws Exception {
+    public static PointFeatureIterator getPointIterator(FeatureDatasetPoint input) throws Exception {
         List<FeatureCollection> collectionList =
             input.getPointFeatureCollectionList();
         if (collectionList.size() > 1) {

@@ -74,6 +74,13 @@
      <column name="maxsize" group="FTP Information" type="double" suffix="(MB)" default="0"   label="Max size to cache" columns="5"  showinhtml="false"/>
  </type>
 
+  <type name="pointdatabase"  description="Point Database" handler="ucar.unidata.repository.data.PointDatabaseTypeHandler">
+     <property name="icon" value="/icons/database.png"/>
+     <property name="form.show.date" value="false"/>
+     <property name="form.show.area" value="false"/>
+     <property name="form.show.datatype" value="false"/>
+</type>
+
 
 
   <type name="catalog"  description="Catalog View" handler="ucar.unidata.repository.data.CatalogTypeHandler">
