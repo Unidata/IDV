@@ -648,7 +648,7 @@ public class DatabaseManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected Statement execute(Connection connection, String sql, int max,
+    public Statement execute(Connection connection, String sql, int max,
                                 int timeout)
             throws Exception {
         Statement statement = connection.createStatement();
@@ -835,6 +835,19 @@ public class DatabaseManager extends RepositoryManager {
     public void executeInsert(String insert, Object[] values)
             throws Exception {
         PreparedStatement pstmt = getPreparedStatement(insert);
+        setValues(pstmt, values);
+        try {
+            pstmt.executeUpdate();
+            close(pstmt);
+        } catch (Exception exc) {
+            logError("Error:" + insert, exc);
+        }
+    }
+
+
+    public void executeInsert(Connection connection, String insert, Object[] values)
+            throws Exception {
+        PreparedStatement pstmt       = connection.prepareStatement(insert);
         setValues(pstmt, values);
         try {
             pstmt.executeUpdate();
