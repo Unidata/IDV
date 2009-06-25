@@ -437,24 +437,31 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                         double[] minmax = getRange(var, ca.read(),
                                               visad.CommonUnit.degree);
                         //                        System.err.println("\t" +"lat range:" + minmax[0] + " " + minmax[1]);
-                        if (extra.get(ARG_MINLAT) == null) {
-                            extra.put(ARG_MINLAT, minmax[0]);
+                        if(minmax[0] == minmax[0]  && minmax[1] == minmax[1]) {  
+                            if (extra.get(ARG_MINLAT) == null) {
+                                extra.put(ARG_MINLAT, minmax[0]);
+                            }
+                            if (extra.get(ARG_MAXLAT) == null) {
+                                extra.put(ARG_MAXLAT, minmax[1]);
+                            }
+                            haveBounds = true;
                         }
-                        if (extra.get(ARG_MAXLAT) == null) {
-                            extra.put(ARG_MAXLAT, minmax[1]);
-                        }
-                        haveBounds = true;
+
                     } else if (axisType.equals(AxisType.Lon)) {
                         double[] minmax = getRange(var, ca.read(),
-                                              visad.CommonUnit.degree);
+                                                   visad.CommonUnit.degree);
                         //                        System.err.println("\t"+" lon range:" + minmax[0] + " " + minmax[1]);
-                        if (extra.get(ARG_MINLON) == null) {
-                            extra.put(ARG_MINLON, minmax[0]);
+                        if(minmax[0] == minmax[0]  && minmax[1] == minmax[1]) {  
+                            if (extra.get(ARG_MINLON) == null) {
+                                extra.put(ARG_MINLON, minmax[0]);
+                            }
+                            if (extra.get(ARG_MAXLON) == null) {
+                                extra.put(ARG_MAXLON, minmax[1]);
+                            }
+                            haveBounds = true;
                         }
-                        if (extra.get(ARG_MAXLON) == null) {
-                            extra.put(ARG_MAXLON, minmax[1]);
-                        }
-                        haveBounds = true;
+
+
                     } else if (axisType.equals(AxisType.Time)) {
                         Date[] dates = getMinMaxDates(var, ca);
                         Date minDate = (Date)  extra.get(ARG_FROMDATE);
@@ -515,15 +522,22 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                         continue;
                     }
                     LatLonRect llr = proj.getDefaultMapAreaLL();
-                    haveBounds = true;
-                    if (extra.get(ARG_MINLAT) == null) {
-                        //                        System.err.println("\t"  +" bounds from cs:" + llr);
-                        extra.put(ARG_MINLAT, llr.getLatMin());
-                        extra.put(ARG_MAXLAT, llr.getLatMax());
-                        extra.put(ARG_MINLON, llr.getLonMin());
-                        extra.put(ARG_MAXLON, llr.getLonMax());
+                    if(llr.getLatMin() == llr.getLatMin()  &&
+                       llr.getLatMax() == llr.getLatMax()  &&
+                       llr.getLonMax() == llr.getLonMax()  &&
+                       llr.getLonMin() == llr.getLonMin()) { 
+                        haveBounds = true;
+                        if (extra.get(ARG_MINLAT) == null) {
+                            //                        System.err.println("\t"  +" bounds from cs:" + llr);
+                            //                        System.err.println("\t"  +" proj:" + proj);
+                            extra.put(ARG_MINLAT, llr.getLatMin());
+                            extra.put(ARG_MAXLAT, llr.getLatMax());
+                            extra.put(ARG_MINLON, llr.getLonMin());
+                            extra.put(ARG_MAXLON, llr.getLonMax());
+                        }
+                        break;
                     }
-                    break;
+
                 }
             }
         } catch (Exception exc) {

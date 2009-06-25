@@ -1615,7 +1615,7 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    private static String llp(double lat, double lon) {
+    public static String llp(double lat, double lon) {
         return "new LatLonPoint(" + lat + "," + lon + ")";
     }
 

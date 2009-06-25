@@ -265,6 +265,16 @@ public class DatabaseManager extends RepositoryManager {
         releaseConnection(connection);
     }
 
+    public void update(String table,
+                       Clause clause, 
+                       String[] names,
+                       Object[] values) throws Exception  {
+        Connection        connection = getConnection();
+        SqlUtil.update(connection, table, clause, names, values);
+        releaseConnection(connection);
+    }
+
+
 
 
     /**

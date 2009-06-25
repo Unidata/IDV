@@ -470,7 +470,7 @@ public class Entry extends Entity {
      * @return The South
      */
     public double getSouth() {
-        return south;
+        return (south==south?south:NONGEO);
     }
 
     /**
@@ -488,7 +488,7 @@ public class Entry extends Entity {
      * @return The North
      */
     public double getNorth() {
-        return north;
+        return (north==north?north:NONGEO);
     }
 
 
@@ -544,7 +544,7 @@ public class Entry extends Entity {
      * @return The East
      */
     public double getEast() {
-        return east;
+        return (east==east?east:NONGEO);
     }
 
     /**
@@ -562,7 +562,7 @@ public class Entry extends Entity {
      * @return The West
      */
     public double getWest() {
-        return west;
+        return (west==west?west:NONGEO);
     }
 
 

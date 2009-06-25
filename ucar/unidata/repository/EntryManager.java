@@ -928,6 +928,7 @@ return new Result(title, sb);
                 origNames.add(resourceName);
                 parents.add(parentGroup);
             } else {
+                isLocalFile = false;
                 Hashtable<String,Group>  nameToGroup = new Hashtable<String,Group>();
                 ZipInputStream zin =
                     new ZipInputStream(getStorageManager().getFileInputStream(resource));

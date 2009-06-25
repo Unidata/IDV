@@ -306,6 +306,7 @@
         <unjar src="${libsrc}/derbytools.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-io-1.4.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-fileupload-1.2.1.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/jfreechart.jar" dest="${tmpjardir}"/>
 
 <!--
         <unjar src="${libsdir}/servlet-api.jar" dest="${tmpjardir}"/>

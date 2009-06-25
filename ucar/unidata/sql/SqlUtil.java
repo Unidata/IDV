@@ -604,6 +604,25 @@ public class SqlUtil {
     }
 
 
+    public static void update(Connection connection, String table,
+                              Clause clause, 
+                              String[] names,
+                              Object[] values)
+            throws Exception {
+        String            query = makeUpdate(table, clause, names);
+        PreparedStatement stmt  = connection.prepareStatement(query);
+        int colCnt=1;
+        for (int i = 0; i < values.length; i++) {
+            SqlUtil.setValue(stmt, values[i], colCnt);
+            colCnt++;
+        }
+        clause.setValue(stmt, colCnt);
+
+        stmt.execute();
+        stmt.close();
+    }
+
+
 
     /**
      * _more_
@@ -656,6 +675,25 @@ public class SqlUtil {
         }
         sb.append(" WHERE ");
         sb.append(colId + " = ?");
+        return sb.toString();
+    }
+
+
+
+    public static String makeUpdate(String table, Clause clause,
+                                    String[] names) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("UPDATE  ");
+        sb.append(table);
+        sb.append(" SET ");
+        for (int i = 0; i < names.length; i++) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append(" " + unDot(names[i]) + "=?" + " ");
+        }
+        sb.append(" WHERE ");
+        clause.addClause(sb);
         return sb.toString();
     }
 
