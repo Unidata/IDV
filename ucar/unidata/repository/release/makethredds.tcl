@@ -28,14 +28,18 @@ puts "pwd: [pwd]"
 puts "exec: [exec pwd]"
 set files ""
 foreach file [glob *] {
+    if {$file=="visad"} continue
     append files " "
     append files "\{[file tail $file]\}"
+    puts "$file"
+}
 }
 
-}
+
+
 
 puts [exec pwd]
-foreach f [glob  ../../../../ucar/unidata/util/DateUtil*class] {
+foreach f [glob -nocomplain  ../../../../ucar/unidata/util/DateUtil*class] {
     puts "File:$f"
     file copy -force $f ucar/unidata/util
 }

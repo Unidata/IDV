@@ -272,6 +272,8 @@ public class HtmlOutputHandler extends OutputHandler {
                     informationBlock, true));
 
             StringBuffer metadataSB = new StringBuffer();
+
+
             getMetadataManager().decorateEntry(request, entry, metadataSB,
                     false);
             String metataDataHtml = metadataSB.toString();

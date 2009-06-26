@@ -77,7 +77,7 @@
   <type name="pointdatabase"  description="Point Database" handler="ucar.unidata.repository.data.PointDatabaseTypeHandler">
      <property name="icon" value="/icons/database.png"/>
      <property name="form.show.date" value="false"/>
-     <property name="form.show.area" value="false"/>
+<!--     <property name="form.show.area" value="false"/> -->
      <property name="form.show.datatype" value="false"/>
 </type>
 

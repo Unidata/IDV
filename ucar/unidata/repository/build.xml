@@ -292,8 +292,8 @@
         <unjar src="${jars_dest}/visad.jar" dest="${tmpjardir}"/>
         <unjar src="${jars_dest}/local-visad.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/extra.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsdir}/jython.jar" dest="${tmpjardir}"/>
         <unjar src="${libsdir}/external.jar" dest="${tmpjardir}"/>
-
         <unjar src="${libsrc}/twitter4j-1.1.4.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jetty.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jetty-util.jar" dest="${tmpjardir}"/>
@@ -320,7 +320,9 @@
             compress="true"
             jarfile="${libsdir}/repositorylib.jar">
               <include name="**"/>
+<!--
               <exclude name="ucar/netcdf/**"/>
+-->
               <exclude name="ucar/multiarray/**"/>
         </jar>
 
@@ -349,6 +351,25 @@
             <exclude name="ucar/**/*.zip"/>            
             <exclude name="ucar/**/*.shp"/>            
             <exclude name="ucar/**/*.nc"/>            
+            <exclude name="ucar/unidata/data/storm/*ADOT*"/>
+            <exclude name="ucar/unidata/idv/control/storm/*ADOT*"/>
+            <exclude name="ucar/unidata/idv/control/storm/StormIntensityControl.java"/>
+            <exclude name="ucar/unidata/apps/demo/**"/>
+            <exclude name="ucar/unidata/apps/imageviewer/**"/>
+            <exclude name="ucar/unidata/apps/geon/**"/>
+            <exclude name="ucar/unidata/apps/lead/**"/>
+            <exclude name="ucar/unidata/apps/rico/**"/>
+            <exclude name="ucar/unidata/apps/sti/**"/>
+            <exclude name="ucar/unidata/apps/trex/**"/>
+            <exclude name="ucar/unidata/apps/workshop/**"/>
+            <exclude name="ucar/unidata/gridviewer/**/*.*"/>
+            <exclude name="ucar/unidata/grid/**"/>
+            <exclude name="ucar/unidata/geoloc/**"/>
+            <exclude name="ucar/unidata/idv/release/**"/>
+            <exclude name="ucar/unidata/view/sounding/test/**"/>
+
+
+<!--
             <exclude name="ucar/unidata/gis/**"/>
             <exclude name="ucar/unidata/repository/docs/**"/>
             <exclude name="ucar/unidata/ui/symbol/**"/>
@@ -363,6 +384,8 @@
             <exclude name="ucar/unidata/grid/**"/>
             <exclude name="ucar/unidata/geoloc/**"/>
             <exclude name="ucar/unidata/view/sounding/test/**"/>
+-->
+
         </jar>
     </target>
 

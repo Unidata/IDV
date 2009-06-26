@@ -654,15 +654,24 @@ public class Request implements Constants {
      *
      * @return _more_
      */
-    public String getUrlArgs(Hashtable except) {
+    public String getUrlArgs(Hashtable exceptArgs) {
+        return getUrlArgs(exceptArgs,null);
+    }
+
+
+    public String getUrlArgs(Hashtable exceptArgs,Hashtable exceptValues) {
         StringBuffer sb  = new StringBuffer();
         int          cnt = 0;
         for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
             String arg = (String) keys.nextElement();
-            if ((except != null) && (except.get(arg) != null)) {
+            if ((exceptArgs != null) && (exceptArgs.get(arg) != null)) {
                 continue;
             }
+
             Object value = parameters.get(arg);
+            if ((exceptValues != null) && (exceptValues.get(value) != null)) {
+                continue;
+            }
             if (value instanceof List) {
                 List l = (List) value;
                 if (l.size() == 0) {

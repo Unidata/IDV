@@ -1102,12 +1102,6 @@ return new Result(title, sb);
                                    new Date());
             String newName = request.getString(ARG_NAME, entry.getLabel());
 
-
-
-
-
-
-
             entry.setName(newName);
             entry.setDescription(request.getString(ARG_DESCRIPTION,
                     entry.getDescription()));
@@ -1157,6 +1151,8 @@ return new Result(title, sb);
                 theEntry.setUser(newUser);
             }
         }
+
+
 
         if (newEntry && request.get(ARG_METADATA_ADD, false)) {
             addInitialMetadata(request, entries,newEntry, false);
@@ -3593,7 +3589,17 @@ return new Result(title, sb);
     }
 
 
-
+    public void addAttachment(Entry entry, File file,boolean andInsert) throws Exception {
+        String theFile =   getStorageManager().moveToEntryDir(entry, file).getName();
+        entry.addMetadata(
+                          new Metadata(
+                                       getRepository().getGUID(), entry.getId(),
+                                       ContentMetadataHandler.TYPE_ATTACHMENT, false, 
+                                       theFile,"","","",""));
+        if(andInsert) {
+            insertEntries((List<Entry>)Misc.newList(entry), false);
+        }
+    }
 
     /**
      * _more_
