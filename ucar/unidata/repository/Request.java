@@ -592,6 +592,11 @@ public class Request implements Constants {
         return checkUrl(getRequestPath() + "?" + getUrlArgs());
     }
 
+
+    public String getUrl(Hashtable exceptArgs,Hashtable exceptValues) {
+        return checkUrl(getRequestPath() + "?" + getUrlArgs(exceptArgs, exceptValues));
+    }
+
     /**
      * _more_
      *
@@ -1354,13 +1359,30 @@ public class Request implements Constants {
                 return new Date[] { null, null };
             }
             toDate = "now";
+        } else if(dflt == null) {
+             return new Date[]{null,null};
         }
 
+        //        System.err.println("from:" + fromDate);
+        //        System.err.println("to:" + toDate);
+
+
+        if(dflt == null) dflt  = new Date();
         Date[] range = DateUtil.getDateRange(fromDate, toDate, dflt);
         //        System.err.println("dateRange:" + fromDate + " date:" + range[0]);
         return range;
     }
 
+
+    public boolean setContains(String key, Object value) {
+        List list = get(key, (List) null);
+        if(list == null) {
+            Object singleValue = getValue(key, (Object) null);
+            if(singleValue ==null) return false;
+            return singleValue.equals(value);
+        }
+        return list.contains(value);
+    }
 
 
     /**

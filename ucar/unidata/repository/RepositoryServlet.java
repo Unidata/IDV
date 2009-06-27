@@ -474,16 +474,11 @@ public class RepositoryServlet extends HttpServlet {
                         repository.getGUID() + StorageManager.FILE_SEPARATOR + fileName));
 
             try {
-                //Check to make sure its safe
-                uploadedFile = repository.getStorageManager().checkWriteFile(uploadedFile);
-            } catch (Exception e) {
-                logException(e, request);
-                return;
-            }
-
-
-            try {
-                item.write(uploadedFile);
+                InputStream inputStream = item.getInputStream();
+                OutputStream outputStream = repository.getStorageManager().getFileOutputStream(uploadedFile);
+                IOUtil.writeTo(inputStream, outputStream);
+                outputStream.close();
+                //                item.write(uploadedFile);
             } catch (Exception e) {
                 logException(e, request);
                 return;

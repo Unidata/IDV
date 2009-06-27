@@ -181,6 +181,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     /** _more_          */
     public static final String FORMAT_CSV = "csv";
 
+    public static final String FORMAT_CHART = "chart";
+
     /** _more_          */
     public static final String FORMAT_CSVHEADER = "csvheader";
 
@@ -201,53 +203,54 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     public static final double MISSING = -987654.98765;
 
     /** _more_          */
-    public static final String ARG_POINT_CHANGETYPE = "point_changetype";
-
-    /** _more_          */
-    public static final String ARG_POINT_UPLOAD_FORM = "point_upload_form";
-
-    /** _more_          */
-    public static final String ARG_POINT_UPLOAD_FILE = "point_upload_file";
+    public static final String ARG_POINT_REDIRECT = "redirect";
+    public static final String ARG_POINT_CHANGETYPE = "changetype";
 
 
     /** _more_          */
-    public static final String ARG_POINT_IMAGE_WIDTH = "point_image_width";
+    public static final String ARG_POINT_UPLOAD_FILE = "upload_file";
+
 
     /** _more_          */
-    public static final String ARG_POINT_IMAGE_HEIGHT = "point_image_height";
+    public static final String ARG_POINT_IMAGE_WIDTH = "image_width";
 
     /** _more_          */
-    public static final String ARG_POINT_SHOW_METADATA = "point_showmetadata";
+    public static final String ARG_POINT_IMAGE_HEIGHT = "image_height";
+
+    public static final String ARG_POINT_VIEW = "pointview";
+
+    public static final String VIEW_UPLOAD = "upload";
+    public static final String VIEW_SEARCHFORM = "searchform";
+    public static final String VIEW_METADATA = "metadata";
+    public static final String VIEW_DEFAULT = "default";
+
 
     /** _more_          */
-    public static final String ARG_POINT_SHOW_DEFAULT = "point_showdefault";
+    public static final String ARG_POINT_FORMAT = "format";
 
     /** _more_          */
-    public static final String ARG_POINT_OUTPUT = "point_output";
+    public static final String ARG_POINT_SEARCH = "search";
 
     /** _more_          */
-    public static final String ARG_POINT_SEARCH = "point_search";
+    public static final String ARG_POINT_FROMDATE = "fromdate";
 
     /** _more_          */
-    public static final String ARG_POINT_FROMDATE = "point_fromdate";
+    public static final String ARG_POINT_TODATE = "todate";
 
     /** _more_          */
-    public static final String ARG_POINT_TODATE = "point_todate";
+    public static final String ARG_POINT_BBOX = "bbox";
 
     /** _more_          */
-    public static final String ARG_POINT_BBOX = "point_bbox";
+    public static final String ARG_POINT_HOUR = "hour";
 
     /** _more_          */
-    public static final String ARG_POINT_HOUR = "point_hour";
+    public static final String ARG_POINT_MONTH = "month";
 
     /** _more_          */
-    public static final String ARG_POINT_MONTH = "point_month";
+    public static final String ARG_POINT_PARAM = "what";
 
     /** _more_          */
-    public static final String ARG_POINT_WHAT = "point_what";
-
-    /** _more_          */
-    public static final String ARG_POINT_WHAT_ALL = "point_what_all";
+    public static final String ARG_POINT_PARAM_ALL = "what_all";
 
     /** _more_          */
     public static final String ARG_POINT_FIELD_VALUE = "value_";
@@ -281,10 +284,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     public static final String COL_ALTITUDE = "altitude";
 
     /** _more_          */
-    public static final String COL_MONTH = "month";
+    public static final String COL_MONTH = "obmonth";
 
     /** _more_          */
-    public static final String COL_HOUR = "hour";
+    public static final String COL_HOUR = "obhour";
 
     /** _more_          */
     public static final int NUM_BASIC_COLUMNS = 6;
@@ -718,10 +721,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    private Result doUpload(Request request, Entry entry) throws Exception {
-        StringBuffer sb = new StringBuffer();
-
-        sb.append(getHeader(request, entry));
+    private  void doUpload(StringBuffer sb, Request request, Entry entry) throws Exception {
         if (request.exists(ARG_POINT_UPLOAD_FILE)) {
             File file =
                 new File(request.getUploadedFile(ARG_POINT_UPLOAD_FILE));
@@ -746,7 +746,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             sb.append(request.uploadForm(getRepository().URL_ENTRY_SHOW));
             sb.append(msgLabel("New data file"));
             sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
-            sb.append(HtmlUtil.hidden(ARG_POINT_UPLOAD_FORM, "true"));
+            sb.append(HtmlUtil.hidden(ARG_POINT_VIEW, VIEW_UPLOAD));
 
             sb.append(HtmlUtil.fileInput(ARG_POINT_UPLOAD_FILE,
                                          HtmlUtil.SIZE_50));
@@ -755,8 +755,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             sb.append(request.uploadForm(getRepository().URL_ENTRY_SHOW));
             sb.append(HtmlUtil.formClose());
         }
-
-        return new Result("Upload", sb);
     }
 
 
@@ -772,27 +770,50 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      */
     private Result doSearch(Request request, Entry entry) throws Exception {
 
-        String result = request.getString(ARG_POINT_OUTPUT, FORMAT_HTML);
-        String baseName =
-            IOUtil.stripExtension(getStorageManager().getFileTail(entry));
-        if (result.equals(FORMAT_TIMESERIES)) {
-            request.put(ARG_POINT_OUTPUT, FORMAT_TIMESERIES_IMAGE);
+        String format = request.getString(ARG_POINT_FORMAT, FORMAT_HTML);
+        String baseName =  IOUtil.stripExtension(entry.getName());
+        boolean redirect = request.get(ARG_POINT_REDIRECT,false);
+        request.remove(ARG_POINT_REDIRECT);
+        request.remove(ARG_POINT_SEARCH);
+        if (format.equals(FORMAT_TIMESERIES)) {
+            request.put(ARG_POINT_FORMAT, FORMAT_TIMESERIES_IMAGE);
             StringBuffer sb = new StringBuffer();
             sb.append(getHeader(request, entry));
-            String redirect = request.getRequestPath() + "/" + baseName
+            String redirectUrl = request.getRequestPath() + "/" + baseName
                               + ".png" + "?"
                               + request.getUrlArgs(null,
                                   Misc.newHashtable(OP_LT, OP_LT));
-            sb.append(HtmlUtil.img(redirect));
+            sb.append(HtmlUtil.img(redirectUrl));
             return new Result("Search Results", sb);
         }
 
-        if (result.equals(FORMAT_SCATTERPLOT)) {}
+
+
+        if(redirect) {
+            String urlSuffix= ".html";
+            if (format.equals(FORMAT_CSV) || format.equals(FORMAT_CSVIDV)
+                || format.equals(FORMAT_CSVHEADER)) {
+                urlSuffix = ".csv";
+            } else if(format.equals(FORMAT_XLS)) {
+                urlSuffix = ".xls";
+            } else if(format.equals(FORMAT_NETCDF)) {
+                urlSuffix = ".nc";
+            }
+
+            String redirectUrl = request.getRequestPath() + "/" + HtmlUtil.urlEncode(baseName)
+                              + urlSuffix + "?"
+                              + request.getUrlArgs(null,
+                                  Misc.newHashtable(OP_LT, OP_LT));
+            return new Result(redirectUrl);
+        }
+
+
+        if (format.equals(FORMAT_SCATTERPLOT)) {}
 
 
         String tableName = getTableName(entry);
         Date[] dateRange = request.getDateRange(ARG_POINT_FROMDATE,
-                               ARG_POINT_TODATE, new Date());
+                               ARG_POINT_TODATE, null);
         List<Clause> clauses = new ArrayList<Clause>();
 
         if (dateRange[0] != null) {
@@ -843,17 +864,17 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         List<PointDataMetadata> metadata = getMetadata(getTableName(entry));
         List<PointDataMetadata> tmp      = new ArrayList<PointDataMetadata>();
-        if (request.get(ARG_POINT_WHAT_ALL, false)) {
+        if (request.get(ARG_POINT_PARAM_ALL, false)) {
             tmp = metadata;
         } else {
             List<String> whatList =
-                (List<String>) request.get(ARG_POINT_WHAT, new ArrayList());
+                (List<String>) request.get(ARG_POINT_PARAM, new ArrayList());
             HashSet seen = new HashSet();
             for (String col : whatList) {
                 seen.add(col);
             }
             for (PointDataMetadata pdm : metadata) {
-                if (pdm.isBasic() || seen.contains(pdm.columnName)) {
+                if (pdm.isBasic() || seen.contains(""+pdm.columnNumber)) {
                     tmp.add(pdm);
                 }
             }
@@ -879,13 +900,14 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             if (pdm.isBasic()) {
                 continue;
             }
-            if ( !request.defined(ARG_POINT_FIELD_VALUE + pdm.columnName)) {
+            String suffix = ""+pdm.columnNumber;
+            if ( !request.defined(ARG_POINT_FIELD_VALUE + suffix)) {
                 continue;
             }
             if (pdm.isString()) {
                 String value = request.getString(ARG_POINT_FIELD_VALUE
-                                   + pdm.columnName, "");
-                if (request.get(ARG_POINT_FIELD_EXACT + pdm.columnName,
+                                   + suffix, "");
+                if (request.get(ARG_POINT_FIELD_EXACT + suffix,
                                 false)) {
                     clauses.add(Clause.eq(pdm.columnName, value));
                 } else {
@@ -894,9 +916,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 }
             } else {
                 String op = request.getString(ARG_POINT_FIELD_OP
-                                + pdm.columnName, OP_LT);
+                                              + suffix, OP_LT);
                 double value = request.get(ARG_POINT_FIELD_VALUE
-                                           + pdm.columnName, 0.0);
+                                           + suffix, 0.0);
                 if (op.equals(OP_LT)) {
                     clauses.add(Clause.le(pdm.columnName, value));
                 } else if (op.equals(OP_GT)) {
@@ -955,24 +977,27 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             }
         }
 
-
-        if (result.equals(FORMAT_HTML) || result.equals(FORMAT_TIMELINE)) {
+        if (format.equals(FORMAT_HTML) || format.equals(FORMAT_TIMELINE)) {
             return makeSearchResultsHtml(request, entry, columnsToUse,
                                          pointDataList,
-                                         result.equals(FORMAT_TIMELINE));
-        } else if (result.equals(FORMAT_CSV) || result.equals(FORMAT_CSVIDV)
-                   || result.equals(FORMAT_CSVHEADER)
-                   || result.equals(FORMAT_XLS)) {
+                                         format.equals(FORMAT_TIMELINE));
+        } else if (format.equals(FORMAT_CSV) || format.equals(FORMAT_CSVIDV)
+                   || format.equals(FORMAT_CSVHEADER)
+                   || format.equals(FORMAT_XLS)) {
             return makeSearchResultsCsv(request, entry, columnsToUse,
-                                        pointDataList, result);
-        } else if (result.equals(FORMAT_TIMESERIES_IMAGE)) {
+                                        pointDataList, format);
+
+        } else if (format.equals(FORMAT_CHART)) {
+            return makeSearchResultsChart(request, entry, columnsToUse,
+                                          pointDataList);
+        } else if (format.equals(FORMAT_TIMESERIES_IMAGE)) {
             return makeSearchResultsTimeSeries(request, entry, columnsToUse,
                     pointDataList);
 
-        } else if (result.equals(FORMAT_SCATTERPLOT_IMAGE)) {
+        } else if (format.equals(FORMAT_SCATTERPLOT_IMAGE)) {
             return makeSearchResultsScatterPlot(request, entry, columnsToUse,
                     pointDataList);
-        } else if (result.equals(FORMAT_MAP)) {
+        } else if (format.equals(FORMAT_MAP)) {
             return makeSearchResultsMap(request, entry, columnsToUse,
                                         pointDataList);
         } else {
@@ -1019,6 +1044,114 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     }
 
 
+    private Result makeSearchResultsChart(
+            Request request, Entry entry,
+            List<PointDataMetadata> columnsToUse, List<PointData> list)
+            throws Exception {
+
+        StringBuffer searchForm = new StringBuffer();
+        searchForm.append("<ul><hr>");
+        createSearchForm(searchForm, request, entry);
+        searchForm.append("<hr></ul>");
+
+
+        StringBuffer sb = new StringBuffer();
+        request.remove(ARG_POINT_SEARCH);
+        request.remove(ARG_POINT_FORMAT);
+        sb.append(getHeader(request, entry));
+        sb.append(header(msg("Point Data Search Results")));
+        sb.append(HtmlUtil.makeShowHideBlock(msg("Search Again"),
+                                             searchForm.toString(), false));
+
+        if (list.size() == 0) {
+            sb.append(msg("No results found"));
+            return new Result("Point Search Results", sb);
+        }
+        sb.append("<script type=\"text/javascript\" src=\"http://www.google.com/jsapi\"></script>\n");
+        sb.append("<script type=\"text/javascript\">\ngoogle.load('visualization', '1', {'packages':['motionchart']});\ngoogle.setOnLoadCallback(drawChart);\nfunction drawChart() {\n        var data = new google.visualization.DataTable();\n");
+        sb.append("data.addRows(" + list.size()+");\n");
+        //        data.addColumn('string', 'Fruit');
+        sb.append("data.addColumn('string', 'Location');\n");
+        sb.append("data.addColumn('date', 'Date');\n");
+        sb.append("data.addColumn('number', 'Latitude');\n");
+        sb.append("data.addColumn('number', 'Longitude');\n");
+        int entityIdx=-1;
+        int idx =-1;
+        for (PointDataMetadata pdm : columnsToUse) {
+            if (pdm.isBasic()) {
+                continue;
+            }
+            idx++;
+            if(entityIdx<0 && pdm.shortName.toLowerCase().indexOf("station")>=0) 
+                entityIdx  = idx;
+            if(pdm.shortName.toLowerCase().indexOf("name")>=0) 
+                entityIdx  = idx;
+            if(pdm.isString()) {
+                sb.append("data.addColumn('string', '" + pdm.shortName+"');\n");
+            } else {
+                sb.append("data.addColumn('number', '" + pdm.shortName+"');\n");
+            }
+        }
+
+        GregorianCalendar cal =
+            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+
+        int row=-1;
+
+        sb.append("var theDate;\n");
+        for (PointData pointData : list) {
+            row++;
+            cal.setTime(pointData.date);
+            List values = pointData.values;
+            if(entityIdx>=0) 
+                sb.append("data.setValue(" +row+", 0, '" + values.get(entityIdx) + "');\n");
+            else
+                sb.append("data.setValue(" +row+", 0, 'latlon_" + pointData.lat+"/"+pointData.lon + "');\n");
+
+
+            sb.append("theDate = new Date(" + cal.get(cal.YEAR) +"," + cal.get(cal.MONTH) +","+ cal.get(cal.DAY_OF_MONTH)+ ");\n");
+
+            sb.append("theDate.setHours("+cal.get(cal.HOUR)+
+                      ","+ cal.get(cal.MINUTE)+
+                      ");\n");
+
+            //            if(row<10)        sb.append("alert(theDate);\n");
+            sb.append("data.setValue(" +row+", 1, theDate);\n");
+            sb.append("data.setValue(" +row+", 2,"+ pointData.lat+");\n");
+            sb.append("data.setValue(" +row+", 3," +pointData.lon+");\n");
+
+            int  cnt    = -1;
+            for (PointDataMetadata pdm : columnsToUse) {
+                if (pdm.isBasic()) {
+                    continue;
+                }
+                cnt++;
+                Object value = values.get(cnt);
+                if(pdm.isString()) {
+                    sb.append("data.setValue(" +row+", " + (cnt+4) +", '" +value +"');\n");
+                } else {
+                    sb.append("data.setValue(" +row+", " + (cnt+4) +", " +value +");\n");
+                }
+            }
+        }
+
+        /*
+        data.setValue(0, 0, 'Apples');
+        data.setValue(0, 1, new Date (1988,0,1));
+        data.setValue(0, 2, 1000);
+        data.setValue(0, 3, 300);
+        data.setValue(0, 4, 'East');*/
+
+        sb.append("var chart = new google.visualization.MotionChart(document.getElementById('chart_div'));\n");
+        sb.append("chart.draw(data, {width: 800, height:500});\n");
+        sb.append("}\n");
+        sb.append("</script>\n");
+        sb.append("<div id=\"chart_div\" style=\"width: 800px; height: 500px;\"></div>\n");
+
+        return new Result("Point Search Results", sb);
+    }
+
+
     /**
      * _more_
      *
@@ -1037,9 +1170,21 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             List<PointDataMetadata> columnsToUse, List<PointData> list,
             boolean showTimeline)
             throws Exception {
+
         StringBuffer sb = new StringBuffer();
         sb.append(getHeader(request, entry));
         sb.append(header(msg("Point Data Search Results")));
+
+        request.remove(ARG_POINT_SEARCH);
+        request.remove(ARG_POINT_FORMAT);
+        StringBuffer searchForm = new StringBuffer();
+        searchForm.append("<ul><hr>");
+        createSearchForm(searchForm, request, entry);
+        searchForm.append("<hr></ul>");
+        sb.append(HtmlUtil.makeShowHideBlock(msg("Search Again"),
+                                             searchForm.toString(), false));
+
+
         if (list.size() == 0) {
             sb.append(msg("No results found"));
             return new Result("Point Search Results", sb);
@@ -1512,12 +1657,12 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                               Permission.ACTION_EDIT);
 
         List    headerLinks  = new ArrayList();
-        boolean showMetadata = request.get(ARG_POINT_SHOW_METADATA, false);
-        boolean showUpload   = request.get(ARG_POINT_UPLOAD_FORM, false);
-        boolean doSearch     = request.exists(ARG_POINT_SEARCH);
-        boolean showSearch   = !showMetadata && !showUpload && !doSearch;
+        String view =  request.getString(ARG_POINT_VIEW, VIEW_SEARCHFORM);
 
-        if (showSearch) {
+
+        boolean doSearch     = request.exists(ARG_POINT_SEARCH) || request.exists(ARG_POINT_FORMAT);
+
+        if (!doSearch && view.equals(VIEW_SEARCHFORM)) {
             headerLinks.add(HtmlUtil.b(msg("Search form")));
         } else {
             headerLinks.add(
@@ -1527,26 +1672,26 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         }
 
-        if (showMetadata) {
+        if (view.equals(VIEW_METADATA)) {
             headerLinks.add(HtmlUtil.b(msg("Metadata")));
         } else {
             headerLinks.add(
                 HtmlUtil.href(
                     request.entryUrl(
                         getRepository().URL_ENTRY_SHOW, entry,
-                        ARG_POINT_SHOW_METADATA, "true"), msg("Metadata")));
+                        ARG_POINT_VIEW, VIEW_METADATA), msg("Metadata")));
         }
 
         if (canEdit) {
-            if ( !showUpload) {
+            if(view.equals(VIEW_UPLOAD)) {
+                headerLinks.add(HtmlUtil.b(msg("Upload more data")));
+            } else {
                 headerLinks.add(
                     HtmlUtil.href(
                         request.entryUrl(
                             getRepository().URL_ENTRY_SHOW, entry,
-                            ARG_POINT_UPLOAD_FORM, "true"), msg(
+                            ARG_POINT_VIEW, VIEW_UPLOAD), msg(
                                 "Upload more data")));
-            } else {
-                headerLinks.add(HtmlUtil.b(msg("Upload more data")));
             }
         }
 
@@ -1554,7 +1699,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             HtmlUtil.href(
                 request.entryUrl(
                     getRepository().URL_ENTRY_SHOW, entry,
-                    ARG_POINT_SHOW_DEFAULT, "true"), msg("Show default")));
+                    ARG_POINT_VIEW, VIEW_DEFAULT), msg("Show default")));
         String header = StringUtil.join("&nbsp;|&nbsp;", headerLinks);
         return HtmlUtil.center(header);
     }
@@ -1577,31 +1722,26 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         boolean canEdit = getAccessManager().canDoAction(request, entry,
                               Permission.ACTION_EDIT);
 
-        if (request.get(ARG_POINT_SHOW_DEFAULT, false)) {
+        String view = request.getString(ARG_POINT_VIEW,VIEW_SEARCHFORM);
+        if (view.equals(VIEW_DEFAULT)) {
             return null;
         }
 
-
-
-        if (request.exists(ARG_POINT_SEARCH)) {
+        boolean doSearch     = request.exists(ARG_POINT_SEARCH) || request.exists(ARG_POINT_FORMAT);
+        if (doSearch) {
             return doSearch(request, entry);
         }
 
-        if (request.get(ARG_POINT_UPLOAD_FORM, false)) {
-            return doUpload(request, entry);
-        }
-
         StringBuffer sb      = new StringBuffer();
-
-
-        boolean showMetadata = request.get(ARG_POINT_SHOW_METADATA, false);
         sb.append(getHeader(request, entry));
-        if (showMetadata) {
+        if (view.equals(VIEW_METADATA)) {
             showMetadata(sb, request, entry);
+        }  else if (view.equals(VIEW_UPLOAD)) {
+            doUpload(sb, request, entry);
         } else {
             createSearchForm(sb, request, entry);
         }
-        return new Result("Point Data Search", sb);
+        return new Result("Point Data", sb);
     }
 
 
@@ -1692,7 +1832,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 type = HtmlUtil.href(
                     request.entryUrl(
                         getRepository().URL_ENTRY_SHOW, entry,
-                        ARG_POINT_SHOW_METADATA, "true",
+                        ARG_POINT_VIEW, VIEW_METADATA,
                         ARG_POINT_CHANGETYPE, pdm.columnName), type,
                             HtmlUtil.title(msg("Change type")));
 
@@ -1724,9 +1864,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
 
 
+        Date[] dateRange = request.getDateRange(ARG_POINT_FROMDATE,
+                                                ARG_POINT_TODATE, null);
 
-        Date                    fromDate  = new Date(entry.getStartDate());
-        Date                    toDate    = new Date(entry.getEndDate());
+        if(dateRange[0] == null) dateRange[0]  = new Date(entry.getStartDate());
+        if(dateRange[1] == null) dateRange[1]  = new Date(entry.getEndDate());
+
+
         StringBuffer            basicSB   = new StringBuffer();
 
         basicSB.append(HtmlUtil.formTable());
@@ -1738,24 +1882,24 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             HtmlUtil.formEntry(
                 msgLabel("From Date"),
                 getRepository().makeDateInput(
-                    request, ARG_POINT_FROMDATE, "pointsearch", fromDate,
+                    request, ARG_POINT_FROMDATE, "pointsearch", dateRange[0],
                     timezone)));
 
         basicSB.append(
             HtmlUtil.formEntry(
                 msgLabel("To Date"),
                 getRepository().makeDateInput(
-                    request, ARG_POINT_TODATE, "pointsearch", toDate,
+                    request, ARG_POINT_TODATE, "pointsearch", dateRange[1],
                     timezone)));
 
 
         basicSB.append(HtmlUtil.formEntry(msgLabel("Month"),
                                           HtmlUtil.select(ARG_POINT_MONTH,
-                                              months, "")));
+                                              months, request.getString(ARG_POINT_MONTH,""))));
 
         basicSB.append(HtmlUtil.formEntry(msgLabel("Hour"),
                                           HtmlUtil.select(ARG_POINT_HOUR,
-                                              hours, "")));
+                                              hours, request.getString(ARG_POINT_HOUR,""))));
 
 
 
@@ -1764,11 +1908,17 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         basicSB.append(
             HtmlUtil.formEntryTop(
                 msgLabel("Location"),
-                HtmlUtil.makeLatLonBox(ARG_POINT_BBOX, "", "", "", "")));
+                HtmlUtil.makeLatLonBox(ARG_POINT_BBOX, 
+                                       request.getString(ARG_POINT_BBOX + "_south",""),
+                                       request.getString(ARG_POINT_BBOX + "_north",""),
+                                       request.getString(ARG_POINT_BBOX + "_east",""),
+                                       request.getString(ARG_POINT_BBOX + "_west",""))));
 
-        String max     = HtmlUtil.input(ARG_MAX, "1000", HtmlUtil.SIZE_5);
+        basicSB.append(HtmlUtil.hidden(ARG_POINT_REDIRECT,"true"));
+        String max     = HtmlUtil.input(ARG_MAX, request.getString(ARG_MAX,"1000"), HtmlUtil.SIZE_5);
         List   formats = Misc.toList(new Object[] {
             new TwoFacedObject("Html", FORMAT_HTML),
+            new TwoFacedObject("Interactive Chart", FORMAT_CHART),
             new TwoFacedObject("Time Series", FORMAT_TIMESERIES),
             new TwoFacedObject("Map", FORMAT_MAP),
             new TwoFacedObject("CSV-Plain", FORMAT_CSV),
@@ -1777,9 +1927,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             new TwoFacedObject("NetCDF", FORMAT_NETCDF)
         });
 
+        String format = request.getString(ARG_POINT_FORMAT, FORMAT_HTML);
         basicSB.append(HtmlUtil.formEntry(msgLabel("Format"),
-                                          HtmlUtil.select(ARG_POINT_OUTPUT,
-                                              formats) + HtmlUtil.space(2)
+                                          HtmlUtil.select(ARG_POINT_FORMAT, formats,format) + HtmlUtil.space(2)
                                                   + msgLabel("Max") + max));
 
 
@@ -1799,6 +1949,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 continue;
             }
             String suffix = HtmlUtil.space(1) + pdm.formatUnit();
+            String argSuffix = ""+pdm.columnNumber;
             String label  = pdm.formatName() + ":";
             if (pdm.isEnumeration()) {
                 List values = pdm.enumeratedValues;
@@ -1812,20 +1963,24 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                     pdm.enumeratedValues = values;
                 }
                 String field = HtmlUtil.select(ARG_POINT_FIELD_VALUE
-                                   + pdm.columnName, values);
+                                   + argSuffix, values);
                 extra.append(HtmlUtil.formEntry(label, field));
             } else if (pdm.isString()) {
                 String field = HtmlUtil.input(ARG_POINT_FIELD_VALUE
-                                   + pdm.columnName, "", HtmlUtil.SIZE_20);
+                                   + argSuffix, request.getString(ARG_POINT_FIELD_VALUE
+                                   + argSuffix,""), HtmlUtil.SIZE_20);
                 String cbx = HtmlUtil.checkbox(ARG_POINT_FIELD_EXACT
-                                 + pdm.columnName, "true", false) + " "
+                                 + argSuffix, "true", request.get(ARG_POINT_FIELD_EXACT
+                                 + argSuffix,false)) + " "
                                      + msg("Exact");
                 extra.append(HtmlUtil.formEntry(label, field + " " + cbx));
             } else {
                 String op = HtmlUtil.select(ARG_POINT_FIELD_OP
-                                            + pdm.columnName, ops);
+                                            + argSuffix, ops,request.getString(ARG_POINT_FIELD_OP
+                                            + argSuffix,""));
                 String field = HtmlUtil.input(ARG_POINT_FIELD_VALUE
-                                   + pdm.columnName, "", HtmlUtil.SIZE_10);
+                                   + argSuffix, request.getString(ARG_POINT_FIELD_VALUE
+                                   + argSuffix,""), HtmlUtil.SIZE_10);
                 extra.append(HtmlUtil.formEntry(label,
                         op + " " + field + suffix));
             }
@@ -1835,16 +1990,19 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         StringBuffer what = new StringBuffer();
         what.append("<ul>");
-        what.append(HtmlUtil.checkbox(ARG_POINT_WHAT_ALL, "true", false));
+        what.append(HtmlUtil.checkbox(ARG_POINT_PARAM_ALL, "true", request.get(ARG_POINT_PARAM_ALL,false)));
         what.append(HtmlUtil.space(1));
         what.append(msg("All"));
         what.append(HtmlUtil.br());
+        List list = request.get(ARG_POINT_PARAM, new ArrayList());
         for (PointDataMetadata pdm : metadata) {
             if (pdm.isBasic()) {
                 continue;
             }
-            what.append(HtmlUtil.checkbox(ARG_POINT_WHAT, pdm.columnName,
-                                          pdm.isBasic()));
+            String value = ""+pdm.columnNumber;
+            boolean checked = pdm.isBasic() || list.contains(value);
+            what.append(HtmlUtil.checkbox(ARG_POINT_PARAM, value,
+                                          checked));
             what.append(HtmlUtil.space(1));
             what.append(pdm.formatName());
             what.append(HtmlUtil.br());
@@ -1854,10 +2012,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         //        sb.append(header(msg("Point Data Search")));
         sb.append(
-            HtmlUtil.formPost(
-                getRepository().URL_ENTRY_SHOW + "/"
-                + IOUtil.stripExtension(
-                    getStorageManager().getFileTail(entry)), HtmlUtil.attr(
+            HtmlUtil.formPost(getRepository().URL_ENTRY_SHOW.toString(), HtmlUtil.attr(
                     "name", "pointsearch") + HtmlUtil.id("pointsearch")));
 
         sb.append(HtmlUtil.submit(msg("Search"), ARG_POINT_SEARCH));

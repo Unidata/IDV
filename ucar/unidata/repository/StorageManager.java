@@ -1243,7 +1243,18 @@ public class StorageManager extends RepositoryManager {
     public void moveFile(File from, File to) throws Exception {
         checkFile(from);
         checkWriteFile(to);
-        IOUtil.moveFile(from, to);
+        try {
+            IOUtil.moveFile(from, to);
+        } catch(Exception exc) {
+            //Handle the windows file move problem
+            if (to.isDirectory()) {
+                to = new File(IOUtil.joinDir(to, IOUtil.getFileTail(from.toString())));
+            }
+            IOUtil.copyFile(from, to);
+            if(!from.delete()) {
+                from.deleteOnExit();
+            }
+        }
     }
 
 

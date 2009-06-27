@@ -19,6 +19,7 @@
       <api request="/entry/new"              method="processEntryNew"        actions="new"/>
       <api request="/entry/upload"           method="processEntryUpload"     actions="upload"/>
       <api request="/entry/get/*"            method="processEntryGet"        authmethod="httpauth" cancache="false" actions="file"/>
+
       <api request="/entry/getentries"       method="processGetEntries" />
       <api request="/entry/copy"             method="processEntryCopy"/>
       <api request="/entry/xmlcreate"        method="processEntryXmlCreate"/>
