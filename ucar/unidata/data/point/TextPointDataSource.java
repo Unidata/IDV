@@ -126,8 +126,8 @@ public class TextPointDataSource extends PointDataSource {
 
     /** variables for time */
     private String[] timeVars = {
-        "time_nominal", "time_Nominal", "timeNominal", "timeObs",
-        "reportTime", "time", "nominal_time", "Time", "observation_time"
+        "time_nominal", "time_Nominal", "timeNominal", "timeObs","obtime",
+        "reportTime", "time", "nominal_time", "Time", "observation_time","datetime","dttm"
     };
 
 
@@ -136,6 +136,9 @@ public class TextPointDataSource extends PointDataSource {
 
     /** variables for longitude */
     private String[] lonVars = { "Longitude", "longitude", "lon" };
+
+
+    private String[] altVars = { "altitude", "Altitude", "elevation" };
 
 
     /** variables for index */
@@ -192,6 +195,13 @@ public class TextPointDataSource extends PointDataSource {
         init();
     }
 
+    public TextPointDataSource(String source)
+        throws VisADException {
+        this(new DataSourceDescriptor(), source, new Hashtable());
+    }
+
+
+
     /**
      * Create a new TextPointDataSource
      *
@@ -225,7 +235,7 @@ public class TextPointDataSource extends PointDataSource {
      *
      * @throws Exception  problem creating data
      */
-    protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
+    public FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
                                 LatLonRect bbox)
             throws Exception {
         //        System.err.println("MAKE OBS");
@@ -298,7 +308,7 @@ public class TextPointDataSource extends PointDataSource {
      *
      * @throws Exception On badness
      */
-    protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
+    public FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
                                 LatLonRect bbox, String trackParam,
                                 boolean sampleIt,
                                 boolean showAttributeGuiIfNeeded)
@@ -335,7 +345,7 @@ public class TextPointDataSource extends PointDataSource {
      *
      * @throws Exception On badness
      */
-    protected FieldImpl makeObs(String contents, String delimiter,
+    public FieldImpl makeObs(String contents, String delimiter,
                                 DataSelection subset, LatLonRect bbox,
                                 String trackParam, boolean sampleIt,
                                 boolean showAttributeGuiIfNeeded)
@@ -1347,6 +1357,18 @@ public class TextPointDataSource extends PointDataSource {
             }
 
 
+            if (altIndex < 0) {
+                for (int i = 0; i < altVars.length; i++) {
+                    altIndex = type.getIndex(altVars[i]);
+                    if (altIndex > -1) {
+                        break;
+                    }
+                }
+            }
+
+
+
+
             if (altIndex >= 0) {
                 varNames.add("Altitude");
             }
@@ -1830,7 +1852,6 @@ public class TextPointDataSource extends PointDataSource {
             TextPointDataSource dataSource =
                 new TextPointDataSource(new DataSourceDescriptor(), csvFile,
                                         properties);
-
 
             String contents;
             if (args[i].endsWith(".xls")) {
