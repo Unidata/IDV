@@ -453,7 +453,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                            metadata.size(), "degrees",
                                            PointDataMetadata.TYPE_DOUBLE));
         metadata.add(new PointDataMetadata(tableName, COL_ALTITUDE,
-                                           metadata.size(), "m",
+                                           metadata.size(), "Altitude","Altitude","m",
                                            PointDataMetadata.TYPE_DOUBLE));
         metadata.add(new PointDataMetadata(tableName, COL_MONTH,
                                            metadata.size(), "",
@@ -2198,7 +2198,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                 new TwoFacedObject("=", OP_EQUALS));
 
         for (PointDataMetadata pdm : metadata) {
-            if (pdm.isBasic()) {
+            if (pdm.isBasic()&& !pdm.columnName.equals(COL_ALTITUDE)) {
                 continue;
             }
             String suffix = HtmlUtil.space(1) + pdm.formatUnit();
@@ -2251,7 +2251,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         int cbxCnt = 0;
 
         for (PointDataMetadata pdm : metadata) {
-            if (pdm.isBasic() && !pdm.columnName.equals(COL_ALTITUDE)) {
+            if (pdm.isBasic()) {
                 continue;
             }
             String value = ""+pdm.columnNumber;
