@@ -950,7 +950,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
 
         for (PointDataMetadata pdm : metadata) {
-            if (pdm.isBasic()) {
+            if (pdm.isBasic()&& !pdm.columnName.equals(COL_ALTITUDE)) {
                 continue;
             }
             String suffix = ""+pdm.columnNumber;
