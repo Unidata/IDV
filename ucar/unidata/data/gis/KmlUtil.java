@@ -23,12 +23,14 @@
 package ucar.unidata.data.gis;
 
 
+import java.text.SimpleDateFormat;
 import visad.DateTime;
 
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.StringUtil;
+import java.util.Date;
 import java.awt.Color;
 
 
@@ -149,11 +151,30 @@ public class KmlUtil {
         return makeText(parent,TAG_VISIBLE, (visible?"1":"0"));
     }
 
+
+
     public static Element timestamp(Element parent, DateTime dttm) {
         String when = dttm.formattedString("yyyy-MM-dd", DateUtil.TIMEZONE_GMT)
             + "T"
             + dttm.formattedString("HH:mm:ss", DateUtil.TIMEZONE_GMT)
             + "Z";
+        Element timestamp = makeElement(parent, TAG_TIMESTAMP);
+        makeText(timestamp,TAG_WHEN, when);
+        return timestamp;
+    }
+
+
+    private static SimpleDateFormat sdf1;
+    private static SimpleDateFormat sdf2;
+    public static Element timestamp(Element parent, Date dttm) {
+        if(sdf1 == null) {
+            sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+            sdf2 = new SimpleDateFormat("HH:mm:ss");
+            sdf1.setTimeZone(DateUtil.TIMEZONE_GMT);
+            sdf2.setTimeZone(DateUtil.TIMEZONE_GMT);
+
+        }
+        String when = sdf1.format(dttm)+"T" + sdf2.format(dttm)+"Z";
         Element timestamp = makeElement(parent, TAG_TIMESTAMP);
         makeText(timestamp,TAG_WHEN, when);
         return timestamp;
