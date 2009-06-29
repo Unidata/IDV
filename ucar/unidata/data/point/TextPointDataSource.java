@@ -138,7 +138,7 @@ public class TextPointDataSource extends PointDataSource {
     private String[] lonVars = { "Longitude", "longitude", "lon" };
 
 
-    private String[] altVars = { "altitude", "Altitude", "elevation" };
+    private String[] altVars = { "altitude", "Altitude", "elevation","Elevation" };
 
 
     /** variables for index */
