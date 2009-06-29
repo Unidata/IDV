@@ -2251,7 +2251,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         int cbxCnt = 0;
 
         for (PointDataMetadata pdm : metadata) {
-            if (pdm.isBasic()) {
+            if (pdm.isBasic() && !pdm.columnName.equals(COL_ALTITUDE)) {
                 continue;
             }
             String value = ""+pdm.columnNumber;
