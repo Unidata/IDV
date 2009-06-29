@@ -969,12 +969,13 @@ public class DatabaseManager extends RepositoryManager {
      *
      * @return _more_
      */
-    protected String getLimitString(int skip, int max) {
+    public String getLimitString(int skip, int max) {
         if(skip<0) skip=0;
         if(max<0) max  = DB_MAX_ROWS;
         if (db.equals(DB_MYSQL)) {
             return " LIMIT " + max + " OFFSET " + skip + " ";
         } else if (db.equals(DB_DERBY)) {
+            //            return " OFFSET " + skip + " ROWS ";
             return "";
         } else if (db.equals(DB_POSTGRES)) {
             return " LIMIT " + max + " OFFSET " + skip + " ";

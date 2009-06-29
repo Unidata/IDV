@@ -95,6 +95,11 @@ import ucar.unidata.repository.output.OutputHandler;
 import ucar.unidata.sql.Clause;
 
 
+import org.w3c.dom.*;
+import org.w3c.dom.Element;
+
+import ucar.unidata.data.gis.KmlUtil;
+
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
@@ -107,6 +112,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
+import ucar.unidata.xml.XmlEncoder;
 
 import visad.FieldImpl;
 
@@ -133,6 +139,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Formatter;
@@ -157,11 +164,17 @@ import javax.swing.*;
  */
 public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
+    public  static final String PROP_ID = "point.id";
+
+    public  static final String PROP_CNT = "point.cnt";
+
     /** _more_ */
     public static String TYPE_POINTDATABASE = "pointdatabase";
 
     /** _more_          */
     public static final String FORMAT_HTML = "html";
+
+    public static final String FORMAT_KML = "kml";
 
     /** _more_          */
     public static final String FORMAT_TIMESERIES = "timeseries";
@@ -200,12 +213,15 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
 
     /** _more_          */
-    public static final double MISSING = -987654.98765;
+    public static final double MISSING = -987654.987654;
 
     /** _more_          */
     public static final String ARG_POINT_REDIRECT = "redirect";
     public static final String ARG_POINT_CHANGETYPE = "changetype";
 
+    public static final String ARG_POINT_ASCENDING = "ascending";
+
+    public static final String ARG_POINT_SORTBY = "sortby";
 
     /** _more_          */
     public static final String ARG_POINT_UPLOAD_FILE = "upload_file";
@@ -271,6 +287,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     /** _more_          */
     public static final String OP_EQUALS = "op_equals";
 
+    public static final String COL_ID = "obid";
+
     /** _more_          */
     public static final String COL_DATE = "obtime";
 
@@ -290,7 +308,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     public static final String COL_HOUR = "obhour";
 
     /** _more_          */
-    public static final int NUM_BASIC_COLUMNS = 6;
+    public static final int NUM_BASIC_COLUMNS = 7;
 
     /** _more_          */
     private List<TwoFacedObject> months;
@@ -301,6 +319,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     /** _more_          */
     private Hashtable<String, List<PointDataMetadata>> metadataCache =
         new Hashtable<String, List<PointDataMetadata>>();
+
+
+    private Hashtable<String, Hashtable> propertiesCache =
+        new Hashtable<String, Hashtable>();
 
     /**
      * _more_
@@ -340,6 +362,21 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     }
 
 
+    private Hashtable  getProperties(Entry entry) throws Exception {
+        Hashtable properties = propertiesCache.get(entry.getId());
+        if(properties == null) {
+            Object[] values       = entry.getValues();
+            XmlEncoder   xmlEncoder = new XmlEncoder();
+            if(values != null  && values.length>0 && values[0]!=null) {
+                properties = (Hashtable) xmlEncoder.decodeXml((String)values[0]);
+            } else {
+                properties = new Hashtable();
+            }
+            propertiesCache.put(entry.getId(),properties);
+        }
+        return properties;
+    }
+
 
     /**
      * _more_
@@ -351,6 +388,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      */
     public void initializeEntry(Request request, Entry entry)
             throws Exception {
+        Hashtable properties = getProperties(entry);
+
+
         Connection connection = getDatabaseManager().getNewConnection();
         connection.setAutoCommit(false);
         try {
@@ -398,6 +438,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         List<PointDataMetadata> numericMetadata =
             new ArrayList<PointDataMetadata>();
 
+
+        metadata.add(new PointDataMetadata(tableName, COL_ID,
+                                           metadata.size(), "",
+                                           PointDataMetadata.TYPE_INT));
 
         metadata.add(new PointDataMetadata(tableName, COL_DATE,
                                            metadata.size(), "",
@@ -586,6 +630,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         boolean didone = false;
 
+        int baseId = Misc.getProperty(getProperties(entry),PROP_ID,0);
+        int newCnt = 0;
         while (pfi.hasNext()) {
             PointFeature                      po = (PointFeature) pfi.next();
             ucar.unidata.geoloc.EarthLocation el = po.getLocation();
@@ -635,19 +681,18 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             didone = true;
 
 
-
             calendar.setTime(time);
             StructureData structure           = po.getData();
-
-
             boolean       hadAnyNumericValues = false;
             boolean       hadGoodNumericValue = false;
 
 
-
             for (PointDataMetadata pdm : metadata) {
                 Object value;
-                if (COL_LATITUDE.equals(pdm.columnName)) {
+                if (COL_ID.equals(pdm.columnName)) {
+                    value = new Integer(baseId);
+                    baseId++;
+                } else if (COL_LATITUDE.equals(pdm.columnName)) {
                     value = new Double(checkWriteValue(lat));
                 } else if (COL_LONGITUDE.equals(pdm.columnName)) {
                     value = new Double(checkWriteValue(lon));
@@ -679,6 +724,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             if (hadAnyNumericValues && !hadGoodNumericValue) {
                 continue;
             }
+            newCnt++;
             getDatabaseManager().setValues(insertStmt, values);
             insertStmt.addBatch();
             batchCnt++;
@@ -693,6 +739,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         if (batchCnt > 0) {
             insertStmt.executeBatch();
         }
+
+        Hashtable properties = getProperties(entry);
+        cnt =  getDatabaseManager().getCount(tableName,null);
+        properties.put(PROP_CNT,""+cnt);
+        properties.put(PROP_ID,baseId+"");
+        XmlEncoder   xmlEncoder = new XmlEncoder();
+        entry.setValues(new Object[]{xmlEncoder.encodeObject(properties)});
 
         if (didone) {
             entry.setWest(west);
@@ -796,6 +849,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 urlSuffix = ".csv";
             } else if(format.equals(FORMAT_XLS)) {
                 urlSuffix = ".xls";
+            } else if(format.equals(FORMAT_KML)) {
+                urlSuffix = ".kml";
             } else if(format.equals(FORMAT_NETCDF)) {
                 urlSuffix = ".nc";
             }
@@ -942,11 +997,24 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         }
 
 
+
+        String sortByCol = COL_DATE;
+        String orderDir = (request.get(ARG_POINT_ASCENDING,false)?" ASC ":" DESC ");
+
+        String sortByArg = request.getString(ARG_POINT_SORTBY,"");
+        for (PointDataMetadata pdm : metadata) {
+            if(pdm.columnName.equals(sortByArg)) {
+                sortByCol = sortByArg;
+                break;
+            }
+        }
+
         Statement stmt = getDatabaseManager().select(cols.toString(),
                              Misc.newList(tableName),
                              Clause.and(Clause.toArray(clauses)),
-                             " ORDER BY " + COL_DATE + " ASC ",
-                             request.get(ARG_MAX, 1000));
+                             " ORDER BY " + sortByCol + orderDir+
+                                                     getDatabaseManager().getLimitString(request.get(ARG_SKIP,0), request.get(ARG_MAX,1000)),
+                                                     request.get(ARG_MAX, 1000));
 
         SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
         ResultSet        results;
@@ -956,8 +1024,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             while (results.next()) {
                 int col = 1;
                 PointData pointData =
-                    new PointData(getDatabaseManager().getDate(results,
-                        col++), checkReadValue(results.getDouble(col++)),
+                    new PointData(results.getInt(col++),
+                                  getDatabaseManager().getDate(results, col++), 
+                                  checkReadValue(results.getDouble(col++)),
                                 checkReadValue(results.getDouble(col++)),
                                 checkReadValue(results.getDouble(col++)), 0,
                                 0);
@@ -979,6 +1048,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         if (format.equals(FORMAT_HTML) || format.equals(FORMAT_TIMELINE)) {
             return makeSearchResultsHtml(request, entry, columnsToUse,
+                                         pointDataList,
+                                         format.equals(FORMAT_TIMELINE));
+        }  if (format.equals(FORMAT_KML)) {
+            return makeSearchResultsKml(request, entry, columnsToUse,
                                          pointDataList,
                                          format.equals(FORMAT_TIMELINE));
         } else if (format.equals(FORMAT_CSV) || format.equals(FORMAT_CSVIDV)
@@ -1043,25 +1116,43 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
     }
 
-
-    private Result makeSearchResultsChart(
-            Request request, Entry entry,
-            List<PointDataMetadata> columnsToUse, List<PointData> list)
-            throws Exception {
-
+    private void getHtmlHeader(Request request, StringBuffer sb, Entry entry, List<PointData> list) throws Exception 
+    {
         StringBuffer searchForm = new StringBuffer();
         searchForm.append("<ul><hr>");
         createSearchForm(searchForm, request, entry);
         searchForm.append("<hr></ul>");
 
 
-        StringBuffer sb = new StringBuffer();
+        int numItems = list.size();
+        int max = request.get(ARG_MAX, 1000);
+        if ((numItems > 0) && ((numItems == max) || request.defined(ARG_SKIP))) {
+            int skip = Math.max(0, request.get(ARG_SKIP, 0));
+            sb.append(msgLabel("Showing") + (skip + 1) + "-" + (skip + numItems));
+        }
+
         request.remove(ARG_POINT_SEARCH);
         request.remove(ARG_POINT_FORMAT);
         sb.append(getHeader(request, entry));
         sb.append(header(msg("Point Data Search Results")));
         sb.append(HtmlUtil.makeShowHideBlock(msg("Search Again"),
                                              searchForm.toString(), false));
+
+
+        
+    }
+
+    
+
+
+
+    private Result makeSearchResultsChart(
+            Request request, Entry entry,
+            List<PointDataMetadata> columnsToUse, List<PointData> list)
+            throws Exception {
+
+        StringBuffer sb = new StringBuffer();
+        getHtmlHeader(request,  sb, entry, list);
 
         if (list.size() == 0) {
             sb.append(msg("No results found"));
@@ -1070,11 +1161,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         sb.append("<script type=\"text/javascript\" src=\"http://www.google.com/jsapi\"></script>\n");
         sb.append("<script type=\"text/javascript\">\ngoogle.load('visualization', '1', {'packages':['motionchart']});\ngoogle.setOnLoadCallback(drawChart);\nfunction drawChart() {\n        var data = new google.visualization.DataTable();\n");
         sb.append("data.addRows(" + list.size()+");\n");
-        //        data.addColumn('string', 'Fruit');
+
         sb.append("data.addColumn('string', 'Location');\n");
         sb.append("data.addColumn('date', 'Date');\n");
-        sb.append("data.addColumn('number', 'Latitude');\n");
         sb.append("data.addColumn('number', 'Longitude');\n");
+        sb.append("data.addColumn('number', 'Latitude');\n");
+        sb.append("data.addColumn('number', 'Month');\n");
+
         int entityIdx=-1;
         int idx =-1;
         for (PointDataMetadata pdm : columnsToUse) {
@@ -1117,8 +1210,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
             //            if(row<10)        sb.append("alert(theDate);\n");
             sb.append("data.setValue(" +row+", 1, theDate);\n");
-            sb.append("data.setValue(" +row+", 2,"+ pointData.lat+");\n");
-            sb.append("data.setValue(" +row+", 3," +pointData.lon+");\n");
+            sb.append("data.setValue(" +row+", 2," +pointData.lon+");\n");
+            sb.append("data.setValue(" +row+", 3,"+ pointData.lat+");\n");
+            sb.append("data.setValue(" +row+", 4,"+ pointData.month+");\n");
+
 
             int  cnt    = -1;
             for (PointDataMetadata pdm : columnsToUse) {
@@ -1128,19 +1223,12 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 cnt++;
                 Object value = values.get(cnt);
                 if(pdm.isString()) {
-                    sb.append("data.setValue(" +row+", " + (cnt+4) +", '" +value +"');\n");
+                    sb.append("data.setValue(" +row+", " + (cnt+5) +", '" +value +"');\n");
                 } else {
-                    sb.append("data.setValue(" +row+", " + (cnt+4) +", " +value +");\n");
+                    sb.append("data.setValue(" +row+", " + (cnt+5) +", " +value +");\n");
                 }
             }
         }
-
-        /*
-        data.setValue(0, 0, 'Apples');
-        data.setValue(0, 1, new Date (1988,0,1));
-        data.setValue(0, 2, 1000);
-        data.setValue(0, 3, 300);
-        data.setValue(0, 4, 'East');*/
 
         sb.append("var chart = new google.visualization.MotionChart(document.getElementById('chart_div'));\n");
         sb.append("chart.draw(data, {width: 800, height:500});\n");
@@ -1150,6 +1238,57 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         return new Result("Point Search Results", sb);
     }
+
+
+    private Result makeSearchResultsKml(
+            Request request, Entry entry,
+            List<PointDataMetadata> columnsToUse, List<PointData> list,
+            boolean showTimeline)
+            throws Exception {
+        Element             root         = KmlUtil.kml(entry.getName());
+        Element             docNode = KmlUtil.document(root, entry.getName());
+        
+        for (PointData pointData : list) {
+            int lblCnt = 0;
+            StringBuffer  info      = new StringBuffer("");
+            StringBuffer  label      = new StringBuffer("");
+            info.append("<b>Date:</b> " + pointData.date + "<br>");
+            List values = pointData.values;
+            int  cnt    = -1;
+            for (PointDataMetadata pdm : columnsToUse) {
+                if (pdm.isBasic()) {
+                    continue;
+                }
+                cnt++;
+                Object value = values.get(cnt);
+                if(lblCnt<4) {
+                    if(lblCnt>0)
+                        label.append("/");
+                    lblCnt++;
+                    if(value instanceof Double) {
+                        value = Misc.format(((Double)value).doubleValue());
+                        label.append(value+ pdm.formatUnit()+"");
+                    } else {
+                        label.append(""+value);
+                    }
+                }
+                info.append(HtmlUtil.b(pdm.formatName())+":" +value+" " +pdm.formatUnit()+"<br>");
+            }
+            
+            Element placemark  = KmlUtil.placemark(docNode, label.toString(),
+                                                   info.toString(), pointData.lat, pointData.lon, pointData.alt, null);
+            KmlUtil.timestamp(placemark, pointData.date);
+        }
+        
+        StringBuffer sb = new StringBuffer(XmlUtil.toString(root));
+
+        return new Result(msg("Point Data"), sb,
+                          getRepository().getMimeTypeFromSuffix(".kml"));
+        
+    }
+
+
+
 
 
     /**
@@ -1172,18 +1311,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             throws Exception {
 
         StringBuffer sb = new StringBuffer();
-        sb.append(getHeader(request, entry));
-        sb.append(header(msg("Point Data Search Results")));
-
-        request.remove(ARG_POINT_SEARCH);
-        request.remove(ARG_POINT_FORMAT);
-        StringBuffer searchForm = new StringBuffer();
-        searchForm.append("<ul><hr>");
-        createSearchForm(searchForm, request, entry);
-        searchForm.append("<hr></ul>");
-        sb.append(HtmlUtil.makeShowHideBlock(msg("Search Again"),
-                                             searchForm.toString(), false));
-
+        getHtmlHeader(request,  sb, entry, list);
 
         if (list.size() == 0) {
             sb.append(msg("No results found"));
@@ -1217,7 +1345,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         sb.append("<table>");
         StringBuffer header =
-            new StringBuffer(HtmlUtil.cols(HtmlUtil.b(msg("Date")),
+            new StringBuffer(HtmlUtil.cols(HtmlUtil.b(msg("ID")),
+                                           HtmlUtil.b(msg("Date")),
                                            HtmlUtil.b(msg("Latitude")),
                                            HtmlUtil.b(msg("Longitude")),
                                            HtmlUtil.b(msg("Altitude"))));
@@ -1235,7 +1364,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         for (PointData pointData : list) {
             StringBuffer row = new StringBuffer();
-            row.append(HtmlUtil.cols(pointData.date.toString(),
+            row.append(HtmlUtil.cols(pointData.id+"",
+                                     pointData.date.toString(),
                                      "" + pointData.lat, "" + pointData.lon,
                                      "" + pointData.alt));
             List values = pointData.values;
@@ -1919,19 +2049,39 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         List   formats = Misc.toList(new Object[] {
             new TwoFacedObject("Html", FORMAT_HTML),
             new TwoFacedObject("Interactive Chart", FORMAT_CHART),
-            new TwoFacedObject("Time Series", FORMAT_TIMESERIES),
+            new TwoFacedObject("Time Series Image", FORMAT_TIMESERIES),
             new TwoFacedObject("Map", FORMAT_MAP),
-            new TwoFacedObject("CSV-Plain", FORMAT_CSV),
-            new TwoFacedObject("CSV-Header", FORMAT_CSVHEADER),
+            new TwoFacedObject("Google Earth KML", FORMAT_KML),
+            //            new TwoFacedObject("CSV-Plain", FORMAT_CSV),
+            new TwoFacedObject("CSV", FORMAT_CSVHEADER),
             new TwoFacedObject("CSV-IDV", FORMAT_CSVIDV),
             new TwoFacedObject("NetCDF", FORMAT_NETCDF)
         });
 
         String format = request.getString(ARG_POINT_FORMAT, FORMAT_HTML);
+
+
+        List sortByList = new ArrayList();
+        sortByList.add(new TwoFacedObject("Date",COL_DATE));
+        for (PointDataMetadata pdm : metadata) {
+            if (pdm.isBasic()) {
+                continue;
+            }
+            sortByList.add(new TwoFacedObject(pdm.formatName(),pdm.columnName));
+        }
+        
+        int cnt = Misc.getProperty(getProperties(entry),PROP_CNT,-1);
+        if(cnt<0) {
+            cnt  = getDatabaseManager().getCount(tableName,null);
+            getProperties(entry).put(PROP_CNT,""+cnt);
+        }
+
+        String sortBy = HtmlUtil.select(ARG_POINT_SORTBY, sortByList,request.getString(ARG_POINT_SORTBY,""));
         basicSB.append(HtmlUtil.formEntry(msgLabel("Format"),
                                           HtmlUtil.select(ARG_POINT_FORMAT, formats,format) + HtmlUtil.space(2)
-                                                  + msgLabel("Max") + max));
-
+                                                  + msgLabel("Max") + max+ HtmlUtil.space(1)+"(" + cnt +" " + msg("total") +")" +HtmlUtil.space(2) +
+                                          HtmlUtil.checkbox(ARG_POINT_ASCENDING,"true", request.get(ARG_POINT_ASCENDING,true)) + " " + msg("Ascending")+HtmlUtil.space(2) +
+                                          msgLabel("Sort by") + " " + sortBy));
 
 
 
@@ -1963,7 +2113,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                     pdm.enumeratedValues = values;
                 }
                 String field = HtmlUtil.select(ARG_POINT_FIELD_VALUE
-                                   + argSuffix, values);
+                                   + argSuffix, values,request.getString(ARG_POINT_FIELD_VALUE+argSuffix,""));
                 extra.append(HtmlUtil.formEntry(label, field));
             } else if (pdm.isString()) {
                 String field = HtmlUtil.input(ARG_POINT_FIELD_VALUE
@@ -1995,14 +2145,29 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         what.append(msg("All"));
         what.append(HtmlUtil.br());
         List list = request.get(ARG_POINT_PARAM, new ArrayList());
+        int cbxCnt = 0;
+
         for (PointDataMetadata pdm : metadata) {
             if (pdm.isBasic()) {
                 continue;
             }
             String value = ""+pdm.columnNumber;
+
             boolean checked = pdm.isBasic() || list.contains(value);
+            String cbxId = "cbx" + (cbxCnt++);
+            String cbxExtra = HtmlUtil.id(cbxId) +
+                HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,
+                              HtmlUtil.call(
+                                            "checkboxClicked",
+                                            HtmlUtil.comma(
+                                                           "event",
+                                                           HtmlUtil.squote(ARG_POINT_PARAM),
+                                                           HtmlUtil.squote(cbxId))));
             what.append(HtmlUtil.checkbox(ARG_POINT_PARAM, value,
-                                          checked));
+                                          checked,cbxExtra));
+
+
+
             what.append(HtmlUtil.space(1));
             what.append(pdm.formatName());
             what.append(HtmlUtil.br());
@@ -2066,7 +2231,12 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                         .eq(Tables.POINTDATAMETADATA
                             .COL_TABLENAME, tableName), " ORDER BY "
                                 + Tables.POINTDATAMETADATA.COL_COLUMNNUMBER
-                                + " ASC ");
+                            + " ASC ");
+            
+
+            
+
+
             SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
             ResultSet        results;
             while ((results = iter.next()) != null) {
@@ -2363,6 +2533,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      */
     public static class PointData {
 
+        int id;
+
         /** _more_          */
         double lat;
 
@@ -2394,8 +2566,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
          * @param month _more_
          * @param hour _more_
          */
-        public PointData(Date date, double lat, double lon, double alt,
+        public PointData(int id,
+                         Date date, double lat, double lon, double alt,
                          int month, int hour) {
+            this.id = id;
             this.lat   = lat;
             this.lon   = lon;
             this.alt   = alt;

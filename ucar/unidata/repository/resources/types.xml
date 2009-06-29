@@ -79,6 +79,7 @@
      <property name="form.show.date" value="false"/>
 <!--     <property name="form.show.area" value="false"/> -->
      <property name="form.show.datatype" value="false"/>
+     <column name="properties" type="clob" size="256000" label="" cansearch="false" showinhtml="false"/>
 </type>
 
 
