@@ -386,15 +386,15 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    public void initializeEntry(Request request, Entry entry)
+    public void initializeEntry(Request request, Entry entry, Group parent, boolean newEntry)
             throws Exception {
+        if(!newEntry) return;
         Hashtable properties = getProperties(entry);
-
 
         Connection connection = getDatabaseManager().getNewConnection();
         connection.setAutoCommit(false);
         try {
-            createDatabase(request, entry, connection);
+            createDatabase(request, entry, parent, connection);
             connection.commit();
             connection.setAutoCommit(true);
             getEntryManager().addAttachment(
@@ -427,7 +427,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    private void createDatabase(Request request, Entry entry,
+    private void createDatabase(Request request, Entry entry, Group parent,
                                 Connection connection)
             throws Exception {
 
@@ -437,7 +437,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             new ArrayList<PointDataMetadata>();
         List<PointDataMetadata> numericMetadata =
             new ArrayList<PointDataMetadata>();
-
 
         metadata.add(new PointDataMetadata(tableName, COL_ID,
                                            metadata.size(), "",
@@ -463,11 +462,15 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                            PointDataMetadata.TYPE_INT));
 
 
-        FeatureDatasetPoint fdp  = getDataset(entry, entry.getFile());
-
+        FeatureDatasetPoint fdp  = getDataset(entry, parent, entry.getFile());
+        if(fdp == null) {
+            throw new IllegalArgumentException("Could not open file as point observation data");
+        }
 
         List                vars = fdp.getDataVariables();
+
         for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
+            //            System.err.println("   var:"+ var.getShortName());
             String unit = var.getUnitsString();
             if (unit == null) {
                 unit = "";
@@ -547,7 +550,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                     Tables.POINTDATAMETADATA.INSERT, pdm.getValues());
         }
         insertData(entry, metadata, fdp, connection, true);
-
     }
 
 
@@ -563,6 +565,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         if (v != v) {
             return MISSING;
         }
+        if(v == Double.POSITIVE_INFINITY) return Double.MAX_VALUE;
+        if(v == Double.NEGATIVE_INFINITY) return -Double.MAX_VALUE;
         return v;
     }
 
@@ -630,8 +634,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             new GregorianCalendar(DateUtil.TIMEZONE_GMT);
         boolean didone = false;
 
-        int baseId = Misc.getProperty(getProperties(entry),PROP_ID,0);
-        int newCnt = 0;
+        Hashtable properties = getProperties(entry);
+        int baseId = Misc.getProperty(properties,PROP_ID,0);
+        int totalCnt = Misc.getProperty(properties,PROP_CNT,0);
+        long t1 = System.currentTimeMillis();
         while (pfi.hasNext()) {
             PointFeature                      po = (PointFeature) pfi.next();
             ucar.unidata.geoloc.EarthLocation el = po.getLocation();
@@ -724,7 +730,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             if (hadAnyNumericValues && !hadGoodNumericValue) {
                 continue;
             }
-            newCnt++;
+            totalCnt++;
             getDatabaseManager().setValues(insertStmt, values);
             insertStmt.addBatch();
             batchCnt++;
@@ -732,17 +738,21 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 insertStmt.executeBatch();
                 batchCnt = 0;
             }
-            if (((cnt++) % 1000) == 0) {
+            if (((cnt++) % 5000) == 0) {
                 System.err.println("added " + cnt + " observations");
             }
         }
+
+
         if (batchCnt > 0) {
             insertStmt.executeBatch();
         }
+        insertStmt.close();
 
-        Hashtable properties = getProperties(entry);
-        cnt =  getDatabaseManager().getCount(tableName,null);
-        properties.put(PROP_CNT,""+cnt);
+        long t2 = System.currentTimeMillis();
+        System.err.println("inserted " + cnt +" observations in " + (t2-t1) +"ms");
+
+        properties.put(PROP_CNT,totalCnt+"");
         properties.put(PROP_ID,baseId+"");
         XmlEncoder   xmlEncoder = new XmlEncoder();
         entry.setValues(new Object[]{xmlEncoder.encodeObject(properties)});
@@ -778,7 +788,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         if (request.exists(ARG_POINT_UPLOAD_FILE)) {
             File file =
                 new File(request.getUploadedFile(ARG_POINT_UPLOAD_FILE));
-            FeatureDatasetPoint fdp = getDataset(entry, file);
+            FeatureDatasetPoint fdp = getDataset(entry, entry.getParentGroup(), file);
             List<PointDataMetadata> metadata =
                 getMetadata(getTableName(entry));
             Connection connection = getDatabaseManager().getNewConnection();
@@ -938,13 +948,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         List<PointDataMetadata> columnsToUse =
             new ArrayList<PointDataMetadata>();
         for (PointDataMetadata pdm : tmp) {
+            //Skip the db id, month and hour
             if (pdm.columnName.equals(COL_MONTH)
-                    || pdm.columnName.equals(COL_HOUR)) {
+                || pdm.columnName.equals(COL_HOUR)) {
                 continue;
             }
             columnsToUse.add(pdm);
         }
-
 
 
 
@@ -994,6 +1004,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             cols.append(pdm.columnName);
         }
 
+        if (cols == null) {
+            cols = new StringBuffer();
+        }
 
 
         String sortByCol = COL_DATE;
@@ -1424,8 +1437,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             StringBuffer row = new StringBuffer();
             row.append(HtmlUtil.cols(pointData.id+"",
                                      pointData.date.toString(),
-                                     "" + pointData.lat, "" + pointData.lon,
-                                     "" + pointData.alt));
+                                     "" + Misc.format(pointData.lat), "" + Misc.format(pointData.lon),
+                                     "" + Misc.format(pointData.alt)));
             List values = pointData.values;
             int  cnt    = -1;
             for (PointDataMetadata pdm : columnsToUse) {
@@ -1434,7 +1447,12 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 }
                 cnt++;
                 Object value = values.get(cnt);
-                row.append(HtmlUtil.cols("" + value));
+                if(value instanceof Double) {
+                    double d = ((Double)value).doubleValue();
+                    row.append(HtmlUtil.cols("" + Misc.format(d)));
+                } else {
+                    row.append(HtmlUtil.cols("" + value));
+                }
             }
             sb.append(HtmlUtil.row(row.toString(),
                                    HtmlUtil.attr(HtmlUtil.ATTR_ALIGN,
@@ -1500,7 +1518,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                     range = rangeMap.get(pdm.unit);
                     if(axises==null) {
                         axises= new ArrayList<ValueAxis>();
-                        range = new double[]{Double.MAX_VALUE, Double.MIN_VALUE};
+                        range = new double[]{Double.MAX_VALUE, -Double.MAX_VALUE};
                         rangeMap.put(pdm.unit, range);
                         axisMap.put(pdm.unit, axises);
                         units.add(pdm.unit);
@@ -1703,6 +1721,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         if (addHeader) {
             int cnt = 0;
             for (PointDataMetadata pdm : columnsToUse) {
+                if(pdm.isObId()) continue;
                 if (cnt != 0) {
                     sb.append(",");
                 }
@@ -1710,6 +1729,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 sb.append(pdm.formatUnit());
                 cnt++;
             }
+            sb.append("\n");
         }
 
         if (addMetadata) {
@@ -1718,6 +1738,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             h1.append("(index) -> (");
             int cnt = 0;
             for (PointDataMetadata pdm : columnsToUse) {
+                if(pdm.isObId()) continue;
                 if (cnt != 0) {
                     h1.append(",");
                     h2.append(",");
@@ -1853,15 +1874,16 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             throws Exception {
 
         TextPointDataSource dataSource = new TextPointDataSource("dummy.csv");
-
         StringBuffer        sb = getCsv(columnsToUse, list, FORMAT_CSVIDV);
         FieldImpl field = dataSource.makeObs(sb.toString(), ",", null, null,
                                              null, false, false);
 
         File file = getStorageManager().getTmpFile(request, "test.nc");
         PointObFactory.writeToNetcdf(file, field);
-        return new Result("", getStorageManager().getFileInputStream(file),
+        Result result = new Result("", getStorageManager().getFileInputStream(file),
                           "application/x-netcdf");
+        result.addHttpHeader(HtmlUtil.HTTP_CONTENT_LENGTH, "" + file.length());
+        return result;
     }
 
 
@@ -1962,12 +1984,17 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         }
 
         StringBuffer sb      = new StringBuffer();
-        sb.append(getHeader(request, entry));
         if (view.equals(VIEW_METADATA)) {
+            if(request.getString(ARG_RESPONSE,"").equals("xml")) {
+                return showMetadataXml(request, entry);
+            }
+            sb.append(getHeader(request, entry));
             showMetadata(sb, request, entry);
         }  else if (view.equals(VIEW_UPLOAD)) {
+            sb.append(getHeader(request, entry));
             doUpload(sb, request, entry);
         } else {
+            sb.append(getHeader(request, entry));
             createSearchForm(sb, request, entry);
         }
         return new Result("Point Data", sb);
@@ -2018,6 +2045,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      */
     private void showMetadata(StringBuffer sb, Request request, Entry entry)
             throws Exception {
+
+
         String tableName = getTableName(entry);
         boolean canEdit = getAccessManager().canDoAction(request, entry,
                               Permission.ACTION_EDIT);
@@ -2070,6 +2099,28 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                     pdm.unit, type)));
         }
         sb.append("</table>");
+    }
+
+
+
+    private Result showMetadataXml(Request request, Entry entry)
+            throws Exception {
+        String tableName = getTableName(entry);
+        List<PointDataMetadata> metadata = getMetadata(getTableName(entry));
+        Document doc = XmlUtil.makeDocument();
+        Element root = doc.createElement("pointmetadata");
+        StringBuffer xml = new StringBuffer();
+        for (PointDataMetadata pdm : metadata) {
+            String type = pdm.varType;
+            Element colNode = XmlUtil.create("column", root);
+            XmlUtil.create(doc, "id", colNode,""+ pdm.columnNumber,null);
+            XmlUtil.create(doc, "isbasic", colNode, ""+pdm.isBasic(),null);
+            XmlUtil.create(doc, "shortname", colNode, pdm.shortName,null);
+            XmlUtil.create(doc, "longname", colNode, pdm.longName,null);
+            XmlUtil.create(doc, "unit", colNode, pdm.unit,null);
+            XmlUtil.create(doc, "type", colNode, pdm.varType,null);
+        }
+        return new Result("",new StringBuffer(XmlUtil.toString(root)),"text/xml");
     }
 
 
@@ -2172,11 +2223,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             sortByList.add(new TwoFacedObject(pdm.formatName(),pdm.columnName));
         }
         
-        int cnt = Misc.getProperty(getProperties(entry),PROP_CNT,-1);
-        if(cnt<0) {
-            cnt  = getDatabaseManager().getCount(tableName,null);
-            getProperties(entry).put(PROP_CNT,""+cnt);
-        }
+        int cnt = Misc.getProperty(getProperties(entry),PROP_CNT,0);
 
         StringBuffer outputSB = new StringBuffer();
         outputSB.append(HtmlUtil.formTable());
@@ -2398,20 +2445,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param formBuffer _more_
-     * @param entry _more_
-     *
-     * @throws Exception _more_
-     */
-    public void addToEntryForm(Request request, StringBuffer formBuffer,
-                               Entry entry)
-            throws Exception {
-        super.addToEntryForm(request, formBuffer, entry);
+
+
+    public void addColumnsToEntryForm(Request request, StringBuffer formBuffer,
+                                      Entry entry) {
+        //noop
     }
+
 
 
     /**
@@ -2424,11 +2464,56 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    protected FeatureDatasetPoint getDataset(Entry entry, File file)
+    protected FeatureDatasetPoint getDataset(Entry entry, Group parent, File file)
             throws Exception {
         Formatter buf = new Formatter();
 
         getStorageManager().checkFile(file);
+        if(file.toString().toLowerCase().endsWith(".csv")) {
+            TextPointDataSource dataSource = new TextPointDataSource("dummy.csv");
+            String contents = getStorageManager().readSystemResource(file);
+            FieldImpl field = dataSource.makeObs(contents, ",", null, null,
+                                                 null, false, false);
+            file = getStorageManager().getTmpFile(null, "test.nc");
+            PointObFactory.writeToNetcdf(file, field);
+        }
+
+
+
+        List<Metadata> metadataList =
+            getMetadataManager().findMetadata(entry,
+                ContentMetadataHandler.TYPE_ATTACHMENT, true);
+        if (metadataList == null) {
+            metadataList =
+                getMetadataManager().findMetadata(parent,
+                                                  ContentMetadataHandler.TYPE_ATTACHMENT, true);
+        }
+
+
+        System.err.println(metadataList + " " + entry.getParentGroupId());
+        if (metadataList != null) {
+
+            for (Metadata metadata : metadataList) {
+                if (metadata.getAttr1().endsWith(".ncml")) {
+                    File templateNcmlFile =
+                        new File(
+                                 IOUtil.joinDir(
+                                                getRepository().getStorageManager().getEntryDir(
+                                                                                                metadata.getEntryId(),
+                                                                                                false), metadata.getAttr1()));
+                    String ncml = getStorageManager().readSystemResource(templateNcmlFile);
+                    ncml = ncml.replace("${location}", file.toString());
+                    File ncmlFile =
+                        getStorageManager().getScratchFile(entry.getId() + "_"
+                                                           + metadata.getId() + ".ncml");
+                    IOUtil.writeBytes(ncmlFile, ncml.getBytes());
+                    file = new File(ncmlFile.toString());
+                    break;
+                }
+            }
+        }
+
+
         FeatureDatasetPoint pods =
             (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
                 ucar.nc2.constants.FeatureType.POINT, file.toString(), null,
@@ -2543,6 +2628,11 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 return "ramadda.datetime";
             }
             return "varchar(1000)";
+        }
+
+
+        public boolean isObId() {
+            return columnName.equals(COL_ID);
         }
 
 

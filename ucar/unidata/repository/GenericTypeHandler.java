@@ -251,9 +251,9 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @throws Exception _more_
      */
-    public void initializeEntry(Request request, Entry entry)
+    public void initializeEntry(Request request, Entry entry,Group parent,boolean newEntry)
             throws Exception {
-        super.initializeEntry(request, entry);
+        super.initializeEntry(request, entry,parent, newEntry);
         if (colNames.size() <= 1) {
             return;
         }
@@ -704,11 +704,17 @@ public class GenericTypeHandler extends TypeHandler {
                                Entry entry)
             throws Exception {
         super.addToEntryForm(request, formBuffer, entry);
+        addColumnsToEntryForm(request, formBuffer, entry);
+    }
+
+
+    public void addColumnsToEntryForm(Request request, StringBuffer formBuffer,
+                               Entry entry)
+            throws Exception {
         Hashtable state = new Hashtable();
         for (Column column : columns) {
             column.addToEntryForm(request, formBuffer, entry, state);
         }
-
     }
 
 

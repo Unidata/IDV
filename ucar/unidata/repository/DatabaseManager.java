@@ -404,7 +404,6 @@ public class DatabaseManager extends RepositoryManager {
      */
     public int getCount(String table, Clause clause) throws Exception {
         Statement statement = select("count(*)", table, clause);
-
         ResultSet results   = statement.getResultSet();
         int       result;
         if ( !results.next()) {

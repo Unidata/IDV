@@ -184,9 +184,9 @@ public class ReportTypeHandler extends TypeHandler {
      *
      * @throws Exception _more_
      */
-    public void initializeEntry(Request request, Entry entry)
+    public void initializeEntry(Request request, Entry entry,Group parent, boolean newEntry)
             throws Exception {
-        super.initializeEntry(request, entry);
+        super.initializeEntry(request, entry,parent,newEntry);
         Object[] values = new Object[1];
         entry.setValues(values);
     }

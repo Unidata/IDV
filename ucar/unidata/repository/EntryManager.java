@@ -1082,7 +1082,7 @@ return new Result(title, sb);
                     initUploadedEntry(request, entry, parent);
                 }
 
-                setEntryState(request, entry);
+                setEntryState(request, entry,parent, newEntry);
                 entries.add(entry);
             }
         } else {
@@ -1130,12 +1130,8 @@ return new Result(title, sb);
             if (dateRange[1] != null) {
                 entry.setEndDate(dateRange[1].getTime());
             }
-            setEntryState(request, entry);
+            setEntryState(request, entry,entry.getParentGroup(), newEntry);
             entries.add(entry);
-
-
-
-
         }
 
 
@@ -1334,14 +1330,13 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    private void setEntryState(Request request, Entry entry)
+    private void setEntryState(Request request, Entry entry, Group parent,boolean newEntry)
             throws Exception {
         entry.setSouth(request.get(ARG_AREA + "_south", entry.getSouth()));
         entry.setNorth(request.get(ARG_AREA + "_north", entry.getNorth()));
         entry.setWest(request.get(ARG_AREA + "_west", entry.getWest()));
         entry.setEast(request.get(ARG_AREA + "_east", entry.getEast()));
-
-        entry.getTypeHandler().initializeEntry(request, entry);
+        entry.getTypeHandler().initializeEntry(request, entry,parent, newEntry);
     }
 
 

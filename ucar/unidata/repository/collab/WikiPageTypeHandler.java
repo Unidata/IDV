@@ -142,7 +142,7 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    public void initializeEntry(Request request, Entry entry)
+    public void initializeEntry(Request request, Entry entry,Group parent,boolean newEntry)
             throws Exception {
         Object[] values       = entry.getValues();
         String   originalText = null;
@@ -150,7 +150,7 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
             originalText = (String) values[0];
         }
         boolean wasNew = (values == null);
-        super.initializeEntry(request, entry);
+        super.initializeEntry(request, entry,parent,newEntry);
         String newText = (String) entry.getValues()[0];
         if ((originalText == null) || !Misc.equals(originalText, newText)) {
             String desc = "";

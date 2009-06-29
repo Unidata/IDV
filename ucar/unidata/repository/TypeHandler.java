@@ -424,7 +424,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void initializeEntry(Request request, Entry entry)
+    public void initializeEntry(Request request, Entry entry,Group parent, boolean newEntry)
             throws Exception {}
 
 
