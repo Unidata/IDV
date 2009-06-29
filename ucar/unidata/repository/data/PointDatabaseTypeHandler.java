@@ -829,9 +829,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         request.remove(ARG_POINT_REDIRECT);
         request.remove(ARG_POINT_SEARCH);
         if (format.equals(FORMAT_TIMESERIES)) {
-            request.put(ARG_POINT_FORMAT, FORMAT_TIMESERIES_IMAGE);
             StringBuffer sb = new StringBuffer();
-            sb.append(getHeader(request, entry));
+            getHtmlHeader(request,  sb, entry, null);
+            request.put(ARG_POINT_FORMAT, FORMAT_TIMESERIES_IMAGE);
             String redirectUrl = request.getRequestPath() + "/" + baseName
                               + ".png" + "?"
                               + request.getUrlArgs(null,
@@ -839,8 +839,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             sb.append(HtmlUtil.img(redirectUrl));
             return new Result("Search Results", sb);
         }
-
-
 
         if(redirect) {
             String urlSuffix= ".html";
@@ -1088,8 +1086,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      *
      * @return _more_
      */
-    private static JFreeChart createChart(XYDataset dataset) {
-        JFreeChart chart = ChartFactory.createTimeSeriesChart("Point Data",  // title
+    private static JFreeChart createChart(Request request, Entry entry,XYDataset dataset) {
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(entry.getName(),  // title
             "Date",   // x-axis label
             "",       // y-axis label
             dataset,  // data
@@ -1099,14 +1097,23 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 );
 
         chart.setBackgroundPaint(Color.white);
-
+        ValueAxis rangeAxis = new NumberAxis("");
+        rangeAxis.setVisible(false);
         XYPlot plot = (XYPlot) chart.getPlot();
-        plot.setBackgroundPaint(Color.lightGray);
-        plot.setDomainGridlinePaint(Color.white);
-        plot.setRangeGridlinePaint(Color.white);
+        if(request.get("gray",false)) {
+            plot.setBackgroundPaint(Color.lightGray);
+            plot.setDomainGridlinePaint(Color.white);
+            plot.setRangeGridlinePaint(Color.white);
+        } else {
+            plot.setBackgroundPaint(Color.white);
+            plot.setDomainGridlinePaint(Color.lightGray);
+            plot.setRangeGridlinePaint(Color.lightGray);
+        }
         plot.setAxisOffset(new RectangleInsets(5.0, 5.0, 5.0, 5.0));
         plot.setDomainCrosshairVisible(true);
         plot.setRangeCrosshairVisible(true);
+        plot.setRangeAxis(0, rangeAxis, false);
+
 
         XYItemRenderer r    = plot.getRenderer();
         DateAxis       axis = (DateAxis) plot.getDomainAxis();
@@ -1123,18 +1130,67 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         createSearchForm(searchForm, request, entry);
         searchForm.append("<hr></ul>");
 
+        StringBuffer cntSB =  new StringBuffer();
 
-        int numItems = list.size();
         int max = request.get(ARG_MAX, 1000);
+        int numItems = (list==null?max:list.size());
         if ((numItems > 0) && ((numItems == max) || request.defined(ARG_SKIP))) {
             int skip = Math.max(0, request.get(ARG_SKIP, 0));
-            sb.append(msgLabel("Showing") + (skip + 1) + "-" + (skip + numItems));
+            cntSB.append(msgLabel("Showing") + (skip + 1) + "-" + (skip + numItems));
+            List<String> toks = new ArrayList<String>();
+            String url;
+            if (skip > 0) {
+                request.put(ARG_SKIP,(skip - max)+"");
+                url = request.getRequestPath() +
+                    "?" 
+                    + request.getUrlArgs(null,
+                                         Misc.newHashtable(OP_LT, OP_LT));
+                request.put(ARG_SKIP,skip +"");
+                toks.add(HtmlUtil.href(url, msg("Previous...")));
+            }
+
+            if (numItems >= max) {
+                request.put(ARG_SKIP,(skip + max)+"");
+                url = request.getRequestPath() +
+                    "?" 
+                    + request.getUrlArgs(null,
+                                         Misc.newHashtable(OP_LT, OP_LT));
+                request.put(ARG_SKIP,skip +"");
+                toks.add(HtmlUtil.href(url, msg("Next...")));
+            }
+
+
+            if (numItems >= max) {
+                request.put(ARG_MAX, "" + (max + 100));
+                url = request.getRequestPath() +
+                    "?" 
+                    + request.getUrlArgs(null,
+                                         Misc.newHashtable(OP_LT, OP_LT));
+                toks.add(HtmlUtil.href(url, msg("View More")));
+                request.put(ARG_MAX, "" + (max / 2));
+                url = request.getRequestPath() +
+                    "?" 
+                    + request.getUrlArgs(null,
+                                         Misc.newHashtable(OP_LT, OP_LT));
+                toks.add(HtmlUtil.href(url, msg("View Less")));
+            }
+
+            request.put(ARG_SKIP, ""+skip);
+            request.put(ARG_MAX, ""+max);
+            if (toks.size() > 0) {
+                cntSB.append(HtmlUtil.space(2));
+                cntSB.append(StringUtil.join(HtmlUtil.span("&nbsp;|&nbsp;",
+                        HtmlUtil.cssClass("separator")), toks));
+            }
         }
 
-        request.remove(ARG_POINT_SEARCH);
-        request.remove(ARG_POINT_FORMAT);
+
+
         sb.append(getHeader(request, entry));
+
+
         sb.append(header(msg("Point Data Search Results")));
+        sb.append(cntSB);
         sb.append(HtmlUtil.makeShowHideBlock(msg("Search Again"),
                                              searchForm.toString(), false));
 
@@ -1413,13 +1469,18 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         }
 
         TimeSeriesCollection dummy  = new TimeSeriesCollection();
-        JFreeChart           chart  = createChart(dummy);
+        JFreeChart           chart  = createChart(request,entry,dummy);
         XYPlot               xyPlot = (XYPlot) chart.getPlot();
 
         Hashtable<String, TimeSeries> seriesMap = new Hashtable<String,
                                                       TimeSeries>();
         int paramCount = 0;
         int colorCount = 0;
+        boolean axisLeft = true;
+        Hashtable<String,List<ValueAxis>> axisMap = new Hashtable<String,List<ValueAxis>>();
+        Hashtable<String,double[]> rangeMap = new Hashtable<String,double[]>();
+        List<String> units = new ArrayList<String>();
+
         for (PointData pointData : list) {
             List values = pointData.values;
             int  cnt    = -1;
@@ -1428,37 +1489,69 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                     continue;
                 }
                 cnt++;
-                Object value = values.get(cnt);
-                if (pdm.isNumeric()) {
-                    TimeSeries series = seriesMap.get(pdm.columnName);
-                    if (series == null) {
-                        paramCount++;
-                        TimeSeriesCollection dataset =
-                            new TimeSeriesCollection();
-                        series = new TimeSeries(pdm.shortName,
-                                Millisecond.class);
-                        ValueAxis rangeAxis = new NumberAxis(pdm.shortName);
-                        XYItemRenderer renderer =
-                            new XYAreaRenderer(XYAreaRenderer.LINES);
-                        if (colorCount >= GuiUtils.COLORS.length) {
-                            colorCount = 0;
-                        }
-                        renderer.setSeriesPaint(0,
-                                GuiUtils.COLORS[colorCount]);
-                        colorCount++;
-                        xyPlot.setRenderer(paramCount, renderer);
-                        xyPlot.setRangeAxis(paramCount, rangeAxis, false);
-                        dataset.setDomainIsPointsInTime(true);
-                        dataset.addSeries(series);
-                        seriesMap.put(pdm.columnName, series);
-                        xyPlot.setDataset(paramCount, dataset);
-                        xyPlot.mapDatasetToRangeAxis(paramCount, paramCount);
+                if (!pdm.isNumeric()) {continue;}
+                double value = ((Double)values.get(cnt)).doubleValue();
+                List<ValueAxis> axises = null;
+                double[]range = null;
+                if(pdm.hasUnit()) {
+                    axises = axisMap.get(pdm.unit);
+                    range = rangeMap.get(pdm.unit);
+                    if(axises==null) {
+                        axises= new ArrayList<ValueAxis>();
+                        range = new double[]{Double.MAX_VALUE, Double.MIN_VALUE};
+                        rangeMap.put(pdm.unit, range);
+                        axisMap.put(pdm.unit, axises);
+                        units.add(pdm.unit);
                     }
-                    series.addOrUpdate(new Millisecond(pointData.date),
-                                       ((Double) value).doubleValue());
+                    if(value == value) {
+                        range[0] = Math.min(range[0],value);
+                        range[1] = Math.max(range[1],value);
+                    }
                 }
+                TimeSeries series = seriesMap.get(pdm.columnName);
+                if (series == null) {
+                    paramCount++;
+                    TimeSeriesCollection dataset =
+                        new TimeSeriesCollection();
+                    series = new TimeSeries(pdm.formatName(),
+                                            Millisecond.class);
+                    ValueAxis rangeAxis = new NumberAxis(pdm.formatName()+" " +pdm.formatUnit());
+                    if(axises!=null) axises.add(rangeAxis);
+                    XYItemRenderer renderer =
+                        new XYAreaRenderer(XYAreaRenderer.LINES);
+                    if (colorCount >= GuiUtils.COLORS.length) {
+                        colorCount = 0;
+                    }
+                    renderer.setSeriesPaint(0,
+                                            GuiUtils.COLORS[colorCount]);
+                    colorCount++;
+                    xyPlot.setRenderer(paramCount, renderer);
+                    xyPlot.setRangeAxis(paramCount, rangeAxis, false);
+                    AxisLocation side        = (axisLeft?AxisLocation.TOP_OR_LEFT:AxisLocation.BOTTOM_OR_RIGHT);
+                    axisLeft = !axisLeft;
+                    xyPlot.setRangeAxisLocation(paramCount, side);
+
+                    dataset.setDomainIsPointsInTime(true);
+                    dataset.addSeries(series);
+                    seriesMap.put(pdm.columnName, series);
+                    xyPlot.setDataset(paramCount, dataset);
+                    xyPlot.mapDatasetToRangeAxis(paramCount, paramCount);
+                }
+                series.addOrUpdate(new Millisecond(pointData.date),value);
             }
         }
+
+
+        for(String unit: units) {
+            List<ValueAxis> axises = axisMap.get(unit);
+            double[]range = rangeMap.get(unit);
+            for(ValueAxis rangeAxis: axises) {
+                rangeAxis.setRange(new org.jfree.data.Range(range[0],range[1]));
+            }
+        }
+
+
+
 
 
 
@@ -1795,11 +1888,15 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         if (!doSearch && view.equals(VIEW_SEARCHFORM)) {
             headerLinks.add(HtmlUtil.b(msg("Search form")));
         } else {
+            Object tmp1 = request.remove(ARG_POINT_SEARCH);
+            Object tmp2  = request.remove(ARG_POINT_FORMAT);
             headerLinks.add(
                 HtmlUtil.href(
                     request.entryUrl(getRepository().URL_ENTRY_SHOW, entry),
                     msg("Search form")));
 
+            if(tmp1!=null) request.put(ARG_POINT_SEARCH,tmp1);
+            if(tmp2!=null) request.put(ARG_POINT_FORMAT,tmp2);
         }
 
         if (view.equals(VIEW_METADATA)) {
@@ -2025,11 +2122,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         basicSB.append(HtmlUtil.formEntry(msgLabel("Month"),
                                           HtmlUtil.select(ARG_POINT_MONTH,
-                                              months, request.getString(ARG_POINT_MONTH,""))));
-
-        basicSB.append(HtmlUtil.formEntry(msgLabel("Hour"),
+                                                          months, request.getString(ARG_POINT_MONTH,"")) +" " +
+                                          msgLabel("Hour")+
                                           HtmlUtil.select(ARG_POINT_HOUR,
-                                              hours, request.getString(ARG_POINT_HOUR,""))));
+                                                          hours, request.getString(ARG_POINT_HOUR,""))));
 
 
 
@@ -2045,6 +2141,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                        request.getString(ARG_POINT_BBOX + "_west",""))));
 
         basicSB.append(HtmlUtil.hidden(ARG_POINT_REDIRECT,"true"));
+
+        basicSB.append(HtmlUtil.formTableClose());
+
+
         String max     = HtmlUtil.input(ARG_MAX, request.getString(ARG_MAX,"1000"), HtmlUtil.SIZE_5);
         List   formats = Misc.toList(new Object[] {
             new TwoFacedObject("Html", FORMAT_HTML),
@@ -2076,16 +2176,17 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             getProperties(entry).put(PROP_CNT,""+cnt);
         }
 
+        StringBuffer outputSB = new StringBuffer();
+        outputSB.append(HtmlUtil.formTable());
         String sortBy = HtmlUtil.select(ARG_POINT_SORTBY, sortByList,request.getString(ARG_POINT_SORTBY,""));
-        basicSB.append(HtmlUtil.formEntry(msgLabel("Format"),
-                                          HtmlUtil.select(ARG_POINT_FORMAT, formats,format) + HtmlUtil.space(2)
-                                                  + msgLabel("Max") + max+ HtmlUtil.space(1)+"(" + cnt +" " + msg("total") +")" +HtmlUtil.space(2) +
-                                          HtmlUtil.checkbox(ARG_POINT_ASCENDING,"true", request.get(ARG_POINT_ASCENDING,true)) + " " + msg("Ascending")+HtmlUtil.space(2) +
-                                          msgLabel("Sort by") + " " + sortBy));
+        outputSB.append(HtmlUtil.formEntry(msgLabel("Format"),
+                                          HtmlUtil.select(ARG_POINT_FORMAT, formats,format)));
+        outputSB.append(HtmlUtil.formEntry(msgLabel("Max"), max+ HtmlUtil.space(1)+"(" + cnt +" " + msg("total") +")"));
+        outputSB.append(HtmlUtil.formEntry(msgLabel("Sort by"), 
+                                           sortBy+" " +   HtmlUtil.checkbox(ARG_POINT_ASCENDING,"true", request.get(ARG_POINT_ASCENDING,true))+" " + msg("ascending")));
+        outputSB.append(HtmlUtil.formTableClose());
 
 
-
-        basicSB.append(HtmlUtil.formTableClose());
 
 
         StringBuffer extra = new StringBuffer();
@@ -2174,7 +2275,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         }
         what.append("</ul>");
 
-
         //        sb.append(header(msg("Point Data Search")));
         sb.append(
             HtmlUtil.formPost(getRepository().URL_ENTRY_SHOW.toString(), HtmlUtil.attr(
@@ -2185,6 +2285,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         sb.append(HtmlUtil.makeShowHideBlock(msg("Basic"),
                                              basicSB.toString(), true));
+
+        sb.append(HtmlUtil.makeShowHideBlock(msg("Output"),
+                                             outputSB.toString(), false));
 
         sb.append(HtmlUtil.makeShowHideBlock(msg("Advanced Search"),
                                              extra.toString(), false));
@@ -2471,6 +2574,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             }
             return "[" + unit + "]";
 
+        }
+
+        public boolean hasUnit() {
+            if ((unit == null) || (unit.length() == 0)) {
+                return false;
+            }
+            return true;
         }
 
         /**

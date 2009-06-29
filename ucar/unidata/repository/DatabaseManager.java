@@ -975,8 +975,7 @@ public class DatabaseManager extends RepositoryManager {
         if (db.equals(DB_MYSQL)) {
             return " LIMIT " + max + " OFFSET " + skip + " ";
         } else if (db.equals(DB_DERBY)) {
-            //            return " OFFSET " + skip + " ROWS ";
-            return "";
+            return " OFFSET " + skip + " ROWS ";
         } else if (db.equals(DB_POSTGRES)) {
             return " LIMIT " + max + " OFFSET " + skip + " ";
         }
@@ -992,7 +991,7 @@ public class DatabaseManager extends RepositoryManager {
         if (db.equals(DB_MYSQL)) {
             return true;
         } else if (db.equals(DB_DERBY)) {
-            return false;
+            return true;
         } else if (db.equals(DB_POSTGRES)) {
             return true;
         }

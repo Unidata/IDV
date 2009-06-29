@@ -261,7 +261,6 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             sb.append(msgLabel("Showing") + (skip + 1) + "-" + (skip + cnt));
             sb.append(HtmlUtil.space(4));
             List<String> toks = new ArrayList<String>();
-
             if (skip > 0) {
                 toks.add(HtmlUtil.href(request.getUrl(ARG_SKIP) + "&"
                                        + ARG_SKIP + "="
