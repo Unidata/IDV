@@ -1222,6 +1222,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         sb.append("data.addColumn('date', 'Date');\n");
         sb.append("data.addColumn('number', 'Longitude');\n");
         sb.append("data.addColumn('number', 'Latitude');\n");
+        sb.append("data.addColumn('number', 'Altitude');\n");
         sb.append("data.addColumn('number', 'Month');\n");
 
         int entityIdx=-1;
@@ -1268,7 +1269,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             sb.append("data.setValue(" +row+", 1, theDate);\n");
             sb.append("data.setValue(" +row+", 2," +pointData.lon+");\n");
             sb.append("data.setValue(" +row+", 3,"+ pointData.lat+");\n");
-            sb.append("data.setValue(" +row+", 4,"+ pointData.month+");\n");
+            sb.append("data.setValue(" +row+", 4,"+ pointData.alt+");\n");
+            sb.append("data.setValue(" +row+", 5,"+ pointData.month+");\n");
 
 
             int  cnt    = -1;
@@ -1279,9 +1281,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 cnt++;
                 Object value = values.get(cnt);
                 if(pdm.isString()) {
-                    sb.append("data.setValue(" +row+", " + (cnt+5) +", '" +value +"');\n");
+                    sb.append("data.setValue(" +row+", " + (cnt+6) +", '" +value +"');\n");
                 } else {
-                    sb.append("data.setValue(" +row+", " + (cnt+5) +", " +value +");\n");
+                    sb.append("data.setValue(" +row+", " + (cnt+6) +", " +value +");\n");
                 }
             }
         }
