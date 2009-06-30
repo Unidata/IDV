@@ -649,6 +649,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             double lon     = el.getLongitude();
             double alt     = el.getAltitude();
             Date   time    = po.getNominalTimeAsDate();
+
+            //            if(totalCnt<5)
+            //                System.err.println("altitiude:" + alt);
             long   tmpTime = time.getTime();
             if (tmpTime < minTime) {
                 minTime = tmpTime;
@@ -686,11 +689,22 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             }
             didone = true;
 
-
             calendar.setTime(time);
             StructureData structure           = po.getData();
             boolean       hadAnyNumericValues = false;
             boolean       hadGoodNumericValue = false;
+            /*
+            if(totalCnt<5) {
+                StructureMembers.Member member =
+                    structure.findMember("altitude");
+                if(member!=null) {
+                    double d = structure.convertScalarFloat(member);
+                } else {
+                    System.err.println("no member");
+
+                }
+            }
+            */
 
 
             for (PointDataMetadata pdm : metadata) {
@@ -1249,10 +1263,12 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 entityIdx  = idx;
             if(pdm.shortName.toLowerCase().indexOf("name")>=0) 
                 entityIdx  = idx;
+            String varName=   pdm.formatName();
+            varName = varName.replace("'","\\'");
             if(pdm.isString()) {
-                sb.append("data.addColumn('string', '" + pdm.shortName+"');\n");
+                sb.append("data.addColumn('string', '" + varName+"');\n");
             } else {
-                sb.append("data.addColumn('number', '" + pdm.shortName+"');\n");
+                sb.append("data.addColumn('number', '" + varName+"');\n");
             }
         }
 
@@ -1294,7 +1310,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 cnt++;
                 Object value = values.get(cnt);
                 if(pdm.isString()) {
-                    sb.append("data.setValue(" +row+", " + (cnt+6) +", '" +value +"');\n");
+                    String tmp = value.toString();
+                    tmp = tmp.replace("'","\\'");
+                    sb.append("data.setValue(" +row+", " + (cnt+6) +", '" +tmp +"');\n");
                 } else {
                     sb.append("data.setValue(" +row+", " + (cnt+6) +", " +value +");\n");
                 }
@@ -2502,7 +2520,15 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                                                                                 metadata.getEntryId(),
                                                                                                 false), metadata.getAttr1()));
                     String ncml = getStorageManager().readSystemResource(templateNcmlFile);
-                    ncml = ncml.replace("${location}", file.toString());
+                    String filePath  = file.toString();
+                    filePath = filePath.replace("\\","/");
+                    if(filePath.indexOf(":")>=0) {
+                        filePath  = IOUtil.getURL(filePath,getClass()).toString();
+                    }
+                    ncml = ncml.replace("${location}", filePath);
+                    System.err.println ("exists:" + file.exists());
+                    System.err.println ("exists:" + (new File(filePath)).exists());
+                    System.err.println ("ncml:" + ncml);
                     File ncmlFile =
                         getStorageManager().getScratchFile(entry.getId() + "_"
                                                            + metadata.getId() + ".ncml");
@@ -2511,7 +2537,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                     break;
                 }
             }
-        }
+       } 
 
 
         FeatureDatasetPoint pods =
