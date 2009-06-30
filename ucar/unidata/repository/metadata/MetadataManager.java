@@ -228,8 +228,15 @@ public class MetadataManager extends RepositoryManager {
     public List<Metadata> findMetadata(Entry entry, String type,
                                        boolean checkInherited)
             throws Exception {
+        return findMetadata(entry, type, checkInherited, true);
+    }
+
+
+    public List<Metadata> findMetadata(Entry entry, String type,
+                                       boolean checkInherited, boolean firstOk)
+            throws Exception {
         List<Metadata> result = new ArrayList<Metadata>();
-        findMetadata(entry, type, result, checkInherited, true);
+        findMetadata(entry, type, result, checkInherited, firstOk);
         if (result.size() == 0) {
             return null;
         }
@@ -249,8 +256,8 @@ public class MetadataManager extends RepositoryManager {
      * @throws Exception _more_
      */
     private void findMetadata(Entry entry, String type,
-                              List<Metadata> result, boolean checkInherited,
-                              boolean firstTime)
+                             List<Metadata> result, boolean checkInherited,
+                             boolean firstTime)
             throws Exception {
 
         if (entry == null) {

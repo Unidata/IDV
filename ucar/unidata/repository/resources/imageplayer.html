@@ -16,7 +16,7 @@
 </style>
 
 
-<SCRIPT LANGUAGE="JavaScript">
+<script LANGUAGE="JavaScript">
 var icon_blank = "${root}/icons/blank.gif";
 var icon_start="${root}/imageplayer/control_play_blue.png";
 var icon_stop="${root}/imageplayer/control_pause_blue.png";
@@ -110,13 +110,6 @@ image4.src = modeRockingImage;
 
 ${imagelist}
 
-
-
-
-//==============================================================
-//== All previous statements are performed as the page loads. ==
-//== The following functions are also defined at this time.   ==
-//==============================================================
  
 //===> Stop the animation
 function startStop() 
@@ -453,13 +446,11 @@ function displayImage() {
 
 
 // -->
-</SCRIPT>
+</script>
 
-<NOSCRIPT>
-<H3>
-This requires Javascript for an animation of the imagery.
-</H3>
-</NOSCRIPT>
+<noscript>
+<h3>This requires Javascript for an animation of the imagery.</h3>
+</noscript>
 
 
 <TABLE BORDER="1" CELLPADDING="0" CELLSPACING="0" width="100%" class="imageplayer">
@@ -472,13 +463,13 @@ This requires Javascript for an animation of the imagery.
 <div style="margin-bottom:2" id="hideboxes">&nbsp;</div>
 <div id="boxes">&nbsp;</div>
 </td>
-<FORM METHOD="POST" NAME="control_form" action="javascript:goToImage(document.control_form.frameNumber.value)">
 <td width="5%" align="right">
-<INPUT TYPE="text" NAME="frameNumber" VALUE=1 SIZE="2" ></INPUT>
+<FORM METHOD="POST" NAME="control_form" action="javascript:goToImage(document.control_form.frameNumber.value)">
+<INPUT TYPE="text" NAME="frameNumber" VALUE=1 SIZE="2" >
+</FORM>
 </td>
 </table>
 </TD>
-</FORM>
 </TR>
 <TR VALIGN="top" >
 <TD>

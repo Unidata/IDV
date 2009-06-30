@@ -132,7 +132,7 @@ public class ImageOutputHandler extends OutputHandler {
         super(repository, element);
         addType(OUTPUT_GALLERY);
         addType(OUTPUT_PLAYER);
-        addType(OUTPUT_SLIDESHOW);
+        //        addType(OUTPUT_SLIDESHOW);
         addType(OUTPUT_EDIT);
     }
 
@@ -485,7 +485,6 @@ public class ImageOutputHandler extends OutputHandler {
             }
         }
 
-        sb.append(HtmlUtil.script("Shadowbox.open('gallery');"));
 
         if (output.equals(OUTPUT_GALLERY)) {
             sb.append("</table>\n");

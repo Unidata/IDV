@@ -2497,20 +2497,16 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         }
 
 
-
         List<Metadata> metadataList =
             getMetadataManager().findMetadata(entry,
                 ContentMetadataHandler.TYPE_ATTACHMENT, true);
         if (metadataList == null) {
             metadataList =
                 getMetadataManager().findMetadata(parent,
-                                                  ContentMetadataHandler.TYPE_ATTACHMENT, true);
+                                                  ContentMetadataHandler.TYPE_ATTACHMENT, true,false);
         }
 
-
-        System.err.println(metadataList + " " + entry.getParentGroupId());
         if (metadataList != null) {
-
             for (Metadata metadata : metadataList) {
                 if (metadata.getAttr1().endsWith(".ncml")) {
                     File templateNcmlFile =

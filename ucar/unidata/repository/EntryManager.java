@@ -994,7 +994,6 @@ return new Result(title, sb);
                 dateRange[1] = dateRange[0];
             }
 
-
             for (int resourceIdx = 0; resourceIdx < resources.size();
                     resourceIdx++) {
                 Group parent = parents.get(resourceIdx);
@@ -2007,8 +2006,8 @@ return new Result(title, sb);
         String mimeType = getRepository().getMimeTypeFromSuffix(
                               IOUtil.getFileExtension(path));
 
-
-        if (request.defined(ARG_IMAGEWIDTH) && ImageUtils.isImage(path)) {
+        boolean isImage = ImageUtils.isImage(path);
+        if (request.defined(ARG_IMAGEWIDTH) && isImage) {
             int width = request.get(ARG_IMAGEWIDTH, 75);
             File thumb = getStorageManager().getThumbFile("entry"
                              + IOUtil.cleanFileName(entry.getId()) + "_"
