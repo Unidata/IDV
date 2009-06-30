@@ -216,6 +216,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     public static final double MISSING = -987654.987654;
 
     /** _more_          */
+    public static final String ARG_POINT_STRIDE = "stride";
+
     public static final String ARG_POINT_REDIRECT = "redirect";
     public static final String ARG_POINT_CHANGETYPE = "changetype";
 
@@ -730,6 +732,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                         structure.findMember((String) pdm.shortName);
                     if (pdm.isString()) {
                         value = structure.getScalarString(member);
+                        if(value== null) value = "";
+                        value = value.toString().trim();
                     } else {
                         double d = structure.convertScalarFloat(member);
                         hadAnyNumericValues = true;
@@ -1034,32 +1038,47 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             }
         }
 
+        int max = request.get(ARG_MAX,1000);
+        int stride = request.get(ARG_POINT_STRIDE,1);
+        if(stride>1) {
+            max = max*stride;
+        }
         Statement stmt = getDatabaseManager().select(cols.toString(),
                              Misc.newList(tableName),
                              Clause.and(Clause.toArray(clauses)),
                              " ORDER BY " + sortByCol + orderDir+
-                                                     getDatabaseManager().getLimitString(request.get(ARG_SKIP,0), request.get(ARG_MAX,1000)),
-                                                     request.get(ARG_MAX, 1000));
+                                                     getDatabaseManager().getLimitString(request.get(ARG_SKIP,0), max),
+                                                     max);
 
         SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
         ResultSet        results;
         int              cnt           = 0;
         List<PointData>  pointDataList = new ArrayList<PointData>();
+        
+
+        int skipHowMany = 0;
         while ((results = iter.next()) != null) {
             while (results.next()) {
+                if(skipHowMany>0) {
+                    skipHowMany--;
+                    continue;
+                }
+                if(stride>1) {
+                    skipHowMany = stride-1;
+                }
                 int col = 1;
                 PointData pointData =
                     new PointData(results.getInt(col++),
                                   getDatabaseManager().getDate(results, col++), 
                                   checkReadValue(results.getDouble(col++)),
-                                checkReadValue(results.getDouble(col++)),
-                                checkReadValue(results.getDouble(col++)), 0,
-                                0);
+                                  checkReadValue(results.getDouble(col++)),
+                                  checkReadValue(results.getDouble(col++)), 0,
+                                  0);
                 List values = new ArrayList();
                 while (col <= columnsToUse.size()) {
                     PointDataMetadata pdm = columnsToUse.get(col - 1);
                     if (pdm.isString()) {
-                        values.add(results.getString(col));
+                        values.add(results.getString(col).trim());
                     } else {
                         double d = checkReadValue(results.getDouble(col));
                         values.add(new Double(d));
@@ -1282,10 +1301,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             row++;
             cal.setTime(pointData.date);
             List values = pointData.values;
-            if(entityIdx>=0) 
-                sb.append("data.setValue(" +row+", 0, '" + values.get(entityIdx) + "');\n");
-            else
+            if(entityIdx>=0)  {
+                String tmp = values.get(entityIdx).toString().trim();
+                tmp = tmp.replace("'","\\'");
+                sb.append("data.setValue(" +row+", 0, '" + tmp + "');\n");
+            } else {
                 sb.append("data.setValue(" +row+", 0, 'latlon_" + pointData.lat+"/"+pointData.lon + "');\n");
+            }
 
 
             sb.append("theDate = new Date(" + cal.get(cal.YEAR) +"," + cal.get(cal.MONTH) +","+ cal.get(cal.DAY_OF_MONTH)+ ");\n");
@@ -1308,9 +1330,11 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                     continue;
                 }
                 cnt++;
+                //Already did the entity
+                if(cnt == entityIdx) continue;
                 Object value = values.get(cnt);
                 if(pdm.isString()) {
-                    String tmp = value.toString();
+                    String tmp = value.toString().trim();
                     tmp = tmp.replace("'","\\'");
                     sb.append("data.setValue(" +row+", " + (cnt+6) +", '" +tmp +"');\n");
                 } else {
@@ -1324,7 +1348,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         sb.append("}\n");
         sb.append("</script>\n");
         sb.append("<div id=\"chart_div\" style=\"width: 800px; height: 500px;\"></div>\n");
-
         return new Result("Point Search Results", sb);
     }
 
@@ -1529,6 +1552,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 cnt++;
                 if (!pdm.isNumeric()) {continue;}
                 double value = ((Double)values.get(cnt)).doubleValue();
+                if(value!=value) continue;
                 List<ValueAxis> axises = null;
                 double[]range = null;
                 if(pdm.hasUnit()) {
@@ -1536,15 +1560,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                     range = rangeMap.get(pdm.unit);
                     if(axises==null) {
                         axises= new ArrayList<ValueAxis>();
-                        range = new double[]{Double.MAX_VALUE, -Double.MAX_VALUE};
+                        range = new double[]{value,value};
                         rangeMap.put(pdm.unit, range);
                         axisMap.put(pdm.unit, axises);
                         units.add(pdm.unit);
                     }
-                    if(value == value) {
-                        range[0] = Math.min(range[0],value);
-                        range[1] = Math.max(range[1],value);
-                    }
+                    range[0] = Math.min(range[0],value);
+                    range[1] = Math.max(range[1],value);
                 }
                 TimeSeries series = seriesMap.get(pdm.columnName);
                 if (series == null) {
@@ -2216,6 +2238,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         basicSB.append(HtmlUtil.formTableClose());
 
 
+
         String max     = HtmlUtil.input(ARG_MAX, request.getString(ARG_MAX,"1000"), HtmlUtil.SIZE_5);
         List   formats = Misc.toList(new Object[] {
             new TwoFacedObject("Html", FORMAT_HTML),
@@ -2249,6 +2272,17 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         outputSB.append(HtmlUtil.formEntry(msgLabel("Format"),
                                           HtmlUtil.select(ARG_POINT_FORMAT, formats,format)));
         outputSB.append(HtmlUtil.formEntry(msgLabel("Max"), max+ HtmlUtil.space(1)+"(" + cnt +" " + msg("total") +")"));
+        List skip = Misc.toList(new Object[]{new TwoFacedObject("None",1),
+                                 new TwoFacedObject("Every other one",2),
+                                 new TwoFacedObject("Every third",3),
+                                 new TwoFacedObject("Every fourth",4),
+                                 new TwoFacedObject("Every fifth",5),
+                                 new TwoFacedObject("Every tenth",10),
+                                 new TwoFacedObject("Every twentieth",20),
+                                 new TwoFacedObject("Every fiftieth",50),
+                                             new TwoFacedObject("Every hundredth",100)});
+
+        outputSB.append(HtmlUtil.formEntry(msgLabel("Skip"),HtmlUtil.select(ARG_POINT_STRIDE,skip,request.getString(ARG_POINT_STRIDE,"1"))));
         outputSB.append(HtmlUtil.formEntry(msgLabel("Sort by"), 
                                            sortBy+" " +   HtmlUtil.checkbox(ARG_POINT_ASCENDING,"true", request.get(ARG_POINT_ASCENDING,true))+" " + msg("ascending")));
         outputSB.append(HtmlUtil.formTableClose());
@@ -2276,6 +2310,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                          SqlUtil.distinct(pdm.columnName),
                                          tableName, (Clause) null);
                     values = Misc.toList(SqlUtil.readString(stmt, 1));
+                    values =  new ArrayList(Misc.sort(values));
                     values.add(0, "");
                     getDatabaseManager().close(stmt);
                     pdm.enumeratedValues = values;
