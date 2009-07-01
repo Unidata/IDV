@@ -127,7 +127,7 @@ public class TextPointDataSource extends PointDataSource {
     /** variables for time */
     private String[] timeVars = {
         "time_nominal", "time_Nominal", "timeNominal", "timeObs","obtime",
-        "reportTime", "time", "nominal_time", "Time", "observation_time","datetime","dttm"
+        "reportTime", "time", "nominal_time", "Time", "observation_time","Observation_Time","datetime","dttm"
     };
 
 
@@ -2243,6 +2243,8 @@ public class TextPointDataSource extends PointDataSource {
         public List getItems() {
             return items;
         }
+
+
 
 
     }

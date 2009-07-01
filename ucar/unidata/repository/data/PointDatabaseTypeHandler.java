@@ -216,6 +216,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     public static final double MISSING = -987654.987654;
 
     /** _more_          */
+    public static final String ARG_POINT_TIMESERIES_TITLE = "timeseriestitle";
+
     public static final String ARG_POINT_STRIDE = "stride";
 
     public static final String ARG_POINT_CHART_USETIMEFORNAME = "usetimeforname";
@@ -1098,18 +1100,23 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
                 while (col <= queryColumns.size()) {
                     PointDataMetadata pdm = queryColumns.get(col - 1);
+                    if (pdm.isDate()) {
+                        continue;
+                    }
                     if (pdm.isString()) {
-                        values.add(results.getString(col).trim());
+                        pointData.setValue(pdm, results.getString(col).trim());
                     } else {
                         double d = checkReadValue(results.getDouble(col));
-                        values.add(new Double(d));
+                        pointData.setValue(pdm, new Double(d));
                     }
                     col++;
                 }
-                pointData.setValues(values);
                 pointDataList.add(pointData);
             }
         }
+
+
+
 
         if (format.equals(FORMAT_HTML) || format.equals(FORMAT_TIMELINE)) {
             return makeSearchResultsHtml(request, entry, columnsToUse,
@@ -1122,6 +1129,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         } else if (format.equals(FORMAT_CSV) || format.equals(FORMAT_CSVIDV)
                    || format.equals(FORMAT_CSVHEADER)
                    || format.equals(FORMAT_XLS)) {
+            ensureMinimalParameters(columnsToUse, metadata);
             return makeSearchResultsCsv(request, entry, columnsToUse,
                                         pointDataList, format);
 
@@ -1139,11 +1147,30 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             return makeSearchResultsMap(request, entry, columnsToUse,
                                         pointDataList);
         } else {
+            ensureMinimalParameters(columnsToUse, metadata);
             return makeSearchResultsNetcdf(request, entry, columnsToUse,
                                            pointDataList);
         }
 
     }
+
+
+    private void ensureMinimalParameters(List<PointDataMetadata> columnsToUse, List<PointDataMetadata> metadata) {
+        if(!PointDataMetadata.contains(columnsToUse,COL_DATE)) {
+            columnsToUse.add(0, PointDataMetadata.find(metadata, COL_DATE));
+        }
+
+
+        if(!PointDataMetadata.contains(columnsToUse,COL_LATITUDE)) {
+            columnsToUse.add(0, PointDataMetadata.find(metadata, COL_LATITUDE));
+        }
+
+        if(!PointDataMetadata.contains(columnsToUse,COL_LONGITUDE)) {
+            columnsToUse.add(0, PointDataMetadata.find(metadata, COL_LONGITUDE));
+        }
+    }
+
+
 
 
     /**
@@ -1154,7 +1181,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      * @return _more_
      */
     private static JFreeChart createChart(Request request, Entry entry,XYDataset dataset) {
-        JFreeChart chart = ChartFactory.createTimeSeriesChart(entry.getName(),  // title
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(request.getString(ARG_POINT_TIMESERIES_TITLE,entry.getName()),  // title
             "Date",   // x-axis label
             "",       // y-axis label
             dataset,  // data
@@ -1290,7 +1317,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         int baseCnt = 2;
 
-        int entityIdx=-1;
+        String entityCol=null;
         int idx =-1;
         boolean useTimeForName = request.get(ARG_POINT_CHART_USETIMEFORNAME,false);
         String           dateFormat  = "yyyy/MM/dd HH:mm:ss";
@@ -1300,16 +1327,20 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             if (pdm.isBasic()) {
                 continue;
             }
-            if(entityIdx<0 && pdm.shortName.toLowerCase().indexOf("station")>=0) 
-                entityIdx  = idx;
-            if(pdm.shortName.toLowerCase().indexOf("name")>=0) 
-                entityIdx  = idx;
+            if(entityCol==null && pdm.shortName.toLowerCase().indexOf("station")>=0)  {
+                entityCol  = pdm.columnName;
+                continue;
+            }
+            if(pdm.shortName.toLowerCase().indexOf("name")>=0)  {
+                entityCol  = pdm.columnName;
+                continue;
+            }
             String varName=   pdm.formatName();
             varName = varName.replace("'","\\'");
             if(pdm.isString()) {
                 sb.append("data.addColumn('string', '" + varName+"');\n");
             } else  if(pdm.isDate()) {
-                sb.append("data.addColumn('string', '" + varName+"');\n");
+                //                sb.append("data.addColumn('string', '" + varName+"');\n");
             } else {
                 sb.append("data.addColumn('number', '" + varName+"');\n");
             }
@@ -1325,12 +1356,11 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         for (PointData pointData : list) {
             row++;
             cal.setTime(pointData.date);
-            List values = pointData.values;
             String entityName;
             if(useTimeForName) {
                 entityName = sdf.format(pointData.date);
-            } else  if(entityIdx>=0)  {
-                entityName = values.get(entityIdx).toString().trim();
+            } else  if(entityCol!=null) {
+                entityName = pointData.getValue(entityCol).toString().trim();
             } else {
                 entityName = "latlon_" + pointData.lat+"/"+pointData.lon;
             }
@@ -1346,29 +1376,24 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                       ","+ cal.get(cal.MILLISECOND)+
                       ");\n");
 
-            //            if(row<10)        sb.append("alert(theDate);\n");
             sb.append("data.setValue(" +row+", 1, theDate);\n");
 
-            /*            sb.append("data.setValue(" +row+", 2," +pointData.lon+");\n");
-                          sb.append("data.setValue(" +row+", 3,"+ pointData.lat+");\n");
-                          sb.append("data.setValue(" +row+", 4,"+ pointData.alt+");\n");
-                          sb.append("data.setValue(" +row+", 5,"+ pointData.month+");\n");
-            */
 
 
             int  cnt    = -1;
             for (PointDataMetadata pdm : columnsToUse) {
-                cnt++;
                 //Already did the entity
-                if(cnt == entityIdx) continue;
-                Object value = values.get(cnt);
+                if(entityCol!=null && pdm.isColumn(entityCol)) continue;
+                Object value = pointData.getValue(pdm);
                 if(pdm.isString()) {
                     String tmp = value.toString().trim();
                     tmp = tmp.replace("'","\\'");
+                    cnt++;
                     sb.append("data.setValue(" +row+", " + (cnt+baseCnt) +", '" +tmp +"');\n");
                 } else  if(pdm.isDate()) {
-                    sb.append("data.setValue(" +row+", " + (cnt+baseCnt) +", " +value +");\n");
+                    //                    sb.append("data.setValue(" +row+", " + (cnt+baseCnt) +", " +value +");\n");
                 } else {
+                    cnt++;
                     sb.append("data.setValue(" +row+", " + (cnt+baseCnt) +", " +value +");\n");
                 }
             }
@@ -1396,14 +1421,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             StringBuffer  info      = new StringBuffer("");
             StringBuffer  label      = new StringBuffer("");
             info.append("<b>Date:</b> " + pointData.date + "<br>");
-            List values = pointData.values;
             int  cnt    = -1;
             for (PointDataMetadata pdm : columnsToUse) {
                 cnt++;
                 if (pdm.isBasic()) {
                     continue;
                 }
-                Object value = values.get(cnt);
+                Object value = pointData.getValue(pdm);
                 if(lblCnt<4) {
                     if(lblCnt>0)
                         label.append("/");
@@ -1453,6 +1477,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             boolean showTimeline)
             throws Exception {
 
+
+
         StringBuffer sb = new StringBuffer();
         getHtmlHeader(request,  sb, entry, list);
 
@@ -1499,11 +1525,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         for (PointData pointData : list) {
             StringBuffer row = new StringBuffer();
-            List values = pointData.values;
             int  cnt    = -1;
             for (PointDataMetadata pdm : columnsToUse) {
                 cnt++;
-                Object value = values.get(cnt);
+                Object value = pointData.getValue(pdm);
                 if(value instanceof Double) {
                     double d = ((Double)value).doubleValue();
                     row.append(HtmlUtil.cols("" + Misc.format(d)));
@@ -1559,15 +1584,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         List<String> units = new ArrayList<String>();
 
         for (PointData pointData : list) {
-            List values = pointData.values;
-            int  cnt    = -1;
             for (PointDataMetadata pdm : columnsToUse) {
-                cnt++;
-                if (pdm.isBasic()) {
-                    continue;
-                }
                 if (!pdm.isNumeric()) {continue;}
-                double value = ((Double)values.get(cnt)).doubleValue();
+                double value = ((Double)pointData.getValue(pdm)).doubleValue();
                 if(value!=value) continue;
                 List<ValueAxis> axises = null;
                 double[]range = null;
@@ -1697,12 +1716,11 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         int paramCount = 0;
         int colorCount = 0;
         for(PointData pointData: list) {
-            List values = pointData.values;
             int cnt = -1;
             for(PointDataMetadata pdm: columnsToUse) {
                 cnt++;
                 if(pdm.isBasic()) continue;
-                Object value = values.get(cnt);
+                Object value = pointData.getValue(pdm);
                 if(pdm.isNumeric()) {
                 }
             }
@@ -1777,7 +1795,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         if (addHeader) {
             int cnt = 0;
             for (PointDataMetadata pdm : columnsToUse) {
-                if(pdm.isObId()) continue;
                 if (cnt != 0) {
                     sb.append(",");
                 }
@@ -1799,8 +1816,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                     h1.append(",");
                     h2.append(",");
                 }
-                h1.append(pdm.shortName);
-                h2.append(pdm.shortName);
+                h1.append(pdm.varName());
+                h2.append(pdm.varName());
                 if (pdm.isString()) {
                     h1.append("(Text)");
                     h2.append("(Text)");
@@ -1825,23 +1842,17 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
 
         for (PointData pointData : list) {
-            sb.append(sdf.format(pointData.date));
-            sb.append(comma);
-            sb.append(pointData.lat);
-            sb.append(comma);
-            sb.append(pointData.lon);
-            sb.append(comma);
-            sb.append(pointData.alt);
-            int  dcnt   = -1;
-            List values = pointData.values;
+            boolean didOne = false;
             for (PointDataMetadata pdm : columnsToUse) {
-                dcnt++;
-                if (pdm.isBasic()) {
-                    continue;
+                Object value = pointData.getValue(pdm);
+                if(didOne)
+                    sb.append(comma);
+                didOne = true;
+                if(pdm.isDate()) {
+                    sb.append(sdf.format((Date) value));
+                } else {
+                    sb.append(value);
                 }
-                Object value = values.get(dcnt);
-                sb.append(comma);
-                sb.append(value);
             }
             sb.append("\n");
         }
@@ -1876,16 +1887,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             StringBuffer info = new StringBuffer("");
             cnt++;
 
-            List values = pointData.values;
             info.append("Date:" + pointData.date);
             info.append("<br>");
-            int dcnt = -1;
             for (PointDataMetadata pdm : columnsToUse) {
-                dcnt++;
-                if (pdm.isBasic()) {
-                    continue;
-                }
-                Object value = values.get(dcnt);
+                Object value = pointData.getValue(pdm);
                 info.append(pdm.shortName + ":" + value);
                 info.append("<br>");
             }
@@ -2271,6 +2276,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         String format = request.getString(ARG_POINT_FORMAT, FORMAT_HTML);
 
 
+
         List sortByList = new ArrayList();
         sortByList.add(new TwoFacedObject("Date",COL_DATE));
         for (PointDataMetadata pdm : metadata) {
@@ -2285,6 +2291,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         StringBuffer outputSB = new StringBuffer();
         outputSB.append(HtmlUtil.formTable());
         String sortBy = HtmlUtil.select(ARG_POINT_SORTBY, sortByList,request.getString(ARG_POINT_SORTBY,""));
+
+
         outputSB.append(HtmlUtil.formEntry(msgLabel("Format"),
                                           HtmlUtil.select(ARG_POINT_FORMAT, formats,format)));
         outputSB.append(HtmlUtil.formEntry(msgLabel("Max"), max+ HtmlUtil.space(1)+"(" + cnt +" " + msg("total") +")"));
@@ -2303,6 +2311,12 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                            sortBy+" " +   HtmlUtil.checkbox(ARG_POINT_ASCENDING,"true", request.get(ARG_POINT_ASCENDING,true))+" " + msg("ascending")));
 
         StringBuffer advOutputSB = new StringBuffer();
+
+        advOutputSB.append(msgLabel("Time Series"));
+        advOutputSB.append(msgLabel("Chart TItle"));
+        advOutputSB.append(HtmlUtil.input(ARG_POINT_TIMESERIES_TITLE,request.getString(ARG_POINT_TIMESERIES_TITLE,""), HtmlUtil.SIZE_60));
+        advOutputSB.append(HtmlUtil.br());
+
         advOutputSB.append(msgLabel("Interactive Chart"));
         advOutputSB.append(HtmlUtil.checkbox(ARG_POINT_CHART_USETIMEFORNAME,"true",request.get(ARG_POINT_CHART_USETIMEFORNAME, false)));
         advOutputSB.append(HtmlUtil.space(1));
@@ -2713,17 +2727,39 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         }
 
 
+        public boolean isColumn(String c) {
+            return Misc.equals(columnName,c);
+        }
+
+
         public boolean isObId() {
-            return columnName.equals(COL_ID);
+            return isColumn(COL_ID);
         }
 
         public boolean isObMonth() {
-            return columnName.equals(COL_MONTH);
+            return isColumn(COL_MONTH);
         }
 
         public boolean isObHour() {
-            return columnName.equals(COL_HOUR);
+            return isColumn(COL_HOUR);
         }
+
+
+        public static boolean contains(List<PointDataMetadata> list, String col) {
+            for(PointDataMetadata pdm: list) {
+                if(pdm.isColumn(col)) return true;
+            }
+            return false;
+        }
+
+        public static PointDataMetadata find(List<PointDataMetadata> list, String col) {
+            for(PointDataMetadata pdm: list) {
+                if(pdm.isColumn(col)) return pdm;
+            }
+            return null;
+        }
+
+
 
 
         /**
@@ -2732,8 +2768,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
          * @return _more_
          */
         public String toString() {
-            return tableName + "." + columnName + " " + shortName + "  "
-                   + varType;
+            //            return columnName + " " + shortName + "  "
+            //                   + varType;
+            return columnName;
         }
 
         /**
@@ -2744,6 +2781,12 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         public String formatName() {
             return shortName.replace("_", " ");
         }
+
+        public String varName() {
+            String n = shortName.replace(" ","_");
+            return n;
+        }
+
 
         /**
          * _more_
@@ -2850,7 +2893,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         int hour;
 
         /** _more_          */
-        List values;
+        Hashtable values = new Hashtable();
 
         /**
          * _more_
@@ -2874,7 +2917,16 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             this.hour  = hour;
         }
 
+        public void setValue(PointDataMetadata pdm,Object v) {
+            values.put(pdm.columnName, v);
+        }
+
+        public Object getValue(PointDataMetadata pdm) {
+            return getValue(pdm.columnName);
+        }
+
         public Object getValue(String col) {
+            if(col==null) return null;
             if(col.equals(COL_ID)) return new Double(id);
             if(col.equals(COL_LATITUDE)) return new Double(lat);
             if(col.equals(COL_LONGITUDE)) return new Double(lon);
@@ -2882,17 +2934,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             if(col.equals(COL_DATE)) return date;
             if(col.equals(COL_MONTH)) return new Double(month);
             if(col.equals(COL_HOUR)) return new Double(hour);
-            return "n/a";
+            return values.get(col);
         }
 
-        /**
-         * _more_
-         *
-         * @param values _more_
-         */
-        public void setValues(List values) {
-            this.values = values;
-        }
+
     }
 
 
