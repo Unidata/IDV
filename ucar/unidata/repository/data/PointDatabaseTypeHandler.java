@@ -218,6 +218,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     /** _more_          */
     public static final String ARG_POINT_STRIDE = "stride";
 
+    public static final String ARG_POINT_CHART_USETIMEFORNAME = "usetimeforname";
+
     public static final String ARG_POINT_REDIRECT = "redirect";
     public static final String ARG_POINT_CHANGETYPE = "changetype";
 
@@ -441,17 +443,16 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             new ArrayList<PointDataMetadata>();
 
         metadata.add(new PointDataMetadata(tableName, COL_ID,
-                                           metadata.size(), "",
+                                           metadata.size(), "ID", "ID","",
                                            PointDataMetadata.TYPE_INT));
-
         metadata.add(new PointDataMetadata(tableName, COL_DATE,
-                                           metadata.size(), "",
+                                           metadata.size(), "Observation Time", "Observation Time","",
                                            PointDataMetadata.TYPE_DATE));
         metadata.add(new PointDataMetadata(tableName, COL_LATITUDE,
-                                           metadata.size(), "degrees",
+                                           metadata.size(), "Latitude", "Latitude", "degrees",
                                            PointDataMetadata.TYPE_DOUBLE));
         metadata.add(new PointDataMetadata(tableName, COL_LONGITUDE,
-                                           metadata.size(), "degrees",
+                                           metadata.size(), "Longitude","Longitude","degrees",
                                            PointDataMetadata.TYPE_DOUBLE));
         metadata.add(new PointDataMetadata(tableName, COL_ALTITUDE,
                                            metadata.size(), "Altitude","Altitude","m",
@@ -955,7 +956,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 seen.add(col);
             }
             for (PointDataMetadata pdm : metadata) {
-                if (pdm.isBasic() || seen.contains(""+pdm.columnNumber)) {
+                if (seen.contains(""+pdm.columnNumber)) {
                     tmp.add(pdm);
                 }
             }
@@ -966,15 +967,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         List<PointDataMetadata> columnsToUse =
             new ArrayList<PointDataMetadata>();
         for (PointDataMetadata pdm : tmp) {
-            //Skip the db id, month and hour
+            //Skip the db month and hour
             if (pdm.columnName.equals(COL_MONTH)
                 || pdm.columnName.equals(COL_HOUR)) {
                 continue;
             }
             columnsToUse.add(pdm);
         }
-
-
 
 
         for (PointDataMetadata pdm : metadata) {
@@ -1012,8 +1011,23 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
 
         StringBuffer cols = null;
+        List<PointDataMetadata> queryColumns = new ArrayList<PointDataMetadata>();
+
+        //Always add the basic columns
+        for (PointDataMetadata pdm : metadata) {
+            if(pdm.isBasic()) {
+                queryColumns.add(pdm);                
+           }
+        }
 
         for (PointDataMetadata pdm : columnsToUse) {
+            if(!pdm.isBasic()) {
+                queryColumns.add(pdm);
+            }
+        }
+
+
+        for (PointDataMetadata pdm : queryColumns) {
             if (cols == null) {
                 cols = new StringBuffer();
             } else {
@@ -1075,8 +1089,15 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                   checkReadValue(results.getDouble(col++)), 0,
                                   0);
                 List values = new ArrayList();
-                while (col <= columnsToUse.size()) {
-                    PointDataMetadata pdm = columnsToUse.get(col - 1);
+                //Add in the selected basic values
+                for(PointDataMetadata pdm: columnsToUse) {
+                    if(pdm.isBasic()) {
+                        values.add(pointData.getValue(pdm.columnName));
+                    }
+                }
+
+                while (col <= queryColumns.size()) {
+                    PointDataMetadata pdm = queryColumns.get(col - 1);
                     if (pdm.isString()) {
                         values.add(results.getString(col).trim());
                     } else {
@@ -1266,18 +1287,19 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         sb.append("data.addColumn('string', 'Location');\n");
         sb.append("data.addColumn('date', 'Date');\n");
-        sb.append("data.addColumn('number', 'Longitude');\n");
-        sb.append("data.addColumn('number', 'Latitude');\n");
-        sb.append("data.addColumn('number', 'Altitude');\n");
-        sb.append("data.addColumn('number', 'Month');\n");
+
+        int baseCnt = 2;
 
         int entityIdx=-1;
         int idx =-1;
+        boolean useTimeForName = request.get(ARG_POINT_CHART_USETIMEFORNAME,false);
+        String           dateFormat  = "yyyy/MM/dd HH:mm:ss";
+        SimpleDateFormat sdf         = new SimpleDateFormat(dateFormat);
         for (PointDataMetadata pdm : columnsToUse) {
+            idx++;
             if (pdm.isBasic()) {
                 continue;
             }
-            idx++;
             if(entityIdx<0 && pdm.shortName.toLowerCase().indexOf("station")>=0) 
                 entityIdx  = idx;
             if(pdm.shortName.toLowerCase().indexOf("name")>=0) 
@@ -1286,10 +1308,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             varName = varName.replace("'","\\'");
             if(pdm.isString()) {
                 sb.append("data.addColumn('string', '" + varName+"');\n");
+            } else  if(pdm.isDate()) {
+                sb.append("data.addColumn('string', '" + varName+"');\n");
             } else {
                 sb.append("data.addColumn('number', '" + varName+"');\n");
             }
         }
+
 
         GregorianCalendar cal =
             new GregorianCalendar(DateUtil.TIMEZONE_GMT);
@@ -1301,34 +1326,38 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             row++;
             cal.setTime(pointData.date);
             List values = pointData.values;
-            if(entityIdx>=0)  {
-                String tmp = values.get(entityIdx).toString().trim();
-                tmp = tmp.replace("'","\\'");
-                sb.append("data.setValue(" +row+", 0, '" + tmp + "');\n");
+            String entityName;
+            if(useTimeForName) {
+                entityName = sdf.format(pointData.date);
+            } else  if(entityIdx>=0)  {
+                entityName = values.get(entityIdx).toString().trim();
             } else {
-                sb.append("data.setValue(" +row+", 0, 'latlon_" + pointData.lat+"/"+pointData.lon + "');\n");
+                entityName = "latlon_" + pointData.lat+"/"+pointData.lon;
             }
 
+            entityName = entityName.replace("'","\\'");
+            sb.append("data.setValue(" +row+", 0, '" +entityName + "');\n");
 
             sb.append("theDate = new Date(" + cal.get(cal.YEAR) +"," + cal.get(cal.MONTH) +","+ cal.get(cal.DAY_OF_MONTH)+ ");\n");
 
             sb.append("theDate.setHours("+cal.get(cal.HOUR)+
                       ","+ cal.get(cal.MINUTE)+
+                      ","+ cal.get(cal.SECOND)+
+                      ","+ cal.get(cal.MILLISECOND)+
                       ");\n");
 
             //            if(row<10)        sb.append("alert(theDate);\n");
             sb.append("data.setValue(" +row+", 1, theDate);\n");
-            sb.append("data.setValue(" +row+", 2," +pointData.lon+");\n");
-            sb.append("data.setValue(" +row+", 3,"+ pointData.lat+");\n");
-            sb.append("data.setValue(" +row+", 4,"+ pointData.alt+");\n");
-            sb.append("data.setValue(" +row+", 5,"+ pointData.month+");\n");
+
+            /*            sb.append("data.setValue(" +row+", 2," +pointData.lon+");\n");
+                          sb.append("data.setValue(" +row+", 3,"+ pointData.lat+");\n");
+                          sb.append("data.setValue(" +row+", 4,"+ pointData.alt+");\n");
+                          sb.append("data.setValue(" +row+", 5,"+ pointData.month+");\n");
+            */
 
 
             int  cnt    = -1;
             for (PointDataMetadata pdm : columnsToUse) {
-                if (pdm.isBasic()) {
-                    continue;
-                }
                 cnt++;
                 //Already did the entity
                 if(cnt == entityIdx) continue;
@@ -1336,9 +1365,11 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 if(pdm.isString()) {
                     String tmp = value.toString().trim();
                     tmp = tmp.replace("'","\\'");
-                    sb.append("data.setValue(" +row+", " + (cnt+6) +", '" +tmp +"');\n");
+                    sb.append("data.setValue(" +row+", " + (cnt+baseCnt) +", '" +tmp +"');\n");
+                } else  if(pdm.isDate()) {
+                    sb.append("data.setValue(" +row+", " + (cnt+baseCnt) +", " +value +");\n");
                 } else {
-                    sb.append("data.setValue(" +row+", " + (cnt+6) +", " +value +");\n");
+                    sb.append("data.setValue(" +row+", " + (cnt+baseCnt) +", " +value +");\n");
                 }
             }
         }
@@ -1368,10 +1399,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             List values = pointData.values;
             int  cnt    = -1;
             for (PointDataMetadata pdm : columnsToUse) {
+                cnt++;
                 if (pdm.isBasic()) {
                     continue;
                 }
-                cnt++;
                 Object value = values.get(cnt);
                 if(lblCnt<4) {
                     if(lblCnt>0)
@@ -1456,16 +1487,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         }
 
         sb.append("<table>");
-        StringBuffer header =
-            new StringBuffer(HtmlUtil.cols(HtmlUtil.b(msg("ID")),
-                                           HtmlUtil.b(msg("Date")),
-                                           HtmlUtil.b(msg("Latitude")),
-                                           HtmlUtil.b(msg("Longitude")),
-                                           HtmlUtil.b(msg("Altitude"))));
+        StringBuffer header = new StringBuffer();
         for (PointDataMetadata pdm : columnsToUse) {
-            if (pdm.isBasic()) {
-                continue;
-            }
             header.append(HtmlUtil.cols(HtmlUtil.b(pdm.formatName() + " "
                     + pdm.formatUnit())));
         }
@@ -1476,16 +1499,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         for (PointData pointData : list) {
             StringBuffer row = new StringBuffer();
-            row.append(HtmlUtil.cols(pointData.id+"",
-                                     pointData.date.toString(),
-                                     "" + Misc.format(pointData.lat), "" + Misc.format(pointData.lon),
-                                     "" + Misc.format(pointData.alt)));
             List values = pointData.values;
             int  cnt    = -1;
             for (PointDataMetadata pdm : columnsToUse) {
-                if (pdm.isBasic()) {
-                    continue;
-                }
                 cnt++;
                 Object value = values.get(cnt);
                 if(value instanceof Double) {
@@ -1546,10 +1562,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             List values = pointData.values;
             int  cnt    = -1;
             for (PointDataMetadata pdm : columnsToUse) {
+                cnt++;
                 if (pdm.isBasic()) {
                     continue;
                 }
-                cnt++;
                 if (!pdm.isNumeric()) {continue;}
                 double value = ((Double)values.get(cnt)).doubleValue();
                 if(value!=value) continue;
@@ -1684,8 +1700,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             List values = pointData.values;
             int cnt = -1;
             for(PointDataMetadata pdm: columnsToUse) {
-                if(pdm.isBasic()) continue;
                 cnt++;
+                if(pdm.isBasic()) continue;
                 Object value = values.get(cnt);
                 if(pdm.isNumeric()) {
                 }
@@ -1819,10 +1835,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             int  dcnt   = -1;
             List values = pointData.values;
             for (PointDataMetadata pdm : columnsToUse) {
+                dcnt++;
                 if (pdm.isBasic()) {
                     continue;
                 }
-                dcnt++;
                 Object value = values.get(dcnt);
                 sb.append(comma);
                 sb.append(value);
@@ -1865,10 +1881,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             info.append("<br>");
             int dcnt = -1;
             for (PointDataMetadata pdm : columnsToUse) {
+                dcnt++;
                 if (pdm.isBasic()) {
                     continue;
                 }
-                dcnt++;
                 Object value = values.get(dcnt);
                 info.append(pdm.shortName + ":" + value);
                 info.append("<br>");
@@ -2285,10 +2301,16 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         outputSB.append(HtmlUtil.formEntry(msgLabel("Skip"),HtmlUtil.select(ARG_POINT_STRIDE,skip,request.getString(ARG_POINT_STRIDE,"1"))));
         outputSB.append(HtmlUtil.formEntry(msgLabel("Sort by"), 
                                            sortBy+" " +   HtmlUtil.checkbox(ARG_POINT_ASCENDING,"true", request.get(ARG_POINT_ASCENDING,true))+" " + msg("ascending")));
+
+        StringBuffer advOutputSB = new StringBuffer();
+        advOutputSB.append(msgLabel("Interactive Chart"));
+        advOutputSB.append(HtmlUtil.checkbox(ARG_POINT_CHART_USETIMEFORNAME,"true",request.get(ARG_POINT_CHART_USETIMEFORNAME, false)));
+        advOutputSB.append(HtmlUtil.space(1));
+        advOutputSB.append(msg("Use time as name"));
+        outputSB.append(HtmlUtil.formEntry(msgLabel("Settings"),
+                                           HtmlUtil.makeShowHideBlock(msg("..."),
+                                                                      advOutputSB.toString(), false)));
         outputSB.append(HtmlUtil.formTableClose());
-
-
-
 
         StringBuffer extra = new StringBuffer();
         extra.append(HtmlUtil.formTable());
@@ -2341,22 +2363,25 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         extra.append(HtmlUtil.formTableClose());
 
 
-        StringBuffer what = new StringBuffer();
-        what.append("<ul>");
-        what.append(HtmlUtil.checkbox(ARG_POINT_PARAM_ALL, "true", request.get(ARG_POINT_PARAM_ALL,false)));
-        what.append(HtmlUtil.space(1));
-        what.append(msg("All"));
-        what.append(HtmlUtil.br());
+        StringBuffer params = new StringBuffer();
+        params.append("<ul>");
+        params.append(HtmlUtil.checkbox(ARG_POINT_PARAM_ALL, "true", request.get(ARG_POINT_PARAM_ALL,false)));
+        params.append(HtmlUtil.space(1));
+        params.append(msg("All"));
+        params.append(HtmlUtil.br());
         List list = request.get(ARG_POINT_PARAM, new ArrayList());
         int cbxCnt = 0;
 
         for (PointDataMetadata pdm : metadata) {
-            if (pdm.isBasic()) {
+            if(pdm.isObMonth() || pdm.isObHour()) {
                 continue;
+            }
+            if (pdm.isBasic()) {
+                //                continue;
             }
             String value = ""+pdm.columnNumber;
 
-            boolean checked = pdm.isBasic() || list.contains(value);
+            boolean checked = (list.size()==0?pdm.isBasic():list.contains(value));
             String cbxId = "cbx" + (cbxCnt++);
             String cbxExtra = HtmlUtil.id(cbxId) +
                 HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,
@@ -2366,16 +2391,16 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                                            "event",
                                                            HtmlUtil.squote(ARG_POINT_PARAM),
                                                            HtmlUtil.squote(cbxId))));
-            what.append(HtmlUtil.checkbox(ARG_POINT_PARAM, value,
+            params.append(HtmlUtil.checkbox(ARG_POINT_PARAM, value,
                                           checked,cbxExtra));
 
 
 
-            what.append(HtmlUtil.space(1));
-            what.append(pdm.formatName());
-            what.append(HtmlUtil.br());
+            params.append(HtmlUtil.space(1));
+            params.append(pdm.formatName());
+            params.append(HtmlUtil.br());
         }
-        what.append("</ul>");
+        params.append("</ul>");
 
         //        sb.append(header(msg("Point Data Search")));
         sb.append(
@@ -2395,7 +2420,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                              extra.toString(), false));
 
         sb.append(HtmlUtil.makeShowHideBlock(msg("Parameters"),
-                                             what.toString(), false));
+                                             params.toString(), false));
 
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.submit(msg("Search"), ARG_POINT_SEARCH));
@@ -2557,9 +2582,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                         filePath  = IOUtil.getURL(filePath,getClass()).toString();
                     }
                     ncml = ncml.replace("${location}", filePath);
-                    System.err.println ("exists:" + file.exists());
-                    System.err.println ("exists:" + (new File(filePath)).exists());
-                    System.err.println ("ncml:" + ncml);
+                    //                    System.err.println ("exists:" + file.exists());
+                    //                    System.err.println ("exists:" + (new File(filePath)).exists());
+                    //                    System.err.println ("ncml:" + ncml);
                     File ncmlFile =
                         getStorageManager().getScratchFile(entry.getId() + "_"
                                                            + metadata.getId() + ".ncml");
@@ -2692,6 +2717,14 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             return columnName.equals(COL_ID);
         }
 
+        public boolean isObMonth() {
+            return columnName.equals(COL_MONTH);
+        }
+
+        public boolean isObHour() {
+            return columnName.equals(COL_HOUR);
+        }
+
 
         /**
          * _more_
@@ -2752,6 +2785,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         public boolean isString() {
             return varType.equals(TYPE_STRING)
                    || varType.equals(TYPE_ENUMERATION);
+        }
+
+        public boolean isDate() {
+            return varType.equals(TYPE_DATE);
         }
 
         /**
@@ -2837,6 +2874,17 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             this.hour  = hour;
         }
 
+        public Object getValue(String col) {
+            if(col.equals(COL_ID)) return new Double(id);
+            if(col.equals(COL_LATITUDE)) return new Double(lat);
+            if(col.equals(COL_LONGITUDE)) return new Double(lon);
+            if(col.equals(COL_ALTITUDE)) return new Double(alt);
+            if(col.equals(COL_DATE)) return date;
+            if(col.equals(COL_MONTH)) return new Double(month);
+            if(col.equals(COL_HOUR)) return new Double(hour);
+            return "n/a";
+        }
+
         /**
          * _more_
          *
@@ -2844,7 +2892,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
          */
         public void setValues(List values) {
             this.values = values;
-
         }
     }
 
