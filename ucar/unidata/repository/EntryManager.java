@@ -2442,6 +2442,8 @@ return new Result(title, sb);
                                    oldEntry.getEndDate(),
                                    oldEntry.getValues());
 
+                typeHandler.intializeCopiedEntry(newEntry, oldEntry);
+
                 List<Metadata> newMetadata = new ArrayList<Metadata>();
                 for (Metadata oldMetadata : getMetadataManager().getMetadata(
                         oldEntry)) {

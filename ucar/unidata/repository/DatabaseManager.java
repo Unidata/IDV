@@ -645,6 +645,12 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
+    public void copyTable(String oldTable, String newTable, Connection connection) throws Exception {
+        String copySql = "INSERT INTO  " +newTable  + " SELECT * from " + oldTable;
+        execute(connection, copySql, -1,-1);
+    }
+
+
     /**
      * _more_
      *

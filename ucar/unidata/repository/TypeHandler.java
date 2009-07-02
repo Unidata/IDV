@@ -1084,7 +1084,7 @@ public class TypeHandler extends RepositoryManager {
      */
     public void initializeNewEntry(Entry entry) throws Exception {}
 
-
+    public void intializeCopiedEntry(Entry newEntry, Entry oldEntry) throws Exception {}
 
 
     /**

@@ -407,19 +407,47 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 entry, new File(entry.getResource().getPath()), false);
             entry.setResource(new Resource());
         } catch (Exception exc) {
+            getDatabaseManager().closeConnection(connection);
             try {
-                connection.close();
-            } catch (Exception ignore) {}
-            try {
-                System.err.println("error:" + exc);
-                exc.printStackTrace();
                 deleteFromDatabase(getTableName(entry));
             } catch (Exception ignore) {}
             throw exc;
         } finally {
+            getDatabaseManager().closeConnection(connection);
+        }
+    }
+
+
+    public void intializeCopiedEntry(Entry newEntry, Entry oldEntry) throws Exception {
+        super.intializeCopiedEntry(newEntry, oldEntry);
+
+        //False says don't get the metadata objects from the cache.
+        //Create them from the DB
+        List<PointDataMetadata> oldMetadata =
+            getMetadata(getTableName(oldEntry),false);
+
+        Connection connection = getDatabaseManager().getNewConnection();
+        connection.setAutoCommit(false);
+        try {
+            String newTableName = getTableName(newEntry);
+            //Set the name to the new table name
+            for (PointDataMetadata pdm : oldMetadata) {
+                pdm.tableName = newTableName;
+            }
+            createDatabase(newEntry, oldMetadata, connection);
+            getDatabaseManager().copyTable(getTableName(oldEntry),getTableName(newEntry), connection);
+            connection.commit();
+            connection.setAutoCommit(true);
+        } catch (Exception exc) {
             try {
                 connection.close();
             } catch (Exception ignore) {}
+            try {
+                deleteFromDatabase(getTableName(newEntry));
+            } catch (Exception ignore) {}
+            throw exc;
+        } finally {
+            getDatabaseManager().closeConnection(connection);
         }
     }
 
@@ -475,7 +503,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         List                vars = fdp.getDataVariables();
 
         for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
-            //            System.err.println("   var:"+ var.getShortName());
             String unit = var.getUnitsString();
             if (unit == null) {
                 unit = "";
@@ -511,10 +538,17 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             pdm.columnNumber = metadata.size();
             metadata.add(pdm);
         }
+        createDatabase(entry, metadata, connection);
+        insertData(entry, metadata, fdp, connection, true);
+    }
 
 
 
 
+    private void createDatabase(Entry entry, List<PointDataMetadata> metadata,
+                                Connection connection)
+            throws Exception {
+        String                  tableName = getTableName(entry);
         StringBuffer sql      = new StringBuffer();
         List<String> indexSql = new ArrayList<String>();
         int          indexCnt = 0;
@@ -538,7 +572,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             }
         }
         sql.append(")");
-        //        System.err.println(sql);
         getDatabaseManager().execute(
             connection, getDatabaseManager().convertSql(sql.toString()),
             1000, 10000);
@@ -554,7 +587,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             getDatabaseManager().executeInsert(connection,
                     Tables.POINTDATAMETADATA.INSERT, pdm.getValues());
         }
-        insertData(entry, metadata, fdp, connection, true);
     }
 
 
@@ -655,8 +687,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             double alt     = el.getAltitude();
             Date   time    = po.getNominalTimeAsDate();
 
-            //            if(totalCnt<5)
-            //                System.err.println("altitiude:" + alt);
+
             long   tmpTime = time.getTime();
             if (tmpTime < minTime) {
                 minTime = tmpTime;
@@ -1811,7 +1842,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             h1.append("(index) -> (");
             int cnt = 0;
             for (PointDataMetadata pdm : columnsToUse) {
-                if(pdm.isObId()) continue;
                 if (cnt != 0) {
                     h1.append(",");
                     h2.append(",");
@@ -2312,15 +2342,21 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         StringBuffer advOutputSB = new StringBuffer();
 
-        advOutputSB.append(msgLabel("Time Series"));
-        advOutputSB.append(msgLabel("Chart TItle"));
-        advOutputSB.append(HtmlUtil.input(ARG_POINT_TIMESERIES_TITLE,request.getString(ARG_POINT_TIMESERIES_TITLE,""), HtmlUtil.SIZE_60));
-        advOutputSB.append(HtmlUtil.br());
+        advOutputSB.append(HtmlUtil.formTable());
 
-        advOutputSB.append(msgLabel("Interactive Chart"));
-        advOutputSB.append(HtmlUtil.checkbox(ARG_POINT_CHART_USETIMEFORNAME,"true",request.get(ARG_POINT_CHART_USETIMEFORNAME, false)));
-        advOutputSB.append(HtmlUtil.space(1));
-        advOutputSB.append(msg("Use time as name"));
+        advOutputSB.append(HtmlUtil.formEntry(msgLabel("Time Series"),
+                                              msgLabel("Chart Title")+
+                                              HtmlUtil.input(ARG_POINT_TIMESERIES_TITLE,request.getString(ARG_POINT_TIMESERIES_TITLE,""), HtmlUtil.SIZE_60)));
+
+
+        advOutputSB.append(HtmlUtil.formEntry(msgLabel("Interactive Chart"),
+                                              HtmlUtil.checkbox(ARG_POINT_CHART_USETIMEFORNAME,"true",request.get(ARG_POINT_CHART_USETIMEFORNAME, false)) +
+                                              HtmlUtil.space(1) +
+                                              msg("Use time as name")));
+
+        advOutputSB.append(HtmlUtil.formTableClose());
+
+
         outputSB.append(HtmlUtil.formEntry(msgLabel("Settings"),
                                            HtmlUtil.makeShowHideBlock(msg("..."),
                                                                       advOutputSB.toString(), false)));
@@ -2461,7 +2497,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      */
     private List<PointDataMetadata> getMetadata(String tableName)
             throws Exception {
-        List<PointDataMetadata> metadata = metadataCache.get(tableName);
+        return getMetadata(tableName, true);
+    }
+
+
+    private List<PointDataMetadata> getMetadata(String tableName, boolean checkCache)
+            throws Exception {
+        List<PointDataMetadata> metadata = (checkCache?metadataCache.get(tableName):null);
         if (metadata == null) {
             if (metadataCache.size() > 100) {
                 metadataCache = new Hashtable<String,
@@ -2476,10 +2518,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                             .COL_TABLENAME, tableName), " ORDER BY "
                                 + Tables.POINTDATAMETADATA.COL_COLUMNNUMBER
                             + " ASC ");
-            
-
-            
-
 
             SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
             ResultSet        results;
@@ -2496,7 +2534,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                             results.getString(col++)));
                 }
             }
-            metadataCache.put(tableName, metadata);
+            if(checkCache) {
+                metadataCache.put(tableName, metadata);
+            }
         }
         return metadata;
     }
@@ -2596,9 +2636,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                         filePath  = IOUtil.getURL(filePath,getClass()).toString();
                     }
                     ncml = ncml.replace("${location}", filePath);
-                    //                    System.err.println ("exists:" + file.exists());
-                    //                    System.err.println ("exists:" + (new File(filePath)).exists());
-                    //                    System.err.println ("ncml:" + ncml);
                     File ncmlFile =
                         getStorageManager().getScratchFile(entry.getId() + "_"
                                                            + metadata.getId() + ".ncml");
@@ -2732,9 +2769,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         }
 
 
-        public boolean isObId() {
-            return isColumn(COL_ID);
-        }
 
         public boolean isObMonth() {
             return isColumn(COL_MONTH);
