@@ -734,6 +734,7 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String space(int cnt) {
+        if(cnt==1) return " ";
         String s = "";
         while (cnt-- > 0) {
             s = s + ENTITY_NBSP;
