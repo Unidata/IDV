@@ -478,11 +478,12 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         metadata.add(new PointDataMetadata(tableName, COL_DATE,
                                            metadata.size(), "Observation Time", "Observation Time","",
                                            PointDataMetadata.TYPE_DATE));
-        metadata.add(new PointDataMetadata(tableName, COL_LATITUDE,
-                                           metadata.size(), "Latitude", "Latitude", "degrees",
-                                           PointDataMetadata.TYPE_DOUBLE));
         metadata.add(new PointDataMetadata(tableName, COL_LONGITUDE,
                                            metadata.size(), "Longitude","Longitude","degrees",
+                                           PointDataMetadata.TYPE_DOUBLE));
+
+        metadata.add(new PointDataMetadata(tableName, COL_LATITUDE,
+                                           metadata.size(), "Latitude", "Latitude", "degrees",
                                            PointDataMetadata.TYPE_DOUBLE));
         metadata.add(new PointDataMetadata(tableName, COL_ALTITUDE,
                                            metadata.size(), "Altitude","Altitude","m",
@@ -1349,28 +1350,29 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         int baseCnt = 2;
 
         String entityCol=null;
-        int idx =-1;
         boolean useTimeForName = request.get(ARG_POINT_CHART_USETIMEFORNAME,false);
         String           dateFormat  = "yyyy/MM/dd HH:mm:ss";
         SimpleDateFormat sdf         = new SimpleDateFormat(dateFormat);
         for (PointDataMetadata pdm : columnsToUse) {
-            idx++;
-            if (pdm.isBasic()) {
-                continue;
-            }
             if(entityCol==null && pdm.shortName.toLowerCase().indexOf("station")>=0)  {
                 entityCol  = pdm.columnName;
                 continue;
             }
             if(pdm.shortName.toLowerCase().indexOf("name")>=0)  {
                 entityCol  = pdm.columnName;
-                continue;
+                break;
             }
+        }
+
+
+        for (PointDataMetadata pdm : columnsToUse) {
+            if(entityCol!=null && pdm.isColumn(entityCol)) continue;
             String varName=   pdm.formatName();
             varName = varName.replace("'","\\'");
             if(pdm.isString()) {
                 sb.append("data.addColumn('string', '" + varName+"');\n");
             } else  if(pdm.isDate()) {
+                //For now skip the date
                 //                sb.append("data.addColumn('string', '" + varName+"');\n");
             } else {
                 sb.append("data.addColumn('number', '" + varName+"');\n");
@@ -1397,8 +1399,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             }
 
             entityName = entityName.replace("'","\\'");
-            sb.append("data.setValue(" +row+", 0, '" +entityName + "');\n");
-
             sb.append("theDate = new Date(" + cal.get(cal.YEAR) +"," + cal.get(cal.MONTH) +","+ cal.get(cal.DAY_OF_MONTH)+ ");\n");
 
             sb.append("theDate.setHours("+cal.get(cal.HOUR)+
@@ -1407,8 +1407,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                       ","+ cal.get(cal.MILLISECOND)+
                       ");\n");
 
+            sb.append("data.setValue(" +row+", 0, '" +entityName + "');\n");
             sb.append("data.setValue(" +row+", 1, theDate);\n");
-
 
 
             int  cnt    = -1;
@@ -1416,16 +1416,19 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 //Already did the entity
                 if(entityCol!=null && pdm.isColumn(entityCol)) continue;
                 Object value = pointData.getValue(pdm);
+                if(row == 0) 
+                    sb.append("//" + pdm.shortName+"\n");
                 if(pdm.isString()) {
+                    cnt++;
                     String tmp = value.toString().trim();
                     tmp = tmp.replace("'","\\'");
-                    cnt++;
                     sb.append("data.setValue(" +row+", " + (cnt+baseCnt) +", '" +tmp +"');\n");
                 } else  if(pdm.isDate()) {
                     //                    sb.append("data.setValue(" +row+", " + (cnt+baseCnt) +", " +value +");\n");
                 } else {
                     cnt++;
                     sb.append("data.setValue(" +row+", " + (cnt+baseCnt) +", " +value +");\n");
+
                 }
             }
         }
