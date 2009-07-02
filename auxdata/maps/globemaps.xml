@@ -21,7 +21,7 @@
          />
 
   <map
-       source="/auxdata/maps/OUTLSUPW"
+       source="/auxdata/maps/OUTVHRES"
        description="World Coastlines"
        visible="true"
        color="0x0000FF"
