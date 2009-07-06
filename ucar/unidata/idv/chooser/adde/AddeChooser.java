@@ -65,6 +65,7 @@ import ucar.unidata.view.station.StationLocationMap;
 import ucar.unidata.view.station.StationLocationRenderer;
 
 import ucar.unidata.xml.XmlResourceCollection;
+import ucar.unidata.data.AddeServer;
 
 import visad.CommonUnit;
 

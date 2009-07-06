@@ -43,7 +43,7 @@ import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.geoloc.ProjectionRect;
 import ucar.unidata.geoloc.projection.*;
 import ucar.unidata.gis.mcidasmap.McidasMap;
-
+import ucar.unidata.data.AddeServer;
 
 import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.chooser.IdvChooserManager;

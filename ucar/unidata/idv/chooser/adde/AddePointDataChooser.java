@@ -27,7 +27,7 @@ import edu.wisc.ssec.mcidas.McIDASUtil;
 import edu.wisc.ssec.mcidas.adde.AddePointDataReader;
 
 import org.w3c.dom.Element;
-
+import ucar.unidata.data.AddeServer;
 import ucar.unidata.data.AddeUtil;
 import ucar.unidata.data.point.AddePointDataSource;
 
