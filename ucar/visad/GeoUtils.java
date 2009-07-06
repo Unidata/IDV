@@ -1,7 +1,5 @@
 /*
- * $Id: GeoUtils.java,v 1.21 2006/07/17 15:30:16 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright  1997-2009 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -58,7 +56,6 @@ import javax.swing.*;
  * Earth-centric utilities
  *
  * @author IDV Development Team
- * @version $Id: GeoUtils.java,v 1.21 2006/07/17 15:30:16 jeffmc Exp $
  */
 public class GeoUtils {
 
