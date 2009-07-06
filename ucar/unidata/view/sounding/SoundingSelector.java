@@ -44,7 +44,7 @@ import ucar.unidata.gis.mcidasmap.McidasMap;
 
 import ucar.unidata.idv.chooser.*;
 import ucar.unidata.idv.chooser.adde.AddeChooser;
-import ucar.unidata.data.AddeServer;
+import ucar.unidata.idv.chooser.adde.AddeServer;
 
 import ucar.unidata.metdata.Station;
 
