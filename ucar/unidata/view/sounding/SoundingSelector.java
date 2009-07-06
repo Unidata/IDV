@@ -44,7 +44,7 @@ import ucar.unidata.gis.mcidasmap.McidasMap;
 
 import ucar.unidata.idv.chooser.*;
 import ucar.unidata.idv.chooser.adde.AddeChooser;
-import ucar.unidata.idv.chooser.adde.AddeServer;
+import ucar.unidata.data.AddeServer;
 
 import ucar.unidata.metdata.Station;
 
@@ -358,7 +358,7 @@ public class SoundingSelector extends IdvChooser {
 
         List servers =
             idvChooser.getIdv().getIdvChooserManager().getAddeServers(
-                AddeServer.TYPE_ANY);
+                AddeServer.TYPE_POINT);
         addeChooser =
             new AddeChooser(idvChooser.getIdv().getIdvChooserManager(),
                             null) {
