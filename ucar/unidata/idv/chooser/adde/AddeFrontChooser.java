@@ -36,7 +36,6 @@ import ucar.unidata.ui.ChooserList;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
-import ucar.unidata.data.AddeServer;
 
 import java.awt.*;
 import java.awt.event.*;

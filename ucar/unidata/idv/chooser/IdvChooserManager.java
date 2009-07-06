@@ -31,6 +31,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
+import ucar.unidata.idv.chooser.adde.AddeServer;
 import ucar.unidata.data.DataManager;
 import ucar.unidata.data.DataSource;
 
@@ -38,7 +39,6 @@ import ucar.unidata.data.DataSource;
 import ucar.unidata.idv.*;
 import ucar.unidata.idv.chooser.adde.AddeChooser;
 
-import ucar.unidata.idv.chooser.adde.AddeServer;
 import ucar.unidata.idv.ui.*;
 
 

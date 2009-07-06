@@ -55,7 +55,6 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.*;
-import ucar.unidata.data.AddeServer;
 
 /**
  * Selection widget for ADDE point data

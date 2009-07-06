@@ -25,7 +25,6 @@ package ucar.unidata.idv.chooser.adde;
 
 
 import org.w3c.dom.Element;
-import ucar.unidata.data.AddeServer;
 
 import ucar.unidata.idv.chooser.IdvChooserManager;
 

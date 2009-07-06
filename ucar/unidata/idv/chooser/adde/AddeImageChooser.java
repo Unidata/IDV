@@ -88,7 +88,6 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
-import ucar.unidata.data.AddeServer;
 
 /**
  * Widget to select images from a remote ADDE server
