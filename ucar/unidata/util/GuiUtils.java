@@ -22,8 +22,6 @@
 
 
 
-
-
 package ucar.unidata.util;
 
 
@@ -57,7 +55,6 @@ import java.util.Vector;
 
 import javax.imageio.*;
 import javax.imageio.stream.ImageOutputStream;
-
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -885,7 +882,7 @@ public class GuiUtils extends LayoutUtil {
         if (c == null) {
             c = GuiUtils.class;
         }
-        Image image = getImage(file, c, cache,false);
+        Image image = getImage(file, c, cache, false);
         if (image == null) {
             return null;
         }
@@ -1013,7 +1010,8 @@ public class GuiUtils extends LayoutUtil {
         System.err.println("Unable to find image:" + file);
         URL url = Misc.getURL(MISSING_IMAGE, GuiUtils.class);
         if (url == null) {
-            System.err.println("Whoah, could not load missing image:" + MISSING_IMAGE);
+            System.err.println("Whoah, could not load missing image:"
+                               + MISSING_IMAGE);
             return null;
         }
         return Toolkit.getDefaultToolkit().createImage(url);
@@ -1033,7 +1031,11 @@ public class GuiUtils extends LayoutUtil {
      */
     public static void showDialogNearSrc(Component src, Component theWindow) {
         try {
-            if (src != null) {
+            boolean iconified = ((src instanceof Frame)
+                                 && ((Frame) src).getState()
+                                    == Frame.ICONIFIED);
+
+            if ((src != null) && !iconified) {
                 Point loc = src.getLocationOnScreen();
                 loc.y += src.getSize().height + 10;
 
@@ -1359,7 +1361,7 @@ public class GuiUtils extends LayoutUtil {
 
 
     /**
-     * This makes a component that contains a jlabel.  The jlabel is inset with some padding at the top and the outer component is aligned to the top. It is intended to be used when doing a form layout and the 
+     * This makes a component that contains a jlabel.  The jlabel is inset with some padding at the top and the outer component is aligned to the top. It is intended to be used when doing a form layout and the
      * component on the right it a tall one
      *
      * @param s The string to create the label with
@@ -1367,7 +1369,8 @@ public class GuiUtils extends LayoutUtil {
      * @return the component
      */
     public static JComponent valignLabel(String s) {
-        return GuiUtils.top(inset(GuiUtils.rLabel(s),new Insets(7,0,0,0)));
+        return GuiUtils.top(inset(GuiUtils.rLabel(s),
+                                  new Insets(7, 0, 0, 0)));
     }
 
     /**
@@ -1382,6 +1385,14 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param objects _more_
+     * @param insets _more_
+     *
+     * @return _more_
+     */
     public static JComponent formLayout(List objects, Insets insets) {
         Component[] comps = new Component[objects.size()];
         for (int i = 0; i < objects.size(); i++) {
@@ -1407,6 +1418,7 @@ public class GuiUtils extends LayoutUtil {
      * then it creates a rLabel(object.toString)
      *
      * @param objects array of components to layout
+     * @param insets _more_
      * @return component
      */
     public static JComponent formLayout(Object[] objects, Insets insets) {
@@ -2182,23 +2194,30 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
-    private static JTextField intervalStepFld  = new JTextField("1", 4);
-    private static  JTextField intervalStartFld = new JTextField("1", 4);
+    /** _more_          */
+    private static JTextField intervalStepFld = new JTextField("1", 4);
 
+    /** _more_          */
+    private static JTextField intervalStartFld = new JTextField("1", 4);
+
+    /**
+     * _more_
+     *
+     * @param list _more_
+     */
     public static void showIntervalSelectionDialog(JList list) {
         tmpInsets = INSETS_5;
         JComponent contents = doLayout(new Component[] {
-            rLabel("Start Index:"),
-            intervalStartFld, rLabel("Interval:"),
-            intervalStepFld }, 2, WT_NN, WT_N);
-        contents = vbox(new JLabel("Choose Selection Interval"),
-                        contents);
+                                  rLabel("Start Index:"),
+                                  intervalStartFld, rLabel("Interval:"),
+                                  intervalStepFld }, 2, WT_NN, WT_N);
+        contents = vbox(new JLabel("Choose Selection Interval"), contents);
         contents = inset(contents, 5);
-        final int size   = list.getModel().getSize();
+        final int size = list.getModel().getSize();
 
         while (true) {
-            if (!showOkCancelDialog(null, "Selection Interval",
-                                    contents, list)) {
+            if ( !showOkCancelDialog(null, "Selection Interval", contents,
+                                     list)) {
                 return;
             }
             try {
@@ -2262,11 +2281,12 @@ public class GuiUtils extends LayoutUtil {
             public void actionPerformed(ActionEvent ae) {
                 final JList theList = list;
                 Misc.run(new Runnable() {
-                        public void run() {
-                            showIntervalSelectionDialog(theList);
-                        }
-                    });
-            }});
+                    public void run() {
+                        showIntervalSelectionDialog(theList);
+                    }
+                });
+            }
+        });
         items.add(MENU_SEPARATOR);
         items.add(selectStrideMenuItem);
         items.add(MENU_SEPARATOR);
@@ -2277,7 +2297,7 @@ public class GuiUtils extends LayoutUtil {
             final int step = steps[i];
             JMenuItem item = new JMenuItem("Select " + labels[i]);
             item.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
+                public void actionPerformed(ActionEvent ae) {
                     list.clearSelection();
                     for (int idx = 0; idx < size; idx += step) {
                         list.addSelectionInterval(idx, idx);
@@ -6258,6 +6278,7 @@ public class GuiUtils extends LayoutUtil {
     }
 
 }
+
 
 
 
