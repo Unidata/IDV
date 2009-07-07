@@ -21,6 +21,9 @@ they essentially get it from their container type tag.
     <group
        names="RTNEXRAD"
        type="radar"/>
+    <group
+       names="RTWXTEXT"
+       type="wxtext"/>
   </server>
   <server name="adde.cise-nsf.gov">
     <group
@@ -32,6 +35,9 @@ they essentially get it from their container type tag.
     <group
        names="RTNEXRAD"
        type="radar"/>
+    <group
+       names="RTWXTEXT"
+       type="wxtext"/>
   </server>
   <server name="stratus.al.noaa.gov">
     <group
@@ -43,12 +49,18 @@ they essentially get it from their container type tag.
     <group
        names="RTNEXRAD"
        type="radar"/>
+    <group
+       names="RTWXTEXT"
+       type="wxtext"/>
   </server>
 
   <server name="weather2.admin.niu.edu">
     <group
        names="GINICOMP,GINIEAST,GINIWEST"
        type="image"/>
+    <group
+       names="RTWXTEXT"
+       type="wxtext"/>
   </server>
   <server name="weather3.admin.niu.edu">
     <group
@@ -57,6 +69,9 @@ they essentially get it from their container type tag.
     <group
        names="RTNEXRAD"
        type="radar"/>
+    <group
+       names="RTWXTEXT"
+       type="wxtext"/>
   </server>
   <server name="twister.millersville.edu">
     <group
@@ -73,6 +88,9 @@ they essentially get it from their container type tag.
     <group
        names="RTNEXRAD"
        type="radar"/>
+    <group
+       names="RTWXTEXT"
+       type="wxtext"/>
   </server>
 <!--
   <server name="io.sca.uqam.ca">
