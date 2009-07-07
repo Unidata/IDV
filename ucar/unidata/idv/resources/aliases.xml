@@ -28,7 +28,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="SPEED"
      label="Wind Speed"
-     aliases="spd, SPD, wspd, windSpd, windSpeed, windspeed, winds,wind_speed,Wind_speed,SPED,SKNT,SMPH,WSPD,WIND_10maboveground"/>
+     aliases="spd, SPD, wspd, windSpd, windSpeed, windspeed, winds,wind_speed,Wind_speed,SPED.*,SKNT.*,SMPH.*,WSPD.*,WIND_10maboveground"/>
   <alias
      name="DIR"
      label="Wind Direction"
