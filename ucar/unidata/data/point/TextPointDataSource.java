@@ -21,9 +21,6 @@
  */
 
 
-
-
-
 package ucar.unidata.data.point;
 
 
@@ -126,8 +123,9 @@ public class TextPointDataSource extends PointDataSource {
 
     /** variables for time */
     private String[] timeVars = {
-        "time_nominal", "time_Nominal", "timeNominal", "timeObs","obtime",
-        "reportTime", "time", "nominal_time", "Time", "observation_time","Observation_Time","datetime","dttm"
+        "time_nominal", "time_Nominal", "timeNominal", "timeObs", "obtime",
+        "reportTime", "time", "nominal_time", "Time", "observation_time",
+        "Observation_Time", "datetime", "dttm"
     };
 
 
@@ -138,7 +136,9 @@ public class TextPointDataSource extends PointDataSource {
     private String[] lonVars = { "Longitude", "longitude", "lon" };
 
 
-    private String[] altVars = { "altitude", "Altitude", "elevation","Elevation" };
+    /** variables for altitude */
+    private String[] altVars = { "altitude", "Altitude", "elevation",
+                                 "Elevation" };
 
 
     /** variables for index */
@@ -195,8 +195,14 @@ public class TextPointDataSource extends PointDataSource {
         init();
     }
 
-    public TextPointDataSource(String source)
-        throws VisADException {
+    /**
+     * Create a TextPointDataSource from the path name
+     *
+     * @param source  path to source data
+     *
+     * @throws VisADException  problem creating the file
+     */
+    public TextPointDataSource(String source) throws VisADException {
         this(new DataSourceDescriptor(), source, new Hashtable());
     }
 
@@ -236,7 +242,7 @@ public class TextPointDataSource extends PointDataSource {
      * @throws Exception  problem creating data
      */
     public FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
-                                LatLonRect bbox)
+                             LatLonRect bbox)
             throws Exception {
         //        System.err.println("MAKE OBS");
         return makeObs(dataChoice, subset, bbox, null, false, true);
@@ -309,9 +315,9 @@ public class TextPointDataSource extends PointDataSource {
      * @throws Exception On badness
      */
     public FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
-                                LatLonRect bbox, String trackParam,
-                                boolean sampleIt,
-                                boolean showAttributeGuiIfNeeded)
+                             LatLonRect bbox, String trackParam,
+                             boolean sampleIt,
+                             boolean showAttributeGuiIfNeeded)
             throws Exception {
         String source = getSource(dataChoice);
         String contents;
@@ -346,9 +352,9 @@ public class TextPointDataSource extends PointDataSource {
      * @throws Exception On badness
      */
     public FieldImpl makeObs(String contents, String delimiter,
-                                DataSelection subset, LatLonRect bbox,
-                                String trackParam, boolean sampleIt,
-                                boolean showAttributeGuiIfNeeded)
+                             DataSelection subset, LatLonRect bbox,
+                             String trackParam, boolean sampleIt,
+                             boolean showAttributeGuiIfNeeded)
             throws Exception {
 
 
@@ -1053,7 +1059,7 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
-     * THis gets called from the Preferences menu and sets the 
+     * THis gets called from the Preferences menu and sets the
      * metadata and also updates the skipRows
      *
      * @param metadata The metadata
@@ -1066,7 +1072,7 @@ public class TextPointDataSource extends PointDataSource {
 
     /**
      *  This gets called in a thread from the applySavedMetaDataFromUI method
-     * 
+     *
      *  @param metadata The metadata
      */
     public void applySavedMetaDataFromUIInner(Metadata metadata) {
@@ -1095,7 +1101,9 @@ public class TextPointDataSource extends PointDataSource {
             ParamRow paramRow = (ParamRow) paramRows.get(tokIdx);
             paramRow.applyMetaData((List) fieldList.get(tokIdx));
         }
-        metaDataComp.validate();
+        if (metaDataComp != null) {
+            metaDataComp.validate();
+        }
     }
 
     /**
@@ -1830,7 +1838,7 @@ public class TextPointDataSource extends PointDataSource {
             //            return;
         }
 
-        if(header!=null) {
+        if (header != null) {
             List toks = StringUtil.split(header, "\n", true, true);
             if (toks.size() != 2) {
                 System.err.println("Bad header");
@@ -1839,7 +1847,8 @@ public class TextPointDataSource extends PointDataSource {
             }
 
             properties.put(TextPointDataSource.PROP_HEADER_MAP, toks.get(0));
-            properties.put(TextPointDataSource.PROP_HEADER_PARAMS, toks.get(1));
+            properties.put(TextPointDataSource.PROP_HEADER_PARAMS,
+                           toks.get(1));
 
         }
 
