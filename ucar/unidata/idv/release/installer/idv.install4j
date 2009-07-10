@@ -467,6 +467,9 @@
                       <void property="programGroupName">
                         <string>${compiler:sys.fullName} ${compiler:sys.version}</string>
                       </void>
+                      <void property="unixSymlinks">
+                        <boolean>false</boolean>
+                      </void>
                     </object>
                   </java>
                 </serializedBean>
@@ -503,7 +506,7 @@
                     <object class="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction">
                       <void property="icon">
                         <object class="com.install4j.api.beans.ExternalFile">
-                          <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv.ico</string>
+                          <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/runIDV.ico</string>
                         </object>
                       </void>
                       <void property="itemName">
