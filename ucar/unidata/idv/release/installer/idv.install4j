@@ -83,6 +83,7 @@
           <entry location="runIDV.bat" fileType="regular" />
           <entry location="simpleIDV" fileType="regular" />
           <entry location="simpleIDV.bat" fileType="regular" />
+          <entry location="runIDV.ico" fileType="regular" />
           <entry location="IDV" fileType="launcher" />
         </include>
         <dependencies>
@@ -952,7 +953,7 @@
     </unixInstaller>
   </mediaSets>
   <buildIds buildAll="true">
-    <mediaSet refId="580" />
+    <mediaSet refId="8" />
   </buildIds>
 </install4j>
 
