@@ -149,12 +149,12 @@
               </void>
               <void property="customPngIcon16File">
                 <object class="com.install4j.api.beans.ExternalFile">
-                  <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv_16x16.png</string>
+                  <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/installer_16x16.png</string>
                 </object>
               </void>
               <void property="customPngIcon32File">
                 <object class="com.install4j.api.beans.ExternalFile">
-                  <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/idv_32x32.png</string>
+                  <string>${compiler:SRCDIR}/ucar/unidata/idv/release/installer/installer_32x32.png</string>
                 </object>
               </void>
               <void property="resizable">
@@ -952,7 +952,7 @@
       </installerScript>
     </unixInstaller>
   </mediaSets>
-  <buildIds buildAll="true">
+  <buildIds buildAll="false">
     <mediaSet refId="8" />
   </buildIds>
 </install4j>
