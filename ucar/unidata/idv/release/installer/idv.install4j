@@ -952,7 +952,7 @@
       </installerScript>
     </unixInstaller>
   </mediaSets>
-  <buildIds buildAll="false">
+  <buildIds buildAll="true">
     <mediaSet refId="8" />
   </buildIds>
 </install4j>
