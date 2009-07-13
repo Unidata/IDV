@@ -24,7 +24,7 @@ set ::idvInstall /home/idv/
 gen::defineMacro {<%workshop.datadir%>} {/data/idv}
 
 ##We use this for referencing download file names
-gen::defineMacro {<%idv.version%>} {2.6}
+gen::defineMacro {<%idv.version%>} {2.7u1}
 
 ##The installed directory of the source
 gen::defineMacro {<%workshop.installdir%>} "$::workshopHome/idv"
@@ -46,18 +46,11 @@ gen::defineMacro {<%workshop.installdir%>} "$::workshopHome/idv"
 set ::workshopexampledir ${::workshopHome}/idv/ucar/unidata/apps/example
 gen::defineMacro {<%workshop.exampledir%>} $::workshopexampledir
 
-##Add the page title macro
-gen::defineMacro {<%workshop.title%>} "$::workshopTitle for version <%idv.version%>"
-
-##We use this for referencing download file names
-gen::defineMacro {<%dev.version%>} {<%idv.version%>}
-
-
 ##Assuming we are in the auxdata/docs/userguide/content directory
 ##read in the version.properties file in
 ##../../../../ucar/unidata/idv/resources/version.properties file
 catch {
-    set fp [open [file join .. .. .. .. ucar unidata idv resources version.properties] r]
+    set fp [open [file join .. .. .. .. ucar unidata idv resources build.properties] r]
     set contents [read $fp]
     close $fp
     set ok 1
@@ -77,6 +70,12 @@ catch {
        gen::defineMacro {<%dev.version%>} "$major.${minor}$revision"
     }
 } err
+
+##Add the page title macro
+gen::defineMacro {<%workshop.title%>} "$::workshopTitle for version <%idv.version%>"
+
+##We use this for referencing download file names
+gen::defineMacro {<%dev.version%>} {<%idv.version%>}
 
 
 set ::forDevWorkshop 0
