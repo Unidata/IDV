@@ -29,8 +29,15 @@ the anonymous upload facility. This cap keeps rogue users from filling up the di
 The Cache Size is the size of the cached files that RAMADDA generates (e.g., ftp files).
 The cache is in: &lt;ramadda home&gt;/tmp/cache
 <p>
-The File System Access is the list of server directories that can be used
-for the <a href="configuration.html#localfiles">Local File View</a> entries.
+
+
+<a name="filesystemaccess"></a>
+The File System Access is the list of server directories that can RAMADDA can serve files from.
+When you have a harvester that does not move the files to RAMADDA storage one of the data directories needs to
+be listed here. Likewise, any  <a href="configuration.html#localfiles">Local File View</a> entry needs to be listed here as well.
+
+
+
 <p>
 If you are running the <a href="http://www.unidata.ucar.edu/software/ldm/">Unidata LDM system</a> on the server machine you 
 can allow RAMADDA services to inject files into the LDM queue by specifying the path to the pqinsert program and the queue location.

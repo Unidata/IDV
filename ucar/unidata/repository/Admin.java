@@ -1117,7 +1117,7 @@ public class Admin extends RepositoryManager {
         String fileLabel =
             msg("Enter one server file system directory per line.")
             + HtmlUtil.br()
-            + msg("These are the directories that you can create local file view entries under.");
+            + msg("Directories that RAMADDA is allowed to serve files from (e.g., from harvesters or the local file view entries).");
         asb.append(HtmlUtil.formEntryTop(msgLabel("File system access"),
                                          "<table><tr valign=top><td>"
                                          + fileWidget + "</td><td>"

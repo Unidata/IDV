@@ -255,12 +255,15 @@ public class PatternHarvester extends Harvester {
                       ? rootDir.toString()
                       : "";
         root = root.replace("\\", "/");
-        String extraLabel = "";
+
+        String adminLink = HtmlUtil.href(getRepository().getUrlBase()+"/help/admin.html#filesystemaccess",msg("See File System Access configuration")," target=_HELP");
+        String extraLabel = adminLink;
         if ((rootDir != null) && !rootDir.exists()) {
-            extraLabel = HtmlUtil.space(2)
+            extraLabel = extraLabel +HtmlUtil.space(2)
                 + HtmlUtil.bold("Directory does not exist");
         }
-            sb.append(HtmlUtil.colspan(msgHeader("Look for files"),2));
+
+        sb.append(HtmlUtil.colspan(msgHeader("Look for files"),2));
         sb.append(HtmlUtil.formEntry(msgLabel("Under directory"),
                                      HtmlUtil.input(ATTR_ROOTDIR, root,
                                          HtmlUtil.SIZE_60) + extraLabel));

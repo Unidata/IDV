@@ -108,7 +108,7 @@ unless specified in the pattern) and the to data time.
 <tr><td>            <i>${create_monthname}</i>,<i>${from_monthname}</i>,  <i>${to_monthname}</i></td><td>Month name</td></tr>
 <tr><td>            <i>${create_year}</i>, <i>${from_year}</i>, <i>${to_year}</i></td><td>Numeric year</td></tr>
 </table>
-p
+
 <p>
 
 
@@ -147,6 +147,20 @@ Would result in groups like:
 You can also name the entrys using the macros. So, using the above date based group template you could then have a Name template that incorporates the formatted date:<pre>
 Gridded data - ${from_date}
 </pre>
+
+
+
+
+
+
+<p>
+The <i>Move file to storage<i> checkbox allows you to determine whether the file is to be moved from its initial location
+to the RAMADDA storage area.
+<br>
+<b>Note: If the file is not moved to the storage area than one of the data directories the file lies under needs to be added
+to the list of file system directories in the Admin-&gt;Access area</b>
+
+
 
 
 
