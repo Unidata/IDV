@@ -195,6 +195,8 @@ public class AddeChooser extends TimesChooser {
     /** Property for the port */
     protected static final String PROP_PORT = "port";
 
+    public static final String PROP_ADDEPORT = "adde.port";
+
     /** Property for the  POS  property */
     protected static final String PROP_POS = "pos";
 
@@ -1296,6 +1298,19 @@ public class AddeChooser extends TimesChooser {
     }
 
 
+
+    /**
+     * Get the port to use. Check the IDV for an adde.port property.
+     * If not null then use the IDV property. Else use DEFAULT_PORT
+     *
+     * @return the port to use
+     */
+    protected String getPort() {
+        String prop = getIdv().getProperty(PROP_ADDEPORT, (String)null);
+        if(prop!=null) return prop;
+        return DEFAULT_PORT;
+    }
+
     /**
      * Get any extra key=value pairs that are appended to all requests.
      *
@@ -1303,7 +1318,7 @@ public class AddeChooser extends TimesChooser {
      */
     protected void appendMiscKeyValues(StringBuffer buff) {
         appendKeyValue(buff, PROP_COMPRESS, DEFAULT_COMPRESS);
-        appendKeyValue(buff, PROP_PORT, DEFAULT_PORT);
+        appendKeyValue(buff, PROP_PORT, getPort());
         appendKeyValue(buff, PROP_DEBUG, DEFAULT_DEBUG);
         appendKeyValue(buff, PROP_VERSION, DEFAULT_VERSION);
         appendKeyValue(buff, PROP_USER, DEFAULT_USER);

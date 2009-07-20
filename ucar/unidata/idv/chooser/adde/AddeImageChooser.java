@@ -2341,7 +2341,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             return "gzip";
         }
         if (prop.equals(PROP_PORT)) {
-            return DEFAULT_PORT;
+            return getPort();
         }
         if (prop.equals(PROP_DEBUG)) {
             return DEFAULT_DEBUG;
