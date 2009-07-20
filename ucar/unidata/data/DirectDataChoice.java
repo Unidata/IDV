@@ -6,7 +6,7 @@
  * support@unidata.ucar.edu.
  *
  * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
+ * under the terms of th`397e GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
  *
@@ -385,8 +385,11 @@ public class DirectDataChoice extends DataChoice {
      * @param listener   listener to add
      */
     public void addDataChangeListener(DataChangeListener listener) {
-        dataSource.addDataChangeListener(listener);
+        DataSource tmpDataSource = dataSource;
+        if(tmpDataSource!=null)
+            tmpDataSource.addDataChangeListener(listener);
     }
+
 
     /**
      * Remove the data change listener
@@ -394,7 +397,9 @@ public class DirectDataChoice extends DataChoice {
      * @param listener   listener to remove
      */
     public void removeDataChangeListener(DataChangeListener listener) {
-        dataSource.removeDataChangeListener(listener);
+        DataSource tmpDataSource = dataSource;
+        if(tmpDataSource!=null)
+            tmpDataSource.removeDataChangeListener(listener);
     }
 
 
