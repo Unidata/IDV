@@ -27,4 +27,27 @@ argument -Dfoo=bar) -->
 
 
 
+    <target name="examplejar" depends="example">
+        <jar 
+            basedir="${srcdir}"
+            compress="true"
+            update="false"
+            jarfile="${jars_dest}/example.jar">
+            <include name="ucar/unidata/apps/example/**"/>
+            <exclude name="ucar/unidata/apps/trex/*.java"/>
+        </jar>
+    </target>
+
+    <target name="plugin" depends="examplejar">
+        <copy overwrite="true"  todir="${user.home}/.unidata/idv/DefaultIdv/plugins">
+             <fileset file="lib/example.jar"/>
+        </copy>
+    </target>
+
+
+
+
+
+
+
 </project>
