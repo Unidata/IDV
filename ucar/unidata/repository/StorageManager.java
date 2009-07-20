@@ -983,6 +983,7 @@ public class StorageManager extends RepositoryManager {
         } else {
             tail = getFileTail(entry.getResource().getPath());
         }
+
         return tail;
     }
 
@@ -998,9 +999,18 @@ public class StorageManager extends RepositoryManager {
         if (idx >= 0) {
             fileName = fileName.substring(idx + "_file_".length());
         } else {
-            idx = fileName.indexOf("_");
-            if (idx >= 0) {
-                fileName = fileName.substring(idx + 1);
+            /* 
+               We had this here for files from old versions of RAMADDA where we did not add the _file_ delimiter
+            */
+            int idx1 = fileName.indexOf("-");
+            if(idx1>=0) {
+                int idx2 = fileName.indexOf("-",idx1);
+                if(idx2>=0) {
+                    idx = fileName.indexOf("_");
+                    if (idx >= 0) {
+                        fileName = fileName.substring(idx + 1);
+                    }
+                }
             }
         }
         //Check for Rich's problem
