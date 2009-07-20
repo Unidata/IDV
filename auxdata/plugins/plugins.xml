@@ -55,6 +55,7 @@
 <plugin version="2.6"  category="Data Sources" name="PAM NetCDF Enhancement" description="NcML needed to read Portable Automated Mesonet (PAM) netCDF files"  url="http://www.unidata.ucar.edu/software/idv/plugins/pam.jar"/>
 <plugin version="2.6"  category="Data Sources" name="SSEC Lightning Data" description="NcML needed to read a lightning point data format"  url="http://www.unidata.ucar.edu/software/idv/plugins/sseclightning.jar"/>
 <plugin name="Mesowest Chooser" url="http://www.unidata.ucar.edu/software/idv/plugins/mesowestplugin.jar" description="Provides access to mesowest point data" category="Data Sources"/>
+<plugin name="ADDE via port 80" url="http://www.unidata.ucar.edu/software/idv/plugins/addeport.jar" description="Provides access to Unidata's ADDE server via port 80" category="Data Sources"/>
 
 <!--
 <plugin version="2.2"  category="Language Packs" name="French Language Pack" description="Contains French translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/fr.pack"/>
