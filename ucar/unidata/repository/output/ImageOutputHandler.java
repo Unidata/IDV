@@ -98,7 +98,7 @@ public class ImageOutputHandler extends OutputHandler {
     /** _more_ */
     public static final OutputType OUTPUT_GALLERY = new OutputType("Gallery",
                                                         "image.gallery",
-                                                        OutputType.TYPE_HTML,
+                                                        OutputType.TYPE_HTML|OutputType.TYPE_FORSEARCH,
                                                         "", ICON_IMAGES);
 
     /** _more_ */
