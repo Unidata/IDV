@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.data.grid;
 
 
@@ -5147,10 +5146,12 @@ public class GridUtil {
         Array         varArray;
         MapProjection mp = getNavigation(domainSet);
         if ((mp instanceof TrivialMapProjection) && !haveEmpirical) {  // straight lat/lon(/alt)
-            xVar = makeCoordinateVariable(ncfile, xName, units[0],
+            //xVar = makeCoordinateVariable(ncfile, xName, units[0],
+            xVar = makeCoordinateVariable(ncfile, xName, "degrees_east",
                                           "longitude coordinate",
                                           "longitude", xName);
-            yVar = makeCoordinateVariable(ncfile, yName, units[1],
+            //yVar = makeCoordinateVariable(ncfile, yName, units[1],
+            yVar = makeCoordinateVariable(ncfile, yName, "degrees_north",
                                           "latitude coordinate", "latitude",
                                           yName);
         } else if ( !haveEmpirical) {
@@ -5171,11 +5172,11 @@ public class GridUtil {
                 varToArray.put(projVar, dataArray);
             }
         } else {  // have Empirical Coordinate System
-            xVar = makeCoordinateVariable(ncfile, xName, null,
+            xVar = makeCoordinateVariable(ncfile, xName, (String) null,
                                           "x coordinate", "x_coordinate",
                                           xName);
 
-            yVar = makeCoordinateVariable(ncfile, yName, null,
+            yVar = makeCoordinateVariable(ncfile, yName, (String) null,
                                           "y coordinate", "y_coordinate",
                                           yName);
 
@@ -5290,12 +5291,32 @@ public class GridUtil {
     private static Variable makeCoordinateVariable(NetcdfFile ncfile,
             String name, Unit unit, String desc, String standard_name,
             String dimName) {
+        return makeCoordinateVariable(ncfile, name, (unit != null)
+                ? unit.toString()
+                : (String) null, desc, standard_name, dimName);
+    }
+
+    /**
+     * Make a coordinate variable
+     *
+     * @param ncfile  file
+     * @param name    name of the variable
+     * @param unitName unit name
+     * @param desc    description (long_name) of the variable
+     * @param standard_name    CF standard name of the variable
+     * @param dimName    name of the variable dimension
+     *
+     * @return  the Variable
+     */
+    private static Variable makeCoordinateVariable(NetcdfFile ncfile,
+            String name, String unitName, String desc, String standard_name,
+            String dimName) {
         Variable v = new Variable(ncfile, null, null, name);
         v.setDataType(DataType.FLOAT);
         v.setDimensions(dimName);
 
-        if (unit != null) {
-            v.addAttribute(new Attribute("units", unit.toString()));
+        if (unitName != null) {
+            v.addAttribute(new Attribute("units", unitName));
         }
         v.addAttribute(new Attribute("long_name", desc));
         v.addAttribute(new Attribute("standard_name", standard_name));
