@@ -531,6 +531,8 @@ public class TypeHandler extends RepositoryManager {
         entry.setNorth(results.getDouble(col++));
         entry.setEast(results.getDouble(col++));
         entry.setWest(results.getDouble(col++));
+
+
         return entry;
     }
 
@@ -1545,6 +1547,8 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public String getIconUrl(Request request, Entry entry) throws Exception {
+
+
         Resource resource = entry.getResource();
         String   path     = resource.getPath();
         if (entry.isGroup()) {

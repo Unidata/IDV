@@ -4177,6 +4177,7 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
+
     public Entry getEntry(Request request, String entryId, boolean andFilter,
                           boolean abbreviated)
             throws Exception {
@@ -4236,8 +4237,9 @@ return new Result(title, sb);
                         return null;
                     }
 
+                    String entryType = results.getString(2);
                     TypeHandler typeHandler =
-                        getRepository().getTypeHandler(results.getString(2));
+                        getRepository().getTypeHandler(entryType);
                     entry = typeHandler.getEntry(results, abbreviated);
                     entryStmt.close();
                     checkEntryFileTime(entry);
@@ -5864,10 +5866,13 @@ return new Result(title, sb);
         ResultSet        results;
         SqlUtil.Iterator iter   = SqlUtil.getIterator(statement);
         List<Group>      groups = new ArrayList<Group>();
-        TypeHandler typeHandler =
-            getRepository().getTypeHandler(TypeHandler.TYPE_GROUP);
+        //        TypeHandler typeHandler =
+        //            getRepository().getTypeHandler(TypeHandler.TYPE_GROUP);
         while ((results = iter.next()) != null) {
             while (results.next()) {
+                String entryType = results.getString(2);
+                TypeHandler typeHandler =
+                    getRepository().getTypeHandler(entryType);
                 Group group = (Group) typeHandler.getEntry(results);
                 groups.add(group);
                 cacheGroup(group);
@@ -5945,7 +5950,12 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public String getIconUrl(Request request, Entry entry) throws Exception {
+
+
         String iconPath = getIconUrlInner(request, entry);
+
+
+
         if(iconPath==null) return null;
         //        System.err.println ("getIconUrl: "+entry.getIsRemoteEntry() + " " + entry);
         if(entry.getIsRemoteEntry()) {
@@ -5988,13 +5998,15 @@ return new Result(title, sb);
 
 
     private  String getIconUrlInner(Request request, Entry entry) throws Exception {
+
+
+
         if (entry.getIcon() != null) {
             return iconUrl(entry.getIcon());
         }
         if (isAnonymousUpload(entry)) {
             return iconUrl(ICON_ENTRY_UPLOAD);
         }
-
         return entry.getTypeHandler().getIconUrl(request, entry);
     }
 
