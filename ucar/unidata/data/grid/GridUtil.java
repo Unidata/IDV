@@ -5146,12 +5146,10 @@ public class GridUtil {
         Array         varArray;
         MapProjection mp = getNavigation(domainSet);
         if ((mp instanceof TrivialMapProjection) && !haveEmpirical) {  // straight lat/lon(/alt)
-            //xVar = makeCoordinateVariable(ncfile, xName, units[0],
-            xVar = makeCoordinateVariable(ncfile, xName, "degrees_east",
+            xVar = makeCoordinateVariable(ncfile, xName, units[0],
                                           "longitude coordinate",
                                           "longitude", xName);
-            //yVar = makeCoordinateVariable(ncfile, yName, units[1],
-            yVar = makeCoordinateVariable(ncfile, yName, "degrees_north",
+            yVar = makeCoordinateVariable(ncfile, yName, units[1],
                                           "latitude coordinate", "latitude",
                                           yName);
         } else if ( !haveEmpirical) {
