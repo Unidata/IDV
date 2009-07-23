@@ -117,7 +117,6 @@ public class TextPointDataSource extends PointDataSource {
     /** the default real */
     private Real dfltReal;
 
-    private Hashtable<String,String> namesToUnits;
 
     /** logging category */
     static LogUtil.LogCategory log_ =
@@ -409,7 +408,6 @@ public class TextPointDataSource extends PointDataSource {
             }
             try {
                 Data d = ta.getData();
-                namesToUnits = ta.getNamesToUnits();
                 if (d == null) {
                     throw new IllegalArgumentException(
                         "Could not create point data");
@@ -430,9 +428,6 @@ public class TextPointDataSource extends PointDataSource {
     }
 
 
-    public Hashtable<String,String> getNamesToUnits() {
-        return namesToUnits;
-    }
 
     /**
      * test
@@ -1886,7 +1881,7 @@ public class TextPointDataSource extends PointDataSource {
 
             String ncFile = IOUtil.stripExtension(args[i]) + ".nc";
             System.err.println("Writing nc file:" + ncFile);
-            PointObFactory.writeToNetcdf(new File(ncFile), field,dataSource.getNamesToUnits());
+            PointObFactory.writeToNetcdf(new File(ncFile), field);
 
         }
 

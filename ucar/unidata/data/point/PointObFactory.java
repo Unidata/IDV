@@ -376,26 +376,6 @@ public class PointObFactory {
     public static void writeToNetcdf(File file, FieldImpl field)
 
             throws VisADException, RemoteException, IOException {
-        writeToNetcdf(file, field, null);
-
-    }
-
-
-    /**
-     * Write the PointObs contained in the given field as a netcdf file
-     *
-     * @param file file to write to
-     * @param field The field
-     * @param namesToUnits  A mapping of the real type names to the original unit strings
-     *
-     * @throws IOException on badness
-     * @throws RemoteException on badness
-     * @throws VisADException on badness
-     */
-    public static void writeToNetcdf(File file, FieldImpl field, Hashtable<String,String> namesToUnits)
-
-            throws VisADException, RemoteException, IOException {
-
         List<PointOb> obs = getPointObs(field);
         if (obs.size() == 0) {
             throw new IllegalArgumentException(
@@ -436,7 +416,8 @@ public class PointObFactory {
                     
                     Unit unit = ((RealType) types[fieldIdx]).getDefaultUnit();
                     if (unit != null) {
-                        String unitName = (namesToUnits!=null?namesToUnits.get(types[fieldIdx].toString()):null);
+                        String unitName =  unit.getIdentifier();
+                        //                        System.err.println("unitName:" + unitName + " unit:" + unit);
                         if(unitName == null ||  unitName.length()==0)
                             unitName  = unit.toString();
                         pointObVar.setUnits(unitName);
