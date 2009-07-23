@@ -255,6 +255,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     /** Where we cache data */
     private String dataCachePath;
 
+    /** To synchronize around dataCachePath creation */
+    private Object DATACACHEPATH_MUTEX = new Object();
+
     /** list of params to show */
     private List paramsToShow;
 
@@ -1324,12 +1327,22 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * Derived classes should overwrite this method and clear out any state
      * they may be holding. Then they should call this method to do the notification.
      */
-    public void reloadData() {
+    public void reloadData() { 
+        //Clear out the data cache path so we force a new read
+        final String tmp = dataCachePath;
         dataCachePath = null;
+
         timesList     = null;
         flushCache();
         notifyDataChange();
         getDataContext().dataSourceChanged(this);
+        if (tmp != null) {
+            //If we are caching data to disk then delete the old data cache dir
+            Misc.run(new Runnable() {
+                    public void run() {
+                        IOUtil.deleteDirectory(new File(tmp));
+                    }});
+        }
     }
 
 
@@ -1337,8 +1350,12 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * Clear the cache
      */
     protected void clearFileCache() {
-        if (dataCachePath != null) {
-            IOUtil.deleteDirectory(new File(dataCachePath));
+        final String tmp = dataCachePath;
+        if (tmp != null) {
+            Misc.run(new Runnable() {
+                    public void run() {
+                        IOUtil.deleteDirectory(new File(tmp));
+                    }});
         }
     }
 
@@ -3612,15 +3629,25 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (getDataContext() == null) {
             return null;
         }
-        if (dataCachePath == null) {
-            String uniqueName = "data_" + Misc.getUniqueId();
-            dataCachePath =
-                IOUtil.joinDir(getDataContext().getIdv().getDataManager()
-                    .getDataCacheDirectory(), uniqueName);
-            IOUtil.makeDir(dataCachePath);
+        
+        synchronized(DATACACHEPATH_MUTEX) {
+            if (dataCachePath == null) {
+
+                String uniqueName = "data_" + Misc.getUniqueId();
+                String tmp =
+                    IOUtil.joinDir(getDataContext().getIdv().getDataManager()
+                                   .getDataCacheDirectory(), uniqueName);
+                IOUtil.makeDir(tmp);
+                try {
+                    new File(tmp).deleteOnExit();
+                } catch(Exception ignoreThis) {}
+                dataCachePath =tmp;
+
+            }
         }
         return dataCachePath;
     }
+
 
 
     /**
