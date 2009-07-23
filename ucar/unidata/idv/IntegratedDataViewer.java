@@ -1452,7 +1452,7 @@ Misc.run(new Runnable() {
             getVMManager().setDisplayMastersActive();
             ignoreRemoveDisplayControl = false;
             getIdvUIManager().displayControlsChanged();
-            //Runtime.getRuntime().gc();
+            Runtime.getRuntime().gc();
         } catch (Throwable exc) {
             logException("removeAllDisplays", exc);
         }
@@ -3077,6 +3077,13 @@ Misc.run(new Runnable() {
         getIdvUIManager().disposeAllWindows();
         getIdvUIManager().clearWaitCursor();
         CacheManager.clearCache();
+    }
+
+    /**
+     * Call CacheManager.printStats
+     */
+    public void printCache() {
+        CacheManager.printStats();
     }
 
 

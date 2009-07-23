@@ -200,7 +200,7 @@
      image="/auxdata/ui/icons/Cut16.gif"
      description="Remove all displays and data"
      group="Displays and Data"
-     action="jython:idv.removeAllDataSources ();idv.removeAllDisplays ();"/>
+     action="jython:idv.removeAllDisplays ();idv.removeAllDataSources ()"/>
   <action
      id="view.reloadalldata"
      image="/auxdata/ui/icons/Refresh16.gif"

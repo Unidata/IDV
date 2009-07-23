@@ -86,10 +86,6 @@
        action="action:edit.removedisplays"
        nmnemonic="C"/>
     <menuitem
-       label="Remove All Data Sources"
-       action="action:edit.removedata"
-       mnemonic="D"/>
-    <menuitem
        label="Remove All Displays and Data"
        action="action:edit.removedisplaysanddata"
        mnemonic="A"/>
@@ -226,6 +222,15 @@
      id="help"
      label="Help"
      mnemonic="H">
+
+<!--
+     <menuitem
+       label="Print cache"
+       action="jython:idv.printCache();"
+       />
+-->
+
+
      <menuitem
        label="User's Guide"
        action="help:idv.index"
