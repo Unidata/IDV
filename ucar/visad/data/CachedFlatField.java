@@ -234,7 +234,6 @@ public class CachedFlatField extends FlatField {
 
         //        msg("CachedFlatField.cloneMe");
 
-
         CachedFlatField ccf = new CachedFlatField(this, copy, type,
                                   domainSet, rangeCoordSys,
                                   rangeCoordSysArray, rangeSets, units);
@@ -715,9 +714,13 @@ public class CachedFlatField extends FlatField {
             String uniqueName = "field_" + System.currentTimeMillis() + "_"
                                 + (cnt++);
             cachefile = IOUtil.joinDir(cacheDir, uniqueName);
+
+
         }
         return cachefile;
     }
+
+
 
 
     /**
@@ -725,7 +728,8 @@ public class CachedFlatField extends FlatField {
      */
     private void writeCache() {
         synchronized (MUTEX) {
-            if (getCacheFile() == null) {
+            String cacheFile  = getCacheFile();
+            if (cacheFile == null) {
                 return;
             }
             if (myFloatValues == null) {
@@ -733,9 +737,7 @@ public class CachedFlatField extends FlatField {
             }
             try {
                 long t1 = System.currentTimeMillis();
-                //                System.err.println(myid + " writing to file cache "
-                //                                   + getCacheFile());
-                FileOutputStream fos = new FileOutputStream(getCacheFile());
+                FileOutputStream fos = new FileOutputStream(cacheFile);
                 BufferedOutputStream bos = new BufferedOutputStream(fos,
                                                100000);
                 ObjectOutputStream p = new ObjectOutputStream(bos);
