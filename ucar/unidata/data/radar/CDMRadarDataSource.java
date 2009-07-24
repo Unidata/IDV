@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.radar;
 
 
@@ -638,6 +639,17 @@ public class CDMRadarDataSource extends RadarDataSource {
 
         getDataContext().dataSourceChanged(this);
     }
+
+
+    /**
+     * Can this data source cache its
+     *
+     * @return can cache data to disk
+     */
+    public boolean canCacheDataToDisk() {
+        return true;
+    }
+
 
     /**
      * Read in the nexrad stations from the

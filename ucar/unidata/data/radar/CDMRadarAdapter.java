@@ -147,6 +147,35 @@ public class CDMRadarAdapter implements RadarAdapter {
     /** flag for a RHI file */
     private boolean isRHI;
 
+
+    /** sweep list */
+    private CDMRadarSweepDB[] RSL_sweep_list = null;
+
+    /** ray data */
+    private float[][][] rayData = null;
+
+    /** ray indices */
+    private int[][] rayIndex = null;
+
+    /** _more_ */
+    private HashMap rhiData = null;
+
+    /** _more_ */
+    private float[] meanEle = null;
+
+    /** _more_ */
+    private HashMap cutmap = null;
+
+    /** _more_ */
+    private double range_step;
+
+    /** _more_ */
+    private double range_to_first_gate;
+
+    /** _more_ */
+    int number_of_bins;
+
+
     /**
      * Zero-argument constructor for construction via unpersistence.
      */
@@ -444,7 +473,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                     angles = new double[nsweep];
                     if (isRHI) {
                         for (int i = 0; i < nsweep; i++) {
-                            angles[i] = getMeanAzimuth(
+                            angles[i] = Misc.getAverage(
                                 radVar.getSweep(i).getAzimuth());
                         }
                     } else {
@@ -474,26 +503,6 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param azimuths _more_
-     *
-     * @return _more_
-     */
-    private double getMeanAzimuth(float[] azimuths) {
-        int   size  = azimuths.length;
-
-        int   total = 0;
-        float all   = 0;
-        for (int i = 0; i < size; i++) {
-            if ( !Float.isNaN(azimuths[i])) {
-                total++;
-                all = all + azimuths[i];
-            }
-        }
-        return (float) all / total;
-    }
 
 
     /**
@@ -1238,32 +1247,6 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     }
 
-    /** sweep list */
-    private CDMRadarSweepDB[] RSL_sweep_list = null;
-
-    /** ray data */
-    private float[][][] rayData = null;
-
-    /** ray indices */
-    private int[][] rayIndex = null;
-
-    /** _more_ */
-    private HashMap rhiData = null;
-
-    /** _more_ */
-    private float[] meanEle = null;
-
-    /** _more_ */
-    private HashMap cutmap = null;
-
-    /** _more_ */
-    private double range_step;
-
-    /** _more_ */
-    private double range_to_first_gate;
-
-    /** _more_ */
-    int number_of_bins;
 
     /**
      * return data in sweep variable within limit (angle) specified
@@ -1874,7 +1857,6 @@ public class CDMRadarAdapter implements RadarAdapter {
      */
     int getAngleIdx(double[] angles, double angle) {
         int size = angles.length;
-
         for (int i = 0; i < size; i++) {
             if (angle == angles[i]) {
                 return i;
@@ -3142,6 +3124,8 @@ public class CDMRadarAdapter implements RadarAdapter {
                                        new Unit[] { u }, values);
 
 
+        initCachedFlatField((CachedFlatField) retField);
+
         putCache(cacheKey, retField);
 
         Trace.call2(" getSweep " + elevation);
@@ -3149,6 +3133,28 @@ public class CDMRadarAdapter implements RadarAdapter {
         return retField;
 
     }
+
+
+    /**
+     * _more_
+     *
+     * @param cff _more_
+     */
+    private void initCachedFlatField(CachedFlatField cff) {
+        if (dataSource.getCacheDataToDisk()) {
+            String filename = IOUtil.joinDir(dataSource.getDataCachePath(),
+                                             Misc.getUniqueId() + ".dat");
+            cff.setCacheFile(filename);
+            cff.setShouldCache(true);
+            cff.setCacheClearDelay(dataSource.getCacheClearDelay());
+        } else {
+            cff.setShouldCache(false);
+        }
+    }
+
+
+
+
 
     /**
      * _more_
@@ -3263,7 +3269,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                 RadialDatasetSweep.Sweep sp  = sweepVar.getSweep(i);
                 float                    azi = 0.f;
                 try {
-                    azi = (float) getMeanAzimuth(sp.getAzimuth());
+                    azi = (float) Misc.getAverage(sp.getAzimuth());
                 } catch (java.io.IOException ex) {}
                 if ((azi != eleLast) && (Math.abs(azi - eleLast) > 0.2)) {
                     eleArray.add(i);
@@ -3527,6 +3533,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                                        (CoordinateSystem) null, (Set[]) null,
                                        new Unit[] { u }, signalVals);
 
+        initCachedFlatField((CachedFlatField) retField);
         // retField.setSamples(signalVals, false);
 
         //        Trace.call2("making gridded3d set");
@@ -3589,7 +3596,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             meanEle[b]     = s1.getMeanElevation();
             eleArray[b]    = s1.getElevation();
             eleArrayIdx[b] = QuickSort.sort(eleArray[b]);
-            meanAzi[b]     = (float) getMeanAzimuth(s1.getAzimuth());
+            meanAzi[b]     = (float) Misc.getAverage(s1.getAzimuth());
         }
 
         cutIdx = QuickSort.sort(meanAzi);
@@ -3736,6 +3743,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                                        (CoordinateSystem) null, (Set[]) null,
                                        new Unit[] { u }, signalVals);
 
+        initCachedFlatField((CachedFlatField) retField);
         // retField.setSamples(signalVals, false);
 
         //        Trace.call2("making gridded3d set");
