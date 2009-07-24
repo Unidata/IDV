@@ -2328,6 +2328,31 @@ public class Misc {
         return Double.parseDouble(s);
     }
 
+
+    /**
+     * Average the array. This ignores NaNs. If all NaNs or values array empty return NaN
+     *
+     * @param values values to average
+     *
+     * @return the average. 
+     */
+    public static float getAverage(float[] values) {
+        if(values == null || values.length==0) return Float.NaN;
+        int   size  = values.length;
+        int   total = 0;
+        float all   = 0;
+        for (int i = 0; i < size; i++) {
+            if (values[i] ==values[i]) {
+                total++;
+                all = all + values[i];
+            }
+        }
+        if(total==0) return Float.NaN;
+        return (float) all / total;
+    }
+
+
+
     /**
      * Parse the float value specified by the string s.
      * If s == null or s == "NaN" return Float.NaN
