@@ -1608,14 +1608,17 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         JFreeChart           chart  = createChart(request,entry,dummy);
         XYPlot               xyPlot = (XYPlot) chart.getPlot();
 
-        Hashtable<String, TimeSeries> seriesMap = new Hashtable<String,
-                                                      TimeSeries>();
+        Hashtable<String, MyTimeSeries> seriesMap = new Hashtable<String,
+                                                      MyTimeSeries>();
+        List<MyTimeSeries> allSeries = new ArrayList<MyTimeSeries>();
         int paramCount = 0;
         int colorCount = 0;
         boolean axisLeft = true;
         Hashtable<String,List<ValueAxis>> axisMap = new Hashtable<String,List<ValueAxis>>();
         Hashtable<String,double[]> rangeMap = new Hashtable<String,double[]>();
         List<String> units = new ArrayList<String>();
+
+        long t1 = System.currentTimeMillis();
 
         for (PointData pointData : list) {
             for (PointDataMetadata pdm : columnsToUse) {
@@ -1637,13 +1640,14 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                     range[0] = Math.min(range[0],value);
                     range[1] = Math.max(range[1],value);
                 }
-                TimeSeries series = seriesMap.get(pdm.columnName);
+                MyTimeSeries series = seriesMap.get(pdm.columnName);
                 if (series == null) {
                     paramCount++;
                     TimeSeriesCollection dataset =
                         new TimeSeriesCollection();
-                    series = new TimeSeries(pdm.formatName(),
+                    series = new MyTimeSeries(pdm.formatName(),
                                             Millisecond.class);
+                    allSeries.add(series);
                     ValueAxis rangeAxis = new NumberAxis(pdm.formatName()+" " +pdm.formatUnit());
                     if(axises!=null) axises.add(rangeAxis);
                     XYItemRenderer renderer =
@@ -1666,10 +1670,17 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                     xyPlot.setDataset(paramCount, dataset);
                     xyPlot.mapDatasetToRangeAxis(paramCount, paramCount);
                 }
-                series.addOrUpdate(new Millisecond(pointData.date),value);
+                //series.addOrUpdate(new Millisecond(pointData.date),value);
+                TimeSeriesDataItem item = new TimeSeriesDataItem(new Millisecond(pointData.date),value);
+                series.addItem(item);
             }
         }
 
+
+
+        for(MyTimeSeries timeSeries: allSeries) {
+            timeSeries.finish();
+        }
 
         for(String unit: units) {
             List<ValueAxis> axises = axisMap.get(unit);
@@ -1680,19 +1691,48 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         }
 
 
-
-
-
+        long t2 = System.currentTimeMillis();
 
         BufferedImage newImage =
             chart.createBufferedImage(request.get(ARG_POINT_IMAGE_WIDTH,
                 1000), request.get(ARG_POINT_IMAGE_HEIGHT, 400));
+        long t3 = System.currentTimeMillis();
+        System.err.println("timeseries image time:" +( t2-t1) + " " + (t3-t2));
+
         File file = getStorageManager().getTmpFile(request, "point.png");
         ImageUtils.writeImageToFile(newImage, file);
         InputStream is     = getStorageManager().getFileInputStream(file);
         Result      result = new Result("", is, "image/png");
         return result;
     }
+
+
+
+    private static class  MyTimeSeries extends TimeSeries {
+        List<TimeSeriesDataItem> items= new ArrayList<TimeSeriesDataItem>();
+        HashSet<TimeSeriesDataItem> seen = new HashSet<TimeSeriesDataItem>();
+
+        public MyTimeSeries(String name, Class c) {
+            super(name, c);
+        }
+        public void addItem(TimeSeriesDataItem item) {
+            if(seen.contains(item)) return;
+            seen.add(item);
+            items.add(item);
+        }
+
+        public void finish() {
+            items = new ArrayList<TimeSeriesDataItem>(Misc.sort(items));
+
+            for(TimeSeriesDataItem item: items) {
+                this.data.add(item);
+            }
+            fireSeriesChanged();
+        }
+
+
+    }
+
 
 
 

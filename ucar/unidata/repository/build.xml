@@ -36,9 +36,7 @@
       <java classname="ucar.unidata.repository.RepositoryServer" maxmemory="512mb">
           <arg value="-port"/>
           <arg value="8080"/>
-<!--
           <arg value="-Dramadda.db=mysql"/>
--->
           <arg value="-Dramadda.cacheresources=false"/>
           <arg value="-Dramadda.log.tostderr=true"/>
 
