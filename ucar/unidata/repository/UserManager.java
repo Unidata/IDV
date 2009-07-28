@@ -1223,9 +1223,9 @@ public class UserManager extends RepositoryManager {
                         rolesList.add(role);
                         rolesMap.put(role, rolesSB);
                     }
-                    rolesSB.append("<li> ");
-                    rolesSB.append(userEditLink + HtmlUtil.space(2)
-                                   + user.getName());
+                    rolesSB.append(HtmlUtil.row(HtmlUtil.cols("<li>",userEditLink,
+                                                              user.getId(),
+                                                              user.getName(), user.getEmail())));
                 }
             }
         }
@@ -1234,7 +1234,7 @@ public class UserManager extends RepositoryManager {
         for (String role : rolesList) {
             StringBuffer rolesSB = rolesMap.get(role);
             rolesHtml.append(HtmlUtil.makeShowHideBlock(role,
-                    "<ul>" + rolesSB.toString() + "</ul>", false));
+                    "<table>" + rolesSB.toString() + "</table>", false));
         }
         if (rolesList.size() == 0) {
             rolesHtml.append(msg("No roles"));
