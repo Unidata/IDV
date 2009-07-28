@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control.chart;
 
 
@@ -82,8 +83,8 @@ import java.text.*;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -99,7 +100,7 @@ import javax.swing.*;
 
 public class TimeSeriesChart extends XYChartManager {
 
-    /** macro for substituting the param name into the chart line name          */
+    /** macro for substituting the param name into the chart line name */
     public static final String MACRO_PARAMETER = "%parameter%";
 
     /** Shows time */
@@ -389,8 +390,8 @@ public class TimeSeriesChart extends XYChartManager {
                              int paramIdx, XYItemRenderer renderer,
                              boolean rangeVisible, boolean addAxis) {
 
-        if(series instanceof MyTimeSeries) {
-            ((MyTimeSeries)series).finish();
+        if (series instanceof MyTimeSeries) {
+            ((MyTimeSeries) series).finish();
         }
 
         if (addAxis && (lineState.getRange() != null)) {
@@ -564,19 +565,19 @@ public class TimeSeriesChart extends XYChartManager {
             if ((rowInfos != null) && (rowInfos.size() > 0)) {
                 MyTimeSeries speedSeries    = null;
                 MyTimeSeries dirSeries      = null;
-                LineState  speedLineState = null;
-                LineState  dirLineState   = null;
-                Unit       speedUnit      = null;
+                LineState    speedLineState = null;
+                LineState    dirLineState   = null;
+                Unit         speedUnit      = null;
                 double
-                    speedMin              = 0,
-                    speedMax              = 0;
+                    speedMin                = 0,
+                    speedMax                = 0;
                 double
-                    dirMin                = 0,
-                    dirMax                = 0;
-                boolean polarWind         = true;
+                    dirMin                  = 0,
+                    dirMax                  = 0;
+                boolean polarWind           = true;
 
-                int     speedIdx          = 0;
-                int     dirIdx            = 0;
+                int     speedIdx            = 0;
+                int     dirIdx              = 0;
 
 
                 for (int paramIdx = 0; paramIdx < rowInfos.size();
@@ -667,7 +668,7 @@ public class TimeSeriesChart extends XYChartManager {
                             new ArrayList<MyTimeSeries>();
 
                         MyTimeSeries series = new MyTimeSeries(name,
-                                                Millisecond.class);
+                                                  Millisecond.class);
 
                         //Set        timeSet   = field.getDomainSet();
                         //Unit[]     timeUnits = timeSet.getSetUnits();
@@ -712,8 +713,7 @@ public class TimeSeriesChart extends XYChartManager {
                                 series = new MyTimeSeries(name,
                                         Millisecond.class);
                             }
-                            series.add(new Millisecond(date),
-                                    valueArray[i]);
+                            series.add(new Millisecond(date), valueArray[i]);
                             if ((i == 0) || (valueArray[i] > max)) {
                                 max = valueArray[i];
                             }
@@ -865,10 +865,10 @@ public class TimeSeriesChart extends XYChartManager {
 
                     MyTimeSeries speedSeries    = null;
                     MyTimeSeries dirSeries      = null;
-                    LineState  speedLineState = null;
-                    LineState  dirLineState   = null;
-                    Unit       speedUnit      = null;
-                    boolean    polarWind      = true;
+                    LineState    speedLineState = null;
+                    LineState    dirLineState   = null;
+                    Unit         speedUnit      = null;
+                    boolean      polarWind      = true;
                     for (int varIdx = 0; varIdx < goodVars.size(); varIdx++) {
                         PointParam plotVar =
                             (PointParam) goodVars.get(varIdx);
@@ -876,7 +876,7 @@ public class TimeSeriesChart extends XYChartManager {
                         if ( !lineState.getVisible()) {
                             continue;
                         }
-                        MyTimeSeries   series   = null;
+                        MyTimeSeries series   = null;
                         List<String> textList = null;
                         String canonical =
                             DataAlias.aliasToCanonical(lineState.getName());
@@ -895,7 +895,8 @@ public class TimeSeriesChart extends XYChartManager {
                                 tuple.getComponent(lineState.index);
                             Date dttm = Util.makeDate(ob.getDateTime());
                             if (series == null) {
-                                series = new MyTimeSeries(lineState.getName(),
+                                series =
+                                    new MyTimeSeries(lineState.getName(),
                                         Millisecond.class);
                             }
                             if ( !(dataElement instanceof Real)) {
@@ -1042,8 +1043,9 @@ public class TimeSeriesChart extends XYChartManager {
                         continue;
                     }
                     addLineState(lineState);
-                    MyTimeSeries series = new MyTimeSeries(lineState.getName(),
-                                            Millisecond.class);
+                    MyTimeSeries series =
+                        new MyTimeSeries(lineState.getName(),
+                                         Millisecond.class);
                     List<DateTime> dates  = lineState.getTimes();
                     List<Real>     values = lineState.getValues();
                     if ((dates == null) || (values == null)) {
@@ -1071,29 +1073,61 @@ public class TimeSeriesChart extends XYChartManager {
 
 
 
-    private static class  MyTimeSeries extends TimeSeries {
-        List<TimeSeriesDataItem> items= new ArrayList<TimeSeriesDataItem>();
+    /**
+     * Class MyTimeSeries buffers the item adds and then adds them all at once
+     *
+     *
+     * @author IDV Development Team
+     */
+    private static class MyTimeSeries extends TimeSeries {
+
+        /** items         */
+        List<TimeSeriesDataItem> items = new ArrayList<TimeSeriesDataItem>();
+
+        /** Keeps track of seen items     */
         HashSet<TimeSeriesDataItem> seen = new HashSet<TimeSeriesDataItem>();
 
+        /**
+         * ctor
+         *
+         * @param name time series name
+         * @param c domain type
+         */
         public MyTimeSeries(String name, Class c) {
             super(name, c);
         }
 
+        /**
+         * add
+         *
+         * @param item item
+         */
         public void add(TimeSeriesDataItem item) {
-            if(seen.contains(item)) return;
+            if (seen.contains(item)) {
+                return;
+            }
             seen.add(item);
             items.add(item);
         }
 
+        /**
+         * add
+         *
+         * @param period period
+         * @param value value
+         */
         public void add(RegularTimePeriod period, double value) {
             TimeSeriesDataItem item = new TimeSeriesDataItem(period, value);
             add(item);
         }
 
+        /**
+         * Sort the items add add them to the list
+         */
         public void finish() {
             items = new ArrayList<TimeSeriesDataItem>(Misc.sort(items));
 
-            for(TimeSeriesDataItem item: items) {
+            for (TimeSeriesDataItem item : items) {
                 this.data.add(item);
             }
             fireSeriesChanged();
@@ -1270,5 +1304,4 @@ public class TimeSeriesChart extends XYChartManager {
 
 
 }
-
 
