@@ -83,6 +83,7 @@ import java.text.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -388,6 +389,9 @@ public class TimeSeriesChart extends XYChartManager {
                              int paramIdx, XYItemRenderer renderer,
                              boolean rangeVisible, boolean addAxis) {
 
+        if(series instanceof MyTimeSeries) {
+            ((MyTimeSeries)series).finish();
+        }
 
         if (addAxis && (lineState.getRange() != null)) {
             addRange(lineState.getRange().getMin(),
@@ -558,8 +562,8 @@ public class TimeSeriesChart extends XYChartManager {
         try {
             initCharts();
             if ((rowInfos != null) && (rowInfos.size() > 0)) {
-                TimeSeries speedSeries    = null;
-                TimeSeries dirSeries      = null;
+                MyTimeSeries speedSeries    = null;
+                MyTimeSeries dirSeries      = null;
                 LineState  speedLineState = null;
                 LineState  dirLineState   = null;
                 Unit       speedUnit      = null;
@@ -659,10 +663,10 @@ public class TimeSeriesChart extends XYChartManager {
 
 
 
-                        List<TimeSeries> timeSeriesList =
-                            new ArrayList<TimeSeries>();
+                        List<MyTimeSeries> timeSeriesList =
+                            new ArrayList<MyTimeSeries>();
 
-                        TimeSeries series = new TimeSeries(name,
+                        MyTimeSeries series = new MyTimeSeries(name,
                                                 Millisecond.class);
 
                         //Set        timeSet   = field.getDomainSet();
@@ -705,10 +709,10 @@ public class TimeSeriesChart extends XYChartManager {
                                 }
                             }
                             if (series == null) {
-                                series = new TimeSeries(name,
+                                series = new MyTimeSeries(name,
                                         Millisecond.class);
                             }
-                            series.addOrUpdate(new Millisecond(date),
+                            series.add(new Millisecond(date),
                                     valueArray[i]);
                             if ((i == 0) || (valueArray[i] > max)) {
                                 max = valueArray[i];
@@ -747,7 +751,7 @@ public class TimeSeriesChart extends XYChartManager {
                             timeSeriesList.add(series);
                         }
                         boolean first = true;
-                        for (TimeSeries tmp : timeSeriesList) {
+                        for (MyTimeSeries tmp : timeSeriesList) {
                             addSeries(tmp, lineState, paramIdx, null, true,
                                       first);
                             first = false;
@@ -859,8 +863,8 @@ public class TimeSeriesChart extends XYChartManager {
                     }
 
 
-                    TimeSeries speedSeries    = null;
-                    TimeSeries dirSeries      = null;
+                    MyTimeSeries speedSeries    = null;
+                    MyTimeSeries dirSeries      = null;
                     LineState  speedLineState = null;
                     LineState  dirLineState   = null;
                     Unit       speedUnit      = null;
@@ -872,7 +876,7 @@ public class TimeSeriesChart extends XYChartManager {
                         if ( !lineState.getVisible()) {
                             continue;
                         }
-                        TimeSeries   series   = null;
+                        MyTimeSeries   series   = null;
                         List<String> textList = null;
                         String canonical =
                             DataAlias.aliasToCanonical(lineState.getName());
@@ -891,7 +895,7 @@ public class TimeSeriesChart extends XYChartManager {
                                 tuple.getComponent(lineState.index);
                             Date dttm = Util.makeDate(ob.getDateTime());
                             if (series == null) {
-                                series = new TimeSeries(lineState.getName(),
+                                series = new MyTimeSeries(lineState.getName(),
                                         Millisecond.class);
                             }
                             if ( !(dataElement instanceof Real)) {
@@ -1038,7 +1042,7 @@ public class TimeSeriesChart extends XYChartManager {
                         continue;
                     }
                     addLineState(lineState);
-                    TimeSeries series = new TimeSeries(lineState.getName(),
+                    MyTimeSeries series = new MyTimeSeries(lineState.getName(),
                                             Millisecond.class);
                     List<DateTime> dates  = lineState.getTimes();
                     List<Real>     values = lineState.getValues();
@@ -1063,6 +1067,41 @@ public class TimeSeriesChart extends XYChartManager {
         }
 
     }
+
+
+
+
+    private static class  MyTimeSeries extends TimeSeries {
+        List<TimeSeriesDataItem> items= new ArrayList<TimeSeriesDataItem>();
+        HashSet<TimeSeriesDataItem> seen = new HashSet<TimeSeriesDataItem>();
+
+        public MyTimeSeries(String name, Class c) {
+            super(name, c);
+        }
+
+        public void add(TimeSeriesDataItem item) {
+            if(seen.contains(item)) return;
+            seen.add(item);
+            items.add(item);
+        }
+
+        public void add(RegularTimePeriod period, double value) {
+            TimeSeriesDataItem item = new TimeSeriesDataItem(period, value);
+            add(item);
+        }
+
+        public void finish() {
+            items = new ArrayList<TimeSeriesDataItem>(Misc.sort(items));
+
+            for(TimeSeriesDataItem item: items) {
+                this.data.add(item);
+            }
+            fireSeriesChanged();
+        }
+
+
+    }
+
 
 
 
