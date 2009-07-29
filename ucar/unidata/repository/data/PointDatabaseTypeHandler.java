@@ -481,7 +481,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         metadata.add(new PointDataMetadata(tableName, COL_LONGITUDE,
                                            metadata.size(), "Longitude","Longitude","degrees",
                                            PointDataMetadata.TYPE_DOUBLE));
-
         metadata.add(new PointDataMetadata(tableName, COL_LATITUDE,
                                            metadata.size(), "Latitude", "Latitude", "degrees",
                                            PointDataMetadata.TYPE_DOUBLE));
@@ -2983,7 +2982,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
          * @param hour _more_
          */
         public PointData(int id,
-                         Date date, double lat, double lon, double alt,
+                         Date date, double lon, double lat, double alt,
                          int month, int hour) {
             this.id = id;
             this.lat   = lat;
