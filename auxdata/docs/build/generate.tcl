@@ -1712,9 +1712,11 @@ proc gen::processFile {from to fileIdx template} {
 
     gen::writeFile $to $html
     if {[file exists $from]} { 
-        set permissions [file attributes $from -permissions]
-        file attributes $to -permissions $permissions
-    }
+            catch {
+                set permissions [file attributes $from -permissions]
+                file attributes $to -permissions $permissions
+            } err
+        }
 
 
 
@@ -2696,8 +2698,10 @@ proc gen::copyFiles {dir} {
             file mkdir $imgDir
         }
         file copy -force $f $imgDir
-        set permissions [file attributes $f -permissions]
-        file attributes [file join $imgDir [file tail $f]] -permissions $permissions
+        catch {
+           set permissions [file attributes $f -permissions]
+           file attributes [file join $imgDir [file tail $f]] -permissions $permissions
+        }
 
         if {[gen::getDoThumbnails] && [regexp {(.gif|.png|.jpg|.jpeg)} $f]} {
             gen::thumb [file join $imgDir [file tail $f]]
