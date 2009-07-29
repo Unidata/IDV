@@ -1626,7 +1626,6 @@ proc gen::getTranslateLinks {from} {
 
 proc gen::processFile {from to fileIdx template} {
 
-
     gen::mkdir [file dirname $to]
 
 
@@ -1712,6 +1711,11 @@ proc gen::processFile {from to fileIdx template} {
 
 
     gen::writeFile $to $html
+    if {[file exists $from]} { 
+        set permissions [file attributes $from -permissions]
+        file attributes $to -permissions $permissions
+    }
+
 
 
     set allHtml $A(body)
@@ -2682,7 +2686,7 @@ proc gen::copyFiles {dir} {
     }
     set targetDir [gen::getTargetDir]
     set images [list]
-    foreach prefix {jnlp gif GIF jpg jpeg JPG JPEG png PNG svg SVG svgz SVGZ} {
+    foreach prefix {jnlp gif GIF jpg jpeg JPG JPEG png PNG ppt PPT svg SVG svgz SVGZ} {
         set images [concat $images [glob -nocomplain [file join $dir *.$prefix]]]
     }
     #        puts "images: $images"
@@ -2692,6 +2696,9 @@ proc gen::copyFiles {dir} {
             file mkdir $imgDir
         }
         file copy -force $f $imgDir
+        set permissions [file attributes $f -permissions]
+        file attributes [file join $imgDir [file tail $f]] -permissions $permissions
+
         if {[gen::getDoThumbnails] && [regexp {(.gif|.png|.jpg|.jpeg)} $f]} {
             gen::thumb [file join $imgDir [file tail $f]]
         }
