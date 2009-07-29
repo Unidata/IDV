@@ -2433,6 +2433,7 @@ proc gen::parseArgs {} {
                 gen::set$proc 1
             } elseif {$arg=="-no$flag"} {
                 set didone 1
+#                puts "    calling \"gen::set$proc  0\"   from command line"
                 gen::set$proc  0
             }
             if {$didone} {break;}
@@ -2750,6 +2751,7 @@ foreach {var dflt} [list  UrlRoot {} DoClean 0 Verbose 0 DoChildOverview 1 DoFin
 
 
 if {[file exists lib.tcl]} {
+#    puts "sourcing local lib.tcl"
     source lib.tcl
 }
 
@@ -2761,13 +2763,20 @@ gen::parseArgs
 
 
 foreach lib $libs {
+#    puts "sourcing lib: $lib"
     source $lib
 }
 
-set scriptDir [file dirname [info script]]
-if {[file exists [file join $scriptDir lib.tcl]]} {
-    source [file join $scriptDir lib.tcl]
+if {0} {
+    set scriptDir [file dirname [info script]]
+    if {[file exists [file join $scriptDir lib.tcl]]} {
+        puts "sourcing script dir lib: [file join $scriptDir lib.tcl]"
+        source [file join $scriptDir lib.tcl]
+    }
 }
+
+
+#puts "final tcleval=[gen::getDoTclEvaluation]"
 
 
 
