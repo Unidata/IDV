@@ -57,6 +57,11 @@
 <plugin name="Mesowest Chooser" url="http://www.unidata.ucar.edu/software/idv/plugins/mesowestplugin.jar" description="Provides access to mesowest point data" category="Data Sources"/>
 <plugin name="ADDE via port 80" url="http://www.unidata.ucar.edu/software/idv/plugins/addeport.jar" description="Provides access to Unidata's ADDE server via port 80" category="Data Sources"/>
 
+<!-- Bug Fixes -->
+<!--
+<plugin  version="2.7" name="WRF-ARW fix for IDV 2.7" url="http://www.unidata.ucar.edu/software/idv/plugins/wrf-arw.jar" category="Bug Fixes"/>
+-->
+
 <!--
 <plugin version="2.2"  category="Language Packs" name="French Language Pack" description="Contains French translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/fr.pack"/>
 <plugin version="2.2"  category="Language Packs" name="German Language Pack" description="Contains German translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/de.pack"/>
