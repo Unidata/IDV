@@ -257,7 +257,13 @@ proc gen::include {file {tag ""}} {
         }
     }
 
-    set c [subst $c]
+    if {[gen::getDoTclEvaluation]} {
+        set ::currentFile $file
+        if {[catch {set c [subst -novariables $c]} err]} {
+            puts "Error evaluating virtual\n$::errorInfo"
+        }
+    }
+
     set c
 }
 
@@ -868,14 +874,12 @@ proc gen::getTitleOverviewBody {path {canUseBodyForOverview 0} {htmlRaw 0}} {
     gen::setImageInfo $path [list]
 
 
-
     foreach {pattern func} $::handlers {
         if {[regexp $pattern $path]} {
             set content [$func $path $content]
             break
         }
     }
-
 
     
     if {[gen::getDoTclEvaluation]} {
@@ -926,7 +930,6 @@ proc gen::getTitleOverviewBody {path {canUseBodyForOverview 0} {htmlRaw 0}} {
             } 
         }
     }
-
 
 
     regexp -nocase {<body>(.*)</body>} $body match body
@@ -1170,7 +1173,6 @@ proc gen::definePage {file actualFilePath parent includeInNav includeInToc {page
 
 
 
-
     gen::setPageType $file $pageType
 
     switch $pageType {
@@ -1188,6 +1190,7 @@ proc gen::definePage {file actualFilePath parent includeInNav includeInToc {page
 	    append body $dfltBody
         }
     }
+
 
     set siblingOrder 0
     if {![gen::fileExists $parent]} {
@@ -1248,7 +1251,10 @@ proc gen::definePage {file actualFilePath parent includeInNav includeInToc {page
         gen::addChild $parent  $file
     }
 
+
     if {$pageType == "real"} {
+        set body [gen::addSubHead $file $body ]
+    } elseif {$pageType == "virtual"} {
         set body [gen::addSubHead $file $body ]
     }
 
@@ -1351,7 +1357,11 @@ proc gen::getLevelLabel {path} {
     if {![gen::getNumbering]} {
         return ""
     }
-    if {![gen::fileExists $path]} {return ""}
+##    if {![gen::fileExists $path]} {return ""}
+
+    if {![info exists ::info($path,LevelLabel)]} {
+        return ""
+    }
     set ::info($path,LevelLabel)
 }
 
@@ -1625,15 +1635,13 @@ proc gen::getTranslateLinks {from} {
 }
 
 proc gen::processFile {from to fileIdx template} {
-
     gen::mkdir [file dirname $to]
 
+    set depth         [gen::getDepth $from]
+    set body [gen::getBody       $from]
 
 
     array set A [gen::initMacroArray]
-    set depth         [gen::getDepth $from]
-
-    set body [gen::getBody       $from]
     set body [gen::addGlossary   $from $body ]
     set body [gen::processSlideShow $from $to $body]
     set body [gen::processIfs $from $body]
@@ -1651,7 +1659,9 @@ proc gen::processFile {from to fileIdx template} {
     set childlist "[ht::tag div class childlist][ht::tag table width 100%]"
 
 
-    foreach child [gen::getChildren $from] {
+    set children [gen::getChildren $from]
+
+    foreach child $children {
 #        if {![gen::getIncludeInToc $child]} {continue}
 	set desc [gen::getDescription $child]
 	if {$desc !=""} {
