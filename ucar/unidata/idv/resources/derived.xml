@@ -598,7 +598,7 @@ or
     <operands categories=""/>
   </derived>
 
-  <derived description="Export Grid/Image to netCDF" formula="exportGridToNetcdf(grid[,categories=GRID-3D-*;GRID-2D-*;IMAGE-*-*;],file[type=file,isuser=true,label=netCDF File,filepattern=\.nc:netCDF Files])" id="exportGridToNetcdf" isdefault="false" isenduser="true">
+  <derived description="Export Grid/Image to netCDF" formula="exportGridToNetcdf(grid[,categories=GRID-3D-*;GRID-2D-*;IMAGE-*-*;*-flowvector-*;*-flowvector3d-*],file[type=file,isuser=true,label=netCDF File,filepattern=\.nc:netCDF Files])" id="exportGridToNetcdf" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Export"/>
     </categories>
