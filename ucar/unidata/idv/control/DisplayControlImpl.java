@@ -4698,7 +4698,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                             "saveDataChoiceInCache"));
         }
         if (canExportData()) {
-            items.add(GuiUtils.makeMenuItem("Export Displayed Data...", this,
+            items.add(GuiUtils.makeMenuItem("Export Displayed Data to NetCDF...", this,
                                             "exportDisplayedData",
                                             FileManager.SUFFIX_NETCDF, true));
         }
