@@ -1017,6 +1017,16 @@ public class WMSControl extends ImageControl implements ImageObserver {
 
 
     /**
+     * This gets called when the user selects the View menu item "Use Native Image Projection"
+     *
+     * @return MapProjection  for the data
+     */
+    public MapProjection getDataProjectionForMenu() {
+        return super.getDataProjection();
+    }
+
+
+    /**
      * Set the data on the display. Perform the color exclude.
      *
      *
