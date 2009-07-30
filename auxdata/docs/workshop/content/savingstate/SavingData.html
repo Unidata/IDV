@@ -1,0 +1,44 @@
+<title>Saving Data</title>
+
+
+
+[ht::desc The IDV can write out both point and gridded netcdf files]
+
+
+
+
+<div class="overview">
+In this section we will cover how to write out point and gridded data files.
+</div>
+
+<ol class="step">
+  <li> First, clear all existing data and displays and load in the Sample ETA Grid from the catalog chooser.
+  <li> Create a  Contour Plan View of Temperature @ 500 MB.
+  <li>Save the displayed data.</li>
+  <ul>
+    <li>Select the [ht::menu File {Save} {Export Displayed Data to NetCDF...}] menu from the display's File  menu.
+    <li> Enter [ht::filename testgrid.nc].
+  </ul>
+  <li> Now, lets load this grid back into the IDV. Note the parameter differences. Create another Contour Plan View with T.
+
+  <li> Let's save off a derived quantity.
+  <ul>
+     <li> Choose Geostrophic Wind Vectors (from Z) under 3D Grid - Derived and create a Vector Plan View. 
+     <li> Repeat the above steps, saving the file as testgrid2.nc
+  </ul>
+
+
+  <li> Let's save point data
+  <ul>   
+    <li> Load in a couple of time steps of real time METARS from the ADDE Point Data  chooser.
+    <li> Create a Station Model display of the data.
+    <li> Write out the NetCDF file with the [ht::menu File Save {Export to NetCDF}] menu.
+  </ul>
+
+  
+
+
+</ol>
+
+
+
