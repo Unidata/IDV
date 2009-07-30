@@ -31,6 +31,7 @@ import ucar.unidata.data.grid.GridUtil;
 
 import ucar.unidata.data.radar.RadarConstants;
 
+import ucar.unidata.idv.CrossSectionViewManager;
 import ucar.unidata.idv.DisplayConventions;
 
 import ucar.unidata.util.Coord;
@@ -849,9 +850,13 @@ public class ColorRhiControl extends ColorCrossSectionControl {
      */
     protected void updateLegendLabel() {
         super.updateLegendLabel();
-        getCrossSectionViewManager().setNewDisplayTitle(
-            ((DataChoice) getDataChoices().get(0)).getName() + " Azimuth "
-            + getDisplayConventions().formatAngle(beamAz));
+        CrossSectionViewManager csvm = getCrossSectionViewManager();
+        List dataChoices = getDataChoices();
+        DisplayConventions dc = getDisplayConventions();
+        if(csvm!=null && dataChoices!=null && dataChoices.size()>0 && dc!=null) {
+            csvm.setNewDisplayTitle(((DataChoice)dataChoices.get(0)).getName() + " Azimuth "
+                                    + dc.formatAngle(beamAz));
+        }
     }
 
 
