@@ -343,7 +343,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
             urls.add(url);
         }
         List newFiles = IOUtil.writeTo(urls, prefix, suffixes, loadId);
-        System.err.println ("files:" + newFiles);
+        // System.err.println ("files:" + newFiles);
         if (newFiles == null) {
             return null;
         }
@@ -1640,6 +1640,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
         myDataChoices   = null;
         myCompositeDataChoice = null;
         imageTimes = null;
+        currentDirs = null;
     }
 
 
