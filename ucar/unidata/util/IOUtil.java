@@ -779,6 +779,12 @@ public class IOUtil {
             files.add(path);
             OutputStream to    = new FileOutputStream(path);
             int          bytes = writeTo(from, to, loadId, length);
+            try {
+                from.close();
+            } catch (Exception exc) {}
+            try {
+                to.close();
+            } catch (Exception exc) {}
             if (bytes <= 0) {
                 return null;
             }
