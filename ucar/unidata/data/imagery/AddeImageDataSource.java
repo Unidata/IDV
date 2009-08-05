@@ -37,6 +37,7 @@ import visad.data.mcidas.AreaAdapter;
 
 import visad.meteorology.SingleBandedImage;
 
+import java.io.RandomAccessFile;
 
 
 import java.rmi.RemoteException;
@@ -157,6 +158,38 @@ public class AddeImageDataSource extends ImageDataSource {
         }
         return dataName;
 
+    }
+
+    /**
+     * Save files to local disk
+     *
+     * @param prefix destination dir and file prefix
+     * @param loadId For JobManager
+     * @param changeLinks Change internal file references
+     *
+     * @return Files copied
+     *
+     * @throws Exception On badness
+     */
+    protected List saveDataToLocalDisk(String prefix, Object loadId,
+                                       boolean changeLinks)
+            throws Exception {
+        List newFiles = super.saveDataToLocalDisk(prefix, loadId, changeLinks);
+        if (newFiles == null) {
+            return newFiles;
+        }
+        // write 0 as the first word
+        for (int i = 0; i < newFiles.size(); i++) {
+            try {
+              RandomAccessFile to    = new RandomAccessFile((String) newFiles.get(i), "rw");
+              to.seek(0);
+              to.writeInt(0);
+              to.close();
+            } catch (Exception e) {
+              System.out.println("unable to set first word to 0");
+            }
+        }
+        return newFiles;
     }
 
 }
