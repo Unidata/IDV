@@ -2777,8 +2777,9 @@ foreach lib $libs {
     source $lib
 }
 
+set scriptDir [file dirname [info script]]
+##Don't copy the lib.tcl from the script dir for now
 if {0} {
-    set scriptDir [file dirname [info script]]
     if {[file exists [file join $scriptDir lib.tcl]]} {
         puts "sourcing script dir lib: [file join $scriptDir lib.tcl]"
         source [file join $scriptDir lib.tcl]
