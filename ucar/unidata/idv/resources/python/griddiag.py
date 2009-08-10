@@ -376,6 +376,14 @@ def vadd(V1,V2):
   """
   return add(V1,V2)
 
+def vecn(S1,S2):
+  """ Make a true nort vector from two components 
+  <div class=jython>
+      VECN ( S1, S2 ) = [ S1, S2 ]
+  </div>
+  """
+  return makeTrueVector(S1,S2)
+
 def vecr(S1,S2):
   """ Make a vector from two components 
   <div class=jython>
