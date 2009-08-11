@@ -156,7 +156,7 @@ public class ImageSequenceControl extends BaseImageControl {
      */
     public ImageSequenceControl() {
         setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT
-                          | FLAG_SKIPFACTOR);
+                          | FLAG_SKIPFACTOR | FLAG_TEXTUREQUALITY);
     }
 
 
@@ -203,6 +203,7 @@ public class ImageSequenceControl extends BaseImageControl {
         sequenceDisplay = new ImageSequenceDisplayable("Images", null,
                 getInitialColorTable().getAlphaTable());
         sequenceDisplay.setTextureEnable(true);
+        sequenceDisplay.setCurvedSize(getTextureQuality());
         if (EMPTY_IMAGE != null) {
             sequenceDisplay.loadData(EMPTY_IMAGE);
         }
@@ -251,6 +252,19 @@ public class ImageSequenceControl extends BaseImageControl {
 
 
         return true;
+    }
+
+    /**
+     *  Use the value of the texture quality to set the value on the display
+     *
+     * @throws RemoteException  problem with Java RMI
+     * @throws VisADException   problem setting attribute on Displayable
+     */
+    protected void applyTextureQuality()
+            throws VisADException, RemoteException {
+        if (sequenceDisplay != null) {
+            sequenceDisplay.setCurvedSize(getTextureQuality());
+        }
     }
 
 
