@@ -90,7 +90,6 @@ import visad.RealType;
 import visad.SampledSet;
 import visad.Set;
 import visad.SetException;
-import visad.SetException;
 import visad.SetType;
 import visad.SingletonSet;
 import visad.Unit;
@@ -882,10 +881,24 @@ public class GeoGridAdapter {
             }  // end 3D gridded set
 
             Trace.call1("GeoGridAdapter.spatial GriddedSet.create");
-            domainSet = GriddedSet.create(domainTemplate, coordData, lengths,
-                                          (CoordinateSystem) null, units,
-                                          (ErrorEstimate[]) null, false,
-                                          false);
+            try {
+                domainSet = GriddedSet.create(domainTemplate, coordData,
+                        lengths, (CoordinateSystem) null, units,
+                        (ErrorEstimate[]) null, false, true);
+            } catch (SetException se) {
+                // if a SetException is thrown, then it's possible that the 
+                // samples are missing or inconsistent.  Try again with 
+                // test = false
+                String msg = se.getMessage();
+                if ((msg.indexOf("form a valid grid") >= 0)
+                        || (msg.indexOf("may not be missing") >= 0)) {
+                    domainSet = GriddedSet.create(domainTemplate, coordData,
+                            lengths, (CoordinateSystem) null, units,
+                            (ErrorEstimate[]) null, false, false);
+                } else {
+                    throw new VisADException(se);
+                }
+            }
             Trace.call2("GeoGridAdapter.spatial GriddedSet.create");
         }  // end non-linear
         log_.debug("Domain set = " + domainSet);
@@ -1416,7 +1429,7 @@ public class GeoGridAdapter {
      * @param timeIndex the time index
      * @param time The time
      * @param readLabel What to show in the status bar
-     * @param gridMap where to store the grid 
+     * @param gridMap where to store the grid
      * @param sampleRanges sample ranges
      * @param lazyEvaluation Are we using the CachedFlatField
      *
