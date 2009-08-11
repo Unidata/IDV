@@ -158,6 +158,12 @@ public class GridTableControl extends GridDisplayControl {
                                          new TableNumberCellRenderer());
                 cardLayoutPanel.addCard(new JScrollPane(table));
             }
+        } else {
+            FlatFieldTable table = new FlatFieldTable((FlatField) field,
+                                           showNativeCoordinates);
+            table.setDefaultRenderer(Number.class,
+                                         new TableNumberCellRenderer());
+            cardLayoutPanel.addCard(new JScrollPane(table));
         }
         setAnimationSet(dates);
     }
