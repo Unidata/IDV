@@ -1361,8 +1361,10 @@ public abstract class CrossSectionControl extends GridDisplayControl {
         endLocation   = elArray[1];
         LatLonPoint latlon1 = startLocation.getLatLonPoint();
         LatLonPoint latlon2 = endLocation.getLatLonPoint();
-        FieldImpl slice = getGridDataInstance().sliceAlongLatLonLine(latlon1,
-                              latlon2);
+        FieldImpl slice = 
+            getGridDataInstance().sliceAlongLatLonLine(latlon1, latlon2, 
+                              getSamplingModeValue( getObjectStore().get(
+                             PREF_SAMPLING_MODE, DEFAULT_SAMPLING_MODE)));
         loadData(slice);
     }
 
