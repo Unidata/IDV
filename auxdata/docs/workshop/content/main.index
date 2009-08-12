@@ -73,6 +73,7 @@ index.html
 >>>savingstate/VectorCapture.html
 >>>savingstate/MovieCapture.html
 >>>savingstate/SavingData.html
+>>>savingstate/Ramadda.html
 #+>>>savingstate/CaptureAndPlayback.html
 #+>>>savingstate/CmdLineImageCapture.html
 #+>>>savingstate/CmdLineMovieCapture.html
@@ -116,17 +117,18 @@ index.html
 #>>>datadisplays/trajectory/TracksInTransect.html
 
 
->>title:Miscellaneous Displays:This section covers GIS data (DEM, WMS, Shapefiles), the drawing tool and weather text displays.
->>>datadisplays/gis/WMS.html
+#>>title:Miscellaneous Displays:This section covers GIS data (DEM, WMS, Shapefiles), the drawing tool and weather text displays.
+>>title:Miscellaneous Displays
++>>>datadisplays/gis/WMS.html
 ##>>>datadisplays/gis/WMS2.html
->>>datadisplays/gis/Shapefile.html
->>>datadisplays/gis/Locations.html
->>>datadisplays/gis/WorldWind.html
->>>datadisplays/gis/DEM.html
->>>datadisplays/gis/DoingMoreGis.html
++>>>datadisplays/gis/Shapefile.html
++>>>datadisplays/gis/Locations.html
++>>>datadisplays/gis/WorldWind.html
++>>>datadisplays/gis/DEM.html
++>>>datadisplays/gis/DoingMoreGis.html
 >>>datadisplays/misc/Drawing1.html
 >>>datadisplays/misc/Drawing2.html
->>>datadisplays/misc/GeoLocatedImage.html
++>>>datadisplays/misc/GeoLocatedImage.html
 >>>datadisplays/misc/WeatherTextProducts.html
 
 
