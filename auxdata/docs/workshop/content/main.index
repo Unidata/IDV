@@ -65,7 +65,6 @@ index.html
 >>savingstate/index.html
 >>>savingstate/Bundles.html
 >>>savingstate/MoreBundles.html
->>>savingstate/JnlpBundles.html
 >>>savingstate/DefaultBundle.html
 >>>savingstate/Favorites.html
 >>>savingstate/DataBundles.html
@@ -74,6 +73,7 @@ index.html
 >>>savingstate/MovieCapture.html
 >>>savingstate/SavingData.html
 >>>savingstate/Ramadda.html
+#+>>>savingstate/JnlpBundles.html
 #+>>>savingstate/CaptureAndPlayback.html
 #+>>>savingstate/CmdLineImageCapture.html
 #+>>>savingstate/CmdLineMovieCapture.html
@@ -119,6 +119,9 @@ index.html
 
 #>>title:Miscellaneous Displays:This section covers GIS data (DEM, WMS, Shapefiles), the drawing tool and weather text displays.
 >>title:Miscellaneous Displays
+>>>datadisplays/misc/Drawing1.html
+>>>datadisplays/misc/Drawing2.html
+>>>datadisplays/misc/WeatherTextProducts.html
 +>>>datadisplays/gis/WMS.html
 ##>>>datadisplays/gis/WMS2.html
 +>>>datadisplays/gis/Shapefile.html
@@ -126,10 +129,8 @@ index.html
 +>>>datadisplays/gis/WorldWind.html
 +>>>datadisplays/gis/DEM.html
 +>>>datadisplays/gis/DoingMoreGis.html
->>>datadisplays/misc/Drawing1.html
->>>datadisplays/misc/Drawing2.html
 +>>>datadisplays/misc/GeoLocatedImage.html
->>>datadisplays/misc/WeatherTextProducts.html
+
 
 
 >>datadisplays/profiler/index.html
@@ -179,12 +180,12 @@ index.html
 
 
 >>title:Configuring IDV Sites:In this section we will cover how to configure the IDV to share common resources within a site installation.
->>>advanced/SiteInstallation.html
->>>advanced/Rbi.html
->>>advanced/Resources.html
 >>>advanced/PluginManager.html
 >>>advanced/PluginCreator.html
->>>advanced/UsingWebstart.html
++>>>advanced/SiteInstallation.html
++>>>advanced/Rbi.html
++>>>advanced/Resources.html
++>>>advanced/UsingWebstart.html
 -advanced/workshop.jnlp
 -advanced/workshop.jnlp.txt
 -advanced/idv.properties.txt
