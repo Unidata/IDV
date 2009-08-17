@@ -344,8 +344,10 @@ public class DirectDataChoice extends DataChoice {
      * @return  the hashcode
      */
     public int hashCode() {
+        Object myDataSource = dataSource;
+        if(myDataSource==null) return super.hashCode();
         //TODO - is this a good way to combine the hash codes?
-        return (dataSource.hashCode() ^ (super.hashCode()));
+        return (myDataSource.hashCode() ^ (super.hashCode()));
     }
 
     /**
