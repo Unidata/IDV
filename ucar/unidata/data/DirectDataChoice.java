@@ -187,8 +187,8 @@ public class DirectDataChoice extends DataChoice {
      * @return    full description
      */
     public String getFullDescription() {
-        return super.getFullDescription() + " from <b>"
-               + dataSource.getPartialDescription() + "</b>";
+        return super.getFullDescription() + " from: <br>"
+               + dataSource.getPartialDescription();
     }
 
 

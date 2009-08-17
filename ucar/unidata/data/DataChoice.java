@@ -841,7 +841,7 @@ public abstract class DataChoice {
      * @return The name concatenated with the description.
      */
     public String getFullDescription() {
-        return getName() + " " + getDescription();
+        return "<b>Field:</b> " + getName() + " <b>(" + getDescription() + ")</b>";
     }
 
 

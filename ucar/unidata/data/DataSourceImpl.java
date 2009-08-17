@@ -2289,7 +2289,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @return  the full description of this data source (description + name)
      */
     public String getFullDescription() {
-        return "<b>Name:</b>" + getName() + "<br>" + "<b>Description:</b>"
+        return "<b>Name: </b>" + getName() + "<br>" + "<b>Description:</b>"
                + getDescription();
     }
 
