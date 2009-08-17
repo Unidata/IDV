@@ -230,7 +230,7 @@ public class Misc {
             }
         } else {  //have something like DD.ddd
             try {
-                value = Double.parseDouble(latlon);
+                value = parseNumber(latlon);
             } catch (NumberFormatException nfe) {
                 value = Double.NaN;
             }
