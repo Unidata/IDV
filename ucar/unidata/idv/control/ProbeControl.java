@@ -293,6 +293,9 @@ public class ProbeControl extends DisplayControlImpl {
 
         for (int i = 0; i < choices.size(); i++) {
             ProbeRowInfo info = getRowInfo(i);
+            if(info == null) {
+                return false;
+            }
             if ( !checkIfDataOk(info.getDataInstance())) {
                 return false;
             }
@@ -2043,8 +2046,10 @@ public class ProbeControl extends DisplayControlImpl {
             infos.add(info);
         }
         ProbeRowInfo info = (ProbeRowInfo) infos.get(row);
+        if(info == null) return null;
         if (andInitializeData && (info.getDataInstance() == null)) {
             List choices = getDataChoices();
+            if(choices==null) return null;
             try {
                 DataChoice dc = (DataChoice) choices.get(row);
                 showWaitCursor();
