@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.ui;
 
 
@@ -167,6 +168,7 @@ public class LatLonWidget extends JPanel {
      * @param latString
      */
     public void setLat(String latString) {
+        latString = formatLatLonString(latString);
         latFld.setText(latString);
         if ((latString != null) && (latString.length() > 0)) {
             latFld.setCaretPosition(0);
@@ -180,6 +182,7 @@ public class LatLonWidget extends JPanel {
      * @param lonString
      */
     public void setLon(String lonString) {
+        lonString = formatLatLonString(lonString);
         lonFld.setText(lonString);
         if ((lonString != null) && (lonString.length() > 0)) {
             lonFld.setCaretPosition(0);
@@ -405,6 +408,25 @@ public class LatLonWidget extends JPanel {
         return altFld;
     }
 
+    /**
+     * Format the lat or lon string
+     *
+     * @param latOrLon  lat or lon value as a string in decimal notation
+     *
+     * @return value in regional formatting
+     */
+    private String formatLatLonString(String latOrLon) {
+        if ((latOrLon == null) || (latOrLon.length() == 0)) {
+            return latOrLon;
+        }
+        String formatted = latOrLon.trim();
+        try {
+            formatted = Misc.format(Misc.parseDouble(formatted));
+        } catch (Exception e) {
+            return latOrLon;
+        }
+        return formatted;
+    }
 
 }
 
