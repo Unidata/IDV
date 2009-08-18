@@ -452,7 +452,6 @@ public class MapViewManager extends NavigatedViewManager {
                         "The viewpoint is not overhead. This will result in an incorrect image capture."), GuiUtils
                             .left(fixViewpointCbx));
             if ( !GuiUtils.askOkCancel("KML Capture", question)) {
-
                 return false;
             }
             if (fixViewpointCbx.isSelected()) {
@@ -465,6 +464,7 @@ public class MapViewManager extends NavigatedViewManager {
                 return true;
             }
         }
+
 
         int cnt = 0;
         while (true) {
@@ -494,30 +494,31 @@ public class MapViewManager extends NavigatedViewManager {
                                      - ll.getLatitude().getValue());
 
 
-            boolean ok = true;
+            boolean projOk = true;
+
             if ( !isClose(width, ul.getLongitude().getValue(),
                           ll.getLongitude().getValue())) {
-                ok = false;
+                projOk = false;
             }
             if ( !isClose(width, ur.getLongitude().getValue(),
                           lr.getLongitude().getValue())) {
-                ok = false;
+                projOk = false;
             }
             if ( !isClose(height, ul.getLatitude().getValue(),
                           ur.getLatitude().getValue())) {
-                ok = false;
+                projOk = false;
             }
             if ( !isClose(height, ll.getLatitude().getValue(),
                           lr.getLatitude().getValue())) {
-                ok = false;
+                projOk = false;
             }
 
-            if (ok) {
+            if (projOk) {
                 return true;
             }
 
             if (fixProjectionCbx == null) {
-                fixProjectionCbx = new JCheckBox("Fix it", false);
+                fixProjectionCbx = new JCheckBox("Fix it", true);
             }
             String msg = ((cnt == 1)
                           ? "The projection is not lat/lon. This will result in an incorrect image capture."
