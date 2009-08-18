@@ -406,6 +406,11 @@ public class IdvUIManager extends IdvManager {
     /** Maps aciton id to xml element */
     private Hashtable actionMap;
 
+    /** The different menu ids */
+    private Hashtable menuIds;
+
+    private Hashtable<String,ImageIcon> actionIcons;
+
 
     /** List of action groups */
     private List actionGroupList = new ArrayList();
@@ -980,6 +985,7 @@ public class IdvUIManager extends IdvManager {
         if (actionMap != null) {
             return;
         }
+        actionIcons = new Hashtable<String,ImageIcon>();
         actionMap  = new Hashtable();
         actionList = new ArrayList();
         XmlResourceCollection xrc = getResourceManager().getXmlResources(
@@ -1007,6 +1013,15 @@ public class IdvUIManager extends IdvManager {
                     actionGroupList.add(group);
                 }
                 groupList.add(actionNode);
+                String image = XmlUtil.getAttribute(actionNode,ATTR_IMAGE,(String)null);
+                if(image!=null) {
+                    ImageIcon icon = GuiUtils.getImageIcon(image, true);
+                    if(icon!=null) {
+                        actionIcons.put("action:" +id,icon);
+                    }
+                }
+                
+
                 //                System.out.println("<li><b>" + id +"</b><br>" + XmlUtil.getAttribute(actionNode, ATTR_DESCRIPTION));
             }
         }
@@ -1617,8 +1632,6 @@ public class IdvUIManager extends IdvManager {
     }
 
 
-    /** The different menu ids */
-    private Hashtable menuIds;
 
     /**
      * Get the map of menu ids
@@ -1638,6 +1651,7 @@ public class IdvUIManager extends IdvManager {
      */
     public JMenuBar doMakeMenuBar() {
 
+
         Hashtable menuMap = new Hashtable();
         menuIds = menuMap;
         JMenuBar menuBar = null;
@@ -1646,7 +1660,7 @@ public class IdvUIManager extends IdvManager {
         menuBar = new JMenuBar();
         for (int i = 0; i < xrc.size(); i++) {
             GuiUtils.processXmlMenuBar(xrc.getRoot(i), menuBar, getIdv(),
-                                       menuMap);
+                                       menuMap,actionIcons);
         }
 
         JMenu helpMenu = (JMenu) menuMap.get(MENU_HELP);
