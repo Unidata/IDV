@@ -227,7 +227,15 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
 
         // Initialize sharing to true
         super("AnimationWidget", true);
-        indicator      = new JComboBox();
+        indicator   = new JComboBox() {
+                public String getToolTipText(MouseEvent event) {
+                    if (boxPanel != null) {
+                        return boxPanel.getToolTipText();
+                    }
+                    return " ";
+                }
+            };
+        indicator.setToolTipText("");
         indicatorMutex = indicator.getTreeLock();
         indicator.setFont(new Font("Dialog", Font.PLAIN, 9));
         indicator.setLightWeightPopupEnabled(false);
