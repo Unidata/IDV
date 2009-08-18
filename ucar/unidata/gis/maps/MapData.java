@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.gis.maps;
 
 
@@ -44,9 +45,26 @@ import java.awt.Color;
 
 public class MapData {
 
+    /** attribute identifier          */
+    public static final String ATTR_COLOR = "color";
+
+    /** attribute identifier          */
+    public static final String ATTR_LINEWIDTH = "linewidth";
+
+    /** attribute identifier          */
+    public static final String ATTR_LINESTYLE = "linestyle";
+
+    /** attribute identifier          */
+    public static final String ATTR_FASTRENDERING = "fastrendering";
+
+    /** attribute identifier          */
+    public static final String ATTR_VISIBLE = "visible";
+
+
     /** The file, url or java resource of the map */
     protected String source;
 
+    /** The category of this map   */
     protected String category = "Maps";
 
     /** The description of the map */
@@ -89,7 +107,8 @@ public class MapData {
     public MapData(Element mapNode, String source) {
         this.source = source;
         //        source = XmlUtil.getAttribute(mapNode, MapInfo.ATTR_SOURCE, "");
-        category = XmlUtil.getAttribute(mapNode, MapInfo.ATTR_CATEGORY,"Maps");
+        category = XmlUtil.getAttribute(mapNode, MapInfo.ATTR_CATEGORY,
+                                        "Maps");
 
         description = XmlUtil.getAttribute(mapNode, MapInfo.ATTR_DESCRIPTION,
                                            source);
@@ -249,6 +268,8 @@ public class MapData {
         description = v;
     }
 
+
+
     /**
      * Get the line width
      *
@@ -360,23 +381,23 @@ public class MapData {
         return fastRendering;
     }
 
-/**
-Set the Category property.
+    /**
+     *  Set the Category property.
+     *
+     *  @param value The new value for Category
+     */
+    public void setCategory(String value) {
+        category = value;
+    }
 
-@param value The new value for Category
-**/
-public void setCategory (String value) {
-	category = value;
-}
-
-/**
-Get the Category property.
-
-@return The Category
-**/
-public String getCategory () {
-	return category;
-}
+    /**
+     *  Get the Category property.
+     *
+     *  @return The Category
+     */
+    public String getCategory() {
+        return category;
+    }
 
 
 }
