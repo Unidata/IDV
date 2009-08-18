@@ -1676,7 +1676,7 @@ public class DrawingControl extends DisplayControlImpl {
         //        widgets.add(new JLabel(" "));
         //        widgets.add(GuiUtils.inset(new JLabel(" "), 5));
         if (showLocationWidgets()) {
-            widgets.add(GuiUtils.rLabel("Location:"));
+            widgets.add(GuiUtils.rLabel("Coordinates:"));
             widgets.add(GuiUtils.left(GuiUtils.flow(new Component[] {
                 coordBox,
                 fullLatLonCbx })));
