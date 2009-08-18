@@ -192,8 +192,7 @@ public class ContourInfoDialog implements ActionListener {
             }
         });
 
-        GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
-        JPanel p1 = GuiUtils.doLayout(new Component[] {
+        Component comps = new Component[] {
             GuiUtils.rLabel("Contour Interval:"),
             GuiUtils.centerRight(intervalFld = makeField(),
                                  new JLabel(labelString)),
@@ -210,9 +209,10 @@ public class ContourInfoDialog implements ActionListener {
             widthBox = GuiUtils.createValueBox(this, "lineWidth", 1,
                 Misc.createIntervalList(1, 5, 1), true),
             GuiUtils.right(dashBtn), styleBox, GuiUtils.right(toggleBtn),
-            GuiUtils.filler()
-        }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
+            GuiUtils.filler()};
 
+        GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
+        JPanel p1 = GuiUtils.doLayout(comps, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
         contents = p1;
 
 
