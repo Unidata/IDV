@@ -522,7 +522,7 @@ public class LineState {
         nameField.setToolTipText("Name of chart entry. Use \""
                                  + TimeSeriesChart.MACRO_PARAMETER
                                  + "\" for parameter name");
-        comps.add(GuiUtils.rLabel("Legend Title:"));
+        comps.add(GuiUtils.rLabel("Legend Label:"));
         comps.add(GuiUtils.left(nameField));
 
         if (chartNames != null) {
