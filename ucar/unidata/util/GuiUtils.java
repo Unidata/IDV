@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -1386,12 +1387,12 @@ public class GuiUtils extends LayoutUtil {
 
 
     /**
-     * _more_
+     * Do a 2 column layout of the objects with the given insets for spacing
      *
-     * @param objects _more_
-     * @param insets _more_
+     * @param objects May be components or strings. If strings this method will create jlabels
+     * @param insets spacing
      *
-     * @return _more_
+     * @return component
      */
     public static JComponent formLayout(List objects, Insets insets) {
         Component[] comps = new Component[objects.size()];
@@ -1418,7 +1419,7 @@ public class GuiUtils extends LayoutUtil {
      * then it creates a rLabel(object.toString)
      *
      * @param objects array of components to layout
-     * @param insets _more_
+     * @param insets The spacing
      * @return component
      */
     public static JComponent formLayout(Object[] objects, Insets insets) {
@@ -2194,16 +2195,16 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
-    /** _more_          */
+    /** widget for interval dailog */
     private static JTextField intervalStepFld = new JTextField("1", 4);
 
-    /** _more_          */
+    /** widget for interval dailog */
     private static JTextField intervalStartFld = new JTextField("1", 4);
 
     /**
-     * _more_
+     * Show the list interval selection dialog
      *
-     * @param list _more_
+     * @param list list
      */
     public static void showIntervalSelectionDialog(JList list) {
         tmpInsets = INSETS_5;
@@ -3401,10 +3402,37 @@ public class GuiUtils extends LayoutUtil {
     public static JMenuItem processXmlMenuItem(Node node,
             ActionListener listener, Hashtable menuItems)
             throws Exception {
-        NamedNodeMap attrs    = node.getAttributes();
-        String       label    = Msg.msg(getAttribute(attrs, "label"));
-        JMenuItem    menuItem = new JMenuItem(label);
-        String       mnemonic = getAttribute(node, "mnemonic", (String) null);
+
+        return processXmlMenuItem(node, listener, menuItems, null);
+    }
+
+
+    /**
+     * Create the JMenuItem defined by the given xml
+     *
+     * @param node Xml menu item node
+     * @param listener Action listener to add to the menu item
+     * @param menuItems Mapping from id (from xml) to JMenuItem
+     * @param actionIcons mapping of string action to imageicon to use in the menu item
+     * @return The menu item
+     *
+     * @throws Exception
+     */
+    public static JMenuItem processXmlMenuItem(Node node,
+            ActionListener listener, Hashtable menuItems,
+            Hashtable<String, ImageIcon> actionIcons)
+            throws Exception {
+        NamedNodeMap attrs     = node.getAttributes();
+        String       label     = Msg.msg(getAttribute(attrs, "label"));
+        String       action = getAttribute(attrs, ATTR_ACTION, (String) null);
+        ImageIcon    imageIcon = (((action != null) && (actionIcons != null))
+                                  ? actionIcons.get(action)
+                                  : null);
+        JMenuItem    menuItem  = ((imageIcon != null)
+                                  ? new JMenuItem(label, imageIcon)
+                                  : new JMenuItem(label));
+        String       mnemonic  = getAttribute(node, "mnemonic",
+                                     (String) null);
         if (mnemonic != null) {
             int keyCode =
                 charToKeyCode(mnemonic.trim().toUpperCase().charAt(0));
@@ -3419,9 +3447,9 @@ public class GuiUtils extends LayoutUtil {
         }
 
 
-        String action = getAttribute(attrs, ATTR_ACTION, (String) null);
-        String id     = getAttribute(attrs, ATTR_ID, (String) null);
-        String icon   = getAttribute(attrs, ATTR_ICON, (String) null);
+
+        String id   = getAttribute(attrs, ATTR_ID, (String) null);
+        String icon = getAttribute(attrs, ATTR_ICON, (String) null);
         menuItem.addActionListener(listener);
         if (action != null) {
             menuItem.setActionCommand(action);
@@ -3552,6 +3580,26 @@ public class GuiUtils extends LayoutUtil {
                                        ActionListener listener,
                                        Hashtable menuItems)
             throws Exception {
+        return processXmlMenu(menuNode, listener, menuItems, null);
+    }
+
+    /**
+     *     Create the JMenu from the given xml.
+     *
+     *     @param menuNode The menu xml node
+     *     @param listener The action listener
+     *     @param menuItems Mapping from id to menu items
+     * @param actionIcons mapping of string action to imageicon to use in the menu item
+     *     @return New JMenu
+     *
+     *     @throws Exception
+     */
+    public static JMenu processXmlMenu(Node menuNode,
+                                       ActionListener listener,
+                                       Hashtable menuItems,
+                                       Hashtable<String,
+                                           ImageIcon> actionIcons)
+            throws Exception {
         NamedNodeMap attrs    = menuNode.getAttributes();
         String       id       = getAttribute(attrs, "id", (String) null);
         NodeList     children = menuNode.getChildNodes();
@@ -3585,9 +3633,11 @@ public class GuiUtils extends LayoutUtil {
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
             if (child.getNodeName().equals("menuitem")) {
-                menu.add(processXmlMenuItem(child, listener, menuItems));
+                menu.add(processXmlMenuItem(child, listener, menuItems,
+                                            actionIcons));
             } else if (child.getNodeName().equals("menu")) {
-                JMenu childMenu = processXmlMenu(child, listener, menuItems);
+                JMenu childMenu = processXmlMenu(child, listener, menuItems,
+                                      actionIcons);
                 if (childMenu != null) {
                     menu.add(childMenu);
                 }
@@ -3611,6 +3661,29 @@ public class GuiUtils extends LayoutUtil {
     public static JMenuBar processXmlMenuBar(Element root, JMenuBar menuBar,
                                              ActionListener listener,
                                              Hashtable menuItems) {
+        return processXmlMenuBar(root, menuBar, listener, menuItems, null);
+    }
+
+
+    /**
+     * Create, if null, and ddd to the JMenuBar from the xml
+     *
+     * @param root Xml root
+     * @param menuBar  The menu bar
+     * @param listener The action listener
+     * @param menuItems Mapping from id to menu items
+     * @param actionIcons mapping of string action to imageicon to use in the menu item
+     * @return The JMenuBar
+     */
+
+    public static JMenuBar processXmlMenuBar(Element root, JMenuBar menuBar,
+                                             ActionListener listener,
+                                             Hashtable menuItems,
+                                             Hashtable<String,
+                                                 ImageIcon> actionIcons) {
+
+
+
         if (root == null) {
             return menuBar;
         }
@@ -3621,7 +3694,7 @@ public class GuiUtils extends LayoutUtil {
             List menus = findChildren(root, "menu");
             for (int i = 0; i < menus.size(); i++) {
                 JMenu menu = processXmlMenu((Node) menus.get(i), listener,
-                                            menuItems);
+                                            menuItems, actionIcons);
                 if (menu != null) {
                     menuBar.add(menu);
                 }
@@ -6278,6 +6351,7 @@ public class GuiUtils extends LayoutUtil {
     }
 
 }
+
 
 
 
