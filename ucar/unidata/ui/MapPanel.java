@@ -20,6 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.ui;
 
 
@@ -81,8 +83,11 @@ public class MapPanel extends JPanel {
     /** The fast rendering  cbx */
     private JCheckBox fastRenderingCbx;
 
-    /** _more_          */
+    /** Do we ignore the setVisibility */
     private boolean ignoreAction = false;
+
+    /** Are we updating the UI */
+    private boolean updatingUI = false;
 
     /**
      * Create the MapPanel with the given MapData
@@ -132,6 +137,9 @@ public class MapPanel extends JPanel {
         add(shownCbx);
         shownCbx.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent event) {
+                if (updatingUI) {
+                    return;
+                }
                 if ( !ignoreAction) {
                     mapData.setVisible(shownCbx.isSelected());
                 }
@@ -150,9 +158,8 @@ public class MapPanel extends JPanel {
         widthBox.setSelectedItem(String.valueOf(mapData.getLineWidth()));
         widthBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mapData.setLineWidth(Float
-                    .parseFloat((String) ((JComboBox) e.getSource())
-                        .getSelectedItem()));
+                mapData.setLineWidth(
+                    Float.parseFloat((String) widthBox.getSelectedItem()));
             }
         });
         p.add(GuiUtils.wrap(widthBox));
@@ -167,8 +174,7 @@ public class MapPanel extends JPanel {
         }
         styleBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mapData.setLineStyle(
-                    ((JComboBox) e.getSource()).getSelectedIndex());
+                mapData.setLineStyle(styleBox.getSelectedIndex());
             }
         });
         p.add(styleBox);
@@ -178,7 +184,7 @@ public class MapPanel extends JPanel {
         colorButton.addPropertyChangeListener("background",
                 new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                Color c = ((JPanel) evt.getSource()).getBackground();
+                Color c = colorButton.getBackground();
                 if (c != null) {
                     mapData.setColor(c);
                 }
@@ -201,6 +207,29 @@ public class MapPanel extends JPanel {
 
         add(p);
     }
+
+
+
+
+
+
+
+    /**
+     * Apply the mapData state to the GUI widgets
+     */
+    public void updateUI() {
+        if (updatingUI || (colorButton == null)) {
+            return;
+        }
+        updatingUI = true;
+        colorButton.setBackground(mapData.getColor());
+        fastRenderingCbx.setSelected(mapData.getFastRendering());
+        shownCbx.setSelected(mapData.getVisible());
+        styleBox.setSelectedIndex(mapData.getLineStyle());
+        widthBox.setSelectedItem(String.valueOf(mapData.getLineWidth()));
+        updatingUI = false;
+    }
+
 
     /**
      * Get the GUI components
