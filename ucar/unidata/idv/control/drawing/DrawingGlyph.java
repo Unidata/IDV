@@ -34,7 +34,9 @@ import ucar.unidata.idv.control.DrawingControl;
 
 
 
+import ucar.unidata.util.FileManager;
 import ucar.unidata.util.DateUtil;
+
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -322,7 +324,7 @@ public abstract class DrawingGlyph {
     /** Shows the color */
     private GuiUtils.ColorSwatch colorSwatch;
 
-
+    private AbstractTableModel pointTableModel;
 
 
     /**
@@ -1309,7 +1311,7 @@ public abstract class DrawingGlyph {
 
         tmpPoints = new ArrayList(points);
 
-        AbstractTableModel pointModel = new AbstractTableModel() {
+        pointTableModel = new AbstractTableModel() {
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return true;
@@ -1415,7 +1417,11 @@ public abstract class DrawingGlyph {
         };
 
 
-        JTable pointTable = new JTable(pointModel);
+        JTable pointTable = new JTable(pointTableModel);
+        
+        JButton writeBtn = GuiUtils.makeButton("Write Points", this, "writePoints");
+
+
         int    width      = 300;
         int    height     = 200;
         JScrollPane scroller = GuiUtils.makeScrollPane(pointTable, width,
@@ -1423,7 +1429,9 @@ public abstract class DrawingGlyph {
         scroller.setBorder(BorderFactory.createLoweredBevelBorder());
         scroller.setPreferredSize(new Dimension(width, height));
         scroller.setMinimumSize(new Dimension(width, height));
-        tabbedPane.add("Points", GuiUtils.center(scroller));
+
+
+        tabbedPane.add("Points", GuiUtils.centerBottom(scroller,GuiUtils.left(writeBtn)));
 
         jythonFld = new JTextField(control.getGlyphJython());
         JButton jythonBtn = GuiUtils.makeButton("Evaluate:", this,
@@ -1438,6 +1446,21 @@ public abstract class DrawingGlyph {
         GuiUtils.showInCenter(propDialog);
         propertiesUp = false;
 
+    }
+
+
+    /**
+     * write out the points as a csv file
+     */
+    public void writePoints() {
+        String filename =
+            FileManager.getWriteFile(Misc.newList(FileManager.FILTER_CSV,
+                                                  FileManager.FILTER_XLS), FileManager.SUFFIX_CSV,null);
+
+        if (filename == null) {
+            return;
+        }
+        GuiUtils.exportAsCsv("", pointTableModel, filename);
     }
 
 
