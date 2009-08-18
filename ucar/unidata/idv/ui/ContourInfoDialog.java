@@ -192,7 +192,7 @@ public class ContourInfoDialog implements ActionListener {
             }
         });
 
-        Component comps = new Component[] {
+        Component[] comps = new Component[] {
             GuiUtils.rLabel("Contour Interval:"),
             GuiUtils.centerRight(intervalFld = makeField(),
                                  new JLabel(labelString)),
