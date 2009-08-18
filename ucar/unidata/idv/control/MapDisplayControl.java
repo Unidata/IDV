@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -100,7 +101,7 @@ public class MapDisplayControl extends DisplayControlImpl {
     /**
      * List of MapState objects
      */
-    private List mapStates = new ArrayList();
+    private List<MapState> mapStates = new ArrayList<MapState>();
 
 
     /** Holds the latitude display info */
@@ -197,6 +198,16 @@ public class MapDisplayControl extends DisplayControlImpl {
 
     /** instance for this instantiation */
     int mycnt = cnt++;
+
+    /** The link button     */
+    private JToggleButton applyToAllBtn;
+
+    /** Do we apply the changes to all the maps     */
+    private boolean applyChangesToAllMaps = false;
+
+    /** Are we currently updating the other maps    */
+    private boolean updatingOtherMapStates = false;
+
 
     /**
      * Default Constructor.
@@ -301,8 +312,8 @@ public class MapDisplayControl extends DisplayControlImpl {
                 setDisplayVisibility(newMap.getDisplayVisibility());
             }
 
-            for (int i = 0; i < mapStates.size(); i++) {
-                Displayable theMap = ((MapState) mapStates.get(i)).getMap();
+            for (MapState mapState : mapStates) {
+                Displayable theMap = mapState.getMap();
                 if (theMap != null) {
                     mapsHolder.removeDisplayable(theMap);
                 }
@@ -319,7 +330,7 @@ public class MapDisplayControl extends DisplayControlImpl {
             latLonHolder.addDisplayable(lonState.getLatLonLines());
 
 
-            this.mapStates = new ArrayList();
+            this.mapStates = new ArrayList<MapState>();
             for (int i = 0; i < newMap.mapStates.size(); i++) {
                 MapState mapState =
                     new MapState((MapData) newMap.mapStates.get(i));
@@ -850,8 +861,19 @@ public class MapDisplayControl extends DisplayControlImpl {
                 : GuiUtils.top(makePositionSlider())));
 
 
+        applyToAllBtn =
+            GuiUtils.getToggleImageButton("/auxdata/ui/icons/Unlinked.gif",
+                                          "/auxdata/ui/icons/Linked.gif", 0,
+                                          0, true);
+        applyToAllBtn.setContentAreaFilled(false);
+        applyToAllBtn.setSelected(applyChangesToAllMaps);
+        applyToAllBtn.setToolTipText("Apply changes to all visible maps");
+
+
+
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.add("Maps", sp);
+        tabbedPane.add("Maps",
+                       GuiUtils.topCenter(GuiUtils.left(applyToAllBtn), sp));
         tabbedPane.add("Settings", displayPanel);
 
         /**
@@ -1397,6 +1419,9 @@ public class MapDisplayControl extends DisplayControlImpl {
         /** map panel */
         private MapPanel mapPanel;
 
+        /** A mutex    */
+        private Object MAP_MUTEX = new Object();
+
         /**
          * ctor for persistence
          */
@@ -1529,14 +1554,11 @@ public class MapDisplayControl extends DisplayControlImpl {
                 if (myMap == null) {
                     return;
                 }
-
-                myMap.setDisplayInactive();
-                myMap.setUseFastRendering(fastRendering);
-                myMap.setColor(mapColor);
-                myMap.setLineWidth(lineWidth);
-                myMap.setLineStyle(lineStyle);
-                myMap.setDisplayActive();
-
+                Misc.run(new Runnable() {
+                    public void run() {
+                        applyStateToMap();
+                    }
+                });
                 if (mapDisplayControl != null) {
                     mapDisplayControl.updateLegendLabel();
                 }
@@ -1545,8 +1567,140 @@ public class MapDisplayControl extends DisplayControlImpl {
             }
         }
 
+
+
+        /**
+         * Apply my map state to the map
+         */
+        protected void applyStateToMap() {
+            try {
+                synchronized (MAP_MUTEX) {
+                    myMap.setDisplayInactive();
+                    myMap.setUseFastRendering(fastRendering);
+                    myMap.setColor(mapColor);
+                    myMap.setLineWidth(lineWidth);
+                    myMap.setLineStyle(lineStyle);
+                    myMap.setDisplayActive();
+                }
+            } catch (Exception exc) {
+                //
+            }
+        }
+
+
+        /**
+         * Signal that the given attribute has changed
+         *
+         * @param attr The attribute identifier
+         */
+        private void attrChanged(String attr) {
+            if (mapDisplayControl != null) {
+                mapDisplayControl.mapStateChanged(this, attr);
+            }
+        }
+
+
+        /**
+         * Subclassed method to pickup changes
+         *
+         * @param v The value
+         */
+        public void setVisible(boolean v) {
+            super.setVisible(v);
+            attrChanged(MapData.ATTR_VISIBLE);
+        }
+
+        /**
+         * Subclassed method to pickup changes
+         *
+         * @param v The value
+         */
+        public void setLineStyle(int v) {
+            super.setLineStyle(v);
+            attrChanged(ATTR_LINESTYLE);
+        }
+
+        /**
+         * Subclassed method to pickup changes
+         *
+         * @param v The value
+         */
+        public void setColor(Color v) {
+            super.setColor(v);
+            attrChanged(MapData.ATTR_COLOR);
+        }
+
+        /**
+         * Subclassed method to pickup changes
+         *
+         * @param v The value
+         */
+        public void setLineWidth(float v) {
+            super.setLineWidth(v);
+            attrChanged(MapData.ATTR_LINEWIDTH);
+        }
+
+        /**
+         * Subclassed method to pickup changes
+         *
+         * @param v The value
+         */
+        public void setFastRendering(boolean v) {
+            super.setFastRendering(v);
+            attrChanged(MapData.ATTR_FASTRENDERING);
+        }
+
     }
 
+
+
+    /**
+     * Apply the changed map state to the other visible maps
+     *
+     * @param changedState Which one changed
+     * @param what Which attribute
+     */
+    private void mapStateChanged(MapState changedState, String what) {
+        updateLegendLabel();
+        if (what.equals(MapData.ATTR_VISIBLE)) {
+            return;
+        }
+        if (updatingOtherMapStates || !getApplyChangesToAllMaps()) {
+            return;
+        }
+        updatingOtherMapStates = true;
+        try {
+            for (MapState mapState : mapStates) {
+                if (mapState == changedState) {
+                    continue;
+                }
+                if ( !mapState.getVisible()) {
+                    continue;
+                }
+                if (what.equals(MapData.ATTR_COLOR)) {
+                    mapState.setColor(changedState.getColor());
+                } else if (what.equals(MapData.ATTR_LINEWIDTH)) {
+                    mapState.setLineWidth(changedState.getLineWidth());
+                } else if (what.equals(MapData.ATTR_LINESTYLE)) {
+                    mapState.setLineStyle(changedState.getLineStyle());
+                } else if (what.equals(MapData.ATTR_FASTRENDERING)) {
+                    mapState.setFastRendering(
+                        changedState.getFastRendering());
+                } else if (what.equals(MapData.ATTR_VISIBLE)) {
+                    continue;
+                    //                mapState.setVisible(changedState.getVisible());
+                } else {
+                    System.err.println("Unknown attribute:" + what);
+                }
+                if (mapState.mapPanel != null) {
+                    mapState.mapPanel.updateUI();
+                }
+            }
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+        updatingOtherMapStates = false;
+    }
 
 
     /**
@@ -1698,6 +1852,29 @@ public class MapDisplayControl extends DisplayControlImpl {
         return myShowInDisplayList;
     }
 
-}
 
+    /**
+     *  Set the ApplyChangesToAllMaps property.
+     *
+     *  @param value The new value for ApplyChangesToAllMaps
+     */
+    public void setApplyChangesToAllMaps(boolean value) {
+        applyChangesToAllMaps = value;
+    }
+
+    /**
+     *  Get the ApplyChangesToAllMaps property.
+     *
+     *  @return The ApplyChangesToAllMaps
+     */
+    public boolean getApplyChangesToAllMaps() {
+        if (applyToAllBtn != null) {
+            return applyToAllBtn.isSelected();
+        }
+        return applyChangesToAllMaps;
+    }
+
+
+
+}
 
