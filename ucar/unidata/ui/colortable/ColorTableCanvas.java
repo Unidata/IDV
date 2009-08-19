@@ -1262,9 +1262,6 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
               break;
 
 
-
-
-
           default :
               activePercent = xToPercent(event.getX());
               prepColorChange();
@@ -1275,6 +1272,11 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
               }
               activeColorIndex =
                   percentToColorIndex(xToPercent(event.getX()));
+              if(currentMode == MODE_INTERPOLATE) {
+                  activeColor = (Color) colorList.get(activeColorIndex);
+              }
+
+
               priorColors = (ArrayList) colorList.clone();
               if (mouseInBox && (activeColorIndex >= 0)) {
                   if (currentMode == MODE_BRIGHTNESS) {
