@@ -9559,11 +9559,16 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     private void setColorTable(ColorTable newColorTable, boolean fromUser)
             throws RemoteException, VisADException {
-        resetDimness();
         if ((colorTable != null) && (newColorTable != null)) {
             if (colorTable.equalsTable(newColorTable)) {
                 return;
             }
+            if(!colorTable.getName().equals(newColorTable.getName())) {
+                resetDimness();
+            }
+
+        } else {
+            resetDimness();
         }
         if (newColorTable == null) {
             this.colorTable = null;
