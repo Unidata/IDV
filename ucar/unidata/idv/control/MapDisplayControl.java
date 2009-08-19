@@ -610,6 +610,9 @@ public class MapDisplayControl extends DisplayControlImpl {
                 }
             });
         }
+        GuiUtils.limitMenuSize(addMapMenu, "Maps ", 20);
+
+
         super.getEditMenuItems(items, forMenuBar);
     }
 
