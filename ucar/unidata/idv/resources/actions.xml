@@ -133,7 +133,7 @@
      action="jython:idv.getJythonManager().importFormulas()"/>
   <action
      id="edit.formula.export"
-     image="/auxdata/ui/icons/EditFormulas16.png"
+     image="/auxdata/ui/icons/EditFormulas16.gif"
      description="Export formula"
      group="Jython"
      action="jython:idv.getJythonManager().exportFormulas()"/>
