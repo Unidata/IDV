@@ -635,7 +635,7 @@ public abstract class ResourceManager {
                 xmlEncoder = new XmlEncoder();
             }
             Element root = XmlUtil.getRoot(xml);
-            return (List) xmlEncoder.toObject(root);
+            return  xmlEncoder.toObject(root);
         } catch (Exception exc) {
             if (shouldWeIgnoreThisXml(xml)) {
                 return null;
