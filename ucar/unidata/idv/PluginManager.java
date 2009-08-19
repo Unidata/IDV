@@ -1502,6 +1502,8 @@ public class PluginManager extends IdvManager {
         else if (f.exists() && f.isDirectory()) {
             scourPlugins(f);
             File[] files = f.listFiles();
+            files = IOUtil.sortFilesOnAge(files,
+                                          false);
             for (int jarFileIdx = 0; jarFileIdx < files.length;
                     jarFileIdx++) {
                 if ( !pluginFileOK(files[jarFileIdx])) {
@@ -2062,6 +2064,8 @@ public class PluginManager extends IdvManager {
         if (localPluginDir != null) {
             scourPlugins(localPluginDir);
             File[] files = localPluginDir.listFiles();
+            files = IOUtil.sortFilesOnAge(files,
+                                          false);
             for (int fileIdx = 0; fileIdx < files.length; fileIdx++) {
                 final File file = files[fileIdx];
                 if (pluginFileOK(file)) {
