@@ -636,8 +636,11 @@ public class ObsListControl extends ObsDisplayControl {
     protected void getSaveMenuItems(List items, boolean forMenuBar) {
 
         super.getSaveMenuItems(items, forMenuBar);
-        items.add(GuiUtils.makeMenuItem("Export Table...", this,
+        items.add(GuiUtils.makeMenuItem("Export Table to CSV...", this,
                                         "exportTable"));
+        
+        items.add(GuiUtils.makeMenuItem("Export all data to NetCDF...", this,
+                                        "exportAsNetcdf", null, true));
     }
 
 

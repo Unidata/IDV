@@ -36,6 +36,7 @@ import ucar.unidata.ui.TableSorter;
 import ucar.unidata.ui.TwoListPanel;
 import ucar.unidata.ui.symbol.*;
 
+import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectListener;
@@ -167,6 +168,33 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
             selectorWindow.dispose();
         }
     }
+
+
+    /**
+     * export the point data as a  netcdf file
+     */
+    public void exportAsNetcdf() {
+        try {
+            JComboBox publishCbx =
+                getIdv().getPublishManager().getSelector("nc.export");
+            String filename =
+                FileManager.getWriteFile(FileManager.FILTER_NETCDF,
+                                         FileManager.SUFFIX_NETCDF, ((publishCbx != null)
+                                                                     ? GuiUtils.top(publishCbx)
+                                                                     : null));
+            if (filename == null) {
+                return;
+            }
+            PointDataInstance pdi = (PointDataInstance) getDataInstance();
+            PointObFactory.writeToNetcdf(new java.io.File(filename),
+                                         pdi.getTimeSequence());
+            getIdv().getPublishManager().publishContent(filename,
+                                                        null, publishCbx);
+        } catch (Exception exc) {
+            logException("Exporting point data to netcdf", exc);
+        }
+    }
+
 
     /**
      * Get the column value  and add it to the html

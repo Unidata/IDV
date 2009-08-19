@@ -2842,30 +2842,6 @@ public class StationModelControl extends ObsDisplayControl {
         }
     }
 
-    /**
-     * export the point data as a  netcdf file
-     */
-    public void exportAsNetcdf() {
-        try {
-            JComboBox publishCbx =
-                getIdv().getPublishManager().getSelector("nc.export");
-            String filename =
-                FileManager.getWriteFile(FileManager.FILTER_NETCDF,
-                                         FileManager.SUFFIX_NETCDF, ((publishCbx != null)
-                                                                     ? GuiUtils.top(publishCbx)
-                                                                     : null));
-            if (filename == null) {
-                return;
-            }
-            PointDataInstance pdi = (PointDataInstance) getDataInstance();
-            PointObFactory.writeToNetcdf(new java.io.File(filename),
-                                         pdi.getTimeSequence());
-            getIdv().getPublishManager().publishContent(filename,
-                                                        null, publishCbx);
-        } catch (Exception exc) {
-            logException("Exporting point data to netcdf", exc);
-        }
-    }
 
 
     /**
