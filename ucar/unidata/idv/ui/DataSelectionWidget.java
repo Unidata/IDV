@@ -573,9 +573,9 @@ public class DataSelectionWidget {
             if (strideCbx.isSelected()) {
                 geoSelection.clearStride();
             }
-
             if (areaCbx.isSelected()) {
                 geoSelection.setBoundingBox(null);
+                geoSelection.setUseFullBounds(false);
             }
         }
 
