@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data;
 
 
@@ -67,6 +68,9 @@ public class GeoSelection {
     /** The bounding box */
     private GeoLocationInfo boundingBox;
 
+    /** A flag to note that even though the bounds are null here we really want to use the full spatial bounds   */
+    private boolean useFullBounds = false;
+
     /** X stride */
     private int xStride = STRIDE_NONE;
 
@@ -102,6 +106,7 @@ public class GeoSelection {
      */
     public GeoSelection(GeoSelection that) {
         this();
+        this.useFullBounds = that.useFullBounds;
         if (that.boundingBox != null) {
             this.boundingBox = new GeoLocationInfo(that.boundingBox);
         }
@@ -110,6 +115,8 @@ public class GeoSelection {
         this.zStride = that.zStride;
         this.level   = that.level;
     }
+
+
 
 
     /**
@@ -158,11 +165,32 @@ public class GeoSelection {
      */
     public GeoSelection(GeoLocationInfo boundingBox, int xStride,
                         int yStride, int zStride, Real level) {
-        this.boundingBox = boundingBox;
-        this.xStride     = xStride;
-        this.yStride     = yStride;
-        this.zStride     = zStride;
-        this.level       = level;
+        this(boundingBox, false, xStride, yStride, zStride, level);
+    }
+
+
+
+
+    /**
+     * ctor.
+     *
+     * @param boundingBox The bounding box. May be null.
+     * @param useFullBounds Use full bounds
+     * @param xStride X stride
+     * @param yStride Y stride
+     * @param zStride Z stride
+     * @param level The level to use
+     */
+    public GeoSelection(GeoLocationInfo boundingBox, boolean useFullBounds,
+                        int xStride, int yStride, int zStride, Real level) {
+
+
+        this.boundingBox   = boundingBox;
+        this.useFullBounds = useFullBounds;
+        this.xStride       = xStride;
+        this.yStride       = yStride;
+        this.zStride       = zStride;
+        this.level         = level;
     }
 
 
@@ -223,7 +251,7 @@ public class GeoSelection {
      * @return Has spatial subset
      */
     public boolean hasSpatialSubset() {
-        return boundingBox != null;
+        return useFullBounds || (boundingBox != null);
     }
 
     /**
@@ -274,10 +302,21 @@ public class GeoSelection {
                                    ? highPriority.boundingBox
                                    : lowPriority.boundingBox);
 
-        Real            level   = ((highPriority.level != null)
-                                   ? highPriority.level
-                                   : lowPriority.level);
-        return new GeoSelection(bbox, xStride, yStride, zStride, level);
+
+
+        if (highPriority.getUseFullBounds()
+                && (highPriority.boundingBox == null)) {
+            bbox = null;
+        }
+
+        Real level = ((highPriority.level != null)
+                      ? highPriority.level
+                      : lowPriority.level);
+        GeoSelection newOne = new GeoSelection(bbox,
+                                  highPriority.getUseFullBounds(), xStride,
+                                  yStride, zStride, level);
+
+        return newOne;
     }
 
 
@@ -521,6 +560,24 @@ public class GeoSelection {
                && Misc.equals(this.level, that.level);
     }
 
+
+    /**
+     *  Set the UseFullBounds property.
+     *
+     *  @param value The new value for UseFullBounds
+     */
+    public void setUseFullBounds(boolean value) {
+        useFullBounds = value;
+    }
+
+    /**
+     *  Get the UseFullBounds property.
+     *
+     *  @return The UseFullBounds
+     */
+    public boolean getUseFullBounds() {
+        return useFullBounds;
+    }
 
 
 

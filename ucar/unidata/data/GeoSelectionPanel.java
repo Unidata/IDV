@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -542,9 +543,13 @@ public class GeoSelectionPanel extends JPanel {
 
 
         if (mapPanel != null) {
+            //xxxx
             LatLonRect llr = getLatLonRect();
             if (llr == null) {
                 geoSelection.setBoundingBox(null);
+                if ((enabledCbx != null) && enabledCbx.isSelected()) {
+                    geoSelection.setUseFullBounds(true);
+                }
             } else {
                 geoSelection.setBoundingBox(new GeoLocationInfo(llr));
             }
@@ -616,7 +621,8 @@ public class GeoSelectionPanel extends JPanel {
 
             if (sampleProjection != null) {
                 setProjectionImpl(sampleProjection);
-                ProjectionRect r = np.normalizeRectangle(sampleProjection.getDefaultMapArea());
+                ProjectionRect r = np.normalizeRectangle(
+                                       sampleProjection.getDefaultMapArea());
                 np.setSelectedRegionBounds(r);
                 points.add(new ProjectionPointImpl(r.getX(), r.getY()));
                 points.add(new ProjectionPointImpl(r.getX() + r.getWidth(),
@@ -625,6 +631,7 @@ public class GeoSelectionPanel extends JPanel {
                         r.getY() + r.getHeight()));
                 points.add(new ProjectionPointImpl(r.getX(),
                         r.getY() + r.getHeight()));
+                //                System.err.println("rect:" + r);
                 //                System.err.println ("Points:" + points);
             }
             np.setSelectRegionMode(true);
