@@ -88,6 +88,9 @@ import javax.swing.event.*;
 public class MapDisplayControl extends DisplayControlImpl {
 
 
+    public static final Color DEFAULT_MAP_COLOR = new Color(0,204,0);
+
+
     /** Where we put the map guis */
     private JPanel contents;
 
@@ -525,7 +528,7 @@ public class MapDisplayControl extends DisplayControlImpl {
      * @param description The description of the map
      */
     private void addMap(String mapPath, String description) {
-        addMap(new MapState(mapPath, description, Color.blue, 1.0f, 0));
+        addMap(new MapState(mapPath, description, DEFAULT_MAP_COLOR, 1.0f, 0));
     }
 
 
@@ -677,7 +680,7 @@ public class MapDisplayControl extends DisplayControlImpl {
      */
     protected boolean selectMap() {
 
-        final JPanel colorButton = new GuiUtils.ColorSwatch(Color.blue,
+        final JPanel colorButton = new GuiUtils.ColorSwatch(DEFAULT_MAP_COLOR,
                                        "Set Map Line Color");
         colorButton.setToolTipText("Set the line color");
 
