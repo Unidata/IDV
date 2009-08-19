@@ -343,8 +343,13 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
                 repaintManager.setDoubleBufferingEnabled(true);
             }
             if (doingPreview) {
+                JComponent previewContents = GuiUtils.centerBottom(
+                                                                   new JLabel(new ImageIcon(previewImage)),
+                                                                   GuiUtils.inset(
+                                                                                  new JLabel("Note: The actual capture will take place after the preview window is dismissed so make sure the window is not occluded"),5)
+);
                 ok = GuiUtils.showOkCancelDialog(null, "",
-                        new JLabel(new ImageIcon(previewImage)), null);
+                                                 previewContents, null);
             }
 
 
