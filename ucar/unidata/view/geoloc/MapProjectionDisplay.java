@@ -1520,7 +1520,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             */
             if (adjustLons) {
                 t2[lonIndex] = (use360)
-                               ? GeoUtils.normalizeLongitude360(latlonalt[1])
+                               //? GeoUtils.normalizeLongitude360(latlonalt[1])
+                               ? latlonalt[1]
                                : GeoUtils.normalizeLongitude(latlonalt[1]);
             }
             t2 = mapProjection.fromReference(t2);
@@ -1595,7 +1596,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             */
             if (adjustLons) {
                 t2[lonIndex] = (use360)
-                               ? GeoUtils.normalizeLongitude360(latlonalt[1])
+                               //? GeoUtils.normalizeLongitude360(latlonalt[1])
+                               ? latlonalt[1]
                                : GeoUtils.normalizeLongitude(latlonalt[1]);
             }
             t2 = mapProjection.fromReference(t2);
@@ -1658,7 +1660,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             */
             if (adjustLons) {
                 xyz[1] = (use360)
-                         ? GeoUtils.normalizeLongitude360(t2[lonIndex])
+                         //? GeoUtils.normalizeLongitude360(t2[lonIndex])
+                         ? t2[lonIndex]
                          : GeoUtils.normalizeLongitude(t2[lonIndex]);
             }
             call2("fromReference(d)", numpoints);
@@ -1701,7 +1704,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             */
             if (adjustLons) {
                 xyz[1] = (use360)
-                         ? GeoUtils.normalizeLongitude360(t2[lonIndex])
+                         //? GeoUtils.normalizeLongitude360(t2[lonIndex])
+                         ? t2[lonIndex]
                          : GeoUtils.normalizeLongitude(t2[lonIndex]);
             }
             call2("fromReference(f)", numpoints);
