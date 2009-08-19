@@ -329,7 +329,8 @@ public class GeoSelectionPanel extends JPanel {
                               5),
                 GuiUtils.inset(GuiUtils.wrap(lrLatLon.getLatField()),
                                5) }, 1, GuiUtils.WT_N, GuiUtils.WT_N);
-            JPanel leftPanel = GuiUtils.vbox(latLonPanel, indexCbx);
+            //            JPanel leftPanel = GuiUtils.vbox(latLonPanel, indexCbx);
+            JComponent leftPanel = latLonPanel;
             //      latLonPanel = GuiUtils.inset(latLonPanel,5);
 
 
