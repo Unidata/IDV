@@ -593,6 +593,8 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
             myEditor = null;
         } else if (e.getPropertyName().equals(
                 ColorTableManager.PROP_CANCEL)) {
+            /**
+               FOr now lets ignore the undoing of the color table on a CANCEL
             try {
                 myEditor = null;
                 ColorTable newTable = (ColorTable) e.getNewValue();
@@ -602,6 +604,7 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
             } catch (Exception exc2) {
                 logException("propertyChange", exc2);
             }
+            ***/
         }
 
     }
