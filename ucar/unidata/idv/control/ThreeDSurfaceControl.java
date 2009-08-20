@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -344,6 +345,21 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
         });
 
     }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected Container doMakeContents()
+            throws VisADException, RemoteException {
+        return GuiUtils.left(doMakeWidgetComponent());
+    }
+
 
 
     /**

@@ -18,6 +18,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.idv.control;
 
 
@@ -78,6 +80,13 @@ public class VolumeRenderControl extends GridDisplayControl {
     /** the display for the volume renderer */
     boolean useTexture3D = true;
 
+    /** _more_ */
+    private boolean usePoints = false;
+
+
+    /** _more_ */
+    private float pointSize = 1.0f;
+
     /**
      * Default constructor; does nothing.
      */
@@ -112,6 +121,7 @@ public class VolumeRenderControl extends GridDisplayControl {
                 ? GraphicsModeControl.TEXTURE3D
                 : GraphicsModeControl.STACK2D, Display.Texture3DMode));
 
+        myDisplay.setPointSize(pointSize);
         addDisplayable(myDisplay, getAttributeFlags());
 
         //Now, set the data. Return false if it fails.
@@ -134,36 +144,36 @@ public class VolumeRenderControl extends GridDisplayControl {
     public void getControlWidgets(List controlWidgets)
             throws VisADException, RemoteException {
         super.getControlWidgets(controlWidgets);
-        JCheckBox textureToggle = GuiUtils.makeCheckbox("", this,
-                                      "useTexture3D");
-        controlWidgets.add(
-            new WrapperWidget(
-                this, GuiUtils.rLabel("Use 3D Texture:"),
-                GuiUtils.leftCenter(textureToggle, GuiUtils.filler())));
+
+        if ( !usePoints) {
+            JCheckBox textureToggle = GuiUtils.makeCheckbox("", this,
+                                          "useTexture3D");
+            controlWidgets.add(new WrapperWidget(this,
+                    GuiUtils.rLabel("Use 3D Texture:"),
+                    GuiUtils.leftCenter(textureToggle, GuiUtils.filler())));
+        } else {
+            final JTextField pointSizeFld = new JTextField("" + pointSize, 5);
+            pointSizeFld.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    try {
+                        pointSize = new Float(
+                            pointSizeFld.getText().trim()).floatValue();
+                        myDisplay.setPointSize(pointSize);
+
+                    } catch (Exception exc) {
+                        logException("Error parsing size:"
+                                     + pointSizeFld.getText(), exc);
+                    }
+                }
+            });
+            controlWidgets.add(new WrapperWidget(this,
+                    GuiUtils.rLabel("Point Size:"),
+                    GuiUtils.left(pointSizeFld)));
+        }
+
     }
 
-    /**
-     * Add checkbox type settings to the Properties panel
-     *
-     * @param comps  list of checkbox components
-     * @param methodNameToSettingsMap  hashtable of methods to checkbox
-     * protected void addCheckBoxSettings(List comps,
-     *                                  Hashtable methodNameToSettingsMap) {
-     *   super.addCheckBoxSettings(comps, methodNameToSettingsMap);
-     *   JCheckBox cbx;
-     *   methodNameToSettingsMap.put("setUseTexture3D",
-     *                               cbx = new JCheckBox("Use Texture3D",
-     *                                   getUseTexture3D()));
-     *   comps.add(cbx);
-     * }
-     *
-     * @param choice the data choice
-     *
-     * @return ???
-     *
-     * @throws RemoteException On badness
-     * @throws VisADException On badness
-     */
+
 
     /**
      * Set the data in this control.
@@ -185,6 +195,20 @@ public class VolumeRenderControl extends GridDisplayControl {
     }
 
     /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected Container doMakeContents()
+            throws VisADException, RemoteException {
+        return GuiUtils.left(doMakeWidgetComponent());
+    }
+
+
+    /**
      * Load the volume data to the display
      *
      * @throws RemoteException   problem loading remote data
@@ -192,39 +216,44 @@ public class VolumeRenderControl extends GridDisplayControl {
      */
     private void loadVolumeData() throws VisADException, RemoteException {
         Trace.call1("VRC.loadVolumeData");
-        FieldImpl grid = getGridDataInstance().getGrid();
-        // make sure the projection is correct before we start 
-        // transforming the data
-        setProjectionInView(true, true);
+        FieldImpl grid    = getGridDataInstance().getGrid();
         FieldImpl newGrid = grid;
-        CoordinateSystem cs =
-            getNavigatedDisplay().getDisplayCoordinateSystem();
-        if ((cs != null)
-                && (getNavigatedDisplay() instanceof MapProjectionDisplay)) {
-            try {
-                if (GridUtil.isConstantSpatialDomain(grid)) {
-                    newGrid = makeLinearGrid(grid, cs);
-                } else {
-                    Set timeSet = GridUtil.getTimeSet(grid);
-                    for (int i = 0; i < timeSet.getLength(); i++) {
-                        FieldImpl timeField =
-                            makeLinearGrid((FieldImpl) grid.getSample(i,
-                                false), cs);
-                        if (i == 0) {
-                            FunctionType ft =
-                                new FunctionType(((SetType) timeSet.getType())
-                                    .getDomain(), timeField.getType());
-                            newGrid = new FieldImpl(ft, timeSet);
+        if ( !usePoints) {
+            // make sure the projection is correct before we start 
+            // transforming the data
+            setProjectionInView(true, true);
+
+            CoordinateSystem cs =
+                getNavigatedDisplay().getDisplayCoordinateSystem();
+            if ((cs != null)
+                    && (getNavigatedDisplay()
+                        instanceof MapProjectionDisplay)) {
+                try {
+                    if (GridUtil.isConstantSpatialDomain(grid)) {
+                        newGrid = makeLinearGrid(grid, cs);
+                    } else {
+                        Set timeSet = GridUtil.getTimeSet(grid);
+                        for (int i = 0; i < timeSet.getLength(); i++) {
+                            FieldImpl timeField =
+                                makeLinearGrid((FieldImpl) grid.getSample(i,
+                                    false), cs);
+                            if (i == 0) {
+                                FunctionType ft =
+                                    new FunctionType(((SetType) timeSet
+                                        .getType()).getDomain(), timeField
+                                            .getType());
+                                newGrid = new FieldImpl(ft, timeSet);
+                            }
+                            newGrid.setSample(i, timeField, false);
                         }
-                        newGrid.setSample(i, timeField, false);
                     }
+                } catch (VisADException ve) {
+                    ve.printStackTrace();
+                    userErrorMessage(
+                        "Can't render volume for " + paramName
+                        + " in this projection. Try using the data projection");
+                    newGrid = grid;
                 }
-            } catch (VisADException ve) {
-                ve.printStackTrace();
-                userErrorMessage(
-                    "Can't render volume for " + paramName
-                    + " in this projection. Try using the data projection");
-                newGrid = grid;
             }
         }
         Trace.call1("VRC.loadVolumeData.loadData");
@@ -356,6 +385,45 @@ public class VolumeRenderControl extends GridDisplayControl {
     public boolean getIsRaster() {
         return true;
     }
+
+    /**
+     *  Set the UsePoints property.
+     *
+     *  @param value The new value for UsePoints
+     */
+    public void setUsePoints(boolean value) {
+        usePoints = value;
+    }
+
+    /**
+     *  Get the UsePoints property.
+     *
+     *  @return The UsePoints
+     */
+    public boolean getUsePoints() {
+        return usePoints;
+    }
+
+
+    /**
+     *  Set the PointSize property.
+     *
+     *  @param value The new value for PointSize
+     */
+    public void setPointSize(float value) {
+        pointSize = value;
+    }
+
+    /**
+     *  Get the PointSize property.
+     *
+     *  @return The PointSize
+     */
+    public float getPointSize() {
+        return pointSize;
+    }
+
+
 
 }
 
