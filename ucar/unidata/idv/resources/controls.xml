@@ -990,6 +990,19 @@ Example of how to make an image movie control with a fixed table of contents
 
 
   <control
+     id="pointvolumerender"
+     categories="GRID-3D-*"
+     class="ucar.unidata.idv.control.VolumeRenderControl"
+     description="3-D Point Volume"
+     label="Point Volume"
+     icon="/ucar/unidata/idv/images/volume.png"
+     displaycategory="Volume Rendering"
+     properties="usePoints=true">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+
+
+  <control
      id="gridtablecontrol"
      categories="trace;GRID-2D-*;IMAGE-*-*;GRID-3D-*;RADAR-3D-*"
      class="ucar.unidata.idv.control.GridTableControl"
