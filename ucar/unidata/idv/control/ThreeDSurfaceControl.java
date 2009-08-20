@@ -348,12 +348,12 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
 
 
     /**
-     * _more_
+     * Make the gui. Align it left
      *
-     * @return _more_
+     * @return The gui
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException on badness
+     * @throws VisADException on badness
      */
     protected Container doMakeContents()
             throws VisADException, RemoteException {
