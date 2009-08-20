@@ -62,6 +62,14 @@ public interface RadarConstants {
     public static final String PROP_VCS =
         "Level2RadarDataSource.verticalcrosssection";
 
+    /** Vertical Cross Section property */
+    public static final String PROP_VCS_START =
+        "Level2RadarDataSource.verticalcrosssectionstart";
+
+    /** Vertical Cross Section property */
+    public static final String PROP_VCS_END =
+        "Level2RadarDataSource.verticalcrosssectionend";
+
     /** Property to define volumes or sweeps */
     public static final String PROP_VOLUMEORSWEEP =
         "Level2RadarDataSource.volumeorsweep";
