@@ -762,6 +762,8 @@ public class TimeSeriesChart extends XYChartManager {
                 }
 
                 if ((speedSeries != null) && (dirSeries != null)) {
+                    speedSeries.finish();
+                    dirSeries.finish();
                     XYItemRenderer renderer =
                         new WindbarbRenderer(speedLineState, speedSeries,
                                              dirSeries, speedUnit, polarWind);

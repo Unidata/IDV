@@ -909,7 +909,7 @@ public abstract class XYChartManager extends ChartManager {
             if (drawer == null) {
                 drawer = new WindBarbSymbol.Drawer();
             }
-            //            System.err.println ("speed:" + speed +" dir:" + dir + " " + sX + " " + bottom);
+            // System.err.println ("speed: " + speed +", dir: " + dir + ", X: " + xPos + ", Y: " + yPos);
             try {
                 g2.setColor(Color.black);
                 g2.setStroke(new BasicStroke());
@@ -920,9 +920,6 @@ public abstract class XYChartManager extends ChartManager {
             }
         }
     }
-
-    ;
-
 
 
 
