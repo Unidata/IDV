@@ -246,7 +246,7 @@ public class ColorTableEditor extends WindowHolder {
      * @return _more_
      */
     public String getWindowTitle() {
-        return "Color Table Editor";
+        return GuiUtils.getApplicationTitle() +"Color Table Editor";
     }
 
 
@@ -574,7 +574,7 @@ public class ColorTableEditor extends WindowHolder {
      * Set the title of the window to the default
      */
     protected void setDialogTitle() {
-        setWindowTitle("Color Table Editor -- " + getColorTableName());
+        setWindowTitle(GuiUtils.getApplicationTitle() +"Color Table Editor -- " + getColorTableName());
     }
 
 

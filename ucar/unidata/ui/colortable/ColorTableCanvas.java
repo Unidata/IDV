@@ -363,7 +363,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         }
 
         if (editor != null) {
-            editor.setWindowTitle("Color Table Editor -- "
+            editor.setWindowTitle(GuiUtils.getApplicationTitle() +"Color Table Editor -- "
                                   + currentColorTable.getName());
         }
 

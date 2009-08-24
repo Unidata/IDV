@@ -278,7 +278,7 @@ public class StationModelCanvas extends EditCanvas {
         setGlyphs(cloneGlyphs(newModel.getList()));
         setName(stationModel.getDisplayName());
         setHaveChanged(false);
-        frame.setTitle("Layout Model Editor -- " + stationModel.getName());
+        frame.setTitle(GuiUtils.getApplicationTitle() +"Layout Model Editor -- " + stationModel.getName());
     }
 
     /**

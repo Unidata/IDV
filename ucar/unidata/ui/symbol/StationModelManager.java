@@ -175,7 +175,7 @@ public class StationModelManager extends ResourceManager {
      */
     public void show(StationModel initModel) {
         if (frame == null) {
-            frame = GuiUtils.createFrame("Layout Model Editor");
+            frame = GuiUtils.createFrame(GuiUtils.getApplicationTitle() +"Layout Model Editor");
             frame.setDefaultCloseOperation(
                 WindowConstants.DO_NOTHING_ON_CLOSE);
             smc = new StationModelCanvas(this, frame) {
