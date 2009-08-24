@@ -633,7 +633,7 @@ public abstract class PointDataSource extends FilesDataSource {
             List<DataSelectionComponent> components,
             final DataChoice dataChoice) {
 
-        if ( !(dataChoice.getId() instanceof List)) {
+        if (dataChoice instanceof CompositeDataChoice || !(dataChoice.getId() instanceof List)) {
             components.add(new PlotModelSelectionComponent(this));
         } else {
             components.add(new GridParameters(this));
@@ -1044,7 +1044,8 @@ public abstract class PointDataSource extends FilesDataSource {
      */
     protected boolean shouldCache(DataChoice dataChoice, Data data) {
         Object id = dataChoice.getId();
-        if (id instanceof List) {
+        if (!(dataChoice instanceof CompositeDataChoice) && id instanceof List) {
+            //Note: idList can also
             List idList = (List) id;
             //Check if its a first guess field
             if (idList.size() > 2) {
