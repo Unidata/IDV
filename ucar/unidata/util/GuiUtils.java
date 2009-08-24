@@ -23,6 +23,8 @@
 
 
 
+
+
 package ucar.unidata.util;
 
 
@@ -75,6 +77,9 @@ import javax.swing.tree.*;
  * @author IDV development team
  */
 public class GuiUtils extends LayoutUtil {
+
+    /** _more_ */
+    private static String applicationTitle = "";
 
     /** missing image path */
     public static String MISSING_IMAGE = "/ucar/unidata/util/scream.gif";
@@ -6350,7 +6355,30 @@ public class GuiUtils extends LayoutUtil {
         return Misc.parseValue(fld.getText().trim());
     }
 
+
+    /*
+     * Set the global application title
+     *
+     * @param title The title
+     */
+    public static void setApplicationTitle(String title) {
+        applicationTitle = title;
+    }
+
+
+    /*
+     * Get the global application title
+     *
+     * @return The title
+     */
+    public static String getApplicationTitle() {
+        return applicationTitle;
+    }
+
+
 }
+
+
 
 
 
