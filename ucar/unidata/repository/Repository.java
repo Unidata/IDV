@@ -496,9 +496,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
             if ( !request.get(ARG_SSLOK, true)) {
                 return false;
             }
-            if (getProperty(PROP_SSL_IGNORE, false)) {
-                return false;
-            }
+        }
+        if (getProperty(PROP_SSL_IGNORE, false)) {
+            return false;
         }
         String port = getProperty(PROP_SSL_PORT, "");
         if (port.trim().length() == 0) {
@@ -1498,7 +1498,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public void initRequestUrl(RequestUrl requestUrl) {
         try {
-            initializedUrls.add(requestUrl);
+            if(!initializedUrls.contains(requestUrl)) {
+                initializedUrls.add(requestUrl);
+            }
             Request request = new Request(this, null,
                                           getUrlBase()
                                           + requestUrl.getPath());

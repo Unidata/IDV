@@ -931,6 +931,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_USER_ADMIN = "user.admin";
+    public static final String ARG_USER_ISGUEST= "user.isguest";
 
     /** _more_ */
     public static final String ARG_USER_ANSWER = "user.answer";

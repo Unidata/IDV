@@ -81,6 +81,8 @@ public class User {
 
     private boolean isLocal = true;
 
+    private boolean isGuest = false;
+
     /**
      * _more_
      */
@@ -130,7 +132,7 @@ public class User {
      */
     public User(String id, String name, String email, String question,
                 String answer, String password, boolean admin,
-                String language, String template) {
+                String language, String template,boolean isGuest) {
 
         this.id       = id;
         this.name     = name;
@@ -144,6 +146,7 @@ public class User {
         }
         this.language = language;
         this.template = template;
+        this.isGuest = isGuest;
     }
 
     /**
@@ -490,6 +493,25 @@ public class User {
     public boolean getIsLocal () {
 	return this.isLocal;
     }
+
+    /**
+       Set the IsGues property.
+
+       @param value The new value for IsGues
+    **/
+    public void setIsGuest (boolean value) {
+	isGuest = value;
+    }
+
+    /**
+       Get the IsGues property.
+
+       @return The IsGues
+    **/
+    public boolean getIsGuest () {
+	return isGuest;
+    }
+
 
 
 }

@@ -535,13 +535,16 @@ public class UserManager extends RepositoryManager {
                     Tables.USERS.COL_NAME, Tables.USERS.COL_PASSWORD,
                     Tables.USERS.COL_EMAIL, Tables.USERS.COL_QUESTION,
                     Tables.USERS.COL_ANSWER, Tables.USERS.COL_ADMIN,
-                    Tables.USERS.COL_LANGUAGE, Tables.USERS.COL_TEMPLATE
+                    Tables.USERS.COL_LANGUAGE, Tables.USERS.COL_TEMPLATE,
+                    Tables.USERS.COL_ISGUEST
                 }, new Object[] {
                     user.getName(), user.getPassword(), user.getEmail(),
                     user.getQuestion(), user.getAnswer(), user.getAdmin()
                             ? new Integer(1)
                             : new Integer(0), user.getLanguage(),
-                    user.getTemplate()
+                    user.getTemplate(),
+                    new Boolean(user.getIsGuest())
+
                 });
                 userMap.remove(user.getId());
             }
@@ -553,7 +556,8 @@ public class UserManager extends RepositoryManager {
             user.getId(), user.getName(), user.getEmail(), user.getQuestion(),
             user.getAnswer(), user.getPassword(),
             new Boolean(user.getAdmin()), user.getLanguage(),
-            user.getTemplate()
+            user.getTemplate(),
+            new Boolean(user.getIsGuest())
         });
 
         userMap.put(user.getId(), user);
@@ -660,6 +664,8 @@ public class UserManager extends RepositoryManager {
             } else {
                 user.setAdmin(request.get(ARG_USER_ADMIN, user.getAdmin()));
             }
+            user.setIsGuest(request.get(ARG_USER_ISGUEST, false));
+
             List<String> roles =
                 StringUtil.split(request.getString(ARG_USER_ROLES, ""), "\n",
                                  true, true);
@@ -784,6 +790,9 @@ public class UserManager extends RepositoryManager {
             sb.append(HtmlUtil.formEntry(msgLabel("Admin"),
                                          HtmlUtil.checkbox(ARG_USER_ADMIN,
                                              "true", user.getAdmin())));
+            sb.append(HtmlUtil.formEntry(msgLabel("Guest"),
+                                         HtmlUtil.checkbox(ARG_USER_ISGUEST,
+                                             "true", user.getIsGuest())));
             String       userRoles = user.getRolesAsString("\n");
             StringBuffer allRoles  = new StringBuffer();
             List         roles     = getRoles();
@@ -902,7 +911,7 @@ public class UserManager extends RepositoryManager {
                     break;
                 }
                 User user = new User(id, name, email, "", "",
-                                     hashPassword(password1), false, "", "");
+                                     hashPassword(password1), false, "", "",false);
                 user.setRoles(roles);
                 users.add(user);
             }
@@ -972,7 +981,7 @@ public class UserManager extends RepositoryManager {
                 String homeGroupId = request.getString(ARG_USER_HOME+"_hidden","");
                 User newUser = new User(id, name, email, "", "",
                                           hashPassword(password1), admin, "",
-                                        "");
+                                        "",false);
                 List<String> newUserRoles =
                     StringUtil.split(request.getString(ARG_USER_ROLES, ""), "\n",
                                      true, true);
@@ -1177,8 +1186,9 @@ public class UserManager extends RepositoryManager {
                 HtmlUtil.bold(msg("ID")) + HtmlUtil.space(2),
                 HtmlUtil.bold(msg("Name")) + HtmlUtil.space(2),
         //                    HtmlUtil.bold(msg("Roles")) + HtmlUtil.space(2),
-        HtmlUtil.bold(msg("Email")) + HtmlUtil.space(2), HtmlUtil.bold(
-            msg("Admin?")) + HtmlUtil.space(2))));
+        HtmlUtil.bold(msg("Email")) + HtmlUtil.space(2), 
+                                                    HtmlUtil.bold( msg("Admin?")) + HtmlUtil.space(2),
+                                                    HtmlUtil.bold(msg("Guest")))));
 
         for (User user : users) {
             String userEditLink = HtmlUtil.href(
@@ -1211,7 +1221,7 @@ public class UserManager extends RepositoryManager {
                               userLogLink + userEditLink, userProfileLink,
                               user.getName(),
             /*user.getRolesAsString("<br>"),*/
-            user.getEmail(), "" + user.getAdmin()) + "</tr>";
+                              user.getEmail(), "" + user.getAdmin(),""+user.getIsGuest()) + "</tr>";
             usersHtml.append(row);
 
             List<String> roles = user.getRoles();
@@ -1293,7 +1303,8 @@ public class UserManager extends RepositoryManager {
                              results.getString(col++),
                              results.getBoolean(col++),
                              results.getString(col++),
-                             results.getString(col++));
+                             results.getString(col++),
+                             results.getBoolean(col++));
 
         Statement stmt = getDatabaseManager().select(
                              Tables.USERROLES.COL_ROLE,
@@ -1581,7 +1592,7 @@ public class UserManager extends RepositoryManager {
      */
     public Result makeResult(Request request, String title, StringBuffer sb) {
         return getRepository().makeResult(request, title, sb,
-                                          (request.getUser().getAnonymous()
+                                          (request.getUser().getIsGuest()||request.getUser().getAnonymous()
                                            ? anonUserUrls
                                            : userUrls));
     }
@@ -1669,7 +1680,7 @@ public class UserManager extends RepositoryManager {
     public Result processFavorite(Request request) throws Exception {
         String message = "";
         User   user    = request.getUser();
-        if (user.getAnonymous()) {
+        if (user.getAnonymous()||  user.getIsGuest()) {
             return new Result(
                 msg("Favorites"),
                 new StringBuffer(
@@ -1726,6 +1737,11 @@ public class UserManager extends RepositoryManager {
             throw new IllegalArgumentException(
                 "Need to be logged in to add favorites");
         }
+        if(user.getIsGuest()) {
+            throw new IllegalArgumentException(
+                "Cannot add favorites");
+        }
+
         for (Entry entry : entries) {
             if (favorites.contains(entry)) {
                 continue;
@@ -1769,6 +1785,7 @@ public class UserManager extends RepositoryManager {
             }
             sb.append(getRepository().showDialogWarning(msg));
             sb.append(makeLoginForm(request));
+            //        } else  if (user.getIsGuest()) {
         } else {
             request.appendMessage(sb);
         }
@@ -1804,7 +1821,7 @@ public class UserManager extends RepositoryManager {
         }
 
 
-        if (cnt == 0) {
+        if (!user.getIsGuest() && cnt == 0) {
             sb.append(
                 "You have no favorite entries defined.<br>When you see an  entry or group just click on the "
                 + HtmlUtil.img(iconUrl(ICON_FAVORITE))
@@ -2511,6 +2528,13 @@ public class UserManager extends RepositoryManager {
                 getRepository().showDialogWarning(
                     msg("You need to be logged in to change user settings")));
             sb.append(makeLoginForm(request));
+            return new Result(msg("User Settings"), sb);
+        }
+
+        if (user.getIsGuest()) {
+            sb.append(
+                getRepository().showDialogWarning(
+                    msg("Guest users cannot change their settings")));
             return new Result(msg("User Settings"), sb);
         }
 

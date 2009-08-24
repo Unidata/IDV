@@ -119,10 +119,13 @@ CREATE TABLE  users (id varchar(200),
                      password  varchar(200),
 		     admin int,
 		     language varchar(50),
-		     template varchar(200));
+		     template varchar(200),
+                     isguest int);
 
 
 alter table users add column template varchar(200);
+alter table users add column isguest int;
+
 
 
 -----------------------------------------------------------------------

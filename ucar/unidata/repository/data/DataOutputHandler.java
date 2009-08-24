@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- */
+a */
 
 
 package ucar.unidata.repository.data;
@@ -1890,10 +1890,13 @@ public class DataOutputHandler extends OutputHandler {
                                 false), metadata.getAttr1()));
                 String ncml = getStorageManager().readSystemResource(templateNcmlFile);
                 ncml = ncml.replace("${location}", location);
-                System.err.println("ncml:" + ncml);
+                //                System.err.println("ncml:" + ncml);
+                //Use the last modified time of the ncml file so we pick up any updated file
+                String dttm = templateNcmlFile.lastModified()+"";
+                String fileName = dttm+"_"+entry.getId() + "_"
+                    + metadata.getId() + ".ncml";
                 File ncmlFile =
-                    getStorageManager().getScratchFile(entry.getId() + "_"
-                        + metadata.getId() + ".ncml");
+                    getStorageManager().getScratchFile(fileName);
                 IOUtil.writeBytes(ncmlFile, ncml.getBytes());
                 location = ncmlFile.toString();
                 break;

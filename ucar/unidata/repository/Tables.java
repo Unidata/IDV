@@ -169,8 +169,9 @@ public static final String COL_PASSWORD = NAME + ".password";
 public static final String COL_ADMIN = NAME + ".admin";
 public static final String COL_LANGUAGE = NAME + ".language";
 public static final String COL_TEMPLATE = NAME + ".template";
+public static final String COL_ISGUEST = NAME + ".isguest";
 public static final String []ARRAY= new String[] {
-COL_ID,COL_NAME,COL_EMAIL,COL_QUESTION,COL_ANSWER,COL_PASSWORD,COL_ADMIN,COL_LANGUAGE,COL_TEMPLATE
+    COL_ID,COL_NAME,COL_EMAIL,COL_QUESTION,COL_ANSWER,COL_PASSWORD,COL_ADMIN,COL_LANGUAGE,COL_TEMPLATE,COL_ISGUEST
 };
 
 

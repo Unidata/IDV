@@ -449,7 +449,7 @@ public class MonitorManager extends RepositoryManager {
      */
     public Result processMonitors(Request request) throws Exception {
 
-        if (request.getUser().getAnonymous()) {
+        if (request.getUser().getAnonymous()|| request.getUser().getIsGuest()) {
             throw new IllegalArgumentException("Cannot access monitors");
         }
         StringBuffer sb = new StringBuffer();

@@ -541,7 +541,7 @@ public class Admin extends RepositoryManager {
                                 UserManager.ARG_USER_EMAIL, "").trim(), "",
                                     "",
                                     getUserManager().hashPassword(password1),
-                                    true, "", ""), false);
+                            true, "", "",false), false);
                     didIt(ARG_ADMIN_ADMINCREATED);
                     didIt(ARG_ADMIN_INSTALLCOMPLETE);
 
