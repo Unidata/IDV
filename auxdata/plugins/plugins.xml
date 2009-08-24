@@ -39,6 +39,8 @@
 <plugin name="European Maps" description="Map" size="381433" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/europemaps.jar" category="Maps"/>
 <plugin version="2.2" name="China Maps" description="Map" size="3883648" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/chinamaps.jar" category="Maps"/>
 <plugin version="2.2" name="Mexico Map" description="Map" size="13806" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/mexico.jar" category="Maps"/>
+<plugin version="2.2" name="Colombia Departments Map" description="Map" size="9421523" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/colombiamap.jar" category="Maps"/>
+
 <plugin version="2.2" name="Mongolia Maps" description="Various maps of Mongolia" size="2859237" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/mongoliamaps_maps.jar" category="Maps"/>
 
 
