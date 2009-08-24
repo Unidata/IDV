@@ -521,7 +521,7 @@ public class ResourceViewer extends IdvManager {
      * @return window title
      */
     public String getWindowTitle() {
-        return "Resource Viewer";
+        return GuiUtils.getApplicationTitle() +"Resource Viewer";
     }
 
 }

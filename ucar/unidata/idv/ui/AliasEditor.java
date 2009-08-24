@@ -130,7 +130,7 @@ public class AliasEditor extends IdvManager {
      * @return window title
      */
     public String getWindowTitle() {
-        return "Alias Editor";
+        return GuiUtils.getApplicationTitle() +"Alias Editor";
     }
 
 

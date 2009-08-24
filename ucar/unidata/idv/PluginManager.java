@@ -1060,7 +1060,7 @@ public class PluginManager extends IdvManager {
             autoInstallCbx = new JCheckBox("Install", false);
             autoInstallCbx.setToolTipText(
                 "Automatically install the plugin when it is created");
-            createWindow = GuiUtils.createFrame("Create Plugin");
+            createWindow = GuiUtils.createFrame(GuiUtils.getApplicationTitle() +"Plugin Creator");
             createList   = new JList();
             createList.addKeyListener(new KeyAdapter() {
                 public void keyPressed(KeyEvent e) {
@@ -2259,7 +2259,7 @@ public class PluginManager extends IdvManager {
         contents = GuiUtils.centerBottom(
             contents,
             GuiUtils.center(GuiUtils.inset(GuiUtils.wrap(closeBtn), 5)));
-        pluginWindow = GuiUtils.createFrame("Plugin Manager");
+        pluginWindow = GuiUtils.createFrame(GuiUtils.getApplicationTitle() +"Plugin Manager");
 
         pluginWindow.getContentPane().add(contents);
         pluginWindow.pack();

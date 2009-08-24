@@ -866,7 +866,7 @@ public class ParamGroupsEditor extends IdvManager implements ActionListener {
      * @return Window title
      */
     protected String getWindowTitle() {
-        return "Parameter Groups Editor";
+        return GuiUtils.getApplicationTitle() +"Parameter Groups Editor";
     }
 
 

@@ -1134,7 +1134,7 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
      * @return Window title
      */
     protected String getWindowTitle() {
-        return "Parameter Defaults Editor";
+        return GuiUtils.getApplicationTitle() +"Parameter Defaults Editor";
     }
 
 
