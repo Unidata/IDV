@@ -298,6 +298,7 @@
   <datasource
      id="FILE.POINTTEXT"
      factory="ucar.unidata.data.point.TextPointDataSource"
+     doesmultiples="true"
      patterns="\.csv$,\.tsv$,\.txt$"
      fileselection="true"
      label="Text Point Data files"/>
