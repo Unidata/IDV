@@ -1,7 +1,5 @@
 /*
- * $Id: StationModelDisplayable.java,v 1.99 2007/07/06 17:56:06 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright  1997-2009 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -21,11 +19,11 @@
  */
 
 
+
 package ucar.visad.display;
 
 
 import org.python.core.*;
-
 import org.python.util.*;
 
 import ucar.unidata.data.DataAlias;
@@ -40,7 +38,6 @@ import ucar.unidata.ui.symbol.*;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
@@ -54,17 +51,17 @@ import ucar.visad.WindBarb;
 
 import visad.*;
 
-
 import visad.data.units.*;
 
 import visad.georef.EarthLocation;
-import visad.georef.EarthLocationTuple;
+import visad.georef.EarthLocationLite;
 import visad.georef.NamedLocationTuple;
 
 import visad.meteorology.WeatherSymbols;
 
-import java.awt.Color;
 
+
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -82,10 +79,9 @@ import java.util.Vector;
 
 
 /**
- * Class for displaying a station model plot
+ * Class for displaying a station (layout) model plot
  *
  * @author IDV Development Team
- * @version $Revision: 1.99 $
  */
 public class StationModelDisplayable extends DisplayableData {
 
@@ -151,7 +147,10 @@ public class StationModelDisplayable extends DisplayableData {
     /** Keeps trakc of when we have  printed out a missing param message */
     private Hashtable haveNotified = null;
 
-    /** Should we try to merge the shapes. This gets set to false if we have an error in merging */
+    /**
+     * Should we try to merge the shapes. This gets set to false
+     *   if we have an error in merging
+     */
     private boolean tryMerge = true;
 
     /** Hashtable for jython codes to operands */
@@ -700,6 +699,7 @@ public class StationModelDisplayable extends DisplayableData {
         String[]  typeNames     = null;
         int       length        = set.getLength();
         TupleType dataTupleType = null;
+        Real      missingAlt    = null;
         for (int obIdx = 0; obIdx < length; obIdx++) {
             PointOb ob = (PointOb) data.getSample(obIdx);
             if (typeNames == null) {
@@ -714,11 +714,24 @@ public class StationModelDisplayable extends DisplayableData {
                 continue;
             }
             for (int j = 0; j < obShapes.size(); j++) {
-                Data     location = (useAltitude
-                                     ? ob.getEarthLocation()
-                                     : ob.getEarthLocation()
-                                         .getLatLonPoint());
-                DateTime obTime   = ob.getDateTime();
+                Data location = (useAltitude
+                                 ? ob.getEarthLocation()
+                                 : ob.getEarthLocation().getLatLonPoint());
+                // check for missing altitude
+                if (useAltitude) {
+                    EarthLocation oldOne = (EarthLocation) location;
+                    Real          alt    = oldOne.getAltitude();
+                    if (alt.isMissing()) {
+                        if (missingAlt == null) {
+                            missingAlt = new Real(RealType.Altitude, 0);
+                        }
+                        location =
+                            new EarthLocationLite(oldOne.getLatitude(),
+                                oldOne.getLongitude(), missingAlt);
+
+                    }
+                }
+                DateTime obTime = ob.getDateTime();
                 Real time = new Real(
                                 timeSelectType,
                                 obTime.getValue(
@@ -883,6 +896,10 @@ public class StationModelDisplayable extends DisplayableData {
                                     : ShapeUtility.shapeFont(stringValue,
                                     font, true);
                             if (shape != null) {
+                                if ((font != null) && (fontSize != 12)) {
+                                    shape = ShapeUtility.setSize(shape,
+                                            (float) fontSize / 12.0f);
+                                }
                                 shapeCache.put(key, shape.clone());
                             }
                         } else {
@@ -890,13 +907,16 @@ public class StationModelDisplayable extends DisplayableData {
                         }
                     }
                 } else if (metSymbol instanceof WeatherSymbol) {
-                    double value;
-                    if (workDataArray[0] instanceof Text) {
-                        value = new Double(
-                            workDataArray[0].toString()).doubleValue();
-                    } else {
-                        value = ((Real) workDataArray[0]).getValue();
-                    }
+                    double value = Double.NaN;
+                    try {
+                        if (workDataArray[0] instanceof Text) {
+                            value = new Double(
+                                workDataArray[0].toString()).doubleValue();
+                        } else {
+                            value = ((Real) workDataArray[0]).getValue();
+                        }
+                        // ignore null data
+                    } catch (Exception npe) {}
                     if ( !Double.isNaN(value)) {
                         shape =
                             ((WeatherSymbol) metSymbol).getLines((int) value);
