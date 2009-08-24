@@ -505,7 +505,6 @@ public class NavigatedPanel extends JPanel implements MouseListener,
 
         newRect.x += (normalizedMinLon - minLon);
 
-        System.err.println ("rect:" + newRect);
 
         //Try to normalize the rectangle
         while(newRect.x+newRect.width>360) {
