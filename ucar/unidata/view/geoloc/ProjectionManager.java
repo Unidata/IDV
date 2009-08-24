@@ -369,7 +369,7 @@ public class ProjectionManager implements ActionListener {
         if (makeDialog) {
             Container buttPanel = GuiUtils.makeApplyOkHelpCancelButtons(this);
             contents   = GuiUtils.centerBottom(contents, buttPanel);
-            viewDialog = GuiUtils.createDialog("Projection Manager", false);
+            viewDialog = GuiUtils.createDialog(GuiUtils.getApplicationTitle() +"Projection Manager", false);
             viewDialog.getContentPane().add(contents);
             viewDialog.pack();
             ucar.unidata.util.Msg.translateTree(viewDialog);
@@ -519,7 +519,7 @@ public class ProjectionManager implements ActionListener {
      * @return manager name
      */
     public String getManagerName() {
-        return "Projection Manager";
+        return GuiUtils.getApplicationTitle() +"Projection Manager";
     }
 
     /**

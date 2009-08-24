@@ -487,6 +487,8 @@ public class NavigatedPanel extends JPanel implements MouseListener,
      * @return The input bb if not in LatLon, else the bb normalized
      */
     public ProjectionRect normalizeRectangle(ProjectionRect bb) {
+
+
         if ((bb == null) || (project == null)
             || !project.isLatLon()) {
             return bb;
@@ -494,11 +496,21 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         ProjectionRect newRect          = new ProjectionRect(bb);
         double         maxLon           = newRect.x + newRect.width;
         double         normalizedMaxLon = LatLonPointImpl.lonNormal(maxLon);
+
+
         newRect.x += (normalizedMaxLon - maxLon);
 
         double         minLon           = newRect.x;
         double         normalizedMinLon = LatLonPointImpl.lonNormal(minLon);
+
         newRect.x += (normalizedMinLon - minLon);
+
+        System.err.println ("rect:" + newRect);
+
+        //Try to normalize the rectangle
+        while(newRect.x+newRect.width>360) {
+            newRect.x-= 360;
+        }
 
         return newRect;
     }
