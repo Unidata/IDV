@@ -36,6 +36,7 @@ import ucar.unidata.idv.ui.ValueSliderComponent;
 
 import ucar.unidata.ui.TimeLengthField;
 import ucar.unidata.ui.symbol.StationModel;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -876,6 +877,9 @@ public abstract class PointDataSource extends FilesDataSource {
                                             getPointCategories(),
                                             properties);
         */
+
+
+
         if (sources.size() > 1) {
             uberChoice = new CompositeDataChoice(this, sources, getName(),
                     getDataName(), getPointCategories(), properties);
@@ -884,9 +888,16 @@ public abstract class PointDataSource extends FilesDataSource {
 
 
         for (int i = 0; i < sources.size(); i++) {
+            String dataChoiceDesc = getDescription();
+            String dataChoiceName = getDataName();
+            if(uberChoice!=null) {
+                dataChoiceDesc = IOUtil.getFileTail(sources.get(i).toString());
+                dataChoiceName = IOUtil.getFileTail(sources.get(i).toString());
+            }
+
             DataChoice choice = new DirectDataChoice(this, new Integer(i),
-                                    getDescription(), getDataName(),
-                                    getPointCategories(), properties);
+                                                     dataChoiceDesc, dataChoiceName,
+                                                     getPointCategories(), properties);
 
             /*
               We'd like to create sub choices for each parameter but we don't really
@@ -897,11 +908,13 @@ public abstract class PointDataSource extends FilesDataSource {
                                     getPointCategories(), properties);
                                     choice.addDataChoice(subChoice);*/
 
-            if (sources.size() > 1) {
+            if (uberChoice!=null) {
                 ((CompositeDataChoice) uberChoice).addDataChoice(choice);
             } else {
                 addDataChoice(choice);
             }
+            //Only add the grid data choices for the first source
+            if(i>0) continue;
             try {
                 FieldImpl sample = (makeGridFields
                                     ? getSample(choice)
@@ -965,6 +978,7 @@ public abstract class PointDataSource extends FilesDataSource {
             } catch (Exception exc) {
                 throw new WrapperException("Making grid parameters", exc);
             }
+            //            if(true) break;
         }
 
     }
@@ -988,6 +1002,10 @@ public abstract class PointDataSource extends FilesDataSource {
             int idx = ((Integer) id).intValue();
             return (String) sources.get(idx);
         }
+        if(dataChoice instanceof CompositeDataChoice) {
+            return (String)sources.get(0);
+        }
+
         return null;
     }
 
@@ -1058,10 +1076,18 @@ public abstract class PointDataSource extends FilesDataSource {
             throws VisADException, RemoteException {
 
         Object id = dataChoice.getId();
+        //CompositeDataChoice
+
         //If it is a list then we are doing a grid field
+        boolean doGriddedData = false;
         if (id instanceof List) {
+            if(((List)id).get(0) instanceof Integer) {
+                doGriddedData = true;
+            }
+        }
+        if (doGriddedData) {
             List      idList     = (List) id;
-            Integer   i          = (Integer) idList.get(0);
+            //            Integer   i          = (Integer) idList.get(0);
             RealType  type       = (RealType) idList.get(1);
             Hashtable properties = dataChoice.getProperties();
             if (properties == null) {
@@ -1103,14 +1129,27 @@ public abstract class PointDataSource extends FilesDataSource {
                 }
             }
 
+            //Merge the point obs
             properties.put(PROP_GRID_PARAM, type);
-            DataChoice choice = new DirectDataChoice(this, i, "", "",
-                                    dataChoice.getCategories(), properties);
-            FieldImpl pointObs = (FieldImpl) getDataInner(choice, category,
-                                     dataSelection, requestProperties);
+            FieldImpl pointObs=null;
+            List datas = new ArrayList();
+            for(int i=0;i<sources.size();i++) {
+                DataChoice choice = new DirectDataChoice(this, new Integer(i), "", "",
+                                                         dataChoice.getCategories(), properties);
+                pointObs = (FieldImpl) getDataInner(choice, category,
+                                                              dataSelection, requestProperties);
+                if(pointObs!=null) {
+                    datas.add(pointObs);
+                }
+            }
+            if(datas.size()==0) {
+                return null;
+            }
+            pointObs = PointObFactory.mergeData(datas);
             if (pointObs == null) {
                 return null;
             }
+
             //{ minY, minX, maxY, maxX };
             float  spacingX     = this.gridX;
             float  spacingY     = this.gridY;
@@ -1206,16 +1245,18 @@ public abstract class PointDataSource extends FilesDataSource {
                            : Misc.toList(new DataChoice[] { dataChoice });
             List datas = new ArrayList(choices.size());
             for (int i = 0; i < choices.size(); i++) {
-                FieldImpl obs = makeObs((DataChoice) choices.get(i),
+                DataChoice subDataChoice = (DataChoice) choices.get(i);
+                FieldImpl obs = makeObs(subDataChoice,
                                         dataSelection, llr);
                 if (obs == null) {
                     return null;
                 }
-                if (true) {
-                    return obs;
-                }
+                
+                //                if (true) {
+                //                    return obs;
+                //                }
                 datas.add(obs);
-                if ((fieldsDescription == null) && (obs != null)) {
+                if (fieldsDescription == null) {
                     makeFieldDescription(obs);
                 }
             }

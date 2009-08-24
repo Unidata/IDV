@@ -219,6 +219,29 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
+     * Create a new PointDataSource
+     *
+     * @param descriptor    data source descriptor
+     * @param sources       List of sources of data (filename/URL)
+     * @param name          The name to use
+     * @param properties    extra properties for initialization
+     *
+     * @throws VisADException   problem creating the data
+     *
+     */
+    public TextPointDataSource(DataSourceDescriptor descriptor, List sources,
+                               Hashtable properties)
+            throws VisADException {
+        super(descriptor, sources, "Text Point Data", properties);
+        if (properties != null) {
+            this.dataProperties =
+                (Hashtable) properties.get(PROP_DATAPROPERTIES);
+        }
+
+    }
+
+
+    /**
      * Create a new TextPointDataSource
      *
      * @param descriptor    data source descriptor

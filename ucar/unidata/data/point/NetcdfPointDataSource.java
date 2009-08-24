@@ -60,9 +60,6 @@ public class NetcdfPointDataSource extends PointDataSource {
     static LogUtil.LogCategory log_ =
         LogUtil.getLogInstance(NetcdfPointDataSource.class.getName());
 
-    /** the dataset */
-    private FeatureDatasetPoint dataset;
-
 
     /**
      * Default constructor
@@ -187,7 +184,7 @@ public class NetcdfPointDataSource extends PointDataSource {
     public void initAfterCreation() {
         super.initAfterCreation();
         //Call getDataset to see if we have a valid file
-        getDataset();
+        getDataset(null);
     }
 
 
@@ -196,11 +193,34 @@ public class NetcdfPointDataSource extends PointDataSource {
      *
      * @return dataset
      */
-    public FeatureDatasetPoint getDataset() {
+    protected FeatureDatasetPoint getDataset(String file) {
+        FeatureDatasetPoint dataset = null;
+        if(file == null) {
+            if(sources !=null && sources.size()>0) {
+                file = (String) sources.get(0);
+            }
+        }
+        if(file == null) {
+            file = getFilePath();
+            if (file == null) {
+                if (haveBeenUnPersisted) {
+                    file = getName();
+                }
+            }
+            if (file == null) {
+                return null;
+            }
+        }
+
+        if (sources == null) {
+            sources = new ArrayList();
+            sources.add(file);
+        }
+
         if (dataset == null) {
             Trace.call1("NetcdfPointDataSource.getDataSet",
                         " name = " + sources);
-            dataset = doMakeDataset();
+            dataset = doMakeDataset(file);
             Trace.call2("NetcdfPointDataSource.getDataSet");
         }
         return dataset;
@@ -211,20 +231,7 @@ public class NetcdfPointDataSource extends PointDataSource {
      *
      * @return the dataset
      */
-    protected FeatureDatasetPoint doMakeDataset() {
-        String file = getFilePath();
-        if (file == null) {
-            if (haveBeenUnPersisted) {
-                file = getName();
-            }
-        }
-        if (file == null) {
-            return null;
-        }
-        if (sources == null) {
-            sources = new ArrayList();
-            sources.add(file);
-        }
+    protected FeatureDatasetPoint doMakeDataset(String file) {
         Formatter        buf     = new Formatter();
         FeatureDatasetPoint pods    = null;
         Exception        toThrow = new Exception("Datset is null");
@@ -305,14 +312,12 @@ public class NetcdfPointDataSource extends PointDataSource {
         } else {
             source = id.toString();
         }
+        System.err.println ("reading data from:" + source);
 
         FieldImpl obs = null;
         Trace.call1("NetcdfPointDatasource:makeObs");
         if (obs == null) {
-            //TODO: We are nulling out the data set to fix a bug where we cannot
-            //use the same data set twice in a row
-            this.dataset = null;
-            FeatureDatasetPoint pods = getDataset();
+            FeatureDatasetPoint pods = getDataset(source);
             if (pods == null) {
                 return null;
             }
@@ -330,14 +335,6 @@ public class NetcdfPointDataSource extends PointDataSource {
      */
     public void doRemove() {
         super.doRemove();
-        if (dataset != null) {
-            try {
-                dataset.close();
-            } catch (java.io.IOException ioe) {
-                LogUtil.consoleMessage(ioe.getMessage());
-            }
-        }
-        dataset   = null;
     }
 
     /**
