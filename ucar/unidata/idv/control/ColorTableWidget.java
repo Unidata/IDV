@@ -207,8 +207,8 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
         try {
             MyColorPreview preview =
                 new MyColorPreview(
-                    this, new BaseRGBMap(colorTable.getNonAlphaTable()),
-                    forMain, legendType);
+                                   this, (List<Color>)colorTable.getColorList(),
+                                   forMain, legendType);
             colorPreviews.add(preview);
             preview.setRange(range, displayControl.getColorUnit());
             return preview.doMakeContents();
@@ -242,9 +242,9 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
          * @param legendType Side or bottom legend if for a legend
          *
          */
-        public MyColorPreview(ColorTableWidget ctw, BaseRGBMap map,
+        public MyColorPreview(ColorTableWidget ctw, List<Color> colors,
                               boolean forMain, int legendType) {
-            super(map, ctw.getDisplayConventions(), legendType, forMain);
+            super(colors, ctw.getDisplayConventions(), legendType, forMain);
             this.ctw = ctw;
             setToolTipText(
                 "<html>Click to edit<br>Right click to show menu<br>Control-r: Revert to default range<br>Right arrow: shift range up<br>Left arrow: shift range down<br>Up arrow: expand range <br>Down arrow: shrink range");
@@ -781,10 +781,12 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
      */
     public void setColorPalette(float[][] palette)
             throws RemoteException, VisADException {
+        ColorTable ct = new ColorTable("","",palette);
+        
         for (int i = 0; i < colorPreviews.size(); i++) {
             MyColorPreview colorPreview =
                 (MyColorPreview) colorPreviews.get(i);
-            colorPreview.colorMap.setValues(palette);
+            colorPreview.setColors(ct.getColorList());
         }
     }
 
@@ -803,7 +805,7 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
         for (int i = 0; i < colorPreviews.size(); i++) {
             MyColorPreview colorPreview =
                 (MyColorPreview) colorPreviews.get(i);
-            colorPreview.colorMap.setValues(colorTable.getNonAlphaTable());
+            colorPreview.setColors(colorTable.getColorList());
         }
         popupBtn.setText(colorTable.getName());
     }

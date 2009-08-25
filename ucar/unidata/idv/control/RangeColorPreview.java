@@ -74,7 +74,7 @@ import javax.swing.*;
  * @version $Revision: 1.11 $
  */
 
-public class RangeColorPreview extends ColorPreview implements MouseMotionListener,
+public class RangeColorPreview extends JPanel implements MouseMotionListener,
         MouseListener {
 
     /** Is this widget for the main window or for a legend */
@@ -82,9 +82,6 @@ public class RangeColorPreview extends ColorPreview implements MouseMotionListen
 
     /** If for a legend is this for the side or bottom legend */
     int legendType;
-
-    /** the color map */
-    BaseRGBMap colorMap;
 
     /** For formatting */
     DisplayConventions displayConventions;
@@ -115,6 +112,8 @@ public class RangeColorPreview extends ColorPreview implements MouseMotionListen
     /** preferred size */
     Dimension myPreferredSize;
 
+    private List<Color> colors;
+
 
     /**
      * Create a new color table preview
@@ -122,8 +121,8 @@ public class RangeColorPreview extends ColorPreview implements MouseMotionListen
      * @param map The map
      * @param dc For formatting
      */
-    public RangeColorPreview(BaseRGBMap map, DisplayConventions dc) {
-        this(map, dc, DisplayControlImpl.SIDE_LEGEND, false);
+    public RangeColorPreview(List<Color>colors, DisplayConventions dc) {
+        this(colors, dc, DisplayControlImpl.SIDE_LEGEND, false);
     }
 
 
@@ -136,14 +135,12 @@ public class RangeColorPreview extends ColorPreview implements MouseMotionListen
      * @param legendType What legend
      * @param forMain Or in main window
      */
-    public RangeColorPreview(BaseRGBMap map, DisplayConventions dc,
+    public RangeColorPreview(List<Color> colors, DisplayConventions dc,
                              int legendType, boolean forMain) {
-        super(map, (forMain
-                    ? 15
-                    : 0));
+        //        super(map, (forMain                    ? 15                    : 0));
+        this.colors = colors;
         this.forMain            = forMain;
         this.displayConventions = dc;
-        this.colorMap           = map;
         this.legendType         = legendType;
         addMouseMotionListener(this);
         addMouseListener(this);
@@ -160,6 +157,10 @@ public class RangeColorPreview extends ColorPreview implements MouseMotionListen
         }
     }
 
+
+  public Dimension xxxgetMaximumSize() {
+    return new Dimension(Integer.MAX_VALUE, 15);
+  }
 
     /**
      * Local implementation of preferred size setting
@@ -294,13 +295,17 @@ public class RangeColorPreview extends ColorPreview implements MouseMotionListen
         }
     }
 
+
+
+
     /**
      * Update the graphics
      *
      * @param g  graphics to update
      */
-    public void update(Graphics g) {
-        super.update(g);
+    public void paint(Graphics g) {
+        super.paint(g);
+        ColorTableCanvas.paintColors(g, getBounds(), colors, false,null);
         if ( !mouseInPreview) {
             return;
         }
@@ -326,6 +331,12 @@ public class RangeColorPreview extends ColorPreview implements MouseMotionListen
         g.setColor(Color.black);
         g.drawString(rangeString, 2, bounds.height - 1);
     }
+
+    public void setColors(List<Color> colors) {
+        this.colors = colors;
+        repaint();
+    }
+
 
     /**
      * Mouse dragged event handler
@@ -378,6 +389,8 @@ public class RangeColorPreview extends ColorPreview implements MouseMotionListen
         mouseInPreview = false;
         repaint();
     }
+
+
 
     /**
      * Mouse pressed event handler

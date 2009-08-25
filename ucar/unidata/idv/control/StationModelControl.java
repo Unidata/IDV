@@ -582,11 +582,13 @@ public class StationModelControl extends ObsDisplayControl {
                 if ((ct == null) || (param == null)) {
                     continue;
                 }
+
                 RangeColorPreview preview =
                     new RangeColorPreview(
-                        new BaseRGBMap(ct.getNonAlphaTable()),
-                        getDisplayConventions());
+                                          ct.getColorList(),
+                    getDisplayConventions());
 
+                //                preview.setPreferred
                 preview.setRange(range);
                 Rectangle b = metSymbol.getBounds();
                 ctComps.add(new Object[] { new Integer(b.y),

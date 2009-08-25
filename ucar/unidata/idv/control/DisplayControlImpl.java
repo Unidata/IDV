@@ -1792,9 +1792,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         //If we had table then set it on the widget and apply the color scale info
         if (table != null) {
             if (ctw != null) {
-                ctw.setColorPalette(new float[][] {
-                    table[0], table[1], table[2]
-                });
+                if(table.length==3) {
+                    ctw.setColorPalette(new float[][] {
+                            table[0], table[1], table[2]
+                        });
+                } else {
+                    ctw.setColorPalette(new float[][] {
+                            table[0], table[1], table[2],table[3]
+                        });
+                }
             }
             if (colorScaleInfo != null) {
                 colorScaleInfo.setColorPalette(table);
