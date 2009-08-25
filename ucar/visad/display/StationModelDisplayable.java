@@ -1147,14 +1147,13 @@ public class StationModelDisplayable extends DisplayableData {
                                     metSymbol.getColorMappings();
                                 Color  theColor    =
                                     metSymbol.getForeground();
-                                String colorString = colorData.toString();
                                 if ((mappings != null)
                                         && (mappings.size() > 0)) {
                                     for (int i = 0; i < mappings.size();
                                             i++) {
                                         ColorMap colorMap =
                                             (ColorMap) mappings.get(i);
-                                        if (colorMap.match(colorString)) {
+                                        if (colorMap.match(colorData)) {
                                             Color color = colorMap.getColor();
                                             if (color == null) {
                                                 continue;
@@ -1164,6 +1163,7 @@ public class StationModelDisplayable extends DisplayableData {
                                         }
                                     }
                                 } else {
+                                    String colorString = colorData.toString();
                                     theColor =
                                         ucar.unidata.util.GuiUtils
                                             .decodeColor(colorString, null);
