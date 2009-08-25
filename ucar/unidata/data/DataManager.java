@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -36,12 +37,12 @@ import ucar.unidata.idv.IdvConstants;
 
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.PluginManager;
+import ucar.unidata.util.AccountManager;
 
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.AccountManager;
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.ResourceCollection;
 import ucar.unidata.util.StringUtil;
@@ -328,15 +329,19 @@ public class DataManager {
         ucar.nc2.iosp.grib.GribServiceProvider.setIndexAlwaysInCache(true);
         ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(true);
 
-        visad.util.ThreadManager.setGlobalMaxThreads(dataContext.getIdv().getMaxRenderThreadCount());
+        visad.util.ThreadManager.setGlobalMaxThreads(
+            dataContext.getIdv().getMaxRenderThreadCount());
 
 
-        AccountManager accountManager = AccountManager.getGlobalAccountManager();
-        if(accountManager==null) {
-            accountManager =  new AccountManager(dataContext.getIdv().getStore().getUserDirectory());
+        AccountManager accountManager =
+            AccountManager.getGlobalAccountManager();
+        if (accountManager == null) {
+            accountManager = new AccountManager(
+                dataContext.getIdv().getStore().getUserDirectory());
             AccountManager.setGlobalAccountManager(accountManager);
         }
-        org.apache.commons.httpclient.auth.CredentialsProvider provider = accountManager;
+        org.apache.commons.httpclient.auth.CredentialsProvider provider =
+            accountManager;
         //ucar.nc2.dataset.HttpClientManager.init(provider, "IDV");
         org.apache.commons.httpclient.HttpClient client =
             ucar.nc2.util.net.HttpClientManager.init(provider, "IDV");
@@ -522,7 +527,8 @@ public class DataManager {
         for (int i = 0; i < gempakParameters.size(); i++) {
             try {
                 String r = gempakParameters.get(i).toString();
-                ucar.nc2.iosp.gempak.GempakGridParameterTable.addParameters(r);
+                ucar.nc2.iosp.gempak.GempakGridParameterTable.addParameters(
+                    r);
             } catch (Exception exc) {
                 //                System.err.println ("bad:"+ exc);
             }
@@ -628,6 +634,29 @@ public class DataManager {
                                           Class datasourceClass,
                                           Hashtable properties)
             throws Exception {
+        return getDatasourceXml(type, label, datasourceClass, properties,
+                                null);
+    }
+
+
+    /**
+     * Create a snippet of the datasource xml for the given data source
+     *
+     * @param type The data source type
+     * @param label the label
+     * @param datasourceClass the class
+     * @param properties properties
+     * @param attributes If non-null then add these are xml attributes
+     *
+     * @return The xml
+     *
+     * @throws Exception On badness
+     */
+    public static String getDatasourceXml(String type, String label,
+                                          Class datasourceClass,
+                                          Hashtable properties,
+                                          String[] attributes)
+            throws Exception {
         Document doc  = XmlUtil.makeDocument();
         Element  root = doc.createElement(TAG_DATASOURCES);
         Element  node = XmlUtil.create(TAG_DATASOURCE, root);
@@ -643,6 +672,12 @@ public class DataManager {
                 Element propNode = XmlUtil.create(doc, TAG_PROPERTY, node,
                                        value, new String[] { ATTR_NAME,
                         key });
+            }
+        }
+        if (attributes != null) {
+            for (int i = 0; i < attributes.length; i += 2) {
+                node.setAttribute(attributes[i],
+                                  XmlUtil.encodeString(attributes[i + 1]));
             }
         }
         /*
