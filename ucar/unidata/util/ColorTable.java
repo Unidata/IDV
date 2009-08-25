@@ -77,7 +77,7 @@ public class ColorTable implements NamedObject {
     private float[] scaleFactor;
 
     /** list of colors */
-    private ArrayList colorList;
+    private ArrayList<Color> colorList;
 
     /** breakpoints */
     private ArrayList breakpoints;
@@ -562,9 +562,9 @@ public class ColorTable implements NamedObject {
      * Convert the colorTable into a list of Color-s
      * @return list of colors
      */
-    public ArrayList getColorList() {
+    public ArrayList<Color> getColorList() {
         if ((colorList == null) && (tableArray != null)) {
-            colorList = new ArrayList();
+            colorList = new ArrayList<Color>();
             boolean haveAlpha = (tableArray.length == 4);
             int     length    = tableArray[0].length;
             for (int i = 0; i < length; i++) {
