@@ -1056,11 +1056,13 @@ public class TextPointDataSource extends PointDataSource {
             String   missing  = paramRow.getMissing();
             String   extra    = paramRow.getExtra();
             List     fields   = new ArrayList();
+            /*
             if (name.length() > 0) {
                 if (unit.length() == 0) {
                     unit = "Text";
                 }
             }
+            */
             paramRow.addToMetaData(metaDataFields);
 
             if (skip > 0) {
