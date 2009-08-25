@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.ui.colortable;
 
 
@@ -145,13 +146,13 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
     /** Tracks if the color table has been changed on a mouse drag. */
     private boolean needToPropagateChanges = false;
 
-    /** _more_          */
+    /** _more_ */
     private Color selectedColor;
 
-    /** _more_          */
+    /** _more_ */
     private boolean cursorOver = false;
 
-    /** _more_          */
+    /** _more_ */
     private int cursorPosition = 0;
 
     /** Allows us to not propagate during the mouse drag */
@@ -160,7 +161,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
     /** Should we propagate changes */
     private boolean propagateChanges = true;
 
-    /** _more_          */
+    /** _more_ */
     private JCheckBox setColorFromChooserCbx =
         new JCheckBox("Actively set color", true);
 
@@ -228,7 +229,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
     /** Drawing mode */
     private int currentMode = MODE_FILL;
 
-    /** _more_          */
+    /** _more_ */
     private boolean mouseInBox = false;
 
     /** Something used when drawing */
@@ -238,7 +239,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
     /** Use trans. mode */
     private JRadioButton modeTransparencyBtn;
 
-    /** _more_          */
+    /** _more_ */
     private JComponent colorSwatch;
 
     /** Use trans. mode */
@@ -265,7 +266,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
     public static final Cursor normalCursor =
         Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
 
-    /** _more_          */
+    /** _more_ */
     public static Cursor paintCursor;
 
 
@@ -363,7 +364,8 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         }
 
         if (editor != null) {
-            editor.setWindowTitle(GuiUtils.getApplicationTitle() +"Color Table Editor -- "
+            editor.setWindowTitle(GuiUtils.getApplicationTitle()
+                                  + "Color Table Editor -- "
                                   + currentColorTable.getName());
         }
 
@@ -789,7 +791,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      *
      * @return  the new color
      */
-    private Color applyBrightness(Color c, float b) {
+    private static Color applyBrightness(Color c, float b) {
         if (b != 1.0) {
             c = new Color(Math.min(255, (int) (b * c.getRed())),
                           Math.min(255, (int) (b * c.getGreen())),
@@ -1272,7 +1274,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
               }
               activeColorIndex =
                   percentToColorIndex(xToPercent(event.getX()));
-              if(currentMode == MODE_INTERPOLATE) {
+              if (currentMode == MODE_INTERPOLATE) {
                   activeColor = (Color) colorList.get(activeColorIndex);
               }
 
@@ -2392,9 +2394,8 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      * @return Color index
      */
     public int percentToColorIndex(double percent) {
-        double index = percent*colorList.size();
-        return Math.min(Math.max(0, (int)index),
-                        colorList.size() - 1);
+        double index = percent * colorList.size();
+        return Math.min(Math.max(0, (int) index), colorList.size() - 1);
     }
 
     /**
@@ -2414,6 +2415,24 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      */
     public void paintColors(Graphics g) {
         Rectangle box = getColorBox();
+        paintColors(g, box, colorList, true, (List<Float>) scales);
+    }
+
+
+
+
+    /**
+     * Paint the color box
+     *
+     * @param g The graphics
+     * @param box _more_
+     * @param colorList _more_
+     * @param doLines _more_
+     * @param scales _more_
+     */
+    public static void paintColors(Graphics g, Rectangle box,
+                                   List<Color> colorList, boolean doLines,
+                                   List<Float> scales) {
 
         //Draw a reference rectangle for transparency
         g.setColor(Color.white);
@@ -2439,16 +2458,21 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         }
 
 
-        int     length      = colorList.size();
-        boolean doLines     = (length < 50);
-        double  dWidth      = (((double) box.width) / length);
-        int     width       = (int) dWidth;
-        double  extraPerBox = dWidth - width;
-        int     x           = box.x;
+        int length = colorList.size();
+        if (length > 50) {
+            doLines = false;
+        }
+        double dWidth         = (((double) box.width) / length);
+        int    width          = (int) dWidth;
+        double extraPerBox    = dWidth - width;
+        int    x              = box.x;
         double remainderWidth = 0.0;
         for (int i = 0; i < length; i++) {
-            float bright = ((Float) scales.get(i)).floatValue();
-            Color c      = applyBrightness((Color) colorList.get(i), bright);
+            Color c = (Color) colorList.get(i);
+            if (scales != null) {
+                float bright = ((Float) scales.get(i)).floatValue();
+                c = applyBrightness(c, bright);
+            }
             g.setColor(c);
             int extraWidth = 0;
             remainderWidth += extraPerBox;
@@ -2467,7 +2491,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
                     g.drawLine(x, box.y, x, box.y + box.height - 1);
                 }
             }
-            x  += width + extraWidth;
+            x += width + extraWidth;
         }
 
     }
@@ -2552,10 +2576,8 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
             String value   = Misc.format(percentToValue(percent));
             g.setColor(Color.gray);
             int lineX = cursorPosition;
-            g.drawLine(lineX, box.y, lineX,
-                       box.y + box.height);
-            g.drawString(value, lineX,
-                         lineHeight + MARGIN_V + box.height);
+            g.drawLine(lineX, box.y, lineX, box.y + box.height);
+            g.drawString(value, lineX, lineHeight + MARGIN_V + box.height);
         }
 
 
@@ -2860,15 +2882,40 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      * @return The icon
      */
     public static Icon getIcon(ColorTable ct) {
+        return getIcon(ct, 100, 15);
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param ct _more_
+     * @param width _more_
+     * @param height _more_
+     *
+     * @return _more_
+     */
+    public static Icon getIcon(ColorTable ct, int width, int height) {
         try {
             if (ct == null) {
                 JLabel tmp = new JLabel(" ");
-                tmp.setSize(new Dimension(100, 15));
+                tmp.setSize(new Dimension(width, height));
                 return new ImageIcon(GuiUtils.getImage(tmp));
             }
-            BaseRGBMap   colorMap = new BaseRGBMap(ct.getNonAlphaTable());
-            ColorPreview preview  = new ColorPreview(colorMap, 15);
-            preview.setSize(new Dimension(100, 15));
+            //            float[][]array =  ct.getNonAlphaTable();
+            //            BaseRGBMap   colorMap = new BaseRGBMap(array);
+            //ColorPreview preview  = new ColorPreview(colorMap, height);
+            //public static void paintColors(Graphics g, Rectangle box, List<Color> colorList, List<Float>scales) {
+            final List<Color> colors  = (List<Color>) ct.getColorList();
+            final Rectangle   box     = new Rectangle(0, 0, width, height);
+            JPanel            preview = new JPanel() {
+                public void paint(Graphics g) {
+                    paintColors(g, box, colors, false, null);
+                }
+            };
+
+            preview.setSize(new Dimension(width, height));
             return new ImageIcon(GuiUtils.getImage(preview));
         } catch (Exception exc) {
             return null;
