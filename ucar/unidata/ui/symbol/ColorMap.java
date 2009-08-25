@@ -45,6 +45,7 @@ import ucar.visad.ShapeUtility;
 
 import visad.*;
 
+import java.rmi.RemoteException;
 import java.awt.*;
 
 import java.awt.event.*;
@@ -224,8 +225,17 @@ public class ColorMap {
      *
      * @return Pattern matches  value
      */
-    public boolean match(String value) {
-        return StringUtil.stringMatch(value, pattern, true, true);
+    public boolean match(Data value) throws Exception {
+        if(value instanceof Real && isNumericRange()) {
+            Real[]range = getNumericRange();
+            Real r = (Real) value;
+            if(r.__ge__(range[0])==0) return false;
+            if(r.__le__(range[1])==0) return false;
+            return true;
+        }
+
+        String stringValue = value.toString();
+        return StringUtil.stringMatch(stringValue, pattern, true, true);
     }
 
     /**
