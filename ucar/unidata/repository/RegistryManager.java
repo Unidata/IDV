@@ -235,13 +235,17 @@ public class RegistryManager extends RepositoryManager {
         sb.append(HtmlUtil.submit("Reload from Registry Servers",
                                   ARG_REGISTRY_RELOAD));
         sb.append(HtmlUtil.open(HtmlUtil.TAG_UL));
-        sb.append(HtmlUtil.br());
         List<ServerInfo> remoteServers = getRemoteServers();
         if (remoteServers.size() == 0) {
             sb.append(msg("No remote servers"));
+        } else {
+            sb.append(msg("Use selected in search"));
         }
+        sb.append(HtmlUtil.br());
+
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
         int idCnt = 0;
+
         for (ServerInfo serverInfo : remoteServers) {
             sb.append(HtmlUtil.hidden(ARG_REGISTRY_SERVER,
                                       serverInfo.getId()));
@@ -293,6 +297,8 @@ public class RegistryManager extends RepositoryManager {
     protected void addToInstallForm(Request request, StringBuffer sb)
             throws Exception {
         String msg =  msg("Servers this server registers with:");
+        msg  = HtmlUtil.space(1) + HtmlUtil.href("http://www.unidata.ucar.edu/software/ramadda/docs/userguide/remoteservers.html",msg("Help"),
+                                                 HtmlUtil.attr(HtmlUtil.ATTR_TARGET,"_help"));
         sb.append(
             HtmlUtil.formEntry(
                 msgLabel("Registry Servers"),
@@ -367,7 +373,7 @@ public class RegistryManager extends RepositoryManager {
                 checkServer(serverInfo, true);
             }
         } catch (Exception exc) {
-            logError("Cleaning up  servers", exc);
+            logError("RegistryManager.cleanUpServers:", exc);
         }
 
 
@@ -381,7 +387,7 @@ public class RegistryManager extends RepositoryManager {
         try {
             registerWithServers();
         } catch (Exception exc) {
-            logError("Registering with servers", exc);
+            logError("RegistryManager.doFinalInitialization: Registering with servers", exc);
         }
     }
 
@@ -413,6 +419,7 @@ public class RegistryManager extends RepositoryManager {
      * @param csb _more_
      */
     public void addAdminConfig(Request request, StringBuffer csb) {
+        String helpLink = HtmlUtil.href("/repository/help/remoteservers.html",msg("Help"), HtmlUtil.attr(HtmlUtil.ATTR_TARGET,"_help"));
         csb.append(
             HtmlUtil.row(HtmlUtil.colspan(msgHeader("Server Registry"), 2)));
 
@@ -425,7 +432,7 @@ public class RegistryManager extends RepositoryManager {
 
         csb.append(
             HtmlUtil.formEntry(
-                "", msg("Servers this server registers with:")));
+                               "", msg("Servers this server registers with:")+HtmlUtil.space(2) + helpLink));
         csb.append(
             HtmlUtil.formEntry(
                 "",
@@ -698,14 +705,14 @@ public class RegistryManager extends RepositoryManager {
             String  contents = getStorageManager().readSystemResource(theUrl);
             Element root     = XmlUtil.getRoot(contents);
             if ( !responseOk(root)) {
-                logInfo("registerWithServer: Failed to register with:" + theUrl);
+                logInfo("RegistryManager.registerWithServer: Failed to register with:" + theUrl);
                 //                logInfo(XmlUtil.getChildText(root).trim());
             } else {
-                logInfo("registerWithServer: Registered with:" + theUrl);
+                logInfo("RegistryManager.registerWithServer: Registered with:" + theUrl);
             }
 
         } catch (Exception exc) {
-            logError("Error registering with:" + theUrl, exc);
+            logError("RegistryManager.registerWithServer: Error registering with:" + theUrl, exc);
         }
     }
 
@@ -734,6 +741,7 @@ public class RegistryManager extends RepositoryManager {
     public Result processRegistryAdd(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
         if ( !isEnabledAsServer()) {
+            logInfo("RegistryManager.processRegistryAdd: Was asked to register a server when this server is not configured as a registry server. URL = " + request);
             return new Result(
                 XmlUtil.tag(
                     TAG_RESPONSE, XmlUtil.attr(ATTR_CODE, CODE_ERROR),
@@ -745,7 +753,7 @@ public class RegistryManager extends RepositoryManager {
 
         ServerInfo serverInfo = new ServerInfo(new URL(baseUrl), "", "");
 
-        //        logInfo("processRegistryAdd: url=" + baseUrl);
+        logInfo("RegistryManager.processRegistryAdd: calling checkServer url=" + baseUrl);
         if (checkServer(serverInfo, true)) {
             return new Result(XmlUtil.tag(TAG_RESPONSE,
                                           XmlUtil.attr(ATTR_CODE, CODE_OK),
@@ -768,11 +776,23 @@ public class RegistryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processRegistryInfo(Request request) throws Exception {
-        final String server = request.getString(ARG_REGISTRY_SERVER, "");
-        if ( !getServersToRegisterWith().contains(server)) {
+        final String requestingServer = request.getString(ARG_REGISTRY_SERVER, "");
+        URL requestingServerUrl = new URL(requestingServer);
+        List<String> servers =   getServersToRegisterWith();
+        boolean ok = false;
+        for(String myServer: servers) {
+            URL myServerUrl = new URL(myServer);
+            if(myServerUrl.getHost().toLowerCase().equals(requestingServerUrl.getHost().toLowerCase()) &&
+               myServerUrl.getPort()== requestingServerUrl.getPort()) {
+                ok = true;
+                break;
+            }
+        }
+
+        if (!ok) {
             logInfo(
-                "Was asked to register with a server that is not in our list:"
-                + server);
+                "RegistryManger.processRegistryInfo: Was asked to register with a server:" + requestingServer +" that is not in our list:"+
+                servers);
             return new Result(
                 XmlUtil.tag(
                     TAG_RESPONSE, XmlUtil.attr(ATTR_CODE, CODE_ERROR),
@@ -781,9 +801,9 @@ public class RegistryManager extends RepositoryManager {
         Misc.run(new Runnable() {
             public void run() {
                 try {
-                    fetchRemoteServers(server);
+                    fetchRemoteServers(requestingServer);
                 } catch (Exception exc) {
-                    logError("Loading servers from:" + server, exc);
+                    logError("RegistryManager.processRegistryInfo: Loading servers from:" + requestingServer, exc);
                 }
             }
         });
@@ -806,7 +826,7 @@ public class RegistryManager extends RepositoryManager {
         Element root     = XmlUtil.getRoot(contents);
 
         if ( !responseOk(root)) {
-            logInfo("fetchRemoteServers: Bad response from " + serverUrl);
+            logInfo("RegistryManager.fetchRemoteServers: Bad response from " + serverUrl);
             return;
         }
         List<ServerInfo> servers  = new ArrayList<ServerInfo>();
@@ -880,7 +900,7 @@ public class RegistryManager extends RepositoryManager {
             if (responseOk(root)) {
                 ServerInfo clientServer = new ServerInfo(root);
                 if (clientServer.equals(serverInfo)) {
-                    logInfo("checkServer: adding server " + serverUrl);
+                    logInfo("RegistryManager.checkServer: adding server " + serverUrl);
                     getDatabaseManager().delete(Tables.SERVERREGISTRY.NAME,
                             Clause.eq(Tables.SERVERREGISTRY.COL_URL,
                                       serverInfo.getUrl()));
@@ -895,18 +915,18 @@ public class RegistryManager extends RepositoryManager {
                     clearRegisteredServers();
                     return true;
                 } else {
-                    logInfo("checkServer: not equals:" + serverInfo.getId()
+                    logInfo("RegistryManager.checkServer: not equals:" + serverInfo.getId()
                             + " " + clientServer.getId());
 
                 }
             } else {
-                logInfo("checkServer: response not ok");
+                logInfo("RegistryManager.checkServer: response not ok from:" + serverInfo +" with url: " +serverUrl +"response:\n" +contents);
             }
         } catch (Exception exc) {
-            logError("checkServer:" + serverInfo, exc);
+            logError("RegistryManager.checkServer: Could not fetch server xml from:" + serverInfo +" with url:" + serverUrl, exc);
         }
         if (deleteOnFailure) {
-            logInfo("checkServer: Deleting server:" + serverInfo.getUrl());
+            logInfo("RegistryManager.checkServer: Deleting server:" + serverInfo.getUrl());
             getDatabaseManager().delete(
                 Tables.SERVERREGISTRY.NAME,
                 Clause.eq(
@@ -960,6 +980,7 @@ public class RegistryManager extends RepositoryManager {
             for (ServerInfo serverInfo : servers) {
                 if(seen.contains(serverInfo)) continue;
                 if(!didone) {
+                    sb.append(HtmlUtil.p());
                     if (i==0) {
                         sb.append(msgHeader("Registered Servers"));
                     } else {

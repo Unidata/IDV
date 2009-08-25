@@ -7,30 +7,42 @@
 
 <body>
 
-
-To address the problem of discovery of RAMADDA data servers a
-server registry facility within RAMADDA has been developed.
-<p>
-
-A RAMADDA server can be enabled to be a registry for other servers. 
-We term this a "registry server".  This configuration is done through the
-<i>Admin-&gt;Settings-&gt;Site and Contact Information</i> page:
-
-[ht::cimg images/registryadmin.jpg {} {border=0 width=700}]
-
-Likewise, a RAMADDA server can be configured to have 0 or more 
-servers that it registers itself with. In this case, a RAMADDA server
+A RAMADDA server can register its existence with one or more other RAMADDA servers.
+In this case, a RAMADDA server
 that is registering itself with a registry server is known as a "registry client". 
 By default a RAMADDA server comes with an initial registry server:<br>
 <i>http://motherlode.ucar.edu/repository</i>
+<p>
+The purpose of this is two-fold. First, this allows for a listing of RAMADDA servers so 
+end users can find out about other repositories.  Secondly, as part of the registration process your
+server will receive and store a list of all of the registered servers. You can then configure your RAMADDA
+server to support distributed searches across a federated network of RAMADDA servers (see below).
 
+<p>
+A RAMADDA server can also be enabled to be a registry for other servers. 
+We term this a "registry server".  This configuration is done through the
+<i>Admin-&gt;Settings-&gt;Site and Contact Information</i> page.
 
 <p>
 A registry server provides a listing of its known clients at:<br>
 <a href="http://motherlode.ucar.edu/repository/registry/list">http://motherlode.ucar.edu/repository/registry/list</a>
 
+
+
+<h3>Configuration</h3>
+In the <i>Admin-&gt;Settings-&gt;Site and Contact Information</i> page there is a field where you can enter one or more
+registry servers, one per line. Just provide the top level URL, e.g., <i>http://motherlode.ucar.edu/repository</i>.
+You can also enable your server to be a registry server for other servers with the <i>Enable this server to be a registry for other servers</i>
+checkbox.
+<p>
+When your RAMADDA server receives a list of other RAMADDA servers  as part of the registry process the server information is stored
+in the database. You can configure your server to provide remote search facilities on selected servers through the 
+<i>Admin-&gt;Remote Servers</i> page.
+
+
+
 <h3>Federated Searches</h3>
-We intend to use this basic registry service as a way in which RAMADDA servers can support aggregated search.
+The basic registry service is used to support aggregated search across a set of RAMADDA servers.
 A client server will, on successful registration with a registry server, request the collection
 of client servers available from its registry server and store these in its database.
 The administrator of the client server will be able to select which of the other servers
@@ -46,8 +58,10 @@ for each of the remote search servers. There are many cases where this will be e
 However, we also want to be able to aggregate the results in the context of the original server and
 display the results as on collection (e.g., as a THREDDS catalog, an RSS feed, etc.) In this case the original
 server would launch each search request in a separate thread with the result output type being set to
-the internal RAMADDA xml format (as opposed to getting HTML back). The XML results would then be
-turned into RAMADDA's internal data model structures and then be displayed accordingly.
+the internal RAMADDA xml format (as opposed to getting HTML back). The XML results are then 
+turned into RAMADDA's internal data model structures and are displayed accordingly.
+
+
 
 
 
