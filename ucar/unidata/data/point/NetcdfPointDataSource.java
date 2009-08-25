@@ -309,10 +309,12 @@ public class NetcdfPointDataSource extends PointDataSource {
         String source;
         if (id instanceof Integer) {
             source = (String) sources.get(((Integer) id).intValue());
+        } else if (id instanceof List && sample) {
+            source = (String) sources.get(0);
         } else {
             source = id.toString();
         }
-        System.err.println ("reading data from:" + source);
+        //System.err.println ("reading data from:" + source);
 
         FieldImpl obs = null;
         Trace.call1("NetcdfPointDatasource:makeObs");
