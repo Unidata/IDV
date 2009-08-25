@@ -166,6 +166,7 @@ public class ColorMap {
     public JTextField getPatternWidget() {
         if (patternFld == null) {
             patternFld = new JTextField(pattern, 20);
+            patternFld.setToolTipText("<html>A string pattern to match or a comma separated numeric range:<br><i>e.g., -5.0,0</i></html>");
         }
         return patternFld;
     }

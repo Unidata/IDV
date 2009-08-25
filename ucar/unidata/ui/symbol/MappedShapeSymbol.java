@@ -240,10 +240,9 @@ public class MappedShapeSymbol extends ShapeSymbol {
                 }
                 return null;
             } else {
-                String value = dataArray[0].toString();
                 for (int i = 0; i < shapeMappings.size(); i++) {
                     shapeMap = (ShapeMap) shapeMappings.get(i);
-                    if (shapeMap.match(value)) {
+                    if (shapeMap.match(dataArray[0])) {
                         return ShapeUtility.createShape(shapeMap.getShape());
                     }
                 }
