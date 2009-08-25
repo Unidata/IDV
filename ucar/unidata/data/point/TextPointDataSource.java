@@ -851,7 +851,7 @@ public class TextPointDataSource extends PointDataSource {
                 trajectory, PROP_HEADER_BLOB,
                 getDataContext().getIdv().encodeObject(new Metadata(skipRows, skipPattern,
                     metaDataFields), false)
-                                 }, new String[]{DataManager.ATTR_DOESMULTIPLES,"true"}));
+                                 }), new String[]{DataManager.ATTR_DOESMULTIPLES,"true"});
             getDataContext().getIdv().getPluginManager().addText(xml,
                     lastType + "datasource.xml");
         } catch (Exception exc) {
