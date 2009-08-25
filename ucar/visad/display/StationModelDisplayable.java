@@ -1217,8 +1217,12 @@ public class StationModelDisplayable extends DisplayableData {
                                     percent = 1.0;
                                 }
                                 List colors = ct.getColorList();
-                                int index = (int) (colors.size() * percent)
-                                            - 1;
+                                double dindex = (colors.size() * percent);
+                                int index = (int) dindex;
+                                //Round up
+                                if(dindex-index>=0.5) index++;
+                                index--;
+                                // System.err.println ("v:" + value + " r:" + r + " %:" + percent + " dindex:" + dindex +" index:" + index + " size:" + colors.size());
                                 if (index < 0) {
                                     index = 0;
                                 }
