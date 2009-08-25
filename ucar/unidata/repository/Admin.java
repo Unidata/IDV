@@ -978,6 +978,7 @@ public class Admin extends RepositoryManager {
                 PROP_ACCESS_ALLSSL, "true",
                 getProperty(PROP_ACCESS_ALLSSL, false)) + " "
                     + msg("Force all connections to be secure");
+        String sslMsg = "Note: If you define an SSL port than all admin access will be redirected to that port. If something is broken with SSL then you have a problem. See the <A target=_help href=\"http://www.unidata.ucar.edu/software/ramadda/docs/userguide/faq.html#fixssl\">FAQ</a> to fix this." ;
         csb.append(
             HtmlUtil.formEntry(
                 msgLabel("SSL Port"),
@@ -985,7 +986,8 @@ public class Admin extends RepositoryManager {
                     PROP_SSL_PORT, getProperty(PROP_SSL_PORT, ""),
                     HtmlUtil.SIZE_5) + HtmlUtil.space(1)
                                      + msg("Port number for SSL access.")
-                                     + HtmlUtil.space(1) + allSslCbx));
+                + HtmlUtil.space(1) + allSslCbx+HtmlUtil.br() +
+                getRepository().showDialogNote(sslMsg)));
 
 
 

@@ -2064,6 +2064,10 @@ public class UserManager extends RepositoryManager {
             return new Result(msg("Password Reset"), sb);
         }
 
+        if(user.getIsGuest()) {
+            return new Result(msg("Password Reset"), new StringBuffer(msg("Guest user cannot reset password")));
+        }
+
         key = getRepository().getGUID() + "_" + Math.random();
         //Time out is 1 hour
         resetInfo = new PasswordReset(user.getId(),

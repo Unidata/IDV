@@ -121,6 +121,7 @@ public class RegistryManager extends RepositoryManager {
 
 
     private List<ServerInfo> registeredServers;
+
     /** _more_          */
     private List<ServerInfo> remoteServers;
     private List<ServerInfo> selectedRemoteServers;
@@ -291,9 +292,11 @@ public class RegistryManager extends RepositoryManager {
      */
     protected void addToInstallForm(Request request, StringBuffer sb)
             throws Exception {
+        String msg =  msg("Servers this server registers with:");
         sb.append(
             HtmlUtil.formEntry(
                 msgLabel("Registry Servers"),
+                msg+HtmlUtil.br() +
                 HtmlUtil.textArea(
                     PROP_REGISTRY_SERVERS,
                     getRepository().getProperty(

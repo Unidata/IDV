@@ -36,9 +36,20 @@ and the site administration pages will automatically use SSL.
 </faqitem>
 
 
-<faqitem id="allssl" q="Oops, I turned on SSL and selected &quot;Force all connections to be secure&quot;. SSL isn't working and now I cannot access anything in RAMADDA. What can I do?" >
-The problem is that the SSL property settings are in the database which takes precedence over other properties. One way around this is to run RAMADDA with the command line argument:<pre>-Dramadda.access.allssl=false</pre>
-Alternatively you can put the following in the repository.properties file:<pre>override.ramadda.access.allssl=false</pre>
+<faqitem id="fixssl" q="Oops, I told RAMADDA to use an SSL port and SSL is not working. Now I cannot access the admin page to turn off SSL and I'm stuck. What can I do?" >
+If you logged in as an administrator then on a URL request add the URL argument:<pre>
+ramadda.ssl.ignore=true
+e.g.:
+http://yourserver:8080/repository/admin/settings?ramadda.ssl.ignore=true
+</pre>
+This temporarily blocks the automatic redirect to the SSL port. You should then go to the Admin Settings
+pages and clear the SSL port (or configure SSL in your servlet container).
+
+<p>
+If you cannot login as an administrator then you can run RAMADDA with the command line argument:
+<pre>-Dramadda.ssl.ignore=true</pre>
+Alternatively you can put the following in the repository.properties file:
+<pre>override.ramadda.ssl.ignore=true</pre>
 The &quot;override.&quot; prefix tells RAMADDA to override the database properties and instead use the property defined in the properties file.
 </faqitem>
 

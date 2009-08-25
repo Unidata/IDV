@@ -4147,21 +4147,23 @@ return new Result(title, sb);
     }
 
 
+    /**
+     * If this entry is a harvested or local file (i.e., it is not a stored file
+     * in the repository's own storage area) then check its file date. If its greater than the entry's date then change the entry.
+     */
     private void checkEntryFileTime(Entry entry) throws Exception {
         if(entry==null || !entry.isFile()) return;
+        
+        if(entry.getResource().isStoredFile()) return;
         File f = entry.getResource().getTheFile();
         if(f ==null || !f.exists()) return;
+        if(entry.getStartDate() != entry.getEndDate()) return;
+
         long fileTime = f.lastModified();
-        if(fileTime == entry.getCreateDate()) return;
-        boolean dateRangeSame = (fileTime == entry.getStartDate() &&
-                                 fileTime == entry.getEndDate());
-        entry.setCreateDate(fileTime);
-        if(dateRangeSame) {
-            entry.setStartDate(fileTime);
-            entry.setEndDate(fileTime);
-        }
+        if(fileTime == entry.getStartDate()) return;
+        entry.setStartDate(fileTime);
+        entry.setEndDate(fileTime);
         updateEntry(entry);
-        
     }
 
 

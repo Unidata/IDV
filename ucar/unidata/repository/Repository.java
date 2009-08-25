@@ -484,6 +484,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    private boolean ignoreSSL = false;
+
     /**
      * _more_
      *
@@ -496,7 +498,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
             if ( !request.get(ARG_SSLOK, true)) {
                 return false;
             }
+            if(request.getUser().getAdmin()) {
+                if(request.exists(PROP_SSL_IGNORE)) {
+                    ignoreSSL = request.get(PROP_SSL_IGNORE,false);
+                }
+            }
         }
+        if(ignoreSSL) return false;
+
         if (getProperty(PROP_SSL_IGNORE, false)) {
             return false;
         }
