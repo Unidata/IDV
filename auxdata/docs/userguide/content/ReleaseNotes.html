@@ -63,6 +63,13 @@ a 3D Hodograph and a table readout.  The data in the table can be
 exported to a text file for import into other applications.
 </faqitem>
 
+<faqitem q="Point Volume Display" id="pointvolume">
+A new display for quickly showing a volume as points was added
+in the 2.7u2 release.  This display will show the individual grid
+points.  The size, color and data range can be changed through 
+the display control.
+</faqitem>
+
 <faqitem cat="Data Changes"></faqitem>
 <faqitem q="UF Radar data reading" id="uf_radar">
 Preliminary work has been done on reading Universal Format (UF)
@@ -93,7 +100,9 @@ added so users can export calculated fields to a netCDf file.
 The Text Point Data import has been improved in this version.
 The metadata interface has been improved to allow skipping over
 header lines and automatically importing the field names from
-a header into the metadata fields.
+a header into the metadata fields.  Support for opening multiple files
+at once was added in 2.7u2.  A plugin for NAPLN Text Lightning data 
+is available through the Plugin Manager.
 </faqitem>
 
 
@@ -138,6 +147,15 @@ Bugs fixed in this update:
 <li>Updated to netCDF-Java 4.0.48.2
 <li>Fix gate size problem when loading multiple Level III/TDWR products
 <li>Fix problem with missing values in grib data
+<li>Font size not getting applied in Layout Model
+<li>Unable to read in CLASS netCDF images
+<li>Lat/lon widget in Image chooser doesn't handle regional number formatting
+<li>Clearing spatial subset in the Data Subset panel does not override data source setting.
+<li>AVN grid (-30 to 330) was not displaying correctly
+<li>Color Table Editor issued discovered during workshop.
+<li>Add icons to menus
+<li>Space in extra attributes in Text Point metadata editor caused problems.
+<li>Some control guis not left justified.
 </ul>
 </faqitem>
 
