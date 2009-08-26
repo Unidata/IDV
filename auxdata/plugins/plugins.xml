@@ -42,6 +42,7 @@
 <plugin version="2.2" name="Colombia Departments Map" description="Map" size="9421523" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/colombiamap.jar" category="Maps"/>
 
 <plugin version="2.2" name="Mongolia Maps" description="Various maps of Mongolia" size="2859237" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/mongoliamaps_maps.jar" category="Maps"/>
+<plugin version="2.7" name="World Maps" description="Miscellaneous World Maps" size="1875100" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/world_maps.jar" category="Maps"/>
 
 
 <!-- Misc -->
@@ -56,6 +57,7 @@
 <!-- Data Helpers -->
 <plugin version="2.6"  category="Data Sources" name="PAM NetCDF Enhancement" description="NcML needed to read Portable Automated Mesonet (PAM) netCDF files"  url="http://www.unidata.ucar.edu/software/idv/plugins/pam.jar"/>
 <plugin version="2.6"  category="Data Sources" name="SSEC Lightning Data" description="NcML needed to read a lightning point data format"  url="http://www.unidata.ucar.edu/software/idv/plugins/sseclightning.jar"/>
+<plugin version="2.7"  category="Data Sources" name="NAPLN Text Lightning Data" description="Datasource and some layout models for NAPLN Lightning data"  url="http://www.unidata.ucar.edu/software/idv/plugins/napln.jar"/>
 <plugin name="Mesowest Chooser" url="http://www.unidata.ucar.edu/software/idv/plugins/mesowestplugin.jar" description="Provides access to mesowest point data" category="Data Sources"/>
 <plugin name="ADDE via port 80" url="http://www.unidata.ucar.edu/software/idv/plugins/addeport.jar" description="Provides access to Unidata's ADDE server via port 80" category="Data Sources"/>
 
