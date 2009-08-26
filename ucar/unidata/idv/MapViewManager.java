@@ -1082,18 +1082,18 @@ public class MapViewManager extends NavigatedViewManager {
         viewMenu.addSeparator();
 
         if (isFullScreen()) {
-            viewMenu.add(GuiUtils.makeMenuItem("Reset Full Screen", this,
-                    "resetFullScreen"));
+            viewMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Reset Full Screen", this,
+                                                                "resetFullScreen"),"/auxdata/ui/icons/arrow_in.png"));
         } else {
-            viewMenu.add(GuiUtils.makeMenuItem("Full Screen", this,
-                    "setFullScreen"));
+            viewMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Full Screen", this,
+                                                                "setFullScreen"),"/auxdata/ui/icons/arrow_out.png"));
         }
         viewMenu.addSeparator();
-        viewMenu.add(GuiUtils.makeMenuItem("Animation Timeline", this,
-                                           "showTimeline"));
+        viewMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Animation Timeline", this,
+                                                            "showTimeline"),"/auxdata/ui/icons/timeline_marker.png"));
 
-        viewMenu.add(GuiUtils.makeMenuItem("Properties", this,
-                                           "showPropertiesDialog"));
+        viewMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Properties", this,
+                                                            "showPropertiesDialog"),"/auxdata/ui/icons/Information16.gif"));
     }
 
     /**
@@ -2055,12 +2055,12 @@ public class MapViewManager extends NavigatedViewManager {
 
         if ( !getUseGlobeDisplay()) {
             projMenu.addSeparator();
-            projMenu.add(GuiUtils.makeMenuItem("New/Edit...", this,
-                    "showProjectionManager"));
-            projMenu.add(GuiUtils.makeMenuItem("Use Displayed Area", this,
-                    "setCurrentAsProjection"));
-            projMenu.add(GuiUtils.makeMenuItem("Go to Address", this,
-                    "goToAddress"));
+            projMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("New/Edit...", this,
+                                                                "showProjectionManager"),"/auxdata/ui/icons/world_edit.png"));
+            projMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Use Displayed Area", this,
+                                                                "setCurrentAsProjection"),"/auxdata/ui/icons/world_rect.png"));
+            projMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Go to Address", this,
+                                                                "goToAddress"),"/auxdata/ui/icons/house_go.png"));
 
             projMenu.addSeparator();
             createCBMI(projMenu, PREF_PROJ_USEFROMDATA).setToolTipText(

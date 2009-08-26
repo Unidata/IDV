@@ -232,6 +232,8 @@
 
 
      <menuitem
+        icon="/auxdata/ui/icons/Help16.gif"
+
        label="User's Guide"
        action="help:idv.index"
        mnemonic="U"/>
@@ -241,6 +243,7 @@
        mnemonic="G"/>
      <menuitem
        label="Zooming, Panning and Rotating"
+        icon="/auxdata/ui/icons/ZoomIn16.gif"
        action="help:idv.ui.navigation"
        mnemonic="Z"/>
      <separator/>
@@ -259,6 +262,7 @@
      <separator/>
      <menuitem
        label="Release Notes"
+       icon="/auxdata/ui/icons/note.png"
        action="help:idv.releasenotes"
        mnemonic="R"/>
      <menuitem

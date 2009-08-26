@@ -985,6 +985,8 @@ public class IdvUIManager extends IdvManager {
         if (actionMap != null) {
             return;
         }
+
+
         actionIcons = new Hashtable<String,ImageIcon>();
         actionMap  = new Hashtable();
         actionList = new ArrayList();
@@ -1658,6 +1660,8 @@ public class IdvUIManager extends IdvManager {
         XmlResourceCollection xrc = getResourceManager().getXmlResources(
                                         getResourceManager().RSC_MENUBAR);
         menuBar = new JMenuBar();
+        //Call initActions so we have the action icons
+        initActions();
         for (int i = 0; i < xrc.size(); i++) {
             GuiUtils.processXmlMenuBar(xrc.getRoot(i), menuBar, getIdv(),
                                        menuMap,actionIcons);
@@ -2530,6 +2534,7 @@ public class IdvUIManager extends IdvManager {
         JMenu     mapMenu;
         if (makeNew) {
             mapMenu = new JMenu("Maps and Backgrounds");
+            GuiUtils.setIcon(mapMenu, "/auxdata/ui/icons/map.png");
             displayMenu.add(mapMenu);
         } else {
             mapMenu = displayMenu;
@@ -2600,7 +2605,7 @@ public class IdvUIManager extends IdvManager {
             List menuItems = NamedStationTable.makeMenuItems(stations,
                                  listener);
             if (makeNew) {
-                displayMenu.add(GuiUtils.makeMenu("Locations", menuItems));
+                displayMenu.add(GuiUtils.setIcon(GuiUtils.makeMenu("Locations", menuItems),"/auxdata/ui/icons/world_loc.png"));
             } else {
                 GuiUtils.makeMenu(displayMenu, menuItems);
             }
@@ -3043,9 +3048,9 @@ public class IdvUIManager extends IdvManager {
             menuItems.add(mi);
         }
         menuItems.add(GuiUtils.MENU_SEPARATOR);
-        menuItems.add(GuiUtils.makeMenuItem("Save As Favorite",
+        menuItems.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Save As Favorite",
                                             getPersistenceManager(),
-                                            "saveDataSource", dataSource));
+                                                             "saveDataSource", dataSource),"/auxdata/ui/icons/Save16.gif"));
         menuItems.add(GuiUtils.makeMenuItem("Properties", dataSource,
                                             "showPropertiesDialog"));
 

@@ -90,13 +90,13 @@
      action="jython:idv.getPluginManager().installPluginFromUrl();"/>
   <action
      id="plugins.manage"
-     image="/auxdata/ui/icons/Open16.gif"
-     description="List plugins"
+     image="/auxdata/ui/icons/plugin.png"
+     description="Manager plugins"
      group="Plugins"
      action="jython:idv.getPluginManager().showPluginList();"/>
   <action
      id="plugins.create"
-     image="/auxdata/ui/icons/New16.gif"
+     image="/auxdata/ui/icons/plugin_edit.png"
      description="Create plugin"
      group="Plugins"
      action="jython:idv.getPluginManager().showCreatePlugin();"/>
@@ -169,6 +169,7 @@
      id="edit.projections"
      description="Edit projections"
      group="Tools"
+     image="/auxdata/ui/icons/world_edit.png"
      action="jython:idv.showIdvProjectionManager ();"/>
   <action
      id="edit.paramdefaults"

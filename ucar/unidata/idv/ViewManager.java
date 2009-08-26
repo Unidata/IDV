@@ -4038,13 +4038,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         JMenu captureMenu = new JMenu("Capture");
         viewMenu.add(captureMenu);
-        captureMenu.add(GuiUtils.makeMenuItem("Image...", this,
-                "doSaveImageInThread"));
-        captureMenu.add(GuiUtils.makeMenuItem("Print...", this,
-                "doPrintImage", null, true));
+        captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Image...", this,
+                                                               "doSaveImageInThread"),"/auxdata/ui/icons/image.png"));
+        captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Print...", this,
+                                                               "doPrintImage", null, true),"/auxdata/ui/icons/printer.png"));
 
-        captureMenu.add(GuiUtils.makeMenuItem("Movie...", this,
-                "startImageCapture"));
+        captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Movie...", this,
+                                                               "startImageCapture"),"/auxdata/ui/icons/film.png"));
 
         viewMenu.add(makeShowMenu());
 
@@ -5654,8 +5654,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param colorMenu The Color menu to initialize
      */
     public void initColorMenu(JMenu colorMenu) {
-        colorMenu.add(GuiUtils.makeMenuItem("Set Colors...", this,
-                                            "showColorPairDialog"));
+        colorMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Set Colors...", this,
+                                                             "showColorPairDialog"),"/auxdata/ui/icons/color_swatch.png"));
 
         JMenu deleteMenu = new JMenu("Delete");
         colorMenu.add(deleteMenu);

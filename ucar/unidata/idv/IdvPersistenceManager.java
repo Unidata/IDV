@@ -1628,6 +1628,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         if (bundleType == BUNDLES_FAVORITES) {
             JMenuItem mi = new JMenuItem("Save As Favorite...");
             mi.setMnemonic(GuiUtils.charToKeyCode("S"));
+            GuiUtils.setIcon(mi,"/auxdata/ui/icons/Save16.gif");
             bundleMenu.add(mi);
             mi.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
