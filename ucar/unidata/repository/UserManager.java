@@ -349,7 +349,7 @@ public class UserManager extends RepositoryManager {
         }
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.formEntry(msgLabel("User"),
-                                     HtmlUtil.input(ARG_USER_ID, id)));
+                                     HtmlUtil.input(ARG_USER_ID, id,HtmlUtil.cssClass("userfield"))));
         sb.append(HtmlUtil.formEntry(msgLabel("Password"),
                                      HtmlUtil.password(ARG_USER_PASSWORD)));
         sb.append(extra);

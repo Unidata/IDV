@@ -5,11 +5,18 @@
 </head>
 
 <body>
-RAMADDA can run under Tomcat or can run stand-alone.
+RAMADDA can run under Tomcat or can run stand-alone with just Java.
+The RAMADDA downloads area can be accessed here:<br>
+<a href="http://www.unidata.ucar.edu/downloads/ramadda/index.jsp">http://www.unidata.ucar.edu/downloads/ramadda/index.jsp</a>.
+<br>
+You will need to register at the Unidata site to access the downloads area.
+<p>
+To run under Tomcat download the <a href="http://www.unidata.ucar.edu/downloads/ramadda/ftp/repository.war">repository.war</a> file. To run stand alone download the <a href="http://www.unidata.ucar.edu/downloads/ramadda/ftp/repository.zip">repository.zip</a> file.
 
 <h2>Running under Tomcat</h2>
 
-Place the repository.war in the tomcat webapps directory. By default the repository is accessed at /repository on the web server.
+To run undr Tomcat just 
+place the repository.war in the tomcat webapps directory. By default the repository is accessed at /repository on the web server.
 <p>
 
 You need to specify the ramadda home directory. This is where it looks for properties files and other resources, where the java derby database is stored and where any uploaded data files are stored. 
@@ -43,9 +50,9 @@ Just define:<pre>ramadda_home=/home/dir</pre>
 
 
 <h2>Running Standalone</h2>
-You can run RAMADDA stand-alone. This is really useful for development and just requires  Java 1.5 or greater.
+You can run RAMADDA stand-alone. This is really useful for development and just requires  Java 1.5 or greater. First, download and unzip the <a href="http://www.unidata.ucar.edu/downloads/ramadda/ftp/repository.zip">repository.zip</a> file.
 <p>
-To run RAMADDA run the ramadda.sh. This just does:<pre>
+To run RAMADDA run the ramadda.sh in the release directory. This just does:<pre>
    java -Xmx512m -jar repository.jar
 </pre>
 
@@ -64,19 +71,26 @@ To change this do:<pre>
 
 <h2>Configuration</h2>
 
-RAMADDA looks in the home directory for a repository.properties
-To configure RAMADDA create a repository.properties file. The properties
+RAMADDA looks in its home directory for a repository.properties
+To configure RAMADDA create a repository.properties file or
+copy <a href="repository.properties">this one</a>. The properties
 defined in the local file override the ones defined in the system file.
-The system properties file, from the source release, can be viewed:<br>
+
+In the source release the system properties file can be viewed:<br>
 /ucar/unidata/repository/resources/repository.properties
-<p>
 
-The major thing you want to change would be the database.
-<p>
 
-By default RAMADDA uses a local Java Derby database. RAMADDA also runs
+<h3>Configuring the Database</h3>
+By default RAMADDA uses a built in Java Derby database. 
+RAMADDA also runs
 using mysql and postgres (though the postgres hasn't been test in a while).
-To define the database just define one of the ramadda.db properties in repository.properties:
+Derby works pretty well though we have seen some performance issues with search.
+If you are planning on really using RAMADDA and foresee a large amount of content stored in the
+repository (by large we don't mean  file size but rather we mean number of entries in the repository)
+then its probably a good idea to use mysql or postgres. 
+<p>
+
+To define the database just uncomment the appropriate  ramadda.db properties in repository.properties:
 <pre>
 ramadda.db=derby
 #ramadda.db=mysql
@@ -85,7 +99,8 @@ ramadda.db=derby
 
 
 The mysql database and user/password is defined in the repository.properties 
-file. To change it add to the repository.properties file the following:
+file. To change the port or server the database is on and to change the user name/password
+just edit:
 <pre>
 ramadda.db.mysql.url=jdbc:mysql://localhost:3306/repository?zeroDateTimeBehavior=convertToNull
 ramadda.db.mysql.user=the database user
@@ -93,7 +108,9 @@ ramadda.db.mysql.password=the database password
 </pre>
 
 
-<h2>Copying a Database</h2>
+
+
+<h3>Copying a Database</h2>
 If you ran RAMADDA with the default settings annd created some content that is in the database 
 and you want to switch databases (e.g., from derby to mysql). Log in to the original RAMADDA
 and go to the Admin-&gt;SQL page. There is a Dump Database link. This will give you a text file of the
