@@ -25,6 +25,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -3427,17 +3428,22 @@ public class GuiUtils extends LayoutUtil {
             ActionListener listener, Hashtable menuItems,
             Hashtable<String, ImageIcon> actionIcons)
             throws Exception {
+
         NamedNodeMap attrs     = node.getAttributes();
         String       label     = Msg.msg(getAttribute(attrs, "label"));
         String       action = getAttribute(attrs, ATTR_ACTION, (String) null);
         ImageIcon    imageIcon = (((action != null) && (actionIcons != null))
                                   ? actionIcons.get(action)
                                   : null);
-        JMenuItem    menuItem  = ((imageIcon != null)
-                                  ? new JMenuItem(label, imageIcon)
-                                  : new JMenuItem(label));
-        String       mnemonic  = getAttribute(node, "mnemonic",
-                                     (String) null);
+        //        if(label.indexOf("Color")>=0) {
+        //            Misc.printStack("",20,null);
+        //            System.err.println (label +" actions :" + (actionIcons!=null) + " action:" + action +" icon:" + imageIcon);
+        //        }
+
+        JMenuItem menuItem = ((imageIcon != null)
+                              ? new JMenuItem(label, imageIcon)
+                              : new JMenuItem(label));
+        String    mnemonic = getAttribute(node, "mnemonic", (String) null);
         if (mnemonic != null) {
             int keyCode =
                 charToKeyCode(mnemonic.trim().toUpperCase().charAt(0));
@@ -6062,6 +6068,14 @@ public class GuiUtils extends LayoutUtil {
 
 
 
+    public static AbstractButton setIcon(AbstractButton button, String iconPath) {
+        button.setIcon(getImageIcon(iconPath, GuiUtils.class));
+        button.setIconTextGap(2);
+        return button;
+    }
+
+
+
     public static void setSelectedItems(JList list, List selected) {
         List items = getItems(list);
         int cnt = 0;
@@ -6377,6 +6391,7 @@ public class GuiUtils extends LayoutUtil {
 
 
 }
+
 
 
 
