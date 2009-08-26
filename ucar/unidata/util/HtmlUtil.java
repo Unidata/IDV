@@ -1687,8 +1687,14 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String input(String name, Object value, String extra) {
-        return tag(TAG_INPUT,
+        if(extra.length()==0) 
+            return tag(TAG_INPUT,
                    attrs(ATTR_CLASS, CLASS_INPUT, ATTR_NAME, name,
+                         ATTR_VALUE, ((value == null)
+                                      ? ""
+                                      : value.toString())) + " " + extra);
+        return tag(TAG_INPUT,
+                   attrs(ATTR_NAME, name,
                          ATTR_VALUE, ((value == null)
                                       ? ""
                                       : value.toString())) + " " + extra);
