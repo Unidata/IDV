@@ -20,7 +20,7 @@
      action="jython:idv.getIdvUIManager().showOrCreateDataSelector();"/>
   <action
      id="show.dashboard"
-     image="/auxdata/ui/icons/Home16.gif"
+     image="/auxdata/ui/icons/application_home.png"
      description="Show dashboard"
      group="User Interface"
      action="jython:idv.getIdvUIManager().showDashboard();"/>
@@ -49,13 +49,13 @@
      action="jython:idv.doSaveAs();"/>
   <action
      id="bundle.default.save"
-     image="/auxdata/ui/icons/SaveAll16.gif"
+     image="/auxdata/ui/icons/page_save.png"
      description="Save as default"
      group="Bundles"
      action="jython:idv.doSaveAsDefault();"/>
   <action
      id="bundle.default.open"
-     image="/auxdata/ui/icons/Refresh16.gif"
+     image="/auxdata/ui/icons/arrow_refresh.png"
      description="Reload default bundle"
      group="Bundles"
      action="jython:idv.doOpenDefault();"/>
@@ -127,13 +127,13 @@
      action="jython:idv.getJythonManager().showFormulaDialog()"/>
   <action
      id="edit.formula.import"
-     image="/auxdata/ui/icons/formula.png"
+     image="/auxdata/ui/icons/formula_import.png"
      description="Import formula"
      group="Jython"
      action="jython:idv.getJythonManager().importFormulas()"/>
   <action
      id="edit.formula.export"
-     image="/auxdata/ui/icons/formula.png"
+     image="/auxdata/ui/icons/formula_export.png"
      description="Export formula"
      group="Jython"
      action="jython:idv.getJythonManager().exportFormulas()"/>
@@ -193,13 +193,13 @@
      action="jython:idv.getJythonManager().showFormulaDialog ();"/>
   <action
      id="edit.removedisplays"
-     image="/auxdata/ui/icons/Erase16.gif"
+     image="/auxdata/ui/icons/image_delete.png"
      description="Remove all displays"
      group="Displays and Data"
      action="jython:idv.removeAllDisplays ();"/>
   <action
      id="edit.removedisplaysanddata"
-     image="/auxdata/ui/icons/Cut16.gif"
+     image="/auxdata/ui/icons/cut.png"
      description="Remove all displays and data"
      group="Displays and Data"
      action="jython:idv.removeAllDisplays ();idv.removeAllDataSources ()"/>
@@ -224,7 +224,7 @@
      action="jython:idv.quit ();"/>
   <action
      id="idv.stopload"
-     image="/auxdata/ui/icons/Exit16.gif"
+     image="/auxdata/ui/icons/stop.png"
      description="Stop current loads"
      group="Displays and Data"
      action="jython:idv.waitLabelClicked();"/>
@@ -264,7 +264,7 @@
      action="jython:idv.getCollabManager().writeState ();"/>
   <action
      id="help.introduction"
-     image="/auxdata/ui/icons/Help16.gif"
+     image="/auxdata/ui/icons/help.png"
      description="Show help"
      group="Help"
      action="help:idv.introduction"/>
@@ -281,7 +281,7 @@
      action="jython:idv.getIdvUIManager().showHelpTips ();"/>
   <action
      id="help.showsupportform"
-     image="/auxdata/ui/icons/SendMail16.gif"
+     image="/auxdata/ui/icons/email_go.png"
      group="Help"
      description="Submit support request"
      action="jython:idv.getIdvUIManager().showSupportForm();"/>
@@ -293,7 +293,7 @@
      action="jython:idv.getIdvUIManager().about ();"/>
   <action
      id="display.curvedrawer"
-     image="/auxdata/ui/icons/Pencil16.gif"
+     image="/auxdata/ui/icons/pencil.png"
      group="Special Displays"
      description="Create Drawing Control"
      action="jython:idv.doMakeControl('curvecontrol')"/>
@@ -305,7 +305,7 @@
      action="jython:idv.doMakeControl('locationindicatorcontrol')"/>
   <action
      id="display.backgroundimage"
-     image="/auxdata/ui/icons/Earth16.gif"
+     image="/auxdata/ui/icons/world.png"
      group="Special Displays"
      description="Create Background Image"
      action="jython:idv.doMakeBackgroundImage()"/>

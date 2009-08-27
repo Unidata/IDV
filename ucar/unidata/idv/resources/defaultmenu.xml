@@ -5,6 +5,7 @@
      id="file"
      mnemonic="F">
     <menu
+       icon="/auxdata/ui/icons/New16.gif"
        label="New"
        mnemonic="N">
       <menu

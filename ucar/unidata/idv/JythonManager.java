@@ -945,10 +945,10 @@ public class JythonManager extends IdvManager implements ActionListener {
         }
 
         fileMenu.addSeparator();
-        fileMenu.add(GuiUtils.makeMenuItem("Export to Plugin", this,
-                                           "exportToPlugin"));
-        fileMenu.add(GuiUtils.makeMenuItem("Export Selected to Plugin", this,
-                                           "exportSelectedToPlugin"));
+        fileMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Export to Plugin", this,
+                                                            "exportToPlugin"),"/auxdata/ui/icons/plugin_add.png"));
+        fileMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Export Selected to Plugin", this,
+                                           "exportSelectedToPlugin"),"/auxdata/ui/icons/plugin_add.png"));
         fileMenu.addSeparator();
         fileMenu.add(GuiUtils.makeMenuItem("Close", this, "close"));
 
@@ -1873,16 +1873,16 @@ public class JythonManager extends IdvManager implements ActionListener {
      */
     public List doMakeFormulaDataSourceMenuItems(DataSource dataSource) {
         List menuItems = new ArrayList();
-        menuItems.add(GuiUtils.makeMenuItem("Create Formula", this,
-                                            "showFormulaDialog"));
-        menuItems.add(GuiUtils.makeMenuItem("Edit Jython Library", this,
-                                            "showJythonEditor"));
-        menuItems.add(GuiUtils.makeMenuItem("Import Formulas", this,
-                                            "importFormulas"));
-        menuItems.add(GuiUtils.makeMenuItem("Export Formulas", this,
-                                            "exportFormulas"));
-        menuItems.add(GuiUtils.makeMenuItem("Export Formulas to Plugin",
-                                            this, "exportFormulasToPlugin"));
+        menuItems.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Create Formula", this,
+                                                             "showFormulaDialog"),"/auxdata/ui/icons/formula_add.png"));
+        menuItems.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Edit Jython Library", this,
+                                            "showJythonEditor"),"/auxdata/ui/icons/EditJython16.gif"));
+        menuItems.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Import Formulas", this,
+                                            "importFormulas"),"/auxdata/ui/icons/formula_import.png"));
+        menuItems.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Export Formulas", this,
+                                            "exportFormulas"),"/auxdata/ui/icons/formula_export.png"));
+        menuItems.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Export Formulas to Plugin",
+                                            this, "exportFormulasToPlugin"),"/auxdata/ui/icons/plugin_add.png"));
 
         if (dataSource instanceof DescriptorDataSource) {
             menuItems.add(

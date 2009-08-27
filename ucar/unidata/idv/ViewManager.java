@@ -909,6 +909,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
         menuBar         = doMakeMenuBar();
         if (menuBar != null) {
             menuBar.setBorderPainted(false);
+            menuBar.setMargin(new Insets(0,0,0,0));
+            menuBar.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            menuBar.setOpaque(false);
         }
         nameLabel = GuiUtils.cLabel(" ");
         updateNameLabel();

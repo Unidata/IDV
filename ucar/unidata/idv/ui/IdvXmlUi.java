@@ -210,17 +210,17 @@ public class IdvXmlUi extends XmlUi {
             }
 
             if (haveImage) {
-                child.setAttribute(ATTR_SPACE, "3");
+                child.setAttribute(ATTR_SPACE, "2");
                 child.setAttribute(
                     ATTR_MOUSE_ENTER,
                     "ui.setText(idv.messagelabel,prop:tooltip);ui.setBorder(this,etched);");
                 child.setAttribute(
                     ATTR_MOUSE_EXIT,
-                    "ui.setText(idv.messagelabel,);ui.setBorder(this,button);");
-                child.setAttribute(ATTR_BORDER, "button");
+                    "ui.setText(idv.messagelabel,);ui.setBorder(this,empty);");
+                child.setAttribute(ATTR_BORDER, "empty");
             } else {
                 child.setAttribute(ATTR_SPACE, "0");
-                child.setAttribute(ATTR_BORDER, "button");
+                child.setAttribute(ATTR_BORDER, "empty");
             }
 
             //            child.setAttribute(ATTR_LABEL, "LABEL");
