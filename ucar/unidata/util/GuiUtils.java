@@ -3440,6 +3440,7 @@ public class GuiUtils extends LayoutUtil {
         //            System.err.println (label +" actions :" + (actionIcons!=null) + " action:" + action +" icon:" + imageIcon);
         //        }
 
+
         JMenuItem menuItem = ((imageIcon != null)
                               ? new JMenuItem(label, imageIcon)
                               : new JMenuItem(label));
@@ -3618,6 +3619,11 @@ public class GuiUtils extends LayoutUtil {
         JMenu        menu     = new JMenu(label);
         String mnemonic = getAttribute(menuNode.getAttributes(), "mnemonic",
                                        (String) null);
+        String icon = getAttribute(attrs,"icon",(String)null);
+        if(icon!=null) {
+            setIcon(menu, icon);
+        }
+
         if (mnemonic != null) {
             int keyCode =
                 charToKeyCode(mnemonic.trim().toUpperCase().charAt(0));
