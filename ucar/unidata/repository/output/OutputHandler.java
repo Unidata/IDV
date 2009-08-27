@@ -1563,7 +1563,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             blockContent = getEntryManager().getEntryActionsTable(request,
                     entry, OutputType.TYPE_ALL);
         } else if (include.equals(WIKIPROP_COMMENTS)) {
-            return getCommentBlock(request, entry).toString();
+            return getCommentBlock(request, entry,false).toString();
         } else if (include.equals(WIKIPROP_TOOLBAR)) {
             return getEntryManager().getEntryToolbar(request, entry, false);
         } else if (include.equals(WIKIPROP_BREADCRUMBS)) {
@@ -1658,12 +1658,12 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * @return _more_
      * @throws Exception _more_
      */
-    public StringBuffer getCommentBlock(Request request, Entry entry)
+    public StringBuffer getCommentBlock(Request request, Entry entry,boolean onlyOfWeHaveThem)
             throws Exception {
         StringBuffer  sb       = new StringBuffer();
         List<Comment> comments = getEntryManager().getComments(request,
                                      entry);
-        if (comments.size() > 0) {
+        if (!onlyOfWeHaveThem || comments.size() > 0) {
             sb.append(getEntryManager().getCommentHtml(request, entry));
         }
         return sb;

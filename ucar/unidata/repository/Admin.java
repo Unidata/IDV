@@ -1362,7 +1362,10 @@ public class Admin extends RepositoryManager {
         getRepository().writeGlobal(request, PROP_HTML_FOOTER);
         getRepository().writeGlobal(request, PROP_GOOGLEAPIKEYS);
         getRepository().writeGlobal(request, PROP_FACEBOOK_CONNECT_KEY);
-        getRepository().writeGlobal(request, PROP_RATINGS_ENABLE);
+
+        String ratings = "" + request.get(PROP_RATINGS_ENABLE,false);
+        getRepository().writeGlobal(PROP_RATINGS_ENABLE,ratings);
+
         getRepository().writeGlobal(request, PROP_HOSTNAME);
         getRepository().writeGlobal(request, PROP_PORT);
 

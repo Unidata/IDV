@@ -3,5 +3,43 @@
 <%nochildlist%>
 
 
+You can create and manage users in the Admin-&gt;Users tab.
+This page shows a list of all of the users. 
+The <img src="images/edit.png"> icon allows you to edit a user.
+The <img src="images/log.gif"> icon allows you to view user logins and logouts.
+The user name link shows the public user profile.
+<p>
+Under the Roles tab will list all of the known user roles and the users that are in each role.
+<p>
+Current sessions shows the current user sessions. The sessions are stored in the database and persist over time.
+You can delete a session.
+<p>
+Recent user activity shows the last 100 or so user logins.
+
+
+<subhead  id="newuser"  intoc="false">Creating New Users</subhead>
+From the Admin-&gt;Users tab select the &quot;New User&quot; button. This takes you to a page where you can create
+an indivdual user account or do a bulk create.
+<p>
+
+When creating a user specify a user id, their name, whether they are an administrator, their email address and an initial password.
+Note: if a user is created as an administrator then they will have full access to do anything on the RAMADDA server.
+
+<p>
+The Home Group allows you to specify an existing  group, under which a new group with the user's name will be created. This group will be owned by the user (so they can upload files, etc) and is added to the user's list of favorites. 
+You cannot actually type in the field. Rather, press the <i>Select</i> link to popup a group selector.
+
+<p>
+If you have configured RAMADDA with a SMTP mail server then you can also send mail to the new user, including instructions on how to change their password. Just select the &quot;Send an email to the new user with message&quot; checkbox.
+
+<p>
+In the &quot;Bulk User Create&quot; you can upload a comma separated list of users. Note: the above user home group and email
+settings are not applied to the bulk created user accounts.
+
+
+<subhead  id="roles"  intoc="false">User Roles</subhead>
+When creating or editing a user account you can specify any number of roles in the given text field (one per line).
+The user roles mechanism is used to define access control for entries. See <a href="access.html">here</a> for  more information.
+
 
 [ht::foot]

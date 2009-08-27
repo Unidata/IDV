@@ -13,7 +13,7 @@ index.html
 >idvpublisher.html
 >faq.html
 
->title:Site Administration:These pages are intended for Site Administrators
+>title:Installation and Site Administration:These pages are intended for Site Administrators
 >>installing.html
 >>admin.html
 >>adminusers.html
@@ -21,6 +21,7 @@ index.html
 >>harvesters.html
 >>remoteservers.html
 >>publishapi.html
+>>misc.html
 
 >credits.html
 

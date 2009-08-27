@@ -871,7 +871,7 @@ public class HtmlOutputHandler extends OutputHandler {
             tabContents.add(tfo.getId());
         }
         tabTitles.add(msg("Comments"));
-        tabContents.add(getCommentBlock(request, entry));
+        tabContents.add(getCommentBlock(request, entry,true));
         if(request.get(ARG_SHOW_ASSOCIATIONS,false)) {
             tabTitles.add("selected:"+msg("Associations"));
         } else {

@@ -1,0 +1,62 @@
+<html>
+<head>
+  <title>Miscellaneous</title>
+  <link rel="stylesheet" type="text/css" href="ramadda.css" title="Style">
+</head>
+
+
+<h3>Copying a Database</h2>
+If you ran RAMADDA with the default settings annd created some content that is in the database 
+and you want to switch databases (e.g., from derby to mysql). Log in to the original RAMADDA
+and go to the Admin-&gt;SQL page. There is a Dump Database link. This will give you a text file of the
+entire database. Note: This might be a big file. You can save this file on the server or have it local.
+<p>
+Then, reconfigure RAMADDA to point to the new database and login again. Note: you'll have to
+add a new admin password, etc. Then go to the Admin-&gt;SQL page. If you saved the SQL file on the 
+server then just enter:<pre>
+file:/path/to/sql/file
+</pre>
+in the text area and hit execute.
+<p>
+If you have the SQL file on your local machine upload through the sql file form.
+<p>
+Its probably best to shutdown and then restart RAMADDA after doing this and you should have
+your old database running in the new RAMADDA. 
+<p>
+If you changed systems then you also need to copy over the storage directory tree to the
+new system. This is in:
+<pre>&lt;ramadda_home&gt;/storage</pre>
+
+
+
+
+
+<h2>Building from Source</h2>
+The  source release creates, at the top level, the ucar source tree and a lib directory. 
+The lib directory has two jar files:<pre>
+lib/repositorylib.jar
+lib/repositorytds.jar
+</pre>
+
+To compile stand-alone (e.g., using javac) put those 2 jar files in your class path.
+<p>
+To compile using ant:<br>
+The default ant target  (all) will compile the repository source and create:
+<pre>
+lib/repository.jar
+lib/repository.war
+</pre>
+
+
+You can run the repository stand-alone by doing:
+<pre>java -jar repository.jar</pre>
+
+
+<p>
+The repository.war is a tomcat war file that needs to be placed in the tomcat install area.
+
+
+
+
+
+</body>
