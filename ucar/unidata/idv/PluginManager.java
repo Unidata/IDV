@@ -1071,7 +1071,7 @@ public class PluginManager extends IdvManager {
             });
             jarFileFld = new JTextField("", 30);
             JButton deleteBtn =
-                GuiUtils.makeImageButton("/auxdata/ui/icons/Delete16.gif",
+                GuiUtils.makeImageButton("/auxdata/ui/icons/plugin_delete.png",
                                          this, "removeCreateFile");
             JScrollPane listScroll = GuiUtils.makeScrollPane(createList, 150,
                                          250);
@@ -2239,7 +2239,7 @@ public class PluginManager extends IdvManager {
 
         String[] keys = {
             "/auxdata/ui/icons/add.png", "Install Plugin",
-            "/auxdata/ui/icons/Delete16.gif", "Delete Plugin",
+            "/auxdata/ui/icons/plugin_delete.png", "Delete Plugin",
             "/auxdata/ui/icons/DocumentOpen16.png", "Send to Plugin Creator",
             "/auxdata/ui/icons/FindAgain16.gif", "View Contents"
         };
@@ -2420,7 +2420,7 @@ public class PluginManager extends IdvManager {
                 }
                 addDelete.append("<a href=\"jython:idv.getPluginManager().removePlugin('"
                         + plugin.file + "')\">"
-                        + HtmlUtil.img("idvresource:/auxdata/ui/icons/Delete16.gif")
+                        + HtmlUtil.img("idvresource:/auxdata/ui/icons/plugin_delete.png")
                         + "</a>&nbsp;" + extra);
                 loadedBuff.append(HtmlUtil.open(HtmlUtil.TAG_TR,
                         HtmlUtil.attr(HtmlUtil.ATTR_VALIGN, "top")));

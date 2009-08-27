@@ -114,26 +114,26 @@
      action="jython:idv.getIdvUIManager().editDisplaySettings();"/>
   <action
      id="jython.shell"
-     image="/auxdata/ui/icons/EditFormulas16.gif"
+     image="/auxdata/ui/icons/formula.png"
      description="Show Jython Shell"
      group="Jython"
      action="jython:idv.getJythonManager().createShell()"/>
 
   <action
      id="edit.formula.create"
-     image="/auxdata/ui/icons/EditFormulas16.gif"
+     image="/auxdata/ui/icons/formula_add.png"
      description="Create formula"
      group="Jython"
      action="jython:idv.getJythonManager().showFormulaDialog()"/>
   <action
      id="edit.formula.import"
-     image="/auxdata/ui/icons/EditFormulas16.gif"
+     image="/auxdata/ui/icons/formula.png"
      description="Import formula"
      group="Jython"
      action="jython:idv.getJythonManager().importFormulas()"/>
   <action
      id="edit.formula.export"
-     image="/auxdata/ui/icons/EditFormulas16.gif"
+     image="/auxdata/ui/icons/formula.png"
      description="Export formula"
      group="Jython"
      action="jython:idv.getJythonManager().exportFormulas()"/>
@@ -163,6 +163,7 @@
   <action
      id="edit.resources"
      description="View Resources"
+     image="/auxdata/ui/icons/report.png"
      group="Tools"
      action="jython:idv.showResourceViewer ();"/>
   <action
