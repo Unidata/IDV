@@ -24,6 +24,8 @@
 
 
 
+
+
 package ucar.unidata.idv;
 
 
@@ -202,6 +204,26 @@ public class MapViewManager extends NavigatedViewManager {
     /** rotate button */
     JToggleButton rotateBtn;
 
+
+    /** _more_ */
+    private Color globeBackgroundColor = Color.white;
+
+    /** _more_ */
+    private boolean globeBackgroundShow = false;
+
+    /** _more_ */
+    private double globeBackgroundLevel = -0.001;
+
+    /** _more_ */
+    private LineDrawing globeBackgroundDisplayable;
+
+    /** _more_ */
+    private JComponent globeBackgroundColorComp;
+
+    /** _more_ */
+    private JSlider globeBackgroundLevelSlider;
+
+
     /**
      *  Default constructor
      */
@@ -295,6 +317,7 @@ public class MapViewManager extends NavigatedViewManager {
                 new GlobeDisplay(getIdv().getArgsManager().getIsOffScreen(),
                                  dimension, null);
             navDisplay = globeDisplay;
+            setGlobeBackground(globeDisplay);
         } else {
             Trace.call1("MapViewManager.doMakeDisplayMaster projection");
             if (mainProjection == null) {
@@ -588,7 +611,7 @@ public class MapViewManager extends NavigatedViewManager {
                     mapInfo.setJustLoadedLocalMaps(true);
                     Trace.call2("checkDefaultMap-1");
                     //SKIP the initial map resources for now
-                } else if (false && initialMapResources != null) {
+                } else if (false && (initialMapResources != null)) {
                     //This got set from the ViewManager properties. It is a comma
                     //delimited list of map resources 
                     Trace.call1("checkDefaultMap-2");
@@ -679,6 +702,19 @@ public class MapViewManager extends NavigatedViewManager {
             }
         }
         getMapDisplay().saveProjection();
+
+        this.globeBackgroundColor = mvm.globeBackgroundColor;
+        this.globeBackgroundShow  = mvm.globeBackgroundShow;
+        this.globeBackgroundLevel = mvm.globeBackgroundLevel;
+
+        if (globeBackgroundDisplayable != null) {
+            setGlobeBackground((GlobeDisplay) getMapDisplay());
+        }
+
+
+
+
+
 
         super.initWithInner(that, ignoreWindow);
         try {
@@ -1083,18 +1119,28 @@ public class MapViewManager extends NavigatedViewManager {
         viewMenu.addSeparator();
 
         if (isFullScreen()) {
-            viewMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Reset Full Screen", this,
-                                                                "resetFullScreen"),"/auxdata/ui/icons/arrow_in.png"));
+            viewMenu.add(
+                GuiUtils.setIcon(
+                    GuiUtils.makeMenuItem(
+                        "Reset Full Screen", this,
+                        "resetFullScreen"), "/auxdata/ui/icons/arrow_in.png"));
         } else {
-            viewMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Full Screen", this,
-                                                                "setFullScreen"),"/auxdata/ui/icons/arrow_out.png"));
+            viewMenu.add(
+                GuiUtils.setIcon(
+                    GuiUtils.makeMenuItem(
+                        "Full Screen", this,
+                        "setFullScreen"), "/auxdata/ui/icons/arrow_out.png"));
         }
         viewMenu.addSeparator();
-        viewMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Animation Timeline", this,
-                                                            "showTimeline"),"/auxdata/ui/icons/timeline_marker.png"));
+        viewMenu.add(
+            GuiUtils.setIcon(
+                GuiUtils.makeMenuItem(
+                    "Animation Timeline", this,
+                    "showTimeline"), "/auxdata/ui/icons/timeline_marker.png"));
 
-        viewMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Properties", this,
-                                                            "showPropertiesDialog"),"/auxdata/ui/icons/Information16.gif"));
+        viewMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Properties",
+                this,
+                "showPropertiesDialog"), "/auxdata/ui/icons/Information16.gif"));
     }
 
     /**
@@ -1118,6 +1164,25 @@ public class MapViewManager extends NavigatedViewManager {
      */
     protected JMenu makeShowMenu() {
         JMenu showMenu = super.makeShowMenu();
+        if (globeBackgroundDisplayable != null) {
+            final JCheckBoxMenuItem cbmi =
+                new JCheckBoxMenuItem("Globe Background",
+                                      globeBackgroundShow);
+            showMenu.add(cbmi);
+            cbmi.addItemListener(new ItemListener() {
+                public void itemStateChanged(ItemEvent event) {
+                    globeBackgroundShow = cbmi.isSelected();
+                    try {
+                        globeBackgroundDisplayable.setVisible(
+                            globeBackgroundShow);
+                    } catch (Exception exc) {
+                        logException("Setting globe background visiblility",
+                                     exc);
+                    }
+                }
+            });
+        }
+
         createCBMI(showMenu, PREF_SHOWSCALES);
         createCBMI(showMenu, PREF_ANIREADOUT);
         createCBMI(showMenu, PREF_SHOWEARTHNAVPANEL);
@@ -1566,21 +1631,107 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
-    private void setGlobeBackground() throws Exception {
-        RealType      line    = RealType.YAxis;
-        RealType      element = RealType.XAxis;
-        RealType      red     = RealType.getRealType("r");
-        RealType      green   = RealType.getRealType("g");
-        RealType      blue    = RealType.getRealType("b");
-        RealTupleType rgb     = new RealTupleType(red, green, blue);
-        RealTupleType domain  = new RealTupleType(element, line);
-        domain.setDefaultSet(new SingletonSet(new RealTuple(domain,
-                                                            new Real[] { new Real(element),
-                                                                         new Real(line) }, null)));
-        
 
-        FlatField ffRGB = new FlatField(new FunctionType(domain, rgb));
+
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean applyProperties() {
+        if ( !super.applyProperties()) {
+            return false;
+        }
+        if (globeBackgroundDisplayable != null) {
+            globeBackgroundColor = globeBackgroundColorComp.getBackground();
+            globeBackgroundLevel = globeBackgroundLevelSlider.getValue()
+                                   / 100.;
+            setGlobeBackground((GlobeDisplay) getMapDisplay());
+        }
+        return true;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param tabbedPane _more_
+     */
+    protected void addPropertiesComponents(JTabbedPane tabbedPane) {
+        super.addPropertiesComponents(tabbedPane);
+        if (globeBackgroundDisplayable == null) {
+            return;
+        }
+
+        globeBackgroundLevelSlider = new JSlider(-99, 100,
+                (int) (100 * globeBackgroundLevel));
+        JPanel labelPanel = GuiUtils.leftCenterRight(new JLabel("Bottom"),
+                                GuiUtils.cLabel("Middle"),
+                                GuiUtils.rLabel("Top"));
+
+        JPanel levelComp = GuiUtils.vbox(globeBackgroundLevelSlider,
+                                         labelPanel);
+        JComponent[] bgComps =
+            GuiUtils.makeColorSwatchWidget(globeBackgroundColor,
+                                           "Globe Background Color");
+
+
+        globeBackgroundColorComp = bgComps[0];
+        JComponent comp = GuiUtils.formLayout(new Component[] {
+                              GuiUtils.rLabel("Color:"),
+                              GuiUtils.left(bgComps[0]),
+                              GuiUtils.rLabel("Level:"),
+                              levelComp });
+        tabbedPane.add("Globe Background", GuiUtils.top(comp));
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param globe _more_
+     */
+    private void setGlobeBackground(GlobeDisplay globe) {
+        try {
+            if (globeBackgroundDisplayable == null) {
+                FlatField ff = ucar.visad.Util.makeField(-180, 180, 180, 90,
+                                   -90, 180, 1, "celsius");
+                Data d = ff;
+                globeBackgroundDisplayable = new LineDrawing("background");
+                globeBackgroundDisplayable.setData(d);
+                globe.addDisplayable(globeBackgroundDisplayable);
+            }
+
+            //            Color c = new Color(globeBackgroundColor.getRed(),
+            //                                globeBackgroundColor.getGreen(),
+            //                                globeBackgroundColor.getBlue(),
+            //                                (int)(255*0.5));
+
+            globeBackgroundDisplayable.setColor(globeBackgroundColor);
+            globeBackgroundDisplayable.setVisible(globeBackgroundShow);
+
+            DisplayRealType drt          = globe.getDisplayAltitudeType();
+            double[]        range        = new double[2];
+            double          realPosition = 1;
+            if (drt.getRange(range)) {
+                double pcnt = (globeBackgroundLevel - (-1)) / 2;
+                realPosition = Math.min((range[0]
+                                         + (range[1] - range[0])
+                                           * pcnt), range[1]);
+            }
+
+            ConstantMap constantMap = new ConstantMap(realPosition, drt);
+            globeBackgroundDisplayable.addConstantMap(constantMap);
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
+
+        }
+    }
+
+
 
 
     /**
@@ -2073,12 +2224,17 @@ public class MapViewManager extends NavigatedViewManager {
 
         if ( !getUseGlobeDisplay()) {
             projMenu.addSeparator();
-            projMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("New/Edit...", this,
-                                                                "showProjectionManager"),"/auxdata/ui/icons/world_edit.png"));
-            projMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Use Displayed Area", this,
-                                                                "setCurrentAsProjection"),"/auxdata/ui/icons/world_rect.png"));
-            projMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Go to Address", this,
-                                                                "goToAddress"),"/auxdata/ui/icons/house_go.png"));
+            projMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("New/Edit...",
+                    this,
+                    "showProjectionManager"), "/auxdata/ui/icons/world_edit.png"));
+            projMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Use Displayed Area",
+                    this,
+                    "setCurrentAsProjection"), "/auxdata/ui/icons/world_rect.png"));
+            projMenu.add(
+                GuiUtils.setIcon(
+                    GuiUtils.makeMenuItem(
+                        "Go to Address", this,
+                        "goToAddress"), "/auxdata/ui/icons/house_go.png"));
 
             projMenu.addSeparator();
             createCBMI(projMenu, PREF_PROJ_USEFROMDATA).setToolTipText(
@@ -2336,6 +2492,11 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public float getDefaultMapPosition() {
         if (getUseGlobeDisplay()) {
             return 0.0f;
@@ -2343,6 +2504,63 @@ public class MapViewManager extends NavigatedViewManager {
             return -0.99f;
         }
     }
+
+    /**
+     *  Set the GlobeBackgroundColor property.
+     *
+     *  @param value The new value for GlobeBackgroundColor
+     */
+    public void setGlobeBackgroundColor(Color value) {
+        globeBackgroundColor = value;
+    }
+
+
+    /**
+     *  Get the GlobeBackgroundColor property.
+     *
+     *  @return The GlobeBackgroundColor
+     */
+    public Color getGlobeBackgroundColor() {
+        return globeBackgroundColor;
+    }
+
+    /**
+     *  Set the GlobeBackgroundShow property.
+     *
+     *  @param value The new value for GlobeBackgroundShow
+     */
+    public void setGlobeBackgroundShow(boolean value) {
+        globeBackgroundShow = value;
+    }
+
+    /**
+     *  Get the GlobeBackgroundShow property.
+     *
+     *  @return The GlobeBackgroundShow
+     */
+    public boolean getGlobeBackgroundShow() {
+        return globeBackgroundShow;
+    }
+
+    /**
+     *  Set the GlobeBackgroundLevel property.
+     *
+     *  @param value The new value for GlobeBackgroundLevel
+     */
+    public void setGlobeBackgroundLevel(double value) {
+        globeBackgroundLevel = value;
+    }
+
+    /**
+     *  Get the GlobeBackgroundLevel property.
+     *
+     *  @return The GlobeBackgroundLevel
+     */
+    public double getGlobeBackgroundLevel() {
+        return globeBackgroundLevel;
+    }
+
+
 
 
 }
