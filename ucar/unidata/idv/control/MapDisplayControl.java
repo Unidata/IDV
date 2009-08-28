@@ -233,7 +233,8 @@ public class MapDisplayControl extends DisplayControlImpl {
         super(mapViewManager.getIdv());
         setLockVisibilityToggle(true);
         defaultViewManager  = mapViewManager;
-        this.mapPosition    = mapInfo.getMapPosition();
+        //        this.mapPosition    = mapInfo.getMapPosition();
+        this.mapPosition    = mapViewManager.getDefaultMapPosition();
         this.defaultMapData = mapInfo.getMapDataList();
         this.defaultLatData = mapInfo.getLatData();
         this.defaultLonData = mapInfo.getLonData();
@@ -408,7 +409,15 @@ public class MapDisplayControl extends DisplayControlImpl {
             defaultMapData = mapInfo.getMapDataList();
             defaultLatData = mapInfo.getLatData();
             defaultLonData = mapInfo.getLonData();
-            mapPosition    = mapInfo.getMapPosition();
+            //            mapPosition    = mapInfo.getMapPosition();
+
+            MapViewManager mvm = getMapViewManager();
+            if(mvm!=null) {
+                System.err.println ("Using position from MVM");
+                this.mapPosition    = mvm.getDefaultMapPosition();
+            } else {
+                System.err.println ("NO MVM");
+            }
         }
 
 

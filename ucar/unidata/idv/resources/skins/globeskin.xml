@@ -18,7 +18,7 @@
         </panel>
         <idv.view embeddednode="true"
            place="Center"
-           properties="useGlobeDisplay=true;initialMapResources=/auxdata/maps/globemaps.xml;"/>
+           properties="useGlobeDisplay=true;"/>
       </panel>
       <idv.statusbar place="South"  id="bottom_bar"/>
     </panel>

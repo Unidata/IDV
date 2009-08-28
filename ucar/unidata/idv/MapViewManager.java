@@ -587,7 +587,8 @@ public class MapViewManager extends NavigatedViewManager {
                     mapInfo = new MapInfo(XmlUtil.getRoot(mapState));
                     mapInfo.setJustLoadedLocalMaps(true);
                     Trace.call2("checkDefaultMap-1");
-                } else if (initialMapResources != null) {
+                    //SKIP the initial map resources for now
+                } else if (false && initialMapResources != null) {
                     //This got set from the ViewManager properties. It is a comma
                     //delimited list of map resources 
                     Trace.call1("checkDefaultMap-2");
@@ -1565,6 +1566,23 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
+    private void setGlobeBackground() throws Exception {
+        RealType      line    = RealType.YAxis;
+        RealType      element = RealType.XAxis;
+        RealType      red     = RealType.getRealType("r");
+        RealType      green   = RealType.getRealType("g");
+        RealType      blue    = RealType.getRealType("b");
+        RealTupleType rgb     = new RealTupleType(red, green, blue);
+        RealTupleType domain  = new RealTupleType(element, line);
+        domain.setDefaultSet(new SingletonSet(new RealTuple(domain,
+                                                            new Real[] { new Real(element),
+                                                                         new Real(line) }, null)));
+        
+
+        FlatField ffRGB = new FlatField(new FunctionType(domain, rgb));
+    }
+
+
     /**
      * Reset projection of display based control's getDataProjection().
      * called by DisplayInfo.addDisplayable (), usually from control's init.
@@ -2318,6 +2336,13 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 
+    public float getDefaultMapPosition() {
+        if (getUseGlobeDisplay()) {
+            return 0.0f;
+        } else {
+            return -0.99f;
+        }
+    }
 
 
 }
