@@ -23,7 +23,9 @@
 package ucar.unidata.util;
 
 
-
+import ucar.unidata.util.GuiUtils;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 import java.awt.*;
@@ -50,7 +52,7 @@ public class MemoryMonitor extends JPanel implements Runnable {
     private boolean running = false;
 
     /** sleep interval */
-    private long sleepInterval = 2000;
+    private long sleepInterval = 1000;
 
     /** a thread */
     private Thread thread;
@@ -80,7 +82,11 @@ public class MemoryMonitor extends JPanel implements Runnable {
     private static long lastTimeRanGC = -1;
 
 
+    private boolean showClock = true;
 
+    private static final Font clockFont = new Font("Dialog", Font.BOLD, 11);
+
+    private static SimpleDateFormat clockFormat = new SimpleDateFormat("HH:mm:ss z");
 
 
 
@@ -117,6 +123,8 @@ public class MemoryMonitor extends JPanel implements Runnable {
 
         MouseListener ml = new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
+                showClock = !showClock;
+                showStats();
                 handleMouseEvent(e);
             }
         };
@@ -134,13 +142,13 @@ public class MemoryMonitor extends JPanel implements Runnable {
     private void popupMenu(MouseEvent event) {
         JPopupMenu popup = new JPopupMenu();
         if (running) {
-            popup.add(GuiUtils.makeMenuItem("Stop Running",
-                                            MemoryMonitor.this,
-                                            "toggleRunning"));
+            //            popup.add(GuiUtils.makeMenuItem("Stop Running",
+            //                                            MemoryMonitor.this,
+            //                                            "toggleRunning"));
         } else {
-            popup.add(GuiUtils.makeMenuItem("Resume Running",
-                                            MemoryMonitor.this,
-                                            "toggleRunning"));
+            //            popup.add(GuiUtils.makeMenuItem("Resume Running",
+            //                                            MemoryMonitor.this,
+            //                                            "toggleRunning"));
         }
 
 
@@ -168,6 +176,7 @@ public class MemoryMonitor extends JPanel implements Runnable {
      * @param event the event
      */
     private void handleMouseEvent(MouseEvent event) {
+        
         if (SwingUtilities.isRightMouseButton(event)) {
             popupMenu(event);
             return;
@@ -238,10 +247,20 @@ public class MemoryMonitor extends JPanel implements Runnable {
             totalMemory   = totalMemory / 1000000.0;
             usedMemory    = usedMemory / 1000000.0;
             highWaterMark = highWaterMark / 1000000.0;
-            label1.setText(" " + Msg.msg("Memory:") + " "
+            String text;
+            if(showClock) {
+                //                g.setFont(clockFont);
+                Date d = new Date();
+                clockFormat.setTimeZone(GuiUtils.getTimeZone());
+                text = clockFormat.format(d);
+                text = StringUtil.padRight(text,20);
+            } else {
+                text = " " + Msg.msg("Memory:") + " "
                            + fmt.format(usedMemory) + "/"
                            + fmt.format(highWaterMark) + "/"
-                           + fmt.format(totalMemory) + " " + Msg.msg("MB"));
+                           + fmt.format(totalMemory) + " " + Msg.msg("MB");
+            }
+            label1.setText(text);
             //            label2.setText(" (" + percent + "%)  ");
 
             long now = System.currentTimeMillis();

@@ -56,6 +56,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
+import java.util.TimeZone;
 
 import javax.imageio.*;
 import javax.imageio.stream.ImageOutputStream;
@@ -238,6 +239,18 @@ public class GuiUtils extends LayoutUtil {
 
     /** default icon size */
     private static int dfltIconSize = -1;
+
+    private static TimeZone defaultTimeZone;
+
+
+    public static void setTimeZone(TimeZone tz) {
+        defaultTimeZone = tz;
+    }
+
+    public static  TimeZone getTimeZone() {
+        if(defaultTimeZone==null) return DateUtil.TIMEZONE_GMT;
+        return defaultTimeZone;
+    }
 
     /**
      * Set the default icon size
