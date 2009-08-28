@@ -213,15 +213,40 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         File   childPath   = getFileFromId(synthId, rootDir);
         File[] files       = childPath.listFiles();
         //        files = IOUtil.sortFilesOnName(files);
-        boolean descending = !request.get(ARG_ASCENDING, false);
+
+        Metadata       sortMetadata = null;
+        if (mainEntry != null) {
+            try {
+                List<Metadata> metadataList = getMetadataManager().findMetadata(mainEntry,
+                                                                 ContentMetadataHandler.TYPE_SORT, true);
+                if ((metadataList != null) && (metadataList.size() > 0)) {
+                    sortMetadata = metadataList.get(0);
+                }
+            } catch (Exception ignore) {}
+        }
 
 
-        if (request.getString(ARG_ORDERBY, "").equals("name")) {
-            //            System.err.println ("by name " + descending);
+
+        boolean descending = !request.get(ARG_ASCENDING,false);
+        String  by        =  request.getString(ARG_ORDERBY, "fromdate");
+        if (sortMetadata != null) {
+            if(!request.exists(ARG_ASCENDING)) {
+                if (Misc.equals(sortMetadata.getAttr2(), "true")) {
+                    descending = false;
+                } else {
+                    descending = true;
+                }
+            }
+            if(!request.exists(ARG_ORDERBY)) {
+                by = sortMetadata.getAttr1();
+            }
+        }
+
+
+
+        if (by.equals("name")) {
             files = IOUtil.sortFilesOnName(files, descending);
         } else {
-            //            files = IOUtil.sortFilesOnName(files, true);
-            //            System.err.println ("by age " + descending);
             files = IOUtil.sortFilesOnAge(files, descending);
         }
 
