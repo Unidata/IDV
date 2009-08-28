@@ -67,10 +67,10 @@ public class MemoryMonitor extends JPanel implements Runnable {
     private static DecimalFormat fmt = new DecimalFormat("#0");
 
     /** the label */
-    private JLabel label1 = new JLabel("");
+    private JLabel label1;
 
     /** another label */
-    private JLabel label2 = new JLabel("");
+    private JLabel label2;
 
     /** the foreground color for the label */
     private Color labelForeground;
@@ -88,8 +88,10 @@ public class MemoryMonitor extends JPanel implements Runnable {
 
     private static SimpleDateFormat clockFormat = new SimpleDateFormat("HH:mm:ss z");
 
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
 
+    private String memoryLabel = "";
 
     /**
      * Default constructor
@@ -110,6 +112,22 @@ public class MemoryMonitor extends JPanel implements Runnable {
      */
     public MemoryMonitor(int percentThreshold) {
         super(new BorderLayout());
+        label1 = new JLabel("",SwingConstants.RIGHT){
+                public String getToolTipText(MouseEvent me) {
+                    dateFormat.setTimeZone(GuiUtils.getTimeZone());
+                    String dttm = "Current Date/Time:" + dateFormat.format(new Date());
+                    if(showClock) {
+                        return "<html>Click to show memory usage<br>"+dttm +
+                            "<br>" + memoryLabel +
+                            "</html>";
+                    } else {
+                        return "<html>Click to show clock<br>" + dttm +
+                            "</html>";
+                    }
+                }
+            };
+        label2 = new JLabel("");
+
         Font f = label1.getFont();
         label1.setToolTipText("Used memory/Max used memory/Max memory");
         label2.setToolTipText("Used memory/Max used memory/Max memory");
@@ -248,19 +266,22 @@ public class MemoryMonitor extends JPanel implements Runnable {
             usedMemory    = usedMemory / 1000000.0;
             highWaterMark = highWaterMark / 1000000.0;
             String text;
+            memoryLabel = " "  
+                           + fmt.format(usedMemory) + "/"
+                           + fmt.format(highWaterMark) + "/"
+                           + fmt.format(totalMemory) + " " + Msg.msg("MB");
+
             if(showClock) {
                 //                g.setFont(clockFont);
                 Date d = new Date();
                 clockFormat.setTimeZone(GuiUtils.getTimeZone());
-                text = clockFormat.format(d);
-                text = StringUtil.padRight(text,20);
+                text = "  " + clockFormat.format(d);
+                //                text = StringUtil.padLeft(text,20);
             } else {
-                text = " " + Msg.msg("Memory:") + " "
-                           + fmt.format(usedMemory) + "/"
-                           + fmt.format(highWaterMark) + "/"
-                           + fmt.format(totalMemory) + " " + Msg.msg("MB");
+                text = memoryLabel;
             }
             label1.setText(text);
+
             //            label2.setText(" (" + percent + "%)  ");
 
             long now = System.currentTimeMillis();
