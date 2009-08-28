@@ -25,7 +25,10 @@ package ucar.unidata.ui;
 
 
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.GuiUtils;
+import java.text.SimpleDateFormat;
 
+import java.util.Date;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
@@ -78,6 +81,50 @@ public class RovingProgress extends JPanel {
     /** for double buffering */
     private Dimension imageSize;
 
+    private boolean showClock = false;
+
+    private boolean clockRunning = false;
+
+    private static final Font clockFont = new Font("Dialog", Font.BOLD, 11);
+
+    private static SimpleDateFormat clockFormat = new SimpleDateFormat("HH:mm:ss z");
+
+    public RovingProgress(boolean showClock) {
+        this(null,null);
+        this.showClock = showClock;
+        if(showClock) {
+            startClock();
+        }
+    }
+
+
+    private void startClock() {
+        if(clockRunning) return;
+        Misc.run(new Runnable() {
+                public void run() {
+                    startClockInner();
+                }
+            });
+    }
+
+    private void startClockInner() {
+        while(showClock) {
+            repaint();
+            Misc.sleep(1000);
+        }
+        clockRunning =false;
+    }
+
+
+    public void setShowClock(boolean showClock) {
+        this.showClock = showClock;
+        if(showClock) {
+            startClock();
+        } 
+    }
+
+
+
 
     /**
      * ctor
@@ -120,7 +167,6 @@ public class RovingProgress extends JPanel {
         } else {
             this.color = c;
         }
-
     }
 
     /**
@@ -131,6 +177,13 @@ public class RovingProgress extends JPanel {
         running         = false;
         repaint();
     }
+
+    public void dispose() {
+        stop();
+        showClock =false;
+    }
+
+
 
     /**
      * Start running
@@ -229,6 +282,13 @@ public class RovingProgress extends JPanel {
         g.setColor(getBackground());
         g.fillRect(2, 2, b.width - 4, b.height - 4);
         if ( !isRunning()) {
+            if(showClock) {
+                g.setFont(clockFont);
+                g.setColor(Color.BLACK);
+                Date d = new Date();
+                clockFormat.setTimeZone(GuiUtils.getTimeZone());
+                g.drawString(clockFormat.format(d),3,b.height-5);
+            }
             return;
         }
         int w = b.width;
