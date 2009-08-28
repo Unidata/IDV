@@ -444,7 +444,7 @@ public class IOUtil {
     public static File[] sortFilesOnName(File[] files, boolean descending) {
         List tuples = new ArrayList();
         for (int i = 0; i < files.length; i++) {
-            tuples.add(new Object[] { files[i].getName(), files[i] });
+            tuples.add(new Object[] { files[i].getName().toLowerCase(), files[i] });
         }
         tuples = Misc.sortTuples(tuples, descending);
 
