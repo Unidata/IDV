@@ -540,6 +540,12 @@ public class IdvWindow extends MultiFrame {
      * Dispose of this window.
      */
     public void dispose() {
+        RovingProgress progress =
+            (RovingProgress) getComponent(IdvUIManager.COMP_PROGRESSBAR);
+        if (progress != null) {
+            progress.dispose();
+        }
+
         allWindows.remove(this);
         mainWindows.remove(this);
 

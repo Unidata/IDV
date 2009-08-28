@@ -250,6 +250,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         paneHolder = new JPanel(new BorderLayout());
         Component buttons = GuiUtils.makeApplyOkHelpCancelButtons(this);
         contents = GuiUtils.centerBottom(paneHolder, buttons);
+        GuiUtils.setTimeZone(getDefaultTimeZone());
     }
 
     /**
@@ -344,6 +345,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                 manager.applyPreference(getStore(), dataList.get(i));
             }
             getStore().save();
+            GuiUtils.setTimeZone(getDefaultTimeZone());
             return true;
         } catch (Exception exc) {
             LogUtil.logException("Error applying preferences", exc);

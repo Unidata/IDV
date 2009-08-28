@@ -435,7 +435,7 @@ public class IdvXmlUi extends XmlUi {
         }
 
         if (tagName.equals(IdvUIManager.COMP_PROGRESSBAR)) {
-            return new RovingProgress();
+            return new RovingProgress(true);
         }
 
         if (tagName.equals(IdvUIManager.COMP_DATATREE)) {

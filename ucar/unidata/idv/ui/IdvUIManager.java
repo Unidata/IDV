@@ -3621,6 +3621,7 @@ public class IdvUIManager extends IdvManager {
 
             }
         };
+        //        progress.setShowClock(true);
         progress.setPreferredSize(new Dimension(130, 10));
         return progress;
     }
