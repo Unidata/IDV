@@ -339,7 +339,6 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
 
 
 
-
     /**
      * Get the correect icon name based on whether we are in big icon mode
      *
@@ -348,6 +347,22 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
      * @return Full path to icon
      */
     private String getIcon(String name) {
+        if(name.equals("Pause")) 
+            return "/auxdata/ui/icons/control_pause_blue.png";
+        if(name.equals("Play")) 
+            return "/auxdata/ui/icons/control_play_blue.png";
+        if(name.equals("Rewind")) 
+            return "/auxdata/ui/icons/control_rewind_blue.png";
+        if(name.equals("StepBack")) 
+            return "/auxdata/ui/icons/control_start_blue.png";
+        if(name.equals("StepForward")) 
+            return "/auxdata/ui/icons/control_end_blue.png";
+        if(name.equals("FastForward")) 
+            return "/auxdata/ui/icons/control_fastforward_blue.png";
+        if(name.equals("Information")) 
+            return "/auxdata/ui/icons/information.png";
+
+
         return "/auxdata/ui/icons/" + name + (bigIcon
                 ? "24"
                 : "16") + ".gif";
@@ -420,8 +435,8 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             btn.addKeyListener(listener);
             //            JComponent wrapper = GuiUtils.center(btn);
             //            wrapper.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-            btn.setBorder(
-                BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+            //            btn.setBorder(
+            //                BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
             buttonList.add(btn);
             //            buttonList.add(wrapper);
             if (i == 2) {
