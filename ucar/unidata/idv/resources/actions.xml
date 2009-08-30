@@ -287,7 +287,7 @@
      action="jython:idv.getIdvUIManager().showSupportForm();"/>
   <action
      id="help.showabout"
-     image="/auxdata/ui/icons/About16.gif"
+     image="/auxdata/ui/icons/information.png"
      group="Help"
      description="About..."
      action="jython:idv.getIdvUIManager().about ();"/>

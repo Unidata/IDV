@@ -2840,9 +2840,9 @@ public class IdvUIManager extends IdvManager {
     private void updateToolbars() {
 
         ImageIcon fileIcon =
-            GuiUtils.getImageIcon("/auxdata/ui/icons/File.gif");
+            GuiUtils.getImageIcon("/auxdata/ui/icons/page.png");
         ImageIcon catIcon =
-            GuiUtils.getImageIcon("/auxdata/ui/icons/Folder.gif");
+            GuiUtils.getImageIcon("/auxdata/ui/icons/folder.png");
         List windows = IdvWindow.getWindows();
         List bundles = getPersistenceManager().getBundles(
                            IdvPersistenceManager.BUNDLES_FAVORITES);

@@ -370,9 +370,9 @@ public class ViewpointControl implements ActionListener {
         rotateButton =
             GuiUtils.getToggleImageButton(
                 GuiUtils.getScaledImageIcon(
-                    "/auxdata/ui/icons/Rotate16.gif", null,
+                    "/auxdata/ui/icons/arrow_rotate_clockwise.png", null,
                     true), GuiUtils.getScaledImageIcon(
-                        "/auxdata/ui/icons/Rotate16.gif", null, true), 2, 2);
+                        "/auxdata/ui/icons/arrow_rotate_clockwise.png", null, true), 2, 2);
         rotateButton.setToolTipText("Auto-rotate");
         rotateButton.setSelected(getAutoRotate());
         rotateButton.addActionListener(new ActionListener() {

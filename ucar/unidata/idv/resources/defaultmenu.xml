@@ -233,8 +233,7 @@
 
 
      <menuitem
-        icon="/auxdata/ui/icons/Help16.gif"
-
+        icon="/auxdata/ui/icons/help.png"
        label="User's Guide"
        action="help:idv.index"
        mnemonic="U"/>
@@ -244,7 +243,7 @@
        mnemonic="G"/>
      <menuitem
        label="Zooming, Panning and Rotating"
-        icon="/auxdata/ui/icons/ZoomIn16.gif"
+        icon="/auxdata/ui/icons/magnifier.png"
        action="help:idv.ui.navigation"
        mnemonic="Z"/>
      <separator/>

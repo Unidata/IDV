@@ -108,7 +108,7 @@ public class CommandManager {
     public JButton getBackButton() {
         if (bBtn == null) {
             bBtn = GuiUtils.getImageButton(
-                GuiUtils.getImageIcon("images/Undo16.gif", getClass()));
+                GuiUtils.getImageIcon("/auxdata/ui/icons/arrow_undo.png", getClass()));
             bBtn.setToolTipText(
                 "Click to go back one step. Shift click to go back 10 steps");
             bBtn.addActionListener(new ActionListener() {
@@ -134,7 +134,7 @@ public class CommandManager {
     public JButton getForwardButton() {
         if (fBtn == null) {
             fBtn = GuiUtils.getImageButton(
-                GuiUtils.getImageIcon("images/Redo16.gif", getClass()));
+                GuiUtils.getImageIcon("/auxdata/ui/icons/arrow_redo.png", getClass()));
             fBtn.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
             fBtn.setToolTipText(
                 "Click to go forward one step. Shift click to go forward 10 steps");

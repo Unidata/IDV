@@ -3588,7 +3588,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if (sideLegendButtonPanel == null) {
                 DndImageButton dndBtn = new DndImageButton(this, "control");
                 sideLegendButtonPanel = GuiUtils.hbox(dndBtn,
-                        makeLockButton(), makeRemoveButton(), 2);
+                                                      /*makeLockButton(), */
+                                                      makeRemoveButton(), 2);
                 dndBtn.setToolTipText("Click to drag-and-drop");
                 sideLegendButtonPanel.setBackground(null);
             }
@@ -5829,6 +5830,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     protected void getViewMenuItems(List items, boolean forMenuBar) {
         items.add(GuiUtils.makeCheckboxMenuItem("Visible", this,
                 "displayVisibility", null));
+        items.add(GuiUtils.makeCheckboxMenuItem("Lock Visibility",this,
+                                                "lockVisibilityToggle", null));
         if (getDisplayInfos().size() > 0) {
             items.add(GuiUtils.makeMenuItem("Bring to Front", this,
                                             "displayableToFront"));
