@@ -1001,9 +1001,9 @@ public class MapDisplayControl extends DisplayControlImpl {
                 "/ucar/unidata/idv/control/images/LevelDown.gif");
 
         ImageIcon removeIcon =
-            GuiUtils.getImageIcon("/auxdata/ui/icons/Delete16.gif");
+            GuiUtils.getImageIcon("/auxdata/ui/icons/map_delete.png");
         ImageIcon addIcon =
-            GuiUtils.getImageIcon("/auxdata/ui/icons/Add16.gif");
+            GuiUtils.getImageIcon("/auxdata/ui/icons/database_add.png");
 
 
         int       colCnt = 0;
