@@ -61,6 +61,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 
@@ -230,11 +231,15 @@ public class NwxTextProductDataSource extends TextProductDataSource {
         }
         List<Product> products = readProducts(tableInfo, null, dateSelection);
         NamedStationTable subset = new NamedStationTable();
+        HashSet seen = new HashSet();
+
         for (Product p : products) {
             String station = p.getStation();
             if ((station == null) || station.equals("")) {
                 continue;
             }
+            if(seen.contains(station)) continue;
+            seen.add(station);
             NamedStationImpl nstat = (NamedStationImpl) all.get(station);
             if (nstat != null) {
                 subset.add(nstat, true);
@@ -309,8 +314,6 @@ public class NwxTextProductDataSource extends TextProductDataSource {
                     table.createStationTableFromGempak(contents);
 
                 }
-
-
                 tableMap.put(tableInfo.locationFile, table);
             }
             return table;
