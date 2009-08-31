@@ -447,11 +447,31 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
      * @param color   default color
      * @return  selector box
      */
-    JComboBox makeColorBox(String cmd, Color color) {
-        JComboBox jcb = getDisplayConventions().makeColorSelector(color);
-        jcb.addActionListener(this);
-        jcb.setActionCommand(cmd);
-        return jcb;
+    JComponent makeColorBox(final String cmd, Color color) {
+        
+        GuiUtils.ColorSwatch swatch = new GuiUtils.ColorSwatch(color,"Set Color") {
+                public void userSelectedNewColor(Color c) {
+                    super.userSelectedNewColor(c);
+                    try {
+                        if (cmd.equals(CMD_RAD_COLOR)) {
+                            rangeRings.setAzimuthLineColor(radColor = c);
+                        } else if (cmd.equals(CMD_RR_COLOR)) {
+                            rangeRings.setRangeRingColor(rrColor = c);
+                        } else if (cmd.equals(CMD_LBL_COLOR)) {
+                            rangeRings.setLabelColor(lblColor = c);
+                        }
+                    } catch(Exception exc) {
+                        logException("setting color", exc);
+                    }
+                }
+            };
+        return swatch;
+        /*
+          JComboBox jcb = getDisplayConventions().makeColorSelector(color);
+          jcb.addActionListener(this);
+          jcb.setActionCommand(cmd);
+          return jcb;
+        */
     }
 
     /**
