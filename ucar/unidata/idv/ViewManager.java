@@ -459,6 +459,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** This is the split pane that holds the side legend */
     private JSplitPane mainSplitPane;
 
+
+
+    private int  splitPaneLocation  = -1;
+
+
     /**
      *  This holds the list of DisplayInfos being displayed in this ViewManager.
      *  The DisplayInfo holds the Displayable and the DisplayControl.
@@ -964,16 +969,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                 ? centerPanel
                                 : sideLegendContainer);
         mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftComp,
-                                       rightComp) {
-            boolean didPaint = false;
-            public void paint(Graphics g) {
-                if ( !didPaint) {
-                    didPaint = true;
-                    adjustSplitPane();
-                }
-                super.paint(g);
-            }
-        };
+                                       rightComp);
 
         if (legendOnLeft) {
             mainSplitPane.setResizeWeight(0.20);
@@ -981,6 +977,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
             mainSplitPane.setResizeWeight(0.80);
         }
         mainSplitPane.setOneTouchExpandable(true);
+        if(splitPaneLocation>=0) {
+            mainSplitPane.setDividerLocation(splitPaneLocation);
+        }
 
 
         //        centerPanelWrapper = new JPanel(new BorderLayout());
@@ -1745,8 +1744,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 }
             }
 
-
+            if(that.splitPaneLocation>=0) {
+                this.splitPaneLocation = that.splitPaneLocation;
+                if(mainSplitPane!=null) {
+                    mainSplitPane.setDividerLocation(that.splitPaneLocation);
+                }
+            }
         }
+
 
         if ((that.name != null) && (that.name.trim().length() > 0)) {
             setName(that.name);
@@ -3104,11 +3109,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /**
      * Get the location of the side legend or -1 if there is no side legend
      *
-     * @return SIde legend location
+     * @return Side legend location
      */
     public int getSideDividerLocation() {
-        if (mainSplitPane != null) {
-            return mainSplitPane.getDividerLocation();
+        JSplitPane tmp=mainSplitPane;
+        if (tmp != null) {
+            return tmp.getDividerLocation();
         }
         return -1;
     }
@@ -6638,6 +6644,33 @@ public class ViewManager extends SharableImpl implements ActionListener,
     public List<LightInfo> getLights() {
         return lights;
     }
+
+
+    /**
+       Set the SplitPaneLocation property.
+
+       @param value The new value for SplitPaneLocation
+    **/
+    public void setSplitPaneLocation (int value) {
+	splitPaneLocation = value;
+    }
+
+    /**
+       Get the SplitPaneLocation property.
+
+       @return The SplitPaneLocation
+    **/
+    public int getSplitPaneLocation () {
+        JSplitPane tmp=mainSplitPane;
+        if(tmp!=null) {
+            return tmp.getDividerLocation();
+        }
+        return -1;
+    }
+
+
+
+
 
 
 
