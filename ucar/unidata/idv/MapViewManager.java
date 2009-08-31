@@ -1140,7 +1140,7 @@ public class MapViewManager extends NavigatedViewManager {
 
         viewMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Properties",
                 this,
-                "showPropertiesDialog"), "/auxdata/ui/icons/Information16.gif"));
+                "showPropertiesDialog"), "/auxdata/ui/icons/information.png"));
     }
 
     /**

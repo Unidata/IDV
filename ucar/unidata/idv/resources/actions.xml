@@ -31,19 +31,19 @@
      action="jython:idv.closeCurrentWindow();"/>
   <action
      id="new.displaywindow"
-     image="/auxdata/ui/icons/New16.gif"
+     image="/auxdata/ui/icons/application_add.png"
      description="New view window"
      group="User Interface"
      action="jython:idv.getIdvUIManager().createNewWindow ();"/>
   <action
      id="bundle.open"
-     image="/auxdata/ui/icons/Open16.gif"
+     image="/auxdata/ui/icons/folder.png"
      description="Open a bundle"
      group="Bundles"
      action="jython:idv.doOpen();"/>
   <action
      id="bundle.save"
-     image="/auxdata/ui/icons/Save16.gif"
+     image="/auxdata/ui/icons/disk.png"
      description="Save bundle"
      group="Bundles"
      action="jython:idv.doSaveAs();"/>
@@ -66,7 +66,7 @@
      action="jython:idv.doClearDefaults ();"/>
   <action
      id="bundle.favorite.save"
-     image="/auxdata/ui/icons/SaveAs16.gif"
+     image="/auxdata/ui/icons/disk_multiple.png"
      description="Save as favorite bundle"
      group="Bundles"
      action="jython:idv.getPersistenceManager().doSaveAsFavorite();"/>
@@ -193,7 +193,7 @@
      action="jython:idv.getJythonManager().showFormulaDialog ();"/>
   <action
      id="edit.removedisplays"
-     image="/auxdata/ui/icons/image_delete.png"
+     image="/auxdata/ui/icons/eraser.png"
      description="Remove all displays"
      group="Displays and Data"
      action="jython:idv.removeAllDisplays ();"/>
