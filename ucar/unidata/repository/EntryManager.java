@@ -1845,6 +1845,8 @@ return new Result(title, sb);
                                   ? oldType
                                   : ""), fromEmail,""));
         User parentUser = parentGroup.getUser();
+        entry.setUser(parentUser);
+
         if (true || getAdmin().isEmailCapable()) {
             StringBuffer contents =
                 new StringBuffer(

@@ -252,7 +252,7 @@ public class AccessManager extends RepositoryManager {
     }
 
 
-    public boolean canDoAction(Request request, Entry entry, String action,boolean log)
+    public boolean canDoAction(Request request, Entry entry, String action, boolean log)
             throws Exception {
         if (entry == null) {
             return false;
@@ -386,6 +386,8 @@ public class AccessManager extends RepositoryManager {
                 }
 
                 boolean hadRole = false;
+                
+                //                Misc.printStack ("can do: " +action + " "  + entry,15,null);
                 for (String role:roles) {
                     boolean negated = false;
                     if (role.startsWith("!")) {
@@ -396,7 +398,9 @@ public class AccessManager extends RepositoryManager {
                         continue;
                     }
                     hadRole = true;
+                    //                    System.err.println ("    role:" + role +" user.isRole:" + user.isRole(role));
                     if (user.isRole(role)) {
+                        //                        System.err.println ("    OK " + (!negated));
                         return !negated;
                     }
                 }
@@ -629,22 +633,20 @@ public class AccessManager extends RepositoryManager {
      */
     protected void insertPermissions(Request request, Entry entry,
                                      List<Permission> permissions)
-            throws Exception {
-        synchronized (MUTEX_PERMISSIONS) {
-            recentPermissions = new Hashtable();
-            getDatabaseManager().delete(
-                Tables.PERMISSIONS.NAME,
-                Clause.eq(Tables.PERMISSIONS.COL_ENTRY_ID, entry.getId()));
+        throws Exception {
+        recentPermissions = new Hashtable();
+        getDatabaseManager().delete(
+                                    Tables.PERMISSIONS.NAME,
+                                    Clause.eq(Tables.PERMISSIONS.COL_ENTRY_ID, entry.getId()));
 
-            for (Permission permission : permissions) {
-                List roles = permission.getRoles();
-                for (int i = 0; i < roles.size(); i++) {
-                    getDatabaseManager().executeInsert(
-                        Tables.PERMISSIONS.INSERT,
-                        new Object[] { entry.getId(),
-                                       permission.getAction(),
-                                       roles.get(i) });
-                }
+        for (Permission permission : permissions) {
+            List roles = permission.getRoles();
+            for (int i = 0; i < roles.size(); i++) {
+                getDatabaseManager().executeInsert(
+                                                   Tables.PERMISSIONS.INSERT,
+                                                   new Object[] { entry.getId(),
+                                                                  permission.getAction(),
+                                                                  roles.get(i) });
             }
         }
         entry.setPermissions(permissions);
@@ -682,42 +684,41 @@ public class AccessManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected List<Permission> getPermissions(Entry entry) throws Exception {
-        synchronized (MUTEX_PERMISSIONS) {
-            if (entry.isGroup() && ((Group) entry).isDummy()) {
-                return new ArrayList<Permission>();
-            }
-            if (entry.getPermissions() != null) {
-                return entry.getPermissions();
-            }
-            //            if(!entry.isGroup()) 
-            //                System.err.println ("getPermissions for entry:" + entry.getId());
-            SqlUtil.Iterator iter =
-                SqlUtil.getIterator(
-                    getDatabaseManager().select(
-                        Tables.PERMISSIONS.COLUMNS, Tables.PERMISSIONS.NAME,
-                        Clause.eq(
-                            Tables.PERMISSIONS.COL_ENTRY_ID, entry.getId())));
-
-            List<Permission> permissions = new ArrayList<Permission>();
-
-            ResultSet        results;
-            Hashtable        actions = new Hashtable();
-            while ((results = iter.next()) != null) {
-                while (results.next()) {
-                    String id     = results.getString(1);
-                    String action = results.getString(2);
-                    String role   = results.getString(3);
-                    List   roles  = (List) actions.get(action);
-                    if (roles == null) {
-                        actions.put(action, roles = new ArrayList());
-                        permissions.add(new Permission(action, roles));
-                    }
-                    roles.add(role);
-                }
-            }
-            entry.setPermissions(permissions);
+        if (entry.isGroup() && ((Group) entry).isDummy()) {
+            return new ArrayList<Permission>();
+        }
+        List<Permission> permissions = entry.getPermissions();
+        if (permissions != null) {
             return permissions;
         }
+        //            if(!entry.isGroup()) 
+        //                System.err.println ("getPermissions for entry:" + entry.getId());
+        SqlUtil.Iterator iter =
+            SqlUtil.getIterator(
+                                getDatabaseManager().select(
+                                                            Tables.PERMISSIONS.COLUMNS, Tables.PERMISSIONS.NAME,
+                                                            Clause.eq(
+                                                                      Tables.PERMISSIONS.COL_ENTRY_ID, entry.getId())));
+
+        permissions = new ArrayList<Permission>();
+
+        ResultSet        results;
+        Hashtable        actions = new Hashtable();
+        while ((results = iter.next()) != null) {
+            while (results.next()) {
+                String id     = results.getString(1);
+                String action = results.getString(2);
+                String role   = results.getString(3);
+                List   roles  = (List) actions.get(action);
+                if (roles == null) {
+                    actions.put(action, roles = new ArrayList());
+                    permissions.add(new Permission(action, roles));
+                }
+                roles.add(role);
+            }
+        }
+        entry.setPermissions(permissions);
+        return permissions;
     }
 
 
@@ -821,30 +822,27 @@ public class AccessManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processAccessChange(Request request) throws Exception {
-        synchronized (MUTEX_PERMISSIONS) {
-            Entry            entry       =
-                getEntryManager().getEntry(request);
-
-
-            List<Permission> permissions = new ArrayList<Permission>();
-
-            for (int i = 0; i < Permission.ACTIONS.length; i++) {
-                List roles = StringUtil.split(request.getString(ARG_ROLES
-                                 + "." + Permission.ACTIONS[i], ""), "\n",
-                                     true, true);
-                if (roles.size() > 0) {
-                    permissions.add(new Permission(Permission.ACTIONS[i],
-                            roles));
-                }
+        Entry            entry       =
+            getEntryManager().getEntry(request);
+        List<Permission> permissions = new ArrayList<Permission>();
+        for (int i = 0; i < Permission.ACTIONS.length; i++) {
+            List roles = StringUtil.split(request.getString(ARG_ROLES
+                                                            + "." + Permission.ACTIONS[i], ""), "\n",
+                                          true, true);
+            if (roles.size() > 0) {
+                permissions.add(new Permission(Permission.ACTIONS[i],
+                                               roles));
             }
-
-            insertPermissions(request, entry, permissions);
-
-
-            return new Result(request.url(URL_ACCESS_FORM, ARG_ENTRYID,
-                                          entry.getId(), 
-                                          ARG_MESSAGE, getRepository().translate(request,MSG_ACCESS_CHANGED)));
         }
+
+        synchronized (MUTEX_PERMISSIONS) {
+            insertPermissions(request, entry, permissions);
+        }
+
+        return new Result(request.url(URL_ACCESS_FORM, ARG_ENTRYID,
+                                      entry.getId(), 
+                                      ARG_MESSAGE, getRepository().translate(request,MSG_ACCESS_CHANGED)));
+
     }
 
 
