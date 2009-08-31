@@ -248,7 +248,7 @@ public class IdvComponentHolder extends ComponentHolder {
         }
         if (object instanceof String) {
             if (type.equals(TYPE_SKIN)) {
-                return "UI Skin";
+                return "IDV User Interface";
             }
             if (type.equals(TYPE_CHOOSERS)) {
                 return "Data Choosers";
