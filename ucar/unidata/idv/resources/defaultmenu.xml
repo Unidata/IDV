@@ -5,13 +5,14 @@
      id="file"
      mnemonic="F">
     <menu
-       icon="/auxdata/ui/icons/New16.gif"
+       icon="/auxdata/ui/icons/application_add.png"
        label="New"
        mnemonic="N">
       <menu
          id="file.new.display"
          label="View Window"/>
       <menu
+       icon="/auxdata/ui/icons/database_add.png"
          label="Data Source"
          id="file.newdata"/>
     </menu>
@@ -165,6 +166,7 @@
      label="Data"
      mnemonic="A">
     <menu
+       icon="/auxdata/ui/icons/database_add.png"
        label="Choose Data"
        id="data.newdata"/>
     <menu
