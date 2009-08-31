@@ -63,8 +63,8 @@ public abstract class IdvLegend {
     public static final String STATE_FLOAT  = "float";
 
 
-    public static final ImageIcon  ICON_FLOAT = GuiUtils.getImageIcon("/auxdata/ui/icons/Export16.gif");
-    public static final ImageIcon  ICON_DOCKED = GuiUtils.getImageIcon("/auxdata/ui/icons/Import16.gif");
+    public static final ImageIcon  ICON_FLOAT = GuiUtils.getImageIcon("/auxdata/ui/icons/application_get.png");
+    public static final ImageIcon  ICON_DOCKED = GuiUtils.getImageIcon("/auxdata/ui/icons/application_put.png");
 
     /** The icon used to bring up the display properties window */
     protected static ImageIcon ICON_PROPERTIES;
@@ -75,9 +75,9 @@ public abstract class IdvLegend {
 
     static {
         ICON_PROPERTIES = new ImageIcon(
-            Resource.getImage("/auxdata/ui/icons/Information16.gif"));
+            Resource.getImage("/auxdata/ui/icons/information.png"));
         ICON_REMOVE = new ImageIcon(
-            Resource.getImage("/auxdata/ui/icons/Remove16.gif"));
+            Resource.getImage("/auxdata/ui/icons/delete.png"));
     }
 
 

@@ -4878,12 +4878,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
 
-        items.add(GuiUtils.makeMenuItem("Display Settings...", this,
-                                        "showDisplaySettingsDialog"));
+        items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Display Settings...", this,
+                                                         "showDisplaySettingsDialog"),"/auxdata/ui/icons/Settings16.png"));
 
 
-        items.add(GuiUtils.makeMenuItem("Properties...", this,
-                                        "showProperties"));
+        items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Properties...", this,
+                                                         "showProperties"),"/auxdata/ui/icons/information.png"));
 
     }
 
@@ -5833,8 +5833,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         items.add(GuiUtils.makeCheckboxMenuItem("Lock Visibility",this,
                                                 "lockVisibilityToggle", null));
         if (getDisplayInfos().size() > 0) {
-            items.add(GuiUtils.makeMenuItem("Bring to Front", this,
-                                            "displayableToFront"));
+            items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Bring to Front", this,
+                                                             "displayableToFront"),"/auxdata/ui/icons/shape_move_front.png"));
 
         }
 
@@ -5890,7 +5890,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * for a popup menu in the legend
      */
     protected void getFileMenuItems(List items, boolean forMenuBar) {
-        items.add(GuiUtils.makeMenuItem("Remove Display", this, "doRemove"));
+        items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Remove Display", this, "doRemove"),"/auxdata/ui/icons/delete.png"));
     }
 
     /**
@@ -5930,7 +5930,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected void getHelpMenuItems(List items, boolean forMenuBar) {
         items.add(GuiUtils.makeMenuItem("Details", this, "showDetails"));
-        items.add(GuiUtils.makeMenuItem("User's Guide", this, "showHelp"));
+        items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("User's Guide", this, "showHelp"),"/auxdata/ui/icons/help.png"));
     }
 
 

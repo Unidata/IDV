@@ -405,7 +405,7 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         ((DisplayControlImpl) control).setMakeWindow(false);
 
         JButton removeBtn =
-            GuiUtils.makeImageButton("/auxdata/ui/icons/Remove16.gif",
+            GuiUtils.makeImageButton("/auxdata/ui/icons/delete.png",
                                      control, "doRemove");
         removeBtn.setToolTipText("Remove Display Control");
 
@@ -417,13 +417,13 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         expandBtn.setToolTipText("Expand in the tabs");
         GuiUtils.makeMouseOverBorder(expandBtn);
         JButton exportBtn =
-            GuiUtils.makeImageButton("/auxdata/ui/icons/Export16.gif", this,
+            GuiUtils.makeImageButton("/auxdata/ui/icons/application_get.png", this,
                                      "undockControl", control);
         exportBtn.setToolTipText("Undock control window");
         GuiUtils.makeMouseOverBorder(exportBtn);
 
         JButton propBtn =
-            GuiUtils.makeImageButton("/auxdata/ui/icons/Information16.gif",
+            GuiUtils.makeImageButton("/auxdata/ui/icons/information.png",
                                      control, "showProperties");
         propBtn.setToolTipText("Show Display Control Properties");
         GuiUtils.makeMouseOverBorder(propBtn);
@@ -597,11 +597,11 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         if (control.canBeDocked()) {
             items.add(GuiUtils.MENU_SEPARATOR);
             if ( !control.shouldBeDocked()) {
-                items.add(GuiUtils.makeMenuItem("Dock in Dashboard", this,
-                        "dockControl", control));
+                items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Dock in Dashboard", this,
+                                                                 "dockControl", control),"/auxdata/ui/icons/application_put.png"));
             } else {
-                items.add(GuiUtils.makeMenuItem("Undock from Dashboard",
-                        this, "undockControl", control));
+                items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Undock from Dashboard",
+                        this, "undockControl", control),"/auxdata/ui/icons/application_get.png"));
             }
             List groups   = getIdv().getIdvUIManager().getComponentGroups();
             List subItems = new ArrayList();

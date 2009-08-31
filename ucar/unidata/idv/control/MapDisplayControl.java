@@ -566,6 +566,7 @@ public class MapDisplayControl extends DisplayControlImpl {
      */
     protected void getViewMenuItems(List items, boolean forMenuBar) {
         JMenu mapsMenu = new JMenu("Maps");
+        GuiUtils.setIcon(mapsMenu, "/auxdata/ui/icons/map.png");
         items.add(mapsMenu);
         for (int i = 0; i < mapStates.size(); i++) {
             final MapState mapState = (MapState) mapStates.get(i);
