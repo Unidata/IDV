@@ -10825,9 +10825,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         lockBtn.setIcon(isLocked
                         ? ICON_LOCK
                         : ICON_UNLOCK);
-        lockBtn.setToolTipText(isLocked
-                               ? "Unlock visibility toggle"
-                               : "Lock visibility toggle");
+        lockBtn.setToolTipText(Msg.msg("When locked this display control is not affected by the visibility toggling"));
     }
 
 
