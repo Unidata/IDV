@@ -3288,14 +3288,14 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         //System.err.println("dim:" + dim[0] + " x " + dim[1] + " # images:"
         //                   + imageList.size());
         int    numPixels = dim[0] * dim[1] * imageList.size();
-        double megs      = (4 * numPixels) / (double) 1000000;
+        double megs      = (int)(4 * numPixels) / (double) 1000000;
 
         if (megs > SIZE_THRESHOLD) {
             final JCheckBox maintainSize =
                 new JCheckBox("Maintain spatial extent", false);
             final JLabel sizeLbl = new JLabel(StringUtil.padRight("  "
-                                       + ((double) ((int) megs * 100))
-                                         / 100.0 + " MB", 14));
+                                                                  + (int)(((double) ((int) megs * 100))
+                                                                          / 100.0) + " MB", 14));
             GuiUtils.setFixedWidthFont(sizeLbl);
             final List[]  listHolder = { imageList };
             final JSlider slider     = new JSlider(2, (int) megs, (int) megs);
@@ -3332,9 +3332,9 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                     dim[0] = aid.getImageInfo().getElements();
                     dim[1] = aid.getImageInfo().getLines();
                     int    numPixels = dim[0] * dim[1] * listHolder[0].size();
-                    double nmegs     = (4 * numPixels) / (double) 1000000;
+                    int nmegs     = (int)((4 * numPixels) / (double) 1000000);
                     sizeLbl.setText(StringUtil.padRight("  "
-                            + ((double) ((int) nmegs * 100)) / 100.0
+                            + nmegs
                             + " MB", 14));
                 }
             };
@@ -3343,7 +3343,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             JComponent msgContents =
                 GuiUtils
                     .vbox(new JLabel(
-                        "<html>You are about to load " + megs
+                                     "<html>You are about to load " + ((int)megs)
                         + " MB of imagery.<br>Are you sure you want to do this?<p><hr><p></html>"), GuiUtils
                             .inset(GuiUtils
                                 .leftCenterRight(
