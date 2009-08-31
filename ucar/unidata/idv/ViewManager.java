@@ -4042,7 +4042,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         JMenu captureMenu = new JMenu("Capture");
         viewMenu.add(captureMenu);
         captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Image...", this,
-                                                               "doSaveImageInThread"),"/auxdata/ui/icons/image.png"));
+                                                               "doSaveImageInThread"),"/auxdata/ui/icons/camera.png"));
         captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Print...", this,
                                                                "doPrintImage", null, true),"/auxdata/ui/icons/printer.png"));
 
@@ -5668,6 +5668,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         XmlResourceCollection colors = getResourceManager().getXmlResources(
                                            IdvResourceManager.RSC_COLORPAIRS);
+
+        boolean didone = false;
         for (int colorResourceIdx = 0; colorResourceIdx < colors.size();
                 colorResourceIdx++) {
             Element root = colors.getRoot(colorResourceIdx, false);
@@ -5684,6 +5686,20 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 final String label = XmlUtil.getAttribute(node, "label");
                 JMenuItem mi = new JMenuItem(GuiUtils.getLocalName(label,
                                    (colorResourceIdx == 0)));
+                try {
+                    JLabel lbl = new JLabel("  T  ");
+                    lbl.setSize(new Dimension(30,20));
+                    lbl.setForeground(fg);
+                    lbl.setBackground(bg);
+                    lbl.setOpaque(true);
+                    Image image = ImageUtils.getImage(lbl);
+                    mi.setIcon(new ImageIcon(image));
+                    //                    if(!didone)
+                        //                        didone = !GuiUtils.showOkCancelDialog(null,null,lbl,null);
+                } catch(Exception exc) {
+                    exc.printStackTrace();
+                }
+                    
                 colorMenu.add(mi);
                 mi.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent ae) {
