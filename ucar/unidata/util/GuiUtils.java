@@ -5600,11 +5600,25 @@ public class GuiUtils extends LayoutUtil {
      *
      * @param tab tab
      */
-    private static void checkHeavyWeightComponents(JTabbedPane tab) {
+    public static void checkHeavyWeightComponents(JTabbedPane tab) {
         Component[] comps       = tab.getComponents();
         int         selectedIdx = tab.getSelectedIndex();
         for (int i = 0; i < comps.length; i++) {
             toggleHeavyWeightComponents(comps[i], i == selectedIdx);
+        }
+    }
+
+
+    /**
+     * Walk the components of the tab and toggle the heavyweight components visiblity
+     *
+     * @param tab tab
+     */
+    public static void resetHeavyWeightComponents(JTabbedPane tab) {
+        Component[] comps       = tab.getComponents();
+        int         selectedIdx = tab.getSelectedIndex();
+        for (int i = 0; i < comps.length; i++) {
+            toggleHeavyWeightComponents(comps[i], true);
         }
     }
 
