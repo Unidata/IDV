@@ -26,6 +26,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -55,8 +56,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Vector;
 import java.util.TimeZone;
+import java.util.Vector;
 
 import javax.imageio.*;
 import javax.imageio.stream.ImageOutputStream;
@@ -240,15 +241,28 @@ public class GuiUtils extends LayoutUtil {
     /** default icon size */
     private static int dfltIconSize = -1;
 
+    /** _more_          */
     private static TimeZone defaultTimeZone;
 
 
+    /**
+     * _more_
+     *
+     * @param tz _more_
+     */
     public static void setTimeZone(TimeZone tz) {
         defaultTimeZone = tz;
     }
 
-    public static  TimeZone getTimeZone() {
-        if(defaultTimeZone==null) return DateUtil.TIMEZONE_GMT;
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public static TimeZone getTimeZone() {
+        if (defaultTimeZone == null) {
+            return DateUtil.TIMEZONE_GMT;
+        }
         return defaultTimeZone;
     }
 
@@ -683,7 +697,7 @@ public class GuiUtils extends LayoutUtil {
             if (newColor != null) {
                 newColor = new Color(newColor.getRed(), newColor.getGreen(),
                                      newColor.getBlue(), alpha);
-                this.setBackground(newColor);
+                ColorSwatch.this.userSelectedNewColor(newColor);
             }
         }
 
@@ -695,7 +709,7 @@ public class GuiUtils extends LayoutUtil {
             Color newColor = JColorChooser.showDialog(null, label,
                                  this.getBackground());
             if (newColor != null) {
-                ColorSwatch.this.setBackground(newColor);
+                ColorSwatch.this.userSelectedNewColor(newColor);
             }
         }
 
@@ -724,6 +738,15 @@ public class GuiUtils extends LayoutUtil {
          */
         public Color getSwatchColor() {
             return color;
+        }
+
+        /**
+         * _more_
+         *
+         * @param c _more_
+         */
+        public void userSelectedNewColor(Color c) {
+            setBackground(c);
         }
 
         /**
@@ -3632,8 +3655,8 @@ public class GuiUtils extends LayoutUtil {
         JMenu        menu     = new JMenu(label);
         String mnemonic = getAttribute(menuNode.getAttributes(), "mnemonic",
                                        (String) null);
-        String icon = getAttribute(attrs,"icon",(String)null);
-        if(icon!=null) {
+        String icon = getAttribute(attrs, "icon", (String) null);
+        if (icon != null) {
             setIcon(menu, icon);
         }
 
@@ -6410,6 +6433,7 @@ public class GuiUtils extends LayoutUtil {
 
 
 }
+
 
 
 
