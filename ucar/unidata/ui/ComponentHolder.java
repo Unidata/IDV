@@ -301,6 +301,12 @@ public class ComponentHolder extends PropertiedThing {
      */
     protected void getPropertiesComponents(List comps, int tabIdx) {
         super.getPropertiesComponents(comps, tabIdx);
+
+        nameFld = new JTextField(getName());
+        comps.add(GuiUtils.rLabel("Name:"));
+        comps.add(nameFld);
+
+
         if (tabIdx == 0) {
             showHeaderCbx = new JCheckBox("Show Label", showHeader);
             borderBox = new JComboBox(new Vector(Misc.toList(BORDER_NAMES)));
@@ -321,6 +327,10 @@ public class ComponentHolder extends PropertiedThing {
         boolean result = super.applyProperties();
         if ( !result) {
             return false;
+        }
+
+        if(nameFld!=null) {
+            setName(nameFld.getText());
         }
 
         //Apply this in case a subclass has changed anything

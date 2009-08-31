@@ -253,7 +253,14 @@ public class ComponentGroup extends ComponentHolder {
     public JComponent doMakeContents() {
         desktop        = new JDesktopPane();
         tabbedPane     = new JTabbedPane();
-        GuiUtils.handleHeavyWeightComponentsInTabs(tabbedPane);
+        tabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if (isLayout(LAYOUT_TABS)) {
+                    GuiUtils.checkHeavyWeightComponents(tabbedPane);
+                }
+            }
+        });
+        //        GuiUtils.handleHeavyWeightComponentsInTabs(tabbedPane);
         container      = new JPanel(new GridLayout(numRows, numColumns, 5,
                 5));
         outerContainer = GuiUtils.center(container);
@@ -342,10 +349,7 @@ public class ComponentGroup extends ComponentHolder {
         if (propertiesTree == null) {
             propertiesTree = new MyDndTree();
         }
-        nameFld = new JTextField(getName());
         propertiesTree.setModel(new DefaultTreeModel(makeTree(null)));
-        comps.add(GuiUtils.rLabel("Name:"));
-        comps.add(nameFld);
 
 
 
@@ -548,7 +552,11 @@ public class ComponentGroup extends ComponentHolder {
             return;
         }
         desktop.removeAll();
-        tabbedPane.removeAll();
+
+        if(!isLayout(LAYOUT_TABS) && tabbedPane.getTabCount()>0) {
+            GuiUtils.resetHeavyWeightComponents(tabbedPane);
+            tabbedPane.removeAll();
+        }
         container.setVisible(false);
         container.removeAll();
 
@@ -786,7 +794,6 @@ public class ComponentGroup extends ComponentHolder {
      * @return Was successful
      */
     protected boolean applyProperties() {
-        setName(nameFld.getText());
         boolean result = super.applyProperties();
         if ( !result) {
             return false;
