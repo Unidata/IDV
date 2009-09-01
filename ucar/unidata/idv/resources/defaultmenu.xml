@@ -37,7 +37,8 @@
        action="action:bundle.favorite.save"
        mnemonic="F"/>
     <separator/>
-    <menu label="Publish" id="publish">
+    <menu label="Publish" id="publish"
+       icon="/auxdata/ui/icons/newspaper.png">
     </menu>
 
 <!--

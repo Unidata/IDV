@@ -62,6 +62,7 @@
   <action
      id="bundle.default.remove"
      description="Delete default bundle"
+     image="/auxdata/ui/icons/delete.png"
      group="Bundles"
      action="jython:idv.doClearDefaults ();"/>
   <action
