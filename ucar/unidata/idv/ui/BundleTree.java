@@ -111,9 +111,9 @@ public class BundleTree extends DndTree {
      */
     public BundleTree(IdvUIManager uiManager, int bundleType) {
 
-        categoryIcon = GuiUtils.getImageIcon("/auxdata/ui/icons/Folder.gif",
+        categoryIcon = GuiUtils.getImageIcon("/auxdata/ui/icons/folder.png",
                                              getClass());
-        bundleIcon = GuiUtils.getImageIcon("/auxdata/ui/icons/File.gif",
+        bundleIcon = GuiUtils.getImageIcon("/auxdata/ui/icons/page.png",
                                            getClass());
 
         this.uiManager = uiManager;
