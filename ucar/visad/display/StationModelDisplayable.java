@@ -1030,6 +1030,7 @@ public class StationModelDisplayable extends DisplayableData {
                     if (shapes[shapeIndex] == null) {
                         continue;
                     }
+                    /*
                     double lat = ob.getEarthLocation().getLatitude().getValue(
                                                                               CommonUnit.degree);
                     double lon = ob.getEarthLocation().getLongitude().getValue(
@@ -1038,6 +1039,7 @@ public class StationModelDisplayable extends DisplayableData {
                     ShapeUtility.rotateX(shapes[shapeIndex],
                                          (float)lat);
 
+                                         */
                     for (int i = 0; i < RotateInfo.TYPES.length; i++) {
                         RotateInfo info =
                             metSymbol.getRotateInfo(RotateInfo.TYPES[i]);
