@@ -132,6 +132,13 @@ example:
      displaycategory="Radar Displays"
      properties="smoothed=false;windowVisible=true;allowSmoothing=false,setAutoScaleYAxis=false"/>
   <control
+     id="rhics"
+     categories="RADAR_CROSS_SECTION"
+     class="ucar.unidata.idv.control.Level2ColorCrossSectionControl"
+     label="Radar Cross Section"
+     displaycategory="Radar Displays"
+     properties="smoothed=false;windowVisible=true;allowSmoothing=false,setAutoScaleYAxis=false"/>
+  <control
      id="rhisweep3d"
      categories="RHISWEEP"
      doeslevels="true"
@@ -260,7 +267,7 @@ example:
  <!--
   <control
      id="stormintesitydisplay"
-     categories="IMAGE-*-*"
+     categories="IMAGE-2D-*"
      class="ucar.unidata.idv.control.storm.StormIntensityControl"
      label="Storm Intensity"
      displaycategory="Probe"
