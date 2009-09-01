@@ -1050,7 +1050,7 @@ public class GuiUtils extends LayoutUtil {
                 byte[] bytes = IOUtil.readBytes(is);
                 image = Toolkit.getDefaultToolkit().createImage(bytes);
                 if (cache) {
-                    //                    imageCache.put(key, image);
+                    imageCache.put(key, image);
                 }
                 return image;
             }
