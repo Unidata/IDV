@@ -2415,7 +2415,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      */
     public void paintColors(Graphics g) {
         Rectangle box = getColorBox();
-        paintColors(g, box, colorList, true, (List<Float>) scales);
+        paintColors(g, box, colorList, true, true, (List<Float>) scales);
     }
 
 
@@ -2432,31 +2432,33 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      */
     public static void paintColors(Graphics g, Rectangle box,
                                    List<Color> colorList, boolean doLines,
+                                   boolean doCheckerboard,
                                    List<Float> scales) {
 
         //Draw a reference rectangle for transparency
         g.setColor(Color.white);
         g.fillRect(box.x, box.y, box.width, box.height);
 
-        int patternX = box.x;
-        g.setColor(Color.black);
-        boolean top           = true;
-        int     patternHeight = box.height / 2;
-        if (patternHeight > 0) {
-            while (patternX < box.x + box.width) {
-                int patternWidth = patternHeight;
-                if ((patternX + patternWidth) > (box.x + box.width)) {
-                    patternWidth = (box.x + box.width) - patternX;
+        if(doCheckerboard) {
+            int patternX = box.x;
+            g.setColor(Color.black);
+            boolean top           = true;
+            int     patternHeight = box.height / 2;
+            if (patternHeight > 0) {
+                while (patternX < box.x + box.width) {
+                    int patternWidth = patternHeight;
+                    if ((patternX + patternWidth) > (box.x + box.width)) {
+                        patternWidth = (box.x + box.width) - patternX;
+                    }
+                    g.fillRect(patternX, (top
+                                          ? box.y
+                                          : box.y + patternHeight), patternWidth,
+                               patternHeight);
+                    patternX += patternHeight;
+                    top      = !top;
                 }
-                g.fillRect(patternX, (top
-                                      ? box.y
-                                      : box.y + patternHeight), patternWidth,
-                                      patternHeight);
-                patternX += patternHeight;
-                top      = !top;
             }
         }
-
 
         int length = colorList.size();
         if (length > 50) {
@@ -2473,6 +2475,12 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
                 float bright = ((Float) scales.get(i)).floatValue();
                 c = applyBrightness(c, bright);
             }
+            //Clear out the alpha
+            if(!doCheckerboard) {
+                c = new Color(c.getRed(), c.getGreen(), c.getBlue());
+            }
+
+
             g.setColor(c);
             int extraWidth = 0;
             remainderWidth += extraPerBox;
@@ -2911,7 +2919,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
             final Rectangle   box     = new Rectangle(0, 0, width, height);
             JPanel            preview = new JPanel() {
                 public void paint(Graphics g) {
-                    paintColors(g, box, colors, false, null);
+                    paintColors(g, box, colors, false, true, null);
                 }
             };
 
