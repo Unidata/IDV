@@ -660,6 +660,26 @@ AD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
             <property name="Id">
                 <string><![CDATA[TOPOGRAPHY/BATHYMETRY]]></string>
             </property>
+            <property name="Range">
+                <object class="ucar.unidata.util.Range">
+                    <property name="Min">
+                        <double>-12458.0</double>
+                    </property>
+                    <property name="Max">
+                        <double>8791.0</double>
+                    </property>
+                </object>
+            </property>
+            <property name="Breakpoints">
+                <object class="java.util.ArrayList">
+                    <method name="add">
+                        <java.lang.Double>0.0</java.lang.Double>
+                    </method>
+                    <method name="add">
+                        <java.lang.Double>1.0</java.lang.Double>
+                    </method>
+                </object>
+            </property>
             <property name="Table">
                 <array class="[F" length="3">
                     <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
