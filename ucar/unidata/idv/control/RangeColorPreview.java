@@ -305,7 +305,7 @@ public class RangeColorPreview extends JPanel implements MouseMotionListener,
      */
     public void paint(Graphics g) {
         super.paint(g);
-        ColorTableCanvas.paintColors(g, getBounds(), colors, false,null);
+        ColorTableCanvas.paintColors(g, getBounds(), colors, false,false, null);
         if ( !mouseInPreview) {
             return;
         }

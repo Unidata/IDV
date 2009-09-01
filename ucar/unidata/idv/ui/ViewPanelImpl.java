@@ -405,7 +405,7 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         ((DisplayControlImpl) control).setMakeWindow(false);
 
         JButton removeBtn =
-            GuiUtils.makeImageButton("/auxdata/ui/icons/delete.png",
+            GuiUtils.makeImageButton("/auxdata/ui/icons/Remove16.gif",
                                      control, "doRemove");
         removeBtn.setToolTipText("Remove Display Control");
 

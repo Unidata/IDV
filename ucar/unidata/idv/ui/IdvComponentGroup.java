@@ -314,6 +314,7 @@ public class IdvComponentGroup extends ComponentGroup {
         comp.setType(comp.TYPE_SKIN);
         comp.setName(skins.getLabel(skinIndex));
         addComponent(comp);
+        GuiUtils.showComponentInTabs(comp.getContents());
     }
 
     /**

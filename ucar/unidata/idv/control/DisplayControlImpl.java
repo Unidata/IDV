@@ -3588,7 +3588,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if (sideLegendButtonPanel == null) {
                 DndImageButton dndBtn = new DndImageButton(this, "control");
                 sideLegendButtonPanel = GuiUtils.hbox(dndBtn,
-                                                      /*makeLockButton(), */
+                                                      makeLockButton(),
                                                       makeRemoveButton(), 2);
                 dndBtn.setToolTipText("Click to drag-and-drop");
                 sideLegendButtonPanel.setBackground(null);
@@ -5890,7 +5890,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * for a popup menu in the legend
      */
     protected void getFileMenuItems(List items, boolean forMenuBar) {
-        items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Remove Display", this, "doRemove"),"/auxdata/ui/icons/delete.png"));
+        items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Remove Display", this, "doRemove"),"/auxdata/ui/icons/Remove16.gif"));
     }
 
     /**
