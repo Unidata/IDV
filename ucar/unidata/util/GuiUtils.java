@@ -1,4 +1,4 @@
-/*
+/**
  * $Id: GuiUtils.java,v 1.317 2007/08/10 14:26:33 jeffmc Exp $
  *
  * Copyright  1997-2004 Unidata Program Center/University Corporation for
@@ -51,6 +51,7 @@ import java.lang.reflect.*;
 import java.net.URL;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -58,6 +59,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Vector;
+import java.text.SimpleDateFormat;
 
 import javax.imageio.*;
 import javax.imageio.stream.ImageOutputStream;
@@ -244,6 +246,8 @@ public class GuiUtils extends LayoutUtil {
     /** _more_          */
     private static TimeZone defaultTimeZone;
 
+    private static SimpleDateFormat defaultDateFormat =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+
 
     /**
      * _more_
@@ -265,6 +269,16 @@ public class GuiUtils extends LayoutUtil {
         }
         return defaultTimeZone;
     }
+
+    public static void setDefaultDateFormat(String fmt) {
+        defaultDateFormat =  new SimpleDateFormat(fmt);
+        defaultDateFormat.setTimeZone(defaultTimeZone);
+    }
+
+    public static String formatDate(Date dttm) {
+        return defaultDateFormat.format(dttm);
+    }
+
 
     /**
      * Set the default icon size
@@ -1036,7 +1050,7 @@ public class GuiUtils extends LayoutUtil {
                 byte[] bytes = IOUtil.readBytes(is);
                 image = Toolkit.getDefaultToolkit().createImage(bytes);
                 if (cache) {
-                    imageCache.put(key, image);
+                    //                    imageCache.put(key, image);
                 }
                 return image;
             }

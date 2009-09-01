@@ -88,7 +88,6 @@ public class MemoryMonitor extends JPanel implements Runnable {
 
     private static SimpleDateFormat clockFormat = new SimpleDateFormat("HH:mm:ss z");
 
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
 
     private String memoryLabel = "";
@@ -114,16 +113,18 @@ public class MemoryMonitor extends JPanel implements Runnable {
         super(new BorderLayout());
         label1 = new JLabel("",SwingConstants.RIGHT){
                 public String getToolTipText(MouseEvent me) {
-                    dateFormat.setTimeZone(GuiUtils.getTimeZone());
-                    String dttm = "Current Date/Time:" + dateFormat.format(new Date());
+                    StringBuffer sb  = new StringBuffer();
+                    sb.append("<html><table>");
+                    sb.append("<tr><td align=right><b>Current Date/Time:</b></td><td><i>" + GuiUtils.formatDate(new Date()) +"</i></td></tr>");
+                    sb.append("<tr><td align=right><b>Memory Usage:</b></td><td><i>" + memoryLabel +"</i></td></tr>");
+                    sb.append("</table>");
                     if(showClock) {
-                        return "<html>Click to show memory usage<br>"+dttm +
-                            "<br>" + memoryLabel +
-                            "</html>";
+                        sb.append("Click to show memory usage");
                     } else {
-                        return "<html>Click to show clock<br>" + dttm +
-                            "</html>";
+                        sb.append("Click to show clock");
                     }
+                    sb.append("</html>");
+                    return sb.toString();
                 }
             };
         label2 = new JLabel("");
@@ -141,8 +142,10 @@ public class MemoryMonitor extends JPanel implements Runnable {
 
         MouseListener ml = new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                showClock = !showClock;
-                showStats();
+                if (!SwingUtilities.isRightMouseButton(e)) {
+                    showClock = !showClock;
+                    showStats();
+                }
                 handleMouseEvent(e);
             }
         };
