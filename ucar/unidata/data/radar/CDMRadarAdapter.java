@@ -47,6 +47,8 @@ import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSourceImpl;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.geoloc.ProjectionImpl;
+import ucar.unidata.geoloc.Bearing;
+import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.util.*;
 
@@ -60,10 +62,7 @@ import visad.Set;
 import visad.bom.Radar2DCoordinateSystem;
 import visad.bom.Radar3DCoordinateSystem;
 
-import visad.georef.EarthLocation;
-import visad.georef.EarthLocationLite;
-import visad.georef.EarthLocationTuple;
-import visad.georef.NamedLocation;
+import visad.georef.*;
 
 import java.io.IOException;
 
@@ -1390,7 +1389,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         if (r == null) {
             return 999;
         }
-        int rd = r.rayIndex;
+        int rd = Integer.parseInt(r.index); //.rayIndex;
         closestRay = theClosestHash(azimuths, ray_angle, rd, limit);
 
         /* Is closest ray within limit parameter ? If
@@ -1506,7 +1505,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                 } else {
                     low  = azimuths[hindex];
                     high = azimuths[hindex + 1];
-                }
+                    }
             } catch (ArrayIndexOutOfBoundsException ee) {
                 int a = hindex;
                 ee.printStackTrace();
@@ -1698,6 +1697,20 @@ public class CDMRadarAdapter implements RadarAdapter {
                 } catch (IOException ex) {
                     LogUtil.logException("getCAPPI", ex);
                 }
+            } else if (requestProperties.containsKey(PROP_VCS)) {
+
+                LatLonPoint latlonStart = (LatLonPoint) requestProperties.get(
+                                       PROP_VCS_START);
+                LatLonPoint latlonEnd = (LatLonPoint) requestProperties.get(
+                                       PROP_VCS_END);
+                //System.out.println("getting rhi at azimuth " + rhiAzimuth);
+
+                try {
+                    fi = getRadarCrossSection(moment, rn, latlonStart, latlonEnd);
+                } catch (IOException ex) {
+                    LogUtil.logException("getRHI", ex);
+                }
+
             } else if (requestProperties.containsKey(PROP_AZIMUTH)) {
                 float rhiAzimuth = ((Float) requestProperties.get(
                                        PROP_AZIMUTH)).floatValue();
@@ -2125,7 +2138,366 @@ public class CDMRadarAdapter implements RadarAdapter {
         return fi;
 
     }
+    /**
+     * Makes a field of all data from one common data model radar adapter;
+     *
+     * @param moment  moment
+     * @param varName variable name
+     * @param p1 cross lint start point
+     * @param p2 cross lint end point
+     *
+     * @return  a FieldImpl
+     *
+     * @throws IOException     Problem reading data
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  Couldn't create VisAD Object
+     */
+    public FieldImpl getRadarCrossSection(int moment, String varName, LatLonPoint p1, LatLonPoint p2)
+            throws VisADException,  IOException {
 
+        Trace.call1("   getRadarCrossSection");
+        Trace.call1("   getRadarCrossSection.setup");
+        RadialDatasetSweep.RadialVariable sweepVar =
+            getRadialVariable(varName);
+
+        Object[] cut            = getCutIdx(sweepVar);
+        int      numberOfSweeps = cut.length;
+        int      numberOfRay    = getRayNumber(sweepVar);
+        int      numberOfBin    = getGateNumber(sweepVar);
+
+        if( p1 == null || p2 == null) {
+            p1 = setCrossSectionLinePosition(0.0f);
+            p2 = setCrossSectionLinePosition(180.0f);
+
+        }
+        if (RSL_sweep_list == null) {
+            RSL_sweep_list = new CDMRadarSweepDB[numberOfSweeps];
+            float[][] aziArray    = new float[numberOfSweeps][];
+            int[][]   aziArrayIdx = new int[numberOfSweeps][];
+
+            for (int b = 0; b < numberOfSweeps; b++) {
+                int sb = Integer.parseInt(cut[b].toString());
+                RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(sb);
+                aziArray[b]    = getAzimuth(s1);
+                aziArrayIdx[b] = QuickSort.sort(aziArray[b]);
+
+            }
+            // now get the hash map for each sweep contain azi as index and ray information.
+            for (int b = 0; b < numberOfSweeps; b++) {
+                //   RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(b);
+                RSL_sweep_list[b] = constructSweepHashTable(aziArray[b],
+                        aziArrayIdx[b], 0.95f);
+            }
+        }
+        //   rhiData = null;
+        FlatField retField;
+
+        RadialDatasetSweep.Sweep s0 = sweepVar.getSweep(numberOfSweeps - 1);
+        range_to_first_gate = s0.getRangeToFirstGate() / 1000.0;
+        range_step          = s0.getGateSize() / 1000.0;
+
+        double halfBeamWidth;
+
+        halfBeamWidth = 0.95 / 2;
+
+        // int     number_of_bins;
+        float[] elevations = new float[numberOfSweeps];
+        int[] tiltindices = new int[numberOfSweeps];
+        float lat3 = (float)p1.getLatitude().getValue();
+        float lon3 = (float)p1.getLongitude().getValue();
+        float lat4 = (float)p2.getLatitude().getValue();
+        float lon4 = (float)p2.getLongitude().getValue();
+        Bearing b1 = getBearing(lat3, lon3);
+        Bearing b2 = getBearing(lat4, lon4);
+
+        double azimuth1 = b1.getAngle();
+        double azimuth2 = b2.getAngle();
+        double deltaAzi = Math.abs(azimuth1 - azimuth2);
+        int bincounter;
+        boolean cs = false;
+        if(deltaAzi <= 181.0 && deltaAzi >= 179.0) {
+            float dis = (float)(b1.getDistance() + b2.getDistance());
+            bincounter =(int) Math.round(dis/range_step) + 1;
+        } else if( deltaAzi >= 0.0 && deltaAzi <= 5.0 ){
+            bincounter = (int)(Math.round(Math.abs(b1.getDistance() - b2.getDistance()))/range_step);
+        } else {
+             bincounter =(int) Math.round(deltaAzi);
+             if(bincounter > 180) {
+                 bincounter = 360 - bincounter;
+                 cs = true;
+             }
+        }
+
+        Trace.call2("   getRadarCrossSection.setup");
+
+        double[][] ranges      = new double[numberOfSweeps][bincounter];
+        int        tiltcounter = 0;
+
+
+        float[][] aziArray    = new float[numberOfSweeps][];
+        int[][]   aziArrayIdx = new int[numberOfSweeps][];
+        int [] ray0Idx = new int[numberOfSweeps];
+        int [] ray1Idx = new int[numberOfSweeps];
+        int [] numberOfRays = new int[numberOfSweeps];
+        float [] gateSize = new float[numberOfSweeps];
+
+        meanEle = new float[numberOfSweeps];
+
+        for (int b = 0; b < numberOfSweeps; b++) {
+            int sb = Integer.parseInt(cut[b].toString());
+            RadialDatasetSweep.Sweep s1 = sweepVar.getSweep(sb);
+            meanEle[b] = s1.getMeanElevation();
+            numberOfRays[b] = s1.getRadialNumber();
+            gateSize[b] = s1.getGateSize()/1000.f;
+            aziArray[b]    = getAzimuth(s1);
+            aziArrayIdx[b] = QuickSort.sort(aziArray[b]);
+            // now get the beginning index of each sweep
+            ray0Idx[b] = getClosestRayFromSweep((float)azimuth1, (float)halfBeamWidth, b, aziArray[b]);
+            ray1Idx[b] = getClosestRayFromSweep((float)azimuth2, (float)halfBeamWidth, b, aziArray[b]);
+        }
+
+
+        Trace.call1("   getRadarCrossSection.getdata");
+
+
+        if (rayData == null) {
+            rayData = getRayData(sweepVar, numberOfRay, numberOfBin);
+        }
+
+        float[][] rdata = new float[numberOfSweeps][bincounter];
+        float[][] rAzimuth = new float[numberOfSweeps][bincounter];
+
+        for (int ti = 0; ti < numberOfSweeps; ti++) {
+
+            float meanElevation = meanEle[ti];
+            elevations[ti] = meanElevation;
+
+     //       System.out.println("Azimuth " + deltaAzi);
+            if(deltaAzi <= 181.0 && deltaAzi >= 179.0) {
+                if(ray0Idx[ti]== 999 || ray1Idx[ti]==999)
+                    continue;
+                int ray0 = aziArrayIdx[ti][ray0Idx[ti]];
+                int ray1 = aziArrayIdx[ti][ray1Idx[ti]];
+                int bincounter2 =(int) (((b2.getDistance()/Math.cos(Math.PI * meanElevation/180.f)
+                        - range_to_first_gate)/range_step) + 1);
+
+                int gateIdx = (int)((b2.getDistance()/Math.cos(Math.PI * meanElevation/180.f)
+                        - range_to_first_gate)/range_step);
+        //        System.out.println("radial " + ray1 + " " + azimuth1 + " " + azimuth2);
+                for(int ri = 0; ri < bincounter2; ri++) {
+                    rAzimuth[ti][ri] = (float)azimuth2;
+                    ranges[ti][ri] = range_to_first_gate + gateIdx * range_step;
+          //      System.out.println("1-1 ti, ri, gi "+ ti + " " + ray1 + " " + gateIdx);
+                    if(gateIdx >= numberOfBin || gateIdx<0)
+                        rdata[ti][ri] = Float.NaN;
+                    else
+                        rdata[ti][ri] = rayData[ti][ray1][gateIdx];
+                    gateIdx--;
+                }
+                gateIdx = 0;
+                for(int ri = bincounter2; ri < bincounter; ri++) {
+                    rAzimuth[ti][ri] = (float)azimuth1;
+                    ranges[ti][ri] = range_to_first_gate + gateIdx * range_step;
+         //        System.out.println("1-2 ti, ri, gi"+ ti + " " + ray0 + " " + gateIdx);
+                    if(gateIdx >= numberOfBin )
+                        rdata[ti][ri] = Float.NaN;
+                    else
+                        rdata[ti][ri] = rayData[ti][ray0][gateIdx];
+                    gateIdx++;
+                }
+
+            } else if(deltaAzi >= 0.0 && deltaAzi <= 5.0) {
+               // average RHIs
+                int ray0 = aziArrayIdx[ti][ray0Idx[ti]];
+                int rn = (int)deltaAzi;
+                int ray = ray0;
+                float dist = (float)b1.getDistance();
+                float azi = (float)azimuth1;
+                boolean incsign = true;
+                if(b1.getDistance() > b2.getDistance()) {
+                    incsign = false;
+                }
+
+                if( ray== 999 )
+                    continue;
+                int gateIdx = (int)((dist/Math.cos(Math.PI * meanElevation/180.f)
+                        - range_to_first_gate)/range_step);
+        //        System.out.println("radial " + ray + " " + azimuth1 + " " + azimuth2);
+                for(int ri = 0; ri < bincounter; ri++) {
+                    float rd = 0;
+                    int cnt = 0;
+                    for(int rj = 0; rj < rn; rj++ ) {
+                        if(gateIdx < numberOfBin && gateIdx>0) {
+                            rd = rd + rayData[ti][ray+ rj][gateIdx];
+                            cnt++;
+                        }
+                    }
+                    rAzimuth[ti][ri] = (float)azi;
+                    ranges[ti][ri] = range_to_first_gate + gateIdx * range_step;
+             //       System.out.println("2 ti, ri, gi "+ ti + " " + ray + " " + gateIdx);
+                    if(Float.isNaN(rd))
+                        rdata[ti][ri] = Float.NaN;
+                    else
+                        rdata[ti][ri] = rd/cnt;
+                    if(incsign)
+                        gateIdx++;
+                    else
+                        gateIdx--;
+                }
+
+            } else {
+                int ray0;
+                boolean incsign = true;
+                ray0 = ray0Idx[ti];
+                if(ray0== 999 )
+                    continue;
+
+                if(azimuth1 > azimuth2)
+                    incsign = false;
+
+            //    System.out.println(" Radial "+ bincounter + " " + azimuth1 + " " + azimuth2);
+
+
+                    for(int ri = 0; ri < bincounter; ri++) {
+                        int rr;
+                        if( cs && incsign){
+                            rr = ray0 - ri;
+                            if(rr < 0)
+                                rr = numberOfRay + rr;
+                        } else if (cs) {
+                            rr = ray0 + ri;
+                            if(rr >= 360)
+                                rr = rr - 360;
+                        } else if (!incsign) {
+                            rr = ray0 - ri;
+                            if(rr < 0)
+                                rr = numberOfRay + rr;
+                        }
+                        else {
+                            rr = ray0 + ri;
+                            if(rr >= 360)
+                                rr = rr - 360;
+                        }
+                        float azi = aziArray[ti][rr];
+                    // System.out.println("azimuth  " + azi + "rr   " + rr + "ray0-ri  " + (ray0 - ri));
+                        float [] inst = getIntersectionOfRayAndLine(radarLocation, azi, lat3, lon3, lat4, lon4);
+                        Bearing b = getBearing(inst[0], inst[1]);
+                        int gateIdx = (int)((b.getDistance()/Math.cos(Math.PI * meanElevation/180.f)
+                                - range_to_first_gate)/range_step);
+                        if(gateIdx < 0) gateIdx = 0;
+                        rAzimuth[ti][ri] = azi;
+                        ranges[ti][ri] = b.getDistance();
+                   //  System.out.println("4 "  + (rr) + "  " + gateIdx);
+                    
+                        if(gateIdx >= numberOfBin)
+                           rdata[ti][ri] = Float.NaN;
+                        else {
+                            float rd = rayData[ti][aziArrayIdx[ti][rr]][gateIdx];
+                            rdata[ti][ri] = rd;
+                        }
+                    }
+
+            }
+
+            tiltindices[tiltcounter] = ti;
+            tiltcounter++;
+
+        }
+        Trace.call2("   getRadarCrossSection.getdata");
+
+
+        Trace.call1("   getRadarCrossSection.makeField");
+
+
+        // radial data
+        float[][] domainVals = new float[3][bincounter*numberOfSweeps];
+        float[][] signalVals = new float[1][bincounter*numberOfSweeps];
+        int l = 0;
+        for (int tc = 0; tc < numberOfSweeps; tc++) {
+            int       ti         = tiltindices[tc];
+            for (int bi = 0; bi < bincounter; bi++) {
+                domainVals[0][l] = (float) ranges[ti][bi];
+                domainVals[1][l] = rAzimuth[ti][bi];
+                domainVals[2][l] = elevations[ti];
+                signalVals[0][l++] = rdata[ti][bi];
+            }
+        }
+
+        Unit          u               = getUnit(sweepVar);
+
+        RealTupleType radarDomainType = makeDomainType3D();
+        GriddedSet domainSet = new Gridded3DSet(radarDomainType,
+                                       domainVals, bincounter, numberOfSweeps,
+                                       radarDomainType.getCoordinateSystem(),
+                                       new Unit[] {
+                                           CommonUnit.meter.scale(1000),
+                                           CommonUnit.degree,
+                                           CommonUnit.degree }, null, false);
+        FunctionType functionType = new FunctionType(radarDomainType,
+                                            getMomentType(varName, u));
+
+        retField = new FlatField(functionType, domainSet,
+                                     (CoordinateSystem) null, (Set[]) null,
+                                     new Unit[] { u });
+        retField.setSamples(signalVals, false);
+
+        return retField;
+
+
+
+    }
+
+    public Bearing getBearing(double lat, double lon){
+          Bearing b1 = Bearing.calculateBearing(radarLocation.getLatitude().getValue(),
+                                             radarLocation.getLongitude().getValue(),
+                                             lat, lon, null);
+        return b1;
+    }
+
+    public LatLonPoint setCrossSectionLinePosition( float azi) throws VisADException, RemoteException {
+        float stationLat = (float)radarLocation.getLatitude().getValue();
+        float stationLon = (float)radarLocation.getLongitude().getValue();
+
+
+        LatLonPointImpl lp1 = Bearing.findPoint(stationLat, stationLon, azi, 150.0f, null);
+
+
+        return new EarthLocationTuple(lp1.getLatitude(), lp1.getLongitude(),
+                                             0.0);
+
+    }
+
+    public float [] getIntersectionOfRayAndLine(EarthLocation radarCenter, float azi, float lat3, float lon3,
+                                                float lat4, float lon4) {
+        float lat1 = (float) radarCenter.getLatitude().getValue();
+        float lon1 = (float) radarCenter.getLongitude().getValue();
+
+        LatLonPointImpl lp = Bearing.findPoint(lat1, lon1, azi, 1000.0f, null);
+
+        float lat2 = (float)lp.getLatitude();
+        float lon2 = (float)lp.getLongitude();
+
+        return getIntersectionOfTwoLines(lat1, lon1, lat2, lon2, lat3, lon3, lat4, lon4);
+
+    }
+    
+    public float [] getIntersectionOfTwoLines(float lat1, float lon1, float lat2, float lon2,
+                                              float lat3, float lon3, float lat4, float lon4){
+        // lat1 = a * lon1 + b for line1
+        // lat2 = c * lon2 + d for line2
+        // first get the a, b, c, d from input
+        float a = (lat2 - lat1) /(lon2 - lon1);
+        float b = -1 * a * lon1 + lat1;
+        float c = (lat4 - lat3) /(lon4 - lon3);
+        float d = -1 * c * lon3 + lat3;
+
+        //now cal the intersection
+        float lon0 = (d - b) / (a - c);
+        float lat0 = a * lon0 + b;
+        float [] out = new float [] {lat0, lon0};
+
+        return out;
+    }
     /**
      * Makes a field of all data from one common data model radar adapter;
      *

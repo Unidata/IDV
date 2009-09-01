@@ -314,7 +314,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                     } else {
                         categories = Misc.newList(CATEGORY_RHI,
                                 CATEGORY_CAPPI, CATEGORY_ISOSURFACE,
-                                CATEGORY_VOLUME);
+                                CATEGORY_VOLUME, CATEGORY_VCS);
                         //categories.add(CATEGORY_SWEEP_3D);
                         if (haveTimes) {
                             categories.add(CATEGORY_SWEEP_3D_TIME);

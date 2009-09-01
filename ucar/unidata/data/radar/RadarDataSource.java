@@ -71,7 +71,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
      * Radar data appropriate for radar vertical cross section
      */
     public static final DataCategory CATEGORY_VCS =
-        DataCategory.parseCategory("RADAR_VERT_XS", false);
+        DataCategory.parseCategory("RADAR_CROSS_SECTION", false);
 
     /**
      * Radar data appropriate for radar isosurface
