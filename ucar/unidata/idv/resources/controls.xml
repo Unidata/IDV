@@ -134,7 +134,7 @@ example:
   <control
      id="rhics"
      categories="RADAR_CROSS_SECTION"
-     class="ucar.unidata.idv.control.Level2ColorCrossSectionControl"
+     class="ucar.unidata.idv.control.RadarCrossSectionControl"
      label="Radar Cross Section"
      displaycategory="Radar Displays"
      properties="smoothed=false;windowVisible=true;allowSmoothing=false,setAutoScaleYAxis=false"/>
