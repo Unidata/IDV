@@ -7,6 +7,7 @@
     <menu
        icon="/auxdata/ui/icons/application_add.png"
        label="New"
+       id="file.new"
        mnemonic="N">
       <menu
          id="file.new.display"

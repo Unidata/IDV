@@ -1562,10 +1562,33 @@ public class IdvUIManager extends IdvManager {
      * @param id Id of the menu
      * @param menu The menu
      */
-    protected void handleMenuSelected(String id, JMenu menu) {
-        if (id.equals(MENU_WINDOWS)) {
+    protected void handleMenuSelected(String id, JMenu menu,IdvWindow idvWindow) {
+        if (id.equals("file.new")) {
+            if(idvWindow==null) return;
+            List<IdvComponentGroup> groups =idvWindow.getComponentGroups();
+            if(groups.size()==0) return;
+            int i=0;
+            //a hack to remove the last group menu we created
+            while(i< menu.getItemCount()) {
+                JMenuItem mi = menu.getItem(i);
+                if(mi.getLabel().startsWith("Group:")) {
+                    menu.remove(mi);
+                    break;
+                }
+                i++;
+            }
+
+            for(IdvComponentGroup group: groups) {
+                List items = new ArrayList();
+                getComponentGroupMenuItems(group, items);
+                JMenu groupMenu = new JMenu("Group: " + group.getName());
+                GuiUtils.makeMenu(groupMenu, items);
+                group.getPopupMenuItems(items);
+                menu.add(groupMenu);
+            }
+        } else if (id.equals(MENU_WINDOWS)) {
             menu.removeAll();
-            makeWindowsMenu(menu);
+            makeWindowsMenu(menu,idvWindow);
         } else if (id.equals("file.newdata") || id.equals("data.newdata")) {
             menu.removeAll();
             GuiUtils.makeMenu(
@@ -1625,7 +1648,7 @@ public class IdvUIManager extends IdvManager {
      * @param id Id of the menu
      * @param menu The menu
      */
-    protected void handleMenuDeSelected(String id, JMenu menu) {
+    protected void handleMenuDeSelected(String id, JMenu menu,IdvWindow idvWindow) {
         if (id.equals(MENU_DISPLAYS)) {
             menu.removeAll();
         } else if (id.equals(MENU_DATA)) {
@@ -1652,7 +1675,16 @@ public class IdvUIManager extends IdvManager {
      * @return The menu bar we just created
      */
     public JMenuBar doMakeMenuBar() {
+        return doMakeMenuBar(null);
+    }
 
+    /**
+     * Make the menu bar and menus for the given IdvWindow. Use the set of xml menu files
+     * defined by the menubarResources member
+     *
+     * @return The menu bar we just created
+     */
+    public JMenuBar doMakeMenuBar(final IdvWindow idvWindow) {
 
         Hashtable menuMap = new Hashtable();
         menuIds = menuMap;
@@ -1730,11 +1762,11 @@ public class IdvUIManager extends IdvManager {
                 public void menuCanceled(MenuEvent e) {}
 
                 public void menuDeselected(MenuEvent e) {
-                    handleMenuDeSelected(menuId, menu);
+                    handleMenuDeSelected(menuId, menu,idvWindow);
                 }
 
                 public void menuSelected(MenuEvent e) {
-                    handleMenuSelected(menuId, menu);
+                    handleMenuSelected(menuId, menu,idvWindow);
                 }
             });
         }
@@ -1985,8 +2017,8 @@ public class IdvUIManager extends IdvManager {
      *
      * @param menu windows menu
      */
-    public void makeWindowsMenu(JMenu menu) {
-        IdvWindow activeWindow = IdvWindow.getActiveWindow();
+    public void makeWindowsMenu(JMenu menu,IdvWindow idvWindow) {
+        IdvWindow activeWindow = (idvWindow!=null?idvWindow:IdvWindow.getActiveWindow());
         if (activeWindow != null) {
             makeWindowMenu(activeWindow, menu);
         }

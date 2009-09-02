@@ -411,7 +411,7 @@ public class IdvXmlUi extends XmlUi {
             return toolbar;
         }
         if (tagName.equals(IdvUIManager.COMP_MENUBAR)) {
-            return idv.getIdvUIManager().doMakeMenuBar();
+            return idv.getIdvUIManager().doMakeMenuBar(window);
         }
 
         if (tagName.equals(IdvUIManager.COMP_MEMORYMONITOR)) {

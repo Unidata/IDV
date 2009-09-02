@@ -644,16 +644,16 @@ public class IdvWindow extends MultiFrame {
         return persistentComponents.get(key);
     }
 
-    public List getComponentGroups() {
-        if(persistentComponents == null) return new ArrayList();
-        List groups = new ArrayList();
+    public List<IdvComponentGroup> getComponentGroups() {
+        List groups = new ArrayList<IdvComponentGroup>();
+        if(persistentComponents == null) return groups;
         Hashtable map = getPersistentComponents();
         for (Enumeration keys =
                  map.keys(); keys.hasMoreElements(); ) {
             Object key = keys.nextElement();
             Object obj = map.get(key);
             if (obj instanceof IdvComponentGroup) {
-                groups.add(obj);
+                groups.add((IdvComponentGroup)obj);
             }
         }
         return groups;
