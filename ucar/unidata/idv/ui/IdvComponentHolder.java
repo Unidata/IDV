@@ -131,6 +131,8 @@ public class IdvComponentHolder extends ComponentHolder {
                               object.getClass().getName());
             node.appendChild(XmlUtil.makeCDataNode(doc,
                     idv.encodeObject(object, false)));
+            node.setAttribute("showheader", ""+getShowHeader());
+
             return node;
         }
         if (object instanceof String) {
@@ -351,6 +353,11 @@ public class IdvComponentHolder extends ComponentHolder {
         if (w != null) {
             w.doLayout();
         }
+    }
+
+    public void initWith(Element node) {
+        super.initWith(node);
+        setShowHeader(XmlUtil.getAttribute(node, "showheader", getShowHeader()));
     }
 
 

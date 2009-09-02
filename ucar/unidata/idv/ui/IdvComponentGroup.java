@@ -141,6 +141,8 @@ public class IdvComponentGroup extends ComponentGroup {
         super.initWith(node);
         autoImportDisplays = XmlUtil.getAttribute(node, "autoimportdisplays",
                 autoImportDisplays);
+        boolean showHeader = XmlUtil.getAttribute(node, "showheader", getShowHeader());
+        setShowHeader(showHeader);
     }
 
 
@@ -154,6 +156,7 @@ public class IdvComponentGroup extends ComponentGroup {
     public Element createXmlNode(Document doc) {
         Element node = doc.createElement(IdvUIManager.COMP_COMPONENT_GROUP);
         node.setAttribute("autoimportdisplays", "" + autoImportDisplays);
+        node.setAttribute("showheader", ""+getShowHeader());
         List displayComponents = getDisplayComponents();
         for (int i = 0; i < displayComponents.size(); i++) {
             ComponentHolder comp  =

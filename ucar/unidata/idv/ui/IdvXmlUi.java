@@ -345,7 +345,7 @@ public class IdvXmlUi extends XmlUi {
 
             if (compGroup == null) {
                 compGroup = makeComponentGroup(node);
-                compGroup.setShowHeader(true);
+                compGroup.setShowHeader(XmlUtil.getAttribute(node, "showheader", true));
                 if(window!=null) {
                     window.putPersistentComponent(key, compGroup);
                 }

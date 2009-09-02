@@ -13,7 +13,7 @@
          id="file.new.display"
          label="View Window"/>
       <menu
-       icon="/auxdata/ui/icons/database_add.png"
+         xxxicon="/auxdata/ui/icons/database_add.png"
          label="Data Source"
          id="file.newdata"/>
     </menu>
