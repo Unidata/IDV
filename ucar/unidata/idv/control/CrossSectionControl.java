@@ -1509,6 +1509,7 @@ public abstract class CrossSectionControl extends GridDisplayControl {
         if (GridUtil.isConstantSpatialDomain(xsectSequence)) {
             domainSet = (GriddedSet) GridUtil.getSpatialDomain(xsectSequence);
             GriddedSet newDomain = make2DDomainSet(domainSet);
+            if (newDomain == null) return null;
             grid2D = GridUtil.setSpatialDomain(xsectSequence, newDomain);
         } else {
             Set          timeSet    = GridUtil.getTimeSet(xsectSequence);
