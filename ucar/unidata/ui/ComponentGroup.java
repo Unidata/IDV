@@ -590,6 +590,7 @@ public class ComponentGroup extends ComponentHolder {
             if (comp.getParent() != null) {
                 comp.getParent().remove(comp);
             }
+            comp.setVisible(true);
             if (isLayout(LAYOUT_TABS)) {
                 tabbedPane.addTab(displayComponent.getName(), displayComponent.getIcon(), comp);
             } else if (isLayout(LAYOUT_DESKTOP)) {
@@ -610,8 +611,6 @@ public class ComponentGroup extends ComponentHolder {
                 comps.add(comp);
             }
         }
-
-
 
         if (isLayout(LAYOUT_TABS)) {
             container.add(BorderLayout.CENTER, tabbedPane);
