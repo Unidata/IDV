@@ -21,7 +21,9 @@
  */
 
 
+
 package ucar.unidata.ui;
+
 
 import org.w3c.dom.Element;
 
@@ -78,22 +80,22 @@ public class ComponentGroup extends ComponentHolder {
     /** type of layout */
     public static final String LAYOUT_VSPLIT = "vsplit";
 
-    /** type of layout */ 
+    /** type of layout */
     public static final String LAYOUT_GRAPH = "graph";
 
-    /** type of layout */ 
+    /** type of layout */
     public static final String LAYOUT_TREE = "tree";
 
-    /** type of layout */ 
+    /** type of layout */
     public static final String LAYOUT_BORDER = "border";
 
-    /** type of layout */ 
+    /** type of layout */
     public static final String LAYOUT_DESKTOP = "desktop";
 
-    /** type of layout */ 
+    /** type of layout */
     public static final String LAYOUT_MENU = "menu";
 
-    /** user readable names of layouts*/
+    /** user readable names of layouts */
     public static final String[] LAYOUT_NAMES = {
         "Columns", "Grid", "Tabs", "Hor. Split", "Vert. Split", "Graph",
         "Tree", "Border", "Menu", "Desktop"
@@ -102,11 +104,11 @@ public class ComponentGroup extends ComponentHolder {
     /** all of the layouts */
     public static final String[] LAYOUTS = {
         LAYOUT_GRIDBAG, LAYOUT_GRID, LAYOUT_TABS, LAYOUT_HSPLIT,
-        LAYOUT_VSPLIT, LAYOUT_GRAPH, LAYOUT_TREE, LAYOUT_BORDER,
-        LAYOUT_MENU,
+        LAYOUT_VSPLIT, LAYOUT_GRAPH, LAYOUT_TREE, LAYOUT_BORDER, LAYOUT_MENU,
         LAYOUT_DESKTOP
     };
 
+    /** _more_          */
     public static final List LAYOUT_LIST = Misc.toList(LAYOUTS);
 
     /** type of layout */
@@ -125,11 +127,13 @@ public class ComponentGroup extends ComponentHolder {
     protected JTabbedPane tabbedPane;
 
 
+    /** _more_          */
     private JComboBox menuBox;
 
+    /** _more_          */
     private GuiUtils.CardLayoutPanel menuPanel;
 
-    /** _more_          */
+    /** _more_ */
     private JDesktopPane desktop;
 
 
@@ -164,7 +168,7 @@ public class ComponentGroup extends ComponentHolder {
     /** _more_ */
     private GuiUtils.CardLayoutPanel extraPanel;
 
-    /** _more_          */
+    /** _more_ */
     private JComponent extraPanelHolder;
 
     /** _more_ */
@@ -173,7 +177,7 @@ public class ComponentGroup extends ComponentHolder {
     /** properties widget */
     private JRadioButton rowBtn;
 
-    /** _more_          */
+    /** _more_ */
     private JRadioButton colBtn;
 
 
@@ -251,8 +255,8 @@ public class ComponentGroup extends ComponentHolder {
      * @return gui contents
      */
     public JComponent doMakeContents() {
-        desktop        = new JDesktopPane();
-        tabbedPane     = new JTabbedPane();
+        desktop    = new JDesktopPane();
+        tabbedPane = new JTabbedPane();
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (isLayout(LAYOUT_TABS)) {
@@ -269,26 +273,44 @@ public class ComponentGroup extends ComponentHolder {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param contents _more_
+     *
+     * @return _more_
+     */
     protected JComponent wrapContents(JComponent contents) {
         DropPanel dropPanel = new DropPanel() {
-                public void handleDrop(Object object) {
-                    doDrop(object);
-                }
-                public boolean okToDrop(Object object) {
-                    return dropOk(object);
-                }
-            };
+            public void handleDrop(Object object) {
+                doDrop(object);
+            }
+            public boolean okToDrop(Object object) {
+                return dropOk(object);
+            }
+        };
         dropPanel.add(BorderLayout.CENTER, contents);
         return dropPanel;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param object _more_
+     *
+     * @return _more_
+     */
     public boolean dropOk(Object object) {
         return false;
     }
 
-    protected void doDrop(Object obj) {
-    }
+    /**
+     * _more_
+     *
+     * @param obj _more_
+     */
+    protected void doDrop(Object obj) {}
 
     /**
      * Make the edit menu items
@@ -308,12 +330,13 @@ public class ComponentGroup extends ComponentHolder {
             comp.getPopupMenuItems(compItems);
             compItems.add(GuiUtils.MENU_SEPARATOR);
             compItems.add(GuiUtils.makeMenuItem("Properties...", comp,
-                                               "showProperties"));
+                    "showProperties"));
             subItems.add(GuiUtils.makeMenu(comp.getName(), compItems));
         }
 
 
         if (subItems.size() > 0) {
+            items.add(GuiUtils.MENU_SEPARATOR);
             items.add(GuiUtils.makeMenu("Components", subItems));
         }
 
@@ -390,7 +413,9 @@ public class ComponentGroup extends ComponentHolder {
                                 LAYOUT_NAMES));
         layoutBox = new JComboBox(layoutList);
         Object selectedLayout = TwoFacedObject.findId(layout, layoutList);
-        if(selectedLayout==null) selectedLayout = layoutList.get(0);
+        if (selectedLayout == null) {
+            selectedLayout = layoutList.get(0);
+        }
         layoutBox.setSelectedItem(selectedLayout);
         layoutBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent event) {
@@ -548,21 +573,22 @@ public class ComponentGroup extends ComponentHolder {
      * Layout components
      */
     public void redoLayout() {
+
         if (tabbedPane == null) {
             return;
         }
         desktop.removeAll();
 
-        if(!isLayout(LAYOUT_TABS) && tabbedPane.getTabCount()>0) {
+        if ( !isLayout(LAYOUT_TABS) && (tabbedPane.getTabCount() > 0)) {
             GuiUtils.resetHeavyWeightComponents(tabbedPane);
             tabbedPane.removeAll();
         }
         container.setVisible(false);
         container.removeAll();
 
-        if(displayComponents.size()==0) {
+        if (displayComponents.size() == 0) {
             container.setVisible(true);
-            container.setPreferredSize(new Dimension(100,100));
+            container.setPreferredSize(new Dimension(100, 100));
             return;
         }
         container.setPreferredSize(null);
@@ -575,14 +601,14 @@ public class ComponentGroup extends ComponentHolder {
 
         int lastMenuIdx = 0;
         if (isLayout(LAYOUT_MENU)) {
-            if(menuBox!=null) {
+            if (menuBox != null) {
                 lastMenuIdx = menuBox.getSelectedIndex();
             }
-            menuPanel = new GuiUtils.CardLayoutPanel();            
+            menuPanel = new GuiUtils.CardLayoutPanel();
         }
         Vector menuItems = new Vector();
 
-        List comps = new ArrayList();
+        List   comps     = new ArrayList();
         for (int i = 0; i < displayComponents.size(); i++) {
             ComponentHolder displayComponent =
                 (ComponentHolder) displayComponents.get(i);
@@ -591,14 +617,23 @@ public class ComponentGroup extends ComponentHolder {
                 comp.getParent().remove(comp);
             }
             comp.setVisible(true);
+            GuiUtils.toggleHeavyWeightComponents(comp, true);
             if (isLayout(LAYOUT_TABS)) {
-                tabbedPane.addTab(displayComponent.getName(), displayComponent.getIcon(), comp);
+                tabbedPane.addTab(displayComponent.getName(),
+                                  displayComponent.getIcon(), comp);
             } else if (isLayout(LAYOUT_DESKTOP)) {
+                boolean shouldIconify =
+                    !displayComponent.getInternalFrameShown();
                 JInternalFrame frame = displayComponent.getInternalFrame();
                 frame.getContentPane().add(comp);
                 frame.pack();
                 frame.show();
                 desktop.add(frame);
+                if (shouldIconify) {
+                    try {
+                        //For now don't do this                        frame.setIcon(true);
+                    } catch (Exception ignore) {}
+                }
             } else if (isLayout(LAYOUT_MENU)) {
                 menuPanel.addCard(comp);
                 menuItems.add(displayComponent.getName());
@@ -617,19 +652,29 @@ public class ComponentGroup extends ComponentHolder {
         } else if (isLayout(LAYOUT_MENU)) {
             menuBox = new JComboBox(menuItems);
             menuBox.addItemListener(new ItemListener() {
-                    public void 	itemStateChanged(ItemEvent e) {
-                        if(menuBox.getSelectedIndex()>=0) {
-                            menuPanel.show(menuBox.getSelectedIndex());
-                        }
+                public void itemStateChanged(ItemEvent e) {
+                    if (menuBox.getSelectedIndex() >= 0) {
+                        menuPanel.show(menuBox.getSelectedIndex());
                     }
-                });
-            if(lastMenuIdx>=0 && displayComponents.size()>0 && lastMenuIdx<displayComponents.size()) {
+                }
+            });
+            if ((lastMenuIdx >= 0) && (displayComponents.size() > 0)
+                    && (lastMenuIdx < displayComponents.size())) {
                 menuBox.setSelectedIndex(lastMenuIdx);
                 menuPanel.show(lastMenuIdx);
             }
-            container.add(BorderLayout.CENTER, GuiUtils.topCenter(GuiUtils.left(menuBox),menuPanel));
+            container.add(BorderLayout.CENTER,
+                          GuiUtils.topCenter(GuiUtils.left(menuBox),
+                                             menuPanel));
         } else if (isLayout(LAYOUT_DESKTOP)) {
             container.add(BorderLayout.CENTER, desktop);
+
+            for (int i = 0; i < displayComponents.size(); i++) {
+                ComponentHolder displayComponent =
+                    (ComponentHolder) displayComponents.get(i);
+                GuiUtils.toggleHeavyWeightComponents(displayComponent.getInternalFrame(),
+                                                     displayComponent.getInternalFrame().isSelected());
+            }
         } else if (isLayout(LAYOUT_HSPLIT)) {
             if (comps.size() > 0) {
                 container.add(BorderLayout.CENTER,
@@ -652,7 +697,8 @@ public class ComponentGroup extends ComponentHolder {
                     name = "Component";
                 }
                 treePanel.addComponent(comp.getContents(),
-                                       comp.getCategory(), name,comp.getIcon());
+                                       comp.getCategory(), name,
+                                       comp.getIcon());
             }
             container.add(treePanel);
         } else if (isLayout(LAYOUT_GRIDBAG)) {
@@ -662,6 +708,7 @@ public class ComponentGroup extends ComponentHolder {
         }
         container.setVisible(true);
         container.revalidate();
+
     }
 
 
@@ -986,8 +1033,9 @@ public class ComponentGroup extends ComponentHolder {
      * @param value The new value for Layout
      */
     public void setLayout(String value) {
-        if(value!=null && !LAYOUT_LIST.contains(value)) {
-            throw new IllegalArgumentException("Unknown layout value:" + value);
+        if ((value != null) && !LAYOUT_LIST.contains(value)) {
+            throw new IllegalArgumentException("Unknown layout value:"
+                    + value);
 
         }
         layout = value;

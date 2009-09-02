@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.ui;
 
 
@@ -105,6 +106,8 @@ public class ComponentHolder extends PropertiedThing {
 
     /** _more_ */
     private JComponent innerContents;
+
+    /** _more_          */
     private JComponent outerContents;
 
     /** _more_ */
@@ -123,9 +126,11 @@ public class ComponentHolder extends PropertiedThing {
     private JCheckBox showHeaderCbx;
 
 
-    /** _more_          */
+    /** _more_ */
     private JInternalFrame frame;
 
+    /** _more_          */
+    private boolean internalFrameShown = true;
 
     /**
      * _more_
@@ -155,10 +160,24 @@ public class ComponentHolder extends PropertiedThing {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public ComponentGroup getRoot() {
-        if(parent !=null) return parent.getRoot();
-        if(this instanceof ComponentGroup) return  (ComponentGroup) this;
+        if (parent != null) {
+            return parent.getRoot();
+        }
+        if (this instanceof ComponentGroup) {
+            return (ComponentGroup) this;
+        }
         return null;
+    }
+
+
+    private String myToString() {
+        return toString();
     }
 
 
@@ -170,12 +189,37 @@ public class ComponentHolder extends PropertiedThing {
     public JInternalFrame getInternalFrame() {
         if (frame == null) {
             frame = new JInternalFrame(getName(), true, true, true, true);
+            frame.addInternalFrameListener(new InternalFrameListener(){
+                    public void 	internalFrameClosed(InternalFrameEvent e) {doRemove();}
+                    public void 	internalFrameClosing(InternalFrameEvent e) {}
+                    public void 	internalFrameDeactivated(InternalFrameEvent e){
+                        GuiUtils.toggleHeavyWeightComponents(frame,false);
+                    }
+                    public void 	internalFrameActivated(InternalFrameEvent e) {
+                        GuiUtils.toggleHeavyWeightComponents(frame,true);
+                    }
+                    public void 	internalFrameDeiconified(InternalFrameEvent e){}
+                    public void 	internalFrameIconified(InternalFrameEvent e){}
+                    public void 	internalFrameOpened(InternalFrameEvent e) {}
+                });
+            if ( !internalFrameShown) {
+                try {
+                    frame.setIcon(true);
+                } catch (Exception ignore) {}
+            }
         }
         return frame;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getHierachicalName() {
-        if(getParent()!=null) return getParent().getHierachicalName() + "-" + getName();
+        if (getParent() != null) {
+            return getParent().getHierachicalName() + "-" + getName();
+        }
         return getName();
     }
 
@@ -213,7 +257,7 @@ public class ComponentHolder extends PropertiedThing {
      */
     protected void clearContents() {
         innerContents = null;
-        
+
     }
 
     /**
@@ -235,13 +279,20 @@ public class ComponentHolder extends PropertiedThing {
         return outerContents;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected JComponent doMakeHeader() {
-        displayBtn = GuiUtils.getImageButton("/auxdata/ui/icons/Down16.gif",getClass());
+        displayBtn = GuiUtils.getImageButton("/auxdata/ui/icons/Down16.gif",
+                                             getClass());
         displayBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    showPopup(displayBtn, 0,(int)displayBtn.getBounds().getHeight());
-                }
-            });
+            public void actionPerformed(ActionEvent ae) {
+                showPopup(displayBtn, 0,
+                          (int) displayBtn.getBounds().getHeight());
+            }
+        });
         displayBtn.setPreferredSize(null);
         displayBtn.setText(getName());
         return GuiUtils.inset(GuiUtils.left(displayBtn),
@@ -249,6 +300,13 @@ public class ComponentHolder extends PropertiedThing {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param contents _more_
+     *
+     * @return _more_
+     */
     protected JComponent wrapContents(JComponent contents) {
         return contents;
     }
@@ -282,9 +340,6 @@ public class ComponentHolder extends PropertiedThing {
     public void showPopup(JComponent where, int x, int y) {
         List items = new ArrayList();
         getPopupMenuItems(items);
-        items.add(GuiUtils.MENU_SEPARATOR);
-        items.add(GuiUtils.makeMenuItem("Properties...", this,
-                                        "showProperties"));
         //        addGroupMenuItems(items);
         if (items.size() == 0) {
             return;
@@ -329,7 +384,7 @@ public class ComponentHolder extends PropertiedThing {
             return false;
         }
 
-        if(nameFld!=null) {
+        if (nameFld != null) {
             setName(nameFld.getText());
         }
 
@@ -398,6 +453,10 @@ public class ComponentHolder extends PropertiedThing {
     protected List getPopupMenuItems(List items) {
         items.add(GuiUtils.makeMenuItem("Remove " + getTypeName(), this,
                                         "removeDisplayComponent"));
+        items.add(GuiUtils.MENU_SEPARATOR);
+        items.add(GuiUtils.makeMenuItem("Properties...", this,
+                                        "showProperties"));
+
         return items;
     }
 
@@ -557,6 +616,11 @@ public class ComponentHolder extends PropertiedThing {
         return category;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public ImageIcon getIcon() {
         return null;
     }
@@ -567,6 +631,7 @@ public class ComponentHolder extends PropertiedThing {
      * @param value The new value for ShowHeader
      */
     public void setShowHeader(boolean value) {
+        //        Misc.printStack("showHeader:" + value);
         showHeader = value;
         if (header != null) {
             header.setVisible(getShowHeader());
@@ -620,6 +685,29 @@ public class ComponentHolder extends PropertiedThing {
     public String getBorderLayoutLocation() {
         return borderLayoutLocation;
     }
+
+    /**
+     * Set the InternalFrameShow property.
+     *
+     * @param value The new value for InternalFrameShow
+     */
+    public void setInternalFrameShown(boolean value) {
+        internalFrameShown = value;
+    }
+
+    /**
+     * Get the InternalFrameShow property.
+     *
+     * @return The InternalFrameShow
+     */
+    public boolean getInternalFrameShown() {
+        if (frame != null) {
+            return !frame.isIcon();
+        }
+        return internalFrameShown;
+    }
+
+
 
 
 
