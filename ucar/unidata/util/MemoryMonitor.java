@@ -20,18 +20,20 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.util;
 
 
 import ucar.unidata.util.GuiUtils;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 
 import java.awt.*;
 import java.awt.event.*;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
 
 import javax.swing.*;
 
@@ -82,14 +84,19 @@ public class MemoryMonitor extends JPanel implements Runnable {
     private static long lastTimeRanGC = -1;
 
 
+    /** _more_          */
     private boolean showClock = true;
 
+    /** _more_          */
     private static final Font clockFont = new Font("Dialog", Font.BOLD, 11);
 
-    private static SimpleDateFormat clockFormat = new SimpleDateFormat("HH:mm:ss z");
+    /** _more_          */
+    private static SimpleDateFormat clockFormat =
+        new SimpleDateFormat("HH:mm:ss z");
 
 
 
+    /** _more_          */
     private String memoryLabel = "";
 
     /**
@@ -110,23 +117,39 @@ public class MemoryMonitor extends JPanel implements Runnable {
      *
      */
     public MemoryMonitor(int percentThreshold) {
+        this(percentThreshold, true);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param percentThreshold _more_
+     * @param showTheClock _more_
+     */
+    public MemoryMonitor(int percentThreshold, boolean showTheClock) {
         super(new BorderLayout());
-        label1 = new JLabel("",SwingConstants.RIGHT){
-                public String getToolTipText(MouseEvent me) {
-                    StringBuffer sb  = new StringBuffer();
-                    sb.append("<html><table>");
-                    sb.append("<tr><td align=right><b>Current Date/Time:</b></td><td><i>" + GuiUtils.formatDate(new Date()) +"</i></td></tr>");
-                    sb.append("<tr><td align=right><b>Memory Usage:</b></td><td><i>" + memoryLabel +"</i></td></tr>");
-                    sb.append("</table>");
-                    if(showClock) {
-                        sb.append("Click to show memory usage");
-                    } else {
-                        sb.append("Click to show clock");
-                    }
-                    sb.append("</html>");
-                    return sb.toString();
+        this.showClock = showTheClock;
+        label1         = new JLabel("", SwingConstants.RIGHT) {
+            public String getToolTipText(MouseEvent me) {
+                StringBuffer sb = new StringBuffer();
+                sb.append("<html><table>");
+                sb.append(
+                    "<tr><td align=right><b>Current Date/Time:</b></td><td><i>"
+                    + GuiUtils.formatDate(new Date()) + "</i></td></tr>");
+                sb.append(
+                    "<tr><td align=right><b>Memory Usage:</b></td><td><i>"
+                    + memoryLabel + "</i></td></tr>");
+                sb.append("</table>");
+                if (showClock) {
+                    sb.append("Click to show memory usage");
+                } else {
+                    sb.append("Click to show clock");
                 }
-            };
+                sb.append("</html>");
+                return sb.toString();
+            }
+        };
         label2 = new JLabel("");
 
         Font f = label1.getFont();
@@ -142,7 +165,7 @@ public class MemoryMonitor extends JPanel implements Runnable {
 
         MouseListener ml = new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                if (!SwingUtilities.isRightMouseButton(e)) {
+                if ( !SwingUtilities.isRightMouseButton(e)) {
                     showClock = !showClock;
                     showStats();
                 }
@@ -197,7 +220,7 @@ public class MemoryMonitor extends JPanel implements Runnable {
      * @param event the event
      */
     private void handleMouseEvent(MouseEvent event) {
-        
+
         if (SwingUtilities.isRightMouseButton(event)) {
             popupMenu(event);
             return;
@@ -269,12 +292,11 @@ public class MemoryMonitor extends JPanel implements Runnable {
             usedMemory    = usedMemory / 1000000.0;
             highWaterMark = highWaterMark / 1000000.0;
             String text;
-            memoryLabel = " "  
-                           + fmt.format(usedMemory) + "/"
-                           + fmt.format(highWaterMark) + "/"
-                           + fmt.format(totalMemory) + " " + Msg.msg("MB");
+            memoryLabel = " " + fmt.format(usedMemory) + "/"
+                          + fmt.format(highWaterMark) + "/"
+                          + fmt.format(totalMemory) + " " + Msg.msg("MB");
 
-            if(showClock) {
+            if (showClock) {
                 //                g.setFont(clockFont);
                 Date d = new Date();
                 clockFormat.setTimeZone(GuiUtils.getTimeZone());
