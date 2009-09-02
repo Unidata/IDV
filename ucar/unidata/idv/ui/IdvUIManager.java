@@ -3592,7 +3592,7 @@ public class IdvUIManager extends IdvManager {
 
 
         //TODO: turn off the memory monitor  when this window is closed.
-        MemoryMonitor mm = new MemoryMonitor();
+        MemoryMonitor mm = new MemoryMonitor(80, new Boolean(getStateManager().getPreferenceOrProperty(PROP_SHOWCLOCK,"true")).booleanValue());
         //      mm.setLabelFont (DisplayConventions.getWindowLabelFont ());
         Border paddedBorder =
             BorderFactory.createCompoundBorder(getStatusBorder(),

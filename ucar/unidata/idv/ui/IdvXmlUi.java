@@ -415,7 +415,7 @@ public class IdvXmlUi extends XmlUi {
         }
 
         if (tagName.equals(IdvUIManager.COMP_MEMORYMONITOR)) {
-            MemoryMonitor monitor = new MemoryMonitor();
+            MemoryMonitor monitor = new MemoryMonitor(80, new Boolean(idv.getStateManager().getPreferenceOrProperty(IdvConstants.PROP_SHOWCLOCK,"true")).booleanValue());
             memoryMonitors.add(monitor);
             return monitor;
         }

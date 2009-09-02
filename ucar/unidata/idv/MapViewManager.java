@@ -877,6 +877,8 @@ public class MapViewManager extends NavigatedViewManager {
               new Boolean(getShowBottomLegend()) },
             { "Show Animation Boxes", PREF_SHOWANIMATIONBOXES,
               new Boolean(getShowAnimationBoxes()) },
+            { "Show Clock", IdvConstants.PROP_SHOWCLOCK,
+              new Boolean(getStateManager().getPreferenceOrProperty(IdvConstants.PROP_SHOWCLOCK,"true"))},
             { "Show Overview Map", PREF_SHOWPIP,
               new Boolean(getStore().get(PREF_SHOWPIP, false)) },
         };

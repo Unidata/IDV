@@ -320,6 +320,7 @@ public interface IdvConstants {
     /** Holds the preference for the default bounds for data source holder windows */
     public static final String PROP_DATAHOLDERBOUNDS = "dataholderbounds";
 
+    public static final String PROP_SHOWCLOCK = "idv.monitor.showclock";
 
     public static final String PROP_MINIMUMFRAMECYCLETIME = "idv.minimumframecycletime";
 
