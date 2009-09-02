@@ -1580,11 +1580,11 @@ public class IdvUIManager extends IdvManager {
 
             for(IdvComponentGroup group: groups) {
                 List items = new ArrayList();
+                group.getPopupMenuItems(items);
                 getComponentGroupMenuItems(group, items);
                 JMenu groupMenu = new JMenu("Group: " + group.getName());
                 GuiUtils.makeMenu(groupMenu, items);
-                group.getPopupMenuItems(items);
-                menu.add(groupMenu);
+                menu.insert(groupMenu,0);
             }
         } else if (id.equals(MENU_WINDOWS)) {
             menu.removeAll();
