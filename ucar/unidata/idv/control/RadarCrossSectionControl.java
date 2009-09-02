@@ -158,7 +158,6 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
             //  startLocation = elArray[0];
             //  endLocation   = elArray[1];
             setVerticalAxisRange(new Range(0, 20000));
-            setRequestProperties();
             loadDataFromLine();
             updateLegendLabel();
             updatePositionWidget();
@@ -305,6 +304,7 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
             return;
         }
 
+        setRequestProperties();
         EarthLocation[] elArray = getLineCoords();
         startLocation = elArray[0];
         endLocation   = elArray[1];
