@@ -542,6 +542,8 @@ public class IdvUIManager extends IdvManager {
             getProperty("idv.animation.bigicon", false);
 
 
+        GuiUtils.setIconsInMenus(getIdv().getStateManager().getPreferenceOrProperty(
+                                                                                    "idv.ui.iconsinmenus","true").equals("true"));
         UIDefaults defaults = UIManager.getDefaults();
         JLabel     tmp      = new JLabel("");
 
