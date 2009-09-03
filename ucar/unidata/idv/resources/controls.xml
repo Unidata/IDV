@@ -290,6 +290,7 @@ Since this is confusing and needs more work lets remove this for now
 -->
 
 
+<!--
   <control
      id="multidisplay.standalone"
      categories="none"
@@ -298,6 +299,7 @@ Since this is confusing and needs more work lets remove this for now
      canstandalone="true"
      label="Multiple Displays"
      properties="windowVisible=true;"/>
+-->
 
 
   <control
@@ -786,6 +788,7 @@ Since this is confusing and needs more work lets remove this for now
 
   <control
      id="rangerings"
+     icon="/auxdata/ui/icons/rangerings.png"
      categories="none"
      class="ucar.unidata.idv.control.RadarGridControl"
      description="Range rings and radials"
@@ -798,6 +801,7 @@ Since this is confusing and needs more work lets remove this for now
 
   <control
      id="rangeandbearing"
+     icon="/auxdata/ui/icons/RangeAndBearing16.gif"
      categories="none"
      class="ucar.unidata.idv.control.RangeAndBearingControl"
      description="Range and Bearing between two points"
@@ -809,6 +813,7 @@ Since this is confusing and needs more work lets remove this for now
 
   <control
      id="animationtext"
+     icon="/auxdata/ui/icons/clock.png"
      categories="none"
      class="ucar.unidata.idv.control.AnimationTextControl"
      description="Synchronized text display"
@@ -834,6 +839,7 @@ Since this is confusing and needs more work lets remove this for now
      categories="none"
      class="ucar.unidata.idv.control.NoteControl"
      canstandalone="true"
+     icon="/auxdata/ui/icons/Text16.gif"
      label="Text Note"
      displaycategory="General"
      properties="windowVisible=true;expandedInTabs=true;showInTabs=false"/>
@@ -850,6 +856,7 @@ Since this is confusing and needs more work lets remove this for now
 
   <control
      id="curvecontrol"
+     icon="/auxdata/ui/icons/pencil.png"
      categories="none"
      class="ucar.unidata.idv.control.DrawingControl"
      label="Drawing Control"
@@ -861,6 +868,7 @@ Since this is confusing and needs more work lets remove this for now
      xxxcategories="xgrf"
      class="ucar.unidata.idv.control.DrawingControl"
      canstandalone="true"
+     icon="/auxdata/ui/icons/pencil.png"
      label="Drawing Control"
      displaycategory="General"
      properties="windowVisible=true;showInTabs=false;showFronts=true;"/>
@@ -900,6 +908,7 @@ Since this is confusing and needs more work lets remove this for now
      categories="none"
      class="ucar.unidata.idv.control.TransectDrawingControl"
      canstandalone="true"
+     icon="/auxdata/ui/icons/transect.png"
      label="Transect Drawing Control"
      displaycategory="General"
      properties="windowVisible=true;showInTabs=false;">
@@ -912,6 +921,7 @@ Since this is confusing and needs more work lets remove this for now
      id="locationindicatorcontrol"
      categories="none"
      class="ucar.unidata.idv.control.LocationIndicatorControl"
+     icon="/auxdata/ui/icons/LocationIndicator16.gif"
      canstandalone="true"
      label="Location Indicator"
      displaycategory="General"
@@ -942,6 +952,7 @@ Since this is confusing and needs more work lets remove this for now
 
   <control
      id="imagemoviecontrol"
+     icon="/auxdata/ui/icons/webcam.png"
      class="ucar.unidata.idv.control.ImageMovieControl"
      canstandalone="true"
      label="WebCam Display"
@@ -974,6 +985,7 @@ Example of how to make an image movie control with a fixed table of contents
   <control
      id="worldwind"
      categories="none"
+     icon="/auxdata/ui/icons/world_loc.png"
      class="ucar.unidata.idv.control.WorldWindControl"
      label="WorldWind Locations"
      canstandalone="true"

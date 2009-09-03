@@ -2683,6 +2683,10 @@ public class IdvUIManager extends IdvManager {
             ControlDescriptor cd =
                 (ControlDescriptor) controlDescriptors.get(i);
             mi = new JMenuItem(cd.getLabel());
+            String icon = cd.getIcon();
+            if(icon!=null) {
+                GuiUtils.setIcon(mi,icon);
+            }
             mi.addActionListener(new ObjectListener(cd) {
                 public void actionPerformed(ActionEvent ev) {
                     getIdv().doMakeControl(new ArrayList(),
