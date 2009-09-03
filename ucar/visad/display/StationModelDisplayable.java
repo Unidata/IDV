@@ -22,10 +22,13 @@
 
 package ucar.visad.display;
 
+import org.w3c.dom.Element;
 
 import org.python.core.*;
 import org.python.util.*;
 
+import ucar.unidata.xml.XmlUtil;
+import ucar.unidata.data.gis.KmlUtil;
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DerivedDataChoice;
 import ucar.unidata.data.point.PointOb;
@@ -61,12 +64,13 @@ import visad.meteorology.WeatherSymbols;
 
 
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.util.zip.*;
+import java.io.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.*;
+import java.awt.geom.*;
 
 import java.rmi.RemoteException;
 
@@ -638,6 +642,49 @@ public class StationModelDisplayable extends DisplayableData {
 
 
 
+
+
+    private StringBuffer kmlSB;
+    private boolean writingKmz = false;
+    private ZipOutputStream kmzZos;
+    private int kmzObCounter = 0;
+    private Element kmlRoot;
+    private Element kmlDoc;
+
+    public void writeKmzFile(File f, FieldImpl data) throws Exception {
+        try {
+            kmzObCounter = 0;
+            kmzZos =
+                new ZipOutputStream(new FileOutputStream(f));
+            writingKmz= true;
+            kmlRoot = KmlUtil.kml("Point Observations");
+            kmlDoc = KmlUtil.document(kmlRoot,"Point Observations");
+            isTimeSequence = ucar.unidata.data.grid.GridUtil.isTimeSequence(data);
+
+            kmlSB = new StringBuffer();
+            if (isTimeSequence) {
+                Set     timeSet     = data.getDomainSet();
+                for (int i = 0; i < timeSet.getLength(); i++) {
+                    makeShapesFromPointObsField(
+                                                (FieldImpl) data.getSample(
+                                                                           i));
+                } 
+            } else {
+                makeShapesFromPointObsField(data);
+            } 
+            kmzZos.putNextEntry(new ZipEntry("observations.kml"));
+            byte[] bytes = XmlUtil.toString(kmlRoot,false).getBytes();
+            kmzZos.write(bytes, 0, bytes.length);
+            kmzZos.closeEntry();
+        } finally {
+            kmlSB = null;
+            writingKmz= false;
+            kmzZos.close();
+        }
+    }
+
+
+
     /**
      * create shapes for an individual time step.
      *
@@ -648,7 +695,7 @@ public class StationModelDisplayable extends DisplayableData {
      * @throws RemoteException  Java RMI failure.
      */
     private FieldImpl makeShapesFromPointObsField(FieldImpl data)
-            throws VisADException, RemoteException {
+            throws Exception {
 
         Set  set = data.getDomainSet();
         Data tmp = data.getSample(0);
@@ -700,6 +747,7 @@ public class StationModelDisplayable extends DisplayableData {
         int       length        = set.getLength();
         TupleType dataTupleType = null;
         Real      missingAlt    = null;
+        boolean show=false;
         for (int obIdx = 0; obIdx < length; obIdx++) {
             PointOb ob = (PointOb) data.getSample(obIdx);
             if (typeNames == null) {
@@ -708,11 +756,73 @@ public class StationModelDisplayable extends DisplayableData {
                 typeNames = getTypeNames(tType);
             }
 
-            List obShapes = makeShapes(ob, typeNames, symbols,
+            List<VisADGeometryArray> obShapes = makeShapes(ob, typeNames, symbols,
                                        pointOnSymbols, offsetFlipPoints);
             if (obShapes == null) {
                 continue;
             }
+            if(writingKmz) {
+                BufferedImage image = new BufferedImage(80,80, BufferedImage.TYPE_INT_ARGB);
+                Graphics g = image.getGraphics();
+                Color bg = new Color(Color.white.getRed(),
+                                     Color.white.getGreen(),
+                                     Color.white.getBlue(),
+                                     180);
+                g.setColor(bg);
+                g.fillRect(0,0,80,80);
+                paint((Graphics2D)g, obShapes);
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ucar.unidata.ui.ImageUtils.writeImageToFile(image, "icon.png", bos,1.0f);
+                String file = "kmzicon" + (kmzObCounter)+".png";
+                kmzZos.putNextEntry(new ZipEntry(file));
+                byte[] bytes = bos.toByteArray();
+                kmzZos.write(bytes, 0, bytes.length);
+                kmzZos.closeEntry();
+                String styleId = "obicon" + kmzObCounter;
+                StringBuffer descSB = new StringBuffer();
+                descSB.append("<h3>Observation</h3>");
+                descSB.append("<table>");
+                Tuple     tuple = (Tuple) ob.getData();
+                TupleType tType          = (TupleType) tuple.getType();
+                String[] names = getTypeNames(tType);
+                Data[] datum = tuple.getComponents();
+                
+                for(int i=0;i<names.length;i++) {
+                    descSB.append("<tr><td align=right><b>");
+                    descSB.append(names[i]);
+
+                    descSB.append(":</b></td><td>");
+                    if(datum[i] instanceof Real) {
+                        Real r = (Real) datum[i];
+                        if(r.isMissing()) {
+                            descSB.append("--");
+                        } else {
+                            descSB.append(""+r);
+                        }
+                        Unit u  =r.getUnit();
+                        if(u!=null) {
+                            String us = u.toString();
+                            if(us.length()>0) {
+                                descSB.append(" [" + us +"]");
+                            }
+                        }
+                    } else {
+                        descSB.append(datum[i]+"");
+                    }
+                    descSB.append("</td></tr>");
+                }
+                
+
+
+
+                descSB.append("</table>");
+                KmlUtil.placemark(kmlDoc, "",descSB.toString(),ob.getEarthLocation(), styleId);
+                KmlUtil.iconstyle(kmlDoc, styleId,file,2.0);
+                kmzObCounter++;
+                //                show = ucar.unidata.util.GuiUtils.showOkCancelDialog(null,null, new JLabel(new ImageIcon(image)), null);
+            }
+
+
             for (int j = 0; j < obShapes.size(); j++) {
                 Data location = (useAltitude
                                  ? ob.getEarthLocation()
@@ -788,7 +898,7 @@ public class StationModelDisplayable extends DisplayableData {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    private List makeShapes(PointOb ob, String[] typeNames, List symbols,
+    private List<VisADGeometryArray> makeShapes(PointOb ob, String[] typeNames, List symbols,
                             List pointOnSymbols, List offsetFlipPoints)
             throws VisADException, RemoteException {
 
@@ -1029,17 +1139,18 @@ public class StationModelDisplayable extends DisplayableData {
                         shapeIndex++) {
                     if (shapes[shapeIndex] == null) {
                         continue;
+
                     }
-                    /*
-                    double lat = ob.getEarthLocation().getLatitude().getValue(
+                    double lat = 90-ob.getEarthLocation().getLatitude().getValue(
                                                                               CommonUnit.degree);
                     double lon = ob.getEarthLocation().getLongitude().getValue(
                                                                               CommonUnit.degree);
 
-                    ShapeUtility.rotateX(shapes[shapeIndex],
-                                         (float)lat);
+                    //                    ShapeUtility.rotateX(shapes[shapeIndex],
+                    //                                         (float)Math.toRadians(lat));
+                    //                    ShapeUtility.rotateX(shapes[shapeIndex],
+                    //                                         (float)Math.toRadians(lat));
 
-                                         */
                     for (int i = 0; i < RotateInfo.TYPES.length; i++) {
                         RotateInfo info =
                             metSymbol.getRotateInfo(RotateInfo.TYPES[i]);
@@ -1295,7 +1406,7 @@ public class StationModelDisplayable extends DisplayableData {
                                           : ""), e);
         }
 
-        List allShapes = new ArrayList();
+        List<VisADGeometryArray> allShapes = new ArrayList<VisADGeometryArray>();
         //Try to merge them. But, if any of the  Visad arrays have different
         //state (normals,colors, etc.) there will be an error. We track that with the 
         //tryMerge flag.
@@ -1335,6 +1446,43 @@ public class StationModelDisplayable extends DisplayableData {
         return allShapes;
     }
 
+
+
+
+
+    private void paint(Graphics2D g, List<VisADGeometryArray> shapes) {
+        for(VisADGeometryArray shape: shapes) {
+            int my=40;
+            int mx = 40;
+            float[] pts   = shape.coordinates;
+            int count = shape.vertexCount;
+            byte[]colors = shape.colors;
+            int jinc = (colors.length == pts.length) ? 3 : 4;
+            //            System.err.println ("shape:" + shape.getClass().getName() + " pts:" + pts.length +" colors:" + colors.length);
+            float scale = 250.0f;
+            if (shape instanceof VisADLineArray) {
+                int j = 0;
+                for (int i=0; i<3*count; i += 6) {
+                  g.setColor(new Color(
+                    (((colors[j] < 0) ? (((int) colors[j]) + 256) :
+                                        ((int) colors[j]) ) +
+                     ((colors[j+jinc] < 0) ? (((int) colors[j+jinc]) + 256) :
+                                        ((int) colors[j+jinc]) ) ) / 2,
+                    (((colors[j+1] < 0) ? (((int) colors[j+1]) + 256) :
+                                        ((int) colors[j+1]) ) +
+                     ((colors[j+jinc+1] < 0) ? (((int) colors[j+jinc+1]) + 256) :
+                                        ((int) colors[j+jinc+1]) ) ) / 2,
+                    (((colors[j+2] < 0) ? (((int) colors[j+2]) + 256) :
+                                        ((int) colors[j+2]) ) +
+                     ((colors[j+jinc+2] < 0) ? (((int) colors[j+jinc+2]) + 256) :
+                                        ((int) colors[j+jinc+2]) ) ) / 2 ));
+                  j += 2 * jinc;
+                  g.draw(new Line2D.Float(mx+scale*pts[i], my-scale*pts[i+1],
+                                           mx+scale*pts[i+3], my-scale*pts[i+4]));
+                }
+            }
+        }
+    }
 
 
     /**
