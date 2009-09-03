@@ -2328,7 +2328,10 @@ public class CDMRadarAdapter implements RadarAdapter {
                     int cnt = 0;
                     for(int rj = 0; rj < rn; rj++ ) {
                         if(gateIdx < numberOfBin && gateIdx>0) {
-                            rd = rd + rayData[ti][ray+ rj][gateIdx];
+                            int rk = ray+ rj;
+                            if(rk >= 360)
+                                rk = rk -360;
+                            rd = rd + rayData[ti][rk][gateIdx];
                             cnt++;
                         }
                     }
