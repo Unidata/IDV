@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -95,7 +96,8 @@ public class TextPointDataSource extends PointDataSource {
     public static final String PROP_HEADER_SKIP = "data.textpoint.skip";
 
     /** property id for how many rows to skip */
-    public static final String PROP_HEADER_SKIPPATTERN = "data.textpoint.skippattern";
+    public static final String PROP_HEADER_SKIPPATTERN =
+        "data.textpoint.skippattern";
 
     /** property id for the whole header blob, map and params */
     public static final String PROP_HEADER_BLOB = "data.textpoint.blob";
@@ -110,6 +112,7 @@ public class TextPointDataSource extends PointDataSource {
     /** skip rows */
     private int skipRows = 0;
 
+    /** _more_          */
     private String skipPattern;
 
 
@@ -171,8 +174,10 @@ public class TextPointDataSource extends PointDataSource {
     /** widget panel */
     JComponent widgetPanel;
 
+    /** _more_          */
     private JTextField skipPatternFld;
 
+    /** _more_          */
     private JTextField skipCntFld;
 
     /** apply names button */
@@ -206,6 +211,20 @@ public class TextPointDataSource extends PointDataSource {
     }
 
     /**
+     * Can this datasource do the geoselection subsetting and decimation
+     *
+     * @return _can do geo subsetting
+     *
+     * @param source _more_
+     *
+     * @throws VisADException _more_
+     */
+    /*    public boolean canDoGeoSelection() {
+        return true;
+        }*/
+
+
+    /**
      * Create a TextPointDataSource from the path name
      *
      * @param source  path to source data
@@ -223,7 +242,6 @@ public class TextPointDataSource extends PointDataSource {
      *
      * @param descriptor    data source descriptor
      * @param sources       List of sources of data (filename/URL)
-     * @param name          The name to use
      * @param properties    extra properties for initialization
      *
      * @throws VisADException   problem creating the data
@@ -352,21 +370,48 @@ public class TextPointDataSource extends PointDataSource {
                              boolean sampleIt,
                              boolean showAttributeGuiIfNeeded)
             throws Exception {
-        String source = getSource(dataChoice);
-        String contents;
-        String delimiter;
-        if (source.endsWith(".xls")) {
-            contents  = DataUtil.xlsToCsv(source);
-            delimiter = ",";
-        } else {
-            contents  = IOUtil.readContents(source, getClass());
-            delimiter = TextAdapter.getDelimiter(source);
-        }
-
+        String source    = getSource(dataChoice);
+        String contents  = getContents(source);
+        String delimiter = getDelimiter(source);
         return makeObs(contents, delimiter, subset, bbox, trackParam,
                        sampleIt, showAttributeGuiIfNeeded);
     }
 
+
+
+    /**
+     * Get the delimiter to use for the given file. If its xls then use ','
+     *
+     * @param source source file
+     *
+     * @return delimiter to use
+     */
+    protected String getDelimiter(String source) {
+        if (source.endsWith(".xls")) {
+            return ",";
+        } else {
+            return TextAdapter.getDelimiter(source);
+        }
+    }
+
+
+    /**
+     * Read the given source file and return the text contents of it.
+     * If the source file is a xls file then convert to csv text
+     *
+     * @param sourceFile The source file (or url)
+     *
+     * @return The contents
+     *
+     * @throws Exception On badness
+     */
+    protected String getContents(String sourceFile) throws Exception {
+        if (sourceFile.endsWith(".xls")) {
+            return DataUtil.xlsToCsv(sourceFile);
+        } else {
+            return IOUtil.readContents(sourceFile, getClass());
+        }
+    }
 
 
     /**
@@ -408,9 +453,13 @@ public class TextPointDataSource extends PointDataSource {
                     skipRows = getProperty(PROP_HEADER_SKIP, skipRows);
                 }
 
-                if(skipPattern == null) {
-                    skipPattern = getProperty(PROP_HEADER_SKIPPATTERN,(String)null);
-                    if(skipPattern!=null && skipPattern.length()==0) skipPattern = null;
+                if (skipPattern == null) {
+                    skipPattern = getProperty(PROP_HEADER_SKIPPATTERN,
+                            (String) null);
+                    if ((skipPattern != null)
+                            && (skipPattern.length() == 0)) {
+                        skipPattern = null;
+                    }
                 }
 
 
@@ -427,7 +476,8 @@ public class TextPointDataSource extends PointDataSource {
                 }
 
                 ta = new TextAdapter(getInputStream(contents), delimiter,
-                                     map, params, dataProperties, sampleIt, skipPattern);
+                                     map, params, dataProperties, sampleIt,
+                                     skipPattern);
             } catch (visad.data.BadFormException bfe) {
                 //Probably don't have the header info
                 //If we already have a map and params then we have problems
@@ -443,7 +493,8 @@ public class TextPointDataSource extends PointDataSource {
                     return null;
                 }
                 ta = new TextAdapter(getInputStream(contents), delimiter,
-                                     map, params, dataProperties, sampleIt, skipPattern);
+                                     map, params, dataProperties, sampleIt,
+                                     skipPattern);
             }
             try {
                 Data d = ta.getData();
@@ -558,8 +609,8 @@ public class TextPointDataSource extends PointDataSource {
         //            lbl.setText("HELLO THERE");
         //            return;
         //        }
-        if(skipCntFld!=null) {
-            skipCntFld.setText(""+index);
+        if (skipCntFld != null) {
+            skipCntFld.setText("" + index);
         }
 
         StringBuffer sb =
@@ -638,7 +689,8 @@ public class TextPointDataSource extends PointDataSource {
         }
 
 
-        applySavedMetaData(new Metadata(skipRows, skipPattern, metaDataFields));
+        applySavedMetaData(new Metadata(skipRows, skipPattern,
+                                        metaDataFields));
         GuiUtils.tmpInsets = new Insets(5, 5, 0, 0);
         double[]   stretch = { 0.0, 1.0, 0.5, 0.0, 0.5 };
         JComponent panel = GuiUtils.doLayout(comps, 5, stretch,
@@ -741,17 +793,19 @@ public class TextPointDataSource extends PointDataSource {
                                        lineLbl);
 
 
-            skipCntFld = new JTextField("",4);
-            skipPatternFld = new JTextField((skipPattern!=null?skipPattern:""),20);
+            skipCntFld     = new JTextField("", 4);
+            skipPatternFld = new JTextField(((skipPattern != null)
+                                             ? skipPattern
+                                             : ""), 20);
             skipPatternFld.setToolTipText("Pattern to use to skip lines");
-            JComponent topComp = GuiUtils.leftRight(new JLabel("Start Line: "),
-                                                    GuiUtils.hbox(
-                                                                  new JLabel("Skip Pattern: "),
-                                                                  skipPatternFld));
-                                                    
-                                                    
-            JComponent skipContents =
-                GuiUtils.topCenter(topComp, skipInner);
+            JComponent topComp = GuiUtils.leftRight(
+                                     new JLabel("Start Line: "),
+                                     GuiUtils.hbox(
+                                         new JLabel("Skip Pattern: "),
+                                         skipPatternFld));
+
+
+            JComponent skipContents = GuiUtils.topCenter(topComp, skipInner);
 
 
             widgetPanel = new JPanel(new BorderLayout());
@@ -845,13 +899,14 @@ public class TextPointDataSource extends PointDataSource {
             String xml = DataManager.getDatasourceXml(lastType, lastLabel,
                              getClass(), Misc.newHashtable(new Object[] {
                 PROP_HEADER_MAP, tmp[0], PROP_HEADER_PARAMS, tmp[1],
-                PROP_HEADER_SKIP, "" + skipRows, 
-                PROP_HEADER_SKIPPATTERN, skipPattern!=null?skipPattern:"",
-                "dataistrajectory",
-                trajectory, PROP_HEADER_BLOB,
-                getDataContext().getIdv().encodeObject(new Metadata(skipRows, skipPattern,
-                    metaDataFields), false)
-                                 }), new String[]{DataManager.ATTR_DOESMULTIPLES,"true"});
+                PROP_HEADER_SKIP, "" + skipRows, PROP_HEADER_SKIPPATTERN,
+                (skipPattern != null)
+                ? skipPattern
+                : "", "dataistrajectory", trajectory,
+                PROP_HEADER_BLOB,
+                getDataContext().getIdv().encodeObject(new Metadata(skipRows,
+                    skipPattern, metaDataFields), false)
+            }), new String[] { DataManager.ATTR_DOESMULTIPLES, "true" });
             getDataContext().getIdv().getPluginManager().addText(xml,
                     lastType + "datasource.xml");
         } catch (Exception exc) {
@@ -941,7 +996,8 @@ public class TextPointDataSource extends PointDataSource {
         String tmpSkipPattern = skipPatternFld.getText().trim();
 
         pointMetaDataMap.put(prefname,
-                             new Metadata(skipRows, tmpSkipPattern, metaDataFields));
+                             new Metadata(skipRows, tmpSkipPattern,
+                                          metaDataFields));
         getDataContext().getIdv().getStore().putEncodedFile(PREF_METADATAMAP,
                 pointMetaDataMap);
     }
@@ -1040,7 +1096,7 @@ public class TextPointDataSource extends PointDataSource {
      * @return the metadata header
      */
     private String[] makeMetadataHeader() {
-        if(skipPatternFld!=null) {
+        if (skipPatternFld != null) {
             skipPattern = skipPatternFld.getText().trim();
         }
         String map    = "(index)->(";
@@ -1143,9 +1199,11 @@ public class TextPointDataSource extends PointDataSource {
         if (metadata.getSkipRows() >= 0) {
             skipRows = metadata.getSkipRows();
         }
-        if(skipPatternFld!=null) {
+        if (skipPatternFld != null) {
             skipPattern = metadata.getSkipPattern();
-            skipPatternFld.setText(skipPattern==null?"":skipPattern);
+            skipPatternFld.setText((skipPattern == null)
+                                   ? ""
+                                   : skipPattern);
         }
 
         setLineText(lineLbl, skipRows, lines);
@@ -2267,6 +2325,7 @@ public class TextPointDataSource extends PointDataSource {
         /** Number of rows to skip */
         private int skipRows = -1;
 
+        /** _more_          */
         private String skipPattern;
 
 
@@ -2282,12 +2341,13 @@ public class TextPointDataSource extends PointDataSource {
          * ctor
          *
          * @param rows rows to skip
+         * @param skipPattern _more_
          * @param items metadata items
          */
         public Metadata(int rows, String skipPattern, List items) {
-            this.skipRows = rows;
-            this.skipPattern  = skipPattern;
-            this.items    = items;
+            this.skipRows    = rows;
+            this.skipPattern = skipPattern;
+            this.items       = items;
         }
 
         /**
@@ -2330,20 +2390,20 @@ public class TextPointDataSource extends PointDataSource {
 
 
         /**
-           Set the SkipPattern property.
-
-           @param value The new value for SkipPattern
-        **/
-        public void setSkipPattern (String value) {
+         *  Set the SkipPattern property.
+         *
+         *  @param value The new value for SkipPattern
+         */
+        public void setSkipPattern(String value) {
             this.skipPattern = value;
         }
 
         /**
-           Get the SkipPattern property.
-
-           @return The SkipPattern
-        **/
-        public String getSkipPattern () {
+         *  Get the SkipPattern property.
+         *
+         *  @return The SkipPattern
+         */
+        public String getSkipPattern() {
             return this.skipPattern;
         }
 
