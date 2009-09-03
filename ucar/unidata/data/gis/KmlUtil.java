@@ -96,6 +96,7 @@ public class KmlUtil {
     public static final String TAG_TOPFOV = "topFov";
     public static final String TAG_URL = "Url";
     public static final String TAG_VIEWVOLUME = "ViewVolume";
+    public static final String TAG_SCALE = "scale";
     public static final String TAG_VIEWBOUNDSCALE = "viewBoundScale";
     public static final String TAG_VISIBLE = "visible";
     public static final String TAG_WEST = "west";
@@ -210,6 +211,18 @@ public class KmlUtil {
     }
 
 
+
+    public  static Element iconstyle(Element parent, String id, String url, double scale) {
+        Element style = style(parent, id);
+        Element iconstyle = makeElement(style, TAG_ICONSTYLE);
+        Element icon = makeElement(iconstyle, TAG_ICON);
+        Element href = makeText(icon, TAG_HREF,url);
+        makeText(iconstyle, TAG_SCALE,""+scale);
+
+        return style;
+    }
+
+
     public  static Element linestyle(Element parent, String id, Color color, int width) {
         Element style = style(parent, id);
         Element linestyle = makeElement(style, TAG_LINESTYLE);
@@ -295,9 +308,10 @@ public class KmlUtil {
 
 
 
-    public static Element placemark(Element parent, String name, String description, visad.georef.EarthLocation el, String style) {
-        return placemark(parent, name, description, el.getLatitude().getValue(),
-                         el.getLongitude().getValue(),
+    public static Element placemark(Element parent, String name, String description, visad.georef.EarthLocation el, String style) throws Exception {
+        return placemark(parent, name, description, 
+                         el.getLatitude().getValue(),
+                         el.getLongitude().getValue(visad.CommonUnit.degree),
                          (el.getAltitude()!=null?el.getAltitude().getValue():0), style);
     }
 
