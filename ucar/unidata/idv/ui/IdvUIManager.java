@@ -3965,12 +3965,33 @@ public class IdvUIManager extends IdvManager {
         String  path     = null;
         String  skinName = null;
 
-        //First try to find the the default skin
-        for (int i = 0; (i < skins.size()) && (root == null); i++) {
-            if (Misc.equals(skins.getProperty("default", i), "true")) {
-                root     = skins.getRoot(i);
-                path     = skins.get(i).toString();
-                skinName = getWindowTitleFromSkin(i);
+        path = getIdv().getProperty("idv.ui.defaultskin",(String)null);
+        if(path != null) {
+            path = path.trim();
+        }
+
+        if(path != null&& path.length()>0) {
+            try {
+            root = XmlUtil.getRoot(path,getClass());
+            skinName = getStateManager().getTitle();
+            String tmp = XmlUtil.getAttribute(root,"name",(String)null);
+            if(tmp==null) 
+                tmp = IOUtil.stripExtension(IOUtil.getFileTail(path));
+            skinName = skinName + " - " + tmp;
+            } catch(Exception exc) {
+                logException("createNewWindow", exc);
+            }
+        }
+
+
+        if(root == null) {
+            //First try to find the default skin
+            for (int i = 0; (i < skins.size()) && (root == null); i++) {
+                if (Misc.equals(skins.getProperty("default", i), "true")) {
+                    root     = skins.getRoot(i);
+                    path     = skins.get(i).toString();
+                    skinName = getWindowTitleFromSkin(i);
+                }
             }
         }
 
