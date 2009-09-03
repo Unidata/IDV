@@ -87,6 +87,7 @@ import visad.georef.MapProjection;
 import visad.util.BaseRGBMap;
 import visad.util.ColorPreview;
 
+import java.io.File;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
@@ -2836,12 +2837,38 @@ public class StationModelControl extends ObsDisplayControl {
         if (pdi != null) {
             items.add(GuiUtils.makeMenuItem("Export to NetCDF...", this,
                                             "exportAsNetcdf", null, true));
+
+            items.add(GuiUtils.makeMenuItem("Export to KMZ...", this,
+                                            "exportAsKmz", null, true));
         }
 
         if ((table != null) && (table.getModel().getRowCount() > 0)) {
             items.add(GuiUtils.makeMenuItem("Export Selected Observation...",
                                             this, "exportAsCsv"));
         }
+    }
+
+
+    public void exportAsKmz() {
+        try {
+            JComboBox publishCbx =
+                getIdv().getPublishManager().getSelector("kmz.export");
+            String filename =
+                FileManager.getWriteFile(FileManager.FILTER_KMZ,
+                                         FileManager.SUFFIX_KMZ, ((publishCbx != null)
+                                                                  ? GuiUtils.top(publishCbx)
+                                                                  : null));
+            if (filename == null) {
+                return;
+            }
+            
+            myDisplay.writeKmzFile(new File(filename), currentStationData);
+            getIdv().getPublishManager().publishContent(filename,
+                                                        null, publishCbx);
+        } catch (Exception exc) {
+            logException("Exporting point data to kmz", exc);
+        }
+
     }
 
 
