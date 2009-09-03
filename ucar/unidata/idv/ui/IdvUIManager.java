@@ -1,7 +1,5 @@
 /*
- * $Id: IdvUIManager.java,v 1.353 2007/08/22 11:59:17 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright  1997-2009 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -19,9 +17,6 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-
 
 
 
@@ -2482,7 +2477,7 @@ public class IdvUIManager extends IdvManager {
         showWaitCursor();
         LogUtil.message("Loading bundle: " + bundle.getName());
         getPersistenceManager().decodeXmlFile(bundle.getUrl(),
-                bundle.getName(), true);
+                bundle.getName(), (bundle.getType() == SavedBundle.TYPE_FAVORITE));
         LogUtil.message("");
         showNormalCursor();
     }
