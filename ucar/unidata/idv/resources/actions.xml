@@ -20,7 +20,7 @@
      action="jython:idv.getIdvUIManager().showOrCreateDataSelector();"/>
   <action
      id="show.dashboard"
-     image="/auxdata/ui/icons/application_home.png"
+     image="/auxdata/ui/icons/controller.png"
      description="Show dashboard"
      group="User Interface"
      action="jython:idv.getIdvUIManager().showDashboard();"/>

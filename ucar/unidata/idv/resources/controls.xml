@@ -137,7 +137,7 @@ example:
      class="ucar.unidata.idv.control.RadarCrossSectionControl"
      label="Radar Cross Section"
      displaycategory="Radar Displays"
-     properties="smoothed=false;windowVisible=true;allowSmoothing=true;setAutoScaleYAxis=false"/>
+     properties="smoothed=false;windowVisible=true;allowSmoothing=true;"/>
   <control
      id="rhisweep3d"
      categories="RHISWEEP"
