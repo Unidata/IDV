@@ -146,7 +146,7 @@ public class NavigatedDisplayToolBar extends JToolBar {
         });
 
         // reset button
-        button = makeButton("/auxdata/ui/icons/magnifier.png",
+        button = makeButton("/auxdata/ui/icons/house.png",
                             "Reset Display Projection");
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
