@@ -27,6 +27,9 @@
 
 
 
+
+
+
 package ucar.unidata.util;
 
 
@@ -50,6 +53,8 @@ import java.lang.reflect.*;
 
 import java.net.URL;
 
+import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -59,7 +64,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Vector;
-import java.text.SimpleDateFormat;
 
 import javax.imageio.*;
 import javax.imageio.stream.ImageOutputStream;
@@ -207,6 +211,22 @@ public class GuiUtils extends LayoutUtil {
     private static Hashtable imageCache = new Hashtable();
 
 
+    /** Do we put the icons in the menus      */
+    private static boolean setIconsInMenus = true;
+
+
+    /** default icon size */
+    private static int dfltIconSize = -1;
+
+    /** The default timezone to use for formatting */
+    private static TimeZone defaultTimeZone;
+
+
+    /** Default date format */
+    private static SimpleDateFormat defaultDateFormat =
+        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+
+
     /**
      * Dummy ctor for doclint
      */
@@ -240,28 +260,24 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
-    /** default icon size */
-    private static int dfltIconSize = -1;
 
-    /** _more_          */
-    private static TimeZone defaultTimeZone;
 
-    private static SimpleDateFormat defaultDateFormat =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+
 
 
     /**
-     * _more_
+     * Set the default timezone used for formatting
      *
-     * @param tz _more_
+     * @param tz timezone
      */
     public static void setTimeZone(TimeZone tz) {
         defaultTimeZone = tz;
     }
 
     /**
-     * _more_
+     * Get the default timezone used for formatting
      *
-     * @return _more_
+     * @return timezone
      */
     public static TimeZone getTimeZone() {
         if (defaultTimeZone == null) {
@@ -270,11 +286,23 @@ public class GuiUtils extends LayoutUtil {
         return defaultTimeZone;
     }
 
+    /**
+     * Set the default date format
+     *
+     * @param fmt date format string
+     */
     public static void setDefaultDateFormat(String fmt) {
-        defaultDateFormat =  new SimpleDateFormat(fmt);
+        defaultDateFormat = new SimpleDateFormat(fmt);
         defaultDateFormat.setTimeZone(defaultTimeZone);
     }
 
+    /**
+     * Format the date with the default date format and timezone
+     *
+     * @param dttm date
+     *
+     * @return formatted date
+     */
     public static String formatDate(Date dttm) {
         return defaultDateFormat.format(dttm);
     }
@@ -755,9 +783,9 @@ public class GuiUtils extends LayoutUtil {
         }
 
         /**
-         * _more_
+         * the user chose a new color. Set the background. THis can be overwritted by client code to act on the color change
          *
-         * @param c _more_
+         * @param c color
          */
         public void userSelectedNewColor(Color c) {
             setBackground(c);
@@ -3491,6 +3519,10 @@ public class GuiUtils extends LayoutUtil {
         //        }
 
 
+        if ( !getIconsInMenus()) {
+            imageIcon = null;
+        }
+
         JMenuItem menuItem = ((imageIcon != null)
                               ? new JMenuItem(label, imageIcon)
                               : new JMenuItem(label));
@@ -3518,7 +3550,7 @@ public class GuiUtils extends LayoutUtil {
         }
 
         if (icon != null) {
-            menuItem.setIcon(getImageIcon(icon, GuiUtils.class));
+            setIcon(menuItem, icon);
         }
         if (id != null) {
             menuItems.put(id, menuItem);
@@ -3667,6 +3699,9 @@ public class GuiUtils extends LayoutUtil {
         NodeList     children = menuNode.getChildNodes();
         String       label    = Msg.msg(getAttribute(attrs, "label"));
         JMenu        menu     = new JMenu(label);
+
+
+
         String mnemonic = getAttribute(menuNode.getAttributes(), "mnemonic",
                                        (String) null);
         String icon = getAttribute(attrs, "icon", (String) null);
@@ -6122,6 +6157,7 @@ public class GuiUtils extends LayoutUtil {
             "Misc",
             "Text"
         };
+        //J+
         List menus = new ArrayList();
         for (int groupIdx = 0; groupIdx < unitGroups.length; groupIdx += 2) {
             String name  = unitGroups[groupIdx];
@@ -6138,26 +6174,66 @@ public class GuiUtils extends LayoutUtil {
 
 
 
-    public static AbstractButton setIcon(AbstractButton button, String iconPath) {
-        button.setIcon(getImageIcon(iconPath, GuiUtils.class));
-        button.setIconTextGap(2);
+
+    /**
+     * Do we show icons in the menus
+     *
+     * @return show icons in menus
+     */
+    public static boolean getIconsInMenus() {
+        return setIconsInMenus;
+    }
+
+    /**
+     * Do we show icons in the menus
+     *
+     * @param doIcons show icons
+     */
+    public static void setIconsInMenus(boolean doIcons) {
+        setIconsInMenus = doIcons;
+    }
+
+
+    /**
+     * Set the icon on the button. This button is usually a JMenu or JMenuItem
+     * If the setIconsInMenus flag is false then don't do this
+     *
+     * @param button The button
+     * @param iconPath The icon path
+     *
+     * @return Just return the button so you can do something like menu.add(GuiUtils.setIcon(menuItem,"/icon path"));
+     */
+    public static AbstractButton setIcon(AbstractButton button,
+                                         String iconPath) {
+        if (setIconsInMenus) {
+            button.setIcon(getImageIcon(iconPath, GuiUtils.class));
+            button.setIconTextGap(2);
+        }
         return button;
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param list _more_
+     * @param selected _more_
+     */
     public static void setSelectedItems(JList list, List selected) {
-        List items = getItems(list);
-        int cnt = 0;
-        int[]indices = new int[items.size()];
-        for(int i=0;i<selected.size();i++) {
+        List  items   = getItems(list);
+        int   cnt     = 0;
+        int[] indices = new int[items.size()];
+        for (int i = 0; i < selected.size(); i++) {
             int idx = items.indexOf(selected.get(i));
-            if(idx<0) continue;
+            if (idx < 0) {
+                continue;
+            }
             indices[cnt++] = idx;
         }
-        if(cnt>0) {
-            int []realIndices = new int[cnt];
-            for(int i=0;i<cnt;i++) {
+        if (cnt > 0) {
+            int[] realIndices = new int[cnt];
+            for (int i = 0; i < cnt; i++) {
                 realIndices[i] = indices[i];
             }
             list.setSelectedIndices(realIndices);
@@ -6165,10 +6241,17 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param list _more_
+     *
+     * @return _more_
+     */
     public static List getItems(JList list) {
-        List items = new ArrayList();
+        List      items = new ArrayList();
         ListModel model = list.getModel();
-        for(int i=0;i<model.getSize();i++) {
+        for (int i = 0; i < model.getSize(); i++) {
             items.add(model.getElementAt(i));
         }
         return items;
@@ -6176,19 +6259,51 @@ public class GuiUtils extends LayoutUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param n _more_
+     * @param local _more_
+     *
+     * @return _more_
+     */
     public static String getLocalName(String n, boolean local) {
-        return getLocalName(n,local,true);
+        return getLocalName(n, local, true);
     }
 
-    public static String getLocalName(String n, boolean local, boolean addHtml) {
-        return (addHtml?"<html>":"") + n +(local?" &lt;<span style=\"color:blue\">local</span>&gt;":"") +(addHtml?"</html>":"");
+    /**
+     * _more_
+     *
+     * @param n _more_
+     * @param local _more_
+     * @param addHtml _more_
+     *
+     * @return _more_
+     */
+    public static String getLocalName(String n, boolean local,
+                                      boolean addHtml) {
+        return (addHtml
+                ? "<html>"
+                : "") + n + (local
+                             ? " &lt;<span style=\"color:blue\">local</span>&gt;"
+                             : "") + (addHtml
+                                      ? "</html>"
+                                      : "");
     }
 
 
-    public static  void appendText(JTextComponent fld, String s, String delimiter) {
+    /**
+     * _more_
+     *
+     * @param fld _more_
+     * @param s _more_
+     * @param delimiter _more_
+     */
+    public static void appendText(JTextComponent fld, String s,
+                                  String delimiter) {
         String t = fld.getText();
-        while(t.endsWith(" ")) {
-            t = t.substring(0,t.length()-1);
+        while (t.endsWith(" ")) {
+            t = t.substring(0, t.length() - 1);
         }
         if ((t.length() > 0) && !t.endsWith(delimiter)) {
             t = t + delimiter;
@@ -6199,16 +6314,21 @@ public class GuiUtils extends LayoutUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param comp _more_
+     */
     public static void addKeyBindings(final JTextComponent comp) {
         //TODO Make this into a KeyMap
         comp.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                if(!e.isControlDown()) {
+                if ( !e.isControlDown()) {
                     return;
                 }
                 int pos = comp.getCaretPosition();
 
-                if(e.getKeyCode() == e.VK_B) {
+                if (e.getKeyCode() == e.VK_B) {
                     if (comp.getCaretPosition() > 0) {
                         comp.setCaretPosition(pos - 1);
                     }
@@ -6221,42 +6341,48 @@ public class GuiUtils extends LayoutUtil {
                     return;
                 }
                 if (e.getKeyCode() == e.VK_E) {
-                    String t = comp.getText();
-                    int endPos = t.indexOf("\n",pos);
-                    if(endPos>=0)
+                    String t      = comp.getText();
+                    int    endPos = t.indexOf("\n", pos);
+                    if (endPos >= 0) {
                         comp.setCaretPosition(endPos);
-                    else
+                    } else {
                         comp.setCaretPosition(t.length());
+                    }
                 }
 
-                if (e.getKeyCode() == e.VK_O && comp instanceof JTextArea) {
+                if ((e.getKeyCode() == e.VK_O)
+                        && (comp instanceof JTextArea)) {
                     String t = comp.getText();
-                    t = t.substring(0,pos)+ "\n"+t.substring(pos);
+                    t = t.substring(0, pos) + "\n" + t.substring(pos);
                     comp.setText(t);
                     comp.setCaretPosition(pos);
                 }
 
-                if (false && comp instanceof  JTextArea && e.getKeyCode() == e.VK_P) {
+                if (false && (comp instanceof JTextArea)
+                        && (e.getKeyCode() == e.VK_P)) {
                     String t = comp.getText();
-                    char c;
-                    int cnt = 0;
-                    while(--pos>=0 && (c = t.charAt(pos))!='\n') {
+                    char   c;
+                    int    cnt = 0;
+                    while ((--pos >= 0) && (c = t.charAt(pos)) != '\n') {
                         cnt++;
                     }
-                    
-                    comp.setCaretPosition(pos-cnt);                    
+
+                    comp.setCaretPosition(pos - cnt);
                 }
 
                 if (e.getKeyCode() == e.VK_K) {
                     String t = comp.getText();
-                    if(pos>=t.length()) return;
-                    int endPos = t.indexOf("\n",pos);
-                    if(endPos==pos) {
-                        t = t.substring(0,pos) + t.substring(endPos+1);
-                    } else if(endPos>pos) {
-                        t = t.substring(0,pos) + "\n" +t.substring(endPos+1);
+                    if (pos >= t.length()) {
+                        return;
+                    }
+                    int endPos = t.indexOf("\n", pos);
+                    if (endPos == pos) {
+                        t = t.substring(0, pos) + t.substring(endPos + 1);
+                    } else if (endPos > pos) {
+                        t = t.substring(0, pos) + "\n"
+                            + t.substring(endPos + 1);
                     } else {
-                        t = t.substring(0,pos);
+                        t = t.substring(0, pos);
                     }
                     comp.setText(t);
                     comp.setCaretPosition(pos);
@@ -6264,34 +6390,47 @@ public class GuiUtils extends LayoutUtil {
 
                 if (e.getKeyCode() == e.VK_D) {
                     String t = comp.getText();
-                    if(pos>=t.length()) return;
-                    if(pos>0) {
-                        t = t.substring(0,pos)+ t.substring(pos+1);
+                    if (pos >= t.length()) {
+                        return;
+                    }
+                    if (pos > 0) {
+                        t = t.substring(0, pos) + t.substring(pos + 1);
                     } else {
-                        t = t.substring(pos+1);
+                        t = t.substring(pos + 1);
                     }
                     comp.setText(t);
-                    if(pos>=0 && pos<t.length())
+                    if ((pos >= 0) && (pos < t.length())) {
                         comp.setCaretPosition(pos);
+                    }
                 }
-            }});
+            }
+        });
     }
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     */
     public static void moveSubtreesToTop(DefaultMutableTreeNode parent) {
-        boolean gotAny = false;
-        List children = Misc.toList(parent.children());
-        for(int i=0;i<children.size()&&!gotAny;i++) {
-            DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.get(i);
-            gotAny = child.getChildCount()>0;
+        boolean gotAny   = false;
+        List    children = Misc.toList(parent.children());
+        for (int i = 0; (i < children.size()) && !gotAny; i++) {
+            DefaultMutableTreeNode child =
+                (DefaultMutableTreeNode) children.get(i);
+            gotAny = child.getChildCount() > 0;
         }
-        if(!gotAny) return;
+        if ( !gotAny) {
+            return;
+        }
         //        for(int i=0;i<children.size();i++) {
-        for(int i=children.size()-1;i>=0;i--) {
-            DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.get(i);
-            if(child.getChildCount()>0) {
+        for (int i = children.size() - 1; i >= 0; i--) {
+            DefaultMutableTreeNode child =
+                (DefaultMutableTreeNode) children.get(i);
+            if (child.getChildCount() > 0) {
                 moveSubtreesToTop(child);
                 parent.remove(child);
-                parent.insert(child,0);
+                parent.insert(child, 0);
             }
         }
     }
@@ -6334,6 +6473,15 @@ public class GuiUtils extends LayoutUtil {
         return getAttribute(element.getAttributes(), name, dflt);
     }
 
+    /**
+     * _more_
+     *
+     * @param attrs _more_
+     * @param name _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public static String getAttribute(NamedNodeMap attrs, String name,
                                       String dflt) {
         if (attrs == null) {
@@ -6345,6 +6493,15 @@ public class GuiUtils extends LayoutUtil {
                 : n.getNodeValue());
     }
 
+    /**
+     * _more_
+     *
+     * @param attrs _more_
+     * @param name _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public static boolean getAttribute(NamedNodeMap attrs, String name,
                                        boolean dflt) {
         if (attrs == null) {
@@ -6356,6 +6513,14 @@ public class GuiUtils extends LayoutUtil {
                 : new Boolean(n.getNodeValue()).booleanValue());
     }
 
+    /**
+     * _more_
+     *
+     * @param attrs _more_
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public static String getAttribute(NamedNodeMap attrs, String name) {
         String value = getAttribute(attrs, name, (String) null);
         if (value == null) {
@@ -6365,6 +6530,14 @@ public class GuiUtils extends LayoutUtil {
         return value;
     }
 
+    /**
+     * _more_
+     *
+     * @param parent _more_
+     * @param tag _more_
+     *
+     * @return _more_
+     */
     public static List findChildren(Node parent, String tag) {
         ArrayList found    = new ArrayList();
         NodeList  children = parent.getChildNodes();
@@ -6378,42 +6551,75 @@ public class GuiUtils extends LayoutUtil {
         return found;
     }
 
+    /**
+     * Class ProgressDialog _more_
+     *
+     *
+     * @author IDV Development Team
+     */
     public static class ProgressDialog extends JDialog {
 
+        /** _more_          */
         private JLabel statusLbl;
+
+        /** _more_          */
         private boolean cancelPressed = false;
 
+        /**
+         * _more_
+         *
+         * @param title _more_
+         */
         public ProgressDialog(String title) {
             this(title, false);
         }
 
+        /**
+         * _more_
+         *
+         * @param title _more_
+         * @param doCancel _more_
+         */
         public ProgressDialog(String title, boolean doCancel) {
-            super((JFrame)null, title, false);
+            super((JFrame) null, title, false);
             statusLbl = new JLabel(" ");
             statusLbl.setMinimumSize(new Dimension(350, 20));
             statusLbl.setPreferredSize(new Dimension(350, 20));
-            JLabel         waitLbl        = new JLabel(getImageIcon("/ucar/unidata/util/wait.gif"));
-            JComponent contents = GuiUtils.inset(GuiUtils.centerRight(statusLbl, waitLbl),5);
-            if(doCancel) {
+            JLabel waitLbl =
+                new JLabel(getImageIcon("/ucar/unidata/util/wait.gif"));
+            JComponent contents =
+                GuiUtils.inset(GuiUtils.centerRight(statusLbl, waitLbl), 5);
+            if (doCancel) {
                 JButton btn = new JButton("Cancel");
                 btn.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent ae) {
-                            cancelPressed = true;
-                            setText("Cancelling");
-                        }
-                    });
-                contents = GuiUtils.centerBottom(contents, GuiUtils.inset(GuiUtils.wrap(btn),5));
+                    public void actionPerformed(ActionEvent ae) {
+                        cancelPressed = true;
+                        setText("Cancelling");
+                    }
+                });
+                contents = GuiUtils.centerBottom(contents,
+                        GuiUtils.inset(GuiUtils.wrap(btn), 5));
             }
             this.getContentPane().add(contents);
             this.pack();
-            this.setLocation(200,200);
+            this.setLocation(200, 200);
             this.show();
         }
 
+        /**
+         * _more_
+         *
+         * @param lbl _more_
+         */
         public void setText(String lbl) {
             statusLbl.setText(lbl);
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean isCancelled() {
             return cancelPressed;
         }
@@ -6445,6 +6651,12 @@ public class GuiUtils extends LayoutUtil {
      *
      * @param title The title
      */
+
+    /**
+     * _more_
+     *
+     * @param title _more_
+     */
     public static void setApplicationTitle(String title) {
         applicationTitle = title;
     }
@@ -6455,20 +6667,16 @@ public class GuiUtils extends LayoutUtil {
      *
      * @return The title
      */
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public static String getApplicationTitle() {
         return applicationTitle;
     }
 
 
 }
-
-
-
-
-
-
-
-
-
-
 
