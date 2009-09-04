@@ -2851,6 +2851,7 @@ public class StationModelControl extends ObsDisplayControl {
 
     JTextField kmzWidthFld;
     JTextField kmzHeightFld;
+    JTextField kmzNameFld;
     GuiUtils.ColorSwatch kmzColorSwatch;
 
     public void exportAsKmz() {
@@ -2858,32 +2859,39 @@ public class StationModelControl extends ObsDisplayControl {
             if(kmzWidthFld==null) {
                 kmzWidthFld = new JTextField("80",5);
                 kmzHeightFld = new JTextField("80",5);
+                kmzNameFld = new JTextField("Point Observations");
                 kmzColorSwatch = new GuiUtils.ColorSwatch(Color.white,"KMZ Icon Color", true);
             }
 
             JComponent widgets = GuiUtils.formLayout(new Component[]{
-                GuiUtils.rLabel("Icon Width:"),
-                kmzWidthFld,
-                GuiUtils.rLabel("Icon Height:"),
-                kmzHeightFld,
-                GuiUtils.rLabel("BG Color:"),
-                kmzColorSwatch.getPanel()
+                    GuiUtils.rLabel("Name:"),
+                    kmzNameFld,
+                    GuiUtils.rLabel("Icon Size:"),
+                    GuiUtils.left(GuiUtils.hbox(kmzWidthFld,new JLabel(" X "),
+                                                kmzHeightFld)),
+                    GuiUtils.rLabel("BG Color:"),
+                    kmzColorSwatch.getPanel()
             });
             JComboBox publishCbx =
                 getIdv().getPublishManager().getSelector("kmz.export");
-            JComponent accessory = (publishCbx != null?GuiUtils.vbox(widgets,publishCbx):
+            JComponent accessory = (publishCbx != null?GuiUtils.topBottom(widgets,publishCbx):
                                     widgets);
             String filename =
                 FileManager.getWriteFile(FileManager.FILTER_KMZ,
                                          FileManager.SUFFIX_KMZ, GuiUtils.top(accessory));
 
+
             if (filename == null) {
                 return;
             }
-            myDisplay.writeKmzFile(new File(filename), currentStationData,
+
+
+
+            if(!myDisplay.writeKmzFile(new File(filename), currentStationData,
+                                   kmzNameFld.getText(),
                                    new Integer(kmzWidthFld.getText().trim()).intValue(),
                                    new Integer(kmzHeightFld.getText().trim()).intValue(),
-                                   kmzColorSwatch.getBackground());
+                                       kmzColorSwatch.getColor())) return;
             getIdv().getPublishManager().publishContent(filename,
                                                         null, publishCbx);
         } catch (Exception exc) {

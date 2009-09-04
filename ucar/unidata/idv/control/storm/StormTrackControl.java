@@ -1753,7 +1753,7 @@ public class StormTrackControl extends DisplayControlImpl {
      */
     protected void writeToGE(Element docNode, Hashtable state,
                              Element parent, StormTrack track, Color color)
-            throws VisADException, RemoteException {
+            throws Exception {
         Element placemark = KmlUtil.placemark(parent, "Track",
                                 "<html>" + getWayName() + ":"
                                 + track.getWay() + "<br>" + ""
