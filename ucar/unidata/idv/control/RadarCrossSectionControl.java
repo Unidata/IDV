@@ -21,6 +21,8 @@
  */
 
 
+
+
 package ucar.unidata.idv.control;
 
 
@@ -68,7 +70,7 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
     public RadarCrossSectionControl() {}
 
     /**
-     * _more_
+     * initialize the cross section
      */
     public void initDone() {
         try {
@@ -96,18 +98,8 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
         csSelector.addPropertyChangeListener(this);
         updatePositionWidget();
     }
-                                                      
-    /**
-     * Called after all initialization is finished.
-     * Labels plot in control window. Loads data in displays.
-     *
-     * @param choice _more_
-     *
-     * @return _more_
-     *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
-     */
+
+
 
     /**
      * Set the data in the control
@@ -145,9 +137,7 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
         }
     }
 
-    /**
-     * Load or reload data for a RHI selector line which has moved.
-     */
+
 
     /**
      * Load or reload data for a cross section.
@@ -198,9 +188,6 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
             logException("Error setting position ", exc);
         }
     }
-    // get (and make if necessary)
-    // the requester Hastable of properties that is carried along with
-    // the data instance
 
     /**
      * Get the request properties hash table.
@@ -218,8 +205,7 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
         return props;
     }
 
-    // make the requester Hastable of properties that is carried along with
-    // the data instance
+
 
     /**
      * Set the request properties
@@ -263,7 +249,7 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
     }
 
     /**
-     * _more_
+     * init positio from south to north
      *
      * @param stationLat _more_
      * @param stationLon _more_
@@ -294,7 +280,7 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
     }
 
     /**
-     * _more_
+     * reload the cross section data
      *
      * @throws RemoteException _more_
      * @throws VisADException _more_
@@ -333,13 +319,7 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
         // move z level of line to near TOP of VisAD display box
         csSelector.setZValue(0.99);
 
-        // for RHI control line show only the end point away from radar;
-        // make center at radar station immovable.
-        //csSelector.dontShowStartPoint();
-        //csSelector.dontShowMiddlePoint();
-        //csSelector.setStartPointFixed(true);
-        //csSelector.setStartPointVisible(false);  //also = no manipilate
-        //csSelector.setMidPointVisible(false);    //false also = no manipilate
+
         setCSLineLength(defaultLen);
 
         setRequestProperties();
@@ -419,9 +399,7 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
         List   choices    = getDataChoices();
         String staname    = ((DataChoice) choices.get(0)).getName();
 
-        // If this isn't satisfactory, then please implement a Misc or
-        // DisplayConventions method that will take an EarthLocation and
-        // return a nicely formatted string.
+
         initLinePosition(stationLat, stationLon);
         setCSLineLength(defaultLen);
     }
@@ -443,21 +421,6 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
     public boolean getAutoScaleYAxis() {
         return false;
     }
-
-
-    /**
-     * Make a FieldImpl suitable for the  2D RHI display;
-     * of form (time -> (integer_index->(x,altitude) -> parm));
-     * x axis positions are in distance along cross section from one end.
-     * from FieldImpl (time -> (integer_index->(range,az,elev) -> parm))
-     *
-     * @param inputfieldImpl   The data as a Field
-     * @return  a 2D version of the data
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException   VisAD error
-     */
-
 
 
 
