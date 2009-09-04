@@ -2849,20 +2849,41 @@ public class StationModelControl extends ObsDisplayControl {
     }
 
 
+    JTextField kmzWidthFld;
+    JTextField kmzHeightFld;
+    GuiUtils.ColorSwatch kmzColorSwatch;
+
     public void exportAsKmz() {
         try {
+            if(kmzWidthFld==null) {
+                kmzWidthFld = new JTextField("80",5);
+                kmzHeightFld = new JTextField("80",5);
+                kmzColorSwatch = new GuiUtils.ColorSwatch(Color.white,"KMZ Icon Color", true);
+            }
+
+            JComponent widgets = GuiUtils.formLayout(new Component[]{
+                GuiUtils.rLabel("Icon Width:"),
+                kmzWidthFld,
+                GuiUtils.rLabel("Icon Height:"),
+                kmzHeightFld,
+                GuiUtils.rLabel("BG Color:"),
+                kmzColorSwatch.getPanel()
+            });
             JComboBox publishCbx =
                 getIdv().getPublishManager().getSelector("kmz.export");
+            JComponent accessory = (publishCbx != null?GuiUtils.vbox(widgets,publishCbx):
+                                    widgets);
             String filename =
                 FileManager.getWriteFile(FileManager.FILTER_KMZ,
-                                         FileManager.SUFFIX_KMZ, ((publishCbx != null)
-                                                                  ? GuiUtils.top(publishCbx)
-                                                                  : null));
+                                         FileManager.SUFFIX_KMZ, GuiUtils.top(accessory));
+
             if (filename == null) {
                 return;
             }
-            
-            myDisplay.writeKmzFile(new File(filename), currentStationData);
+            myDisplay.writeKmzFile(new File(filename), currentStationData,
+                                   new Integer(kmzWidthFld.getText().trim()).intValue(),
+                                   new Integer(kmzHeightFld.getText().trim()).intValue(),
+                                   kmzColorSwatch.getBackground());
             getIdv().getPublishManager().publishContent(filename,
                                                         null, publishCbx);
         } catch (Exception exc) {
