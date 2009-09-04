@@ -711,6 +711,7 @@ public class GuiUtils extends LayoutUtil {
             });
         }
 
+
         /**
          * Show the color chooser
          */
