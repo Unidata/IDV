@@ -448,6 +448,12 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 
+    protected void mouseFlicked(double[] startMatrix, double [] endMatrix) {
+        if (getUseGlobeDisplay()) {
+            //            getViewpointControl().setAutoRotate(true);
+        }
+    }
+
 
     /**
      * Check if its ok to capture a kmz file

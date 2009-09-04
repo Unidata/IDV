@@ -560,6 +560,13 @@ public abstract class NavigatedViewManager extends ViewManager {
     }
 
 
+    private long mouseMovedTime=-1;
+    private long mousePressedTime=-1;
+
+    private double[] startMoveMatrix;
+
+    private Point mouseStartPoint;
+
 
     /**
      *  An implementation of the the DisplayListener interface.
@@ -582,7 +589,11 @@ public abstract class NavigatedViewManager extends ViewManager {
         InputEvent inputEvent = de.getInputEvent();
         if ((inputEvent instanceof MouseEvent)
                 && (eventId == DisplayEvent.MOUSE_PRESSED)) {
+            mousePressedTime = System.currentTimeMillis();
+            getViewpointControl().setAutoRotate(false);
+            startMoveMatrix = getProjectionControl().getMatrix();
             MouseEvent mouseEvent = (MouseEvent) inputEvent;
+            mouseStartPoint = new Point(mouseEvent.getX(), mouseEvent.getY());
             if ((mouseEvent.getClickCount() > 1)
                     && mouseEvent.isShiftDown()) {
                 NavigatedDisplay navDisplay = getNavigatedDisplay();
@@ -596,6 +607,7 @@ public abstract class NavigatedViewManager extends ViewManager {
 
         if ((eventId == DisplayEvent.MOUSE_PRESSED)
                 || (eventId == DisplayEvent.MOUSE_DRAGGED)) {
+            mouseMovedTime  = System.currentTimeMillis();
             MouseEvent mouseEvent  = (MouseEvent) inputEvent;
             int[][][]  functionMap = getMaster().getMouseFunctionMap();
             if (functionMap != null) {
@@ -626,9 +638,31 @@ public abstract class NavigatedViewManager extends ViewManager {
                 cursorReadoutWindow.handleMouseReleased(mouseEvent);
                 cursorReadoutWindow = null;
             }
+            Point toPoint = new Point(mouseEvent.getX(), mouseEvent.getY());
+
+
+            double distance = GuiUtils.distance(mouseStartPoint.x, mouseStartPoint.y, toPoint.x, toPoint.y);
+            long deltaTime = System.currentTimeMillis()-mouseMovedTime;
+            if(System.currentTimeMillis()-mousePressedTime>0) {
+                double speed = distance/(System.currentTimeMillis()-mousePressedTime);
+                if(mouseStartPoint!=null && 
+                   distance>50 &&
+                   deltaTime<200 &&
+                   speed>0.5) {
+                    double[] endMatrix = getProjectionControl().getMatrix();
+                    mouseFlicked(startMoveMatrix, endMatrix);
+                }
+            }
+            mouseMovedTime  = -1;
         }
         super.displayChanged(de);
     }
+
+
+    protected void mouseFlicked(double[] startMatrix, double [] endMatrix) {
+        getViewpointControl().setAutoRotate(true);
+    }
+
 
     /**
      * Handle an animation time change
