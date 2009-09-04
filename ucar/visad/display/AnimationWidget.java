@@ -347,6 +347,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
      * @return Full path to icon
      */
     private String getIcon(String name) {
+        /*
         if(name.equals("Pause")) 
             return "/auxdata/ui/icons/control_pause_blue.png";
         if(name.equals("Play")) 
@@ -361,8 +362,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             return "/auxdata/ui/icons/control_fastforward_blue.png";
         if(name.equals("Information")) 
             return "/auxdata/ui/icons/information.png";
-
-
+        */
         return "/auxdata/ui/icons/" + name + (bigIcon
                 ? "24"
                 : "16") + ".gif";
@@ -435,8 +435,8 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             btn.addKeyListener(listener);
             //            JComponent wrapper = GuiUtils.center(btn);
             //            wrapper.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-            //            btn.setBorder(
-            //                BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+            btn.setBorder(
+                          BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
             buttonList.add(btn);
             //            buttonList.add(wrapper);
             if (i == 2) {
