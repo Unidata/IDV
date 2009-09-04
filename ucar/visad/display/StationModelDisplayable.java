@@ -20,31 +20,35 @@
 
 
 
+
 package ucar.visad.display;
 
-import org.w3c.dom.Element;
 
 import org.python.core.*;
 import org.python.util.*;
 
-import ucar.unidata.xml.XmlUtil;
-import ucar.unidata.data.gis.KmlUtil;
+import org.w3c.dom.Element;
+
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DerivedDataChoice;
+import ucar.unidata.data.gis.KmlUtil;
 import ucar.unidata.data.point.PointOb;
 
 import ucar.unidata.idv.JythonManager;
 import ucar.unidata.ui.drawing.Glyph;
 
 import ucar.unidata.ui.symbol.*;
-
 import ucar.unidata.util.ColorTable;
+
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.WrapperException;
+
+import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.ShapeUtility;
 import ucar.visad.Util;
@@ -62,15 +66,11 @@ import visad.georef.NamedLocationTuple;
 
 import visad.meteorology.WeatherSymbols;
 
-
-
-import java.util.zip.*;
-import java.io.*;
-
-import javax.swing.*;
 import java.awt.*;
-import java.awt.image.*;
 import java.awt.geom.*;
+import java.awt.image.*;
+
+import java.io.*;
 
 import java.rmi.RemoteException;
 
@@ -79,6 +79,12 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+
+
+
+import java.util.zip.*;
+
+import javax.swing.*;
 
 
 
@@ -644,59 +650,102 @@ public class StationModelDisplayable extends DisplayableData {
 
 
 
-    private StringBuffer kmlSB;
+
+    /** kmz writing state          */
     private boolean writingKmz = false;
+
+    /** kmz writing state          */
     private ZipOutputStream kmzZos;
+
+    /** kmz writing state          */
     private int kmzObCounter = 0;
+
+    /** kmz writing state          */
     private Element kmlRoot;
+
+    /** kmz writing state          */
     private Element kmlDoc;
-    private int iconHeight=40;
-    private int iconWidth=40;
+
+    /** kmz writing state          */
+    private int kmzIconHeight = 40;
+
+    /** kmz writing state          */
+    private int kmzIconWidth = 40;
+
+    /** kmz writing state          */
     private Color iconColor;
 
+    /** kmz writing state          */
+    private File kmzFile;
 
-    public void writeKmzFile(File f, FieldImpl data, int iconWidth, int iconHeight, Color bgColor) throws Exception {
+    /** kmz writing state          */
+    private boolean kmzShowExampleDialog = true;
+
+
+    /**
+     * Write the station display into a kmz file
+     *
+     * @param f The file
+     * @param data The data
+     * @param name Name for kml
+     * @param kmzIconWidth icon width
+     * @param kmzIconHeight icon height
+     * @param bgColor background color of icon
+     *
+     * @return success
+     *
+     * @throws Exception on badness
+     */
+    public boolean writeKmzFile(File f, FieldImpl data, String name,
+                                int kmzIconWidth, int kmzIconHeight,
+                                Color bgColor)
+            throws Exception {
         try {
-            this.iconWidth = iconWidth;
-            this.iconHeight = iconHeight;
-            this.iconColor = bgColor;
-            if(iconColor!=null) {
-                //Add some transparency
-                iconColor = new Color(iconColor.getRed(),
-                                      iconColor.getGreen(),
-                                      iconColor.getBlue(),
-                                      180);
-            } else {
-                iconColor = new Color(0,0,0,255);
-            }
-            kmzObCounter = 0;
-            kmzZos =
-                new ZipOutputStream(new FileOutputStream(f));
-            writingKmz= true;
-            kmlRoot = KmlUtil.kml("Point Observations");
-            kmlDoc = KmlUtil.document(kmlRoot,"Point Observations");
-            isTimeSequence = ucar.unidata.data.grid.GridUtil.isTimeSequence(data);
 
-            kmlSB = new StringBuffer();
+            this.kmzShowExampleDialog = true;
+            this.kmzIconWidth         = kmzIconWidth;
+            this.kmzIconHeight        = kmzIconHeight;
+            this.iconColor            = bgColor;
+            this.kmzObCounter         = 0;
+            this.kmzFile              = f;
+            this.writingKmz           = true;
+            this.kmlRoot              = KmlUtil.kml(name);
+            this.kmlDoc               = KmlUtil.document(kmlRoot, name);
+
+
+
+            isTimeSequence =
+                ucar.unidata.data.grid.GridUtil.isTimeSequence(data);
+
+
+
             if (isTimeSequence) {
-                Set     timeSet     = data.getDomainSet();
+                Set timeSet = data.getDomainSet();
                 for (int i = 0; i < timeSet.getLength(); i++) {
                     makeShapesFromPointObsField(
-                                                (FieldImpl) data.getSample(
-                                                                           i));
-                } 
+                        (FieldImpl) data.getSample(i));
+                }
             } else {
                 makeShapesFromPointObsField(data);
-            } 
+            }
+
+            if ( !writingKmz) {
+                return false;
+            }
+
             kmzZos.putNextEntry(new ZipEntry("observations.kml"));
-            byte[] bytes = XmlUtil.toString(kmlRoot,false).getBytes();
+            byte[] bytes = XmlUtil.toString(kmlRoot, false).getBytes();
             kmzZos.write(bytes, 0, bytes.length);
             kmzZos.closeEntry();
         } finally {
-            kmlSB = null;
-            writingKmz= false;
-            kmzZos.close();
+            writingKmz = false;
+            if (kmzZos != null) {
+                kmzZos.close();
+            }
+            kmzZos  = null;
+            kmzFile = null;
         }
+        return writingKmz;
     }
 
 
@@ -707,8 +756,8 @@ public class StationModelDisplayable extends DisplayableData {
      * @param data
      * @return
      *
-     * @throws VisADException   VisAD failure.
-     * @throws RemoteException  Java RMI failure.
+     *
+     * @throws Exception on badness
      */
     private FieldImpl makeShapesFromPointObsField(FieldImpl data)
             throws Exception {
@@ -763,7 +812,6 @@ public class StationModelDisplayable extends DisplayableData {
         int       length        = set.getLength();
         TupleType dataTupleType = null;
         Real      missingAlt    = null;
-        boolean show=true;
         for (int obIdx = 0; obIdx < length; obIdx++) {
             PointOb ob = (PointOb) data.getSample(obIdx);
             if (typeNames == null) {
@@ -772,71 +820,95 @@ public class StationModelDisplayable extends DisplayableData {
                 typeNames = getTypeNames(tType);
             }
 
-            List<VisADGeometryArray> obShapes = makeShapes(ob, typeNames, symbols,
-                                       pointOnSymbols, offsetFlipPoints);
+            List<VisADGeometryArray> obShapes = makeShapes(ob, typeNames,
+                                                    symbols, pointOnSymbols,
+                                                    offsetFlipPoints);
             if (obShapes == null) {
                 continue;
             }
-            if(writingKmz) {
-                BufferedImage image = new BufferedImage(iconWidth,iconHeight, BufferedImage.TYPE_INT_ARGB);
-                Graphics2D g = (Graphics2D)image.getGraphics();
-                if(iconColor!=null) {
+            if (writingKmz) {
+                BufferedImage image = new BufferedImage(kmzIconWidth,
+                                          kmzIconHeight,
+                                          BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g = (Graphics2D) image.getGraphics();
+                if (iconColor != null) {
                     g.setColor(iconColor);
-                    g.fillRect(0,0,iconWidth,iconHeight);
+                    g.fillRect(0, 0, kmzIconWidth, kmzIconHeight);
                 }
                 g.setStroke(new BasicStroke(2.0f));
                 paint(g, obShapes);
+                if (kmzShowExampleDialog) {
+                    writingKmz =
+                        ucar.unidata.util.GuiUtils.showOkCancelDialog(
+                            null, null,
+                            GuiUtils.vbox(
+                                new JLabel("Example:"),
+                                new JLabel(new ImageIcon(image))), null);
+                    kmzShowExampleDialog = false;
+                    if ( !writingKmz) {
+                        return null;
+                    }
+                }
+
+                if (kmzZos == null) {
+                    kmzZos =
+                        new ZipOutputStream(new FileOutputStream(kmzFile));
+
+                }
+
+
+
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ucar.unidata.ui.ImageUtils.writeImageToFile(image, "icon.png", bos,1.0f);
-                String file = "kmzicon" + (kmzObCounter)+".png";
+                ucar.unidata.ui.ImageUtils.writeImageToFile(image,
+                        "icon.png", bos, 1.0f);
+                String file = "kmzicon" + (kmzObCounter) + ".png";
                 kmzZos.putNextEntry(new ZipEntry(file));
                 byte[] bytes = bos.toByteArray();
                 kmzZos.write(bytes, 0, bytes.length);
                 kmzZos.closeEntry();
-                String styleId = "obicon" + kmzObCounter;
-                StringBuffer descSB = new StringBuffer();
+                String       styleId = "obicon" + kmzObCounter;
+                StringBuffer descSB  = new StringBuffer();
                 descSB.append("<h3>Observation</h3>");
                 descSB.append("<table>");
                 Tuple     tuple = (Tuple) ob.getData();
-                TupleType tType          = (TupleType) tuple.getType();
-                String[] names = getTypeNames(tType);
-                Data[] datum = tuple.getComponents();
-                
-                for(int i=0;i<names.length;i++) {
+                TupleType tType = (TupleType) tuple.getType();
+                String[]  names = getTypeNames(tType);
+                Data[]    datum = tuple.getComponents();
+
+                for (int i = 0; i < names.length; i++) {
                     descSB.append("<tr><td align=right><b>");
                     descSB.append(names[i]);
 
                     descSB.append(":</b></td><td>");
-                    if(datum[i] instanceof Real) {
+                    if (datum[i] instanceof Real) {
                         Real r = (Real) datum[i];
-                        if(r.isMissing()) {
+                        if (r.isMissing()) {
                             descSB.append("--");
                         } else {
-                            descSB.append(""+r);
+                            descSB.append("" + r);
                         }
-                        Unit u  =r.getUnit();
-                        if(u!=null) {
+                        Unit u = r.getUnit();
+                        if (u != null) {
                             String us = u.toString();
-                            if(us.length()>0) {
-                                descSB.append(" [" + us +"]");
+                            if (us.length() > 0) {
+                                descSB.append(" [" + us + "]");
                             }
                         }
                     } else {
-                        descSB.append(datum[i]+"");
+                        descSB.append(datum[i] + "");
                     }
                     descSB.append("</td></tr>");
                 }
-                
 
 
 
                 descSB.append("</table>");
-                KmlUtil.placemark(kmlDoc, "",descSB.toString(),ob.getEarthLocation(), styleId);
-                KmlUtil.iconstyle(kmlDoc, styleId,file,2.0);
+                Element placemark = KmlUtil.placemark(kmlDoc, "",
+                                        descSB.toString(),
+                                        ob.getEarthLocation(), styleId);
+                KmlUtil.timestamp(placemark, ob.getDateTime());
+                KmlUtil.iconstyle(kmlDoc, styleId, file, 2.0);
                 kmzObCounter++;
-                if(show) {
-                    show = ucar.unidata.util.GuiUtils.showOkCancelDialog(null,null, new JLabel(new ImageIcon(image)), null);
-                }
             }
 
 
@@ -915,8 +987,9 @@ public class StationModelDisplayable extends DisplayableData {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    private List<VisADGeometryArray> makeShapes(PointOb ob, String[] typeNames, List symbols,
-                            List pointOnSymbols, List offsetFlipPoints)
+    private List<VisADGeometryArray> makeShapes(PointOb ob,
+            String[] typeNames, List symbols, List pointOnSymbols,
+            List offsetFlipPoints)
             throws VisADException, RemoteException {
 
         List      lineShapes     = null;
@@ -1158,10 +1231,12 @@ public class StationModelDisplayable extends DisplayableData {
                         continue;
 
                     }
-                    double lat = 90-ob.getEarthLocation().getLatitude().getValue(
-                                                                              CommonUnit.degree);
-                    double lon = ob.getEarthLocation().getLongitude().getValue(
-                                                                              CommonUnit.degree);
+                    double lat =
+                        90 - ob.getEarthLocation().getLatitude().getValue(
+                            CommonUnit.degree);
+                    double lon =
+                        ob.getEarthLocation().getLongitude().getValue(
+                            CommonUnit.degree);
 
                     //                    ShapeUtility.rotateX(shapes[shapeIndex],
                     //                                         (float)Math.toRadians(lat));
@@ -1281,10 +1356,8 @@ public class StationModelDisplayable extends DisplayableData {
                             Data colorData = getComponent(ob, data, tType,
                                                  typeNames, colorParam);
                             if (colorData != null) {
-                                List   mappings =
-                                    metSymbol.getColorMappings();
-                                Color  theColor    =
-                                    metSymbol.getForeground();
+                                List  mappings = metSymbol.getColorMappings();
+                                Color theColor = metSymbol.getForeground();
                                 if ((mappings != null)
                                         && (mappings.size() > 0)) {
                                     for (int i = 0; i < mappings.size();
@@ -1354,11 +1427,13 @@ public class StationModelDisplayable extends DisplayableData {
                                 } else if (percent > 1.0) {
                                     percent = 1.0;
                                 }
-                                List colors = ct.getColorList();
+                                List   colors = ct.getColorList();
                                 double dindex = (colors.size() * percent);
-                                int index = (int) dindex;
+                                int    index  = (int) dindex;
                                 //Round up
-                                if(dindex-index>=0.5) index++;
+                                if (dindex - index >= 0.5) {
+                                    index++;
+                                }
                                 index--;
                                 // System.err.println ("v:" + value + " r:" + r + " %:" + percent + " dindex:" + dindex +" index:" + index + " size:" + colors.size());
                                 if (index < 0) {
@@ -1423,7 +1498,8 @@ public class StationModelDisplayable extends DisplayableData {
                                           : ""), e);
         }
 
-        List<VisADGeometryArray> allShapes = new ArrayList<VisADGeometryArray>();
+        List<VisADGeometryArray> allShapes =
+            new ArrayList<VisADGeometryArray>();
         //Try to merge them. But, if any of the  Visad arrays have different
         //state (normals,colors, etc.) there will be an error. We track that with the 
         //tryMerge flag.
@@ -1467,132 +1543,184 @@ public class StationModelDisplayable extends DisplayableData {
 
 
 
+    /**
+     * Paint the shapes into the graphics for kmz icon generation
+     *
+     * @param g2 graphics
+     * @param shapes shapes
+     */
     private void paint(Graphics2D g2, List<VisADGeometryArray> shapes) {
-        for(VisADGeometryArray array: shapes) {
-            int my=iconHeight/2;
-            int mx = iconWidth/2;
-            float[] pts   = array.coordinates;
-            int count = array.vertexCount;
-            byte[]colors = array.colors;
+
+        for (VisADGeometryArray array : shapes) {
+            int     my     = kmzIconHeight / 2;
+            int     mx     = kmzIconWidth / 2;
+            float[] pts    = array.coordinates;
+            int     count  = array.vertexCount;
+            byte[]  colors = array.colors;
             //            System.err.println ("shape:" + array.getClass().getName() + " pts:" + pts.length +" colors:" + colors.length);
-            float scale = 250.0f;
+            float scale = 200.0f;
             if (array instanceof VisADLineArray) {
-                int jinc = (colors.length == pts.length) ? 3 : 4;
-                int j = 0;
-                for (int i=0; i<3*count; i += 6) {
-                    g2.setColor(new Color(
-                                          (((colors[j] < 0) ? (((int) colors[j]) + 256) :
-                                            ((int) colors[j]) ) +
-                                           ((colors[j+jinc] < 0) ? (((int) colors[j+jinc]) + 256) :
-                                            ((int) colors[j+jinc]) ) ) / 2,
-                                          (((colors[j+1] < 0) ? (((int) colors[j+1]) + 256) :
-                                            ((int) colors[j+1]) ) +
-                                           ((colors[j+jinc+1] < 0) ? (((int) colors[j+jinc+1]) + 256) :
-                                            ((int) colors[j+jinc+1]) ) ) / 2,
-                                          (((colors[j+2] < 0) ? (((int) colors[j+2]) + 256) :
-                                            ((int) colors[j+2]) ) +
-                                           ((colors[j+jinc+2] < 0) ? (((int) colors[j+jinc+2]) + 256) :
-                                            ((int) colors[j+jinc+2]) ) ) / 2 ));
+                int jinc = (colors.length == pts.length)
+                           ? 3
+                           : 4;
+                int j    = 0;
+                for (int i = 0; i < 3 * count; i += 6) {
+                    g2.setColor(new Color((((colors[j] < 0)
+                                            ? (((int) colors[j]) + 256)
+                                            : ((int) colors[j])) + ((colors[j + jinc]
+                                            < 0)
+                            ? (((int) colors[j + jinc]) + 256)
+                            : ((int) colors[j + jinc]))) / 2, (((colors[j + 1]
+                               < 0)
+                            ? (((int) colors[j + 1]) + 256)
+                            : ((int) colors[j + 1])) + ((colors[j + jinc + 1]
+                               < 0)
+                            ? (((int) colors[j + jinc + 1]) + 256)
+                            : ((int) colors[j + jinc + 1]))) / 2, (((colors[j + 2]
+                               < 0)
+                            ? (((int) colors[j + 2]) + 256)
+                            : ((int) colors[j + 2])) + ((colors[j + jinc + 2]
+                               < 0)
+                            ? (((int) colors[j + jinc + 2]) + 256)
+                            : ((int) colors[j + jinc + 2]))) / 2));
                     j += 2 * jinc;
-                    g2.draw(new Line2D.Float(mx+scale*pts[i], my-scale*pts[i+1],
-                                             mx+scale*pts[i+3], my-scale*pts[i+4]));
+                    g2.draw(new Line2D.Float(mx + scale * pts[i],
+                                             my - scale * pts[i + 1],
+                                             mx + scale * pts[i + 3],
+                                             my - scale * pts[i + 4]));
                 }
-            }  else if (array instanceof VisADTriangleArray) {
+            } else if (array instanceof VisADTriangleArray) {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                     RenderingHints.VALUE_ANTIALIAS_OFF);
 
                 if (colors == null) {
-                    for (int i=0; i<3*count; i += 9) {
-                        GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-                        path.moveTo(mx+scale*pts[i], my-scale*pts[i+1]);
-                        path.lineTo(mx+scale*pts[i+3], my-scale*pts[i+4]);
-                        path.lineTo(mx+scale*pts[i+6], my-scale*pts[i+7]);
+                    for (int i = 0; i < 3 * count; i += 9) {
+                        GeneralPath path =
+                            new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+                        path.moveTo(mx + scale * pts[i],
+                                    my - scale * pts[i + 1]);
+                        path.lineTo(mx + scale * pts[i + 3],
+                                    my - scale * pts[i + 4]);
+                        path.lineTo(mx + scale * pts[i + 6],
+                                    my - scale * pts[i + 7]);
                         path.closePath();
                         g2.fill(path);
                     }
-                }
-                else { // colors != null
-                    int j = 0;
-                    int jinc = (colors.length == pts.length) ? 3 : 4;
-                    for (int i=0; i<3*count; i += 9) {
-                        g2.setColor(new Color(
-                                              (((colors[j] < 0) ? (((int) colors[j]) + 256) :
-                                                ((int) colors[j]) ) +
-                                               ((colors[j+jinc] < 0) ? (((int) colors[j+jinc]) + 256) :
-                                                ((int) colors[j+jinc]) ) +
-                                               ((colors[j+2*jinc] < 0) ? (((int) colors[j+2*jinc]) + 256) :
-                                                ((int) colors[j+2*jinc]) ) ) / 3,
-                                              (((colors[j+1] < 0) ? (((int) colors[j+1]) + 256) :
-                                                ((int) colors[j+1]) ) +
-                                               ((colors[j+jinc+1] < 0) ? (((int) colors[j+jinc+1]) + 256) :
-                                                ((int) colors[j+jinc+1]) ) +
-                                               ((colors[j+2*jinc+1] < 0) ? (((int) colors[j+2*jinc+1]) + 256) :
-                                                ((int) colors[j+2*jinc+1]) ) ) / 3,
-                                              (((colors[j+2] < 0) ? (((int) colors[j+2]) + 256) :
-                                                ((int) colors[j+2]) ) +
-                                               ((colors[j+jinc+2] < 0) ? (((int) colors[j+jinc+2]) + 256) :
-                                                ((int) colors[j+jinc+2]) ) +
-                                               ((colors[j+2*jinc+2] < 0) ? (((int) colors[j+2*jinc+2]) + 256) :
-                                                ((int) colors[j+2*jinc+2]) ) ) / 3 ));
+                } else {  // colors != null
+                    int j    = 0;
+                    int jinc = (colors.length == pts.length)
+                               ? 3
+                               : 4;
+                    for (int i = 0; i < 3 * count; i += 9) {
+                        g2.setColor(new Color((((colors[j] < 0)
+                                ? (((int) colors[j]) + 256)
+                                : ((int) colors[j])) + ((colors[j + jinc] < 0)
+                                ? (((int) colors[j + jinc]) + 256)
+                                : ((int) colors[j + jinc])) + ((colors[j + 2 * jinc]
+                                   < 0)
+                                ? (((int) colors[j + 2 * jinc]) + 256)
+                                : ((int) colors[j + 2 * jinc]))) / 3, (((colors[j + 1]
+                                   < 0)
+                                ? (((int) colors[j + 1]) + 256)
+                                : ((int) colors[j + 1])) + ((colors[j + jinc + 1]
+                                   < 0)
+                                ? (((int) colors[j + jinc + 1]) + 256)
+                                : ((int) colors[j + jinc + 1])) + ((colors[j + 2 * jinc + 1]
+                                   < 0)
+                                ? (((int) colors[j + 2 * jinc + 1]) + 256)
+                                : ((int) colors[j + 2 * jinc + 1]))) / 3, (((colors[j + 2]
+                                   < 0)
+                                ? (((int) colors[j + 2]) + 256)
+                                : ((int) colors[j + 2])) + ((colors[j + jinc + 2]
+                                   < 0)
+                                ? (((int) colors[j + jinc + 2]) + 256)
+                                : ((int) colors[j + jinc + 2])) + ((colors[j + 2 * jinc + 2]
+                                   < 0)
+                                ? (((int) colors[j + 2 * jinc + 2]) + 256)
+                                : ((int) colors[j + 2 * jinc + 2]))) / 3));
                         j += 3 * jinc;
-                        GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-                        path.moveTo(mx+scale*pts[i], my-scale*pts[i+1]);
-                        path.lineTo(mx+scale*pts[i+3], my-scale*pts[i+4]);
-                        path.lineTo(mx+scale*pts[i+6], my-scale*pts[i+7]);
+                        GeneralPath path =
+                            new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+                        path.moveTo(mx + scale * pts[i],
+                                    my - scale * pts[i + 1]);
+                        path.lineTo(mx + scale * pts[i + 3],
+                                    my - scale * pts[i + 4]);
+                        path.lineTo(mx + scale * pts[i + 6],
+                                    my - scale * pts[i + 7]);
                         path.closePath();
                         g2.fill(path);
                     }
                 }
-            }
-            else if (array instanceof VisADQuadArray) {
+            } else if (array instanceof VisADQuadArray) {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                     RenderingHints.VALUE_ANTIALIAS_OFF);
                 if (colors == null) {
-                    for (int i=0; i<3*count; i += 12) {
-                        GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-                        path.moveTo(mx+scale*pts[i], my-scale*pts[i+1]);
-                        path.lineTo(mx+scale*pts[i+3], my-scale*pts[i+4]);
-                        path.lineTo(mx+scale*pts[i+6], my-scale*pts[i+7]);
-                        path.lineTo(mx+scale*pts[i+9], my-scale*pts[i+10]);
+                    for (int i = 0; i < 3 * count; i += 12) {
+                        GeneralPath path =
+                            new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+                        path.moveTo(mx + scale * pts[i],
+                                    my - scale * pts[i + 1]);
+                        path.lineTo(mx + scale * pts[i + 3],
+                                    my - scale * pts[i + 4]);
+                        path.lineTo(mx + scale * pts[i + 6],
+                                    my - scale * pts[i + 7]);
+                        path.lineTo(mx + scale * pts[i + 9],
+                                    my - scale * pts[i + 10]);
                         path.closePath();
                         g2.fill(path);
                     }
-                }
-                else { // colors != null
-                    int j = 0;
-                    int jinc = (colors.length == pts.length) ? 3 : 4;
-                    for (int i=0; i<3*count; i += 12) {
-                        g2.setColor(new Color(
-                                              (((colors[j] < 0) ? (((int) colors[j]) + 256) :
-                                                ((int) colors[j]) ) +
-                                               ((colors[j+jinc] < 0) ? (((int) colors[j+jinc]) + 256) :
-                                                ((int) colors[j+jinc]) ) +
-                                               ((colors[j+2*jinc] < 0) ? (((int) colors[j+2*jinc]) + 256) :
-                                                ((int) colors[j+2*jinc]) ) +
-                                               ((colors[j+3*jinc] < 0) ? (((int) colors[j+3*jinc]) + 256) :
-                                                ((int) colors[j+3*jinc]) ) ) / 4,
-                                              (((colors[j+1] < 0) ? (((int) colors[j+1]) + 256) :
-                                                ((int) colors[j+1]) ) +
-                                               ((colors[j+jinc+1] < 0) ? (((int) colors[j+jinc+1]) + 256) :
-                                                ((int) colors[j+jinc+1]) ) +
-                                               ((colors[j+2*jinc+1] < 0) ? (((int) colors[j+2*jinc+1]) + 256) :
-                                                ((int) colors[j+2*jinc+1]) ) +
-                                               ((colors[j+3*jinc+1] < 0) ? (((int) colors[j+3*jinc+1]) + 256) :
-                                                ((int) colors[j+3*jinc+1]) ) ) / 4,
-                                              (((colors[j+2] < 0) ? (((int) colors[j+2]) + 256) :
-                                                ((int) colors[j+2]) ) +
-                                               ((colors[j+jinc+2] < 0) ? (((int) colors[j+jinc+2]) + 256) :
-                                                ((int) colors[j+jinc+2]) ) +
-                                               ((colors[j+2*jinc+2] < 0) ? (((int) colors[j+2*jinc+2]) + 256) :
-                                                ((int) colors[j+2*jinc+2]) ) +
-                                               ((colors[j+3*jinc+2] < 0) ? (((int) colors[j+3*jinc+2]) + 256) :
-                                                ((int) colors[j+3*jinc+2]) ) ) / 4 ));
+                } else {  // colors != null
+                    int j    = 0;
+                    int jinc = (colors.length == pts.length)
+                               ? 3
+                               : 4;
+                    for (int i = 0; i < 3 * count; i += 12) {
+                        g2.setColor(new Color((((colors[j] < 0)
+                                ? (((int) colors[j]) + 256)
+                                : ((int) colors[j])) + ((colors[j + jinc] < 0)
+                                ? (((int) colors[j + jinc]) + 256)
+                                : ((int) colors[j + jinc])) + ((colors[j + 2 * jinc]
+                                   < 0)
+                                ? (((int) colors[j + 2 * jinc]) + 256)
+                                : ((int) colors[j + 2 * jinc])) + ((colors[j + 3 * jinc]
+                                   < 0)
+                                ? (((int) colors[j + 3 * jinc]) + 256)
+                                : ((int) colors[j + 3 * jinc]))) / 4, (((colors[j + 1]
+                                   < 0)
+                                ? (((int) colors[j + 1]) + 256)
+                                : ((int) colors[j + 1])) + ((colors[j + jinc + 1]
+                                   < 0)
+                                ? (((int) colors[j + jinc + 1]) + 256)
+                                : ((int) colors[j + jinc + 1])) + ((colors[j + 2 * jinc + 1]
+                                   < 0)
+                                ? (((int) colors[j + 2 * jinc + 1]) + 256)
+                                : ((int) colors[j + 2 * jinc + 1])) + ((colors[j + 3 * jinc + 1]
+                                   < 0)
+                                ? (((int) colors[j + 3 * jinc + 1]) + 256)
+                                : ((int) colors[j + 3 * jinc + 1]))) / 4, (((colors[j + 2]
+                                   < 0)
+                                ? (((int) colors[j + 2]) + 256)
+                                : ((int) colors[j + 2])) + ((colors[j + jinc + 2]
+                                   < 0)
+                                ? (((int) colors[j + jinc + 2]) + 256)
+                                : ((int) colors[j + jinc + 2])) + ((colors[j + 2 * jinc + 2]
+                                   < 0)
+                                ? (((int) colors[j + 2 * jinc + 2]) + 256)
+                                : ((int) colors[j + 2 * jinc + 2])) + ((colors[j + 3 * jinc + 2]
+                                   < 0)
+                                ? (((int) colors[j + 3 * jinc + 2]) + 256)
+                                : ((int) colors[j + 3 * jinc + 2]))) / 4));
                         j += 4 * jinc;
-                        GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-                        path.moveTo(mx+scale*pts[i], my-scale*pts[i+1]);
-                        path.lineTo(mx+scale*pts[i+3], my-scale*pts[i+4]);
-                        path.lineTo(mx+scale*pts[i+6], my-scale*pts[i+7]);
-                        path.lineTo(mx+scale*pts[i+9], my-scale*pts[i+10]);
+                        GeneralPath path =
+                            new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+                        path.moveTo(mx + scale * pts[i],
+                                    my - scale * pts[i + 1]);
+                        path.lineTo(mx + scale * pts[i + 3],
+                                    my - scale * pts[i + 4]);
+                        path.lineTo(mx + scale * pts[i + 6],
+                                    my - scale * pts[i + 7]);
+                        path.lineTo(mx + scale * pts[i + 9],
+                                    my - scale * pts[i + 10]);
                         path.closePath();
                         g2.fill(path);
                     }
@@ -1600,6 +1728,7 @@ public class StationModelDisplayable extends DisplayableData {
             }
 
         }
+
     }
 
 
