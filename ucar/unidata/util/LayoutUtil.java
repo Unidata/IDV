@@ -1077,6 +1077,22 @@ public class LayoutUtil extends MenuUtil {
         return topCenterBottom(top, center, null);
     }
 
+
+
+
+    /**
+     *  Creates a JPanel and does a BorderLayout NORTH/BOTTOM of the given components
+     *
+     * @param top The top component
+     * @param bottom The bottom component
+     * @return The new JPanel
+     */
+    public static JPanel topBottom(Component top, Component bottom) {
+        return topCenterBottom(top, null, bottom);
+    }
+
+
+
     /**
      *  Creates a JPanel and does a BorderLayout CENTER/SOUTH of the given components
      *

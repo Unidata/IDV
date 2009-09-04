@@ -833,6 +833,11 @@ public class GuiUtils extends LayoutUtil {
             return GuiUtils.hbox(this, clearBtn, 4);
         }
 
+        public Color getColor() {
+            return color;
+        }
+
+
         /**
          * Get the panel that shows the swatch and the Set button.
          *
