@@ -112,7 +112,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     private boolean autoRotate = false;
 
     /** matrix multiplier */
-    private double[] mult = null;
+    private double[] rotationMultiplier = null;
 
     /** rotation delay */
     private long rotateDelay = 50;
@@ -276,7 +276,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                 }
             }
         });
-        mult = display.make_matrix(0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0);
+        rotationMultiplier = display.make_matrix(0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0);
     }
 
     /**
@@ -2001,7 +2001,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     private void rotate() throws VisADException, RemoteException {
         double[] matrix = getProjectionMatrix();
-        setProjectionMatrix(getDisplay().multiply_matrix(mult, matrix));
+        setProjectionMatrix(getDisplay().multiply_matrix(rotationMultiplier, matrix));
     }
 
 
