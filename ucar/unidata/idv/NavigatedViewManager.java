@@ -650,7 +650,7 @@ public abstract class NavigatedViewManager extends ViewManager {
                    deltaTime<200 &&
                    speed>0.5) {
                     double[] endMatrix = getProjectionControl().getMatrix();
-                    mouseFlicked(startMoveMatrix, endMatrix);
+                    mouseFlicked(mouseStartPoint, toPoint, startMoveMatrix, endMatrix);
                 }
             }
             mouseMovedTime  = -1;
@@ -659,8 +659,8 @@ public abstract class NavigatedViewManager extends ViewManager {
     }
 
 
-    protected void mouseFlicked(double[] startMatrix, double [] endMatrix) {
-        getViewpointControl().setAutoRotate(true);
+
+    protected void mouseFlicked(Point startPoint, Point endPoint, double[] startMatrix, double [] endMatrix) {
     }
 
 

@@ -23,9 +23,6 @@
 
 
 
-
-
-
 package ucar.unidata.idv;
 
 
@@ -191,6 +188,8 @@ public class MapViewManager extends NavigatedViewManager {
 
     /** The map panel in the GUI */
     private PipPanel pipPanel;
+
+    private JComponent  pipPanelWrapper;
 
     /** Do we reproject when we goto address */
     private static JCheckBox addressReprojectCbx;
@@ -448,10 +447,43 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 
-    protected void mouseFlicked(double[] startMatrix, double [] endMatrix) {
-        if (getUseGlobeDisplay()) {
-            //            getViewpointControl().setAutoRotate(true);
+    protected void mouseFlicked(Point startPoint, Point endPoint, double[] startMatrix, double [] endMatrix) {
+        if(true) return;
+        if (!getUseGlobeDisplay()) {
+            return;
         }
+        //        rotationMultiplier = display.make_matrix(0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0);
+        //  public double[] make_matrix(double rotx, double roty, double rotz,
+        //         double scale, double transx, double transy, double transz) {
+
+
+        double[] trans         = { 0.0, 0.0, 0.0 };
+        double[] rot1           = { 0.0, 0.0, 0.0 };
+        double[] rot2           = { 0.0, 0.0, 0.0 };
+        double[] scale         = { 0.0, 0.0, 0.0 };
+        getNavigatedDisplay().getMouseBehavior().instance_unmake_matrix(rot1, scale, trans,
+                                                  startMatrix);
+        getNavigatedDisplay().getMouseBehavior().instance_unmake_matrix(rot2, scale, trans,
+                                                  endMatrix);
+        System.err.println ("rot1:" + rot1[0] +" " + rot1[1] +" " + rot1[2]);
+        System.err.println ("rot2:" + rot2[0] +" " + rot2[1] +" " + rot2[2]);
+
+        double delta = (rot1[0]-rot2[0])+(rot1[1]-rot2[1])+(rot1[2]-rot2[2]);
+        //        getNavigatedDisplay().setRotationMultiplierMatrix((rot1[0]-rot2[0])/delta, 
+        //                                                          (rot1[1]-rot2[1])/delta, 
+        //                                                          (rot1[2]-rot2[2])/delta);
+        
+        double distance = GuiUtils.distance(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+        if(distance==0) return;
+        double angleX = (endPoint.x-startPoint.x)/distance;
+        double angleY = (endPoint.y-startPoint.y)/distance;
+        System.err.println("angle:" + angleX + " " + angleY);
+
+        getNavigatedDisplay().setRotationMultiplierMatrix(angleX,
+                                                          angleY,
+                                                          1.0);
+
+        getViewpointControl().setAutoRotate(true);
     }
 
 
@@ -884,9 +916,9 @@ public class MapViewManager extends NavigatedViewManager {
             { "Show Animation Boxes", PREF_SHOWANIMATIONBOXES,
               new Boolean(getShowAnimationBoxes()) },
             { "Show Clock", IdvConstants.PROP_SHOWCLOCK,
-              new Boolean(getStateManager().getPreferenceOrProperty(IdvConstants.PROP_SHOWCLOCK,"true"))},
-            { "Show Overview Map", PREF_SHOWPIP,
-              new Boolean(getStore().get(PREF_SHOWPIP, false)) },
+              new Boolean(getStateManager().getPreferenceOrProperty(IdvConstants.PROP_SHOWCLOCK,"true"))}
+            , { "Show Overview Map", PREF_SHOWPIP,
+                new Boolean(getStore().get(PREF_SHOWPIP, false)) },
         };
 
         Object[][] toolbarObjects = {
@@ -1045,7 +1077,7 @@ public class MapViewManager extends NavigatedViewManager {
      * @return The side legend or the sidelegend coupled with the pip panel
      */
     protected JComponent getSideComponent(JComponent sideLegend) {
-        if (getUseGlobeDisplay() || !getStore().get(PREF_SHOWPIP, false)) {
+        if (getUseGlobeDisplay()) {
             return sideLegend;
         }
         pipPanel = new PipPanel(this);
@@ -1061,8 +1093,15 @@ public class MapViewManager extends NavigatedViewManager {
         });
         splitPane.setDividerSize(3);
 
+
         //        return splitPane;
-        return GuiUtils.centerBottom(sideLegend, pipPanel);
+        JButton closeBtn  = GuiUtils.makeImageButton("/auxdata/ui/icons/Cancel16.gif",this,"hidePip");
+        pipPanelWrapper = GuiUtils.topCenter(GuiUtils.right(closeBtn), pipPanel);
+        if (!getShowPip()) {
+            pipPanelWrapper.setVisible(false);
+        }
+
+        return GuiUtils.centerBottom(sideLegend, pipPanelWrapper);
     }
 
 
@@ -1193,7 +1232,9 @@ public class MapViewManager extends NavigatedViewManager {
 
         createCBMI(showMenu, PREF_SHOWSCALES);
         createCBMI(showMenu, PREF_ANIREADOUT);
+        createCBMI(showMenu, PREF_SHOWPIP);
         createCBMI(showMenu, PREF_SHOWEARTHNAVPANEL);
+
         return showMenu;
     }
 
@@ -1280,6 +1321,9 @@ public class MapViewManager extends NavigatedViewManager {
         p = (ProjectionImpl) p.clone();
         try {
             setMapProjection(new ProjectionCoordinateSystem(p), true);
+            if(pipPanel!=null) {
+                pipPanel.setProjectionImpl(p);
+            }
         } catch (Exception excp) {
             logException("setMapProjection ()", excp);
         }
@@ -1554,7 +1598,6 @@ public class MapViewManager extends NavigatedViewManager {
                     if (maintainViewpoint) {
                         setDisplayMatrix(matrix);
                     }
-
                 } catch (Exception e) {
                     logException("setProjection", e);
                 }
@@ -2331,6 +2374,10 @@ public class MapViewManager extends NavigatedViewManager {
                                              earthNavPanel);
                 }
             }
+        } else if (id.equals(PREF_SHOWPIP)) {
+            if (pipPanelWrapper != null) {
+                pipPanelWrapper.setVisible(value);
+            }
         } else if (id.equals(PREF_PERSPECTIVEVIEW)) {
             if (hasViewpointControl()) {
                 getViewpointControl().setPerspectiveView(value);
@@ -2361,6 +2408,10 @@ public class MapViewManager extends NavigatedViewManager {
         props.add(new BooleanProperty(PREF_SHOWEARTHNAVPANEL,
                                       "Show Earth Navigation Panel",
                                       "Show Earth Navigation Panel", false));
+
+        props.add(new BooleanProperty(PREF_SHOWPIP,
+                                      "Show Overview Map",
+                                      "Show Overview Map", false));
 
     }
 
@@ -2470,6 +2521,29 @@ public class MapViewManager extends NavigatedViewManager {
      */
     public boolean getShowEarthNavPanel() {
         return getBp(PREF_SHOWEARTHNAVPANEL);
+    }
+
+
+    public void hidePip() {
+        setShowPip(false);
+    }
+
+    /**
+     * Set the ShowPipPanel property.
+     *
+     * @param value The new value for ShowPipPanel
+     */
+    public void setShowPip(boolean value) {
+        setBp(PREF_SHOWPIP, value);
+    }
+
+    /**
+     * Get the ShowPipPanel property.
+     *
+     * @return The ShowPipPanel
+     */
+    public boolean getShowPip() {
+        return getBp(PREF_SHOWPIP);
     }
 
 
