@@ -279,6 +279,13 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         rotationMultiplier = display.make_matrix(0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0);
     }
 
+
+    public void setRotationMultiplierMatrix(double rotx, double roty, double rotz) {
+        DisplayImpl display = (DisplayImpl) getDisplay();
+        rotationMultiplier = display.make_matrix(rotx, roty, rotz, 1.0, 0.0, 0.0, 0.0);
+    }
+
+
     /**
      * Accessor method.
      * @return name for this view
