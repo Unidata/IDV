@@ -276,6 +276,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                 }
             }
         });
+        //  public double[] make_matrix(double rotx, double roty, double rotz,
+        //         double scale, double transx, double transy, double transz) {
         rotationMultiplier = display.make_matrix(0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0);
     }
 
@@ -1954,6 +1956,15 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     public void setRotateDelay(long millis) {
         rotateDelay = millis;
+        if(rotateDelay<1) rotateDelay = 1;
+    }
+
+    public void rotateFaster() {
+        setRotateDelay(rotateDelay/2);
+    }
+
+    public void rotateSlower() {
+        setRotateDelay(rotateDelay*2);
     }
 
 

@@ -36,6 +36,8 @@ import visad.Unit;
 
 import visad.georef.*;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.awt.BorderLayout;
 import java.awt.event.*;
 
@@ -51,6 +53,12 @@ import javax.swing.event.*;
  * @version $Revision: 1.31 $
  */
 public class ViewpointControl implements ActionListener {
+
+    private static final String ROTATE_RIGHT = "rotate.right";
+    private static final String ROTATE_LEFT = "rotate.left";
+    private static final String ROTATE_UP = "rotate.up";
+    private static final String ROTATE_DOWN = "rotate.down";
+
 
     /** Action command */
     private static final String CMD_SETTOP = "cmd.settopview";
@@ -373,18 +381,47 @@ public class ViewpointControl implements ActionListener {
                     "/auxdata/ui/icons/arrow_rotate_clockwise.png", null,
                     true), GuiUtils.getScaledImageIcon(
                         "/auxdata/ui/icons/arrow_rotate_clockwise.png", null, true), 2, 2);
-        rotateButton.setToolTipText("Auto-rotate");
+        rotateButton.setToolTipText("Auto-rotate;Right click to show menu");
         rotateButton.setSelected(getAutoRotate());
         rotateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 changeAutoRotate(rotateButton.isSelected());
             }
         });
+        rotateButton.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent me) {
+                if ( !SwingUtilities.isRightMouseButton(me)) {
+                    return;
+                }
+                List items = new ArrayList();
+                items.add(GuiUtils.makeMenuItem("Rotate Right", ViewpointControl.this, "setRotate",ROTATE_RIGHT));
+                items.add(GuiUtils.makeMenuItem("Rotate Left", ViewpointControl.this, "setRotate",ROTATE_LEFT));
+                items.add(GuiUtils.makeMenuItem("Rotate Up", ViewpointControl.this, "setRotate",ROTATE_UP));
+                items.add(GuiUtils.makeMenuItem("Rotate Down", ViewpointControl.this, "setRotate",ROTATE_DOWN));
+                items.add(GuiUtils.MENU_SEPARATOR);
+                items.add(GuiUtils.makeMenuItem("Rotate Faster", navDisplay, "rotateFaster"));
+                items.add(GuiUtils.makeMenuItem("Rotate Slower", navDisplay, "rotateSlower"));
+                GuiUtils.showPopupMenu(items, rotateButton);
+            }});
         toolbar.add(rotateButton);
 
         //        if(true) return toolbar;
         //        toolbar.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         return toolbar;
+    }
+
+
+    public void setRotate(String dir) {
+        if(dir.equals(ROTATE_RIGHT)) {
+            navDisplay.setRotationMultiplierMatrix(0,-1,0);
+        } else  if(dir.equals(ROTATE_LEFT)) {
+            navDisplay.setRotationMultiplierMatrix(0,1,0);
+        } else  if(dir.equals(ROTATE_UP)) {
+            navDisplay.setRotationMultiplierMatrix(1,0,0);
+        } else  if(dir.equals(ROTATE_DOWN)) {
+            navDisplay.setRotationMultiplierMatrix(-1,0,0);
+        }
+        setAutoRotate(true);
     }
 
 
