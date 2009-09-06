@@ -191,6 +191,7 @@ public class MapViewManager extends NavigatedViewManager {
 
     private JComponent  pipPanelWrapper;
 
+
     /** Do we reproject when we goto address */
     private static JCheckBox addressReprojectCbx;
 
@@ -448,41 +449,17 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     protected void mouseFlicked(Point startPoint, Point endPoint, double[] startMatrix, double [] endMatrix) {
-        if(true) return;
+        //        if(true) return;
         if (!getUseGlobeDisplay()) {
             return;
         }
-        //        rotationMultiplier = display.make_matrix(0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0);
-        //  public double[] make_matrix(double rotx, double roty, double rotz,
-        //         double scale, double transx, double transy, double transz) {
-
-
-        double[] trans         = { 0.0, 0.0, 0.0 };
-        double[] rot1           = { 0.0, 0.0, 0.0 };
-        double[] rot2           = { 0.0, 0.0, 0.0 };
-        double[] scale         = { 0.0, 0.0, 0.0 };
-        getNavigatedDisplay().getMouseBehavior().instance_unmake_matrix(rot1, scale, trans,
-                                                  startMatrix);
-        getNavigatedDisplay().getMouseBehavior().instance_unmake_matrix(rot2, scale, trans,
-                                                  endMatrix);
-        System.err.println ("rot1:" + rot1[0] +" " + rot1[1] +" " + rot1[2]);
-        System.err.println ("rot2:" + rot2[0] +" " + rot2[1] +" " + rot2[2]);
-
-        double delta = (rot1[0]-rot2[0])+(rot1[1]-rot2[1])+(rot1[2]-rot2[2]);
-        //        getNavigatedDisplay().setRotationMultiplierMatrix((rot1[0]-rot2[0])/delta, 
-        //                                                          (rot1[1]-rot2[1])/delta, 
-        //                                                          (rot1[2]-rot2[2])/delta);
-        
         double distance = GuiUtils.distance(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
         if(distance==0) return;
-        double angleX = (endPoint.x-startPoint.x)/distance;
-        double angleY = (endPoint.y-startPoint.y)/distance;
-        System.err.println("angle:" + angleX + " " + angleY);
-
-        getNavigatedDisplay().setRotationMultiplierMatrix(angleX,
-                                                          angleY,
-                                                          1.0);
-
+        double percentX = (endPoint.x-startPoint.x)/distance;
+        double percentY = (endPoint.y-startPoint.y)/distance;
+        getNavigatedDisplay().setRotationMultiplierMatrix(-percentY,
+                                                          -percentX,
+                                                          0.0);
         getViewpointControl().setAutoRotate(true);
     }
 
