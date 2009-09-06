@@ -1597,10 +1597,13 @@ public class PluginManager extends IdvManager {
      */
     public void removePlugin(File file) {
         myPlugins.remove(file.toString());
+        System.err.println ("remove:" + file);
         try {
             String deleteThisFile = file + ".deletethis";
             IOUtil.writeFile(deleteThisFile, "");
-        } catch (Exception exc) {}
+        } catch (Exception exc) {
+            System.err.println (exc);
+        }
         //        file.deleteOnExit();
 
         Plugin p = (Plugin) Plugin.pathToPlugin.get(decode(file));
@@ -2418,8 +2421,12 @@ public class PluginManager extends IdvManager {
                         + HtmlUtil.img(
                             "idvresource:/auxdata/ui/icons/Refresh16.gif") + "</a>";
                 }
-                addDelete.append("<a href=\"jython:idv.getPluginManager().removePlugin('"
-                        + plugin.file + "')\">"
+
+
+                String deleteHtml = "<a href=\"jython:idv.getPluginManager().removePlugin('"
+                    + plugin.getFilePath() + "')\">";
+                //                System.err.println ("html: " + deleteHtml);
+                addDelete.append(deleteHtml
                         + HtmlUtil.img("idvresource:/auxdata/ui/icons/plugin_delete.png")
                         + "</a>&nbsp;" + extra);
                 loadedBuff.append(HtmlUtil.open(HtmlUtil.TAG_TR,
@@ -2634,6 +2641,12 @@ public class PluginManager extends IdvManager {
             deleted   = true;
         }
 
+
+        public String getFilePath() {
+            String path = file.toString();
+            path = path.replaceAll("\\\\","/");
+            return path;
+        }
 
         /**
          * tostring
