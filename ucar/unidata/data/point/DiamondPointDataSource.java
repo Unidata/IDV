@@ -164,15 +164,7 @@ public class DiamondPointDataSource extends TextPointDataSource {
 
         int currentIndex = 1;
 
-        /*
-diamond 1 00Äê02ÔÂ01ÈÕ02Ê±µØÃæÌîÍ¼
-00 02 01 02 3971
-50468  127.45   50.25  166   16    0    0    0  250   -6    0    0
-      0 9999    0 9999  -17.9   25.0    0   -8.5 9999 9999 9999 9999
-50953  126.77   45.75  143    1    0  200    3  383  -11    0    0
-      0 9999    0 9999  -24.5   20.0    0  -21.8 9999 9999 9999 9999
 
-         */
         while (currentIndex < lines.size()) {
 
             String       headerLine2 = lines.get(currentIndex++);
@@ -247,15 +239,6 @@ diamond 1 00Äê02ÔÂ01ÈÕ02Ê±µØÃæÌîÍ¼
 
         int currentIndex = 1;
         //  String headerLine1 = lines.get(currentIndex++);
-
-        /*
-diamond 2 00Äê02ÔÂ01ÈÕ08Ê±500°ÙÅÁ¸ß¿Õ¹Û²â
-00 02 01 08  500 364
-  1001   -8.66   70.93    9    1  506  -41 9999  290   24
-  1028   19.02   74.52   14    1  495  -38    6  215    5
-  1152   14.37   67.27   13    1  501  -43 9999  310   24
-         */
-        // if(headerLine1.contains("diamond 2"))
 
 
         while (currentIndex < lines.size()) {
