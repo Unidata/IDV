@@ -21,8 +21,6 @@
  */
 
 
-
-
 package ucar.unidata.idv;
 
 
@@ -448,17 +446,33 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 
-    protected void mouseFlicked(Point startPoint, Point endPoint, double[] startMatrix, double [] endMatrix) {
+    protected void mouseFlicked(Point startPoint, Point endPoint, double[] startMatrix, double [] endMatrix,double speed) {
         //        if(true) return;
         if (!getUseGlobeDisplay()) {
             return;
         }
+        
+
+        double[] trans         = { 0.0, 0.0, 0.0 };
+        double[] rot1           = { 0.0, 0.0, 0.0 };
+        double[] rot2           = { 0.0, 0.0, 0.0 };
+        double[] scale         = { 0.0, 0.0, 0.0 };
+        getNavigatedDisplay().getMouseBehavior().instance_unmake_matrix(rot1, scale, trans,
+                                                  startMatrix);
+        getNavigatedDisplay().getMouseBehavior().instance_unmake_matrix(rot2, scale, trans,
+                                                  endMatrix);
+
+        //If there was no rotation then return
+        if(rot1[0] == rot2[0] && rot1[1] == rot2[1]) return;
+
         double distance = GuiUtils.distance(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
         if(distance==0) return;
         double percentX = (endPoint.x-startPoint.x)/distance;
         double percentY = (endPoint.y-startPoint.y)/distance;
-        getNavigatedDisplay().setRotationMultiplierMatrix(-percentY,
-                                                          -percentX,
+        speed *=2;
+        //        System.err.println ("speed:" + speed);
+        getNavigatedDisplay().setRotationMultiplierMatrix(speed*-percentY,
+                                                          speed*-percentX,
                                                           0.0);
         getViewpointControl().setAutoRotate(true);
     }
