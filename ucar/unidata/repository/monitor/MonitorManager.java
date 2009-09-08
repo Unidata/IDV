@@ -199,6 +199,7 @@ public class MonitorManager extends RepositoryManager {
                 tmpMonitors = new ArrayList<EntryMonitor>(monitors);
             }
             for (Entry entry : entries) {
+                //                System.err.println("check entry: " + entry);
                 for (EntryMonitor entryMonitor : tmpMonitors) {
                     entryMonitor.checkEntry(entry);
                 }

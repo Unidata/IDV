@@ -120,6 +120,9 @@ public class Harvester extends RepositoryManager {
     public static final String ATTR_ADDMETADATA = "addmetadata";
 
     /** _more_ */
+    public static final String ATTR_ADDSHORTMETADATA = "addshortmetadata";
+
+    /** _more_ */
     public static final String ATTR_NAME = "name";
 
     /** _more_ */
@@ -207,6 +210,9 @@ public class Harvester extends RepositoryManager {
 
     /** _more_ */
     private boolean addMetadata = false;
+
+    /** _more_ */
+    private boolean addShortMetadata = false;
 
     /** _more_ */
     private String id;
@@ -394,6 +400,8 @@ public class Harvester extends RepositoryManager {
         this.monitor = XmlUtil.getAttribute(element, ATTR_MONITOR, monitor);
         this.addMetadata = XmlUtil.getAttribute(element, ATTR_ADDMETADATA,
                 addMetadata);
+        this.addShortMetadata = XmlUtil.getAttribute(element, ATTR_ADDSHORTMETADATA,
+                addShortMetadata);
         this.activeOnStart = XmlUtil.getAttribute(element,
                 ATTR_ACTIVEONSTART, activeOnStart);
         this.testCount = XmlUtil.getAttribute(element, ATTR_TESTCOUNT,
@@ -461,6 +469,7 @@ public class Harvester extends RepositoryManager {
         testMode      = request.get(ATTR_TESTMODE, false);
         monitor       = request.get(ATTR_MONITOR, false);
         addMetadata   = request.get(ATTR_ADDMETADATA, false);
+        addShortMetadata   = request.get(ATTR_ADDSHORTMETADATA, false);
         sleepMinutes  = request.get(ATTR_SLEEP, sleepMinutes);
         sleepUnit     = request.getString(ATTR_SLEEPUNIT, sleepUnit);
         if (sleepUnit.equals(UNIT_HOUR)) {
@@ -573,6 +582,7 @@ public class Harvester extends RepositoryManager {
         element.setAttribute(ATTR_TESTCOUNT, testCount + "");
         element.setAttribute(ATTR_MONITOR, monitor + "");
         element.setAttribute(ATTR_ADDMETADATA, addMetadata + "");
+        element.setAttribute(ATTR_ADDSHORTMETADATA, addShortMetadata + "");
         element.setAttribute(ATTR_TYPE, typeHandler.getType());
 
         element.setAttribute(ATTR_SLEEP, sleepMinutes + "");
@@ -842,6 +852,25 @@ public class Harvester extends RepositoryManager {
      */
     public boolean getAddMetadata() {
         return addMetadata;
+    }
+
+
+    /**
+     *  Set the AddMetadata property.
+     *
+     *  @param value The new value for AddMetadata
+     */
+    public void setAddShortMetadata(boolean value) {
+        addShortMetadata = value;
+    }
+
+    /**
+     *  Get the AddMetadata property.
+     *
+     *  @return The AddMetadata
+     */
+    public boolean getAddShortMetadata() {
+        return addShortMetadata;
     }
 
 

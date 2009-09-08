@@ -308,6 +308,9 @@ public class PatternHarvester extends Harvester {
         sb.append(HtmlUtil.formEntry(msgLabel("Add Metadata"),
                                      HtmlUtil.checkbox(ATTR_ADDMETADATA,
                                          "true", getAddMetadata())));
+        sb.append(HtmlUtil.formEntry(msgLabel("Just Add Spatial/Temporal Metadata"),
+                                     HtmlUtil.checkbox(ATTR_ADDSHORTMETADATA,
+                                         "true", getAddShortMetadata())));
 
     }
 
@@ -575,9 +578,9 @@ public class PatternHarvester extends Harvester {
                     }
                     if (needToAdd.size() > 1000) {
                         if ( !getTestMode()) {
-                            if (getAddMetadata()) {
+                            if (getAddMetadata() || getAddShortMetadata()) {
                                 getEntryManager().addInitialMetadata(null,
-                                                                     needToAdd, true, false);
+                                                                     needToAdd, true, getAddShortMetadata());
                             }
                             getEntryManager().insertEntries(needToAdd, true,
                                     true);
@@ -598,9 +601,9 @@ public class PatternHarvester extends Harvester {
             newEntryCnt += uniqueEntries.size();
             needToAdd.addAll(uniqueEntries);
             if (needToAdd.size() > 0) {
-                if (getAddMetadata()) {
+                if (getAddMetadata()||getAddShortMetadata()) {
                     getEntryManager().addInitialMetadata(null, needToAdd,
-                                                         true, false);
+                                                         true, getAddShortMetadata());
                 }
                 getEntryManager().insertEntries(needToAdd, true, true);
             }

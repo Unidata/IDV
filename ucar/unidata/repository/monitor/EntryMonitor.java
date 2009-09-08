@@ -107,6 +107,7 @@ public class EntryMonitor implements Constants {
     public static final String ARG_DELETE_ACTION_CONFIRM =
         "deleteactionconfirm";
 
+    
 
 
     /**
@@ -349,10 +350,28 @@ public class EntryMonitor implements Constants {
      */
     private void applyEditFilterField(Request request, String what)
             throws Exception {
+        boolean doNot = request.get(what + "_not", false);
+        if (what.equals(ARG_AREA)) {
+            double[]bbox = new double[]{
+                request.get(ARG_AREA + "_south", Entry.NONGEO),
+                request.get(ARG_AREA + "_north", Entry.NONGEO),
+                request.get(ARG_AREA + "_east", Entry.NONGEO),
+                request.get(ARG_AREA + "_west", Entry.NONGEO)};
+
+            if(bbox[0]!=Entry.NONGEO ||
+               bbox[1]!=Entry.NONGEO ||
+               bbox[2]!=Entry.NONGEO ||
+               bbox[3]!=Entry.NONGEO) {
+                addFilter(new Filter(what, bbox,doNot));
+            }
+            return;
+        }
+
+
+
         if ( !request.defined(what)) {
             return;
         }
-        boolean doNot = request.get(what + "_not", false);
         if (what.equals(ARG_FILESUFFIX)) {
             List<String> suffixes = StringUtil.split(request.getString(what,
                                         ""), ",", true, true);
@@ -465,6 +484,24 @@ public class EntryMonitor implements Constants {
                                           what) + HtmlUtil.attr(
                                           HtmlUtil.ATTR_SIZE, "60")) + select
                                               + notCbx));
+
+
+        } else if (what.equals(ARG_AREA)) {
+            double[]values = (filter==null?new double[]{Entry.NONGEO,
+                                                        Entry.NONGEO,
+                                                        Entry.NONGEO,
+                                                        Entry.NONGEO}:
+                              (double[])filter.getValue());
+            String latLonForm = HtmlUtil.makeLatLonBox(ARG_AREA,
+                                                       values[0]!=Entry.NONGEO?values[0]:Double.NaN,
+                                                       values[1]!=Entry.NONGEO?values[1]:Double.NaN,
+                                                       values[2]!=Entry.NONGEO?values[2]:Double.NaN,
+                                                       values[3]!=Entry.NONGEO?values[3]:Double.NaN);
+
+            sb.append(
+                HtmlUtil.formEntry(
+                    getRepository().msgLabel("Area"),
+                    latLonForm));
         } else if (what.equals(ARG_TYPE)) {
             List<TypeHandler> typeHandlers =
                 getRepository().getTypeHandlers();
@@ -528,6 +565,8 @@ public class EntryMonitor implements Constants {
             desc = "name/description";
         } else if (what.equals(ARG_USER)) {
             desc = "user";
+        } else if (what.equals(ARG_AREA)) {
+            desc = "area";
         } else if (what.equals(ARG_ANCESTOR)) {
             desc = "ancestor";
             Group group = getGroup(filter);
@@ -685,6 +724,7 @@ public class EntryMonitor implements Constants {
 
         for (Filter filter : filters) {
             boolean ok = checkEntry(filter, entry);
+            System.err.println ("Checking " + ok +" filter=" +filter );
             if ( !ok) {
                 //                System.err.println("filter not OK");
                 return false;
@@ -745,6 +785,20 @@ public class EntryMonitor implements Constants {
                 }
             }
 
+        } else if (field.equals(ARG_AREA)) {
+            //            System.err.println ("got area filter");
+            double[] bbox = (double[]) filter.getValue();
+            boolean okSouth=true, okNorth=true, okEast=true, okWest = true;
+            if(bbox[0]!=Entry.NONGEO) 
+                okSouth = entry.hasSouth() && entry.getSouth()>= bbox[0];
+            if(bbox[1]!=Entry.NONGEO) 
+                okNorth = entry.hasNorth() && entry.getNorth()<= bbox[1];
+            if(bbox[2]!=Entry.NONGEO) 
+                okEast = entry.hasEast() && entry.getEast()<= bbox[2];
+            if(bbox[3]!=Entry.NONGEO) 
+                okWest = entry.hasWest() && entry.getWest()>= bbox[3];
+            //            System.err.println (okWest +" " + okEast +" " +  okNorth +" " + okSouth);
+            ok = okWest&&okEast&& okNorth && okSouth;
         } else if (field.equals(ARG_USER)) {
             List<String> users = (List<String>) value;
             ok = users.contains(entry.getUser().getId());
@@ -1063,7 +1117,6 @@ public class EntryMonitor implements Constants {
     public String getLastError() {
         return this.lastError;
     }
-
 
 
 }
