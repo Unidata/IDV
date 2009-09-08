@@ -21,6 +21,13 @@
      doesmultiples="true"
      label="AWX Image files (AWX)"/>
 
+<datasource
+     id="FILE.DIAMONDPOINTTEXT"
+     factory="ucar.unidata.data.point.DiamondPointDataSource"
+     doesmultiples="true"
+     patterns="\.csv$,\.tsv$,\.txt$"
+     fileselection="true"
+     label="Diamond Point Data files"/>
 
 
 </datasources>
