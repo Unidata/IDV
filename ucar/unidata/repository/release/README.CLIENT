@@ -1,0 +1,8 @@
+
+To run this from the command line do:
+java -jar repositoryclient.jar
+to see the command line arguments.
+
+e.g.:
+
+java -jar repositoryclient.jar http://motherlode.ucar.edu/repository <user id> <password> -file <the file to upload> -name "Entry name" -description "Entry description"  -parent <Parent group ID to place new entry under> 

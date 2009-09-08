@@ -57,11 +57,13 @@
         <antcall target="repositoryjar"/>
         <antcall target="repositorytar"/>
         <antcall target="repositorywar"/>
+        <antcall target="clientjar"/>
+
     </target>
 
 
 
-    <target name="idvplugin" depends="init,clean">
+     <target name="idvplugin" depends="init,clean">
         <property name="pluginclasspath" value="${libsdir}/idv.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/ncIdv.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar:${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar:${libsdir}/servlet-api.jar"/>
         <javac
             verbose="false"
@@ -97,6 +99,9 @@
 
 
     </target>
+
+
+
 
 
 
@@ -143,8 +148,7 @@
 
 
     <target name="clientjar" depends="init,clean">
-        <property name="xclasspath" value="${libsdir}/external.jar"/>
-        <property name="clientclasspath" value="${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar"/>
+        <property name="xclasspath" value="${libsrc}/commons-httpclient-3.1.jar:${libsdir}/extra.jar:${srcdir}"/>
         <javac
             verbose="false"
             classpath="${xclasspath}"
@@ -161,15 +165,43 @@
         >
         <include name="ucar/unidata/repository/InteractiveRepositoryClient.java"/>
         </javac>
+        <mkdir dir="${tmpjardir}"/>
+        <delete includeemptydirs="true">
+            <fileset dir="${tmpjardir}" includes="**/*"/>
+        </delete>
+        <unjar src="${jars_dest}/extra.jar" dest="${tmpjardir}"/>
+
         <jar 
             basedir="${compiledir}"
             update="false"
             compress="true"
             jarfile="${jars_dest}/repositoryclient.jar">
+           <manifest>
+              <attribute name="Implementation-Title" value="Unidata's Ramada Client"/>
+              <attribute name="Implementation-Version" value="1.0"/>
+              <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
+              <attribute name="Main-class" value="ucar.unidata.repository.RepositoryClient"/>
+              <attribute name="Class-Path" value="commons-httpclient-3.1.jar commons-logging-1.1.jar commons-codec-1.3.jar"/>
+            </manifest> 
+
+
+            <include name="lib/tmpjardir/org/apache/xerces/impl/dv/util/Base64.class"/>
+
             <include name="ucar/**/*.class"/>
             <include name="ucar/unidata/repository/htdocs/icons/folderopen.png"/>
             <include name="ucar/unidata/repository/htdocs/icons/folderclosed.png"/>
+
 	    </jar>
+
+
+        <zip destfile="${libsdir}/repositoryclient.zip">
+         <zipfileset dir="${libsdir}" includes="repositoryclient.jar" fullpath="repositoryclient/repositoryclient.jar"/>
+         <zipfileset dir="${libsrc}" includes="commons-httpclient-3.1.jar" fullpath="repositoryclient/commons-httpclient-3.1.jar"/>
+         <zipfileset dir="${libsrc}" includes="commons-logging-1.1.jar" fullpath="repositoryclient/commons-logging-1.1.jar"/>
+         <zipfileset dir="${libsrc}" includes="commons-codec-1.3.jar" fullpath="repositoryclient/commons-codec-1.3.jar"/>
+         <zipfileset dir="ucar/unidata/repository/release" includes="README.CLIENT" fullpath="repositoryclient/README"/>
+        </zip>
+
     </target>
 
 

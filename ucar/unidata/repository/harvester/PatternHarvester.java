@@ -305,12 +305,12 @@ public class PatternHarvester extends Harvester {
                                      HtmlUtil.checkbox(ATTR_MOVETOSTORAGE,
                                          "true", moveToStorage)));
 
+        
         sb.append(HtmlUtil.formEntry(msgLabel("Add Metadata"),
                                      HtmlUtil.checkbox(ATTR_ADDMETADATA,
-                                         "true", getAddMetadata())));
-        sb.append(HtmlUtil.formEntry(msgLabel("Just Add Spatial/Temporal Metadata"),
-                                     HtmlUtil.checkbox(ATTR_ADDSHORTMETADATA,
-                                         "true", getAddShortMetadata())));
+                                                       "true", getAddMetadata())+HtmlUtil.space(2) +
+                                     msgLabel("Just Add Spatial/Temporal Metadata") + HtmlUtil.space(1)+HtmlUtil.checkbox(ATTR_ADDSHORTMETADATA,
+                                                                                                                          "true", getAddShortMetadata())));
 
     }
 

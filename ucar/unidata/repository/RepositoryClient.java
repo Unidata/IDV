@@ -187,6 +187,8 @@ public class RepositoryClient extends RepositoryBase {
         System.err.println(msg);
         System.err.println(
             "Usage: RepositoryClient <server url> <user id> <password> <arguments>");
+        System.err.println(
+            "Where arguments are:\n\t-parent <parent group id>\n\t-file <file to upload>\n\t-name <entry name>\n\t-descr <entry description>\n\t-attach <file to attach>\n\t-addmetadata (Add metadata to entry)\n\t");
         System.exit(1);
     }
 
