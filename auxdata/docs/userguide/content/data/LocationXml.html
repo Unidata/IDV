@@ -14,8 +14,9 @@ Select the &quot;Location&quot; data type.
 <%childlist%>
 
 <subhead intoc="false" id="xml">Locations XML</subhead>
-The main one format the IDV  uses is a custom locations xml format. This format still
-has some nomenclature from when it was atmospheric science related (e.g. &quot;stations&quot;).
+The main one format the IDV  uses is a custom locations xml format. This 
+format still has some nomenclature from when it was atmospheric science 
+related (e.g. &quot;stations&quot;).
 A simple example:
 [ug::xml {
 <?xml version="1.0" encoding="ISO-8859-1"?>
@@ -68,6 +69,30 @@ The  [ug::tag station] tags can also have any other  attributes:
 These can be displayed by the station model used in the 
 <a href="../controls/StationLocationControl.html">Location Display Control</a>.
 
+<p>
+If you want to create a permenant list of stations that shows up the the
+[ug::menu Display Locations] menu, you can create a file called
+userstations.xml in the [ht::command  .unidata/idv/DefaultIdv] directory
+under your user's home directory.  The format would look like:
+
+
+[ug::xml {
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<stationtables>
+
+<stationtable name="SubsetA" category="My Custom Stations">
+(list of stations for subset A)
+</stationable>
+
+<stationtable name="SubsetB" category="My Custom Stations">
+(list of stations for subset B)
+</stationtable>
+</stationtables>
+}]
+
+This will show up in the [ug::menu Display Locations] menu as a top menu called
+[ug::menu {My Custom Stations}] and sub menus [ug::menu SubsetA]
+and [ug::menu SubsetB].
 
 <subhead intoc="false" id="csv">CSV Format</subhead>
 Location data can be defined in a CSV (Comma Separated Value) format.
