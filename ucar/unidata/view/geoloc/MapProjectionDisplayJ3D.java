@@ -372,6 +372,16 @@ public class MapProjectionDisplayJ3D extends MapProjectionDisplay {
      * @param perspective  true for perspective view
      */
     public void setPerspectiveView(boolean perspective) {
+        /*        if(true) {
+            DisplayRendererJ3D rend =
+                (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
+            View v = rend.getView();
+            System.err.println ("fov:" + v.getFieldOfView());
+            v.setFieldOfView(v.getFieldOfView() * 0.9f);
+            return;
+            }*/
+
+
         if ( !(getDisplayMode() == MODE_3D)) {
             return;
         }

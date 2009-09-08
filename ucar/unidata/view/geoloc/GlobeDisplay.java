@@ -659,6 +659,16 @@ public class GlobeDisplay extends NavigatedDisplay {
      * @param perspective  true for perspective view
      */
     public void setPerspectiveView(boolean perspective) {
+        /*        if(true) {
+            DisplayRendererJ3D rend =
+                (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
+            View v = rend.getView();
+            System.err.println ("fov:" + v.getFieldOfView());
+            v.setFieldOfView(v.getFieldOfView() * 0.9f);
+            return;
+            }*/
+
+
         if (perspective == isPerspectiveView()) {
             return;
         }
