@@ -92,9 +92,9 @@
      label="Upsonde/Dropsonde files"/>
 
   <datasource
-     id="NetCDF.POINT"
+     id="NetCDF.POINT,OPENDAP.Station"
      factory="ucar.unidata.data.point.NetcdfPointDataSource"
-     patterns="_metar\.nc$,.*metar.*\.nc$,.*_syn\.nc$,.*_buoy\.nc$,.*_sounder_.*\.nc$,Surface_METAR.*\.nc,\.sfc$,sao\.gem$,sb\.gem$"
+     patterns="_metar\.nc$,.*metar.*\.nc$,.*_syn\.nc$,.*_buoy\.nc$,.*_sounder_.*\.nc$,Surface_METAR.*\.nc,\.sfc$,sao\.gem$,sb\.gem$,cdmremote"
      doesmultiples="true"
      fileselection="true"
      label="netCDF/GEMPAK Point Data files"/>
