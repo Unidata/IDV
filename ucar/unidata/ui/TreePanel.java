@@ -200,10 +200,11 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
 
         JComponent center;
         if (useSplitPane) {
+            double weight = 0.2;
             JSplitPane splitPane = ((treeWidth > 0)
                                     ? GuiUtils.hsplit(treeView, panel,
-                                        treeWidth)
-                                    : GuiUtils.hsplit(treeView, panel, 150));
+                                                      treeWidth,weight)
+                                    : GuiUtils.hsplit(treeView, panel, 150,weight));
             center = splitPane;
             splitPane.setOneTouchExpandable(true);
         } else {
