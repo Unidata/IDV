@@ -160,6 +160,7 @@ public class SideLegend extends IdvLegend {
      * have changed in some way.
      */
     protected void fillLegendSafely() {
+        if(legendsPanel==null) return;
         List controls = viewManager.getControlsForLegend();
         for (int i = 0; i < categoryPanels.size(); i++) {
             CategoryPanel categoryPanel =
