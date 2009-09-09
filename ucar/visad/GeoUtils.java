@@ -19,10 +19,13 @@
  */
 
 
+
 package ucar.visad;
 
 
 import org.w3c.dom.Element;
+
+import ucar.unidata.geoloc.LatLonRect;
 
 import ucar.unidata.util.GuiUtils;
 
@@ -102,6 +105,23 @@ public class GeoUtils {
     }
 
 
+    /**
+     * Convert a LatLonRect to a LinearLatLonSet.
+     * @param rect the LatLonRect
+     * @return the corresponding LinearLatLonSet
+     *
+     * @throws VisADException Problem creating the set
+     */
+    public static LinearLatLonSet latLonRectToSet(LatLonRect rect)
+            throws VisADException {
+        LinearLatLonSet bounds =
+            new LinearLatLonSet(RealTupleType.LatitudeLongitudeTuple,
+                                rect.getLatMin(),
+                                rect.getLatMin() + rect.getHeight(), 11,
+                                rect.getLonMin(),
+                                rect.getLonMin() + rect.getWidth(), 11);
+        return bounds;
+    }
 
     /**
      * Get the location of an address.
