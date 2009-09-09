@@ -26,6 +26,8 @@ package ucar.unidata.data.sounding;
 
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.StringUtil;
 
 import ucar.visad.Util;
 import ucar.visad.quantities.AirPressure;
@@ -132,6 +134,98 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
      * @throws Exception   problem reading the file
      */
     protected void init() throws Exception {
+        if (haveInitialized) {
+            return;
+        }
+        super.init();
+        times = new ArrayList();
+        // get the station list and number of stations
+        stations       = new ArrayList();  // array of stations
+        soundings      = new ArrayList();  // array of soundings
+        soundingLevels = new ArrayList();
+
+        String       s            = IOUtil.readContents(filename);
+        List<String> lines        = StringUtil.split(s, "\n", true, true);
+        int          currentIndex = 0;
+        String       headerLine = lines.get(currentIndex++);
+        String          delim   = (headerLine.indexOf(",") >= 0)
+                                  ? ","
+                                  : " ";
+        List<String> toks = StringUtil.split(headerLine, delim, true,
+                                    true);
+
+        while (currentIndex < lines.size()) {
+
+            StringBuffer buf    = new StringBuffer();
+            int          tokNum = 0;
+            while (tokNum < 3) {
+                buf.append(toks.get(tokNum));
+                buf.append("-");
+                tokNum++;
+            }
+            buf.append(toks.get(tokNum++));
+        // now should have something like 2007-1-27-0
+            DateTime dt = DateTime.createDateTime(buf.toString(),
+                          "yyyy-MM-dd-HH");
+
+            times.add(dt);
+            int numStations = Integer.parseInt(toks.get(tokNum));
+            int endPtsIndex = currentIndex + numStations;
+
+
+                
+            // fill the station and sounding lists
+            SoundingStation currentStation = null;
+            List            levels         = null;
+            int             numFound       = 0;
+
+            while (numFound < numStations && currentIndex < lines.size()) {
+
+                String dataLine = lines.get(currentIndex++);
+                if (dataLine == null) {
+                    break;
+                }
+
+                List<String> dtoks = StringUtil.split(dataLine, delim, true,
+                                    true);
+                int numToks = dtoks.size();
+                if (numToks == 4) {  // new station
+                    if (levels != null && levels.size() >0) {
+                        SoundingOb so = new SoundingOb(currentStation, dt);
+                        soundings.add(so);
+                        soundingLevels.add(levels);
+                        numFound++;
+                    }
+                    currentStation = makeSoundingStationList(dtoks);
+                    levels         = new ArrayList();
+                } else if(numToks == 6){
+                    appendLevelList(levels, dtoks);
+                } else if(numToks == 5) {
+                    if (levels != null && levels.size() > 0) {
+                        SoundingOb so = new SoundingOb(currentStation, dt);
+                        soundings.add(so);
+                        soundingLevels.add(levels);
+                        numFound++;
+                    }
+                    toks = StringUtil.split(dataLine, delim, true,
+                                    true);
+                    break;
+                }
+            }
+
+
+
+        }
+
+    }
+
+    /**
+     * Read a file of decoded soundings from CMA.  Format of
+     * file is as follows:
+     *
+     * @throws Exception   problem reading the file
+     */
+    protected void initold() throws Exception {
         if (haveInitialized) {
             return;
         }
@@ -243,6 +337,46 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
     }
 
     /**
+     * Append levels to the list
+     *
+     * @param levels  the list of levels
+     * @param toks  a list of tokens for the level
+     */
+    private void appendLevelList(List levels, List<String> toks) {
+        if (levels == null) {
+            return;
+        }
+        SoundingLevelData sld      = new SoundingLevelData();
+        float             pressure = getValue(toks.get(0));
+        if (Double.isNaN(pressure)) {
+            return;
+        }
+        sld.pressure    = pressure;
+        sld.height      = getValue(toks.get(1));
+        sld.temperature = getValue(toks.get(2));
+        sld.dewpoint    = getValue(toks.get(3));
+        sld.direction   = getValue(toks.get(4));
+        sld.speed       = getValue(toks.get(5));
+        try {
+            // figure out if we are in Geopotential or GeopotentialMeters
+            if ((heightUnit == null) && !Double.isNaN(sld.height)) {
+                float expected =
+                    AirPressure.getStandardAtmosphereCS().toReference(
+                        new float[][] {
+                    { sld.pressure }
+                })[0][0];
+                if (Math.abs(sld.height) > expected + 50) {
+                    heightUnit = GEOPOTENTIAL_UNIT;
+                } else {
+                    heightUnit = GeopotentialAltitude.getGeopotentialMeter();
+                }
+            }
+        } catch (VisADException ve) {}
+
+        levels.add(sld);
+    }
+
+    /**
      * Get a value from a string
      *
      * @param s  the string
@@ -290,6 +424,33 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
         return s;
     }
 
+    /**
+     * Create a sounding station object from the netCDF file info
+     *
+     * @param toks  the tokenizer to parse
+     *
+     * @return the SoundingStation
+     * @throws Exception   problem getting the data
+     */
+    private SoundingStation makeSoundingStationList(List<String> toks)
+            throws Exception {
+        String wmoID;
+        double latvalue;
+        double lonvalue;
+        double elevvalue;
+        try {
+            wmoID = new Integer((int) getValue(toks.get(0))).toString();
+            latvalue  = getValue(toks.get(1));
+            lonvalue  = getValue(toks.get(2));
+            elevvalue = getValue(toks.get(3));
+        } catch (Exception ne) {
+            throw new Exception(ne.toString());
+        }
+        SoundingStation s = new SoundingStation(wmoID, latvalue, lonvalue,
+                                elevvalue);
+        stations.add(s);
+        return s;
+    }
 
     /**
      * Set the data in the RAOB.
