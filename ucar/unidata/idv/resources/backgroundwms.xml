@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <backgroundwms>
+
   <wms
      server="http://wms.jpl.nasa.gov/wms.cgi"
      layer="modis"
@@ -8,6 +9,32 @@
      format="image/png"
      version="1.1.1"
      bbox="90,-180,-90,180"/>
+
+
+  <image file="/auxdata/images/Topography.jpg"
+         layer="fixed-topography"
+         title="World Topography - Fixed"/>
+
+  <image file="/auxdata/images/ndvi.jpg"
+         layer="fixed-ndvi"
+         title="World NDVI - Fixed"/>
+
+  <image file="/auxdata/images/BigEarth.jpg"
+         layer="fixed-bigearth"
+         title="World Big Earth - Fixed"/>
+
+  <image file="/auxdata/images/Earth.EOSVid.jpg"
+         layer="fixed-eosvid"
+         title="World Earth.EOSVid - Fixed"/>
+
+  <image file="/auxdata/images/PathfinderMap.jpg"
+         layer="fixed-pathfinder"
+         title="World Pathfinder - Fixed"/>
+
+  <image file="/auxdata/images/etopo-land.png"
+         layer="fixed-etopoland"
+         title="World Etopo Land - Fixed"/>
+
 
 
   <wms
