@@ -1759,7 +1759,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                                       EventMap.IDV_KEYBOARD_FUNCTIONS),
                                   Misc.newList(
                                       EventMap.GEARTH_MOUSE_FUNCTIONS,
-                                      EventMap.IDV_WHEEL_FUNCTIONS,
+                                      EventMap.GEARTH_WHEEL_FUNCTIONS,
                                       EventMap.GEARTH_KEYBOARD_FUNCTIONS),
                                   new ArrayList() };
         ButtonGroup  bg        = new ButtonGroup();
