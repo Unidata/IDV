@@ -1073,25 +1073,11 @@ public class MapViewManager extends NavigatedViewManager {
         }
         pipPanel = new PipPanel(this);
         pipPanel.setPreferredSize(new Dimension(100, 100));
-
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                                   sideLegend, pipPanel);
-        splitPane.setResizeWeight(0.8);
-        splitPane.setUI(new BasicSplitPaneUI() {
-            public BasicSplitPaneDivider createDefaultDivider() {
-                return new BasicSplitPaneDivider(this);
-            }
-        });
-        splitPane.setDividerSize(3);
-
-
-        //        return splitPane;
         JButton closeBtn  = GuiUtils.makeImageButton("/auxdata/ui/icons/Cancel16.gif",this,"hidePip");
         pipPanelWrapper = GuiUtils.topCenter(GuiUtils.right(closeBtn), pipPanel);
         if (!getShowPip()) {
             pipPanelWrapper.setVisible(false);
         }
-
         return GuiUtils.centerBottom(sideLegend, pipPanelWrapper);
     }
 
