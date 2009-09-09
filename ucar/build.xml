@@ -187,6 +187,7 @@ argument -Dfoo=bar) -->
               <include name="auxdata/jython/libs/**"/>
               <include name="auxdata/maps/**"/>
               <include name="auxdata/ui/**"/>
+              <include name="auxdata/images/**"/>
               <include name="auxdata/docs/userguide/**"/>
               <exclude name="auxdata/docs/userguide/content/**"/>
               <exclude name="auxdata/ui/colortables/**"/>
