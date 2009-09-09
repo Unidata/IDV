@@ -227,5 +227,10 @@ abstract public class EventMap {
         { WHEEL_ZOOMIN, WHEEL_ROTATEX }, { WHEEL_ROTATEY, WHEEL_ROTATEZ }
     };
 
+    /** IDV wheel functions */
+    public static final int[][] GEARTH_WHEEL_FUNCTIONS = {
+        { WHEEL_ZOOMOUT, WHEEL_ROTATEX }, { WHEEL_ROTATEY, WHEEL_ROTATEZ }
+    };
+
 }
 
