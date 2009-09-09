@@ -5623,6 +5623,7 @@ public class GuiUtils extends LayoutUtil {
 
     /**
      * Walk the tree and set any heavyweight components visibility.
+     * Note: We don't turn off any component that is under the javax.swing package
      * If we encounter a JTabbedPane then only show the components
      * that are in the selected tab
      *
@@ -5631,8 +5632,10 @@ public class GuiUtils extends LayoutUtil {
      */
     public static void toggleHeavyWeightComponents(Component comp,
             boolean visible) {
-        if ( !(comp instanceof JComponent)) {
-            comp.setVisible(visible);
+        if (!(comp instanceof JComponent)) {
+            if(!comp.getClass().getName().startsWith("javax.swing")) {
+                comp.setVisible(visible);
+            }
         }
         if ( !(comp instanceof Container)) {
             return;
