@@ -2166,8 +2166,8 @@ public class CDMRadarAdapter implements RadarAdapter {
         int      numberOfBin    = getGateNumber(sweepVar);
 
         if( p1 == null || p2 == null) {
-            p1 = setCrossSectionLinePosition(0.0f);
-            p2 = setCrossSectionLinePosition(180.0f);
+            p1 = setCrossSectionLinePosition(180.0f);
+            p2 = setCrossSectionLinePosition(0.0f);
 
         }
         if (RSL_sweep_list == null) {
@@ -2285,24 +2285,24 @@ public class CDMRadarAdapter implements RadarAdapter {
                         - range_to_first_gate)/range_step);
         //        System.out.println("radial " + ray1 + " " + azimuth1 + " " + azimuth2);
                 for(int ri = 0; ri < bincounter2; ri++) {
-                    rAzimuth[ti][ri] = (float)azimuth2;
+                    rAzimuth[ti][ri] = (float)azimuth1;
                     ranges[ti][ri] = range_to_first_gate + gateIdx * range_step;
           //      System.out.println("1-1 ti, ri, gi "+ ti + " " + ray1 + " " + gateIdx);
                     if(gateIdx >= numberOfBin || gateIdx<0)
                         rdata[ti][ri] = Float.NaN;
                     else
-                        rdata[ti][ri] = rayData[ti][ray1][gateIdx];
+                        rdata[ti][ri] = rayData[ti][ray0][gateIdx];
                     gateIdx--;
                 }
                 gateIdx = 0;
                 for(int ri = bincounter2; ri < bincounter; ri++) {
-                    rAzimuth[ti][ri] = (float)azimuth1;
+                    rAzimuth[ti][ri] = (float)azimuth2;
                     ranges[ti][ri] = range_to_first_gate + gateIdx * range_step;
          //        System.out.println("1-2 ti, ri, gi"+ ti + " " + ray0 + " " + gateIdx);
                     if(gateIdx >= numberOfBin )
                         rdata[ti][ri] = Float.NaN;
                     else
-                        rdata[ti][ri] = rayData[ti][ray0][gateIdx];
+                        rdata[ti][ri] = rayData[ti][ray1][gateIdx];
                     gateIdx++;
                 }
 
