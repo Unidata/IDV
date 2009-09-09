@@ -30,6 +30,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -211,7 +212,7 @@ public class GuiUtils extends LayoutUtil {
     private static Hashtable imageCache = new Hashtable();
 
 
-    /** Do we put the icons in the menus      */
+    /** Do we put the icons in the menus */
     private static boolean setIconsInMenus = true;
 
 
@@ -833,6 +834,11 @@ public class GuiUtils extends LayoutUtil {
             return GuiUtils.hbox(this, clearBtn, 4);
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public Color getColor() {
             return color;
         }
@@ -993,11 +999,22 @@ public class GuiUtils extends LayoutUtil {
     public static ImageIcon getScaledImageIcon(String file, Class c,
             boolean cache) {
         ImageIcon icon = getImageIcon(file, c, cache);
+        return scaleImageIcon(icon);
+    }
+
+
+    /**
+     * This scales the image icon up to the minimum icon size if it is defined
+     *
+     * @param icon The icon
+     *
+     * @return The scaled icon
+     */
+    public static ImageIcon scaleImageIcon(ImageIcon icon) {
         if (icon == null) {
             return null;
         }
         int w = icon.getIconWidth();
-        //        System.err.println (file + " " + w);
         if ((w > 0) && (w < dfltIconSize)) {
             Image image = icon.getImage();
             int   h     = image.getHeight(null);
@@ -1008,6 +1025,8 @@ public class GuiUtils extends LayoutUtil {
         return icon;
 
     }
+
+
 
 
 
@@ -1084,7 +1103,7 @@ public class GuiUtils extends LayoutUtil {
                 byte[] bytes = IOUtil.readBytes(is);
                 image = Toolkit.getDefaultToolkit().createImage(bytes);
                 if (cache) {
-                    //                    imageCache.put(key, image);
+                    imageCache.put(key, image);
                 }
                 return image;
             }
@@ -3529,10 +3548,12 @@ public class GuiUtils extends LayoutUtil {
             imageIcon = null;
         }
 
+
         JMenuItem menuItem = ((imageIcon != null)
-                              ? new JMenuItem(label, imageIcon)
+                              ? new JMenuItem(label,
+                                  scaleImageIcon(imageIcon))
                               : new JMenuItem(label));
-        String    mnemonic = getAttribute(node, "mnemonic", (String) null);
+        String mnemonic = getAttribute(node, "mnemonic", (String) null);
         if (mnemonic != null) {
             int keyCode =
                 charToKeyCode(mnemonic.trim().toUpperCase().charAt(0));
@@ -5632,8 +5653,8 @@ public class GuiUtils extends LayoutUtil {
      */
     public static void toggleHeavyWeightComponents(Component comp,
             boolean visible) {
-        if (!(comp instanceof JComponent)) {
-            if(!comp.getClass().getName().startsWith("javax.swing")) {
+        if ( !(comp instanceof JComponent)) {
+            if ( !comp.getClass().getName().startsWith("javax.swing")) {
                 comp.setVisible(visible);
             }
         }
@@ -6215,7 +6236,10 @@ public class GuiUtils extends LayoutUtil {
     public static AbstractButton setIcon(AbstractButton button,
                                          String iconPath) {
         if (setIconsInMenus) {
-            button.setIcon(getImageIcon(iconPath, GuiUtils.class));
+
+
+            button.setIcon(getScaledImageIcon(iconPath, GuiUtils.class,
+                    true));
             button.setIconTextGap(2);
         }
         return button;
@@ -6568,10 +6592,10 @@ public class GuiUtils extends LayoutUtil {
      */
     public static class ProgressDialog extends JDialog {
 
-        /** _more_          */
+        /** _more_ */
         private JLabel statusLbl;
 
-        /** _more_          */
+        /** _more_ */
         private boolean cancelPressed = false;
 
         /**
