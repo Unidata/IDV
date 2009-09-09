@@ -11,6 +11,31 @@
      bbox="90,-180,-90,180"/>
 
 
+
+
+  <image file="/auxdata/images/bluemarble2.jpg"
+         layer="fixed-bluemarble"
+         title="Blue Marble - Fixed"/>
+
+  <image file="/auxdata/images/bathymetrytopo.jpg"
+         layer="fixed-bathymetrytopo"
+         title="Bathymetry/Topography - Fixed"/>
+
+
+  <image file="/auxdata/images/Day.jpg"
+         layer="fixed-day"
+         title="World Day - Fixed"/>
+
+  <image file="/auxdata/images/earthlights.jpg"
+         layer="fixed-earthlights"
+         title="Lights - Fixed"/>
+
+
+  <image file="/auxdata/images/usgstopo.jpg"
+         layer="fixed-usgstopo"
+         title="USGS Topography - Fixed"/>
+
+<!--
   <image file="/auxdata/images/Topography.jpg"
          layer="fixed-topography"
          title="World Topography - Fixed"/>
@@ -34,8 +59,7 @@
   <image file="/auxdata/images/etopo-land.png"
          layer="fixed-etopoland"
          title="World Etopo Land - Fixed"/>
-
-
+-->
 
   <wms
      server="http://terraserver-usa.com/ogcmap.ashx"
