@@ -22,6 +22,11 @@
          title="Bathymetry/Topography - Fixed"/>
 
 
+  <image file="/auxdata/images/ssectopo.gif"
+         layer="fixed-ssectopo"
+         title="World Topography - Fixed"/>
+
+
   <image file="/auxdata/images/Day.jpg"
          layer="fixed-day"
          title="World Day - Fixed"/>
