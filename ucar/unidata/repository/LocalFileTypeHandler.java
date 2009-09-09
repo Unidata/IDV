@@ -21,9 +21,11 @@
  */
 
 package ucar.unidata.repository;
-import ucar.unidata.repository.metadata.*;
+
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.metadata.*;
 
 import ucar.unidata.sql.Clause;
 
@@ -180,6 +182,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
      * _more_
      *
      * @param request _more_
+     * @param mainEntry _more_
      * @param parentEntry _more_
      * @param synthId _more_
      *
@@ -187,20 +190,18 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    public List<String> getSynthIds(Request request, 
-                                    Group mainEntry,
-                                    Group parentEntry,
-                                    String synthId)
+    public List<String> getSynthIds(Request request, Group mainEntry,
+                                    Group parentEntry, String synthId)
             throws Exception {
         List<String> ids    = new ArrayList<String>();
         Object[]     values = mainEntry.getValues();
         if (values == null) {
             return ids;
         }
-        int max = request.get(ARG_MAX,DB_MAX_ROWS);
-        int skip = request.get(ARG_SKIP,0);
+        int  max  = request.get(ARG_MAX, DB_MAX_ROWS);
+        int  skip = request.get(ARG_SKIP, 0);
 
-        long t1 = System.currentTimeMillis();
+        long t1   = System.currentTimeMillis();
         //        System.err.println("getSynthIds " + mainEntry);
         File rootDir = new File((String) values[0]);
         if ( !rootDir.exists()) {
@@ -210,15 +211,16 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         String rootDirPath = rootDir.toString();
         getStorageManager().checkLocalFile(rootDir);
 
-        File   childPath   = getFileFromId(synthId, rootDir);
-        File[] files       = childPath.listFiles();
+        File   childPath = getFileFromId(synthId, rootDir);
+        File[] files     = childPath.listFiles();
         //        files = IOUtil.sortFilesOnName(files);
 
-        Metadata       sortMetadata = null;
+        Metadata sortMetadata = null;
         if (mainEntry != null) {
             try {
-                List<Metadata> metadataList = getMetadataManager().findMetadata(mainEntry,
-                                                                 ContentMetadataHandler.TYPE_SORT, true);
+                List<Metadata> metadataList =
+                    getMetadataManager().findMetadata(mainEntry,
+                        ContentMetadataHandler.TYPE_SORT, true);
                 if ((metadataList != null) && (metadataList.size() > 0)) {
                     sortMetadata = metadataList.get(0);
                 }
@@ -227,17 +229,17 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
 
 
 
-        boolean descending = !request.get(ARG_ASCENDING,false);
-        String  by        =  request.getString(ARG_ORDERBY, "fromdate");
+        boolean descending = !request.get(ARG_ASCENDING, false);
+        String  by         = request.getString(ARG_ORDERBY, "fromdate");
         if (sortMetadata != null) {
-            if(!request.exists(ARG_ASCENDING)) {
+            if ( !request.exists(ARG_ASCENDING)) {
                 if (Misc.equals(sortMetadata.getAttr2(), "true")) {
                     descending = false;
                 } else {
                     descending = true;
                 }
             }
-            if(!request.exists(ARG_ORDERBY)) {
+            if ( !request.exists(ARG_ORDERBY)) {
                 by = sortMetadata.getAttr1();
             }
         }
@@ -255,10 +257,10 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         List<String> excludes = get(values, COL_EXCLUDES);
         long age = (long) (1000
                            * (((Double) values[COL_AGE]).doubleValue() * 60));
-        long now = System.currentTimeMillis();
-        int start = skip;
+        long now   = System.currentTimeMillis();
+        int  start = skip;
 
-        int cnt = 0;
+        int  cnt   = 0;
         for (int i = start; i < files.length; i++) {
             File childFile = files[i];
             if (childFile.isHidden()) {
@@ -275,7 +277,9 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
             }
             ids.add(getSynthId(mainEntry, rootDirPath, childFile));
             cnt++;
-            if(cnt>=max) break;
+            if (cnt >= max) {
+                break;
+            }
         }
         long t2 = System.currentTimeMillis();
         //        System.err.println ("Time:" + (t2-t1) + " ids:" + ids.size());
@@ -396,11 +400,11 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                                    TypeHandler.TYPE_GROUP)
                                : getRepository().getTypeHandler(
                                    TypeHandler.TYPE_FILE));
-        Entry        entry  = (targetFile.isDirectory()
-                               ? (Entry) new Group(synthId, handler)
-                               : new Entry(synthId, handler));
+        Entry entry = (targetFile.isDirectory()
+                       ? (Entry) new Group(synthId, handler)
+                       : new Entry(synthId, handler));
 
-        if(entry instanceof Group) {
+        if (entry instanceof Group) {
             entry.setIcon(ICON_SYNTH_FILE);
         }
         Entry templateEntry = getEntryManager().getTemplateEntry(targetFile);

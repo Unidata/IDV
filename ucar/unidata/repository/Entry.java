@@ -22,6 +22,7 @@
 
 package ucar.unidata.repository;
 
+
 import ucar.unidata.repository.metadata.*;
 
 import ucar.unidata.util.DateUtil;
@@ -84,10 +85,13 @@ public class Entry extends Entity {
     /** _more_ */
     private boolean isLocalFile = false;
 
+    /** _more_ */
     private boolean isRemoteEntry = false;
 
+    /** _more_ */
     private String remoteServer;
 
+    /** _more_ */
     private String icon;
 
 
@@ -159,6 +163,11 @@ public class Entry extends Entity {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public File getFile() {
         return getTypeHandler().getFileForEntry(this);
     }
@@ -470,7 +479,9 @@ public class Entry extends Entity {
      * @return The South
      */
     public double getSouth() {
-        return (south==south?south:NONGEO);
+        return ((south == south)
+                ? south
+                : NONGEO);
     }
 
     /**
@@ -488,7 +499,9 @@ public class Entry extends Entity {
      * @return The North
      */
     public double getNorth() {
-        return (north==north?north:NONGEO);
+        return ((north == north)
+                ? north
+                : NONGEO);
     }
 
 
@@ -544,7 +557,9 @@ public class Entry extends Entity {
      * @return The East
      */
     public double getEast() {
-        return (east==east?east:NONGEO);
+        return ((east == east)
+                ? east
+                : NONGEO);
     }
 
     /**
@@ -562,7 +577,9 @@ public class Entry extends Entity {
      * @return The West
      */
     public double getWest() {
-        return (west==west?west:NONGEO);
+        return ((west == west)
+                ? west
+                : NONGEO);
     }
 
 
@@ -604,59 +621,59 @@ public class Entry extends Entity {
     }
 
     /**
-       Set the Icon property.
-
-       @param value The new value for Icon
-    **/
-    public void setIcon (String value) {
-	icon = value;
+     *  Set the Icon property.
+     *
+     *  @param value The new value for Icon
+     */
+    public void setIcon(String value) {
+        icon = value;
     }
 
     /**
-       Get the Icon property.
-
-       @return The Icon
-    **/
-    public String getIcon () {
-	return icon;
+     *  Get the Icon property.
+     *
+     *  @return The Icon
+     */
+    public String getIcon() {
+        return icon;
     }
 
 
-/**
-Set the IsRemoteEntry property.
+    /**
+     * Set the IsRemoteEntry property.
+     *
+     * @param value The new value for IsRemoteEntry
+     */
+    public void setIsRemoteEntry(boolean value) {
+        isRemoteEntry = value;
+    }
 
-@param value The new value for IsRemoteEntry
-**/
-public void setIsRemoteEntry (boolean value) {
-	isRemoteEntry = value;
-}
+    /**
+     * Get the IsRemoteEntry property.
+     *
+     * @return The IsRemoteEntry
+     */
+    public boolean getIsRemoteEntry() {
+        return isRemoteEntry;
+    }
 
-/**
-Get the IsRemoteEntry property.
+    /**
+     * Set the RemoteServer property.
+     *
+     * @param value The new value for RemoteServer
+     */
+    public void setRemoteServer(String value) {
+        remoteServer = value;
+    }
 
-@return The IsRemoteEntry
-**/
-public boolean getIsRemoteEntry () {
-	return isRemoteEntry;
-}
-
-/**
-Set the RemoteServer property.
-
-@param value The new value for RemoteServer
-**/
-public void setRemoteServer (String value) {
-	remoteServer = value;
-}
-
-/**
-Get the RemoteServer property.
-
-@return The RemoteServer
-**/
-public String getRemoteServer () {
-	return remoteServer;
-}
+    /**
+     * Get the RemoteServer property.
+     *
+     * @return The RemoteServer
+     */
+    public String getRemoteServer() {
+        return remoteServer;
+    }
 
 
 

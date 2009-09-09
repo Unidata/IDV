@@ -48,17 +48,17 @@ import java.util.List;
  */
 public class CopyAction extends MonitorAction {
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_SUBGROUP = "subgroup";
 
 
-    /** _more_          */
+    /** _more_ */
     private String parentGroupId;
 
-    /** _more_          */
+    /** _more_ */
     private String subGroup = "";
 
-    /** _more_          */
+    /** _more_ */
     private Group group;
 
     /**

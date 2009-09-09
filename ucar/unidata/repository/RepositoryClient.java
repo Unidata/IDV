@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -302,15 +301,15 @@ public class RepositoryClient extends RepositoryBase {
                                        IOUtil.getFileTail(args[i]));
                 files.add(f);
             } else if (arg.equals("-addmetadata")) {
-                if(entryNode==null) {
+                if (entryNode == null) {
                     usage("Need to specify a -file first");
                 }
-                entryNode.setAttribute(ATTR_ADDMETADATA,"true");
+                entryNode.setAttribute(ATTR_ADDMETADATA, "true");
             } else if (arg.equals("-addshortmetadata")) {
-                if(entryNode==null) {
+                if (entryNode == null) {
                     usage("Need to specify a -file first");
                 }
-                entryNode.setAttribute(ATTR_ADDSHORTMETADATA,"true");
+                entryNode.setAttribute(ATTR_ADDSHORTMETADATA, "true");
             } else if (arg.equals("-attach")) {
                 if (i == args.length) {
                     usage("Bad -file argument");
@@ -320,7 +319,7 @@ public class RepositoryClient extends RepositoryBase {
                 if ( !f.exists()) {
                     usage("File does not exist:" + args[i]);
                 }
-                if(entryNode==null) {
+                if (entryNode == null) {
                     usage("Need to specify a -file first");
                 }
                 if (root == null) {
@@ -385,19 +384,161 @@ public class RepositoryClient extends RepositoryBase {
 
         String  body     = XmlUtil.getChildText(response).trim();
         if (responseOk(response)) {
-            System.err.println("OK:" +body);
+            System.err.println("OK:" + body);
         } else {
             System.err.println("Error:" + body);
         }
 
     }
 
+
+    /**
+     * _more_
+     *
+     * @param host _more_
+     * @param port _more_
+     * @param base _more_
+     * @param user _more_
+     * @param passwd _more_
+     * @param entryName _more_
+     * @param entryDescription _more_
+     * @param parent _more_
+     * @param filePath _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void uploadFileToRamadda(String host, int port,
+                                           String base, String user,
+                                           String passwd, String entryName,
+                                           String entryDescription,
+                                           String parent, String filePath)
+            throws Exception {
+        uploadFileToRamadda(new URL("http://" + host + ":" + port + base),
+                            user, passwd, entryName, entryDescription,
+                            parent, filePath);
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param host _more_
+     * @param user _more_
+     * @param passwd _more_
+     * @param entryName _more_
+     * @param entryDescription _more_
+     * @param parent _more_
+     * @param filePath _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void uploadFileToRamadda(URL host, String user,
+                                           String passwd, String entryName,
+                                           String entryDescription,
+                                           String parent, String filePath)
+            throws Exception {
+
+        RepositoryClient client = new RepositoryClient(host, user, passwd);
+        String[]         msg    = { "" };
+        if (client.isValidSession(true, msg)) {
+            System.err.println("Valid session");
+        } else {
+            System.err.println("Invalid session:" + msg[0]);
+            return;
+        }
+
+        Document doc = XmlUtil.makeDocument();
+        Element root = XmlUtil.create(doc, TAG_ENTRIES, null,
+                                      new String[] {});
+        Element entryNode = XmlUtil.create(doc, TAG_ENTRY, root,
+                                           new String[] {});
+
+        /*
+         * name
+         */
+        entryNode.setAttribute(ATTR_NAME, entryName);
+        /*
+         * description
+         */
+        Element descNode = XmlUtil.create(doc, TAG_DESCRIPTION, entryNode);
+        descNode.appendChild(XmlUtil.makeCDataNode(doc, entryDescription,
+                false));
+        /*
+         * parent
+         */
+        entryNode.setAttribute(ATTR_PARENT, parent);
+        /*
+         * file
+         */
+        File file = new File(filePath);
+        entryNode.setAttribute(ATTR_FILE, IOUtil.getFileTail(filePath));
+        /*
+         * addmetadata
+         */
+        entryNode.setAttribute(ATTR_ADDMETADATA, "true");
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ZipOutputStream       zos = new ZipOutputStream(bos);
+
+        /*
+         * write the xml definition into the zip file
+         */
+        String xml = XmlUtil.toString(root);
+        zos.putNextEntry(new ZipEntry("entries.xml"));
+        byte[] bytes = xml.getBytes();
+        zos.write(bytes, 0, bytes.length);
+        zos.closeEntry();
+
+        /*
+         * add also the file
+         */
+        String file2string = file.toString();
+        zos.putNextEntry(new ZipEntry(IOUtil.getFileTail(file2string)));
+        bytes = IOUtil.readBytes(new FileInputStream(file));
+        zos.write(bytes, 0, bytes.length);
+        zos.closeEntry();
+
+        zos.close();
+        bos.close();
+
+        List<HttpFormEntry> postEntries = new ArrayList<HttpFormEntry>();
+        postEntries.add(HttpFormEntry.hidden(ARG_SESSIONID,
+                                             client.getSessionId()));
+        postEntries.add(HttpFormEntry.hidden(ARG_RESPONSE, RESPONSE_XML));
+        postEntries.add(new HttpFormEntry(ARG_FILE, "entries.zip",
+                                          bos.toByteArray()));
+
+        RequestUrl URL_ENTRY_XMLCREATE = new RequestUrl(client,
+                                             "/entry/xmlcreate");
+        String[] result = client.doPost(URL_ENTRY_XMLCREATE, postEntries);
+        if (result[0] != null) {
+            System.err.println("Error:" + result[0]);
+            return;
+        }
+
+        System.err.println("result:" + result[1]);
+        Element response = XmlUtil.getRoot(result[1]);
+
+        String  body     = XmlUtil.getChildText(response).trim();
+        if (client.responseOk(response)) {
+            System.err.println("OK:" + body);
+        } else {
+            System.err.println("Error:" + body);
+        }
+
+    }
+
+
+
     /**
      * _more_
      *
      * @param args _more_
+     *
+     * @throws Exception _more_
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         if (args.length < 3) {
             usage("Incorrect number of arguments");
@@ -743,9 +884,11 @@ public class RepositoryClient extends RepositoryBase {
         //        System.err.println(contents);
         Element root = XmlUtil.getRoot(contents);
 
-        sslPort     = XmlUtil.getGrandChildText(root, ServerInfo.TAG_INFO_SSLPORT);
-        title       = XmlUtil.getGrandChildText(root, ServerInfo.TAG_INFO_TITLE);
-        description = XmlUtil.getGrandChildText(root, ServerInfo.TAG_INFO_DESCRIPTION);
+        sslPort = XmlUtil.getGrandChildText(root,
+                                            ServerInfo.TAG_INFO_SSLPORT);
+        title = XmlUtil.getGrandChildText(root, ServerInfo.TAG_INFO_TITLE);
+        description = XmlUtil.getGrandChildText(root,
+                ServerInfo.TAG_INFO_DESCRIPTION);
         //        System.err.println (sslPort + "  "+ title +" " + description);
         if (sslPort != null) {
             URL_USER_LOGIN.setNeedsSsl(true);

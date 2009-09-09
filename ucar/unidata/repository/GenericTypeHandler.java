@@ -21,9 +21,11 @@
  */
 
 package ucar.unidata.repository;
-import ucar.unidata.repository.output.*;
+
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.output.*;
 
 import ucar.unidata.sql.Clause;
 
@@ -80,6 +82,9 @@ public class GenericTypeHandler extends TypeHandler {
     /** _more_ */
     Hashtable nameMap = new Hashtable();
 
+    /**
+     * _more_
+     */
     public GenericTypeHandler() {
         super(null);
     }
@@ -248,12 +253,15 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @param request _more_
      * @param entry _more_
+     * @param parent _more_
+     * @param newEntry _more_
      *
      * @throws Exception _more_
      */
-    public void initializeEntry(Request request, Entry entry,Group parent,boolean newEntry)
+    public void initializeEntry(Request request, Entry entry, Group parent,
+                                boolean newEntry)
             throws Exception {
-        super.initializeEntry(request, entry,parent, newEntry);
+        super.initializeEntry(request, entry, parent, newEntry);
         if (colNames.size() <= 1) {
             return;
         }
@@ -708,8 +716,17 @@ public class GenericTypeHandler extends TypeHandler {
     }
 
 
-    public void addColumnsToEntryForm(Request request, StringBuffer formBuffer,
-                               Entry entry)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param formBuffer _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addColumnsToEntryForm(Request request,
+                                      StringBuffer formBuffer, Entry entry)
             throws Exception {
         Hashtable state = new Hashtable();
         for (Column column : columns) {

@@ -39,8 +39,8 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 import java.awt.Image;
@@ -95,6 +95,7 @@ import java.util.zip.*;
  */
 public class AssociationManager extends RepositoryManager {
 
+    /** _more_ */
     private List<String> types = null;
 
     /**
@@ -135,16 +136,18 @@ public class AssociationManager extends RepositoryManager {
 
         String name = request.getString(ARG_NAME, (String) null);
         if (name != null) {
-            String type = request.getString(ARG_TYPE_FREEFORM,"").trim();
-            if(type.length()==0) {
-                type = request.getString(ARG_TYPE,"").trim();
+            String type = request.getString(ARG_TYPE_FREEFORM, "").trim();
+            if (type.length() == 0) {
+                type = request.getString(ARG_TYPE, "").trim();
             }
             addAssociation(request, fromEntry, toEntry, name, type);
             //            return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, fromEntry));
             return new Result(
                 request.entryUrl(
                     getRepositoryBase().URL_ENTRY_SHOW, fromEntry,
-                    ARG_MESSAGE, getRepository().translate(request,MSG_ASSOCIATION_ADDED)));
+                    ARG_MESSAGE,
+                    getRepository().translate(
+                        request, MSG_ASSOCIATION_ADDED)));
         }
 
 
@@ -160,9 +163,15 @@ public class AssociationManager extends RepositoryManager {
                                      HtmlUtil.input(ARG_NAME)));
 
         List types = getAssociationManager().getTypes();
-        types.add(0,new TwoFacedObject("None",""));
-        String select = (types.size()==1?"":HtmlUtil.select(ARG_TYPE,types)+HtmlUtil.space(1) + "Or:" +HtmlUtil.space(1));
-        sb.append(HtmlUtil.formEntry(msgLabel("Type"), select + HtmlUtil.input(ARG_TYPE_FREEFORM,"",HtmlUtil.SIZE_20)));
+        types.add(0, new TwoFacedObject("None", ""));
+        String select = ((types.size() == 1)
+                         ? ""
+                         : HtmlUtil.select(ARG_TYPE, types)
+                           + HtmlUtil.space(1) + "Or:" + HtmlUtil.space(1));
+        sb.append(HtmlUtil.formEntry(msgLabel("Type"),
+                                     select
+                                     + HtmlUtil.input(ARG_TYPE_FREEFORM, "",
+                                         HtmlUtil.SIZE_20)));
 
         sb.append(HtmlUtil.formTableClose());
 
@@ -172,8 +181,9 @@ public class AssociationManager extends RepositoryManager {
         sb.append(HtmlUtil.submit(msg("Add Association")));
         sb.append(HtmlUtil.formClose());
 
-        return getEntryManager().addEntryHeader(request, fromEntry,new Result("Add Association", sb));
-        
+        return getEntryManager().addEntryHeader(request, fromEntry,
+                new Result("Add Association", sb));
+
 
     }
 
@@ -195,7 +205,8 @@ public class AssociationManager extends RepositoryManager {
             return new Result(
                 msg("Delete Associations"),
                 new StringBuffer(
-                    getRepository().showDialogError("Could not find assocation")));
+                    getRepository().showDialogError(
+                        "Could not find assocation")));
         }
 
         Entry fromEntry = getEntryManager().getEntry(request,
@@ -250,7 +261,7 @@ public class AssociationManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public String processAssociationXml(Request request, Element node,
-                                           Hashtable entries, Hashtable files)
+                                        Hashtable entries, Hashtable files)
             throws Exception {
 
         String fromId    = XmlUtil.getAttribute(node, ATTR_FROM);
@@ -344,14 +355,21 @@ public class AssociationManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public List<String> getTypes() throws Exception {
-        if(types == null) {
-            Statement stmt = getDatabaseManager().select(
-                                 SqlUtil.distinct(Tables.ASSOCIATIONS.COL_TYPE),
-                                 Tables.ASSOCIATIONS.NAME,
-                                 (Clause)null);
-            String[]values = SqlUtil.readString(stmt, 1);
-            types = (List<String>)Misc.toList(values);
+        if (types == null) {
+            Statement stmt =
+                getDatabaseManager().select(
+                    SqlUtil.distinct(Tables.ASSOCIATIONS.COL_TYPE),
+                    Tables.ASSOCIATIONS.NAME, (Clause) null);
+            String[] values = SqlUtil.readString(stmt, 1);
+            types = (List<String>) Misc.toList(values);
             types.remove("");
         }
         return new ArrayList<String>(types);
@@ -371,11 +389,13 @@ public class AssociationManager extends RepositoryManager {
     public void associationChanged(Request request, Association association)
             throws Exception {
         types = null;
-        Entry fromEntry = getEntryManager().getEntry(request, association.getFromId());
+        Entry fromEntry = getEntryManager().getEntry(request,
+                              association.getFromId());
         if (fromEntry != null) {
             fromEntry.setAssociations(null);
         }
-        Entry toEntry = getEntryManager().getEntry(request, association.getToId());
+        Entry toEntry = getEntryManager().getEntry(request,
+                            association.getToId());
         if (toEntry != null) {
             toEntry.setAssociations(null);
         }
@@ -492,32 +512,35 @@ public class AssociationManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public List<Association> getAssociations(Request request,
-            Clause clause)
+    public List<Association> getAssociations(Request request, Clause clause)
             throws Exception {
         int max = request.get(ARG_MAX, DB_MAX_ROWS);
-        String   orderBy = " ORDER BY " + Tables.ASSOCIATIONS.COL_TYPE + " ASC ," +
-                                                                                   Tables.ASSOCIATIONS.COL_NAME + " ASC ";
-        Statement stmt =
-            getDatabaseManager().select(Tables.ASSOCIATIONS.COLUMNS,
-                                        Tables.ASSOCIATIONS.NAME, clause,
-                                        orderBy + " " +
-                                        getDatabaseManager().getLimitString(request.get(ARG_SKIP, 0), max));
+        String orderBy = " ORDER BY " + Tables.ASSOCIATIONS.COL_TYPE
+                         + " ASC ," + Tables.ASSOCIATIONS.COL_NAME + " ASC ";
+        Statement stmt = getDatabaseManager().select(
+                             Tables.ASSOCIATIONS.COLUMNS,
+                             Tables.ASSOCIATIONS.NAME, clause,
+                             orderBy + " "
+                             + getDatabaseManager().getLimitString(
+                                 request.get(ARG_SKIP, 0), max));
         //        System.err.println (getRepository().getQueryOrderAndLimit(request,false));
         List<Association> associations = new ArrayList();
         SqlUtil.Iterator  iter         = SqlUtil.getIterator(stmt);
         ResultSet         results;
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                Association association = new Association(results.getString(1),
-                                                          results.getString(2), results.getString(3),
-                                                          results.getString(4), results.getString(5));
+                Association association =
+                    new Association(results.getString(1),
+                                    results.getString(2),
+                                    results.getString(3),
+                                    results.getString(4),
+                                    results.getString(5));
 
                 Entry fromEntry = getEntryManager().getEntry(request,
-                                                             association.getFromId());
+                                      association.getFromId());
                 Entry toEntry = getEntryManager().getEntry(request,
-                                                             association.getToId());
-                if (fromEntry!=null && toEntry!=null) {
+                                    association.getToId());
+                if ((fromEntry != null) && (toEntry != null)) {
                     associations.add(association);
                 }
             }
@@ -608,30 +631,43 @@ public class AssociationManager extends RepositoryManager {
             StringBuffer sb = new StringBuffer();
             return sb;
         }
-        return getAssociationList(request, associations, entry,canEdit);
+        return getAssociationList(request, associations, entry, canEdit);
     }
 
-    public StringBuffer getAssociationList(Request request, List<Association>associations, Entry entry, boolean canEdit) 
-        throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param associations _more_
+     * @param entry _more_
+     * @param canEdit _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public StringBuffer getAssociationList(Request request,
+                                           List<Association> associations,
+                                           Entry entry, boolean canEdit)
+            throws Exception {
 
-        List cols = Misc.toList(new Object[]{
-            "&nbsp;",
-            HtmlUtil.bold(msg("From")),
-            HtmlUtil.bold(msg("Type")),
-            HtmlUtil.bold(msg("Name")),
-            "&nbsp;",
-            HtmlUtil.bold(msg("To"))});
+        List cols = Misc.toList(new Object[] {
+            "&nbsp;", HtmlUtil.bold(msg("From")), HtmlUtil.bold(msg("Type")),
+            HtmlUtil.bold(msg("Name")), "&nbsp;", HtmlUtil.bold(msg("To"))
+        });
 
         for (Association association : associations) {
             Entry fromEntry = null;
             Entry toEntry   = null;
-            if (entry!=null && association.getFromId().equals(entry.getId())) {
+            if ((entry != null)
+                    && association.getFromId().equals(entry.getId())) {
                 fromEntry = entry;
             } else {
                 fromEntry = getEntryManager().getEntry(request,
                         association.getFromId());
             }
-            if (entry!=null && association.getToId().equals(entry.getId())) {
+            if ((entry != null)
+                    && association.getToId().equals(entry.getId())) {
                 toEntry = entry;
             } else {
                 toEntry = getEntryManager().getEntry(request,
@@ -642,7 +678,8 @@ public class AssociationManager extends RepositoryManager {
             }
             if (canEdit) {
                 cols.add(
-                         HtmlUtil.pad(HtmlUtil.href(
+                    HtmlUtil.pad(
+                        HtmlUtil.href(
                             request.url(
                                 getRepository().URL_ASSOCIATION_DELETE,
                                 ARG_ASSOCIATION,
@@ -653,78 +690,113 @@ public class AssociationManager extends RepositoryManager {
                 cols.add("");
             }
             List args = Misc.newList(ARG_SHOW_ASSOCIATIONS, "true");
-            cols.add(HtmlUtil.img( getEntryManager().getIconUrl(request, fromEntry))+
-                     HtmlUtil.pad(
-                     (Misc.equals(fromEntry,entry)? fromEntry.getLabel(): 
-                      getEntryManager().getEntryLink(request, fromEntry, args))));
+            cols.add(HtmlUtil.img(getEntryManager().getIconUrl(request,
+                    fromEntry)) + HtmlUtil.pad((Misc.equals(fromEntry, entry)
+                    ? fromEntry.getLabel()
+                    : getEntryManager().getEntryLink(request, fromEntry,
+                    args))));
 
             cols.add(association.getType());
             cols.add(association.getLabel());
             cols.add(HtmlUtil.img(getRepository().iconUrl(ICON_ARROW)));
-            cols.add(HtmlUtil.img(getEntryManager().getIconUrl(request, toEntry))+
-                     HtmlUtil.pad((Misc.equals(toEntry,entry)
-                                   ? toEntry.getLabel()
-                                   : getEntryManager().getEntryLink(request, toEntry,
-                                                                    args))));
+            cols.add(HtmlUtil.img(getEntryManager().getIconUrl(request,
+                    toEntry)) + HtmlUtil.pad((Misc.equals(toEntry, entry)
+                    ? toEntry.getLabel()
+                    : getEntryManager().getEntryLink(request, toEntry,
+                    args))));
         }
-        return HtmlUtil.table(cols,6,HtmlUtil.attr(HtmlUtil.ATTR_CELLSPACING,"3"));
+        return HtmlUtil.table(cols, 6,
+                              HtmlUtil.attr(HtmlUtil.ATTR_CELLSPACING, "3"));
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processSearchAssociations(Request request)
             throws Exception {
-        StringBuffer sb = new StringBuffer();
-        String type = request.getString(ARG_TYPE,"").trim();
-        String name = request.getString(ARG_NAME,"").trim();
+        StringBuffer sb      = new StringBuffer();
+        String       type    = request.getString(ARG_TYPE, "").trim();
+        String       name    = request.getString(ARG_NAME, "").trim();
         List<Clause> clauses = new ArrayList<Clause>();
-        if(type.length()>0) {
+        if (type.length() > 0) {
             clauses.add(Clause.eq(Tables.ASSOCIATIONS.COL_TYPE, type));
         }
 
-        if(name.length()>0) {
-            if(request.get(ARG_EXACT,false)) {
+        if (name.length() > 0) {
+            if (request.get(ARG_EXACT, false)) {
                 clauses.add(Clause.eq(Tables.ASSOCIATIONS.COL_NAME, name));
             } else {
-                clauses.add(Clause.like(Tables.ASSOCIATIONS.COL_NAME, "%"+name+"%"));
+                clauses.add(Clause.like(Tables.ASSOCIATIONS.COL_NAME,
+                                        "%" + name + "%"));
             }
         }
-        List<Association> associations = getAssociationManager().getAssociations(request,
-                                                                                 Clause.and(clauses));
-        int max = request.get(ARG_MAX, DB_MAX_ROWS);
-        int cnt  = associations.size();
+        List<Association> associations =
+            getAssociationManager().getAssociations(request,
+                Clause.and(clauses));
+        int     max = request.get(ARG_MAX, DB_MAX_ROWS);
+        int     cnt = associations.size();
         boolean showingAll;
         if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
-            showingAll= false;
+            showingAll = false;
         } else {
-            showingAll= true;
+            showingAll = true;
         }
 
-        if(associations.size()==0) {
-            sb.append(getRepository().showDialogNote(msg("No associations found")));
-            getAssociationsSearchForm( request,  sb);
+        if (associations.size() == 0) {
+            sb.append(
+                getRepository().showDialogNote(msg("No associations found")));
+            getAssociationsSearchForm(request, sb);
         } else {
-            getAssociationsSearchForm( request,  sb);
-            getRepository().getHtmlOutputHandler().showNext(request,cnt, sb);
-            sb.append(getAssociationManager().getAssociationList(request, associations, null,false));
+            getAssociationsSearchForm(request, sb);
+            getRepository().getHtmlOutputHandler().showNext(request, cnt, sb);
+            sb.append(getAssociationManager().getAssociationList(request,
+                    associations, null, false));
         }
 
-        return getRepository().makeResult(request, msg("Search Associations"), sb,
+        return getRepository().makeResult(request,
+                                          msg("Search Associations"), sb,
                                           getSearchManager().getSearchUrls());
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processSearchAssociationsForm(Request request)
             throws Exception {
 
         StringBuffer sb = new StringBuffer();
-        getAssociationsSearchForm( request,  sb);
-        return getRepository().makeResult(request, msg("Search Associations"), sb,
+        getAssociationsSearchForm(request, sb);
+        return getRepository().makeResult(request,
+                                          msg("Search Associations"), sb,
                                           getSearchManager().getSearchUrls());
     }
 
 
 
-    private void getAssociationsSearchForm(Request request, StringBuffer sb) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    private void getAssociationsSearchForm(Request request, StringBuffer sb)
+            throws Exception {
         sb.append(
             HtmlUtil.form(
                 request.url(
@@ -737,20 +809,26 @@ public class AssociationManager extends RepositoryManager {
                              + HtmlUtil.checkbox(ARG_EXACT, "true",
                                  request.get(ARG_EXACT, false)) + " "
                                      + msg("Match exactly");
-        sb.append(HtmlUtil.formEntry(msgLabel("Name"), HtmlUtil.input(ARG_NAME,request.getString(ARG_NAME,""), HtmlUtil.SIZE_40)+ searchExact));
+        sb.append(HtmlUtil.formEntry(msgLabel("Name"),
+                                     HtmlUtil.input(ARG_NAME,
+                                         request.getString(ARG_NAME, ""),
+                                         HtmlUtil.SIZE_40) + searchExact));
 
 
         List types = getAssociationManager().getTypes();
-        types.add(0,new TwoFacedObject(msg("None"),""));
-        if(types.size()>1) {
-            sb.append(HtmlUtil.formEntry(msgLabel("Type"), HtmlUtil.select(ARG_TYPE,types,request.getString(ARG_TYPE,""))));
+        types.add(0, new TwoFacedObject(msg("None"), ""));
+        if (types.size() > 1) {
+            sb.append(HtmlUtil.formEntry(msgLabel("Type"),
+                                         HtmlUtil.select(ARG_TYPE, types,
+                                             request.getString(ARG_TYPE,
+                                                 ""))));
         }
 
 
         sb.append(HtmlUtil.formTableClose());
 
-        OutputType  output      = request.getOutput(BLANK);
-        String      buttons     = HtmlUtil.submit(msg("Search"), "submit");
+        OutputType output  = request.getOutput(BLANK);
+        String     buttons = HtmlUtil.submit(msg("Search"), "submit");
         sb.append(HtmlUtil.p());
         sb.append(buttons);
         sb.append(HtmlUtil.p());

@@ -20,9 +20,11 @@
  */
 
 package ucar.unidata.repository.metadata;
-import ucar.unidata.repository.*;
+
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.util.DateUtil;
@@ -146,7 +148,8 @@ public class MetadataHandler extends RepositoryManager {
         forUser = XmlUtil.getAttribute(node, ATTR_FORUSER, true);
         String type = XmlUtil.getAttribute(node, ATTR_TYPE);
         //TODO: Handle the extra attributes
-        String extra = XmlUtil.getGrandChildText(node,Metadata.TAG_EXTRA,"");
+        String extra = XmlUtil.getGrandChildText(node, Metadata.TAG_EXTRA,
+                           "");
         Metadata metadata =
             new Metadata(getRepository().getGUID(), entry.getId(), type,
                          XmlUtil.getAttribute(node, ATTR_INHERITED,
@@ -156,7 +159,7 @@ public class MetadataHandler extends RepositoryManager {
                                      ""), XmlUtil.getAttribute(node,
                                          ATTR_ATTR3,
                                          ""), XmlUtil.getAttribute(node,
-                                             ATTR_ATTR4, ""),extra);
+                                             ATTR_ATTR4, ""), extra);
 
         MetadataType metadataType = findType(type);
         if ( !metadataType.processMetadataXml(entry, node, metadata, fileMap,
@@ -300,14 +303,16 @@ public class MetadataHandler extends RepositoryManager {
      * @param attr2 _more_
      * @param attr3 _more_
      * @param attr4 _more_
+     * @param extra _more_
      *
      * @return _more_
      */
     public Metadata makeMetadata(String id, String entryId, String type,
                                  boolean inherited, String attr1,
-                                 String attr2, String attr3, String attr4,String extra) {
+                                 String attr2, String attr3, String attr4,
+                                 String extra) {
         return new Metadata(id, entryId, type, inherited, attr1, attr2,
-                            attr3, attr4,extra);
+                            attr3, attr4, extra);
     }
 
 
@@ -323,6 +328,7 @@ public class MetadataHandler extends RepositoryManager {
      * @param attr2 _more_
      * @param attr3 _more_
      * @param attr4 _more_
+     * @param extra _more_
      * @param newMetadata _more_
      *
      * @return _more_
@@ -331,9 +337,10 @@ public class MetadataHandler extends RepositoryManager {
                                           Entry entry, String type,
                                           boolean inherited, String attr1,
                                           String attr2, String attr3,
-                                          String attr4, String extra, boolean newMetadata) {
+                                          String attr4, String extra,
+                                          boolean newMetadata) {
         return new Metadata(id, entry.getId(), type, inherited, attr1, attr2,
-                            attr3, attr4,extra);
+                            attr3, attr4, extra);
     }
 
 
@@ -380,6 +387,7 @@ public class MetadataHandler extends RepositoryManager {
      * _more_
      *
      * @param request _more_
+     * @param xmlType _more_
      * @param entry _more_
      * @param metadata _more_
      * @param doc _more_
@@ -387,16 +395,15 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addMetadataToXml(Request request, String xmlType,Entry entry,
-                                     Metadata metadata, Document doc,
-                                     Element datasetNode)
+    public void addMetadataToXml(Request request, String xmlType,
+                                 Entry entry, Metadata metadata,
+                                 Document doc, Element datasetNode)
             throws Exception {
         MetadataType type = getType(metadata.getType());
         if (type == null) {
             return;
         }
-        type.addMetadataToXml(request, xmlType,
-                              entry, metadata, datasetNode);
+        type.addMetadataToXml(request, xmlType, entry, metadata, datasetNode);
     }
 
 
@@ -462,8 +469,11 @@ public class MetadataHandler extends RepositoryManager {
      * @param metadata _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public String[] getHtml(Request request, Entry entry, Metadata metadata) throws Exception {
+    public String[] getHtml(Request request, Entry entry, Metadata metadata)
+            throws Exception {
         MetadataType type = getType(metadata.getType());
         if ((type == null) || !type.hasElements()) {
             return null;
@@ -621,7 +631,6 @@ public class MetadataHandler extends RepositoryManager {
      * @param request _more_
      * @param sb _more_
      * @param type _more_
-     * @param doSelect _more_
      *
      * @throws Exception _more_
      */

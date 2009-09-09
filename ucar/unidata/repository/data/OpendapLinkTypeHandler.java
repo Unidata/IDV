@@ -66,6 +66,7 @@ import java.util.Properties;
  */
 public class OpendapLinkTypeHandler extends GenericTypeHandler {
 
+    /** _more_ */
     public static final String TYPE_OPENDAPLINK = "opendaplink";
 
     /**

@@ -20,12 +20,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
-import org.w3c.dom.*;
 import org.apache.commons.net.ftp.*;
+
+
+import org.w3c.dom.*;
 
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -34,6 +35,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 import java.io.*;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -79,10 +81,19 @@ public class FtpTypeHandler extends GenericTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public TypeHandler getTypeHandlerForCopy(Entry entry) throws Exception {
-        if(getEntryManager().isSynthEntry(entry.getId())) 
-            return getRepository().getTypeHandler(
-                                                  TypeHandler.TYPE_FILE);
+        if (getEntryManager().isSynthEntry(entry.getId())) {
+            return getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
+        }
         return this;
     }
 
@@ -119,7 +130,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
      */
     public String getIconUrl(Request request, Entry entry) throws Exception {
         if (entry.isGroup()) {
-            if(!getEntryManager().isSynthEntry(entry.getId())) {
+            if ( !getEntryManager().isSynthEntry(entry.getId())) {
                 return iconUrl(ICON_FTP);
             }
             return iconUrl(ICON_FTP);
@@ -129,10 +140,20 @@ public class FtpTypeHandler extends GenericTypeHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public boolean canDownload(Request request, Entry entry)
-        throws Exception {
+            throws Exception {
         Entry mainEntry = getMainEntry(entry.getId());
-        if(mainEntry == null) {
+        if (mainEntry == null) {
             return false;
         }
         Object[] values = mainEntry.getValues();
@@ -140,93 +161,113 @@ public class FtpTypeHandler extends GenericTypeHandler {
             return false;
         }
         double maxSize = 0;
-        if(values[COL_MAXSIZE]!=null) {
-            maxSize = ((Double)values[COL_MAXSIZE]).doubleValue();
+        if (values[COL_MAXSIZE] != null) {
+            maxSize = ((Double) values[COL_MAXSIZE]).doubleValue();
         }
-        return entry.getResource().getFileSize()<1000000*maxSize;
+        return entry.getResource().getFileSize() < 1000000 * maxSize;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private Entry getMainEntry(String id) throws Exception {
-        String[] pair          = getEntryManager().getSynthId(id);
-        Entry parent = getEntryManager().getEntry(null,pair[0]);
+        String[] pair   = getEntryManager().getSynthId(id);
+        Entry    parent = getEntryManager().getEntry(null, pair[0]);
         return parent;
     }
 
 
 
-    public File getFileForEntry(Entry entry)  {
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    public File getFileForEntry(Entry entry) {
         try {
-            File badFile=  new File("badfile");
-            Entry parent = getMainEntry(entry.getId());
-            if(parent == null) {
+            File  badFile = new File("badfile");
+            Entry parent  = getMainEntry(entry.getId());
+            if (parent == null) {
                 System.err.println("Could not find main entry");
                 return badFile;
             }
-            Object[] values  = parent.getValues();
-            if(values == null) {
+            Object[] values = parent.getValues();
+            if (values == null) {
                 System.err.println("no values");
                 return badFile;
             }
             double maxSize = 0;
-            if(values[COL_MAXSIZE]!=null) {
-                maxSize = ((Double)values[COL_MAXSIZE]).doubleValue();
+            if (values[COL_MAXSIZE] != null) {
+                maxSize = ((Double) values[COL_MAXSIZE]).doubleValue();
             }
-            String server = (String)values[COL_SERVER];
-            if(entry.getResource().getFileSize()>1000000*maxSize) {
-                System.err.println("Bad size " + entry.getResource().getFileSize());
+            String server = (String) values[COL_SERVER];
+            if (entry.getResource().getFileSize() > 1000000 * maxSize) {
+                System.err.println("Bad size "
+                                   + entry.getResource().getFileSize());
                 return badFile;
             }
-            FTPClient    ftpClient=null;
+            FTPClient ftpClient = null;
             try {
-                String[] pair          = getEntryManager().getSynthId(entry.getId());
+                String[] pair = getEntryManager().getSynthId(entry.getId());
                 MyFTPFile myFtpFile = getFileFromId(parent, pair[1],
-                                                    (String)values[COL_BASEDIR]);
-                ftpClient= getFtpClient(parent);
+                                          (String) values[COL_BASEDIR]);
+                ftpClient = getFtpClient(parent);
                 if (ftpClient == null) {
                     System.err.println("no ftp client ");
                     return badFile;
                 }
                 //                String path = entry.getResource().getPath();
-                String path = myFtpFile.path;
-                String prefix =  "ftp://" + server;
-                if(path.startsWith(prefix)) {
+                String path   = myFtpFile.path;
+                String prefix = "ftp://" + server;
+                if (path.startsWith(prefix)) {
                     path = path.substring(prefix.length());
                 }
-                String cacheFileName =  java.net.URLEncoder.encode("ftp:" + values[COL_SERVER]+":"+path, "UTF-8");
-                File cacheFile = getStorageManager().getCacheFile(cacheFileName);
-                if(cacheFile.exists()) {
+                String cacheFileName = java.net.URLEncoder.encode("ftp:"
+                                           + values[COL_SERVER] + ":"
+                                           + path, "UTF-8");
+                File cacheFile =
+                    getStorageManager().getCacheFile(cacheFileName);
+                if (cacheFile.exists()) {
                     return cacheFile;
                 }
 
                 //                System.err.println("Fetching:" + path);
                 //                System.err.println("writing to:" + cacheFile);
-                OutputStream fos = getStorageManager().getFileOutputStream(cacheFile);
+                OutputStream fos =
+                    getStorageManager().getFileOutputStream(cacheFile);
                 if (ftpClient.retrieveFile(path, fos)) {
                     fos.flush();
                     fos.close();
                     return cacheFile;
-                } 
+                }
                 //                System.err.println ("BAD FILE");
                 return badFile;
             } finally {
-                if(ftpClient!=null) {
+                if (ftpClient != null) {
                     closeConnection(ftpClient);
                 }
             }
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
 
-        
+
     }
 
     /**
      * _more_
      *
      * @param id _more_
-     * @param baseFile _more_
-     * @param baseDir _more_
+       * @param baseDir _more_
      *
      * @return _more_
      *
@@ -244,7 +285,6 @@ public class FtpTypeHandler extends GenericTypeHandler {
      *
      * @param parentEntry _more_
      * @param rootDirPath _more_
-     * @param childFile _more_
      * @param parentPath _more_
      * @param file _more_
      *
@@ -258,6 +298,15 @@ public class FtpTypeHandler extends GenericTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param parentEntry _more_
+     * @param rootDirPath _more_
+     * @param parentPath _more_
+     *
+     * @return _more_
+     */
     public String getSynthId(Entry parentEntry, String rootDirPath,
                              String parentPath) {
         String id = parentPath;
@@ -273,6 +322,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
      * _more_
      *
      * @param request _more_
+     * @param mainEntry _more_
      * @param parentEntry _more_
      * @param synthId _more_
      *
@@ -280,16 +330,14 @@ public class FtpTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    public List<String> getSynthIds(Request request, 
-                                    Group mainEntry,
-                                    Group parentEntry,
-                                    String synthId)
+    public List<String> getSynthIds(Request request, Group mainEntry,
+                                    Group parentEntry, String synthId)
             throws Exception {
-        List<String> ids       = new ArrayList<String>();
+        List<String> ids     = new ArrayList<String>();
 
-        Object[] values  = mainEntry.getValues();
-        String   baseDir = (String) values[COL_BASEDIR];
-        String   path    = getPathFromId(synthId, baseDir);
+        Object[]     values  = mainEntry.getValues();
+        String       baseDir = (String) values[COL_BASEDIR];
+        String       path    = getPathFromId(synthId, baseDir);
 
         /*        boolean descending = !request.get(ARG_ASCENDING, false);
         if (request.getString(ARG_ORDERBY, "").equals("name")) {
@@ -297,7 +345,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
         } else {
             files = IOUtil.sortFilesOnAge(files, descending);
             }*/
-        FTPClient    ftpClient = getFtpClient(mainEntry);
+        FTPClient ftpClient = getFtpClient(mainEntry);
         if (ftpClient == null) {
             return ids;
         }
@@ -306,28 +354,34 @@ public class FtpTypeHandler extends GenericTypeHandler {
             boolean isDir = ftpClient.changeWorkingDirectory(path);
             Hashtable<String, FTPFile> cache = getCache(mainEntry);
             if (isDir) {
-                boolean checkReadme = parentEntry.getDescription().length()==0;
+                boolean checkReadme = parentEntry.getDescription().length()
+                                      == 0;
                 FTPFile[] files = ftpClient.listFiles(path);
 
                 for (int i = 0; i < files.length; i++) {
                     String name = files[i].getName().toLowerCase();
-                    if(checkReadme) {
-                        if(name.equals("readme")||
-                           name.equals("readme.txt")) {
+                    if (checkReadme) {
+                        if (name.equals("readme")
+                                || name.equals("readme.txt")) {
                             try {
-                                InputStream fis = ftpClient.retrieveFileStream(path + "/" + files[i].getName());
-                                if(fis!=null) {
-                                    String desc = HtmlUtil.entityEncode(IOUtil.readInputStream(fis));
-                                    parentEntry.setDescription("<pre>"+desc+"</pre>");
+                                InputStream fis =
+                                    ftpClient.retrieveFileStream(path + "/"
+                                        + files[i].getName());
+                                if (fis != null) {
+                                    String desc = HtmlUtil.entityEncode(
+                                                      IOUtil.readInputStream(
+                                                          fis));
+                                    parentEntry.setDescription("<pre>" + desc
+                                            + "</pre>");
                                     fis.close();
                                     ftpClient.completePendingCommand();
                                 }
-                            } catch(Exception exc) {
+                            } catch (Exception exc) {
                                 //                            exc.printStackTrace();
                             }
                         }
                     }
-                    
+
 
                     cache.put(path + "/" + files[i].getName(), files[i]);
                     ids.add(getSynthId(mainEntry, baseDir, path, files[i]));
@@ -423,11 +477,11 @@ public class FtpTypeHandler extends GenericTypeHandler {
         if (values == null) {
             return null;
         }
-        String    server    = (String) values[COL_SERVER];
-        String    baseDir   = (String) values[COL_BASEDIR];
-        String    user      = (String) values[COL_USER];
-        String    password  = (String) values[COL_PASSWORD];
-        if(password!=null) {
+        String server   = (String) values[COL_SERVER];
+        String baseDir  = (String) values[COL_BASEDIR];
+        String user     = (String) values[COL_USER];
+        String password = (String) values[COL_PASSWORD];
+        if (password != null) {
             password = getRepository().processTemplate(password, false);
         } else {
             password = "";
@@ -454,7 +508,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
     }
 
 
-    /** _more_          */
+    /** _more_ */
     Hashtable<String, Hashtable> cache = new Hashtable<String, Hashtable>();
 
     /**
@@ -516,9 +570,9 @@ public class FtpTypeHandler extends GenericTypeHandler {
         try {
             boolean isDir = ftpClient.changeWorkingDirectory(path);
             if (isDir) {
-                File   tmp    = new File(path);
-                String parent = tmp.getParent().replace("\\", "/");
-                String name   = tmp.getName();
+                File      tmp               = new File(path);
+                String    parent = tmp.getParent().replace("\\", "/");
+                String    name              = tmp.getName();
                 FTPFile[] files             = ftpClient.listFiles(parent);
                 MyFTPFile lookingForThisOne = null;
                 for (int i = 0; i < files.length; i++) {
@@ -577,15 +631,15 @@ public class FtpTypeHandler extends GenericTypeHandler {
             return null;
         }
         String    baseDir   = (String) values[COL_BASEDIR];
-        String    server   = (String) values[COL_SERVER];
+        String    server    = (String) values[COL_SERVER];
         MyFTPFile myFtpFile = getFileFromId(parentEntry, id, baseDir);
         if (myFtpFile == null) {
             return null;
         }
-        if(myFtpFile.path.equals(baseDir)) {
+        if (myFtpFile.path.equals(baseDir)) {
             return parentEntry;
         }
-        FTPFile ftpFile = myFtpFile.ftpFile;
+        FTPFile     ftpFile = myFtpFile.ftpFile;
         TypeHandler handler = (ftpFile.isDirectory()
                                ? getRepository().getTypeHandler(
                                    TypeHandler.TYPE_GROUP)
@@ -602,42 +656,41 @@ public class FtpTypeHandler extends GenericTypeHandler {
 
         String  name  = IOUtil.getFileTail(ftpFile.getName());
         entry.setIsLocalFile(true);
-        Group    parent;
+        Group parent;
         if (myFtpFile.path.equals(baseDir)) {
             parent = (Group) parentEntry;
         } else {
-            File   tmp    = new File(myFtpFile.path);
+            File   tmp        = new File(myFtpFile.path);
             String parentPath = tmp.getParent().replace("\\", "/");
-            String parentId = getSynthId(parentEntry, baseDir, parentPath);
+            String parentId   = getSynthId(parentEntry, baseDir, parentPath);
             if (parentPath.equals(baseDir)) {
                 parent = (Group) parentEntry;
             } else {
-                parent = (Group) getEntryManager().getEntry(request, parentId,
-                                                            false, false);
+                parent = (Group) getEntryManager().getEntry(request,
+                        parentId, false, false);
             }
         }
 
 
 
         double maxSize = 0;
-        if(values[COL_MAXSIZE]!=null) {
-            maxSize = ((Double)values[COL_MAXSIZE]).doubleValue();
+        if (values[COL_MAXSIZE] != null) {
+            maxSize = ((Double) values[COL_MAXSIZE]).doubleValue();
         }
 
 
 
-        long     dttm   = ftpFile.getTimestamp().getTime().getTime();
+        long     dttm = ftpFile.getTimestamp().getTime().getTime();
         Resource resource;
         if (isDir) {
-            resource = new Resource("ftp://" + server+myFtpFile.path,
+            resource = new Resource("ftp://" + server + myFtpFile.path,
                                     Resource.TYPE_URL);
         } else {
-            if(ftpFile.getSize()>1000000*maxSize) {
-                resource = new Resource("ftp://" + server+myFtpFile.path,
+            if (ftpFile.getSize() > 1000000 * maxSize) {
+                resource = new Resource("ftp://" + server + myFtpFile.path,
                                         Resource.TYPE_URL);
             } else {
-                resource = new Resource(name,
-                                        Resource.TYPE_REMOTE_FILE);
+                resource = new Resource(name, Resource.TYPE_REMOTE_FILE);
 
             }
             resource.setFileSize(ftpFile.getSize());
@@ -658,10 +711,10 @@ public class FtpTypeHandler extends GenericTypeHandler {
      */
     public static class MyFTPFile {
 
-        /** _more_          */
+        /** _more_ */
         FTPFile ftpFile;
 
-        /** _more_          */
+        /** _more_ */
         String path;
 
         /**

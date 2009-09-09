@@ -236,8 +236,7 @@ public class CatalogHarvester extends Harvester {
             try {
                 if (metadata.getAttr1().length() > 10000) {
                     repository.getLogManager().logError("Too long metadata:"
-                                        + metadata.getAttr1().substring(0,
-                                            100) + "...");
+                            + metadata.getAttr1().substring(0, 100) + "...");
                     continue;
                 }
                 getMetadataManager().insertMetadata(metadata);
@@ -282,8 +281,7 @@ public class CatalogHarvester extends Harvester {
             XmlUtil.getAttribute(node, ATTR_NAME,
                                  IOUtil.getFileTail(catalogUrlPath));
         NodeList elements = XmlUtil.getElements(node);
-        String urlPath = XmlUtil.getAttribute(node,
-                             CatalogUtil.ATTR_URLPATH,
+        String urlPath = XmlUtil.getAttribute(node, CatalogUtil.ATTR_URLPATH,
                              (String) null);
         if (urlPath == null) {
             Element accessNode = XmlUtil.findChild(node,
@@ -333,7 +331,9 @@ public class CatalogHarvester extends Harvester {
             if (ext.length() > 0) {
                 entry.addMetadata(new Metadata(repository.getGUID(),
                         entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,
-                        DFLT_INHERITED, ext, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,Metadata.DFLT_EXTRA));
+                        DFLT_INHERITED, ext, Metadata.DFLT_ATTR,
+                        Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,
+                        Metadata.DFLT_EXTRA));
             }
 
 
@@ -345,10 +345,11 @@ public class CatalogHarvester extends Harvester {
                 String tail    = IOUtil.getFileTail(urlPath);
                 File   newFile = getStorageManager().getTmpFile(null, tail);
                 try {
-                    URL              fromUrl    = new URL(urlPath);
-                    URLConnection    connection = fromUrl.openConnection();
-                    InputStream      fromStream = connection.getInputStream();
-                    OutputStream toStream = getStorageManager().getFileOutputStream(newFile);
+                    URL           fromUrl    = new URL(urlPath);
+                    URLConnection connection = fromUrl.openConnection();
+                    InputStream   fromStream = connection.getInputStream();
+                    OutputStream toStream =
+                        getStorageManager().getFileOutputStream(newFile);
                     int bytes = IOUtil.writeTo(fromStream, toStream);
                     toStream.close();
                     fromStream.close();
@@ -384,21 +385,24 @@ public class CatalogHarvester extends Harvester {
                                           ThreddsMetadataHandler.TYPE_LINK,
                                           DFLT_INHERITED,
                                           "Imported from catalog",
-                                          catalogUrlPath, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,Metadata.DFLT_EXTRA));
+                                          catalogUrlPath, Metadata.DFLT_ATTR,
+                                          Metadata.DFLT_ATTR,
+                                          Metadata.DFLT_EXTRA));
             for (Metadata metadata : metadataList) {
                 metadata.setEntryId(entry.getId());
                 entry.addMetadata(metadata);
             }
 
 
-            if(isOpendap && getAddMetadata()) {
+            if (isOpendap && getAddMetadata()) {
                 getEntryManager().addInitialMetadata(null,
-                                                     (List<Entry>)Misc.newList(entry), true, false);
-                
+                        (List<Entry>) Misc.newList(entry), true, false);
+
             }
 
-            if(true)
+            if (true) {
                 return;
+            }
 
 
             if (entries.size() > 100) {
@@ -427,7 +431,9 @@ public class CatalogHarvester extends Harvester {
                                           ThreddsMetadataHandler.TYPE_LINK,
                                           DFLT_INHERITED,
                                           "Imported from catalog",
-                                          catalogUrlPath, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,Metadata.DFLT_EXTRA));
+                                          catalogUrlPath, Metadata.DFLT_ATTR,
+                                          Metadata.DFLT_ATTR,
+                                          Metadata.DFLT_EXTRA));
 
             insertMetadata(group, metadataList);
             String crumbs = getEntryManager().getBreadCrumbs(null, group,

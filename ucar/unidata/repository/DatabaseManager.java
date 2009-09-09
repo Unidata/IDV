@@ -91,6 +91,7 @@ import java.util.TimeZone;
  */
 public class DatabaseManager extends RepositoryManager {
 
+    /** _more_ */
     private static final int TIMEOUT = 5000;
 
     /** _more_ */
@@ -246,15 +247,15 @@ public class DatabaseManager extends RepositoryManager {
         PreparedStatement stmt       = connection.prepareStatement(query);
         for (int i = 0; i < values.length; i++) {
             Object value = values[i];
-            if (value==null) {
+            if (value == null) {
                 stmt.setNull(i + 1, java.sql.Types.VARCHAR);
             } else if (value instanceof Date) {
                 setDate(stmt, i + 1, (Date) value);
             } else if (value instanceof Boolean) {
                 boolean b = ((Boolean) value).booleanValue();
                 stmt.setInt(i + 1, (b
-                                           ? 1
-                                           : 0));
+                                    ? 1
+                                    : 0));
             } else {
                 stmt.setObject(i + 1, value);
             }
@@ -265,11 +266,20 @@ public class DatabaseManager extends RepositoryManager {
         releaseConnection(connection);
     }
 
-    public void update(String table,
-                       Clause clause, 
-                       String[] names,
-                       Object[] values) throws Exception  {
-        Connection        connection = getConnection();
+    /**
+     * _more_
+     *
+     * @param table _more_
+     * @param clause _more_
+     * @param names _more_
+     * @param values _more_
+     *
+     * @throws Exception _more_
+     */
+    public void update(String table, Clause clause, String[] names,
+                       Object[] values)
+            throws Exception {
+        Connection connection = getConnection();
         SqlUtil.update(connection, table, clause, names, values);
         releaseConnection(connection);
     }
@@ -645,9 +655,21 @@ public class DatabaseManager extends RepositoryManager {
 
 
 
-    public void copyTable(String oldTable, String newTable, Connection connection) throws Exception {
-        String copySql = "INSERT INTO  " +newTable  + " SELECT * from " + oldTable;
-        execute(connection, copySql, -1,-1);
+    /**
+     * _more_
+     *
+     * @param oldTable _more_
+     * @param newTable _more_
+     * @param connection _more_
+     *
+     * @throws Exception _more_
+     */
+    public void copyTable(String oldTable, String newTable,
+                          Connection connection)
+            throws Exception {
+        String copySql = "INSERT INTO  " + newTable + " SELECT * from "
+                         + oldTable;
+        execute(connection, copySql, -1, -1);
     }
 
 
@@ -664,7 +686,7 @@ public class DatabaseManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Statement execute(Connection connection, String sql, int max,
-                                int timeout)
+                             int timeout)
             throws Exception {
         Statement statement = connection.createStatement();
         if (timeout > 0) {
@@ -860,9 +882,19 @@ public class DatabaseManager extends RepositoryManager {
     }
 
 
-    public void executeInsert(Connection connection, String insert, Object[] values)
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param insert _more_
+     * @param values _more_
+     *
+     * @throws Exception _more_
+     */
+    public void executeInsert(Connection connection, String insert,
+                              Object[] values)
             throws Exception {
-        PreparedStatement pstmt       = connection.prepareStatement(insert);
+        PreparedStatement pstmt = connection.prepareStatement(insert);
         setValues(pstmt, values);
         try {
             pstmt.executeUpdate();
@@ -975,8 +1007,12 @@ public class DatabaseManager extends RepositoryManager {
      * @return _more_
      */
     public String getLimitString(int skip, int max) {
-        if(skip<0) skip=0;
-        if(max<0) max  = DB_MAX_ROWS;
+        if (skip < 0) {
+            skip = 0;
+        }
+        if (max < 0) {
+            max = DB_MAX_ROWS;
+        }
         if (db.equals(DB_MYSQL)) {
             return " LIMIT " + max + " OFFSET " + skip + " ";
         } else if (db.equals(DB_DERBY)) {
@@ -1019,32 +1055,56 @@ public class DatabaseManager extends RepositoryManager {
     public Statement select(String what, String table, Clause clause,
                             String extra)
             throws Exception {
-        return select(what, Misc.newList(table),clause, extra,-1);
+        return select(what, Misc.newList(table), clause, extra, -1);
     }
 
 
 
+    /**
+     * Class SelectInfo _more_
+     *
+     *
+     * @author IDV Development Team
+     */
     private static class SelectInfo {
+
+        /** _more_ */
         long time;
+
+        /** _more_ */
         String what;
+
+        /** _more_ */
         List tables;
+
+        /** _more_ */
         Clause clause;
+
+        /** _more_ */
         String extra;
+
+        /** _more_ */
         int max;
 
-        public SelectInfo(String what,
-                          List tables,
-                          Clause clause,
-                          String extra,
-                          int max) {
-            time=System.currentTimeMillis();
-            this.what=what;
-            this.tables=tables;
-            this.clause=clause;
-            this.extra=extra;
-            this.max=max;
+        /**
+         * _more_
+         *
+         * @param what _more_
+         * @param tables _more_
+         * @param clause _more_
+         * @param extra _more_
+         * @param max _more_
+         */
+        public SelectInfo(String what, List tables, Clause clause,
+                          String extra, int max) {
+            time        = System.currentTimeMillis();
+            this.what   = what;
+            this.tables = tables;
+            this.clause = clause;
+            this.extra  = extra;
+            this.max    = max;
         }
-        
+
     }
 
 
@@ -1061,12 +1121,14 @@ public class DatabaseManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public Statement select(final String what, final List tables, final Clause clause,
-                            final String extra, final  int max)
+    public Statement select(final String what, final List tables,
+                            final Clause clause, final String extra,
+                            final int max)
             throws Exception {
         Connection connection = getConnection();
-        SelectInfo selectInfo = new SelectInfo(what, tables, clause, extra, max);
-        final boolean[] done = {false};
+        SelectInfo selectInfo = new SelectInfo(what, tables, clause, extra,
+                                    max);
+        final boolean[] done = { false };
         /*
         Misc.run(new Runnable() {
                 public void run() {
@@ -1085,7 +1147,7 @@ public class DatabaseManager extends RepositoryManager {
         */
 
         Statement stmt = SqlUtil.select(connection, what, tables, clause,
-                                        extra, max,TIMEOUT);
+                                        extra, max, TIMEOUT);
 
         done[0] = true;
         releaseConnection(connection);
@@ -1158,7 +1220,7 @@ public class DatabaseManager extends RepositoryManager {
      */
     public Statement select(String what, List tables, Clause[] clauses)
             throws Exception {
-        return select(what, tables, Clause.and(clauses),null, -1);
+        return select(what, tables, Clause.and(clauses), null, -1);
     }
 
 

@@ -19,8 +19,11 @@
  */
 
 package ucar.unidata.repository;
-import ucar.unidata.repository.output.OutputType;
+
+
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.output.OutputType;
 
 import ucar.unidata.sql.Clause;
 import ucar.unidata.sql.SqlUtil;
@@ -81,6 +84,7 @@ public class Column implements Constants {
     /** _more_ */
     public static final String TYPE_STRING = "string";
 
+    /** _more_ */
     public static final String TYPE_PASSWORD = "password";
 
     /** _more_ */
@@ -265,8 +269,9 @@ public class Column implements Constants {
         if (type.equals(TYPE_ENUMERATION)) {
             String valueString = XmlUtil.getAttribute(element, ATTR_VALUES);
             if (valueString.startsWith("file:")) {
-                valueString = typeHandler.getStorageManager().readSystemResource(
-                                                                             valueString.substring("file:".length()));
+                valueString =
+                    typeHandler.getStorageManager().readSystemResource(
+                        valueString.substring("file:".length()));
                 values = StringUtil.split(valueString, "\n", true, true);
             } else {
                 values = StringUtil.split(valueString, ",", true, true);
@@ -295,10 +300,14 @@ public class Column implements Constants {
      */
     private String toString(Object[] values, int idx) {
         if (values == null) {
-            return (dflt!=null?dflt:"");
+            return ((dflt != null)
+                    ? dflt
+                    : "");
         }
         if (values[idx] == null) {
-            return (dflt!=null?dflt:"");
+            return ((dflt != null)
+                    ? dflt
+                    : "");
         }
         return values[idx].toString();
     }
@@ -313,7 +322,7 @@ public class Column implements Constants {
      */
     private boolean toBoolean(Object[] values, int idx) {
         if (values[idx] == null) {
-            if(StringUtil.notEmpty(dflt)) {
+            if (StringUtil.notEmpty(dflt)) {
                 return new Boolean(dflt).booleanValue();
             }
             return true;
@@ -403,9 +412,11 @@ public class Column implements Constants {
                 stmt.setDouble(stmtIdx + 1, Entry.NONGEO);
             }
             stmtIdx += 2;
-        } else  if (type.equals(TYPE_PASSWORD)) {
+        } else if (type.equals(TYPE_PASSWORD)) {
             if (values[offset] != null) {
-                String value = new String(XmlUtil.encodeBase64(toString(values, offset).getBytes()).getBytes());
+                String value =
+                    new String(XmlUtil.encodeBase64(toString(values,
+                        offset).getBytes()).getBytes());
                 stmt.setString(stmtIdx, value);
             } else {
                 stmt.setString(stmtIdx, null);
@@ -456,9 +467,9 @@ public class Column implements Constants {
 
         } else if (type.equals(TYPE_PASSWORD)) {
             String value = results.getString(valueIdx);
-            if(value!=null) {
+            if (value != null) {
                 byte[] bytes = XmlUtil.decodeBase64(value);
-                if(bytes!=null) {
+                if (bytes != null) {
                     value = new String(bytes);
                 }
             }
@@ -749,31 +760,42 @@ public class Column implements Constants {
             widget = HtmlUtil.select(getFullName(),
                                      Misc.newList("True", "False"), value);
         } else if (type.equals(TYPE_ENUMERATION)) {
-            String value = (dflt!=null?dflt:"");
+            String value = ((dflt != null)
+                            ? dflt
+                            : "");
             if (entry != null) {
                 value = (String) toString(values, offset);
             }
             widget = HtmlUtil.select(getFullName(), this.values, value);
         } else if (type.equals(TYPE_INT)) {
-            String value = (dflt!=null?dflt:"");
+            String value = ((dflt != null)
+                            ? dflt
+                            : "");
             if (entry != null) {
                 value = "" + toString(values, offset);
             }
             widget = HtmlUtil.input(getFullName(), value, HtmlUtil.SIZE_10);
         } else if (type.equals(TYPE_DOUBLE)) {
-            String value = (dflt!=null?dflt:"");
+            String value = ((dflt != null)
+                            ? dflt
+                            : "");
             if (entry != null) {
                 value = "" + toString(values, offset);
             }
             widget = HtmlUtil.input(getFullName(), value, HtmlUtil.SIZE_10);
         } else if (type.equals(TYPE_PASSWORD)) {
-            String value = (dflt!=null?dflt:"");
+            String value = ((dflt != null)
+                            ? dflt
+                            : "");
             if (entry != null) {
                 value = "" + toString(values, offset);
             }
-            widget = HtmlUtil.password(getFullName(), value, HtmlUtil.SIZE_10);
+            widget = HtmlUtil.password(getFullName(), value,
+                                       HtmlUtil.SIZE_10);
         } else {
-            String value = (dflt!=null?dflt:"");
+            String value = ((dflt != null)
+                            ? dflt
+                            : "");
             if (entry != null) {
                 value = toString(values, offset);
             }
@@ -828,32 +850,46 @@ public class Column implements Constants {
             //TODO
         } else if (type.equals(TYPE_BOOLEAN)) {
             String value = request.getString(getFullName(),
-                                             (StringUtil.notEmpty(dflt)?dflt:"true")).toLowerCase();
+                                             (StringUtil.notEmpty(dflt)
+                    ? dflt
+                    : "true")).toLowerCase();
             values[offset] = new Boolean(value);
         } else if (type.equals(TYPE_ENUMERATION)) {
             if (request.exists(getFullName())) {
-                values[offset] = request.getString(getFullName(), (dflt!=null?dflt:""));
+                values[offset] = request.getString(getFullName(),
+                        ((dflt != null)
+                         ? dflt
+                         : ""));
             } else {
                 values[offset] = dflt;
             }
         } else if (type.equals(TYPE_INT)) {
-            int dfltValue = (StringUtil.notEmpty(dflt)?new Integer(dflt).intValue():0);
+            int dfltValue = (StringUtil.notEmpty(dflt)
+                             ? new Integer(dflt).intValue()
+                             : 0);
             if (request.exists(getFullName())) {
-                values[offset] = new Integer(request.get(getFullName(), dfltValue));
+                values[offset] = new Integer(request.get(getFullName(),
+                        dfltValue));
             } else {
                 values[offset] = dfltValue;
             }
         } else if (type.equals(TYPE_DOUBLE)) {
-            double dfltValue = (StringUtil.notEmpty(dflt)?new Double(dflt.trim()).doubleValue():0);
+            double dfltValue = (StringUtil.notEmpty(dflt)
+                                ? new Double(dflt.trim()).doubleValue()
+                                : 0);
             if (request.exists(getFullName())) {
-                values[offset] = new Double(request.get(getFullName(), dfltValue));
+                values[offset] = new Double(request.get(getFullName(),
+                        dfltValue));
             } else {
                 values[offset] = dfltValue;
 
             }
         } else {
             if (request.exists(getFullName())) {
-                values[offset] = request.getString(getFullName(), (dflt!=null?dflt:""));
+                values[offset] = request.getString(getFullName(),
+                        ((dflt != null)
+                         ? dflt
+                         : ""));
             } else {
                 values[offset] = dflt;
             }

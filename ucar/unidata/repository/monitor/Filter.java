@@ -48,8 +48,9 @@ import java.util.List;
 public class Filter implements Constants {
 
     /** _more_ */
-    public static final String[] FIELD_TYPES = { ARG_TEXT, ARG_TYPE, ARG_USER,
-            ARG_FILESUFFIX, ARG_ANCESTOR,ARG_AREA };
+    public static final String[] FIELD_TYPES = {
+        ARG_TEXT, ARG_TYPE, ARG_USER, ARG_FILESUFFIX, ARG_ANCESTOR, ARG_AREA
+    };
 
 
     /** _more_ */

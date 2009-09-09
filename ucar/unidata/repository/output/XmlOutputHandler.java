@@ -20,10 +20,11 @@
  */
 
 package ucar.unidata.repository.output;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.sql.Clause;
 
@@ -81,14 +82,17 @@ import java.util.zip.*;
 public class XmlOutputHandler extends OutputHandler {
 
     /** _more_ */
-    public static final OutputType OUTPUT_XML = new OutputType("XML",
-                                                    "xml.xml",
-                                                    OutputType.TYPE_NONHTML|OutputType.TYPE_FORSEARCH,"",ICON_XML);
+    public static final OutputType OUTPUT_XML =
+        new OutputType("XML", "xml.xml",
+                       OutputType.TYPE_NONHTML | OutputType.TYPE_FORSEARCH,
+                       "", ICON_XML);
 
 
-    public static final OutputType OUTPUT_XMLENTRY = new OutputType("XML Entry",
-                                                    "xml.xmlentry",
-                                                    OutputType.TYPE_NONHTML|OutputType.TYPE_FORSEARCH,"",ICON_XML);
+    /** _more_ */
+    public static final OutputType OUTPUT_XMLENTRY =
+        new OutputType("XML Entry", "xml.xmlentry",
+                       OutputType.TYPE_NONHTML | OutputType.TYPE_FORSEARCH,
+                       "", ICON_XML);
 
 
 
@@ -125,8 +129,7 @@ public class XmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result listTypes(Request request,
-                               List<TypeHandler> typeHandlers)
+    public Result listTypes(Request request, List<TypeHandler> typeHandlers)
             throws Exception {
         StringBuffer sb     = new StringBuffer();
         OutputType   output = request.getOutput();
@@ -209,14 +212,14 @@ public class XmlOutputHandler extends OutputHandler {
         OutputType   output = request.getOutput();
         sb.append(XmlUtil.XML_HEADER + "\n");
         sb.append(XmlUtil.openTag(TAG_ASSOCIATIONS));
-        TypeHandler   typeHandler = repository.getTypeHandler(request);
+        TypeHandler typeHandler = repository.getTypeHandler(request);
 
-        String[] associations     =
+        String[] associations =
             getAssociationManager().getAssociations(request);
 
 
-        List<String>  names       = new ArrayList<String>();
-        List<Integer> counts      = new ArrayList<Integer>();
+        List<String>  names  = new ArrayList<String>();
+        List<Integer> counts = new ArrayList<Integer>();
         ResultSet     results;
         int           max = -1;
         int           min = -1;
@@ -253,15 +256,26 @@ public class XmlOutputHandler extends OutputHandler {
 
         String pageTitle = "";
         sb.append(XmlUtil.closeTag(TAG_ASSOCIATIONS));
-        return new Result(pageTitle, sb, repository.getMimeTypeFromSuffix(".xml"));
+        return new Result(pageTitle, sb,
+                          repository.getMimeTypeFromSuffix(".xml"));
 
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result outputEntry(Request request, Entry entry) throws Exception {
-        Document   doc    = XmlUtil.makeDocument();
-        Element    root   = getEntryTag(entry, doc, null);
-        StringBuffer sb = new StringBuffer(XmlUtil.toString(root));
+        Document     doc  = XmlUtil.makeDocument();
+        Element      root = getEntryTag(entry, doc, null);
+        StringBuffer sb   = new StringBuffer(XmlUtil.toString(root));
         return new Result("", sb, repository.getMimeTypeFromSuffix(".xml"));
     }
 
@@ -284,12 +298,12 @@ public class XmlOutputHandler extends OutputHandler {
             throws Exception {
         OutputType output = request.getOutput();
 
-        if(output.equals(OUTPUT_XMLENTRY)) {
+        if (output.equals(OUTPUT_XMLENTRY)) {
             return outputEntry(request, group);
         }
 
-        Document   doc    = XmlUtil.makeDocument();
-        Element    root   = getGroupTag(request, group, doc, null);
+        Document doc  = XmlUtil.makeDocument();
+        Element  root = getGroupTag(request, group, doc, null);
         for (Group subgroup : subGroups) {
             getGroupTag(request, subgroup, doc, root);
         }
@@ -303,9 +317,17 @@ public class XmlOutputHandler extends OutputHandler {
 
 
 
-    private void addMetadata(Entry entry,  Document doc, Element parent)
-        throws Exception {
-    }
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param doc _more_
+     * @param parent _more_
+     *
+     * @throws Exception _more_
+     */
+    private void addMetadata(Entry entry, Document doc, Element parent)
+            throws Exception {}
 
 
     /**
@@ -326,12 +348,13 @@ public class XmlOutputHandler extends OutputHandler {
             entry.getResource().getPath(), ATTR_RESOURCE_TYPE,
             entry.getResource().getType(), ATTR_GROUP,
             entry.getParentGroupId(), ATTR_TYPE,
-            entry.getTypeHandler().getType(),
-            ATTR_ISGROUP,
-            ""+entry.isGroup(),
-            ATTR_FROMDATE, getRepository().formatDate(new Date(entry.getStartDate())),
-            ATTR_TODATE, getRepository().formatDate(new Date(entry.getEndDate())),
-            ATTR_CREATEDATE, getRepository().formatDate(new Date(entry.getCreateDate()))
+            entry.getTypeHandler().getType(), ATTR_ISGROUP,
+            "" + entry.isGroup(), ATTR_FROMDATE,
+            getRepository().formatDate(new Date(entry.getStartDate())),
+            ATTR_TODATE,
+            getRepository().formatDate(new Date(entry.getEndDate())),
+            ATTR_CREATEDATE,
+            getRepository().formatDate(new Date(entry.getCreateDate()))
         });
 
 
@@ -361,13 +384,13 @@ public class XmlOutputHandler extends OutputHandler {
     private Element getGroupTag(Request request, Group group, Document doc,
                                 Element parent)
             throws Exception {
-        Element node  = getEntryTag(group, doc, parent);
+        Element node = getEntryTag(group, doc, parent);
         boolean canDoNew = getAccessManager().canDoAction(request, group,
                                Permission.ACTION_NEW);
         boolean canDoUpload = getAccessManager().canDoAction(request, group,
                                   Permission.ACTION_UPLOAD);
-        node.setAttribute(ATTR_CANDONEW,""+canDoNew);
-        node.setAttribute(ATTR_CANDOUPLOAD,""+canDoUpload);
+        node.setAttribute(ATTR_CANDONEW, "" + canDoNew);
+        node.setAttribute(ATTR_CANDOUPLOAD, "" + canDoUpload);
         return node;
 
     }

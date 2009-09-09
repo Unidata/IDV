@@ -21,12 +21,13 @@
  */
 
 package ucar.unidata.repository.harvester;
-import ucar.unidata.repository.*;
-import ucar.unidata.repository.output.*;
-import ucar.unidata.repository.metadata.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
+import ucar.unidata.repository.metadata.*;
+import ucar.unidata.repository.output.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -256,14 +257,18 @@ public class PatternHarvester extends Harvester {
                       : "";
         root = root.replace("\\", "/");
 
-        String adminLink = HtmlUtil.href(getRepository().getUrlBase()+"/help/admin.html#filesystemaccess",msg("See File System Access configuration")," target=_HELP");
+        String adminLink =
+            HtmlUtil.href(
+                getRepository().getUrlBase()
+                + "/help/admin.html#filesystemaccess", msg(
+                    "See File System Access configuration"), " target=_HELP");
         String extraLabel = adminLink;
         if ((rootDir != null) && !rootDir.exists()) {
-            extraLabel = extraLabel +HtmlUtil.space(2)
-                + HtmlUtil.bold("Directory does not exist");
+            extraLabel = extraLabel + HtmlUtil.space(2)
+                         + HtmlUtil.bold("Directory does not exist");
         }
 
-        sb.append(HtmlUtil.colspan(msgHeader("Look for files"),2));
+        sb.append(HtmlUtil.colspan(msgHeader("Look for files"), 2));
         sb.append(HtmlUtil.formEntry(msgLabel("Under directory"),
                                      HtmlUtil.input(ATTR_ROOTDIR, root,
                                          HtmlUtil.SIZE_60) + extraLabel));
@@ -272,15 +277,21 @@ public class PatternHarvester extends Harvester {
                                          filePatternString,
                                          HtmlUtil.SIZE_60)));
 
-        sb.append(HtmlUtil.colspan(msgHeader("Then create an entry with"+HtmlUtil.space(2) +
-                                             HtmlUtil.href(getRepository().getUrlBase()+"/help/harvesters.html","(Help)"," target=_HELP")),2));
+        sb.append(
+            HtmlUtil.colspan(
+                msgHeader(
+                    "Then create an entry with" + HtmlUtil.space(2)
+                    + HtmlUtil.href(
+                        getRepository().getUrlBase()
+                        + "/help/harvesters.html", "(Help)",
+                            " target=_HELP")), 2));
 
 
         //        sb.append(
         //HtmlUtil.formEntry("",
         //msgLabel("Then create an entry with")));
 
-        addBaseGroupSelect(ATTR_BASEGROUP,sb);
+        addBaseGroupSelect(ATTR_BASEGROUP, sb);
 
         sb.append(HtmlUtil.formEntry(msgLabel("Group template"),
                                      HtmlUtil.input(ATTR_GROUPTEMPLATE,
@@ -305,12 +316,16 @@ public class PatternHarvester extends Harvester {
                                      HtmlUtil.checkbox(ATTR_MOVETOSTORAGE,
                                          "true", moveToStorage)));
 
-        
-        sb.append(HtmlUtil.formEntry(msgLabel("Add Metadata"),
-                                     HtmlUtil.checkbox(ATTR_ADDMETADATA,
-                                                       "true", getAddMetadata())+HtmlUtil.space(2) +
-                                     msgLabel("Just Add Spatial/Temporal Metadata") + HtmlUtil.space(1)+HtmlUtil.checkbox(ATTR_ADDSHORTMETADATA,
-                                                                                                                          "true", getAddShortMetadata())));
+
+        sb.append(
+            HtmlUtil.formEntry(
+                msgLabel("Add Metadata"),
+                HtmlUtil.checkbox(ATTR_ADDMETADATA, "true", getAddMetadata())
+                + HtmlUtil.space(2)
+                + msgLabel("Just Add Spatial/Temporal Metadata")
+                + HtmlUtil.space(1)
+                + HtmlUtil.checkbox(
+                    ATTR_ADDSHORTMETADATA, "true", getAddShortMetadata())));
 
     }
 
@@ -369,10 +384,12 @@ public class PatternHarvester extends Harvester {
             }
             filePattern = Pattern.compile(pattern.toString());
             if (getTestMode()) {
-                getRepository().getLogManager().logInfo("orig pattern:" + "  "
-                                        + filePatternString);
-                getRepository().getLogManager().logInfo("pattern:" + "  " + pattern);
-                getRepository().getLogManager().logInfo("pattern names:" + patternNames);
+                getRepository().getLogManager().logInfo("orig pattern:"
+                        + "  " + filePatternString);
+                getRepository().getLogManager().logInfo("pattern:" + "  "
+                        + pattern);
+                getRepository().getLogManager().logInfo("pattern names:"
+                        + patternNames);
             }
         }
     }
@@ -580,7 +597,8 @@ public class PatternHarvester extends Harvester {
                         if ( !getTestMode()) {
                             if (getAddMetadata() || getAddShortMetadata()) {
                                 getEntryManager().addInitialMetadata(null,
-                                                                     needToAdd, true, getAddShortMetadata());
+                                        needToAdd, true,
+                                        getAddShortMetadata());
                             }
                             getEntryManager().insertEntries(needToAdd, true,
                                     true);
@@ -601,9 +619,9 @@ public class PatternHarvester extends Harvester {
             newEntryCnt += uniqueEntries.size();
             needToAdd.addAll(uniqueEntries);
             if (needToAdd.size() > 0) {
-                if (getAddMetadata()||getAddShortMetadata()) {
+                if (getAddMetadata() || getAddShortMetadata()) {
                     getEntryManager().addInitialMetadata(null, needToAdd,
-                                                         true, getAddShortMetadata());
+                            true, getAddShortMetadata());
                 }
                 getEntryManager().insertEntries(needToAdd, true, true);
             }
@@ -727,11 +745,10 @@ public class PatternHarvester extends Harvester {
         //        System.err.println ("file:" +fileName + " " + dirPath +" " + dirToks);
 
         Group baseGroup = getBaseGroup();
-        String dirGroup = getDirNames(rootDir, baseGroup, dirToks,
-                                      false && 
-                                      !getTestMode() &&
-                                      groupTemplate.indexOf("${dirgroup}")
-                                      >= 0);
+        String dirGroup =
+            getDirNames(rootDir, baseGroup, dirToks,
+                        false && !getTestMode()
+                        && (groupTemplate.indexOf("${dirgroup}") >= 0));
         dirGroup = SqlUtil.cleanUp(dirGroup);
         dirGroup = dirGroup.replace("\\", "/");
 
@@ -766,9 +783,9 @@ public class PatternHarvester extends Harvester {
 
         //        System.err.println("values:");
         //        System.err.println("map:" + map);
-        Object[] values     = typeHandler.makeValues(map);
+        Object[] values = typeHandler.makeValues(map);
         //        Date     createDate = new Date();
-        Date     createDate = new Date(f.lastModified());
+        Date createDate = new Date(f.lastModified());
         if (fromDate == null) {
             fromDate = toDate;
         }

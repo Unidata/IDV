@@ -19,8 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.repository;
 
 
@@ -69,7 +67,7 @@ public class ServerInfo implements Constants {
     /** _more_ */
     public static final String TAG_INFO_ISREGISTRY = "isregistry";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ID_THIS = "this";
 
 

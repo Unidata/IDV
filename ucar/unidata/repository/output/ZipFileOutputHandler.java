@@ -20,10 +20,11 @@
  */
 
 package ucar.unidata.repository.output;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -71,6 +72,7 @@ import java.util.zip.*;
 
 import java.util.zip.*;
 
+
 /**
  *
  *
@@ -82,9 +84,9 @@ public class ZipFileOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_LIST = new OutputType("Zip File Listing",
-                                                               "zipfile.list",
-                                                               OutputType.TYPE_FILE, "", ICON_ZIP);
+    public static final OutputType OUTPUT_LIST =
+        new OutputType("Zip File Listing", "zipfile.list",
+                       OutputType.TYPE_FILE, "", ICON_ZIP);
 
 
 
@@ -115,8 +117,7 @@ public class ZipFileOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
 
         if (state.entry == null) {
@@ -130,8 +131,9 @@ public class ZipFileOutputHandler extends OutputHandler {
                 state.entry)) {
             return;
         }
-        String path =state.entry.getResource().getPath().toLowerCase();
-        if(path.endsWith(".zip") || path.endsWith(".jar") || path.endsWith(".zidv")) {
+        String path = state.entry.getResource().getPath().toLowerCase();
+        if (path.endsWith(".zip") || path.endsWith(".jar")
+                || path.endsWith(".zidv")) {
             links.add(makeLink(request, state.entry, OUTPUT_LIST));
         }
 
@@ -156,34 +158,37 @@ public class ZipFileOutputHandler extends OutputHandler {
         }
         StringBuffer sb = new StringBuffer();
 
-        ZipInputStream zin =
-            new ZipInputStream(getStorageManager().getFileInputStream(entry.getResource().getPath()));
+        ZipInputStream zin = new ZipInputStream(
+                                 getStorageManager().getFileInputStream(
+                                     entry.getResource().getPath()));
         ZipEntry ze = null;
         sb.append("<ul>");
-        String fileToFetch = request.getString(ARG_FILE,null);
+        String fileToFetch = request.getString(ARG_FILE, null);
         while ((ze = zin.getNextEntry()) != null) {
             if (ze.isDirectory()) {
                 continue;
             }
             String path = ze.getName();
-            if(fileToFetch!=null && path.equals(fileToFetch)) {
-                String type   = getRepository().getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
-                return new Result("",zin,type);
+            if ((fileToFetch != null) && path.equals(fileToFetch)) {
+                String type = getRepository().getMimeTypeFromSuffix(
+                                  IOUtil.getFileExtension(path));
+                return new Result("", zin, type);
             }
             //            if(path.endsWith("MANIFEST.MF")) continue;
             sb.append("<li>");
             String name = IOUtil.getFileTail(path);
-            String url = getRepository().URL_ENTRY_SHOW+"/"
-                + name;
+            String url  = getRepository().URL_ENTRY_SHOW + "/" + name;
 
-            url  = HtmlUtil.url(url, ARG_ENTRYID,entry.getId(),ARG_FILE,path,ARG_OUTPUT,OUTPUT_LIST.getId());
+            url = HtmlUtil.url(url, ARG_ENTRYID, entry.getId(), ARG_FILE,
+                               path, ARG_OUTPUT, OUTPUT_LIST.getId());
             sb.append(HtmlUtil.href(url, path));
         }
         sb.append("</ul>");
 
-        return makeLinksResult(request, msg("Zip File Listing"), sb, new State(entry));
+        return makeLinksResult(request, msg("Zip File Listing"), sb,
+                               new State(entry));
     }
- 
+
 
 
 }

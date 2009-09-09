@@ -20,11 +20,12 @@
  */
 
 package ucar.unidata.repository.collab;
-import ucar.unidata.repository.output.*;
+
 
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.output.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -249,7 +250,7 @@ public class ChatOutputHandler extends OutputHandler {
                 String  type = XmlUtil.getAttribute(node, ATTR_TYPE);
                 if (session == null) {
                     String tmpSession = XmlUtil.getAttribute(node,
-                                                             ATTR_SESSIONID,"");
+                                            ATTR_SESSIONID, "");
                     SessionManager.Session session =
                         getSessionManager().getSession(tmpSession);
                     if (session == null) {
@@ -260,7 +261,7 @@ public class ChatOutputHandler extends OutputHandler {
                         user = session.getUser();
                     }
                     String tmpEntryId = XmlUtil.getAttribute(node,
-                                                             ATTR_CHANNEL,"");
+                                            ATTR_CHANNEL, "");
                     entry = getEntryManager().getEntry(null, tmpEntryId);
                     if (entry == null) {
                         //                        entry = getRepository().getEntryManager().getTopGroup();
@@ -522,8 +523,7 @@ public class ChatOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
 
         Entry entry = state.getEntry();

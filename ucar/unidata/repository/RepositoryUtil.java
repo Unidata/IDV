@@ -129,15 +129,27 @@ public class RepositoryUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public static final String encodeInput(String s) {
-        s= HtmlUtil.urlEncode(s);
-        s = s.replace("+"," ");
+        s = HtmlUtil.urlEncode(s);
+        s = s.replace("+", " ");
         return s;
     }
 
 
-    public static void main(String []args) {
-        for(String s:args) {
+    /**
+     * _more_
+     *
+     * @param args _more_
+     */
+    public static void main(String[] args) {
+        for (String s : args) {
             System.err.println(encodeInput(s));
         }
     }

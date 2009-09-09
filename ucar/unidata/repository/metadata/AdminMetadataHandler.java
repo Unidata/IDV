@@ -20,10 +20,11 @@
  */
 
 package ucar.unidata.repository.metadata;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -93,8 +94,11 @@ public class AdminMetadataHandler extends MetadataHandler {
      * @param metadata _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public String[] getHtml(Request request, Entry entry, Metadata metadata) throws Exception {
+    public String[] getHtml(Request request, Entry entry, Metadata metadata)
+            throws Exception {
         String[] result = super.getHtml(request, entry, metadata);
         if (result != null) {
             return result;

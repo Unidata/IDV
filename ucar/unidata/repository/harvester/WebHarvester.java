@@ -20,11 +20,13 @@
  */
 
 package ucar.unidata.repository.harvester;
-import ucar.unidata.repository.*;
-import ucar.unidata.repository.output.*;
-import ucar.unidata.repository.metadata.*;
+
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
+import ucar.unidata.repository.metadata.*;
+import ucar.unidata.repository.output.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -190,9 +192,7 @@ public class WebHarvester extends Harvester {
                                           new String[] {
                 ATTR_URL, urlEntry.url, ATTR_NAME, urlEntry.name,
                 ATTR_DESCRIPTION, urlEntry.description, ATTR_GROUP,
-                urlEntry.group,
-                ATTR_BASEGROUP,
-                urlEntry.baseGroupId
+                urlEntry.group, ATTR_BASEGROUP, urlEntry.baseGroupId
             });
         }
 
@@ -212,7 +212,7 @@ public class WebHarvester extends Harvester {
         StringBuffer sb  = new StringBuffer();
         int          cnt = 1;
         urlEntries = new ArrayList<HarvesterEntry>();
-        HarvesterEntry lastEntry=null;
+        HarvesterEntry lastEntry = null;
         while (true) {
             if ( !request.exists(ATTR_URL + cnt)) {
                 break;
@@ -221,27 +221,25 @@ public class WebHarvester extends Harvester {
                 cnt++;
                 continue;
             }
-            String baseGroupId = request.getUnsafeString(ATTR_BASEGROUP + cnt+"_hidden", "");
+            String baseGroupId = request.getUnsafeString(ATTR_BASEGROUP + cnt
+                                     + "_hidden", "");
 
             String groupName = request.getUnsafeString(ATTR_GROUP + cnt, "");
             groupName = groupName.replace(" > ", "/");
             groupName = groupName.replace(">", "/");
 
 
-            if(!request.exists(ATTR_NAME+cnt) && lastEntry!=null) {
-                lastEntry = new HarvesterEntry(
-                                               request.getUnsafeString(ATTR_URL + cnt, ""),
-                                               lastEntry.name,
-                                               lastEntry.description,
-                                               lastEntry.group,
-                                               lastEntry.baseGroupId);
+            if ( !request.exists(ATTR_NAME + cnt) && (lastEntry != null)) {
+                lastEntry =
+                    new HarvesterEntry(request.getUnsafeString(ATTR_URL
+                        + cnt, ""), lastEntry.name, lastEntry.description,
+                                    lastEntry.group, lastEntry.baseGroupId);
             } else {
-                lastEntry = new HarvesterEntry(
-                                               request.getUnsafeString(ATTR_URL + cnt, ""),
-                                               request.getUnsafeString(ATTR_NAME + cnt, ""),
-                                               request.getUnsafeString(ATTR_DESCRIPTION + cnt, ""),
-                                               groupName,
-                                               baseGroupId);
+                lastEntry =
+                    new HarvesterEntry(request.getUnsafeString(ATTR_URL
+                        + cnt, ""), request.getUnsafeString(ATTR_NAME + cnt,
+                            ""), request.getUnsafeString(ATTR_DESCRIPTION
+                            + cnt, ""), groupName, baseGroupId);
             }
             urlEntries.add(lastEntry);
             cnt++;
@@ -261,7 +259,8 @@ public class WebHarvester extends Harvester {
      */
     public void createEditForm(Request request, StringBuffer formSB)
             throws Exception {
-        StringBuffer sb = new StringBuffer();
+
+        StringBuffer sb      = new StringBuffer();
         StringBuffer superSB = new StringBuffer();
 
         formSB.append(HtmlUtil.formTableClose());
@@ -269,8 +268,7 @@ public class WebHarvester extends Harvester {
         super.createEditForm(request, superSB);
         superSB.append(HtmlUtil.formTableClose());
         formSB.append(HtmlUtil.makeShowHideBlock("Basic Information",
-                                                 superSB.toString(),
-                                                 true));
+                superSB.toString(), true));
 
         sb.append(HtmlUtil.hr());
         sb.append("Enter urls and the groups to add them to.");
@@ -294,7 +292,7 @@ public class WebHarvester extends Harvester {
                                              HtmlUtil.SIZE_80) + link;
 
             entrySB.append(HtmlUtil.formEntry(msgLabel("Fetch URL"),
-                                              urlInput));
+                    urlInput));
             entrySB.append(
                 RepositoryManager.tableSubHeader(
                     "Then create an entry with"));
@@ -312,15 +310,23 @@ public class WebHarvester extends Harvester {
                                    + HtmlUtil.title(templateHelp))));
 
             String baseGroupFieldId = ATTR_BASEGROUP + cnt;
-            Group baseGroup = (urlEntry.baseGroupId.length()==0?null:getEntryManager().findGroup(request, urlEntry.baseGroupId));
-            String baseSelect  = OutputHandler.getGroupSelect(request, baseGroupFieldId);
-            entrySB.append(HtmlUtil.hidden(baseGroupFieldId+"_hidden", urlEntry.baseGroupId,
-                                           HtmlUtil.id(baseGroupFieldId+"_hidden")));
+            Group  baseGroup        = ((urlEntry.baseGroupId.length() == 0)
+                                       ? null
+                                       : getEntryManager().findGroup(request,
+                                           urlEntry.baseGroupId));
+            String baseSelect = OutputHandler.getGroupSelect(request,
+                                    baseGroupFieldId);
+            entrySB.append(HtmlUtil.hidden(baseGroupFieldId + "_hidden",
+                                           urlEntry.baseGroupId,
+                                           HtmlUtil.id(baseGroupFieldId
+                                               + "_hidden")));
             entrySB.append(HtmlUtil.formEntry(msgLabel("Base Group"),
-                                              HtmlUtil.disabledInput(baseGroupFieldId, 
-                                                                     (baseGroup!=null?baseGroup.getFullName():""),
-                                                                     HtmlUtil.id(baseGroupFieldId) +
-                                                                     HtmlUtil.SIZE_60)+baseSelect));
+                    HtmlUtil.disabledInput(baseGroupFieldId,
+                                           ((baseGroup != null)
+                                            ? baseGroup.getFullName()
+                                            : ""), HtmlUtil
+                                            .id(baseGroupFieldId) + HtmlUtil
+                                            .SIZE_60) + baseSelect));
 
 
             String fieldId = ATTR_GROUP + cnt;
@@ -330,7 +336,7 @@ public class WebHarvester extends Harvester {
                                    + HtmlUtil.title(templateHelp))));
             entrySB.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.makeShowHideBlock("URL #" + cnt,
-                                                 entrySB.toString(), true));
+                    entrySB.toString(), true));
             sb.append(HtmlUtil.hr());
             cnt++;
         }
@@ -338,8 +344,8 @@ public class WebHarvester extends Harvester {
         entrySB = new StringBuffer();
         entrySB.append(HtmlUtil.formTable());
         entrySB.append(HtmlUtil.formEntry(msgLabel("Fetch URL"),
-                                          HtmlUtil.input(ATTR_URL + cnt, "", HtmlUtil.SIZE_80)
-                                          ));
+                                          HtmlUtil.input(ATTR_URL + cnt, "",
+                                              HtmlUtil.SIZE_80)));
         /*
         entrySB.append(
             RepositoryManager.tableSubHeader("Then create an entry with"));
@@ -365,14 +371,15 @@ public class WebHarvester extends Harvester {
 
         entrySB.append(HtmlUtil.formTableClose());
 
-        sb.append(HtmlUtil.makeShowHideBlock("New URL",
-                                             entrySB.toString(), true));
+        sb.append(HtmlUtil.makeShowHideBlock("New URL", entrySB.toString(),
+                                             true));
 
 
         sb.append(HtmlUtil.p());
 
         formSB.append(sb);
         formSB.append(HtmlUtil.formTable());
+
     }
 
 
@@ -457,9 +464,13 @@ public class WebHarvester extends Harvester {
             if ( !getActive()) {
                 return;
             }
-            Group baseGroup = (urlEntry.baseGroupId.length()==0?null:getEntryManager().findGroup(null, urlEntry.baseGroupId));
+            Group baseGroup = ((urlEntry.baseGroupId.length() == 0)
+                               ? null
+                               : getEntryManager().findGroup(null,
+                                   urlEntry.baseGroupId));
             Entry entry = processUrl(urlEntry.url, urlEntry.name,
-                                     urlEntry.description, baseGroup, urlEntry.group);
+                                     urlEntry.description, baseGroup,
+                                     urlEntry.group);
             if (entry != null) {
                 entries.add(entry);
                 if (statusMessages.size() > 100) {
@@ -484,6 +495,7 @@ public class WebHarvester extends Harvester {
      *
      * @param name _more_
      * @param desc _more_
+     * @param baseGroup _more_
      * @param groupName _more_
      *
      * @param url _more_
@@ -493,8 +505,7 @@ public class WebHarvester extends Harvester {
      * @throws Exception _more_
      */
     private Entry processUrl(String url, String name, String desc,
-                             Group baseGroup,
-                             String groupName)
+                             Group baseGroup, String groupName)
             throws Exception {
 
 
@@ -505,8 +516,8 @@ public class WebHarvester extends Harvester {
 
         try {
             IOUtil.writeTo(new URL(url), tmpFile, null);
-        } catch(Exception exc) {
-            statusMessages.add("Unable to fetch URL: " +url);
+        } catch (Exception exc) {
+            statusMessages.add("Unable to fetch URL: " + url);
             return null;
         }
         File newFile = getStorageManager().moveToStorage(null, tmpFile, "");
@@ -529,10 +540,12 @@ public class WebHarvester extends Harvester {
         desc = applyMacros(desc, createDate, fromDate, toDate, fileName);
 
 
-        Group group = (baseGroup!=null?getEntryManager().findGroupUnder(getRequest(),baseGroup, groupName, getUser()):
-                       getEntryManager().findGroupFromName(groupName,
-                                                           getUser(), true));
-        System.err.println ("Group:" + group.getFullName());
+        Group group = ((baseGroup != null)
+                       ? getEntryManager().findGroupUnder(getRequest(),
+                           baseGroup, groupName, getUser())
+                       : getEntryManager().findGroupFromName(groupName,
+                           getUser(), true));
+        System.err.println("Group:" + group.getFullName());
         Entry entry = typeHandler.createEntry(repository.getGUID());
         Resource resource = new Resource(newFile.toString(),
                                          Resource.TYPE_STOREDFILE);
@@ -547,7 +560,9 @@ public class WebHarvester extends Harvester {
             for (int i = 0; i < tags.size(); i++) {
                 entry.addMetadata(new Metadata(repository.getGUID(),
                         entry.getId(), EnumeratedMetadataHandler.TYPE_TAG,
-                        DFLT_INHERITED, (String) tags.get(i),Metadata.DFLT_ATTR, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,Metadata.DFLT_EXTRA));
+                        DFLT_INHERITED, (String) tags.get(i),
+                        Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,
+                        Metadata.DFLT_ATTR, Metadata.DFLT_EXTRA));
             }
 
         }

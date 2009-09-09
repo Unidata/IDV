@@ -66,11 +66,14 @@ public class ExtensibleGroupTypeHandler extends GenericTypeHandler {
      * _more_
      *
      * @param repository _more_
+     * @param entryNode _more_
      *
      * @throws Exception _more_
      */
-    public ExtensibleGroupTypeHandler(Repository repository, Element entryNode) throws Exception {
-        super(repository,entryNode);
+    public ExtensibleGroupTypeHandler(Repository repository,
+                                      Element entryNode)
+            throws Exception {
+        super(repository, entryNode);
     }
 
 

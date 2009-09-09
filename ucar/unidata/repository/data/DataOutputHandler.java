@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-a */
-
+ * a
+ */
 
 package ucar.unidata.repository.data;
 
@@ -72,15 +72,15 @@ import ucar.nc2.dt.grid.NetcdfCFWriter;
 import ucar.nc2.dt.trajectory.TrajectoryObsDatasetFactory;
 
 import ucar.nc2.ft.FeatureCollection;
+
+import ucar.nc2.ft.FeatureDatasetFactoryManager;
+import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.ft.NestedPointFeatureCollection;
 import ucar.nc2.ft.PointFeature;
 import ucar.nc2.ft.PointFeatureCollection;
 import ucar.nc2.ft.PointFeatureIterator;
 import ucar.nc2.ft.point.*;
-
-import ucar.nc2.ft.FeatureDatasetFactoryManager;
-import ucar.nc2.ft.FeatureDatasetPoint;
 
 import ucar.unidata.data.gis.KmlUtil;
 import ucar.unidata.geoloc.LatLonPointImpl;
@@ -121,11 +121,11 @@ import java.sql.Statement;
 
 import java.text.SimpleDateFormat;
 
-import java.util.Formatter;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+
+import java.util.Formatter;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -228,7 +228,7 @@ public class DataOutputHandler extends OutputHandler {
                                                            Boolean>(5000);
 
 
-    /** _more_          */
+    /** _more_ */
     private TemporaryDir nj22Dir;
 
     //TODO: When we close a ncfile some thread might be using it
@@ -489,9 +489,9 @@ public class DataOutputHandler extends OutputHandler {
 
         Object oldOutput = request.getOutput();
         request.put(ARG_OUTPUT, OUTPUT_OPENDAP);
-        
+
         String opendapUrl = getRepository().URL_ENTRY_SHOW + "/"
-                            + request.getPathEmbeddedArgs()+"/"
+                            + request.getPathEmbeddedArgs() + "/"
                             + getStorageManager().getFileTail(entry)
                             + "/dodsC/entry.das";
         links.add(new Link(opendapUrl, getRepository().iconUrl(ICON_OPENDAP),
@@ -521,9 +521,8 @@ public class DataOutputHandler extends OutputHandler {
     public String getTdsUrl(Entry entry) {
         return "/" + ARG_OUTPUT + ":"
                + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ENTRYID
-               + ":" + Request.encodeEmbedded(entry.getId())            +"/"
-               + getStorageManager().getFileTail(entry)
-               + "/dodsC/entry.das";
+               + ":" + Request.encodeEmbedded(entry.getId()) + "/"
+               + getStorageManager().getFileTail(entry) + "/dodsC/entry.das";
     }
 
 
@@ -538,8 +537,7 @@ public class DataOutputHandler extends OutputHandler {
         return getRepository().URL_ENTRY_SHOW.getFullUrl() + "/" + ARG_OUTPUT
                + ":" + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/"
                + ARG_ENTRYID + ":" + Request.encodeEmbedded(entry.getId())
-               +"/"
-               + getStorageManager().getFileTail(entry)
+               + "/" + getStorageManager().getFileTail(entry)
                + "/dodsC/entry.das";
     }
 
@@ -587,7 +585,6 @@ public class DataOutputHandler extends OutputHandler {
      * Can the given entry be served by the tds
      *
      *
-     * @param request _more_
      * @param entry The entry
      *
      * @return Can the given entry be served by the tds
@@ -595,7 +592,7 @@ public class DataOutputHandler extends OutputHandler {
     public boolean canLoadAsCdm(Entry entry) {
         if ( !entry.getType().equals(
                 OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
-            if (!entry.isFile()) {
+            if ( !entry.isFile()) {
                 return false;
             }
             if (cannotLoad(entry, TYPE_CDM)) {
@@ -973,9 +970,12 @@ public class DataOutputHandler extends OutputHandler {
             if ((dates[0] != null) && (dates[1] != null)
                     && (dates[0].getTime() > dates[1].getTime())) {
                 sb.append(
-                    getRepository().showDialogWarning("From date is after to date"));
+                    getRepository().showDialogWarning(
+                        "From date is after to date"));
             } else if (varNames.size() == 0) {
-                sb.append(getRepository().showDialogWarning("No variables selected"));
+                sb.append(
+                    getRepository().showDialogWarning(
+                        "No variables selected"));
             } else {
                 NetcdfCFWriter writer = new NetcdfCFWriter();
                 File f =
@@ -1026,9 +1026,10 @@ public class DataOutputHandler extends OutputHandler {
                                 getRepository().URL_ENTRY_FORM, newEntry));
                     }
                 } else {
-                    return new Result(entry.getName() + ".nc",
-                                      getStorageManager().getFileInputStream(f),
-                                      "application/x-netcdf");
+                    return new Result(
+                        entry.getName() + ".nc",
+                        getStorageManager().getFileInputStream(f),
+                        "application/x-netcdf");
                 }
             }
         }
@@ -1090,11 +1091,13 @@ public class DataOutputHandler extends OutputHandler {
 
         for (GridDatatype grid : sortGrids(dataset)) {
             String cbxId = "varcbx_" + (varCnt++);
-            String call = HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,
-                                 HtmlUtil.call("checkboxClicked",
-                                     HtmlUtil.comma("event",
-                                         HtmlUtil.squote(ARG_VARIABLE),
-                                         HtmlUtil.squote(cbxId))));
+            String call = HtmlUtil.attr(
+                              HtmlUtil.ATTR_ONCLICK,
+                              HtmlUtil.call(
+                                  "checkboxClicked",
+                                  HtmlUtil.comma(
+                                      "event", HtmlUtil.squote(ARG_VARIABLE),
+                                      HtmlUtil.squote(cbxId))));
 
 
             VariableEnhanced var = grid.getVariable();
@@ -1103,7 +1106,8 @@ public class DataOutputHandler extends OutputHandler {
                     HtmlUtil.cols(
                         HtmlUtil.checkbox(
                             ARG_VARIABLE + "." + var.getShortName(),
-                            HtmlUtil.VALUE_TRUE, false, HtmlUtil.id(cbxId) + call) + HtmlUtil.space(1)
+                            HtmlUtil.VALUE_TRUE, false,
+                            HtmlUtil.id(cbxId) + call) + HtmlUtil.space(1)
                                 + var.getName() + HtmlUtil.space(1)
                                 + ((var.getUnitsString() != null)
                                    ? "(" + var.getUnitsString() + ")"
@@ -1213,7 +1217,18 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
-    public static PointFeatureIterator getPointIterator(FeatureDatasetPoint input) throws Exception {
+    /**
+     * _more_
+     *
+     * @param input _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static PointFeatureIterator getPointIterator(
+            FeatureDatasetPoint input)
+            throws Exception {
         List<FeatureCollection> collectionList =
             input.getPointFeatureCollectionList();
         if (collectionList.size() > 1) {
@@ -1232,8 +1247,7 @@ public class DataOutputHandler extends OutputHandler {
             throw new IllegalArgumentException(
                 "Can't handle collection of type " + fc.getClass().getName());
         }
-        return 
-            collection.getPointFeatureIterator(16384);
+        return collection.getPointFeatureIterator(16384);
     }
 
 
@@ -1263,12 +1277,12 @@ public class DataOutputHandler extends OutputHandler {
 
         StringBuffer        js         = new StringBuffer();
         js.append("var marker;\n");
-        int      cnt            = 0;
-        int      total          = 0;
-        String   icon           = iconUrl("/icons/pointdata.gif");
+        int                  cnt            = 0;
+        int                  total          = 0;
+        String               icon           = iconUrl("/icons/pointdata.gif");
 
-        PointFeatureIterator dataIterator = getPointIterator(pod);
-        List     columnDataList = new ArrayList();
+        PointFeatureIterator dataIterator   = getPointIterator(pod);
+        List                 columnDataList = new ArrayList();
         while (dataIterator.hasNext()) {
             PointFeature po = (PointFeature) dataIterator.next();
             //                ucar.unidata.geoloc.EarthLocation el = po.getLocation();
@@ -1633,12 +1647,12 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputPointCsv(Request request, Entry entry)
             throws Exception {
 
-        String              path         = getPath(entry);
-        FeatureDatasetPoint pod          = pointPool.get(path);
-        StringBuffer        sb           = new StringBuffer();
-        List                vars         = pod.getDataVariables();
+        String               path         = getPath(entry);
+        FeatureDatasetPoint  pod          = pointPool.get(path);
+        StringBuffer         sb           = new StringBuffer();
+        List                 vars         = pod.getDataVariables();
         PointFeatureIterator dataIterator = getPointIterator(pod);
-        int                 cnt          = 0;
+        int                  cnt          = 0;
         while (dataIterator.hasNext()) {
             PointFeature po = (PointFeature) dataIterator.next();
             ucar.unidata.geoloc.EarthLocation el = po.getLocation();
@@ -1709,11 +1723,12 @@ public class DataOutputHandler extends OutputHandler {
      */
     public Result outputPointKml(Request request, Entry entry)
             throws Exception {
-        String              path         = getPath(entry);
-        FeatureDatasetPoint pod          = pointPool.get(path);
-        Element             root         = KmlUtil.kml(entry.getName());
-        Element             docNode = KmlUtil.document(root, entry.getName());
-        List                vars         = pod.getDataVariables();
+        String               path         = getPath(entry);
+        FeatureDatasetPoint  pod          = pointPool.get(path);
+        Element              root         = KmlUtil.kml(entry.getName());
+        Element              docNode = KmlUtil.document(root,
+                                           entry.getName());
+        List                 vars         = pod.getDataVariables();
         PointFeatureIterator dataIterator = getPointIterator(pod);
 
         while (dataIterator.hasNext()) {
@@ -1834,9 +1849,10 @@ public class DataOutputHandler extends OutputHandler {
 
         if (output.equals(OUTPUT_OPENDAP)) {
             //If its a head request then just return the content description
-            if(request.isHeadRequest()) {
-                Result result  = new Result("",new StringBuffer());
-                result.addHttpHeader(HtmlUtil.HTTP_CONTENT_DESCRIPTION,"dods-dds");
+            if (request.isHeadRequest()) {
+                Result result = new Result("", new StringBuffer());
+                result.addHttpHeader(HtmlUtil.HTTP_CONTENT_DESCRIPTION,
+                                     "dods-dds");
                 return result;
             }
             Result result = outputOpendap(request, entry);
@@ -1867,7 +1883,7 @@ public class DataOutputHandler extends OutputHandler {
                 location = IOUtil.stripExtension(location);
             }
         } else {
-            File file =  getEntryManager().getFileForEntry(entry);
+            File file = getEntryManager().getFileForEntry(entry);
             location = file.toString();
         }
         getStorageManager().checkPath(location);
@@ -1888,15 +1904,15 @@ public class DataOutputHandler extends OutputHandler {
                             getRepository().getStorageManager().getEntryDir(
                                 metadata.getEntryId(),
                                 false), metadata.getAttr1()));
-                String ncml = getStorageManager().readSystemResource(templateNcmlFile);
+                String ncml =
+                    getStorageManager().readSystemResource(templateNcmlFile);
                 ncml = ncml.replace("${location}", location);
                 //                System.err.println("ncml:" + ncml);
                 //Use the last modified time of the ncml file so we pick up any updated file
-                String dttm = templateNcmlFile.lastModified()+"";
-                String fileName = dttm+"_"+entry.getId() + "_"
-                    + metadata.getId() + ".ncml";
-                File ncmlFile =
-                    getStorageManager().getScratchFile(fileName);
+                String dttm = templateNcmlFile.lastModified() + "";
+                String fileName = dttm + "_" + entry.getId() + "_"
+                                  + metadata.getId() + ".ncml";
+                File ncmlFile = getStorageManager().getScratchFile(fileName);
                 IOUtil.writeBytes(ncmlFile, ncml.getBytes());
                 location = ncmlFile.toString();
                 break;
@@ -1973,7 +1989,7 @@ public class DataOutputHandler extends OutputHandler {
         /** _more_ */
         NetcdfFile ncFile;
 
-        /** _more_          */
+        /** _more_ */
         Entry entry;
 
         /**

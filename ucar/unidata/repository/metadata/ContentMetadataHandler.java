@@ -19,13 +19,12 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.repository.metadata;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.repository.data.*;
 
@@ -85,6 +84,7 @@ public class ContentMetadataHandler extends MetadataHandler {
     /** _more_ */
     public static final String TYPE_TIMEZONE = "content.timezone";
 
+    /** _more_ */
     public static final String TYPE_ALIAS = "content.alias";
 
 

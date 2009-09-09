@@ -20,10 +20,11 @@
  */
 
 package ucar.unidata.repository.output;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -81,10 +82,10 @@ public class MapOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_MAP = new OutputType("Map",
-                                                    "map.map",
-                                                    OutputType.TYPE_HTML|OutputType.TYPE_FORSEARCH, "",
-                                                    ICON_MAP);
+    public static final OutputType OUTPUT_MAP =
+        new OutputType("Map", "map.map",
+                       OutputType.TYPE_HTML | OutputType.TYPE_FORSEARCH, "",
+                       ICON_MAP);
 
 
     /**
@@ -113,8 +114,7 @@ public class MapOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
         boolean ok = false;
         for (Entry entry : state.getAllEntries()) {

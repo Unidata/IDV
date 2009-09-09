@@ -298,7 +298,7 @@ public class MonitorManager extends RepositoryManager {
             return new Result(
                 request.url(
                     getRepositoryBase().URL_USER_MONITORS, ARG_MESSAGE,
-                    getRepository().translate(request,"Monitor deleted")));
+                    getRepository().translate(request, "Monitor deleted")));
         }
 
         if (request.exists(ARG_MONITOR_CHANGE)) {
@@ -450,7 +450,8 @@ public class MonitorManager extends RepositoryManager {
      */
     public Result processMonitors(Request request) throws Exception {
 
-        if (request.getUser().getAnonymous()|| request.getUser().getIsGuest()) {
+        if (request.getUser().getAnonymous()
+                || request.getUser().getIsGuest()) {
             throw new IllegalArgumentException("Cannot access monitors");
         }
         StringBuffer sb = new StringBuffer();
@@ -489,13 +490,12 @@ public class MonitorManager extends RepositoryManager {
 
         String[] createTypesxxx = {
             "email", "Email Action", "twitter", "Twitter Action", "copy",
-            "Copy Action","ftp","FTP Action"
+            "Copy Action", "ftp", "FTP Action"
         };
 
 
-        String[] createTypes = {
-            "email", "Email Action", "twitter", "Twitter Action"
-        };
+        String[] createTypes = { "email", "Email Action", "twitter",
+                                 "Twitter Action" };
 
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TABLE));
         sb.append(HtmlUtil.open(HtmlUtil.TAG_TR));

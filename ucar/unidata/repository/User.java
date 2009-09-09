@@ -79,8 +79,10 @@ public class User {
     /** _more_ */
     private String template;
 
+    /** _more_ */
     private boolean isLocal = true;
 
+    /** _more_ */
     private boolean isGuest = false;
 
     /**
@@ -129,10 +131,11 @@ public class User {
      * @param admin _more_
      * @param language _more_
      * @param template _more_
+     * @param isGuest _more_
      */
     public User(String id, String name, String email, String question,
                 String answer, String password, boolean admin,
-                String language, String template,boolean isGuest) {
+                String language, String template, boolean isGuest) {
 
         this.id       = id;
         this.name     = name;
@@ -146,7 +149,7 @@ public class User {
         }
         this.language = language;
         this.template = template;
-        this.isGuest = isGuest;
+        this.isGuest  = isGuest;
     }
 
     /**
@@ -477,39 +480,39 @@ public class User {
     }
 
     /**
-       Set the IsLocal property.
-
-       @param value The new value for IsLocal
-    **/
-    public void setIsLocal (boolean value) {
-	this.isLocal = value;
+     *  Set the IsLocal property.
+     *
+     *  @param value The new value for IsLocal
+     */
+    public void setIsLocal(boolean value) {
+        this.isLocal = value;
     }
 
     /**
-       Get the IsLocal property.
-
-       @return The IsLocal
-    **/
-    public boolean getIsLocal () {
-	return this.isLocal;
+     *  Get the IsLocal property.
+     *
+     *  @return The IsLocal
+     */
+    public boolean getIsLocal() {
+        return this.isLocal;
     }
 
     /**
-       Set the IsGues property.
-
-       @param value The new value for IsGues
-    **/
-    public void setIsGuest (boolean value) {
-	isGuest = value;
+     *  Set the IsGues property.
+     *
+     *  @param value The new value for IsGues
+     */
+    public void setIsGuest(boolean value) {
+        isGuest = value;
     }
 
     /**
-       Get the IsGues property.
-
-       @return The IsGues
-    **/
-    public boolean getIsGuest () {
-	return isGuest;
+     *  Get the IsGues property.
+     *
+     *  @return The IsGues
+     */
+    public boolean getIsGuest() {
+        return isGuest;
     }
 
 

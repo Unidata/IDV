@@ -22,31 +22,49 @@
 
 
 
-import java.util.ArrayList;
-import java.util.List;
-
-import ucar.unidata.repository.UserAuthenticator;
 import ucar.unidata.repository.Repository;
 import ucar.unidata.repository.Request;
 import ucar.unidata.repository.User;
 
+import ucar.unidata.repository.UserAuthenticator;
+
+
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+/**
+ * Class TestUserAuthenticator _more_
+ *
+ *
+ * @author IDV Development Team
+ */
 public class TestUserAuthenticator implements UserAuthenticator {
 
 
-    public TestUserAuthenticator() {
-    }
+    /**
+     * _more_
+     */
+    public TestUserAuthenticator() {}
 
     /**
      * this gets called when we want to just get a User object from the ID.
      * return null if user is unknown
+     *
+     * @param repository _more_
+     * @param userId _more_
+     *
+     * @return _more_
      */
     public User findUser(Repository repository, String userId) {
         //Create the xxx user
-        if(userId.equals("xxx")) {
+        if (userId.equals("xxx")) {
             //The false says this is not an administrator
             User user = new User(userId, "Some name for user xxx", false);
             user.setEmail("xxx@foo.bar");
-            ArrayList<String>roles = new ArrayList<String>();
+            ArrayList<String> roles = new ArrayList<String>();
             roles.add("some role1");
             roles.add("some role2");
             user.setRoles(roles);
@@ -58,12 +76,18 @@ public class TestUserAuthenticator implements UserAuthenticator {
     /**
      * this gets called when we want to  autheticate the given user/password
      * return null if user/password is unknown or incorrect
+     *
+     * @param repository _more_
+     * @param userId _more_
+     * @param password _more_
+     *
+     * @return _more_
      */
-    public User authenticateUser(Repository repository, String userId, String password) {
+    public User authenticateUser(Repository repository, String userId,
+                                 String password) {
         System.err.println("test authenticator authenticateUser: " + userId);
         //This example will create a User for userid=xxx password=yyy
-        if(userId.equals("xxx") &&
-           password.equals("yyy")) {
+        if (userId.equals("xxx") && password.equals("yyy")) {
             return findUser(repository, userId);
         }
         return null;
@@ -72,9 +96,11 @@ public class TestUserAuthenticator implements UserAuthenticator {
 
     /**
      * This is used to list out the roles in the access pages
+     *
+     * @return _more_
      */
     public List<String> getAllRoles() {
-        ArrayList<String>roles = new ArrayList<String>();
+        ArrayList<String> roles = new ArrayList<String>();
         roles.add("some role1");
         roles.add("some role2");
         return roles;
@@ -84,6 +110,8 @@ public class TestUserAuthenticator implements UserAuthenticator {
      * this can be used to list out all of the users and display them
      * in RAMADDA
      * It is not used by RAMADDA right now
+     *
+     * @return _more_
      */
     public List<User> getAllUsers() {
         return new ArrayList<User>();
@@ -94,16 +122,23 @@ public class TestUserAuthenticator implements UserAuthenticator {
      * This will be used to allow this authenticator to add options
      * to the admin config form
      * Its not used right now
+     *
+     * @param repository _more_
+     * @param sb _more_
      */
-    public void addToConfigurationForm(Repository repository, StringBuffer sb){
-    }
+    public void addToConfigurationForm(Repository repository,
+                                       StringBuffer sb) {}
 
     /**
      * This will be used to allow this authenticator to set the options from the config form
      * to the admin config form
      * Its not used right now
+     *
+     * @param repository _more_
+     * @param request _more_
      */
-    public void applyConfigurationForm(Repository repository,Request request){
-    }
+    public void applyConfigurationForm(Repository repository,
+                                       Request request) {}
 
 }
+

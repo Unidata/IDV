@@ -20,10 +20,11 @@
  */
 
 package ucar.unidata.repository.output;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -86,15 +87,16 @@ public class CalendarOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_GRID = new OutputType("Date Grid",
-                                                     "calendar.grid",
-                                                     OutputType.TYPE_HTML|OutputType.TYPE_FORSEARCH,
-                                                     "", ICON_DATEGRID);
+    public static final OutputType OUTPUT_GRID =
+        new OutputType("Date Grid", "calendar.grid",
+                       OutputType.TYPE_HTML | OutputType.TYPE_FORSEARCH, "",
+                       ICON_DATEGRID);
 
     /** _more_ */
     public static final OutputType OUTPUT_CALENDAR =
-        new OutputType("Calendar", "calendar.calendar", OutputType.TYPE_HTML|OutputType.TYPE_FORSEARCH,
-                       "", ICON_CALENDAR);
+        new OutputType("Calendar", "calendar.calendar",
+                       OutputType.TYPE_HTML | OutputType.TYPE_FORSEARCH, "",
+                       ICON_CALENDAR);
 
 
     /**
@@ -126,8 +128,7 @@ public class CalendarOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
         if (state.entry != null) {
             return;
@@ -373,7 +374,8 @@ public class CalendarOutputHandler extends OutputHandler {
             throws Exception {
 
         if (entries.size() == 0) {
-            sb.append(getRepository().showDialogNote(msg("No entries found")));
+            sb.append(
+                getRepository().showDialogNote(msg("No entries found")));
         }
         boolean hadDateArgs = request.defined(ARG_YEAR)
                               || request.defined(ARG_MONTH)

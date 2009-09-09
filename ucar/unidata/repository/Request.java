@@ -21,6 +21,8 @@
  */
 
 package ucar.unidata.repository;
+
+
 import ucar.unidata.repository.output.*;
 
 import ucar.unidata.sql.SqlUtil;
@@ -83,9 +85,11 @@ import javax.servlet.http.*;
 public class Request implements Constants {
 
 
+    /** _more_ */
     private static int COUNTER = 0;
 
-    public int  count = COUNTER++;
+    /** _more_ */
+    public int count = COUNTER++;
 
 
     /** _more_ */
@@ -230,14 +234,27 @@ public class Request implements Constants {
         return entryUrl(theUrl, entry, ARG_ENTRYID);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean useFullUrl() {
-        return get(ARG_FULLURL,false);
+        return get(ARG_FULLURL, false);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param url _more_
+     *
+     * @return _more_
+     */
     public String checkUrl(String url) {
-        if(useFullUrl() && !url.startsWith("http"))  
+        if (useFullUrl() && !url.startsWith("http")) {
             return repository.absoluteUrl(url);
+        }
         return url;
     }
 
@@ -282,12 +299,14 @@ public class Request implements Constants {
      * @return _more_
      */
     public String entryUrl(RequestUrl theUrl, Entry entry, String arg) {
-        if(entry.getIsRemoteEntry()) {
-            String id = repository.getEntryManager().getRemoteEntryInfo(entry.getId())[1]; 
-            if(id.length()==0)  {
-                return entry.getRemoteServer()+theUrl.getPath();
+        if (entry.getIsRemoteEntry()) {
+            String id = repository.getEntryManager().getRemoteEntryInfo(
+                            entry.getId())[1];
+            if (id.length() == 0) {
+                return entry.getRemoteServer() + theUrl.getPath();
             }
-            return HtmlUtil.url(entry.getRemoteServer()+theUrl.getPath(), arg, id);
+            return HtmlUtil.url(entry.getRemoteServer() + theUrl.getPath(),
+                                arg, id);
         }
 
 
@@ -365,8 +384,8 @@ public class Request implements Constants {
      */
     public String entryUrl(RequestUrl theUrl, Entry entry, String arg1,
                            Object value1, String arg2, Object value2) {
-        return checkUrl(HtmlUtil.url(entryUrl(theUrl, entry), arg1, value1, arg2,
-                                   value2));
+        return checkUrl(HtmlUtil.url(entryUrl(theUrl, entry), arg1, value1,
+                                     arg2, value2));
     }
 
 
@@ -489,7 +508,8 @@ public class Request implements Constants {
      */
     public String url(RequestUrl theUrl, String arg1, Object value1,
                       String arg2, Object value2) {
-        return checkUrl(HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2));
+        return checkUrl(HtmlUtil.url(url(theUrl), arg1, value1, arg2,
+                                     value2));
     }
 
     /**
@@ -508,8 +528,8 @@ public class Request implements Constants {
     public String url(RequestUrl theUrl, String arg1, Object value1,
                       String arg2, Object value2, String arg3,
                       Object value3) {
-        return checkUrl(HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2, arg3,
-                                   value3));
+        return checkUrl(HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2,
+                                     arg3, value3));
     }
 
     /**
@@ -530,8 +550,8 @@ public class Request implements Constants {
     public String url(RequestUrl theUrl, String arg1, Object value1,
                       String arg2, Object value2, String arg3, Object value3,
                       String arg4, Object value4) {
-        return checkUrl(HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2, arg3,
-                                   value3, arg4, value4));
+        return checkUrl(HtmlUtil.url(url(theUrl), arg1, value1, arg2, value2,
+                                     arg3, value3, arg4, value4));
     }
 
 
@@ -593,8 +613,17 @@ public class Request implements Constants {
     }
 
 
-    public String getUrl(Hashtable exceptArgs,Hashtable exceptValues) {
-        return checkUrl(getRequestPath() + "?" + getUrlArgs(exceptArgs, exceptValues));
+    /**
+     * _more_
+     *
+     * @param exceptArgs _more_
+     * @param exceptValues _more_
+     *
+     * @return _more_
+     */
+    public String getUrl(Hashtable exceptArgs, Hashtable exceptValues) {
+        return checkUrl(getRequestPath() + "?"
+                        + getUrlArgs(exceptArgs, exceptValues));
     }
 
     /**
@@ -655,16 +684,25 @@ public class Request implements Constants {
     /**
      * _more_
      *
-     * @param except _more_
+     *
+     * @param exceptArgs _more_
      *
      * @return _more_
      */
     public String getUrlArgs(Hashtable exceptArgs) {
-        return getUrlArgs(exceptArgs,null);
+        return getUrlArgs(exceptArgs, null);
     }
 
 
-    public String getUrlArgs(Hashtable exceptArgs,Hashtable exceptValues) {
+    /**
+     * _more_
+     *
+     * @param exceptArgs _more_
+     * @param exceptValues _more_
+     *
+     * @return _more_
+     */
+    public String getUrlArgs(Hashtable exceptArgs, Hashtable exceptValues) {
         StringBuffer sb  = new StringBuffer();
         int          cnt = 0;
         for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
@@ -1051,9 +1089,14 @@ public class Request implements Constants {
 
 
 
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     */
     public void appendMessage(StringBuffer sb) {
         if (defined(ARG_MESSAGE)) {
-            String message =  getUnsafeString(ARG_MESSAGE, "");
+            String message = getUnsafeString(ARG_MESSAGE, "");
             //            message = HtmlUtil.entityEncode(getUnsafeString(ARG_MESSAGE, "");
             message = RepositoryBase.getDialogString(message);
             sb.append(repository.showDialogNote(message));
@@ -1079,10 +1122,10 @@ public class Request implements Constants {
 
         //If the user is anonymous then replace all "script" strings with "_script_"
         //encode < and >
-        if(isAnonymous()) {
-            v = v.replaceAll("([sS][cC][rR][iI][pP][tT])","_$1_");
-            v = v.replaceAll("<","&lt;");
-            v = v.replaceAll(">","&gt;");
+        if (isAnonymous()) {
+            v = v.replaceAll("([sS][cC][rR][iI][pP][tT])", "_$1_");
+            v = v.replaceAll("<", "&lt;");
+            v = v.replaceAll(">", "&gt;");
         }
 
 
@@ -1169,10 +1212,13 @@ public class Request implements Constants {
             }
             return (String) l.get(0);
         }
-        String s =  result.toString();
-        if(s.startsWith("${")) {
-            String extra = (String)repository.getSessionManager().getSessionExtra(s);
-            if(extra!=null) s=extra;
+        String s = result.toString();
+        if (s.startsWith("${")) {
+            String extra =
+                (String) repository.getSessionManager().getSessionExtra(s);
+            if (extra != null) {
+                s = extra;
+            }
         }
         return s;
     }
@@ -1359,26 +1405,38 @@ public class Request implements Constants {
                 return new Date[] { null, null };
             }
             toDate = "now";
-        } else if(dflt == null) {
-             return new Date[]{null,null};
+        } else if (dflt == null) {
+            return new Date[] { null, null };
         }
 
         //        System.err.println("from:" + fromDate);
         //        System.err.println("to:" + toDate);
 
 
-        if(dflt == null) dflt  = new Date();
+        if (dflt == null) {
+            dflt = new Date();
+        }
         Date[] range = DateUtil.getDateRange(fromDate, toDate, dflt);
         //        System.err.println("dateRange:" + fromDate + " date:" + range[0]);
         return range;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
     public boolean setContains(String key, Object value) {
         List list = get(key, (List) null);
-        if(list == null) {
+        if (list == null) {
             Object singleValue = getValue(key, (Object) null);
-            if(singleValue ==null) return false;
+            if (singleValue == null) {
+                return false;
+            }
             return singleValue.equals(value);
         }
         return list.contains(value);
@@ -1554,8 +1612,15 @@ public class Request implements Constants {
         return user;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isAnonymous() {
-        if(user == null || user.getAnonymous()) return true;
+        if ((user == null) || user.getAnonymous()) {
+            return true;
+        }
         return false;
     }
 
@@ -1577,23 +1642,42 @@ public class Request implements Constants {
         return ip;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getUserAgent() {
         return getHeaderArg("User-Agent");
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isSpider() {
         String userAgent = getUserAgent();
-        if(userAgent==null) return false;
+        if (userAgent == null) {
+            return false;
+        }
         userAgent = userAgent.toLowerCase();
-        return  (userAgent.indexOf("googlebot") >= 0 ||
-                 userAgent.indexOf("slurp")>=0 ||
-                 userAgent.indexOf("msnbot")>=0);
+        return ((userAgent.indexOf("googlebot") >= 0)
+                || (userAgent.indexOf("slurp") >= 0)
+                || (userAgent.indexOf("msnbot") >= 0));
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isHeadRequest() {
-        if(httpServletRequest!=null) return httpServletRequest.getMethod().equals("HEAD");
+        if (httpServletRequest != null) {
+            return httpServletRequest.getMethod().equals("HEAD");
+        }
         return false;
     }
 

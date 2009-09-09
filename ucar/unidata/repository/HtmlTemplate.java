@@ -154,7 +154,8 @@ public class HtmlTemplate {
                 id = IOUtil.stripExtension(IOUtil.getFileTail(path));
             }
         } catch (Exception exc) {
-            repository.getLogManager().logError("Error processing template: " + path, exc);
+            repository.getLogManager().logError("Error processing template: "
+                    + path, exc);
             this.template = t;
         }
 

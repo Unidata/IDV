@@ -316,7 +316,7 @@ public class LdmListener {
      */
     private void writeToBuffer(File f) throws Exception {
         if (bufferOS == null) {
-            bufferOS = new  FileOutputStream(bufferFile, true);
+            bufferOS = new FileOutputStream(bufferFile, true);
         }
         String s = type + ":" + f + "\n";
         bufferOS.write(s.getBytes());

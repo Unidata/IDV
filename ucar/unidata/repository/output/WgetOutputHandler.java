@@ -20,10 +20,11 @@
  */
 
 package ucar.unidata.repository.output;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -79,9 +80,9 @@ public class WgetOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_WGET = new OutputType("Wget Script",
-                                                    "wget.wget",
-                                                                OutputType.TYPE_FILE, "", ICON_ZIP);
+    public static final OutputType OUTPUT_WGET =
+        new OutputType("Wget Script", "wget.wget", OutputType.TYPE_FILE, "",
+                       ICON_ZIP);
 
 
     /**
@@ -100,6 +101,13 @@ public class WgetOutputHandler extends OutputHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     public AuthorizationMethod getAuthorizationMethod(Request request) {
         return AuthorizationMethod.AUTH_HTTP;
     }
@@ -113,11 +121,11 @@ public class WgetOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
         if (state.entry != null) {
-            if (state.entry.getResource().isUrl() || getAccessManager().canDownload(request, state.entry)) {
+            if (state.entry.getResource().isUrl()
+                    || getAccessManager().canDownload(request, state.entry)) {
                 links.add(
                     makeLink(
                         request, state.entry, OUTPUT_WGET,
@@ -127,7 +135,8 @@ public class WgetOutputHandler extends OutputHandler {
         } else {
             boolean ok = false;
             for (Entry child : state.getAllEntries()) {
-                if (child.getResource().isUrl() || getAccessManager().canDownload(request, child)) {
+                if (child.getResource().isUrl()
+                        || getAccessManager().canDownload(request, child)) {
                     ok = true;
                     break;
                 }
@@ -161,7 +170,8 @@ public class WgetOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputEntry(Request request, Entry entry) throws Exception {
-        return outputGroup(request,null,null,(List<Entry>)Misc.newList(entry));
+        return outputGroup(request, null, null,
+                           (List<Entry>) Misc.newList(entry));
     }
 
 
@@ -182,21 +192,22 @@ public class WgetOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb = new StringBuffer();
         for (Entry entry : entries) {
-            if(entry.getResource().isUrl()) {
-                sb.append ("wget \"" + entry.getResource().getPath()+"\"");
-                sb.append ("\n");
+            if (entry.getResource().isUrl()) {
+                sb.append("wget \"" + entry.getResource().getPath() + "\"");
+                sb.append("\n");
                 continue;
             } else if ( !getAccessManager().canDownload(request, entry)) {
                 continue;
             }
             String tail = getStorageManager().getFileTail(entry);
-            String path =  getRepository().absoluteUrl(getEntryManager().getEntryResourceUrl(request, entry));
-            sb.append ("wget -O \"" + tail +"\" \"" + path+"\"");
-            sb.append ("\n");
+            String path = getRepository().absoluteUrl(
+                              getEntryManager().getEntryResourceUrl(
+                                  request, entry));
+            sb.append("wget -O \"" + tail + "\" \"" + path + "\"");
+            sb.append("\n");
         }
 
-        return new Result("", sb,
-                          getMimeType(OUTPUT_WGET));
+        return new Result("", sb, getMimeType(OUTPUT_WGET));
 
     }
 

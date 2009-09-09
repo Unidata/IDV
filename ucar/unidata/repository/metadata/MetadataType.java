@@ -19,13 +19,12 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.repository.metadata;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.repository.data.ThreddsMetadataHandler;
 
@@ -80,6 +79,7 @@ public class MetadataType extends MetadataTypeBase {
     /** _more_ */
     public static final String ATTR_HANDLER = "handler";
 
+    /** _more_ */
     public static final String ATTR_ID = "id";
 
 
@@ -137,10 +137,11 @@ public class MetadataType extends MetadataTypeBase {
     /**
      * _more_
      *
-     * @param type _more_
-     * @param name _more_
+     *
+     * @param id _more_
+     * @param handler _more_
      */
-    public MetadataType(String id,MetadataHandler handler) {
+    public MetadataType(String id, MetadataHandler handler) {
         super(handler);
         this.id = id;
     }
@@ -160,7 +161,6 @@ public class MetadataType extends MetadataTypeBase {
      * _more_
      *
      * @param root _more_
-     * @param repository _more_
      * @param manager _more_
      *
      * @return _more_
@@ -195,17 +195,19 @@ public class MetadataType extends MetadataTypeBase {
                 parse(node, manager, types);
                 continue;
             }
-            if (!node.getTagName().equals(TAG_TYPE)) {
-                manager.logError("Unknown metadata xml tag:" + node.getTagName(),null);
+            if ( !node.getTagName().equals(TAG_TYPE)) {
+                manager.logError("Unknown metadata xml tag:"
+                                 + node.getTagName(), null);
             }
 
-            Class c = Misc.findClass(XmlUtil.getAttributeFromTree(node,
-                          ATTR_CLASS,
-                          "ucar.unidata.repository.metadata.MetadataHandler"));
+            Class c =
+                Misc.findClass(XmlUtil.getAttributeFromTree(node, ATTR_CLASS,
+                    "ucar.unidata.repository.metadata.MetadataHandler"));
 
-            MetadataHandler handler = manager.getHandler(c);
-            String          id    = XmlUtil.getAttribute(node, ATTR_ID);
-            MetadataType metadataType = new MetadataType(id,handler);
+            MetadataHandler handler      = manager.getHandler(c);
+            String          id           = XmlUtil.getAttribute(node,
+                                               ATTR_ID);
+            MetadataType    metadataType = new MetadataType(id, handler);
             metadataType.init(node);
             handler.addMetadataType(metadataType);
             types.add(metadataType);
@@ -213,20 +215,25 @@ public class MetadataType extends MetadataTypeBase {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     *
+     * @throws Exception _more_
+     */
     public void init(Element node) throws Exception {
         super.init(node);
-        setAdminOnly(XmlUtil.getAttributeFromTree(node,
-                                                  ATTR_ADMINONLY, false));
-        setForUser(XmlUtil.getAttributeFromTree(node,
-                                                ATTR_FORUSER, true));
+        setAdminOnly(XmlUtil.getAttributeFromTree(node, ATTR_ADMINONLY,
+                false));
+        setForUser(XmlUtil.getAttributeFromTree(node, ATTR_FORUSER, true));
 
-        setBrowsable(XmlUtil.getAttributeFromTree(node,
-                                                  ATTR_BROWSABLE, false));
-        setDisplayCategory(
-                           XmlUtil.getAttributeFromTree(
-                                                        node, ATTR_DISPLAYCATEGORY, "Metadata"));
-        setCategory(XmlUtil.getAttributeFromTree(node,
-                                                 ATTR_CATEGORY, handler.getHandlerGroupName()));
+        setBrowsable(XmlUtil.getAttributeFromTree(node, ATTR_BROWSABLE,
+                false));
+        setDisplayCategory(XmlUtil.getAttributeFromTree(node,
+                ATTR_DISPLAYCATEGORY, "Metadata"));
+        setCategory(XmlUtil.getAttributeFromTree(node, ATTR_CATEGORY,
+                handler.getHandlerGroupName()));
     }
 
 
@@ -249,10 +256,8 @@ public class MetadataType extends MetadataTypeBase {
                     continue;
                 }
                 if ( !entry.getIsLocalFile()) {
-                    fileArg =
-                        getStorageManager()
-                            .copyToEntryDir(entry, new File(fileArg))
-                            .getName();
+                    fileArg = getStorageManager().copyToEntryDir(entry,
+                            new File(fileArg)).getName();
                 }
                 metadata.setAttr(element.getIndex(), fileArg);
             }
@@ -296,8 +301,8 @@ public class MetadataType extends MetadataTypeBase {
                     return false;
                 }
                 File file = new File(tmpFile);
-                fileName =
-                    getStorageManager().copyToEntryDir(entry, file).getName();
+                fileName = getStorageManager().copyToEntryDir(entry,
+                        file).getName();
             }
 
             metadata.setAttr(element.getIndex(), fileName);
@@ -314,9 +319,7 @@ public class MetadataType extends MetadataTypeBase {
      *  @param request _more_
      *  @param entry _more_
      *  @param id _more_
-     * @param metadata _more_
      *  @param suffix _more_
-     *  @param metadataList _more_
      * @param oldMetadata _more_
      *  @param newMetadata _more_
      *
@@ -333,35 +336,47 @@ public class MetadataType extends MetadataTypeBase {
         Metadata metadata = new Metadata(id, entry.getId(), getId(),
                                          inherited);
         for (MetadataElement element : getChildren()) {
-            String value =  element.handleForm(request,  entry, metadata, oldMetadata,
-                                               suffix);
+            String value = element.handleForm(request, entry, metadata,
+                               oldMetadata, suffix);
             metadata.setAttr(element.getIndex(), value);
         }
         return metadata;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param templateType _more_
+     * @param entry _more_
+     * @param metadata _more_
+     * @param parent _more_
+     *
+     * @throws Exception _more_
+     */
     public void addMetadataToXml(Request request, String templateType,
-                                 Entry entry,
-                                 Metadata metadata, 
+                                 Entry entry, Metadata metadata,
                                  Element parent)
             throws Exception {
 
 
-        String xml = applyTemplate(templateType,
-                                   entry,
-                                   metadata,
-                                   parent);
-        if(xml==null || xml.length()==0) return;
-        xml =  "<tmp>" + xml + "</tmp>";
-        Element root=null;
-        try {
-            root =
-                XmlUtil.getRoot(new ByteArrayInputStream(xml.getBytes()));
-        } catch(Exception exc) {
-            throw new IllegalStateException("XML Error:" + exc+"\nCould not create xml:" + xml);
+        String xml = applyTemplate(templateType, entry, metadata, parent);
+        if ((xml == null) || (xml.length() == 0)) {
+            return;
         }
-        if(root==null) throw new IllegalStateException("Could not create xml:" + xml);
+        xml = "<tmp>" + xml + "</tmp>";
+        Element root = null;
+        try {
+            root = XmlUtil.getRoot(new ByteArrayInputStream(xml.getBytes()));
+        } catch (Exception exc) {
+            throw new IllegalStateException("XML Error:" + exc
+                                            + "\nCould not create xml:"
+                                            + xml);
+        }
+        if (root == null) {
+            throw new IllegalStateException("Could not create xml:" + xml);
+        }
         NodeList children = XmlUtil.getElements(root);
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
@@ -458,9 +473,11 @@ public class MetadataType extends MetadataTypeBase {
             f = thumb;
         }
 
-        Result result = new Result("thumbnail",
-                                   IOUtil.readBytes(getStorageManager().getFileInputStream(f),
-                                       null, true), mimeType);
+        Result result = new Result(
+                            "thumbnail",
+                            IOUtil.readBytes(
+                                getStorageManager().getFileInputStream(f),
+                                null, true), mimeType);
         result.setShouldDecorate(false);
         return result;
     }
@@ -492,8 +509,7 @@ public class MetadataType extends MetadataTypeBase {
             if ( !element.getSearchable()) {
                 continue;
             }
-            args.add(ARG_METADATA_ATTR + element.getIndex() + "."
-                     + getId());
+            args.add(ARG_METADATA_ATTR + element.getIndex() + "." + getId());
             args.add(metadata.getAttr(element.getIndex()));
         }
 
@@ -513,15 +529,16 @@ public class MetadataType extends MetadataTypeBase {
     /**
      * _more_
      *
-     * @param handler _more_
      * @param request _more_
      * @param entry _more_
      * @param metadata _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public String[] getHtml(Request request,
-                            Entry entry, Metadata metadata) throws Exception {
+    public String[] getHtml(Request request, Entry entry, Metadata metadata)
+            throws Exception {
         if ( !getShowInHtml()) {
             return null;
         }
@@ -538,7 +555,8 @@ public class MetadataType extends MetadataTypeBase {
             if (value == null) {
                 value = "";
             }
-            nameString = nameString.replace("${attr" + element.getIndex() + "}", value);
+            nameString = nameString.replace("${attr" + element.getIndex()
+                                            + "}", value);
         }
 
 
@@ -559,8 +577,7 @@ public class MetadataType extends MetadataTypeBase {
             boolean didOne = false;
             content.append("<table cellpadding=2 cellspacing=2>");
             for (MetadataElement element : getChildren()) {
-                if (element.getHtml(content,
-                                    metadata.getAttr(cnt))) {
+                if (element.getHtml(content, metadata.getAttr(cnt))) {
                     didOne = true;
                 }
                 cnt++;
@@ -581,6 +598,7 @@ public class MetadataType extends MetadataTypeBase {
      * @param request _more_
      * @param entry _more_
      * @param metadata _more_
+     * @param suffix _more_
      * @param forEdit _more_
      *
      * @return _more_
@@ -588,30 +606,35 @@ public class MetadataType extends MetadataTypeBase {
      * @throws Exception _more_
      */
     public String[] getForm(MetadataHandler handler, Request request,
-                            Entry entry, Metadata metadata, String suffix,boolean forEdit)
+                            Entry entry, Metadata metadata, String suffix,
+                            boolean forEdit)
             throws Exception {
 
-        String lbl    = msgLabel(getName());
-        String submit = HtmlUtil.submit(msg("Add")
-                                        + HtmlUtil.space(1) + getName());
-        String cancel = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
+        String lbl = msgLabel(getName());
+        String submit = HtmlUtil.submit(msg("Add") + HtmlUtil.space(1)
+                                        + getName());
+        String       cancel = HtmlUtil.submit(msg("Cancel"), ARG_CANCEL);
 
 
-        StringBuffer sb  = new StringBuffer();
+        StringBuffer sb     = new StringBuffer();
 
-        if(!forEdit) 
-            sb.append(header("Add: "+ getName()));
+        if ( !forEdit) {
+            sb.append(header("Add: " + getName()));
+        }
         sb.append(HtmlUtil.br());
         String lastGroup = null;
         for (MetadataElement element : getChildren()) {
-            if(element.getGroup()!=null && !Misc.equals(element.getGroup(),lastGroup)) {
+            if ((element.getGroup() != null)
+                    && !Misc.equals(element.getGroup(), lastGroup)) {
                 lastGroup = element.getGroup();
-                sb.append(HtmlUtil.row(HtmlUtil.colspan(header(lastGroup),2)));
+                sb.append(HtmlUtil.row(HtmlUtil.colspan(header(lastGroup),
+                        2)));
             }
             String elementLbl = msgLabel(element.getLabel());
-            String widget = element.getForm(request, entry,  metadata,
-                                            suffix, 
-                                            metadata.getAttr(element.getIndex()), forEdit);
+            String widget =
+                element.getForm(request, entry, metadata, suffix,
+                                metadata.getAttr(element.getIndex()),
+                                forEdit);
             if ((widget == null) || (widget.length() == 0)) {}
             else {
                 sb.append(HtmlUtil.formEntryTop(elementLbl, widget));
@@ -647,7 +670,7 @@ public class MetadataType extends MetadataTypeBase {
     /**
      * _more_
      *
-     * @param type _more_
+     * @param id _more_
      *
      * @return _more_
      */

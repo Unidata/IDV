@@ -37,14 +37,14 @@ import ucar.unidata.util.LogUtil;
 
 import ucar.unidata.util.Misc;
 
-import java.text.SimpleDateFormat;
-
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.WrapperException;
 
 import java.io.*;
 
 import java.net.*;
+
+import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -72,8 +72,10 @@ import javax.servlet.http.*;
 public class RepositoryServlet extends HttpServlet {
 
     //                                   "Tue, 20 Jan 2009 01:45:54 GMT");
-    private SimpleDateFormat sdf = RepositoryUtil.makeDateFormat(
-                                                                 "E, d M yyyy HH:m Z");
+
+    /** _more_ */
+    private SimpleDateFormat sdf =
+        RepositoryUtil.makeDateFormat("E, d M yyyy HH:m Z");
 
 
 
@@ -91,8 +93,7 @@ public class RepositoryServlet extends HttpServlet {
     /**
      * _more_
      */
-    public RepositoryServlet() {
-    }
+    public RepositoryServlet() {}
 
     /**
      * _more_
@@ -141,7 +142,9 @@ public class RepositoryServlet extends HttpServlet {
     private synchronized void createRepository(int port,
             Properties webAppProperties)
             throws Exception {
-        if(repository!=null) return;
+        if (repository != null) {
+            return;
+        }
         Repository tmp = new Repository(getInitParams(), port, true);
         tmp.init(webAppProperties);
         repository = tmp;
@@ -267,7 +270,7 @@ public class RepositoryServlet extends HttpServlet {
             }
 
             Date lastModified = repositoryResult.getLastModified();
-            if(lastModified!=null) {
+            if (lastModified != null) {
                 response.addDateHeader("Last-Modified",
                                        lastModified.getTime());
             }
@@ -275,7 +278,7 @@ public class RepositoryServlet extends HttpServlet {
                 response.setHeader("Cache-Control", "public,max-age=259200");
                 response.setHeader("Expires",
                                    "Tue, 08 Jan 2019 07:41:19 GMT");
-                if(lastModified==null) {
+                if (lastModified == null) {
                     response.setHeader("Last-Modified",
                                        "Tue, 20 Jan 2009 01:45:54 GMT");
                 }
@@ -451,14 +454,14 @@ public class RepositoryServlet extends HttpServlet {
             }
 
             //Look for full path names and get the tail
-            int idx =  fileName.lastIndexOf("\\");
-            if(idx>=0) {
-                fileName = fileName.substring(idx+1);
+            int idx = fileName.lastIndexOf("\\");
+            if (idx >= 0) {
+                fileName = fileName.substring(idx + 1);
             }
 
-            idx =  fileName.lastIndexOf("/");
-            if(idx>=0) {
-                fileName = fileName.substring(idx+1);
+            idx = fileName.lastIndexOf("/");
+            if (idx >= 0) {
+                fileName = fileName.substring(idx + 1);
             }
 
 
@@ -471,11 +474,14 @@ public class RepositoryServlet extends HttpServlet {
                 new File(
                     IOUtil.joinDir(
                         repository.getStorageManager().getUploadDir(),
-                        repository.getGUID() + StorageManager.FILE_SEPARATOR + fileName));
+                        repository.getGUID() + StorageManager.FILE_SEPARATOR
+                        + fileName));
 
             try {
                 InputStream inputStream = item.getInputStream();
-                OutputStream outputStream = repository.getStorageManager().getFileOutputStream(uploadedFile);
+                OutputStream outputStream =
+                    repository.getStorageManager().getFileOutputStream(
+                        uploadedFile);
                 IOUtil.writeTo(inputStream, outputStream);
                 outputStream.close();
                 //                item.write(uploadedFile);
@@ -528,8 +534,8 @@ public class RepositoryServlet extends HttpServlet {
             }
             //            logger.logException(logger.getStackTrace(exc), address);
             if (repository != null) {
-                repository.getLogManager().logError("Error in RepositoryServlet address="
-                                    + address, exc);
+                repository.getLogManager().logError(
+                    "Error in RepositoryServlet address=" + address, exc);
                 return;
             }
             System.err.println("Exception: " + exc);

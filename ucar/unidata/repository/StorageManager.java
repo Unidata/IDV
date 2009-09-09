@@ -20,8 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.repository;
 
 
@@ -308,7 +306,6 @@ public class StorageManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param prefix _more_
      *
      * @param dir _more_
      */
@@ -999,13 +996,13 @@ public class StorageManager extends RepositoryManager {
         if (idx >= 0) {
             fileName = fileName.substring(idx + "_file_".length());
         } else {
-            /* 
+            /*
                We had this here for files from old versions of RAMADDA where we did not add the _file_ delimiter
             */
             int idx1 = fileName.indexOf("-");
-            if(idx1>=0) {
-                int idx2 = fileName.indexOf("-",idx1);
-                if(idx2>=0) {
+            if (idx1 >= 0) {
+                int idx2 = fileName.indexOf("-", idx1);
+                if (idx2 >= 0) {
                     idx = fileName.indexOf("_");
                     if (idx >= 0) {
                         fileName = fileName.substring(idx + 1);
@@ -1095,7 +1092,6 @@ public class StorageManager extends RepositoryManager {
     /**
      * _more_
      *
-     * @param filePath _more_
      *
      * @param file _more_
      *
@@ -1249,19 +1245,22 @@ public class StorageManager extends RepositoryManager {
      *
      * @param from _more_
      * @param to _more_
+     *
+     * @throws Exception _more_
      */
     public void moveFile(File from, File to) throws Exception {
         checkFile(from);
         checkWriteFile(to);
         try {
             IOUtil.moveFile(from, to);
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             //Handle the windows file move problem
             if (to.isDirectory()) {
-                to = new File(IOUtil.joinDir(to, IOUtil.getFileTail(from.toString())));
+                to = new File(
+                    IOUtil.joinDir(to, IOUtil.getFileTail(from.toString())));
             }
             IOUtil.copyFile(from, to);
-            if(!from.delete()) {
+            if ( !from.delete()) {
                 from.deleteOnExit();
             }
         }

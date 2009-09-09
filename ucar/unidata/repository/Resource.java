@@ -59,8 +59,9 @@ public class Resource {
     public static final String TYPE_URL = "url";
 
     /** _more_ */
-    public static final String TYPE_REMOTE_FILE= "remotefile";
+    public static final String TYPE_REMOTE_FILE = "remotefile";
 
+    /** _more_ */
     public static final String TYPE_UNKNOWN = "unknown";
 
     /** _more_ */
@@ -72,7 +73,8 @@ public class Resource {
     /** _more_ */
     private File file;
 
-    private long fileSize=-1;
+    /** _more_ */
+    private long fileSize = -1;
 
     /**
      * _more_
@@ -157,8 +159,15 @@ public class Resource {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public long getFileSize() {
-        if(fileSize>=0) return fileSize;
+        if (fileSize >= 0) {
+            return fileSize;
+        }
         return getTheFile().length();
     }
 
@@ -173,7 +182,8 @@ public class Resource {
         }
 
         if (type.equals(TYPE_FILE) || type.equals(TYPE_STOREDFILE)
-                || type.equals(TYPE_LOCAL_FILE) || type.equals(TYPE_REMOTE_FILE)) {
+                || type.equals(TYPE_LOCAL_FILE)
+                || type.equals(TYPE_REMOTE_FILE)) {
             return getTheFile().exists();
         }
         return false;
@@ -211,6 +221,11 @@ public class Resource {
         return type.equals(TYPE_URL);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isRemoteFile() {
         return type.equals(TYPE_REMOTE_FILE);
     }
@@ -265,14 +280,14 @@ public class Resource {
 
 
 
-/**
-Set the FileSize property.
-
-@param value The new value for FileSize
-**/
-public void setFileSize (long value) {
-	this.fileSize = value;
-}
+    /**
+     * Set the FileSize property.
+     *
+     * @param value The new value for FileSize
+     */
+    public void setFileSize(long value) {
+        this.fileSize = value;
+    }
 
 
 

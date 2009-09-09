@@ -198,7 +198,7 @@ public class AccessManager extends RepositoryManager {
                 throw new IllegalArgumentException("Could not find group:"
                         + request.getString(ARG_GROUP, ""));
             }
-            boolean canDo= canDoAction(request, group, action);
+            boolean canDo = canDoAction(request, group, action);
             //            System.err.println ("action:" + action +" found group:" + group + " canDo:" + canDo);
             return canDo;
         }
@@ -252,7 +252,20 @@ public class AccessManager extends RepositoryManager {
     }
 
 
-    public boolean canDoAction(Request request, Entry entry, String action, boolean log)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param action _more_
+     * @param log _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public boolean canDoAction(Request request, Entry entry, String action,
+                               boolean log)
             throws Exception {
         if (entry == null) {
             return false;
@@ -267,13 +280,21 @@ public class AccessManager extends RepositoryManager {
             }
         }
 
-        if(log) logInfo("Upload:canDoAction:"+ action);
-        
-        if(!action.equals(Permission.ACTION_VIEW)) {
-            boolean okToView = canDoAction(request, entry, Permission.ACTION_VIEW);
-            if(log) logInfo("Upload:action isn't view. view permission="+ okToView);
+        if (log) {
+            logInfo("Upload:canDoAction:" + action);
+        }
+
+        if ( !action.equals(Permission.ACTION_VIEW)) {
+            boolean okToView = canDoAction(request, entry,
+                                           Permission.ACTION_VIEW);
+            if (log) {
+                logInfo("Upload:action isn't view. view permission="
+                        + okToView);
+            }
             //            System.err.println("action isn't view viwe ok:"+ okToView);
-            if(!okToView) return false;
+            if ( !okToView) {
+                return false;
+            }
         }
 
 
@@ -294,20 +315,24 @@ public class AccessManager extends RepositoryManager {
 
         //The admin can do anything
         if (user.getAdmin()) {
-            if(log) logInfo("Upload:user is admin");
+            if (log) {
+                logInfo("Upload:user is admin");
+            }
             //            System.err.println("user is admin");
             return true;
         }
 
         //If user is owner then they can do anything
         if ( !user.getAnonymous() && Misc.equals(user, entry.getUser())) {
-            if(log) logInfo("Upload:user is owner");
+            if (log) {
+                logInfo("Upload:user is owner");
+            }
             //            System.err.println("user is owner of entry");
             return true;
         }
 
-        String key = "a:" + action + "_u:" + user.getId() + "_ip:" + requestIp +
-            "_e:"+ entry.getId();
+        String key = "a:" + action + "_u:" + user.getId() + "_ip:"
+                     + requestIp + "_e:" + entry.getId();
         Object[] pastResult = (Object[]) recentPermissions.get(key);
         Date     now        = new Date();
         if (pastResult != null) {
@@ -315,8 +340,10 @@ public class AccessManager extends RepositoryManager {
             Boolean ok   = (Boolean) pastResult[1];
             //If we have checked this in the last 60 seconds then return the result
             //TODO - Do we really need the time threshold
-            if (true || now.getTime() - then.getTime() < 60000) {
-                if(log) logInfo("Upload:getting result from cache");
+            if (true || (now.getTime() - then.getTime() < 60000)) {
+                if (log) {
+                    logInfo("Upload:getting result from cache");
+                }
                 return ok.booleanValue();
             } else {
                 recentPermissions.remove(key);
@@ -352,25 +379,25 @@ public class AccessManager extends RepositoryManager {
 
         //        System.err.println ("checking entry:" + entry);
         while (entry != null) {
-            List permissions = getPermissions(entry);
-            List<String> roles       = (List<String>)getRoles(entry, action);
+            List         permissions = getPermissions(entry);
+            List<String> roles       = (List<String>) getRoles(entry, action);
             if (roles != null) {
-                if(requestIp!=null) {
+                if (requestIp != null) {
                     boolean hadIp = false;
-                    for (String role:roles) {
+                    for (String role : roles) {
                         boolean negated = false;
                         if (role.startsWith("!")) {
                             negated = true;
-                            role  = role.substring(1);
-                        } 
-                        if (!role.startsWith("ip:")) {
+                            role    = role.substring(1);
+                        }
+                        if ( !role.startsWith("ip:")) {
                             continue;
                         }
                         //logInfo("action:" + action +" checking IP:" + requestIp + " against:" + (negated?"!":"") +role);
-                        if(!negated) {
+                        if ( !negated) {
                             hadIp = true;
                         }
-                        String ip  = role.substring(3);
+                        String ip = role.substring(3);
                         if (requestIp.startsWith(ip)) {
                             if (negated) {
                                 //                                logInfo ("   returning  false");
@@ -382,17 +409,19 @@ public class AccessManager extends RepositoryManager {
                             }
                         }
                     }
-                    if(hadIp) return false;
+                    if (hadIp) {
+                        return false;
+                    }
                 }
 
                 boolean hadRole = false;
-                
+
                 //                Misc.printStack ("can do: " +action + " "  + entry,15,null);
-                for (String role:roles) {
+                for (String role : roles) {
                     boolean negated = false;
                     if (role.startsWith("!")) {
                         negated = true;
-                        role  = role.substring(1);
+                        role    = role.substring(1);
                     }
                     if (role.startsWith("ip:")) {
                         continue;
@@ -405,7 +434,9 @@ public class AccessManager extends RepositoryManager {
                     }
                 }
                 //If there were any roles 
-                if(hadRole) return false;
+                if (hadRole) {
+                    return false;
+                }
             }
             //LOOK: make sure we pass in false here which says do not check for access control
             entry = getEntryManager().getEntry(request,
@@ -450,7 +481,9 @@ public class AccessManager extends RepositoryManager {
     public boolean canAccessFile(Request request, Entry entry)
             throws Exception {
         //Check if its a crawler
-        if(request!=null && request.isSpider()) return false;
+        if ((request != null) && request.isSpider()) {
+            return false;
+        }
         return canDoAction(request, entry, Permission.ACTION_FILE);
     }
 
@@ -499,7 +532,9 @@ public class AccessManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Entry filterEntry(Request request, Entry entry) throws Exception {
-        if(entry.getIsRemoteEntry()) return entry;
+        if (entry.getIsRemoteEntry()) {
+            return entry;
+        }
 
         if ((entry.getResource() != null)
                 && Misc.equals(entry.getResource().getType(),
@@ -633,20 +668,19 @@ public class AccessManager extends RepositoryManager {
      */
     protected void insertPermissions(Request request, Entry entry,
                                      List<Permission> permissions)
-        throws Exception {
+            throws Exception {
         recentPermissions = new Hashtable();
         getDatabaseManager().delete(
-                                    Tables.PERMISSIONS.NAME,
-                                    Clause.eq(Tables.PERMISSIONS.COL_ENTRY_ID, entry.getId()));
+            Tables.PERMISSIONS.NAME,
+            Clause.eq(Tables.PERMISSIONS.COL_ENTRY_ID, entry.getId()));
 
         for (Permission permission : permissions) {
             List roles = permission.getRoles();
             for (int i = 0; i < roles.size(); i++) {
-                getDatabaseManager().executeInsert(
-                                                   Tables.PERMISSIONS.INSERT,
-                                                   new Object[] { entry.getId(),
-                                                                  permission.getAction(),
-                                                                  roles.get(i) });
+                getDatabaseManager().executeInsert(Tables.PERMISSIONS.INSERT,
+                        new Object[] { entry.getId(),
+                                       permission.getAction(),
+                                       roles.get(i) });
             }
         }
         entry.setPermissions(permissions);
@@ -693,17 +727,18 @@ public class AccessManager extends RepositoryManager {
         }
         //            if(!entry.isGroup()) 
         //                System.err.println ("getPermissions for entry:" + entry.getId());
-        SqlUtil.Iterator iter =
-            SqlUtil.getIterator(
-                                getDatabaseManager().select(
-                                                            Tables.PERMISSIONS.COLUMNS, Tables.PERMISSIONS.NAME,
-                                                            Clause.eq(
-                                                                      Tables.PERMISSIONS.COL_ENTRY_ID, entry.getId())));
+        SqlUtil.Iterator iter = SqlUtil.getIterator(
+                                    getDatabaseManager().select(
+                                        Tables.PERMISSIONS.COLUMNS,
+                                        Tables.PERMISSIONS.NAME,
+                                        Clause.eq(
+                                            Tables.PERMISSIONS.COL_ENTRY_ID,
+                                            entry.getId())));
 
         permissions = new ArrayList<Permission>();
 
-        ResultSet        results;
-        Hashtable        actions = new Hashtable();
+        ResultSet results;
+        Hashtable actions = new Hashtable();
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 String id     = results.getString(1);
@@ -822,16 +857,13 @@ public class AccessManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processAccessChange(Request request) throws Exception {
-        Entry            entry       =
-            getEntryManager().getEntry(request);
+        Entry            entry       = getEntryManager().getEntry(request);
         List<Permission> permissions = new ArrayList<Permission>();
         for (int i = 0; i < Permission.ACTIONS.length; i++) {
-            List roles = StringUtil.split(request.getString(ARG_ROLES
-                                                            + "." + Permission.ACTIONS[i], ""), "\n",
-                                          true, true);
+            List roles = StringUtil.split(request.getString(ARG_ROLES + "."
+                             + Permission.ACTIONS[i], ""), "\n", true, true);
             if (roles.size() > 0) {
-                permissions.add(new Permission(Permission.ACTIONS[i],
-                                               roles));
+                permissions.add(new Permission(Permission.ACTIONS[i], roles));
             }
         }
 
@@ -840,8 +872,9 @@ public class AccessManager extends RepositoryManager {
         }
 
         return new Result(request.url(URL_ACCESS_FORM, ARG_ENTRYID,
-                                      entry.getId(), 
-                                      ARG_MESSAGE, getRepository().translate(request,MSG_ACCESS_CHANGED)));
+                                      entry.getId(), ARG_MESSAGE,
+                                      getRepository().translate(request,
+                                          MSG_ACCESS_CHANGED)));
 
     }
 

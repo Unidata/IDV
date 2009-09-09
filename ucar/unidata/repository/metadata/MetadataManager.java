@@ -21,9 +21,11 @@
  */
 
 package ucar.unidata.repository.metadata;
-import ucar.unidata.repository.*;
+
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 
@@ -232,8 +234,21 @@ public class MetadataManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param type _more_
+     * @param checkInherited _more_
+     * @param firstOk _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public List<Metadata> findMetadata(Entry entry, String type,
-                                       boolean checkInherited, boolean firstOk)
+                                       boolean checkInherited,
+                                       boolean firstOk)
             throws Exception {
         List<Metadata> result = new ArrayList<Metadata>();
         findMetadata(entry, type, result, checkInherited, firstOk);
@@ -256,8 +271,8 @@ public class MetadataManager extends RepositoryManager {
      * @throws Exception _more_
      */
     private void findMetadata(Entry entry, String type,
-                             List<Metadata> result, boolean checkInherited,
-                             boolean firstTime)
+                              List<Metadata> result, boolean checkInherited,
+                              boolean firstTime)
             throws Exception {
 
         if (entry == null) {
@@ -333,7 +348,7 @@ public class MetadataManager extends RepositoryManager {
                 int             col     = 1;
                 String          type    = results.getString(3);
                 MetadataHandler handler = findMetadataHandler(type);
-                
+
                 metadataList.add(
                     handler.makeMetadata(
                         results.getString(col++), results.getString(col++),
@@ -659,7 +674,9 @@ public class MetadataManager extends RepositoryManager {
                     parent.setMetadata(null);
                     return new Result(request.url(URL_METADATA_FORM,
                             ARG_ENTRYID, parent.getId(), ARG_MESSAGE,
-                            cnt + " " + getRepository().translate(request,"metadata items added")));
+                            cnt + " "
+                            + getRepository().translate(request,
+                                "metadata items added")));
 
                 }
 
@@ -847,7 +864,8 @@ public class MetadataManager extends RepositoryManager {
         sb.append(HtmlUtil.p());
         if (metadataList.size() == 0) {
             sb.append(
-                getRepository().showDialogNote(msg("No metadata defined for entry")));
+                getRepository().showDialogNote(
+                    msg("No metadata defined for entry")));
             sb.append(msgLabel("Add new metadata"));
             makeAddList(request, entry, sb);
         } else {
@@ -901,7 +919,12 @@ public class MetadataManager extends RepositoryManager {
                 metadataEntry.append(HtmlUtil.formTable());
                 metadataEntry.append(html[1]);
                 metadataEntry.append(HtmlUtil.formTableClose());
-                sb.append(HtmlUtil.makeShowHideBlock(cbx + html[0],HtmlUtil.div(metadataEntry.toString(),HtmlUtil.cssClass("metadatagroup")),false));
+                sb.append(
+                    HtmlUtil.makeShowHideBlock(
+                        cbx + html[0],
+                        HtmlUtil.div(
+                            metadataEntry.toString(),
+                            HtmlUtil.cssClass("metadatagroup")), false));
             }
             sb.append(HtmlUtil.p());
             sb.append(HtmlUtil.submit(msg("Change")));
@@ -1063,8 +1086,7 @@ public class MetadataManager extends RepositoryManager {
                                  SqlUtil.distinct(Tables.METADATA.COL_ATTR1),
                                  Tables.METADATA.NAME,
                                  Clause.eq(
-                                     Tables.METADATA.COL_TYPE,
-                                     type.getId()));
+                                     Tables.METADATA.COL_TYPE, type.getId()));
             values = SqlUtil.readString(stmt, 1);
             getDatabaseManager().close(stmt);
             if (myDistinctMap != null) {

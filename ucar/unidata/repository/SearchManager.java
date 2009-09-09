@@ -19,13 +19,12 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.repository;
-import ucar.unidata.repository.metadata.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.metadata.*;
 
 import ucar.unidata.repository.output.*;
 
@@ -104,8 +103,13 @@ import java.util.zip.*;
  */
 public class SearchManager extends RepositoryManager {
 
+    /** _more_ */
     public static final String ARG_SEARCH_SUBMIT = "search.submit";
+
+    /** _more_ */
     public static final String ARG_SEARCH_SUBSET = "search.subset";
+
+    /** _more_ */
     public static final String ARG_SEARCH_SERVERS = "search.servers";
 
 
@@ -153,11 +157,23 @@ public class SearchManager extends RepositoryManager {
 
 
 
-    public Result makeSearchForm (Request request, boolean justText,
-                                  boolean typeSpecific)
-        throws Exception {
-        StringBuffer sb = new StringBuffer();
-        TypeHandler typeHandler = getRepository().getTypeHandler(request);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param justText _more_
+     * @param typeSpecific _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result makeSearchForm(Request request, boolean justText,
+                                 boolean typeSpecific)
+            throws Exception {
+
+        StringBuffer sb          = new StringBuffer();
+        TypeHandler  typeHandler = getRepository().getTypeHandler(request);
 
         sb.append(
             HtmlUtil.form(
@@ -168,9 +184,10 @@ public class SearchManager extends RepositoryManager {
 
         //Put in an empty submit button so when the user presses return 
         //it acts like a regular submit (not a submit to change the type)
-        sb.append(HtmlUtil.submitImage(iconUrl(ICON_BLANK), ARG_SEARCH_SUBMIT));
+        sb.append(HtmlUtil.submitImage(iconUrl(ICON_BLANK),
+                                       ARG_SEARCH_SUBMIT));
 
-        String      what        = (String) request.getWhat(BLANK);
+        String what = (String) request.getWhat(BLANK);
         if (what.length() == 0) {
             what = WHAT_ENTRIES;
         }
@@ -182,81 +199,87 @@ public class SearchManager extends RepositoryManager {
         String buttons;
 
 
-        if(servers.size()>0) {
-            buttons=  RepositoryUtil.buttons(HtmlUtil.submit(msg("Search this Repository"), ARG_SEARCH_SUBMIT), 
-                                             HtmlUtil.submit(msg("Search Remote Repositories"),
-                                                             ARG_SEARCH_SERVERS));
+        if (servers.size() > 0) {
+            buttons =
+                RepositoryUtil.buttons(
+                    HtmlUtil.submit(
+                        msg("Search this Repository"),
+                        ARG_SEARCH_SUBMIT), HtmlUtil.submit(
+                            msg("Search Remote Repositories"),
+                            ARG_SEARCH_SERVERS));
         } else {
-            buttons=  HtmlUtil.submit(msg("Search"),ARG_SEARCH_SUBMIT);
+            buttons = HtmlUtil.submit(msg("Search"), ARG_SEARCH_SUBMIT);
         }
         sb.append(HtmlUtil.p());
-        if(!justText) {
+        if ( !justText) {
             sb.append(buttons);
             sb.append(HtmlUtil.p());
         }
 
 
-        if(justText) {
-            sb.append("<table width=\"100%\" border=\"0\"><tr><td width=\"60\">");
+        if (justText) {
+            sb.append(
+                "<table width=\"100%\" border=\"0\"><tr><td width=\"60\">");
             typeHandler.addTextSearch(request, sb);
             sb.append("</table>");
             sb.append(HtmlUtil.p());
         } else {
-        Object       oldValue = request.remove(ARG_RELATIVEDATE);
-        List<Clause> where    = typeHandler.assembleWhereClause(request);
-        if (oldValue != null) {
-            request.put(ARG_RELATIVEDATE, oldValue);
-        }
+            Object       oldValue = request.remove(ARG_RELATIVEDATE);
+            List<Clause> where    = typeHandler.assembleWhereClause(request);
+            if (oldValue != null) {
+                request.put(ARG_RELATIVEDATE, oldValue);
+            }
 
-        typeHandler.addToSearchForm(request, sb, where, true);
-
-
-        StringBuffer metadataSB = new StringBuffer();
-        metadataSB.append(HtmlUtil.formTable());
-        getMetadataManager().addToSearchForm(request, metadataSB);
-        metadataSB.append(HtmlUtil.formTableClose());
-        sb.append(HtmlUtil.makeShowHideBlock(msg("Metadata"),
-                                             metadataSB.toString(), false));
+            typeHandler.addToSearchForm(request, sb, where, true);
 
 
-
-        StringBuffer outputForm = new StringBuffer(HtmlUtil.formTable());
-        if (request.defined(ARG_OUTPUT)) {
-            OutputType output = request.getOutput(BLANK);
-            outputForm.append(HtmlUtil.hidden(ARG_OUTPUT,
-                    output.getId().toString()));
-        }
-
-        List orderByList = new ArrayList();
-        orderByList.add(new TwoFacedObject(msg("None"), "none"));
-        orderByList.add(new TwoFacedObject(msg("From Date"), "fromdate"));
-        orderByList.add(new TwoFacedObject(msg("To Date"), "todate"));
-        orderByList.add(new TwoFacedObject(msg("Create Date"), "createdate"));
-        orderByList.add(new TwoFacedObject(msg("Name"), "name"));
-
-        String orderBy =
-            HtmlUtil.select(ARG_ORDERBY, orderByList,
-                            request.getString(ARG_ORDERBY,
-                                "none")) + HtmlUtil.checkbox(ARG_ASCENDING,
-                                    "true",
-                                    request.get(ARG_ASCENDING,
-                                        false)) + HtmlUtil.space(1)
-                                            + msg("ascending");
-        outputForm.append(HtmlUtil.formEntry(msgLabel("Order By"), orderBy));
-        outputForm.append(
-            HtmlUtil.formEntry(
-                msgLabel("Output"),
-                HtmlUtil.select(
-                    ARG_OUTPUT, getOutputHandlerSelectList(),
-                    request.getString(ARG_OUTPUT, ""))));
-
-        outputForm.append(HtmlUtil.formTableClose());
+            StringBuffer metadataSB = new StringBuffer();
+            metadataSB.append(HtmlUtil.formTable());
+            getMetadataManager().addToSearchForm(request, metadataSB);
+            metadataSB.append(HtmlUtil.formTableClose());
+            sb.append(HtmlUtil.makeShowHideBlock(msg("Metadata"),
+                    metadataSB.toString(), false));
 
 
 
+            StringBuffer outputForm = new StringBuffer(HtmlUtil.formTable());
+            if (request.defined(ARG_OUTPUT)) {
+                OutputType output = request.getOutput(BLANK);
+                outputForm.append(HtmlUtil.hidden(ARG_OUTPUT,
+                        output.getId().toString()));
+            }
 
-        sb.append(HtmlUtil.makeShowHideBlock(msg("Output"),
-                                             outputForm.toString(), false));
+            List orderByList = new ArrayList();
+            orderByList.add(new TwoFacedObject(msg("None"), "none"));
+            orderByList.add(new TwoFacedObject(msg("From Date"), "fromdate"));
+            orderByList.add(new TwoFacedObject(msg("To Date"), "todate"));
+            orderByList.add(new TwoFacedObject(msg("Create Date"),
+                    "createdate"));
+            orderByList.add(new TwoFacedObject(msg("Name"), "name"));
+
+            String orderBy = HtmlUtil.select(
+                                 ARG_ORDERBY, orderByList,
+                                 request.getString(
+                                     ARG_ORDERBY,
+                                     "none")) + HtmlUtil.checkbox(
+                                         ARG_ASCENDING, "true",
+                                         request.get(
+                                             ARG_ASCENDING,
+                                             false)) + HtmlUtil.space(1)
+                                                 + msg("ascending");
+            outputForm.append(HtmlUtil.formEntry(msgLabel("Order By"),
+                    orderBy));
+            outputForm.append(HtmlUtil.formEntry(msgLabel("Output"),
+                    HtmlUtil.select(ARG_OUTPUT, getOutputHandlerSelectList(),
+                                    request.getString(ARG_OUTPUT, ""))));
+
+            outputForm.append(HtmlUtil.formTableClose());
+
+
+
+
+            sb.append(HtmlUtil.makeShowHideBlock(msg("Output"),
+                    outputForm.toString(), false));
 
         }
 
@@ -302,7 +325,7 @@ public class SearchManager extends RepositoryManager {
                         HtmlUtil.cssClass("serverdiv")), false));
         }
 
-        
+
 
 
         sb.append(HtmlUtil.p());
@@ -312,6 +335,7 @@ public class SearchManager extends RepositoryManager {
 
         return getRepository().makeResult(request, msg("Search Form"), sb,
                                           getSearchUrls());
+
 
     }
 
@@ -414,7 +438,8 @@ public class SearchManager extends RepositoryManager {
         }
 
         if ( !didone) {
-            sb.append(getRepository().showDialogNote(msg("No servers selected")));
+            sb.append(
+                getRepository().showDialogNote(msg("No servers selected")));
         } else {
             sb.append(HtmlUtil.div(serverSB.toString(),
                                    HtmlUtil.cssClass("serverblock")));
@@ -488,24 +513,25 @@ public class SearchManager extends RepositoryManager {
 
         StringBuffer     searchCriteriaSB = new StringBuffer();
         boolean          searchThis       = true;
-        List<ServerInfo> servers=null;
+        List<ServerInfo> servers          = null;
 
         ServerInfo       thisServer       = getRepository().getServerInfo();
         boolean          doFrames         = request.get(ARG_DOFRAMES, false);
 
         if (request.exists(ARG_SEARCH_SERVERS)) {
             servers = findServers(request, true);
-            if(servers.size()==0) {
-                servers=getRegistryManager().getSelectedRemoteServers();
+            if (servers.size() == 0) {
+                servers = getRegistryManager().getSelectedRemoteServers();
             }
             if (request.defined(ATTR_SERVER)) {
                 searchThis = servers.contains(thisServer);
-                if (!doFrames) {
+                if ( !doFrames) {
                     servers.remove(thisServer);
                 }
             }
-            if(servers.size()>100) {
-                throw new IllegalArgumentException("Too many remote servers:" + servers.size());
+            if (servers.size() > 100) {
+                throw new IllegalArgumentException("Too many remote servers:"
+                        + servers.size());
             }
         }
 
@@ -528,7 +554,7 @@ public class SearchManager extends RepositoryManager {
 
 
 
-        if (servers!=null && servers.size() > 0) {
+        if ((servers != null) && (servers.size() > 0)) {
             request.remove(ATTR_SERVER);
             request.remove(ARG_SEARCH_SERVERS);
 
@@ -571,7 +597,7 @@ public class SearchManager extends RepositoryManager {
             }
 
 
-            Group  tmpGroup = getEntryManager().getDummyGroup();
+            Group tmpGroup = getEntryManager().getDummyGroup();
             doDistributedSearch(request, servers, tmpGroup, groups, entries);
 
             Result result = getRepository().getOutputHandler(
@@ -622,13 +648,30 @@ public class SearchManager extends RepositoryManager {
 
 
 
-    private void doDistributedSearch(final Request request, List<ServerInfo>servers,Group tmpGroup, final List<Group> groups, final List<Entry> entries) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param servers _more_
+     * @param tmpGroup _more_
+     * @param groups _more_
+     * @param entries _more_
+     *
+     * @throws Exception _more_
+     */
+    private void doDistributedSearch(final Request request,
+                                     List<ServerInfo> servers,
+                                     Group tmpGroup,
+                                     final List<Group> groups,
+                                     final List<Entry> entries)
+            throws Exception {
+
         String output = request.getString(ARG_OUTPUT, "");
         request.put(ARG_OUTPUT, XmlOutputHandler.OUTPUT_XML);
-        final String linkUrl  = request.getUrlArgs();
-        ServerInfo       thisServer       = getRepository().getServerInfo();
-        final int[]runnableCnt={0};
-        final boolean[]running = {true};
+        final String    linkUrl     = request.getUrlArgs();
+        ServerInfo      thisServer  = getRepository().getServerInfo();
+        final int[]     runnableCnt = { 0 };
+        final boolean[] running     = { true };
         //TODO: We need to cap the number of servers we're searching on
         List<Runnable> runnables = new ArrayList<Runnable>();
         for (ServerInfo server : servers) {
@@ -637,7 +680,8 @@ public class SearchManager extends RepositoryManager {
             }
             final Group parentGroup =
                 new Group(getRepository().getGroupTypeHandler(), true);
-            parentGroup.setId(getEntryManager().getRemoteEntryId(server.getUrl(),""));
+            parentGroup.setId(
+                getEntryManager().getRemoteEntryId(server.getUrl(), ""));
             getEntryManager().cacheEntry(parentGroup);
             parentGroup.setRemoteServer(server.getUrl());
             parentGroup.setIsRemoteEntry(true);
@@ -645,84 +689,100 @@ public class SearchManager extends RepositoryManager {
             parentGroup.setParentGroup(tmpGroup);
             parentGroup.setName(server.getUrl());
             final ServerInfo theServer = server;
-            Runnable runnable = new Runnable() {
-                    public void run() {
-                        String remoteSearchUrl =
-                            theServer.getUrl()
-                            + getRepository().URL_ENTRY_SEARCH.getPath() + "?"
-                            + linkUrl;
+            Runnable         runnable  = new Runnable() {
+                public void run() {
+                    String remoteSearchUrl =
+                        theServer.getUrl()
+                        + getRepository().URL_ENTRY_SEARCH.getPath() + "?"
+                        + linkUrl;
 
-                        try {
-                            String entriesXml = getStorageManager().readSystemResource(new URL(remoteSearchUrl));
-                            //                            System.err.println(entriesXml);
-                            if(!running[0]) return;
-                            Element  root     = XmlUtil.getRoot(entriesXml);
-                            NodeList children = XmlUtil.getElements(root);
-                            //Synchronize on the groups list so only one thread at  a time adds its entries to it
-                            synchronized(groups) {
-                                for (int i = 0; i < children.getLength(); i++) {
-                                    Element node = (Element) children.item(i);
-                                    //                    if (!node.getTagName().equals(TAG_ENTRY)) {continue;}
-                                    Entry entry = getEntryManager().processEntryXml(request,
-                                                                                    node, parentGroup, new Hashtable(),
-                                                                                    false, false);
+                    try {
+                        String entriesXml =
+                            getStorageManager().readSystemResource(
+                                new URL(remoteSearchUrl));
+                        //                            System.err.println(entriesXml);
+                        if ( !running[0]) {
+                            return;
+                        }
+                        Element  root     = XmlUtil.getRoot(entriesXml);
+                        NodeList children = XmlUtil.getElements(root);
+                        //Synchronize on the groups list so only one thread at  a time adds its entries to it
+                        synchronized (groups) {
+                            for (int i = 0; i < children.getLength(); i++) {
+                                Element node = (Element) children.item(i);
+                                //                    if (!node.getTagName().equals(TAG_ENTRY)) {continue;}
+                                Entry entry =
+                                    getEntryManager().processEntryXml(
+                                        request, node, parentGroup,
+                                        new Hashtable(), false, false);
 
-                                    entry.setResource(new Resource("remote:" + XmlUtil.getAttribute(node, ATTR_RESOURCE,""),
-                                                                   Resource.TYPE_REMOTE_FILE));
-                                    entry.setId(getEntryManager().getRemoteEntryId(theServer.getUrl(),XmlUtil.getAttribute(node, ATTR_ID)));
-                                    entry.setIsRemoteEntry(true);
-                                    entry.setRemoteServer(theServer.getUrl());
-                                    getEntryManager().cacheEntry(entry);
-                                    if (entry.isGroup()) {
-                                        groups.add((Group) entry);
-                                    } else {
-                                        entries.add((Entry) entry);
-                                    }
+                                entry.setResource(
+                                    new Resource(
+                                        "remote:"
+                                        + XmlUtil.getAttribute(
+                                            node, ATTR_RESOURCE,
+                                            ""), Resource.TYPE_REMOTE_FILE));
+                                entry.setId(
+                                    getEntryManager().getRemoteEntryId(
+                                        theServer.getUrl(),
+                                        XmlUtil.getAttribute(node, ATTR_ID)));
+                                entry.setIsRemoteEntry(true);
+                                entry.setRemoteServer(theServer.getUrl());
+                                getEntryManager().cacheEntry(entry);
+                                if (entry.isGroup()) {
+                                    groups.add((Group) entry);
+                                } else {
+                                    entries.add((Entry) entry);
                                 }
                             }
-                        } catch(Exception exc) {
-                            logException("Error doing search:" + remoteSearchUrl,exc);
-                        } finally {
-                            synchronized(runnableCnt) {
-                                runnableCnt[0]--;
-                            }
+                        }
+                    } catch (Exception exc) {
+                        logException("Error doing search:" + remoteSearchUrl,
+                                     exc);
+                    } finally {
+                        synchronized (runnableCnt) {
+                            runnableCnt[0]--;
                         }
                     }
+                }
 
-                    public String toString() {
-                        return "Runnable:" + theServer.getUrl();
-                    }
-                };
+                public String toString() {
+                    return "Runnable:" + theServer.getUrl();
+                }
+            };
             runnables.add(runnable);
         }
 
 
         runnableCnt[0] = runnables.size();
-        for(Runnable runnable: runnables) {
-            Misc.runInABit(0,runnable);
+        for (Runnable runnable : runnables) {
+            Misc.runInABit(0, runnable);
         }
 
 
         //Wait at most 10 seconds for all of the thread to finish
         long t1 = System.currentTimeMillis();
-        while(true) {
-            synchronized(runnableCnt) {                            
-                if(runnableCnt[0]<=0) break;
+        while (true) {
+            synchronized (runnableCnt) {
+                if (runnableCnt[0] <= 0) {
+                    break;
+                }
             }
             //Busy loop
             Misc.sleep(100);
             long t2 = System.currentTimeMillis();
             //Wait at most 10 seconds
-            if((t2-t1)>20000) {
-                logInfo("Remote search waited too long" );
+            if ((t2 - t1) > 20000) {
+                logInfo("Remote search waited too long");
                 break;
             }
         }
-        running[0]  = false;
+        running[0] = false;
 
 
 
         request.put(ARG_OUTPUT, output);
+
 
     }
 

@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -66,9 +65,10 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
+import javax.mail.Address;
+
 import javax.mail.Message;
 import javax.mail.Transport;
-import javax.mail.Address;
 import javax.mail.internet.InternetAddress;
 
 
@@ -223,9 +223,10 @@ public class Admin extends RepositoryManager {
                 msgHeader("Enter a message to show one time to all users"));
             sb.append(request.form(URL_ADMIN_USERMESSAGE, ""));
             sb.append(HtmlUtil.formTable());
-            sb.append(HtmlUtil.formEntry(msgLabel("Message"),
-                                         HtmlUtil.textArea(ARG_SESSION_MESSAGE, "",
-                                             5, 60)));
+            sb.append(
+                HtmlUtil.formEntry(
+                    msgLabel("Message"),
+                    HtmlUtil.textArea(ARG_SESSION_MESSAGE, "", 5, 60)));
             sb.append(HtmlUtil.formTableClose());
             sb.append(HtmlUtil.submit(msg("Set user message")));
             sb.append("</form>");
@@ -304,7 +305,7 @@ public class Admin extends RepositoryManager {
      */
     private void getErrorLog(Request request, StringBuffer sb, File logFile)
             throws Exception {
-        FileInputStream fis      = getStorageManager().getFileInputStream(logFile);
+        FileInputStream fis = getStorageManager().getFileInputStream(logFile);
         String          log      = request.getString(ARG_LOG, "error");
         int             numBytes = request.get(ARG_BYTES, 10000);
         if (numBytes < 0) {
@@ -419,8 +420,8 @@ public class Admin extends RepositoryManager {
                 int    idx  = userAgent.indexOf("(");
                 if (idx > 0) {
                     userAgent = userAgent.substring(0, idx);
-                    userAgent = HtmlUtil.makeShowHideBlock(HtmlUtil.entityEncode(userAgent), full,
-                            false);
+                    userAgent = HtmlUtil.makeShowHideBlock(
+                        HtmlUtil.entityEncode(userAgent), full, false);
                 }
 
 
@@ -454,7 +455,9 @@ public class Admin extends RepositoryManager {
      */
     private StringBuffer getLicenseForm() throws Exception {
         StringBuffer sb = new StringBuffer();
-        String license = getStorageManager().readSystemResource("/ucar/unidata/repository/resources/license.txt");
+        String license =
+            getStorageManager().readSystemResource(
+                "/ucar/unidata/repository/resources/license.txt");
         sb.append(HtmlUtil.textArea("", license, 20, 50));
         sb.append("<p>");
         sb.append(HtmlUtil.checkbox("agree", "1"));
@@ -541,7 +544,7 @@ public class Admin extends RepositoryManager {
                                 UserManager.ARG_USER_EMAIL, "").trim(), "",
                                     "",
                                     getUserManager().hashPassword(password1),
-                            true, "", "",false), false);
+                                    true, "", "", false), false);
                     didIt(ARG_ADMIN_ADMINCREATED);
                     didIt(ARG_ADMIN_INSTALLCOMPLETE);
 
@@ -978,7 +981,8 @@ public class Admin extends RepositoryManager {
                 PROP_ACCESS_ALLSSL, "true",
                 getProperty(PROP_ACCESS_ALLSSL, false)) + " "
                     + msg("Force all connections to be secure");
-        String sslMsg = "Note: If you define an SSL port than all admin access will be redirected to that port. If something is broken with SSL then you have a problem.<br>See the <A target=_help href=\"http://www.unidata.ucar.edu/software/ramadda/docs/userguide/faq.html#fixssl\">FAQ</a> to fix this." ;
+        String sslMsg =
+            "Note: If you define an SSL port than all admin access will be redirected to that port. If something is broken with SSL then you have a problem.<br>See the <A target=_help href=\"http://www.unidata.ucar.edu/software/ramadda/docs/userguide/faq.html#fixssl\">FAQ</a> to fix this.";
         csb.append(
             HtmlUtil.formEntryTop(
                 msgLabel("SSL Port"),
@@ -986,8 +990,10 @@ public class Admin extends RepositoryManager {
                     PROP_SSL_PORT, getProperty(PROP_SSL_PORT, ""),
                     HtmlUtil.SIZE_5) + HtmlUtil.space(1)
                                      + msg("Port number for SSL access.")
-                + HtmlUtil.space(1) + allSslCbx+HtmlUtil.br() +
-                getRepository().showDialogNote(sslMsg)));
+                                     + HtmlUtil.space(1) + allSslCbx
+                                     + HtmlUtil.br()
+                                     + getRepository().showDialogNote(
+                                         sslMsg)));
 
 
 
@@ -1296,14 +1302,27 @@ public class Admin extends RepositoryManager {
     public void sendEmail(String to, String from, String subject,
                           String contents, boolean asHtml)
             throws Exception {
-        sendEmail((List<Address>)Misc.newList(new InternetAddress(to)),
-                  new InternetAddress(from), subject, contents, false, asHtml);
+        sendEmail((List<Address>) Misc.newList(new InternetAddress(to)),
+                  new InternetAddress(from), subject, contents, false,
+                  asHtml);
     }
 
 
-    public void sendEmail(List<Address> to, 
-                          InternetAddress from, String subject,
-                          String contents, boolean bcc, boolean asHtml)
+    /**
+     * _more_
+     *
+     * @param to _more_
+     * @param from _more_
+     * @param subject _more_
+     * @param contents _more_
+     * @param bcc _more_
+     * @param asHtml _more_
+     *
+     * @throws Exception _more_
+     */
+    public void sendEmail(List<Address> to, InternetAddress from,
+                          String subject, String contents, boolean bcc,
+                          boolean asHtml)
             throws Exception {
         if ( !isEmailCapable()) {
             throw new IllegalStateException(
@@ -1322,11 +1341,13 @@ public class Admin extends RepositoryManager {
                                          null);
         MimeMessage msg = new MimeMessage(session);
         msg.setFrom(from);
-        Address[]array = new Address[to.size()];
-        for(int i=0;i<to.size();i++) {
+        Address[] array = new Address[to.size()];
+        for (int i = 0; i < to.size(); i++) {
             array[i] = to.get(i);
         }
-        msg.setRecipients((bcc?Message.RecipientType.BCC:Message.RecipientType.TO), array);
+        msg.setRecipients((bcc
+                           ? Message.RecipientType.BCC
+                           : Message.RecipientType.TO), array);
         msg.setSubject(subject);
         msg.setSentDate(new Date());
         msg.setContent(contents, (asHtml
@@ -1363,8 +1384,8 @@ public class Admin extends RepositoryManager {
         getRepository().writeGlobal(request, PROP_GOOGLEAPIKEYS);
         getRepository().writeGlobal(request, PROP_FACEBOOK_CONNECT_KEY);
 
-        String ratings = "" + request.get(PROP_RATINGS_ENABLE,false);
-        getRepository().writeGlobal(PROP_RATINGS_ENABLE,ratings);
+        String ratings = "" + request.get(PROP_RATINGS_ENABLE, false);
+        getRepository().writeGlobal(PROP_RATINGS_ENABLE, ratings);
 
         getRepository().writeGlobal(request, PROP_HOSTNAME);
         getRepository().writeGlobal(request, PROP_PORT);
@@ -1637,7 +1658,8 @@ public class Admin extends RepositoryManager {
             query = (String) request.getUnsafeString(ARG_QUERY,
                     (String) null);
             if ((query != null) && query.trim().startsWith("file:")) {
-                query = getStorageManager().readSystemResource(query.trim().substring(5));
+                query = getStorageManager().readSystemResource(
+                    query.trim().substring(5));
                 bulkLoad = true;
             }
         }

@@ -19,12 +19,12 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository.metadata;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -79,14 +79,26 @@ import java.util.zip.*;
  * @version $Revision: 1.3 $
  */
 public class Metadata implements Constants {
+
+    /** _more_ */
     public static String TAG_EXTRA = "extra";
+
+    /** _more_ */
     public static String TAG_ATTRIBUTES = "attributes";
 
+    /** _more_ */
     public static String ATTR_INDEX = "index";
 
+    /** _more_ */
     public static final String DFLT_EXTRA = "";
+
+    /** _more_ */
     public static final String DFLT_ATTR = "";
+
+    /** _more_ */
     public static final String DFLT_ID = "";
+
+    /** _more_ */
     public static final String DFLT_ENTRYID = "";
 
     /** _more_ */
@@ -103,26 +115,30 @@ public class Metadata implements Constants {
 
 
     /** _more_ */
-    private String attr1="";
+    private String attr1 = "";
 
     /** _more_ */
-    private String attr2="";
+    private String attr2 = "";
 
     /** _more_ */
-    private String attr3="";
+    private String attr3 = "";
 
     /** _more_ */
-    private String attr4="";
+    private String attr4 = "";
 
+    /** _more_ */
     private String extra;
 
-    private Hashtable<Integer,String> extraMap;
+    /** _more_ */
+    private Hashtable<Integer, String> extraMap;
 
     /** _more_ */
     private boolean inherited = false;
 
-    public Metadata() {
-    }
+    /**
+     * _more_
+     */
+    public Metadata() {}
 
     /**
      * _more_
@@ -130,7 +146,8 @@ public class Metadata implements Constants {
      * @param type _more_
      */
     public Metadata(String type) {
-        this(DFLT_ID, DFLT_ENTRYID, type, false, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_EXTRA);
+        this(DFLT_ID, DFLT_ENTRYID, type, false, DFLT_ATTR, DFLT_ATTR,
+             DFLT_ATTR, DFLT_ATTR, DFLT_EXTRA);
     }
 
 
@@ -144,7 +161,8 @@ public class Metadata implements Constants {
      */
     public Metadata(String id, String entryId, String type,
                     boolean inherited) {
-        this(id, entryId, type, inherited, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_EXTRA);
+        this(id, entryId, type, inherited, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR,
+             DFLT_ATTR, DFLT_EXTRA);
     }
 
 
@@ -156,10 +174,12 @@ public class Metadata implements Constants {
      * @param attr2 _more_
      * @param attr3 _more_
      * @param attr4 _more_
+     * @param extra _more_
      */
     public Metadata(String type, String attr1, String attr2, String attr3,
-                    String attr4,String extra) {
-        this(DFLT_ID, DFLT_ENTRYID, type, false, attr1, attr2, attr3, attr4,extra);
+                    String attr4, String extra) {
+        this(DFLT_ID, DFLT_ENTRYID, type, false, attr1, attr2, attr3, attr4,
+             extra);
     }
 
 
@@ -169,7 +189,8 @@ public class Metadata implements Constants {
      * @param type _more_
      */
     public Metadata(MetadataType type) {
-        this(DFLT_ID, DFLT_ENTRYID, type, false, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR, DFLT_ATTR,DFLT_EXTRA);
+        this(DFLT_ID, DFLT_ENTRYID, type, false, DFLT_ATTR, DFLT_ATTR,
+             DFLT_ATTR, DFLT_ATTR, DFLT_EXTRA);
     }
 
 
@@ -184,12 +205,13 @@ public class Metadata implements Constants {
      * @param attr2 _more_
      * @param attr3 _more_
      * @param attr4 _more_
+     * @param extra _more_
      */
     public Metadata(String id, String entryId, MetadataType type,
                     boolean inherited, String attr1, String attr2,
-                    String attr3, String attr4,String extra) {
+                    String attr3, String attr4, String extra) {
         this(id, entryId, type.getId(), inherited, attr1, attr2, attr3,
-             attr4,extra);
+             attr4, extra);
     }
 
 
@@ -204,10 +226,11 @@ public class Metadata implements Constants {
      * @param attr2 _more_
      * @param attr3 _more_
      * @param attr4 _more_
+     * @param extra _more_
      */
     public Metadata(String id, String entryId, String type,
                     boolean inherited, String attr1, String attr2,
-                    String attr3, String attr4,String extra) {
+                    String attr3, String attr4, String extra) {
         this.id        = id;
         this.entryId   = entryId;
         this.type      = type;
@@ -216,8 +239,10 @@ public class Metadata implements Constants {
         this.attr2     = attr2;
         this.attr3     = attr3;
         this.attr4     = attr4;
-        this.extra      = extra;
-        if(this.extra ==null) this.extra = "";
+        this.extra     = extra;
+        if (this.extra == null) {
+            this.extra = "";
+        }
     }
 
     /**
@@ -236,8 +261,10 @@ public class Metadata implements Constants {
         this.attr2     = that.attr2;
         this.attr3     = that.attr3;
         this.attr4     = that.attr4;
-        this.extra      = that.extra;
-        if(this.extra ==null) this.extra = "";
+        this.extra     = that.extra;
+        if (this.extra == null) {
+            this.extra = "";
+        }
     }
 
     /**
@@ -320,7 +347,7 @@ public class Metadata implements Constants {
         if (idx == 4) {
             attr4 = value;
         }
-        Hashtable<Integer,String> extraMap = getExtraMap();
+        Hashtable<Integer, String> extraMap = getExtraMap();
         extraMap.put(new Integer(idx), value);
         this.extra = null;
     }
@@ -451,10 +478,10 @@ public class Metadata implements Constants {
         if (idx == 4) {
             return attr4;
         }
-        Hashtable<Integer,String> extraMap = getExtraMap();
+        Hashtable<Integer, String> extraMap = getExtraMap();
         return extraMap.get(new Integer(idx));
         //        throw new IllegalArgumentException("Bad attr idx:" + idx);
-        
+
 
 
     }
@@ -759,7 +786,7 @@ public class Metadata implements Constants {
                && Misc.equals(this.attr2, that.attr2)
                && Misc.equals(this.attr3, that.attr3)
                && Misc.equals(this.attr4, that.attr4)
-               && Misc.equals(this.extra,  that.extra)
+               && Misc.equals(this.extra, that.extra)
                && Misc.equals(this.entryId, that.entryId);
     }
 
@@ -786,58 +813,76 @@ public class Metadata implements Constants {
     }
 
     /**
-       Set the Extra property.
-
-       @param value The new value for Extra
-    **/
-    public void setExtra (String value) {
-	this.extra = value;
+     *  Set the Extra property.
+     *
+     *  @param value The new value for Extra
+     */
+    public void setExtra(String value) {
+        this.extra = value;
     }
 
     /**
-       Get the Extra property.
-
-       @return The Extra
-    **/
-    public String getExtra () {
+     *  Get the Extra property.
+     *
+     *  @return The Extra
+     */
+    public String getExtra() {
         String tmp = this.extra;
-        if(tmp == null) {
-            if(extraMap==null) return null;
-            tmp =mapToExtra(extraMap); 
+        if (tmp == null) {
+            if (extraMap == null) {
+                return null;
+            }
+            tmp        = mapToExtra(extraMap);
             this.extra = tmp;
         }
         return tmp;
     }
 
 
-    public Hashtable<Integer,String> getExtraMap () {
-        if(extraMap!=null) return extraMap;
-        Hashtable<Integer,String> tmp = extraToMap(extra);
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Hashtable<Integer, String> getExtraMap() {
+        if (extraMap != null) {
+            return extraMap;
+        }
+        Hashtable<Integer, String> tmp = extraToMap(extra);
         extraMap = tmp;
-        extra = null;
+        extra    = null;
         return tmp;
     }
 
 
 
-    public static Hashtable<Integer,String> extraToMap (String extra) {
-        Hashtable<Integer,String> tmp = new Hashtable<Integer,String>();
-        if(extra != null && extra.length()>0) {
+    /**
+     * _more_
+     *
+     * @param extra _more_
+     *
+     * @return _more_
+     */
+    public static Hashtable<Integer, String> extraToMap(String extra) {
+        Hashtable<Integer, String> tmp = new Hashtable<Integer, String>();
+        if ((extra != null) && (extra.length() > 0)) {
             try {
                 Element root = XmlUtil.getRoot(extra);
                 if (root != null) {
-                    List elements = XmlUtil.findChildren(root,
-                                                         TAG_EXTRA);
+                    List elements = XmlUtil.findChildren(root, TAG_EXTRA);
 
                     for (int j = 0; j < elements.size(); j++) {
                         Element extraNode = (Element) elements.get(j);
-                        int index = XmlUtil.getAttribute(extraNode, ATTR_INDEX,-1);
+                        int index = XmlUtil.getAttribute(extraNode,
+                                        ATTR_INDEX, -1);
                         String text = XmlUtil.getChildText(extraNode);
-                        if(text==null) text="";
-                        tmp.put(new Integer(index),text);
+                        if (text == null) {
+                            text = "";
+                        }
+                        tmp.put(new Integer(index), text);
                     }
                 }
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
         }
@@ -846,19 +891,27 @@ public class Metadata implements Constants {
 
 
 
-    public static String mapToExtra (Hashtable<Integer,String> map) {
+    /**
+     * _more_
+     *
+     * @param map _more_
+     *
+     * @return _more_
+     */
+    public static String mapToExtra(Hashtable<Integer, String> map) {
         try {
-            Document doc   = XmlUtil.makeDocument();
-            Element  root  = XmlUtil.create(doc, TAG_ATTRIBUTES, (Element)null);
-            for (Enumeration keys =
-                     map.keys(); keys.hasMoreElements(); ) {
+            Document doc = XmlUtil.makeDocument();
+            Element root = XmlUtil.create(doc, TAG_ATTRIBUTES,
+                                          (Element) null);
+            for (Enumeration keys = map.keys(); keys.hasMoreElements(); ) {
                 Integer index = (Integer) keys.nextElement();
-                String extra = map.get(index);
-                XmlUtil.create(doc,TAG_EXTRA,root,extra,new String[]{
-                    ATTR_INDEX,index.toString()});
+                String  extra = map.get(index);
+                XmlUtil.create(doc, TAG_EXTRA, root, extra,
+                               new String[] { ATTR_INDEX,
+                        index.toString() });
             }
-            return  XmlUtil.toString(root,false);
-        } catch(Exception exc) {
+            return XmlUtil.toString(root, false);
+        } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
     }

@@ -20,10 +20,11 @@
  */
 
 package ucar.unidata.repository.output;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.util.HtmlUtil;
@@ -105,8 +106,7 @@ public class ExampleOutputHandler extends OutputHandler {
      *
      * @throws Exception On badness
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
         //We'll add example1 when we are viewing a group and example2 when viewing a single entry
         if (state.group != null) {

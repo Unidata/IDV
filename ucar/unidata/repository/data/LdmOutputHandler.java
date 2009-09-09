@@ -21,11 +21,13 @@
 
 package ucar.unidata.repository.data;
 
-import ucar.unidata.repository.output.*;
+
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.monitor.LdmAction;
+
+import ucar.unidata.repository.output.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -116,8 +118,7 @@ public class LdmOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
 
         //Are we configured to do the LDM
@@ -188,10 +189,10 @@ public class LdmOutputHandler extends OutputHandler {
         return handleEntries(request, group, entries);
     }
 
-    /** _more_          */
+    /** _more_ */
     private String lastFeed = "SPARE";
 
-    /** _more_          */
+    /** _more_ */
     private String lastProductId = "${filename}";
 
     /**
@@ -281,7 +282,8 @@ public class LdmOutputHandler extends OutputHandler {
                 String id =
                     getRepository().getEntryManager().replaceMacros(entry,
                         productId);
-                LdmAction.insertIntoQueue(getRepository(), pqinsert, queue, feed, id,
+                LdmAction.insertIntoQueue(getRepository(), pqinsert, queue,
+                                          feed, id,
                                           entry.getResource().getPath());
                 sb.append("Inserted: "
                           + getStorageManager().getFileTail(entry));

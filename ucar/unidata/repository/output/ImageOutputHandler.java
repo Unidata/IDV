@@ -20,10 +20,11 @@
  */
 
 package ucar.unidata.repository.output;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -37,13 +38,14 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
+import java.awt.Image;
+import java.awt.image.*;
+
 
 import java.io.*;
 
 import java.io.File;
 import java.io.InputStream;
-import java.awt.Image;
-import java.awt.image.*;
 
 
 
@@ -80,42 +82,68 @@ import java.util.zip.*;
  */
 public class ImageOutputHandler extends OutputHandler {
 
+    /** _more_ */
     public static final String ARG_IMAGE_EDIT = "image.edit";
-    public static final String ARG_IMAGE_UNDO = "image.undo";
-    public static final String ARG_IMAGE_EDIT_RESIZE = "image.edit.resize";
-    public static final String ARG_IMAGE_EDIT_WIDTH = "image.edit.width";
-    public static final String ARG_IMAGE_EDIT_CROP = "image.edit.crop";
-    public static final String ARG_IMAGE_EDIT_REDEYE = "image.edit.redeye";
-
-    public static final String ARG_IMAGE_CROPX1 = "image.edit.cropx1";
-    public static final String ARG_IMAGE_CROPY1 = "image.edit.cropy1";
-    public static final String ARG_IMAGE_CROPX2 = "image.edit.cropx2";
-    public static final String ARG_IMAGE_CROPY2 = "image.edit.cropy2";
-
-    public static final String ARG_IMAGE_EDIT_ROTATE_LEFT = "image.edit.rotate.left";
-    public static final String ARG_IMAGE_EDIT_ROTATE_RIGHT = "image.edit.rotate.right";
 
     /** _more_ */
-    public static final OutputType OUTPUT_GALLERY = new OutputType("Gallery",
-                                                        "image.gallery",
-                                                        OutputType.TYPE_HTML|OutputType.TYPE_FORSEARCH,
-                                                        "", ICON_IMAGES);
+    public static final String ARG_IMAGE_UNDO = "image.undo";
+
+    /** _more_ */
+    public static final String ARG_IMAGE_EDIT_RESIZE = "image.edit.resize";
+
+    /** _more_ */
+    public static final String ARG_IMAGE_EDIT_WIDTH = "image.edit.width";
+
+    /** _more_ */
+    public static final String ARG_IMAGE_EDIT_CROP = "image.edit.crop";
+
+    /** _more_ */
+    public static final String ARG_IMAGE_EDIT_REDEYE = "image.edit.redeye";
+
+    /** _more_ */
+    public static final String ARG_IMAGE_CROPX1 = "image.edit.cropx1";
+
+    /** _more_ */
+    public static final String ARG_IMAGE_CROPY1 = "image.edit.cropy1";
+
+    /** _more_ */
+    public static final String ARG_IMAGE_CROPX2 = "image.edit.cropx2";
+
+    /** _more_ */
+    public static final String ARG_IMAGE_CROPY2 = "image.edit.cropy2";
+
+    /** _more_ */
+    public static final String ARG_IMAGE_EDIT_ROTATE_LEFT =
+        "image.edit.rotate.left";
+
+    /** _more_ */
+    public static final String ARG_IMAGE_EDIT_ROTATE_RIGHT =
+        "image.edit.rotate.right";
+
+    /** _more_ */
+    public static final OutputType OUTPUT_GALLERY =
+        new OutputType("Gallery", "image.gallery",
+                       OutputType.TYPE_HTML | OutputType.TYPE_FORSEARCH, "",
+                       ICON_IMAGES);
 
     /** _more_ */
     public static final OutputType OUTPUT_PLAYER =
-        new OutputType("Image Player", "image.player", OutputType.TYPE_HTML|OutputType.TYPE_FORSEARCH,
-                       "", ICON_IMAGES);
+        new OutputType("Image Player", "image.player",
+                       OutputType.TYPE_HTML | OutputType.TYPE_FORSEARCH, "",
+                       ICON_IMAGES);
 
     /** _more_ */
     public static final OutputType OUTPUT_SLIDESHOW =
-        new OutputType("Slideshow", "image.slideshow", OutputType.TYPE_HTML|OutputType.TYPE_FORSEARCH,
-                       "", ICON_IMAGES);
+        new OutputType("Slideshow", "image.slideshow",
+                       OutputType.TYPE_HTML | OutputType.TYPE_FORSEARCH, "",
+                       ICON_IMAGES);
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_EDIT =
-        new OutputType("Edit Image", "image.edit", OutputType.TYPE_HTML,
-                       "", ICON_IMAGES);
+    public static final OutputType OUTPUT_EDIT = new OutputType("Edit Image",
+                                                     "image.edit",
+                                                     OutputType.TYPE_HTML,
+                                                     "", ICON_IMAGES);
 
 
 
@@ -148,17 +176,18 @@ public class ImageOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
 
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
 
         //If its a single entry then punt
 
         if (state.entry != null) {
-            if(getAccessManager().canDoAction(request, state.entry, Permission.ACTION_EDIT)) {
-                File f =state.entry.getFile();
-                if(f!=null && f.canWrite()) {
-                    Link link = makeLink(request, state.getEntry(), OUTPUT_EDIT);
+            if (getAccessManager().canDoAction(request, state.entry,
+                    Permission.ACTION_EDIT)) {
+                File f = state.entry.getFile();
+                if ((f != null) && f.canWrite()) {
+                    Link link = makeLink(request, state.getEntry(),
+                                         OUTPUT_EDIT);
                     link.setLinkType(OutputType.TYPE_EDIT);
                     links.add(link);
                 }
@@ -195,91 +224,126 @@ public class ImageOutputHandler extends OutputHandler {
 
 
 
-    private Hashtable<String,Image> imageCache = new Hashtable<String,Image>();
+    /** _more_ */
+    private Hashtable<String, Image> imageCache = new Hashtable<String,
+                                                      Image>();
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     private Image getImage(Entry entry) {
         Image image = imageCache.get(entry.getId());
-        if(image == null) {
-            image =ImageUtils.readImage(entry.getResource().getPath(),false);
+        if (image == null) {
+            image = ImageUtils.readImage(entry.getResource().getPath(),
+                                         false);
             //Keep the cache size low
-            if(imageCache.size()>5) {
-                imageCache = new Hashtable<String,Image>();
+            if (imageCache.size() > 5) {
+                imageCache = new Hashtable<String, Image>();
             }
-            imageCache.put(entry.getId(),image);
+            imageCache.put(entry.getId(), image);
         }
         return image;
     }
 
-    private void putImage(Entry entry,Image image) {
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param image _more_
+     */
+    private void putImage(Entry entry, Image image) {
         imageCache.put(entry.getId(), image);
     }
 
 
 
 
-    public Result outputEntry(Request request, Entry  entry) 
-            throws Exception {
-        if(!getAccessManager().canDoAction(request, entry, Permission.ACTION_EDIT)) {
-            throw new AccessException ("Cannot edit image", null);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result outputEntry(Request request, Entry entry) throws Exception {
+
+        if ( !getAccessManager().canDoAction(request, entry,
+                                             Permission.ACTION_EDIT)) {
+            throw new AccessException("Cannot edit image", null);
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb          = new StringBuffer();
 
 
-        String url = getImageUrl(request, entry,true);
-        Image image = getImage(entry);
-        int imageWidth = image.getWidth(null);
-        int imageHeight = image.getHeight(null);
-        Image newImage = null;
-        if(request.exists(ARG_IMAGE_UNDO)) {
-            File f =entry.getFile();
-            if(f!=null && f.canWrite()) {
-                File entryDir = getStorageManager().getEntryDir(entry.getId(), true);
-                File original = new File(entryDir+"/"+ "originalimage");
-                if(original.exists()) {
+        String       url         = getImageUrl(request, entry, true);
+        Image        image       = getImage(entry);
+        int          imageWidth  = image.getWidth(null);
+        int          imageHeight = image.getHeight(null);
+        Image        newImage    = null;
+        if (request.exists(ARG_IMAGE_UNDO)) {
+            File f = entry.getFile();
+            if ((f != null) && f.canWrite()) {
+                File entryDir =
+                    getStorageManager().getEntryDir(entry.getId(), true);
+                File original = new File(entryDir + "/" + "originalimage");
+                if (original.exists()) {
                     imageCache.remove(entry.getId());
-                    IOUtil.copyFile(original,f);
+                    IOUtil.copyFile(original, f);
                     request.remove(ARG_IMAGE_UNDO);
                     return new Result(request.getUrl());
                 }
             }
-        } else  if(request.exists(ARG_IMAGE_EDIT_RESIZE)) {
-            newImage  = ImageUtils.resize(image, request.get(ARG_IMAGE_EDIT_WIDTH, imageWidth),-1);
+        } else if (request.exists(ARG_IMAGE_EDIT_RESIZE)) {
+            newImage = ImageUtils.resize(image,
+                                         request.get(ARG_IMAGE_EDIT_WIDTH,
+                                             imageWidth), -1);
             request.remove(ARG_IMAGE_EDIT_RESIZE);
-        }  else if(request.exists(ARG_IMAGE_EDIT_REDEYE)) {
-            int x1= request.get(ARG_IMAGE_CROPX1,0);            
-            int y1= request.get(ARG_IMAGE_CROPY1,0);
-            int x2= request.get(ARG_IMAGE_CROPX2,0);            
-            int y2= request.get(ARG_IMAGE_CROPY2,0);
-            if(x1<x2 && y1<y2) {
-                newImage = ImageUtils.removeRedeye(image, x1, y1,  x2,  y2);
+        } else if (request.exists(ARG_IMAGE_EDIT_REDEYE)) {
+            int x1 = request.get(ARG_IMAGE_CROPX1, 0);
+            int y1 = request.get(ARG_IMAGE_CROPY1, 0);
+            int x2 = request.get(ARG_IMAGE_CROPX2, 0);
+            int y2 = request.get(ARG_IMAGE_CROPY2, 0);
+            if ((x1 < x2) && (y1 < y2)) {
+                newImage = ImageUtils.removeRedeye(image, x1, y1, x2, y2);
             }
             request.remove(ARG_IMAGE_EDIT_REDEYE);
-        }  else if(request.exists(ARG_IMAGE_EDIT_CROP)) {
-            int x1= request.get(ARG_IMAGE_CROPX1,0);            
-            int y1= request.get(ARG_IMAGE_CROPY1,0);
-            int x2= request.get(ARG_IMAGE_CROPX2,0);            
-            int y2= request.get(ARG_IMAGE_CROPY2,0);
-            if(x1<x2 && y1<y2) {
-                newImage = ImageUtils.clip(ImageUtils.toBufferedImage(image), new int[]{x1,y1},new int[]{x2,y2});
+        } else if (request.exists(ARG_IMAGE_EDIT_CROP)) {
+            int x1 = request.get(ARG_IMAGE_CROPX1, 0);
+            int y1 = request.get(ARG_IMAGE_CROPY1, 0);
+            int x2 = request.get(ARG_IMAGE_CROPX2, 0);
+            int y2 = request.get(ARG_IMAGE_CROPY2, 0);
+            if ((x1 < x2) && (y1 < y2)) {
+                newImage = ImageUtils.clip(ImageUtils.toBufferedImage(image),
+                                           new int[] { x1,
+                        y1 }, new int[] { x2, y2 });
             }
             request.remove(ARG_IMAGE_EDIT_CROP);
-        }  else if(request.exists(ARG_IMAGE_EDIT_ROTATE_LEFT)) {
-            newImage = ImageUtils.rotate90(ImageUtils.toBufferedImage(image), true);
+        } else if (request.exists(ARG_IMAGE_EDIT_ROTATE_LEFT)) {
+            newImage = ImageUtils.rotate90(ImageUtils.toBufferedImage(image),
+                                           true);
             request.remove(ARG_IMAGE_EDIT_ROTATE_LEFT);
-        }  else if(request.exists(ARG_IMAGE_EDIT_ROTATE_RIGHT)) {
-            newImage = ImageUtils.rotate90(ImageUtils.toBufferedImage(image), false);
+        } else if (request.exists(ARG_IMAGE_EDIT_ROTATE_RIGHT)) {
+            newImage = ImageUtils.rotate90(ImageUtils.toBufferedImage(image),
+                                           false);
             request.remove(ARG_IMAGE_EDIT_ROTATE_RIGHT);
         }
-        if(newImage!=null) {
+        if (newImage != null) {
             ImageUtils.waitOnImage(newImage);
             putImage(entry, newImage);
-            File f =entry.getFile();
+            File f = entry.getFile();
             getStorageManager().checkFile(f);
-            if(f!=null && f.canWrite()) {
-                File entryDir = getStorageManager().getEntryDir(entry.getId(), true);
-                File original = new File(entryDir+"/"+ "originalimage");
-                if(!original.exists()) {
+            if ((f != null) && f.canWrite()) {
+                File entryDir =
+                    getStorageManager().getEntryDir(entry.getId(), true);
+                File original = new File(entryDir + "/" + "originalimage");
+                if ( !original.exists()) {
                     IOUtil.copyFile(f, original);
                 }
                 ImageUtils.writeImageToFile(newImage, f);
@@ -287,42 +351,60 @@ public class ImageOutputHandler extends OutputHandler {
             return new Result(request.getUrl());
         }
         sb.append(request.formPost(getRepository().URL_ENTRY_SHOW));
-        sb.append(HtmlUtil.hidden(ARG_ENTRYID,entry.getId()));
-        sb.append(HtmlUtil.hidden(ARG_OUTPUT,OUTPUT_EDIT));
-        sb.append(HtmlUtil.submit(msg("Change width:"),ARG_IMAGE_EDIT_RESIZE));
-        sb.append(HtmlUtil.input(ARG_IMAGE_EDIT_WIDTH,""+imageWidth,HtmlUtil.SIZE_5));
+        sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
+        sb.append(HtmlUtil.hidden(ARG_OUTPUT, OUTPUT_EDIT));
+        sb.append(HtmlUtil.submit(msg("Change width:"),
+                                  ARG_IMAGE_EDIT_RESIZE));
+        sb.append(HtmlUtil.input(ARG_IMAGE_EDIT_WIDTH, "" + imageWidth,
+                                 HtmlUtil.SIZE_5));
         sb.append(HtmlUtil.space(2));
 
-        sb.append(HtmlUtil.submit(msg("Crop"),ARG_IMAGE_EDIT_CROP));
-        sb.append(HtmlUtil.submit(msg("Remove Redeye"),ARG_IMAGE_EDIT_REDEYE));
-        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPX1,"",HtmlUtil.SIZE_3+HtmlUtil.id(ARG_IMAGE_CROPX1)));
-        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPY1,"",HtmlUtil.SIZE_3+HtmlUtil.id(ARG_IMAGE_CROPY1)));
-        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPX2,"",HtmlUtil.SIZE_3+HtmlUtil.id(ARG_IMAGE_CROPX2)));
-        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPY2,"",HtmlUtil.SIZE_3+HtmlUtil.id(ARG_IMAGE_CROPY2)));
-        sb.append(HtmlUtil.div("",HtmlUtil.cssClass("image_edit_box")+HtmlUtil.id("image_edit_box")));
+        sb.append(HtmlUtil.submit(msg("Crop"), ARG_IMAGE_EDIT_CROP));
+        sb.append(HtmlUtil.submit(msg("Remove Redeye"),
+                                  ARG_IMAGE_EDIT_REDEYE));
+        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPX1, "",
+                                  HtmlUtil.SIZE_3
+                                  + HtmlUtil.id(ARG_IMAGE_CROPX1)));
+        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPY1, "",
+                                  HtmlUtil.SIZE_3
+                                  + HtmlUtil.id(ARG_IMAGE_CROPY1)));
+        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPX2, "",
+                                  HtmlUtil.SIZE_3
+                                  + HtmlUtil.id(ARG_IMAGE_CROPX2)));
+        sb.append(HtmlUtil.hidden(ARG_IMAGE_CROPY2, "",
+                                  HtmlUtil.SIZE_3
+                                  + HtmlUtil.id(ARG_IMAGE_CROPY2)));
+        sb.append(HtmlUtil.div("",
+                               HtmlUtil.cssClass("image_edit_box")
+                               + HtmlUtil.id("image_edit_box")));
 
         sb.append(HtmlUtil.space(2));
-        sb.append(HtmlUtil.submitImage(iconUrl(ICON_ANTIROTATE),ARG_IMAGE_EDIT_ROTATE_LEFT));
+        sb.append(HtmlUtil.submitImage(iconUrl(ICON_ANTIROTATE),
+                                       ARG_IMAGE_EDIT_ROTATE_LEFT));
         sb.append(HtmlUtil.space(2));
-        sb.append(HtmlUtil.submitImage(iconUrl(ICON_ROTATE),ARG_IMAGE_EDIT_ROTATE_RIGHT));
+        sb.append(HtmlUtil.submitImage(iconUrl(ICON_ROTATE),
+                                       ARG_IMAGE_EDIT_ROTATE_RIGHT));
         File entryDir = getStorageManager().getEntryDir(entry.getId(), false);
-        File original = new File(entryDir+"/"+ "originalimage");
-        if(original.exists()) {
+        File original = new File(entryDir + "/" + "originalimage");
+        if (original.exists()) {
             sb.append(HtmlUtil.space(2));
-            sb.append(HtmlUtil.submit(msg("Undo all edits"),ARG_IMAGE_UNDO));
+            sb.append(HtmlUtil.submit(msg("Undo all edits"), ARG_IMAGE_UNDO));
         }
         sb.append(HtmlUtil.formClose());
 
 
-        String clickParams = "event,'imgid',"+
-            HtmlUtil.comma(HtmlUtil.squote(ARG_IMAGE_CROPX1),
-                           HtmlUtil.squote(ARG_IMAGE_CROPY1),
-                           HtmlUtil.squote(ARG_IMAGE_CROPX2),
-                           HtmlUtil.squote(ARG_IMAGE_CROPY2));
+        String clickParams =
+            "event,'imgid',"
+            + HtmlUtil.comma(HtmlUtil.squote(ARG_IMAGE_CROPX1),
+                             HtmlUtil.squote(ARG_IMAGE_CROPY1),
+                             HtmlUtil.squote(ARG_IMAGE_CROPX2),
+                             HtmlUtil.squote(ARG_IMAGE_CROPY2));
 
-        String call = HtmlUtil.onMouseClick(HtmlUtil.call("editImageClick",clickParams));
-        sb.append(HtmlUtil.img(url,"",HtmlUtil.id("imgid")+call));
+        String call = HtmlUtil.onMouseClick(HtmlUtil.call("editImageClick",
+                          clickParams));
+        sb.append(HtmlUtil.img(url, "", HtmlUtil.id("imgid") + call));
         return new Result("Image Edit", sb);
+
     }
 
 
@@ -380,8 +462,8 @@ public class ImageOutputHandler extends OutputHandler {
                               List<Entry> entries)
             throws Exception {
 
-        StringBuffer sb         = new StringBuffer();
-        OutputType   output     = request.getOutput();
+        StringBuffer sb     = new StringBuffer();
+        OutputType   output = request.getOutput();
         if (entries.size() == 0) {
             sb.append("<b>Nothing Found</b><p>");
             return new Result("Query Results", sb, getMimeType(output));
@@ -390,7 +472,7 @@ public class ImageOutputHandler extends OutputHandler {
         if (output.equals(OUTPUT_GALLERY)) {
             sb.append("<table>");
         } else if (output.equals(OUTPUT_PLAYER)) {
-            if(!request.exists(ARG_ASCENDING)) {
+            if ( !request.exists(ARG_ASCENDING)) {
                 entries = getEntryManager().sortEntriesOnDate(entries, true);
             }
         }
@@ -526,8 +608,7 @@ public class ImageOutputHandler extends OutputHandler {
             sb = new StringBuffer(template);
         }
         StringBuffer finalSB = new StringBuffer();
-        showNext(request, new ArrayList<Group>(),
-                 entries, finalSB);
+        showNext(request, new ArrayList<Group>(), entries, finalSB);
 
         finalSB.append(HtmlUtil.p());
         finalSB.append(sb);

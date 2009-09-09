@@ -21,6 +21,7 @@
 
 package ucar.unidata.repository.monitor;
 
+
 import org.apache.commons.net.ftp.*;
 
 import ucar.unidata.repository.*;
@@ -31,11 +32,12 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
+import java.io.BufferedInputStream;
+
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.FileInputStream;
-import java.io.BufferedInputStream;
+import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -50,18 +52,37 @@ import java.util.List;
  * @version $Revision: 1.30 $
  */
 public class FtpAction extends MonitorAction {
+
+    /** _more_ */
     public static final String PROP_FTP_SERVER = "ftp.server";
+
+    /** _more_ */
     public static final String PROP_FTP_DIRECTORY = "ftp.directory";
+
+    /** _more_ */
     public static final String PROP_FTP_FILETEMPLATE = "ftp.filetemplate";
+
+    /** _more_ */
     public static final String PROP_FTP_USER = "ftp.user";
+
+    /** _more_ */
     public static final String PROP_FTP_PASSWORD = "ftp.password";
 
 
-    private String  server="";
-    private String  directory="";
-    private String  fileTemplate="${filename}";
-    private String  user="";
-    private String  password="";
+    /** _more_ */
+    private String server = "";
+
+    /** _more_ */
+    private String directory = "";
+
+    /** _more_ */
+    private String fileTemplate = "${filename}";
+
+    /** _more_ */
+    private String user = "";
+
+    /** _more_ */
+    private String password = "";
 
 
     /**
@@ -110,10 +131,11 @@ public class FtpAction extends MonitorAction {
      */
     public void applyEditForm(Request request, EntryMonitor monitor) {
         super.applyEditForm(request, monitor);
-        this.server    = request.getString(getArgId(PROP_FTP_SERVER), "");
-        this.user      = request.getString(getArgId(PROP_FTP_USER), "");
-        this.directory   = request.getString(getArgId(PROP_FTP_DIRECTORY), "");
-        this.fileTemplate   = request.getString(getArgId(PROP_FTP_FILETEMPLATE), "");
+        this.server = request.getString(getArgId(PROP_FTP_SERVER), "");
+        this.user   = request.getString(getArgId(PROP_FTP_USER), "");
+        this.directory = request.getString(getArgId(PROP_FTP_DIRECTORY), "");
+        this.fileTemplate =
+            request.getString(getArgId(PROP_FTP_FILETEMPLATE), "");
         this.password = request.getString(getArgId(PROP_FTP_PASSWORD), "");
     }
 
@@ -129,26 +151,39 @@ public class FtpAction extends MonitorAction {
         sb.append(HtmlUtil.colspan("FTP Action", 2));
 
 
-        sb.append(HtmlUtil.formEntry(monitor.getRepository().msgLabel("FTP Server"),
-                                     HtmlUtil.input(getArgId(PROP_FTP_SERVER), server,
-                                                    HtmlUtil.SIZE_60)));
-        sb.append(HtmlUtil.formEntry(monitor.getRepository().msgLabel("FTP Directory"),
-                                     HtmlUtil.input(getArgId(PROP_FTP_DIRECTORY), directory,
-                                                    HtmlUtil.SIZE_60)));
+        sb.append(
+            HtmlUtil.formEntry(
+                monitor.getRepository().msgLabel("FTP Server"),
+                HtmlUtil.input(
+                    getArgId(PROP_FTP_SERVER), server, HtmlUtil.SIZE_60)));
+        sb.append(
+            HtmlUtil.formEntry(
+                monitor.getRepository().msgLabel("FTP Directory"),
+                HtmlUtil.input(
+                    getArgId(PROP_FTP_DIRECTORY), directory,
+                    HtmlUtil.SIZE_60)));
         String tooltip =
             "macros: ${from_day}  ${from_month} ${from_year} ${from_monthname}  <br>"
             + "${to_day}  ${to_month} ${to_year} ${to_monthname} <br> "
             + "${filename}  ${fileextension} etc";
 
-        sb.append(HtmlUtil.formEntry(monitor.getRepository().msgLabel("File Name Template"),
-                                     HtmlUtil.input(getArgId(PROP_FTP_FILETEMPLATE), fileTemplate,
-                                                    HtmlUtil.SIZE_60+HtmlUtil.title(tooltip))));
-        sb.append(HtmlUtil.formEntry(monitor.getRepository().msgLabel("User ID"),
-                                     HtmlUtil.input(getArgId(PROP_FTP_USER), user,
-                                                    HtmlUtil.SIZE_60)));
-        sb.append(HtmlUtil.formEntry(monitor.getRepository().msgLabel("Password"),
-                                     HtmlUtil.password(getArgId(PROP_FTP_PASSWORD), password,
-                                                    HtmlUtil.SIZE_20)));
+        sb.append(
+            HtmlUtil.formEntry(
+                monitor.getRepository().msgLabel("File Name Template"),
+                HtmlUtil.input(
+                    getArgId(PROP_FTP_FILETEMPLATE), fileTemplate,
+                    HtmlUtil.SIZE_60 + HtmlUtil.title(tooltip))));
+        sb.append(
+            HtmlUtil.formEntry(
+                monitor.getRepository().msgLabel("User ID"),
+                HtmlUtil.input(
+                    getArgId(PROP_FTP_USER), user, HtmlUtil.SIZE_60)));
+        sb.append(
+            HtmlUtil.formEntry(
+                monitor.getRepository().msgLabel("Password"),
+                HtmlUtil.password(
+                    getArgId(PROP_FTP_PASSWORD), password,
+                    HtmlUtil.SIZE_20)));
 
         sb.append(HtmlUtil.formTableClose());
     }
@@ -168,34 +203,44 @@ public class FtpAction extends MonitorAction {
             if ( !resource.isFile()) {
                 return;
             }
-            if(server.length()==0) return;
+            if (server.length() == 0) {
+                return;
+            }
 
-            String passwordToUse = monitor.getRepository().processTemplate(password, false);
+            String passwordToUse =
+                monitor.getRepository().processTemplate(password, false);
             ftpClient.connect(server);
-            if (user.length()>0) {
+            if (user.length() > 0) {
                 ftpClient.login(user, password);
             }
             int reply = ftpClient.getReplyCode();
             if ( !FTPReply.isPositiveCompletion(reply)) {
                 ftpClient.disconnect();
-                monitor.handleError("FTP server refused connection:" + server,null);
+                monitor.handleError("FTP server refused connection:"
+                                    + server, null);
                 return;
             }
             ftpClient.setFileType(FTP.IMAGE_FILE_TYPE);
             ftpClient.enterLocalPassiveMode();
-            if(directory.length()>0) 
+            if (directory.length() > 0) {
                 ftpClient.changeWorkingDirectory(directory);
+            }
 
-            String filename = monitor.getRepository().getEntryManager().replaceMacros(
-                                                                         entry, fileTemplate);
+            String filename =
+                monitor.getRepository().getEntryManager().replaceMacros(
+                    entry, fileTemplate);
 
-            InputStream is = new BufferedInputStream(monitor.getRepository().getStorageManager().getFileInputStream(new File(resource.getPath())));
+            InputStream is =
+                new BufferedInputStream(monitor.getRepository()
+                    .getStorageManager()
+                    .getFileInputStream(new File(resource.getPath())));
             boolean ok = ftpClient.storeUniqueFile(filename, is);
             is.close();
-            if(ok) {
-                monitor.logInfo ("Wrote file:" + directory +" " + filename);
+            if (ok) {
+                monitor.logInfo("Wrote file:" + directory + " " + filename);
             } else {
-                monitor.handleError("Failed to write file:" + directory +" " + filename,null);
+                monitor.handleError("Failed to write file:" + directory + " "
+                                    + filename, null);
             }
         } catch (Exception exc) {
             monitor.handleError("Error posting to FTP:" + server, exc);
@@ -212,84 +257,84 @@ public class FtpAction extends MonitorAction {
 
 
     /**
-Set the Server property.
+     * Set the Server property.
+     *
+     * @param value The new value for Server
+     */
+    public void setServer(String value) {
+        server = value;
+    }
 
-@param value The new value for Server
-**/
-public void setServer (String value) {
-	server = value;
-}
+    /**
+     * Get the Server property.
+     *
+     * @return The Server
+     */
+    public String getServer() {
+        return server;
+    }
 
-/**
-Get the Server property.
+    /**
+     * Set the Directory property.
+     *
+     * @param value The new value for Directory
+     */
+    public void setDirectory(String value) {
+        directory = value;
+    }
 
-@return The Server
-**/
-public String getServer () {
-	return server;
-}
+    /**
+     * Get the Directory property.
+     *
+     * @return The Directory
+     */
+    public String getDirectory() {
+        return directory;
+    }
 
-/**
-Set the Directory property.
+    /**
+     * Set the User property.
+     *
+     * @param value The new value for User
+     */
+    public void setUser(String value) {
+        user = value;
+    }
 
-@param value The new value for Directory
-**/
-public void setDirectory (String value) {
-	directory = value;
-}
-
-/**
-Get the Directory property.
-
-@return The Directory
-**/
-public String getDirectory () {
-	return directory;
-}
-
-/**
-Set the User property.
-
-@param value The new value for User
-**/
-public void setUser (String value) {
-	user = value;
-}
-
-/**
-Get the User property.
-
-@return The User
-**/
-public String getUser () {
-	return user;
-}
+    /**
+     * Get the User property.
+     *
+     * @return The User
+     */
+    public String getUser() {
+        return user;
+    }
 
 
-/**
-Set the Tmp property.
-
-@param value The new value for Tmp
-**/
-public void setTmp (byte[] value) {
+    /**
+     * Set the Tmp property.
+     *
+     * @param value The new value for Tmp
+     */
+    public void setTmp(byte[] value) {
         if (value == null) {
             password = null;
         } else {
             password = new String(XmlUtil.decodeBase64(new String(value)));
         }
-}
+    }
 
-/**
-Get the Tmp property.
-
-@return The Tmp
-**/
-public byte[] getTmp () {
+    /**
+     * Get the Tmp property.
+     *
+     * @return The Tmp
+     */
+    public byte[] getTmp() {
         if (password == null) {
             return null;
         }
         return XmlUtil.encodeBase64(password.getBytes()).getBytes();
-}
+    }
 
 
 

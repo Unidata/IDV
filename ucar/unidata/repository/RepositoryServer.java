@@ -174,7 +174,8 @@ public class RepositoryServer extends HttpServer implements Constants {
                 repository.getStorageManager().getUploadFilePath(filename);
             //TODO: Check for security hole with the file upload
             fileUploads.put(attrName, f.toString());
-            OutputStream output = repository.getStorageManager().getFileOutputStream(f);
+            OutputStream output =
+                repository.getStorageManager().getFileOutputStream(f);
             multipartStream.readBodyData(output);
             output.close();
             args.put(attrName, filename);

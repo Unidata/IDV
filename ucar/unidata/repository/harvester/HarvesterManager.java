@@ -21,9 +21,11 @@
  */
 
 package ucar.unidata.repository.harvester;
-import ucar.unidata.repository.*;
+
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.repository.data.*;
 
@@ -168,14 +170,15 @@ public class HarvesterManager extends RepositoryManager {
                 String id        = results.getString(1);
                 String className = results.getString(2);
                 String content   = results.getString(3);
-                
+
                 Class  c         = null;
 
                 try {
-                    c         = Misc.findClass(className);
-                } catch(ClassNotFoundException cnfe) {
-                    className = className.replace("repository.","repository.harvester.");
-                    c         = Misc.findClass(className);
+                    c = Misc.findClass(className);
+                } catch (ClassNotFoundException cnfe) {
+                    className = className.replace("repository.",
+                            "repository.harvester.");
+                    c = Misc.findClass(className);
                 }
 
 
@@ -211,8 +214,7 @@ public class HarvesterManager extends RepositoryManager {
                         harvesterMap.put(harvester.getId(), harvester);
                     }
                 } catch (Exception exc) {
-                    logError("Error loading harvester file:"
-                                             + file, exc);
+                    logError("Error loading harvester file:" + file, exc);
                 }
             }
         } catch (Exception exc) {
@@ -309,13 +311,11 @@ public class HarvesterManager extends RepositoryManager {
                 Misc.newList(
                     new TwoFacedObject(
                         "Local Files",
-                        "ucar.unidata.repository.harvester.PatternHarvester"), 
-                    new TwoFacedObject(
-                                       "URL",
-                                       "ucar.unidata.repository.harvester.WebHarvester"),
-                    new TwoFacedObject(
-                            "Make groups from directory tree",
-                            "ucar.unidata.repository.harvester.DirectoryHarvester")));
+                        "ucar.unidata.repository.harvester.PatternHarvester"), new TwoFacedObject(
+                            "URL",
+                            "ucar.unidata.repository.harvester.WebHarvester"), new TwoFacedObject(
+                                "Make groups from directory tree",
+                                "ucar.unidata.repository.harvester.DirectoryHarvester")));
         sb.append(HtmlUtil.formEntry(msgLabel("Type"), typeInput));
         sb.append(HtmlUtil.formEntry("",
                                      HtmlUtil.submit(msg("Create"))
@@ -432,12 +432,13 @@ public class HarvesterManager extends RepositoryManager {
 
 
             String extra = harvester.getExtraInfo();
-            if(extra!=null && extra.length()>0) {
-                extra = HtmlUtil.makeShowHideBlock(msg("Information"),extra,false);
+            if ((extra != null) && (extra.length() > 0)) {
+                extra = HtmlUtil.makeShowHideBlock(msg("Information"), extra,
+                        false);
             }
             sb.append(HtmlUtil.table(new Object[] { formSB,
                     HtmlUtil.br() + harvester.getRunLink(request, true)
-                    +extra }));
+                    + extra }));
             sb.append(buttons);
         }
         sb.append(HtmlUtil.formClose());
@@ -536,11 +537,11 @@ public class HarvesterManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processImportCatalog(Request request) throws Exception {
-        Group        group    = getEntryManager().findGroup(request);
-        boolean      recurse  = request.get(ARG_RECURSE, false);
+        Group        group       = getEntryManager().findGroup(request);
+        boolean      recurse     = request.get(ARG_RECURSE, false);
         boolean      addMetadata = request.get(ATTR_ADDMETADATA, false);
-        boolean      download = request.get(ARG_RESOURCE_DOWNLOAD, false);
-        StringBuffer sb       = new StringBuffer();
+        boolean      download    = request.get(ARG_RESOURCE_DOWNLOAD, false);
+        StringBuffer sb          = new StringBuffer();
         //        sb.append(getEntryManager().makeEntryHeader(request, group));
         sb.append("<p>");
         String catalog = request.getString(ARG_CATALOG, "").trim();

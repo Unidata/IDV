@@ -27,9 +27,9 @@ import ucar.unidata.sql.Clause;
 
 
 import ucar.unidata.sql.SqlUtil;
-import ucar.unidata.util.DateUtil;
 
 import ucar.unidata.util.Cache;
+import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
@@ -92,7 +92,9 @@ public class SessionManager extends RepositoryManager {
     private List ipUserList = new ArrayList();
 
 
-    private Cache<Object,Object> sessionExtra = new Cache<Object,Object>(5000);
+    /** _more_ */
+    private Cache<Object, Object> sessionExtra = new Cache<Object,
+                                                     Object>(5000);
 
 
     /**
@@ -119,18 +121,38 @@ public class SessionManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param value _more_
+     *
+     * @return _more_
+     */
     public String putSessionExtra(Object value) {
-        String id = "${" + getRepository().getGUID()+"}";
-        putSessionExtra(id,value);
+        String id = "${" + getRepository().getGUID() + "}";
+        putSessionExtra(id, value);
         return id;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param value _more_
+     */
     public void putSessionExtra(Object key, Object value) {
-        sessionExtra.put(key,value);
+        sessionExtra.put(key, value);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     public Object getSessionExtra(Object key) {
         return sessionExtra.get(key);
     }
@@ -586,15 +608,13 @@ public class SessionManager extends RepositoryManager {
                     HtmlUtil.bold(msg("User")), HtmlUtil.bold(msg("Since")),
                     HtmlUtil.bold(msg("Last Activity")))));
         for (Session session : sessions) {
-            String url = request.url(getRepositoryBase().URL_USER_LIST,ARG_REMOVESESSIONID, session.getId());
-            sessionHtml.append(
-                HtmlUtil.row(
-                    HtmlUtil.cols(
-                                  HtmlUtil.href(url,HtmlUtil.img(iconUrl(ICON_DELETE)))+
-                                   " " +
-                        session.user.getLabel(),
-                        formatDate(request, session.createDate),
-                        formatDate(request, session.getLastActivity()))));
+            String url = request.url(getRepositoryBase().URL_USER_LIST,
+                                     ARG_REMOVESESSIONID, session.getId());
+            sessionHtml.append(HtmlUtil.row(HtmlUtil.cols(HtmlUtil.href(url,
+                    HtmlUtil.img(iconUrl(ICON_DELETE))) + " "
+                        + session.user.getLabel(), formatDate(request,
+                            session.createDate), formatDate(request,
+                                session.getLastActivity()))));
         }
         sessionHtml.append(HtmlUtil.formTableClose());
         return sessionHtml;

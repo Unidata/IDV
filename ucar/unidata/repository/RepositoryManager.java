@@ -21,11 +21,12 @@
  */
 
 package ucar.unidata.repository;
-import ucar.unidata.repository.metadata.*;
 
 
 import org.w3c.dom.*;
+
 import ucar.unidata.repository.harvester.*;
+import ucar.unidata.repository.metadata.*;
 
 
 
@@ -128,6 +129,12 @@ public class RepositoryManager implements RepositorySource, Constants,
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param message _more_
+     */
     public void fatalError(Request request, String message) {
         throw new IllegalArgumentException(message);
     }
@@ -335,8 +342,18 @@ public class RepositoryManager implements RepositorySource, Constants,
         return getRepository().formatDate(request, d);
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param d _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public String formatDate(Request request, Date d, Entry entry) {
-        return getRepository().formatDate(request, d,getEntryManager().getTimezone(entry));
+        return getRepository().formatDate(
+            request, d, getEntryManager().getTimezone(entry));
     }
 
 
@@ -353,8 +370,18 @@ public class RepositoryManager implements RepositorySource, Constants,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param ms _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     public String formatDate(Request request, long ms, Entry entry) {
-        return getRepository().formatDate(request, ms,getEntryManager().getTimezone(entry));
+        return getRepository().formatDate(
+            request, ms, getEntryManager().getTimezone(entry));
     }
 
     /**
@@ -367,6 +394,11 @@ public class RepositoryManager implements RepositorySource, Constants,
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public RegistryManager getRegistryManager() {
         return repository.getRegistryManager();
     }
@@ -435,6 +467,11 @@ public class RepositoryManager implements RepositorySource, Constants,
         return repository.getSessionManager();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public LogManager getLogManager() {
         return repository.getLogManager();
     }
@@ -466,10 +503,20 @@ public class RepositoryManager implements RepositorySource, Constants,
         return repository.getEntryManager();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public SearchManager getSearchManager() {
         return repository.getSearchManager();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public AssociationManager getAssociationManager() {
         return repository.getAssociationManager();
     }

@@ -21,9 +21,11 @@
  */
 
 package ucar.unidata.repository.harvester;
-import ucar.unidata.repository.*;
+
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -177,7 +179,7 @@ public class DirectoryHarvester extends Harvester {
         sb.append(
             RepositoryManager.tableSubHeader("Create new groups under"));
 
-        addBaseGroupSelect(ATTR_BASEGROUP,sb);
+        addBaseGroupSelect(ATTR_BASEGROUP, sb);
 
 
 
@@ -196,7 +198,7 @@ public class DirectoryHarvester extends Harvester {
             return;
         }
         Group baseGroup = getBaseGroup();
-        if(baseGroup == null) {
+        if (baseGroup == null) {
             baseGroup = getEntryManager().getTopGroup();
         }
         walkTree(rootDir, baseGroup);

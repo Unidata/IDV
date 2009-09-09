@@ -21,6 +21,7 @@
 
 package ucar.unidata.repository.metadata;
 
+
 import org.w3c.dom.*;
 
 
@@ -62,29 +63,76 @@ import java.util.List;
 public class DifMetadataHandler extends MetadataHandler {
 
     /** _more_ */
-    public static final String TYPE_ENTRY_TITLE="dif.entry_title";
-    public static final String TYPE_DATA_SET_CITATION="dif.data_set_citation";
-    public static final String TYPE_PERSONNEL="dif.personnel";
-    public static final String TYPE_PARAMETERS="dif.parameters";
-    public static final String TYPE_ISO_TOPIC_CATEGORY="dif.iso_topic_category";
-    public static final String TYPE_KEYWORD="dif.keyword";
-    public static final String TYPE_DATA_SET_PROGRESS="dif.data_set_progress";
-    public static final String TYPE_LOCATION="dif.location";
-    public static final String TYPE_QUALITY="dif.quality";
-    public static final String TYPE_DATA_SET_LANGUAGE="dif.data_set_language";
-    public static final String TYPE_ORIGINATING_CENTER="dif.originating_center";
-    public static final String TYPE_DATA_CENTER="dif.data_center";
-    public static final String TYPE_DISTRIBUTION="dif.distribution";
-    public static final String TYPE_REFERENCE="dif.reference";
-    public static final String TYPE_SUMMARY="dif.summary";
-    public static final String TYPE_RELATED_URL="dif.related_url";
-    public static final String TYPE_METADATA_NAME="dif.metadata_name";
-    public static final String TYPE_METADATA_VERSION="dif.metadata_version";
-    public static final String TYPE_="dif.";
+    public static final String TYPE_ENTRY_TITLE = "dif.entry_title";
+
+    /** _more_ */
+    public static final String TYPE_DATA_SET_CITATION =
+        "dif.data_set_citation";
+
+    /** _more_ */
+    public static final String TYPE_PERSONNEL = "dif.personnel";
+
+    /** _more_ */
+    public static final String TYPE_PARAMETERS = "dif.parameters";
+
+    /** _more_ */
+    public static final String TYPE_ISO_TOPIC_CATEGORY =
+        "dif.iso_topic_category";
+
+    /** _more_ */
+    public static final String TYPE_KEYWORD = "dif.keyword";
+
+    /** _more_ */
+    public static final String TYPE_DATA_SET_PROGRESS =
+        "dif.data_set_progress";
+
+    /** _more_ */
+    public static final String TYPE_LOCATION = "dif.location";
+
+    /** _more_ */
+    public static final String TYPE_QUALITY = "dif.quality";
+
+    /** _more_ */
+    public static final String TYPE_DATA_SET_LANGUAGE =
+        "dif.data_set_language";
+
+    /** _more_ */
+    public static final String TYPE_ORIGINATING_CENTER =
+        "dif.originating_center";
+
+    /** _more_ */
+    public static final String TYPE_DATA_CENTER = "dif.data_center";
+
+    /** _more_ */
+    public static final String TYPE_DISTRIBUTION = "dif.distribution";
+
+    /** _more_ */
+    public static final String TYPE_REFERENCE = "dif.reference";
+
+    /** _more_ */
+    public static final String TYPE_SUMMARY = "dif.summary";
+
+    /** _more_ */
+    public static final String TYPE_RELATED_URL = "dif.related_url";
+
+    /** _more_ */
+    public static final String TYPE_METADATA_NAME = "dif.metadata_name";
+
+    /** _more_ */
+    public static final String TYPE_METADATA_VERSION = "dif.metadata_version";
+
+    /** _more_ */
+    public static final String TYPE_ = "dif.";
 
 
-    public DifMetadataHandler(Repository repository)
-            throws Exception {
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     *
+     * @throws Exception _more_
+     */
+    public DifMetadataHandler(Repository repository) throws Exception {
         super(repository);
     }
 

@@ -68,7 +68,7 @@ import java.util.Properties;
  */
 public class WikiPageTypeHandler extends GenericTypeHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static String ASSOC_WIKILINK = "wikilink";
 
 
@@ -139,10 +139,13 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
      *
      * @param request _more_
      * @param entry _more_
+     * @param parent _more_
+     * @param newEntry _more_
      *
      * @throws Exception _more_
      */
-    public void initializeEntry(Request request, Entry entry,Group parent,boolean newEntry)
+    public void initializeEntry(Request request, Entry entry, Group parent,
+                                boolean newEntry)
             throws Exception {
         Object[] values       = entry.getValues();
         String   originalText = null;
@@ -150,7 +153,7 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
             originalText = (String) values[0];
         }
         boolean wasNew = (values == null);
-        super.initializeEntry(request, entry,parent,newEntry);
+        super.initializeEntry(request, entry, parent, newEntry);
         String newText = (String) entry.getValues()[0];
         if ((originalText == null) || !Misc.equals(originalText, newText)) {
             String desc = "";
@@ -192,7 +195,10 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
             for (String cat : (List<String>) categories) {
                 Metadata metadata = new Metadata(getRepository().getGUID(),
                                         entry.getId(), "wikicategory", false,
-                                        cat, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,Metadata.DFLT_EXTRA);
+                                        cat, Metadata.DFLT_ATTR,
+                                        Metadata.DFLT_ATTR,
+                                        Metadata.DFLT_ATTR,
+                                        Metadata.DFLT_EXTRA);
                 //                getMetadataManager().insertMetadata(metadata);
                 metadataList.add(metadata);
             }
@@ -229,7 +235,8 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
             for (Association newAssociation : (List<Association>) new ArrayList(
                     newAssociations)) {
                 if ( !associations.contains(newAssociation)) {
-                    getAssociationManager().addAssociation(request, newAssociation);
+                    getAssociationManager().addAssociation(request,
+                            newAssociation);
                 }
             }
 

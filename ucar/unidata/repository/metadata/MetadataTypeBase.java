@@ -19,12 +19,12 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository.metadata;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.repository.data.ThreddsMetadataHandler;
 
@@ -70,10 +70,13 @@ public class MetadataTypeBase extends RepositoryManager {
     /** _more_ */
     public static final String TAG_TEMPLATE = "template";
 
+    /** _more_ */
     public static final String ATTR_FILE = "file";
 
+    /** _more_ */
     public static final String ATTR_TAG = "tag";
 
+    /** _more_ */
     public static final String ATTR_TYPE = "type";
 
 
@@ -92,9 +95,10 @@ public class MetadataTypeBase extends RepositoryManager {
     /** _more_ */
     public static final String TEMPLATETYPE_THREDDS = "thredds";
 
+    /** _more_ */
     public static final String TEMPLATETYPE_DIF = "dif";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TEMPLATETYPE_HTML = "html";
 
     /** _more_ */
@@ -105,27 +109,29 @@ public class MetadataTypeBase extends RepositoryManager {
 
 
     /** _more_ */
-    List<MetadataElement> children= new ArrayList<MetadataElement>();
+    List<MetadataElement> children = new ArrayList<MetadataElement>();
 
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, String> templates = new Hashtable<String,
                                                       String>();
 
 
+    /** _more_ */
     MetadataHandler handler;
 
     /** _more_ */
     private boolean searchable = false;
 
-    private Hashtable<String,String> tags = new Hashtable<String,String>();
+    /** _more_ */
+    private Hashtable<String, String> tags = new Hashtable<String, String>();
 
 
     /**
      * _more_
      *
-     * @param type _more_
-     * @param name _more_
+     *
+     * @param handler _more_
      */
     public MetadataTypeBase(MetadataHandler handler) {
         super(handler.getRepository());
@@ -161,10 +167,19 @@ public class MetadataTypeBase extends RepositoryManager {
     }
 
 
-    protected void checkFileXml(String templateType, 
-                                Entry entry,
-                                Metadata metadata,
-                                Element parent) throws Exception {
+    /**
+     * _more_
+     *
+     * @param templateType _more_
+     * @param entry _more_
+     * @param metadata _more_
+     * @param parent _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void checkFileXml(String templateType, Entry entry,
+                                Metadata metadata, Element parent)
+            throws Exception {
         for (MetadataElement element : getChildren()) {
             if ( !element.getDataType().equals(element.TYPE_FILE)) {
                 continue;
@@ -173,8 +188,7 @@ public class MetadataTypeBase extends RepositoryManager {
             if (f == null) {
                 continue;
             }
-            String tail =
-                getStorageManager().getFileTail(f.toString());
+            String tail = getStorageManager().getFileTail(f.toString());
             String path =
                 handler.getRepository().getMetadataManager().URL_METADATA_VIEW
                     .getFullUrl("/" + tail);
@@ -182,38 +196,49 @@ public class MetadataTypeBase extends RepositoryManager {
                                       element.getIndex() + "", ARG_ENTRYID,
                                       metadata.getEntryId(), ARG_METADATA_ID,
                                       metadata.getId());
-            if(templateType.equals(TEMPLATETYPE_THREDDS)) {
+            if (templateType.equals(TEMPLATETYPE_THREDDS)) {
                 XmlUtil.create(
-                               parent.getOwnerDocument(),
-                               ThreddsMetadataHandler.getTag(
-                                                             ThreddsMetadataHandler.TYPE_PROPERTY), parent,
-                               new String[] { ThreddsMetadataHandler.ATTR_NAME,
-                                              (element.getThumbnail()
-                                               ? "thumbnail"
-                                               : "attachment"), ThreddsMetadataHandler
-                                              .ATTR_VALUE, url });
+                    parent.getOwnerDocument(),
+                    ThreddsMetadataHandler.getTag(
+                        ThreddsMetadataHandler.TYPE_PROPERTY), parent,
+                            new String[] { ThreddsMetadataHandler.ATTR_NAME,
+                                           (element.getThumbnail()
+                                            ? "thumbnail"
+                                            : "attachment"), ThreddsMetadataHandler
+                                            .ATTR_VALUE, url });
             }
         }
     }
 
 
 
-    public String applyTemplate(String templateType,
-                                Entry entry,
-                                Metadata metadata, Element parent) throws Exception {
-        checkFileXml(templateType,  entry,
-                     metadata,      parent);
+    /**
+     * _more_
+     *
+     * @param templateType _more_
+     * @param entry _more_
+     * @param metadata _more_
+     * @param parent _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String applyTemplate(String templateType, Entry entry,
+                                Metadata metadata, Element parent)
+            throws Exception {
+        checkFileXml(templateType, entry, metadata, parent);
 
         String template = getTemplate(templateType);
         if ((template == null) || (template.length() == 0)) {
             return null;
         }
-        template = template.replace("${root}",
-                                    getRepository().getUrlBase());
+        template = template.replace("${root}", getRepository().getUrlBase());
 
         for (MetadataElement element : getChildren()) {
-            String value = element.getValueForXml(templateType, entry, metadata,
-                                                  metadata.getAttr(element.getIndex()), parent);
+            String value = element.getValueForXml(templateType, entry,
+                               metadata,
+                               metadata.getAttr(element.getIndex()), parent);
 
             template = applyMacros(template, element, value);
         }
@@ -221,34 +246,40 @@ public class MetadataTypeBase extends RepositoryManager {
     }
 
 
-    public String applyMacros(String template,
-                              MetadataElement element,
+    /**
+     * _more_
+     *
+     * @param template _more_
+     * @param element _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
+    public String applyMacros(String template, MetadataElement element,
                               String value) {
-        if(value == null) {
+        if (value == null) {
             value = "";
         }
         value = XmlUtil.encodeString(value);
-        String label   = element.getLabel(value);
-        String name = element.getName();
-        String []keys = {"attr" + element.getIndex(),
-                         name,
-                         name.toLowerCase(),
-                         name.replace(" ","_"),
-                         name.toLowerCase().replace(" ","_"),
-                         element.getId()};
-        for(String key: keys) {
-            if(key==null) continue;
+        String   label = element.getLabel(value);
+        String   name  = element.getName();
+        String[] keys  = {
+            "attr" + element.getIndex(), name, name.toLowerCase(),
+            name.replace(" ", "_"), name.toLowerCase().replace(" ", "_"),
+            element.getId()
+        };
+        for (String key : keys) {
+            if (key == null) {
+                continue;
+            }
             //                System.err.println("key: " + key);
-            template = template.replace("${" + key + "}",
-                                        value);
-            template = template.replace("${" + key + ".label}",
-                                        label);
+            template = template.replace("${" + key + "}", value);
+            template = template.replace("${" + key + ".label}", label);
             template = template.replace("${" + key + ".cdata}",
-                                        "[CDATA[" + value
-                                        + "]]");
+                                        "[CDATA[" + value + "]]");
         }
         template = template.replaceAll("\r\n\r\n", "<p>");
-        template = template.replace("\n\n","<p>");
+        template = template.replace("\n\n", "<p>");
         return template;
     }
 
@@ -262,24 +293,36 @@ public class MetadataTypeBase extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param what _more_
+     *
+     * @return _more_
+     */
     public String getTag(String what) {
-        return tags.get(what+".tag");
+        return tags.get(what + ".tag");
     }
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     *
+     * @throws Exception _more_
+     */
     public void init(Element node) throws Exception {
-        setName(XmlUtil.getAttribute(node,
-                                     ATTR_NAME, ""));
-        setShowInHtml(XmlUtil.getAttribute(node,
-                                           ATTR_SHOWINHTML, true));
-        setSearchable(XmlUtil.getAttributeFromTree(node,
-                                                   ATTR_SEARCHABLE, false));
+        setName(XmlUtil.getAttribute(node, ATTR_NAME, ""));
+        setShowInHtml(XmlUtil.getAttribute(node, ATTR_SHOWINHTML, true));
+        setSearchable(XmlUtil.getAttributeFromTree(node, ATTR_SEARCHABLE,
+                false));
 
-        NamedNodeMap nnm     = node.getAttributes();
+        NamedNodeMap nnm = node.getAttributes();
         if (nnm != null) {
             for (int i = 0; i < nnm.getLength(); i++) {
-                Attr attr = (Attr) nnm.item(i);
-                String attrName=  attr.getNodeName();
-                if(attrName.endsWith(".tag")) {
+                Attr   attr     = (Attr) nnm.item(i);
+                String attrName = attr.getNodeName();
+                if (attrName.endsWith(".tag")) {
                     tags.put(attrName, attr.getNodeValue());
                 }
             }
@@ -290,36 +333,48 @@ public class MetadataTypeBase extends RepositoryManager {
             Element childNode = (Element) children.item(i);
             if (childNode.getTagName().equals(TAG_TEMPLATE)) {
                 String templateType = XmlUtil.getAttribute(childNode,
-                                                           ATTR_TYPE);
-                if(XmlUtil.hasAttribute(childNode, ATTR_FILE)) {
-                    templates.put(templateType, 
-                                  getStorageManager().readSystemResource(XmlUtil.getAttribute(childNode,ATTR_FILE)));
+                                          ATTR_TYPE);
+                if (XmlUtil.hasAttribute(childNode, ATTR_FILE)) {
+                    templates.put(
+                        templateType,
+                        getStorageManager().readSystemResource(
+                            XmlUtil.getAttribute(childNode, ATTR_FILE)));
                 } else {
-                    templates.put(templateType, XmlUtil.getChildText(childNode));
+                    templates.put(templateType,
+                                  XmlUtil.getChildText(childNode));
                 }
-            } else if (childNode.getTagName().equals(TAG_ELEMENT)) {
-            } else {
-                logError("Unknown metadata xml tag:" + childNode.getTagName(),null);
+            } else if (childNode.getTagName().equals(TAG_ELEMENT)) {}
+            else {
+                logError("Unknown metadata xml tag:"
+                         + childNode.getTagName(), null);
             }
         }
 
         List childrenElements = XmlUtil.findChildren(node, TAG_ELEMENT);
-        int lastIndex = 0;
+        int  lastIndex        = 0;
         for (int j = 0; j < childrenElements.size(); j++) {
             Element elementNode = (Element) childrenElements.get(j);
-            int index = lastIndex+1;
-            if(XmlUtil.hasAttribute(elementNode, MetadataElement.ATTR_INDEX)) {
-                index = XmlUtil.getAttribute(elementNode, MetadataElement.ATTR_INDEX, index);
+            int     index       = lastIndex + 1;
+            if (XmlUtil.hasAttribute(elementNode,
+                                     MetadataElement.ATTR_INDEX)) {
+                index = XmlUtil.getAttribute(elementNode,
+                                             MetadataElement.ATTR_INDEX,
+                                             index);
             }
             lastIndex = index;
-            MetadataElement element =
-                new MetadataElement(getHandler(), this, lastIndex, elementNode);
+            MetadataElement element = new MetadataElement(getHandler(), this,
+                                          lastIndex, elementNode);
             addElement(element);
         }
 
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<MetadataElement> getChildren() {
         return children;
     }
@@ -366,8 +421,7 @@ public class MetadataTypeBase extends RepositoryManager {
                              element.getIndex() + "", ARG_ENTRYID,
                              metadata.getEntryId(), ARG_METADATA_ID,
                              metadata.getId(), ARG_THUMBNAIL,
-                             "" + forLink), msg("Click to enlarge"),
-                                            extra);
+                             "" + forLink), msg("Click to enlarge"), extra);
 
             if (forLink) {
                 String bigimg = HtmlUtil.img(HtmlUtil.url(path, ARG_ELEMENT,
@@ -391,8 +445,7 @@ public class MetadataTypeBase extends RepositoryManager {
             }
             return img;
         } else if (f.exists()) {
-            String name =
-                getStorageManager().getFileTail(f.getName());
+            String name = getStorageManager().getFileTail(f.getName());
             return HtmlUtil.href(HtmlUtil.url(path, ARG_ELEMENT,
                     element.getIndex() + "", ARG_ENTRYID,
                     metadata.getEntryId(), ARG_METADATA_ID,
@@ -412,7 +465,7 @@ public class MetadataTypeBase extends RepositoryManager {
      * @return _more_
      */
     public File getFile(Entry entry, Metadata metadata,
-                         MetadataElement element) {
+                        MetadataElement element) {
         File f;
         if ( !entry.getIsLocalFile()) {
             f = new File(

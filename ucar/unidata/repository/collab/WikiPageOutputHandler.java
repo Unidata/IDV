@@ -20,13 +20,14 @@
  */
 
 package ucar.unidata.repository.collab;
-import ucar.unidata.repository.output.*;
+
 
 import org.incava.util.diff.*;
 
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.output.*;
 import ucar.unidata.util.HtmlUtil;
 
 
@@ -104,8 +105,7 @@ public class WikiPageOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
 
         if (state.entry == null) {
@@ -152,9 +152,9 @@ public class WikiPageOutputHandler extends OutputHandler {
                     "Could not find wiki history");
             }
             wikiText = wph.getText();
-            header = getRepository().showDialogNote(
-                msgLabel("Text from version")
-                + getRepository().formatDate(wph.getDate()));
+            header =
+                getRepository().showDialogNote(msgLabel("Text from version")
+                    + getRepository().formatDate(wph.getDate()));
         } else {
             Object[] values = entry.getValues();
             if ((values != null) && (values.length > 0)
@@ -365,8 +365,7 @@ public class WikiPageOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public static void main(String[] args) throws Exception {
-    }
+    public static void main(String[] args) throws Exception {}
 
 
     /**

@@ -20,10 +20,11 @@
  */
 
 package ucar.unidata.repository.output;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -108,6 +109,13 @@ public class ZipOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     public AuthorizationMethod getAuthorizationMethod(Request request) {
         return AuthorizationMethod.AUTH_HTTP;
     }
@@ -122,8 +130,7 @@ public class ZipOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
         if (state.entry != null) {
             if (getAccessManager().canDownload(request, state.entry)) {
@@ -171,7 +178,7 @@ public class ZipOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputEntry(Request request, Entry entry) throws Exception {
-        List<Entry>entries = new ArrayList<Entry>();
+        List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
         return toZip(request, entries);
     }
@@ -230,21 +237,22 @@ public class ZipOutputHandler extends OutputHandler {
     protected Result toZip(Request request, List<Entry> entries)
             throws Exception {
         OutputStream os;
-        boolean doingFile = false;
+        boolean      doingFile = false;
 
-        File tmpFile = null;
-        if(request.getHttpServletResponse() !=null) {
+        File         tmpFile   = null;
+        if (request.getHttpServletResponse() != null) {
             os = request.getHttpServletResponse().getOutputStream();
-            request.getHttpServletResponse().setContentType(getMimeType(OUTPUT_ZIP));
+            request.getHttpServletResponse().setContentType(
+                getMimeType(OUTPUT_ZIP));
         } else {
-            tmpFile =
-                getRepository().getStorageManager().getTmpFile(request, ".zip");
-            os  = getStorageManager().getFileOutputStream(tmpFile);
+            tmpFile = getRepository().getStorageManager().getTmpFile(request,
+                    ".zip");
+            os        = getStorageManager().getFileOutputStream(tmpFile);
             doingFile = true;
         }
 
-        ZipOutputStream  zos  = new ZipOutputStream(os);
-        Hashtable        seen = new Hashtable();
+        ZipOutputStream zos  = new ZipOutputStream(os);
+        Hashtable       seen = new Hashtable();
         for (Entry entry : entries) {
             if ( !getAccessManager().canDownload(request, entry)) {
                 continue;
@@ -257,16 +265,18 @@ public class ZipOutputHandler extends OutputHandler {
             }
             seen.put(name, name);
             zos.putNextEntry(new ZipEntry(name));
-            InputStream fileInputStream = getStorageManager().getFileInputStream(path);
-            IOUtil.writeTo(fileInputStream,zos);
+            InputStream fileInputStream =
+                getStorageManager().getFileInputStream(path);
+            IOUtil.writeTo(fileInputStream, zos);
             fileInputStream.close();
             zos.closeEntry();
         }
         zos.close();
-        if(doingFile) {
+        if (doingFile) {
             os.close();
-            return new Result("", getStorageManager().getFileInputStream(tmpFile),
-                              getMimeType(OUTPUT_ZIP));
+            return new Result(
+                "", getStorageManager().getFileInputStream(tmpFile),
+                getMimeType(OUTPUT_ZIP));
 
         }
         Result result = new Result();

@@ -20,10 +20,11 @@
  */
 
 package ucar.unidata.repository.output;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.sql.*;
 
@@ -117,8 +118,7 @@ public class GraphOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
         if (state.getEntry() != null) {
             links.add(makeLink(request, state.getEntry(), OUTPUT_GRAPH));
@@ -146,13 +146,11 @@ public class GraphOutputHandler extends OutputHandler {
                    ? NODETYPE_GROUP
                    : NODETYPE_ENTRY;
         }
-        String html =
-            StringUtil.replace(graphAppletTemplate, "${id}",
-                               HtmlUtil.urlEncode(entry.getId()));
+        String html = StringUtil.replace(graphAppletTemplate, "${id}",
+                                         HtmlUtil.urlEncode(entry.getId()));
         html = StringUtil.replace(html, "${root}",
                                   getRepository().getUrlBase());
-        html = StringUtil.replace(html, "${type}",
-                                  HtmlUtil.urlEncode(type));
+        html = StringUtil.replace(html, "${type}", HtmlUtil.urlEncode(type));
         StringBuffer sb = new StringBuffer();
         sb.append(html);
         Result result = new Result(msg("Graph"), sb);

@@ -181,12 +181,15 @@ public class ReportTypeHandler extends TypeHandler {
      *
      * @param request _more_
      * @param entry _more_
+     * @param parent _more_
+     * @param newEntry _more_
      *
      * @throws Exception _more_
      */
-    public void initializeEntry(Request request, Entry entry,Group parent, boolean newEntry)
+    public void initializeEntry(Request request, Entry entry, Group parent,
+                                boolean newEntry)
             throws Exception {
-        super.initializeEntry(request, entry,parent,newEntry);
+        super.initializeEntry(request, entry, parent, newEntry);
         Object[] values = new Object[1];
         entry.setValues(values);
     }

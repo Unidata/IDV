@@ -62,6 +62,7 @@ import java.util.Properties;
 import javax.mail.Address;
 import javax.mail.internet.InternetAddress;
 
+
 /**
  *
  *
@@ -70,11 +71,22 @@ import javax.mail.internet.InternetAddress;
  */
 public class EmailListTypeHandler extends GenericTypeHandler {
 
+    /** _more_ */
     public static String ARG_EMAIL_SHOWFORM = "email.showform";
-    public static String ARG_EMAIL_FROMADDRESS = "email.fromadress";   
+
+    /** _more_ */
+    public static String ARG_EMAIL_FROMADDRESS = "email.fromadress";
+
+    /** _more_ */
     public static String ARG_EMAIL_FROMNAME = "email.fromname";
+
+    /** _more_ */
     public static String ARG_EMAIL_SUBJECT = "email.subject";
+
+    /** _more_ */
     public static String ARG_EMAIL_MESSAGE = "email.message";
+
+    /** _more_ */
     public static String ARG_EMAIL_BCC = "email.bcc";
 
 
@@ -96,44 +108,72 @@ public class EmailListTypeHandler extends GenericTypeHandler {
     }
 
 
-    public Result showForm(Request request, Entry entry)
-            throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result showForm(Request request, Entry entry) throws Exception {
         StringBuffer sb = new StringBuffer();
 
         sb.append(request.formPost(getRepository().URL_ENTRY_SHOW));
         sb.append(HtmlUtil.submit(msg("Send Message")));
         sb.append(HtmlUtil.formTable());
-        sb.append(HtmlUtil.hidden(ARG_ENTRYID,entry.getId()));
+        sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
         sb.append(HtmlUtil.formEntry(msgLabel("From name"),
-                                     HtmlUtil.input(ARG_EMAIL_FROMNAME,request.getUser().getName(),HtmlUtil.SIZE_40)));
+                                     HtmlUtil.input(ARG_EMAIL_FROMNAME,
+                                         request.getUser().getName(),
+                                         HtmlUtil.SIZE_40)));
         sb.append(HtmlUtil.formEntry(msgLabel("From email"),
-                                     HtmlUtil.input(ARG_EMAIL_FROMADDRESS,request.getUser().getEmail(),HtmlUtil.SIZE_40)));
-        String bcc = HtmlUtil.checkbox(ARG_EMAIL_BCC,"true",false) +HtmlUtil.space(1) +msg("Send as BCC");
+                                     HtmlUtil.input(ARG_EMAIL_FROMADDRESS,
+                                         request.getUser().getEmail(),
+                                         HtmlUtil.SIZE_40)));
+        String bcc = HtmlUtil.checkbox(ARG_EMAIL_BCC, "true", false)
+                     + HtmlUtil.space(1) + msg("Send as BCC");
 
 
-        sb.append(HtmlUtil.formEntry(msgLabel("Subject"),
-                                     HtmlUtil.input(ARG_EMAIL_SUBJECT,"",HtmlUtil.SIZE_40)+HtmlUtil.space(2)+bcc));
+        sb.append(
+            HtmlUtil.formEntry(
+                msgLabel("Subject"),
+                HtmlUtil.input(ARG_EMAIL_SUBJECT, "", HtmlUtil.SIZE_40)
+                + HtmlUtil.space(2) + bcc));
         sb.append(HtmlUtil.formEntryTop(msgLabel("Message"),
-                                     HtmlUtil.textArea(ARG_EMAIL_MESSAGE,"",30,60)));
+                                        HtmlUtil.textArea(ARG_EMAIL_MESSAGE,
+                                            "", 30, 60)));
         sb.append(HtmlUtil.formTableClose());
         sb.append(HtmlUtil.submit(msg("Send Message")));
         sb.append(HtmlUtil.formClose());
 
-        return new Result("Mailing list",sb);
+        return new Result("Mailing list", sb);
     }
 
 
-    public Result sendMail(Request request, Entry entry)
-            throws Exception {
-        StringBuffer sb = new StringBuffer();
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result sendMail(Request request, Entry entry) throws Exception {
+        StringBuffer  sb = new StringBuffer();
         List<Address> to = getAddresses(entry);
-        getAdmin().sendEmail(to, 
-                    new InternetAddress(request.getString(ARG_EMAIL_FROMADDRESS,""),
-                                        request.getString(ARG_EMAIL_FROMNAME,"")),
-                    request.getString(ARG_EMAIL_SUBJECT,""),
-                    request.getString(ARG_EMAIL_MESSAGE,""),
-                    request.get(ARG_EMAIL_BCC,false),
-                    false);
+        getAdmin().sendEmail(
+            to, new InternetAddress(
+                request.getString(
+                    ARG_EMAIL_FROMADDRESS, ""), request.getString(
+                    ARG_EMAIL_FROMNAME, "")), request.getString(
+                        ARG_EMAIL_SUBJECT, ""), request.getString(
+                        ARG_EMAIL_MESSAGE, ""), request.get(
+                        ARG_EMAIL_BCC, false), false);
         sb.append(getRepository().showDialogNote(msg("Message Sent")));
         return showList(request, entry, sb);
     }
@@ -154,45 +194,66 @@ public class EmailListTypeHandler extends GenericTypeHandler {
             throws Exception {
         StringBuffer sb = new StringBuffer();
 
-        if(request.get(ARG_EMAIL_SHOWFORM,false)) {
+        if (request.get(ARG_EMAIL_SHOWFORM, false)) {
             return showForm(request, entry);
         }
 
-        if(request.exists(ARG_EMAIL_FROMNAME)) {
+        if (request.exists(ARG_EMAIL_FROMNAME)) {
             return sendMail(request, entry);
         }
 
         return showList(request, entry, sb);
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result showList(Request request, Entry entry, StringBuffer sb)
             throws Exception {
-        sb.append(HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,entry,ARG_EMAIL_SHOWFORM,"true"),msg("Send message")));
+        sb.append(
+            HtmlUtil.href(
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, entry,
+                    ARG_EMAIL_SHOWFORM, "true"), msg("Send message")));
         sb.append(HtmlUtil.formTable());
-        for(String[] tuple: getTuples(entry)) {
-            String email = HtmlUtil.href("mailto:" + tuple[0],tuple[0]);
-            if(tuple.length==1) {
+        for (String[] tuple : getTuples(entry)) {
+            String email = HtmlUtil.href("mailto:" + tuple[0], tuple[0]);
+            if (tuple.length == 1) {
                 sb.append(HtmlUtil.row(HtmlUtil.cols(email)));
             } else {
-                sb.append(HtmlUtil.row(HtmlUtil.cols(email,tuple[1])));
+                sb.append(HtmlUtil.row(HtmlUtil.cols(email, tuple[1])));
             }
         }
         sb.append(HtmlUtil.formTableClose());
-        return new Result("Mailing list",sb);
+        return new Result("Mailing list", sb);
     }
 
-    private List<String[]>  getTuples(Entry entry) {
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    private List<String[]> getTuples(Entry entry) {
         List<String[]> addresses = new ArrayList<String[]>();
-        String list = "";
-        Object[] values = entry.getValues();
-        if ((values != null) && (values.length > 0)
-            && (values[0] != null)) {
-            list = (String)values[0];
+        String         list      = "";
+        Object[]       values    = entry.getValues();
+        if ((values != null) && (values.length > 0) && (values[0] != null)) {
+            list = (String) values[0];
         }
-        for(String line: StringUtil.split(list,"\n",true,true)) {
-            String[]tuple = StringUtil.split(line,",",2);
-            if(tuple==null) {
-                addresses.add(new String[]{line});
+        for (String line : StringUtil.split(list, "\n", true, true)) {
+            String[] tuple = StringUtil.split(line, ",", 2);
+            if (tuple == null) {
+                addresses.add(new String[] { line });
             } else {
                 addresses.add(tuple);
             }
@@ -200,14 +261,23 @@ public class EmailListTypeHandler extends GenericTypeHandler {
         return addresses;
     }
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private List<Address> getAddresses(Entry entry) throws Exception {
         List<Address> addresses = new ArrayList<Address>();
-        for(String[] tuple: getTuples(entry)) {
+        for (String[] tuple : getTuples(entry)) {
             Address address;
-            if(tuple.length==1) {
-                address  = new InternetAddress(tuple[0]);
+            if (tuple.length == 1) {
+                address = new InternetAddress(tuple[0]);
             } else {
-                address  = new InternetAddress(tuple[0],tuple[1]);
+                address = new InternetAddress(tuple[0], tuple[1]);
             }
             addresses.add(address);
         }

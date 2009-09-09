@@ -65,8 +65,11 @@ public class InteractiveRepositoryClient extends RepositoryClient {
     /** _more_ */
     GroupNode treeRoot;
 
+    /** _more_ */
     String initialGroup;
-    String initialGroupName="Top";
+
+    /** _more_ */
+    String initialGroupName = "Top";
 
     /**
      * _more_
@@ -190,7 +193,9 @@ public class InteractiveRepositoryClient extends RepositoryClient {
      * _more_
      */
     private void doMakeGroupTree() {
-        treeRoot  = new GroupNode(initialGroupName, (initialGroup!=null?initialGroup:""), true, false);
+        treeRoot  = new GroupNode(initialGroupName, ((initialGroup != null)
+                ? initialGroup
+                : ""), true, false);
         treeModel = new DefaultTreeModel(treeRoot);
         groupTree = new GroupTree(treeModel);
         groupTree.setToolTipText(
@@ -228,10 +233,10 @@ public class InteractiveRepositoryClient extends RepositoryClient {
                         expanded, leaf, row, hasFocus);
                 if (value instanceof GroupNode) {
                     GroupNode node = (GroupNode) value;
-                    if(node.canDoNew || node.canDoUpload) {
-                        setForeground(Color.black);                    
+                    if (node.canDoNew || node.canDoUpload) {
+                        setForeground(Color.black);
                     } else {
-                        setForeground(Color.gray);                    
+                        setForeground(Color.gray);
                     }
 
                     if (node.canDoNew) {
@@ -385,18 +390,19 @@ public class InteractiveRepositoryClient extends RepositoryClient {
                 Element root = XmlUtil.getRoot(xml);
                 for (Element child : (List<Element>) XmlUtil.findChildren(
                         root, TAG_ENTRY)) {
-                    if(XmlUtil.getAttribute(child, ATTR_TYPE,"").equals(TYPE_GROUP)||
-                       XmlUtil.getAttribute(child, ATTR_ISGROUP,false)) {
+                    if (XmlUtil.getAttribute(child, ATTR_TYPE, "").equals(
+                            TYPE_GROUP) || XmlUtil.getAttribute(
+                            child, ATTR_ISGROUP, false)) {
                         GroupNode childNode =
-                            new GroupNode(XmlUtil.getAttribute(child, ATTR_NAME),
-                                          XmlUtil.getAttribute(child, ATTR_ID),
-                                          XmlUtil.getAttribute(child,
-                                                               ATTR_CANDONEW,
-                                                               false), XmlUtil.getAttribute(child,
-                                                                                            ATTR_CANDOUPLOAD, false));
+                            new GroupNode(XmlUtil.getAttribute(child,
+                                ATTR_NAME), XmlUtil.getAttribute(child,
+                                    ATTR_ID), XmlUtil.getAttribute(child,
+                                        ATTR_CANDONEW,
+                                        false), XmlUtil.getAttribute(child,
+                                            ATTR_CANDOUPLOAD, false));
 
                         childNode.add(
-                                      new DefaultMutableTreeNode("Please wait..."));
+                            new DefaultMutableTreeNode("Please wait..."));
                         this.add(childNode);
                     }
                 }
@@ -540,40 +546,40 @@ public class InteractiveRepositoryClient extends RepositoryClient {
     }
 
     /**
-       Set the InitialGroup property.
-
-       @param value The new value for InitialGroup
-    **/
-    public void setInitialGroup (String value) {
-	this.initialGroup = value;
+     *  Set the InitialGroup property.
+     *
+     *  @param value The new value for InitialGroup
+     */
+    public void setInitialGroup(String value) {
+        this.initialGroup = value;
     }
 
     /**
-       Get the InitialGroup property.
-
-       @return The InitialGroup
-    **/
-    public String getInitialGroup () {
-	return this.initialGroup;
+     *  Get the InitialGroup property.
+     *
+     *  @return The InitialGroup
+     */
+    public String getInitialGroup() {
+        return this.initialGroup;
     }
 
 
     /**
-       Set the InitialGroupName property.
-
-       @param value The new value for InitialGroupName
-    **/
-    public void setInitialGroupName (String value) {
-	this.initialGroupName = value;
+     *  Set the InitialGroupName property.
+     *
+     *  @param value The new value for InitialGroupName
+     */
+    public void setInitialGroupName(String value) {
+        this.initialGroupName = value;
     }
 
     /**
-       Get the InitialGroupName property.
-
-       @return The InitialGroupName
-    **/
-    public String getInitialGroupName () {
-	return this.initialGroupName;
+     *  Get the InitialGroupName property.
+     *
+     *  @return The InitialGroupName
+     */
+    public String getInitialGroupName() {
+        return this.initialGroupName;
     }
 
 

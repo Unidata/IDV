@@ -32,16 +32,20 @@ package ucar.unidata.repository;
 public interface Constants {
 
     //j--
+
     /** _more_ */
     public static final String ICON_ACCESS = "ramadda.icon.access";
 
     /** _more_ */
     public static final String ICON_ADD = "ramadda.icon.add";
 
+    /** _more_ */
     public static final String ICON_ELLIPSIS = "ramadda.icon.ellipsis";
 
+    /** _more_ */
     public static final String ICON_ROTATE = "ramadda.icon.rotate";
 
+    /** _more_ */
     public static final String ICON_ANTIROTATE = "ramadda.icon.antirotate";
 
     /** _more_ */
@@ -80,6 +84,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_COMMENTS = "ramadda.icon.comments";
 
+    /** _more_ */
     public static final String ICON_FTP = "ramadda.icon.ftp";
 
     /** _more_ */
@@ -88,7 +93,8 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_DATA = "ramadda.icon.data";
 
-    public static final String ICON_DIF =   "ramadda.icon.data";
+    /** _more_ */
+    public static final String ICON_DIF = "ramadda.icon.data";
 
     /** _more_ */
     public static final String ICON_DATEGRID = "ramadda.icon.dategrid";
@@ -108,6 +114,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_ENTRY_ADD = "ramadda.icon.entry_add";
 
+    /** _more_ */
     public static final String ICON_PUBLISH = "ramadda.icon.publish";
 
     /** _more_ */
@@ -171,6 +178,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_LCURVE = "ramadda.icon.lcurve";
 
+    /** _more_ */
     public static final String ICON_SYNTH_FILE = "ramadda.icon.synthfile";
 
     /** _more_ */
@@ -273,7 +281,9 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_WIKI = "ramadda.icon.wiki";
 
+    /** _more_ */
     public static final String ICON_XML = "ramadda.icon.xml";
+
     /** _more_ */
     public static final String ICON_ZIP = "ramadda.icon.zip";
 
@@ -281,8 +291,11 @@ public interface Constants {
 
     /** _more_ */
     public static final String ATTR_ADDMETADATA = "addmetadata";
+
+    /** _more_ */
     public static final String ATTR_ADDSHORTMETADATA = "addshortmetadata";
 
+    /** _more_ */
     public static final String ATTR_ATTR = "attr";
 
 
@@ -370,6 +383,7 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_RSS_VERSION = "version";
 
+    /** _more_ */
     public static final String ATTR_SERVER = "server";
 
     /** _more_ */
@@ -387,6 +401,7 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_TODATE = "todate";
 
+    /** _more_ */
     public static final String ATTR_CREATEDATE = "createdate";
 
     /** _more_ */
@@ -395,6 +410,7 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_TYPE = "type";
 
+    /** _more_ */
     public static final String ATTR_ISGROUP = "isgroup";
 
     /** _more_ */
@@ -404,8 +420,10 @@ public interface Constants {
     public static final String ATTR_WEST = "west";
 
 
+    /** _more_ */
     public static final String ARG_DECORATE = "decorate";
 
+    /** _more_ */
     public static final String ARG_FULLURL = "fullurl";
 
 
@@ -483,6 +501,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_AUTH_USER = "auth.user";
 
+    /** _more_ */
     public static final String ARG_BYTES = "bytes";
 
     /** _more_ */
@@ -544,6 +563,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_DELETE = "delete";
 
+    /** _more_ */
     public static final String ARG_DOFRAMES = "doframes";
 
     /** _more_ */
@@ -554,6 +574,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_EAST = "east";
+
+    /** _more_ */
     public static final String ARG_ELEMENT = "element";
 
     /** _more_ */
@@ -588,7 +610,10 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_FILE_UNZIP = "file.unzip";
-    public static final String ARG_FILE_PRESERVEDIRECTORY = "file.preservedirectoryfile";
+
+    /** _more_ */
+    public static final String ARG_FILE_PRESERVEDIRECTORY =
+        "file.preservedirectoryfile";
 
 
     /** _more_ */
@@ -666,6 +691,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_LOCALFILE = "localfile";
+
+    /** _more_ */
     public static final String ARG_LOG = "log";
 
     /** _more_ */
@@ -680,16 +707,20 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_MESSAGE = "message";
 
+    /** _more_ */
     public static final String ARG_SESSION_MESSAGE = "session.message";
 
     /** _more_ */
     public static final String ARG_METADATA_ADD = "metadata.add";
+
+    /** _more_ */
     public static final String ARG_METADATA_ADDSHORT = "metadata.addshort";
 
     /** _more_ */
     public static final String ARG_METADATA_ADDTOPARENT =
         "metadata.addtoparent";
 
+    /** _more_ */
     public static final String ARG_METADATA_ATTR = "metadata.attr";
 
 
@@ -763,6 +794,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_NAME = "name";
 
+    /** _more_ */
     public static final String ARG_NOREDIRECT = "noredirect";
 
     /** _more_ */
@@ -774,8 +806,13 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_NODETYPE = "nodetype";
 
+    /** _more_ */
     public static final String ARG_USER_MESSAGE = "usermessage";
+
+    /** _more_ */
     public static final String ARG_USER_SENDMAIL = "usersendmail";
+
+    /** _more_ */
     public static final String ARG_USER_HOME = "userhome";
 
     /** _more_ */
@@ -801,6 +838,8 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_PUBLISH = "publish";
+
+    /** _more_ */
     public static final String ARG_JUSTPUBLISH = "justpublish";
 
     /** _more_ */
@@ -842,6 +881,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SESSIONID = "sessionid";
 
+    /** _more_ */
     public static final String ARG_REMOVESESSIONID = "removesessionid";
 
     /** _more_ */
@@ -854,6 +894,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SHOWLINK = "showlink";
 
+    /** _more_ */
     public static final String ARG_SHOWTAB = "showtab";
 
     /** _more_ */
@@ -889,11 +930,13 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SUBMIT = "submit";
 
+    /** _more_ */
     public static final String ARG_SAVENEXT = "savenext";
 
     /** _more_ */
     public static final String ARG_TEMPLATE = "template";
 
+    /** _more_ */
     public static final String ARG_TARGET = "target";
 
     /** _more_ */
@@ -920,6 +963,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TYPE = "type";
 
+    /** _more_ */
     public static final String ARG_TYPE_FREEFORM = "type.freeform";
 
     /** _more_ */
@@ -933,7 +977,9 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_USER_ADMIN = "user.admin";
-    public static final String ARG_USER_ISGUEST= "user.isguest";
+
+    /** _more_ */
+    public static final String ARG_USER_ISGUEST = "user.isguest";
 
     /** _more_ */
     public static final String ARG_USER_ANSWER = "user.answer";
@@ -1105,11 +1151,17 @@ public interface Constants {
     public static final String PROP_ADMIN = "ramadda.admin";
 
 
-    public static final String PROP_REGISTRY_DEFAULTSERVER= "ramadda.registry.defaultserver";
+    /** _more_ */
+    public static final String PROP_REGISTRY_DEFAULTSERVER =
+        "ramadda.registry.defaultserver";
 
-    public static final String PROP_REGISTRY_ENABLED = "ramadda.registry.enabled";
+    /** _more_ */
+    public static final String PROP_REGISTRY_ENABLED =
+        "ramadda.registry.enabled";
 
-    public static final String PROP_REGISTRY_SERVERS = "ramadda.registry.servers";
+    /** _more_ */
+    public static final String PROP_REGISTRY_SERVERS =
+        "ramadda.registry.servers";
 
     //    public static final String PROP_CLEARINGHOUSE_ENABLED = "ramadda.clearinghouse.enabled";
 
@@ -1173,7 +1225,10 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_ENTRY_HEADER = "ramadda.entryheader";
 
-    public static final String PROP_ENTRY_BREADCRUMBS = "ramadda.entry.breadcrumbs";
+    /** _more_ */
+    public static final String PROP_ENTRY_BREADCRUMBS =
+        "ramadda.entry.breadcrumbs";
+
     /** _more_ */
     public static final String PROP_FACEBOOK_CONNECT_KEY =
         "ramadda.facebook.connect.key";
@@ -1188,10 +1243,14 @@ public interface Constants {
     public static final String PROP_HARVESTERS_ACTIVE =
         "ramadda.harvesters.active";
 
+    /** _more_ */
     public static final String PROP_LOGO_URL = "ramadda.logo.url";
+
+    /** _more_ */
     public static final String PROP_LOGO_IMAGE = "ramadda.logo.image";
 
-    public static final String PROP_HTML_HEAD ="html.head";
+    /** _more_ */
+    public static final String PROP_HTML_HEAD = "html.head";
 
     /** _more_ */
     public static final String PROP_HOSTNAME = "ramadda.hostname";
@@ -1253,11 +1312,11 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_LOCALFILEPATHS = "ramadda.localfilepaths";
 
+    /** _more_ */
     public static final String PROP_LOG_TOSTDERR = "ramadda.log.tostderr";
 
     /** _more_ */
-    public static final String PROP_METADATA =
-        "ramadda.metadata";
+    public static final String PROP_METADATA = "ramadda.metadata";
 
     /** _more_ */
     public static final String PROP_NAVLINKS = "ramadda.navlinks";
@@ -1281,6 +1340,7 @@ public interface Constants {
     public static final String PROP_REPOSITORY_NAME =
         "ramadda.repository.name";
 
+    /** _more_ */
     public static final String PROP_REPOSITORY_DESCRIPTION =
         "ramadda.repository.description";
 
@@ -1304,6 +1364,7 @@ public interface Constants {
     public static final String PROP_UPLOAD_MAXSIZEGB =
         "ramadda.upload.maxsizegb";
 
+    /** _more_ */
     public static final String PROP_CACHE_MAXSIZEGB =
         "ramadda.cache.maxsizegb";
 
@@ -1467,9 +1528,12 @@ public interface Constants {
     //j++
 
 
-    public static final String MSG_ACCESS_CHANGED =  "Access Changed";
+    /** _more_ */
+    public static final String MSG_ACCESS_CHANGED = "Access Changed";
 
-    public static final String MSG_ASSOCIATION_ADDED = "The association has been added";
+    /** _more_ */
+    public static final String MSG_ASSOCIATION_ADDED =
+        "The association has been added";
 
 
 }

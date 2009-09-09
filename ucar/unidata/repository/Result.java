@@ -87,6 +87,7 @@ public class Result {
     /** _more_ */
     private boolean cacheOk = false;
 
+    /** _more_ */
     private Date lastModified;
 
 
@@ -106,8 +107,10 @@ public class Result {
     /** _more_ */
     private AuthorizationMethod authorizationMethod;
 
-    public Result() {
-    }
+    /**
+     * _more_
+     */
+    public Result() {}
 
 
     /**
@@ -545,21 +548,21 @@ public class Result {
     }
 
     /**
-       Set the LastModified property.
-
-       @param value The new value for LastModified
-    **/
-    public void setLastModified (Date value) {
-	this.lastModified = value;
+     *  Set the LastModified property.
+     *
+     *  @param value The new value for LastModified
+     */
+    public void setLastModified(Date value) {
+        this.lastModified = value;
     }
 
     /**
-       Get the LastModified property.
-
-       @return The LastModified
-    **/
-    public Date getLastModified () {
-	return this.lastModified;
+     *  Get the LastModified property.
+     *
+     *  @return The LastModified
+     */
+    public Date getLastModified() {
+        return this.lastModified;
     }
 
 

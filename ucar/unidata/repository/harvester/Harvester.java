@@ -21,10 +21,12 @@
  */
 
 package ucar.unidata.repository.harvester;
-import ucar.unidata.repository.*;
-import ucar.unidata.repository.output.OutputHandler;
+
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
+import ucar.unidata.repository.output.OutputHandler;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -155,6 +157,7 @@ public class Harvester extends RepositoryManager {
 
 
 
+    /** _more_ */
     protected String baseGroupId = "";
 
     /** _more_ */
@@ -302,11 +305,9 @@ public class Harvester extends RepositoryManager {
         if (toDate == null) {
             toDate = fromDate;
         }
-        s = getEntryManager().replaceMacros(s, createDate,  fromDate,  toDate);
-        String[] macros = {
-            "filename", filename,
-            "fileextension",       IOUtil.getFileExtension(filename),
-        };
+        s = getEntryManager().replaceMacros(s, createDate, fromDate, toDate);
+        String[] macros = { "filename", filename, "fileextension",
+                            IOUtil.getFileExtension(filename), };
 
         for (int i = 0; i < macros.length; i += 2) {
             String macro = "${" + macros[i] + "}";
@@ -332,34 +333,67 @@ public class Harvester extends RepositoryManager {
     }
 
 
+    /** _more_ */
     private Request request;
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected Request getRequest() throws Exception {
-        if(request == null)
+        if (request == null) {
             request = new Request(getRepository(), getUser());
+        }
         return request;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Group getBaseGroup() throws Exception {
-        if(baseGroupId==null || baseGroupId.length()==0) return null;
+        if ((baseGroupId == null) || (baseGroupId.length() == 0)) {
+            return null;
+        }
         Request request = new Request(getRepository(), getUser());
-        Group g = getEntryManager().findGroup(getRequest(), baseGroupId);
-        if(g!=null) return g;
-        return  getEntryManager().findGroupFromName(baseGroupId, getUser(), false);
+        Group   g = getEntryManager().findGroup(getRequest(), baseGroupId);
+        if (g != null) {
+            return g;
+        }
+        return getEntryManager().findGroupFromName(baseGroupId, getUser(),
+                false);
     }
 
 
 
-    protected void addBaseGroupSelect(String selectId, StringBuffer sb) throws Exception {
+    /**
+     * _more_
+     *
+     * @param selectId _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void addBaseGroupSelect(String selectId, StringBuffer sb)
+            throws Exception {
         Group baseGroup = getBaseGroup();
-        String baseSelect  = OutputHandler.getGroupSelect(getRequest(), selectId);
-        sb.append(HtmlUtil.hidden(selectId+"_hidden", (baseGroup!=null?baseGroup.getId():""),
-                                  HtmlUtil.id(selectId+"_hidden")));
+        String baseSelect = OutputHandler.getGroupSelect(getRequest(),
+                                selectId);
+        sb.append(HtmlUtil.hidden(selectId + "_hidden", ((baseGroup != null)
+                ? baseGroup.getId()
+                : ""), HtmlUtil.id(selectId + "_hidden")));
         sb.append(HtmlUtil.formEntry(msgLabel("Base Group"),
-                                     HtmlUtil.disabledInput(selectId, 
-                                                            (baseGroup!=null?baseGroup.getFullName():""),
-                                                            HtmlUtil.id(selectId) +
-                                                            HtmlUtil.SIZE_60)+baseSelect));
+                                     HtmlUtil.disabledInput(selectId,
+                                         ((baseGroup != null)
+                                          ? baseGroup.getFullName()
+                                          : ""), HtmlUtil.id(selectId)
+                                          + HtmlUtil.SIZE_60) + baseSelect));
     }
 
 
@@ -379,12 +413,11 @@ public class Harvester extends RepositoryManager {
 
         groupTemplate = XmlUtil.getAttribute(element, ATTR_GROUPTEMPLATE,
                                              groupTemplate);
-        this.baseGroupId = XmlUtil.getAttribute(element, ATTR_BASEGROUP,
-                "");
+        this.baseGroupId = XmlUtil.getAttribute(element, ATTR_BASEGROUP, "");
 
-        Group baseGroup =getBaseGroup();
-        if(baseGroup!=null) {
-            baseGroupId =  baseGroup.getId();
+        Group baseGroup = getBaseGroup();
+        if (baseGroup != null) {
+            baseGroupId = baseGroup.getId();
         }
 
 
@@ -400,8 +433,8 @@ public class Harvester extends RepositoryManager {
         this.monitor = XmlUtil.getAttribute(element, ATTR_MONITOR, monitor);
         this.addMetadata = XmlUtil.getAttribute(element, ATTR_ADDMETADATA,
                 addMetadata);
-        this.addShortMetadata = XmlUtil.getAttribute(element, ATTR_ADDSHORTMETADATA,
-                addShortMetadata);
+        this.addShortMetadata = XmlUtil.getAttribute(element,
+                ATTR_ADDSHORTMETADATA, addShortMetadata);
         this.activeOnStart = XmlUtil.getAttribute(element,
                 ATTR_ACTIVEONSTART, activeOnStart);
         this.testCount = XmlUtil.getAttribute(element, ATTR_TESTCOUNT,
@@ -464,14 +497,14 @@ public class Harvester extends RepositoryManager {
 
         typeHandler = repository.getTypeHandler(request.getString(ATTR_TYPE,
                 ""));
-        activeOnStart = request.get(ATTR_ACTIVEONSTART, false);
-        testCount     = request.get(ATTR_TESTCOUNT, testCount);
-        testMode      = request.get(ATTR_TESTMODE, false);
-        monitor       = request.get(ATTR_MONITOR, false);
-        addMetadata   = request.get(ATTR_ADDMETADATA, false);
-        addShortMetadata   = request.get(ATTR_ADDSHORTMETADATA, false);
-        sleepMinutes  = request.get(ATTR_SLEEP, sleepMinutes);
-        sleepUnit     = request.getString(ATTR_SLEEPUNIT, sleepUnit);
+        activeOnStart    = request.get(ATTR_ACTIVEONSTART, false);
+        testCount        = request.get(ATTR_TESTCOUNT, testCount);
+        testMode         = request.get(ATTR_TESTMODE, false);
+        monitor          = request.get(ATTR_MONITOR, false);
+        addMetadata      = request.get(ATTR_ADDMETADATA, false);
+        addShortMetadata = request.get(ATTR_ADDSHORTMETADATA, false);
+        sleepMinutes     = request.get(ATTR_SLEEP, sleepMinutes);
+        sleepUnit        = request.getString(ATTR_SLEEPUNIT, sleepUnit);
         if (sleepUnit.equals(UNIT_HOUR)) {
             sleepMinutes = sleepMinutes * 60;
         } else if (sleepUnit.equals(UNIT_DAY)) {
@@ -481,7 +514,7 @@ public class Harvester extends RepositoryManager {
         groupTemplate = request.getUnsafeString(ATTR_GROUPTEMPLATE,
                 groupTemplate);
 
-        baseGroupId = request.getUnsafeString(ATTR_BASEGROUP +"_hidden", "");
+        baseGroupId = request.getUnsafeString(ATTR_BASEGROUP + "_hidden", "");
 
         descTemplate = request.getUnsafeString(ATTR_DESCTEMPLATE,
                 descTemplate);
@@ -624,11 +657,11 @@ public class Harvester extends RepositoryManager {
         if ((content == null) || (content.trim().length() == 0)) {
             return;
         }
-        content = content.replace("${fromdate}","${from_date}");
-        content = content.replace("${year}","${from_year}");
-        content = content.replace("${month}","${from_month}");
-        content = content.replace("${monthname}","${from_monthname}");
-        content = content.replace("${day}","${from_day}");
+        content = content.replace("${fromdate}", "${from_date}");
+        content = content.replace("${year}", "${from_year}");
+        content = content.replace("${month}", "${from_month}");
+        content = content.replace("${monthname}", "${from_monthname}");
+        content = content.replace("${day}", "${from_day}");
         Element root =
             XmlUtil.getRoot(new ByteArrayInputStream(content.getBytes()));
         init(root);
@@ -964,6 +997,7 @@ public class Harvester extends RepositoryManager {
         /** _more_ */
         String description;
 
+        /** _more_ */
         String baseGroupId;
 
         /** _more_ */
@@ -976,6 +1010,7 @@ public class Harvester extends RepositoryManager {
          * @param name _more_
          * @param description _more_
          * @param group _more_
+         * @param baseGroupId _more_
          */
         public HarvesterEntry(String url, String name, String description,
                               String group, String baseGroupId) {
@@ -983,7 +1018,7 @@ public class Harvester extends RepositoryManager {
             this.name        = name;
             this.description = description;
             this.group       = group;
-            this.baseGroupId       = baseGroupId;
+            this.baseGroupId = baseGroupId;
 
         }
 
@@ -997,7 +1032,7 @@ public class Harvester extends RepositoryManager {
             this.name = XmlUtil.getAttribute(node, ATTR_NAME, "");
             this.description = XmlUtil.getAttribute(node, ATTR_DESCRIPTION,
                     "");
-            this.group = XmlUtil.getAttribute(node, ATTR_GROUP, "");
+            this.group       = XmlUtil.getAttribute(node, ATTR_GROUP, "");
             this.baseGroupId = XmlUtil.getAttribute(node, ATTR_BASEGROUP, "");
         }
 

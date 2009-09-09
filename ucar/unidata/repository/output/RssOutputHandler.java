@@ -20,10 +20,11 @@
  */
 
 package ucar.unidata.repository.output;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.util.DateUtil;
@@ -118,7 +119,8 @@ public class RssOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_RSS_SUMMARY =
-        new OutputType("RSS Feed", "rss.summary", OutputType.TYPE_NONHTML|OutputType.TYPE_FORSEARCH,
+        new OutputType("RSS Feed", "rss.summary",
+                       OutputType.TYPE_NONHTML | OutputType.TYPE_FORSEARCH,
                        "", ICON_RSS);
 
 
@@ -150,8 +152,7 @@ public class RssOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
 
         if (state.getEntry() != null) {

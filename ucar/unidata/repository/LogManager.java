@@ -21,17 +21,21 @@
 
 package ucar.unidata.repository;
 
-import ucar.unidata.util.LogUtil;
+
 import ucar.unidata.util.HtmlUtil;
+
+import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+
+import java.io.FileNotFoundException;
+
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
-import java.io.OutputStream;
 
 /**
  *
@@ -46,6 +50,7 @@ public class LogManager extends RepositoryManager {
     private OutputStream fullLogFOS;
 
 
+    /** _more_ */
     private OutputStream runLogFOS;
 
 
@@ -57,22 +62,39 @@ public class LogManager extends RepositoryManager {
     /** _more_ */
     private List<LogEntry> log = new ArrayList<LogEntry>();
 
+    /** _more_ */
     private int requestCount = 0;
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     */
     public LogManager(Repository repository) {
         super(repository);
     }
 
 
+    /**
+     * _more_
+     */
     public void init() {
         try {
-            fullLogFOS = new FileOutputStream(getStorageManager().getFullLogFile(), true);
-            runLogFOS = new FileOutputStream(getStorageManager().getLogFile(), false);
-        } catch(Exception exc) {
-            throw new RuntimeException (exc);
+            fullLogFOS =
+                new FileOutputStream(getStorageManager().getFullLogFile(),
+                                     true);
+            runLogFOS =
+                new FileOutputStream(getStorageManager().getLogFile(), false);
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     */
     public void logRequest(Request request) {
         requestCount++;
         //Keep the size of the log at 200
@@ -106,6 +128,11 @@ public class LogManager extends RepositoryManager {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getRequestCount() {
         return requestCount;
     }
@@ -129,7 +156,7 @@ public class LogManager extends RepositoryManager {
      * @param message _more_
      */
     public void logInfo(String message) {
-        log(message,null);
+        log(message, null);
     }
 
 
@@ -151,11 +178,17 @@ public class LogManager extends RepositoryManager {
      * @param exc _more_
      */
     public void logError(String message, Throwable exc) {
-        log("Error:" +message,exc);
+        log("Error:" + message, exc);
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param message _more_
+     * @param exc _more_
+     */
     private void log(String message, Throwable exc) {
         message = encode(message);
 
@@ -165,9 +198,9 @@ public class LogManager extends RepositoryManager {
         }
 
 
-        if(getProperty(PROP_LOG_TOSTDERR,false)) {
+        if (getProperty(PROP_LOG_TOSTDERR, false)) {
             System.err.println(message);
-            if (thr!=null) {
+            if (thr != null) {
                 if (thr instanceof RepositoryUtil.MissingEntryException) {
                     System.err.println(encode(thr.getMessage()));
                 } else {
@@ -178,18 +211,22 @@ public class LogManager extends RepositoryManager {
 
         try {
             String line = new Date() + " -- " + message;
-            for(FileOutputStream os: (List<FileOutputStream>)Misc.newList(fullLogFOS,runLogFOS)) {
-                synchronized(os) {
+            for (FileOutputStream os : (List<FileOutputStream>) Misc.newList(
+                    fullLogFOS, runLogFOS)) {
+                synchronized (os) {
                     os.write(line.getBytes());
                     os.write("\n".getBytes());
                     if (thr != null) {
-                        if (thr instanceof RepositoryUtil.MissingEntryException) {
+                        if (thr instanceof RepositoryUtil
+                                .MissingEntryException) {
                             os.write(encode(thr.toString()).getBytes());
                             os.write("\n".getBytes());
                         } else {
                             os.write("<stack>".getBytes());
                             os.write("\n".getBytes());
-                            os.write(encode(LogUtil.getStackTrace(thr)).getBytes());
+                            os.write(
+                                encode(LogUtil.getStackTrace(
+                                    thr)).getBytes());
                             os.write("\n".getBytes());
                             os.write("</stack>".getBytes());
                         }
@@ -204,11 +241,18 @@ public class LogManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     private String encode(String s) {
         //If we do an entityEncode then the log can only be shown through the web
-        s = s.replaceAll("([sS][cC][rR][iI][pP][tT])","_$1_");
-        s = s.replace("<","&lt;");
-        s = s.replace(">","&gt;");
+        s = s.replaceAll("([sS][cC][rR][iI][pP][tT])", "_$1_");
+        s = s.replace("<", "&lt;");
+        s = s.replace(">", "&gt;");
         return s;
     }
 

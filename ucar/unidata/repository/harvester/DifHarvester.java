@@ -21,12 +21,13 @@
  */
 
 package ucar.unidata.repository.harvester;
-import ucar.unidata.repository.metadata.*;
+
 
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.data.*;
+import ucar.unidata.repository.metadata.*;
 
 import ucar.unidata.sql.SqlUtil;
 
@@ -72,6 +73,7 @@ import java.util.Properties;
  * @version $Revision: 1.3 $
  */
 public class DifHarvester extends Harvester {
+
     /*
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
 <DIF>
@@ -306,6 +308,7 @@ Two ASCII files are available for each year for freeze depth and thaw depth, res
     /** _more_ */
     Group topGroup;
 
+    /** _more_ */
     String url;
 
     /**
@@ -315,15 +318,13 @@ Two ASCII files are available for each year for freeze depth and thaw depth, res
      * @param group _more_
      * @param url _more_
      * @param user _more_
-     * @param recurse _more_
-     * @param download _more_
      */
     public DifHarvester(Repository repository, Group group, String url,
-                            User user) {
+                        User user) {
         super(repository);
         setName("DIF harvester");
         this.topGroup = group;
-        this.url   = url;
+        this.url      = url;
         this.user     = user;
     }
 
@@ -336,47 +337,74 @@ Two ASCII files are available for each year for freeze depth and thaw depth, res
      * @param timestamp _more_
      * @throws Exception _more_
      */
-    protected void runInner(int timestamp) throws Exception {
-        
+    protected void runInner(int timestamp) throws Exception {}
 
-    }
-
+    /**
+     * _more_
+     *
+     * @param difNode _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public static Metadata makeMetadata(Element difNode) throws Exception {
-        Metadata metadata = null;
-        String tag = difNode.getTagName();
+        Metadata     metadata = null;
+        String       tag      = difNode.getTagName();
 
-        MetadataType type = null;
+        MetadataType type     = null;
 
-        if(type==null) return null;
+        if (type == null) {
+            return null;
+        }
 
 
         return metadata;
     }
 
+    /**
+     * _more_
+     *
+     * @param url _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public static List<Metadata> ingestDif(String url) throws Exception {
         List<Metadata> results = new ArrayList<Metadata>();
-        Element root = XmlUtil.getRoot(url, DifHarvester.class);
+        Element        root    = XmlUtil.getRoot(url, DifHarvester.class);
         if (root == null) {
             throw new IllegalArgumentException("Could not parse xml:" + url);
         }
         NodeList children = XmlUtil.getElements(root);
         for (int i = 0; i < children.getLength(); i++) {
-            Element node = (Element) children.item(i);
+            Element  node     = (Element) children.item(i);
             Metadata metadata = makeMetadata(node);
-            if(metadata==null) continue;
+            if (metadata == null) {
+                continue;
+            }
             results.add(metadata);
         }
         return results;
     }
-    
-    public static void main(String[]args) {
+
+    /**
+     * _more_
+     *
+     * @param args _more_
+     */
+    public static void main(String[] args) {
         try {
-            ingestDif("http://nsidc.org/cgi-bin/get_metadata.pl?id=G02169&format=DIF&style=XML");
-        } catch(Exception exc) {
+            ingestDif(
+                "http://nsidc.org/cgi-bin/get_metadata.pl?id=G02169&format=DIF&style=XML");
+        } catch (Exception exc) {
             exc.printStackTrace();
         }
     }
 
 
 
+
 }
+

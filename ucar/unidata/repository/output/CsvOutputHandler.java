@@ -20,10 +20,11 @@
  */
 
 package ucar.unidata.repository.output;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.sql.Clause;
 
@@ -115,8 +116,7 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
         if (state.entry != null) {
             links.add(makeLink(request, state.entry, OUTPUT_CSV));
@@ -159,8 +159,7 @@ public class CsvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result listTypes(Request request,
-                               List<TypeHandler> typeHandlers)
+    public Result listTypes(Request request, List<TypeHandler> typeHandlers)
             throws Exception {
         StringBuffer sb = new StringBuffer();
         for (TypeHandler theTypeHandler : typeHandlers) {
@@ -200,13 +199,13 @@ public class CsvOutputHandler extends OutputHandler {
      */
     public Result listAsociations(Request request) throws Exception {
 
-        StringBuffer  sb          = new StringBuffer();
-        TypeHandler   typeHandler = repository.getTypeHandler(request);
-        String[] associations     =
+        StringBuffer sb          = new StringBuffer();
+        TypeHandler  typeHandler = repository.getTypeHandler(request);
+        String[] associations =
             getAssociationManager().getAssociations(request);
 
-        List<String>  names       = new ArrayList<String>();
-        List<Integer> counts      = new ArrayList<Integer>();
+        List<String>  names  = new ArrayList<String>();
+        List<Integer> counts = new ArrayList<Integer>();
         ResultSet     results;
         int           max = -1;
         int           min = -1;

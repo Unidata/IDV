@@ -19,8 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.repository.data;
 
 
@@ -42,6 +40,10 @@ import org.jfree.ui.*;
 
 
 import org.w3c.dom.*;
+
+
+import org.w3c.dom.*;
+import org.w3c.dom.Element;
 
 import ucar.ma2.DataType;
 import ucar.ma2.StructureData;
@@ -84,6 +86,8 @@ import ucar.nc2.ft.PointFeatureCollection;
 import ucar.nc2.ft.PointFeatureIterator;
 import ucar.nc2.ft.point.*;
 
+import ucar.unidata.data.gis.KmlUtil;
+
 import ucar.unidata.data.point.PointObFactory;
 
 
@@ -93,12 +97,6 @@ import ucar.unidata.repository.*;
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.output.OutputHandler;
 import ucar.unidata.sql.Clause;
-
-
-import org.w3c.dom.*;
-import org.w3c.dom.Element;
-
-import ucar.unidata.data.gis.KmlUtil;
 
 import ucar.unidata.sql.SqlUtil;
 import ucar.unidata.ui.ImageUtils;
@@ -111,8 +109,8 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
-import ucar.unidata.xml.XmlUtil;
 import ucar.unidata.xml.XmlEncoder;
+import ucar.unidata.xml.XmlUtil;
 
 import visad.FieldImpl;
 
@@ -139,13 +137,13 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Formatter;
 
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -164,169 +162,191 @@ import javax.swing.*;
  */
 public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
-    public  static final String PROP_ID = "point.id";
+    /** _more_ */
+    public static final String PROP_ID = "point.id";
 
-    public  static final String PROP_CNT = "point.cnt";
+    /** _more_ */
+    public static final String PROP_CNT = "point.cnt";
 
     /** _more_ */
     public static String TYPE_POINTDATABASE = "pointdatabase";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FORMAT_HTML = "html";
 
+    /** _more_ */
     public static final String FORMAT_KML = "kml";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FORMAT_TIMESERIES = "timeseries";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FORMAT_TIMESERIES_IMAGE = "timeseries_image";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FORMAT_SCATTERPLOT = "scatterplot";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FORMAT_SCATTERPLOT_IMAGE = "scatterplot_image";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FORMAT_TIMELINE = "timeline";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FORMAT_CSV = "csv";
 
+    /** _more_ */
     public static final String FORMAT_CHART = "chart";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FORMAT_CSVHEADER = "csvheader";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FORMAT_CSVIDV = "csvidv";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FORMAT_XLS = "xls";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FORMAT_NETCDF = "netcdf";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FORMAT_MAP = "map";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final double MISSING = -987654.987654;
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_TIMESERIES_TITLE = "timeseriestitle";
 
+    /** _more_ */
     public static final String ARG_POINT_STRIDE = "stride";
 
-    public static final String ARG_POINT_CHART_USETIMEFORNAME = "usetimeforname";
+    /** _more_ */
+    public static final String ARG_POINT_CHART_USETIMEFORNAME =
+        "usetimeforname";
 
+    /** _more_ */
     public static final String ARG_POINT_REDIRECT = "redirect";
+
+    /** _more_ */
     public static final String ARG_POINT_CHANGETYPE = "changetype";
 
+    /** _more_ */
     public static final String ARG_POINT_ASCENDING = "ascending";
 
+    /** _more_ */
     public static final String ARG_POINT_SORTBY = "sortby";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_UPLOAD_FILE = "upload_file";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_IMAGE_WIDTH = "image_width";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_IMAGE_HEIGHT = "image_height";
 
+    /** _more_ */
     public static final String ARG_POINT_VIEW = "pointview";
 
+    /** _more_ */
     public static final String VIEW_UPLOAD = "upload";
+
+    /** _more_ */
     public static final String VIEW_SEARCHFORM = "searchform";
+
+    /** _more_ */
     public static final String VIEW_METADATA = "metadata";
+
+    /** _more_ */
     public static final String VIEW_DEFAULT = "default";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_FORMAT = "format";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_SEARCH = "search";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_FROMDATE = "fromdate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_TODATE = "todate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_BBOX = "bbox";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_HOUR = "hour";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_MONTH = "month";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_PARAM = "what";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_PARAM_ALL = "what_all";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_FIELD_VALUE = "value_";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_FIELD_EXACT = "exact_";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_POINT_FIELD_OP = "op_";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String OP_LT = "op_lt";
 
-    /** _more_          */
+    /** _more_ */
     public static final String OP_GT = "op_gt";
 
-    /** _more_          */
+    /** _more_ */
     public static final String OP_EQUALS = "op_equals";
 
+    /** _more_ */
     public static final String COL_ID = "obid";
 
-    /** _more_          */
+    /** _more_ */
     public static final String COL_DATE = "obtime";
 
-    /** _more_          */
+    /** _more_ */
     public static final String COL_LATITUDE = "latitude";
 
-    /** _more_          */
+    /** _more_ */
     public static final String COL_LONGITUDE = "longitude";
 
-    /** _more_          */
+    /** _more_ */
     public static final String COL_ALTITUDE = "altitude";
 
-    /** _more_          */
+    /** _more_ */
     public static final String COL_MONTH = "obmonth";
 
-    /** _more_          */
+    /** _more_ */
     public static final String COL_HOUR = "obhour";
 
-    /** _more_          */
+    /** _more_ */
     public static final int NUM_BASIC_COLUMNS = 7;
 
-    /** _more_          */
+    /** _more_ */
     private List<TwoFacedObject> months;
 
-    /** _more_          */
+    /** _more_ */
     private List hours;
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, List<PointDataMetadata>> metadataCache =
         new Hashtable<String, List<PointDataMetadata>>();
 
 
+    /** _more_ */
     private Hashtable<String, Hashtable> propertiesCache =
         new Hashtable<String, Hashtable>();
 
@@ -368,17 +388,28 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     }
 
 
-    private Hashtable  getProperties(Entry entry) throws Exception {
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Hashtable getProperties(Entry entry) throws Exception {
         Hashtable properties = propertiesCache.get(entry.getId());
-        if(properties == null) {
-            Object[] values       = entry.getValues();
-            XmlEncoder   xmlEncoder = new XmlEncoder();
-            if(values != null  && values.length>0 && values[0]!=null) {
-                properties = (Hashtable) xmlEncoder.decodeXml((String)values[0]);
+        if (properties == null) {
+            Object[]   values     = entry.getValues();
+            XmlEncoder xmlEncoder = new XmlEncoder();
+            if ((values != null) && (values.length > 0)
+                    && (values[0] != null)) {
+                properties =
+                    (Hashtable) xmlEncoder.decodeXml((String) values[0]);
             } else {
                 properties = new Hashtable();
             }
-            propertiesCache.put(entry.getId(),properties);
+            propertiesCache.put(entry.getId(), properties);
         }
         return properties;
     }
@@ -389,13 +420,18 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      *
      * @param request _more_
      * @param entry _more_
+     * @param parent _more_
+     * @param newEntry _more_
      *
      * @throws Exception _more_
      */
-    public void initializeEntry(Request request, Entry entry, Group parent, boolean newEntry)
+    public void initializeEntry(Request request, Entry entry, Group parent,
+                                boolean newEntry)
             throws Exception {
-        if(!newEntry) return;
-        Hashtable properties = getProperties(entry);
+        if ( !newEntry) {
+            return;
+        }
+        Hashtable  properties = getProperties(entry);
 
         Connection connection = getDatabaseManager().getNewConnection();
         connection.setAutoCommit(false);
@@ -418,13 +454,22 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     }
 
 
-    public void intializeCopiedEntry(Entry newEntry, Entry oldEntry) throws Exception {
+    /**
+     * _more_
+     *
+     * @param newEntry _more_
+     * @param oldEntry _more_
+     *
+     * @throws Exception _more_
+     */
+    public void intializeCopiedEntry(Entry newEntry, Entry oldEntry)
+            throws Exception {
         super.intializeCopiedEntry(newEntry, oldEntry);
 
         //False says don't get the metadata objects from the cache.
         //Create them from the DB
         List<PointDataMetadata> oldMetadata =
-            getMetadata(getTableName(oldEntry),false);
+            getMetadata(getTableName(oldEntry), false);
 
         Connection connection = getDatabaseManager().getNewConnection();
         connection.setAutoCommit(false);
@@ -435,7 +480,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 pdm.tableName = newTableName;
             }
             createDatabase(newEntry, oldMetadata, connection);
-            getDatabaseManager().copyTable(getTableName(oldEntry),getTableName(newEntry), connection);
+            getDatabaseManager().copyTable(getTableName(oldEntry),
+                                           getTableName(newEntry),
+                                           connection);
             connection.commit();
             connection.setAutoCommit(true);
         } catch (Exception exc) {
@@ -457,6 +504,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      *
      * @param request _more_
      * @param entry _more_
+     * @param parent _more_
      * @param connection _more_
      *
      * @throws Exception _more_
@@ -473,19 +521,24 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             new ArrayList<PointDataMetadata>();
 
         metadata.add(new PointDataMetadata(tableName, COL_ID,
-                                           metadata.size(), "ID", "ID","",
+                                           metadata.size(), "ID", "ID", "",
                                            PointDataMetadata.TYPE_INT));
         metadata.add(new PointDataMetadata(tableName, COL_DATE,
-                                           metadata.size(), "Observation Time", "Observation Time","",
+                                           metadata.size(),
+                                           "Observation Time",
+                                           "Observation Time", "",
                                            PointDataMetadata.TYPE_DATE));
         metadata.add(new PointDataMetadata(tableName, COL_LONGITUDE,
-                                           metadata.size(), "Longitude","Longitude","degrees",
+                                           metadata.size(), "Longitude",
+                                           "Longitude", "degrees",
                                            PointDataMetadata.TYPE_DOUBLE));
         metadata.add(new PointDataMetadata(tableName, COL_LATITUDE,
-                                           metadata.size(), "Latitude", "Latitude", "degrees",
+                                           metadata.size(), "Latitude",
+                                           "Latitude", "degrees",
                                            PointDataMetadata.TYPE_DOUBLE));
         metadata.add(new PointDataMetadata(tableName, COL_ALTITUDE,
-                                           metadata.size(), "Altitude","Altitude","m",
+                                           metadata.size(), "Altitude",
+                                           "Altitude", "m",
                                            PointDataMetadata.TYPE_DOUBLE));
         metadata.add(new PointDataMetadata(tableName, COL_MONTH,
                                            metadata.size(), "",
@@ -495,12 +548,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                            PointDataMetadata.TYPE_INT));
 
 
-        FeatureDatasetPoint fdp  = getDataset(entry, parent, entry.getFile());
-        if(fdp == null) {
-            throw new IllegalArgumentException("Could not open file as point observation data");
+        FeatureDatasetPoint fdp = getDataset(entry, parent, entry.getFile());
+        if (fdp == null) {
+            throw new IllegalArgumentException(
+                "Could not open file as point observation data");
         }
 
-        List                vars = fdp.getDataVariables();
+        List vars = fdp.getDataVariables();
 
         for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
             String unit = var.getUnitsString();
@@ -545,13 +599,23 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
 
 
-    private void createDatabase(Entry entry, List<PointDataMetadata> metadata,
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param metadata _more_
+     * @param connection _more_
+     *
+     * @throws Exception _more_
+     */
+    private void createDatabase(Entry entry,
+                                List<PointDataMetadata> metadata,
                                 Connection connection)
             throws Exception {
-        String                  tableName = getTableName(entry);
-        StringBuffer sql      = new StringBuffer();
-        List<String> indexSql = new ArrayList<String>();
-        int          indexCnt = 0;
+        String       tableName = getTableName(entry);
+        StringBuffer sql       = new StringBuffer();
+        List<String> indexSql  = new ArrayList<String>();
+        int          indexCnt  = 0;
 
         sql.append("CREATE TABLE ");
         sql.append(tableName);
@@ -602,8 +666,12 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         if (v != v) {
             return MISSING;
         }
-        if(v == Double.POSITIVE_INFINITY) return Double.MAX_VALUE;
-        if(v == Double.NEGATIVE_INFINITY) return -Double.MAX_VALUE;
+        if (v == Double.POSITIVE_INFINITY) {
+            return Double.MAX_VALUE;
+        }
+        if (v == Double.NEGATIVE_INFINITY) {
+            return -Double.MAX_VALUE;
+        }
         return v;
     }
 
@@ -669,12 +737,12 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         int                  batchCnt = 0;
         GregorianCalendar calendar =
             new GregorianCalendar(DateUtil.TIMEZONE_GMT);
-        boolean didone = false;
+        boolean   didone     = false;
 
         Hashtable properties = getProperties(entry);
-        int baseId = Misc.getProperty(properties,PROP_ID,0);
-        int totalCnt = Misc.getProperty(properties,PROP_CNT,0);
-        long t1 = System.currentTimeMillis();
+        int       baseId     = Misc.getProperty(properties, PROP_ID, 0);
+        int       totalCnt   = Misc.getProperty(properties, PROP_CNT, 0);
+        long      t1         = System.currentTimeMillis();
         while (pfi.hasNext()) {
             PointFeature                      po = (PointFeature) pfi.next();
             ucar.unidata.geoloc.EarthLocation el = po.getLocation();
@@ -766,7 +834,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                         structure.findMember((String) pdm.shortName);
                     if (pdm.isString()) {
                         value = structure.getScalarString(member);
-                        if(value== null) value = "";
+                        if (value == null) {
+                            value = "";
+                        }
                         value = value.toString().trim();
                     } else {
                         double d = structure.convertScalarFloat(member);
@@ -802,12 +872,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         insertStmt.close();
 
         long t2 = System.currentTimeMillis();
-        System.err.println("inserted " + cnt +" observations in " + (t2-t1) +"ms");
+        System.err.println("inserted " + cnt + " observations in "
+                           + (t2 - t1) + "ms");
 
-        properties.put(PROP_CNT,totalCnt+"");
-        properties.put(PROP_ID,baseId+"");
-        XmlEncoder   xmlEncoder = new XmlEncoder();
-        entry.setValues(new Object[]{xmlEncoder.encodeObject(properties)});
+        properties.put(PROP_CNT, totalCnt + "");
+        properties.put(PROP_ID, baseId + "");
+        XmlEncoder xmlEncoder = new XmlEncoder();
+        entry.setValues(new Object[] { xmlEncoder.encodeObject(properties) });
 
         if (didone) {
             entry.setWest(west);
@@ -829,18 +900,21 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param sb _more_
      * @param request _more_
      * @param entry _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */
-    private  void doUpload(StringBuffer sb, Request request, Entry entry) throws Exception {
+    private void doUpload(StringBuffer sb, Request request, Entry entry)
+            throws Exception {
         if (request.exists(ARG_POINT_UPLOAD_FILE)) {
             File file =
                 new File(request.getUploadedFile(ARG_POINT_UPLOAD_FILE));
-            FeatureDatasetPoint fdp = getDataset(entry, entry.getParentGroup(), file);
+            FeatureDatasetPoint fdp = getDataset(entry,
+                                          entry.getParentGroup(), file);
             List<PointDataMetadata> metadata =
                 getMetadata(getTableName(entry));
             Connection connection = getDatabaseManager().getNewConnection();
@@ -885,40 +959,41 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      */
     private Result doSearch(Request request, Entry entry) throws Exception {
 
-        String format = request.getString(ARG_POINT_FORMAT, FORMAT_HTML);
-        String baseName =  IOUtil.stripExtension(entry.getName());
-        boolean redirect = request.get(ARG_POINT_REDIRECT,false);
+        String  format   = request.getString(ARG_POINT_FORMAT, FORMAT_HTML);
+        String  baseName = IOUtil.stripExtension(entry.getName());
+        boolean redirect = request.get(ARG_POINT_REDIRECT, false);
         request.remove(ARG_POINT_REDIRECT);
         request.remove(ARG_POINT_SEARCH);
         if (format.equals(FORMAT_TIMESERIES)) {
             StringBuffer sb = new StringBuffer();
-            getHtmlHeader(request,  sb, entry, null);
+            getHtmlHeader(request, sb, entry, null);
             request.put(ARG_POINT_FORMAT, FORMAT_TIMESERIES_IMAGE);
             String redirectUrl = request.getRequestPath() + "/" + baseName
-                              + ".png" + "?"
-                              + request.getUrlArgs(null,
-                                  Misc.newHashtable(OP_LT, OP_LT));
+                                 + ".png" + "?"
+                                 + request.getUrlArgs(null,
+                                     Misc.newHashtable(OP_LT, OP_LT));
             sb.append(HtmlUtil.img(redirectUrl));
             return new Result("Search Results", sb);
         }
 
-        if(redirect) {
-            String urlSuffix= ".html";
+        if (redirect) {
+            String urlSuffix = ".html";
             if (format.equals(FORMAT_CSV) || format.equals(FORMAT_CSVIDV)
-                || format.equals(FORMAT_CSVHEADER)) {
+                    || format.equals(FORMAT_CSVHEADER)) {
                 urlSuffix = ".csv";
-            } else if(format.equals(FORMAT_XLS)) {
+            } else if (format.equals(FORMAT_XLS)) {
                 urlSuffix = ".xls";
-            } else if(format.equals(FORMAT_KML)) {
+            } else if (format.equals(FORMAT_KML)) {
                 urlSuffix = ".kml";
-            } else if(format.equals(FORMAT_NETCDF)) {
+            } else if (format.equals(FORMAT_NETCDF)) {
                 urlSuffix = ".nc";
             }
 
-            String redirectUrl = request.getRequestPath() + "/" + HtmlUtil.urlEncode(baseName)
-                              + urlSuffix + "?"
-                              + request.getUrlArgs(null,
-                                  Misc.newHashtable(OP_LT, OP_LT));
+            String redirectUrl = request.getRequestPath() + "/"
+                                 + HtmlUtil.urlEncode(baseName) + urlSuffix
+                                 + "?"
+                                 + request.getUrlArgs(null,
+                                     Misc.newHashtable(OP_LT, OP_LT));
             return new Result(redirectUrl);
         }
 
@@ -989,7 +1064,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 seen.add(col);
             }
             for (PointDataMetadata pdm : metadata) {
-                if (seen.contains(""+pdm.columnNumber)) {
+                if (seen.contains("" + pdm.columnNumber)) {
                     tmp.add(pdm);
                 }
             }
@@ -1002,7 +1077,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         for (PointDataMetadata pdm : tmp) {
             //Skip the db month and hour
             if (pdm.columnName.equals(COL_MONTH)
-                || pdm.columnName.equals(COL_HOUR)) {
+                    || pdm.columnName.equals(COL_HOUR)) {
                 continue;
             }
             columnsToUse.add(pdm);
@@ -1010,28 +1085,27 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
 
         for (PointDataMetadata pdm : metadata) {
-            if (pdm.isBasic()&& !pdm.columnName.equals(COL_ALTITUDE)) {
+            if (pdm.isBasic() && !pdm.columnName.equals(COL_ALTITUDE)) {
                 continue;
             }
-            String suffix = ""+pdm.columnNumber;
+            String suffix = "" + pdm.columnNumber;
             if ( !request.defined(ARG_POINT_FIELD_VALUE + suffix)) {
                 continue;
             }
             if (pdm.isString()) {
                 String value = request.getString(ARG_POINT_FIELD_VALUE
                                    + suffix, "");
-                if (request.get(ARG_POINT_FIELD_EXACT + suffix,
-                                false)) {
+                if (request.get(ARG_POINT_FIELD_EXACT + suffix, false)) {
                     clauses.add(Clause.eq(pdm.columnName, value));
                 } else {
                     clauses.add(Clause.like(pdm.columnName,
                                             "%" + value + "%"));
                 }
             } else {
-                String op = request.getString(ARG_POINT_FIELD_OP
-                                              + suffix, OP_LT);
-                double value = request.get(ARG_POINT_FIELD_VALUE
-                                           + suffix, 0.0);
+                String op = request.getString(ARG_POINT_FIELD_OP + suffix,
+                                OP_LT);
+                double value = request.get(ARG_POINT_FIELD_VALUE + suffix,
+                                           0.0);
                 if (op.equals(OP_LT)) {
                     clauses.add(Clause.le(pdm.columnName, value));
                 } else if (op.equals(OP_GT)) {
@@ -1044,17 +1118,18 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
 
         StringBuffer cols = null;
-        List<PointDataMetadata> queryColumns = new ArrayList<PointDataMetadata>();
+        List<PointDataMetadata> queryColumns =
+            new ArrayList<PointDataMetadata>();
 
         //Always add the basic columns
         for (PointDataMetadata pdm : metadata) {
-            if(pdm.isBasic()) {
-                queryColumns.add(pdm);                
-           }
+            if (pdm.isBasic()) {
+                queryColumns.add(pdm);
+            }
         }
 
         for (PointDataMetadata pdm : columnsToUse) {
-            if(!pdm.isBasic()) {
+            if ( !pdm.isBasic()) {
                 queryColumns.add(pdm);
             }
         }
@@ -1075,56 +1150,58 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
 
         String sortByCol = COL_DATE;
-        String orderDir = (request.get(ARG_POINT_ASCENDING,false)?" ASC ":" DESC ");
+        String orderDir  = (request.get(ARG_POINT_ASCENDING, false)
+                            ? " ASC "
+                            : " DESC ");
 
-        String sortByArg = request.getString(ARG_POINT_SORTBY,"");
+        String sortByArg = request.getString(ARG_POINT_SORTBY, "");
         for (PointDataMetadata pdm : metadata) {
-            if(pdm.columnName.equals(sortByArg)) {
+            if (pdm.columnName.equals(sortByArg)) {
                 sortByCol = sortByArg;
                 break;
             }
         }
 
-        int max = request.get(ARG_MAX,1000);
-        int stride = request.get(ARG_POINT_STRIDE,1);
-        if(stride>1) {
-            max = max*stride;
+        int max    = request.get(ARG_MAX, 1000);
+        int stride = request.get(ARG_POINT_STRIDE, 1);
+        if (stride > 1) {
+            max = max * stride;
         }
-        Statement stmt = getDatabaseManager().select(cols.toString(),
-                             Misc.newList(tableName),
+        Statement stmt = getDatabaseManager().select(
+                             cols.toString(), Misc.newList(tableName),
                              Clause.and(Clause.toArray(clauses)),
-                             " ORDER BY " + sortByCol + orderDir+
-                                                     getDatabaseManager().getLimitString(request.get(ARG_SKIP,0), max),
-                                                     max);
+                             " ORDER BY " + sortByCol + orderDir
+                             + getDatabaseManager().getLimitString(
+                                 request.get(ARG_SKIP, 0), max), max);
 
         SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
         ResultSet        results;
         int              cnt           = 0;
         List<PointData>  pointDataList = new ArrayList<PointData>();
-        
 
-        int skipHowMany = 0;
+
+        int              skipHowMany   = 0;
         while ((results = iter.next()) != null) {
             while (results.next()) {
-                if(skipHowMany>0) {
+                if (skipHowMany > 0) {
                     skipHowMany--;
                     continue;
                 }
-                if(stride>1) {
-                    skipHowMany = stride-1;
+                if (stride > 1) {
+                    skipHowMany = stride - 1;
                 }
                 int col = 1;
                 PointData pointData =
-                    new PointData(results.getInt(col++),
-                                  getDatabaseManager().getDate(results, col++), 
-                                  checkReadValue(results.getDouble(col++)),
-                                  checkReadValue(results.getDouble(col++)),
-                                  checkReadValue(results.getDouble(col++)), 0,
-                                  0);
+                    new PointData(
+                        results.getInt(col++),
+                        getDatabaseManager().getDate(results, col++),
+                        checkReadValue(results.getDouble(col++)),
+                        checkReadValue(results.getDouble(col++)),
+                        checkReadValue(results.getDouble(col++)), 0, 0);
                 List values = new ArrayList();
                 //Add in the selected basic values
-                for(PointDataMetadata pdm: columnsToUse) {
-                    if(pdm.isBasic()) {
+                for (PointDataMetadata pdm : columnsToUse) {
+                    if (pdm.isBasic()) {
                         values.add(pointData.getValue(pdm.columnName));
                     }
                 }
@@ -1135,7 +1212,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                         continue;
                     }
                     if (pdm.isString()) {
-                        pointData.setValue(pdm, results.getString(col).trim());
+                        pointData.setValue(pdm,
+                                           results.getString(col).trim());
                     } else {
                         double d = checkReadValue(results.getDouble(col));
                         pointData.setValue(pdm, new Double(d));
@@ -1153,10 +1231,11 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             return makeSearchResultsHtml(request, entry, columnsToUse,
                                          pointDataList,
                                          format.equals(FORMAT_TIMELINE));
-        }  if (format.equals(FORMAT_KML)) {
+        }
+        if (format.equals(FORMAT_KML)) {
             return makeSearchResultsKml(request, entry, columnsToUse,
-                                         pointDataList,
-                                         format.equals(FORMAT_TIMELINE));
+                                        pointDataList,
+                                        format.equals(FORMAT_TIMELINE));
         } else if (format.equals(FORMAT_CSV) || format.equals(FORMAT_CSVIDV)
                    || format.equals(FORMAT_CSVHEADER)
                    || format.equals(FORMAT_XLS)) {
@@ -1186,18 +1265,28 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     }
 
 
-    private void ensureMinimalParameters(List<PointDataMetadata> columnsToUse, List<PointDataMetadata> metadata) {
-        if(!PointDataMetadata.contains(columnsToUse,COL_DATE)) {
+    /**
+     * _more_
+     *
+     * @param columnsToUse _more_
+     * @param metadata _more_
+     */
+    private void ensureMinimalParameters(
+            List<PointDataMetadata> columnsToUse,
+            List<PointDataMetadata> metadata) {
+        if ( !PointDataMetadata.contains(columnsToUse, COL_DATE)) {
             columnsToUse.add(0, PointDataMetadata.find(metadata, COL_DATE));
         }
 
 
-        if(!PointDataMetadata.contains(columnsToUse,COL_LATITUDE)) {
-            columnsToUse.add(0, PointDataMetadata.find(metadata, COL_LATITUDE));
+        if ( !PointDataMetadata.contains(columnsToUse, COL_LATITUDE)) {
+            columnsToUse.add(0, PointDataMetadata.find(metadata,
+                    COL_LATITUDE));
         }
 
-        if(!PointDataMetadata.contains(columnsToUse,COL_LONGITUDE)) {
-            columnsToUse.add(0, PointDataMetadata.find(metadata, COL_LONGITUDE));
+        if ( !PointDataMetadata.contains(columnsToUse, COL_LONGITUDE)) {
+            columnsToUse.add(0, PointDataMetadata.find(metadata,
+                    COL_LONGITUDE));
         }
     }
 
@@ -1207,12 +1296,19 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
+     * @param entry _more_
      * @param dataset _more_
      *
      * @return _more_
      */
-    private static JFreeChart createChart(Request request, Entry entry,XYDataset dataset) {
-        JFreeChart chart = ChartFactory.createTimeSeriesChart(request.getString(ARG_POINT_TIMESERIES_TITLE,entry.getName()),  // title
+    private static JFreeChart createChart(Request request, Entry entry,
+                                          XYDataset dataset) {
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(
+                               request.getString(
+                                   ARG_POINT_TIMESERIES_TITLE,
+                                   entry.getName()),  // title
             "Date",   // x-axis label
             "",       // y-axis label
             dataset,  // data
@@ -1225,7 +1321,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         ValueAxis rangeAxis = new NumberAxis("");
         rangeAxis.setVisible(false);
         XYPlot plot = (XYPlot) chart.getPlot();
-        if(request.get("gray",false)) {
+        if (request.get("gray", false)) {
             plot.setBackgroundPaint(Color.lightGray);
             plot.setDomainGridlinePaint(Color.white);
             plot.setRangeGridlinePaint(Color.white);
@@ -1248,60 +1344,71 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
     }
 
-    private void getHtmlHeader(Request request, StringBuffer sb, Entry entry, List<PointData> list) throws Exception 
-    {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     * @param entry _more_
+     * @param list _more_
+     *
+     * @throws Exception _more_
+     */
+    private void getHtmlHeader(Request request, StringBuffer sb, Entry entry,
+                               List<PointData> list)
+            throws Exception {
         StringBuffer searchForm = new StringBuffer();
         searchForm.append("<ul><hr>");
         createSearchForm(searchForm, request, entry);
         searchForm.append("<hr></ul>");
 
-        StringBuffer cntSB =  new StringBuffer();
+        StringBuffer cntSB    = new StringBuffer();
 
-        int max = request.get(ARG_MAX, 1000);
-        int numItems = (list==null?max:list.size());
-        if ((numItems > 0) && ((numItems == max) || request.defined(ARG_SKIP))) {
+        int          max      = request.get(ARG_MAX, 1000);
+        int          numItems = ((list == null)
+                                 ? max
+                                 : list.size());
+        if ((numItems > 0)
+                && ((numItems == max) || request.defined(ARG_SKIP))) {
             int skip = Math.max(0, request.get(ARG_SKIP, 0));
-            cntSB.append(msgLabel("Showing") + (skip + 1) + "-" + (skip + numItems));
+            cntSB.append(msgLabel("Showing") + (skip + 1) + "-"
+                         + (skip + numItems));
             List<String> toks = new ArrayList<String>();
-            String url;
+            String       url;
             if (skip > 0) {
-                request.put(ARG_SKIP,(skip - max)+"");
-                url = request.getRequestPath() +
-                    "?" 
-                    + request.getUrlArgs(null,
-                                         Misc.newHashtable(OP_LT, OP_LT));
-                request.put(ARG_SKIP,skip +"");
+                request.put(ARG_SKIP, (skip - max) + "");
+                url = request.getRequestPath() + "?"
+                      + request.getUrlArgs(null,
+                                           Misc.newHashtable(OP_LT, OP_LT));
+                request.put(ARG_SKIP, skip + "");
                 toks.add(HtmlUtil.href(url, msg("Previous...")));
             }
 
             if (numItems >= max) {
-                request.put(ARG_SKIP,(skip + max)+"");
-                url = request.getRequestPath() +
-                    "?" 
-                    + request.getUrlArgs(null,
-                                         Misc.newHashtable(OP_LT, OP_LT));
-                request.put(ARG_SKIP,skip +"");
+                request.put(ARG_SKIP, (skip + max) + "");
+                url = request.getRequestPath() + "?"
+                      + request.getUrlArgs(null,
+                                           Misc.newHashtable(OP_LT, OP_LT));
+                request.put(ARG_SKIP, skip + "");
                 toks.add(HtmlUtil.href(url, msg("Next...")));
             }
 
 
             if (numItems >= max) {
                 request.put(ARG_MAX, "" + (max + 100));
-                url = request.getRequestPath() +
-                    "?" 
-                    + request.getUrlArgs(null,
-                                         Misc.newHashtable(OP_LT, OP_LT));
+                url = request.getRequestPath() + "?"
+                      + request.getUrlArgs(null,
+                                           Misc.newHashtable(OP_LT, OP_LT));
                 toks.add(HtmlUtil.href(url, msg("View More")));
                 request.put(ARG_MAX, "" + (max / 2));
-                url = request.getRequestPath() +
-                    "?" 
-                    + request.getUrlArgs(null,
-                                         Misc.newHashtable(OP_LT, OP_LT));
+                url = request.getRequestPath() + "?"
+                      + request.getUrlArgs(null,
+                                           Misc.newHashtable(OP_LT, OP_LT));
                 toks.add(HtmlUtil.href(url, msg("View Less")));
             }
 
-            request.put(ARG_SKIP, ""+skip);
-            request.put(ARG_MAX, ""+max);
+            request.put(ARG_SKIP, "" + skip);
+            request.put(ARG_MAX, "" + max);
             if (toks.size() > 0) {
                 cntSB.append(HtmlUtil.space(2));
                 cntSB.append(StringUtil.join(HtmlUtil.span("&nbsp;|&nbsp;",
@@ -1320,171 +1427,213 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                              searchForm.toString(), false));
 
 
-        
+
     }
 
-    
 
 
 
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param columnsToUse _more_
+     * @param list _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private Result makeSearchResultsChart(
             Request request, Entry entry,
             List<PointDataMetadata> columnsToUse, List<PointData> list)
             throws Exception {
 
         StringBuffer sb = new StringBuffer();
-        getHtmlHeader(request,  sb, entry, list);
+        getHtmlHeader(request, sb, entry, list);
 
         if (list.size() == 0) {
             sb.append(msg("No results found"));
             return new Result("Point Search Results", sb);
         }
-        sb.append("<script type=\"text/javascript\" src=\"http://www.google.com/jsapi\"></script>\n");
-        sb.append("<script type=\"text/javascript\">\ngoogle.load('visualization', '1', {'packages':['motionchart']});\ngoogle.setOnLoadCallback(drawChart);\nfunction drawChart() {\n        var data = new google.visualization.DataTable();\n");
-        sb.append("data.addRows(" + list.size()+");\n");
+        sb.append(
+            "<script type=\"text/javascript\" src=\"http://www.google.com/jsapi\"></script>\n");
+        sb.append(
+            "<script type=\"text/javascript\">\ngoogle.load('visualization', '1', {'packages':['motionchart']});\ngoogle.setOnLoadCallback(drawChart);\nfunction drawChart() {\n        var data = new google.visualization.DataTable();\n");
+        sb.append("data.addRows(" + list.size() + ");\n");
 
         sb.append("data.addColumn('string', 'Location');\n");
         sb.append("data.addColumn('date', 'Date');\n");
 
-        int baseCnt = 2;
+        int    baseCnt   = 2;
 
-        String entityCol=null;
-        boolean useTimeForName = request.get(ARG_POINT_CHART_USETIMEFORNAME,false);
-        String           dateFormat  = "yyyy/MM/dd HH:mm:ss";
-        SimpleDateFormat sdf         = new SimpleDateFormat(dateFormat);
+        String entityCol = null;
+        boolean useTimeForName = request.get(ARG_POINT_CHART_USETIMEFORNAME,
+                                             false);
+        String           dateFormat = "yyyy/MM/dd HH:mm:ss";
+        SimpleDateFormat sdf        = new SimpleDateFormat(dateFormat);
         for (PointDataMetadata pdm : columnsToUse) {
-            if(entityCol==null && pdm.shortName.toLowerCase().indexOf("station")>=0)  {
-                entityCol  = pdm.columnName;
+            if ((entityCol == null)
+                    && (pdm.shortName.toLowerCase().indexOf("station")
+                        >= 0)) {
+                entityCol = pdm.columnName;
                 continue;
             }
-            if(pdm.shortName.toLowerCase().indexOf("name")>=0)  {
-                entityCol  = pdm.columnName;
+            if (pdm.shortName.toLowerCase().indexOf("name") >= 0) {
+                entityCol = pdm.columnName;
                 break;
             }
         }
 
 
         for (PointDataMetadata pdm : columnsToUse) {
-            if(entityCol!=null && pdm.isColumn(entityCol)) continue;
-            String varName=   pdm.formatName();
-            varName = varName.replace("'","\\'");
-            if(pdm.isString()) {
-                sb.append("data.addColumn('string', '" + varName+"');\n");
-            } else  if(pdm.isDate()) {
+            if ((entityCol != null) && pdm.isColumn(entityCol)) {
+                continue;
+            }
+            String varName = pdm.formatName();
+            varName = varName.replace("'", "\\'");
+            if (pdm.isString()) {
+                sb.append("data.addColumn('string', '" + varName + "');\n");
+            } else if (pdm.isDate()) {
                 //For now skip the date
                 //                sb.append("data.addColumn('string', '" + varName+"');\n");
             } else {
-                sb.append("data.addColumn('number', '" + varName+"');\n");
+                sb.append("data.addColumn('number', '" + varName + "');\n");
             }
         }
 
 
-        GregorianCalendar cal =
-            new GregorianCalendar(DateUtil.TIMEZONE_GMT);
+        GregorianCalendar cal = new GregorianCalendar(DateUtil.TIMEZONE_GMT);
 
-        int row=-1;
+        int               row = -1;
 
         sb.append("var theDate;\n");
         for (PointData pointData : list) {
             row++;
             cal.setTime(pointData.date);
             String entityName;
-            if(useTimeForName) {
+            if (useTimeForName) {
                 entityName = sdf.format(pointData.date);
-            } else  if(entityCol!=null) {
+            } else if (entityCol != null) {
                 entityName = pointData.getValue(entityCol).toString().trim();
             } else {
-                entityName = "latlon_" + pointData.lat+"/"+pointData.lon;
+                entityName = "latlon_" + pointData.lat + "/" + pointData.lon;
             }
 
-            entityName = entityName.replace("'","\\'");
-            sb.append("theDate = new Date(" + cal.get(cal.YEAR) +"," + cal.get(cal.MONTH) +","+ cal.get(cal.DAY_OF_MONTH)+ ");\n");
+            entityName = entityName.replace("'", "\\'");
+            sb.append("theDate = new Date(" + cal.get(cal.YEAR) + ","
+                      + cal.get(cal.MONTH) + "," + cal.get(cal.DAY_OF_MONTH)
+                      + ");\n");
 
-            sb.append("theDate.setHours("+cal.get(cal.HOUR)+
-                      ","+ cal.get(cal.MINUTE)+
-                      ","+ cal.get(cal.SECOND)+
-                      ","+ cal.get(cal.MILLISECOND)+
-                      ");\n");
+            sb.append("theDate.setHours(" + cal.get(cal.HOUR) + ","
+                      + cal.get(cal.MINUTE) + "," + cal.get(cal.SECOND) + ","
+                      + cal.get(cal.MILLISECOND) + ");\n");
 
-            sb.append("data.setValue(" +row+", 0, '" +entityName + "');\n");
-            sb.append("data.setValue(" +row+", 1, theDate);\n");
+            sb.append("data.setValue(" + row + ", 0, '" + entityName
+                      + "');\n");
+            sb.append("data.setValue(" + row + ", 1, theDate);\n");
 
 
-            int  cnt    = -1;
+            int cnt = -1;
             for (PointDataMetadata pdm : columnsToUse) {
                 //Already did the entity
-                if(entityCol!=null && pdm.isColumn(entityCol)) continue;
+                if ((entityCol != null) && pdm.isColumn(entityCol)) {
+                    continue;
+                }
                 Object value = pointData.getValue(pdm);
-                if(row == 0) 
-                    sb.append("//" + pdm.shortName+"\n");
-                if(pdm.isString()) {
+                if (row == 0) {
+                    sb.append("//" + pdm.shortName + "\n");
+                }
+                if (pdm.isString()) {
                     cnt++;
                     String tmp = value.toString().trim();
-                    tmp = tmp.replace("'","\\'");
-                    sb.append("data.setValue(" +row+", " + (cnt+baseCnt) +", '" +tmp +"');\n");
-                } else  if(pdm.isDate()) {
+                    tmp = tmp.replace("'", "\\'");
+                    sb.append("data.setValue(" + row + ", " + (cnt + baseCnt)
+                              + ", '" + tmp + "');\n");
+                } else if (pdm.isDate()) {
                     //                    sb.append("data.setValue(" +row+", " + (cnt+baseCnt) +", " +value +");\n");
                 } else {
                     cnt++;
-                    sb.append("data.setValue(" +row+", " + (cnt+baseCnt) +", " +value +");\n");
+                    sb.append("data.setValue(" + row + ", " + (cnt + baseCnt)
+                              + ", " + value + ");\n");
 
                 }
             }
         }
 
-        sb.append("var chart = new google.visualization.MotionChart(document.getElementById('chart_div'));\n");
+        sb.append(
+            "var chart = new google.visualization.MotionChart(document.getElementById('chart_div'));\n");
         sb.append("chart.draw(data, {width: 800, height:500});\n");
         sb.append("}\n");
         sb.append("</script>\n");
-        sb.append("<div id=\"chart_div\" style=\"width: 800px; height: 500px;\"></div>\n");
+        sb.append(
+            "<div id=\"chart_div\" style=\"width: 800px; height: 500px;\"></div>\n");
         return new Result("Point Search Results", sb);
     }
 
 
-    private Result makeSearchResultsKml(
-            Request request, Entry entry,
-            List<PointDataMetadata> columnsToUse, List<PointData> list,
-            boolean showTimeline)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param columnsToUse _more_
+     * @param list _more_
+     * @param showTimeline _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Result makeSearchResultsKml(Request request, Entry entry,
+                                        List<PointDataMetadata> columnsToUse,
+                                        List<PointData> list,
+                                        boolean showTimeline)
             throws Exception {
-        Element             root         = KmlUtil.kml(entry.getName());
-        Element             docNode = KmlUtil.document(root, entry.getName());
-        
+        Element root    = KmlUtil.kml(entry.getName());
+        Element docNode = KmlUtil.document(root, entry.getName());
+
         for (PointData pointData : list) {
-            int lblCnt = 0;
-            StringBuffer  info      = new StringBuffer("");
-            StringBuffer  label      = new StringBuffer("");
+            int          lblCnt = 0;
+            StringBuffer info   = new StringBuffer("");
+            StringBuffer label  = new StringBuffer("");
             info.append("<b>Date:</b> " + pointData.date + "<br>");
-            int  cnt    = -1;
+            int cnt = -1;
             for (PointDataMetadata pdm : columnsToUse) {
                 cnt++;
                 if (pdm.isBasic()) {
                     continue;
                 }
                 Object value = pointData.getValue(pdm);
-                if(lblCnt<4) {
-                    if(lblCnt>0)
+                if (lblCnt < 4) {
+                    if (lblCnt > 0) {
                         label.append("/");
+                    }
                     lblCnt++;
-                    if(value instanceof Double) {
-                        value = Misc.format(((Double)value).doubleValue());
-                        label.append(value+ pdm.formatUnit()+"");
+                    if (value instanceof Double) {
+                        value = Misc.format(((Double) value).doubleValue());
+                        label.append(value + pdm.formatUnit() + "");
                     } else {
-                        label.append(""+value);
+                        label.append("" + value);
                     }
                 }
-                info.append(HtmlUtil.b(pdm.formatName())+":" +value+" " +pdm.formatUnit()+"<br>");
+                info.append(HtmlUtil.b(pdm.formatName()) + ":" + value + " "
+                            + pdm.formatUnit() + "<br>");
             }
-            
-            Element placemark  = KmlUtil.placemark(docNode, label.toString(),
-                                                   info.toString(), pointData.lat, pointData.lon, pointData.alt, null);
+
+            Element placemark = KmlUtil.placemark(docNode, label.toString(),
+                                    info.toString(), pointData.lat,
+                                    pointData.lon, pointData.alt, null);
             KmlUtil.timestamp(placemark, pointData.date);
         }
-        
+
         StringBuffer sb = new StringBuffer(XmlUtil.toString(root));
 
         return new Result(msg("Point Data"), sb,
                           getRepository().getMimeTypeFromSuffix(".kml"));
-        
+
     }
 
 
@@ -1513,7 +1662,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
 
         StringBuffer sb = new StringBuffer();
-        getHtmlHeader(request,  sb, entry, list);
+        getHtmlHeader(request, sb, entry, list);
 
         if (list.size() == 0) {
             sb.append(msg("No results found"));
@@ -1558,12 +1707,12 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         for (PointData pointData : list) {
             StringBuffer row = new StringBuffer();
-            int  cnt    = -1;
+            int          cnt = -1;
             for (PointDataMetadata pdm : columnsToUse) {
                 cnt++;
                 Object value = pointData.getValue(pdm);
-                if(value instanceof Double) {
-                    double d = ((Double)value).doubleValue();
+                if (value instanceof Double) {
+                    double d = ((Double) value).doubleValue();
                     row.append(HtmlUtil.cols("" + Misc.format(d)));
                 } else {
                     row.append(HtmlUtil.cols("" + value));
@@ -1595,6 +1744,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     private Result makeSearchResultsTimeSeries(Request request, Entry entry,
             List<PointDataMetadata> columnsToUse, List<PointData> list)
             throws Exception {
+
         StringBuffer sb = new StringBuffer();
         sb.append(getHeader(request, entry));
         sb.append(header(msg("Point Data Search Results")));
@@ -1604,62 +1754,72 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         }
 
         TimeSeriesCollection dummy  = new TimeSeriesCollection();
-        JFreeChart           chart  = createChart(request,entry,dummy);
+        JFreeChart chart = createChart(request, entry, dummy);
         XYPlot               xyPlot = (XYPlot) chart.getPlot();
 
         Hashtable<String, MyTimeSeries> seriesMap = new Hashtable<String,
-                                                      MyTimeSeries>();
+                                                        MyTimeSeries>();
         List<MyTimeSeries> allSeries = new ArrayList<MyTimeSeries>();
-        int paramCount = 0;
-        int colorCount = 0;
-        boolean axisLeft = true;
-        Hashtable<String,List<ValueAxis>> axisMap = new Hashtable<String,List<ValueAxis>>();
-        Hashtable<String,double[]> rangeMap = new Hashtable<String,double[]>();
+        int     paramCount = 0;
+        int     colorCount = 0;
+        boolean axisLeft   = true;
+        Hashtable<String, List<ValueAxis>> axisMap = new Hashtable<String,
+                                                         List<ValueAxis>>();
+        Hashtable<String, double[]> rangeMap = new Hashtable<String,
+                                                   double[]>();
         List<String> units = new ArrayList<String>();
 
-        long t1 = System.currentTimeMillis();
+        long         t1    = System.currentTimeMillis();
 
         for (PointData pointData : list) {
             for (PointDataMetadata pdm : columnsToUse) {
-                if (!pdm.isNumeric()) {continue;}
-                double value = ((Double)pointData.getValue(pdm)).doubleValue();
-                if(value!=value) continue;
+                if ( !pdm.isNumeric()) {
+                    continue;
+                }
+                double value =
+                    ((Double) pointData.getValue(pdm)).doubleValue();
+                if (value != value) {
+                    continue;
+                }
                 List<ValueAxis> axises = null;
-                double[]range = null;
-                if(pdm.hasUnit()) {
+                double[]        range  = null;
+                if (pdm.hasUnit()) {
                     axises = axisMap.get(pdm.unit);
-                    range = rangeMap.get(pdm.unit);
-                    if(axises==null) {
-                        axises= new ArrayList<ValueAxis>();
-                        range = new double[]{value,value};
+                    range  = rangeMap.get(pdm.unit);
+                    if (axises == null) {
+                        axises = new ArrayList<ValueAxis>();
+                        range  = new double[] { value, value };
                         rangeMap.put(pdm.unit, range);
                         axisMap.put(pdm.unit, axises);
                         units.add(pdm.unit);
                     }
-                    range[0] = Math.min(range[0],value);
-                    range[1] = Math.max(range[1],value);
+                    range[0] = Math.min(range[0], value);
+                    range[1] = Math.max(range[1], value);
                 }
                 MyTimeSeries series = seriesMap.get(pdm.columnName);
                 if (series == null) {
                     paramCount++;
-                    TimeSeriesCollection dataset =
-                        new TimeSeriesCollection();
+                    TimeSeriesCollection dataset = new TimeSeriesCollection();
                     series = new MyTimeSeries(pdm.formatName(),
-                                            Millisecond.class);
+                            Millisecond.class);
                     allSeries.add(series);
-                    ValueAxis rangeAxis = new NumberAxis(pdm.formatName()+" " +pdm.formatUnit());
-                    if(axises!=null) axises.add(rangeAxis);
+                    ValueAxis rangeAxis = new NumberAxis(pdm.formatName()
+                                              + " " + pdm.formatUnit());
+                    if (axises != null) {
+                        axises.add(rangeAxis);
+                    }
                     XYItemRenderer renderer =
                         new XYAreaRenderer(XYAreaRenderer.LINES);
                     if (colorCount >= GuiUtils.COLORS.length) {
                         colorCount = 0;
                     }
-                    renderer.setSeriesPaint(0,
-                                            GuiUtils.COLORS[colorCount]);
+                    renderer.setSeriesPaint(0, GuiUtils.COLORS[colorCount]);
                     colorCount++;
                     xyPlot.setRenderer(paramCount, renderer);
                     xyPlot.setRangeAxis(paramCount, rangeAxis, false);
-                    AxisLocation side        = (axisLeft?AxisLocation.TOP_OR_LEFT:AxisLocation.BOTTOM_OR_RIGHT);
+                    AxisLocation side = (axisLeft
+                                         ? AxisLocation.TOP_OR_LEFT
+                                         : AxisLocation.BOTTOM_OR_RIGHT);
                     axisLeft = !axisLeft;
                     xyPlot.setRangeAxisLocation(paramCount, side);
 
@@ -1670,22 +1830,25 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                     xyPlot.mapDatasetToRangeAxis(paramCount, paramCount);
                 }
                 //series.addOrUpdate(new Millisecond(pointData.date),value);
-                TimeSeriesDataItem item = new TimeSeriesDataItem(new Millisecond(pointData.date),value);
+                TimeSeriesDataItem item =
+                    new TimeSeriesDataItem(new Millisecond(pointData.date),
+                                           value);
                 series.addItem(item);
             }
         }
 
 
 
-        for(MyTimeSeries timeSeries: allSeries) {
+        for (MyTimeSeries timeSeries : allSeries) {
             timeSeries.finish();
         }
 
-        for(String unit: units) {
+        for (String unit : units) {
             List<ValueAxis> axises = axisMap.get(unit);
-            double[]range = rangeMap.get(unit);
-            for(ValueAxis rangeAxis: axises) {
-                rangeAxis.setRange(new org.jfree.data.Range(range[0],range[1]));
+            double[]        range  = rangeMap.get(unit);
+            for (ValueAxis rangeAxis : axises) {
+                rangeAxis.setRange(new org.jfree.data.Range(range[0],
+                        range[1]));
             }
         }
 
@@ -1696,34 +1859,63 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             chart.createBufferedImage(request.get(ARG_POINT_IMAGE_WIDTH,
                 1000), request.get(ARG_POINT_IMAGE_HEIGHT, 400));
         long t3 = System.currentTimeMillis();
-        System.err.println("timeseries image time:" +( t2-t1) + " " + (t3-t2));
+        System.err.println("timeseries image time:" + (t2 - t1) + " "
+                           + (t3 - t2));
 
         File file = getStorageManager().getTmpFile(request, "point.png");
         ImageUtils.writeImageToFile(newImage, file);
         InputStream is     = getStorageManager().getFileInputStream(file);
         Result      result = new Result("", is, "image/png");
         return result;
+
     }
 
 
 
-    private static class  MyTimeSeries extends TimeSeries {
-        List<TimeSeriesDataItem> items= new ArrayList<TimeSeriesDataItem>();
+    /**
+     * Class MyTimeSeries _more_
+     *
+     *
+     * @author IDV Development Team
+     */
+    private static class MyTimeSeries extends TimeSeries {
+
+        /** _more_ */
+        List<TimeSeriesDataItem> items = new ArrayList<TimeSeriesDataItem>();
+
+        /** _more_ */
         HashSet<TimeSeriesDataItem> seen = new HashSet<TimeSeriesDataItem>();
 
+        /**
+         * _more_
+         *
+         * @param name _more_
+         * @param c _more_
+         */
         public MyTimeSeries(String name, Class c) {
             super(name, c);
         }
+
+        /**
+         * _more_
+         *
+         * @param item _more_
+         */
         public void addItem(TimeSeriesDataItem item) {
-            if(seen.contains(item)) return;
+            if (seen.contains(item)) {
+                return;
+            }
             seen.add(item);
             items.add(item);
         }
 
+        /**
+         * _more_
+         */
         public void finish() {
             items = new ArrayList<TimeSeriesDataItem>(Misc.sort(items));
 
-            for(TimeSeriesDataItem item: items) {
+            for (TimeSeriesDataItem item : items) {
                 this.data.add(item);
             }
             fireSeriesChanged();
@@ -1917,10 +2109,11 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             boolean didOne = false;
             for (PointDataMetadata pdm : columnsToUse) {
                 Object value = pointData.getValue(pdm);
-                if(didOne)
+                if (didOne) {
                     sb.append(comma);
+                }
                 didOne = true;
-                if(pdm.isDate()) {
+                if (pdm.isDate()) {
                     sb.append(sdf.format((Date) value));
                 } else {
                     sb.append(value);
@@ -2013,9 +2206,11 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         File file = getStorageManager().getTmpFile(request, "test.nc");
         PointObFactory.writeToNetcdf(file, field);
-        Result result = new Result("", getStorageManager().getFileInputStream(file),
-                          "application/x-netcdf");
-        result.addHttpHeader(HtmlUtil.HTTP_CONTENT_LENGTH, "" + file.length());
+        Result result =
+            new Result("", getStorageManager().getFileInputStream(file),
+                       "application/x-netcdf");
+        result.addHttpHeader(HtmlUtil.HTTP_CONTENT_LENGTH,
+                             "" + file.length());
         return result;
     }
 
@@ -2036,24 +2231,29 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         boolean canEdit = getAccessManager().canDoAction(request, entry,
                               Permission.ACTION_EDIT);
 
-        List    headerLinks  = new ArrayList();
-        String view =  request.getString(ARG_POINT_VIEW, VIEW_SEARCHFORM);
+        List   headerLinks = new ArrayList();
+        String view = request.getString(ARG_POINT_VIEW, VIEW_SEARCHFORM);
 
 
-        boolean doSearch     = request.exists(ARG_POINT_SEARCH) || request.exists(ARG_POINT_FORMAT);
+        boolean doSearch = request.exists(ARG_POINT_SEARCH)
+                           || request.exists(ARG_POINT_FORMAT);
 
-        if (!doSearch && view.equals(VIEW_SEARCHFORM)) {
+        if ( !doSearch && view.equals(VIEW_SEARCHFORM)) {
             headerLinks.add(HtmlUtil.b(msg("Search form")));
         } else {
             Object tmp1 = request.remove(ARG_POINT_SEARCH);
-            Object tmp2  = request.remove(ARG_POINT_FORMAT);
+            Object tmp2 = request.remove(ARG_POINT_FORMAT);
             headerLinks.add(
                 HtmlUtil.href(
                     request.entryUrl(getRepository().URL_ENTRY_SHOW, entry),
                     msg("Search form")));
 
-            if(tmp1!=null) request.put(ARG_POINT_SEARCH,tmp1);
-            if(tmp2!=null) request.put(ARG_POINT_FORMAT,tmp2);
+            if (tmp1 != null) {
+                request.put(ARG_POINT_SEARCH, tmp1);
+            }
+            if (tmp2 != null) {
+                request.put(ARG_POINT_FORMAT, tmp2);
+            }
         }
 
         if (view.equals(VIEW_METADATA)) {
@@ -2067,7 +2267,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         }
 
         if (canEdit) {
-            if(view.equals(VIEW_UPLOAD)) {
+            if (view.equals(VIEW_UPLOAD)) {
                 headerLinks.add(HtmlUtil.b(msg("Upload more data")));
             } else {
                 headerLinks.add(
@@ -2082,8 +2282,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         headerLinks.add(
             HtmlUtil.href(
                 request.entryUrl(
-                    getRepository().URL_ENTRY_SHOW, entry,
-                    ARG_POINT_VIEW, VIEW_DEFAULT), msg("Show default")));
+                    getRepository().URL_ENTRY_SHOW, entry, ARG_POINT_VIEW,
+                    VIEW_DEFAULT), msg("Show default")));
         String header = StringUtil.join("&nbsp;|&nbsp;", headerLinks);
         return HtmlUtil.center(header);
     }
@@ -2106,24 +2306,25 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         boolean canEdit = getAccessManager().canDoAction(request, entry,
                               Permission.ACTION_EDIT);
 
-        String view = request.getString(ARG_POINT_VIEW,VIEW_SEARCHFORM);
+        String view = request.getString(ARG_POINT_VIEW, VIEW_SEARCHFORM);
         if (view.equals(VIEW_DEFAULT)) {
             return null;
         }
 
-        boolean doSearch     = request.exists(ARG_POINT_SEARCH) || request.exists(ARG_POINT_FORMAT);
+        boolean doSearch = request.exists(ARG_POINT_SEARCH)
+                           || request.exists(ARG_POINT_FORMAT);
         if (doSearch) {
             return doSearch(request, entry);
         }
 
-        StringBuffer sb      = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
         if (view.equals(VIEW_METADATA)) {
-            if(request.getString(ARG_RESPONSE,"").equals("xml")) {
+            if (request.getString(ARG_RESPONSE, "").equals("xml")) {
                 return showMetadataXml(request, entry);
             }
             sb.append(getHeader(request, entry));
             showMetadata(sb, request, entry);
-        }  else if (view.equals(VIEW_UPLOAD)) {
+        } else if (view.equals(VIEW_UPLOAD)) {
             sb.append(getHeader(request, entry));
             doUpload(sb, request, entry);
         } else {
@@ -2223,9 +2424,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                 type = HtmlUtil.href(
                     request.entryUrl(
                         getRepository().URL_ENTRY_SHOW, entry,
-                        ARG_POINT_VIEW, VIEW_METADATA,
-                        ARG_POINT_CHANGETYPE, pdm.columnName), type,
-                            HtmlUtil.title(msg("Change type")));
+                        ARG_POINT_VIEW, VIEW_METADATA, ARG_POINT_CHANGETYPE,
+                        pdm.columnName), type,
+                                         HtmlUtil.title(msg("Change type")));
 
             }
             sb.append(HtmlUtil.row(HtmlUtil.cols(pdm.shortName, pdm.longName,
@@ -2236,24 +2437,36 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private Result showMetadataXml(Request request, Entry entry)
             throws Exception {
-        String tableName = getTableName(entry);
-        List<PointDataMetadata> metadata = getMetadata(getTableName(entry));
-        Document doc = XmlUtil.makeDocument();
-        Element root = doc.createElement("pointmetadata");
-        StringBuffer xml = new StringBuffer();
+        String                  tableName = getTableName(entry);
+        List<PointDataMetadata> metadata  = getMetadata(getTableName(entry));
+        Document                doc       = XmlUtil.makeDocument();
+        Element                 root      =
+            doc.createElement("pointmetadata");
+        StringBuffer            xml       = new StringBuffer();
         for (PointDataMetadata pdm : metadata) {
-            String type = pdm.varType;
+            String  type    = pdm.varType;
             Element colNode = XmlUtil.create("column", root);
-            XmlUtil.create(doc, "id", colNode,""+ pdm.columnNumber,null);
-            XmlUtil.create(doc, "isbasic", colNode, ""+pdm.isBasic(),null);
-            XmlUtil.create(doc, "shortname", colNode, pdm.shortName,null);
-            XmlUtil.create(doc, "longname", colNode, pdm.longName,null);
-            XmlUtil.create(doc, "unit", colNode, pdm.unit,null);
-            XmlUtil.create(doc, "type", colNode, pdm.varType,null);
+            XmlUtil.create(doc, "id", colNode, "" + pdm.columnNumber, null);
+            XmlUtil.create(doc, "isbasic", colNode, "" + pdm.isBasic(), null);
+            XmlUtil.create(doc, "shortname", colNode, pdm.shortName, null);
+            XmlUtil.create(doc, "longname", colNode, pdm.longName, null);
+            XmlUtil.create(doc, "unit", colNode, pdm.unit, null);
+            XmlUtil.create(doc, "type", colNode, pdm.varType, null);
         }
-        return new Result("",new StringBuffer(XmlUtil.toString(root)),"text/xml");
+        return new Result("", new StringBuffer(XmlUtil.toString(root)),
+                          "text/xml");
     }
 
 
@@ -2278,13 +2491,17 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
 
         Date[] dateRange = request.getDateRange(ARG_POINT_FROMDATE,
-                                                ARG_POINT_TODATE, null);
+                               ARG_POINT_TODATE, null);
 
-        if(dateRange[0] == null) dateRange[0]  = new Date(entry.getStartDate());
-        if(dateRange[1] == null) dateRange[1]  = new Date(entry.getEndDate());
+        if (dateRange[0] == null) {
+            dateRange[0] = new Date(entry.getStartDate());
+        }
+        if (dateRange[1] == null) {
+            dateRange[1] = new Date(entry.getEndDate());
+        }
 
 
-        StringBuffer            basicSB   = new StringBuffer();
+        StringBuffer basicSB = new StringBuffer();
 
         basicSB.append(HtmlUtil.formTable());
         basicSB.append(HtmlUtil.hidden(ARG_OUTPUT,
@@ -2306,12 +2523,16 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                     timezone)));
 
 
-        basicSB.append(HtmlUtil.formEntry(msgLabel("Month"),
-                                          HtmlUtil.select(ARG_POINT_MONTH,
-                                                          months, request.getString(ARG_POINT_MONTH,"")) +" " +
-                                          msgLabel("Hour")+
-                                          HtmlUtil.select(ARG_POINT_HOUR,
-                                                          hours, request.getString(ARG_POINT_HOUR,""))));
+        basicSB.append(
+            HtmlUtil.formEntry(
+                msgLabel("Month"),
+                HtmlUtil.select(
+                    ARG_POINT_MONTH, months,
+                    request.getString(ARG_POINT_MONTH, "")) + " "
+                        + msgLabel("Hour")
+                        + HtmlUtil.select(
+                            ARG_POINT_HOUR, hours,
+                            request.getString(ARG_POINT_HOUR, ""))));
 
 
 
@@ -2320,20 +2541,23 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         basicSB.append(
             HtmlUtil.formEntryTop(
                 msgLabel("Location"),
-                HtmlUtil.makeLatLonBox(ARG_POINT_BBOX, 
-                                       request.getString(ARG_POINT_BBOX + "_south",""),
-                                       request.getString(ARG_POINT_BBOX + "_north",""),
-                                       request.getString(ARG_POINT_BBOX + "_east",""),
-                                       request.getString(ARG_POINT_BBOX + "_west",""))));
+                HtmlUtil.makeLatLonBox(
+                    ARG_POINT_BBOX,
+                    request.getString(ARG_POINT_BBOX + "_south", ""),
+                    request.getString(ARG_POINT_BBOX + "_north", ""),
+                    request.getString(ARG_POINT_BBOX + "_east", ""),
+                    request.getString(ARG_POINT_BBOX + "_west", ""))));
 
-        basicSB.append(HtmlUtil.hidden(ARG_POINT_REDIRECT,"true"));
+        basicSB.append(HtmlUtil.hidden(ARG_POINT_REDIRECT, "true"));
 
         basicSB.append(HtmlUtil.formTableClose());
 
 
 
-        String max     = HtmlUtil.input(ARG_MAX, request.getString(ARG_MAX,"1000"), HtmlUtil.SIZE_5);
-        List   formats = Misc.toList(new Object[] {
+        String max = HtmlUtil.input(ARG_MAX,
+                                    request.getString(ARG_MAX, "1000"),
+                                    HtmlUtil.SIZE_5);
+        List formats = Misc.toList(new Object[] {
             new TwoFacedObject("Html", FORMAT_HTML),
             new TwoFacedObject("Interactive Chart", FORMAT_CHART),
             new TwoFacedObject("Time Series Image", FORMAT_TIMESERIES),
@@ -2345,63 +2569,91 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             new TwoFacedObject("NetCDF", FORMAT_NETCDF)
         });
 
-        String format = request.getString(ARG_POINT_FORMAT, FORMAT_HTML);
+        String format     = request.getString(ARG_POINT_FORMAT, FORMAT_HTML);
 
 
 
-        List sortByList = new ArrayList();
-        sortByList.add(new TwoFacedObject("Date",COL_DATE));
+        List   sortByList = new ArrayList();
+        sortByList.add(new TwoFacedObject("Date", COL_DATE));
         for (PointDataMetadata pdm : metadata) {
             if (pdm.isBasic()) {
                 continue;
             }
-            sortByList.add(new TwoFacedObject(pdm.formatName(),pdm.columnName));
+            sortByList.add(new TwoFacedObject(pdm.formatName(),
+                    pdm.columnName));
         }
-        
-        int cnt = Misc.getProperty(getProperties(entry),PROP_CNT,0);
+
+        int          cnt = Misc.getProperty(getProperties(entry), PROP_CNT,
+                                            0);
 
         StringBuffer outputSB = new StringBuffer();
         outputSB.append(HtmlUtil.formTable());
-        String sortBy = HtmlUtil.select(ARG_POINT_SORTBY, sortByList,request.getString(ARG_POINT_SORTBY,""));
+        String sortBy = HtmlUtil.select(ARG_POINT_SORTBY, sortByList,
+                                        request.getString(ARG_POINT_SORTBY,
+                                            ""));
 
 
         outputSB.append(HtmlUtil.formEntry(msgLabel("Format"),
-                                          HtmlUtil.select(ARG_POINT_FORMAT, formats,format)));
-        outputSB.append(HtmlUtil.formEntry(msgLabel("Max"), max+ HtmlUtil.space(1)+"(" + cnt +" " + msg("total") +")"));
-        List skip = Misc.toList(new Object[]{new TwoFacedObject("None",1),
-                                 new TwoFacedObject("Every other one",2),
-                                 new TwoFacedObject("Every third",3),
-                                 new TwoFacedObject("Every fourth",4),
-                                 new TwoFacedObject("Every fifth",5),
-                                 new TwoFacedObject("Every tenth",10),
-                                 new TwoFacedObject("Every twentieth",20),
-                                 new TwoFacedObject("Every fiftieth",50),
-                                             new TwoFacedObject("Every hundredth",100)});
+                                           HtmlUtil.select(ARG_POINT_FORMAT,
+                                               formats, format)));
+        outputSB.append(HtmlUtil.formEntry(msgLabel("Max"),
+                                           max + HtmlUtil.space(1) + "("
+                                           + cnt + " " + msg("total") + ")"));
+        List skip = Misc.toList(new Object[] {
+            new TwoFacedObject("None", 1),
+            new TwoFacedObject("Every other one", 2),
+            new TwoFacedObject("Every third", 3),
+            new TwoFacedObject("Every fourth", 4),
+            new TwoFacedObject("Every fifth", 5),
+            new TwoFacedObject("Every tenth", 10),
+            new TwoFacedObject("Every twentieth", 20),
+            new TwoFacedObject("Every fiftieth", 50),
+            new TwoFacedObject("Every hundredth", 100)
+        });
 
-        outputSB.append(HtmlUtil.formEntry(msgLabel("Skip"),HtmlUtil.select(ARG_POINT_STRIDE,skip,request.getString(ARG_POINT_STRIDE,"1"))));
-        outputSB.append(HtmlUtil.formEntry(msgLabel("Sort by"), 
-                                           sortBy+" " +   HtmlUtil.checkbox(ARG_POINT_ASCENDING,"true", request.get(ARG_POINT_ASCENDING,true))+" " + msg("ascending")));
+        outputSB.append(
+            HtmlUtil.formEntry(
+                msgLabel("Skip"),
+                HtmlUtil.select(
+                    ARG_POINT_STRIDE, skip,
+                    request.getString(ARG_POINT_STRIDE, "1"))));
+        outputSB.append(
+            HtmlUtil.formEntry(
+                msgLabel("Sort by"),
+                sortBy + " "
+                + HtmlUtil.checkbox(
+                    ARG_POINT_ASCENDING, "true",
+                    request.get(ARG_POINT_ASCENDING, true)) + " "
+                        + msg("ascending")));
 
         StringBuffer advOutputSB = new StringBuffer();
 
         advOutputSB.append(HtmlUtil.formTable());
 
-        advOutputSB.append(HtmlUtil.formEntry(msgLabel("Time Series"),
-                                              msgLabel("Chart Title")+
-                                              HtmlUtil.input(ARG_POINT_TIMESERIES_TITLE,request.getString(ARG_POINT_TIMESERIES_TITLE,""), HtmlUtil.SIZE_60)));
+        advOutputSB.append(
+            HtmlUtil.formEntry(
+                msgLabel("Time Series"),
+                msgLabel("Chart Title")
+                + HtmlUtil.input(
+                    ARG_POINT_TIMESERIES_TITLE,
+                    request.getString(ARG_POINT_TIMESERIES_TITLE, ""),
+                    HtmlUtil.SIZE_60)));
 
 
         advOutputSB.append(HtmlUtil.formEntry(msgLabel("Interactive Chart"),
-                                              HtmlUtil.checkbox(ARG_POINT_CHART_USETIMEFORNAME,"true",request.get(ARG_POINT_CHART_USETIMEFORNAME, false)) +
-                                              HtmlUtil.space(1) +
-                                              msg("Use time as name")));
+                HtmlUtil.checkbox(ARG_POINT_CHART_USETIMEFORNAME, "true",
+                                  request.get(ARG_POINT_CHART_USETIMEFORNAME,
+                                      false)) + HtmlUtil.space(1)
+                                          + msg("Use time as name")));
 
         advOutputSB.append(HtmlUtil.formTableClose());
 
 
-        outputSB.append(HtmlUtil.formEntry(msgLabel("Settings"),
-                                           HtmlUtil.makeShowHideBlock(msg("..."),
-                                                                      advOutputSB.toString(), false)));
+        outputSB.append(
+            HtmlUtil.formEntry(
+                msgLabel("Settings"),
+                HtmlUtil.makeShowHideBlock(
+                    msg("..."), advOutputSB.toString(), false)));
         outputSB.append(HtmlUtil.formTableClose());
 
         StringBuffer extra = new StringBuffer();
@@ -2411,12 +2663,12 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                 new TwoFacedObject("=", OP_EQUALS));
 
         for (PointDataMetadata pdm : metadata) {
-            if (pdm.isBasic()&& !pdm.columnName.equals(COL_ALTITUDE)) {
+            if (pdm.isBasic() && !pdm.columnName.equals(COL_ALTITUDE)) {
                 continue;
             }
-            String suffix = HtmlUtil.space(1) + pdm.formatUnit();
-            String argSuffix = ""+pdm.columnNumber;
-            String label  = pdm.formatName() + ":";
+            String suffix    = HtmlUtil.space(1) + pdm.formatUnit();
+            String argSuffix = "" + pdm.columnNumber;
+            String label     = pdm.formatName() + ":";
             if (pdm.isEnumeration()) {
                 List values = pdm.enumeratedValues;
                 if (values == null) {
@@ -2424,30 +2676,37 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                          SqlUtil.distinct(pdm.columnName),
                                          tableName, (Clause) null);
                     values = Misc.toList(SqlUtil.readString(stmt, 1));
-                    values =  new ArrayList(Misc.sort(values));
+                    values = new ArrayList(Misc.sort(values));
                     values.add(0, "");
                     getDatabaseManager().close(stmt);
                     pdm.enumeratedValues = values;
                 }
-                String field = HtmlUtil.select(ARG_POINT_FIELD_VALUE
-                                   + argSuffix, values,request.getString(ARG_POINT_FIELD_VALUE+argSuffix,""));
+                String field =
+                    HtmlUtil.select(ARG_POINT_FIELD_VALUE + argSuffix,
+                                    values,
+                                    request.getString(ARG_POINT_FIELD_VALUE
+                                        + argSuffix, ""));
                 extra.append(HtmlUtil.formEntry(label, field));
             } else if (pdm.isString()) {
-                String field = HtmlUtil.input(ARG_POINT_FIELD_VALUE
-                                   + argSuffix, request.getString(ARG_POINT_FIELD_VALUE
-                                   + argSuffix,""), HtmlUtil.SIZE_20);
+                String field =
+                    HtmlUtil.input(ARG_POINT_FIELD_VALUE + argSuffix,
+                                   request.getString(ARG_POINT_FIELD_VALUE
+                                       + argSuffix, ""), HtmlUtil.SIZE_20);
                 String cbx = HtmlUtil.checkbox(ARG_POINT_FIELD_EXACT
-                                 + argSuffix, "true", request.get(ARG_POINT_FIELD_EXACT
-                                 + argSuffix,false)) + " "
-                                     + msg("Exact");
+                                 + argSuffix, "true",
+                                     request.get(ARG_POINT_FIELD_EXACT
+                                         + argSuffix, false)) + " "
+                                             + msg("Exact");
                 extra.append(HtmlUtil.formEntry(label, field + " " + cbx));
             } else {
-                String op = HtmlUtil.select(ARG_POINT_FIELD_OP
-                                            + argSuffix, ops,request.getString(ARG_POINT_FIELD_OP
-                                            + argSuffix,""));
-                String field = HtmlUtil.input(ARG_POINT_FIELD_VALUE
-                                   + argSuffix, request.getString(ARG_POINT_FIELD_VALUE
-                                   + argSuffix,""), HtmlUtil.SIZE_10);
+                String op =
+                    HtmlUtil.select(ARG_POINT_FIELD_OP + argSuffix, ops,
+                                    request.getString(ARG_POINT_FIELD_OP
+                                        + argSuffix, ""));
+                String field =
+                    HtmlUtil.input(ARG_POINT_FIELD_VALUE + argSuffix,
+                                   request.getString(ARG_POINT_FIELD_VALUE
+                                       + argSuffix, ""), HtmlUtil.SIZE_10);
                 extra.append(HtmlUtil.formEntry(label,
                         op + " " + field + suffix));
             }
@@ -2457,34 +2716,36 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         StringBuffer params = new StringBuffer();
         params.append("<ul>");
-        params.append(HtmlUtil.checkbox(ARG_POINT_PARAM_ALL, "true", request.get(ARG_POINT_PARAM_ALL,false)));
+        params.append(HtmlUtil.checkbox(ARG_POINT_PARAM_ALL, "true",
+                                        request.get(ARG_POINT_PARAM_ALL,
+                                            false)));
         params.append(HtmlUtil.space(1));
         params.append(msg("All"));
         params.append(HtmlUtil.br());
-        List list = request.get(ARG_POINT_PARAM, new ArrayList());
-        int cbxCnt = 0;
+        List list   = request.get(ARG_POINT_PARAM, new ArrayList());
+        int  cbxCnt = 0;
 
         for (PointDataMetadata pdm : metadata) {
-            if(pdm.isObMonth() || pdm.isObHour()) {
+            if (pdm.isObMonth() || pdm.isObHour()) {
                 continue;
             }
             if (pdm.isBasic()) {
                 //                continue;
             }
-            String value = ""+pdm.columnNumber;
+            String  value   = "" + pdm.columnNumber;
 
-            boolean checked = (list.size()==0?pdm.isBasic():list.contains(value));
-            String cbxId = "cbx" + (cbxCnt++);
-            String cbxExtra = HtmlUtil.id(cbxId) +
-                HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,
-                              HtmlUtil.call(
-                                            "checkboxClicked",
-                                            HtmlUtil.comma(
-                                                           "event",
-                                                           HtmlUtil.squote(ARG_POINT_PARAM),
-                                                           HtmlUtil.squote(cbxId))));
-            params.append(HtmlUtil.checkbox(ARG_POINT_PARAM, value,
-                                          checked,cbxExtra));
+            boolean checked = ((list.size() == 0)
+                               ? pdm.isBasic()
+                               : list.contains(value));
+            String  cbxId   = "cbx" + (cbxCnt++);
+            String cbxExtra = HtmlUtil.id(cbxId)
+                              + HtmlUtil.attr(HtmlUtil.ATTR_ONCLICK,
+                                  HtmlUtil.call("checkboxClicked",
+                                      HtmlUtil.comma("event",
+                                          HtmlUtil.squote(ARG_POINT_PARAM),
+                                          HtmlUtil.squote(cbxId))));
+            params.append(HtmlUtil.checkbox(ARG_POINT_PARAM, value, checked,
+                                            cbxExtra));
 
 
 
@@ -2496,8 +2757,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         //        sb.append(header(msg("Point Data Search")));
         sb.append(
-            HtmlUtil.formPost(getRepository().URL_ENTRY_SHOW.toString(), HtmlUtil.attr(
-                    "name", "pointsearch") + HtmlUtil.id("pointsearch")));
+            HtmlUtil.formPost(
+                getRepository().URL_ENTRY_SHOW.toString(),
+                HtmlUtil.attr("name", "pointsearch")
+                + HtmlUtil.id("pointsearch")));
 
         sb.append(HtmlUtil.submit(msg("Search"), ARG_POINT_SEARCH));
         sb.append(HtmlUtil.p());
@@ -2543,9 +2806,22 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
     }
 
 
-    private List<PointDataMetadata> getMetadata(String tableName, boolean checkCache)
+    /**
+     * _more_
+     *
+     * @param tableName _more_
+     * @param checkCache _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private List<PointDataMetadata> getMetadata(String tableName,
+            boolean checkCache)
             throws Exception {
-        List<PointDataMetadata> metadata = (checkCache?metadataCache.get(tableName):null);
+        List<PointDataMetadata> metadata = (checkCache
+                                            ? metadataCache.get(tableName)
+                                            : null);
         if (metadata == null) {
             if (metadataCache.size() > 100) {
                 metadataCache = new Hashtable<String,
@@ -2559,7 +2835,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                         .eq(Tables.POINTDATAMETADATA
                             .COL_TABLENAME, tableName), " ORDER BY "
                                 + Tables.POINTDATAMETADATA.COL_COLUMNNUMBER
-                            + " ASC ");
+                                + " ASC ");
 
             SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
             ResultSet        results;
@@ -2576,7 +2852,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                             results.getString(col++)));
                 }
             }
-            if(checkCache) {
+            if (checkCache) {
                 metadataCache.put(tableName, metadata);
             }
         }
@@ -2621,8 +2897,15 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
 
 
-    public void addColumnsToEntryForm(Request request, StringBuffer formBuffer,
-                                      Entry entry) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param formBuffer _more_
+     * @param entry _more_
+     */
+    public void addColumnsToEntryForm(Request request,
+                                      StringBuffer formBuffer, Entry entry) {
         //noop
     }
 
@@ -2632,22 +2915,25 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      * _more_
      *
      * @param entry _more_
+     * @param parent _more_
      * @param file _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected FeatureDatasetPoint getDataset(Entry entry, Group parent, File file)
+    protected FeatureDatasetPoint getDataset(Entry entry, Group parent,
+                                             File file)
             throws Exception {
         Formatter buf = new Formatter();
 
         getStorageManager().checkFile(file);
-        if(file.toString().toLowerCase().endsWith(".csv")) {
-            TextPointDataSource dataSource = new TextPointDataSource("dummy.csv");
+        if (file.toString().toLowerCase().endsWith(".csv")) {
+            TextPointDataSource dataSource =
+                new TextPointDataSource("dummy.csv");
             String contents = getStorageManager().readSystemResource(file);
             FieldImpl field = dataSource.makeObs(contents, ",", null, null,
-                                                 null, false, false);
+                                  null, false, false);
             file = getStorageManager().getTmpFile(null, "test.nc");
             PointObFactory.writeToNetcdf(file, field);
         }
@@ -2657,36 +2943,36 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             getMetadataManager().findMetadata(entry,
                 ContentMetadataHandler.TYPE_ATTACHMENT, true);
         if (metadataList == null) {
-            metadataList =
-                getMetadataManager().findMetadata(parent,
-                                                  ContentMetadataHandler.TYPE_ATTACHMENT, true,false);
+            metadataList = getMetadataManager().findMetadata(parent,
+                    ContentMetadataHandler.TYPE_ATTACHMENT, true, false);
         }
 
         if (metadataList != null) {
             for (Metadata metadata : metadataList) {
                 if (metadata.getAttr1().endsWith(".ncml")) {
                     File templateNcmlFile =
-                        new File(
-                                 IOUtil.joinDir(
-                                                getRepository().getStorageManager().getEntryDir(
-                                                                                                metadata.getEntryId(),
-                                                                                                false), metadata.getAttr1()));
-                    String ncml = getStorageManager().readSystemResource(templateNcmlFile);
-                    String filePath  = file.toString();
-                    filePath = filePath.replace("\\","/");
-                    if(filePath.indexOf(":")>=0) {
-                        filePath  = IOUtil.getURL(filePath,getClass()).toString();
+                        new File(IOUtil
+                            .joinDir(getRepository().getStorageManager()
+                                .getEntryDir(metadata.getEntryId(),
+                                             false), metadata.getAttr1()));
+                    String ncml = getStorageManager().readSystemResource(
+                                      templateNcmlFile);
+                    String filePath = file.toString();
+                    filePath = filePath.replace("\\", "/");
+                    if (filePath.indexOf(":") >= 0) {
+                        filePath = IOUtil.getURL(filePath,
+                                getClass()).toString();
                     }
                     ncml = ncml.replace("${location}", filePath);
                     File ncmlFile =
-                        getStorageManager().getScratchFile(entry.getId() + "_"
-                                                           + metadata.getId() + ".ncml");
+                        getStorageManager().getScratchFile(entry.getId()
+                            + "_" + metadata.getId() + ".ncml");
                     IOUtil.writeBytes(ncmlFile, ncml.getBytes());
                     file = new File(ncmlFile.toString());
                     break;
                 }
             }
-       } 
+        }
 
 
         FeatureDatasetPoint pods =
@@ -2715,13 +3001,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         /** _more_ */
         public static final String TYPE_DOUBLE = "double";
 
-        /** _more_          */
+        /** _more_ */
         public static final String TYPE_INT = "int";
 
         /** _more_ */
         public static final String TYPE_DATE = "date";
 
-        /** _more_          */
+        /** _more_ */
         public static final String TYPE_ENUMERATION = "enumeration";
 
 
@@ -2746,7 +3032,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         /** _more_ */
         private String unit;
 
-        /** _more_          */
+        /** _more_ */
         private List enumeratedValues;
 
         /**
@@ -2806,31 +3092,70 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         }
 
 
+        /**
+         * _more_
+         *
+         * @param c _more_
+         *
+         * @return _more_
+         */
         public boolean isColumn(String c) {
-            return Misc.equals(columnName,c);
+            return Misc.equals(columnName, c);
         }
 
 
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean isObMonth() {
             return isColumn(COL_MONTH);
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean isObHour() {
             return isColumn(COL_HOUR);
         }
 
 
-        public static boolean contains(List<PointDataMetadata> list, String col) {
-            for(PointDataMetadata pdm: list) {
-                if(pdm.isColumn(col)) return true;
+        /**
+         * _more_
+         *
+         * @param list _more_
+         * @param col _more_
+         *
+         * @return _more_
+         */
+        public static boolean contains(List<PointDataMetadata> list,
+                                       String col) {
+            for (PointDataMetadata pdm : list) {
+                if (pdm.isColumn(col)) {
+                    return true;
+                }
             }
             return false;
         }
 
-        public static PointDataMetadata find(List<PointDataMetadata> list, String col) {
-            for(PointDataMetadata pdm: list) {
-                if(pdm.isColumn(col)) return pdm;
+        /**
+         * _more_
+         *
+         * @param list _more_
+         * @param col _more_
+         *
+         * @return _more_
+         */
+        public static PointDataMetadata find(List<PointDataMetadata> list,
+                                             String col) {
+            for (PointDataMetadata pdm : list) {
+                if (pdm.isColumn(col)) {
+                    return pdm;
+                }
             }
             return null;
         }
@@ -2858,8 +3183,13 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             return shortName.replace("_", " ");
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public String varName() {
-            String n = shortName.replace(" ","_");
+            String n = shortName.replace(" ", "_");
             return n;
         }
 
@@ -2877,6 +3207,11 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean hasUnit() {
             if ((unit == null) || (unit.length() == 0)) {
                 return false;
@@ -2906,6 +3241,11 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                    || varType.equals(TYPE_ENUMERATION);
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean isDate() {
             return varType.equals(TYPE_DATE);
         }
@@ -2948,32 +3288,35 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
      */
     public static class PointData {
 
+        /** _more_ */
         int id;
 
-        /** _more_          */
+        /** _more_ */
         double lat;
 
-        /** _more_          */
+        /** _more_ */
         double lon;
 
-        /** _more_          */
+        /** _more_ */
         double alt;
 
-        /** _more_          */
+        /** _more_ */
         Date date;
 
-        /** _more_          */
+        /** _more_ */
         int month;
 
-        /** _more_          */
+        /** _more_ */
         int hour;
 
-        /** _more_          */
+        /** _more_ */
         Hashtable values = new Hashtable();
 
         /**
          * _more_
          *
+         *
+         * @param id _more_
          * @param date _more_
          * @param lat _more_
          * @param lon _more_
@@ -2981,10 +3324,9 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
          * @param month _more_
          * @param hour _more_
          */
-        public PointData(int id,
-                         Date date, double lon, double lat, double alt,
-                         int month, int hour) {
-            this.id = id;
+        public PointData(int id, Date date, double lon, double lat,
+                         double alt, int month, int hour) {
+            this.id    = id;
             this.lat   = lat;
             this.lon   = lon;
             this.alt   = alt;
@@ -2993,23 +3335,59 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             this.hour  = hour;
         }
 
-        public void setValue(PointDataMetadata pdm,Object v) {
+        /**
+         * _more_
+         *
+         * @param pdm _more_
+         * @param v _more_
+         */
+        public void setValue(PointDataMetadata pdm, Object v) {
             values.put(pdm.columnName, v);
         }
 
+        /**
+         * _more_
+         *
+         * @param pdm _more_
+         *
+         * @return _more_
+         */
         public Object getValue(PointDataMetadata pdm) {
             return getValue(pdm.columnName);
         }
 
+        /**
+         * _more_
+         *
+         * @param col _more_
+         *
+         * @return _more_
+         */
         public Object getValue(String col) {
-            if(col==null) return null;
-            if(col.equals(COL_ID)) return new Double(id);
-            if(col.equals(COL_LATITUDE)) return new Double(lat);
-            if(col.equals(COL_LONGITUDE)) return new Double(lon);
-            if(col.equals(COL_ALTITUDE)) return new Double(alt);
-            if(col.equals(COL_DATE)) return date;
-            if(col.equals(COL_MONTH)) return new Double(month);
-            if(col.equals(COL_HOUR)) return new Double(hour);
+            if (col == null) {
+                return null;
+            }
+            if (col.equals(COL_ID)) {
+                return new Double(id);
+            }
+            if (col.equals(COL_LATITUDE)) {
+                return new Double(lat);
+            }
+            if (col.equals(COL_LONGITUDE)) {
+                return new Double(lon);
+            }
+            if (col.equals(COL_ALTITUDE)) {
+                return new Double(alt);
+            }
+            if (col.equals(COL_DATE)) {
+                return date;
+            }
+            if (col.equals(COL_MONTH)) {
+                return new Double(month);
+            }
+            if (col.equals(COL_HOUR)) {
+                return new Double(hour);
+            }
             return values.get(col);
         }
 

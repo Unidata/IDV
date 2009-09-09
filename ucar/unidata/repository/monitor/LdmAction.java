@@ -57,7 +57,7 @@ public class LdmAction extends MonitorAction {
     /** _more_ */
     private String feed = "SPARE";
 
-    /** _more_          */
+    /** _more_ */
     private String productId = "";
 
 
@@ -176,14 +176,16 @@ public class LdmAction extends MonitorAction {
         try {
             Resource resource = entry.getResource();
             if ( !resource.isFile()) {
-                monitor.handleError("LdmMonitor:" + this+" Entry is not a file:" + entry,null);
+                monitor.handleError("LdmMonitor:" + this
+                                    + " Entry is not a file:" + entry, null);
                 return;
             }
             String id = productId.trim();
             id = monitor.getRepository().getEntryManager().replaceMacros(
-                                                                         entry, id);
+                entry, id);
 
-            insertIntoQueue(monitor.getRepository(),pqinsert, queue, feed, id, resource.getPath());
+            insertIntoQueue(monitor.getRepository(), pqinsert, queue, feed,
+                            id, resource.getPath());
 
         } catch (Exception exc) {
             monitor.handleError("Error posting to LDM", exc);
@@ -193,6 +195,8 @@ public class LdmAction extends MonitorAction {
     /**
      * _more_
      *
+     *
+     * @param repository _more_
      * @param pqinsert _more_
      * @param queue _more_
      * @param feed _more_
@@ -201,7 +205,8 @@ public class LdmAction extends MonitorAction {
      *
      * @throws Exception _more_
      */
-    public static void insertIntoQueue(Repository repository, String pqinsert, String queue,
+    public static void insertIntoQueue(Repository repository,
+                                       String pqinsert, String queue,
                                        String feed, String productId,
                                        String file)
             throws Exception {
@@ -214,15 +219,19 @@ public class LdmAction extends MonitorAction {
         Process process = Runtime.getRuntime().exec(command);
         int     result  = process.waitFor();
         if (result == 0) {
-            repository.getLogManager().logInfo("LdmMonitor inserted into queue:" + file);
+            repository.getLogManager().logInfo(
+                "LdmMonitor inserted into queue:" + file);
         } else {
             try {
                 InputStream is    = process.getErrorStream();
                 byte[]      bytes = IOUtil.readBytes(is);
-                repository.getLogManager().logError("LdmMonitor failed to insert into queue:" + file+"\n"+ new String(bytes));
+                repository.getLogManager().logError(
+                    "LdmMonitor failed to insert into queue:" + file + "\n"
+                    + new String(bytes));
                 System.err.println("Error:" + new String(bytes));
             } catch (Exception noop) {
-                repository.getLogManager().logError("LdmMonitor failed to insert into queue:" + file);
+                repository.getLogManager().logError(
+                    "LdmMonitor failed to insert into queue:" + file);
             }
         }
     }

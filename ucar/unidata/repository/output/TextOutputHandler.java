@@ -20,10 +20,11 @@
  */
 
 package ucar.unidata.repository.output;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -118,8 +119,7 @@ public class TextOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
 
         if (state.entry == null) {
@@ -180,19 +180,22 @@ public class TextOutputHandler extends OutputHandler {
 
 
         Object output = request.getOutput();
-        if(output.equals(OUTPUT_WORDCLOUD)) {
+        if (output.equals(OUTPUT_WORDCLOUD)) {
             return outputWordCloud(request, entry);
         }
-        
-
-StringBuffer head = new StringBuffer("<link type=\"text/css\" rel=\"stylesheet\" href=\"${root}/javascript/syntaxhighlighter/styles/shCore.css\" />\n<link type=\"text/css\" rel=\"stylesheet\" href=\"${root}/javascript/syntaxhighlighter/styles/shThemeDefault.css\" />\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shCore.js\">\n</script>\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shBrushJScript.js\">\n</script>\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shBrushBash.js\">\n</script>\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shBrushCpp.js\">\n</script>\n");
 
 
- //<script type="text/javascript">SyntaxHighlighter.all();</script> 
+        StringBuffer head =
+            new StringBuffer(
+                "<link type=\"text/css\" rel=\"stylesheet\" href=\"${root}/javascript/syntaxhighlighter/styles/shCore.css\" />\n<link type=\"text/css\" rel=\"stylesheet\" href=\"${root}/javascript/syntaxhighlighter/styles/shThemeDefault.css\" />\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shCore.js\">\n</script>\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shBrushJScript.js\">\n</script>\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shBrushBash.js\">\n</script>\n<script type=\"text/javascript\" src=\"${root}/javascript/syntaxhighlighter/scripts/shBrushCpp.js\">\n</script>\n");
+
+
+        //<script type="text/javascript">SyntaxHighlighter.all();</script> 
 
 
 
-        String contents  = getStorageManager().readSystemResource(entry.getFile());
+        String contents =
+            getStorageManager().readSystemResource(entry.getFile());
         StringBuffer sb  = new StringBuffer();
         int          cnt = 0;
         sb.append("<pre>");
@@ -210,14 +213,29 @@ StringBuffer head = new StringBuffer("<link type=\"text/css\" rel=\"stylesheet\"
     }
 
 
-    public Result outputWordCloud(Request request, Entry entry) throws Exception {
-        String contents  = getStorageManager().readSystemResource(entry.getFile());
-        StringBuffer sb  = new StringBuffer();
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result outputWordCloud(Request request, Entry entry)
+            throws Exception {
+        String contents =
+            getStorageManager().readSystemResource(entry.getFile());
+        StringBuffer sb   = new StringBuffer();
 
         StringBuffer head = new StringBuffer();
         head.append("\n");
-        head.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"http://visapi-gadgets.googlecode.com/svn/trunk/wordcloud/wc.css\">\n");
-        head.append(HtmlUtil.importJS("http://visapi-gadgets.googlecode.com/svn/trunk/wordcloud/wc.js"));
+        head.append(
+            "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://visapi-gadgets.googlecode.com/svn/trunk/wordcloud/wc.css\">\n");
+        head.append(
+            HtmlUtil.importJS(
+                "http://visapi-gadgets.googlecode.com/svn/trunk/wordcloud/wc.js"));
         head.append("\n");
         head.append(HtmlUtil.importJS("http://www.google.com/jsapi"));
         head.append("\n");
@@ -230,15 +248,15 @@ StringBuffer head = new StringBuffer("<link type=\"text/css\" rel=\"stylesheet\"
         js.append("function draw() {\n");
         js.append("var data = new google.visualization.DataTable();\n");
         js.append("data.addColumn('string', 'Text1');\n");
-        List<String> lines=(List<String>) StringUtil.split(contents, "\n",
-                                                           false, false); 
-        
-        js.append("data.addRows("+lines.size()+");\n");
-        int     cnt = 0;
+        List<String> lines = (List<String>) StringUtil.split(contents, "\n",
+                                 false, false);
+
+        js.append("data.addRows(" + lines.size() + ");\n");
+        int cnt = 0;
         for (String line : lines) {
             line = line.replace("\r", "");
             line = line.replace("'", "\\'");
-            js.append("data.setCell(" + cnt+", 0, '" + line +"');\n");
+            js.append("data.setCell(" + cnt + ", 0, '" + line + "');\n");
             cnt++;
         }
         js.append("var outputDiv = document.getElementById('wcdiv');\n");
@@ -246,7 +264,8 @@ StringBuffer head = new StringBuffer("<link type=\"text/css\" rel=\"stylesheet\"
         js.append("wc.draw(data, null);\n");
         js.append("      }");
         sb.append(HtmlUtil.script(js.toString()));
-        Result result =  makeLinksResult(request, msg("Word Cloud"), sb, new State(entry));
+        Result result = makeLinksResult(request, msg("Word Cloud"), sb,
+                                        new State(entry));
         result.putProperty(PROP_HTML_HEAD, head.toString());
         return result;
     }

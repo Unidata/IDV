@@ -20,14 +20,15 @@
  */
 
 package ucar.unidata.repository.output;
-import ucar.unidata.repository.*;
-import ucar.unidata.repository.metadata.*;
 
 
 import org.w3c.dom.Element;
 
+import ucar.unidata.repository.*;
+
 
 import ucar.unidata.repository.collab.*;
+import ucar.unidata.repository.metadata.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -90,10 +91,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     public static final String LABEL_LINKS = "View &amp; Edit";
 
     /** _more_ */
-    public static final OutputType OUTPUT_HTML = new OutputType("Entry",
-                                                     "default.html",
-                                                     OutputType.TYPE_HTML|OutputType.TYPE_FORSEARCH,
-                                                     "", ICON_INFORMATION);
+    public static final OutputType OUTPUT_HTML =
+        new OutputType("Entry", "default.html",
+                       OutputType.TYPE_HTML | OutputType.TYPE_FORSEARCH, "",
+                       ICON_INFORMATION);
 
 
     /** _more_ */
@@ -248,11 +249,20 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                          List<Entry> entries, StringBuffer sb)
             throws Exception {
         int cnt = subGroups.size() + entries.size();
-        showNext(request,cnt, sb);
+        showNext(request, cnt, sb);
     }
 
-    public void showNext(Request request, int cnt,StringBuffer sb) 
-        throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param cnt _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public void showNext(Request request, int cnt, StringBuffer sb)
+            throws Exception {
 
         int max = request.get(ARG_MAX, DB_MAX_ROWS);
         //        System.err.println ("cnt:" + cnt + " " + max);
@@ -458,7 +468,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * @throws Exception _more_
      */
     public Result makeLinksResult(Request request, String title,
-                                     StringBuffer sb, State state)
+                                  StringBuffer sb, State state)
             throws Exception {
         Result result = new Result(title, sb);
         addLinks(request, result, state);
@@ -498,8 +508,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {}
 
 
@@ -515,8 +524,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public Link makeLink(Request request, Entry entry,
-                            OutputType outputType)
+    public Link makeLink(Request request, Entry entry, OutputType outputType)
             throws Exception {
         return makeLink(request, entry, outputType, "");
     }
@@ -533,8 +541,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public Link makeLink(Request request, Entry entry,
-                            OutputType outputType, String suffix)
+    public Link makeLink(Request request, Entry entry, OutputType outputType,
+                         String suffix)
             throws Exception {
         String url;
         if (entry == null) {
@@ -565,8 +573,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public void addOutputLink(Request request, Entry entry,
-                                 List<Link> links, OutputType type)
+    public void addOutputLink(Request request, Entry entry, List<Link> links,
+                              OutputType type)
             throws Exception {
         links.add(new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW,
                                             entry, ARG_OUTPUT,
@@ -681,12 +689,11 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                      + "," + HtmlUtil.squote(type));
         String clearEvent = HtmlUtil.call("clearSelect",
                                           HtmlUtil.squote(elementId));
-        return HtmlUtil.mouseClickHref(event, label,
-                                       HtmlUtil.id(elementId
-                                           + ".selectlink")) + " "+
-            HtmlUtil.mouseClickHref(clearEvent, "Clear",
-                                    HtmlUtil.id(elementId
-                                                + ".selectlink"));
+        return HtmlUtil.mouseClickHref(
+            event, label, HtmlUtil.id(elementId + ".selectlink")) + " "
+                + HtmlUtil.mouseClickHref(
+                    clearEvent, "Clear",
+                    HtmlUtil.id(elementId + ".selectlink"));
     }
 
     /**
@@ -700,8 +707,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public String getSelectLink(Request request, Entry entry,
-                                   String target)
+    public String getSelectLink(Request request, Entry entry, String target)
             throws Exception {
         String       linkText = entry.getLabel();
         StringBuffer sb       = new StringBuffer();
@@ -712,11 +718,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         String folderClickUrl =
             request.entryUrl(getRepository().URL_ENTRY_SHOW, entry) + "&"
             + HtmlUtil.args(new String[] {
-                    ARG_NOREDIRECT,"true",
-            ARG_OUTPUT, request.getString(ARG_OUTPUT, "selectxml"),
-            ATTR_TARGET, target, ARG_ALLENTRIES,
-            request.getString(ARG_ALLENTRIES, "true"), ARG_SELECTTYPE,
-            request.getString(ARG_SELECTTYPE, "")
+            ARG_NOREDIRECT, "true", ARG_OUTPUT,
+            request.getString(ARG_OUTPUT, "selectxml"), ATTR_TARGET, target,
+            ARG_ALLENTRIES, request.getString(ARG_ALLENTRIES, "true"),
+            ARG_SELECTTYPE, request.getString(ARG_SELECTTYPE, "")
         });
 
         String prefix = HtmlUtil.img(
@@ -744,7 +749,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         String value     = (entry.isGroup()
                             ? ((Group) entry).getFullName()
                             : entry.getName());
-        value = value.replace("'","\\'");
+        value = value.replace("'", "\\'");
 
 
         sb.append(HtmlUtil.mouseClickHref(HtmlUtil.call("selectClick",
@@ -861,12 +866,16 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             "Sort by date descending"
         };
 
-        sb.append(HtmlUtil.span(msgLabel("Sort"),HtmlUtil.cssClass("sortlinkoff")));
-        String entryIds = request.getString(ARG_ENTRYIDS,(String)null);
+        sb.append(HtmlUtil.span(msgLabel("Sort"),
+                                HtmlUtil.cssClass("sortlinkoff")));
+        String entryIds = request.getString(ARG_ENTRYIDS, (String) null);
         //Swap out the long value
-        if(entryIds!=null) {
+        if (entryIds != null) {
             String extraId = getRepository().getGUID();
-            request.put(ARG_ENTRYIDS,getRepository().getSessionManager().putSessionExtra(entryIds));
+            request.put(
+                ARG_ENTRYIDS,
+                getRepository().getSessionManager().putSessionExtra(
+                    entryIds));
         }
 
         for (int i = 0; i < order.length; i += 4) {
@@ -885,8 +894,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             }
         }
 
-        if(entryIds!=null) {
-            request.put(ARG_ENTRYIDS,entryIds);
+        if (entryIds != null) {
+            request.put(ARG_ENTRYIDS, entryIds);
         }
 
         request.remove(ARG_SHOWENTRYSELECTFORM);
@@ -924,8 +933,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
 
         List<Link> links = getRepository().getOutputLinks(request,
-                                                          new State(getEntryManager().getDummyGroup(),
-                                                                    entries));
+                               new State(getEntryManager().getDummyGroup(),
+                                         entries));
 
 
         List<HtmlUtil.Selector> tfos = new ArrayList<HtmlUtil.Selector>();
@@ -999,11 +1008,12 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         String cbxId        = "entry_" + (HtmlUtil.blockCnt++);
         String cbxArgId     = "entry_" + entry.getId();
         String cbxWrapperId = "cbx_" + (HtmlUtil.blockCnt++);
-        jsSB.append(HtmlUtil.callln("new EntryRow",
-                                    HtmlUtil.comma(HtmlUtil.squote(entry.getId()),
-                                                   HtmlUtil.squote(rowId),
-                                                   HtmlUtil.squote(cbxId),
-                                                   HtmlUtil.squote(cbxWrapperId))));
+        jsSB.append(
+            HtmlUtil.callln(
+                "new EntryRow",
+                HtmlUtil.comma(
+                    HtmlUtil.squote(entry.getId()), HtmlUtil.squote(rowId),
+                    HtmlUtil.squote(cbxId), HtmlUtil.squote(cbxWrapperId))));
 
         String cbx =
             HtmlUtil.checkbox(
@@ -1080,21 +1090,42 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                  boolean doFormClose, boolean doCbx,
                                  boolean showCrumbs)
             throws Exception {
-        return getEntriesList(request,sb,entries,null, doFormOpen, doFormClose, doCbx, showCrumbs,false);
+        return getEntriesList(request, sb, entries, null, doFormOpen,
+                              doFormClose, doCbx, showCrumbs, false);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     * @param entries _more_
+     * @param entriesToCheck _more_
+     * @param doFormOpen _more_
+     * @param doFormClose _more_
+     * @param doCbx _more_
+     * @param showCrumbs _more_
+     * @param hideParents _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public String getEntriesList(Request request, StringBuffer sb,
-                                 List entries, List<Entry> entriesToCheck, boolean doFormOpen,
-                                 boolean doFormClose, boolean doCbx,
-                                 boolean showCrumbs,
+                                 List entries, List<Entry> entriesToCheck,
+                                 boolean doFormOpen, boolean doFormClose,
+                                 boolean doCbx, boolean showCrumbs,
                                  boolean hideParents)
             throws Exception {
 
         String link = "";
         String base = "";
         if (doFormOpen) {
-            String[] tuple = getEntryFormStart(request, (entriesToCheck!=null?entriesToCheck:entries), true);
+            String[] tuple = getEntryFormStart(request,
+                                 ((entriesToCheck != null)
+                                  ? entriesToCheck
+                                  : entries), true);
             link = tuple[0];
             base = tuple[1];
             sb.append(tuple[2]);
@@ -1113,7 +1144,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                 HtmlUtil.callln(
                     "new EntryRow",
                     HtmlUtil.comma(
-                                   HtmlUtil.squote(entry.getId()),
+                        HtmlUtil.squote(entry.getId()),
                         HtmlUtil.squote(rowId), HtmlUtil.squote(cbxId),
                         HtmlUtil.squote(cbxWrapperId))));
             if (doCbx) {
@@ -1138,18 +1169,21 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             }
 
             if (showCrumbs) {
-                String img = 
-                    HtmlUtil.img(
-                                 getEntryManager().getIconUrl(request, entry));
+                String img =
+                    HtmlUtil.img(getEntryManager().getIconUrl(request,
+                        entry));
                 cbxSB.append(img);
                 cbxSB.append(HtmlUtil.space(1));
 
                 String crumbs = getEntryManager().getBreadCrumbs(request,
-                                                                 (hideParents?entry.getParentGroup():entry),null,60);
-                if(hideParents) {
-                    cbxSB.append(HtmlUtil.makeToggleInline("",crumbs+HtmlUtil.pad("&gt;"),false));
-                    cbxSB.append(getEntryManager().getTooltipLink(request, entry,
-                                                                   entry.getLabel(), null));
+                                    (hideParents
+                                     ? entry.getParentGroup()
+                                     : entry), null, 60);
+                if (hideParents) {
+                    cbxSB.append(HtmlUtil.makeToggleInline("",
+                            crumbs + HtmlUtil.pad("&gt;"), false));
+                    cbxSB.append(getEntryManager().getTooltipLink(request,
+                            entry, entry.getLabel(), null));
                 } else {
                     cbxSB.append(crumbs);
                 }
@@ -1204,20 +1238,20 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         sb.append(extra);
         sb.append(link.getLink());
         sb.append("</td><td align=right class=entryrowlabel>");
-        StringBuffer  extraAlt  = new StringBuffer();
-        String userLabel="";
+        StringBuffer extraAlt  = new StringBuffer();
+        String       userLabel = "";
         extraAlt.append(", ");
         extraAlt.append(entry.getUser().getId());
         if (entry.getResource().isFile()) {
             extraAlt.append(", ");
-            extraAlt.append(formatFileLength(entry.getResource().getFileSize()));
+            extraAlt.append(
+                formatFileLength(entry.getResource().getFileSize()));
 
-       }
+        }
 
         sb.append(getRepository().formatDateShort(request,
-                                                  new Date(entry.getStartDate()),
-                                                  getEntryManager().getTimezone(entry),
-                                                  extraAlt.toString()));
+                new Date(entry.getStartDate()),
+                getEntryManager().getTimezone(entry), extraAlt.toString()));
         sb.append("</td><td width=\"1%\" align=right class=entryrowlabel>");
         sb.append(HtmlUtil.space(1));
         /*        String userSearchLink =
@@ -1307,8 +1341,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public Result listTypes(Request request,
-                               List<TypeHandler> typeHandlers)
+    public Result listTypes(Request request, List<TypeHandler> typeHandlers)
             throws Exception {
         return notImplemented("listTypes");
     }
@@ -1443,13 +1476,15 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             }
             request.putExtraProperty(property, property);
 
-            List<String> toks      = StringUtil.splitUpTo(property, " ", 2);
-            if(toks.size()==0) {
+            List<String> toks = StringUtil.splitUpTo(property, " ", 2);
+            if (toks.size() == 0) {
                 return "<b>Incorrect import specification:" + property
-                    + "</b>";
+                       + "</b>";
             }
-            String       tag       = (toks.size()==0?"":toks.get(0));
-            String       remainder = "";
+            String tag       = ((toks.size() == 0)
+                                ? ""
+                                : toks.get(0));
+            String remainder = "";
             if (toks.size() > 1) {
                 remainder = toks.get(1);
             }
@@ -1501,8 +1536,20 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     }
 
 
+    /** _more_ */
     private static int imageVersionCnt = 0;
-    public String getImageUrl(Request request, Entry entry,boolean addVersion) {
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param addVersion _more_
+     *
+     * @return _more_
+     */
+    public String getImageUrl(Request request, Entry entry,
+                              boolean addVersion) {
         if ( !entry.getResource().isImage()) {
             if (true) {
                 return null;
@@ -1518,10 +1565,11 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             return null;
         }
 
-        return HtmlUtil.url(
-                            request.url(repository.URL_ENTRY_GET) + "/" +(addVersion?("v" +(imageVersionCnt++)):"") +
-                            getStorageManager().getFileTail(entry), ARG_ENTRYID,
-                entry.getId());
+        return HtmlUtil.url(request.url(repository.URL_ENTRY_GET) + "/"
+                            + (addVersion
+                               ? ("v" + (imageVersionCnt++))
+                               : "") + getStorageManager().getFileTail(
+                                   entry), ARG_ENTRYID, entry.getId());
     }
 
 
@@ -1563,7 +1611,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             blockContent = getEntryManager().getEntryActionsTable(request,
                     entry, OutputType.TYPE_ALL);
         } else if (include.equals(WIKIPROP_COMMENTS)) {
-            return getCommentBlock(request, entry,false).toString();
+            return getCommentBlock(request, entry, false).toString();
         } else if (include.equals(WIKIPROP_TOOLBAR)) {
             return getEntryManager().getEntryToolbar(request, entry, false);
         } else if (include.equals(WIKIPROP_BREADCRUMBS)) {
@@ -1653,17 +1701,19 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @param request _more_
      * @param entry _more_
+     * @param onlyOfWeHaveThem _more_
      *
      *
      * @return _more_
      * @throws Exception _more_
      */
-    public StringBuffer getCommentBlock(Request request, Entry entry,boolean onlyOfWeHaveThem)
+    public StringBuffer getCommentBlock(Request request, Entry entry,
+                                        boolean onlyOfWeHaveThem)
             throws Exception {
         StringBuffer  sb       = new StringBuffer();
         List<Comment> comments = getEntryManager().getComments(request,
                                      entry);
-        if (!onlyOfWeHaveThem || comments.size() > 0) {
+        if ( !onlyOfWeHaveThem || (comments.size() > 0)) {
             sb.append(getEntryManager().getCommentHtml(request, entry));
         }
         return sb;

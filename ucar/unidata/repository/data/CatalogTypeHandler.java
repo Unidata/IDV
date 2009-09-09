@@ -155,8 +155,7 @@ public class CatalogTypeHandler extends GenericTypeHandler {
         NodeList elements = XmlUtil.getElements(parent);
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);
-            if ( !child.getTagName().equals(
-                    CatalogUtil.TAG_DATASET)) {
+            if ( !child.getTagName().equals(CatalogUtil.TAG_DATASET)) {
                 continue;
             }
             ids.put(getId(child), child);
@@ -264,6 +263,7 @@ public class CatalogTypeHandler extends GenericTypeHandler {
      * _more_
      *
      * @param request _more_
+     * @param mainEntry _more_
      * @param parentEntry _more_
      * @param id _more_
      *
@@ -272,8 +272,7 @@ public class CatalogTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     public List<String> getSynthIds(Request request, Group mainEntry,
-                                    Group parentEntry,
-                                    String id)
+                                    Group parentEntry, String id)
             throws Exception {
         if (id == null) {
             id = mainEntry.getId();
@@ -444,8 +443,7 @@ public class CatalogTypeHandler extends GenericTypeHandler {
             resource = new Resource("", Resource.TYPE_URL);
         } else {
             String urlPath = XmlUtil.getAttribute(root,
-                                 CatalogUtil.ATTR_URLPATH,
-                                 (String) null);
+                                 CatalogUtil.ATTR_URLPATH, (String) null);
             if (urlPath == null) {
                 Element accessNode = XmlUtil.findChild(root,
                                          CatalogUtil.TAG_ACCESS);
@@ -474,7 +472,9 @@ public class CatalogTypeHandler extends GenericTypeHandler {
         metadataList.add(new Metadata(repository.getGUID(), entry.getId(),
                                       ThreddsMetadataHandler.TYPE_LINK,
                                       DFLT_INHERITED,
-                                      "Imported from catalog", url, Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,Metadata.DFLT_EXTRA));
+                                      "Imported from catalog", url,
+                                      Metadata.DFLT_ATTR, Metadata.DFLT_ATTR,
+                                      Metadata.DFLT_EXTRA));
         for (Metadata metadata : metadataList) {
             metadata.setEntryId(entry.getId());
             entry.addMetadata(metadata);

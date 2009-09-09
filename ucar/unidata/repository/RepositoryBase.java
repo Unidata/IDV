@@ -65,25 +65,36 @@ public class RepositoryBase implements Constants, RepositorySource {
     /** _more_ */
     public final RequestUrl URL_DUMMY = new RequestUrl(this, "/dummy");
 
+    /** _more_ */
     public final RequestUrl URL_INSTALL = new RequestUrl(this, "/install");
 
 
-    public final RequestUrl URL_REGISTRY_ADD = new RequestUrl(this, "/registry/add");
+    /** _more_ */
+    public final RequestUrl URL_REGISTRY_ADD = new RequestUrl(this,
+                                                   "/registry/add");
 
-    public final RequestUrl URL_REGISTRY_LIST = new RequestUrl(this, "/registry/list");
+    /** _more_ */
+    public final RequestUrl URL_REGISTRY_LIST = new RequestUrl(this,
+                                                    "/registry/list");
 
-    public final RequestUrl URL_REGISTRY_INFO = new RequestUrl(this, "/registry/info");
+    /** _more_ */
+    public final RequestUrl URL_REGISTRY_INFO = new RequestUrl(this,
+                                                    "/registry/info");
 
 
     /** _more_ */
     public final RequestUrl URL_SEARCH_FORM = new RequestUrl(this,
                                                   "/search/form", "Advanced");
 
-    public final RequestUrl URL_SEARCH_ASSOCIATIONS = new RequestUrl(this,
-                                                  "/search/associations/do", "Search Associations");
+    /** _more_ */
+    public final RequestUrl URL_SEARCH_ASSOCIATIONS =
+        new RequestUrl(this, "/search/associations/do",
+                       "Search Associations");
 
-    public final RequestUrl URL_SEARCH_ASSOCIATIONS_FORM = new RequestUrl(this,
-                                                  "/search/associations/form", "Search Associations");
+    /** _more_ */
+    public final RequestUrl URL_SEARCH_ASSOCIATIONS_FORM =
+        new RequestUrl(this, "/search/associations/form",
+                       "Search Associations");
 
     /** _more_ */
     public final RequestUrl URL_SEARCH_TEXTFORM = new RequestUrl(this,
@@ -97,9 +108,9 @@ public class RepositoryBase implements Constants, RepositorySource {
 
 
 
-    public final RequestUrl URL_SEARCH_REMOTE_DO = new RequestUrl(this,
-                                                    "/search/remote/do",
-                                                    "Search Remote Servers");
+    /** _more_ */
+    public final RequestUrl URL_SEARCH_REMOTE_DO =
+        new RequestUrl(this, "/search/remote/do", "Search Remote Servers");
 
     /** _more_ */
     public final RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this,
@@ -113,10 +124,8 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public final RequestUrl[] remoteSearchUrls = { URL_SEARCH_TEXTFORM,
-                                                   URL_SEARCH_FORM,
-                                                   URL_SEARCH_BROWSE,
-                                                   URL_SEARCH_ASSOCIATIONS_FORM
-                                                   };
+            URL_SEARCH_FORM, URL_SEARCH_BROWSE,
+            URL_SEARCH_ASSOCIATIONS_FORM };
 
     /** _more_ */
     public final RequestUrl URL_COMMENTS_SHOW = new RequestUrl(this,
@@ -351,14 +360,21 @@ public class RepositoryBase implements Constants, RepositorySource {
 
 
 
+    /**
+     * _more_
+     *
+     * @param date _more_
+     *
+     * @return _more_
+     */
     public String formatYYYYMMDD(Date date) {
         return dateSdf.format(date);
     }
 
-/**
-     * _more_
+    /**
+     *     _more_
      *
-     * @return _more_
+     *     @return _more_
      */
     public String getGUID() {
         return UUID.randomUUID().toString();
@@ -377,25 +393,39 @@ public class RepositoryBase implements Constants, RepositorySource {
     }
 
 
-    private Hashtable<String,SimpleDateFormat> dateFormats= new Hashtable<String,SimpleDateFormat>();
+    /** _more_ */
+    private Hashtable<String, SimpleDateFormat> dateFormats =
+        new Hashtable<String, SimpleDateFormat>();
 
+    /** _more_ */
     TimeZone defaultTimeZone;
 
 
+    /**
+     * _more_
+     *
+     * @param format _more_
+     * @param timezone _more_
+     *
+     * @return _more_
+     */
     protected SimpleDateFormat getSDF(String format, String timezone) {
         String key;
-        if(timezone != null)
-            key =  format+"-"+timezone;
-        else
-            key =  format;
+        if (timezone != null) {
+            key = format + "-" + timezone;
+        } else {
+            key = format;
+        }
         SimpleDateFormat sdf = dateFormats.get(key);
-        if(sdf == null) {
+        if (sdf == null) {
             sdf = new SimpleDateFormat();
             sdf.applyPattern(format);
-            if(timezone==null) {
+            if (timezone == null) {
                 sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
             } else {
-                if(defaultTimeZone!=null && (timezone.equals("") || timezone.equals("default"))) {
+                if ((defaultTimeZone != null)
+                        && (timezone.equals("")
+                            || timezone.equals("default"))) {
                     sdf.setTimeZone(defaultTimeZone);
                 } else {
                     sdf.setTimeZone(TimeZone.getTimeZone(timezone));
@@ -426,14 +456,25 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @return _more_
      */
     public String formatDate(Date d) {
-        return formatDate(d,null);
+        return formatDate(d, null);
     }
 
+    /**
+     * _more_
+     *
+     * @param d _more_
+     * @param timezone _more_
+     *
+     * @return _more_
+     */
     public String formatDate(Date d, String timezone) {
         if (sdf == null) {
             sdf = makeSDF(getProperty(PROP_DATE_FORMAT, DEFAULT_TIME_FORMAT));
         }
-        SimpleDateFormat dateFormat  = (timezone==null?sdf:getSDF(getProperty(PROP_DATE_FORMAT, DEFAULT_TIME_FORMAT),timezone));
+        SimpleDateFormat dateFormat = ((timezone == null)
+                                       ? sdf
+                                       : getSDF(getProperty(PROP_DATE_FORMAT,
+                                           DEFAULT_TIME_FORMAT), timezone));
         if (d == null) {
             return BLANK;
         }
@@ -653,14 +694,21 @@ public class RepositoryBase implements Constants, RepositorySource {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public static String getDialogString(String s) {
         s = HtmlUtil.entityEncode(s);
-        s = s.replace("&#60;msg&#32;","<msg ");
-        s = s.replace("&#32;msg&#62;"," msg>");        
-        s = s.replace("&#32;"," ");
-        s = s.replace("&#60;p&#62;","<p>");
-        s = s.replace("&#60;br&#62;","<br>");
-        s = s.replace("&#38;nbsp&#59;","&nbsp;");
+        s = s.replace("&#60;msg&#32;", "<msg ");
+        s = s.replace("&#32;msg&#62;", " msg>");
+        s = s.replace("&#32;", " ");
+        s = s.replace("&#60;p&#62;", "<p>");
+        s = s.replace("&#60;br&#62;", "<br>");
+        s = s.replace("&#38;nbsp&#59;", "&nbsp;");
         return s;
     }
 
@@ -711,7 +759,9 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @return _more_
      */
     public String iconUrl(String f) {
-        if(f==null) return null;
+        if (f == null) {
+            return null;
+        }
         String path = getProperty(f, f);
         return urlBase + path;
     }

@@ -20,11 +20,14 @@
  */
 
 package ucar.unidata.repository.idv;
+
+
+import org.w3c.dom.*;
+
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.data.*;
-import ucar.unidata.repository.output.*;
 import ucar.unidata.repository.metadata.*;
-import org.w3c.dom.*;
+import ucar.unidata.repository.output.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -84,7 +87,9 @@ public class IdvWebstartOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_WEBSTART = new OutputType("View in IDV","idv.webstart",OutputType.TYPE_NONHTML,"","/icons/idv.gif");
+    public static final OutputType OUTPUT_WEBSTART =
+        new OutputType("View in IDV", "idv.webstart",
+                       OutputType.TYPE_NONHTML, "", "/icons/idv.gif");
 
 
 
@@ -106,28 +111,33 @@ public class IdvWebstartOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param entry _more_
-     * @param types _more_
+     * @param state _more_
+     * @param links _more_
      *
      * @throws Exception _more_
      */
-    public void getEntryLinks(Request request, State state,
-                                 List<Link> links)
+    public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
-            if(state.entry==null) return;
-            Entry entry = state.entry;
-            if(entry.getResource().getPath().endsWith(".xidv") ||
-               entry.getResource().getPath().endsWith(".zidv")) {
-                String fileTail = getStorageManager().getFileTail(entry);
-                String suffix = "/"+IOUtil.stripExtension(fileTail)+".jnlp";
-                //                suffix = java.net.URLEncoder.encode(suffix);
-                links.add(makeLink(request, state.getEntry(),OUTPUT_WEBSTART,suffix));
-            } else {
-                DataOutputHandler data = (DataOutputHandler) getRepository().getOutputHandler(DataOutputHandler.OUTPUT_OPENDAP);
-                if(data !=null) {
-                if(data.canLoadAsCdm(entry)) {
-                    String suffix = "/"+entry.getId()+".jnlp";
-                    links.add(makeLink(request, state.getEntry(),OUTPUT_WEBSTART,suffix));
+        if (state.entry == null) {
+            return;
+        }
+        Entry entry = state.entry;
+        if (entry.getResource().getPath().endsWith(".xidv")
+                || entry.getResource().getPath().endsWith(".zidv")) {
+            String fileTail = getStorageManager().getFileTail(entry);
+            String suffix   = "/" + IOUtil.stripExtension(fileTail) + ".jnlp";
+            //                suffix = java.net.URLEncoder.encode(suffix);
+            links.add(makeLink(request, state.getEntry(), OUTPUT_WEBSTART,
+                               suffix));
+        } else {
+            DataOutputHandler data =
+                (DataOutputHandler) getRepository().getOutputHandler(
+                    DataOutputHandler.OUTPUT_OPENDAP);
+            if (data != null) {
+                if (data.canLoadAsCdm(entry)) {
+                    String suffix = "/" + entry.getId() + ".jnlp";
+                    links.add(makeLink(request, state.getEntry(),
+                                       OUTPUT_WEBSTART, suffix));
                 }
             }
 
@@ -136,63 +146,88 @@ public class IdvWebstartOutputHandler extends OutputHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result outputEntry(Request request, Entry entry) throws Exception {
-        String jnlp = getRepository().getResource("/ucar/unidata/repository/idv/template.jnlp");
+        String jnlp = getRepository().getResource(
+                          "/ucar/unidata/repository/idv/template.jnlp");
 
         StringBuffer args = new StringBuffer();
-        if(entry.getResource().getPath().endsWith(".xidv") ||
-           entry.getResource().getPath().endsWith(".zidv")) {
+        if (entry.getResource().getPath().endsWith(".xidv")
+                || entry.getResource().getPath().endsWith(".zidv")) {
 
             String fileTail = getStorageManager().getFileTail(entry);
-            String url = HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
-                                      + fileTail, ARG_ENTRYID, entry.getId());
+            String url =
+                HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
+                             + fileTail, ARG_ENTRYID, entry.getId());
             url = getRepository().absoluteUrl(url);
             args.append("<argument>-bundle</argument>");
-            args.append("<argument>" + url +"</argument>");
+            args.append("<argument>" + url + "</argument>");
         } else {
 
             List<Metadata> metadataList =
-                getMetadataManager().findMetadata( entry, ContentMetadataHandler.TYPE_ATTACHMENT,
-                                                   true);
+                getMetadataManager().findMetadata(entry,
+                    ContentMetadataHandler.TYPE_ATTACHMENT, true);
 
-            DataOutputHandler data = (DataOutputHandler) getRepository().getOutputHandler(DataOutputHandler.OUTPUT_OPENDAP);
-            if(data !=null && data.canLoadAsCdm(entry)) {
+            DataOutputHandler data =
+                (DataOutputHandler) getRepository().getOutputHandler(
+                    DataOutputHandler.OUTPUT_OPENDAP);
+            if ((data != null) && data.canLoadAsCdm(entry)) {
                 String embeddedBundle = null;
-                String opendapUrl = data.getFullTdsUrl(entry);
-                if(metadataList!=null) {
+                String opendapUrl     = data.getFullTdsUrl(entry);
+                if (metadataList != null) {
                     for (Metadata metadata : metadataList) {
                         if (metadata.getAttr1().endsWith(".xidv")) {
-                            File xidvFile=  new File(
-                                                     IOUtil.joinDir(
-                                                                    getRepository().getStorageManager().getEntryDir(
-                                                                                                                    metadata.getEntryId(), false), metadata.getAttr1()));
-                            embeddedBundle = getStorageManager().readSystemResource(xidvFile);
-                            embeddedBundle = embeddedBundle.replace("${datasource}", opendapUrl);
-                            embeddedBundle =  XmlUtil.encodeBase64(embeddedBundle.getBytes());
+                            File xidvFile =
+                                new File(IOUtil
+                                    .joinDir(getRepository()
+                                        .getStorageManager()
+                                        .getEntryDir(metadata.getEntryId(),
+                                            false), metadata.getAttr1()));
+                            embeddedBundle =
+                                getStorageManager().readSystemResource(
+                                    xidvFile);
+                            embeddedBundle =
+                                embeddedBundle.replace("${datasource}",
+                                    opendapUrl);
+                            embeddedBundle = XmlUtil.encodeBase64(
+                                embeddedBundle.getBytes());
                             break;
                         }
-                    } 
-                } 
+                    }
+                }
 
 
-                if(embeddedBundle!=null) {
-                    args.append("<argument>-b64bundle</argument>\n<argument>");
+                if (embeddedBundle != null) {
+                    args.append(
+                        "<argument>-b64bundle</argument>\n<argument>");
                     args.append(embeddedBundle);
                     args.append("</argument>\n");
                 } else {
                     args.append("<argument>-data</argument>\n<argument>");
                     String type = "OPENDAP.GRID";
-                    if(entry.getDataType()!=null) {
-                        if(entry.getDataType().equals("point")) type = "NetCDF.POINT";
+                    if (entry.getDataType() != null) {
+                        if (entry.getDataType().equals("point")) {
+                            type = "NetCDF.POINT";
+                        }
                     }
-                    args.append("type:"+type+":"+opendapUrl);
+                    args.append("type:" + type + ":" + opendapUrl);
                     args.append("</argument>\n");
                 }
             }
         }
-        jnlp = jnlp.replace("${args}",args.toString()); 
+        jnlp = jnlp.replace("${args}", args.toString());
 
-        return new Result("",new StringBuffer(jnlp),"application/x-java-jnlp-file");
+        return new Result("", new StringBuffer(jnlp),
+                          "application/x-java-jnlp-file");
         //        return new Result("",new StringBuffer(jnlp),"text/xml");
     }
 
