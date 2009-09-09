@@ -2011,6 +2011,7 @@ public class XmlUi implements ActionListener, ItemListener {
         Image          selectImage = getImageAttr(node, ATTR_SELECTIMAGE);
 
         ImageIcon      icon        = new ImageIcon(image);
+        icon  = GuiUtils.scaleImageIcon(icon);
         AbstractButton tb;
         if (tag.equals(TAG_TOGGLEBUTTON)) {
             tb = new JToggleButton(icon);
