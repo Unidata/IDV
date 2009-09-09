@@ -36,18 +36,20 @@ import org.apache.commons.httpclient.auth.RFC2617Scheme;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
-import ucar.unidata.xml.XmlUtil;
 import ucar.unidata.xml.XmlEncoder;
+import ucar.unidata.xml.XmlUtil;
 
-import java.io.File;
 import java.awt.*;
 
 import java.awt.event.*;
 
+import java.io.File;
+
 import java.net.*;
 
-import java.util.Hashtable;
 import java.util.Enumeration;
+
+import java.util.Hashtable;
 
 import javax.swing.*;
 
@@ -58,9 +60,11 @@ import javax.swing.*;
  * @author IDV Development Team
  * @version $Id: AccountManager.java,v 1.3 2007/05/09 21:59:26 dmurray Exp $
  */
-public class AccountManager implements CredentialsProvider {
+public class AccountManager implements CredentialsProvider,
+                                       IOUtil.UserAccountManager {
 
 
+    /** _more_          */
     private static AccountManager accountManager;
 
     /** for the gui */
@@ -83,7 +87,7 @@ public class AccountManager implements CredentialsProvider {
     private boolean ok;
 
     /** Holds previously saved name/passwords */
-    private Hashtable<String,UserInfo> table;
+    private Hashtable<String, UserInfo> table;
 
     /**
      * This keeps track of username/passwords we've been using during the current run.
@@ -91,26 +95,41 @@ public class AccountManager implements CredentialsProvider {
      */
     private Hashtable currentlyUsedOnes = new Hashtable();
 
+    /** _more_          */
     private File stateDir;
 
 
     /**
      * constructor
      *
+     *
+     * @param stateDir _more_
      */
     public AccountManager(File stateDir) {
         this.stateDir = stateDir;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public static AccountManager getGlobalAccountManager() {
         return accountManager;
     }
 
+    /**
+     * _more_
+     *
+     * @param manager _more_
+     */
     public static void setGlobalAccountManager(AccountManager manager) {
-        if(accountManager!=null) {
-            throw new IllegalArgumentException("Already have an account manager");
+        if (accountManager != null) {
+            throw new IllegalArgumentException(
+                "Already have an account manager");
         }
         accountManager = manager;
+        IOUtil.setUserAccountManager(accountManager);
     }
 
 
@@ -145,15 +164,28 @@ public class AccountManager implements CredentialsProvider {
 
         String key = host + ":" + port + ":" + scheme.getRealm();
         //        System.err.println ("got auth call " + key);
-        UserInfo userInfo = getUserNamePassword(key,"The server " + host + ":" + port +" requires a username/password");
-        if(userInfo == null) return null;
-        return new UsernamePasswordCredentials(userInfo.getUserId(), userInfo.getPassword());
+        UserInfo userInfo = getUserNamePassword(key,
+                                "The server " + host + ":" + port
+                                + " requires a username/password");
+        if (userInfo == null) {
+            return null;
+        }
+        return new UsernamePasswordCredentials(userInfo.getUserId(),
+                userInfo.getPassword());
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param label _more_
+     *
+     * @return _more_
+     */
     public UserInfo getUserNamePassword(String key, String label) {
-        UserInfo userInfo =  getTable().get(key);
+        UserInfo userInfo = getTable().get(key);
 
         if (userInfo != null) {
             if (currentlyUsedOnes.get(userInfo) != null) {
@@ -173,34 +205,44 @@ public class AccountManager implements CredentialsProvider {
             if ( !ok) {
                 return null;
             }
-            userInfo = new UserInfo(key,
-                                            nameFld.getText().trim(),
-                                            new String(passwdFld.getPassword()).trim());
+            userInfo =
+                new UserInfo(key, nameFld.getText().trim(),
+                             new String(passwdFld.getPassword()).trim());
             if (saveCbx.isSelected()) {
                 table.put(key, userInfo);
                 writeTable();
-           }
+            }
         }
         currentlyUsedOnes.put(userInfo, "");
-        return userInfo ;
+        return userInfo;
     }
 
 
-    protected void writeTable()  {
+    /**
+     * _more_
+     */
+    protected void writeTable() {
         try {
             String xml = XmlEncoder.encodeObject(getTable());
-            IOUtil.writeFile(IOUtil.joinDir(stateDir,"authentication.xml"), xml);
-        } catch(Exception exc) {
+            IOUtil.writeFile(IOUtil.joinDir(stateDir, "authentication.xml"),
+                             xml);
+        } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
     }
 
-    protected Hashtable<String,UserInfo> getTable() {
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected Hashtable<String, UserInfo> getTable() {
         if (table == null) {
             try {
-                String xml = IOUtil.readContents(IOUtil.joinDir(stateDir,"authentication.xml"),(String)null);
+                String xml = IOUtil.readContents(IOUtil.joinDir(stateDir,
+                                 "authentication.xml"), (String) null);
                 Hashtable tmp = null;
-                if(xml!=null) {
+                if (xml != null) {
                     tmp = (Hashtable) XmlEncoder.decodeXml(xml);
                 }
                 if (tmp == null) {
@@ -210,17 +252,17 @@ public class AccountManager implements CredentialsProvider {
                 table = new Hashtable();
 
                 //Convert to the new passwordinfo
-                for (Enumeration keys = tmp.keys();
-                     keys.hasMoreElements(); ) {
+                for (Enumeration keys =
+                        tmp.keys(); keys.hasMoreElements(); ) {
                     String key   = (String) keys.nextElement();
-                    Object  value = tmp.get(key);
-                    if(!(value instanceof UserInfo)) {
-                        String[]pair = decode(value);
-                        value = new UserInfo(key,pair[0],pair[1]);
+                    Object value = tmp.get(key);
+                    if ( !(value instanceof UserInfo)) {
+                        String[] pair = decode(value);
+                        value = new UserInfo(key, pair[0], pair[1]);
                     }
-                    table.put(key,(UserInfo)value);
+                    table.put(key, (UserInfo) value);
                 }
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
         }
@@ -255,13 +297,13 @@ public class AccountManager implements CredentialsProvider {
         nameFld   = new JTextField("", 10);
         passwdFld = new JPasswordField("", 10);
         saveCbx   = new JCheckBox("Save Password");
-        JButton okBtn = new JButton("OK");
+        JButton        okBtn      = new JButton("OK");
         ActionListener okListener = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 ok = true;
                 dialog.dispose();
             }
-            };
+        };
         nameFld.addActionListener(okListener);
         passwdFld.addActionListener(okListener);
         okBtn.addActionListener(okListener);
@@ -276,15 +318,14 @@ public class AccountManager implements CredentialsProvider {
 
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
         JPanel contents = GuiUtils.doLayout(new Component[] {
-            GuiUtils.rLabel("Name:"),
-            nameFld, GuiUtils.rLabel("Password:"), passwdFld,
-            GuiUtils.filler(), saveCbx
+            GuiUtils.rLabel("Name:"), nameFld, GuiUtils.rLabel("Password:"),
+            passwdFld, GuiUtils.filler(), saveCbx
         }, 2, GuiUtils.WT_N, GuiUtils.WT_N);
 
 
         contents = GuiUtils.topCenterBottom(
-                                            serverLabel,
-            contents, GuiUtils.wrap(GuiUtils.doLayout(new Component[] { okBtn,
+            serverLabel, contents,
+            GuiUtils.wrap(GuiUtils.doLayout(new Component[] { okBtn,
                 new JLabel(" "), cancelBtn }, 3, GuiUtils.WT_N,
                 GuiUtils.WT_N)));
         dialog = GuiUtils.createDialog("Server Authentication", true);

@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -171,7 +172,7 @@ public class IOUtil {
         /** flag for youngest first sorting */
         boolean youngestFirst;
 
-        /** _more_          */
+        /** _more_ */
         long size = -1;
 
         /**
@@ -444,7 +445,8 @@ public class IOUtil {
     public static File[] sortFilesOnName(File[] files, boolean descending) {
         List tuples = new ArrayList();
         for (int i = 0; i < files.length; i++) {
-            tuples.add(new Object[] { files[i].getName().toLowerCase(), files[i] });
+            tuples.add(new Object[] { files[i].getName().toLowerCase(),
+                                      files[i] });
         }
         tuples = Misc.sortTuples(tuples, descending);
 
@@ -1039,7 +1041,7 @@ public class IOUtil {
         fos.close();
         try {
             fis.close();
-        } catch(Exception exc) {}
+        } catch (Exception exc) {}
     }
 
 
@@ -1224,9 +1226,7 @@ public class IOUtil {
                         String auth =
                             connection.getHeaderField("WWW-Authenticate");
                         if (auth != null) {
-                            AccountManager accountManager =
-                                AccountManager.getGlobalAccountManager();
-                            if (accountManager != null) {
+                            if (userAccountManager != null) {
 
                                 while (true) {
                                     url        = new URL(url.toString());
@@ -1234,7 +1234,7 @@ public class IOUtil {
                                     huc = (HttpURLConnection) connection;
                                     String host = url.getHost();
                                     UserInfo userInfo =
-                                        accountManager.getUserNamePassword(
+                                        userAccountManager.getUserNamePassword(
                                             host + ":" + auth,
                                             "<html>The server: <i>" + host
                                             + "<i> requires a username/password</html>");
@@ -1267,6 +1267,41 @@ public class IOUtil {
         throw new FileNotFoundException("Could not load resource:"
                                         + filename);
     }
+
+
+
+
+    /** _more_          */
+    private static UserAccountManager userAccountManager;
+
+    /**
+     * _more_
+     *
+     * @param manager _more_
+     */
+    public static void setUserAccountManager(UserAccountManager manager) {
+        IOUtil.userAccountManager = manager;
+    }
+
+    /**
+     * UserAccountManager _more_
+     *
+     *
+     * @author IDV Development Team
+     */
+    public interface UserAccountManager {
+
+        /**
+         * _more_
+         *
+         * @param key _more_
+         * @param label _more_
+         *
+         * @return _more_
+         */
+        public UserInfo getUserNamePassword(String key, String label);
+    }
+
 
     /**
      * Get an input stream for the filename
@@ -2244,180 +2279,47 @@ public class IOUtil {
      */
     public static void main(String[] args) throws Exception {
 
-        String baseUrl  = "http://motherlode.ucar.edu:9080/thredds/radarServer/nexrad/level3/IDD?&stn=${station}&var=N0R&time_start=1909-05-24T21:26:24&time_end=2109-04-05T21:26:24";
-        String[]stations = {
-            "TLH",
-            "BYX",
-            "EVX",
-            "FFC",
-            "JGX",
-            "VAX",
-            "GUA",
-            "HMO",
-            "HWA",
-            "HKM",
-            "HKI",
-            "DMX",
-            "DVN",
-            "CBX",
-            "SFX",
-            "LOT",
-            "ILX",
-            "IND",
-            "IWX",
-            "VWX",
-            "DDC",
-            "ICT",
-            "TWX",
-            "GLD",
-            "LVX",
-            "PAH",
-            "JKL",
-            "HPX",
-            "LIX",
-            "LCH",
-            "SHV",
-            "POE",
-            "BOX",
-            "LWX",
-            "GYX",
-            "CBW",
-            "DTX",
-            "GRR",
-            "MQT",
-            "APX",
-            "MPX",
-            "DLH",
-            "LSX",
-            "EAX",
-            "SGF",
-            "JAN",
-            "DGX",
-            "GWX",
-            "TFX",
-            "MSX",
-            "BLX",
-            "GGW",
-            "MHX",
-            "LTX",
-            "RAX",
-            "BIS",
-            "MVX",
-            "MBX",
-            "UEX",
-            "OAX",
-            "LNX",
-            "DIX",
-            "ABX",
-            "FDX",
-            "HDX",
-            "RGX",
-            "ESX",
-            "LRX",
-            "OKX",
-            "BGM",
-            "ENX",
-            "BUF",
-            "TYX",
-            "CLE",
-            "ILN",
-            "TLX",
-            "INX",
-            "FDR",
-            "VNX",
-            "RTX",
-            "MAX",
-            "PDT",
-            "PBZ",
-            "CCX",
-            "JUA",
-            "CAE",
-            "GSP",
-            "CLX",
-            "ABR",
-            "FSD",
-            "UDX",
-            "NQA",
-            "MRX",
-            "OHX",
-            "AMA",
-            "HGX",
-            "FWS",
-            "EWX",
-            "LBB",
-            "MAF",
-            "BRO",
-            "EPZ",
-            "SJT",
-            "CRP",
-            "GRK",
-            "DYX",
-            "DFX",
-            "MTX",
-            "ICX",
-            "FCX",
-            "AKQ",
-            "CXX",
-            "ATX",
-            "OTX",
-            "GRB",
-            "MKX",
-            "ARX",
-            "RLX",
-            "CYS",
-            "RIW",
-            "NOP3",
-            "SHI",
-            "APD",
-            "AEC",
-            "ACG",
-            "AIH",
-            "ABC",
-            "AHG",
-            "AKC",
-            "BMX",
-            "MOB",
-            "HTX",
-            "MXX",
-            "EOX",
-            "LZK",
-            "SRX",
-            "IWA",
-            "EMX",
-            "FSX",
-            "YUX",
-            "DAX",
-            "VTX",
-            "MUX",
-            "BHX",
-            "HNX",
-            "NKX",
-            "SOX",
-            "VBX",
-            "EYX",
-            "BBX",
-            "FTG",
-            "PUX",
-            "GJX",
-            "DOX",
-            "MLB",
-            "AMX",
-            "TBW"};
+        String baseUrl =
+            "http://motherlode.ucar.edu:9080/thredds/radarServer/nexrad/level3/IDD?&stn=${station}&var=N0R&time_start=1909-05-24T21:26:24&time_end=2109-04-05T21:26:24";
+        String[] stations = {
+            "TLH", "BYX", "EVX", "FFC", "JGX", "VAX", "GUA", "HMO", "HWA",
+            "HKM", "HKI", "DMX", "DVN", "CBX", "SFX", "LOT", "ILX", "IND",
+            "IWX", "VWX", "DDC", "ICT", "TWX", "GLD", "LVX", "PAH", "JKL",
+            "HPX", "LIX", "LCH", "SHV", "POE", "BOX", "LWX", "GYX", "CBW",
+            "DTX", "GRR", "MQT", "APX", "MPX", "DLH", "LSX", "EAX", "SGF",
+            "JAN", "DGX", "GWX", "TFX", "MSX", "BLX", "GGW", "MHX", "LTX",
+            "RAX", "BIS", "MVX", "MBX", "UEX", "OAX", "LNX", "DIX", "ABX",
+            "FDX", "HDX", "RGX", "ESX", "LRX", "OKX", "BGM", "ENX", "BUF",
+            "TYX", "CLE", "ILN", "TLX", "INX", "FDR", "VNX", "RTX", "MAX",
+            "PDT", "PBZ", "CCX", "JUA", "CAE", "GSP", "CLX", "ABR", "FSD",
+            "UDX", "NQA", "MRX", "OHX", "AMA", "HGX", "FWS", "EWX", "LBB",
+            "MAF", "BRO", "EPZ", "SJT", "CRP", "GRK", "DYX", "DFX", "MTX",
+            "ICX", "FCX", "AKQ", "CXX", "ATX", "OTX", "GRB", "MKX", "ARX",
+            "RLX", "CYS", "RIW", "NOP3", "SHI", "APD", "AEC", "ACG", "AIH",
+            "ABC", "AHG", "AKC", "BMX", "MOB", "HTX", "MXX", "EOX", "LZK",
+            "SRX", "IWA", "EMX", "FSX", "YUX", "DAX", "VTX", "MUX", "BHX",
+            "HNX", "NKX", "SOX", "VBX", "EYX", "BBX", "FTG", "PUX", "GJX",
+            "DOX", "MLB", "AMX", "TBW"
+        };
 
 
-        for(int i=0;i<100;i++) {
-            for(int stnIdx = 0;stnIdx<stations.length;stnIdx++) {
-                String theUrl = baseUrl.replace("${station}", stations[stnIdx]);
-                long t1 = System.currentTimeMillis();
-                String contents = readContents(theUrl,IOUtil.class);
-                long t2 = System.currentTimeMillis();
-                System.err.println ("Time:" + (t2-t1) + " bytes:" + contents.length());
+        for (int i = 0; i < 100; i++) {
+            for (int stnIdx = 0; stnIdx < stations.length; stnIdx++) {
+                String theUrl = baseUrl.replace("${station}",
+                                    stations[stnIdx]);
+                long   t1       = System.currentTimeMillis();
+                String contents = readContents(theUrl, IOUtil.class);
+                long   t2       = System.currentTimeMillis();
+                System.err.println("Time:" + (t2 - t1) + " bytes:"
+                                   + contents.length());
             }
         }
 
-            
 
-        if(true) return;
+
+        if (true) {
+            return;
+        }
 
         if (true) {
             byte[] buffer = new byte[1048748];
@@ -2436,6 +2338,7 @@ public class IOUtil {
             return;
         }
 
+        /*
         AccountManager.setGlobalAccountManager(
             new AccountManager(new File(".")));
 
@@ -2452,6 +2355,7 @@ public class IOUtil {
         if (is != null) {
             System.err.println(new String(readBytes(is)));
         }
+        */
     }
 
 
