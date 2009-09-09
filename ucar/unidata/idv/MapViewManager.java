@@ -135,6 +135,8 @@ public class MapViewManager extends NavigatedViewManager {
     /** Preference for  showing the pip */
     public static final String PREF_SHOWPIP = "View.ShowPip";
 
+    public static final String PREF_SHOWGLOBEBACKGROUND = "View.ShowGlobeBackground";
+
     /** Preference for  showing the earth nav panel */
     public static final String PREF_SHOWEARTHNAVPANEL =
         "View.ShowEarthNavPanel";
@@ -206,8 +208,6 @@ public class MapViewManager extends NavigatedViewManager {
     /** _more_ */
     private Color globeBackgroundColor = Color.white;
 
-    /** _more_ */
-    private boolean globeBackgroundShow = false;
 
     /** _more_ */
     private double globeBackgroundLevel = -0.001;
@@ -733,9 +733,7 @@ public class MapViewManager extends NavigatedViewManager {
         getMapDisplay().saveProjection();
 
         this.globeBackgroundColor = mvm.globeBackgroundColor;
-        this.globeBackgroundShow  = mvm.globeBackgroundShow;
         this.globeBackgroundLevel = mvm.globeBackgroundLevel;
-
         if (globeBackgroundDisplayable != null) {
             setGlobeBackground((GlobeDisplay) getMapDisplay());
         }
@@ -907,9 +905,11 @@ public class MapViewManager extends NavigatedViewManager {
             { "Show Animation Boxes", PREF_SHOWANIMATIONBOXES,
               new Boolean(getShowAnimationBoxes()) },
             { "Show Clock", IdvConstants.PROP_SHOWCLOCK,
-              new Boolean(getStateManager().getPreferenceOrProperty(IdvConstants.PROP_SHOWCLOCK,"true"))}
-            , { "Show Overview Map", PREF_SHOWPIP,
-                new Boolean(getStore().get(PREF_SHOWPIP, false)) },
+              new Boolean(getStateManager().getPreferenceOrProperty(IdvConstants.PROP_SHOWCLOCK,"true"))}, 
+            { "Show Overview Map", PREF_SHOWPIP,
+              new Boolean(getStore().get(PREF_SHOWPIP, false))}, 
+            { "Show Globe Background", PREF_SHOWGLOBEBACKGROUND,
+              new Boolean(getStore().get(PREF_SHOWGLOBEBACKGROUND, false))}
         };
 
         Object[][] toolbarObjects = {
@@ -1189,22 +1189,7 @@ public class MapViewManager extends NavigatedViewManager {
     protected JMenu makeShowMenu() {
         JMenu showMenu = super.makeShowMenu();
         if (globeBackgroundDisplayable != null) {
-            final JCheckBoxMenuItem cbmi =
-                new JCheckBoxMenuItem("Globe Background",
-                                      globeBackgroundShow);
-            showMenu.add(cbmi);
-            cbmi.addItemListener(new ItemListener() {
-                public void itemStateChanged(ItemEvent event) {
-                    globeBackgroundShow = cbmi.isSelected();
-                    try {
-                        globeBackgroundDisplayable.setVisible(
-                            globeBackgroundShow);
-                    } catch (Exception exc) {
-                        logException("Setting globe background visiblility",
-                                     exc);
-                    }
-                }
-            });
+            createCBMI(showMenu, PREF_SHOWGLOBEBACKGROUND);
         }
 
         createCBMI(showMenu, PREF_SHOWSCALES);
@@ -1739,7 +1724,7 @@ public class MapViewManager extends NavigatedViewManager {
             //                                (int)(255*0.5));
 
             globeBackgroundDisplayable.setColor(globeBackgroundColor);
-            globeBackgroundDisplayable.setVisible(globeBackgroundShow);
+            globeBackgroundDisplayable.setVisible(getGlobeBackgroundShow());
 
             DisplayRealType drt          = globe.getDisplayAltitudeType();
             double[]        range        = new double[2];
@@ -2355,6 +2340,10 @@ public class MapViewManager extends NavigatedViewManager {
             if (pipPanelWrapper != null) {
                 pipPanelWrapper.setVisible(value);
             }
+        } else if (id.equals(PREF_SHOWGLOBEBACKGROUND)) {
+            if(globeBackgroundDisplayable!=null) {
+                globeBackgroundDisplayable.setVisible(value);
+            }
         } else if (id.equals(PREF_PERSPECTIVEVIEW)) {
             if (hasViewpointControl()) {
                 getViewpointControl().setPerspectiveView(value);
@@ -2390,6 +2379,11 @@ public class MapViewManager extends NavigatedViewManager {
                                       "Show Overview Map",
                                       "Show Overview Map", false));
 
+        if(useGlobeDisplay) {
+            props.add(new BooleanProperty(PREF_SHOWGLOBEBACKGROUND,
+                                      "Show Globe Background",
+                                      "Show Globe Background", false));
+        }
     }
 
 
@@ -2589,7 +2583,7 @@ public class MapViewManager extends NavigatedViewManager {
      *  @param value The new value for GlobeBackgroundShow
      */
     public void setGlobeBackgroundShow(boolean value) {
-        globeBackgroundShow = value;
+        setBp(PREF_SHOWGLOBEBACKGROUND,value);
     }
 
     /**
@@ -2598,7 +2592,7 @@ public class MapViewManager extends NavigatedViewManager {
      *  @return The GlobeBackgroundShow
      */
     public boolean getGlobeBackgroundShow() {
-        return globeBackgroundShow;
+        return getBp(PREF_SHOWGLOBEBACKGROUND);
     }
 
     /**
@@ -2607,7 +2601,7 @@ public class MapViewManager extends NavigatedViewManager {
      *  @param value The new value for GlobeBackgroundLevel
      */
     public void setGlobeBackgroundLevel(double value) {
-        globeBackgroundLevel = value;
+        globeBackgroundLevel = value;        
     }
 
     /**
