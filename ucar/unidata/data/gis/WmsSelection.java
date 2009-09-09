@@ -21,10 +21,12 @@
  */
 
 
+
 package ucar.unidata.data.gis;
 
 
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import ucar.unidata.data.GeoLocationInfo;
 
@@ -55,6 +57,9 @@ public class WmsSelection {
     public static final String TAG_WMS = "wms";
 
     /** xml tag name */
+    public static final String TAG_IMAGE = "image";
+
+    /** xml tag name */
     public static final String ATTR_SERVER = "server";
 
 
@@ -70,6 +75,7 @@ public class WmsSelection {
     /** xml attribute name */
     public static final String ATTR_SRS = "srs";
 
+    /** _more_          */
     public static final String ATTR_CRS = "crs";
 
     /** xml attribute name */
@@ -126,10 +132,28 @@ public class WmsSelection {
     private String version;
 
 
+    /** _more_          */
+    private String imageFile;
+
     /**
      * Default constructor.
      */
     public WmsSelection() {}
+
+
+    /**
+     * _more_
+     *
+     * @param layer _more_
+     * @param title _more_
+     * @param imageFile _more_
+     */
+    public WmsSelection(String layer, String title, String imageFile) {
+        this.imageFile = imageFile;
+        this.layer     = layer;
+        this.title     = title;
+    }
+
 
 
     /**
@@ -199,10 +223,10 @@ public class WmsSelection {
 
         return url + "version=" + version + "&request=GetMap" +
         //          "&Exceptions=se_xml" + 
-        "&Styles=" + "" + "&format=" + format + "&SRS=" + srs +
-            "&CRS=" + srs + "&Layers="
-                   + layer + "&BBOX=" + bbox + "&width=" + imageWidth
-                   + "&height=" + imageHeight+"&reaspect=false";
+        "&Styles=" + "" + "&format=" + format + "&SRS=" + srs + "&CRS=" + srs
+                   + "&Layers=" + layer + "&BBOX=" + bbox + "&width="
+                   + imageWidth + "&height=" + imageHeight
+                   + "&reaspect=false";
     }
 
     /**
@@ -363,16 +387,26 @@ public class WmsSelection {
             if (root == null) {
                 continue;
             }
-            List children = XmlUtil.findChildren(root, TAG_WMS);
-            for (int wmsIdx = 0; wmsIdx < children.size(); wmsIdx++) {
-                Element wmsNode = (Element) children.get(wmsIdx);
+            NodeList children = XmlUtil.getElements(root);
+            for (int childIdx = 0; childIdx < children.getLength();
+                    childIdx++) {
+                Element wmsNode = (Element) children.item(childIdx);
+                String  layer   = XmlUtil.getAttribute(wmsNode, ATTR_LAYER);
+                if (wmsNode.getTagName().equals(TAG_IMAGE)) {
+                    infos.add(new WmsSelection(layer,
+                            XmlUtil.getAttribute(wmsNode, ATTR_TITLE, layer),
+                            XmlUtil.getAttribute(wmsNode, "file")));
+                    continue;
+                }
+
+
+
                 double[] bbox =
                     Misc.parseDoubles(XmlUtil.getAttribute(wmsNode,
                         ATTR_BBOX));
 
                 GeoLocationInfo bounds = new GeoLocationInfo(bbox[0],
                                              bbox[1], bbox[2], bbox[3]);
-                String layer = XmlUtil.getAttribute(wmsNode, ATTR_LAYER);
                 WmsSelection wmsSelection =
                     new WmsSelection(
                         XmlUtil.getAttribute(wmsNode, ATTR_SERVER), layer,
@@ -523,6 +557,29 @@ public class WmsSelection {
             this.format, this.version
         }).hashCode();
     }
+
+
+
+
+    /**
+     *  Set the ImageFile property.
+     *
+     *  @param value The new value for ImageFile
+     */
+    public void setImageFile(String value) {
+        imageFile = value;
+    }
+
+    /**
+     *  Get the ImageFile property.
+     *
+     *  @return The ImageFile
+     */
+    public String getImageFile() {
+        return imageFile;
+    }
+
+
 
 
 

@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.gis;
 
 
@@ -238,206 +239,227 @@ public class WmsDataSource extends DataSourceImpl {
             }
         }
 
-
-        //      LogUtil.message("Data: " + toStringTruncated() + ": "
-        //                      + wmsInfo);
-        String writeFile = (String) requestProperties.get(PROP_WRITEFILE);
         GeoLocationInfo boundsToUse =
             (GeoLocationInfo) requestProperties.get(PROP_BOUNDS);
 
-        int imageWidth = Misc.getProperty(requestProperties, PROP_IMAGEWIDTH,
-                                          800);
-        int imageHeight = Misc.getProperty(requestProperties,
-                                           PROP_IMAGEHEIGHT, -1);
-        double resolution = Misc.getProperty(requestProperties,
-                                             PROP_RESOLUTION, (float) 1.0);
-
-
-        if (wmsInfo.getLegendIcon() != null) {
-            requestProperties.put(PROP_ICONPATH, wmsInfo.getLegendIcon());
-        }
-        if (!wmsInfo.getAllowSubsets() || boundsToUse == null) {
-            boundsToUse = wmsInfo.getBounds();
-        } else {
-            boundsToUse.rectify(wmsInfo.getBounds(), 0.0);
-            boundsToUse.snapToGrid();
-            boundsToUse.rectify(wmsInfo.getBounds(), 0.0);
-        }
-
-
-        double widthDegrees = boundsToUse.getMaxLon()
-                              - boundsToUse.getMinLon();
-        double heightDegrees = boundsToUse.getMaxLat()
-                               - boundsToUse.getMinLat();
-
-        if (wmsInfo.getFixedWidth() > -1) {
-            imageWidth = wmsInfo.getFixedWidth();
-        }
-        if (wmsInfo.getFixedHeight() > -1) {
-            imageHeight = wmsInfo.getFixedHeight();
-        } else {
-            if (imageHeight < 0) {
-                imageHeight = Math.abs((int) (imageWidth
-                        * boundsToUse.getDegreesY()
-                        / boundsToUse.getDegreesX()));
-            }
-        }
-        imageWidth  = Math.min(Math.max(imageWidth, 50), 2056);
-        imageHeight = Math.min(Math.max(imageHeight, 50), 2056);
-
-
-        double diff = Math.abs(boundsToUse.getMinLon()
-                               - boundsToUse.getMaxLon());
-        String url = wmsInfo.assembleRequest(boundsToUse,
-                                             (int) (imageWidth / resolution),
-                                             (int) (imageHeight
-                                                 / resolution));
-
-        Image  image      = null;
-        String cacheGroup = "WMS";
-        synchronized (cachedUrls) {
-            if (writeFile == null) {
-                for (int i = 0; i < cachedUrls.size(); i++) {
-                    if (url.equals(cachedUrls.get(i))) {
-                        image = (Image) cachedData.get(i);
-                        break;
-                    }
-                }
-            }
-        }
-
-
-
-        byte[]    imageContent = null;
+        Image     image        = null;
         FieldImpl xyData       = null;
-        try {
-            if (image == null) {
-                if (Misc.equals(url, lastUrl) && (lastImageContent != null)) {
-                    imageContent = lastImageContent;
-                } else {}
+        byte[]    imageContent = null;
 
-                if (imageContent == null) {
-                    long t1 = System.currentTimeMillis();
-                    //                    System.err.println("getting image:" + url);
-                    LogUtil.message("Reading WMS image: " + wmsInfo);
-                    //System.err.println ("url:" + url);
-
-                    InputStream is = IOUtil.getInputStream(url);
-                    long        t2 = System.currentTimeMillis();
-                    imageContent = IOUtil.readBytes(is, myLoadId);
-                    long t3 = System.currentTimeMillis();
-                    LogUtil.message("");
-                    //                    System.err.println("Done");
-                }
-                //If it is null then there is another thread that is doing
-                //a subsequent read
-                lastImageContent = null;
-                if (imageContent == null) {
-                    return null;
-                }
-                Trace.call2("Getting image");
-                Trace.call1("Making image");
+        //        System.err.println(wmsInfo.getImageFile());
+        if (wmsInfo.getImageFile() != null) {
+            try {
+                boundsToUse = new GeoLocationInfo(90, -180, -90, 180);
+                InputStream is =
+                    IOUtil.getInputStream(wmsInfo.getImageFile());
+                imageContent = IOUtil.readBytes(is, myLoadId);
                 image = Toolkit.getDefaultToolkit().createImage(imageContent);
-                Trace.call2("Making image");
-                lastImageContent = imageContent;
-                lastUrl          = url;
-                updateDetailsText();
-                if ( !JobManager.getManager().canContinue(myLoadId)) {
-                    Trace.call2("WMSControl.loadImage");
-                    return null;
-                }
-                synchronized (cachedUrls) {
-                    if (cachedUrls.size() > 5) {
-                        cachedUrls.remove(cachedUrls.size() - 1);
-                        cachedData.remove(cachedData.size() - 1);
-                    }
-                    //For now don't cache
-                    //      cachedUrls.add(0, url);
-                    //                    cachedData.add(0, image);
+                xyData       = DataUtility.makeField(image);
+            } catch (Exception iexc) {
+                logException("There was an error accessing the image:\n"
+                             + wmsInfo.getImageFile(), iexc);
+                return null;
+            }
+        } else {
+            String writeFile = (String) requestProperties.get(PROP_WRITEFILE);
+
+            int imageWidth = Misc.getProperty(requestProperties,
+                                 PROP_IMAGEWIDTH, 800);
+            int imageHeight = Misc.getProperty(requestProperties,
+                                  PROP_IMAGEHEIGHT, -1);
+            double resolution = Misc.getProperty(requestProperties,
+                                    PROP_RESOLUTION, (float) 1.0);
+
+
+            if (wmsInfo.getLegendIcon() != null) {
+                requestProperties.put(PROP_ICONPATH, wmsInfo.getLegendIcon());
+            }
+            if ( !wmsInfo.getAllowSubsets() || (boundsToUse == null)) {
+                boundsToUse = wmsInfo.getBounds();
+            } else {
+                boundsToUse.rectify(wmsInfo.getBounds(), 0.0);
+                boundsToUse.snapToGrid();
+                boundsToUse.rectify(wmsInfo.getBounds(), 0.0);
+            }
+
+
+            double widthDegrees = boundsToUse.getMaxLon()
+                                  - boundsToUse.getMinLon();
+            double heightDegrees = boundsToUse.getMaxLat()
+                                   - boundsToUse.getMinLat();
+
+            if (wmsInfo.getFixedWidth() > -1) {
+                imageWidth = wmsInfo.getFixedWidth();
+            }
+            if (wmsInfo.getFixedHeight() > -1) {
+                imageHeight = wmsInfo.getFixedHeight();
+            } else {
+                if (imageHeight < 0) {
+                    imageHeight = Math.abs((int) (imageWidth
+                            * boundsToUse.getDegreesY()
+                            / boundsToUse.getDegreesX()));
                 }
             }
-            ImageHelper ih    = new ImageHelper();
-            int         width = image.getWidth(ih);
-            if (ih.badImage) {
-                throw new IllegalStateException();
-            }
-            long tt1 = System.currentTimeMillis();
-            xyData = DataUtility.makeField(image);
-            long tt2 = System.currentTimeMillis();
-            //      System.err.println("time to make field:" + (tt2-tt1));
-        } catch (Exception iexc) {
-            if (imageContent != null) {
-                String msg = new String(imageContent);
-                //  System.err.println ("msg:" + msg);
-                /* Check to see if this is of the form:
+            imageWidth  = Math.min(Math.max(imageWidth, 50), 2056);
+            imageHeight = Math.min(Math.max(imageHeight, 50), 2056);
 
-                <?xml version='1.0' encoding="UTF-8" standalone="no" ?>
-                <!DOCTYPE ServiceExceptionReport SYSTEM "http://www.digitalearth.gov/wmt/xml/exception_1_1_0.dtd ">
-                <ServiceExceptionReport version="1.1.0">
-                 <ServiceException>
-                   Service denied due to system overload. Please try again later.
-                 </ServiceException>
-                </ServiceExceptionReport>
 
-                */
-                if (msg.indexOf("<ServiceExceptionReport") >= 0) {
-                    try {
-                        StringBuffer errors = new StringBuffer();
-                        errors.append("\n");
-                        Element root = XmlUtil.getRoot(msg);
-                        List children = XmlUtil.findChildren(root,
-                                            "ServiceException");
-                        for (int i = 0; i < children.size(); i++) {
+            double diff = Math.abs(boundsToUse.getMinLon()
+                                   - boundsToUse.getMaxLon());
+            String url = wmsInfo.assembleRequest(boundsToUse,
+                             (int) (imageWidth / resolution),
+                             (int) (imageHeight / resolution));
 
-                            Element node = (Element) children.get(i);
-                            String code = XmlUtil.getAttribute(node, "code",
-                                              (String) null);
-                            String body = XmlUtil.getChildText(node);
-                            if (code != null) {
-                                errors.append(code + "\n");
-                            }
-                            errors.append(body.trim() + "\n");
+            String cacheGroup = "WMS";
+            synchronized (cachedUrls) {
+                if (writeFile == null) {
+                    for (int i = 0; i < cachedUrls.size(); i++) {
+                        if (url.equals(cachedUrls.get(i))) {
+                            image = (Image) cachedData.get(i);
+                            break;
                         }
-                        LogUtil.userErrorMessage(
-                            "Error accessing image with the url:\n" + url
-                            + "\nError:\n" + errors);
-                    } catch (Exception exc) {
-                        LogUtil.userErrorMessage(
-                            "Error accessing image with the url:\n" + url
-                            + "\nError:\n" + StringUtil.stripTags(msg));
                     }
-                    return null;
                 }
+            }
 
 
-                msg = StringUtil.replace(msg, "\n", " ").toLowerCase();
-                if (StringUtil.stringMatch(msg, "service\\s*exception")) {
-                    if (StringUtil.stringMatch(msg,
-                            "cannot\\s*be\\s*less\\s*than")) {
+
+
+            try {
+                if (image == null) {
+                    if (Misc.equals(url, lastUrl)
+                            && (lastImageContent != null)) {
+                        imageContent = lastImageContent;
+                    } else {}
+
+                    if (imageContent == null) {
+                        long t1 = System.currentTimeMillis();
+                        //                    System.err.println("getting image:" + url);
+                        LogUtil.message("Reading WMS image: " + wmsInfo);
+                        //System.err.println ("url:" + url);
+
+                        InputStream is = IOUtil.getInputStream(url);
+                        long        t2 = System.currentTimeMillis();
+                        imageContent = IOUtil.readBytes(is, myLoadId);
+                        long t3 = System.currentTimeMillis();
+                        LogUtil.message("");
+                        //                    System.err.println("Done");
+                    }
+                    //If it is null then there is another thread that is doing
+                    //a subsequent read
+                    lastImageContent = null;
+                    if (imageContent == null) {
+                        return null;
+                    }
+                    Trace.call2("Getting image");
+                    Trace.call1("Making image");
+                    image =
+                        Toolkit.getDefaultToolkit().createImage(imageContent);
+                    Trace.call2("Making image");
+                    lastImageContent = imageContent;
+                    lastUrl          = url;
+                    updateDetailsText();
+                    if ( !JobManager.getManager().canContinue(myLoadId)) {
+                        Trace.call2("WMSControl.loadImage");
+                        return null;
+                    }
+                    synchronized (cachedUrls) {
+                        if (cachedUrls.size() > 5) {
+                            cachedUrls.remove(cachedUrls.size() - 1);
+                            cachedData.remove(cachedData.size() - 1);
+                        }
+                        //For now don't cache
+                        //      cachedUrls.add(0, url);
+                        //                    cachedData.add(0, image);
+                    }
+                }
+                ImageHelper ih    = new ImageHelper();
+                int         width = image.getWidth(ih);
+                if (ih.badImage) {
+                    throw new IllegalStateException();
+                }
+                long tt1 = System.currentTimeMillis();
+                xyData = DataUtility.makeField(image);
+                long tt2 = System.currentTimeMillis();
+                //      System.err.println("time to make field:" + (tt2-tt1));
+            } catch (Exception iexc) {
+                if (imageContent != null) {
+                    String msg = new String(imageContent);
+                    //  System.err.println ("msg:" + msg);
+                    /* Check to see if this is of the form:
+
+                    <?xml version='1.0' encoding="UTF-8" standalone="no" ?>
+                    <!DOCTYPE ServiceExceptionReport SYSTEM "http://www.digitalearth.gov/wmt/xml/exception_1_1_0.dtd ">
+                    <ServiceExceptionReport version="1.1.0">
+                     <ServiceException>
+                       Service denied due to system overload. Please try again later.
+                     </ServiceException>
+                    </ServiceExceptionReport>
+
+                    */
+                    if (msg.indexOf("<ServiceExceptionReport") >= 0) {
+                        try {
+                            StringBuffer errors = new StringBuffer();
+                            errors.append("\n");
+                            Element root = XmlUtil.getRoot(msg);
+                            List children = XmlUtil.findChildren(root,
+                                                "ServiceException");
+                            for (int i = 0; i < children.size(); i++) {
+
+                                Element node = (Element) children.get(i);
+                                String code = XmlUtil.getAttribute(node,
+                                                  "code", (String) null);
+                                String body = XmlUtil.getChildText(node);
+                                if (code != null) {
+                                    errors.append(code + "\n");
+                                }
+                                errors.append(body.trim() + "\n");
+                            }
+                            LogUtil.userErrorMessage(
+                                "Error accessing image with the url:\n" + url
+                                + "\nError:\n" + errors);
+                        } catch (Exception exc) {
+                            LogUtil.userErrorMessage(
+                                "Error accessing image with the url:\n" + url
+                                + "\nError:\n" + StringUtil.stripTags(msg));
+                        }
+                        return null;
+                    }
+
+
+                    msg = StringUtil.replace(msg, "\n", " ").toLowerCase();
+                    if (StringUtil.stringMatch(msg, "service\\s*exception")) {
+                        if (StringUtil.stringMatch(msg,
+                                "cannot\\s*be\\s*less\\s*than")) {
+                            return null;
+                        }
+                    }
+                    if (msg.indexOf("error") >= 0) {
+                        LogUtil.userErrorMessage(
+                            "There was an error accessing the image with the url:\n"
+                            + url + "\nError:\n" + new String(imageContent));
                         return null;
                     }
                 }
-                if (msg.indexOf("error") >= 0) {
-                    LogUtil.userErrorMessage(
-                        "There was an error accessing the image with the url:\n"
-                        + url + "\nError:\n" + new String(imageContent));
-                    return null;
+                logException(
+                    "There was an error accessing the image with the url:\n"
+                    + url, iexc);
+                return null;
+            }
+
+            if (writeFile != null) {
+                try {
+                    ImageXmlDataSource.writeToFile(writeFile, boundsToUse,
+                            imageContent, wmsInfo.getFormat());
+                } catch (Exception exc) {
+                    throw new IllegalArgumentException(
+                        "Error writing image xml file:" + writeFile + " "
+                        + exc);
                 }
             }
-            logException(
-                "There was an error accessing the image with the url:\n"
-                + url, iexc);
-            return null;
-        }
 
-        if (writeFile != null) {
-            try {
-                ImageXmlDataSource.writeToFile(writeFile, boundsToUse,
-                        imageContent, wmsInfo.getFormat());
-            } catch (Exception exc) {
-                throw new IllegalArgumentException(
-                    "Error writing image xml file:" + writeFile + " " + exc);
-            }
+
+
         }
 
 
@@ -478,7 +500,8 @@ public class WmsDataSource extends DataSourceImpl {
             sb.append("<p><b>Last request:</b> " + lastUrl);
         }
 
-        sb.append("Images<p><table><tr><td><b>Name</b></td><td><b>Layer</b></td><td><b>Server</b></td></tr>\n");
+        sb.append(
+            "Images<p><table><tr><td><b>Name</b></td><td><b>Layer</b></td><td><b>Server</b></td></tr>\n");
         for (int i = 0; i < wmsSelections.size(); i++) {
             WmsSelection selection = (WmsSelection) wmsSelections.get(i);
             sb.append("<tr><td>");
