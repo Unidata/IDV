@@ -162,9 +162,15 @@ public class IdvXmlUi extends XmlUi {
         Object iconSize =
             uiManager.getIdv().getStateManager()
                 .getPreferenceOrProperty("idv.ui.iconsize");
+        if(iconSize!=null && iconSize.toString().trim().length()==0) {
+            iconSize = null;
+        }
         if(iconSize==null) {
             iconSize =  uiManager.getIdv().getStateManager()
                 .getPreferenceOrProperty("idv.ui.minimumiconsize");
+        }
+        if(iconSize!=null && iconSize.toString().trim().length()==0) {
+            iconSize = null;
         }
         for (int i = 0; i < elements.getLength(); i++) {
             Element child = (Element) elements.item(i);

@@ -551,8 +551,11 @@ public class IdvUIManager extends IdvManager {
 
 
         if (iconSize != null) {
-            GuiUtils.setDefaultIconSize(
-                new Integer(iconSize.toString()).intValue());
+            String tmpSize = iconSize.toString().trim();
+            if(tmpSize.length()>0) {
+                GuiUtils.setDefaultIconSize(
+                                            new Integer(tmpSize).intValue());
+            }
         }
 
         if (fontSize != null) {
@@ -2872,9 +2875,9 @@ public class IdvUIManager extends IdvManager {
     private void updateToolbars() {
 
         ImageIcon fileIcon =
-            GuiUtils.getImageIcon("/auxdata/ui/icons/page.png");
+            GuiUtils.scaleImageIcon(GuiUtils.getImageIcon("/auxdata/ui/icons/page.png"));
         ImageIcon catIcon =
-            GuiUtils.getImageIcon("/auxdata/ui/icons/folder.png");
+            GuiUtils.scaleImageIcon(GuiUtils.getImageIcon("/auxdata/ui/icons/folder.png"));
         List windows = IdvWindow.getWindows();
         List bundles = getPersistenceManager().getBundles(
                            IdvPersistenceManager.BUNDLES_FAVORITES);
