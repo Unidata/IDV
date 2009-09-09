@@ -1374,8 +1374,12 @@ public class TypeHandler extends RepositoryManager {
                 }
 
                 String addMetadata = HtmlUtil.checkbox(ARG_METADATA_ADD)
-                                     + HtmlUtil.space(1)
-                                     + msg("Add Metadata");
+                    + HtmlUtil.space(1)
+                    + msg("Add Metadata")+
+                    HtmlUtil.space(1) +
+                    HtmlUtil.checkbox(ARG_METADATA_ADDSHORT)
+                    + HtmlUtil.space(1)
+                    + msg("Just Spatial/Temporal Metadata");
 
                 List datePatterns = new ArrayList();
                 datePatterns.add(new TwoFacedObject("", BLANK));

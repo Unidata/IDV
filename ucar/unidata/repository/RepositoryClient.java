@@ -188,7 +188,7 @@ public class RepositoryClient extends RepositoryBase {
         System.err.println(
             "Usage: RepositoryClient <server url> <user id> <password> <arguments>");
         System.err.println(
-            "Where arguments are:\n\t-parent <parent group id>\n\t-file <file to upload>\n\t-name <entry name>\n\t-descr <entry description>\n\t-attach <file to attach>\n\t-addmetadata (Add metadata to entry)\n\t");
+            "Where arguments are:\n\t-parent <parent group id>\n\t-file <file to upload>\n\t-name <entry name>\n\t-descr <entry description>\n\t-attach <file to attach>\n\t-addmetadata (Add full metadata to entry)\n\t-addshortmetadata (Add spatial/temporal metadata to entry)\n\t");
         System.exit(1);
     }
 
@@ -306,6 +306,11 @@ public class RepositoryClient extends RepositoryBase {
                     usage("Need to specify a -file first");
                 }
                 entryNode.setAttribute(ATTR_ADDMETADATA,"true");
+            } else if (arg.equals("-addshortmetadata")) {
+                if(entryNode==null) {
+                    usage("Need to specify a -file first");
+                }
+                entryNode.setAttribute(ATTR_ADDSHORTMETADATA,"true");
             } else if (arg.equals("-attach")) {
                 if (i == args.length) {
                     usage("Bad -file argument");

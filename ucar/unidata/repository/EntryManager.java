@@ -1150,8 +1150,12 @@ return new Result(title, sb);
 
 
 
-        if (newEntry && request.get(ARG_METADATA_ADD, false)) {
-            addInitialMetadata(request, entries,newEntry, false);
+        if (newEntry) {
+            if(request.get(ARG_METADATA_ADD, false)) {
+                addInitialMetadata(request, entries,newEntry, false);
+            } else if(request.get(ARG_METADATA_ADDSHORT, false)) {
+                addInitialMetadata(request, entries,newEntry, true);
+            }
         }
 
         insertEntries(entries, newEntry);
@@ -2688,6 +2692,10 @@ return new Result(title, sb);
                     List<Entry> tmpEntries =
                         (List<Entry>) Misc.newList(entry);
                     addInitialMetadata(request, tmpEntries, true, false);
+                } else if (XmlUtil.getAttribute(node, ATTR_ADDSHORTMETADATA, false)) {
+                    List<Entry> tmpEntries =
+                        (List<Entry>) Misc.newList(entry);
+                    addInitialMetadata(request, tmpEntries, true, true);
                 }
 
             } else if (node.getTagName().equals(TAG_ASSOCIATION)) {

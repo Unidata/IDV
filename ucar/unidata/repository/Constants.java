@@ -281,6 +281,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ATTR_ADDMETADATA = "addmetadata";
+    public static final String ATTR_ADDSHORTMETADATA = "addshortmetadata";
 
     public static final String ATTR_ATTR = "attr";
 
@@ -683,6 +684,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_METADATA_ADD = "metadata.add";
+    public static final String ARG_METADATA_ADDSHORT = "metadata.addshort";
 
     /** _more_ */
     public static final String ARG_METADATA_ADDTOPARENT =
