@@ -638,19 +638,19 @@ public abstract class NavigatedViewManager extends ViewManager {
                 cursorReadoutWindow.handleMouseReleased(mouseEvent);
                 cursorReadoutWindow = null;
             }
-            Point toPoint = new Point(mouseEvent.getX(), mouseEvent.getY());
-
-
-            double distance = GuiUtils.distance(mouseStartPoint.x, mouseStartPoint.y, toPoint.x, toPoint.y);
-            long deltaTime = System.currentTimeMillis()-mouseMovedTime;
-            if(System.currentTimeMillis()-mousePressedTime>0) {
-                double speed = distance/(System.currentTimeMillis()-mousePressedTime);
-                if(mouseStartPoint!=null && 
-                   distance>50 &&
-                   deltaTime<200 &&
-                   speed>0.5) {
-                    double[] endMatrix = getProjectionControl().getMatrix();
-                    mouseFlicked(mouseStartPoint, toPoint, startMoveMatrix, endMatrix,speed);
+            Point mouseStart = mouseStartPoint;
+            if(mouseStart!=null) {
+                Point toPoint = new Point(mouseEvent.getX(), mouseEvent.getY());
+                double distance = GuiUtils.distance(mouseStart.x, mouseStart.y, toPoint.x, toPoint.y);
+                long deltaTime = System.currentTimeMillis()-mouseMovedTime;
+                if(System.currentTimeMillis()-mousePressedTime>0) {
+                    double speed = distance/(System.currentTimeMillis()-mousePressedTime);
+                    if(distance>50 &&
+                       deltaTime<200 &&
+                       speed>0.5) {
+                        double[] endMatrix = getProjectionControl().getMatrix();
+                        mouseFlicked(mouseStart, toPoint, startMoveMatrix, endMatrix,speed);
+                    }
                 }
             }
             mouseMovedTime  = -1;
