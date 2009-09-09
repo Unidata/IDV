@@ -45,7 +45,7 @@ import visad.util.BaseRGBMap;
 import visad.util.ColorPreview;
 
 
-import java.awt.Color;
+import java.awt.*;
 
 
 
@@ -148,6 +148,11 @@ public class ImageControl extends BaseImageControl {
 
     }
 
+
+    protected Container doMakeContents()
+            throws VisADException, RemoteException {
+        return GuiUtils.topLeft(doMakeWidgetComponent());
+    }  // end doMakeContents
 
 
 

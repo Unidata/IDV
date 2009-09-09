@@ -217,13 +217,13 @@ public class ShapefileControl extends DisplayControlImpl {
             throws VisADException, RemoteException {
         JComponent mainContents = (JComponent) super.doMakeContents();
         if ( !hasProperties) {
-            return mainContents;
+            return GuiUtils.left(GuiUtils.top(mainContents));
         }
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.add("Display", GuiUtils.topLeft(mainContents));
         tabbedPane.add("Filters", makeFilterGui());
         tabbedPane.add("Table", doMakeTable());
-        return tabbedPane;
+        return GuiUtils.left(GuiUtils.top(tabbedPane));
     }
 
     /**
