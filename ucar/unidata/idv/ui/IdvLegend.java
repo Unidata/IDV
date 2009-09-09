@@ -120,6 +120,11 @@ public abstract class IdvLegend {
     }
 
 
+    public void setContents(JComponent contents) {
+        this.contents = contents;
+    }
+
+
     /**
      * Create, if needed, and return the GUI contents.
      *
