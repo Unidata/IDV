@@ -961,7 +961,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         sideLegendContainer.add(BorderLayout.CENTER, sideLegendComponent);
         //Set the contents from the side legend in case the sideLegendComponent is not just the 
         //contents from the legend
-        sideLegend.setContents(sideLegendComponent);
+        sideLegend.setContentsToUse(sideLegendComponent);
 
 
         JComponent leftComp  = (legendOnLeft

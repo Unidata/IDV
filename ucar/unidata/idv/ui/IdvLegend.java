@@ -120,7 +120,7 @@ public abstract class IdvLegend {
     }
 
 
-    public void setContents(JComponent contents) {
+    public void setContentsToUse(JComponent contents) {
         this.contents = contents;
     }
 
