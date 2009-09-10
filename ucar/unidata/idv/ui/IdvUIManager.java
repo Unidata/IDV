@@ -548,6 +548,8 @@ public class IdvUIManager extends IdvManager {
         String fontSize =
             (String) getIdv().getStateManager().getPreferenceOrProperty(
                 "idv.ui.fontsize");
+        // check for empty String
+        if (fontSize != null && fontSize.trim().length() == 0) fontSize = null;
 
 
         if (iconSize != null) {
