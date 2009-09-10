@@ -36,6 +36,7 @@ import ucar.unidata.gis.maps.MapData;
 import ucar.unidata.gis.maps.MapInfo;
 
 import ucar.unidata.idv.control.MapDisplayControl;
+import ucar.unidata.idv.control.ZSlider;
 
 import ucar.unidata.idv.ui.*;
 
@@ -219,7 +220,7 @@ public class MapViewManager extends NavigatedViewManager {
     private JComponent globeBackgroundColorComp;
 
     /** _more_ */
-    private JSlider globeBackgroundLevelSlider;
+    private ZSlider globeBackgroundLevelSlider;
 
 
     /**
@@ -447,11 +448,9 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     protected void mouseFlicked(Point startPoint, Point endPoint, double[] startMatrix, double [] endMatrix,double speed) {
-        //        if(true) return;
         if (!getUseGlobeDisplay()) {
             return;
         }
-        
 
         double[] trans         = { 0.0, 0.0, 0.0 };
         double[] rot1           = { 0.0, 0.0, 0.0 };
@@ -470,7 +469,6 @@ public class MapViewManager extends NavigatedViewManager {
         double percentX = (endPoint.x-startPoint.x)/distance;
         double percentY = (endPoint.y-startPoint.y)/distance;
         speed *=2;
-        //        System.err.println ("speed:" + speed);
         getNavigatedDisplay().setRotationMultiplierMatrix(speed*-percentY,
                                                           speed*-percentX,
                                                           0.0);
@@ -1660,8 +1658,7 @@ public class MapViewManager extends NavigatedViewManager {
         }
         if (globeBackgroundDisplayable != null) {
             globeBackgroundColor = globeBackgroundColorComp.getBackground();
-            globeBackgroundLevel = globeBackgroundLevelSlider.getValue()
-                                   / 100.;
+            globeBackgroundLevel = globeBackgroundLevelSlider.getValue();
             setGlobeBackground((GlobeDisplay) getMapDisplay());
         }
         return true;
@@ -1680,14 +1677,8 @@ public class MapViewManager extends NavigatedViewManager {
             return;
         }
 
-        globeBackgroundLevelSlider = new JSlider(-99, 100,
-                (int) (100 * globeBackgroundLevel));
-        JPanel labelPanel = GuiUtils.leftCenterRight(new JLabel("Bottom"),
-                                GuiUtils.cLabel("Middle"),
-                                GuiUtils.rLabel("Top"));
-
-        JPanel levelComp = GuiUtils.vbox(globeBackgroundLevelSlider,
-                                         labelPanel);
+        globeBackgroundLevelSlider = new ZSlider(globeBackgroundLevel);
+        JComponent levelComp = globeBackgroundLevelSlider.getContents();
         JComponent[] bgComps =
             GuiUtils.makeColorSwatchWidget(globeBackgroundColor,
                                            "Globe Background Color");
