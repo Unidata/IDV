@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -316,11 +317,44 @@ public class WMSControl extends ImageControl implements ImageObserver {
     }
 
     /**
+     * _more_
+     *
+     * @return _more_
+     */
+    private boolean isLayerFixed() {
+        if (wmsInfo != null) {
+            return wmsInfo.isFixedImage();
+        }
+
+
+        if ((theLayer != null) && (theLayer instanceof TwoFacedObject)) {
+            String layer = ((TwoFacedObject) theLayer).getId().toString();
+            //A hack but we gotta work with what we got
+            if (layer.indexOf("fixed") >= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected boolean getInitialFastRendering() {
+        return false;
+    }
+
+    /**
      * Method to call if projection changes.  Subclasses that
      * are worried about such events should implement this.
      */
     public void projectionChanged() {
         super.projectionChanged();
+        if (isLayerFixed()) {
+            return;
+        }
         if ( !inGlobe && getEnableAutoFetch()) {
             loadImageFromScreen();
         }
@@ -332,6 +366,9 @@ public class WMSControl extends ImageControl implements ImageObserver {
      */
     public void viewpointChanged() {
         super.viewpointChanged();
+        if (isLayerFixed()) {
+            return;
+        }
         if ( !inGlobe && getEnableAutoFetch()) {
             loadImageFromScreen();
         }

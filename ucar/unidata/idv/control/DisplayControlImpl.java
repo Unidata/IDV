@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -198,7 +199,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** time label animation */
     private Animation viewAnimation;
 
-    /** The animation held solely by this display control          */
+    /** The animation held solely by this display control */
     private Animation internalAnimation;
 
     /** Animation info */
@@ -932,8 +933,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         //Initialize the adjust flags if we have not been unpersisted
         if ( !wasUnPersisted) {
-            useFastRendering = controlContext.getObjectStore().get(
-                IdvConstants.PREF_FAST_RENDER, getDefaultFastRendering());
+            useFastRendering = getInitialFastRendering();
         }
 
         //Set the myDataChoices member and add this object as a DataChangeListener
@@ -1792,14 +1792,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         //If we had table then set it on the widget and apply the color scale info
         if (table != null) {
             if (ctw != null) {
-                if(table.length==3) {
+                if (table.length == 3) {
                     ctw.setColorPalette(new float[][] {
-                            table[0], table[1], table[2]
-                        });
+                        table[0], table[1], table[2]
+                    });
                 } else {
                     ctw.setColorPalette(new float[][] {
-                            table[0], table[1], table[2],table[3]
-                        });
+                        table[0], table[1], table[2], table[3]
+                    });
                 }
             }
             if (colorScaleInfo != null) {
@@ -3588,8 +3588,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if (sideLegendButtonPanel == null) {
                 DndImageButton dndBtn = new DndImageButton(this, "control");
                 sideLegendButtonPanel = GuiUtils.hbox(dndBtn,
-                                                      makeLockButton(),
-                                                      makeRemoveButton(), 2);
+                        makeLockButton(), makeRemoveButton(), 2);
                 dndBtn.setToolTipText("Click to drag-and-drop");
                 sideLegendButtonPanel.setBackground(null);
             }
@@ -4705,9 +4704,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                             "saveDataChoiceInCache"));
         }
         if (canExportData()) {
-            items.add(GuiUtils.makeMenuItem("Export Displayed Data to NetCDF...", this,
-                                            "exportDisplayedData",
-                                            FileManager.SUFFIX_NETCDF, true));
+            items.add(
+                GuiUtils.makeMenuItem(
+                    "Export Displayed Data to NetCDF...", this,
+                    "exportDisplayedData", FileManager.SUFFIX_NETCDF, true));
         }
         if ((myDataChoices != null) && haveParameterDefaults()
                 && (myDataChoices.size() == 1)) {
@@ -4878,12 +4878,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
 
-        items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Display Settings...", this,
-                                                         "showDisplaySettingsDialog"),"/auxdata/ui/icons/Settings16.png"));
+        items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Display Settings...",
+                this,
+                "showDisplaySettingsDialog"), "/auxdata/ui/icons/Settings16.png"));
 
 
-        items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Properties...", this,
-                                                         "showProperties"),"/auxdata/ui/icons/information.png"));
+        items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Properties...",
+                this,
+                "showProperties"), "/auxdata/ui/icons/information.png"));
 
     }
 
@@ -5830,11 +5832,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     protected void getViewMenuItems(List items, boolean forMenuBar) {
         items.add(GuiUtils.makeCheckboxMenuItem("Visible", this,
                 "displayVisibility", null));
-        items.add(GuiUtils.makeCheckboxMenuItem("Lock Visibility",this,
-                                                "lockVisibilityToggle", null));
+        items.add(GuiUtils.makeCheckboxMenuItem("Lock Visibility", this,
+                "lockVisibilityToggle", null));
         if (getDisplayInfos().size() > 0) {
-            items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Bring to Front", this,
-                                                             "displayableToFront"),"/auxdata/ui/icons/shape_move_front.png"));
+            items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Bring to Front",
+                    this,
+                    "displayableToFront"), "/auxdata/ui/icons/shape_move_front.png"));
 
         }
 
@@ -5890,7 +5893,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * for a popup menu in the legend
      */
     protected void getFileMenuItems(List items, boolean forMenuBar) {
-        items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Remove Display", this, "doRemove"),"/auxdata/ui/icons/delete.png"));
+        items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Remove Display",
+                this, "doRemove"), "/auxdata/ui/icons/delete.png"));
     }
 
     /**
@@ -5930,7 +5934,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected void getHelpMenuItems(List items, boolean forMenuBar) {
         items.add(GuiUtils.makeMenuItem("Details", this, "showDetails"));
-        items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("User's Guide", this, "showHelp"),"/auxdata/ui/icons/help.png"));
+        items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("User's Guide",
+                this, "showHelp"), "/auxdata/ui/icons/help.png"));
     }
 
 
@@ -8033,7 +8038,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         /** Is mouse in */
         boolean mouseIn = false;
 
-        /** the foreground color          */
+        /** the foreground color */
         Color color;
 
         /**
@@ -9572,7 +9577,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             if (colorTable.equalsTable(newColorTable)) {
                 return;
             }
-            if(!colorTable.getName().equals(newColorTable.getName())) {
+            if ( !colorTable.getName().equals(newColorTable.getName())) {
                 resetDimness();
             }
 
@@ -10705,6 +10710,17 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected boolean getInitialFastRendering() {
+        return controlContext.getObjectStore().get(
+            IdvConstants.PREF_FAST_RENDER, getDefaultFastRendering());
+    }
+
+
+    /**
      * call setUseFastRendering on all of the displayables
      */
     private void applyUseFastRendering() {
@@ -10825,7 +10841,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         lockBtn.setIcon(isLocked
                         ? ICON_LOCK
                         : ICON_UNLOCK);
-        lockBtn.setToolTipText(Msg.msg("When locked this display control is not affected by the visibility toggling"));
+        lockBtn.setToolTipText(
+            Msg.msg(
+                "When locked this display control is not affected by the visibility toggling"));
     }
 
 
@@ -11447,5 +11465,4 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 }
-
 
