@@ -1690,10 +1690,11 @@ public class MapViewManager extends NavigatedViewManager {
             return;
         }
 
+        /*
         NavigatedDisplay navDisplay = getMapDisplay();
         frontClipFld = new JTextField(navDisplay.getView().getFrontClipDistance()+"",8);
         backClipFld = new JTextField(navDisplay.getView().getFrontClipDistance()+"",8);
-        /*
+
         tabbedPane.addTab("Clipping",GuiUtils.formLayout(new Component[]{
             GuiUtils.rLabel("Front Clipping:"),
             GuiUtils.left(frontClipFld),
