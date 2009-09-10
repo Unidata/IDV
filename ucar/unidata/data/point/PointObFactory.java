@@ -297,6 +297,22 @@ public class PointObFactory {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
+    public static FieldImpl subSet(FieldImpl pointObs, LatLonRect bounds)
+            throws VisADException, RemoteException {
+        return subSet(pointObs, GeoUtils.latLonRectToSet(bounds));
+    }
+
+    /**
+     * Returns a subset of the field of point observations that lie
+     * within the boundaries of the LinearLatLonSet.
+     *
+     * @param pointObs    set of obs.
+     * @param bounds      LinearLatLonSet bounding box
+     * @return   subset within the bounds
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
     public static FieldImpl subSet(FieldImpl pointObs, LinearLatLonSet bounds)
             throws VisADException, RemoteException {
         long      t1             = System.currentTimeMillis();
@@ -374,8 +390,8 @@ public class PointObFactory {
      * @throws VisADException on badness
      */
     public static void writeToNetcdf(File file, FieldImpl field)
-
             throws VisADException, RemoteException, IOException {
+
         List<PointOb> obs = getPointObs(field);
         if (obs.size() == 0) {
             throw new IllegalArgumentException(
@@ -412,14 +428,15 @@ public class PointObFactory {
                     isText[fieldIdx] = false;
                     PointObVar pointObVar = new PointObVar();
                     pointObVar.setName(Util.cleanTypeName(types[fieldIdx]));
-                    
-                    
+
+
                     Unit unit = ((RealType) types[fieldIdx]).getDefaultUnit();
                     if (unit != null) {
-                        String unitName =  unit.getIdentifier();
+                        String unitName = unit.getIdentifier();
                         //                        System.err.println("unitName:" + unitName + " unit:" + unit);
-                        if(unitName == null ||  unitName.length()==0)
-                            unitName  = unit.toString();
+                        if ((unitName == null) || (unitName.length() == 0)) {
+                            unitName = unit.toString();
+                        }
                         pointObVar.setUnits(unitName);
                         //                        System.err.println("Var:" + pointObVar.getName()
                         //                                           + " unit: "
@@ -519,6 +536,7 @@ public class PointObFactory {
 
         writer.finish();
         dos.close();
+
 
     }
 
@@ -1284,9 +1302,9 @@ public class PointObFactory {
         } else if (fc instanceof NestedPointFeatureCollection) {
             NestedPointFeatureCollection npfc =
                 (NestedPointFeatureCollection) fc;
-            if (llr != null) {
-                npfc = npfc.subset(llr);
-            }
+            //if (llr != null) {
+            //    npfc = npfc.subset(llr);
+            //}
             collection = npfc.flatten(llr, null);
         } else {
             throw new IllegalArgumentException(
@@ -1403,11 +1421,9 @@ public class PointObFactory {
                                   new String[shortNamesList.size()]);
 
 
-        int numReals   = numericTypes.size();
-        int numStrings = stringTypes.size();
-        int obIdx      = 0;
-        PointFeatureIterator dataIterator =
-            collection.getPointFeatureIterator(16384);
+        int       numReals     = numericTypes.size();
+        int       numStrings   = stringTypes.size();
+        int       obIdx        = 0;
         int       NUM          = 500;
         TupleType allTupleType = (allReals
                                   ? new RealTupleType(
@@ -1419,6 +1435,9 @@ public class PointObFactory {
             (Unit[]) numericUnits.toArray(new Unit[numericUnits.size()]);
 
 
+        int               listSize = (sample)
+                                     ? 1
+                                     : 100000;
         Real              lat      = new Real(RealType.Latitude, 40);
         Real              lon      = new Real(RealType.Longitude, -100);
         Real              alt      = new Real(RealType.Altitude, 0);
@@ -1426,56 +1445,35 @@ public class PointObFactory {
         EarthLocationLite elt;
         TupleType         finalTT = null;
         PointObTuple      pot     = null;
-        List<Tuple>       tuples  = new ArrayList<Tuple>(100000);
-        List<DateTime>    times   = new ArrayList<DateTime>(100000);
+        List<Tuple>       tuples  = new ArrayList<Tuple>(listSize);
+        List<DateTime>    times   = new ArrayList<DateTime>(listSize);
         List<EarthLocationLite> elts =
-            new ArrayList<EarthLocationLite>(100000);
+            new ArrayList<EarthLocationLite>(listSize);
 
         StructureMembers.Member member;
-        Trace.call1("FeatureDatasetPoint: iterating on PointFeatures");
+        Trace.call1("FeatureDatasetPoint: iterating on PointFeatures",
+                    "sample = " + sample);
         int    missing = 0;
-        String svalue;
-        float  value;
-        while (dataIterator.hasNext()) {
-            PointFeature po = (PointFeature) dataIterator.next();
+        String svalue  = "missing";
+        float  value   = Float.NaN;
+        // if we are only getting a sample there's no need to use the iterator
+        if (sample) {
             obIdx++;
-            ucar.unidata.geoloc.EarthLocation el = po.getLocation();
-            elt = new EarthLocationLite(lat.cloneButValue(el.getLatitude()),
-                                        lon.cloneButValue(el.getLongitude()),
-                                        alt.cloneButValue(el.getAltitude()));
+            elt = new EarthLocationLite(lat, lon, alt);
             double[] realArray   = new double[numReals];
             String[] stringArray = ((numStrings == 0)
                                     ? null
                                     : new String[numStrings]);
 
             // make the VisAD data object
-            StructureData structure = po.getData();
-            int           stringCnt = 0;
-            int           realCnt   = 0;
-            if (needToAddStationId) {
-                StationObsDatatype sod = (StationObsDatatype) po;
-                stringArray[stringCnt++] = sod.getStation().getName();
-            }
-            boolean allMissing = true;
+            int stringCnt = 0;
+            int realCnt   = 0;
             for (varIdx = varIdxBase; varIdx < numVars; varIdx++) {
-                member = structure.findMember((String) shortNames[varIdx]);
                 if ( !isVarNumeric[varIdx]) {
-                    svalue = structure.getScalarString(member);
-                    if (svalue.length() != 0) {
-                        allMissing = false;
-                    }
                     stringArray[stringCnt++] = svalue;
                 } else {
-                    value = structure.convertScalarFloat(member);
-                    if (value == value) {
-                        allMissing = false;
-                    }
                     realArray[realCnt++] = value;
                 }
-            }
-            if (allMissing) {
-                missing++;
-                continue;
             }
 
             Tuple tuple = (allReals
@@ -1486,29 +1484,79 @@ public class PointObFactory {
                                stringArray, allUnits));
 
             tuples.add(tuple);
-            times.add(new DateTime(po.getNominalTimeAsDate()));
+            times.add(new DateTime(0));
             elts.add(elt);
+        } else {
+            PointFeatureIterator dataIterator =
+            //collection.getPointFeatureIterator(-1);
+            collection.getPointFeatureIterator(16384);
+            while (dataIterator.hasNext()) {
+                PointFeature po = (PointFeature) dataIterator.next();
+                obIdx++;
+                ucar.unidata.geoloc.EarthLocation el = po.getLocation();
+                elt = new EarthLocationLite(
+                    lat.cloneButValue(el.getLatitude()),
+                    lon.cloneButValue(el.getLongitude()),
+                    alt.cloneButValue(el.getAltitude()));
+                double[] realArray   = new double[numReals];
+                String[] stringArray = ((numStrings == 0)
+                                        ? null
+                                        : new String[numStrings]);
 
-
-            if (sample) {
-                break;
-            }
-            if (obIdx % NUM == 0) {
-                if ( !JobManager.getManager().canContinue(loadId)) {
-                    LogUtil.message("");
-                    return null;
+                // make the VisAD data object
+                StructureData structure = po.getData();
+                int           stringCnt = 0;
+                int           realCnt   = 0;
+                if (needToAddStationId) {
+                    StationObsDatatype sod = (StationObsDatatype) po;
+                    stringArray[stringCnt++] = sod.getStation().getName();
                 }
-                //if (llr == null) {
-                //    LogUtil.message("Read " + obIdx + "/" + total
-                //                    + " observations");
-                //} else {
-                LogUtil.message("Read " + obIdx + " observations");
-                //}
+                boolean allMissing = true;
+                for (varIdx = varIdxBase; varIdx < numVars; varIdx++) {
+                    member =
+                        structure.findMember((String) shortNames[varIdx]);
+                    if ( !isVarNumeric[varIdx]) {
+                        svalue = structure.getScalarString(member);
+                        if (svalue.length() != 0) {
+                            allMissing = false;
+                        }
+                        stringArray[stringCnt++] = svalue;
+                    } else {
+                        value = structure.convertScalarFloat(member);
+                        if (value == value) {
+                            allMissing = false;
+                        }
+                        realArray[realCnt++] = value;
+                    }
+                }
+                if (allMissing) {
+                    missing++;
+                    continue;
+                }
+
+                Tuple tuple = (allReals
+                               ? (Tuple) new DoubleTuple(
+                                   (RealTupleType) allTupleType, realArray,
+                                   allUnits)
+                               : new DoubleStringTuple(allTupleType,
+                                   realArray, stringArray, allUnits));
+
+                tuples.add(tuple);
+                times.add(new DateTime(po.getNominalTimeAsDate()));
+                elts.add(elt);
+
+                if (obIdx % NUM == 0) {
+                    if ( !JobManager.getManager().canContinue(loadId)) {
+                        LogUtil.message("");
+                        return null;
+                    }
+                    LogUtil.message("Read " + obIdx + " observations");
+                }
             }
+            Trace.call2("FeatureDatasetPoint: iterating on PointFeatures",
+                        "found " + missing + " missing out of " + obIdx);
+            dataIterator.finish();
         }
-        dataIterator.finish();
-        Trace.call2("FeatureDatasetPoint: iterating on PointFeatures",
-                    "found " + missing + " missing out of " + obIdx);
 
         //Bin times
         Trace.call1("FeatureDatasetPoint: binTimes");

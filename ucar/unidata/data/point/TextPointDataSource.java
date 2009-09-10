@@ -1,7 +1,5 @@
 /**
- * $Id: TextPointDataSource.java,v 1.22 2007/08/16 12:00:50 jeffmc Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2009 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -21,7 +19,6 @@
  */
 
 
-
 package ucar.unidata.data.point;
 
 
@@ -38,7 +35,6 @@ import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
-
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
@@ -75,7 +71,6 @@ import javax.swing.event.*;
  * A data source for point data from a Text file
  *
  * @author IDV Development Team
- * @version $Revision: 1.22 $ $Date: 2007/08/16 12:00:50 $
  */
 public class TextPointDataSource extends PointDataSource {
 
@@ -112,7 +107,7 @@ public class TextPointDataSource extends PointDataSource {
     /** skip rows */
     private int skipRows = 0;
 
-    /** _more_          */
+    /** the skip pattern */
     private String skipPattern;
 
 
@@ -174,10 +169,10 @@ public class TextPointDataSource extends PointDataSource {
     /** widget panel */
     JComponent widgetPanel;
 
-    /** _more_          */
+    /** skip pattern text field */
     private JTextField skipPatternFld;
 
-    /** _more_          */
+    /** skip count text field */
     private JTextField skipCntFld;
 
     /** apply names button */
@@ -213,15 +208,11 @@ public class TextPointDataSource extends PointDataSource {
     /**
      * Can this datasource do the geoselection subsetting and decimation
      *
-     * @return _can do geo subsetting
-     *
-     * @param source _more_
-     *
-     * @throws VisADException _more_
+     * @return treu if can do geo subsetting
      */
-    /*    public boolean canDoGeoSelection() {
+    public boolean canDoGeoSelection() {
         return true;
-        }*/
+    }
 
 
     /**
@@ -505,6 +496,9 @@ public class TextPointDataSource extends PointDataSource {
                 obs = makePointObs(d, trackParam);
                 if ((fieldsDescription == null) && (obs != null)) {
                     makeFieldDescription(obs);
+                }
+                if (bbox != null) {
+                    obs = PointObFactory.subSet(obs, bbox);
                 }
                 metaDataOk = true;
             } catch (Exception exc) {
@@ -2325,7 +2319,7 @@ public class TextPointDataSource extends PointDataSource {
         /** Number of rows to skip */
         private int skipRows = -1;
 
-        /** _more_          */
+        /** the skip pattern */
         private String skipPattern;
 
 
@@ -2341,7 +2335,7 @@ public class TextPointDataSource extends PointDataSource {
          * ctor
          *
          * @param rows rows to skip
-         * @param skipPattern _more_
+         * @param skipPattern the skip pattern
          * @param items metadata items
          */
         public Metadata(int rows, String skipPattern, List items) {
