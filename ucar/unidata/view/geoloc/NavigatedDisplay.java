@@ -65,13 +65,13 @@ import java.util.List;
 public abstract class NavigatedDisplay extends DisplayMaster {
 
     /** _more_          */
-    public static double CLIP_FRONT_DEFAULT = -100000.0;
+    public static double CLIP_FRONT_DEFAULT = -2000.0;
 
     /** _more_          */
     public static double CLIP_FRONT_PERSPECTIVE = 0.1;
 
     /** _more_          */
-    public static double CLIP_BACK_DEFAULT = 100000.0;
+    public static double CLIP_BACK_DEFAULT = 2000.0;
 
     /** _more_          */
     public static double CLIP_BACK_PERSPECTIVE = 10.0;
@@ -126,8 +126,11 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     /** flag for auto-rotation */
     private boolean autoRotate = false;
 
-    /** matrix multiplier */
-    private double[] rotationMultiplier = null;
+
+    private double rotateX=0;
+    private double rotateY=-1;
+    private double rotateZ=0;
+
 
     /** rotation delay */
     private long rotateDelay = 50;
@@ -291,10 +294,6 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                 }
             }
         });
-        //  public double[] make_matrix(double rotx, double roty, double rotz,
-        //         double scale, double transx, double transy, double transz) {
-        rotationMultiplier = display.make_matrix(0.0, -1.0, 0.0, 1.0, 0.0,
-                0.0, 0.0);
     }
 
 
@@ -307,9 +306,9 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     public void setRotationMultiplierMatrix(double rotx, double roty,
                                             double rotz) {
-        DisplayImpl display = (DisplayImpl) getDisplay();
-        rotationMultiplier = display.make_matrix(rotx, roty, rotz, 1.0, 0.0,
-                0.0, 0.0);
+        rotateX = rotx;
+        rotateY = roty;
+        rotateZ = rotz;
     }
 
 
@@ -1464,6 +1463,17 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     }
 
 
+    public double getScale() {
+        double[] currentMatrix = getProjectionMatrix();
+        double[] trans         = { 0.0, 0.0, 0.0 };
+        double[] rot           = { 0.0, 0.0, 0.0 };
+        double[] scale         = { 0.0, 0.0, 0.0 };
+        getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
+                                                  currentMatrix);
+
+        return scale[0];
+    }
+
     /**
      * Move the x/y point to the x/y point of the the given screen coords
      *
@@ -2077,7 +2087,11 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws VisADException     VisAD problem
      */
     private void rotate() throws VisADException, RemoteException {
+        DisplayImpl display = (DisplayImpl) getDisplay();
         double[] matrix = getProjectionMatrix();
+        double scale = getScale();
+        double[]rotationMultiplier = display.make_matrix(rotateX/scale, rotateY/scale, rotateZ/scale, 1.0, 0.0,
+                0.0, 0.0);
         setProjectionMatrix(getDisplay().multiply_matrix(rotationMultiplier,
                 matrix));
     }

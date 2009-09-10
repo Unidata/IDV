@@ -207,7 +207,7 @@ public class GlobeDisplay extends NavigatedDisplay {
         canDoStereo = rend.getCanvas().getStereoAvailable();
         //System.err.println("GlobeDisplay:canDoStereo = " + canDoStereo);
         getView().setFrontClipDistance(CLIP_FRONT_DEFAULT);
-        getView().setBackClipDistance(CLIP_BACK_DEFAULT);
+        //        getView().setBackClipDistance(CLIP_BACK_DEFAULT);
         setPerspectiveView(canDoStereo);
         setEyePosition(0.004);
 
@@ -678,17 +678,6 @@ public class GlobeDisplay extends NavigatedDisplay {
      * @param perspectiveView  true for perspective view
      */
     public void setPerspectiveView(boolean perspectiveView) {
-        /*
-        if(true) {
-            DisplayRendererJ3D rend =
-                (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
-            View v = rend.getView();
-            System.err.println ("clip:" + v.getFrontClipDistance());
-            v.setFrontClipDistance(v.getFrontClipDistance()*0.9);
-            //            v.setFieldOfView(v.getFieldOfView() * 0.9f);
-            return;
-            }*/
-
 
         if (perspectiveView == isPerspectiveView()) {
             return;
@@ -696,10 +685,8 @@ public class GlobeDisplay extends NavigatedDisplay {
 
         if (perspectiveView) {
             getView().setFrontClipDistance(CLIP_FRONT_PERSPECTIVE);
-            getView().setBackClipDistance(CLIP_BACK_PERSPECTIVE);
         } else {
             getView().setFrontClipDistance(CLIP_FRONT_DEFAULT);
-            getView().setBackClipDistance(CLIP_BACK_DEFAULT);
         }
 
         try {
