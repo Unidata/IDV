@@ -653,18 +653,30 @@ public class GlobeDisplay extends NavigatedDisplay {
         super.enableClipping(clip);
     }
 
+
+    public View getView() {
+        DisplayRendererJ3D rend =
+            (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
+        return rend.getView();
+    }
+
+
+
+
     /**
      * Set the view to perspective or parallel if this is a 3D display.
      *
      * @param perspective  true for perspective view
      */
     public void setPerspectiveView(boolean perspective) {
-        /*        if(true) {
+        /*
+        if(true) {
             DisplayRendererJ3D rend =
                 (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
             View v = rend.getView();
-            System.err.println ("fov:" + v.getFieldOfView());
-            v.setFieldOfView(v.getFieldOfView() * 0.9f);
+            System.err.println ("clip:" + v.getFrontClipDistance());
+            v.setFrontClipDistance(v.getFrontClipDistance()*0.9);
+            //            v.setFieldOfView(v.getFieldOfView() * 0.9f);
             return;
             }*/
 
