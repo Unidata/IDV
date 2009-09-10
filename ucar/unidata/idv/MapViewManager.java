@@ -728,7 +728,13 @@ public class MapViewManager extends NavigatedViewManager {
                 getMapDisplay().setDisplayAspect(getAspectRatio());
             }
         }
-        getMapDisplay().saveProjection();
+
+
+        //Only save the projection if we're not a globe
+        //        getMapDisplay().saveProjection();
+        if (!getUseGlobeDisplay()) {
+            getMapDisplay().saveProjection();
+        }
 
         this.globeBackgroundColor = mvm.globeBackgroundColor;
         this.globeBackgroundLevel = mvm.globeBackgroundLevel;
