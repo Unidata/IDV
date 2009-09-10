@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -37,6 +38,7 @@ import ucar.visad.display.*;
 import ucar.visad.quantities.GeopotentialAltitude;
 
 import visad.*;
+
 import visad.georef.*;
 
 import java.awt.*;
@@ -61,6 +63,19 @@ import java.util.List;
  * @version $Revision: 1.100 $ $Date: 2007/04/24 14:00:56 $
  */
 public abstract class NavigatedDisplay extends DisplayMaster {
+
+    /** _more_          */
+    public static double CLIP_FRONT_DEFAULT = -100000.0;
+
+    /** _more_          */
+    public static double CLIP_FRONT_PERSPECTIVE = 0.1;
+
+    /** _more_          */
+    public static double CLIP_BACK_DEFAULT = 100000.0;
+
+    /** _more_          */
+    public static double CLIP_BACK_PERSPECTIVE = 10.0;
+
 
     /**
      * The name of the latitude property.
@@ -278,13 +293,23 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         });
         //  public double[] make_matrix(double rotx, double roty, double rotz,
         //         double scale, double transx, double transy, double transz) {
-        rotationMultiplier = display.make_matrix(0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0);
+        rotationMultiplier = display.make_matrix(0.0, -1.0, 0.0, 1.0, 0.0,
+                0.0, 0.0);
     }
 
 
-    public void setRotationMultiplierMatrix(double rotx, double roty, double rotz) {
+    /**
+     * _more_
+     *
+     * @param rotx _more_
+     * @param roty _more_
+     * @param rotz _more_
+     */
+    public void setRotationMultiplierMatrix(double rotx, double roty,
+                                            double rotz) {
         DisplayImpl display = (DisplayImpl) getDisplay();
-        rotationMultiplier = display.make_matrix(rotx, roty, rotz, 1.0, 0.0, 0.0, 0.0);
+        rotationMultiplier = display.make_matrix(rotx, roty, rotz, 1.0, 0.0,
+                0.0, 0.0);
     }
 
 
@@ -1026,14 +1051,23 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                 screenBounds.height / 2);
     }
 
-    
-    public List<TwoFacedObject> getScreenCoordinates() throws VisADException, RemoteException {
-        List<TwoFacedObject> l  = new ArrayList<TwoFacedObject>();
-        l.add(new TwoFacedObject("Center",getScreenCenter()));
-        l.add(new TwoFacedObject("Upper Left",getScreenUpperLeft()));
-        l.add(new TwoFacedObject("Upper Right",getScreenUpperRight()));
-        l.add(new TwoFacedObject("Lower Left",getScreenLowerLeft()));
-        l.add(new TwoFacedObject("Lower Right",getScreenLowerRight()));
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public List<TwoFacedObject> getScreenCoordinates()
+            throws VisADException, RemoteException {
+        List<TwoFacedObject> l = new ArrayList<TwoFacedObject>();
+        l.add(new TwoFacedObject("Center", getScreenCenter()));
+        l.add(new TwoFacedObject("Upper Left", getScreenUpperLeft()));
+        l.add(new TwoFacedObject("Upper Right", getScreenUpperRight()));
+        l.add(new TwoFacedObject("Lower Left", getScreenLowerLeft()));
+        l.add(new TwoFacedObject("Lower Right", getScreenLowerRight()));
         return l;
     }
 
@@ -1106,27 +1140,41 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     public Rectangle2D.Double getLatLonBox()
             throws VisADException, RemoteException {
-        return getLatLonBox(true,true);
+        return getLatLonBox(true, true);
     }
 
 
-    public Rectangle2D.Double getLatLonBox(boolean padSamples, boolean normalizeLon)
+    /**
+     * _more_
+     *
+     * @param padSamples _more_
+     * @param normalizeLon _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public Rectangle2D.Double getLatLonBox(boolean padSamples,
+                                           boolean normalizeLon)
             throws VisADException, RemoteException {
-        java.awt.Rectangle b  = getScreenBounds();
+        java.awt.Rectangle b   = getScreenBounds();
 
-        double pad = (padSamples?0.1:0.0);
-        double[] xs;
-        double[] ys;
+        double             pad = (padSamples
+                                  ? 0.1
+                                  : 0.0);
+        double[]           xs;
+        double[]           ys;
 
-        xs = new double[]{
+        xs = new double[] {
             b.width * -pad, b.width * 0.0, b.width * 0.1, b.width * 0.2,
             b.width * 0.3, b.width * 0.4, b.width * 0.5, b.width * 0.6,
             b.width * 0.7, b.width * 0.8, b.width * 0.9, b.width * 1.0,
-            b.width * (1+pad)
+            b.width * (1 + pad)
         };
 
 
-        ys = new double[]{
+        ys = new double[] {
             0 - b.height * pad, 0, b.height * 0.25, b.height * 0.5,
             b.height * 1, b.height + b.height * pad
         };
@@ -1137,13 +1185,13 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         for (int yidx = 0; yidx < ys.length; yidx++) {
             for (int xidx = 0; xidx < xs.length; xidx++) {
                 findMinMaxFromScreen((int) xs[xidx], (int) ys[yidx], rangeX,
-                                     rangeY,normalizeLon);
+                                     rangeY, normalizeLon);
             }
         }
         for (int xidx = 0; xidx < 100; xidx++) {
             double percent = xidx / 100.0;
             findMinMaxFromScreen((int) (b.width * percent), b.height / 2,
-                                 rangeX, rangeY,normalizeLon);
+                                 rangeX, rangeY, normalizeLon);
         }
 
         double left   = rangeX[0];
@@ -1187,6 +1235,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @param y y position
      * @param rangeX X range
      * @param rangeY Y range
+     * @param normalizeLon _more_
      *
      * @throws VisADException problem accessing screen
      */
@@ -1204,7 +1253,9 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             return;
         }
 
-        if(normalizeLon)         tmpx = LatLonPointImpl.lonNormal(tmpx);
+        if (normalizeLon) {
+            tmpx = LatLonPointImpl.lonNormal(tmpx);
+        }
         if ((rangeX[0] != rangeX[0]) || (tmpx < rangeX[0])) {
             rangeX[0] = tmpx;
         }
@@ -1728,7 +1779,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         double[] rot           = { 0.0, 0.0, 0.0 };
         double[] scale         = { 0.0, 0.0, 0.0 };
         getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
-                                                  currentMatrix);
+                currentMatrix);
         return rot;
     }
 
@@ -1956,15 +2007,23 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     public void setRotateDelay(long millis) {
         rotateDelay = millis;
-        if(rotateDelay<1) rotateDelay = 1;
+        if (rotateDelay < 1) {
+            rotateDelay = 1;
+        }
     }
 
+    /**
+     * _more_
+     */
     public void rotateFaster() {
-        setRotateDelay(rotateDelay/2);
+        setRotateDelay(rotateDelay / 2);
     }
 
+    /**
+     * _more_
+     */
     public void rotateSlower() {
-        setRotateDelay(rotateDelay*2);
+        setRotateDelay(rotateDelay * 2);
     }
 
 
@@ -2019,7 +2078,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     private void rotate() throws VisADException, RemoteException {
         double[] matrix = getProjectionMatrix();
-        setProjectionMatrix(getDisplay().multiply_matrix(rotationMultiplier, matrix));
+        setProjectionMatrix(getDisplay().multiply_matrix(rotationMultiplier,
+                matrix));
     }
 
 

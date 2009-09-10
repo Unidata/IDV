@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -165,8 +166,9 @@ public class GlobeDisplay extends NavigatedDisplay {
                                    : DisplayImplJ3D.JPANEL);
         boolean useStereo = System.getProperty("idv.enableStereo",
                                 "false").equals("true");
-        GraphicsConfiguration config = ucar.visad.display.DisplayUtil.getPreferredConfig(screen, true,
-                                           useStereo);
+        GraphicsConfiguration config =
+            ucar.visad.display.DisplayUtil.getPreferredConfig(screen, true,
+                useStereo);
         DisplayRendererJ3D renderer = new DefaultDisplayRendererJ3D();
         if (offscreen) {
             displayImpl = new DisplayImplJ3D("Globe Display", renderer,
@@ -204,6 +206,8 @@ public class GlobeDisplay extends NavigatedDisplay {
             (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
         canDoStereo = rend.getCanvas().getStereoAvailable();
         //System.err.println("GlobeDisplay:canDoStereo = " + canDoStereo);
+        getView().setFrontClipDistance(CLIP_FRONT_DEFAULT);
+        getView().setBackClipDistance(CLIP_BACK_DEFAULT);
         setPerspectiveView(canDoStereo);
         setEyePosition(0.004);
 
@@ -654,6 +658,11 @@ public class GlobeDisplay extends NavigatedDisplay {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public View getView() {
         DisplayRendererJ3D rend =
             (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
@@ -666,9 +675,9 @@ public class GlobeDisplay extends NavigatedDisplay {
     /**
      * Set the view to perspective or parallel if this is a 3D display.
      *
-     * @param perspective  true for perspective view
+     * @param perspectiveView  true for perspective view
      */
-    public void setPerspectiveView(boolean perspective) {
+    public void setPerspectiveView(boolean perspectiveView) {
         /*
         if(true) {
             DisplayRendererJ3D rend =
@@ -681,19 +690,28 @@ public class GlobeDisplay extends NavigatedDisplay {
             }*/
 
 
-        if (perspective == isPerspectiveView()) {
+        if (perspectiveView == isPerspectiveView()) {
             return;
         }
+
+        if (perspectiveView) {
+            getView().setFrontClipDistance(CLIP_FRONT_PERSPECTIVE);
+            getView().setBackClipDistance(CLIP_BACK_PERSPECTIVE);
+        } else {
+            getView().setFrontClipDistance(CLIP_FRONT_DEFAULT);
+            getView().setBackClipDistance(CLIP_BACK_DEFAULT);
+        }
+
         try {
             getDisplay().getGraphicsModeControl().setProjectionPolicy(
-                (perspective == true)
+                (perspectiveView == true)
                 ? DisplayImplJ3D.PERSPECTIVE_PROJECTION
                 : DisplayImplJ3D.PARALLEL_PROJECTION);
 
         } catch (Exception e) {
             ;
         }
-        super.setPerspectiveView(perspective);
+        super.setPerspectiveView(perspectiveView);
     }
 
     /**

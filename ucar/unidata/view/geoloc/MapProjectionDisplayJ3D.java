@@ -228,6 +228,9 @@ public class MapProjectionDisplayJ3D extends MapProjectionDisplay {
         try {
             DisplayRendererJ3D rend =
                 (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
+            getView().setFrontClipDistance(CLIP_FRONT_DEFAULT);
+            getView().setBackClipDistance(CLIP_BACK_DEFAULT);
+
             canDoStereo = (getDisplayMode() == MODE_3D)
                           && rend.getCanvas().getStereoAvailable();
             //System.err.println(
@@ -366,38 +369,45 @@ public class MapProjectionDisplayJ3D extends MapProjectionDisplay {
     }
 
 
+    public View getView() {
+        DisplayRendererJ3D rend =
+            (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
+        return rend.getView();
+    }
+
+
+
     /**
      * Set the view to perspective or parallel if this is a 3D display..
      *
-     * @param perspective  true for perspective view
+     * @param perspectiveView  true for perspective view
      */
-    public void setPerspectiveView(boolean perspective) {
-        /*        if(true) {
-            DisplayRendererJ3D rend =
-                (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
-            View v = rend.getView();
-            System.err.println ("fov:" + v.getFieldOfView());
-            v.setFieldOfView(v.getFieldOfView() * 0.9f);
-            return;
-            }*/
-
+    public void setPerspectiveView(boolean perspectiveView) {
 
         if ( !(getDisplayMode() == MODE_3D)) {
             return;
         }
-        if (perspective == isPerspectiveView()) {
+        if (perspectiveView == isPerspectiveView()) {
             return;
         }
+        if(perspectiveView) {
+            getView().setFrontClipDistance(CLIP_FRONT_PERSPECTIVE);
+            getView().setBackClipDistance(CLIP_BACK_PERSPECTIVE);
+        } else {
+            getView().setFrontClipDistance(CLIP_FRONT_DEFAULT);
+            getView().setBackClipDistance(CLIP_BACK_DEFAULT);
+        }
+
         try {
             getDisplay().getGraphicsModeControl().setProjectionPolicy(
-                (perspective == true)
+                (perspectiveView == true)
                 ? DisplayImplJ3D.PERSPECTIVE_PROJECTION
                 : DisplayImplJ3D.PARALLEL_PROJECTION);
 
         } catch (Exception e) {
             ;
         }
-        super.setPerspectiveView(perspective);
+        super.setPerspectiveView(perspectiveView);
     }
 
     /**
