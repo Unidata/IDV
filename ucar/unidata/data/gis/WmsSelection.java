@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.gis;
 
 
@@ -75,7 +76,7 @@ public class WmsSelection {
     /** xml attribute name */
     public static final String ATTR_SRS = "srs";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CRS = "crs";
 
     /** xml attribute name */
@@ -132,7 +133,7 @@ public class WmsSelection {
     private String version;
 
 
-    /** _more_          */
+    /** _more_ */
     private String imageFile;
 
     /**
@@ -190,6 +191,16 @@ public class WmsSelection {
         layer  = layer + "," + layerName;
         bounds = bounds.union(thatBounds);
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isFixedImage() {
+        return imageFile != null;
+    }
+
 
     /**
      * Create the wms request
