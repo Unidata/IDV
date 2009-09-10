@@ -66,6 +66,8 @@ import visad.georef.*;
 import java.awt.*;
 import java.awt.Container;
 import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
 import java.net.URL;
 
@@ -75,8 +77,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.event.*;
+
 
 
 /**
@@ -191,7 +192,7 @@ public class MapDisplayControl extends DisplayControlImpl {
     /**
      * position slider
      */
-    private JSlider levelSlider = null;
+    private ZSlider levelSlider = null;
 
     /** flag for slider events */
     private boolean ignoreSliderEvents = false;
@@ -874,7 +875,7 @@ public class MapDisplayControl extends DisplayControlImpl {
 
         JPanel displayPanel = GuiUtils.topCenter(llPanel, ( !useZPosition()
                 ? GuiUtils.filler()
-                : GuiUtils.top(makePositionSlider())));
+                                                            : GuiUtils.top(GuiUtils.leftCenter(new JLabel("Map Position:  "), makePositionSlider()))));
 
 
         applyToAllBtn =
@@ -947,27 +948,13 @@ public class MapDisplayControl extends DisplayControlImpl {
      * @return Map position slider
      */
     private JComponent makePositionSlider() {
-        levelSlider = new JSlider(-99, 100, (int) (100 * mapPosition));
-        levelSlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                JSlider slider = (JSlider) e.getSource();
-                if ( !slider.getValueIsAdjusting() && !ignoreSliderEvents) {
-                    mapPosition = slider.getValue() / 100.;
+        levelSlider = new ZSlider(mapPosition) {
+                public void valueHasBeenSet() {
+                    mapPosition = getValue();
                     applyMapPosition();
                 }
-            }
-        });
-        JPanel labelPanel = GuiUtils.leftCenterRight(new JLabel("Bottom"),
-                                GuiUtils.cLabel("Middle"),
-                                GuiUtils.rLabel("Top"));
-
-        JPanel sliderPanel = GuiUtils.doLayout(new Component[] {
-                                 new JLabel("Map position:   "),
-                                 levelSlider, new JLabel(" "),
-                                 labelPanel }, 2, GuiUtils.WT_NY,
-                                     GuiUtils.WT_NN);
-        return GuiUtils.inset(sliderPanel, new Insets(20, 4, 4, 4));
-
+            };
+        return levelSlider.getContents();
     }
 
 
@@ -976,9 +963,7 @@ public class MapDisplayControl extends DisplayControlImpl {
      */
     private void setSliderPosition() {
         if (levelSlider != null) {
-            ignoreSliderEvents = true;
-            levelSlider.setValue((int) (100 * mapPosition));
-            ignoreSliderEvents = false;
+            levelSlider.setValue(mapPosition);
         }
     }
 

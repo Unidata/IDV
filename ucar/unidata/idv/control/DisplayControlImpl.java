@@ -805,7 +805,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     protected JSlider skipSlider;
 
     /** z position slider */
-    private JSlider zPositionSlider;
+    private ZSlider zPositionSlider;
 
     /** the skip value */
     private int skipValue = 0;
@@ -6982,9 +6982,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @param value slider value
      */
-    public void zSliderChanged(int value) {
+    public void zSliderChanged(double value) {
         try {
-            setZPosition((double) (value / 100.), true);
+            setZPosition(value);
         } catch (Exception exc) {
             logException("Setting z position", exc);
         }
@@ -7018,8 +7018,18 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @return The panel that shows the z position  slider
      */
-    protected JPanel doMakeZPositionSlider() {
+    protected JComponent doMakeZPositionSlider() {
         int sliderPos = (int) (getZPosition() * 100);
+
+
+        zPositionSlider = new ZSlider(getZPosition()) {
+                public void valueHasBeenSet() {
+                    zSliderChanged(getValue());
+                }
+            };
+        return zPositionSlider.getContents();
+
+        /*
         int min       = -100;
         int max       = 100;
         sliderPos = Math.min(Math.max(sliderPos, min), max);
@@ -7032,6 +7042,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
         return GuiUtils.vbox(zPositionSlider, labelPanel);
+        */
     }
 
     /**
@@ -10377,7 +10388,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             applyZPosition();
         }
         if ((zPositionSlider != null) && !fromSlider) {
-            zPositionSlider.setValue((int) (value * 100));
+            zPositionSlider.setValue(value);
         }
     }
 

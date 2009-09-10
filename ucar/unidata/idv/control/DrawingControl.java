@@ -1571,7 +1571,7 @@ public class DrawingControl extends DisplayControlImpl {
      *
      * @param value the new z slider value
      */
-    public void zSliderChanged(int value) {
+    public void zSliderChanged(double value) {
         super.zSliderChanged(value);
         if (displayOnly) {
             try {
