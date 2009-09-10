@@ -315,7 +315,6 @@ public class MapViewManager extends NavigatedViewManager {
                 new GlobeDisplay(getIdv().getArgsManager().getIsOffScreen(),
                                  dimension, null);
             navDisplay = globeDisplay;
-            globeDisplay.getView().setFrontClipDistance(-2000.0);
             setGlobeBackground(globeDisplay);
         } else {
             Trace.call1("MapViewManager.doMakeDisplayMaster projection");
@@ -1665,19 +1664,10 @@ public class MapViewManager extends NavigatedViewManager {
                                    / 100.;
             setGlobeBackground((GlobeDisplay) getMapDisplay());
         }
-        //        NavigatedDisplay navDisplay = getMapDisplay();
-        //        navDisplay.getView().setFrontClipDistance(new Double(frontClipFld.getText()).doubleValue());
-        //        navDisplay.getView().setBackClipDistance(new Double(backClipFld.getText()).doubleValue());
-
-
-
-
         return true;
     }
 
 
-    JTextField frontClipFld;
-    JTextField backClipFld;
 
     /**
      * _more_
@@ -1689,21 +1679,6 @@ public class MapViewManager extends NavigatedViewManager {
         if (globeBackgroundDisplayable == null) {
             return;
         }
-
-        /*
-        NavigatedDisplay navDisplay = getMapDisplay();
-        frontClipFld = new JTextField(navDisplay.getView().getFrontClipDistance()+"",8);
-        backClipFld = new JTextField(navDisplay.getView().getFrontClipDistance()+"",8);
-
-        tabbedPane.addTab("Clipping",GuiUtils.formLayout(new Component[]{
-            GuiUtils.rLabel("Front Clipping:"),
-            GuiUtils.left(frontClipFld),
-            GuiUtils.rLabel("Back Clipping:"),
-            GuiUtils.left(backClipFld)
-            }));*/
-
-
-
 
         globeBackgroundLevelSlider = new JSlider(-99, 100,
                 (int) (100 * globeBackgroundLevel));
