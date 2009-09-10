@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <backgroundwms>
 
+  <image file="/auxdata/images/bluemarble2.jpg"
+         layer="fixed-bluemarble"
+         title="Blue Marble - Fixed"/>
+
   <wms
      server="http://wms.jpl.nasa.gov/wms.cgi"
      layer="modis"
-     title="Blue Marble"
+     title="Blue Marble - Dynamic"
      srs="EPSG:4326"
      format="image/png"
      version="1.1.1"
      bbox="90,-180,-90,180"/>
 
-
-
-
-  <image file="/auxdata/images/bluemarble2.jpg"
-         layer="fixed-bluemarble"
-         title="Blue Marble - Fixed"/>
 
   <image file="/auxdata/images/bathymetrytopo.jpg"
          layer="fixed-bathymetrytopo"
