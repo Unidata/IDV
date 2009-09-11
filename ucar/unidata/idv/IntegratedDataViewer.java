@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -2311,14 +2312,24 @@ Misc.run(new Runnable() {
 
 
     /**
-     * Make the background wms image
+     * _more_
+     *
+     * @return _more_
      */
-    public void doMakeBackgroundImage() {
+    public List getBackgroundImages() {
         if (backgroundImages == null) {
             backgroundImages = WmsSelection.parseWmsResources(
                 getResourceManager().getXmlResources(
                     IdvResourceManager.RSC_BACKGROUNDWMS));
         }
+        return backgroundImages;
+    }
+
+
+    /**
+     * Make the background wms image
+     */
+    public void doMakeBackgroundImage() {
         //If we failed to make it it might mean we already have one around
 
         DataSource dataSource  = null;
@@ -2329,7 +2340,7 @@ Misc.run(new Runnable() {
                 continue;
             }
             WmsDataSource wmsDataSource = (WmsDataSource) tmp;
-            if ( !Misc.equals(backgroundImages,
+            if ( !Misc.equals(getBackgroundImages(),
                               wmsDataSource.getWmsSelections())) {
                 continue;
             }
@@ -2340,7 +2351,7 @@ Misc.run(new Runnable() {
         if (dataSource == null) {
             Hashtable properties = Misc.newHashtable(DataSource.PROP_TITLE,
                                        "Background images");
-            dataSource = makeOneDataSource(backgroundImages, "WMS",
+            dataSource = makeOneDataSource(getBackgroundImages(), "WMS",
                                            properties);
         } else {
             createDefaultDisplays("WMS", dataSource);
