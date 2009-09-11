@@ -688,6 +688,14 @@ public class WMSControl extends ImageControl implements ImageObserver {
         } else if (theDataChoice != null) {
             List layerList =
                 (List) theDataChoice.getProperty(WmsDataSource.PROP_LAYERS);
+            if(layerList!=null) {
+                List dataSources = new ArrayList();
+                theDataChoice.getDataSources(dataSources);
+                if(dataSources.size()==1 && dataSources.get(0) instanceof WmsDataSource) {
+                    layerList = ((WmsDataSource) dataSources.get(0)).getLayerList();
+                }
+            }
+
             if ((layerList != null) && (layerList.size() > 1)) {
                 layerBox = GuiUtils.makeComboBox(layerList, theLayer, false,
                         this, "selectLayer");
