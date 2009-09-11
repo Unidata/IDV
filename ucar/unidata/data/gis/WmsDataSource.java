@@ -125,6 +125,8 @@ public class WmsDataSource extends DataSourceImpl {
     String lastUrl;
 
 
+    private List layerList = new ArrayList();
+
     /**
      * Dummy constructor so this object can get unpersisted.
      */
@@ -148,6 +150,10 @@ public class WmsDataSource extends DataSourceImpl {
         initWmsDataSource();
     }
 
+    public List getLayerList() {
+        return layerList;
+    }
+
     /**
      * Initialize after we have been unpersisted
      */
@@ -166,7 +172,7 @@ public class WmsDataSource extends DataSourceImpl {
      * Create the data choices associated with this source.
      */
     protected void doMakeDataChoices() {
-        List layerList = new ArrayList();
+        layerList = new ArrayList();
         for (int i = 0; i < wmsSelections.size(); i++) {
             WmsSelection selection = (WmsSelection) wmsSelections.get(i);
             layerList.add(new TwoFacedObject(selection.getTitle(),
