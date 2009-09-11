@@ -126,6 +126,10 @@ public class StationModelDisplayable extends DisplayableData {
     /** Work object */
     private Rectangle2D workShapeBounds = new Rectangle2D.Float();
 
+    private double[]currentRotation;
+    private double rx=1,ry=1,rz=1;
+    private JTextField rxf,ryf,rzf;
+
     /** Work object */
     private float[] workOffsetArray = { 0.0f, 0.0f, 0.0f };
 
@@ -595,6 +599,15 @@ public class StationModelDisplayable extends DisplayableData {
         }
 
         FieldImpl newFI = null;
+        currentRotation=master.getRotation();
+        if(rxf==null) {
+             rxf = new JTextField(""+rx);
+             ryf = new JTextField(""+ry);
+             rzf = new JTextField(""+rz);
+             
+        }
+        System.err.println("rot:" + currentRotation[0] + "/" + currentRotation[1] +"/" +
+                           currentRotation[2]);
         synchronized (SHAPES_MUTEX) {
             haveNotified = null;
             isTimeSequence =
@@ -719,6 +732,7 @@ public class StationModelDisplayable extends DisplayableData {
 
 
 
+            currentRotation = null;
             if (isTimeSequence) {
                 Set timeSet = data.getDomainSet();
                 for (int i = 0; i < timeSet.getLength(); i++) {
@@ -1238,11 +1252,17 @@ public class StationModelDisplayable extends DisplayableData {
                         ob.getEarthLocation().getLongitude().getValue(
                             CommonUnit.degree);
 
-                    //                    ShapeUtility.rotateX(shapes[shapeIndex],
-                    //                                         (float)Math.toRadians(lat));
-                    //                    ShapeUtility.rotateX(shapes[shapeIndex],
-                    //                                         (float)Math.toRadians(lat));
-
+                    if(currentRotation!=null) {
+                        rx = new Double(rxf.getText()).doubleValue();
+                        ry = new Double(ryf.getText()).doubleValue();
+                        rz = new Double(rzf.getText()).doubleValue();
+                        ShapeUtility.rotateX(shapes[shapeIndex],
+                                             (float)Math.toRadians(rx*currentRotation[0]));
+                        ShapeUtility.rotateY(shapes[shapeIndex],
+                                             (float)Math.toRadians(ry*currentRotation[1]));
+                        ShapeUtility.rotateZ(shapes[shapeIndex],
+                                             (float)Math.toRadians(rz*currentRotation[2]));
+                    }
                     for (int i = 0; i < RotateInfo.TYPES.length; i++) {
                         RotateInfo info =
                             metSymbol.getRotateInfo(RotateInfo.TYPES[i]);

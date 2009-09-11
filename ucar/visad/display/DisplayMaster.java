@@ -530,7 +530,6 @@ abstract public class DisplayMaster {
      * @return                  The associated AWT Component.
      */
     public Component getComponent() {
-        checkDestroyed();
         return jPanel;
     }
 
@@ -539,7 +538,6 @@ abstract public class DisplayMaster {
      *
      */
     protected synchronized void reDisplayAll() {
-        checkDestroyed();
         if (display != null) {
             display.reDisplayAll();
         }
@@ -550,7 +548,6 @@ abstract public class DisplayMaster {
      * set on them.
      */
     public void reScale() {
-        checkDestroyed();
         if (display != null) {
             ((DisplayImpl) display).reAutoScale();
         }
@@ -567,7 +564,6 @@ abstract public class DisplayMaster {
     public synchronized void rebuildDisplay()
             throws VisADException, RemoteException {
 
-        checkDestroyed();
         if ( !active) {
             return;
         }
@@ -670,9 +666,6 @@ abstract public class DisplayMaster {
      * @return          The VisAD display.
      */
     public final LocalDisplay getDisplay() {
-
-        checkDestroyed();
-
         return (LocalDisplay) display;
     }
 
@@ -681,9 +674,6 @@ abstract public class DisplayMaster {
      * @return          The number of Displayable-s.
      */
     public final int getDisplayableCount() {
-
-        checkDestroyed();
-
         return displayables.size();
     }
 
@@ -695,7 +685,6 @@ abstract public class DisplayMaster {
      */
     public final synchronized void addDisplayable(Displayable displayable)
             throws RemoteException, VisADException {
-        checkDestroyed();
         setDisplayables(getDisplayableCount(), displayable);
     }
 
@@ -711,7 +700,6 @@ abstract public class DisplayMaster {
             Displayable displayable)
             throws VisADException, RemoteException {
 
-        checkDestroyed();
         setDisplayInactive();
 
         if ((index >= 0) && (index < getDisplayableCount())) {
@@ -760,14 +748,10 @@ abstract public class DisplayMaster {
     public synchronized final void setDisplayables(Displayable[] displayables)
             throws VisADException, RemoteException {
 
-        checkDestroyed();
-
         setDisplayInactive();
-
         for (int i = 0; i < displayables.length; ++i) {
             setDisplayables(i, displayables[i]);
         }
-
         setDisplayActive();
     }
 
@@ -793,7 +777,6 @@ abstract public class DisplayMaster {
         if (displayable == null) {
             return false;
         }
-        checkDestroyed();
 
         boolean existed = releaseDisplayable(displayable);
 
@@ -823,9 +806,6 @@ abstract public class DisplayMaster {
      */
     public synchronized void removeDisplayables()
             throws VisADException, RemoteException {
-
-        checkDestroyed();
-
         setDisplayInactive();
 
         /*
@@ -843,9 +823,6 @@ abstract public class DisplayMaster {
      * @param color  a Java Color to become the background color.
      */
     public void setBackground(Color color) {
-
-        checkDestroyed();
-
         try {
             float[] rgb = color.getRGBComponents(null);
 
@@ -869,8 +846,6 @@ abstract public class DisplayMaster {
      */
     public Color getBackground() {
 
-        checkDestroyed();
-
         float[] rgb =
             getDisplay().getDisplayRenderer().getRendererControl()
                 .getBackgroundColor();
@@ -885,8 +860,6 @@ abstract public class DisplayMaster {
      */
     public Color getForeground() {
 
-        checkDestroyed();
-
         float[] rgb =
             getDisplay().getDisplayRenderer().getRendererControl()
                 .getCursorColor();
@@ -900,8 +873,6 @@ abstract public class DisplayMaster {
      * @param color  color to use
      */
     public void setForeground(Color color) {
-
-        checkDestroyed();
 
         try {
             float[] rgb = color.getRGBComponents(null);
@@ -920,9 +891,6 @@ abstract public class DisplayMaster {
      * @return                  The Displayable at the given position.
      */
     public final Displayable getDisplayables(int index) {
-
-        checkDestroyed();
-
         return displayables.get(index);
     }
 
@@ -932,9 +900,6 @@ abstract public class DisplayMaster {
      * @return                  The array of Displayable-s.
      */
     public final Displayable[] getDisplayables() {
-
-        checkDestroyed();
-
         return displayables.toArray();
     }
 
@@ -947,9 +912,6 @@ abstract public class DisplayMaster {
      *                    Displayable.
      */
     public int indexOf(Displayable displayable) {
-
-        checkDestroyed();
-
         return displayables.indexOf(displayable);
     }
 
@@ -963,8 +925,6 @@ abstract public class DisplayMaster {
      */
     public void setPointMode(boolean usePoints)
             throws VisADException, RemoteException {
-
-        checkDestroyed();
 
         GraphicsModeControl gmc          = display.getGraphicsModeControl();
         Boolean             oldPointMode = new Boolean(gmc.getPointMode());
@@ -981,8 +941,6 @@ abstract public class DisplayMaster {
      */
     public boolean isPointMode() {
 
-        checkDestroyed();
-
         return display.getGraphicsModeControl().getPointMode();
     }
 
@@ -993,7 +951,6 @@ abstract public class DisplayMaster {
      * @see #resetProjection()
      */
     public void saveProjection() {
-        checkDestroyed();
         display.getProjectionControl().saveProjection();
     }
 
@@ -1007,7 +964,6 @@ abstract public class DisplayMaster {
      */
     public void setDisplayAspect(double[] newAspect)
             throws VisADException, RemoteException {
-        checkDestroyed();
         //Change the aspect ratio array to size 2 if we are in 2d
         if ( !is3D()) {
             newAspect = new double[] { newAspect[0], newAspect[1] };
@@ -1035,9 +991,6 @@ abstract public class DisplayMaster {
      * @return                       The current display aspect ratio.
      */
     public double[] getDisplayAspect() {
-
-        checkDestroyed();
-
         return myAspect;
     }
 
@@ -1048,11 +1001,31 @@ abstract public class DisplayMaster {
      * @return                       The current display projection.
      */
     public double[] getProjectionMatrix() {
-
-        checkDestroyed();
-
         return display.getProjectionControl().getMatrix();
     }
+
+    public double getScale() {
+        double[] currentMatrix = getProjectionMatrix();
+        double[] trans         = { 0.0, 0.0, 0.0 };
+        double[] rot           = { 0.0, 0.0, 0.0 };
+        double[] scale         = { 0.0, 0.0, 0.0 };
+        getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
+                                                  currentMatrix);
+
+        return scale[0];
+    }
+
+    public double []getRotation() {
+        double[] currentMatrix = getProjectionMatrix();
+        double[] trans         = { 0.0, 0.0, 0.0 };
+        double[] rot           = { 0.0, 0.0, 0.0 };
+        double[] scale         = { 0.0, 0.0, 0.0 };
+        getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
+                                                  currentMatrix);
+
+        return rot;
+    }
+
 
     /**
      * Sets the current display projection.  The argument is passed, unaltered,
@@ -1064,8 +1037,6 @@ abstract public class DisplayMaster {
      */
     public void setProjectionMatrix(double[] newMatrix)
             throws VisADException, RemoteException {
-        checkDestroyed();
-
         //        System.err.print ("DisplayMaster.setProjectionMatrix ");
         //        for(int i=0;i<newMatrix.length;i++) 
         //            System.err.print(" " + newMatrix[i]);
@@ -1080,9 +1051,6 @@ abstract public class DisplayMaster {
      * @return                       The saved projection matrix.
      */
     public double[] getSavedProjectionMatrix() {
-
-        checkDestroyed();
-
         return display.getProjectionControl().getSavedProjectionMatrix();
     }
 
@@ -1095,7 +1063,6 @@ abstract public class DisplayMaster {
      * @throws RemoteException  Java RMI failure.
      */
     public void resetProjection() throws VisADException, RemoteException {
-        checkDestroyed();
         display.getProjectionControl().resetProjection();
     }
 
@@ -1109,7 +1076,6 @@ abstract public class DisplayMaster {
      * @param behavior               The keyboard behavior to be added.
      */
     public void addKeyboardBehavior(KeyboardBehavior behavior) {
-        checkDestroyed();
     }
 
 
@@ -1164,8 +1130,7 @@ abstract public class DisplayMaster {
      */
     public void setMouseFunctions(int[][][] map) throws VisADException {
         mouseFunctionMap = map;
-        display.getDisplayRenderer().getMouseBehavior().getMouseHelper()
-            .setFunctionMap(map);
+        getMouseBehavior().getMouseHelper().setFunctionMap(map);
     }
 
 
@@ -1325,6 +1290,8 @@ abstract public class DisplayMaster {
      */
     public float getDisplayScale() {
         if (display != null) {
+            //jeffmc:
+            //            if(true) return (float)getScale();
             ProjectionControl pc          = display.getProjectionControl();
             double[]          init_matrix = pc.getSavedProjectionMatrix();
             double[]          rot_a       = new double[3];
@@ -1422,7 +1389,6 @@ abstract public class DisplayMaster {
      * @param visible  true to make it visible
      */
     public void setWaitMessageVisible(boolean visible) {
-        checkDestroyed();
         ((DisplayRenderer) getDisplay().getDisplayRenderer())
             .setWaitMessageVisible(visible);
     }
@@ -1432,7 +1398,6 @@ abstract public class DisplayMaster {
      * @return true if visible
      */
     public boolean getWaitMessageVisible() {
-        checkDestroyed();
         return ((DisplayRenderer) getDisplay().getDisplayRenderer())
             .getWaitMessageVisible();
     }
@@ -1442,7 +1407,6 @@ abstract public class DisplayMaster {
      * @param visible  true to make it visible
      */
     public void setAnimationStringVisible(boolean visible) {
-        checkDestroyed();
         ((DisplayRenderer) getDisplay().getDisplayRenderer())
             .setAnimationStringVisible(visible);
     }
@@ -1452,7 +1416,6 @@ abstract public class DisplayMaster {
      * @return  true if visible
      */
     public boolean getAnimationStringVisible() {
-        checkDestroyed();
         return ((DisplayRenderer) getDisplay().getDisplayRenderer())
             .getAnimationStringVisible();
     }
@@ -1481,7 +1444,6 @@ abstract public class DisplayMaster {
      * @param listener          The VetoableChangeListener to add.
      */
     public void addVetoableChangeListener(VetoableChangeListener listener) {
-        checkDestroyed();
         vetoableListeners.addVetoableChangeListener(listener);
     }
 
@@ -1493,7 +1455,6 @@ abstract public class DisplayMaster {
      */
     public void addVetoableChangeListener(String name,
                                           VetoableChangeListener listener) {
-        checkDestroyed();
         vetoableListeners.addVetoableChangeListener(name, listener);
     }
 
@@ -1505,7 +1466,6 @@ abstract public class DisplayMaster {
     public void removeVetoableChangeListener(
             VetoableChangeListener listener) {
 
-        checkDestroyed();
         vetoableListeners.removeVetoableChangeListener(listener);
     }
 
@@ -1517,8 +1477,6 @@ abstract public class DisplayMaster {
      */
     public void removeVetoableChangeListener(
             String name, VetoableChangeListener listener) {
-
-        checkDestroyed();
         vetoableListeners.removeVetoableChangeListener(name, listener);
     }
 
@@ -1528,7 +1486,6 @@ abstract public class DisplayMaster {
      * @param listener          The PropertyChangeListener to add.
      */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-        checkDestroyed();
         changeListeners.addPropertyChangeListener(listener);
     }
 
@@ -1540,7 +1497,6 @@ abstract public class DisplayMaster {
      */
     public void addPropertyChangeListener(String name,
                                           PropertyChangeListener listener) {
-        checkDestroyed();
         changeListeners.addPropertyChangeListener(name, listener);
     }
 
@@ -1552,7 +1508,6 @@ abstract public class DisplayMaster {
     public void removePropertyChangeListener(
             PropertyChangeListener listener) {
 
-        checkDestroyed();
         changeListeners.removePropertyChangeListener(listener);
     }
 
@@ -1565,7 +1520,6 @@ abstract public class DisplayMaster {
     public void removePropertyChangeListener(
             String name, PropertyChangeListener listener) {
 
-        checkDestroyed();
         changeListeners.removePropertyChangeListener(name, listener);
     }
 
@@ -1590,7 +1544,6 @@ abstract public class DisplayMaster {
      */
     public synchronized boolean equals(Object obj) {
 
-        checkDestroyed();
 
         boolean equals;
 
@@ -1619,8 +1572,6 @@ abstract public class DisplayMaster {
      */
     public synchronized int hashCode() {
 
-        checkDestroyed();
-
         return display.hashCode() ^ displayables.hashCode()
                ^ (changeListeners.hashCode())
                ^ (vetoableListeners.hashCode());
@@ -1633,7 +1584,6 @@ abstract public class DisplayMaster {
      * @param listener          The VisAD DisplayListener to be added.
      */
     public void addDisplayListener(DisplayListener listener) {
-        checkDestroyed();
         getDisplay().addDisplayListener(listener);
     }
 
@@ -1915,7 +1865,6 @@ abstract public class DisplayMaster {
      *                          master is active.
      */
     public synchronized boolean isActive() {
-        checkDestroyed();
         return active;
     }
 
@@ -2050,7 +1999,6 @@ abstract public class DisplayMaster {
                 active = newActiveValue;
             }
         }
-        checkDestroyed();
         if (haveInitialized) {
             if (active) {
                 rebuildDisplay();
@@ -2074,7 +2022,7 @@ abstract public class DisplayMaster {
     public synchronized boolean ensureInactive() {
         boolean prev = active;
         try {
-            setActive(false);      // invokes checkDestroyed()
+            setActive(false);      
         } catch (Exception ex) {}  // can't happen for setActive(false)
         return prev;
     }
@@ -2114,7 +2062,6 @@ abstract public class DisplayMaster {
      * @param  toFile  The file to which to save the current image.
      */
     public void saveCurrentDisplay(File toFile) {
-        checkDestroyed();
         saveCurrentDisplay(toFile, false, false);
     }
 
@@ -2252,7 +2199,6 @@ abstract public class DisplayMaster {
      */
     public void saveCurrentDisplay(File toFile, final boolean doSync,
                                    boolean block, final float quality) {
-        checkDestroyed();
         // user has requested saving display as an image
         final File saveFile = toFile;
 
@@ -2321,16 +2267,6 @@ abstract public class DisplayMaster {
         return image;
     }
 
-
-    /**
-     * Check if this has been destroyed or not.
-     */
-    private final void checkDestroyed() {
-
-        if (isDestroyed) {
-            throw new IllegalStateException();
-        }
-    }
 
     /**
      * Class BackedScalarMaps
