@@ -170,6 +170,7 @@ public class GlobeDisplay extends NavigatedDisplay {
             ucar.visad.display.DisplayUtil.getPreferredConfig(screen, true,
                 useStereo);
         DisplayRendererJ3D renderer = new DefaultDisplayRendererJ3D();
+        renderer.setScaleRotation(true);
         if (offscreen) {
             displayImpl = new DisplayImplJ3D("Globe Display", renderer,
                                              dimension.width,
