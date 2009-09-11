@@ -159,6 +159,18 @@ public class WmsDataSource extends DataSourceImpl {
      */
     public void initAfterUnpersistence() {
         super.initAfterUnpersistence();
+
+        //Check if we were created with the background layers. If so then use the new list
+        if(wmsSelections!=null) {
+            List backgroundImages =  getDataContext().getIdv().getBackgroundImages();
+            for(Object o: wmsSelections) {
+                if(backgroundImages.contains(o)) {
+                    wmsSelections = backgroundImages;
+                    break;
+                }
+            }
+        }
+
         initWmsDataSource();
     }
 
