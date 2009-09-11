@@ -11344,7 +11344,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 if (skipSlider.getValueIsAdjusting()) {
                     return;
                 }
-                applySkipFactor();
+                Misc.run(new Runnable() {
+                        public void run() {
+                            applySkipFactor();}});
             }
         });
         return GuiUtils.hgrid(skipSlider, GuiUtils.filler());

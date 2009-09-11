@@ -176,6 +176,22 @@ public class VolumeRenderControl extends GridDisplayControl {
 
 
     /**
+     *  Use the value of the skip factor to subset the data.
+     */
+    protected void applySkipFactor() {
+        try {
+            showWaitCursor();
+            loadVolumeData();
+        } catch (Exception exc) {
+            logException("loading volume data", exc);
+        } finally {
+            showNormalCursor();
+        }
+
+    }
+
+
+    /**
      * Set the data in this control.
      *
      * @param choice  data description
@@ -206,6 +222,10 @@ public class VolumeRenderControl extends GridDisplayControl {
      */
     protected Container doMakeContents()
             throws VisADException, RemoteException {
+        if (usePoints) {
+            setAttributeFlags(FLAG_SKIPFACTOR);
+        }
+
         return GuiUtils.left(doMakeWidgetComponent());
     }
 
@@ -221,6 +241,12 @@ public class VolumeRenderControl extends GridDisplayControl {
         Trace.call1("VRC.loadVolumeData");
         FieldImpl grid    = getGridDataInstance().getGrid();
         FieldImpl newGrid = grid;
+
+        if (getSkipValue() > 0) {
+            grid = GridUtil.subset(grid, getSkipValue() + 1);
+            newGrid = grid;
+        }
+
         if ( !usePoints) {
             // make sure the projection is correct before we start 
             // transforming the data
