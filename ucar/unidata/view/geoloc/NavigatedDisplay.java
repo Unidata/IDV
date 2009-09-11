@@ -2088,12 +2088,35 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     private void rotate() throws VisADException, RemoteException {
         DisplayImpl display = (DisplayImpl) getDisplay();
-        double[] matrix = getProjectionMatrix();
+        double[] myMatrix = getProjectionMatrix();
         double scale = getScale();
-        double[]rotationMultiplier = display.make_matrix(rotateX/scale, rotateY/scale, rotateZ/scale, 1.0, 0.0,
-                0.0, 0.0);
-        setProjectionMatrix(getDisplay().multiply_matrix(rotationMultiplier,
-                matrix));
+
+        double[] transA         = { 0.0, 0.0, 0.0 };
+        double[] rotA           = { 0.0, 0.0, 0.0 };
+        double[] scaleA         = { 0.0, 0.0, 0.0 };
+        MouseBehavior mouseBehavior = getMouseBehavior();
+        DisplayRenderer displayRenderer = display.getDisplayRenderer();
+
+        mouseBehavior.instance_unmake_matrix(rotA, scaleA, transA, myMatrix);
+
+
+        double[] t2 = null;
+        if(displayRenderer.getRotateAboutCenter()) {
+            myMatrix = mouseBehavior.multiply_matrix(mouseBehavior.make_translate(-transA[0], -transA[1], -transA[2]), myMatrix);
+            t2 = mouseBehavior.make_translate(transA[0], transA[1], transA[2]);
+        }
+
+
+        double[]t1 = display.make_matrix(rotateX/scale, rotateY/scale, rotateZ/scale, 1.0, 0.0,
+                                         0.0, 0.0);
+
+        t1 = mouseBehavior.multiply_matrix(t1, myMatrix);
+
+        if(t2!=null) {
+            t1 = mouseBehavior.multiply_matrix(t2,t1);
+        }
+
+        setProjectionMatrix(t1);
     }
 
 

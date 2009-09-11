@@ -171,6 +171,7 @@ public class GlobeDisplay extends NavigatedDisplay {
                 useStereo);
         DisplayRendererJ3D renderer = new DefaultDisplayRendererJ3D();
         renderer.setScaleRotation(true);
+        renderer.setRotateAboutCenter(true);
         if (offscreen) {
             displayImpl = new DisplayImplJ3D("Globe Display", renderer,
                                              dimension.width,
