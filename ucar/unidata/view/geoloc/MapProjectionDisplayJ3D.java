@@ -228,6 +228,7 @@ public class MapProjectionDisplayJ3D extends MapProjectionDisplay {
         try {
             DisplayRendererJ3D rend =
                 (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
+            rend.setRotateAboutCenter(true);
             getView().setFrontClipDistance(CLIP_FRONT_DEFAULT);
             getView().setBackClipDistance(CLIP_BACK_DEFAULT);
 

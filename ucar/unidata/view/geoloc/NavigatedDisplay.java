@@ -1463,16 +1463,6 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     }
 
 
-    public double getScale() {
-        double[] currentMatrix = getProjectionMatrix();
-        double[] trans         = { 0.0, 0.0, 0.0 };
-        double[] rot           = { 0.0, 0.0, 0.0 };
-        double[] scale         = { 0.0, 0.0, 0.0 };
-        getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
-                                                  currentMatrix);
-
-        return scale[0];
-    }
 
     /**
      * Move the x/y point to the x/y point of the the given screen coords
