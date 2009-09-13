@@ -155,7 +155,10 @@ public class CursorReadoutWindow {
                 //                window.toFront();
                 
             }
-            label = GuiUtils.getFixedWidthLabel("<html>Location: " + lastEarthLocation +(didone?"<hr>":"") +"<table cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">"+sb + "</table></html>");
+
+
+            String llp = (lastEarthLocation==null?"":vm.getIdv().getDisplayConventions().formatLatLonPoint(lastEarthLocation.getLatLonPoint()));
+            label = GuiUtils.getFixedWidthLabel("<html>Location: " + llp +(didone?"<hr>":"") +"<table cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">"+sb + "</table></html>");
             label.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
             window.getContentPane().removeAll();

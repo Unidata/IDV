@@ -131,11 +131,6 @@
        id="edit.displaysettings"
        action="action:edit.displaysettings"/>
     <separator/>
-    <menu
-       label="Delete Saved Views"
-       id="edit.deleteviews"
-       action="action:edit.views.delete"/>
-    <separator/>
     <menuitem
        label="Preferences"
        action="action:edit.preferences"

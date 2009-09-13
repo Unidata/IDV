@@ -436,13 +436,49 @@ public class MapViewManager extends NavigatedViewManager {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public void displayChanged(DisplayEvent de)
+    public void displayChanged(DisplayEvent event)
             throws VisADException, RemoteException {
         if (getIsDestroyed()) {
             return;
         }
+
         checkPipPanel();
-        super.displayChanged(de);
+
+        int id = event.getId();
+        InputEvent inputEvent = event.getInputEvent();
+        if (id == DisplayEvent.KEY_PRESSED && inputEvent instanceof KeyEvent) {
+            KeyEvent keyEvent = (KeyEvent) inputEvent;
+            if (keyEvent.isControlDown() && (keyEvent.getKeyCode() == KeyEvent.VK_H||
+                                             keyEvent.getKeyCode() == KeyEvent.VK_J||
+                                             keyEvent.getKeyCode() == KeyEvent.VK_K||
+                                             keyEvent.getKeyCode() == KeyEvent.VK_L
+                                             )) {
+                double[] matrix = getProjectionControl().getMatrix();
+                double[] rot = new double[3];
+                double[] scale = new double[3];
+                double[] trans = new double[3];
+                MouseBehavior mouseBehavior = getNavigatedDisplay().getMouseBehavior();
+                mouseBehavior.instance_unmake_matrix(rot, scale, trans, matrix);
+
+                double[] t =null;
+                if(keyEvent.getKeyCode() == KeyEvent.VK_H) 
+                    t = mouseBehavior.make_matrix(-5, 0.0, 0, 1.0, 0.0, 0.0, 0.0);
+                else if(keyEvent.getKeyCode() == KeyEvent.VK_J) 
+                    t = mouseBehavior.make_matrix(5, 0.0, 0, 1.0, 0.0, 0.0, 0.0);
+                else if(keyEvent.getKeyCode() == KeyEvent.VK_K) 
+                    t = mouseBehavior.make_matrix(0, -5.0, 0, 1.0, 0.0, 0.0, 0.0);
+                else if(keyEvent.getKeyCode() == KeyEvent.VK_L) 
+                    t = mouseBehavior.make_matrix(0, 5.0, 0, 1.0, 0.0, 0.0, 0.0);
+                matrix  = mouseBehavior.multiply_matrix(t,
+                                                        matrix);
+                getMaster().setProjectionMatrix(matrix);
+                
+                return;
+            }
+        }
+
+
+        super.displayChanged(event);
     }
 
 
@@ -699,6 +735,20 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 
+    public  void initWith(ViewState  viewState) throws Exception {
+        MapProjection  thatProjection = (MapProjection) viewState.get(ViewState.PROP_PROJECTION);
+        if(thatProjection!=null) {
+            setMapProjection(thatProjection, false,
+                             "Projection");
+        }
+        double []aspect = (double[])viewState.get(ViewState.PROP_ASPECTRATIO);
+        if(aspect!=null) {
+            this.setAspectRatio(aspect);
+        }
+        super.initWith(viewState);
+     }
+
+
     /**
      * Initialize this object's state with the state from that.
      *
@@ -768,6 +818,14 @@ public class MapViewManager extends NavigatedViewManager {
         }
     }
 
+
+    public void initViewState(ViewState viewState) {
+        super.initViewState(viewState);
+        viewState.put(ViewState.PROP_GLOBE,new Boolean(getUseGlobeDisplay()));
+        if(!getUseGlobeDisplay()) {
+            viewState.put(ViewState.PROP_PROJECTION,getMainProjection());
+        }
+    }
 
 
     /**
@@ -1143,7 +1201,6 @@ public class MapViewManager extends NavigatedViewManager {
             viewMenu.add(getViewpointControl().getMenu());
         }
         viewMenu.add(makeColorMenu());
-        viewMenu.add(makeSavedViewsMenu());
         viewMenu.addSeparator();
 
         if (isFullScreen()) {
@@ -2207,6 +2264,27 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
+    public boolean isCompatibleWith(ViewManager vm) {
+        if(!super.isCompatibleWith(vm)) {
+            return false;
+        }
+        MapViewManager that = (MapViewManager)vm;
+        return this.getUseGlobeDisplay() == that.getUseGlobeDisplay();
+    }
+
+
+    public boolean isCompatibleWith(ViewState viewState) {
+        if(!super.isCompatibleWith(viewState)) {
+            return false;
+        }
+        Boolean b= (Boolean) viewState.get(ViewState.PROP_GLOBE);
+        if(b!=null) {
+            return getUseGlobeDisplay() == b.booleanValue();
+        }
+        return true;
+    }
+
+
     /**
      * Make the "Projections" menu to be added to the menu bar, which provides
      * controls for maps.
@@ -2224,6 +2302,7 @@ public class MapViewManager extends NavigatedViewManager {
             projMenu.add(projectionsMenu);
             projMenu.add(displaysMenu);
         }
+        projMenu.add(makeSavedViewsMenu());
         JMenu projectionHistoryMenu = GuiUtils.makeDynamicMenu("History",
                                           this,
                                           "initializeProjectionHistoryMenu");

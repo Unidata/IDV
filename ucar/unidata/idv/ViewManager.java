@@ -1507,68 +1507,68 @@ public class ViewManager extends SharableImpl implements ActionListener,
     private List<TwoFacedObject>lastCoords;
 
     private void setMatrixLabel(boolean force) {
-            try {
-        if(matrixLabel==null) return;
-        if(!force && !propertiesDialogShown) return;
-        if(!force) {
-            try {
-                matrixLabel.getLocationOnScreen();
-            } catch (Exception exc) {
-                return;
+        try {
+            if(matrixLabel==null) return;
+            if(!force && !propertiesDialogShown) return;
+            if(!force) {
+                try {
+                    matrixLabel.getLocationOnScreen();
+                } catch (Exception exc) {
+                    return;
+                }
             }
-        }
-        double[] currentMatrix = getDisplayMatrix();
-        boolean changed = !Misc.equals(lastMatrix, currentMatrix);
-        List<TwoFacedObject> coords=null;
-        if(getMaster() instanceof NavigatedDisplay) {
-            coords = ((NavigatedDisplay)getMaster()).getScreenCoordinates();
-            if(!Misc.equals(coords,lastCoords)) changed = true;
-        }
-        if(!changed) return;
-
-        lastMatrix = currentMatrix;
-        double[] trans         = { 0.0, 0.0, 0.0 };
-        double[] rot           = { 0.0, 0.0, 0.0 };
-        double[] scale         = { 0.0, 0.0, 0.0 };
-        getMaster().getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
-                                                              currentMatrix);
-
-
-
-        StringBuffer sb= new StringBuffer();
-        sb.append("<html><table width=100%><tr><td width=33%></td><td width=33%>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=33%>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Y&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Z&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>" +
-                            "<tr><td align=right>Rotation:</td><td align=right>" + fmt(rot[0])+"</td><td align=right>"+fmt(rot[1])+"</td><td align=right>" + fmt(rot[2])+"</td></tr>" +
-                            "<tr><td align=right>Translation:</td><td align=right>" + fmt(trans[0])+"</td><td align=right>"+fmt(trans[1])+"</td><td align=right>"+fmt(trans[2]) +"</td></tr>" +
-                  "<tr><td align=right>Scale:</td><td align=right>" + fmt(scale[0])+"</td></tr>");
-
-        if(getMaster() instanceof NavigatedDisplay) {
-            NavigatedDisplay navDisplay = (NavigatedDisplay)getMaster();
-            sb.append("<tr><td></td><td colspan=3 align=center>Box</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td colspan=2 align=center>Screen</td></tr>");
-            for(TwoFacedObject tfo:coords) {
-                double[]xyz = (double[])tfo.getId();
-                int []scoords = navDisplay.getScreenCoordinates(xyz);
-                sb.append("<tr align=right><td align=right>");
-                sb.append(tfo.toString()+":");
-                sb.append("</td><td>");
-                sb.append(fmt(xyz[0]));
-                sb.append("</td><td>");
-                sb.append(fmt(xyz[1]));
-                sb.append("</td><td>");
-                sb.append(fmt(xyz[2]));
-                sb.append("</td><td>");
-                sb.append("</td><td>");
-                sb.append(scoords[0]);
-                sb.append("</td><td>");
-                sb.append(scoords[1]);
-                sb.append("</td></tr>");
+            double[] currentMatrix = getDisplayMatrix();
+            boolean changed = !Misc.equals(lastMatrix, currentMatrix);
+            List<TwoFacedObject> coords=null;
+            if(getMaster() instanceof NavigatedDisplay) {
+                coords = ((NavigatedDisplay)getMaster()).getScreenCoordinates();
+                if(!Misc.equals(coords,lastCoords)) changed = true;
             }
-        }
-        sb.append("</table>");
+            if(!changed) return;
 
-        matrixLabel.setText(sb.toString());
-            } catch(Exception exc) {
-                LogUtil.consoleMessage("Error:" + exc);
+            lastMatrix = currentMatrix;
+            double[] trans         = { 0.0, 0.0, 0.0 };
+            double[] rot           = { 0.0, 0.0, 0.0 };
+            double[] scale         = { 0.0, 0.0, 0.0 };
+            getMaster().getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
+                                                                  currentMatrix);
+
+
+
+            StringBuffer sb= new StringBuffer();
+            sb.append("<html><table width=100%><tr><td width=33%></td><td width=33%>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=33%>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Y&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Z&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>" +
+                      "<tr><td align=right>Rotation:</td><td align=right>" + fmt(rot[0])+"</td><td align=right>"+fmt(rot[1])+"</td><td align=right>" + fmt(rot[2])+"</td></tr>" +
+                      "<tr><td align=right>Translation:</td><td align=right>" + fmt(trans[0])+"</td><td align=right>"+fmt(trans[1])+"</td><td align=right>"+fmt(trans[2]) +"</td></tr>" +
+                      "<tr><td align=right>Scale:</td><td align=right>" + fmt(scale[0])+"</td></tr>");
+
+            if(getMaster() instanceof NavigatedDisplay) {
+                NavigatedDisplay navDisplay = (NavigatedDisplay)getMaster();
+                sb.append("<tr><td></td><td colspan=3 align=center>Box</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td colspan=2 align=center>Screen</td></tr>");
+                for(TwoFacedObject tfo:coords) {
+                    double[]xyz = (double[])tfo.getId();
+                    int []scoords = navDisplay.getScreenCoordinates(xyz);
+                    sb.append("<tr align=right><td align=right>");
+                    sb.append(tfo.toString()+":");
+                    sb.append("</td><td>");
+                    sb.append(fmt(xyz[0]));
+                    sb.append("</td><td>");
+                    sb.append(fmt(xyz[1]));
+                    sb.append("</td><td>");
+                    sb.append(fmt(xyz[2]));
+                    sb.append("</td><td>");
+                    sb.append("</td><td>");
+                    sb.append(scoords[0]);
+                    sb.append("</td><td>");
+                    sb.append(scoords[1]);
+                    sb.append("</td></tr>");
+                }
             }
+            sb.append("</table>");
+
+            matrixLabel.setText(sb.toString());
+        } catch(Exception exc) {
+            LogUtil.consoleMessage("Error:" + exc);
+        }
 
     }
 
@@ -1681,6 +1681,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
             throws VisADException, RemoteException {
         setIdv(idv);
         initBooleanProperties();
+    }
+
+
+    public  void initWith(ViewState  viewState) throws Exception {
+        double [] matrix = (double[]) viewState.get(ViewState.PROP_MATRIX);
+        if(matrix!=null) {
+            setDisplayMatrix(matrix);
+        }
     }
 
 
@@ -4072,7 +4080,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @return saved views menu
      */
     protected JMenu makeSavedViewsMenu() {
-        return GuiUtils.makeDynamicMenu("Saved State", this,
+        return GuiUtils.makeDynamicMenu("Viewpoints", this,
                                         "initViewStateMenu");
     }
 
@@ -4083,11 +4091,20 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param viewStateMenu the menu to init
      */
     public void initViewStateMenu(JMenu viewStateMenu) {
-        viewStateMenu.add(GuiUtils.makeMenuItem("Save View State",
+        viewStateMenu.add(GuiUtils.makeMenuItem("Save Current Viewpoint",
                 getViewManager(), "doSaveState"));
         viewStateMenu.addSeparator();
         makeViewStateMenu(viewStateMenu);
     }
+
+    public boolean isCompatibleWith(ViewManager vm) {
+        return getClass().equals(vm.getClass());
+    }
+
+    public boolean isCompatibleWith(ViewState viewState) {
+        return getClass().getName().toString().equals(viewState.getViewClassName().trim());
+    }
+
 
     /**
      * Make the view state menu
@@ -6671,7 +6688,16 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
+    public void initViewState(ViewState viewState) {
+        viewState.put(ViewState.PROP_MATRIX,getDisplayMatrix());
+    }
 
+
+    public ViewState doMakeViewState() {
+        ViewState viewState = new ViewState(getClass().getName());
+        initViewState(viewState);
+        return viewState;
+    }
 
 
 

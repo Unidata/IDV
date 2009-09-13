@@ -410,15 +410,22 @@ public class VMManager extends IdvManager {
      * @param vm The view manager to save
      */
     protected void saveViewManagerState(ViewManager vm) {
-        String name = ((vm instanceof MapViewManager)
-                       ? "Map View"
-                       : "View");
-        name = GuiUtils.getInput(null, "Name for saved view: ", name);
-        if (name == null) {
-            return;
+        try {
+            String name = ((vm instanceof MapViewManager)
+                           ? "Map View"
+                           : "View");
+            name = GuiUtils.getInput(null, "Name for saved view: ", name);
+            if (name == null) {
+                return;
+            }
+            ViewState viewState = vm.doMakeViewState();
+            viewState.setName(name);
+            System.err.println  ("Writing: " + viewState);
+            getVMState().add(viewState);
+            writeVMState();
+        } catch (Exception exc) {
+            logException("Saving view state", exc);
         }
-        getVMState().add(new TwoFacedObject(name, vm));
-        writeVMState();
     }
 
 

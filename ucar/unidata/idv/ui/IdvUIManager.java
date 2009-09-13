@@ -2083,26 +2083,46 @@ public class IdvUIManager extends IdvManager {
     public void makeViewStateMenu(JMenu menu, final ViewManager vm) {
         List vms = getVMManager().getVMState();
         if (vms.size() == 0) {
-            menu.add(new JMenuItem(Msg.msg("No Saved Views")));
+            menu.add(new JMenuItem(Msg.msg("No Saved Viewpoints")));
+        } else {
+            JMenu deleteMenu = new JMenu("Delete");
+            menu.add(deleteMenu);
+            makeDeleteViewsMenu(deleteMenu);
         }
+
         for (int i = 0; i < vms.size(); i++) {
-            TwoFacedObject tfo = (TwoFacedObject) vms.get(i);
+            Object vpObject = vms.get(i);
+            TwoFacedObject tfo = null;
+            if(vpObject instanceof TwoFacedObject) { 
+                tfo = (TwoFacedObject) vpObject;
+                ViewManager that = (ViewManager) tfo.getId();
+                if(!vm.isCompatibleWith(that)) {
+                    continue;
+                }
+            } else if(vpObject instanceof ViewState) {
+                if(!vm.isCompatibleWith((ViewState)vpObject)) {
+                    continue;
+                }
+                tfo = new TwoFacedObject(((ViewState)vpObject).getName(),
+                                         vpObject);
+            }
             JMenuItem      mi  = new JMenuItem(tfo.getLabel().toString());
             menu.add(mi);
             mi.addActionListener(new ObjectListener(tfo.getId()) {
                 public void actionPerformed(ActionEvent ae) {
                     if (vm == null) {
                         ViewManager otherView = (ViewManager) theObject;
-                        //Create a new VM in its own window (thus the true, true)
-                        //TODO: Do something with this
-                        /*ViewManager newVM = getVMManager().xgetViewManager(
-                          otherView.getViewDescriptor(),
-                          true, true, null);*/
-                        //                        newVM.initWith(otherView);
                     } else {
-                        vm.initWith((ViewManager) theObject, true);
+                        if(theObject instanceof ViewManager) {
+                            vm.initWith((ViewManager) theObject, true);
+                        } else if(theObject instanceof ViewState) {
+                            try {
+                                vm.initWith((ViewState) theObject);
+                            } catch (Throwable exc) {
+                                logException("Initializing viewpoint", exc);
+                            }
+                        }
                     }
-
                 }
             });
         }
@@ -2122,11 +2142,17 @@ public class IdvUIManager extends IdvManager {
             menu.add(new JMenuItem(Msg.msg("No Saved Views")));
         }
         for (int i = 0; i < vms.size(); i++) {
-            TwoFacedObject tfo = (TwoFacedObject) vms.get(i);
-            JMenuItem mi = new JMenuItem("Delete "
-                                         + tfo.getLabel().toString());
+            String label="";
+            Object  o = vms.get(i);
+            if(o instanceof TwoFacedObject) {
+                label = ((TwoFacedObject)o).getLabel().toString();
+            } else if(o instanceof ViewState) {
+                label = ((ViewState)o).getName();
+            }
+
+            JMenuItem mi = new JMenuItem("Delete " + label);
             menu.add(mi);
-            mi.addActionListener(new ObjectListener(tfo) {
+            mi.addActionListener(new ObjectListener(o) {
                 public void actionPerformed(ActionEvent ae) {
                     if ( !GuiUtils.askYesNo(
                             "Delete Saved View",
