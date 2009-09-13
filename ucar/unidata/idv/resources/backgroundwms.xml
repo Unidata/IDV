@@ -97,4 +97,21 @@
      format="image/jpeg"
      version="1.1.1"
      bbox="71.0,-168.0, 17.0,-65.0"/>
+
+  <image file="/auxdata/images/blue.jpg"
+         layer="fixed-solid-blue"
+         title="Solid Blue"/>
+
+  <image file="/auxdata/images/lightblue.jpg"
+         layer="fixed-solid-lightblue"
+         title="Solid Light Blue"/>
+
+  <image file="/auxdata/images/white.jpg"
+         layer="fixed-solid-white"
+         title="Solid White"/>
+
+  <image file="/auxdata/images/green.jpg"
+         layer="fixed-solid-green"
+         title="Solid Green"/>
+
 </backgroundwms>
