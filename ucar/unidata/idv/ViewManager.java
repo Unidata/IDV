@@ -2415,34 +2415,42 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
         for (int i = 0; i < props.size(); i++) {
             BooleanProperty bp           = (BooleanProperty) props.get(i);
-            boolean         defaultValue = bp.getDefault();
-            if (stateManager != null) {
-                defaultValue = getStateManager().getProperty(bp.getId(),
-                        defaultValue);
-            }
-
-            if (store != null) {
-                defaultValue = store.get(bp.getId(), defaultValue);
-            }
-            if (booleanPropertiesForPersistence != null) {
-                Boolean b =
-                    (Boolean) booleanPropertiesForPersistence.get(bp.getId());
-                //                System.err.println("has for persistence: " + b);
-                if (b != null) {
-                    bp.setValue(b.booleanValue());
-                }
-            }
-            // debug("\tbp: " + bp);
-            BooleanProperty existingBp =
-                (BooleanProperty) booleanPropertyMap.get(bp.getId());
-            if ((existingBp != null)
-                    && (booleanPropertiesForPersistence == null)) {
-                // debug("\thave existing " + existingBp);
-                bp.setValue(existingBp.getValue());
-            }
+            initializeBooleanProperty(bp);
+        }
+    }
 
 
-            BooleanProperty newBp = new BooleanProperty(bp) {
+    protected void initializeBooleanProperty(BooleanProperty bp) {
+        StateManager   stateManager = getStateManager();
+        XmlObjectStore store        = getStore();
+        boolean         defaultValue = bp.getDefault();
+        if (stateManager != null) {
+            defaultValue = getStateManager().getProperty(bp.getId(),
+                                                         defaultValue);
+        }
+
+        if (store != null) {
+            defaultValue = store.get(bp.getId(), defaultValue);
+        }
+        if (booleanPropertiesForPersistence != null) {
+            Boolean b =
+                (Boolean) booleanPropertiesForPersistence.get(bp.getId());
+            //                System.err.println("has for persistence: " + b);
+            if (b != null) {
+                bp.setValue(b.booleanValue());
+            }
+        }
+        // debug("\tbp: " + bp);
+        BooleanProperty existingBp =
+            (BooleanProperty) booleanPropertyMap.get(bp.getId());
+        if ((existingBp != null)
+            && (booleanPropertiesForPersistence == null)) {
+            // debug("\thave existing " + existingBp);
+            bp.setValue(existingBp.getValue());
+        }
+
+
+        BooleanProperty newBp = new BooleanProperty(bp) {
                 public void setValueInner(boolean value) throws Exception {
                     super.setValueInner(value);
                     if (getHaveInitialized()) {
@@ -2450,9 +2458,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     }
                 }
             };
-            newBp.setDefault(defaultValue);
-            addBooleanProperty(newBp);
-        }
+        newBp.setDefault(defaultValue);
+        addBooleanProperty(newBp);
+
     }
 
 

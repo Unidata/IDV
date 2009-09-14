@@ -264,6 +264,8 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
+
+
     /**
      * Make the DisplayMaster for this ViewManager
      *
@@ -406,6 +408,15 @@ public class MapViewManager extends NavigatedViewManager {
         Trace.call1("MapViewManager.init checkDefaultMap");
         checkDefaultMap();
         Trace.call2("MapViewManager.init checkDefaultMap");
+
+        if(useGlobeDisplay) {
+            //            if(!hasBooleanProperty(PREF_SHOWGLOBEBACKGROUND)) {
+                initializeBooleanProperty(new BooleanProperty(PREF_SHOWGLOBEBACKGROUND,
+                                                              "Show Globe Background",
+                                                              "Show Globe Background", false));
+                //            }
+        }
+
     }
 
 
@@ -2629,7 +2640,7 @@ public class MapViewManager extends NavigatedViewManager {
      */
     public float getDefaultMapPosition() {
         if (getUseGlobeDisplay()) {
-            return -0.004f;
+            return -0.0f;
         } else {
             return -0.99f;
         }
