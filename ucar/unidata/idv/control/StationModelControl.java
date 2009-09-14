@@ -69,6 +69,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 
+import ucar.unidata.view.geoloc.GlobeDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.ShapeUtility;
@@ -143,6 +144,8 @@ public class StationModelControl extends ObsDisplayControl {
 
     /** Do we use altitude if we have it */
     private boolean shouldUseAltitude = true;
+
+    private boolean inGlobe = false;
 
     /** holds the z position slider */
     protected JPanel zPositionPanel;
@@ -293,6 +296,8 @@ public class StationModelControl extends ObsDisplayControl {
     /** bounds of the display */
     private Rectangle2D lastViewBounds = null;
 
+    private double[]lastRotation;
+
     /** Have we gotten the initial display scale */
     private boolean haveSetInitialScale = false;
 
@@ -436,6 +441,12 @@ public class StationModelControl extends ObsDisplayControl {
             shouldUseAltitude = false;
         }
         myDisplay.setShouldUseAltitude(shouldUseAltitude);
+        inGlobe = (getNavigatedDisplay() instanceof GlobeDisplay);
+
+        if(inGlobe) {
+            myDisplay.setRotateShapes(true);
+        }
+
         timesHolder = new LineDrawing("ob_time" + dataChoice);
         timesHolder.setManipulable(false);
         timesHolder.setVisible(false);
@@ -3516,34 +3527,51 @@ public class StationModelControl extends ObsDisplayControl {
             }
             Rectangle2D newBounds    = calculateRectangle();
             boolean     shouldReload = false;
-            if ((lastViewBounds == null) || (lastViewBounds.getWidth() == 0)
+
+            if(inGlobe) {
+                if(lastRotation==null) {
+                    shouldReload = true;
+                } else {
+                    double[] rotation = getNavigatedDisplay().getRotation();
+                    if(!java.util.Arrays.equals(rotation, lastRotation)) {
+                        //TODO: Check if the rotation changed considerably
+                        lastRotation = rotation;
+                        shouldReload = true;
+                    }
+                }
+            } else {
+                if ((lastViewBounds == null) || (lastViewBounds.getWidth() == 0)
                     || (lastViewBounds.getHeight() == 0)) {
-                shouldReload = true;
-            } else if ( !(newBounds.equals(lastViewBounds))) {
-                double widthratio = newBounds.getWidth()
-                                    / lastViewBounds.getWidth();
-                double heightratio = newBounds.getHeight()
-                                     / lastViewBounds.getHeight();
-                double xdiff = Math.abs(newBounds.getX()
-                                        - lastViewBounds.getX());
-                double ydiff = Math.abs(newBounds.getY()
-                                        - lastViewBounds.getY());
-                // See if this is 20% greater or smaller than before.
-                if ((((widthratio < .80) || (widthratio > 1.20))
-                        && ((heightratio < .80)
-                            || (heightratio > 1.20))) || ((xdiff
-                               > .2 * lastViewBounds.getWidth()) || (ydiff
-                                   > .2 * lastViewBounds.getHeight()))) {
+                    shouldReload = true;
+                } else if ( !(newBounds.equals(lastViewBounds))) {
+                    double widthratio = newBounds.getWidth()
+                        / lastViewBounds.getWidth();
+                    double heightratio = newBounds.getHeight()
+                        / lastViewBounds.getHeight();
+                    double xdiff = Math.abs(newBounds.getX()
+                                            - lastViewBounds.getX());
+                    double ydiff = Math.abs(newBounds.getY()
+                                            - lastViewBounds.getY());
+                    // See if this is 20% greater or smaller than before.
+                    if ((((widthratio < .80) || (widthratio > 1.20))
+                         && ((heightratio < .80)
+                             || (heightratio > 1.20))) || ((xdiff
+                                                            > .2 * lastViewBounds.getWidth()) || (ydiff
+                                                                                                  > .2 * lastViewBounds.getHeight()))) {
+                        shouldReload = true;
+                    }
+                }
+                float newScale = getScaleFromDisplayable();
+                if (Float.floatToIntBits(lastViewScale)
+                    != Float.floatToIntBits(newScale)) {
                     shouldReload = true;
                 }
             }
-            float newScale = getScaleFromDisplayable();
-            if (Float.floatToIntBits(lastViewScale)
-                    != Float.floatToIntBits(newScale)) {
-                shouldReload = true;
-            }
+
             if (shouldReload) {
                 if ( !stationsLocked) {
+                    loadDataInAWhile();
+                } else if(inGlobe) {
                     loadDataInAWhile();
                 }
             }
