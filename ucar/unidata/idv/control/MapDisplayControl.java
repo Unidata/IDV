@@ -414,10 +414,8 @@ public class MapDisplayControl extends DisplayControlImpl {
 
             MapViewManager mvm = getMapViewManager();
             if(mvm!=null) {
-                System.err.println ("Using position from MVM");
                 this.mapPosition    = mvm.getDefaultMapPosition();
             } else {
-                System.err.println ("NO MVM");
             }
         }
 

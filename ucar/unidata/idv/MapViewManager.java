@@ -2629,7 +2629,7 @@ public class MapViewManager extends NavigatedViewManager {
      */
     public float getDefaultMapPosition() {
         if (getUseGlobeDisplay()) {
-            return 0.0f;
+            return -0.004f;
         } else {
             return -0.99f;
         }
