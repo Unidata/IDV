@@ -86,6 +86,9 @@ import java.util.zip.*;
 
 import javax.swing.*;
 
+import javax.vecmath.Matrix3f;
+
+import javax.vecmath.Vector3f;
 
 
 /**
@@ -117,6 +120,21 @@ public class StationModelDisplayable extends DisplayableData {
     /** Should we use altitude */
     private boolean shouldUseAltitude = true;
 
+    private boolean rotateShapes = false;
+
+
+    private Matrix3f rotateMatrix = new Matrix3f();
+
+    /** Local state for the rotate method */
+    private  float[] rotateArray = new float[3];
+
+    /** Local state for the rotate method */
+    private  Vector3f rotateVector = new Vector3f();
+
+    private double[]currentRotation;
+
+
+
     /** Keep around for makeShapes */
     private Point2D workPoint = new Point2D.Double();
 
@@ -126,9 +144,9 @@ public class StationModelDisplayable extends DisplayableData {
     /** Work object */
     private Rectangle2D workShapeBounds = new Rectangle2D.Float();
 
-    private double[]currentRotation;
-    private double rx=1,ry=1,rz=1;
-    private JTextField rxf,ryf,rzf;
+
+
+
 
     /** Work object */
     private float[] workOffsetArray = { 0.0f, 0.0f, 0.0f };
@@ -599,15 +617,33 @@ public class StationModelDisplayable extends DisplayableData {
         }
 
         FieldImpl newFI = null;
-        currentRotation=master.getRotation();
-        if(rxf==null) {
-             rxf = new JTextField(""+rx);
-             ryf = new JTextField(""+ry);
-             rzf = new JTextField(""+rz);
-             
+        if(rotateShapes) {
+            currentRotation=master.getRotation();
+            double[] t = master.getMouseBehavior().make_matrix(currentRotation[0], 
+                                                               currentRotation[1],
+                                                               currentRotation[2],  
+                                                               1.0,0,0,0);
+
+            t = master.getMouseBehavior().make_matrix(currentRotation[0], 
+                                                      0,0,
+                                                      1.0,0,0,0);
+
+            Matrix3f ym = new Matrix3f();
+            Matrix3f zm = new Matrix3f();
+            ym.rotY(-(float)Math.toRadians(currentRotation[1]));
+            zm.rotZ(-(float)Math.toRadians(currentRotation[2]));
+
+
+            rotateMatrix.rotX(-(float)Math.toRadians(currentRotation[0]));
+            rotateMatrix.mul(ym);
+            rotateMatrix.mul(zm);
+
+            System.err.println("rot:" + currentRotation[0] + "/" + currentRotation[1] +"/" +
+                               currentRotation[2]);
         }
-        System.err.println("rot:" + currentRotation[0] + "/" + currentRotation[1] +"/" +
-                           currentRotation[2]);
+
+
+
         synchronized (SHAPES_MUTEX) {
             haveNotified = null;
             isTimeSequence =
@@ -1252,16 +1288,8 @@ public class StationModelDisplayable extends DisplayableData {
                         ob.getEarthLocation().getLongitude().getValue(
                             CommonUnit.degree);
 
-                    if(currentRotation!=null) {
-                        rx = new Double(rxf.getText()).doubleValue();
-                        ry = new Double(ryf.getText()).doubleValue();
-                        rz = new Double(rzf.getText()).doubleValue();
-                        ShapeUtility.rotateX(shapes[shapeIndex],
-                                             (float)Math.toRadians(rx*currentRotation[0]));
-                        ShapeUtility.rotateY(shapes[shapeIndex],
-                                             (float)Math.toRadians(ry*currentRotation[1]));
-                        ShapeUtility.rotateZ(shapes[shapeIndex],
-                                             (float)Math.toRadians(rz*currentRotation[2]));
+                    if(rotateShapes && currentRotation!=null) {
+                        rotate(shapes[shapeIndex]);
                     }
                     for (int i = 0; i < RotateInfo.TYPES.length; i++) {
                         RotateInfo info =
@@ -1558,6 +1586,22 @@ public class StationModelDisplayable extends DisplayableData {
         }
         return allShapes;
     }
+
+
+
+    private  void rotate(VisADGeometryArray shape) {
+        for (int i = 0; i < shape.coordinates.length; i += 3) {
+            rotateVector.set(shape.coordinates[i + 0],
+                             shape.coordinates[i + 1],
+                             shape.coordinates[i + 2]);
+            rotateMatrix.transform(rotateVector);
+            rotateVector.get(rotateArray);
+            shape.coordinates[i + 0] = rotateArray[0];
+            shape.coordinates[i + 1] = rotateArray[1];
+            shape.coordinates[i + 2] = rotateArray[2];
+        }
+    }
+
 
 
 
@@ -2277,6 +2321,26 @@ public class StationModelDisplayable extends DisplayableData {
         return ( !Double.isNaN(lowSelectedRange)
                  && !Double.isNaN(highSelectedRange));
     }
+
+    /**
+       Set the RotateShapes property.
+
+       @param value The new value for RotateShapes
+    **/
+    public void setRotateShapes (boolean value) {
+	rotateShapes = value;
+    }
+
+    /**
+       Get the RotateShapes property.
+
+       @return The RotateShapes
+    **/
+    public boolean getRotateShapes () {
+	return rotateShapes;
+    }
+
+
 
 }
 
