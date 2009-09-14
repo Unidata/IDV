@@ -272,7 +272,10 @@ public class WmsDataSource extends DataSourceImpl {
                     IOUtil.getInputStream(wmsInfo.getImageFile());
                 imageContent = IOUtil.readBytes(is, myLoadId);
                 image = Toolkit.getDefaultToolkit().createImage(imageContent);
-                xyData       = DataUtility.makeField(image);
+                //                javax.swing.JLabel l = new javax.swing.JLabel(new javax.swing.ImageIcon(image));
+                //                l.setBackground(Color.red);
+                //                ucar.unidata.util.GuiUtils.showOkCancelDialog(null,null, l,null);
+                xyData       = ucar.visad.Util.makeField(image,true);
             } catch (Exception iexc) {
                 logException("There was an error accessing the image:\n"
                              + wmsInfo.getImageFile(), iexc);
