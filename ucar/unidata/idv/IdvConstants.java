@@ -265,10 +265,6 @@ public interface IdvConstants {
     public static final String ARG_PRINTJNLP = "-printjnlp";
 
 
-
-    /** Filename for the view manager state file */
-    public static final String FILE_VMSTATE = "vmstate.xml";
-
     /** Helper so we don't have to do (String)null */
     public static final String NULL_STRING = null;
 

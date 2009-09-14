@@ -36,6 +36,7 @@ import ucar.unidata.idv.control.TransectDrawingControl;
 import ucar.unidata.idv.ui.IdvWindow;
 import ucar.unidata.idv.ui.WindowInfo;
 
+import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 
@@ -51,6 +52,8 @@ import visad.VisADException;
 
 import visad.georef.EarthLocation;
 import visad.georef.MapProjection;
+
+import java.io.File;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -96,7 +99,7 @@ public class VMManager extends IdvManager {
     /**
      *  List of TwoFacedObjects (name, viewmanager) for the named saved viewmanager states.
      */
-    private List vmState;
+    private List viewpoints;
 
 
     /** The viewmanager whose window was last active */
@@ -110,6 +113,16 @@ public class VMManager extends IdvManager {
      */
     public VMManager(IntegratedDataViewer idv) {
         super(idv);
+        //Switch the vmstate.xml to viewpoints.xml
+        try {
+            File oldFile = new File(IOUtil.joinDir(getStore().getUserDirectory(), "vmstate.xml"));
+            File newFile = new File(IOUtil.joinDir(getStore().getUserDirectory(), "viewpoints.xml"));
+            if(oldFile.exists() &&!newFile.exists()) {
+                IOUtil.moveFile(oldFile,newFile);
+            }
+        } catch (Exception exc) {
+            logException("moving vmstate.xml to viewpoints.xml", exc);
+        }
     }
 
 
@@ -364,40 +377,65 @@ public class VMManager extends IdvManager {
 
 
 
-
     /**
-     *  Write the vmState list to the file: ~user/.unidata/idv/&lt;APP&gt;/vmstate.xml
+     *  Write the viewpoints list
      */
     public void writeVMState() {
         getVMState();
-        getStore().putFile(FILE_VMSTATE,
-                           getIdv().getEncoderForWrite().toXml(vmState));
-        vmState = null;
+        List localViewpoints = new ArrayList();
+        List tmp = viewpoints;
+        for(Object o: tmp) {
+            if(o instanceof ViewState && !((ViewState)o).getIsLocal()) continue;
+            localViewpoints.add(o);
+        }
+        try {
+            XmlResourceCollection rc = getResourceManager().getXmlResources(getResourceManager().RSC_VIEWPOINTS);
+            for (int i = 0; i < rc.size(); i++) {
+                if (rc.isWritable(i)) {
+                    File f = new File(rc.get(i).toString());
+                    String contents = getIdv().encodeObject(localViewpoints,true);
+                    IOUtil.writeFile(f, contents);
+                }
+            }
+        } catch (Exception exc) {
+            logException("writing viewpoints", exc);
+        }
     }
 
 
     /**
      * Instantiates (if needed) and returns the list of
-     * {@link TwoFacedObject}s that is the set of saved ViewManagers
+     * {@link TwoFacedObject}s that is the set of saved viewpoints
      *
-     * @return List that holds the view manager   states
+     * @return List that holds the viewpoints
      */
     public List getVMState() {
-        if (vmState == null) {
-            String contents = getStore().getFileContents(FILE_VMSTATE);
-            if (contents == null) {
-                vmState = new ArrayList();
-            } else {
+        if (viewpoints == null) {
+            List tmp = new ArrayList();
+            XmlResourceCollection rc = getResourceManager().getXmlResources(getResourceManager().RSC_VIEWPOINTS);
+
+            for (int i = 0; i < rc.size(); i++) {
+                String contents = rc.read(i);
+                if (contents == null) {
+                    continue;
+                }
                 try {
-                    vmState = (List) getIdv().getEncoderForRead().toObject(
-                        contents);
+                    List resources =  (List) getIdv().getEncoderForRead().toObject(
+                                                                                   contents);
+                    tmp.addAll(resources);
+                    boolean local = rc.isWritable(i);
+                    for(Object o: resources) {
+                        if(o instanceof ViewState) {
+                            ((ViewState)o).setIsLocal(local);
+                        }
+                    }
                 } catch (Exception exc) {
                     logException("Creating VM list", exc);
-                    vmState = new ArrayList();
                 }
             }
+            viewpoints = tmp;
         }
-        return vmState;
+        return viewpoints;
     }
 
 
@@ -420,7 +458,6 @@ public class VMManager extends IdvManager {
             }
             ViewState viewState = vm.doMakeViewState();
             viewState.setName(name);
-            System.err.println  ("Writing: " + viewState);
             getVMState().add(viewState);
             writeVMState();
         } catch (Exception exc) {

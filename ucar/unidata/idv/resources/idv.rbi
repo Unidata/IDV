@@ -556,6 +556,15 @@
     <resource location="%IDVPATH%/stationmodels.xml"/>
   </resources>
 
+
+<!-- Where we find viewpoints  -->
+  <resources name="idv.resource.viewpoints">
+    <resource location="%USERPATH%/viewpoints.xml"/>
+    <resource location="%SITEPATH%/viewpoints.xml"/>
+    <resource location="%APPPATH%/viewpoints.xml"/>
+    <resource location="%IDVPATH%/viewpoints.xml"/>
+  </resources>
+
 <!-- What goes into the station model editor  -->
   <resources name="idv.resource.stationsymbols">
     <resource location="%USERPATH%/stationsymbols.xml"/>

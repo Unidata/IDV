@@ -2147,7 +2147,9 @@ public class IdvUIManager extends IdvManager {
             if(o instanceof TwoFacedObject) {
                 label = ((TwoFacedObject)o).getLabel().toString();
             } else if(o instanceof ViewState) {
-                label = ((ViewState)o).getName();
+                ViewState viewState = (ViewState)o;
+                if(!viewState.getIsLocal()) continue;
+                label = viewState.getName();
             }
 
             JMenuItem mi = new JMenuItem("Delete " + label);

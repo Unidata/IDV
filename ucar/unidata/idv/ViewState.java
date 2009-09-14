@@ -157,6 +157,8 @@ public  class ViewState {
 
     Hashtable properties = new Hashtable();
 
+    private boolean isLocal = true;
+
     public ViewState() {
     }
 
@@ -232,5 +234,25 @@ public  class ViewState {
         return this.name;
     }
         
+    /**
+       Set the IsLocal property.
+
+       @param value The new value for IsLocal
+    **/
+    public void setIsLocal (boolean value) {
+	this.isLocal = value;
+    }
+
+    /**
+       Get the IsLocal property.
+
+       @return The IsLocal
+    **/
+    public boolean getIsLocal () {
+	return this.isLocal;
+    }
+
+
+
 }
 
