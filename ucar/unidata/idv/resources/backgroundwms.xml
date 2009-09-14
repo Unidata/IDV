@@ -38,6 +38,19 @@
          layer="fixed-usgstopo"
          title="USGS Topography - Fixed"/>
 
+
+  <image file="/auxdata/images/landseamask.png"
+         layer="fixed-landseamask"
+         title="Land/Sea Mask - Fixed"/>
+
+  <image file="/auxdata/images/landmask.png"
+         layer="fixed-landmask"
+         title="Land Mask - Fixed"/>
+
+  <image file="/auxdata/images/seamask.png"
+         layer="fixed-seamask"
+         title="Sea Mask - Fixed"/>
+
 <!--
   <image file="/auxdata/images/Topography.jpg"
          layer="fixed-topography"
