@@ -12,7 +12,7 @@ def make3DMap(map, topo):
   """Make a 3d map. map -  map line data - topo - topography dataset
   """
   b = DerivedGridFactory.create2DTopography(topo, topo)
-  c = b.resample(map)
+  c = GridUtil.slice(topo,map);
   return c
 
 
