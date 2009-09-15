@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -64,16 +65,16 @@ import java.util.List;
  */
 public abstract class NavigatedDisplay extends DisplayMaster {
 
-    /** _more_          */
+    /** _more_ */
     public static double CLIP_FRONT_DEFAULT = -2000.0;
 
-    /** _more_          */
+    /** _more_ */
     public static double CLIP_FRONT_PERSPECTIVE = 0.1;
 
-    /** _more_          */
+    /** _more_ */
     public static double CLIP_BACK_DEFAULT = 2000.0;
 
-    /** _more_          */
+    /** _more_ */
     public static double CLIP_BACK_PERSPECTIVE = 10.0;
 
 
@@ -127,9 +128,14 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     private boolean autoRotate = false;
 
 
-    private double rotateX=0;
-    private double rotateY=-1;
-    private double rotateZ=0;
+    /** _more_          */
+    private double rotateX = 0;
+
+    /** _more_          */
+    private double rotateY = -1;
+
+    /** _more_          */
+    private double rotateZ = 0;
 
 
     /** rotation delay */
@@ -877,6 +883,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     public abstract RealTuple getSpatialCoordinates(EarthLocation el);
 
+
+
     /**
      * Returns the spatial (XYZ) coordinates of the particular EarthLocation
      *
@@ -889,9 +897,33 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      *                            change in a remote collaborative display.
      * @throws  VisADException    Couldn't create the necessary VisAD object
      */
+    public double[] getSpatialCoordinates(EarthLocation el, double[] xyz)
+            throws VisADException, RemoteException {
+        return getSpatialCoordinates(
+            el, xyz, el.getAltitude().getValue(CommonUnit.meter));
+    }
+
+
+
+    /**
+     * Returns the spatial (XYZ) coordinates of the particular EarthLocation
+     *
+     * @param el   earth location to translate
+     * @param xyz  buffer to put value in
+     * @param altitude _more_
+     *
+     * @return  xyz
+     *
+     * @throws  RemoteException   If there was a problem making this
+     *                            change in a remote collaborative display.
+     * @throws  VisADException    Couldn't create the necessary VisAD object
+     */
+
     public abstract double[] getSpatialCoordinates(EarthLocation el,
-            double[] xyz)
+            double[] xyz, double altitude)
      throws VisADException, RemoteException;
+
+
 
     /**
      * Return the real altitude from a ZAxis (or displayAltitudeType) value
@@ -1228,6 +1260,24 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
     /**
+     * _more_
+     *
+     * @param x _more_
+     * @param y _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public EarthLocation screenToEarthLocation(int x, int y)
+            throws VisADException {
+        double[] pt = getSpatialCoordinatesFromScreen(x, y, -1);
+        return getEarthLocation(pt);
+    }
+
+
+
+    /**
      * Find min max values from the screen
      *
      * @param x x position
@@ -1241,8 +1291,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     private void findMinMaxFromScreen(int x, int y, double[] rangeX,
                                       double[] rangeY, boolean normalizeLon)
             throws VisADException {
-        double[]      pt   = getSpatialCoordinatesFromScreen(x, y, -1);
-        EarthLocation el   = getEarthLocation(pt);
+        EarthLocation el   = screenToEarthLocation(x, y);
+
         double        tmpx = el.getLongitude().getValue(CommonUnit.degree);
         if (tmpx != tmpx) {
             return;
@@ -1368,6 +1418,9 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             for (int xidx = 0; xidx < xs.length; xidx++) {
                 double[] pt = getSpatialCoordinatesFromScreen((int) xs[xidx],
                                   (int) ys[yidx], -1);
+                //                if(xs[xidx]==0)
+                //                    System.err.println("  x/y:" + xs[xidx] +"/" + ys[yidx] +"  pt:" + pt[0]+"/" + pt[1] +"/" + pt[2]);
+
                 if ((yidx == 0) || (pt[0] < left)) {
                     left = pt[0];
                 }
@@ -1397,8 +1450,9 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         top    = Math.min(top, 90);
         bottom = Math.max(bottom, -90);
 
-        return new Rectangle2D.Double(left, bottom, right - left,
-                                      top - bottom);
+        Rectangle2D.Double box = new Rectangle2D.Double(left, bottom,
+                                     right - left, top - bottom);
+        return box;
     }
 
 
@@ -2077,33 +2131,37 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws VisADException     VisAD problem
      */
     private void rotate() throws VisADException, RemoteException {
-        DisplayImpl display = (DisplayImpl) getDisplay();
-        double[] myMatrix = getProjectionMatrix();
-        double scale = getScale();
+        DisplayImpl     display         = (DisplayImpl) getDisplay();
+        double[]        myMatrix        = getProjectionMatrix();
+        double          scale           = getScale();
 
-        double[] transA         = { 0.0, 0.0, 0.0 };
-        double[] rotA           = { 0.0, 0.0, 0.0 };
-        double[] scaleA         = { 0.0, 0.0, 0.0 };
-        MouseBehavior mouseBehavior = getMouseBehavior();
+        double[]        transA          = { 0.0, 0.0, 0.0 };
+        double[]        rotA            = { 0.0, 0.0, 0.0 };
+        double[]        scaleA          = { 0.0, 0.0, 0.0 };
+        MouseBehavior   mouseBehavior   = getMouseBehavior();
         DisplayRenderer displayRenderer = display.getDisplayRenderer();
 
         mouseBehavior.instance_unmake_matrix(rotA, scaleA, transA, myMatrix);
 
 
         double[] t2 = null;
-        if(displayRenderer.getRotateAboutCenter()) {
-            myMatrix = mouseBehavior.multiply_matrix(mouseBehavior.make_translate(-transA[0], -transA[1], -transA[2]), myMatrix);
-            t2 = mouseBehavior.make_translate(transA[0], transA[1], transA[2]);
+        if (displayRenderer.getRotateAboutCenter()) {
+            myMatrix = mouseBehavior.multiply_matrix(
+                mouseBehavior.make_translate(
+                    -transA[0], -transA[1], -transA[2]), myMatrix);
+            t2 = mouseBehavior.make_translate(transA[0], transA[1],
+                    transA[2]);
         }
 
 
-        double[]t1 = display.make_matrix(rotateX/scale, rotateY/scale, rotateZ/scale, 1.0, 0.0,
-                                         0.0, 0.0);
+        double[] t1 = display.make_matrix(rotateX / scale, rotateY / scale,
+                                          rotateZ / scale, 1.0, 0.0, 0.0,
+                                          0.0);
 
         t1 = mouseBehavior.multiply_matrix(t1, myMatrix);
 
-        if(t2!=null) {
-            t1 = mouseBehavior.multiply_matrix(t2,t1);
+        if (t2 != null) {
+            t1 = mouseBehavior.multiply_matrix(t2, t1);
         }
 
         setProjectionMatrix(t1);

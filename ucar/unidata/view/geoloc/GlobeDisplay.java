@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -385,6 +386,32 @@ public class GlobeDisplay extends NavigatedDisplay {
             getEarthLocation(getDisplay().getDisplayRenderer().getCursor()));
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @param x _more_
+     * @param y _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public EarthLocation screenToEarthLocation(int x, int y)
+            throws VisADException {
+
+        double[]      xyz = getSpatialCoordinatesFromScreen(x, y, Double.NaN);
+        EarthLocation el  = getEarthLocation(xyz);
+        //        System.err.println("screenToEarth: x/y:" + x +"/" + y +" x/y/z:" + x1+"/" + x2 +"/" + x3 + "  el:" + el);
+        return el;
+    }
+
+
+
+
+
+
     /**
      * Handles a change in the position of the mouse-pointer.  For
      * this implementation, it will only list the
@@ -403,38 +430,17 @@ public class GlobeDisplay extends NavigatedDisplay {
          * Convert from (pixel, line) Java Component coordinates to (latitude,
          * longitude)
          */
-        VisADRay ray =
-            getDisplay().getDisplayRenderer().getMouseBehavior().findRay(x,
-                y);
-        double           x1 = ray.position[0];
-        double           x2 = ray.position[1];
-        double           x3 = ray.position[2];
-        java.util.Vector v  = getDisplay().getRenderers();
-        if ( !v.isEmpty()) {
-            DataRenderer rend      = (DataRenderer) v.get(0);
-            double[]     origin    = ray.position;
-            double[]     direction = ray.vector;
-            float r = rend.findRayManifoldIntersection(true, origin,
-                          direction, Display.DisplaySpatialSphericalTuple, 2,
-                          1);
-            if (r != r) {
-                x1 = Double.NaN;
-                x2 = Double.NaN;
-                x3 = Double.NaN;
-            } else {
-                float[][] xx = {
-                    { (float) (origin[0] + r * direction[0]) },
-                    { (float) (origin[1] + r * direction[1]) },
-                    { (float) (origin[2] + r * direction[2]) }
-                };
-                x1 = xx[0][0];
-                x2 = xx[1][0];
-                x3 = xx[2][0];
-            }
-        }
 
-        EarthLocation el = getEarthLocation(new double[] { x1, x2, x3 });
+        double[]      xyz  = getSpatialCoordinatesFromScreen(x, y,
+                                 Double.NaN);
+        EarthLocation el   = getEarthLocation(xyz);
+        double[]      xyz2 = new double[3];
+        xyz2 = getSpatialCoordinates(el, xyz2);
 
+        //            xyz = navDisplay.getSpatialCoordinates(ob.getEarthLocation(),
+        //                    xyz);
+        //        System.err.println("x/y:" + x+"/" + y +" xyz:" + xyz[0]+"/"+xyz[1]  + " xyz2:" + xyz2[0]+"/"+xyz2[1] + " el:" + el);
+        //        EarthLocation el = screenToEarthLocation(x,y);
         setCursorLatitude(el.getLatitude());
         setCursorLongitude(el.getLongitude());
         setCursorAltitude(surface);  // always use surface for this renderer
@@ -740,6 +746,57 @@ public class GlobeDisplay extends NavigatedDisplay {
         return value;
     }
 
+
+    /**
+     * _more_
+     *
+     * @param x _more_
+     * @param y _more_
+     * @param zDepth _more_
+     *
+     * @return _more_
+     */
+    public double[] getSpatialCoordinatesFromScreen(int x, int y,
+            double zDepth) {
+        try {
+            VisADRay ray =
+                getDisplay().getDisplayRenderer().getMouseBehavior().findRay(
+                    x, y);
+            double           x1 = ray.position[0];
+            double           x2 = ray.position[1];
+            double           x3 = ray.position[2];
+            java.util.Vector v  = getDisplay().getRenderers();
+            if ( !v.isEmpty()) {
+                DataRenderer rend      = (DataRenderer) v.get(0);
+                double[]     origin    = ray.position;
+                double[]     direction = ray.vector;
+                float r = rend.findRayManifoldIntersection(true, origin,
+                              direction,
+                              Display.DisplaySpatialSphericalTuple, 2, 1);
+                if (r != r) {
+                    x1 = Double.NaN;
+                    x2 = Double.NaN;
+                    x3 = Double.NaN;
+                } else {
+                    float[][] xx = {
+                        { (float) (origin[0] + r * direction[0]) },
+                        { (float) (origin[1] + r * direction[1]) },
+                        { (float) (origin[2] + r * direction[2]) }
+                    };
+                    x1 = xx[0][0];
+                    x2 = xx[1][0];
+                    x3 = xx[2][0];
+                }
+            }
+            return new double[] { x1, x2, ((zDepth == zDepth)
+                                           ? zDepth
+                                           : x3) };
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+
     /**
      * Returns the spatial (XYZ) coordinates of the particular EarthLocation
      *
@@ -786,21 +843,22 @@ public class GlobeDisplay extends NavigatedDisplay {
      *
      * @param el    earth location (lat/lon/alt) to translate
      * @param xyz Where to put the value
+     * @param altitude _more_
      *
      * @return  The xyz array
      *
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public double[] getSpatialCoordinates(EarthLocation el, double[] xyz)
+    public double[] getSpatialCoordinates(EarthLocation el, double[] xyz,
+                                          double altitude)
             throws VisADException, RemoteException {
         float[][] temp = coordinateSystem.toReference(new float[][] {
             latitudeMap.scaleValues(new double[] {
                 el.getLatitude().getValue(CommonUnit.degree) }),
             longitudeMap.scaleValues(new double[] {
                 el.getLongitude().getValue(CommonUnit.degree) }),
-            altitudeMap.scaleValues(new double[] {
-                el.getAltitude().getValue(CommonUnit.meter) })
+            altitudeMap.scaleValues(new double[] { altitude })
         });
         if (xyz == null) {
             xyz = new double[3];
@@ -970,7 +1028,7 @@ public class GlobeDisplay extends NavigatedDisplay {
      *
      * @return lat lon box  or null if it can't be determined
      */
-    public Rectangle2D.Double getLatLonBox() {
+    public Rectangle2D.Double xxxgetLatLonBox() {
         return new Rectangle2D.Double(-180, -90, 360, 180);
     }
 

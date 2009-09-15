@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -1232,9 +1233,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         //        if(true) return;
 
         VisADRay ray = getRay(x, y);
-
-        updateLocation(getEarthLocation(new double[] { ray.position[0],
-                ray.position[1], ray.position[2] }));
+        EarthLocation el = getEarthLocation(new double[] { ray.position[0],
+                ray.position[1], ray.position[2] });
+        updateLocation(el);
     }
 
 
@@ -1333,18 +1334,21 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      *
      * @param el    earth location to transform
      * @param xyz    The in value to set. May be null.
+     * @param altitude _more_
      *
      * @return  xyz array
      *
      * @throws RemoteException    Java RMI problem
      * @throws VisADException     VisAD problem
      */
-    public double[] getSpatialCoordinates(EarthLocation el, double[] xyz)
+
+    public double[] getSpatialCoordinates(EarthLocation el, double[] xyz,
+                                          double altitude)
             throws VisADException, RemoteException {
+
         float[] altValues;
         if ((altitudeMap != null) && (el.getAltitude() != null)) {
-            altValues = altitudeMap.scaleValues(new double[] {
-                el.getAltitude().getValue(CommonUnit.meter) });
+            altValues = altitudeMap.scaleValues(new double[] { altitude });
         } else {
             altValues = new float[] { 0f };
         }
@@ -1520,7 +1524,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             */
             if (adjustLons) {
                 t2[lonIndex] = (use360)
-                               //? GeoUtils.normalizeLongitude360(latlonalt[1])
+                //? GeoUtils.normalizeLongitude360(latlonalt[1])
                                ? latlonalt[1]
                                : GeoUtils.normalizeLongitude(latlonalt[1]);
             }
@@ -1596,7 +1600,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             */
             if (adjustLons) {
                 t2[lonIndex] = (use360)
-                               //? GeoUtils.normalizeLongitude360(latlonalt[1])
+                //? GeoUtils.normalizeLongitude360(latlonalt[1])
                                ? latlonalt[1]
                                : GeoUtils.normalizeLongitude(latlonalt[1]);
             }
@@ -1660,7 +1664,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             */
             if (adjustLons) {
                 xyz[1] = (use360)
-                         //? GeoUtils.normalizeLongitude360(t2[lonIndex])
+                //? GeoUtils.normalizeLongitude360(t2[lonIndex])
                          ? t2[lonIndex]
                          : GeoUtils.normalizeLongitude(t2[lonIndex]);
             }
@@ -1704,7 +1708,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             */
             if (adjustLons) {
                 xyz[1] = (use360)
-                         //? GeoUtils.normalizeLongitude360(t2[lonIndex])
+                //? GeoUtils.normalizeLongitude360(t2[lonIndex])
                          ? t2[lonIndex]
                          : GeoUtils.normalizeLongitude(t2[lonIndex]);
             }

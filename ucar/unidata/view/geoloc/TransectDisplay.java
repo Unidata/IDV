@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -1623,21 +1624,22 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
      *
      * @param el    earth location to transform
      * @param xyz    The in value to set. May be null.
+     * @param altitude _more_
      *
      * @return  xyz array
      *
      * @throws RemoteException    Java RMI problem
      * @throws VisADException     VisAD problem
      */
-    public double[] getSpatialCoordinates(EarthLocation el, double[] xyz)
+    public double[] getSpatialCoordinates(EarthLocation el, double[] xyz,
+                                          double altitude)
             throws VisADException, RemoteException {
         float[][] temp = coordinateSystem.toReference(new float[][] {
             latitudeMap.scaleValues(new double[] {
                 el.getLatitude().getValue(CommonUnit.degree) }),
             longitudeMap.scaleValues(new double[] {
                 el.getLongitude().getValue(CommonUnit.degree) }),
-            altitudeMap.scaleValues(new double[] {
-                el.getAltitude().getValue(CommonUnit.meter) })
+            altitudeMap.scaleValues(new double[] { altitude })
         });
         if (xyz == null) {
             xyz = new double[3];
@@ -1647,6 +1649,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
         xyz[2] = temp[2][0];
         return xyz;
     }
+
 
 
     /**
@@ -1714,10 +1717,18 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
      * update the font scales
      */
     private void setFontOnScales() {
-        if (heightScale != null) heightScale.setFont(axisFont);
-        if (pressureScale != null) pressureScale.setFont(axisFont);
-        if (latlonScale != null) latlonScale.setFont(axisFont);
-        if (distanceScale != null) distanceScale.setFont(axisFont);
+        if (heightScale != null) {
+            heightScale.setFont(axisFont);
+        }
+        if (pressureScale != null) {
+            pressureScale.setFont(axisFont);
+        }
+        if (latlonScale != null) {
+            latlonScale.setFont(axisFont);
+        }
+        if (distanceScale != null) {
+            distanceScale.setFont(axisFont);
+        }
     }
 
     /**
