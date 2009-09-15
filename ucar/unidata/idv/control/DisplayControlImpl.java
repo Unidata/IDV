@@ -7870,42 +7870,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         List labels = getLegendLabels(SIDE_LEGEND);
 
         legendTextArea = new JTextArea("");
-        /*
-        legendTextArea = new JTextArea("") {
-                public void paintImmediately(int x,int y,int w, int h) {
-                    Graphics g  = getGraphics();
-                    Container parent = getParent();
-                    boolean ok = false;
-                    while(parent !=null) {
-                        if(parent instanceof Window ) {
-                            ok  =true;
-                            break;
-                        }
-                        parent = parent.getParent();
-                    }
-                    if(!ok)
-                    System.out.println ("OK:" + ok + " visible:" + isVisible());
-                    //                    if(!ok) return;
-                    super.paintImmediately( x, y, w,  h) ;
-                    parent = getParent();
-                    ok = false;
-                    while(parent !=null) {
-                        if(parent instanceof Window ) {
-                            ok  =true;
-                            break;
-                        }
-                        parent = parent.getParent();
-                    }
-                    if(!ok)
-                        System.out.println ("OK again:" + ok);
-
-
-                }
-                public String toString() {
-                    return label;
-                }
-            };
-        */
+        legendTextArea.setBackground(Color.red);
+        legendTextArea.setBackground(Color.red);
+        GuiUtils.applyDefaultFont(legendTextArea);
         legendTextArea.setEditable(false);
         //Add a paint method to draw an underline
         //We can't do it with the html in the jlabel
@@ -7924,7 +7891,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 comp.setToolTipText("<html>Right click to show menu.</html>");
             }
 
-            comp.setFont(GuiUtils.buttonFont);
+            //            comp.setFont(GuiUtils.buttonFont);
             comp.addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent event) {
                     if (SwingUtilities.isRightMouseButton(event)) {
@@ -8001,8 +7968,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             legendPanel.setBackground(Color.blue);
         }
 
-        GuiUtils.setFontOnTree(legendPanel,
-                               GuiUtils.buttonFont.deriveFont(10.0f));
+        if(GuiUtils.getDefaultFont()==null) {
+            GuiUtils.setFontOnTree(legendPanel,
+                                   GuiUtils.buttonFont.deriveFont(10.0f));
+        } else {
+            GuiUtils.setFontOnTree(legendPanel,
+                                   GuiUtils.getDefaultFont());
+        }
         return legendPanel;
     }
 
@@ -8065,8 +8037,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             //            setForeground(Color.blue);
 
             color = GuiUtils.decodeColor("#005aff", Color.red);
-            setForeground(color);
-            addMouseListener(new MouseAdapter() {
+            this.setForeground(color);
+            GuiUtils.applyDefaultFont(this);
+            this.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent event) {
                     //Don't do anything if it is the right mouse button
                     if (SwingUtilities.isRightMouseButton(event)) {
