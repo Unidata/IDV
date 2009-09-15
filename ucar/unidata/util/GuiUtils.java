@@ -205,7 +205,7 @@ public class GuiUtils extends LayoutUtil {
 
 
     /** Used by apps for having a common font for buttons */
-    public static final Font buttonFont = new Font("Dialog", Font.BOLD, 10);
+    public static  Font buttonFont = new Font("Dialog", Font.BOLD, 10);
 
 
     /** Holds a mapping from image filename to Image object */
@@ -337,6 +337,9 @@ public class GuiUtils extends LayoutUtil {
      */
     public static void setDefaultFont(Font font) {
         dfltFont = font;
+        if(dfltFont!=null) {
+            buttonFont = dfltFont;
+        }
     }
 
     /**
@@ -349,6 +352,13 @@ public class GuiUtils extends LayoutUtil {
             return dfltFont;
         }
         return null;
+    }
+
+
+    public static void applyDefaultFont(Component comp) {
+        if(dfltFont!=null) {
+            comp.setFont(dfltFont);
+        }
     }
 
 
