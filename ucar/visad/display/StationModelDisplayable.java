@@ -21,6 +21,7 @@
 
 
 
+
 package ucar.visad.display;
 
 
@@ -84,11 +85,13 @@ import java.util.Vector;
 
 import java.util.zip.*;
 
+import javax.media.j3d.Transform3D;
+
 import javax.swing.*;
 
-import javax.vecmath.Matrix3f;
+import javax.vecmath.*;
 
-import javax.vecmath.Vector3f;
+
 
 
 /**
@@ -120,18 +123,18 @@ public class StationModelDisplayable extends DisplayableData {
     /** Should we use altitude */
     private boolean shouldUseAltitude = true;
 
+    /** _more_          */
     private boolean rotateShapes = false;
 
 
-    private Matrix3f rotateMatrix = new Matrix3f();
+    /** _more_          */
+    private Point3f point3f = new Point3f();
 
-    /** Local state for the rotate method */
-    private  float[] rotateArray = new float[3];
+    /** _more_          */
+    private Transform3D transform = new Transform3D();
 
-    /** Local state for the rotate method */
-    private  Vector3f rotateVector = new Vector3f();
-
-    private double[]currentRotation;
+    /** _more_          */
+    private double[] currentRotation;
 
 
 
@@ -599,7 +602,7 @@ public class StationModelDisplayable extends DisplayableData {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    private FieldImpl makeNewDataWithShapes(FieldImpl data)
+    private synchronized FieldImpl makeNewDataWithShapes(FieldImpl data)
             throws VisADException, RemoteException {
 
         if (data == null) {
@@ -617,32 +620,17 @@ public class StationModelDisplayable extends DisplayableData {
         }
 
         FieldImpl newFI = null;
-        if(rotateShapes) {
-            currentRotation=master.getRotation();
-            double[] t = master.getMouseBehavior().make_matrix(currentRotation[0], 
-                                                               currentRotation[1],
-                                                               currentRotation[2],  
-                                                               1.0,0,0,0);
+        if (rotateShapes) {
+            currentRotation = master.getRotation();
+            double[] m =
+                master.getMouseBehavior().make_matrix(currentRotation[0],
+                    currentRotation[1], currentRotation[2], 1.0, 0.0, 0.0,
+                    0.0);
 
-            t = master.getMouseBehavior().make_matrix(currentRotation[0], 
-                                                      0,0,
-                                                      1.0,0,0,0);
-
-            Matrix3f xm = new Matrix3f();
-            Matrix3f ym = new Matrix3f();
-            Matrix3f zm = new Matrix3f();
-
-            xm.rotX(-(float)Math.toRadians(currentRotation[0]));
-            ym.rotY((float)Math.toRadians(currentRotation[1]));
-            zm.rotZ((float)Math.toRadians(currentRotation[2]));
-
-
-            rotateMatrix.rotX(-(float)Math.toRadians(currentRotation[0]));
-            rotateMatrix.mul(ym);
-            rotateMatrix.mul(zm);
-
-            System.err.println("rot:" + currentRotation[0] + "/" + currentRotation[1] +"/" +
-                               currentRotation[2]);
+            transform = new Transform3D(m);
+            transform.invert();
+            //            System.err.println("rot:" + currentRotation[0] + "/" + currentRotation[1] +"/" +
+            //                               currentRotation[2]);
         }
 
 
@@ -703,34 +691,34 @@ public class StationModelDisplayable extends DisplayableData {
 
 
 
-    /** kmz writing state          */
+    /** kmz writing state */
     private boolean writingKmz = false;
 
-    /** kmz writing state          */
+    /** kmz writing state */
     private ZipOutputStream kmzZos;
 
-    /** kmz writing state          */
+    /** kmz writing state */
     private int kmzObCounter = 0;
 
-    /** kmz writing state          */
+    /** kmz writing state */
     private Element kmlRoot;
 
-    /** kmz writing state          */
+    /** kmz writing state */
     private Element kmlDoc;
 
-    /** kmz writing state          */
+    /** kmz writing state */
     private int kmzIconHeight = 40;
 
-    /** kmz writing state          */
+    /** kmz writing state */
     private int kmzIconWidth = 40;
 
-    /** kmz writing state          */
+    /** kmz writing state */
     private Color iconColor;
 
-    /** kmz writing state          */
+    /** kmz writing state */
     private File kmzFile;
 
-    /** kmz writing state          */
+    /** kmz writing state */
     private boolean kmzShowExampleDialog = true;
 
 
@@ -1291,7 +1279,7 @@ public class StationModelDisplayable extends DisplayableData {
                         ob.getEarthLocation().getLongitude().getValue(
                             CommonUnit.degree);
 
-                    if(rotateShapes && currentRotation!=null) {
+                    if (rotateShapes && (currentRotation != null)) {
                         rotate(shapes[shapeIndex]);
                     }
                     for (int i = 0; i < RotateInfo.TYPES.length; i++) {
@@ -1592,16 +1580,20 @@ public class StationModelDisplayable extends DisplayableData {
 
 
 
-    private  void rotate(VisADGeometryArray shape) {
+    /**
+     * _more_
+     *
+     * @param shape _more_
+     */
+    private void rotate(VisADGeometryArray shape) {
         for (int i = 0; i < shape.coordinates.length; i += 3) {
-            rotateVector.set(shape.coordinates[i + 0],
-                             shape.coordinates[i + 1],
-                             shape.coordinates[i + 2]);
-            rotateMatrix.transform(rotateVector);
-            rotateVector.get(rotateArray);
-            shape.coordinates[i + 0] = rotateArray[0];
-            shape.coordinates[i + 1] = rotateArray[1];
-            shape.coordinates[i + 2] = rotateArray[2];
+            point3f.x = shape.coordinates[i + 0];
+            point3f.y = shape.coordinates[i + 1];
+            point3f.z = shape.coordinates[i + 2];
+            transform.transform(point3f);
+            shape.coordinates[i + 0] = point3f.x;
+            shape.coordinates[i + 1] = point3f.y;
+            shape.coordinates[i + 2] = point3f.z;
         }
     }
 
@@ -2326,21 +2318,21 @@ public class StationModelDisplayable extends DisplayableData {
     }
 
     /**
-       Set the RotateShapes property.
-
-       @param value The new value for RotateShapes
-    **/
-    public void setRotateShapes (boolean value) {
-	rotateShapes = value;
+     *  Set the RotateShapes property.
+     *
+     *  @param value The new value for RotateShapes
+     */
+    public void setRotateShapes(boolean value) {
+        rotateShapes = value;
     }
 
     /**
-       Get the RotateShapes property.
-
-       @return The RotateShapes
-    **/
-    public boolean getRotateShapes () {
-	return rotateShapes;
+     *  Get the RotateShapes property.
+     *
+     *  @return The RotateShapes
+     */
+    public boolean getRotateShapes() {
+        return rotateShapes;
     }
 
 
