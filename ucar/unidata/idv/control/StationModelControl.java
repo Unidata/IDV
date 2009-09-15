@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -88,7 +89,6 @@ import visad.georef.MapProjection;
 import visad.util.BaseRGBMap;
 import visad.util.ColorPreview;
 
-import java.io.File;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
@@ -96,6 +96,8 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 
 import java.beans.PropertyChangeListener;
+
+import java.io.File;
 
 import java.rmi.RemoteException;
 
@@ -145,6 +147,7 @@ public class StationModelControl extends ObsDisplayControl {
     /** Do we use altitude if we have it */
     private boolean shouldUseAltitude = true;
 
+    /** _more_          */
     private boolean inGlobe = false;
 
     /** holds the z position slider */
@@ -296,7 +299,8 @@ public class StationModelControl extends ObsDisplayControl {
     /** bounds of the display */
     private Rectangle2D lastViewBounds = null;
 
-    private double[]lastRotation;
+    /** _more_          */
+    private double[] lastRotation;
 
     /** Have we gotten the initial display scale */
     private boolean haveSetInitialScale = false;
@@ -443,7 +447,7 @@ public class StationModelControl extends ObsDisplayControl {
         myDisplay.setShouldUseAltitude(shouldUseAltitude);
         inGlobe = (getNavigatedDisplay() instanceof GlobeDisplay);
 
-        if(inGlobe) {
+        if (inGlobe) {
             myDisplay.setRotateShapes(true);
         }
 
@@ -596,9 +600,8 @@ public class StationModelControl extends ObsDisplayControl {
                 }
 
                 RangeColorPreview preview =
-                    new RangeColorPreview(
-                                          ct.getColorList(),
-                    getDisplayConventions());
+                    new RangeColorPreview(ct.getColorList(),
+                                          getDisplayConventions());
 
                 //                preview.setPreferred
                 preview.setRange(range);
@@ -1575,6 +1578,7 @@ public class StationModelControl extends ObsDisplayControl {
             Trace.call1("StationModelControl.loadData");
             FieldImpl data = null;
 
+
             if (isInTransectView() || (llBounds == null)) {
                 Trace.call1("getObs-1");
                 data = pdi.getTimeSequence();
@@ -2468,7 +2472,7 @@ public class StationModelControl extends ObsDisplayControl {
                                      : 1), this, "setShouldUseAltitudeIndex");
 
         return GuiUtils.doLayout(new Component[] { jrbs[0], GuiUtils.filler(),
-                jrbs[1], zPositionPanel }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
+                jrbs[1], zPositionPanel }, 1, GuiUtils.WT_Y, GuiUtils.WT_N);
 
     }
 
@@ -2860,36 +2864,47 @@ public class StationModelControl extends ObsDisplayControl {
     }
 
 
+    /** _more_          */
     JTextField kmzWidthFld;
+
+    /** _more_          */
     JTextField kmzHeightFld;
+
+    /** _more_          */
     JTextField kmzNameFld;
+
+    /** _more_          */
     GuiUtils.ColorSwatch kmzColorSwatch;
 
+    /**
+     * _more_
+     */
     public void exportAsKmz() {
         try {
-            if(kmzWidthFld==null) {
-                kmzWidthFld = new JTextField("80",5);
-                kmzHeightFld = new JTextField("80",5);
-                kmzNameFld = new JTextField("Point Observations");
-                kmzColorSwatch = new GuiUtils.ColorSwatch(Color.white,"KMZ Icon Color", true);
+            if (kmzWidthFld == null) {
+                kmzWidthFld  = new JTextField("80", 5);
+                kmzHeightFld = new JTextField("80", 5);
+                kmzNameFld   = new JTextField("Point Observations");
+                kmzColorSwatch = new GuiUtils.ColorSwatch(Color.white,
+                        "KMZ Icon Color", true);
             }
 
-            JComponent widgets = GuiUtils.formLayout(new Component[]{
-                    GuiUtils.rLabel("Name:"),
-                    kmzNameFld,
-                    GuiUtils.rLabel("Icon Size:"),
-                    GuiUtils.left(GuiUtils.hbox(kmzWidthFld,new JLabel(" X "),
-                                                kmzHeightFld)),
-                    GuiUtils.rLabel("BG Color:"),
-                    kmzColorSwatch.getPanel()
+            JComponent widgets = GuiUtils.formLayout(new Component[] {
+                GuiUtils.rLabel("Name:"), kmzNameFld,
+                GuiUtils.rLabel("Icon Size:"),
+                GuiUtils.left(GuiUtils.hbox(kmzWidthFld, new JLabel(" X "),
+                                            kmzHeightFld)),
+                GuiUtils.rLabel("BG Color:"), kmzColorSwatch.getPanel()
             });
             JComboBox publishCbx =
                 getIdv().getPublishManager().getSelector("kmz.export");
-            JComponent accessory = (publishCbx != null?GuiUtils.topBottom(widgets,publishCbx):
-                                    widgets);
+            JComponent accessory = ((publishCbx != null)
+                                    ? GuiUtils.topBottom(widgets, publishCbx)
+                                    : widgets);
             String filename =
                 FileManager.getWriteFile(FileManager.FILTER_KMZ,
-                                         FileManager.SUFFIX_KMZ, GuiUtils.top(accessory));
+                                         FileManager.SUFFIX_KMZ,
+                                         GuiUtils.top(accessory));
 
 
             if (filename == null) {
@@ -2898,13 +2913,16 @@ public class StationModelControl extends ObsDisplayControl {
 
 
 
-            if(!myDisplay.writeKmzFile(new File(filename), currentStationData,
-                                   kmzNameFld.getText(),
-                                   new Integer(kmzWidthFld.getText().trim()).intValue(),
-                                   new Integer(kmzHeightFld.getText().trim()).intValue(),
-                                       kmzColorSwatch.getColor())) return;
-            getIdv().getPublishManager().publishContent(filename,
-                                                        null, publishCbx);
+            if ( !myDisplay.writeKmzFile(
+                    new File(filename), currentStationData,
+                    kmzNameFld.getText(),
+                    new Integer(kmzWidthFld.getText().trim()).intValue(),
+                    new Integer(kmzHeightFld.getText().trim()).intValue(),
+                    kmzColorSwatch.getColor())) {
+                return;
+            }
+            getIdv().getPublishManager().publishContent(filename, null,
+                    publishCbx);
         } catch (Exception exc) {
             logException("Exporting point data to kmz", exc);
         }
@@ -3154,10 +3172,9 @@ public class StationModelControl extends ObsDisplayControl {
 
         long      t1          = System.currentTimeMillis();
         Rectangle glyphBounds = getStationModel().getBounds();
-        float     myScale     = getScale() * .0025f * getDeclutterFilter();
-        //        float     myScale = getScale() * .0025f * getDeclutterFilter();
-        //        System.out.println("\ndecluttering  myScale=" + myScale + 
-        //                           " filter=" +getDeclutterFilter());
+
+        float     myScale = getScale() * .0025f * getDeclutterFilter();
+
         Rectangle2D scaledGlyphBounds =
             new Rectangle2D.Double(glyphBounds.getX() * myScale,
                                    glyphBounds.getY() * myScale,
@@ -3168,6 +3185,11 @@ public class StationModelControl extends ObsDisplayControl {
         Rectangle2D.Double obBounds   = new Rectangle2D.Double();
         obBounds.width  = scaledGlyphBounds.getWidth();
         obBounds.height = scaledGlyphBounds.getHeight();
+
+
+        //        System.out.println("my bounds: x:" + getBounds().getX()+"-" +(getBounds().getX()+getBounds().getWidth())+" y:" +
+        //                           getBounds().getY()+"-" +(getBounds().getY()+getBounds().getHeight()));
+
 
         if (stationGrid == null) {
             stationGrid = new SpatialGrid(200, 200);
@@ -3186,9 +3208,11 @@ public class StationModelControl extends ObsDisplayControl {
         for (int i = 0; i < numObs; i++) {
             PointOb ob = (PointOb) pointObs.getSample(i);
             xyz = navDisplay.getSpatialCoordinates(ob.getEarthLocation(),
-                    xyz);
+                    xyz, 0);
             obBounds.x = xyz[0];
             obBounds.y = xyz[1];
+            //            if(i<30)
+            //                System.err.println("\tel:" + ob.getEarthLocation() +" obBounds:" + obBounds.x +"/" + obBounds.y);
             if (stationGrid.markIfClear(obBounds, "") || isSelected(ob)) {
                 v.add(ob);  // is in the bounds
             }
@@ -3528,42 +3552,48 @@ public class StationModelControl extends ObsDisplayControl {
             Rectangle2D newBounds    = calculateRectangle();
             boolean     shouldReload = false;
 
-            if(inGlobe) {
-                if(lastRotation==null) {
+            if (inGlobe) {
+                if (stationsLocked) {
+                    return;
+                }
+                if (lastRotation == null) {
                     shouldReload = true;
                 } else {
                     double[] rotation = getNavigatedDisplay().getRotation();
-                    if(!java.util.Arrays.equals(rotation, lastRotation)) {
+                    if ( !java.util.Arrays.equals(rotation, lastRotation)) {
                         //TODO: Check if the rotation changed considerably
                         lastRotation = rotation;
                         shouldReload = true;
                     }
                 }
             } else {
-                if ((lastViewBounds == null) || (lastViewBounds.getWidth() == 0)
-                    || (lastViewBounds.getHeight() == 0)) {
+                if ((lastViewBounds == null)
+                        || (lastViewBounds.getWidth() == 0)
+                        || (lastViewBounds.getHeight() == 0)) {
                     shouldReload = true;
                 } else if ( !(newBounds.equals(lastViewBounds))) {
                     double widthratio = newBounds.getWidth()
-                        / lastViewBounds.getWidth();
+                                        / lastViewBounds.getWidth();
                     double heightratio = newBounds.getHeight()
-                        / lastViewBounds.getHeight();
+                                         / lastViewBounds.getHeight();
                     double xdiff = Math.abs(newBounds.getX()
                                             - lastViewBounds.getX());
                     double ydiff = Math.abs(newBounds.getY()
                                             - lastViewBounds.getY());
                     // See if this is 20% greater or smaller than before.
                     if ((((widthratio < .80) || (widthratio > 1.20))
-                         && ((heightratio < .80)
-                             || (heightratio > 1.20))) || ((xdiff
-                                                            > .2 * lastViewBounds.getWidth()) || (ydiff
-                                                                                                  > .2 * lastViewBounds.getHeight()))) {
+                            && ((heightratio < .80)
+                                || (heightratio > 1.20))) || ((xdiff
+                                   > .2 * lastViewBounds
+                                       .getWidth()) || (ydiff
+                                           > .2 * lastViewBounds
+                                               .getHeight()))) {
                         shouldReload = true;
                     }
                 }
                 float newScale = getScaleFromDisplayable();
                 if (Float.floatToIntBits(lastViewScale)
-                    != Float.floatToIntBits(newScale)) {
+                        != Float.floatToIntBits(newScale)) {
                     shouldReload = true;
                 }
             }
@@ -3571,7 +3601,7 @@ public class StationModelControl extends ObsDisplayControl {
             if (shouldReload) {
                 if ( !stationsLocked) {
                     loadDataInAWhile();
-                } else if(inGlobe) {
+                } else if (inGlobe) {
                     loadDataInAWhile();
                 }
             }
