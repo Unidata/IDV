@@ -665,6 +665,22 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     protected void init(Properties properties) throws Exception {
+
+
+        final PrintStream oldErr = System.err;
+        final PrintStream oldOut = System.out;
+        System.setErr(new PrintStream(oldOut){
+                public void     println(String x) {
+                    if(x.indexOf("Fatal")>=0) {
+                        Misc.printStack("got it");
+                    }
+                    oldErr.println(x);
+                }
+            });
+
+
+
+
         initProperties(properties);
         initServer();
     }

@@ -202,7 +202,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
             }
             Object[] values = parent.getValues();
             if (values == null) {
-                System.err.println("no values");
+                System.err.println("FtpTypeHandler: no values");
                 return badFile;
             }
             double maxSize = 0;
@@ -211,8 +211,9 @@ public class FtpTypeHandler extends GenericTypeHandler {
             }
             String server = (String) values[COL_SERVER];
             if (entry.getResource().getFileSize() > 1000000 * maxSize) {
-                System.err.println("Bad size "
-                                   + entry.getResource().getFileSize());
+                //                System.err.println("FtpTypeHandler: Bad size "
+                //                                   + entry.getResource().getFileSize()+" " +
+                //                                   entry.getResource());
                 return badFile;
             }
             FTPClient ftpClient = null;

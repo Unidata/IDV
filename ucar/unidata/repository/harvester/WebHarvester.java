@@ -545,7 +545,7 @@ public class WebHarvester extends Harvester {
                            baseGroup, groupName, getUser())
                        : getEntryManager().findGroupFromName(groupName,
                            getUser(), true));
-        System.err.println("Group:" + group.getFullName());
+        //        System.err.println("Group:" + group.getFullName());
         Entry entry = typeHandler.createEntry(repository.getGUID());
         Resource resource = new Resource(newFile.toString(),
                                          Resource.TYPE_STOREDFILE);

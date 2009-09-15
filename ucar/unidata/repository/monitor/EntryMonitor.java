@@ -734,7 +734,7 @@ public class EntryMonitor implements Constants {
 
         for (Filter filter : filters) {
             boolean ok = checkEntry(filter, entry);
-            System.err.println("Checking " + ok + " filter=" + filter);
+            //            System.err.println("Checking " + ok + " filter=" + filter);
             if ( !ok) {
                 //                System.err.println("filter not OK");
                 return false;
