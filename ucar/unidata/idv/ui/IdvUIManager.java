@@ -579,6 +579,7 @@ public class IdvUIManager extends IdvManager {
             for (int i = 0; i < landf.length; i++) {
                 defaults.put(landf[i] + ".font", dfltFont);
             }
+            defaults.put("HONOR_DISPLAY_PROPERTIES", Boolean.TRUE);
         }
 
         if (getStateManager().getProperty(PROP_UI_DESKTOP, false)) {
