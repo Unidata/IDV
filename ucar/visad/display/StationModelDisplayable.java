@@ -628,10 +628,13 @@ public class StationModelDisplayable extends DisplayableData {
                                                       0,0,
                                                       1.0,0,0,0);
 
+            Matrix3f xm = new Matrix3f();
             Matrix3f ym = new Matrix3f();
             Matrix3f zm = new Matrix3f();
-            ym.rotY(-(float)Math.toRadians(currentRotation[1]));
-            zm.rotZ(-(float)Math.toRadians(currentRotation[2]));
+
+            xm.rotX(-(float)Math.toRadians(currentRotation[0]));
+            ym.rotY((float)Math.toRadians(currentRotation[1]));
+            zm.rotZ((float)Math.toRadians(currentRotation[2]));
 
 
             rotateMatrix.rotX(-(float)Math.toRadians(currentRotation[0]));
