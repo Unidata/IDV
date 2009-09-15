@@ -1699,7 +1699,7 @@ public class Admin extends RepositoryManager {
             SqlUtil.loadSql(query, statement, false, true);
             connection.commit();
             connection.setAutoCommit(true);
-            connection.close();
+            getDatabaseManager().closeConnection(connection);
             return makeResult(request, msg("SQL"),
                               new StringBuffer("Executed SQL" + "<P>"
                                   + HtmlUtil.space(1) + sb.toString()));

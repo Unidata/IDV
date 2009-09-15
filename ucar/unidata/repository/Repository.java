@@ -846,7 +846,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             SqlUtil.loadSql(sql, statement, false, true);
             connection.commit();
             connection.setAutoCommit(true);
-            connection.close();
+            getDatabaseManager().closeConnection(connection);
         }
         readGlobals();
 

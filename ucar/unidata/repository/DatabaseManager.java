@@ -294,6 +294,7 @@ public class DatabaseManager extends RepositoryManager {
      */
     public void releaseConnection(Connection connection) {}
 
+
     /**
      * _more_
      *

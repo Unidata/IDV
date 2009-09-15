@@ -1642,9 +1642,7 @@ return new Result(title, sb);
         try {
             deleteEntriesInner(request, entries, connection, asynchId);
         } finally {
-            try {
-                connection.close();
-            } catch (Exception exc) {}
+            getDatabaseManager().closeConnection(connection);
         }
         getRepository().clearCache();
     }
@@ -2532,9 +2530,7 @@ return new Result(title, sb);
                                           getRepository().translate(request,
                                               "Entries copied")));
         } finally {
-            try {
-                connection.close();
-            } catch (Exception exc) {}
+            getDatabaseManager().closeConnection(connection);
         }
     }
 
@@ -2579,9 +2575,7 @@ return new Result(title, sb);
                                           ARG_ENTRYID,
                                           entries.get(0).getId()));
         } finally {
-            try {
-                connection.close();
-            } catch (Exception exc) {}
+            getDatabaseManager().closeConnection(connection);
         }
     }
 
@@ -4679,9 +4673,7 @@ return new Result(title, sb);
         try {
             insertEntriesInner(entries, connection, isNew, canBeBatched);
         } finally {
-            try {
-                connection.close();
-            } catch (Exception exc) {}
+            getDatabaseManager().closeConnection(connection);
         }
     }
 
@@ -4848,10 +4840,6 @@ return new Result(title, sb);
                 //                 + "/second");
             }
         }
-
-
-
-
 
         entryStmt.close();
         metadataStmt.close();
