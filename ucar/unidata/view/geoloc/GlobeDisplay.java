@@ -32,6 +32,7 @@ import ucar.unidata.geoloc.ProjectionRect;
 import ucar.unidata.geoloc.projection.*;
 
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
 
 import ucar.visad.Util;
 import ucar.visad.display.*;
@@ -441,7 +442,7 @@ public class GlobeDisplay extends NavigatedDisplay {
 
         //            xyz = navDisplay.getSpatialCoordinates(ob.getEarthLocation(),
         //                    xyz);
-        //        System.err.println("x/y:" + x+"/" + y +" xyz:" + xyz[0]+"/"+xyz[1]  + " xyz2:" + xyz2[0]+"/"+xyz2[1] + " el:" + el);
+        //        System.err.println("x/y:" + x+"/" + y +" xyz:" + xyz[0]+"/"+xyz[1]);
         //        EarthLocation el = screenToEarthLocation(x,y);
         setCursorLatitude(el.getLatitude());
         setCursorLongitude(el.getLongitude());
@@ -586,6 +587,29 @@ public class GlobeDisplay extends NavigatedDisplay {
         setCursorAltitude(new Real(RealType.Altitude, realValue));
     }
 
+
+    public void resetScaleTranslate() throws VisADException, RemoteException  {
+        double[]        myMatrix        = getProjectionMatrix();
+        double[]        trans          = { 0.0, 0.0, 0.0 };
+        double[]        rot            = { 0.0, 0.0, 0.0 };
+        double[]        rot2            = { 0.0, 0.0, 0.0 };
+        double[]        scale          = { 0.0, 0.0, 0.0 };
+        MouseBehavior   mouseBehavior   = getMouseBehavior();
+       
+
+        double[] saved = getDisplay().getProjectionControl().getSavedProjectionMatrix();
+
+        mouseBehavior.instance_unmake_matrix(rot, scale, trans, myMatrix);
+        mouseBehavior.instance_unmake_matrix(rot2, scale, trans, saved);
+
+        double[] t = mouseBehavior.make_matrix(rot[0], rot[1], rot[2],
+                                          scale[0], scale[1], scale[2],
+                                          trans[0],trans[1],trans[2]);
+        setProjectionMatrix(t);
+    }
+
+
+
     /**
      * Set the view for 3D.  The views are based on the original display
      * as follows:
@@ -682,28 +706,15 @@ public class GlobeDisplay extends NavigatedDisplay {
 
 
 
-    int cnt = 0;
+
+
+
     /**
      * Set the view to perspective or parallel if this is a 3D display.
      *
      * @param perspectiveView  true for perspective view
      */
     public void setPerspectiveView(boolean perspectiveView) {
-
-        /*
-        if(cnt++>3) {
-            try {
-            System.err.println("doing look at");
-            Transform3D t = new Transform3D();
-            t.lookAt(new Point3d(-1,-1,-1), new Point3d(),new Vector3d());
-            Matrix3d m3d = new Matrix3d();
-            t.get(m3d);
-            setProjectionMatrix(c);
-            } catch(Exception exc) {
-                exc.printStackTrace();
-            }
-            return;
-            }*/
 
 
         if (perspectiveView == isPerspectiveView()) {
@@ -764,6 +775,87 @@ public class GlobeDisplay extends NavigatedDisplay {
         }  // can't happen
         return value;
     }
+
+
+
+    public void centerAndZoom(final EarthLocation el, boolean animated,
+                              double zoomFactor)
+            throws VisADException, RemoteException {
+        centerAndZoom(el, null,zoomFactor, animated);
+    }
+
+
+    public void centerAndZoomTo(final EarthLocation el, Real altitude,
+                                boolean animated)
+            throws VisADException, RemoteException {
+        centerAndZoom(el, altitude, Double.NaN, animated);
+    }
+
+
+
+    public void centerAndZoom(final EarthLocation el, Real altitude, double zoomFactor,
+                                boolean animated)
+            throws VisADException, RemoteException {
+
+
+        if (el.getLongitude().isMissing() || el.getLatitude().isMissing()) {
+            return;
+        }
+
+        MouseBehavior      mouseBehavior = getMouseBehavior();
+        double[]           currentMatrix = getProjectionMatrix();
+        double[]           trans         = { 0.0, 0.0, 0.0 };
+        double[]           scale         = { 0.0, 0.0, 0.0 };
+        double[] rot1           = { 0.0, 0.0, 0.0 };
+        double[] rot2           = { 0.0, 0.0, 0.0 };
+
+        getMouseBehavior().instance_unmake_matrix(rot2, scale, trans,
+                                                  currentMatrix);
+
+
+        double[]           xy            = getSpatialCoordinates(el,
+                                                                 null);
+
+        Transform3D t = new Transform3D();
+        double []xxx = getMouseBehavior().make_matrix(rot2[0], rot2[1],  rot2[2], 
+                                                    1.0,0,0,0);
+
+        Transform3D t2 =  new Transform3D(xxx);
+        double[] vector =  new double[]{0,-1,0};
+        Vector3d v3d = new Vector3d(vector[0],vector[1],vector[2]);
+        //        t2.transform(v3d);
+        //        System.err.println("v3d:" + v3d.x+"/"+v3d.y+"/"+v3d.z);
+        t.lookAt(new Point3d(xy[0],xy[1],xy[2]), new Point3d(0,0,0), v3d);
+        //        t.invert();
+        double[]m = new double[16];
+        t.get(m);
+
+        getMouseBehavior().instance_unmake_matrix(rot1, scale, trans,
+                                                  m);
+
+
+        m = getMouseBehavior().make_matrix(rot1[0], rot1[1],  rot1[2], 
+                                           (zoomFactor==zoomFactor?zoomFactor*scale[0]:scale[0]),
+                                           (zoomFactor==zoomFactor?zoomFactor*scale[1]:scale[1]),
+                                           (zoomFactor==zoomFactor?zoomFactor*scale[2]:scale[2]),
+                                           trans[0],trans[1], trans[2]);
+
+        if ( !animated) {
+            setProjectionMatrix(m);
+        } else {
+            final double[] to = m;
+            Misc.run(new Runnable() {
+                    public void run() {
+                        animateMatrix(++animationTimeStamp,
+                                      getProjectionMatrix(), to, null);
+                    }
+                });
+        }
+
+    }                
+
+
+
 
 
     /**

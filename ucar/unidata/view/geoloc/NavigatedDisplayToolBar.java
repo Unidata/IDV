@@ -151,7 +151,7 @@ public class NavigatedDisplayToolBar extends JToolBar {
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    navDisplay.resetProjection();
+                    navDisplay.resetScaleTranslate();
                 } catch (VisADException ve) {
                     ve.printStackTrace();
                 } catch (RemoteException re) {

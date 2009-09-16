@@ -66,13 +66,13 @@ import java.util.List;
 public abstract class NavigatedDisplay extends DisplayMaster {
 
     /** _more_ */
-    public static double CLIP_FRONT_DEFAULT = -2000.0;
+    public static double CLIP_FRONT_DEFAULT = -1000.0;
 
     /** _more_ */
     public static double CLIP_FRONT_PERSPECTIVE = 0.1;
 
     /** _more_ */
-    public static double CLIP_BACK_DEFAULT = 2000.0;
+    public static double CLIP_BACK_DEFAULT = 1000.0;
 
     /** _more_ */
     public static double CLIP_BACK_PERSPECTIVE = 10.0;
@@ -1039,9 +1039,42 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     public void animateMatrix(int myTimeStamp, double[] from, double[] to,
                               EarthLocation finalLocation) {
         try {
+            setAutoRotate(false);
             double[] tmp      = new double[from.length];
             int      numSteps = 20;
             isAnimating = true;
+            double [] lastMatrix=null;
+            double[] trans1         = { 0.0, 0.0, 0.0 };
+            double[] rot1           = { 0.0, 0.0, 0.0 };
+            double[] scale1         = { 0.0, 0.0, 0.0 };
+            double[] trans2         = { 0.0, 0.0, 0.0 };
+            double[] rot2           = { 0.0, 0.0, 0.0 };
+            double[] scale2         = { 0.0, 0.0, 0.0 };
+            double[] trans         = { 0.0, 0.0, 0.0 };
+            double[] rot           = { 0.0, 0.0, 0.0 };
+            double[] scale         = { 0.0, 0.0, 0.0 };
+
+            MouseBehavior mouseBehavior = getMouseBehavior();
+            mouseBehavior.instance_unmake_matrix(rot1, scale1, trans1,
+                                                 from);
+            mouseBehavior.instance_unmake_matrix(rot2, scale2, trans2,
+                                                 to);
+
+            //            System.err.println ("from:" + rot1[0]+"/"+rot1[1]+"/"+rot1[2]);
+            //            System.err.println ("to:" + rot2[0]+"/"+rot2[1]+"/"+rot2[2]);
+
+
+            //Just keeps  getting piled on deeper and deeper.
+            for(int i=0;i<3;i++) {
+                if((int)(rot1[i]*100) == -17999) {
+                    rot1[i] = 179.99;
+                } 
+
+                if((int)(rot2[i]*100) == -17999) {
+                    rot2[i] = 179.99;
+                } 
+            }
+
             for (int step = 1; step <= numSteps; step++) {
                 if (myTimeStamp != animationTimeStamp) {
                     isAnimating = false;
@@ -1056,11 +1089,37 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                     return;
                 }
                 double percent = ((double) step) / numSteps;
-                for (int i = 0; i < tmp.length; i++) {
-                    tmp[i] = from[i] + percent * (to[i] - from[i]);
-                }
                 isAnimating = true;
+                
+                tmp= mouseBehavior.make_matrix(
+                                               interp(rot1,rot2,0,percent),
+                                               interp(rot1,rot2,1,percent),
+                                               interp(rot1,rot2,2,percent),
+
+                                               interp(scale1,scale2,0,percent),
+                                               interp(scale1,scale2,1,percent),
+                                               interp(scale1,scale2,2,percent),
+
+                                               interp(trans1,trans2,0,percent),
+                                               interp(trans1,trans2,1,percent),
+                                               interp(trans1,trans2,2,percent));
+                
+                double[] currentMatrix = getProjectionMatrix();
+                if(lastMatrix!=null && !Misc.arraysEquals(lastMatrix, currentMatrix)) {
+                    isAnimating = false;
+                    return;
+                }
                 setProjectionMatrix(tmp);
+                lastMatrix = getProjectionMatrix();
+
+
+                getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
+                                                          lastMatrix);
+
+
+                //                System.err.println ("   step:" + rot[0]+"/"+rot[1]+"/"+rot[2]);
+                //                System.err.println ("\t" + scale[0]+"/"+scale[1]+"/"+scale[2]);
+
                 Misc.sleep(50);
             }
         } catch (Exception exp) {
@@ -1068,6 +1127,10 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         }
     }
 
+
+        private double interp(double[]a1,double[]a2,int index,double percent) {
+            return a1[index]+percent*(a2[index]-a1[index]);
+        }
 
     /**
      * Get the x/y position of the center of the screen
@@ -2087,6 +2150,9 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
 
+
+
+
     /**
      * Set the autorotation.
      *
@@ -2103,6 +2169,10 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         }
     }
 
+    public void resetScaleTranslate() throws VisADException, RemoteException  {
+        getDisplay().getProjectionControl().resetProjection();
+    }
+
 
     /**
      * Should be called from a thread. This will automatically rotate the display
@@ -2110,9 +2180,16 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @param myTimeStamp The time stamp of when this thread got started
      */
     private void doRotate(int myTimeStamp) {
+        double [] lastMatrix=null;
         while (autoRotate && (myTimeStamp == rotateTimeStamp)) {
             try {
+                double[] currentMatrix = getProjectionMatrix();
+                if(lastMatrix!=null && !Misc.arraysEquals(lastMatrix, currentMatrix)) {
+                    setAutoRotate(false);
+                    return;
+                }
                 rotate();
+                lastMatrix =  getProjectionMatrix();
                 Thread.sleep(rotateDelay);
             } catch (Exception e) {
                 return;
