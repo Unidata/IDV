@@ -1578,13 +1578,13 @@ public class StationModelControl extends ObsDisplayControl {
             Trace.call1("StationModelControl.loadData");
             FieldImpl data = null;
 
-
             if (isInTransectView() || (llBounds == null)) {
                 Trace.call1("getObs-1");
                 data = pdi.getTimeSequence();
                 Trace.call2("getObs-1");
             } else {
                 Trace.call1("getObs-2");
+
                 data = pdi.getTimeSequence(llBounds);
                 Trace.call2("getObs-2");
             }
@@ -2471,8 +2471,8 @@ public class StationModelControl extends ObsDisplayControl {
                                      ? 0
                                      : 1), this, "setShouldUseAltitudeIndex");
 
-        return GuiUtils.doLayout(new Component[] { jrbs[0], GuiUtils.filler(),
-                jrbs[1], zPositionPanel }, 1, GuiUtils.WT_Y, GuiUtils.WT_N);
+        return GuiUtils.doLayout(new Component[] { GuiUtils.left(GuiUtils.hbox(jrbs[0], 
+                                                                 jrbs[1])), zPositionPanel }, 1, GuiUtils.WT_Y, GuiUtils.WT_N);
 
     }
 
@@ -3187,15 +3187,17 @@ public class StationModelControl extends ObsDisplayControl {
         obBounds.height = scaledGlyphBounds.getHeight();
 
 
-        //        System.out.println("my bounds: x:" + getBounds().getX()+"-" +(getBounds().getX()+getBounds().getWidth())+" y:" +
-        //                           getBounds().getY()+"-" +(getBounds().getY()+getBounds().getHeight()));
+        
+        Rectangle2D bounds = getBounds();
+        //        System.out.println("my bounds: x:" + bounds.getX()+"-" +(bounds.getX()+bounds.getWidth())+" y:" +
+        //                           bounds.getY()+"-" +(bounds.getY()+bounds.getHeight()));
 
 
         if (stationGrid == null) {
             stationGrid = new SpatialGrid(200, 200);
         }
         stationGrid.clear();
-        stationGrid.setGrid(getBounds(), scaledGlyphBounds);
+        stationGrid.setGrid(bounds, scaledGlyphBounds);
         if (getDeclutterFilter() < 0.3f) {
             //      stationGrid.setOverlap((int)((1.0-getDeclutterFilter())*100));
             //      stationGrid.setOverlap(          (int)((.5f-getDeclutterFilter())*100));
@@ -3351,6 +3353,9 @@ public class StationModelControl extends ObsDisplayControl {
         try {
 
             Rectangle2D.Double rect = getNavigatedDisplay().getLatLonBox();
+
+
+            //            System.err.println("llb:" + rect);
 
             bounds =
                 new LinearLatLonSet(RealTupleType.LatitudeLongitudeTuple,
@@ -3553,20 +3558,19 @@ public class StationModelControl extends ObsDisplayControl {
             boolean     shouldReload = false;
 
             if (inGlobe) {
-                if (stationsLocked) {
-                    return;
-                }
+                double[] rotation = getNavigatedDisplay().getRotation();
                 if (lastRotation == null) {
                     shouldReload = true;
                 } else {
-                    double[] rotation = getNavigatedDisplay().getRotation();
                     if ( !java.util.Arrays.equals(rotation, lastRotation)) {
                         //TODO: Check if the rotation changed considerably
-                        lastRotation = rotation;
                         shouldReload = true;
                     }
                 }
-            } else {
+                lastRotation = rotation;
+            }
+
+            if(!shouldReload) {
                 if ((lastViewBounds == null)
                         || (lastViewBounds.getWidth() == 0)
                         || (lastViewBounds.getHeight() == 0)) {

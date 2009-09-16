@@ -226,6 +226,7 @@ public class WMSControl extends ImageControl implements ImageObserver {
             throws VisADException, RemoteException {
         super.init(dataChoice);
         inGlobe = (getNavigatedDisplay() instanceof GlobeDisplay);
+        inGlobe = false;
 
         if (dataChoice != null) {
             theDataChoice = dataChoice;
