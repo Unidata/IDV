@@ -2462,7 +2462,7 @@ public final class RAOB extends InvisiblePropertiedBean {
         /**
          * @serial
          */
-        private final CoordinateSystem domainCoordinateSystem;
+        private CoordinateSystem domainCoordinateSystem;
 
         /**
          * @serial
@@ -2683,6 +2683,9 @@ public final class RAOB extends InvisiblePropertiedBean {
                      : (FlatField) DataUtility.consolidate(
                          (FlatField[]) fieldList.toArray(
                              new FlatField[fieldCount]));
+            result = (FlatField) Util.clone(result,
+                                            Util.clone(result.getDomainSet(),
+                                                coordinateSystem));
             return result;
         }
 
@@ -2701,9 +2704,11 @@ public final class RAOB extends InvisiblePropertiedBean {
                 throws VisADException, RemoteException,
                        UnimplementedException, PropertyVetoException {
             if (adjustCoordinateSystem(cs, getFlatField(), this)) {
+                domainCoordinateSystem = cs;
                 notifyListeners();
             }
         }
+
     }
 
     /**
