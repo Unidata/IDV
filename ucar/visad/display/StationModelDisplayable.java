@@ -1381,7 +1381,8 @@ public class StationModelDisplayable extends DisplayableData {
                     }
 
                     //Bump it a bit up
-                    ShapeUtility.offset(shapes[s], 0.0f, 0.0f, 0.001f);
+                    ShapeUtility.offset(shapes[s], 0.0f, 0.0f, 0.002f);
+
 
                     ColorTable ct         = metSymbol.getColorTable();
                     String     colorParam = metSymbol.getColorParam();
