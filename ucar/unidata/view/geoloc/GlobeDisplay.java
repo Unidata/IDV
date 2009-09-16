@@ -44,6 +44,8 @@ import visad.data.mcidas.BaseMapAdapter;
 import visad.georef.*;
 
 import visad.java3d.*;
+import javax.media.j3d.Transform3D;
+import javax.vecmath.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -680,12 +682,29 @@ public class GlobeDisplay extends NavigatedDisplay {
 
 
 
+    int cnt = 0;
     /**
      * Set the view to perspective or parallel if this is a 3D display.
      *
      * @param perspectiveView  true for perspective view
      */
     public void setPerspectiveView(boolean perspectiveView) {
+
+        /*
+        if(cnt++>3) {
+            try {
+            System.err.println("doing look at");
+            Transform3D t = new Transform3D();
+            t.lookAt(new Point3d(-1,-1,-1), new Point3d(),new Vector3d());
+            Matrix3d m3d = new Matrix3d();
+            t.get(m3d);
+            setProjectionMatrix(c);
+            } catch(Exception exc) {
+                exc.printStackTrace();
+            }
+            return;
+            }*/
+
 
         if (perspectiveView == isPerspectiveView()) {
             return;
