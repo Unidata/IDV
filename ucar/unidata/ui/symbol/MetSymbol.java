@@ -1229,6 +1229,12 @@ public abstract class MetSymbol extends RectangleGlyph {
         return displayUnit;
     }
 
+    /**
+     * Can we rotate this symbol when the display rotates
+     */
+    public boolean rotateOnEarth() {
+        return true;
+    }
 
 
 }

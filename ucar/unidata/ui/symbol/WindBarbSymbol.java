@@ -452,6 +452,13 @@ public class WindBarbSymbol extends MetSymbol {
 
     }
 
+    /**
+     * Can we rotate this symbol when the display rotates
+     */
+    public boolean rotateOnEarth() {
+        return false;
+    }
+
 
 
 }
