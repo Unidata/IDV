@@ -1419,19 +1419,24 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                 double[] pt = getSpatialCoordinatesFromScreen((int) xs[xidx],
                                   (int) ys[yidx], -1);
                 //                if(xs[xidx]==0)
-                //                    System.err.println("  x/y:" + xs[xidx] +"/" + ys[yidx] +"  pt:" + pt[0]+"/" + pt[1] +"/" + pt[2]);
+                //                System.err.println("  x/y:" + xs[xidx] +"/" + ys[yidx] +"  pt:" + pt[0]+"/" + pt[1] +"/" + pt[2]);
 
-                if ((yidx == 0) || (pt[0] < left)) {
-                    left = pt[0];
+
+                if(pt[0] == pt[0]) {
+                    if ((yidx == 0) || (pt[0] < left)) {
+                        left = pt[0];
+                    }
+                    if ((yidx == 0) || (pt[0] > right)) {
+                        right = pt[0];
+                    }
                 }
-                if ((yidx == 0) || (pt[0] > right)) {
-                    right = pt[0];
-                }
-                if ((yidx == 0) || (pt[1] < bottom)) {
-                    bottom = pt[1];
-                }
-                if ((yidx == 0) || (pt[1] > top)) {
-                    top = pt[1];
+                if(pt[1] == pt[1]) {
+                    if ((yidx == 0) || (pt[1] < bottom)) {
+                        bottom = pt[1];
+                    }
+                    if ((yidx == 0) || (pt[1] > top)) {
+                        top = pt[1];
+                    }
                 }
             }
         }
