@@ -1541,6 +1541,11 @@ public class StationModelDisplayable extends DisplayableData {
 
                         quadShapes = add(quadShapes, bgshape);
                     }
+                    if (rotateShapes && (currentRotation != null) && metSymbol.rotateOnEarth()) {
+                        for (VisADGeometryArray points : shapes) {
+                            rotate(points);
+                        }
+                    }
 
                     if (shapes[s] instanceof VisADLineArray) {
                         lineShapes = add(lineShapes, shapes[s]);
@@ -1598,11 +1603,11 @@ public class StationModelDisplayable extends DisplayableData {
         }
 
 
-        if (rotateShapes && (currentRotation != null)) {
-            for (VisADGeometryArray points : allShapes) {
-                rotate(points);
-            }
-        }
+        //if (rotateShapes && (currentRotation != null)) {
+        //    for (VisADGeometryArray points : allShapes) {
+        //        rotate(points);
+        //    }
+        //}
 
         return allShapes;
     }
