@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.sounding;
 
 
@@ -103,10 +104,19 @@ public final class RaobDataSource extends DataSourceImpl {
 
 
 
+    /**
+     * Check for equality
+     *
+     * @param object the object in question
+     *
+     * @return  true if they are equal
+     */
     public boolean equals(Object object) {
-        if(!object.getClass().equals(getClass())) return false;
+        if ( !object.getClass().equals(getClass())) {
+            return false;
+        }
         RaobDataSource that = (RaobDataSource) object;
-        return Misc.equals(this.rds,that.rds);
+        return Misc.equals(this.rds, that.rds);
     }
 
 
@@ -307,6 +317,11 @@ public final class RaobDataSource extends DataSourceImpl {
         }
         RAOB            raob = so.getRAOB();
         SoundingStation ss   = (SoundingStation) so.getStation();
+        // sanity check
+        FlatField t = raob.getTemperatureProfile();
+        if (t.getDomainSet().getLength() == 1) {
+            return null;
+        }
         return new Tuple(new Data[] { so.getTimestamp(),
                                       ((SoundingStation) so.getStation())
                                           .getNamedLocation(),

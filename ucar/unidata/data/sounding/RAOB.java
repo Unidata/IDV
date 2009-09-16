@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.sounding;
 
 
@@ -1989,13 +1990,18 @@ public final class RAOB extends InvisiblePropertiedBean {
                         (FlatField) DataUtility.ensureRange(
                             mandatoryPressureProperty.getFlatField(),
                             GeopotentialAltitude.getRealType()));
-                cs = ((geopotentialField == null)
-                      || geopotentialField.isMissing()
-                      || (geopotentialField.getLength() <= 1))
-                     ? (CoordinateSystem) null
-                     : EmpiricalCoordinateSystem.create(
-                         (FlatField) GeopotentialAltitude.toAltitude(
-                             geopotentialField, gravityProperty.get()));
+                try {
+                    cs = ((geopotentialField == null)
+                          || geopotentialField.isMissing()
+                          || (geopotentialField.getLength() <= 1))
+                         ? (CoordinateSystem) null
+                         : EmpiricalCoordinateSystem.create(
+                             (FlatField) GeopotentialAltitude.toAltitude(
+                                 geopotentialField, gravityProperty.get()));
+                } catch (SetException e) {
+                    cs =  //(CoordinateSystem) null;
+                        AirPressure.getRealTupleType().getCoordinateSystem();
+                }
             }
         }
 
