@@ -1512,7 +1512,7 @@ public class StationModelDisplayable extends DisplayableData {
                             bgshape.normals[i + 2] = 1.0f;
                         }
                         //Bump it a bit up
-                        ShapeUtility.offset(bgshape, 0.0f, 0.0f, 0.002f);
+                        ShapeUtility.offset(bgshape, 0.0f, 0.0f, 0.001f);
 
                         ShapeUtility.setColor(bgshape,
                                 metSymbol.getBackground());
