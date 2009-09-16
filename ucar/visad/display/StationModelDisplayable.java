@@ -1279,9 +1279,6 @@ public class StationModelDisplayable extends DisplayableData {
                         ob.getEarthLocation().getLongitude().getValue(
                             CommonUnit.degree);
 
-                    if (rotateShapes && (currentRotation != null)) {
-                        rotate(shapes[shapeIndex]);
-                    }
                     for (int i = 0; i < RotateInfo.TYPES.length; i++) {
                         RotateInfo info =
                             metSymbol.getRotateInfo(RotateInfo.TYPES[i]);
@@ -1384,7 +1381,7 @@ public class StationModelDisplayable extends DisplayableData {
                     }
 
                     //Bump it a bit up
-                    ShapeUtility.offset(shapes[s], 0.0f, 0.0f, 0.002f);
+                    ShapeUtility.offset(shapes[s], 0.0f, 0.0f, 0.001f);
 
                     ColorTable ct         = metSymbol.getColorTable();
                     String     colorParam = metSymbol.getColorParam();
@@ -1514,10 +1511,12 @@ public class StationModelDisplayable extends DisplayableData {
                             bgshape.normals[i + 2] = 1.0f;
                         }
                         //Bump it a bit up
-                        ShapeUtility.offset(bgshape, 0.0f, 0.0f, 0.001f);
+                        ShapeUtility.offset(bgshape, 0.0f, 0.0f, 0.002f);
 
                         ShapeUtility.setColor(bgshape,
                                 metSymbol.getBackground());
+
+
                         quadShapes = add(quadShapes, bgshape);
                     }
 
@@ -1575,6 +1574,14 @@ public class StationModelDisplayable extends DisplayableData {
         if (quadShapes != null) {
             allShapes.addAll(quadShapes);
         }
+
+        
+        if (rotateShapes && (currentRotation != null)) {
+            for(VisADGeometryArray points: allShapes) {
+                rotate(points);
+            }
+        }
+
         return allShapes;
     }
 
