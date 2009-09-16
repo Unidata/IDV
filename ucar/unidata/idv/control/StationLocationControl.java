@@ -485,6 +485,7 @@ public class StationLocationControl extends StationModelControl {
             "selected displayable", getControlContext().getJythonManager());
         selectedDisplayable.setShouldUseAltitude(false);
         addDisplayable(selectedDisplayable, FLAG_COLOR | FLAG_ZPOSITION);
+        selectedDisplayable.setRotateShapes(true);
 
         StationModel sm =
             getControlContext().getStationModelManager()
@@ -517,6 +518,17 @@ public class StationLocationControl extends StationModelControl {
         }
         return true;
     }
+
+
+    protected void loadDataInAWhile() {
+        super.loadDataInAWhile();
+        try {
+            updateSelectedDisplayable();
+        } catch (Exception excp) {
+            logException("Updating selected displayable", excp);
+        }
+    }
+
 
     /**
      * Handle when the user clicks in the main display
