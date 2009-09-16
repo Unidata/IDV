@@ -1505,6 +1505,7 @@ public class StationModelDisplayable extends DisplayableData {
                     }
 
 
+                    VisADQuadArray bgshape = null;
                     if (metSymbol.getBackground() != null) {
                         Rectangle2D tmp = ShapeUtility.bounds2d(shapes[s],
                                               workRect);
@@ -1519,7 +1520,7 @@ public class StationModelDisplayable extends DisplayableData {
                         bgb.width  += bgb.width * 0.1f;
                         bgb.height += bgb.height * 0.1f;
 
-                        VisADQuadArray bgshape = new VisADQuadArray();
+                        bgshape = new VisADQuadArray();
                         bgshape.coordinates = new float[] {
                             bgb.x, bgb.y, 0.0f, bgb.x, bgb.y + bgb.height,
                             0.0f, bgb.x + bgb.width, bgb.y + bgb.height, 0.0f,
@@ -1538,12 +1539,15 @@ public class StationModelDisplayable extends DisplayableData {
                         ShapeUtility.setColor(bgshape,
                                 metSymbol.getBackground());
 
-
                         quadShapes = add(quadShapes, bgshape);
                     }
+
                     if (rotateShapes && (currentRotation != null) && metSymbol.rotateOnEarth()) {
                         for (VisADGeometryArray points : shapes) {
                             rotate(points);
+                        }
+                        if(bgshape!=null) {
+                            rotate(bgshape);
                         }
                     }
 
