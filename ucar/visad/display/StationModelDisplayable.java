@@ -20,8 +20,6 @@
 
 
 
-
-
 package ucar.visad.display;
 
 
@@ -123,17 +121,17 @@ public class StationModelDisplayable extends DisplayableData {
     /** Should we use altitude */
     private boolean shouldUseAltitude = true;
 
-    /** _more_          */
+    /** _more_ */
     private boolean rotateShapes = false;
 
 
-    /** _more_          */
+    /** _more_ */
     private Point3f point3f = new Point3f();
 
-    /** _more_          */
+    /** _more_ */
     private Transform3D transform = new Transform3D();
 
-    /** _more_          */
+    /** _more_ */
     private double[] currentRotation;
 
 
@@ -1169,7 +1167,7 @@ public class StationModelDisplayable extends DisplayableData {
                     Object key = "wind_" + pointOnSymbol + "_" + isNorth
                                  + "_" + workDataArray[0] + "_"
                                  + workDataArray[1];
-                    shapes = (VisADGeometryArray[]) shapeCache.get(key);
+                    //shapes = (VisADGeometryArray[]) shapeCache.get(key);
                     if (shapes != null) {
                         shapes = ShapeUtility.clone(shapes);
                     } else {
@@ -1201,6 +1199,29 @@ public class StationModelDisplayable extends DisplayableData {
                         }
                         workFlowValues[0][0] = workUV[0];
                         workFlowValues[1][0] = workUV[1];
+                        DisplayMaster master = getDisplayMaster();
+                        // adjust flow to earth
+                        if ((master
+                                instanceof ucar.unidata.view.geoloc
+                                    .NavigatedDisplay) && (renderer != null)
+                                        && addRefsInvoked()) {
+                            ucar.unidata.view.geoloc.NavigatedDisplay navDisplay =
+                                (ucar.unidata.view.geoloc.NavigatedDisplay) master;
+                            double[] boxCoords =
+                                navDisplay.getSpatialCoordinates(
+                                    ob.getEarthLocation(), new double[3]);
+                            float[][] spatial_locs = new float[][] {
+                                { (float) boxCoords[0] },
+                                { (float) boxCoords[1] },
+                                { (float) boxCoords[2] }
+                            };
+
+                            if (renderer != null) {
+                                ShadowType.adjustFlowToEarth(0,
+                                        workFlowValues, spatial_locs,
+                                        getScale(), renderer, true);
+                            }
+                        }
                         workSpatialValues[0][0] =
                             (float) (pointOnSymbol.getX());
                         workSpatialValues[1][0] =
@@ -1576,9 +1597,9 @@ public class StationModelDisplayable extends DisplayableData {
             allShapes.addAll(quadShapes);
         }
 
-        
+
         if (rotateShapes && (currentRotation != null)) {
-            for(VisADGeometryArray points: allShapes) {
+            for (VisADGeometryArray points : allShapes) {
                 rotate(points);
             }
         }
