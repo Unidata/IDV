@@ -120,10 +120,6 @@ public class LineDrawing extends DisplayableData {
     /** style for linedrawing */
     private int myLineStyle;
 
-
-    /** local copy of renderr */
-    private DataRenderer renderer;
-
     /**
      * Constructs an instance with the specified name
      *

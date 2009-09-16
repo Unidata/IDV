@@ -50,7 +50,7 @@ public class ImageSequenceDisplayable extends Grid2DDisplayable {
     private ImageSequence sequence;
 
     /** renderer */
-    private ImageRendererJ3D renderer = null;
+    private ImageRendererJ3D myRenderer = null;
 
     /**
      * Create a new ImageSequenceDisplayable with the given name and
@@ -183,12 +183,12 @@ public class ImageSequenceDisplayable extends Grid2DDisplayable {
         if (getDisplay().getDisplayRenderer() instanceof DisplayRendererJ2D) {
             return new DefaultRendererJ2D();
         } else {
-            if (renderer == null) {
-                renderer = new ImageRendererJ3D();
-                renderer.setReUseFrames(false);
+            if (myRenderer == null) {
+                myRenderer = new ImageRendererJ3D();
+                myRenderer.setReUseFrames(false);
                 //renderer.setSetSetOnReUseFrames(false);
             }
-            return renderer;
+            return myRenderer;
         }
     }
 
@@ -203,19 +203,19 @@ public class ImageSequenceDisplayable extends Grid2DDisplayable {
     public void setColorPalette(float[][] colorPalette)
             throws RemoteException, VisADException {
 
-        boolean reUseTrue = (renderer != null)
-                            ? renderer.getReUseFrames()
+        boolean reUseTrue = (myRenderer != null)
+                            ? myRenderer.getReUseFrames()
                             : false;
 
         /// Warning = Major hack
         if (reUseTrue) {  // turn off reuse so color table will change
-            renderer.setReUseFrames(false);
+            myRenderer.setReUseFrames(false);
             super.setColorPalette(colorPalette);
             try {
                 Thread.sleep(500);
             } catch (Exception excp) {}
 
-            renderer.setReUseFrames(true);
+            myRenderer.setReUseFrames(true);
         } else {
             super.setColorPalette(colorPalette);
         }
@@ -262,8 +262,8 @@ public class ImageSequenceDisplayable extends Grid2DDisplayable {
      */
     public void setReUseScenes(boolean on)
             throws RemoteException, VisADException {
-        if ((renderer != null) && (renderer instanceof ImageRendererJ3D)) {
-            renderer.setReUseFrames(on);
+        if ((myRenderer != null) && (myRenderer instanceof ImageRendererJ3D)) {
+            myRenderer.setReUseFrames(on);
         }
     }
 }

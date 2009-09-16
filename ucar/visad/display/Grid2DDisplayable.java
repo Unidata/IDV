@@ -61,7 +61,7 @@ public class Grid2DDisplayable extends RGBDisplayable implements GridDisplayable
     private Field field;
 
     /** renderer */
-    private DataRenderer renderer;
+    private DataRenderer myRenderer;
 
     /** flag for texturing */
     private boolean isTextured = false;
@@ -191,25 +191,25 @@ public class Grid2DDisplayable extends RGBDisplayable implements GridDisplayable
 
             if (getDisplay().getDisplayRenderer()
                     instanceof DisplayRendererJ2D) {
-                renderer = new DefaultRendererJ2D();
+                myRenderer = new DefaultRendererJ2D();
             } else {
                 if ((getData() != null)
                         && ImageRendererJ3D.isImageType(getData().getType())
                         && getTextureEnable() && !getUseDefaultRenderer()
                         && !getUseRGBTypeForSelect()) {
 
-                    renderer = new visad.bom.ImageRendererJ3D();
-                    ((visad.bom.ImageRendererJ3D) renderer).setReUseFrames(
+                    myRenderer = new visad.bom.ImageRendererJ3D();
+                    ((visad.bom.ImageRendererJ3D) myRenderer).setReUseFrames(
                         false);
                 } else {
-                    renderer = new DefaultRendererJ3D();
+                    myRenderer = new DefaultRendererJ3D();
                 }
             }
         } catch (RemoteException re) {
-            renderer = super.getDataRenderer();
+            myRenderer = super.getDataRenderer();
         }
-        //System.out.println("renderer = " + renderer.getClass().getName());
-        return renderer;
+        //System.out.println("myRenderer = " + myRenderer.getClass().getName());
+        return myRenderer;
     }
 
     /**
@@ -239,8 +239,8 @@ public class Grid2DDisplayable extends RGBDisplayable implements GridDisplayable
      */
     protected void myAddConstantMaps(ConstantMap[] newMaps)
             throws VisADException, RemoteException {
-        if (renderer != null) {
-            String c = renderer.getClass().getName();
+        if (myRenderer != null) {
+            String c = myRenderer.getClass().getName();
             if ((c.equals("visad.bom.ImageRendererJ3D") && !isTextured)
                     || (c.equals("visad.java3d.DefaultRendererJ3D")
                         && !isTextured)) {

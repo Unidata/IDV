@@ -126,7 +126,7 @@ public class DisplayableData extends Displayable {
     private boolean active = true;
 
     /** renderer for the data */
-    private DataRenderer renderer;
+    protected DataRenderer renderer;
 
     /** flag for whether the reference as been added to the display yet */
     private boolean refAdded = false;
@@ -544,6 +544,7 @@ public class DisplayableData extends Displayable {
         renderer       = null;
         changeListener = null;
         reference      = null;
+        cachedAnimationSet = null;
         super.destroy();
     }
 
