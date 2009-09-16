@@ -455,6 +455,12 @@ public class MapViewManager extends NavigatedViewManager {
 
         checkPipPanel();
 
+
+        NavigatedDisplay navDisplay = getMapDisplay();
+        if(!navDisplay.getAutoRotate() && getViewpointControl().getAutoRotate()) {
+            getViewpointControl().setAutoRotate(false);
+        }
+
         int id = event.getId();
         InputEvent inputEvent = event.getInputEvent();
         if (id == DisplayEvent.KEY_PRESSED && inputEvent instanceof KeyEvent) {
@@ -1049,6 +1055,7 @@ public class MapViewManager extends NavigatedViewManager {
     private void goToAddressInner() {
         try {
             if (addressReprojectCbx == null) {
+                
                 addressReprojectCbx = new JCheckBox("Reproject",
                         getStore().get(PREF_ADDRESS_REPROJECT, true));
                 List savedAddresses =
@@ -1059,7 +1066,7 @@ public class MapViewManager extends NavigatedViewManager {
             }
             getIdvUIManager().showWaitCursor();
             LatLonPoint llp = GeoUtils.getLocationOfAddress(
-                                  GuiUtils.left(addressReprojectCbx));
+                                                            GuiUtils.left(getUseGlobeDisplay()?GuiUtils.filler():(JComponent)addressReprojectCbx));
             getIdvUIManager().showNormalCursor();
             if (llp == null) {
                 return;
@@ -1075,7 +1082,7 @@ public class MapViewManager extends NavigatedViewManager {
             float offset = (float) (1.0 / 60.0f);
             Rectangle2D.Float rect = new Rectangle2D.Float(x - offset,
                                          y - offset, offset * 2, offset * 2);
-            if (addressReprojectCbx.isSelected()) {
+            if (!getUseGlobeDisplay() && addressReprojectCbx.isSelected()) {
                 TrivialMapProjection mp =
                     new TrivialMapProjection(
                         RealTupleType.SpatialEarth2DTuple, rect);
@@ -2331,12 +2338,14 @@ public class MapViewManager extends NavigatedViewManager {
             projMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Use Displayed Area",
                     this,
                     "setCurrentAsProjection"), "/auxdata/ui/icons/world_rect.png"));
-            projMenu.add(
-                GuiUtils.setIcon(
-                    GuiUtils.makeMenuItem(
-                        "Go to Address", this,
-                        "goToAddress"), "/auxdata/ui/icons/house_go.png"));
+        }
+        projMenu.add(
+                     GuiUtils.setIcon(
+                                      GuiUtils.makeMenuItem(
+                                                            "Go to Address", this,
+                                                            "goToAddress"), "/auxdata/ui/icons/house_go.png"));
 
+        if ( !getUseGlobeDisplay()) {
             projMenu.addSeparator();
             createCBMI(projMenu, PREF_PROJ_USEFROMDATA).setToolTipText(
                 "Automatically change the projection to the native data projection of new displays");
