@@ -358,7 +358,7 @@ specified  -->
      range_min="0.0"
      range_max="8000.0"
      ci_interval="1000"
-     unit="Joules"/>
+     unit="Joules/kg"/>
   <param
      name="zdr"
      table="DbZ"
