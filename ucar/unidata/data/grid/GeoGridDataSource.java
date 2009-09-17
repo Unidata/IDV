@@ -19,6 +19,7 @@
  */
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -193,6 +194,14 @@ public class GeoGridDataSource extends GridDataSource {
 
     /** category attributes */
     private static String[] categoryAttributes = { "GRIB_param_category" };
+
+
+    /** Do we really reverse the time indices */
+    private boolean reverseTimes = false;
+
+    /** for properties_ */
+    private JCheckBox reverseTimesCheckbox;
+
 
 
     /**
@@ -1600,13 +1609,23 @@ public class GeoGridDataSource extends GridDataSource {
             allTimes =
                 getGeoGridTimes((CoordinateAxis1DTime) geoGrid
                     .getCoordinateSystem().getTimeAxis1D());
+            int numTimes = allTimes.size();
             if (holdsIndices(times)) {
                 for (int i = 0; i < times.size(); i++) {
-                    timeIndices[i] = ((Integer) times.get(i)).intValue();
+                    int index = ((Integer) times.get(i)).intValue();
+                    if (getReverseTimes()) {
+                        index = numTimes - index - 1;
+                    }
+
+                    timeIndices[i] = index;
                 }
             } else {
                 for (int i = 0; i < times.size(); i++) {
-                    timeIndices[i] = allTimes.indexOf(times.get(i));
+                    int index = allTimes.indexOf(times.get(i));
+                    if (getReverseTimes()) {
+                        index = numTimes - index - 1;
+                    }
+                    timeIndices[i] = index;
                 }
             }
         }
@@ -2200,6 +2219,57 @@ public class GeoGridDataSource extends GridDataSource {
     public void setFileNameOrUrl(String value) {
         oldSourceFromBundles = value;
     }
+
+
+
+    /**
+     * Apply the properties
+     *
+     * @return everything ok
+     */
+    public boolean applyProperties() {
+        if ( !super.applyProperties()) {
+            return false;
+        }
+        reverseTimes = reverseTimesCheckbox.isSelected();
+        return true;
+    }
+
+    /**
+     * Add the reverse times checkbox
+     *
+     * @return extra comp
+     */
+    protected JComponent getExtraTimesComponent() {
+        reverseTimesCheckbox = new JCheckBox(
+            "Reverse Times",
+            reverseTimes);
+        reverseTimesCheckbox.setToolTipText("If you have selected the first time then really use the last time");
+        return GuiUtils.right(reverseTimesCheckbox);
+    }
+
+
+    /**
+     * Set the ReverseTimes property.
+     *
+     * @param value The new value for ReverseTimes
+     */
+    public void setReverseTimes(boolean value) {
+        reverseTimes = value;
+    }
+
+    /**
+     * Get the ReverseTimes property.
+     *
+     * @return The ReverseTimes
+     */
+    public boolean getReverseTimes() {
+        return reverseTimes;
+    }
+
+
+
+
 
 
 

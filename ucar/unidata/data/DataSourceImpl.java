@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data;
 
 
@@ -236,7 +237,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     /** How many get data calls are we currently waiting on */
     private static int outstandingGetDataCalls = 0;
 
-    /** mutex used when accessing the outstanding getdata calls counter     */
+    /** mutex used when accessing the outstanding getdata calls counter */
     private static Object MUTEX_OUTSTANDINGGETDATACALLS = new Object();
 
 
@@ -1327,7 +1328,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * Derived classes should overwrite this method and clear out any state
      * they may be holding. Then they should call this method to do the notification.
      */
-    public void reloadData() { 
+    public void reloadData() {
         //Clear out the data cache path so we force a new read
         final String tmp = dataCachePath;
         dataCachePath = null;
@@ -1339,9 +1340,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (tmp != null) {
             //If we are caching data to disk then delete the old data cache dir
             Misc.run(new Runnable() {
-                    public void run() {
-                        IOUtil.deleteDirectory(new File(tmp));
-                    }});
+                public void run() {
+                    IOUtil.deleteDirectory(new File(tmp));
+                }
+            });
         }
     }
 
@@ -1353,9 +1355,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         final String tmp = dataCachePath;
         if (tmp != null) {
             Misc.run(new Runnable() {
-                    public void run() {
-                        IOUtil.deleteDirectory(new File(tmp));
-                    }});
+                public void run() {
+                    IOUtil.deleteDirectory(new File(tmp));
+                }
+            });
         }
     }
 
@@ -2114,8 +2117,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         getAllDateTimes();
 
 
-        log_.debug("data source data selection:" +getDataSelection());
-        log_.debug("incoming data selection:" +incomingDataSelection);
+        log_.debug("data source data selection:" + getDataSelection());
+        log_.debug("incoming data selection:" + incomingDataSelection);
 
         DataSelection selection = DataSelection.merge(incomingDataSelection,
                                       getDataSelection());
@@ -2157,7 +2160,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                 decrOutstandingGetDataCalls();
             }
             if ((cacheKey != null) && (cachedData != null)
-                && shouldCache(dataChoice, cachedData)) {
+                    && shouldCache(dataChoice, cachedData)) {
                 putCache(cacheKey, cachedData);
             }
         } else {}
@@ -2864,6 +2867,15 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
     /**
+     * This gets pu at the bottom of the times properties tab
+     *
+     * @return extra comp
+     */
+    protected JComponent getExtraTimesComponent() {
+        return null;
+    }
+
+    /**
      * Add any extra tabs into the properties tab
      *
      * @param tabbedPane The properties tab
@@ -2884,7 +2896,16 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if ((times != null) && (times.size() > 0)) {
             dsw = new DataSelectionWidget(getDataContext().getIdv());
             dsw.setTimes(getAllDateTimes(), getDateTimeSelection());
-            tabbedPane.add("Times", dsw.getTimesList("Use All"));
+            JComponent extraTimesComp = getExtraTimesComponent();
+            JComponent timesComp      = dsw.getTimesList("Use All");
+
+            if (extraTimesComp != null) {
+                tabbedPane.add("Times",
+                               GuiUtils.centerBottom(timesComp,
+                                   extraTimesComp));
+            } else {
+                tabbedPane.add("Times", timesComp);
+            }
         }
 
         if (canDoGeoSelection()) {
@@ -3060,7 +3081,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             if ( !geoSelectionPanel.applyProperties(geoSubset)) {
                 return false;
             }
-            log_.debug("data selection:" +getDataSelection());
+            log_.debug("data selection:" + getDataSelection());
         }
 
 
@@ -3629,19 +3650,19 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (getDataContext() == null) {
             return null;
         }
-        
-        synchronized(DATACACHEPATH_MUTEX) {
+
+        synchronized (DATACACHEPATH_MUTEX) {
             if (dataCachePath == null) {
 
                 String uniqueName = "data_" + Misc.getUniqueId();
                 String tmp =
                     IOUtil.joinDir(getDataContext().getIdv().getDataManager()
-                                   .getDataCacheDirectory(), uniqueName);
+                        .getDataCacheDirectory(), uniqueName);
                 IOUtil.makeDir(tmp);
                 try {
                     new File(tmp).deleteOnExit();
-                } catch(Exception ignoreThis) {}
-                dataCachePath =tmp;
+                } catch (Exception ignoreThis) {}
+                dataCachePath = tmp;
 
             }
         }
