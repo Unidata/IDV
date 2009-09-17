@@ -1210,6 +1210,9 @@ public class WMSControl extends ImageControl implements ImageObserver {
         }
         updateLegendAndList();
         if (imageDisplay != null) {
+            if(isLayerFixed() && getUseFastRendering()) {
+                setUseFastRendering(false);
+            }
             loadImageFromScreen();
         }
     }
