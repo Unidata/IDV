@@ -1280,6 +1280,7 @@ public class PointObFactory {
 
         List    actualVariables    = input.getDataVariables();
         int     numVars            = actualVariables.size();
+        String _isMissing = "_isMissing";
 
         boolean needToAddStationId = false;
         String  stationFieldName   = null;
@@ -1383,7 +1384,7 @@ public class PointObFactory {
         for (Iterator iter = actualVariables.iterator(); iter.hasNext(); ) {
             VariableSimpleIF var       = (VariableSimpleIF) iter.next();
             String           shortName = var.getShortName();
-            if (shortName.equals("_isMissing")) {
+            if (shortName.equals(_isMissing)) {
                 numVars--;
                 continue;
             }
@@ -1454,6 +1455,8 @@ public class PointObFactory {
         Trace.call1("FeatureDatasetPoint: iterating on PointFeatures",
                     "sample = " + sample);
         int    missing = 0;
+        int    ismissing = 0;
+        boolean iammissing = false;
         String svalue  = "missing";
         float  value   = Float.NaN;
         // if we are only getting a sample there's no need to use the iterator
@@ -1492,6 +1495,7 @@ public class PointObFactory {
             collection.getPointFeatureIterator(16384);
             while (dataIterator.hasNext()) {
                 PointFeature po = (PointFeature) dataIterator.next();
+                iammissing = false;
                 obIdx++;
                 ucar.unidata.geoloc.EarthLocation el = po.getLocation();
                 elt = new EarthLocationLite(
@@ -1512,9 +1516,23 @@ public class PointObFactory {
                     stringArray[stringCnt++] = sod.getStation().getName();
                 }
                 boolean allMissing = true;
+
+                // check for a missing flag
+                member = structure.findMember(_isMissing);
+                if (member != null) {
+                    value = structure.convertScalarInt(member);
+                    if (value == 1) {
+                        iammissing = true;
+                        ismissing++;
+                        missing++;
+                        continue;
+                    }
+                }
+
                 for (varIdx = varIdxBase; varIdx < numVars; varIdx++) {
                     member =
                         structure.findMember((String) shortNames[varIdx]);
+                    if (member == null) continue;
                     if ( !isVarNumeric[varIdx]) {
                         svalue = structure.getScalarString(member);
                         if (svalue.length() != 0) {
@@ -1529,6 +1547,11 @@ public class PointObFactory {
                         realArray[realCnt++] = value;
                     }
                 }
+                /*
+                if (allMissing  && !iammissing) {
+                    System.out.println("has all missing, but not iammissing: " + el);
+                }
+                */
                 if (allMissing) {
                     missing++;
                     continue;
@@ -1554,7 +1577,7 @@ public class PointObFactory {
                 }
             }
             Trace.call2("FeatureDatasetPoint: iterating on PointFeatures",
-                        "found " + missing + " missing out of " + obIdx);
+                        "found " + ismissing + "/" + missing + " missing out of " + obIdx);
             dataIterator.finish();
         }
 
