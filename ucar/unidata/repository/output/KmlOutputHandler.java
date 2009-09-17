@@ -131,7 +131,6 @@ public class KmlOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
         throws Exception {
-        System.err.println ("output group:" + group);
         boolean justOneEntry = group.isDummy() && (entries.size() == 1)
             && (subGroups.size() == 0);
 
