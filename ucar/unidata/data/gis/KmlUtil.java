@@ -78,6 +78,7 @@ public class KmlUtil {
     public static final String TAG_NETWORKLINK = "NetworkLink";
     public static final String TAG_NORTH = "north";
     public static final String TAG_PHOTOOVERLAY = "PhotoOverlay";
+    public static final String TAG_OPEN = "open";
     public static final String TAG_PLACEMARK = "Placemark";
     public static final String TAG_POINT = "Point";
 
@@ -98,13 +99,11 @@ public class KmlUtil {
     public static final String TAG_VIEWVOLUME = "ViewVolume";
     public static final String TAG_SCALE = "scale";
     public static final String TAG_VIEWBOUNDSCALE = "viewBoundScale";
-    public static final String TAG_VISIBLE = "visible";
+    public static final String TAG_VISIBILITY = "visibility";
     public static final String TAG_WEST = "west";
     public static final String TAG_WHEN = "when";
     public static final String TAG_WIDTH = "width";
     //J+
-
-
 
 
 
@@ -134,6 +133,25 @@ public class KmlUtil {
     }
 
 
+    public static Element networkLink(Element parent, String name, String url) {
+        Element networkLink = makeElement(parent,TAG_NETWORKLINK);
+        makeText(networkLink, TAG_NAME,name);
+        Element link  =    makeElement(networkLink,TAG_LINK);
+        makeText(link, TAG_HREF,url);
+        //        makeElement(link,TAG_HREF);
+        return networkLink;
+    }
+
+    /*        
+<NetworkLink>
+	<name>SVP Drifter 82224</name>
+	<visibility>1</visibility>
+	<flyToView>0</flyToView>
+	<Link>
+		<href>http://dataserver.imedea.uib-csic.es:8080/repository/entry/get/20090511_sinocop_b82224.kmz?entryid=0b13318a-2520-4fcb-915e-55af83c1fede</href>
+
+    */
+
     public static Element document(Element parent, String name, boolean visible) {
         Element node = makeElement(parent,TAG_DOCUMENT);
         name(node,name);
@@ -149,7 +167,12 @@ public class KmlUtil {
     }
 
     public static Element visible(Element parent, boolean visible) {
-        return makeText(parent,TAG_VISIBLE, (visible?"1":"0"));
+        return makeText(parent,TAG_VISIBILITY, (visible?"1":"0"));
+    }
+
+
+    public static Element open(Element parent, boolean visible) {
+        return makeText(parent,TAG_OPEN, (visible?"1":"0"));
     }
 
 
