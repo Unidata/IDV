@@ -130,7 +130,7 @@ example:
      class="ucar.unidata.idv.control.ColorRhiControl"
      label="RHI"
      displaycategory="Radar Displays"
-     properties="smoothed=false;windowVisible=true;allowSmoothing=false;setAutoScaleYAxis=false"/>
+     properties="smoothed=false;windowVisible=true;allowSmoothing=false;autoScaleYAxis=false"/>
   <control
      id="rhics"
      categories="RADAR_CROSS_SECTION"
