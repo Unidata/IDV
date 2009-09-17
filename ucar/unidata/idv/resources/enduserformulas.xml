@@ -37,6 +37,7 @@
       <category value="*-flowvector-*"/>
       <category value="display:flowxs"/>
       <category value="display:windbarbxs"/>
+      <category value="display:probe"/>
     </categories>
     <operands/>
   </derived>
@@ -59,6 +60,9 @@
       <category
          display="false"
          value="*-flowvector-*;display:windbarbplan"/>
+      <category
+         display="false"
+         value="*-flowvector-*;display:probe"/>
     </categories>
     <operands/>
   </derived>
