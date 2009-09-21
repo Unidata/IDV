@@ -223,8 +223,6 @@ public class PointObFactory {
                 continue;
             }
 
-
-            System.err.println("dttm:" + dttm);
             if (lumpMinutes > 0) {
                 double seconds = dttm.getValue();
                 seconds = seconds - seconds % (lumpMinutes * 60);
