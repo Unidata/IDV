@@ -368,11 +368,12 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
             int       numObs  = oneTime.getDomainSet().getLength();
             for (int obIdx = 0; obIdx < numObs; obIdx++) {
                 PointOb tmpOb = (PointOb) oneTime.getSample(obIdx);
+                double time = tmpOb.getDateTime().getValue();
                 //Humm, why do we have this check here?
-                //                if (tmpOb.getDateTime().getValue() > 0) {
+                if (time > 0 || time<0) {
                     ob = tmpOb;
                     break;
-                    //                }
+                }
             }
             if (ob == null) {
                 continue;
