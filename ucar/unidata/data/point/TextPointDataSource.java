@@ -19,10 +19,13 @@
  */
 
 
+
 package ucar.unidata.data.point;
 
 
 import edu.wisc.ssec.mcidas.McIDASUtil;
+
+import ucar.nc2.ft.point.writer.CFPointObWriter;
 
 import ucar.unidata.data.*;
 
@@ -135,15 +138,15 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /** variables for latitude */
-    private String[] latVars = { "Latitude", "latitude", "lat" };
+    private static String[] latVars = { "Latitude", "latitude", "lat" };
 
     /** variables for longitude */
-    private String[] lonVars = { "Longitude", "longitude", "lon" };
+    private static String[] lonVars = { "Longitude", "longitude", "lon" };
 
 
     /** variables for altitude */
-    private String[] altVars = { "altitude", "Altitude", "elevation",
-                                 "Elevation" };
+    private static String[] altVars = { "altitude", "Altitude", "elevation",
+                                        "Elevation" };
 
 
     /** variables for index */
@@ -196,6 +199,10 @@ public class TextPointDataSource extends PointDataSource {
     /** for the metadata gui */
     List lines;
 
+    /** _more_          */
+    private TextAdapter.StreamProcessor streamProcessor;
+
+
     /**
      * Default constructor
      *
@@ -203,6 +210,17 @@ public class TextPointDataSource extends PointDataSource {
      */
     public TextPointDataSource() throws VisADException {
         init();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param streamProcessor _more_
+     */
+    public void setStreamProcessor(
+            TextAdapter.StreamProcessor streamProcessor) {
+        this.streamProcessor = streamProcessor;
     }
 
     /**
@@ -468,7 +486,7 @@ public class TextPointDataSource extends PointDataSource {
 
                 ta = new TextAdapter(getInputStream(contents), delimiter,
                                      map, params, dataProperties, sampleIt,
-                                     skipPattern);
+                                     skipPattern, streamProcessor);
             } catch (visad.data.BadFormException bfe) {
                 //Probably don't have the header info
                 //If we already have a map and params then we have problems
@@ -485,11 +503,14 @@ public class TextPointDataSource extends PointDataSource {
                 }
                 ta = new TextAdapter(getInputStream(contents), delimiter,
                                      map, params, dataProperties, sampleIt,
-                                     skipPattern);
+                                     skipPattern, streamProcessor);
             }
             try {
                 Data d = ta.getData();
                 if (d == null) {
+                    if (streamProcessor != null) {
+                        return null;
+                    }
                     throw new IllegalArgumentException(
                         "Could not create point data");
                 }
@@ -1451,52 +1472,19 @@ public class TextPointDataSource extends PointDataSource {
                     "can't find DateTime components");
             }
 
-            Real      dfltAlt       = new Real(RealType.Altitude, 1);
-            Real      dfltReal      = getDefaultValue();
+            Real      dfltAlt          = new Real(RealType.Altitude, 1);
+            Real      dfltReal         = getDefaultValue();
 
 
-            TupleType finalTT       = null;
-            TupleType dataTupleType = null;
-            Unit[]    dataUnits     = null;
+            TupleType finalTT          = null;
+            TupleType dataTupleType    = null;
+            Unit[]    dataUnits        = null;
 
 
-            // Check for LAT/LON/ALT
-            int latIndex = type.getIndex(RealType.Latitude);
-            int lonIndex = type.getIndex(RealType.Longitude);
-            int altIndex = type.getIndex(RealType.Altitude);
-
-            if (latIndex < 0) {
-                for (int i = 0; i < latVars.length; i++) {
-                    latIndex = type.getIndex(latVars[i]);
-                    if (latIndex > -1) {
-                        break;
-                    }
-                }
-            }
-
-
-
-            if (lonIndex < 0) {
-                for (int i = 0; i < lonVars.length; i++) {
-                    lonIndex = type.getIndex(lonVars[i]);
-                    if (lonIndex > -1) {
-                        break;
-                    }
-                }
-            }
-
-
-            if (altIndex < 0) {
-                for (int i = 0; i < altVars.length; i++) {
-                    altIndex = type.getIndex(altVars[i]);
-                    if (altIndex > -1) {
-                        break;
-                    }
-                }
-            }
-
-
-
+            int[]     latLonAltIndices = findLatLonAltIndices(type);
+            int       latIndex         = latLonAltIndices[0];
+            int       lonIndex         = latLonAltIndices[1];
+            int       altIndex         = latLonAltIndices[2];
 
             if (altIndex >= 0) {
                 varNames.add("Altitude");
@@ -1726,6 +1714,53 @@ public class TextPointDataSource extends PointDataSource {
 
 
     /**
+     * _more_
+     *
+     * @param type _more_
+     *
+     * @return _more_
+     */
+    public static int[] findLatLonAltIndices(TupleType type) {
+        // Check for LAT/LON/ALT
+        int latIndex = type.getIndex(RealType.Latitude);
+        int lonIndex = type.getIndex(RealType.Longitude);
+        int altIndex = type.getIndex(RealType.Altitude);
+
+        if (latIndex < 0) {
+            for (int i = 0; i < latVars.length; i++) {
+                latIndex = type.getIndex(latVars[i]);
+                if (latIndex > -1) {
+                    break;
+                }
+            }
+        }
+
+
+
+        if (lonIndex < 0) {
+            for (int i = 0; i < lonVars.length; i++) {
+                lonIndex = type.getIndex(lonVars[i]);
+                if (lonIndex > -1) {
+                    break;
+                }
+            }
+        }
+
+
+        if (altIndex < 0) {
+            for (int i = 0; i < altVars.length; i++) {
+                altIndex = type.getIndex(altVars[i]);
+                if (altIndex > -1) {
+                    break;
+                }
+            }
+        }
+
+        return new int[] { latIndex, lonIndex, altIndex };
+    }
+
+
+    /**
      * should we make trajectories out of the point obs
      *
      * @return make trajectories
@@ -1910,6 +1945,7 @@ public class TextPointDataSource extends PointDataSource {
         boolean          readToFirstNumeric = false;
 
         int              argIdx             = 1;
+        boolean          doStream           = false;
         for (argIdx = 0; argIdx < args.length; argIdx++) {
             if (args[argIdx].equals("-skip")) {
                 if (argIdx == args.length - 1) {
@@ -1919,6 +1955,8 @@ public class TextPointDataSource extends PointDataSource {
                 properties.put(TextPointDataSource.PROP_HEADER_SKIP,
                                new Integer(args[argIdx + 1]));
                 argIdx++;
+            } else if (args[argIdx].equals("-stream")) {
+                doStream = true;
             } else if (args[argIdx].equals("-header")) {
                 if (argIdx == args.length - 1) {
                     usage();
@@ -1992,15 +2030,121 @@ public class TextPointDataSource extends PointDataSource {
                         TextPointDataSource.class);
             }
 
-
-            FieldImpl field = dataSource.makeObs(contents, ",", null, null,
-                                  null, false, false);
-
-
             String ncFile = IOUtil.stripExtension(args[i]) + ".nc";
-            System.err.println("Writing nc file:" + ncFile);
-            PointObFactory.writeToNetcdf(new File(ncFile), field);
 
+
+            System.err.println("Writing nc file:" + ncFile);
+
+            if ( !doStream) {
+                FieldImpl field = dataSource.makeObs(contents, ",", null,
+                                      null, null, false, false);
+
+
+                PointObFactory.writeToNetcdf(new File(ncFile), field);
+            } else {
+                final DataOutputStream dos =
+                    new DataOutputStream(
+                        new BufferedOutputStream(
+                            new FileOutputStream(new File(ncFile)), 10000));
+                final CFPointObWriter[] writer = { null };
+
+                dataSource.setStreamProcessor(
+                    new TextAdapter.StreamProcessor() {
+                    int      cnt       = 0;
+                    int      latIndex  = -1;
+                    int      lonIndex  = -1;
+                    int      altIndex  = -1;
+                    int      timeIndex = -1;
+                    double[] dvals;
+                    String[] svals;
+                    public void processTuple(Tuple tuple) {
+                        try {
+                            Data[]  data  = tuple.getComponents();
+                            boolean first = false;
+                            if (writer[0] == null) {
+                                first = true;
+                                TupleType type  = (TupleType) tuple.getType();
+                                int[] latLonAlt = findLatLonAltIndices(type);
+                                latIndex = latLonAlt[0];
+                                lonIndex = latLonAlt[1];
+                                altIndex = latLonAlt[2];
+                                String altUnit = "meters";
+                                //                                    System.err.println ("tuple:" + tuple);
+                                timeIndex = type.getIndex(RealType.Time);
+                                if (timeIndex < 0) {}
+                                if (timeIndex < 0) {
+                                    throw new IllegalArgumentException(
+                                        "Could not find time index");
+                                }
+                                writer[0] = PointObFactory.makeWriter(dos,
+                                        tuple, new int[] { latIndex,
+                                        lonIndex, altIndex, timeIndex }, 200,
+                                        altUnit);
+
+                                int dcnt = 0;
+                                int scnt = 0;
+                                for (int i = 0; i < data.length; i++) {
+                                    if ((i == latIndex) || (i == lonIndex)
+                                            || (i == altIndex)
+                                            || (i == timeIndex)) {
+                                        continue;
+                                    }
+                                    if (data[i] instanceof Text) {
+                                        scnt++;
+                                    } else {
+                                        dcnt++;
+                                    }
+                                }
+
+                                dvals = new double[dcnt];
+                                svals = new String[scnt];
+                            }
+
+                            int dcnt = 0;
+                            int scnt = 0;
+                            for (int i = 0; i < data.length; i++) {
+                                if ((i == latIndex) || (i == lonIndex)
+                                        || (i == altIndex)
+                                        || (i == timeIndex)) {
+                                    continue;
+                                }
+                                if (data[i] instanceof Text) {
+                                    svals[scnt++] =
+                                        ((Text) data[i]).getValue();
+                                } else {
+                                    dvals[dcnt++] =
+                                        ((Real) data[i]).getValue();
+                                }
+                            }
+                            DateTime dttm =
+                                new DateTime((Real) data[timeIndex]);
+                            Real lat = (Real) data[latIndex];
+                            Real lon = (Real) data[lonIndex];
+                            Real alt = (Real) ((altIndex < 0)
+                                    ? null
+                                    : data[altIndex]);
+                            writer[0].addPoint(
+                                lat.getValue(CommonUnit.degree),
+                                lon.getValue(CommonUnit.degree),
+                                ((alt != null)
+                                 ? alt.getValue(CommonUnit.meter)
+                                 : 0.0), ucar.visad.Util.makeDate(dttm),
+                                         dvals, svals);
+                        } catch (Exception exc) {
+                            throw new RuntimeException(exc);
+                        }
+                    }
+                });
+
+
+                FieldImpl field = dataSource.makeObs(contents, ",", null,
+                                      null, null, false, false);
+
+                if (writer[0] != null) {
+                    writer[0].finish();
+                    dos.close();
+                }
+            }
         }
 
         System.exit(0);

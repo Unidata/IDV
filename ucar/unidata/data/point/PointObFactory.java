@@ -19,6 +19,7 @@
  */
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -217,9 +218,13 @@ public class PointObFactory {
                 }
             }
             DateTime dttm = ob.getDateTime();
+
             if (dttm.isMissing()) {
                 continue;
             }
+
+
+            System.err.println("dttm:" + dttm);
             if (lumpMinutes > 0) {
                 double seconds = dttm.getValue();
                 seconds = seconds - seconds % (lumpMinutes * 60);
@@ -258,6 +263,7 @@ public class PointObFactory {
         Data[] timeSamples = new Data[times.length];
         for (int i = 0; i < times.length; i++) {
             DateTime dttm   = times[i];
+
             Double   dValue = new Double(dttm.getValue());
             List     v      = (List) timeToObs.get(dValue);
             Data[]   obs;
@@ -539,6 +545,93 @@ public class PointObFactory {
 
 
     }
+
+
+    /**
+     * _more_
+     *
+     * @param dos _more_
+     * @param tuple _more_
+     * @param skipIndices _more_
+     * @param defaultStringLength _more_
+     * @param altUnit _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static CFPointObWriter makeWriter(DataOutputStream dos,
+                                             Tuple tuple, int[] skipIndices,
+                                             int defaultStringLength,
+                                             String altUnit)
+            throws Exception {
+        TupleType        type      = (TupleType) tuple.getType();
+        MathType[]       types     = type.getComponents();
+        int              numFields = types.length;
+        int              numFloat  = 0;
+        int              numString = 0;
+        int[]            lengths   = new int[numFields];
+        boolean[]        isText    = new boolean[numFields];
+        boolean          haveText  = false;
+        List<Attribute>  attrs     = new ArrayList<Attribute>();
+        List<PointObVar> dataVars  = new ArrayList<PointObVar>();
+        HashSet          skip      = new HashSet();
+        for (int i = 0; i < skipIndices.length; i++) {
+            skip.add(new Integer(skipIndices[i]));
+        }
+
+
+        for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
+            if (skip.contains(new Integer(fieldIdx))) {
+                continue;
+            }
+
+            if (types[fieldIdx] instanceof TextType) {
+                lengths[fieldIdx] = defaultStringLength;
+                haveText          = true;
+                isText[fieldIdx]  = true;
+                continue;
+            }
+            lengths[fieldIdx] = 0;
+            isText[fieldIdx]  = false;
+            PointObVar pointObVar = new PointObVar();
+            pointObVar.setName(Util.cleanTypeName(types[fieldIdx]));
+            Unit unit = ((RealType) types[fieldIdx]).getDefaultUnit();
+            System.err.println("unit:" + unit);
+            if (unit != null) {
+                String unitName = unit.getIdentifier();
+                if ((unitName == null) || (unitName.length() == 0)) {
+                    unitName = unit.toString();
+                }
+                pointObVar.setUnits(unitName);
+            }
+
+            pointObVar.setDataType(DataType.DOUBLE);
+            dataVars.add(pointObVar);
+            numFloat++;
+        }
+
+
+        for (int fieldIdx = 0; fieldIdx < lengths.length; fieldIdx++) {
+            if (skip.contains(new Integer(fieldIdx))) {
+                continue;
+            }
+            if ( !isText[fieldIdx]) {
+                continue;
+            }
+            PointObVar pointObVar = new PointObVar();
+            lengths[fieldIdx] = Math.max(lengths[fieldIdx], 2);
+            pointObVar.setName(Util.cleanTypeName(types[fieldIdx]));
+            pointObVar.setDataType(DataType.STRING);
+            pointObVar.setLen(lengths[fieldIdx]);
+            dataVars.add(pointObVar);
+            numString++;
+        }
+        //        return  new CFPointObWriter(dos, attrs, altUnit, dataVars, 2000000);
+        return new CFPointObWriter(dos, attrs, altUnit, dataVars, 800);
+    }
+
+
 
 
     /**
@@ -1280,7 +1373,7 @@ public class PointObFactory {
 
         List    actualVariables    = input.getDataVariables();
         int     numVars            = actualVariables.size();
-        String _isMissing = "_isMissing";
+        String  _isMissing         = "_isMissing";
 
         boolean needToAddStationId = false;
         String  stationFieldName   = null;
@@ -1454,11 +1547,11 @@ public class PointObFactory {
         StructureMembers.Member member;
         Trace.call1("FeatureDatasetPoint: iterating on PointFeatures",
                     "sample = " + sample);
-        int    missing = 0;
-        int    ismissing = 0;
+        int     missing    = 0;
+        int     ismissing  = 0;
         boolean iammissing = false;
-        String svalue  = "missing";
-        float  value   = Float.NaN;
+        String  svalue     = "missing";
+        float   value      = Float.NaN;
         // if we are only getting a sample there's no need to use the iterator
         if (sample) {
             obIdx++;
@@ -1532,7 +1625,9 @@ public class PointObFactory {
                 for (varIdx = varIdxBase; varIdx < numVars; varIdx++) {
                     member =
                         structure.findMember((String) shortNames[varIdx]);
-                    if (member == null) continue;
+                    if (member == null) {
+                        continue;
+                    }
                     if ( !isVarNumeric[varIdx]) {
                         svalue = structure.getScalarString(member);
                         if (svalue.length() != 0) {
@@ -1577,7 +1672,8 @@ public class PointObFactory {
                 }
             }
             Trace.call2("FeatureDatasetPoint: iterating on PointFeatures",
-                        "found " + ismissing + "/" + missing + " missing out of " + obIdx);
+                        "found " + ismissing + "/" + missing
+                        + " missing out of " + obIdx);
             dataIterator.finish();
         }
 
