@@ -597,7 +597,6 @@ public class PointObFactory {
             PointObVar pointObVar = new PointObVar();
             pointObVar.setName(Util.cleanTypeName(types[fieldIdx]));
             Unit unit = ((RealType) types[fieldIdx]).getDefaultUnit();
-            System.err.println("unit:" + unit);
             if (unit != null) {
                 String unitName = unit.getIdentifier();
                 if ((unitName == null) || (unitName.length() == 0)) {
