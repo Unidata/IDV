@@ -886,7 +886,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         return spatialLociVisible;
     }
 
-
+    public int getCurrentIdx() {
+        return currIndex;
+    }
 
     /**
      * Sets the currently-displayed sounding.  The index is that of the
@@ -967,7 +969,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      *
      * @return the current index
      */
-    protected int getCurrentIndex() {
+    public int getCurrentIndex() {
         return currIndex;
     }
 
@@ -1011,6 +1013,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             dewProfiles  = (Field[]) dewPros.clone();
             windProfiles = (Field[]) windPros.clone();
         } else {
+            tempProfiles = new Field[n];
+            dewProfiles  = new Field[n];
+            windProfiles = new Field[n];
             System.arraycopy(tempPros, 0, tempProfiles, 0, n);
             System.arraycopy(dewPros, 0, dewProfiles, 0, n);
             System.arraycopy(windPros, 0, windProfiles, 0, n);
