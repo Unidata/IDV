@@ -361,16 +361,18 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
         if (seconds == 0) {
             seconds = 1;
         }
+        //        System.out.println ("***********  numTimes=" + numTimes);
         for (int timeIdx = 0; timeIdx < numTimes; timeIdx++) {
             FieldImpl oneTime = (FieldImpl) obs.getSample(timeIdx);
             PointOb   ob      = null;
             int       numObs  = oneTime.getDomainSet().getLength();
             for (int obIdx = 0; obIdx < numObs; obIdx++) {
                 PointOb tmpOb = (PointOb) oneTime.getSample(obIdx);
-                if (tmpOb.getDateTime().getValue() > 0) {
+                //Humm, why do we have this check here?
+                //                if (tmpOb.getDateTime().getValue() > 0) {
                     ob = tmpOb;
                     break;
-                }
+                    //                }
             }
             if (ob == null) {
                 continue;
@@ -379,11 +381,13 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
                                           / seconds);
             //Include the last time step
             if ((timeIdx < numTimes - 1) && (seenTime.get(timeKey) != null)) {
+                //                System.out.println ("   skipping:" + ob.getDateTime() + "  " + timeKey);
                 continue;
             }
             seenTime.put(timeKey, timeKey);
             timeFields.add(oneTime);
             timeValues.add(ob.getDateTime());
+            //            System.out.println ("   Using:" + ob.getDateTime());
         }
 
 
