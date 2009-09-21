@@ -2011,6 +2011,7 @@ public class TextPointDataSource extends PointDataSource {
 
         }
 
+        final int numObs = 2000000;
         for (int i = argIdx; i < args.length; i++) {
             String csvFile = args[i];
             //            if(csvFile.endsWith(".xls")) {
@@ -2079,7 +2080,7 @@ public class TextPointDataSource extends PointDataSource {
                                 writer[0] = PointObFactory.makeWriter(dos,
                                         tuple, new int[] { latIndex,
                                         lonIndex, altIndex, timeIndex }, 200,
-                                        altUnit);
+                                                                      altUnit, numObs);
 
                                 int dcnt = 0;
                                 int scnt = 0;

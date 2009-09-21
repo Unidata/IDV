@@ -563,7 +563,7 @@ public class PointObFactory {
     public static CFPointObWriter makeWriter(DataOutputStream dos,
                                              Tuple tuple, int[] skipIndices,
                                              int defaultStringLength,
-                                             String altUnit)
+                                             String altUnit, int cnt)
             throws Exception {
         TupleType        type      = (TupleType) tuple.getType();
         MathType[]       types     = type.getComponents();
@@ -627,7 +627,7 @@ public class PointObFactory {
             numString++;
         }
         //        return  new CFPointObWriter(dos, attrs, altUnit, dataVars, 2000000);
-        return new CFPointObWriter(dos, attrs, altUnit, dataVars, 800);
+        return new CFPointObWriter(dos, attrs, altUnit, dataVars, cnt);
     }
 
 
