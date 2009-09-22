@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -30,17 +31,18 @@ import ucar.unidata.util.Misc;
 
 import ucar.visad.Util;
 
-import java.awt.*;
+import visad.CommonUnit;
 
-import javax.swing.*;
+import visad.Unit;
+
+import java.awt.*;
 
 import java.awt.event.*;
 
-import javax.swing.event.*;
+import javax.swing.*;
 import javax.swing.border.*;
 
-import visad.Unit;
-import visad.CommonUnit;
+import javax.swing.event.*;
 
 
 
@@ -53,7 +55,7 @@ import visad.CommonUnit;
 public class VertScaleDialog extends JPanel implements ActionListener {
 
     /** The dialog whe in dialog mode */
-    private JDialog dialog;
+    JDialog dialog;
 
     /** input fields for max/min values */
     private JTextField min, max;
@@ -65,10 +67,10 @@ public class VertScaleDialog extends JPanel implements ActionListener {
     private boolean ok;
 
     /** The control */
-    private ViewpointControl control;
+    ViewpointControl control;
 
     /** Holds the info */
-    private VertScaleInfo transfer;
+    VertScaleInfo transfer;
 
     /** The frame parent */
     JFrame parent;
@@ -93,19 +95,25 @@ public class VertScaleDialog extends JPanel implements ActionListener {
      */
     public VertScaleDialog(JFrame parent, ViewpointControl control,
                            VertScaleInfo transfer) {
-        this.control = control;
-        this.parent  = parent;
+        this.control  = control;
+        this.parent   = parent;
+        this.transfer = transfer;
+        doMakeContents();
+    }
+
+    /**
+     * Make the widget contents (UI)
+     */
+    protected void doMakeContents() {
         setLayout(new BorderLayout());
         GuiUtils.tmpInsets = new Insets(5, 5, 0, 0);
         JPanel p1 = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Min value: "), min = new JTextField(""),
             GuiUtils.rLabel("Max value: "), max = new JTextField(""),
             GuiUtils.rLabel("Units: "),
-            unitCombo = GuiUtils.getEditableBox(Misc.toList(new String[]{
+            unitCombo = GuiUtils.getEditableBox(Misc.toList(new String[] {
                 "meters",
-                "km",
-                "feet",
-                "fathoms" }), null)
+                "km", "feet", "fathoms" }), null)
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
 
         min.setActionCommand(GuiUtils.CMD_OK);
@@ -114,11 +122,10 @@ public class VertScaleDialog extends JPanel implements ActionListener {
         max.addActionListener(this);
 
         this.add("Center", GuiUtils.inset(p1, 5));
-        this.transfer = transfer;
         if (transfer != null) {
             min.setText(Misc.format(transfer.minVertScale));
             max.setText(Misc.format(transfer.maxVertScale));
-            if(transfer.unit!=null) {
+            if (transfer.unit != null) {
                 unitCombo.setSelectedItem(transfer.unit.toString());
             }
         }
@@ -225,3 +232,4 @@ public class VertScaleDialog extends JPanel implements ActionListener {
     }
 
 }
+

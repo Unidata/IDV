@@ -2446,6 +2446,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
          */
         public TransectDisplayRenderer() {
             super();
+            //setScreenBasedScaleFactor(6.0);
         }
 
         /**
