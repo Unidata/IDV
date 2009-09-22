@@ -77,6 +77,17 @@
          title="World Etopo Land - Static"/>
 -->
 
+
+  <wms
+     server="http://cwcgom.aoml.noaa.gov/erddap/wms/request"
+     layer="etopo180:altitude"
+     title="Global Topography - Dynamic"
+     srs="EPSG:4326"
+     format="image/png"
+     version="1.3.0"
+     bbox="90,-180,-90,180"/>
+
+
   <wms
      server="http://terraserver-usa.com/ogcmap.ashx"
      layer="DRG"
