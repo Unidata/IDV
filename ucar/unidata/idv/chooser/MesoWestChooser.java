@@ -100,6 +100,15 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
     public static final String ARG_DAY1 = "day1";
     public static final String ARG_MONTH1 = "month1";
     public static final String ARG_YEAR1 = "year1";
+    public static final String ARG_RAWSFLAG = "rawsflag";
+
+    public static final String ARG_MINUTES = "minutes";
+
+    public static final int RAWS_NWS = 3;
+    public static final int RAWS_NWSANDRAWS = 1;
+    public static final int RAWS_ALL = 290;
+
+
 
     private JTextField clatFld;
     private JTextField clonFld;
@@ -107,6 +116,8 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
     private DateTimePicker dateTimePicker;
     private NavigatedMapPanel map;
     private JLabel statusLbl;
+    private JComboBox rawsBox;
+    private JComboBox minutesBox;
 
     /**
      * Create the <code>UrlChooser</code>
@@ -205,6 +216,20 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
      * @return The GUI
      */
     protected JComponent doMakeContents() {
+        Vector rawsList = new Vector();
+        rawsList.add(new TwoFacedObject("NWS Only", new Integer(RAWS_NWS)));
+        rawsList.add(new TwoFacedObject("NWS and RAWS", new Integer(RAWS_NWSANDRAWS)));
+        rawsList.add(new TwoFacedObject("All", new Integer(RAWS_ALL)));
+        rawsBox = new JComboBox(rawsList);
+
+        Vector minutesList = new Vector();
+        minutesList.add(new TwoFacedObject("5 Minutes",new Integer(5)));
+        minutesList.add(new TwoFacedObject("15 Minutes",new Integer(15)));
+        minutesList.add(new TwoFacedObject("30 Minutes",new Integer(30)));
+        minutesList.add(new TwoFacedObject("60 Minutes",new Integer(60)));
+        minutesBox = new JComboBox(minutesList);
+
+
         statusLbl = new JLabel("");
         map = new NavigatedMapPanel(true,true) {
                 protected void annotateMap(Graphics2D g) {
@@ -234,21 +259,25 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
             throw new RuntimeException(exc);
         }
 
-        np.setPreferredSize(new Dimension(400,400));
+        np.setPreferredSize(new Dimension(350,350));
         //        StationLocationMap map = getStationMap();
         dateTimePicker = new DateTimePicker();
 
         List comps = new ArrayList();
         comps.add(GuiUtils.rLabel("Date/Time:"));
         comps.add(GuiUtils.left(dateTimePicker));
+        comps.add(GuiUtils.rLabel("Interval:"));
+        comps.add(GuiUtils.left(minutesBox));
+
+        comps.add(GuiUtils.rLabel("Observations:"));
+        comps.add(GuiUtils.left(rawsBox));
+
         comps.add(GuiUtils.rLabel("Location:"));   
         comps.add(GuiUtils.centerBottom(np,GuiUtils.left(np.getNavToolBar())));
         comps.add(GuiUtils.filler());
         comps.add(GuiUtils.left(statusLabel));
 
-        JComponent mainContents = GuiUtils.doLayout(comps,2,
-                                                    GuiUtils.WT_NY,
-                                                    GuiUtils.WT_NYN);
+        JComponent mainContents = GuiUtils.formLayout(comps);
         JComponent urlButtons = getDefaultButtons();
         setHaveData(true);
         return GuiUtils.top(GuiUtils.vbox(mainContents,urlButtons));
@@ -299,6 +328,10 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
             new String[]{
                 ARG_CLAT, (llr.getLatMin()+(llr.getLatMax()-llr.getLatMin())/2)+"",
                 ARG_CLON, (llr.getLonMin()+(llr.getLonMax()-llr.getLonMin())/2)+"",
+                ARG_RAWSFLAG,
+                ((TwoFacedObject)rawsBox.getSelectedItem()).getId().toString(),
+                ARG_MINUTES,
+                ((TwoFacedObject)minutesBox.getSelectedItem()).getId().toString(),
                 ARG_BOXRAD,  radii+"",
                 ARG_HOUR1,hour,
                 ARG_DAY1,day,
