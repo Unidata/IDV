@@ -430,6 +430,11 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         brightnessBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 modeBrightnessBtn.setSelected(true);
+                if(setColorFromChooserCbx.isSelected()) {
+                    if(currentBP!=null) {
+                        setBrightness(currentBP, currentBP);
+                    }
+                }
             }
         });
 
@@ -446,6 +451,11 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         transBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 modeTransparencyBtn.setSelected(true);
+                if(setColorFromChooserCbx.isSelected()) {
+                    if(currentBP!=null) {
+                        setTransparency(currentBP, currentBP);
+                    }
+                }
             }
         });
 
@@ -1512,14 +1522,10 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
             transMenu.add(interpTrans);
             interpTrans.add(mi = GuiUtils.makeMenuItem("All", this,
                     "interpolateTransAll"));
-            mi.setToolTipText("Control-t;Control-a");
-
             interpTrans.add(mi = GuiUtils.makeMenuItem("Left", this,
                     "interpolateTransLeft"));
-            mi.setToolTipText("Control-t;Control-left arrow");
             interpTrans.add(mi = GuiUtils.makeMenuItem("Right", this,
                     "interpolateTransRight"));
-            mi.setToolTipText("Control-t;Control-right arrow");
         }
 
         String brightLbl = brightnessBox.getSelectedItem().toString();
@@ -1536,6 +1542,16 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
             scaleMenu.add(mi = GuiUtils.makeMenuItem("Right", this,
                     "brightRight"));
             mi.setToolTipText("Control-b;Control-right arrow");
+
+            JMenu interpBrightness= new JMenu("Interpolate");
+            scaleMenu.add(interpBrightness);
+            interpBrightness.add(mi = GuiUtils.makeMenuItem("All", this,
+                    "interpolateBrightnessAll"));
+            interpBrightness.add(mi = GuiUtils.makeMenuItem("Left", this,
+                    "interpolateBrightnessLeft"));
+            interpBrightness.add(mi = GuiUtils.makeMenuItem("Right", this,
+                    "interpolateBrightnessRight"));
+
         }
 
         popup.add(GuiUtils.makeMenuItem("Replicate Color Table", this,
@@ -1827,6 +1843,8 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
 
 
 
+
+
     /**
      * Set the color at the current BP
      *
@@ -2013,6 +2031,33 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
     }
 
 
+
+    /**
+     * Interpolate transparency from end to end
+     */
+    public void interpolateBrightnessAll() {
+        prepColorChange();
+        interpolateBrightness(0, colorList.size() - 1, (Color) colorList.get(0),
+                         (Color) colorList.get(colorList.size() - 1));
+    }
+
+
+    /**
+     * Interpolate transparency left
+     */
+    public void interpolateBrightnessLeft() {
+        interpolateBrightness(getPrevious(currentBP), currentBP);
+    }
+
+    /**
+     * Interpolate transparency right
+     */
+    public void interpolateBrightnessRight() {
+        interpolateBrightness(currentBP, getNext(currentBP));
+    }
+
+
+
     /**
      * replicate
      */
@@ -2170,6 +2215,58 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
             Color current  = (Color) colorList.get(i);
             colorList.set(i, new Color(current.getRed(), current.getGreen(),
                                        current.getBlue(), newAlpha));
+        }
+        tableChanged();
+        repaint();
+    }
+
+
+
+    /**
+     * Do a linear interpolation of the colors in the range defined
+     * by the given breakpoints.
+     *
+     *
+     * @param from starting breakpoint
+     * @param to ending breakpoint
+     */
+    public void interpolateBrightness(ColorTable.Breakpoint from,
+                                 ColorTable.Breakpoint to) {
+        int lowerColorIndex = percentToColorIndex(((from != null)
+                ? from.getValue()
+                : 0.0));
+        int upperColorIndex = percentToColorIndex(((to != null)
+                ? to.getValue()
+                : 1.0));
+
+        prepColorChange();
+        interpolateBrightness(lowerColorIndex, upperColorIndex,
+                         (Color) colorList.get(lowerColorIndex),
+                         (Color) colorList.get(upperColorIndex));
+    }
+
+
+    /**
+     * Do a linear interpolation of transparency between the given colors
+     *
+     * @param lowerColorIndex Where to start
+     * @param upperColorIndex Where to end
+     * @param lowerColor The lower color
+     * @param upperColor The upper color
+     */
+    public void interpolateBrightness(int lowerColorIndex, int upperColorIndex,
+                                 Color lowerColor, Color upperColor) {
+        float steps = (float) (upperColorIndex - lowerColorIndex + 1);
+
+
+        float f1 =  ((Float)scales.get(lowerColorIndex)).floatValue();
+        float f2 =  ((Float)scales.get(upperColorIndex)).floatValue();
+
+        float brightnessStep = (f2-f1)/ steps;
+        int cnt = 0;
+        for (int i = lowerColorIndex; i <= upperColorIndex; i++, cnt++) {
+            float   newBrightness = f1 +  (brightnessStep * cnt);
+            scales.set(i, new Float(newBrightness));
         }
         tableChanged();
         repaint();
