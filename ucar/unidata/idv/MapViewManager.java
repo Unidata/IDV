@@ -2611,7 +2611,7 @@ public class MapViewManager extends NavigatedViewManager {
      * @return The ShowPipPanel
      */
     public boolean getShowPip() {
-        return getBp(PREF_SHOWPIP);
+        return getBp(PREF_SHOWPIP,false);
     }
 
 
@@ -2689,7 +2689,14 @@ public class MapViewManager extends NavigatedViewManager {
      *  @return The GlobeBackgroundShow
      */
     public boolean getGlobeBackgroundShow() {
-        return getBp(PREF_SHOWGLOBEBACKGROUND);
+        if(hasBooleanProperty(PREF_SHOWGLOBEBACKGROUND)) {
+            return getBp(PREF_SHOWGLOBEBACKGROUND,false);
+        }
+        XmlObjectStore store        = getStore();
+        if (store != null) {
+            return  store.get(PREF_SHOWGLOBEBACKGROUND, false);
+        }
+        return false;
     }
 
     /**

@@ -980,7 +980,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
         mainSplitPane.setOneTouchExpandable(true);
         if(splitPaneLocation>=0) {
-            mainSplitPane.setDividerLocation(splitPaneLocation);
+            //SPLIT       mainSplitPane.setDividerLocation(splitPaneLocation);
         }
 
 
@@ -1035,6 +1035,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      *
      */
     protected void adjustSplitPane() {
+        //SPLIT
+        if(true) return;
         //        centerPanelWrapper.removeAll();
         if (legendState.equals(IdvLegend.STATE_DOCKED)) {
             mainSplitPane.resetToPreferredSizes();
@@ -1755,10 +1757,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
             }
 
             if(that.splitPaneLocation>=0) {
+                //SPLIT
+                /*
                 this.splitPaneLocation = that.splitPaneLocation;
                 if(mainSplitPane!=null) {
                     mainSplitPane.setDividerLocation(that.splitPaneLocation);
                 }
+                */
             }
         }
 
@@ -2484,6 +2489,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @return The BooleanProperty
      */
     protected BooleanProperty getBooleanProperty(String propertyId) {
+        return getBooleanProperty(propertyId, true);
+    }
+
+    protected BooleanProperty getBooleanProperty(String propertyId, boolean dflt) {
         if (booleanPropertyMap.size() == 0) {
             initBooleanProperties();
         }
@@ -2491,8 +2500,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
             (BooleanProperty) booleanPropertyMap.get(propertyId);
         if (bp == null) {
             bp = new BooleanProperty(propertyId, propertyId, propertyId,
-                                     true);
+                                     dflt);
             booleanPropertyMap.put(bp.getId(), bp);
+            initializeBooleanProperty(bp);
         }
         return bp;
     }
@@ -2516,7 +2526,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @return The value
      */
     protected boolean getBp(String propertyId) {
-        return getBooleanProperty(propertyId).getValue();
+        return getBp(propertyId, true);
+    }
+
+
+    protected boolean getBp(String propertyId, boolean dflt) {
+        return getBooleanProperty(propertyId, dflt).getValue();
     }
 
 
