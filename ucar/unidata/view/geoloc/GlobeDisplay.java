@@ -105,10 +105,10 @@ public class GlobeDisplay extends NavigatedDisplay {
     /** altitude ScalarMap */
     private ScalarMap altitudeMap = null;
 
-    /** minimum range for altitudeMap */
+    /** minimum range for altitudeMap; about a 40x vertical exaggeration */
     private double altitudeMin = -159000;
 
-    /** maximum range for altitudeMap */
+    /** maximum range for altitudeMap; about a 40x vertical exaggeration */
     private double altitudeMax = 159000;
 
     /** flag for whether this has been initialized or not */

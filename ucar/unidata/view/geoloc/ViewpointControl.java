@@ -22,9 +22,6 @@
 
 
 
-
-
-
 package ucar.unidata.view.geoloc;
 
 
@@ -404,7 +401,7 @@ public class ViewpointControl implements ActionListener {
                 if ( !SwingUtilities.isRightMouseButton(me)) {
                     return;
                 }
-                List items = new ArrayList();
+                List<Object> items = new ArrayList<Object>();
                 items.add(GuiUtils.makeMenuItem("Rotate Right",
                         ViewpointControl.this, "setRotate", ROTATE_RIGHT));
                 items.add(GuiUtils.makeMenuItem("Rotate Left",
