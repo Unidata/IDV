@@ -561,7 +561,7 @@ public class PointObFactory {
     public static CFPointObWriter makeWriter(DataOutputStream dos,
                                              Tuple tuple, int[] skipIndices,
                                              int defaultStringLength,
-                                             String altUnit, int cnt)
+                                             String altUnit, int cnt,int []slengths)
             throws Exception {
         TupleType        type      = (TupleType) tuple.getType();
         MathType[]       types     = type.getComponents();
@@ -585,7 +585,7 @@ public class PointObFactory {
             }
 
             if (types[fieldIdx] instanceof TextType) {
-                lengths[fieldIdx] = defaultStringLength;
+                lengths[fieldIdx] = (slengths==null?defaultStringLength:slengths[fieldIdx]);
                 haveText          = true;
                 isText[fieldIdx]  = true;
                 continue;

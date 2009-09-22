@@ -2011,7 +2011,6 @@ public class TextPointDataSource extends PointDataSource {
 
         }
 
-        final int numObs = 2000000;
         for (int i = argIdx; i < args.length; i++) {
             String csvFile = args[i];
             //            if(csvFile.endsWith(".xls")) {
@@ -2021,6 +2020,7 @@ public class TextPointDataSource extends PointDataSource {
             TextPointDataSource dataSource =
                 new TextPointDataSource(new DataSourceDescriptor(), csvFile,
                                         properties);
+
 
             String contents;
             if (args[i].endsWith(".xls")) {
@@ -2034,20 +2034,45 @@ public class TextPointDataSource extends PointDataSource {
             String ncFile = IOUtil.stripExtension(args[i]) + ".nc";
 
 
-            System.err.println("Writing nc file:" + ncFile);
-
+            
             if ( !doStream) {
+                System.err.println("Writing nc file:" + ncFile);
                 FieldImpl field = dataSource.makeObs(contents, ",", null,
                                       null, null, false, false);
 
 
                 PointObFactory.writeToNetcdf(new File(ncFile), field);
             } else {
+                System.err.println("Writing nc file:" + ncFile +" (streaming)");
                 final DataOutputStream dos =
                     new DataOutputStream(
                         new BufferedOutputStream(
                             new FileOutputStream(new File(ncFile)), 10000));
                 final CFPointObWriter[] writer = { null };
+                final int[] tupleCnt={0};
+
+                final int[][]lengths = {null};
+                dataSource.setStreamProcessor(
+                    new TextAdapter.StreamProcessor() {
+                        public void processTuple(Tuple tuple) {
+                            tupleCnt[0]++;
+                            if(tupleCnt[0]%10000 == 0)
+                                System.err.println("   " + tupleCnt[0]);
+                            Data[]  data  = tuple.getComponents();
+                            if(lengths[0]==null) {
+                                lengths[0] = new int[data.length];
+                                for(int i=0;i<lengths[0].length;i++) lengths[0][i]=2;
+                            }
+                            for (int i = 0; i < data.length; i++) {
+                                if (data[i] instanceof Text) {
+                                    String s = ((Text) data[i]).getValue();
+                                    lengths[0][i]=Math.max(s.length(),lengths[0][i]);
+                                }
+                            }
+                        }});
+                System.err.println ("First stage");
+                dataSource.makeObs(contents, ",", null,
+                                   null, null, false, false);
 
                 dataSource.setStreamProcessor(
                     new TextAdapter.StreamProcessor() {
@@ -2080,7 +2105,7 @@ public class TextPointDataSource extends PointDataSource {
                                 writer[0] = PointObFactory.makeWriter(dos,
                                         tuple, new int[] { latIndex,
                                         lonIndex, altIndex, timeIndex }, 200,
-                                                                      altUnit, numObs);
+                                                                      altUnit, tupleCnt[0],lengths[0]);
 
                                 int dcnt = 0;
                                 int scnt = 0;
@@ -2131,6 +2156,10 @@ public class TextPointDataSource extends PointDataSource {
                                  ? alt.getValue(CommonUnit.meter)
                                  : 0.0), ucar.visad.Util.makeDate(dttm),
                                          dvals, svals);
+                            cnt++;
+                            if(cnt %10000 == 0) {
+                                System.err.println ("   "+ cnt);
+                            }
                         } catch (Exception exc) {
                             throw new RuntimeException(exc);
                         }
@@ -2138,8 +2167,9 @@ public class TextPointDataSource extends PointDataSource {
                 });
 
 
-                FieldImpl field = dataSource.makeObs(contents, ",", null,
-                                      null, null, false, false);
+                System.err.println ("Second stage. Writing " + tupleCnt[0]+" obs");
+                dataSource.makeObs(contents, ",", null,
+                                   null, null, false, false);
 
                 if (writer[0] != null) {
                     writer[0].finish();
