@@ -193,8 +193,10 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
         for (int i = 0; i < stations.size(); i++) {
             String     st     = (String) stations.get(i);
             List<Data> tuples = stationsTuples.get(st);
+            Data [] tpData = tuples.toArray(new Data[tuples.size()]);
+            TupleType tupleType = Tuple.buildTupleType(tpData);
             Tuple tp =
-                new Tuple((Data[]) tuples.toArray(new Data[tuples.size()]));
+                new Tuple(tupleType, tpData );
             stationsTuple.put(st, tp);
         }
 
