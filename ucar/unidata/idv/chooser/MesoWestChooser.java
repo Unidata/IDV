@@ -101,12 +101,17 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
     public static final String ARG_MONTH1 = "month1";
     public static final String ARG_YEAR1 = "year1";
     public static final String ARG_RAWSFLAG = "rawsflag";
+    public static final String ARG_PAST = "past";
 
+    public static final String ARG_HOURS = "hours";
     public static final String ARG_MINUTES = "minutes";
 
     public static final int RAWS_NWS = 3;
     public static final int RAWS_NWSANDRAWS = 1;
     public static final int RAWS_ALL = 290;
+
+    private static String projectionString = "<object class=\"ucar.unidata.geoloc.projection.LatLonProjection\"><property name=\"CenterLon\"><double>-109</double></property><property name=\"Name\"><string><![CDATA[US>States>West>Colorado]]></string></property><property name=\"DefaultMapArea\"><object class=\"ucar.unidata.geoloc.ProjectionRect\"><constructor><double>-124</double><double>31</double><double>-100</double><double>47</double></constructor></object></property></object>";
+
 
 
 
@@ -118,6 +123,9 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
     private JLabel statusLbl;
     private JComboBox rawsBox;
     private JComboBox minutesBox;
+    private JComboBox rangeBox;
+    private JRadioButton mostRecentBtn;
+    private JRadioButton dateBtn;
 
     /**
      * Create the <code>UrlChooser</code>
@@ -219,17 +227,37 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
         Vector rawsList = new Vector();
         rawsList.add(new TwoFacedObject("NWS Only", new Integer(RAWS_NWS)));
         rawsList.add(new TwoFacedObject("NWS and RAWS", new Integer(RAWS_NWSANDRAWS)));
-        rawsList.add(new TwoFacedObject("All", new Integer(RAWS_ALL)));
+        rawsList.add(new TwoFacedObject("All Network" , new Integer(RAWS_ALL)));
         rawsBox = new JComboBox(rawsList);
 
-        Vector minutesList = new Vector();
-        minutesList.add(new TwoFacedObject("5 Minutes",new Integer(5)));
-        minutesList.add(new TwoFacedObject("15 Minutes",new Integer(15)));
-        minutesList.add(new TwoFacedObject("30 Minutes",new Integer(30)));
-        minutesList.add(new TwoFacedObject("60 Minutes",new Integer(60)));
-        minutesBox = new JComboBox(minutesList);
+        minutesBox = new JComboBox(new Vector());
+        Vector rangeList = new Vector();
+        rangeList.add(new TwoFacedObject("24 hours",new Integer(24)));
+        rangeList.add(new TwoFacedObject("12 hours",new Integer(12)));
+        rangeList.add(new TwoFacedObject("6 hours",new Integer(6)));
+        rangeList.add(new TwoFacedObject("2 hours",new Integer(2)));
+        rangeBox = new JComboBox(rangeList);
+        rangeBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    checkMinutes();
+                }
+            });
 
+        checkMinutes();
+        mostRecentBtn = new JRadioButton("Use most recent time", true);
+        mostRecentBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    checkDateEnable();
+                }
+            });
+        dateBtn = new JRadioButton("Select date:", true);
+        dateBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    checkDateEnable();                    
+                }
+            });
 
+        GuiUtils.buttonGroup(mostRecentBtn, dateBtn);
         statusLbl = new JLabel("");
         map = new NavigatedMapPanel(true,true) {
                 protected void annotateMap(Graphics2D g) {
@@ -252,22 +280,28 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
 
         map.repaint();
         try {
-        ProjectionImpl proj = (ProjectionImpl)getIdv().decodeObject("<object class=\"ucar.unidata.geoloc.projection.LatLonProjection\"><property name=\"CenterLon\"><double>-109</double></property><property name=\"Name\"><string><![CDATA[US>States>West>Colorado]]></string></property><property name=\"DefaultMapArea\"><object class=\"ucar.unidata.geoloc.ProjectionRect\"><constructor><double>-124</double><double>31</double><double>-100</double><double>47</double></constructor></object></property></object>");
+        ProjectionImpl proj = (ProjectionImpl)getIdv().decodeObject(projectionString);
 
         np.setProjectionImpl(proj);
         } catch(Exception exc) {
             throw new RuntimeException(exc);
         }
 
-        np.setPreferredSize(new Dimension(350,350));
+        np.setPreferredSize(new Dimension(250,300));
         //        StationLocationMap map = getStationMap();
         dateTimePicker = new DateTimePicker();
-
+        JComponent dateComp = GuiUtils.vbox(mostRecentBtn,
+                                            GuiUtils.hbox(dateBtn, dateTimePicker));
+        checkDateEnable();
         List comps = new ArrayList();
         comps.add(GuiUtils.rLabel("Date/Time:"));
-        comps.add(GuiUtils.left(dateTimePicker));
-        comps.add(GuiUtils.rLabel("Interval:"));
-        comps.add(GuiUtils.left(minutesBox));
+        comps.add(GuiUtils.left(dateComp));
+
+        comps.add(GuiUtils.rLabel("Range:"));
+        comps.add(GuiUtils.left(GuiUtils.hbox(rangeBox,
+                                              GuiUtils.filler(20,5),
+                                              GuiUtils.rLabel("Interval: "),
+                                              GuiUtils.left(minutesBox))));
 
         comps.add(GuiUtils.rLabel("Observations:"));
         comps.add(GuiUtils.left(rawsBox));
@@ -284,6 +318,30 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
     }
 
 
+
+    private void  checkMinutes() {
+        int hours = ((Integer)getId(rangeBox)).intValue();
+        Object selected = minutesBox.getSelectedItem();
+        Vector minutesList = new Vector();
+        minutesList.add(new TwoFacedObject("60 Minutes",new Integer(60)));
+        if(hours<24) {
+            minutesList.add(new TwoFacedObject("30 Minutes",new Integer(30)));
+            if(hours<12) {
+                minutesList.add(new TwoFacedObject("15 Minutes",new Integer(15)));
+                if(hours<6) {
+                    minutesList.add(new TwoFacedObject("5 Minutes",new Integer(5)));
+                }
+            }
+        }
+        GuiUtils.setListData(minutesBox, minutesList);
+        if(selected!=null && minutesList.contains(selected)) {
+            minutesBox.setSelectedItem(selected);
+        }
+    }
+
+    private void  checkDateEnable() {
+        GuiUtils.enableTree(dateTimePicker,!mostRecentBtn.isSelected());
+    }
 
     public void setStatus(String msg, String what) {
         super.setStatus("Press \"" + CMD_LOAD
@@ -324,27 +382,42 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
             radii = 5;
             maxedOut  =true;
         }
-        String url = HtmlUtil.url(BASEURL,
-            new String[]{
-                ARG_CLAT, (llr.getLatMin()+(llr.getLatMax()-llr.getLatMin())/2)+"",
-                ARG_CLON, (llr.getLonMin()+(llr.getLonMax()-llr.getLonMin())/2)+"",
-                ARG_RAWSFLAG,
-                ((TwoFacedObject)rawsBox.getSelectedItem()).getId().toString(),
-                ARG_MINUTES,
-                ((TwoFacedObject)minutesBox.getSelectedItem()).getId().toString(),
-                ARG_BOXRAD,  radii+"",
+        List<String> args = new ArrayList<String>();
+        if(mostRecentBtn.isSelected()) {
+            args.add(ARG_PAST);
+            args.add("0");
+        } else {
+            args.addAll(Misc.toList(new Object[]{
+                ARG_PAST,
+                "1",
                 ARG_HOUR1,hour,
                 ARG_DAY1,day,
                 ARG_MONTH1,month,
-                ARG_YEAR1,year});
-        //        System.out.println(url);
-
+                ARG_YEAR1,year}));
+        }
+        args.addAll(Misc.toList(new Object[]{
+            ARG_RAWSFLAG,
+            getId(rawsBox).toString(),
+            ARG_CLAT, (llr.getLatMin()+(llr.getLatMax()-llr.getLatMin())/2)+"",
+            ARG_CLON, (llr.getLonMin()+(llr.getLonMax()-llr.getLonMin())/2)+"",
+            ARG_BOXRAD,  
+            radii+"",
+            ARG_HOURS,
+            getId(rangeBox).toString(),
+            ARG_MINUTES,
+            getId(minutesBox).toString()}));
+        String url = HtmlUtil.url(BASEURL,
+                                  Misc.listToStringArray(args));
+        //        url = url+"${extra}"
+        System.out.println(url);
         if(makeDataSource(url, dataSourceId, properties)) {
             closeChooser();
         }
     }
 
-
+    private Object getId(JComboBox box) {
+        return ((TwoFacedObject)box.getSelectedItem()).getId();
+    }
 
 }
 
