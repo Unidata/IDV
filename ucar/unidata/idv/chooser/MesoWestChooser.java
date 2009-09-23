@@ -408,8 +408,7 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
             getId(minutesBox).toString()}));
         String url = HtmlUtil.url(BASEURL,
                                   Misc.listToStringArray(args));
-        //        url = url+"${extra}"
-        System.out.println(url);
+        url = url+"&maxcount=%maxcount%";
         if(makeDataSource(url, dataSourceId, properties)) {
             closeChooser();
         }

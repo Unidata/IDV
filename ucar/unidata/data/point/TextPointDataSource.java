@@ -380,12 +380,14 @@ public class TextPointDataSource extends PointDataSource {
             throws Exception {
         String source    = getSource(dataChoice);
         if(sampleIt) {
-            source = source.replace("${extra}","&count=1");
+            source = source.replace("%maxcount%","1");
         } else {
-            source = source.replace("${extra}","");
+            source = source.replace("%maxcount%","1000000");
         }
 
+        System.out.println("URL:"+source);
         String contents  = getContents(source);
+        System.out.println(contents);
         String delimiter = getDelimiter(source);
         return makeObs(contents, delimiter, subset, bbox, trackParam,
                        sampleIt, showAttributeGuiIfNeeded);
