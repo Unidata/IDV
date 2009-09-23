@@ -19,7 +19,6 @@
  */
 
 
-
 package ucar.unidata.data.point;
 
 
@@ -380,6 +379,12 @@ public class TextPointDataSource extends PointDataSource {
                              boolean showAttributeGuiIfNeeded)
             throws Exception {
         String source    = getSource(dataChoice);
+        if(sampleIt) {
+            source = source.replace("${extra}","&count=1");
+        } else {
+            source = source.replace("${extra}","");
+        }
+
         String contents  = getContents(source);
         String delimiter = getDelimiter(source);
         return makeObs(contents, delimiter, subset, bbox, trackParam,
