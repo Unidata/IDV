@@ -970,6 +970,10 @@ public class NamedStationTable extends StationTableImpl {
                     && (altIndex == -1)) {
                 altIndex = i;
                 //              int bracketIdx = name.indexOf("[");
+            } else  if (name.startsWith("elev")
+                        && (altIndex == -1)) {
+                altIndex = i;
+                //              int bracketIdx = name.indexOf("[");
             }
             if ((i != latIndex) && (i != lonIndex) && (i != altIndex)
                     && (titleIndex == -1)) {
