@@ -991,32 +991,8 @@ public class StorageManager extends RepositoryManager {
      *
      * @return _more_
      */
-    public String getFileTail(String fileName) {
-        int idx = fileName.indexOf("_file_");
-        if (idx >= 0) {
-            fileName = fileName.substring(idx + "_file_".length());
-        } else {
-            /*
-               We had this here for files from old versions of RAMADDA where we did not add the _file_ delimiter
-            */
-            int idx1 = fileName.indexOf("-");
-            if (idx1 >= 0) {
-                int idx2 = fileName.indexOf("-", idx1);
-                if (idx2 >= 0) {
-                    idx = fileName.indexOf("_");
-                    if (idx >= 0) {
-                        fileName = fileName.substring(idx + 1);
-                    }
-                }
-            }
-        }
-        //Check for Rich's problem
-        idx = fileName.lastIndexOf("\\");
-        if (idx >= 0) {
-            fileName = fileName.substring(idx + 1);
-        }
-        String tail = IOUtil.getFileTail(fileName);
-        return tail;
+    public static String getFileTail(String fileName) {
+        return RepositoryUtil.getFileTail(fileName);
     }
 
     /**

@@ -50,8 +50,6 @@ public class Entry extends Entity {
     /** _more_ */
     public static final double NONGEO = -999999;
 
-
-
     /** _more_ */
     Object[] values;
 

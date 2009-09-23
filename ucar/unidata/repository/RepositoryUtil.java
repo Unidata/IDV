@@ -20,10 +20,12 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
 import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.util.IOUtil;
 
 import java.io.*;
 
@@ -32,11 +34,7 @@ import java.net.*;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
 import java.util.TimeZone;
 
 
@@ -95,6 +93,43 @@ public class RepositoryUtil {
         return dateFormat;
     }
 
+
+    /**
+     * _more_
+     *
+     * @param fileName _more_
+     *
+     * @return _more_
+     */
+    public static String getFileTail(String fileName) {
+        int idx = fileName.indexOf("_file_");
+        if (idx >= 0) {
+            fileName = fileName.substring(idx + "_file_".length());
+        } else {
+            /*
+               We had this here for files from old versions of RAMADDA where we did not add the _file_ delimiter
+            */
+            int idx1 = fileName.indexOf("-");
+            if (idx1 >= 0) {
+                int idx2 = fileName.indexOf("-", idx1);
+                if (idx2 >= 0) {
+                    idx = fileName.indexOf("_");
+                    if (idx >= 0) {
+                        fileName = fileName.substring(idx + 1);
+                    }
+                }
+            }
+        }
+        //Check for Rich's problem
+        idx = fileName.lastIndexOf("\\");
+        if (idx >= 0) {
+            fileName = fileName.substring(idx + 1);
+        }
+        String tail = IOUtil.getFileTail(fileName);
+        return tail;
+
+
+    }
 
 
     /**

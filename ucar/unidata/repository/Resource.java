@@ -23,8 +23,6 @@
 package ucar.unidata.repository;
 
 
-import ucar.unidata.ui.ImageUtils;
-
 
 
 import java.io.File;
@@ -143,7 +141,10 @@ public class Resource {
      * @return _more_
      */
     public boolean isImage() {
-        return ImageUtils.isImage(path);
+        if(path==null) return false;
+        String  file = path.toLowerCase();
+        return file.endsWith(".jpg") || file.endsWith(".jpeg")
+               || file.endsWith(".gif") || file.endsWith(".png");
     }
 
     /**

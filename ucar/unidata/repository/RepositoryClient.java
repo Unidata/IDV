@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository;
 
 
@@ -42,6 +43,8 @@ import java.io.ByteArrayOutputStream;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
 import java.net.URL;
 
@@ -187,7 +190,7 @@ public class RepositoryClient extends RepositoryBase {
         System.err.println(
             "Usage: RepositoryClient <server url> <user id> <password> <arguments>");
         System.err.println(
-            "Where arguments are:\n\t-parent <parent group id>\n\t-file <file to upload>\n\t-name <entry name>\n\t-descr <entry description>\n\t-attach <file to attach>\n\t-addmetadata (Add full metadata to entry)\n\t-addshortmetadata (Add spatial/temporal metadata to entry)\n\t");
+            "Where arguments are:\nFor fetching: \n\t-fetch <entry id> <destination file or directory>\n\nFor uploading:\n\t-parent <parent group id>\n\t-file <file to upload>\n\t-name <entry name>\n\t-descr <entry description>\n\t-attach <file to attach>\n\t-addmetadata (Add full metadata to entry)\n\t-addshortmetadata (Add spatial/temporal metadata to entry)\n\t");
         System.exit(1);
     }
 
@@ -209,6 +212,14 @@ public class RepositoryClient extends RepositoryBase {
         boolean    haveParent = false;
         for (int i = 3; i < args.length; i++) {
             String arg = args[i];
+            if (arg.equals("-fetch")) {
+                if (i>= args.length-2) {
+                    usage("Bad -fetch argument");
+                }
+                File f = writeFile(args[i+1], new File(args[i+2]));
+                System.err.println ("Wrote file to:" + f);
+                return;
+            }
             if (arg.equals("-name")) {
                 if (i == args.length) {
                     usage("Bad -name argument");
@@ -552,6 +563,8 @@ public class RepositoryClient extends RepositoryBase {
                 return;
             }
 
+            //            client.writeFile("46d283c8-b852-4a6f-a6e6-055b7ac19fe9",
+            //                             new File("test.nc"));
             client.processCommandLine(args);
         } catch (Exception exc) {
             System.err.println("Error:" + exc);
@@ -559,6 +572,100 @@ public class RepositoryClient extends RepositoryBase {
         }
 
     }
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param entryId _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public ClientEntry getEntry(String entryId) throws Exception {
+        checkSession();
+        String[] args = new String[] {
+            ARG_ENTRYID, entryId, ARG_OUTPUT, "xml.xml", ARG_SESSIONID,
+            getSessionId()
+        };
+        String url = HtmlUtil.url(URL_ENTRY_SHOW.getFullUrl(), args);
+        String xml = IOUtil.readContents(url, getClass());
+        Element root  = XmlUtil.getRoot(xml);
+
+        ClientEntry   entry = new ClientEntry(entryId);
+        entry.setName(XmlUtil.getAttribute(root, ATTR_NAME));
+        String desc = XmlUtil.getGrandChildText(root, TAG_DESCRIPTION);
+        if (desc != null) {
+            entry.setDescription(desc);
+        }
+        if (XmlUtil.hasAttribute(root, ATTR_RESOURCE)) {
+            entry.setResource(new Resource(XmlUtil.getAttribute(root,
+                    ATTR_RESOURCE), XmlUtil.getAttribute(root,
+                        ATTR_RESOURCE_TYPE)));
+        }
+
+        return entry;
+    }
+
+
+    /**
+     * This gets a input stream to the file download for the given entry
+     *
+     * @param entryId entry id
+     *
+     * @return  inputstream to the file download
+     *
+     * @throws Exception On badness
+     */
+    public InputStream getResourceInputStream(String entryId)
+            throws Exception {
+        checkSession();
+        String url = HtmlUtil.url(URL_ENTRY_GET.getFullUrl(),
+                                  new String[] { ARG_ENTRYID,
+                entryId, ARG_SESSIONID, getSessionId() });
+        return IOUtil.getInputStream(url, getClass());
+    }
+
+
+
+    /**
+     * Download the resource for the given entry and write it to the given file. If the
+     * toFileOrDirectory argument is a directory then download the Entry information from
+     * RAMADDA and use the file name as the name of the file to write to. If a file of that name
+     * already exists then it will get overwritten
+     *
+     * @param entryId The entry id
+     * @param toFileOrDirectory The file or directory to write to
+     *
+     * @return the file that was written
+     * @throws Exception On badness
+     */
+    public File writeFile(String entryId, File toFileOrDirectory)
+            throws Exception {
+        //If this is a directory then we need to get the file name from ramadda
+        if (toFileOrDirectory.isDirectory()) {
+            ClientEntry entry = getEntry(entryId);
+            if ((entry.getResource() == null)
+                    || (entry.getResource().getPath() == null)) {
+                throw new IllegalStateException(
+                    "Given entry does not have a file");
+            }
+            String fileTail =
+                RepositoryUtil.getFileTail(entry.getResource().getPath());
+            toFileOrDirectory = new File(IOUtil.joinDir(toFileOrDirectory,
+                    fileTail));
+        }
+
+        InputStream stream = getResourceInputStream(entryId);
+        IOUtil.copyFile(stream, toFileOrDirectory);
+        stream.close();
+        return toFileOrDirectory;
+    }
+
 
 
     /**
@@ -732,6 +839,19 @@ public class RepositoryClient extends RepositoryBase {
 
 
 
+
+
+    /**
+     * _more_
+     *
+     * @throws InvalidSession _more_
+     */
+    public void checkSession() throws InvalidSession {
+        String[] msg = { "" };
+        if ( !isValidSession(true, msg)) {
+            throw new InvalidSession(msg[0]);
+        }
+    }
 
 
 
@@ -1024,6 +1144,26 @@ public class RepositoryClient extends RepositoryBase {
      */
     public String getDefaultGroupName() {
         return defaultGroupName;
+    }
+
+
+
+    /**
+     * Class InvalidSession _more_
+     *
+     *
+     * @author IDV Development Team
+     */
+    public static class InvalidSession extends RuntimeException {
+
+        /**
+         * _more_
+         *
+         * @param message _more_
+         */
+        public InvalidSession(String message) {
+            super(message);
+        }
     }
 
 
