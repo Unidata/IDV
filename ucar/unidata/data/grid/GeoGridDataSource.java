@@ -19,7 +19,6 @@
  */
 
 
-
 package ucar.unidata.data.grid;
 
 
@@ -144,6 +143,9 @@ public class GeoGridDataSource extends GridDataSource {
 
     /** property timesize */
     public static final String PROP_TIMESIZE = "prop.timesize";
+
+    /** property time variable */
+    public static final String PROP_TIMEVAR = "timeVariable";
 
     /** This is used to synchronize geogrid read access */
     protected final Object readLock = new Object();
@@ -1021,12 +1023,13 @@ public class GeoGridDataSource extends GridDataSource {
 
         //Make sythetic data ncml file
         if (sources.size() > 1) {
-            StringBuffer sb = new StringBuffer();
+            String       timeName = getProperty(PROP_TIMEVAR, "time");
+            StringBuffer sb       = new StringBuffer();
             sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
             sb.append(
                 "<netcdf xmlns=\"http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2\">\n");
-            sb.append(
-                "<aggregation type=\"joinExisting\" dimName=\"time\" timeUnitsChange=\"true\">\n");
+            sb.append("<aggregation type=\"joinExisting\" dimName=\""
+                      + timeName + "\" timeUnitsChange=\"true\">\n");
             for (int i = 0; i < sources.size(); i++) {
                 String s = sources.get(i).toString();
                 try {
@@ -2241,10 +2244,9 @@ public class GeoGridDataSource extends GridDataSource {
      * @return extra comp
      */
     protected JComponent getExtraTimesComponent() {
-        reverseTimesCheckbox = new JCheckBox(
-            "Reverse Times",
-            reverseTimes);
-        reverseTimesCheckbox.setToolTipText("If you have selected the first time then really use the last time");
+        reverseTimesCheckbox = new JCheckBox("Reverse Times", reverseTimes);
+        reverseTimesCheckbox.setToolTipText(
+            "If you have selected the first time then really use the last time");
         return GuiUtils.right(reverseTimesCheckbox);
     }
 
