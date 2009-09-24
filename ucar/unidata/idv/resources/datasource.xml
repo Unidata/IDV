@@ -127,6 +127,21 @@
      fileselection="true"
      doesmultiples="true"
      label="Aggregate Grids by Time">
+    <property name="timeVariable" value="time"/>
+    <property
+       name="icon"
+       value="/auxdata/ui/icons/3D.gif"/>
+  </datasource>
+
+
+  <datasource
+     id="aggregated.WRFnetCDF.Grid"
+     factory="ucar.unidata.data.grid.GeoGridDataSource"
+     xxxpatterns="If we use any patterns here is will screw up adding multiple grid files as separate data sources"
+     fileselection="true"
+     doesmultiples="true"
+     label="Aggregate WRF netCDF grids by Time">
+    <property name="timeVariable" value="Time"/>
     <property
        name="icon"
        value="/auxdata/ui/icons/3D.gif"/>
