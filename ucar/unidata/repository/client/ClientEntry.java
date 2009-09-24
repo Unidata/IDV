@@ -21,9 +21,8 @@
  */
 
 
-
-
-package ucar.unidata.repository;
+package ucar.unidata.repository.client;
+import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.Element;

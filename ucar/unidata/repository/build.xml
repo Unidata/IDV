@@ -58,7 +58,7 @@
         <antcall target="repositorytar"/>
         <antcall target="repositorywar"/>
         <antcall target="clientjar"/>
-
+        <antcall target="idvplugin"/>
     </target>
 
 
@@ -80,6 +80,7 @@
            target="1.5"
         >
         <include name="ucar/unidata/repository/idv/RamaddaPublisher.java"/>
+        <include name="ucar/unidata/repository/InteractiveRepositoryClient.java"/>
         </javac>
         <jar 
             basedir="${compiledir}"
@@ -163,6 +164,7 @@
             memoryMaximumSize="256m"
            target="1.5"
         >
+        <include name="ucar/unidata/repository/client/InteractiveRepositoryClient.java"/>
         <include name="ucar/unidata/repository/InteractiveRepositoryClient.java"/>
         </javac>
         <mkdir dir="${tmpjardir}"/>
