@@ -416,15 +416,16 @@ public class RepositoryClient extends RepositoryBase {
      * @param parent _more_
      * @param filePath _more_
      *
+     * @return The id of the uploaded entry
      * @throws Exception _more_
      */
-    public static void uploadFileToRamadda(String host, int port,
+    public static String uploadFileToRamadda(String host, int port,
                                            String base, String user,
                                            String passwd, String entryName,
                                            String entryDescription,
                                            String parent, String filePath)
             throws Exception {
-        uploadFileToRamadda(new URL("http://" + host + ":" + port + base),
+        return uploadFileToRamadda(new URL("http://" + host + ":" + port + base),
                             user, passwd, entryName, entryDescription,
                             parent, filePath);
     }
@@ -442,22 +443,26 @@ public class RepositoryClient extends RepositoryBase {
      * @param parent _more_
      * @param filePath _more_
      *
+     * @return The id of the uploaded entry
      * @throws Exception _more_
      */
-    public static void uploadFileToRamadda(URL host, String user,
+    public static String uploadFileToRamadda(URL host, String user,
                                            String passwd, String entryName,
                                            String entryDescription,
                                            String parent, String filePath)
             throws Exception {
 
         RepositoryClient client = new RepositoryClient(host, user, passwd);
-        String[]         msg    = { "" };
-        if (client.isValidSession(true, msg)) {
-            System.err.println("Valid session");
-        } else {
-            System.err.println("Invalid session:" + msg[0]);
-            return;
-        }
+        return client.uploadFile(entryName, entryDescription, parent, filePath);
+    }
+
+
+    public String uploadFile(String entryName,
+                             String entryDescription,
+                             String parent, String filePath)
+        throws Exception {
+
+        checkSession();
 
         Document doc = XmlUtil.makeDocument();
         Element root = XmlUtil.create(doc, TAG_ENTRIES, null,
@@ -469,6 +474,7 @@ public class RepositoryClient extends RepositoryBase {
          * name
          */
         entryNode.setAttribute(ATTR_NAME, entryName);
+
         /*
          * description
          */
@@ -515,27 +521,24 @@ public class RepositoryClient extends RepositoryBase {
 
         List<HttpFormEntry> postEntries = new ArrayList<HttpFormEntry>();
         postEntries.add(HttpFormEntry.hidden(ARG_SESSIONID,
-                                             client.getSessionId()));
+                                             getSessionId()));
         postEntries.add(HttpFormEntry.hidden(ARG_RESPONSE, RESPONSE_XML));
         postEntries.add(new HttpFormEntry(ARG_FILE, "entries.zip",
                                           bos.toByteArray()));
 
-        RequestUrl URL_ENTRY_XMLCREATE = new RequestUrl(client,
+        RequestUrl URL_ENTRY_XMLCREATE = new RequestUrl(this,
                                              "/entry/xmlcreate");
-        String[] result = client.doPost(URL_ENTRY_XMLCREATE, postEntries);
+        String[] result = doPost(URL_ENTRY_XMLCREATE, postEntries);
         if (result[0] != null) {
-            System.err.println("Error:" + result[0]);
-            return;
+            throw new EntryErrorException(result[0]);
         }
 
-        System.err.println("result:" + result[1]);
         Element response = XmlUtil.getRoot(result[1]);
-
         String  body     = XmlUtil.getChildText(response).trim();
-        if (client.responseOk(response)) {
-            System.err.println("OK:" + body);
+        if (responseOk(response)) {
+            return body.trim();
         } else {
-            System.err.println("Error:" + body);
+            throw new EntryErrorException(body);
         }
 
     }
@@ -1162,6 +1165,19 @@ public class RepositoryClient extends RepositoryBase {
          * @param message _more_
          */
         public InvalidSession(String message) {
+            super(message);
+        }
+    }
+
+
+    public static class EntryErrorException extends RuntimeException {
+
+        /**
+         * _more_
+         *
+         * @param message _more_
+         */
+        public EntryErrorException(String message) {
             super(message);
         }
     }

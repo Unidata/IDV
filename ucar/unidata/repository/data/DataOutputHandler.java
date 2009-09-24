@@ -437,6 +437,27 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
+    public void addToEntryNode(Request request, Entry entry, Element node) throws Exception {
+        super.addToEntryNode(request, entry, node);
+        if ( !getRepository().getAccessManager().canAccessFile(request,
+                entry)) {
+            return;
+        }
+        if ( !canLoadAsCdm(entry)) {
+            return;
+        }
+        String url  = getFullTdsUrl(entry);
+        Element serviceNode = 
+            XmlUtil.create(TAG_SERVICE, node);
+        XmlUtil.setAttributes(serviceNode,
+                              new String[]{
+                                  ATTR_TYPE, "opendap",
+                                  ATTR_URL, url
+                              });
+
+    }
+
+
     /**
      * _more_
      *
@@ -454,7 +475,6 @@ public class DataOutputHandler extends OutputHandler {
         if (entry == null) {
             return;
         }
-
 
         if ( !getRepository().getAccessManager().canAccessFile(request,
                 entry)) {
@@ -489,7 +509,6 @@ public class DataOutputHandler extends OutputHandler {
 
         Object oldOutput = request.getOutput();
         request.put(ARG_OUTPUT, OUTPUT_OPENDAP);
-
         String opendapUrl = getRepository().URL_ENTRY_SHOW + "/"
                             + request.getPathEmbeddedArgs() + "/"
                             + getStorageManager().getFileTail(entry)

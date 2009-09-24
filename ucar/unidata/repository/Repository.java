@@ -3326,8 +3326,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      * @return _more_
      */
-    protected List<OutputHandler> getOutputHandlers() {
-        return outputHandlers;
+    public List<OutputHandler> getOutputHandlers() {
+        return new ArrayList<OutputHandler>(outputHandlers);
     }
 
     /**

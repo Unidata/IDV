@@ -274,7 +274,7 @@ public class XmlOutputHandler extends OutputHandler {
      */
     public Result outputEntry(Request request, Entry entry) throws Exception {
         Document     doc  = XmlUtil.makeDocument();
-        Element      root = getEntryTag(entry, doc, null);
+        Element      root = getEntryTag(request, entry, doc, null);
         StringBuffer sb   = new StringBuffer(XmlUtil.toString(root));
         return new Result("", sb, repository.getMimeTypeFromSuffix(".xml"));
     }
@@ -308,7 +308,7 @@ public class XmlOutputHandler extends OutputHandler {
             getGroupTag(request, subgroup, doc, root);
         }
         for (Entry entry : entries) {
-            getEntryTag(entry, doc, root);
+            getEntryTag(request, entry, doc, root);
         }
         StringBuffer sb = new StringBuffer(XmlUtil.toString(root));
         return new Result("", sb, repository.getMimeTypeFromSuffix(".xml"));
@@ -341,7 +341,7 @@ public class XmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    private Element getEntryTag(Entry entry, Document doc, Element parent)
+    private Element getEntryTag(Request request, Entry entry, Document doc, Element parent)
             throws Exception {
         Element node = XmlUtil.create(doc, TAG_ENTRY, parent, new String[] {
             ATTR_ID, entry.getId(), ATTR_NAME, entry.getName(), ATTR_RESOURCE,
@@ -357,6 +357,10 @@ public class XmlOutputHandler extends OutputHandler {
             getRepository().formatDate(new Date(entry.getCreateDate()))
         });
 
+
+        for (OutputHandler outputHandler : getRepository().getOutputHandlers()) {
+            outputHandler.addToEntryNode(request, entry, node);
+        }
 
         if ((entry.getDescription() != null)
                 && (entry.getDescription().length() > 0)) {
@@ -384,7 +388,7 @@ public class XmlOutputHandler extends OutputHandler {
     private Element getGroupTag(Request request, Group group, Document doc,
                                 Element parent)
             throws Exception {
-        Element node = getEntryTag(group, doc, parent);
+        Element node = getEntryTag(request, group, doc, parent);
         boolean canDoNew = getAccessManager().canDoAction(request, group,
                                Permission.ACTION_NEW);
         boolean canDoUpload = getAccessManager().canDoAction(request, group,

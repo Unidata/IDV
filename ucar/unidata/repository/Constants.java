@@ -1090,6 +1090,8 @@ public interface Constants {
     /** _more_ */
     public static final String TAG_DESCRIPTION = "description";
 
+    public static final String TAG_SERVICE = "service";
+
     /** _more_ */
     public static final String TAG_EDGE = "edge";
 

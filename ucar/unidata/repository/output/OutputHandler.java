@@ -159,6 +159,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      */
     public void clearCache() {}
 
+    public void addToEntryNode(Request request, Entry entry, Element node) throws Exception  {
+    }
+
+
     /**
      * _more_
      *
