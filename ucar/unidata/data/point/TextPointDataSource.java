@@ -385,9 +385,9 @@ public class TextPointDataSource extends PointDataSource {
             source = source.replace("%maxcount%","1000000");
         }
 
-        System.out.println("URL:"+source);
+        //        System.out.println("URL:"+source);
         String contents  = getContents(source);
-        System.out.println(contents);
+        //        System.out.println(contents);
         String delimiter = getDelimiter(source);
         return makeObs(contents, delimiter, subset, bbox, trackParam,
                        sampleIt, showAttributeGuiIfNeeded);
