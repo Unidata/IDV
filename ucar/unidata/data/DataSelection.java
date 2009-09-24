@@ -45,6 +45,9 @@ public class DataSelection {
     /** Property for selected levels */
     public static final String PROP_DEFAULT_LEVELS = "default_levels";
 
+    /** Flag to use any times set elsewhere */
+    public final static String PROP_DATESELECTION = "date_selection";
+
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(
