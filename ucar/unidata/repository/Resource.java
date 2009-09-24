@@ -135,6 +135,10 @@ public class Resource {
         this.type = that.type;
     }
 
+    public boolean isDefined() {
+        return path!=null && path.length()>0;
+    }
+
     /**
      * _more_
      *

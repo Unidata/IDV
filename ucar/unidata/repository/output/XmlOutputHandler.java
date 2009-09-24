@@ -344,23 +344,50 @@ public class XmlOutputHandler extends OutputHandler {
     private Element getEntryTag(Request request, Entry entry, Document doc, Element parent)
             throws Exception {
         Element node = XmlUtil.create(doc, TAG_ENTRY, parent, new String[] {
-            ATTR_ID, entry.getId(), ATTR_NAME, entry.getName(), ATTR_RESOURCE,
-            entry.getResource().getPath(), ATTR_RESOURCE_TYPE,
-            entry.getResource().getType(), ATTR_GROUP,
-            entry.getParentGroupId(), ATTR_TYPE,
-            entry.getTypeHandler().getType(), ATTR_ISGROUP,
-            "" + entry.isGroup(), ATTR_FROMDATE,
+            ATTR_ID, entry.getId(), ATTR_NAME, entry.getName(), 
+            ATTR_GROUP,       entry.getParentGroupId(), 
+            ATTR_TYPE,        entry.getTypeHandler().getType(), 
+            ATTR_ISGROUP,    "" + entry.isGroup(), 
+            ATTR_FROMDATE,
             getRepository().formatDate(new Date(entry.getStartDate())),
-            ATTR_TODATE,
-            getRepository().formatDate(new Date(entry.getEndDate())),
-            ATTR_CREATEDATE,
-            getRepository().formatDate(new Date(entry.getCreateDate()))
+            ATTR_TODATE,       getRepository().formatDate(new Date(entry.getEndDate())),
+            ATTR_CREATEDATE,   getRepository().formatDate(new Date(entry.getCreateDate()))
         });
 
 
-        for (OutputHandler outputHandler : getRepository().getOutputHandlers()) {
-            outputHandler.addToEntryNode(request, entry, node);
+        if(entry.hasNorth()) 
+            node.setAttribute(ATTR_NORTH, ""+entry.getNorth());
+        if(entry.hasSouth()) 
+            node.setAttribute(ATTR_SOUTH, ""+entry.getSouth());
+        if(entry.hasEast()) 
+            node.setAttribute(ATTR_EAST, ""+entry.getEast());
+        if(entry.hasWest()) 
+            node.setAttribute(ATTR_WEST, ""+entry.getWest());
+
+        if (!entry.isGroup() &&  entry.getResource().isDefined()) {
+            XmlUtil.setAttributes(node, new String[]{
+                    ATTR_RESOURCE,
+                    entry.getResource().getPath(), ATTR_RESOURCE_TYPE,
+                    entry.getResource().getType()}); 
+
+            //Add the service nodes
+            for (OutputHandler outputHandler : getRepository().getOutputHandlers()) {
+                outputHandler.addToEntryNode(request, entry, node);
+            }
+
+            if (getRepository().getAccessManager().canAccessFile(request,  entry)) {
+                node.setAttribute(ATTR_FILESIZE,""+  entry.getResource().getFileSize());
+                String url  =   getRepository().getEntryManager().getEntryResourceUrl(request, entry, true);
+                Element serviceNode = 
+                    XmlUtil.create(TAG_SERVICE, node);
+                XmlUtil.setAttributes(serviceNode,
+                                      new String[]{
+                                          ATTR_TYPE, SERVICE_FILE,
+                                          ATTR_URL, url
+                                      });
+            }
         }
+
 
         if ((entry.getDescription() != null)
                 && (entry.getDescription().length() > 0)) {

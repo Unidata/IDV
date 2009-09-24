@@ -292,6 +292,11 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_ADDMETADATA = "addmetadata";
 
+    public static final String ATTR_FILESIZE = "filesize";
+
+
+
+
     /** _more_ */
     public static final String ATTR_ADDSHORTMETADATA = "addshortmetadata";
 
@@ -1111,6 +1116,7 @@ public interface Constants {
     /** _more_ */
     public static final String TAG_METADATA = "metadata";
 
+
     /** _more_ */
     public static final String TAG_METADATAHANDLER = "metadatahandler";
 
@@ -1536,6 +1542,11 @@ public interface Constants {
     /** _more_ */
     public static final String MSG_ASSOCIATION_ADDED =
         "The association has been added";
+
+
+    public static final String SERVICE_OPENDAP = "opendap";
+    public static final String SERVICE_FILE = "file";
+
 
 
 }

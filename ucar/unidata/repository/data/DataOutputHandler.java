@@ -443,6 +443,7 @@ public class DataOutputHandler extends OutputHandler {
                 entry)) {
             return;
         }
+
         if ( !canLoadAsCdm(entry)) {
             return;
         }
@@ -451,7 +452,7 @@ public class DataOutputHandler extends OutputHandler {
             XmlUtil.create(TAG_SERVICE, node);
         XmlUtil.setAttributes(serviceNode,
                               new String[]{
-                                  ATTR_TYPE, "opendap",
+                                  ATTR_TYPE, SERVICE_OPENDAP,
                                   ATTR_URL, url
                               });
 

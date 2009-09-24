@@ -4940,9 +4940,26 @@ return new Result(title, sb);
      * @return _more_
      */
     public String getEntryResourceUrl(Request request, Entry entry) {
+        return getEntryResourceUrl(request, entry, false);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    public String getEntryResourceUrl(Request request, Entry entry, boolean full) {
         String fileTail = getStorageManager().getFileTail(entry);
-        return HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
-                            + fileTail, ARG_ENTRYID, entry.getId());
+        if(full)
+            return HtmlUtil.url(getRepository().URL_ENTRY_GET.getFullUrl() + "/"
+                                + fileTail, ARG_ENTRYID, entry.getId());
+        else
+            return HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
+                                + fileTail, ARG_ENTRYID, entry.getId());
     }
 
 
