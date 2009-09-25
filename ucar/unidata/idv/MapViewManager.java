@@ -1758,6 +1758,10 @@ public class MapViewManager extends NavigatedViewManager {
             return;
         }
 
+
+
+
+
         globeBackgroundLevelSlider = new ZSlider(globeBackgroundLevel);
         JComponent levelComp = globeBackgroundLevelSlider.getContents();
         JComponent[] bgComps =

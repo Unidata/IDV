@@ -1541,7 +1541,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             sb.append("<html><table width=100%><tr><td width=33%></td><td width=33%>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=33%>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Y&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Z&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>" +
                       "<tr><td align=right>Rotation:</td><td align=right>" + fmt(rot[0])+"</td><td align=right>"+fmt(rot[1])+"</td><td align=right>" + fmt(rot[2])+"</td></tr>" +
                       "<tr><td align=right>Translation:</td><td align=right>" + fmt(trans[0])+"</td><td align=right>"+fmt(trans[1])+"</td><td align=right>"+fmt(trans[2]) +"</td></tr>" +
-                      "<tr><td align=right>Scale:</td><td align=right>" + fmt(scale[0])+"</td></tr>");
+                      "<tr><td align=right>Scale:</td><td align=right>" + fmt(scale[0])+"</td><td>" +fmt(scale[1])+"</td><td>" +fmt(scale[2])+"</td></tr>");
 
             if(getMaster() instanceof NavigatedDisplay) {
                 NavigatedDisplay navDisplay = (NavigatedDisplay)getMaster();
