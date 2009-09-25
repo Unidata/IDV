@@ -148,10 +148,8 @@ public class PolyGlyph extends LineGlyph {
     protected void getPropertiesComponents(List comps, Hashtable compMap) {
         super.getPropertiesComponents(comps, compMap);
 
-        /**
-         *        comps.add(new JLabel(""));
-         *          comps.add(GuiUtils.makeButton("Start Flythrough",this, "doFlythrough"));
-         */
+        comps.add(new JLabel(""));
+        comps.add(GuiUtils.makeButton("Start Flythrough",this, "doFlythrough"));
     }
 
     /**
