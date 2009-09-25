@@ -2077,6 +2077,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             getLogManager().debug("user:" + request.getUser() + " -- "
                                   + request.toString());
         }
+
         //        logInfo("request:" + request);
         try {
             getSessionManager().checkSession(request);

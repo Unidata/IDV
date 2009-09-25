@@ -335,12 +335,15 @@ public class RepositoryClient extends RepositoryBase {
         }
 
         Element response = XmlUtil.getRoot(result[1]);
-        String  body     = XmlUtil.getChildText(response).trim();
-        if (responseOk(response)) {
-            return body.trim();
-        } else {
+        if (!responseOk(response)) {
+            String body = XmlUtil.getChildText(response);
             throw new EntryErrorException(body);
         }
+        Element newEntryNode = XmlUtil.findChild(response, TAG_ENTRY);
+        if(newEntryNode==null) {
+            throw new IllegalStateException("No entry node found in:"+ XmlUtil.toString(response));
+        }
+        return XmlUtil.getAttribute(newEntryNode, ATTR_ID);
 
     }
 
@@ -1012,7 +1015,7 @@ public class RepositoryClient extends RepositoryBase {
         System.err.println(
             "Usage: RepositoryClient <server url> <user id> <password> <arguments>");
         System.err.println(
-            "Where arguments are:\nFor fetching: \n\t-print <entry id> Create and print the given entry\n\t-printxml <entry id> Print out the xml for the given entry id\n\t-fetch <entry id> <destination file or directory>\n\nFor uploading:\n\t-parent <parent group id>\n\t-file <file to upload>\n\t-name <entry name>\n\t-descr <entry description>\n\t-attach <file to attach>\n\t-addmetadata (Add full metadata to entry)\n\t-addshortmetadata (Add spatial/temporal metadata to entry)\n\t");
+            "Where arguments are:\nFor fetching: \n\t-print <entry id> Create and print the given entry\n\t-printxml <entry id> Print out the xml for the given entry id\n\t-fetch <entry id> <destination file or directory>\n\nFor uploading:\n\t-parent <parent group id or full path to the parent group, e.g., \"Top/Destination\">\n\t-file <file to upload>\n\t-name <entry name>\n\t-descr <entry description>\n\t-attach <file to attach>\n\t-addmetadata (Add full metadata to entry)\n\t-addshortmetadata (Add spatial/temporal metadata to entry)\n\t");
         System.exit(1);
     }
 
@@ -1187,6 +1190,7 @@ public class RepositoryClient extends RepositoryBase {
                 files.add(new File(args[i]));
             }
         }
+
 
         if ((files.size() == 0) && (root == null)) {
             usage("");

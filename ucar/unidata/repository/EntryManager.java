@@ -2703,7 +2703,7 @@ return new Result(title, sb);
                                 false));
                     } else {
                         String name =
-                            IOUtil.getFileTail(ze.getName().toLowerCase());
+                            IOUtil.getFileTail(ze.getName());
                         File f = getStorageManager().getTmpFile(request,
                                      name);
                         FileOutputStream fos =
@@ -2816,6 +2816,10 @@ return new Result(title, sb);
         Group parentGroup = (Group) entries.get(parentId);
         if (parentGroup == null) {
             parentGroup = (Group) getEntry(request, parentId);
+            if (parentGroup == null) {
+                parentGroup = (Group) findEntryFromName(parentId, request.getUser(), false);
+            }
+
             if (parentGroup == null) {
                 throw new RepositoryUtil.MissingEntryException(
                     "Could not find parent:" + parentId);
