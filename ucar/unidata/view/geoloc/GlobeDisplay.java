@@ -856,18 +856,14 @@ public class GlobeDisplay extends NavigatedDisplay {
                            rot2[2], 1.0, 0, 0, 0);
 
         Transform3D t2     = new Transform3D(xxx);
-        double[]    vector = new double[] { 0, -1, 0 };
-        Vector3d    v3d    = new Vector3d(vector[0], vector[1], vector[2]);
+        Vector3d    upVector    = new Vector3d(0,-1,0);
+
         //        t2.transform(v3d);
         //        System.err.println("v3d:" + v3d.x+"/"+v3d.y+"/"+v3d.z);
-        t.lookAt(new Point3d(xy[0], xy[1], xy[2]), new Point3d(0, 0, 0), v3d);
-        //        t.invert();
+        t.lookAt(new Point3d(xy[0], xy[1], xy[2]), new Point3d(0, 0, 0), upVector);
         double[] m = new double[16];
         t.get(m);
-
         getMouseBehavior().instance_unmake_matrix(rot1, scale, trans, m);
-
-
         m = getMouseBehavior().make_matrix(rot1[0], rot1[1], rot1[2],
                                            ((zoomFactor == zoomFactor)
                                             ? zoomFactor * scale[0]

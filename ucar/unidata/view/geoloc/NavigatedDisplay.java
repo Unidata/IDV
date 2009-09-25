@@ -38,7 +38,10 @@ import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.display.*;
 import ucar.visad.quantities.GeopotentialAltitude;
 
+import ucar.unidata.util.GuiUtils;
+
 import visad.*;
+import visad.java3d.*;
 
 import visad.georef.*;
 
@@ -53,6 +56,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.*;
+
+import javax.media.j3d.*;
+import javax.vecmath.*;
 
 /**
  * Provides support for a navigated VisAD DisplayImplJ3D for
@@ -1630,11 +1637,6 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         }
     }
 
-    /** tmp for flythrough */
-    float[][] flythroughPts;
-
-    /** tmp for flythrough */
-    int flythroughIndex = 0;
 
     /** tmp for flythrough */
     int flythroughTimeStamp = 0;
@@ -1642,71 +1644,266 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     /** tmp for flythrough */
     private Object FLYTHROUGH_MUTEX = new Object();
 
+
+
+
     /**
      * tmp
      *
      * @param pts pts
      */
-    public void flythrough(float[][] pts) {
+    public void flythrough(final float[][] pts) {
         synchronized (FLYTHROUGH_MUTEX) {
-            flythroughPts   = pts;
-            flythroughIndex = 0;
             Misc.run(new Runnable() {
                 public void run() {
-                    doFlythrough(++flythroughTimeStamp);
+                    try {
+                        doFlythrough(++flythroughTimeStamp,pts);
+                    } catch(Exception exc) {
+                        exc.printStackTrace();
+                    }
                 }
             });
         }
     }
+
+    boolean dostep = true;
+
+
+    /**
+     * Get the View
+     *
+     * @return the View
+     */
+    public View getView() {
+        DisplayRendererJ3D rend =
+            (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
+        return rend.getView();
+    }
+
+    JTextField x1fld,x2fld,y1fld,y2fld,z1fld,z2fld;
+    JTextField upxfld,upyfld,upzfld;
+    JTextField zoomFld;
+    JTextField tiltFld;
+    JRadioButton backBtn;
+
+    JFrame flyThroughFrame;
+
+
+
+    public static float[][] smooth_curve(float[][] curve, int window) {
+        int       len      = curve[0].length;
+        float[][] newcurve = new float[curve.length][len];
+        for (int i = 0; i < len; i++) {
+            int win = window;
+            if (i < win) {
+                win = i;
+            }
+            int ii = (len - 1) - i;
+            if (ii < win) {
+                win = ii;
+            }
+            float runx = 0.0f;
+            float runy = 0.0f;
+            for (int j = i - win; j <= i + win; j++) {
+                runx += curve[0][j];
+                runy += curve[1][j];
+            }
+            newcurve[0][i] = runx / (2 * win + 1);
+            newcurve[1][i] = runy / (2 * win + 1);
+            newcurve[2][i] = curve[2][i];
+        }
+        return newcurve;
+    }
+
+
+
+
+    /** The line from the origin to the point */
+    LineDrawing flyThroughLine1;
+    LineDrawing flyThroughLine2;
+
+    public static void setPts(LineDrawing ld, float x1, float x2, float y1,
+                              float y2, float z1, float z2)
+            throws VisADException, RemoteException {
+        MathType  mathType = RealTupleType.SpatialCartesian3DTuple;
+        float[][] pts      = new float[][] {
+            { x1, x2 }, { y1, y2 }, { z1, z2 }
+        };
+        ld.setData(new Gridded3DSet(mathType, pts, 2));
+    }
+
 
     /**
      * tmp
      *
      * @param myTimeStamp timestamp
      */
-    private void doFlythrough(int myTimeStamp) {
-        if ((flythroughPts == null) || (flythroughPts.length == 0)) {
-            return;
+    private void doFlythrough(int myTimeStamp,    
+                              float[][] flythroughPts) throws Exception {
+        //        flythroughPts = smooth_curve(flythroughPts,10);
+        //        if ((flythroughPts == null) || (flythroughPts.length == 0)) {
+        //            return;
+        //        }
+        boolean domanual = false;
+        dostep = false;
+        final int[]index={0};
+        if(zoomFld==null) {
+            flyThroughLine1 = new LineDrawing("LocationIndicatorControl.xline");
+            flyThroughLine2 = new LineDrawing("LocationIndicatorControl.xline");
+            flyThroughLine1.setColor(Color.blue);            
+            flyThroughLine2.setColor(Color.magenta);
+            addDisplayable(flyThroughLine1);
+            flyThroughLine1.setPointSize(5);
+            addDisplayable(flyThroughLine2);
+            flyThroughLine2.setPointSize(5);
+
+            JButton btn = new JButton("Step");
+            flyThroughFrame  = new JFrame();
+            zoomFld = new JTextField("1",5);
+            tiltFld = new JTextField("0",5);
+            backBtn =new JRadioButton("Back",false);
+            ActionListener listener = new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        dostep = true;
+                    }
+                };
+            upxfld= new JTextField("0",5);
+            upyfld= new JTextField("1",5);
+            upzfld= new JTextField("0",5);
+
+            upxfld.addActionListener(listener);
+            upyfld.addActionListener(listener);
+            upzfld.addActionListener(listener);
+
+
+            x1fld= new JTextField("-1",5);
+            x2fld= new JTextField("1",5);
+            y1fld= new JTextField("0",5);
+            y2fld= new JTextField("0",5);
+            z1fld= new JTextField("0",5);
+            z2fld= new JTextField("0",5);
+            x1fld.addActionListener(listener);
+            x2fld.addActionListener(listener);
+            y1fld.addActionListener(listener);
+            y2fld.addActionListener(listener);
+            z1fld.addActionListener(listener);
+            z2fld.addActionListener(listener);
+            JComponent flds;
+            GuiUtils.tmpInsets = GuiUtils.INSETS_5;
+            if(domanual) {
+                flds = GuiUtils.doLayout(new Component[]{
+                        new JLabel("from:"), x1fld,y1fld,z1fld,
+                        new JLabel("to:"), x2fld,y2fld,z2fld,
+                        new JLabel("up:"), upxfld,upyfld,upzfld
+                    },4,GuiUtils.WT_N,GuiUtils.WT_N);
+            } else {
+                flds = GuiUtils.doLayout(new Component[]{
+                        GuiUtils.rLabel("Zoom:"), zoomFld,
+                        GuiUtils.rLabel("Tilt:"), tiltFld},2,
+                    GuiUtils.WT_N,GuiUtils.WT_N);
+            }
+            flyThroughFrame.getContentPane().add(GuiUtils.vbox(flds,GuiUtils.hbox(backBtn,btn)));
+            btn.addActionListener(listener);
+            flyThroughFrame.pack();
+            flyThroughFrame.setLocation(400,400);
         }
+        flyThroughFrame.show();
+
+
         MouseBehavior mouseBehavior = getMouseBehavior();
-        for (int i = 0; i < flythroughPts[0].length - 1; i++) {
+        double[]initMatrix = getProjectionMatrix();
+        double[]      trans         = { 0.0, 0.0, 0.0 };
+        double[]      scale         = { 0.0, 0.0, 0.0 };
+        double[]      rot          = { 0.0, 0.0, 0.0 };
+        double[]           currentMatrix = getProjectionMatrix();
+        mouseBehavior.instance_unmake_matrix(rot, scale, trans,
+                                             currentMatrix);
+
+        Vector3d upVector = new Vector3d(0,0,1);
+        while(true) {
+            while(!dostep) {
+                Misc.sleep(100);
+            }
+            dostep = false;
+            int i = index[0];
+            if(backBtn.isSelected()) {
+                index[0]--;
+            } else {
+                index[0]++;
+            }
+            if(index[0]+1>=flythroughPts[0].length) index[0] = 0;
+            else if(index[0]<0) index[0] = flythroughPts[0].length-1;
+
             synchronized (FLYTHROUGH_MUTEX) {
-                float x1 = flythroughPts[0][i];
-                float y1 = flythroughPts[1][i];
-                float z1 = flythroughPts[2][i];
-                float x2 = flythroughPts[0][i + 1];
-                float y2 = flythroughPts[1][i + 1];
-                float z2 = flythroughPts[2][i + 1];
                 try {
-                    double[] currentMatrix = getProjectionMatrix();
-                    double[] trans         = { 0.0, 0.0, 0.0 };
-                    double[] rot           = { 0.0, 0.0, 0.0 };
-                    double[] scale         = { 0.0 };
-                    mouseBehavior.instance_unmake_matrix(rot, scale, trans,
-                            currentMatrix);
-                    if (i == 0) {
-                        System.err.println("" + x1 + " " + y1 + " " + z1
-                                           + "\n" + x2 + " " + y2 + " " + z2);
-                        Misc.printArray("rot:", rot);
-                        Misc.printArray("scale:", scale);
-                        Misc.printArray("trans:", trans);
+                    float x1 = flythroughPts[0][i];
+                    float y1 = flythroughPts[1][i];
+                    float z1 = flythroughPts[2][i];
+                    float x2 = flythroughPts[0][i + 1];
+                    float y2 = flythroughPts[1][i + 1];
+                    float z2 = flythroughPts[2][i + 1];
+                    double zoom = new Double(zoomFld.getText().trim()).doubleValue();
+                    setPts(flyThroughLine1,  x1, x1,  y1,
+                           y1,z1, -1);
+                    setPts(flyThroughLine2,  x2, x2,  y2,
+                           y2, z2, 1);
+
+                    if(domanual) {
+                        x1 = (float) new Double(x1fld.getText().trim()).doubleValue();
+                        y1 = (float) new Double(y1fld.getText().trim()).doubleValue();
+                        z1 = (float) new Double(z1fld.getText().trim()).doubleValue();
+                
+                        x2 = (float) new Double(x2fld.getText().trim()).doubleValue();
+                        y2 = (float) new Double(y2fld.getText().trim()).doubleValue();
+                        z2 = (float) new Double(z2fld.getText().trim()).doubleValue();
+
+                        upVector = new Vector3d(new Double(upxfld.getText().trim()).doubleValue(),
+                                                new Double(upyfld.getText().trim()).doubleValue(),
+                                                new Double(upzfld.getText().trim()).doubleValue());
+                    } else {
+                        double tilt = new Double(tiltFld.getText().trim()).doubleValue();
+                        if(zoom!=0)
+                            tilt = tilt/zoom;
+                        z1+=tilt;
                     }
 
-                    //                    lookAt(x1, y1, z1, x2, y2, z2, scale[0]);
-                    //              if(true)
-                    //                  break;
+                    //Check for nans
+                    if(x2!=x2 || y2!=y2 || z2!=z2) continue;
+                    if(x1!=x1 || y1!=y1 || z1!=z1) continue;
+
+
+                    //Transform3D t  = new Transform3D(currentMatrix);
+                    Transform3D t  = new Transform3D();
+                    System.err.println("Look at:" + new Point3d(x1,y1,z1)+ "   " +  new Point3d(x2,y2,z2));
+                    t.lookAt(new Point3d(x1,y1,z1), new Point3d(x2,y2,z2), upVector);
+                    double[] m = new double[16];
+                    t.get(m);
+
+                    double[] scaleMatrix = mouseBehavior.make_matrix(0.0, 0.0,
+                                                                     0.0, scale[0],scale[1], scale[2], 0.0, 0.0,0.0);                    
+                    m = mouseBehavior.multiply_matrix(scaleMatrix, m);
+
+                    scaleMatrix = mouseBehavior.make_matrix(0.0, 0.0,
+                                                            0.0, zoom, 0.0, 0.0,0.0);                    
+
+                    m = mouseBehavior.multiply_matrix(scaleMatrix, m);
+                    setProjectionMatrix(m);
                 } catch (Exception exc) {
                     System.err.println("Error:" + exc);
                     exc.printStackTrace();
-                    break;
+                    try {
+                        setProjectionMatrix(initMatrix);
+                    } catch(Exception ignore) {}
+                    //                    break;
                 }
             }
-            Misc.sleep(250);
             if (myTimeStamp != flythroughTimeStamp) {
                 return;
             }
         }
     }
+
+    
 
     /**
      * Move the center to the given earth location
