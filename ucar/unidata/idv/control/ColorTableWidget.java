@@ -247,7 +247,7 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
             super(colors, ctw.getDisplayConventions(), legendType, forMain);
             this.ctw = ctw;
             setToolTipText(
-                "<html>Click to edit<br>Right click to show menu<br>Control-r: Revert to default range<br>Right arrow: shift range up<br>Left arrow: shift range down<br>Up arrow: expand range <br>Down arrow: shrink range");
+                "<html>Click to focus<br>Right click to show menu<br>Control-r: Revert to default range<br>Right arrow: shift range up<br>Left arrow: shift range down<br>Up arrow: expand range <br>Down arrow: shrink range");
             addKeyListener(this);
         }
 
@@ -260,7 +260,7 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
         public String getToolTipText() {
             //Only request focus if the mouse is been in the component
             if (mouseIn) {
-                requestFocus();
+                //                requestFocus();
             }
             return super.getToolTipText();
         }
@@ -343,6 +343,7 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
          * @param event  the MouseEvent
          */
         public void mouseClicked(MouseEvent event) {
+            requestFocus();
             if (SwingUtilities.isRightMouseButton(event)) {
                 if (parentWidget == null) {
                     ctw.showMenu(this);
