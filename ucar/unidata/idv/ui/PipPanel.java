@@ -28,12 +28,16 @@ import ucar.unidata.geoloc.projection.*;
 
 
 import ucar.unidata.idv.MapViewManager;
+import ucar.unidata.idv.Flythrough;
+import ucar.unidata.idv.FlythroughPoint;
 
 
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.view.geoloc.*;
 import ucar.unidata.view.geoloc.*;
+
+
 
 
 import ucar.visad.ProjectionCoordinateSystem;
@@ -82,6 +86,7 @@ public class PipPanel extends NavigatedMapPanel {
 
     /** Draws the overview box */
     List points = new ArrayList();
+
 
 
     /** Used when dragging rect */
@@ -193,6 +198,7 @@ public class PipPanel extends NavigatedMapPanel {
      * @throws VisADException On badness
      */
     public void resetDrawBounds() throws RemoteException, VisADException {
+
         NavigatedDisplay nav = (NavigatedDisplay) mapViewManager.getMaster();
         points = new ArrayList();
         points.add(
@@ -267,6 +273,45 @@ public class PipPanel extends NavigatedMapPanel {
         }
         gNP.setColor(Color.red);
         gNP.draw(path);
+
+        Flythrough flythrough  = mapViewManager.getFlythrough();
+        if(flythrough!=null) {
+            FlythroughPoint currentPoint  = flythrough.getCurrentPoint();
+            if(currentPoint!=null) {
+                try {
+                Real          lat = currentPoint.getEarthLocation().getLatLonPoint().getLatitude();
+                Real          lon = currentPoint.getEarthLocation().getLatLonPoint().getLongitude();
+                
+                ProjectionPoint p = project.latLonToProj(new LatLonPointImpl(
+                                                                             lat.getValue(CommonUnit.degree),
+                                                                             lon.getValue(CommonUnit.degree)),
+                                                           new ProjectionPointImpl());
+                gNP.setColor(Color.blue);
+                GeneralPath path2 = new GeneralPath(GeneralPath.WIND_EVEN_ODD,
+                                                    points.size());
+                double dx = 4;
+                double dy = 4;
+                AffineTransform transform = gNP.getTransform();
+                if(transform!=null) {
+                    double sx = transform.getScaleX();
+                    double sy = transform.getScaleX();
+                    if(sx!=0)
+                        dx=dx/sx;
+                    if(sy!=0)
+                        dy=dy/sy;
+                }
+
+                path2.moveTo((float) (p.getX()-dx), (float) (p.getY()-dy));
+                path2.lineTo((float) (p.getX()+dx), (float) (p.getY()-dy));
+                path2.lineTo((float) (p.getX()+dx), (float) (p.getY()+dy));
+                path2.lineTo((float) (p.getX()-dx), (float) (p.getY()+dy));
+                path2.lineTo((float) (p.getX()-dx), (float) (p.getY()-dy));
+
+                gNP.fill(path2);
+                } catch(Exception exc) {}
+            }
+        }
+
     }
 
 

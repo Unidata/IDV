@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
 import ucar.unidata.geoloc.Bearing;
 
 import ucar.unidata.geoloc.LatLonPointImpl;
-import ucar.unidata.idv.DisplayConventions;
+import ucar.unidata.idv.*;
 
 
 import ucar.unidata.idv.control.DrawingControl;
@@ -222,7 +222,10 @@ public class PolyGlyph extends LineGlyph {
      * @throws VisADException On badness
      */
     public void doFlythrough() throws VisADException, RemoteException {
-        control.getNavigatedDisplay().flythrough(getPointValues(true));
+        ViewManager vm = control.getViewManager();
+        if(vm instanceof MapViewManager) {
+            ((MapViewManager)vm).flythrough(getPointValues(true));
+        }
         if (propDialog != null) {
             propDialog.dispose();
         }

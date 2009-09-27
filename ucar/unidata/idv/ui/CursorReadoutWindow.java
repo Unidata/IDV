@@ -79,6 +79,8 @@ public class CursorReadoutWindow {
 
     public CursorReadoutWindow(NavigatedViewManager vm) {
         this.vm = vm;
+        label = GuiUtils.getFixedWidthLabel("");
+        label.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
     }
 
 
@@ -129,6 +131,20 @@ public class CursorReadoutWindow {
 
     public  void updateReadout() {
         if(lastEarthLocation == null || window == null) return;
+        String readout =  getReadout(lastEarthLocation,true,false);
+        if(readout==null) readout = "";
+        label.setText(readout);
+        window.getContentPane().removeAll();
+        window.getContentPane().add(label);
+        window.pack(); 
+        window.toFront();
+    }
+
+
+
+
+    public  String getReadout(EarthLocation earthLocation,boolean showDisplays, boolean showAlt) {
+        if(earthLocation == null) return "";
         List         controls = vm.getControls();
         StringBuffer sb       = new StringBuffer();
         Animation animation = vm.getAnimation();
@@ -136,16 +152,19 @@ public class CursorReadoutWindow {
         Real      aniValue  = animation.getAniValue();
 
         boolean   didone    = false;
+
         try {
+            if(showDisplays) {
             for (int i = 0; i < controls.size(); i++) {
                 DisplayControl display = (DisplayControl) controls.get(i);
-                List readout = display.getCursorReadout(lastEarthLocation, aniValue, step);
+                List readout = display.getCursorReadout(earthLocation, aniValue, step);
                 if ((readout != null) && (readout.size() > 0)) {
                     didone = true;
                     sb.append(StringUtil.join("", readout));
                 }
 
             }
+        }
 
             if ( !didone) {
                 //                window.setVisible(false);
@@ -157,16 +176,13 @@ public class CursorReadoutWindow {
             }
 
 
-            String llp = (lastEarthLocation==null?"":vm.getIdv().getDisplayConventions().formatLatLonPoint(lastEarthLocation.getLatLonPoint()));
-            label = GuiUtils.getFixedWidthLabel("<html>Location: " + llp +(didone?"<hr>":"") +"<table cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">"+sb + "</table></html>");
-            label.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
-            window.getContentPane().removeAll();
-            window.getContentPane().add(label);
-            window.pack(); 
-          window.toFront();
+            String llp = (earthLocation==null?"":vm.getIdv().getDisplayConventions().formatEarthLocation(earthLocation,showAlt));
+
+            return "<html>Location: " + llp +(didone?"<hr>":"") +"<table cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">"+sb + "</table></html>";
         } catch (Exception exc) {
             vm.logException("Getting cursor readouts", exc);
+            return "";
         }
     }
 

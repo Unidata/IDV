@@ -223,6 +223,9 @@ public class MapViewManager extends NavigatedViewManager {
     private ZSlider globeBackgroundLevelSlider;
 
 
+    private Flythrough flythrough;
+
+
     /**
      *  Default constructor
      */
@@ -1208,6 +1211,8 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 
+
+
     /**
      * Dynamically initialize the view menu
      *
@@ -1275,7 +1280,7 @@ public class MapViewManager extends NavigatedViewManager {
         createCBMI(showMenu, PREF_ANIREADOUT);
         createCBMI(showMenu, PREF_SHOWPIP);
         createCBMI(showMenu, PREF_SHOWEARTHNAVPANEL);
-
+        showMenu.add(GuiUtils.makeMenuItem("Flythrough",this,"showFlythrough"));
         return showMenu;
     }
 
@@ -1822,6 +1827,36 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
+    public void destroy() {
+        super.destroy();
+
+        if(flythrough!=null) {
+            flythrough.destroy();
+            flythrough = null;
+        }
+    }
+
+    public void showFlythrough() {
+        if(flythrough==null) {
+            flythrough = new Flythrough(this);
+        }
+        flythrough.show();
+    }
+
+    public void flythrough(final float[][] pts) {
+        if(flythrough==null) {
+            flythrough = new Flythrough(this);
+        }
+        flythrough.setPoints(pts);
+    }
+
+
+    public void flythrough(List<FlythroughPoint>  pts) {
+        if(flythrough==null) {
+            flythrough = new Flythrough(this);
+        }
+        flythrough.setPoints(pts);
+    }
 
 
     /**
@@ -2720,6 +2755,24 @@ public class MapViewManager extends NavigatedViewManager {
     public double getGlobeBackgroundLevel() {
         return globeBackgroundLevel;
     }
+
+/**
+Set the Flythrough property.
+
+@param value The new value for Flythrough
+**/
+public void setFlythrough (Flythrough value) {
+	this.flythrough = value;
+}
+
+/**
+Get the Flythrough property.
+
+@return The Flythrough
+**/
+public Flythrough getFlythrough () {
+	return this.flythrough;
+}
 
 
 

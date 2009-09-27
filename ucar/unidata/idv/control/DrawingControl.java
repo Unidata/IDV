@@ -2582,6 +2582,28 @@ public class DrawingControl extends DisplayControlImpl {
             this.myTableModel = tableModel;
             addKeyListener(new KeyAdapter() {
                 public void keyPressed(KeyEvent ke) {
+                    if (ke.getKeyCode() == KeyEvent.VK_F && ke.isControlDown()) {
+                        int[]   rows      = getSelectedRows();
+                        int row = -1;
+                        for (int i = 0; i < rows.length; i++) {
+                            row = rows[i];
+                            if ((row >= 0) && (row < glyphs.size())) {
+                                DrawingGlyph glyph =
+                                    (DrawingGlyph) glyphs.get(row);
+                                if(glyph instanceof PolyGlyph) {
+                                    try {
+                                    ((PolyGlyph)glyph).doFlythrough();
+                                    } catch (Exception exc) {
+                                        logException("", exc);
+                                    }
+                                    return;
+                                }
+                            }
+                        }
+                    }
+
+
+
                     if (ke.getKeyCode() == KeyEvent.VK_DELETE) {
                         int[]   rows      = getSelectedRows();
                         List    tmpGlyphs = new ArrayList(glyphs);
