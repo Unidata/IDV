@@ -163,6 +163,8 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     /** Indicator (currently a JComboBox) */
     private JComboBox indicator = null;
 
+    private boolean indicatorVisible = true;
+
     /** mutex  for accessing the indicator */
     private Object indicatorMutex;
 
@@ -271,6 +273,13 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
         }
     }
 
+
+    public void showDateBox(boolean v) {
+        indicatorVisible = v;
+        if(indicator!=null) {
+            indicator.setVisible(v);
+        }
+    }
 
     /**
      * Set the times that should be used. If this is set we don't go to the displaymaster to get the times.
@@ -1127,7 +1136,8 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
                     //        }
 
                     //        synchronized (indicatorMutex) {
-                    indicator.setVisible((timesArray != null)
+                    indicator.setVisible(indicatorVisible &&
+                                         (timesArray != null)
                                          && (indicator.getItemCount() > 0));
                     //        }
                     updateRunButton();

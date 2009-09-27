@@ -385,7 +385,7 @@ public class SelectorPoint extends LineDrawing {
                 if (fixed[i]) {
                     if (v.getValue() != oldValues[i]) {
                         didChange = true;
-                        v         = v.cloneButValue(oldValues[i]);
+                        v  = v.cloneButValue(oldValues[i]);
                     }
                 }
             }
