@@ -23,109 +23,139 @@
 
 
 
+
 package ucar.unidata.idv;
+
+
 import visad.*;
-import java.util.Date;
 
 import visad.georef.*;
+
+import java.util.Date;
+
 
 /**
  *
  * @author IDV development team
  */
 
-public  class FlythroughPoint {
+public class FlythroughPoint {
+
+    /** _more_          */
     private EarthLocation earthLocation;
+
+    /** _more_          */
     private Date dateTime;
-    private double tilt=Double.NaN;
-    private double zoom=Double.NaN;
 
-    public FlythroughPoint() {
-    }
+    /** _more_          */
+    private double tilt = Double.NaN;
 
+    /** _more_          */
+    private double zoom = Double.NaN;
+
+    /**
+     * _more_
+     */
+    public FlythroughPoint() {}
+
+    /**
+     * _more_
+     *
+     * @param earthLocation _more_
+     */
     public FlythroughPoint(EarthLocation earthLocation) {
         this.earthLocation = earthLocation;
     }
 
-/**
-Set the EarthLocation property.
+    /**
+     * Set the EarthLocation property.
+     *
+     * @param value The new value for EarthLocation
+     */
+    public void setEarthLocation(EarthLocation value) {
+        this.earthLocation = value;
+    }
 
-@param value The new value for EarthLocation
-**/
-public void setEarthLocation (EarthLocation value) {
-	this.earthLocation = value;
-}
+    /**
+     * Get the EarthLocation property.
+     *
+     * @return The EarthLocation
+     */
+    public EarthLocation getEarthLocation() {
+        return this.earthLocation;
+    }
 
-/**
-Get the EarthLocation property.
+    /**
+     * Set the DateTime property.
+     *
+     * @param value The new value for DateTime
+     */
+    public void setDateTime(Date value) {
+        this.dateTime = value;
+    }
 
-@return The EarthLocation
-**/
-public EarthLocation getEarthLocation () {
-	return this.earthLocation;
-}
+    /**
+     * Get the DateTime property.
+     *
+     * @return The DateTime
+     */
+    public Date getDateTime() {
+        return this.dateTime;
+    }
 
-/**
-Set the DateTime property.
-
-@param value The new value for DateTime
-**/
-public void setDateTime (Date value) {
-	this.dateTime = value;
-}
-
-/**
-Get the DateTime property.
-
-@return The DateTime
-**/
-public Date getDateTime () {
-	return this.dateTime;
-}
-
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean hasTilt() {
-        return tilt==tilt;
+        return tilt == tilt;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean hasZoom() {
-        return zoom==zoom;
+        return zoom == zoom;
     }
 
-/**
-Set the Tilt property.
+    /**
+     * Set the Tilt property.
+     *
+     * @param value The new value for Tilt
+     */
+    public void setTilt(double value) {
+        this.tilt = value;
+    }
 
-@param value The new value for Tilt
-**/
-public void setTilt (double value) {
-	this.tilt = value;
-}
+    /**
+     * Get the Tilt property.
+     *
+     * @return The Tilt
+     */
+    public double getTilt() {
+        return this.tilt;
+    }
 
-/**
-Get the Tilt property.
+    /**
+     * Set the Zoom property.
+     *
+     * @param value The new value for Zoom
+     */
+    public void setZoom(double value) {
+        this.zoom = value;
+    }
 
-@return The Tilt
-**/
-public double getTilt () {
-	return this.tilt;
-}
-
-/**
-Set the Zoom property.
-
-@param value The new value for Zoom
-**/
-public void setZoom (double value) {
-	this.zoom = value;
-}
-
-/**
-Get the Zoom property.
-
-@return The Zoom
-**/
-public double getZoom () {
-	return this.zoom;
-}
+    /**
+     * Get the Zoom property.
+     *
+     * @return The Zoom
+     */
+    public double getZoom() {
+        return this.zoom;
+    }
 
 
 
