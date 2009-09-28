@@ -224,7 +224,16 @@ public class PolyGlyph extends LineGlyph {
     public void doFlythrough() throws VisADException, RemoteException {
         ViewManager vm = control.getViewManager();
         if(vm instanceof MapViewManager) {
-            ((MapViewManager)vm).flythrough(getPointValues(true));
+
+            if (isInLatLonSpace()) {
+                List<FlythroughPoint> pts = new ArrayList<FlythroughPoint>();
+                for(EarthLocation el: ((List<EarthLocation>)points)) {
+                    pts.add(new FlythroughPoint(el));
+                }
+                ((MapViewManager)vm).flythrough(pts);
+            } else {
+                ((MapViewManager)vm).flythrough(getPointValues(true));
+            }
         }
         if (propDialog != null) {
             propDialog.dispose();

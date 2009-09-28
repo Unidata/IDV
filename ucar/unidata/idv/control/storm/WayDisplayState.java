@@ -745,6 +745,7 @@ public class WayDisplayState {
                                : stormDisplayState.getForecastLayoutModel());
             if (sm != null) {
                 labelDisplay = new StationModelDisplayable("dots");
+                labelDisplay.setRotateShapes(true);
                 labelDisplay.setUseTimesInAnimation(false);
                 addDisplayable(labelDisplay);
                 labelDisplay
@@ -768,6 +769,7 @@ public class WayDisplayState {
             throws VisADException, RemoteException {
         if (obsPointDisplay == null) {
             obsPointDisplay = new StationModelDisplayable("dots");
+            obsPointDisplay.setRotateShapes(true);
             obsPointDisplay.setUseTimesInAnimation(false);
             addDisplayable(obsPointDisplay);
             obsPointDisplay.setScale(

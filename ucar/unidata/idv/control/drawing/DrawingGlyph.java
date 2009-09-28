@@ -2391,11 +2391,7 @@ public abstract class DrawingGlyph {
                 double lat = (double) pts[IDX_LAT][i];
                 double lon = (double) pts[IDX_LON][i];
                 double alt = (double) pts[IDX_ALT][i];
-                actualPoints.add(
-                    new EarthLocationTuple(
-                        new Real(RealType.Latitude, lat),
-                        new Real(RealType.Longitude, lon),
-                        new Real(RealType.Altitude, alt)));
+                actualPoints.add(makePoint(lat,lon,alt));
             }
         }
     }

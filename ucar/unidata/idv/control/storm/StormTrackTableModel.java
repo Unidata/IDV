@@ -65,7 +65,6 @@ import ucar.visad.display.Animation;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.SelectRangeDisplayable;
 import ucar.visad.display.SelectorPoint;
-import ucar.visad.display.StationModelDisplayable;
 import ucar.visad.display.TrackDisplayable;
 
 

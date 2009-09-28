@@ -350,6 +350,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** Captures one frame */
     JButton grabBtn;
 
+    private JCheckBox grabFlythroughCbx= new JCheckBox("Capture Flythrough",false);
+
     /** Clear all captured frames */
     JButton clearButton;
 
@@ -369,11 +371,6 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     JRadioButton fullWindowBtn;
 
 
-    /** This is the Animation from the ViewManager. */
-    private Animation anime;
-
-    /** This is the Animation from the ViewManager. */
-    private AnimationWidget animationWidget;
 
     /** If non-null then we use this and don't ask the user. */
     private String movieFileName;
@@ -586,16 +583,35 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     }
 
 
+    private AnimationWidget getAnimationWidget() {
+        if(grabFlythroughCbx!=null && grabFlythroughCbx.isSelected() && (viewManager instanceof MapViewManager)) {
+            Flythrough flythrough =  ((MapViewManager)viewManager).getFlythrough();
+            if(flythrough!=null) {
+                return flythrough.getAnimationWidget();
+            }
+        }
+        AnimationWidget animationWidget = viewManager.getAnimationWidget();
+        if(animationWidget==null)         animationWidget = viewManager.getExternalAnimationWidget();
+        return animationWidget;
+    }
+
+
+    private Animation getAnimation() {
+        if(grabFlythroughCbx!=null && grabFlythroughCbx.isSelected() && (viewManager instanceof MapViewManager)) {
+            Flythrough flythrough =  ((MapViewManager)viewManager).getFlythrough();
+            if(flythrough!=null) {
+                return flythrough.getAnimation();
+            }
+        }
+        Animation anime           = viewManager.getAnimation();
+        if(anime==null)         anime           = viewManager.getExternalAnimation();
+        return anime;
+    }
+
     /**
      * Initialize me. Create the windows, etc.
      */
     private void init() {
-
-        //Get the animation from the VM
-        anime           = viewManager.getAnimation();
-        if(anime==null)         anime           = viewManager.getExternalAnimation();
-        animationWidget = viewManager.getAnimationWidget();
-        if(animationWidget==null)         animationWidget = viewManager.getExternalAnimationWidget();
 
         //Store the images in a unique (by current time) subdir of the user's tmp  dir
         directory =
@@ -676,6 +692,12 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         grabAnimationBtn = makeButton("Time Animation", CMD_GRAB_ANIMATION);
 
 
+        grabFlythroughCbx= new JCheckBox("Flythrough",false);
+        boolean hasFlythrough = false;
+        if(viewManager instanceof MapViewManager && ((MapViewManager)viewManager).getFlythrough()!=null) {
+            hasFlythrough = ((MapViewManager)viewManager).getFlythrough().hasPoints();
+        }
+
 
         List frameButtons = new ArrayList();
         frameButtons.add(previewButton = makeButton("Preview",
@@ -711,7 +733,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                               grabAutoBtn.getPreferredSize().width));
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
         JPanel capturePanel = GuiUtils.doLayout(new Component[] {
-            grabBtn, GuiUtils.filler(), grabAnimationBtn, animationResetCbx,
+                grabBtn, GuiUtils.filler(), GuiUtils.top(grabAnimationBtn), GuiUtils.vbox(animationResetCbx,
+                                                                            (hasFlythrough?(JComponent)grabFlythroughCbx:GuiUtils.filler())),
             grabAutoBtn, runPanel, GuiUtils.filler(maxBtnWidth + 10, 1),
             GuiUtils.filler(),
         }, 2, GuiUtils.WT_N, GuiUtils.WT_N);
@@ -959,7 +982,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      * Turn on animation based  capture
      */
     private void startAnimationCapture() {
-        if (capturingAnim || (anime == null)) {
+        if (capturingAnim || (getAnimation() == null)) {
             return;
         }
         grabAnimationBtn.setText("Stop animation");
@@ -998,9 +1021,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
      */
     private void runAnimationCapture(int timestamp) {
         try {
-            anime.setAnimating(false);
+            getAnimation().setAnimating(false);
             if (animationResetCbx!=null && animationResetCbx.isSelected()) {
-                animationWidget.gotoBeginning();
+                getAnimationWidget().gotoBeginning();
             }
             int sleepTime =
                 idv.getStateManager().getProperty("idv.capture.sleep",
@@ -1011,10 +1034,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     imageGenerator.applyMacros(scriptingNode, ATTR_STEPS);
                 int[] steps = Misc.parseInts(stepsString, ",");
                 for (int i = 0; i < steps.length; i++) {
-                    if (steps[i] > anime.getNumSteps()) {
+                    if (steps[i] > getAnimation().getNumSteps()) {
                         break;
                     }
-                    anime.setCurrent(steps[i]);
+                    getAnimation().setCurrent(steps[i]);
                     //Sleep for a bit  to allow for the display to redraw itself
                     try {
                         Misc.sleep(sleepTime);
@@ -1046,24 +1069,24 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     grabImageAndBlock();
                 }
             } else {
-               animationWidget.gotoBeginning();
-               int start = anime.getCurrent();
+                getAnimationWidget().gotoBeginning();
+               int start = getAnimation().getCurrent();
                while (true) {
                     //Sleep for a bit  to allow for the display to redraw itself
                     try {
                         Misc.sleep(sleepTime);
                     } catch (Exception exc) {}
                     //Has the user pressed Stop?
-                    if ((anime == null) || !keepRunning(timestamp)) {
+                    if ((getAnimation() == null) || !keepRunning(timestamp)) {
                         break;
                     }
                     //Now grab the image in block mode
                     grabImageAndBlock();
-                    if (anime == null) {
+                    if (getAnimation() == null) {
                         break;
                     }
-                    animationWidget.stepForward();
-                    int current = anime.getCurrent();
+                    getAnimationWidget().stepForward();
+                    int current = getAnimation().getCurrent();
                     if (current <= start) {
                         break;
                     }
@@ -1333,7 +1356,6 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     private void close() {
         captureTimeStamp++;
         capturingAuto = false;
-        anime         = null;
         if (previewDialog != null) {
             previewDialog.dispose();
             previewDialog = null;
@@ -1472,7 +1494,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         template = StringUtil.replace(template, "%count%", "" + cnt);
 
         try {
-            DateTime dttm       = new DateTime(anime.getAniValue());
+            DateTime dttm       = new DateTime(getAnimation().getAniValue());
 
             String   timeString = "" + dttm;
             timeString = StringUtil.replace(timeString, ":", "_");
@@ -1566,8 +1588,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 //            System.err.println ("ImageSequenceGrabber file dir: " +getFileDirectory() +" path: " +  path);
                 DateTime time = null;
 
-                time = (((anime != null) && (anime.getAniValue() != null))
-                        ? new DateTime(anime.getAniValue())
+                time = (((getAnimation() != null) && (getAnimation().getAniValue() != null))
+                        ? new DateTime(getAnimation().getAniValue())
                         : null);
 
                 GeoLocationInfo bounds = null;
@@ -1613,7 +1635,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         GraphicsConfiguration gc = comp.getGraphicsConfiguration();
                         Robot robot = new Robot(gc.getDevice());
                     
-                        System.err.println ("gc:" + gc + " " + gc.getBounds());
+                        //                        System.err.println ("gc:" + gc + " " + gc.getBounds());
                         if(gc.getBounds().x>0 || gc.getBounds().y>0) {
                             System.err.println("Offsetting location:" + loc +" by gc bounds: " + gc.getBounds().x + " " + 
                                                gc.getBounds().y);

@@ -787,6 +787,12 @@ public class MapViewManager extends NavigatedViewManager {
         MapProjection  thatProjection = mvm.getMainProjection();
         this.setAspectRatio(that.getAspectRatio());
 
+        if(mvm.flythrough!=null) {
+            if(this.flythrough!=null) {
+                this.flythrough.initWith(mvm.flythrough);
+            } 
+        }
+
         boolean setProjection = false;
         if (thatProjection != null) {
             setProjection = setMapProjection(thatProjection, false,
@@ -1829,12 +1835,13 @@ public class MapViewManager extends NavigatedViewManager {
 
     public void destroy() {
         super.destroy();
-
         if(flythrough!=null) {
             flythrough.destroy();
             flythrough = null;
         }
     }
+
+
 
     public void showFlythrough() {
         if(flythrough==null) {
@@ -1843,11 +1850,12 @@ public class MapViewManager extends NavigatedViewManager {
         flythrough.show();
     }
 
+
     public void flythrough(final float[][] pts) {
         if(flythrough==null) {
             flythrough = new Flythrough(this);
         }
-        flythrough.setPoints(pts);
+        flythrough.flythrough(pts);
     }
 
 
@@ -1855,7 +1863,15 @@ public class MapViewManager extends NavigatedViewManager {
         if(flythrough==null) {
             flythrough = new Flythrough(this);
         }
-        flythrough.setPoints(pts);
+        flythrough.flythrough(pts);
+    }
+
+    public final void initAfterUnPersistence(IntegratedDataViewer idv)
+            throws VisADException, RemoteException {
+        if(flythrough!=null) {
+            flythrough.setViewManager(this);
+        }
+        super.initAfterUnPersistence(idv);
     }
 
 

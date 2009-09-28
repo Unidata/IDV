@@ -22,6 +22,8 @@
 
 
 
+
+
 package ucar.unidata.idv;
 
 
@@ -76,6 +78,7 @@ import javax.media.j3d.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
+import javax.swing.table.*;
 
 import javax.vecmath.*;
 
@@ -88,82 +91,108 @@ import javax.vecmath.*;
 
 public class Flythrough implements PropertyChangeListener {
 
-    /** _more_          */
+    /** _more_ */
     private MapViewManager viewManager;
 
-    /** _more_          */
+    /** _more_ */
     private List<FlythroughPoint> points = new ArrayList<FlythroughPoint>();
 
-    /** _more_          */
-    private int index = 0;
 
-    /** _more_          */
-    private JTextField zoomFld;
-
-    public static final int ORIENT_RELATIVE =0;
-    public static final int ORIENT_FIXED =1;
-
-    private int orientation = ORIENT_RELATIVE;
-
-    private JCheckBox orientCbx;
-
-    private JTextField tiltxFld;
-    private JTextField tiltyFld;    
-    private JTextField tiltzFld;
-
-    /** _more_          */
-    private JRadioButton backBtn;
-
-
-    /** _more_          */
-    private JFrame frame;
-
-    /** The line from the origin to the point */
-    private LineDrawing locationLine;
-    private SelectorPoint locationPoint;
-
-
-
-    /** _more_          */
+    /** _more_ */
     private double tiltX = 0.0;
+
+    /** _more_ */
     private double tiltY = 0.0;
+
+    /** _more_ */
     private double tiltZ = 0.0;
 
-    /** _more_          */
+    /** _more_ */
     private double zoom = 1.0;
 
-    /** _more_          */
+    /** _more_ */
     private boolean changeViewpoint = true;
 
+
     /** _more_          */
+    private boolean showLine = true;
+
+
+    /** _more_ */
     private boolean showReadout = true;
 
 
     /** Animation info */
     private AnimationInfo animationInfo;
 
-    /** _more_          */
+    /** _more_ */
     private Animation animation;
 
     /** The anim widget */
     private AnimationWidget animationWidget;
 
-    /** _more_          */
+    /** _more_ */
+    private boolean hasTimes = false;
+
+    /** _more_ */
+    private boolean showTimes = false;
+
+
+
+
+    /** _more_ */
+    private JCheckBox showTimesCbx;
+
+    /** _more_ */
     private FlythroughPoint currentPoint;
 
-    /** _more_          */
+    /** _more_ */
     private CursorReadoutWindow readout;
 
-    /** _more_          */
+    /** _more_ */
     private JLabel readoutLabel;
 
-    /** _more_          */
+    /** _more_ */
     private JCheckBox showReadoutCbx;
 
-    /** _more_          */
+    /** _more_ */
     private JCheckBox changeViewpointCbx;
 
+    /** _more_ */
     private JCheckBox overheadCbx;
+
+    /** _more_ */
+    private JTextField zoomFld;
+
+    /** _more_ */
+    private JCheckBox orientCbx;
+
+    /** _more_ */
+    private JTextField tiltxFld;
+
+    /** _more_ */
+    private JTextField tiltyFld;
+
+    /** _more_ */
+    private JTextField tiltzFld;
+
+    /** _more_ */
+    private JRadioButton backBtn;
+
+
+    /** _more_ */
+    private JFrame frame;
+
+    /** The line from the origin to the point */
+    private LineDrawing locationLine;
+
+    /** _more_ */
+    private SelectorPoint locationPoint;
+
+    private JTable pointTable;
+    private AbstractTableModel pointTableModel;
+
+
 
     /**
      * _more_
@@ -181,6 +210,30 @@ public class Flythrough implements PropertyChangeListener {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param that _more_
+     */
+    public void initWith(Flythrough that) {
+        this.points          = new ArrayList<FlythroughPoint>(that.points);
+        this.animationInfo   = that.animationInfo;
+        this.tiltX           = that.tiltX;
+        this.tiltY           = that.tiltY;
+        this.tiltZ           = that.tiltZ;
+        this.zoom            = that.zoom;
+        this.changeViewpoint = that.changeViewpoint;
+        this.showLine        = that.showLine;
+        this.showReadout     = that.showReadout;
+        this.showTimes       = that.showTimes;
+        try {
+            doMakeContents(true);
+        } catch (Exception exc) {
+            viewManager.logException("Initializing flythrough", exc);
+        }
+        setAnimationTimes();
+    }
+
 
     /**
      * _more_
@@ -190,6 +243,11 @@ public class Flythrough implements PropertyChangeListener {
             frame.dispose();
             frame = null;
         }
+        if (animationWidget != null) {
+            animationWidget.destroy();
+            animationWidget = null;
+        }
+        viewManager = null;
     }
 
 
@@ -200,6 +258,14 @@ public class Flythrough implements PropertyChangeListener {
      */
     public void setAnimationInfo(AnimationInfo value) {
         animationInfo = value;
+    }
+
+    public AnimationWidget getAnimationWidget() {
+        return animationWidget;
+    }
+
+    public Animation getAnimation() {
+        return animation;
     }
 
     /**
@@ -229,8 +295,8 @@ public class Flythrough implements PropertyChangeListener {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    public static void setPts(LineDrawing ld, float x1, float x2, float y1,
-                              float y2, float z1, float z2)
+    private void setPts(LineDrawing ld, float x1, float x2, float y1,
+                        float y2, float z1, float z2)
             throws VisADException, RemoteException {
         MathType  mathType = RealTupleType.SpatialCartesian3DTuple;
         float[][] pts      = new float[][] {
@@ -238,12 +304,6 @@ public class Flythrough implements PropertyChangeListener {
         };
         ld.setData(new Gridded3DSet(mathType, pts, 2));
     }
-
-    /** tmp for flythrough */
-    int flythroughTimeStamp = 0;
-
-    /** tmp for flythrough */
-    private Object FLYTHROUGH_MUTEX = new Object();
 
 
 
@@ -253,16 +313,16 @@ public class Flythrough implements PropertyChangeListener {
      *
      * @param pts _more_
      */
-    public void setPoints(final float[][] pts) {
+    public void flythrough(final float[][] pts) {
         List<FlythroughPoint> points     = new ArrayList<FlythroughPoint>();
         NavigatedDisplay      navDisplay = viewManager.getNavigatedDisplay();
         for (int i = 0; i < pts[0].length; i++) {
             EarthLocation el = navDisplay.getEarthLocation(pts[0][i],
                                    pts[1][i], pts[2][i], false);
-            System.err.println("el:" + el + "  " + pts[2][i]);
             points.add(new FlythroughPoint(el));
         }
         this.points = points;
+        setAnimationTimes();
         show();
     }
 
@@ -271,39 +331,49 @@ public class Flythrough implements PropertyChangeListener {
     /**
      * tmp
      *
-     * @param pts pts
      *
-     * @param points _more_
+     * @param newPoints _more_
+     *
      */
-    public void flythrough(final List<FlythroughPoint> points) {
-        this.points = points;
+    public void flythrough(final List<FlythroughPoint> newPoints) {
+        this.points = new ArrayList<FlythroughPoint>(newPoints);
         setAnimationTimes();
+        show();
     }
 
     /**
      * _more_
      */
     private void setAnimationTimes() {
+        hasTimes = false;
+        if (animationWidget == null) {
+            return;
+        }
         try {
-            Set                   set           = null;
-            List<FlythroughPoint> points        = this.points;
-            boolean               showIndicator = false;
-            if ((points != null) && !points.isEmpty()) {
-                DateTime[] timeArray = new DateTime[points.size()];
-                for (int i = 0; i < points.size(); i++) {
-                    Date dttm = points.get(i).getDateTime();
+            Set                   set       = null;
+            List<FlythroughPoint> thePoints = this.points;
+            if ((thePoints != null) && !thePoints.isEmpty()) {
+                DateTime[] timeArray = new DateTime[thePoints.size()];
+                for (int i = 0; i < thePoints.size(); i++) {
+                    DateTime dttm = thePoints.get(i).getDateTime();
                     if (dttm == null) {
-                        dttm = new Date(i * 1000 * 60 * 60 * 24);
+                        dttm = new DateTime(new Date(i * 1000 * 60 * 60
+                                * 24));
                     } else {
-                        showIndicator = true;
+                        hasTimes = true;
                     }
-                    timeArray[i] = new DateTime(dttm);
+                    timeArray[i] = dttm;
                 }
                 set = DateTime.makeTimeSet(timeArray);
             }
-            System.err.println("show:" + showIndicator);
-            animationWidget.showDateBox(showIndicator);
+            if (showTimesCbx != null) {
+                showTimesCbx.setEnabled(hasTimes);
+            }
+            animationWidget.showDateBox(hasTimes);
             animationWidget.setBaseTimes(set);
+            if(pointTableModel!=null) {
+                pointTableModel.fireTableStructureChanged();
+            }
         } catch (Exception exc) {
             viewManager.logException("Setting flythrough", exc);
         }
@@ -335,21 +405,30 @@ public class Flythrough implements PropertyChangeListener {
         }
     }
 
+    /** _more_ */
+    private static int cnt = 0;
+
 
     /**
      * _more_
      *
+     *
+     * @param force _more_
      * @throws Exception _more_
      */
-    private synchronized void doMakeContents() throws Exception {
-        if (readout != null) {
+    private synchronized void doMakeContents(boolean force) throws Exception {
+        if ( !force && (readout != null)) {
             return;
         }
-        JTabbedPane tabbedPane = new JTabbedPane();
-        readout = new CursorReadoutWindow(viewManager);
+        if (readout == null) {
+            readout = new CursorReadoutWindow(viewManager);
+        }
+
+        showTimesCbx = new JCheckBox("Show Animation Times", showTimes);
+        showTimesCbx.setEnabled(hasTimes);
         changeViewpointCbx = new JCheckBox("Change Viewpoint",
                                            changeViewpoint);
-        orientCbx = new JCheckBox("Relative",true);
+        orientCbx      = new JCheckBox("Relative", true);
         showReadoutCbx = new JCheckBox("Show Readout", showReadout);
         readoutLabel =
             GuiUtils.getFixedWidthLabel("<html><br><br><br></html>");
@@ -363,61 +442,119 @@ public class Flythrough implements PropertyChangeListener {
                 goToCurrent();
             }
         };
-        animationWidget = new AnimationWidget(null, null, animationInfo);
-        animationWidget.setShareGroup("flythrough");
-        animation = new Animation();
-        animation.addPropertyChangeListener(this);
+        if (animationWidget == null) {
+            animationWidget = new AnimationWidget(null, null, animationInfo);
+            animationWidget.setShareGroup("flythrough");
+            animation = new Animation();
+            animation.addPropertyChangeListener(this);
+            animationWidget.setAnimation(animation);
+        }
+
         animation.setAnimationInfo(animationInfo);
-        animationWidget.setAnimation(animation);
+
+        if (locationLine == null) {
+            locationLine = new LineDrawing("flythroughpoint.line");
+            locationPoint = new SelectorPoint("flythrough.point",
+                    new RealTuple(RealTupleType.SpatialCartesian3DTuple,
+                                  new double[] { 0,
+                    0, 0 }));
+
+            locationPoint.setAutoSize(true);
+            locationPoint.setManipulable(false);
+            locationPoint.setColor(Color.green);
+
+            locationLine.setVisible(false);
+            locationPoint.setVisible(false);
+            locationLine.setLineWidth(3);
+            locationLine.setColor(Color.blue);
+            viewManager.getMaster().addDisplayable(locationPoint);
+            viewManager.getMaster().addDisplayable(locationLine);
+        }
 
 
-        locationLine = new LineDrawing("flythroughpoint.line");
-        locationPoint = new SelectorPoint("flythrough.point",
-                                          new RealTuple(RealTupleType.SpatialCartesian3DTuple,
-                                                        new double[] { 0,
-                                                                       0,0 }));
+        zoomFld  = new JTextField(zoom + "", 5);
 
-        locationPoint.setAutoSize(true);
-        locationPoint.setManipulable(false);
-        locationPoint.setColor(Color.green);
-        viewManager.getMaster().addDisplayable(locationPoint);
-
-        locationLine.setColor(Color.blue);
-        viewManager.getMaster().addDisplayable(locationLine);
-        locationLine.setLineWidth(3);
-
-
-        frame   = new JFrame("IDV - Flythrough");
-        zoomFld = new JTextField(zoom + "", 5);
-
-        tiltxFld = new JTextField(""+tiltX, 4);
-        tiltyFld = new JTextField(""+tiltY, 4);
-        tiltzFld = new JTextField(""+tiltZ, 4);
+        tiltxFld = new JTextField("" + tiltX, 4);
+        tiltyFld = new JTextField("" + tiltY, 4);
+        tiltzFld = new JTextField("" + tiltZ, 4);
         tiltxFld.addActionListener(listener);
         tiltyFld.addActionListener(listener);
         tiltzFld.addActionListener(listener);
-
-
         zoomFld.addActionListener(listener);
 
 
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
-        JComponent flds = GuiUtils.formLayout(new Component[] {
-            changeViewpointCbx, GuiUtils.filler(), 
-            GuiUtils.rLabel("Orientation:"),
-            GuiUtils.left(orientCbx),
-            GuiUtils.rLabel("Zoom:"),
-            GuiUtils.left(zoomFld), GuiUtils.rLabel("Tilt:"),
-            GuiUtils.left(GuiUtils.hbox(tiltxFld,tiltyFld,tiltzFld))
+        JComponent orientationComp = GuiUtils.formLayout(new Component[] {
+            changeViewpointCbx, GuiUtils.filler(),
+            GuiUtils.rLabel("Orientation:"), GuiUtils.left(orientCbx),
+            GuiUtils.rLabel("Zoom:"), GuiUtils.left(zoomFld),
+            GuiUtils.rLabel("Tilt:"),
+            GuiUtils.left(GuiUtils.hbox(tiltxFld, tiltyFld, tiltzFld)),
+            GuiUtils.rLabel("Animation:"), GuiUtils.left(showTimesCbx),
+            GuiUtils.filler(),
+            GuiUtils.makeCheckbox("Show Location Line", this, "showLine")
         });
 
 
-        tabbedPane.addTab("Orientation", GuiUtils.top(flds));
-        tabbedPane.addTab("Readout", GuiUtils.topCenter(GuiUtils.left(showReadoutCbx), readoutLabel));
-        JComponent contents = GuiUtils.topCenter(animationWidget.getContents(),
-                                                 tabbedPane);
+
+        if(pointTable==null) {
+            pointTableModel = new AbstractTableModel() {
+                    public int getRowCount() {
+                        return points.size();
+                    }
+
+                    public int getColumnCount() {
+                        return 4;
+                    }
+
+                    public Object getValueAt(int row, int column) {
+                        List<FlythroughPoint> thePoints = points;
+                        if(row>=thePoints.size()) return "n/a";
+                        FlythroughPoint pt = thePoints.get(row);
+                        if(column==0) return pt.getEarthLocation().getLatitude();
+                        if(column==1) return pt.getEarthLocation().getLongitude();
+                        if(column==2) return pt.getEarthLocation().getAltitude();
+                        if(column==3) return pt.getDateTime();
+                        return "";
+                    }
+
+                    public String getColumnName(int column) {
+                        switch (column) {
+                        case 0 :
+                            return "Latitude";
+
+                        case 1:
+                            return "Longitude";
+
+                        case 2:
+                            return "Altitude";
+
+                        case 3:
+                            return "Date/Time";
+                        }
+                        return "";
+                    }
+                };
+            pointTable = new JTable(pointTableModel);
+        }
+        JScrollPane scrollPane = new JScrollPane(pointTable);
+        scrollPane.setPreferredSize(new Dimension(300,400));
+
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("View", GuiUtils.top(orientationComp));
+        tabbedPane.addTab("Readout",
+                          GuiUtils.topCenter(GuiUtils.left(showReadoutCbx),
+                                             readoutLabel));
+        tabbedPane.addTab("Points", scrollPane);
+
+        JComponent contents =
+            GuiUtils.topCenter(animationWidget.getContents(), tabbedPane);
         contents = GuiUtils.inset(contents, 5);
         setAnimationTimes();
+        if (frame == null) {
+            frame = new JFrame("IDV - Flythrough");
+        }
+        frame.getContentPane().removeAll();
         frame.getContentPane().add(contents);
         frame.pack();
         frame.setLocation(400, 400);
@@ -430,7 +567,7 @@ public class Flythrough implements PropertyChangeListener {
     public void show() {
         if (frame == null) {
             try {
-                doMakeContents();
+                doMakeContents(false);
             } catch (Exception exc) {
                 viewManager.logException("Showing flythrough", exc);
             }
@@ -441,36 +578,67 @@ public class Flythrough implements PropertyChangeListener {
 
 
     /**
-     * tmp
+     * _more_
      *
-     * @param myTimeStamp timestamp
+     * @return _more_
+     */
+    public boolean isActive() {
+        return viewManager != null;
+    }
+
+
+    /**
+     * fly to the given point
      *
      * @param index _more_
      *
      * @throws Exception _more_
      */
     private void doStep(int index) throws Exception {
-        List<FlythroughPoint> points = this.points;
-        NavigatedDisplay navDisplay     = viewManager.getNavigatedDisplay();
-        MouseBehavior    mouseBehavior  = navDisplay.getMouseBehavior();
-        double[]         lastGoodMatrix = navDisplay.getProjectionMatrix();
-        double[]         aspect         = navDisplay.getDisplayAspect();
-        double[] xyz1     = { 0, 0, 0 };
-        double[] xyz2     = { 0, 0, 0 };
 
-        Vector3d upVector = new Vector3d(0, 0, 1);
-        if (index >= points.size()) {
+        if ( !isActive()) {
+            return;
+        }
+
+
+        MapViewManager viewManager  = this.viewManager;
+        if(viewManager==null) return;
+        boolean               doGlobe       =
+            viewManager.getUseGlobeDisplay();
+        List<FlythroughPoint> thePoints     = this.points;
+        NavigatedDisplay      navDisplay = viewManager.getNavigatedDisplay();
+        MouseBehavior         mouseBehavior = navDisplay.getMouseBehavior();
+        double[]              currentMatrix =
+            navDisplay.getProjectionMatrix();
+        double[]              aspect        = navDisplay.getDisplayAspect();
+        double[]              xyz1          = { 0, 0, 0 };
+        double[]              xyz2          = { 0, 0, 0 };
+
+        Vector3d              upVector;
+
+        if (index >= thePoints.size()) {
             index = 0;
         } else if (index < 0) {
-            index = points.size() - 1;
+            index = thePoints.size() - 1;
         }
-        int index1 = index;        
-        int index2 = index+1;
-        if(index2>=points.size()) index2=0;
+        if(pointTable!=null) { 
+            pointTable.getSelectionModel().setSelectionInterval(index,index);
+            pointTable.repaint();
+        }
+        
+
+        int     index1 = index;
+        int     index2 = index + 1;
+        boolean atEnd  = false;
+        if (index2 >= thePoints.size()) {
+            index2 = 0;
+            atEnd  = true;
+        }
+
 
         try {
-            FlythroughPoint pt1 = points.get(index1);
-            FlythroughPoint pt2 = points.get(index2);
+            FlythroughPoint pt1 = thePoints.get(index1);
+            FlythroughPoint pt2 = thePoints.get(index2);
 
             xyz1 = navDisplay.getSpatialCoordinates(pt1.getEarthLocation(),
                     xyz1);
@@ -479,16 +647,29 @@ public class Flythrough implements PropertyChangeListener {
             xyz2 = navDisplay.getSpatialCoordinates(pt2.getEarthLocation(),
                     xyz2);
 
-            float  x1   = (float) xyz1[0];
-            float  y1   = (float) xyz1[1];
-            float  z1   = (float) xyz1[2];
+            float x1 = (float) xyz1[0];
+            float y1 = (float) xyz1[1];
+            float z1 = (float) xyz1[2];
+
+            if (atEnd && (thePoints.size() > 1) && (index1 > 0)) {
+                FlythroughPoint prevPt = thePoints.get(index1 - 1);
+
+                double[] xyz3 = navDisplay.getSpatialCoordinates(
+                                    prevPt.getEarthLocation(), null);
+                xyz2[0] = x1 + (x1 - xyz3[0]);
+                xyz2[1] = y1 + (y1 - xyz3[1]);
+                xyz2[2] = z1 + (z1 - xyz3[2]);
+            }
+
+
             float  x2   = (float) xyz2[0];
             float  y2   = (float) xyz2[1];
             float  z2   = (float) xyz2[2];
 
             double zoom = getZoom();
-            if(zoom == 0) zoom = 0.1;
-
+            if (zoom == 0) {
+                zoom = 0.1;
+            }
 
             double tiltx = getTiltX();
             double tilty = getTiltY();
@@ -507,10 +688,17 @@ public class Flythrough implements PropertyChangeListener {
             //Transform3D t  = new Transform3D(currentMatrix);
             Transform3D t = new Transform3D();
             //            System.err.println("Look at:" + new Point3d(x1, y1, z1) + "  " + new Point3d(x2, y2, z2));
-            if(!orientCbx.isSelected()) {
-                y2=y1+10;
-                x2=x1;
+            if ( !orientCbx.isSelected()) {
+                y2 = y1 + 10;
+                x2 = x1;
             }
+
+            if (doGlobe) {
+                upVector = new Vector3d(x1, y1, z1);
+            } else {
+                upVector = new Vector3d(0, 0, 1);
+            }
+
 
             t.lookAt(new Point3d(x1, y1, z1), new Point3d(x2, y2, z2),
                      upVector);
@@ -518,7 +706,8 @@ public class Flythrough implements PropertyChangeListener {
             t.get(m);
 
 
-            double[] tiltMatrix = mouseBehavior.make_matrix(tiltx,tilty,tiltz, 1.0,1.0,1.0,0.0,0.0,0.0);
+            double[] tiltMatrix = mouseBehavior.make_matrix(tiltx, tilty,
+                                      tiltz, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0);
             m = mouseBehavior.multiply_matrix(tiltMatrix, m);
             if (aspect != null) {
                 //                double[] aspectMatrix = mouseBehavior.make_matrix(0.0, 0.0,
@@ -538,19 +727,39 @@ public class Flythrough implements PropertyChangeListener {
                 navDisplay.setProjectionMatrix(m);
             }
 
-            setPts(locationLine, x1, x1, y1, y1, 1, -1);
-            locationPoint.setPoint(new RealTuple(RealTupleType.SpatialCartesian3DTuple,
-                                                 new double[] { x1, y1,z1 }));
+            if (hasTimes && getShowTimes()) {
+                DateTime dttm = pt1.getDateTime();
+                if (dttm != null) {
+                    viewManager.getAnimationWidget().setTimeFromUser(dttm);
+                }
 
-            lastGoodMatrix = m;
+            }
+
+
+
+            if (doGlobe) {
+                setPts(locationLine, 0, x1*2, 0, y1*2, 0, z1*2);
+            } else {
+                setPts(locationLine, x1, x1, y1, y1, 1, -1);
+            }
+            locationPoint.setPoint(
+                new RealTuple(
+                    RealTupleType.SpatialCartesian3DTuple, new double[] { x1,
+                    y1, z1 }));
+
+            locationLine.setVisible(showLine);
+            //            locationPoint.setVisible(showLine);
+
+        } catch (NumberFormatException exc) {
+            viewManager.logException("Error parsing number:" + exc, exc);
         } catch (Exception exc) {
             System.err.println("Error:" + exc);
             exc.printStackTrace();
             try {
-                navDisplay.setProjectionMatrix(lastGoodMatrix);
+                navDisplay.setProjectionMatrix(currentMatrix);
             } catch (Exception ignore) {}
-            //                    break;
         }
+
     }
 
 
@@ -582,9 +791,17 @@ public class Flythrough implements PropertyChangeListener {
         return this.points;
     }
 
-
-    public void setTilt(double value) {
+    public boolean hasPoints() {
+        return points.size()>0;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void setTilt(double value) {}
 
     /**
      *  Set the Tilt property.
@@ -690,14 +907,6 @@ public class Flythrough implements PropertyChangeListener {
         this.viewManager = value;
     }
 
-    /**
-     *  Get the ViewManager property.
-     *
-     *  @return The ViewManager
-     */
-    public MapViewManager getViewManager() {
-        return this.viewManager;
-    }
 
     /**
      *  Set the ChangeViewpoint property.
@@ -740,6 +949,54 @@ public class Flythrough implements PropertyChangeListener {
         }
         return this.showReadout;
     }
+
+
+    /**
+     * Set the ShowTimes property.
+     *
+     * @param value The new value for ShowTimes
+     */
+    public void setShowTimes(boolean value) {
+        showTimes = value;
+    }
+
+    /**
+     * Get the ShowTimes property.
+     *
+     * @return The ShowTimes
+     */
+    public boolean getShowTimes() {
+        if (showTimesCbx != null) {
+            showTimes = showTimesCbx.isSelected();
+        }
+        return showTimes;
+    }
+
+
+    /**
+     *  Set the ShowLine property.
+     *
+     *  @param value The new value for ShowLine
+     */
+    public void setShowLine(boolean value) {
+        showLine = value;
+        if (locationLine != null) {
+            try {
+                locationLine.setVisible(value);
+                //                locationPoint.setVisible(value);
+            } catch (Exception ignore) {}
+        }
+    }
+
+    /**
+     * Get the ShowLine property.
+     *
+     * @return The ShowLine
+     */
+    public boolean getShowLine() {
+        return showLine;
+    }
+
 
 
 

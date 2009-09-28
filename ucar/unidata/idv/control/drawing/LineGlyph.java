@@ -41,8 +41,6 @@ import ucar.visad.display.*;
 
 import visad.*;
 
-import visad.georef.EarthLocation;
-import visad.georef.LatLonPoint;
 
 import java.awt.*;
 import java.awt.event.*;

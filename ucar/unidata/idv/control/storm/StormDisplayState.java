@@ -41,6 +41,7 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 
 
+import ucar.unidata.idv.FlythroughPoint;
 import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.control.DisplayControlImpl;
@@ -2050,6 +2051,7 @@ public class StormDisplayState {
         int width  = 400;
         int height = 400;
         for (StormTrack track : trackCollection.getTracks()) {
+            final StormTrack theTrack = track;
             StormTrackTableModel tableModel = new StormTrackTableModel(this,
                                                   track);
             tableModels.add(tableModel);
@@ -2073,6 +2075,8 @@ public class StormDisplayState {
 
             track.putTemporaryProperty(PROP_TRACK_TABLE, contents);
 
+            JButton flythroughBtn = GuiUtils.makeButton("Fly through", this, "flythroughTrack",track);
+            contents = GuiUtils.centerBottom(contents, GuiUtils.right(flythroughBtn));
             tableTreePanel.addComponent(contents, track.getWay().toString(),
                                         track.getStartTime().toString(),
                                         null, track);
@@ -2082,6 +2086,20 @@ public class StormDisplayState {
         return tableTreePanel;
     }
 
+
+    public void flythroughTrack(StormTrack track) {
+        try {
+            List<FlythroughPoint> points = new ArrayList<FlythroughPoint>();
+            for( StormTrackPoint stp: track.getTrackPoints()) {
+                EarthLocation newLoc = makePoint(stp.getLocation().getLatitude().getValue(CommonUnit.degree),
+                                                 stp.getLocation().getLongitude().getValue(CommonUnit.degree));
+                points.add(new FlythroughPoint(newLoc,stp.getTime()));
+            }
+            stormTrackControl.getMapViewManager().flythrough(points);
+        } catch (Exception exc) {
+            stormTrackControl.logException("Doing flythrough", exc);
+        }
+    }
 
 
     /** _more_ */

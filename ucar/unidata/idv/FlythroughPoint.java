@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -41,16 +42,16 @@ import java.util.Date;
 
 public class FlythroughPoint {
 
-    /** _more_          */
+    /** _more_ */
     private EarthLocation earthLocation;
 
-    /** _more_          */
-    private Date dateTime;
+    /** _more_ */
+    private DateTime dateTime;
 
-    /** _more_          */
+    /** _more_ */
     private double tilt = Double.NaN;
 
-    /** _more_          */
+    /** _more_ */
     private double zoom = Double.NaN;
 
     /**
@@ -65,6 +66,18 @@ public class FlythroughPoint {
      */
     public FlythroughPoint(EarthLocation earthLocation) {
         this.earthLocation = earthLocation;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param earthLocation _more_
+     * @param dttm _more_
+     */
+    public FlythroughPoint(EarthLocation earthLocation, DateTime dttm) {
+        this.earthLocation = earthLocation;
+        this.dateTime      = dttm;
     }
 
     /**
@@ -90,7 +103,7 @@ public class FlythroughPoint {
      *
      * @param value The new value for DateTime
      */
-    public void setDateTime(Date value) {
+    public void setDateTime(DateTime value) {
         this.dateTime = value;
     }
 
@@ -99,7 +112,7 @@ public class FlythroughPoint {
      *
      * @return The DateTime
      */
-    public Date getDateTime() {
+    public DateTime getDateTime() {
         return this.dateTime;
     }
 

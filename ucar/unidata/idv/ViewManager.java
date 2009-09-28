@@ -1679,7 +1679,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @throws RemoteException  Java RMI exception
      * @throws VisADException   Couldn't create the VisAD display
      */
-    public final void initAfterUnPersistence(IntegratedDataViewer idv)
+    public  void initAfterUnPersistence(IntegratedDataViewer idv)
             throws VisADException, RemoteException {
         setIdv(idv);
         initBooleanProperties();
