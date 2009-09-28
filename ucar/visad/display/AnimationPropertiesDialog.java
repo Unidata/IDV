@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.visad.display;
 
 
@@ -36,12 +37,11 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
-import java.rmi.RemoteException;
-import visad.VisADException;
 import visad.CommonUnit;
 import visad.DateTime;
 import visad.Real;
 import visad.Set;
+import visad.VisADException;
 
 
 import java.*;
@@ -57,6 +57,8 @@ import java.io.*;
 import java.lang.*;
 
 import java.net.*;
+
+import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -117,7 +119,7 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
     /** label for endScrollBar */
     private JTextField endField;
 
-    /** _more_          */
+    /** share none button */
     private JRadioButton shareNoneBtn;
 
     /** checkbox for selecting shared state */
@@ -129,7 +131,7 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
     /** Show the boxes */
     private JCheckBox boxesVisibleButton;
 
-    /** _more_          */
+    /** predefined button */
     private JButton predefinedBtn;
 
     /** Direction widget */
@@ -228,6 +230,7 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
     /** flag for updating labels */
     private boolean okToUpdate = false;
 
+    /** timeline */
     private Timeline timeline;
 
 
@@ -301,7 +304,7 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
 
 
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
-        timeline = new Timeline(new ArrayList(),300);
+        timeline           = new Timeline(new ArrayList(), 300);
         timeline.setIsCapableOfSelection(false);
 
         JComponent top = GuiUtils.formLayout(new Component[] {
@@ -351,17 +354,24 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
     }  // end cstr
 
 
-    private DateTime[]getAnimationTimes() 
-        throws VisADException, RemoteException { 
-        Set timeSet =
-            animationWidget.getAnimationSetInfo().getBaseTimes();
+    /**
+     * Get the animation times
+     *
+     * @return array of times
+     *
+     * @throws RemoteException Java RMI exception
+     * @throws VisADException  problem creating the DateTime objects
+     */
+    private DateTime[] getAnimationTimes()
+            throws VisADException, RemoteException {
+        Set timeSet = animationWidget.getAnimationSetInfo().getBaseTimes();
         if ((timeSet == null)
-            && (animationWidget.getDisplayMaster() != null)) {
+                && (animationWidget.getDisplayMaster() != null)) {
             timeSet =
                 animationWidget.getDisplayMaster()
-                .getAnimationSetFromDisplayables();
+                    .getAnimationSetFromDisplayables();
         }
-        DateTime[] timesArray  = Animation.getDateTimeArray(timeSet);
+        DateTime[] timesArray = Animation.getDateTimeArray(timeSet);
         return timesArray;
     }
 
@@ -435,7 +445,8 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
                 setFieldFromSlider(slide, field);
             }
         };
-        JComponent[] comps = GuiUtils.makeSliderPopup(1, 100, 5, listener);
+        JComponent[] comps = GuiUtils.makeSliderPopup(5, 1000, 50, listener);
+        ((JSlider)comps[1]).setMinorTickSpacing(5);
         if (field == fwdField) {
             fwdSlider = (JSlider) comps[1];
         }
@@ -526,12 +537,12 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
         endTimeBox.addActionListener(boxListener);
 
         Date startDate = null;
-        Date endDate = null;
+        Date endDate   = null;
         try {
             //            DateTime[] times = animationWidget.getTimes();
             //            startDate = (times!=null&&times.length>0?ucar.visad.Util.makeDate(times[0]):null);
             //            endDate = (times!=null&&times.length>0?ucar.visad.Util.makeDate(times[times.length-1]):null);
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             //noop
         }
         startTimePicker = new DateTimePicker(startDate);
@@ -617,16 +628,16 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
 
     }
 
-    /** _more_          */
+    /** predefined methods */
     String[] PREDEFINED_METHODS = { "predefinedDataRange",
                                     "predefinedRealTime" };
 
-    /** _more_          */
+    /** predefined labels */
     String[] PREDEFINED_LABELS = { "Uniform Across Data Range", "Real Time" };
 
 
     /**
-     * _more_
+     * Popup predefined menu
      */
     public void popupPredefinedMenu() {
         List items = new ArrayList();
@@ -639,13 +650,13 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
 
 
 
-    /** _more_          */
+    /** predefined interval field*/
     TimeLengthField predefinedIntervalField;
 
     /**
-     * _more_
+     * Get the predefined interval component
      *
-     * @return _more_
+     * @return  the interval component
      */
     private JComponent getPredefinedInterval() {
         if (predefinedIntervalField == null) {
@@ -657,9 +668,9 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
     }
 
     /**
-     * _more_
+     * Apply the predefined interval
      *
-     * @return _more_
+     * @return true if successful
      */
     private boolean applyPredefinedInterval() {
         if ( !predefinedIntervalField.applyFields(true)) {
@@ -671,7 +682,7 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
 
 
     /**
-     * _more_
+     * Set up the predefined data range
      */
     public void predefinedDataRange() {
 
@@ -698,7 +709,7 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
 
 
     /**
-     * _more_
+     * Set up the predefined real time
      */
     public void predefinedRealTime() {
         TimeLengthField widthField = new TimeLengthField("Interval", true,
@@ -747,17 +758,17 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
     }
 
 
-    /** _more_          */
+    /** predefined dialog */
     JDialog predefinedDialog;
 
     /**
-     * _more_
+     * Show the predefined dialog
      *
-     * @param contents _more_
-     * @param label _more_
-     * @param title _more_
+     * @param contents  the contents
+     * @param label  the label
+     * @param title  the dialog title
      *
-     * @return _more_
+     * @return  true if successful
      */
     private boolean showPredefined(JComponent contents, String label,
                                    String title) {
@@ -884,6 +895,9 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
         return true;
     }
 
+    /**
+     * Show the properties dialog
+     */
     public void show() {
         updateTimeline();
         super.show();
@@ -988,14 +1002,13 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
 
             try {
                 myInfo.setFwdSpeed(
-                    (float) (Double.parseDouble(fwdField.getText().trim())));
+                    (float) (Misc.parseValue(fwdField.getText().trim())));
                 myInfo.setBackSpeed(
-                    (float) (Double.parseDouble(backField.getText().trim())));
+                    (float) (Misc.parseValue(backField.getText().trim())));
                 myInfo.setStartDwell(
-                    (float) (Double.parseDouble(
-                        startField.getText().trim())));
+                    (float) (Misc.parseValue(startField.getText().trim())));
                 myInfo.setEndDwell(
-                    (float) (Double.parseDouble(endField.getText().trim())));
+                    (float) (Misc.parseValue(endField.getText().trim())));
             } catch (NumberFormatException nfe) {
                 LogUtil.userErrorMessage("Bad number format:" + nfe);
                 return;
@@ -1050,9 +1063,9 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
      */
     private void setSliderFromField(JTextField field, JSlider bar) {
         try {
-            double v = Math.max(0.1,
-                                Double.parseDouble(field.getText().trim()));
-            bar.setValue((int) (v * 10.0f));
+            double v = Math.max(0.01,
+                                Misc.parseValue(field.getText().trim()));
+            bar.setValue((int) (v * 100.0f));
             field.setText("" + v);
         } catch (NumberFormatException nfe) {
             LogUtil.userErrorMessage("Bad number format:"
@@ -1071,7 +1084,10 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
      * @param field The field
      */
     private void setFieldFromSlider(JSlider bar, JTextField field) {
-        field.setText((float) (bar.getValue() / 10.0f) + "");
+        // round off to nearest .05
+        int rawValue = bar.getValue();
+        rawValue = rawValue - rawValue % 5;
+        field.setText((float) (rawValue / 100.0f) + "");
     }
 
 
@@ -1126,11 +1142,16 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
     }
 
 
+    /**
+     * Update the timeline
+     */
     private void updateTimeline() {
         try {
-            List datedThings = DatedObject.wrap(ucar.visad.Util.makeDates(getAnimationTimes()));
-            timeline.setDatedThings(datedThings,true);
-        } catch(Exception exc) {
+            List datedThings = DatedObject.wrap(
+                                   ucar.visad.Util.makeDates(
+                                       getAnimationTimes()));
+            timeline.setDatedThings(datedThings, true);
+        } catch (Exception exc) {
             LogUtil.logException("Error initializing dialog", exc);
         }
 
