@@ -100,8 +100,16 @@ public class Flythrough implements PropertyChangeListener {
     /** _more_          */
     private JTextField zoomFld;
 
-    /** _more_          */
-    private JTextField tiltFld;
+    public static final int ORIENT_RELATIVE =0;
+    public static final int ORIENT_FIXED =1;
+
+    private int orientation = ORIENT_RELATIVE;
+
+    private JCheckBox orientCbx;
+
+    private JTextField tiltxFld;
+    private JTextField tiltyFld;    
+    private JTextField tiltzFld;
 
     /** _more_          */
     private JRadioButton backBtn;
@@ -111,11 +119,15 @@ public class Flythrough implements PropertyChangeListener {
     private JFrame frame;
 
     /** The line from the origin to the point */
-    private LineDrawing flyThroughLine;
+    private LineDrawing locationLine;
+    private SelectorPoint locationPoint;
+
 
 
     /** _more_          */
-    private double tilt = 0.01;
+    private double tiltX = 0.0;
+    private double tiltY = 0.0;
+    private double tiltZ = 0.0;
 
     /** _more_          */
     private double zoom = 1.0;
@@ -150,6 +162,8 @@ public class Flythrough implements PropertyChangeListener {
 
     /** _more_          */
     private JCheckBox changeViewpointCbx;
+
+    private JCheckBox overheadCbx;
 
     /**
      * _more_
@@ -327,18 +341,19 @@ public class Flythrough implements PropertyChangeListener {
      *
      * @throws Exception _more_
      */
-    private void doMakeContents() throws Exception {
-        if (frame != null) {
+    private synchronized void doMakeContents() throws Exception {
+        if (readout != null) {
             return;
         }
+        JTabbedPane tabbedPane = new JTabbedPane();
         readout = new CursorReadoutWindow(viewManager);
         changeViewpointCbx = new JCheckBox("Change Viewpoint",
                                            changeViewpoint);
+        orientCbx = new JCheckBox("Relative",true);
         showReadoutCbx = new JCheckBox("Show Readout", showReadout);
         readoutLabel =
             GuiUtils.getFixedWidthLabel("<html><br><br><br></html>");
         readoutLabel.setVerticalAlignment(SwingConstants.TOP);
-        //        readoutLabel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
         if (animationInfo == null) {
             animationInfo = new AnimationInfo();
@@ -356,29 +371,51 @@ public class Flythrough implements PropertyChangeListener {
         animationWidget.setAnimation(animation);
 
 
-        flyThroughLine = new LineDrawing("LocationIndicatorControl.xline");
-        flyThroughLine.setColor(Color.blue);
-        viewManager.getMaster().addDisplayable(flyThroughLine);
-        flyThroughLine.setLineWidth(3);
+        locationLine = new LineDrawing("flythroughpoint.line");
+        locationPoint = new SelectorPoint("flythrough.point",
+                                          new RealTuple(RealTupleType.SpatialCartesian3DTuple,
+                                                        new double[] { 0,
+                                                                       0,0 }));
+
+        locationPoint.setAutoSize(true);
+        locationPoint.setManipulable(false);
+        locationPoint.setColor(Color.green);
+        viewManager.getMaster().addDisplayable(locationPoint);
+
+        locationLine.setColor(Color.blue);
+        viewManager.getMaster().addDisplayable(locationLine);
+        locationLine.setLineWidth(3);
+
 
         frame   = new JFrame("IDV - Flythrough");
         zoomFld = new JTextField(zoom + "", 5);
-        tiltFld = new JTextField(tilt + "", 5);
+
+        tiltxFld = new JTextField(""+tiltX, 4);
+        tiltyFld = new JTextField(""+tiltY, 4);
+        tiltzFld = new JTextField(""+tiltZ, 4);
+        tiltxFld.addActionListener(listener);
+        tiltyFld.addActionListener(listener);
+        tiltzFld.addActionListener(listener);
+
+
         zoomFld.addActionListener(listener);
-        tiltFld.addActionListener(listener);
+
 
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
         JComponent flds = GuiUtils.formLayout(new Component[] {
-            changeViewpointCbx, GuiUtils.filler(), GuiUtils.rLabel("Zoom:"),
+            changeViewpointCbx, GuiUtils.filler(), 
+            GuiUtils.rLabel("Orientation:"),
+            GuiUtils.left(orientCbx),
+            GuiUtils.rLabel("Zoom:"),
             GuiUtils.left(zoomFld), GuiUtils.rLabel("Tilt:"),
-            GuiUtils.left(tiltFld)
+            GuiUtils.left(GuiUtils.hbox(tiltxFld,tiltyFld,tiltzFld))
         });
 
-        JComponent contents = GuiUtils.vbox(animationWidget.getContents(),
-                                            flds, GuiUtils.filler(400, 5));
-        contents = GuiUtils.topCenter(
-            contents,
-            GuiUtils.topCenter(GuiUtils.left(showReadoutCbx), readoutLabel));
+
+        tabbedPane.addTab("Orientation", GuiUtils.top(flds));
+        tabbedPane.addTab("Readout", GuiUtils.topCenter(GuiUtils.left(showReadoutCbx), readoutLabel));
+        JComponent contents = GuiUtils.topCenter(animationWidget.getContents(),
+                                                 tabbedPane);
         contents = GuiUtils.inset(contents, 5);
         setAnimationTimes();
         frame.getContentPane().add(contents);
@@ -413,28 +450,27 @@ public class Flythrough implements PropertyChangeListener {
      * @throws Exception _more_
      */
     private void doStep(int index) throws Exception {
+        List<FlythroughPoint> points = this.points;
         NavigatedDisplay navDisplay     = viewManager.getNavigatedDisplay();
         MouseBehavior    mouseBehavior  = navDisplay.getMouseBehavior();
         double[]         lastGoodMatrix = navDisplay.getProjectionMatrix();
         double[]         aspect         = navDisplay.getDisplayAspect();
-        double[]         trans          = { 0.0, 0.0, 0.0 };
-        double[]         scale          = { 0.0, 0.0, 0.0 };
-        double[]         rot            = { 0.0, 0.0, 0.0 };
-        mouseBehavior.instance_unmake_matrix(rot, scale, trans,
-                                             lastGoodMatrix);
         double[] xyz1     = { 0, 0, 0 };
         double[] xyz2     = { 0, 0, 0 };
 
         Vector3d upVector = new Vector3d(0, 0, 1);
-        if (index + 1 >= points.size()) {
+        if (index >= points.size()) {
             index = 0;
         } else if (index < 0) {
             index = points.size() - 1;
         }
+        int index1 = index;        
+        int index2 = index+1;
+        if(index2>=points.size()) index2=0;
+
         try {
-            FlythroughPoint pt1 = points.get(index);
-            currentPoint = pt1;
-            FlythroughPoint pt2 = points.get(index + 1);
+            FlythroughPoint pt1 = points.get(index1);
+            FlythroughPoint pt2 = points.get(index2);
 
             xyz1 = navDisplay.getSpatialCoordinates(pt1.getEarthLocation(),
                     xyz1);
@@ -451,13 +487,14 @@ public class Flythrough implements PropertyChangeListener {
             float  z2   = (float) xyz2[2];
 
             double zoom = getZoom();
-            setPts(flyThroughLine, x1, x1, y1, y1, 1, -1);
+            if(zoom == 0) zoom = 0.1;
 
-            double tilt = getTilt();
-            if (zoom != 0) {
-                tilt = tilt / zoom;
-            }
-            z1 += tilt;
+
+            double tiltx = getTiltX();
+            double tilty = getTiltY();
+            double tiltz = getTiltZ();
+
+
 
             //Check for nans
             if ((x2 != x2) || (y2 != y2) || (z2 != z2)) {
@@ -469,13 +506,20 @@ public class Flythrough implements PropertyChangeListener {
 
             //Transform3D t  = new Transform3D(currentMatrix);
             Transform3D t = new Transform3D();
-            System.err.println("Look at:" + new Point3d(x1, y1, z1) + "   "
-                               + new Point3d(x2, y2, z2));
+            //            System.err.println("Look at:" + new Point3d(x1, y1, z1) + "  " + new Point3d(x2, y2, z2));
+            if(!orientCbx.isSelected()) {
+                y2=y1+10;
+                x2=x1;
+            }
+
             t.lookAt(new Point3d(x1, y1, z1), new Point3d(x2, y2, z2),
                      upVector);
             double[] m = new double[16];
             t.get(m);
 
+
+            double[] tiltMatrix = mouseBehavior.make_matrix(tiltx,tilty,tiltz, 1.0,1.0,1.0,0.0,0.0,0.0);
+            m = mouseBehavior.multiply_matrix(tiltMatrix, m);
             if (aspect != null) {
                 //                double[] aspectMatrix = mouseBehavior.make_matrix(0.0, 0.0,
                 //                                                             0.0, aspect[0],aspect[1], aspect[2], 0.0, 0.0,0.0);                    
@@ -486,15 +530,24 @@ public class Flythrough implements PropertyChangeListener {
                                        zoom, 0.0, 0.0, 0.0);
 
             m = mouseBehavior.multiply_matrix(scaleMatrix, m);
+
+            double[] screenCenter = navDisplay.getScreenCenter();
+
+            currentPoint = pt1;
             if (changeViewpointCbx.isSelected()) {
-                viewManager.getMaster().setProjectionMatrix(m);
+                navDisplay.setProjectionMatrix(m);
             }
+
+            setPts(locationLine, x1, x1, y1, y1, 1, -1);
+            locationPoint.setPoint(new RealTuple(RealTupleType.SpatialCartesian3DTuple,
+                                                 new double[] { x1, y1,z1 }));
+
             lastGoodMatrix = m;
         } catch (Exception exc) {
             System.err.println("Error:" + exc);
             exc.printStackTrace();
             try {
-                viewManager.getMaster().setProjectionMatrix(lastGoodMatrix);
+                navDisplay.setProjectionMatrix(lastGoodMatrix);
             } catch (Exception ignore) {}
             //                    break;
         }
@@ -529,13 +582,17 @@ public class Flythrough implements PropertyChangeListener {
         return this.points;
     }
 
+
+    public void setTilt(double value) {
+    }
+
     /**
      *  Set the Tilt property.
      *
      *  @param value The new value for Tilt
      */
-    public void setTilt(double value) {
-        this.tilt = value;
+    public void setTiltX(double value) {
+        tiltX = value;
     }
 
     /**
@@ -543,12 +600,63 @@ public class Flythrough implements PropertyChangeListener {
      *
      *  @return The Tilt
      */
-    public double getTilt() {
-        if (tiltFld != null) {
-            this.tilt = new Double(tiltFld.getText().trim()).doubleValue();
+    public double getTiltX() {
+        if (tiltxFld != null) {
+            this.tiltX = new Double(tiltxFld.getText().trim()).doubleValue();
         }
-        return this.tilt;
+        return this.tiltX;
     }
+
+
+
+
+    /**
+     *  Set the Tilt property.
+     *
+     *  @param value The new value for Tilt
+     */
+    public void setTiltY(double value) {
+        tiltY = value;
+    }
+
+    /**
+     *  Get the Tilt property.
+     *
+     *  @return The Tilt
+     */
+    public double getTiltY() {
+        if (tiltyFld != null) {
+            this.tiltY = new Double(tiltyFld.getText().trim()).doubleValue();
+        }
+        return this.tiltY;
+    }
+
+
+
+
+    /**
+     *  Set the Tilt propertz.
+     *
+     *  @param value The new value for Tilt
+     */
+    public void setTiltZ(double value) {
+        tiltZ = value;
+    }
+
+    /**
+     *  Get the Tilt propertz.
+     *
+     *  @return The Tilt
+     */
+    public double getTiltZ() {
+        if (tiltzFld != null) {
+            this.tiltZ = new Double(tiltzFld.getText().trim()).doubleValue();
+        }
+        return this.tiltZ;
+    }
+
+
+
 
     /**
      *  Set the Zoom property.
