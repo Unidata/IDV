@@ -21,10 +21,6 @@
  */
 
 
-
-
-
-
 package ucar.unidata.idv;
 
 
@@ -49,10 +45,15 @@ public class FlythroughPoint {
     private DateTime dateTime;
 
     /** _more_ */
-    private double tilt = Double.NaN;
+    private double tiltX = Double.NaN;
+    private double tiltY = Double.NaN;    
+    private double tiltZ = Double.NaN;
 
     /** _more_ */
     private double zoom = Double.NaN;
+
+
+    private double[] matrix;
 
     /**
      * _more_
@@ -76,8 +77,23 @@ public class FlythroughPoint {
      * @param dttm _more_
      */
     public FlythroughPoint(EarthLocation earthLocation, DateTime dttm) {
+        this(earthLocation, dttm, Double.NaN,Double.NaN, Double.NaN);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param earthLocation _more_
+     * @param dttm _more_
+     */
+
+    public FlythroughPoint(EarthLocation earthLocation, DateTime dttm, double tiltX, double tiltY, double tiltZ) {
         this.earthLocation = earthLocation;
         this.dateTime      = dttm;
+        this.tiltX = tiltX;
+        this.tiltY = tiltY;
+        this.tiltZ = tiltZ;
     }
 
     /**
@@ -116,14 +132,7 @@ public class FlythroughPoint {
         return this.dateTime;
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean hasTilt() {
-        return tilt == tilt;
-    }
+
 
     /**
      * _more_
@@ -134,23 +143,6 @@ public class FlythroughPoint {
         return zoom == zoom;
     }
 
-    /**
-     * Set the Tilt property.
-     *
-     * @param value The new value for Tilt
-     */
-    public void setTilt(double value) {
-        this.tilt = value;
-    }
-
-    /**
-     * Get the Tilt property.
-     *
-     * @return The Tilt
-     */
-    public double getTilt() {
-        return this.tilt;
-    }
 
     /**
      * Set the Zoom property.
@@ -168,6 +160,110 @@ public class FlythroughPoint {
      */
     public double getZoom() {
         return this.zoom;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean hasTiltX() {
+        return tiltX == tiltX;
+    }
+
+    /**
+     * Set the Tilt propertx.
+     *
+     * @param value The new value for Tilt
+     */
+    public void setTiltX(double value) {
+        this.tiltX = value;
+    }
+
+    /**
+     * Get the Tilt property.
+     *
+     * @return The Tilt
+     */
+    public double getTiltX() {
+        return this.tiltX;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean hasTiltY() {
+        return tiltY == tiltY;
+    }
+
+    /**
+     * Set the Tilt property.
+     *
+     * @param value The new value for Tilt
+     */
+    public void setTiltY(double value) {
+        this.tiltY = value;
+    }
+
+    /**
+     * Get the Tilt property.
+     *
+     * @return The Tilt
+     */
+    public double getTiltY() {
+        return this.tiltY;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean hasTiltZ() {
+        return tiltZ == tiltZ;
+    }
+
+    /**
+     * Set the Tilt property.
+     *
+     * @param value The new value for Tilt
+     */
+    public void setTiltZ(double value) {
+        this.tiltZ = value;
+    }
+
+
+    /**
+     * Get the Tilt property.
+     *
+     * @return The Tilt
+     */
+    public double getTiltZ() {
+        return this.tiltZ;
+    }
+
+
+    /**
+       Set the Matrix property.
+
+       @param value The new value for Matrix
+    **/
+    public void setMatrix (double[] value) {
+	this.matrix = value;
+    }
+
+    /**
+       Get the Matrix property.
+
+       @return The Matrix
+    **/
+    public double[] getMatrix () {
+	return this.matrix;
     }
 
 
