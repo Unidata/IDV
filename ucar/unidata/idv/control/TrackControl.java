@@ -36,8 +36,10 @@ import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.data.sounding.TrackDataSource;
 
+import visad.georef.EarthLocation;
+import visad.georef.EarthLocationLite;
 
-import ucar.unidata.idv.ControlContext;
+import ucar.unidata.idv.*;
 import ucar.unidata.ui.drawing.*;
 
 
@@ -259,6 +261,41 @@ public class TrackControl extends GridDisplayControl {
         }
         return true;
     }
+
+    protected void getViewMenuItems(List items, boolean forMenuBar) {
+        MapViewManager mvm =  getMapViewManager();
+        if(mvm!=null) {
+            items.add(GuiUtils.makeMenuItem("Show Flythrough", this,
+                                            "showFlythrough", null));
+        }
+
+        super.getViewMenuItems(items,forMenuBar);
+    }
+
+    public void showFlythrough() throws Exception {
+        /*
+        MathType t = d.getType();
+        visad.jmet.DumpType.dumpMathType(t, System.out);
+        visad.jmet.DumpType.dumpDataType(d, System.out);
+       */
+        MapViewManager mvm =  getMapViewManager();
+        FlatField flatField = getFlatField();
+        Set domainSet = flatField.getDomainSet();
+        List<FlythroughPoint> points = new ArrayList<FlythroughPoint>();
+        int length = domainSet.getLength();
+        for(int i=0;i<length;i++) {
+            Real[] llaR = DataUtility.getSample(domainSet,i).getRealComponents();
+            Tuple tuple = (Tuple)flatField.getSample(i);
+            EarthLocation el = new EarthLocationLite(llaR[0],llaR[1],llaR[2]);
+            points.add(new FlythroughPoint(el, new DateTime((Real) tuple.getComponent(1))));
+
+        }
+
+        mvm.flythrough(points);
+    }
+
+
+
 
     /**
      * Call to help make this kind of Display Control; also calls code to
