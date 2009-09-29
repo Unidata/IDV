@@ -128,6 +128,20 @@ downloaded and installed if it is newer than the version you have on
 your system. 
 </faqitem>
 
+<faqitem q="How can I change the amount of memory used by IDV through Webstart?" id="wsmemory">
+The amount of memory used by the IDV is hardcoded in the Web Start JNLP file 
+that is used to launch the IDV.  If you would like to run IDV via 
+Java Web Start with a modified memory alloaction, simply right click on the 
+&quot;Click here to launch the IDV&quot; link on the IDV's Web Start page
+and save the file (e.g., idv.jnlp) to a convenient location. Then, open 
+this file with an editor (e.g., WordPad, gedit) and modify the line 
+"&lt;j2se version=&quot;1.6+&quot; max-heap-size=&quot;1024m&quot; /&gt; to 
+reflect your memory need.  After saving, you need only to launch this 
+.jnlp file to run IDV via Java Web Start with the modified memory allocation.
+Please see the <a href=#memory>FAQ item below</a> for more information on
+changing the memory allocation.
+</faqitem>
+
 <faqitem q="What is &quot;there is no disk in drive A&quot; message in Web Start?" id="nodisk">
 Sometimes starting a program  on a Windows system with Web Start will
 produce a dialog box that says "There is no disk in drive A." Normally
