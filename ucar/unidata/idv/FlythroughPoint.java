@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -46,13 +47,18 @@ public class FlythroughPoint {
 
     /** _more_ */
     private double tiltX = Double.NaN;
-    private double tiltY = Double.NaN;    
+
+    /** _more_          */
+    private double tiltY = Double.NaN;
+
+    /** _more_          */
     private double tiltZ = Double.NaN;
 
     /** _more_ */
     private double zoom = Double.NaN;
 
 
+    /** _more_          */
     private double[] matrix;
 
     /**
@@ -77,7 +83,7 @@ public class FlythroughPoint {
      * @param dttm _more_
      */
     public FlythroughPoint(EarthLocation earthLocation, DateTime dttm) {
-        this(earthLocation, dttm, Double.NaN,Double.NaN, Double.NaN);
+        this(earthLocation, dttm, Double.NaN, Double.NaN, Double.NaN);
     }
 
 
@@ -86,14 +92,18 @@ public class FlythroughPoint {
      *
      * @param earthLocation _more_
      * @param dttm _more_
+     * @param tiltX _more_
+     * @param tiltY _more_
+     * @param tiltZ _more_
      */
 
-    public FlythroughPoint(EarthLocation earthLocation, DateTime dttm, double tiltX, double tiltY, double tiltZ) {
+    public FlythroughPoint(EarthLocation earthLocation, DateTime dttm,
+                           double tiltX, double tiltY, double tiltZ) {
         this.earthLocation = earthLocation;
         this.dateTime      = dttm;
-        this.tiltX = tiltX;
-        this.tiltY = tiltY;
-        this.tiltZ = tiltZ;
+        this.tiltX         = tiltX;
+        this.tiltY         = tiltY;
+        this.tiltZ         = tiltZ;
     }
 
     /**
@@ -249,21 +259,21 @@ public class FlythroughPoint {
 
 
     /**
-       Set the Matrix property.
-
-       @param value The new value for Matrix
-    **/
-    public void setMatrix (double[] value) {
-	this.matrix = value;
+     *  Set the Matrix property.
+     *
+     *  @param value The new value for Matrix
+     */
+    public void setMatrix(double[] value) {
+        this.matrix = value;
     }
 
     /**
-       Get the Matrix property.
-
-       @return The Matrix
-    **/
-    public double[] getMatrix () {
-	return this.matrix;
+     *  Get the Matrix property.
+     *
+     *  @return The Matrix
+     */
+    public double[] getMatrix() {
+        return this.matrix;
     }
 
 
