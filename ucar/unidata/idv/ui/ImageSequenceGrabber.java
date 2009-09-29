@@ -1069,7 +1069,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     grabImageAndBlock();
                 }
             } else {
-                getAnimationWidget().gotoBeginning();
+
+                //                getAnimationWidget().gotoBeginning();
                int start = getAnimation().getCurrent();
                while (true) {
                     //Sleep for a bit  to allow for the display to redraw itself
