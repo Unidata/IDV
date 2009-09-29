@@ -72,6 +72,7 @@ public class KmlUtil {
     public static final String TAG_LINESTYLE = "LineStyle";
     public static final String TAG_LINK = "Link";
     public static final String TAG_LONGITUDE = "longitude";
+    public static final String TAG_LOOKAT = "LookAt";
     public static final String TAG_MULTIGEOMETRY = "MultiGeometry";
     public static final String TAG_NAME = "name";
     public static final String TAG_NEAR = "near";
@@ -104,6 +105,14 @@ public class KmlUtil {
     public static final String TAG_WHEN = "when";
     public static final String TAG_WIDTH = "width";
     //J+
+
+
+
+    public static final String TAG_TOUR = "gx:Tour";
+    public static final String TAG_PLAYLIST = "gx:Playlist";
+    public static final String TAG_FLYTO = "gx:FlyTo";
+    public static final String TAG_WAIT = "gx:Wait";
+
 
 
 
