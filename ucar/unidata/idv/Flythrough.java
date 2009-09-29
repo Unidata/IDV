@@ -757,7 +757,7 @@ public class Flythrough implements PropertyChangeListener {
         setAnimationTimes();
         boolean hadFrame = true;
         if (frame == null) {
-            frame    = new JFrame("IDV - Flythrough");
+            frame    = new JFrame(GuiUtils.getApplicationTitle()+"Flythrough");
             hadFrame = false;
         }
         frame.getContentPane().removeAll();
@@ -1196,7 +1196,7 @@ public class Flythrough implements PropertyChangeListener {
                     upVector = new Vector3d(0, 0, 1);
                 }
 
-                t.lookAt(new Point3d(x1, y1, z1), new Point3d(x2, y2, z2),
+                t.lookAt(new Point3d(x1, y1, z1), new Point3d(x2, y2, z1),
                          upVector);
                 t.get(m);
 

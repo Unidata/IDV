@@ -1252,6 +1252,8 @@ public class MapViewManager extends NavigatedViewManager {
                     "Animation Timeline", this,
                     "showTimeline"), "/auxdata/ui/icons/timeline_marker.png"));
 
+        viewMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Flythrough",this,"showFlythrough"),"/auxdata/ui/icons/plane.png"));
+
         viewMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Properties",
                 this,
                 "showPropertiesDialog"), "/auxdata/ui/icons/information.png"));
@@ -1286,7 +1288,6 @@ public class MapViewManager extends NavigatedViewManager {
         createCBMI(showMenu, PREF_ANIREADOUT);
         createCBMI(showMenu, PREF_SHOWPIP);
         createCBMI(showMenu, PREF_SHOWEARTHNAVPANEL);
-        showMenu.add(GuiUtils.makeMenuItem("Flythrough",this,"showFlythrough"));
         return showMenu;
     }
 

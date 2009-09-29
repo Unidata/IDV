@@ -493,7 +493,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      */
 
     protected final void init() {
-        GuiUtils.setApplicationTitle("IDV - ");
+        GuiUtils.setApplicationTitle("Unidata IDV - ");
 
 
         /*
