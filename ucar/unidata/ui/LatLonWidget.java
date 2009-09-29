@@ -415,7 +415,7 @@ public class LatLonWidget extends JPanel {
      *
      * @return value in regional formatting
      */
-    private String formatLatLonString(String latOrLon) {
+    protected String formatLatLonString(String latOrLon) {
         if ((latOrLon == null) || (latOrLon.length() == 0)) {
             return latOrLon;
         }
