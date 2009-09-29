@@ -22,9 +22,6 @@
 
 
 
-
-
-
 package ucar.unidata.view.sounding;
 
 
@@ -106,7 +103,7 @@ import javax.swing.event.ListSelectionListener;
  */
 public class SoundingSelector extends IdvChooser {
 
-    /** _more_ */
+    /** the idv chooser */
     private IdvChooser idvChooser;
 
     /** This is a virtual timestamp that tracks if the threaded adde connection should be aborted or not */
@@ -146,7 +143,7 @@ public class SoundingSelector extends IdvChooser {
     private SoundingFileBrowser fileBrowser = null;
 
 
-    /** _more_ */
+    /** the adde chooser */
     AddeChooser addeChooser;
 
 
@@ -173,11 +170,11 @@ public class SoundingSelector extends IdvChooser {
 
 
     /**
-     * _more_
+     * Create a new SoundingSelector associated with the resources
      *
-     * @param idvChooser _more_
-     * @param mgr _more_
-     * @param chooserNode _more_
+     * @param idvChooser  the associated IDV chooser
+     * @param mgr  the associated IDV chooser manager
+     * @param chooserNode  the description of the chooser in XML
      */
     public SoundingSelector(IdvChooser idvChooser, IdvChooserManager mgr,
                             Element chooserNode) {
@@ -224,7 +221,7 @@ public class SoundingSelector extends IdvChooser {
      * multipleSelect flag to the given value
      *
      *
-     * @param idvChooser _more_
+     * @param idvChooser  the IDV chooser
      * @param servers  list of servers
      * @param forServer   true for server vs. file
      * @param multipleSelect  true to select multiple stations
@@ -270,7 +267,7 @@ public class SoundingSelector extends IdvChooser {
              multipleSelect);
     }
 
-    /** _more_          */
+    /** the directory name */
     private String directoryName;
 
     /**
@@ -278,7 +275,7 @@ public class SoundingSelector extends IdvChooser {
      * the specified directory.
      *
      *
-     * @param idvChooser _more_
+     * @param idvChooser       the IDV chooser
      * @param servers          list of servers
      * @param directoryName    starting directory for files
      * @param serverName       default server
@@ -298,9 +295,9 @@ public class SoundingSelector extends IdvChooser {
 
 
     /**
-     * _more_
+     * Get the file browser
      *
-     * @return _more_
+     * @return the file browser
      */
     private SoundingFileBrowser getFileBrowser() {
         if (fileBrowser == null) {
@@ -317,7 +314,7 @@ public class SoundingSelector extends IdvChooser {
 
 
     /**
-     * _more_
+     * Update the status
      */
     public void updateStatus() {
         if (getHaveData()) {
@@ -346,9 +343,9 @@ public class SoundingSelector extends IdvChooser {
 
 
     /**
-     * _more_
+     * Make the UI contents
      *
-     * @return _more_
+     * @return the UI contents
      */
     protected JComponent doMakeContents() {
 
@@ -390,14 +387,15 @@ public class SoundingSelector extends IdvChooser {
             extraTimeComp = mainHoursCbx;
             selectorPanel = GuiUtils.hbox(new Component[] {
                 addeChooser.getServerSelector(),
-                GuiUtils.rLabel(" Group: "), groupSelector, GuiUtils.filler(),
-                connectBtn });
-            selectorPanel = GuiUtils.formLayout(new Component[]{
-                GuiUtils.rLabel("Server:"), selectorPanel});
+                GuiUtils.rLabel(" Group: "), groupSelector,
+                GuiUtils.filler(), connectBtn });
+            selectorPanel = GuiUtils.formLayout(new Component[] {
+                GuiUtils.rLabel("Server:"),
+                selectorPanel });
         } else {
-            selectorPanel = GuiUtils.formLayout(new Component[]{
+            selectorPanel = GuiUtils.formLayout(new Component[] {
                 GuiUtils.rLabel("File: "),
-                getFileBrowser().getContents()});
+                getFileBrowser().getContents() });
         }
         selectorPanel = GuiUtils.inset(GuiUtils.leftCenter(selectorPanel,
                 GuiUtils.filler()), 4);
@@ -422,18 +420,17 @@ public class SoundingSelector extends IdvChooser {
         JScrollPane timesPane = new JScrollPane(createTimesList());
         timesPane.setPreferredSize(new Dimension(175, 50));
 
-        
+
 
 
         JComponent timeLabel = new JLabel("Available Times:");
-        if(extraTimeComp!=null) {
+        if (extraTimeComp != null) {
             timeLabel = GuiUtils.vbox(timeLabel, extraTimeComp);
         }
 
-        JPanel left = GuiUtils.doLayout(new Component[] {
-                timeLabel,
-                          timesPane, new JLabel("Selected Soundings:"),
-                          obsPane }, 1, GuiUtils.WT_N, GuiUtils.WT_NYNY);
+        JPanel left = GuiUtils.doLayout(new Component[] { timeLabel,
+                timesPane, new JLabel("Selected Soundings:"), obsPane }, 1,
+                    GuiUtils.WT_N, GuiUtils.WT_NYNY);
 
         middlePanel.add(GuiUtils.inset(left, 5), BorderLayout.WEST);
 
@@ -456,6 +453,9 @@ public class SoundingSelector extends IdvChooser {
                 } else if (pe.getPropertyName().equals(
                         StationLocationMap.UNSELECTED_PROPERTY)) {
                     stationUnselected((Station) pe.getNewValue());
+                } else if (pe.getPropertyName().equals(
+                        StationLocationMap.ALL_UNSELECTED_PROPERTY)) {
+                    unselectAll();
                 }
             }
         });
@@ -528,6 +528,20 @@ public class SoundingSelector extends IdvChooser {
                 selectedObs.remove(newObs);
             }
         }
+        obsList.setListData(selectedObs);
+        checkLoadData();
+    }
+
+
+    /**
+     * Unselect all station
+     */
+    private void unselectAll() {
+        List selectedTimes = getSelectedTimes();
+        if ((selectedTimes == null) || (selectedTimes.size() < 1)) {
+            return;
+        }
+        selectedObs.removeAllElements();
         obsList.setListData(selectedObs);
         checkLoadData();
     }

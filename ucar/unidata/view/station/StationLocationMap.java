@@ -1,7 +1,5 @@
 /*
- * $Id: StationLocationMap.java,v 1.38 2006/04/06 20:59:35 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright  1997-2009 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -20,27 +18,9 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.view.station;
 
-
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.*;
-
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
-
-import java.util.List;
-import java.util.ArrayList;
-
-import javax.swing.*;
-import javax.swing.border.EtchedBorder;
 
 import ucar.unidata.beans.NonVetoableProperty;
 import ucar.unidata.beans.Property;
@@ -56,6 +36,27 @@ import ucar.unidata.view.geoloc.PickEvent;
 import ucar.unidata.view.geoloc.PickEventListener;
 
 
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.*;
+
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
+
+import java.util.ArrayList;
+
+import java.util.List;
+
+import javax.swing.*;
+import javax.swing.border.EtchedBorder;
+
+
 /**
  * A navigated panel with 2 renderers - a map renderer and a
  * station location renderer.
@@ -68,6 +69,9 @@ public class StationLocationMap extends JPanel {
 
     /** Property for unselecting a station */
     public static final String UNSELECTED_PROPERTY = "unselectedStation";
+
+    /** Property for unselecting a station */
+    public static final String ALL_UNSELECTED_PROPERTY = "unselectedAll";
 
     /** name of default map */
     public static final String DEFAULT_MAP = "/auxdata/maps/OUTLSUPW";
@@ -117,6 +121,9 @@ public class StationLocationMap extends JPanel {
 
     /** the unselected station property */
     private Property unselectedStationProperty;
+
+    /** the unselected station property */
+    private Property unselectAllProperty;
 
     /** the property set */
     private PropertySet propertySet;
@@ -179,8 +186,8 @@ public class StationLocationMap extends JPanel {
                               String template) {
         this(multipleSelect,
              new ucar.unidata.gis.mcidasmap.McidasMap((defaultMap != null)
-                                                      ? defaultMap
-                                                      : DEFAULT_MAP), template);
+                ? defaultMap
+                : DEFAULT_MAP), template);
 
     }
 
@@ -214,6 +221,8 @@ public class StationLocationMap extends JPanel {
             new NonVetoableProperty(this, SELECTED_PROPERTY));
         getPropertySet().addProperty(unselectedStationProperty =
             new NonVetoableProperty(this, UNSELECTED_PROPERTY));
+        getPropertySet().addProperty(unselectAllProperty =
+            new NonVetoableProperty(this, ALL_UNSELECTED_PROPERTY));
 
         // here's where the map will be drawn:
         navigatedPanel = new NavigatedPanel();
@@ -243,7 +252,7 @@ public class StationLocationMap extends JPanel {
                                  + boundingBox.getWidth() / 2;
                     LatLonProjection llproj = (LatLonProjection) project;
                     if (llproj.getCenterLon() != wx0) {
-                        llproj.setCenterLon(wx0);     // shift cylinder seam
+                        llproj.setCenterLon(wx0);  // shift cylinder seam
                         wx0 = llproj.getCenterLon();  // normalize wx0 to  [-180,180]
                         // tell navigation panel to shift
                         navigatedPanel.setWorldCenterX(wx0);
@@ -297,9 +306,8 @@ public class StationLocationMap extends JPanel {
                 }
                 JPopupMenu popup = new JPopupMenu();
                 JMenuItem  mi    = new JMenuItem("Select All");
-                mi.setAccelerator(
-                    KeyStroke.getKeyStroke(
-                        new Character('A'), InputEvent.CTRL_MASK));
+                mi.setAccelerator(KeyStroke.getKeyStroke(new Character('A'),
+                        InputEvent.CTRL_MASK));
                 mi.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         selectAll();
@@ -409,7 +417,8 @@ public class StationLocationMap extends JPanel {
             unselectSelected();
         }
         Rectangle2D                       pickBounds = pickEvent.getBounds();
-        List                              stations = stnRender.getStations();
+        List                              stations   =
+            stnRender.getStations();
         StationLocationRenderer.SLStation station;
         for (int i = 0; i < stations.size(); i++) {
             station = (StationLocationRenderer.SLStation) stations.get(i);
@@ -467,6 +476,7 @@ public class StationLocationMap extends JPanel {
      */
     private void unselectSelected() {
         setSelectedStations(new ArrayList());
+        unselectAllProperty.notifyListeners();
     }
 
 
@@ -787,3 +797,4 @@ public class StationLocationMap extends JPanel {
     }
 
 }
+
