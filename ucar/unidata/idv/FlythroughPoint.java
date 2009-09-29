@@ -61,6 +61,9 @@ public class FlythroughPoint {
     /** _more_          */
     private double[] matrix;
 
+
+    private String description;
+
     /**
      * _more_
      */
@@ -274,6 +277,24 @@ public class FlythroughPoint {
      */
     public double[] getMatrix() {
         return this.matrix;
+    }
+
+    /**
+       Set the Description property.
+
+       @param value The new value for Description
+    **/
+    public void setDescription (String value) {
+	description = value;
+    }
+
+    /**
+       Get the Description property.
+
+       @return The Description
+    **/
+    public String getDescription () {
+	return description;
     }
 
 

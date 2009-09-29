@@ -35,8 +35,8 @@ import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.gis.SpatialGrid;
 
 
-import ucar.unidata.idv.DisplayConventions;
-import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.*;
+
 
 
 import ucar.unidata.metdata.NamedStationImpl;
@@ -71,6 +71,8 @@ import visad.*;
 
 import visad.georef.*;
 import visad.georef.EarthLocation;
+import visad.georef.EarthLocationLite;
+
 import visad.georef.NamedLocation;
 import visad.georef.NamedLocationTuple;
 
@@ -499,6 +501,13 @@ public class StationLocationControl extends StationModelControl {
     }
 
 
+    protected void initDisplayable(StationModelDisplayable myDisplay) throws VisADException , RemoteException{
+        super.initDisplayable(myDisplay);
+        myDisplay.setRotateShapes(true);
+    }
+
+
+
     /**
      * Override the superclass method since currently, the DataChoice
      * for this instance is null or not used.
@@ -697,58 +706,65 @@ public class StationLocationControl extends StationModelControl {
         return s;
     }
 
+    private StringBuffer getHtml(NamedStationImpl location) {
+        StringBuffer sb = new StringBuffer();
+        Hashtable          properties = location.getProperties();
+        Enumeration        keys       = properties.keys();
+        NamedLocation      locationOb = location.getNamedLocation();
+        EarthLocation      locationEl = locationOb.getEarthLocation();
+        LatLonPoint        llp        = locationEl.getLatLonPoint();
+        DisplayConventions dc         = getDisplayConventions();
+        String llLabel = dc.formatLatLon(llp.getLatitude().getValue())
+            + "/"
+            + dc.formatLatLon(llp.getLongitude().getValue());
+
+        StringBuffer entrySB = new StringBuffer();
+        entrySB.append("<table>\n");
+        entrySB.append("<tr><td><b>Name</b>:</td><td> "
+                       + location.getName() + "</td></tr>\n");
+        entrySB.append("<tr><td><b>Lat/Lon</b>:</td><td> " + llLabel
+                       + "</td></tr>\n");
+
+        String description = "";
+        while (keys.hasMoreElements()) {
+            Object key = keys.nextElement();
+            String lbl = key.toString();
+            if (lbl.equalsIgnoreCase("name")
+                || lbl.equalsIgnoreCase("lat")
+                || lbl.equalsIgnoreCase("lon")) {
+                continue;
+            }
+            if (lbl.equalsIgnoreCase("description")) {
+                description = (String) properties.get(key);
+                continue;
+            }
+            lbl = lbl.substring(0, 1).toUpperCase() + lbl.substring(1);
+            entrySB.append("<tr valign=\"top\"><td><b>" + lbl
+                           + "</b>&nbsp;</td><td> " + properties.get(key)
+                           + "</td></tr>\n");
+        }
+        entrySB.append("</table>\n");
+        String html = cleanupHtml(description);
+        sb.append(html);
+        sb.append(entrySB);
+        return sb;
+
+    }
+
+
     /**
      * Display the selected location in the gui
      */
     private void showSelectedInReadout() {
-        StringBuffer sb = new StringBuffer();
         if (selectionList.size() == 0) {
             readoutText.setText("<html></html>");
             return;
         }
-        String html = "";
+        StringBuffer sb = new StringBuffer();
         for (int i = 0; i < selectionList.size(); i++) {
             NamedStationImpl location =
                 (NamedStationImpl) selectionList.get(i);
-            Hashtable          properties = location.getProperties();
-            Enumeration        keys       = properties.keys();
-            NamedLocation      locationOb = location.getNamedLocation();
-            EarthLocation      locationEl = locationOb.getEarthLocation();
-            LatLonPoint        llp        = locationEl.getLatLonPoint();
-            DisplayConventions dc         = getDisplayConventions();
-            String llLabel = dc.formatLatLon(llp.getLatitude().getValue())
-                             + "/"
-                             + dc.formatLatLon(llp.getLongitude().getValue());
-
-            StringBuffer entrySB = new StringBuffer();
-            entrySB.append("<table>\n");
-            entrySB.append("<tr><td><b>Name</b>:</td><td> "
-                           + location.getName() + "</td></tr>\n");
-            entrySB.append("<tr><td><b>Lat/Lon</b>:</td><td> " + llLabel
-                           + "</td></tr>\n");
-
-            String description = "";
-            while (keys.hasMoreElements()) {
-                Object key = keys.nextElement();
-                String lbl = key.toString();
-                if (lbl.equalsIgnoreCase("name")
-                        || lbl.equalsIgnoreCase("lat")
-                        || lbl.equalsIgnoreCase("lon")) {
-                    continue;
-                }
-                if (lbl.equalsIgnoreCase("description")) {
-                    description = (String) properties.get(key);
-                    continue;
-                }
-                lbl = lbl.substring(0, 1).toUpperCase() + lbl.substring(1);
-                entrySB.append("<tr valign=\"top\"><td><b>" + lbl
-                               + "</b>&nbsp;</td><td> " + properties.get(key)
-                               + "</td></tr>\n");
-            }
-            entrySB.append("</table>\n");
-            html = cleanupHtml(description);
-            sb.append(html);
-            sb.append(entrySB);
+            sb.append(getHtml(location));
         }
 
         if ((readoutText != null) && (sb != null)) {
@@ -1974,6 +1990,34 @@ public class StationLocationControl extends StationModelControl {
                                             "exportLocations"));
         }
     }
+
+    protected void getViewMenuItems(List items, boolean forMenuBar) {
+        MapViewManager mvm =  getMapViewManager();
+        if(mvm!=null) {
+            items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Show Flythrough", this,
+                                                             "showFlythrough", null),"/auxdata/ui/icons/plane.png"));
+        }
+
+        super.getViewMenuItems(items,forMenuBar);
+    }
+
+
+
+    public void showFlythrough() throws Exception {
+        MapViewManager mvm =  getMapViewManager();
+        List<FlythroughPoint> points = new ArrayList<FlythroughPoint>();
+        List sortedStations    = Misc.sort(displayedStations);
+        for(int i=0;i<sortedStations.size();i++) {
+            NamedStationImpl station = (NamedStationImpl) sortedStations.get(i);
+            FlythroughPoint pt = new FlythroughPoint(station.getEarthLocation());
+            pt.setDescription(getHtml(station).toString());
+            points.add(pt);
+        }
+
+        mvm.flythrough(points);
+    }
+
+
 
     /**
      * Write out the locations as an xml file

@@ -333,6 +333,8 @@ public class StationModelControl extends ObsDisplayControl {
     /** For loadDataInAWhile */
     private Object LOADDATA_MUTEX = new Object();
 
+    private int loadDataTimestamp = 0;
+
     /** locking object */
     private Object MUTEX = new Object();
 
@@ -444,12 +446,8 @@ public class StationModelControl extends ObsDisplayControl {
         if ( !useZPosition()) {
             shouldUseAltitude = false;
         }
-        myDisplay.setShouldUseAltitude(shouldUseAltitude);
         inGlobe = (getNavigatedDisplay() instanceof GlobeDisplay);
-
-        if (inGlobe) {
-            myDisplay.setRotateShapes(true);
-        }
+        initDisplayable(myDisplay);
 
         timesHolder = new LineDrawing("ob_time" + dataChoice);
         timesHolder.setManipulable(false);
@@ -479,6 +477,14 @@ public class StationModelControl extends ObsDisplayControl {
                 filtersEnabled, matchAll, listener);
 
         return ok;
+    }
+
+
+    protected void initDisplayable(StationModelDisplayable myDisplay) throws VisADException, RemoteException {
+        if (inGlobe) {
+            myDisplay.setRotateShapes(true);
+        }
+        myDisplay.setShouldUseAltitude(shouldUseAltitude);
     }
 
     /**
@@ -1552,6 +1558,7 @@ public class StationModelControl extends ObsDisplayControl {
      * @see #doMakeDataInstance(DataChoice)
      */
     protected void loadData() {
+        int myTimestamp = ++loadDataTimestamp;
 
         try {
             if ( !getActive()) {
@@ -1651,7 +1658,9 @@ public class StationModelControl extends ObsDisplayControl {
             if (declutter) {
                 if ( !stationsLocked || (lastDeclutteredData == null)) {
                     Trace.call1("doDeclutter");
-                    lastDeclutteredData = doDeclutter(theData);
+                    FieldImpl tmp =  doDeclutter(theData,myTimestamp);
+                    if(tmp==null) return;
+                    lastDeclutteredData = tmp;
                     Trace.call2("doDeclutter");
                 }
                 theData = lastDeclutteredData;
@@ -3111,6 +3120,7 @@ public class StationModelControl extends ObsDisplayControl {
         }
     }
 
+
     /**
      * Declutters the observations.  This is just a wrapper around
      * the real decluttering in {@link #doTheActualDecluttering(FieldImpl)}
@@ -3123,9 +3133,8 @@ public class StationModelControl extends ObsDisplayControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    private FieldImpl doDeclutter(FieldImpl obs)
+    private FieldImpl doDeclutter(FieldImpl obs, int timestamp)
             throws VisADException, RemoteException {
-
 
         long      millis           = System.currentTimeMillis();
         boolean   isTimeSequence   = GridUtil.isTimeSequence(obs);
@@ -3137,13 +3146,14 @@ public class StationModelControl extends ObsDisplayControl {
             int numTimes = timeSet.getLength();
             for (int i = 0; i < numTimes; i++) {
                 FieldImpl oneTime = (FieldImpl) obs.getSample(i);
-                FieldImpl subTime = doTheActualDecluttering(oneTime);
+                FieldImpl subTime = doTheActualDecluttering(oneTime,timestamp);
+                if(timestamp !=loadDataTimestamp) return null;
                 if (subTime != null) {
                     declutteredField.setSample(i, subTime, false);
                 }
             }
         } else {
-            declutteredField = doTheActualDecluttering(obs);
+            declutteredField = doTheActualDecluttering(obs,timestamp);
         }
         //System.out.println("Subsetting took : " +
         //    (System.currentTimeMillis() - millis) + " ms");
@@ -3160,7 +3170,7 @@ public class StationModelControl extends ObsDisplayControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    private FieldImpl doTheActualDecluttering(FieldImpl pointObs)
+    private FieldImpl doTheActualDecluttering(FieldImpl pointObs,int timestamp)
             throws VisADException, RemoteException {
         if ((pointObs == null) || pointObs.isMissing()) {
             return pointObs;
@@ -3186,8 +3196,6 @@ public class StationModelControl extends ObsDisplayControl {
         obBounds.width  = scaledGlyphBounds.getWidth();
         obBounds.height = scaledGlyphBounds.getHeight();
 
-
-        
         Rectangle2D bounds = getBounds();
         //        System.out.println("my bounds: x:" + bounds.getX()+"-" +(bounds.getX()+bounds.getWidth())+" y:" +
         //                           bounds.getY()+"-" +(bounds.getY()+bounds.getHeight()));
@@ -3208,6 +3216,7 @@ public class StationModelControl extends ObsDisplayControl {
         double[] xyz = new double[3];
         //TODO: The repeated getSpatialCoords is a bit expensive
         for (int i = 0; i < numObs; i++) {
+            if(timestamp !=loadDataTimestamp) return null;
             PointOb ob = (PointOb) pointObs.getSample(i);
             xyz = navDisplay.getSpatialCoordinates(ob.getEarthLocation(),
                     xyz, 0);

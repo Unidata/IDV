@@ -265,8 +265,8 @@ public class TrackControl extends GridDisplayControl {
     protected void getViewMenuItems(List items, boolean forMenuBar) {
         MapViewManager mvm =  getMapViewManager();
         if(mvm!=null) {
-            items.add(GuiUtils.makeMenuItem("Show Flythrough", this,
-                                            "showFlythrough", null));
+            items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Show Flythrough", this,
+                                                             "showFlythrough", null),"/auxdata/ui/icons/plane.png"));
         }
 
         super.getViewMenuItems(items,forMenuBar);

@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -30,7 +31,13 @@ import org.w3c.dom.*;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.collab.*;
+
+
+import ucar.unidata.data.gis.KmlUtil;
+
 import ucar.unidata.idv.ui.CursorReadoutWindow;
+import ucar.unidata.ui.LatLonWidget;
 import ucar.unidata.util.DateUtil;
 
 import ucar.unidata.util.FileManager;
@@ -76,6 +83,7 @@ import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
+import java.util.Vector;
 import java.util.Date;
 import java.util.List;
 
@@ -95,55 +103,60 @@ import javax.vecmath.*;
  * @author IDV development team
  */
 
-public class Flythrough implements PropertyChangeListener {
+public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
-    /** _more_          */
+    /** _more_ */
     public static final int COL_LAT = 0;
 
-    /** _more_          */
+    /** _more_ */
     public static final int COL_LON = 1;
 
-    /** _more_          */
+    /** _more_ */
     public static final int COL_ALT = 2;
 
-    /** _more_          */
+    /** _more_ */
     public static final int COL_DATE = 3;
 
-    /** _more_          */
+
+
+    /** _more_ */
     public static final String TAG_FLYTHROUGH = "flythrough";
 
     /** _more_          */
+    public static final String TAG_DESCRIPTION = "description";
+
+    /** _more_ */
     public static final String TAG_POINT = "point";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DATE = "date";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LAT = "lat";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LON = "lon";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ALT = "alt";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TILTX = "tiltx";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TILTY = "tilty";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TILTZ = "tiltz";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ZOOM = "zoom";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_MATRIX = "matrix";
 
 
-    /** _more_          */
+    /** _more_ */
     private SimpleDateFormat sdf;
 
     /** _more_ */
@@ -167,6 +180,12 @@ public class Flythrough implements PropertyChangeListener {
 
     /** _more_ */
     private boolean changeViewpoint = true;
+
+    /** _more_          */
+    private boolean animate = false;
+
+    /** _more_          */
+    private JCheckBox animateCbx;
 
 
     /** _more_ */
@@ -192,6 +211,7 @@ public class Flythrough implements PropertyChangeListener {
     /** _more_ */
     private boolean showTimes = false;
 
+    private boolean relativeOrientation = true;
 
 
 
@@ -222,6 +242,7 @@ public class Flythrough implements PropertyChangeListener {
     /** _more_ */
     private JCheckBox orientCbx;
 
+
     /** _more_ */
     private JTextField tiltxFld;
 
@@ -244,13 +265,18 @@ public class Flythrough implements PropertyChangeListener {
     /** _more_ */
     private SelectorPoint locationPoint;
 
-    /** _more_          */
+    /** _more_ */
     private JTable pointTable;
 
-    /** _more_          */
+    /** _more_ */
     private AbstractTableModel pointTableModel;
 
+    /** _more_          */
+    private JEditorPane htmlView;
 
+
+    /** _more_          */
+    private JComponent contents;
 
     /**
      * _more_
@@ -315,6 +341,7 @@ public class Flythrough implements PropertyChangeListener {
         }
         viewManager = null;
     }
+
 
 
     /**
@@ -523,65 +550,72 @@ public class Flythrough implements PropertyChangeListener {
     /**
      * _more_
      *
-     *
-     * @param force _more_
      * @throws Exception _more_
      */
-    private synchronized void doMakeContents(boolean force) throws Exception {
-
-        if ( !force && (readout != null)) {
-            return;
-        }
-        if (readout == null) {
-            readout = new CursorReadoutWindow(viewManager);
-        }
+    private void makeWidgets() throws Exception {
 
         showTimesCbx = new JCheckBox("Show Animation Times", showTimes);
         showTimesCbx.setEnabled(hasTimes);
+        animateCbx = new JCheckBox("Smooth Transitions", animate);
         changeViewpointCbx = new JCheckBox("Change Viewpoint",
                                            changeViewpoint);
-        orientCbx      = new JCheckBox("Relative", true);
+        orientCbx      = new JCheckBox("Relative", getRelativeOrientation ());
         showReadoutCbx = new JCheckBox("Show Readout", showReadout);
         readoutLabel =
             GuiUtils.getFixedWidthLabel("<html><br><br><br></html>");
         readoutLabel.setVerticalAlignment(SwingConstants.TOP);
 
-        if (animationInfo == null) {
+        if(animationInfo==null) {
             animationInfo = new AnimationInfo();
+            animationInfo.setShareIndex(true);
         }
+
+
         ActionListener listener = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 goToCurrent();
             }
         };
-        if (animationWidget == null) {
-            animationWidget = new AnimationWidget(null, null, animationInfo);
-            animationWidget.setShareGroup("flythrough");
-            animation = new Animation();
-            animation.addPropertyChangeListener(this);
-            animationWidget.setAnimation(animation);
+
+
+        htmlView = new JEditorPane();
+        htmlView.setPreferredSize(new Dimension(300, 400));
+        htmlView.setEditable(false);
+        htmlView.setContentType("text/html");
+
+
+        animationWidget = new AnimationWidget(null, null, animationInfo);
+
+        if(getShareGroup() == null || getShareGroup().equals(SharableManager.GROUP_ALL)) {
+            setShareGroup("flythrough");
         }
+        animationWidget.setShareGroup(getShareGroup());
+        animationWidget.setSharing(getSharing());
 
-        animation.setAnimationInfo(animationInfo);
 
-        if (locationLine == null) {
-            locationLine = new LineDrawing("flythroughpoint.line");
-            locationPoint = new SelectorPoint("flythrough.point",
-                    new RealTuple(RealTupleType.SpatialCartesian3DTuple,
-                                  new double[] { 0,
-                    0, 0 }));
 
-            locationPoint.setAutoSize(true);
-            locationPoint.setManipulable(false);
-            locationPoint.setColor(Color.green);
+        animation = new Animation();
+        animation.addPropertyChangeListener(this);
+        animationWidget.setAnimation(animation);
+        locationLine = new LineDrawing("flythroughpoint.line");
+        locationPoint = new SelectorPoint(
+            "flythrough.point",
+            new RealTuple(
+                RealTupleType.SpatialCartesian3DTuple, new double[] { 0,
+                0, 0 }));
 
-            locationLine.setVisible(false);
-            locationPoint.setVisible(false);
-            locationLine.setLineWidth(3);
-            locationLine.setColor(Color.blue);
-            viewManager.getMaster().addDisplayable(locationPoint);
-            viewManager.getMaster().addDisplayable(locationLine);
-        }
+        locationPoint.setAutoSize(true);
+        locationPoint.setManipulable(false);
+        locationPoint.setColor(Color.green);
+
+        locationLine.setVisible(false);
+        locationPoint.setVisible(false);
+        locationLine.setLineWidth(3);
+        locationLine.setColor(Color.blue);
+        viewManager.getMaster().addDisplayable(locationPoint);
+        viewManager.getMaster().addDisplayable(locationLine);
+
+        readout  = new CursorReadoutWindow(viewManager);
 
 
         zoomFld  = new JTextField(zoom + "", 5);
@@ -594,6 +628,133 @@ public class Flythrough implements PropertyChangeListener {
         tiltzFld.addActionListener(listener);
         zoomFld.addActionListener(listener);
 
+        pointTableModel = new AbstractTableModel() {
+            public int getRowCount() {
+                return points.size();
+            }
+
+            public int getColumnCount() {
+                return 4;
+            }
+            public void setValueAt(Object aValue, int rowIndex,
+                                   int columnIndex) {
+                List<FlythroughPoint> thePoints = points;
+                FlythroughPoint       pt        = thePoints.get(rowIndex);
+                if (aValue == null) {
+                    pt.setDateTime(null);
+                } else if (aValue instanceof DateTime) {
+                    pt.setDateTime((DateTime) aValue);
+                } else {
+                    //??
+                }
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return columnIndex == COL_DATE;
+            }
+
+            public Object getValueAt(int row, int column) {
+                List<FlythroughPoint> thePoints = points;
+                if (row >= thePoints.size()) {
+                    return "n/a";
+                }
+                FlythroughPoint pt = thePoints.get(row);
+                if (column == COL_LAT) {
+                    if (pt.getMatrix() != null) {
+                        return "matrix";
+                    }
+                    return pt.getEarthLocation().getLatitude();
+                }
+                if (column == COL_LON) {
+                    if (pt.getMatrix() != null) {
+                        return "";
+                    }
+                    return pt.getEarthLocation().getLongitude();
+                }
+                if (column == COL_ALT) {
+                    if (pt.getMatrix() != null) {
+                        return "";
+                    }
+                    return pt.getEarthLocation().getAltitude();
+                }
+                if (column == COL_DATE) {
+                    return pt.getDateTime();
+                }
+                return "";
+            }
+
+            public String getColumnName(int column) {
+                switch (column) {
+
+                  case COL_LAT :
+                      return "Latitude";
+
+                  case COL_LON :
+                      return "Longitude";
+
+                  case COL_ALT :
+                      return "Altitude";
+
+                  case COL_DATE :
+                      return "Date/Time";
+                }
+                return "";
+            }
+        };
+
+        pointTable = new JTable(pointTableModel);
+        pointTable.setToolTipText("Double click: view; Control-P: Show point properties; Delete: delete point");
+
+
+        pointTable.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if ((e.getKeyCode() == KeyEvent.VK_P) && e.isControlDown()) {
+                    List<FlythroughPoint> newPoints =
+                        new ArrayList<FlythroughPoint>();
+                    int[]                 rows = pointTable.getSelectedRows();
+                    List<FlythroughPoint> oldPoints = points;
+                    for (int j = 0; j < rows.length; j++) {
+                        FlythroughPoint pt = oldPoints.get(rows[j]);
+                        if ( !showProperties(pt)) {
+                            break;
+                        }
+                        pointTable.repaint();
+                    }
+                }
+
+                if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    List<FlythroughPoint> newPoints =
+                        new ArrayList<FlythroughPoint>();
+                    int[]                 rows = pointTable.getSelectedRows();
+                    List<FlythroughPoint> oldPoints = points;
+                    for (int i = 0; i < oldPoints.size(); i++) {
+                        boolean good = true;
+                        for (int j = 0; j < rows.length; j++) {
+                            if (i == rows[j]) {
+                                good = false;
+                                break;
+                            }
+                        }
+                        if (good) {
+                            newPoints.add(oldPoints.get(i));
+                        }
+                    }
+                    flythrough(newPoints);
+                }
+            }
+        });
+
+        pointTable.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                final int row = pointTable.rowAtPoint(e.getPoint());
+                if ((row < 0) || (row >= points.size())) {
+                    return;
+                }
+                if (e.getClickCount() > 1) {
+                    animation.setCurrent(row);
+                }
+            }
+        });
 
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
         JComponent orientationComp = GuiUtils.formLayout(new Component[] {
@@ -602,131 +763,20 @@ public class Flythrough implements PropertyChangeListener {
             GuiUtils.rLabel("Zoom:"), GuiUtils.left(zoomFld),
             GuiUtils.rLabel("Tilt:"),
             GuiUtils.left(GuiUtils.hbox(tiltxFld, tiltyFld, tiltzFld)),
-            GuiUtils.rLabel("Animation:"), GuiUtils.left(showTimesCbx),
+            GuiUtils.rLabel(""), GuiUtils.left(GuiUtils.left(animateCbx)),
+            GuiUtils.rLabel("Data Animation:"), GuiUtils.left(showTimesCbx),
             GuiUtils.filler(),
             GuiUtils.makeCheckbox("Show Location Line", this, "showLine")
         });
 
 
 
-        if (pointTable == null) {
-            pointTableModel = new AbstractTableModel() {
-                public int getRowCount() {
-                    return points.size();
-                }
 
-                public int getColumnCount() {
-                    return 4;
-                }
-                public void setValueAt(Object aValue, int rowIndex,
-                                       int columnIndex) {
-                    List<FlythroughPoint> thePoints = points;
-                    FlythroughPoint       pt        = thePoints.get(rowIndex);
-                    if (aValue == null) {
-                        pt.setDateTime(null);
-                    } else if (aValue instanceof DateTime) {
-                        pt.setDateTime((DateTime) aValue);
-                    } else {
-                        //??
-                    }
-                }
-
-                public boolean isCellEditable(int rowIndex, int columnIndex) {
-                    return columnIndex == COL_DATE;
-                }
-
-                public Object getValueAt(int row, int column) {
-                    List<FlythroughPoint> thePoints = points;
-                    if (row >= thePoints.size()) {
-                        return "n/a";
-                    }
-                    FlythroughPoint pt = thePoints.get(row);
-                    if (column == COL_LAT) {
-                        if (pt.getMatrix() != null) {
-                            return "matrix";
-                        }
-                        return pt.getEarthLocation().getLatitude();
-                    }
-                    if (column == COL_LON) {
-                        if (pt.getMatrix() != null) {
-                            return "";
-                        }
-                        return pt.getEarthLocation().getLongitude();
-                    }
-                    if (column == COL_ALT) {
-                        if (pt.getMatrix() != null) {
-                            return "";
-                        }
-                        return pt.getEarthLocation().getAltitude();
-                    }
-                    if (column == COL_DATE) {
-                        return pt.getDateTime();
-                    }
-                    return "";
-                }
-
-                public String getColumnName(int column) {
-                    switch (column) {
-
-                      case COL_LAT :
-                          return "Latitude";
-
-                      case COL_LON :
-                          return "Longitude";
-
-                      case COL_ALT :
-                          return "Altitude";
-
-                      case COL_DATE :
-                          return "Date/Time";
-                    }
-                    return "";
-                }
-            };
-            pointTable = new JTable(pointTableModel);
-
-            pointTable.getColumnModel().getColumn(COL_DATE).setCellEditor(
-                new DateEditor());
-
-            pointTable.addKeyListener(new KeyAdapter() {
-                public void keyPressed(KeyEvent e) {
-                    if (e.getKeyCode() == KeyEvent.VK_DELETE) {
-                        List<FlythroughPoint> newPoints =
-                            new ArrayList<FlythroughPoint>();
-                        int[] rows = pointTable.getSelectedRows();
-                        List<FlythroughPoint> oldPoints = points;
-                        for (int i = 0; i < oldPoints.size(); i++) {
-                            boolean good = true;
-                            for (int j = 0; j < rows.length; j++) {
-                                if (i == rows[j]) {
-                                    good = false;
-                                    break;
-                                }
-                            }
-                            if (good) {
-                                newPoints.add(oldPoints.get(i));
-                            }
-                        }
-                        flythrough(newPoints);
-                    }
-                }
-            });
-
-            pointTable.addMouseListener(new MouseAdapter() {
-                public void mousePressed(MouseEvent e) {
-                    final int row = pointTable.rowAtPoint(e.getPoint());
-                    if ((row < 0) || (row >= points.size())) {
-                        return;
-                    }
-                    if (e.getClickCount() > 1) {
-                        animation.setCurrent(row);
-                    }
-                }
-            });
-
-        }
         JScrollPane scrollPane = new JScrollPane(pointTable);
         scrollPane.setPreferredSize(new Dimension(400, 300));
+
+        JScrollPane htmlScrollPane = new JScrollPane(htmlView);
+        htmlScrollPane.setPreferredSize(new Dimension(400, 300));
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("View", GuiUtils.top(orientationComp));
@@ -734,30 +784,170 @@ public class Flythrough implements PropertyChangeListener {
                           GuiUtils.topCenter(GuiUtils.left(showReadoutCbx),
                                              readoutLabel));
         tabbedPane.addTab("Points", scrollPane);
+        tabbedPane.addTab("Description", htmlScrollPane);
 
-        JComponent contents =
+        JComponent innerContents =
             GuiUtils.topCenter(animationWidget.getContents(), tabbedPane);
         JMenuBar menuBar  = new JMenuBar();
-
         JMenu    fileMenu = new JMenu("File");
-        JMenu    editMenu = new JMenu("Edit");
+        JMenu    editMenu = GuiUtils.makeDynamicMenu("Edit", this,"initEditMenu");
         fileMenu.add(GuiUtils.makeMenuItem("Export", this, "doExport"));
         fileMenu.add(GuiUtils.makeMenuItem("Import", this, "doImport"));
-        editMenu.add(GuiUtils.makeMenuItem("Add Point", this,
-                                           "addPointWithoutTime"));
-        editMenu.add(GuiUtils.makeMenuItem("Add Point with Time", this,
-                                           "addPointWithTime"));
+
+
+
 
         menuBar.add(fileMenu);
         menuBar.add(editMenu);
 
 
-        contents = GuiUtils.inset(contents, 5);
-        contents = GuiUtils.topCenter(menuBar, contents);
+        innerContents = GuiUtils.inset(innerContents, 5);
+        contents      = GuiUtils.topCenter(menuBar, innerContents);
+
+    }
+
+
+    public void initEditMenu(JMenu editMenu) {
+        editMenu.add(GuiUtils.makeMenuItem("Add Point", this,
+                                           "addPointWithoutTime"));
+        editMenu.add(GuiUtils.makeMenuItem("Add Point with Time", this,
+                                           "addPointWithTime"));
+
+        editMenu.add(GuiUtils.makeCheckboxMenuItem("Sharing On", this,
+                                                   "sharing", null));
+
+        editMenu.add(GuiUtils.makeMenuItem("Set Share Group", this,
+                                           "showSharableDialog"));
+
+    }
+
+
+    public void setSharing(boolean sharing) {
+        super.setSharing(sharing);
+        if(animationWidget!=null) {
+            animationWidget.setSharing(sharing);
+            animationInfo.setShared(true);
+        }
+    }
+
+    public void setShareGroup(Object shareGroup) {
+        super.setShareGroup(shareGroup);
+        if(animationWidget!=null) {
+            animationWidget.setShareGroup(shareGroup);
+        }
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param pt _more_
+     *
+     * @return _more_
+     */
+    private boolean showProperties(FlythroughPoint pt) {
+        try {
+            DateTime[] times = viewManager.getAnimationWidget().getTimes();
+            JComboBox timeBox=null;
+            JLabel timeLabel = GuiUtils.rLabel("Time:");
+            Vector timesList = new Vector();
+            timesList.add(0,new TwoFacedObject("None",null));
+            if(times!=null && times.length>0) {
+                timesList.addAll(Misc.toList(times));
+            }
+            if(pt.getDateTime()!=null && !timesList.contains(pt.getDateTime())) {
+                timesList.add(pt.getDateTime());
+            }
+            timeBox = new JComboBox(timesList);
+            if(pt.getDateTime()!=null) {
+                timeBox.setSelectedItem(pt.getDateTime());
+            }
+
+            LatLonWidget llw = new LatLonWidget("Latitude: ", "Longitude: ",
+                                                "Altitude: ", null) {
+                    protected String formatLatLonString(String latOrLon) {
+                        return latOrLon;
+                    }
+                };
+
+            EarthLocation el = pt.getEarthLocation();
+            llw.setLatLon(el.getLatitude().getValue(CommonUnit.degree),
+                          el.getLongitude().getValue(CommonUnit.degree));
+            llw.setAlt(el.getAltitude().getValue(CommonUnit.meter));
+
+            JTextArea textArea = new JTextArea("", 5, 100);
+            if (pt.getDescription() != null) {
+                textArea.setText(pt.getDescription());
+            }
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            scrollPane.setPreferredSize(new Dimension(400, 300));
+            JComponent contents = GuiUtils.formLayout(new Component[] {
+                                      GuiUtils.rLabel("Location:"),
+                                      llw, timeLabel,
+                                      GuiUtils.left(timeBox), GuiUtils.rLabel("Description:"),
+                                      scrollPane });
+            if (!GuiUtils.showOkCancelDialog(frame, "Point Properties",
+                    contents, null)) {
+                return false;
+            }
+            pt.setDescription(textArea.getText());
+            pt.setEarthLocation(makePoint(llw.getLat(),llw.getLon(),llw.getAlt()));
+            Object selectedDate = timeBox.getSelectedItem();
+            if(selectedDate instanceof TwoFacedObject) {
+                pt.setDateTime(null);
+            } else {
+                pt.setDateTime((DateTime)selectedDate);
+            }
+
+
+            return true;
+        } catch (Exception exc) {
+            viewManager.logException("Showing point properties", exc);
+            return false;
+        }
+
+    }
+
+
+    /**
+     * _more_
+     *
+     *
+     * @param force _more_
+     * @throws Exception _more_
+     */
+    private synchronized void doMakeContents(boolean force) throws Exception {
+
+        if ( !force && (contents != null)) {
+            return;
+        }
+
+        if (contents == null) {
+            makeWidgets();
+        }
+
+        animation.setAnimationInfo(animationInfo);
+        showTimesCbx.setSelected(showTimes);
+        showTimesCbx.setEnabled(hasTimes);
+        animateCbx.setSelected(animate);
+        changeViewpointCbx.setSelected(changeViewpoint);
+
+        orientCbx.setSelected(relativeOrientation);
+        showReadoutCbx.setSelected(showReadout);
+        zoomFld.setText(zoom + "");
+        tiltxFld.setText("" + tiltX);
+        tiltyFld.setText("" + tiltY);
+        tiltzFld.setText("" + tiltZ);
+
+
+
         setAnimationTimes();
         boolean hadFrame = true;
         if (frame == null) {
-            frame    = new JFrame(GuiUtils.getApplicationTitle()+"Flythrough");
+            frame = new JFrame(GuiUtils.getApplicationTitle() + "Flythrough");
+            frame.setIconImage(
+                GuiUtils.getImage("/auxdata/ui/icons/plane.png"));
             hadFrame = false;
         }
         frame.getContentPane().removeAll();
@@ -771,40 +961,32 @@ public class Flythrough implements PropertyChangeListener {
     }
 
 
+
+
     /**
+     * _more_
+     *
+     * @param latitude _more_
+     * @param longitude _more_
+     * @param alt _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    public class DateEditor extends DefaultCellEditor {
-
-        /**
-         * New editor, create as a combo box
-         */
-        public DateEditor() {
-            super(new JComboBox());
-        }
-
-        /**
-         * Get the component for editing the levels
-         *
-         * @param table           the JTable
-         * @param value           the value
-         * @param isSelected      flag for selection
-         * @param rowIndex        row index
-         * @param vColIndex       column index.
-         * @return   the editing component
-         */
-        public Component getTableCellEditorComponent(JTable table,
-                Object value, boolean isSelected, int rowIndex,
-                int vColIndex) {
-            JComboBox box = (JComboBox) getComponent();
-            List      ll  = new ArrayList();
-            ll.add(0, new TwoFacedObject("none", null));
-            GuiUtils.setListData(box, ll.toArray());
-            //            if (value instanceof Real) {
-            //                value = Util.labeledReal((Real) value);
-            //            }
-            //            box.setSelectedItem(value);
-            return box;
-        }
+    private EarthLocation makePoint(String latitude, String longitude,
+                                    String alt)
+            throws VisADException, RemoteException {
+        return makePoint(((latitude == null)
+                          ? 0
+                          : new Double(
+                              latitude.trim()).doubleValue()), ((longitude
+                                  == null)
+                ? 0
+                : new Double(longitude.trim()).doubleValue()), ((alt == null)
+                ? 0
+                : new Double(alt.trim()).doubleValue()));
     }
 
 
@@ -830,6 +1012,92 @@ public class Flythrough implements PropertyChangeListener {
                                      altReal);
     }
 
+
+    /**
+     * _more_
+     *
+     * @param root _more_
+     */
+    private void importKml(Element root) {
+        try {
+            List tourNodes = XmlUtil.findDescendants(root, KmlUtil.TAG_TOUR);
+            if (tourNodes.size() == 0) {
+                LogUtil.userMessage("Could not find any tours");
+                return;
+            }
+            Element               tourNode  = (Element) tourNodes.get(0);
+            List<FlythroughPoint> thePoints =
+                new ArrayList<FlythroughPoint>();
+            Element playListNode = XmlUtil.findChild(tourNode,
+                                       KmlUtil.TAG_PLAYLIST);
+            if (playListNode == null) {
+                LogUtil.userMessage("Could not find playlist");
+                return;
+            }
+
+            NodeList elements = XmlUtil.getElements(playListNode);
+            for (int i = 0; i < elements.getLength(); i++) {
+                Element child = (Element) elements.item(i);
+                if (child.getTagName().equals(KmlUtil.TAG_FLYTO)) {
+                    Element cameraNode = XmlUtil.findChild(child,
+                                             KmlUtil.TAG_CAMERA);
+                    /*        <Camera>
+          <longitude>170.157</longitude>
+          <latitude>-43.671</latitude>
+          <altitude>9700</altitude>
+          <heading>-6.333</heading>
+          <tilt>33.5</tilt>
+          </Camera>*/
+                    if (cameraNode == null) {
+                        cameraNode = XmlUtil.findChild(child,
+                                KmlUtil.TAG_LOOKAT);
+                    }
+
+                    if (cameraNode == null) {
+                        //                        System.err.println ("no camera:" + XmlUtil.toString(child));
+                        continue;
+                    }
+                    FlythroughPoint pt =
+                        new FlythroughPoint(makePoint(XmlUtil
+                            .getGrandChildText(cameraNode,
+                                KmlUtil.TAG_LATITUDE), XmlUtil
+                                    .getGrandChildText(cameraNode,
+                                        KmlUtil.TAG_LONGITUDE), XmlUtil
+                                            .getGrandChildText(cameraNode,
+                                                KmlUtil.TAG_ALTITUDE)));
+
+                    pt.setTiltX(
+                        -new Double(
+                            XmlUtil.getGrandChildText(
+                                cameraNode, KmlUtil.TAG_TILT,
+                                "0")).doubleValue());
+                    pt.setTiltY(
+                        new Double(
+                            XmlUtil.getGrandChildText(
+                                cameraNode, KmlUtil.TAG_HEADING,
+                                "0")).doubleValue());
+                    pt.setTiltZ(
+                        new Double(
+                            XmlUtil.getGrandChildText(
+                                cameraNode, KmlUtil.TAG_ROLL,
+                                "0")).doubleValue());
+
+                    thePoints.add(pt);
+
+                } else if (child.getTagName().equals(KmlUtil.TAG_WAIT)) {}
+                else {}
+
+            }
+
+
+            this.points = thePoints;
+            doMakeContents(true);
+            setAnimationTimes();
+        } catch (Exception exc) {
+            viewManager.logException("Importing kml", exc);
+        }
+    }
+
     /**
      * _more_
      */
@@ -840,6 +1108,12 @@ public class Flythrough implements PropertyChangeListener {
                 return;
             }
             Element root = XmlUtil.getRoot(filename, getClass());
+            if (root.getTagName().equals(KmlUtil.TAG_KML)) {
+                importKml(root);
+                return;
+            }
+
+
             if ( !root.getTagName().equals(TAG_FLYTHROUGH)) {
                 throw new IllegalStateException("Unknown tag:"
                         + root.getTagName());
@@ -849,16 +1123,20 @@ public class Flythrough implements PropertyChangeListener {
             tiltZ = XmlUtil.getAttribute(root, ATTR_TILTZ, tiltZ);
             zoom  = XmlUtil.getAttribute(root, ATTR_ZOOM, zoom);
 
-            NodeList              elements  = XmlUtil.getElements(root);
             List<FlythroughPoint> thePoints =
                 new ArrayList<FlythroughPoint>();
+            NodeList elements = XmlUtil.getElements(root);
             for (int i = 0; i < elements.getLength(); i++) {
                 Element child = (Element) elements.item(i);
+
                 if ( !child.getTagName().equals(TAG_POINT)) {
                     throw new IllegalStateException("Unknown tag:"
                             + child.getTagName());
                 }
                 FlythroughPoint pt = new FlythroughPoint();
+                pt.setDescription(XmlUtil.getGrandChildText(child,
+                        TAG_DESCRIPTION));
+
                 pt.setEarthLocation(makePoint(XmlUtil.getAttribute(child,
                         ATTR_LAT, 0.0), XmlUtil.getAttribute(child, ATTR_LON,
                             0.0), XmlUtil.getAttribute(child, ATTR_ALT,
@@ -997,8 +1275,14 @@ public class Flythrough implements PropertyChangeListener {
 
             List<FlythroughPoint> thePoints = this.points;
             for (FlythroughPoint pt : thePoints) {
-                Element       ptNode = XmlUtil.create(TAG_POINT, root);
-                EarthLocation el     = pt.getEarthLocation();
+                Element ptNode = XmlUtil.create(TAG_POINT, root);
+
+                if (pt.getDescription() != null) {
+                    XmlUtil.create(root.getOwnerDocument(), TAG_DESCRIPTION,
+                                   ptNode, pt.getDescription());
+                }
+
+                EarthLocation el = pt.getEarthLocation();
                 if (pt.getDateTime() != null) {
                     ptNode.setAttribute(ATTR_DATE,
                                         formatDate(pt.getDateTime()));
@@ -1113,7 +1397,6 @@ public class Flythrough implements PropertyChangeListener {
             pointTable.repaint();
         }
 
-
         int     index1 = index;
         int     index2 = index + 1;
         boolean atEnd  = false;
@@ -1126,6 +1409,15 @@ public class Flythrough implements PropertyChangeListener {
         try {
             FlythroughPoint pt1 = thePoints.get(index1);
             FlythroughPoint pt2 = thePoints.get(index2);
+
+            if (htmlView != null) {
+                if (pt1.getDescription() != null) {
+                    htmlView.setText(pt1.getDescription());
+                } else {
+                    htmlView.setText("");
+                }
+            }
+
 
             xyz1 = navDisplay.getSpatialCoordinates(pt1.getEarthLocation(),
                     xyz1);
@@ -1185,7 +1477,7 @@ public class Flythrough implements PropertyChangeListener {
                 m = new double[16];
 
                 Transform3D t = new Transform3D();
-                if ( !orientCbx.isSelected()) {
+                if ( !getRelativeOrientation()) {
                     y2 = y1 + 10;
                     x2 = x1;
                 }
@@ -1196,8 +1488,10 @@ public class Flythrough implements PropertyChangeListener {
                     upVector = new Vector3d(0, 0, 1);
                 }
 
-                t.lookAt(new Point3d(x1, y1, z1), new Point3d(x2, y2, z1),
-                         upVector);
+                //Keep flat in z for non globe
+                t.lookAt(new Point3d(x1, y1, z1), new Point3d(x2, y2, (doGlobe
+                        ? z2
+                        : z1)), upVector);
                 t.get(m);
 
                 double[] tiltMatrix = mouseBehavior.make_matrix(tiltx, tilty,
@@ -1217,19 +1511,6 @@ public class Flythrough implements PropertyChangeListener {
             }
 
             currentPoint = pt1;
-            if (changeViewpointCbx.isSelected()) {
-                navDisplay.setProjectionMatrix(m);
-            }
-
-            if (hasTimes && getShowTimes()) {
-                DateTime dttm = pt1.getDateTime();
-                if (dttm != null) {
-                    viewManager.getAnimationWidget().setTimeFromUser(dttm);
-                }
-
-            }
-
-
 
             if (doGlobe) {
                 setPts(locationLine, 0, x1 * 2, 0, y1 * 2, 0, z1 * 2);
@@ -1243,6 +1524,25 @@ public class Flythrough implements PropertyChangeListener {
 
             locationLine.setVisible(showLine);
             //            locationPoint.setVisible(showLine);
+
+            if (changeViewpointCbx.isSelected()) {
+                if (getAnimate()) {
+                    navDisplay.animateMatrix(m);
+                } else {
+                    navDisplay.setProjectionMatrix(m);
+                }
+            }
+
+            if (hasTimes && getShowTimes()) {
+                DateTime dttm = pt1.getDateTime();
+                if (dttm != null) {
+                    viewManager.getAnimationWidget().setTimeFromUser(dttm);
+                }
+
+            }
+
+
+
 
         } catch (NumberFormatException exc) {
             viewManager.logException("Error parsing number:" + exc, exc);
@@ -1496,6 +1796,48 @@ public class Flythrough implements PropertyChangeListener {
         return showLine;
     }
 
+
+    /**
+     * Set the Animate property.
+     *
+     * @param value The new value for Animate
+     */
+    public void setAnimate(boolean value) {
+        animate = value;
+    }
+
+    /**
+     * Get the Animate property.
+     *
+     * @return The Animate
+     */
+    public boolean getAnimate() {
+        if (animateCbx != null) {
+            animate = animateCbx.isSelected();
+        }
+        return animate;
+    }
+
+
+    /**
+       Set the RelativeOrientation property.
+
+       @param value The new value for RelativeOrientation
+    **/
+    public void setRelativeOrientation (boolean value) {
+	relativeOrientation = value;
+    }
+
+    /**
+       Get the RelativeOrientation property.
+
+       @return The RelativeOrientation
+    **/
+    public boolean getRelativeOrientation () {
+        if(orientCbx!=null)
+            relativeOrientation = orientCbx.isSelected();
+	return relativeOrientation;
+    }
 
 
 
