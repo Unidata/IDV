@@ -1034,6 +1034,12 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     }
 
 
+    public void animateMatrix(double[] to) {
+        animateMatrix(++animationTimeStamp,
+                      getProjectionMatrix(), to, null);
+    }
+
+
     /**
      * Animate the matrix changes. Go through N steps, and set the projection matrix
      * to be step/N percent between the from and to values.
@@ -1045,6 +1051,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     public void animateMatrix(int myTimeStamp, double[] from, double[] to,
                               EarthLocation finalLocation) {
+        double[]lastGoodMatrix = from;
         try {
             setAutoRotate(false);
             double[] tmp      = new double[from.length];
@@ -1088,7 +1095,13 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                     return;
                 }
                 if (step == numSteps) {
-                    setProjectionMatrix(to);
+                    try {
+                        setProjectionMatrix(to);
+                    } catch(Exception exc) {
+                        //In case we have a bad affine transform
+                        setProjectionMatrix(lastGoodMatrix);                    
+                    }
+                
                     isAnimating = false;
                     if (finalLocation != null) {
                         center(finalLocation);
@@ -1116,7 +1129,13 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                     isAnimating = false;
                     return;
                 }
-                setProjectionMatrix(tmp);
+                try {
+                    setProjectionMatrix(tmp);
+                    lastGoodMatrix = tmp;
+                } catch(Exception exc) {
+                    //In case we have a bad affine transform
+                    setProjectionMatrix(lastGoodMatrix);                    
+                }
                 lastMatrix = getProjectionMatrix();
 
 
@@ -1130,7 +1149,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                 Misc.sleep(50);
             }
         } catch (Exception exp) {
-            System.out.println("  Rotate view got " + exp);
+            System.out.println("Error  animating matrix:" + exp);
         }
     }
 
