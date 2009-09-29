@@ -335,10 +335,33 @@ public class Flythrough implements PropertyChangeListener {
      * @param newPoints _more_
      *
      */
-    public void flythrough(final List<FlythroughPoint> newPoints) {
+    public void flythrough(List<FlythroughPoint> newPoints) {
+        while (newPoints.size()>1000) {
+            ArrayList<FlythroughPoint> tmp = new ArrayList<FlythroughPoint>();
+            for(int i=0;i<newPoints.size();i++) {
+                if(i%3==0) {
+                    tmp.add(newPoints.get(i));
+                }
+            }
+            newPoints = tmp;
+        }
+
         this.points = new ArrayList<FlythroughPoint>(newPoints);
         setAnimationTimes();
         show();
+    }
+
+    private double parse(JTextField fld, double d) {
+        String t = fld.getText().trim();
+        if(t.length()==0) return d;
+        if(t.equals("-")) return d;
+        try {
+            return new Double(t).doubleValue();
+        } catch(NumberFormatException  nfe) {
+            animationWidget.setRunning(false);
+            viewManager.logException("Parse error:" + t, nfe);
+            return d;
+        }
     }
 
     /**
@@ -819,7 +842,7 @@ public class Flythrough implements PropertyChangeListener {
      */
     public double getTiltX() {
         if (tiltxFld != null) {
-            this.tiltX = new Double(tiltxFld.getText().trim()).doubleValue();
+            this.tiltX = parse(tiltxFld,tiltX);
         }
         return this.tiltX;
     }
@@ -843,7 +866,7 @@ public class Flythrough implements PropertyChangeListener {
      */
     public double getTiltY() {
         if (tiltyFld != null) {
-            this.tiltY = new Double(tiltyFld.getText().trim()).doubleValue();
+            this.tiltY = parse(tiltyFld,tiltY);
         }
         return this.tiltY;
     }
@@ -867,7 +890,7 @@ public class Flythrough implements PropertyChangeListener {
      */
     public double getTiltZ() {
         if (tiltzFld != null) {
-            this.tiltZ = new Double(tiltzFld.getText().trim()).doubleValue();
+            this.tiltZ = parse(tiltzFld,tiltZ);
         }
         return this.tiltZ;
     }
@@ -891,7 +914,7 @@ public class Flythrough implements PropertyChangeListener {
      */
     public double getZoom() {
         if (zoomFld != null) {
-            this.zoom = new Double(zoomFld.getText().trim()).doubleValue();
+            this.zoom = parse(zoomFld,tiltZ);
         }
         return this.zoom;
     }
