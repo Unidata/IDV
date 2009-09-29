@@ -1,7 +1,5 @@
 /**
- * $Id: ProbeRowInfo.java,v 1.19 2007/07/24 13:39:22 dmurray Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2009 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -19,6 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 
 package ucar.unidata.idv.control;
 
@@ -101,13 +100,10 @@ import javax.swing.table.*;
 
 
 
-
 /**
  * Class ProbeRowInfo holds the state for each row in the probe control.
  *
- *
  * @author IDV Development Team
- * @version $Revision: 1.19 $
  */
 public class ProbeRowInfo {
 
@@ -562,7 +558,8 @@ public class ProbeRowInfo {
                 if ( !(tt.getComponent(i) instanceof RealType)) {
                     continue;
                 }
-                setPointParameter(tt.getComponent(i).toString());
+                setPointParameter(
+                    Util.cleanTypeName(tt.getComponent(i).toString()));
                 break;
             }
         }
@@ -588,7 +585,8 @@ public class ProbeRowInfo {
                 return -1;
             }
             for (int i = 0; i < tt.getDimension(); i++) {
-                if (tt.getComponent(i).toString().equals(pointParameter)) {
+                if (Util.cleanTypeName(tt.getComponent(i).toString()).equals(
+                        pointParameter)) {
                     pointIndex = i;
                     break;
                 }
@@ -857,5 +855,4 @@ public class ProbeRowInfo {
 
 
 }
-
 

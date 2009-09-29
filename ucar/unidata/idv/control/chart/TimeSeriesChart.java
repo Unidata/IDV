@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control.chart;
 
 
@@ -627,6 +628,7 @@ public class TimeSeriesChart extends XYChartManager {
                     }
                     String name      = lineState.getName();
                     String canonical = DataAlias.aliasToCanonical(name);
+                    //System.err.println ("name:" + name + " canon:" + canonical);
                     if (info.getLevel() != null) {
                         name = name + "@" + Util.formatReal(info.getLevel())
                                + info.getLevel().getUnit();
@@ -640,12 +642,8 @@ public class TimeSeriesChart extends XYChartManager {
                     }
                     Unit[] rawUnits =
                         ucar.visad.Util.getDefaultRangeUnits(field);
-                    boolean haveWinds =
-                        (values.length > 1) && Unit
-                            .canConvert(rawUnits[0], CommonUnit
-                                .meterPerSecond) && Unit
-                                    .canConvert(rawUnits[1], CommonUnit
-                                        .meterPerSecond);
+                    boolean haveWinds = (values.length > 1)
+                                        && checkWindUnits(rawUnits);
                     for (int j = 0; j < values.length; j++) {
                         // if not winds, don't process more than one param
                         if ((j > 0) && !haveWinds) {
@@ -655,7 +653,7 @@ public class TimeSeriesChart extends XYChartManager {
                         if ((j > 1) && haveWinds) {
                             break;
                         }
-                        if (haveWinds) {
+                        if (haveWinds && (values.length > 1)) {
                             canonical = (j == 0)
                                         ? "U"
                                         : "V";
@@ -698,7 +696,9 @@ public class TimeSeriesChart extends XYChartManager {
                                 if (Misc.equals(canonical, "U")
                                         || Misc.equals(canonical, "UREL")
                                         || Misc.equals(canonical, "V")
-                                        || Misc.equals(canonical, "VREL")) {}
+                                        || Misc.equals(canonical, "VREL")
+                                        || Misc.equals(canonical, "DIR")
+                                        || Misc.equals(canonical, "SPEED")) {}
                                 else {
                                     //MISSING
                                     //                                continue;
@@ -743,6 +743,25 @@ public class TimeSeriesChart extends XYChartManager {
                                 dirMin       = min;
                                 dirMax       = max;
                                 polarWind    = false;
+                                continue;
+                            }
+                            if (Misc.equals(canonical, "SPEED")) {
+                                speedIdx       = paramIdx;
+                                speedMin       = min;
+                                speedMax       = max;
+                                speedUnit      = lineState.unit;
+                                speedSeries    = series;
+                                polarWind      = true;
+                                speedLineState = lineState;
+                                continue;
+                            }
+                            if (Misc.equals(canonical, "DIR")) {
+                                dirIdx       = paramIdx;
+                                dirSeries    = series;
+                                dirLineState = lineState;
+                                dirMin       = min;
+                                dirMax       = max;
+                                polarWind    = true;
                                 continue;
                             }
                         }
@@ -800,7 +819,30 @@ public class TimeSeriesChart extends XYChartManager {
 
     }
 
-
+    /**
+     * Check to see if the units are wind units (u &amp; v or speed and dir)
+     * @param units units to check
+     * @return true if the units check out.
+     */
+    private boolean checkWindUnits(Unit[] units) {
+        if ((units == null) || (units.length < 2)) {
+            return false;
+        }
+        // u & v
+        if (Unit.canConvert(units[0], CommonUnit.meterPerSecond)
+                && Unit.canConvert(units[1], CommonUnit.meterPerSecond)) {
+            return true;
+            // speed & dir
+        } else if (Unit.canConvert(units[0], CommonUnit.meterPerSecond)
+                   && Unit.canConvert(units[1], CommonUnit.degree)) {
+            return true;
+            // dir && speed
+        } else if (Unit.canConvert(units[0], CommonUnit.degree)
+                   && Unit.canConvert(units[1], CommonUnit.meterPerSecond)) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * set chart from point data
@@ -882,7 +924,7 @@ public class TimeSeriesChart extends XYChartManager {
                         List<String> textList = null;
                         String canonical =
                             DataAlias.aliasToCanonical(lineState.getName());
-                        //                    System.err.println ("var:" + var + " canon:" + canonical);
+                        //System.err.println ("var:" + lineState.getName() + " canon:" + canonical);
                         Unit   unit = null;
                         double
                             min     = 0,
@@ -1083,10 +1125,10 @@ public class TimeSeriesChart extends XYChartManager {
      */
     private static class MyTimeSeries extends TimeSeries {
 
-        /** items         */
+        /** items */
         List<TimeSeriesDataItem> items = new ArrayList<TimeSeriesDataItem>();
 
-        /** Keeps track of seen items     */
+        /** Keeps track of seen items */
         HashSet<TimeSeriesDataItem> seen = new HashSet<TimeSeriesDataItem>();
 
         /**

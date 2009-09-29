@@ -1119,6 +1119,7 @@ public class ProbeControl extends DisplayControlImpl {
                             continue;
                         }
                         String name = t.getComponent(i).toString();
+                        name = Util.cleanTypeName(name);
                         subItems.add(GuiUtils.makeMenuItem(name, this,
                                 "changePointParameter",
                                 new Object[] { rowInfo,
