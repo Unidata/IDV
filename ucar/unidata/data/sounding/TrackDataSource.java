@@ -1278,6 +1278,13 @@ public class TrackDataSource extends FilesDataSource {
         try {
             text = strideFld.getText().trim();
             setStride(new Integer(text).intValue());
+            List adapters = getAdapters();
+            if (adapters != null) {
+                for (int i = 0; i < adapters.size(); i++) {
+                    ((TrackAdapter) adapters.get(i)).setStride(stride);
+                }
+            }
+
             what = "last n minutes";
             text = lastNMinutesFld.getText().trim();
             if (text.equals("all") || (text.length() == 0)) {
@@ -1360,12 +1367,6 @@ public class TrackDataSource extends FilesDataSource {
      */
     public void setStride(int value) {
         stride = value;
-        List adapters = getAdapters();
-        if (adapters != null) {
-            for (int i = 0; i < adapters.size(); i++) {
-                ((TrackAdapter) adapters.get(i)).setStride(stride);
-            }
-        }
     }
 
     /**
