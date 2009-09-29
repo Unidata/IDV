@@ -515,6 +515,26 @@ public class VisADPersistence {
             }
         });
 
+        addDelegate(EarthLocationLite.class, new XmlDelegateImpl() {
+            public Element createElement(XmlEncoder e, Object o) {
+                try {
+                    EarthLocationLite nlt = (EarthLocationLite) o;
+                    Real lat = nlt.getLatitude();
+                    Real lon = nlt.getLongitude();
+                    Real alt = nlt.getAltitude();
+                    List args = Misc.newList(lat,lon,alt);
+                    return e.createObjectConstructorElement(o, args);
+                } catch (Exception exc) {
+                    System.err.println("Error persisting NamedLocationTuple:"
+                                       + exc);
+                    return null;
+
+                }
+            }
+        });
+
+
+
         //TODO: Do we need the other tuple delegates to be before the RealTuple delegate
         addDelegate(RealTuple.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
@@ -581,6 +601,8 @@ public class VisADPersistence {
                 }
             }
         });
+
+
 
         addDelegate(UnionSet.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
