@@ -209,9 +209,9 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
                 } else {
                     try {
                         int i = stationProbes.getCloseIndex();
-                        if ((i >= 0) && (stationMenue != null)) {
+                        if ((i >= 0) && (stMenue != null)) {
                             selectedStation.setPoint((RealTuple) latLons[i]);
-                            stationMenue.setSelectedIndex(i);
+                          //  stationMenue.setSelectedIndex(i);
                             stMenue.setSelectedIndex(i);
                         }
                     } catch (Exception ex) {
@@ -225,8 +225,8 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
 
         String stName = (String) stations.get(0);
         //  setSoundings(tempPros, dewPros, windPros);
-        //  addDisplayable(stationProbes, FLAG_COLOR);
-        //  addDisplayable(selectedStation, FLAG_COLOR);
+        addDisplayable(stationProbes, FLAG_COLOR);
+        addDisplayable(selectedStation, FLAG_COLOR);
         if (getSelectedStationIndex() >= 0) {
             selectedStation.setPoint(
                 (RealTuple) latLons[getSelectedStationIndex()]);
@@ -343,6 +343,21 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
 
 
      
+    /**
+     * Set the station for the index
+     *
+     * @param index   station index.
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    private void setStation(int index)
+            throws VisADException, RemoteException {
+        selectedStation.setPoint((RealTuple) latLons[index]);
+     //   setSounding(index);
+        setLocation(latLons[index]);
+    }
+
     /**
      * Change the domain of the wind field which should be
      * GeopotentialAltitude with CS to Altitude, to one with
@@ -498,7 +513,7 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
                         //System.out.println("here " + st + " "+  stationsTuple.get(st).getLength()) ;
                         updateHeaderLabel();
 
-                        //setStation(stMenue.getSelectedIndex());
+                        setStation(stMenue.getSelectedIndex());
                     } catch (Exception ex) {
                         logException(ex);
                     }
