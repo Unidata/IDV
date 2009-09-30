@@ -3845,6 +3845,7 @@ public class IdvUIManager extends IdvManager {
         for (int newWindowIdx = 0; newWindowIdx < windows.size();
                 newWindowIdx++) {
             WindowInfo windowInfo = (WindowInfo) windows.get(newWindowIdx);
+            windowInfo.setIsAMainWindow(true);
 
             List       newVms     = windowInfo.getViewManagers();
             newViewManagers.removeAll(newVms);
