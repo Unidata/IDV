@@ -31,6 +31,7 @@ import ucar.unidata.data.*;
 
 import ucar.unidata.geoloc.LatLonRect;
 
+import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
@@ -323,8 +324,9 @@ public class NetcdfPointDataSource extends PointDataSource {
             if (pods == null) {
                 return null;
             }
+            DateSelection ds = (DateSelection) getProperty(DataSelection.PROP_DATESELECTION);
             obs = PointObFactory.makePointObs(pods, getBinRoundTo(),
-                    getBinWidth(), bbox, sample);
+                    getBinWidth(), bbox, ds, sample);
             pods.close();
         }
         Trace.call2("NetcdfPointDatasource:makeObs");
@@ -376,7 +378,7 @@ public class NetcdfPointDataSource extends PointDataSource {
                 Trace.startTrace();
                 long t1 = System.currentTimeMillis();
                 FieldImpl field = PointObFactory.makePointObs(pods, 0, 0,
-                                      null, false);
+                                      null, null, false);
                 PointObFactory.makeTimeSequenceOfPointObs(field, 0);
                 //                PointObFactory.makePointObsOnly(pods, 0, 0,null);
                 long t2 = System.currentTimeMillis();

@@ -20,6 +20,7 @@
 
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -37,36 +38,37 @@ import ucar.ma2.StructureMembers;
 import ucar.nc2.Attribute;
 import ucar.nc2.VariableSimpleIF;
 import ucar.nc2.dataset.NetcdfDataset;
+
 import ucar.nc2.dt.PointObsDataset;
 import ucar.nc2.dt.PointObsDatatype;
 import ucar.nc2.dt.StationObsDataset;
 import ucar.nc2.dt.StationObsDatatype;
 import ucar.nc2.dt.point.*;
+
 import ucar.nc2.ft.FeatureCollection;
 import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.ft.NestedPointFeatureCollection;
 import ucar.nc2.ft.PointFeature;
 import ucar.nc2.ft.PointFeatureCollection;
 import ucar.nc2.ft.PointFeatureIterator;
+
 import ucar.nc2.ft.point.*;
 
 import ucar.nc2.ft.point.writer.CFPointObWriter;
 import ucar.nc2.ft.point.writer.PointObVar;
+import ucar.nc2.units.DateRange;
 
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.DataUtil;
-import ucar.unidata.data.GeoLocationInfo;
-
 import ucar.unidata.data.grid.GridUtil;
 
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.Station;
+import ucar.unidata.util.DateSelection;
+
 import ucar.unidata.util.IOUtil;
-
 import ucar.unidata.util.JobManager;
-
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
@@ -86,14 +88,14 @@ import visad.georef.*;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-
 import java.io.IOException;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
+import java.util.Collections;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -553,6 +555,8 @@ public class PointObFactory {
      * @param skipIndices _more_
      * @param defaultStringLength _more_
      * @param altUnit _more_
+     * @param cnt _more_
+     * @param slengths _more_
      *
      * @return _more_
      *
@@ -561,7 +565,8 @@ public class PointObFactory {
     public static CFPointObWriter makeWriter(DataOutputStream dos,
                                              Tuple tuple, int[] skipIndices,
                                              int defaultStringLength,
-                                             String altUnit, int cnt,int []slengths)
+                                             String altUnit, int cnt,
+                                             int[] slengths)
             throws Exception {
         TupleType        type      = (TupleType) tuple.getType();
         MathType[]       types     = type.getComponents();
@@ -585,7 +590,9 @@ public class PointObFactory {
             }
 
             if (types[fieldIdx] instanceof TextType) {
-                lengths[fieldIdx] = (slengths==null?defaultStringLength:slengths[fieldIdx]);
+                lengths[fieldIdx] = ((slengths == null)
+                                     ? defaultStringLength
+                                     : slengths[fieldIdx]);
                 haveText          = true;
                 isText[fieldIdx]  = true;
                 continue;
@@ -1353,6 +1360,7 @@ public class PointObFactory {
      * @param binRoundTo bin round to
      * @param binWidth time bin size
      * @param llr bounding box
+     * @param dateSelection _more_
      * @param sample If true then just sample the data, i.e., read the first ob
      *
      * @return The field
@@ -1361,7 +1369,9 @@ public class PointObFactory {
      */
     public static FieldImpl makePointObs(FeatureDatasetPoint input,
                                          double binRoundTo, double binWidth,
-                                         LatLonRect llr, boolean sample)
+                                         LatLonRect llr,
+                                         DateSelection dateSelection,
+                                         boolean sample)
             throws Exception {
 
 
@@ -1385,10 +1395,26 @@ public class PointObFactory {
         FeatureCollection      fc         = collectionList.get(0);
         PointFeatureCollection collection = null;
         // System.out.println("llr = " + llr);
+        DateRange dateRange = null;
+        if (dateSelection != null) {
+            if (dateSelection.getTimes() != null) {
+                List<Date> range = dateSelection.getTimes();
+                Collections.sort(range);
+                dateRange = new DateRange(range.get(0),
+                                          range.get(range.size() - 1));
+            } else if (dateSelection.hasInterval()) {
+                double interval = dateSelection.getInterval();
+                int    count    = dateSelection.getCount();
+                long   timespan = (long) interval * count;
+                Date   now      = new Date();
+                dateRange = new DateRange(new Date(now.getTime() - timespan),
+                                          now);
+            }
+        }
         if (fc instanceof PointFeatureCollection) {
             collection = (PointFeatureCollection) fc;
-            if (llr != null) {
-                collection = collection.subset(llr, null);
+            if ((llr != null) || (dateRange != null)) {
+                collection = collection.subset(llr, dateRange);
             }
         } else if (fc instanceof NestedPointFeatureCollection) {
             NestedPointFeatureCollection npfc =
@@ -1396,7 +1422,7 @@ public class PointObFactory {
             //if (llr != null) {
             //    npfc = npfc.subset(llr);
             //}
-            collection = npfc.flatten(llr, null);
+            collection = npfc.flatten(llr, dateRange);
         } else {
             throw new IllegalArgumentException(
                 "Can't handle collection of type " + fc.getClass().getName());
@@ -1411,28 +1437,7 @@ public class PointObFactory {
         //Is this station data
         if (input instanceof StationObsDataset) {
             //TODO: Get the variable name used for the station id:
-            //stationFieldName = ((StationObsDataset)input).getStationVarName();
-
-            //If it is we need to see if there is already a station id in the data itself
-            needToAddStationId = true;
-
-            /**
-             * For now don't do this...
-             * for (Iterator iter = actualVariables.iterator(); needToAddStationId&&iter.hasNext(); ) {
-             *   VariableSimpleIF var = (VariableSimpleIF) iter.next();
-             *   String name = var.getShortName();
-             *   if (Misc.equals(name,PointOb.PARAM_ID) || Misc.equals(name,PointOb.PARAM_IDN)) {
-             *       needToAddStationId = false;
-             *   }
-             *   String canonical = DataAlias.aliasToCanonical(name);
-             *   if (Misc.equals(canonical,PointOb.PARAM_ID) || Misc.equals(canonical,PointOb.PARAM_IDN)) {
-             *       System.err.println ("Don't need to add id. Already have it in the data:" + name);
-             *       needToAddStationId = false;
-             *   }
-             * }
-             */
         }
-
 
 
         int varIdxBase = 0;
