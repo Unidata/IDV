@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.idv;
 
 
@@ -159,7 +158,10 @@ public class DisplayConventions extends IdvManager {
             buf.append("Lat: ");
         }
         try {
-            buf.append(formatLatLon(llp.getLatitude().getValue()));
+            buf.append(
+                formatLatLon(
+                    Math.min(
+                        Math.max(llp.getLatitude().getValue(), -90), 90)));
         } catch (Exception e) {
             buf.append(" ");
         }
@@ -273,8 +275,7 @@ public class DisplayConventions extends IdvManager {
      */
     public DecimalFormat getLatLonFormat() {
         DecimalFormat fmt = new DecimalFormat(DEFAULT_FORMAT);
-        fmt.applyPattern(getStore().get(PREF_LATLON_FORMAT,
-                DEFAULT_FORMAT));
+        fmt.applyPattern(getStore().get(PREF_LATLON_FORMAT, DEFAULT_FORMAT));
         return fmt;
     }
 
@@ -905,5 +906,4 @@ public class DisplayConventions extends IdvManager {
     }
 
 }
-
 
