@@ -272,7 +272,7 @@ or
      isdefault="true" 
      isenduser="false"
      properties="levels=false"
-     formula="DerivedGridFactory.createLayerDifference (D1, 500, 1000, makeUnit(&quot;hPa&quot;))">
+     formula="sub(D1[level=500(hPa)], D1[level=1000(hPa)])">
     <categories>
       <category
          value="2D grid-Derived"
