@@ -118,7 +118,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** Filter for HTML files */
     public static final PatternFileFilter FILTER_ANIS =
         new PatternFileFilter(".+\\.html|.+\\.htm",
-                              "ANIS Applet HTML File (*.html)", ".html");
+                              "AniS or FlAniS HTML File (*.html)", ".html");
 
 
     /** xml tag or attr name */
@@ -150,6 +150,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
     /** xml tag or attr name */
     public static final String ATTR_ANIS_POSTHTML = "anis_posthtml";
+
+    /** xml tag or attr name */
+    public static final String ATTR_ANIS_TYPE = "anis_type";
 
 
 
@@ -1069,8 +1072,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     grabImageAndBlock();
                 }
             } else {
-
-                //                getAnimationWidget().gotoBeginning();
+                getAnimationWidget().gotoBeginning();
                int start = getAnimation().getCurrent();
                while (true) {
                     //Sleep for a bit  to allow for the display to redraw itself
@@ -1757,6 +1759,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** widget for saving html */
     private static JCheckBox copyCbx;
 
+    /** widget for switching between AniS and FlAniS */
+    private static JCheckBox typeCbx;
+
     /**
      * Create an image panel
      *
@@ -2058,6 +2063,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
         try {
             boolean copyFiles = false;
+            boolean doFlanis  = false;
+            String  type      = "anis";
             String  dir       = IOUtil.getFileRoot(movieFile);
             String  preText   = "";
             String  postText  = "";
@@ -2074,6 +2081,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     copyCbx   = new JCheckBox("Copy image files to: " + dir);
                     widthFld  = new JTextField("600", 5);
                     heightFld = new JTextField("600", 5);
+                    typeCbx   = new JCheckBox("FlAniS? (default: AniS)");
+                    typeCbx.setToolTipText("Check this box to create HTML to use the Flash animator (FlAniS); otherwise, the java applet animator (AniS) will be used.");
                 }
                 widthFld.setText(width);
                 heightFld.setText(height);
@@ -2087,6 +2096,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     GuiUtils.makeScrollPane(preFld, 200, 100),
                     GuiUtils.top(GuiUtils.rLabel("Bottom HTML:")),
                     GuiUtils.makeScrollPane(postFld, 200, 100),
+                    GuiUtils.rLabel(""), typeCbx,
                     GuiUtils.rLabel(""), copyCbx
                 }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
                 if ( !GuiUtils.showOkCancelDialog(null,
@@ -2094,6 +2104,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     return;
                 }
                 copyFiles = copyCbx.isSelected();
+                doFlanis  = typeCbx.isSelected();
                 preText   = preFld.getText();
                 postText  = postFld.getText();
                 width     = widthFld.getText().trim();
@@ -2107,6 +2118,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         ATTR_ANIS_PREHTML, preText);
                 postText = XmlUtil.getAttribute(scriptingNode,
                         ATTR_ANIS_POSTHTML, postText);
+                type     = XmlUtil.getAttribute(scriptingNode,
+                        ATTR_ANIS_TYPE, type);
+                doFlanis = type.toLowerCase().equals("anis") ? false : true;
             }
 
             StringBuffer sb    = new StringBuffer();
@@ -2125,14 +2139,24 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             }
             sb.append(preText);
             sb.append("\n");
-            sb.append("<APPLET code=\"AniS.class\" width=" + width
-                      + " height=" + height + ">\n");
-            sb.append(
-                "<PARAM name=\"controls\" value=\"startstop,audio, step, speed, refresh, toggle, zoom\">\n");
-            sb.append("<PARAM name=\"filenames\" value=\"" + files + "\">\n");
-            sb.append("</APPLET>\n");
+            if (doFlanis) {
+                sb.append("<OBJECT type=\"application/x-shockwave-flash\" data=\"./flanis.swf\" width=\"" + width + "\" height=\"" + height + "\" id=\"FlAniS\"> \n");
+                sb.append("<PARAM NAME=\"movie\" VALUE=\"./flanis.swf\"> \n");
+                sb.append("<PARAM NAME=\"quality\" VALUE=\"high\"> \n");
+                sb.append("<PARAM NAME=\"menu\" value=\"false\"> \n");
+                sb.append("<PARAM NAME=\"FlashVars\" value=\"controls=startstop,step,speed,toggle,zoom&filenames="+files+"\"> \n");
+                sb.append("</OBJECT>\n");
+
+            } else {
+                sb.append("<APPLET code=\"AniS.class\" width=" + width
+                          + " height=" + height + ">\n");
+                sb.append( "<PARAM name=\"controls\" value=\"startstop,step, speed, toggle, zoom\">\n");
+                sb.append("<PARAM name=\"filenames\" value=\"" + files + "\">\n");
+                sb.append("</APPLET>\n");
+            }
             sb.append("\n");
             sb.append(postText);
+
             IOUtil.writeFile(new File(movieFile), sb.toString());
         } catch (Exception exc) {
             LogUtil.logException("Saving html file", exc);
