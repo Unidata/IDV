@@ -20,15 +20,9 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.view.geoloc;
 
-
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-
-import java.text.DecimalFormat;
 
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
@@ -36,9 +30,17 @@ import ucar.unidata.util.StringUtil;
 
 import visad.*;
 
+import java.awt.*;
+
 import java.beans.*;
 
-import java.awt.*;
+import java.text.DecimalFormat;
+
+
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 
 /**
@@ -116,7 +118,7 @@ public class NavigatedDisplayCursorReadout extends JPanel {
         setLayout(new FlowLayout(FlowLayout.LEFT));
         if (label != null) {
             myOwnLabel = true;
-            Font   lblFont = label.getFont();
+            Font lblFont = label.getFont();
             Font monoFont = new Font("Monospaced", lblFont.getStyle(),
                                      lblFont.getSize());
 
@@ -127,7 +129,15 @@ public class NavigatedDisplayCursorReadout extends JPanel {
         valueDisplay           = label;
         latitudeChangeListener = new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent event) {
-                latitude = (Real) event.getNewValue();
+                Real lat = (Real) event.getNewValue();
+                try {
+                    double latVal = lat.getValue(CommonUnit.degree);
+                    if ((latVal > 90) || (latVal < -90)) {
+                        latVal = Math.min(Math.max(latVal, -90), 90);
+                        lat    = new Real(RealType.Latitude, latVal);
+                    }
+                } catch (Exception e) {}
+                latitude = lat;
                 setLabelText();
             }
         };
@@ -260,15 +270,33 @@ public class NavigatedDisplayCursorReadout extends JPanel {
         setLabelText();
     }
 
+    /**
+     * Pad the string
+     *
+     * @param s  the string
+     *
+     * @return padded string
+     */
     private String pad(String s) {
-        s = StringUtil.padRight(s,7);
+        s = StringUtil.padRight(s, 7);
         return s;
     }
 
+    /**
+     * Format a double
+     *
+     * @param v the value
+     *
+     * @return the formatted value
+     */
     private String format(double v) {
-        if(v!=v) return pad("NA");
+        if (v != v) {
+            return pad("NA");
+        }
         String s = formatter.format(v);
-        if(v>=0) s = " " + s;
+        if (v >= 0) {
+            s = " " + s;
+        }
         return pad(s);
     }
 
@@ -280,8 +308,8 @@ public class NavigatedDisplayCursorReadout extends JPanel {
         if ( !active) {
             return;
         }
-        String SPACE =  " ";
-        StringBuffer buf = new StringBuffer();
+        String       SPACE = " ";
+        StringBuffer buf   = new StringBuffer();
         buf.append("Latitude: ");
         if (latitude != null) {
             try {
@@ -303,8 +331,9 @@ public class NavigatedDisplayCursorReadout extends JPanel {
                     buf.append(pad("NA"));
                 } else {
                     try {
-                        String altText = formatter.format(altitude.getValue())+" " +
-                            altitude.getUnit().toString();
+                        String altText =
+                            formatter.format(altitude.getValue()) + " "
+                            + altitude.getUnit().toString();
                         buf.append(pad(altText));
                     } catch (Exception e) {}
                 }
@@ -317,7 +346,7 @@ public class NavigatedDisplayCursorReadout extends JPanel {
             if (myOwnLabel) {
                 FontMetrics fm = label.getFontMetrics(label.getFont());
                 label.setPreferredSize(new Dimension(fm.stringWidth(text),
-                                                     fm.getHeight()));
+                        fm.getHeight()));
             }
         }
     }
