@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -897,6 +898,23 @@ public class DrawingControl extends DisplayControlImpl {
     }
 
     /**
+     * _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void doFlythrough() throws VisADException, RemoteException {
+        for (int i = 0; i < selectedGlyphs.size(); i++) {
+            if (selectedGlyphs.get(i) instanceof PolyGlyph) {
+                ((PolyGlyph) selectedGlyphs.get(i)).doFlythrough();
+                break;
+            }
+        }
+
+    }
+
+
+    /**
      * Listen for DisplayEvents
      *
      * @param event The event
@@ -925,6 +943,11 @@ public class DrawingControl extends DisplayControlImpl {
                     if ((keyEvent.getKeyCode() == KeyEvent.VK_X)
                             && keyEvent.isControlDown()) {
                         doCut();
+                        return;
+                    }
+                    if ((keyEvent.getKeyCode() == KeyEvent.VK_F)
+                            && keyEvent.isControlDown()) {
+                        doFlythrough();
                         return;
                     }
                     if ((keyEvent.getKeyCode() == KeyEvent.VK_C)
@@ -2582,17 +2605,18 @@ public class DrawingControl extends DisplayControlImpl {
             this.myTableModel = tableModel;
             addKeyListener(new KeyAdapter() {
                 public void keyPressed(KeyEvent ke) {
-                    if (ke.getKeyCode() == KeyEvent.VK_F && ke.isControlDown()) {
-                        int[]   rows      = getSelectedRows();
-                        int row = -1;
+                    if ((ke.getKeyCode() == KeyEvent.VK_F)
+                            && ke.isControlDown()) {
+                        int[] rows = getSelectedRows();
+                        int   row  = -1;
                         for (int i = 0; i < rows.length; i++) {
                             row = rows[i];
                             if ((row >= 0) && (row < glyphs.size())) {
                                 DrawingGlyph glyph =
                                     (DrawingGlyph) glyphs.get(row);
-                                if(glyph instanceof PolyGlyph) {
+                                if (glyph instanceof PolyGlyph) {
                                     try {
-                                    ((PolyGlyph)glyph).doFlythrough();
+                                        ((PolyGlyph) glyph).doFlythrough();
                                     } catch (Exception exc) {
                                         logException("", exc);
                                     }
