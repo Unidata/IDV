@@ -1,7 +1,5 @@
 /**
- * $Id: DerivedDataChoice.java,v 1.118 2006/12/01 20:41:22 jeffmc Exp $
- *
- * Copyright 1997-2004 Unidata Program Center/University Corporation for
+ * Copyright 1997-2009 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -19,6 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 
 
 package ucar.unidata.data;
@@ -599,7 +598,8 @@ public class DerivedDataChoice extends ListDataChoice {
                          DataSelection dataSelection,
                          Hashtable requestProperties)
             throws VisADException, RemoteException {
-        Object data = dataChoiceToData.get(dataChoice);
+        //System.out.println("getting data for " + dataChoice.getName() + "," + dataOperand.getName());
+        Object data = dataChoiceToData.get(dataOperand.getName());
         if (data == null) {
             if (dataChoice.getClass().equals(ListDataChoice.class)) {
                 ListDataChoice ldc = (ListDataChoice) dataChoice;
@@ -607,11 +607,11 @@ public class DerivedDataChoice extends ListDataChoice {
                                        requestProperties);
             } else {
                 //                System.err.println("Calling checkLevel");
-                checkLevel(dataChoice, dataOperand);
+                checkLevel(dataChoice, dataOperand, dataSelection);
                 data = dataChoice.getData(DataCategory.NULL, dataSelection,
                                           requestProperties);
             }
-            dataChoiceToData.put(dataChoice, data);
+            dataChoiceToData.put(dataOperand.getName(), data);
         }
         dataOperand.setData(data);
         //        return data;
@@ -620,24 +620,27 @@ public class DerivedDataChoice extends ListDataChoice {
 
 
     /**
-     * if the operand has a level property then set the level on the data choices DataSelection
+     * if the operand has a level property then set the level on the 
+     * uber DataSelection
      *
      * @param dataChoice the data choice
      * @param op the operand
+     * @param incomingSelection the incoming data selection
      *
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    private void checkLevel(DataChoice dataChoice, DataOperand op)
+    private void checkLevel(DataChoice dataChoice, DataOperand op,
+                            DataSelection incomingSelection)
             throws VisADException, RemoteException {
         DataSelection dataSelection = dataChoice.getDataSelection();
-        //        System.err.println (op +" LEVEL:" + op.getProperty("level"));
+        // System.err.println (op +" LEVEL:" + op.getProperty("level"));
 
-        //        System.err.println("checkLevel : " + dataChoice + " " + dataSelection + "  prop:" + op + " " + op.getProperty("level"));
+        // System.err.println("checkLevel : " + dataChoice + " " + dataSelection + "  prop:" + op + " " + op.getProperty("level"));
 
-        if ((op.getProperty("level") != null)
-                && ((dataSelection == null)
-                    || (dataSelection.getFromLevel() == null))) {
+        if (op.getProperty("level") != null) {
+            //&& ((dataSelection == null)
+            //    || (dataSelection.getFromLevel() == null))) {
             List levels = StringUtil.split(op.getProperty("level"), ":",
                                            true, true);
             Object fromLevel = null,
@@ -656,9 +659,10 @@ public class DerivedDataChoice extends ListDataChoice {
                 } else {
                     toLevel = fromLevel;
                 }
-                //                System.err.println ("setting levels data selection " + fromLevel);
-                dataChoice.setDataSelection(new DataSelection(fromLevel,
-                        toLevel));
+                // System.err.println ("setting levels data selection " + fromLevel+ " to " + toLevel);
+                incomingSelection.setLevelRange(toLevel, fromLevel);
+                //dataChoice.setDataSelection(new DataSelection(fromLevel,
+                //        toLevel));
             } catch (Exception exc) {
                 throw new VisADException("Error parsing levels:" + exc);
             }
