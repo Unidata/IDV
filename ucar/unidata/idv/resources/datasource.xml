@@ -92,7 +92,7 @@
      label="Upsonde/Dropsonde files"/>
 
   <datasource
-     id="NetCDF.POINT,OPENDAP.Station"
+     id="NetCDF.POINT,OPENDAP.Station,CDMREMOTE.POINT,CDMREMOTE.STATION"
      factory="ucar.unidata.data.point.NetcdfPointDataSource"
      patterns="_metar\.nc$,.*metar.*\.nc$,.*_syn\.nc$,.*_buoy\.nc$,.*_sounder_.*\.nc$,Surface_METAR.*\.nc,\.sfc$,sao\.gem$,sb\.gem$,cdmremote"
      doesmultiples="true"
