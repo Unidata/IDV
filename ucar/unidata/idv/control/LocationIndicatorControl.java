@@ -35,6 +35,8 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.idv.*;
 
+import ucar.unidata.view.geoloc.NavigatedDisplay;
+
 import ucar.unidata.idv.ViewManager;
 
 
@@ -60,6 +62,7 @@ import ucar.visad.display.*;
 
 
 import visad.*;
+import visad.java3d.*;
 
 import visad.georef.EarthLocation;
 import visad.georef.LatLonPoint;
@@ -97,6 +100,10 @@ import javax.swing.event.ChangeListener;
 public class LocationIndicatorControl extends DisplayControlImpl {
 
 
+    public static final int CLIP_NONE = 0;
+    public static final int CLIP_POSITIVE = 1;
+    public static final int CLIP_NEGATIVE = 2;
+
     /** Indices into arrays */
     public static final int IDX_X = 0;
 
@@ -105,6 +112,10 @@ public class LocationIndicatorControl extends DisplayControlImpl {
 
     /** Indices into arrays */
     public static final int IDX_Z = 2;
+
+    public static String [] CLIP_NAMES1 = {"Above","Left","Bottom"};
+    public static String [] CLIP_NAMES2 = {"Below","Right","Top"};
+
 
     /**
      * The width of the box we use. A little less than visad's 1.0 so we don't have problems
@@ -441,6 +452,70 @@ public class LocationIndicatorControl extends DisplayControlImpl {
     }
 
 
+    private void checkClip(boolean onlyIfOn)   {
+        try {
+            double        oX       = originLoc[IDX_X];
+            double        oY       = originLoc[IDX_Y];
+            double        oZ       = originLoc[IDX_Z];
+            NavigatedDisplay navDisplay = getNavigatedDisplay();
+            DisplayRendererJ3D dr =
+                (DisplayRendererJ3D) navDisplay.getDisplay().getDisplayRenderer();
+
+            AxisInfo axis;
+            int coeff;
+            double value;
+
+            axis = getXInfo();
+            if(!onlyIfOn || axis.getClip() !=CLIP_NONE) {
+                value = oY;
+                coeff=axis.getClipCoefficient();
+                dr.setClip(axis.getIndex(), 
+                           axis.getClip()!=CLIP_NONE, 
+                           0.f,
+                           (float)coeff,
+                           0.f,
+                           (float)((-coeff*(value+coeff*0.01f))));
+            } 
+
+
+
+            axis = getYInfo();
+            if(!onlyIfOn || axis.getClip() !=CLIP_NONE) {
+                value = oX;
+                coeff=-axis.getClipCoefficient();
+                dr.setClip(axis.getIndex(), 
+                           axis.getClip()!=CLIP_NONE, 
+                           (float)coeff,
+                           0.f,
+                           0.f,
+                           (float)((-coeff*(value+coeff*0.01f))));
+            } 
+
+
+            axis = getZInfo();
+            if(!onlyIfOn || axis.getClip() !=CLIP_NONE) {
+                value = oZ;
+                coeff=-axis.getClipCoefficient();
+                dr.setClip(axis.getIndex(), 
+                           axis.getClip()!=CLIP_NONE, 
+                                             0.f,
+                           0.f,
+                           (float)coeff,
+                           (float)((-coeff*(value+coeff*0.01f))));
+            } 
+
+
+
+
+
+        } catch (Exception exc) {
+            logException("Updating position", exc);
+        }
+
+        
+    }
+
+
     /**
      * Move the axises
      *
@@ -471,6 +546,8 @@ public class LocationIndicatorControl extends DisplayControlImpl {
         getYInfo().updateAxisPosition(originEl, ptEl);
         getZInfo().updateAxisPosition(originEl, ptEl);
 
+
+        checkClip(true);
 
         Bearing result =
             Bearing.calculateBearing(
@@ -1062,13 +1139,21 @@ public class LocationIndicatorControl extends DisplayControlImpl {
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
         JPanel topPanel = GuiUtils.doLayout(new Component[] {
             GuiUtils.filler(), GuiUtils.cLabel("X"), GuiUtils.cLabel("Y"),
-            GuiUtils.cLabel("Z"), GuiUtils.filler(), GuiUtils.rLabel("Move:"),
+            GuiUtils.cLabel("Z"), GuiUtils.filler(), 
+            GuiUtils.rLabel("Move:"),
             GuiUtils.makeCheckbox("", getXInfo(), "move"),
             GuiUtils.makeCheckbox("", getYInfo(), "move"),
             GuiUtils.makeCheckbox("", getZInfo(), "move"),
             GuiUtils.hbox(GuiUtils.makeCheckbox("Keep in Box", this,
                 "keepInBox"), GuiUtils.makeCheckbox("Enabled", this,
                     "enabled")),
+
+            GuiUtils.rLabel("Clip:"),
+            getXInfo().makeClipBox(),
+            getYInfo().makeClipBox(),
+            getZInfo().makeClipBox(),
+            GuiUtils.filler(),
+
             GuiUtils.rLabel("Visibility:"),
             GuiUtils.makeCheckbox("", getXInfo(), "visible"),
             GuiUtils.makeCheckbox("", getYInfo(), "visible"),
@@ -1549,6 +1634,7 @@ public class LocationIndicatorControl extends DisplayControlImpl {
      */
     public static class AxisInfo {
 
+
         /** used for creating text */
         private double[] TEXT_START = { 0.0, 0.0, 0.0 };
 
@@ -1560,41 +1646,41 @@ public class LocationIndicatorControl extends DisplayControlImpl {
 
 
         /** The control */
-        LocationIndicatorControl lic;
+        private LocationIndicatorControl lic;
 
         /** Should the point be shown */
         private boolean showLines = false;
 
 
         /** Axis visible */
-        boolean visible = true;
+        private         boolean visible = true;
 
         /** Axis label visible */
-        boolean labelVisible = true;
+        private         boolean labelVisible = true;
 
         /** Show solid plane */
-        boolean solid = false;
+        private         boolean solid = false;
 
         /** Can move */
-        boolean move = true;
+        private         boolean move = true;
 
         /** Axis holder */
-        CompositeDisplayable axis;
+        private         CompositeDisplayable axis;
 
         /** Axis line */
-        LineDrawing axisLine;
+        private         LineDrawing axisLine;
 
         /** Line to point */
-        LineDrawing line;
+        private         LineDrawing line;
 
         /** Tick mark on axis */
-        ShapeDisplayable tick;
+        private         ShapeDisplayable tick;
 
         /** The solid */
-        ShapeDisplayable solidDisplayable;
+        private         ShapeDisplayable solidDisplayable;
 
-        /** THe index (x,y or x) */
-        int index;
+        /** The index (x,y or x) */
+        private         int index;
 
         /** Text at center */
         private ShapeDisplayable tickTextDisplayable;
@@ -1607,6 +1693,8 @@ public class LocationIndicatorControl extends DisplayControlImpl {
 
         /** Z position of tick */
         private float tickZ = 0.0f;
+
+        private int clip = CLIP_NONE;
 
 
         /**
@@ -1872,6 +1960,70 @@ public class LocationIndicatorControl extends DisplayControlImpl {
          */
         public boolean getShowLines() {
             return showLines;
+        }
+
+
+        /**
+         * Set the Clip property.
+         *
+         * @param value The new value for Clip
+         */
+        public void setClip(int value) {
+            clip = value;
+            if(lic!=null) {
+                lic.checkClip(false);
+            }
+        }
+        private JComboBox clipBox;
+
+        JComboBox makeClipBox() {
+            Object[]items = {new TwoFacedObject("None", CLIP_NONE),
+                             new TwoFacedObject(CLIP_NAMES1[index],CLIP_POSITIVE),
+                             new TwoFacedObject(CLIP_NAMES2[index],CLIP_NEGATIVE)};
+            clipBox= new JComboBox(items);
+            clipBox.setSelectedIndex(clip);
+            clipBox.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        clip = clipBox.getSelectedIndex();
+                        lic.checkClip(false);
+                    }
+                });
+            return clipBox;
+
+        }
+
+
+        public int getClipCoefficient() {
+            if(clip == CLIP_POSITIVE) return 1;
+            return -1;
+        }
+
+        /**
+         * Get the Clip property.
+         *
+         * @return The Clip
+         */
+        public int getClip() {
+            return clip;
+        }
+
+
+        /**
+           Set the Index property.
+
+           @param value The new value for Index
+        **/
+        public void setIndex (int value) {
+            this.index = value;
+        }
+
+        /**
+           Get the Index property.
+
+           @return The Index
+        **/
+        public int getIndex () {
+            return this.index;
         }
 
 

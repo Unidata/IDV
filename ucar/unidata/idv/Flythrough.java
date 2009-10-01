@@ -119,7 +119,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
 
 
-    public JTextField[] cflds = {null,null,null,null};
+    private JTextField[] cflds = {null,null,null,null};
 
     /** _more_ */
     public static final String TAG_FLYTHROUGH = "flythrough";
@@ -279,6 +279,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
     /** _more_          */
     private JComponent contents;
+
+    private boolean shown  = false;
 
     /**
      * _more_
@@ -1380,7 +1382,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
      */
     private void doStep(int index) throws Exception {
 
-        if ( !isActive()) {
+        if (points.size()==0 || !isActive()) {
             return;
         }
 
@@ -1868,6 +1870,28 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             relativeOrientation = orientCbx.isSelected();
 	return relativeOrientation;
     }
+
+
+/**
+Set the Shown property.
+
+@param value The new value for Shown
+**/
+public void setShown (boolean value) {
+	this.shown = value;
+}
+
+/**
+Get the Shown property.
+
+@return The Shown
+**/
+public boolean getShown () {
+    if(frame!=null) {
+        return frame.isShowing();
+    }
+	return this.shown;
+}
 
 
 

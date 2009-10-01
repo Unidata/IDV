@@ -1871,9 +1871,13 @@ public class MapViewManager extends NavigatedViewManager {
             throws VisADException, RemoteException {
         if(flythrough!=null) {
             flythrough.setViewManager(this);
+            if(flythrough.getShown()) {
+                flythrough.show();
+            }
         }
         super.initAfterUnPersistence(idv);
     }
+
 
 
     /**
