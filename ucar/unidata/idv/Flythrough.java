@@ -119,6 +119,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
 
 
+    public JTextField[] cflds = {null,null,null,null};
+
     /** _more_ */
     public static final String TAG_FLYTHROUGH = "flythrough";
 
@@ -454,6 +456,12 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
         show();
     }
 
+
+    
+    private float parsef(JTextField fld) {
+        return (float)parse(fld,0);
+    }
+
     /**
      * _more_
      *
@@ -618,6 +626,12 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
         readout  = new CursorReadoutWindow(viewManager);
 
 
+        for(int ci=0;ci<cflds.length;ci++) {
+            cflds[ci] = new JTextField("0.0");
+            cflds[ci].addActionListener(listener);
+        }
+
+
         zoomFld  = new JTextField(zoom + "", 5);
 
         tiltxFld = new JTextField("" + tiltX, 4);
@@ -760,6 +774,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
         JComponent orientationComp = GuiUtils.formLayout(new Component[] {
             changeViewpointCbx, GuiUtils.filler(),
             GuiUtils.rLabel("Orientation:"), GuiUtils.left(orientCbx),
+            GuiUtils.rLabel("Clip:"), GuiUtils.hbox(cflds),
             GuiUtils.rLabel("Zoom:"), GuiUtils.left(zoomFld),
             GuiUtils.rLabel("Tilt:"),
             GuiUtils.left(GuiUtils.hbox(tiltxFld, tiltyFld, tiltzFld)),
@@ -1525,6 +1540,19 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             locationLine.setVisible(showLine);
             //            locationPoint.setVisible(showLine);
 
+
+            System.err.println ("x/y:" + x1 + "  " +y1);
+            DisplayRendererJ3D dr =
+                (DisplayRendererJ3D) navDisplay.getDisplay().getDisplayRenderer();
+            dr.setClip(0, true, 
+                       parsef(cflds[0]),
+                       parsef(cflds[1]),
+                       parsef(cflds[2]),
+                       parsef(cflds[3]));
+
+            if(true) return;
+
+
             if (changeViewpointCbx.isSelected()) {
                 if (getAnimate()) {
                     navDisplay.animateMatrix(m);
@@ -1546,12 +1574,14 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
         } catch (NumberFormatException exc) {
             viewManager.logException("Error parsing number:" + exc, exc);
-        } catch (Exception exc) {
-            System.err.println("Error:" + exc);
-            exc.printStackTrace();
+        } catch(javax.media.j3d.BadTransformException bte) {
             try {
                 navDisplay.setProjectionMatrix(currentMatrix);
             } catch (Exception ignore) {}
+        } catch (Exception exc) {
+            viewManager.logException("Error", exc);
+            animationWidget.setRunning(false);
+            return;
         }
 
     }
