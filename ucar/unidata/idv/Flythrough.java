@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -83,9 +84,9 @@ import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-import java.util.Vector;
 import java.util.Date;
 import java.util.List;
+import java.util.Vector;
 
 import javax.media.j3d.*;
 
@@ -119,12 +120,16 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
 
 
-    private JTextField[] cflds = {null,null,null,null};
+    /** _more_          */
+    private JTextField clipFld;
+
+    /** _more_          */
+    private JTextField[] cflds = { null, null, null, null };
 
     /** _more_ */
     public static final String TAG_FLYTHROUGH = "flythrough";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DESCRIPTION = "description";
 
     /** _more_ */
@@ -183,11 +188,14 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
     /** _more_ */
     private boolean changeViewpoint = true;
 
-    /** _more_          */
+    /** _more_ */
     private boolean animate = false;
 
-    /** _more_          */
+    /** _more_ */
     private JCheckBox animateCbx;
+
+    /** _more_          */
+    private JCheckBox clipCbx;
 
 
     /** _more_ */
@@ -213,9 +221,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
     /** _more_ */
     private boolean showTimes = false;
 
+    /** _more_          */
     private boolean relativeOrientation = true;
 
-
+    /** _more_          */
+    private boolean clip = false;
 
     /** _more_ */
     private JCheckBox showTimesCbx;
@@ -273,14 +283,15 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
     /** _more_ */
     private AbstractTableModel pointTableModel;
 
-    /** _more_          */
+    /** _more_ */
     private JEditorPane htmlView;
 
 
-    /** _more_          */
+    /** _more_ */
     private JComponent contents;
 
-    private boolean shown  = false;
+    /** _more_          */
+    private boolean shown = false;
 
     /**
      * _more_
@@ -459,9 +470,16 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
     }
 
 
-    
+
+    /**
+     * _more_
+     *
+     * @param fld _more_
+     *
+     * @return _more_
+     */
     private float parsef(JTextField fld) {
-        return (float)parse(fld,0);
+        return (float) parse(fld, 0);
     }
 
     /**
@@ -564,18 +582,19 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
      */
     private void makeWidgets() throws Exception {
 
+        clipCbx      = GuiUtils.makeCheckbox("Clip Viewpoint", this, "clip");
         showTimesCbx = new JCheckBox("Show Animation Times", showTimes);
         showTimesCbx.setEnabled(hasTimes);
         animateCbx = new JCheckBox("Smooth Transitions", animate);
         changeViewpointCbx = new JCheckBox("Change Viewpoint",
                                            changeViewpoint);
-        orientCbx      = new JCheckBox("Relative", getRelativeOrientation ());
+        orientCbx      = new JCheckBox("Relative", getRelativeOrientation());
         showReadoutCbx = new JCheckBox("Show Readout", showReadout);
         readoutLabel =
             GuiUtils.getFixedWidthLabel("<html><br><br><br></html>");
         readoutLabel.setVerticalAlignment(SwingConstants.TOP);
 
-        if(animationInfo==null) {
+        if (animationInfo == null) {
             animationInfo = new AnimationInfo();
             animationInfo.setShareIndex(true);
         }
@@ -596,7 +615,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
         animationWidget = new AnimationWidget(null, null, animationInfo);
 
-        if(getShareGroup() == null || getShareGroup().equals(SharableManager.GROUP_ALL)) {
+        if ((getShareGroup() == null)
+                || getShareGroup().equals(SharableManager.GROUP_ALL)) {
             setShareGroup("flythrough");
         }
         animationWidget.setShareGroup(getShareGroup());
@@ -625,10 +645,12 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
         viewManager.getMaster().addDisplayable(locationPoint);
         viewManager.getMaster().addDisplayable(locationLine);
 
-        readout  = new CursorReadoutWindow(viewManager);
+        readout = new CursorReadoutWindow(viewManager);
 
 
-        for(int ci=0;ci<cflds.length;ci++) {
+        clipFld = new JTextField("0", 5);
+        clipFld.addActionListener(listener);
+        for (int ci = 0; ci < cflds.length; ci++) {
             cflds[ci] = new JTextField("0.0");
             cflds[ci].addActionListener(listener);
         }
@@ -719,7 +741,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
         };
 
         pointTable = new JTable(pointTableModel);
-        pointTable.setToolTipText("Double click: view; Control-P: Show point properties; Delete: delete point");
+        pointTable.setToolTipText(
+            "Double click: view; Control-P: Show point properties; Delete: delete point");
 
 
         pointTable.addKeyListener(new KeyAdapter() {
@@ -776,13 +799,14 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
         JComponent orientationComp = GuiUtils.formLayout(new Component[] {
             changeViewpointCbx, GuiUtils.filler(),
             GuiUtils.rLabel("Orientation:"), GuiUtils.left(orientCbx),
-            GuiUtils.rLabel("Clip:"), GuiUtils.hbox(cflds),
             GuiUtils.rLabel("Zoom:"), GuiUtils.left(zoomFld),
             GuiUtils.rLabel("Tilt:"),
             GuiUtils.left(GuiUtils.hbox(tiltxFld, tiltyFld, tiltzFld)),
             GuiUtils.rLabel(""), GuiUtils.left(GuiUtils.left(animateCbx)),
             GuiUtils.rLabel("Data Animation:"), GuiUtils.left(showTimesCbx),
-            GuiUtils.filler(),
+            GuiUtils.filler(), GuiUtils.left(clipCbx),
+            GuiUtils.rLabel("Clip Distance:"), GuiUtils.left(clipFld),
+            GuiUtils.rLabel("Clip:"), GuiUtils.hbox(cflds), GuiUtils.filler(),
             GuiUtils.makeCheckbox("Show Location Line", this, "showLine")
         });
 
@@ -807,7 +831,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             GuiUtils.topCenter(animationWidget.getContents(), tabbedPane);
         JMenuBar menuBar  = new JMenuBar();
         JMenu    fileMenu = new JMenu("File");
-        JMenu    editMenu = GuiUtils.makeDynamicMenu("Edit", this,"initEditMenu");
+        JMenu editMenu = GuiUtils.makeDynamicMenu("Edit", this,
+                             "initEditMenu");
         fileMenu.add(GuiUtils.makeMenuItem("Export", this, "doExport"));
         fileMenu.add(GuiUtils.makeMenuItem("Import", this, "doImport"));
 
@@ -824,6 +849,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param editMenu _more_
+     */
     public void initEditMenu(JMenu editMenu) {
         editMenu.add(GuiUtils.makeMenuItem("Add Point", this,
                                            "addPointWithoutTime"));
@@ -831,7 +861,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
                                            "addPointWithTime"));
 
         editMenu.add(GuiUtils.makeCheckboxMenuItem("Sharing On", this,
-                                                   "sharing", null));
+                "sharing", null));
 
         editMenu.add(GuiUtils.makeMenuItem("Set Share Group", this,
                                            "showSharableDialog"));
@@ -839,17 +869,27 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param sharing _more_
+     */
     public void setSharing(boolean sharing) {
         super.setSharing(sharing);
-        if(animationWidget!=null) {
+        if (animationWidget != null) {
             animationWidget.setSharing(sharing);
             animationInfo.setShared(true);
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param shareGroup _more_
+     */
     public void setShareGroup(Object shareGroup) {
         super.setShareGroup(shareGroup);
-        if(animationWidget!=null) {
+        if (animationWidget != null) {
             animationWidget.setShareGroup(shareGroup);
         }
     }
@@ -865,28 +905,30 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
      */
     private boolean showProperties(FlythroughPoint pt) {
         try {
-            DateTime[] times = viewManager.getAnimationWidget().getTimes();
-            JComboBox timeBox=null;
-            JLabel timeLabel = GuiUtils.rLabel("Time:");
-            Vector timesList = new Vector();
-            timesList.add(0,new TwoFacedObject("None",null));
-            if(times!=null && times.length>0) {
+            DateTime[] times     =
+                viewManager.getAnimationWidget().getTimes();
+            JComboBox  timeBox   = null;
+            JLabel     timeLabel = GuiUtils.rLabel("Time:");
+            Vector     timesList = new Vector();
+            timesList.add(0, new TwoFacedObject("None", null));
+            if ((times != null) && (times.length > 0)) {
                 timesList.addAll(Misc.toList(times));
             }
-            if(pt.getDateTime()!=null && !timesList.contains(pt.getDateTime())) {
+            if ((pt.getDateTime() != null)
+                    && !timesList.contains(pt.getDateTime())) {
                 timesList.add(pt.getDateTime());
             }
             timeBox = new JComboBox(timesList);
-            if(pt.getDateTime()!=null) {
+            if (pt.getDateTime() != null) {
                 timeBox.setSelectedItem(pt.getDateTime());
             }
 
             LatLonWidget llw = new LatLonWidget("Latitude: ", "Longitude: ",
-                                                "Altitude: ", null) {
-                    protected String formatLatLonString(String latOrLon) {
-                        return latOrLon;
-                    }
-                };
+                                   "Altitude: ", null) {
+                protected String formatLatLonString(String latOrLon) {
+                    return latOrLon;
+                }
+            };
 
             EarthLocation el = pt.getEarthLocation();
             llw.setLatLon(el.getLatitude().getValue(CommonUnit.degree),
@@ -900,21 +942,22 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             JScrollPane scrollPane = new JScrollPane(textArea);
             scrollPane.setPreferredSize(new Dimension(400, 300));
             JComponent contents = GuiUtils.formLayout(new Component[] {
-                                      GuiUtils.rLabel("Location:"),
-                                      llw, timeLabel,
-                                      GuiUtils.left(timeBox), GuiUtils.rLabel("Description:"),
-                                      scrollPane });
-            if (!GuiUtils.showOkCancelDialog(frame, "Point Properties",
+                GuiUtils.rLabel("Location:"), llw, timeLabel,
+                GuiUtils.left(timeBox), GuiUtils.rLabel("Description:"),
+                scrollPane
+            });
+            if ( !GuiUtils.showOkCancelDialog(frame, "Point Properties",
                     contents, null)) {
                 return false;
             }
             pt.setDescription(textArea.getText());
-            pt.setEarthLocation(makePoint(llw.getLat(),llw.getLon(),llw.getAlt()));
+            pt.setEarthLocation(makePoint(llw.getLat(), llw.getLon(),
+                                          llw.getAlt()));
             Object selectedDate = timeBox.getSelectedItem();
-            if(selectedDate instanceof TwoFacedObject) {
+            if (selectedDate instanceof TwoFacedObject) {
                 pt.setDateTime(null);
             } else {
-                pt.setDateTime((DateTime)selectedDate);
+                pt.setDateTime((DateTime) selectedDate);
             }
 
 
@@ -1359,7 +1402,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             }
         }
         setAnimationTimes();
-        frame.show();
+        if (frame != null) {
+            frame.show();
+        }
     }
 
 
@@ -1382,7 +1427,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
      */
     private void doStep(int index) throws Exception {
 
-        if (points.size()==0 || !isActive()) {
+        if ((points.size() == 0) || !isActive()) {
             return;
         }
 
@@ -1543,17 +1588,31 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             //            locationPoint.setVisible(showLine);
 
 
-            System.err.println ("x/y:" + x1 + "  " +y1);
+            System.err.println("x/y:" + x1 + "  " + y1);
             DisplayRendererJ3D dr =
-                (DisplayRendererJ3D) navDisplay.getDisplay().getDisplayRenderer();
-            dr.setClip(0, true, 
+                (DisplayRendererJ3D) navDisplay.getDisplay()
+                    .getDisplayRenderer();
+            /*
+            dr.setClip(0, true,
                        parsef(cflds[0]),
                        parsef(cflds[1]),
                        parsef(cflds[2]),
-                       parsef(cflds[3]));
+                       parsef(cflds[3]));*/
 
-            if(true) return;
+            float  coeff = 1;
+            double value = y1;
+            dr.setClip(0, getClip(), 0.f, (float) coeff, 0.f,
+                       (float) ((-coeff * (value + coeff * 0.01f))));
 
+
+
+
+            if (false && navDisplay instanceof MapProjectionDisplayJ3D) {
+                double clipDistance = parse(clipFld, 0.0);
+                System.err.println("Clip distance:" + clipDistance);
+                ((MapProjectionDisplayJ3D) navDisplay).getView()
+                    .setFrontClipDistance(clipDistance);
+            }
 
             if (changeViewpointCbx.isSelected()) {
                 if (getAnimate()) {
@@ -1576,7 +1635,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
         } catch (NumberFormatException exc) {
             viewManager.logException("Error parsing number:" + exc, exc);
-        } catch(javax.media.j3d.BadTransformException bte) {
+        } catch (javax.media.j3d.BadTransformException bte) {
             try {
                 navDisplay.setProjectionMatrix(currentMatrix);
             } catch (Exception ignore) {}
@@ -1852,46 +1911,77 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
 
     /**
-       Set the RelativeOrientation property.
-
-       @param value The new value for RelativeOrientation
-    **/
-    public void setRelativeOrientation (boolean value) {
-	relativeOrientation = value;
+     *  Set the RelativeOrientation property.
+     *
+     *  @param value The new value for RelativeOrientation
+     */
+    public void setRelativeOrientation(boolean value) {
+        relativeOrientation = value;
     }
 
     /**
-       Get the RelativeOrientation property.
-
-       @return The RelativeOrientation
-    **/
-    public boolean getRelativeOrientation () {
-        if(orientCbx!=null)
+     *  Get the RelativeOrientation property.
+     *
+     *  @return The RelativeOrientation
+     */
+    public boolean getRelativeOrientation() {
+        if (orientCbx != null) {
             relativeOrientation = orientCbx.isSelected();
-	return relativeOrientation;
+        }
+        return relativeOrientation;
     }
 
 
-/**
-Set the Shown property.
-
-@param value The new value for Shown
-**/
-public void setShown (boolean value) {
-	this.shown = value;
-}
-
-/**
-Get the Shown property.
-
-@return The Shown
-**/
-public boolean getShown () {
-    if(frame!=null) {
-        return frame.isShowing();
+    /**
+     * Set the Shown property.
+     *
+     * @param value The new value for Shown
+     */
+    public void setShown(boolean value) {
+        this.shown = value;
     }
-	return this.shown;
-}
+
+    /**
+     * Get the Shown property.
+     *
+     * @return The Shown
+     */
+    public boolean getShown() {
+        if (frame != null) {
+            return frame.isShowing();
+        }
+        return this.shown;
+    }
+
+    /**
+     *  Set the Clip property.
+     *
+     *  @param value The new value for Clip
+     *
+     * @throws Exception _more_
+     */
+    public void setClip(boolean value) throws Exception {
+        if (clip != value) {
+            clip = value;
+            if (isActive() && (animationWidget != null)) {
+                doStep(animation.getCurrent());
+            }
+        }
+    }
+
+    /**
+     *  Get the Clip property.
+     *
+     *  @return The Clip
+     */
+    public boolean getClip() {
+        if (clipCbx != null) {
+            clip = clipCbx.isSelected();
+        }
+        return clip;
+    }
+
+
 
 
 

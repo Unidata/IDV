@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv;
 
 
@@ -136,7 +137,9 @@ public class MapViewManager extends NavigatedViewManager {
     /** Preference for  showing the pip */
     public static final String PREF_SHOWPIP = "View.ShowPip";
 
-    public static final String PREF_SHOWGLOBEBACKGROUND = "View.ShowGlobeBackground";
+    /** _more_          */
+    public static final String PREF_SHOWGLOBEBACKGROUND =
+        "View.ShowGlobeBackground";
 
     /** Preference for  showing the earth nav panel */
     public static final String PREF_SHOWEARTHNAVPANEL =
@@ -190,7 +193,8 @@ public class MapViewManager extends NavigatedViewManager {
     /** The map panel in the GUI */
     private PipPanel pipPanel;
 
-    private JComponent  pipPanelWrapper;
+    /** _more_          */
+    private JComponent pipPanelWrapper;
 
 
     /** Do we reproject when we goto address */
@@ -223,6 +227,7 @@ public class MapViewManager extends NavigatedViewManager {
     private ZSlider globeBackgroundLevelSlider;
 
 
+    /** _more_          */
     private Flythrough flythrough;
 
 
@@ -412,12 +417,13 @@ public class MapViewManager extends NavigatedViewManager {
         checkDefaultMap();
         Trace.call2("MapViewManager.init checkDefaultMap");
 
-        if(useGlobeDisplay) {
+        if (useGlobeDisplay) {
             //            if(!hasBooleanProperty(PREF_SHOWGLOBEBACKGROUND)) {
-                initializeBooleanProperty(new BooleanProperty(PREF_SHOWGLOBEBACKGROUND,
-                                                              "Show Globe Background",
-                                                              "Show Globe Background", false));
-                //            }
+            initializeBooleanProperty(
+                new BooleanProperty(
+                    PREF_SHOWGLOBEBACKGROUND, "Show Globe Background",
+                    "Show Globe Background", false));
+            //            }
         }
 
     }
@@ -447,6 +453,8 @@ public class MapViewManager extends NavigatedViewManager {
      *
      * @param de The event
      *
+     * @param event _more_
+     *
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
@@ -460,39 +468,47 @@ public class MapViewManager extends NavigatedViewManager {
 
 
         NavigatedDisplay navDisplay = getMapDisplay();
-        if(!navDisplay.getAutoRotate() && getViewpointControl().getAutoRotate()) {
+        if ( !navDisplay.getAutoRotate()
+                && getViewpointControl().getAutoRotate()) {
             getViewpointControl().setAutoRotate(false);
         }
 
-        int id = event.getId();
+        int        id         = event.getId();
         InputEvent inputEvent = event.getInputEvent();
-        if (id == DisplayEvent.KEY_PRESSED && inputEvent instanceof KeyEvent) {
+        if ((id == DisplayEvent.KEY_PRESSED)
+                && (inputEvent instanceof KeyEvent)) {
             KeyEvent keyEvent = (KeyEvent) inputEvent;
-            if (keyEvent.isControlDown() && (keyEvent.getKeyCode() == KeyEvent.VK_H||
-                                             keyEvent.getKeyCode() == KeyEvent.VK_J||
-                                             keyEvent.getKeyCode() == KeyEvent.VK_K||
-                                             keyEvent.getKeyCode() == KeyEvent.VK_L
-                                             )) {
+            if (keyEvent.isControlDown()
+                    && ((keyEvent.getKeyCode() == KeyEvent.VK_H)
+                        || (keyEvent.getKeyCode() == KeyEvent.VK_J)
+                        || (keyEvent.getKeyCode() == KeyEvent.VK_K)
+                        || (keyEvent.getKeyCode() == KeyEvent.VK_L))) {
                 double[] matrix = getProjectionControl().getMatrix();
-                double[] rot = new double[3];
+                double[] rot   = new double[3];
                 double[] scale = new double[3];
                 double[] trans = new double[3];
-                MouseBehavior mouseBehavior = getNavigatedDisplay().getMouseBehavior();
-                mouseBehavior.instance_unmake_matrix(rot, scale, trans, matrix);
+                MouseBehavior mouseBehavior =
+                    getNavigatedDisplay().getMouseBehavior();
+                mouseBehavior.instance_unmake_matrix(rot, scale, trans,
+                        matrix);
 
-                double[] t =null;
-                if(keyEvent.getKeyCode() == KeyEvent.VK_H) 
-                    t = mouseBehavior.make_matrix(-5, 0.0, 0, 1.0, 0.0, 0.0, 0.0);
-                else if(keyEvent.getKeyCode() == KeyEvent.VK_J) 
-                    t = mouseBehavior.make_matrix(5, 0.0, 0, 1.0, 0.0, 0.0, 0.0);
-                else if(keyEvent.getKeyCode() == KeyEvent.VK_K) 
-                    t = mouseBehavior.make_matrix(0, -5.0, 0, 1.0, 0.0, 0.0, 0.0);
-                else if(keyEvent.getKeyCode() == KeyEvent.VK_L) 
-                    t = mouseBehavior.make_matrix(0, 5.0, 0, 1.0, 0.0, 0.0, 0.0);
-                matrix  = mouseBehavior.multiply_matrix(t,
-                                                        matrix);
+                double[] t = null;
+                if (keyEvent.getKeyCode() == KeyEvent.VK_H) {
+                    t = mouseBehavior.make_matrix(-5, 0.0, 0, 1.0, 0.0, 0.0,
+                            0.0);
+                } else if (keyEvent.getKeyCode() == KeyEvent.VK_J) {
+                    t = mouseBehavior.make_matrix(5, 0.0, 0, 1.0, 0.0, 0.0,
+                            0.0);
+                } else if (keyEvent.getKeyCode() == KeyEvent.VK_K) {
+                    t = mouseBehavior.make_matrix(0, -5.0, 0, 1.0, 0.0, 0.0,
+                            0.0);
+                } else if (keyEvent.getKeyCode() == KeyEvent.VK_L) {
+                    t = mouseBehavior.make_matrix(0, 5.0, 0, 1.0, 0.0, 0.0,
+                            0.0);
+                }
+                matrix = mouseBehavior.multiply_matrix(t, matrix);
                 getMaster().setProjectionMatrix(matrix);
-                
+
                 return;
             }
         }
@@ -503,31 +519,46 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 
-    protected void mouseFlicked(Point startPoint, Point endPoint, double[] startMatrix, double [] endMatrix,double speed) {
-        if (!getUseGlobeDisplay()) {
+    /**
+     * _more_
+     *
+     * @param startPoint _more_
+     * @param endPoint _more_
+     * @param startMatrix _more_
+     * @param endMatrix _more_
+     * @param speed _more_
+     */
+    protected void mouseFlicked(Point startPoint, Point endPoint,
+                                double[] startMatrix, double[] endMatrix,
+                                double speed) {
+        if ( !getUseGlobeDisplay()) {
             return;
         }
 
-        double[] trans         = { 0.0, 0.0, 0.0 };
-        double[] rot1           = { 0.0, 0.0, 0.0 };
-        double[] rot2           = { 0.0, 0.0, 0.0 };
-        double[] scale         = { 0.0, 0.0, 0.0 };
-        getNavigatedDisplay().getMouseBehavior().instance_unmake_matrix(rot1, scale, trans,
-                                                  startMatrix);
-        getNavigatedDisplay().getMouseBehavior().instance_unmake_matrix(rot2, scale, trans,
-                                                  endMatrix);
+        double[] trans = { 0.0, 0.0, 0.0 };
+        double[] rot1  = { 0.0, 0.0, 0.0 };
+        double[] rot2  = { 0.0, 0.0, 0.0 };
+        double[] scale = { 0.0, 0.0, 0.0 };
+        getNavigatedDisplay().getMouseBehavior().instance_unmake_matrix(rot1,
+                scale, trans, startMatrix);
+        getNavigatedDisplay().getMouseBehavior().instance_unmake_matrix(rot2,
+                scale, trans, endMatrix);
 
         //If there was no rotation then return
-        if(rot1[0] == rot2[0] && rot1[1] == rot2[1]) return;
+        if ((rot1[0] == rot2[0]) && (rot1[1] == rot2[1])) {
+            return;
+        }
 
-        double distance = GuiUtils.distance(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
-        if(distance==0) return;
-        double percentX = (endPoint.x-startPoint.x)/distance;
-        double percentY = (endPoint.y-startPoint.y)/distance;
-        speed *=2;
-        getNavigatedDisplay().setRotationMultiplierMatrix(speed*-percentY,
-                                                          speed*-percentX,
-                                                          0.0);
+        double distance = GuiUtils.distance(startPoint.x, startPoint.y,
+                                            endPoint.x, endPoint.y);
+        if (distance == 0) {
+            return;
+        }
+        double percentX = (endPoint.x - startPoint.x) / distance;
+        double percentY = (endPoint.y - startPoint.y) / distance;
+        speed *= 2;
+        getNavigatedDisplay().setRotationMultiplierMatrix(speed * -percentY,
+                speed * -percentX, 0.0);
         getViewpointControl().setAutoRotate(true);
     }
 
@@ -755,18 +786,26 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 
-    public  void initWith(ViewState  viewState) throws Exception {
-        MapProjection  thatProjection = (MapProjection) viewState.get(ViewState.PROP_PROJECTION);
-        if(thatProjection!=null) {
-            setMapProjection(thatProjection, false,
-                             "Projection");
+    /**
+     * _more_
+     *
+     * @param viewState _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initWith(ViewState viewState) throws Exception {
+        MapProjection thatProjection =
+            (MapProjection) viewState.get(ViewState.PROP_PROJECTION);
+        if (thatProjection != null) {
+            setMapProjection(thatProjection, false, "Projection");
         }
-        double []aspect = (double[])viewState.get(ViewState.PROP_ASPECTRATIO);
-        if(aspect!=null) {
+        double[] aspect =
+            (double[]) viewState.get(ViewState.PROP_ASPECTRATIO);
+        if (aspect != null) {
             this.setAspectRatio(aspect);
         }
         super.initWith(viewState);
-     }
+    }
 
 
     /**
@@ -787,10 +826,16 @@ public class MapViewManager extends NavigatedViewManager {
         MapProjection  thatProjection = mvm.getMainProjection();
         this.setAspectRatio(that.getAspectRatio());
 
-        if(mvm.flythrough!=null) {
-            if(this.flythrough!=null) {
-                this.flythrough.initWith(mvm.flythrough);
-            } 
+        if ((mvm.flythrough != null) && (mvm.flythrough != this.flythrough)) {
+            if (this.flythrough != null) {
+                this.flythrough.destroy();
+                //                this.flythrough.initWith(mvm.flythrough);
+            }
+            this.flythrough = mvm.flythrough;
+            this.flythrough.setViewManager(this);
+            if (this.flythrough.getShown()) {
+                this.flythrough.show();
+            }
         }
 
         boolean setProjection = false;
@@ -808,7 +853,7 @@ public class MapViewManager extends NavigatedViewManager {
 
         //Only save the projection if we're not a globe
         //        getMapDisplay().saveProjection();
-        if (!getUseGlobeDisplay()) {
+        if ( !getUseGlobeDisplay()) {
             getMapDisplay().saveProjection();
         }
 
@@ -845,11 +890,17 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param viewState _more_
+     */
     public void initViewState(ViewState viewState) {
         super.initViewState(viewState);
-        viewState.put(ViewState.PROP_GLOBE,new Boolean(getUseGlobeDisplay()));
-        if(!getUseGlobeDisplay()) {
-            viewState.put(ViewState.PROP_PROJECTION,getMainProjection());
+        viewState.put(ViewState.PROP_GLOBE,
+                      new Boolean(getUseGlobeDisplay()));
+        if ( !getUseGlobeDisplay()) {
+            viewState.put(ViewState.PROP_PROJECTION, getMainProjection());
         }
     }
 
@@ -993,11 +1044,13 @@ public class MapViewManager extends NavigatedViewManager {
             { "Show Animation Boxes", PREF_SHOWANIMATIONBOXES,
               new Boolean(getShowAnimationBoxes()) },
             { "Show Clock", IdvConstants.PROP_SHOWCLOCK,
-              new Boolean(getStateManager().getPreferenceOrProperty(IdvConstants.PROP_SHOWCLOCK,"true"))}, 
+              new Boolean(
+                  getStateManager().getPreferenceOrProperty(
+                      IdvConstants.PROP_SHOWCLOCK, "true")) },
             { "Show Overview Map", PREF_SHOWPIP,
-              new Boolean(getStore().get(PREF_SHOWPIP, false))}, 
+              new Boolean(getStore().get(PREF_SHOWPIP, false)) },
             { "Show Globe Background", PREF_SHOWGLOBEBACKGROUND,
-              new Boolean(getStore().get(PREF_SHOWGLOBEBACKGROUND, false))}
+              new Boolean(getStore().get(PREF_SHOWGLOBEBACKGROUND, false)) }
         };
 
         Object[][] toolbarObjects = {
@@ -1064,7 +1117,7 @@ public class MapViewManager extends NavigatedViewManager {
     private void goToAddressInner() {
         try {
             if (addressReprojectCbx == null) {
-                
+
                 addressReprojectCbx = new JCheckBox("Reproject",
                         getStore().get(PREF_ADDRESS_REPROJECT, true));
                 List savedAddresses =
@@ -1075,7 +1128,9 @@ public class MapViewManager extends NavigatedViewManager {
             }
             getIdvUIManager().showWaitCursor();
             LatLonPoint llp = GeoUtils.getLocationOfAddress(
-                                                            GuiUtils.left(getUseGlobeDisplay()?GuiUtils.filler():(JComponent)addressReprojectCbx));
+                                  GuiUtils.left(getUseGlobeDisplay()
+                    ? GuiUtils.filler()
+                    : (JComponent) addressReprojectCbx));
             getIdvUIManager().showNormalCursor();
             if (llp == null) {
                 return;
@@ -1091,7 +1146,7 @@ public class MapViewManager extends NavigatedViewManager {
             float offset = (float) (1.0 / 60.0f);
             Rectangle2D.Float rect = new Rectangle2D.Float(x - offset,
                                          y - offset, offset * 2, offset * 2);
-            if (!getUseGlobeDisplay() && addressReprojectCbx.isSelected()) {
+            if ( !getUseGlobeDisplay() && addressReprojectCbx.isSelected()) {
                 TrivialMapProjection mp =
                     new TrivialMapProjection(
                         RealTupleType.SpatialEarth2DTuple, rect);
@@ -1162,9 +1217,12 @@ public class MapViewManager extends NavigatedViewManager {
         }
         pipPanel = new PipPanel(this);
         pipPanel.setPreferredSize(new Dimension(100, 100));
-        JButton closeBtn  = GuiUtils.makeImageButton("/auxdata/ui/icons/Cancel16.gif",this,"hidePip");
-        pipPanelWrapper = GuiUtils.topCenter(GuiUtils.right(closeBtn), pipPanel);
-        if (!getShowPip()) {
+        JButton closeBtn =
+            GuiUtils.makeImageButton("/auxdata/ui/icons/Cancel16.gif", this,
+                                     "hidePip");
+        pipPanelWrapper = GuiUtils.topCenter(GuiUtils.right(closeBtn),
+                                             pipPanel);
+        if ( !getShowPip()) {
             pipPanelWrapper.setVisible(false);
         }
         return GuiUtils.centerBottom(sideLegend, pipPanelWrapper);
@@ -1252,7 +1310,8 @@ public class MapViewManager extends NavigatedViewManager {
                     "Animation Timeline", this,
                     "showTimeline"), "/auxdata/ui/icons/timeline_marker.png"));
 
-        viewMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Flythrough",this,"showFlythrough"),"/auxdata/ui/icons/plane.png"));
+        viewMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Flythrough",
+                this, "showFlythrough"), "/auxdata/ui/icons/plane.png"));
 
         viewMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Properties",
                 this,
@@ -1374,7 +1433,7 @@ public class MapViewManager extends NavigatedViewManager {
         p = (ProjectionImpl) p.clone();
         try {
             setMapProjection(new ProjectionCoordinateSystem(p), true);
-            if(pipPanel!=null) {
+            if (pipPanel != null) {
                 pipPanel.setProjectionImpl(p);
             }
         } catch (Exception excp) {
@@ -1834,9 +1893,12 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
+    /**
+     * _more_
+     */
     public void destroy() {
         super.destroy();
-        if(flythrough!=null) {
+        if (flythrough != null) {
             flythrough.destroy();
             flythrough = null;
         }
@@ -1844,34 +1906,55 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 
+    /**
+     * _more_
+     */
     public void showFlythrough() {
-        if(flythrough==null) {
+        if (flythrough == null) {
             flythrough = new Flythrough(this);
         }
         flythrough.show();
     }
 
 
+    /**
+     * _more_
+     *
+     * @param pts _more_
+     */
     public void flythrough(final float[][] pts) {
-        if(flythrough==null) {
+        if (flythrough == null) {
             flythrough = new Flythrough(this);
         }
         flythrough.flythrough(pts);
     }
 
 
-    public void flythrough(List<FlythroughPoint>  pts) {
-        if(flythrough==null) {
+    /**
+     * _more_
+     *
+     * @param pts _more_
+     */
+    public void flythrough(List<FlythroughPoint> pts) {
+        if (flythrough == null) {
             flythrough = new Flythrough(this);
         }
         flythrough.flythrough(pts);
     }
 
+    /**
+     * _more_
+     *
+     * @param idv _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public final void initAfterUnPersistence(IntegratedDataViewer idv)
             throws VisADException, RemoteException {
-        if(flythrough!=null) {
+        if (flythrough != null) {
             flythrough.setViewManager(this);
-            if(flythrough.getShown()) {
+            if (flythrough.getShown()) {
                 flythrough.show();
             }
         }
@@ -2342,21 +2425,35 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param vm _more_
+     *
+     * @return _more_
+     */
     public boolean isCompatibleWith(ViewManager vm) {
-        if(!super.isCompatibleWith(vm)) {
+        if ( !super.isCompatibleWith(vm)) {
             return false;
         }
-        MapViewManager that = (MapViewManager)vm;
+        MapViewManager that = (MapViewManager) vm;
         return this.getUseGlobeDisplay() == that.getUseGlobeDisplay();
     }
 
 
+    /**
+     * _more_
+     *
+     * @param viewState _more_
+     *
+     * @return _more_
+     */
     public boolean isCompatibleWith(ViewState viewState) {
-        if(!super.isCompatibleWith(viewState)) {
+        if ( !super.isCompatibleWith(viewState)) {
             return false;
         }
-        Boolean b= (Boolean) viewState.get(ViewState.PROP_GLOBE);
-        if(b!=null) {
+        Boolean b = (Boolean) viewState.get(ViewState.PROP_GLOBE);
+        if (b != null) {
             return getUseGlobeDisplay() == b.booleanValue();
         }
         return true;
@@ -2399,11 +2496,8 @@ public class MapViewManager extends NavigatedViewManager {
                     this,
                     "setCurrentAsProjection"), "/auxdata/ui/icons/world_rect.png"));
         }
-        projMenu.add(
-                     GuiUtils.setIcon(
-                                      GuiUtils.makeMenuItem(
-                                                            "Go to Address", this,
-                                                            "goToAddress"), "/auxdata/ui/icons/house_go.png"));
+        projMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Go to Address",
+                this, "goToAddress"), "/auxdata/ui/icons/house_go.png"));
 
         if ( !getUseGlobeDisplay()) {
             projMenu.addSeparator();
@@ -2498,7 +2592,7 @@ public class MapViewManager extends NavigatedViewManager {
                 pipPanelWrapper.setVisible(value);
             }
         } else if (id.equals(PREF_SHOWGLOBEBACKGROUND)) {
-            if(globeBackgroundDisplayable!=null) {
+            if (globeBackgroundDisplayable != null) {
                 globeBackgroundDisplayable.setVisible(value);
             }
         } else if (id.equals(PREF_PERSPECTIVEVIEW)) {
@@ -2532,14 +2626,13 @@ public class MapViewManager extends NavigatedViewManager {
                                       "Show Earth Navigation Panel",
                                       "Show Earth Navigation Panel", false));
 
-        props.add(new BooleanProperty(PREF_SHOWPIP,
-                                      "Show Overview Map",
+        props.add(new BooleanProperty(PREF_SHOWPIP, "Show Overview Map",
                                       "Show Overview Map", false));
 
-        if(useGlobeDisplay) {
+        if (useGlobeDisplay) {
             props.add(new BooleanProperty(PREF_SHOWGLOBEBACKGROUND,
-                                      "Show Globe Background",
-                                      "Show Globe Background", false));
+                                          "Show Globe Background",
+                                          "Show Globe Background", false));
         }
     }
 
@@ -2652,6 +2745,9 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
+    /**
+     * _more_
+     */
     public void hidePip() {
         setShowPip(false);
     }
@@ -2671,7 +2767,7 @@ public class MapViewManager extends NavigatedViewManager {
      * @return The ShowPipPanel
      */
     public boolean getShowPip() {
-        return getBp(PREF_SHOWPIP,false);
+        return getBp(PREF_SHOWPIP, false);
     }
 
 
@@ -2740,7 +2836,7 @@ public class MapViewManager extends NavigatedViewManager {
      *  @param value The new value for GlobeBackgroundShow
      */
     public void setGlobeBackgroundShow(boolean value) {
-        setBp(PREF_SHOWGLOBEBACKGROUND,value);
+        setBp(PREF_SHOWGLOBEBACKGROUND, value);
     }
 
     /**
@@ -2749,12 +2845,12 @@ public class MapViewManager extends NavigatedViewManager {
      *  @return The GlobeBackgroundShow
      */
     public boolean getGlobeBackgroundShow() {
-        if(hasBooleanProperty(PREF_SHOWGLOBEBACKGROUND)) {
-            return getBp(PREF_SHOWGLOBEBACKGROUND,false);
+        if (hasBooleanProperty(PREF_SHOWGLOBEBACKGROUND)) {
+            return getBp(PREF_SHOWGLOBEBACKGROUND, false);
         }
-        XmlObjectStore store        = getStore();
+        XmlObjectStore store = getStore();
         if (store != null) {
-            return  store.get(PREF_SHOWGLOBEBACKGROUND, false);
+            return store.get(PREF_SHOWGLOBEBACKGROUND, false);
         }
         return false;
     }
@@ -2765,7 +2861,7 @@ public class MapViewManager extends NavigatedViewManager {
      *  @param value The new value for GlobeBackgroundLevel
      */
     public void setGlobeBackgroundLevel(double value) {
-        globeBackgroundLevel = value;        
+        globeBackgroundLevel = value;
     }
 
     /**
@@ -2777,23 +2873,23 @@ public class MapViewManager extends NavigatedViewManager {
         return globeBackgroundLevel;
     }
 
-/**
-Set the Flythrough property.
+    /**
+     * Set the Flythrough property.
+     *
+     * @param value The new value for Flythrough
+     */
+    public void setFlythrough(Flythrough value) {
+        this.flythrough = value;
+    }
 
-@param value The new value for Flythrough
-**/
-public void setFlythrough (Flythrough value) {
-	this.flythrough = value;
-}
-
-/**
-Get the Flythrough property.
-
-@return The Flythrough
-**/
-public Flythrough getFlythrough () {
-	return this.flythrough;
-}
+    /**
+     * Get the Flythrough property.
+     *
+     * @return The Flythrough
+     */
+    public Flythrough getFlythrough() {
+        return this.flythrough;
+    }
 
 
 
