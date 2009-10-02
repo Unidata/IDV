@@ -1040,6 +1040,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     }
 
 
+
     /**
      * Animate the matrix changes. Go through N steps, and set the projection matrix
      * to be step/N percent between the from and to values.
@@ -1054,8 +1055,10 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         double[]lastGoodMatrix = from;
         try {
             setAutoRotate(false);
+            double[]finalMatrix = to;
             double[] tmp      = new double[from.length];
             int      numSteps = 20;
+            long sleep = 50;
             isAnimating = true;
             double [] lastMatrix=null;
             double[] trans1         = { 0.0, 0.0, 0.0 };
@@ -1070,24 +1073,21 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
             MouseBehavior mouseBehavior = getMouseBehavior();
             mouseBehavior.instance_unmake_matrix(rot1, scale1, trans1,
-                                                 from);
+                                                      from);
             mouseBehavior.instance_unmake_matrix(rot2, scale2, trans2,
-                                                 to);
-
-            //            System.err.println ("from:" + rot1[0]+"/"+rot1[1]+"/"+rot1[2]);
-            //            System.err.println ("to:" + rot2[0]+"/"+rot2[1]+"/"+rot2[2]);
+                                                      to);
 
 
-            //Just keeps  getting piled on deeper and deeper.
-            for(int i=0;i<3;i++) {
-                if((int)(rot1[i]*100) == -17999) {
-                    rot1[i] = 179.99;
-                } 
+            Quat4d  q1 = new Quat4d();            
+            Quat4d  q2 = new Quat4d();
 
-                if((int)(rot2[i]*100) == -17999) {
-                    rot2[i] = 179.99;
-                } 
-            }
+            Transform3D t1 = new Transform3D(from);
+            Transform3D t2 = new Transform3D(to);
+            t1.get(q1);
+            t2.get(q2);
+            
+            System.err.println ("from:" + rot1[0]+"/"+rot1[1]+"/"+rot1[2]);            
+            System.err.println ("to:" + rot2[0]+"/"+rot2[1]+"/"+rot2[2]);            
 
             for (int step = 1; step <= numSteps; step++) {
                 if (myTimeStamp != animationTimeStamp) {
@@ -1096,7 +1096,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                 }
                 if (step == numSteps) {
                     try {
-                        setProjectionMatrix(to);
+                        setProjectionMatrix(finalMatrix);
                     } catch(Exception exc) {
                         //In case we have a bad affine transform
                         setProjectionMatrix(lastGoodMatrix);                    
@@ -1111,11 +1111,17 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                 double percent = ((double) step) / numSteps;
                 isAnimating = true;
                 
-                tmp= mouseBehavior.make_matrix(
-                                               interp(rot1,rot2,0,percent),
-                                               interp(rot1,rot2,1,percent),
-                                               interp(rot1,rot2,2,percent),
+                Quat4d q3 = new Quat4d();
+                q3.interpolate(q1,q2,percent);
+                Transform3D t3 = new Transform3D();
+                t3.set(q3);
+                double[]tmpRot  = new double[16];
+                t3.get(tmpRot);
+                getMouseBehavior().instance_unmake_matrix(rot, scale, trans, tmpRot);
 
+                tmp= mouseBehavior.make_matrix(
+                                               rot[0],rot[1],rot[2],
+                                               //                                               0,0,0,
                                                interp(scale1,scale2,0,percent),
                                                interp(scale1,scale2,1,percent),
                                                interp(scale1,scale2,2,percent),
@@ -1124,33 +1130,59 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                                                interp(trans1,trans2,1,percent),
                                                interp(trans1,trans2,2,percent));
                 
+                //                System.err.println ("    rot:" + rot[0] +"/" + rot[1] +"/" + rot[2]);
+                //                tmp = getMouseBehavior().multiply_matrix(tmpRot,tmp);
                 double[] currentMatrix = getProjectionMatrix();
                 if(lastMatrix!=null && !Misc.arraysEquals(lastMatrix, currentMatrix)) {
                     isAnimating = false;
                     return;
                 }
+
+                boolean ok = true;
+                try {
+                    Transform3D testt = new Transform3D(tmp);
+                    testt.invert();
+                } catch(Exception exc) {
+                    ok = false;
+                    System.err.println ("bad:" + exc);
+                }
+
+                if(ok) {
                 try {
                     setProjectionMatrix(tmp);
                     lastGoodMatrix = tmp;
                 } catch(Exception exc) {
+                    System.err.println("EXC:" + exc);
                     //In case we have a bad affine transform
                     setProjectionMatrix(lastGoodMatrix);                    
                 }
+                }
                 lastMatrix = getProjectionMatrix();
 
-
-                getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
-                                                          lastMatrix);
-
-
+                //                getMouseBehavior().instance_unmake_matrix(rot, scale, trans, lastMatrix);
                 //                System.err.println ("   step:" + rot[0]+"/"+rot[1]+"/"+rot[2]);
                 //                System.err.println ("\t" + scale[0]+"/"+scale[1]+"/"+scale[2]);
-
-                Misc.sleep(50);
+                Misc.sleep(sleep);
             }
         } catch (Exception exp) {
             System.out.println("Error  animating matrix:" + exp);
         }
+    }
+
+
+    private double interp(double d1, double d2,double percent) {
+        return d1+percent*(d2-d1);
+    }
+
+
+
+
+    private double interp(Vector3d a1,Vector3d a2,int index,double percent) {
+        if(index==0)
+            return a1.x+percent*(a2.x-a1.x);
+        if(index==1)
+            return a1.y+percent*(a2.y-a1.y); 
+        return a1.z+percent*(a2.z-a1.z);
     }
 
 
