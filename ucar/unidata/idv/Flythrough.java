@@ -191,6 +191,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
     /** _more_ */
     private boolean animate = false;
 
+    private long animateSpeed = 50;
+
     /** _more_ */
     private JCheckBox animateCbx;
 
@@ -254,6 +256,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
     /** _more_ */
     private JCheckBox orientCbx;
 
+    private JCheckBox fixedZCbx;
+
 
     /** _more_ */
     private JTextField tiltxFld;
@@ -293,6 +297,10 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
     /** _more_          */
     private boolean shown = false;
 
+    private boolean useFixedZ = true;
+
+    private int currentIndex =0;
+
     /**
      * _more_
      */
@@ -324,7 +332,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             return;
         }
         this.points          = new ArrayList<FlythroughPoint>(that.points);
+        System.err.println("initWith old:" + this.animationInfo + "  new:" + that.animationInfo);
         this.animationInfo   = that.animationInfo;
+
         this.tiltX           = that.tiltX;
         this.tiltY           = that.tiltY;
         this.tiltZ           = that.tiltZ;
@@ -368,6 +378,22 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
         animationInfo = value;
     }
 
+
+    /**
+     * Get the AnimationInfo property.
+     *
+     * @return The AnimationInfo
+     */
+    public AnimationInfo getAnimationInfo() {
+        if (animationWidget != null) {
+            animationInfo = animationWidget.getAnimationInfo();
+        }
+        if(viewManager!=null)
+            System.err.println ("Animation info:" + animationInfo);
+        return animationInfo;
+    }
+
+
     /**
      * _more_
      *
@@ -386,17 +412,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
         return animation;
     }
 
-    /**
-     * Get the AnimationInfo property.
-     *
-     * @return The AnimationInfo
-     */
-    public AnimationInfo getAnimationInfo() {
-        if (animationWidget != null) {
-            return animationWidget.getAnimationInfo();
-        }
-        return animationInfo;
-    }
 
 
     /**
@@ -582,6 +597,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
      */
     private void makeWidgets() throws Exception {
 
+        boolean               doGlobe       =
+            viewManager.getUseGlobeDisplay();
+
         clipCbx      = GuiUtils.makeCheckbox("Clip Viewpoint", this, "clip");
         showTimesCbx = new JCheckBox("Show Animation Times", showTimes);
         showTimesCbx.setEnabled(hasTimes);
@@ -595,6 +613,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
         readoutLabel.setVerticalAlignment(SwingConstants.TOP);
 
         if (animationInfo == null) {
+            System.err.println("making new animation info");
             animationInfo = new AnimationInfo();
             animationInfo.setShareIndex(true);
         }
@@ -602,7 +621,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
         ActionListener listener = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                goToCurrent();
+                Misc.run(Flythrough.this,"goToCurrent");
             }
         };
 
@@ -613,6 +632,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
         htmlView.setContentType("text/html");
 
 
+        System.err.println("animation info:" + animationInfo);
         animationWidget = new AnimationWidget(null, null, animationInfo);
 
         if ((getShareGroup() == null)
@@ -623,8 +643,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
         animationWidget.setSharing(getSharing());
 
 
-
         animation = new Animation();
+        animation.setAnimationInfo(animationInfo);
         animation.addPropertyChangeListener(this);
         animationWidget.setAnimation(animation);
         locationLine = new LineDrawing("flythroughpoint.line");
@@ -795,10 +815,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             }
         });
 
+        fixedZCbx = GuiUtils.makeCheckbox("Use fixed Z",this,"useFixedZ");
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
         JComponent orientationComp = GuiUtils.formLayout(new Component[] {
             changeViewpointCbx, GuiUtils.filler(),
-            GuiUtils.rLabel("Orientation:"), GuiUtils.left(orientCbx),
+            GuiUtils.rLabel("Orientation:"), GuiUtils.left(GuiUtils.hbox(orientCbx, (doGlobe?GuiUtils.filler():(JComponent)fixedZCbx))),
             GuiUtils.rLabel("Zoom:"), GuiUtils.left(zoomFld),
             GuiUtils.rLabel("Tilt:"),
             GuiUtils.left(GuiUtils.hbox(tiltxFld, tiltyFld, tiltzFld)),
@@ -845,6 +866,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
         innerContents = GuiUtils.inset(innerContents, 5);
         contents      = GuiUtils.topCenter(menuBar, innerContents);
+
+        animation.setCurrent(currentIndex);
+
 
     }
 
@@ -1545,6 +1569,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
                     x2 = x1;
                 }
 
+                if (x1==x2 && y1==y2 && z1==z2) return;
+
                 if (doGlobe) {
                     upVector = new Vector3d(x1, y1, z1);
                 } else {
@@ -1552,7 +1578,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
                 }
 
                 //Keep flat in z for non globe
-                t.lookAt(new Point3d(x1, y1, z1), new Point3d(x2, y2, (doGlobe
+                t.lookAt(new Point3d(x1, y1, z1), new Point3d(x2, y2, (getUseFixedZ()||doGlobe
                         ? z2
                         : z1)), upVector);
                 t.get(m);
@@ -1589,7 +1615,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             //            locationPoint.setVisible(showLine);
 
 
-            System.err.println("x/y:" + x1 + "  " + y1);
+
             DisplayRendererJ3D dr =
                 (DisplayRendererJ3D) navDisplay.getDisplay()
                     .getDisplayRenderer();
@@ -1607,7 +1633,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
 
 
-
             if (false && navDisplay instanceof MapProjectionDisplayJ3D) {
                 double clipDistance = parse(clipFld, 0.0);
                 System.err.println("Clip distance:" + clipDistance);
@@ -1615,13 +1640,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
                     .setFrontClipDistance(clipDistance);
             }
 
-            if (changeViewpointCbx.isSelected()) {
-                if (getAnimate()) {
-                    navDisplay.animateMatrix(m);
-                } else {
-                    navDisplay.setProjectionMatrix(m);
-                }
-            }
+            //            System.err.println("x/y:" + x1 +"/" + y1 + "  " + x2 +"/" + y2);
 
             if (hasTimes && getShowTimes()) {
                 DateTime dttm = pt1.getDateTime();
@@ -1631,6 +1650,14 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
             }
 
+
+            if (changeViewpointCbx.isSelected()) {
+                if (getAnimate()) {
+                    navDisplay.animateMatrix(m);
+                } else {
+                    navDisplay.setProjectionMatrix(m);
+                }
+            }
 
 
 
@@ -1982,6 +2009,49 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
         return clip;
     }
 
+
+
+    /**
+       Set the UseFixedZ property.
+
+       @param value The new value for UseFixedZ
+    **/
+    public void setUseFixedZ (boolean value) {
+	useFixedZ = value;
+    }
+
+    /**
+       Get the UseFixedZ property.
+
+       @return The UseFixedZ
+    **/
+    public boolean getUseFixedZ () {
+	return useFixedZ;
+    }
+
+
+    /**
+       Set the CurrentIndex property.
+
+       @param value The new value for CurrentIndex
+    **/
+    public void setCurrentIndex (int value) {
+	currentIndex = value;
+    }
+
+    /**
+       Get the CurrentIndex property.
+
+       @return The CurrentIndex
+    **/
+    public int getCurrentIndex () {
+        if(animation!=null) {
+            try {
+                currentIndex = animation.getCurrent();
+            } catch(Exception ignore) {}
+        }
+	return currentIndex;
+    }
 
 
 

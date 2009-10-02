@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -31,6 +32,8 @@ import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.geoloc.ProjectionRect;
 
+import ucar.unidata.util.GuiUtils;
+
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.TwoFacedObject;
 
@@ -38,12 +41,11 @@ import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.display.*;
 import ucar.visad.quantities.GeopotentialAltitude;
 
-import ucar.unidata.util.GuiUtils;
-
 import visad.*;
-import visad.java3d.*;
 
 import visad.georef.*;
+
+import visad.java3d.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -56,10 +58,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.media.j3d.*;
+
 import javax.swing.*;
 
-import javax.media.j3d.*;
 import javax.vecmath.*;
+
 
 /**
  * Provides support for a navigated VisAD DisplayImplJ3D for
@@ -135,13 +139,13 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     private boolean autoRotate = false;
 
 
-    /** _more_          */
+    /** _more_ */
     private double rotateX = 0;
 
-    /** _more_          */
+    /** _more_ */
     private double rotateY = -1;
 
-    /** _more_          */
+    /** _more_ */
     private double rotateZ = 0;
 
 
@@ -1034,9 +1038,18 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param to _more_
+     */
     public void animateMatrix(double[] to) {
-        animateMatrix(++animationTimeStamp,
-                      getProjectionMatrix(), to, null);
+        animateMatrix(++animationTimeStamp, getProjectionMatrix(), to, null);
+    }
+
+
+    public void animateMatrix(double[] to, long sleepTime) {
+        animateMatrix(++animationTimeStamp, getProjectionMatrix(), to, null,sleepTime);
     }
 
 
@@ -1052,42 +1065,84 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     public void animateMatrix(int myTimeStamp, double[] from, double[] to,
                               EarthLocation finalLocation) {
-        double[]lastGoodMatrix = from;
+
+        animateMatrix(myTimeStamp, from ,to, finalLocation, 50);
+    }
+
+
+    public void animateMatrix(int myTimeStamp, double[] from, double[] to,
+                              EarthLocation finalLocation, long sleepTime) {
+
+        double[] lastGoodMatrix = from;
         try {
             setAutoRotate(false);
-            double[]finalMatrix = to;
-            double[] tmp      = new double[from.length];
-            int      numSteps = 20;
-            long sleep = 50;
+            double[] finalMatrix = to;
+            double[] tmp         = new double[from.length];
+            int      numSteps    = 20;
             isAnimating = true;
-            double [] lastMatrix=null;
-            double[] trans1         = { 0.0, 0.0, 0.0 };
-            double[] rot1           = { 0.0, 0.0, 0.0 };
-            double[] scale1         = { 0.0, 0.0, 0.0 };
-            double[] trans2         = { 0.0, 0.0, 0.0 };
-            double[] rot2           = { 0.0, 0.0, 0.0 };
-            double[] scale2         = { 0.0, 0.0, 0.0 };
-            double[] trans         = { 0.0, 0.0, 0.0 };
-            double[] rot           = { 0.0, 0.0, 0.0 };
-            double[] scale         = { 0.0, 0.0, 0.0 };
+            double[]      lastMatrix    = null;
+            double[]      trans1        = { 0.0, 0.0, 0.0 };
+            double[]      rot1          = { 0.0, 0.0, 0.0 };
+            double[]      scale1        = { 0.0, 0.0, 0.0 };
+            double[]      trans2        = { 0.0, 0.0, 0.0 };
+            double[]      rot2          = { 0.0, 0.0, 0.0 };
+            double[]      scale2        = { 0.0, 0.0, 0.0 };
+            double[]      trans         = { 0.0, 0.0, 0.0 };
+            double[]      rot           = { 0.0, 0.0, 0.0 };
+            double[]      scale         = { 0.0, 0.0, 0.0 };
 
             MouseBehavior mouseBehavior = getMouseBehavior();
-            mouseBehavior.instance_unmake_matrix(rot1, scale1, trans1,
-                                                      from);
-            mouseBehavior.instance_unmake_matrix(rot2, scale2, trans2,
-                                                      to);
+            mouseBehavior.instance_unmake_matrix(rot1, scale1, trans1, from);
+            mouseBehavior.instance_unmake_matrix(rot2, scale2, trans2, to);
 
 
-            Quat4d  q1 = new Quat4d();            
-            Quat4d  q2 = new Quat4d();
 
-            Transform3D t1 = new Transform3D(from);
-            Transform3D t2 = new Transform3D(to);
+
+
+            Transform3D        t1          = new Transform3D(from);
+            Transform3D        t2          = new Transform3D(to);
+
+
+            java.awt.Rectangle bounds      = getScreenBounds();
+            int[]              ptsx = { 0, bounds.width / 2, bounds.width };
+            int[]              ptsy = { 0, bounds.height / 2, bounds.height };
+            double             maxDistance = 0;
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    double[] screenLoc =
+                        getSpatialCoordinatesFromScreen(ptsx[i], ptsx[j]);
+                    Point3d p1 = new Point3d(screenLoc[0], screenLoc[1],
+                                             screenLoc[2]);
+                    Point3d p2 = new Point3d(screenLoc[0], screenLoc[1],
+                                             screenLoc[2]);
+                    t1.transform(p1);
+                    t2.transform(p2);
+                    double distance = p1.distance(p2);
+                    if (distance > maxDistance) {
+                        maxDistance = distance;
+                    }
+                }
+            }
+
+
+
+            //            maxDistance = maxDistance/2;
+            System.err.print("d:" + maxDistance);
+            maxDistance *= 2;
+            maxDistance = Math.min(maxDistance, 10);
+
+            if (maxDistance > 0) {
+                numSteps = (int) (numSteps * maxDistance) + 1;
+            }
+
+            System.err.println("     numSteps:" + numSteps);
+
+            Quat4d q1 = new Quat4d();
+            Quat4d q2 = new Quat4d();
+
             t1.get(q1);
             t2.get(q2);
-            
-            System.err.println ("from:" + rot1[0]+"/"+rot1[1]+"/"+rot1[2]);            
-            System.err.println ("to:" + rot2[0]+"/"+rot2[1]+"/"+rot2[2]);            
+            boolean ask = true;
 
             for (int step = 1; step <= numSteps; step++) {
                 if (myTimeStamp != animationTimeStamp) {
@@ -1097,11 +1152,11 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                 if (step == numSteps) {
                     try {
                         setProjectionMatrix(finalMatrix);
-                    } catch(Exception exc) {
+                    } catch (Exception exc) {
                         //In case we have a bad affine transform
-                        setProjectionMatrix(lastGoodMatrix);                    
+                        setProjectionMatrix(lastGoodMatrix);
                     }
-                
+
                     isAnimating = false;
                     if (finalLocation != null) {
                         center(finalLocation);
@@ -1110,30 +1165,27 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                 }
                 double percent = ((double) step) / numSteps;
                 isAnimating = true;
-                
+
                 Quat4d q3 = new Quat4d();
-                q3.interpolate(q1,q2,percent);
+                q3.interpolate(q1, q2, percent);
                 Transform3D t3 = new Transform3D();
                 t3.set(q3);
-                double[]tmpRot  = new double[16];
+                double[] tmpRot = new double[16];
                 t3.get(tmpRot);
-                getMouseBehavior().instance_unmake_matrix(rot, scale, trans, tmpRot);
+                getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
+                        tmpRot);
 
-                tmp= mouseBehavior.make_matrix(
-                                               rot[0],rot[1],rot[2],
-                                               //                                               0,0,0,
-                                               interp(scale1,scale2,0,percent),
-                                               interp(scale1,scale2,1,percent),
-                                               interp(scale1,scale2,2,percent),
+                tmp = mouseBehavior.make_matrix(rot[0], rot[1], rot[2],
+                //                                               0,0,0,
+                interp(scale1, scale2, 0, percent), interp(scale1, scale2, 1,
+                       percent), interp(scale1, scale2, 2, percent),
+                                 interp(trans1, trans2, 0, percent),
+                                 interp(trans1, trans2, 1, percent),
+                                 interp(trans1, trans2, 2, percent));
 
-                                               interp(trans1,trans2,0,percent),
-                                               interp(trans1,trans2,1,percent),
-                                               interp(trans1,trans2,2,percent));
-                
-                //                System.err.println ("    rot:" + rot[0] +"/" + rot[1] +"/" + rot[2]);
-                //                tmp = getMouseBehavior().multiply_matrix(tmpRot,tmp);
                 double[] currentMatrix = getProjectionMatrix();
-                if(lastMatrix!=null && !Misc.arraysEquals(lastMatrix, currentMatrix)) {
+                if ((lastMatrix != null)
+                        && !Misc.arraysEquals(lastMatrix, currentMatrix)) {
                     isAnimating = false;
                     return;
                 }
@@ -1142,53 +1194,97 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                 try {
                     Transform3D testt = new Transform3D(tmp);
                     testt.invert();
-                } catch(Exception exc) {
-                    ok = false;
-                    System.err.println ("bad:" + exc);
+                } catch (Exception exc) {
+                    setProjectionMatrix(lastGoodMatrix);
+                    return;
+                    //                    ok = false;
+                    //                    System.err.println ("bad:" + exc);
                 }
 
-                if(ok) {
-                try {
-                    setProjectionMatrix(tmp);
-                    lastGoodMatrix = tmp;
-                } catch(Exception exc) {
-                    System.err.println("EXC:" + exc);
-                    //In case we have a bad affine transform
-                    setProjectionMatrix(lastGoodMatrix);                    
-                }
+                /*
+                double[] center=       getSpatialCoordinatesFromScreen(bounds.width/2, bounds.height/2);
+                Transform3D centerTransform = new Transform3D(tmp);
+                Point3d centerPoint = new Point3d(center[0],center[1],center[2]);
+                centerTransform.transform(centerPoint);
+                double dx = center[0]-centerPoint.x;
+                double dy = center[1]-centerPoint.y;
+                double []centerM = getMouseBehavior().make_translate(dx,dy);
+                System.err.println ("   dx:" + dx + "  center:" + center[0] + "   centerPoint:" + centerPoint.x);
+                */
+
+                if (ok) {
+                    try {
+                        //                    tmp =   getMouseBehavior().multiply_matrix(centerM, tmp);
+                        setProjectionMatrix(tmp);
+                        lastGoodMatrix = tmp;
+                    } catch (Exception exc) {
+                        System.err.println("EXC:" + exc);
+                        //In case we have a bad affine transform
+                        setProjectionMatrix(lastGoodMatrix);
+                    }
                 }
                 lastMatrix = getProjectionMatrix();
-
-                //                getMouseBehavior().instance_unmake_matrix(rot, scale, trans, lastMatrix);
-                //                System.err.println ("   step:" + rot[0]+"/"+rot[1]+"/"+rot[2]);
-                //                System.err.println ("\t" + scale[0]+"/"+scale[1]+"/"+scale[2]);
-                Misc.sleep(sleep);
+                Misc.sleep(sleepTime);
             }
         } catch (Exception exp) {
             System.out.println("Error  animating matrix:" + exp);
         }
+
     }
 
 
-    private double interp(double d1, double d2,double percent) {
-        return d1+percent*(d2-d1);
+    /**
+     * _more_
+     *
+     * @param d1 _more_
+     * @param d2 _more_
+     * @param percent _more_
+     *
+     * @return _more_
+     */
+    private double interp(double d1, double d2, double percent) {
+        return d1 + percent * (d2 - d1);
     }
 
 
 
 
-    private double interp(Vector3d a1,Vector3d a2,int index,double percent) {
-        if(index==0)
-            return a1.x+percent*(a2.x-a1.x);
-        if(index==1)
-            return a1.y+percent*(a2.y-a1.y); 
-        return a1.z+percent*(a2.z-a1.z);
-    }
-
-
-        private double interp(double[]a1,double[]a2,int index,double percent) {
-            return a1[index]+percent*(a2[index]-a1[index]);
+    /**
+     * _more_
+     *
+     * @param a1 _more_
+     * @param a2 _more_
+     * @param index _more_
+     * @param percent _more_
+     *
+     * @return _more_
+     */
+    private double interp(Vector3d a1, Vector3d a2, int index,
+                          double percent) {
+        if (index == 0) {
+            return a1.x + percent * (a2.x - a1.x);
         }
+        if (index == 1) {
+            return a1.y + percent * (a2.y - a1.y);
+        }
+        return a1.z + percent * (a2.z - a1.z);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param a1 _more_
+     * @param a2 _more_
+     * @param index _more_
+     * @param percent _more_
+     *
+     * @return _more_
+     */
+    private double interp(double[] a1, double[] a2, int index,
+                          double percent) {
+        return a1[index] + percent * (a2[index] - a1[index]);
+    }
 
     /**
      * Get the x/y position of the center of the screen
@@ -1543,7 +1639,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                 //                System.err.println("  x/y:" + xs[xidx] +"/" + ys[yidx] +"  pt:" + pt[0]+"/" + pt[1] +"/" + pt[2]);
 
 
-                if(pt[0] == pt[0]) {
+                if (pt[0] == pt[0]) {
                     if ((yidx == 0) || (pt[0] < left)) {
                         left = pt[0];
                     }
@@ -1551,7 +1647,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                         right = pt[0];
                     }
                 }
-                if(pt[1] == pt[1]) {
+                if (pt[1] == pt[1]) {
                     if ((yidx == 0) || (pt[1] < bottom)) {
                         bottom = pt[1];
                     }
@@ -1701,7 +1797,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         return rend.getView();
     }
 
-    
+
 
     /**
      * Move the center to the given earth location
@@ -2164,7 +2260,13 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         }
     }
 
-    public void resetScaleTranslate() throws VisADException, RemoteException  {
+    /**
+     * _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void resetScaleTranslate() throws VisADException, RemoteException {
         getDisplay().getProjectionControl().resetProjection();
     }
 
@@ -2175,16 +2277,17 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @param myTimeStamp The time stamp of when this thread got started
      */
     private void doRotate(int myTimeStamp) {
-        double [] lastMatrix=null;
+        double[] lastMatrix = null;
         while (autoRotate && (myTimeStamp == rotateTimeStamp)) {
             try {
                 double[] currentMatrix = getProjectionMatrix();
-                if(lastMatrix!=null && !Misc.arraysEquals(lastMatrix, currentMatrix)) {
+                if ((lastMatrix != null)
+                        && !Misc.arraysEquals(lastMatrix, currentMatrix)) {
                     setAutoRotate(false);
                     return;
                 }
                 rotate();
-                lastMatrix =  getProjectionMatrix();
+                lastMatrix = getProjectionMatrix();
                 Thread.sleep(rotateDelay);
             } catch (Exception e) {
                 return;
