@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -35,9 +36,6 @@ import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.data.sounding.TrackDataSource;
-
-import visad.georef.EarthLocation;
-import visad.georef.EarthLocationLite;
 
 import ucar.unidata.idv.*;
 import ucar.unidata.ui.drawing.*;
@@ -69,6 +67,9 @@ import ucar.visad.display.TrackDisplayable;
 
 
 import visad.*;
+
+import visad.georef.EarthLocation;
+import visad.georef.EarthLocationLite;
 
 import visad.georef.EarthLocationLite;
 
@@ -262,32 +263,50 @@ public class TrackControl extends GridDisplayControl {
         return true;
     }
 
+    /**
+     * Add in the flythrough menu
+     *
+     * @param items  the menu items
+     * @param forMenuBar  true for the menu bar
+     */
     protected void getViewMenuItems(List items, boolean forMenuBar) {
-        MapViewManager mvm =  getMapViewManager();
-        if(mvm!=null) {
-            items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Show Flythrough", this,
-                                                             "showFlythrough", null),"/auxdata/ui/icons/plane.png"));
+        MapViewManager mvm = getMapViewManager();
+        if (mvm != null) {
+            items.add(
+                GuiUtils.setIcon(
+                    GuiUtils.makeMenuItem(
+                        "Show Flythrough", this, "showFlythrough",
+                        null), "/auxdata/ui/icons/plane.png"));
         }
 
-        super.getViewMenuItems(items,forMenuBar);
+        super.getViewMenuItems(items, forMenuBar);
     }
 
+    /**
+     * Show the flythrough
+     *
+     * @throws Exception problem showing the flythrough
+     */
     public void showFlythrough() throws Exception {
         /*
         MathType t = d.getType();
         visad.jmet.DumpType.dumpMathType(t, System.out);
         visad.jmet.DumpType.dumpDataType(d, System.out);
        */
-        MapViewManager mvm =  getMapViewManager();
-        FlatField flatField = getFlatField();
-        Set domainSet = flatField.getDomainSet();
-        List<FlythroughPoint> points = new ArrayList<FlythroughPoint>();
-        int length = domainSet.getLength();
-        for(int i=0;i<length;i++) {
-            Real[] llaR = DataUtility.getSample(domainSet,i).getRealComponents();
-            Tuple tuple = (Tuple)flatField.getSample(i);
-            EarthLocation el = new EarthLocationLite(llaR[0],llaR[1],llaR[2]);
-            points.add(new FlythroughPoint(el, new DateTime((Real) tuple.getComponent(1))));
+        MapViewManager        mvm       = getMapViewManager();
+        FlatField             flatField = getFlatField();
+        Set                   domainSet = flatField.getDomainSet();
+        List<FlythroughPoint> points    = new ArrayList<FlythroughPoint>();
+        int                   length    = domainSet.getLength();
+        for (int i = 0; i < length; i++) {
+            Real[] llaR = DataUtility.getSample(domainSet,
+                              i).getRealComponents();
+            Tuple tuple = (Tuple) flatField.getSample(i);
+            EarthLocation el = new EarthLocationLite(llaR[0], llaR[1],
+                                   llaR[2]);
+            points.add(
+                new FlythroughPoint(
+                    el, new DateTime((Real) tuple.getComponent(1))));
 
         }
 
@@ -892,14 +911,19 @@ public class TrackControl extends GridDisplayControl {
                     trackDisplay.setSelectedRange(startDate, endDate);
                 }
             }
+            // set the position of the marker at the animation time
+            double aniDate = ((aniValue != null)
+                              && (aniValue instanceof Real))
+                             ? ((Real) aniValue).getValue(dataTimeUnit)
+                             : endDate;
             int      index = 0;
             double[] times = flatField.getValues(false)[1];
             for (; index < times.length; index++) {
-                if (times[index] >= endDate) {
+                if (times[index] >= aniDate) {
                     index--;
                     break;
                 }
-                if (times[index] == endDate) {
+                if (times[index] == aniDate) {
                     break;
                 }
             }
