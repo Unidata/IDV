@@ -1432,6 +1432,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
         }
 
 
+
         MapViewManager viewManager = this.viewManager;
         if (viewManager == null) {
             return;

@@ -192,6 +192,7 @@ public class MapViewManager extends NavigatedViewManager {
 
     /** The map panel in the GUI */
     private PipPanel pipPanel;
+    private Object  PIP_MUTEX = new Object();
 
     /** _more_          */
     private JComponent pipPanelWrapper;
@@ -1737,14 +1738,18 @@ public class MapViewManager extends NavigatedViewManager {
      */
     public void checkPipPanel() {
         try {
-            if (pipPanel == null) {
-                return;
+            synchronized(PIP_MUTEX) {
+                if (pipPanel == null) {
+                    return;
+                }
+                pipPanel.resetDrawBounds();
             }
-            pipPanel.resetDrawBounds();
         } catch (Exception exc) {
+            pipPanel = null;
             logException("Error setting pip panel", exc);
         }
     }
+
 
 
     /**
