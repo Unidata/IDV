@@ -24,6 +24,7 @@
 package ucar.unidata.idv.ui;
 
 import ucar.unidata.idv.*;
+import ucar.unidata.idv.control.ReadoutInfo;
 import ucar.visad.display.*;
 
 import ucar.unidata.geoloc.*;
@@ -49,6 +50,7 @@ import java.awt.event.*;
 
 import java.rmi.RemoteException;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
@@ -131,7 +133,7 @@ public class CursorReadoutWindow {
 
     public  void updateReadout() {
         if(lastEarthLocation == null || window == null) return;
-        String readout =  getReadout(lastEarthLocation,true,false);
+        String readout =  getReadout(lastEarthLocation,true,false,new ArrayList<ReadoutInfo>());
         if(readout==null) readout = "";
         label.setText(readout);
         window.getContentPane().removeAll();
@@ -143,7 +145,7 @@ public class CursorReadoutWindow {
 
 
 
-    public  String getReadout(EarthLocation earthLocation,boolean showDisplays, boolean showAlt) {
+    public  String getReadout(EarthLocation earthLocation,boolean showDisplays, boolean showAlt,List<ReadoutInfo> samples) {
         if(earthLocation == null) return "";
         List         controls = vm.getControls();
         StringBuffer sb       = new StringBuffer();
@@ -157,7 +159,7 @@ public class CursorReadoutWindow {
             if(showDisplays) {
             for (int i = 0; i < controls.size(); i++) {
                 DisplayControl display = (DisplayControl) controls.get(i);
-                List readout = display.getCursorReadout(earthLocation, aniValue, step);
+                List readout = display.getCursorReadout(earthLocation, aniValue, step,samples);
                 if ((readout != null) && (readout.size() > 0)) {
                     didone = true;
                     sb.append(StringUtil.join("", readout));

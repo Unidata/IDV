@@ -24,6 +24,8 @@
 package ucar.unidata.idv;
 
 
+import ucar.unidata.idv.control.ReadoutInfo;
+
 import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
@@ -632,7 +634,7 @@ public interface DisplayControl extends Sharable {
      * @throws Exception  problem getting the cursor readout
      */
     public List getCursorReadout(EarthLocation el, visad.Real animationValue,
-                                 int animationStep)
+                                 int animationStep,List<ReadoutInfo> samples)
      throws Exception;
 
 

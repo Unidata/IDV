@@ -220,7 +220,8 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     protected List getCursorReadoutInner(EarthLocation el,
                                          Real animationValue,
-                                         int animationStep)
+                                         int animationStep,
+                                         List<ReadoutInfo> samples)
             throws Exception {
         if (currentSlice == null) {
             return null;
@@ -231,7 +232,12 @@ public abstract class PlanViewControl extends GridDisplayControl {
                      getSamplingModeValue(
                          getObjectStore().get(
                              PREF_SAMPLING_MODE, DEFAULT_SAMPLING_MODE)));
+        if(r!=null) {
+            samples.add(new ReadoutInfo(this, r, el, animationValue));
+        }
+
         if ((r != null) && !r.isMissing()) {
+
             result.add("<tr><td>" + getMenuLabel()
                        + ":</td><td  align=\"right\">"
                        + formatForCursorReadout(r) + ((currentLevel != null)

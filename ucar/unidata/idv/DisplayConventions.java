@@ -108,8 +108,6 @@ public class DisplayConventions extends IdvManager {
 
 
 
-
-
     /**
      * Create this object with the given idv
      *

@@ -2160,7 +2160,8 @@ public class StormTrackControl extends DisplayControlImpl {
      */
     protected List getCursorReadoutInner(EarthLocation el,
                                          Real animationValue,
-                                         int animationStep)
+                                         int animationStep,
+                                         List<ReadoutInfo> samples)
             throws Exception {
 
         StormTrackPoint ob             = null;

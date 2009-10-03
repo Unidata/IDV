@@ -465,7 +465,7 @@ public abstract class CrossSectionControl extends GridDisplayControl {
      * @throws Exception    problem reading the data
      */
     public List getCursorReadoutInner(EarthLocation el, Real animationValue,
-                                      int animationStep)
+                                      int animationStep,List<ReadoutInfo> samples)
             throws Exception {
         if ( !isInTransectView()) {
             return null;

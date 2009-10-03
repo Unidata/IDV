@@ -6645,13 +6645,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @throws Exception  problem getting at the data
      */
     public final List getCursorReadout(EarthLocation el, Real animationValue,
-                                       int animationStep)
+                                       int animationStep,List<ReadoutInfo> samples)
             throws Exception {
         if ( !getDoCursorReadout()) {
             return null;
         }
         try {
-            List l = getCursorReadoutInner(el, animationValue, animationStep);
+            List l = getCursorReadoutInner(el, animationValue, animationStep,samples);
             return l;
         } catch (Exception exc) {
             LogUtil.consoleMessage("Error getting cursor readout");
@@ -6674,11 +6674,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected List getCursorReadoutInner(EarthLocation el,
                                          Real animationValue,
-                                         int animationStep)
+                                         int animationStep,
+                                         List<ReadoutInfo> samples)
             throws Exception {
         return null;
     }
 
+    protected final List getCursorReadoutInner(EarthLocation el,
+                                               Real animationValue,
+        int animationStep) {return null;}
 
 
     /**

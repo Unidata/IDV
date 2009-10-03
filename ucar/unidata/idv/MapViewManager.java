@@ -808,6 +808,13 @@ public class MapViewManager extends NavigatedViewManager {
         super.initWith(viewState);
     }
 
+    protected void animationTimeChanged() {
+        super.animationTimeChanged();
+        if(flythrough!=null) {
+            flythrough.animationTimeChanged();
+        }
+    }
+
 
     /**
      * Initialize this object's state with the state from that.
@@ -1904,7 +1911,9 @@ public class MapViewManager extends NavigatedViewManager {
     public void destroy() {
         super.destroy();
         if (flythrough != null) {
-            flythrough.destroy();
+            try {
+                flythrough.destroy();
+            } catch(Exception ignore) {}
             flythrough = null;
         }
     }
