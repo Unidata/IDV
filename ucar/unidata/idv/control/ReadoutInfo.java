@@ -22,7 +22,9 @@
 
 
 
+
 package ucar.unidata.idv.control;
+
 
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.view.*;
@@ -30,7 +32,9 @@ import ucar.unidata.view.geoloc.*;
 
 
 import visad.*;
+
 import visad.georef.*;
+
 import visad.java3d.*;
 
 
@@ -41,84 +45,113 @@ import visad.java3d.*;
  */
 
 public class ReadoutInfo {
+
+    /** _more_          */
     private DisplayControl fromDisplay;
+
+    /** _more_          */
     private EarthLocation location;
+
+    /** _more_          */
     private Data data;
+
+    /** _more_          */
     private Real animationValue;
 
 
+    /**
+     * _more_
+     *
+     * @param from _more_
+     * @param data _more_
+     */
     public ReadoutInfo(DisplayControl from, Data data) {
         this.fromDisplay = from;
-        this.data = data;
+        this.data        = data;
     }
 
 
-    public ReadoutInfo(DisplayControl from, Data data, EarthLocation location, Real time) {
-        this.fromDisplay = from;
-        this.data = data;
-        this.location = location;
+    /**
+     * _more_
+     *
+     * @param from _more_
+     * @param data _more_
+     * @param location _more_
+     * @param time _more_
+     */
+    public ReadoutInfo(DisplayControl from, Data data,
+                       EarthLocation location, Real time) {
+        this.fromDisplay    = from;
+        this.data           = data;
+        this.location       = location;
         this.animationValue = time;
     }
 
-/**
-Set the FromDisplay property.
+    /**
+     * Set the FromDisplay property.
+     *
+     * @param value The new value for FromDisplay
+     */
+    public void setFromDisplay(DisplayControl value) {
+        this.fromDisplay = value;
+    }
 
-@param value The new value for FromDisplay
-**/
-public void setFromDisplay (DisplayControl value) {
-	this.fromDisplay = value;
-}
+    /**
+     * Get the FromDisplay property.
+     *
+     * @return The FromDisplay
+     */
+    public DisplayControl getFromDisplay() {
+        return this.fromDisplay;
+    }
 
-/**
-Get the FromDisplay property.
+    /**
+     * Set the Location property.
+     *
+     * @param value The new value for Location
+     */
+    public void setLocation(EarthLocation value) {
+        this.location = value;
+    }
 
-@return The FromDisplay
-**/
-public DisplayControl getFromDisplay () {
-	return this.fromDisplay;
-}
+    /**
+     * Get the Location property.
+     *
+     * @return The Location
+     */
+    public EarthLocation getLocation() {
+        return this.location;
+    }
 
-/**
-Set the Location property.
+    /**
+     * Set the Data property.
+     *
+     * @param value The new value for Data
+     */
+    public void setData(Data value) {
+        this.data = value;
+    }
 
-@param value The new value for Location
-**/
-public void setLocation (EarthLocation value) {
-	this.location = value;
-}
+    /**
+     * Get the Data property.
+     *
+     * @return The Data
+     */
+    public Data getData() {
+        return this.data;
+    }
 
-/**
-Get the Location property.
-
-@return The Location
-**/
-public EarthLocation getLocation () {
-	return this.location;
-}
-
-/**
-Set the Data property.
-
-@param value The new value for Data
-**/
-public void setData (Data value) {
-	this.data = value;
-}
-
-/**
-Get the Data property.
-
-@return The Data
-**/
-public Data getData () {
-	return this.data;
-}
-
-public Real getReal () {
-    if(data instanceof Real)
-        return (Real) data;
-    return null;
-}
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Real getReal() {
+        if (data instanceof Real) {
+            return (Real) data;
+        }
+        return null;
+    }
 
 
 }

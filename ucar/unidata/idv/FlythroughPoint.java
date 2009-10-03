@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -48,20 +49,21 @@ public class FlythroughPoint {
     /** _more_ */
     private double tiltX = Double.NaN;
 
-    /** _more_          */
+    /** _more_ */
     private double tiltY = Double.NaN;
 
-    /** _more_          */
+    /** _more_ */
     private double tiltZ = Double.NaN;
 
     /** _more_ */
     private double zoom = Double.NaN;
 
 
-    /** _more_          */
+    /** _more_ */
     private double[] matrix;
 
 
+    /** _more_          */
     private String description;
 
     /**
@@ -280,21 +282,21 @@ public class FlythroughPoint {
     }
 
     /**
-       Set the Description property.
-
-       @param value The new value for Description
-    **/
-    public void setDescription (String value) {
-	description = value;
+     *  Set the Description property.
+     *
+     *  @param value The new value for Description
+     */
+    public void setDescription(String value) {
+        description = value;
     }
 
     /**
-       Get the Description property.
-
-       @return The Description
-    **/
-    public String getDescription () {
-	return description;
+     *  Get the Description property.
+     *
+     *  @return The Description
+     */
+    public String getDescription() {
+        return description;
     }
 
 

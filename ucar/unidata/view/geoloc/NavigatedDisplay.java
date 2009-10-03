@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.view.geoloc;
 
 
@@ -1048,8 +1049,15 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param to _more_
+     * @param sleepTime _more_
+     */
     public void animateMatrix(double[] to, long sleepTime) {
-        animateMatrix(++animationTimeStamp, getProjectionMatrix(), to, null,sleepTime);
+        animateMatrix(++animationTimeStamp, getProjectionMatrix(), to, null,
+                      sleepTime);
     }
 
 
@@ -1066,10 +1074,19 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     public void animateMatrix(int myTimeStamp, double[] from, double[] to,
                               EarthLocation finalLocation) {
 
-        animateMatrix(myTimeStamp, from ,to, finalLocation, 50);
+        animateMatrix(myTimeStamp, from, to, finalLocation, 50);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param myTimeStamp _more_
+     * @param from _more_
+     * @param to _more_
+     * @param finalLocation _more_
+     * @param sleepTime _more_
+     */
     public void animateMatrix(int myTimeStamp, double[] from, double[] to,
                               EarthLocation finalLocation, long sleepTime) {
 
@@ -1134,7 +1151,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             if (maxDistance > 0) {
                 numSteps = (int) (numSteps * maxDistance) + 1;
             }
-            numSteps = Math.min(numSteps,100);
+            numSteps = Math.min(numSteps, 100);
             //            System.err.println("     numSteps:" + numSteps);
 
             Quat4d q1 = new Quat4d();
