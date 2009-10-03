@@ -1127,15 +1127,15 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
 
             //            maxDistance = maxDistance/2;
-            System.err.print("d:" + maxDistance);
-            maxDistance *= 2;
+            //            System.err.print("d:" + maxDistance);
+            //            maxDistance *= 2;
             maxDistance = Math.min(maxDistance, 10);
 
             if (maxDistance > 0) {
                 numSteps = (int) (numSteps * maxDistance) + 1;
             }
-
-            System.err.println("     numSteps:" + numSteps);
+            numSteps = Math.min(numSteps,100);
+            //            System.err.println("     numSteps:" + numSteps);
 
             Quat4d q1 = new Quat4d();
             Quat4d q2 = new Quat4d();
