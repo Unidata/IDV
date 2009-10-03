@@ -37,6 +37,7 @@ import ucar.unidata.data.storm.StormInfo;
 
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.idv.MapViewManager;
+import ucar.unidata.idv.control.ReadoutInfo;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.ui.TreePanel;
 import ucar.unidata.ui.TwoListPanel;
