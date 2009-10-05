@@ -50,6 +50,7 @@ public class CommandManager {
         ucar.unidata.util.LogUtil.getLogInstance(
             CommandManager.class.getName());
 
+    private Object MUTEX = new Object();
     /** _more_ */
     ArrayList commands = new ArrayList();
 
@@ -243,23 +244,24 @@ public class CommandManager {
      * @param andCallDoCommand _more_
      */
     public void add(Command command, boolean andCallDoCommand) {
-
-
-        int i = currentIdx + 1;
-        while (i < commands.size()) {
-            commands.remove(i);
+        synchronized(MUTEX) {
+            int i = currentIdx + 1;
+            while (i < commands.size()) {
+                commands.remove(i);
+            }
+            //Purge the list. 
+            while (commands.size() > historySize) {
+                commands.remove(0);
+            }
+            commands.add(command);
+            currentIdx = commands.size() - 1;
         }
-        //Purge the list. 
-        while (commands.size() > historySize) {
-            commands.remove(0);
-        }
-        commands.add(command);
         if (andCallDoCommand) {
             command.doCommand();
         }
-        currentIdx = commands.size() - 1;
         checkGui();
     }
+
 
     /**
      * _more_
@@ -276,8 +278,10 @@ public class CommandManager {
      */
     public String toString() {
         String s = "Commands:";
-        for (int i = 0; i < commands.size(); i++) {
-            s = s + "\n\t" + commands.get(i);
+        synchronized(MUTEX) {
+            for (int i = 0; i < commands.size(); i++) {
+                s = s + "\n\t" + commands.get(i);
+            }
         }
         return s;
 
