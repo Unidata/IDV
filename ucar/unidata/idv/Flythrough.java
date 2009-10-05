@@ -2118,7 +2118,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
                 ThermometerPlot plot = new ThermometerPlot(dataset);
                 if(info.getRange()!=null) {
                     Range range = info.getRange();
-                    plot.setRange(range.getMin(), range.getMax());
+                    double min = unit.toThat(range.getMin(),CommonUnits.CELSIUS);
+                    double max = unit.toThat(range.getMax(),CommonUnits.CELSIUS);
+                    plot.setRange(min, max);
                 }
                 JFreeChart chart = new JFreeChart("",
                                        JFreeChart.DEFAULT_TITLE_FONT, plot,
