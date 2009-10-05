@@ -30,6 +30,8 @@ import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.view.*;
 import ucar.unidata.view.geoloc.*;
 
+import ucar.unidata.util.Range;
+
 
 import visad.*;
 
@@ -57,6 +59,10 @@ public class ReadoutInfo {
 
     /** _more_          */
     private Real animationValue;
+
+    private Unit unit;
+
+    private Range range;
 
 
     /**
@@ -151,6 +157,42 @@ public class ReadoutInfo {
             return (Real) data;
         }
         return null;
+    }
+
+    /**
+       Set the Unit property.
+
+       @param value The new value for Unit
+    **/
+    public void setUnit (Unit value) {
+	this.unit = value;
+    }
+
+    /**
+       Get the Unit property.
+
+       @return The Unit
+    **/
+    public Unit getUnit () {
+	return this.unit;
+    }
+
+    /**
+       Set the Range property.
+
+       @param value The new value for Range
+    **/
+    public void setRange (Range value) {
+	this.range = value;
+    }
+
+    /**
+       Get the Range property.
+
+       @return The Range
+    **/
+    public Range getRange () {
+	return this.range;
     }
 
 

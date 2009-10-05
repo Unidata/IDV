@@ -357,7 +357,9 @@ public class PipPanel extends NavigatedMapPanel {
                     (NavigatedDisplay) mapViewManager.getMaster();
                 double[] destXY = nav.getSpatialCoordinates(el,
                                       (double[]) null);
-                nav.moveToScreen(destXY[0], destXY[1], 0, 0);
+                if(!mapViewManager.getUseGlobeDisplay()) {
+                    nav.moveToScreen(destXY[0], destXY[1], 0, 0);
+                }
             } catch (Exception exc) {
                 //TODO
             }

@@ -467,6 +467,10 @@ public class MapViewManager extends NavigatedViewManager {
 
         checkPipPanel();
 
+        if(flythrough!=null) {
+            flythrough.displayChanged(event);
+        }
+
 
         NavigatedDisplay navDisplay = getMapDisplay();
         if ( !navDisplay.getAutoRotate()
@@ -1220,7 +1224,7 @@ public class MapViewManager extends NavigatedViewManager {
      * @return The side legend or the sidelegend coupled with the pip panel
      */
     protected JComponent getSideComponent(JComponent sideLegend) {
-        if (getUseGlobeDisplay()) {
+        if (false && getUseGlobeDisplay()) {
             return sideLegend;
         }
         pipPanel = new PipPanel(this);
@@ -1909,13 +1913,13 @@ public class MapViewManager extends NavigatedViewManager {
      * _more_
      */
     public void destroy() {
-        super.destroy();
         if (flythrough != null) {
             try {
                 flythrough.destroy();
             } catch(Exception ignore) {}
             flythrough = null;
         }
+        super.destroy();
     }
 
 

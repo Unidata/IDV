@@ -233,7 +233,10 @@ public abstract class PlanViewControl extends GridDisplayControl {
                          getObjectStore().get(
                              PREF_SAMPLING_MODE, DEFAULT_SAMPLING_MODE)));
         if(r!=null) {
-            samples.add(new ReadoutInfo(this, r, el, animationValue));
+            ReadoutInfo readoutInfo =  new ReadoutInfo(this, r, el, animationValue); 
+            readoutInfo.setUnit(getDisplayUnit());
+            readoutInfo.setRange(getRange());
+            samples.add(readoutInfo);
         }
 
         if ((r != null) && !r.isMissing()) {

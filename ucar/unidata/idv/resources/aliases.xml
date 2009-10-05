@@ -8,7 +8,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="TEMP"
      label="Temperature"
-     aliases="T,t,Temperature,temperature,tdry,T_tenths,air_temperature,T,T22,T2,TMPK_PRES,TMPK,TMPC,TMPF,Temperature_weightedMean_pressure,TMP_2maboveground"/>
+     aliases="T,t,Temperature,temperature,tdry,T_tenths,air_temperature,T,T22,T2,TMPK_PRES,TMPK,TMPC,TMPF,Temperature_weightedMean_pressure,TMP_2maboveground,Temperature_surface,Temperature_tropopause,Temperature_middle_cloud_top"/>
   <alias
      name="RH"
      label="Relative humidity"
