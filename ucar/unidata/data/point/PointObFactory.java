@@ -57,6 +57,8 @@ import ucar.nc2.ft.point.*;
 import ucar.nc2.ft.point.writer.CFPointObWriter;
 import ucar.nc2.ft.point.writer.PointObVar;
 import ucar.nc2.units.DateRange;
+import ucar.nc2.units.DateType;
+import ucar.nc2.units.TimeDuration;
 
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataChoice;
@@ -1410,6 +1412,8 @@ public class PointObFactory {
                 dateRange = new DateRange(new Date(now.getTime() - timespan),
                                           now);
             }
+        //} else if (true) {
+        //    dateRange = new DateRange(null, new DateType(true, null), new TimeDuration("1 hour"), null);
         }
         if (fc instanceof PointFeatureCollection) {
             collection = (PointFeatureCollection) fc;
@@ -1677,6 +1681,9 @@ public class PointObFactory {
                         "found " + ismissing + "/" + missing
                         + " missing out of " + obIdx);
             dataIterator.finish();
+        }
+        if (tuples.isEmpty()) {
+            return null;
         }
 
         //Bin times
