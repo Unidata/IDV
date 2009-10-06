@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -1929,12 +1930,14 @@ public class GridUtil {
             throw new IllegalArgumentException("Grid must be 3D");
         }
         RealTuple point = null;
+        Real longitude = normalizeLongitude(spatialSet,
+                                            location.getLongitude());
         try {
             if (isLatLonOrder(grid)) {
                 point = new RealTuple(new Real[] { location.getLatitude(),
-                        location.getLongitude(), location.getAltitude() });
+                        longitude, location.getAltitude() });
             } else {
-                point = new RealTuple(new Real[] { location.getLongitude(),
+                point = new RealTuple(new Real[] { longitude,
                         location.getLatitude(), location.getAltitude() });
             }
         } catch (RemoteException re) {
@@ -2005,12 +2008,13 @@ public class GridUtil {
                 "Can't sample a 3-D grid on Lat/Lon only");
         }
         RealTuple location = null;
+        Real longitude = normalizeLongitude(spatialSet, point.getLongitude());
         try {
             if (isLatLonOrder(grid)) {
                 location = new RealTuple(new Real[] { point.getLatitude(),
-                        point.getLongitude() });
+                        longitude });
             } else {
-                location = new RealTuple(new Real[] { point.getLongitude(),
+                location = new RealTuple(new Real[] { longitude,
                         point.getLatitude() });
             }
         } catch (RemoteException re) {
@@ -3351,12 +3355,53 @@ public class GridUtil {
      * If domain not of such coordinates, do nothing and return input value.
      *
      * @param domain    domain  set of value for normalization
+     * @param lon       longitude
+     * @return   normalized longitude
+     *
+     * @throws VisADException   problem accessing set
+     */
+    private static Real normalizeLongitude(SampledSet domain, Real lon)
+            throws VisADException {
+        double lonValue = normalizeLongitude(domain, lon.getValue(),
+                                             lon.getUnit());
+        return lon.cloneButValue(lonValue);
+
+    }
+
+    /**
+     * Make sure a longitude value for use in
+     * a spatial domain Set with Longitude in the spatial domain
+     * is inside the spatial domain's longitude range.
+     * If not, then adjust so that it is.
+     * If domain not of such coordinates, do nothing and return input value.
+     *
+     * @param domain    domain  set of value for normalization
      * @param lon       longitude values
      * @return   normalized longitude
      *
      * @throws VisADException   problem accessing set
      */
     private static double normalizeLongitude(SampledSet domain, double lon)
+            throws VisADException {
+        return normalizeLongitude(domain, lon, null);
+    }
+
+    /**
+     * Make sure a longitude value for use in
+     * a spatial domain Set with Longitude in the spatial domain
+     * is inside the spatial domain's longitude range.
+     * If not, then adjust so that it is.
+     * If domain not of such coordinates, do nothing and return input value.
+     *
+     * @param domain    domain  set of value for normalization
+     * @param lon       longitude values
+     * @param lonUnit   longitude unit
+     * @return   normalized longitude
+     *
+     * @throws VisADException   problem accessing set
+     */
+    private static double normalizeLongitude(SampledSet domain, double lon,
+                                             Unit lonUnit)
             throws VisADException {
         int lonindex = isLatLonOrder(domain)
                        ? 1
@@ -3368,13 +3413,15 @@ public class GridUtil {
                     .equalsExceptNameButUnits(RealType.Longitude))) {
             return lon;
         }
-        Unit setLonUnit = domain.getSetUnits()[lonindex];
-        lon = (float) CommonUnit.degree.toThis(lon, setLonUnit);
+        if (lonUnit == null) {
+            lonUnit = domain.getSetUnits()[lonindex];
+        }
+        lon = (float) CommonUnit.degree.toThis(lon, lonUnit);
 
         float low = domain.getLow()[lonindex];
-        low = (float) CommonUnit.degree.toThis(low, setLonUnit);
+        low = (float) CommonUnit.degree.toThis(low, lonUnit);
         float hi = domain.getHi()[lonindex];
-        hi = (float) CommonUnit.degree.toThis(hi, setLonUnit);
+        hi = (float) CommonUnit.degree.toThis(hi, lonUnit);
 
         while ((float) lon < low && (float) lon < hi) {
             lon += 360;
@@ -3383,7 +3430,7 @@ public class GridUtil {
         while ((float) lon > hi && (float) lon > low) {
             lon -= 360;
         }
-        return (float) setLonUnit.toThis(lon, CommonUnit.degree);
+        return (float) lonUnit.toThis(lon, CommonUnit.degree);
     }
 
     /**
