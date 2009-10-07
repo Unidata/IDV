@@ -20,37 +20,31 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.data.sounding;
 
 
 import ucar.ma2.Range;
-
-import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.VarInfo;
-import ucar.unidata.data.point.*;
-
+import ucar.unidata.data.point.PointOb;
+import ucar.unidata.data.point.PointObTuple;
 import ucar.unidata.geoloc.Bearing;
-
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
-
-import ucar.visad.UtcDate;
 import ucar.visad.Util;
+import ucar.visad.functiontypes.DewPointProfile;
+import ucar.visad.functiontypes.InSituAirTemperatureProfile;
 import ucar.visad.quantities.*;
-
-import ucar.visad.quantities.CommonUnits;
-
 import visad.*;
-
-import visad.georef.*;
-
+import visad.georef.EarthLocation;
+import visad.georef.EarthLocationTuple;
 import visad.util.DataUtility;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -847,7 +841,7 @@ public abstract class TrackInfo {
         }
         Unit unit = null;
         //Look for the special variables.
-        //We will replace this when we can do a getLatitudeVarInfo, etc. 
+        //We will replace this when we can do a getLatitudeVarInfo, etc.
         //call
         float[]  value  = null;
         double[] dvalue = null;
@@ -948,6 +942,11 @@ public abstract class TrackInfo {
             String  name      = var.getShortName();
             String  canonical = DataAlias.aliasToCanonical(name);
             if (canonical == null) {
+                if (name.equals("Pres")) {
+                    pressureVar = var;
+                } else if (name.equals("Temp")) {
+                    tempVar = var;
+                }
                 continue;
             }
             if (canonical.equals("PRESSURE")) {
@@ -969,20 +968,21 @@ public abstract class TrackInfo {
         if (pressureVar == null) {
             missing = missing + "\nPressure";
         }
-        if (dewpointVar == null) {
-            missing = missing + "\nDewpoint";
+        if (tempVar == null) {
+            missing = missing + "\nTemperature";
         }
-        if (wspdVar == null) {
-            missing = missing + "\nWind speed";
-        }
-        if (wdirVar == null) {
-            missing = missing + "\nWind direction";
-        }
+
         if (missing.length() > 0) {
             throw new VisADException(
                 "Couldn't find all needed variables for aerological diagram:"
                 + missing);
         }
+
+        if ((wspdVar == null) && (wdirVar == null)) {
+
+            return getAerologicalDiagramDataNoWind();
+        }
+
 
 
         TupleType addType = new TupleType(new MathType[] {
@@ -1032,8 +1032,242 @@ public abstract class TrackInfo {
         return addField;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Data getAerologicalDiagramDataNoWind() throws Exception {
+
+        VarInfo pressureVar = null;
+        VarInfo tempVar     = null;
+        VarInfo vaprVar     = null;
+
+        for (int varIdx = 0; varIdx < variables.size(); varIdx++) {
+            VarInfo var  = (VarInfo) variables.get(varIdx);
+            String  name = var.getShortName();
+
+            if (name.equals("Pres")) {
+                pressureVar = var;
+            } else if (name.equals("Temp")) {
+                tempVar = var;
+            } else if (name.equals("Vp")) {
+                vaprVar = var;
+            }
+        }
 
 
+        TupleType addType = new TupleType(new MathType[] {
+                                AirPressure.getRealType(),
+                                AirTemperature.getRealType(),
+                                DewPoint.getRealType(),
+                                RealTupleType.LatitudeLongitudeAltitude });
+
+        Range        range        = getFullRange();
+
+        FunctionType addFType     = new FunctionType(RealType.Time, addType);
+        GriddedSet   llaSet       = getSpatialSet(getFullRange());
+        Unit[]       llaUnits     = llaSet.getSetUnits();
+        Unit         tempUnit     = tempVar.getUnit();
+        Unit         dewpointUnit = tempVar.getUnit();  //dewpointVar.getUnit();
+        Unit[]       addUnits     = new Unit[] {
+            pressureVar.getUnit(),
+            (Unit.canConvert(tempUnit, CommonUnits.CELSIUS)
+             ? tempUnit
+             : CommonUnits.CELSIUS), (Unit.canConvert(dewpointUnit,
+                 CommonUnits.CELSIUS)
+                                      ? dewpointUnit
+                                      : CommonUnits.CELSIUS), llaUnits[0],
+                                          llaUnits[1],
+            llaUnits[2]
+        };
+        float[][] llaSamples = llaSet.getSamples();
+
+
+        double[]  timeVals   = getTimeVals(range);
+        Gridded1DDoubleSet timeSet = new Gridded1DDoubleSet(RealType.Time,
+                                         new double[][] {
+            timeVals
+        }, timeVals.length, (CoordinateSystem) null,
+           new Unit[] { getTimeUnit() }, (ErrorEstimate[]) null);
+
+
+
+        FlatField addField = new FlatField(addFType, timeSet,
+                                           (CoordinateSystem[]) null,
+                                           (Set[]) null, addUnits);
+
+        addField.setSamples(new float[][] {
+            getFloatData(range, pressureVar), getFloatData(range, tempVar),
+            getDewPointFloatData(range), llaSamples[0], llaSamples[1],
+            llaSamples[2]
+        });
+
+        return addField;
+
+
+
+    }
+
+    /**
+     * get the data
+     *
+     * @return the data
+     *
+     * @throws Exception On badness
+     */
+    public Data[] getAerologicalDiagramDataArrayNoWind() throws Exception {
+
+        VarInfo pressureVar = null;
+        VarInfo tempVar     = null;
+        VarInfo vaprVar     = null;
+
+        for (int varIdx = 0; varIdx < variables.size(); varIdx++) {
+            VarInfo var  = (VarInfo) variables.get(varIdx);
+            String  name = var.getShortName();
+
+            if (name.equals("Pres")) {
+                pressureVar = var;
+            } else if (name.equals("Temp")) {
+                tempVar = var;
+            } else if (name.equals("Vp")) {
+                vaprVar = var;
+            }
+        }
+
+
+        TupleType tempType = new TupleType(new MathType[] {
+                                 AirPressure.getRealType(),
+                                 AirTemperature.getRealType(),
+                                 RealTupleType.LatitudeLongitudeAltitude });
+
+        TupleType dewType = new TupleType(new MathType[] {
+                                AirPressure.getRealType(),
+                                DewPoint.getRealType(),
+                                RealTupleType.LatitudeLongitudeAltitude });
+
+        Range        range        = getFullRange();
+
+        FunctionType tempFType    = new FunctionType(RealType.Time, tempType);
+        FunctionType dewFType     = new FunctionType(RealType.Time, dewType)
+        ;
+        GriddedSet   llaSet       = getSpatialSet(getFullRange());
+        Unit[]       llaUnits     = llaSet.getSetUnits();
+        Unit         tempUnit     = tempVar.getUnit();
+        Unit         dewpointUnit = tempVar.getUnit();  //dewpointVar.getUnit();
+        Unit[] tempUnits = new Unit[] { pressureVar.getUnit(),
+                                        (Unit.canConvert(tempUnit,
+                                            CommonUnits.CELSIUS)
+                                         ? tempUnit
+                                         : CommonUnits.CELSIUS), llaUnits[0],
+                                             llaUnits[1],
+                                        llaUnits[2] };
+        Unit[] dewUnits = new Unit[] { pressureVar.getUnit(),
+                                       (Unit.canConvert(dewpointUnit,
+                                           CommonUnits.CELSIUS)
+                                        ? dewpointUnit
+                                        : CommonUnits.CELSIUS), llaUnits[0],
+                                            llaUnits[1],
+                                       llaUnits[2] };
+
+        float[][] llaSamples = llaSet.getSamples();
+
+        double[]  timeVals   = getTimeVals(range);
+        Gridded1DDoubleSet timeSet = new Gridded1DDoubleSet(RealType.Time,
+                                         new double[][] {
+            timeVals
+        }, timeVals.length, (CoordinateSystem) null,
+           new Unit[] { getTimeUnit() }, (ErrorEstimate[]) null);
+
+
+
+        FlatField tempField = new FlatField(tempFType, timeSet,
+                                            (CoordinateSystem[]) null,
+                                            (Set[]) null, tempUnits);
+
+        tempField.setSamples(new float[][] {
+            getFloatData(range, pressureVar), getFloatData(range, tempVar),
+            llaSamples[0], llaSamples[1], llaSamples[2]
+        });
+
+        FlatField dewField = new FlatField(dewFType, timeSet,
+                                           (CoordinateSystem[]) null,
+                                           (Set[]) null, dewUnits);
+
+        dewField.setSamples(new float[][] {
+            getFloatData(range, pressureVar), getDewPointFloatData(range),
+            llaSamples[0], llaSamples[1], llaSamples[2]
+        });
+
+        //   return new Field[]{tempField, dewField};
+        float[] press   = getFloatData(range, pressureVar);
+        float[] temps   = getFloatData(range, tempVar);
+        float[] dews    = getDewPointFloatData(range);
+        int[]   indexes = Util.strictlySortedIndexes(press, false);
+        press = Util.take(press, indexes);
+        temps = Util.take(temps, indexes);
+        dews  = Util.take(dews, indexes);
+        Set presDomain = new Gridded1DSet(AirPressure.getRealTupleType(),
+                                          new float[][] {
+            press
+        }, press.length, (CoordinateSystem) null,
+           new Unit[] { pressureVar.getUnit() }, (ErrorEstimate[]) null);
+        Field tempPro = new FlatField(InSituAirTemperatureProfile.instance(),
+                                      presDomain);
+        Field dewPro = new FlatField(DewPointProfile.instance(), presDomain);
+
+
+        tempPro.setSamples(new float[][] {
+            temps
+        });
+        dewPro.setSamples(new float[][] {
+            dews
+        });
+
+        return new Field[] { tempPro, dewPro };
+    }
+
+    /**
+     * _more_
+     *
+     * @param range _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected float[] getDewPointFloatData(Range range) throws Exception {
+        float[] temp   = getFloatData(range, "Temp");
+        float[] vapor  = getFloatData(range, "Vp");
+        float[] dpoint = new float[temp.length];
+
+        for (int i = 0; i < temp.length; i++) {
+            dpoint[i] = getDewpoint(temp[i], vapor[i]);
+        }
+        return dpoint;
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param temp _more_
+     * @param vp _more_
+     *
+     * @return _more_
+     */
+    public float getDewpoint(float temp, float vp) {
+        float pa = 7.5f;
+        float pb = 237.3f;
+        float pc = 6.1078f;
+
+        float p  = (float) Math.log10(vp / pc);
+
+        return pb * p / (pa - p);
+
+    }
 
     /**
      * Make the RAOB
@@ -1063,7 +1297,8 @@ public abstract class TrackInfo {
                 PolarHorizontalWind.getSpeedRealType().getDefaultUnit(),
                 samples[wspdIndex],
                 PolarHorizontalWind.getDirectionRealType().getDefaultUnit(),
-                samples[wdirIndex], DataUtil.parseUnit("gpm"), samples[altIndex]);
+                samples[wdirIndex], DataUtil.parseUnit("gpm"),
+                samples[altIndex]);
 
         raob.setMandatoryPressureProfile(mpp);
 
