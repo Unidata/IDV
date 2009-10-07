@@ -712,6 +712,30 @@ Since this is confusing and needs more work lets remove this for now
      displaycategory="Soundings"
      properties="windowVisible=true;displayType=emagram;"/>
   <control
+     id="trajectory_skewt"
+     categories="TRAJECTORY_SOUNDING"
+     class="ucar.unidata.idv.control.TrajectoryFeatureTypeSoundingControl"
+     description="Skew-T for sounding tracks"
+     label="Trajectory Skew-T"
+     displaycategory="Soundings"
+     properties="windowVisible=true;displayType=skewT;"/>
+  <control
+     id="trajectory_stuve"
+     categories="TRAJECTORY_SOUNDING"
+     class="ucar.unidata.idv.control.TrajectoryFeatureTypeSoundingControl"
+     description="Stuve for sounding tracks"
+     label="Trajectory Stuve"
+     displaycategory="Soundings"
+     properties="windowVisible=true;displayType=stuve;"/>
+  <control
+     id="trajectory_emagram"
+     categories="TRAJECTORY_SOUNDING"
+     class="ucar.unidata.idv.control.TrajectoryFeatureTypeSoundingControl"
+     description="Emagram for sounding tracks"
+     label="Trajectory Emagram"
+     displaycategory="Soundings"
+     properties="windowVisible=true;displayType=emagram;"/>
+  <control
      id="grid_skewt"
      categories="GRID_SOUNDING"
      class="ucar.unidata.idv.control.GriddedSoundingControl"
