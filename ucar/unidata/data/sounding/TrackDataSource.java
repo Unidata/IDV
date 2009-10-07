@@ -101,10 +101,10 @@ public class TrackDataSource extends FilesDataSource {
 
 
     /** track categories */
-    private List traceCats;
+    protected List traceCats;
 
     /** sounding categories */
-    private List soundingCats;
+    protected List soundingCats;
 
     /** raob categories */
     private List raobCats;
@@ -542,7 +542,7 @@ public class TrackDataSource extends FilesDataSource {
      *
      * @return List of adapters or null
      */
-    protected List getAdapters() {
+    public List getAdapters() {
         if ((adapters == null) || (adapters.size() == 0)) {
             initTrack();
         }
