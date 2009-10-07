@@ -20,29 +20,20 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-
-
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
-
-
 
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.StringTokenizer;
-
-
 
 
 /**
@@ -144,6 +135,9 @@ public class DataCategory {
     /** The track skew-T category @deprecated use TRACK_SOUNDING */
     public static final String CATEGORY_TRACKSKEWT = "TRACK_SKEWT";
 
+    /** The track skew-T category @deprecated use TRACK_SOUNDING */
+    public static final String CATEGORY_COSMICSKEWT = "COSMIC_SKEWT";
+
     /** The grid skew-T category */
     public static final String CATEGORY_GRIDSOUNDING = "GRID_SOUNDING";
 
@@ -152,6 +146,10 @@ public class DataCategory {
 
     /** The track skew-T category */
     public static final String CATEGORY_TRACKSOUNDING = "TRACK_SOUNDING";
+
+    /** The track skew-T category */
+    public static final String CATEGORY_TRAJECTORYSOUNDING =
+        "TRAJECTORY_SOUNDING";
 
     /** The one station profiler category */
     public static final String CATEGORY_PROFILER_ONESTA = "PROFILER_ONESTA";
@@ -233,6 +231,10 @@ public class DataCategory {
     public static final DataCategory TRACK_SKEWT_CATEGORY =
         new DataCategory(CATEGORY_TRACKSKEWT, false);
 
+    /** _more_          */
+    public static final DataCategory COSMIC_SKEWT_CATEGORY =
+        new DataCategory(CATEGORY_COSMICSKEWT, false);
+
     /**
      * Grid-derived data appropriate for an aerological sounding display
      * ({@link visad.DateTime} -> ({@link visad.georef.EarthLocationTuple}
@@ -252,6 +254,10 @@ public class DataCategory {
      */
     public static final DataCategory TRACK_SOUNDING_CATEGORY =
         new DataCategory(CATEGORY_TRACKSOUNDING, false);
+
+    /** Category for the trajectory feature type data files  */
+    public static final DataCategory TRAJECTORY_SOUNDING_CATEGORY =
+        new DataCategory(CATEGORY_TRAJECTORYSOUNDING, false);
 
     /** Category for the drawing files */
     public static final DataCategory XGRF_CATEGORY = new DataCategory("xgrf",
