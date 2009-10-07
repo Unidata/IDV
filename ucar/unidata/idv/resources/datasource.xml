@@ -92,6 +92,14 @@
      label="Upsonde/Dropsonde files"/>
 
   <datasource
+     id="FILE.TRAJECTORY"
+     factory="ucar.unidata.data.sounding.TrajectoryFeatureTypeDataSource"
+     patterns="GLASS.*\.nc$,class.*\.nc$,sgp.*cdf$,SGP.*cdf$,sgp.*nc$,.*QCcdf,.*QC\.nc$$"
+     fileselection="true"
+     doesmultiples="true"
+     label="Trajectory Sounding files"/>
+
+  <datasource
      id="NetCDF.POINT,OPENDAP.Station,CDMREMOTE.POINT,CDMREMOTE.STATION"
      factory="ucar.unidata.data.point.NetcdfPointDataSource"
      patterns="_metar\.nc$,.*metar.*\.nc$,.*_syn\.nc$,.*_buoy\.nc$,.*_sounder_.*\.nc$,Surface_METAR.*\.nc,\.sfc$,sao\.gem$,sb\.gem$,cdmremote"
@@ -174,7 +182,7 @@
      fileselection="false"
      doesmultiples="true"
      factory="ucar.unidata.data.radar.CDMRadarDataSource"
-     label="OPeNDAP Radar files"></datasource> 
+     label="OPeNDAP Radar files"></datasource>
 
   <datasource
      id="FILE.DORADERADAR"
