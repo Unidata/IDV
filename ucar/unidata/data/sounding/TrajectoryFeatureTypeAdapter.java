@@ -71,6 +71,7 @@ public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
         // we can add difference trajFeatureTypeInfos here from difference data source
         addTrackInfo( new CosmicTrajectoryFeatureTypeInfo(
                      this, dataset, pfc));
+        dataset.close();
 
     }
 
