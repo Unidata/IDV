@@ -199,7 +199,7 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
                 TrackInfo    trackInfo =
                     (TrackInfo) ta.getTrackInfos().get(0);
                 String       trackName = trackInfo.getTrackName() + i;
-                System.out.println("track name = " + trackName);
+               // System.out.println("track name = " + trackName);
                 ((CompositeDataChoice) soundingChoice).addDataChoice(
                     new DirectDataChoice(
                         this, id, trackName, ("Sonde " + i), category));
