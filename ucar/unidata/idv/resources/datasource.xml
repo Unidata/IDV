@@ -44,7 +44,7 @@
   <datasource
      id="FILE.TRACK,OPENDAP.TRACK,OPENDAP.TRAJECTORY"
      factory="ucar.unidata.data.sounding.TrackDataSource"
-     patterns="c130.*\.nc,p3.*.nc$,P3.*\.nc$,.*WMI_Lear.*\.nc$,\.c1\.nc$,wetPrf_.*_nc$"
+     patterns="c130.*\.nc,p3.*.nc$,P3.*\.nc$,.*WMI_Lear.*\.nc$,\.c1\.nc$"
      fileselection="true"
      doesmultiples="true"
      label="Track files"/>
@@ -94,7 +94,7 @@
   <datasource
      id="FILE.TRAJECTORY"
      factory="ucar.unidata.data.sounding.TrajectoryFeatureTypeDataSource"
-     patterns="GLASS.*\.nc$,class.*\.nc$,sgp.*cdf$,SGP.*cdf$,sgp.*nc$,.*QCcdf,.*QC\.nc$$"
+     patterns="wetPrf_.*_nc$"
      fileselection="true"
      doesmultiples="true"
      label="Trajectory Sounding files"/>
