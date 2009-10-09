@@ -85,7 +85,7 @@ public class PipPanel extends NavigatedMapPanel {
     private MapViewManager mapViewManager;
 
     /** Draws the overview box */
-    List points = new ArrayList();
+    List thePoints = new ArrayList();
 
 
 
@@ -200,7 +200,7 @@ public class PipPanel extends NavigatedMapPanel {
     public void resetDrawBounds() throws RemoteException, VisADException {
 
         NavigatedDisplay nav = (NavigatedDisplay) mapViewManager.getMaster();
-        points = new ArrayList();
+        List points = new ArrayList();
         points.add(
             getPoint(
                 nav.getEarthLocation(
@@ -217,6 +217,7 @@ public class PipPanel extends NavigatedMapPanel {
             getPoint(
                 nav.getEarthLocation(
                     nav.getScreenLowerLeft()).getLatLonPoint()));
+        this.thePoints = points;
         redrawInABit();
     }
 
@@ -249,6 +250,7 @@ public class PipPanel extends NavigatedMapPanel {
      * @param gNP graphics to draw in
      */
     protected void annotateMap(Graphics2D gNP) {
+        List points = thePoints;
         if (points.size() == 0) {
             return;
         }
@@ -336,6 +338,7 @@ public class PipPanel extends NavigatedMapPanel {
             }
 
             try {
+                List points = thePoints;
                 if ((points.size() == 0) || (deltaFromOrigin == null)) {
                     return;
                 }
@@ -378,6 +381,7 @@ public class PipPanel extends NavigatedMapPanel {
                 super.mousePressed(e);
                 return;
             }
+            List points = thePoints;
             if (points.size() == 0) {
                 return;
             }

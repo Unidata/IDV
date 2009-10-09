@@ -342,6 +342,10 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
     private     double heading =0;
 
+    private JLabel dashboardLbl;
+
+
+    private double precipLevel =0;
 
     /**
      * _more_
@@ -979,7 +983,19 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
         tabbedPane.addTab("Readout",
                           GuiUtils.topCenter(GuiUtils.left(showReadoutCbx),
                                              readoutTab));
-        readoutTab.addTab("Gauges", readoutDisplay);
+        dashboardLbl = new JLabel(GuiUtils.getImageIcon("/auxdata/ui/icons/racecar.gif")) {
+                public void paint(Graphics g) {
+                    paintDashboard(g, dashboardLbl);
+                    super.paint(g);
+                }
+            };
+
+        dashboardLbl.setVerticalAlignment(SwingConstants.BOTTOM);
+
+        JComponent gaugesPanel = GuiUtils.doLayout(new Component[]{readoutDisplay,GuiUtils.wrap(dashboardLbl)},1,GuiUtils.WT_Y,GuiUtils.WT_YN);
+
+
+        readoutTab.addTab("Gauges", gaugesPanel);
         readoutTab.addTab("Values", readoutLabel);
 
 
@@ -1010,6 +1026,27 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
         animation.setCurrent(currentIndex);
     }
 
+
+    private Image rainIcon;
+    public void paintDashboard(Graphics g,JComponent comp) {
+        Rectangle b = comp.getBounds();
+        g.setColor(Color.white);
+        g.fillRect(0,0,b.width,b.height);
+        if(precipLevel>0) {
+            int cv = 255-(int)(255*(Math.min(precipLevel,100)/100));
+            Color c = new Color(cv,cv,cv);
+            g.setColor(c);
+            g.fillRect(0,0,b.width,b.height); 
+            if(rainIcon == null) {
+                rainIcon = GuiUtils.getImage("/auxdata/ui/icons/drops.gif",getClass());
+            }
+            for(int i=0;i<precipLevel*10;i++) {
+                int x = (int)(Math.random()*b.width)-rainIcon.getWidth(null);
+                int y = (int)(Math.random()*b.height)-rainIcon.getHeight(null);
+                g.drawImage(rainIcon,x,y,null);
+            }
+        }
+    }
 
     private static final String DIR_FORWARD = "forward";    
     private static final String DIR_BACK = "back";
@@ -1091,9 +1128,14 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             throws VisADException, RemoteException {
         int id = event.getId();
         if (id == DisplayEvent.MOUSE_PRESSED && goToClick) {
-            NavigatedDisplay      navDisplay = viewManager.getNavigatedDisplay();
-            location = navDisplay.screenToEarthLocation(event.getX(), event.getY());
-            doDrive(false, heading);
+
+            InputEvent inputEvent = event.getInputEvent();
+            int mods = inputEvent.getModifiers();
+            if ((mods & InputEvent.BUTTON1_MASK) != 0) {
+                NavigatedDisplay      navDisplay = viewManager.getNavigatedDisplay();
+                location = navDisplay.screenToEarthLocation(event.getX(), event.getY());
+                doDrive(false, heading);
+            }
         }
     }
 
@@ -1956,7 +1998,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
                          new Point3d(x2, y2, (( !getUseFixedZ() || doGlobe)
                                               ? z2
                                               : z1)), upVector);
+
                 t.get(m);
+
 
                 double[] tiltMatrix = mouseBehavior.make_matrix(tiltx, tilty,
                                                                 tiltz, 1.0, 1.0, 1.0, 0.0, 0.0,
@@ -2091,6 +2135,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             return;
         }
 
+        precipLevel = 0;
 
         List comps  = new ArrayList();
         List labels = new ArrayList();
@@ -2106,6 +2151,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             if(unit!=null) {
                 unitSuffix = " [" + unit + "]";
             }
+            if (name.toLowerCase().indexOf("precipitation") >= 0 && Unit.canConvert(unit, CommonUnits.MM)) {
+                precipLevel =  r.getValue(CommonUnits.MM);
+            }
+
+
             if (unit!=null && Unit.canConvert(unit, CommonUnits.CELSIUS)) {
                 if (r.isMissing()) {
                     continue;
@@ -2160,8 +2210,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
                 if(unit!=null)
                     plot.setUnits(unit.toString());
                 plot.setDialBackgroundPaint(Color.white);
-                plot.setDialShape(DialShape.CHORD);
-                plot.setMeterAngle(260);
+                //             plot.setDialShape(DialShape.CHORD);
+                //                plot.setMeterAngle(260);
                 plot.setTickLabelsVisible(true);
                 plot.setTickLabelFont(new Font("Dialog", Font.BOLD, 10));
                 plot.setTickLabelPaint(Color.darkGray);
@@ -2184,6 +2234,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
                            GuiUtils.doLayout(allComps, labels.size(),
                                              GuiUtils.WT_Y, GuiUtils.WT_NY));
 
+        dashboardLbl.repaint();
     }
 
 

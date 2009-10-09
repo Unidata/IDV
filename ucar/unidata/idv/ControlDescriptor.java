@@ -984,6 +984,7 @@ public class ControlDescriptor {
         } catch (DataCancelException dce) {
             //This means the selection of some derived quantity operand was canceled
         } catch (Throwable exc) {
+            exc.printStackTrace();
             LogUtil.printException(log_, "Creating display: " + label, exc);
         }
         idv.showNormalCursor();
