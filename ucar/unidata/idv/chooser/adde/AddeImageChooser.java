@@ -89,6 +89,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 
+
 /**
  * Widget to select images from a remote ADDE server
  * Displays a list of the descriptors (names) of the image datasets
@@ -3285,17 +3286,18 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         AddeImageDescriptor aid = (AddeImageDescriptor) imageList.get(0);
         dim[0] = aid.getImageInfo().getElements();
         dim[1] = aid.getImageInfo().getLines();
-        //System.err.println("dim:" + dim[0] + " x " + dim[1] + " # images:"
-        //                   + imageList.size());
+        int bytesPerPixel = aid.getImageInfo().getSpacing();
+        //System.err.println("dim: " + dim[0] + " x " + dim[1] + 
+        //      " bytes: " + bytesPerPixel +  " # images:" + imageList.size());
         int    numPixels = dim[0] * dim[1] * imageList.size();
-        double megs      = (int)(4 * numPixels) / (double) 1000000;
+        double megs = (int) (bytesPerPixel * numPixels) / (double) 1000000;
 
         if (megs > SIZE_THRESHOLD) {
             final JCheckBox maintainSize =
                 new JCheckBox("Maintain spatial extent", false);
             final JLabel sizeLbl = new JLabel(StringUtil.padRight("  "
-                                                                  + (int)(((double) ((int) megs * 100))
-                                                                          / 100.0) + " MB", 14));
+                                       + (int) (((double) ((int) megs * 100))
+                                           / 100.0) + " MB", 14));
             GuiUtils.setFixedWidthFont(sizeLbl);
             final List[]  listHolder = { imageList };
             final JSlider slider     = new JSlider(2, (int) megs, (int) megs);
@@ -3331,11 +3333,13 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                         (AddeImageDescriptor) listHolder[0].get(0);
                     dim[0] = aid.getImageInfo().getElements();
                     dim[1] = aid.getImageInfo().getLines();
-                    int    numPixels = dim[0] * dim[1] * listHolder[0].size();
-                    int nmegs     = (int)((4 * numPixels) / (double) 1000000);
-                    sizeLbl.setText(StringUtil.padRight("  "
-                            + nmegs
-                            + " MB", 14));
+                    int bytesPerPixel = aid.getImageInfo().getSpacing();
+                    int numPixels     = dim[0] * dim[1]
+                                        * listHolder[0].size();
+                    int nmegs = (int) ((bytesPerPixel * numPixels)
+                                       / (double) 1000000);
+                    sizeLbl.setText(StringUtil.padRight("  " + nmegs + " MB",
+                            14));
                 }
             };
             slider.addChangeListener(sizeListener);
@@ -3343,7 +3347,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             JComponent msgContents =
                 GuiUtils
                     .vbox(new JLabel(
-                                     "<html>You are about to load " + ((int)megs)
+                        "<html>You are about to load " + ((int) megs)
                         + " MB of imagery.<br>Are you sure you want to do this?<p><hr><p></html>"), GuiUtils
                             .inset(GuiUtils
                                 .leftCenterRight(
