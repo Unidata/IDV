@@ -110,6 +110,15 @@ public class CommonUnits {
      */
     public static final Unit MILE;
 
+
+    /**
+     * A common unit of millimeter
+     */
+    public static final Unit MM;
+
+
+
+
     static {
         Unit pascal          = null;
         Unit millibar        = null;
@@ -122,6 +131,8 @@ public class CommonUnits {
         Unit foot            = null;
         Unit kilometer       = null;
         Unit mile            = null;
+        Unit mm              = null;
+
 
         try {
             pascal = SI.kilogram.divide(SI.meter).divide(
@@ -136,6 +147,7 @@ public class CommonUnits {
             foot            = SI.meter.scale(.0254 * 12).clone("ft");
             kilometer       = SI.meter.scale(1000).clone("km");
             mile            = foot.scale(5280).clone("mi");
+            mm              = SI.meter.scale(.001).clone("mm");
 
         } catch (Exception e) {
             String reason = e.getMessage();
@@ -160,6 +172,7 @@ public class CommonUnits {
         FOOT               = foot;
         KILOMETER          = kilometer;
         MILE               = mile;
+        MM                 = mm;
     }
 
     /**
