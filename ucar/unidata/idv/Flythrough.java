@@ -564,7 +564,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             return new Double(t).doubleValue();
         } catch (NumberFormatException nfe) {
             animationWidget.setRunning(false);
-            viewManager.logException("Parse error:" + t, nfe);
+            logException("Parse error:" + t, nfe);
             return d;
         }
     }
@@ -603,7 +603,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
                 pointTableModel.fireTableStructureChanged();
             }
         } catch (Exception exc) {
-            viewManager.logException("Setting flythrough", exc);
+            logException("Setting flythrough", exc);
         }
     }
 
@@ -623,7 +623,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
                 }
             }
         } catch (Exception exc) {
-            viewManager.logException("Setting flythrough", exc);
+            logException("Setting flythrough", exc);
         }
     }
 
@@ -1027,8 +1027,21 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
     }
 
 
+    Object REPAINT_MUTEX = new Object();
+    int repaintCnt=0;
+    public void doRepaint(JComponent c) {
+        boolean callRepaint = false;
+        synchronized(REPAINT_MUTEX) {
+            repaintCnt--;
+            if(repaintCnt==0) callRepaint = true;
+        }
+        if(callRepaint) 
+            c.repaint();
+    }
+
+
     private Image rainIcon;
-    public void paintDashboard(Graphics g,JComponent comp) {
+    public void paintDashboard(Graphics g,final JComponent comp) {
         Rectangle b = comp.getBounds();
         g.setColor(Color.white);
         g.fillRect(0,0,b.width,b.height);
@@ -1044,6 +1057,10 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
                 int x = (int)(Math.random()*b.width)-rainIcon.getWidth(null);
                 int y = (int)(Math.random()*b.height)-rainIcon.getHeight(null);
                 g.drawImage(rainIcon,x,y,null);
+            }
+            synchronized(REPAINT_MUTEX) {
+                repaintCnt++;
+                Misc.runInABit(250,this,"doRepaint",comp);
             }
         }
     }
@@ -1237,7 +1254,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
             goTo(new FlythroughPoint(location),xyz1, xyz2);
         } catch (Exception exc) {
-            viewManager.logException("Driving", exc);
+            logException("Driving", exc);
         }
     }
 
@@ -1372,7 +1389,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
             return true;
         } catch (Exception exc) {
-            viewManager.logException("Showing point properties", exc);
+            logException("Showing point properties", exc);
             return false;
         }
 
@@ -1573,7 +1590,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             doMakeContents(true);
             setAnimationTimes();
         } catch (Exception exc) {
-            viewManager.logException("Importing kml", exc);
+            logException("Importing kml", exc);
         }
     }
 
@@ -1652,7 +1669,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             doMakeContents(true);
             setAnimationTimes();
         } catch (Exception exc) {
-            viewManager.logException("Initializing flythrough", exc);
+            logException("Initializing flythrough", exc);
         }
     }
 
@@ -1728,7 +1745,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             flythrough(points);
             return pt;
         } catch (Exception exc) {
-            viewManager.logException("Adding point", exc);
+            logException("Adding point", exc);
             return null;
         }
     }
@@ -1804,7 +1821,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             String xml = XmlUtil.toString(root);
             IOUtil.writeFile(filename, xml);
         } catch (Exception exc) {
-            viewManager.logException("Exporting flythrough", exc);
+            logException("Exporting flythrough", exc);
         }
 
     }
@@ -1817,7 +1834,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             try {
                 doMakeContents(false);
             } catch (Exception exc) {
-                viewManager.logException("Showing flythrough", exc);
+                logException("Showing flythrough", exc);
             }
         }
         setAnimationTimes();
@@ -2088,19 +2105,26 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
 
 
         } catch (NumberFormatException exc) {
-            viewManager.logException("Error parsing number:" + exc, exc);
+            logException("Error parsing number:" + exc, exc);
         } catch (javax.media.j3d.BadTransformException bte) {
             try {
                 navDisplay.setProjectionMatrix(currentMatrix);
             } catch (Exception ignore) {}
         } catch (Exception exc) {
-            viewManager.logException("Error", exc);
-            animationWidget.setRunning(false);
+            logException("Error", exc);
+            if(animationWidget!=null) {
+                animationWidget.setRunning(false);
+            }
             return;
         }
 
     }
 
+
+
+    public void logException(String msg, Throwable exc) {
+        LogUtil.printException(IntegratedDataViewer.log_, msg, exc);
+    }
 
 
     /**
@@ -2112,7 +2136,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener {
             try {
                 processReadout(pt1);
             } catch (Exception exc) {
-                viewManager.logException("Setting readout", exc);
+                logException("Setting readout", exc);
             }
         }
 
