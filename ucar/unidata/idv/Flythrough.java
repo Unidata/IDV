@@ -21,17 +21,19 @@
  */
 
 
+
 package ucar.unidata.idv;
+
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.chart.plot.dial.*;
-import org.jfree.data.general.DefaultValueDataset;
 import org.jfree.chart.plot.DialShape;
 import org.jfree.chart.plot.MeterInterval;
 import org.jfree.chart.plot.MeterPlot;
+import org.jfree.chart.plot.ThermometerPlot;
+import org.jfree.chart.plot.dial.*;
+import org.jfree.data.general.DefaultValueDataset;
+import org.jfree.data.general.DefaultValueDataset;
 
 
 import org.w3c.dom.*;
@@ -39,25 +41,25 @@ import org.w3c.dom.*;
 import org.w3c.dom.*;
 
 import ucar.unidata.collab.*;
-import ucar.unidata.geoloc.Bearing;
-import ucar.unidata.geoloc.LatLonPoint;
-import ucar.unidata.geoloc.LatLonPointImpl;
 
 
 import ucar.unidata.data.gis.KmlUtil;
+import ucar.unidata.geoloc.Bearing;
+import ucar.unidata.geoloc.LatLonPoint;
+import ucar.unidata.geoloc.LatLonPointImpl;
 
 import ucar.unidata.idv.control.ReadoutInfo;
 import ucar.unidata.idv.ui.CursorReadoutWindow;
 import ucar.unidata.ui.ImagePanel;
 import ucar.unidata.ui.LatLonWidget;
 import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.Range;
 
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
@@ -66,12 +68,13 @@ import ucar.unidata.view.geoloc.*;
 
 import ucar.unidata.xml.XmlUtil;
 
-import ucar.visad.quantities.CommonUnits;
 import ucar.visad.ShapeUtility;
 
 import ucar.visad.Util;
 
 import ucar.visad.display.*;
+
+import ucar.visad.quantities.CommonUnits;
 
 import visad.*;
 
@@ -83,9 +86,9 @@ import visad.java3d.*;
 
 
 import java.awt.*;
-import java.awt.image.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.awt.image.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -116,29 +119,38 @@ import javax.vecmath.*;
  * @author IDV development team
  */
 
-public class Flythrough extends SharableImpl implements PropertyChangeListener, ImageObserver {
+public class Flythrough extends SharableImpl implements PropertyChangeListener,
+        ImageObserver {
 
-    /** _more_          */
+    /** _more_ */
     public static final String ORIENT_POINT = "point";
 
+    /** _more_          */
     public static final String ORIENT_FORWARD = "forward";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ORIENT_UP = "up";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ORIENT_DOWN = "down";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ORIENT_LEFT = "left";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ORIENT_RIGHT = "right";
 
 
-    private static final String DIR_FORWARD = "forward";    
+    /** _more_          */
+    private static final String DIR_FORWARD = "forward";
+
+    /** _more_          */
     private static final String DIR_BACK = "back";
+
+    /** _more_          */
     private static final String DIR_LEFT = "left";
+
+    /** _more_          */
     private static final String DIR_RIGHT = "right";
 
 
@@ -206,18 +218,20 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
     /** _more_ */
     private double[] tilt = { -30.0, 0.0, 0.0 };
 
-    /** _more_          */
+    /** _more_ */
     JSlider[] tiltSliders = { null, null, null };
 
-    /** _more_          */
+    /** _more_ */
     JLabel[] tiltLabels = { null, null, null };
 
 
     /** _more_ */
     private double zoom = 1.0;
 
+    /** _more_          */
     private boolean lastMoveWasTrack = true;
 
+    /** _more_          */
     private boolean goToClick = false;
 
     /** _more_ */
@@ -226,7 +240,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
     /** _more_ */
     private boolean animate = false;
 
-    /** _more_          */
+    /** _more_ */
     private int animationSpeed = 50;
 
     /** _more_ */
@@ -239,7 +253,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
     /** _more_ */
     private boolean showLine = true;
 
-    /** _more_          */
+    /** _more_ */
     private boolean showMarker = true;
 
 
@@ -280,7 +294,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
     /** _more_ */
     private JLabel readoutLabel;
 
-    /** _more_          */
+    /** _more_ */
     private JComponent readoutDisplay;
 
 
@@ -299,11 +313,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
     /** _more_ */
     private JComboBox orientBox;
 
-    /** _more_          */
+    /** _more_ */
     private Vector<TwoFacedObject> orients = new Vector<TwoFacedObject>();
 
 
-    /** _more_          */
+    /** _more_ */
     private JCheckBox fixedZCbx;
 
 
@@ -314,6 +328,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
     /** _more_ */
     private JFrame frame;
 
+    /** _more_          */
     private Point frameLocation;
 
     /** The line from the origin to the point */
@@ -338,31 +353,41 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
     /** _more_ */
     private boolean shown = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean useFixedZ = true;
 
-    /** _more_          */
+    /** _more_ */
     private int currentIndex = 0;
 
-    private     EarthLocation location;
+    /** _more_          */
+    private EarthLocation location;
 
-    private     double heading =0;
+    /** _more_          */
+    private double heading = 0;
 
-    private  JLabel dashboardLbl;
+    /** _more_          */
+    private JLabel dashboardLbl;
 
-    private Point dashboardImageOffset  = new Point(0,0);
+    /** _more_          */
+    private Point dashboardImageOffset = new Point(0, 0);
 
+    /** _more_          */
     private Image rainIcon;
 
 
+    /** _more_          */
     private Image dashboardImage;
 
-    private double precipLevel =0;
+    /** _more_          */
+    private double precipLevel = 0;
 
+    /** _more_          */
     private String imageUrl;
 
+    /** _more_          */
     private String imageName;
 
+    /** _more_          */
     private Image backgroundImage;
 
     /**
@@ -544,7 +569,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
         }
 
         this.points = new ArrayList<FlythroughPoint>(newPoints);
-        if(animation!=null) {
+        if (animation != null) {
             animation.setCurrent(currentIndex);
             setAnimationTimes();
         }
@@ -634,8 +659,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
      */
     public void goToCurrent() {
         try {
-            if(!lastMoveWasTrack) {
-                doDrive(false,heading);
+            if ( !lastMoveWasTrack) {
+                doDrive(false, heading);
             } else {
                 if (animation != null) {
                     doStep(animation.getCurrent());
@@ -647,7 +672,20 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
         }
     }
 
-    public boolean 	imageUpdate(Image img, int flags, int x, int y, int width, int height) {
+    /**
+     * _more_
+     *
+     * @param img _more_
+     * @param flags _more_
+     * @param x _more_
+     * @param y _more_
+     * @param width _more_
+     * @param height _more_
+     *
+     * @return _more_
+     */
+    public boolean imageUpdate(Image img, int flags, int x, int y, int width,
+                               int height) {
         if ((flags & ImageObserver.ERROR) != 0) {
             return false;
         }
@@ -677,8 +715,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
      * _more_
      *
      * @throws Exception _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
      */
-    private void makeWidgets() throws VisADException, RemoteException  { 
+    private void makeWidgets() throws VisADException, RemoteException {
         JTabbedPane tabbedPane = new JTabbedPane();
 
         tabbedPane.addTab("Viewpoint", doMakeViewpointPanel());
@@ -687,7 +728,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
         tabbedPane.addTab("Description", doMakeDescriptionPanel());
 
         JComponent innerContents =
-            GuiUtils.topCenterBottom(animationWidget.getContents(), tabbedPane,doMakeDrivePanel());
+            GuiUtils.topCenterBottom(animationWidget.getContents(),
+                                     tabbedPane, doMakeDrivePanel());
 
         JComponent menuBar = doMakeMenuBar();
         innerContents = GuiUtils.inset(innerContents, 5);
@@ -696,6 +738,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public JComponent doMakeDescriptionPanel() {
         JScrollPane htmlScrollPane = new JScrollPane(htmlView);
         htmlScrollPane.setPreferredSize(new Dimension(400, 300));
@@ -703,6 +750,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public JMenuBar doMakeMenuBar() {
         JMenuBar menuBar  = new JMenuBar();
         JMenu    fileMenu = new JMenu("File");
@@ -720,7 +772,16 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
     }
 
 
-    public JComponent doMakeViewpointPanel() throws VisADException, RemoteException  {
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public JComponent doMakeViewpointPanel()
+            throws VisADException, RemoteException {
 
         boolean doGlobe     = viewManager.getUseGlobeDisplay();
         JSlider speedSlider = new JSlider(1, 200, 200 - animationSpeed);
@@ -818,7 +879,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
         locationLine.setLineWidth(2);
         locationLine.setColor(Color.green);
 
-        Misc.runInABit(1000,this,"setScaleOnMarkers",null);
+        Misc.runInABit(1000, this, "setScaleOnMarkers", null);
 
         viewManager.getMaster().addDisplayable(locationMarker);
         viewManager.getMaster().addDisplayable(locationLine);
@@ -872,19 +933,15 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
         JComponent orientationComp = GuiUtils.formLayout(new Component[] {
             GuiUtils.filler(), GuiUtils.left(changeViewpointCbx),
-
             GuiUtils.rLabel("Tilt Down/Up:"),
             GuiUtils.centerRight(tiltSliders[0], tiltLabels[0]),
             GuiUtils.rLabel("Tilt Left/Right:"),
             GuiUtils.centerRight(tiltSliders[1], tiltLabels[1]),
-            GuiUtils.rLabel("Zoom:"),
-            GuiUtils.left(zoomFld),
-
+            GuiUtils.rLabel("Zoom:"), GuiUtils.left(zoomFld),
             GuiUtils.rLabel("Orientation:"),
             GuiUtils.left(GuiUtils.hbox(orientBox, (doGlobe
                     ? GuiUtils.filler()
-                    : (JComponent) fixedZCbx))), 
-
+                    : (JComponent) fixedZCbx))),
             //            GuiUtils.rLabel("Tilt Down/Up:"), GuiUtils.centerRight(tiltSliders[2],tiltLabels[2]),
 
             GuiUtils.rLabel("Transitions:"),
@@ -906,18 +963,28 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
     }
 
 
+    /**
+     * _more_
+     */
     public void setScaleOnMarkers() {
-        if(viewManager!=null && locationMarker!=null) {
+        if ((viewManager != null) && (locationMarker != null)) {
             try {
-                NavigatedDisplay      navDisplay = viewManager.getNavigatedDisplay();
-                locationMarker.setScale((float)navDisplay.getDisplayScale());
-            } catch(Exception exc) {
+                NavigatedDisplay navDisplay =
+                    viewManager.getNavigatedDisplay();
+                locationMarker.setScale((float) navDisplay.getDisplayScale());
+            } catch (Exception exc) {
                 logException("Setting scale on marker", exc);
             }
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public JComponent doMakePointsPanel() {
+
         pointTableModel = new AbstractTableModel() {
             public int getRowCount() {
                 return points.size();
@@ -1050,13 +1117,18 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
         JScrollPane scrollPane = new JScrollPane(pointTable);
         scrollPane.setPreferredSize(new Dimension(400, 300));
         return scrollPane;
+
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public JComponent doMakeReadoutPanel() {
 
         showReadoutCbx = new JCheckBox("Show Readout", showReadout);
-        readoutLabel =
-            GuiUtils.getFixedWidthLabel("<html></html>");
+        readoutLabel   = GuiUtils.getFixedWidthLabel("<html></html>");
         readoutLabel.setVerticalAlignment(SwingConstants.TOP);
 
         readoutDisplay = new JPanel();
@@ -1066,54 +1138,66 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
         JTabbedPane readoutTab = new JTabbedPane();
 
         dashboardImage = GuiUtils.getImage("/auxdata/ui/icons/dashboard.gif");
-        dashboardLbl = new JLabel(new ImageIcon(dashboardImage)) {
-                public void paint(Graphics g) {
-                    paintDashboard(g, dashboardLbl);
-                    super.paint(g);
-                }
-            };
+        dashboardLbl   = new JLabel(new ImageIcon(dashboardImage)) {
+            public void paint(Graphics g) {
+                paintDashboard(g, dashboardLbl);
+                super.paint(g);
+            }
+        };
         dashboardLbl.setVerticalAlignment(SwingConstants.BOTTOM);
-        MouseAdapter mouseAdapter = 
-            new MouseAdapter() {
-                Point mouseStart = new Point(0,0);
-                Point originalOffset = new Point(0,0);
-                public void mousePressed(MouseEvent me) {
-                    originalOffset = new Point(dashboardImageOffset);
-                    mouseStart.x  = me.getX();
-                    mouseStart.y  = me.getY();
-                }
+        MouseAdapter mouseAdapter = new MouseAdapter() {
+            Point mouseStart     = new Point(0, 0);
+            Point originalOffset = new Point(0, 0);
+            public void mousePressed(MouseEvent me) {
+                originalOffset = new Point(dashboardImageOffset);
+                mouseStart.x   = me.getX();
+                mouseStart.y   = me.getY();
+            }
 
-                public void mouseDragged(MouseEvent me) {
-                    dashboardImageOffset.x = originalOffset.x + me.getX()-mouseStart.x;
-                    dashboardImageOffset.y = originalOffset.y + me.getY()-mouseStart.y;
-                    dashboardLbl.repaint();
-                }
-            };
+            public void mouseDragged(MouseEvent me) {
+                dashboardImageOffset.x = originalOffset.x + me.getX()
+                                         - mouseStart.x;
+                dashboardImageOffset.y = originalOffset.y + me.getY()
+                                         - mouseStart.y;
+                dashboardLbl.repaint();
+            }
+        };
 
         dashboardLbl.addMouseListener(mouseAdapter);
         dashboardLbl.addMouseMotionListener(mouseAdapter);
 
-        JComponent gaugesPanel = GuiUtils.vsplit(readoutDisplay,dashboardLbl);
+        JComponent gaugesPanel = GuiUtils.vsplit(readoutDisplay,
+                                     dashboardLbl);
         readoutTab.addTab("Gauges", gaugesPanel);
-        readoutTab.addTab("Values", GuiUtils.inset(readoutLabel,1));
+        readoutTab.addTab("Values", GuiUtils.inset(readoutLabel, 1));
 
-        return GuiUtils.topCenter(GuiUtils.left(showReadoutCbx),
-                                  readoutTab);
+        return GuiUtils.topCenter(GuiUtils.left(showReadoutCbx), readoutTab);
     }
 
 
 
+    /** _more_          */
     private Object REPAINT_MUTEX = new Object();
-    private int repaintCnt=0;
 
+    /** _more_          */
+    private int repaintCnt = 0;
+
+    /**
+     * _more_
+     *
+     * @param c _more_
+     */
     public void doRepaint(JComponent c) {
         boolean callRepaint = false;
-        synchronized(REPAINT_MUTEX) {
+        synchronized (REPAINT_MUTEX) {
             repaintCnt--;
-            if(repaintCnt==0) callRepaint = true;
+            if (repaintCnt == 0) {
+                callRepaint = true;
+            }
         }
-        if(callRepaint) 
+        if (callRepaint) {
             c.repaint();
+        }
     }
 
 
@@ -1121,245 +1205,395 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
 
 
 
+    /**
+     * _more_
+     *
+     * @param g _more_
+     * @param comp _more_
+     */
     public void paintDashboard(Graphics g, JComponent comp) {
         Rectangle b = comp.getBounds();
         g.setColor(Color.white);
-        g.fillRect(0,0,b.width,b.height);
+        g.fillRect(0, 0, b.width, b.height);
         Image image = backgroundImage;
-        if(image!=null) {
+        if (image != null) {
             int imageHeight = image.getHeight(null);
-            int imageWidth = image.getWidth(this);
-            if(imageHeight>0) {
-                g.drawImage(image,b.width/2-imageWidth/2+dashboardImageOffset.x,dashboardImageOffset.y,null);
+            int imageWidth  = image.getWidth(this);
+            if (imageHeight > 0) {
+                g.drawImage(image,
+                            b.width / 2 - imageWidth / 2
+                            + dashboardImageOffset.x, dashboardImageOffset.y,
+                                null);
             } else {
-                g.drawImage(image,0,0,null);
+                g.drawImage(image, 0, 0, null);
             }
             g.setColor(Color.black);
-            g.drawString(imageName, 10,20);
+            g.drawString(imageName, 10, 20);
         }
 
-        if(precipLevel>0) {
-            int cv = 255-(int)(255*(Math.min(precipLevel,100)/100));
-            Color c = new Color(cv,cv,cv);
+        if (precipLevel > 0) {
+            int   cv = 255 - (int) (255 * (Math.min(precipLevel, 100) / 100));
+            Color c  = new Color(cv, cv, cv);
             g.setColor(c);
-            if(backgroundImage==null) {
-                g.fillRect(0,0,b.width,b.height); 
+            if (backgroundImage == null) {
+                g.fillRect(0, 0, b.width, b.height);
             }
-            if(rainIcon == null) {
-                rainIcon = GuiUtils.getImage("/auxdata/ui/icons/drops.gif",getClass());
+            if (rainIcon == null) {
+                rainIcon = GuiUtils.getImage("/auxdata/ui/icons/drops.gif",
+                                             getClass());
             }
-            for(int i=0;i<precipLevel*10;i++) {
-                int x = (int)(Math.random()*b.width)-rainIcon.getWidth(null);
-                int y = (int)(Math.random()*b.height)-rainIcon.getHeight(null);
-                g.drawImage(rainIcon,x,y,null);
+            for (int i = 0; i < precipLevel * 10; i++) {
+                int x = (int) (Math.random() * b.width)
+                        - rainIcon.getWidth(null);
+                int y = (int) (Math.random() * b.height)
+                        - rainIcon.getHeight(null);
+                g.drawImage(rainIcon, x, y, null);
             }
-            synchronized(REPAINT_MUTEX) {
+            synchronized (REPAINT_MUTEX) {
                 repaintCnt++;
-                Misc.runInABit(250,this,"doRepaint",comp);
+                Misc.runInABit(250, this, "doRepaint", comp);
             }
         }
     }
 
-    public class  DriveButton extends JButton implements MouseListener {
+    /**
+     * Class DriveButton _more_
+     *
+     *
+     * @author IDV Development Team
+     */
+    public class DriveButton extends JButton implements MouseListener {
+
+        /** _more_          */
         private int timestamp = 0;
+
+        /** _more_          */
         private String dir = DIR_FORWARD;
+
+        /** _more_          */
         private boolean mouseDown = false;
+
+        /** _more_          */
         long lastKeyClick = 0;
-        Object KEY_MUTEX = new Object(); 
+
+        /** _more_          */
+        Object KEY_MUTEX = new Object();
+
+        /** _more_          */
         boolean handlingKey = false;
+
+        /**
+         * _more_
+         *
+         * @param label _more_
+         * @param dir _more_
+         */
         public DriveButton(String label, String dir) {
             super(label);
             this.dir = dir;
             this.addMouseListener(this);
             this.addKeyListener(new KeyAdapter() {
                 public void keyPressed(KeyEvent e) {
-                    if(handlingKey) return;
+                    if (handlingKey) {
+                        return;
+                    }
                     handlingKey = true;
                     try {
-                    if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-                        driveRight();
-                    else if (e.getKeyCode() == KeyEvent.VK_LEFT)
-                        driveLeft();
-                    else if (e.getKeyCode() == KeyEvent.VK_UP)
-                        driveForward();
-                    else if (e.getKeyCode() == KeyEvent.VK_DOWN)
-                        driveBack();
+                        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                            driveRight();
+                        } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                            driveLeft();
+                        } else if (e.getKeyCode() == KeyEvent.VK_UP) {
+                            driveForward();
+                        } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                            driveBack();
+                        }
                     } finally {
                         handlingKey = false;
                     }
                 }
-                });
+            });
         }
-        public void 	mouseClicked(MouseEvent e) {}
-        public  void 	mouseEntered(MouseEvent e) {
+
+        /**
+         * _more_
+         *
+         * @param e _more_
+         */
+        public void mouseClicked(MouseEvent e) {}
+
+        /**
+         * _more_
+         *
+         * @param e _more_
+         */
+        public void mouseEntered(MouseEvent e) {
             mouseDown = false;
         }
-        public  void 	mouseExited(MouseEvent e) {
+
+        /**
+         * _more_
+         *
+         * @param e _more_
+         */
+        public void mouseExited(MouseEvent e) {
             mouseDown = false;
         }
-        public  void 	mousePressed(MouseEvent e) {
+
+        /**
+         * _more_
+         *
+         * @param e _more_
+         */
+        public void mousePressed(MouseEvent e) {
             mouseDown = true;
             start(++timestamp);
         }
 
+        /**
+         * _more_
+         *
+         * @param runTimestamp _more_
+         */
         public void start(final int runTimestamp) {
             Misc.run(new Runnable() {
-                    public void run() {
-                        while(true) {
-                            go();
-                            Misc.sleep(50);
-                            if(!mouseDown || runTimestamp!=timestamp) return;
+                public void run() {
+                    while (true) {
+                        go();
+                        Misc.sleep(50);
+                        if ( !mouseDown || (runTimestamp != timestamp)) {
+                            return;
                         }
                     }
-                });
+                }
+            });
         }
 
 
-        public  void 	mouseReleased(MouseEvent e) {
+        /**
+         * _more_
+         *
+         * @param e _more_
+         */
+        public void mouseReleased(MouseEvent e) {
             mouseDown = false;
         }
 
+        /**
+         * _more_
+         */
         public synchronized void go() {
-            if(animationWidget!=null) {
+            if (animationWidget != null) {
                 animationWidget.setRunning(false);
             }
-            if(dir.equals(DIR_LEFT)) driveLeft();
-            else if(dir.equals(DIR_RIGHT)) driveRight();
-            else if(dir.equals(DIR_BACK)) driveBack();
-            else driveForward();
+            if (dir.equals(DIR_LEFT)) {
+                driveLeft();
+            } else if (dir.equals(DIR_RIGHT)) {
+                driveRight();
+            } else if (dir.equals(DIR_BACK)) {
+                driveBack();
+            } else {
+                driveForward();
+            }
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param event _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public void displayChanged(DisplayEvent event)
             throws VisADException, RemoteException {
         int id = event.getId();
-        if (id == DisplayEvent.MOUSE_PRESSED && goToClick) {
+        if ((id == DisplayEvent.MOUSE_PRESSED) && goToClick) {
 
             InputEvent inputEvent = event.getInputEvent();
-            int mods = inputEvent.getModifiers();
+            int        mods       = inputEvent.getModifiers();
             if ((mods & InputEvent.BUTTON1_MASK) != 0) {
-                NavigatedDisplay      navDisplay = viewManager.getNavigatedDisplay();
-                location = navDisplay.screenToEarthLocation(event.getX(), event.getY());
+                NavigatedDisplay navDisplay =
+                    viewManager.getNavigatedDisplay();
+                location = navDisplay.screenToEarthLocation(event.getX(),
+                        event.getY());
                 doDrive(false, heading);
             }
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public JComponent doMakeDrivePanel() {
-        DriveButton leftBtn = new DriveButton("Left",DIR_LEFT);
+        DriveButton leftBtn = new DriveButton("Left", DIR_LEFT);
         leftBtn.setToolTipText("Go left");
-        DriveButton forwardBtn = new DriveButton("Forward",DIR_FORWARD);
+        DriveButton forwardBtn = new DriveButton("Forward", DIR_FORWARD);
         forwardBtn.setToolTipText("Go forward");
-        DriveButton backBtn = new DriveButton("Back",DIR_BACK);
+        DriveButton backBtn = new DriveButton("Back", DIR_BACK);
         backBtn.setToolTipText("Back up");
-        DriveButton rightBtn = new DriveButton("Right",DIR_RIGHT);
+        DriveButton rightBtn = new DriveButton("Right", DIR_RIGHT);
         rightBtn.setToolTipText("Go right");
-        JCheckBox goToClickCbx      = GuiUtils.makeCheckbox("Go to mouse click", this, "goToClick");
-        return GuiUtils.centerRight(GuiUtils.wrap(GuiUtils.hbox(leftBtn,GuiUtils.vbox(forwardBtn,backBtn),rightBtn)),goToClickCbx);
+        JCheckBox goToClickCbx = GuiUtils.makeCheckbox("Go to mouse click",
+                                     this, "goToClick");
+        return GuiUtils.centerRight(GuiUtils.wrap(GuiUtils.hbox(leftBtn,
+                GuiUtils.vbox(forwardBtn, backBtn), rightBtn)), goToClickCbx);
     }
 
 
+    /**
+     * _more_
+     */
     public void driveLeft() {
-        heading-=3;
-        doDrive(false,heading);
+        heading -= 3;
+        doDrive(false, heading);
     }
 
+    /**
+     * _more_
+     */
     public void driveRight() {
-        heading+=3;
-        doDrive(false,heading);
+        heading += 3;
+        doDrive(false, heading);
     }
 
 
+    /**
+     * _more_
+     */
     public void driveForward() {
         doDrive(true, heading);
     }
 
 
+    /**
+     * _more_
+     */
     public void driveBack() {
-        doDrive(true, heading-180,false);
+        doDrive(true, heading - 180, false);
     }
 
 
 
 
+    /**
+     * _more_
+     *
+     * @param takeStep _more_
+     * @param heading _more_
+     */
     public void doDrive(boolean takeStep, double heading) {
         doDrive(takeStep, heading, true);
     }
 
+    /**
+     * _more_
+     *
+     * @param takeStep _more_
+     * @param heading _more_
+     * @param forward _more_
+     */
     public void doDrive(boolean takeStep, double heading, boolean forward) {
         lastMoveWasTrack = false;
         try {
-            boolean  doGlobe  =  viewManager.getUseGlobeDisplay();
-            if(location==null) {
-                if(points.size()>0) {
+            boolean doGlobe = viewManager.getUseGlobeDisplay();
+            if (location == null) {
+                if (points.size() > 0) {
                     location = points.get(0).getEarthLocation();
                 } else {
-                    location = makePoint(0,0,0);
+                    location = makePoint(0, 0, 0);
                 }
             }
-            double zoom =getZoom();
-            if(zoom == 0) zoom = 0.1;
+            double zoom = getZoom();
+            if (zoom == 0) {
+                zoom = 0.1;
+            }
 
-            NavigatedDisplay      navDisplay = viewManager.getNavigatedDisplay();
-            double[]              xyz1          = { 0, 0, 0 };
-            double[]              xyz2          = { 0, 0, 0 };
-            double[]              xyz = navDisplay.getSpatialCoordinates(location,null);
+            NavigatedDisplay navDisplay = viewManager.getNavigatedDisplay();
+            double[]         xyz1            = { 0, 0, 0 };
+            double[]         xyz2            = { 0, 0, 0 };
+            double[] xyz = navDisplay.getSpatialCoordinates(location, null);
 
 
-            double distancePerStep = 200/zoom;
-            LatLonPointImpl llp = Bearing.findPoint(new LatLonPointImpl(getLat(location),
-                                                                        getLon(location)),heading,distancePerStep,null);
+            double           distancePerStep = 200 / zoom;
+            LatLonPointImpl llp =
+                Bearing.findPoint(new LatLonPointImpl(getLat(location),
+                    getLon(location)), heading, distancePerStep, null);
 
-            EarthLocation location2 = makePoint(llp.getLatitude(), llp.getLongitude(),0);
+            EarthLocation location2 = makePoint(llp.getLatitude(),
+                                          llp.getLongitude(), 0);
 
-            if(takeStep) {
+            if (takeStep) {
                 location = location2;
-                llp = Bearing.findPoint(new LatLonPointImpl(getLat(location), getLon(location)),heading,100,null);
-                location2 = makePoint(llp.getLatitude(), llp.getLongitude(),0);
+                llp = Bearing.findPoint(new LatLonPointImpl(getLat(location),
+                        getLon(location)), heading, 100, null);
+                location2 = makePoint(llp.getLatitude(), llp.getLongitude(),
+                                      0);
             }
 
 
 
-            xyz1 = navDisplay.getSpatialCoordinates(location,
-                                                    xyz1);
+            xyz1 = navDisplay.getSpatialCoordinates(location, xyz1);
 
-            xyz2 = navDisplay.getSpatialCoordinates(location2,
-                                                    xyz2);
+            xyz2 = navDisplay.getSpatialCoordinates(location2, xyz2);
 
-            if(!forward) {
+            if ( !forward) {
                 //                System.err.println("before: " + xyz1[0]+"/" + xyz1[1] + "    " + xyz2[0]+"/" + xyz2[1]);
-                double[]xyz3 = {xyz1[0]-(xyz2[0]-xyz1[0]),
-                                xyz1[1]-(xyz2[1]-xyz1[1]),
-                                xyz1[2]-(xyz2[2]-xyz1[2])};
+                double[] xyz3 = { xyz1[0] - (xyz2[0] - xyz1[0]),
+                                  xyz1[1] - (xyz2[1] - xyz1[1]),
+                                  xyz1[2] - (xyz2[2] - xyz1[2]) };
                 //                System.err.println("xyz3: " + xyz3[0]+"/" + xyz3[1]);
                 //                xyz2 = xyz1;
                 //                xyz1 = xyz3;
 
                 xyz1 = xyz1;
                 xyz2 = xyz3;
-                location = navDisplay.getEarthLocation(xyz1[0],
-                                                       xyz1[1],
-                                                       xyz1[2], false);
+                location = navDisplay.getEarthLocation(xyz1[0], xyz1[1],
+                        xyz1[2], false);
             }
 
 
-            goTo(new FlythroughPoint(location),xyz1, xyz2);
+            goTo(new FlythroughPoint(location), xyz1, xyz2);
         } catch (Exception exc) {
             logException("Driving", exc);
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param location _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
     public double getLat(EarthLocation location) throws VisADException {
         return location.getLatitude().getValue(CommonUnit.degree);
     }
 
+    /**
+     * _more_
+     *
+     * @param location _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
     public double getLon(EarthLocation location) throws VisADException {
         return location.getLongitude().getValue(CommonUnit.degree);
     }
 
+    /**
+     * _more_
+     */
     public void clearPoints() {
         flythrough(new ArrayList<FlythroughPoint>());
     }
@@ -1376,8 +1610,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
                                            "addPointWithTime"));
 
         int cnt = points.size();
-        editMenu.add(GuiUtils.makeMenuItem("Remove all points (#" +cnt +")", this,
-                                           "clearPoints"));
+        editMenu.add(GuiUtils.makeMenuItem("Remove all points (#" + cnt
+                                           + ")", this, "clearPoints"));
 
         editMenu.add(GuiUtils.makeCheckboxMenuItem("Sharing On", this,
                 "sharing", null));
@@ -1534,7 +1768,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
         frame.getContentPane().add(contents);
         frame.pack();
         if ( !hadFrame) {
-            if(frameLocation!=null) {
+            if (frameLocation != null) {
                 frame.setLocation(frameLocation);
             } else {
                 frame.setLocation(400, 400);
@@ -1961,12 +2195,12 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
             return;
         }
 
-        List<FlythroughPoint> thePoints     = this.points;
+        List<FlythroughPoint> thePoints  = this.points;
 
         NavigatedDisplay      navDisplay = viewManager.getNavigatedDisplay();
 
-        double[]              xyz1          = { 0, 0, 0 };
-        double[]              xyz2          = { 0, 0, 0 };
+        double[]              xyz1       = { 0, 0, 0 };
+        double[]              xyz2       = { 0, 0, 0 };
 
 
         if (index >= thePoints.size()) {
@@ -1990,30 +2224,32 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
         FlythroughPoint pt1 = thePoints.get(index1);
         FlythroughPoint pt2 = thePoints.get(index2);
 
-        xyz1 = navDisplay.getSpatialCoordinates(pt1.getEarthLocation(),
-                                                xyz1);
-        xyz2 = navDisplay.getSpatialCoordinates(pt2.getEarthLocation(),
-                                                xyz2);
+        xyz1 = navDisplay.getSpatialCoordinates(pt1.getEarthLocation(), xyz1);
+        xyz2 = navDisplay.getSpatialCoordinates(pt2.getEarthLocation(), xyz2);
 
         if (orientation.equals(ORIENT_FORWARD)) {
             //Average the next N points
-            int ptCnt = 0;
-            double []sum = {0,0,0};
-            double[]tmp = {0,0,0};
-            int max = thePoints.size()/10;
-            for(int ptIdx=index2;ptIdx<thePoints.size() && ptCnt<max;ptIdx++) {
-                tmp = navDisplay.getSpatialCoordinates(thePoints.get(ptIdx).getEarthLocation(),
-                                                          tmp);
-                if(tmp[0]!=tmp[0] || tmp[1]!=tmp[1] || tmp[2]!=tmp[2]) continue;
+            int      ptCnt = 0;
+            double[] sum   = { 0, 0, 0 };
+            double[] tmp   = { 0, 0, 0 };
+            int      max   = thePoints.size() / 10;
+            for (int ptIdx = index2;
+                    (ptIdx < thePoints.size()) && (ptCnt < max); ptIdx++) {
+                tmp = navDisplay.getSpatialCoordinates(
+                    thePoints.get(ptIdx).getEarthLocation(), tmp);
+                if ((tmp[0] != tmp[0]) || (tmp[1] != tmp[1])
+                        || (tmp[2] != tmp[2])) {
+                    continue;
+                }
                 ptCnt++;
                 //Divide by the cnt so closer points have more affect
-                sum[0]+= tmp[0];
-                sum[1]+= tmp[1];                
-                sum[2]+= tmp[2];
+                sum[0] += tmp[0];
+                sum[1] += tmp[1];
+                sum[2] += tmp[2];
             }
-            xyz2[0] = sum[0]/ptCnt;
-            xyz2[1] = sum[1]/ptCnt;
-            xyz2[2] = sum[2]/ptCnt;
+            xyz2[0] = sum[0] / ptCnt;
+            xyz2[1] = sum[1] / ptCnt;
+            xyz2[2] = sum[2] / ptCnt;
         }
 
 
@@ -2027,25 +2263,34 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
         if (atEnd && (thePoints.size() > 1) && (index1 > 0)) {
             FlythroughPoint prevPt = thePoints.get(index1 - 1);
 
-            double[] xyz3 = navDisplay.getSpatialCoordinates(
-                                                             prevPt.getEarthLocation(), null);
+            double[] xyz3 =
+                navDisplay.getSpatialCoordinates(prevPt.getEarthLocation(),
+                    null);
             xyz2[0] = x1 + (x1 - xyz3[0]);
             xyz2[1] = y1 + (y1 - xyz3[1]);
             xyz2[2] = z1 + (z1 - xyz3[2]);
         }
 
 
-        goTo(pt1,xyz1,xyz2);
+        goTo(pt1, xyz1, xyz2);
     }
 
 
-    protected void goTo(FlythroughPoint pt1, double [] xyz1, double[] xyz2) {
-        NavigatedDisplay      navDisplay = viewManager.getNavigatedDisplay();
-        MouseBehavior         mouseBehavior = navDisplay.getMouseBehavior();
-        double[]              currentMatrix =   navDisplay.getProjectionMatrix();
-        double[]              aspect        = navDisplay.getDisplayAspect();
+    /**
+     * _more_
+     *
+     * @param pt1 _more_
+     * @param xyz1 _more_
+     * @param xyz2 _more_
+     */
+    protected void goTo(FlythroughPoint pt1, double[] xyz1, double[] xyz2) {
+
+        NavigatedDisplay navDisplay    = viewManager.getNavigatedDisplay();
+        MouseBehavior    mouseBehavior = navDisplay.getMouseBehavior();
+        double[]         currentMatrix = navDisplay.getProjectionMatrix();
+        double[]         aspect        = navDisplay.getDisplayAspect();
         try {
-            boolean  doGlobe  =  viewManager.getUseGlobeDisplay();
+            boolean doGlobe = viewManager.getUseGlobeDisplay();
 
             if (htmlView != null) {
                 if (pt1.getDescription() != null) {
@@ -2057,9 +2302,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
 
             processReadout(pt1);
 
-            float x1 = (float) xyz1[0];
-            float y1 = (float) xyz1[1];
-            float z1 = (float) xyz1[2];
+            float  x1   = (float) xyz1[0];
+            float  y1   = (float) xyz1[1];
+            float  z1   = (float) xyz1[2];
 
             float  x2   = (float) xyz2[0];
             float  y2   = (float) xyz2[1];
@@ -2083,7 +2328,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
                             : tilt[2]);
 
 
-            
+
 
             //Check for nans
             if ((x2 != x2) || (y2 != y2) || (z2 != z2)) {
@@ -2117,7 +2362,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
                     return;
                 }
 
-                Vector3d              upVector;
+                Vector3d upVector;
                 if (doGlobe) {
                     upVector = new Vector3d(x1, y1, z1);
                 } else {
@@ -2127,30 +2372,32 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
                 //Keep flat in z for non globe
                 t.lookAt(new Point3d(x1, y1, z1),
                          new Point3d(x2, y2, (( !getUseFixedZ() || doGlobe)
-                                              ? z2
-                                              : z1)), upVector);
+                        ? z2
+                        : z1)), upVector);
 
                 t.get(m);
 
 
                 double[] tiltMatrix = mouseBehavior.make_matrix(tiltx, tilty,
-                                                                tiltz, 1.0, 1.0, 1.0, 0.0, 0.0,
-                                                                0.0);
+                                          tiltz, 1.0, 1.0, 1.0, 0.0, 0.0,
+                                          0.0);
                 m = mouseBehavior.multiply_matrix(tiltMatrix, m);
                 if (aspect != null) {
-                    double[] aspectMatrix = mouseBehavior.make_matrix(0.0, 0.0,
-                                                                      0.0, aspect[0],aspect[1], aspect[2], 0.0, 0.0,0.0);                    
+                    double[] aspectMatrix = mouseBehavior.make_matrix(0.0,
+                                                0.0, 0.0, aspect[0],
+                                                aspect[1], aspect[2], 0.0,
+                                                0.0, 0.0);
                     //                    m = mouseBehavior.multiply_matrix(aspectMatrix, m);
                 }
 
                 double[] scaleMatrix = mouseBehavior.make_matrix(0.0, 0.0,
-                                                                 0.0, zoom, 0.0, 0.0, 0.0);
+                                           0.0, zoom, 0.0, 0.0, 0.0);
 
                 m = mouseBehavior.multiply_matrix(scaleMatrix, m);
             }
 
             currentPoint = pt1;
-            location = currentPoint.getEarthLocation();
+            location     = currentPoint.getEarthLocation();
 
             if (doGlobe) {
                 setPts(locationLine, 0, x1 * 2, 0, y1 * 2, 0, z1 * 2);
@@ -2158,24 +2405,28 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
                 setPts(locationLine, x1, x1, y1, y1, 1, -1);
             }
 
-            RealTuple markerLocation = new RealTuple(RealTupleType.SpatialCartesian3DTuple, new double[] { x1,
-                                                                                                               y1, z1+0.01 });
+            RealTuple markerLocation =
+                new RealTuple(RealTupleType.SpatialCartesian3DTuple,
+                              new double[] { x1,
+                                             y1, z1 + 0.01 });
 
-            if(xyz1[0]!=xyz2[0]) {
-                VisADGeometryArray marker = 
+            if (xyz1[0] != xyz2[0]) {
+                VisADGeometryArray marker =
                     ShapeUtility.setSize(
-                                         ShapeUtility.createShape(ShapeUtility.AIRPLANE3D)[0],
-                                         .1f);
+                        ShapeUtility.createShape(ShapeUtility.AIRPLANE3D)[0],
+                        .1f);
 
-                double rot1 = Math.toDegrees(Math.atan2(xyz2[1]-xyz1[1],xyz2[0]-xyz1[0]));
+                double rot1 = Math.toDegrees(Math.atan2(xyz2[1] - xyz1[1],
+                                  xyz2[0] - xyz1[0]));
                 //                System.err.println ("rot:" + rot1);
                 double[] markerM =
-                    navDisplay.getMouseBehavior().make_matrix(0,0, -rot1+90, 1.0, 0.0, 0.0, 0.0);
+                    navDisplay.getMouseBehavior().make_matrix(0, 0,
+                        -rot1 + 90, 1.0, 0.0, 0.0, 0.0);
 
                 Transform3D rotTransform = new Transform3D(markerM);
                 ShapeUtility.rotate(marker, rotTransform);
                 locationMarker.setPoint(markerLocation, marker);
-            }  else {
+            } else {
                 locationMarker.setPoint(markerLocation);
             }
 
@@ -2186,7 +2437,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
 
             DisplayRendererJ3D dr =
                 (DisplayRendererJ3D) navDisplay.getDisplay()
-                .getDisplayRenderer();
+                    .getDisplayRenderer();
             /*
               dr.setClip(0, true,
               parsef(cflds[0]),
@@ -2243,16 +2494,23 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
             } catch (Exception ignore) {}
         } catch (Exception exc) {
             logException("Error", exc);
-            if(animationWidget!=null) {
+            if (animationWidget != null) {
                 animationWidget.setRunning(false);
             }
             return;
         }
 
+
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     * @param exc _more_
+     */
     public void logException(String msg, Throwable exc) {
         LogUtil.printException(IntegratedDataViewer.log_, msg, exc);
     }
@@ -2282,6 +2540,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
      * @throws Exception _more_
      */
     protected void processReadout(FlythroughPoint pt1) throws Exception {
+
         List<ReadoutInfo> samples = new ArrayList<ReadoutInfo>();
         readoutLabel.setText(readout.getReadout(pt1.getEarthLocation(),
                 showReadoutCbx.isSelected(), true, samples));
@@ -2291,34 +2550,38 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
         }
 
         String newImageUrl = null;
-        imageName = "";
+        imageName   = "";
         precipLevel = 0;
 
         List comps  = new ArrayList();
         List labels = new ArrayList();
         for (ReadoutInfo info : samples) {
-            if(info.getImageUrl()!=null) {
-                newImageUrl  = info.getImageUrl();
-                imageName = info.getImageName();
+            if (info.getImageUrl() != null) {
+                newImageUrl = info.getImageUrl();
+                imageName   = info.getImageName();
             }
             Real r = info.getReal();
             if (r == null) {
                 continue;
             }
-            
+
             String name = ucar.visad.Util.cleanTypeName(r.getType());
-            Unit unit = info.getUnit();
-            if(unit==null) unit = r.getUnit();
+            Unit   unit = info.getUnit();
+            if (unit == null) {
+                unit = r.getUnit();
+            }
             String unitSuffix = "";
-            if(unit!=null) {
+            if (unit != null) {
                 unitSuffix = " [" + unit + "]";
             }
-            if (name.toLowerCase().indexOf("precipitation") >= 0 && Unit.canConvert(unit, CommonUnits.MM)) {
-                precipLevel =  r.getValue(CommonUnits.MM);
+            if ((name.toLowerCase().indexOf("precipitation") >= 0)
+                    && Unit.canConvert(unit, CommonUnits.MM)) {
+                precipLevel = r.getValue(CommonUnits.MM);
             }
 
 
-            if (unit!=null && Unit.canConvert(unit, CommonUnits.CELSIUS)) {
+            if ((unit != null)
+                    && Unit.canConvert(unit, CommonUnits.CELSIUS)) {
                 if (r.isMissing()) {
                     continue;
                 }
@@ -2328,10 +2591,12 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
                 DefaultValueDataset dataset =
                     new DefaultValueDataset(new Double(v));
                 ThermometerPlot plot = new ThermometerPlot(dataset);
-                if(info.getRange()!=null) {
+                if (info.getRange() != null) {
                     Range range = info.getRange();
-                    double min = unit.toThat(range.getMin(),CommonUnits.CELSIUS);
-                    double max = unit.toThat(range.getMax(),CommonUnits.CELSIUS);
+                    double min = unit.toThat(range.getMin(),
+                                             CommonUnits.CELSIUS);
+                    double max = unit.toThat(range.getMax(),
+                                             CommonUnits.CELSIUS);
                     plot.setRange(min, max);
                 }
                 JFreeChart chart = new JFreeChart("",
@@ -2340,7 +2605,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
                 ChartPanel chartPanel = new ChartPanel(chart);
                 //                chartPanel.setPreferredSize(new Dimension(100,300));
                 comps.add(chartPanel);
-            } else  if (false && name.toLowerCase().indexOf("precipitation") >= 0) {
+            } else if (false
+                       && (name.toLowerCase().indexOf("precipitation")
+                           >= 0)) {
                 double v = r.getValue();
                 String html;
                 if (r.isMissing() || (v < 0.01)) {
@@ -2361,16 +2628,19 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
                 }
                 double v = r.getValue(unit);
                 labels.add(new JLabel("<html>" + name.replace("_", " ")
-                                      + "<br>" + Misc.format(v) + unitSuffix));
+                                      + "<br>" + Misc.format(v)
+                                      + unitSuffix));
                 DefaultValueDataset dataset =
                     new DefaultValueDataset(new Double(v));
                 MeterPlot plot = new MeterPlot(dataset);
-                if(info.getRange()!=null) {
+                if (info.getRange() != null) {
                     Range range = info.getRange();
-                    plot.setRange(new org.jfree.data.Range(range.getMin(), range.getMax()));
+                    plot.setRange(new org.jfree.data.Range(range.getMin(),
+                            range.getMax()));
                 }
-                if(unit!=null)
+                if (unit != null) {
                     plot.setUnits(unit.toString());
+                }
                 plot.setDialBackgroundPaint(Color.white);
                 //             plot.setDialShape(DialShape.CHORD);
                 //                plot.setMeterAngle(260);
@@ -2381,7 +2651,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
                 plot.setTickPaint(Color.lightGray);
                 plot.setValuePaint(Color.black);
 
-                JFreeChart chart = new JFreeChart("", plot);
+                JFreeChart chart      = new JFreeChart("", plot);
                 ChartPanel chartPanel = new ChartPanel(chart);
                 chartPanel.setPreferredSize(new Dimension(400, 400));
                 comps.add(chartPanel);
@@ -2392,18 +2662,18 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
         List allComps = new ArrayList(labels);
         allComps.addAll(comps);
         readoutDisplay.removeAll();
-        if(allComps.size()>0) {
+        if (allComps.size() > 0) {
             readoutDisplay.add("Center",
                                GuiUtils.doLayout(allComps, labels.size(),
-                                                 GuiUtils.WT_Y, GuiUtils.WT_NY));
+                                   GuiUtils.WT_Y, GuiUtils.WT_NY));
         }
 
         //        System.err.println ("image url:" + imageUrl);
-        if(!Misc.equals(newImageUrl,imageUrl)) {
+        if ( !Misc.equals(newImageUrl, imageUrl)) {
             imageUrl = newImageUrl;
-            if(imageUrl!=null) {
+            if (imageUrl != null) {
                 backgroundImage = GuiUtils.getImage(imageUrl, getClass());
-                if(backgroundImage!=null) {
+                if (backgroundImage != null) {
                     backgroundImage.getWidth(this);
                 }
             } else {
@@ -2411,6 +2681,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
             }
         }
         dashboardLbl.repaint();
+
     }
 
 
@@ -2815,83 +3086,83 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener, 
 
 
     /**
-       Set the Location property.
-
-       @param value The new value for Location
-    **/
-    public void setLocation (EarthLocation value) {
-	this.location = value;
+     *  Set the Location property.
+     *
+     *  @param value The new value for Location
+     */
+    public void setLocation(EarthLocation value) {
+        this.location = value;
     }
 
     /**
-       Get the Location property.
-
-       @return The Location
-    **/
-    public EarthLocation getLocation () {
-	return this.location;
+     *  Get the Location property.
+     *
+     *  @return The Location
+     */
+    public EarthLocation getLocation() {
+        return this.location;
     }
 
     /**
-       Set the Heading property.
-
-       @param value The new value for Heading
-    **/
-    public void setHeading (double value) {
-	this.heading = value;
+     *  Set the Heading property.
+     *
+     *  @param value The new value for Heading
+     */
+    public void setHeading(double value) {
+        this.heading = value;
     }
 
     /**
-       Get the Heading property.
-
-       @return The Heading
-    **/
-    public double getHeading () {
-	return this.heading;
+     *  Get the Heading property.
+     *
+     *  @return The Heading
+     */
+    public double getHeading() {
+        return this.heading;
     }
 
 
-/**
-Set the FrameLocation property.
-
-@param value The new value for FrameLocation
-**/
-public void setFrameLocation (Point value) {
-	this.frameLocation = value;
-}
-
-/**
-Get the FrameLocation property.
-
-@return The FrameLocation
-**/
-public Point getFrameLocation () {
-    if(frame!=null) {
-        try {
-            this.frameLocation = frame.getLocation();
-        } catch(Exception ignore) {}
+    /**
+     * Set the FrameLocation property.
+     *
+     * @param value The new value for FrameLocation
+     */
+    public void setFrameLocation(Point value) {
+        this.frameLocation = value;
     }
-    return this.frameLocation;
-}
+
+    /**
+     * Get the FrameLocation property.
+     *
+     * @return The FrameLocation
+     */
+    public Point getFrameLocation() {
+        if (frame != null) {
+            try {
+                this.frameLocation = frame.getLocation();
+            } catch (Exception ignore) {}
+        }
+        return this.frameLocation;
+    }
 
 
-/**
-Set the GoToClick property.
+    /**
+     * Set the GoToClick property.
+     *
+     * @param value The new value for GoToClick
+     */
+    public void setGoToClick(boolean value) {
+        this.goToClick = value;
+    }
 
-@param value The new value for GoToClick
-**/
-public void setGoToClick (boolean value) {
-	this.goToClick = value;
-}
-
-/**
-Get the GoToClick property.
-
-@return The GoToClick
-**/
-public boolean getGoToClick () {
-	return this.goToClick;
-}
+    /**
+     * Get the GoToClick property.
+     *
+     * @return The GoToClick
+     */
+    public boolean getGoToClick() {
+        return this.goToClick;
+    }
 
 
 

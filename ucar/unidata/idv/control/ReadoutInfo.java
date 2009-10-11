@@ -23,14 +23,15 @@
 
 
 
+
 package ucar.unidata.idv.control;
 
 
 import ucar.unidata.idv.DisplayControl;
-import ucar.unidata.view.*;
-import ucar.unidata.view.geoloc.*;
 
 import ucar.unidata.util.Range;
+import ucar.unidata.view.*;
+import ucar.unidata.view.geoloc.*;
 
 
 
@@ -49,24 +50,29 @@ import visad.java3d.*;
 
 public class ReadoutInfo {
 
-    /** _more_          */
+    /** _more_ */
     private DisplayControl fromDisplay;
 
-    /** _more_          */
+    /** _more_ */
     private EarthLocation location;
 
-    /** _more_          */
+    /** _more_ */
     private Data data;
 
-    /** _more_          */
+    /** _more_ */
     private Real animationValue;
 
+    /** _more_          */
     private Unit unit;
 
+    /** _more_          */
     private Range range;
 
 
+    /** _more_          */
     private String imageUrl;
+
+    /** _more_          */
     private String imageName;
 
     /**
@@ -164,78 +170,78 @@ public class ReadoutInfo {
     }
 
     /**
-       Set the Unit property.
-
-       @param value The new value for Unit
-    **/
-    public void setUnit (Unit value) {
-	this.unit = value;
+     *  Set the Unit property.
+     *
+     *  @param value The new value for Unit
+     */
+    public void setUnit(Unit value) {
+        this.unit = value;
     }
 
     /**
-       Get the Unit property.
-
-       @return The Unit
-    **/
-    public Unit getUnit () {
-	return this.unit;
+     *  Get the Unit property.
+     *
+     *  @return The Unit
+     */
+    public Unit getUnit() {
+        return this.unit;
     }
 
     /**
-       Set the Range property.
-
-       @param value The new value for Range
-    **/
-    public void setRange (Range value) {
-	this.range = value;
+     *  Set the Range property.
+     *
+     *  @param value The new value for Range
+     */
+    public void setRange(Range value) {
+        this.range = value;
     }
 
     /**
-       Get the Range property.
-
-       @return The Range
-    **/
-    public Range getRange () {
-	return this.range;
+     *  Get the Range property.
+     *
+     *  @return The Range
+     */
+    public Range getRange() {
+        return this.range;
     }
 
 
     /**
-       Set the ImageUrl property.
-
-       @param value The new value for ImageUrl
-    **/
-    public void setImageUrl (String value) {
-	this.imageUrl = value;
+     *  Set the ImageUrl property.
+     *
+     *  @param value The new value for ImageUrl
+     */
+    public void setImageUrl(String value) {
+        this.imageUrl = value;
     }
 
     /**
-       Get the ImageUrl property.
-
-       @return The ImageUrl
-    **/
-    public String getImageUrl () {
-	return this.imageUrl;
+     *  Get the ImageUrl property.
+     *
+     *  @return The ImageUrl
+     */
+    public String getImageUrl() {
+        return this.imageUrl;
     }
 
 
 
     /**
-       Set the ImageName property.
-
-       @param value The new value for ImageName
-    **/
-    public void setImageName (String value) {
-	this.imageName = value;
+     *  Set the ImageName property.
+     *
+     *  @param value The new value for ImageName
+     */
+    public void setImageName(String value) {
+        this.imageName = value;
     }
 
     /**
-       Get the ImageName property.
-
-       @return The ImageName
-    **/
-    public String getImageName () {
-	return this.imageName;
+     *  Get the ImageName property.
+     *
+     *  @return The ImageName
+     */
+    public String getImageName() {
+        return this.imageName;
     }
 
 
