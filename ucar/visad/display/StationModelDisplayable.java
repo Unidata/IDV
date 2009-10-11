@@ -124,10 +124,6 @@ public class StationModelDisplayable extends DisplayableData {
     /** _more_ */
     private boolean rotateShapes = false;
 
-
-    /** _more_ */
-    private Point3f point3f = new Point3f();
-
     /** _more_ */
     private Transform3D transform = new Transform3D();
 
@@ -1544,10 +1540,10 @@ public class StationModelDisplayable extends DisplayableData {
 
                     if (rotateShapes && (currentRotation != null) && metSymbol.rotateOnEarth()) {
                         for (VisADGeometryArray points : shapes) {
-                            rotate(points);
+                            ShapeUtility.rotate(points,transform);
                         }
                         if(bgshape!=null) {
-                            rotate(bgshape);
+                            ShapeUtility.rotate(bgshape,transform);
                         }
                     }
 
@@ -1607,34 +1603,9 @@ public class StationModelDisplayable extends DisplayableData {
         }
 
 
-        //if (rotateShapes && (currentRotation != null)) {
-        //    for (VisADGeometryArray points : allShapes) {
-        //        rotate(points);
-        //    }
-        //}
 
         return allShapes;
     }
-
-
-
-    /**
-     * _more_
-     *
-     * @param shape _more_
-     */
-    private void rotate(VisADGeometryArray shape) {
-        for (int i = 0; i < shape.coordinates.length; i += 3) {
-            point3f.x = shape.coordinates[i + 0];
-            point3f.y = shape.coordinates[i + 1];
-            point3f.z = shape.coordinates[i + 2];
-            transform.transform(point3f);
-            shape.coordinates[i + 0] = point3f.x;
-            shape.coordinates[i + 1] = point3f.y;
-            shape.coordinates[i + 2] = point3f.z;
-        }
-    }
-
 
 
 

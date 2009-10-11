@@ -34,9 +34,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.geom.*;
 
-import javax.vecmath.Matrix3f;
+import javax.media.j3d.Transform3D;
+import javax.vecmath.*;
 
-import javax.vecmath.Vector3f;
 
 
 /**
@@ -1352,6 +1352,22 @@ public class ShapeUtility {
         }
 
     }
+
+
+    public static  void rotate(VisADGeometryArray shape, Transform3D transform) {
+        Point3f point3f = new Point3f();
+        for (int i = 0; i < shape.coordinates.length; i += 3) {
+            point3f.x = shape.coordinates[i + 0];
+            point3f.y = shape.coordinates[i + 1];
+            point3f.z = shape.coordinates[i + 2];
+            transform.transform(point3f);
+            shape.coordinates[i + 0] = point3f.x;
+            shape.coordinates[i + 1] = point3f.y;
+            shape.coordinates[i + 2] = point3f.z;
+        }
+    }
+
+
 
     /**
      * Rotate the given shape about the x axis the given angle (in radians).

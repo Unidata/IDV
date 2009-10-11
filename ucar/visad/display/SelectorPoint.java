@@ -201,6 +201,15 @@ public class SelectorPoint extends LineDrawing {
         setPointWithTime(value, null);
     }
 
+    public void setPoint(RealTuple value,VisADGeometryArray marker)
+        throws VisADException, RemoteException {
+        this.marker = marker;
+        if (shapeControl != null) {
+            shapeControl.setShape(0, marker);
+        }
+        setPointWithTime(value, null);
+    }
+
 
     /**
      * _more_
@@ -304,6 +313,19 @@ public class SelectorPoint extends LineDrawing {
         }
         pointSize = newSize;
     }
+
+
+    public void setScale(float newScale)
+            throws VisADException, RemoteException {
+        if (shapeControl != null) {
+            //We set auto scale false here so the shape control 
+            //clears out its controllistener which was keeping around the old initial scale
+            shapeControl.setAutoScale(false);
+            shapeControl.setScale(newScale);
+            shapeControl.setAutoScale(true);
+        }
+    }
+
 
     /**
      * Get the scale of the ShapeControl.
