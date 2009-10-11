@@ -39,6 +39,7 @@ import ucar.visad.display.Grid2DDisplayable;
 import visad.*;
 import visad.VisADException;
 
+import java.awt.*;
 import java.awt.event.*;
 
 
@@ -120,6 +121,10 @@ public class ColorPlanViewControl extends PlanViewControl {
         }
     }
 
+
+
+
+
     /**
      * Add in any special control widgets to the current list of widgets.
      * @param controlWidgets  list of control widgets
@@ -155,9 +160,10 @@ public class ColorPlanViewControl extends PlanViewControl {
                     new WrapperWidget(
                         this, GuiUtils.rLabel("Display:"),
                         GuiUtils.left(
-                            GuiUtils.hbox(
+                                      GuiUtils.hbox(new Component[]{
                                 GuiUtils.rLabel("Shade Colors:"), toggle,
-                                new JLabel("  Mode: "), polyModeCombo))));
+                                new JLabel("  Mode: "), polyModeCombo,
+                                new JLabel("  Point Size: "), doMakePointSizeWidget()}))));
             } else {
                 controlWidgets.add(new WrapperWidget(this,
                         GuiUtils.rLabel("Shade Colors:"),

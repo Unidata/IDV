@@ -73,10 +73,6 @@ public class TopographyControl extends PlanViewControl {
     /** flag for smoothing */
     boolean isSmoothed;
 
-
-    /** point size (for point mode) */
-    float pointSize = 2f;
-
     /**
      * Construct a new topography control.  Set the attribute flags.
      */
@@ -151,7 +147,7 @@ public class TopographyControl extends PlanViewControl {
         });
         Component right = toggle;
         if (visad.util.Util.canDoJava3D()) {
-            getGridDisplay().setPointSize(pointSize);
+            getGridDisplay().setPointSize(getPointSize());
 
             Component tmpComp = GuiUtils.hgrid(
                                     Misc.newList(
@@ -162,6 +158,12 @@ public class TopographyControl extends PlanViewControl {
         }  // end canDoJava3D
         controlWidgets.add(
             new WrapperWidget(this, GuiUtils.rLabel("Shade Colors:"), right));
+
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel("Point Size:"),
+                                             GuiUtils.left(doMakePointSizeWidget())));
+
+
     }
 
     /**
@@ -194,30 +196,24 @@ public class TopographyControl extends PlanViewControl {
 
 
     /**
-     * Set the size of points if this is displayed as points
-     *
-     * @param v point size.  Used by XML persistence.
-     */
-    public void setPointSize(float v) {
-        pointSize = v;
-    }
-
-    /**
-     * Get the size of points for this display
-     *
-     * @return size of points
-     */
-    public float getPointSize() {
-        return pointSize;
-    }
-
-    /**
      * Is this a raster display?
      *
      * @return  true if raster
      */
     public boolean getIsRaster() {
         return true;
+    }
+
+
+    public void setPointSize(float value) {
+        super.setPointSize(value);
+        if(getGridDisplay()!=null) {
+            try {
+                getGridDisplay().setPointSize(getPointSize());
+            } catch (Exception e) {
+                logException("Setting point size", e);
+            }
+        }
     }
 
 }

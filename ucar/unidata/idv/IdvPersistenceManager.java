@@ -3319,62 +3319,67 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         String jython = (String) ht.get(ID_JYTHON);
         if (jython != null) {
             final String theJython = jython;
-            JLabel label =
-                new JLabel(
-                    "<html>The bundle contained the following jython library.<p>&nbsp;&nbsp; What would you like to do with this?<br></html>");
-            final JDialog dialog =
-                GuiUtils.createDialog("Load Jython Library", true);
+            //If we are in off screen mode (e.g., running ISL) then add the jython to the tmp library
+            if (getArgsManager().getIsOffScreen()) {
+                getJythonManager().appendTmpJython(theJython);
+            } else {
+                JLabel label =
+                    new JLabel(
+                               "<html>The bundle contained the following jython library.<p>&nbsp;&nbsp; What would you like to do with this?<br></html>");
+                final JDialog dialog =
+                    GuiUtils.createDialog("Load Jython Library", true);
 
-            final JTextArea textArea = new JTextArea(jython);
-            textArea.setEditable(false);
+                final JTextArea textArea = new JTextArea(jython);
+                textArea.setEditable(false);
 
-            JButton dontLoadBtn    = new JButton("Don't load it");
-            JButton addItBtn       =
-                new JButton("Add it to my local library");
-            JButton addTmpBtn = new JButton("Add it to my temporary library");
-            JButton addSelectedBtn = new JButton("Add selected text");
+                JButton dontLoadBtn    = new JButton("Don't load it");
+                JButton addItBtn       =
+                    new JButton("Add it to my local library");
+                JButton addTmpBtn = new JButton("Add it to my temporary library");
+                JButton addSelectedBtn = new JButton("Add selected text");
 
 
-            addItBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    getJythonManager().appendJythonFromBundle(theJython);
-                    dialog.dispose();
-                }
-            });
+                addItBtn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent ae) {
+                            getJythonManager().appendJythonFromBundle(theJython);
+                            dialog.dispose();
+                        }
+                    });
 
-            addTmpBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    getJythonManager().appendTmpJython(theJython);
-                    dialog.dispose();
-                }
-            });
 
-            addSelectedBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    String text = textArea.getSelectedText();
-                    if ((text != null) && (text.length() > 0)) {
-                        getJythonManager().appendJythonFromBundle(text);
-                    }
-                    dialog.dispose();
-                }
-            });
-            dontLoadBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    dialog.dispose();
-                }
-            });
-            JPanel buttons = GuiUtils.hbox(Misc.newList(addItBtn, addTmpBtn,
-                                 addSelectedBtn, dontLoadBtn), 5);
-            JPanel comp = GuiUtils.topCenter(
-                              GuiUtils.inset(
-                                  GuiUtils.vbox(
-                                      GuiUtils.inset(label, 5),
-                                      buttons), 5), GuiUtils.makeScrollPane(
-                                          textArea, 300, 500));
-            dialog.getContentPane().add(comp);
-            GuiUtils.showInCenter(dialog);
+                addTmpBtn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent ae) {
+                            getJythonManager().appendTmpJython(theJython);
+                            dialog.dispose();
+                        }
+                    });
+
+                addSelectedBtn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent ae) {
+                            String text = textArea.getSelectedText();
+                            if ((text != null) && (text.length() > 0)) {
+                                getJythonManager().appendJythonFromBundle(text);
+                            }
+                            dialog.dispose();
+                        }
+                    });
+                dontLoadBtn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent ae) {
+                            dialog.dispose();
+                        }
+                    });
+                JPanel buttons = GuiUtils.hbox(Misc.newList(addItBtn, addTmpBtn,
+                                                            addSelectedBtn, dontLoadBtn), 5);
+                JPanel comp = GuiUtils.topCenter(
+                                                 GuiUtils.inset(
+                                                                GuiUtils.vbox(
+                                                                              GuiUtils.inset(label, 5),
+                                                                              buttons), 5), GuiUtils.makeScrollPane(
+                                                                                                                    textArea, 300, 500));
+                dialog.getContentPane().add(comp);
+                GuiUtils.showInCenter(dialog);
+            }
         }
-
         List overrideTimes = ((bundleProperties == null)
                               ? null
                               : (List) bundleProperties.get(PROP_TIMESLIST));

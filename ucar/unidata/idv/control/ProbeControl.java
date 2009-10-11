@@ -228,10 +228,6 @@ public class ProbeControl extends DisplayControlImpl {
     private JLabel sideLegendReadout;
 
 
-
-    /** The point size */
-    private float pointSize = 1.0f;
-
     /** The shape for the probe point */
     private String marker;
 
@@ -331,9 +327,8 @@ public class ProbeControl extends DisplayControlImpl {
         }
         addDisplayable(probe, FLAG_COLOR);
         setContents(doMakeContents());
-        //        probe.setPointSize(pointSize);
-        if (pointSize != 1.0f) {
-            probe.setPointSize(pointSize);
+        if (getPointSize() != 1.0f) {
+            probe.setPointSize(getPointSize());
         } else {
             probe.setPointSize(getDisplayScale());
         }
@@ -2749,8 +2744,8 @@ public class ProbeControl extends DisplayControlImpl {
         if (probe == null) {
             return;
         }
-        pointSize = probe.getPointScale();
-        setPointSize(pointSize + pointSize * 0.5f);
+        float newPointSize = probe.getPointScale();
+        setPointSize(newPointSize + newPointSize * 0.5f);
     }
 
 
@@ -2761,12 +2756,12 @@ public class ProbeControl extends DisplayControlImpl {
         if (probe == null) {
             return;
         }
-        pointSize = probe.getPointScale();
-        pointSize = pointSize - pointSize * 0.5f;
-        if (pointSize < 0.1f) {
-            pointSize = 0.1f;
+        float newPointSize = probe.getPointScale();
+        newPointSize = newPointSize - newPointSize * 0.5f;
+        if (newPointSize < 0.1f) {
+            newPointSize = 0.1f;
         }
-        setPointSize(pointSize);
+        setPointSize(newPointSize);
     }
 
 
@@ -2777,25 +2772,16 @@ public class ProbeControl extends DisplayControlImpl {
      *  @param value The new value for PointSize
      */
     public void setPointSize(float value) {
-        pointSize = value;
+        super.setPointSize(value);
         if (probe != null) {
             try {
                 probe.setAutoSize(false);
-                probe.setPointSize(pointSize);
+                probe.setPointSize(getPointSize());
                 probe.setAutoSize(true);
             } catch (Exception exc) {
                 logException("Increasing probe size", exc);
             }
         }
-    }
-
-    /**
-     *  Get the PointSize property.
-     *
-     *  @return The PointSize
-     */
-    public float getPointSize() {
-        return pointSize;
     }
 
 

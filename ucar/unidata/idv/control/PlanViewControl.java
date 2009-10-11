@@ -820,6 +820,20 @@ public abstract class PlanViewControl extends GridDisplayControl {
         return (GridDisplayable) planDisplay;
     }
 
+
+    public void setPointSize(float value) {
+        super.setPointSize(value);
+        if(planDisplay!=null) {
+            try {
+                planDisplay.setPointSize(getPointSize());
+            } catch (Exception e) {
+                logException("Setting point size", e);
+            }
+        }
+    }
+
+
+
     /**
      * Method for creating the <code>DisplayableData</code> object
      * that is the main depiction for the data controlled by this

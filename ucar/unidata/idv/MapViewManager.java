@@ -430,6 +430,19 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
+
+    protected void initUI() {
+        super.initUI();
+        //Initialize the flythrough here
+        if (flythrough != null) {
+            flythrough.setViewManager(this);
+            if (flythrough.getShown()) {
+                flythrough.show();
+            }
+        }
+    }
+
+
     /**
      * Handle a perspective view change
      *
@@ -839,10 +852,13 @@ public class MapViewManager extends NavigatedViewManager {
         this.setAspectRatio(that.getAspectRatio());
 
         if ((mvm.flythrough != null) && (mvm.flythrough != this.flythrough)) {
+            System.err.println ("Initing flythrough");
             if (this.flythrough != null) {
+                System.err.println ("destroying old one");
                 this.flythrough.destroy();
                 //                this.flythrough.initWith(mvm.flythrough);
             }
+            System.err.println ("setting new one");
             this.flythrough = mvm.flythrough;
             this.flythrough.setViewManager(this);
             if (this.flythrough.getShown()) {
@@ -1970,12 +1986,6 @@ public class MapViewManager extends NavigatedViewManager {
      */
     public final void initAfterUnPersistence(IntegratedDataViewer idv)
             throws VisADException, RemoteException {
-        if (flythrough != null) {
-            flythrough.setViewManager(this);
-            if (flythrough.getShown()) {
-                flythrough.show();
-            }
-        }
         super.initAfterUnPersistence(idv);
     }
 

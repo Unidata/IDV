@@ -826,6 +826,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     private JSlider textureSlider = null;
 
+
+    /** _more_ */
+    private float pointSize = 1.0f;
+
+
+
     /**
      * Default constructor. This is called when the control is
      * unpersisted through the {@link ucar.unidata.xml.XmlEncoder}
@@ -11452,6 +11458,44 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected void applyTextureQuality()
             throws VisADException, RemoteException {}
+
+
+
+
+    /**
+     *  Set the PointSize property.
+     *
+     *  @param value The new value for PointSize
+     */
+    public void setPointSize(float value) {
+        pointSize = value;
+    }
+
+    /**
+     *  Get the PointSize property.
+     *
+     *  @return The PointSize
+     */
+    public float getPointSize() {
+        return pointSize;
+    }
+
+    public JComponent doMakePointSizeWidget() {
+        final JTextField pointSizeFld = new JTextField("" + getPointSize(), 5);
+        pointSizeFld.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    try {
+                        setPointSize(new Float(
+                            pointSizeFld.getText().trim()).floatValue());
+                    } catch (Exception exc) {
+                        logException("Error parsing size:"
+                                     + pointSizeFld.getText(), exc);
+                    }
+                }
+            });
+
+        return pointSizeFld;
+    }
 
 
 }

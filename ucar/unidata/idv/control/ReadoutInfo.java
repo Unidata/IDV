@@ -33,6 +33,7 @@ import ucar.unidata.view.geoloc.*;
 import ucar.unidata.util.Range;
 
 
+
 import visad.*;
 
 import visad.georef.*;
@@ -64,6 +65,9 @@ public class ReadoutInfo {
 
     private Range range;
 
+
+    private String imageUrl;
+    private String imageName;
 
     /**
      * _more_
@@ -193,6 +197,45 @@ public class ReadoutInfo {
     **/
     public Range getRange () {
 	return this.range;
+    }
+
+
+    /**
+       Set the ImageUrl property.
+
+       @param value The new value for ImageUrl
+    **/
+    public void setImageUrl (String value) {
+	this.imageUrl = value;
+    }
+
+    /**
+       Get the ImageUrl property.
+
+       @return The ImageUrl
+    **/
+    public String getImageUrl () {
+	return this.imageUrl;
+    }
+
+
+
+    /**
+       Set the ImageName property.
+
+       @param value The new value for ImageName
+    **/
+    public void setImageName (String value) {
+	this.imageName = value;
+    }
+
+    /**
+       Get the ImageName property.
+
+       @return The ImageName
+    **/
+    public String getImageName () {
+	return this.imageName;
     }
 
 

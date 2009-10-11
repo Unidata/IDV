@@ -110,8 +110,6 @@ public class ColorRadarVolumeControl extends GridDisplayControl {
     private JLabel stationLabel = new JLabel("   ");
 
 
-    /** _more_ */
-    private float pointSize = 1.0f;
 
     /**
      * Default constructor.  Sets the appropriate attribute flags.
@@ -181,7 +179,7 @@ public class ColorRadarVolumeControl extends GridDisplayControl {
         setRequestProperties();
 
         mainDisplay = createMainDisplay();
-        mainDisplay.setPointSize(pointSize);
+        mainDisplay.setPointSize(getPointSize());
 
         // set the data (which uses the displayables above).
         if ( !setData(dataChoice)) {
@@ -257,26 +255,26 @@ public class ColorRadarVolumeControl extends GridDisplayControl {
         controlWidgets.add(new WrapperWidget(this,
                                              GuiUtils.rLabel("Station:"),
                                              stationLabel));
-        final JTextField pointSizeFld = new JTextField("" + pointSize, 5);
-        pointSizeFld.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    try {
-                        pointSize = new Float(
-                                              pointSizeFld.getText().trim()).floatValue();
-                        mainDisplay.setPointSize(pointSize);
-
-                    } catch (Exception exc) {
-                        logException("Error parsing size:"
-                                     + pointSizeFld.getText(), exc);
-                    }
-                }
-            });
         controlWidgets.add(new WrapperWidget(this,
                                              GuiUtils.rLabel("Point Size:"),
-                                             GuiUtils.left(pointSizeFld)));
+                                             GuiUtils.left(doMakePointSizeWidget())));
 
 
     }
+
+
+    public void setPointSize(float value) {
+        super.setPointSize(value);
+        if(mainDisplay!=null) {
+            try {
+                mainDisplay.setPointSize(getPointSize());
+            } catch (Exception e) {
+                logException("Setting point size", e);
+            }
+        }
+    }
+
+
 
 
     /**
@@ -409,25 +407,6 @@ public class ColorRadarVolumeControl extends GridDisplayControl {
         getGridDisplayable().loadData(fieldImpl);
     }
 
-
-
-    /**
-     *  Set the PointSize property.
-     *
-     *  @param value The new value for PointSize
-     */
-    public void setPointSize(float value) {
-        pointSize = value;
-    }
-
-    /**
-     *  Get the PointSize property.
-     *
-     *  @return The PointSize
-     */
-    public float getPointSize() {
-        return pointSize;
-    }
 
 
 }

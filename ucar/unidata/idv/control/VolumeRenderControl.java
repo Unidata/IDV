@@ -84,8 +84,6 @@ public class VolumeRenderControl extends GridDisplayControl {
     private boolean usePoints = false;
 
 
-    /** _more_ */
-    private float pointSize = 1.0f;
 
     /**
      * Default constructor; does nothing.
@@ -121,7 +119,7 @@ public class VolumeRenderControl extends GridDisplayControl {
                 ? GraphicsModeControl.TEXTURE3D
                 : GraphicsModeControl.STACK2D, Display.Texture3DMode));
 
-        myDisplay.setPointSize(pointSize);
+        myDisplay.setPointSize(getPointSize());
         addDisplayable(myDisplay, getAttributeFlags());
 
         //Now, set the data. Return false if it fails.
@@ -152,25 +150,23 @@ public class VolumeRenderControl extends GridDisplayControl {
                     GuiUtils.rLabel("Use 3D Texture:"),
                     GuiUtils.leftCenter(textureToggle, GuiUtils.filler())));
         } else {
-            final JTextField pointSizeFld = new JTextField("" + pointSize, 5);
-            pointSizeFld.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    try {
-                        pointSize = new Float(
-                            pointSizeFld.getText().trim()).floatValue();
-                        myDisplay.setPointSize(pointSize);
-
-                    } catch (Exception exc) {
-                        logException("Error parsing size:"
-                                     + pointSizeFld.getText(), exc);
-                    }
-                }
-            });
             controlWidgets.add(new WrapperWidget(this,
                     GuiUtils.rLabel("Point Size:"),
-                    GuiUtils.left(pointSizeFld)));
+                    GuiUtils.left(doMakePointSizeWidget())));
         }
 
+    }
+
+
+    public void setPointSize(float value) {
+        super.setPointSize(value);
+        if(myDisplay!=null) {
+            try {
+                myDisplay.setPointSize(getPointSize());
+            } catch (Exception e) {
+                logException("Setting point size", e);
+            }
+        }
     }
 
 
@@ -433,24 +429,6 @@ public class VolumeRenderControl extends GridDisplayControl {
         return usePoints;
     }
 
-
-    /**
-     *  Set the PointSize property.
-     *
-     *  @param value The new value for PointSize
-     */
-    public void setPointSize(float value) {
-        pointSize = value;
-    }
-
-    /**
-     *  Get the PointSize property.
-     *
-     *  @return The PointSize
-     */
-    public float getPointSize() {
-        return pointSize;
-    }
 
 
 

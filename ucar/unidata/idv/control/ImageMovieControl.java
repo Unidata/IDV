@@ -1,4 +1,4 @@
-/*
+/**
  * $Id: ImageMovieControl.java,v 1.71 2007/08/09 17:22:25 dmurray Exp $
  *
  * Copyright  1997-2004 Unidata Program Center/University Corporation for
@@ -36,6 +36,8 @@ import ucar.unidata.gis.mcidasmap.McidasMap;
 
 
 import ucar.unidata.idv.IdvResourceManager;
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.ui.ImagePanel;
 import ucar.unidata.ui.ImageUtils;
@@ -177,7 +179,6 @@ public class ImageMovieControl extends DisplayControlImpl {
     private int dateType = DATETYPE_FILENAME;
 
 
-
     /** Points to the imageset xml file */
     private String imageSetUrl;
 
@@ -241,16 +242,21 @@ public class ImageMovieControl extends DisplayControlImpl {
     private List times;
 
     /** Maps imageset id to  station for the station map */
-    private Hashtable idToStation = new Hashtable();
+    private Hashtable<String,NamedStationImpl> idToStation = new Hashtable<String,NamedStationImpl>();
 
     /** Maps station map to xml element from the imagesets xml */
-    private Hashtable stationToElement = new Hashtable();
+    private Hashtable<NamedStationImpl,Element> stationToElement = new Hashtable<NamedStationImpl,Element>();
 
     /** Maps xml element to station */
-    private Hashtable elementToStation = new Hashtable();
+    private Hashtable<Element,NamedStationImpl> elementToStation = new Hashtable<Element,NamedStationImpl>();
+
+
+    private Hashtable<String,Element> urlToRoot = new Hashtable<String,Element>();
 
     /** Displays imageset locations */
     private StationLocationMap stationMap;
+
+    private List<NamedStationImpl> stations;
 
     /** The directory */
     private String directory;
@@ -320,6 +326,52 @@ public class ImageMovieControl extends DisplayControlImpl {
     public ColorTable getRGBColorTable() {
         return getDisplayConventions().getParamColorTable("image");
     }
+
+
+    protected List getCursorReadoutInner(EarthLocation el,
+                                         Real animationValue,
+                                         int animationStep,
+                                         List<ReadoutInfo> samples)
+            throws Exception {
+        NamedStationImpl closest= null;
+        double minDistance = 0;
+        
+        LatLonPointImpl llp = new LatLonPointImpl(el.getLatitude().getValue(CommonUnit.degree), 
+                                                  el.getLongitude().getValue(CommonUnit.degree));
+        if(stations==null) {
+            return null;
+        }
+        for(NamedStationImpl station: stations) {
+            EarthLocation el2 = station.getEarthLocation();
+            LatLonPointImpl llp2 = new LatLonPointImpl(el2.getLatitude().getValue(CommonUnit.degree), 
+                                                       el2.getLongitude().getValue(CommonUnit.degree));
+            Bearing bearing =
+                Bearing.calculateBearing(llp,
+                                         llp2,
+                                         null);
+
+            double distance     = bearing.getDistance();
+            if(closest==null || distance<minDistance) {
+                minDistance = distance;
+                closest = station;
+            } 
+        }
+
+        if(closest!=null) {
+            Element element = (Element) stationToElement.get(closest);
+            String url  = getImageSetUrl(element);
+            List[]files = loadFilesFromXml(url,null);
+            if(files[0].size()>0) {
+                ReadoutInfo info = new ReadoutInfo(this,null,closest.getEarthLocation(),(DateTime)(files[1].get(files[1].size()-1)));
+                info.setImageUrl(files[0].get(files[0].size()-1).toString());
+                info.setImageName(closest.getName());
+                samples.add(info);
+           }
+        }
+        return null;
+    }
+
+
 
     /**
      *
@@ -473,7 +525,7 @@ public class ImageMovieControl extends DisplayControlImpl {
             return;
         }
         try {
-            Element root = XmlUtil.getRoot(path, getClass());
+            Element root = getRoot(path);
             if (root == null) {
                 LogUtil.userErrorMessage("Could not load the image set xml: "
                                          + path);
@@ -883,7 +935,8 @@ public class ImageMovieControl extends DisplayControlImpl {
      */
     private void loadImageSetsMap()
             throws VisADException, RemoteException, Exception {
-        List stations = new ArrayList();
+        stations = new ArrayList<NamedStationImpl>();
+
         List locs     = new ArrayList();
         List children = XmlUtil.findDescendants(getImageSetsRoot(),
                             TAG_IMAGESET);
@@ -1076,7 +1129,8 @@ public class ImageMovieControl extends DisplayControlImpl {
     public void propertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equals(
                 StationLocationMap.SELECTED_PROPERTY)) {
-            List selected = stationMap.getSelectedStations();
+
+            List<NamedStationImpl> selected = (List<NamedStationImpl>)stationMap.getSelectedStations();
             if (selected.size() == 0) {
                 return;
             }
@@ -1163,6 +1217,19 @@ public class ImageMovieControl extends DisplayControlImpl {
     }
 
 
+    private Element getRoot(String url) throws Exception {
+        if(url==null) return null;
+        Element root = urlToRoot.get(url);
+        if(root==null) {
+            root = XmlUtil.getRoot(url, getClass());
+            if(root!=null) {
+                urlToRoot.put(url,root);
+            }
+        }
+        return root;
+    }
+
+
     /**
      * Show the prevew image defined by the given node
      *
@@ -1179,7 +1246,7 @@ public class ImageMovieControl extends DisplayControlImpl {
         if (url == null) {
             return;
         }
-        Element root = XmlUtil.getRoot(url, getClass());
+        Element root = getRoot(url);
         String  base = XmlUtil.getAttribute(root, ATTR_BASE, (String) null);
         if (base == null) {
             base = IOUtil.getFileRoot(url);
@@ -1294,7 +1361,7 @@ public class ImageMovieControl extends DisplayControlImpl {
         }
         try {
             if (imageSetRoot == null) {
-                imageSetRoot = XmlUtil.getRoot(imageSetUrl, getClass());
+                imageSetRoot = getRoot(imageSetUrl);
             }
             String base = XmlUtil.getAttribute(imageSetRoot, ATTR_BASE,
                               (String) null);
@@ -1351,6 +1418,62 @@ public class ImageMovieControl extends DisplayControlImpl {
             logException("Error reading xml", exc);
         }
     }
+
+
+
+    public List[] loadFilesFromXml(String imageSetUrl, Element imageSetRoot) {
+        List files = new ArrayList();
+        List times = new ArrayList();
+        if (imageSetUrl == null) {
+            return new List[]{files,times};
+        }
+        try {
+            if (imageSetRoot == null) {
+                imageSetRoot = getRoot(imageSetUrl);
+            }
+            String base = XmlUtil.getAttribute(imageSetRoot, ATTR_BASE,
+                              (String) null);
+            if (base == null) {
+                base = IOUtil.getFileRoot(imageSetUrl);
+            }
+            String format = XmlUtil.getAttribute(imageSetRoot, ATTR_FORMAT,
+                                "yyyyMMddHHmmz");
+
+            NodeList children  = XmlUtil.getElements(imageSetRoot, TAG_IMAGE);
+            List     fileDates = new ArrayList();
+            for (int i = 0; i < children.getLength(); i++) {
+                Element child = (Element) children.item(i);
+                String  url   = XmlUtil.getAttribute(child, ATTR_FILE);
+                String  time  = XmlUtil.getAttribute(child, ATTR_TIME);
+                if ((base != null) && !url.startsWith("http:")
+                        && !url.startsWith(File.separator + "")
+                        && (url.indexOf(":") < 0)) {
+                    if ( !base.endsWith("/") && !url.startsWith("/")) {
+                        url = base + "/" + url;
+                    } else {
+                        url = base + url;
+                    }
+                }
+                DateTime dateTime = DateTime.createDateTime(time, format);
+                fileDates.add(new FileDate(url, dateTime));
+            }
+
+            fileDates = Misc.sort(fileDates);
+            for (int i = 0; i < fileDates.size(); i++) {
+                FileDate fd = (FileDate) fileDates.get(i);
+                files.add(fd.file);
+                times.add(fd.dttm);
+            }
+            return new List[]{files,times};
+        } catch (Exception exc) {
+            logException("Error reading xml", exc);
+        }
+        return new List[]{files,times};
+    }
+
+
+
+
 
     /**
      * Class FileDate For sorting
@@ -1490,6 +1613,7 @@ public class ImageMovieControl extends DisplayControlImpl {
     private void addMoviesToList() {
         Vector items = new Vector();
         List   files = getImagePanel().getFiles();
+        List times = this.times;
         for (int i = 0; i < files.size(); i++) {
             items.add(times.get(i).toString());
         }
