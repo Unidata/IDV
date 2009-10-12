@@ -1355,15 +1355,20 @@ public class ShapeUtility {
 
 
     public static  void rotate(VisADGeometryArray shape, Transform3D transform) {
+        rotate(shape, transform, 0f,0f,0f);
+    }
+
+
+    public static  void rotate(VisADGeometryArray shape, Transform3D transform, float deltax,float deltay, float deltaz) {
         Point3f point3f = new Point3f();
         for (int i = 0; i < shape.coordinates.length; i += 3) {
-            point3f.x = shape.coordinates[i + 0];
-            point3f.y = shape.coordinates[i + 1];
-            point3f.z = shape.coordinates[i + 2];
+            point3f.x = shape.coordinates[i + 0]+deltax;
+            point3f.y = shape.coordinates[i + 1]+deltay;
+            point3f.z = shape.coordinates[i + 2]+deltaz;
             transform.transform(point3f);
-            shape.coordinates[i + 0] = point3f.x;
-            shape.coordinates[i + 1] = point3f.y;
-            shape.coordinates[i + 2] = point3f.z;
+            shape.coordinates[i + 0] = point3f.x-deltax;
+            shape.coordinates[i + 1] = point3f.y-deltay;
+            shape.coordinates[i + 2] = point3f.z-deltaz;
         }
     }
 
