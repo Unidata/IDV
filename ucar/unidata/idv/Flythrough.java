@@ -334,6 +334,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** The line from the origin to the point */
     private LineDrawing locationLine;
 
+    private LineDrawing locationLine2;
+
     /** _more_ */
     private SelectorPoint locationMarker;
 
@@ -449,6 +451,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         if ((locationMarker != null) && (viewManager != null)) {
             viewManager.getMaster().removeDisplayable(locationMarker);
             viewManager.getMaster().removeDisplayable(locationLine);
+            viewManager.getMaster().removeDisplayable(locationLine2);
         }
 
 
@@ -859,7 +862,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         animation.setAnimationInfo(animationInfo);
         animation.addPropertyChangeListener(this);
         animationWidget.setAnimation(animation);
-        locationLine = new LineDrawing("flythroughpoint.line");
+
         locationMarker =
             new SelectorPoint(
                 "flythrough.point",
@@ -873,16 +876,24 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         locationMarker.setAutoSize(true);
         locationMarker.setManipulable(false);
         locationMarker.setColor(Color.green);
-
-        locationLine.setVisible(false);
         locationMarker.setVisible(false);
+
+        locationLine = new LineDrawing("flythroughpoint.line");
+        locationLine.setVisible(false);
         locationLine.setLineWidth(2);
         locationLine.setColor(Color.green);
+
+
+        locationLine2 = new LineDrawing("flythroughpoint.line2");
+        locationLine2.setVisible(false);
+        locationLine2.setLineWidth(2);
+        locationLine2.setColor(Color.red);
 
         Misc.runInABit(1000, this, "setScaleOnMarkers", null);
 
         viewManager.getMaster().addDisplayable(locationMarker);
         viewManager.getMaster().addDisplayable(locationLine);
+        viewManager.getMaster().addDisplayable(locationLine2);
 
         readout = new CursorReadoutWindow(viewManager);
 
@@ -1514,25 +1525,30 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 zoom = 0.1;
             }
 
+            LatLonPointImpl llp=null;
+            EarthLocation nextLocation=null;
             NavigatedDisplay navDisplay = viewManager.getNavigatedDisplay();
             double[]         xyz1            = { 0, 0, 0 };
             double[]         xyz2            = { 0, 0, 0 };
-            double[] xyz = navDisplay.getSpatialCoordinates(location, null);
-
+            double[]         xyz = navDisplay.getSpatialCoordinates(location, null);
 
             double           distancePerStep = 200 / zoom;
-            LatLonPointImpl llp =
-                Bearing.findPoint(new LatLonPointImpl(getLat(location),
-                    getLon(location)), heading, distancePerStep, null);
+            if(true || doGlobe) {
+                llp =
+                    Bearing.findPoint(new LatLonPointImpl(getLat(location),
+                                                          getLon(location)), heading, distancePerStep, null);
 
-            EarthLocation location2 = makePoint(llp.getLatitude(),
-                                          llp.getLongitude(), 0);
+                nextLocation = makePoint(llp.getLatitude(),
+                                         llp.getLongitude(), 0);
+            } else {
+
+            }
 
             if (takeStep) {
-                location = location2;
+                location = nextLocation;
                 llp = Bearing.findPoint(new LatLonPointImpl(getLat(location),
                         getLon(location)), heading, 100, null);
-                location2 = makePoint(llp.getLatitude(), llp.getLongitude(),
+                nextLocation = makePoint(llp.getLatitude(), llp.getLongitude(),
                                       0);
             }
 
@@ -1540,7 +1556,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
             xyz1 = navDisplay.getSpatialCoordinates(location, xyz1);
 
-            xyz2 = navDisplay.getSpatialCoordinates(location2, xyz2);
+            xyz2 = navDisplay.getSpatialCoordinates(nextLocation, xyz2);
 
             if ( !forward) {
                 //                System.err.println("before: " + xyz1[0]+"/" + xyz1[1] + "    " + xyz2[0]+"/" + xyz2[1]);
@@ -2401,6 +2417,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
             if (doGlobe) {
                 setPts(locationLine, 0, x1 * 2, 0, y1 * 2, 0, z1 * 2);
+                setPts(locationLine2, 0, x2 * 2, 0, y2 * 2, 0, z2 * 2);
             } else {
                 setPts(locationLine, x1, x1, y1, y1, 1, -1);
             }
@@ -2411,34 +2428,47 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                                              y1, z1 + 0.01 });
 
             if (xyz1[0] != xyz2[0]) {
-                VisADGeometryArray marker =
-                    ShapeUtility.setSize(
-                        ShapeUtility.createShape(ShapeUtility.AIRPLANE3D)[0],
-                        .1f);
+                Transform3D rotTransform;
+                VisADGeometryArray marker = (VisADGeometryArray)getMarker().clone();
+                double rotx = 0;
+                double roty = 0;
+                double rotz = 0;
+                rotz = -Math.toDegrees(Math.atan2(xyz2[1] - xyz1[1],
+                                                 xyz2[0] - xyz1[0]))+90;
+                
 
-                double rot1 = Math.toDegrees(Math.atan2(xyz2[1] - xyz1[1],
-                                  xyz2[0] - xyz1[0]));
-                //                System.err.println ("rot:" + rot1);
-                double[] markerM =
-                    navDisplay.getMouseBehavior().make_matrix(0, 0,
-                        -rot1 + 90, 1.0, 0.0, 0.0, 0.0);
+                if(doGlobe) {
+                    Vector3d upVector = new Vector3d(x1, y1, z1);
+                    rotTransform= new Transform3D();
+                    rotTransform.lookAt(new Point3d(x1, y1, z1),
+                                        new Point3d(x2, y2, z2),
+                                        upVector);
+                    rotTransform.invert();
+                    ShapeUtility.rotate(marker, rotTransform,(float)x1,(float)y1,(float)z1);
+                    //                    ShapeUtility.rotate(marker, rotTransform);
+                } else {
+                    double[] markerM =
+                        navDisplay.getMouseBehavior().make_matrix(rotx, roty, rotz, 1.0, 0.0, 0.0, 0.0);
+                    rotTransform = new Transform3D(markerM);
+                    ShapeUtility.rotate(marker, rotTransform);
+                }
 
-                Transform3D rotTransform = new Transform3D(markerM);
-                ShapeUtility.rotate(marker, rotTransform);
                 locationMarker.setPoint(markerLocation, marker);
             } else {
                 locationMarker.setPoint(markerLocation);
             }
 
             locationLine.setVisible(showLine);
+            locationLine2.setVisible(showLine);
             locationMarker.setVisible(showMarker);
 
 
 
+
+            /*
             DisplayRendererJ3D dr =
                 (DisplayRendererJ3D) navDisplay.getDisplay()
                     .getDisplayRenderer();
-            /*
               dr.setClip(0, true,
               parsef(cflds[0]),
               parsef(cflds[1]),
@@ -2451,11 +2481,12 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                           Point3d toPt  = new Point3d(x2,y2,z2);
                           t3.transform(toPt);*/
 
+            /*
             float  coeff = 1;
             double value = y1;
             dr.setClip(0, getClip(), 0.f, (float) coeff, 0.f,
                        (float) ((-coeff * (value + coeff * 0.01f))));
-
+            */
 
 
             if (false && (navDisplay instanceof MapProjectionDisplayJ3D)) {
@@ -2503,6 +2534,17 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
     }
 
+
+    private VisADGeometryArray marker;
+
+    public VisADGeometryArray getMarker() {
+        if(marker==null) {
+            marker = ShapeUtility.setSize(
+                                          ShapeUtility.createShape(ShapeUtility.AIRPLANE3D)[0],
+                                          .2f);
+        } 
+        return marker;
+    }
 
 
     /**
@@ -2877,6 +2919,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         if (locationLine != null) {
             try {
                 locationLine.setVisible(value);
+            } catch (Exception ignore) {}
+        }
+        if (locationLine2 != null) {
+            try {
+                locationLine2.setVisible(value);
             } catch (Exception ignore) {}
         }
     }
