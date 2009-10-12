@@ -63,7 +63,7 @@ import javax.swing.*;
 public class GeoUtils {
 
     /** Keep around the last address */
-    private static String lastAddress = "";
+    public static String lastAddress = "";
 
     /** list of addresses */
     private static List addresses = new ArrayList();
@@ -123,6 +123,7 @@ public class GeoUtils {
         return bounds;
     }
 
+
     /**
      * Get the location of an address.
      *
@@ -168,6 +169,7 @@ public class GeoUtils {
             if (address == null) {
                 return null;
             }
+            lastAddress = address;
             LatLonPoint llp = getLocationFromAddress(address, null);
             if (llp != null) {
                 return llp;

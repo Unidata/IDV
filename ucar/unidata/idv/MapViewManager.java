@@ -1159,6 +1159,7 @@ public class MapViewManager extends NavigatedViewManager {
                                   GuiUtils.left(getUseGlobeDisplay()
                     ? GuiUtils.filler()
                     : (JComponent) addressReprojectCbx));
+            System.out.println ("{" + GeoUtils.lastAddress+"}  -ll {" + llp.getLatitude()+","+llp.getLongitude()+"}");
             getIdvUIManager().showNormalCursor();
             if (llp == null) {
                 return;

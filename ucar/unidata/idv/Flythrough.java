@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -125,7 +126,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     public static final String ORIENT_POINT = "point";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ORIENT_FORWARD = "forward";
 
     /** _more_ */
@@ -141,16 +142,16 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     public static final String ORIENT_RIGHT = "right";
 
 
-    /** _more_          */
+    /** _more_ */
     private static final String DIR_FORWARD = "forward";
 
-    /** _more_          */
+    /** _more_ */
     private static final String DIR_BACK = "back";
 
-    /** _more_          */
+    /** _more_ */
     private static final String DIR_LEFT = "left";
 
-    /** _more_          */
+    /** _more_ */
     private static final String DIR_RIGHT = "right";
 
 
@@ -228,10 +229,10 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private double zoom = 1.0;
 
-    /** _more_          */
+    /** _more_ */
     private boolean lastMoveWasTrack = true;
 
-    /** _more_          */
+    /** _more_ */
     private boolean goToClick = false;
 
     /** _more_ */
@@ -328,12 +329,13 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private JFrame frame;
 
-    /** _more_          */
+    /** _more_ */
     private Point frameLocation;
 
     /** The line from the origin to the point */
     private LineDrawing locationLine;
 
+    /** _more_          */
     private LineDrawing locationLine2;
 
     /** _more_ */
@@ -361,35 +363,41 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private int currentIndex = 0;
 
-    /** _more_          */
+    /** _more_ */
     private EarthLocation location;
 
-    /** _more_          */
+    /** _more_ */
     private double heading = 0;
 
-    /** _more_          */
+    /** _more_ */
     private JLabel dashboardLbl;
 
-    /** _more_          */
+    /** _more_ */
     private Point dashboardImageOffset = new Point(0, 0);
 
-    /** _more_          */
+    /** _more_ */
     private Image rainIcon;
 
-
     /** _more_          */
+    private Image snowIcon;
+
+
+    /** _more_ */
     private Image dashboardImage;
 
-    /** _more_          */
+    /** _more_ */
     private double precipLevel = 0;
 
     /** _more_          */
+    private double temperature = Double.NaN;
+
+    /** _more_ */
     private String imageUrl;
 
-    /** _more_          */
+    /** _more_ */
     private String imageName;
 
-    /** _more_          */
+    /** _more_ */
     private Image backgroundImage;
 
     /**
@@ -451,7 +459,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         if ((locationMarker != null) && (viewManager != null)) {
             viewManager.getMaster().removeDisplayable(locationMarker);
             viewManager.getMaster().removeDisplayable(locationLine);
-            viewManager.getMaster().removeDisplayable(locationLine2);
+            //            viewManager.getMaster().removeDisplayable(locationLine2);
         }
 
 
@@ -717,7 +725,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /**
      * _more_
      *
-     * @throws Exception _more_
      *
      * @throws RemoteException _more_
      * @throws VisADException _more_
@@ -786,7 +793,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     public JComponent doMakeViewpointPanel()
             throws VisADException, RemoteException {
 
-        boolean doGlobe     = viewManager.getUseGlobeDisplay();
+
         JSlider speedSlider = new JSlider(1, 200, 200 - animationSpeed);
         speedSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -884,16 +891,17 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         locationLine.setColor(Color.green);
 
 
-        locationLine2 = new LineDrawing("flythroughpoint.line2");
-        locationLine2.setVisible(false);
-        locationLine2.setLineWidth(2);
-        locationLine2.setColor(Color.red);
+        //        locationLine2 = new LineDrawing("flythroughpoint.line2");
+        //        locationLine2.setVisible(false);
+        //        locationLine2.setLineWidth(2);
+        //        locationLine2.setColor(Color.red);
+        //        viewManager.getMaster().addDisplayable(locationLine2);
 
         Misc.runInABit(1000, this, "setScaleOnMarkers", null);
 
         viewManager.getMaster().addDisplayable(locationMarker);
         viewManager.getMaster().addDisplayable(locationLine);
-        viewManager.getMaster().addDisplayable(locationLine2);
+
 
         readout = new CursorReadoutWindow(viewManager);
 
@@ -950,7 +958,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             GuiUtils.centerRight(tiltSliders[1], tiltLabels[1]),
             GuiUtils.rLabel("Zoom:"), GuiUtils.left(zoomFld),
             GuiUtils.rLabel("Orientation:"),
-            GuiUtils.left(GuiUtils.hbox(orientBox, (doGlobe
+            GuiUtils.left(GuiUtils.hbox(orientBox, (doGlobe()
                     ? GuiUtils.filler()
                     : (JComponent) fixedZCbx))),
             //            GuiUtils.rLabel("Tilt Down/Up:"), GuiUtils.centerRight(tiltSliders[2],tiltLabels[2]),
@@ -1187,10 +1195,10 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
 
-    /** _more_          */
+    /** _more_ */
     private Object REPAINT_MUTEX = new Object();
 
-    /** _more_          */
+    /** _more_ */
     private int repaintCnt = 0;
 
     /**
@@ -1250,15 +1258,20 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 g.fillRect(0, 0, b.width, b.height);
             }
             if (rainIcon == null) {
+                snowIcon =
+                    GuiUtils.getImage("/auxdata/ui/icons/snowflake.gif",
+                                      getClass());
                 rainIcon = GuiUtils.getImage("/auxdata/ui/icons/drops.gif",
                                              getClass());
             }
+            Image icon = (((temperature == temperature) && (temperature < 0))
+                          ? snowIcon
+                          : rainIcon);
             for (int i = 0; i < precipLevel * 10; i++) {
-                int x = (int) (Math.random() * b.width)
-                        - rainIcon.getWidth(null);
+                int x = (int) (Math.random() * b.width) - icon.getWidth(null);
                 int y = (int) (Math.random() * b.height)
-                        - rainIcon.getHeight(null);
-                g.drawImage(rainIcon, x, y, null);
+                        - icon.getHeight(null);
+                g.drawImage(icon, x, y, null);
             }
             synchronized (REPAINT_MUTEX) {
                 repaintCnt++;
@@ -1275,22 +1288,22 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      */
     public class DriveButton extends JButton implements MouseListener {
 
-        /** _more_          */
+        /** _more_ */
         private int timestamp = 0;
 
-        /** _more_          */
+        /** _more_ */
         private String dir = DIR_FORWARD;
 
-        /** _more_          */
+        /** _more_ */
         private boolean mouseDown = false;
 
-        /** _more_          */
+        /** _more_ */
         long lastKeyClick = 0;
 
-        /** _more_          */
+        /** _more_ */
         Object KEY_MUTEX = new Object();
 
-        /** _more_          */
+        /** _more_ */
         boolean handlingKey = false;
 
         /**
@@ -1420,6 +1433,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      */
     public void displayChanged(DisplayEvent event)
             throws VisADException, RemoteException {
+        if ( !isActive()) {
+            return;
+        }
         int id = event.getId();
         if ((id == DisplayEvent.MOUSE_PRESSED) && goToClick) {
 
@@ -1512,61 +1528,68 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     public void doDrive(boolean takeStep, double heading, boolean forward) {
         lastMoveWasTrack = false;
         try {
-            boolean doGlobe = viewManager.getUseGlobeDisplay();
+            NavigatedDisplay navDisplay = viewManager.getNavigatedDisplay();
             if (location == null) {
                 if (points.size() > 0) {
                     location = points.get(0).getEarthLocation();
                 } else {
-                    location = makePoint(0, 0, 0);
+                    if (doGlobe()) {
+                        location = makePoint(40, -100, 0);
+                    } else {
+                        location = navDisplay.getEarthLocation(
+                            navDisplay.getScreenCenter());
+                    }
                 }
             }
-            double zoom = getZoom();
-            if (zoom == 0) {
-                zoom = 0.1;
+
+            double          zoom         = navDisplay.getScale();
+            LatLonPointImpl llp          = null;
+            EarthLocation   nextLocation = null;
+            double[]        xyz1         = { 0, 0, 0 };
+            double[]        xyz2         = { 0, 0, 0 };
+            double[]        xyz          = getXYZ(location);
+
+            EarthLocation sll =
+                navDisplay.getEarthLocation(navDisplay.getScreenUpperLeft());
+            EarthLocation slr =
+                navDisplay.getEarthLocation(navDisplay.getScreenLowerRight());
+            Bearing bearing =
+                Bearing.calculateBearing(new LatLonPointImpl(getLat(sll),
+                                                             getLon(sll)), new LatLonPointImpl(getLat(slr),
+                                                                                               getLon(slr)), null);
+            double distance        = bearing.getDistance();
+            double distancePerStep = distance / 30;
+            if (distancePerStep != distancePerStep) {
+                distancePerStep = 100;
             }
 
-            LatLonPointImpl llp=null;
-            EarthLocation nextLocation=null;
-            NavigatedDisplay navDisplay = viewManager.getNavigatedDisplay();
-            double[]         xyz1            = { 0, 0, 0 };
-            double[]         xyz2            = { 0, 0, 0 };
-            double[]         xyz = navDisplay.getSpatialCoordinates(location, null);
 
-            double           distancePerStep = 200 / zoom;
-            if(true || doGlobe) {
-                llp =
-                    Bearing.findPoint(new LatLonPointImpl(getLat(location),
-                                                          getLon(location)), heading, distancePerStep, null);
+            if (true || doGlobe()) {
+                llp = Bearing.findPoint(new LatLonPointImpl(getLat(location),
+                        getLon(location)), heading, distancePerStep, null);
 
                 nextLocation = makePoint(llp.getLatitude(),
                                          llp.getLongitude(), 0);
-            } else {
-
-            }
+            } else {}
 
             if (takeStep) {
                 location = nextLocation;
                 llp = Bearing.findPoint(new LatLonPointImpl(getLat(location),
                         getLon(location)), heading, 100, null);
-                nextLocation = makePoint(llp.getLatitude(), llp.getLongitude(),
-                                      0);
+                nextLocation = makePoint(llp.getLatitude(),
+                                         llp.getLongitude(), 0);
             }
 
 
 
-            xyz1 = navDisplay.getSpatialCoordinates(location, xyz1);
+            //            System.err.println (location +" " + nextLocation);
 
-            xyz2 = navDisplay.getSpatialCoordinates(nextLocation, xyz2);
-
+            xyz1 = getXYZ(location);
+            xyz2 = getXYZ(nextLocation);
             if ( !forward) {
-                //                System.err.println("before: " + xyz1[0]+"/" + xyz1[1] + "    " + xyz2[0]+"/" + xyz2[1]);
                 double[] xyz3 = { xyz1[0] - (xyz2[0] - xyz1[0]),
                                   xyz1[1] - (xyz2[1] - xyz1[1]),
                                   xyz1[2] - (xyz2[2] - xyz1[2]) };
-                //                System.err.println("xyz3: " + xyz3[0]+"/" + xyz3[1]);
-                //                xyz2 = xyz1;
-                //                xyz1 = xyz3;
-
                 xyz1 = xyz1;
                 xyz2 = xyz3;
                 location = navDisplay.getEarthLocation(xyz1[0], xyz1[1],
@@ -1574,7 +1597,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             }
 
 
-            goTo(new FlythroughPoint(location), xyz1, xyz2);
+            goTo(new FlythroughPoint(location), xyz1, xyz2, null, false);
         } catch (Exception exc) {
             logException("Driving", exc);
         }
@@ -2189,7 +2212,30 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      * @return _more_
      */
     public boolean isActive() {
-        return viewManager != null;
+        if ((frame == null) || (viewManager == null)) {
+            return false;
+        }
+        return frame.isShowing();
+    }
+
+    /**
+     * _more_
+     *
+     * @param el _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    private double[] getXYZ(EarthLocation el)
+            throws VisADException, RemoteException {
+        NavigatedDisplay navDisplay = viewManager.getNavigatedDisplay();
+        double           alt = el.getAltitude().getValue(CommonUnit.meter);
+        if (doGlobe() && (alt == 0)) {
+            alt = 100;
+        }
+        return navDisplay.getSpatialCoordinates(el, null, alt);
     }
 
 
@@ -2211,12 +2257,13 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             return;
         }
 
-        List<FlythroughPoint> thePoints  = this.points;
+        List<FlythroughPoint> thePoints   = this.points;
 
-        NavigatedDisplay      navDisplay = viewManager.getNavigatedDisplay();
+        NavigatedDisplay      navDisplay  = viewManager.getNavigatedDisplay();
 
-        double[]              xyz1       = { 0, 0, 0 };
-        double[]              xyz2       = { 0, 0, 0 };
+        double[]              xyz1        = { 0, 0, 0 };
+        double[]              xyz2        = { 0, 0, 0 };
+        double[]              actualPoint = { 0, 0, 0 };
 
 
         if (index >= thePoints.size()) {
@@ -2240,19 +2287,19 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         FlythroughPoint pt1 = thePoints.get(index1);
         FlythroughPoint pt2 = thePoints.get(index2);
 
-        xyz1 = navDisplay.getSpatialCoordinates(pt1.getEarthLocation(), xyz1);
-        xyz2 = navDisplay.getSpatialCoordinates(pt2.getEarthLocation(), xyz2);
+        xyz1        = getXYZ(pt1.getEarthLocation());
+        xyz2        = getXYZ(pt2.getEarthLocation());
+        actualPoint = xyz2;
 
         if (orientation.equals(ORIENT_FORWARD)) {
             //Average the next N points
             int      ptCnt = 0;
             double[] sum   = { 0, 0, 0 };
             double[] tmp   = { 0, 0, 0 };
-            int      max   = thePoints.size() / 10;
+            int      max   = 10;
             for (int ptIdx = index2;
                     (ptIdx < thePoints.size()) && (ptCnt < max); ptIdx++) {
-                tmp = navDisplay.getSpatialCoordinates(
-                    thePoints.get(ptIdx).getEarthLocation(), tmp);
+                tmp = getXYZ(thePoints.get(ptIdx).getEarthLocation());
                 if ((tmp[0] != tmp[0]) || (tmp[1] != tmp[1])
                         || (tmp[2] != tmp[2])) {
                     continue;
@@ -2263,9 +2310,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 sum[1] += tmp[1];
                 sum[2] += tmp[2];
             }
-            xyz2[0] = sum[0] / ptCnt;
-            xyz2[1] = sum[1] / ptCnt;
-            xyz2[2] = sum[2] / ptCnt;
+            xyz2 = new double[] { sum[0] / ptCnt, sum[1] / ptCnt,
+                                  sum[2] / ptCnt };
         }
 
 
@@ -2279,16 +2325,14 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         if (atEnd && (thePoints.size() > 1) && (index1 > 0)) {
             FlythroughPoint prevPt = thePoints.get(index1 - 1);
 
-            double[] xyz3 =
-                navDisplay.getSpatialCoordinates(prevPt.getEarthLocation(),
-                    null);
-            xyz2[0] = x1 + (x1 - xyz3[0]);
-            xyz2[1] = y1 + (y1 - xyz3[1]);
-            xyz2[2] = z1 + (z1 - xyz3[2]);
+            double[]        xyz3   = getXYZ(prevPt.getEarthLocation());
+            xyz2 = new double[] { x1 + (x1 - xyz3[0]), y1 + (y1 - xyz3[1]),
+                                  z1 + (z1 - xyz3[2]) };
+            actualPoint = xyz2;
         }
 
 
-        goTo(pt1, xyz1, xyz2);
+        goTo(pt1, xyz1, xyz2, actualPoint, getAnimate());
     }
 
 
@@ -2298,15 +2342,19 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      * @param pt1 _more_
      * @param xyz1 _more_
      * @param xyz2 _more_
+     * @param actualPoint _more_
      */
-    protected void goTo(FlythroughPoint pt1, double[] xyz1, double[] xyz2) {
+    protected void goTo(FlythroughPoint pt1, double[] xyz1, double[] xyz2,
+                        double[] actualPoint, boolean animateMove) {
 
+        if (actualPoint == null) {
+            actualPoint = xyz2;
+        }
         NavigatedDisplay navDisplay    = viewManager.getNavigatedDisplay();
         MouseBehavior    mouseBehavior = navDisplay.getMouseBehavior();
         double[]         currentMatrix = navDisplay.getProjectionMatrix();
         double[]         aspect        = navDisplay.getDisplayAspect();
         try {
-            boolean doGlobe = viewManager.getUseGlobeDisplay();
 
             if (htmlView != null) {
                 if (pt1.getDescription() != null) {
@@ -2379,7 +2427,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 }
 
                 Vector3d upVector;
-                if (doGlobe) {
+                if (doGlobe()) {
                     upVector = new Vector3d(x1, y1, z1);
                 } else {
                     upVector = new Vector3d(0, 0, 1);
@@ -2387,7 +2435,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
                 //Keep flat in z for non globe
                 t.lookAt(new Point3d(x1, y1, z1),
-                         new Point3d(x2, y2, (( !getUseFixedZ() || doGlobe)
+                         new Point3d(x2, y2, (( !getUseFixedZ() || doGlobe())
                         ? z2
                         : z1)), upVector);
 
@@ -2415,9 +2463,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             currentPoint = pt1;
             location     = currentPoint.getEarthLocation();
 
-            if (doGlobe) {
+            if (doGlobe()) {
                 setPts(locationLine, 0, x1 * 2, 0, y1 * 2, 0, z1 * 2);
-                setPts(locationLine2, 0, x2 * 2, 0, y2 * 2, 0, z2 * 2);
+                //                setPts(locationLine2, 0, x2 * 2, 0, y2 * 2, 0, z2 * 2);
             } else {
                 setPts(locationLine, x1, x1, y1, y1, 1, -1);
             }
@@ -2425,30 +2473,36 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             RealTuple markerLocation =
                 new RealTuple(RealTupleType.SpatialCartesian3DTuple,
                               new double[] { x1,
-                                             y1, z1 + 0.01 });
+                                             y1, z1 });
 
             if (xyz1[0] != xyz2[0]) {
                 Transform3D rotTransform;
-                VisADGeometryArray marker = (VisADGeometryArray)getMarker().clone();
+                VisADGeometryArray marker =
+                    (VisADGeometryArray) getMarker().clone();
                 double rotx = 0;
                 double roty = 0;
                 double rotz = 0;
-                rotz = -Math.toDegrees(Math.atan2(xyz2[1] - xyz1[1],
-                                                 xyz2[0] - xyz1[0]))+90;
-                
+                rotz = -Math.toDegrees(Math.atan2(actualPoint[1] - xyz1[1],
+                        actualPoint[0] - xyz1[0])) + 90;
 
-                if(doGlobe) {
+
+                if (doGlobe()) {
                     Vector3d upVector = new Vector3d(x1, y1, z1);
-                    rotTransform= new Transform3D();
+                    rotTransform = new Transform3D();
                     rotTransform.lookAt(new Point3d(x1, y1, z1),
-                                        new Point3d(x2, y2, z2),
-                                        upVector);
+                                        new Point3d(x2, y2, z2), upVector);
+                    Matrix3d m3d = new Matrix3d();
+                    rotTransform.get(m3d);
+                    rotTransform = new Transform3D(m3d,
+                            new Vector3d(0, 0, 0), 1);
                     rotTransform.invert();
-                    ShapeUtility.rotate(marker, rotTransform,(float)x1,(float)y1,(float)z1);
-                    //                    ShapeUtility.rotate(marker, rotTransform);
+                    //                    ShapeUtility.rotate(marker, rotTransform,(float)x1,(float)y1,(float)z1);
+                    ShapeUtility.rotate(marker, rotTransform);
+
                 } else {
                     double[] markerM =
-                        navDisplay.getMouseBehavior().make_matrix(rotx, roty, rotz, 1.0, 0.0, 0.0, 0.0);
+                        navDisplay.getMouseBehavior().make_matrix(rotx, roty,
+                            rotz, 1.0, 0.0, 0.0, 0.0);
                     rotTransform = new Transform3D(markerM);
                     ShapeUtility.rotate(marker, rotTransform);
                 }
@@ -2459,7 +2513,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             }
 
             locationLine.setVisible(showLine);
-            locationLine2.setVisible(showLine);
+            //            locationLine2.setVisible(showLine);
             locationMarker.setVisible(showMarker);
 
 
@@ -2475,11 +2529,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
               parsef(cflds[2]),
               parsef(cflds[3]));*/
 
-
-            /*            Transform3D t3 = new Transform3D();
-                          t3.rotX(Math.toRadians(90));
-                          Point3d toPt  = new Point3d(x2,y2,z2);
-                          t3.transform(toPt);*/
 
             /*
             float  coeff = 1;
@@ -2508,7 +2557,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
             if (changeViewpointCbx.isSelected()) {
-                if (getAnimate()) {
+                if (animateMove) {
                     navDisplay.animateMatrix(m, animationSpeed);
                 } else {
                     navDisplay.setProjectionMatrix(m);
@@ -2535,14 +2584,38 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     }
 
 
+    /** _more_          */
     private VisADGeometryArray marker;
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean doGlobe() {
+        if (viewManager != null) {
+            return viewManager.getUseGlobeDisplay();
+        }
+        return false;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public VisADGeometryArray getMarker() {
-        if(marker==null) {
-            marker = ShapeUtility.setSize(
-                                          ShapeUtility.createShape(ShapeUtility.AIRPLANE3D)[0],
-                                          .2f);
-        } 
+        if (marker == null) {
+            if (doGlobe()) {
+                marker = ShapeUtility.setSize(
+                    ShapeUtility.createShape(ShapeUtility.CROSS)[0], .1f);
+            } else {
+                marker = ShapeUtility.setSize(
+                    ShapeUtility.createShape(ShapeUtility.AIRPLANE3D)[0],
+                    .1f);
+            }
+        }
         return marker;
     }
 
@@ -2581,7 +2654,12 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      *
      * @throws Exception _more_
      */
+
     protected void processReadout(FlythroughPoint pt1) throws Exception {
+
+        if ((readoutLabel == null) || (pt1 == null)) {
+            return;
+        }
 
         List<ReadoutInfo> samples = new ArrayList<ReadoutInfo>();
         readoutLabel.setText(readout.getReadout(pt1.getEarthLocation(),
@@ -2594,6 +2672,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         String newImageUrl = null;
         imageName   = "";
         precipLevel = 0;
+        temperature = Double.NaN;
 
         List comps  = new ArrayList();
         List labels = new ArrayList();
@@ -2616,9 +2695,12 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             if (unit != null) {
                 unitSuffix = " [" + unit + "]";
             }
-            if ((name.toLowerCase().indexOf("precipitation") >= 0)
-                    && Unit.canConvert(unit, CommonUnits.MM)) {
+            if (((name.toLowerCase().indexOf("precipitation") >= 0)
+                    || (name.toLowerCase().indexOf("rain")
+                        >= 0)) && Unit.canConvert(unit, CommonUnits.MM)) {
                 precipLevel = r.getValue(CommonUnits.MM);
+            } else if (Unit.canConvert(unit, CommonUnits.CELSIUS)) {
+                temperature = r.getValue(CommonUnits.CELSIUS);
             }
 
 
@@ -2723,6 +2805,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             }
         }
         dashboardLbl.repaint();
+
 
     }
 

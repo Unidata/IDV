@@ -2014,6 +2014,9 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     }
 
 
+
+
+
     /**
      * Change point of view of a 3D VisAD display, using input angles
      * (unit = degree): For example, a view from the
