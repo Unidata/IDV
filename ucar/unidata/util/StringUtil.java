@@ -1691,29 +1691,32 @@ public class StringUtil {
      */
     public static String replaceDate(String s, String macroName, Date date,
                                      String macroPrefix, String macroSuffix) {
-        int idx1 = s.indexOf(macroPrefix + macroName);
-        if (idx1 < 0) {
-            return s;
-        }
 
-        int idx2 = s.indexOf(macroSuffix, idx1);
-        if (idx2 < 0) {
-            return s;
-        }
+        while(true) {
+            int idx1 = s.indexOf(macroPrefix + macroName);
+            if (idx1 < 0) {
+                return s;
+            }
 
-        String   fullMacro = s.substring(idx1 + macroPrefix.length(), idx2);
-        String[] toks      = StringUtil.split(fullMacro, ":", 2);
+            int idx2 = s.indexOf(macroSuffix, idx1);
+            if (idx2 < 0) {
+                return s;
+            }
 
-        if ((toks == null) || (toks.length != 2)) {
-            throw new IllegalArgumentException("Could not find date format:"
-                    + s);
+            String   fullMacro = s.substring(idx1 + macroPrefix.length(), idx2);
+            String[] toks      = StringUtil.split(fullMacro, ":", 2);
+
+            if ((toks == null) || (toks.length != 2)) {
+                throw new IllegalArgumentException("Could not find date format:"
+                                                   + s);
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat(toks[1]);
+            sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+            String formattedDate = sdf.format(date);
+            s = s.replace(macroPrefix + fullMacro + macroSuffix, formattedDate);
+            //        System.err.println(s);
         }
-        SimpleDateFormat sdf = new SimpleDateFormat(toks[1]);
-        sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
-        String formattedDate = sdf.format(date);
-        s = s.replace(macroPrefix + fullMacro + macroSuffix, formattedDate);
-        //        System.err.println(s);
-        return s;
+        //        return s;
     }
 
 
