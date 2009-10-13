@@ -191,7 +191,9 @@ public class KmlGroundOverlay extends KmlImageElement {
         }
         Trace.call1("makeField");
         try {
-            FieldImpl xyData = DataUtility.makeField(image);
+            //            FieldImpl xyData = DataUtility.makeField(image);
+            //Threshold alpha at 127
+            FieldImpl xyData = ucar.visad.Util.makeField(image,127f);
             Trace.call2("makeField");
             Linear2DSet domain = (Linear2DSet) xyData.getDomainSet();
             Linear2DSet imageDomain =
