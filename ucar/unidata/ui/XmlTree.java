@@ -1032,7 +1032,7 @@ public class XmlTree extends JTree {
      * @param node The node
      * @param href The href to the xml doc
      */
-    protected void expandXlink(XlinkTreeNode node, String href) {
+    protected void expandXlink(final XlinkTreeNode node, String href) {
         try {
             href = expandRelativeUrl(href);
             Document document = readXlinkXml(href);
