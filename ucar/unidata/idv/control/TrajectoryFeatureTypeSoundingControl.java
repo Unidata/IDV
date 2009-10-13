@@ -238,7 +238,7 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
             TrajectoryFeatureTypeAdapter          cta   = adapters.get(i);
             List<CosmicTrajectoryFeatureTypeInfo> infos = cta.getTrackInfos();
             CosmicTrajectoryFeatureTypeInfo       cfti  = infos.get(0);
-            Data[] sddata = cfti.getAerologicalDiagramDataArrayNoWind();
+            Data[] sddata = cfti.getAerologicalDiagramDataArray();
             dataList.add(sddata);
             NamedLocationTuple s = cfti.getLatLonPoint();
             latLons[i]    = s.getLatLonPoint();
