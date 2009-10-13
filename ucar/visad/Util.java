@@ -2731,6 +2731,27 @@ public final class Util {
                                       boolean makeNansForAnyAlpha)
             throws IOException, VisADException {
 
+        return makeField(image, (makeNansForAnyAlpha?0f:-1f));
+    }
+
+
+
+    /**
+     * Create a VisAD Data object from the given Image
+     * @param  image   image to use
+     * @param  alphaThreshold If there is an alpha channel in the image then set the field value to nan
+     * for any alhpa greater than the given threshold. Do nothing if threshold<0
+     *   value and we turn the other values into nan-s
+     * @return a FlatField representation of the image
+     *
+     * @throws IOException  problem reading the image
+     * @throws VisADException problem creating the FlatField
+     */
+
+    public static FlatField makeField(Image image,
+                                      float alphaThreshold)
+            throws IOException, VisADException {
+
         if (image == null) {
             throw new VisADException("image cannot be null");
         }
@@ -2780,7 +2801,7 @@ public final class Util {
             blue_pix[i]  = cm.getBlue(words[i]);
         }
         boolean opaque = true;
-        if (makeNansForAnyAlpha) {
+        if (alphaThreshold>=0) {
             float   alpha_pix;
             boolean hasAlpha = cm.hasAlpha();
             for (int i = 0; i < numPixels; i++) {
@@ -2789,7 +2810,7 @@ public final class Util {
                 } else {
                     alpha_pix = 255.0f;
                 }
-                if (alpha_pix != 255.0f) {
+                if (alpha_pix <alphaThreshold) {
                     red_pix[i]   = Float.NaN;
                     green_pix[i] = Float.NaN;
                     blue_pix[i]  = Float.NaN;
