@@ -67,6 +67,7 @@ import java.io.File;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
@@ -243,7 +244,11 @@ public class ThreddsHandler extends XmlHandler {
     }
 
     private Hashtable<String,ImageIcon> thumbnails = new Hashtable();
+
+    private HashSet pendingImageUrls = new HashSet();
+
     private ImageIcon remoteIcon;
+
     private ImageIcon datasetIcon;
 
     /**
@@ -255,8 +260,7 @@ public class ThreddsHandler extends XmlHandler {
         showThumbsCbx = new JCheckBox("Show Thumbnail Images",true);
         showThumbsCbx.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
-                    tree.updateUI();
-                    tree.repaint();
+                    updateTree();
                 }
             });
         double version = CatalogUtil.getVersion(root);
@@ -291,23 +295,22 @@ public class ThreddsHandler extends XmlHandler {
                     String []  ids;
                     if(showThumbsCbx.isSelected()) ids = new String[]{"thumbnail","icon"};
                     else ids = new String[]{"icon"};
-
                     for(String id:ids) {
                         for (Element propertyNode : (List<Element>) propertyNodes) {
                             String name = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_NAME,"");
                             if(name.equals(id)) {
-                                String value = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_VALUE,"");
-                                ImageIcon icon = thumbnails.get(value);
+                                String imageUrl = XmlUtil.getAttribute(propertyNode,CatalogUtil.ATTR_VALUE,"");
+                                ImageIcon icon = thumbnails.get(imageUrl);
                                 if(icon == null) {
-                                    Image image = ImageUtils.readImage(value);
-                                    if(id.equals("thumbnail"))  {
-                                        image = ImageUtils.resize(image, 100,-1);
-                                        ImageUtils.waitOnImage(image);
+                                    //Only fetch it once
+                                    if(!pendingImageUrls.contains(imageUrl)) {
+                                        pendingImageUrls.add(imageUrl);
+                                        Misc.run(ThreddsHandler.this,"fetchImages",new String[]{id,imageUrl});
                                     }
-                                    icon = new ImageIcon(image);
-                                    thumbnails.put(value,icon);
+                                    return super.getIconForNode(node);
+                                } else {
+                                    return icon;
                                 }
-                                return icon;
                             }
                         }
                     }            
@@ -342,7 +345,8 @@ public class ThreddsHandler extends XmlHandler {
                 //Else (e.g., wms) show a new xml xhooser ui
                 chooser.makeUi(doc, doc.getDocumentElement(), href);
                 return null;
-            }
+                }
+
 
             /**
              * Import the children of the top level data set node
@@ -494,6 +498,42 @@ public class ThreddsHandler extends XmlHandler {
 
 
 
+    /**
+     * update the tree in the swing thread
+     */
+    private void updateTree() {
+        GuiUtils.invokeInSwingThread(new Runnable() {
+                public void run() {
+                    try {
+                        tree.updateUI();
+                        tree.repaint();
+                    } catch(Exception exc) {
+                        exc.printStackTrace();
+                    }
+                }});
+    }
+
+
+
+    /**
+     * Fetch the image url and update the tree.
+     * The tuple contains a pair [id, imageUrl] where id is either icon or thumbnail
+     *
+     * @param tuple id and url
+     */
+    public void fetchImages(String[] tuple) {
+        String id = tuple[0];
+        String imageUrl = tuple[1];
+        Image image = ImageUtils.readImage(imageUrl);
+        if(id.equals("thumbnail"))  {
+            image = ImageUtils.resize(image, 100,-1);
+            ImageUtils.waitOnImage(image);
+        }
+        ImageIcon icon = new ImageIcon(image);
+        thumbnails.put(imageUrl,icon);
+        pendingImageUrls.remove(imageUrl);
+        updateTree();
+    }
 
 
 
