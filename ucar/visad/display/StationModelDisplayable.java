@@ -780,7 +780,7 @@ public class StationModelDisplayable extends DisplayableData {
             kmzZos  = null;
             kmzFile = null;
         }
-        return writingKmz;
+        return true;
     }
 
 
