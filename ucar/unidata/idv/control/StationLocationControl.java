@@ -30,6 +30,8 @@ import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.Bearing;
 
 import ucar.unidata.gis.SpatialGrid;
@@ -319,6 +321,63 @@ public class StationLocationControl extends StationModelControl {
      */
     protected boolean isChartEnabled() {
         return false;
+    }
+
+
+
+    private boolean checkedCursorReadout = false;
+    private boolean doCursorReadout = false;
+
+    protected List getCursorReadoutInner(EarthLocation el,
+                                         Real animationValue,
+                                         int animationStep,
+                                         List<ReadoutInfo> samples)
+            throws Exception {
+        if(!checkedCursorReadout) {
+            List    stations   = getStationList();
+            if(stations.size()==0) return null;
+            NamedStationImpl tmp= (NamedStationImpl)stations.get(0);
+            Hashtable          properties = tmp.getProperties();
+            if(properties.get("imageurl")!=null) {
+                doCursorReadout = true;
+            }
+            checkedCursorReadout = true;
+        }
+
+        if(!doCursorReadout)return null;
+        List    stations   = getStationList();
+        NamedStationImpl closest= null;
+        double minDistance = 0;
+        LatLonPointImpl llp = new LatLonPointImpl(el.getLatitude().getValue(CommonUnit.degree), 
+                                                  el.getLongitude().getValue(CommonUnit.degree));
+        for (Iterator iter = stations.iterator(); iter.hasNext(); ) {
+            NamedStationImpl station = (NamedStationImpl) iter.next();
+            EarthLocation el2 = station.getEarthLocation();
+            LatLonPointImpl llp2 = new LatLonPointImpl(el2.getLatitude().getValue(CommonUnit.degree), 
+                                                       el2.getLongitude().getValue(CommonUnit.degree));
+            Bearing bearing =
+                Bearing.calculateBearing(llp,
+                                         llp2,
+                                         null);
+
+            double distance     = bearing.getDistance();
+            if(closest==null || distance<minDistance) {
+                minDistance = distance;
+                closest = station;
+            } 
+        }
+
+        if(closest!=null) {
+            Hashtable          properties = closest.getProperties();
+            String url  = (String) properties.get("imageurl");
+            if(url!=null) {
+                ReadoutInfo info = new ReadoutInfo(this,null,closest.getEarthLocation(),null);
+                info.setImageUrl(url);
+                info.setImageName(closest.getName());
+                samples.add(info);
+            }
+        }
+        return null;
     }
 
 

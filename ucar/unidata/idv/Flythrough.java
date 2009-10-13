@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -98,8 +99,10 @@ import java.rmi.RemoteException;
 
 import java.text.SimpleDateFormat;
 
+
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
@@ -335,7 +338,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** The line from the origin to the point */
     private LineDrawing locationLine;
 
-    /** _more_          */
+    /** _more_ */
     private LineDrawing locationLine2;
 
     /** _more_ */
@@ -378,26 +381,32 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private Image rainIcon;
 
-    /** _more_          */
+    /** _more_ */
     private Image snowIcon;
 
 
     /** _more_ */
     private Image dashboardImage;
 
+    /** _more_          */
     private ReadoutInfo imageReadout;
 
-    private String imageUrl;
-
-    /** _more_ */
-    private double precipLevel = 0;
-
     /** _more_          */
-    private double temperature = Double.NaN;
+    private String imageUrl;
 
 
     /** _more_ */
     private Image backgroundImage;
+
+    /** _more_          */
+    private HashSet fetchedImages = new HashSet();
+
+
+    /** _more_ */
+    private double precipLevel = 0;
+
+    /** _more_ */
+    private double temperature = Double.NaN;
 
     /**
      * _more_
@@ -1155,8 +1164,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
         JTabbedPane readoutTab = new JTabbedPane();
 
-        dashboardImage = GuiUtils.getImage("/auxdata/ui/icons/cockpit.gif",getClass(), false);
-        dashboardLbl   = new JLabel(new ImageIcon(dashboardImage)) {
+        dashboardImage = GuiUtils.getImage("/auxdata/ui/icons/cockpit.gif",
+                                           getClass(), false);
+        dashboardLbl = new JLabel(new ImageIcon(dashboardImage)) {
             public void paint(Graphics g) {
                 paintDashboard(g, dashboardLbl);
                 super.paint(g);
@@ -1231,19 +1241,19 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      */
     public void paintDashboard(Graphics g, JComponent comp) {
         Graphics2D g2 = (Graphics2D) g;
-        Rectangle b = comp.getBounds();
+        Rectangle  b  = comp.getBounds();
         g.setColor(Color.white);
         g.fillRect(0, 0, b.width, b.height);
         Image image = backgroundImage;
         if (image != null) {
             int imageHeight = image.getHeight(null);
             int imageWidth  = image.getWidth(this);
-            
+
 
             if (imageHeight > 0) {
-                double scale = b.width/(double)imageWidth;
+                double          scale        = b.width / (double) imageWidth;
                 AffineTransform oldTransform = g2.getTransform();
-                g2.scale(scale,scale);
+                g2.scale(scale, scale);
                 g.drawImage(image, 0, dashboardImageOffset.y, null);
                 g2.setTransform(oldTransform);
             } else {
@@ -1251,7 +1261,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             }
 
             g.setColor(Color.black);
-            if(imageReadout.getImageName()!=null) {
+            if (imageReadout.getImageName() != null) {
                 g.drawString(imageReadout.getImageName(), 10, 20);
             }
         }
@@ -1444,15 +1454,16 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         }
         int id = event.getId();
         if ((id == DisplayEvent.MOUSE_PRESSED) && goToClick) {
-
             InputEvent inputEvent = event.getInputEvent();
-            int        mods       = inputEvent.getModifiers();
-            if ((mods & InputEvent.BUTTON1_MASK) != 0) {
-                NavigatedDisplay navDisplay =
-                    viewManager.getNavigatedDisplay();
-                location = navDisplay.screenToEarthLocation(event.getX(),
-                        event.getY());
-                doDrive(false, heading);
+            if ( !inputEvent.isShiftDown() && !inputEvent.isControlDown()) {
+                int mods = inputEvent.getModifiers();
+                if ((mods & InputEvent.BUTTON1_MASK) != 0) {
+                    NavigatedDisplay navDisplay =
+                        viewManager.getNavigatedDisplay();
+                    location = navDisplay.screenToEarthLocation(event.getX(),
+                            event.getY());
+                    doDrive(false, heading);
+                }
             }
         }
     }
@@ -1561,8 +1572,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 navDisplay.getEarthLocation(navDisplay.getScreenLowerRight());
             Bearing bearing =
                 Bearing.calculateBearing(new LatLonPointImpl(getLat(sll),
-                                                             getLon(sll)), new LatLonPointImpl(getLat(slr),
-                                                                                               getLon(slr)), null);
+                    getLon(sll)), new LatLonPointImpl(getLat(slr),
+                        getLon(slr)), null);
             double distance        = bearing.getDistance();
             double distancePerStep = distance / 30;
             if (distancePerStep != distancePerStep) {
@@ -2349,6 +2360,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      * @param xyz1 _more_
      * @param xyz2 _more_
      * @param actualPoint _more_
+     * @param animateMove _more_
      */
     protected void goTo(FlythroughPoint pt1, double[] xyz1, double[] xyz2,
                         double[] actualPoint, boolean animateMove) {
@@ -2590,7 +2602,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     }
 
 
-    /** _more_          */
+    /** _more_ */
     private VisADGeometryArray marker;
 
     /**
@@ -2676,16 +2688,16 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         }
 
         String newImageUrl = null;
-        
-        precipLevel = 0;
-        temperature = Double.NaN;
+
+        precipLevel  = 0;
+        temperature  = Double.NaN;
         imageReadout = null;
 
         List comps  = new ArrayList();
         List labels = new ArrayList();
         for (ReadoutInfo info : samples) {
             if (info.getImageUrl() != null) {
-                newImageUrl = info.getImageUrl();
+                newImageUrl  = info.getImageUrl();
                 imageReadout = info;
             }
             Real r = info.getReal();
@@ -2803,16 +2815,33 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         if ( !Misc.equals(newImageUrl, imageUrl)) {
             imageUrl = newImageUrl;
             if (imageUrl != null) {
-                backgroundImage = GuiUtils.getImage(imageUrl, getClass());
-                if (backgroundImage != null) {
-                    backgroundImage.getWidth(this);
+                if ( !fetchedImages.contains(imageUrl)) {
+                    fetchedImages.add(imageUrl);
+                    Misc.run(this, "fetchBackgroundImage", imageUrl);
                 }
             } else {
                 backgroundImage = null;
             }
         }
         dashboardLbl.repaint();
+    }
 
+
+
+    /**
+     * _more_
+     *
+     * @param url _more_
+     */
+    public void fetchBackgroundImage(String url) {
+        Image image = GuiUtils.getImage(imageUrl, getClass());
+        if (image != null) {
+            image.getWidth(this);
+            if (Misc.equals(url, imageUrl)) {
+                backgroundImage = image;
+                dashboardLbl.repaint();
+            }
+        }
 
     }
 

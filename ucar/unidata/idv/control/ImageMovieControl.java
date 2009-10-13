@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -28,6 +29,8 @@ import org.w3c.dom.NodeList;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.geoloc.Bearing;
+import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.ProjectionRect;
 
 
@@ -36,8 +39,6 @@ import ucar.unidata.gis.mcidasmap.McidasMap;
 
 
 import ucar.unidata.idv.IdvResourceManager;
-import ucar.unidata.geoloc.LatLonPointImpl;
-import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.ui.ImagePanel;
 import ucar.unidata.ui.ImageUtils;
@@ -85,7 +86,7 @@ import java.awt.image.*;
 
 import java.beans.*;
 
-import java.io.File;
+import java.io.*;
 
 import java.net.URL;
 
@@ -94,6 +95,7 @@ import java.rmi.RemoteException;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -114,7 +116,7 @@ import javax.swing.*;
  */
 public class ImageMovieControl extends DisplayControlImpl {
 
-//wbug api: A6357478562
+    //wbug api: A6357478562
 
     /** Xml tag name */
     public static final String TAG_IMAGESET = "imageset";
@@ -244,20 +246,26 @@ public class ImageMovieControl extends DisplayControlImpl {
     private List times;
 
     /** Maps imageset id to  station for the station map */
-    private Hashtable<String,NamedStationImpl> idToStation = new Hashtable<String,NamedStationImpl>();
+    private Hashtable<String, NamedStationImpl> idToStation =
+        new Hashtable<String, NamedStationImpl>();
 
     /** Maps station map to xml element from the imagesets xml */
-    private Hashtable<NamedStationImpl,Element> stationToElement = new Hashtable<NamedStationImpl,Element>();
+    private Hashtable<NamedStationImpl, Element> stationToElement =
+        new Hashtable<NamedStationImpl, Element>();
 
     /** Maps xml element to station */
-    private Hashtable<Element,NamedStationImpl> elementToStation = new Hashtable<Element,NamedStationImpl>();
+    private Hashtable<Element, NamedStationImpl> elementToStation =
+        new Hashtable<Element, NamedStationImpl>();
 
 
-    private Hashtable<String,Element> urlToRoot = new Hashtable<String,Element>();
+    /** _more_          */
+    private Hashtable<String, Element> urlToRoot = new Hashtable<String,
+                                                       Element>();
 
     /** Displays imageset locations */
     private StationLocationMap stationMap;
 
+    /** _more_          */
     private List<NamedStationImpl> stations;
 
     /** The directory */
@@ -330,45 +338,62 @@ public class ImageMovieControl extends DisplayControlImpl {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param el _more_
+     * @param animationValue _more_
+     * @param animationStep _more_
+     * @param samples _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected List getCursorReadoutInner(EarthLocation el,
                                          Real animationValue,
                                          int animationStep,
                                          List<ReadoutInfo> samples)
             throws Exception {
-        NamedStationImpl closest= null;
-        double minDistance = 0;
-        
-        LatLonPointImpl llp = new LatLonPointImpl(el.getLatitude().getValue(CommonUnit.degree), 
-                                                  el.getLongitude().getValue(CommonUnit.degree));
-        if(stations==null) {
+        NamedStationImpl closest     = null;
+        double           minDistance = 0;
+
+        LatLonPointImpl llp =
+            new LatLonPointImpl(
+                el.getLatitude().getValue(CommonUnit.degree),
+                el.getLongitude().getValue(CommonUnit.degree));
+        if (stations == null) {
             return null;
         }
-        for(NamedStationImpl station: stations) {
+        for (NamedStationImpl station : stations) {
             EarthLocation el2 = station.getEarthLocation();
-            LatLonPointImpl llp2 = new LatLonPointImpl(el2.getLatitude().getValue(CommonUnit.degree), 
-                                                       el2.getLongitude().getValue(CommonUnit.degree));
-            Bearing bearing =
-                Bearing.calculateBearing(llp,
-                                         llp2,
-                                         null);
+            LatLonPointImpl llp2 =
+                new LatLonPointImpl(
+                    el2.getLatitude().getValue(CommonUnit.degree),
+                    el2.getLongitude().getValue(CommonUnit.degree));
+            Bearing bearing  = Bearing.calculateBearing(llp, llp2, null);
 
-            double distance     = bearing.getDistance();
-            if(closest==null || distance<minDistance) {
+            double  distance = bearing.getDistance();
+            if ((closest == null) || (distance < minDistance)) {
                 minDistance = distance;
-                closest = station;
-            } 
+                closest     = station;
+            }
         }
 
-        if(closest!=null) {
+        if (closest != null) {
             Element element = (Element) stationToElement.get(closest);
-            String url  = getImageSetUrl(element);
-            List[]files = loadFilesFromXml(url,null);
-            if(files[0].size()>0) {
-                ReadoutInfo info = new ReadoutInfo(this,null,closest.getEarthLocation(),(DateTime)(files[1].get(files[1].size()-1)));
-                info.setImageUrl(files[0].get(files[0].size()-1).toString());
+            String  url     = getImageSetUrl(element);
+            List[]  files   = loadFilesFromXml(url, null);
+            if (files[0].size() > 0) {
+                ReadoutInfo info =
+                    new ReadoutInfo(this, null, closest.getEarthLocation(),
+                                    (DateTime) (files[1].get(files[1].size()
+                                        - 1)));
+                info.setImageUrl(files[0].get(files[0].size()
+                        - 1).toString());
                 info.setImageName(closest.getName());
                 samples.add(info);
-           }
+            }
         }
         return null;
     }
@@ -939,7 +964,7 @@ public class ImageMovieControl extends DisplayControlImpl {
             throws VisADException, RemoteException, Exception {
         stations = new ArrayList<NamedStationImpl>();
 
-        List locs     = new ArrayList();
+        List locs = new ArrayList();
         List children = XmlUtil.findDescendants(getImageSetsRoot(),
                             TAG_IMAGESET);
         pointNodes = new ArrayList();
@@ -1132,7 +1157,8 @@ public class ImageMovieControl extends DisplayControlImpl {
         if (event.getPropertyName().equals(
                 StationLocationMap.SELECTED_PROPERTY)) {
 
-            List<NamedStationImpl> selected = (List<NamedStationImpl>)stationMap.getSelectedStations();
+            List<NamedStationImpl> selected =
+                (List<NamedStationImpl>) stationMap.getSelectedStations();
             if (selected.size() == 0) {
                 return;
             }
@@ -1219,13 +1245,24 @@ public class ImageMovieControl extends DisplayControlImpl {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param url _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private Element getRoot(String url) throws Exception {
-        if(url==null) return null;
+        if (url == null) {
+            return null;
+        }
         Element root = urlToRoot.get(url);
-        if(root==null) {
+        if (root == null) {
             root = XmlUtil.getRoot(url, getClass());
-            if(root!=null) {
-                urlToRoot.put(url,root);
+            if (root != null) {
+                urlToRoot.put(url, root);
             }
         }
         return root;
@@ -1423,11 +1460,19 @@ public class ImageMovieControl extends DisplayControlImpl {
 
 
 
+    /**
+     * _more_
+     *
+     * @param imageSetUrl _more_
+     * @param imageSetRoot _more_
+     *
+     * @return _more_
+     */
     public List[] loadFilesFromXml(String imageSetUrl, Element imageSetRoot) {
         List files = new ArrayList();
         List times = new ArrayList();
         if (imageSetUrl == null) {
-            return new List[]{files,times};
+            return new List[] { files, times };
         }
         try {
             if (imageSetRoot == null) {
@@ -1466,11 +1511,11 @@ public class ImageMovieControl extends DisplayControlImpl {
                 files.add(fd.file);
                 times.add(fd.dttm);
             }
-            return new List[]{files,times};
+            return new List[] { files, times };
         } catch (Exception exc) {
             logException("Error reading xml", exc);
         }
-        return new List[]{files,times};
+        return new List[] { files, times };
     }
 
 
@@ -1615,7 +1660,7 @@ public class ImageMovieControl extends DisplayControlImpl {
     private void addMoviesToList() {
         Vector items = new Vector();
         List   files = getImagePanel().getFiles();
-        List times = this.times;
+        List   times = this.times;
         for (int i = 0; i < files.size(); i++) {
             items.add(times.get(i).toString());
         }
@@ -1908,17 +1953,150 @@ public class ImageMovieControl extends DisplayControlImpl {
     }
 
 
-    public static void main(String[]args) throws Exception {
-        for(int lat=40;lat<45;lat++) {
-            for(int lon=-100;lon>-105;lon--) {
-                String filename = "cam_" + lat +"_" + lon +".xml";
-                if(new File(filename).exists()) continue;
-                String url = "http://api.wxbug.net/getCamerasXML.aspx?ACode=A6357478562&lat=" + lat+"&long="+lon+"&unittype=1";
-                String xml =     IOUtil.readContents(url, ImageMovieControl.class, (String) null);
-                System.err.println ("Writing:" + filename);
-                IOUtil.writeFile(filename,xml);
-                Misc.sleep(1000);
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void main(String[] args) throws Exception {
+
+        if (false) {
+            int cnt = 0;
+            for (int lat = 24; lat <= 48; lat += 3) {
+                for (int lon = -77; lon >= -124; lon -= 3) {
+                    String filename = "cam_" + lat + "_" + lon + ".xml";
+                    if (new File(filename).exists()) {
+                        continue;
+                    }
+                    String url =
+                        "http://api.wxbug.net/getCamerasXML.aspx?ACode=A6357478562&lat="
+                        + lat + "&long=" + lon + "&unittype=1";
+                    String xml = IOUtil.readContents(url,
+                                     ImageMovieControl.class, (String) null);
+                    cnt++;
+                    System.err.println("#" + cnt + "  " + filename);
+                    IOUtil.writeFile(filename, xml);
+                    Misc.sleep(1000);
+                }
             }
+        }
+
+
+
+        Hashtable<String, double[]> zipcodes = new Hashtable<String,
+                                                   double[]>();
+        for (String line : (List<String>) StringUtil.split(
+                IOUtil.readContents(
+                    "zip_codes.csv", ImageMovieControl.class), "\n", true,
+                        true)) {
+            if (line.length() == 0) {
+                continue;
+            }
+            if (line.startsWith("#")) {
+                continue;
+            }
+            List<String> toks = StringUtil.split(line, ",", true, false);
+            if (toks.size() < 3) {
+                continue;
+            }
+            if (toks.get(2).length() == 0) {
+                continue;
+            }
+            if (toks.get(3).length() == 0) {
+                continue;
+            }
+            zipcodes.put(toks.get(0),
+                         new double[] { new Double(toks.get(1)).doubleValue(),
+                                        new Double(
+                                            toks.get(2)).doubleValue() });
+        }
+
+        HashSet          seen    = new HashSet();
+        List<CameraInfo> cameras = new ArrayList<CameraInfo>();
+        File             dir     = new File(".");
+        File[]           files   = dir.listFiles();
+        FileOutputStream fos     = new FileOutputStream("cameras.xml");
+        fos.write(
+            new String(
+                "<stationtable name=\"WeatherBug Web Cams\">\n").getBytes());
+        for (File f : files) {
+            if ( !f.getName().toString().startsWith("cam_")) {
+                continue;
+            }
+            Element root = XmlUtil.getRoot(f.toString(),
+                                           ImageMovieControl.class);
+            List nodes = XmlUtil.findDescendants(root, "aws:camera");
+            for (Element camNode : (List<Element>) nodes) {
+                String id = XmlUtil.getAttribute(camNode, "id");
+                if (seen.contains(id)) {
+                    continue;
+                }
+                seen.add(id);
+                String   zipCode = XmlUtil.getAttribute(camNode, "zipcode");
+                double[] latlon  = zipcodes.get(zipCode);
+                if (latlon == null) {
+                    //                    System.err.println ("Unknown zip:" + zipCode);
+                    continue;
+                }
+                double lat  = latlon[0];
+                double lon  = latlon[1];
+                String name = XmlUtil.getAttribute(camNode, "name");
+                CameraInfo cameraInfo = new CameraInfo(id, latlon[0],
+                                            latlon[1]);
+                cameras.add(cameraInfo);
+                id   = id.replace(",", "_");
+                name = name.replace(",", " ");
+                StringBuffer sb = new StringBuffer();
+                String imageUrl = "http://wwc.instacam.com/instacamimg/" + id
+                                  + "/" + id + "_s.jpg";
+                String html = "<h3>WeatherBug WebCam</h3><b>" + name
+                              + "</b><br><img src=\"" + imageUrl + "\">";
+                sb.append(XmlUtil.openTag("station",
+                                          XmlUtil.attrs("name", name, "lat",
+                                              "" + lat, "lon", "" + lon,
+                                                  "imageurl", imageUrl)));
+                sb.append("<![CDATA[" + html + "]]></station>\n");
+
+                //                    <station      name="Alabama"                population="4447100"    lat="33.001471"   lon="-86.766233" />
+                fos.write(sb.toString().getBytes());
+
+            }
+        }
+        fos.write(new String("</stationtable>\n").getBytes());
+        fos.close();
+        System.err.println("#cameras:" + cameras.size());
+    }
+
+    /**
+     * Class CameraInfo _more_
+     *
+     *
+     * @author IDV Development Team
+     */
+    public static class CameraInfo {
+
+        /** _more_          */
+        String id;
+
+        /** _more_          */
+        double lat;
+
+        /** _more_          */
+        double lon;
+
+        /**
+         * _more_
+         *
+         * @param id _more_
+         * @param lat _more_
+         * @param lon _more_
+         */
+        public CameraInfo(String id, double lat, double lon) {
+            this.id  = id;
+            this.lat = lat;
+            this.lon = lon;
         }
     }
 
