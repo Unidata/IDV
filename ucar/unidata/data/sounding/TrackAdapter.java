@@ -214,7 +214,7 @@ public abstract class TrackAdapter {
      *
      * @return the track info or null if not found
      */
-    private TrackInfo getTrackInfo(String name) {
+    public TrackInfo getTrackInfo(String name) {
         for (int trackIdx = 0; trackIdx < trackInfos.size(); trackIdx++) {
             TrackInfo trackInfo = (TrackInfo) trackInfos.get(trackIdx);
             if ((name == null) || name.equals(trackInfo.getTrackName())) {
