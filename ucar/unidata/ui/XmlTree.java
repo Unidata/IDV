@@ -1065,10 +1065,13 @@ public class XmlTree extends JTree {
                         node.getXmlNode().appendChild(child);*/
                 process(node, child);
             }
-            TreePath path = new TreePath(treeModel.getPathToRoot(node));
-            expandPath(path);
-            treeModel.nodeStructureChanged(node);
-            repaint();
+            final TreePath path = new TreePath(treeModel.getPathToRoot(node));
+            GuiUtils.invokeInSwingThread(new Runnable() {
+                    public void run() {
+                        expandPath(path);
+                        treeModel.nodeStructureChanged(node);
+                        repaint();
+                    }});
         } catch (Throwable exc) {
             LogUtil.logException("Expanding xlink node:" + href, exc);
         }
