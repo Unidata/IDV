@@ -1601,9 +1601,6 @@ public class StationModelDisplayable extends DisplayableData {
         if (quadShapes != null) {
             allShapes.addAll(quadShapes);
         }
-
-
-
         return allShapes;
     }
 
@@ -1625,38 +1622,50 @@ public class StationModelDisplayable extends DisplayableData {
             float[] pts    = array.coordinates;
             int     count  = array.vertexCount;
             byte[]  colors = array.colors;
+            if(colors==null) {
+                //                System.err.println ("colors are null");
+                //                continue;
+            }
+            if(pts==null) {
+                //                System.err.println ("pts are null");
+                //                continue;
+            }
             //            System.err.println ("shape:" + array.getClass().getName() + " pts:" + pts.length +" colors:" + colors.length);
             float scale = 200.0f;
             if (array instanceof VisADLineArray) {
-                int jinc = (colors.length == pts.length)
-                           ? 3
-                           : 4;
-                int j    = 0;
-                for (int i = 0; i < 3 * count; i += 6) {
-                    g2.setColor(new Color((((colors[j] < 0)
-                                            ? (((int) colors[j]) + 256)
-                                            : ((int) colors[j])) + ((colors[j + jinc]
-                                            < 0)
-                            ? (((int) colors[j + jinc]) + 256)
-                            : ((int) colors[j + jinc]))) / 2, (((colors[j + 1]
-                               < 0)
-                            ? (((int) colors[j + 1]) + 256)
-                            : ((int) colors[j + 1])) + ((colors[j + jinc + 1]
-                               < 0)
-                            ? (((int) colors[j + jinc + 1]) + 256)
-                            : ((int) colors[j + jinc + 1]))) / 2, (((colors[j + 2]
-                               < 0)
-                            ? (((int) colors[j + 2]) + 256)
-                            : ((int) colors[j + 2])) + ((colors[j + jinc + 2]
-                               < 0)
-                            ? (((int) colors[j + jinc + 2]) + 256)
-                            : ((int) colors[j + jinc + 2]))) / 2));
-                    j += 2 * jinc;
-                    g2.draw(new Line2D.Float(mx + scale * pts[i],
-                                             my - scale * pts[i + 1],
-                                             mx + scale * pts[i + 3],
-                                             my - scale * pts[i + 4]));
+                if(colors==null) {
+                    g2.setColor(Color.black);
                 }
+                int jinc = (colors==null?0:(colors.length == pts.length)
+                        ? 3
+                            : 4);
+                    int j    = 0;
+                    for (int i = 0; i < 3 * count; i += 6) {
+                        if(colors!=null)
+                            g2.setColor(new Color((((colors[j] < 0)
+                                                ? (((int) colors[j]) + 256)
+                                                : ((int) colors[j])) + ((colors[j + jinc]
+                                                                         < 0)
+                                                                        ? (((int) colors[j + jinc]) + 256)
+                                                                        : ((int) colors[j + jinc]))) / 2, (((colors[j + 1]
+                                                                                                             < 0)
+                                                                                                            ? (((int) colors[j + 1]) + 256)
+                                                                                                            : ((int) colors[j + 1])) + ((colors[j + jinc + 1]
+                                                                                                                                         < 0)
+                                                                                                                                        ? (((int) colors[j + jinc + 1]) + 256)
+                                                                                                                                        : ((int) colors[j + jinc + 1]))) / 2, (((colors[j + 2]
+                                                                                                                                                                                 < 0)
+                                                                                                                                                                                ? (((int) colors[j + 2]) + 256)
+                                                                                                                                                                                : ((int) colors[j + 2])) + ((colors[j + jinc + 2]
+                                                                                                                                                                                                             < 0)
+                                                                                                                                                                                                            ? (((int) colors[j + jinc + 2]) + 256)
+                                                                                                                                                                                                            : ((int) colors[j + jinc + 2]))) / 2));
+                        j += 2 * jinc;
+                        g2.draw(new Line2D.Float(mx + scale * pts[i],
+                                                 my - scale * pts[i + 1],
+                                                 mx + scale * pts[i + 3],
+                                                 my - scale * pts[i + 4]));
+                    }
             } else if (array instanceof VisADTriangleArray) {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                     RenderingHints.VALUE_ANTIALIAS_OFF);
