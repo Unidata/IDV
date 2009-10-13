@@ -11,6 +11,8 @@ import java.util.Hashtable;
 import java.util.Formatter;
 import java.util.List;
 
+import visad.Data;
+
 /**
  * Created by IntelliJ IDEA.
  * User: yuanho
@@ -75,5 +77,27 @@ public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
 
     }
 
+    /**
+     * Get the track data parameters necessary to plot an aerological
+     * diagram. Returned data is of type:
+     * <pre>
+     *     (Time -> (AirPressure,
+     *                AirTemperature,
+     *                Dewpoint,
+     *                (Latitude, Longitude, Altitude)))
+     * </pre>
+     *
+     *
+     * @param trackId id of the track
+     * @return Data object in the format above
+     *
+     *
+     * @throws Exception On badness
+     */
+    public Data getAerologicalDiagramData(String trackId) throws Exception {
+
+        CosmicTrajectoryFeatureTypeInfo ctfi = (CosmicTrajectoryFeatureTypeInfo) getTrackInfo(trackId);
+        return ctfi.getAerologicalDiagramData();
+    }
 
 }
