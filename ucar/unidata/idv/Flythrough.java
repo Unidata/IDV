@@ -385,17 +385,14 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private Image dashboardImage;
 
+    private ReadoutInfo imageReadout;
+
     /** _more_ */
     private double precipLevel = 0;
 
     /** _more_          */
     private double temperature = Double.NaN;
 
-    /** _more_ */
-    private String imageUrl;
-
-    /** _more_ */
-    private String imageName;
 
     /** _more_ */
     private Image backgroundImage;
@@ -2670,16 +2667,16 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         }
 
         String newImageUrl = null;
-        imageName   = "";
         precipLevel = 0;
         temperature = Double.NaN;
+        imageReadout = null;
 
         List comps  = new ArrayList();
         List labels = new ArrayList();
         for (ReadoutInfo info : samples) {
             if (info.getImageUrl() != null) {
                 newImageUrl = info.getImageUrl();
-                imageName   = info.getImageName();
+                imageReadout = info;
             }
             Real r = info.getReal();
             if (r == null) {

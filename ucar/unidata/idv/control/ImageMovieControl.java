@@ -114,6 +114,8 @@ import javax.swing.*;
  */
 public class ImageMovieControl extends DisplayControlImpl {
 
+//wbug api: A6357478562
+
     /** Xml tag name */
     public static final String TAG_IMAGESET = "imageset";
 
