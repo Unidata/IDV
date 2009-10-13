@@ -387,6 +387,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
     private ReadoutInfo imageReadout;
 
+    private String imageUrl;
+
     /** _more_ */
     private double precipLevel = 0;
 
@@ -1153,7 +1155,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
         JTabbedPane readoutTab = new JTabbedPane();
 
-        dashboardImage = GuiUtils.getImage("/auxdata/ui/icons/dashboard.gif");
+        dashboardImage = GuiUtils.getImage("/auxdata/ui/icons/cockpit.gif",getClass(), false);
         dashboardLbl   = new JLabel(new ImageIcon(dashboardImage)) {
             public void paint(Graphics g) {
                 paintDashboard(g, dashboardLbl);
@@ -1228,6 +1230,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      * @param comp _more_
      */
     public void paintDashboard(Graphics g, JComponent comp) {
+        Graphics2D g2 = (Graphics2D) g;
         Rectangle b = comp.getBounds();
         g.setColor(Color.white);
         g.fillRect(0, 0, b.width, b.height);
@@ -1235,16 +1238,22 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         if (image != null) {
             int imageHeight = image.getHeight(null);
             int imageWidth  = image.getWidth(this);
+            
+
             if (imageHeight > 0) {
-                g.drawImage(image,
-                            b.width / 2 - imageWidth / 2
-                            + dashboardImageOffset.x, dashboardImageOffset.y,
-                                null);
+                double scale = b.width/(double)imageWidth;
+                AffineTransform oldTransform = g2.getTransform();
+                g2.scale(scale,scale);
+                g.drawImage(image, 0, dashboardImageOffset.y, null);
+                g2.setTransform(oldTransform);
             } else {
                 g.drawImage(image, 0, 0, null);
             }
+
             g.setColor(Color.black);
-            g.drawString(imageName, 10, 20);
+            if(imageReadout.getImageName()!=null) {
+                g.drawString(imageReadout.getImageName(), 10, 20);
+            }
         }
 
         if (precipLevel > 0) {
@@ -2667,6 +2676,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         }
 
         String newImageUrl = null;
+        
         precipLevel = 0;
         temperature = Double.NaN;
         imageReadout = null;

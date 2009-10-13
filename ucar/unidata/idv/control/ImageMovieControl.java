@@ -1907,5 +1907,21 @@ public class ImageMovieControl extends DisplayControlImpl {
         return true;
     }
 
+
+    public static void main(String[]args) throws Exception {
+        for(int lat=40;lat<45;lat++) {
+            for(int lon=-100;lon>-105;lon--) {
+                String filename = "cam_" + lat +"_" + lon +".xml";
+                if(new File(filename).exists()) continue;
+                String url = "http://api.wxbug.net/getCamerasXML.aspx?ACode=A6357478562&lat=" + lat+"&long="+lon+"&unittype=1";
+                String xml =     IOUtil.readContents(url, ImageMovieControl.class, (String) null);
+                System.err.println ("Writing:" + filename);
+                IOUtil.writeFile(filename,xml);
+                Misc.sleep(1000);
+            }
+        }
+    }
+
+
 }
 
