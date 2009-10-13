@@ -1961,11 +1961,10 @@ public class ImageMovieControl extends DisplayControlImpl {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-
         if (false) {
             int cnt = 0;
-            for (int lat = 24; lat <= 48; lat += 3) {
-                for (int lon = -77; lon >= -124; lon -= 3) {
+            for (int lat = 24; lat <= 48; lat += 1) {
+                for (int lon = -77; lon >= -124; lon -= 1) {
                     String filename = "cam_" + lat + "_" + lon + ".xml";
                     if (new File(filename).exists()) {
                         continue;
@@ -1978,7 +1977,7 @@ public class ImageMovieControl extends DisplayControlImpl {
                     cnt++;
                     System.err.println("#" + cnt + "  " + filename);
                     IOUtil.writeFile(filename, xml);
-                    Misc.sleep(1000);
+                    //                    Misc.sleep(1000);
                 }
             }
         }
@@ -2017,7 +2016,7 @@ public class ImageMovieControl extends DisplayControlImpl {
         List<CameraInfo> cameras = new ArrayList<CameraInfo>();
         File             dir     = new File(".");
         File[]           files   = dir.listFiles();
-        FileOutputStream fos     = new FileOutputStream("cameras.xml");
+        FileOutputStream fos     = new FileOutputStream("weatherbugcameras.xml");
         fos.write(
             new String(
                 "<stationtable name=\"WeatherBug Web Cams\">\n").getBytes());
@@ -2034,15 +2033,19 @@ public class ImageMovieControl extends DisplayControlImpl {
                     continue;
                 }
                 seen.add(id);
+
                 String   zipCode = XmlUtil.getAttribute(camNode, "zipcode");
+                if(id.equals("BLDBC")) {
+                    zipCode = "80303";
+                }
                 double[] latlon  = zipcodes.get(zipCode);
+                String name = XmlUtil.getAttribute(camNode, "name");
                 if (latlon == null) {
-                    //                    System.err.println ("Unknown zip:" + zipCode);
+                    //                    System.err.println ("Unknown zip:" + zipCode +" for:" + name);
                     continue;
                 }
                 double lat  = latlon[0];
                 double lon  = latlon[1];
-                String name = XmlUtil.getAttribute(camNode, "name");
                 CameraInfo cameraInfo = new CameraInfo(id, latlon[0],
                                             latlon[1]);
                 cameras.add(cameraInfo);
