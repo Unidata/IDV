@@ -941,7 +941,7 @@ public class Column implements Constants {
                                      SqlUtil.distinct(getFullName()), tmp,
                                      "");
                 long     t2     = System.currentTimeMillis();
-                String[] values = SqlUtil.readString(stmt, 1);
+                String[] values = SqlUtil.readString(typeHandler.getDatabaseManager().getIterator(stmt), 1);
                 long     t3     = System.currentTimeMillis();
                 //                System.err.println("TIME:" + (t2-t1) + " " + (t3-t2));
                 List<TwoFacedObject> list = new ArrayList();

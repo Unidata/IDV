@@ -161,7 +161,7 @@
             nowarn="true"
             srcdir="${srcdir}"
             fork="true"
-            memoryMaximumSize="256m"
+            memoryMaximumSize="512m"
            target="1.5"
         >
         <include name="ucar/unidata/repository/client/InteractiveRepositoryClient.java"/>
@@ -220,6 +220,8 @@
             failonerror="${failonerror}" 
             nowarn="true"
             srcdir="${srcdir}"
+	    fork="true"
+            memoryMaximumSize="512m"
            target="1.5"
         >
         <include name="ucar/unidata/repository/*.java"/>
@@ -338,6 +340,8 @@
         <unjar src="${libsrc}/derby.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/derbytools.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-io-1.4.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/commons-dbcp-1.2.2.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/commons-pool-1.5.3.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-fileupload-1.2.1.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jfreechart.jar" dest="${tmpjardir}"/>
 

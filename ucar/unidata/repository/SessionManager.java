@@ -191,7 +191,7 @@ public class SessionManager extends RepositoryManager {
         long          now              = new Date().getTime();
         Statement stmt = getDatabaseManager().select(Tables.SESSIONS.COLUMNS,
                              Tables.SESSIONS.NAME, (Clause) null);
-        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
         double           timeDiff = DateUtil.daysToMillis(SESSION_DAYS);
         while ((results = iter.next()) != null) {
@@ -231,7 +231,7 @@ public class SessionManager extends RepositoryManager {
                                  Clause.eq(
                                      Tables.SESSIONS.COL_SESSION_ID,
                                      sessionId));
-            SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+            SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
             ResultSet        results;
             //COL_SESSION_ID,COL_USER_ID,COL_CREATE_DATE,COL_LAST_ACTIVE_DATE,COL_EXTRA
             while ((results = iter.next()) != null) {
@@ -318,7 +318,7 @@ public class SessionManager extends RepositoryManager {
         List<Session> sessions = new ArrayList<Session>();
         Statement stmt = getDatabaseManager().select(Tables.SESSIONS.COLUMNS,
                              Tables.SESSIONS.NAME, (Clause) null);
-        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
         while ((results = iter.next()) != null) {
             while (results.next()) {

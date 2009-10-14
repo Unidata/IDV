@@ -175,13 +175,13 @@ public class EntryManager extends RepositoryManager {
                                   ContentMetadataHandler.TYPE_ALIAS) }), "",
                                       1);
 
-        SqlUtil.Iterator iter     = SqlUtil.getIterator(statement);
+        SqlUtil.Iterator iter     = getDatabaseManager().getIterator(statement);
         List<Comment>    comments = new ArrayList();
         ResultSet        results;
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 String id = results.getString(1);
-                statement.close();
+                iter.close();
                 return getEntry(request, id);
             }
         }
@@ -1638,7 +1638,7 @@ return new Result(title, sb);
             return;
         }
         delCnt = 0;
-        Connection connection = getDatabaseManager().getNewConnection();
+        Connection connection = getDatabaseManager().getConnection();
         try {
             deleteEntriesInner(request, entries, connection, asynchId);
         } finally {
@@ -1721,11 +1721,11 @@ return new Result(title, sb);
                 getActionManager().setActionMessage(actionId,
                         "Delete canceled");
                 connection.rollback();
-                permissionsStmt.close();
-                metadataStmt.close();
-                commentsStmt.close();
-                assocStmt.close();
-                entriesStmt.close();
+                getDatabaseManager().closeStatement(permissionsStmt);
+                getDatabaseManager().closeStatement(metadataStmt);
+                getDatabaseManager().closeStatement(commentsStmt);
+                getDatabaseManager().closeStatement(assocStmt);
+                getDatabaseManager().closeStatement(entriesStmt);
                 return;
             }
             getActionManager().setActionMessage(actionId,
@@ -1777,11 +1777,11 @@ return new Result(title, sb);
             getStorageManager().deleteEntryDir((String) allIds.get(i));
         }
 
-        permissionsStmt.close();
-        metadataStmt.close();
-        commentsStmt.close();
-        assocStmt.close();
-        entriesStmt.close();
+        getDatabaseManager().closeStatement(permissionsStmt);
+        getDatabaseManager().closeStatement(metadataStmt);
+        getDatabaseManager().closeStatement(commentsStmt);
+        getDatabaseManager().closeStatement(assocStmt);
+        getDatabaseManager().closeStatement(entriesStmt);
     }
 
 
@@ -2461,7 +2461,7 @@ return new Result(title, sb);
                                    List<Entry> entries)
             throws Exception {
         StringBuffer sb         = new StringBuffer();
-        Connection   connection = getDatabaseManager().getNewConnection();
+        Connection   connection = getDatabaseManager().getConnection();
         connection.setAutoCommit(false);
         Statement   statement  = connection.createStatement();
         List<Entry> newEntries = new ArrayList<Entry>();
@@ -2550,7 +2550,7 @@ return new Result(title, sb);
     private Result processEntryMove(Request request, Group toGroup,
                                     List<Entry> entries)
             throws Exception {
-        Connection connection = getDatabaseManager().getNewConnection();
+        Connection connection = getDatabaseManager().getConnection();
         connection.setAutoCommit(false);
         Statement statement = connection.createStatement();
         try {
@@ -2568,7 +2568,7 @@ return new Result(title, sb);
                 statement.execute(sql);
                 connection.commit();
             }
-            getDatabaseManager().close(statement);
+            getDatabaseManager().closeStatement(statement);
             connection.setAutoCommit(true);
             getRepository().clearCache();
             return new Result(request.url(getRepository().URL_ENTRY_SHOW,
@@ -3142,7 +3142,7 @@ return new Result(title, sb);
                 Tables.COMMENTS.COLUMNS, Tables.COMMENTS.NAME,
                 Clause.eq(Tables.COMMENTS.COL_ENTRY_ID, entry.getId()),
                 " order by " + Tables.COMMENTS.COL_DATE + " asc ");
-        SqlUtil.Iterator iter     = SqlUtil.getIterator(stmt);
+        SqlUtil.Iterator iter     = getDatabaseManager().getIterator(stmt);
         List<Comment>    comments = new ArrayList();
         ResultSet        results;
         while ((results = iter.next()) != null) {
@@ -4378,7 +4378,7 @@ return new Result(title, sb);
 
                     ResultSet results = entryStmt.getResultSet();
                     if ( !results.next()) {
-                        entryStmt.close();
+                        getDatabaseManager().closeAndReleaseConnection(entryStmt);
                         return null;
                     }
 
@@ -4386,7 +4386,7 @@ return new Result(title, sb);
                     TypeHandler typeHandler =
                         getRepository().getTypeHandler(entryType);
                     entry = typeHandler.getEntry(results, abbreviated);
-                    entryStmt.close();
+                    getDatabaseManager().closeAndReleaseConnection(entryStmt);
                     checkEntryFileTime(entry);
                 }
             } catch (Exception exc) {
@@ -4448,7 +4448,7 @@ return new Result(title, sb);
         List<Entry>      entries = new ArrayList<Entry>();
         List<Entry>      groups  = new ArrayList<Entry>();
         ResultSet        results;
-        SqlUtil.Iterator iter       = SqlUtil.getIterator(statement);
+        SqlUtil.Iterator iter       = getDatabaseManager().getIterator(statement);
         boolean canDoSelectOffset   =
             getDatabaseManager().canDoSelectOffset();
         Hashtable        seen       = new Hashtable();
@@ -4673,7 +4673,7 @@ return new Result(title, sb);
 
 
         //We have our own connection
-        Connection connection = getDatabaseManager().getNewConnection();
+        Connection connection = getDatabaseManager().getConnection();
         try {
             insertEntriesInner(entries, connection, isNew, canBeBatched);
         } finally {
@@ -4690,14 +4690,11 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     private void updateEntry(Entry entry) throws Exception {
-        Connection connection = getDatabaseManager().getConnection();
-        PreparedStatement entryStmt =
-            connection.prepareStatement(Tables.ENTRIES.UPDATE);
+        PreparedStatement entryStmt =getDatabaseManager().getPreparedStatement(Tables.ENTRIES.UPDATE);
         setStatement(entry, entryStmt, false, entry.getTypeHandler());
         entryStmt.addBatch();
         entryStmt.executeBatch();
-        entryStmt.close();
-        getDatabaseManager().releaseConnection(connection);
+        getDatabaseManager().closeAndReleaseConnection(entryStmt);
     }
 
 
@@ -4845,16 +4842,16 @@ return new Result(title, sb);
             }
         }
 
-        entryStmt.close();
-        metadataStmt.close();
+        getDatabaseManager().closeStatement(entryStmt);
+        getDatabaseManager().closeStatement(metadataStmt);
         for (Enumeration keys =
                 typeStatements.keys(); keys.hasMoreElements(); ) {
             PreparedStatement typeStatement =
                 (PreparedStatement) typeStatements.get(keys.nextElement());
-            typeStatement.close();
+            getDatabaseManager().closeStatement(typeStatement);
         }
 
-        connection.close();
+        getDatabaseManager().closeConnection(connection);
         Misc.run(getRepository(), "checkNewEntries", entries);
     }
 
@@ -4922,8 +4919,8 @@ return new Result(title, sb);
                     }
                 }
             }
-            select.close();
-            getDatabaseManager().releaseConnection(connection);
+            getDatabaseManager().closeStatement(select);
+            getDatabaseManager().closeConnection(connection);
             long t2 = System.currentTimeMillis();
             //            System.err.println("Took:" + (t2 - t1) + "ms to check: "
             //                               + entries.size() + " entries");
@@ -5118,7 +5115,7 @@ return new Result(title, sb);
         int         skipCnt     = request.get(ARG_SKIP, 0);
         Statement statement = typeHandler.select(request,
                                   Tables.ENTRIES.COL_ID, where, orderBy);
-        SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
         ResultSet        results;
         boolean canDoSelectOffset = getDatabaseManager().canDoSelectOffset();
 
@@ -5652,13 +5649,13 @@ return new Result(title, sb);
             return group;
         }
         String[] ids = SqlUtil.readString(
-                           getDatabaseManager().select(
+                           getDatabaseManager().getIterator(getDatabaseManager().select(
                                Tables.ENTRIES.COL_ID, Tables.ENTRIES.NAME,
                                Clause.and(
                                    Clause.eq(
                                        Tables.ENTRIES.COL_PARENT_GROUP_ID,
                                        parent.getId()), Clause.eq(
-                                           Tables.ENTRIES.COL_NAME, name))));
+                                           Tables.ENTRIES.COL_NAME, name)))));
         if (ids.length == 0) {
             return null;
         }
@@ -5773,7 +5770,7 @@ return new Result(title, sb);
                 getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
                                             Tables.ENTRIES.NAME, clauses);
             List<Group> groups = readGroups(statement);
-            statement.close();
+            getDatabaseManager().closeStatement(statement);
             if (groups.size() > 0) {
                 group = groups.get(0);
             } else {
@@ -5934,7 +5931,7 @@ return new Result(title, sb);
         Statement statement =
             getDatabaseManager().select(Tables.ENTRIES.COL_ID,
                                         Tables.ENTRIES.NAME, clauses);
-        return getGroups(request, SqlUtil.readString(statement, 1));
+        return getGroups(request, SqlUtil.readString(getDatabaseManager().getIterator(statement), 1));
     }
 
 
@@ -6006,7 +6003,7 @@ return new Result(title, sb);
                                   Clause.eq(
                                       Tables.ENTRIES.COL_PARENT_GROUP_ID,
                                       getTopGroup().getId()));
-        String[]    ids    = SqlUtil.readString(statement, 1);
+        String[]    ids    = SqlUtil.readString(getDatabaseManager().getIterator(statement), 1);
         List<Group> groups = new ArrayList<Group>();
         for (int i = 0; i < ids.length; i++) {
             //Get the entry but don't check for access control
@@ -6058,7 +6055,7 @@ return new Result(title, sb);
      */
     private List<Group> readGroups(Statement statement) throws Exception {
         ResultSet        results;
-        SqlUtil.Iterator iter   = SqlUtil.getIterator(statement);
+        SqlUtil.Iterator iter   = getDatabaseManager().getIterator(statement);
         List<Group>      groups = new ArrayList<Group>();
         //        TypeHandler typeHandler =
         //            getRepository().getTypeHandler(TypeHandler.TYPE_GROUP);
@@ -6335,7 +6332,7 @@ return new Result(title, sb);
                         Tables.ENTRIES.NAME), Clause.eq(
                         Tables.ENTRIES.COL_PARENT_GROUP_ID, entry.getId()));
 
-            SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+            SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
             ResultSet        results;
             while ((results = iter.next()) != null) {
                 while (results.next()) {

@@ -686,7 +686,7 @@ public class Admin extends RepositoryManager {
      */
     protected StringBuffer getDbMetaData() throws Exception {
 
-        Connection connection = getDatabaseManager().getNewConnection();
+        Connection connection = getDatabaseManager().getConnection();
         try {
             StringBuffer     sb       = new StringBuffer();
             DatabaseMetaData dbmd     = connection.getMetaData();
@@ -795,14 +795,14 @@ public class Admin extends RepositoryManager {
             if ( !getDatabaseManager().hasConnection()) {
                 sb.append("Not connected to database");
             } else {
-                getRepository().getDatabaseManager().closeConnection();
+                getRepository().getDatabaseManager().shutdown();
                 sb.append("Database is shut down");
             }
         } else if (what.equals("restart")) {
             if (getDatabaseManager().hasConnection()) {
                 sb.append("Already connected to database");
             } else {
-                getRepository().getDatabaseManager().makeConnection();
+                //TODO:                getRepository().getDatabaseManager().makeConnection();
                 sb.append("Database is restarted");
             }
         }
@@ -1479,7 +1479,7 @@ public class Admin extends RepositoryManager {
         Hashtable<String, List> idToPermissions = new Hashtable<String,
                                                       List>();
 
-        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
         List<String>     ids = new ArrayList<String>();
         while ((results = iter.next()) != null) {
@@ -1693,13 +1693,7 @@ public class Admin extends RepositoryManager {
         long t1 = System.currentTimeMillis();
 
         if (bulkLoad) {
-            Connection connection = getDatabaseManager().getNewConnection();
-            connection.setAutoCommit(false);
-            Statement statement = connection.createStatement();
-            SqlUtil.loadSql(query, statement, false, true);
-            connection.commit();
-            connection.setAutoCommit(true);
-            getDatabaseManager().closeConnection(connection);
+            getDatabaseManager().loadSql(query,  false, true);
             return makeResult(request, msg("SQL"),
                               new StringBuffer("Executed SQL" + "<P>"
                                   + HtmlUtil.space(1) + sb.toString()));
@@ -1713,7 +1707,7 @@ public class Admin extends RepositoryManager {
                 throw exc;
             }
 
-            SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
+            SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
             ResultSet        results;
             int              cnt    = 0;
             Hashtable        map    = new Hashtable();
@@ -1796,7 +1790,7 @@ public class Admin extends RepositoryManager {
                              + Tables.ENTRIES.COL_ID + ","
                              + Tables.ENTRIES.COL_PARENT_GROUP_ID + " from "
                              + Tables.ENTRIES.NAME, 10000000, 0);
-        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
         int              cnt        = 0;
         List<Entry>      badEntries = new ArrayList<Entry>();
@@ -1900,7 +1894,7 @@ public class Admin extends RepositoryManager {
                                 Tables.ENTRIES.COL_RESOURCE_TYPE,
                                 Resource.TYPE_FILE));
 
-            SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+            SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
             ResultSet        results;
             int              cnt       = 0;
             int              deleteCnt = 0;

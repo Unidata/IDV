@@ -396,7 +396,7 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
                                      + Tables.WIKIPAGEHISTORY.COL_DATE
                                      + " asc ");
 
-        SqlUtil.Iterator      iter = SqlUtil.getIterator(stmt);
+        SqlUtil.Iterator      iter = getDatabaseManager().getIterator(stmt);
         ResultSet             results;
         List<WikiPageHistory> history = new ArrayList<WikiPageHistory>();
         int                   version = 1;

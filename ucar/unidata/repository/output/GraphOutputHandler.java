@@ -47,17 +47,12 @@ import java.io.*;
 import java.io.File;
 import java.io.InputStream;
 
-
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 import java.net.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
+
 
 import java.text.SimpleDateFormat;
 
@@ -441,7 +436,7 @@ public class GraphOutputHandler extends OutputHandler {
                 Tables.ENTRIES.COL_RESOURCE), Tables.ENTRIES.NAME,
                     Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
                               group.getId()));
-        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
         cnt       = 0;
         actualCnt = 0;

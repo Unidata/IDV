@@ -61,13 +61,7 @@ import java.lang.reflect.*;
 
 import java.net.*;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.text.SimpleDateFormat;
@@ -340,7 +334,7 @@ public class MetadataManager extends RepositoryManager {
                 Tables.METADATA.COLUMNS, Tables.METADATA.NAME,
                 Clause.eq(Tables.METADATA.COL_ENTRY_ID, entry.getId()),
                 " order by " + Tables.METADATA.COL_TYPE);
-        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
         metadataList = new ArrayList();
         while ((results = iter.next()) != null) {
@@ -359,6 +353,7 @@ public class MetadataManager extends RepositoryManager {
             }
         }
 
+        getDatabaseManager().closeStatement(stmt);
         entry.setMetadata(metadataList);
         return metadataList;
     }
@@ -754,7 +749,7 @@ public class MetadataManager extends RepositoryManager {
             cnt[i] = results.getInt(1);
             max    = Math.max(cnt[i], max);
             min    = Math.min(cnt[i], min);
-            stmt.close();
+            getDatabaseManager().closeStatement(stmt);
         }
         int    diff         = max - min;
         double distribution = diff / 5.0;
@@ -1087,8 +1082,8 @@ public class MetadataManager extends RepositoryManager {
                                  Tables.METADATA.NAME,
                                  Clause.eq(
                                      Tables.METADATA.COL_TYPE, type.getId()));
-            values = SqlUtil.readString(stmt, 1);
-            getDatabaseManager().close(stmt);
+            values = SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1);
+            getDatabaseManager().closeStatement(stmt);
             if (myDistinctMap != null) {
                 myDistinctMap.put(type.getId(), values);
             }

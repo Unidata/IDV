@@ -50,7 +50,6 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import java.sql.PreparedStatement;
 
 import java.sql.ResultSet;
 
@@ -109,7 +108,7 @@ public class MonitorManager extends RepositoryManager {
                                         Tables.MONITORS.NAME, new Clause(),
                                         " order by "
                                         + Tables.MONITORS.COL_NAME);
-        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
         while ((results = iter.next()) != null) {
             while (results.next()) {

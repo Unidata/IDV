@@ -128,7 +128,6 @@ import java.io.InputStream;
 import java.net.*;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -433,7 +432,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         }
         Hashtable  properties = getProperties(entry);
 
-        Connection connection = getDatabaseManager().getNewConnection();
+        Connection connection = getDatabaseManager().getConnection();
         connection.setAutoCommit(false);
         try {
             createDatabase(request, entry, parent, connection);
@@ -471,7 +470,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         List<PointDataMetadata> oldMetadata =
             getMetadata(getTableName(oldEntry), false);
 
-        Connection connection = getDatabaseManager().getNewConnection();
+        Connection connection = getDatabaseManager().getConnection();
         connection.setAutoCommit(false);
         try {
             String newTableName = getTableName(newEntry);
@@ -487,7 +486,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             connection.setAutoCommit(true);
         } catch (Exception exc) {
             try {
-                connection.close();
+                getDatabaseManager().closeConnection(connection);
             } catch (Exception ignore) {}
             try {
                 deleteFromDatabase(getTableName(newEntry));
@@ -640,17 +639,15 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
             connection, getDatabaseManager().convertSql(sql.toString()),
             1000, 10000);
 
-        Statement statement = connection.createStatement();
         for (String index : indexSql) {
-            SqlUtil.loadSql(index, statement, false, false);
+            getDatabaseManager().loadSql(index, false, false);
         }
-        statement.close();
 
-
+        List<Object[]> valueList  = new ArrayList<Object[]>();
         for (PointDataMetadata pdm : metadata) {
-            getDatabaseManager().executeInsert(connection,
-                    Tables.POINTDATAMETADATA.INSERT, pdm.getValues());
+            valueList.add(pdm.getValues());
         }
+        getDatabaseManager().executeInsert(Tables.POINTDATAMETADATA.INSERT, valueList);
     }
 
 
@@ -917,7 +914,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                           entry.getParentGroup(), file);
             List<PointDataMetadata> metadata =
                 getMetadata(getTableName(entry));
-            Connection connection = getDatabaseManager().getNewConnection();
+            Connection connection = getDatabaseManager().getConnection();
             try {
                 connection.setAutoCommit(false);
                 insertData(entry, metadata, fdp, connection, true);
@@ -1174,7 +1171,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                              + getDatabaseManager().getLimitString(
                                  request.get(ARG_SKIP, 0), max), max);
 
-        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
         int              cnt           = 0;
         List<PointData>  pointDataList = new ArrayList<PointData>();
@@ -2675,10 +2672,10 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                     Statement stmt = getDatabaseManager().select(
                                          SqlUtil.distinct(pdm.columnName),
                                          tableName, (Clause) null);
-                    values = Misc.toList(SqlUtil.readString(stmt, 1));
+                    values = Misc.toList(SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1));
                     values = new ArrayList(Misc.sort(values));
                     values.add(0, "");
-                    getDatabaseManager().close(stmt);
+                    getDatabaseManager().closeAndReleaseConnection(stmt);
                     pdm.enumeratedValues = values;
                 }
                 String field =
@@ -2837,7 +2834,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
                                 + Tables.POINTDATAMETADATA.COL_COLUMNNUMBER
                                 + " ASC ");
 
-            SqlUtil.Iterator iter = SqlUtil.getIterator(statement);
+            SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
             ResultSet        results;
             while ((results = iter.next()) != null) {
                 while (results.next()) {

@@ -1874,7 +1874,7 @@ public class TypeHandler extends RepositoryManager {
                  *
                  * List<Group> groups =
                  *   getRepository().getGroups(SqlUtil.readString(stmt, 1));
-                 * stmt.close();
+                 * getDatabaseManager().closeStatement(stmt);
                  *
                  * if (groups.size() > 1) {
                  *   List groupList = new ArrayList();

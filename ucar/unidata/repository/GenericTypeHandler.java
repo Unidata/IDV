@@ -149,7 +149,6 @@ public class GenericTypeHandler extends TypeHandler {
             return;
         }
 
-
         Statement statement = getDatabaseManager().createStatement();
         colNames.add(COL_ID);
         StringBuffer tableDef = new StringBuffer("CREATE TABLE "
@@ -157,8 +156,7 @@ public class GenericTypeHandler extends TypeHandler {
 
         tableDef.append(COL_ID + " varchar(200))");
         try {
-            statement.execute(tableDef.toString());
-
+            getDatabaseManager().execute(tableDef.toString());
         } catch (Throwable exc) {
             if (exc.toString().indexOf("already exists") < 0) {
                 //TODO:
@@ -171,7 +169,7 @@ public class GenericTypeHandler extends TypeHandler {
                         + "  ON " + getTableName() + " (" + COL_ID + ");\n");
 
         try {
-            SqlUtil.loadSql(indexDef.toString(), statement, true);
+            getDatabaseManager().loadSql(indexDef.toString(), true, false);
         } catch (Throwable exc) {
             //TODO:
             //            throw new WrapperException(exc);
@@ -191,11 +189,8 @@ public class GenericTypeHandler extends TypeHandler {
             colNames.addAll(column.getColumnNames());
             column.createTable(statement);
         }
-        statement.close();
-
+        getDatabaseManager().closeAndReleaseConnection(statement);
         //TODO: Run through the table and delete any columns and indices that aren't defined anymore
-
-
     }
 
     /**
@@ -363,7 +358,7 @@ public class GenericTypeHandler extends TypeHandler {
         Statement statement = select(request, SqlUtil.distinct(column),
                                      where, "");
 
-        String[]     values = SqlUtil.readString(statement, 1);
+        String[]     values = SqlUtil.readString(getDatabaseManager().getIterator(statement), 1);
         StringBuffer sb     = new StringBuffer();
         OutputType   output = request.getOutput();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {

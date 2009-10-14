@@ -368,7 +368,7 @@ public class AssociationManager extends RepositoryManager {
                 getDatabaseManager().select(
                     SqlUtil.distinct(Tables.ASSOCIATIONS.COL_TYPE),
                     Tables.ASSOCIATIONS.NAME, (Clause) null);
-            String[] values = SqlUtil.readString(stmt, 1);
+            String[] values = SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1);
             types = (List<String>) Misc.toList(values);
             types.remove("");
         }
@@ -525,7 +525,7 @@ public class AssociationManager extends RepositoryManager {
                                  request.get(ARG_SKIP, 0), max));
         //        System.err.println (getRepository().getQueryOrderAndLimit(request,false));
         List<Association> associations = new ArrayList();
-        SqlUtil.Iterator  iter         = SqlUtil.getIterator(stmt);
+        SqlUtil.Iterator  iter         = getDatabaseManager().getIterator(stmt);
         ResultSet         results;
         while ((results = iter.next()) != null) {
             while (results.next()) {
@@ -571,9 +571,9 @@ public class AssociationManager extends RepositoryManager {
                                    Tables.ENTRIES.COL_ID));
         }
 
-        return SqlUtil.readString(typeHandler.select(request,
+        return SqlUtil.readString(getDatabaseManager().getIterator(typeHandler.select(request,
                 SqlUtil.distinct(Tables.ASSOCIATIONS.COL_NAME), where,
-                ""), 1);
+                "")), 1);
     }
 
 

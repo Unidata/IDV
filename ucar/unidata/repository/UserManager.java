@@ -235,7 +235,7 @@ public class UserManager extends RepositoryManager {
                                  Clause.eq(
                                      Tables.FAVORITES.COL_USER_ID,
                                      user.getId()));
-            SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+            SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
             ResultSet        results;
             //COL_ID,COL_USER_ID,COL_ENTRY_ID,COL_NAME,COL_CATEGORY
             while ((results = iter.next()) != null) {
@@ -380,7 +380,6 @@ public class UserManager extends RepositoryManager {
                     msg("Forget your password?")));
         }
 
-
         return sb.toString();
     }
 
@@ -453,7 +452,6 @@ public class UserManager extends RepositoryManager {
         ResultSet results = stmt.getResultSet();
         if (results.next()) {
             user = getUser(results);
-            getDatabaseManager().close(stmt);
         } else {
             for (UserAuthenticator userAuthenticator : userAuthenticators) {
                 user = userAuthenticator.findUser(getRepository(), id);
@@ -463,7 +461,7 @@ public class UserManager extends RepositoryManager {
                 }
             }
         }
-        getDatabaseManager().close(stmt);
+        getDatabaseManager().closeAndReleaseConnection(stmt);
 
         if (user == null) {
             if (userDefaultIfNotFound) {
@@ -1231,7 +1229,7 @@ public class UserManager extends RepositoryManager {
                              Tables.USERS.NAME, new Clause(),
                              " order by " + Tables.USERS.COL_ID);
 
-        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
 
         List<User>       users = new ArrayList();
@@ -1374,7 +1372,7 @@ public class UserManager extends RepositoryManager {
                              Clause.eq(
                                  Tables.USERROLES.COL_USER_ID, user.getId()));
 
-        String[]     array = SqlUtil.readString(stmt, 1);
+        String[]     array = SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1);
         List<String> roles = new ArrayList<String>(Misc.toList(array));
         user.setRoles(roles);
         return user;
@@ -2267,11 +2265,11 @@ public class UserManager extends RepositoryManager {
                                 new String[] { Tables.USERS.COL_PASSWORD },
                                 new Object[] { hashedPassword });
                     }
-                    stmt2.close();
+                    getDatabaseManager().closeAndReleaseConnection(stmt2);
                 } else {
                     user = getUser(results);
                 }
-                stmt.close();
+                getDatabaseManager().closeAndReleaseConnection(stmt);
 
                 if (user == null) {
                     for (UserAuthenticator userAuthenticator : userAuthenticators) {
@@ -2347,11 +2345,11 @@ public class UserManager extends RepositoryManager {
                                     "Sorry, we were doing some cleanup and have reset your password")));
 
                             addPasswordResetForm(request, sb, name);
-                            stmt.close();
+                            getDatabaseManager().closeAndReleaseConnection(stmt);
                             return new Result(msg("Login"), sb);
                         }
                     }
-                    stmt.close();
+                    getDatabaseManager().closeAndReleaseConnection(stmt);
                 }
 
                 //TODO: what to do when we have ssl here?
@@ -2474,10 +2472,10 @@ public class UserManager extends RepositoryManager {
      */
     public List<String> getRoles() throws Exception {
         String[] roleArray =
-            SqlUtil.readString(
+            SqlUtil.readString(getDatabaseManager().getIterator(
                 getDatabaseManager().select(
                     SqlUtil.distinct(Tables.USERROLES.COL_ROLE),
-                    Tables.USERROLES.NAME, new Clause()), 1);
+                    Tables.USERROLES.NAME, new Clause())), 1);
         List<String> roles = new ArrayList<String>(Misc.toList(roleArray));
 
         for (UserAuthenticator userAuthenticator : userAuthenticators) {
@@ -2552,7 +2550,7 @@ public class UserManager extends RepositoryManager {
                                         + Tables.USER_ACTIVITY.COL_DATE
                                         + " desc " + limitString);
 
-        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
         if (theUser != null) {
             sb.append(msgLabel("Activity for User"));

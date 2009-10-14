@@ -38,6 +38,9 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
+import java.sql.ResultSet;
+
+
 
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
@@ -48,15 +51,6 @@ import ucar.unidata.xml.XmlUtil;
 import java.io.File;
 
 import java.lang.reflect.*;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 
 import java.util.ArrayList;
@@ -159,7 +153,7 @@ public class HarvesterManager extends RepositoryManager {
         harvesters = new ArrayList<Harvester>();
 
 
-        SqlUtil.Iterator iter = SqlUtil.getIterator(
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(
                                     getDatabaseManager().select(
                                         Tables.HARVESTERS.COLUMNS,
                                         Tables.HARVESTERS.NAME,

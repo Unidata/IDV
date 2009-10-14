@@ -56,13 +56,9 @@ import java.lang.reflect.*;
 
 import java.net.*;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
+
+
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.text.SimpleDateFormat;
@@ -534,7 +530,7 @@ public class RegistryManager extends RepositoryManager {
                                         (Clause) null,
                                         " order by "
                                         + Tables.SERVERREGISTRY.COL_URL);
-        SqlUtil.Iterator iter     = SqlUtil.getIterator(stmt);
+        SqlUtil.Iterator iter     = getDatabaseManager().getIterator(stmt);
         List<Comment>    comments = new ArrayList();
         ResultSet        results;
         while ((results = iter.next()) != null) {
@@ -681,7 +677,7 @@ public class RegistryManager extends RepositoryManager {
                                         (Clause) null,
                                         " order by "
                                         + Tables.REMOTESERVERS.COL_URL);
-        SqlUtil.Iterator iter = SqlUtil.getIterator(stmt);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
         ResultSet        results;
         while ((results = iter.next()) != null) {
             while (results.next()) {

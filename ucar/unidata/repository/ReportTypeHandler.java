@@ -111,9 +111,9 @@ public class ReportTypeHandler extends TypeHandler {
         tableDef.append(COL_CONTENT + " varchar(10000)");
         tableDef.append(")");
 
-        Statement statement = getDatabaseManager().createStatement();
+
         try {
-            statement.execute(tableDef.toString());
+            getDatabaseManager().execute(tableDef.toString());
         } catch (Throwable exc) {
             //            if (exc.toString().indexOf("already exists") < 0) {
             //                throw new WrapperException(exc);

@@ -651,7 +651,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     public void close() throws Exception {
-        getDatabaseManager().closeConnection();
+        getDatabaseManager().shutdown();
     }
 
 
@@ -840,13 +840,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         for (String sqlFile : (List<String>) loadFiles) {
             String sql =
                 getStorageManager().readUncheckedSystemResource(sqlFile);
-            Connection connection = getDatabaseManager().getNewConnection();
-            connection.setAutoCommit(false);
-            Statement statement = connection.createStatement();
-            SqlUtil.loadSql(sql, statement, false, true);
-            connection.commit();
-            connection.setAutoCommit(true);
-            getDatabaseManager().closeConnection(connection);
+            getDatabaseManager().loadSql(sql, false, true);
         }
         readGlobals();
 
@@ -1529,7 +1523,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             String value = results.getString(2);
             dbProperties.put(name, value);
         }
-        statement.close();
+        getDatabaseManager().closeAndReleaseConnection(statement);
     }
 
 
@@ -3111,8 +3105,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                          getProperty(PROP_DB_SCRIPT));
         sql = getDatabaseManager().convertSql(sql);
 
-        Statement statement = getDatabaseManager().createStatement();
-        SqlUtil.loadSql(sql, statement, true);
+        getDatabaseManager().loadSql(sql,  true,false);
 
         for (String file : typeDefFiles) {
             file = getStorageManager().localizePath(file);
@@ -4356,7 +4349,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             typeHandler.select(request,
                                SqlUtil.distinct(Tables.ENTRIES.COL_TYPE),
                                where, "");
-        String[] types = SqlUtil.readString(stmt, 1);
+        String[] types = SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1);
         for (int i = 0; i < types.length; i++) {
             TypeHandler theTypeHandler = getTypeHandler(types[i]);
 
@@ -4384,7 +4377,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         Statement stmt = getDatabaseManager().select(
                              SqlUtil.distinct(Tables.ENTRIES.COL_DATATYPE),
                              Tables.ENTRIES.NAME, new Clause[] {});
-        String[]  types = SqlUtil.readString(stmt, 1);
+        String[]  types = SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1);
         List      tmp   = new ArrayList();
         Hashtable seen  = new Hashtable();
         for (TypeHandler typeHandler : getTypeHandlers()) {
@@ -4450,12 +4443,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *
      *   Statement stmt;
      *   String[] tags =
-     *       SqlUtil.readString(stmt =
+     *       SqlUtil.readString(getDatabaseManager().getIterator(stmt =
      *           typeHandler.select(request,
      *                                     SqlUtil.distinct(Tables.TAGS.COL_NAME),
      *                                     where,
-     *                                     " order by " + Tables.TAGS.COL_NAME), 1);
-     *   stmt.close();
+     *                                     " order by " + Tables.TAGS.COL_NAME)), 1);
+     *   getDatabaseManager().closeStatement(stmt);
      *
      *   List<Tag>     tagList = new ArrayList();
      *   List<String>  names   = new ArrayList<String>();
@@ -4475,7 +4468,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *           continue;
      *       }
      *       int count = results2.getInt(1);
-     *       stmt2.close();
+     *       getDatabaseManager().closeStatement(stmt2);
      *       if ((max < 0) || (count > max)) {
      *           max = count;
      *       }
