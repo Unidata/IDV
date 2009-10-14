@@ -600,7 +600,7 @@ public class SqlUtil {
         }
         stmt.setString(values.length + 1, id);
         stmt.execute();
-        stmt.close();
+        close(stmt);
     }
 
 
@@ -619,7 +619,7 @@ public class SqlUtil {
         clause.setValue(stmt, colCnt);
 
         stmt.execute();
-        stmt.close();
+        close(stmt);
     }
 
 
@@ -947,7 +947,6 @@ public class SqlUtil {
                                boolean ignoreErrors, boolean printStatus)
             throws Exception {
 
-
         int cnt=0;
         for (String command : parseSql(sql)) {
             if(printStatus) {
@@ -1035,12 +1034,11 @@ public class SqlUtil {
      *
      * @throws Exception _more_
      */
-    public static double[] readTime(Statement stmt, int column)
+    public static double[] readTime(Iterator iter, int column)
             throws Exception {
         ResultSet results;
         double[]  current = new double[10000];
         int       cnt     = 0;
-        Iterator  iter    = getIterator(stmt);
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 Date   dttm  = results.getDate(column, calendar);
@@ -1073,12 +1071,11 @@ public class SqlUtil {
      *
      * @throws Exception _more_
      */
-    public static float[] readFloat(Statement stmt, int column, float missing)
+    public static float[] readFloat(Iterator iter, int column, float missing)
             throws Exception {
         float[]   current = new float[10000];
         int       cnt     = 0;
         ResultSet results;
-        Iterator  iter = getIterator(stmt);
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 float value = results.getFloat(column);
@@ -1100,13 +1097,12 @@ public class SqlUtil {
 
 
 
-    public static List<float[]> readFloats(Statement stmt, float missing)
+    public static List<float[]> readFloats(Iterator iter, float missing)
             throws Exception {
         List<float[]> arrays = new ArrayList<float[]>();
         int numCols =  -1;
         int       cnt     = 0;
         ResultSet results;
-        Iterator  iter = getIterator(stmt);
         while ((results = iter.next()) != null) {
             if(numCols == -1) {
                 ResultSetMetaData rsmd = results.getMetaData();
@@ -1160,11 +1156,10 @@ public class SqlUtil {
      *
      * @throws Exception _more_
      */
-    public static int[] readInt(Statement stmt, int column) throws Exception {
+    public static int[] readInt(Iterator iter, int column) throws Exception {
         int[]     current = new int[10000];
         int       cnt     = 0;
         ResultSet results;
-        Iterator  iter = getIterator(stmt);
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 int value = results.getInt(column);
@@ -1195,9 +1190,9 @@ public class SqlUtil {
      *
      * @throws Exception _more_
      */
-    public static String[] readString(Statement stmt, String columnName)
+    public static String[] readString(Iterator iter, String columnName)
             throws Exception {
-        return readString(stmt, -1, columnName);
+        return readString(iter, -1, columnName);
     }
 
 
@@ -1211,8 +1206,8 @@ public class SqlUtil {
      *
      * @throws Exception _more_
      */
-    public static String[] readString(Statement stmt) throws Exception {
-        return readString(stmt, 1);
+    public static String[] readString(Iterator iter) throws Exception {
+        return readString(iter, 1);
     }
 
     /**
@@ -1225,9 +1220,9 @@ public class SqlUtil {
      *
      * @throws Exception _more_
      */
-    public static String[] readString(Statement stmt, int column)
+    public static String[] readString(Iterator iter, int column)
             throws Exception {
-        return readString(stmt, column, null);
+        return readString(iter, column, null);
     }
 
 
@@ -1242,13 +1237,12 @@ public class SqlUtil {
      *
      * @throws Exception _more_
      */
-    private static String[] readString(Statement stmt, int column,
+    private static String[] readString(Iterator iter, int column,
                                        String name)
             throws Exception {
         String[]  current = new String[10000];
         int       cnt     = 0;
         ResultSet results;
-        Iterator  iter = getIterator(stmt);
         while ((results = iter.next()) != null) {
             if (name != null) {
                 column = results.findColumn(name);
@@ -1282,13 +1276,12 @@ public class SqlUtil {
      *
      * @throws Exception _more_
      */
-    public static double[] readDouble(Statement stmt, int column,
+    public static double[] readDouble(Iterator iter, int column,
                                       double missing)
             throws Exception {
         double[]  current = new double[10000];
         int       cnt     = 0;
         ResultSet results;
-        Iterator  iter = getIterator(stmt);
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 double value = results.getDouble(column);
@@ -1318,12 +1311,11 @@ public class SqlUtil {
      *
      * @throws Exception _more_
      */
-    public static Date[] readDate(Statement stmt, int column)
+    public static Date[] readDate(Iterator iter, int column)
             throws Exception {
         Date[]    current = new Date[10000];
         int       cnt     = 0;
         ResultSet results;
-        Iterator  iter = getIterator(stmt);
         while ((results = iter.next()) != null) {
             while (results.next()) {
                 Date value = results.getDate(column, calendar);
@@ -1400,12 +1392,45 @@ public class SqlUtil {
             cnt++;
             lastResultSet = stmt.getResultSet();
             if (lastResultSet == null) {
-                stmt.close();
+                close(stmt);
                 stmt = null;
             }
             return lastResultSet;
         }
+
+        public void close() throws SQLException {
+            if(stmt!=null) {
+                close(stmt);
+                stmt  = null;
+            }
+        }
+
+        protected void close(Statement stmt) throws SQLException {
+            SqlUtil.close(stmt);
+        }
     }
+
+
+    private static ConnectionManager connectionManager;
+
+    public static void setConnectionManager(ConnectionManager mgr) {
+        connectionManager = mgr;
+    }
+
+    public static void close(Statement stmt) throws SQLException {
+        if(connectionManager!=null) {
+            connectionManager.closeStatement(stmt);
+        } else {
+            close(stmt);
+        }
+    }
+
+
+    public static interface ConnectionManager {
+        public void closeStatement(Statement stmt);
+    }
+
+
 
     /**
      * _more_
@@ -1578,7 +1603,7 @@ public class SqlUtil {
                                      clause);
         clause.setValue(stmt, 1);
         stmt.execute();
-        stmt.close();
+        close(stmt);
     }
 
     /**
