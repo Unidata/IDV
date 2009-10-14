@@ -541,8 +541,8 @@ public class EolDbTrackAdapter extends TrackAdapter {
          */
         protected double[] getDoubleData(Range range, String var)
                 throws Exception {
-            double[] d = SqlUtil.readDouble(select(var, TABLE_DATA,
-                             "order by " + varTime), 1, getMissingValue(var));
+            double[] d = SqlUtil.readDouble(SqlUtil.getIterator(select(var, TABLE_DATA,
+                             "order by " + varTime)), 1, getMissingValue(var));
             if (d.length == 0) {
                 throw new BadDataException(
                     "No observations found in data base");
@@ -580,8 +580,8 @@ public class EolDbTrackAdapter extends TrackAdapter {
         protected float[] getFloatData(Range range, String var)
                 throws Exception {
             long t1 = System.currentTimeMillis();
-            float[] f = SqlUtil.readFloat(select("(" + var + ")",
-                            TABLE_DATA, "order by " + varTime), 1,
+            float[] f = SqlUtil.readFloat(SqlUtil.getIterator(select("(" + var + ")",
+                            TABLE_DATA, "order by " + varTime)), 1,
                                 (float) getMissingValue(var));
             long t2 = System.currentTimeMillis();
             //            System.err.println("length:" + f.length + " time:" + (t2-t1));
@@ -604,8 +604,8 @@ public class EolDbTrackAdapter extends TrackAdapter {
          */
         protected String[] getStringData(Range range, String var)
                 throws Exception {
-            return SqlUtil.readString(select(var, TABLE_DATA,
-                    "order by " + varTime), 1);
+            return SqlUtil.readString(SqlUtil.getIterator(select(var, TABLE_DATA,
+                    "order by " + varTime)), 1);
         }
 
     }
