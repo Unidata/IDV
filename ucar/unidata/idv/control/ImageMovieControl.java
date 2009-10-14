@@ -1961,6 +1961,7 @@ public class ImageMovieControl extends DisplayControlImpl {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
+
         if (false) {
             int cnt = 0;
             for (int lat = 24; lat <= 48; lat += 1) {
@@ -2012,14 +2013,11 @@ public class ImageMovieControl extends DisplayControlImpl {
                                             toks.get(2)).doubleValue() });
         }
 
-        HashSet          seen    = new HashSet();
+        Hashtable<String,CameraInfo>      seen    = new Hashtable<String,CameraInfo>();
         List<CameraInfo> cameras = new ArrayList<CameraInfo>();
         File             dir     = new File(".");
         File[]           files   = dir.listFiles();
-        FileOutputStream fos     = new FileOutputStream("weatherbugcameras.xml");
-        fos.write(
-            new String(
-                "<stationtable name=\"WeatherBug Web Cams\">\n").getBytes());
+        Hashtable<String,Integer> zips = new Hashtable<String,Integer>();
         for (File f : files) {
             if ( !f.getName().toString().startsWith("cam_")) {
                 continue;
@@ -2029,12 +2027,8 @@ public class ImageMovieControl extends DisplayControlImpl {
             List nodes = XmlUtil.findDescendants(root, "aws:camera");
             for (Element camNode : (List<Element>) nodes) {
                 String id = XmlUtil.getAttribute(camNode, "id");
-                if (seen.contains(id)) {
-                    continue;
-                }
-                seen.add(id);
-
                 String   zipCode = XmlUtil.getAttribute(camNode, "zipcode");
+                double distance =  XmlUtil.getAttribute(camNode,"distance",0.0);
                 if(id.equals("BLDBC")) {
                     zipCode = "80303";
                 }
@@ -2046,27 +2040,58 @@ public class ImageMovieControl extends DisplayControlImpl {
                 }
                 double lat  = latlon[0];
                 double lon  = latlon[1];
-                CameraInfo cameraInfo = new CameraInfo(id, latlon[0],
-                                            latlon[1]);
-                cameras.add(cameraInfo);
                 id   = id.replace(",", "_");
                 name = name.replace(",", " ");
+
+                CameraInfo cameraInfo = new CameraInfo(id, name, latlon[0],
+                                                       latlon[1],
+                                                       distance);
+
+                
+                CameraInfo old= seen.get(id);
+                if(old!=null) {
+                    if(old.distance>cameraInfo.distance) {
+                        old.distance = cameraInfo.distance;
+                    }
+                    continue;
+                }
+                seen.put(id,cameraInfo);
+                cameras.add(cameraInfo);
+
+                Integer cnt = zips.get(zipCode);
+                if(cnt!=null) {
+                    //                    System.out.println("zip:" + zipCode);
+                } else {
+                    zips.put(zipCode,new Integer(1));
+                }
+
+
+
+            }
+
+        }
+ 
+        FileOutputStream fos     = new FileOutputStream("weatherbugcameras.xml");
+        fos.write(
+            new String(
+                "<stationtable name=\"WeatherBug Web Cams\">\n").getBytes());
+
+            for(CameraInfo camInfo: cameras) {
                 StringBuffer sb = new StringBuffer();
-                String imageUrl = "http://wwc.instacam.com/instacamimg/" + id
-                                  + "/" + id + "_s.jpg";
-                String html = "<h3>WeatherBug WebCam</h3><b>" + name
+                String imageUrl = "http://wwc.instacam.com/instacamimg/" +  camInfo.id
+                                  + "/" + camInfo.id + "_s.jpg";
+                String html = "<h3>WeatherBug WebCam</h3><b>" + camInfo.name
                               + "</b><br><img src=\"" + imageUrl + "\">";
                 sb.append(XmlUtil.openTag("station",
-                                          XmlUtil.attrs("name", name, "lat",
-                                              "" + lat, "lon", "" + lon,
+                                          XmlUtil.attrs("name", camInfo.name, "lat",
+                                              "" + camInfo.lat, "lon", "" + camInfo.lon,
                                                   "imageurl", imageUrl)));
                 sb.append("<![CDATA[" + html + "]]></station>\n");
 
-                //                    <station      name="Alabama"                population="4447100"    lat="33.001471"   lon="-86.766233" />
                 fos.write(sb.toString().getBytes());
 
             }
-        }
+            
         fos.write(new String("</stationtable>\n").getBytes());
         fos.close();
         System.err.println("#cameras:" + cameras.size());
@@ -2083,11 +2108,16 @@ public class ImageMovieControl extends DisplayControlImpl {
         /** _more_          */
         String id;
 
+        String name;
+
         /** _more_          */
         double lat;
 
         /** _more_          */
         double lon;
+
+        double distance;
+
 
         /**
          * _more_
@@ -2096,10 +2126,12 @@ public class ImageMovieControl extends DisplayControlImpl {
          * @param lat _more_
          * @param lon _more_
          */
-        public CameraInfo(String id, double lat, double lon) {
+        public CameraInfo(String id, String name, double lat, double lon, double distance) {
             this.id  = id;
+            this.name = name;
             this.lat = lat;
             this.lon = lon;
+            this.distance = distance;
         }
     }
 
