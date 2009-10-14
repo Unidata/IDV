@@ -1194,8 +1194,10 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         dashboardLbl.addMouseListener(mouseAdapter);
         dashboardLbl.addMouseMotionListener(mouseAdapter);
 
-        JComponent gaugesPanel = GuiUtils.vsplit(readoutDisplay,
+        JSplitPane gaugesPanel = GuiUtils.vsplit(readoutDisplay,
                                      dashboardLbl);
+        gaugesPanel.setResizeWeight(0.5);
+        gaugesPanel.setOneTouchExpandable(true);
         readoutTab.addTab("Gauges", gaugesPanel);
         readoutTab.addTab("Values", GuiUtils.inset(readoutLabel, 1));
 
