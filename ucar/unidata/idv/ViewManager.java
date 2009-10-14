@@ -6180,17 +6180,23 @@ public class ViewManager extends SharableImpl implements ActionListener,
             return;
         }
 
-        JComponent navComponent = getComponent();
-        innerContents.add(BorderLayout.CENTER, navComponent);
-        fullScreenWindow.setVisible(false);
-        fullScreenWindow.dispose();
-        fullScreenWindow = null;
-        AnimationWidget animationWidget = getAnimationWidget();
-        if ((animationWidget != null) && (animationHolder != null)) {
-            //            animationHolder.add(BorderLayout.CENTER,
-            //                                animationWidget.getContents());
-            animationHolder.add(animationWidget.getContents());
-        }
+        Runnable runnable = new Runnable() {
+                public void run() {
+                    //                    System.err.println("reset full screen:" + Thread.currentThread());
+                    JComponent navComponent = getComponent();
+                    innerContents.add(BorderLayout.CENTER, navComponent);
+                    fullScreenWindow.setVisible(false);
+                    fullScreenWindow.dispose();
+                    fullScreenWindow = null;
+                    AnimationWidget animationWidget = getAnimationWidget();
+                    if ((animationWidget != null) && (animationHolder != null)) {
+                        //            animationHolder.add(BorderLayout.CENTER,
+                        //                                animationWidget.getContents());
+                        animationHolder.add(animationWidget.getContents());
+                    }
+                }};
+        //        GuiUtils.invokeInSwingThread(runnable);
+        Misc.run(runnable);
     }
 
     /**
