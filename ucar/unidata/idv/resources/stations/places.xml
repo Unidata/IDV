@@ -11,6 +11,11 @@
      category="US"
      href="/ucar/unidata/idv/resources/stations/place_u_s_cities.xml"/>
 
+  <stationtable
+     name="Weather Bug Web Cams"
+     category="US"
+     href="http://www.unidata.ucar.edu/georesources/locations/weatherbugcameras.xml"/>
+
 
   <stationtable
      name="US Weather Stations"
