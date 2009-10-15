@@ -79,8 +79,17 @@ public class CursorReadoutWindow {
 
     private    EarthLocation lastEarthLocation;
 
+    private boolean ignoreMissing = true;
+
+
     public CursorReadoutWindow(NavigatedViewManager vm) {
+        this(vm,true);
+    }
+
+
+    public CursorReadoutWindow(NavigatedViewManager vm, boolean ignoreMissing) {
         this.vm = vm;
+        this.ignoreMissing = ignoreMissing;
         label = GuiUtils.getFixedWidthLabel("");
         label.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
     }

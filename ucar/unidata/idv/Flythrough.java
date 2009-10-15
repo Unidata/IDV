@@ -27,9 +27,12 @@
 package ucar.unidata.idv;
 
 
+import org.jfree.chart.title.TextTitle;
+
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.DialShape;
+import org.jfree.chart.plot.CompassPlot;
 import org.jfree.chart.plot.MeterInterval;
 import org.jfree.chart.plot.MeterPlot;
 import org.jfree.chart.plot.ThermometerPlot;
@@ -52,7 +55,9 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 
 import ucar.unidata.idv.control.ReadoutInfo;
 import ucar.unidata.idv.ui.CursorReadoutWindow;
+import ucar.unidata.idv.ui.PipPanel;
 import ucar.unidata.ui.ImagePanel;
+import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.LatLonWidget;
 import ucar.unidata.util.DateUtil;
 
@@ -372,8 +377,26 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private double heading = 0;
 
+    private double currentHeading = 0;
+
     /** _more_ */
     private JLabel dashboardLbl;
+
+    private PipPanel pipPanel;
+    private JFrame pipFrame;
+
+    private int[][] dialPts = {
+        {400,100,190,135},
+        {256,  81, 100,100},
+        {224,  200, 100,100},
+        {565,  200,150,100},
+        {356,  252,150,100},
+        {447,  252,150,100},
+
+    };
+
+    private List<JComponent> dials  = new ArrayList<JComponent>();
+
 
     /** _more_ */
     private Point dashboardImageOffset = new Point(0, 0);
@@ -911,7 +934,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         viewManager.getMaster().addDisplayable(locationLine);
 
 
-        readout = new CursorReadoutWindow(viewManager);
+        readout = new CursorReadoutWindow(viewManager,false);
 
 
         clipFld = new JTextField("0", 5);
@@ -1166,20 +1189,52 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
         dashboardImage = GuiUtils.getImage("/auxdata/ui/icons/cockpit.gif",
                                            getClass(), false);
+        pipPanel  = new PipPanel(viewManager);
+        pipPanel.setPreferredSize(new Dimension(100, 100));
+        pipPanel.doLayout();
+        pipPanel.validate();
+        pipFrame = new JFrame("Show remain invisible");
+        pipFrame.setContentPane(pipPanel);
+        pipFrame.pack();
+        //        GuiUtils.showOkCancelDialog(null,null,pipPanel,null);
+
         dashboardLbl = new JLabel(new ImageIcon(dashboardImage)) {
             public void paint(Graphics g) {
                 paintDashboard(g, dashboardLbl);
                 super.paint(g);
+                paintDashboardAfter(g, dashboardLbl);
             }
         };
+        Misc.run(new Runnable() {
+                public void run() {
+                    try {
+                        BufferedImage image = new BufferedImage(10,10,
+                                                                BufferedImage.TYPE_INT_RGB);
+                        Graphics2D g = (Graphics2D) image.getGraphics();
+                        paintDashboardAfter(g, dashboardLbl);
+                    } catch(Exception ignore) {}}});
+
+        dashboardLbl.addKeyListener(new KeyAdapter() {
+                public void keyPressed(KeyEvent e) {
+                    pipPanel.keyPressedInMap(e);
+                    dashboardLbl.repaint();
+                }
+            });
+
         dashboardLbl.setVerticalAlignment(SwingConstants.BOTTOM);
         MouseAdapter mouseAdapter = new MouseAdapter() {
             Point mouseStart     = new Point(0, 0);
             Point originalOffset = new Point(0, 0);
             public void mousePressed(MouseEvent me) {
+                dashboardLbl.requestFocus();
                 originalOffset = new Point(dashboardImageOffset);
                 mouseStart.x   = me.getX();
                 mouseStart.y   = me.getY();
+                Rectangle b = dashboardLbl.getBounds();
+                int w = dashboardImage.getWidth(null);
+                int h = dashboardImage.getHeight(null);
+                Point ul = new Point (b.width/2-w/2,b.height-h);
+                //                System.out.println("{" + (me.getX()-ul.x) +",  " + (me.getY()-ul.y)+"}");
             }
 
             public void mouseDragged(MouseEvent me) {
@@ -1194,11 +1249,12 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         dashboardLbl.addMouseListener(mouseAdapter);
         dashboardLbl.addMouseMotionListener(mouseAdapter);
 
-        JSplitPane gaugesPanel = GuiUtils.vsplit(readoutDisplay,
-                                     dashboardLbl);
-        gaugesPanel.setResizeWeight(0.5);
-        gaugesPanel.setOneTouchExpandable(true);
-        readoutTab.addTab("Gauges", gaugesPanel);
+        //        JSplitPane gaugesPanel = GuiUtils.vsplit(readoutDisplay,
+        //                                     dashboardLbl);
+        //        gaugesPanel.setResizeWeight(0.5);
+        //        gaugesPanel.setOneTouchExpandable(true);
+        JComponent gaugesPanel = dashboardLbl;
+        readoutTab.addTab("Dashboard", gaugesPanel);
         readoutTab.addTab("Values", GuiUtils.inset(readoutLabel, 1));
 
         return GuiUtils.topCenter(GuiUtils.left(showReadoutCbx), readoutTab);
@@ -1232,7 +1288,75 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
 
+    public void paintDashboardAfter(Graphics g, JComponent comp) {
+        Graphics2D g2 = (Graphics2D) g;
+        AffineTransform oldTransform = g2.getTransform();
+        Rectangle b = dashboardLbl.getBounds();
+        int w = dashboardImage.getWidth(null);
+        int h = dashboardImage.getHeight(null);
+        Point ul = new Point (b.width/2-w/2,b.height-h);
+        int ptsIdx=0;
 
+
+        DefaultValueDataset dataset =
+            new DefaultValueDataset(new Double(currentHeading));
+
+        try {
+            pipPanel.setPreferredSize(new Dimension(dialPts[ptsIdx][2],
+                                                    dialPts[ptsIdx][3]));
+            pipFrame.setSize(dialPts[ptsIdx][2],
+                             dialPts[ptsIdx][3]);
+            pipPanel.doLayout();
+            pipPanel.validate();
+            pipFrame.pack();
+            pipPanel.resetDrawBounds();
+            pipPanel.redraw();
+        } catch(Exception ignore) {}
+
+
+        CompassPlot plot = new CompassPlot(dataset);
+        plot.setSeriesNeedle(0);
+        plot.setSeriesPaint(0, Color.red);
+        plot.setSeriesOutlinePaint(0, Color.red);
+        JFreeChart chart      = new JFreeChart("", plot);
+        ChartPanel compassPanel = new ChartPanel(chart);
+
+        plot.setBackgroundPaint( new Color(255,255,255,0) );
+        plot.setBackgroundImageAlpha(0.0f);
+        chart.setBackgroundPaint( new Color(255,255,255,0) );
+        compassPanel.setBackground( new Color(255,255,255,0) );
+
+
+        g2.setTransform(oldTransform);
+        drawDial(g2, pipPanel, ptsIdx++,ul);
+        g2.setTransform(oldTransform);
+        drawDial(g2, compassPanel, ptsIdx++,ul);
+
+        for(JComponent dial: dials) {
+            g2.setTransform(oldTransform);
+            drawDial(g2, dial, ptsIdx++,ul);
+        }
+
+        g2.setTransform(oldTransform);
+    }
+
+
+
+    private void drawDial(Graphics g2, JComponent comp, int ptsIdx,Point ul) {
+        if(ptsIdx>=dialPts.length) return;
+        comp.setSize(new Dimension(dialPts[ptsIdx][2], dialPts[ptsIdx][3]));
+        try {
+            Image image = ImageUtils.getImage(comp);
+            g2.translate(ul.x+dialPts[ptsIdx][0]-dialPts[ptsIdx][2]/2,
+                         ul.y+dialPts[ptsIdx][1]-dialPts[ptsIdx][3]/2);
+            g2.drawImage(image, 0, 0, null);
+
+        } catch(Exception exc) {
+            exc.printStackTrace();
+        }
+
+
+    }
 
 
     /**
@@ -1243,15 +1367,18 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      */
     public void paintDashboard(Graphics g, JComponent comp) {
         Graphics2D g2 = (Graphics2D) g;
-        Rectangle  b  = comp.getBounds();
+        Rectangle b = dashboardLbl.getBounds();
+        int w = dashboardImage.getWidth(null);
+        int h = dashboardImage.getHeight(null);
+        Point ul = new Point (b.width/2-w/2,b.height-h);
         g.setColor(Color.white);
         g.fillRect(0, 0, b.width, b.height);
         Image image = backgroundImage;
+        int ptsIdx=0;
+        //        dialPts
         if (image != null) {
             int imageHeight = image.getHeight(null);
             int imageWidth  = image.getWidth(this);
-
-
             if (imageHeight > 0) {
                 double          scale        = b.width / (double) imageWidth;
                 AffineTransform oldTransform = g2.getTransform();
@@ -1454,6 +1581,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         if ( !isActive()) {
             return;
         }
+        dashboardLbl.repaint();
         int id = event.getId();
         if ((id == DisplayEvent.MOUSE_PRESSED) && goToClick) {
             InputEvent inputEvent = event.getInputEvent();
@@ -2367,6 +2495,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     protected void goTo(FlythroughPoint pt1, double[] xyz1, double[] xyz2,
                         double[] actualPoint, boolean animateMove) {
 
+        currentHeading = 180;
         if (actualPoint == null) {
             actualPoint = xyz2;
         }
@@ -2454,12 +2583,22 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 }
 
                 //Keep flat in z for non globe
-                t.lookAt(new Point3d(x1, y1, z1),
-                         new Point3d(x2, y2, (( !getUseFixedZ() || doGlobe())
+                Point3d p1 = new Point3d(x1, y1, z1);
+                Point3d p2 = new Point3d(x2, y2, (( !getUseFixedZ() || doGlobe())
                         ? z2
-                        : z1)), upVector);
+                                                  : z1));
+                t.lookAt(p1,p2, upVector);
 
                 t.get(m);
+
+                EarthLocation el1 = navDisplay.getEarthLocation(p1.x,p1.y,p1.z,false);
+                EarthLocation el2 = navDisplay.getEarthLocation(p2.x,p2.y,p2.z,false);
+                Bearing bearing =
+                    Bearing.calculateBearing(new LatLonPointImpl(getLat(el1),
+                                                                 getLon(el1)), new LatLonPointImpl(getLat(el2),
+                                                                                                   getLon(el2)), null);
+                currentHeading  = bearing.getAngle();
+
 
 
                 double[] tiltMatrix = mouseBehavior.make_matrix(tiltx, tilty,
@@ -2677,6 +2816,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
     protected void processReadout(FlythroughPoint pt1) throws Exception {
 
+        dials  = new ArrayList<JComponent>();
         if ((readoutLabel == null) || (pt1 == null)) {
             return;
         }
@@ -2725,7 +2865,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             }
 
 
-            if ((unit != null)
+            if (false && (unit != null)
                     && Unit.canConvert(unit, CommonUnits.CELSIUS)) {
                 if (r.isMissing()) {
                     continue;
@@ -2744,37 +2884,34 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                                              CommonUnits.CELSIUS);
                     plot.setRange(min, max);
                 }
+                //                plot.setTickLabelFont(new Font("Dialog", Font.BOLD, 14));
                 JFreeChart chart = new JFreeChart("",
                                        JFreeChart.DEFAULT_TITLE_FONT, plot,
                                        false);
                 ChartPanel chartPanel = new ChartPanel(chart);
+                plot.setBackgroundPaint( new Color(255,255,255,0) );
+                plot.setBackgroundImageAlpha(0.0f);
+                chart.setBackgroundPaint( new Color(255,255,255,0) );
+                chartPanel.setBackground( new Color(255,255,255,0) );
                 //                chartPanel.setPreferredSize(new Dimension(100,300));
                 comps.add(chartPanel);
-            } else if (false
-                       && (name.toLowerCase().indexOf("precipitation")
-                           >= 0)) {
-                double v = r.getValue();
-                String html;
-                if (r.isMissing() || (v < 0.01)) {
-                    html = "<html><img  src=idvresource:/ucar/unidata/idv/control/images/sunny.png></html>";
-                } else {
-                    html = "<html><img  src=idvresource:/ucar/unidata/idv/control/images/rainy.png></html>";
-                }
-                String labelString = name.replace("_", " ") + "<br>"
-                                     + Misc.format(v);
-                if (r.getUnit() != null) {
-                    labelString += " [" + r.getUnit() + "]";
-                }
-                labels.add(new JLabel("<html>" + labelString));
-                comps.add(new JLabel(html));
+                dials.add(chartPanel);
             } else {
-                if (r.isMissing()) {
-                    continue;
-                }
+                Font font = new Font("Dialog", Font.BOLD, 22);
+                //                if (r.isMissing()) {
+                //                    continue;
+                //                }
+
                 double v = r.getValue(unit);
+                if(v==v)
+                    v = new Double(Misc.format(v)).doubleValue();
                 labels.add(new JLabel("<html>" + name.replace("_", " ")
                                       + "<br>" + Misc.format(v)
                                       + unitSuffix));
+
+                JLabel label =new JLabel(name.replace("_", " "));
+                
+                label.setFont(font);
                 DefaultValueDataset dataset =
                     new DefaultValueDataset(new Double(v));
                 MeterPlot plot = new MeterPlot(dataset);
@@ -2785,29 +2922,43 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 }
                 if (unit != null) {
                     plot.setUnits(unit.toString());
+                } else {
+                    plot.setUnits("");
                 }
                 plot.setDialBackgroundPaint(Color.white);
-                //             plot.setDialShape(DialShape.CHORD);
-                //                plot.setMeterAngle(260);
                 plot.setTickLabelsVisible(true);
-                plot.setTickLabelFont(new Font("Dialog", Font.BOLD, 10));
+                plot.setValueFont(font);
+                plot.setTickLabelFont(font);
                 plot.setTickLabelPaint(Color.darkGray);
-                //                plot.setTickSize(500.0);
-                plot.setTickPaint(Color.lightGray);
+                plot.setTickPaint(Color.black);
                 plot.setValuePaint(Color.black);
 
                 JFreeChart chart      = new JFreeChart("", plot);
+                TextTitle title =    new TextTitle(label.getText(),font);
+                //                title.setExpandToFitSpace(true);
+                title.setBackgroundPaint(Color.gray);
+                title.setPaint(Color.white);
+                chart.setTitle(title);
                 ChartPanel chartPanel = new ChartPanel(chart);
                 chartPanel.setPreferredSize(new Dimension(400, 400));
-                comps.add(chartPanel);
+                plot.setBackgroundPaint( new Color(255,255,255,0) );
+                plot.setBackgroundImageAlpha(0.0f);
+                chart.setBackgroundPaint( new Color(255,255,255,0) );
+                chartPanel.setBackground( new Color(255,255,255,0) );
 
+                comps.add(chartPanel);
+                //                dials.add(GuiUtils.centerBottom(chartPanel,label));
+                dials.add(chartPanel);
             }
         }
+
+
 
         List allComps = new ArrayList(labels);
         allComps.addAll(comps);
         readoutDisplay.removeAll();
-        if (allComps.size() > 0) {
+
+        if (false && allComps.size() > 0) {
             readoutDisplay.add("Center",
                                GuiUtils.doLayout(allComps, labels.size(),
                                    GuiUtils.WT_Y, GuiUtils.WT_NY));

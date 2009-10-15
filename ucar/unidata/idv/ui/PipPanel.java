@@ -147,7 +147,7 @@ public class PipPanel extends NavigatedMapPanel {
      *
      * @param e The event
      */
-    private void keyPressedInMap(KeyEvent e) {
+    public void keyPressedInMap(KeyEvent e) {
         if ((e.getKeyCode() == KeyEvent.VK_UP) && e.isShiftDown()) {
             navigatedPanel.zoom(ZOOM_IN);
         } else if ((e.getKeyCode() == KeyEvent.VK_DOWN) && e.isShiftDown()) {

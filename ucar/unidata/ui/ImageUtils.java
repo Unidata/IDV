@@ -756,7 +756,7 @@ public class ImageUtils {
             return null;
         }
         BufferedImage image = new BufferedImage((int) w, (int) h,
-                                  BufferedImage.TYPE_INT_RGB);
+                                  BufferedImage.TYPE_INT_ARGB);
         repaintManager.setDoubleBufferingEnabled(false);
         Graphics2D g = (Graphics2D) image.getGraphics();
         component.paint(g);
