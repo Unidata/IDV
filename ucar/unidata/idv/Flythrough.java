@@ -92,6 +92,7 @@ import visad.java3d.*;
 
 
 
+import java.io.File;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
@@ -385,14 +386,17 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     private PipPanel pipPanel;
     private JFrame pipFrame;
 
-    private int[][] dialPts = {
-        {400,100,190,135},
-        {256,  81, 100,100},
-        {224,  200, 100,100},
-        {565,  200,150,100},
-        {356,  252,150,100},
-        {447,  252,150,100},
+    private Dimension dialDimension = new Dimension(180,130);
 
+    private int[][] dialPts = {
+        {400,  100,200,145},
+        {256,  90, 120,100},
+        {224,  180, 170,100},
+        {575,  180, 170,100},
+        {356,  240, 150,100},
+        {447,  240, 150,100},
+        {560,  90, 130,100},
+        {687, 262, 90, 100}
     };
 
     private List<JComponent> dials  = new ArrayList<JComponent>();
@@ -1200,6 +1204,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
         dashboardLbl = new JLabel(new ImageIcon(dashboardImage)) {
             public void paint(Graphics g) {
+                readPts();
                 paintDashboard(g, dashboardLbl);
                 super.paint(g);
                 paintDashboardAfter(g, dashboardLbl);
@@ -1261,6 +1266,25 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     }
 
 
+    public void readPts() {
+        try {
+
+            if(new File("pts").exists()) {
+                List<int[]> pts = new ArrayList<int[]>();
+                for(String line: StringUtil.split(IOUtil.readContents("pts",""),"\n",true,true)) {
+                    pts.add(Misc.parseInts(line,","));
+                }
+                dialPts = new int[pts.size()][];
+                for(int i=0;i<pts.size();i++) {
+                    dialPts[i] = pts.get(i);
+                }
+            }
+
+
+        } catch(Exception exc) {
+            exc.printStackTrace();
+        }
+    }
 
     /** _more_ */
     private Object REPAINT_MUTEX = new Object();
@@ -1288,6 +1312,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
 
+    int xcnt = 0;
     public void paintDashboardAfter(Graphics g, JComponent comp) {
         Graphics2D g2 = (Graphics2D) g;
         AffineTransform oldTransform = g2.getTransform();
@@ -1314,6 +1339,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         } catch(Exception ignore) {}
 
 
+
         CompassPlot plot = new CompassPlot(dataset);
         plot.setSeriesNeedle(0);
         plot.setSeriesPaint(0, Color.red);
@@ -1325,14 +1351,26 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         plot.setBackgroundImageAlpha(0.0f);
         chart.setBackgroundPaint( new Color(255,255,255,0) );
         compassPanel.setBackground( new Color(255,255,255,0) );
+        compassPanel.setPreferredSize(dialDimension);
+        //        compassPanel.setSize(new Dimension(100,100));
 
 
         g2.setTransform(oldTransform);
         drawDial(g2, pipPanel, ptsIdx++,ul);
+
+
+        JFrame dummyFrame  = new JFrame("");
+        dummyFrame.setContentPane(compassPanel);
+        dummyFrame.pack();
+
         g2.setTransform(oldTransform);
         drawDial(g2, compassPanel, ptsIdx++,ul);
 
+
         for(JComponent dial: dials) {
+            dummyFrame.setContentPane(dial);
+            dummyFrame.pack();
+
             g2.setTransform(oldTransform);
             drawDial(g2, dial, ptsIdx++,ul);
         }
@@ -1341,10 +1379,20 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     }
 
 
-
     private void drawDial(Graphics g2, JComponent comp, int ptsIdx,Point ul) {
         if(ptsIdx>=dialPts.length) return;
-        comp.setSize(new Dimension(dialPts[ptsIdx][2], dialPts[ptsIdx][3]));
+        int w = comp.getWidth();
+        int h = comp.getHeight();
+        if(comp instanceof ChartPanel) {
+
+            int desiredWidth = dialPts[ptsIdx][2];
+            double scale = w/(double)desiredWidth;
+            if(scale!=0)
+                h = (int)(h/scale);
+            comp.setSize(new Dimension(desiredWidth, h));
+        } else {
+            comp.setSize(new Dimension(dialPts[ptsIdx][2], dialPts[ptsIdx][3]));
+        }
         try {
             Image image = ImageUtils.getImage(comp);
             g2.translate(ul.x+dialPts[ptsIdx][0]-dialPts[ptsIdx][2]/2,
@@ -2891,8 +2939,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 ChartPanel chartPanel = new ChartPanel(chart);
                 plot.setBackgroundPaint( new Color(255,255,255,0) );
                 plot.setBackgroundImageAlpha(0.0f);
-                chart.setBackgroundPaint( new Color(255,255,255,0) );
-                chartPanel.setBackground( new Color(255,255,255,0) );
+                //                chart.setBackgroundPaint( new Color(255,255,255,0) );
+                //                chartPanel.setBackground( new Color(255,255,255,0) );
                 //                chartPanel.setPreferredSize(new Dimension(100,300));
                 comps.add(chartPanel);
                 dials.add(chartPanel);
@@ -2934,13 +2982,14 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 plot.setValuePaint(Color.black);
 
                 JFreeChart chart      = new JFreeChart("", plot);
-                TextTitle title =    new TextTitle(label.getText(),font);
+                TextTitle title =    new TextTitle(" " + label.getText()+" ",font);
                 //                title.setExpandToFitSpace(true);
                 title.setBackgroundPaint(Color.gray);
                 title.setPaint(Color.white);
                 chart.setTitle(title);
                 ChartPanel chartPanel = new ChartPanel(chart);
-                chartPanel.setPreferredSize(new Dimension(400, 400));
+                chartPanel.setPreferredSize(dialDimension);
+                chartPanel.setSize(new Dimension(150, 150));
                 plot.setBackgroundPaint( new Color(255,255,255,0) );
                 plot.setBackgroundImageAlpha(0.0f);
                 chart.setBackgroundPaint( new Color(255,255,255,0) );
