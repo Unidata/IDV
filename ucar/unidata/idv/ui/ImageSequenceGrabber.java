@@ -35,6 +35,7 @@ import ucar.unidata.data.gis.KmlDataSource;
 
 
 import ucar.unidata.idv.*;
+import ucar.unidata.idv.flythrough.Flythrough;
 
 import ucar.unidata.ui.AnimatedGifEncoder;
 import ucar.unidata.ui.ImageUtils;

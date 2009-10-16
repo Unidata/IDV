@@ -29,6 +29,7 @@ import ucar.unidata.geoloc.Bearing;
 
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.idv.*;
+import ucar.unidata.idv.flythrough.FlythroughPoint;
 
 
 import ucar.unidata.idv.control.DrawingControl;

@@ -24,6 +24,7 @@ package ucar.unidata.idv.ui;
 
 
 import ucar.unidata.idv.*;
+import ucar.unidata.idv.flythrough.Flythrough;
 
 import ucar.unidata.idv.ui.*;
 
@@ -107,6 +108,12 @@ public class EarthNavPanel extends JPanel implements MouseListener,
     /** Use to kill threaded goto address calls */
     private int[] masterTimeStamp = { 0 };
 
+    private Flythrough flythrough;
+
+    /** _more_ */
+    private boolean handlingKey = false;
+
+
     /**
      * ctor
      *
@@ -117,6 +124,17 @@ public class EarthNavPanel extends JPanel implements MouseListener,
         if (prop != null) {
             showAddress = new Boolean(prop).booleanValue();
         }
+        init(viewManager);
+    }
+    public EarthNavPanel(MapViewManager viewManager, Flythrough flythrough, boolean showAddress) {
+        this.showAddress = showAddress;
+        this.flythrough  = flythrough;
+        init(viewManager);
+    }
+
+
+    private void init(MapViewManager viewManager) {
+        this.viewManager = viewManager;
         setLayout(new BorderLayout());
         label = new JLabel("", SwingConstants.CENTER) {
             public void paint(Graphics g) {
@@ -137,20 +155,41 @@ public class EarthNavPanel extends JPanel implements MouseListener,
         add(BorderLayout.CENTER, label);
         label.setIcon(panelIcon =
             GuiUtils.getImageIcon("/auxdata/ui/icons/EarthPanel.png"));
-        label.addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent ke) {
-                isControlDown = ke.isControlDown();
-                isShiftDown   = ke.isShiftDown();
-            }
-
-            public void keyReleased(KeyEvent ke) {
-                isControlDown = ke.isControlDown();
-                isShiftDown   = ke.isShiftDown();
-            }
-        });
         label.addMouseListener(this);
         label.addMouseMotionListener(this);
-        this.viewManager = viewManager;
+
+        label.addKeyListener(new KeyAdapter() {
+                public void keyReleased(KeyEvent ke) {
+                    isControlDown = ke.isControlDown();
+                    isShiftDown   = ke.isShiftDown();
+                }
+
+                public void keyPressed(KeyEvent ke) {
+                isControlDown = ke.isControlDown();
+                isShiftDown   = ke.isShiftDown();
+                    if(flythrough==null) return;
+                    if (handlingKey) {
+                        return;
+                    }
+                    handlingKey = true;
+                    try {
+                        if (ke.getKeyCode() == KeyEvent.VK_RIGHT) {
+                            flythrough.driveRight();
+                        } else if (ke.getKeyCode() == KeyEvent.VK_LEFT) {
+                            flythrough.driveLeft();
+                        } else if (ke.getKeyCode() == KeyEvent.VK_UP) {
+                            flythrough.driveForward();
+                        } else if (ke.getKeyCode() == KeyEvent.VK_DOWN) {
+                            flythrough.driveBack();
+                        }
+                    } finally {
+                        handlingKey = false;
+                    }
+                }
+            });
+
+
+
 
         addressBox       = new JComboBox();
         addressBox.setToolTipText(
@@ -304,7 +343,6 @@ public class EarthNavPanel extends JPanel implements MouseListener,
                                    "action:"
                                    + MapViewManager.CMD_NAV_SMALLTILTDOWN));
 
-
         locations.add(new Location(tiltX, bottomY1, width1,
                                    "action:"
                                    + MapViewManager.CMD_NAV_SMALLTILTUP));
@@ -316,7 +354,22 @@ public class EarthNavPanel extends JPanel implements MouseListener,
                 rotateRightX, rotateY, width3,
                 "action:" + MapViewManager.CMD_NAV_SMALLROTATERIGHT));
 
-        locations.add(new Location(panLeftX, panHY, width2,
+        if(flythrough!=null) {
+            locations.add(new Location(panLeftX, panHY, width2,
+                                       "action:"
+                                       + MapViewManager.CMD_FLY_LEFT));
+            locations.add(new Location(panRightX, panHY, width2,
+                                       "action:"
+                                       + MapViewManager.CMD_FLY_RIGHT));
+
+            locations.add(new Location(panVX, panUpY, width2,
+                                       "action:"
+                                       + MapViewManager.CMD_FLY_FORWARD));
+            locations.add(new Location(panVX, panDownY, width2,
+                                       "action:"
+                                       + MapViewManager.CMD_FLY_BACK));
+        } else {
+            locations.add(new Location(panLeftX, panHY, width2,
                                    "action:"
                                    + MapViewManager.CMD_NAV_SMALLLEFT));
         locations.add(new Location(panRightX, panHY, width2,
@@ -329,6 +382,10 @@ public class EarthNavPanel extends JPanel implements MouseListener,
         locations.add(new Location(panVX, panDownY, width2,
                                    "action:"
                                    + MapViewManager.CMD_NAV_SMALLDOWN));
+        }
+
+
+
 
         locations.add(new Location(216, 86, 22,
                                    "action:" + MapViewManager.CMD_NAV_HOME));
@@ -385,6 +442,7 @@ public class EarthNavPanel extends JPanel implements MouseListener,
      * @param event The event
      */
     public void mousePressed(MouseEvent event) {
+        label.requestFocus();
         isControlDown = event.isControlDown();
         isShiftDown   = event.isShiftDown();
         timeStamp++;

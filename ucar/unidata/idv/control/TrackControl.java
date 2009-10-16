@@ -24,6 +24,7 @@
 package ucar.unidata.idv.control;
 
 
+import ucar.unidata.idv.flythrough.FlythroughPoint;
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.collab.SharableImpl;
 

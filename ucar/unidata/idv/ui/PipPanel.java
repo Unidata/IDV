@@ -28,8 +28,8 @@ import ucar.unidata.geoloc.projection.*;
 
 
 import ucar.unidata.idv.MapViewManager;
-import ucar.unidata.idv.Flythrough;
-import ucar.unidata.idv.FlythroughPoint;
+import ucar.unidata.idv.flythrough.Flythrough;
+import ucar.unidata.idv.flythrough.FlythroughPoint;
 
 
 import ucar.unidata.util.Misc;

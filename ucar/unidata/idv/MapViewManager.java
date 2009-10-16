@@ -25,6 +25,9 @@
 package ucar.unidata.idv;
 
 
+import ucar.unidata.idv.flythrough.Flythrough;
+import ucar.unidata.idv.flythrough.FlythroughPoint;
+
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.GeoLocationInfo;
 
@@ -114,6 +117,11 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
  */
 
 public class MapViewManager extends NavigatedViewManager {
+
+    public static final String CMD_FLY_LEFT = "cmd.fly.left";
+    public static final String CMD_FLY_RIGHT = "cmd.fly.right";
+    public static final String CMD_FLY_FORWARD = "cmd.fly.forward";
+    public static final String CMD_FLY_BACK = "cmd.fly.back";
 
     /** preference id for the list of addresses in the geocode dialog */
     public static final String PREF_ADDRESS_LIST = "view.address.list";
@@ -442,6 +450,13 @@ public class MapViewManager extends NavigatedViewManager {
         }
     }
 
+
+    public void fillLegends() {
+        super.fillLegends();
+        if(flythrough!=null) {
+            flythrough.displayControlChanged();
+        }
+    }
 
     /**
      * Handle a perspective view change
@@ -2084,7 +2099,15 @@ public class MapViewManager extends NavigatedViewManager {
      */
     public void actionPerformed(ActionEvent event) {
         String cmd = event.getActionCommand();
-        if (cmd.equals(CMD_NAV_ZOOMIN)) {
+        if(cmd.equals(CMD_FLY_FORWARD) && flythrough!=null) {
+            flythrough.driveForward();
+        } else if(cmd.equals(CMD_FLY_BACK) && flythrough!=null) {
+            flythrough.driveBack();
+        } else if(cmd.equals(CMD_FLY_LEFT) && flythrough!=null) {
+            flythrough.driveLeft();
+        } else if(cmd.equals(CMD_FLY_RIGHT) && flythrough!=null) {
+            flythrough.driveRight();
+        } else  if (cmd.equals(CMD_NAV_ZOOMIN)) {
             getMapDisplay().zoom(ZOOM_FACTOR);
         } else if (cmd.equals(CMD_NAV_ROTATELEFT)) {
             getMapDisplay().rotateZ(-5.0);

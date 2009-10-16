@@ -23,6 +23,7 @@
 package ucar.unidata.idv.control.storm;
 
 
+import ucar.unidata.idv.flythrough.FlythroughPoint;
 import org.apache.poi.hssf.usermodel.*;
 
 import org.w3c.dom.*;
@@ -41,7 +42,6 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 
 
-import ucar.unidata.idv.FlythroughPoint;
 import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.control.DisplayControlImpl;

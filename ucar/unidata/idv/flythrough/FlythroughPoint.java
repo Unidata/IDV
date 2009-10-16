@@ -23,7 +23,8 @@
 
 
 
-package ucar.unidata.idv;
+package ucar.unidata.idv.flythrough;
+import ucar.unidata.idv.*;
 
 
 import visad.*;

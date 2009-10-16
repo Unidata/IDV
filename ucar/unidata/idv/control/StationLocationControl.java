@@ -23,6 +23,7 @@
 package ucar.unidata.idv.control;
 
 
+import ucar.unidata.idv.flythrough.FlythroughPoint;
 import org.w3c.dom.Element;
 
 import ucar.unidata.collab.Sharable;
