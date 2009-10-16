@@ -198,7 +198,6 @@ public class PipPanel extends NavigatedMapPanel {
      * @throws VisADException On badness
      */
     public void resetDrawBounds() throws RemoteException, VisADException {
-
         NavigatedDisplay nav = (NavigatedDisplay) mapViewManager.getMaster();
         List points = new ArrayList();
         points.add(
@@ -399,5 +398,17 @@ public class PipPanel extends NavigatedMapPanel {
                     - origin.getX(), pt.getY() - origin.getY());
         }
     }
+
+
+        public LatLonPoint screenToLatLon(int x,int y)  {
+            ProjectionPointImpl point=
+                navigatedPanel.getNavigation().screenToWorld(
+                                                             new Point2D.Double(x,y),
+                                                             new ProjectionPointImpl());
+            return getProjection().projToLatLon(point);
+        }
+
+
+
 }
 

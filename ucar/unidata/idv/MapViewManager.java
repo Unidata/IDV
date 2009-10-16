@@ -451,7 +451,7 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
-    public void fillLegends() {
+    protected void fillLegends() {
         super.fillLegends();
         if(flythrough!=null) {
             flythrough.displayControlChanged();

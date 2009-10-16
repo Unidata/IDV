@@ -23,7 +23,10 @@
 
 
 
+
 package ucar.unidata.idv.flythrough;
+
+
 import ucar.unidata.idv.*;
 
 
@@ -64,7 +67,7 @@ public class FlythroughPoint {
     private double[] matrix;
 
 
-    /** _more_          */
+    /** _more_ */
     private String description;
 
     /**

@@ -24,19 +24,20 @@
 
 
 
-package ucar.unidata.idv.flythrough;
-import ucar.unidata.idv.*;
 
-import org.jfree.chart.title.TextTitle;
+package ucar.unidata.idv.flythrough;
+
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.DialShape;
 import org.jfree.chart.plot.CompassPlot;
+import org.jfree.chart.plot.DialShape;
 import org.jfree.chart.plot.MeterInterval;
 import org.jfree.chart.plot.MeterPlot;
 import org.jfree.chart.plot.ThermometerPlot;
 import org.jfree.chart.plot.dial.*;
+
+import org.jfree.chart.title.TextTitle;
 import org.jfree.data.general.DefaultValueDataset;
 import org.jfree.data.general.DefaultValueDataset;
 
@@ -52,6 +53,7 @@ import ucar.unidata.data.gis.KmlUtil;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPoint;
 import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.idv.*;
 
 import ucar.unidata.idv.control.ReadoutInfo;
 import ucar.unidata.idv.ui.CursorReadoutWindow;
@@ -91,10 +93,6 @@ import visad.georef.*;
 
 import visad.java3d.*;
 
-
-
-
-import java.io.File;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
@@ -102,6 +100,11 @@ import java.awt.image.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
+
+
+
+import java.io.File;
 
 import java.rmi.RemoteException;
 
@@ -381,30 +384,36 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private double heading = 0;
 
+    /** _more_          */
     private double currentHeading = 0;
 
     /** _more_ */
     private JLabel dashboardLbl;
 
+    /** _more_          */
     private EarthNavPanel earthNavPanel;
 
+    /** _more_          */
     private PipPanel pipPanel;
+
+    /** _more_          */
     private JFrame pipFrame;
 
-    private Dimension dialDimension = new Dimension(180,130);
+    /** _more_          */
+    private Rectangle pipRect;
 
+    /** _more_          */
+    private Dimension dialDimension = new Dimension(180, 130);
+
+    /** _more_          */
     private int[][] dialPts = {
-        {405,  100,210,145},
-        {256,  90, 120,100},
-        {224,  180, 170,100},
-        {575,  180, 170,100},
-        {356,  240, 150,100},
-        {447,  240, 150,100},
-        {560,  90, 130,100},
-        {687, 262, 90, 100}
+        { 405, 100, 210, 145 }, { 256, 90, 120, 100 }, { 224, 180, 170, 100 },
+        { 575, 180, 170, 100 }, { 356, 240, 150, 100 },
+        { 447, 240, 150, 100 }, { 560, 90, 130, 100 }, { 687, 262, 90, 100 }
     };
 
-    private List<JComponent> dials  = new ArrayList<JComponent>();
+    /** _more_          */
+    private List<JComponent> dials = new ArrayList<JComponent>();
 
 
     /** _more_ */
@@ -420,17 +429,17 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private Image dashboardImage;
 
-    /** _more_          */
+    /** _more_ */
     private ReadoutInfo imageReadout;
 
-    /** _more_          */
+    /** _more_ */
     private String imageUrl;
 
 
     /** _more_ */
     private Image backgroundImage;
 
-    /** _more_          */
+    /** _more_ */
     private HashSet fetchedImages = new HashSet();
 
 
@@ -945,7 +954,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         viewManager.getMaster().addDisplayable(locationLine);
 
 
-        readout = new CursorReadoutWindow(viewManager,false);
+        readout = new CursorReadoutWindow(viewManager, false);
 
 
         clipFld = new JTextField("0", 5);
@@ -1207,7 +1216,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     public JComponent doMakeDashboardPanel() {
         dashboardImage = GuiUtils.getImage("/auxdata/ui/icons/cockpit.gif",
                                            getClass(), false);
-        pipPanel  = new PipPanel(viewManager);
+        pipPanel = new PipPanel(viewManager);
         pipPanel.setPreferredSize(new Dimension(100, 100));
         pipPanel.doLayout();
         pipPanel.validate();
@@ -1225,25 +1234,44 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             }
         };
         dashboardLbl.addKeyListener(new KeyAdapter() {
-                public void keyPressed(KeyEvent e) {
-                    pipPanel.keyPressedInMap(e);
-                    dashboardLbl.repaint();
-                }
-            });
+            public void keyPressed(KeyEvent e) {
+                pipPanel.keyPressedInMap(e);
+                dashboardLbl.repaint();
+            }
+        });
 
         dashboardLbl.setVerticalAlignment(SwingConstants.BOTTOM);
         MouseAdapter mouseAdapter = new MouseAdapter() {
             Point mouseStart     = new Point(0, 0);
             Point originalOffset = new Point(0, 0);
+            public void mouseClicked(MouseEvent me) {
+                if (pipRect == null) {
+                    return;
+                }
+                if (goToClick && pipRect.contains(new Point(me.getX(), me.getY()))) {
+                    try {
+                        int x = me.getX() - pipRect.x;
+                        int y = me.getY() - pipRect.y;
+                        //                        System.err.println ("x:" + x +" y:" + y);
+                        LatLonPoint llp = pipPanel.screenToLatLon(x, y);
+                        location = makePoint(llp.getLatitude(),
+                                             llp.getLongitude(), 0);
+                        doDrive(false, heading);
+                    } catch (Exception exc) {
+                        logException("Driving", exc);
+                    }
+                }
+            }
+
             public void mousePressed(MouseEvent me) {
                 dashboardLbl.requestFocus();
                 originalOffset = new Point(dashboardImageOffset);
                 mouseStart.x   = me.getX();
                 mouseStart.y   = me.getY();
-                Rectangle b = dashboardLbl.getBounds();
-                int w = dashboardImage.getWidth(null);
-                int h = dashboardImage.getHeight(null);
-                Point ul = new Point (b.width/2-w/2,b.height-h);
+                Rectangle b  = dashboardLbl.getBounds();
+                int       w  = dashboardImage.getWidth(null);
+                int       h  = dashboardImage.getHeight(null);
+                Point     ul = new Point(b.width / 2 - w / 2, b.height - h);
                 //                System.out.println("{" + (me.getX()-ul.x) +",  " + (me.getY()-ul.y)+"}");
             }
 
@@ -1265,13 +1293,15 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         //        gaugesPanel.setOneTouchExpandable(true);
 
         Misc.run(new Runnable() {
-                public void run() {
-                    try {
-                        BufferedImage image = new BufferedImage(10,10,
-                                                                BufferedImage.TYPE_INT_RGB);
-                        Graphics2D g = (Graphics2D) image.getGraphics();
-                        paintDashboardAfter(g, dashboardLbl);
-                    } catch(Exception ignore) {}}});
+            public void run() {
+                try {
+                    BufferedImage image = new BufferedImage(10, 10,
+                                              BufferedImage.TYPE_INT_RGB);
+                    Graphics2D g = (Graphics2D) image.getGraphics();
+                    paintDashboardAfter(g, dashboardLbl);
+                } catch (Exception ignore) {}
+            }
+        });
 
 
 
@@ -1280,24 +1310,27 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     }
 
 
+    /**
+     * _more_
+     */
     public void readPts() {
         try {
-            if(new File("pts").exists()) {
-                String s = IOUtil.readContents("pts","");
-                s = s.replace("{","");
-                s = s.replace("}","");
+            if (new File("pts").exists()) {
+                String s = IOUtil.readContents("pts", "");
+                s = s.replace("{", "");
+                s = s.replace("}", "");
                 List<int[]> pts = new ArrayList<int[]>();
-                for(String line: StringUtil.split(s,"\n",true,true)) {
-                    pts.add(Misc.parseInts(line,","));
+                for (String line : StringUtil.split(s, "\n", true, true)) {
+                    pts.add(Misc.parseInts(line, ","));
                 }
                 dialPts = new int[pts.size()][];
-                for(int i=0;i<pts.size();i++) {
+                for (int i = 0; i < pts.size(); i++) {
                     dialPts[i] = pts.get(i);
                 }
             }
 
 
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             exc.printStackTrace();
         }
     }
@@ -1328,15 +1361,23 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
 
+    /** _more_          */
     int xcnt = 0;
+
+    /**
+     * _more_
+     *
+     * @param g _more_
+     * @param comp _more_
+     */
     public void paintDashboardAfter(Graphics g, JComponent comp) {
-        Graphics2D g2 = (Graphics2D) g;
+        Graphics2D      g2           = (Graphics2D) g;
         AffineTransform oldTransform = g2.getTransform();
-        Rectangle b = dashboardLbl.getBounds();
-        int w = dashboardImage.getWidth(null);
-        int h = dashboardImage.getHeight(null);
-        Point ul = new Point (b.width/2-w/2,b.height-h);
-        int ptsIdx=0;
+        Rectangle       b            = dashboardLbl.getBounds();
+        int             w            = dashboardImage.getWidth(null);
+        int             h            = dashboardImage.getHeight(null);
+        Point           ul = new Point(b.width / 2 - w / 2, b.height - h);
+        int             ptsIdx       = 0;
 
 
         DefaultValueDataset dataset =
@@ -1344,15 +1385,14 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
         try {
             pipPanel.setPreferredSize(new Dimension(dialPts[ptsIdx][2],
-                                                    dialPts[ptsIdx][3]));
-            pipFrame.setSize(dialPts[ptsIdx][2],
-                             dialPts[ptsIdx][3]);
+                    dialPts[ptsIdx][3]));
+            pipFrame.setSize(dialPts[ptsIdx][2], dialPts[ptsIdx][3]);
             pipPanel.doLayout();
             pipPanel.validate();
             pipFrame.pack();
             pipPanel.resetDrawBounds();
             pipPanel.redraw();
-        } catch(Exception ignore) {}
+        } catch (Exception ignore) {}
 
 
 
@@ -1360,64 +1400,81 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         plot.setSeriesNeedle(0);
         plot.setSeriesPaint(0, Color.red);
         plot.setSeriesOutlinePaint(0, Color.red);
-        JFreeChart chart      = new JFreeChart("", plot);
+        JFreeChart chart        = new JFreeChart("", plot);
         ChartPanel compassPanel = new ChartPanel(chart);
 
-        plot.setBackgroundPaint( new Color(255,255,255,0) );
+        plot.setBackgroundPaint(new Color(255, 255, 255, 0));
         plot.setBackgroundImageAlpha(0.0f);
-        chart.setBackgroundPaint( new Color(255,255,255,0) );
-        compassPanel.setBackground( new Color(255,255,255,0) );
+        chart.setBackgroundPaint(new Color(255, 255, 255, 0));
+        compassPanel.setBackground(new Color(255, 255, 255, 0));
         compassPanel.setPreferredSize(dialDimension);
         //        compassPanel.setSize(new Dimension(100,100));
 
 
         g2.setTransform(oldTransform);
-        drawDial(g2, pipPanel, ptsIdx++,ul);
+        pipRect = drawDial(g2, pipPanel, ptsIdx++, ul);
 
 
-        JFrame dummyFrame  = new JFrame("");
+        JFrame dummyFrame = new JFrame("");
         dummyFrame.setContentPane(compassPanel);
         dummyFrame.pack();
 
         g2.setTransform(oldTransform);
-        drawDial(g2, compassPanel, ptsIdx++,ul);
+        drawDial(g2, compassPanel, ptsIdx++, ul);
 
 
-        for(JComponent dial: dials) {
+        for (JComponent dial : dials) {
             dummyFrame.setContentPane(dial);
             dummyFrame.pack();
 
             g2.setTransform(oldTransform);
-            drawDial(g2, dial, ptsIdx++,ul);
+            drawDial(g2, dial, ptsIdx++, ul);
         }
 
         g2.setTransform(oldTransform);
     }
 
 
-    private void drawDial(Graphics g2, JComponent comp, int ptsIdx,Point ul) {
-        if(ptsIdx>=dialPts.length) return;
+    /**
+     * _more_
+     *
+     * @param g2 _more_
+     * @param comp _more_
+     * @param ptsIdx _more_
+     * @param ul _more_
+     *
+     * @return _more_
+     */
+    private Rectangle drawDial(Graphics g2, JComponent comp, int ptsIdx,
+                               Point ul) {
+        if (ptsIdx >= dialPts.length) {
+            return null;
+        }
         int w = comp.getWidth();
         int h = comp.getHeight();
-        if(comp instanceof ChartPanel) {
-
-            int desiredWidth = dialPts[ptsIdx][2];
-            double scale = w/(double)desiredWidth;
-            if(scale!=0)
-                h = (int)(h/scale);
+        if (comp instanceof ChartPanel) {
+            int    desiredWidth = dialPts[ptsIdx][2];
+            double scale        = w / (double) desiredWidth;
+            if (scale != 0) {
+                h = (int) (h / scale);
+            }
             comp.setSize(new Dimension(desiredWidth, h));
         } else {
-            comp.setSize(new Dimension(dialPts[ptsIdx][2], dialPts[ptsIdx][3]));
+            comp.setSize(new Dimension(dialPts[ptsIdx][2],
+                                       dialPts[ptsIdx][3]));
         }
         try {
+            int   x     = ul.x + dialPts[ptsIdx][0] - dialPts[ptsIdx][2] / 2;
+            int   y     = ul.y + dialPts[ptsIdx][1] - dialPts[ptsIdx][3] / 2;
             Image image = ImageUtils.getImage(comp);
-            g2.translate(ul.x+dialPts[ptsIdx][0]-dialPts[ptsIdx][2]/2,
-                         ul.y+dialPts[ptsIdx][1]-dialPts[ptsIdx][3]/2);
+            g2.translate(x, y);
             g2.drawImage(image, 0, 0, null);
+            return new Rectangle(x, y, comp.getWidth(), comp.getHeight());
 
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             exc.printStackTrace();
         }
+        return null;
 
 
     }
@@ -1431,14 +1488,14 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      */
     public void paintDashboard(Graphics g, JComponent comp) {
         Graphics2D g2 = (Graphics2D) g;
-        Rectangle b = dashboardLbl.getBounds();
-        int w = dashboardImage.getWidth(null);
-        int h = dashboardImage.getHeight(null);
-        Point ul = new Point (b.width/2-w/2,b.height-h);
+        Rectangle  b  = dashboardLbl.getBounds();
+        int        w  = dashboardImage.getWidth(null);
+        int        h  = dashboardImage.getHeight(null);
+        Point      ul = new Point(b.width / 2 - w / 2, b.height - h);
         g.setColor(Color.white);
         g.fillRect(0, 0, b.width, b.height);
-        Image image = backgroundImage;
-        int ptsIdx=0;
+        Image image  = backgroundImage;
+        int   ptsIdx = 0;
         //        dialPts
         if (image != null) {
             int imageHeight = image.getHeight(null);
@@ -1669,9 +1726,12 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      * @return _more_
      */
     public JComponent doMakeDrivePanel() {
-        earthNavPanel = new EarthNavPanel(viewManager,this, false);
-        if(true) {
-            return earthNavPanel;
+        JCheckBox goToClickCbx = GuiUtils.makeCheckbox("Go to mouse click",
+                                     this, "goToClick");
+        earthNavPanel = new EarthNavPanel(viewManager, this, false);
+        if (true) {
+            return GuiUtils.centerRight(earthNavPanel,
+                                        GuiUtils.bottom(goToClickCbx));
         }
 
         DriveButton leftBtn = new DriveButton("Left", DIR_LEFT);
@@ -1682,8 +1742,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         backBtn.setToolTipText("Back up");
         DriveButton rightBtn = new DriveButton("Right", DIR_RIGHT);
         rightBtn.setToolTipText("Go right");
-        JCheckBox goToClickCbx = GuiUtils.makeCheckbox("Go to mouse click",
-                                     this, "goToClick");
+
         return GuiUtils.centerRight(GuiUtils.wrap(GuiUtils.hbox(leftBtn,
                 GuiUtils.vbox(forwardBtn, backBtn), rightBtn)), goToClickCbx);
     }
@@ -1692,7 +1751,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /**
      * _more_
      */
-   public void driveLeft() {
+    public void driveLeft() {
         heading -= 3;
         doDrive(false, heading);
     }
@@ -2016,25 +2075,25 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         if (frame == null) {
             frame = new JFrame(GuiUtils.getApplicationTitle() + "Flythrough");
             frame.addWindowListener(new WindowAdapter() {
-                    public void windowClosing(WindowEvent e) {
-                        if(locationLine!=null) {
-                            try {
-                                locationLine.setVisible(false);
-                                locationMarker.setVisible(false);
-                            } catch(Exception ignore) {}
-                        }
+                public void windowClosing(WindowEvent e) {
+                    if (locationLine != null) {
+                        try {
+                            locationLine.setVisible(false);
+                            locationMarker.setVisible(false);
+                        } catch (Exception ignore) {}
                     }
+                }
 
-                    public void windowDeiconified(WindowEvent e) {
-                        System.err.println("window");
-                        if(locationLine!=null) {
-                            try {
-                                locationLine.setVisible(showLine);
-                                locationMarker.setVisible(showMarker);
-                            } catch(Exception ignore) {}
-                        }
+                public void windowDeiconified(WindowEvent e) {
+                    System.err.println("window");
+                    if (locationLine != null) {
+                        try {
+                            locationLine.setVisible(showLine);
+                            locationMarker.setVisible(showMarker);
+                        } catch (Exception ignore) {}
                     }
-                });
+                }
+            });
             frame.setIconImage(
                 GuiUtils.getImage("/auxdata/ui/icons/plane.png"));
             hadFrame = false;
@@ -2673,20 +2732,23 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
                 //Keep flat in z for non globe
                 Point3d p1 = new Point3d(x1, y1, z1);
-                Point3d p2 = new Point3d(x2, y2, (( !getUseFixedZ() || doGlobe())
-                        ? z2
-                                                  : z1));
-                t.lookAt(p1,p2, upVector);
+                Point3d p2 = new Point3d(x2, y2,
+                                         (( !getUseFixedZ() || doGlobe())
+                                          ? z2
+                                          : z1));
+                t.lookAt(p1, p2, upVector);
 
                 t.get(m);
 
-                EarthLocation el1 = navDisplay.getEarthLocation(p1.x,p1.y,p1.z,false);
-                EarthLocation el2 = navDisplay.getEarthLocation(p2.x,p2.y,p2.z,false);
+                EarthLocation el1 = navDisplay.getEarthLocation(p1.x, p1.y,
+                                        p1.z, false);
+                EarthLocation el2 = navDisplay.getEarthLocation(p2.x, p2.y,
+                                        p2.z, false);
                 Bearing bearing =
                     Bearing.calculateBearing(new LatLonPointImpl(getLat(el1),
-                                                                 getLon(el1)), new LatLonPointImpl(getLat(el2),
-                                                                                                   getLon(el2)), null);
-                currentHeading  = bearing.getAngle();
+                        getLon(el1)), new LatLonPointImpl(getLat(el2),
+                            getLon(el2)), null);
+                currentHeading = bearing.getAngle();
 
 
 
@@ -2881,11 +2943,17 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
 
+    /**
+     * _more_
+     */
     public void displayControlChanged() {
         doUpdate();
     }
 
 
+    /**
+     * _more_
+     */
     public void doUpdate() {
         FlythroughPoint pt1 = getCurrentPoint();
         if (pt1 != null) {
@@ -2916,7 +2984,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
     protected void processReadout(FlythroughPoint pt1) throws Exception {
 
-        dials  = new ArrayList<JComponent>();
+        dials = new ArrayList<JComponent>();
         if ((readoutLabel == null) || (pt1 == null)) {
             return;
         }
@@ -2989,7 +3057,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                                        JFreeChart.DEFAULT_TITLE_FONT, plot,
                                        false);
                 ChartPanel chartPanel = new ChartPanel(chart);
-                plot.setBackgroundPaint( new Color(255,255,255,0) );
+                plot.setBackgroundPaint(new Color(255, 255, 255, 0));
                 plot.setBackgroundImageAlpha(0.0f);
                 //                chart.setBackgroundPaint( new Color(255,255,255,0) );
                 //                chartPanel.setBackground( new Color(255,255,255,0) );
@@ -2997,20 +3065,21 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 comps.add(chartPanel);
                 dials.add(chartPanel);
             } else {
-                Font font = new Font("Dialog", Font.BOLD, 22);
+                Font   font = new Font("Dialog", Font.BOLD, 22);
                 //                if (r.isMissing()) {
                 //                    continue;
                 //                }
 
-                double v = r.getValue(unit);
-                if(v==v)
+                double v    = r.getValue(unit);
+                if (v == v) {
                     v = new Double(Misc.format(v)).doubleValue();
+                }
                 labels.add(new JLabel("<html>" + name.replace("_", " ")
                                       + "<br>" + Misc.format(v)
                                       + unitSuffix));
 
-                JLabel label =new JLabel(name.replace("_", " "));
-                
+                JLabel label = new JLabel(name.replace("_", " "));
+
                 label.setFont(font);
                 DefaultValueDataset dataset =
                     new DefaultValueDataset(new Double(v));
@@ -3033,8 +3102,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 plot.setTickPaint(Color.black);
                 plot.setValuePaint(Color.black);
 
-                JFreeChart chart      = new JFreeChart("", plot);
-                TextTitle title =    new TextTitle(" " + label.getText()+" ",font);
+                JFreeChart chart = new JFreeChart("", plot);
+                TextTitle title = new TextTitle(" " + label.getText() + " ",
+                                      font);
                 //                title.setExpandToFitSpace(true);
                 title.setBackgroundPaint(Color.gray);
                 title.setPaint(Color.white);
@@ -3042,10 +3112,10 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 ChartPanel chartPanel = new ChartPanel(chart);
                 chartPanel.setPreferredSize(dialDimension);
                 chartPanel.setSize(new Dimension(150, 150));
-                plot.setBackgroundPaint( new Color(255,255,255,0) );
+                plot.setBackgroundPaint(new Color(255, 255, 255, 0));
                 plot.setBackgroundImageAlpha(0.0f);
-                chart.setBackgroundPaint( new Color(255,255,255,0) );
-                chartPanel.setBackground( new Color(255,255,255,0) );
+                chart.setBackgroundPaint(new Color(255, 255, 255, 0));
+                chartPanel.setBackground(new Color(255, 255, 255, 0));
 
                 comps.add(chartPanel);
                 //                dials.add(GuiUtils.centerBottom(chartPanel,label));
@@ -3059,7 +3129,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         allComps.addAll(comps);
         readoutDisplay.removeAll();
 
-        if (false && allComps.size() > 0) {
+        if (false && (allComps.size() > 0)) {
             readoutDisplay.add("Center",
                                GuiUtils.doLayout(allComps, labels.size(),
                                    GuiUtils.WT_Y, GuiUtils.WT_NY));
