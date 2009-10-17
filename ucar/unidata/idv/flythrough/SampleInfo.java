@@ -22,34 +22,35 @@
 
 
 
+
 package ucar.unidata.idv.flythrough;
-
-
-import org.jfree.ui.RectangleInsets;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.axis.Axis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.Axis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CompassPlot;
 import org.jfree.chart.plot.DialShape;
 import org.jfree.chart.plot.MeterInterval;
 import org.jfree.chart.plot.MeterPlot;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.ThermometerPlot;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.plot.dial.*;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 
 import org.jfree.chart.title.TextTitle;
 import org.jfree.data.general.DefaultValueDataset;
 import org.jfree.data.general.DefaultValueDataset;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+
+
+import org.jfree.ui.RectangleInsets;
 
 
 import org.w3c.dom.*;
@@ -146,147 +147,190 @@ import javax.vecmath.*;
  */
 
 public class SampleInfo {
+
+    /** _more_          */
     private Unit unit;
+
+    /** _more_          */
     private XYSeries series;
+
+    /** _more_          */
     private String name;
+
+    /** _more_          */
     private Range range;
+
+    /** _more_          */
     private List<Real> values = new ArrayList<Real>();
+
+    /** _more_          */
     private List<EarthLocation> locations = new ArrayList<EarthLocation>();
 
-    public SampleInfo(String name,Unit unit, Range range) {
-        this.name = name;
-        this.unit = unit;
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param unit _more_
+     * @param range _more_
+     */
+    public SampleInfo(String name, Unit unit, Range range) {
+        this.name  = name;
+        this.unit  = unit;
         this.range = range;
         String unitSuffix = "";
         if (unit != null) {
             unitSuffix = " [" + unit + "]";
         }
-        series = new XYSeries(name+unitSuffix);
+        series = new XYSeries(name + unitSuffix);
     }
 
-    public void add(Real r,EarthLocation loc) throws VisADException {
-        double v = (unit==null?r.getValue():r.getValue(unit));
+    /**
+     * _more_
+     *
+     * @param r _more_
+     * @param loc _more_
+     *
+     * @throws VisADException _more_
+     */
+    public void add(Real r, EarthLocation loc) throws VisADException {
+        double v = ((unit == null)
+                    ? r.getValue()
+                    : r.getValue(unit));
         series.add(values.size(), v);
         values.add(r);
         locations.add(loc);
     }
 
+    /**
+     * _more_
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     */
     public boolean equals(Object o) {
-        if(!(o instanceof SampleInfo)) return false;
-        return Misc.equals(name, ((SampleInfo)o).name);
+        if ( !(o instanceof SampleInfo)) {
+            return false;
+        }
+        return Misc.equals(name, ((SampleInfo) o).name);
     }
 
-    public   int hashCode( ) {
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int hashCode() {
         return name.hashCode();
     }
 
 
     /**
-       Set the Unit property.
-
-       @param value The new value for Unit
-    **/
-    public void setUnit (Unit value) {
-	this.unit = value;
+     *  Set the Unit property.
+     *
+     *  @param value The new value for Unit
+     */
+    public void setUnit(Unit value) {
+        this.unit = value;
     }
 
     /**
-       Get the Unit property.
-
-       @return The Unit
-    **/
-    public Unit getUnit () {
-	return this.unit;
+     *  Get the Unit property.
+     *
+     *  @return The Unit
+     */
+    public Unit getUnit() {
+        return this.unit;
     }
 
     /**
-       Set the Name property.
-
-       @param value The new value for Name
-    **/
-    public void setName (String value) {
-	this.name = value;
+     *  Set the Name property.
+     *
+     *  @param value The new value for Name
+     */
+    public void setName(String value) {
+        this.name = value;
     }
 
     /**
-       Get the Name property.
-
-       @return The Name
-    **/
-    public String getName () {
-	return this.name;
+     *  Get the Name property.
+     *
+     *  @return The Name
+     */
+    public String getName() {
+        return this.name;
     }
 
     /**
-       Set the Values property.
-
-       @param value The new value for Values
-    **/
-    public void setValues (List<Real> value) {
-	this.values = value;
+     *  Set the Values property.
+     *
+     *  @param value The new value for Values
+     */
+    public void setValues(List<Real> value) {
+        this.values = value;
     }
 
     /**
-       Get the Values property.
-
-       @return The Values
-    **/
-    public List<Real> getValues () {
-	return this.values;
+     *  Get the Values property.
+     *
+     *  @return The Values
+     */
+    public List<Real> getValues() {
+        return this.values;
     }
 
     /**
-       Set the Locations property.
-
-       @param value The new value for Locations
-    **/
-    public void setLocations (List<EarthLocation> value) {
-	this.locations = value;
+     *  Set the Locations property.
+     *
+     *  @param value The new value for Locations
+     */
+    public void setLocations(List<EarthLocation> value) {
+        this.locations = value;
     }
 
     /**
-       Get the Locations property.
-
-       @return The Locations
-    **/
-    public List<EarthLocation> getLocations () {
-	return this.locations;
+     *  Get the Locations property.
+     *
+     *  @return The Locations
+     */
+    public List<EarthLocation> getLocations() {
+        return this.locations;
     }
 
     /**
-       Set the Range property.
-
-       @param value The new value for Range
-    **/
-    public void setRange (Range value) {
-	this.range = value;
+     *  Set the Range property.
+     *
+     *  @param value The new value for Range
+     */
+    public void setRange(Range value) {
+        this.range = value;
     }
 
     /**
-       Get the Range property.
-
-       @return The Range
-    **/
-    public Range getRange () {
-	return this.range;
+     *  Get the Range property.
+     *
+     *  @return The Range
+     */
+    public Range getRange() {
+        return this.range;
     }
 
     /**
-       Set the Series property.
-
-       @param value The new value for Series
-    **/
-    public void setSeries (XYSeries value) {
-	this.series = value;
+     *  Set the Series property.
+     *
+     *  @param value The new value for Series
+     */
+    public void setSeries(XYSeries value) {
+        this.series = value;
     }
 
     /**
-       Get the Series property.
-
-       @return The Series
-    **/
-    public XYSeries getSeries () {
-	return this.series;
+     *  Get the Series property.
+     *
+     *  @return The Series
+     */
+    public XYSeries getSeries() {
+        return this.series;
     }
 
 
