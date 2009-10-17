@@ -40,6 +40,18 @@ import org.jfree.data.general.*;
 import org.jfree.data.time.*;
 import org.jfree.data.xy.*;
 import org.jfree.ui.*;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.jfree.chart.title.TextTitle;
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.ui.ApplicationFrame;
+import org.jfree.ui.HorizontalAlignment;
+import org.jfree.ui.RectangleEdge;
+import org.jfree.ui.RefineryUtilities;
+
 
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.grid.GridUtil;
