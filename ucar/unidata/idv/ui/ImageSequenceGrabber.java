@@ -374,6 +374,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** Capture full window */
     JRadioButton fullWindowBtn;
 
+    JRadioButton fullScreenBtn;
+
 
 
     /** If non-null then we use this and don't ask the user. */
@@ -642,13 +644,18 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         mainDisplayBtn = new JRadioButton("View", true);
         contentsBtn    = new JRadioButton("View & Legend", false);
         fullWindowBtn  = new JRadioButton("Full Window", false);
-        GuiUtils.buttonGroup(mainDisplayBtn, fullWindowBtn).add(contentsBtn);
+        fullScreenBtn  = new JRadioButton("Full Screen", false);
+        ButtonGroup bg = GuiUtils.buttonGroup(mainDisplayBtn, fullWindowBtn);
+        bg.add(contentsBtn);
+        bg.add(fullScreenBtn);
 
         beepCbx.setToolTipText("Beep when an image is captured");
-        JComponent whatPanel = GuiUtils.vbox(Misc.newList(new JLabel("What to capture:"),
+        List btns = Misc.newList(new JLabel("What to capture:"),
                                              mainDisplayBtn, contentsBtn,
-                                             fullWindowBtn,
-                                             beepCbx));
+                                 fullWindowBtn, fullScreenBtn);
+        btns.add(beepCbx);
+        
+        JComponent whatPanel = GuiUtils.vbox(btns);
 
 
 
@@ -997,6 +1004,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         //        runAnimationCapture(++captureTimeStamp);
         Misc.run(new Runnable() {
             public void run() {
+                Misc.sleep(2000);
                 runAnimationCapture(++captureTimeStamp);
             }
             });
@@ -1624,18 +1632,24 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         subsetBounds(bounds, imageProperties);
                     } else {
                         Component comp;
+                        Dimension dim = null;
+                        Point     loc =null;
                         if (fullWindowBtn.isSelected()) {
                             comp = viewManager.getDisplayWindow()
                                 .getComponent();
                         } else if (mainDisplayBtn.isSelected()) {
                             comp = viewManager.getMaster().getComponent();
+                        } else if (fullScreenBtn.isSelected()) {
+                            comp = viewManager.getMaster().getComponent();
+                            dim = Toolkit.getDefaultToolkit().getScreenSize();
+                            loc = new Point(0,0);
                         } else {
                             comp = viewManager.getContents();
                         }
-
-                           
-                        Dimension dim   = comp.getSize();
-                        Point     loc   = comp.getLocationOnScreen();
+                        if(dim==null) {
+                            dim   = comp.getSize();
+                            loc   = comp.getLocationOnScreen();
+                        }
                         GraphicsConfiguration gc = comp.getGraphicsConfiguration();
                         Robot robot = new Robot(gc.getDevice());
                     

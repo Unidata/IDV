@@ -252,8 +252,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     private List<FlythroughPoint> pointsToUse =
         new ArrayList<FlythroughPoint>();
 
-    /** _more_          */
-    private int maxPoints = 1000;
+    private int stride = 1;
 
 
     /** _more_ */
@@ -428,9 +427,14 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
     /** _more_ */
     private int[][] dialPts = {
-        { 405, 100, 210, 145 }, { 256, 90, 120, 100 }, { 224, 180, 170, 100 },
-        { 575, 180, 170, 100 }, { 356, 240, 150, 100 },
-        { 447, 240, 150, 100 }, { 560, 90, 130, 100 }, { 687, 262, 90, 100 }
+        { 402, 100, 206, 145 }, 
+        { 256, 90, 120, 100 }, 
+        { 224, 180, 170, 100 },
+        { 575, 180, 170, 100 }, 
+        { 356, 240, 150, 100 },
+        { 447, 240, 150, 100 }, 
+        { 560, 90, 130, 100 }, 
+        { 687, 262, 90, 100 }
     };
 
     /** _more_ */
@@ -538,7 +542,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         }
         this.allPoints       = new ArrayList<FlythroughPoint>(that.allPoints);
         this.pointsToUse = new ArrayList<FlythroughPoint>(that.pointsToUse);
-        this.maxPoints       = that.maxPoints;
+        this.stride      = that.stride;
 
         this.animationInfo   = that.animationInfo;
         this.tilt = new double[] { that.tilt[0], that.tilt[1], that.tilt[2] };
@@ -655,17 +659,12 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     public void flythrough(List<FlythroughPoint> newPoints) {
         this.allPoints = new ArrayList<FlythroughPoint>(newPoints);
         //subsample
-        while ((newPoints.size() > maxPoints) && (maxPoints > 0)) {
-            ArrayList<FlythroughPoint> tmp = new ArrayList<FlythroughPoint>();
-            for (int i = 0; i < newPoints.size(); i++) {
-                if (i % 2 == 0) {
-                    tmp.add(newPoints.get(i));
-                }
-            }
-            newPoints = tmp;
+        ArrayList<FlythroughPoint> tmp = new ArrayList<FlythroughPoint>();
+        for(int i=0;i<newPoints.size();i+=stride) {
+            tmp.add(newPoints.get(i));
         }
+        newPoints = tmp;
 
-        //        System.err.println("max:" + maxPoints +"  all:" + allPoints.size() + " " + pointsToUse.size());
         this.pointsToUse = new ArrayList<FlythroughPoint>(newPoints);
         if (animation != null) {
             animation.setCurrent(currentIndex);
@@ -1057,13 +1056,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                           GuiUtils.leftCenter(new JLabel("Speed"),
                               speedSlider)),
             GuiUtils.filler(), GuiUtils.left(showTimesCbx),
-            //            GuiUtils.filler(), GuiUtils.left(clipCbx),
-            //            GuiUtils.rLabel("Clip Distance:"), GuiUtils.left(clipFld),
-            //            GuiUtils.Label("Clip:"), GuiUtils.hbox(cflds), GuiUtils.filler(),
-            GuiUtils.filler(),
-            GuiUtils.left(GuiUtils.hbox(GuiUtils.makeCheckbox("Show Line",
-                this, "showLine"), GuiUtils.makeCheckbox("Show Marker", this,
-                    "showMarker")))
         });
 
         return GuiUtils.top(orientationComp);
@@ -1254,6 +1246,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         dashboardImage = GuiUtils.getImage("/auxdata/ui/icons/cockpit.gif",
                                            getClass(), false);
         pipPanel = new PipPanel(viewManager);
+        pipPanel.getNavigatedPanel().setBorder(null);
         pipPanel.setPreferredSize(new Dimension(100, 100));
         pipPanel.doLayout();
         pipPanel.validate();
@@ -1264,7 +1257,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
         dashboardLbl = new JLabel(new ImageIcon(dashboardImage)) {
             public void paint(Graphics g) {
-                //                    readPts();
+                //                readPts();
                 paintDashboard(g, dashboardLbl);
                 super.paint(g);
                 paintDashboardAfter(g, dashboardLbl);
@@ -1459,12 +1452,14 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         drawDial(g2, compassPanel, ptsIdx++, ul);
 
 
-        for (JComponent dial : dials) {
-            dummyFrame.setContentPane(dial);
-            dummyFrame.pack();
-
-            g2.setTransform(oldTransform);
-            drawDial(g2, dial, ptsIdx++, ul);
+        if(showReadout) {
+            for (JComponent dial : dials) {
+                dummyFrame.setContentPane(dial);
+                dummyFrame.pack();
+                
+                g2.setTransform(oldTransform);
+                drawDial(g2, dial, ptsIdx++, ul);
+            }
         }
 
         g2.setTransform(oldTransform);
@@ -1950,14 +1945,23 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
         int cnt = pointsToUse.size();
         if (cnt > 0) {
+            int []strides = {1,2,3,4,5,6,7,8,9,10,20,50,75,100};
+            JMenu strideMenu = new JMenu("Stride");
+            editMenu.add(strideMenu);
             editMenu.add(GuiUtils.makeMenuItem("Remove all points (#" + cnt
                     + ")", this, "clearPoints"));
-            editMenu.add(GuiUtils.makeMenuItem("Use fewer points", this,
-                    "decreasePoints"));
-            if (allPoints.size() != pointsToUse.size()) {
-                editMenu.add(GuiUtils.makeMenuItem("Use more points", this,
-                        "increasePoints"));
+            for(int s: strides) {
+                final int theStride = s;
+                JMenuItem mi = new JMenuItem((s==1?"All points":"Every " + s+" points")+"  " + (s==stride?"(current)":""));
+                mi.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent ae) {
+                            stride = theStride;
+                            flythrough(allPoints);
+                        }
+                    });
+                strideMenu.add(mi);
             }
+
         }
 
         editMenu.addSeparator();
@@ -2026,22 +2030,33 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      * @param viewMenu _more_
      */
     public void initViewMenu(JMenu viewMenu) {
+        JMenu dashboardMenu = new JMenu("Dashboard");
+        viewMenu.add(dashboardMenu);
         viewMenu.add(GuiUtils.makeCheckboxMenuItem("Go to mouse click", this,
                 "goToClick", null));
         viewMenu.add(GuiUtils.makeCheckboxMenuItem("Show animation", this,
                 "showAnimation", null));
-        viewMenu.add(GuiUtils.makeCheckboxMenuItem("Show weather", this,
-                "showDecoration", null));
-        viewMenu.add(GuiUtils.makeCheckboxMenuItem("Show gauges", this,
-                "showReadout", null));
-        viewMenu.addSeparator();
+        viewMenu.add(GuiUtils.makeCheckboxMenuItem("Show line", this,
+                "showLine", null));
+        viewMenu.add(GuiUtils.makeCheckboxMenuItem("Show marker", this,
+                "showMarker", null));
 
-        viewMenu.add(GuiUtils.makeCheckboxMenuItem("Collect data", this,
+        dashboardMenu.add(GuiUtils.makeCheckboxMenuItem("Collect data", this,
                 "collectSamples", null));
-        viewMenu.add(GuiUtils.makeCheckboxMenuItem("Show chart", this,
+        dashboardMenu.add(GuiUtils.makeCheckboxMenuItem("Show chart", this,
                 "showChart", null));
 
-        viewMenu.add(GuiUtils.makeMenuItem("Clear data", this,
+        dashboardMenu.add(GuiUtils.makeCheckboxMenuItem("Show weather", this,
+                "showDecoration", null));
+        dashboardMenu.add(GuiUtils.makeCheckboxMenuItem("Show gauges", this,
+                "showReadout", null));
+
+
+
+
+
+
+        dashboardMenu.add(GuiUtils.makeMenuItem("Clear data", this,
                                            "clearSamples"));
     }
 
@@ -3400,6 +3415,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      */
     public void setShowReadout(boolean value) {
         this.showReadout = value;
+        updateDashboard();
     }
 
     /**
@@ -3768,6 +3784,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      */
     public void setShowDecoration(boolean value) {
         this.showDecoration = value;
+        updateDashboard();
     }
 
     /**
@@ -3848,21 +3865,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     }
 
 
-    /**
-     * _more_
-     */
-    public void decreasePoints() {
-        maxPoints = Math.max(maxPoints / 2, 10);
-        flythrough(allPoints);
-    }
 
-    /**
-     * _more_
-     */
-    public void increasePoints() {
-        maxPoints = maxPoints * 2;
-        flythrough(allPoints);
-    }
 
     /**
      * Set the MaxPoints property.
@@ -3870,17 +3873,25 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      * @param value The new value for MaxPoints
      */
     public void setMaxPoints(int value) {
-        this.maxPoints = value;
     }
 
-    /**
-     * Get the MaxPoints property.
-     *
-     * @return The MaxPoints
-     */
-    public int getMaxPoints() {
-        return this.maxPoints;
-    }
+/**
+Set the Stride property.
+
+@param value The new value for Stride
+**/
+public void setStride (int value) {
+	this.stride = value;
+}
+
+/**
+Get the Stride property.
+
+@return The Stride
+**/
+public int getStride () {
+	return this.stride;
+}
 
 
 
