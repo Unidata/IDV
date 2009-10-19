@@ -749,7 +749,7 @@ public class MetadataManager extends RepositoryManager {
             cnt[i] = results.getInt(1);
             max    = Math.max(cnt[i], max);
             min    = Math.min(cnt[i], min);
-            getDatabaseManager().closeStatement(stmt);
+            getDatabaseManager().closeAndReleaseConnection(stmt);
         }
         int    diff         = max - min;
         double distribution = diff / 5.0;
@@ -1083,7 +1083,7 @@ public class MetadataManager extends RepositoryManager {
                                  Clause.eq(
                                      Tables.METADATA.COL_TYPE, type.getId()));
             values = SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1);
-            getDatabaseManager().closeStatement(stmt);
+            getDatabaseManager().closeAndReleaseConnection(stmt);
             if (myDistinctMap != null) {
                 myDistinctMap.put(type.getId(), values);
             }

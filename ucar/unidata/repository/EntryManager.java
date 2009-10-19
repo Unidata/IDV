@@ -1247,6 +1247,11 @@ return new Result(title, sb);
                          ARG_ENTRYID, entry.getId());
         //j-
         String[] macros = {
+            "entryid", entry.getId(),
+            "resourcepath",
+            entry.getResource().getPath(),
+            "resourcename",
+            getStorageManager().getFileTail(entry.getResource().getPath()),
             "filename",
             getStorageManager().getFileTail(entry.getResource().getPath()),
             "fileextension",
@@ -2463,7 +2468,6 @@ return new Result(title, sb);
         StringBuffer sb         = new StringBuffer();
         Connection   connection = getDatabaseManager().getConnection();
         connection.setAutoCommit(false);
-        Statement   statement  = connection.createStatement();
         List<Entry> newEntries = new ArrayList<Entry>();
         try {
             List<String[]> ids = getDescendents(request, entries, connection,
@@ -5770,7 +5774,7 @@ return new Result(title, sb);
                 getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
                                             Tables.ENTRIES.NAME, clauses);
             List<Group> groups = readGroups(statement);
-            getDatabaseManager().closeStatement(statement);
+            getDatabaseManager().closeAndReleaseConnection(statement);
             if (groups.size() > 0) {
                 group = groups.get(0);
             } else {
@@ -6333,6 +6337,8 @@ return new Result(title, sb);
                         Tables.ENTRIES.COL_PARENT_GROUP_ID, entry.getId()));
 
             SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
+            //Don't close the statement because that ends up closing the connection
+            iter.setShouldCloseStatement(false);
             ResultSet        results;
             while ((results = iter.next()) != null) {
                 while (results.next()) {
@@ -6351,6 +6357,7 @@ return new Result(title, sb);
                     }
                 }
             }
+            getDatabaseManager().closeStatement(stmt);
         }
         return children;
     }

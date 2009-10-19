@@ -4448,7 +4448,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *                                     SqlUtil.distinct(Tables.TAGS.COL_NAME),
      *                                     where,
      *                                     " order by " + Tables.TAGS.COL_NAME)), 1);
-     *   getDatabaseManager().closeStatement(stmt);
+     *   getDatabaseManager().closeAndReleaseStatement(stmt);
      *
      *   List<Tag>     tagList = new ArrayList();
      *   List<String>  names   = new ArrayList<String>();
@@ -4468,7 +4468,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      *           continue;
      *       }
      *       int count = results2.getInt(1);
-     *       getDatabaseManager().closeStatement(stmt2);
+     *       getDatabaseManager().closeAndReleaseStatement(stmt2);
      *       if ((max < 0) || (count > max)) {
      *           max = count;
      *       }

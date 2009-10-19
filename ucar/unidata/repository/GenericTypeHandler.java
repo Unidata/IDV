@@ -156,7 +156,7 @@ public class GenericTypeHandler extends TypeHandler {
 
         tableDef.append(COL_ID + " varchar(200))");
         try {
-            getDatabaseManager().execute(tableDef.toString());
+            getDatabaseManager().executeAndClose(tableDef.toString());
         } catch (Throwable exc) {
             if (exc.toString().indexOf("already exists") < 0) {
                 //TODO:
@@ -580,6 +580,8 @@ public class GenericTypeHandler extends TypeHandler {
             }
         }
         entry.setValues(values);
+
+        getDatabaseManager().closeAndReleaseConnection(stmt);
         return entry;
     }
 

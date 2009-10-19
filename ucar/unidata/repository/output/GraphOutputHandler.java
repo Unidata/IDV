@@ -329,9 +329,11 @@ public class GraphOutputHandler extends OutputHandler {
 
             ResultSet results = stmt.getResultSet();
             if ( !results.next()) {
+                getDatabaseManager().closeAndReleaseConnection(stmt);
                 throw new IllegalArgumentException("Unknown entry id:" + id);
             }
             sb.append(getEntryNodeXml(request, results));
+            getDatabaseManager().closeAndReleaseConnection(stmt);
             getAssociationsGraph(request, id, sb);
 
             Group group = getEntryManager().findGroup(request,

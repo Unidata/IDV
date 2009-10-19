@@ -130,8 +130,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
 
 
     public void checkConnections() {
+
         while(true) {
-            Misc.sleep(10000);
+            Misc.sleep(1000);
             Hashtable<Connection,ConnectionInfo> tmp = new Hashtable<Connection,ConnectionInfo>();
             tmp.putAll(connectionMap);
             long now = System.currentTimeMillis();
@@ -139,9 +140,13 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
                 Connection connection = (Connection) keys.nextElement();
                 ConnectionInfo info  = tmp.get(connection);
                 //If a connection has been out for more than a minute then close it
-                if(now-info.time > 60000) {
-                    System.err.println ("Scouring connection:" + info.where);
+                if(now-info.time > 10000) {
+                    System.err.println ("A connection has been open for more that 30 seconds:\n" + info.where);
                     closeConnection(connection);
+                }
+                if(now-info.time > 60000) {
+                    //                    System.err.println ("Scouring connection:" + info.where);
+                    //                    closeConnection(connection);
                 }
             }
         }
@@ -376,10 +381,12 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
             connection.setAutoCommit(true);
             connection.close();
             BasicDataSource bds = (BasicDataSource)dataSource;
-            System.err.println("closeConnection  active:" + bds.getNumActive() +" idle:" +bds.getNumIdle() +" max: " +
-                               bds.getMaxActive() +" " + bds.getMaxIdle());
+            if(bds.getNumActive()>3) {
+                System.err.println("closeConnection  active:" + bds.getNumActive() +" idle:" +bds.getNumIdle() +" max: " +
+                                   bds.getMaxActive() +" " + bds.getMaxIdle());
+            }
         } catch (Exception exc) {
-            //NOOP
+            exc.printStackTrace();
         }
     }
 
@@ -410,7 +417,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
         if(connection!=null) {
             closeConnection(connection);
         } else {
-            System.err.println ("whoa, a stmt with no connection");
+            //            System.err.println ("whoa, a stmt with no connection");
+            Misc.printStack("whoa, a stmt with no connection",10);
         }
     }
 
@@ -651,10 +659,35 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
 
 
 
-    public Statement execute(String sql)
+
+    public void executeAndClose(String sql)
             throws Exception {
-        return execute(sql,10000000,0);
+        executeAndClose(sql,10000000,0);
     }
+
+
+
+
+
+    public void executeAndClose(String sql, int max, int timeout)
+        throws Exception {
+        Connection connection = getConnection();
+        try {
+            Statement stmt= execute(connection, sql, max, timeout);
+            closeStatement(stmt);
+        } finally {
+            closeConnection(connection);
+        }
+    }
+
+
+    private void execute(String sql)
+            throws Exception {
+        //        return execute(sql,10000000,0);
+         execute(sql,10000000,0);
+    }
+
+
 
 
     /**
@@ -670,32 +703,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      */
     public Statement execute(String sql, int max, int timeout)
             throws Exception {
-        Connection connection = getConnection();
-        try {
-            Statement  stmt       = execute(connection, sql, max, timeout);
-            return stmt;
-        } finally {
-            closeConnection(connection);
-        }
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param oldTable _more_
-     * @param newTable _more_
-     * @param connection _more_
-     *
-     * @throws Exception _more_
-     */
-    public void copyTable(String oldTable, String newTable,
-                          Connection connection)
-            throws Exception {
-        String copySql = "INSERT INTO  " + newTable + " SELECT * from "
-                         + oldTable;
-        execute(connection, copySql, -1, -1);
+        return execute(getConnection(), sql, max, timeout);
     }
 
 
@@ -739,6 +747,28 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
         }
         return statement;
     }
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param oldTable _more_
+     * @param newTable _more_
+     * @param connection _more_
+     *
+     * @throws Exception _more_
+     */
+    public void copyTable(String oldTable, String newTable,
+                          Connection connection)
+            throws Exception {
+        String copySql = "INSERT INTO  " + newTable + " SELECT * from "
+                         + oldTable;
+        execute(connection, copySql, -1, -1);
+    }
+
 
 
     /**

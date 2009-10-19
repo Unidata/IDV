@@ -226,6 +226,7 @@ public class XmlOutputHandler extends OutputHandler {
 
             ResultSet results2 = stmt2.getResultSet();
             if ( !results2.next()) {
+                getDatabaseManager().closeAndReleaseConnection(stmt2);
                 continue;
             }
             int count = results2.getInt(1);
@@ -237,6 +238,7 @@ public class XmlOutputHandler extends OutputHandler {
             }
             names.add(association);
             counts.add(new Integer(count));
+            getDatabaseManager().closeAndReleaseConnection(stmt2);
         }
 
         int    diff         = max - min;

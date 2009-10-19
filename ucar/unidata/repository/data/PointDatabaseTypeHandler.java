@@ -636,8 +636,8 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         }
         sql.append(")");
         getDatabaseManager().execute(
-            connection, getDatabaseManager().convertSql(sql.toString()),
-            1000, 10000);
+                                     connection, getDatabaseManager().convertSql(sql.toString()),
+                                                 1000, 10000);
 
         for (String index : indexSql) {
             getDatabaseManager().loadSql(index, false, false);
@@ -2882,7 +2882,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         StringBuffer sql = new StringBuffer();
         try {
             sql.append("drop table " + tableName);
-            getDatabaseManager().execute(sql.toString(), 1000, 10000);
+            getDatabaseManager().executeAndClose(sql.toString(), 1000, 10000);
         } catch (Exception ignore) {}
         try {
             getDatabaseManager().delete(

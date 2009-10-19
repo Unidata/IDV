@@ -113,7 +113,7 @@ public class ReportTypeHandler extends TypeHandler {
 
 
         try {
-            getDatabaseManager().execute(tableDef.toString());
+            getDatabaseManager().executeAndClose(tableDef.toString());
         } catch (Throwable exc) {
             //            if (exc.toString().indexOf("already exists") < 0) {
             //                throw new WrapperException(exc);

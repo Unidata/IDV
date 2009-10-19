@@ -1355,14 +1355,16 @@ public class SqlUtil {
     public static class Iterator {
 
         /** _more_ */
-        Statement stmt;
+        private         Statement stmt;
 
         /** _more_ */
-        int cnt = 0;
+        private         int cnt = 0;
 
         /** _more_ */
-        ResultSet lastResultSet;
+        private         ResultSet lastResultSet;
 
+        /** _more_ */
+        private boolean shouldCloseStatement = true;
 
         /**
          *
@@ -1371,6 +1373,25 @@ public class SqlUtil {
         public Iterator(Statement stmt) {
             this.stmt = stmt;
         }
+
+        /**
+           Set the ShouldCloseStatement property.
+
+           @param value The new value for ShouldCloseStatement
+        **/
+        public void setShouldCloseStatement (boolean value) {
+            shouldCloseStatement = value;
+        }
+
+        /**
+           Get the ShouldCloseStatement property.
+
+           @return The ShouldCloseStatement
+        **/
+        public boolean getShouldCloseStatement () {
+            return shouldCloseStatement;
+        }
+
 
         /**
          * _more_
@@ -1392,7 +1413,9 @@ public class SqlUtil {
             cnt++;
             lastResultSet = stmt.getResultSet();
             if (lastResultSet == null) {
-                close(stmt);
+                if(shouldCloseStatement) {
+                    close(stmt);
+                }
                 stmt = null;
             }
             return lastResultSet;
@@ -1400,7 +1423,9 @@ public class SqlUtil {
 
         public void close() throws SQLException {
             if(stmt!=null) {
-                close(stmt);
+                if(shouldCloseStatement) {
+                    close(stmt);
+                }
                 stmt  = null;
             }
         }

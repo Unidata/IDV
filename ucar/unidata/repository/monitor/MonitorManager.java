@@ -379,12 +379,16 @@ public class MonitorManager extends RepositoryManager {
             monitor.addAction(new FtpAction(getRepository().getGUID()));
         } else if (type.equals("copy")) {
             monitor.addAction(new CopyAction(getRepository().getGUID()));
-        } else if (type.equals("ldm")) {
+        } else if (type.equals("ldm") || type.equals("exec")) {
             if ( !request.getUser().getAdmin()) {
                 throw new IllegalArgumentException(
-                    "You need to be an admin to add an LDM action");
+                    "You need to be an admin to add an " + type +" action");
             }
-            monitor.addAction(new LdmAction(getRepository().getGUID()));
+            if (type.equals("ldm")) {
+                monitor.addAction(new LdmAction(getRepository().getGUID()));
+            } else {
+                monitor.addAction(new ExecAction(getRepository().getGUID()));
+            }
         } else {
             System.err.println("unknown type:" + type);
         }
@@ -480,10 +484,15 @@ public class MonitorManager extends RepositoryManager {
 
         sb.append(HtmlUtil.br());
         String ldmCreate = "";
+        String execCreate = "";
         if (request.getUser().getAdmin()) {
             ldmCreate = request.form(getRepositoryBase().URL_USER_MONITORS)
                         + HtmlUtil.submit("LDM Action", ARG_MONITOR_CREATE)
                         + HtmlUtil.hidden(ARG_MONITOR_TYPE, "ldm")
+                        + HtmlUtil.formClose();
+            execCreate = request.form(getRepositoryBase().URL_USER_MONITORS)
+                        + HtmlUtil.submit("Exec Action", ARG_MONITOR_CREATE)
+                        + HtmlUtil.hidden(ARG_MONITOR_TYPE, "exec")
                         + HtmlUtil.formClose();
         }
 
@@ -507,6 +516,8 @@ public class MonitorManager extends RepositoryManager {
             sb.append(HtmlUtil.col(form));
         }
         sb.append(HtmlUtil.col(ldmCreate));
+        sb.append(HtmlUtil.col(execCreate));
+
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TR));
         sb.append(HtmlUtil.close(HtmlUtil.TAG_TABLE));
 

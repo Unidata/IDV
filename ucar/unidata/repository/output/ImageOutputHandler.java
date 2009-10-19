@@ -552,8 +552,10 @@ public class ImageOutputHandler extends OutputHandler {
                 col++;
 
                 sb.append("<td>");
-                String imgExtra = XmlUtil.attr(ARG_WIDTH, "400");
-                sb.append(HtmlUtil.img(url, "", imgExtra));
+                String imgExtra = "";
+                //                String imgExtra = XmlUtil.attr(ARG_WIDTH, "400");
+                String imageUrl = url+"&imagewidth=" + request.get(ARG_IMAGEWIDTH,400);
+                sb.append(HtmlUtil.href(url,(HtmlUtil.img(imageUrl, "", imgExtra))));
                 sb.append("<br>\n");
                 sb.append(getEntryLink(request, entry));
                 sb.append(" " + new Date(entry.getStartDate()));
