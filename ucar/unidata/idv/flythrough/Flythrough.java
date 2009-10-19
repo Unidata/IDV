@@ -424,15 +424,21 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private Dimension dialDimension = new Dimension(180, 130);
 
-    /** _more_ */
+    /** The location on the dashboard image of the dials.
+     * this is of the form:<pre>
+     {centerx, centery, width, height}
+     The first one is used for the map. The second for the compass. 
+     The third is the lat/lon readout. The x/y is the upper left and width is ignored for the label
+     </pre>
+    */
     private int[][] dialPts = {
         { 402, 100, 206, 145 }, 
         { 256, 90, 120, 100 }, 
+        { 515, 60, 130, 100 }, 
         { 224, 180, 170, 100 },
         { 575, 180, 170, 100 }, 
         { 356, 240, 150, 100 },
         { 447, 240, 150, 100 }, 
-        { 560, 90, 130, 100 }, 
         { 687, 262, 90, 100 }
     };
 
@@ -479,7 +485,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private List<SampleInfo> sampleInfos = new ArrayList<SampleInfo>();
 
-    /** _more_ */
+    /** We cache the chart image to save some time in the redraw */
     private Image lastChartImage;
 
     /** _more_ */
@@ -498,8 +504,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     public Flythrough() {
         sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss Z");
         sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
-        decorators.add(new RainDecorator(this));
         decorators.add(new ImageDecorator(this));
+        decorators.add(new RainDecorator(this));
     }
 
 
@@ -539,6 +545,16 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         setAnimationTimes();
     }
 
+
+    public MapViewManager getViewManager() {
+        return viewManager;
+    }
+
+
+
+    public IntegratedDataViewer getIdv() {
+        return viewManager.getIdv();
+    }
 
     /**
      * _more_
@@ -1303,23 +1319,17 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         dashboardLbl.addMouseListener(mouseAdapter);
         dashboardLbl.addMouseMotionListener(mouseAdapter);
 
-        //        JSplitPane gaugesPanel = GuiUtils.vsplit(readoutDisplay,
-        //                                     dashboardLbl);
-        //        gaugesPanel.setResizeWeight(0.5);
-        //        gaugesPanel.setOneTouchExpandable(true);
 
+        //Create ome charts to force classloading (which takes some time) in a thread
+        //So the gui shows quicker
         Misc.run(new Runnable() {
             public void run() {
                 try {
-                    BufferedImage image = new BufferedImage(10, 10,
-                                              BufferedImage.TYPE_INT_RGB);
-                    Graphics2D g = (Graphics2D) image.getGraphics();
-                    paintDashboardAfter(g, dashboardLbl);
+                    MeterPlot plot = new MeterPlot(new DefaultValueDataset(new Double(1)));
+                    createChart(new XYSeriesCollection());
                 } catch (Exception ignore) {}
             }
         });
-
-
 
 
         return dashboardLbl;
@@ -1327,9 +1337,18 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
     /**
-     * _more_
+     * this is used to define a new set of location points  for the dials
+     * It looks for a file "pts" in the working dir, if there it reads in the values.
+     * the pts file looks like the inner of the dialPts  array, e.g.:
+     <pre>{ 402, 100, 206, 145 }, 
+        { 256, 90, 120, 100 }, 
+        { 224, 180, 170, 100 },
+     </pre>
+     *
+     * This lets you run the flythrough and edit the locations, save the file, and then you repaint 
+     * the dialog to show the new locations
      */
-    public void readPts() {
+    private void readPts() {
         try {
             if (new File("pts").exists()) {
                 String s = IOUtil.readContents("pts", "");
@@ -1393,8 +1412,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         int             ptsIdx       = 0;
 
 
-        DefaultValueDataset dataset =
-            new DefaultValueDataset(new Double(currentHeading));
 
         try {
             pipPanel.setPreferredSize(new Dimension(dialPts[ptsIdx][2],
@@ -1409,7 +1426,27 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
 
-        CompassPlot plot = new CompassPlot(dataset);
+        JLabel locLbl = null;
+
+
+        if(lastLocation!=null) {
+            try {
+            locLbl = new JLabel("<html><table width=100%><tr><td align=right>&nbsp;Lat:</td></td>" + getIdv().getDisplayConventions().formatLatLon(getLat(lastLocation))+"</td></tr>" +
+                                "<tr><td align=right>&nbsp;Lon:</td></td>" +getIdv().getDisplayConventions().formatLatLon(getLon(lastLocation))+"</td></tr>" +
+                                "<tr><td align=right>&nbsp;Alt:</td></td>" +getIdv().getDisplayConventions().formatDistance(getAlt(lastLocation))+
+                                "</table>");
+            } catch(Exception ignore){}
+        }
+        if(locLbl==null) 
+            locLbl = new JLabel("<html><table width=100%><tr><td align=right>&nbsp;Lat:</td></td>N/A</td></tr><tr><td align=right>&nbsp;Lon:</td></td>N/A</td></tr><tr><td align=right>&nbsp;Alt:</td></td>N/A</table>");
+        locLbl.setOpaque(true);
+        locLbl.setBackground(Color.white);
+
+
+        DefaultValueDataset headingDataset =
+            new DefaultValueDataset(new Double(currentHeading));
+
+        CompassPlot plot = new CompassPlot(headingDataset);
         plot.setSeriesNeedle(0);
         plot.setSeriesPaint(0, Color.red);
         plot.setSeriesOutlinePaint(0, Color.red);
@@ -1434,6 +1471,12 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
         g2.setTransform(oldTransform);
         drawDial(g2, compassPanel, ptsIdx++, ul);
+
+
+        g2.setTransform(oldTransform);
+        dummyFrame.setContentPane(locLbl);
+        dummyFrame.pack();
+        drawDial(g2, locLbl, ptsIdx++, ul);
 
 
         if(showReadout) {
@@ -1579,6 +1622,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         }
         int w = comp.getWidth();
         int h = comp.getHeight();
+        boolean useUpperLeft = false;
         if (comp instanceof ChartPanel) {
             int    desiredWidth = dialPts[ptsIdx][2];
             double scale        = w / (double) desiredWidth;
@@ -1586,13 +1630,16 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 h = (int) (h / scale);
             }
             comp.setSize(new Dimension(desiredWidth, h));
+        } else  if (comp instanceof JLabel) {
+            //Don't set size for labels
+            useUpperLeft = true;
         } else {
             comp.setSize(new Dimension(dialPts[ptsIdx][2],
                                        dialPts[ptsIdx][3]));
         }
         try {
-            int   x     = ul.x + dialPts[ptsIdx][0] - dialPts[ptsIdx][2] / 2;
-            int   y     = ul.y + dialPts[ptsIdx][1] - dialPts[ptsIdx][3] / 2;
+            int   x     = ul.x + dialPts[ptsIdx][0] - (useUpperLeft?0:dialPts[ptsIdx][2] / 2);
+            int   y     = ul.y + dialPts[ptsIdx][1] - (useUpperLeft?0:dialPts[ptsIdx][3] / 2);
             Image image = ImageUtils.getImage(comp);
             g2.translate(x, y);
             g2.drawImage(image, 0, 0, null);
@@ -1846,6 +1893,18 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         return location.getLongitude().getValue(CommonUnit.degree);
     }
 
+
+    public double getAlt(EarthLocation location) throws VisADException {
+        Real r = location.getAltitude();
+        if(r==null) return 0;
+        return r.getValue(CommonUnit.meter);
+    }
+
+    
+
+
+
+
     /**
      * _more_
      */
@@ -2056,7 +2115,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             EarthLocation el = pt.getEarthLocation();
             llw.setLatLon(el.getLatitude().getValue(CommonUnit.degree),
                           el.getLongitude().getValue(CommonUnit.degree));
-            llw.setAlt(el.getAltitude().getValue(CommonUnit.meter));
+            llw.setAlt(getAlt(el));
 
             JTextArea textArea = new JTextArea("", 5, 100);
             if (pt.getDescription() != null) {
@@ -2501,7 +2560,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                     "" + el.getLongitude().getValue(CommonUnit.degree));
                 ptNode.setAttribute(
                     ATTR_ALT,
-                    "" + el.getAltitude().getValue(CommonUnit.meter));
+                    "" + getAlt(el));
                 if (pt.hasTiltX()) {
                     ptNode.setAttribute(ATTR_TILT[0], "" + pt.getTiltX());
                 }
@@ -2579,7 +2638,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     private double[] getXYZ(EarthLocation el)
             throws VisADException, RemoteException {
         NavigatedDisplay navDisplay = viewManager.getNavigatedDisplay();
-        double           alt = el.getAltitude().getValue(CommonUnit.meter);
+        double           alt = getAlt(el);
         if (doGlobe() && (alt == 0)) {
             alt = 100;
         }
@@ -2701,6 +2760,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      */
     protected void goTo(FlythroughPoint pt1, double[] xyz1, double[] xyz2,
                         double[] actualPoint, boolean animateMove) {
+
 
         currentHeading = 180;
         if (actualPoint == null) {
@@ -2885,11 +2945,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             //            locationLine2.setVisible(showLine);
             locationMarker.setVisible(showMarker);
 
-
-
-
-
-
             if (false && (navDisplay instanceof MapProjectionDisplayJ3D)) {
                 double clipDistance = parse(clipFld, 0.0);
                 System.err.println("Clip distance:" + clipDistance);
@@ -2916,6 +2971,13 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 }
             }
 
+            if(!Misc.equals(lastLocation, pt1.getEarthLocation())) {
+                lastLocation = pt1.getEarthLocation();
+                EarthLocationTuple tuplePosition =     new EarthLocationTuple(lastLocation.getLatitude(),
+                                                                              lastLocation.getLongitude(),
+                                                                              lastLocation.getAltitude());
+                doShare(ucar.unidata.idv.control.ProbeControl.SHARE_POSITION, tuplePosition);
+            }
 
 
         } catch (NumberFormatException exc) {
@@ -2931,6 +2993,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             }
             return;
         }
+
 
 
     }
@@ -3059,6 +3122,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             }
             String name = ucar.visad.Util.cleanTypeName(r.getType());
 
+            //TODO: Right now we cache with name. But we could easily have the same name with different fields
+            //We need to cache with something specific to the displaycontrol in the readout
             if (collectSamples
                     && !Misc.equals(lastLocation, pt1.getEarthLocation())) {
                 SampleInfo sampleInfo = sampleMap.get(name);
@@ -3113,7 +3178,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             JFreeChart chart = new JFreeChart("", plot);
             TextTitle title = new TextTitle(" " + label.getText() + " ",
                                             font);
-            //                title.setExpandToFitSpace(true);
             title.setBackgroundPaint(Color.gray);
             title.setPaint(Color.white);
             chart.setTitle(title);
@@ -3129,7 +3193,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         }
 
 
-        lastLocation = pt1.getEarthLocation();
 
         List allComps = new ArrayList(labels);
         allComps.addAll(comps);
