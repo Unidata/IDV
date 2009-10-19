@@ -104,10 +104,7 @@ import visad.georef.*;
 
 import visad.java3d.*;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.image.*;
+
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -131,12 +128,14 @@ import java.util.Vector;
 
 import javax.media.j3d.*;
 
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.*;
+import java.awt.image.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-
-import javax.vecmath.*;
 
 import javax.vecmath.*;
 
@@ -444,11 +443,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private Point dashboardImageOffset = new Point(0, 0);
 
-    /** _more_ */
-    private Image rainIcon;
-
-    /** _more_ */
-    private Image snowIcon;
 
 
     /** _more_ */
@@ -504,11 +498,10 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private int lastIndex = -1;
 
-    /** _more_ */
-    private double precipLevel = 0;
 
-    /** _more_ */
-    private double temperature = Double.NaN;
+
+
+    private List<FlythroughDecorator> decorators = new ArrayList<FlythroughDecorator>();
 
 
     /**
@@ -517,7 +510,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     public Flythrough() {
         sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss Z");
         sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+        decorators.add(new RainDecorator());
     }
+
 
 
     /**
@@ -1681,38 +1676,17 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         }
 
         if (showDecoration) {
-            if (precipLevel > 0) {
-                int cv = 255
-                         - (int) (255 * (Math.min(precipLevel, 100) / 100));
-                Color c = new Color(cv, cv, cv);
-                g.setColor(c);
-                if (backgroundImage == null) {
-                    g.fillRect(0, 0, b.width, b.height);
-                }
-                if (rainIcon == null) {
-                    snowIcon =
-                        GuiUtils.getImage("/auxdata/ui/icons/snowflake.gif",
-                                          getClass());
-                    rainIcon =
-                        GuiUtils.getImage("/auxdata/ui/icons/drops.gif",
-                                          getClass());
-                }
-                Image icon = (((temperature == temperature)
-                               && (temperature < 0))
-                              ? snowIcon
-                              : rainIcon);
-                for (int i = 0; i < precipLevel * 10; i++) {
-                    int x = (int) (Math.random() * b.width)
-                            - icon.getWidth(null);
-                    int y = (int) (Math.random() * b.height)
-                            - icon.getHeight(null);
-                    g.drawImage(icon, x, y, null);
-                }
+            boolean callRepaint = false;
+            for(FlythroughDecorator decorator: decorators) {
+                if(decorator.paintDashboard(g2, comp)) callRepaint = true;
+            }
+            if(callRepaint) {
                 synchronized (REPAINT_MUTEX) {
                     repaintCnt++;
                     Misc.runInABit(500, this, "doRepaint", comp);
                 }
             }
+
         }
 
     }
@@ -3120,13 +3094,20 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
         String newImageUrl = null;
 
-        precipLevel  = 0;
-        temperature  = Double.NaN;
         imageReadout = null;
 
         List comps  = new ArrayList();
         List labels = new ArrayList();
+        for(FlythroughDecorator decorator: decorators) {
+            decorator.initReadout(this);
+        }
+
+        for(FlythroughDecorator decorator: decorators) {
+            decorator.handleReadout(this, samples);
+        }
+
         for (ReadoutInfo info : samples) {
+
             if (info.getImageUrl() != null) {
                 newImageUrl  = info.getImageUrl();
                 imageReadout = info;
@@ -3141,6 +3122,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 unit = r.getUnit();
             }
             String name = ucar.visad.Util.cleanTypeName(r.getType());
+
 
             if (collectSamples
                     && !Misc.equals(lastLocation, pt1.getEarthLocation())) {
@@ -3159,13 +3141,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             String unitSuffix = "";
             if (unit != null) {
                 unitSuffix = " [" + unit + "]";
-            }
-            if (((name.toLowerCase().indexOf("precipitation") >= 0)
-                    || (name.toLowerCase().indexOf("rain")
-                        >= 0)) && Unit.canConvert(unit, CommonUnits.MM)) {
-                precipLevel = r.getValue(CommonUnits.MM);
-            } else if (Unit.canConvert(unit, CommonUnits.CELSIUS)) {
-                temperature = r.getValue(CommonUnits.CELSIUS);
             }
 
 
