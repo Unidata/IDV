@@ -26,6 +26,9 @@
 package ucar.unidata.idv.flythrough;
 
 import ucar.unidata.idv.control.ReadoutInfo;
+import ucar.unidata.util.GuiUtils;
+
+import visad.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -36,6 +39,7 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
+import ucar.visad.quantities.CommonUnits;
 
 import java.util.List;
 
@@ -43,10 +47,16 @@ import java.util.List;
  *
  * @author IDV development team
  */
-public interface FlythroughDecorator {
 
-    public void handleReadout(List<ReadoutInfo> samples) throws Exception;
+public abstract class FlythroughDecoratorImpl implements FlythroughDecorator {
 
-    public boolean paintDashboard(Graphics2D g, JComponent comp);
+    Flythrough flythrough;
+
+    public FlythroughDecoratorImpl() {
+    }
+
+    public FlythroughDecoratorImpl(Flythrough flythrough) {
+        this.flythrough = flythrough;
+    }
 
 }

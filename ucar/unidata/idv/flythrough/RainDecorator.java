@@ -48,7 +48,7 @@ import java.util.List;
  * @author IDV development team
  */
 
-public class RainDecorator implements FlythroughDecorator {
+public class RainDecorator extends  FlythroughDecoratorImpl {
 
     /** _more_ */
     private double precipLevel = 0;
@@ -66,13 +66,15 @@ public class RainDecorator implements FlythroughDecorator {
     public RainDecorator() {
     }
 
-    public void initReadout(Flythrough flythrough) {
-        precipLevel  = 0;
-        temperature  = Double.NaN;
+
+    public RainDecorator(Flythrough flythrough) {
+        super(flythrough);
     }
 
 
-    public void handleReadout(Flythrough flythrough, List<ReadoutInfo> samples) throws Exception {
+    public void handleReadout(List<ReadoutInfo> samples) throws Exception {
+        precipLevel  = 0;
+        temperature  = Double.NaN;
         for (ReadoutInfo info : samples) {
             Real r = info.getReal();
             if (r == null) {

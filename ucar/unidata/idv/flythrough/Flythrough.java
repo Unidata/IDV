@@ -441,25 +441,15 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
     /** _more_ */
-    private Point dashboardImageOffset = new Point(0, 0);
+    protected Point dashboardImageOffset = new Point(0, 0);
 
 
 
     /** _more_ */
     private Image dashboardImage;
 
-    /** _more_ */
-    private ReadoutInfo imageReadout;
-
-    /** _more_ */
-    private String imageUrl;
 
 
-    /** _more_ */
-    private Image backgroundImage;
-
-    /** _more_ */
-    private HashSet fetchedImages = new HashSet();
 
     /** _more_ */
     private boolean collectSamples = false;
@@ -499,8 +489,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     private int lastIndex = -1;
 
 
-
-
     private List<FlythroughDecorator> decorators = new ArrayList<FlythroughDecorator>();
 
 
@@ -510,7 +498,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     public Flythrough() {
         sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss Z");
         sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
-        decorators.add(new RainDecorator());
+        decorators.add(new RainDecorator(this));
+        decorators.add(new ImageDecorator(this));
     }
 
 
@@ -1461,7 +1450,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
         if (showChart) {
             try {
-                paintSamples(g2, comp);
+                paintChart(g2, comp);
             } catch (Exception exc) {
                 logException("Drawing data samples", exc);
             }
@@ -1477,7 +1466,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      *
      * @throws Exception _more_
      */
-    public void paintSamples(Graphics2D g2, JComponent comp)
+    public void paintChart(Graphics2D g2, JComponent comp)
             throws Exception {
         List<SampleInfo> infos = new ArrayList<SampleInfo>(sampleInfos);
         if (infos.size() == 0) {
@@ -1532,9 +1521,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             xyPlot.setRenderer(i, renderer);
         }
 
-
-
-
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(chartWidth, chartHeight));
         dummyFrame.setContentPane(chartPanel);
@@ -1555,8 +1541,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      * @return a chart.
      */
     private static JFreeChart createChart(XYDataset dataset) {
-
-        // create the chart...
         JFreeChart chart = ChartFactory.createXYLineChart("",  // chart title
             "",                                                // x axis label
             "",                                                // y axis label
@@ -1565,31 +1549,15 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             true,                                              // tooltips
             false                                              // urls
                 );
-
-        // NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
         chart.setBackgroundPaint(new Color(255, 255, 255, 0));
-
-
-        // get a reference to the plot for further customisation...
         XYPlot plot = (XYPlot) chart.getPlot();
         plot.setBackgroundPaint(Color.lightGray);
-        plot.setAxisOffset(new RectangleInsets(5.0, 5.0, 5.0, 5.0));
+        //        plot.setAxisOffset(new RectangleInsets(5.0, 5.0, 5.0, 5.0));
         plot.setDomainGridlinePaint(Color.white);
         plot.setRangeGridlinePaint(Color.white);
-
-
-        //        renderer.setShapesVisible(false);
-
-        // change the auto tick unit selection to integer units only...
         Axis domainAxis = plot.getDomainAxis();
         domainAxis.setVisible(false);
-
-        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-        //        rangeAxis.setVisible(false);
-        //        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
-
         return chart;
-
     }
 
 
@@ -1653,27 +1621,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         Point      ul = new Point(b.width / 2 - w / 2, b.height - h);
         g.setColor(Color.white);
         g.fillRect(0, 0, b.width, b.height);
-        Image image  = backgroundImage;
-        int   ptsIdx = 0;
-        //        dialPts
-        if (image != null) {
-            int imageHeight = image.getHeight(null);
-            int imageWidth  = image.getWidth(this);
-            if (imageHeight > 0) {
-                double          scale        = b.width / (double) imageWidth;
-                AffineTransform oldTransform = g2.getTransform();
-                g2.scale(scale, scale);
-                g.drawImage(image, 0, dashboardImageOffset.y, null);
-                g2.setTransform(oldTransform);
-            } else {
-                g.drawImage(image, 0, 0, null);
-            }
-
-            g.setColor(Color.black);
-            if (imageReadout.getImageName() != null) {
-                g.drawString(imageReadout.getImageName(), 10, 20);
-            }
-        }
 
         if (showDecoration) {
             boolean callRepaint = false;
@@ -3092,26 +3039,15 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             return;
         }
 
-        String newImageUrl = null;
 
-        imageReadout = null;
 
         List comps  = new ArrayList();
         List labels = new ArrayList();
         for(FlythroughDecorator decorator: decorators) {
-            decorator.initReadout(this);
-        }
-
-        for(FlythroughDecorator decorator: decorators) {
-            decorator.handleReadout(this, samples);
+            decorator.handleReadout(samples);
         }
 
         for (ReadoutInfo info : samples) {
-
-            if (info.getImageUrl() != null) {
-                newImageUrl  = info.getImageUrl();
-                imageReadout = info;
-            }
             Real r = info.getReal();
             if (r == null) {
                 continue;
@@ -3122,7 +3058,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 unit = r.getUnit();
             }
             String name = ucar.visad.Util.cleanTypeName(r.getType());
-
 
             if (collectSamples
                     && !Misc.equals(lastLocation, pt1.getEarthLocation())) {
@@ -3189,9 +3124,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             plot.setBackgroundImageAlpha(0.0f);
             chart.setBackgroundPaint(new Color(255, 255, 255, 0));
             chartPanel.setBackground(new Color(255, 255, 255, 0));
-
             comps.add(chartPanel);
-            //                dials.add(GuiUtils.centerBottom(chartPanel,label));
             dials.add(chartPanel);
         }
 
@@ -3201,47 +3134,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         List allComps = new ArrayList(labels);
         allComps.addAll(comps);
         readoutDisplay.removeAll();
-
-        if (false && (allComps.size() > 0)) {
-            readoutDisplay.add("Center",
-                               GuiUtils.doLayout(allComps, labels.size(),
-                                   GuiUtils.WT_Y, GuiUtils.WT_NY));
-        }
-
-        //        System.err.println ("image url:" + imageUrl);
-        if ( !Misc.equals(newImageUrl, imageUrl)) {
-            imageUrl = newImageUrl;
-            if (imageUrl != null) {
-                if ( !fetchedImages.contains(imageUrl)) {
-                    fetchedImages.add(imageUrl);
-                    Misc.run(this, "fetchBackgroundImage", imageUrl);
-                }
-            } else {
-                backgroundImage = null;
-            }
-        }
         updateDashboard();
 
     }
 
 
-
-    /**
-     * _more_
-     *
-     * @param url _more_
-     */
-    public void fetchBackgroundImage(String url) {
-        Image image = GuiUtils.getImage(imageUrl, getClass());
-        if (image != null) {
-            image.getWidth(this);
-            if (Misc.equals(url, imageUrl)) {
-                backgroundImage = image;
-                updateDashboard();
-            }
-        }
-
-    }
 
 
     /**
