@@ -435,15 +435,18 @@ public class MapViewManager extends NavigatedViewManager {
             //            }
         }
 
-    }
 
+
+
+
+    }
 
 
     protected void initUI() {
         super.initUI();
         //Initialize the flythrough here
         if (flythrough != null) {
-            flythrough.setViewManager(this);
+            flythrough.init(this);
             if (flythrough.getShown()) {
                 flythrough.show();
             }
