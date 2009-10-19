@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.idv.flythrough;
 
 
@@ -83,7 +84,12 @@ public class WeatherDecorator extends FlythroughDecorator {
     }
 
 
-    public  String getName() {
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getName() {
         return "raindrops and weather";
     }
 
@@ -95,7 +101,7 @@ public class WeatherDecorator extends FlythroughDecorator {
      *
      * @throws Exception _more_
      */
-    public void handleReadout(List<ReadoutInfo> samples) throws Exception {
+    public void handleReadout(FlythroughPoint pt, List<ReadoutInfo> samples) throws Exception {
         precipLevel = 0;
         temperature = Double.NaN;
         for (ReadoutInfo info : samples) {

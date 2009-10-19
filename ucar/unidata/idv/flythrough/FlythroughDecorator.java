@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.idv.flythrough;
 
 
@@ -54,10 +55,13 @@ import javax.swing.table.*;
 
 public abstract class FlythroughDecorator {
 
-    /** _more_          */
+    /** _more_ */
     Flythrough flythrough;
 
+    /** _more_          */
     private boolean shown = true;
+
+
 
 
     /**
@@ -75,6 +79,11 @@ public abstract class FlythroughDecorator {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param flythrough _more_
+     */
     public void setFlythrough(Flythrough flythrough) {
         this.flythrough = flythrough;
     }
@@ -86,8 +95,7 @@ public abstract class FlythroughDecorator {
      *
      * @throws Exception _more_
      */
-    public void handleReadout(List<ReadoutInfo> samples) throws Exception {
-    }
+    public void handleReadout(FlythroughPoint pt, List<ReadoutInfo> samples) throws Exception {}
 
     /**
      * _more_
@@ -101,46 +109,74 @@ public abstract class FlythroughDecorator {
         return false;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public abstract String getName();
 
-    public void clearSamples() {
-    }
-
-    public void initViewMenu(JMenu viewMenu) {
-        GuiUtils.makeCheckboxMenuItem("Show " + getName(), this,
-                                      "shown", null);
-    }
-
-
-    public void initEditMenu(JMenu viewMenu) {
-    }
-
-    public void initFileMenu(JMenu viewMenu) {
-    }
+    /**
+     * _more_
+     */
+    public void clearSamples() {}
 
     /**
-       Set the Shown property.
+     * _more_
+     *
+     * @param viewMenu _more_
+     */
+    public void initViewMenu(JMenu viewMenu) {
+        viewMenu.add(GuiUtils.makeCheckboxMenuItem("Show " + getName(), this, "shown",
+                                                   null));
+    }
 
-       @param value The new value for Shown
-    **/
-    public void setShown (boolean value) {
-	shown = value;
-        if(flythrough!=null) {
+
+    /**
+     * _more_
+     *
+     * @param viewMenu _more_
+     */
+    public void initEditMenu(JMenu viewMenu) {}
+
+    /**
+     * _more_
+     *
+     * @param viewMenu _more_
+     */
+    public void initFileMenu(JMenu viewMenu) {}
+
+
+    /**
+     *  Set the Shown property.
+     *
+     *  @param value The new value for Shown
+     */
+    public void setShown(boolean value) {
+        shown = value;
+        if (flythrough != null) {
             flythrough.updateDashboard();
         }
     }
 
     /**
-       Get the Shown property.
-
-       @return The Shown
-    **/
-    public boolean getShown () {
-	return shown;
+     *  Get the Shown property.
+     *
+     *  @return The Shown
+     */
+    public boolean getShown() {
+        return shown;
     }
 
+
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     * @param exc _more_
+     */
     public void logException(String msg, Throwable exc) {
-        flythrough.logException(msg,exc);
+        flythrough.logException(msg, exc);
     }
 
 

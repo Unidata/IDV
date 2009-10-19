@@ -25,6 +25,7 @@
 
 
 
+
 package ucar.unidata.idv.flythrough;
 
 
@@ -57,12 +58,16 @@ import org.jfree.ui.RectangleInsets;
 
 import ucar.unidata.idv.control.ReadoutInfo;
 import ucar.unidata.ui.ImageUtils;
+import ucar.unidata.util.FileManager;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 
 import ucar.visad.quantities.CommonUnits;
 
+
 import visad.*;
+import visad.georef.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -71,6 +76,7 @@ import java.awt.image.*;
 
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -87,6 +93,19 @@ import javax.swing.table.*;
  */
 
 public class ChartDecorator extends FlythroughDecorator {
+
+
+    /** _more_ */
+    private boolean collectSamples = false;
+
+    /** _more_ */
+    private Hashtable<String, SampleInfo> sampleMap = new Hashtable<String,
+                                                          SampleInfo>();
+
+    /** _more_ */
+    private List<SampleInfo> sampleInfos = new ArrayList<SampleInfo>();
+
+
 
 
     /** _more_ */
@@ -116,6 +135,60 @@ public class ChartDecorator extends FlythroughDecorator {
     }
 
 
+    public void initViewMenu(JMenu viewMenu) {
+        viewMenu.add(GuiUtils.makeCheckboxMenuItem("Collect data", this,
+                                                   "collectSamples", null));
+        super.initViewMenu(viewMenu);
+    }
+
+    public void initFileMenu(JMenu fileMenu) {
+        super.initFileMenu(fileMenu);
+
+        if (sampleInfos.size() > 0) {
+            fileMenu.add(GuiUtils.makeMenuItem("Write data", this,
+                    "writeData"));
+        }
+    }
+
+
+    /**
+     * _more_
+     */
+    public void writeData() {
+        try {
+            String filename =
+                FileManager.getWriteFile(FileManager.FILTER_CSV,
+                                         FileManager.SUFFIX_CSV);
+            if (filename == null) {
+                return;
+            }
+            StringBuffer     sb    = new StringBuffer();
+            List<SampleInfo> infos = new ArrayList<SampleInfo>(sampleInfos);
+            for (int i = 0; i < infos.size(); i++) {
+                SampleInfo          sampleInfo = infos.get(i);
+                List<Real>          values     = sampleInfo.getValues();
+                List<EarthLocation> locations  = sampleInfo.getLocations();
+                sb.append("parameter:");
+                sb.append(sampleInfo.getName());
+                sb.append("\n");
+                for (int j = 0; j < values.size(); j++) {
+                    EarthLocation el = locations.get(j);
+                    sb.append(el.getLatitude());
+                    sb.append(",");
+                    sb.append(el.getLongitude());
+                    sb.append(",");
+                    sb.append(values.get(i));
+                    sb.append("\n");
+                }
+            }
+            IOUtil.writeFile(filename, sb.toString());
+        } catch (Exception exc) {
+            logException("Exporting data", exc);
+        }
+    }
+
+
+
     /**
      * _more_
      *
@@ -123,8 +196,38 @@ public class ChartDecorator extends FlythroughDecorator {
      *
      * @throws Exception _more_
      */
-    public void handleReadout(List<ReadoutInfo> samples) throws Exception {}
+    public void handleReadout(FlythroughPoint pt, List<ReadoutInfo> samples) throws Exception {
 
+        for (ReadoutInfo info : samples) {
+            Real r = info.getReal();
+            if (r == null) {
+                continue;
+            }
+
+            Unit unit = info.getUnit();
+            if (unit == null) {
+                unit = r.getUnit();
+            }
+            String name = ucar.visad.Util.cleanTypeName(r.getType());
+
+
+            //TODO: Right now we cache with name. But we could easily have the same name with different fields
+            //We need to cache with something specific to the displaycontrol in the readout
+            if (collectSamples
+                && !Misc.equals(flythrough.getLastLocation(), pt.getEarthLocation())) {
+                SampleInfo sampleInfo = sampleMap.get(name);
+                if (sampleInfo == null) {
+                    sampleInfo = new SampleInfo(name, unit, info.getRange());
+                    sampleInfos.add(sampleInfo);
+                    sampleMap.put(name, sampleInfo);
+                }
+                sampleInfo.add(r, info.getLocation());
+                lastChartImage = null;
+            }
+
+        }
+
+    }
 
 
 
@@ -142,8 +245,12 @@ public class ChartDecorator extends FlythroughDecorator {
      * _more_
      */
     public void clearSamples() {
+        super.clearSamples();
+        sampleMap   = new Hashtable<String, SampleInfo>();
+        sampleInfos = new ArrayList<SampleInfo>();
         lastChartImage = null;
     }
+
 
     /**
      * _more_
@@ -156,7 +263,7 @@ public class ChartDecorator extends FlythroughDecorator {
     public boolean paintDashboard(Graphics2D g2, JComponent comp) {
         try {
             List<SampleInfo> infos =
-                new ArrayList<SampleInfo>(flythrough.getSamples());
+                new ArrayList<SampleInfo>(sampleInfos);
             if (infos.size() == 0) {
                 return false;
             }
@@ -232,6 +339,25 @@ public class ChartDecorator extends FlythroughDecorator {
 
 
     }
+
+    /**
+     *  Set the CollectSamples property.
+     *
+     *  @param value The new value for CollectSamples
+     */
+    public void setCollectSamples(boolean value) {
+        this.collectSamples = value;
+    }
+
+    /**
+     *  Get the CollectSamples property.
+     *
+     *  @return The CollectSamples
+     */
+    public boolean getCollectSamples() {
+        return this.collectSamples;
+    }
+
 
 
 }

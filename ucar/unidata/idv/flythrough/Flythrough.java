@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.flythrough;
 
 
@@ -245,7 +246,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     private List<FlythroughPoint> pointsToUse =
         new ArrayList<FlythroughPoint>();
 
-    /** _more_          */
+    /** _more_ */
     private int stride = 1;
 
 
@@ -448,9 +449,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
 
-    /** _more_ */
-    private boolean collectSamples = false;
-
 
     /** _more_ */
     private boolean showTimes = false;
@@ -467,12 +465,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private double[] lastViewpoint;
 
-    /** _more_ */
-    private Hashtable<String, SampleInfo> sampleMap = new Hashtable<String,
-                                                          SampleInfo>();
-
-    /** _more_ */
-    private List<SampleInfo> sampleInfos = new ArrayList<SampleInfo>();
 
 
     /** _more_ */
@@ -482,7 +474,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     private int lastIndex = -1;
 
 
-    /** _more_          */
+    /** _more_ */
     private List<FlythroughDecorator> decorators =
         new ArrayList<FlythroughDecorator>();
 
@@ -494,8 +486,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss Z");
         sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         decorators.add(new ImageDecorator(this));
-        decorators.add(new ChartDecorator(this));
         decorators.add(new WeatherDecorator(this));
+        decorators.add(new ChartDecorator(this));
     }
 
 
@@ -511,11 +503,21 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param viewManager _more_
+     */
     public void setViewManager(MapViewManager viewManager) {
         this.viewManager = viewManager;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param viewManager _more_
+     */
     public void init(MapViewManager viewManager) {
         this.viewManager = viewManager;
         for (FlythroughDecorator decorator : decorators) {
@@ -675,7 +677,13 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     }
 
 
-        public void flythrough(List<FlythroughPoint> newPoints, boolean andShow) {
+    /**
+     * _more_
+     *
+     * @param newPoints _more_
+     * @param andShow _more_
+     */
+    public void flythrough(List<FlythroughPoint> newPoints, boolean andShow) {
         this.allPoints = new ArrayList<FlythroughPoint>(newPoints);
         //subsample
         ArrayList<FlythroughPoint> tmp = new ArrayList<FlythroughPoint>();
@@ -689,7 +697,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             animation.setCurrent(currentIndex);
             setAnimationTimes();
         }
-        if(andShow) {
+        if (andShow) {
             show();
         }
     }
@@ -1417,6 +1425,10 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     }
 
 
+    public EarthLocation getLastLocation() {
+        return lastLocation;
+    }
+
 
     /**
      * _more_
@@ -1525,13 +1537,15 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Image getDashboardImage() {
         return dashboardImage;
     }
 
-    public List<SampleInfo> getSamples() {
-        return sampleInfos;
-    }
 
 
     /**
@@ -1631,7 +1645,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         if (showDecoration) {
             boolean callRepaint = false;
             for (FlythroughDecorator decorator : decorators) {
-                if(!decorator.getShown()) continue;
+                if ( !decorator.getShown()) {
+                    continue;
+                }
                 if (decorator.paintDashboard(g2, comp)) {
                     callRepaint = true;
                 }
@@ -1924,7 +1940,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         }
 
         for (FlythroughDecorator decorator : decorators) {
-            initEditMenu(editMenu);
+            decorator.initEditMenu(editMenu);
         }
 
 
@@ -1946,52 +1962,12 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     public void initFileMenu(JMenu fileMenu) {
         fileMenu.add(GuiUtils.makeMenuItem("Export", this, "doExport"));
         fileMenu.add(GuiUtils.makeMenuItem("Import", this, "doImport"));
-        if (sampleInfos.size() > 0) {
-            fileMenu.add(GuiUtils.makeMenuItem("Write data", this,
-                    "writeData"));
-        }
-
         for (FlythroughDecorator decorator : decorators) {
-            initFileMenu(fileMenu);
+            decorator.initFileMenu(fileMenu);
         }
 
     }
 
-    /**
-     * _more_
-     */
-    public void writeData() {
-        try {
-            String filename =
-                FileManager.getWriteFile(FileManager.FILTER_CSV,
-                                         FileManager.SUFFIX_CSV);
-            if (filename == null) {
-                return;
-            }
-            StringBuffer     sb    = new StringBuffer();
-            List<SampleInfo> infos = new ArrayList<SampleInfo>(sampleInfos);
-            for (int i = 0; i < infos.size(); i++) {
-                SampleInfo          sampleInfo = infos.get(i);
-                List<Real>          values     = sampleInfo.getValues();
-                List<EarthLocation> locations  = sampleInfo.getLocations();
-                sb.append("parameter:");
-                sb.append(sampleInfo.getName());
-                sb.append("\n");
-                for (int j = 0; j < values.size(); j++) {
-                    EarthLocation el = locations.get(j);
-                    sb.append(el.getLatitude());
-                    sb.append(",");
-                    sb.append(el.getLongitude());
-                    sb.append(",");
-                    sb.append(values.get(i));
-                    sb.append("\n");
-                }
-            }
-            IOUtil.writeFile(filename, sb.toString());
-        } catch (Exception exc) {
-            logException("Exporting data", exc);
-        }
-    }
 
     /**
      * _more_
@@ -2010,21 +1986,14 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         viewMenu.add(GuiUtils.makeCheckboxMenuItem("Show marker", this,
                 "showMarker", null));
 
-        dashboardMenu.add(GuiUtils.makeCheckboxMenuItem("Collect data", this,
-                "collectSamples", null));
 
         for (FlythroughDecorator decorator : decorators) {
-            initViewMenu(viewMenu);
+            decorator.initViewMenu(dashboardMenu);
         }
 
 
         dashboardMenu.add(GuiUtils.makeCheckboxMenuItem("Show gauges", this,
                 "showReadout", null));
-
-
-
-
-
 
         dashboardMenu.add(GuiUtils.makeMenuItem("Clear data", this,
                 "clearSamples"));
@@ -2034,8 +2003,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      * _more_
      */
     public void clearSamples() {
-        sampleMap      = new Hashtable<String, SampleInfo>();
-        sampleInfos    = new ArrayList<SampleInfo>();
         for (FlythroughDecorator decorator : decorators) {
             decorator.clearSamples();
         }
@@ -3094,11 +3061,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         }
 
 
-
         List comps  = new ArrayList();
-        List labels = new ArrayList();
         for (FlythroughDecorator decorator : decorators) {
-            decorator.handleReadout(samples);
+            decorator.handleReadout(pt1, samples);
         }
 
         for (ReadoutInfo info : samples) {
@@ -3114,18 +3079,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             String name = ucar.visad.Util.cleanTypeName(r.getType());
 
 
-            //TODO: Right now we cache with name. But we could easily have the same name with different fields
-            //We need to cache with something specific to the displaycontrol in the readout
-            if (collectSamples
-                    && !Misc.equals(lastLocation, pt1.getEarthLocation())) {
-                SampleInfo sampleInfo = sampleMap.get(name);
-                if (sampleInfo == null) {
-                    sampleInfo = new SampleInfo(name, unit, info.getRange());
-                    sampleInfos.add(sampleInfo);
-                    sampleMap.put(name, sampleInfo);
-                }
-                sampleInfo.add(r, info.getLocation());
-            }
 
 
 
@@ -3139,8 +3092,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             if (v == v) {
                 v = new Double(Misc.format(v)).doubleValue();
             }
-            labels.add(new JLabel("<html>" + name.replace("_", " ") + "<br>"
-                                  + Misc.format(v) + unitSuffix));
 
             JLabel label = new JLabel(name.replace("_", " "));
 
@@ -3185,8 +3136,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
 
-        List allComps = new ArrayList(labels);
-        allComps.addAll(comps);
+
         readoutDisplay.removeAll();
         updateDashboard();
 
@@ -3654,31 +3604,13 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     }
 
 
-    /**
-     *  Set the CollectSamples property.
-     *
-     *  @param value The new value for CollectSamples
-     */
-    public void setCollectSamples(boolean value) {
-        this.collectSamples = value;
-    }
-
-    /**
-     *  Get the CollectSamples property.
-     *
-     *  @return The CollectSamples
-     */
-    public boolean getCollectSamples() {
-        return this.collectSamples;
-    }
 
     /**
      *  Set the ShowChart property.
      *
      *  @param value The new value for ShowChart
      */
-    public void setShowChart(boolean value) {
-    }
+    public void setShowChart(boolean value) {}
 
 
 
@@ -3799,23 +3731,23 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     }
 
 
-/**
-Set the Decorators property.
+    /**
+     * Set the Decorators property.
+     *
+     * @param value The new value for Decorators
+     */
+    public void setDecorators(List<FlythroughDecorator> value) {
+        decorators = value;
+    }
 
-@param value The new value for Decorators
-**/
-public void setDecorators (List<FlythroughDecorator> value) {
-	decorators = value;
-}
-
-/**
-Get the Decorators property.
-
-@return The Decorators
-**/
-public List<FlythroughDecorator> getDecorators () {
-	return decorators;
-}
+    /**
+     * Get the Decorators property.
+     *
+     * @return The Decorators
+     */
+    public List<FlythroughDecorator> getDecorators() {
+        return decorators;
+    }
 
 
 }

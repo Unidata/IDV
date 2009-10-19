@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.idv.flythrough;
 
 
@@ -94,8 +95,7 @@ public class ImageDecorator extends FlythroughDecorator {
      *
      * @throws Exception _more_
      */
-    public void handleReadout(List<ReadoutInfo> samples) throws Exception {
-
+    public void handleReadout(FlythroughPoint pt, List<ReadoutInfo> samples) throws Exception {
         String newImageUrl = null;
         imageReadout = null;
         for (ReadoutInfo info : samples) {
@@ -139,7 +139,12 @@ public class ImageDecorator extends FlythroughDecorator {
     }
 
 
-    public  String getName() {
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getName() {
         return "background images";
     }
 
