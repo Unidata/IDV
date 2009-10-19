@@ -20,10 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
-
 package ucar.unidata.idv.flythrough;
 
 
@@ -150,11 +146,7 @@ import javax.vecmath.*;
 public class Flythrough extends SharableImpl implements PropertyChangeListener,
         ImageObserver {
 
-    /** _more_ */
-    public static final Color[] COLORS = {
-        Color.blue, Color.red, Color.green, Color.orange, Color.cyan,
-        Color.magenta, Color.pink, Color.yellow
-    };
+
 
     /** _more_ */
     public static final String ORIENT_POINT = "point";
@@ -459,8 +451,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private boolean collectSamples = false;
 
-    /** _more_ */
-    private boolean showChart = true;
 
     /** _more_ */
     private boolean showTimes = false;
@@ -484,8 +474,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private List<SampleInfo> sampleInfos = new ArrayList<SampleInfo>();
 
-    /** We cache the chart image to save some time in the redraw */
-    private Image lastChartImage;
 
     /** _more_ */
     private EarthLocation lastLocation;
@@ -506,7 +494,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss Z");
         sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
         decorators.add(new ImageDecorator(this));
-        decorators.add(new RainDecorator(this));
+        decorators.add(new ChartDecorator(this));
+        decorators.add(new WeatherDecorator(this));
     }
 
 
@@ -520,6 +509,20 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         this();
         this.viewManager = viewManager;
     }
+
+
+    public void setViewManager(MapViewManager viewManager) {
+        this.viewManager = viewManager;
+    }
+
+
+    public void init(MapViewManager viewManager) {
+        this.viewManager = viewManager;
+        for (FlythroughDecorator decorator : decorators) {
+            decorator.setFlythrough(this);
+        }
+    }
+
 
 
     /**
@@ -668,6 +671,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      *
      */
     public void flythrough(List<FlythroughPoint> newPoints) {
+        flythrough(newPoints, true);
+    }
+
+
+        public void flythrough(List<FlythroughPoint> newPoints, boolean andShow) {
         this.allPoints = new ArrayList<FlythroughPoint>(newPoints);
         //subsample
         ArrayList<FlythroughPoint> tmp = new ArrayList<FlythroughPoint>();
@@ -681,7 +689,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             animation.setCurrent(currentIndex);
             setAnimationTimes();
         }
-        show();
+        if(andShow) {
+            show();
+        }
     }
 
 
@@ -1269,7 +1279,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         dashboardLbl = new JLabel(new ImageIcon(dashboardImage)) {
             public void paint(Graphics g) {
                 //                readPts();
-                paintDashboard(g, dashboardLbl);
+                paintDashboardBackground(g, dashboardLbl);
                 super.paint(g);
                 paintDashboardAfter(g, dashboardLbl);
             }
@@ -1458,7 +1468,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         }
         if (locLbl == null) {
             locLbl = new JLabel(
-                "<html><table width=100%><tr><td align=right>&nbsp;Lat:</td></td>N/A</td></tr><tr><td align=right>&nbsp;Lon:</td></td>N/A</td></tr><tr><td align=right>&nbsp;Alt:</td></td>N/A</table>");
+                "<html><table width=100%><tr><td align=right>&nbsp;Lat:</td></td>N/A </td></tr><tr><td align=right>&nbsp;Lon:</td></td>N/A </td></tr><tr><td align=right>&nbsp;Alt:</td></td>N/A </table>");
         }
         locLbl.setOpaque(true);
         locLbl.setBackground(Color.white);
@@ -1512,90 +1522,17 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
         g2.setTransform(oldTransform);
 
-        if (showChart) {
-            try {
-                paintChart(g2, comp);
-            } catch (Exception exc) {
-                logException("Drawing data samples", exc);
-            }
-        }
-
-
     }
 
-    /**
-     * _more_
-     *
-     * @param g2 _more_
-     * @param comp _more_
-     *
-     * @throws Exception _more_
-     */
-    public void paintChart(Graphics2D g2, JComponent comp) throws Exception {
-        List<SampleInfo> infos = new ArrayList<SampleInfo>(sampleInfos);
-        if (infos.size() == 0) {
-            return;
-        }
-        Rectangle          b          = comp.getBounds();
-        JFrame             dummyFrame = new JFrame("");
-        XYSeriesCollection dataset    = new XYSeriesCollection();
-        JFreeChart         chart      = createChart(dataset);
-        XYPlot             xyPlot     = (XYPlot) chart.getPlot();
 
-        int chartHeight = b.height - dashboardImage.getHeight(null);
-        chartHeight = Math.max(chartHeight, 50);
-        int   chartWidth = Math.min(chartHeight * 4, b.width);
-
-
-        int   dx         = b.width / 2 - chartWidth / 2;
-        int   dy         = 0;
-
-        Image lastImage  = lastChartImage;
-        if ((lastImage != null) && (lastImage.getWidth(null) == chartWidth)
-                && (lastImage.getHeight(null) == chartHeight)) {
-            g2.translate(dx, dy);
-            g2.drawImage(lastImage, 0, 0, null);
-            g2.translate(-dx, -dy);
-            return;
-        }
-
-
-
-        for (int i = 0; i < infos.size(); i++) {
-            SampleInfo info      = infos.get(i);
-            ValueAxis  rangeAxis = new NumberAxis(info.getName());
-            if (info.getRange() != null) {
-                rangeAxis.setRange(
-                    new org.jfree.data.Range(
-                        info.getRange().getMin(), info.getRange().getMax()));
-            }
-            dataset = new XYSeriesCollection();
-            dataset.addSeries(info.getSeries());
-            xyPlot.setRangeAxis(i, rangeAxis, false);
-            xyPlot.setDataset(i, dataset);
-            xyPlot.mapDatasetToRangeAxis(i, i);
-            final Color color = COLORS[i % COLORS.length];
-            XYLineAndShapeRenderer renderer =
-                new XYLineAndShapeRenderer(true, false) {
-                public Paint xgetItemPaint(final int row, final int column) {
-                    return color;
-                }
-            };
-            renderer.setSeriesPaint(0, color);
-            xyPlot.setRenderer(i, renderer);
-        }
-
-        ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new Dimension(chartWidth, chartHeight));
-        dummyFrame.setContentPane(chartPanel);
-        dummyFrame.pack();
-        Image image = ImageUtils.getImage(chartPanel);
-        lastChartImage = image;
-        g2.translate(dx, dy);
-        g2.drawImage(image, 0, 0, null);
-        g2.translate(-dx, -dy);
-
+    public Image getDashboardImage() {
+        return dashboardImage;
     }
+
+    public List<SampleInfo> getSamples() {
+        return sampleInfos;
+    }
+
 
     /**
      * Creates a chart.
@@ -1604,7 +1541,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      *
      * @return a chart.
      */
-    private static JFreeChart createChart(XYDataset dataset) {
+    public static JFreeChart createChart(XYDataset dataset) {
         JFreeChart chart = ChartFactory.createXYLineChart("",  // chart title
             "",                                                // x axis label
             "",                                                // y axis label
@@ -1685,18 +1622,16 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      * @param g _more_
      * @param comp _more_
      */
-    public void paintDashboard(Graphics g, JComponent comp) {
+    public void paintDashboardBackground(Graphics g, JComponent comp) {
         Graphics2D g2 = (Graphics2D) g;
         Rectangle  b  = dashboardLbl.getBounds();
-        int        w  = dashboardImage.getWidth(null);
-        int        h  = dashboardImage.getHeight(null);
-        Point      ul = new Point(b.width / 2 - w / 2, b.height - h);
         g.setColor(Color.white);
         g.fillRect(0, 0, b.width, b.height);
 
         if (showDecoration) {
             boolean callRepaint = false;
             for (FlythroughDecorator decorator : decorators) {
+                if(!decorator.getShown()) continue;
                 if (decorator.paintDashboard(g2, comp)) {
                     callRepaint = true;
                 }
@@ -1988,6 +1923,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
         }
 
+        for (FlythroughDecorator decorator : decorators) {
+            initEditMenu(editMenu);
+        }
+
+
         editMenu.addSeparator();
         editMenu.add(GuiUtils.makeCheckboxMenuItem("Sharing On", this,
                 "sharing", null));
@@ -2010,6 +1950,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             fileMenu.add(GuiUtils.makeMenuItem("Write data", this,
                     "writeData"));
         }
+
+        for (FlythroughDecorator decorator : decorators) {
+            initFileMenu(fileMenu);
+        }
+
     }
 
     /**
@@ -2067,11 +2012,12 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
         dashboardMenu.add(GuiUtils.makeCheckboxMenuItem("Collect data", this,
                 "collectSamples", null));
-        dashboardMenu.add(GuiUtils.makeCheckboxMenuItem("Show chart", this,
-                "showChart", null));
 
-        dashboardMenu.add(GuiUtils.makeCheckboxMenuItem("Show weather", this,
-                "showDecoration", null));
+        for (FlythroughDecorator decorator : decorators) {
+            initViewMenu(viewMenu);
+        }
+
+
         dashboardMenu.add(GuiUtils.makeCheckboxMenuItem("Show gauges", this,
                 "showReadout", null));
 
@@ -2090,7 +2036,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     public void clearSamples() {
         sampleMap      = new Hashtable<String, SampleInfo>();
         sampleInfos    = new ArrayList<SampleInfo>();
-        lastChartImage = null;
+        for (FlythroughDecorator decorator : decorators) {
+            decorator.clearSamples();
+        }
         updateDashboard();
     }
 
@@ -2260,10 +2208,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         frame.getContentPane().add(contents);
         frame.pack();
         if (windowBounds != null) {
-            frame.setSize(windowBounds.width, windowBounds.height);
+            //            frame.setSize(windowBounds.width, windowBounds.height);
             frame.setLocation(windowBounds.x, windowBounds.y);
         }
-
 
         GuiUtils.toFront(frame);
 
@@ -3166,6 +3113,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             }
             String name = ucar.visad.Util.cleanTypeName(r.getType());
 
+
             //TODO: Right now we cache with name. But we could easily have the same name with different fields
             //We need to cache with something specific to the displaycontrol in the readout
             if (collectSamples
@@ -3177,7 +3125,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                     sampleMap.put(name, sampleInfo);
                 }
                 sampleInfo.add(r, info.getLocation());
-                lastChartImage = null;
             }
 
 
@@ -3353,17 +3300,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         return this.zoom;
     }
 
-
-
-    /**
-     *  Set the ViewManager property.
-     *
-     *  @param value The new value for ViewManager
-     */
-    public void setViewManager(MapViewManager value) {
-        this.viewManager = value;
-        flythrough(allPoints);
-    }
 
 
     /**
@@ -3742,18 +3678,9 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      *  @param value The new value for ShowChart
      */
     public void setShowChart(boolean value) {
-        this.showChart = value;
-        updateDashboard();
     }
 
-    /**
-     *  Get the ShowChart property.
-     *
-     *  @return The ShowChart
-     */
-    public boolean getShowChart() {
-        return this.showChart;
-    }
+
 
 
     /**
@@ -3871,6 +3798,24 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         return this.stride;
     }
 
+
+/**
+Set the Decorators property.
+
+@param value The new value for Decorators
+**/
+public void setDecorators (List<FlythroughDecorator> value) {
+	decorators = value;
+}
+
+/**
+Get the Decorators property.
+
+@return The Decorators
+**/
+public List<FlythroughDecorator> getDecorators () {
+	return decorators;
+}
 
 
 }

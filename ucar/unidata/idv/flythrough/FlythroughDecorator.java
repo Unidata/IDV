@@ -28,12 +28,16 @@ package ucar.unidata.idv.flythrough;
 
 
 import ucar.unidata.idv.control.ReadoutInfo;
+import ucar.unidata.util.GuiUtils;
+
+import ucar.visad.quantities.CommonUnits;
+
+import visad.*;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.*;
-
 
 import java.util.List;
 
@@ -47,7 +51,33 @@ import javax.swing.table.*;
  *
  * @author IDV development team
  */
-public interface FlythroughDecorator {
+
+public abstract class FlythroughDecorator {
+
+    /** _more_          */
+    Flythrough flythrough;
+
+    private boolean shown = true;
+
+
+    /**
+     * _more_
+     */
+    public FlythroughDecorator() {}
+
+    /**
+     * _more_
+     *
+     * @param flythrough _more_
+     */
+    public FlythroughDecorator(Flythrough flythrough) {
+        this.flythrough = flythrough;
+    }
+
+
+    public void setFlythrough(Flythrough flythrough) {
+        this.flythrough = flythrough;
+    }
 
     /**
      * _more_
@@ -56,7 +86,8 @@ public interface FlythroughDecorator {
      *
      * @throws Exception _more_
      */
-    public void handleReadout(List<ReadoutInfo> samples) throws Exception;
+    public void handleReadout(List<ReadoutInfo> samples) throws Exception {
+    }
 
     /**
      * _more_
@@ -66,7 +97,53 @@ public interface FlythroughDecorator {
      *
      * @return _more_
      */
-    public boolean paintDashboard(Graphics2D g, JComponent comp);
+    public boolean paintDashboard(Graphics2D g, JComponent comp) {
+        return false;
+    }
+
+    public abstract String getName();
+
+    public void clearSamples() {
+    }
+
+    public void initViewMenu(JMenu viewMenu) {
+        GuiUtils.makeCheckboxMenuItem("Show " + getName(), this,
+                                      "shown", null);
+    }
+
+
+    public void initEditMenu(JMenu viewMenu) {
+    }
+
+    public void initFileMenu(JMenu viewMenu) {
+    }
+
+    /**
+       Set the Shown property.
+
+       @param value The new value for Shown
+    **/
+    public void setShown (boolean value) {
+	shown = value;
+        if(flythrough!=null) {
+            flythrough.updateDashboard();
+        }
+    }
+
+    /**
+       Get the Shown property.
+
+       @return The Shown
+    **/
+    public boolean getShown () {
+	return shown;
+    }
+
+    public void logException(String msg, Throwable exc) {
+        flythrough.logException(msg,exc);
+    }
+
+
 
 }
 

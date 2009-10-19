@@ -52,7 +52,7 @@ import javax.swing.table.*;
  * @author IDV development team
  */
 
-public class RainDecorator extends FlythroughDecorator {
+public class WeatherDecorator extends FlythroughDecorator {
 
     /** _more_ */
     private double precipLevel = 0;
@@ -70,7 +70,7 @@ public class RainDecorator extends FlythroughDecorator {
     /**
      * _more_
      */
-    public RainDecorator() {}
+    public WeatherDecorator() {}
 
 
     /**
@@ -78,7 +78,7 @@ public class RainDecorator extends FlythroughDecorator {
      *
      * @param flythrough _more_
      */
-    public RainDecorator(Flythrough flythrough) {
+    public WeatherDecorator(Flythrough flythrough) {
         super(flythrough);
     }
 

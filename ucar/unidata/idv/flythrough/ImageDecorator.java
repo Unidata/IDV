@@ -55,7 +55,7 @@ import javax.swing.table.*;
  * @author IDV development team
  */
 
-public class ImageDecorator extends FlythroughDecoratorImpl {
+public class ImageDecorator extends FlythroughDecorator {
 
     /** _more_ */
     private Image backgroundImage;
@@ -138,6 +138,10 @@ public class ImageDecorator extends FlythroughDecoratorImpl {
 
     }
 
+
+    public  String getName() {
+        return "background images";
+    }
 
 
     /**
