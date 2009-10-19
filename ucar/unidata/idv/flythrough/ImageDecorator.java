@@ -23,11 +23,15 @@
 
 
 
+
 package ucar.unidata.idv.flythrough;
+
 
 import ucar.unidata.idv.control.ReadoutInfo;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
+
+import ucar.visad.quantities.CommonUnits;
 
 import visad.*;
 
@@ -35,15 +39,16 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.*;
+
+import java.util.HashSet;
+
+import java.util.List;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
-import ucar.visad.quantities.CommonUnits;
-
-import java.util.List;
-import java.util.HashSet;
 
 /**
  *
@@ -67,14 +72,28 @@ public class ImageDecorator extends FlythroughDecoratorImpl {
 
 
 
-    public ImageDecorator() {
-    }
+    /**
+     * _more_
+     */
+    public ImageDecorator() {}
 
+    /**
+     * _more_
+     *
+     * @param flythrough _more_
+     */
     public ImageDecorator(Flythrough flythrough) {
         super(flythrough);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param samples _more_
+     *
+     * @throws Exception _more_
+     */
     public void handleReadout(List<ReadoutInfo> samples) throws Exception {
 
         String newImageUrl = null;
@@ -121,17 +140,26 @@ public class ImageDecorator extends FlythroughDecoratorImpl {
 
 
 
+    /**
+     * _more_
+     *
+     * @param g2 _more_
+     * @param comp _more_
+     *
+     * @return _more_
+     */
     public boolean paintDashboard(Graphics2D g2, JComponent comp) {
-        Image image  = backgroundImage;
+        Image image = backgroundImage;
         if (image != null) {
-            Rectangle b = comp.getBounds();
-            int imageHeight = image.getHeight(null);
-            int imageWidth  = image.getWidth(flythrough);
+            Rectangle b           = comp.getBounds();
+            int       imageHeight = image.getHeight(null);
+            int       imageWidth  = image.getWidth(flythrough);
             if (imageHeight > 0) {
                 double          scale        = b.width / (double) imageWidth;
                 AffineTransform oldTransform = g2.getTransform();
                 g2.scale(scale, scale);
-                g2.drawImage(image, 0, flythrough.dashboardImageOffset.y, null);
+                g2.drawImage(image, 0, flythrough.dashboardImageOffset.y,
+                             null);
                 g2.setTransform(oldTransform);
             } else {
                 g2.drawImage(image, 0, 0, null);
@@ -146,3 +174,4 @@ public class ImageDecorator extends FlythroughDecoratorImpl {
     }
 
 }
+

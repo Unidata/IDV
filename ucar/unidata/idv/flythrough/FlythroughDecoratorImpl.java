@@ -23,10 +23,14 @@
 
 
 
+
 package ucar.unidata.idv.flythrough;
+
 
 import ucar.unidata.idv.control.ReadoutInfo;
 import ucar.unidata.util.GuiUtils;
+
+import ucar.visad.quantities.CommonUnits;
 
 import visad.*;
 
@@ -34,14 +38,14 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.*;
+
+import java.util.List;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
-import ucar.visad.quantities.CommonUnits;
-
-import java.util.List;
 
 /**
  *
@@ -50,13 +54,22 @@ import java.util.List;
 
 public abstract class FlythroughDecoratorImpl implements FlythroughDecorator {
 
+    /** _more_          */
     Flythrough flythrough;
 
-    public FlythroughDecoratorImpl() {
-    }
+    /**
+     * _more_
+     */
+    public FlythroughDecoratorImpl() {}
 
+    /**
+     * _more_
+     *
+     * @param flythrough _more_
+     */
     public FlythroughDecoratorImpl(Flythrough flythrough) {
         this.flythrough = flythrough;
     }
 
 }
+

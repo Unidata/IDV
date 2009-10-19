@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv.flythrough;
 
 
@@ -148,22 +149,22 @@ import javax.vecmath.*;
 
 public class SampleInfo {
 
-    /** _more_          */
+    /** _more_ */
     private Unit unit;
 
-    /** _more_          */
+    /** _more_ */
     private XYSeries series;
 
-    /** _more_          */
+    /** _more_ */
     private String name;
 
-    /** _more_          */
+    /** _more_ */
     private Range range;
 
-    /** _more_          */
+    /** _more_ */
     private List<Real> values = new ArrayList<Real>();
 
-    /** _more_          */
+    /** _more_ */
     private List<EarthLocation> locations = new ArrayList<EarthLocation>();
 
     /**

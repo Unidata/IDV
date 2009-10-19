@@ -23,7 +23,9 @@
 
 
 
+
 package ucar.unidata.idv.flythrough;
+
 
 import ucar.unidata.idv.control.ReadoutInfo;
 
@@ -31,13 +33,15 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.*;
+
+
+import java.util.List;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
-
-import java.util.List;
 
 /**
  *
@@ -45,8 +49,24 @@ import java.util.List;
  */
 public interface FlythroughDecorator {
 
+    /**
+     * _more_
+     *
+     * @param samples _more_
+     *
+     * @throws Exception _more_
+     */
     public void handleReadout(List<ReadoutInfo> samples) throws Exception;
 
+    /**
+     * _more_
+     *
+     * @param g _more_
+     * @param comp _more_
+     *
+     * @return _more_
+     */
     public boolean paintDashboard(Graphics2D g, JComponent comp);
 
 }
+

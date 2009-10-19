@@ -23,10 +23,14 @@
 
 
 
+
 package ucar.unidata.idv.flythrough;
+
 
 import ucar.unidata.idv.control.ReadoutInfo;
 import ucar.unidata.util.GuiUtils;
+
+import ucar.visad.quantities.CommonUnits;
 
 import visad.*;
 
@@ -34,21 +38,21 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.*;
+
+import java.util.List;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
-import ucar.visad.quantities.CommonUnits;
-
-import java.util.List;
 
 /**
  *
  * @author IDV development team
  */
 
-public class RainDecorator extends  FlythroughDecoratorImpl {
+public class RainDecorator extends FlythroughDecoratorImpl {
 
     /** _more_ */
     private double precipLevel = 0;
@@ -63,18 +67,32 @@ public class RainDecorator extends  FlythroughDecoratorImpl {
     private Image snowIcon;
 
 
-    public RainDecorator() {
-    }
+    /**
+     * _more_
+     */
+    public RainDecorator() {}
 
 
+    /**
+     * _more_
+     *
+     * @param flythrough _more_
+     */
     public RainDecorator(Flythrough flythrough) {
         super(flythrough);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param samples _more_
+     *
+     * @throws Exception _more_
+     */
     public void handleReadout(List<ReadoutInfo> samples) throws Exception {
-        precipLevel  = 0;
-        temperature  = Double.NaN;
+        precipLevel = 0;
+        temperature = Double.NaN;
         for (ReadoutInfo info : samples) {
             Real r = info.getReal();
             if (r == null) {
@@ -86,8 +104,8 @@ public class RainDecorator extends  FlythroughDecoratorImpl {
             }
             String name = ucar.visad.Util.cleanTypeName(r.getType());
             if (((name.toLowerCase().indexOf("precipitation") >= 0)
-                 || (name.toLowerCase().indexOf("rain")
-                     >= 0)) && Unit.canConvert(unit, CommonUnits.MM)) {
+                    || (name.toLowerCase().indexOf("rain")
+                        >= 0)) && Unit.canConvert(unit, CommonUnits.MM)) {
                 precipLevel = r.getValue(CommonUnits.MM);
             } else if (Unit.canConvert(unit, CommonUnits.CELSIUS)) {
                 temperature = r.getValue(CommonUnits.CELSIUS);
@@ -97,12 +115,19 @@ public class RainDecorator extends  FlythroughDecoratorImpl {
 
 
 
+    /**
+     * _more_
+     *
+     * @param g _more_
+     * @param comp _more_
+     *
+     * @return _more_
+     */
     public boolean paintDashboard(Graphics2D g, JComponent comp) {
         if (precipLevel > 0) {
             Rectangle b = comp.getBounds();
-            int cv = 255
-                - (int) (255 * (Math.min(precipLevel, 100) / 100));
-            Color c = new Color(cv, cv, cv);
+            int cv = 255 - (int) (255 * (Math.min(precipLevel, 100) / 100));
+            Color     c = new Color(cv, cv, cv);
             g.setColor(c);
             //            if (backgroundImage == null) {
             //                g.fillRect(0, 0, b.width, b.height);
@@ -111,19 +136,16 @@ public class RainDecorator extends  FlythroughDecoratorImpl {
                 snowIcon =
                     GuiUtils.getImage("/auxdata/ui/icons/snowflake.gif",
                                       getClass());
-                rainIcon =
-                    GuiUtils.getImage("/auxdata/ui/icons/drops.gif",
-                                      getClass());
+                rainIcon = GuiUtils.getImage("/auxdata/ui/icons/drops.gif",
+                                             getClass());
             }
-            Image icon = (((temperature == temperature)
-                           && (temperature < 0))
+            Image icon = (((temperature == temperature) && (temperature < 0))
                           ? snowIcon
                           : rainIcon);
             for (int i = 0; i < precipLevel * 10; i++) {
-                int x = (int) (Math.random() * b.width)
-                    - icon.getWidth(null);
+                int x = (int) (Math.random() * b.width) - icon.getWidth(null);
                 int y = (int) (Math.random() * b.height)
-                    - icon.getHeight(null);
+                        - icon.getHeight(null);
                 g.drawImage(icon, x, y, null);
             }
             return true;
@@ -132,3 +154,4 @@ public class RainDecorator extends  FlythroughDecoratorImpl {
     }
 
 }
+
