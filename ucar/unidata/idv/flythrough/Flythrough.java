@@ -148,7 +148,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         ImageObserver {
 
 
-
     /** _more_ */
     public static final String ORIENT_POINT = "point";
 
@@ -182,61 +181,47 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
 
-    /** _more_ */
-    public static final int COL_LAT = 0;
 
-    /** _more_ */
-    public static final int COL_LON = 1;
 
-    /** _more_ */
-    public static final int COL_ALT = 2;
-
-    /** _more_ */
-    public static final int COL_DATE = 3;
-
-    /** _more_ */
-    private JTextField clipFld;
-
-    /** _more_ */
-    private JTextField[] cflds = { null, null, null, null };
-
-    /** _more_ */
+    /** xml tag and attr name */
     public static final String TAG_FLYTHROUGH = "flythrough";
 
-    /** _more_ */
+    /** xml tag and attr name */
     public static final String TAG_DESCRIPTION = "description";
 
-    /** _more_ */
+    /** xml tag and attr name */
     public static final String TAG_POINT = "point";
 
-    /** _more_ */
+    /** xml tag and attr name */
     public static final String ATTR_DATE = "date";
 
-    /** _more_ */
+    /** xml tag and attr name */
     public static final String ATTR_LAT = "lat";
 
-    /** _more_ */
+    /** xml tag and attr name */
     public static final String ATTR_LON = "lon";
 
-    /** _more_ */
+    /** xml tag and attr name */
     public static final String ATTR_ALT = "alt";
 
-    /** _more_ */
+    /** xml tag and attr name */
     public static final String[] ATTR_TILT = { "tiltx", "tilty", "tiltz" };
 
-
-    /** _more_ */
+    /** xml tag and attr name */
     public static final String ATTR_ZOOM = "zoom";
 
-    /** _more_ */
+    /** xml tag and attr name */
     public static final String ATTR_MATRIX = "matrix";
 
 
-    /** _more_ */
+    /** The view manager I am part of */
+    private MapViewManager viewManager;
+
+
+    /** date formatter */
     private SimpleDateFormat sdf;
 
-    /** _more_ */
-    private MapViewManager viewManager;
+
 
     /** _more_ */
     private List<FlythroughPoint> allPoints =
@@ -288,12 +273,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private JCheckBox animateCbx;
 
-    /** _more_ */
-    private JCheckBox clipCbx;
-
-
-
-
 
     /** Animation info */
     private AnimationInfo animationInfo;
@@ -307,13 +286,8 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private boolean hasTimes = false;
 
-
-
     /** _more_ */
     private String orientation = ORIENT_POINT;
-
-    /** _more_ */
-    private boolean clip = false;
 
     /** _more_ */
     private JCheckBox showTimesCbx;
@@ -333,9 +307,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
     /** _more_ */
     private JCheckBox changeViewpointCbx;
-
-    /** _more_ */
-    private JCheckBox overheadCbx;
 
     /** _more_ */
     private JTextField zoomFld;
@@ -375,7 +346,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     private JTable pointTable;
 
     /** _more_ */
-    private AbstractTableModel pointTableModel;
+    private FlythroughTableModel pointTableModel;
 
     /** _more_ */
     private JEditorPane htmlView;
@@ -462,6 +433,11 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     /** _more_ */
     private boolean showReadout = true;
 
+    /** list of decorators */
+    private List<FlythroughDecorator> decorators =
+        new ArrayList<FlythroughDecorator>();
+
+
     /** _more_ */
     private double[] lastViewpoint;
 
@@ -474,9 +450,15 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
     private int lastIndex = -1;
 
 
+
+
+
+
     /** _more_ */
-    private List<FlythroughDecorator> decorators =
-        new ArrayList<FlythroughDecorator>();
+    private Object REPAINT_MUTEX = new Object();
+
+    /** _more_ */
+    private int repaintCnt = 0;
 
 
     /**
@@ -923,12 +905,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         });
 
         showTimesCbx = new JCheckBox("Set Animation Time", showTimes);
-
-
-
-
-        clipCbx      = GuiUtils.makeCheckbox("Clip Viewpoint", this, "clip");
-        showTimesCbx = new JCheckBox("Set Animation Time", showTimes);
         showTimesCbx.setEnabled(hasTimes);
         animateCbx = new JCheckBox("Animated", animate);
         changeViewpointCbx = new JCheckBox("Change Viewpoint",
@@ -1023,12 +999,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         readout = new CursorReadoutWindow(viewManager, false);
 
 
-        clipFld = new JTextField("0", 5);
-        clipFld.addActionListener(listener);
-        for (int ci = 0; ci < cflds.length; ci++) {
-            cflds[ci] = new JTextField("0.0");
-            cflds[ci].addActionListener(listener);
-        }
 
 
         zoomFld = new JTextField(zoom + "", 5);
@@ -1107,6 +1077,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         }
     }
 
+
     /**
      * _more_
      *
@@ -1114,80 +1085,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      */
     public JComponent doMakePointsPanel() {
 
-        pointTableModel = new AbstractTableModel() {
-            public int getRowCount() {
-                return pointsToUse.size();
-            }
-
-            public int getColumnCount() {
-                return 4;
-            }
-            public void setValueAt(Object aValue, int rowIndex,
-                                   int columnIndex) {
-                List<FlythroughPoint> thePoints = pointsToUse;
-                FlythroughPoint       pt        = thePoints.get(rowIndex);
-                if (aValue == null) {
-                    pt.setDateTime(null);
-                } else if (aValue instanceof DateTime) {
-                    pt.setDateTime((DateTime) aValue);
-                } else {
-                    //??
-                }
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return columnIndex == COL_DATE;
-            }
-
-            public Object getValueAt(int row, int column) {
-                List<FlythroughPoint> thePoints = pointsToUse;
-                if (row >= thePoints.size()) {
-                    return "n/a";
-                }
-                FlythroughPoint pt = thePoints.get(row);
-                if (column == COL_LAT) {
-                    if (pt.getMatrix() != null) {
-                        return "matrix";
-                    }
-                    return pt.getEarthLocation().getLatitude();
-                }
-                if (column == COL_LON) {
-                    if (pt.getMatrix() != null) {
-                        return "";
-                    }
-                    return pt.getEarthLocation().getLongitude();
-                }
-                if (column == COL_ALT) {
-                    if (pt.getMatrix() != null) {
-                        return "";
-                    }
-                    return pt.getEarthLocation().getAltitude();
-                }
-                if (column == COL_DATE) {
-                    return pt.getDateTime();
-                }
-                return "";
-            }
-
-            public String getColumnName(int column) {
-                switch (column) {
-
-                  case COL_LAT :
-                      return "Latitude";
-
-                  case COL_LON :
-                      return "Longitude";
-
-                  case COL_ALT :
-                      return "Altitude";
-
-                  case COL_DATE :
-                      return "Date/Time";
-                }
-                return "";
-            }
-        };
-
+        pointTableModel = new FlythroughTableModel(this);
         pointTable = new JTable(pointTableModel);
         pointTable.setToolTipText(
             "Double click: view; Control-P: Show point properties; Delete: delete point");
@@ -1249,6 +1147,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
     }
 
+
     /**
      * _more_
      *
@@ -1262,8 +1161,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         readoutDisplay.setLayout(new BorderLayout());
         return readoutLabel;
     }
-
-
 
 
     /**
@@ -1282,7 +1179,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         pipFrame = new JFrame("Show remain invisible");
         pipFrame.setContentPane(pipPanel);
         pipFrame.pack();
-        //        GuiUtils.showOkCancelDialog(null,null,pipPanel,null);
 
         dashboardLbl = new JLabel(new ImageIcon(dashboardImage)) {
             public void paint(Graphics g) {
@@ -1400,11 +1296,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         }
     }
 
-    /** _more_ */
-    private Object REPAINT_MUTEX = new Object();
 
-    /** _more_ */
-    private int repaintCnt = 0;
 
     /**
      * _more_
@@ -2901,14 +2793,6 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             //            locationLine2.setVisible(showLine);
             locationMarker.setVisible(showMarker);
 
-            if (false && (navDisplay instanceof MapProjectionDisplayJ3D)) {
-                double clipDistance = parse(clipFld, 0.0);
-                System.err.println("Clip distance:" + clipDistance);
-                ((MapProjectionDisplayJ3D) navDisplay).getView()
-                    .setFrontClipDistance(clipDistance);
-            }
-
-
 
             if (hasTimes && getShowTimes()) {
                 DateTime dttm = pt1.getDateTime();
@@ -2917,6 +2801,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                 }
 
             }
+
 
 
             if (changeViewpointCbx.isSelected()) {
@@ -3171,6 +3056,10 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      */
     public List<FlythroughPoint> getPoints() {
         return this.allPoints;
+    }
+
+    public List<FlythroughPoint> getPointsToUse() {
+        return this.pointsToUse;
     }
 
     /**
@@ -3445,26 +3334,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
      * @throws Exception _more_
      */
     public void setClip(boolean value) throws Exception {
-        if (clip != value) {
-            clip = value;
-            if (isActive() && (animationWidget != null)) {
-                doStep(animation.getCurrent());
-            }
-        }
     }
-
-    /**
-     *  Get the Clip property.
-     *
-     *  @return The Clip
-     */
-    public boolean getClip() {
-        if (clipCbx != null) {
-            clip = clipCbx.isSelected();
-        }
-        return clip;
-    }
-
 
 
     /**
