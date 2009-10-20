@@ -806,7 +806,6 @@ public class CachedFlatField extends FlatField {
      * @return a new FlatField
      *
      * @throws VisADException  Problem in VisAD land
-     */
     protected FlatField cloneFloat(MathType f_type, Unit[] units,
                                    ErrorEstimate[] errors,
                                    float[][] newValues)
@@ -841,6 +840,7 @@ public class CachedFlatField extends FlatField {
                                     newValues);
         return field;
     }
+     */
 
 }
 
