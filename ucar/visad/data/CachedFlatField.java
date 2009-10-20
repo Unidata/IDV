@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad.data;
 
 
@@ -47,10 +48,10 @@ import java.rmi.RemoteException;
 public class CachedFlatField extends FlatField {
 
 
-    /** _more_ */
+    /** the id counter */
     static int id = 0;
 
-    /** _more_ */
+    /** the id for this instance */
     String myid = "" + (id++);
 
     /** Mutex */
@@ -59,7 +60,7 @@ public class CachedFlatField extends FlatField {
     /** For uniqueness */
     private static int cnt = 0;
 
-    /** _more_ */
+    /** myParent */
     protected CachedFlatField myParent;
 
     /** Where we write */
@@ -84,10 +85,10 @@ public class CachedFlatField extends FlatField {
     /** The min/max ranges */
     Range[] sampleRanges;
 
-    /** _more_ */
+    /** default time to pause before clearing */
     private long pauseBeforeClearing = 2000;
 
-    /** _more_ */
+    /** timestamp */
     private int accessTimestamp = 0;
 
 
@@ -152,10 +153,30 @@ public class CachedFlatField extends FlatField {
                            CoordinateSystem rangeCoordSys, Set[] rangeSets,
                            Unit[] units, float[][] floats)
             throws VisADException {
-        super(type, domainSet, rangeCoordSys, rangeSets, units);
-        init(floats);
+        this(type, domainSet, rangeCoordSys, null, rangeSets, units, floats);
     }
 
+    /**
+     * Create a new CachedFlatField
+     *
+     * @param type Function type
+     * @param domainSet Domain
+     * @param rangeCoordSys  range CoordSystem
+     * @param rangeCoordSyses  range CoordSystem's
+     * @param rangeSets range sets
+     * @param units units
+     * @param floats The values
+     *
+     * @throws VisADException On badness
+     */
+    public CachedFlatField(FunctionType type, Set domainSet,
+                           CoordinateSystem rangeCoordSys,
+                           CoordinateSystem[] rangeCoordSyses,
+                           Set[] rangeSets, Unit[] units, float[][] floats)
+            throws VisADException {
+        super(type, domainSet, rangeCoordSys, null, rangeSets, units);
+        init(floats);
+    }
 
     /**
      * Copy constructor
@@ -197,9 +218,9 @@ public class CachedFlatField extends FlatField {
     }
 
     /**
-     * _more_
+     * Do we have data on disk?
      *
-     * @return _more_
+     * @return true if we do
      */
     protected boolean haveDataOnDisk() {
         if (getCacheFile() == null) {
@@ -242,8 +263,19 @@ public class CachedFlatField extends FlatField {
 
 
 
+    /**
+     * Set the sample
+     *
+     * @param values the samples
+     * @param errors errors
+     * @param copy   tru to copy
+     *
+     * @throws RemoteException Java RMI Exception
+     * @throws VisADException  Problem in VisAD land
+     */
     public void setSamples(float[][] values, ErrorEstimate[] errors,
-                           boolean copy) throws VisADException, RemoteException {
+                           boolean copy)
+            throws VisADException, RemoteException {
 
         myFloatValues = new float[values.length][];
         for (int i = 0; i < myFloatValues.length; i++) {
@@ -255,7 +287,7 @@ public class CachedFlatField extends FlatField {
         }
         setRangeErrors(errors);
         //If we have data on the disk then force a write of the new data
-        if(shouldCache && haveDataOnDisk()) {
+        if (shouldCache && haveDataOnDisk()) {
             writeCache();
         }
         //now clear the cache if needed
@@ -265,9 +297,9 @@ public class CachedFlatField extends FlatField {
 
 
     /**
-     * _more_
+     * Set the sample ranges
      *
-     * @param sampleRanges _more_
+     * @param sampleRanges the sample ranges
      */
     public void setSampleRanges(Range[] sampleRanges) {
         this.sampleRanges = sampleRanges;
@@ -275,7 +307,7 @@ public class CachedFlatField extends FlatField {
 
     /**
      * Override method so we clear the caches on the cloned object
-     * 
+     *
      * @return the clone
      */
     public Object clone() {
@@ -290,7 +322,7 @@ public class CachedFlatField extends FlatField {
      */
     public void clearCachedRange() {
         sampleRanges = null;
-        ranges = null;
+        ranges       = null;
     }
 
 
@@ -311,8 +343,8 @@ public class CachedFlatField extends FlatField {
      * Get the ranges
      *
      *
-     * @param force _more_
-     * @return ranges
+     * @param force   force a recalc
+     * @return ranges  the ranges
      *
      * @throws VisADException  problem getting ranges
      */
@@ -333,13 +365,13 @@ public class CachedFlatField extends FlatField {
 
 
     /**
-     * _more_
+     * Get the ranges for the values
      *
-     * @param values _more_
+     * @param values the values
      *
-     * @return _more_
+     * @return the ranges
      *
-     * @throws VisADException _more_
+     * @throws VisADException  Problem in VisAD land
      */
     public Range[] getRanges(float[][] values) throws VisADException {
         sampleRanges = null;
@@ -380,9 +412,9 @@ public class CachedFlatField extends FlatField {
     }
 
     /**
-     * _more_
+     * Get the cache directory
      *
-     * @return _more_
+     * @return the cache directory
      */
     public static File getCacheDir() {
         return cacheDir;
@@ -401,9 +433,9 @@ public class CachedFlatField extends FlatField {
 
 
     /**
-     * _more_
+     * Set the cache flag
      *
-     * @param b _more_
+     * @param b true to cache
      */
     public void setShouldCache(boolean b) {
         shouldCache = b;
@@ -632,13 +664,13 @@ public class CachedFlatField extends FlatField {
 
 
     /**
-     * _more_
+     * Unpack floats
      *
-     * @param s_index _more_
+     * @param s_index the sample index
      *
-     * @return _more_
+     * @return  the floats for that index
      *
-     * @throws VisADException _more_
+     * @throws VisADException  Problem in VisAD land
      */
     protected float[] unpackFloats(int s_index) throws VisADException {
         float[][] values = getMyValues();
@@ -680,7 +712,7 @@ public class CachedFlatField extends FlatField {
     }
 
     /**
-     * _more_
+     * Clear the cache
      */
     private void clearCache() {
         if (myFloatValues == null) {
@@ -695,9 +727,9 @@ public class CachedFlatField extends FlatField {
 
 
     /**
-     * _more_
+     * Set the cache file
      *
-     * @param f _more_
+     * @param f  the file
      */
     public void setCacheFile(String f) {
         cachefile = f;
@@ -705,9 +737,9 @@ public class CachedFlatField extends FlatField {
 
 
     /**
-     * _more_
+     * Get the cache file
      *
-     * @return _more_
+     * @return  the cache file
      */
     protected String getCacheFile() {
         if ((cachefile == null) && (cacheDir != null)) {
@@ -728,7 +760,7 @@ public class CachedFlatField extends FlatField {
      */
     private void writeCache() {
         synchronized (MUTEX) {
-            String cacheFile  = getCacheFile();
+            String cacheFile = getCacheFile();
             if (cacheFile == null) {
                 return;
             }
@@ -736,7 +768,7 @@ public class CachedFlatField extends FlatField {
                 return;
             }
             try {
-                long t1 = System.currentTimeMillis();
+                long             t1  = System.currentTimeMillis();
                 FileOutputStream fos = new FileOutputStream(cacheFile);
                 BufferedOutputStream bos = new BufferedOutputStream(fos,
                                                100000);
@@ -754,12 +786,60 @@ public class CachedFlatField extends FlatField {
 
 
     /**
-     * _more_
+     * Set the time before clearing the cache
      *
-     * @param p _more_
+     * @param p  time in milliseconds
      */
     public void setCacheClearDelay(long p) {
         pauseBeforeClearing = p;
+    }
+
+    /**
+     * Make a clone of this using the new type, units and errors.  Called
+     * from unary and binar
+     *
+     * @param f_type  the new FunctionType
+     * @param units   the new Units
+     * @param errors  the new Errors
+     * @param newValues  the new values
+     *
+     * @return a new FlatField
+     *
+     * @throws VisADException  Problem in VisAD land
+     */
+    protected FlatField cloneFloat(MathType f_type, Unit[] units,
+                                   ErrorEstimate[] errors,
+                                   float[][] newValues)
+            throws VisADException {
+        MathType N_type = ((f_type == null)
+                           ? getType()
+                           : f_type);
+
+        // create (initially missing) FlatField for return
+        // use FloatSet rather than RangeSet for intermediate computation results
+        Set[] sets = new Set[TupleDimension];
+        for (int i = 0; i < TupleDimension; i++) {
+            SetType set_type =
+                new SetType(
+                    ((FunctionType) N_type).getFlatRange().getComponent(i));
+            sets[i] = new FloatSet(set_type);
+        }
+        RealTupleType d_type  = ((FunctionType) N_type).getDomain();
+        Set           new_set = null;
+        if ( !d_type.equals(((FunctionType) getType()).getDomain())) {
+            new_set = (Set) getDomainSet().cloneButType(d_type);
+        } else {
+            new_set = getDomainSet();
+        }
+        if (newValues == null) {
+            //If we don't have the values array then copy this one.
+            newValues = unpackFloats(true);
+        }
+        CachedFlatField field = new CachedFlatField((FunctionType) N_type,
+                                    new_set, RangeCoordinateSystem,
+                                    RangeCoordinateSystems, sets, units,
+                                    newValues);
+        return field;
     }
 
 }
