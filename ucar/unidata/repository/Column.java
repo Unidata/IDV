@@ -360,78 +360,78 @@ public class Column implements Constants {
     /**
      * _more_
      *
-     * @param stmt _more_
+     * @param statement _more_
      * @param values _more_
-     * @param stmtIdx _more_
+     * @param statementIdx _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected int setValues(PreparedStatement stmt, Object[] values,
-                            int stmtIdx)
+    protected int setValues(PreparedStatement statement, Object[] values,
+                            int statementIdx)
             throws Exception {
         if (type.equals(TYPE_INT)) {
             if (values[offset] != null) {
-                stmt.setInt(stmtIdx, ((Integer) values[offset]).intValue());
+                statement.setInt(statementIdx, ((Integer) values[offset]).intValue());
             } else {
-                stmt.setInt(stmtIdx, 0);
+                statement.setInt(statementIdx, 0);
             }
-            stmtIdx++;
+            statementIdx++;
         } else if (type.equals(TYPE_DOUBLE)) {
             if (values[offset] != null) {
-                stmt.setDouble(stmtIdx,
+                statement.setDouble(statementIdx,
                                ((Double) values[offset]).doubleValue());
             } else {
-                stmt.setDouble(stmtIdx, 0.0);
+                statement.setDouble(statementIdx, 0.0);
             }
-            stmtIdx++;
+            statementIdx++;
         } else if (type.equals(TYPE_BOOLEAN)) {
             if (values[offset] != null) {
                 boolean v = ((Boolean) values[offset]).booleanValue();
-                stmt.setInt(stmtIdx, (v
+                statement.setInt(statementIdx, (v
                                       ? 1
                                       : 0));
             } else {
-                stmt.setInt(stmtIdx, 0);
+                statement.setInt(statementIdx, 0);
             }
-            stmtIdx++;
+            statementIdx++;
         } else if (type.equals(TYPE_DATE)) {
             Date dttm = (Date) values[offset];
-            typeHandler.getRepository().getDatabaseManager().setDate(stmt,
-                    stmtIdx, dttm);
-            stmtIdx++;
+            typeHandler.getRepository().getDatabaseManager().setDate(statement,
+                    statementIdx, dttm);
+            statementIdx++;
         } else if (type.equals(TYPE_LATLON)) {
             if (values[offset] != null) {
                 double lat = ((Double) values[offset]).doubleValue();
-                stmt.setDouble(stmtIdx, lat);
+                statement.setDouble(statementIdx, lat);
                 double lon = ((Double) values[offset + 1]).doubleValue();
-                stmt.setDouble(stmtIdx + 1, lon);
+                statement.setDouble(statementIdx + 1, lon);
             } else {
-                stmt.setDouble(stmtIdx, Entry.NONGEO);
-                stmt.setDouble(stmtIdx + 1, Entry.NONGEO);
+                statement.setDouble(statementIdx, Entry.NONGEO);
+                statement.setDouble(statementIdx + 1, Entry.NONGEO);
             }
-            stmtIdx += 2;
+            statementIdx += 2;
         } else if (type.equals(TYPE_PASSWORD)) {
             if (values[offset] != null) {
                 String value =
                     new String(XmlUtil.encodeBase64(toString(values,
                         offset).getBytes()).getBytes());
-                stmt.setString(stmtIdx, value);
+                statement.setString(statementIdx, value);
             } else {
-                stmt.setString(stmtIdx, null);
+                statement.setString(statementIdx, null);
             }
-            stmtIdx++;
+            statementIdx++;
         } else {
-            //            System.err.println("\tset stmt:" + offset + " " + values[offset]);
+            //            System.err.println("\tset statement:" + offset + " " + values[offset]);
             if (values[offset] != null) {
-                stmt.setString(stmtIdx, toString(values, offset));
+                statement.setString(statementIdx, toString(values, offset));
             } else {
-                stmt.setString(stmtIdx, null);
+                statement.setString(statementIdx, null);
             }
-            stmtIdx++;
+            statementIdx++;
         }
-        return stmtIdx;
+        return statementIdx;
 
 
     }
@@ -937,11 +937,11 @@ public class Column implements Constants {
         } else {
             if (searchType.equals(SEARCHTYPE_SELECT)) {
                 long t1 = System.currentTimeMillis();
-                Statement stmt = typeHandler.select(request,
+                Statement statement = typeHandler.select(request,
                                      SqlUtil.distinct(getFullName()), tmp,
                                      "");
                 long     t2     = System.currentTimeMillis();
-                String[] values = SqlUtil.readString(typeHandler.getDatabaseManager().getIterator(stmt), 1);
+                String[] values = SqlUtil.readString(typeHandler.getDatabaseManager().getIterator(statement), 1);
                 long     t3     = System.currentTimeMillis();
                 //                System.err.println("TIME:" + (t2-t1) + " " + (t3-t2));
                 List<TwoFacedObject> list = new ArrayList();

@@ -723,18 +723,18 @@ public class RepositoryBase implements Constants, RepositorySource {
      * @return _more_
      */
     public String getMessage(String h, String icon, boolean showClose) {
-        String close =
+        String html =
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("hide('messageblock')"),
                             HtmlUtil.img(iconUrl(Constants.ICON_CLOSE)));
         if ( !showClose) {
-            close = "&nbsp;";
+            html = "&nbsp;";
         }
         h = "<div class=\"innernote\"><table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td valign=\"top\">"
             + HtmlUtil.img(iconUrl(icon)) + HtmlUtil.space(2)
             + "</td><td valign=\"bottom\"><span class=\"notetext\">" + h
             + "</span></td></tr></table></div>";
         return "\n<table border=\"0\" id=\"messageblock\"><tr><td><div class=\"note\"><table><tr valign=top><td>"
-               + h + "</td><td>" + close + "</td></tr></table>"
+               + h + "</td><td>" + html + "</td></tr></table>"
                + "</div></td></tr></table>\n";
     }
 

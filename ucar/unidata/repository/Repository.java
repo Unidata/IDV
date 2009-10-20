@@ -4994,10 +4994,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                boolean makeClose) {
         StringBuffer menu = new StringBuffer();
         if (makeClose) {
-            String closeLink =
+            String cLink =
                 HtmlUtil.jsLink(HtmlUtil.onMouseClick("hidePopupObject();"),
                                 HtmlUtil.img(iconUrl(ICON_CLOSE)), "");
-            contents = closeLink + HtmlUtil.br() + contents;
+            contents = cLink + HtmlUtil.br() + contents;
         }
 
         menu.append(HtmlUtil.div(contents,

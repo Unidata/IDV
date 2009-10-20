@@ -115,8 +115,6 @@ public class ExecAction extends MonitorAction {
         sb.append(HtmlUtil.formTable());
         sb.append(HtmlUtil.colspan("Exec Action", 2));
 
-
-
         sb.append(
             HtmlUtil.formEntry(
                 "Execute:",

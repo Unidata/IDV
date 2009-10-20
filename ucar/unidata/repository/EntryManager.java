@@ -67,14 +67,9 @@ import java.io.InputStream;
 import java.net.*;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.Statement;
-
 
 
 import java.util.ArrayList;
@@ -1709,6 +1704,7 @@ return new Result(title, sb);
                                                 Tables.ENTRIES.NAME,
                                                 Tables.ENTRIES.COL_ID, "?"));
 
+	try {
         connection.setAutoCommit(false);
         Statement statement      = connection.createStatement();
         int       deleteCnt      = 0;
@@ -1726,11 +1722,6 @@ return new Result(title, sb);
                 getActionManager().setActionMessage(actionId,
                         "Delete canceled");
                 connection.rollback();
-                getDatabaseManager().closeStatement(permissionsStmt);
-                getDatabaseManager().closeStatement(metadataStmt);
-                getDatabaseManager().closeStatement(commentsStmt);
-                getDatabaseManager().closeStatement(assocStmt);
-                getDatabaseManager().closeStatement(entriesStmt);
                 return;
             }
             getActionManager().setActionMessage(actionId,
@@ -1782,12 +1773,15 @@ return new Result(title, sb);
             getStorageManager().deleteEntryDir((String) allIds.get(i));
         }
 
+	} finally {
         getDatabaseManager().closeStatement(permissionsStmt);
         getDatabaseManager().closeStatement(metadataStmt);
         getDatabaseManager().closeStatement(commentsStmt);
         getDatabaseManager().closeStatement(assocStmt);
         getDatabaseManager().closeStatement(entriesStmt);
+	}
     }
+
 
 
 
@@ -4855,7 +4849,6 @@ return new Result(title, sb);
             getDatabaseManager().closeStatement(typeStatement);
         }
 
-        getDatabaseManager().closeConnection(connection);
         Misc.run(getRepository(), "checkNewEntries", entries);
     }
 

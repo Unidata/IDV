@@ -215,10 +215,11 @@ public class HtmlOutputHandler extends OutputHandler {
         StringBuffer sb = new StringBuffer("<content>\n");
         String links = getEntryManager().getEntryActionsTable(request, entry,
                            OutputType.TYPE_ALL);
-        String closeLink =
+        String cLink =
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("hidePopupObject();"),
                             HtmlUtil.img(iconUrl(ICON_CLOSE)), "");
-        sb.append(closeLink + HtmlUtil.br());
+        sb.append(cLink);
+	sb.append(HtmlUtil.br());
         sb.append(links);
         sb.append("\n</content>");
         return new Result("", sb, "text/xml");
@@ -446,107 +447,6 @@ public class HtmlOutputHandler extends OutputHandler {
         } else {
             return super.getMimeType(output);
         }
-    }
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result listAssociations(Request request) throws Exception {
-
-        StringBuffer sb     = new StringBuffer();
-        OutputType   output = request.getOutput();
-        if (output.equals(OUTPUT_HTML)) {
-            //            appendListHeader(request, output, WHAT_ASSOCIATION, sb);
-            sb.append("<ul>");
-        }
-        TypeHandler typeHandler = getRepository().getTypeHandler(request);
-        String[] associations =
-            getAssociationManager().getAssociations(request);
-
-
-        if (associations.length == 0) {
-            if (output.equals(OUTPUT_HTML)) {
-                sb.append(msg("No associations found"));
-            }
-        }
-        List<String>  names  = new ArrayList<String>();
-        List<Integer> counts = new ArrayList<Integer>();
-        ResultSet     results;
-        int           max = -1;
-        int           min = -1;
-        for (int i = 0; i < associations.length; i++) {
-            String association = associations[i];
-            Statement stmt2 = typeHandler.select(request, SqlUtil.count("*"),
-                                  Clause.eq(Tables.ASSOCIATIONS.COL_NAME,
-                                            association), "");
-
-            ResultSet results2 = stmt2.getResultSet();
-            if ( !results2.next()) {
-                getDatabaseManager().closeAndReleaseConnection(stmt2);
-                continue;
-            }
-            int count = results2.getInt(1);
-            if ((max < 0) || (count > max)) {
-                max = count;
-            }
-            if ((min < 0) || (count < min)) {
-                min = count;
-            }
-            names.add(association);
-            counts.add(new Integer(count));
-            getDatabaseManager().closeAndReleaseConnection(stmt2);
-        }
-
-        int    diff         = max - min;
-        double distribution = diff / 5.0;
-
-        for (int i = 0; i < names.size(); i++) {
-            String association = names.get(i);
-            int    count       = counts.get(i).intValue();
-            if (output.equals(OUTPUT_HTML)) {
-                sb.append("<li> ");
-                sb.append(
-                    getAssociationManager().getAssociationLinks(
-                        request, association));
-                sb.append(" ");
-                sb.append(association);
-                sb.append(" (" + count + ")");
-
-            } else if (output.equals(OUTPUT_CLOUD)) {
-                double percent = count / distribution;
-                int    bin     = (int) (percent * 5);
-                String css     = "font-size:" + (12 + bin * 2);
-                sb.append("<span style=\"" + css + "\">");
-                String extra = XmlUtil.attrs("alt",
-                                             msgLabel("Count") + count,
-                                             "title",
-                                             msgLabel("Count") + count);
-                sb.append(
-                    HtmlUtil.href(
-                        request.url(
-                            getRepository().URL_GRAPH_VIEW, ARG_ENTRYID,
-                            association, ARG_NODETYPE,
-                            TYPE_ASSOCIATION), association, extra));
-                sb.append("</span>");
-                sb.append(HtmlUtil.space(1));
-            }
-        }
-
-        String pageTitle = "";
-        if (output.equals(OUTPUT_HTML)) {
-            pageTitle = msg("Associations");
-            sb.append("</ul>");
-        } else if (output.equals(OUTPUT_CLOUD)) {
-            pageTitle = msg("Association Cloud");
-        }
-        return new Result(pageTitle, sb, getMimeType(output));
-
     }
 
 

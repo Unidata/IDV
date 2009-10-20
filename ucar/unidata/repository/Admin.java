@@ -1468,7 +1468,7 @@ public class Admin extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("Access Overview"));
 
-        Statement stmt = getDatabaseManager().execute(
+        Statement statement = getDatabaseManager().execute(
                              "select "
                              + SqlUtil.comma(
                                  Tables.PERMISSIONS.COL_ENTRY_ID,
@@ -1479,7 +1479,7 @@ public class Admin extends RepositoryManager {
         Hashtable<String, List> idToPermissions = new Hashtable<String,
                                                       List>();
 
-        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
         ResultSet        results;
         List<String>     ids = new ArrayList<String>();
         while ((results = iter.next()) != null) {
@@ -1582,45 +1582,7 @@ public class Admin extends RepositoryManager {
 
         StringBuffer dbSB = new StringBuffer();
 
-
-
-        dbSB.append("<table>\n");
-        String[] names = { msg("Users"), msg("Associations"),
-                           msg("Metadata Items") };
-        String[] tables = { Tables.USERS.NAME, Tables.ASSOCIATIONS.NAME,
-                            Tables.METADATA.NAME };
-        for (int i = 0; i < tables.length; i++) {
-            dbSB.append(HtmlUtil.row(HtmlUtil.cols(""
-                    + getDatabaseManager().getCount(tables[i].toLowerCase(),
-                        new Clause()), names[i])));
-        }
-
-
-        dbSB.append(
-            HtmlUtil.row(
-                HtmlUtil.colspan(HtmlUtil.bold(msgLabel("Types")), 2)));
-        int total = 0;
-        dbSB.append(HtmlUtil.row(HtmlUtil.cols(""
-                + getDatabaseManager().getCount(Tables.ENTRIES.NAME,
-                    new Clause()), msg("Total entries"))));
-        for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
-            if (typeHandler.isType(TypeHandler.TYPE_ANY)) {
-                continue;
-            }
-            int cnt = getDatabaseManager().getCount(Tables.ENTRIES.NAME,
-                          Clause.eq("type", typeHandler.getType()));
-
-            String url =
-                HtmlUtil.href(
-                    request.url(
-                        getRepository().URL_SEARCH_FORM, ARG_TYPE,
-                        typeHandler.getType()), typeHandler.getLabel());
-            dbSB.append(HtmlUtil.row(HtmlUtil.cols("" + cnt, url)));
-        }
-
-
-
-        dbSB.append("</table>\n");
+	getDatabaseManager().addStatistics(request,dbSB);
 
         StringBuffer sb = new StringBuffer();
         sb.append(HtmlUtil.makeShowHideBlock(msg("System Status"),
@@ -1786,11 +1748,11 @@ public class Admin extends RepositoryManager {
     public Result adminScanForBadParents(Request request) throws Exception {
         boolean      delete = request.get("delete", false);
         StringBuffer sb     = new StringBuffer();
-        Statement stmt = getDatabaseManager().execute("select "
+        Statement statement = getDatabaseManager().execute("select "
                              + Tables.ENTRIES.COL_ID + ","
                              + Tables.ENTRIES.COL_PARENT_GROUP_ID + " from "
                              + Tables.ENTRIES.NAME, 10000000, 0);
-        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
         ResultSet        results;
         int              cnt        = 0;
         List<Entry>      badEntries = new ArrayList<Entry>();
@@ -1885,7 +1847,7 @@ public class Admin extends RepositoryManager {
         cleanupStatus  = new StringBuffer();
         int myTS = ++cleanupTS;
         try {
-            Statement stmt =
+            Statement statement =
                 getDatabaseManager().select(
                     SqlUtil.comma(
                         Tables.ENTRIES.COL_ID, Tables.ENTRIES.COL_RESOURCE,
@@ -1894,7 +1856,7 @@ public class Admin extends RepositoryManager {
                                 Tables.ENTRIES.COL_RESOURCE_TYPE,
                                 Resource.TYPE_FILE));
 
-            SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
+            SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
             ResultSet        results;
             int              cnt       = 0;
             int              deleteCnt = 0;

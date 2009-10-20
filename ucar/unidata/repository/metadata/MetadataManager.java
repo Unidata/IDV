@@ -353,7 +353,6 @@ public class MetadataManager extends RepositoryManager {
             }
         }
 
-        getDatabaseManager().closeStatement(stmt);
         entry.setMetadata(metadataList);
         return metadataList;
     }
@@ -1083,7 +1082,7 @@ public class MetadataManager extends RepositoryManager {
                                  Clause.eq(
                                      Tables.METADATA.COL_TYPE, type.getId()));
             values = SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1);
-            getDatabaseManager().closeAndReleaseConnection(stmt);
+
             if (myDistinctMap != null) {
                 myDistinctMap.put(type.getId(), values);
             }

@@ -261,9 +261,9 @@ public class DataOutputHandler extends OutputHandler {
     /** _more_ */
     private Pool<String, GridDataset> gridPool = new Pool<String,
                                                      GridDataset>(10) {
-        protected void removeValue(String key, GridDataset value) {
+        protected void removeValue(String key, GridDataset dataset) {
             try {
-                value.close();
+                dataset.close();
             } catch (Exception exc) {}
         }
 
@@ -300,9 +300,9 @@ public class DataOutputHandler extends OutputHandler {
     /** _more_ */
     private Pool<String, FeatureDatasetPoint> pointPool =
         new Pool<String, FeatureDatasetPoint>(10) {
-        protected void removeValue(String key, NetcdfFile value) {
+        protected void removeValue(String key, NetcdfFile dataset) {
             try {
-                value.close();
+                dataset.close();
             } catch (Exception exc) {}
         }
 
@@ -339,9 +339,9 @@ public class DataOutputHandler extends OutputHandler {
     /** _more_ */
     private Pool<String, TrajectoryObsDataset> trajectoryPool =
         new Pool<String, TrajectoryObsDataset>(10) {
-        protected void removeValue(String key, TrajectoryObsDataset value) {
+        protected void removeValue(String key, TrajectoryObsDataset dataset) {
             try {
-                value.close();
+                dataset.close();
             } catch (Exception exc) {}
         }
 

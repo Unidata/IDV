@@ -1202,6 +1202,11 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_DB_CANCACHE = "ramadda.db.cancache";
 
+    public static final String PROP_DB_POOL_MAXACTIVE = "ramadda.db.pool.maxactive";
+    public static final String PROP_DB_POOL_MAXIDLE = "ramadda.db.pool.maxidle";
+    public static final String PROP_DB_POOL_TIMEUNTILCLOSED    = "ramadda.db.pool.timeuntilclosed";
+
+
     /** _more_ */
     public static final String PROP_DB_DERBY_HOME = "ramadda.db.derby.home";
 

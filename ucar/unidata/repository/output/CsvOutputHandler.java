@@ -187,65 +187,6 @@ public class CsvOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result listAsociations(Request request) throws Exception {
-
-        StringBuffer sb          = new StringBuffer();
-        TypeHandler  typeHandler = repository.getTypeHandler(request);
-        String[] associations =
-            getAssociationManager().getAssociations(request);
-
-        List<String>  names  = new ArrayList<String>();
-        List<Integer> counts = new ArrayList<Integer>();
-        ResultSet     results;
-        int           max = -1;
-        int           min = -1;
-        for (int i = 0; i < associations.length; i++) {
-            String association = associations[i];
-            Statement stmt2 = typeHandler.select(request, SqlUtil.count("*"),
-                                  Clause.eq(Tables.ASSOCIATIONS.COL_NAME,
-                                            association), "");
-
-            ResultSet results2 = stmt2.getResultSet();
-            if ( !results2.next()) {
-                getDatabaseManager().closeAndReleaseConnection(stmt2);
-                continue;
-            }
-            int count = results2.getInt(1);
-            if ((max < 0) || (count > max)) {
-                max = count;
-            }
-            if ((min < 0) || (count < min)) {
-                min = count;
-            }
-            names.add(association);
-            counts.add(new Integer(count));
-            getDatabaseManager().closeAndReleaseConnection(stmt2);
-        }
-
-        int    diff         = max - min;
-        double distribution = diff / 5.0;
-
-        for (int i = 0; i < names.size(); i++) {
-            String association = names.get(i);
-            sb.append(association);
-            sb.append("\n");
-        }
-
-        return new Result("", sb, getMimeType(OUTPUT_CSV));
-
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
      * @param group _more_
      * @param subGroups _more_
      * @param entries _more_

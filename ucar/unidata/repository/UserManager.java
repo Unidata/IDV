@@ -48,9 +48,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import java.sql.PreparedStatement;
-
 import java.sql.ResultSet;
-
 import java.sql.Statement;
 
 
@@ -229,13 +227,13 @@ public class UserManager extends RepositoryManager {
         List<FavoriteEntry> favorites = user.getFavorites();
         if (favorites == null) {
             favorites = new ArrayList<FavoriteEntry>();
-            Statement stmt = getDatabaseManager().select(
+            Statement statement = getDatabaseManager().select(
                                  Tables.FAVORITES.COLUMNS,
                                  Tables.FAVORITES.NAME,
                                  Clause.eq(
                                      Tables.FAVORITES.COL_USER_ID,
                                      user.getId()));
-            SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
+            SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
             ResultSet        results;
             //COL_ID,COL_USER_ID,COL_ENTRY_ID,COL_NAME,COL_CATEGORY
             while ((results = iter.next()) != null) {
@@ -446,10 +444,10 @@ public class UserManager extends RepositoryManager {
             //            System.err.println ("got from user map:" + id +" " + user);
             return user;
         }
-        Statement stmt = getDatabaseManager().select(Tables.USERS.COLUMNS,
+        Statement statement = getDatabaseManager().select(Tables.USERS.COLUMNS,
                              Tables.USERS.NAME,
                              Clause.eq(Tables.USERS.COL_ID, id));
-        ResultSet results = stmt.getResultSet();
+        ResultSet results = statement.getResultSet();
         if (results.next()) {
             user = getUser(results);
         } else {
@@ -461,7 +459,7 @@ public class UserManager extends RepositoryManager {
                 }
             }
         }
-        getDatabaseManager().closeAndReleaseConnection(stmt);
+        getDatabaseManager().closeAndReleaseConnection(statement);
 
         if (user == null) {
             if (userDefaultIfNotFound) {
@@ -486,10 +484,10 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     protected User findUserFromEmail(String email) throws Exception {
-        Statement stmt = getDatabaseManager().select(Tables.USERS.COLUMNS,
+        Statement statement = getDatabaseManager().select(Tables.USERS.COLUMNS,
                              Tables.USERS.NAME,
                              Clause.eq(Tables.USERS.COL_EMAIL, email));
-        ResultSet results = stmt.getResultSet();
+        ResultSet results = statement.getResultSet();
         if ( !results.next()) {
             return null;
         }
@@ -1225,11 +1223,11 @@ public class UserManager extends RepositoryManager {
         usersHtml.append(HtmlUtil.submit(msg("New User")));
         usersHtml.append("</form>");
 
-        Statement stmt = getDatabaseManager().select(Tables.USERS.COLUMNS,
+        Statement statement = getDatabaseManager().select(Tables.USERS.COLUMNS,
                              Tables.USERS.NAME, new Clause(),
                              " order by " + Tables.USERS.COL_ID);
 
-        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
         ResultSet        results;
 
         List<User>       users = new ArrayList();
@@ -1366,13 +1364,13 @@ public class UserManager extends RepositoryManager {
                              results.getString(col++),
                              results.getBoolean(col++));
 
-        Statement stmt = getDatabaseManager().select(
+        Statement statement = getDatabaseManager().select(
                              Tables.USERROLES.COL_ROLE,
                              Tables.USERROLES.NAME,
                              Clause.eq(
                                  Tables.USERROLES.COL_USER_ID, user.getId()));
 
-        String[]     array = SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1);
+        String[]     array = SqlUtil.readString(getDatabaseManager().getIterator(statement), 1);
         List<String> roles = new ArrayList<String>(Misc.toList(array));
         user.setRoles(roles);
         return user;
@@ -2236,20 +2234,20 @@ public class UserManager extends RepositoryManager {
             String password = request.getString(ARG_USER_PASSWORD, "").trim();
             if ((name.length() > 0) && (password.length() > 0)) {
                 String hashedPassword = hashPassword(password);
-                Statement stmt =
+                Statement statement =
                     getDatabaseManager().select(Tables.USERS.COLUMNS,
                         Tables.USERS.NAME,
                         Clause.and(Clause.eq(Tables.USERS.COL_ID, name),
                                    Clause.eq(Tables.USERS.COL_PASSWORD,
                                              hashedPassword)));
 
-                ResultSet results = stmt.getResultSet();
+                ResultSet results = statement.getResultSet();
                 if ( !results.next()) {
                     //We changed the password hash function to a new one so
                     //check if the DB has the old hashed password
                     //If it does then insert the new one
                     String oldHashedPassword = hashPasswordOld(password);
-                    Statement stmt2 =
+                    Statement statement2 =
                         getDatabaseManager().select(Tables.USERS.COLUMNS,
                             Tables.USERS.NAME,
                             Clause.and(Clause.eq(Tables.USERS.COL_ID, name),
@@ -2257,7 +2255,7 @@ public class UserManager extends RepositoryManager {
                                            oldHashedPassword)));
 
 
-                    ResultSet results2 = stmt2.getResultSet();
+                    ResultSet results2 = statement2.getResultSet();
                     if (results2.next()) {
                         user = getUser(results2);
                         getDatabaseManager().update(Tables.USERS.NAME,
@@ -2265,11 +2263,11 @@ public class UserManager extends RepositoryManager {
                                 new String[] { Tables.USERS.COL_PASSWORD },
                                 new Object[] { hashedPassword });
                     }
-                    getDatabaseManager().closeAndReleaseConnection(stmt2);
+                    getDatabaseManager().closeAndReleaseConnection(statement2);
                 } else {
                     user = getUser(results);
                 }
-                getDatabaseManager().closeAndReleaseConnection(stmt);
+                getDatabaseManager().closeAndReleaseConnection(statement);
 
                 if (user == null) {
                     for (UserAuthenticator userAuthenticator : userAuthenticators) {
@@ -2330,12 +2328,12 @@ public class UserManager extends RepositoryManager {
 
                 if (name.length() > 0) {
                     //Check if they have a blank password
-                    Statement stmt = getDatabaseManager().select(
+                    Statement statement = getDatabaseManager().select(
                                          Tables.USERS.COL_PASSWORD,
                                          Tables.USERS.NAME,
                                          Clause.eq(
                                              Tables.USERS.COL_ID, name));
-                    ResultSet results = stmt.getResultSet();
+                    ResultSet results = statement.getResultSet();
                     if (results.next()) {
                         password = results.getString(1);
                         if ((password == null) || (password.length() == 0)) {
@@ -2345,11 +2343,11 @@ public class UserManager extends RepositoryManager {
                                     "Sorry, we were doing some cleanup and have reset your password")));
 
                             addPasswordResetForm(request, sb, name);
-                            getDatabaseManager().closeAndReleaseConnection(stmt);
+                            getDatabaseManager().closeAndReleaseConnection(statement);
                             return new Result(msg("Login"), sb);
                         }
                     }
-                    getDatabaseManager().closeAndReleaseConnection(stmt);
+                    getDatabaseManager().closeAndReleaseConnection(statement);
                 }
 
                 //TODO: what to do when we have ssl here?
@@ -2543,14 +2541,14 @@ public class UserManager extends RepositoryManager {
         }
 
 
-        Statement stmt =
+        Statement statement =
             getDatabaseManager().select(Tables.USER_ACTIVITY.COLUMNS,
                                         Tables.USER_ACTIVITY.NAME, clause,
                                         " order by "
                                         + Tables.USER_ACTIVITY.COL_DATE
                                         + " desc " + limitString);
 
-        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
         ResultSet        results;
         if (theUser != null) {
             sb.append(msgLabel("Activity for User"));

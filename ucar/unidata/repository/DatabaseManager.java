@@ -114,6 +114,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     /** Keeps track of active connections */
     private Hashtable<Connection,ConnectionInfo> connectionMap = new Hashtable<Connection,ConnectionInfo>();
 
+    private List<String> messages = new ArrayList<String>();
+
     /**
      * _more_
      *
@@ -132,23 +134,23 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     public void checkConnections() {
 
         while(true) {
-            Misc.sleep(1000);
+            Misc.sleep(5000);
             Hashtable<Connection,ConnectionInfo> tmp = new Hashtable<Connection,ConnectionInfo>();
             tmp.putAll(connectionMap);
             long now = System.currentTimeMillis();
+	    int seconds = getRepository().getProperty(PROP_DB_POOL_TIMEUNTILCLOSED,30);
             for (Enumeration keys = tmp.keys(); keys.hasMoreElements(); ) {
                 Connection connection = (Connection) keys.nextElement();
                 ConnectionInfo info  = tmp.get(connection);
                 //If a connection has been out for more than a minute then close it
-                if(now-info.time > 10000) {
-                    System.err.println ("A connection has been open for more that 30 seconds:\n" + info.where);
+                if(now-info.time > seconds*1000) {
+                    System.err.println ("A connection has been open for more than "+seconds +" seconds:\n" + info.where);
+		    while(messages.size()>100)
+			messages.remove(0);
+		    messages.add("SCOURED:" +info.where);
                     closeConnection(connection);
                 }
-                if(now-info.time > 60000) {
-                    //                    System.err.println ("Scouring connection:" + info.where);
-                    //                    closeConnection(connection);
-                }
-            }
+	    }
         }
     }
 
@@ -175,8 +177,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
 
     protected DataSource doMakeDataSource() throws Exception {
         BasicDataSource ds = new BasicDataSource();
-        ds.setMaxActive(100);
-        ds.setMaxIdle(100);
+        ds.setMaxActive(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE,100));
+        ds.setMaxIdle(getRepository().getProperty(PROP_DB_POOL_MAXIDLE,100));
+
         //        ds.setValidationQuery("select * from dummy");
         String userName = (String) getRepository().getProperty(
                               PROP_DB_USER.replace("${db}", db));
@@ -196,6 +199,66 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
         ds.setUrl(connectionURL);
         return ds;
     }
+
+
+
+    public void addStatistics(Request request,StringBuffer dbSB) throws Exception {
+
+	BasicDataSource bds = (BasicDataSource)dataSource;
+
+	StringBuffer msgb = new StringBuffer();
+	for(String msg: messages) {
+	    msgb.append("<pre>" + msg +"</pre>");
+	    msgb.append("<hr>");
+	}
+	if(messages.size()>0) {
+	    dbSB.append(HtmlUtil.makeShowHideBlock(msg("Connection Problems"),
+						   msgb.toString(), false));
+	}
+
+
+
+	dbSB.append("Connection Pool:<br>&nbsp;&nbsp;#active:" + bds.getNumActive() +"<br>&nbsp;&nbsp;#idle:" +bds.getNumIdle()  +"<br>&nbsp;&nbsp;max active: " +
+		    bds.getMaxActive() +"<br>&nbsp;&nbsp;max idle:" + bds.getMaxIdle());
+	dbSB.append(HtmlUtil.br());
+        dbSB.append("<table>\n");
+        String[] names = { msg("Users"), msg("Associations"),
+                           msg("Metadata Items") };
+        String[] tables = { Tables.USERS.NAME, Tables.ASSOCIATIONS.NAME,
+                            Tables.METADATA.NAME };
+        for (int i = 0; i < tables.length; i++) {
+            dbSB.append(HtmlUtil.row(HtmlUtil.cols(""
+                    + getDatabaseManager().getCount(tables[i].toLowerCase(),
+                        new Clause()), names[i])));
+        }
+
+
+        dbSB.append(
+            HtmlUtil.row(
+                HtmlUtil.colspan(HtmlUtil.bold(msgLabel("Types")), 2)));
+        int total = 0;
+        dbSB.append(HtmlUtil.row(HtmlUtil.cols(""
+                + getDatabaseManager().getCount(Tables.ENTRIES.NAME,
+                    new Clause()), msg("Total entries"))));
+        for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
+            if (typeHandler.isType(TypeHandler.TYPE_ANY)) {
+                continue;
+            }
+            int cnt = getCount(Tables.ENTRIES.NAME,
+			       Clause.eq("type", typeHandler.getType()));
+
+            String url =
+                HtmlUtil.href(
+                    request.url(
+                        getRepository().URL_SEARCH_FORM, ARG_TYPE,
+                        typeHandler.getType()), typeHandler.getLabel());
+            dbSB.append(HtmlUtil.row(HtmlUtil.cols("" + cnt, url)));
+        }
+
+
+        dbSB.append("</table>\n");
+    }
+
 
 
 
@@ -246,9 +309,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      */
     public PreparedStatement getPreparedStatement(String query)
             throws Exception {
-        Connection        connection = getConnection();
-        PreparedStatement stmt       = connection.prepareStatement(query);
-        return stmt;
+        return  getConnection().prepareStatement(query);
     }
 
 
@@ -266,28 +327,25 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     public void update(String table, String colId, String id, String[] names,
                        Object[] values)
             throws Exception {
-        Connection        connection = getConnection();
-        String            query      = SqlUtil.makeUpdate(table, colId,
-                                           names);
-        PreparedStatement stmt       = connection.prepareStatement(query);
+	PreparedStatement statement       = getPreparedStatement(SqlUtil.makeUpdate(table, colId, names));
         for (int i = 0; i < values.length; i++) {
             Object value = values[i];
             if (value == null) {
-                stmt.setNull(i + 1, java.sql.Types.VARCHAR);
+                statement.setNull(i + 1, java.sql.Types.VARCHAR);
             } else if (value instanceof Date) {
-                setDate(stmt, i + 1, (Date) value);
+                setDate(statement, i + 1, (Date) value);
             } else if (value instanceof Boolean) {
                 boolean b = ((Boolean) value).booleanValue();
-                stmt.setInt(i + 1, (b
+                statement.setInt(i + 1, (b
                                     ? 1
                                     : 0));
             } else {
-                stmt.setObject(i + 1, value);
+                statement.setObject(i + 1, value);
             }
         }
-        stmt.setString(values.length + 1, id);
-        stmt.execute();
-        closeAndReleaseConnection(stmt);
+        statement.setString(values.length + 1, id);
+        statement.execute();
+        closeAndReleaseConnection(statement);
     }
 
     /**
@@ -304,8 +362,11 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
                        Object[] values)
             throws Exception {
         Connection connection = getConnection();
-        SqlUtil.update(connection, table, clause, names, values);
-        closeConnection(connection);
+	try {
+	    SqlUtil.update(connection, table, clause, names, values);
+	} finally {
+	    closeConnection(connection);
+	}
     }
 
 
@@ -326,8 +387,11 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      */
     public void delete(String table, Clause clause) throws Exception {
         Connection connection = getConnection();
-        SqlUtil.delete(connection, table, clause);
-        closeConnection(connection);
+	try {
+	    SqlUtil.delete(connection, table, clause);
+	} finally {
+	    closeConnection(connection);
+	}
     }
 
 
@@ -395,30 +459,34 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     /**
      * _more_
      *
-     * @param stmt _more_
+     * @param statement _more_
      */
-    public void closeStatement(Statement stmt) {
-        if(stmt==null) return;
+    public void closeStatement(Statement statement) {
+        if(statement==null) return;
         try {
-            stmt.close();
+            statement.close();
         } catch (Exception ignore) {}
     }
 
 
 
-    public void closeAndReleaseConnection(Statement stmt) throws SQLException {
-        if(stmt==null) return;
+    public void closeAndReleaseConnection(Statement statement) throws SQLException {
+        if(statement==null) return;
         Connection connection = null;
         try {
-            connection = stmt.getConnection();
-            stmt.close();
+            connection = statement.getConnection();
+            statement.close();
         } catch (Throwable ignore) {}
 
         if(connection!=null) {
             closeConnection(connection);
         } else {
-            //            System.err.println ("whoa, a stmt with no connection");
-            Misc.printStack("whoa, a stmt with no connection",10);
+            //            System.err.println ("whoa, a statement with no connection");
+	    while(messages.size()>100)
+		messages.remove(0);
+	    messages.add("WHOA,a statement with no connection:" +LogUtil.getStackTrace());
+            Misc.printStack("whoa, a statement with no connection",10);
+	    
         }
     }
 
@@ -522,9 +590,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
                 }
                 colNames += ") ";
 
-                Statement stmt = execute("select * from " + tableName,
+                Statement statement = execute("select * from " + tableName,
                                          10000000, 0);
-                SqlUtil.Iterator iter = getIterator(stmt);
+                SqlUtil.Iterator iter = getIterator(statement);
                 ResultSet        results;
                 int              rowCnt    = 0;
                 List             valueList = new ArrayList();
@@ -602,44 +670,10 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     }
 
 
-    public SqlUtil.Iterator getIterator(Statement stmt) {
-        return  new Iterator(this, stmt);
+    public SqlUtil.Iterator getIterator(Statement statement) {
+        return  new Iterator(this, statement);
     }
 
-
-
-    /**
-     * _more_
-     *
-     *
-     * @return _more_
-     * @throws Exception _more_
-     */
-    protected Connection xxxmakeConnection() throws Exception {
-
-        String userName = (String) getRepository().getProperty(
-                              PROP_DB_USER.replace("${db}", db));
-        String password = (String) getRepository().getProperty(
-                              PROP_DB_PASSWORD.replace("${db}", db));
-        String connectionURL =
-            (String) getRepository().getProperty(PROP_DB_URL.replace("${db}",
-                db));
-        Misc.findClass(
-            (String) getRepository().getProperty(
-                PROP_DB_DRIVER.replace("${db}", db)));
-
-
-        Connection connection;
-        if (userName != null) {
-            connection = DriverManager.getConnection(connectionURL, userName,
-                    password);
-        } else {
-            connection = DriverManager.getConnection(connectionURL);
-        }
-
-        initConnection(connection);
-        return connection;
-    }
 
 
     /**
@@ -673,21 +707,12 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
         throws Exception {
         Connection connection = getConnection();
         try {
-            Statement stmt= execute(connection, sql, max, timeout);
-            closeStatement(stmt);
+            Statement statement= execute(connection, sql, max, timeout);
+            closeStatement(statement);
         } finally {
             closeConnection(connection);
         }
     }
-
-
-    private void execute(String sql)
-            throws Exception {
-        //        return execute(sql,10000000,0);
-         execute(sql,10000000,0);
-    }
-
-
 
 
     /**
@@ -774,18 +799,18 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     /**
      * _more_
      *
-     * @param stmt _more_
+     * @param statement _more_
      * @param col _more_
      * @param date _more_
      *
      * @throws Exception _more_
      */
-    public void setTimestamp(PreparedStatement stmt, int col, Date date)
+    public void setTimestamp(PreparedStatement statement, int col, Date date)
             throws Exception {
         if (date == null) {
-            stmt.setTimestamp(col, null);
+            statement.setTimestamp(col, null);
         } else {
-            stmt.setTimestamp(col, new java.sql.Timestamp(date.getTime()),
+            statement.setTimestamp(col, new java.sql.Timestamp(date.getTime()),
                               Repository.calendar);
         }
     }
@@ -814,37 +839,37 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     /**
      * _more_
      *
-     * @param stmt _more_
+     * @param statement _more_
      * @param col _more_
      * @param time _more_
      *
      * @throws Exception _more_
      */
-    public void setDate(PreparedStatement stmt, int col, long time)
+    public void setDate(PreparedStatement statement, int col, long time)
             throws Exception {
-        setDate(stmt, col, new Date(time));
+        setDate(statement, col, new Date(time));
     }
 
 
     /**
      * _more_
      *
-     * @param stmt _more_
+     * @param statement _more_
      * @param col _more_
      * @param date _more_
      *
      * @throws Exception _more_
      */
-    public void setDate(PreparedStatement stmt, int col, Date date)
+    public void setDate(PreparedStatement statement, int col, Date date)
             throws Exception {
         //        if (!db.equals(DB_MYSQL)) {
         if (true || !db.equals(DB_MYSQL)) {
-            setTimestamp(stmt, col, date);
+            setTimestamp(statement, col, date);
         } else {
             if (date == null) {
-                stmt.setTime(col, null);
+                statement.setTime(col, null);
             } else {
-                stmt.setTime(col, new java.sql.Time(date.getTime()),
+                statement.setTime(col, new java.sql.Time(date.getTime()),
                              Repository.calendar);
             }
         }
@@ -878,40 +903,40 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     /**
      * _more_
      *
-     * @param stmt _more_
+     * @param statement _more_
      * @param values _more_
      *
      * @throws Exception _more_
      */
-    public void setValues(PreparedStatement stmt, Object[] values)
+    public void setValues(PreparedStatement statement, Object[] values)
             throws Exception {
-        setValues(stmt, values, 1);
+        setValues(statement, values, 1);
     }
 
     /**
      * _more_
      *
-     * @param stmt _more_
+     * @param statement _more_
      * @param values _more_
      * @param startIdx _more_
      *
      * @throws Exception _more_
      */
-    public void setValues(PreparedStatement stmt, Object[] values,
+    public void setValues(PreparedStatement statement, Object[] values,
                           int startIdx)
             throws Exception {
         for (int i = 0; i < values.length; i++) {
             if (values[i] == null) {
-                stmt.setNull(i + startIdx, java.sql.Types.VARCHAR);
+                statement.setNull(i + startIdx, java.sql.Types.VARCHAR);
             } else if (values[i] instanceof Date) {
-                setDate(stmt, i + startIdx, (Date) values[i]);
+                setDate(statement, i + startIdx, (Date) values[i]);
             } else if (values[i] instanceof Boolean) {
                 boolean b = ((Boolean) values[i]).booleanValue();
-                stmt.setInt(i + startIdx, (b
+                statement.setInt(i + startIdx, (b
                                            ? 1
                                            : 0));
             } else {
-                stmt.setObject(i + startIdx, values[i]);
+                statement.setObject(i + startIdx, values[i]);
             }
         }
     }
@@ -944,16 +969,16 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     public void executeInsert(String insert,
                               List<Object[]> valueList)
             throws Exception {
-        PreparedStatement pstmt = getPreparedStatement(insert);
+        PreparedStatement pstatement = getPreparedStatement(insert);
         for(Object[] values: valueList) {
-            setValues(pstmt, values);
+            setValues(pstatement, values);
             try {
-                pstmt.executeUpdate();
+                pstatement.executeUpdate();
             } catch (Exception exc) {
                 logError("Error:" + insert, exc);
             }
         }
-        closeAndReleaseConnection(pstmt);
+        closeAndReleaseConnection(pstatement);
     }
 
     /**
@@ -987,13 +1012,16 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
                                boolean ignoreErrors, boolean printStatus)
             throws Exception {
         Connection connection = getConnection();
+	try {
         connection.setAutoCommit(false);
         Statement  statement       = connection.createStatement();
         SqlUtil.loadSql(sql, statement, ignoreErrors, printStatus);
         connection.commit();
         connection.setAutoCommit(true);
         closeStatement(statement);
-        closeConnection(connection);
+	} finally {
+	    closeConnection(connection);
+	}
     }
 
 
@@ -1207,11 +1235,11 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
                 }
             });
         */
-        Statement stmt = SqlUtil.select(getConnection(), what, tables, clause,
+        Statement statement = SqlUtil.select(getConnection(), what, tables, clause,
                                         extra, max, TIMEOUT);
 
         done[0] = true;
-        return stmt;
+        return statement;
     }
 
 
@@ -1315,15 +1343,14 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
         Statement statement;
         DatabaseManager databaseManager;
         
-        public Iterator(DatabaseManager databaseManager, Statement stmt) {
-            super(stmt);
-            this.statement = stmt;
+        public Iterator(DatabaseManager databaseManager, Statement statement) {
+            super(statement);
+            this.statement = statement;
             this.databaseManager = databaseManager;
         }
 
-
-        protected void close(Statement stmt) throws SQLException {
-            databaseManager.closeAndReleaseConnection(stmt);
+        protected void close(Statement statement) throws SQLException {
+            databaseManager.closeAndReleaseConnection(statement);
         }
 
     }

@@ -59,7 +59,6 @@ import java.net.*;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -336,20 +335,14 @@ public class AssociationManager extends RepositoryManager {
      */
     public String addAssociation(Request request, Association association)
             throws Exception {
-
-        PreparedStatement assocInsert =
-            getDatabaseManager().getPreparedStatement(
-                Tables.ASSOCIATIONS.INSERT);
-        int    col = 1;
         String id  = getRepository().getGUID();
-        assocInsert.setString(col++, association.getId());
-        assocInsert.setString(col++, association.getName());
-        assocInsert.setString(col++, association.getType());
-        assocInsert.setString(col++, association.getFromId());
-        assocInsert.setString(col++, association.getToId());
-        assocInsert.execute();
-        assocInsert.close();
-        associationChanged(request, association);
+	getDatabaseManager().executeInsert(Tables.ASSOCIATIONS.INSERT,
+					   new Object[]{
+					       association.getId(),
+					       association.getName(),
+					       association.getType(),
+					       association.getFromId(),
+					       association.getToId()});
         return id;
     }
 
@@ -523,7 +516,6 @@ public class AssociationManager extends RepositoryManager {
                              orderBy + " "
                              + getDatabaseManager().getLimitString(
                                  request.get(ARG_SKIP, 0), max));
-        //        System.err.println (getRepository().getQueryOrderAndLimit(request,false));
         List<Association> associations = new ArrayList();
         SqlUtil.Iterator  iter         = getDatabaseManager().getIterator(stmt);
         ResultSet         results;
