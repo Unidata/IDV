@@ -31,6 +31,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -205,7 +206,7 @@ public class GuiUtils extends LayoutUtil {
 
 
     /** Used by apps for having a common font for buttons */
-    public static  Font buttonFont = new Font("Dialog", Font.BOLD, 10);
+    public static Font buttonFont = new Font("Dialog", Font.BOLD, 10);
 
 
     /** Holds a mapping from image filename to Image object */
@@ -337,7 +338,7 @@ public class GuiUtils extends LayoutUtil {
      */
     public static void setDefaultFont(Font font) {
         dfltFont = font;
-        if(dfltFont!=null) {
+        if (dfltFont != null) {
             buttonFont = dfltFont;
         }
     }
@@ -355,8 +356,13 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param comp _more_
+     */
     public static void applyDefaultFont(Component comp) {
-        if(dfltFont!=null) {
+        if (dfltFont != null) {
             comp.setFont(dfltFont);
         }
     }
