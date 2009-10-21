@@ -42,10 +42,7 @@ import ucar.nc2.dt.grid.GeoGrid;
 import ucar.nc2.dt.grid.GridCoordSys;
 import ucar.nc2.units.DateUnit;
 
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.DataSourceImpl;
-import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.*;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
@@ -994,6 +991,8 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         if (rayData == null) {
             rayData = getRayData(sweepVar, rayNum, numBin);
+            if(rayData == null)
+                return null;
         }
 
         /* Calculate elevation angle verse range array */
@@ -1136,7 +1135,14 @@ public class CDMRadarAdapter implements RadarAdapter {
         int[] rNum = new int[numberOfSweeps];
 
         // get data for the whole volume
-        float[]     allData = sweepVar.readAllData();
+        float[]     allData = null;
+        try {
+             allData = sweepVar.readAllData();
+        } catch (Exception np) {
+            LogUtil.consoleMessage("Radar read volume data error in file:\n" + swpFileName);
+            return null;
+        }
+
         float[][][] data2   = new float[numberOfSweeps][numberOfRay][numBin];
 
         for (int sweepIdx = 0; sweepIdx < numberOfSweeps; sweepIdx++) {
@@ -2262,6 +2268,8 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         if (rayData == null) {
             rayData = getRayData(sweepVar, numberOfRay, numberOfBin);
+            if(rayData == null)
+                return null;
         }
 
         float[][] rdata = new float[numberOfSweeps][bincounter];
@@ -2586,6 +2594,8 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         if (rhiData == null) {
             getRHIData(sweepVar);
+            if(rhiData == null)
+                return null;
         } else {
             if (rhiData.get(sweepVar.getName()) == null) {
                 getRHIData(sweepVar);
@@ -2761,6 +2771,10 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         // if(rayData == null)
         rayData = getRayData(sweepVar, numberOfRay, numberOfBin);
+        if(rayData == null) {
+            rhiData = null;
+            return;
+        }
         //float[][][] rdata =  getRayData(sweepVar, numberOfRay, numberOfBin);
 
 
@@ -3803,7 +3817,14 @@ public class CDMRadarAdapter implements RadarAdapter {
         //        Trace.call2("volume preamble");
 
         //        Trace.call1("data read");
-        float[]     allData = sweepVar.readAllData();
+        float[]     allData ;
+        try {
+             allData = sweepVar.readAllData();
+        } catch (Exception np) {
+            LogUtil.consoleMessage("Radar read volume data error in file:\n" + swpFileName);
+            return null;
+        }
+
         float[][][] data2   = new float[numberOfSweeps][numberOfRay][gates];
 
         for (int sweepIdx = 0; sweepIdx < numberOfSweeps; sweepIdx++) {
@@ -4043,7 +4064,13 @@ public class CDMRadarAdapter implements RadarAdapter {
         //        Trace.call2("volume preamble");
 
         //        Trace.call1("data read");
-        float[]     allData = sweepVar.readAllData();
+        float[]     allData;
+        try {
+             allData = sweepVar.readAllData();
+        } catch (Exception np) {
+            LogUtil.consoleMessage("Radar read volume data error in file:\n" + swpFileName);
+            return null;
+        }
         float[][][] data2   = new float[numberOfSweeps][numberOfRay][gates];
 
         for (int sweepIdx = 0; sweepIdx < numberOfSweeps; sweepIdx++) {
