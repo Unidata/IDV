@@ -496,6 +496,7 @@ public class IdvUIManager extends IdvManager {
      * Load in the look and feel
      */
     public void loadLookAndFeel() {
+
         String lookAndFeel = getStore().get(PREF_LOOKANDFEEL, (String) null);
         if (lookAndFeel != null) {
             try {
@@ -933,6 +934,7 @@ public class IdvUIManager extends IdvManager {
         ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 
 
+
         if (getIdv().getStateManager().getShowDashboardOnStart()) {
             //            showBasicWindow(true);
             //            doMakeBasicWindows();
@@ -1193,6 +1195,13 @@ public class IdvUIManager extends IdvManager {
     }
 
 
+
+
+    public boolean isMac() {
+	String os = System.getProperty("os.name");
+	if(os!=null && os.toLowerCase().indexOf("mac")>=0) return true;
+	return false;
+    }
 
     /**
      * Create the splash screen if needed
@@ -3381,6 +3390,8 @@ public class IdvUIManager extends IdvManager {
         initHelpTips(false);
     }
 
+
+
     /**
      *  Show a message in the splash screen (if it exists)
      *
@@ -3564,6 +3575,7 @@ public class IdvUIManager extends IdvManager {
             showControlDialog(dataTree, event);
         }
     }
+
 
     /**
      * Create and show a {@link DataControlDialog} for the {@link ucar.unidata.data.DataChoice}

@@ -318,6 +318,8 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         }
 
 
+
+
         try {
             Trace.call1("initState");
             getStateManager().initState(interactiveMode);

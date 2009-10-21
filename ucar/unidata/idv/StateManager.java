@@ -298,6 +298,12 @@ public class StateManager extends IdvManager {
         }
 
 
+	System.setProperty("apple.laf.useScreenMenuBar", "true");
+	System.setProperty("com.apple.mrj.application.apple.menu.about.name", 
+			   (String) getProperty("idv.title",
+							 "Unidata IDV"));
+
+
         //Now do any command line argument -Dname=value properties
         for (int i = 0; i < getArgsManager().argPropertyNames.size(); i++) {
             idvProperties.put(getArgsManager().argPropertyNames.get(i),
@@ -332,7 +338,13 @@ public class StateManager extends IdvManager {
         //Trace.msg("initState-1");
 
         //Load in the properties  to get some initial information (e.g., splash screen, store name, etc.)
+
+
+
         loadProperties();
+
+
+
 
         //Set the sitepath property if we were given it on the command line
         if (getArgsManager().sitePathFromArgs != null) {
@@ -396,6 +408,10 @@ public class StateManager extends IdvManager {
                 IdvResourceManager.RSC_MESSAGES));
 
 
+
+
+
+
         // set the look and feel
         getIdvUIManager().loadLookAndFeel();
 
@@ -405,6 +421,15 @@ public class StateManager extends IdvManager {
         version      = null;
         getIdvUIManager().initSplash();
         getIdvUIManager().splashMsg("Initializing Resources");
+	try {
+	    if(getIdvUIManager().isMac()) {
+		new ucar.unidata.idv.mac.MacBridge(getIdv());
+	    }
+	} catch(Throwable ignore) {
+	    LogUtil.consoleMessage("Failed to create MacBridge:" + ignore);
+	}
+
+
 
         //Trace.msg("initState-5");
         //Now, hopefully the store has read in the sitepath.
