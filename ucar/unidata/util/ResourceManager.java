@@ -530,6 +530,10 @@ public abstract class ResourceManager {
                 return null;
             }
             String newName = field.getText().trim();
+            if (newName.equals("")) {
+               LogUtil.userMessage("The name cannot be blank");
+               continue;
+            }
             //Clean up any categories
             List toks =  StringUtil.split(newName, ">", true,true);
             newName = StringUtil.join(">", toks);

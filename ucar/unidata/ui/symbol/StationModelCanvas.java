@@ -701,7 +701,7 @@ public class StationModelCanvas extends EditCanvas {
         if ( !okToChange()) {
             return;
         }
-        String newName = smm.doNew(this);
+        String newName = smm.doNew(this, "New", "model", "Provide a name for the model");
         if (newName == null) {
             return;
         }
