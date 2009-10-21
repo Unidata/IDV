@@ -351,8 +351,8 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         dewProRef   = new DataReferenceImpl("DewPointProfile");
         windProRef  = new DataReferenceImpl("WindProfile");
 
-        tempProRef.setData(AirTemperatureProfile.instance().missingData());
         dewProRef.setData(DewPointProfile.instance().missingData());
+        tempProRef.setData(AirTemperatureProfile.instance().missingData());
         windProRef.setData(
             CartesianHorizontalWindOfPressure.instance().missingData());
 
@@ -986,8 +986,8 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      */
     private void setSounding(Field tempPro, Field dewPro, Field windPro)
             throws VisADException, RemoteException {
-        tempProRef.setData(tempPro);
         dewProRef.setData(dewPro);
+        tempProRef.setData(tempPro);
         windProRef.setData(windPro);
         updateLegendAndList();
     }
@@ -1022,7 +1022,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             System.arraycopy(windPros, 0, windProfiles, 0, n);
         }
         Field[] tableSoundings = new Field[n];
-        //XXX        hodoDisplay.clear();
+        hodoDisplay.clear();
 
         for (int i = 0; i < n; i++) {
             if ((i == 0) && (windProfiles[i] != null)) {
@@ -1040,12 +1040,12 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 //visad.python.JPythonMethods.dumpTypes(windProfiles[i]);
             }
             if (showUVCbx != null) {
-        //XXX                showUVCbx.setEnabled(haveWinds);
+                showUVCbx.setEnabled(haveWinds);
             }
             aeroDisplay.addProfile(i, tempProfiles[i], dewProfiles[i],
                                    windProfiles[i]);
             if (haveWinds) {
-        //XXX                hodoDisplay.addProfile(i, windProfiles[i]);
+                hodoDisplay.addProfile(i, windProfiles[i]);
             }
             if ( !haveWinds) {
                 tableSoundings[i] = FieldImpl.combine(new Field[] {
@@ -1059,9 +1059,6 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         }
 
         aeroDisplay.setProfileVisible(currIndex, true);
-
-
-        if(true) return;
 
 
         if (haveWinds) {
