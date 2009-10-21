@@ -30,6 +30,7 @@ import ucar.unidata.data.sounding.CosmicTrajectoryFeatureTypeInfo;
 import ucar.unidata.data.sounding.TrackDataSource;
 import ucar.unidata.data.sounding.TrajectoryFeatureTypeAdapter;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.Misc;
 import ucar.visad.Util;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.IndicatorPoint;
@@ -40,9 +41,9 @@ import visad.georef.LatLonPoint;
 import visad.georef.NamedLocationTuple;
 
 import javax.swing.*;
+import javax.swing.event.*;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +77,9 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
 
     /** _more_ */
     private JComboBox stationMenue;
+
+    private boolean ignoreStationMenuEvent = false;
+
 
     /** _more_ */
     private String[] stationIds;
@@ -153,17 +157,23 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
                 if (first) {
                     first = false;
                 } else {
+                    Misc.run(new Runnable() {
+                            public void run() {
                     try {
                         int i = stationProbes.getCloseIndex();
                         if ((i >= 0) && (stationMenue != null)) {
+                            ignoreStationMenuEvent =true;
                             selectedStation.setPoint((RealTuple) latLons[i]);
-                            //  stationMenue.setSelectedIndex(i);
                             stationMenue.setSelectedIndex(i);
+                            setStation(i);
                         }
                     } catch (Exception ex) {
                         logException(ex);
+                    } finally {
+                        ignoreStationMenuEvent = false;
                     }
-                }
+                            }});
+                            }
             }
         });
 
@@ -270,9 +280,8 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
 
         setSoundings(new Field[] { tempPro }, new Field[] { dewPro },
                      new Field[] { null });
-        setSounding(0);
-        addDisplayable(track, FLAG_COLOR);
-
+        //LOOK:        setSounding(0);
+        //        addDisplayable(track, FLAG_COLOR);
         return true;
     }
 
@@ -298,7 +307,8 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
 
         stationMenue = new JComboBox(stationIds);
 
-        if (selectedStationIndex >= 0) {
+        //TODO: Check this
+        if (selectedStationIndex >= 0 && selectedStationIndex< stationIds.length) {
             stationMenue.setSelectedIndex(selectedStationIndex);
             setStation(selectedStationIndex);
         } else {
@@ -311,12 +321,33 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
         stationMenue.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 try {
-                    setStation(stationMenue.getSelectedIndex());
+                    //                    System.err.println("station menu changed");
+                    //                    setStation(stationMenue.getSelectedIndex());
                 } catch (Exception ex) {
                     logException(ex);
                 }
             }
         });
+
+
+        stationMenue.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if(ignoreStationMenuEvent) return;
+                    Misc.run(new Runnable() {
+                            public void run() {
+                                try {
+                                    setStation(stationMenue.getSelectedIndex());
+                                    Misc.runInABit(250, new Runnable() {
+                                            public void run() {
+                                                stationMenue.requestFocus();
+                                            }});
+                                } catch (Exception ex) {
+                                    logException(ex);
+                                }
+                            }});
+
+                }
+            });
 
         return GuiUtils.top(GuiUtils.inset(GuiUtils.label("Soundings: ",
                 stationMenue), 8));
@@ -333,8 +364,8 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
     private void setStation(int index) throws VisADException,
             RemoteException {
         selectedStation.setPoint((RealTuple) latLons[index]);
-        initSounding(dataList.get(index));
         setLocation(latLons[index]);
+        initSounding(dataList.get(index));
     }
 }
 

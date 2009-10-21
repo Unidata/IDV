@@ -902,8 +902,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      */
     void setSounding(int index) throws VisADException, RemoteException {
 
-        if (tempProfiles != null) {
+        System.err.println ("setSounding: index=" +index +"  currIndex:" + currIndex);
 
+        if (tempProfiles != null) {
             /*
              * The following nested try-blocks ensure that the display
              * returns to its original state if an exception occurs.
@@ -1021,7 +1022,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             System.arraycopy(windPros, 0, windProfiles, 0, n);
         }
         Field[] tableSoundings = new Field[n];
-        hodoDisplay.clear();
+        //XXX        hodoDisplay.clear();
 
         for (int i = 0; i < n; i++) {
             if ((i == 0) && (windProfiles[i] != null)) {
@@ -1039,12 +1040,12 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 //visad.python.JPythonMethods.dumpTypes(windProfiles[i]);
             }
             if (showUVCbx != null) {
-                showUVCbx.setEnabled(haveWinds);
+        //XXX                showUVCbx.setEnabled(haveWinds);
             }
             aeroDisplay.addProfile(i, tempProfiles[i], dewProfiles[i],
                                    windProfiles[i]);
             if (haveWinds) {
-                hodoDisplay.addProfile(i, windProfiles[i]);
+        //XXX                hodoDisplay.addProfile(i, windProfiles[i]);
             }
             if ( !haveWinds) {
                 tableSoundings[i] = FieldImpl.combine(new Field[] {
@@ -1058,6 +1059,11 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         }
 
         aeroDisplay.setProfileVisible(currIndex, true);
+
+
+        if(true) return;
+
+
         if (haveWinds) {
             hodoDisplay.setProfileVisible(currIndex, true);
         }
@@ -1067,7 +1073,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             viewTabs.setEnabledAt(viewTabs.indexOfTab(HODOGRAPH_DISPLAY),
                                   haveWinds);
         }
-        setSounding(currIndex);
+
+
+        //        setSounding(currIndex);
     }
 
     /**
