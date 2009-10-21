@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -438,6 +439,8 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
             exc.printStackTrace();
         }
     }
+
+
 
 
     /**
@@ -3143,6 +3146,12 @@ Misc.run(new Runnable() {
         CacheManager.printStats();
     }
 
+    /**
+     * _more_
+     */
+    public void printDataCacheStats() {
+        visad.DataCacheManager.getCacheManager().printStats();
+    }
 
     /**
      * Apply preferences.
