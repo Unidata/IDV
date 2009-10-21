@@ -230,6 +230,11 @@
        />
 -->
 
+     <menuitem
+       label="Print Data Cache Stats"
+       action="jython:idv.printDataCacheStats()"
+        />
+
 
      <menuitem
         icon="/auxdata/ui/icons/help.png"
