@@ -28,6 +28,7 @@ package ucar.unidata.idv.control;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.radar.RadarConstants;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
@@ -35,6 +36,7 @@ import ucar.unidata.idv.DisplayInfo;
 import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.util.Range;
+import ucar.unidata.util.LogUtil;
 import ucar.visad.RadarMapProjection;
 import ucar.visad.display.CrossSectionSelector;
 import ucar.visad.display.SelectorDisplayable;
@@ -43,6 +45,7 @@ import visad.bom.Radar3DCoordinateSystem;
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
+import visad.georef.MapProjection;
 
 import java.beans.PropertyChangeEvent;
 import java.rmi.RemoteException;
@@ -80,8 +83,11 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
             setVerticalAxisRange(new Range(0, 20000));
 
             loadDataFromLine();
+            GridDataInstance ginst = getGridDataInstance();
+            if(ginst == null)
+                return;
             FieldImpl fieldImpl =
-                (FieldImpl) (getGridDataInstance().getGrid()).getSample(0);
+                (FieldImpl) (ginst.getGrid()).getSample(0);
             GriddedSet domainSet =
                 (GriddedSet) GridUtil.getSpatialDomain(fieldImpl);
             Unit   xUnit     = domainSet.getSetUnits()[0];
@@ -114,7 +120,7 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
             RemoteException {
         if ( !super.setData(choice)) {
             System.out.println("set data is false");
-            //return false;
+            return false;
         }
         dataIs3D = true;
         updateCenterPoint();
@@ -219,8 +225,14 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
                                    new Boolean(true));
         if ((startLocation == null) || (endLocation == null)) {
             MapViewManager mm = getMapViewManager();
-            RadarMapProjection rp =
-                (RadarMapProjection) mm.getMainProjection();
+            MapProjection mp =mm.getMainProjection();
+            RadarMapProjection rp ;
+            try{
+                rp = (RadarMapProjection) mp;
+            } catch (ClassCastException ce) {
+                LogUtil.consoleMessage("Radar projection cast error\n");
+                return;
+            }
             LatLonPoint llp = rp.getCenterLatLon();
             initLinePosition((float) llp.getLatitude().getValue(),
                              (float) llp.getLongitude().getValue());
@@ -294,13 +306,15 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
         EarthLocation[] elArray = getLineCoords();
         startLocation = elArray[0];
         endLocation   = elArray[1];
-
-        getGridDataInstance().reInitialize();
-        FieldImpl grid = getGridDataInstance().getGrid();
-        if (grid == null) {
+        GridDataInstance ginst = getGridDataInstance();
+        if (ginst == null) {
             return;
         }
+        ginst.reInitialize();
+
+        FieldImpl grid = ginst.getGrid();
         loadData(grid);
+
 
     }
 
@@ -323,6 +337,7 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
         setCSLineLength(defaultLen);
 
         setRequestProperties();
+
     }
 
     /**
@@ -385,8 +400,13 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
     protected void updateCenterPoint() throws VisADException,
             RemoteException {
 
+        GridDataInstance ginst = getGridDataInstance();
+        if(ginst == null)
+              return;
+        FieldImpl fieldImpl = ginst.getGrid();
+
         GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(
-                                   getGridDataInstance().getGrid());
+                                   fieldImpl);
 
         // Get location for label of control window
         Radar3DCoordinateSystem transform =
