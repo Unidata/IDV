@@ -20,6 +20,7 @@
 
 
 
+
 package ucar.unidata.idv.ui;
 
 
@@ -168,8 +169,8 @@ public class IdvUIManager extends IdvManager {
     public static ImageIcon ICON_REMOVE;
 
     static {
-        ICON_REMOVE = new ImageIcon(
-            Resource.getImage("/auxdata/ui/icons/delete.png"));
+        ICON_REMOVE =
+            new ImageIcon(Resource.getImage("/auxdata/ui/icons/delete.png"));
         ICON_LOCK = new ImageIcon(
             Resource.getImage("/ucar/unidata/idv/images/lock.png"));
         ICON_UNLOCK = new ImageIcon(
@@ -404,7 +405,8 @@ public class IdvUIManager extends IdvManager {
     /** The different menu ids */
     private Hashtable menuIds;
 
-    private Hashtable<String,ImageIcon> actionIcons;
+    /** _more_          */
+    private Hashtable<String, ImageIcon> actionIcons;
 
 
     /** List of action groups */
@@ -538,8 +540,9 @@ public class IdvUIManager extends IdvManager {
             getProperty("idv.animation.bigicon", false);
 
 
-        GuiUtils.setIconsInMenus(getIdv().getStateManager().getPreferenceOrProperty(
-                                                                                    "idv.ui.iconsinmenus","true").equals("true"));
+        GuiUtils.setIconsInMenus(
+            getIdv().getStateManager().getPreferenceOrProperty(
+                "idv.ui.iconsinmenus", "true").equals("true"));
         UIDefaults defaults = UIManager.getDefaults();
         JLabel     tmp      = new JLabel("");
 
@@ -550,14 +553,15 @@ public class IdvUIManager extends IdvManager {
             (String) getIdv().getStateManager().getPreferenceOrProperty(
                 "idv.ui.fontsize");
         // check for empty String
-        if (fontSize != null && fontSize.trim().length() == 0) fontSize = null;
+        if ((fontSize != null) && (fontSize.trim().length() == 0)) {
+            fontSize = null;
+        }
 
 
         if (iconSize != null) {
             String tmpSize = iconSize.toString().trim();
-            if(tmpSize.length()>0) {
-                GuiUtils.setDefaultIconSize(
-                                            new Integer(tmpSize).intValue());
+            if (tmpSize.length() > 0) {
+                GuiUtils.setDefaultIconSize(new Integer(tmpSize).intValue());
             }
         }
 
@@ -992,9 +996,9 @@ public class IdvUIManager extends IdvManager {
         }
 
 
-        actionIcons = new Hashtable<String,ImageIcon>();
-        actionMap  = new Hashtable();
-        actionList = new ArrayList();
+        actionIcons = new Hashtable<String, ImageIcon>();
+        actionMap   = new Hashtable();
+        actionList  = new ArrayList();
         XmlResourceCollection xrc = getResourceManager().getXmlResources(
                                         getResourceManager().RSC_ACTIONS);
 
@@ -1020,14 +1024,15 @@ public class IdvUIManager extends IdvManager {
                     actionGroupList.add(group);
                 }
                 groupList.add(actionNode);
-                String image = XmlUtil.getAttribute(actionNode,ATTR_IMAGE,(String)null);
-                if(image!=null) {
+                String image = XmlUtil.getAttribute(actionNode, ATTR_IMAGE,
+                                   (String) null);
+                if (image != null) {
                     ImageIcon icon = GuiUtils.getImageIcon(image, true);
-                    if(icon!=null) {
-                        actionIcons.put("action:" +id,icon);
+                    if (icon != null) {
+                        actionIcons.put("action:" + id, icon);
                     }
                 }
-                
+
 
                 //                System.out.println("<li><b>" + id +"</b><br>" + XmlUtil.getAttribute(actionNode, ATTR_DESCRIPTION));
             }
@@ -1197,10 +1202,17 @@ public class IdvUIManager extends IdvManager {
 
 
 
+    /**
+     * Is this running on a Mac?
+     *
+     * @return true if running on Mac
+     */
     public boolean isMac() {
-	String os = System.getProperty("os.name");
-	if(os!=null && os.toLowerCase().indexOf("mac")>=0) return true;
-	return false;
+        String os = System.getProperty("os.name");
+        if ((os != null) && (os.toLowerCase().indexOf("mac") >= 0)) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -1573,33 +1585,39 @@ public class IdvUIManager extends IdvManager {
      *
      * @param id Id of the menu
      * @param menu The menu
+     * @param idvWindow  the IDV window
      */
-    protected void handleMenuSelected(String id, JMenu menu,IdvWindow idvWindow) {
+    protected void handleMenuSelected(String id, JMenu menu,
+                                      IdvWindow idvWindow) {
         if (id.equals("file.new")) {
-            if(idvWindow==null) return;
-            List<IdvComponentGroup> groups =idvWindow.getComponentGroups();
-            if(groups.size()==0) return;
-            int i=0;
+            if (idvWindow == null) {
+                return;
+            }
+            List<IdvComponentGroup> groups = idvWindow.getComponentGroups();
+            if (groups.size() == 0) {
+                return;
+            }
+            int i = 0;
             //a hack to remove the last group menu we created
-            while(i< menu.getItemCount()) {
+            while (i < menu.getItemCount()) {
                 JMenuItem mi = menu.getItem(i);
-                if(mi.getLabel().startsWith("Group:")) {
+                if (mi.getLabel().startsWith("Group:")) {
                     menu.remove(mi);
                     break;
                 }
                 i++;
             }
 
-            for(IdvComponentGroup group: groups) {
+            for (IdvComponentGroup group : groups) {
                 List items = new ArrayList();
                 group.getPopupMenuItems(items);
                 JMenu groupMenu = new JMenu("Group: " + group.getName());
                 GuiUtils.makeMenu(groupMenu, items);
-                menu.insert(groupMenu,0);
+                menu.insert(groupMenu, 0);
             }
         } else if (id.equals(MENU_WINDOWS)) {
             menu.removeAll();
-            makeWindowsMenu(menu,idvWindow);
+            makeWindowsMenu(menu, idvWindow);
         } else if (id.equals("file.newdata") || id.equals("data.newdata")) {
             menu.removeAll();
             GuiUtils.makeMenu(
@@ -1658,8 +1676,10 @@ public class IdvUIManager extends IdvManager {
      *
      * @param id Id of the menu
      * @param menu The menu
+     * @param idvWindow  the IDV window
      */
-    protected void handleMenuDeSelected(String id, JMenu menu,IdvWindow idvWindow) {
+    protected void handleMenuDeSelected(String id, JMenu menu,
+                                        IdvWindow idvWindow) {
         if (id.equals(MENU_DISPLAYS)) {
             menu.removeAll();
         } else if (id.equals(MENU_DATA)) {
@@ -1693,6 +1713,8 @@ public class IdvUIManager extends IdvManager {
      * Make the menu bar and menus for the given IdvWindow. Use the set of xml menu files
      * defined by the menubarResources member
      *
+     *
+     * @param idvWindow  the IDV window
      * @return The menu bar we just created
      */
     public JMenuBar doMakeMenuBar(final IdvWindow idvWindow) {
@@ -1707,7 +1729,7 @@ public class IdvUIManager extends IdvManager {
         initActions();
         for (int i = 0; i < xrc.size(); i++) {
             GuiUtils.processXmlMenuBar(xrc.getRoot(i), menuBar, getIdv(),
-                                       menuMap,actionIcons);
+                                       menuMap, actionIcons);
         }
 
         JMenu helpMenu = (JMenu) menuMap.get(MENU_HELP);
@@ -1773,11 +1795,11 @@ public class IdvUIManager extends IdvManager {
                 public void menuCanceled(MenuEvent e) {}
 
                 public void menuDeselected(MenuEvent e) {
-                    handleMenuDeSelected(menuId, menu,idvWindow);
+                    handleMenuDeSelected(menuId, menu, idvWindow);
                 }
 
                 public void menuSelected(MenuEvent e) {
-                    handleMenuSelected(menuId, menu,idvWindow);
+                    handleMenuSelected(menuId, menu, idvWindow);
                 }
             });
         }
@@ -2027,9 +2049,12 @@ public class IdvUIManager extends IdvManager {
      * and allows the user to show them.
      *
      * @param menu windows menu
+     * @param idvWindow  the IDV window
      */
-    public void makeWindowsMenu(JMenu menu,IdvWindow idvWindow) {
-        IdvWindow activeWindow = (idvWindow!=null?idvWindow:IdvWindow.getActiveWindow());
+    public void makeWindowsMenu(JMenu menu, IdvWindow idvWindow) {
+        IdvWindow activeWindow = ((idvWindow != null)
+                                  ? idvWindow
+                                  : IdvWindow.getActiveWindow());
         if (activeWindow != null) {
             makeWindowMenu(activeWindow, menu);
         }
@@ -2101,31 +2126,31 @@ public class IdvUIManager extends IdvManager {
         }
 
         for (int i = 0; i < vms.size(); i++) {
-            Object vpObject = vms.get(i);
-            TwoFacedObject tfo = null;
-            if(vpObject instanceof TwoFacedObject) { 
+            Object         vpObject = vms.get(i);
+            TwoFacedObject tfo      = null;
+            if (vpObject instanceof TwoFacedObject) {
                 tfo = (TwoFacedObject) vpObject;
                 ViewManager that = (ViewManager) tfo.getId();
-                if(!vm.isCompatibleWith(that)) {
+                if ( !vm.isCompatibleWith(that)) {
                     continue;
                 }
-            } else if(vpObject instanceof ViewState) {
-                if(!vm.isCompatibleWith((ViewState)vpObject)) {
+            } else if (vpObject instanceof ViewState) {
+                if ( !vm.isCompatibleWith((ViewState) vpObject)) {
                     continue;
                 }
-                tfo = new TwoFacedObject(((ViewState)vpObject).getName(),
+                tfo = new TwoFacedObject(((ViewState) vpObject).getName(),
                                          vpObject);
             }
-            JMenuItem      mi  = new JMenuItem(tfo.getLabel().toString());
+            JMenuItem mi = new JMenuItem(tfo.getLabel().toString());
             menu.add(mi);
             mi.addActionListener(new ObjectListener(tfo.getId()) {
                 public void actionPerformed(ActionEvent ae) {
                     if (vm == null) {
                         ViewManager otherView = (ViewManager) theObject;
                     } else {
-                        if(theObject instanceof ViewManager) {
+                        if (theObject instanceof ViewManager) {
                             vm.initWith((ViewManager) theObject, true);
-                        } else if(theObject instanceof ViewState) {
+                        } else if (theObject instanceof ViewState) {
                             try {
                                 vm.initWith((ViewState) theObject);
                             } catch (Throwable exc) {
@@ -2152,13 +2177,15 @@ public class IdvUIManager extends IdvManager {
             menu.add(new JMenuItem(Msg.msg("No Saved Views")));
         }
         for (int i = 0; i < vms.size(); i++) {
-            String label="";
-            Object  o = vms.get(i);
-            if(o instanceof TwoFacedObject) {
-                label = ((TwoFacedObject)o).getLabel().toString();
-            } else if(o instanceof ViewState) {
-                ViewState viewState = (ViewState)o;
-                if(!viewState.getIsLocal()) continue;
+            String label = "";
+            Object o     = vms.get(i);
+            if (o instanceof TwoFacedObject) {
+                label = ((TwoFacedObject) o).getLabel().toString();
+            } else if (o instanceof ViewState) {
+                ViewState viewState = (ViewState) o;
+                if ( !viewState.getIsLocal()) {
+                    continue;
+                }
                 label = viewState.getName();
             }
 
@@ -2519,8 +2546,12 @@ public class IdvUIManager extends IdvManager {
     public void processBundle(SavedBundle bundle) {
         showWaitCursor();
         LogUtil.message("Loading bundle: " + bundle.getName());
-        getPersistenceManager().decodeXmlFile(bundle.getUrl(),
-                bundle.getName(), (bundle.getType() == SavedBundle.TYPE_FAVORITE));
+        boolean ok = getPersistenceManager().decodeXmlFile(bundle.getUrl(),
+                         bundle.getName(),
+                         (bundle.getType() == SavedBundle.TYPE_FAVORITE));
+        if (ok && (bundle.getType() == SavedBundle.TYPE_DATA)) {
+            showDataSelector();
+        }
         LogUtil.message("");
         showNormalCursor();
     }
@@ -2676,7 +2707,10 @@ public class IdvUIManager extends IdvManager {
             List menuItems = NamedStationTable.makeMenuItems(stations,
                                  listener);
             if (makeNew) {
-                displayMenu.add(GuiUtils.setIcon(GuiUtils.makeMenu("Locations", menuItems),"/auxdata/ui/icons/world_loc.png"));
+                displayMenu.add(
+                    GuiUtils.setIcon(
+                        GuiUtils.makeMenu("Locations", menuItems),
+                        "/auxdata/ui/icons/world_loc.png"));
             } else {
                 GuiUtils.makeMenu(displayMenu, menuItems);
             }
@@ -2724,8 +2758,8 @@ public class IdvUIManager extends IdvManager {
                 (ControlDescriptor) controlDescriptors.get(i);
             mi = new JMenuItem(cd.getLabel());
             String icon = cd.getIcon();
-            if(icon!=null) {
-                GuiUtils.setIcon(mi,icon);
+            if (icon != null) {
+                GuiUtils.setIcon(mi, icon);
             }
             mi.addActionListener(new ObjectListener(cd) {
                 public void actionPerformed(ActionEvent ev) {
@@ -2914,10 +2948,12 @@ public class IdvUIManager extends IdvManager {
      */
     private void updateToolbars() {
 
-        ImageIcon fileIcon =
-            GuiUtils.scaleImageIcon(GuiUtils.getImageIcon("/auxdata/ui/icons/page.png"));
-        ImageIcon catIcon =
-            GuiUtils.scaleImageIcon(GuiUtils.getImageIcon("/auxdata/ui/icons/folder.png"));
+        ImageIcon fileIcon = GuiUtils.scaleImageIcon(
+                                 GuiUtils.getImageIcon(
+                                     "/auxdata/ui/icons/page.png"));
+        ImageIcon catIcon = GuiUtils.scaleImageIcon(
+                                GuiUtils.getImageIcon(
+                                    "/auxdata/ui/icons/folder.png"));
         List windows = IdvWindow.getWindows();
         List bundles = getPersistenceManager().getBundles(
                            IdvPersistenceManager.BUNDLES_FAVORITES);
@@ -3123,9 +3159,12 @@ public class IdvUIManager extends IdvManager {
             menuItems.add(mi);
         }
         menuItems.add(GuiUtils.MENU_SEPARATOR);
-        menuItems.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Save As Favorite",
-                                            getPersistenceManager(),
-                                                             "saveDataSource", dataSource),"/auxdata/ui/icons/Save16.gif"));
+        menuItems.add(
+            GuiUtils.setIcon(
+                GuiUtils.makeMenuItem(
+                    "Save As Favorite", getPersistenceManager(),
+                    "saveDataSource",
+                    dataSource), "/auxdata/ui/icons/Save16.gif"));
         menuItems.add(GuiUtils.makeMenuItem("Properties", dataSource,
                                             "showPropertiesDialog"));
 
@@ -3134,9 +3173,9 @@ public class IdvUIManager extends IdvManager {
 
 
     /**
-     * _more_
+     * Notify the data source of a change in state
      *
-     * @param dataSource _more_
+     * @param dataSource  the data source to notify
      */
     public void changeState(DataSource dataSource) {
         Misc.run(getPersistenceManager(), "changeState", dataSource);
@@ -3638,7 +3677,12 @@ public class IdvUIManager extends IdvManager {
 
 
         //TODO: turn off the memory monitor  when this window is closed.
-        MemoryMonitor mm = new MemoryMonitor(80, new Boolean(getStateManager().getPreferenceOrProperty(PROP_SHOWCLOCK,"true")).booleanValue());
+        MemoryMonitor mm = new MemoryMonitor(
+                               80,
+                               new Boolean(
+                                   getStateManager().getPreferenceOrProperty(
+                                       PROP_SHOWCLOCK,
+                                       "true")).booleanValue());
         //      mm.setLabelFont (DisplayConventions.getWindowLabelFont ());
         Border paddedBorder =
             BorderFactory.createCompoundBorder(getStatusBorder(),
@@ -3859,7 +3903,7 @@ public class IdvUIManager extends IdvManager {
             WindowInfo windowInfo = (WindowInfo) windows.get(newWindowIdx);
             windowInfo.setIsAMainWindow(true);
 
-            List       newVms     = windowInfo.getViewManagers();
+            List newVms = windowInfo.getViewManagers();
             newViewManagers.removeAll(newVms);
 
             boolean createANewOne = true;
@@ -3918,7 +3962,7 @@ public class IdvUIManager extends IdvManager {
     }
 
     /**
-     * _more_
+     * Dispose of all Windows
      */
     public void disposeAllWindows() {
         List allWindows = IdvWindow.getWindows();
@@ -4007,26 +4051,28 @@ public class IdvUIManager extends IdvManager {
         String  path     = null;
         String  skinName = null;
 
-        path = getIdv().getProperty("idv.ui.defaultskin",(String)null);
-        if(path != null) {
+        path = getIdv().getProperty("idv.ui.defaultskin", (String) null);
+        if (path != null) {
             path = path.trim();
         }
 
-        if(path != null&& path.length()>0) {
+        if ((path != null) && (path.length() > 0)) {
             try {
-            root = XmlUtil.getRoot(path,getClass());
-            skinName = getStateManager().getTitle();
-            String tmp = XmlUtil.getAttribute(root,"name",(String)null);
-            if(tmp==null) 
-                tmp = IOUtil.stripExtension(IOUtil.getFileTail(path));
-            skinName = skinName + " - " + tmp;
-            } catch(Exception exc) {
+                root     = XmlUtil.getRoot(path, getClass());
+                skinName = getStateManager().getTitle();
+                String tmp = XmlUtil.getAttribute(root, "name",
+                                 (String) null);
+                if (tmp == null) {
+                    tmp = IOUtil.stripExtension(IOUtil.getFileTail(path));
+                }
+                skinName = skinName + " - " + tmp;
+            } catch (Exception exc) {
                 logException("createNewWindow", exc);
             }
         }
 
 
-        if(root == null) {
+        if (root == null) {
             //First try to find the default skin
             for (int i = 0; (i < skins.size()) && (root == null); i++) {
                 if (Misc.equals(skins.getProperty("default", i), "true")) {
@@ -4264,9 +4310,9 @@ public class IdvUIManager extends IdvManager {
 
 
     /**
-     * _more_
+     * Get the component groups
      *
-     * @return _more_
+     * @return  the List of groups
      */
     public List getComponentGroups() {
         List groups     = new ArrayList();
@@ -5767,9 +5813,9 @@ public class IdvUIManager extends IdvManager {
 
 
     /**
-     * _more_
+     * Get the system info
      *
-     * @return _more_
+     * @return  the system info
      */
     public StringBuffer getSystemInfo() {
         StringBuffer extra = new StringBuffer();
@@ -5848,11 +5894,9 @@ public class IdvUIManager extends IdvManager {
         entries.add(new HttpFormEntry(HttpFormEntry.TYPE_INPUT, "subject",
                                       "Subject:"));
 
-        String nag = "<html><h3>In order for us to provide an effective response to your problem <font color=\"red\"><i>we need to have as much information as possible</i></font>.<br> Please provide a <i>thorough</i> description of the problem you encountered, including a description of what you were<br> trying to do, what data you were accessing, etc.</h3></html>" ;
-        entries.add(
-            new HttpFormEntry(
-                HttpFormEntry.TYPE_LABEL, "",
-                nag));
+        String nag =
+            "<html><h3>In order for us to provide an effective response to your problem <font color=\"red\"><i>we need to have as much information as possible</i></font>.<br> Please provide a <i>thorough</i> description of the problem you encountered, including a description of what you were<br> trying to do, what data you were accessing, etc.</h3></html>";
+        entries.add(new HttpFormEntry(HttpFormEntry.TYPE_LABEL, "", nag));
         entries.add(descriptionEntry =
             new HttpFormEntry(HttpFormEntry.TYPE_AREA, "description",
                               "Description:", description, 5, 30, true));
@@ -6233,7 +6277,7 @@ public class IdvUIManager extends IdvManager {
      * Popup a centering menu
      *
      * @param near component to popup near
-     * @param latLonWidget _more_
+     * @param latLonWidget  the lat/lon widget
      */
     public void popupCenterMenu(JComponent near,
                                 final LatLonWidget latLonWidget) {
@@ -6298,13 +6342,13 @@ public class IdvUIManager extends IdvManager {
     }
 
     /**
-     * _more_
+     * Make a location menu item
      *
-     * @param el _more_
-     * @param name _more_
-     * @param listener _more_
+     * @param el  the earth location
+     * @param name  a name
+     * @param listener  the listener
      *
-     * @return _more_
+     * @return  the menu
      */
     private JMenuItem makeLocationMenuItem(final EarthLocation el,
                                            final String name,
