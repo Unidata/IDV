@@ -72,11 +72,11 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="U"
      label="U component of wind"
-     aliases="u,U,GridRelative_u,u_sfc,u_wind,WesterlyWind,U_component_of_wind,U_component_of_wind_height_above_ground,Wind_Velocity_U_Component,U-component_of_wind,U_velocity,u_wind_height_above_ground,u-component_of_wind,U-component_of_wind_height_above_ground,UWND,UREL,UREL_PRES,UREL_HGHT,UREL_THTA,U-component_of_wind_weightedMean_pressure,UGRD_10maboveground,ugeo"/>
+     aliases="u,U,u_sfc,u_wind,WesterlyWind,U_component_of_wind,U_component_of_wind_height_above_ground,Wind_Velocity_U_Component,U-component_of_wind,U_velocity,u_wind_height_above_ground,u-component_of_wind,U-component_of_wind_height_above_ground,UWND,U-component_of_wind_weightedMean_pressure,UGRD_10maboveground,ugeo"/>
   <alias
      name="V"
      label="V component of wind"
-     aliases="v,V,GridRelative_v,v_sfc,v_wind,SoutherlyWind,V_component_of_wind,V_component_of_wind_height_above_ground,Wind_Velocity_V_Component,V-component_of_wind,V_velocity,v_wind_height_above_ground,v-component_of_wind,V-component_of_wind_height_above_ground,VWND,VREL,VREL_PRES,VREL_HGHT,VREL_THTA,V-component_of_wind_weightedMean_pressure,VGRD_10maboveground,vgeo"/>
+     aliases="v,V,v_sfc,v_wind,SoutherlyWind,V_component_of_wind,V_component_of_wind_height_above_ground,Wind_Velocity_V_Component,V-component_of_wind,V_velocity,v_wind_height_above_ground,v-component_of_wind,V-component_of_wind_height_above_ground,VWND,V-component_of_wind_weightedMean_pressure,VGRD_10maboveground,vgeo"/>
   <alias
      name="W"
      label="W component of wind"
