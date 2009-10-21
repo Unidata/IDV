@@ -411,7 +411,9 @@ public class ThreddsHandler extends XmlHandler {
                 if (n.getTagName().equals(CatalogUtil.TAG_DOCPARENT)) {
                     return "Documentation";
                 }
-                return super.getLabel(n);
+                String lbl =super.getLabel(n);
+                lbl = lbl.replace("_"," ");
+                return lbl;
             }
 
             public void doDoubleClick(XmlTree theTree,
