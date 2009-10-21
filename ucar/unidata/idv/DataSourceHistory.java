@@ -78,7 +78,7 @@ public class DataSourceHistory extends History {
      */
     public int hashCode() {
         return super.hashCode() ^ Misc.hashcode(dataSourceXml)
-               ^ Misc.hashcode(dataSourceXml);
+               ^ Misc.hashcode(dataSourceIdentifier);
     }
 
     /**

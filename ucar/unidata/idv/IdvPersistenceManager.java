@@ -20,6 +20,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -1628,7 +1629,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         if (bundleType == BUNDLES_FAVORITES) {
             JMenuItem mi = new JMenuItem("Save As Favorite...");
             mi.setMnemonic(GuiUtils.charToKeyCode("S"));
-            GuiUtils.setIcon(mi,"/auxdata/ui/icons/disk_multiple.png");
+            GuiUtils.setIcon(mi, "/auxdata/ui/icons/disk_multiple.png");
             bundleMenu.add(mi);
             mi.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
@@ -2982,6 +2983,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             boolean showDialog, boolean shouldMerge,
             Hashtable bundleProperties, boolean didRemoveAll,
             boolean letUserChangeData) {
+
         LoadBundleDialog loadDialog = new LoadBundleDialog(this, label);
         boolean          inError    = false;
 
@@ -3000,6 +3002,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
 
         getStateManager().putProperty(PROP_LOADINGXML, true);
+        DataSource datasource = null;
         try {
             xml = applyPropertiesToBundle(xml);
             if (xml == null) {
@@ -3021,8 +3024,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                             properties);
                     loadDialog.addDisplayControl((DisplayControl) data);
                 } else if (data instanceof DataSource) {
-                    getIdv().getDataManager().addDataSource(
-                        (DataSource) data);
+                    datasource = (DataSource) data;
+                    getIdv().getDataManager().addDataSource(datasource);
                 } else if (data instanceof ColorTable) {
                     getColorTableManager().doImport(data, true);
                 } else {
@@ -3058,7 +3061,18 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
         if ( !inError && getIdv().getInteractiveMode()) {
             if (xmlFile != null) {
-                getIdv().addToHistoryList(xmlFile);
+
+                if (datasource != null) {
+                    String identifier = datasource.getClass().getName() + "_"
+                                        + xmlFile;
+                    identifier = new String(
+                        XmlUtil.encodeBase64(identifier.getBytes()));
+                    getIdv().addToHistoryList(
+                        new DataSourceHistory(
+                            datasource.toString(), xml, identifier));
+                } else {
+                    getIdv().addToHistoryList(xmlFile);
+                }
             }
         }
 
@@ -3079,6 +3093,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         }
 
         loadDialog.clear();
+
 
     }
 
@@ -3325,57 +3340,57 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             } else {
                 JLabel label =
                     new JLabel(
-                               "<html>The bundle contained the following jython library.<p>&nbsp;&nbsp; What would you like to do with this?<br></html>");
+                        "<html>The bundle contained the following jython library.<p>&nbsp;&nbsp; What would you like to do with this?<br></html>");
                 final JDialog dialog =
                     GuiUtils.createDialog("Load Jython Library", true);
 
                 final JTextArea textArea = new JTextArea(jython);
                 textArea.setEditable(false);
 
-                JButton dontLoadBtn    = new JButton("Don't load it");
-                JButton addItBtn       =
-                    new JButton("Add it to my local library");
-                JButton addTmpBtn = new JButton("Add it to my temporary library");
+                JButton dontLoadBtn = new JButton("Don't load it");
+                JButton addItBtn = new JButton("Add it to my local library");
+                JButton addTmpBtn =
+                    new JButton("Add it to my temporary library");
                 JButton addSelectedBtn = new JButton("Add selected text");
 
 
                 addItBtn.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent ae) {
-                            getJythonManager().appendJythonFromBundle(theJython);
-                            dialog.dispose();
-                        }
-                    });
+                    public void actionPerformed(ActionEvent ae) {
+                        getJythonManager().appendJythonFromBundle(theJython);
+                        dialog.dispose();
+                    }
+                });
 
 
                 addTmpBtn.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent ae) {
-                            getJythonManager().appendTmpJython(theJython);
-                            dialog.dispose();
-                        }
-                    });
+                    public void actionPerformed(ActionEvent ae) {
+                        getJythonManager().appendTmpJython(theJython);
+                        dialog.dispose();
+                    }
+                });
 
                 addSelectedBtn.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent ae) {
-                            String text = textArea.getSelectedText();
-                            if ((text != null) && (text.length() > 0)) {
-                                getJythonManager().appendJythonFromBundle(text);
-                            }
-                            dialog.dispose();
+                    public void actionPerformed(ActionEvent ae) {
+                        String text = textArea.getSelectedText();
+                        if ((text != null) && (text.length() > 0)) {
+                            getJythonManager().appendJythonFromBundle(text);
                         }
-                    });
+                        dialog.dispose();
+                    }
+                });
                 dontLoadBtn.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent ae) {
-                            dialog.dispose();
-                        }
-                    });
-                JPanel buttons = GuiUtils.hbox(Misc.newList(addItBtn, addTmpBtn,
-                                                            addSelectedBtn, dontLoadBtn), 5);
-                JPanel comp = GuiUtils.topCenter(
-                                                 GuiUtils.inset(
-                                                                GuiUtils.vbox(
-                                                                              GuiUtils.inset(label, 5),
-                                                                              buttons), 5), GuiUtils.makeScrollPane(
-                                                                                                                    textArea, 300, 500));
+                    public void actionPerformed(ActionEvent ae) {
+                        dialog.dispose();
+                    }
+                });
+                JPanel buttons = GuiUtils.hbox(Misc.newList(addItBtn,
+                                     addTmpBtn, addSelectedBtn,
+                                     dontLoadBtn), 5);
+                JPanel comp =
+                    GuiUtils.topCenter(
+                        GuiUtils.inset(
+                            GuiUtils.vbox(GuiUtils.inset(label, 5), buttons),
+                            5), GuiUtils.makeScrollPane(textArea, 300, 500));
                 dialog.getContentPane().add(comp);
                 GuiUtils.showInCenter(dialog);
             }
