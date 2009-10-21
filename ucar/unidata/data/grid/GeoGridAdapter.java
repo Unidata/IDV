@@ -1120,15 +1120,13 @@ public class GeoGridAdapter {
     private CachedFlatField getFlatField(int timeIndex, String readLabel)
             throws VisADException {
 
-        String filename = IOUtil.joinDir(dataSource.getDataCachePath(),
-                                         cacheFile + "_t_" + timeIndex
-                                         + ".dat");
-        List cacheKey = Misc.newList(filename);
+        String baseCacheKey =      "t_" + timeIndex;
+        List cacheKey = Misc.newList(baseCacheKey);
         if (extraCacheKey != null) {
             cacheKey.add(extraCacheKey);
         }
-        CachedFlatField retField =
-            (CachedFlatField) dataSource.getCache(cacheKey);
+
+        CachedFlatField retField = null;
         if (retField != null) {
             //            System.err.println("in cache");
             return retField;
@@ -1246,11 +1244,7 @@ public class GeoGridAdapter {
                                         readLockToUse, timeIndex, domainSet,
                                         ffType);
 
-            if (dataSource.getCacheDataToDisk() && (cacheFile != null)) {
-                ggff.setCacheFile(filename);
-                ggff.setShouldCache(true);
-                ggff.setCacheClearDelay(dataSource.getCacheClearDelay());
-            }
+
             ggff.setReadLabel(readLabel);
             retField = ggff;
             //Not sure why we had this here since this forces a data read

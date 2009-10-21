@@ -3530,6 +3530,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @param cff _more_
      */
     private void initCachedFlatField(CachedFlatField cff) {
+        /*
         if (dataSource.getCacheDataToDisk()) {
             String filename = IOUtil.joinDir(dataSource.getDataCachePath(),
                                              Misc.getUniqueId() + ".dat");
@@ -3539,6 +3540,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         } else {
             cff.setShouldCache(false);
         }
+        */
     }
 
 

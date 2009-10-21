@@ -308,11 +308,7 @@ public class DataManager {
                 IdvResourceManager.RSC_DATASOURCE));
 
         loadIospResources(resourceManager);
-        CachedFlatField.setCacheDir(new File(getDataCacheDirectory()));
-        CachedFlatField.setCacheThreshold(
-            dataContext.getObjectStore().get(
-                IdvConstants.PREF_FIELD_CACHETHRESHOLD, 1000000));
-
+        visad.DataCacheManager.getCacheManager().setCacheDir(new File(getDataCacheDirectory()));
 
         String nj22TmpFile =
             IOUtil.joinDir(

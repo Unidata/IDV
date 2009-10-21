@@ -304,9 +304,6 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
         aiff.aid         = aid;
         cs.aiff          = aiff;
         aiff.startTime   = new DateTime(areaDirectory.getStartTime());
-        aiff.setCacheClearDelay(cacheClearDelay);
-        aiff.setCacheFile(cacheFile);
-        aiff.setShouldCache(shouldCache);
         return aiff;
     }
 
@@ -332,7 +329,7 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
     private int[] dir;
 
     private String getDirNavAuxFile() {
-        String file = getCacheFile();
+        String file = DataCacheManager.getCacheManager().getCacheFile().toString();
         if(file!=null)
             return file + ".dirnavaux";
         return null;
