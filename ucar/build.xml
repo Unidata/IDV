@@ -132,6 +132,8 @@ argument -Dfoo=bar) -->
 
         <unjar src="${libsdir}/commons-net-1.4.1.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/abom.jar" dest="${tmpjardir}"/>
+
+        <unjar src="${libsrc}/AppleJavaExtensions.jar" dest="${tmpjardir}"/>
         <jar 
             basedir="${tmpjardir}"
             compress="true"
