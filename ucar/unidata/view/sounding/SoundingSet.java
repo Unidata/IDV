@@ -153,7 +153,7 @@ public class SoundingSet extends CompositeDisplayable {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    public synchronized void addSounding(Sounding sounding)
+    public void addSounding(Sounding sounding)
             throws RemoteException, VisADException {
         addSounding(displayableCount(), sounding);
     }
@@ -166,7 +166,7 @@ public class SoundingSet extends CompositeDisplayable {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    public synchronized void addSounding(int index, Sounding sounding)
+    public void addSounding(int index, Sounding sounding)
             throws RemoteException, VisADException {
         setDisplayable(index, sounding);
         sounding.setConstrainProfiles(constrainProfiles);

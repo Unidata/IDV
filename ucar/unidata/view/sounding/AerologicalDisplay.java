@@ -890,11 +890,15 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
                            Field windProfile)
             throws VisADException, RemoteException {
 
-        Sounding sounding = new Sounding(getDisplay());
 
+        Sounding sounding = (Sounding) soundings.getDisplayable(index);
+        if(sounding==null) {
+            sounding = new Sounding(getDisplay());
+            soundings.addSounding(index, sounding);
+        }
         sounding.setFields(temperature, dewPoint);
-        sounding.setVisible(false);
-        soundings.addSounding(index, sounding);
+        //        sounding.setVisible(false);
+        //        soundings.addSounding(index, sounding);
         WindBarbProfile windBarbs = new WindBarbProfile(getDisplay(),
                                         getCoordinateSystem());
         Field ff = vetWinds(windProfile);

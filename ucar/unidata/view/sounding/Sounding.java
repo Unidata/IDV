@@ -159,13 +159,12 @@ public class Sounding extends CompositeDisplayable {
                          * The following logic is necessary to prevent an
                          * infinite loop.
                          */
-                        synchronized (constraintLock) {
+                        //jeffmc                        synchronized (constraintLock) {
                             if (constrainTemperatures) {
                                 constrainTemperatures();
                             }
-
                             constrainTemperatures = !constrainTemperatures;
-                        }
+                            //                        }
                     }
                 } catch (Exception e) {
                     System.err.println(
@@ -202,13 +201,13 @@ public class Sounding extends CompositeDisplayable {
                          * The following logic is necessary to prevent an
                          * infinite loop.
                          */
-                        synchronized (constraintLock) {
+                        //                        synchronized (constraintLock) {
                             if (constrainDewPoints) {
                                 constrainDewPoints();
                             }
 
                             constrainDewPoints = !constrainDewPoints;
-                        }
+                            //                        }
                     }
                 } catch (Exception e) {
                     System.err.println(
@@ -441,9 +440,12 @@ public class Sounding extends CompositeDisplayable {
      * @throws RemoteException  Java RMI failure.
      */
     private static void constrainProfile(
-            Profile profile1, Constraint constraint,
-            Profile profile2) throws VisADException, RemoteException {
+                                         final Profile profile1,final Constraint constraint,
+                                         final Profile profile2) throws VisADException, RemoteException {
 
+        //jeffmc
+        //For now don't do this as it is triggering a deadlock
+        if(true) return;
         if ( !profile1.getActive()) {
             return;  // avoid deadlock
         }
@@ -451,7 +453,7 @@ public class Sounding extends CompositeDisplayable {
 
         Field field1 = profile1.getProfile();
         Field field2 = profile2.getProfile().resample(field1.getDomainSet(),
-                           Data.WEIGHTED_AVERAGE, Data.NO_ERRORS);
+                                                      Data.WEIGHTED_AVERAGE, Data.NO_ERRORS);
         int      sampleCount = field1.getLength();
         MathType type1       = ((FunctionType) field1.getType()).getRange();
 
