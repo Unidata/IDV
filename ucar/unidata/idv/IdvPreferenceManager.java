@@ -388,14 +388,10 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             }
 
 
-            if (key.equals(PREF_MAXIMAGESIZE)
-                    || key.equals(PREF_FIELD_CACHETHRESHOLD)) {
+            if (key.equals(PREF_MAXIMAGESIZE)) {
                 int value = (int) Misc.parseNumber(
                                 (((JTextField) widget).getText().trim()));
                 store.put(key, value);
-                if (key.equals(PREF_FIELD_CACHETHRESHOLD)) {
-                    ucar.visad.data.CachedFlatField.setCacheThreshold(value);
-                }
                 continue;
             }
             if (key.equals(PREF_SITEPATH)) {
@@ -1155,22 +1151,6 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         widgets.put(PREF_MAXIMAGESIZE, imageSizeFld);
         formatComps.add(GuiUtils.left(GuiUtils.hbox(imageSizeFld,
                 new JLabel(" (Pixels, -1=no limit)"))));
-
-
-        formatComps.add(GuiUtils.rLabel("Grid Threshold:"));
-        JTextField thresholdFld = new JTextField(
-                                      Misc.format(
-                                          getStore().get(
-                                              PREF_FIELD_CACHETHRESHOLD,
-                                              1000000)), 7);
-        widgets.put(PREF_FIELD_CACHETHRESHOLD, thresholdFld);
-        formatComps.add(
-            GuiUtils.left(
-                GuiUtils.hbox(
-                    thresholdFld,
-                    new JLabel(
-                        " (Bytes, cache grids larger than this to disk)"))));
-
 
 
 
