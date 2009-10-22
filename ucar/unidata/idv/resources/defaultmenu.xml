@@ -234,6 +234,10 @@
        label="Print Data Cache Stats"
        action="jython:idv.printDataCacheStats()"
         />
+     <menuitem
+       label="Flush Cache"
+       action="jython:idv.flushDataCache()"
+        />
 
 
      <menuitem

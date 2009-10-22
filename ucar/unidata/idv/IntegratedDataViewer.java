@@ -3156,6 +3156,11 @@ Misc.run(new Runnable() {
         visad.DataCacheManager.getCacheManager().printStats();
     }
 
+    public void flushDataCache() {
+        visad.DataCacheManager.getCacheManager().flushAllCachedData();
+    }
+
+
     /**
      * Apply preferences.
      */

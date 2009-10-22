@@ -138,6 +138,8 @@ public class DataManager {
     /** The show in tree property */
     public static final String PROP_SHOW_IN_TREE = "show_in_tree";
 
+    public static final String PROP_CACHE_PERCENT = "idv.data.cache.percent";
+
     /** bbox property */
     public static final String PROP_GEOSUBSET_BBOX =
         "idv.data.geosubset.bbox";
@@ -309,6 +311,8 @@ public class DataManager {
 
         loadIospResources(resourceManager);
         visad.DataCacheManager.getCacheManager().setCacheDir(new File(getDataCacheDirectory()));
+        visad.DataCacheManager.getCacheManager().setMemoryPercent(dataContext.getIdv().getStateManager().getPreferenceOrProperty(PROP_CACHE_PERCENT, 0.25));
+
 
         String nj22TmpFile =
             IOUtil.joinDir(

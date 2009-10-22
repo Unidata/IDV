@@ -53,8 +53,8 @@ public class CachedGridded2DSet extends Gridded2DSet {
     }
 
     public void finalize()  throws Throwable {
-        super.finalize();
         DataCacheManager.getCacheManager().removeFromCache(cacheId);
+        super.finalize();
     }
 
     protected void setMySamples(float[][]samples) {

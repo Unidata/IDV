@@ -28,6 +28,7 @@ package ucar.unidata.idv;
 import org.w3c.dom.Element;
 
 import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.DataManager;
 
 import ucar.unidata.idv.control.DisplayControlImpl;
 
@@ -392,6 +393,14 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                 int value = (int) Misc.parseNumber(
                                 (((JTextField) widget).getText().trim()));
                 store.put(key, value);
+                continue;
+            }
+
+            if (key.equals(DataManager.PROP_CACHE_PERCENT)) {
+                double value = (double) Misc.parseNumber(
+                                                         (((JTextField) widget).getText().trim()))/100.0;
+                store.put(key, value);
+                visad.DataCacheManager.getCacheManager().setMemoryPercent(value);
                 continue;
             }
             if (key.equals(PREF_SITEPATH)) {
@@ -1102,13 +1111,13 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                                                true));
         widgets.put(PREF_DOCACHE, cacheCbx);
 
-        JTextField cacheSizeFld =
+        JTextField diskCacheSizeFld =
             new JTextField(Misc.format(getStore().get(PREF_CACHESIZE, 20.0)),
                            5);
         List cacheComps =
-            Misc.newList(new JLabel("   Disk Cache Size: "), cacheSizeFld,
+            Misc.newList(new JLabel("   Disk Cache Size: "), diskCacheSizeFld,
                          new JLabel(" (MB)  (for temporary files)"));
-        widgets.put(PREF_CACHESIZE, cacheSizeFld);
+        widgets.put(PREF_CACHESIZE, diskCacheSizeFld);
 
         Vector threadCnt = new Vector();
         for(int i=1;i<=Runtime.getRuntime().availableProcessors();i++) {
@@ -1142,6 +1151,19 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                                                     maxRenderThreadsFld,
                                                     new JLabel("   Data Reading: "),
                                                     maxDataThreadsFld)));
+
+
+
+        formatComps.add(GuiUtils.rLabel("Data Cache Memory Percent:"));
+        JTextField cacheSizeFld =
+            new JTextField(""+(int)(100*getStore().get(DataManager.PROP_CACHE_PERCENT,
+                                                       0.25)), 7);
+        widgets.put(DataManager.PROP_CACHE_PERCENT, cacheSizeFld);
+        formatComps.add(GuiUtils.left(GuiUtils.hbox(cacheSizeFld,
+                new JLabel(" (Percent of available memory to be used in the data cache)"))));
+
+
+
 
 
         formatComps.add(GuiUtils.rLabel("Max Image Size:"));

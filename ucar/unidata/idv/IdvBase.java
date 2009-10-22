@@ -1123,6 +1123,20 @@ public abstract class IdvBase implements IdvConstants, XmlPersistable {
 
 
     /**
+     *  Utility method to retrieve an int property from the idv properties.
+     *  If the property does not exists return the given default value.
+     *
+     * @param name The name of the property
+     * @param dflt The default value if the property is not found
+     * @return The given property or the dflt value
+     */
+
+    public double getProperty(String name, double dflt) {
+        return getStateManager().getProperty(name, dflt);
+    }
+
+
+    /**
      *  Utility method to retrieve a String property from the idv properties.
      *  If the property does not exists return the given default value.
      *

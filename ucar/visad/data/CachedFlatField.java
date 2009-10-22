@@ -48,8 +48,6 @@ import java.rmi.RemoteException;
 public class CachedFlatField extends FlatField {
 
 
-
-
     /** the id for this instance */
     private Object cacheId;
 
@@ -384,7 +382,11 @@ public class CachedFlatField extends FlatField {
      */
     protected void init(float[][] data) throws VisADException {
         if(data!=null) {
-            cacheId = DataCacheManager.getCacheManager().addToCache(data);
+            if(cacheId!=null) {
+                DataCacheManager.getCacheManager().updateData(cacheId, data);
+            } else {
+                cacheId = DataCacheManager.getCacheManager().addToCache(data);
+            }
             inCache = true;
         }
         //Read the ranges when we first have data

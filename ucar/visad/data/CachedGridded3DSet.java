@@ -63,14 +63,14 @@ public class CachedGridded3DSet extends Gridded3DSet {
 
 
     public void finalize()  throws Throwable {
-        super.finalize();
         DataCacheManager.getCacheManager().removeFromCache(cacheId);
+        super.finalize();
     }
 
     private void initCache(float[][]samples) {
 	if(cacheId!=null) return;
 	cacheId = DataCacheManager.getCacheManager().addToCache(samples);
-	setMySamples(null);
+	super.setMySamples(null);
     }
 
     protected void setMySamples(float[][]samples) {

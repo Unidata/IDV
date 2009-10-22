@@ -632,6 +632,22 @@ public class StateManager extends IdvManager {
         return dflt;
     }
 
+    /**
+     *  Utility method to retrieve an int property from the idv properties.
+     *  If the property does not exists return the given default value.
+     *
+     * @param name Property name
+     * @param dflt The default value to return if name is not found
+     * @return The property value converted into an int or dflt if not found
+     */
+    public double getProperty(String name, double dflt) {
+        String v = (String) getProperty(name);
+        if (v != null) {
+            return new Double(v.trim()).doubleValue();
+        }
+        return dflt;
+    }
+
 
     /**
      *  Utility method to retrieve a String property from the idv properties.
@@ -992,6 +1008,25 @@ public class StateManager extends IdvManager {
         Object o = getPreferenceOrProperty(pref);
         if (o != null) {
             return o.toString();
+        }
+        return dflt;
+    }
+
+
+    /**
+     * Find either the preference with the given name
+     * or, if not found, return the property String value of the given name if found.
+     * If not found return the dflt
+     *
+     * @param pref The preference or property name
+     * @param dflt default
+     * @return The value of either the preference or the property
+     */
+
+    public double getPreferenceOrProperty(String pref, double dflt) {
+        Object o = getPreferenceOrProperty(pref);
+        if (o != null) {
+            return new Double(o.toString()).doubleValue();
         }
         return dflt;
     }
