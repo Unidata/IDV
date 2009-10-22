@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.sounding;
 
 
@@ -35,6 +36,7 @@ import ucar.unidata.data.DirectDataChoice;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.xml.XmlEncoder;
@@ -78,7 +80,11 @@ import java.util.Vector;
 public final class RaobDataSource extends DataSourceImpl {
 
     /** the associated raob data set */
-    private RaobDataSet rds;
+    private RaobDataSet raobDataSet;
+
+    /** the file or url   */
+    private String file;
+
 
     /**
      * Constructs from nothing.  This is necessary for use of this class as a
@@ -99,9 +105,57 @@ public final class RaobDataSource extends DataSourceImpl {
             throws VisADException {
         super(descriptor, "RAOB data: " + rds.getAdapterSource(),
               "RAOB data source", properties);
-        this.rds = rds;
+        this.raobDataSet = rds;
     }
 
+
+
+    /**
+     * Constructs from a specification of the data-source.
+     *
+     * @param descriptor          A description of the data-source.
+     * @param file                File or url
+     * @param properties          A map of associated attributes.
+     * @throws VisADException     if a VisAD failure occurs.
+     */
+    public RaobDataSource(DataSourceDescriptor descriptor, String file,
+                          Hashtable properties)
+            throws VisADException {
+        super(descriptor, "RAOB data: " + file, "RAOB data source",
+              properties);
+        this.file        = file;
+        this.raobDataSet = doMakeRaobDataSet();
+    }
+
+
+
+    /**
+     * Make a dataset with the file
+     *
+     * @return dataset
+     */
+    private RaobDataSet doMakeRaobDataSet() {
+        SoundingAdapter adapter = null;
+        try {
+            adapter = new NetcdfSoundingAdapter(file);
+        } catch (IllegalArgumentException ill) {
+            System.out.println(ill.getMessage());
+            try {
+                adapter = new CMASoundingAdapter(file);
+            } catch (Exception exc) {
+                LogUtil.logException("Reading sounding:" + file, exc);
+                return null;
+            }
+        } catch (Exception exc) {
+            LogUtil.logException("Reading sounding:" + file, exc);
+            return null;
+        }
+
+        SoundingOb[] obs = adapter.getSoundingObs();
+        return new RaobDataSet(adapter, Misc.toList(obs));
+
+
+    }
 
 
     /**
@@ -116,7 +170,10 @@ public final class RaobDataSource extends DataSourceImpl {
             return false;
         }
         RaobDataSource that = (RaobDataSource) object;
-        return Misc.equals(this.rds, that.rds);
+        if (file != null) {
+            return Misc.equals(this.file, that.file);
+        }
+        return Misc.equals(raobDataSet, that.raobDataSet);
     }
 
 
@@ -128,8 +185,8 @@ public final class RaobDataSource extends DataSourceImpl {
     public List getDataPaths() {
         List paths = new ArrayList();
         AddeSoundingAdapter asa =
-            (AddeSoundingAdapter) rds.getSoundingAdapter();
-        List obs = rds.getSoundingObs();
+            (AddeSoundingAdapter) getRDS().getSoundingAdapter();
+        List obs = getRDS().getSoundingObs();
         for (int i = 0; i < obs.size(); i++) {
             SoundingOb ob = (SoundingOb) obs.get(i);
             if (ob.getMandatoryFile() != null) {
@@ -154,9 +211,9 @@ public final class RaobDataSource extends DataSourceImpl {
         super.initAfterUnpersistence();
         List tmp = getTmpPaths();
         if (tmp != null) {
-            List obs = rds.getSoundingObs();
+            List obs = getRDS().getSoundingObs();
             AddeSoundingAdapter asa =
-                (AddeSoundingAdapter) rds.getSoundingAdapter();
+                (AddeSoundingAdapter) getRDS().getSoundingAdapter();
             for (int i = 0; i < tmp.size(); i += 2) {
                 SoundingOb ob = (SoundingOb) obs.get(i / 2);
                 ob.setMandatoryFile(tmp.get(i).toString());
@@ -180,9 +237,9 @@ public final class RaobDataSource extends DataSourceImpl {
                                        boolean changeLinks)
             throws Exception {
         List urls = new ArrayList();
-        List obs  = rds.getSoundingObs();
+        List obs  = getRDS().getSoundingObs();
         AddeSoundingAdapter asa =
-            (AddeSoundingAdapter) rds.getSoundingAdapter();
+            (AddeSoundingAdapter) getRDS().getSoundingAdapter();
         for (int i = 0; i < obs.size(); i++) {
             SoundingOb ob = (SoundingOb) obs.get(i);
             urls.add(asa.getMandatoryURL(ob) + "&rawstream=true");
@@ -209,8 +266,8 @@ public final class RaobDataSource extends DataSourceImpl {
      * @return Can save to local disk
      */
     public boolean canSaveDataToLocalDisk() {
-        return (rds.getSoundingAdapter() instanceof AddeSoundingAdapter)
-               && ((SoundingOb) rds.getSoundingObs().get(
+        return (getRDS().getSoundingAdapter() instanceof AddeSoundingAdapter)
+               && ((SoundingOb) getRDS().getSoundingObs().get(
                    0)).getMandatoryFile() == null;
 
     }
@@ -223,7 +280,7 @@ public final class RaobDataSource extends DataSourceImpl {
      */
     protected void doMakeDataChoices() {
         int  i           = 0;
-        List soundingObs = rds.getSoundingObs();
+        List soundingObs = getRDS().getSoundingObs();
         List categories  = new ArrayList();
 
         DataCategory cat =
@@ -311,7 +368,7 @@ public final class RaobDataSource extends DataSourceImpl {
      */
     private Data makeSoundingOb(DataChoice dc, DataSelection dataSelection)
             throws VisADException, RemoteException {
-        SoundingOb so = rds.initSoundingOb((SoundingOb) dc.getId());
+        SoundingOb so = getRDS().initSoundingOb((SoundingOb) dc.getId());
         if (so == null) {
             return null;
         }
@@ -357,13 +414,33 @@ public final class RaobDataSource extends DataSourceImpl {
                : new Tuple((Data[]) v.toArray(new Data[v.size()]), false);
     }
 
+
+
+
+
+    /**
+     * Dynamically create the rds if needed and return it
+     *
+     * @return the rds
+     */
+    public RaobDataSet getRDS() {
+        if ((raobDataSet == null) && (file != null)) {
+            this.raobDataSet = doMakeRaobDataSet();
+        }
+        return raobDataSet;
+    }
+
     /**
      * Get the RaobDataSet for this data source
      *
      * @return  the RaobDataSet for this data source
      */
     public RaobDataSet getRaobDataSet() {
-        return rds;
+        //Only write out the  dataset if we don't have a file
+        if (file == null) {
+            return raobDataSet;
+        }
+        return null;
     }
 
     /**
@@ -372,7 +449,25 @@ public final class RaobDataSource extends DataSourceImpl {
      * @param newRds  the RaobDataSet for this data source
      */
     public void setRaobDataSet(RaobDataSet newRds) {
-        rds = newRds;
+        raobDataSet = newRds;
+    }
+
+    /**
+     *  Set the File property.
+     *
+     *  @param value The new value for File
+     */
+    public void setFile(String value) {
+        file = value;
+    }
+
+    /**
+     *  Get the File property.
+     *
+     *  @return The File
+     */
+    public String getFile() {
+        return file;
     }
 
 
