@@ -4271,6 +4271,12 @@ public class IdvUIManager extends IdvManager {
                 contents = (JComponent) xmlUI.getContents();
                 window.setXmlUI(xmlUI);
                 viewManagers = xmlUI.getViewManagers();
+		if(isMac()) {
+		    JMenuBar menuBar = doMakeMenuBar();
+		    if (menuBar != null) {
+			window.setJMenuBar(menuBar);
+		    }
+		}
             } else {
                 //Else call out to make the gui
                 if (viewManagers.size() == 0) {
