@@ -498,8 +498,10 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
                 heights);
             //System.err.println("data = " + r.getMandatoryPressureProfile());
         } catch (Exception excp) {
-            //System.err.println("couldn't set RAOB data");
-            throw new RuntimeException(excp);
+            //YUAN: error here...
+            System.err.println("Error:");
+            excp.printStackTrace();
+            //            throw new RuntimeException(excp);
         }
     }
 
