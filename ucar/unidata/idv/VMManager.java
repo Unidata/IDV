@@ -391,10 +391,11 @@ public class VMManager extends IdvManager {
         try {
             XmlResourceCollection rc = getResourceManager().getXmlResources(getResourceManager().RSC_VIEWPOINTS);
             for (int i = 0; i < rc.size(); i++) {
-                if (rc.isWritable(i)) {
+                if (rc.isWritableResource(i)) {
                     File f = new File(rc.get(i).toString());
                     String contents = getIdv().encodeObject(localViewpoints,true);
                     IOUtil.writeFile(f, contents);
+		    return;
                 }
             }
         } catch (Exception exc) {
