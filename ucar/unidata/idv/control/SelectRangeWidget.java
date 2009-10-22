@@ -92,7 +92,7 @@ public class SelectRangeWidget extends ControlWidget {
         enabledCbx = GuiUtils.makeCheckbox("", this, "selectRangeEnabled");
         button.addActionListener(this);
         rhLabel.setEnabled(enabledCbx.isSelected());
-        button.setEnabled(enabledCbx.isSelected());
+        //        button.setEnabled(enabledCbx.isSelected());
     }
 
     /**
@@ -170,9 +170,8 @@ public class SelectRangeWidget extends ControlWidget {
      * @param v is enabled
      */
     public void setSelectRangeEnabled(boolean v) {
-
         rhLabel.setEnabled(v);
-        button.setEnabled(v);
+        //        button.setEnabled(v);
         displayControl.setSelectRangeEnabled(v);
     }
 

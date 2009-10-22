@@ -9547,6 +9547,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (selectRange != null) {
             if (srw != null) {
                 srw.setRange(selectRange);
+                if(!srw.getSelectRangeEnabled()) return;
             }
             if (getHaveInitialized()) {
                 applySelectRange();
