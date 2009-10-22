@@ -26,7 +26,11 @@
      label="Images from an ADDE server"/>
   <datasource
      id="RAOB"
-     factory="ucar.unidata.data.sounding.RaobDataSource"/>
+     fileselection="true"
+     patterns="\.ta$"
+     factory="ucar.unidata.data.sounding.RaobDataSource"
+     label="RAOB Soundings"/>
+
   <datasource
      id="ADDE.POINT"
      factory="ucar.unidata.data.point.AddePointDataSource"
