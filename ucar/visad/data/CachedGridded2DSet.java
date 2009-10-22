@@ -24,17 +24,11 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
 MA 02111-1307, USA
 */
 
-package ucar.unidata.data;
+package ucar.visad.data;
+
 import visad.*;
 
-import java.io.InputStreamReader;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Vector;
 
-import visad.util.Trace;
 
 /**
  * Gridded3DSet represents a finite set of samples of R^3.
@@ -43,67 +37,39 @@ import visad.util.Trace;
 public class CachedGridded2DSet extends Gridded2DSet {
     private Object cacheId;
 
-  public CachedGridded2DSet(MathType type, float[][] samples, int lengthX, int lengthY,
-               CoordinateSystem coord_sys, Unit[] units,
-               ErrorEstimate[] errors, boolean copy, boolean test)
-               throws VisADException {
-      super(type, samples, lengthX, lengthY, coord_sys, units, errors, copy, test);
-      cacheId = DataCacheManager.getCacheManager().addToCache(samples);
-      super.setMySamples(null);
-  }
+    public CachedGridded2DSet(MathType type, float[][] samples, int lengthX, int lengthY,
+			      CoordinateSystem coord_sys, Unit[] units,
+			      ErrorEstimate[] errors, boolean copy, boolean test)
+	throws VisADException {
+	super(type, samples, lengthX, lengthY, coord_sys, units, errors, copy, test);
+	initCache(samples);
+    }
 
+
+    private void initCache(float[][]samples) {
+	if(cacheId!=null) return;
+	cacheId = DataCacheManager.getCacheManager().addToCache(samples);
+	super.setMySamples(null);
+    }
 
     public void finalize()  throws Throwable {
         super.finalize();
         DataCacheManager.getCacheManager().removeFromCache(cacheId);
     }
 
-  protected void setMySamples(float[][]samples) {
-      DataCacheManager.getCacheManager().updateData(cacheId, myFloatValues);
-      super.setMySamples(null);
-  }
-
-  protected float[][] getMySamples() {
-      System.err.println (" getMySamples");
-      //      if(cachedSamples==null && haveCached) {
-      //          readCache();
-      //      }
-      return cachedSamples;
-      //      return super.getMySamples();
-  }
-
-    private void readCache() {
-
+    protected void setMySamples(float[][]samples) {
+	if(cacheId==null) {
+	    cacheId = DataCacheManager.getCacheManager().addToCache(samples);
+	} else {
+	    DataCacheManager.getCacheManager().updateData(cacheId, samples);
+	}
+	super.setMySamples(null);
     }
 
 
-    protected String getCacheFile() {
-        if ((cacheFile == null) && (cacheDir != null)) {
-            String uniqueName = "field_" + System.currentTimeMillis() + "_"
-                                + (cnt++);
-            cacheFile = cacheDir+ File.separator+ uniqueName;
-        }
-        return cacheFile;
+    protected float[][] getMySamples() {
+	return DataCacheManager.getCacheManager().getFloatArray2D(cacheId);
     }
-
-    /**
-     * Set where we write to
-     *
-     * @param f Cache dir
-     */
-    public static void setCacheDir(File f) {
-        cacheDir = f;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public static File getCacheDir() {
-        return cacheDir;
-    }
-
 
 
 }

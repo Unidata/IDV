@@ -24,56 +24,66 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
 MA 02111-1307, USA
 */
 
-package ucar.unidata.data;
+package ucar.visad.data;
 import visad.*;
 
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Vector;
 
-import visad.util.Trace;
 
 /**
- * Gridded3DSet represents a finite set of samples of R^3.
- * <P>
  */
 public class CachedGridded3DSet extends Gridded3DSet {
 
-  public CachedGridded3DSet(MathType type, float[][] samples, int lengthX,
-      int lengthY, int lengthZ, CoordinateSystem coord_sys, Unit[] units,
-      ErrorEstimate[] errors, boolean copy, boolean test) throws VisADException {
-    super(type, samples, lengthX, lengthY, lengthZ,  coord_sys,
-        units, errors, copy,test);
-  }
+    private Object cacheId;
+
+    public CachedGridded3DSet(MathType type, float[][] samples, int lengthX,
+			      int lengthY, int lengthZ, CoordinateSystem coord_sys, Unit[] units,
+			      ErrorEstimate[] errors, boolean copy, boolean test) throws VisADException {
+	super(type, samples, lengthX, lengthY, lengthZ,  coord_sys,
+	      units, errors, copy,test);
+	initCache(samples);
+    }
 
 
 
-  public CachedGridded3DSet(MathType type, float[][] samples, int lengthX,
-      CoordinateSystem coord_sys, Unit[] units, ErrorEstimate[] errors,
-      boolean copy) throws VisADException {
-    super(type, samples, lengthX, coord_sys, units,
-        errors, copy);
-  }
+    public CachedGridded3DSet(MathType type, float[][] samples, int lengthX,
+			      CoordinateSystem coord_sys, Unit[] units, ErrorEstimate[] errors,
+			      boolean copy) throws VisADException {
+	super(type, samples, lengthX, coord_sys, units,
+	      errors, copy);
+	initCache(samples);
+    }
 
 
-  public CachedGridded3DSet(MathType type, float[][] samples, int lengthX,
-      int lengthY, CoordinateSystem coord_sys, Unit[] units,
-      ErrorEstimate[] errors, boolean copy) throws VisADException {
-      super(type, samples, lengthX, lengthY, coord_sys, units, errors, copy);
-  }
+    public CachedGridded3DSet(MathType type, float[][] samples, int lengthX,
+			      int lengthY, CoordinateSystem coord_sys, Unit[] units,
+			      ErrorEstimate[] errors, boolean copy) throws VisADException {
+	super(type, samples, lengthX, lengthY, coord_sys, units, errors, copy);
+	initCache(samples);
+    }
 
 
+    public void finalize()  throws Throwable {
+        super.finalize();
+        DataCacheManager.getCacheManager().removeFromCache(cacheId);
+    }
 
-  protected void setMySamples(float[][]samples) {
-      System.err.println ("setMySamples");
-      super.setMySamples(samples);
-  }
+    private void initCache(float[][]samples) {
+	if(cacheId!=null) return;
+	cacheId = DataCacheManager.getCacheManager().addToCache(samples);
+	setMySamples(null);
+    }
 
-  protected float[][] getMySamples() {
-      System.err.println ("getMySamples");
-      return super.getMySamples();
-  }
+    protected void setMySamples(float[][]samples) {
+	if(cacheId==null) {
+	    cacheId = DataCacheManager.getCacheManager().addToCache(samples);
+	} else {
+	    DataCacheManager.getCacheManager().updateData(cacheId, samples);
+	}
+	super.setMySamples(null);
+    }
+
+    protected float[][] getMySamples() {
+	return DataCacheManager.getCacheManager().getFloatArray2D(cacheId);
+    }
 
 }
