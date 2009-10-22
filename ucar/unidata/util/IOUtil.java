@@ -2268,16 +2268,51 @@ public class IOUtil {
 
 
 
+    public static Object readSerializedObject(String file) throws Exception {
+        FileInputStream fis = new FileInputStream(file);
+        BufferedInputStream bis = new BufferedInputStream(fis, 100000);
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        Object  o = ois.readObject();
+        ois.close();
+        bis.close();
+        fis.close();
+        return o;
+    }
+
+    public static void writeSerializedObject(String file, Object o) throws Exception {
+        FileOutputStream fos = new FileOutputStream(file);
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        oos.writeObject(o);
+        oos.close();
+        fos.close();
+    }
+
+
+
+    public static void testio() throws Exception {
+        byte[]d = new byte[4*1000000];
+        writeSerializedObject("test.dat", d);
+        long t1  = System.currentTimeMillis();
+        for(int i=0;i<100;i++) {
+            d = (byte[])readSerializedObject("test.dat");
+        }
+        long t2  = System.currentTimeMillis();
+        System.err.println ("Time:" + (t2-t1));
+    }
 
 
     /**
-     * test main
+     * test mainp
      *
      * @param args cmd line args
      *
      * @throws Exception On badness
      */
     public static void main(String[] args) throws Exception {
+        if(true) {
+            testio();
+            return;
+        }
 
         String baseUrl =
             "http://motherlode.ucar.edu:9080/thredds/radarServer/nexrad/level3/IDD?&stn=${station}&var=N0R&time_start=1909-05-24T21:26:24&time_end=2109-04-05T21:26:24";
