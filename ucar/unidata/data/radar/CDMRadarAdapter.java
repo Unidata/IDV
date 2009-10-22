@@ -49,6 +49,7 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.util.*;
 
+import ucar.visad.data.*;
 import ucar.visad.RadarMapProjection;
 import ucar.visad.Util;
 import ucar.visad.data.CachedFlatField;
@@ -883,7 +884,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         radarDomain2d = makeDomainType2D();
 
         RealTupleType tt = radarDomain2d;
-        GriddedSet set = new Gridded2DSet(tt, domainVals, ringcounter,
+        GriddedSet set = new CachedGridded2DSet(tt, domainVals, ringcounter,
                                           low_rays, tt.getCoordinateSystem(),
                                           new Unit[] {
                                               CommonUnit.meter.scale(1000),
@@ -1080,7 +1081,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         radarDomain2d = makeDomainType2D();
 
         RealTupleType tt = radarDomain2d;
-        GriddedSet set = new Gridded2DSet(tt, domainVals, numBin, numRay,
+        GriddedSet set = new CachedGridded2DSet(tt, domainVals, numBin, numRay,
                                           tt.getCoordinateSystem(),
                                           new Unit[] {
                                               CommonUnit.meter.scale(1),
@@ -2111,7 +2112,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             Unit          u               = getUnit(sweepVar);
 
             RealTupleType radarDomainType = makeDomainType3D();
-            GriddedSet domainSet = new Gridded3DSet(radarDomainType,
+            GriddedSet domainSet = new CachedGridded3DSet(radarDomainType,
                                        domainVals, bincounter, 2,
                                        radarDomainType.getCoordinateSystem(),
                                        new Unit[] {
@@ -2437,7 +2438,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         Unit          u               = getUnit(sweepVar);
 
         RealTupleType radarDomainType = makeDomainType3D();
-        GriddedSet domainSet = new Gridded3DSet(radarDomainType,
+        GriddedSet domainSet = new CachedGridded3DSet(radarDomainType,
                                        domainVals, bincounter, numberOfSweeps,
                                        radarDomainType.getCoordinateSystem(),
                                        new Unit[] {
@@ -2694,7 +2695,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             Unit          u               = getUnit(sweepVar);
 
             RealTupleType radarDomainType = makeDomainType3D();
-            GriddedSet domainSet = new Gridded3DSet(radarDomainType,
+            GriddedSet domainSet = new CachedGridded3DSet(radarDomainType,
                                        domainVals, bincounter, 2,
                                        radarDomainType.getCoordinateSystem(),
                                        new Unit[] {
@@ -3261,7 +3262,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             Unit          u               = getUnit(sweepVar);
 
             RealTupleType radarDomainType = makeDomainType3D();
-            GriddedSet domainSet = new Gridded3DSet(radarDomainType,
+            GriddedSet domainSet = new CachedGridded3DSet(radarDomainType,
                                        domainVals, bincounter, 2,
                                        radarDomainType.getCoordinateSystem(),
                                        new Unit[] { CommonUnit.meter,
@@ -3495,10 +3496,10 @@ public class CDMRadarAdapter implements RadarAdapter {
                             ? radarDomain3d
                             : radarDomain2d;
         GriddedSet    set = (want3D)
-                            ? (GriddedSet) new Gridded3DSet(tt, domainVals3d,
+                            ? (GriddedSet) new CachedGridded3DSet(tt, domainVals3d,
                                 numGates, rayN + 2, (CoordinateSystem) null,
                                 domUnits3d, (ErrorEstimate[]) null, false)
-                            : (GriddedSet) new Gridded2DSet(tt, domainVals2d,
+                            : (GriddedSet) new CachedGridded2DSet(tt, domainVals2d,
                                 numGates, rayN + 2, tt.getCoordinateSystem(),
                                 domUnits2d, (ErrorEstimate[]) null, false,
                                 false);
@@ -3921,7 +3922,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         RealTupleType tt = radarDomain3d;
         Unit[] domUnits3d = new Unit[] { CommonUnit.meter, CommonUnit.degree,
                                          CommonUnit.degree };
-        GriddedSet set = new Gridded3DSet(tt, domainVals, gates, numberOfRay,
+        GriddedSet set = new CachedGridded3DSet(tt, domainVals, gates, numberOfRay,
                                           numberOfSweeps, null, domUnits3d,
                                           null, false, false);
         FunctionType sweepType = new FunctionType(tt,
@@ -4137,7 +4138,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         RealTupleType tt = radarDomain3d;
         Unit[] domUnits3d = new Unit[] { CommonUnit.meter, CommonUnit.degree,
                                          CommonUnit.degree };
-        GriddedSet set = new Gridded3DSet(tt, domainVals, gates, numberOfRay,
+        GriddedSet set = new CachedGridded3DSet(tt, domainVals, gates, numberOfRay,
                                           numberOfSweeps, null, domUnits3d,
                                           null, false, false);
         FunctionType sweepType = new FunctionType(tt,
