@@ -519,6 +519,11 @@ public class LogUtil {
             inner = ((WrapperException) exc).getException();
         } else if (exc instanceof InvocationTargetException) {
             inner = ((InvocationTargetException) exc).getTargetException();
+        } else {
+            Throwable cause = exc.getCause();
+            if(cause!=null) {
+                inner = cause;
+            }
         }
         if (inner != null) {
             Throwable innerInner = getInnerException(inner);
