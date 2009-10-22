@@ -2907,6 +2907,9 @@ Misc.run(new Runnable() {
         //For now put this here
         //        encoder.registerNewClassName("ucar.unidata.repository.InteractiveRepositoryClient",
         //                                     "ucar.unidata.repository.client.InteractiveRepositoryClient");
+
+	encoder.registerNewClassName("ucar.unidata.idv.FlythroughPoint",
+				     "ucar.unidata.idv.flythrough.FlythroughPoint");
         VisADPersistence.init(encoder);
         initEncoder(encoder, forRead);
         return encoder;
