@@ -902,7 +902,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      */
     void setSounding(int index) throws VisADException, RemoteException {
 
-        System.err.println ("setSounding: index=" +index +"  currIndex:" + currIndex);
+        //System.err.println ("setSounding: index=" +index +"  currIndex:" + currIndex);
 
         if (tempProfiles != null) {
             /*
@@ -1057,7 +1057,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                     dewProfiles[i], windProfiles[i] }, true);
             }
         }
-
+        for (int i = 0; i < n; i++) {
+           aeroDisplay.setProfileVisible(i, false);
+        }
         aeroDisplay.setProfileVisible(currIndex, true);
 
 
