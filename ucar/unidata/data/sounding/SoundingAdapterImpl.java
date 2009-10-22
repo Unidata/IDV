@@ -139,7 +139,7 @@ public abstract class SoundingAdapterImpl extends InvisiblePropertiedBean {
      */
     protected void dbPrint(String s) {
         if (debug) {
-            System.out.println(s);
+            System.err.println(s);
         }
     }
 

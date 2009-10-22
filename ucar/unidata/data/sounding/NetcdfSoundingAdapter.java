@@ -513,7 +513,7 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
                             tUnit, t, tdUnit, td, spdUnit, spd, dirUnit, dir,
                             zUnit, z);
                 } else if (debug) {
-                    System.out.println(
+                    System.err.println(
                         "No mandatory pressure data found for this station");
                 }
             } catch (Exception e) {
@@ -530,7 +530,7 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
                 levFill   = (int) getFillValue(numMandW, missingValue);
                 if ((numLevels > 0) && (numLevels != levFill)) {
                     if (debug) {
-                        System.out.println("Num mand wind levels = "
+                        System.err.println("Num mand wind levels = "
                                            + numLevels);
                     }
 
@@ -572,7 +572,7 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
                                 spdUnit, spd, dirUnit, dir);
                     }
                 } else if (debug) {
-                    System.out.println("No mandatory wind data found "
+                    System.err.println("No mandatory wind data found "
                                        + "for this station");
                 }
             } catch (Exception e) {
@@ -589,7 +589,7 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
                 levFill   = (int) getFillValue(numSigT, missingValue);
                 if ((numLevels > 0) && (numLevels != levFill)) {
                     if (debug) {
-                        System.out.println("Num sig temperature levels = "
+                        System.err.println("Num sig temperature levels = "
                                            + numLevels);
                     }
                     // Get the variables and their units
@@ -638,7 +638,7 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
                             pUnit, p, tUnit, t, tdUnit, td);
                     }
                 } else if (debug) {
-                    System.out.println("No sig temperature data found "
+                    System.err.println("No sig temperature data found "
                                        + "for this station");
                 }
             } catch (Exception e) {
@@ -655,7 +655,7 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
                 levFill   = (int) getFillValue(numSigW, missingValue);
                 if ((numLevels > 0) && (numLevels != levFill)) {
                     if (debug) {
-                        System.out.println("Num significant wind levels = "
+                        System.err.println("Num significant wind levels = "
                                            + numLevels);
                     }
                     // Get the variables and their units
@@ -714,7 +714,7 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
                 levFill   = (int) getFillValue(numMaxW, missingValue);
                 if ((numLevels > 0) && (numLevels != levFill)) {
                     if (debug) {
-                        System.out.println("Num max wind levels = "
+                        System.err.println("Num max wind levels = "
                                            + numLevels);
                     }
                     // Get the variables and their units
@@ -765,7 +765,7 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
                                 spdUnit, spd, dirUnit, dir);
                     }
                 } else if (debug) {
-                    System.out.println("No maximum wind data found "
+                    System.err.println("No maximum wind data found "
                                        + "for this station");
                 }
             } catch (Exception e) {
@@ -786,7 +786,7 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
                             : (int) getFillValue(numTrop, missingValue);
                 if ((numLevels > 0) && (numLevels != levFill)) {
                     if (debug) {
-                        System.out.println("Num tropopause levels = "
+                        System.err.println("Num tropopause levels = "
                                            + numLevels);
                     }
                     // Get the variables and their units
@@ -861,7 +861,7 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
                         }
                     }
                 } else if (debug) {
-                    System.out.println("No tropopause data found "
+                    System.err.println("No tropopause data found "
                                        + "for this station");
                 }
             } catch (Exception e) {

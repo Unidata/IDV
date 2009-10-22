@@ -258,7 +258,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
         times.add(dt);
 
         int numStations = Integer.parseInt(tok.nextToken());
-        // System.out.println("numStations = " + numStations);
+        // System.err.println("numStations = " + numStations);
 
         // get the station list and number of stations
         stations       = new ArrayList(numStations);  // array of stations
@@ -496,10 +496,10 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
                 speeds, CommonUnit.degree, dirs,
                 GeopotentialAltitude.getGeopotentialUnit(CommonUnit.meter),
                 heights);
-            //System.out.println("data = " + r.getMandatoryPressureProfile());
+            //System.err.println("data = " + r.getMandatoryPressureProfile());
         } catch (Exception excp) {
-            //System.out.println("couldn't set RAOB data");
-            System.out.println(excp.getMessage());
+            //System.err.println("couldn't set RAOB data");
+            throw new RuntimeException(excp);
         }
     }
 
@@ -510,7 +510,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
      * @return  sounding with data
      */
     public SoundingOb initSoundingOb(SoundingOb sound) {
-        // System.out.println("init sounding ob " + sound);
+        // System.err.println("init sounding ob " + sound);
         checkInit();
         if ( !sound.hasData()) {
             int idx = soundings.indexOf(sound);
@@ -551,7 +551,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
      */
     public static void main(String[] args) throws Exception {
         if (args.length == 0) {
-            System.out.println("must supply a filename");
+            System.err.println("must supply a filename");
             System.exit(1);
         }
         CMASoundingAdapter csa = new CMASoundingAdapter(args[0]);

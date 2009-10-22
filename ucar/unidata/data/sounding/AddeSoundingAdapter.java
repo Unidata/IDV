@@ -466,7 +466,7 @@ public class AddeSoundingAdapter extends SoundingAdapterImpl implements Sounding
         }
         Collections.sort(times);
         if (debug) {
-            System.out.println("Times:" + times);
+            System.err.println("Times:" + times);
         }
     }
 
@@ -635,12 +635,12 @@ public class AddeSoundingAdapter extends SoundingAdapterImpl implements Sounding
                     dir[i] = (float) scaleValue(data[5][i], scales[5]);
                 }
                 if (debug) {
-                    System.out.println("P[" + pUnit + "]\t" + "Z[" + zUnit
+                    System.err.println("P[" + pUnit + "]\t" + "Z[" + zUnit
                                        + "]\t" + "T[" + tUnit + "]\t" + "TD["
                                        + tdUnit + "]\t" + "SPD[" + spdUnit
                                        + "]\t" + "DIR[" + dirUnit + "]");
                     for (int i = 0; i < numLevels; i++) {
-                        System.out.println(p[i] + "\t" + z[i] + "\t" + t[i]
+                        System.err.println(p[i] + "\t" + z[i] + "\t" + t[i]
                                            + "\t" + td[i] + "\t" + spd[i]
                                            + "\t" + dir[i]);
                     }
@@ -732,10 +732,10 @@ public class AddeSoundingAdapter extends SoundingAdapterImpl implements Sounding
                 if (numSigT > 0) {
                     try {
                         if (debug) {
-                            System.out.println("P[" + pUnit + "]\tT[" + tUnit
+                            System.err.println("P[" + pUnit + "]\tT[" + tUnit
                                     + "]\tTD[" + tdUnit + "]");
                             for (int i = 0; i < numSigT; i++) {
-                                System.out.println(p[i] + "\t" + t[i] + "\t"
+                                System.err.println(p[i] + "\t" + t[i] + "\t"
                                         + td[i]);
                             }
                         }
@@ -750,10 +750,10 @@ public class AddeSoundingAdapter extends SoundingAdapterImpl implements Sounding
                 if (numSigW > 0) {
                     try {
                         if (debug) {
-                            System.out.println("Z[" + zUnit + "]\tSPD["
+                            System.err.println("Z[" + zUnit + "]\tSPD["
                                     + spdUnit + "]\tDIR[" + dirUnit + "]");
                             for (int i = 0; i < numSigW; i++) {
-                                System.out.println(z[i] + "\t" + spd[i]
+                                System.err.println(z[i] + "\t" + spd[i]
                                         + "\t" + dir[i]);
                             }
                         }
@@ -854,7 +854,7 @@ public class AddeSoundingAdapter extends SoundingAdapterImpl implements Sounding
               }
             */
         } catch (Exception e) {
-            System.out.println("Unable to initialize defaults file");
+            System.err.println("Unable to initialize defaults file");
         }
     }
 
@@ -1000,7 +1000,7 @@ public class AddeSoundingAdapter extends SoundingAdapterImpl implements Sounding
         */
         //        }
         //        catch (Exception me)   {
-        //            System.out.println(me);
+        //            System.err.println(me);
         //        }
     }
 

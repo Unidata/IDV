@@ -380,7 +380,7 @@ public abstract class TrackAdapter {
          *                                           CommonUnit.meter));
          *       soundingOb = new SoundingOb(station, baseTime, xmakeRAOB());
          *   } catch (Exception e) {
-         *       System.out.println("couldn't make soundingOb " + e);
+         *       System.err.println("couldn't make soundingOb " + e);
          *   }
          * }
          * return soundingOb;

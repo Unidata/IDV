@@ -1101,21 +1101,21 @@ public class TrackDataSource extends FilesDataSource {
 
 
         if (args.length == 0) {
-            System.out.println("Must supply a file name");
+            System.err.println("Must supply a file name");
             System.exit(1);
         }
         TrackDataSource v5d = new TrackDataSource(null, Misc.toList(args),
                                   null);
         /*
         for (Iterator iter = v5d.getDataChoices().iterator(); iter.hasNext();) {
-            System.out.println(iter.next());
+            System.err.println(iter.next());
         }
         Data testData = v5d.getData ((DataChoice) v5d.getDataChoices().get(0), null);
         visad.python.JPythonMethods.dumpTypes (testData);
         */
         for (Iterator iter =
                 v5d.getAllDateTimes().iterator(); iter.hasNext(); ) {
-            System.out.println(iter.next());
+            System.err.println(iter.next());
         }
 
     }

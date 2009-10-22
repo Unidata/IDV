@@ -184,7 +184,7 @@ public class SondeDataSource extends TrackDataSource {
                 TrackInfo trackInfo =
                      (TrackInfo) ta.getTrackInfos().get(0);
                 String trackName           = trackInfo.getTrackName();
-                System.out.println("track name = " + trackName);
+                System.err.println("track name = " + trackName);
                 ((CompositeDataChoice)soundingChoice).addDataChoice(
                     new DirectDataChoice(
                         this, ID_SOUNDINGOB, trackName,

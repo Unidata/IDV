@@ -139,7 +139,6 @@ public final class RaobDataSource extends DataSourceImpl {
         try {
             adapter = new NetcdfSoundingAdapter(file);
         } catch (IllegalArgumentException ill) {
-            System.out.println(ill.getMessage());
             try {
                 adapter = new CMASoundingAdapter(file);
             } catch (Exception exc) {
