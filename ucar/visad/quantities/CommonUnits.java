@@ -114,7 +114,7 @@ public class CommonUnits {
     /**
      * A common unit of millimeter
      */
-    public static final Unit MM;
+    public static final Unit MILLIMETER;
 
 
 
@@ -131,7 +131,7 @@ public class CommonUnits {
         Unit foot            = null;
         Unit kilometer       = null;
         Unit mile            = null;
-        Unit mm              = null;
+        Unit millimeter      = null;
 
 
         try {
@@ -147,7 +147,7 @@ public class CommonUnits {
             foot            = SI.meter.scale(.0254 * 12).clone("ft");
             kilometer       = SI.meter.scale(1000).clone("km");
             mile            = foot.scale(5280).clone("mi");
-            mm              = SI.meter.scale(.001).clone("mm");
+            millimeter      = SI.meter.scale(.001).clone("mm");
 
         } catch (Exception e) {
             String reason = e.getMessage();
@@ -172,7 +172,7 @@ public class CommonUnits {
         FOOT               = foot;
         KILOMETER          = kilometer;
         MILE               = mile;
-        MM                 = mm;
+        MILLIMETER         = millimeter;
     }
 
     /**

@@ -116,8 +116,8 @@ public class WeatherDecorator extends FlythroughDecorator {
             String name = ucar.visad.Util.cleanTypeName(r.getType());
             if (((name.toLowerCase().indexOf("precipitation") >= 0)
                     || (name.toLowerCase().indexOf("rain")
-                        >= 0)) && Unit.canConvert(unit, CommonUnits.MM)) {
-                precipLevel = r.getValue(CommonUnits.MM);
+                        >= 0)) && Unit.canConvert(unit, CommonUnits.MILLIMETER)) {
+                precipLevel = r.getValue(CommonUnits.MILLIMETER);
             } else if (Unit.canConvert(unit, CommonUnits.CELSIUS)) {
                 temperature = r.getValue(CommonUnits.CELSIUS);
             }
