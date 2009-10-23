@@ -31,6 +31,13 @@
                 href="/ucar/unidata/idv/resources/stations/profilerstns.xml"/>
 
   <stationtable
+     name="USGS Stream Gauges"
+     category="Earth"
+     href="http://www.unidata.ucar.edu/georesources/locations/usgs.xml"/>
+
+
+
+  <stationtable
      name="Magnitude 2.5+  in last 7 days"
      category="Earth/Earthquakes"
      href="http://earthquake.usgs.gov/eqcenter/recenteqsww/catalogs/eqs7day-M2.5.xml"/>
