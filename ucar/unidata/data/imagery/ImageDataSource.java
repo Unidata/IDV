@@ -44,7 +44,7 @@ import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.util.TwoFacedObject;
 
-import ucar.visad.data.AddeImageFlatField;
+import ucar.visad.data.AreaImageFlatField;
 
 import visad.*;
 import visad.data.DataRange;
@@ -1129,7 +1129,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                                       ? "" + areaDir.getStartTime().getTime()
                                       : "") + ".dat");
 
-                AddeImageFlatField aiff = AddeImageFlatField.create(aid,
+                AreaImageFlatField aiff = AreaImageFlatField.create(aid,
                                               areaDir, getCacheDataToDisk(),
                                               filename, getCacheClearDelay(),
                                               readLabel);
