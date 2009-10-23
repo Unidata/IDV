@@ -38,7 +38,6 @@ import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.Range;
 import ucar.unidata.xml.XmlEncoder;
 
 import visad.Data;

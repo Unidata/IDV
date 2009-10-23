@@ -796,6 +796,18 @@ public class KmlDataSource extends FilesDataSource {
                             currentDisplayCategories, baseUrl);
             }
             if (pointNodes != null) {
+                for(Element n: (List<Element>) pointNodes) {
+                    String name = XmlUtil.getGrandChildText(n,"name");
+                    Element ptnode = XmlUtil.findChild(n,"Point");
+                    if(ptnode!=null) {
+                        String coords = XmlUtil.getGrandChildText(ptnode,"coordinates");
+                        System.out.println(coords+"," + name);
+                    }
+                }
+
+
+
+
                 String dataChoiceName = "Placemarks";
                 String displayCategory = StringUtil.join("-",
                                              currentDisplayCategories);

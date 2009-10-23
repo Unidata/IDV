@@ -47,6 +47,8 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.visad.data.AddeImageFlatField;
 
 import visad.*;
+import visad.data.DataRange;
+import visad.data.DataRange;
 import visad.util.ThreadManager;
 
 import visad.data.mcidas.AreaAdapter;
@@ -868,7 +870,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
 
     /** _more_ */
-    private Range[] sampleRanges = null;
+    private DataRange[] sampleRanges = null;
 
     /**
      * Create the actual data represented by the given
@@ -1137,7 +1139,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     if ((sampleRanges != null) && (sampleRanges.length > 0)) {
                         for (int rangeIdx = 0; rangeIdx < sampleRanges.length;
                                 rangeIdx++) {
-                            Range r = sampleRanges[rangeIdx];
+                            DataRange r = sampleRanges[rangeIdx];
                             if (Double.isInfinite(r.getMin())
                                     || Double.isInfinite(r.getMax())) {
                                 sampleRanges = null;

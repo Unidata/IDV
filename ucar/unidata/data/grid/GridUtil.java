@@ -49,18 +49,19 @@ import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Parameter;
-import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
 
 import ucar.visad.ProjectionCoordinateSystem;
 
 import ucar.visad.Util;
 
-import ucar.visad.data.CachedFlatField;
+import visad.data.CachedFlatField;
 import ucar.visad.quantities.AirPressure;
 import ucar.visad.quantities.CommonUnits;
 
 import visad.*;
+import visad.data.DataRange;
+import ucar.unidata.util.Range;
 
 import visad.bom.Radar2DCoordinateSystem;
 import visad.bom.Radar3DCoordinateSystem;
@@ -4142,7 +4143,7 @@ public class GridUtil {
     public static Range[] fieldMinMax(visad.FlatField field)
             throws VisADException, RemoteException {
         if (field instanceof CachedFlatField) {
-            return ((CachedFlatField) field).getRanges();
+            return makeRanges(((CachedFlatField) field).getRanges());
         }
 
 
@@ -4169,6 +4170,39 @@ public class GridUtil {
         return result;
     }
 
+
+    public static Range  makeRange(visad.data.DataRange range) {
+        if(range==null) return null;
+        return new Range(range.getMin(), range.getMax());
+    }
+
+
+    public static Range[]  makeRanges(visad.data.DataRange[] range) {
+        if(range==null) return null;
+        Range[] r = new Range[range.length];
+        for(int i=0;i<range.length;i++) {
+            r[i] = makeRange(range[i]);
+        }
+        return r;
+    }
+
+
+
+
+    public static DataRange  makeDataRange(Range range) {
+        if(range==null) return null;
+        return new DataRange(range.getMin(), range.getMax());
+    }
+
+
+    public static DataRange[]  makeDataRanges(Range[] range) {
+        if(range==null) return null;
+        DataRange[] r = new DataRange[range.length];
+        for(int i=0;i<range.length;i++) {
+            r[i] = makeDataRange(range[i]);
+        }
+        return r;
+    }
 
 
     /**

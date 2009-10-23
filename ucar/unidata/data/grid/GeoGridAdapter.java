@@ -59,7 +59,7 @@ import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.RadarGridCoordinateSystem;
 import ucar.visad.Util;
 
-import ucar.visad.data.CachedFlatField;
+import visad.data.CachedFlatField;
 import ucar.visad.data.GeoGridFlatField;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
@@ -1437,7 +1437,7 @@ public class GeoGridAdapter {
         CachedFlatField sample = getFlatField(timeIndex, readLabel);
         synchronized (sampleRanges) {
             if (sampleRanges[0] == null) {
-                sampleRanges[0] = sample.getRanges(true);
+                sampleRanges[0] = GridUtil.makeRanges(sample.getRanges(true));
                 //Check to see if the sample is valid
                 if ((sampleRanges[0] != null)
                         && (sampleRanges[0].length > 0)) {
@@ -1455,7 +1455,7 @@ public class GeoGridAdapter {
             }
         }
 
-        sample.setSampleRanges(sampleRanges[0]);
+        sample.setSampleRanges(GridUtil.makeDataRanges(sampleRanges[0]));
 
 
         if ((sample != null) && !sample.isMissing()) {

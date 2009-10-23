@@ -51,6 +51,7 @@ import ucar.unidata.util.Trace;
 
 
 import visad.*;
+import visad.data.CachedFlatField;
 
 import visad.data.mcidas.AREACoordinateSystem;
 
@@ -341,8 +342,8 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
      * @return _more_
      */
     protected int[][] getDirNavAux() {
-        if (myParent != null) {
-            return ((AddeImageFlatField) myParent).getDirNavAux();
+        if (getParent() != null) {
+            return ((AddeImageFlatField) getParent()).getDirNavAux();
         }
         checkReadData();
         String file = getDirNavAuxFile();
@@ -430,7 +431,7 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
      *
      * @return data
      */
-    protected float[][] readData() {
+    public float[][] readData() {
         try {
             msg("Reading ADDE data  " + readLabel);
             LogUtil.message(readLabel);

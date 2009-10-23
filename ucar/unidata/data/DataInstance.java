@@ -27,7 +27,6 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.ObjectArray;
 
 
-import ucar.unidata.util.Range;
 import ucar.unidata.util.ThreeDSize;
 
 import ucar.visad.quantities.CommonUnits;

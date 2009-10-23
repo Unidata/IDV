@@ -54,7 +54,6 @@ import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
-import ucar.visad.data.CachedFlatField;
 
 import visad.*;
 

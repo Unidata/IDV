@@ -49,13 +49,16 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.util.*;
 
+
 import ucar.visad.data.*;
 import ucar.visad.RadarMapProjection;
 import ucar.visad.Util;
-import ucar.visad.data.CachedFlatField;
 
-import visad.*;
+
 import visad.Set;
+import visad.*;
+import visad.data.*;
+
 
 import visad.bom.Radar2DCoordinateSystem;
 import visad.bom.Radar3DCoordinateSystem;

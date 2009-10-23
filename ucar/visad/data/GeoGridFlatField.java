@@ -39,11 +39,11 @@ import ucar.unidata.util.IOUtil;
 
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
 
 
 import visad.*;
+import visad.data.CachedFlatField;
 
 import visad.util.DataUtility;
 
@@ -203,9 +203,9 @@ public class GeoGridFlatField extends CachedFlatField {
      *
      * @return data
      */
-    protected float[][] readData() {
-        if (myParent != null) {
-            return myParent.readData();
+    public float[][] readData() {
+        if (getParent() != null) {
+            return getParent().readData();
         }
         //        Misc.printStack("GeoGridFlatField.readData",15,null);
         Array arr;

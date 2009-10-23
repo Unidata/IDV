@@ -34,6 +34,8 @@ import ucar.unidata.util.TwoFacedObject;
 
 
 import ucar.visad.data.*;
+import visad.data.CachedFlatField;
+import visad.data.DataRange;
 import ucar.visad.display.ColorScaleInfo;
 
 import ucar.visad.quantities.CommonUnits;

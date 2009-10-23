@@ -58,7 +58,6 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.ThreeDSize;
 import ucar.unidata.util.Trace;
@@ -69,7 +68,6 @@ import ucar.unidata.xml.*;
 
 import ucar.visad.Util;
 
-import ucar.visad.data.CachedFlatField;
 
 import visad.Data;
 import visad.DataReference;
