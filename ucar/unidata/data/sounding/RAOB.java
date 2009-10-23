@@ -2299,6 +2299,7 @@ public final class RAOB extends InvisiblePropertiedBean {
                 dewPointProfileProperty.enableRecomputation();
                 windProfileProperty.enableRecomputation();
             } catch (PropertyVetoException e) {}  // ignore
+              catch (NullPointerException excp) {} // ignore some missing data in raob
         }
 
         /**
