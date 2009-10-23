@@ -76,7 +76,7 @@ import java.rmi.RemoteException;
  * @author Unidata Development Team
  * @version $Revision: 1.7 $ $Date: 2007/08/08 17:14:56 $
  */
-public class AddeImageFlatField extends CachedFlatField implements SingleBandedImage {
+public class AreaImageFlatField extends CachedFlatField implements SingleBandedImage {
 
 
 
@@ -115,7 +115,7 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
      *
      * @throws VisADException On badness
      */
-    public AddeImageFlatField(AddeImageFlatField that, boolean copy,
+    public AreaImageFlatField(AreaImageFlatField that, boolean copy,
                               FunctionType type, Set domainSet,
                               CoordinateSystem rangeCoordSys,
                               CoordinateSystem[] rangeCoordSysArray,
@@ -148,7 +148,7 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
                                    CoordinateSystem[] rangeCoordSysArray,
                                    Set[] rangeSets, Unit[] units)
             throws VisADException {
-        return new AddeImageFlatField(this, copy, type, domainSet,
+        return new AreaImageFlatField(this, copy, type, domainSet,
                                       rangeCoordSys, rangeCoordSysArray,
                                       rangeSets, units, readLabel);
     }
@@ -167,7 +167,7 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
      *
      * @throws VisADException On badness
      */
-    public AddeImageFlatField(FunctionType type, Set domainSet,
+    public AreaImageFlatField(FunctionType type, Set domainSet,
                               CoordinateSystem rangeCoordSys,
                               Set[] rangeSets, Unit[] units, float[][] floats, String readLabel)
             throws VisADException {
@@ -192,7 +192,7 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    public static AddeImageFlatField create(AddeImageDescriptor aid,
+    public static AreaImageFlatField create(AddeImageDescriptor aid,
                                             AreaDirectory areaDirectory,
                                             boolean shouldCache,
                                             String cacheFile,
@@ -298,7 +298,7 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
         }
 
 
-        AddeImageFlatField aiff = new AddeImageFlatField(image_type,
+        AreaImageFlatField aiff = new AreaImageFlatField(image_type,
                                       domain_set, null, rangeSets,
                                       rangeUnits, null, readLabel);
         aiff.bandIndices = bandIndices;
@@ -343,7 +343,7 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
      */
     protected int[][] getDirNavAux() {
         if (getParent() != null) {
-            return ((AddeImageFlatField) getParent()).getDirNavAux();
+            return ((AreaImageFlatField) getParent()).getDirNavAux();
         }
         checkReadData();
         String file = getDirNavAuxFile();
@@ -380,7 +380,7 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
     public static class MyAREACoordinateSystem extends AREACoordinateSystem {
 
         /** _more_ */
-        AddeImageFlatField aiff;
+        AreaImageFlatField aiff;
 
         /**
          * _more_
@@ -447,24 +447,46 @@ public class AddeImageFlatField extends CachedFlatField implements SingleBandedI
               areaFile = aa.getAreaFile();
             */
             haveReadData = true;
+
+
+            long tt1 = System.currentTimeMillis();
             AreaFile areaFile = AreaFileFactory.getAreaFileInstance(aid.getImageInfo()!=null?
                                                                     aid.getImageInfo().makeAddeUrl():
                                                                     aid.getSource());
+            long tt2 = System.currentTimeMillis();
+
+
+            System.err.println("Time new areafile:" + (tt2-tt1));
+            long t1 = System.currentTimeMillis();
             float[][][] flt_samples = areaFile.getFloatData();
-            int nLines = (aid.getImageInfo()!=null?aid.getImageInfo().getLines():aid.getDirectory().getLines());
-            int nEles = (aid.getImageInfo()!=null?aid.getImageInfo().getElements():aid.getDirectory().getElements());
-
+            long t2 = System.currentTimeMillis();
+            System.err.println("Time getfloatdata:" + (t2-t1));
+            //            int nLines = (aid.getImageInfo()!=null?aid.getImageInfo().getLines():aid.getDirectory().getLines());
+            //            int nEles = (aid.getImageInfo()!=null?aid.getImageInfo().getElements():aid.getDirectory().getElements());
+            int nLines = flt_samples[0].length;
+            int nEles = flt_samples[0][0].length;
             float[][]   samples     = new float[1][nEles * nLines];
-
 
             float calScale =
                 (1.0f
                  / areaFile.getAreaDirectory().getCalibrationScaleFactor());
-            for (int i = 0; i < nLines; i++) {
-                for (int j = 0; j < nEles; j++) {
-                    float v = calScale * flt_samples[bandIndices[0]][i][j];
-                    samples[0][j + (nEles * i)] = v;
+
+            int bandIndex = bandIndices[0];
+
+            int lineIdx=0; int elementIdx=0;
+            try {
+                for (lineIdx = 0; lineIdx < nLines; lineIdx++) {
+                    int sampleOffset = (nEles * lineIdx);
+                    float line[] = flt_samples[bandIndex][lineIdx];
+                    for (elementIdx = 0; elementIdx < nEles; elementIdx++) {
+                        float v = calScale * line[elementIdx];
+                        samples[0][elementIdx + sampleOffset] = v;
+                    }
                 }
+            } catch(ArrayIndexOutOfBoundsException aioe) {
+                System.err.println("error:" + aioe+"\n      band index:" + bandIndex+" neles:" + nEles +" nLines:" + nLines +"  flt:" + flt_samples.length +" X " + flt_samples[0].length +" X " + flt_samples[0][0].length +"   i:" + lineIdx +" elementIdx:" + elementIdx);
+                aioe.printStackTrace();
+                throw aioe;
             }
 
 
