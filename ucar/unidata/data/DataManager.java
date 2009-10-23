@@ -309,6 +309,7 @@ public class DataManager {
                 IdvResourceManager.RSC_DATASOURCE));
 
         loadIospResources(resourceManager);
+	System.setProperty("visad.java3d.imageByRef", "true");
         visad.DataCacheManager.getCacheManager().setCacheDir(new File(getDataCacheDirectory()));
         visad.DataCacheManager.getCacheManager().setMemoryPercent(dataContext.getIdv().getStateManager().getPreferenceOrProperty(PROP_CACHE_PERCENT, 0.25));
 
