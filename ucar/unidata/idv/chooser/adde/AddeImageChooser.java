@@ -1190,8 +1190,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         if (useLatLon()) {
             locationPanel.flip();
         }
-        centerLineFld.setText("" + (propertiesAD.getLines() / 2));
-        centerElementFld.setText("" + (propertiesAD.getElements() / 2));
+        centerLineFld.setText("" + (propertiesAD.getLines() / 2 - 1));
+        centerElementFld.setText("" + (propertiesAD.getElements() / 2 - 1));
 
         setMagSliders(1, 1);
         amSettingProperties = false;
