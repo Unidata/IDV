@@ -1468,7 +1468,7 @@ public class DataManager {
                     new BadDataException(
                         "Do not know how to handle the given data: "
                         + type.definingObject));
-                continue;
+                break;
             }
             dataType       = type.dataTypeId;
             definingObject = type.definingObject;
@@ -1478,7 +1478,7 @@ public class DataManager {
                     type.definingObject,
                     new BadDataException(
                         "No factory for dataType: " + dataType));
-                continue;
+                break;
             }
 
             LogUtil.consoleMessage("Loading in data source: "
@@ -1493,7 +1493,7 @@ public class DataManager {
                         type.definingObject,
                         new BadDataException(
                             "No factory for dataType: " + dataType));
-                    continue;
+                    break;
                 }
 
 
@@ -1509,7 +1509,7 @@ public class DataManager {
                             "No constructor found for class:"
                             + factoryClass.getName() + " data:"
                             + definingObject.getClass()));
-                    continue;
+                    break;
                 }
 
 
@@ -1532,7 +1532,7 @@ public class DataManager {
                                 new BadDataException(
                                     dataSource.getErrorMessage()));
                         }
-                        continue;
+                        break;
                     } else {
                         if (addDataSource(dataSource)) {
                             lookupKey = new Object[] { definingObject,
@@ -1555,24 +1555,28 @@ public class DataManager {
                 results.addFailed(definingObject,
                                   new BadDataException("Cannot open file: "
                                       + definingObject, iae));
+                break;
             } catch (java.lang.reflect.InvocationTargetException ite) {
                 results.addFailed(
                     definingObject,
                     new BadDataException(
                         "Error creating data source:" + dataType + " with: "
                         + definingObject + "\n", ite.getTargetException()));
+                break;
             } catch (WrapperException wexc) {
                 results.addFailed(
                     definingObject, new BadDataException(
                         "Error creating data source:" + dataType + " with: "
                         + definingObject + "\n" + wexc.getMessage()
                         + "\n", wexc.getException()));
+                break;
             } catch (Throwable exc) {
                 results.addFailed(
                     definingObject,
                     new BadDataException(
                         "Error creating data source:" + dataType + " with: "
                         + definingObject + "\n", exc));
+                break;
             }
         }
         return results;
