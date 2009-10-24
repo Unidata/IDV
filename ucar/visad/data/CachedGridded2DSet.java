@@ -38,18 +38,18 @@ public class CachedGridded2DSet extends Gridded2DSet {
     private Object cacheId;
 
     public CachedGridded2DSet(MathType type, float[][] samples, int lengthX, int lengthY,
-			      CoordinateSystem coord_sys, Unit[] units,
-			      ErrorEstimate[] errors, boolean copy, boolean test)
-	throws VisADException {
-	super(type, samples, lengthX, lengthY, coord_sys, units, errors, copy, test);
-	initCache(samples);
+                              CoordinateSystem coord_sys, Unit[] units,
+                              ErrorEstimate[] errors, boolean copy, boolean test)
+        throws VisADException {
+        super(type, samples, lengthX, lengthY, coord_sys, units, errors, copy, test);
+        initCache(samples);
     }
 
 
     private void initCache(float[][]samples) {
-	if(cacheId!=null) return;
-	cacheId = DataCacheManager.getCacheManager().addToCache(samples);
-	super.setMySamples(null);
+        if(cacheId!=null) return;
+        cacheId = DataCacheManager.getCacheManager().addToCache(samples);
+        super.setMySamples(null);
     }
 
     public void finalize()  throws Throwable {
@@ -58,17 +58,17 @@ public class CachedGridded2DSet extends Gridded2DSet {
     }
 
     protected void setMySamples(float[][]samples) {
-	if(cacheId==null) {
-	    cacheId = DataCacheManager.getCacheManager().addToCache(samples);
-	} else {
-	    DataCacheManager.getCacheManager().updateData(cacheId, samples);
-	}
-	super.setMySamples(null);
+        if(cacheId==null) {
+            cacheId = DataCacheManager.getCacheManager().addToCache(samples);
+        } else {
+            DataCacheManager.getCacheManager().updateData(cacheId, samples);
+        }
+        super.setMySamples(null);
     }
 
 
     protected float[][] getMySamples() {
-	return DataCacheManager.getCacheManager().getFloatArray2D(cacheId);
+        return DataCacheManager.getCacheManager().getFloatArray2D(cacheId);
     }
 
 

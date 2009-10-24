@@ -36,29 +36,29 @@ public class CachedGridded3DSet extends Gridded3DSet {
     private Object cacheId;
 
     public CachedGridded3DSet(MathType type, float[][] samples, int lengthX,
-			      int lengthY, int lengthZ, CoordinateSystem coord_sys, Unit[] units,
-			      ErrorEstimate[] errors, boolean copy, boolean test) throws VisADException {
-	super(type, samples, lengthX, lengthY, lengthZ,  coord_sys,
-	      units, errors, copy,test);
-	initCache(samples);
+                              int lengthY, int lengthZ, CoordinateSystem coord_sys, Unit[] units,
+                              ErrorEstimate[] errors, boolean copy, boolean test) throws VisADException {
+        super(type, samples, lengthX, lengthY, lengthZ,  coord_sys,
+              units, errors, copy,test);
+        initCache(samples);
     }
 
 
 
     public CachedGridded3DSet(MathType type, float[][] samples, int lengthX,
-			      CoordinateSystem coord_sys, Unit[] units, ErrorEstimate[] errors,
-			      boolean copy) throws VisADException {
-	super(type, samples, lengthX, coord_sys, units,
-	      errors, copy);
-	initCache(samples);
+                              CoordinateSystem coord_sys, Unit[] units, ErrorEstimate[] errors,
+                              boolean copy) throws VisADException {
+        super(type, samples, lengthX, coord_sys, units,
+              errors, copy);
+        initCache(samples);
     }
 
 
     public CachedGridded3DSet(MathType type, float[][] samples, int lengthX,
-			      int lengthY, CoordinateSystem coord_sys, Unit[] units,
-			      ErrorEstimate[] errors, boolean copy) throws VisADException {
-	super(type, samples, lengthX, lengthY, coord_sys, units, errors, copy);
-	initCache(samples);
+                              int lengthY, CoordinateSystem coord_sys, Unit[] units,
+                              ErrorEstimate[] errors, boolean copy) throws VisADException {
+        super(type, samples, lengthX, lengthY, coord_sys, units, errors, copy);
+        initCache(samples);
     }
 
 
@@ -68,22 +68,22 @@ public class CachedGridded3DSet extends Gridded3DSet {
     }
 
     private void initCache(float[][]samples) {
-	if(cacheId!=null) return;
-	cacheId = DataCacheManager.getCacheManager().addToCache(samples);
-	super.setMySamples(null);
+        if(cacheId!=null) return;
+        cacheId = DataCacheManager.getCacheManager().addToCache(samples);
+        super.setMySamples(null);
     }
 
     protected void setMySamples(float[][]samples) {
-	if(cacheId==null) {
-	    cacheId = DataCacheManager.getCacheManager().addToCache(samples);
-	} else {
-	    DataCacheManager.getCacheManager().updateData(cacheId, samples);
-	}
-	super.setMySamples(null);
+        if(cacheId==null) {
+            cacheId = DataCacheManager.getCacheManager().addToCache(samples);
+        } else {
+            DataCacheManager.getCacheManager().updateData(cacheId, samples);
+        }
+        super.setMySamples(null);
     }
 
     protected float[][] getMySamples() {
-	return DataCacheManager.getCacheManager().getFloatArray2D(cacheId);
+        return DataCacheManager.getCacheManager().getFloatArray2D(cacheId);
     }
 
 }
