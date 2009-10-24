@@ -229,14 +229,13 @@ public class MapProjectionDisplayJ3D extends MapProjectionDisplay {
             DisplayRendererJ3D rend =
                 (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
             rend.setRotateAboutCenter(true);
-            getView().setFrontClipDistance(CLIP_FRONT_DEFAULT);
-            getView().setBackClipDistance(CLIP_BACK_DEFAULT);
 
             canDoStereo = (getDisplayMode() == MODE_3D)
                           && rend.getCanvas().getStereoAvailable();
             //System.err.println(
             //    "MapProjectionDisplayJ3D:canDoStereo = " + canDoStereo);
             setPerspectiveView(canDoStereo);
+	    checkClipDistance();
             setEyePosition(0.004);
             KeyboardBehaviorJ3D behavior = new KeyboardBehaviorJ3D(rend);
             rend.addKeyboardBehavior(behavior);
@@ -391,13 +390,6 @@ public class MapProjectionDisplayJ3D extends MapProjectionDisplay {
         if (perspectiveView == isPerspectiveView()) {
             return;
         }
-        if(perspectiveView) {
-            getView().setFrontClipDistance(CLIP_FRONT_PERSPECTIVE);
-            getView().setBackClipDistance(CLIP_BACK_PERSPECTIVE);
-        } else {
-            getView().setFrontClipDistance(CLIP_FRONT_DEFAULT);
-            getView().setBackClipDistance(CLIP_BACK_DEFAULT);
-        }
 
         try {
             getDisplay().getGraphicsModeControl().setProjectionPolicy(
@@ -409,6 +401,7 @@ public class MapProjectionDisplayJ3D extends MapProjectionDisplay {
             ;
         }
         super.setPerspectiveView(perspectiveView);
+	checkClipDistance();
     }
 
     /**
@@ -530,6 +523,33 @@ public class MapProjectionDisplayJ3D extends MapProjectionDisplay {
         // default is(-0.033, 0.0, 0.0)
         myBody.setRightEyePosition(new Point3d(+position, 0.0, 0.0));
     }
+
+
+
+    public void setClipDistanceFront (double value) {
+        super.setClipDistanceFront(value);
+	checkClipDistance();
+    }
+
+    public void setClipDistanceBack (double value) {
+        super.setClipDistanceBack(value);
+	checkClipDistance();
+    }
+
+
+    public void checkClipDistance() {
+	View view = getView();
+	if(view==null) return;
+	if (isPerspectiveView()) {
+            view.setFrontClipDistance(CLIP_FRONT_PERSPECTIVE);
+            view.setBackClipDistance(CLIP_BACK_PERSPECTIVE);
+        } else {
+	    view.setFrontClipDistance(getClipDistanceFront());
+	    view.setBackClipDistance(getClipDistanceBack());
+	    System.err.println("map clip:" + getClipDistanceFront() + " " +getClipDistanceBack());
+        }
+    }
+
 
 }
 

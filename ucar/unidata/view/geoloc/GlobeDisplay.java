@@ -215,9 +215,8 @@ public class GlobeDisplay extends NavigatedDisplay {
             (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
         canDoStereo = rend.getCanvas().getStereoAvailable();
         //System.err.println("GlobeDisplay:canDoStereo = " + canDoStereo);
-        getView().setFrontClipDistance(CLIP_FRONT_DEFAULT);
-        //        getView().setBackClipDistance(CLIP_BACK_DEFAULT);
         setPerspectiveView(canDoStereo);
+	checkClipDistance();
         setEyePosition(0.004);
 
         KeyboardBehaviorJ3D behavior = new KeyboardBehaviorJ3D(rend);
@@ -708,6 +707,7 @@ public class GlobeDisplay extends NavigatedDisplay {
      * @return the View
      */
     public View getView() {
+	if(getDisplay()==null) return null;
         DisplayRendererJ3D rend =
             (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
         return rend.getView();
@@ -721,15 +721,8 @@ public class GlobeDisplay extends NavigatedDisplay {
      */
     public void setPerspectiveView(boolean perspectiveView) {
 
-
         if (perspectiveView == isPerspectiveView()) {
             return;
-        }
-
-        if (perspectiveView) {
-            getView().setFrontClipDistance(CLIP_FRONT_PERSPECTIVE);
-        } else {
-            getView().setFrontClipDistance(CLIP_FRONT_DEFAULT);
         }
 
         try {
@@ -742,6 +735,9 @@ public class GlobeDisplay extends NavigatedDisplay {
             ;
         }
         super.setPerspectiveView(perspectiveView);
+
+        checkClipDistance();
+
     }
 
     /**
@@ -1380,5 +1376,23 @@ public class GlobeDisplay extends NavigatedDisplay {
         globeDisplay.setBoxVisible(false);
         */
     }
+
+
+
+    public void setClipDistanceFront (double value) {
+        super.setClipDistanceFront(value);
+	checkClipDistance();
+    }
+
+    public void checkClipDistance() {
+	View view = getView();
+	if(view==null) return;
+	if (isPerspectiveView()) {
+            view.setFrontClipDistance(CLIP_FRONT_PERSPECTIVE);
+        } else {
+	    view.setFrontClipDistance(getClipDistanceFront());
+        }
+    }
+
 }
 

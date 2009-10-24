@@ -90,6 +90,12 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     public static double CLIP_BACK_PERSPECTIVE = 10.0;
 
 
+    private double clipDistanceBack = CLIP_BACK_DEFAULT;
+
+    private double clipDistanceFront = CLIP_FRONT_DEFAULT;
+
+
+
     /**
      * The name of the latitude property.
      */
@@ -2365,6 +2371,44 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         }
 
         setProjectionMatrix(t1);
+    }
+
+    /**
+       Set the ClipDistanceBack property.
+
+       @param value The new value for ClipDistanceBack
+    **/
+    public void setClipDistanceBack (double value) {
+	this.clipDistanceBack = value;
+    }
+
+    /**
+       Get the ClipDistanceBack property.
+
+       @return The ClipDistanceBack
+    **/
+    public double getClipDistanceBack () {
+	return this.clipDistanceBack;
+    }
+
+    /**
+       Set the ClipDistanceFront property.
+
+       @param value The new value for ClipDistanceFront
+    **/
+    public void setClipDistanceFront (double value) {
+	this.clipDistanceFront = value;
+    }
+
+
+
+    /**
+       Get the ClipDistanceFront property.
+
+       @return The ClipDistanceFront
+    **/
+    public double getClipDistanceFront () {
+	return this.clipDistanceFront;
     }
 
 
