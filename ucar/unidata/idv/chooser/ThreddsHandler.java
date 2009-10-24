@@ -257,7 +257,7 @@ public class ThreddsHandler extends XmlHandler {
      *  @return The UI component
      */
     protected JComponent doMakeContents() {
-        showThumbsCbx = new JCheckBox("Show Thumbnail Images",true);
+        showThumbsCbx = new JCheckBox("Show Thumbnail Images",!GuiUtils.isMac());
         showThumbsCbx.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     updateTree();

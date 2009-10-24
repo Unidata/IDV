@@ -913,9 +913,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
         contentsWrapper = GuiUtils.center(innerContents);
         menuBar         = doMakeMenuBar();
         if (menuBar != null) {
-            menuBar.setBorderPainted(false);
-            menuBar.setMargin(new Insets(0,0,0,0));
-            menuBar.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+	    menuBar.setBorderPainted(false);
+	    menuBar.setMargin(new Insets(0,0,0,0));
+	    menuBar.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
             menuBar.setOpaque(false);
         }
         nameLabel = GuiUtils.cLabel(" ");
@@ -3538,7 +3538,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     protected JMenuBar doMakeMenuBar() {
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-        return GuiUtils.makeMenuBar(doMakeMenuList());
+	List items = doMakeMenuList();
+	JMenuBar menuBar =  GuiUtils.makeMenuBar(items);
+	return menuBar;
     }
 
     /**
