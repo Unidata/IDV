@@ -38,6 +38,20 @@
        action="action:bundle.favorite.save"
        mnemonic="F"/>
     <separator/>
+    <menu
+       label="Cache"
+       id="file.cache"
+       mnemonic="C">
+     <menuitem
+       label="Print Data Cache Stats"
+       action="jython:idv.printDataCacheStats()"
+        />
+     <menuitem
+       label="Flush Cache"
+       action="jython:idv.flushDataCache()"
+        />
+    </menu>
+    <separator/>
     <menu label="Publish" id="publish"
        icon="/auxdata/ui/icons/newspaper.png">
     </menu>
@@ -222,23 +236,6 @@
      id="help"
      label="Help"
      mnemonic="H">
-
-<!--
-     <menuitem
-       label="Print cache"
-       action="jython:idv.printCache();"
-       />
--->
-
-     <menuitem
-       label="Print Data Cache Stats"
-       action="jython:idv.printDataCacheStats()"
-        />
-     <menuitem
-       label="Flush Cache"
-       action="jython:idv.flushDataCache()"
-        />
-
 
      <menuitem
         icon="/auxdata/ui/icons/help.png"
