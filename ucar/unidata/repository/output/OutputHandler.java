@@ -1432,6 +1432,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /** _more_ */
     public static final String WIKIPROP_CHILDREN = "children";
 
+    public static final String WIKIPROP_URL = "url";
+
     //        WIKIPROP_IMPORT = "import";
 
     /** _more_ */
@@ -1571,6 +1573,106 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     }
 
 
+    public String getWikiImage(Request request,String url, Entry entry, Hashtable props)
+            throws Exception {
+	String width = (String)props.get(HtmlUtil.ATTR_WIDTH);
+	String extra = "";
+	
+	if(width!=null)
+	    extra = HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, width);
+	String img =  HtmlUtil.img(url, entry.getName(),extra);
+	boolean link = Misc.equals("true",props.get("link"));
+	if(link) {
+	    return HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
+						  entry), img);
+
+	}
+	return img;
+    }
+
+
+    public String getWikiUrl(WikiUtil wikiUtil, Request request,
+                                 Entry entry, Hashtable props)
+            throws Exception {
+
+	String src = (String)props.get("src");
+	Entry srcEntry=null;
+	if(src==null) {
+	    srcEntry = entry;
+	} else {
+	    src = src.trim();
+	    if(src.length()==0 || entry.getName().equals(src)) {
+		srcEntry = entry;
+	    } else if(entry instanceof Group) {
+		srcEntry = getEntryManager().findEntryWithName(request, (Group)entry, src);
+	    }
+	}
+	if(srcEntry==null) {
+	    srcEntry = getEntryManager().getEntry(request, src);
+	}
+
+	if(srcEntry==null) {
+	    return msg("Could not find src:" + src);
+	}
+	
+	return request.entryUrl(getRepository().URL_ENTRY_SHOW,	srcEntry);
+
+    }
+
+
+    public String getWikiImage(WikiUtil wikiUtil, Request request,
+                                 Entry entry, Hashtable props)
+            throws Exception {
+
+	String src = (String)props.get("src");
+	if(src==null) {
+	    if ( !entry.getResource().isImage()) {
+		return msg("Not an image");
+	    }
+	    return  getWikiImage(request,getImageUrl(request, entry), entry,props);
+	}
+
+	String attachment = null;
+	int idx = src.indexOf("::");
+	if(idx>=0) {
+            List<String> toks = StringUtil.splitUpTo(src, "::", 2);
+	    if(toks.size()==2) {
+		src = toks.get(0);
+		attachment = toks.get(1).substring(1);
+	    }
+	}
+	src = src.trim();
+	Entry srcEntry=null;
+
+	if(src.length()==0 || entry.getName().equals(src)) {
+	    srcEntry = entry;
+	} else if(entry instanceof Group) {
+	    srcEntry = getEntryManager().findEntryWithName(request, (Group)entry, src);
+	}
+	if(srcEntry==null) {
+	    return msg("Could not find src:" + src);
+	}
+	if(attachment==null) {
+	    if ( !srcEntry.getResource().isImage()) {
+		return msg("Not an image");
+	    }
+	    return getWikiImage(request,getImageUrl(request, srcEntry), srcEntry,props);
+	}
+
+
+        for (Metadata metadata : getMetadataManager().getMetadata(srcEntry)) {
+	    MetadataType metadataType = getMetadataManager().findType(metadata.getType());
+	    String url = metadataType.getImageUrl(request, srcEntry,metadata,attachment);
+	    if(url!=null) {
+		return getWikiImage(request,url, srcEntry,props);
+	    }
+	}
+
+	return msg("Could not find image attachment:" + attachment);
+    }
+
+
+
     /**
      * _more_
      *
@@ -1600,10 +1702,9 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                     request, entry, true);
             blockTitle = Misc.getProperty(props, "title", msg("Information"));
         } else if (include.equals(WIKIPROP_IMAGE)) {
-            if ( !entry.getResource().isImage()) {
-                return msg("Not an image");
-            }
-            return HtmlUtil.img(getImageUrl(request, entry), entry.getName());
+            return getWikiImage(wikiUtil, request, entry, props);
+        } else if (include.equals(WIKIPROP_URL)) {
+            return getWikiUrl(wikiUtil, request, entry, props);
         } else if (include.equals(WIKIPROP_LINKS)) {
             blockTitle = Misc.getProperty(props, "title", msg(LABEL_LINKS));
             blockContent = getEntryManager().getEntryActionsTable(request,
