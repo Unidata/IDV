@@ -2232,7 +2232,9 @@ public class GeoGridDataSource extends GridDataSource {
         if ( !super.applyProperties()) {
             return false;
         }
-        reverseTimes = reverseTimesCheckbox.isSelected();
+	if(reverseTimesCheckbox!=null) {
+	    reverseTimes = reverseTimesCheckbox.isSelected();
+	}
         return true;
     }
 
