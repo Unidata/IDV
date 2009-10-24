@@ -936,6 +936,7 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
         contents = GuiUtils.topCenterBottom(menuBar,
                                             GuiUtils.inset(tableTabbedPane,
                                                 2), bottom);
+	setMenuBar(menuBar);
         loadResources(resources);
     }
 

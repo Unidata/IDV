@@ -6727,5 +6727,26 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    /**
+     * Is this running on a Mac?
+     *
+     * @return true if running on Mac
+     */
+    public static boolean isMac() {
+        String os = System.getProperty("os.name");
+        if ((os != null) && (os.toLowerCase().indexOf("mac") >= 0)) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public static void decorateFrame(JFrame frame, JMenuBar menuBar) {
+	if(frame!=null & menuBar!=null && isMac()) {
+	    frame.setJMenuBar(menuBar);
+	}
+    }
+
+
 }
 

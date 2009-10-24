@@ -102,6 +102,7 @@ public class DisplaySettingsDialog {
     /** gui component */
     private JComponent contents;
 
+    private JMenuBar menuBar;
 
     /** list of dipslays */
     private JList displaysList;
@@ -516,7 +517,7 @@ public class DisplaySettingsDialog {
         menus.add(editMenu);
         fileMenu.add(GuiUtils.makeMenuItem("Save Selected Properties", this,
                                            "doSave"));
-        JMenuBar menuBar = GuiUtils.makeMenuBar(menus);
+        menuBar = GuiUtils.makeMenuBar(menus);
         applyContents = GuiUtils.topCenter(menuBar, applyContents);
         return applyContents;
 

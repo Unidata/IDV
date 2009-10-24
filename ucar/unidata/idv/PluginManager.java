@@ -1334,7 +1334,8 @@ public class PluginManager extends IdvManager {
             JComponent contents = GuiUtils.topCenterBottom(menuBar, center,
                                       bottom);
             createWindow.getContentPane().add(contents);
-            createWindow.pack();
+	    GuiUtils.decorateFrame(createWindow, menuBar);
+	    createWindow.pack();
             ucar.unidata.util.Msg.translateTree(createWindow);
             createWindow.setLocation(100, 100);
         }
@@ -2265,6 +2266,7 @@ public class PluginManager extends IdvManager {
         pluginWindow = GuiUtils.createFrame(GuiUtils.getApplicationTitle() +"Plugin Manager");
 
         pluginWindow.getContentPane().add(contents);
+	GuiUtils.decorateFrame(pluginWindow, menuBar);
         pluginWindow.pack();
         ucar.unidata.util.Msg.translateTree(pluginWindow);
         pluginWindow.setLocation(100, 100);

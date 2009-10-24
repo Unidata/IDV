@@ -282,6 +282,7 @@ public class AliasEditor extends IdvManager {
                                 "close"));
         contents = GuiUtils.topCenterBottom(menuBar, tabbedPane, bottom);
 
+	setMenuBar(menuBar);
     }
 
 

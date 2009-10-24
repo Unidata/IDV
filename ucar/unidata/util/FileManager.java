@@ -1067,6 +1067,7 @@ public class FileManager {
 
         chooser.setApproveButtonText("Save");
         if (accessory != null) {
+	    accessory = GuiUtils.inset(accessory, 2);
             chooser.setAccessory(accessory);
         }
 
@@ -1396,6 +1397,7 @@ public class FileManager {
             }
         }
         if (accessory != null) {
+	    accessory = GuiUtils.inset(accessory, 2);
             fileManager.setAccessory(accessory);
         }
         fileManager.getChooser().setDialogType((forWrite

@@ -60,12 +60,22 @@ public abstract class WindowHolder implements ActionListener {
     /** _more_ */
     protected Window window;
 
+    private  JMenuBar menuBar;
 
     /**
      * Construct this object
      *
      */
     public WindowHolder() {}
+
+
+    public void setMenuBar(JMenuBar menuBar) {
+	this.menuBar = menuBar;
+
+	if(frame!=null) {
+	    GuiUtils.decorateFrame(frame, menuBar);
+	} 
+    }
 
 
     /**
@@ -128,6 +138,9 @@ public abstract class WindowHolder implements ActionListener {
         } else {
             if (frame == null) {
                 frame = new JFrame(getWindowTitle());
+		if(menuBar !=null) {
+		    GuiUtils.decorateFrame(frame, menuBar);
+		}
                 LogUtil.registerWindow(frame);
                 frame.getContentPane().add(contents);
                 frame.pack();

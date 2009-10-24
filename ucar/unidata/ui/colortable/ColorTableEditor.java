@@ -148,6 +148,7 @@ public class ColorTableEditor extends WindowHolder {
         this.listener      = listener;
     }
 
+
     /**
      * Show the window
      */
@@ -236,6 +237,7 @@ public class ColorTableEditor extends WindowHolder {
                                             bottom);
 
 
+	setMenuBar(menuBar);
         setDialogTitle();
         show();
     }

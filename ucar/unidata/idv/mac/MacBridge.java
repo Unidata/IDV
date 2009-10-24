@@ -28,7 +28,7 @@ import com.apple.eawt.*;
 
 import java.awt.*;
 
-public class MacBridge extends IdvManager implements ApplicationListener {
+public class MacBridge extends IdvManager implements ApplicationListener  {
 
     /**
      * Create this manager
@@ -40,6 +40,8 @@ public class MacBridge extends IdvManager implements ApplicationListener {
         super(idv);
 	init();
     }
+
+
 
     private void init() {
 	Application application = Application.getApplication();

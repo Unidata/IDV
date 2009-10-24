@@ -1150,7 +1150,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 buttons), 5);
         boolean newOne = false;
         if (propertiesDialog == null) {
-            propertiesDialog = GuiUtils.createDialog("Properties", false);
+	    IdvWindow myWindow = getDisplayWindow();
+	    Window window = null;
+	    if(myWindow!=null) 
+		window = myWindow.getWindow();
+            propertiesDialog = GuiUtils.createDialog(window, "Properties", false);
             newOne           = true;
         }
         propertiesDialog.getContentPane().removeAll();

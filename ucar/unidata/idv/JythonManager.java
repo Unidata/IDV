@@ -584,8 +584,11 @@ public class JythonManager extends IdvManager implements ActionListener {
                     return findVisibleComponent();
                 }
             };
-            return contents = GuiUtils.topCenterBottom(menuBar, treePanel,
+             contents = GuiUtils.topCenterBottom(menuBar, treePanel,
                     textSearcher);
+	    setMenuBar(menuBar);
+	    return contents;
+
         } catch (Throwable exc) {
             logException("Creating jython editor", exc);
             return null;

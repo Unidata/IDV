@@ -298,12 +298,6 @@ public class StateManager extends IdvManager {
         }
 
 
-	System.setProperty("apple.laf.useScreenMenuBar", "true");
-	System.setProperty("com.apple.mrj.application.apple.menu.about.name", 
-			   (String) getProperty("idv.title",
-							 "Unidata IDV"));
-
-
         //Now do any command line argument -Dname=value properties
         for (int i = 0; i < getArgsManager().argPropertyNames.size(); i++) {
             idvProperties.put(getArgsManager().argPropertyNames.get(i),
@@ -330,9 +324,16 @@ public class StateManager extends IdvManager {
      */
     protected void initState(boolean interactiveMode) {
 
+
+	//Seems like we have to have this way up front here as something we do below
+	//triggers the mac to ignore these settings
+	System.setProperty("apple.laf.useScreenMenuBar", "true");
+	System.setProperty("com.apple.mrj.application.apple.menu.about.name", 
+			   "IDV");
+
+
         LogUtil.setTestMode(getArgsManager().noGui
                             || getArgsManager().getIsOffScreen());
-
 
 
         //Trace.msg("initState-1");
@@ -342,6 +343,8 @@ public class StateManager extends IdvManager {
 
 
         loadProperties();
+
+
 
 
 
@@ -395,6 +398,8 @@ public class StateManager extends IdvManager {
         propertyRbiFiles.addAll(0, getArgsManager().argRbiFiles);
 
 
+
+
         //Have the resource manager load up the resources
         getResourceManager().init(propertyRbiFiles);
         //Trace.msg("initState-4");
@@ -406,8 +411,6 @@ public class StateManager extends IdvManager {
         ucar.unidata.util.Msg.init(
             getResourceManager().getResources(
                 IdvResourceManager.RSC_MESSAGES));
-
-
 
 
 
