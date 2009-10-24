@@ -546,7 +546,6 @@ public class MapProjectionDisplayJ3D extends MapProjectionDisplay {
         } else {
 	    view.setFrontClipDistance(getClipDistanceFront());
 	    view.setBackClipDistance(getClipDistanceBack());
-	    System.err.println("map clip:" + getClipDistanceFront() + " " +getClipDistanceBack());
         }
     }
 
