@@ -118,6 +118,12 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 public class MapViewManager extends NavigatedViewManager {
 
+    public static final String PROP_CLIPDISTANCE_GLOBE_FRONT  = "idv.clipdistance.globe.front";
+    public static final String PROP_CLIPDISTANCE_GLOBE_BACK  = "idv.clipdistance.globe.back";
+    public static final String PROP_CLIPDISTANCE_MAP_FRONT  = "idv.clipdistance.map.front";
+    public static final String PROP_CLIPDISTANCE_MAP_BACK  = "idv.clipdistance.map.back";
+
+
     public static final String CMD_FLY_LEFT = "cmd.fly.left";
     public static final String CMD_FLY_RIGHT = "cmd.fly.right";
     public static final String CMD_FLY_FORWARD = "cmd.fly.forward";
@@ -334,6 +340,8 @@ public class MapViewManager extends NavigatedViewManager {
             GlobeDisplay globeDisplay =
                 new GlobeDisplay(getIdv().getArgsManager().getIsOffScreen(),
                                  dimension, null);
+	    globeDisplay.setClipDistanceFront(getStateManager().getProperty(PROP_CLIPDISTANCE_GLOBE_FRONT,NavigatedDisplay.CLIP_FRONT_DEFAULT));
+	    globeDisplay.setClipDistanceBack(getStateManager().getProperty(PROP_CLIPDISTANCE_GLOBE_BACK,NavigatedDisplay.CLIP_BACK_DEFAULT));
             navDisplay = globeDisplay;
             setGlobeBackground(globeDisplay);
         } else {
@@ -352,6 +360,8 @@ public class MapViewManager extends NavigatedViewManager {
                     getIdv().getArgsManager().getIsOffScreen(), dimension);
             Trace.call2("MapViewManager.new MPD");
 
+	    mapDisplay.setClipDistanceFront(getStateManager().getProperty(PROP_CLIPDISTANCE_MAP_FRONT,NavigatedDisplay.CLIP_FRONT_DEFAULT));
+	    mapDisplay.setClipDistanceBack(getStateManager().getProperty(PROP_CLIPDISTANCE_MAP_BACK,NavigatedDisplay.CLIP_BACK_DEFAULT));
 
             double[] aspect = getAspectRatio();
             if (aspect == null) {
