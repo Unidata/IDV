@@ -588,7 +588,12 @@ public class StateManager extends IdvManager {
      * @return  the property or null
      */
     public Object getProperty(String name) {
-        Object value = idvProperties.get(name);
+        Object value = null;
+	if(getIdvUIManager().isMac()) {
+	    value = idvProperties.get("mac."+name);
+	}
+        if(value ==null) 
+	    value = idvProperties.get(name);
         if (value == null) {
             String fixedName = StateManager.fixIds(name);
             if ( !name.equals(fixedName)) {
