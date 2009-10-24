@@ -37,6 +37,14 @@ import visad.*;
 public class CachedGridded2DSet extends Gridded2DSet {
     private Object cacheId;
 
+    public CachedGridded2DSet(MathType type, float[][] samples, int lengthX,
+                              CoordinateSystem coord_sys, Unit[] units,
+                              ErrorEstimate[] errors, boolean copy)
+        throws VisADException {
+        super(type, samples, lengthX, coord_sys, units, errors, copy);
+        initCache(samples);
+    }
+
     public CachedGridded2DSet(MathType type, float[][] samples, int lengthX, int lengthY,
                               CoordinateSystem coord_sys, Unit[] units,
                               ErrorEstimate[] errors, boolean copy, boolean test)

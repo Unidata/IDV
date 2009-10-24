@@ -70,7 +70,7 @@ public class CachedGriddedSet extends GriddedSet {
         if (manifold_dimension == 1) {
           return new CachedGridded2DSet(type, samples,
                                   lengths[0],
-                                  coord_sys, units, errors, copy, false);
+                                  coord_sys, units, errors, copy);
         }
         else {
           return new CachedGridded2DSet(type, samples,
