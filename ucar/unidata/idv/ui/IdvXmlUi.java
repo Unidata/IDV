@@ -417,7 +417,7 @@ public class IdvXmlUi extends XmlUi {
             return toolbar;
         }
         if (tagName.equals(IdvUIManager.COMP_MENUBAR)) {
-	    if(idv.getIdvUIManager().isMac()) {
+	    if(GuiUtils.doMacMenubar()) {
 		return GuiUtils.filler();
 	    }
             return idv.getIdvUIManager().doMakeMenuBar(window);

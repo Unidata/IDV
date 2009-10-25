@@ -1208,11 +1208,7 @@ public class IdvUIManager extends IdvManager {
      * @return true if running on Mac
      */
     public boolean isMac() {
-        String os = System.getProperty("os.name");
-        if ((os != null) && (os.toLowerCase().indexOf("mac") >= 0)) {
-            return true;
-        }
-        return false;
+	return GuiUtils.isMac();
     }
 
     /**
@@ -2687,6 +2683,8 @@ public class IdvUIManager extends IdvManager {
     }
 
 
+
+
     /**
      * Add the station menu into the display menu
      *
@@ -2696,25 +2694,30 @@ public class IdvUIManager extends IdvManager {
     protected void processStationMenu(JMenu displayMenu, boolean makeNew) {
         ControlDescriptor locationDescriptor =
             getIdv().getControlDescriptor("locationcontrol");
-        if (locationDescriptor != null) {
-            List           stations = getIdv().getLocationList();
-            ObjectListener listener = new ObjectListener(locationDescriptor) {
-                public void actionPerformed(ActionEvent ae, Object obj) {
-                    addStationDisplay((NamedStationTable) obj,
-                                      (ControlDescriptor) theObject);
-                }
-            };
-            List menuItems = NamedStationTable.makeMenuItems(stations,
-                                 listener);
-            if (makeNew) {
-                displayMenu.add(
-                    GuiUtils.setIcon(
-                        GuiUtils.makeMenu("Locations", menuItems),
-                        "/auxdata/ui/icons/world_loc.png"));
-            } else {
-                GuiUtils.makeMenu(displayMenu, menuItems);
-            }
-        }
+
+        if (locationDescriptor == null) {
+	    return;
+	}
+	List<JMenuItem> stationMenuItems = null;
+	if(stationMenuItems==null) {
+	    List           stations = getIdv().getLocationList();
+	    ObjectListener listener = new ObjectListener(locationDescriptor) {
+		    public void actionPerformed(ActionEvent ae, Object obj) {
+			addStationDisplay((NamedStationTable) obj,
+					  (ControlDescriptor) theObject);
+		    }
+		};
+	    stationMenuItems = NamedStationTable.makeMenuItems(stations,
+							       listener);
+	}
+	if (makeNew) {
+	    displayMenu.add(
+			    GuiUtils.setIcon(
+					     GuiUtils.makeMenu("Locations", stationMenuItems),
+					     "/auxdata/ui/icons/world_loc.png"));
+	} else {
+	    GuiUtils.makeMenu(displayMenu, stationMenuItems);
+	}
     }
 
 
@@ -2843,7 +2846,6 @@ public class IdvUIManager extends IdvManager {
         processBundleMenu(displayMenu,
                           IdvPersistenceManager.BUNDLES_FAVORITES);
         processBundleMenu(displayMenu, IdvPersistenceManager.BUNDLES_DISPLAY);
-
         processMapMenu(displayMenu, true);
         processStationMenu(displayMenu, true);
         processStandAloneMenu(displayMenu, true);
@@ -4271,7 +4273,7 @@ public class IdvUIManager extends IdvManager {
                 contents = (JComponent) xmlUI.getContents();
                 window.setXmlUI(xmlUI);
                 viewManagers = xmlUI.getViewManagers();
-		if(isMac()) {
+		if(GuiUtils.doMacMenubar()) {
 		    JMenuBar menuBar = doMakeMenuBar();
 		    if (menuBar != null) {
 			window.setJMenuBar(menuBar);
