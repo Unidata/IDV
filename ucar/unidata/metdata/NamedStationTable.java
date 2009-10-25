@@ -35,6 +35,7 @@ import ucar.unidata.data.DataUtil;
 import ucar.unidata.gis.WorldWindReader;
 
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
@@ -51,6 +52,7 @@ import visad.Unit;
 import visad.VisADException;
 
 import java.awt.event.*;
+import java.awt.*;
 
 import java.io.*;
 
@@ -1552,12 +1554,41 @@ FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
      *
      * @return a List of menu items
      */
-    public static List makeMenuItems(final List locations,
-                                     final ObjectListener listener) {
-        List            items         = new ArrayList();
+    public static List<JMenuItem> makeMenuItems(final List locations,
+						final ObjectListener listener) {
+	//Don't do this for now since we don't use the mac menubar
+	if(false && GuiUtils.isMac()) {
+	    JMenuItem menuItem = new JMenuItem("Add Location...");
+	    menuItem.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent ae) {
+			JMenuBar menuBar = new JMenuBar();
+			List<JMenuItem> items         = makeMenuItemsInner(locations, listener);
+			for(JMenuItem mi: items) {
+			    menuBar.add(mi);
+			}
+			GuiUtils.showOkDialog((Window)null,"Locations",(Component)menuBar,(Component)null);
+		    }
+		});
+	    List<JMenuItem>            items         = new ArrayList<JMenuItem>();
+	    items.add(menuItem);
+	    return items;
+	} else {
+	    return makeMenuItemsInner(locations, listener);
+	}
+    }
+	
+
+
+
+    private  static List<JMenuItem> makeMenuItemsInner(final List locations,
+							   final ObjectListener listener) {
+        List<JMenuItem>            items         = new ArrayList<JMenuItem>();
+
         JMenu           locationsMenu = null;
         Hashtable       menus         = new Hashtable();
         final Hashtable categoryMap   = new Hashtable();
+
+	final List<Object[]> macItems = new ArrayList<Object[]>();
 
         for (int i = 0; i < locations.size(); i++) {
             NamedStationTable stationTable =
@@ -1602,19 +1633,26 @@ FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
                 lastMenu = catMenu;
             }
             if (catMenu != null) {
-                if (catMenu.getMenuListeners().length == 0) {
+		boolean newOne = catMenu.getMenuListeners().length==0;
+                if (newOne) {
                     final JMenu  theMenu     = catMenu;
                     final String theCategory = catSoFar;
-                    catMenu.addMenuListener(new MenuListener() {
-                        public void menuCanceled(MenuEvent e) {}
+		    //Don't do this for now
+		    if(false && GuiUtils.isMac()) {
+			macItems.add(new Object[]{
+				categoryMap, theMenu, theCategory});
+		    } else {
+			catMenu.addMenuListener(new MenuListener() {
+				public void menuCanceled(MenuEvent e) {}
 
-                        public void menuDeselected(MenuEvent e) {}
+				public void menuDeselected(MenuEvent e) {}
 
-                        public void menuSelected(MenuEvent e) {
-                            addMenuItems(categoryMap, theMenu, theCategory,
-                                         listener);
-                        }
-                    });
+				public void menuSelected(MenuEvent e) {
+				    addMenuItems(categoryMap, theMenu, theCategory,
+						 listener);
+				}
+			    });
+		    }
                 }
             } else {
                 JMenuItem mi = new JMenuItem(stationTable.getName());
@@ -1626,6 +1664,20 @@ FXAK61 PAFC     ALASKA/PACIFIC_RFC               AK US  6115 -14997     0
                 items.add(mi);
             }
         }
+
+	if(macItems.size()>0) {
+	    Misc.run(new Runnable() {
+		    public void run() {
+			for(Object[]tuple: macItems) {
+			    Hashtable categoryMap = (Hashtable) tuple[0];
+			    JMenu theMenu = (JMenu) tuple[1];
+			    String theCategory = (String) tuple[2];
+			    addMenuItems(categoryMap, theMenu, theCategory,
+					 listener);
+			}
+		    }
+		});
+	}
         return items;
     }
 
