@@ -114,7 +114,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     /** Keeps track of active connections */
     private Hashtable<Connection,ConnectionInfo> connectionMap = new Hashtable<Connection,ConnectionInfo>();
 
-    private List<String> messages = new ArrayList<String>();
+    private List<String> scourMessages = new ArrayList<String>();
 
     /**
      * _more_
@@ -136,18 +136,22 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
         while(true) {
             Misc.sleep(5000);
             Hashtable<Connection,ConnectionInfo> tmp = new Hashtable<Connection,ConnectionInfo>();
-            tmp.putAll(connectionMap);
+	    synchronized(connectionMap) {
+		tmp.putAll(connectionMap);
+	    }
             long now = System.currentTimeMillis();
-	    int seconds = getRepository().getProperty(PROP_DB_POOL_TIMEUNTILCLOSED,30);
+	    int seconds = getRepository().getProperty(PROP_DB_POOL_TIMEUNTILCLOSED,60);
             for (Enumeration keys = tmp.keys(); keys.hasMoreElements(); ) {
                 Connection connection = (Connection) keys.nextElement();
                 ConnectionInfo info  = tmp.get(connection);
                 //If a connection has been out for more than a minute then close it
                 if(now-info.time > seconds*1000) {
-                    System.err.println ("A connection has been open for more than "+seconds +" seconds:\n" + info.where);
-		    while(messages.size()>100)
-			messages.remove(0);
-		    messages.add("SCOURED:" +info.where);
+		    logInfo ("A connection has been open for more than "+seconds +" seconds:\n" + info.where);
+		    synchronized(scourMessages) {
+			while(scourMessages.size()>100)
+			    scourMessages.remove(0);
+			scourMessages.add("SCOURED:" +info.where);
+		    }
                     closeConnection(connection);
                 }
 	    }
@@ -207,15 +211,16 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
 	BasicDataSource bds = (BasicDataSource)dataSource;
 
 	StringBuffer msgb = new StringBuffer();
-	for(String msg: messages) {
-	    msgb.append("<pre>" + msg +"</pre>");
-	    msgb.append("<hr>");
+	synchronized(scourMessages) {
+	    for(String msg: scourMessages) {
+		msgb.append("<pre>" + msg +"</pre>");
+		msgb.append("<hr>");
+	    }
+	    if(scourMessages.size()>0) {
+		dbSB.append(HtmlUtil.makeShowHideBlock(msg("Connection Problems"),
+						       msgb.toString(), false));
+	    }
 	}
-	if(messages.size()>0) {
-	    dbSB.append(HtmlUtil.makeShowHideBlock(msg("Connection Problems"),
-						   msgb.toString(), false));
-	}
-
 
 
 	dbSB.append("Connection Pool:<br>&nbsp;&nbsp;#active:" + bds.getNumActive() +"<br>&nbsp;&nbsp;#idle:" +bds.getNumIdle()  +"<br>&nbsp;&nbsp;max active: " +
@@ -427,7 +432,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      */
     public Connection getConnection() throws Exception {
         Connection connection = dataSource.getConnection();
-        connectionMap.put(connection,new ConnectionInfo());
+	synchronized(connectionMap) {
+	    connectionMap.put(connection,new ConnectionInfo());
+	}
         return connection;
     }
 
@@ -441,7 +448,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      */
     public void closeConnection(Connection connection) {
         try {
-            connectionMap.remove(connection);
+	    synchronized(connectionMap) {
+		connectionMap.remove(connection);
+	    }
             connection.setAutoCommit(true);
             connection.close();
             BasicDataSource bds = (BasicDataSource)dataSource;
@@ -481,12 +490,11 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
         if(connection!=null) {
             closeConnection(connection);
         } else {
-            //            System.err.println ("whoa, a statement with no connection");
-	    while(messages.size()>100)
-		messages.remove(0);
-	    messages.add("WHOA,a statement with no connection:" +LogUtil.getStackTrace());
-            Misc.printStack("whoa, a statement with no connection",10);
-	    
+	    synchronized(scourMessages) {
+		while(scourMessages.size()>100)
+		    scourMessages.remove(0);
+		scourMessages.add("Trying to close a statement with no connection:" +LogUtil.getStackTrace());
+	    }
         }
     }
 
