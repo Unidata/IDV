@@ -54,6 +54,7 @@ import java.io.*;
 import java.lang.reflect.*;
 
 import java.net.URL;
+import java.net.URI;
 
 import java.text.SimpleDateFormat;
 
@@ -6726,6 +6727,11 @@ public class GuiUtils extends LayoutUtil {
         return applicationTitle;
     }
 
+    public static boolean doMacMenubar() {
+	if(true) return false;
+	return isMac();
+    }
+
 
     /**
      * Is this running on a Mac?
@@ -6742,11 +6748,37 @@ public class GuiUtils extends LayoutUtil {
 
 
     public static void decorateFrame(JFrame frame, JMenuBar menuBar) {
-	if(frame!=null & menuBar!=null && isMac()) {
+	if(frame!=null & menuBar!=null && doMacMenubar()) {
 	    frame.setJMenuBar(menuBar);
 	}
     }
 
+
+    public static void showUrl(String s) throws Exception {
+	URI url = new URI(s);
+	if(!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+	    System.err.println("Browse not supported");
+	    return;
+	}
+	Desktop.getDesktop().browse(url);
+    }	
+
+    public static void addLinkListener(JEditorPane editor) {
+	editor.addHyperlinkListener(new HyperlinkListener() {
+		public void hyperlinkUpdate(HyperlinkEvent e) {
+		    if(e.getEventType()== HyperlinkEvent.EventType.ACTIVATED) { 
+			String url = e.getDescription();
+			try {
+			    showUrl(url);
+			} catch(Exception exc) {
+			    LogUtil.logException("error showing url:" + url,exc);
+
+			}
+		    }
+		}
+	    });
+
+    }
 
 }
 
