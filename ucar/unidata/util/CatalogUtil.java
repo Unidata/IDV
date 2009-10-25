@@ -355,9 +355,10 @@ public class CatalogUtil {
                               ATTR_NAME, tags);
         String title = null;
         if ((titleAttrs != null) && (titleAttrs.size() >= 1)) {
-            if (titleAttrs.size() >= 2) {
-                String t1 = titleAttrs.get(titleAttrs.size() - 2).toString();
-                String t2 = titleAttrs.get(titleAttrs.size() - 1).toString();
+	    //Don't use more than one for now
+            if (false && titleAttrs.size() >= 2) {
+                String t1 = titleAttrs.get(titleAttrs.size() - 2).toString().replace("_"," ");
+                String t2 = titleAttrs.get(titleAttrs.size() - 1).toString().replace("_"," ");
                 //If the first 8 characters are the same then just use the name
                 if ((t1.length() > 8) && (t2.length() > 8)
                         && t1.substring(0, 8).equals(t2.substring(0, 8))) {
@@ -366,9 +367,16 @@ public class CatalogUtil {
                     title = t1 + " " + t2;
                 }
             } else {
-                title = titleAttrs.get(titleAttrs.size() - 1).toString();
+                title = titleAttrs.get(titleAttrs.size() - 1).toString().replace("_"," ");
             }
         }
+	if(title!=null) {
+	    String ext = IOUtil.getFileExtension(title);
+	    //If it looks like it has an extension then strip it off
+	    if(ext!=null && ext.length()<=6) {
+		title = IOUtil.stripExtension(title);
+	    }
+	}
         return title;
     }
 
