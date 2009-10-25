@@ -115,6 +115,8 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(IdvChooser.class.getName());
 
+    public static final String PROP_CHOOSERCLASSNAME = "prop.chooserclassname";
+
     /**
      * Can pass in null properties. So instead of  a null or casting null
      * as a Hashtable we just define one here
@@ -185,6 +187,9 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
 
     /** Different subclasses can use the combobox of data source ids */
     private JComboBox dataSourcesCbx;
+
+
+    private DataSource dataSource;
 
 
     /** This is the list data source ids that can be file based */
@@ -310,6 +315,12 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      * @return the button component
      */
     public JComponent getDefaultButtons(ActionListener listener) {
+	if(dataSource!=null) {
+	    JButton reloadButton = GuiUtils.makeButton("Reload Data",this,"doLoad");
+	    return GuiUtils.wrap(reloadButton);
+	}
+
+
         JComponent buttons = super.getDefaultButtons(listener);
         buttons = decorateButtons(buttons);
         JComponent extra       = GuiUtils.filler(100, 1);
@@ -879,6 +890,9 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     }
 
 
+    public boolean isReloadable() {
+	return true;
+    }
 
 
     /**
@@ -900,6 +914,16 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      */
     protected boolean makeDataSource(Object definingObject, String dataType,
                                      Hashtable properties) {
+	if(properties == null) {
+	    properties = new Hashtable();
+	}
+
+
+	if(isReloadable()) {
+	    properties.put(PROP_CHOOSERCLASSNAME, getClass().getName());
+	} else {
+	}
+
         if (dataSourceListener != null) {
             dataSourceListener.actionPerformed(new ActionEvent(new Object[] {
                 definingObject,
@@ -907,9 +931,21 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
             return true;
         }
 
+
+
         showWaitCursor();
-        boolean result = idv.makeDataSource(definingObject, dataType,
-                                            properties);
+	boolean result;
+	if(dataSource!=null) {
+	    try {
+		dataSource.reloadData(definingObject, properties);
+	    } catch(Exception exc) {
+		logException("Error reloading data", exc);
+	    }
+	    result = false;
+	} else {
+	    result = idv.makeDataSource(definingObject, dataType,
+					properties);
+	}
         showNormalCursor();
         if (result) {
             closeChooser();
@@ -967,7 +1003,8 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      * show wait cursor
      */
     public void showWaitCursor() {
-        super.showWaitCursor();
+	if(contents!=null) 
+	    super.showWaitCursor(contents);
         idv.getIdvUIManager().showWaitCursor();
         if (cancelButton != null) {
             cancelButton.setEnabled(true);
@@ -978,7 +1015,8 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      * show regular cursor
      */
     public void showNormalCursor() {
-        super.showNormalCursor();
+	if(contents!=null) 
+	    super.showNormalCursor(contents);
         idv.getIdvUIManager().showNormalCursor();
         if (cancelButton != null) {
             cancelButton.setEnabled(false);
@@ -1050,6 +1088,12 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
     protected boolean shouldDoUpdateOnFirstDisplay() {
         return false;
     }
+
+
+
+
+
+
 
 
     /**
@@ -1304,6 +1348,27 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
         return getIdv().getColorProperty(PROP_STATUS_FOREGROUND,
                                          super.getStatusLabelForeground());
     }
+
+/**
+Set the DataSource property.
+
+@param value The new value for DataSource
+**/
+public void setDataSource (DataSource value) {
+	this.dataSource = value;
+}
+
+/**
+Get the DataSource property.
+
+@return The DataSource
+**/
+public DataSource getDataSource () {
+	return this.dataSource;
+}
+
+
+
 
 }
 

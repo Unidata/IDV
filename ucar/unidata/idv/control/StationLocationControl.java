@@ -1423,6 +1423,7 @@ public class StationLocationControl extends StationModelControl {
         readoutGuiHolder    = new JPanel(new BorderLayout());
 
         readoutText         = new JEditorPane();
+	GuiUtils.addLinkListener(readoutText);
         readoutText.setEditable(false);
         readoutText.setContentType("text/html");
 

@@ -163,6 +163,20 @@ public class CDMRadarDataSource extends RadarDataSource {
     }
 
 
+
+    public void reloadData(Object object, Hashtable properties) {
+	if(object instanceof RadarQuery) {
+	    reloadProperties(properties);
+	    setProperty(PROP_RADARQUERY, object);
+    
+	    sourcesChanged();
+
+	} else {
+	    super.reloadData(object, properties);
+	}
+    }
+
+
     /**
      * handle legacy bundles
      */

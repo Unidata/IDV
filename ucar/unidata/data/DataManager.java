@@ -1513,12 +1513,16 @@ public class DataManager {
                 }
 
 
+		Hashtable propertiesToUse; 
+		if(type.properties!=null) {
+		    propertiesToUse = type.properties;
+		} else {
+		    propertiesToUse = properties;
+		}
                 DataSourceFactory factory =
                     (DataSourceFactory) ctor.newInstance(new Object[] {
                         descriptor,
-                        definingObject, ((type.properties != null)
-                                         ? type.properties
-                                         : properties) });
+                        definingObject, propertiesToUse});
                 DataSource dataSource = factory.getDataSource();
 
                 if (dataSource != null) {

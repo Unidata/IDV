@@ -31,6 +31,7 @@ import org.w3c.dom.Element;
 
 
 import ucar.unidata.idv.*;
+import ucar.unidata.data.DataSource;
 import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.ui.DatasetUI;
 import ucar.unidata.ui.XmlTree;
@@ -87,6 +88,8 @@ public class XmlChooser extends IdvChooser implements ActionListener {
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(XmlChooser.class.getName());
 
+
+    public static final String PROP_CHOOSER_URL = "idv.chooser.url";
 
     /**
      * If there was some error in loading the xml
@@ -167,9 +170,17 @@ public class XmlChooser extends IdvChooser implements ActionListener {
      */
     public XmlChooser(IdvChooserManager mgr, Element root) {
         super(mgr, root);
-        initialUrlPath = XmlUtil.getAttribute(chooserNode, ATTR_URL, "");
+        initialUrlPath = (chooserNode!=null?XmlUtil.getAttribute(chooserNode, ATTR_URL, ""):"");
     }
 
+
+    public void setDataSource(DataSource dataSource) {
+	super.setDataSource(dataSource);
+	String tmp = (String)dataSource.getProperty(PROP_CHOOSER_URL);
+	if(tmp!=null) {
+	    initialUrlPath = tmp;
+	}
+    }
 
     /**
      * _more_
@@ -236,6 +247,17 @@ public class XmlChooser extends IdvChooser implements ActionListener {
         }
     }
 
+    public void initSubProperties(Hashtable properties) {
+	properties.put(PROP_CHOOSERCLASSNAME, getClass().getName());
+	properties.put(PROP_CHOOSER_URL, urlBox.getSelectedItem());
+    }
+
+
+    protected boolean makeDataSource(Object definingObject, String dataType,
+                                     Hashtable properties) {
+	properties.put(PROP_CHOOSER_URL, urlBox.getSelectedItem());
+	return super.makeDataSource(definingObject, dataType, properties);
+    }
 
 
     /**

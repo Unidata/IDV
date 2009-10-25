@@ -408,6 +408,20 @@ public abstract class FilesDataSource extends DataSourceImpl {
     }
 
 
+    public void reloadData(Object object, Hashtable properties) {
+	if(object instanceof String) {
+	    sources = Misc.newList(object);
+	} else if(object instanceof List)  {
+	    sources = (List) object;
+	} else {
+	    throw new IllegalArgumentException("Unkown data:" + object);
+	}
+	reloadProperties(properties);
+	sourcesChanged();
+    }
+
+
+
     /**
      * Get the location where we poll.
      *

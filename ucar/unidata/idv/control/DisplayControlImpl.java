@@ -2708,6 +2708,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             inDataChangeCall = true;
             //Now, reset the data
             resetData();
+	    
+	    List infos  = getDisplayInfos();
+	    for (int i = 0; i < infos.size(); i++) {
+		DisplayInfo displayInfo = (DisplayInfo) infos.get(i);
+		displayInfo.getViewManager().displayDataChanged(this);
+		break;
+	    }
+
             //Clear the flag
             inDataChangeCall = false;
         } catch (Exception exc) {

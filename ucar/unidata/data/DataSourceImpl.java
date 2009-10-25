@@ -39,6 +39,8 @@ import ucar.unidata.geoloc.projection.*;
 
 import ucar.unidata.idv.DisplayControl;
 
+import ucar.unidata.idv.chooser.*;
+
 import ucar.unidata.idv.ui.DataControlDialog;
 import ucar.unidata.idv.ui.DataSelectionWidget;
 import ucar.unidata.idv.ui.IdvUIManager;
@@ -70,6 +72,7 @@ import visad.DataReferenceImpl;
 import visad.DateTime;
 import visad.VisADException;
 
+import java.lang.reflect.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -161,6 +164,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     /** name of the DataSource */
     private String name = "";
 
+    private boolean everChangedName = false;
 
     /** The description of this DataSource */
     String description = "";
@@ -297,6 +301,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (this.properties == null) {
             this.properties = new Hashtable();
         }
+	//	System.err.println("properties:" + this.properties);
         if ((descriptor != null) && (descriptor.getProperties() != null)) {
             this.properties.putAll(descriptor.getProperties());
         }
@@ -321,6 +326,27 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             }
         }
     }
+
+
+
+    public void reloadData(Object object, Hashtable properties) {
+	System.err.println ("Reload data:" + object);
+    }
+
+
+    public void reloadProperties(Hashtable newProperties) {
+	properties = newProperties;
+	if(!everChangedName) {
+	    String v = (String)newProperties.get(PROP_TITLE);
+	    if(v!=null) {
+		setName(v);
+		if(nameFld!=null) {
+		    nameFld.setText(v);
+		}
+	    }
+	}
+    }
+
 
 
     /**
@@ -2917,6 +2943,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
 
 
+	addReloadTab(tabbedPane);
+
 
         detailsEditor = new JEditorPane();
         int height = 300;
@@ -2936,6 +2964,29 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+    protected void addReloadTab(JTabbedPane tabbedPane) {
+	try {
+	    String chooserClassName = (String)getProperty(IdvChooser.PROP_CHOOSERCLASSNAME);
+	    if(chooserClassName!=null) {
+		IdvChooser chooser = null;
+		Class theClass = Misc.findClass(chooserClassName);
+		Class[] paramTypes = new Class[] { IdvChooserManager.class,
+						   Element.class };
+		Object[]    args = new Object[] {getDataContext().getIdv().getIdvChooserManager(), null};
+		Constructor ctor = Misc.findConstructor(theClass, paramTypes);
+		if (ctor != null) {
+		    chooser = (IdvChooser) ctor.newInstance(args);
+		    chooser.setDataSource(this);
+		    tabbedPane.add("Reload Data", chooser.getContents());
+		} else {
+		    //		    System.err.println ("no ctor:" + chooserClassName);
+		}
+	    }
+	} catch(Exception exc) {
+	    exc.printStackTrace();
+	}
+
+    }
 
 
     /**
@@ -3063,6 +3114,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      */
     public boolean applyProperties() {
         String newName = nameFld.getText().trim();
+	if(!Misc.equals(newName, name.trim())) {
+	    System.err.println("newName:"+newName +": name:" + name);
+	    everChangedName = true;
+	}
         setName(newName);
         if (properties != null) {
             properties.put(PROP_TITLE, newName);
@@ -3770,6 +3825,24 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
+
+/**
+Set the EverChangedName property.
+
+@param value The new value for EverChangedName
+**/
+public void setEverChangedName (boolean value) {
+	this.everChangedName = value;
+}
+
+/**
+Get the EverChangedName property.
+
+@return The EverChangedName
+**/
+public boolean getEverChangedName () {
+	return this.everChangedName;
+}
 
 
 

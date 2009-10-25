@@ -84,7 +84,6 @@ public class ChooserPanel extends JPanel implements ActionListener {
 
 
 
-
     /** The color for station maps */
     public static final Color MAP_COLOR = Color.lightGray;
 
@@ -458,25 +457,45 @@ public class ChooserPanel extends JPanel implements ActionListener {
      * Set the wait cursor over this panel
      */
     public void showWaitCursor() {
-        cursorCnt++;
-        GuiUtils.setCursor(getContents(),
-                           Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	showWaitCursor(getContents());
     }
+
+
 
     /**
      * Set the normal cursor over this panel
      */
     public void showNormalCursor() {
+	showNormalCursor(getContents());
+    }
+
+
+    /**
+     * Set the wait cursor over this panel
+     */
+    public void showWaitCursor(JComponent comp) {
+        cursorCnt++;
+        GuiUtils.setCursor(comp,
+                           Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    }
+
+
+
+    /**
+     * Set the normal cursor over this panel
+     */
+    public void showNormalCursor(JComponent comp) {
         cursorCnt--;
         if (cursorCnt < 0) {
             cursorCnt = 0;
         }
         if (cursorCnt == 0) {
             GuiUtils.setCursor(
-                getContents(),
+			       comp,
                 Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         }
     }
+
 
     public JComponent padLabel(String s) {
         return GuiUtils.inset(new JLabel(s),new Insets(0,5,0,5));

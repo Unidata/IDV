@@ -2019,6 +2019,30 @@ public class MapViewManager extends NavigatedViewManager {
     }
 
 
+    public void displayDataChanged(DisplayControl display) {
+        try {
+            if ( !getUseGlobeDisplay() && getUseProjectionFromData()
+		 && !getStateManager().getProperty(
+						   IdvConstants.PROP_LOADINGXML, false)) {
+                MapProjection mp = display.getDataProjection();
+                if (displayProjectionOk(mp)) {
+                    if ((mainProjection == null)
+			|| !mp.equals(mainProjection)) {
+                        setMapProjection(
+					 mp, true,
+					 getDisplayConventions().getMapProjectionLabel(
+										       mp, display));
+                    }
+                }
+            }
+        } catch (Exception exp) {
+            // ignore, don't set anything.   Uncomment for debugging
+            // LogUtil.logException ( "addDisplayInfo:setMapProjection()", exp);
+        }
+
+	
+    }
+
 
     /**
      * Reset projection of display based control's getDataProjection().
@@ -2051,26 +2075,7 @@ public class MapViewManager extends NavigatedViewManager {
         }
 
 
-
-        try {
-            if ( !getUseGlobeDisplay() && getUseProjectionFromData()
-                    && !getStateManager().getProperty(
-                        IdvConstants.PROP_LOADINGXML, false)) {
-                MapProjection mp = display.getDataProjection();
-                if (displayProjectionOk(mp)) {
-                    if ((mainProjection == null)
-                            || !mp.equals(mainProjection)) {
-                        setMapProjection(
-                            mp, true,
-                            getDisplayConventions().getMapProjectionLabel(
-                                mp, display));
-                    }
-                }
-            }
-        } catch (Exception exp) {
-            // ignore, don't set anything.   Uncomment for debugging
-            // LogUtil.logException ( "addDisplayInfo:setMapProjection()", exp);
-        }
+	displayDataChanged(display);
 
         if ( !super.addDisplayInfo(displayInfo)) {
             return false;

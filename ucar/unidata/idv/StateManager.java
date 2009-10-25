@@ -327,7 +327,10 @@ public class StateManager extends IdvManager {
 
 	//Seems like we have to have this way up front here as something we do below
 	//triggers the mac to ignore these settings
-	System.setProperty("apple.laf.useScreenMenuBar", "true");
+
+	//For now don't do this:
+	//System.setProperty("apple.laf.useScreenMenuBar", "true");
+
 	System.setProperty("com.apple.mrj.application.apple.menu.about.name", 
 			   "IDV");
 

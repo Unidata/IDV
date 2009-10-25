@@ -773,6 +773,7 @@ public class ThreddsHandler extends XmlHandler {
                         }
                         properties.put(DataSource.PROP_SUBPROPERTIES
                                        + urls.size(), action.properties);
+			chooser.initSubProperties(action.properties);
                         urls.add(action.action);
                     }
                 }

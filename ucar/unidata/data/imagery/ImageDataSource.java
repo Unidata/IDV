@@ -156,16 +156,6 @@ public abstract class ImageDataSource extends DataSourceImpl {
     }
 
 
-    /**
-     * Handle when this data source gets new files to use at runtime (e.g., from isl)
-     *
-     * @param files List of files
-     *
-     */
-    public void setNewFiles(List files) {
-        setImageList(makeImageDescriptors(Misc.listToStringArray(files)));
-    }
-
 
     /**
      * Create a new ImageDataSource with a list of (String) images. These
@@ -198,6 +188,43 @@ public abstract class ImageDataSource extends DataSourceImpl {
         setImageList(new ArrayList(ids.getImageDescriptors()));
         setDescription(getImageDataSourceName());
     }
+
+
+    public void reloadData(Object object, Hashtable properties) {
+	if(object instanceof ImageDataset) {
+	    ImageDataset ids = (ImageDataset) object;
+	    setImageList(new ArrayList(ids.getImageDescriptors()));
+	} else if(object instanceof List) {
+	    String[]images = StringUtil.listToStringArray((List)object);
+            setImageList(makeImageDescriptors(images));
+	} else {
+	    try {
+		String[] images = (String[]) object;
+		setImageList(makeImageDescriptors(images));
+	    } catch(Exception exc) {
+		return;
+	    }
+	}
+	setDescription(getImageDataSourceName());
+	reloadProperties(properties);
+	reloadData();
+    }
+
+
+
+
+
+    /**
+     * Handle when this data source gets new files to use at runtime (e.g., from isl)
+     *
+     * @param files List of files
+     *
+     */
+    public void setNewFiles(List files) {
+        setImageList(makeImageDescriptors(Misc.listToStringArray(files)));
+    }
+
+
 
 
     /**

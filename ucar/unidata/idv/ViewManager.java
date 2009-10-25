@@ -3574,6 +3574,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
+    public void displayDataChanged(DisplayControl displayControl) {
+    }
 
     /**
      * Return the  list of {@link DisplayControl}s displayed in this ViewManager

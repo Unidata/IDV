@@ -590,5 +590,8 @@ public interface DataSource {
      */
     public boolean canAddCurrentName(DataChoice dataChoice);
 
+
+    public void reloadData(Object object, Hashtable properties);
+
 }
 
