@@ -651,6 +651,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    protected void setHttpsPort(int port) {
+	super.setHttpsPort(port);
+	reinitializeRequestUrls();
+    }
 
 
     /**
@@ -661,8 +665,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     protected void init(Properties properties) throws Exception {
-
-
+	/*
         final PrintStream oldErr = System.err;
         final PrintStream oldOut = System.out;
         System.setErr(new PrintStream(oldOut){
@@ -673,7 +676,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     oldErr.println(x);
                 }
             });
-
+	*/
 
 
 
@@ -826,10 +829,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
             StringUtil.split(
                 getProperty("ramadda.html.htdocroots", BLANK), ";", true,
                 true));
-
-
-
-
 
     }
 

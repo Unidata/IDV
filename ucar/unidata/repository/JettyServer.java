@@ -140,9 +140,8 @@ public class JettyServer extends RepositoryServlet implements Constants {
 	String ssls = repository.getPropertyValue(PROP_SSL_PORT,(String)null,false);
         if (ssls!=null && ssls.trim().length()>0) {
             sslPort = new Integer(ssls.trim());
+
 	}
-
-
 
 	if(sslPort<0) {
 	    repository.getLogManager().logInfoAndPrint("SSL: no ssl port defined. not creating ssl connection");

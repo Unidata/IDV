@@ -105,7 +105,16 @@ public class RepositoryServlet extends HttpServlet implements Constants {
     public RepositoryServlet(String[] args, int port) throws Exception {
         this.args = args;
         createRepository(port, new Properties());
-	repository.setHttpsPort(repository.getProperty(PROP_SSL_PORT, -1));
+	//This is the method that is called when we are running under tomcat.
+	//Set the ssl port if its defined
+        int sslPort = -1;
+	String ssls = repository.getPropertyValue(PROP_SSL_PORT,(String)null,false);
+        if (ssls!=null && ssls.trim().length()>0) {
+            sslPort = new Integer(ssls.trim());
+	}
+	if(sslPort>=0) {
+	    repository.setHttpsPort(sslPort);
+	}
     }
 
 
