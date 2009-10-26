@@ -4186,6 +4186,7 @@ public class ImageGenerator extends IdvManager {
                 Point pp = ImageUtils.parsePoint(applyMacros(child,
                                ATTR_PLACE, "lr,-10,-10"), imageRect);
                 String text = applyMacros(child, ATTR_TEXT, (String) null);
+                Color bg = applyMacros(child, ATTR_BACKGROUND, (Color) null);
                 if (text != null) {
                     double angle = Math.toRadians(applyMacros(child,
                                        ATTR_ANGLE, 0.0));
@@ -4194,8 +4195,8 @@ public class ImageGenerator extends IdvManager {
                     if(c!=null && transparency>0) {
                         c = new Color(c.getRed(),c.getGreen(),c.getBlue(), ImageUtils.toAlpha(transparency));
                     }
-                    Color bg = applyMacros(child, ATTR_BACKGROUND,
-                                           (Color) null);
+                    //Color bg = applyMacros(child, ATTR_BACKGROUND,
+                    //                       (Color) null);
                     if(bg!=null && transparency>0) {
                         bg = new Color(bg.getRed(),bg.getGreen(),bg.getBlue(), ImageUtils.toAlpha(transparency));
                     }
@@ -4233,7 +4234,7 @@ public class ImageGenerator extends IdvManager {
                                        ATTR_ANCHOR,
                                        "lr,-10,-10"), new Rectangle(0, 0,
                                            width, height));
-                        g.drawImage(overlay, pp.x - ap.x, pp.y - ap.y, null);
+                        g.drawImage(overlay, pp.x - ap.x, pp.y - ap.y, bg, null);
                     }
                 }
             } else {
