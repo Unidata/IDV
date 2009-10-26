@@ -165,7 +165,7 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
         // stationIds = new String[tempPros.length];
         int length = entries.getDimension();
         stations = new ArrayList();
-        latLons  = new LatLonPoint[length];
+        LatLonPoint [] slatLons  = new LatLonPoint[length];
         Hashtable<String, List> stationsTuples = new Hashtable<String,
                                                      List>();
         stationsTuple = new Hashtable<String, Tuple>();
@@ -181,7 +181,7 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
 
             if ( !stations.contains(stName)) {
                 stations.add(stName);
-                latLons[j++] = station.getLatLonPoint();
+                slatLons[j++] = station.getLatLonPoint();
             }
             List<DateTime> timeList  = stationsTimes.get(stName);
             List<Data>     tupleList = stationsTuples.get(stName);
@@ -197,8 +197,9 @@ public class RaobSoundingControl extends AerologicalSoundingControl {
             tupleList.add((Data) ob);
 
         }
-
+        latLons  = new LatLonPoint[stations.size()];
         for (int i = 0; i < stations.size(); i++) {
+            latLons[i] = slatLons[i];
             String     st        = (String) stations.get(i);
             List<Data> tuples    = stationsTuples.get(st);
             Data[]     tpData    = tuples.toArray(new Data[tuples.size()]);
