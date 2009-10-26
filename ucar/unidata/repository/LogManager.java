@@ -150,6 +150,14 @@ public class LogManager extends RepositoryManager {
     }
 
 
+    public void logInfoAndPrint(String message) {
+	logInfo(message);
+        if (!getProperty(PROP_LOG_TOSTDERR, false)) {
+            System.err.println(message);
+	}
+    }
+
+
     /**
      * _more_
      *
@@ -170,6 +178,14 @@ public class LogManager extends RepositoryManager {
     }
 
 
+
+    public void logErrorAndPrint(String message, Throwable exc) {
+	logError(message, exc);
+        if (!getProperty(PROP_LOG_TOSTDERR, false)) {
+	    System.err.println(message);
+	    exc.printStackTrace();
+	}
+    }
 
     /**
      * _more_

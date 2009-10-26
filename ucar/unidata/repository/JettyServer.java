@@ -25,6 +25,7 @@ package ucar.unidata.repository;
 
 import org.apache.commons.fileupload.MultipartStream;
 
+import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.HttpConnection;
@@ -67,7 +68,7 @@ import javax.servlet.http.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class JettyServer extends RepositoryServlet {
+public class JettyServer extends RepositoryServlet implements Constants {
 
     /**
      * _more_
@@ -84,13 +85,89 @@ public class JettyServer extends RepositoryServlet {
             }
         }
         Server  server  = new Server(port);
+
+
+	RepositoryServlet repositoryServlet = new RepositoryServlet(this, args, port);
         Context context = new Context(server, "/", Context.SESSIONS);
-        context.addServlet(new ServletHolder(new RepositoryServlet(args,
-                port)), "/*");
+        context.addServlet(new ServletHolder(repositoryServlet),"/*");
+
+	Repository repository = repositoryServlet.getRepository();
+	try {
+	    initSsl(server, repository);
+	    //	} catch(java.net.BindException exc) {
+	    //	    repository.getLogManager().logInfoAndPrint("SSL: no password and keypassword property defined");
+	} catch(Throwable exc) {
+	    repository.getLogManager().logErrorAndPrint("SSL: error opening ssl connection", exc);
+	}
         server.start();
         server.join();
     }
 
+
+    protected void initSsl(Server server, Repository repository) throws Throwable {
+
+
+	File keystore = new File(repository.getPropertyValue(PROP_SSL_KEYSTORE, repository.getStorageManager().getRepositoryDir()+"/keystore",false));
+	if(!keystore.exists()) {
+	    return;
+	}
+
+	if(repository.getProperty(PROP_SSL_IGNORE,false)) {
+	    repository.getLogManager().logInfoAndPrint("SSL: ssl.ignore is set.");
+	    return;
+	}
+	repository.getLogManager().logInfoAndPrint("SSL: using keystore: " + keystore);
+
+	String password = repository.getPropertyValue(PROP_SSL_PASSWORD,(String)null,false);
+	String keyPassword = repository.getPropertyValue(PROP_SSL_PASSWORD,password,false);
+	if(password == null) {
+	    repository.getLogManager().logInfoAndPrint("SSL: no password and keypassword property defined");
+	    repository.getLogManager().logInfoAndPrint("SSL: define the properties:\n\t" + 
+						       PROP_SSL_PASSWORD +"=<the ssl password>\n" + 
+						       "\t" + PROP_SSL_KEYPASSWORD +"=<the key password>\n" + 
+						       "in some .properties file (e.g., \"ssl.properties\") in the RAMADDA directory:" +
+						       repository.getStorageManager().getRepositoryDir()+
+						       "\nor as a System property on the java command line:" +
+						       "-D"+PROP_SSL_PASSWORD +"=<the ssl password>  " + 
+						       "-D" + PROP_SSL_KEYPASSWORD +"=<the key password>"						       
+						       );
+
+	    return;
+	}
+
+
+        int sslPort = -1;
+	String ssls = repository.getPropertyValue(PROP_SSL_PORT,(String)null,false);
+        if (ssls!=null && ssls.trim().length()>0) {
+            sslPort = new Integer(ssls.trim());
+	}
+
+
+
+	if(sslPort<0) {
+	    repository.getLogManager().logInfoAndPrint("SSL: no ssl port defined. not creating ssl connection");
+	    repository.getLogManager().logInfoAndPrint("SSL: define the property:\n\t" + 
+						       PROP_SSL_PORT +"=<the ssl port>\n" + 
+						       "in some .properties file (e.g., \"ssl.properties\") in the RAMADDA directory:" +
+						       repository.getStorageManager().getRepositoryDir()+
+						       "\nor as a System property on the java command line:" +
+						       "-D"+PROP_SSL_PORT +"=<the ssl port>" 
+						       );
+
+	    return;
+	}
+
+	repository.getLogManager().logInfoAndPrint("SSL: creating ssl connection on port:" + sslPort);
+	SslSocketConnector sslSocketConnector = new 	SslSocketConnector();
+	sslSocketConnector.setKeystore(keystore.toString());
+	sslSocketConnector.setPassword(password);
+	sslSocketConnector.setKeyPassword(keyPassword);
+	sslSocketConnector.setTrustPassword(password);
+	sslSocketConnector.setPort(sslPort);
+	server.addConnector(sslSocketConnector);
+	repository.setHttpsPort(sslPort);
+    }
+    
 
 
     /**

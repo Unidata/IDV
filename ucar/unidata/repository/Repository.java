@@ -515,11 +515,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (getProperty(PROP_SSL_IGNORE, false)) {
             return false;
         }
-        String port = getProperty(PROP_SSL_PORT, "");
-        if (port.trim().length() == 0) {
-            return false;
-        }
-        return true;
+	return getHttpsPort()>=0;
     }
 
 
@@ -762,13 +758,24 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         try {
             //Now load in the local properties file
-            String localPropertyFile =
-                IOUtil.joinDir(getStorageManager().getRepositoryDir(),
-                               "repository.properties");
+	    //First load in the repository.properties file
+	    String localPropertyFile =
+		IOUtil.joinDir(getStorageManager().getRepositoryDir(),
+			       "repository.properties");
+	    if(new File(localPropertyFile).exists()) {
+		properties.load(IOUtil.getInputStream(localPropertyFile,
+						      getClass()));
+	    }
 
+	    File[] localFiles = getStorageManager().getRepositoryDir().listFiles();
+	    for(File f: localFiles) {
+		if(!f.toString().endsWith(".properties")) continue;
+		if(f.getName().equals("repository.properties")) continue;
+		properties.load(IOUtil.getInputStream(f.toString(),
+						      getClass()));
+		
+	    }
 
-            properties.load(IOUtil.getInputStream(localPropertyFile,
-                    getClass()));
         } catch (Exception exc) {}
 
 
@@ -2935,6 +2942,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public String getProperty(String name) {
+	return getPropertyValue(name, true);
+    }
+
+
+    public String getPropertyValue(String name, boolean checkDb) {
         if (systemEnv == null) {
             systemEnv = System.getenv();
         }
@@ -2955,8 +2967,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
             prop = (String) cmdLineProperties.get(override);
         }
 
-
-
         if (prop == null) {
             prop = (String) properties.get(override);
         }
@@ -2968,7 +2978,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
         //Then the  database properties  first
-        if (prop == null) {
+        if (checkDb && prop == null) {
             prop = (String) dbProperties.get(name);
         }
 
@@ -3001,7 +3011,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public String getProperty(String name, String dflt) {
-        String prop = getProperty(name);
+	return getPropertyValue(name, dflt, true);
+    }
+
+
+    public String getPropertyValue(String name, String dflt,boolean checkDb) {
+        String prop = getPropertyValue(name,checkDb);
         if (prop != null) {
             return prop;
         }
@@ -3592,10 +3607,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public ServerInfo getServerInfo() {
-        int sslPort = -1;
-        if (getHttpsPort().trim().length() > 0) {
-            sslPort = new Integer(getHttpsPort().trim()).intValue();
-        }
+        int sslPort = getHttpsPort();
         return new ServerInfo(
             getHostname(), getPort(), sslPort, getUrlBase(),
             getProperty(PROP_REPOSITORY_NAME, "Repository"),

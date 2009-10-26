@@ -62,15 +62,13 @@ import java.util.StringTokenizer;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-
 /**
  *
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class RepositoryServlet extends HttpServlet {
-
+public class RepositoryServlet extends HttpServlet implements Constants {
     //                                   "Tue, 20 Jan 2009 01:45:54 GMT");
 
     /** _more_ */
@@ -95,6 +93,7 @@ public class RepositoryServlet extends HttpServlet {
      */
     public RepositoryServlet() {}
 
+
     /**
      * _more_
      *
@@ -106,9 +105,22 @@ public class RepositoryServlet extends HttpServlet {
     public RepositoryServlet(String[] args, int port) throws Exception {
         this.args = args;
         createRepository(port, new Properties());
+	repository.setHttpsPort(repository.getProperty(PROP_SSL_PORT, -1));
     }
 
 
+    public RepositoryServlet(JettyServer jettyServer, String[] args, int port) throws Exception {
+        this.args = args;
+        createRepository(port, new Properties());
+    }
+
+
+
+
+
+    public Repository getRepository() {
+	return repository;
+    }
 
     /**
      * Create the repository
@@ -150,6 +162,9 @@ public class RepositoryServlet extends HttpServlet {
         repository = tmp;
     }
 
+
+
+    
 
 
     /**

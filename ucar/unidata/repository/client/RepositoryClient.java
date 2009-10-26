@@ -92,7 +92,7 @@ public class RepositoryClient extends RepositoryBase {
     private String defaultGroupName;
 
     /** _more_ */
-    private String sslPort;
+    private int sslPort;
 
     /** _more_ */
     private String title;
@@ -169,7 +169,7 @@ public class RepositoryClient extends RepositoryBase {
      *
      * @return _more_
      */
-    protected String getHttpsPort() {
+    protected int getHttpsPort() {
         return sslPort;
     }
 
@@ -827,13 +827,17 @@ public class RepositoryClient extends RepositoryBase {
         //        System.err.println(contents);
         Element root = XmlUtil.getRoot(contents);
 
-        sslPort = XmlUtil.getGrandChildText(root,
+        String sslPortProp = XmlUtil.getGrandChildText(root,
                                             ServerInfo.TAG_INFO_SSLPORT);
+	if(sslPortProp!=null && sslPortProp.trim().length()>0) {
+	    sslPort  = new Integer(sslPortProp.trim()).intValue();
+	}
+
         title = XmlUtil.getGrandChildText(root, ServerInfo.TAG_INFO_TITLE);
         description = XmlUtil.getGrandChildText(root,
                 ServerInfo.TAG_INFO_DESCRIPTION);
         //        System.err.println (sslPort + "  "+ title +" " + description);
-        if (sslPort != null) {
+        if (sslPort > 0) {
             URL_USER_LOGIN.setNeedsSsl(true);
         } else {
             URL_USER_LOGIN.setNeedsSsl(false);

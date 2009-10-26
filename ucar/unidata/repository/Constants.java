@@ -1144,6 +1144,7 @@ public interface Constants {
 
 
 
+
     /** _more_ */
     public static final String PROP_ACCESS_ADMINONLY =
         "ramadda.access.adminonly";
@@ -1369,6 +1370,13 @@ public interface Constants {
 
     /** _more_ */
     public static final String PROP_SSL_PORT = "ramadda.ssl.port";
+
+    public static final String PROP_SSL_PASSWORD = "ramadda.ssl.password";
+
+    public static final String PROP_SSL_KEYPASSWORD = "ramadda.ssl.keypassword";
+
+    public static final String PROP_SSL_KEYSTORE = "ramadda.ssl.keystore";
+
 
     /** _more_ */
     public static final String PROP_TYPES = "ramadda.types";

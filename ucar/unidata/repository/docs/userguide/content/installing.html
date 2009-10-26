@@ -16,7 +16,6 @@ RAMADDA can run under Tomcat or can run stand-alone with just Java.
 To run under Tomcat download the <a href="http://www.unidata.ucar.edu/downloads/ramadda/ftp/repository.war">repository.war</a> file. To run stand alone download the <a href="http://www.unidata.ucar.edu/downloads/ramadda/ftp/repository.zip">repository.zip</a> file.
 <p>
 
-The major difference is that when running stand-alone RAMADDA does not support SSL access. To use SSL you should run under Tomcat (or some other Java servlet container) and configure that for SSL access. For more information see the  <a href="faq.html#ssl">SSL FAQ</a>.
 
 
 <h2>Running under Tomcat</h2>
@@ -54,9 +53,22 @@ Environment variables can be set for the tomcat process
 Just define:<pre>ramadda_home=/home/dir</pre>
 </ol>
 
+<a name="ssl"></a>
+<h3>Configuring SSL under Tomcat</h3>
+If you have your Tomcat server configured for SSL access all you need to do is to tell RAMADDA what port it is running under. Add the property:
+<pre>
+ramadda.ssl.port=&lt;the ssl port&gt;
+</pre>
+to any .properties file in the RAMADDA home directory (See <a href="#properties">below</a>).
+<p>
+
+<b>Note: When you define an SSL port then RAMADDA will automatically redirect all login and admin requests
+to that port. If your Tomcat server is not really configured for SSL then you will not be able to access RAMADDA. See the <a href="faq.html#fixssl">FAQ</a> for how to fix this.</b>
+
+
 
 <h2>Running Standalone</h2>
-You can run RAMADDA stand-alone. This is really useful for development and just requires  Java 1.5 or greater. First, download and unzip the <a href="http://www.unidata.ucar.edu/downloads/ramadda/ftp/repository.zip">repository.zip</a> file.
+You can run RAMADDA stand-alone. This is really useful for development and just requires  Java 1.6 or greater. First, download and unzip the <a href="http://www.unidata.ucar.edu/downloads/ramadda/ftp/repository.zip">repository.zip</a> file.
 <p>
 To run RAMADDA run the ramadda.sh in the release directory. This just does:<pre>
    java -Xmx512m -jar repository.jar
@@ -74,6 +86,37 @@ To change this do:<pre>
     java -Xmx512m -jar repository.jar -Dramadda_home=/home/dir
 </pre>
 
+
+
+
+
+<a name="ssljetty"></a>
+<h3>Configuring SSL when running standalone</h3>
+To configure secure SSL access to a stand-alone version of RAMADDA you need to
+generate a keystore and an optional certificate. There are instructions 
+<a href="http://docs.codehaus.org/display/JETTY/How+to+configure+SSL">here</a>.
+Ignore the step 4 as RAMADDA uses the below method to specify password, port, etc.
+<p>
+Once you have your keystore file generated you can copy it to the RAMADDA home directory as file &quot;keystore&quot;. You then need to specify some configuration options for RAMADDA through a .properties file that you place in the RAMADDA home directory. e.g., ssl.properties:
+
+<pre>
+ramadda.ssl.password=&lt;the password&gt;
+ramadda.ssl.keypassword=&lt;the keystore password&gt;
+ramadda.ssl.port=&lt;the ssl port&gt;
+
+#You can override the location of the keystore. The default is:
+#&lt;repository dir&gt;/keystore
+#ramadda.ssl.keystore=alternative path to keystore
+
+#If you want to skip ssl for now set this to true
+#ramadda.ssl.ignore=true
+
+</pre>
+
+Alternatively you can specify these as command line arguments:
+<pre>
+-Dramadda.ssl.password=&lt;the password&gt; -Dramadda.ssl.keypassword=&lt;the keystore password&gt; -Dramadda.ssl.port=&lt;the ssl port&gt;
+</pre>
 
 
 
@@ -148,7 +191,6 @@ Common tasks include:
 <li> Change the  repository title and logo in the <a href="admin.html#display">Admin-&gt;Settings-&gt;Display</a>
 <li> Setting up an email server so RAMADDA can send email to users (e.g., for password notification). This is done on the
 <a href="admin.html#contact">Admin-&gt;Settings-&gt;Site and Contact Information</a>  page.
-<li> Enabling <a href="faq.html#ssl">SSL</a> for secure login and admin access.
 <li> Adding <a href="adminusers.html">new users</a>.
 <li> Creating new <a href="newentry.html">groups and uploading files</a>.
 <li> Defining where RAMADDA <a href="admin.html#access">can serve files from</a>.
@@ -180,7 +222,8 @@ More information is available \[http://www.unidata.ucar.edu/software/ramadda/ind
 
 
 <h3>Other Configuration Options</h3>
-For other  configuration options RAMADDA looks in its home directory for a repository.properties
+For other  configuration options RAMADDA looks in its home directory for any .properties files.
+The first one it loads is &quot;repository.properties&quot;.
 To configure RAMADDA create a repository.properties file or
 copy <a href="repository.properties">this one</a>. The properties
 defined in the local file override the ones defined in the system file.

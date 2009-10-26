@@ -949,19 +949,6 @@ public class Admin extends RepositoryManager {
         sb.append(HtmlUtil.br());
         StringBuffer csb = new StringBuffer();
         csb.append(HtmlUtil.formTable());
-        csb.append(HtmlUtil.row(HtmlUtil.colspan(msgHeader("Email"), 2)));
-        csb.append(HtmlUtil.formEntry(msgLabel("Administrator Email"),
-                                      HtmlUtil.input(PROP_ADMIN_EMAIL,
-                                          getProperty(PROP_ADMIN_EMAIL, ""),
-                                          HtmlUtil.SIZE_40)));
-
-        csb.append(
-            HtmlUtil.formEntry(
-                msgLabel("Mail Server"), HtmlUtil.input(
-                    PROP_ADMIN_SMTP, getProperty(
-                        PROP_ADMIN_SMTP, ""), HtmlUtil.SIZE_40) + " "
-                            + msg("For sending password reset messages")));
-
 
 
         csb.append(
@@ -983,19 +970,31 @@ public class Admin extends RepositoryManager {
                 PROP_ACCESS_ALLSSL, "true",
                 getProperty(PROP_ACCESS_ALLSSL, false)) + " "
                     + msg("Force all connections to be secure");
-        String sslMsg =
-            "Note: If you define an SSL port than all admin access will be redirected to that port. If something is broken with SSL then you have a problem.<br>See the <A target=_help href=\"http://www.unidata.ucar.edu/software/ramadda/docs/userguide/faq.html#fixssl\">FAQ</a> to fix this.";
+        String sslMsg =       "Note: To enable ssl see the installation guide";
         csb.append(
             HtmlUtil.formEntryTop(
-                msgLabel("SSL Port"),
-                HtmlUtil.input(
-                    PROP_SSL_PORT, getProperty(PROP_SSL_PORT, ""),
-                    HtmlUtil.SIZE_5) + HtmlUtil.space(1)
-                                     + msg("Port number for SSL access.")
-                                     + HtmlUtil.space(1) + allSslCbx
-                                     + HtmlUtil.br()
+                msgLabel("SSL"),
+		allSslCbx  + HtmlUtil.br()
                                      + getRepository().showDialogNote(
                                          sslMsg)));
+
+
+
+
+
+        csb.append(HtmlUtil.row(HtmlUtil.colspan(msgHeader("Email"), 2)));
+        csb.append(HtmlUtil.formEntry(msgLabel("Administrator Email"),
+                                      HtmlUtil.input(PROP_ADMIN_EMAIL,
+                                          getProperty(PROP_ADMIN_EMAIL, ""),
+                                          HtmlUtil.SIZE_40)));
+
+        csb.append(
+            HtmlUtil.formEntry(
+                msgLabel("Mail Server"), HtmlUtil.input(
+                    PROP_ADMIN_SMTP, getProperty(
+                        PROP_ADMIN_SMTP, ""), HtmlUtil.SIZE_40) + " "
+                            + msg("For sending password reset messages")));
+
 
 
 
@@ -1392,20 +1391,11 @@ public class Admin extends RepositoryManager {
         getRepository().writeGlobal(request, PROP_HOSTNAME);
         getRepository().writeGlobal(request, PROP_PORT);
 
-        String oldSsl = getProperty(PROP_SSL_PORT, "");
-        String newSsl;
-        getRepository().writeGlobal(PROP_SSL_PORT,
-                                    newSsl = request.getString(PROP_SSL_PORT,
-                                        getProperty(PROP_SSL_PORT, "")));
-
         getRepository().writeGlobal(PROP_ACCESS_ALLSSL,
                                     "" + request.get(PROP_ACCESS_ALLSSL,
                                         false));
 
 
-        if ( !oldSsl.equals(newSsl)) {
-            getRepository().reinitializeRequestUrls();
-        }
 
         getRepository().writeGlobal(PROP_UPLOAD_MAXSIZEGB,
                                     request.getString(PROP_UPLOAD_MAXSIZEGB,

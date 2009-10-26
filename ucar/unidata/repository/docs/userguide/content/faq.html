@@ -27,30 +27,15 @@ checkbox clicked. Doing a Control-Click on a checkbox toggles all of them on or 
 
 
 <faqitem cxat="Administration" id="ssl" q="How do I configure SSL access to RAMADDA?" >
-RAMADDA itself does not implement SSL, that is up to the web server container (e.g., Tomcat).
-However, once you have SSL enabled you can configure RAMADDA to use  SSL for the connections
-that require it (e.g., login, user settings, admin area).
-On the main Site Administration  page under the &quot;Contact&quot; area you can specify
-the SSL port number on your server. When RAMADDA is configured to use SSL the login form
-and the site administration pages will automatically use SSL.
+To configure SSL access see <a href="installing.html#ssl">here</a> if you are running under Tomcat.
+See <a href="installing.html#ssljetty">here</a> if you are running stand-alone.
 </faqitem>
 
 
 <faqitem id="fixssl" q="Oops, I told RAMADDA to use an SSL port and SSL is not working. Now I cannot access the admin page to turn off SSL and I'm stuck. What can I do?" >
-If you logged in as an administrator then on a URL request add the URL argument:<pre>
-ramadda.ssl.ignore=true
-e.g.:
-http://yourserver:8080/repository/admin/settings?ramadda.ssl.ignore=true
-</pre>
-This temporarily blocks the automatic redirect to the SSL port. You should then go to the Admin Settings
-pages and clear the SSL port (or configure SSL in your servlet container).
-
-<p>
-If you cannot login as an administrator then you can run RAMADDA with the command line argument:
+You need to comment out the ramadda.ssl.port property in your .properties file.
+Alternatively, you can run RAMADDA with the command line argument:
 <pre>-Dramadda.ssl.ignore=true</pre>
-Alternatively you can put the following in the repository.properties file:
-<pre>override.ramadda.ssl.ignore=true</pre>
-The &quot;override.&quot; prefix tells RAMADDA to override the database properties and instead use the property defined in the properties file.
 </faqitem>
 
 <faqitem q="I forgot the administrator password and cannot access RAMADDA. How do I login?" >
