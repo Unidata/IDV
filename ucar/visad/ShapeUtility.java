@@ -1,7 +1,5 @@
 /*
- * $Id: ShapeUtility.java,v 1.40 2007/08/16 22:29:11 jeffmc Exp $
- *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright  1997-2009 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -20,6 +18,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad;
 
 
@@ -35,6 +34,7 @@ import java.awt.Font;
 import java.awt.geom.*;
 
 import javax.media.j3d.Transform3D;
+
 import javax.vecmath.*;
 
 
@@ -43,8 +43,7 @@ import javax.vecmath.*;
  * A utility class for manipulating VisAD Shapes (VisADGeometryArrays).
  * Adapted from RAP's ShapeFactory class.
  *
- * @author MetApps Development Team
- * @version $Revision: 1.40 $
+ * @author IDV Development Team
  */
 public class ShapeUtility {
 
@@ -1111,7 +1110,7 @@ public class ShapeUtility {
      */
     public static void setColor(VisADGeometryArray[] shapes, float[] RGB) {
         for (int i = 0; i < shapes.length; i++) {
-            setColor(shapes[i], RGB[0], RGB[1], RGB[2]);
+            setColor(shapes[i], RGB);
         }
     }
 
@@ -1124,19 +1123,22 @@ public class ShapeUtility {
     public static void setColor(VisADGeometryArray shape, Color color) {
         setColor(shape, (float) color.getRed() / 255.0f,
                  (float) color.getGreen() / 255.0f,
-                 (float) color.getBlue() / 255.0f);
+                 (float) color.getBlue() / 255.0f,
+                 (float) color.getAlpha() / 255.0f);
     }
 
     /**
-     * Blend the color for the shape specified with color.
+     * Set the color for the shape specified.
      *
      * @param shape shape to color
-     * @param color color to use for blending.
+     * @param RGB array of color components (R, G, B) to use.
      */
-    public static void blendColor(VisADGeometryArray shape, Color color) {
-        blendColor(shape, (float) color.getRed() / 255.0f,
-                   (float) color.getGreen() / 255.0f,
-                   (float) color.getBlue() / 255.0f);
+    public static void setColor(VisADGeometryArray shape, float[] RGB) {
+        if (RGB.length > 3) {
+            setColor(shape, RGB[0], RGB[1], RGB[2], RGB[3]);
+        } else {
+            setColor(shape, RGB[0], RGB[1], RGB[2]);
+        }
     }
 
     /**
@@ -1149,23 +1151,56 @@ public class ShapeUtility {
      */
     public static void setColor(VisADGeometryArray shape, float R, float G,
                                 float B) {
-        shape.colors = new byte[shape.coordinates.length];
-        for (int ic = 0; ic < shape.coordinates.length; ic += 3) {
-            shape.colors[ic]     = ShadowType.floatToByte(R);
-            shape.colors[ic + 1] = ShadowType.floatToByte(G);
-            shape.colors[ic + 2] = ShadowType.floatToByte(B);
-        }
-
+        setColor(shape, R, G, B, 1.f);
     }
 
     /**
      * Set the color for the shape specified.
      *
      * @param shape shape to color
-     * @param RGB array of color components (R, G, B) to use.
+     * @param R red color component
+     * @param G green color component
+     * @param B blue color component
+     * @param A alpha component
      */
-    public static void setColor(VisADGeometryArray shape, float[] RGB) {
-        setColor(shape, RGB[0], RGB[1], RGB[2]);
+    public static void setColor(VisADGeometryArray shape, float R, float G,
+                                float B, float A) {
+        // TODO: should we always use 4 or should we stick to the previous
+        // color?
+        int colorLength = 4;
+        int vertexCount = shape.coordinates.length / 3;
+        /*
+        if (shape.colors != null) {
+          int c1 = shape.colors.length;
+          int c2 = shape.coordinates.length;
+          colorLength = (c1 == c2) ? 3 : 4;
+        }
+        */
+        byte[] colors = new byte[vertexCount * colorLength];
+        for (int ic = 0; ic < colors.length; ic += colorLength) {
+            colors[ic]     = ShadowType.floatToByte(R);
+            colors[ic + 1] = ShadowType.floatToByte(G);
+            colors[ic + 2] = ShadowType.floatToByte(B);
+            if (colorLength == 4) {
+                colors[ic + 3] = ShadowType.floatToByte(A);
+            }
+        }
+        shape.colors = colors;
+
+    }
+
+    // --- Color blending
+
+    /**
+     * Blend the color for the shape specified with color.
+     *
+     * @param shape shape to color
+     * @param color color to use for blending.
+     */
+    public static void blendColor(VisADGeometryArray shape, Color color) {
+        blendColor(shape, (float) color.getRed() / 255.0f,
+                   (float) color.getGreen() / 255.0f,
+                   (float) color.getBlue() / 255.0f);
     }
 
 
@@ -1354,21 +1389,39 @@ public class ShapeUtility {
     }
 
 
-    public static  void rotate(VisADGeometryArray shape, Transform3D transform) {
-        rotate(shape, transform, 0f,0f,0f);
+    /**
+     * Rotate a shape
+     *
+     * @param shape the shape
+     * @param transform  the 3D transform
+     */
+    public static void rotate(VisADGeometryArray shape,
+                              Transform3D transform) {
+        rotate(shape, transform, 0f, 0f, 0f);
     }
 
 
-    public static  void rotate(VisADGeometryArray shape, Transform3D transform, float deltax,float deltay, float deltaz) {
+    /**
+     * Rotate a shape
+     *
+     * @param shape  the shape
+     * @param transform  the transform
+     * @param deltax delta x
+     * @param deltay delta y
+     * @param deltaz delta z
+     */
+    public static void rotate(VisADGeometryArray shape,
+                              Transform3D transform, float deltax,
+                              float deltay, float deltaz) {
         Point3f point3f = new Point3f();
         for (int i = 0; i < shape.coordinates.length; i += 3) {
-            point3f.x = shape.coordinates[i + 0]+deltax;
-            point3f.y = shape.coordinates[i + 1]+deltay;
-            point3f.z = shape.coordinates[i + 2]+deltaz;
+            point3f.x = shape.coordinates[i + 0] + deltax;
+            point3f.y = shape.coordinates[i + 1] + deltay;
+            point3f.z = shape.coordinates[i + 2] + deltaz;
             transform.transform(point3f);
-            shape.coordinates[i + 0] = point3f.x-deltax;
-            shape.coordinates[i + 1] = point3f.y-deltay;
-            shape.coordinates[i + 2] = point3f.z-deltaz;
+            shape.coordinates[i + 0] = point3f.x - deltax;
+            shape.coordinates[i + 1] = point3f.y - deltay;
+            shape.coordinates[i + 2] = point3f.z - deltaz;
         }
     }
 

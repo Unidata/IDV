@@ -20,6 +20,7 @@
 
 
 
+
 package ucar.visad.display;
 
 
@@ -121,13 +122,13 @@ public class StationModelDisplayable extends DisplayableData {
     /** Should we use altitude */
     private boolean shouldUseAltitude = true;
 
-    /** _more_ */
+    /** flag for rotating shapes */
     private boolean rotateShapes = false;
 
-    /** _more_ */
+    /** working  transform */
     private Transform3D transform = new Transform3D();
 
-    /** _more_ */
+    /** the current rotation */
     private double[] currentRotation;
 
 
@@ -1511,12 +1512,12 @@ public class StationModelDisplayable extends DisplayableData {
                                 (float) tmp.getHeight());
 
 
-                        bgb.x      = bgb.x - bgb.width * 0.05f;
-                        bgb.y      = bgb.y - bgb.height * 0.05f;
-                        bgb.width  += bgb.width * 0.1f;
-                        bgb.height += bgb.height * 0.1f;
+                        bgb.x               = bgb.x - bgb.width * 0.05f;
+                        bgb.y               = bgb.y - bgb.height * 0.05f;
+                        bgb.width           += bgb.width * 0.1f;
+                        bgb.height          += bgb.height * 0.1f;
 
-                        bgshape = new VisADQuadArray();
+                        bgshape             = new VisADQuadArray();
                         bgshape.coordinates = new float[] {
                             bgb.x, bgb.y, 0.0f, bgb.x, bgb.y + bgb.height,
                             0.0f, bgb.x + bgb.width, bgb.y + bgb.height, 0.0f,
@@ -1538,12 +1539,13 @@ public class StationModelDisplayable extends DisplayableData {
                         quadShapes = add(quadShapes, bgshape);
                     }
 
-                    if (rotateShapes && (currentRotation != null) && metSymbol.rotateOnEarth()) {
+                    if (rotateShapes && (currentRotation != null)
+                            && metSymbol.rotateOnEarth()) {
                         for (VisADGeometryArray points : shapes) {
-                            ShapeUtility.rotate(points,transform);
+                            ShapeUtility.rotate(points, transform);
                         }
-                        if(bgshape!=null) {
-                            ShapeUtility.rotate(bgshape,transform);
+                        if (bgshape != null) {
+                            ShapeUtility.rotate(bgshape, transform);
                         }
                     }
 
@@ -1622,50 +1624,52 @@ public class StationModelDisplayable extends DisplayableData {
             float[] pts    = array.coordinates;
             int     count  = array.vertexCount;
             byte[]  colors = array.colors;
-            if(colors==null) {
+            if (colors == null) {
                 //                System.err.println ("colors are null");
                 //                continue;
             }
-            if(pts==null) {
+            if (pts == null) {
                 //                System.err.println ("pts are null");
                 //                continue;
             }
             //            System.err.println ("shape:" + array.getClass().getName() + " pts:" + pts.length +" colors:" + colors.length);
             float scale = 200.0f;
             if (array instanceof VisADLineArray) {
-                if(colors==null) {
+                if (colors == null) {
                     g2.setColor(Color.black);
                 }
-                int jinc = (colors==null?0:(colors.length == pts.length)
-                        ? 3
-                            : 4);
-                    int j    = 0;
-                    for (int i = 0; i < 3 * count; i += 6) {
-                        if(colors!=null)
-                            g2.setColor(new Color((((colors[j] < 0)
-                                                ? (((int) colors[j]) + 256)
-                                                : ((int) colors[j])) + ((colors[j + jinc]
-                                                                         < 0)
-                                                                        ? (((int) colors[j + jinc]) + 256)
-                                                                        : ((int) colors[j + jinc]))) / 2, (((colors[j + 1]
-                                                                                                             < 0)
-                                                                                                            ? (((int) colors[j + 1]) + 256)
-                                                                                                            : ((int) colors[j + 1])) + ((colors[j + jinc + 1]
-                                                                                                                                         < 0)
-                                                                                                                                        ? (((int) colors[j + jinc + 1]) + 256)
-                                                                                                                                        : ((int) colors[j + jinc + 1]))) / 2, (((colors[j + 2]
-                                                                                                                                                                                 < 0)
-                                                                                                                                                                                ? (((int) colors[j + 2]) + 256)
-                                                                                                                                                                                : ((int) colors[j + 2])) + ((colors[j + jinc + 2]
-                                                                                                                                                                                                             < 0)
-                                                                                                                                                                                                            ? (((int) colors[j + jinc + 2]) + 256)
-                                                                                                                                                                                                            : ((int) colors[j + jinc + 2]))) / 2));
-                        j += 2 * jinc;
-                        g2.draw(new Line2D.Float(mx + scale * pts[i],
-                                                 my - scale * pts[i + 1],
-                                                 mx + scale * pts[i + 3],
-                                                 my - scale * pts[i + 4]));
+                int jinc = ((colors == null)
+                            ? 0
+                            : (colors.length == pts.length)
+                              ? 3
+                              : 4);
+                int j    = 0;
+                for (int i = 0; i < 3 * count; i += 6) {
+                    if (colors != null) {
+                        g2.setColor(new Color((((colors[j] < 0)
+                                ? (((int) colors[j]) + 256)
+                                : ((int) colors[j])) + ((colors[j + jinc] < 0)
+                                ? (((int) colors[j + jinc]) + 256)
+                                : ((int) colors[j + jinc]))) / 2, (((colors[j + 1]
+                                   < 0)
+                                ? (((int) colors[j + 1]) + 256)
+                                : ((int) colors[j + 1])) + ((colors[j + jinc + 1]
+                                   < 0)
+                                ? (((int) colors[j + jinc + 1]) + 256)
+                                : ((int) colors[j + jinc + 1]))) / 2, (((colors[j + 2]
+                                   < 0)
+                                ? (((int) colors[j + 2]) + 256)
+                                : ((int) colors[j + 2])) + ((colors[j + jinc + 2]
+                                   < 0)
+                                ? (((int) colors[j + jinc + 2]) + 256)
+                                : ((int) colors[j + jinc + 2]))) / 2));
                     }
+                    j += 2 * jinc;
+                    g2.draw(new Line2D.Float(mx + scale * pts[i],
+                                             my - scale * pts[i + 1],
+                                             mx + scale * pts[i + 3],
+                                             my - scale * pts[i + 4]));
+                }
             } else if (array instanceof VisADTriangleArray) {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                     RenderingHints.VALUE_ANTIALIAS_OFF);
@@ -2290,9 +2294,46 @@ public class StationModelDisplayable extends DisplayableData {
         lowSelectedRange  = low;
         highSelectedRange = hi;
         if ((timeSelectControl != null) && hasSelectedRange()) {
+            setTimeColorRange(low, hi);
             timeSelectControl.setRange(new double[] { low, hi });
         }
 
+    }
+
+    /**
+     * Set the time color range
+     *
+     * @param low  low value
+     * @param hi   high value
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   problem creating VisAD object
+     */
+    private void setTimeColorRange(double low, double hi)
+            throws VisADException, RemoteException {
+        if (stationModel != null) {
+            // check for glyphs that are colored by time
+            boolean haveTimeColoredShape = false;
+            for (Iterator iter = stationModel.iterator(); iter.hasNext(); ) {
+                MetSymbol metSymbol = (MetSymbol) iter.next();
+                if ( !metSymbol.getActive() || !metSymbol.shouldBeColored()) {
+                    continue;
+                }
+                String colorParam = metSymbol.getColorTableParam();
+                if ((colorParam != null) && (colorParam.length() > 0)) {
+                    if (colorParam.equalsIgnoreCase(PointOb.PARAM_TIME)) {
+                        haveTimeColoredShape = true;
+                        metSymbol.setColorTableRange(new Range(low, hi));
+                    }
+                }
+            }
+            if (haveTimeColoredShape) {
+                // see if we can make this more efficient
+                if (stationData != null) {
+                    setStationData(stationData);
+                }
+            }
+        }
     }
 
     /**
