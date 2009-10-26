@@ -455,8 +455,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
             connection.close();
             BasicDataSource bds = (BasicDataSource)dataSource;
             if(bds.getNumActive()>3) {
-                System.err.println("closeConnection  active:" + bds.getNumActive() +" idle:" +bds.getNumIdle() +" max: " +
-                                   bds.getMaxActive() +" " + bds.getMaxIdle());
+                //                System.err.println("closeConnection  active:" + bds.getNumActive() +" idle:" +bds.getNumIdle() +" max: " +
+                //                                   bds.getMaxActive() +" " + bds.getMaxIdle());
             }
         } catch (Exception exc) {
             exc.printStackTrace();

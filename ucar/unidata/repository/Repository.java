@@ -498,20 +498,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public boolean isSSLEnabled(Request request) {
-        if (request != null) {
-            if ( !request.get(ARG_SSLOK, true)) {
-                return false;
-            }
-            if (request.getUser().getAdmin()) {
-                if (request.exists(PROP_SSL_IGNORE)) {
-                    ignoreSSL = request.get(PROP_SSL_IGNORE, false);
-                }
-            }
-        }
         if (ignoreSSL) {
             return false;
         }
-
         if (getProperty(PROP_SSL_IGNORE, false)) {
             return false;
         }
@@ -1578,10 +1567,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                          + requestUrl.getPath());
                 return;
             }
-            if (getProperty("ramadda.sslok", true)) {
-                if (isSSLEnabled(null) && apiMethod.getNeedsSsl()) {
-                    requestUrl.setNeedsSsl(true);
-                }
+            if (isSSLEnabled(null) && apiMethod.getNeedsSsl()) {
+                requestUrl.setNeedsSsl(true);
             }
         } catch (Exception exc) {
             throw new RuntimeException(exc);
@@ -2299,15 +2286,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
             return getHtdocsFile(request);
         }
 
-        /*
-        if(!request.exists(ARG_ENTRYID) &&
-           Misc.equals(apiMethod.getUrl().getBasePath(), URL_ENTRY_SHOW.getBasePath())) {
-            String prefix =  URL_ENTRY_SHOW.toString();
-            String suffix = request.getRequestPath().substring(prefix.length());
-            //Entry entry =  getEntryManager().getEntryFromCache(suffix,false);
-            //if(entry!=null) request.put(ARG_ENTRYID, entry.getId());
-        }
-        */
 
 
         boolean allSsl = false;
@@ -2318,6 +2296,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             }
         }
 
+        //        System.err.println("sslEnabled:" +sslEnabled + "  " + apiMethod.getNeedsSsl());
         if (sslEnabled) {
             if ( !request.get(ARG_NOREDIRECT, false)) {
                 if (apiMethod.getNeedsSsl() && !request.getSecure()) {

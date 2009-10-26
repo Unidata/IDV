@@ -104,23 +104,13 @@ public class RepositoryServlet extends HttpServlet implements Constants {
      */
     public RepositoryServlet(String[] args, int port) throws Exception {
         this.args = args;
-        createRepository(port, new Properties());
-	//This is the method that is called when we are running under tomcat.
-	//Set the ssl port if its defined
-        int sslPort = -1;
-	String ssls = repository.getPropertyValue(PROP_SSL_PORT,(String)null,false);
-        if (ssls!=null && ssls.trim().length()>0) {
-            sslPort = new Integer(ssls.trim());
-	}
-	if(sslPort>=0) {
-	    repository.setHttpsPort(sslPort);
-	}
+        createRepository(port, new Properties(), true);
     }
 
 
     public RepositoryServlet(JettyServer jettyServer, String[] args, int port) throws Exception {
         this.args = args;
-        createRepository(port, new Properties());
+        createRepository(port, new Properties(), false);
     }
 
 
@@ -149,7 +139,7 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                 webAppProperties.load(is);
             }
         }
-        createRepository(request.getServerPort(), webAppProperties);
+        createRepository(request.getServerPort(), webAppProperties,true);
     }
 
     /**
@@ -161,14 +151,27 @@ public class RepositoryServlet extends HttpServlet implements Constants {
      * @throws Exception _more_
      */
     private synchronized void createRepository(int port,
-            Properties webAppProperties)
-            throws Exception {
+                                               Properties webAppProperties, boolean checkSsl)
+        throws Exception {
         if (repository != null) {
             return;
         }
         Repository tmp = new Repository(getInitParams(), port, true);
         tmp.init(webAppProperties);
+        if(checkSsl) {
+            int sslPort = -1;
+            String ssls = tmp.getPropertyValue(PROP_SSL_PORT,(String)null, false);
+            if (ssls!=null && ssls.trim().length()>0) {
+                sslPort = new Integer(ssls.trim());
+            }
+            if(sslPort>=0) {
+                tmp.getLogManager().logInfo("SSL: using port:" + sslPort);
+                tmp.setHttpsPort(sslPort);
+            }
+        }
+
         repository = tmp;
+
     }
 
 
