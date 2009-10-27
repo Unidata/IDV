@@ -1,4 +1,4 @@
-/*
+/**
  * $Id: TwoFacedObject.java,v 1.20 2006/06/23 20:17:32 dmurray Exp $
  *
  * Copyright  1997-2004 Unidata Program Center/University Corporation for
@@ -25,7 +25,9 @@ package ucar.unidata.util;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Comparator;
 
 
 /**
@@ -315,5 +317,21 @@ public class TwoFacedObject implements Comparable {
         }
         return toString().compareTo(o.toString());
     }
+
+
+
+
+    public static void sort(List list) {
+	Comparator comp = new Comparator() {
+		public int compare(Object o1,Object o2 ) {
+		    return o1.toString().toLowerCase().compareTo(o2.toString().toLowerCase());
+
+		}
+	    };
+	Collections.sort(list, comp);
+	
+    }
+
+
 }
 
