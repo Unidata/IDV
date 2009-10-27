@@ -896,18 +896,24 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
             sounding = new Sounding(getDisplay());
             soundings.addSounding(index, sounding);
         }
+        WindBarbProfile windBarbs = (WindBarbProfile)winds.getDisplayable(index);
+        if(windBarbs==null){
+            windBarbs = new WindBarbProfile(getDisplay(),
+                                        getCoordinateSystem());
+            winds.addWindProfile(index, windBarbs);
+        }
         sounding.setFields(temperature, dewPoint);
         //        sounding.setVisible(false);
         //        soundings.addSounding(index, sounding);
-        WindBarbProfile windBarbs = new WindBarbProfile(getDisplay(),
-                                        getCoordinateSystem());
+        //WindBarbProfile windBarbs = new WindBarbProfile(getDisplay(),
+        //                                getCoordinateSystem());
         Field ff = vetWinds(windProfile);
         if (ff != null) {
             windBarbs.setProfile(ff);
             windStaff.setVisible(true);
         }
         windBarbs.setVisible(false);
-        winds.addWindProfile(index, windBarbs);
+        //winds.addWindProfile(index, windBarbs);
     }
 
     /**
