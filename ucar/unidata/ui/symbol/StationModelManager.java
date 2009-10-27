@@ -190,8 +190,8 @@ public class StationModelManager extends ResourceManager {
                 }
             });
             smc.setPreferredSize(new Dimension(250, 250));
-	    GuiUtils.decorateFrame(frame, smc.getMenuBar());
-	    //            frame.setJMenuBar(smc.getMenuBar());
+	    //	    GuiUtils.decorateFrame(frame, smc.getMenuBar());
+	    frame.setJMenuBar(smc.getMenuBar());
             GuiUtils.packWindow(frame, smc.getContents(), true);
         }
         if (initModel != null) {
