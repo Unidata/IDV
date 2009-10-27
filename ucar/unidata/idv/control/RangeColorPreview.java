@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control;
 
 
@@ -40,6 +41,10 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
+
+import ucar.visad.UtcDate;
+
+import visad.DateTime;
 
 import visad.Unit;
 
@@ -112,36 +117,71 @@ public class RangeColorPreview extends JPanel implements MouseMotionListener,
     /** preferred size */
     Dimension myPreferredSize;
 
+    /** is this a time range? */
+    private boolean isTime;
+
+    /** the list of colors */
     private List<Color> colors;
 
 
     /**
      * Create a new color table preview
      *
-     * @param map The map
+     * @param colors the colors
      * @param dc For formatting
      */
-    public RangeColorPreview(List<Color>colors, DisplayConventions dc) {
-        this(colors, dc, DisplayControlImpl.SIDE_LEGEND, false);
+    public RangeColorPreview(List<Color> colors, DisplayConventions dc) {
+        this(colors, dc, DisplayControlImpl.SIDE_LEGEND, false, false);
     }
 
+
+    /**
+     * Create a new color table preview
+     *
+     * @param colors the colors
+     * @param dc For formatting
+     * @param isTime  is this a time range
+     */
+    public RangeColorPreview(List<Color> colors, DisplayConventions dc,
+                             boolean isTime) {
+        this(colors, dc, DisplayControlImpl.SIDE_LEGEND, false, isTime);
+    }
 
 
     /**
      * Create a new color table preview
      *
      * @param map The map
+     *
+     * @param colors the colors
      * @param dc For formatting
      * @param legendType What legend
      * @param forMain Or in main window
      */
     public RangeColorPreview(List<Color> colors, DisplayConventions dc,
                              int legendType, boolean forMain) {
-        //        super(map, (forMain                    ? 15                    : 0));
-        this.colors = colors;
+        this(colors, dc, DisplayControlImpl.SIDE_LEGEND, forMain, false);
+    }
+
+    /**
+     * Create a new color table preview
+     *
+     * @param map The map
+     *
+     * @param colors the colors
+     * @param dc For formatting
+     * @param legendType What legend
+     * @param forMain Or in main window
+     * @param isTime  is this a time range
+     */
+    public RangeColorPreview(List<Color> colors, DisplayConventions dc,
+                             int legendType, boolean forMain,
+                             boolean isTime) {
+        this.colors             = colors;
         this.forMain            = forMain;
         this.displayConventions = dc;
         this.legendType         = legendType;
+        this.isTime             = isTime;
         addMouseMotionListener(this);
         addMouseListener(this);
         lowerLbl  = new JLabel(StringUtil.padRight("", 5), JLabel.RIGHT);
@@ -158,9 +198,14 @@ public class RangeColorPreview extends JPanel implements MouseMotionListener,
     }
 
 
-  public Dimension xxxgetMaximumSize() {
-    return new Dimension(Integer.MAX_VALUE, 15);
-  }
+    /**
+     * Get the maximum size
+     *
+     * @return the size
+     */
+    public Dimension xxxgetMaximumSize() {
+        return new Dimension(Integer.MAX_VALUE, 15);
+    }
 
     /**
      * Local implementation of preferred size setting
@@ -274,12 +319,22 @@ public class RangeColorPreview extends JPanel implements MouseMotionListener,
             unitString = " " + unitString;
         }
         if (range != null) {
-            lower = displayConventions.format(range.getMin());
-            if (forSideLegend()) {
-                upper = displayConventions.format(range.getMax());
+            if ( !isTime) {
+                lower = displayConventions.format(range.getMin());
+                if (forSideLegend()) {
+                    upper = displayConventions.format(range.getMax());
+                } else {
+                    upper = displayConventions.format(range.getMax())
+                            + unitString;
+                }
             } else {
-                upper = displayConventions.format(range.getMax())
-                        + unitString;
+                try {
+                    lower = UtcDate.getHHMM(new DateTime(range.getMin()));
+                    upper = UtcDate.getHHMM(new DateTime(range.getMax()));
+                } catch (VisADException ve) {
+                    lower = "";
+                    upper = "";
+                }
             }
         } else {
             lower = "";
@@ -305,7 +360,8 @@ public class RangeColorPreview extends JPanel implements MouseMotionListener,
      */
     public void paint(Graphics g) {
         super.paint(g);
-        ColorTableCanvas.paintColors(g, getBounds(), colors, false,false, null);
+        ColorTableCanvas.paintColors(g, getBounds(), colors, false, false,
+                                     null);
         if ( !mouseInPreview) {
             return;
         }
@@ -317,9 +373,19 @@ public class RangeColorPreview extends JPanel implements MouseMotionListener,
         if ((bounds.width == 0) || (getRange() == null)) {
             return;
         }
-        double percent = previewMouseX / (double) bounds.width;
-        String rangeString = (displayConventions.format(
-                                 getRange().getValueOfPercent(percent)));
+        double percent     = previewMouseX / (double) bounds.width;
+        double value       = getRange().getValueOfPercent(percent);
+        String rangeString = "";
+        if (isTime) {
+            try {
+                rangeString = UtcDate.getHHMM(new DateTime(value));
+            } catch (VisADException ve) {
+                rangeString = "";
+            }
+        }
+        if (rangeString.length() == 0) {
+            rangeString = displayConventions.format(value);
+        }
         g.setFont(rangeFont);
         FontMetrics fm      = g.getFontMetrics();
         Rectangle2D sBounds = fm.getStringBounds(rangeString, g);
@@ -332,6 +398,11 @@ public class RangeColorPreview extends JPanel implements MouseMotionListener,
         g.drawString(rangeString, 2, bounds.height - 1);
     }
 
+    /**
+     * Set the colors
+     *
+     * @param colors the colors
+     */
     public void setColors(List<Color> colors) {
         this.colors = colors;
         repaint();
@@ -398,5 +469,13 @@ public class RangeColorPreview extends JPanel implements MouseMotionListener,
      * @param event  the MouseEvent
      */
     public void mousePressed(MouseEvent event) {}
+
+    /**
+     * Is this a time preview?
+     * @return true if it is
+     */
+    public boolean getIsTime() {
+        return isTime;
+    }
 }
 

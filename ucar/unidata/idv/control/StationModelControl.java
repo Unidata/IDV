@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
@@ -147,7 +148,7 @@ public class StationModelControl extends ObsDisplayControl {
     /** Do we use altitude if we have it */
     private boolean shouldUseAltitude = true;
 
-    /** _more_          */
+    /** are we in the globe */
     private boolean inGlobe = false;
 
     /** holds the z position slider */
@@ -299,7 +300,7 @@ public class StationModelControl extends ObsDisplayControl {
     /** bounds of the display */
     private Rectangle2D lastViewBounds = null;
 
-    /** _more_          */
+    /** last rotation */
     private double[] lastRotation;
 
     /** Have we gotten the initial display scale */
@@ -333,6 +334,7 @@ public class StationModelControl extends ObsDisplayControl {
     /** For loadDataInAWhile */
     private Object LOADDATA_MUTEX = new Object();
 
+    /** loadData timestamp */
     private int loadDataTimestamp = 0;
 
     /** locking object */
@@ -361,6 +363,8 @@ public class StationModelControl extends ObsDisplayControl {
     /** flag for using data times */
     private boolean useDataTimes = true;
 
+    /** the range color preview for the legend */
+    private RangeColorPreview rangeColorPreview = null;
 
     /**
      * Default constructor.
@@ -480,7 +484,16 @@ public class StationModelControl extends ObsDisplayControl {
     }
 
 
-    protected void initDisplayable(StationModelDisplayable myDisplay) throws VisADException, RemoteException {
+    /**
+     * Initialize the displayable with another
+     *
+     * @param myDisplay  the display
+     *
+     * @throws VisADException  some problem creating a VisAD object
+     * @throws RemoteException  some problem creating a remote VisAD object
+     */
+    protected void initDisplayable(StationModelDisplayable myDisplay)
+            throws VisADException, RemoteException {
         if (inGlobe) {
             myDisplay.setRotateShapes(true);
         }
@@ -570,7 +583,6 @@ public class StationModelControl extends ObsDisplayControl {
         return GuiUtils.centerBottom(legendComp, sideLegendExtra);
     }
 
-
     /**
      * Fill the side legend
      */
@@ -605,18 +617,18 @@ public class StationModelControl extends ObsDisplayControl {
                     continue;
                 }
 
-                RangeColorPreview preview =
-                    new RangeColorPreview(ct.getColorList(),
-                                          getDisplayConventions());
+                rangeColorPreview = new RangeColorPreview(ct.getColorList(),
+                        getDisplayConventions(),
+                        param.equalsIgnoreCase(PointOb.PARAM_TIME));
 
-                //                preview.setPreferred
-                preview.setRange(range);
+                //                rangeColorPreview.setPreferred
+                rangeColorPreview.setRange(range);
                 Rectangle b = metSymbol.getBounds();
                 ctComps.add(new Object[] { new Integer(b.y),
                                            GuiUtils
                                            .topCenter(GuiUtils
                                                .left(new JLabel(param
-                                                   + ":")), preview
+                                                   + ":")), rangeColorPreview
                                                        .doMakeContents()) });
             }
 
@@ -1494,6 +1506,9 @@ public class StationModelControl extends ObsDisplayControl {
                     myDisplay.setSelectedRange(startDate, endDate);
                 }
             }
+            if ((rangeColorPreview != null) && rangeColorPreview.getIsTime()) {
+                rangeColorPreview.setRange(new Range(startDate, endDate));
+            }
         } catch (Exception e) {
             logException("applyTimeRange", e);
         }
@@ -1558,6 +1573,7 @@ public class StationModelControl extends ObsDisplayControl {
      * @see #doMakeDataInstance(DataChoice)
      */
     protected void loadData() {
+
         int myTimestamp = ++loadDataTimestamp;
 
         try {
@@ -1658,8 +1674,10 @@ public class StationModelControl extends ObsDisplayControl {
             if (declutter) {
                 if ( !stationsLocked || (lastDeclutteredData == null)) {
                     Trace.call1("doDeclutter");
-                    FieldImpl tmp =  doDeclutter(theData,myTimestamp);
-                    if(tmp==null) return;
+                    FieldImpl tmp = doDeclutter(theData, myTimestamp);
+                    if (tmp == null) {
+                        return;
+                    }
                     lastDeclutteredData = tmp;
                     Trace.call2("doDeclutter");
                 }
@@ -1702,6 +1720,7 @@ public class StationModelControl extends ObsDisplayControl {
 
         //      Trace.stopTrace();
         //If we went to showAllTimes=true then we need to update the animation set
+
 
     }
 
@@ -2480,8 +2499,9 @@ public class StationModelControl extends ObsDisplayControl {
                                      ? 0
                                      : 1), this, "setShouldUseAltitudeIndex");
 
-        return GuiUtils.doLayout(new Component[] { GuiUtils.left(GuiUtils.hbox(jrbs[0], 
-                                                                 jrbs[1])), zPositionPanel }, 1, GuiUtils.WT_Y, GuiUtils.WT_N);
+        return GuiUtils.doLayout(new Component[] {
+            GuiUtils.left(GuiUtils.hbox(jrbs[0], jrbs[1])),
+            zPositionPanel }, 1, GuiUtils.WT_Y, GuiUtils.WT_N);
 
     }
 
@@ -2873,16 +2893,16 @@ public class StationModelControl extends ObsDisplayControl {
     }
 
 
-    /** _more_          */
+    /** _more_ */
     JTextField kmzWidthFld;
 
-    /** _more_          */
+    /** _more_ */
     JTextField kmzHeightFld;
 
-    /** _more_          */
+    /** _more_ */
     JTextField kmzNameFld;
 
-    /** _more_          */
+    /** _more_ */
     GuiUtils.ColorSwatch kmzColorSwatch;
 
     /**
@@ -3094,6 +3114,7 @@ public class StationModelControl extends ObsDisplayControl {
     public void doRemove() throws VisADException, RemoteException {
         getControlContext().getStationModelManager()
             .removePropertyChangeListener(this);
+        rangeColorPreview = null;
         super.doRemove();
     }
 
@@ -3127,6 +3148,7 @@ public class StationModelControl extends ObsDisplayControl {
      * to handle the case where there is a time sequence of observations.
      *
      * @param  obs initial field of observations.
+     * @param timestamp _more_
      *
      * @return a decluttered version of obs
      *
@@ -3146,14 +3168,17 @@ public class StationModelControl extends ObsDisplayControl {
             int numTimes = timeSet.getLength();
             for (int i = 0; i < numTimes; i++) {
                 FieldImpl oneTime = (FieldImpl) obs.getSample(i);
-                FieldImpl subTime = doTheActualDecluttering(oneTime,timestamp);
-                if(timestamp !=loadDataTimestamp) return null;
+                FieldImpl subTime = doTheActualDecluttering(oneTime,
+                                        timestamp);
+                if (timestamp != loadDataTimestamp) {
+                    return null;
+                }
                 if (subTime != null) {
                     declutteredField.setSample(i, subTime, false);
                 }
             }
         } else {
-            declutteredField = doTheActualDecluttering(obs,timestamp);
+            declutteredField = doTheActualDecluttering(obs, timestamp);
         }
         //System.out.println("Subsetting took : " +
         //    (System.currentTimeMillis() - millis) + " ms");
@@ -3164,13 +3189,15 @@ public class StationModelControl extends ObsDisplayControl {
      * a     * Declutters a single timestep of observations.
      *
      * @param pointObs  point observations for one timestep.
+     * @param timestamp _more_
      *
      * @return a decluttered version of pointObs
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    private FieldImpl doTheActualDecluttering(FieldImpl pointObs,int timestamp)
+    private FieldImpl doTheActualDecluttering(FieldImpl pointObs,
+            int timestamp)
             throws VisADException, RemoteException {
         if ((pointObs == null) || pointObs.isMissing()) {
             return pointObs;
@@ -3216,7 +3243,9 @@ public class StationModelControl extends ObsDisplayControl {
         double[] xyz = new double[3];
         //TODO: The repeated getSpatialCoords is a bit expensive
         for (int i = 0; i < numObs; i++) {
-            if(timestamp !=loadDataTimestamp) return null;
+            if (timestamp != loadDataTimestamp) {
+                return null;
+            }
             PointOb ob = (PointOb) pointObs.getSample(i);
             xyz = navDisplay.getSpatialCoordinates(ob.getEarthLocation(),
                     xyz, 0);
@@ -3579,7 +3608,7 @@ public class StationModelControl extends ObsDisplayControl {
                 lastRotation = rotation;
             }
 
-            if(!shouldReload) {
+            if ( !shouldReload) {
                 if ((lastViewBounds == null)
                         || (lastViewBounds.getWidth() == 0)
                         || (lastViewBounds.getHeight() == 0)) {
