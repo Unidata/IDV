@@ -62,6 +62,7 @@ import java.util.ArrayList;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.*;
@@ -128,6 +129,8 @@ public class XmlEncoder extends XmlUtil {
      *  Method name for List.add
      */
     public static final String METHOD_ADD = "add";
+
+
 
 
     /**
@@ -2563,6 +2566,21 @@ public class XmlEncoder extends XmlUtil {
             }
             return elements;
         }
+
+
+
+	/*
+        if (object instanceof HashSet) {
+            List      elements = new ArrayList();
+            HashSet ht       = (HashSet) object;
+            for (Enumeration keys = ht.keys(); keys.hasMoreElements(); ) {
+                Object  key           = keys.nextElement();
+                Element methodElement = createMethodElement(METHOD_ADD);
+                methodElement.appendChild(createElement(key));
+                elements.add(methodElement);
+            }
+            return elements;
+	    }*/
         return null;
     }
 
@@ -2661,11 +2679,14 @@ public class XmlEncoder extends XmlUtil {
     public static void main(String[] args) {
 
         try {
-            String xmltest = IOUtil.readContents("test.xml",
+	    /*            String xmltest = IOUtil.readContents("test.xml",
                                  XmlEncoder.class, (String) null);
             XmlEncoder enc1 = new XmlEncoder();
-            Object     o1   = enc1.toObject(xmltest);
-            System.err.println("o1:" + o1);
+	    HashSet hs = new HashSet();
+	    hs.add("foo");
+            HashSet h2   = (HashSet) enc1.toObject(hs);
+            System.err.println("o1:" + h2);
+	    */
         } catch (Exception exc) {
             System.err.println("OOps:" + exc);
         }

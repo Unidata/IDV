@@ -58,6 +58,7 @@ import java.security.SignatureException;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.crypto.Mac;
@@ -2167,47 +2168,106 @@ public abstract class XmlUtil {
         if(true) return;
         */
 
+	boolean doFormat = true;
         for (int i = 0; i < args.length; i++) {
-            try {
-                String       xml = IOUtil.readContents(args[i],
-                                       XmlUtil.class);
-                String       origXml = xml;
-                StringBuffer buff    = new StringBuffer();
-                //Replace comments with special CDATA 
-                while (true) {
-                    int idx1 = xml.indexOf("<!--");
-                    if (idx1 < 0) {
-                        buff.append(xml);
-                        break;
-                    }
-                    int idx2 = xml.indexOf("-->");
-                    if ((idx2 < 0) || (idx2 < idx1)) {
-                        buff.append(xml);
-                        break;
-                    }
-                    buff.append(xml.substring(0, idx1));
-                    String commentBlock = xml.substring(idx1 + 4, idx2);
-                    xml = xml.substring(idx2 + 3);
-                    buff.append("<![CDATA[XmlUtil.COMMENT:" + commentBlock
-                                + "]]>");
-                }
-
-                Element root      = getRoot(buff.toString());
-                                String  xmlString = toStringWithHeader(root, "  ", "\n",
-                                                        true);
-
-                //                String  xmlString = toStringWithHeader(root, "", "",
-                //                                        false);
-                IOUtil.writeFile(new java.io.File(args[i]), xmlString);
-            } catch (Exception exc) {
-                System.err.println("Error processing:" + args[i]);
-                exc.printStackTrace();
-            }
-            System.exit(0);
+	    if(args[i].equals("-format")) {
+		doFormat = true;
+		continue;
+	    }  
+	    if(args[i].equals("-printtags")) {
+		doFormat = false;
+		continue;
+	    }  
+	    if(doFormat) {
+		format(args[i]);
+	    } else {
+		printTags(args[i]);
+	    }
         }
     }
 
+    private static void printTags(Element node, HashSet<String> seen, StringBuffer tagBuff, StringBuffer attrBuff) {
+	String tagName = node.getTagName();
+	if(tagName.indexOf(":")<0 && !seen.contains("tag:" +tagName)) {
+	    seen.add("tag:"+tagName);
+	    tagBuff.append("public static final String TAG_" + tagName.toUpperCase() +" = \"" + tagName+"\";\n");
+	}
+        NamedNodeMap nnm = node.getAttributes();
+        if (nnm != null) {
+	    for (int i = 0; i < nnm.getLength(); i++) {
+		Attr attr = (Attr) nnm.item(i);
+		String attrName = attr.getName();
+		if(attrName.indexOf(":")<0 && !seen.contains("attr:" +attrName)) {
+		    seen.add("attr:"+attrName);
+		    attrBuff.append("public static final String ATTR_" + attrName.toUpperCase() +" = \"" + attrName+"\";\n");
+		}
+	    }
+	}
 
+        NodeList elements = getElements(node);
+        for (int i = 0; i < elements.getLength(); i++) {
+            Element child = (Element) elements.item(i);
+	    printTags(child, seen, tagBuff, attrBuff);
+	}
+    }
+
+
+    private static void printTags(String f) {
+	try {
+	    String       xml = IOUtil.readContents(f,
+						   XmlUtil.class);
+	    Element root      = getRoot(xml);
+	    StringBuffer tagBuff = new StringBuffer();
+	    StringBuffer attrBuff = new StringBuffer();
+	    printTags(root, new HashSet<String>(), tagBuff, attrBuff);
+	    System.out.println(tagBuff);
+	    System.out.println(attrBuff);
+	} catch (Exception exc) {
+	    System.err.println("Error processing:" + f);
+	    exc.printStackTrace();
+	}
+    }
+
+
+
+
+    private static void format(String f) {
+	try {
+	    String       xml = IOUtil.readContents(f,
+						   XmlUtil.class);
+	    String       origXml = xml;
+	    StringBuffer buff    = new StringBuffer();
+	    //Replace comments with special CDATA 
+	    while (true) {
+		int idx1 = xml.indexOf("<!--");
+		if (idx1 < 0) {
+		    buff.append(xml);
+		    break;
+		}
+		int idx2 = xml.indexOf("-->");
+		if ((idx2 < 0) || (idx2 < idx1)) {
+		    buff.append(xml);
+		    break;
+		}
+		buff.append(xml.substring(0, idx1));
+		String commentBlock = xml.substring(idx1 + 4, idx2);
+		xml = xml.substring(idx2 + 3);
+		buff.append("<![CDATA[XmlUtil.COMMENT:" + commentBlock
+			    + "]]>");
+	    }
+
+	    Element root      = getRoot(buff.toString());
+	    String  xmlString = toStringWithHeader(root, "  ", "\n",
+						   true);
+
+	    //                String  xmlString = toStringWithHeader(root, "", "",
+	    //                                        false);
+	    IOUtil.writeFile(new java.io.File(f), xmlString);
+	} catch (Exception exc) {
+	    System.err.println("Error processing:" + f);
+	    exc.printStackTrace();
+	}
+    }
 
     /** sha algorithm to use */
     private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
