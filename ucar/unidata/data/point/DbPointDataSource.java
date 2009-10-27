@@ -297,8 +297,6 @@ public class DbPointDataSource extends PointDataSource {
         List stringTypes = new ArrayList();
         stringTypes.add(TextType.getTextType("Station"));
 
-
-
         TupleType allTupleType =
             DoubleStringTuple.makeTupleType(numericTypes, stringTypes);
 
