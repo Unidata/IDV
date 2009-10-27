@@ -575,6 +575,9 @@ public class GeoGridDataSource extends GridDataSource {
      */
     public void doRemove() {
         super.doRemove();
+        try {
+        if (dataset != null) dataset.close();
+        } catch (IOException ioe) {}
         dataset   = null;
         gcsVsTime = null;
     }
@@ -1180,7 +1183,22 @@ public class GeoGridDataSource extends GridDataSource {
                         choice.setName(PREFIX_GRIDRELATIVE
                                        + choice.getName());
                     }
+                } /*else {  // check for GRIB definition
+                    String canonical = DataAlias.aliasToCanonical(choice.getName());
+                    if (Misc.equals(canonical, "U") ||
+                        Misc.equals(canonical, "V")) {
+                         Attribute vecFlag = 
+                             cfield.findAttributeIgnoreCase("GRIB_VectorComponentFlag");
+                         if (vecFlag != null) {
+                             String vecFlagVal = vecFlag.getStringValue();
+                             if (vecFlagVal.equals("gridRelative")) {
+                                  choice.setName(PREFIX_GRIDRELATIVE
+                                                 + choice.getName());
+                             }
+                         }
+                    }
                 }
+                */
                 addDataChoice(choice);
             }
         }
@@ -1293,7 +1311,8 @@ public class GeoGridDataSource extends GridDataSource {
             long t1 = System.currentTimeMillis();
             GeoGridAdapter geoGridAdapter = makeGeoGridAdapter(dataChoice,
                                                 dataSelection, null,
-                                                fromLevelIndex, toLevelIndex);
+                                                fromLevelIndex, toLevelIndex,
+                                                true);
             long t2 = System.currentTimeMillis();
             //            System.err.println("time 2:" + (t2-t1));
             if (geoGridAdapter != null) {
@@ -1339,6 +1358,8 @@ public class GeoGridDataSource extends GridDataSource {
      * @param requestProperties request properties
      * @param fromLevelIndex First level index. -1 if it is undefined
      * @param toLevelIndex Second level index. -1 if it is undefined
+     * @param forMetaData   true if we are using this to get metadata instead of
+     *                      reading data.
      *
      * @return The GeoGridAdapter
      *
@@ -1346,10 +1367,10 @@ public class GeoGridDataSource extends GridDataSource {
      */
     private GeoGridAdapter makeGeoGridAdapter(DataChoice dataChoice,
             DataSelection givenDataSelection, Hashtable requestProperties,
-            int fromLevelIndex, int toLevelIndex)
+            int fromLevelIndex, int toLevelIndex, boolean forMetaData)
             throws VisADException {
 
-        boolean readingFullGrid = true;
+        boolean readingFullGrid = !forMetaData;
         int     numLevels       = -1;
         if ((fromLevelIndex >= 0) && (toLevelIndex >= 0)) {
             numLevels = Math.abs(toLevelIndex - fromLevelIndex) + 1;
@@ -1592,7 +1613,7 @@ public class GeoGridDataSource extends GridDataSource {
         Trace.call1("GeoGridDataSource.make GeoGridAdapter");
         GeoGridAdapter adapter = makeGeoGridAdapter(dataChoice,
                                      givenDataSelection, requestProperties,
-                                     fromLevelIndex, toLevelIndex);
+                                     fromLevelIndex, toLevelIndex, false);
         if (adapter == null) {
             throw new BadDataException("Could not find field:"
                                        + dataChoice.getStringId());
