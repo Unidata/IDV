@@ -60,6 +60,14 @@
      factory="ucar.unidata.data.point.DbPointDataSource"
      label="Point data database"/>
 
+  <datasource
+     id="waterml"
+     fileselection="true"
+     factory="ucar.unidata.data.point.WaterMLDataSource"
+     label="WaterML Point Data"/>
+
+
+
 <!--
   <datasource
      id="DB.STORMTRACK"

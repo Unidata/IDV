@@ -470,10 +470,10 @@ public class TimesChooser extends IdvChooser {
             JSplitPane splitter  = GuiUtils.hsplit(timeline.getContents(false), timesList.getScroller(),0.75);
             splitter.setOneTouchExpandable(true);
             timesTab.add("Absolute", GuiUtils.centerBottom(splitter,GuiUtils.leftRight(absTimesLbl,absoluteExtra)));
-            timesTab.setPreferredSize(new Dimension(400, 120));
+            timesTab.setPreferredSize(new Dimension(350, 150));
         } else {
             timesTab.add("Absolute", GuiUtils.centerBottom(timesList.getScroller(), absoluteExtra));
-            timesTab.setPreferredSize(new Dimension(200, 120));
+            timesTab.setPreferredSize(new Dimension(350, 150));
         }
 
 

@@ -71,6 +71,7 @@ import java.awt.event.*;
 import java.beans.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -813,19 +814,8 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      */
     public static JComboBox getDataSourcesComponent(boolean justFileSources,
             DataManager dataManager, boolean addLucky) {
-        JComboBox dataSourcesCbx  = new JComboBox();
-        List      dataSources     = (addLucky
-                                     ? Misc.newList("I'm Feeling Lucky")
-                                     : (List) new ArrayList());
-        List      fileDataSources = (justFileSources
-                                     ? dataManager.getFileDataSourceList()
-                                     : (List) dataManager
-                                         .getAllDataSourceIds());
-        dataSources.addAll(fileDataSources);
-        GuiUtils.setListData(dataSourcesCbx, dataSources);
-        dataSourcesCbx.setToolTipText(
-            "<html>Optional way to specifically select<br>the type of datasource.</html>");
-        return dataSourcesCbx;
+	return dataManager.getDataContext().getIdv().getIdvChooserManager().getDataSourcesComponent(justFileSources,
+										   dataManager,  addLucky);
     }
 
     /**
@@ -834,7 +824,7 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
      * Else, return null
      *
      * @return Data source id
-     */
+    */
     protected String getDataSourceId() {
         return getDataSourceId(dataSourcesCbx);
     }
@@ -852,7 +842,9 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
         }
         Object selected = dataSourcesCbx.getSelectedItem();
         if ((selected != null) && (selected instanceof TwoFacedObject)) {
-            return (String) ((TwoFacedObject) selected).getId();
+	    String id =  (String) ((TwoFacedObject) selected).getId();
+	    chooserManager.dataSourceIdSelected(id);
+	    return id;
         }
         return null;
     }

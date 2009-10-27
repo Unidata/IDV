@@ -227,6 +227,8 @@ public class IdvChooserManager extends IdvManager {
     /** All of the adde servers */
     private List addeServers = new ArrayList();
 
+    private List<String> selectedDataSourceIds = null;
+
 
     /**
      *  Create a new IdvChooserManager.
@@ -877,6 +879,55 @@ public class IdvChooserManager extends IdvManager {
 
 
 
+
+    private List<String> getSelectedDataSourceIds() {
+	if(selectedDataSourceIds==null) {
+	    selectedDataSourceIds = (List) getIdv().getStore().getEncodedFile("selecteddatasourceids.xml");
+	}
+	if(selectedDataSourceIds==null) {
+	    selectedDataSourceIds= new ArrayList();
+	}
+	return selectedDataSourceIds;
+    } 
+
+    private void writeSelectedDataSourceIds() {
+	if(selectedDataSourceIds!=null) {
+	    getIdv().getStore().putEncodedFile("selecteddatasourceids.xml", 
+					       selectedDataSourceIds);
+	}
+    } 
+
+
+
+
+    public List sortDataSourceIds(List ids) {
+	List result = new ArrayList();
+	for(String id: (List<String>) getSelectedDataSourceIds()) {
+	    TwoFacedObject tfo = TwoFacedObject.findId(id, ids);
+	    if(tfo!=null) {
+		ids.remove(tfo);
+		result.add(tfo);
+	    }
+	}
+	//	TwoFacedObject.sort(result);
+	TwoFacedObject.sort(ids);
+	result.addAll(ids);
+	return result;
+    }
+
+
+    public void dataSourceIdSelected(String id) {
+	List ids = getSelectedDataSourceIds();
+	ids.remove(id);
+	ids.add(0,id);
+	while(selectedDataSourceIds.size()>15) {
+	    ids.remove(selectedDataSourceIds.size()-1);
+	}
+	writeSelectedDataSourceIds();
+    }
+
+
+
     /**
      * Create the data source from the given user chooser xml
      *
@@ -1250,6 +1301,50 @@ public class IdvChooserManager extends IdvManager {
         }
 
     }
+
+    /**
+     * Return the component that holds the dataSources combo box
+     *
+     * @param justFileSources If true then just use data sources that access files
+     * @param dataManager The data manager
+     * @return The GUI for the data sources selector
+     */
+    public JComboBox getDataSourcesComponent(boolean justFileSources,
+            DataManager dataManager) {
+        return getDataSourcesComponent(justFileSources, dataManager, true);
+    }
+
+    /**
+     * Get the component for listing data source types
+     *
+     * @param justFileSources  true for just files
+     * @param dataManager  the data manager
+     * @param addLucky  true to add the "I'm Feeiling Lucky" option
+     *
+     * @return the component
+     */
+    public JComboBox getDataSourcesComponent(boolean justFileSources,
+            DataManager dataManager, boolean addLucky) {
+        JComboBox dataSourcesCbx  = new JComboBox();
+        List      dataSources     =  new ArrayList();
+        List      fileDataSources = (justFileSources
+                                     ? dataManager.getFileDataSourceList()
+                                     : (List) dataManager
+                                         .getAllDataSourceIds());
+
+        dataSources.addAll(fileDataSources);
+	dataSources = sortDataSourceIds(dataSources);
+	if(addLucky) {
+	    dataSources.add(0, "I'm Feeling Lucky");
+	    
+	}
+        GuiUtils.setListData(dataSourcesCbx, dataSources);
+        dataSourcesCbx.setToolTipText(
+            "<html>Optional way to specifically select<br>the type of datasource.</html>");
+        return dataSourcesCbx;
+    }
+
+
 
 
 
