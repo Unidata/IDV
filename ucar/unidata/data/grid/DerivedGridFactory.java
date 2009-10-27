@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.data.grid;
 
 
@@ -729,53 +728,127 @@ public class DerivedGridFactory {
             // TODO:  handle a time sequence topography or topo with CS
             if ( !GridUtil.isTimeSequence(topoGrid)) {
                 if ( !paramRef.equals(topoRef)) {
+                    //System.out.println("refs aren't equal");
                     GriddedSet newSet = null;
                     if (topoDomain.getCoordinateSystem() == null) {
-                        if (topoDomain instanceof Linear2DSet) {
-                            Unit[] setUnits = topoDomain.getSetUnits();
-                            RealTupleType rtt =
-                                ((SetType) topoDomain.getType()).getDomain();
-                            if (rtt.equals(
-                                    RealTupleType.SpatialEarth2DTuple)) {
-                                rtt = RealTupleType.LatitudeLongitudeTuple;
-                            } else {
-                                rtt = RealTupleType.SpatialEarth2DTuple;
-                            }
-                            newSet = new Linear2DSet(rtt,
-                                    new Linear1DSet[] {
-                                        ((Linear2DSet) topoDomain).getY(),
-                                        ((Linear2DSet) topoDomain)
-                                        .getX() }, (CoordinateSystem) null,
-                                            new Unit[] { setUnits[1],
-                                    setUnits[0] }, (ErrorEstimate[]) null,
-                                    true);
-                        } else if (topoDomain instanceof Gridded2DSet) {
-                            int[] lengths =
-                                ((GriddedSet) topoDomain).getLengths();
-                            Unit[] units =
-                                ((GriddedSet) topoDomain).getSetUnits();
-                            ErrorEstimate[] errors =
-                                ((GriddedSet) topoDomain).getSetErrors();
-                            float[][] topoVals = topoDomain.getSamples(false);
-                            newSet = new Gridded2DSet(paramRef,
-                                    new float[][] {
-                                topoVals[1], topoVals[0]
-                            }, lengths[1], lengths[0],
-                               (CoordinateSystem) null, new Unit[] { units[1],
-                                    units[0] }, new ErrorEstimate[] {
-                                        errors[1],
-                                        errors[0] });
+                        if ((topoRef
+                                .equals(RealTupleType
+                                    .SpatialEarth2DTuple) || topoRef
+                                        .equals(RealTupleType
+                                            .LatitudeLongitudeTuple))) {
+                            topoGrid = swapLatLon((FlatField) topoGrid);
                         }
-                    }
-                    if (newSet != null) {
-                        // System.out.println("newSet = " + newSet);
-                        topoGrid = GridUtil.setSpatialDomain(topoGrid,
-                                newSet);
                     }
                 }
             }
             return combineGrids(grid, topoGrid);
         }
+    }
+
+    /**
+     * Make a FieldImpl of some parameter and topography.  We add a little
+     * bit to the topography grid so it will raise it up just a tad
+     *
+     * @param grid   grid to swap
+     *
+     * @return lat/lon swapped grid
+     *
+     * @throws VisADException  VisAD problem
+     * @throws RemoteException  remote problem
+     */
+    private static FlatField swapLatLon(FlatField grid)
+            throws VisADException, RemoteException {
+
+        FlatField topoGrid = grid;
+        // check to make sure domains are compatible
+        Set topoDomain = GridUtil.getSpatialDomain(grid);
+        //System.err.println("grid domain " +topoDomain);
+
+        RealTupleType topoRef = ((SetType) topoDomain.getType()).getDomain();
+        //System.err.println("topoRef = " + topoRef);
+        if ( !(topoRef.equals(RealTupleType.SpatialEarth2DTuple)
+                || topoRef.equals(RealTupleType.LatitudeLongitudeTuple))) {
+            System.out.println("not lat/lon");
+            return topoGrid;
+        }
+        if ( !GridUtil.isTimeSequence(grid)) {
+            FlatField     myGrid = (FlatField) grid;
+            GriddedSet    newSet = null;
+            RealTupleType rtt    = null;
+            if (topoDomain.getCoordinateSystem() == null) {
+                if (topoDomain instanceof Linear2DSet) {
+                    //System.out.println("linear sets");
+                    Unit[] setUnits = topoDomain.getSetUnits();
+                    rtt = ((SetType) topoDomain.getType()).getDomain();
+                    if (rtt.equals(RealTupleType.SpatialEarth2DTuple)) {
+                        rtt = RealTupleType.LatitudeLongitudeTuple;
+                    } else {
+                        rtt = RealTupleType.SpatialEarth2DTuple;
+                    }
+                    //System.err.println("new topoRef = " + rtt);
+                    newSet = (topoDomain instanceof LinearLatLonSet)
+                             ? new LinearLatLonSet(rtt,
+                             new Linear1DSet[] {
+                                 ((Linear2DSet) topoDomain).getY(),
+                                 ((Linear2DSet) topoDomain)
+                                     .getX() }, (CoordinateSystem) null,
+                                         new Unit[] { setUnits[1],
+                            setUnits[0] }, (ErrorEstimate[]) null)
+                             : new Linear2DSet(rtt,
+                             new Linear1DSet[] {
+                                 ((Linear2DSet) topoDomain).getY(),
+                                 ((Linear2DSet) topoDomain)
+                                     .getX() }, (CoordinateSystem) null,
+                                         new Unit[] { setUnits[1],
+                            setUnits[0] }, (ErrorEstimate[]) null);
+                    //System.out.println("new set = " + newSet);
+                }  /*else if (topoDomain instanceof Gridded2DSet) {
+                     System.out.println("gridded2D sets");
+                     int[] lengths =
+                         ((GriddedSet) topoDomain).getLengths();
+                     Unit[] units =
+                         ((GriddedSet) topoDomain).getSetUnits();
+                     ErrorEstimate[] errors =
+                         ((GriddedSet) topoDomain).getSetErrors();
+                     float[][] topoVals = topoDomain.getSamples(true);
+                     newSet = new Gridded2DSet(paramRef,
+                             new float[][] {
+                         topoVals[1], topoVals[0]
+                     }, lengths[1], lengths[0],
+                        (CoordinateSystem) null, new Unit[] { units[1],
+                             units[0] }, new ErrorEstimate[] {
+                                 errors[1],
+                                 errors[0] });
+                 }*/
+                if (newSet != null) {
+                    // System.out.println("newSet = " + newSet);
+                    FunctionType newType =
+                        new FunctionType(
+                            ((SetType) newSet.getType()).getDomain(),
+                            GridUtil.getParamType(myGrid));
+                    topoGrid = new FlatField(newType, newSet);
+                    float[][] samples = myGrid.getFloats(false);
+                    float[][] newSamples =
+                        new float[samples.length][samples[0].length];
+                    int[] lengths  = newSet.getLengths();
+                    int   sizeX    = lengths[0];  // oldY
+                    int   sizeY    = lengths[1];  // oldX
+                    int   oldIndex = 0;
+                    for (int i = 0; i < samples.length; i++) {
+                        int l = 0;
+                        for (int j = 0; j < sizeY; j++) {
+                            for (int k = 0; k < sizeX; k++) {
+                                //compute stride into 1D array of old structure
+                                int oldelem = j + k * sizeY;
+                                newSamples[i][l++] = samples[i][oldelem];
+                            }
+                        }
+                    }
+                    topoGrid.setSamples(newSamples, false);
+                }
+            }
+        }
+        return topoGrid;
     }
 
     /**
