@@ -403,7 +403,7 @@ public class WindBarb {
 
             //2.5 to 7.5 kt winds are plotted with the barb part way done the pole
             if (nbarb5 == 1) {
-                barb  = barb * 0.4f;
+                barb  = barb * 0.6f;
                 slant = slant * 0.4f;
                 x1    = (x + x0 * d);
                 y1    = (y + y0 * d);
@@ -430,7 +430,7 @@ public class WindBarb {
 
             //add a little more pole
             if ((wsp25 >= 5.0f) && (wsp25 < 10.0f)) {
-                d  = d + 0.125f * scale;
+                d  = d + 0.25f * scale;
                 x1 = (x + x0 * d);
                 y1 = (y + y0 * d);
                 /* WLH 24 April 99
@@ -451,7 +451,7 @@ public class WindBarb {
             barb  = 0.4f * scale;
             slant = 0.15f * scale;
             for (int j = 0; j < nbarb10; j++) {
-                d  = d + 0.125f * scale;
+                d  = d + 0.25f * scale;
                 x1 = (x + x0 * d);
                 y1 = (y + y0 * d);
                 if (south) {
