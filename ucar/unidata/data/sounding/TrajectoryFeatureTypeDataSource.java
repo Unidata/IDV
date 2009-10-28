@@ -136,7 +136,7 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
      * @throws RemoteException _more_
      * @throws VisADException  problem in VisAD
      */
-    protected FieldImpl HIDEaggregateTracks(
+    protected FieldImpl aggregateTracks(
             List tracks) throws VisADException, RemoteException {
         List         adapters = getAdapters();
         FunctionType fiType   = null;
