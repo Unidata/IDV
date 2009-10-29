@@ -307,22 +307,15 @@ public final class Util {
      * @return cleaned up name
      */
     public static String cleanName(String name) {
-
-        String newName = new String(name);
-
-        if (newName.indexOf(".") > -1) {
-            newName = newName.replace('.', '_');
-        }
-        if (newName.indexOf(" ") > -1) {
-            newName = newName.replace(' ', '_');
-        }
-        if (newName.indexOf("(") > -1) {
-            newName = newName.replace('(', '[');
-        }
-        if (newName.indexOf(")") > -1) {
-            newName = newName.replace(')', ']');
-        }
-        return newName;
+	name = name.replace('.', '_');
+	name = name.replace(",","_");
+	name = name.replace(' ', '_');
+	name = name.replace('(', '[');
+	name = name.replace(')', ']');
+	while(name.indexOf("__")>=0) {
+	    name = name.replace("__","_");
+	}
+        return name;
     }
 
     /**
