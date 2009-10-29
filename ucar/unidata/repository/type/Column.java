@@ -725,8 +725,11 @@ public class Column implements Constants {
                         2)));
             state.put(group, group);
         }
-        formBuffer.append(HtmlUtil.formEntry(getLabel() + ":", widget));
-        //xxxx                                             HtmlUtil.hbox(widget, suffix)));
+	if(rows>1) {
+	    formBuffer.append(HtmlUtil.formEntryTop(getLabel() + ":", widget));
+	} else {
+	    formBuffer.append(HtmlUtil.formEntry(getLabel() + ":", widget));
+	}
         formBuffer.append("\n");
     }
 

@@ -38,6 +38,7 @@ import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.util.WrapperException;
@@ -515,7 +516,7 @@ public class GenericTypeHandler extends TypeHandler {
                 SqlUtil.getQuestionMarks(colNames.size()));
         } else {
             return SqlUtil.makeUpdate(getTableName(), COL_ID,
-                                      Misc.listToStringArray(colNames));
+                                      StringUtil.listToStringArray(colNames));
         }
     }
 

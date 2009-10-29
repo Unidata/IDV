@@ -30,11 +30,19 @@
        id="content.thumbnail">
       <element name="Thumbnail File" datatype="file" thumbnail="true"/>
     </type>
+
     <type
        name="File Attachment"
        id="content.attachment">
       <element name="File" datatype="file" thumbnail="false"/>
     </type>
+
+    <type
+       name="Jython Script"
+       id="content.jython">
+      <element name="Jython File" datatype="file" thumbnail="false"/>
+    </type>
+
     <type name="Contact" id="content.contact">
       <element name="Name" />
       <element name="Email" />

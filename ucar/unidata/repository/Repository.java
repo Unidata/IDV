@@ -330,6 +330,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private List<String> metadataDefFiles = new ArrayList<String>();
 
 
+    private List<String> pythonLibs = new ArrayList<String>();
+
+
+
     /** _more_ */
     private List<User> cmdLineUsers = new ArrayList();
 
@@ -1161,6 +1165,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
+    public List<String> getPythonLibs() {
+	return pythonLibs;
+    }
+
 
     /**
      * _more_
@@ -1446,10 +1454,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 for (int entryIdx = 0; entryIdx < entries.size();
                         entryIdx++) {
                     String entry = (String) entries.get(entryIdx);
-                    if ( !checkFile(entry)) {
+		    //                    if ( !checkFile(entry)) {
                         //                        getLogManager().logError("Don't know how to handle plugin resource:"
                         //                                 + entry + " from plugin:" + plugins[i]);
-                    }
+		    //                    }
                 }
             } else {
                 checkFile(pluginFile);
@@ -1474,6 +1482,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             outputDefFiles.add(file);
         } else if (file.indexOf("metadata.xml") >= 0) {
             metadataDefFiles.add(file);
+        } else if (file.endsWith(".py")) {
+            pythonLibs.add(file);
         } else {
             return false;
         }
@@ -3113,7 +3123,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 Class handlerClass =
                     Misc.findClass(XmlUtil.getAttribute(entryNode,
                         TypeHandler.TAG_HANDLER,
-                        "ucar.unidata.repository.GenericTypeHandler"));
+                        "ucar.unidata.repository.type.GenericTypeHandler"));
                 Constructor ctor = Misc.findConstructor(handlerClass,
                                        new Class[] { Repository.class,
                         Element.class });

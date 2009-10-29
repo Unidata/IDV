@@ -9,9 +9,16 @@ index.html
 >entries.html
 >access.html
 >configuration.html
->wiki.html
 >idvpublisher.html
 >faq.html
+
+>title:Entry Types:Documentation for how to use the different types of entries available
+>>localfileview.html
+>>ftpview.html
+>>repositoryscript.html
+>>wiki.html
+
+
 
 >title:Installation and Site Administration:These pages are intended for Site Administrators
 >>installing.html

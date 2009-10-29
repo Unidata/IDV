@@ -21,7 +21,7 @@
    </type>
 
 
-  <type name="wikipage"  description="Wiki Page" handler="ucar.unidata.repository.type.collab.WikiPageTypeHandler">
+  <type name="wikipage"  description="Wiki Page" handler="ucar.unidata.repository.collab.WikiPageTypeHandler">
      <property name="icon" value="/icons/wiki.gif"/>
      <property name="form.rows.desc" value="50"/>
      <property name="form.show.date" value="false"/>
@@ -31,7 +31,7 @@
      <column name="category" type="string"  label="Wiki Page Category" cansearch="true" isindex="true" searchtype="select" showinhtml="false"/>
 </type>
 
-  <type name="emaillist"  description="Email List" handler="ucar.unidata.repository.type.collab.EmailListTypeHandler">
+  <type name="emaillist"  description="Email List" handler="ucar.unidata.repository.collab.EmailListTypeHandler">
      <property name="icon" value="/icons/email.png"/>
      <property name="form.show.date" value="false"/>
      <property name="form.show.area" value="false"/>
@@ -40,7 +40,7 @@
   </type>
 
 
-  <type name="opendaplink"  description="OpenDAP Link" handler="ucar.unidata.repository.type.data.OpendapLinkTypeHandler">
+  <type name="opendaplink"  description="OpenDAP Link" handler="ucar.unidata.repository.data.OpendapLinkTypeHandler">
      <property name="icon" value="/icons/opendap.gif"/>
      <property name="form.show.date" value="false"/>
      <property name="form.show.area" value="false"/>
@@ -74,7 +74,7 @@
      <column name="maxsize" group="FTP Information" type="double" suffix="(MB)" default="0"   label="Max size to cache" columns="5"  showinhtml="false"/>
  </type>
 
-  <type name="pointdatabase"  description="Point Database" handler="ucar.unidata.repository.type.data.PointDatabaseTypeHandler">
+  <type name="pointdatabase"  description="Point Database" handler="ucar.unidata.repository.data.PointDatabaseTypeHandler">
      <property name="icon" value="/icons/database.png"/>
      <property name="form.show.date" value="false"/>
 <!--     <property name="form.show.area" value="false"/> -->
@@ -97,7 +97,7 @@
 
 
 
-  <type name="catalog"  description="Catalog View" handler="ucar.unidata.repository.type.data.CatalogTypeHandler">
+  <type name="catalog"  description="Catalog View" handler="ucar.unidata.repository.data.CatalogTypeHandler">
      <property name="form.show.file" value="false"/>
      <property name="form.show.url" value="true"/>
      <property name="form.label.url" value="Catalog URL"/>

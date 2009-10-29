@@ -74,6 +74,7 @@ public class ContentMetadataHandler extends MetadataHandler {
 
     /** _more_ */
     public static final String TYPE_ATTACHMENT = "content.attachment";
+    public static final String TYPE_JYTHON = "content.jython";
 
     /** _more_ */
     public static final String TYPE_CONTACT = "content.contact";
