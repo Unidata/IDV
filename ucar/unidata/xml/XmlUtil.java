@@ -1525,6 +1525,20 @@ public abstract class XmlUtil {
     }
 
 
+    public static double getGrandChildValue(Node parent, String childTag,
+                                           double dflt) {
+        String text = getGrandChildText(parent, childTag);
+        if (text == null) {
+            return dflt;
+        }
+	text = text.trim();
+        if (text.length() == 0) {
+            return dflt;
+        }
+        return new Double(text).doubleValue();
+    }
+
+
     /**
      * Finds the child node with the given tag name. Then gets the child text from that node if it is non-null.
      *
