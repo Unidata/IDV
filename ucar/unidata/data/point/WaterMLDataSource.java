@@ -138,12 +138,26 @@ public class WaterMLDataSource extends PointDataSource {
         </geogLocation>
 	    */
 
+	    double latitude = 0;
+	    double longitude =0;
+	    double altitude  = 0;
+
+
 	    Element sourceNode = XmlUtil.findChild(timeSeriesNode,WaterMLUtil.TAG_SOURCEINFO);
 	    Element geoNode = XmlUtil.findChild(sourceNode,WaterMLUtil.TAG_GEOLOCATION);
-	    Element geogNode = XmlUtil.findChild(geoNode,WaterMLUtil.TAG_GEOGLOCATION);
-	    double latitude = new Double(XmlUtil.getGrandChildText(geogNode,WaterMLUtil.TAG_LATITUDE)).doubleValue();
-	    double longitude = new Double(XmlUtil.getGrandChildText(geogNode,WaterMLUtil.TAG_LONGITUDE)).doubleValue();
-	    double altitude  = 0;
+	    Element dataSetLocationNode = XmlUtil.findChild(sourceNode,WaterMLUtil.TAG_DATASETLOCATION);
+	    if(geoNode!=null) {
+		Element geogNode = XmlUtil.findChild(geoNode,WaterMLUtil.TAG_GEOGLOCATION);
+		latitude = XmlUtil.getGrandChildValue(geogNode,WaterMLUtil.TAG_LATITUDE,latitude);
+		longitude = XmlUtil.getGrandChildValue(geogNode,WaterMLUtil.TAG_LONGITUDE,longitude);
+	    }  else if(dataSetLocationNode!=null)  {
+		double south = XmlUtil.getGrandChildValue(dataSetLocationNode,WaterMLUtil.TAG_SOUTH,0);
+		double north = XmlUtil.getGrandChildValue(dataSetLocationNode,WaterMLUtil.TAG_NORTH,0);
+		double east = XmlUtil.getGrandChildValue(dataSetLocationNode,WaterMLUtil.TAG_EAST,0);
+		double west = XmlUtil.getGrandChildValue(dataSetLocationNode,WaterMLUtil.TAG_WEST,0);
+		latitude = south+(north-south)/2;
+		longitude = east+(west-east)/2;
+	    }
 
 	    String station = "stn";
 	    Element variableNode = XmlUtil.findChild(timeSeriesNode,WaterMLUtil.TAG_VARIABLE);

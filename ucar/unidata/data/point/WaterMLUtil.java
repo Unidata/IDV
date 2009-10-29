@@ -99,4 +99,15 @@ public static final String ATTR_SOURCEID = "sourceID";
 
 
 
+
+public static final String TAG_DATASETLOCATION = "dataSetLocation";
+public static final String TAG_SOUTH = "south";
+public static final String TAG_WEST = "west";
+public static final String TAG_NORTH = "north";
+public static final String TAG_EAST = "east";
+
+
+
+
+
 }
