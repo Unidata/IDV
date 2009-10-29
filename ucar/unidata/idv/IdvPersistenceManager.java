@@ -2157,6 +2157,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         List fileComps       = new ArrayList();
         List copyComps       = new ArrayList();
         List notSavedLabels  = new ArrayList();
+	JCheckBox allCbx = new JCheckBox("All",false);
         for (int i = 0; i < dataSources.size(); i++) {
             DataSource          dataSource = (DataSource) dataSources.get(i);
             List                files      = dataSource.getDataPaths();
@@ -2208,11 +2209,21 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         List comps = new ArrayList();
 
         copyComps.addAll(fileComps);
+	
 
         if (copyComps.size() > 0) {
+	    if (copyComps.size() > 1) {
+		copyComps.add(0, allCbx);
+	    }
             copyComps.add(
                 0, new JLabel("Select the data sources to include:"));
-            comps.add(GuiUtils.vbox(copyComps));
+	    if(copyComps.size()>5) {
+		JComponent sp = GuiUtils.makeScrollPane(GuiUtils.top(GuiUtils.vbox(copyComps)), 300,400);
+		sp.setPreferredSize(new Dimension(300,400));
+		comps.add(sp);
+	    } else {
+		comps.add(GuiUtils.vbox(copyComps));
+	    }
         }
 
         /*
@@ -2250,16 +2261,15 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         for (int i = 0; i < copyDataSources.size(); i++) {
             DataSourceComponent dsc =
                 (DataSourceComponent) copyDataSources.get(i);
-            if ( !dsc.cbx.isSelected()) {
-                continue;
-            }
-            List files = dsc.dataSource.saveDataToLocalDisk(false,
-                             IOUtil.joinDir(dir, "data_" + i));
-            if (files == null) {
-                return null;
-            }
-            dsc.files = files;
-            fileDataSources.add(dsc);
+            if (allCbx.isSelected() ||  dsc.cbx.isSelected()) {
+		List files = dsc.dataSource.saveDataToLocalDisk(false,
+								IOUtil.joinDir(dir, "data_" + i));
+		if (files == null) {
+		    return null;
+		}
+		dsc.files = files;
+		fileDataSources.add(dsc);
+	    }
         }
 
 
