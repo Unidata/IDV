@@ -16,12 +16,12 @@
 
 
 
-  <type name="homepage"  description="Home Page" handler="ucar.unidata.repository.ExtensibleGroupTypeHandler">
+  <type name="homepage"  description="Home Page" handler="ucar.unidata.repository.type.ExtensibleGroupTypeHandler">
      <property name="icon" value="/icons/user.png"/>
    </type>
 
 
-  <type name="wikipage"  description="Wiki Page" handler="ucar.unidata.repository.collab.WikiPageTypeHandler">
+  <type name="wikipage"  description="Wiki Page" handler="ucar.unidata.repository.type.collab.WikiPageTypeHandler">
      <property name="icon" value="/icons/wiki.gif"/>
      <property name="form.rows.desc" value="50"/>
      <property name="form.show.date" value="false"/>
@@ -31,7 +31,7 @@
      <column name="category" type="string"  label="Wiki Page Category" cansearch="true" isindex="true" searchtype="select" showinhtml="false"/>
 </type>
 
-  <type name="emaillist"  description="Email List" handler="ucar.unidata.repository.collab.EmailListTypeHandler">
+  <type name="emaillist"  description="Email List" handler="ucar.unidata.repository.type.collab.EmailListTypeHandler">
      <property name="icon" value="/icons/email.png"/>
      <property name="form.show.date" value="false"/>
      <property name="form.show.area" value="false"/>
@@ -40,7 +40,7 @@
   </type>
 
 
-  <type name="opendaplink"  description="OpenDAP Link" handler="ucar.unidata.repository.data.OpendapLinkTypeHandler">
+  <type name="opendaplink"  description="OpenDAP Link" handler="ucar.unidata.repository.type.data.OpendapLinkTypeHandler">
      <property name="icon" value="/icons/opendap.gif"/>
      <property name="form.show.date" value="false"/>
      <property name="form.show.area" value="false"/>
@@ -49,7 +49,7 @@
 
 
 
-  <type name="localfiles"  description="Local File View" handler="ucar.unidata.repository.LocalFileTypeHandler">
+  <type name="localfiles"  description="Local File View" handler="ucar.unidata.repository.type.LocalFileTypeHandler">
      <property name="icon" value="/icons/folder_page.png"/>
      <property name="form.show.resource" value="false"/>
      <property name="form.show.area" value="false"/>
@@ -63,7 +63,7 @@
 
 
 
-  <type name="ftp"  description="Remote FTP File View" handler="ucar.unidata.repository.FtpTypeHandler">
+  <type name="ftp"  description="Remote FTP File View" handler="ucar.unidata.repository.type.FtpTypeHandler">
      <property name="form.show.resource" value="false"/>
      <property name="form.show.area" value="false"/>
      <property name="form.show.date" value="false"/>
@@ -74,7 +74,7 @@
      <column name="maxsize" group="FTP Information" type="double" suffix="(MB)" default="0"   label="Max size to cache" columns="5"  showinhtml="false"/>
  </type>
 
-  <type name="pointdatabase"  description="Point Database" handler="ucar.unidata.repository.data.PointDatabaseTypeHandler">
+  <type name="pointdatabase"  description="Point Database" handler="ucar.unidata.repository.type.data.PointDatabaseTypeHandler">
      <property name="icon" value="/icons/database.png"/>
      <property name="form.show.date" value="false"/>
 <!--     <property name="form.show.area" value="false"/> -->
@@ -84,7 +84,20 @@
 
 
 
-  <type name="catalog"  description="Catalog View" handler="ucar.unidata.repository.data.CatalogTypeHandler">
+  <type name="jythonscript"  description="Repository Script" handler="ucar.unidata.repository.type.JythonTypeHandler">
+     <property name="icon" value="/icons/python.png"/>
+     <property name="form.show.date" value="false"/>
+     <property name="form.show.area" value="false"/>
+     <property name="form.show.datatype" value="false"/>
+     <property name="form.show.resource" value="false"/>
+     <column name="password"  type="password"    label="Password" showinhtml="false"/>
+     <column name="initializationCode"  type="clob"  size="4028"   label="Initialization" columns="80"  rows="10" showinhtml="false"/>
+     <column name="executionCode"       type="clob"  label="Execute" columns="80"  rows="20" showinhtml="false"/>
+</type>
+
+
+
+  <type name="catalog"  description="Catalog View" handler="ucar.unidata.repository.type.data.CatalogTypeHandler">
      <property name="form.show.file" value="false"/>
      <property name="form.show.url" value="true"/>
      <property name="form.label.url" value="Catalog URL"/>
@@ -118,7 +131,7 @@
 
 
 <!--
-  <type name="level3radar" datatype="radar" description="Level 3 Radar File" handler="ucar.unidata.repository.Level3RadarTypeHandler">
+  <type name="level3radar" datatype="radar" description="Level 3 Radar File" handler="ucar.unidata.repository.type.Level3RadarTypeHandler">
 	<column name="station" group="Level 3 Things" type="string" isindex="true" cansearch="true" canlist="true" searchtype="select" label="Station" 
                 properties="/ucar/unidata/repository/resources/level3radar.station.properties"/>
 	<column name="product" type="string" group="Level 3 Things"  isindex="true" cansearch="true" canlist="true" searchtype="select" label="Product"  

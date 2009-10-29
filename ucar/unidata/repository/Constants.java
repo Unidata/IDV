@@ -1020,6 +1020,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_USER_NEW = "user.new";
 
+    public static final String ARG_PASSWORD = "password";
+
     /** _more_ */
     public static final String ARG_USER_PASSWORD = "user.password";
 

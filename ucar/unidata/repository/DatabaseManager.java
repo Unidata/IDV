@@ -24,7 +24,7 @@ package ucar.unidata.repository;
 
 
 import org.w3c.dom.*;
-
+import ucar.unidata.repository.type.*;
 
 
 
@@ -1057,7 +1057,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      *
      * @return _more_
      */
-    protected String convertType(String type) {
+    public String convertType(String type) {
         return convertType(type, -1);
     }
 
@@ -1069,7 +1069,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      *
      * @return _more_
      */
-    protected String convertType(String type, int size) {
+    public String convertType(String type, int size) {
         if (type.equals("clob")) {
             if (db.equals(DB_DERBY)) {
                 return "clob(" + size + ") ";

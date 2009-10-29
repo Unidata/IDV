@@ -24,6 +24,7 @@ package ucar.unidata.repository;
 
 
 import ucar.unidata.repository.output.*;
+import ucar.unidata.repository.type.*;
 import ucar.unidata.sql.Clause;
 
 

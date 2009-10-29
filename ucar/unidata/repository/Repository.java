@@ -31,7 +31,7 @@ import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.monitor.*;
 
 import ucar.unidata.repository.output.*;
-
+import ucar.unidata.repository.type.*;
 
 
 import ucar.unidata.sql.Clause;

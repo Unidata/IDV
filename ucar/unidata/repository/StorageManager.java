@@ -1008,7 +1008,7 @@ public class StorageManager extends RepositoryManager {
         }
         File file = resource.getTheFile();
 
-        //This is for the FtpTypeHandler where it caches the file
+        //This is for the ftptypehandler where it caches the file
         if (resource.isRemoteFile()) {
             return true;
         }

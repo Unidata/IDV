@@ -24,6 +24,7 @@ package ucar.unidata.repository;
 
 
 import ucar.unidata.repository.metadata.*;
+import ucar.unidata.repository.type.*;
 
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;

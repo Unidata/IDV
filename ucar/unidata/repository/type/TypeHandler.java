@@ -20,8 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
-
+package ucar.unidata.repository.type;
+import ucar.unidata.repository.*;
 
 import org.w3c.dom.*;
 
@@ -2001,7 +2001,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected List<Clause> assembleWhereClause(Request request)
+    public List<Clause> assembleWhereClause(Request request)
             throws Exception {
         return assembleWhereClause(request, new StringBuffer());
     }
@@ -2018,7 +2018,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected List<Clause> assembleWhereClause(Request request,
+    public List<Clause> assembleWhereClause(Request request,
             StringBuffer searchCriteria)
             throws Exception {
 

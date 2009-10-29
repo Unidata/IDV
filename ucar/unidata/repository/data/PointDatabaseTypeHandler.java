@@ -1,5 +1,5 @@
 /**
- *
+2 *
  * Copyright 1997-2005 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
@@ -21,7 +21,7 @@
 
 package ucar.unidata.repository.data;
 
-
+import ucar.unidata.repository.type.*;
 
 
 import org.jfree.chart.*;
@@ -159,7 +159,7 @@ import javax.swing.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class PointDatabaseTypeHandler extends GenericTypeHandler {
+public class PointDatabaseTypeHandler extends BlobTypeHandler {
 
     /** _more_ */
     public static final String PROP_ID = "point.id";
@@ -345,9 +345,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         new Hashtable<String, List<PointDataMetadata>>();
 
 
-    /** _more_ */
-    private Hashtable<String, Hashtable> propertiesCache =
-        new Hashtable<String, Hashtable>();
 
     /**
      * _more_
@@ -386,32 +383,6 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
         return getTableName(entry.getId());
     }
 
-
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    private Hashtable getProperties(Entry entry) throws Exception {
-        Hashtable properties = propertiesCache.get(entry.getId());
-        if (properties == null) {
-            Object[]   values     = entry.getValues();
-            XmlEncoder xmlEncoder = new XmlEncoder();
-            if ((values != null) && (values.length > 0)
-                    && (values[0] != null)) {
-                properties =
-                    (Hashtable) xmlEncoder.decodeXml((String) values[0]);
-            } else {
-                properties = new Hashtable();
-            }
-            propertiesCache.put(entry.getId(), properties);
-        }
-        return properties;
-    }
 
 
     /**
@@ -874,8 +845,7 @@ public class PointDatabaseTypeHandler extends GenericTypeHandler {
 
         properties.put(PROP_CNT, totalCnt + "");
         properties.put(PROP_ID, baseId + "");
-        XmlEncoder xmlEncoder = new XmlEncoder();
-        entry.setValues(new Object[] { xmlEncoder.encodeObject(properties) });
+	setProperties(entry, properties);
 
         if (didone) {
             entry.setWest(west);

@@ -912,6 +912,17 @@ public class DataOutputHandler extends OutputHandler {
         return makeLinksResult(request, "CDL", sb, new State(entry));
     }
 
+    public NetcdfDataset getNetcdfDataset(Entry entry, String path) {
+	if(!canLoadAsCdm(entry)) {
+	    return null;
+	}
+	return ncFilePool.get(path);
+    }
+
+    public void  returnNetcdfDataset(String path,NetcdfDataset ncd) {
+        ncFilePool.put(path, ncd);
+    }
+
     /**
      * _more_
      *
