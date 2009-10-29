@@ -5853,6 +5853,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     this,
                     "displayableToFront"), "/auxdata/ui/icons/shape_move_front.png"));
 
+	    ViewManager vm = getViewManager();
+	    if(vm!=null) {
+		items.add(GuiUtils.makeMenuItem("Show Main Window",vm,"toFront"));
+	    }
+
         }
 
 
