@@ -150,7 +150,7 @@ public class Pool<KeyType, ValueType> {
         while (size >= maxSize - 1) {
             for (KeyType keyToCheck : keys) {
                 List<ValueType> listToCheck = cache.get(keyToCheck);
-                while (listToCheck.size() > 0) {
+                while (listToCheck !=null && listToCheck.size() > 0) {
                     ValueType valueToRemove = listToCheck.remove(0);
                     removeValue(key, valueToRemove);
                     size--;
