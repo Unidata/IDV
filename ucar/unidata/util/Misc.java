@@ -4428,6 +4428,26 @@ public class Misc {
      * @param args _more_
      */
     public static void main(String[] args) {
+	long t1 = System.currentTimeMillis();
+	double d=0;
+
+	for(int i=0;i<10000000;i++) {
+	    d = new Double("2.3").doubleValue();
+	    //	    d = Double.parseDouble("2.3");
+	}
+        long t2 = System.currentTimeMillis();
+
+
+        long t3 = System.currentTimeMillis();
+
+	System.err.println("time 1:" + (t2 - t1));
+
+	if(true) return;
+
+
+
+	/*
+
         List<String> test = new ArrayList<String>();
 
 
@@ -4461,7 +4481,7 @@ public class Misc {
         System.err.println("time 3:" + (t2 - t1));
 
 
-
+	*/
 
     }
 
