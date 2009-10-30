@@ -923,6 +923,18 @@ public class DataOutputHandler extends OutputHandler {
         ncFilePool.put(path, ncd);
     }
 
+
+    public GridDataset getGridDataset(Entry entry, String path) {
+	if(!canLoadAsGrid(entry)) {
+	    return null;
+	}
+	return gridPool.get(path);
+    }
+
+    public void  returnGridDataset(String path,GridDataset ncd) {
+        gridPool.put(path, ncd);
+    }
+
     /**
      * _more_
      *
@@ -1005,6 +1017,7 @@ public class DataOutputHandler extends OutputHandler {
                 File f =
                     getRepository().getStorageManager().getTmpFile(request,
                         "subset.nc");
+
                 GridDataset gds = gridPool.get(path);
                 //                System.err.println ("varNames:" + varNames);
 

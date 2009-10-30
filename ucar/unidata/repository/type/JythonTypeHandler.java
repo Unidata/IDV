@@ -24,6 +24,9 @@ package ucar.unidata.repository.type;
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.metadata.*;
 
+import ucar.unidata.data.grid.GeoGridDataSource;
+import ucar.unidata.data.DataSource;
+
 import ucar.unidata.repository.output.*;
 import ucar.unidata.repository.data.*;
 
@@ -34,6 +37,7 @@ import org.apache.commons.net.ftp.*;
 import org.w3c.dom.*;
 
 import ucar.unidata.util.HtmlUtil;
+import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Pool;
@@ -46,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dt.grid.GridDataset;
 
 import org.python.core.*;
 import org.python.util.*;
@@ -68,6 +73,7 @@ public class JythonTypeHandler extends GenericTypeHandler {
 		for(String f: getRepository().getPythonLibs()) {
 		    interp.execfile(IOUtil.getInputStream(f, getClass()), f);
 		}
+		interp.exec(getRepository().getResource("/ucar/unidata/repository/resources/init.py"));
 		return interp;
             } catch (Exception exc) {
                 throw new RuntimeException(exc);
@@ -88,6 +94,7 @@ public class JythonTypeHandler extends GenericTypeHandler {
     public JythonTypeHandler(Repository repository, Element entryNode)
 	throws Exception {
         super(repository, entryNode);
+	LogUtil.setTestMode(true);
     }
 
 
@@ -127,7 +134,6 @@ public class JythonTypeHandler extends GenericTypeHandler {
 	StringBuffer sb = new StringBuffer();
 	FormInfo formInfo = new FormInfo(this, request, sb);
 	boolean makeForm = !request.exists(ARG_SUBMIT);
-
 
 	interp.set("formInfo", formInfo);
 	interp.set("request", request);
@@ -171,10 +177,13 @@ public class JythonTypeHandler extends GenericTypeHandler {
 
 	    if(formInfo.cnt>0) {
 		String formUrl = getRepository().URL_ENTRY_SHOW.getFullUrl();
+		if(formInfo.resultFileName!=null) {
+		    formUrl = formUrl+"/" +formInfo.resultFileName;
+		}
 		formSB.append(HtmlUtil.uploadForm(formUrl,""));
 		formSB.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
 		formSB.append(HtmlUtil.formTable());
-		if(password!=null && password.length()>0) {
+		if(password!=null && password.trim().length()>0) {
 		    formSB.append(HtmlUtil.formEntry(msgLabel("Password"), HtmlUtil.password(ARG_PASSWORD)));
 		}
 		formSB.append(sb);
@@ -185,13 +194,17 @@ public class JythonTypeHandler extends GenericTypeHandler {
 	    Result result = new Result(formInfo.title!=null?formInfo.title:entry.getName(), formSB);
 	    return result;
 	} else {
-	    if(password!=null && password.length()>0) {
-		if(!Misc.equals(password, request.getString(ARG_PASSWORD,""))) {
+	    if(password!=null && password.trim().length()>0) {
+		if(!Misc.equals(password.trim(), request.getString(ARG_PASSWORD,"").trim())) {
 		    return new Result(formInfo.title!=null?formInfo.title:entry.getName(), new StringBuffer(repository.showDialogError("Bad password")));
 		}
 	    }
 	    List<String> ncPaths =  new ArrayList<String>();
 	    List<NetcdfDataset> ncData =  new ArrayList<NetcdfDataset>();
+
+	    List<String> gridPaths =  new ArrayList<String>();
+	    List<GridDataset> gridData =  new ArrayList<GridDataset>();
+	    List<DataSource> dataSources =  new ArrayList<DataSource>();
 	    List<File> files = new ArrayList<File>();
 	    try {
 		for(InputInfo info: formInfo.inputs) {
@@ -222,18 +235,26 @@ public class JythonTypeHandler extends GenericTypeHandler {
 			}
 			String       path   = dataOutputHandler.getPath(theEntry);
 			if(path!=null) {
-			    NetcdfDataset ncDataset = dataOutputHandler.getNetcdfDataset(theEntry, path);
+			    //Try it as grid first
+			    GridDataset gds = dataOutputHandler.getGridDataset(theEntry, path);
+			    NetcdfDataset ncDataset = null;
+			    GeoGridDataSource dataSource = null;
+			    interp.set(info.id+"_griddataset", gds);
+			    if(gds==null) {
+				//Else try it as a ncdataset
+				ncDataset = dataOutputHandler.getNetcdfDataset(theEntry, path);
+			    }  else {
+				dataSource = new GeoGridDataSource(gds);
+				dataSources.add(dataSource);
+			    }
+			    interp.set(info.id+"_datasource", dataSource);
+			    interp.set(info.id+"_ncdataset", ncDataset);
 			    if(ncDataset!=null) {
 				ncPaths.add(path);
 				ncData.add(ncDataset);
-				interp.set(info.id+"_ncdataset", ncDataset);
-			    } else {
-				interp.set(info.id+"_ncdataset", null);
 			    }
-			
 			}
-
-		    } else 	if(info.type ==InputInfo.TYPE_NUMBER) {
+		    } else if(info.type ==InputInfo.TYPE_NUMBER) {
 			interp.set(info.id, new Double(request.getString(info.id,"").trim()));
 		    } else {
 			interp.set(info.id, request.getString(info.id,""));
@@ -248,12 +269,23 @@ public class JythonTypeHandler extends GenericTypeHandler {
 		for(File f: files) {
 		    f.delete();
 		}
+		for(DataSource dataSource: dataSources) {
+		    dataSource.doRemove();
+		}
 		for(int i=0;i<ncPaths.size();i++) {
 		    dataOutputHandler.returnNetcdfDataset(ncPaths.get(i), ncData.get(i));
-
 		}
+		for(int i=0;i<gridPaths.size();i++) {
+		    dataOutputHandler.returnGridDataset(gridPaths.get(i), gridData.get(i));
+		}
+
 	    }
-	    if(formInfo.inputStream != null) {
+
+	    if (formInfo.errorMessage!=null) {
+		formInfo.resultHtml = getRepository().showDialogError(formInfo.errorMessage);
+	    }
+
+	    if (formInfo.inputStream != null) {
 		return new Result(formInfo.title!=null?formInfo.title:entry.getName(), formInfo.inputStream, formInfo.mimeType);
 	    }
 
@@ -300,10 +332,21 @@ public class JythonTypeHandler extends GenericTypeHandler {
 	String resultHtml;
 	String mimeType = "text/html";
 	InputStream inputStream;
+	String errorMessage;
+	String resultFileName = null;
+
 	public FormInfo(JythonTypeHandler typeHandler, Request request, StringBuffer sb) {
 	    this.sb = sb;
 	    this.request = request;
 	    this.typeHandler = typeHandler;
+	}
+
+	public void setErrorMessage (String value) {
+	    errorMessage  =value;
+	}
+
+	public void setResultFileName(String f) {
+	    resultFileName = f;
 	}
 
 	/**
@@ -329,7 +372,8 @@ public class JythonTypeHandler extends GenericTypeHandler {
 
 	   @param value The new value for InputStream
 	**/
-	public void setInputStream (InputStream value) {
+	public void setInputStream (InputStream value, String mimeType) {
+	    this.mimeType = mimeType;
 	    this.inputStream = value;
 	}
 
@@ -347,7 +391,7 @@ public class JythonTypeHandler extends GenericTypeHandler {
 	    sb.append(s);
 	}
 
-	public void setResultHtml(String html) {
+	public void setResult(String html) {
 	    resultHtml = html;
 	}
 
@@ -356,9 +400,10 @@ public class JythonTypeHandler extends GenericTypeHandler {
 	}
 
 
-	public void setPrefix(String prefix) {
+	public void setFormPrefix(String prefix) {
 	    this.prefix = prefix;
 	}
+
 
 	public void addFormFileUpload(String id, String label) {
 	    cnt++;
@@ -399,6 +444,12 @@ public class JythonTypeHandler extends GenericTypeHandler {
 	    }
 	}
 
+	public void addFormSelect(String id, String label, String dflt, List items) {
+	    cnt++;
+	    inputs.add(new InputInfo(InputInfo.TYPE_TEXT, id));
+	    sb.append(HtmlUtil.select(id, items, dflt));
+	}
+
 
 	public void addFormNumber(String id, String label, double dflt) {
 	    inputs.add(new InputInfo(InputInfo.TYPE_NUMBER, id));
@@ -406,6 +457,7 @@ public class JythonTypeHandler extends GenericTypeHandler {
 	    sb.append(HtmlUtil.formEntry(typeHandler.msgLabel(label),
 					 HtmlUtil.input(id, ""+dflt, HtmlUtil.attr(HtmlUtil.ATTR_SIZE,""+5))));
 	}
+
 
     }
 

@@ -231,6 +231,7 @@
         <include name="ucar/unidata/repository/metadata/*.java"/>
         <include name="ucar/unidata/repository/harvester/*.java"/>
         <include name="ucar/unidata/repository/collab/*.java"/>
+        <include name="ucar/unidata/repository/type/*.java"/>
         <include name="ucar/unidata/repository/monitor/*.java"/>
         <include name="ucar/unidata/repository/idv/IdvWebstartOutputHandler.java"/>
         <include name="ucar/unidata/repository/idv/TdsOutputHandler.java"/>
@@ -274,6 +275,7 @@
         </delete>
         <copy  file="${libsdir}/repository.jar" todir="${releasedir}"/>
         <copy  file="${libsdir}/repositorylib.jar" todir="${releasedir}"/>
+        <copy  file="${libsdir}/idv.jar" todir="${releasedir}"/>
         <copy  file="${repositorydir}/release/ramadda.sh" todir="${releasedir}"/>
         <copy  file="${repositorydir}/release/ramaddamysql.sh" todir="${releasedir}"/>
         <copy  file="${repositorydir}/README" todir="${releasedir}"/>
@@ -313,6 +315,7 @@
           <lib file="${libsdir}/repository.jar"/>
           <lib file="${libsdir}/repositorylib.jar"/>
           <lib file="${libsdir}/repositorytds.jar"/>
+          <lib file="${libsdir}/idv.jar"/>
       </war>
 
 
