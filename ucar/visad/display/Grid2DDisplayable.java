@@ -354,7 +354,8 @@ public class Grid2DDisplayable extends RGBDisplayable implements GridDisplayable
 
         float dataSize = (float) GridUtil.getSpatialDomain(fi).getLength();
         ConstantMapSet maps = new ConstantMapSet();
-        if ((dataSize > THRESHOLD) && !isTextured) {
+        if ((dataSize > THRESHOLD) && !isTextured 
+            && false) {  // TODO: figure out what breaks when we don't do this!
             int curvedSize = Math.min(dfltCurvedSize,
                                       Math.max((int) ((THRESHOLD / dataSize)
                                           * 10.), 3));
