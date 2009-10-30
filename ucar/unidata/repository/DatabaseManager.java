@@ -132,29 +132,32 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
 
 
     public void checkConnections() {
-
         while(true) {
-            Misc.sleep(5000);
-            Hashtable<Connection,ConnectionInfo> tmp = new Hashtable<Connection,ConnectionInfo>();
-	    synchronized(connectionMap) {
-		tmp.putAll(connectionMap);
-	    }
-            long now = System.currentTimeMillis();
-	    int seconds = getRepository().getProperty(PROP_DB_POOL_TIMEUNTILCLOSED,60);
-            for (Enumeration keys = tmp.keys(); keys.hasMoreElements(); ) {
-                Connection connection = (Connection) keys.nextElement();
-                ConnectionInfo info  = tmp.get(connection);
-                //If a connection has been out for more than a minute then close it
-                if(now-info.time > seconds*1000) {
-		    logInfo ("A connection has been open for more than "+seconds +" seconds:\n" + info.where);
-		    synchronized(scourMessages) {
-			while(scourMessages.size()>100)
-			    scourMessages.remove(0);
-			scourMessages.add("SCOURED:" +info.where);
-		    }
-                    closeConnection(connection);
+            try {
+                Misc.sleep(5000);
+                Hashtable<Connection,ConnectionInfo> tmp = new Hashtable<Connection,ConnectionInfo>();
+                synchronized(connectionMap) {
+                    tmp.putAll(connectionMap);
                 }
-	    }
+                long now = System.currentTimeMillis();
+                int seconds = getRepository().getProperty(PROP_DB_POOL_TIMEUNTILCLOSED,60);
+                for (Enumeration keys = tmp.keys(); keys.hasMoreElements(); ) {
+                    Connection connection = (Connection) keys.nextElement();
+                    ConnectionInfo info  = tmp.get(connection);
+                    //If a connection has been out for more than a minute then close it
+                    if(now-info.time > seconds*1000) {
+                        logInfo ("A connection has been open for more than "+seconds +" seconds:\n" + info.where);
+                        synchronized(scourMessages) {
+                            while(scourMessages.size()>100)
+                                scourMessages.remove(0);
+                            scourMessages.add("SCOURED @"+new Date() +" info.date: " +new Date(info.time) +" Where:" +info.where);
+                        }
+                        closeConnection(connection);
+                    }
+                }
+            } catch(Exception exc) {
+                scourMessages.add("Error checking connection:" + exc);
+            }
         }
     }
 

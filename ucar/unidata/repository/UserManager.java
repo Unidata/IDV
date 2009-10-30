@@ -1386,7 +1386,7 @@ public class UserManager extends RepositoryManager {
      *
      * @return _more_
      */
-    protected List<Entry> getCart(Request request) {
+    public List<Entry> getCart(Request request) {
         String sessionId = request.getSessionId();
 
         if (sessionId == null) {

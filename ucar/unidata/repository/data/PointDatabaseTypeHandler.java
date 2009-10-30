@@ -1,5 +1,5 @@
 /**
-2 *
+ *
  * Copyright 1997-2005 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
@@ -2645,7 +2645,6 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
                     values = Misc.toList(SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1));
                     values = new ArrayList(Misc.sort(values));
                     values.add(0, "");
-                    getDatabaseManager().closeAndReleaseConnection(stmt);
                     pdm.enumeratedValues = values;
                 }
                 String field =

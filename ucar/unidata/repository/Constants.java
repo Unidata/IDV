@@ -592,6 +592,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ENTRYID = "entryid";
 
+    public static final String ARG_LOCALEID = "localeid";
+
     /** _more_ */
     public static final String ARG_ENTRYIDS = "entryids";
 

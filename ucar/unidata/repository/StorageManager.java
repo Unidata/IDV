@@ -54,6 +54,8 @@ import java.lang.reflect.*;
 
 
 
+import org.python.core.*;
+import org.python.util.*;
 import java.net.*;
 
 
@@ -239,6 +241,20 @@ public class StorageManager extends RepositoryManager {
     }
 
 
+    private boolean haveInitializedPython = false;
+
+
+    public void initPython() {
+        if(haveInitializedPython) return;
+        haveInitializedPython = true;
+        String pythonCacheDir =  getCacheDir().toString();
+        Properties pythonProps = new Properties();
+        pythonProps.put("python.home", pythonCacheDir);
+        PythonInterpreter.initialize(System.getProperties(), pythonProps,
+                                     new String[]{});
+    }
+
+
     /**
      * _more_
      */
@@ -279,6 +295,10 @@ public class StorageManager extends RepositoryManager {
         dirDepth = getRepository().getProperty(PROP_DIRDEPTH, dirDepth);
         dirRange = getRepository().getProperty(PROP_DIRRANGE, dirRange);
         getUploadDir();
+
+
+
+
     }
 
 
@@ -510,7 +530,6 @@ public class StorageManager extends RepositoryManager {
      * @return _more_
      */
     private TemporaryDir getCacheDir() {
-
         if (cacheDir == null) {
             cacheDir = makeTemporaryDir(DIR_CACHE);
             cacheDir.setMaxSize(1000 * 1000 * 1000);

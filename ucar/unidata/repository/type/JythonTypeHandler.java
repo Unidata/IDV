@@ -64,11 +64,13 @@ import org.python.util.*;
  */
 public class JythonTypeHandler extends GenericTypeHandler {
 
+    public static final String ARG_SCRIPT_PASSWORD = "script.password";
+
     /** _more_ */
-    private Pool<String, PythonInterpreter> interpPool = new Pool<String,
-	PythonInterpreter>(100) {
+    private Pool<String, PythonInterpreter> interpPool = new Pool<String,PythonInterpreter>(100) {
         protected PythonInterpreter createValue(String path) {
             try {
+                getStorageManager().initPython();
 		PythonInterpreter interp = new PythonInterpreter();
 		for(String f: getRepository().getPythonLibs()) {
 		    interp.execfile(IOUtil.getInputStream(f, getClass()), f);
@@ -132,7 +134,7 @@ public class JythonTypeHandler extends GenericTypeHandler {
 	String init = (String)entry.getValues()[1];
 	String exec = (String)entry.getValues()[2];
 	StringBuffer sb = new StringBuffer();
-	FormInfo formInfo = new FormInfo(this, request, sb);
+	FormInfo formInfo = new FormInfo(this, entry, request, sb);
 	boolean makeForm = !request.exists(ARG_SUBMIT);
 
 	interp.set("formInfo", formInfo);
@@ -184,7 +186,7 @@ public class JythonTypeHandler extends GenericTypeHandler {
 		formSB.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
 		formSB.append(HtmlUtil.formTable());
 		if(password!=null && password.trim().length()>0) {
-		    formSB.append(HtmlUtil.formEntry(msgLabel("Password"), HtmlUtil.password(ARG_PASSWORD)));
+		    formSB.append(HtmlUtil.formEntry(msgLabel("Password"), HtmlUtil.password(ARG_SCRIPT_PASSWORD)));
 		}
 		formSB.append(sb);
 		formSB.append(HtmlUtil.formTableClose());
@@ -195,7 +197,7 @@ public class JythonTypeHandler extends GenericTypeHandler {
 	    return result;
 	} else {
 	    if(password!=null && password.trim().length()>0) {
-		if(!Misc.equals(password.trim(), request.getString(ARG_PASSWORD,"").trim())) {
+		if(!Misc.equals(password.trim(), request.getString(ARG_SCRIPT_PASSWORD,"").trim())) {
 		    return new Result(formInfo.title!=null?formInfo.title:entry.getName(), new StringBuffer(repository.showDialogError("Bad password")));
 		}
 	    }
@@ -322,9 +324,15 @@ public class JythonTypeHandler extends GenericTypeHandler {
 	
 	List<InputInfo> inputs = new ArrayList<InputInfo>();
 
+
+
+	JythonTypeHandler typeHandler;
+        Entry entry;
+
+
 	StringBuffer sb;
 	int cnt = 0;
-	JythonTypeHandler typeHandler;
+
 	String title;
 	String prefix="";
 	Request request;
@@ -335,10 +343,12 @@ public class JythonTypeHandler extends GenericTypeHandler {
 	String errorMessage;
 	String resultFileName = null;
 
-	public FormInfo(JythonTypeHandler typeHandler, Request request, StringBuffer sb) {
+
+	public FormInfo(JythonTypeHandler typeHandler, Entry entry, Request request, StringBuffer sb) {
 	    this.sb = sb;
 	    this.request = request;
 	    this.typeHandler = typeHandler;
+            this.entry = entry;
 	}
 
 	public void setErrorMessage (String value) {
@@ -418,7 +428,7 @@ public class JythonTypeHandler extends GenericTypeHandler {
 
 	    sb.append(HtmlUtil.hidden(id + "_hidden", "", HtmlUtil.id(id + "_hidden")));
             String select = OutputHandler.getSelect(request, id,
-						    "Select", true, null);
+						    "Select", true, null, entry);
 	    sb.append(HtmlUtil.formEntry(label,
 					 HtmlUtil.disabledInput(id,
 								"", HtmlUtil.id(id)

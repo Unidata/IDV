@@ -697,9 +697,64 @@ public class HtmlOutputHandler extends OutputHandler {
     public Result getSelectXml(Request request, List<Group> subGroups,
                                List<Entry> entries)
             throws Exception {
+        String localeId = request.getString(ARG_LOCALEID,null);
+
         String       target = request.getString(ATTR_TARGET, "");
         StringBuffer sb     = new StringBuffer();
+
+
+        
+        //If we have a localeid that means this is the first call
+        if(localeId!=null) {
+            Entry localeEntry  =  getEntryManager().getEntry(request, localeId);
+            if(localeEntry!=null) {
+                if(!localeEntry.isGroup()) {
+                    localeEntry = getEntryManager().getParent(request, localeEntry);
+                }
+                if(localeEntry!=null) {
+                    Entry grandParent = getEntryManager().getParent(request, localeEntry);
+                    String indent = "";
+                    if(grandParent!=null) {
+                        sb.append(getSelectLink(request, grandParent, target));
+                        //indent = HtmlUtil.space(2);
+                    }
+                    sb.append(indent);
+                    sb.append(getSelectLink(request, localeEntry, target));
+                    localeId = localeEntry.getId();
+                    sb.append("<hr style=\"padding:0px;margin-bottom:2px;  margin:0px;\">");
+                }
+            }
+
+
+            List<FavoriteEntry> favoritesList =
+                getUserManager().getFavorites(request, request.getUser());
+            StringBuffer favorites = new StringBuffer();
+            if (favoritesList.size() > 0) {
+                sb.append(HtmlUtil.b(msg("Favorites")));
+                sb.append(HtmlUtil.br());
+                List favoriteLinks = new ArrayList();
+                for (FavoriteEntry favorite : favoritesList) {
+                    Entry favEntry = favorite.getEntry();
+                    sb.append(getSelectLink(request, favEntry, target));
+                }
+                sb.append("<hr style=\"padding:0px;margin-bottom:2px;  margin:0px;\">");
+            }
+
+
+            List<Entry> cartEntries = getUserManager().getCart(request);
+            if (cartEntries.size() > 0) {
+                sb.append(HtmlUtil.b(msg("Cart")));
+                sb.append(HtmlUtil.br());
+                for (Entry cartEntry : cartEntries) {
+                    sb.append(getSelectLink(request, cartEntry, target));
+                }
+                sb.append("<hr style=\"padding:0px;margin-bottom:2px;  margin:0px;\">");
+            }
+        }
+
+
         for (Group subGroup : subGroups) {
+            if(Misc.equals(localeId, subGroup.getId())) continue;
             sb.append(getSelectLink(request, subGroup, target));
         }
 

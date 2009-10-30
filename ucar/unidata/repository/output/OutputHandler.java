@@ -660,7 +660,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      */
     public static String getGroupSelect(Request request, String elementId)
             throws Exception {
-        return getSelect(request, elementId, "Select", false, "");
+        return getSelect(request, elementId, "Select", false, "",null);
     }
 
 
@@ -681,10 +681,20 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                    String label, boolean allEntries,
                                    String type)
             throws Exception {
+
+        return getSelect(request, elementId, label, allEntries, type, null);
+    }
+
+
+    public static String getSelect(Request request, String elementId,
+                                   String label, boolean allEntries,
+                                   String type, Entry entry)
+            throws Exception {
         String event = HtmlUtil.call("selectInitialClick",
                                      "event," + HtmlUtil.squote(elementId)
                                      + "," + HtmlUtil.squote("" + allEntries)
-                                     + "," + HtmlUtil.squote(type));
+                                     + "," + HtmlUtil.squote(type) 
+                                     + "," + (entry!=null?HtmlUtil.squote(entry.getId()):"null"));
         String clearEvent = HtmlUtil.call("clearSelect",
                                           HtmlUtil.squote(elementId));
         return HtmlUtil.mouseClickHref(
@@ -722,8 +732,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             ARG_SELECTTYPE, request.getString(ARG_SELECTTYPE, "")
         });
 
-        String prefix = HtmlUtil.img(
-                            getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
+        String prefix = (!entry.isGroup()? HtmlUtil.img(
+                                                                getRepository().iconUrl(ICON_BLANK),"", HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"10")):
+                         HtmlUtil.img(
+                                     getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
                             msg("Click to open group"),
                             HtmlUtil.id("img_" + uid)
                             + HtmlUtil.onMouseClick(
@@ -734,10 +746,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                                         HtmlUtil.squote(folderClickUrl),
                                         HtmlUtil.squote(
                                             iconUrl(
-                                                ICON_TOGGLEARROWDOWN))))));
+                                                    ICON_TOGGLEARROWDOWN)))))));
 
 
-        String img = prefix + HtmlUtil.img(icon);
+        String img = prefix + HtmlUtil.space(1) + HtmlUtil.img(icon);
 
         sb.append(img);
         sb.append(HtmlUtil.space(1));
@@ -1974,7 +1986,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                             "Add link", true, "wikilink") + HtmlUtil.space(1)
                                 + OutputHandler.getSelect(request,
                                     textAreaId, "Add import entry", true,
-                                    "entryid");
+                                                          "entryid", entry);
 
         StringBuffer buttons = new StringBuffer();
         buttons.append(addWikiEditButton(textAreaId, "button_bold.png",
