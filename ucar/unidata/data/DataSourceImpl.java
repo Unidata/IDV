@@ -37,6 +37,7 @@ import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
 
 
+import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.idv.DisplayControl;
 
 import ucar.unidata.idv.chooser.*;
@@ -382,12 +383,19 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         return false;
     }
 
+    public IntegratedDataViewer getIdv() {
+	if(getDataContext()==null) return null;
+	return getDataContext().getIdv();
+    }
+
     /**
      * Check to see if there is a field maskfile defined. If so load it in.
      */
     protected void loadFieldMask() {
+	if(getIdv() == null) return;
+
         String maskFile =
-            getDataContext().getIdv().getProperty(getClass().getName()
+            getIdv().getProperty(getClass().getName()
                 + ".maskfile", (String) null);
         if (maskFile != null) {
             loadFieldMask(maskFile);
@@ -473,7 +481,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         Hashtable  catMap             = new Hashtable();
         Hashtable  currentDataChoices = new Hashtable();
 
-        List       displays = getDataContext().getIdv().getDisplayControls();
+        List       displays = getIdv().getDisplayControls();
         for (int i = 0; i < displays.size(); i++) {
             List dataChoices =
                 ((DisplayControl) displays.get(i)).getDataChoices();
@@ -624,7 +632,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             }
             IOUtil.writeJarFile(jarFile, files);
             if (installCbx.isSelected()) {
-                getDataContext().getIdv().getPluginManager()
+                getIdv().getPluginManager()
                     .installPluginFromFile(jarFile);
             }
         } catch (Exception exc) {
@@ -746,7 +754,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         initAfterUnpersistenceBeenCalled = true;
         initAfter();
         //TODO: Let's not change anything for now
-        //      descriptor = getDataContext().getIdv().getDataManager().getCurrent(descriptor);
+        //      descriptor = getIdv().getDataManager().getCurrent(descriptor);
     }
 
 
@@ -1538,9 +1546,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             List choices = getDataChoices();
             for (int cIdx = 0; cIdx < choices.size(); cIdx++) {
                 DataChoice dataChoice = (DataChoice) choices.get(cIdx);
-                dataContext.getIdv().doMakeControl(
+                getIdv().doMakeControl(
                     dataChoice,
-                    dataContext.getIdv().getControlDescriptor(displayType),
+                    getIdv().getControlDescriptor(displayType),
                     (String) null);
                 //For now break after the first one
                 //so we don't keep adding displays
@@ -1760,8 +1768,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @param dataChoices base list of choices
      */
     protected void makeDerivedDataChoices(List dataChoices) {
+	if(getIdv() == null) return;
         List derivedList =
-            getDataContext().getIdv().getDerivedDataChoices(this,
+            getIdv().getDerivedDataChoices(this,
                 dataChoices);
         if (derivedList != null) {
             dataChoices.addAll(derivedList);
@@ -2920,7 +2929,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         List times = getAllDateTimes();
         if ((times != null) && (times.size() > 0)) {
-            dsw = new DataSelectionWidget(getDataContext().getIdv());
+            dsw = new DataSelectionWidget(getIdv());
             dsw.setTimes(getAllDateTimes(), getDateTimeSelection());
             JComponent extraTimesComp = getExtraTimesComponent();
             JComponent timesComp      = dsw.getTimesList("Use All");
@@ -2972,7 +2981,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 		Class theClass = Misc.findClass(chooserClassName);
 		Class[] paramTypes = new Class[] { IdvChooserManager.class,
 						   Element.class };
-		Object[]    args = new Object[] {getDataContext().getIdv().getIdvChooserManager(), null};
+		Object[]    args = new Object[] {getIdv().getIdvChooserManager(), null};
 		Constructor ctor = Misc.findConstructor(theClass, paramTypes);
 		if (ctor != null) {
 		    chooser = (IdvChooser) ctor.newInstance(args);
@@ -3127,7 +3136,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         setAlias(aliasFld.getText().trim());
         if (dsw != null) {
             setDateTimeSelection(dsw.getSelectedDateTimes());
-            getDataContext().getIdv().getIdvUIManager().dataSourceTimeChanged(
+            getIdv().getIdvUIManager().dataSourceTimeChanged(
                 this);
         }
 
@@ -3189,7 +3198,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (canChangeData()) {
             a = new AbstractAction("Change Data") {
                 public void actionPerformed(ActionEvent ae) {
-                    Misc.run(getDataContext().getIdv().getIdvUIManager(),
+                    Misc.run(getIdv().getIdvUIManager(),
                              "changeState", DataSourceImpl.this);
                 }
             };
@@ -3711,7 +3720,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
                 String uniqueName = "data_" + Misc.getUniqueId();
                 String tmp =
-                    IOUtil.joinDir(getDataContext().getIdv().getDataManager()
+                    IOUtil.joinDir(getIdv().getDataManager()
                         .getDataCacheDirectory(), uniqueName);
                 IOUtil.makeDir(tmp);
                 try {
