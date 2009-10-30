@@ -220,7 +220,6 @@ public class ShapeFileDataSource extends FilesDataSource {
         byte[] bytes    = null;
         try {
             if (shapefileData == null) {
-
                 //If its not a shp or zip file then try it with the mapFamily
                 if (!IOUtil.hasSuffix(filename,".shp") &&
                     !IOUtil.hasSuffix(filename,".zip")) {
@@ -236,9 +235,6 @@ public class ShapeFileDataSource extends FilesDataSource {
                     }
                 }
                 
-
-
-
 
                 if (getProperty(PROP_CACHEABLE, false)) {
                     bytes = CacheManager.getCachedFile("ShapeFileDataSource",
@@ -291,6 +287,35 @@ public class ShapeFileDataSource extends FilesDataSource {
             logException("Reading shapefile: " + filename, exc, bytes);
         }
         return null;
+    }
+
+
+
+    public static Data readMap(String filename) 
+            throws Exception {
+	if (!IOUtil.hasSuffix(filename,".shp") &&
+	    !IOUtil.hasSuffix(filename,".zip")) {
+	    try {
+	    URL url = IOUtil.getURL(filename, ShapeFileDataSource.class);
+	    Data data =   (url == null)
+		    ? (SampledSet) mapFamily.open(filename)
+		    : (SampledSet) mapFamily.open(url);
+	    return data;
+	    } catch(Exception ignore){}
+	}                
+
+
+	byte[] bytes = IOUtil.readBytes(IOUtil.getInputStream(filename,
+						       ShapeFileDataSource.class));
+	if (bytes == null) {
+	    return null;
+	}
+	ShapefileAdapter sfa =
+	    new ShapefileAdapter(new ByteArrayInputStream(bytes, 0,
+							  bytes.length), filename);
+
+	Data data =  sfa.getData();
+	return data;
     }
 
 
