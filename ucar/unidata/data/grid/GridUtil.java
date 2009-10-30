@@ -4255,7 +4255,6 @@ public class GridUtil {
                 }
 
                 if (field != null) {
-
                     Range[] tmp = fieldMinMax(field);
                     if (result == null) {
                         result = new Range[tmp.length];
@@ -5667,6 +5666,58 @@ public class GridUtil {
         return newDSet;
 
 
+    }
+
+
+
+    public static List<FieldStats> findMinMaxAverage(FieldImpl field, UnionSet mapSets ) throws VisADException, RemoteException {
+	List<FieldStats> stats = new ArrayList<FieldStats>();
+	if (GridUtil.isTimeSequence(field)) {
+	    int numTimes = field.getDomainSet().getLength();
+	    float[][]result  = new float[numTimes][];
+	    for (int timeStep=0;timeStep<numTimes;timeStep++) {
+		stats.add(findMinMaxAverageFromRange((FlatField)field.getSample(timeStep), mapSets));
+	    }
+	} else {
+	    stats.add(findMinMaxAverageFromRange((FlatField)field, mapSets));
+	}
+	return stats;
+    }
+
+
+    public static FieldStats findMinMaxAverageFromRange(FlatField field, UnionSet mapSets) throws VisADException, RemoteException {
+	int[][]indices = (mapSets==null?null:GridUtil.findContainedIndices((GriddedSet)field.getDomainSet(), mapSets));
+	float[]mma = {0,0,0,0};
+	float[][]values = field.getFloats(false);
+	if(indices==null) {
+	    int len = values[0].length;
+	    indices = new int[1][len];
+	    for(int i=0;i<len;i++) {
+		indices[0][i] = i;
+	    }
+	} else {
+	    //	    System.err.println("indices:" + indices.length +" values:" + values[0].length);
+	}
+
+	int cnt = 0;
+	for(int mapIdx =0;mapIdx<indices.length;mapIdx++) {
+	    int[] indexArray = indices[mapIdx];
+	    //	    System.err.println("   index:" + indexArray.length);
+	    for(int j=0;j<indexArray.length;j++) {
+		int index = indexArray[j];
+		if(cnt==0) {
+		    mma[2] = mma[1] =  mma[0] = values[0][index];
+		} else {
+		    mma[0]=Math.min(values[0][index],mma[0]);
+		    mma[1]=Math.max(values[0][index],mma[1]);
+		    mma[2]+=values[0][index];
+		}
+		cnt++;
+	    }
+	}
+	if(cnt>0) mma[2] = mma[2]/cnt;
+	mma[3] = cnt;
+	return new FieldStats(mma);
     }
 
 }

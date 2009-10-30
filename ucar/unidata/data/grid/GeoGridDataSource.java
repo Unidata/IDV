@@ -38,6 +38,7 @@ import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.grid.*;
 
 
+
 import ucar.unidata.data.*;
 
 import ucar.unidata.geoloc.*;
@@ -208,6 +209,12 @@ public class GeoGridDataSource extends GridDataSource {
      * Default constructor
      */
     public GeoGridDataSource() {}
+
+
+    public GeoGridDataSource(GridDataset gds) {
+	dataset = gds;
+    }
+
 
     /**
      * Create a GeoGridDataSource from a File.
@@ -673,7 +680,7 @@ public class GeoGridDataSource extends GridDataSource {
         Hashtable             catMap             = new Hashtable();
         Hashtable             currentDataChoices = new Hashtable();
 
-        List displays = getDataContext().getIdv().getDisplayControls();
+        List displays = getIdv().getDisplayControls();
         for (int i = 0; i < displays.size(); i++) {
             List dataChoices =
                 ((DisplayControl) displays.get(i)).getDataChoices();
@@ -1110,7 +1117,6 @@ public class GeoGridDataSource extends GridDataSource {
      * with the method addDataChoice.
      */
     protected void doMakeDataChoices() {
-
         GridDataset myDataset = getDataset();
         if (myDataset == null) {
             return;
@@ -1174,7 +1180,6 @@ public class GeoGridDataSource extends GridDataSource {
             GeoGrid cfield = (GeoGrid) iter.next();
             choice = makeDataChoiceFromGeoGrid(cfield, myTimes, timeToIndex);
             if (choice != null) {
-
                 cnt++;
                 if (gridRelativeWind == true) {
                     if ((choice.getDescription().indexOf("u-component") >= 0)
@@ -1210,7 +1215,7 @@ public class GeoGridDataSource extends GridDataSource {
                         GuiUtils.inset(new JLabel("<html>No gridded data found for:<br><br>&nbsp;&nbsp;<i>"
                             + this
                             + "</i><br><br>Do you want to try to load this as another data type?</html>"), 5), null)) {
-                getDataContext().getIdv().getDataManager()
+                getIdv().getDataManager()
                     .createDataSourceAndAskForType(getFilePath(),
                         getProperties());
                 setInError(true, false, "");
@@ -1262,6 +1267,28 @@ public class GeoGridDataSource extends GridDataSource {
         //        System.err.println("getData:" + getFilePath() +" field="+dataChoice);
         Data data = makeFieldImpl(dataChoice, givenDataSelection,
                                   requestProperties);
+        return data;
+        //        }
+    }
+
+
+
+    public List<String> listParameters() {
+	List<String> params = new ArrayList<String>();
+	for(DataChoice dc: (List<DataChoice>)getDataChoices()) {
+	    params.add(dc.getName());
+	}
+	return params;
+    }
+
+    public Data getData(String parameter) 
+            throws VisADException, RemoteException {
+	DataChoice dataChoice = findDataChoice(parameter);
+	if(dataChoice == null) return null;
+	DataSelection dataSelection = new DataSelection();
+	//	dataSelection.setTimes(Misc.newList(new Integer(0)));
+        Data data = makeFieldImpl(dataChoice, dataSelection,
+                                  new Hashtable());
         return data;
         //        }
     }

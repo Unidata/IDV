@@ -1366,7 +1366,7 @@ public class GeoGridAdapter {
                 }
 
             }
-            if (dataSource.isLocalFile()) {
+            if (dataSource.getIdv() == null || dataSource.isLocalFile()) {
                 threadManager.runSequentially();
             } else {
                 threadManager
