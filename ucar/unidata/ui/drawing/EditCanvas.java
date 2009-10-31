@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.border.*;
 
 
 /**
@@ -1265,13 +1266,15 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
             return null;
         }
         List shapeButtons = new ArrayList();
+	Border bborder = BorderFactory.createEmptyBorder(2,2,2,2);
         if (showTextInPalette()) {
             ImageIcon image =
                 GuiUtils.getImageIcon(
                     "/ucar/unidata/ui/drawing/images/pointer.gif");
             selectButton = new JToggleButton("Select", image);
-            selectButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2,
-                    2));
+	    if(!GuiUtils.isMac()) {
+		selectButton.setBorder(bborder);
+	    }
         } else {
             selectButton = GuiUtils.getToggleButton(
                 "/ucar/unidata/ui/drawing/images/pointer.gif", 4, 4);
@@ -1290,7 +1293,9 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
             if (showTextInPalette()) {
                 ImageIcon image = GuiUtils.getImageIcon(sd.iconName);
                 tb = new JToggleButton(sd.name, image);
-                tb.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		if(!GuiUtils.isMac()) {
+		    tb.setBorder(bborder);
+		}
             } else {
                 tb = GuiUtils.getToggleButton(sd.iconName, 4, 4);
             }
@@ -1306,9 +1311,11 @@ public class EditCanvas extends DisplayCanvas implements MouseListener,
                 }
             });
         }
-        JPanel buttons = GuiUtils.vbox(shapeButtons);
-        buttons.setBorder(BorderFactory.createEtchedBorder());
-        return GuiUtils.topCenter(buttons, new JLabel(" "));
+
+        JComponent buttons = GuiUtils.vbox(shapeButtons);
+	JScrollPane sp = GuiUtils.makeScrollPane(GuiUtils.top(buttons),175,300);
+	sp.setPreferredSize(new Dimension(175,300));
+        return sp;
     }
 
 
