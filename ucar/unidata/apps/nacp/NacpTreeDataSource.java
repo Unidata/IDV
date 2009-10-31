@@ -97,11 +97,11 @@ public class NacpTreeDataSource extends TextPointDataSource {
 
     private static String header = "(index) -> (Time,longitude,latitude,altitude,id(Text),Condition(Text),Species(Text),dbh,Crown_along_slope,Crown_cross_slope,Crown_form(Text),Height,Crown_base,Distance,Azimuth,Notes(Text))\nTime[fmt=\"yyyy-MM-dd\"],longitude[unit=\"degrees\" ],latitude[unit=\"degrees\"],altitude[units=\"m\"],id(Text),Condition(Text),Species(Text),dbh[unit=\"cm\" missing=\"-999.9\"],Crown_along_slope[unit=\"cm\" missing=\"-999.9\"],Crown_cross_slope[unit=\"cm\" missing=\"-999.9\"],Crown_form(Text),Height[unit=\"m\"  missing=\"-999.9\"],Crown_base[unit=\"m\"  missing=\"-999.9\"],Distance[unit=\"m\" missing=\"-999.9\"],Azimuth[unit=\"m\" missing=\"-999.9\"],Notes(Text)";
 
-    protected String getContents(String sourceFile) throws Exception {
-	return process(sourceFile);
+    protected String getContents(String sourceFile, boolean sampleIt) throws Exception {
+	return process(sourceFile, sampleIt);
     }
 
-    public static String process(String file) throws Exception {
+    public static String process(String file, boolean sampleIt) throws Exception {
 	StringBuffer sb  = new StringBuffer();
 	sb.append(header);
 	/*1,Longitude,decimal degrees,Longitude of plot location in decimal degrees. Negative values indicate west 
@@ -172,6 +172,7 @@ public class NacpTreeDataSource extends TextPointDataSource {
 
 	    sb.append("\n");
 
+	    if(sampleIt) break;
 	}
 	return sb.toString();
     }
@@ -180,7 +181,7 @@ public class NacpTreeDataSource extends TextPointDataSource {
 
     public static void main(String []args) throws Exception {
 	for(int i=0;i<args.length;i++) {
-	    process(args[i]);
+	    process(args[i],false);
 	}
 
     }
