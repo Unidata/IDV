@@ -120,6 +120,8 @@ public class TextPointDataSource extends PointDataSource {
     /** The visad textadapter map params line. We have this here if the data file does not have it */
     private String params;
 
+
+
     /** the default real */
     private Real dfltReal;
 
@@ -289,6 +291,29 @@ public class TextPointDataSource extends PointDataSource {
 
 
 
+    /**
+     * Create a new TextPointDataSource
+     *
+     * @param descriptor    data source descriptor
+     * @param source        source of data (filename/URL)
+     * @param properties    extra properties for initialization
+     *
+     * @throws VisADException   problem creating the data
+     *
+     */
+    public TextPointDataSource(DataSourceDescriptor descriptor,
+                               String source, 			       String name,
+			       Hashtable properties)
+            throws VisADException {
+        super(descriptor, source, name, properties);
+        if (properties != null) {
+            this.dataProperties =
+                (Hashtable) properties.get(PROP_DATAPROPERTIES);
+        }
+    }
+
+
+
 
     /**
      * Make PointObs from the raw VisAD data
@@ -386,8 +411,8 @@ public class TextPointDataSource extends PointDataSource {
         }
 
         //        System.out.println("URL:"+source);
-        String contents  = getContents(source);
-        //        System.out.println(contents);
+        String contents  = getContents(source, sampleIt);
+	//	System.out.println(contents);
         String delimiter = getDelimiter(source);
         return makeObs(contents, delimiter, subset, bbox, trackParam,
                        sampleIt, showAttributeGuiIfNeeded);
@@ -411,6 +436,12 @@ public class TextPointDataSource extends PointDataSource {
     }
 
 
+    protected final String getContents(String sourceFile) throws Exception {
+	//A check to see if derived classes break
+	return getContents(sourceFile, false);
+    }
+
+
     /**
      * Read the given source file and return the text contents of it.
      * If the source file is a xls file then convert to csv text
@@ -421,7 +452,7 @@ public class TextPointDataSource extends PointDataSource {
      *
      * @throws Exception On badness
      */
-    protected String getContents(String sourceFile) throws Exception {
+    protected String getContents(String sourceFile, boolean sampleIt) throws Exception {
         if (sourceFile.endsWith(".xls")) {
             return DataUtil.xlsToCsv(sourceFile);
         } else {
@@ -2227,6 +2258,9 @@ public class TextPointDataSource extends PointDataSource {
     public String getParams() {
         return params;
     }
+
+
+
 
 
     /**

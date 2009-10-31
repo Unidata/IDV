@@ -133,7 +133,7 @@ public class DiamondPointDataSource extends TextPointDataSource {
      *
      * @throws Exception On badness
      */
-    protected String getContents(String sourceFile) throws Exception {
+    protected String getContents(String sourceFile, boolean sampleIt) throws Exception {
         String       s            = IOUtil.readContents(sourceFile);
 
         List<String> lines        = StringUtil.split(s, "\n", true, true);
