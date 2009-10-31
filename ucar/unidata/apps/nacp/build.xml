@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- In Ant all file paths are relative to the basedir.  Since this
+build.xml file is in ucar the basedir is "..", the parent directory of
+ucar.  (Unless overwritten by a calling ant process or by a command line
+argument -Dfoo=bar) -->
+
+
+<project basedir="../../../../" default="plugin" name="NACP IDV">
+
+    <import file="../../../build.xml"/>
+
+
+    <target name="nacp" depends="init">
+        <javac
+            classpath="${classpath}"
+            debug="true"
+            source="${srcversion}"
+            deprecation="false" 
+            destdir="${compiledir}"
+            failonerror="${failonerror}" 
+            nowarn="true"
+            srcdir="${srcdir}"
+        >
+        <include name="ucar/unidata/apps/nacp/**"/>
+        </javac>
+    </target>
+
+
+    <target name="nacpjar" depends="nacp">
+        <jar 
+            basedir="${srcdir}"
+            compress="true"
+            update="false"
+            jarfile="${jars_dest}/nacpidv.jar"
+            >
+            <include name="ucar/unidata/apps/nacp/**"/>
+            <include name="ucar/unidata/apps/nacp/maps/**"/>
+        </jar>
+    </target>
+
+    <target name="plugin" depends="nacpjar">
+        <copy overwrite="true"  todir="${user.home}/.unidata/idv/DefaultIdv/plugins">
+             <fileset file="lib/nacpidv.jar"/>
+        </copy>
+    </target>
+
+
+</project>
