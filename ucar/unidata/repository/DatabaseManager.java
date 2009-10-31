@@ -150,7 +150,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
                         synchronized(scourMessages) {
                             while(scourMessages.size()>100)
                                 scourMessages.remove(0);
-                            scourMessages.add("SCOURED @"+new Date() +" info.date: " +new Date(info.time) +" Where:" +info.where);
+                            scourMessages.add("SCOURED @"+new Date() +" info.date: " +new Date(info.time) +"  msg:" + info.msg +"  Where:" +info.where);
                         }
                         closeConnection(connection);
                     }
@@ -228,6 +228,20 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
 
 	dbSB.append("Connection Pool:<br>&nbsp;&nbsp;#active:" + bds.getNumActive() +"<br>&nbsp;&nbsp;#idle:" +bds.getNumIdle()  +"<br>&nbsp;&nbsp;max active: " +
 		    bds.getMaxActive() +"<br>&nbsp;&nbsp;max idle:" + bds.getMaxIdle());
+
+	if(bds.getNumActive()>0) {
+	    Hashtable<Connection,ConnectionInfo> tmp = new Hashtable<Connection,ConnectionInfo>();
+	    synchronized(connectionMap) {
+		tmp.putAll(connectionMap);
+	    }
+	    for (Enumeration keys = tmp.keys(); keys.hasMoreElements(); ) {
+		Connection connection = (Connection) keys.nextElement();
+		ConnectionInfo info  = tmp.get(connection);
+		dbSB.append("Connection:  info.date: " +new Date(info.time) +"  msg:" + info.msg +"  Where:" +info.where);
+	    }
+	}
+
+
 	dbSB.append(HtmlUtil.br());
         dbSB.append("<table>\n");
         String[] names = { msg("Users"), msg("Associations"),
@@ -284,13 +298,16 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
 
         String where;
 
+	String msg; 
+
         /**
          * _more_
          *
          * @param connection _more_
          */
-        ConnectionInfo() {
+        ConnectionInfo(String msg) {
             this.time  = System.currentTimeMillis();
+	    this.msg = msg;
             where = Misc.getStackTrace();
         }
     }
@@ -434,9 +451,13 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      * @throws Exception _more_
      */
     public Connection getConnection() throws Exception {
+	return getConnection("");
+    }
+
+    private Connection getConnection(String msg) throws Exception {
         Connection connection = dataSource.getConnection();
 	synchronized(connectionMap) {
-	    connectionMap.put(connection,new ConnectionInfo());
+	    connectionMap.put(connection,new ConnectionInfo(msg));
 	}
         return connection;
     }
@@ -1230,7 +1251,12 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
         SelectInfo selectInfo = new SelectInfo(what, tables, clause, extra,
                                     max);
         final boolean[] done = { false };
-        /*
+	String msg = "Select what:" + what + "\ntables:" +
+                                           tables +
+                                           "\nclause:" + clause +
+                                           "\nextra:" + extra+
+                                           "max:" + max;
+	/*
         Misc.run(new Runnable() {
                 public void run() {
                     //Wait 20 seconds
@@ -1246,7 +1272,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
                 }
             });
         */
-        Statement statement = SqlUtil.select(getConnection(), what, tables, clause,
+        Statement statement = SqlUtil.select(getConnection(msg), what, tables, clause,
                                         extra, max, TIMEOUT);
 
         done[0] = true;

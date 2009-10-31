@@ -136,11 +136,14 @@ public class JythonTypeHandler extends GenericTypeHandler {
 	StringBuffer sb = new StringBuffer();
 	FormInfo formInfo = new FormInfo(this, entry, request, sb);
 	boolean makeForm = !request.exists(ARG_SUBMIT);
+	String formUrl = getRepository().URL_ENTRY_SHOW.getFullUrl();
 
 	interp.set("formInfo", formInfo);
 	interp.set("request", request);
+	interp.set("formUrl", formUrl);
 	interp.set("typeHandler", this);
 	interp.set("repository", getRepository());
+
 	interp.set("makeForm", (makeForm?new Integer(1):new Integer(0)));
 
         List<Metadata> metadataList =
@@ -178,7 +181,6 @@ public class JythonTypeHandler extends GenericTypeHandler {
 	    formSB.append(formInfo.prefix);
 
 	    if(formInfo.cnt>0) {
-		String formUrl = getRepository().URL_ENTRY_SHOW.getFullUrl();
 		if(formInfo.resultFileName!=null) {
 		    formUrl = formUrl+"/" +formInfo.resultFileName;
 		}
