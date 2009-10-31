@@ -140,7 +140,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
                     tmp.putAll(connectionMap);
                 }
                 long now = System.currentTimeMillis();
-                int seconds = getRepository().getProperty(PROP_DB_POOL_TIMEUNTILCLOSED,60);
+                int seconds = getRepository().getProperty(PROP_DB_POOL_TIMEUNTILCLOSED,180);
                 for (Enumeration keys = tmp.keys(); keys.hasMoreElements(); ) {
                     Connection connection = (Connection) keys.nextElement();
                     ConnectionInfo info  = tmp.get(connection);
