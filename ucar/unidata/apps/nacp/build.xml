@@ -10,7 +10,6 @@ argument -Dfoo=bar) -->
 
     <import file="../../../build.xml"/>
 
-
     <target name="nacp" depends="init">
         <javac
             classpath="${classpath}"
@@ -20,8 +19,11 @@ argument -Dfoo=bar) -->
             destdir="${compiledir}"
             failonerror="${failonerror}" 
             nowarn="true"
+            fork="true"
+            memoryMaximumSize="256m"
             srcdir="${srcdir}"
         >
+
         <include name="ucar/unidata/apps/nacp/**"/>
         </javac>
     </target>

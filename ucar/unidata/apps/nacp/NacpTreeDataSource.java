@@ -31,35 +31,16 @@ import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 
-import ucar.unidata.xml.XmlUtil;
-
-import ucar.visad.Util;
-
-import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
-import visad.*;
-
-import visad.georef.*;
-
-
-
-import java.rmi.RemoteException;
-
-
-import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.TimeZone;
+import visad.*;
 
-import org.w3c.dom.Element;
 
 /**
  *
@@ -95,7 +76,7 @@ public class NacpTreeDataSource extends TextPointDataSource {
 
 
 
-    private static String header = "(index) -> (Time,longitude,latitude,altitude,id(Text),Condition(Text),Species(Text),dbh,Crown_along_slope,Crown_cross_slope,Crown_form(Text),Height,Crown_base,Distance,Azimuth,Notes(Text))\nTime[fmt=\"yyyy-MM-dd\"],longitude[unit=\"degrees\" ],latitude[unit=\"degrees\"],altitude[units=\"m\"],id(Text),Condition(Text),Species(Text),dbh[unit=\"cm\" missing=\"-999.9\"],Crown_along_slope[unit=\"cm\" missing=\"-999.9\"],Crown_cross_slope[unit=\"cm\" missing=\"-999.9\"],Crown_form(Text),Height[unit=\"m\"  missing=\"-999.9\"],Crown_base[unit=\"m\"  missing=\"-999.9\"],Distance[unit=\"m\" missing=\"-999.9\"],Azimuth[unit=\"m\" missing=\"-999.9\"],Notes(Text)";
+    private static String header = "(index) -> (Time,Longitude,Latitude,Altitude,id(Text),Condition(Text),Species(Text),dbh,Crown_along_slope,Crown_cross_slope,Crown_form(Text),Height,Crown_base,Distance,Azimuth,Notes(Text))\nTime[fmt=\"yyyy-MM-dd\"],Longitude[unit=\"degrees\" ],Latitude[unit=\"degrees\"],Altitude[units=\"m\"],id(Text),Condition(Text),Species(Text),dbh[unit=\"cm\" missing=\"-999.9\"],Crown_along_slope[unit=\"cm\" missing=\"-999.9\"],Crown_cross_slope[unit=\"cm\" missing=\"-999.9\"],Crown_form(Text),Height[unit=\"m\"  missing=\"-999.9\"],Crown_base[unit=\"m\"  missing=\"-999.9\"],Distance[unit=\"m\" missing=\"-999.9\"],Azimuth[unit=\"m\" missing=\"-999.9\"],Notes(Text)";
 
     protected String getContents(String sourceFile, boolean sampleIt) throws Exception {
 	return process(sourceFile, sampleIt);
