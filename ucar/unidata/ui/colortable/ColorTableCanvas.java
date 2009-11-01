@@ -554,8 +554,12 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         setColorFromChooserCbx.setToolTipText(
             "Automatically change the color of the selected breakpoint");
         Vector colorSpaces = new Vector();
-        colorSpaces.add(new TwoFacedObject("RGB", ColorSpace.CS_sRGB));
-        colorSpaces.add(new TwoFacedObject("RGB", ColorSpace.CS_CIEXYZ));
+        colorSpaces.add(new TwoFacedObject("RGB", ColorSpace.CS_LINEAR_RGB));
+        colorSpaces.add(new TwoFacedObject("SRGB", ColorSpace.CS_sRGB));
+        colorSpaces.add(new TwoFacedObject("CIE", ColorSpace.CS_CIEXYZ));
+        colorSpaces.add(new TwoFacedObject("GRAY", ColorSpace.CS_GRAY));
+        colorSpaces.add(new TwoFacedObject("PYCC", ColorSpace.CS_PYCC));
+
         colorSpaceCbx = new JComboBox(colorSpaces);
         JPanel colorChooserPanel =
             GuiUtils.topCenter(
@@ -2168,7 +2172,8 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         float      steps = (float) (upperColorIndex - lowerColorIndex + 1);
 
 
-        ColorSpace rgb   = ColorSpace.getInstance(ColorSpace.CS_sRGB);
+	//        ColorSpace rgb   = ColorSpace.getInstance(ColorSpace.CS_sRGB);
+        ColorSpace rgb   = ColorSpace.getInstance(ColorSpace.CS_LINEAR_RGB);
 
         int colorSpace =
             ((Integer) ((TwoFacedObject) colorSpaceCbx.getSelectedItem())
