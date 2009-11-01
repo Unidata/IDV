@@ -23,6 +23,8 @@
 
 
 
+
+
 package ucar.unidata.ui.colortable;
 
 
@@ -48,6 +50,8 @@ import visad.util.BaseRGBMap;
 import visad.util.ColorPreview;
 
 import java.awt.*;
+
+import java.awt.color.*;
 import java.awt.event.*;
 
 import java.beans.PropertyChangeEvent;
@@ -164,6 +168,9 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
     /** _more_ */
     private JCheckBox setColorFromChooserCbx =
         new JCheckBox("Actively set color", true);
+
+    /** _more_ */
+    private JComboBox colorSpaceCbx;
 
     /** THe color chooser */
     private JColorChooser colorChooser;
@@ -430,8 +437,8 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         brightnessBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 modeBrightnessBtn.setSelected(true);
-                if(setColorFromChooserCbx.isSelected()) {
-                    if(currentBP!=null) {
+                if (setColorFromChooserCbx.isSelected()) {
+                    if (currentBP != null) {
                         setBrightness(currentBP, currentBP);
                     }
                 }
@@ -451,8 +458,8 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         transBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 modeTransparencyBtn.setSelected(true);
-                if(setColorFromChooserCbx.isSelected()) {
-                    if(currentBP!=null) {
+                if (setColorFromChooserCbx.isSelected()) {
+                    if (currentBP != null) {
                         setTransparency(currentBP, currentBP);
                     }
                 }
@@ -546,12 +553,17 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
 
         setColorFromChooserCbx.setToolTipText(
             "Automatically change the color of the selected breakpoint");
+        Vector colorSpaces = new Vector();
+        colorSpaces.add(new TwoFacedObject("RGB", ColorSpace.CS_sRGB));
+        colorSpaces.add(new TwoFacedObject("RGB", ColorSpace.CS_CIEXYZ));
+        colorSpaceCbx = new JComboBox(colorSpaces);
         JPanel colorChooserPanel =
             GuiUtils.topCenter(
-                GuiUtils.left(
+                GuiUtils.leftRight(
                     GuiUtils.hbox(
                         setColorFromChooserCbx,
-                        GuiUtils.wrap(colorSwatch))), colorChooser);
+                        GuiUtils.wrap(
+                            colorSwatch)), colorSpaceCbx), colorChooser);
 
 
         JPanel contents = GuiUtils.inset(
@@ -1543,7 +1555,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
                     "brightRight"));
             mi.setToolTipText("Control-b;Control-right arrow");
 
-            JMenu interpBrightness= new JMenu("Interpolate");
+            JMenu interpBrightness = new JMenu("Interpolate");
             scaleMenu.add(interpBrightness);
             interpBrightness.add(mi = GuiUtils.makeMenuItem("All", this,
                     "interpolateBrightnessAll"));
@@ -2037,8 +2049,9 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      */
     public void interpolateBrightnessAll() {
         prepColorChange();
-        interpolateBrightness(0, colorList.size() - 1, (Color) colorList.get(0),
-                         (Color) colorList.get(colorList.size() - 1));
+        interpolateBrightness(0, colorList.size() - 1,
+                              (Color) colorList.get(0),
+                              (Color) colorList.get(colorList.size() - 1));
     }
 
 
@@ -2152,21 +2165,76 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      */
     public void interpolate(int lowerColorIndex, int upperColorIndex,
                             Color lowerColor, Color upperColor) {
-        double steps   = (double) (upperColorIndex - lowerColorIndex + 1);
+        float      steps = (float) (upperColorIndex - lowerColorIndex + 1);
+
+
+        ColorSpace rgb   = ColorSpace.getInstance(ColorSpace.CS_sRGB);
+
+        int colorSpace =
+            ((Integer) ((TwoFacedObject) colorSpaceCbx.getSelectedItem())
+                .getId()).intValue();
+        ColorSpace other = ColorSpace.getInstance(colorSpace);
+
+
+        float[] comps1 = rgb.toCIEXYZ(lowerColor.getColorComponents(rgb,
+                             null));
+        float[] comps2 = rgb.toCIEXYZ(upperColor.getColorComponents(rgb,
+                             null));
+        comps1 = other.fromCIEXYZ(comps1);
+        comps2 = other.fromCIEXYZ(comps2);
+
+
+        /*
         double redStep = (upperColor.getRed() - lowerColor.getRed()) / steps;
         double greenStep = (upperColor.getGreen() - lowerColor.getGreen())
                            / steps;
         double blueStep = (upperColor.getBlue() - lowerColor.getBlue())
                           / steps;
 
-        int cnt = 0;
+        */
+
+        float[] stepArray = new float[comps1.length];
+        for (int j = 0; j < comps1.length; j++) {
+            stepArray[j] = (comps2[j] - comps1[j]) / steps;
+            //            System.err.println("step:" + j +"  " +stepArray[j]);
+        }
+
+        float redStep = (upperColor.getRed() - lowerColor.getRed()) / steps;
+        float greenStep = (upperColor.getGreen() - lowerColor.getGreen())
+                          / steps;
+        float blueStep = (upperColor.getBlue() - lowerColor.getBlue())
+                         / steps;
+
+        int     cnt = 0;
+        float[] tmp = new float[comps1.length];
+
         for (int i = lowerColorIndex; i <= upperColorIndex; i++, cnt++) {
-            int   newRed   = lowerColor.getRed() + (int) (redStep * cnt);
-            int   newGreen = lowerColor.getGreen() + (int) (greenStep * cnt);
-            int   newBlue  = lowerColor.getBlue() + (int) (blueStep * cnt);
-            Color current  = (Color) colorList.get(i);
-            colorList.set(i, new Color(newRed, newGreen, newBlue,
-                                       current.getAlpha()));
+            try {
+                Color current = (Color) colorList.get(i);
+                for (int j = 0; j < comps1.length; j++) {
+                    tmp[j] = comps1[j] + stepArray[j] * i;
+                    //                System.err.print(tmp[j] +" ");
+                }
+                //            System.err.println("");
+
+                //            Color c = new Color(other, tmp,current.getAlpha());
+                Color c = new Color(other, tmp,
+                                    ((float) current.getAlpha()) / 255.0f);
+                colorList.set(i, c);
+
+                //            int   newRed   = lowerColor.getRed() + (int) (redStep * cnt);
+                //            int   newGreen = lowerColor.getGreen() + (int) (greenStep * cnt);
+                //            int   newBlue  = lowerColor.getBlue() + (int) (blueStep * cnt);
+                //            colorList.set(i, new Color(newRed, newGreen, newBlue,
+                //                                       current.getAlpha()));
+            } catch (IllegalArgumentException iae) {
+                //                throw iae;
+                System.err.print("bad  ");
+                for (int j = 0; j < comps1.length; j++) {
+                    System.err.print(tmp[j] + " ");
+                }
+                System.err.println("");
+            }
         }
         tableChanged();
         repaint();
@@ -2231,7 +2299,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      * @param to ending breakpoint
      */
     public void interpolateBrightness(ColorTable.Breakpoint from,
-                                 ColorTable.Breakpoint to) {
+                                      ColorTable.Breakpoint to) {
         int lowerColorIndex = percentToColorIndex(((from != null)
                 ? from.getValue()
                 : 0.0));
@@ -2241,8 +2309,8 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
 
         prepColorChange();
         interpolateBrightness(lowerColorIndex, upperColorIndex,
-                         (Color) colorList.get(lowerColorIndex),
-                         (Color) colorList.get(upperColorIndex));
+                              (Color) colorList.get(lowerColorIndex),
+                              (Color) colorList.get(upperColorIndex));
     }
 
 
@@ -2254,18 +2322,20 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      * @param lowerColor The lower color
      * @param upperColor The upper color
      */
-    public void interpolateBrightness(int lowerColorIndex, int upperColorIndex,
-                                 Color lowerColor, Color upperColor) {
-        float steps = (float) (upperColorIndex - lowerColorIndex + 1);
+    public void interpolateBrightness(int lowerColorIndex,
+                                      int upperColorIndex, Color lowerColor,
+                                      Color upperColor) {
+        float steps          = (float) (upperColorIndex - lowerColorIndex
+                                        + 1);
 
 
-        float f1 =  ((Float)scales.get(lowerColorIndex)).floatValue();
-        float f2 =  ((Float)scales.get(upperColorIndex)).floatValue();
+        float f1 = ((Float) scales.get(lowerColorIndex)).floatValue();
+        float f2 = ((Float) scales.get(upperColorIndex)).floatValue();
 
-        float brightnessStep = (f2-f1)/ steps;
-        int cnt = 0;
+        float brightnessStep = (f2 - f1) / steps;
+        int   cnt            = 0;
         for (int i = lowerColorIndex; i <= upperColorIndex; i++, cnt++) {
-            float   newBrightness = f1 +  (brightnessStep * cnt);
+            float newBrightness = f1 + (brightnessStep * cnt);
             scales.set(i, new Float(newBrightness));
         }
         tableChanged();
@@ -2525,6 +2595,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      * @param box _more_
      * @param colorList _more_
      * @param doLines _more_
+     * @param doCheckerboard _more_
      * @param scales _more_
      */
     public static void paintColors(Graphics g, Rectangle box,
@@ -2536,7 +2607,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         g.setColor(Color.white);
         g.fillRect(box.x, box.y, box.width, box.height);
 
-        if(doCheckerboard) {
+        if (doCheckerboard) {
             int patternX = box.x;
             g.setColor(Color.black);
             boolean top           = true;
@@ -2549,8 +2620,9 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
                     }
                     g.fillRect(patternX, (top
                                           ? box.y
-                                          : box.y + patternHeight), patternWidth,
-                               patternHeight);
+                                          : box.y
+                                            + patternHeight), patternWidth,
+                                                patternHeight);
                     patternX += patternHeight;
                     top      = !top;
                 }
@@ -2573,7 +2645,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
                 c = applyBrightness(c, bright);
             }
             //Clear out the alpha
-            if(!doCheckerboard) {
+            if ( !doCheckerboard) {
                 c = new Color(c.getRed(), c.getGreen(), c.getBlue());
             }
 
