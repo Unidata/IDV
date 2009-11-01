@@ -24,8 +24,12 @@
 package ucar.unidata.data.gis;
 
 
-import ucar.unidata.data.*;
+import ucar.visad.Util;
 
+import ucar.unidata.data.*;
+import ucar.unidata.data.grid.GridUtil;
+
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
@@ -41,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.swing.*;
 
 /**
  * This is an implementation that will read in a generic data file
@@ -53,6 +58,11 @@ public class GeotiffDataSource extends FilesDataSource {
 
     /** the adapter */
     private GeotiffAdapter adapter;
+
+    private String paramName="";
+
+    private String unit="";
+
 
     /**
      *  Parameterless constructor for XML encoding.
@@ -102,6 +112,28 @@ public class GeotiffDataSource extends FilesDataSource {
     }
 
 
+    private JTextField nameFld;
+    private JTextField unitFld;
+
+    public boolean applyProperties() {
+	paramName = nameFld.getText().trim();
+	unit = unitFld.getText().trim();
+	return super.applyProperties();
+    }
+
+    public void getPropertiesComponents(List comps) {
+	super.getPropertiesComponents(comps);
+	nameFld = new JTextField(paramName, 20);
+	unitFld = new JTextField(unit, 10);
+
+	comps.add(GuiUtils.filler());
+	comps.add(getPropertiesHeader("Parameter"));
+	comps.add(GuiUtils.rLabel("Name:"));
+	comps.add(GuiUtils.left(nameFld));
+	comps.add(GuiUtils.rLabel("Unit:"));
+	comps.add(GuiUtils.left(unitFld));
+
+    }
 
     /**
      * Open the data.
@@ -143,7 +175,10 @@ public class GeotiffDataSource extends FilesDataSource {
                                                    desc + " -  3 Color RGB", categories,
                                                    DataChoice.NULL_PROPERTIES));
                 categories = DataCategory.parseCategories("IMAGE-2D;GRID-2D", false);
-                addDataChoice(new DirectDataChoice(this, new Object[]{"grid"}, desc+" -  Grid data",
+		String name = paramName;
+		if(name==null || name.length()==0) 
+		    name = desc+" -  Grid data";
+		addDataChoice(new DirectDataChoice(this, new Object[]{"grid"}, name,
                                                    desc+" -  Grid data", categories,
                                                    DataChoice.NULL_PROPERTIES));
 
@@ -215,7 +250,13 @@ public class GeotiffDataSource extends FilesDataSource {
             }
             Object[]idArray = (Object[]) id;
             if(idArray[0].equals("grid")) {
-                return adapter.getDataAsGrid();
+		FieldImpl field = (FieldImpl) adapter.getDataAsGrid();
+		if(unit!=null && unit.length()>0) {
+		    Unit newunit = Util.parseUnit(unit);
+		    RealType newType = Util.makeRealType(paramName, newunit);
+		    field= GridUtil.setParamType(field, newType);
+		}
+		return field;
             } else {
                 return adapter.getDataAsRgb();
             }
@@ -238,6 +279,46 @@ public class GeotiffDataSource extends FilesDataSource {
         // don't know for this, so return empty ArrayList
         return new ArrayList();
     }
+
+
+    /**
+       Set the ParamName property.
+
+       @param value The new value for ParamName
+    **/
+    public void setParamName (String value) {
+	this.paramName = value;
+    }
+
+    /**
+       Get the ParamName property.
+
+       @return The ParamName
+    **/
+    public String getParamName () {
+	return this.paramName;
+    }
+
+    /**
+       Set the Unit property.
+
+       @param value The new value for Unit
+    **/
+    public void setUnit (String value) {
+	this.unit = value;
+    }
+
+    /**
+       Get the Unit property.
+
+       @return The Unit
+    **/
+    public String getUnit () {
+	return this.unit;
+    }
+
+
+
 
 }
 
