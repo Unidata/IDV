@@ -13,6 +13,7 @@
   <outputhandler class="ucar.unidata.repository.output.DifOutputHandler" name="GCMD DIF"/>
   <outputhandler class="ucar.unidata.repository.data.DataOutputHandler" name="Data" required="true"/>
   <outputhandler class="ucar.unidata.repository.output.RssOutputHandler" name="RSS"/>
+  <outputhandler class="ucar.unidata.repository.output.IcalOutputHandler" name="ICAL"/>
   <outputhandler class="ucar.unidata.repository.output.XmlOutputHandler" name="XML"/>
 
 <!--

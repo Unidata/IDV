@@ -410,6 +410,14 @@ public class Entry extends Entity {
         return false;
     }
 
+    public double[] getLocation() {
+	return new double[]{south,east};
+    }
+
+    public double[] getCenter() {
+	return new double[]{south+(north-south)/2,east+(west-east)/2};
+    }
+
     /**
      * _more_
      *
