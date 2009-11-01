@@ -20,19 +20,24 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.visad;
 
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import ucar.unidata.geoloc.Projection;
+import ucar.unidata.geoloc.ProjectionImpl;
+import ucar.unidata.geoloc.projection.LatLonProjection;
+
 import ucar.unidata.gis.GisFeature;
 
 import ucar.unidata.gis.shapefile.DbaseFile;
 import ucar.unidata.gis.shapefile.EsriShapefile;
+import ucar.unidata.gis.shapefile.ProjFile;
 
 import ucar.unidata.idv.control.drawing.ShapeGlyph;
-
 
 
 import ucar.unidata.util.IOUtil;
@@ -41,6 +46,8 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.data.MapSet;
+
+import ucar.visad.quantities.CommonUnits;
 
 
 
@@ -633,6 +640,23 @@ public class ShapefileAdapter {
      */
     public UnionSet getData() {
         return mapLines;
+    }
+
+    /**
+     * Test this out
+     *
+     * @param args filename
+     *
+     * @throws Exception  problem
+     */
+    public static void main(String[] args) throws Exception {
+        if (args.length == 0) {
+            System.err.println("need to supply a filename");
+            System.exit(1);
+        }
+        ShapefileAdapter sfa  = new ShapefileAdapter(args[0]);
+        UnionSet         data = sfa.getData();
+        visad.python.JPythonMethods.dumpTypes(data);
     }
 }
 
