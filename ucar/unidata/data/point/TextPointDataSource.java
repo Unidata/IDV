@@ -442,6 +442,7 @@ public class TextPointDataSource extends PointDataSource {
     }
 
 
+
     /**
      * Read the given source file and return the text contents of it.
      * If the source file is a xls file then convert to csv text
@@ -1496,6 +1497,8 @@ public class TextPointDataSource extends PointDataSource {
             long    mil2     = System.currentTimeMillis();
             boolean allReals = (type instanceof RealTupleType);
 
+	    //The default time to use is now
+	    Real dfltTime = new DateTime(new java.util.Date());
             // check for time 
             int timeIndex = -1;
             for (int i = 0; i < timeVars.length; i++) {
@@ -1506,8 +1509,7 @@ public class TextPointDataSource extends PointDataSource {
             }
 
             if (timeIndex == -1) {
-                throw new IllegalArgumentException(
-                    "can't find DateTime components");
+		//jeffmc, time change                throw new IllegalArgumentException("can't find DateTime components");
             }
 
             Real      dfltAlt          = new Real(RealType.Altitude, 1);
@@ -1575,7 +1577,7 @@ public class TextPointDataSource extends PointDataSource {
                 tuples.add(tupleData);
                 // get DateTime.  Must have valid time unit.  If not assume
                 // seconds since epoch.  Maybe we should throw an error?
-                Real timeVal = (Real) tupleData[timeIndex];
+                Real timeVal = (timeIndex==-1?dfltTime:(Real) tupleData[timeIndex]);
                 if (timeVal.getUnit() != null) {
                     times.add(new DateTime(timeVal));
                 } else {  // assume seconds since epoch
@@ -1671,12 +1673,28 @@ public class TextPointDataSource extends PointDataSource {
                 //Clear the garbage
                 tuples.set(i, null);
                 // get location
-                EarthLocation location =
-                    new EarthLocationLite((Real) tupleData[latIndex],
-                                          (Real) tupleData[lonIndex],
-                                          (altIndex != -1)
-                                          ? (Real) tupleData[altIndex]
-                                          : dfltAlt);
+		
+		Real lat = (Real) tupleData[latIndex];
+		Real lon = (Real) tupleData[lonIndex];
+		Real alt = (altIndex != -1)
+		    ? (Real) tupleData[altIndex]
+		    : dfltAlt;
+
+		if(!lat.getType().equals(RealType.Latitude)) {
+		    lat = new Real(RealType.Latitude,lat.getValue(RealType.Latitude.getDefaultUnit()) );
+		}
+
+		if(!lon.getType().equals(RealType.Longitude)) {
+		    lon = new Real(RealType.Longitude,lon.getValue(RealType.Longitude.getDefaultUnit()) );
+		}
+
+		if(altIndex>=0 && !alt.getType().equals(RealType.Altitude)) {
+		    alt = new Real(RealType.Altitude,alt.getValue(RealType.Altitude.getDefaultUnit()) );
+		}
+
+		
+                EarthLocation location =  new EarthLocationLite(lat,lon,alt);
+
 
 
                 // now make data
@@ -2136,9 +2154,9 @@ public class TextPointDataSource extends PointDataSource {
                                 //                                    System.err.println ("tuple:" + tuple);
                                 timeIndex = type.getIndex(RealType.Time);
                                 if (timeIndex < 0) {}
-                                if (timeIndex < 0) {
-                                    throw new IllegalArgumentException(
-                                        "Could not find time index");
+				//TODO: handle when there is no time
+                                if (timeIndex < 0) {	
+				    throw new IllegalArgumentException("Could not find time index");
                                 }
                                 writer[0] = PointObFactory.makeWriter(dos,
                                         tuple, new int[] { latIndex,
