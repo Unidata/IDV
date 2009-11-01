@@ -192,7 +192,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     /** Points to station models */
     public static final IdvResource RSC_STATIONMODELS =
         new IdvResource("idv.resource.stationmodels", "Station models",
-                        "stationmodels\\.xml$", true);
+                        "(stationmodels\\.xml$|.ism$)", true);
 
     /** viewpoints */
     public static final IdvResource RSC_VIEWPOINTS =
