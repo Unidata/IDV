@@ -430,7 +430,17 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
-    public void addToEntryNode(Request request, Entry entry, Element node) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param node _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addToEntryNode(Request request, Entry entry, Element node)
+            throws Exception {
         super.addToEntryNode(request, entry, node);
         if ( !getRepository().getAccessManager().canAccessFile(request,
                 entry)) {
@@ -440,14 +450,10 @@ public class DataOutputHandler extends OutputHandler {
         if ( !canLoadAsCdm(entry)) {
             return;
         }
-        String url  = getFullTdsUrl(entry);
-        Element serviceNode = 
-            XmlUtil.create(TAG_SERVICE, node);
-        XmlUtil.setAttributes(serviceNode,
-                              new String[]{
-                                  ATTR_TYPE, SERVICE_OPENDAP,
-                                  ATTR_URL, url
-                              });
+        String  url         = getFullTdsUrl(entry);
+        Element serviceNode = XmlUtil.create(TAG_SERVICE, node);
+        XmlUtil.setAttributes(serviceNode, new String[] { ATTR_TYPE,
+                SERVICE_OPENDAP, ATTR_URL, url });
 
     }
 
@@ -912,26 +918,54 @@ public class DataOutputHandler extends OutputHandler {
         return makeLinksResult(request, "CDL", sb, new State(entry));
     }
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param path _more_
+     *
+     * @return _more_
+     */
     public NetcdfDataset getNetcdfDataset(Entry entry, String path) {
-	if(!canLoadAsCdm(entry)) {
-	    return null;
-	}
-	return ncFilePool.get(path);
+        if ( !canLoadAsCdm(entry)) {
+            return null;
+        }
+        return ncFilePool.get(path);
     }
 
-    public void  returnNetcdfDataset(String path,NetcdfDataset ncd) {
+    /**
+     * _more_
+     *
+     * @param path _more_
+     * @param ncd _more_
+     */
+    public void returnNetcdfDataset(String path, NetcdfDataset ncd) {
         ncFilePool.put(path, ncd);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param path _more_
+     *
+     * @return _more_
+     */
     public GridDataset getGridDataset(Entry entry, String path) {
-	if(!canLoadAsGrid(entry)) {
-	    return null;
-	}
-	return gridPool.get(path);
+        if ( !canLoadAsGrid(entry)) {
+            return null;
+        }
+        return gridPool.get(path);
     }
 
-    public void  returnGridDataset(String path,GridDataset ncd) {
+    /**
+     * _more_
+     *
+     * @param path _more_
+     * @param ncd _more_
+     */
+    public void returnGridDataset(String path, GridDataset ncd) {
         gridPool.put(path, ncd);
     }
 

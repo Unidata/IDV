@@ -62,6 +62,7 @@ import java.util.StringTokenizer;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+
 /**
  *
  *
@@ -69,6 +70,7 @@ import javax.servlet.http.*;
  * @version $Revision: 1.3 $
  */
 public class RepositoryServlet extends HttpServlet implements Constants {
+
     //                                   "Tue, 20 Jan 2009 01:45:54 GMT");
 
     /** _more_ */
@@ -108,7 +110,17 @@ public class RepositoryServlet extends HttpServlet implements Constants {
     }
 
 
-    public RepositoryServlet(JettyServer jettyServer, String[] args, int port) throws Exception {
+    /**
+     * _more_
+     *
+     * @param jettyServer _more_
+     * @param args _more_
+     * @param port _more_
+     *
+     * @throws Exception _more_
+     */
+    public RepositoryServlet(JettyServer jettyServer, String[] args, int port)
+            throws Exception {
         this.args = args;
         createRepository(port, new Properties(), false);
     }
@@ -117,8 +129,13 @@ public class RepositoryServlet extends HttpServlet implements Constants {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Repository getRepository() {
-	return repository;
+        return repository;
     }
 
     /**
@@ -139,7 +156,7 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                 webAppProperties.load(is);
             }
         }
-        createRepository(request.getServerPort(), webAppProperties,true);
+        createRepository(request.getServerPort(), webAppProperties, true);
     }
 
     /**
@@ -147,24 +164,26 @@ public class RepositoryServlet extends HttpServlet implements Constants {
      *
      * @param port _more_
      * @param webAppProperties _more_
+     * @param checkSsl _more_
      *
      * @throws Exception _more_
      */
     private synchronized void createRepository(int port,
-                                               Properties webAppProperties, boolean checkSsl)
-        throws Exception {
+            Properties webAppProperties, boolean checkSsl)
+            throws Exception {
         if (repository != null) {
             return;
         }
         Repository tmp = new Repository(getInitParams(), port, true);
         tmp.init(webAppProperties);
-        if(checkSsl) {
+        if (checkSsl) {
             int sslPort = -1;
-            String ssls = tmp.getPropertyValue(PROP_SSL_PORT,(String)null, false);
-            if (ssls!=null && ssls.trim().length()>0) {
+            String ssls = tmp.getPropertyValue(PROP_SSL_PORT, (String) null,
+                              false);
+            if ((ssls != null) && (ssls.trim().length() > 0)) {
                 sslPort = new Integer(ssls.trim());
             }
-            if(sslPort>=0) {
+            if (sslPort >= 0) {
                 tmp.getLogManager().logInfo("SSL: using port:" + sslPort);
                 tmp.setHttpsPort(sslPort);
             }
@@ -176,7 +195,7 @@ public class RepositoryServlet extends HttpServlet implements Constants {
 
 
 
-    
+
 
 
     /**
@@ -572,6 +591,7 @@ public class RepositoryServlet extends HttpServlet implements Constants {
         }
 
     }
+
 
 
 

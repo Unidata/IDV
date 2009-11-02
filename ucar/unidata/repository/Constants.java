@@ -292,6 +292,7 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_ADDMETADATA = "addmetadata";
 
+    /** _more_          */
     public static final String ATTR_FILESIZE = "filesize";
 
 
@@ -592,6 +593,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ENTRYID = "entryid";
 
+    /** _more_          */
     public static final String ARG_LOCALEID = "localeid";
 
     /** _more_ */
@@ -1022,6 +1024,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_USER_NEW = "user.new";
 
+    /** _more_          */
     public static final String ARG_PASSWORD = "password";
 
     /** _more_ */
@@ -1099,6 +1102,7 @@ public interface Constants {
     /** _more_ */
     public static final String TAG_DESCRIPTION = "description";
 
+    /** _more_          */
     public static final String TAG_SERVICE = "service";
 
     /** _more_ */
@@ -1148,6 +1152,12 @@ public interface Constants {
 
 
 
+
+    /** _more_          */
+    public static final String PROP_BUILD_VERSION = "ramadda.build.version";
+
+    /** _more_          */
+    public static final String PROP_BUILD_DATE = "ramadda.build.date";
 
     /** _more_ */
     public static final String PROP_ACCESS_ADMINONLY =
@@ -1207,9 +1217,17 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_DB_CANCACHE = "ramadda.db.cancache";
 
-    public static final String PROP_DB_POOL_MAXACTIVE = "ramadda.db.pool.maxactive";
-    public static final String PROP_DB_POOL_MAXIDLE = "ramadda.db.pool.maxidle";
-    public static final String PROP_DB_POOL_TIMEUNTILCLOSED    = "ramadda.db.pool.timeuntilclosed";
+    /** _more_          */
+    public static final String PROP_DB_POOL_MAXACTIVE =
+        "ramadda.db.pool.maxactive";
+
+    /** _more_          */
+    public static final String PROP_DB_POOL_MAXIDLE =
+        "ramadda.db.pool.maxidle";
+
+    /** _more_          */
+    public static final String PROP_DB_POOL_TIMEUNTILCLOSED =
+        "ramadda.db.pool.timeuntilclosed";
 
 
     /** _more_ */
@@ -1375,10 +1393,14 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_SSL_PORT = "ramadda.ssl.port";
 
+    /** _more_          */
     public static final String PROP_SSL_PASSWORD = "ramadda.ssl.password";
 
-    public static final String PROP_SSL_KEYPASSWORD = "ramadda.ssl.keypassword";
+    /** _more_          */
+    public static final String PROP_SSL_KEYPASSWORD =
+        "ramadda.ssl.keypassword";
 
+    /** _more_          */
     public static final String PROP_SSL_KEYSTORE = "ramadda.ssl.keystore";
 
 
@@ -1561,7 +1583,10 @@ public interface Constants {
         "The association has been added";
 
 
+    /** _more_          */
     public static final String SERVICE_OPENDAP = "opendap";
+
+    /** _more_          */
     public static final String SERVICE_FILE = "file";
 
 

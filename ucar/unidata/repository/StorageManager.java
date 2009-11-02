@@ -23,6 +23,11 @@
 package ucar.unidata.repository;
 
 
+
+import org.python.core.*;
+import org.python.util.*;
+
+
 import org.w3c.dom.*;
 
 
@@ -52,10 +57,6 @@ import java.io.InputStream;
 
 import java.lang.reflect.*;
 
-
-
-import org.python.core.*;
-import org.python.util.*;
 import java.net.*;
 
 
@@ -241,17 +242,23 @@ public class StorageManager extends RepositoryManager {
     }
 
 
+    /** _more_          */
     private boolean haveInitializedPython = false;
 
 
+    /**
+     * _more_
+     */
     public void initPython() {
-        if(haveInitializedPython) return;
+        if (haveInitializedPython) {
+            return;
+        }
         haveInitializedPython = true;
-        String pythonCacheDir =  getCacheDir().toString();
-        Properties pythonProps = new Properties();
+        String     pythonCacheDir = getCacheDir().toString();
+        Properties pythonProps    = new Properties();
         pythonProps.put("python.home", pythonCacheDir);
         PythonInterpreter.initialize(System.getProperties(), pythonProps,
-                                     new String[]{});
+                                     new String[] {});
     }
 
 

@@ -25,10 +25,10 @@ package ucar.unidata.repository.output;
 import org.w3c.dom.Element;
 
 import ucar.unidata.repository.*;
-import ucar.unidata.repository.type.*;
 
 import ucar.unidata.repository.collab.*;
 import ucar.unidata.repository.metadata.*;
+import ucar.unidata.repository.type.*;
 
 
 import ucar.unidata.sql.SqlUtil;
@@ -153,8 +153,17 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      */
     public void clearCache() {}
 
-    public void addToEntryNode(Request request, Entry entry, Element node) throws Exception  {
-    }
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param node _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addToEntryNode(Request request, Entry entry, Element node)
+            throws Exception {}
 
 
     /**
@@ -660,7 +669,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      */
     public static String getGroupSelect(Request request, String elementId)
             throws Exception {
-        return getSelect(request, elementId, "Select", false, "",null);
+        return getSelect(request, elementId, "Select", false, "", null);
     }
 
 
@@ -686,6 +695,20 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param elementId _more_
+     * @param label _more_
+     * @param allEntries _more_
+     * @param type _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public static String getSelect(Request request, String elementId,
                                    String label, boolean allEntries,
                                    String type, Entry entry)
@@ -693,8 +716,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         String event = HtmlUtil.call("selectInitialClick",
                                      "event," + HtmlUtil.squote(elementId)
                                      + "," + HtmlUtil.squote("" + allEntries)
-                                     + "," + HtmlUtil.squote(type) 
-                                     + "," + (entry!=null?HtmlUtil.squote(entry.getId()):"null"));
+                                     + "," + HtmlUtil.squote(type) + ","
+                                     + ((entry != null)
+                                        ? HtmlUtil.squote(entry.getId())
+                                        : "null"));
         String clearEvent = HtmlUtil.call("clearSelect",
                                           HtmlUtil.squote(elementId));
         return HtmlUtil.mouseClickHref(
@@ -732,21 +757,24 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             ARG_SELECTTYPE, request.getString(ARG_SELECTTYPE, "")
         });
 
-        String prefix = (!entry.isGroup()? HtmlUtil.img(
-                                                                getRepository().iconUrl(ICON_BLANK),"", HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,"10")):
-                         HtmlUtil.img(
-                                     getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
-                            msg("Click to open group"),
-                            HtmlUtil.id("img_" + uid)
-                            + HtmlUtil.onMouseClick(
-                                HtmlUtil.call(
-                                    "folderClick",
-                                    HtmlUtil.comma(
-                                        HtmlUtil.squote(uid),
-                                        HtmlUtil.squote(folderClickUrl),
-                                        HtmlUtil.squote(
-                                            iconUrl(
-                                                    ICON_TOGGLEARROWDOWN)))))));
+        String prefix = ( !entry.isGroup()
+                          ? HtmlUtil.img(getRepository().iconUrl(ICON_BLANK),
+                                         "",
+                                         HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
+                                             "10"))
+                          : HtmlUtil.img(
+                              getRepository().iconUrl(ICON_TOGGLEARROWRIGHT),
+                              msg("Click to open group"),
+                              HtmlUtil.id("img_" + uid)
+                              + HtmlUtil.onMouseClick(
+                                  HtmlUtil.call(
+                                      "folderClick",
+                                      HtmlUtil.comma(
+                                          HtmlUtil.squote(uid),
+                                          HtmlUtil.squote(folderClickUrl),
+                                          HtmlUtil.squote(
+                                              iconUrl(
+                                                  ICON_TOGGLEARROWDOWN)))))));
 
 
         String img = prefix + HtmlUtil.space(1) + HtmlUtil.img(icon);
@@ -1444,6 +1472,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /** _more_ */
     public static final String WIKIPROP_CHILDREN = "children";
 
+    /** _more_          */
     public static final String WIKIPROP_URL = "url";
 
     //        WIKIPROP_IMPORT = "import";
@@ -1585,102 +1614,146 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     }
 
 
-    public String getWikiImage(Request request,String url, Entry entry, Hashtable props)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param url _more_
+     * @param entry _more_
+     * @param props _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getWikiImage(Request request, String url, Entry entry,
+                               Hashtable props)
             throws Exception {
-	String width = (String)props.get(HtmlUtil.ATTR_WIDTH);
-	String extra = "";
-	
-	if(width!=null)
-	    extra = HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, width);
-	String img =  HtmlUtil.img(url, entry.getName(),extra);
-	boolean link = Misc.equals("true",props.get("link"));
-	if(link) {
-	    return HtmlUtil.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
-						  entry), img);
+        String width = (String) props.get(HtmlUtil.ATTR_WIDTH);
+        String extra = "";
 
-	}
-	return img;
+        if (width != null) {
+            extra = HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, width);
+        }
+        String  img  = HtmlUtil.img(url, entry.getName(), extra);
+        boolean link = Misc.equals("true", props.get("link"));
+        if (link) {
+            return HtmlUtil.href(
+                request.entryUrl(getRepository().URL_ENTRY_SHOW, entry), img);
+
+        }
+        return img;
     }
 
 
-    public String getWikiUrl(WikiUtil wikiUtil, Request request,
-                                 Entry entry, Hashtable props)
+    /**
+     * _more_
+     *
+     * @param wikiUtil _more_
+     * @param request _more_
+     * @param entry _more_
+     * @param props _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getWikiUrl(WikiUtil wikiUtil, Request request, Entry entry,
+                             Hashtable props)
             throws Exception {
 
-	String src = (String)props.get("src");
-	Entry srcEntry=null;
-	if(src==null) {
-	    srcEntry = entry;
-	} else {
-	    src = src.trim();
-	    if(src.length()==0 || entry.getName().equals(src)) {
-		srcEntry = entry;
-	    } else if(entry instanceof Group) {
-		srcEntry = getEntryManager().findEntryWithName(request, (Group)entry, src);
-	    }
-	}
-	if(srcEntry==null) {
-	    srcEntry = getEntryManager().getEntry(request, src);
-	}
+        String src      = (String) props.get("src");
+        Entry  srcEntry = null;
+        if (src == null) {
+            srcEntry = entry;
+        } else {
+            src = src.trim();
+            if ((src.length() == 0) || entry.getName().equals(src)) {
+                srcEntry = entry;
+            } else if (entry instanceof Group) {
+                srcEntry = getEntryManager().findEntryWithName(request,
+                        (Group) entry, src);
+            }
+        }
+        if (srcEntry == null) {
+            srcEntry = getEntryManager().getEntry(request, src);
+        }
 
-	if(srcEntry==null) {
-	    return msg("Could not find src:" + src);
-	}
-	
-	return request.entryUrl(getRepository().URL_ENTRY_SHOW,	srcEntry);
+        if (srcEntry == null) {
+            return msg("Could not find src:" + src);
+        }
+
+        return request.entryUrl(getRepository().URL_ENTRY_SHOW, srcEntry);
 
     }
 
 
+    /**
+     * _more_
+     *
+     * @param wikiUtil _more_
+     * @param request _more_
+     * @param entry _more_
+     * @param props _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public String getWikiImage(WikiUtil wikiUtil, Request request,
-                                 Entry entry, Hashtable props)
+                               Entry entry, Hashtable props)
             throws Exception {
 
-	String src = (String)props.get("src");
-	if(src==null) {
-	    if ( !entry.getResource().isImage()) {
-		return msg("Not an image");
-	    }
-	    return  getWikiImage(request,getImageUrl(request, entry), entry,props);
-	}
+        String src = (String) props.get("src");
+        if (src == null) {
+            if ( !entry.getResource().isImage()) {
+                return msg("Not an image");
+            }
+            return getWikiImage(request, getImageUrl(request, entry), entry,
+                                props);
+        }
 
-	String attachment = null;
-	int idx = src.indexOf("::");
-	if(idx>=0) {
+        String attachment = null;
+        int    idx        = src.indexOf("::");
+        if (idx >= 0) {
             List<String> toks = StringUtil.splitUpTo(src, "::", 2);
-	    if(toks.size()==2) {
-		src = toks.get(0);
-		attachment = toks.get(1).substring(1);
-	    }
-	}
-	src = src.trim();
-	Entry srcEntry=null;
+            if (toks.size() == 2) {
+                src        = toks.get(0);
+                attachment = toks.get(1).substring(1);
+            }
+        }
+        src = src.trim();
+        Entry srcEntry = null;
 
-	if(src.length()==0 || entry.getName().equals(src)) {
-	    srcEntry = entry;
-	} else if(entry instanceof Group) {
-	    srcEntry = getEntryManager().findEntryWithName(request, (Group)entry, src);
-	}
-	if(srcEntry==null) {
-	    return msg("Could not find src:" + src);
-	}
-	if(attachment==null) {
-	    if ( !srcEntry.getResource().isImage()) {
-		return msg("Not an image");
-	    }
-	    return getWikiImage(request,getImageUrl(request, srcEntry), srcEntry,props);
-	}
+        if ((src.length() == 0) || entry.getName().equals(src)) {
+            srcEntry = entry;
+        } else if (entry instanceof Group) {
+            srcEntry = getEntryManager().findEntryWithName(request,
+                    (Group) entry, src);
+        }
+        if (srcEntry == null) {
+            return msg("Could not find src:" + src);
+        }
+        if (attachment == null) {
+            if ( !srcEntry.getResource().isImage()) {
+                return msg("Not an image");
+            }
+            return getWikiImage(request, getImageUrl(request, srcEntry),
+                                srcEntry, props);
+        }
 
 
         for (Metadata metadata : getMetadataManager().getMetadata(srcEntry)) {
-	    MetadataType metadataType = getMetadataManager().findType(metadata.getType());
-	    String url = metadataType.getImageUrl(request, srcEntry,metadata,attachment);
-	    if(url!=null) {
-		return getWikiImage(request,url, srcEntry,props);
-	    }
-	}
+            MetadataType metadataType =
+                getMetadataManager().findType(metadata.getType());
+            String url = metadataType.getImageUrl(request, srcEntry,
+                             metadata, attachment);
+            if (url != null) {
+                return getWikiImage(request, url, srcEntry, props);
+            }
+        }
 
-	return msg("Could not find image attachment:" + attachment);
+        return msg("Could not find image attachment:" + attachment);
     }
 
 
@@ -1986,7 +2059,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
                             "Add link", true, "wikilink") + HtmlUtil.space(1)
                                 + OutputHandler.getSelect(request,
                                     textAreaId, "Add import entry", true,
-                                                          "entryid", entry);
+                                    "entryid", entry);
 
         StringBuffer buttons = new StringBuffer();
         buttons.append(addWikiEditButton(textAreaId, "button_bold.png",

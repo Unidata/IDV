@@ -20,13 +20,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository.client;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
@@ -111,6 +111,7 @@ public class ClientEntry implements Constants {
     private String type;
 
 
+    /** _more_          */
     private boolean isGroup = false;
 
 
@@ -156,10 +157,10 @@ public class ClientEntry implements Constants {
         setType(XmlUtil.getAttribute(node, ATTR_TYPE, ""));
         setParentGroupId(XmlUtil.getAttribute(node, ATTR_GROUP, ""));
         setIsGroup(XmlUtil.getAttribute(node, ATTR_ISGROUP, false));
-        north = XmlUtil.getAttribute(node, ATTR_NORTH,north);
-        south = XmlUtil.getAttribute(node, ATTR_SOUTH,south);
-        east = XmlUtil.getAttribute(node, ATTR_EAST,east);
-        west = XmlUtil.getAttribute(node, ATTR_WEST,west);
+        north = XmlUtil.getAttribute(node, ATTR_NORTH, north);
+        south = XmlUtil.getAttribute(node, ATTR_SOUTH, south);
+        east  = XmlUtil.getAttribute(node, ATTR_EAST, east);
+        west  = XmlUtil.getAttribute(node, ATTR_WEST, west);
 
 
         String desc = XmlUtil.getGrandChildText(node, TAG_DESCRIPTION);
@@ -268,21 +269,21 @@ public class ClientEntry implements Constants {
     }
 
     /**
-       Set the IsGroup property.
-
-       @param value The new value for IsGroup
-    **/
-    public void setIsGroup (boolean value) {
-	isGroup = value;
+     *  Set the IsGroup property.
+     *
+     *  @param value The new value for IsGroup
+     */
+    public void setIsGroup(boolean value) {
+        isGroup = value;
     }
 
     /**
-       Get the IsGroup property.
-
-       @return The IsGroup
-    **/
-    public boolean getIsGroup () {
-	return isGroup;
+     *  Get the IsGroup property.
+     *
+     *  @return The IsGroup
+     */
+    public boolean getIsGroup() {
+        return isGroup;
     }
 
 

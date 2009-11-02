@@ -27,8 +27,8 @@ import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.metadata.*;
-import ucar.unidata.repository.type.*;
 import ucar.unidata.repository.output.OutputHandler;
+import ucar.unidata.repository.type.*;
 
 
 import ucar.unidata.sql.Clause;
@@ -375,7 +375,8 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
     public List<WikiPageHistory> getHistoryList(Entry entry, Date date,
             boolean includeText)
             throws Exception {
-        Statement statement = getDatabaseManager().select(SqlUtil.comma(includeText
+        Statement statement =
+            getDatabaseManager().select(SqlUtil.comma(includeText
                 ? new String[] { Tables.WIKIPAGEHISTORY.COL_USER_ID,
                                  Tables.WIKIPAGEHISTORY.COL_DATE,
                                  Tables.WIKIPAGEHISTORY.COL_DESCRIPTION,
@@ -397,7 +398,7 @@ public class WikiPageTypeHandler extends GenericTypeHandler {
                                      + Tables.WIKIPAGEHISTORY.COL_DATE
                                      + " asc ");
 
-        SqlUtil.Iterator      iter = getDatabaseManager().getIterator(statement);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
         ResultSet             results;
         List<WikiPageHistory> history = new ArrayList<WikiPageHistory>();
         int                   version = 1;

@@ -21,9 +21,11 @@
  */
 
 package ucar.unidata.repository.type;
-import ucar.unidata.repository.*;
+
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.output.*;
@@ -2019,7 +2021,7 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public List<Clause> assembleWhereClause(Request request,
-            StringBuffer searchCriteria)
+                                            StringBuffer searchCriteria)
             throws Exception {
 
         List<Clause> where    = new ArrayList<Clause>();

@@ -382,7 +382,7 @@ public class MonitorManager extends RepositoryManager {
         } else if (type.equals("ldm") || type.equals("exec")) {
             if ( !request.getUser().getAdmin()) {
                 throw new IllegalArgumentException(
-                    "You need to be an admin to add an " + type +" action");
+                    "You need to be an admin to add an " + type + " action");
             }
             if (type.equals("ldm")) {
                 monitor.addAction(new LdmAction(getRepository().getGUID()));
@@ -483,7 +483,7 @@ public class MonitorManager extends RepositoryManager {
         }
 
         sb.append(HtmlUtil.br());
-        String ldmCreate = "";
+        String ldmCreate  = "";
         String execCreate = "";
         if (request.getUser().getAdmin()) {
             ldmCreate = request.form(getRepositoryBase().URL_USER_MONITORS)
@@ -491,9 +491,9 @@ public class MonitorManager extends RepositoryManager {
                         + HtmlUtil.hidden(ARG_MONITOR_TYPE, "ldm")
                         + HtmlUtil.formClose();
             execCreate = request.form(getRepositoryBase().URL_USER_MONITORS)
-                        + HtmlUtil.submit("Exec Action", ARG_MONITOR_CREATE)
-                        + HtmlUtil.hidden(ARG_MONITOR_TYPE, "exec")
-                        + HtmlUtil.formClose();
+                         + HtmlUtil.submit("Exec Action", ARG_MONITOR_CREATE)
+                         + HtmlUtil.hidden(ARG_MONITOR_TYPE, "exec")
+                         + HtmlUtil.formClose();
         }
 
         String[] createTypesxxx = {

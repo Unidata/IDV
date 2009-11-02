@@ -330,6 +330,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private List<String> metadataDefFiles = new ArrayList<String>();
 
 
+    /** _more_          */
     private List<String> pythonLibs = new ArrayList<String>();
 
 
@@ -353,6 +354,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private UserManager userManager;
 
+    /** _more_          */
     private OaiManager oaiManager;
 
     /** _more_ */
@@ -510,7 +512,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (getProperty(PROP_SSL_IGNORE, false)) {
             return false;
         }
-	return getHttpsPort()>=0;
+        return getHttpsPort() >= 0;
     }
 
 
@@ -646,9 +648,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param port _more_
+     */
     protected void setHttpsPort(int port) {
-	super.setHttpsPort(port);
-	reinitializeRequestUrls();
+        super.setHttpsPort(port);
+        reinitializeRequestUrls();
     }
 
 
@@ -660,7 +667,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     protected void init(Properties properties) throws Exception {
-	/*
+        /*
         final PrintStream oldErr = System.err;
         final PrintStream oldOut = System.out;
         System.setErr(new PrintStream(oldOut){
@@ -671,7 +678,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     oldErr.println(x);
                 }
             });
-	*/
+        */
 
 
 
@@ -706,6 +713,12 @@ public class Repository extends RepositoryBase implements RequestHandler {
             IOUtil.getInputStream(
                 "/ucar/unidata/repository/resources/repository.properties",
                 getClass()));
+        try {
+            properties.load(
+                IOUtil.getInputStream(
+                    "/ucar/unidata/repository/resources/build.properties",
+                    getClass()));
+        } catch (Exception exc) {}
 
         for (int i = 0; i < args.length; i++) {
             if (checkFile(args[i])) {
@@ -756,23 +769,28 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         try {
             //Now load in the local properties file
-	    //First load in the repository.properties file
-	    String localPropertyFile =
-		IOUtil.joinDir(getStorageManager().getRepositoryDir(),
-			       "repository.properties");
-	    if(new File(localPropertyFile).exists()) {
-		properties.load(IOUtil.getInputStream(localPropertyFile,
-						      getClass()));
-	    }
+            //First load in the repository.properties file
+            String localPropertyFile =
+                IOUtil.joinDir(getStorageManager().getRepositoryDir(),
+                               "repository.properties");
+            if (new File(localPropertyFile).exists()) {
+                properties.load(IOUtil.getInputStream(localPropertyFile,
+                        getClass()));
+            }
 
-	    File[] localFiles = getStorageManager().getRepositoryDir().listFiles();
-	    for(File f: localFiles) {
-		if(!f.toString().endsWith(".properties")) continue;
-		if(f.getName().equals("repository.properties")) continue;
-		properties.load(IOUtil.getInputStream(f.toString(),
-						      getClass()));
-		
-	    }
+            File[] localFiles =
+                getStorageManager().getRepositoryDir().listFiles();
+            for (File f : localFiles) {
+                if ( !f.toString().endsWith(".properties")) {
+                    continue;
+                }
+                if (f.getName().equals("repository.properties")) {
+                    continue;
+                }
+                properties.load(IOUtil.getInputStream(f.toString(),
+                        getClass()));
+
+            }
 
         } catch (Exception exc) {}
 
@@ -1191,8 +1209,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<String> getPythonLibs() {
-	return pythonLibs;
+        return pythonLibs;
     }
 
 
@@ -1480,10 +1503,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 for (int entryIdx = 0; entryIdx < entries.size();
                         entryIdx++) {
                     String entry = (String) entries.get(entryIdx);
-		    //                    if ( !checkFile(entry)) {
-                        //                        getLogManager().logError("Don't know how to handle plugin resource:"
-                        //                                 + entry + " from plugin:" + plugins[i]);
-		    //                    }
+                    //                    if ( !checkFile(entry)) {
+                    //                        getLogManager().logError("Don't know how to handle plugin resource:"
+                    //                                 + entry + " from plugin:" + plugins[i]);
+                    //                    }
                 }
             } else {
                 checkFile(pluginFile);
@@ -2958,10 +2981,18 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public String getProperty(String name) {
-	return getPropertyValue(name, true);
+        return getPropertyValue(name, true);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param checkDb _more_
+     *
+     * @return _more_
+     */
     public String getPropertyValue(String name, boolean checkDb) {
         if (systemEnv == null) {
             systemEnv = System.getenv();
@@ -2994,7 +3025,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
         //Then the  database properties  first
-        if (checkDb && prop == null) {
+        if (checkDb && (prop == null)) {
             prop = (String) dbProperties.get(name);
         }
 
@@ -3027,12 +3058,22 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     public String getProperty(String name, String dflt) {
-	return getPropertyValue(name, dflt, true);
+        return getPropertyValue(name, dflt, true);
     }
 
 
-    public String getPropertyValue(String name, String dflt,boolean checkDb) {
-        String prop = getPropertyValue(name,checkDb);
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param dflt _more_
+     * @param checkDb _more_
+     *
+     * @return _more_
+     */
+    public String getPropertyValue(String name, String dflt,
+                                   boolean checkDb) {
+        String prop = getPropertyValue(name, checkDb);
         if (prop != null) {
             return prop;
         }
@@ -3136,7 +3177,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                          getProperty(PROP_DB_SCRIPT));
         sql = getDatabaseManager().convertSql(sql);
 
-        getDatabaseManager().loadSql(sql,  true,false);
+        getDatabaseManager().loadSql(sql, true, false);
 
         for (String file : typeDefFiles) {
             file = getStorageManager().localizePath(file);
@@ -4377,7 +4418,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
             typeHandler.select(request,
                                SqlUtil.distinct(Tables.ENTRIES.COL_TYPE),
                                where, "");
-        String[] types = SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1);
+        String[] types =
+            SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1);
         for (int i = 0; i < types.length; i++) {
             TypeHandler theTypeHandler = getTypeHandler(types[i]);
 
@@ -4405,9 +4447,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
         Statement stmt = getDatabaseManager().select(
                              SqlUtil.distinct(Tables.ENTRIES.COL_DATATYPE),
                              Tables.ENTRIES.NAME, new Clause[] {});
-        String[]  types = SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1);
-        List      tmp   = new ArrayList();
-        Hashtable seen  = new Hashtable();
+        String[] types =
+            SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1);
+        List      tmp  = new ArrayList();
+        Hashtable seen = new Hashtable();
         for (TypeHandler typeHandler : getTypeHandlers()) {
             if (typeHandler.hasDefaultDataType()
                     && (seen.get(typeHandler.getDefaultDataType()) == null)) {

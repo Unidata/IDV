@@ -20,12 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
-
 package ucar.unidata.repository.client;
-
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.Document;
@@ -33,6 +28,8 @@ import org.w3c.dom.Document;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.ui.HttpFormEntry;
 
@@ -335,13 +332,14 @@ public class RepositoryClient extends RepositoryBase {
         }
 
         Element response = XmlUtil.getRoot(result[1]);
-        if (!responseOk(response)) {
+        if ( !responseOk(response)) {
             String body = XmlUtil.getChildText(response);
             throw new EntryErrorException(body);
         }
         Element newEntryNode = XmlUtil.findChild(response, TAG_ENTRY);
-        if(newEntryNode==null) {
-            throw new IllegalStateException("No entry node found in:"+ XmlUtil.toString(response));
+        if (newEntryNode == null) {
+            throw new IllegalStateException("No entry node found in:"
+                                            + XmlUtil.toString(response));
         }
         return XmlUtil.getAttribute(newEntryNode, ATTR_ID);
 
@@ -828,10 +826,10 @@ public class RepositoryClient extends RepositoryBase {
         Element root = XmlUtil.getRoot(contents);
 
         String sslPortProp = XmlUtil.getGrandChildText(root,
-                                            ServerInfo.TAG_INFO_SSLPORT);
-	if(sslPortProp!=null && sslPortProp.trim().length()>0) {
-	    sslPort  = new Integer(sslPortProp.trim()).intValue();
-	}
+                                 ServerInfo.TAG_INFO_SSLPORT);
+        if ((sslPortProp != null) && (sslPortProp.trim().length() > 0)) {
+            sslPort = new Integer(sslPortProp.trim()).intValue();
+        }
 
         title = XmlUtil.getGrandChildText(root, ServerInfo.TAG_INFO_TITLE);
         description = XmlUtil.getGrandChildText(root,

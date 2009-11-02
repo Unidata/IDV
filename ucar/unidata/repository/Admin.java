@@ -1,5 +1,3 @@
-
-
 /**
  * $Id: ,v 1.90 2007/08/06 17:02:27 jeffmc Exp $
  *
@@ -970,13 +968,12 @@ public class Admin extends RepositoryManager {
                 PROP_ACCESS_ALLSSL, "true",
                 getProperty(PROP_ACCESS_ALLSSL, false)) + " "
                     + msg("Force all connections to be secure");
-        String sslMsg =       "Note: To enable ssl see the installation guide";
+        String sslMsg = "Note: To enable ssl see the installation guide";
         csb.append(
             HtmlUtil.formEntryTop(
                 msgLabel("SSL"),
-		allSslCbx  + HtmlUtil.br()
-                                     + getRepository().showDialogNote(
-                                         sslMsg)));
+                allSslCbx + HtmlUtil.br()
+                + getRepository().showDialogNote(sslMsg)));
 
 
 
@@ -1460,13 +1457,14 @@ public class Admin extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         sb.append(msgHeader("Access Overview"));
 
-        Statement statement = getDatabaseManager().execute(
-                             "select "
-                             + SqlUtil.comma(
-                                 Tables.PERMISSIONS.COL_ENTRY_ID,
-                                 Tables.PERMISSIONS.COL_ACTION,
-                                 Tables.PERMISSIONS.COL_ROLE) + " from "
-                                     + Tables.PERMISSIONS.NAME, 10000000, 0);
+        Statement statement =
+            getDatabaseManager().execute(
+                "select "
+                + SqlUtil.comma(
+                    Tables.PERMISSIONS.COL_ENTRY_ID,
+                    Tables.PERMISSIONS.COL_ACTION,
+                    Tables.PERMISSIONS.COL_ROLE) + " from "
+                        + Tables.PERMISSIONS.NAME, 10000000, 0);
 
         Hashtable<String, List> idToPermissions = new Hashtable<String,
                                                       List>();
@@ -1551,6 +1549,16 @@ public class Admin extends RepositoryManager {
         usedMemory  = usedMemory / 1000000.0;
         statusSB.append(
             HtmlUtil.formEntry(
+                msgLabel("Version"),
+                getRepository().getProperty(PROP_BUILD_VERSION, "1.0")));
+        statusSB.append(
+            HtmlUtil.formEntry(
+                msgLabel("Build Date"),
+                getRepository().getProperty(PROP_BUILD_DATE, "N/A")));
+
+
+        statusSB.append(
+            HtmlUtil.formEntry(
                 msgLabel("Total Memory Available"),
                 fmt.format(totalMemory) + " (MB)"));
         statusSB.append(HtmlUtil.formEntry(msgLabel("Used Memory"),
@@ -1574,7 +1582,7 @@ public class Admin extends RepositoryManager {
 
         StringBuffer dbSB = new StringBuffer();
 
-	getDatabaseManager().addStatistics(request,dbSB);
+        getDatabaseManager().addStatistics(request, dbSB);
 
         StringBuffer sb = new StringBuffer();
         sb.append(HtmlUtil.makeShowHideBlock(msg("System Status"),
@@ -1647,7 +1655,7 @@ public class Admin extends RepositoryManager {
         long t1 = System.currentTimeMillis();
 
         if (bulkLoad) {
-            getDatabaseManager().loadSql(query,  false, true);
+            getDatabaseManager().loadSql(query, false, true);
             return makeResult(request, msg("SQL"),
                               new StringBuffer("Executed SQL" + "<P>"
                                   + HtmlUtil.space(1) + sb.toString()));
@@ -1661,11 +1669,12 @@ public class Admin extends RepositoryManager {
                 throw exc;
             }
 
-            SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
-            ResultSet        results;
-            int              cnt    = 0;
-            Hashtable        map    = new Hashtable();
-            int              unique = 0;
+            SqlUtil.Iterator iter =
+                getDatabaseManager().getIterator(statement);
+            ResultSet results;
+            int       cnt    = 0;
+            Hashtable map    = new Hashtable();
+            int       unique = 0;
             while ((results = iter.next()) != null) {
                 ResultSetMetaData rsmd = results.getMetaData();
                 while (results.next()) {
@@ -1741,9 +1750,10 @@ public class Admin extends RepositoryManager {
         boolean      delete = request.get("delete", false);
         StringBuffer sb     = new StringBuffer();
         Statement statement = getDatabaseManager().execute("select "
-                             + Tables.ENTRIES.COL_ID + ","
-                             + Tables.ENTRIES.COL_PARENT_GROUP_ID + " from "
-                             + Tables.ENTRIES.NAME, 10000000, 0);
+                                  + Tables.ENTRIES.COL_ID + ","
+                                  + Tables.ENTRIES.COL_PARENT_GROUP_ID
+                                  + " from " + Tables.ENTRIES.NAME, 10000000,
+                                      0);
         SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
         ResultSet        results;
         int              cnt        = 0;
@@ -1848,12 +1858,13 @@ public class Admin extends RepositoryManager {
                                 Tables.ENTRIES.COL_RESOURCE_TYPE,
                                 Resource.TYPE_FILE));
 
-            SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
-            ResultSet        results;
-            int              cnt       = 0;
-            int              deleteCnt = 0;
-            long             t1        = System.currentTimeMillis();
-            List<Entry>      entries   = new ArrayList<Entry>();
+            SqlUtil.Iterator iter =
+                getDatabaseManager().getIterator(statement);
+            ResultSet   results;
+            int         cnt       = 0;
+            int         deleteCnt = 0;
+            long        t1        = System.currentTimeMillis();
+            List<Entry> entries   = new ArrayList<Entry>();
             while ((results = iter.next()) != null) {
                 while (results.next()) {
                     if ((cleanupTS != myTS) || !runningCleanup) {

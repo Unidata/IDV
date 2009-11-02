@@ -21,8 +21,6 @@
 
 package ucar.unidata.repository.data;
 
-import ucar.unidata.repository.type.*;
-
 
 import org.jfree.chart.*;
 import org.jfree.chart.annotations.*;
@@ -96,6 +94,8 @@ import ucar.unidata.data.point.TextPointDataSource;
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.output.OutputHandler;
+
+import ucar.unidata.repository.type.*;
 import ucar.unidata.sql.Clause;
 
 import ucar.unidata.sql.SqlUtil;
@@ -607,18 +607,19 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
         }
         sql.append(")");
         getDatabaseManager().execute(
-                                     connection, getDatabaseManager().convertSql(sql.toString()),
-                                                 1000, 10000);
+            connection, getDatabaseManager().convertSql(sql.toString()),
+            1000, 10000);
 
         for (String index : indexSql) {
             getDatabaseManager().loadSql(index, false, false);
         }
 
-        List<Object[]> valueList  = new ArrayList<Object[]>();
+        List<Object[]> valueList = new ArrayList<Object[]>();
         for (PointDataMetadata pdm : metadata) {
             valueList.add(pdm.getValues());
         }
-        getDatabaseManager().executeInsert(Tables.POINTDATAMETADATA.INSERT, valueList);
+        getDatabaseManager().executeInsert(Tables.POINTDATAMETADATA.INSERT,
+                                           valueList);
     }
 
 
@@ -845,7 +846,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
 
         properties.put(PROP_CNT, totalCnt + "");
         properties.put(PROP_ID, baseId + "");
-	setProperties(entry, properties);
+        setProperties(entry, properties);
 
         if (didone) {
             entry.setWest(west);
@@ -2642,7 +2643,9 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
                     Statement stmt = getDatabaseManager().select(
                                          SqlUtil.distinct(pdm.columnName),
                                          tableName, (Clause) null);
-                    values = Misc.toList(SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1));
+                    values = Misc.toList(
+                        SqlUtil.readString(
+                            getDatabaseManager().getIterator(stmt), 1));
                     values = new ArrayList(Misc.sort(values));
                     values.add(0, "");
                     pdm.enumeratedValues = values;
@@ -2803,8 +2806,9 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
                                 + Tables.POINTDATAMETADATA.COL_COLUMNNUMBER
                                 + " ASC ");
 
-            SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
-            ResultSet        results;
+            SqlUtil.Iterator iter =
+                getDatabaseManager().getIterator(statement);
+            ResultSet results;
             while ((results = iter.next()) != null) {
                 while (results.next()) {
                     int col = 1;

@@ -393,35 +393,48 @@ public class MetadataTypeBase extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param metadata _more_
+     * @param matchFile _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public String getImageUrl(Request request, Entry entry,
-                              Metadata metadata,String matchFile) throws Exception { 
+                              Metadata metadata, String matchFile)
+            throws Exception {
         for (MetadataElement element : getChildren()) {
             if ( !element.getDataType().equals(element.TYPE_FILE)) {
                 continue;
             }
 
-	    File f = getFile(entry, metadata, element);
-	    if (f == null) {
-		return null;
-	    }
+            File f = getFile(entry, metadata, element);
+            if (f == null) {
+                return null;
+            }
 
-	    String tail  = getStorageManager().getFileTail(f.toString());
-	    if(matchFile!=null && !Misc.equals(matchFile, tail)) {
-		continue;
-	    }
-	    if (ImageUtils.isImage(f.toString())) {
-		String path =
-		    handler.getRepository().getMetadataManager().URL_METADATA_VIEW
-		    + "/" + tail;
-		
-		return HtmlUtil.url(path, ARG_ELEMENT,
-				    element.getIndex() + "", ARG_ENTRYID,
-				    metadata.getEntryId(), ARG_METADATA_ID,
-				    metadata.getId());
-	    }
-	}
-	return null;
-    } 
+            String tail = getStorageManager().getFileTail(f.toString());
+            if ((matchFile != null) && !Misc.equals(matchFile, tail)) {
+                continue;
+            }
+            if (ImageUtils.isImage(f.toString())) {
+                String path =
+                    handler.getRepository().getMetadataManager()
+                        .URL_METADATA_VIEW + "/" + tail;
+
+                return HtmlUtil.url(path, ARG_ELEMENT,
+                                    element.getIndex() + "", ARG_ENTRYID,
+                                    metadata.getEntryId(), ARG_METADATA_ID,
+                                    metadata.getId());
+            }
+        }
+        return null;
+    }
 
     /**
      * _more_

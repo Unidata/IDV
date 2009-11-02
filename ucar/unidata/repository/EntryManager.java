@@ -28,9 +28,9 @@ import ucar.unidata.repository.data.*;
 import ucar.unidata.repository.harvester.*;
 
 import ucar.unidata.repository.metadata.*;
+import ucar.unidata.repository.output.*;
 
 import ucar.unidata.repository.type.*;
-import ucar.unidata.repository.output.*;
 
 
 import ucar.unidata.sql.Clause;
@@ -171,7 +171,7 @@ public class EntryManager extends RepositoryManager {
                                   ContentMetadataHandler.TYPE_ALIAS) }), "",
                                       1);
 
-        SqlUtil.Iterator iter     = getDatabaseManager().getIterator(statement);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
         List<Comment>    comments = new ArrayList();
         ResultSet        results;
         while ((results = iter.next()) != null) {
@@ -1243,10 +1243,8 @@ return new Result(title, sb);
                          ARG_ENTRYID, entry.getId());
         //j-
         String[] macros = {
-            "entryid", entry.getId(),
-            "resourcepath",
-            entry.getResource().getPath(),
-            "resourcename",
+            "entryid", entry.getId(), "resourcepath",
+            entry.getResource().getPath(), "resourcename",
             getStorageManager().getFileTail(entry.getResource().getPath()),
             "filename",
             getStorageManager().getFileTail(entry.getResource().getPath()),
@@ -1705,82 +1703,82 @@ return new Result(title, sb);
                                                 Tables.ENTRIES.NAME,
                                                 Tables.ENTRIES.COL_ID, "?"));
 
-	try {
-        connection.setAutoCommit(false);
-        Statement statement      = connection.createStatement();
-        int       deleteCnt      = 0;
-        int       totalDeleteCnt = 0;
-        //Go backwards so we go up the tree and hit the children first
-        List allIds = new ArrayList();
-        for (int i = found.size() - 1; i >= 0; i--) {
-            String[] tuple = found.get(i);
-            String   id    = tuple[0];
-            allIds.add(id);
-            deleteCnt++;
-            totalDeleteCnt++;
-            if ((actionId != null)
-                    && !getActionManager().getActionOk(actionId)) {
+        try {
+            connection.setAutoCommit(false);
+            Statement statement      = connection.createStatement();
+            int       deleteCnt      = 0;
+            int       totalDeleteCnt = 0;
+            //Go backwards so we go up the tree and hit the children first
+            List allIds = new ArrayList();
+            for (int i = found.size() - 1; i >= 0; i--) {
+                String[] tuple = found.get(i);
+                String   id    = tuple[0];
+                allIds.add(id);
+                deleteCnt++;
+                totalDeleteCnt++;
+                if ((actionId != null)
+                        && !getActionManager().getActionOk(actionId)) {
+                    getActionManager().setActionMessage(actionId,
+                            "Delete canceled");
+                    connection.rollback();
+                    return;
+                }
                 getActionManager().setActionMessage(actionId,
-                        "Delete canceled");
-                connection.rollback();
-                return;
+                        "Deleted:" + totalDeleteCnt + "/" + found.size()
+                        + " entries");
+                getStorageManager().removeFile(
+                    new Resource(new File(tuple[2]), tuple[3]));
+
+                permissionsStmt.setString(1, id);
+                permissionsStmt.addBatch();
+
+                metadataStmt.setString(1, id);
+                metadataStmt.addBatch();
+
+                commentsStmt.setString(1, id);
+                commentsStmt.addBatch();
+
+                assocStmt.setString(1, id);
+                assocStmt.setString(2, id);
+                assocStmt.addBatch();
+
+                entriesStmt.setString(1, id);
+                entriesStmt.addBatch();
+
+                //TODO: Batch up the specific type deletes
+                TypeHandler typeHandler =
+                    getRepository().getTypeHandler(tuple[1]);
+                typeHandler.deleteEntry(request, statement, id);
+                if (deleteCnt > 1000) {
+                    permissionsStmt.executeBatch();
+                    metadataStmt.executeBatch();
+                    commentsStmt.executeBatch();
+                    assocStmt.executeBatch();
+                    entriesStmt.executeBatch();
+                    deleteCnt = 0;
+                }
             }
-            getActionManager().setActionMessage(actionId,
-                    "Deleted:" + totalDeleteCnt + "/" + found.size()
-                    + " entries");
-            getStorageManager().removeFile(new Resource(new File(tuple[2]),
-                    tuple[3]));
 
-            permissionsStmt.setString(1, id);
-            permissionsStmt.addBatch();
+            permissionsStmt.executeBatch();
+            metadataStmt.executeBatch();
+            commentsStmt.executeBatch();
+            assocStmt.executeBatch();
+            entriesStmt.executeBatch();
 
-            metadataStmt.setString(1, id);
-            metadataStmt.addBatch();
+            connection.commit();
+            connection.setAutoCommit(true);
 
-            commentsStmt.setString(1, id);
-            commentsStmt.addBatch();
-
-            assocStmt.setString(1, id);
-            assocStmt.setString(2, id);
-            assocStmt.addBatch();
-
-            entriesStmt.setString(1, id);
-            entriesStmt.addBatch();
-
-            //TODO: Batch up the specific type deletes
-            TypeHandler typeHandler =
-                getRepository().getTypeHandler(tuple[1]);
-            typeHandler.deleteEntry(request, statement, id);
-            if (deleteCnt > 1000) {
-                permissionsStmt.executeBatch();
-                metadataStmt.executeBatch();
-                commentsStmt.executeBatch();
-                assocStmt.executeBatch();
-                entriesStmt.executeBatch();
-                deleteCnt = 0;
+            for (int i = 0; i < allIds.size(); i++) {
+                getStorageManager().deleteEntryDir((String) allIds.get(i));
             }
+
+        } finally {
+            getDatabaseManager().closeStatement(permissionsStmt);
+            getDatabaseManager().closeStatement(metadataStmt);
+            getDatabaseManager().closeStatement(commentsStmt);
+            getDatabaseManager().closeStatement(assocStmt);
+            getDatabaseManager().closeStatement(entriesStmt);
         }
-
-        permissionsStmt.executeBatch();
-        metadataStmt.executeBatch();
-        commentsStmt.executeBatch();
-        assocStmt.executeBatch();
-        entriesStmt.executeBatch();
-
-        connection.commit();
-        connection.setAutoCommit(true);
-
-        for (int i = 0; i < allIds.size(); i++) {
-            getStorageManager().deleteEntryDir((String) allIds.get(i));
-        }
-
-	} finally {
-        getDatabaseManager().closeStatement(permissionsStmt);
-        getDatabaseManager().closeStatement(metadataStmt);
-        getDatabaseManager().closeStatement(commentsStmt);
-        getDatabaseManager().closeStatement(assocStmt);
-        getDatabaseManager().closeStatement(entriesStmt);
-	}
     }
 
 
@@ -1898,6 +1896,8 @@ return new Result(title, sb);
                                   ? oldType
                                   : ""), fromEmail, ""));
         User parentUser = parentGroup.getUser();
+        logInfo("upload: setting user to: " + parentUser.getName()
+                + " from parent group:" + parentGroup);
         entry.setUser(parentUser);
 
         if (true || getAdmin().isEmailCapable()) {
@@ -2701,8 +2701,7 @@ return new Result(title, sb);
                         entriesXml = new String(IOUtil.readBytes(zin, null,
                                 false));
                     } else {
-                        String name =
-                            IOUtil.getFileTail(ze.getName());
+                        String name = IOUtil.getFileTail(ze.getName());
                         File f = getStorageManager().getTmpFile(request,
                                      name);
                         FileOutputStream fos =
@@ -2816,7 +2815,8 @@ return new Result(title, sb);
         if (parentGroup == null) {
             parentGroup = (Group) getEntry(request, parentId);
             if (parentGroup == null) {
-                parentGroup = (Group) findEntryFromName(parentId, request.getUser(), false);
+                parentGroup = (Group) findEntryFromName(parentId,
+                        request.getUser(), false);
             }
 
             if (parentGroup == null) {
@@ -4377,7 +4377,8 @@ return new Result(title, sb);
 
                     ResultSet results = entryStmt.getResultSet();
                     if ( !results.next()) {
-                        getDatabaseManager().closeAndReleaseConnection(entryStmt);
+                        getDatabaseManager().closeAndReleaseConnection(
+                            entryStmt);
                         return null;
                     }
 
@@ -4447,7 +4448,7 @@ return new Result(title, sb);
         List<Entry>      entries = new ArrayList<Entry>();
         List<Entry>      groups  = new ArrayList<Entry>();
         ResultSet        results;
-        SqlUtil.Iterator iter       = getDatabaseManager().getIterator(statement);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
         boolean canDoSelectOffset   =
             getDatabaseManager().canDoSelectOffset();
         Hashtable        seen       = new Hashtable();
@@ -4689,7 +4690,8 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     private void updateEntry(Entry entry) throws Exception {
-        PreparedStatement entryStmt =getDatabaseManager().getPreparedStatement(Tables.ENTRIES.UPDATE);
+        PreparedStatement entryStmt =
+            getDatabaseManager().getPreparedStatement(Tables.ENTRIES.UPDATE);
         setStatement(entry, entryStmt, false, entry.getTypeHandler());
         entryStmt.addBatch();
         entryStmt.executeBatch();
@@ -4948,17 +4950,20 @@ return new Result(title, sb);
      *
      * @param request _more_
      * @param entry _more_
+     * @param full _more_
      *
      * @return _more_
      */
-    public String getEntryResourceUrl(Request request, Entry entry, boolean full) {
+    public String getEntryResourceUrl(Request request, Entry entry,
+                                      boolean full) {
         String fileTail = getStorageManager().getFileTail(entry);
-        if(full)
-            return HtmlUtil.url(getRepository().URL_ENTRY_GET.getFullUrl() + "/"
-                                + fileTail, ARG_ENTRYID, entry.getId());
-        else
-            return HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
-                                + fileTail, ARG_ENTRYID, entry.getId());
+        if (full) {
+            return HtmlUtil.url(getRepository().URL_ENTRY_GET.getFullUrl()
+                                + "/" + fileTail, ARG_ENTRYID, entry.getId());
+        } else {
+            return HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET)
+                                + "/" + fileTail, ARG_ENTRYID, entry.getId());
+        }
     }
 
 
@@ -5646,14 +5651,16 @@ return new Result(title, sb);
         if (group != null) {
             return group;
         }
-        String[] ids = SqlUtil.readString(
-                           getDatabaseManager().getIterator(getDatabaseManager().select(
-                               Tables.ENTRIES.COL_ID, Tables.ENTRIES.NAME,
-                               Clause.and(
-                                   Clause.eq(
-                                       Tables.ENTRIES.COL_PARENT_GROUP_ID,
-                                       parent.getId()), Clause.eq(
-                                           Tables.ENTRIES.COL_NAME, name)))));
+        String[] ids =
+            SqlUtil.readString(
+                getDatabaseManager().getIterator(
+                    getDatabaseManager().select(
+                        Tables.ENTRIES.COL_ID, Tables.ENTRIES.NAME,
+                        Clause.and(
+                            Clause.eq(
+                                Tables.ENTRIES.COL_PARENT_GROUP_ID,
+                                parent.getId()), Clause.eq(
+                                    Tables.ENTRIES.COL_NAME, name)))));
         if (ids.length == 0) {
             return null;
         }
@@ -5929,7 +5936,10 @@ return new Result(title, sb);
         Statement statement =
             getDatabaseManager().select(Tables.ENTRIES.COL_ID,
                                         Tables.ENTRIES.NAME, clauses);
-        return getGroups(request, SqlUtil.readString(getDatabaseManager().getIterator(statement), 1));
+        return getGroups(
+            request,
+            SqlUtil.readString(
+                getDatabaseManager().getIterator(statement), 1));
     }
 
 
@@ -6001,7 +6011,9 @@ return new Result(title, sb);
                                   Clause.eq(
                                       Tables.ENTRIES.COL_PARENT_GROUP_ID,
                                       getTopGroup().getId()));
-        String[]    ids    = SqlUtil.readString(getDatabaseManager().getIterator(statement), 1);
+        String[] ids =
+            SqlUtil.readString(getDatabaseManager().getIterator(statement),
+                               1);
         List<Group> groups = new ArrayList<Group>();
         for (int i = 0; i < ids.length; i++) {
             //Get the entry but don't check for access control
@@ -6333,7 +6345,7 @@ return new Result(title, sb);
             SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
             //Don't close the statement because that ends up closing the connection
             iter.setShouldCloseStatement(false);
-            ResultSet        results;
+            ResultSet results;
             while ((results = iter.next()) != null) {
                 while (results.next()) {
                     int    col       = 1;

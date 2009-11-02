@@ -5,7 +5,10 @@
 
 
     <target name="init">
-        <property  name="version" value="0.1"/>
+       <tstamp>
+         <format property="date" pattern="yyyy-MM-dd HH:mm z" timezone="UTC"/>
+       </tstamp>
+        <property  name="version" value="1.1"/>
         <property  name="build.sysclasspath" value="ignore"/>
         <property name="srcdir" value="${basedir}"/>
         <property name="failonerror" value="true"/>
@@ -239,6 +242,12 @@
     </target>
 
     <target name="repositoryjar" depends="compile">
+        <copy overwrite="true" file="ucar/unidata/repository/resources/version.properties" tofile="ucar/unidata/repository/resources/build.properties">
+            <filterset>
+                <filter token="DATE" value="${date}"/>
+                <filter token="VERSION" value="${version}"/>
+            </filterset>
+        </copy>
         <jar 
             basedir="${srcdir}"
             compress="true"

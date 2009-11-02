@@ -21,13 +21,14 @@
  */
 
 package ucar.unidata.repository.type;
-import ucar.unidata.repository.*;
 
 
 import org.apache.commons.net.ftp.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
@@ -269,7 +270,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
      * _more_
      *
      * @param id _more_
-       * @param baseDir _more_
+     *   @param baseDir _more_
      *
      * @return _more_
      *

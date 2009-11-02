@@ -21,10 +21,11 @@
  */
 
 package ucar.unidata.repository.type;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.repository.output.*;
 
@@ -360,7 +361,9 @@ public class GenericTypeHandler extends TypeHandler {
         Statement statement = select(request, SqlUtil.distinct(column),
                                      where, "");
 
-        String[]     values = SqlUtil.readString(getDatabaseManager().getIterator(statement), 1);
+        String[] values =
+            SqlUtil.readString(getDatabaseManager().getIterator(statement),
+                               1);
         StringBuffer sb     = new StringBuffer();
         OutputType   output = request.getOutput();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
@@ -480,7 +483,7 @@ public class GenericTypeHandler extends TypeHandler {
      * @throws Exception _more_
      */
     public List<Clause> assembleWhereClause(Request request,
-            StringBuffer searchCriteria)
+                                            StringBuffer searchCriteria)
             throws Exception {
         List<Clause> where = super.assembleWhereClause(request,
                                  searchCriteria);

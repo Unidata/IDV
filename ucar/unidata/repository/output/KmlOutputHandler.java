@@ -24,10 +24,10 @@ package ucar.unidata.repository.output;
 
 import org.w3c.dom.*;
 
-import ucar.unidata.repository.*;
-
 
 import ucar.unidata.data.gis.KmlUtil;
+
+import ucar.unidata.repository.*;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
@@ -57,6 +57,7 @@ import java.util.Properties;
  */
 public class KmlOutputHandler extends OutputHandler {
 
+    /** _more_          */
     public static final String KML_ATTRS =
         " xmlns=\"http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" ";
 
@@ -96,8 +97,10 @@ public class KmlOutputHandler extends OutputHandler {
     public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
         if (state.getEntry() != null) {
-            if(!state.getEntry().isGroup()) {
-                if(true) return;
+            if ( !state.getEntry().isGroup()) {
+                if (true) {
+                    return;
+                }
             }
             links.add(makeLink(request, state.getEntry(), OUTPUT_KML));
         }
@@ -130,36 +133,38 @@ public class KmlOutputHandler extends OutputHandler {
      */
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
-        throws Exception {
+            throws Exception {
         boolean justOneEntry = group.isDummy() && (entries.size() == 1)
-            && (subGroups.size() == 0);
+                               && (subGroups.size() == 0);
 
 
-        String   title = (justOneEntry
+        String  title  = (justOneEntry
                           ? entries.get(0).getName()
                           : group.getFullName());
-        Element root = KmlUtil.kml(title);
-        Element folder = KmlUtil.folder(root, title,false);
+        Element root   = KmlUtil.kml(title);
+        Element folder = KmlUtil.folder(root, title, false);
         KmlUtil.open(folder, false);
-        if(group.getDescription().length()>0) {
+        if (group.getDescription().length() > 0) {
             KmlUtil.description(folder, group.getDescription());
         }
 
         int cnt  = subGroups.size() + entries.size();
         int max  = request.get(ARG_MAX, DB_MAX_ROWS);
         int skip = Math.max(0, request.get(ARG_SKIP, 0));
-        for(Group childGroup: subGroups) {
-            String url =  getRepository().absoluteUrl(
-                                                      request.url(repository.URL_ENTRY_SHOW, ARG_ENTRYID,
-                                                                  childGroup.getId(), ARG_OUTPUT, OUTPUT_KML));
-            Element link = KmlUtil.networkLink(folder, childGroup.getName(), url);
-            if(childGroup.getDescription().length()>0) {
+        for (Group childGroup : subGroups) {
+            String url = getRepository().absoluteUrl(
+                             request.url(
+                                 repository.URL_ENTRY_SHOW, ARG_ENTRYID,
+                                 childGroup.getId(), ARG_OUTPUT, OUTPUT_KML));
+            Element link = KmlUtil.networkLink(folder, childGroup.getName(),
+                               url);
+            if (childGroup.getDescription().length() > 0) {
                 KmlUtil.description(link, childGroup.getDescription());
             }
 
             KmlUtil.visible(link, false);
             KmlUtil.open(link, false);
-            link.setAttribute(KmlUtil.ATTR_ID,childGroup.getId());
+            link.setAttribute(KmlUtil.ATTR_ID, childGroup.getId());
         }
 
         if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
@@ -168,9 +173,9 @@ public class KmlOutputHandler extends OutputHandler {
                 request.remove(ARG_SKIP);
                 String url = request.url(repository.URL_ENTRY_SHOW,
                                          ARG_ENTRYID, group.getId(),
-                                         ARG_OUTPUT, OUTPUT_KML,
-                                         ARG_SKIP, "" + (skip + max),
-                                         ARG_MAX, "" + max);
+                                         ARG_OUTPUT, OUTPUT_KML, ARG_SKIP,
+                                         "" + (skip + max), ARG_MAX,
+                                         "" + max);
 
                 url = getRepository().absoluteUrl(url);
                 Element link = KmlUtil.networkLink(folder, "More...", url);
@@ -182,33 +187,36 @@ public class KmlOutputHandler extends OutputHandler {
         }
 
 
-        for(Entry entry: (List<Entry>)entries) {
+        for (Entry entry : (List<Entry>) entries) {
             String resource = entry.getResource().getPath();
-            if(resource==null) continue;
-            if(!IOUtil.hasSuffix(resource,"kml") &&
-               !IOUtil.hasSuffix(resource,"kmz")) {
+            if (resource == null) {
+                continue;
+            }
+            if ( !IOUtil.hasSuffix(resource, "kml")
+                    && !IOUtil.hasSuffix(resource, "kmz")) {
                 continue;
             }
 
             String url;
-            if(entry.getResource().isFile()) {
+            if (entry.getResource().isFile()) {
                 String fileTail = getStorageManager().getFileTail(entry);
-                url =  HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET) + "/"
-                                       + fileTail, ARG_ENTRYID, entry.getId());
+                url = HtmlUtil.url(request.url(getRepository().URL_ENTRY_GET)
+                                   + "/" + fileTail, ARG_ENTRYID,
+                                       entry.getId());
                 url = getRepository().absoluteUrl(url);
-            } else if(entry.getResource().isUrl()) {
+            } else if (entry.getResource().isUrl()) {
                 url = entry.getResource().getPath();
             } else {
                 continue;
             }
             Element link = KmlUtil.networkLink(folder, entry.getName(), url);
 
-            if(entry.getDescription().length()>0) {
+            if (entry.getDescription().length() > 0) {
                 KmlUtil.description(link, entry.getDescription());
             }
             KmlUtil.visible(link, false);
             KmlUtil.open(link, false);
-            link.setAttribute(KmlUtil.ATTR_ID,entry.getId());
+            link.setAttribute(KmlUtil.ATTR_ID, entry.getId());
 
 
         }

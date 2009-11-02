@@ -303,6 +303,7 @@ public class RepositoryBase implements Constants, RepositorySource {
     /** _more_ */
     private int httpPort = 80;
 
+    /** _more_          */
     private int httpsPort = -1;
 
     /** _more_ */
@@ -554,8 +555,13 @@ public class RepositoryBase implements Constants, RepositorySource {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param port _more_
+     */
     protected void setHttpsPort(int port) {
-	httpsPort = port;
+        httpsPort = port;
     }
 
 
@@ -569,12 +575,12 @@ public class RepositoryBase implements Constants, RepositorySource {
      */
     public String httpsUrl(String url) {
         int port = getHttpsPort();
-        if (port<0) {
+        if (port < 0) {
             return "http://" + getHostname() + ":" + getPort() + url;
             //            return url;
             //            throw new IllegalStateException("Do not have ssl port defined");
         }
-        if (port==0) {
+        if (port == 0) {
             return "https://" + getHostname() + url;
         } else {
             return "https://" + getHostname() + ":" + port + url;

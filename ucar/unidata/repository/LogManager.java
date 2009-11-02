@@ -150,11 +150,16 @@ public class LogManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param message _more_
+     */
     public void logInfoAndPrint(String message) {
-	logInfo(message);
-        if (!getProperty(PROP_LOG_TOSTDERR, false)) {
+        logInfo(message);
+        if ( !getProperty(PROP_LOG_TOSTDERR, false)) {
             System.err.println(message);
-	}
+        }
     }
 
 
@@ -179,12 +184,18 @@ public class LogManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param message _more_
+     * @param exc _more_
+     */
     public void logErrorAndPrint(String message, Throwable exc) {
-	logError(message, exc);
-        if (!getProperty(PROP_LOG_TOSTDERR, false)) {
-	    System.err.println(message);
-	    exc.printStackTrace();
-	}
+        logError(message, exc);
+        if ( !getProperty(PROP_LOG_TOSTDERR, false)) {
+            System.err.println(message);
+            exc.printStackTrace();
+        }
     }
 
     /**

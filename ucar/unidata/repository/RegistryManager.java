@@ -824,8 +824,14 @@ public class RegistryManager extends RepositoryManager {
         URL          requestingServerUrl = new URL(requestingServer);
         List<String> servers             = getServersToRegisterWith();
         boolean      ok                  = false;
+        StringBuffer msg                 = new StringBuffer();
+
+        msg.append("requesting server:" + requestingServerUrl.getHost() + ":"
+                   + requestingServerUrl.getPort() + "\n");
         for (String myServer : servers) {
             URL myServerUrl = new URL(myServer);
+            msg.append("    my server:" + myServerUrl.getHost() + ":"
+                       + myServerUrl.getPort() + "\n");
             if (myServerUrl.getHost().toLowerCase()
                     .equals(requestingServerUrl.getHost()
                         .toLowerCase()) && (myServerUrl
@@ -842,7 +848,7 @@ public class RegistryManager extends RepositoryManager {
             return new Result(
                 XmlUtil.tag(
                     TAG_RESPONSE, XmlUtil.attr(ATTR_CODE, CODE_ERROR),
-                    "Not registering with you"), MIME_XML);
+                    "Not registering with you. Output: " + msg), MIME_XML);
         }
         Misc.run(new Runnable() {
             public void run() {

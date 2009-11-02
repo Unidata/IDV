@@ -21,10 +21,11 @@
  */
 
 package ucar.unidata.repository.type;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.sql.SqlUtil;

@@ -22,13 +22,15 @@
 
 package ucar.unidata.repository;
 
+
 /**
  * A stub class so old IDV bundles can still work because we moved the client classes to the client package
  *
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class InteractiveRepositoryClient extends ucar.unidata.repository.client.InteractiveRepositoryClient {
+public class InteractiveRepositoryClient extends ucar.unidata.repository
+    .client.InteractiveRepositoryClient {
 
     /**
      * _more_

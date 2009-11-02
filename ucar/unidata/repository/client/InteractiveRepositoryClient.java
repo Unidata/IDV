@@ -21,11 +21,12 @@
  */
 
 package ucar.unidata.repository.client;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.util.GuiUtils;

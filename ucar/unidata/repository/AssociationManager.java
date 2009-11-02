@@ -25,8 +25,8 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.data.*;
-import ucar.unidata.repository.type.*;
 import ucar.unidata.repository.output.*;
+import ucar.unidata.repository.type.*;
 
 
 import ucar.unidata.sql.Clause;
@@ -336,14 +336,12 @@ public class AssociationManager extends RepositoryManager {
      */
     public String addAssociation(Request request, Association association)
             throws Exception {
-        String id  = getRepository().getGUID();
-	getDatabaseManager().executeInsert(Tables.ASSOCIATIONS.INSERT,
-					   new Object[]{
-					       association.getId(),
-					       association.getName(),
-					       association.getType(),
-					       association.getFromId(),
-					       association.getToId()});
+        String id = getRepository().getGUID();
+        getDatabaseManager().executeInsert(Tables.ASSOCIATIONS.INSERT,
+                                           new Object[] { association.getId(),
+                association.getName(), association.getType(),
+                association.getFromId(),
+                association.getToId() });
         return id;
     }
 
@@ -362,7 +360,8 @@ public class AssociationManager extends RepositoryManager {
                 getDatabaseManager().select(
                     SqlUtil.distinct(Tables.ASSOCIATIONS.COL_TYPE),
                     Tables.ASSOCIATIONS.NAME, (Clause) null);
-            String[] values = SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1);
+            String[] values =
+                SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1);
             types = (List<String>) Misc.toList(values);
             types.remove("");
         }
@@ -518,7 +517,7 @@ public class AssociationManager extends RepositoryManager {
                              + getDatabaseManager().getLimitString(
                                  request.get(ARG_SKIP, 0), max));
         List<Association> associations = new ArrayList();
-        SqlUtil.Iterator  iter         = getDatabaseManager().getIterator(stmt);
+        SqlUtil.Iterator  iter = getDatabaseManager().getIterator(stmt);
         ResultSet         results;
         while ((results = iter.next()) != null) {
             while (results.next()) {
@@ -564,9 +563,11 @@ public class AssociationManager extends RepositoryManager {
                                    Tables.ENTRIES.COL_ID));
         }
 
-        return SqlUtil.readString(getDatabaseManager().getIterator(typeHandler.select(request,
-                SqlUtil.distinct(Tables.ASSOCIATIONS.COL_NAME), where,
-                "")), 1);
+        return SqlUtil.readString(
+            getDatabaseManager().getIterator(
+                typeHandler.select(
+                    request, SqlUtil.distinct(Tables.ASSOCIATIONS.COL_NAME),
+                    where, "")), 1);
     }
 
 

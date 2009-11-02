@@ -45,11 +45,12 @@ import java.io.*;
 
 import java.io.File;
 import java.io.InputStream;
-import java.sql.ResultSet;
-import java.sql.Statement;
 
 
 import java.net.*;
+
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 
 
@@ -219,7 +220,7 @@ public class HtmlOutputHandler extends OutputHandler {
             HtmlUtil.jsLink(HtmlUtil.onMouseClick("hidePopupObject();"),
                             HtmlUtil.img(iconUrl(ICON_CLOSE)), "");
         sb.append(cLink);
-	sb.append(HtmlUtil.br());
+        sb.append(HtmlUtil.br());
         sb.append(links);
         sb.append("\n</content>");
         return new Result("", sb, "text/xml");
@@ -697,31 +698,35 @@ public class HtmlOutputHandler extends OutputHandler {
     public Result getSelectXml(Request request, List<Group> subGroups,
                                List<Entry> entries)
             throws Exception {
-        String localeId = request.getString(ARG_LOCALEID,null);
+        String       localeId = request.getString(ARG_LOCALEID, null);
 
-        String       target = request.getString(ATTR_TARGET, "");
-        StringBuffer sb     = new StringBuffer();
+        String       target   = request.getString(ATTR_TARGET, "");
+        StringBuffer sb       = new StringBuffer();
 
 
-        
+
         //If we have a localeid that means this is the first call
-        if(localeId!=null) {
-            Entry localeEntry  =  getEntryManager().getEntry(request, localeId);
-            if(localeEntry!=null) {
-                if(!localeEntry.isGroup()) {
-                    localeEntry = getEntryManager().getParent(request, localeEntry);
+        if (localeId != null) {
+            Entry localeEntry = getEntryManager().getEntry(request, localeId);
+            if (localeEntry != null) {
+                if ( !localeEntry.isGroup()) {
+                    localeEntry = getEntryManager().getParent(request,
+                            localeEntry);
                 }
-                if(localeEntry!=null) {
-                    Entry grandParent = getEntryManager().getParent(request, localeEntry);
+                if (localeEntry != null) {
+                    Entry grandParent = getEntryManager().getParent(request,
+                                            localeEntry);
                     String indent = "";
-                    if(grandParent!=null) {
-                        sb.append(getSelectLink(request, grandParent, target));
+                    if (grandParent != null) {
+                        sb.append(getSelectLink(request, grandParent,
+                                target));
                         //indent = HtmlUtil.space(2);
                     }
                     sb.append(indent);
                     sb.append(getSelectLink(request, localeEntry, target));
                     localeId = localeEntry.getId();
-                    sb.append("<hr style=\"padding:0px;margin-bottom:2px;  margin:0px;\">");
+                    sb.append(
+                        "<hr style=\"padding:0px;margin-bottom:2px;  margin:0px;\">");
                 }
             }
 
@@ -737,7 +742,8 @@ public class HtmlOutputHandler extends OutputHandler {
                     Entry favEntry = favorite.getEntry();
                     sb.append(getSelectLink(request, favEntry, target));
                 }
-                sb.append("<hr style=\"padding:0px;margin-bottom:2px;  margin:0px;\">");
+                sb.append(
+                    "<hr style=\"padding:0px;margin-bottom:2px;  margin:0px;\">");
             }
 
 
@@ -748,13 +754,16 @@ public class HtmlOutputHandler extends OutputHandler {
                 for (Entry cartEntry : cartEntries) {
                     sb.append(getSelectLink(request, cartEntry, target));
                 }
-                sb.append("<hr style=\"padding:0px;margin-bottom:2px;  margin:0px;\">");
+                sb.append(
+                    "<hr style=\"padding:0px;margin-bottom:2px;  margin:0px;\">");
             }
         }
 
 
         for (Group subGroup : subGroups) {
-            if(Misc.equals(localeId, subGroup.getId())) continue;
+            if (Misc.equals(localeId, subGroup.getId())) {
+                continue;
+            }
             sb.append(getSelectLink(request, subGroup, target));
         }
 

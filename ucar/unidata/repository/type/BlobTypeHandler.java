@@ -20,6 +20,12 @@
  */
 
 package ucar.unidata.repository.type;
+
+
+
+
+import org.w3c.dom.*;
+
 import ucar.unidata.repository.*;
 
 import ucar.unidata.xml.XmlEncoder;
@@ -27,11 +33,6 @@ import ucar.unidata.xml.XmlUtil;
 
 
 import java.util.Hashtable;
-
-
-
-
-import org.w3c.dom.*;
 
 
 
@@ -91,7 +92,16 @@ public class BlobTypeHandler extends GenericTypeHandler {
         return properties;
     }
 
-    protected void setProperties(Entry entry, Hashtable properties) throws Exception {
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param properties _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void setProperties(Entry entry, Hashtable properties)
+            throws Exception {
         XmlEncoder xmlEncoder = new XmlEncoder();
         entry.setValues(new Object[] { xmlEncoder.encodeObject(properties) });
     }

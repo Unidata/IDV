@@ -23,7 +23,11 @@
 package ucar.unidata.repository;
 
 
+import org.apache.commons.dbcp.BasicDataSource;
+
+
 import org.w3c.dom.*;
+
 import ucar.unidata.repository.type.*;
 
 
@@ -58,9 +62,6 @@ import java.lang.reflect.*;
 
 import java.net.*;
 
-import org.apache.commons.dbcp.BasicDataSource;
-import javax.sql.DataSource;
-
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -82,6 +83,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import javax.sql.DataSource;
+
 
 
 
@@ -92,7 +95,8 @@ import java.util.TimeZone;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class DatabaseManager extends RepositoryManager implements SqlUtil.ConnectionManager {
+public class DatabaseManager extends RepositoryManager implements SqlUtil
+    .ConnectionManager {
 
     /** _more_ */
     private static final int TIMEOUT = 5000;
@@ -109,11 +113,14 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     /** _more_ */
     private static final String DB_POSTGRES = "postgres";
 
+    /** _more_          */
     private DataSource dataSource;
 
     /** Keeps track of active connections */
-    private Hashtable<Connection,ConnectionInfo> connectionMap = new Hashtable<Connection,ConnectionInfo>();
+    private Hashtable<Connection, ConnectionInfo> connectionMap =
+        new Hashtable<Connection, ConnectionInfo>();
 
+    /** _more_          */
     private List<String> scourMessages = new ArrayList<String>();
 
     /**
@@ -131,31 +138,43 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     }
 
 
+    /**
+     * _more_
+     */
     public void checkConnections() {
-        while(true) {
+        while (true) {
             try {
                 Misc.sleep(5000);
-                Hashtable<Connection,ConnectionInfo> tmp = new Hashtable<Connection,ConnectionInfo>();
-                synchronized(connectionMap) {
+                Hashtable<Connection, ConnectionInfo> tmp =
+                    new Hashtable<Connection, ConnectionInfo>();
+                synchronized (connectionMap) {
                     tmp.putAll(connectionMap);
                 }
                 long now = System.currentTimeMillis();
-                int seconds = getRepository().getProperty(PROP_DB_POOL_TIMEUNTILCLOSED,180);
-                for (Enumeration keys = tmp.keys(); keys.hasMoreElements(); ) {
+                int seconds =
+                    getRepository().getProperty(PROP_DB_POOL_TIMEUNTILCLOSED,
+                        180);
+                for (Enumeration keys =
+                        tmp.keys(); keys.hasMoreElements(); ) {
                     Connection connection = (Connection) keys.nextElement();
-                    ConnectionInfo info  = tmp.get(connection);
+                    ConnectionInfo info   = tmp.get(connection);
                     //If a connection has been out for more than a minute then close it
-                    if(now-info.time > seconds*1000) {
-                        logInfo ("A connection has been open for more than "+seconds +" seconds:\n" + info.where);
-                        synchronized(scourMessages) {
-                            while(scourMessages.size()>100)
+                    if (now - info.time > seconds * 1000) {
+                        logInfo("A connection has been open for more than "
+                                + seconds + " seconds:\n" + info.where);
+                        synchronized (scourMessages) {
+                            while (scourMessages.size() > 100) {
                                 scourMessages.remove(0);
-                            scourMessages.add("SCOURED @"+new Date() +" info.date: " +new Date(info.time) +"  msg:" + info.msg +"  Where:" +info.where);
+                            }
+                            scourMessages.add("SCOURED @" + new Date()
+                                    + " info.date: " + new Date(info.time)
+                                    + "  msg:" + info.msg + "  Where:"
+                                    + info.where);
                         }
                         closeConnection(connection);
                     }
                 }
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 scourMessages.add("Error checking connection:" + exc);
             }
         }
@@ -170,22 +189,32 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      */
     public void init() throws Exception {
         SqlUtil.setConnectionManager(this);
-        if(dataSource!=null) return;
+        if (dataSource != null) {
+            return;
+        }
         dataSource = doMakeDataSource();
-        BasicDataSource bds  = (BasicDataSource) dataSource;
+        BasicDataSource bds = (BasicDataSource) dataSource;
         if (db.equals(DB_MYSQL)) {
             Statement statement = getConnection().createStatement();
             statement.execute("set time_zone = '+0:00'");
             closeAndReleaseConnection(statement);
         }
-        Misc.run(this,"checkConnections", null);
+        Misc.run(this, "checkConnections", null);
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     protected DataSource doMakeDataSource() throws Exception {
         BasicDataSource ds = new BasicDataSource();
-        ds.setMaxActive(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE,100));
-        ds.setMaxIdle(getRepository().getProperty(PROP_DB_POOL_MAXIDLE,100));
+        ds.setMaxActive(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE,
+                100));
+        ds.setMaxIdle(getRepository().getProperty(PROP_DB_POOL_MAXIDLE, 100));
 
         //        ds.setValidationQuery("select * from dummy");
         String userName = (String) getRepository().getProperty(
@@ -195,8 +224,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
         String connectionURL =
             (String) getRepository().getProperty(PROP_DB_URL.replace("${db}",
                 db));
-        String driverClassName =  (String) getRepository().getProperty(
-                                                                       PROP_DB_DRIVER.replace("${db}", db));
+        String driverClassName = (String) getRepository().getProperty(
+                                     PROP_DB_DRIVER.replace("${db}", db));
         Misc.findClass(driverClassName);
 
 
@@ -209,40 +238,55 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
 
 
 
-    public void addStatistics(Request request,StringBuffer dbSB) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param dbSB _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addStatistics(Request request, StringBuffer dbSB)
+            throws Exception {
 
-	BasicDataSource bds = (BasicDataSource)dataSource;
+        BasicDataSource bds  = (BasicDataSource) dataSource;
 
-	StringBuffer msgb = new StringBuffer();
-	synchronized(scourMessages) {
-	    for(String msg: scourMessages) {
-		msgb.append("<pre>" + msg +"</pre>");
-		msgb.append("<hr>");
-	    }
-	    if(scourMessages.size()>0) {
-		dbSB.append(HtmlUtil.makeShowHideBlock(msg("Connection Problems"),
-						       msgb.toString(), false));
-	    }
-	}
-
-
-	dbSB.append("Connection Pool:<br>&nbsp;&nbsp;#active:" + bds.getNumActive() +"<br>&nbsp;&nbsp;#idle:" +bds.getNumIdle()  +"<br>&nbsp;&nbsp;max active: " +
-		    bds.getMaxActive() +"<br>&nbsp;&nbsp;max idle:" + bds.getMaxIdle());
-
-	if(bds.getNumActive()>0) {
-	    Hashtable<Connection,ConnectionInfo> tmp = new Hashtable<Connection,ConnectionInfo>();
-	    synchronized(connectionMap) {
-		tmp.putAll(connectionMap);
-	    }
-	    for (Enumeration keys = tmp.keys(); keys.hasMoreElements(); ) {
-		Connection connection = (Connection) keys.nextElement();
-		ConnectionInfo info  = tmp.get(connection);
-		dbSB.append("Connection:  info.date: " +new Date(info.time) +"  msg:" + info.msg +"  Where:" +info.where);
-	    }
-	}
+        StringBuffer    msgb = new StringBuffer();
+        synchronized (scourMessages) {
+            for (String msg : scourMessages) {
+                msgb.append("<pre>" + msg + "</pre>");
+                msgb.append("<hr>");
+            }
+            if (scourMessages.size() > 0) {
+                dbSB.append(
+                    HtmlUtil.makeShowHideBlock(
+                        msg("Connection Problems"), msgb.toString(), false));
+            }
+        }
 
 
-	dbSB.append(HtmlUtil.br());
+        dbSB.append("Connection Pool:<br>&nbsp;&nbsp;#active:"
+                    + bds.getNumActive() + "<br>&nbsp;&nbsp;#idle:"
+                    + bds.getNumIdle() + "<br>&nbsp;&nbsp;max active: "
+                    + bds.getMaxActive() + "<br>&nbsp;&nbsp;max idle:"
+                    + bds.getMaxIdle());
+
+        if (bds.getNumActive() > 0) {
+            Hashtable<Connection, ConnectionInfo> tmp =
+                new Hashtable<Connection, ConnectionInfo>();
+            synchronized (connectionMap) {
+                tmp.putAll(connectionMap);
+            }
+            for (Enumeration keys = tmp.keys(); keys.hasMoreElements(); ) {
+                Connection     connection = (Connection) keys.nextElement();
+                ConnectionInfo info       = tmp.get(connection);
+                dbSB.append("Connection:  info.date: " + new Date(info.time)
+                            + "  msg:" + info.msg + "  Where:" + info.where);
+            }
+        }
+
+
+        dbSB.append(HtmlUtil.br());
         dbSB.append("<table>\n");
         String[] names = { msg("Users"), msg("Associations"),
                            msg("Metadata Items") };
@@ -267,7 +311,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
                 continue;
             }
             int cnt = getCount(Tables.ENTRIES.NAME,
-			       Clause.eq("type", typeHandler.getType()));
+                               Clause.eq("type", typeHandler.getType()));
 
             String url =
                 HtmlUtil.href(
@@ -296,19 +340,23 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
         /** _more_ */
         long time;
 
+        /** _more_          */
         String where;
 
-	String msg; 
+        /** _more_          */
+        String msg;
 
         /**
          * _more_
          *
          * @param connection _more_
+         *
+         * @param msg _more_
          */
         ConnectionInfo(String msg) {
-            this.time  = System.currentTimeMillis();
-	    this.msg = msg;
-            where = Misc.getStackTrace();
+            this.time = System.currentTimeMillis();
+            this.msg  = msg;
+            where     = Misc.getStackTrace();
         }
     }
 
@@ -316,6 +364,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     /**
      * _more_
      *
+     *
+     * @param query _more_
      * @return _more_
      *
      * @throws Exception _more_
@@ -334,7 +384,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      */
     public PreparedStatement getPreparedStatement(String query)
             throws Exception {
-        return  getConnection().prepareStatement(query);
+        return getConnection().prepareStatement(query);
     }
 
 
@@ -352,7 +402,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
     public void update(String table, String colId, String id, String[] names,
                        Object[] values)
             throws Exception {
-	PreparedStatement statement       = getPreparedStatement(SqlUtil.makeUpdate(table, colId, names));
+        PreparedStatement statement =
+            getPreparedStatement(SqlUtil.makeUpdate(table, colId, names));
         for (int i = 0; i < values.length; i++) {
             Object value = values[i];
             if (value == null) {
@@ -362,8 +413,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
             } else if (value instanceof Boolean) {
                 boolean b = ((Boolean) value).booleanValue();
                 statement.setInt(i + 1, (b
-                                    ? 1
-                                    : 0));
+                                         ? 1
+                                         : 0));
             } else {
                 statement.setObject(i + 1, value);
             }
@@ -387,16 +438,23 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
                        Object[] values)
             throws Exception {
         Connection connection = getConnection();
-	try {
-	    SqlUtil.update(connection, table, clause, names, values);
-	} finally {
-	    closeConnection(connection);
-	}
+        try {
+            SqlUtil.update(connection, table, clause, names, values);
+        } finally {
+            closeConnection(connection);
+        }
     }
 
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Statement createStatement() throws Exception {
         return getConnection().createStatement();
     }
@@ -412,15 +470,20 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      */
     public void delete(String table, Clause clause) throws Exception {
         Connection connection = getConnection();
-	try {
-	    SqlUtil.delete(connection, table, clause);
-	} finally {
-	    closeConnection(connection);
-	}
+        try {
+            SqlUtil.delete(connection, table, clause);
+        } finally {
+            closeConnection(connection);
+        }
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     public void shutdown() throws Exception {
         //TODO: Close the datasource
     }
@@ -451,14 +514,23 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      * @throws Exception _more_
      */
     public Connection getConnection() throws Exception {
-	return getConnection("");
+        return getConnection("");
     }
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private Connection getConnection(String msg) throws Exception {
         Connection connection = dataSource.getConnection();
-	synchronized(connectionMap) {
-	    connectionMap.put(connection,new ConnectionInfo(msg));
-	}
+        synchronized (connectionMap) {
+            connectionMap.put(connection, new ConnectionInfo(msg));
+        }
         return connection;
     }
 
@@ -472,13 +544,13 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      */
     public void closeConnection(Connection connection) {
         try {
-	    synchronized(connectionMap) {
-		connectionMap.remove(connection);
-	    }
+            synchronized (connectionMap) {
+                connectionMap.remove(connection);
+            }
             connection.setAutoCommit(true);
             connection.close();
-            BasicDataSource bds = (BasicDataSource)dataSource;
-            if(bds.getNumActive()>3) {
+            BasicDataSource bds = (BasicDataSource) dataSource;
+            if (bds.getNumActive() > 3) {
                 //                System.err.println("closeConnection  active:" + bds.getNumActive() +" idle:" +bds.getNumIdle() +" max: " +
                 //                                   bds.getMaxActive() +" " + bds.getMaxIdle());
             }
@@ -495,7 +567,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      * @param statement _more_
      */
     public void closeStatement(Statement statement) {
-        if(statement==null) return;
+        if (statement == null) {
+            return;
+        }
         try {
             statement.close();
         } catch (Exception ignore) {}
@@ -503,22 +577,35 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
 
 
 
-    public void closeAndReleaseConnection(Statement statement) throws SQLException {
-        if(statement==null) return;
+    /**
+     * _more_
+     *
+     * @param statement _more_
+     *
+     * @throws SQLException _more_
+     */
+    public void closeAndReleaseConnection(Statement statement)
+            throws SQLException {
+        if (statement == null) {
+            return;
+        }
         Connection connection = null;
         try {
             connection = statement.getConnection();
             statement.close();
         } catch (Throwable ignore) {}
 
-        if(connection!=null) {
+        if (connection != null) {
             closeConnection(connection);
         } else {
-	    synchronized(scourMessages) {
-		while(scourMessages.size()>100)
-		    scourMessages.remove(0);
-		scourMessages.add("Trying to close a statement with no connection:" +LogUtil.getStackTrace());
-	    }
+            synchronized (scourMessages) {
+                while (scourMessages.size() > 100) {
+                    scourMessages.remove(0);
+                }
+                scourMessages.add(
+                    "Trying to close a statement with no connection:"
+                    + LogUtil.getStackTrace());
+            }
         }
     }
 
@@ -573,6 +660,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      */
     public void makeDatabaseCopy(OutputStream os, boolean all)
             throws Exception {
+
         Connection connection = getConnection();
         try {
             DatabaseMetaData dbmd     = connection.getMetaData();
@@ -623,7 +711,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
                 colNames += ") ";
 
                 Statement statement = execute("select * from " + tableName,
-                                         10000000, 0);
+                                          10000000, 0);
                 SqlUtil.Iterator iter = getIterator(statement);
                 ResultSet        results;
                 int              rowCnt    = 0;
@@ -699,11 +787,19 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
             closeConnection(connection);
         }
 
+
     }
 
 
+    /**
+     * _more_
+     *
+     * @param statement _more_
+     *
+     * @return _more_
+     */
     public SqlUtil.Iterator getIterator(Statement statement) {
-        return  new Iterator(this, statement);
+        return new Iterator(this, statement);
     }
 
 
@@ -726,20 +822,35 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
 
 
 
-    public void executeAndClose(String sql)
-            throws Exception {
-        executeAndClose(sql,10000000,0);
+    /**
+     * _more_
+     *
+     * @param sql _more_
+     *
+     * @throws Exception _more_
+     */
+    public void executeAndClose(String sql) throws Exception {
+        executeAndClose(sql, 10000000, 0);
     }
 
 
 
 
 
+    /**
+     * _more_
+     *
+     * @param sql _more_
+     * @param max _more_
+     * @param timeout _more_
+     *
+     * @throws Exception _more_
+     */
     public void executeAndClose(String sql, int max, int timeout)
-        throws Exception {
+            throws Exception {
         Connection connection = getConnection();
         try {
-            Statement statement= execute(connection, sql, max, timeout);
+            Statement statement = execute(connection, sql, max, timeout);
             closeStatement(statement);
         } finally {
             closeConnection(connection);
@@ -842,8 +953,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
         if (date == null) {
             statement.setTimestamp(col, null);
         } else {
-            statement.setTimestamp(col, new java.sql.Timestamp(date.getTime()),
-                              Repository.calendar);
+            statement.setTimestamp(col,
+                                   new java.sql.Timestamp(date.getTime()),
+                                   Repository.calendar);
         }
     }
 
@@ -902,7 +1014,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
                 statement.setTime(col, null);
             } else {
                 statement.setTime(col, new java.sql.Time(date.getTime()),
-                             Repository.calendar);
+                                  Repository.calendar);
             }
         }
     }
@@ -965,8 +1077,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
             } else if (values[i] instanceof Boolean) {
                 boolean b = ((Boolean) values[i]).booleanValue();
                 statement.setInt(i + startIdx, (b
-                                           ? 1
-                                           : 0));
+                        ? 1
+                        : 0));
             } else {
                 statement.setObject(i + startIdx, values[i]);
             }
@@ -995,14 +1107,14 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
      * _more_
      *
      * @param insert _more_
+     * @param valueList _more_
      *
      * @throws Exception _more_
      */
-    public void executeInsert(String insert,
-                              List<Object[]> valueList)
+    public void executeInsert(String insert, List<Object[]> valueList)
             throws Exception {
         PreparedStatement pstatement = getPreparedStatement(insert);
-        for(Object[] values: valueList) {
+        for (Object[] values : valueList) {
             setValues(pstatement, values);
             try {
                 pstatement.executeUpdate();
@@ -1040,20 +1152,28 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
         return sql;
     }
 
-    public void loadSql(String sql, 
-                               boolean ignoreErrors, boolean printStatus)
+    /**
+     * _more_
+     *
+     * @param sql _more_
+     * @param ignoreErrors _more_
+     * @param printStatus _more_
+     *
+     * @throws Exception _more_
+     */
+    public void loadSql(String sql, boolean ignoreErrors, boolean printStatus)
             throws Exception {
         Connection connection = getConnection();
-	try {
-        connection.setAutoCommit(false);
-        Statement  statement       = connection.createStatement();
-        SqlUtil.loadSql(sql, statement, ignoreErrors, printStatus);
-        connection.commit();
-        connection.setAutoCommit(true);
-        closeStatement(statement);
-	} finally {
-	    closeConnection(connection);
-	}
+        try {
+            connection.setAutoCommit(false);
+            Statement statement = connection.createStatement();
+            SqlUtil.loadSql(sql, statement, ignoreErrors, printStatus);
+            connection.commit();
+            connection.setAutoCommit(true);
+            closeStatement(statement);
+        } finally {
+            closeConnection(connection);
+        }
     }
 
 
@@ -1251,12 +1371,10 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
         SelectInfo selectInfo = new SelectInfo(what, tables, clause, extra,
                                     max);
         final boolean[] done = { false };
-	String msg = "Select what:" + what + "\ntables:" +
-                                           tables +
-                                           "\nclause:" + clause +
-                                           "\nextra:" + extra+
-                                           "max:" + max;
-	/*
+        String msg = "Select what:" + what + "\ntables:" + tables
+                     + "\nclause:" + clause + "\nextra:" + extra + "max:"
+                     + max;
+        /*
         Misc.run(new Runnable() {
                 public void run() {
                     //Wait 20 seconds
@@ -1272,8 +1390,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
                 }
             });
         */
-        Statement statement = SqlUtil.select(getConnection(msg), what, tables, clause,
-                                        extra, max, TIMEOUT);
+        Statement statement = SqlUtil.select(getConnection(msg), what,
+                                             tables, clause, extra, max,
+                                             TIMEOUT);
 
         done[0] = true;
         return statement;
@@ -1376,16 +1495,40 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil.Connec
 
 
 
+    /**
+     * Class Iterator _more_
+     *
+     *
+     * @author IDV Development Team
+     */
     public static class Iterator extends SqlUtil.Iterator {
+
+        /** _more_          */
         Statement statement;
+
+        /** _more_          */
         DatabaseManager databaseManager;
-        
-        public Iterator(DatabaseManager databaseManager, Statement statement) {
+
+        /**
+         * _more_
+         *
+         * @param databaseManager _more_
+         * @param statement _more_
+         */
+        public Iterator(DatabaseManager databaseManager,
+                        Statement statement) {
             super(statement);
-            this.statement = statement;
+            this.statement       = statement;
             this.databaseManager = databaseManager;
         }
 
+        /**
+         * _more_
+         *
+         * @param statement _more_
+         *
+         * @throws SQLException _more_
+         */
         protected void close(Statement statement) throws SQLException {
             databaseManager.closeAndReleaseConnection(statement);
         }

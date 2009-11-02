@@ -26,8 +26,8 @@ package ucar.unidata.repository.harvester;
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
-import ucar.unidata.repository.type.*;
 import ucar.unidata.repository.data.*;
+import ucar.unidata.repository.type.*;
 
 import ucar.unidata.sql.Clause;
 
@@ -37,8 +37,6 @@ import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
-import java.sql.ResultSet;
 
 
 
@@ -51,6 +49,8 @@ import ucar.unidata.xml.XmlUtil;
 import java.io.File;
 
 import java.lang.reflect.*;
+
+import java.sql.ResultSet;
 
 
 import java.util.ArrayList;

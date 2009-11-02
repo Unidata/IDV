@@ -26,8 +26,8 @@ package ucar.unidata.repository.data;
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
-import ucar.unidata.repository.type.*;
 import ucar.unidata.repository.metadata.*;
+import ucar.unidata.repository.type.*;
 
 import ucar.unidata.sql.Clause;
 

@@ -19,10 +19,11 @@
  */
 
 package ucar.unidata.repository.type;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 import ucar.unidata.repository.output.OutputType;
 
@@ -374,7 +375,8 @@ public class Column implements Constants {
             throws Exception {
         if (type.equals(TYPE_INT)) {
             if (values[offset] != null) {
-                statement.setInt(statementIdx, ((Integer) values[offset]).intValue());
+                statement.setInt(statementIdx,
+                                 ((Integer) values[offset]).intValue());
             } else {
                 statement.setInt(statementIdx, 0);
             }
@@ -382,7 +384,7 @@ public class Column implements Constants {
         } else if (type.equals(TYPE_DOUBLE)) {
             if (values[offset] != null) {
                 statement.setDouble(statementIdx,
-                               ((Double) values[offset]).doubleValue());
+                                    ((Double) values[offset]).doubleValue());
             } else {
                 statement.setDouble(statementIdx, 0.0);
             }
@@ -391,16 +393,16 @@ public class Column implements Constants {
             if (values[offset] != null) {
                 boolean v = ((Boolean) values[offset]).booleanValue();
                 statement.setInt(statementIdx, (v
-                                      ? 1
-                                      : 0));
+                        ? 1
+                        : 0));
             } else {
                 statement.setInt(statementIdx, 0);
             }
             statementIdx++;
         } else if (type.equals(TYPE_DATE)) {
             Date dttm = (Date) values[offset];
-            typeHandler.getRepository().getDatabaseManager().setDate(statement,
-                    statementIdx, dttm);
+            typeHandler.getRepository().getDatabaseManager().setDate(
+                statement, statementIdx, dttm);
             statementIdx++;
         } else if (type.equals(TYPE_LATLON)) {
             if (values[offset] != null) {
@@ -725,11 +727,12 @@ public class Column implements Constants {
                         2)));
             state.put(group, group);
         }
-	if(rows>1) {
-	    formBuffer.append(HtmlUtil.formEntryTop(getLabel() + ":", widget));
-	} else {
-	    formBuffer.append(HtmlUtil.formEntry(getLabel() + ":", widget));
-	}
+        if (rows > 1) {
+            formBuffer.append(HtmlUtil.formEntryTop(getLabel() + ":",
+                    widget));
+        } else {
+            formBuffer.append(HtmlUtil.formEntry(getLabel() + ":", widget));
+        }
         formBuffer.append("\n");
     }
 
@@ -942,11 +945,14 @@ public class Column implements Constants {
             if (searchType.equals(SEARCHTYPE_SELECT)) {
                 long t1 = System.currentTimeMillis();
                 Statement statement = typeHandler.select(request,
-                                     SqlUtil.distinct(getFullName()), tmp,
-                                     "");
-                long     t2     = System.currentTimeMillis();
-                String[] values = SqlUtil.readString(typeHandler.getDatabaseManager().getIterator(statement), 1);
-                long     t3     = System.currentTimeMillis();
+                                          SqlUtil.distinct(getFullName()),
+                                          tmp, "");
+                long t2 = System.currentTimeMillis();
+                String[] values =
+                    SqlUtil.readString(
+                        typeHandler.getDatabaseManager().getIterator(
+                            statement), 1);
+                long t3 = System.currentTimeMillis();
                 //                System.err.println("TIME:" + (t2-t1) + " " + (t3-t2));
                 List<TwoFacedObject> list = new ArrayList();
                 for (int i = 0; i < values.length; i++) {

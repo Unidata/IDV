@@ -79,11 +79,13 @@ public class IcalOutputHandler extends OutputHandler {
 
 
     /** _more_ */
-    public static final OutputType OUTPUT_ICAL =
-        new OutputType("ICAL", "ical", OutputType.TYPE_NONHTML,
-                       "", ICON_CALENDAR);
+    public static final OutputType OUTPUT_ICAL = new OutputType("ICAL",
+                                                     "ical",
+                                                     OutputType.TYPE_NONHTML,
+                                                     "", ICON_CALENDAR);
 
 
+    /** _more_          */
     private SimpleDateFormat sdf;
 
     /**
@@ -162,11 +164,18 @@ public class IcalOutputHandler extends OutputHandler {
         return outputEntries(request, entries);
     }
 
+    /**
+     * _more_
+     *
+     * @param t _more_
+     *
+     * @return _more_
+     */
     private String format(long t) {
-	if(sdf == null) {
-	    sdf =   RepositoryUtil.makeDateFormat("yyyyMMdd'T'HHmmss");
-	}
-	return sdf.format(new Date(t))+"Z";
+        if (sdf == null) {
+            sdf = RepositoryUtil.makeDateFormat("yyyyMMdd'T'HHmmss");
+        }
+        return sdf.format(new Date(t)) + "Z";
     }
 
 
@@ -185,41 +194,41 @@ public class IcalOutputHandler extends OutputHandler {
 
         StringBuffer sb = new StringBuffer();
         sb.append("BEGIN:VCALENDAR\n");
-	sb.append("PRODID:-//Unidata/UCAR//RAMADDA Calendar//EN\n");
-	sb.append("VERSION:2.0\n");
-	sb.append("CALSCALE:GREGORIAN\n");
-	sb.append("METHOD:PUBLISH\n");
-        OutputType             output = request.getOutput();
+        sb.append("PRODID:-//Unidata/UCAR//RAMADDA Calendar//EN\n");
+        sb.append("VERSION:2.0\n");
+        sb.append("CALSCALE:GREGORIAN\n");
+        sb.append("METHOD:PUBLISH\n");
+        OutputType output = request.getOutput();
         request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
 
         for (Entry entry : entries) {
-	    sb.append("BEGIN:VEVENT\n");
-	    sb.append("UID:" + entry.getId() +"\n");
-	    sb.append("CREATED:"+ format(entry.getCreateDate())+"\n");
-	    sb.append("DTSTAMP:"+ format(entry.getCreateDate())+"\n");
-	    sb.append("DTSTART:"+ format(entry.getStartDate())+"\n");
-	    sb.append("DTEND:"+ format(entry.getEndDate())+"\n");
+            sb.append("BEGIN:VEVENT\n");
+            sb.append("UID:" + entry.getId() + "\n");
+            sb.append("CREATED:" + format(entry.getCreateDate()) + "\n");
+            sb.append("DTSTAMP:" + format(entry.getCreateDate()) + "\n");
+            sb.append("DTSTART:" + format(entry.getStartDate()) + "\n");
+            sb.append("DTEND:" + format(entry.getEndDate()) + "\n");
 
-	    sb.append("SUMMARY:" + entry.getName()+"\n");
-	    String desc = entry.getDescription();
-	    desc = desc.replace("\n","\\n");
+            sb.append("SUMMARY:" + entry.getName() + "\n");
+            String desc = entry.getDescription();
+            desc = desc.replace("\n", "\\n");
 
-	    sb.append("DESCRIPTION:" + desc);
-	    sb.append("\n");
-	    double[] loc = null;
-	    if(entry.hasAreaDefined()) {
-		loc = entry.getLocation();
-	    } else  if(entry.hasLocationDefined()) {
-		loc = entry.getCenter();
-	    }
-	    if(loc!=null) {
-		sb.append("GEO:" + loc[0]+";" + loc[1]+"\n");
-	    }
+            sb.append("DESCRIPTION:" + desc);
+            sb.append("\n");
+            double[] loc = null;
+            if (entry.hasAreaDefined()) {
+                loc = entry.getLocation();
+            } else if (entry.hasLocationDefined()) {
+                loc = entry.getCenter();
+            }
+            if (loc != null) {
+                sb.append("GEO:" + loc[0] + ";" + loc[1] + "\n");
+            }
             String url =
                 repository.absoluteUrl(request.url(repository.URL_ENTRY_SHOW,
                     ARG_ENTRYID, entry.getId()));
-            sb.append("ATTACH:" + url +"\n");
-	    sb.append("END:VEVENT\n");
+            sb.append("ATTACH:" + url + "\n");
+            sb.append("END:VEVENT\n");
         }
 
         request.put(ARG_OUTPUT, output);

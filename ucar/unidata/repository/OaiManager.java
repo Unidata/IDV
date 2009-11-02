@@ -20,7 +20,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository;
 
 
@@ -79,271 +78,277 @@ import java.util.Properties;
  */
 public class OaiManager extends RepositoryManager {
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_VERB = "verb";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_IDENTIFIER = "identifier";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_RESUMPTIONTOKEN = "resumptionToken";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_FROM = "from";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_UNTIL = "until";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_SET = "set";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_METADATAPREFIX = "metadataPrefix";
 
-    /** _more_          */
+    /** _more_ */
     private static final String[] ALLARGS = {
         ARG_VERB, ARG_IDENTIFIER, ARG_RESUMPTIONTOKEN, ARG_FROM, ARG_UNTIL,
         ARG_SET, ARG_METADATAPREFIX
     };
 
-    /** _more_          */
+    /** _more_ */
     private static final String[] formats = { "yyyy-MM-dd'T'HH:mm:ss Z",
             "yyyyMMdd'T'HHmmss Z" };
 
-    /** _more_          */
+    /** _more_ */
     private SimpleDateFormat[] parsers;
 
 
 
-    /** _more_          */
+    /** _more_ */
     private static HashSet argSet;
 
-    /** _more_          */
+    /** _more_ */
     private static HashSet verbSet;
 
-    /** _more_          */
+    /** _more_ */
     public static final String VERB_IDENTIFY = "Identify";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VERB_LISTMETADATAFORMATS =
         "ListMetadataFormats";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VERB_LISTSETS = "ListSets";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VERB_LISTIDENTIFIERS = "ListIdentifiers";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VERB_LISTRECORDS = "ListRecords";
 
-    /** _more_          */
+    /** _more_ */
     public static final String VERB_GETRECORD = "GetRecord";
 
-    /** _more_          */
+    /** _more_ */
     private static final String[] ALLVERBS = {
         VERB_IDENTIFY, VERB_LISTMETADATAFORMATS, VERB_LISTSETS,
         VERB_LISTIDENTIFIERS, VERB_LISTRECORDS, VERB_GETRECORD
     };
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ERROR_BADARGUMENT = "badArgument";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ERROR_BADRESUMPTIONTOKEN =
         "badResumptionToken";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ERROR_BADVERB = "badVerb";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ERROR_CANNOTDISSEMINATEFORMAT =
         "cannotDisseminateFormat";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ERROR_IDDOESNOTEXIST = "idDoesNotExist";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ERROR_NORECORDSMATCH = "noRecordsMatch";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ERROR_NOMETADATAFORMATS = "noMetaDataFormats";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ERROR_NOSETHIERARCHY = "noSetHierarchy";
 
 
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_OAI_PMH = "OAI-PMH";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_RESPONSEDATE = "responseDate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_REQUEST = "request";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_IDENTIFY = "Identify";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_REPOSITORYNAME = "repositoryName";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_BASEURL = "baseURL";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_PROTOCOLVERSION = "protocolVersion";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_ADMINEMAIL = "adminEmail";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_EARLIESTDATESTAMP = "earliestDatestamp";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DELETEDRECORD = "deletedRecord";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_GRANULARITY = "granularity";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DESCRIPTION = "description";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_OAI_IDENTIFIER = "oai-identifier";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SCHEME = "scheme";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_REPOSITORYIDENTIFIER =
         "repositoryIdentifier";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DELIMITER = "delimiter";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SAMPLEIDENTIFIER = "sampleIdentifier";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_ERROR = "error";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_LISTMETADATAFORMATS =
         "ListMetadataFormats";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_METADATAFORMAT = "metadataFormat";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_METADATAPREFIX = "metadataPrefix";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SCHEMA = "schema";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_METADATANAMESPACE = "metadataNamespace";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_LISTIDENTIFIERS = "ListIdentifiers";
 
-
     /** _more_          */
+    public static final String TAG_LISTRECORDS = "ListRecords";
+
+
+    /** _more_ */
     public static final String TAG_DC_TITLE = "dc:title";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DC_CREATOR = "dc:creator";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DC_PUBLISHER = "dc:publisher";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DC_SUBJECT = "dc:subject";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DC_DESCRIPTION = "dc:description";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DC_CONTRIBUTOR = "dc:contributor";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DC_TYPE = "dc:type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DC_IDENTIFIER = "dc:identifier";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DC_LANGUAGE = "dc:language";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DC_RELATION = "dc:relation";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_GETRECORD = "GetRecord";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_RECORD = "record";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_HEADER = "header";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_IDENTIFIER = "identifier";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_DATESTAMP = "datestamp";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_METADATA = "metadata";
 
-    /** _more_          */
-    public static final String TAG_OAI_DC = "oai_dc";
+    /** _more_ */
+    public static final String TAG_OAIDC_DC = "oaidc:dc";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_RESUMPTIONTOKEN = "resumptionToken";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CODE = "code";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_XMLNS = "xmlns";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_XMLNS_DC = "xmlns:dc";
 
     /** _more_          */
+    public static final String ATTR_XMLNS_OAIDC = "xmlns:oaidc";
+
+    /** _more_ */
     public static final String ATTR_XMLNS_XSI = "xmlns:xsi";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VERB = "verb";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_IDENTIFIER = "identifier";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_METADATAPREFIX = "metadataPrefix";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_XSI_SCHEMALOCATION = "xsi:schemaLocation";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SCHEMA =
         "http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd";
 
 
 
 
-    /** _more_          */
+    /** _more_ */
     private SimpleDateFormat sdf;
 
-    /** _more_          */
+    /** _more_ */
     private String repositoryIdentifier;
 
 
@@ -413,7 +418,7 @@ public class OaiManager extends RepositoryManager {
                                   "bad metadataPrefix argument");
         }
 
-        if (request.exists(ARG_RESUMPTIONTOKEN)) {
+        if (request.defined(ARG_RESUMPTIONTOKEN)) {
             try {
                 new Integer(request.getString(ARG_RESUMPTIONTOKEN,
                         "")).intValue();
@@ -480,6 +485,10 @@ public class OaiManager extends RepositoryManager {
     public Result processRequest(Request request) throws Exception {
         Element root = getRoot(request);
         try {
+            String verb = request.getString(ARG_VERB, VERB_IDENTIFY);
+            //            if(verb.equals(VERB_GETRECORD)) {
+            //                return new Result("",new StringBuffer(getRepository().getResource("/ucar/unidata/repository/resources/test.xml")),"text/xml");
+            //            }
             processRequestInner(request, root);
         } catch (MyException myexc) {
             handleError(request, root, myexc.code, myexc.toString());
@@ -507,7 +516,11 @@ public class OaiManager extends RepositoryManager {
         }
         String verb = request.getString(ARG_VERB, VERB_IDENTIFY);
         if ( !verbSet.contains(verb)) {
-            handleError(request, root, ERROR_BADVERB);
+            //Add in an attributeless request node
+            String url =
+                getRepository().absoluteUrl(request.getRequestPath());
+            XmlUtil.create(TAG_REQUEST, root, url);
+            handleError(request, root, ERROR_BADVERB, "Bad verb:" + verb);
             return;
         }
 
@@ -722,10 +735,10 @@ public class OaiManager extends RepositoryManager {
      */
     private static class EntryList {
 
-        /** _more_          */
+        /** _more_ */
         String resumptionToken;
 
-        /** _more_          */
+        /** _more_ */
         List<Entry> entries = new ArrayList<Entry>();
 
         /**
@@ -778,7 +791,7 @@ public class OaiManager extends RepositoryManager {
      */
     public static class MyException extends IllegalArgumentException {
 
-        /** _more_          */
+        /** _more_ */
         String code;
 
         /**
@@ -820,9 +833,15 @@ public class OaiManager extends RepositoryManager {
      */
     private EntryList getEntries(Request request) throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
-        int         max     = request.get(ARG_MAX, 5);
-        int         skip    = request.get(ARG_RESUMPTIONTOKEN, 0);
-        Request newRequest  = new Request(getRepository(), request.getUser());
+        if (true) {
+            //            entries.add(getEntryManager().getTopGroup());
+            //            return new EntryList(entries, null);
+        }
+
+
+        int     max        = request.get(ARG_MAX, 5);
+        int     skip       = request.get(ARG_RESUMPTIONTOKEN, 0);
+        Request newRequest = new Request(getRepository(), request.getUser());
         newRequest.put(ARG_SKIP, "" + skip);
         newRequest.put(ARG_MAX, "" + max);
 
@@ -879,6 +898,9 @@ public class OaiManager extends RepositoryManager {
         if (entries.resumptionToken != null) {
             XmlUtil.create(TAG_RESUMPTIONTOKEN, root,
                            entries.resumptionToken);
+        } else if (request.exists(ARG_RESUMPTIONTOKEN)) {
+            //Put in the blank one
+            XmlUtil.create(TAG_RESUMPTIONTOKEN, root, "");
         }
 
     }
@@ -944,10 +966,11 @@ public class OaiManager extends RepositoryManager {
                         "No records match");
             return;
         }
+        Element listRecordNode = XmlUtil.create(TAG_LISTRECORDS, root);
         for (Entry entry : entryList.entries) {
-            makeRecord(request, entry, root);
+            makeRecord(request, entry, listRecordNode);
         }
-        addResumption(request, root, entryList);
+        addResumption(request, listRecordNode, entryList);
     }
 
 
@@ -1008,7 +1031,8 @@ public class OaiManager extends RepositoryManager {
             return;
         }
 
-        makeRecord(request, entry, root);
+        Element node = XmlUtil.create(TAG_GETRECORD, root);
+        makeRecord(request, entry, node);
     }
 
     /**
@@ -1017,18 +1041,18 @@ public class OaiManager extends RepositoryManager {
      * @param request _more_
      * @param entry _more_
      * @param root _more_
+     * @param node _more_
      *
      * @throws Exception _more_
      */
-    private void makeRecord(Request request, Entry entry, Element root)
+    private void makeRecord(Request request, Entry entry, Element node)
             throws Exception {
-        Element node   = XmlUtil.create(TAG_GETRECORD, root);
         Element record = XmlUtil.create(TAG_RECORD, node);
         makeHeader(entry, record);
 
         Element metadata = XmlUtil.create(TAG_METADATA, record);
-        Element oaidc    = XmlUtil.create(TAG_OAI_DC, metadata, new String[] {
-            ATTR_XMLNS, "http://www.openarchives.org/OAI/2.0/oai_dc/",
+        Element oaidc = XmlUtil.create(TAG_OAIDC_DC, metadata, new String[] {
+            ATTR_XMLNS_OAIDC, "http://www.openarchives.org/OAI/2.0/oai_dc/",
             ATTR_XMLNS_DC, "http://purl.org/dc/elements/1.1/", ATTR_XMLNS_XSI,
             "http://www.w3.org/2001/XMLSchema-instance",
             ATTR_XSI_SCHEMALOCATION,

@@ -135,8 +135,13 @@ public class Resource {
         this.type = that.type;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isDefined() {
-        return path!=null && path.length()>0;
+        return (path != null) && (path.length() > 0);
     }
 
     /**
@@ -145,8 +150,10 @@ public class Resource {
      * @return _more_
      */
     public boolean isImage() {
-        if(path==null) return false;
-        String  file = path.toLowerCase();
+        if (path == null) {
+            return false;
+        }
+        String file = path.toLowerCase();
         return file.endsWith(".jpg") || file.endsWith(".jpeg")
                || file.endsWith(".gif") || file.endsWith(".png");
     }

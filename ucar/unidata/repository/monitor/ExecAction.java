@@ -19,7 +19,6 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.repository.monitor;
 
 
@@ -49,7 +48,7 @@ import java.util.List;
  */
 public class ExecAction extends MonitorAction {
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_EXEC_EXECLINE = "exec.execline";
 
     /** _more_ */

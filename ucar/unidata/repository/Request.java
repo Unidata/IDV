@@ -1005,6 +1005,13 @@ public class Request implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     public boolean hasMultiples(String key) {
         Object result = getValue(key, (Object) null);
         if (result == null) {
