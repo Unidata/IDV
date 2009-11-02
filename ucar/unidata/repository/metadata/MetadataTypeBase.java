@@ -98,6 +98,10 @@ public class MetadataTypeBase extends RepositoryManager {
     /** _more_ */
     public static final String TEMPLATETYPE_DIF = "dif";
 
+
+    /** _more_ */
+    public static final String TEMPLATETYPE_OAIDC = "oaidc";
+
     /** _more_ */
     public static final String TEMPLATETYPE_HTML = "html";
 
@@ -276,7 +280,7 @@ public class MetadataTypeBase extends RepositoryManager {
             template = template.replace("${" + key + "}", value);
             template = template.replace("${" + key + ".label}", label);
             template = template.replace("${" + key + ".cdata}",
-                                        "[CDATA[" + value + "]]");
+                                        "<![CDATA[" + value + "]]>");
         }
         template = template.replaceAll("\r\n\r\n", "<p>");
         template = template.replace("\n\n", "<p>");

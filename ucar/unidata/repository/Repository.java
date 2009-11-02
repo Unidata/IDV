@@ -353,6 +353,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private UserManager userManager;
 
+    private OaiManager oaiManager;
+
     /** _more_ */
     private MonitorManager monitorManager;
 
@@ -987,6 +989,30 @@ public class Repository extends RepositoryBase implements RequestHandler {
             userManager = doMakeUserManager();
         }
         return userManager;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected OaiManager doMakeOaiManager() {
+        return new OaiManager(this);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public OaiManager getOaiManager() {
+        if (oaiManager == null) {
+            oaiManager = doMakeOaiManager();
+        }
+        return oaiManager;
     }
 
 
@@ -1661,6 +1687,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 handler = getUserManager();
             } else if (handlerName.equals("monitormanager")) {
                 handler = getMonitorManager();
+            } else if (handlerName.equals("oaimanager")) {
+                handler = getOaiManager();
             } else if (handlerName.equals("admin")) {
                 handler = getAdmin();
             } else if (handlerName.equals("harvestermanager")) {

@@ -134,4 +134,9 @@
       <api request="/harvester/new"            method="processNew"            admin="true" />
       <api request="/harvester/edit/*"           method="processEdit"           admin="true" />
   </group>
+
+
+  <group handler="oaimanager">
+      <api request="/oai/*"           method="processRequest"          admin="false" />
+  </group>
 </api>

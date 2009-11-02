@@ -7,6 +7,7 @@
     <type name="Tag" id="enum_tag" searchable="true" browsable="true">
       <element name="Tag Value" />
       <template type="thredds"><![CDATA[<keyword>${attr1}</keyword>]]></template>
+      <template type="oaidc"><![CDATA[<dc:subject>${attr1.cdata}</dc:subject>]]></template>
     </type>
 
     <type name="Wiki Category" id="wikicategory" foruser="false">

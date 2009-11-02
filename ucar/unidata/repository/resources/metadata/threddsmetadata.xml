@@ -30,6 +30,7 @@
       <element name="" datatype="skip"/>
       <element name="Email" datatype="email"/>
       <element name="URL" datatype="url"/>
+      <template type="oaidc"><![CDATA[<dc:creator>${Organization.cdata}</dc:creator>]]></template>
     </type>
 
     <type name="Publisher" id="thredds.publisher"  searchable="true" browsable="true">
@@ -39,6 +40,7 @@
       <element name="URL" datatype="url"/>
       <template type="thredds"><![CDATA[<publisher><name role="${attr2}">${Organization}</name>
  <contact email="${Email}" url="${URL}"/></publisher>]]></template>
+      <template type="oaidc"><![CDATA[<dc:publisher>${Organization.cdata}</dc:publisher>]]></template>
     </type>
 
 
@@ -46,6 +48,7 @@
       <element name="Name" />
       <element name="Role" />
       <template type="thredds"><![CDATA[<contributor role="${Role}">${Name}</contributor>]]></template>
+      <template type="oaidc"><![CDATA[<dc:contributor>${Name.cdata}</dc:contributor>]]></template>
     </type>
 
     <type name="Property" id="thredds.property"  searchable="true" browsable="true">
@@ -71,6 +74,8 @@
 
     <type name="Data Format" id="thredds.dataFormat">
       <element name="Value" />
+      <template type="oaidc"><![CDATA[<dc:format>${Value.cdata}</dc:format>]]></template>
+
       <template type="thredds"><![CDATA[<dataFormat>${Value}</dataFormat>]]></template>
 
       <template type="dif"><![CDATA[<Distribution>
@@ -84,6 +89,7 @@
     <type name="Datatype" id="thredds.dataType">
       <element name="Value" />
       <template type="thredds"><![CDATA[<dataType>${Value}</dataType>]]></template>
+      <template type="oaidc"><![CDATA[<dc:type>${Value.cdata}</dc:type>]]></template>
     </type>
 
     <type name="Authority" id="thredds.authority">
