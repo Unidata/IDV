@@ -241,6 +241,23 @@ public class Misc {
 
 
 
+    /**
+     * Reverse an array
+     *
+     * @param fromArray   array to reverse
+     * @param toArray     reversed array
+     *
+     * @return reversed array
+     */
+    public static List reverseList(List l) {
+	ArrayList l2  = new ArrayList();
+	for(Object o: l) {
+	    l2.add(0, o);
+	}
+	return l2;
+    }
+
+
 
     /**
      * Reverse an array
