@@ -20,12 +20,12 @@
 
 
 <!-- Color Tables -->
-<plugin name="CIMSS Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/cimssenh.jar" description="Color tables for CIMSS Satellite products" category="Color Tables"/>
 <plugin name="GEMPAK Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/gempak.jar" description="Color tables from GEMPAK" category="Color Tables"/>
 <plugin name="NCL Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/ncl.jar" description="Color tables from NCL" category="Color Tables"/>
 <plugin name="McIDAS Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/mcidas.jar" description="Color tables from McIDAS" category="Color Tables"/>
 <plugin name="Panoply Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/panoply.jar" description="Color tables from the Panoply application" category="Color Tables"/>
-
+<plugin name="Geovista Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/geovista.jar" description="Color tables from the Geovista application" category="Color Tables"/>
+<plugin name="CIMSS Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/cimssenh.jar" description="Color tables for CIMSS Satellite products" category="Color Tables"/>
 <!-- Maps -->
 
 <plugin  version="2.2"  name="U.S. Highways and Roads" description="Map" size="4201747" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/usroads.jar" category="Maps"/>
