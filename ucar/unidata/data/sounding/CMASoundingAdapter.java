@@ -24,6 +24,7 @@
 package ucar.unidata.data.sounding;
 
 
+import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.IOUtil;
@@ -71,6 +72,10 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
     /** unit for geopotential */
     private static final Unit GEOPOTENTIAL_UNIT;
 
+    private List<SimpleDateFormat> formats;
+
+    private static final String []DATE_FORMATS = {"yyyy-MM-dd-HH-mm","yyyy-MM-dd-HH"};
+
     static {
         try {
             GEOPOTENTIAL_UNIT = DataUtil.parseUnit("m2/s2");
@@ -97,6 +102,12 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
     public CMASoundingAdapter(String filename) throws Exception {
         super("CMASoundingAdapter");
         this.filename = filename;
+        formats = new ArrayList<SimpleDateFormat>();
+        for(String fmt: DATE_FORMATS) {
+            SimpleDateFormat sdf = new SimpleDateFormat(fmt);
+            sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
+            formats.add(sdf);
+        }
         init();
     }
 
@@ -126,6 +137,19 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
     }
 
 
+
+    private DateTime parseDate(String dttm) {
+        dttm = dttm.trim();
+        for(SimpleDateFormat sdf: formats) {
+            try {
+                Date date = sdf.parse(dttm);
+                if(date!=null) {
+                    return new DateTime(date);
+                }
+            } catch(Exception exc){}
+        }
+        return null;
+    }
 
     /**
      * Read a file of decoded soundings from CMA.  Format of
@@ -165,8 +189,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
             }
             buf.append(toks.get(tokNum++));
         // now should have something like 2007-1-27-0
-            DateTime dt = DateTime.createDateTime(buf.toString(),
-                          "yyyy-MM-dd-HH");
+            DateTime dt = parseDate(buf.toString());
 
             times.add(dt);
             int numStations = Integer.parseInt(toks.get(tokNum));
@@ -252,8 +275,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
         }
         buf.append(tok.nextToken());
         // now should have something like 2007-1-27-0
-        DateTime dt = DateTime.createDateTime(buf.toString(),
-                          "yyyy-MM-dd-HH");
+        DateTime dt = parseDate(buf.toString());
         times = new ArrayList(1);
         times.add(dt);
 
