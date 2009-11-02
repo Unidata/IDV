@@ -35,7 +35,7 @@ import ucar.unidata.gis.GisFeature;
 
 import ucar.unidata.gis.shapefile.DbaseFile;
 import ucar.unidata.gis.shapefile.EsriShapefile;
-import ucar.unidata.gis.shapefile.ProjFile;
+//jeffmc: import ucar.unidata.gis.shapefile.ProjFile;
 
 import ucar.unidata.idv.control.drawing.ShapeGlyph;
 
