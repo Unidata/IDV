@@ -1179,6 +1179,66 @@ public abstract class XmlUtil {
     }
 
 
+
+
+    /**
+     * _more_
+     *
+     * @param doc _more_
+     * @param tag _more_
+     * @param parent _more_
+     * @param attrs _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Element create(String tag, Element parent,
+                                 String[] attrs)
+            throws Exception {
+	return create(parent.getOwnerDocument(), tag, parent, attrs);
+    }
+
+    /**
+     * _more_
+     *
+     * @param doc _more_
+     * @param tag _more_
+     * @param parent _more_
+     * @param text _more_
+     * @param attrs _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Element create(String tag, Element parent,
+                                 String text, String[] attrs)
+            throws Exception {
+	return create(parent.getOwnerDocument(), tag, parent, text, attrs);
+    }
+
+    /**
+     * _more_
+     *
+     * @param doc _more_
+     * @param tag _more_
+     * @param parent _more_
+     * @param text _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Element create(String tag, Element parent,
+                                 String text)
+            throws Exception {
+	return create(parent.getOwnerDocument(),tag,parent,text);
+    }
+
+
+
+
     /**
      *  Read in the xml contained in the given filename, parse it and return the
      *  root Element. If the filename cannot be found then return null
@@ -2202,9 +2262,10 @@ public abstract class XmlUtil {
 
     private static void printTags(Element node, HashSet<String> seen, StringBuffer tagBuff, StringBuffer attrBuff) {
 	String tagName = node.getTagName();
-	if(tagName.indexOf(":")<0 && !seen.contains("tag:" +tagName)) {
+	if(!seen.contains("tag:" +tagName)) {
 	    seen.add("tag:"+tagName);
-	    tagBuff.append("public static final String TAG_" + tagName.toUpperCase() +" = \"" + tagName+"\";\n");
+	    String tmp = tagName.replace(":","_").toUpperCase();
+	    tagBuff.append("public static final String TAG_" + tmp +" = \"" + tagName+"\";\n");
 	}
         NamedNodeMap nnm = node.getAttributes();
         if (nnm != null) {
