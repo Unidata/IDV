@@ -137,17 +137,23 @@ public final class RaobDataSource extends DataSourceImpl {
         SoundingAdapter adapter = null;
         try {
             adapter = new NetcdfSoundingAdapter(file);
-        } catch (IllegalArgumentException ill) {
+        } catch (Exception ill) {
+        }
+
+        if(adapter == null) {
             try {
                 adapter = new CMASoundingAdapter(file);
             } catch (Exception exc) {
                 LogUtil.logException("Reading sounding:" + file, exc);
                 return null;
             }
-        } catch (Exception exc) {
-            LogUtil.logException("Reading sounding:" + file, exc);
-            return null;
         }
+
+        if(adapter == null) {
+            throw new IllegalArgumentException("Could not open sounding file:" + file);
+        }
+
+
 
         SoundingOb[] obs = adapter.getSoundingObs();
         return new RaobDataSet(adapter, Misc.toList(obs));
