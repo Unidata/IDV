@@ -104,10 +104,10 @@ import org.apache.ftpserver.*;
 import org.apache.ftpserver.listener.*;
 import org.apache.ftpserver.ftplet.*;
 import org.apache.ftpserver.usermanager.*;
-import ucar.unidata.repository.ftp.*;
 import org.apache.ftpserver.usermanager.impl.*;
 
 
+import ucar.unidata.repository.ftp.FtpManager;
 
 
 /**
@@ -403,6 +403,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     /** _more_ */
     private DatabaseManager databaseManager;
+
+    private FtpManager ftpManager;
 
     /** _more_ */
     private Admin admin;
@@ -1063,8 +1065,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (getInstallationComplete()) {
             getRegistryManager().doFinalInitialization();
         }
-	initFtpServer();
-
+	getFtpManager();
     }
 
 
@@ -1145,6 +1146,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     protected DatabaseManager doMakeDatabaseManager() {
         return new DatabaseManager(this);
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected FtpManager doMakeFtpManager() {
+        return new FtpManager(this);
     }
 
 
@@ -1453,6 +1463,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
             databaseManager = doMakeDatabaseManager();
         }
         return databaseManager;
+    }
+
+
+    public FtpManager getFtpManager() {
+        if (ftpManager == null) {
+            ftpManager = doMakeFtpManager();
+        }
+        return ftpManager;
     }
 
 

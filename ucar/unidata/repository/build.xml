@@ -241,6 +241,7 @@
         <include name="ucar/unidata/repository/harvester/*.java"/>
         <include name="ucar/unidata/repository/collab/*.java"/>
         <include name="ucar/unidata/repository/type/*.java"/>
+        <include name="ucar/unidata/repository/ftp/*.java"/>
         <include name="ucar/unidata/repository/monitor/*.java"/>
         <include name="ucar/unidata/repository/idv/IdvWebstartOutputHandler.java"/>
         <include name="ucar/unidata/repository/idv/TdsOutputHandler.java"/>
@@ -366,7 +367,8 @@
         <unjar src="${libsrc}/ftplet-api-1.0.3.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/ftpserver-core-1.0.3.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/mina-core-2.0.0-M6.jar" dest="${tmpjardir}"/>
-        <unjar src="${libsrc}/slf4j-api-1.5.2.jar" dest="${tmpjardir}"/>
+<!--        <unjar src="${libsrc}/slf4j-api-1.5.2.jar" dest="${tmpjardir}"/>
+-->
 
 
 
