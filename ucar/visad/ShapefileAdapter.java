@@ -35,7 +35,6 @@ import ucar.unidata.gis.GisFeature;
 
 import ucar.unidata.gis.shapefile.DbaseFile;
 import ucar.unidata.gis.shapefile.EsriShapefile;
-//jeffmc: import ucar.unidata.gis.shapefile.ProjFile;
 
 import ucar.unidata.idv.control.drawing.ShapeGlyph;
 
@@ -656,6 +655,7 @@ public class ShapefileAdapter {
         }
         ShapefileAdapter sfa  = new ShapefileAdapter(args[0]);
         UnionSet         data = sfa.getData();
+        //System.out.println(data);
         visad.python.JPythonMethods.dumpTypes(data);
     }
 }
