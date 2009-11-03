@@ -1059,9 +1059,11 @@ public class OaiManager extends RepositoryManager {
             "http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd"
         });
 
-        //      XmlUtil.create(TAG_DC_IDENTIFIER, oaidc,entry.getId());
+	String entryUrl = getRepository().absoluteUrl(request.entryUrl(
+								       getRepository().URL_ENTRY_SHOW, entry));
+	XmlUtil.create(TAG_DC_IDENTIFIER, oaidc,entryUrl);
         XmlUtil.create(TAG_DC_TITLE, oaidc, entry.getName());
-        //      XmlUtil.create(TAG_DC_DESCRIPTION, oaidc,entry.getDescription());
+	XmlUtil.create(TAG_DC_DESCRIPTION, oaidc,entry.getDescription());
         addMetadata(request, entry, oaidc);
 
     }

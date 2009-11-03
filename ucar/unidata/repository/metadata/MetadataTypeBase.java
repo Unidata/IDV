@@ -100,7 +100,7 @@ public class MetadataTypeBase extends RepositoryManager {
 
 
     /** _more_ */
-    public static final String TEMPLATETYPE_OAIDC = "oaidc";
+    public static final String TEMPLATETYPE_OAIDC = "oai_dc";
 
     /** _more_ */
     public static final String TEMPLATETYPE_HTML = "html";
@@ -272,19 +272,26 @@ public class MetadataTypeBase extends RepositoryManager {
             name.replace(" ", "_"), name.toLowerCase().replace(" ", "_"),
             element.getId()
         };
+	Hashtable macros = new Hashtable();
+	macros.put("name",name);
+	//	template = template.replaceAll("\\${name}", name);
         for (String key : keys) {
             if (key == null) {
                 continue;
             }
             //                System.err.println("key: " + key);
-            template = template.replace("${" + key + "}", value);
-            template = template.replace("${" + key + ".label}", label);
-            template = template.replace("${" + key + ".cdata}",
-                                        "<![CDATA[" + value + "]]>");
+	    //            template = template.replaceAll("\\${" + key + "}", value);
+	    //            template = template.replaceAll("\\${" + key + ".label}", label);
+	    //            template = template.replaceAll("\\${" + key + ".cdata}",
+	    //                                        "<![CDATA[" + value + "]]>");
+	    macros.put(key, value);
+	    macros.put(key + ".label", label);
+	    macros.put(key + ".cdata", "<![CDATA[" + value + "]]>");
         }
+	template = StringUtil.applyMacros(template, macros, false);
         template = template.replaceAll("\r\n\r\n", "<p>");
         template = template.replace("\n\n", "<p>");
-        return template;
+	return template;
     }
 
     /**

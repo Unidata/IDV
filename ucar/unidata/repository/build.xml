@@ -26,7 +26,13 @@
         <property name="docs_javadoc_dest" value="${docs_dest}/javadoc" />
         <mkdir dir="${docs_javadoc_dest}"/>
 
-        <property name="classpath" value="${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar:${libsdir}/servlet-api.jar:${libsdir}/jython.jar"/>
+
+
+<!--	<property name="ftp" value="/Users/jeffmc/ftplib"/>
+	<property name="ftpcp" value="${ftp}/ftplet-api-1.0.3.jar:${ftp}/ftpserver-core-1.0.3.jar:${ftp}/mina-core-2.0.0-M6.jar:${ftp}/slf4j-api-1.5.2.jar:${ftp}/slf4j-log4j12-1.5.2.jar"/>
+	<echo message="${ftpcp}"/>
+-->
+        <property name="classpath" value="${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar:${libsdir}/servlet-api.jar:${libsdir}/jython.jar:${ftpcp}"/>
     </target>
 
     <target name="clean" depends="init" >
@@ -356,6 +362,16 @@
         <unjar src="${libsrc}/commons-pool-1.5.3.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/commons-fileupload-1.2.1.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jfreechart.jar" dest="${tmpjardir}"/>
+
+        <unjar src="${libsrc}/ftplet-api-1.0.3.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/ftpserver-core-1.0.3.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/mina-core-2.0.0-M6.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/slf4j-api-1.5.2.jar" dest="${tmpjardir}"/>
+
+
+
+
+
 
 <!--
         <unjar src="${libsdir}/servlet-api.jar" dest="${tmpjardir}"/>
