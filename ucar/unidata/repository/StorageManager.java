@@ -459,7 +459,7 @@ public class StorageManager extends RepositoryManager {
      *
      * @return _more_
      */
-    private File getTmpDir() {
+    public File getTmpDir() {
         if (tmpDir == null) {
             tmpDir = new File(IOUtil.joinDir(getRepositoryDir(), DIR_TMP));
             IOUtil.makeDirRecursive(tmpDir);

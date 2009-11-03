@@ -19,12 +19,22 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository.ftp;
+
+
+import org.apache.ftpserver.*;
+import org.apache.ftpserver.ftplet.*;
+import org.apache.ftpserver.listener.*;
+import org.apache.ftpserver.usermanager.*;
+import org.apache.ftpserver.usermanager.impl.*;
 
 
 
 
 import ucar.unidata.repository.*;
+
+import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,14 +49,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import java.io.IOException;
-
-import org.apache.ftpserver.*;
-import org.apache.ftpserver.listener.*;
-import org.apache.ftpserver.ftplet.*;
-import org.apache.ftpserver.usermanager.*;
-import org.apache.ftpserver.usermanager.impl.*;
-
 
 
 
@@ -56,45 +58,55 @@ import org.apache.ftpserver.usermanager.impl.*;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class FtpManager  extends RepositoryManager {
+public class FtpManager extends RepositoryManager {
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     */
     public FtpManager(Repository repository) {
         super(repository);
-	try {
-	    initFtpServer();
-	} catch(Exception exc) {
-	    logError("Creating FTP server", exc);
-	}
+        try {
+            initFtpServer();
+        } catch (Exception exc) {
+            logError("Creating FTP server", exc);
+        }
     }
 
 
 
 
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     private void initFtpServer() throws Exception {
 
-	FtpServerFactory serverFactory = new FtpServerFactory();
+        FtpServerFactory serverFactory = new FtpServerFactory();
 
-	Hashtable ftplets = new Hashtable<java.lang.String,Ftplet>();
-	ftplets.put("default",new RepositoryFtplet(this));
-	serverFactory.setFtplets(ftplets);
-
-        
-	ListenerFactory factory = new ListenerFactory();
-
-        
-	// set the port of the listener
-	factory.setPort(2221);
-
-	// replace the default listener
-	serverFactory.addListener("default", factory.createListener());
+        Hashtable        ftplets = new Hashtable<java.lang.String, Ftplet>();
+        ftplets.put("default", new RepositoryFtplet(this));
+        serverFactory.setFtplets(ftplets);
 
 
-       serverFactory.setUserManager(new RepositoryFtpUserManager(this));
+        ListenerFactory factory = new ListenerFactory();
 
-	// start the server
-	FtpServer server = serverFactory.createServer(); 
-	server.start();
+
+        // set the port of the listener
+        factory.setPort(2221);
+
+        // replace the default listener
+        serverFactory.addListener("default", factory.createListener());
+
+
+        serverFactory.setUserManager(new RepositoryFtpUserManager(this));
+
+        // start the server
+        FtpServer server = serverFactory.createServer();
+        server.start();
 
     }
 

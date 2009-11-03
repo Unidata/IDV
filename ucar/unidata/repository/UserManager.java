@@ -2219,6 +2219,23 @@ public class UserManager extends RepositoryManager {
     }
 
 
+    public boolean isPasswordValid(String name, String password) throws Exception {
+        String hashedPassword = hashPassword(password);
+        Statement statement =
+            getDatabaseManager().select(Tables.USERS.COLUMNS,
+                                        Tables.USERS.NAME,
+                                        Clause.and(Clause.eq(Tables.USERS.COL_ID, name),
+                                                   Clause.eq(Tables.USERS.COL_PASSWORD,
+                                                             hashedPassword)));
+
+        ResultSet results = statement.getResultSet();
+        boolean valid = results.next();
+        getDatabaseManager().closeAndReleaseConnection(statement);
+        return valid;
+    }
+
+
+
     /**
      * _more_
      *

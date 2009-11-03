@@ -5739,7 +5739,6 @@ return new Result(title, sb);
             if (group != null) {
                 return group;
             }
-            //            System.err.println("Looking for:" + name);
 
             List<String> toks = (List<String>) StringUtil.split(name,
                                     Group.PATHDELIMITER, true, true);
@@ -5758,11 +5757,12 @@ return new Result(title, sb);
                         return null;
                     }
                     return getTopGroup();
+                } else {
                 }
             }
             List<Clause> clauses = new ArrayList<Clause>();
-            clauses.add(Clause.eq(Tables.ENTRIES.COL_TYPE,
-                                  TypeHandler.TYPE_GROUP));
+            //            clauses.add(Clause.eq(Tables.ENTRIES.COL_TYPE,
+                                  //                                  TypeHandler.TYPE_GROUP));
             if (parent != null) {
                 clauses.add(Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
                                       parent.getId()));
@@ -5770,12 +5770,14 @@ return new Result(title, sb);
                 clauses.add(
                     Clause.isNull(Tables.ENTRIES.COL_PARENT_GROUP_ID));
             }
+
             clauses.add(Clause.eq(Tables.ENTRIES.COL_NAME, lastName));
             Statement statement =
                 getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
                                             Tables.ENTRIES.NAME, clauses);
             List<Group> groups = readGroups(statement);
             getDatabaseManager().closeAndReleaseConnection(statement);
+
             if (groups.size() > 0) {
                 group = groups.get(0);
             } else {

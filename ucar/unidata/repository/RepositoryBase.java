@@ -447,7 +447,7 @@ public class RepositoryBase implements Constants, RepositorySource {
      *
      * @return _more_
      */
-    protected SimpleDateFormat makeSDF(String format) {
+    public SimpleDateFormat makeSDF(String format) {
         return getSDF(format, null);
     }
 

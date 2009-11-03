@@ -19,12 +19,22 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.repository.ftp;
+
+
+import org.apache.ftpserver.*;
+import org.apache.ftpserver.ftplet.*;
+import org.apache.ftpserver.listener.*;
+import org.apache.ftpserver.usermanager.*;
+import org.apache.ftpserver.usermanager.impl.*;
 
 
 
 
 import ucar.unidata.repository.*;
+
+import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,14 +49,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import java.io.IOException;
-
-import org.apache.ftpserver.*;
-import org.apache.ftpserver.listener.*;
-import org.apache.ftpserver.ftplet.*;
-import org.apache.ftpserver.usermanager.*;
-import org.apache.ftpserver.usermanager.impl.*;
-
 
 
 
@@ -57,68 +59,138 @@ import org.apache.ftpserver.usermanager.impl.*;
  * @version $Revision: 1.3 $
  */
 
-public class RepositoryFtpUserManager implements org.apache.ftpserver.ftplet.UserManager {
+public class RepositoryFtpUserManager implements org.apache.ftpserver.ftplet
+    .UserManager {
+
+    /** _more_          */
     FtpManager ftpManager;
+
+    /** _more_          */
     BaseUser user;
 
+    /**
+     * _more_
+     *
+     * @param ftpManager _more_
+     */
     public RepositoryFtpUserManager(FtpManager ftpManager) {
-	this.ftpManager = ftpManager;
-	user = new BaseUser();
-	user.setName("test");
-	user.setPassword("test");
-	user.setHomeDirectory("/Users/jeffmc");
-	List<Authority> auths = new ArrayList<Authority>();
-	auths.add(new ConcurrentLoginPermission(10,10));
-	//	    Authority auth = new WritePermission();
-	//	    auths.add(auth);
-	user.setAuthorities(auths);
+        this.ftpManager = ftpManager;
     }
 
-    public org.apache.ftpserver.ftplet.User authenticate(Authentication auth) {
-	if(true) return user;
-	/*
-	  if(auth instanceof UsernamePasswordAuthentication) {
-	  UsernamePasswordAuthentication upa = (UsernamePasswordAuthentication) auth;
-	  System.err.println ("auth:" +upa.getUsername() +" " + upa.getPassword());
-	  if(user == null) {
-	  user = new RepositoryFtpUser(upa.getUsername(), upa.getPassword());
-	  List<Authority> authorities = new ArrayList<Authority>();
-	  //		authorities.add(new ConcurrentLoginPermission(10,10));
-	  user.setAuthorities(authorities);
-	  }
-	  return user;
-	  }*/
-	return null;
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    private Repository getRepository() {
+        return ftpManager.getRepository();
     }
 
-    public 	void delete(java.lang.String username) {
+    /**
+     * _more_
+     *
+     * @param auth _more_
+     *
+     * @return _more_
+     */
+    public org.apache.ftpserver.ftplet.User authenticate(
+            Authentication auth) {
 
+        String name = "anonymous";
+        String password = "";
+        
+        try {
+        if(auth instanceof UsernamePasswordAuthentication) {
+            UsernamePasswordAuthentication upa = (UsernamePasswordAuthentication) auth;
+            name = "jeffmc";
+            //            name = upa.getName();
+            password = upa.getPassword();
+            if(!ftpManager.getRepository().getUserManager().isPasswordValid(name, password)) {
+                return null;
+            }
+        } else         if(auth instanceof UsernamePasswordAuthentication) {
+
+        } else {
+            return null;
+        }
+        BaseUser user   = new BaseUser();
+        user.setName(name);
+        user.setHomeDirectory(getRepository().getStorageManager().getTmpDir().toString());
+        List<Authority> auths = new ArrayList<Authority>();
+        auths.add(new ConcurrentLoginPermission(10, 10));
+        user.setAuthorities(auths);
+        return user;
+        } catch(Exception exc) {
+            throw new RuntimeException(exc);
+        }
     }
 
-    public 	boolean doesExist(java.lang.String username) {
-	return true;
+    /**
+     * _more_
+     *
+     * @param username _more_
+     */
+    public void delete(java.lang.String username) {}
+
+    /**
+     * _more_
+     *
+     * @param username _more_
+     *
+     * @return _more_
+     */
+    public boolean doesExist(java.lang.String username) {
+        return true;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getAdminName() {
-	return "foo";
+        return "foo";
     }
 
-    public 	String[] getAllUserNames() {
-	return new String[]{"jeffmc"};
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String[] getAllUserNames() {
+        return new String[] { "jeffmc" };
     }
 
 
-    public 	org.apache.ftpserver.ftplet.User getUserByName(java.lang.String username) {
-	return user;
-    }
-	
-    public 	boolean isAdmin(java.lang.String username) {
-	return  false;
+    /**
+     * _more_
+     *
+     * @param username _more_
+     *
+     * @return _more_
+     */
+    public org.apache.ftpserver.ftplet.User getUserByName(
+            java.lang.String username) {
+        return user;
     }
 
-    public 	void save(org.apache.ftpserver.ftplet.User user)  {
-
+    /**
+     * _more_
+     *
+     * @param username _more_
+     *
+     * @return _more_
+     */
+    public boolean isAdmin(java.lang.String username) {
+        return false;
     }
+
+    /**
+     * _more_
+     *
+     * @param user _more_
+     */
+    public void save(org.apache.ftpserver.ftplet.User user) {}
 
 }
 
