@@ -227,8 +227,7 @@ public abstract class AbstractGisFeature implements GisFeature {
 
         int            iP          = 0;  // part counter
         try {
-            RealTupleType coordMathType =
-                new RealTupleType(RealType.Longitude, RealType.Latitude);
+            RealTupleType coordMathType = RealTupleType.SpatialEarth2DTuple;
             java.util.Iterator pi = getGisParts();
             while (pi.hasNext()) {
                 GisPart   gp   = (GisPart) pi.next();
