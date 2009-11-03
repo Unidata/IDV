@@ -2708,13 +2708,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             inDataChangeCall = true;
             //Now, reset the data
             resetData();
-	    
-	    List infos  = getDisplayInfos();
-	    for (int i = 0; i < infos.size(); i++) {
-		DisplayInfo displayInfo = (DisplayInfo) infos.get(i);
-		displayInfo.getViewManager().displayDataChanged(this);
-		break;
-	    }
+
+            List infos = getDisplayInfos();
+            for (int i = 0; i < infos.size(); i++) {
+                DisplayInfo displayInfo = (DisplayInfo) infos.get(i);
+                displayInfo.getViewManager().displayDataChanged(this);
+                break;
+            }
 
             //Clear the flag
             inDataChangeCall = false;
@@ -5853,10 +5853,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     this,
                     "displayableToFront"), "/auxdata/ui/icons/shape_move_front.png"));
 
-	    ViewManager vm = getViewManager();
-	    if(vm!=null) {
-		items.add(GuiUtils.makeMenuItem("Show Main Window",vm,"toFront"));
-	    }
+            ViewManager vm = getViewManager();
+            if (vm != null) {
+                items.add(GuiUtils.makeMenuItem("Show View Window", vm,
+                        "toFront"));
+            }
 
         }
 
@@ -6658,19 +6659,22 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param el   location of cursor
      * @param animationValue  animation value
      * @param animationStep  animation step
+     * @param samples _more_
      *
      * @return list of strings for readout
      *
      * @throws Exception  problem getting at the data
      */
     public final List getCursorReadout(EarthLocation el, Real animationValue,
-                                       int animationStep,List<ReadoutInfo> samples)
+                                       int animationStep,
+                                       List<ReadoutInfo> samples)
             throws Exception {
         if ( !getDoCursorReadout()) {
             return null;
         }
         try {
-            List l = getCursorReadoutInner(el, animationValue, animationStep,samples);
+            List l = getCursorReadoutInner(el, animationValue, animationStep,
+                                           samples);
             return l;
         } catch (Exception exc) {
             LogUtil.consoleMessage("Error getting cursor readout");
@@ -6686,6 +6690,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param el   location of cursor
      * @param animationValue  animation value
      * @param animationStep  animation step
+     * @param samples _more_
      *
      * @return list of strings for readout
      *
@@ -6699,9 +6704,19 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return null;
     }
 
+    /**
+     * _more_
+     *
+     * @param el _more_
+     * @param animationValue _more_
+     * @param animationStep _more_
+     *
+     * @return _more_
+     */
     protected final List getCursorReadoutInner(EarthLocation el,
-                                               Real animationValue,
-        int animationStep) {return null;}
+            Real animationValue, int animationStep) {
+        return null;
+    }
 
 
     /**
@@ -6733,7 +6748,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             result = Misc.format(value);
             result = result + "[" + unit + "]";
             int length = result.length();
-            result = StringUtil.padLeft(result, 5 * (20 - length), "&nbsp;");
+            result = StringUtil.padLeft(result, 8 * (20 - length), "&nbsp;");
         }
 
         return result;
@@ -7046,10 +7061,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
         zPositionSlider = new ZSlider(getZPosition()) {
-                public void valueHasBeenSet() {
-                    zSliderChanged(getValue());
-                }
-            };
+            public void valueHasBeenSet() {
+                zSliderChanged(getValue());
+            }
+        };
         return zPositionSlider.getContents();
 
         /*
@@ -7893,8 +7908,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         List labels = getLegendLabels(SIDE_LEGEND);
 
         legendTextArea = new JTextArea("");
-        legendTextArea.setBackground(Color.red);
-        legendTextArea.setBackground(Color.red);
+        //legendTextArea.setBackground(Color.red);
         GuiUtils.applyDefaultFont(legendTextArea);
         legendTextArea.setEditable(false);
         //Add a paint method to draw an underline
@@ -7991,12 +8005,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             legendPanel.setBackground(Color.blue);
         }
 
-        if(GuiUtils.getDefaultFont()==null) {
+        if (GuiUtils.getDefaultFont() == null) {
             GuiUtils.setFontOnTree(legendPanel,
                                    GuiUtils.buttonFont.deriveFont(10.0f));
         } else {
-            GuiUtils.setFontOnTree(legendPanel,
-                                   GuiUtils.getDefaultFont());
+            GuiUtils.setFontOnTree(legendPanel, GuiUtils.getDefaultFont());
         }
         return legendPanel;
     }
@@ -9560,7 +9573,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (selectRange != null) {
             if (srw != null) {
                 srw.setRange(selectRange);
-                if(!srw.getSelectRangeEnabled()) return;
+                if ( !srw.getSelectRangeEnabled()) {
+                    return;
+                }
             }
             if (getHaveInitialized()) {
                 applySelectRange();
@@ -11342,8 +11357,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     return;
                 }
                 Misc.run(new Runnable() {
-                        public void run() {
-                            applySkipFactor();}});
+                    public void run() {
+                        applySkipFactor();
+                    }
+                });
             }
         });
         return GuiUtils.hgrid(skipSlider, GuiUtils.filler());
@@ -11494,19 +11511,26 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return pointSize;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public JComponent doMakePointSizeWidget() {
-        final JTextField pointSizeFld = new JTextField("" + getPointSize(), 5);
+        final JTextField pointSizeFld = new JTextField("" + getPointSize(),
+                                            5);
         pointSizeFld.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    try {
-                        setPointSize(new Float(
+            public void actionPerformed(ActionEvent ae) {
+                try {
+                    setPointSize(
+                        new Float(
                             pointSizeFld.getText().trim()).floatValue());
-                    } catch (Exception exc) {
-                        logException("Error parsing size:"
-                                     + pointSizeFld.getText(), exc);
-                    }
+                } catch (Exception exc) {
+                    logException("Error parsing size:"
+                                 + pointSizeFld.getText(), exc);
                 }
-            });
+            }
+        });
 
         return pointSizeFld;
     }
