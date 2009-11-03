@@ -20,17 +20,27 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 package ucar.unidata.gis.shapefile;
+
+
+import ucar.unidata.gis.AbstractGisFeature;
+import ucar.unidata.gis.GisFeature;
+import ucar.unidata.gis.GisPart;
+import ucar.unidata.io.BeLeDataInputStream;
+import ucar.unidata.util.IOUtil;
 
 
 
 import java.awt.geom.Rectangle2D;
 
 import java.io.BufferedInputStream;
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import java.net.URL;
 
@@ -40,10 +50,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import ucar.unidata.gis.AbstractGisFeature;
-import ucar.unidata.gis.GisFeature;
-import ucar.unidata.gis.GisPart;
-import ucar.unidata.io.BeLeDataInputStream;
 
 
 /**
@@ -57,99 +63,101 @@ import ucar.unidata.io.BeLeDataInputStream;
  */
 public class EsriShapefile {
 
-    /** _more_ */
+    /** shapefile magic number */
     public final static int SHAPEFILE_CODE = 9994;  // shapefile magic number
 
     // these are only shape types handled by this package, so far
 
-    /** _more_ */
+    /** null shape */
     public final static int NULL = 0;
 
-    /** _more_ */
+    /** point shape */
     public final static int POINT = 1;
 
-    /** _more_ */
+    /** polyline shape */
     public final static int POLYLINE = 3;
 
-    /** _more_ */
+    /** polygon shape */
     public final static int POLYGON = 5;
 
-    /** _more_ */
+    /** multipoint shape */
     public final static int MULTIPOINT = 8;
 
     // Eventually we should handle these new types also (is anyone using these?)
 
-    /** _more_ */
+    /** point with Z */
     public final static int POINTZ = 11;
 
-    /** _more_ */
+    /** polyline with z */
     public final static int POLYLINEZ = 13;
 
-    /** _more_ */
+    /** polygon with z */
     public final static int POLYGONZ = 15;
 
-    /** _more_ */
+    /** multipoint with z */
     public final static int MULTIPOINTZ = 18;
 
-    /** _more_ */
+    /** Measured point */
     public final static int POINTM = 21;
 
-    /** _more_ */
+    /** Measured polyline */
     public final static int POLYLINEM = 23;
 
-    /** _more_ */
+    /** Measured polygon */
     public final static int POLYGONM = 25;
 
-    /** _more_ */
+    /** Measured multi point */
     public final static int MULTIPOINTM = 28;
 
-    /** _more_ */
+    /** muti patch */
     public final static int MULTIPATCH = 31;
 
-    /** _more_          */
+    /** the feature type */
     private int featureType;
 
 
-    /** _more_ */
-    private BeLeDataInputStream bdis;               // the shapefile data stream
+    /** the shapefile data stream */
+    private BeLeDataInputStream bdis;
 
-    /** _more_ */
-    private int fileBytes;                          // bytes in file, according to header
+    /** bytes in file, according to header */
+    private int fileBytes;
 
-    /** _more_ */
-    private int bytesSeen = 0;                      // so far, in bytes.
+    /** so far, in bytes */
+    private int bytesSeen = 0;
 
-    /** _more_ */
-    private int version;                            // of shapefile format (currently 1000)
+    /** version of shapefile format (currently 1000) */
+    private int version;
 
-    /** _more_ */
-    private int fileShapeType;                      // not used here
+    /** file shape type */
+    private int fileShapeType;  // not used here
 
-    /** _more_ */
-    private ArrayList features;                     // EsriFeatures in List
+    /** EsriFeatures as List */
+    private ArrayList features;  // EsriFeatures in List
 
-    /** _more_ */
-    private Rectangle2D listBounds;                 // bounds from shapefile
+    /** bounds from shapefile */
+    private Rectangle2D listBounds;  // bounds from shapefile
 
-    /** _more_ */
-    private double resolution;                      // computed from coarseness
+    /** resolution computed from coarseness */
+    private double resolution;  // computed from coarseness
 
-    /** _more_          */
+    /** the Dbase file */
     private DbaseFile dbFile;
 
+    /** the projection file */
+    private ProjFile prjFile;
 
-    /** _more_ */
+    /** default coarseness */
     private final static double defaultCoarseness = 0.0;
-    /*
+
+    /**
      * Relative accuracy of plotting.  Larger means coarser but
      * faster, 0.0 is all available resolution.  Anything less than 1
      * is wasted sub-pixel plotting, but retains quality for closer
      * zooming.  Anything over about 2.0 is ugly.  1.50 makes things
      * faster than 1.0 at the cost of barely discernible ugliness, but
      * for best quality (without zooms), set to 1.0.  If you still
-     * want quality at 10:1 zooms, set to 1/10, etc.  */
-
-    /** _more_ */
+     * want quality at 10:1 zooms, set to 1/10, etc.  
+     */
     private double coarseness = defaultCoarseness;
 
 
@@ -300,7 +308,8 @@ public class EsriShapefile {
      *
      * @throws IOException
      */
-    public EsriShapefile(InputStream iStream, Rectangle2D bBox, double coarseness)
+    public EsriShapefile(InputStream iStream, Rectangle2D bBox,
+                         double coarseness)
             throws IOException {
 
         BufferedInputStream bin = new BufferedInputStream(iStream);
@@ -312,29 +321,48 @@ public class EsriShapefile {
         }
         if (isZipStream(bin)) {
             BeLeDataInputStream dbInputStream = null;
+            byte[]              shapeBytes    = null;
             ZipInputStream      zin           = new ZipInputStream(bin);
             ZipEntry            ze            = null;
             while ((ze = zin.getNextEntry()) != null) {
                 String name = ze.getName().toLowerCase();
                 if (name.endsWith(".shp")) {
+                    // hold bytes until we've read the other stuff
+                    shapeBytes = IOUtil.readBytes(zin, null, false);
+                    /*
                     bdis = new BeLeDataInputStream(zin);
                     Init(bBox);
-                    if (dbFile != null) {
+                    if ((dbFile != null) && (prjFile != null)) {
                         return;
                     }
+                    */
                 } else if (name.endsWith(".dbf")) {
                     dbFile = new DbaseFile(new BeLeDataInputStream(zin));
                     dbFile.loadHeader();
                     dbFile.loadData();
-                    if (bdis != null) {
-                        return;
+                    if ((shapeBytes != null) && (prjFile != null)) {
+                        break;
+                    }
+                } else if (name.endsWith(".prj")) {
+                    try {
+                        prjFile = new ProjFile(zin);
+                    } catch (Exception e) {
+                        prjFile = null;
+                        break;
+                    }
+                    if ((shapeBytes != null) && (dbFile != null)) {
+                        break;
                     }
                 } else {
                     zin.closeEntry();
                 }
             }
-            if (bdis == null) {
+            if (shapeBytes == null) {
                 throw new IOException("no .shp entry found in zipped input");
+            } else {
+                bdis = new BeLeDataInputStream(
+                    new ByteArrayInputStream(shapeBytes));
+                Init(bBox);
             }
         } else {
             bdis = new BeLeDataInputStream(bin);
@@ -344,19 +372,28 @@ public class EsriShapefile {
 
 
     /**
-     * _more_
+     * Get the Dbase file object
      *
-     * @return _more_
+     * @return  the DbaseFile object; may be null
      */
     public DbaseFile getDbFile() {
         return dbFile;
     }
 
     /**
-     * _more_
+     * Get the projection file
+     *
+     * @return  the projection file; may be null
+     */
+    public ProjFile getProjFile() {
+        return prjFile;
+    }
+
+    /**
+     * Is this a Zip stream?
      *
      * @param is
-     * @return _more_
+     * @return  true if it is
      *
      * @throws IOException
      */
@@ -374,11 +411,11 @@ public class EsriShapefile {
     }
 
     /**
-     * _more_
+     * Initialize with the bounding box
      *
-     * @param bBox
+     * @param bBox  bounding box in shape coordinates
      *
-     * @throws IOException
+     * @throws IOException  problem reading from the file
      */
     private void Init(Rectangle2D bBox) throws IOException {
         int fileCode = readInt();
@@ -451,13 +488,14 @@ public class EsriShapefile {
     }
 
     /**
-     * _more_
-     * @return _more_
+     * Read the bounding box for the file or shape
+     * @return the bounding box as a rectangle
      *
      * @throws IOException
      */
     private Rectangle2D readBoundingBox() throws IOException {
 
+        // TODO: convert bounding box to lat/lon if projFile != null
         double xMin   = readLEDouble();
         double yMin   = readLEDouble();
         double xMax   = readLEDouble();
@@ -469,10 +507,10 @@ public class EsriShapefile {
     }
 
     /**
-     * _more_
-     * @return _more_
+     * Read the next feature
+     * @return  the next feature
      *
-     * @throws IOException
+     * @throws IOException problem reading the feature
      */
     private EsriFeature nextFeature() throws IOException {
 
@@ -483,23 +521,23 @@ public class EsriShapefile {
 
         switch (featureType) {
 
-          case EsriShapefile.NULL :        // placeholder
+          case EsriShapefile.NULL :   // placeholder
               return new EsriNull();
 
-          case EsriShapefile.POINT :       // point data
-              //      System.err.println ("point");
+          case EsriShapefile.POINT :  // point data
+              // System.err.println ("point");
               return new EsriPoint();
 
           case EsriShapefile.MULTIPOINT :  // multipoint, only 1 part
-              //      System.err.println ("multi point");
+              // System.err.println ("multi point");
               return new EsriMultipoint();
 
-          case EsriShapefile.POLYLINE :    // arcs
-              //      System.err.println ("polyline");
+          case EsriShapefile.POLYLINE :  // arcs
+              // System.err.println ("polyline");
               return new EsriPolyline();
 
-          case EsriShapefile.POLYGON :     // polygon
-              //      System.err.println ("polygon");
+          case EsriShapefile.POLYGON :  // polygon
+              // System.err.println ("polygon");
               return new EsriPolygon();
 
           default :
@@ -509,8 +547,8 @@ public class EsriShapefile {
     }
 
     /**
-     * _more_
-     * @return _more_
+     * Read a little endian int
+     * @return the value
      *
      * @throws IOException
      */
@@ -520,8 +558,8 @@ public class EsriShapefile {
     }
 
     /**
-     * _more_
-     * @return _more_
+     * Read a 4 byte integer
+     * @return the value
      *
      * @throws IOException
      */
@@ -531,8 +569,8 @@ public class EsriShapefile {
     }
 
     /**
-     * _more_
-     * @return _more_
+     * Read a little endian double
+     * @return the value
      *
      * @throws IOException
      */
@@ -542,10 +580,10 @@ public class EsriShapefile {
     }
 
     /**
-     * _more_
+     * Read an array of little endian doubles
      *
-     * @param d
-     * @param n
+     * @param d  the output array
+     * @param n  the number of elements
      *
      * @throws IOException
      */
@@ -555,9 +593,9 @@ public class EsriShapefile {
     }
 
     /**
-     * _more_
+     * Skip bytes
      *
-     * @param n
+     * @param n the number of bytes to skip
      *
      * @throws IOException
      */
@@ -633,16 +671,16 @@ public class EsriShapefile {
      */
     public abstract class EsriFeature extends AbstractGisFeature {
 
-        /** _more_ */
+        /** bounds of this feature */
         protected Rectangle2D bounds;
 
-        /** _more_ */
+        /** number of points */
         protected int numPoints;
 
-        /** _more_ */
+        /** number of parts */
         protected int numParts;
 
-        /** _more_ */
+        /** the list of parts */
         protected List partsList = new ArrayList();
 
 
@@ -691,7 +729,7 @@ public class EsriShapefile {
     }  // EsriFeature
 
 
-    /** _more_ */
+    /** buffer for points input */
     private double[] xyPoints = new double[100];  // buffer for points input
 
     /**
@@ -725,7 +763,7 @@ public class EsriShapefile {
     public class EsriPolygon extends EsriFeature {
 
         /**
-         * _more_
+         * Create a new EsriPolygon
          *
          * @throws java.io.IOException
          *
@@ -748,7 +786,7 @@ public class EsriShapefile {
 
             /* numPoints is reduced by removing dupl. discretized points */
             numPoints = 0;
-            int ixy          = 0;
+            int ixy = 0;
             int numPartsLeft = 0;  // may be < numParts after eliminating 1-point parts
             for (int part = 0; part < numParts; part++) {
                 int pointsInPart = parts[part + 1] - parts[part];
@@ -783,7 +821,7 @@ public class EsriShapefile {
     public class EsriPolyline extends EsriFeature {
 
         /**
-         * _more_
+         * Create a new EsriPolyline
          *
          * @throws java.io.IOException
          *
@@ -806,7 +844,7 @@ public class EsriShapefile {
 
             /* numPoints is reduced by removing dupl. discretized points */
             numPoints = 0;
-            int ixy          = 0;
+            int ixy = 0;
             int numPartsLeft = 0;  // may be < numParts after eliminating 1-point parts
             for (int part = 0; part < numParts; part++) {
                 int pointsInPart = parts[part + 1] - parts[part];
@@ -837,7 +875,7 @@ public class EsriShapefile {
     public class EsriMultipoint extends EsriFeature {
 
         /**
-         * _more_
+         * Create a new EsriMultipoint
          *
          * @throws java.io.IOException
          *
@@ -867,7 +905,7 @@ public class EsriShapefile {
     public class EsriPoint extends EsriFeature {
 
         /**
-         * _more_
+         * Create a new EsriPoint
          *
          * @throws java.io.IOException
          *
@@ -894,7 +932,7 @@ public class EsriShapefile {
     public class EsriNull extends EsriFeature {
 
         /**
-         * _more_
+         * Create a null feature
          *
          */
         public EsriNull() {
@@ -903,21 +941,18 @@ public class EsriShapefile {
     }  // EsriNull
 
     /**
-     * Class EsriPart
-     *
-     *
-     * @author
-     * @version %I%, %G%
+     * Implementation of GisPart for Esri specific features, x and y are
+     * converted to lon/lat if a ProjFile is available
      */
     class EsriPart implements GisPart {
 
-        /** _more_ */
+        /** number of points */
         private int numPoints = 0;
 
-        /** _more_ */
+        /** the x values */
         private double[] x;
 
-        /** _more_ */
+        /** the y values */
         private double[] y;
 
         /**
@@ -966,43 +1001,62 @@ public class EsriShapefile {
                     yy   = y[j];
                 }
             }
+            double[][] xy = makeLatLon(new double[][] {
+                x, y
+            });
+            x = xy[0];
+            y = xy[1];
+
         }
 
         /**
-         * _more_
-         * @return _more_
+         * Get the number of points
+         * @return the number of points
          */
         public int getNumPoints() {
             return numPoints;
         }
 
         /**
-         * _more_
-         * @return _more_
+         * Get the X values
+         * @return  the x values
          */
         public double[] getX() {
             return x;
         }
 
         /**
-         * _more_
-         * @return _more_
+         * Get the Y values
+         * @return the Y values
          */
         public double[] getY() {
             return y;
         }
 
+        /**
+         * Convert xy to lat/lon if we have a ProjFile
+         *
+         * @param xy  the xy values
+         *
+         * @return  the lat/lon values if there is a proj file
+         */
+        private double[][] makeLatLon(double[][] xy) {
+            if (getProjFile() == null) {
+                return xy;
+            }
+            return getProjFile().convertToLonLat(xy);
+        }
+
     }
 
     /**
-     * _more_
+     * Get the feature type
      *
-     * @return _more_
+     * @return  the type
      */
     public int getFeatureType() {
         return featureType;
     }
 
 }
-
 
