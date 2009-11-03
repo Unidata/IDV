@@ -322,7 +322,7 @@ public class WindBarb {
      * @param y          y value location
      * @param z          z value location
      * @param scale      scale factor
-     * @param pt_size    size of barb
+     * @param pt_size    spacing between barbs
      * @param f0         u component
      * @param f1         v component
      * @param vx         x coordinate of VisADLineArrays
@@ -378,7 +378,7 @@ public class WindBarb {
             //plot the flag pole
             // lengthen to 'd = 3.0f * barb'
             // was 'd = barb' in original BOM code
-            d  = 3.0f * barb;
+            d  = 2.0f * barb;
             x1 = (x + x0 * d);
             y1 = (y + y0 * d);
 
@@ -404,7 +404,7 @@ public class WindBarb {
             //2.5 to 7.5 kt winds are plotted with the barb part way done the pole
             if (nbarb5 == 1) {
                 barb  = barb * 0.6f;
-                slant = slant * 0.4f;
+                slant = slant * 0.6f;
                 x1    = (x + x0 * d);
                 y1    = (y + y0 * d);
 
@@ -430,7 +430,8 @@ public class WindBarb {
 
             //add a little more pole
             if ((wsp25 >= 5.0f) && (wsp25 < 10.0f)) {
-                d  = d + 0.25f * scale;
+                //d  = d + 0.25f * scale;
+                d  = d + pt_size;
                 x1 = (x + x0 * d);
                 y1 = (y + y0 * d);
                 /* WLH 24 April 99
@@ -451,7 +452,8 @@ public class WindBarb {
             barb  = 0.4f * scale;
             slant = 0.15f * scale;
             for (int j = 0; j < nbarb10; j++) {
-                d  = d + 0.25f * scale;
+                //d  = d + 0.25f * scale;
+                d  = d + pt_size;
                 x1 = (x + x0 * d);
                 y1 = (y + y0 * d);
                 if (south) {
@@ -488,9 +490,9 @@ public class WindBarb {
 
             //lengthen the pole to accomodate the 50 knot barbs
             if (nbarb50 > 0) {
-                d  = d + 0.125f * scale;
-                x1 = (x + x0 * d);
-                y1 = (y + y0 * d);
+                 d = d + pt_size;
+                //x1 = (x + x0 * d);
+                //y1 = (y + y0 * d);
                 /* WLH 24 April 99
                         vx[nv] = x;
                         vy[nv] = y;
@@ -510,12 +512,14 @@ public class WindBarb {
                   s195 = (float) Math.sin(195 * Data.DEGREES_TO_RADIANS);
                   c195 = (float) Math.cos(195 * Data.DEGREES_TO_RADIANS);
             */
+            float flagSpace = .5f*pt_size;
+            float flagWidth = 1.75f*slant;
             for (int j = 0; j < nbarb50; j++) {
+                //d  = d + 0.6f * scale;
                 x1 = (x + x0 * d);
                 y1 = (y + y0 * d);
-                d  = d + 0.3f * scale;
-                x3 = (x + x0 * d);
-                y3 = (y + y0 * d);
+                x3 = (x + x0 * (d+flagWidth));
+                y3 = (y + y0 * (d+flagWidth));
                 /* WLH 5 Nov 99
                         if (south) {
                           x2 = (x3+barb*(x0*s195+y0*c195));
@@ -533,6 +537,8 @@ public class WindBarb {
                     x2 = (x + x0 * (d + slant) + y0 * barb);
                     y2 = (y + y0 * (d + slant) - x0 * barb);
                 }
+                // now lengthen the distance to the next position
+                d = d + flagWidth + flagSpace;
 
                 float[] xp = { x1, x2, x3 };
                 float[] yp = { y1, y2, y3 };

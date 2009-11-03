@@ -1223,6 +1223,7 @@ public class StationModelDisplayable extends DisplayableData {
                             (float) (pointOnSymbol.getX());
                         workSpatialValues[1][0] =
                             (float) (-pointOnSymbol.getY());
+                        float scale = 2.5f * (float) metSymbol.getScale();
                         try {
                             shapes = WindBarb.staticMakeFlow(workFlowValues,
                                     2.5f, workSpatialValues, (byte[][]) null,  //color_values, 
@@ -1230,9 +1231,9 @@ public class StationModelDisplayable extends DisplayableData {
                             shapeCache.put(key, ShapeUtility.clone(shapes));
 
                         } catch (Exception excp) {
-                            System.out.println("speed = " + speed);
-                            System.out.println("dir = " + speed);
-                            Misc.printArray("workUV", workUV);
+                            //System.out.println("speed = " + speed);
+                            //System.out.println("dir = " + speed);
+                            //Misc.printArray("workUV", workUV);
                         }  // bad winds
                     }
 
