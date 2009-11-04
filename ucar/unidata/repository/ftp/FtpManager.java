@@ -24,6 +24,7 @@ package ucar.unidata.repository.ftp;
 
 
 import org.apache.ftpserver.*;
+import org.apache.ftpserver.ssl.*;
 import org.apache.ftpserver.ftplet.*;
 import org.apache.ftpserver.listener.*;
 import org.apache.ftpserver.usermanager.*;
@@ -35,6 +36,7 @@ import org.apache.ftpserver.usermanager.impl.*;
 import ucar.unidata.repository.*;
 
 import java.io.IOException;
+import java.io.File;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,11 +116,35 @@ public class FtpManager extends RepositoryManager {
         Hashtable        ftplets = new Hashtable<java.lang.String, Ftplet>();
         ftplets.put("default", new RepositoryFtplet(this));
         serverFactory.setFtplets(ftplets);
-
+	
         ListenerFactory factory = new ListenerFactory();
-
         // set the port of the listener
         factory.setPort(port);
+
+
+
+        File keystore =
+            new File(getRepository().getPropertyValue(PROP_SSL_KEYSTORE,
+                getRepository().getStorageManager().getRepositoryDir()
+                + "/keystore", false));
+	
+        if (keystore.exists()) {
+	    logInfo("FTP: using FTPS");
+	    String password = getRepository().getPropertyValue(PROP_SSL_PASSWORD,
+							       (String) null, false);
+	    String keyPassword = getRepository().getPropertyValue(PROP_SSL_PASSWORD,
+								  password, false);
+
+	    SslConfigurationFactory ssl = new SslConfigurationFactory();
+	    ssl.setKeystoreFile(keystore);
+	    ssl.setKeystorePassword(keyPassword);
+
+	    factory.setSslConfiguration(ssl.createSslConfiguration());
+	    factory.setImplicitSsl(true);
+	}
+
+
+
 
         // replace the default listener
         serverFactory.addListener("default", factory.createListener());
