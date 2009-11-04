@@ -599,7 +599,6 @@ public class MetadataType extends MetadataTypeBase {
 		template = template.replace("${id}", id);
 	    }
 	}
- 	System.err.println("done:" + template);
 	return template;
     }
 

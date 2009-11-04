@@ -122,6 +122,11 @@ public class FtpManager extends RepositoryManager {
         factory.setPort(port);
 
 
+        DataConnectionConfigurationFactory dccf = new DataConnectionConfigurationFactory();
+        String passive = "44000-44100";
+        logInfo("FTP: setting passive ports to:" + passive);
+        dccf.setPassivePorts(passive);
+        factory.setDataConnectionConfiguration(dccf.createDataConnectionConfiguration());
 
         File keystore =
             new File(getRepository().getPropertyValue(PROP_SSL_KEYSTORE,

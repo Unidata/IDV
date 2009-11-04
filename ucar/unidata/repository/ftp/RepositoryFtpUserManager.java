@@ -133,7 +133,7 @@ public class RepositoryFtpUserManager implements ucar.unidata.repository.Constan
         List<Authority> auths = new ArrayList<Authority>();
         auths.add(new ConcurrentLoginPermission(10, 10));
         user.setAuthorities(auths);
-	System.err.println(" returning user:"+ user);
+        //	System.err.println(" returning user:"+ user);
         return user;
         } catch(Exception exc) {
             throw new RuntimeException(exc);

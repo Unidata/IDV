@@ -279,7 +279,7 @@ public class AccessManager extends RepositoryManager {
 
         if ( !action.equals(Permission.ACTION_VIEW)) {
             boolean okToView = canDoAction(request, entry,
-                                           Permission.ACTION_VIEW);
+                                           Permission.ACTION_VIEW, log);
             if (log) {
                 logInfo("Upload:action isn't view. view permission="
                         + okToView);
@@ -302,6 +302,7 @@ public class AccessManager extends RepositoryManager {
 
 
         if (user == null) {
+            logInfo("Upload:canDoAction: user is null");
             return false;
         }
 
@@ -337,6 +338,7 @@ public class AccessManager extends RepositoryManager {
                 if (log) {
                     logInfo("Upload:getting result from cache");
                 }
+                //            logInfo("Upload:canDoAction: cache");
                 return ok.booleanValue();
             } else {
                 recentPermissions.remove(key);
@@ -345,6 +347,7 @@ public class AccessManager extends RepositoryManager {
 
         boolean result = canDoActionInner(request, entry, action, user,
                                           requestIp);
+        //        logInfo("Upload:canDoAction:  result= " + result);
         if (recentPermissions.size() > 10000) {
             recentPermissions = new Hashtable();
         }
@@ -386,7 +389,7 @@ public class AccessManager extends RepositoryManager {
                         if ( !role.startsWith("ip:")) {
                             continue;
                         }
-                        //logInfo("action:" + action +" checking IP:" + requestIp + " against:" + (negated?"!":"") +role);
+                        //                        logInfo("action:" + action +" checking IP:" + requestIp + " against:" + (negated?"!":"") +role);
                         if ( !negated) {
                             hadIp = true;
                         }
@@ -403,6 +406,7 @@ public class AccessManager extends RepositoryManager {
                         }
                     }
                     if (hadIp) {
+                        //                        logInfo ("   returning  false hadIp");
                         return false;
                     }
                 }
@@ -422,20 +426,24 @@ public class AccessManager extends RepositoryManager {
                     hadRole = true;
                     //                    System.err.println ("    role:" + role +" user.isRole:" + user.isRole(role));
                     if (user.isRole(role)) {
-                        //                        System.err.println ("    OK " + (!negated));
+                        //                        logInfo ("    OK " + (!negated));
                         return !negated;
                     }
                 }
                 //If there were any roles 
                 if (hadRole) {
+                    //                    logInfo ("   hadRole:" + hadRole);
                     return false;
                 }
             }
             //LOOK: make sure we pass in false here which says do not check for access control
+            //            logInfo ("  Entry = " + entry.getName() +"  parent id:" + entry.getParentGroupId());
             entry = getEntryManager().getEntry(request,
                     entry.getParentGroupId(), false);
+            //            logInfo ("  new entry " + entry);
         }
 
+        //        logInfo ("  default false");
         return false;
     }
 
@@ -477,7 +485,7 @@ public class AccessManager extends RepositoryManager {
         if ((request != null) && request.isSpider()) {
             return false;
         }
-        return canDoAction(request, entry, Permission.ACTION_FILE);
+        return canDoAction(request, entry, Permission.ACTION_FILE,false);
     }
 
     /**

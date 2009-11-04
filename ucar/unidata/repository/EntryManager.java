@@ -1118,7 +1118,7 @@ return new Result(title, sb);
 
                 }
 
-                if ( canBeCreatedBy(request,typeHandler)) {
+                if (! canBeCreatedBy(request,typeHandler)) {
                     fatalError(request,
                                "Cannot create an entry of type "
                                + typeHandler.getDescription());
@@ -2981,7 +2981,7 @@ return new Result(title, sb);
                     ATTR_TODATE));
         }
 
-        if ( canBeCreatedBy(request,typeHandler)) {
+        if (! canBeCreatedBy(request,typeHandler)) {
             throw new IllegalArgumentException(
                 "Cannot create an entry of type "
                 + typeHandler.getDescription());
@@ -5603,9 +5603,9 @@ return new Result(title, sb);
                                         Tables.ENTRIES.NAME,
                                         Clause.eq(Tables.ENTRIES.COL_ID, id));
 
-        List<Group> groups = readGroups(statement);
+        List<Entry> groups = readEntries(statement);
         if (groups.size() > 0) {
-            return groups.get(0);
+            return (Group)groups.get(0);
         }
         return null;
     }
@@ -5785,10 +5785,7 @@ return new Result(title, sb);
                     && !name.startsWith(topGroupName + Group.PATHDELIMITER)) {
                 name = topGroupName + Group.PATHDELIMITER + name;
             }
-            Group group = getGroupFromCache(name, false);
-            if (group != null) {
-                return group;
-            }
+            Entry entry = null;
 
             List<String> toks = (List<String>) StringUtil.split(name,
                                     Group.PATHDELIMITER, true, true);
@@ -5825,19 +5822,20 @@ return new Result(title, sb);
             Statement statement =
                 getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
                                             Tables.ENTRIES.NAME, clauses);
-            List<Group> groups = readGroups(statement);
+
+
+            List<Entry> entries = readEntries(statement);
             getDatabaseManager().closeAndReleaseConnection(statement);
 
-            if (groups.size() > 0) {
-                group = groups.get(0);
+            if (entries.size() > 0) {
+                entry = entries.get(0);
             } else {
                 if ( !createIfNeeded) {
                     return null;
                 }
                 return makeNewGroup(parent, lastName, user);
             }
-            cacheGroup(group);
-            return group;
+            return entry;
         }
     }
 
@@ -6115,10 +6113,10 @@ return new Result(title, sb);
      *
      * @throws Exception _more_
      */
-    private List<Group> readGroups(Statement statement) throws Exception {
+    private List<Entry> readEntries(Statement statement) throws Exception {
         ResultSet        results;
         SqlUtil.Iterator iter   = getDatabaseManager().getIterator(statement);
-        List<Group>      groups = new ArrayList<Group>();
+        List<Entry>      entries = new ArrayList<Entry>();
         //        TypeHandler typeHandler =
         //            getRepository().getTypeHandler(TypeHandler.TYPE_GROUP);
         while ((results = iter.next()) != null) {
@@ -6126,22 +6124,18 @@ return new Result(title, sb);
                 String entryType = results.getString(2);
                 TypeHandler typeHandler =
                     getRepository().getTypeHandler(entryType);
-                Group group = (Group) typeHandler.getEntry(results);
-                groups.add(group);
-                cacheGroup(group);
+                Entry entry = (Entry) typeHandler.getEntry(results);
+                entries.add(entry);
             }
         }
-        for (Group group : groups) {
-            if (group.getParentGroupId() != null) {
-                Group parentGroup =
-                    getGroupFromCache(group.getParentGroupId());
-                group.setParentGroup(parentGroup);
+        for (Entry entry: entries) {
+            if (entry.getParentGroupId() != null) {
+                Group parentGroup = (Group)  findGroup(null, entry.getParentGroupId());
+                entry.setParentGroup(parentGroup);
             }
-            cacheGroup(group);
         }
 
-
-        return groups;
+        return entries;
     }
 
 
@@ -6322,9 +6316,9 @@ return new Result(title, sb);
 
 
 
-        List<Group> groups = readGroups(statement);
-        if (groups.size() > 0) {
-            topGroup = groups.get(0);
+        List<Entry> entries = readEntries(statement);
+        if (entries.size() > 0) {
+            topGroup = (Group) entries.get(0);
         }
 
         //Make the top group if needed
