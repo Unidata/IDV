@@ -59,8 +59,7 @@ import java.util.TimeZone;
  * @version $Revision: 1.3 $
  */
 
-public class RepositoryFtpUserManager implements org.apache.ftpserver.ftplet
-    .UserManager {
+public class RepositoryFtpUserManager implements ucar.unidata.repository.Constants, org.apache.ftpserver.ftplet.UserManager {
 
     /** _more_          */
     FtpManager ftpManager;
@@ -102,23 +101,39 @@ public class RepositoryFtpUserManager implements org.apache.ftpserver.ftplet
         try {
         if(auth instanceof UsernamePasswordAuthentication) {
             UsernamePasswordAuthentication upa = (UsernamePasswordAuthentication) auth;
-            name = "jeffmc";
-            //            name = upa.getName();
+	    name = upa.getUsername(); 
             password = upa.getPassword();
+	    System.err.println("name:" + name +" password:" + password);
             if(!ftpManager.getRepository().getUserManager().isPasswordValid(name, password)) {
+		System.err.println("bad pass");
                 return null;
             }
-        } else         if(auth instanceof UsernamePasswordAuthentication) {
-
+        } else  if(auth instanceof AnonymousAuthentication) {
+	    if (getRepository().getProperty(PROP_ACCESS_REQUIRELOGIN, false)) {
+		return null;
+	    }
+	    name = ucar.unidata.repository.UserManager.USER_ANONYMOUS;
         } else {
             return null;
         }
+
+	ucar.unidata.repository.User repositoryUser = getRepository().getUserManager().findUser(name);
+	if(repositoryUser == null) {
+	    System.err.println(" no user");
+	    return null;
+	}
+
+	if (getRepository().getProperty(PROP_ACCESS_ADMINONLY, false)) {
+	    if(!repositoryUser.getAdmin()) return  null;
+	}
+
         BaseUser user   = new BaseUser();
         user.setName(name);
-        user.setHomeDirectory(getRepository().getStorageManager().getTmpDir().toString());
+	user.setHomeDirectory(getRepository().getStorageManager().getTmpDir().toString());
         List<Authority> auths = new ArrayList<Authority>();
         auths.add(new ConcurrentLoginPermission(10, 10));
         user.setAuthorities(auths);
+	System.err.println(" returning user:"+ user);
         return user;
         } catch(Exception exc) {
             throw new RuntimeException(exc);

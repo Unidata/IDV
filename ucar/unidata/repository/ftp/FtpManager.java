@@ -59,6 +59,8 @@ import java.util.TimeZone;
  * @version $Revision: 1.3 $
  */
 public class FtpManager extends RepositoryManager {
+    private FtpServer server;
+    private int port=-1;
 
     /**
      * _more_
@@ -68,15 +70,37 @@ public class FtpManager extends RepositoryManager {
     public FtpManager(Repository repository) {
         super(repository);
         try {
-            initFtpServer();
+	    checkServer();
         } catch (Exception exc) {
             logError("Creating FTP server", exc);
         }
     }
 
 
+    public void checkServer() throws Exception {
+	int newPort = getRepository().getProperty(PROP_FTP_PORT,-1);
+	if(newPort<0) {
+	    stop();
+	    return;
+	} 
+	if(newPort!=port) {
+	    stop();
+	}
+
+	port  = newPort;
+	if(server == null) {
+	    initFtpServer();
+	}
+
+    }
 
 
+    private void stop() {
+	if(server!=null) {
+	    server.stop();
+	}
+	server= null;
+    }
 
     /**
      * _more_
@@ -91,12 +115,10 @@ public class FtpManager extends RepositoryManager {
         ftplets.put("default", new RepositoryFtplet(this));
         serverFactory.setFtplets(ftplets);
 
-
         ListenerFactory factory = new ListenerFactory();
 
-
         // set the port of the listener
-        factory.setPort(2221);
+        factory.setPort(port);
 
         // replace the default listener
         serverFactory.addListener("default", factory.createListener());
@@ -105,9 +127,9 @@ public class FtpManager extends RepositoryManager {
         serverFactory.setUserManager(new RepositoryFtpUserManager(this));
 
         // start the server
-        FtpServer server = serverFactory.createServer();
+        server = serverFactory.createServer();
         server.start();
-
+	logInfo("FTP: starting server on port:" + port);
     }
 
 

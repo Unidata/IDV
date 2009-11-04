@@ -558,6 +558,7 @@ public class Admin extends RepositoryManager {
                                 request.getString(PROP_PORT, "").trim());
                     }
 
+
                     if (request.defined(PROP_REPOSITORY_NAME)) {
                         getRepository().writeGlobal(PROP_REPOSITORY_NAME,
                                 request.getString(PROP_REPOSITORY_NAME, ""));
@@ -655,7 +656,12 @@ public class Admin extends RepositoryManager {
                                          HtmlUtil.input(PROP_PORT, port,
                                              HtmlUtil.SIZE_10)));
 
+
+
+
             getRegistryManager().addToInstallForm(request, sb);
+
+
 
 
             sb.append(HtmlUtil.formTableClose());
@@ -960,6 +966,12 @@ public class Admin extends RepositoryManager {
                                       HtmlUtil.input(PROP_PORT,
                                           getProperty(PROP_PORT, ""),
                                           HtmlUtil.SIZE_5)));
+
+
+	csb.append(HtmlUtil.formEntry(msgLabel("FTP Port"),
+				      HtmlUtil.input(PROP_FTP_PORT, 
+						     getRepository().getProperty(PROP_FTP_PORT,"-1"),
+						     HtmlUtil.SIZE_10)));
 
 
         String allSslCbx =
@@ -1391,6 +1403,13 @@ public class Admin extends RepositoryManager {
         getRepository().writeGlobal(PROP_ACCESS_ALLSSL,
                                     "" + request.get(PROP_ACCESS_ALLSSL,
                                         false));
+
+
+	if (request.defined(PROP_FTP_PORT)) {
+	    getRepository().writeGlobal(PROP_FTP_PORT,
+					request.getString(PROP_FTP_PORT, "").trim());
+	    getRepository().getFtpManager().checkServer();
+	}
 
 
 

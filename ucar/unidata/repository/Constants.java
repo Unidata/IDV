@@ -34,7 +34,7 @@ public interface Constants {
     //j--
 
     /** _more_ */
-    public static final String ICON_ACCESS = "ramadda.icon.access";
+   public static final String ICON_ACCESS = "ramadda.icon.access";
 
     /** _more_ */
     public static final String ICON_ADD = "ramadda.icon.add";
@@ -763,6 +763,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_MINLON = "minlon";
 
+    public static final String PROP_MONITOR_ENABLE_EXEC = "ramadda.monitor.enable.exec";
+
     /** _more_ */
     public static final String ARG_MONITOR_CHANGE = "monitorchange";
 
@@ -1150,6 +1152,7 @@ public interface Constants {
     public static final String TAG_TYPES = "types";
 
 
+    public static final String PROP_FTP_PORT = "ramadda.ftp.port";
 
 
 
@@ -1164,6 +1167,7 @@ public interface Constants {
         "ramadda.access.adminonly";
 
     /** _more_ */
+
     public static final String PROP_ACCESS_REQUIRELOGIN =
         "ramadda.access.requirelogin";
 

@@ -388,6 +388,7 @@ return new Result(title, sb);
         }
 
 
+
         Entry entry = null;
         if (request.defined(ARG_ENTRYID)) {
             try {
@@ -690,6 +691,28 @@ return new Result(title, sb);
         return doProcessEntryChange(request, false, null);
     }
 
+
+
+
+    public boolean canBeCreatedBy(Request request, TypeHandler  typeHandler) throws Exception  {
+        if ( !typeHandler.canBeCreatedBy(request)) {
+	    return false;
+        }
+
+	String ips = getRepository().getProperty("ramadda.type." + typeHandler.getType()+".ips",null);
+	if(ips!=null) {
+            String requestIp = request.getIp();
+	    boolean ok = false;
+	    for(String ip: StringUtil.split(ips,";",true,true)) {
+		if(requestIp.startsWith(ip)) {
+		    ok = true;
+		    break;
+		}
+	    }
+	    if(!ok) return false;
+	}
+	return true;
+    }
 
 
 
@@ -1095,7 +1118,7 @@ return new Result(title, sb);
 
                 }
 
-                if ( !typeHandler.canBeCreatedBy(request)) {
+                if ( canBeCreatedBy(request,typeHandler)) {
                     fatalError(request,
                                "Cannot create an entry of type "
                                + typeHandler.getDescription());
@@ -2958,7 +2981,7 @@ return new Result(title, sb);
                     ATTR_TODATE));
         }
 
-        if ( !typeHandler.canBeCreatedBy(request)) {
+        if ( canBeCreatedBy(request,typeHandler)) {
             throw new IllegalArgumentException(
                 "Cannot create an entry of type "
                 + typeHandler.getDescription());
@@ -5708,6 +5731,33 @@ return new Result(title, sb);
         return findEntryFromName(name, user, createIfNeeded, false, false);
     }
 
+
+
+    public Entry findDescendant(Request request, Group parent, String name) 
+	throws Exception {
+	List<String> toks = (List<String>) StringUtil.split(name,
+							    Group.PATHDELIMITER, true, true);
+	for(int i=0;i<toks.size();i++) {
+	    String tok = toks.get(i);
+	    Entry theChild = null;
+	    for (Entry child : getChildren(request, parent)) {
+		if (child.getName().equals(tok)) {
+		    theChild = child;
+		    break;
+		}
+	    }
+	    if(theChild==null) return null;
+	    if(i==toks.size()-1) {
+		return theChild;
+	    } 
+	    if(theChild.isGroup()) {
+		parent = (Group) theChild;
+	    } else {
+		return null;
+	    }
+	}
+	return null;
+    }
 
 
     /**

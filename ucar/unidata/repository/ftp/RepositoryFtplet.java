@@ -32,7 +32,20 @@ import org.apache.ftpserver.usermanager.impl.*;
 
 
 
-import ucar.unidata.repository.*;
+
+import ucar.unidata.repository.Repository;
+import ucar.unidata.repository.Result;
+import ucar.unidata.repository.Resource;
+import ucar.unidata.repository.type.TypeHandler;
+import ucar.unidata.repository.Permission;
+import ucar.unidata.repository.UserManager;
+import ucar.unidata.repository.EntryManager;
+import ucar.unidata.repository.Entry;
+import ucar.unidata.repository.Group;
+import ucar.unidata.repository.Request;
+import ucar.unidata.repository.Constants;
+
+
 import ucar.unidata.util.StringUtil;
 
 import java.io.*;
@@ -162,21 +175,46 @@ public class RepositoryFtplet extends DefaultFtplet {
             throws FtpException, IOException {
         try {
             System.err.println("command:" + ftpRequest.getCommand() + " arg:" + ftpRequest.getArgument());
-            if (ftpRequest.getCommand().equals(CMD_LIST)) {
-                return handleList(getRequest(session), session, ftpRequest);
-            }
+	    Request request = getRequest(session);
+	    Group        group  = getGroup(request, session);
+	    if(group == null) {
+		return handleError(session, ftpRequest, "No CWD");
+	    }
+	    String cmd = ftpRequest.getCommand();
+	    if(!getRepository().getUserManager().isRequestOk(request)) {
+		return handleError(session, ftpRequest, "Cannot access repository");
+	    }
 
-            if (ftpRequest.getCommand().equals(CMD_SYST)) {
-                return handleSyst(getRequest(session), session, ftpRequest);
+            if (cmd.equals(CMD_LIST)) {
+                return handleList(request, group, session, ftpRequest);
+	    }
+
+            if (cmd.equals(CMD_MKD)) {
+                return handleMkd(request, group, session, ftpRequest);
+	    }
+
+            if (cmd.equals(CMD_STOR)) {
+                return handleStor(request, group, session, ftpRequest);
+	    }
+
+            if (cmd.equals(CMD_DELE)) {
+                return handleDele(request, group, session, ftpRequest);
+	    }
+
+            if (cmd.equals(CMD_RMD)) {
+                return handleRmd(request, group, session, ftpRequest);
+	    }
+	    if (ftpRequest.getCommand().equals(CMD_SYST)) {
+                return handleSyst(request, group, session, ftpRequest);
             }
             if (ftpRequest.getCommand().equals(CMD_PWD)) {
-                return handlePwd(getRequest(session), session, ftpRequest);
+                return handlePwd(request, group, session, ftpRequest);
             }
             if (ftpRequest.getCommand().equals(CMD_CWD)) {
-                return handleCwd(getRequest(session), session, ftpRequest);
+                return handleCwd(request, group, session, ftpRequest);
             }
             if (ftpRequest.getCommand().equals(CMD_RETR)) {
-                return handleRetr(getRequest(session), session, ftpRequest);
+                return handleRetr(request, group, session, ftpRequest);
             }
             return super.beforeCommand(session, ftpRequest);
             //          return FtpletResult.SKIP;
@@ -218,9 +256,11 @@ public class RepositoryFtplet extends DefaultFtplet {
      */
     private Request getRequest(FtpSession session) throws Exception {
         try {
+	    User user  = session.getUser();
+	    String name = (user==null?ucar.unidata.repository.UserManager.USER_ANONYMOUS:user.getName());
             return new Request(
                 getRepository(),
-                getRepository().getUserManager().getAnonymousUser());
+                getRepository().getUserManager().findUser(name));
         } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
@@ -257,9 +297,15 @@ public class RepositoryFtplet extends DefaultFtplet {
      */
     public FtpletResult handleError(FtpSession session, FtpRequest ftpRequest,
                                     String message) throws     FtpException, IOException {
+
+	return handleError(session, ftpRequest, FtpReply.REPLY_550_REQUESTED_ACTION_NOT_TAKEN, message);
+    }
+
+    public FtpletResult handleError(FtpSession session, FtpRequest ftpRequest, int reply,
+                                    String message) throws     FtpException, IOException {
         session.write(
             new DefaultFtpReply(
-                FtpReply.REPLY_550_REQUESTED_ACTION_NOT_TAKEN , message));
+				reply , message));
         return FtpletResult.SKIP;
 
     }
@@ -277,24 +323,24 @@ public class RepositoryFtplet extends DefaultFtplet {
      *
      * @throws Exception _more_
      */
-    public FtpletResult handlePwd(Request request,FtpSession session, FtpRequest ftpRequest)
+    public FtpletResult handlePwd(Request request,Group group, FtpSession session, FtpRequest ftpRequest)
             throws Exception {
         StringBuffer result = new StringBuffer();
-        Group        group  = getGroup(request, session);
-        if (group == null) {
-            return handleError(session, ftpRequest, "No current group");
-        }
         if(group.isTopGroup()) {
             result.append("\"" +"/"+"\"");
         } else {
-            result.append("\"" +group.getFullName()+"\"");
+	    String fullName = group.getFullName();
+	    int idx = fullName.indexOf("/");
+	    if(idx>=0)
+		fullName = fullName.substring(idx);
+            result.append("\"" +fullName+"\"");
         }
         session.write(new DefaultFtpReply(FtpReply.REPLY_257_PATHNAME_CREATED,
                                           result.toString()));
         return FtpletResult.SKIP;
     }
 
-    public FtpletResult handleSyst(Request request,FtpSession session, FtpRequest ftpRequest)
+    public FtpletResult handleSyst(Request request,Group group, FtpSession session, FtpRequest ftpRequest)
             throws Exception {
         session.write(new DefaultFtpReply(FtpReply.REPLY_215_NAME_SYSTEM_TYPE ,
                                           "UNIX Type: L8"));
@@ -311,20 +357,13 @@ public class RepositoryFtplet extends DefaultFtplet {
      *
      * @throws Exception _more_
      */
-    public FtpletResult handleList(Request request, FtpSession session, FtpRequest ftpRequest)
+    public FtpletResult handleList(Request request,Group group, FtpSession session, FtpRequest ftpRequest)
             throws Exception {
-        //      if(true)        return super.beforeCommand(session, ftpRequest);
         //dr-x------   3 user group            0 Oct 20 14:27 Desktop
 
         StringBuffer result = new StringBuffer();
-        Group        group  = getGroup(request, session);
-        if (group == null) {
-            return handleError(session, ftpRequest, "No current group");
-        }
-
         List<Entry> children =
             getEntryManager().getChildren(getRequest(session), group);
-        System.err.println("group:" + group.getName() +" children:" + children.size());
         for (Entry e : children) {
             String prefix;
             String name;
@@ -362,7 +401,6 @@ public class RepositoryFtplet extends DefaultFtplet {
                 FtpReply.REPLY_150_FILE_STATUS_OKAY,
                 " Here comes the directory listing.."));
 
-        System.err.println(" result:" +result);
         session.getDataConnection().openConnection().transferToClient(
             session, result.toString());
         session.write(
@@ -371,6 +409,133 @@ public class RepositoryFtplet extends DefaultFtplet {
                 "Directory send OK."));
 
         session.getDataConnection().closeDataConnection();
+
+
+        return FtpletResult.SKIP;
+    }
+
+
+
+    public FtpletResult handleMkd(Request request,Group group, FtpSession session, FtpRequest ftpRequest)
+            throws Exception {
+	if ( !getRepository().getAccessManager().canDoAction(request, group, Permission.ACTION_NEW)) {
+            return handleError(session, ftpRequest, FtpReply.REPLY_450_REQUESTED_FILE_ACTION_NOT_TAKEN , "You do not have the access to create a directory");
+	}
+
+
+	getEntryManager().makeNewGroup(group, ftpRequest.getArgument(), request.getUser());
+        session.write(
+            new DefaultFtpReply(
+                FtpReply.REPLY_257_PATHNAME_CREATED ,
+                "Directory created"));
+
+
+        return FtpletResult.SKIP;
+    }
+
+
+
+
+    public FtpletResult handleStor(Request request,Group group, FtpSession session, FtpRequest ftpRequest)
+            throws Exception {
+	if ( !getRepository().getAccessManager().canDoAction(request, group, Permission.ACTION_NEW)) {
+            return handleError(session, ftpRequest, FtpReply.REPLY_450_REQUESTED_FILE_ACTION_NOT_TAKEN , "You do not have the access to create a directory");
+	}
+
+
+	String name  = ftpRequest.getArgument();
+	if(name.trim().length()==0) {
+            return handleError(session, ftpRequest, "Bad file name");
+	}
+	File newFile = getRepository().getStorageManager().getTmpFile(request,
+								      name);
+	FileOutputStream fos = getRepository().getStorageManager().getFileOutputStream(newFile);
+        session.getDataConnection().openConnection().transferFromClient(
+            session, fos);
+
+	newFile = getRepository().getStorageManager().moveToStorage(request, newFile);
+
+        TypeHandler typeHandler = getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
+        Entry    entry = typeHandler.createEntry(getRepository().getGUID());
+        Resource resource = new Resource(newFile.toString(),
+					  Resource.TYPE_STOREDFILE);
+	Date dttm  = new Date();
+        entry.initEntry(name, "", group, request.getUser(), resource, "",
+                        dttm.getTime(), dttm.getTime(),
+                        dttm.getTime(), null);
+        typeHandler.initializeNewEntry(entry);
+        List<Entry>    newEntries = new ArrayList<Entry>();
+	newEntries.add(entry);
+	getEntryManager().insertEntries(newEntries, true,
+					true);
+
+        session.write(
+            new DefaultFtpReply(
+                FtpReply.REPLY_257_PATHNAME_CREATED ,
+                "File created"));
+
+
+        return FtpletResult.SKIP;
+    }
+
+
+
+    public FtpletResult handleDele(Request request,Group group, FtpSession session, FtpRequest ftpRequest)
+            throws Exception {
+        Entry entry = findEntry(request, group, ftpRequest.getArgument());
+        if (entry == null) {
+            return handleError(session, ftpRequest, "Not a valid file:" + ftpRequest.getArgument());
+        }
+
+        if (entry.isGroup()) {
+            return handleError(session, ftpRequest, "Not a file");
+        }
+
+	if ( !getRepository().getAccessManager().canDoAction(request, entry, Permission.ACTION_DELETE)) {
+            return handleError(session, ftpRequest, FtpReply.REPLY_450_REQUESTED_FILE_ACTION_NOT_TAKEN , "You do not have the access to delete the entry");
+	}
+
+	//TODO: Do we really want to support this?
+	if(true) {
+            return handleError(session, ftpRequest, FtpReply.REPLY_202_COMMAND_NOT_IMPLEMENTED  , "Not implemented");
+	}
+
+	getEntryManager().makeNewGroup(group, ftpRequest.getArgument(), request.getUser());
+        session.write(
+            new DefaultFtpReply(
+                FtpReply.REPLY_257_PATHNAME_CREATED ,
+                "Directory created"));
+
+
+        return FtpletResult.SKIP;
+    }
+
+
+    public FtpletResult handleRmd(Request request,Group group, FtpSession session, FtpRequest ftpRequest)
+            throws Exception {
+        Entry entry = findEntry(request, group, ftpRequest.getArgument());
+        if (entry == null) {
+            return handleError(session, ftpRequest, "Not a valid file:" + ftpRequest.getArgument());
+        }
+
+        if (!entry.isGroup()) {
+            return handleError(session, ftpRequest, "Not a directory");
+        }
+
+	if ( !getRepository().getAccessManager().canDoAction(request, entry, Permission.ACTION_DELETE)) {
+            return handleError(session, ftpRequest, FtpReply.REPLY_450_REQUESTED_FILE_ACTION_NOT_TAKEN , "You do not have the access to delete the entry");
+	}
+
+	//TODO: Do we really want to support this?
+	if(true) {
+            return handleError(session, ftpRequest, FtpReply.REPLY_202_COMMAND_NOT_IMPLEMENTED  , "Not implemented");
+	}
+
+	getEntryManager().makeNewGroup(group, ftpRequest.getArgument(), request.getUser());
+        session.write(
+            new DefaultFtpReply(
+                FtpReply.REPLY_257_PATHNAME_CREATED ,
+                "Directory created"));
 
 
         return FtpletResult.SKIP;
@@ -388,24 +553,23 @@ public class RepositoryFtplet extends DefaultFtplet {
      *
      * @throws Exception _more_
      */
-    public FtpletResult handleRetr(Request request, FtpSession session, FtpRequest ftpRequest)
+    public FtpletResult handleRetr(Request request,Group group, FtpSession session, FtpRequest ftpRequest)
             throws Exception {
-        Group        group  = getGroup(request, session);
 
+	String entryName = ftpRequest.getArgument();
+	String  outputType = null;
+	String delimiter = ".ramadda.output.";
+	int idx = entryName.indexOf(delimiter);
 
+	if(idx>0) {
+	    outputType = entryName.substring(idx+delimiter.length());
+	    entryName   = entryName.substring(0,idx);
+	}
+	//	System.err.println ("outputType:" + outputType +" name:" + entryName);
 
-        if (group == null) {
-            return handleError(session, ftpRequest, "No cwd");
-        }
-
-
-        Entry entry = findEntry(request, group, ftpRequest.getArgument());
+        Entry entry = findEntry(request, group, entryName);
         if (entry == null) {
             return handleError(session, ftpRequest, "Not a valid file:" + ftpRequest.getArgument());
-        }
-
-        if(!entry.isFile()) {
-            return handleError(session, ftpRequest, "Not a file");
         }
 
 
@@ -413,12 +577,22 @@ public class RepositoryFtplet extends DefaultFtplet {
             return handleError(session, ftpRequest, "You don't have permission to get the file");
         }
 
+        InputStream inputStream =null;
 
 
-        File file   = entry.getFile();
-        long length = file.length();
-        InputStream inputStream =
-            getRepository().getStorageManager().getFileInputStream(file);
+	if(outputType!=null) {
+	    request.put(Constants.ARG_OUTPUT, outputType);
+	    Result result = getEntryManager().processEntryShow(request,  entry);
+	    byte[] contents  =result.getContent();
+	    inputStream = new ByteArrayInputStream(contents);
+	} else {
+	    if(!entry.isFile()) {
+		return handleError(session, ftpRequest, "Not a file");
+	    }
+	    File file   = entry.getFile();
+	    inputStream =
+		getRepository().getStorageManager().getFileInputStream(file);
+	}
 
         session.write(
             new DefaultFtpReply(
@@ -438,21 +612,31 @@ public class RepositoryFtplet extends DefaultFtplet {
 
 
     private Entry findEntry(Request request,  Group parent,String  name) throws Exception {
+
+
+
         if(name.endsWith("/")) name = name.substring(0, name.length()-1);
-        //        System.err.println("name:" + name+":");
+	System.err.println("parent:" + parent.getName() +" name:" + name);
         if(name.length()==0) {
             return getEntryManager().getTopGroup();
         }
         if(name.startsWith("/")) {
-            if(name.startsWith("/")) name = name.substring(1);
+            name = name.substring(1);
             if(name.length()==0) {
                 return getEntryManager().getTopGroup();
             }
             Entry entry = getEntryManager().findEntryFromName(name, request.getUser(), false);
             return entry;
         } else {
-            Entry entry = getEntryManager().findEntryWithName(request, parent, name);
-            if(entry == null || entry.getName().equals(parent)) return parent;
+	    while(name.startsWith("..")) {
+		if(parent.getParentGroup()==null) break;
+		parent  =parent.getParentGroup();
+		name = name.substring(2);
+		if(name.startsWith("/")) name = name.substring(1);
+	    }
+	    if(name.equals("")) return parent;
+            Entry entry = getEntryManager().findDescendant(request, parent, name);
+            if(entry != null && entry.getName().equals(parent)) return parent;
             return entry;
         }
     }
@@ -468,14 +652,11 @@ public class RepositoryFtplet extends DefaultFtplet {
      *
      * @throws Exception _more_
      */
-    public FtpletResult handleCwd(Request request, FtpSession session, FtpRequest ftpRequest)
+    public FtpletResult handleCwd(Request request,Group group, FtpSession session, FtpRequest ftpRequest)
             throws Exception {
 
         StringBuffer result = new StringBuffer();
-        Group        group  = getGroup(request, session);
-        if (group == null) {
-            return handleError(session, ftpRequest, "No current group");
-        }
+
         String subGroupName =ftpRequest.getArgument().trim();
         Entry entry =findEntry(request, group, subGroupName);
         if (entry == null) {

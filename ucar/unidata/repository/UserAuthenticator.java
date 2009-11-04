@@ -45,6 +45,7 @@ public interface UserAuthenticator {
      */
     public User findUser(Repository repository, String userId);
 
+
     /**
      * this gets called when we want to autheticate the given user/password
      * return null if user/password is unknown or incorrect
@@ -55,8 +56,12 @@ public interface UserAuthenticator {
      *
      * @return _more_
      */
-    public User authenticateUser(Repository repository, String userId,
+    public User authenticateUser(Repository repository, 
+				 Request request, 
+				 StringBuffer loginFormExtra,
+				 String userId,
                                  String password);
+
 
 
     /**

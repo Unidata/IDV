@@ -84,16 +84,6 @@
 
 
 
-  <type name="jythonscript"  description="Repository Script" handler="ucar.unidata.repository.type.JythonTypeHandler">
-     <property name="icon" value="/icons/python.png"/>
-     <property name="form.show.date" value="false"/>
-     <property name="form.show.area" value="false"/>
-     <property name="form.show.datatype" value="false"/>
-     <property name="form.show.resource" value="false"/>
-     <column name="password"  type="password"    label="Password" showinhtml="false"/>
-     <column name="initializationCode"  type="clob"  size="4028"   label="Initialization" columns="80"  rows="10" showinhtml="false"/>
-     <column name="executionCode"    size="16000"   type="clob"  label="Execute" columns="80"  rows="20" showinhtml="false"/>
-</type>
 
 
 

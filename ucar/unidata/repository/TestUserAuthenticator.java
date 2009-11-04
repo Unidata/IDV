@@ -27,7 +27,7 @@ import ucar.unidata.repository.Repository;
 import ucar.unidata.repository.Request;
 import ucar.unidata.repository.User;
 
-import ucar.unidata.repository.UserAuthenticator;
+import ucar.unidata.repository.UserAuthenticatorImpl;
 
 
 
@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author IDV Development Team
  */
-public class TestUserAuthenticator implements UserAuthenticator {
+public class TestUserAuthenticator extends UserAuthenticatorImpl {
 
 
     /**
@@ -84,7 +84,7 @@ public class TestUserAuthenticator implements UserAuthenticator {
      *
      * @return _more_
      */
-    public User authenticateUser(Repository repository, String userId,
+    public User authenticateUser(Repository repository, Request request, StringBuffer extraLoginForm, String userId,
                                  String password) {
         System.err.println("test authenticator authenticateUser: " + userId);
         //This example will create a User for userid=xxx password=yyy

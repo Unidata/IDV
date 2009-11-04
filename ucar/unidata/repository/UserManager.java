@@ -304,7 +304,7 @@ public class UserManager extends RepositoryManager {
      *
      * @return _more_
      */
-    protected boolean isRequestOk(Request request) {
+    public boolean isRequestOk(Request request) {
         if (getProperty(PROP_ACCESS_ADMINONLY, false)
                 && !request.getUser().getAdmin()) {
             if ( !request.getRequestPath().startsWith(
@@ -387,7 +387,7 @@ public class UserManager extends RepositoryManager {
     private static final String USER_DEFAULT = "default";
 
     /** _more_ */
-    private static final String USER_ANONYMOUS = "anonymous";
+    public static final String USER_ANONYMOUS = "anonymous";
 
     /**
      * _more_
@@ -2252,12 +2252,14 @@ public class UserManager extends RepositoryManager {
         StringBuffer sb     = new StringBuffer();
         User         user   = null;
         String       output = request.getString(ARG_OUTPUT, "");
+	StringBuffer loginFormExtra = new StringBuffer();
         if (request.exists(ARG_USER_ID)) {
             String name = request.getString(ARG_USER_ID, "").trim();
             if (name.equals(USER_DEFAULT) || name.equals(USER_ANONYMOUS)) {
                 name = "";
             }
             String password = request.getString(ARG_USER_PASSWORD, "").trim();
+
             if ((name.length() > 0) && (password.length() > 0)) {
                 String hashedPassword = hashPassword(password);
                 Statement statement =
@@ -2299,14 +2301,14 @@ public class UserManager extends RepositoryManager {
                 if (user == null) {
                     for (UserAuthenticator userAuthenticator : userAuthenticators) {
                         user = userAuthenticator.authenticateUser(
-                            getRepository(), name, password);
+								  getRepository(), request, loginFormExtra, name, password);
                         if (user != null) {
                             user.setIsLocal(false);
                             break;
                         }
                     }
                 }
-            }
+	    }
 
 
             if (user != null) {
@@ -2389,7 +2391,7 @@ public class UserManager extends RepositoryManager {
 
 
         if (user == null) {
-            sb.append(makeLoginForm(request));
+            sb.append(makeLoginForm(request,loginFormExtra.toString()));
         }
         return new Result(msg("Login"), sb);
 

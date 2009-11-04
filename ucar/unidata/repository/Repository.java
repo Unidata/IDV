@@ -1713,7 +1713,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     protected boolean checkFile(String file) {
         if (file.indexOf("api.xml") >= 0) {
             apiDefFiles.add(file);
-        } else if (file.indexOf("types.xml") >= 0) {
+        } else if (file.indexOf("types.xml") >= 0 || file.indexOf("type.xml") >= 0) {
             typeDefFiles.add(file);
         } else if (file.indexOf("outputhandlers.xml") >= 0) {
             outputDefFiles.add(file);
