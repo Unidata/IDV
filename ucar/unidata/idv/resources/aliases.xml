@@ -64,7 +64,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="ID"
      label="IACO Station ID"
-     aliases="stn_name,ID,stnName,Identifier,id,station_id,stationId,STID"/>
+     aliases="stn_name,ID,stnName,Identifier,id,station_id,stationId,STID,region,Region"/>
   <alias
      name="IDN"
      label="Station ID"
