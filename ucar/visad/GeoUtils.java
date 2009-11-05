@@ -434,7 +434,12 @@ public class GeoUtils {
      * @param args args
      */
     public static void main(String[] args) {
-        System.err.println("lat/lon:" + getLocationOfAddress());
+	//        System.err.println("lat/lon:" + getLocationOfAddress());
+	for(String arg: args) {
+	    System.err.println(arg +" " + getLocationFromAddress(arg,null));
+	}
+
+
     }
 
     /**
