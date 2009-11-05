@@ -36,6 +36,8 @@
 <plugin version="2.2" name="Climate Zones" description="Map" size="1029967" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/gempak_maps.jar" category="Maps"/>
 <plugin  version="2.2" name="Offshore Forecast Areas" description="Map" size="494557" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/gempak_forecast.jar" category="Maps"/>
 <plugin  version="2.2"  name="Pacific and Atlantic Products" description="Map" size="12409" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/gempak_intl.jar" category="Maps"/>
+<plugin name="African Maps" description="Map" size="23573725" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/africamaps.jar" category="Maps"/>
+
 <plugin name="European Maps" description="Map" size="381433" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/europemaps.jar" category="Maps"/>
 <plugin version="2.2" name="China Maps" description="Map" size="3883648" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/chinamaps.jar" category="Maps"/>
 <plugin version="2.2" name="Mexico Map" description="Map" size="13806" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/mexico.jar" category="Maps"/>
