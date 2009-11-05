@@ -92,7 +92,8 @@ public class Converter {
 	    String region= cols.get(col++);
 	    double population = new Double(cols.get(col++)).doubleValue();
 	    //	    System.err.println ("line:"+i);
-	    LatLonPoint llp = GeoUtils.getLocationFromAddress(region+"," +country,null);
+	    LatLonPoint llp = GeoUtils.getLocationFromAddress(region+"," +state+"," + country,null);
+            System.err.println(region+" " + llp);
 	    if(llp==null && lats.trim().length()==0) {
 		System.err.println("No location:" +region);
 	    }
