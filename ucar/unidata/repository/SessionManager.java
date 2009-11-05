@@ -396,6 +396,7 @@ public class SessionManager extends RepositoryManager {
             if (auth != null) {
                 auth = auth.trim();
                 //Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+		System.err.println ("has auth: " + auth);
                 if (auth.startsWith("Basic")) {
                     auth = new String(
                         XmlUtil.decodeBase64(auth.substring(5).trim()));

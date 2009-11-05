@@ -88,5 +88,9 @@ public class AuthorizationMethod {
         return this.type.equals(that.type);
     }
 
+    public String toString() {
+	return type;
+    }
+
 }
 

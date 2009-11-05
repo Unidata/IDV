@@ -56,6 +56,9 @@ public class RepositoryBase implements Constants, RepositorySource {
     /** _more_ */
     public final RequestUrl URL_PING = new RequestUrl(this, "/ping");
 
+
+    public final RequestUrl URL_REDIRECT = new RequestUrl(this, "/redirect");
+
     /** _more_ */
     public final RequestUrl URL_INFO = new RequestUrl(this, "/info");
 

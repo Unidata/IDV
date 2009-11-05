@@ -2316,8 +2316,22 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         //        logInfo("request:" + request);
         try {
+
             getSessionManager().checkSession(request);
             result = getResult(request);
+
+	    if(false && request.get("forauth",false)) {
+		System.err.println("got an authorized request with forauth in it " + request.getSecure());
+		request.remove("forauth");
+		ApiMethod apiMethod  = findApiMethod(request);
+		Result sslRedirect = checkForSslRedirect(request, apiMethod);
+		if(sslRedirect!=null) {
+		    System.err.println("       redirecting to:" + sslRedirect.getRedirectUrl());
+		    return sslRedirect;
+		}
+	    }
+
+
         } catch (Throwable exc) {
             //In case the session checking didn't set the user
             if (request.getUser() == null) {
@@ -2348,6 +2362,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                             apiMethod.getAuthMethod());
                     }
                 }
+		//		System.err.println ("auth:" + authMethod);
                 if (authMethod.equals(AuthorizationMethod.AUTH_HTML)) {
                     sb.append(showDialogError(inner.getMessage()));
                     String redirect =
@@ -2356,14 +2371,21 @@ public class Repository extends RepositoryBase implements RequestHandler {
                             HtmlUtil.hidden(ARG_REDIRECT, redirect)));
                 } else {
                     sb.append(inner.getMessage());
-                    if ( !request.getSecure() && isSSLEnabled(null)) {
-                        result = new Result(httpsUrl(request.getUrl()));
+                    if (!request.getSecure() && isSSLEnabled(null)) {
+			//xxxxxxx
+			String redirectUrl = XmlUtil.encodeBase64(request.getUrl().getBytes());
+			String url = HtmlUtil.url(httpsUrl(URL_REDIRECT.toString()),ARG_REDIRECT, redirectUrl,"forauth","true");
+			//			if(url.indexOf("?")<0) url = url+"?forauth=true";
+			//			else url = url+"&forauth=true";
+			System.err.println ("redirecting to:" + url);
+                        result = new Result(url);
                     } else {
                         result = new Result("Error", sb);
                         result.addHttpHeader(HtmlUtil.HTTP_WWW_AUTHENTICATE,
-                                             "Basic realm=\"Secure Area\"");
+                                             "Basic realm=\"ramadda\"");
                         result.setResponseCode(Result.RESPONSE_UNAUTHORIZED);
                     }
+		    System.err.println("need to authorize");
                     return result;
                 }
             }
@@ -2527,8 +2549,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     protected Result getResult(Request request) throws Exception {
 
-        boolean   sslEnabled = isSSLEnabled(request);
-
         ApiMethod apiMethod  = findApiMethod(request);
 
         if (apiMethod == null) {
@@ -2536,28 +2556,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
 
-
-        boolean allSsl = false;
-        if (sslEnabled) {
-            allSsl = getProperty(PROP_ACCESS_ALLSSL, false);
-            if (allSsl && !request.getSecure()) {
-                return new Result(httpsUrl(request.getUrl()));
-            }
-        }
+	System.err.println("request:" +request.getUrl());
 
         //        System.err.println("sslEnabled:" +sslEnabled + "  " + apiMethod.getNeedsSsl());
-        if (sslEnabled) {
-            if ( !request.get(ARG_NOREDIRECT, false)) {
-                if (apiMethod.getNeedsSsl() && !request.getSecure()) {
-                    //                System.err.println ("Redirecting to ssl: "+ httpsUrl(request.getUrl()));
-                    return new Result(httpsUrl(request.getUrl()));
-                } else if ( !allSsl && !apiMethod.getNeedsSsl()
-                            && request.getSecure()) {
-                    //                System.err.println ("Redirecting to no ssl "+absoluteUrl(request.getUrl()));
-                    return new Result(absoluteUrl(request.getUrl()));
-                }
-            }
-        }
+	Result sslRedirect = checkForSslRedirect(request, apiMethod);
+	if(sslRedirect!=null) {
+	    return sslRedirect;
+	}
+
 
         //        System.out.println(absoluteUrl(request.getUrl()));
 
@@ -2625,6 +2631,37 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     }
 
+
+    private Result checkForSslRedirect(Request request, ApiMethod apiMethod) {
+        boolean   sslEnabled = isSSLEnabled(request);
+        boolean allSsl = false;
+        if (sslEnabled) {
+            allSsl = getProperty(PROP_ACCESS_ALLSSL, false);
+            if (allSsl && !request.getSecure()) {
+                return new Result(httpsUrl(request.getUrl()));
+            }
+        }
+
+
+        if (sslEnabled) {
+            if ( !request.get(ARG_NOREDIRECT, false)) {
+                if (apiMethod.getNeedsSsl() && !request.getSecure()) {
+                    //                System.err.println ("Redirecting to ssl: "+ httpsUrl(request.getUrl()));
+                    return new Result(httpsUrl(request.getUrl()));
+                } else if ( !allSsl && !apiMethod.getNeedsSsl()
+                            && request.getSecure()) {
+		    if(request.get("forauth",false)) {
+			//xxxx
+			System.err.println ("a forauth request");
+		    } else {
+			System.err.println ("Redirecting to no ssl "+absoluteUrl(request.getUrl()));
+			return new Result(absoluteUrl(request.getUrl()));
+		    }
+                }
+            }
+        }
+	return null;
+    }
 
     /**
      * _more_
@@ -3954,6 +3991,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public Result processDummy(Request request) throws Exception {
         return new Result(BLANK, new StringBuffer(BLANK));
+    }
+
+
+    public Result processRedirect(Request request) throws Exception {
+	String url = request.getString(ARG_REDIRECT,"");
+	url = new String(XmlUtil.decodeBase64(url));
+        return new Result(url);
     }
 
 
