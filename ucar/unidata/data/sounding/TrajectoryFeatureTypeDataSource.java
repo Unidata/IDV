@@ -149,7 +149,7 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
                 fiType = new FunctionType(RealType.Time, data.getType());
 
             }
-            times[i] = adapter.getStartTime();
+            times[i] = time; //adapter.getStartTime();
         }
 
         FieldImpl fi = new FieldImpl(fiType, DateTime.makeTimeSet(times));
@@ -216,15 +216,15 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
 
 
         List locCats = DataCategory.parseCategories("locations", false);
-        addDataChoice(new DirectDataChoice(this, ID_SONDESTARTLOCATIONS,
-                                           "Sonde Start Locations",
-                                           "Sonde Start Locations", locCats));
-        /*  End locations don't work now because lat/lon/alt values are NaN
+   //     addDataChoice(new DirectDataChoice(this, ID_SONDESTARTLOCATIONS,
+   //                                        "Sonde Start Locations",
+   //                                        "Sonde Start Locations", locCats));
+        /*  End locations don't work now because lat/lon/alt values are NaN  */
         addDataChoice(
             new DirectDataChoice(
                 this, ID_SONDEENDLOCATIONS, "Sonde End Locations",
                 "Sonde End Locations", locCats));
-        */
+
     }
 
     /**
