@@ -1166,14 +1166,24 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         Connection connection = getConnection();
         try {
             connection.setAutoCommit(false);
-            Statement statement = connection.createStatement();
-            SqlUtil.loadSql(sql, statement, ignoreErrors, printStatus);
+	    loadSql(connection, sql, ignoreErrors, printStatus);
             connection.commit();
             connection.setAutoCommit(true);
-            closeStatement(statement);
         } finally {
             closeConnection(connection);
         }
+    }
+
+
+
+    public void loadSql(Connection connection, String sql, boolean ignoreErrors, boolean printStatus)
+	throws Exception {
+	Statement statement = connection.createStatement();
+	try {
+	    SqlUtil.loadSql(sql, statement, ignoreErrors, printStatus);
+	} finally {
+	    closeStatement(statement);
+	}
     }
 
 

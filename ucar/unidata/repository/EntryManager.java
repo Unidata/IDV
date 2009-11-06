@@ -4356,7 +4356,7 @@ return new Result(title, sb);
             return getTopGroup();
         }
 
-        synchronized (MUTEX_ENTRY) {
+	//        synchronized (MUTEX_ENTRY) {
             Entry entry = getEntryFromCache(entryId);
             if (entry != null) {
                 checkEntryFileTime(entry);
@@ -4365,7 +4365,7 @@ return new Result(title, sb);
                 }
                 entry = getAccessManager().filterEntry(request, entry);
                 return entry;
-            }
+	    }
 
             //catalog:url:dataset:datasetid
             try {
@@ -4426,7 +4426,7 @@ return new Result(title, sb);
             }
 
             return entry;
-        }
+	    //    }
 
     }
 

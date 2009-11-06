@@ -611,7 +611,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
             1000, 10000);
 
         for (String index : indexSql) {
-            getDatabaseManager().loadSql(index, false, false);
+            getDatabaseManager().loadSql(connection, index, false, false);
         }
 
         List<Object[]> valueList = new ArrayList<Object[]>();
@@ -1460,8 +1460,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
             }
         }
 
-
-        System.err.println ("entityCol:" + entityCol);
+	//        System.err.println ("entityCol:" + entityCol);
 
         for (PointDataMetadata pdm : columnsToUse) {
             if ((entityCol != null) && pdm.isColumn(entityCol)) {
@@ -2304,6 +2303,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
             doUpload(sb, request, entry);
         } else {
             sb.append(getHeader(request, entry));
+	    sb.append(entry.getDescription());
             createSearchForm(sb, request, entry);
         }
         return new Result("Point Data", sb);
