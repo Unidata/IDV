@@ -206,7 +206,7 @@ public abstract class FilesDataSource extends DataSourceImpl {
     protected String processDataFilename(String filename, int index) {
         int idx = filename.indexOf("?");
         if (idx >= 0) {
-            filename = filename.substring(0, idx);
+	    //            filename = filename.substring(0, idx);
         }
         return filename;
     }
@@ -227,7 +227,9 @@ public abstract class FilesDataSource extends DataSourceImpl {
             throws Exception {
         List processedSources = new ArrayList();
         for (int i = 0; i < sources.size(); i++) {
-            String file = processDataFilename(sources.get(i).toString(), i);
+	    String  source  = sources.get(i).toString();
+	    //	    System.err.println(source);
+            String file = processDataFilename(source, i);
             if (file == null) {
                 continue;
             }

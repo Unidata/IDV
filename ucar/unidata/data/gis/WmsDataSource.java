@@ -32,6 +32,7 @@ import ucar.unidata.data.grid.GridUtil;
 
 import ucar.unidata.data.imagery.ImageXmlDataSource;
 
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.JobManager;
@@ -43,7 +44,7 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.xml.XmlUtil;
 
-
+import javax.swing.*;
 import visad.*;
 
 import visad.util.DataUtility;
@@ -113,6 +114,10 @@ public class WmsDataSource extends DataSourceImpl {
 
     /** List of selections (layers) */
     private List wmsSelections;
+
+    private boolean maintainRatio  =false;
+
+    private JCheckBox maintainRatioCbx; 
 
 
     /**
@@ -325,6 +330,10 @@ public class WmsDataSource extends DataSourceImpl {
             imageHeight = Math.min(Math.max(imageHeight, 50), 2056);
 
 
+	    if(maintainRatio) {
+		imageHeight =(int)(imageWidth*(heightDegrees/widthDegrees));
+	    }
+
             double diff = Math.abs(boundsToUse.getMinLon()
                                    - boundsToUse.getMaxLon());
             String url = wmsInfo.assembleRequest(boundsToUse,
@@ -510,6 +519,21 @@ public class WmsDataSource extends DataSourceImpl {
 
 
 
+    public void getPropertiesComponents(List comps) {
+	super.getPropertiesComponents(comps);
+	maintainRatioCbx = new JCheckBox("Match Ration", maintainRatio);
+	comps.add(GuiUtils.filler());
+	comps.add(GuiUtils.left(maintainRatioCbx));
+    }
+
+    public boolean applyProperties() {
+	if(!super.applyProperties()) return false;
+	maintainRatio =  maintainRatioCbx.isSelected();
+	return true;
+
+    }
+
+
     /**
      * Get the description. This adds on the last url requested.
      *
@@ -599,6 +623,23 @@ public class WmsDataSource extends DataSourceImpl {
         return Misc.equals(this.wmsSelections, that.wmsSelections);
     }
 
+/**
+Set the MaintainRatio property.
+
+@param value The new value for MaintainRatio
+**/
+public void setMaintainRatio (boolean value) {
+	this.maintainRatio = value;
+}
+
+/**
+Get the MaintainRatio property.
+
+@return The MaintainRatio
+**/
+public boolean getMaintainRatio () {
+	return this.maintainRatio;
+}
 
 
 }

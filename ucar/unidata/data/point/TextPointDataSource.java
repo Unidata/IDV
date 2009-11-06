@@ -214,6 +214,11 @@ public class TextPointDataSource extends PointDataSource {
     }
 
 
+    public boolean canSaveDataToLocalDisk() {
+        return !isFileBased();
+    }
+
+
     /**
      * _more_
      *
