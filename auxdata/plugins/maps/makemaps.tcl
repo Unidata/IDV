@@ -287,10 +287,10 @@ makeMap africa/MOZ.zip          {Mozambique }
 setCategory "Africa N-Z"
 makeMap africa/NAM-level_1.zip  {Namibia level 1}
 makeMap africa/NAM.zip          {Namibia }
-makeMap africa/NIG-level_1.zip  {Nigeria level 1}
-makeMap africa/NIG.zip          {Nigeria }
-makeMap africa/NIR-level_1.zip  {Niger level 1}
-makeMap africa/NIR.zip          {Niger }
+makeMap africa/NIG-level_1.zip  {Nigerlevel 1}
+makeMap africa/NIG.zip          {Niger }
+makeMap africa/NIR-level_1.zip  {Nigeria level 1}
+makeMap africa/NIR.zip          {Nigeria }
 makeMap africa/RWA-level_1.zip  {Rwanda level 1}
 makeMap africa/RWA.zip          {Rwanda }
 makeMap africa/SEN-level_1.zip  {Senegal level 1}
