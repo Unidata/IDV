@@ -551,7 +551,8 @@ public class ImageGlyph extends DrawingGlyph {
         }
 
 
-        imageDisplay = new ImageRGBDisplayable("ImageGlyph." + (typeCnt++));
+	//Make a RGBA
+        imageDisplay = new ImageRGBDisplayable("ImageGlyph." + (typeCnt++),true);
         ColorTable colorTable = control.getRGBColorTable();
         imageDisplay.setRangeForColor(0.0, 255.0);
         imageDisplay.setColorPalette(colorTable.getAlphaTable());
@@ -563,7 +564,6 @@ public class ImageGlyph extends DrawingGlyph {
             imageDisplay.addConstantMap(new ConstantMap(getZPosition(),
                     Display.ZAxis));
         }
-
         addDisplayable(imageDisplay);
 
         if (points.size() == 1) {
@@ -614,7 +614,9 @@ public class ImageGlyph extends DrawingGlyph {
                     //GuiUtils.showOkCancelDialog(null,"",lbl1,null);
                 }
                 imageData = (FlatField) ucar.visad.Util.makeField(theImage,
-                        true);
+								  -1f, true);
+		//		System.err.println ("image:" + imageData.getType());
+
             }
         } catch (java.io.IOException ioe) {}
         if (imageData == null) {
