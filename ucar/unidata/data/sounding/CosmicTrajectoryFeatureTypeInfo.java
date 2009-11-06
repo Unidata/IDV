@@ -305,6 +305,7 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
      */
     public float[] getFloatData(Range range, String var) throws Exception {
         float[] fdata  = new float[range.length()];
+
         int     first  = range.first();
         int     stride = range.stride();
         int     last   = range.last();
@@ -314,7 +315,11 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
         }
         int i = first;
         int j = 0;
-        while (i <= last) {
+
+        if(obsList.size() <= last){
+            i = obsList.size() - 1;
+        }
+        while (i <= obsList.size() && j < range.length()) {
             PointFeature  pf   = obsList.get(i);
             StructureData pfsd = pf.getData();
 
@@ -322,7 +327,11 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
 
             i          = i + stride;
         }
-
+        if(obsList.size() < last && j < range.length()) {
+            for(int ii = i; ii < last; ii = ii+stride ){
+                  fdata[ii] = fdata[i];
+            }
+        }
         return fdata;
 
     }
@@ -346,7 +355,11 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
 
         int      i      = first;
         int      j      = 0;
-        while (i <= last) {
+
+        if(obsList.size() <= last){
+            i = obsList.size() - 1;
+        }
+        while (i <= obsList.size() && j < range.length()) {
             PointFeature  pf   = obsList.get(i);
             StructureData pfsd = pf.getData();
 
@@ -354,7 +367,11 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
 
             i          = i + stride;
         }
-
+        if(obsList.size() < last && j < range.length()) {
+            for(int ii = i; ii < last; ii = ii+stride ){
+                  fdata[ii] = fdata[i];
+            }
+        }
         return fdata;
     }
 
