@@ -32,6 +32,7 @@ import ucar.unidata.ui.Command;
 import ucar.unidata.ui.CommandManager;
 
 
+import java.awt.image.*;
 import ucar.unidata.ui.ImageUtils;
 
 import ucar.unidata.util.ColorTable;
@@ -2607,10 +2608,21 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
                                    List<Color> colorList, boolean doLines,
                                    boolean doCheckerboard,
                                    List<Float> scales) {
+	paintColors(g, box, colorList, doLines, doCheckerboard,false, scales);
+    }
+
+
+    public static void paintColors(Graphics g, Rectangle box,
+                                   List<Color> colorList, boolean doLines,
+                                   boolean doCheckerboard,
+				   boolean doTransparency,
+                                   List<Float> scales) {
 
         //Draw a reference rectangle for transparency
-        g.setColor(Color.white);
-        g.fillRect(box.x, box.y, box.width, box.height);
+	if(!doTransparency) {
+	    g.setColor(Color.white);
+	    g.fillRect(box.x, box.y, box.width, box.height);
+	}
 
         if (doCheckerboard) {
             int patternX = box.x;
@@ -2650,10 +2662,9 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
                 c = applyBrightness(c, bright);
             }
             //Clear out the alpha
-            if ( !doCheckerboard) {
+            if ( !doCheckerboard && !doTransparency) {
                 c = new Color(c.getRed(), c.getGreen(), c.getBlue());
             }
-
 
             g.setColor(c);
             int extraWidth = 0;
@@ -3099,6 +3110,23 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
 
             preview.setSize(new Dimension(width, height));
             return new ImageIcon(GuiUtils.getImage(preview));
+        } catch (Exception exc) {
+            return null;
+        }
+    }
+
+
+
+
+    public static Image getImage(ColorTable ct, int width, int height) {
+        try {
+            final List<Color> colors  = (List<Color>) ct.getColorList();
+            final Rectangle   box     = new Rectangle(0, 0, width, height);
+	    BufferedImage image = new BufferedImage((int) width, (int) height,
+						    BufferedImage.TYPE_INT_ARGB);
+	    Graphics2D g = (Graphics2D) image.getGraphics();
+	    paintColors(g, box, colors, false, false, true, null);
+	    return image;
         } catch (Exception exc) {
             return null;
         }

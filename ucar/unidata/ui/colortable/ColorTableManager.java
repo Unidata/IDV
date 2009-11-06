@@ -32,7 +32,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import ucar.unidata.util.ColorTable;
-
+import ucar.unidata.ui.ImageUtils;
 
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
@@ -163,6 +163,19 @@ public class ColorTableManager extends ResourceManager {
      */
     public ColorTableManager() {}
 
+
+    public void doExport(NamedObject object, String file) {
+	if(!ImageUtils.isImage(file)) {
+	    super.doExport(object, file);
+	}
+	try {
+	    Image image =ColorTableCanvas.getImage((ColorTable) object, 200,30);
+	    ImageUtils.writeImageToFile(image,  new File(file));
+	} catch(Exception exc) {
+	    throw new RuntimeException(exc);
+	}
+	
+    }
 
     /**
      * set the singleton manager
