@@ -1443,18 +1443,25 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
         String           dateFormat = "yyyy/MM/dd HH:mm:ss";
         SimpleDateFormat sdf        = new SimpleDateFormat(dateFormat);
         for (PointDataMetadata pdm : columnsToUse) {
-            if ((entityCol == null)
-                    && (pdm.shortName.toLowerCase().indexOf("station")
-                        >= 0)) {
-                entityCol = pdm.columnName;
+            String pdmName = pdm.shortName.toLowerCase();
+
+            if(pdm.columnName.equals(COL_ID)) {
                 continue;
             }
-            if (pdm.shortName.toLowerCase().indexOf("name") >= 0) {
+            if (entityCol == null) {
+                if(pdmName.indexOf("station") >= 0 || pdmName.equals("region") || pdmName.equals("id") || pdmName.equals("idn")) {
+                    entityCol = pdm.columnName;
+                    continue;
+                }
+            }
+            if (pdmName.indexOf("name") >= 0) {
                 entityCol = pdm.columnName;
                 break;
             }
         }
 
+
+        System.err.println ("entityCol:" + entityCol);
 
         for (PointDataMetadata pdm : columnsToUse) {
             if ((entityCol != null) && pdm.isColumn(entityCol)) {
