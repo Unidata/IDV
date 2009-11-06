@@ -54,10 +54,16 @@
 <plugin name="RAMADDA Publisher" url="http://www.unidata.ucar.edu/software/idv/plugins/ramaddaplugin.jar" description="Supports publishing to a RAMADDA data repository" category="Miscellaneous"/>
 
 
+<plugin  category="Miscellaneous" name="UCAR Africa Initiative" description="A plugin for the UCAR Africa Initiative"  url="http://www.unidata.ucar.edu/software/idv/plugins/africaidv.jar"/>
+
+
 <plugin  name="Greenland Layout Models" url="http://www.unidata.ucar.edu/software/idv/plugins/greenland.jar" category="Miscellaneous"/>
 
 <!-- Data Helpers -->
 <plugin version="2.6"  category="Data Sources" name="PAM NetCDF Enhancement" description="NcML needed to read Portable Automated Mesonet (PAM) netCDF files"  url="http://www.unidata.ucar.edu/software/idv/plugins/pam.jar"/>
+
+
+
 <plugin  category="Data Sources" name="NACP Plugin" description="Provides data sources for North American Carbon Project data"  url="http://www.unidata.ucar.edu/software/idv/plugins/nacpidv.jar"/>
 <plugin version="2.6"  category="Data Sources" name="SSEC Lightning Data" description="NcML needed to read a lightning point data format"  url="http://www.unidata.ucar.edu/software/idv/plugins/sseclightning.jar"/>
 <plugin version="2.7"  category="Data Sources" name="NAPLN Text Lightning Data" description="Datasource and some layout models for NAPLN Lightning data"  url="http://www.unidata.ucar.edu/software/idv/plugins/napln.jar"/>
