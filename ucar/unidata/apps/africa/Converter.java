@@ -39,6 +39,8 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
+import java.io.*;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,9 +55,14 @@ import visad.*;
  * @version $Revision: 1.90 $ $Date: 2007/08/06 17:02:27 $
  */
 public class Converter {
-    public static final String HEADER = "(index)->(Latitude,Longitude,Country(Text),State(Text),Region(Text),Time,rate)\nLatitude[ unit=\"degrees\" ],Longitude[ unit=\"degrees\" ],Country(Text),State(Text),Region(Text),Time[ fmt=\"yyyy-MM-dd\" ],rate[]";
+    public static final String HEADER = "(index)->(Latitude,Longitude,Country(Text),State(Text),Region(Text),Time,rate,Population)\nLatitude[ unit=\"degrees\" ],Longitude[ unit=\"degrees\" ],Country(Text),State(Text),Region(Text),Population[],Time[ fmt=\"yyyy-MM-dd\" ],rate[ missing=\"-9999.9\" ]";
 
     public static void process(String file, String country, String year) throws Exception {
+	File f = new File("locations.properties");
+	if(f.exists()) {
+
+	}
+
 	String contents = IOUtil.readContents(file, Converter.class);
 	List<String> lines = StringUtil.split(contents, "\n", false,false);
 	if(lines.size()==1) {
@@ -66,16 +73,17 @@ public class Converter {
 	sdf1.setTimeZone(DateUtil.TIMEZONE_GMT);
 	sdf2.setTimeZone(DateUtil.TIMEZONE_GMT);
 	List<String> dates = new ArrayList<String>();
+	int colOffset =3;
 	for(int i=0;i<lines.size();i++) {
-	    if(i==0) continue;
+	    if(i==1) continue;
 	    String line = lines.get(i).trim();
 	    if(line.length()==0) continue;
 	    
 	    List<String> cols =  StringUtil.split(line, ",", false,false);
 
-	    if(i==1) {
+	    if(i==0) {
 		//,Latitude,Longitude,Location,Population,Dec 29-Jan 4,Jan 5-Jan 11,Jan 12-Jan 18,Jan 19-Jan 25,Jan 26-Feb 1,Feb 2-Feb 8,Feb 9-Feb 15,Feb 16-Feb 22,Feb 23-Mar 1,Mar 2-Mar 8,Mar 9-Mar 15,Mar 16-Mar 22,Mar 23-Mar 29,Mar 30-Apr 5,Apr 6-Apr 12,Apr 13-Apr 19,Apr 20-Apr 26
-		for(int col=5;col<cols.size();col++) {
+		for(int col=colOffset;col<cols.size();col++) {
 		    String dttms = cols.get(col);
 		    List<String> toks = StringUtil.split(dttms,"-",true,true);
 		    //Get the second date
@@ -87,14 +95,12 @@ public class Converter {
 	//Kano,11.70,9.10,Albasu,209606.00,,,,,,0.48,2.86,0.48,,,3.82,6.20,9.54,20.99,2.86,,
 	    int col=0;
 	    String state= cols.get(col++);
-	    String lats= cols.get(col++);
-	    String lons= cols.get(col++);
 	    String region= cols.get(col++);
 	    double population = new Double(cols.get(col++)).doubleValue();
 	    //	    System.err.println ("line:"+i);
 	    LatLonPoint llp = GeoUtils.getLocationFromAddress(region+"," +state+"," + country,null);
-            System.err.println(region+" " + llp);
-	    if(llp==null && lats.trim().length()==0) {
+	    System.err.println(region+" " + llp);
+	    if(llp==null) {
 		System.err.println("No location:" +region);
 	    }
 	    System.out.println("Latitude=" + llp.getLatitude().getValue(CommonUnit.degree));
@@ -102,12 +108,13 @@ public class Converter {
 	    System.out.println("Country=" + country);
 	    System.out.println("State=" + state);
 	    System.out.println("Region=" + region);
-	    for(int dateIdx=5;dateIdx<cols.size();dateIdx++) {
-		System.out.print(dates.get(dateIdx-5));
+	    System.out.println("Population=" + population);
+	    for(int dateIdx=colOffset;dateIdx<cols.size();dateIdx++) {
+		System.out.print(dates.get(dateIdx-colOffset));
 		System.out.print(",");
 		String value = cols.get(dateIdx);
 		if(value.trim().length() == 0) 
-		    value = "0.0";
+		    value = "-9999.9";
 		System.out.println(new Double(value).doubleValue());
 	    }
 
