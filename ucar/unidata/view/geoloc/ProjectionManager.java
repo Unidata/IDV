@@ -888,6 +888,8 @@ public class ProjectionManager implements ActionListener {
                     }
                 });
             }
+	    GuiUtils.limitMenuSize(mapMenu, "Maps ", 20);
+
             toolbar.add(navToolbar);
             toolbar.add(moveToolbar);
 

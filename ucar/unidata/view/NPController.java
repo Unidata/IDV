@@ -30,6 +30,7 @@ import ucar.unidata.geoloc.projection.*;
 import ucar.unidata.gis.mcidasmap.McidasMap;
 import ucar.unidata.gis.shapefile.EsriShapefileRenderer;
 import ucar.unidata.util.Debug;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.view.*;
 import ucar.unidata.view.geoloc.*;
 
@@ -174,7 +175,7 @@ public class NPController {
         Renderer mapRenderer = null;
         try {
             mapRenderer = EsriShapefileRenderer.factory(
-                ucar.unidata.util.Resource.getURL(mapPath).openStream());
+							IOUtil.getInputStream(mapPath, getClass()));
         } catch (Exception exc) {}
 
         if (mapRenderer == null) {
