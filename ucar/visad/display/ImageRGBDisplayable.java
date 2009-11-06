@@ -122,10 +122,11 @@ public class ImageRGBDisplayable extends DisplayableData implements GridDisplaya
         }
 
         addConstantMaps(new ConstantMap[] {
-            new ConstantMap(GraphicsModeControl.SUM_COLOR_MODE,
-                            Display.ColorMode),
+		new ConstantMap(GraphicsModeControl.SUM_COLOR_MODE,
+			      Display.ColorMode),
             new ConstantMap(1.0, Display.MissingTransparent) });
     }
+
 
     /**
      * Constructs from another instance.  The following attributes are set from
@@ -171,6 +172,7 @@ public class ImageRGBDisplayable extends DisplayableData implements GridDisplaya
         }
         setData(field);
     }
+
 
     /**
      * Get the RealTupleType of the RGB parameter.
@@ -364,6 +366,7 @@ public class ImageRGBDisplayable extends DisplayableData implements GridDisplaya
         if (colorPalette == null) {
             return;
         }
+
 
         if (colorMaps[colorMapIndex] == null) {
             return;

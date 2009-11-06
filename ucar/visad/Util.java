@@ -2746,6 +2746,27 @@ public final class Util {
     public static FlatField makeField(Image image,
                                       float alphaThreshold)
             throws IOException, VisADException {
+	return makeField(image, alphaThreshold, false);
+    }
+
+
+
+    /**
+     * Create a VisAD Data object from the given Image
+     * @param  image   image to use
+     * @param  alphaThreshold If there is an alpha channel in the image then set the field value to nan
+     * for any alhpa greater than the given threshold. Do nothing if threshold<0
+     *   value and we turn the other values into nan-s
+     * @return a FlatField representation of the image
+     *
+     * @throws IOException  problem reading the image
+     * @throws VisADException problem creating the FlatField
+     */
+
+    public static FlatField makeField(Image image,
+                                      float alphaThreshold,
+				      boolean makeAlpha)
+            throws IOException, VisADException {
 
         if (image == null) {
             throw new VisADException("image cannot be null");
@@ -2789,23 +2810,33 @@ public final class Util {
         float[]    red_pix   = new float[numPixels];
         float[]    green_pix = new float[numPixels];
         float[]    blue_pix  = new float[numPixels];
+        float[]    alpha_pix  = new float[numPixels];
+
+	boolean hasAlpha = cm.hasAlpha();
+	System.err.println ("has alpha");
 
         for (int i = 0; i < numPixels; i++) {
             red_pix[i]   = cm.getRed(words[i]);
             green_pix[i] = cm.getGreen(words[i]);
             blue_pix[i]  = cm.getBlue(words[i]);
+	    if (hasAlpha) {
+		alpha_pix[i] = cm.getAlpha(words[i]);
+	    } else {
+		alpha_pix[i] = 0f;
+	    }
         }
+
         boolean opaque = true;
-        if (alphaThreshold>=0) {
-            float   alpha_pix;
-            boolean hasAlpha = cm.hasAlpha();
+        if (!makeAlpha&& alphaThreshold>=0) {
+            float   alphaValue;
             for (int i = 0; i < numPixels; i++) {
                 if (hasAlpha) {
-                    alpha_pix = cm.getAlpha(words[i]);
+                    alphaValue = cm.getAlpha(words[i]);
                 } else {
-                    alpha_pix = 255.0f;
+                    alphaValue = 255.0f;
                 }
-                if (alpha_pix <alphaThreshold) {
+		
+                if (alphaValue <alphaThreshold) {
                     red_pix[i]   = Float.NaN;
                     green_pix[i] = Float.NaN;
                     blue_pix[i]  = Float.NaN;
@@ -2825,7 +2856,8 @@ public final class Util {
         RealType      c_blue            = RealType.getRealType("Blue");
         RealType      c_alpha           = RealType.getRealType("Alpha");
 
-        RealType[]    c_all = new RealType[] { c_red, c_green, c_blue };
+        RealType[]    c_all = (makeAlpha?new RealType[] { c_red, c_green, c_blue,c_alpha }:
+			       new RealType[] { c_red, c_green, c_blue });
         RealTupleType radiance          = new RealTupleType(c_all);
 
         RealType[]    domain_components = { element, line };
@@ -2838,9 +2870,8 @@ public final class Util {
 
         FlatField    field      = new FlatField(image_type, domain_set);
 
-        float[][]    samples    = new float[][] {
-            red_pix, green_pix, blue_pix
-        };
+        float[][]    samples    = (makeAlpha?new float[][] {red_pix, green_pix, blue_pix,alpha_pix}:
+				   new float[][] {red_pix, green_pix, blue_pix});
         try {
             field.setSamples(samples, false);
         } catch (RemoteException e) {
