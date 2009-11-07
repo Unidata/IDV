@@ -922,6 +922,10 @@ public class HtmlUtil {
         return tag(TAG_DIV, extra, content);
     }
 
+
+
+
+
     /**
      * _more_
      *
@@ -1968,6 +1972,12 @@ public class HtmlUtil {
      */
     public static String inset(String html, int space) {
         return div(html, style("margin:" + space + "px;"));
+    }
+
+
+
+    public static String insetLeft(String html, int space) {
+        return div(html, style("margin-left:" + space + "px;"));
     }
 
     /**

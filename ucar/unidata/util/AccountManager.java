@@ -64,12 +64,11 @@ public class AccountManager implements CredentialsProvider,
                                        IOUtil.UserAccountManager {
 
 
-    /** _more_          */
+    /** The global account manager   */
     private static AccountManager accountManager;
 
     /** for the gui */
     private JLabel serverLabel;
-
 
     /** for the gui */
     private JDialog dialog;
@@ -95,7 +94,7 @@ public class AccountManager implements CredentialsProvider,
      */
     private Hashtable currentlyUsedOnes = new Hashtable();
 
-    /** _more_          */
+    /** This is where we write and read the persistent state   */
     private File stateDir;
 
 
@@ -103,25 +102,25 @@ public class AccountManager implements CredentialsProvider,
      * constructor
      *
      *
-     * @param stateDir _more_
+     * @param stateDir The directory to read/write state to
      */
     public AccountManager(File stateDir) {
         this.stateDir = stateDir;
     }
 
     /**
-     * _more_
+     * Get the account manager
      *
-     * @return _more_
+     * @return The account manager
      */
     public static AccountManager getGlobalAccountManager() {
         return accountManager;
     }
 
     /**
-     * _more_
+     * Set te global account manager. If one is set already then throw an exception
      *
-     * @param manager _more_
+     * @param manager Instance of the global account manager
      */
     public static void setGlobalAccountManager(AccountManager manager) {
         if (accountManager != null) {
