@@ -2095,6 +2095,9 @@ public class PluginManager extends IdvManager {
         if (deleteFile.exists()) {
             return false;
         }
+	if(file.getName().startsWith(".tmp.")) {
+	    return false;
+	}
         return true;
     }
 
@@ -2172,25 +2175,26 @@ public class PluginManager extends IdvManager {
     private File installPlugin(String plugin, boolean andLoad)
             throws Exception {
         String filename = encode(plugin);
+	String tmpFilename = ".tmp." + filename;
         String extDir =
             IOUtil.joinDir(getStore().getUserDirectory().toString(),
                            "plugins");
+        File newTmpFile = new File(IOUtil.joinDir(extDir, tmpFilename));
         File newFile = new File(IOUtil.joinDir(extDir, filename));
         Object loadId =
             JobManager.getManager().startLoad("Installing plugin", true);
         byte[] bytes = null;
         try {
             URL url = IOUtil.getURL(plugin, getClass());
-            if (IOUtil.writeTo(url, newFile, loadId) <= 0) {
+            if (IOUtil.writeTo(url, newTmpFile, loadId) <= 0) {
+		newTmpFile.delete();
                 return null;
             }
-            //            bytes = IOUtil.readBytes(IOUtil.getInputStream(plugin,
-            //                                                           getClass()), loadId);
+	    IOUtil.moveFile(newTmpFile, newFile);
+	    //	    newTmpFile.delete();
         } finally {
             JobManager.getManager().stopLoad(loadId);
         }
-        //        if(bytes==null) return null;
-        //        IOUtil.writeBytes(newFile, bytes);
         if (andLoad) {
             new Plugin(newFile);
         }
