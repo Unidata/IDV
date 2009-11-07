@@ -2813,7 +2813,6 @@ public final class Util {
         float[]    alpha_pix  = new float[numPixels];
 
 	boolean hasAlpha = cm.hasAlpha();
-	System.err.println ("has alpha");
 
         for (int i = 0; i < numPixels; i++) {
             red_pix[i]   = cm.getRed(words[i]);
