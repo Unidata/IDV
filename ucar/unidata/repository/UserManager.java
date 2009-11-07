@@ -225,6 +225,7 @@ public class UserManager extends RepositoryManager {
      */
     public List<FavoriteEntry> getFavorites(Request request, User user)
             throws Exception {
+	if(user.getAnonymous()) return new ArrayList<FavoriteEntry>();
         List<FavoriteEntry> favorites = user.getFavorites();
         if (favorites == null) {
             favorites = new ArrayList<FavoriteEntry>();
