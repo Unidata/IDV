@@ -1406,7 +1406,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                                     max);
         final boolean[] done = { false };
         String msg = "Select what:" + what + "\ntables:" + tables
-                     + "\nclause:" + clause + "\nextra:" + extra + "max:"
+                     + "\nclause:" + clause + "\nextra:" + extra + "\nmax:"
                      + max;
         /*
         Misc.run(new Runnable() {
