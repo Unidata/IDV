@@ -2316,22 +2316,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         //        logInfo("request:" + request);
         try {
-
             getSessionManager().checkSession(request);
             result = getResult(request);
-
-	    if(false && request.get("forauth",false)) {
-		System.err.println("got an authorized request with forauth in it " + request.getSecure());
-		request.remove("forauth");
-		ApiMethod apiMethod  = findApiMethod(request);
-		Result sslRedirect = checkForSslRedirect(request, apiMethod);
-		if(sslRedirect!=null) {
-		    System.err.println("       redirecting to:" + sslRedirect.getRedirectUrl());
-		    return sslRedirect;
-		}
-	    }
-
-
         } catch (Throwable exc) {
             //In case the session checking didn't set the user
             if (request.getUser() == null) {
@@ -2371,13 +2357,17 @@ public class Repository extends RepositoryBase implements RequestHandler {
                             HtmlUtil.hidden(ARG_REDIRECT, redirect)));
                 } else {
                     sb.append(inner.getMessage());
+		    //If the authmethod is basic http auth then, if ssl is enabled, we 
+		    //want to have the authentication go over ssl. Else we do it clear text
                     if (!request.getSecure() && isSSLEnabled(null)) {
-			//xxxxxxx
+			/*
+			If ssl then we are a little tricky here. We redirect the request to the generic ssl based SSLREDIRCT url
+			passing the actual request as an argument. The processSslRedirect method checks for authentication. If
+			not authenticated then it throws an access exception which triggers a auth request back to the client
+			If authenticated then it redirects the client back to the original non ssl request
+			*/
 			String redirectUrl = XmlUtil.encodeBase64(request.getUrl().getBytes());
-			String url = HtmlUtil.url(httpsUrl(URL_REDIRECT.toString()),ARG_REDIRECT, redirectUrl,"forauth","true");
-			//			if(url.indexOf("?")<0) url = url+"?forauth=true";
-			//			else url = url+"&forauth=true";
-			System.err.println ("redirecting to:" + url);
+			String url = HtmlUtil.url(URL_SSLREDIRECT.toString(),ARG_REDIRECT, redirectUrl);
                         result = new Result(url);
                     } else {
                         result = new Result("Error", sb);
@@ -2385,7 +2375,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
                                              "Basic realm=\"ramadda\"");
                         result.setResponseCode(Result.RESPONSE_UNAUTHORIZED);
                     }
-		    System.err.println("need to authorize");
                     return result;
                 }
             }
@@ -2644,17 +2633,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (sslEnabled) {
             if ( !request.get(ARG_NOREDIRECT, false)) {
                 if (apiMethod.getNeedsSsl() && !request.getSecure()) {
-                    //                System.err.println ("Redirecting to ssl: "+ httpsUrl(request.getUrl()));
                     return new Result(httpsUrl(request.getUrl()));
                 } else if ( !allSsl && !apiMethod.getNeedsSsl()
                             && request.getSecure()) {
-		    if(request.get("forauth",false)) {
-			//xxxx
-			System.err.println ("a forauth request");
-		    } else {
-			System.err.println ("Redirecting to no ssl "+absoluteUrl(request.getUrl()));
-			return new Result(absoluteUrl(request.getUrl()));
-		    }
+		    return new Result(absoluteUrl(request.getUrl()));
                 }
             }
         }
@@ -3431,6 +3413,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
         getUserManager().makeUserIfNeeded(new User("anonymous", "Anonymous",
                 false));
 
+
+	getDatabaseManager().initComplete();
+
+
         readGlobals();
 
     }
@@ -3992,7 +3978,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
-    public Result processRedirect(Request request) throws Exception {
+    public Result processSslRedirect(Request request) throws Exception {
+        if (request.getCheckingAuthMethod()) {
+            return new Result(AuthorizationMethod.AUTH_HTTP);
+        }
+
+
+	if(request.isAnonymous()) {
+            throw new AccessException("Cannot access data", request);
+	}
 	String url = request.getString(ARG_REDIRECT,"");
 	url = new String(XmlUtil.decodeBase64(url));
         return new Result(url);

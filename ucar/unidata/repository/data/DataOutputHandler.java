@@ -1874,8 +1874,6 @@ public class DataOutputHandler extends OutputHandler {
     public Result outputEntry(final Request request, Entry entry)
             throws Exception {
 
-
-
         if ( !getRepository().getAccessManager().canDoAction(request, entry,
                 Permission.ACTION_FILE)) {
             throw new AccessException("Cannot access data", request);

@@ -164,7 +164,7 @@ public class AccessManager extends RepositoryManager {
             Entry entry = getEntryManager().getEntry(request,
                               request.getString(ARG_ENTRYID, ""), false);
             if (entry == null) {
-                throw new IllegalArgumentException("Could not find entry:"
+                throw new RepositoryUtil.MissingEntryException("Could not find entry:"
                         + request.getString(ARG_ENTRYID, ""));
             }
             return canDoAction(request, entry, action);
@@ -175,7 +175,7 @@ public class AccessManager extends RepositoryManager {
                     ""), ",", true, true)) {
                 Entry entry = getEntryManager().getEntry(request, id, false);
                 if (entry == null) {
-                    throw new IllegalArgumentException(
+                    throw new RepositoryUtil.MissingEntryException(
                         "Could not find entry:" + id);
                 }
                 if ( !canDoAction(request, entry, action)) {
@@ -188,7 +188,7 @@ public class AccessManager extends RepositoryManager {
         if (request.exists(ARG_GROUP)) {
             Group group = getEntryManager().findGroup(request);
             if (group == null) {
-                throw new IllegalArgumentException("Could not find group:"
+                throw new RepositoryUtil.MissingEntryException("Could not find group:"
                         + request.getString(ARG_GROUP, ""));
             }
             boolean canDo = canDoAction(request, group, action);
@@ -218,7 +218,7 @@ public class AccessManager extends RepositoryManager {
             }
         }
 
-        throw new IllegalArgumentException("Could not find entry or group");
+        throw new RepositoryUtil.MissingEntryException("Could not find entry or group");
         //        return false;
     }
 

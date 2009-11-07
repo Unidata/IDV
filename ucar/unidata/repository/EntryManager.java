@@ -381,12 +381,10 @@ return new Result(title, sb);
      */
     public Result processEntryShow(Request request) throws Exception {
         //        System.err.println ("processEntryShow " + request);
-
         if (request.getCheckingAuthMethod()) {
             OutputHandler handler = getRepository().getOutputHandler(request);
             return new Result(handler.getAuthorizationMethod(request));
         }
-
 
 
         Entry entry = null;

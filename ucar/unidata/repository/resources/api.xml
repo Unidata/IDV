@@ -54,7 +54,7 @@
 
   <group handler="repository">
       <api request="/message"                method="processMessage"    cancache="false" />
-      <api request="/redirect"               method="processRedirect"    cancache="false" />
+      <api request="/sslredirect"            method="processSslRedirect"    cancache="false"  needs_ssl="true" checkauthmethod="true"/>
       <api request="/dummy"                  method="processDummy"/>
       <api request="/install"                method="processDummy"/>
       <api request="/test/memory"            method="processTestMemory"/>

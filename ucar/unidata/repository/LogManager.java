@@ -90,6 +90,10 @@ public class LogManager extends RepositoryManager {
         }
     }
 
+    public OutputStream getLogOutputStream() {
+	return runLogFOS;
+    }
+
     /**
      * _more_
      *
