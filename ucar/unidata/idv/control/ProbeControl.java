@@ -361,6 +361,56 @@ public class ProbeControl extends DisplayControlImpl {
         }
     }
 
+    private JSlider probeSizeSlider;
+    private GuiUtils.ColorSwatch probeColorSwatch;
+    private JComboBox 	shapeCbx;
+
+    protected void addPropertiesComponents(JTabbedPane jtp) {
+        super.addPropertiesComponents(jtp);
+	List comps = new ArrayList();
+	comps.add(GuiUtils.rLabel("Size:"));
+	probeSizeSlider =   new JSlider(1, 2000, (int)(getPointSize()*100));
+	comps.add(probeSizeSlider);
+	probeColorSwatch = new GuiUtils.ColorSwatch(getColor(),"Probe Color");
+	comps.add(GuiUtils.rLabel("Color:"));
+	comps.add(GuiUtils.left(probeColorSwatch));
+
+
+	TwoFacedObject selected = null;
+	Vector shapes = new Vector();
+        for (int i = 0; i < ShapeUtility.SHAPES.length; i++) {
+            TwoFacedObject tof = ShapeUtility.SHAPES[i];
+            if (Misc.equals(tof.getId(), marker)) {
+		selected = tof;
+            }
+	    shapes.add(tof);
+        }
+	shapeCbx = new JComboBox(shapes);
+	if(selected!=null)
+	    shapeCbx.setSelectedItem(selected);
+	comps.add(GuiUtils.rLabel("Shape:"));
+	comps.add(GuiUtils.left(shapeCbx));
+
+
+	jtp.addTab("Probe", GuiUtils.top(GuiUtils.formLayout(comps)));
+    }
+
+
+    public boolean doApplyProperties() {
+	if(!super.doApplyProperties()) return false;
+	setPointSize((float)(probeSizeSlider.getValue()/100.0));
+	try {
+	    setColor(probeColorSwatch.getColor());
+	    TwoFacedObject tfo =  (TwoFacedObject)shapeCbx.getSelectedItem();
+	    setMarker(tfo.getId().toString());
+	} catch(Exception exc) {
+	    throw new RuntimeException(exc);
+	}
+	return true;
+
+    }
+
+
     /**
      * Return the label that is to be used for the color widget
      * This allows derived classes to override this and provide their
