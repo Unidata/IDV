@@ -333,7 +333,7 @@ public class ZipOutputHandler extends OutputHandler {
 	    //	    System.err.println ("name:" + name + " file length:" + f.length() + " size so far:" + (sizeSoFar+sizeProcessed));
 
 	    //cap it at a gigabyte
-	    if(sizeSoFar+sizeProcessed>getRepository().getProperty(PROP_ZIPOUTPUT_MAXSIZEMB, 1000)) {
+	    if(sizeSoFar+sizeProcessed>MEGA*getRepository().getProperty(PROP_ZIPOUTPUT_MAXSIZEMB, 1000)) {
 		throw new IllegalArgumentException("Size of request has exceeded maximum size");
 	    }
 
