@@ -380,6 +380,20 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryShow(Request request) throws Exception {
+	
+	/*
+	while(true) {
+	    Misc.sleep(1000);
+	    if(!request.isConnected()) {
+		System.err.println("break");
+		break;
+	    }
+	    System.err.println("still connected");
+	}
+	*/
+
+
+
         //        System.err.println ("processEntryShow " + request);
         if (request.getCheckingAuthMethod()) {
             OutputHandler handler = getRepository().getOutputHandler(request);

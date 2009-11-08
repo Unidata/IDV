@@ -33,6 +33,7 @@ import ucar.unidata.repository.monitor.*;
 import ucar.unidata.repository.output.*;
 import ucar.unidata.repository.type.*;
 
+import ucar.unidata.repository.ftp.FtpManager;
 
 import ucar.unidata.sql.Clause;
 
@@ -100,14 +101,7 @@ import java.util.regex.*;
 import java.util.zip.*;
 
 
-import org.apache.ftpserver.*;
-import org.apache.ftpserver.listener.*;
-import org.apache.ftpserver.ftplet.*;
-import org.apache.ftpserver.usermanager.*;
-import org.apache.ftpserver.usermanager.impl.*;
 
-
-import ucar.unidata.repository.ftp.FtpManager;
 
 
 /**
@@ -855,165 +849,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
     }
 
-    private class MyFtplet extends DefaultFtplet {
-	public MyFtplet() {
-	}
-
-	public	    void init(FtpletContext ftpletContext)  throws FtpException {
-	    System.err.println ("init ");
-	    super.init(ftpletContext);
-	}
-
-	public	FtpletResult afterCommand(FtpSession session, FtpRequest request, FtpReply reply) throws FtpException, IOException {
-	    if(request.getCommand().equals("PASS")) {
-		System.err.println("FOO");
-	    }
-
-	    return super.afterCommand(session, request, reply);
-	}
-
-	public	    FtpletResult beforeCommand(FtpSession session, FtpRequest request) throws FtpException, IOException {
-	    System.err.println ("beforeCommand " + request);
-	    return super.beforeCommand(session, request);
-	}
-
-	public	    void destroy() {
-	    //	    System.err.println ("destroy");
-	    super.destroy();
-	}
 
 
-	public	    FtpletResult onConnect(FtpSession session) throws FtpException, IOException {
-	    //	    System.err.println ("onconnect");
-	    return super.onConnect(session);
-	}
-      
-	public	    FtpletResult onDisconnect(FtpSession session)  throws FtpException, IOException {
-	    //	    System.err.println ("ondisconnect");
-	    return super.onDisconnect(session);
-	}
-
-
-	public FtpletResult onLogin(FtpSession session, FtpRequest request) throws FtpException, IOException {
-	    System.err.println("onLogin:" + session.getUser());
-	    return FtpletResult.DEFAULT;
-	}
-
-    }
-
-
-
-    private static class RepositoryFtpUserManager implements org.apache.ftpserver.ftplet.UserManager {
-	BaseUser user;
-
-	public RepositoryFtpUserManager() {
-	    user = new BaseUser();
-	    user.setName("test");
-	    user.setPassword("test");
-	    user.setHomeDirectory("/Users/jeffmc");
-	    List<Authority> auths = new ArrayList<Authority>();
-	    auths.add(new ConcurrentLoginPermission(10,10));
-	    //	    Authority auth = new WritePermission();
-	    //	    auths.add(auth);
-	    user.setAuthorities(auths);
-	}
-
-	public org.apache.ftpserver.ftplet.User authenticate(Authentication auth) {
-	    if(true) return user;
-	    /*
-	    if(auth instanceof UsernamePasswordAuthentication) {
-		UsernamePasswordAuthentication upa = (UsernamePasswordAuthentication) auth;
-		System.err.println ("auth:" +upa.getUsername() +" " + upa.getPassword());
-		if(user == null) {
-		    user = new RepositoryFtpUser(upa.getUsername(), upa.getPassword());
-		    List<Authority> authorities = new ArrayList<Authority>();
-		    //		authorities.add(new ConcurrentLoginPermission(10,10));
-		    user.setAuthorities(authorities);
-		}
-		return user;
-		}*/
-	    return null;
-	}
-
-	public 	void delete(java.lang.String username) {
-
-	}
-
-	public 	boolean doesExist(java.lang.String username) {
-	    return true;
-	}
-
-	public String getAdminName() {
-	    return "foo";
-	}
-
-	public 	String[] getAllUserNames() {
-	    return new String[]{"jeffmc"};
-	}
-
-
-	public 	org.apache.ftpserver.ftplet.User getUserByName(java.lang.String username) {
-	    return user;
-	}
-	
-	public 	boolean isAdmin(java.lang.String username) {
-	    return  false;
-	}
-
-	public 	void save(org.apache.ftpserver.ftplet.User user)  {
-
-	}
-
-    }
-
-    protected void initFtpServer() throws Exception {
-
-	FtpServerFactory serverFactory = new FtpServerFactory();
-
-	Hashtable ftplets = new Hashtable<java.lang.String,Ftplet>();
-	ftplets.put("default",new MyFtplet());
-	serverFactory.setFtplets(ftplets);
-
-
-        
-	ListenerFactory factory = new ListenerFactory();
-
-        
-	// set the port of the listener
-	factory.setPort(2221);
-
-	// replace the default listener
-	serverFactory.addListener("default", factory.createListener());
-
-
-       PropertiesUserManagerFactory userManagerFactory = new  PropertiesUserManagerFactory();
-       userManagerFactory.setPasswordEncryptor(new
-					       SaltedPasswordEncryptor());
-       org.apache.ftpserver.ftplet.UserManager userManager = userManagerFactory.createUserManager();
-
-       BaseUser user = new BaseUser();
-       user.setName("test");
-       user.setPassword("test");
-       user.setHomeDirectory("/Users/jeffmc");
-       List<Authority> auths = new ArrayList<Authority>();
-       Authority auth = new WritePermission();
-       auths.add(auth);
-       user.setAuthorities(auths);
-       try {
-	   userManager.save(user);
-       } catch (FtpException e1) {
-	   // TODO Auto-generated catch block
-	   e1.printStackTrace();
-       }
-
-       serverFactory.setUserManager(new RepositoryFtpUserManager());
-       //serverFactory.setUserManager(userManager);
-
-	// start the server
-	FtpServer server = serverFactory.createServer(); 
-	server.start();
-
-    }
 
 
     /**
@@ -3317,6 +3154,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String prop = getProperty(name);
         if (prop != null) {
             return new Integer(prop).intValue();
+        }
+        return dflt;
+    }
+
+
+    public long getProperty(String name, long dflt) {
+        String prop = getProperty(name);
+        if (prop != null) {
+            return new Long(prop).longValue();
         }
         return dflt;
     }

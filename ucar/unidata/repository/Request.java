@@ -215,6 +215,19 @@ public class Request implements Constants {
     }
 
 
+    public boolean isConnected() {
+	try {
+	    OutputStream os = getHttpServletResponse().getOutputStream();
+	    InputStream is = getHttpServletRequest().getInputStream();
+	    System.err.println(is.available());
+	} catch(Exception exc) {
+	    System.err.println ("bad");
+	    return false;
+	}
+	return true;
+    }
+
+
     /**
      * _more_
      *

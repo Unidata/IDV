@@ -305,6 +305,7 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                                "Unknown request:" + request.getRequestURI());
             return;
         }
+
         if (repositoryResult.getNeedToWrite()) {
             List<String> args = repositoryResult.getHttpHeaderArgs();
             if (args != null) {

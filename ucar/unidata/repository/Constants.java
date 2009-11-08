@@ -287,6 +287,8 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_ZIP = "ramadda.icon.zip";
 
+    public static final String ICON_ZIPTREE = "ramadda.icon.ziptree";
+
 
 
     /** _more_ */
@@ -1419,6 +1421,12 @@ public interface Constants {
     public static final String PROP_CACHE_MAXSIZEGB =
         "ramadda.cache.maxsizegb";
 
+    public static final String PROP_ZIPOUTPUT_MAXSIZEMB =
+        "ramadda.zip.maxsizemb";
+
+
+
+
     /** _more_ */
     public static final String PROP_USER_RESET_ID_SUBJECT =
         "ramadda.user.reset.id.subject";
@@ -1592,6 +1600,10 @@ public interface Constants {
 
     /** _more_          */
     public static final String SERVICE_FILE = "file";
+
+
+    public static long MEGA =1000000;
+    public static long GIGA =MEGA*1000;
 
 
 

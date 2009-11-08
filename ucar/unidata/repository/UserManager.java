@@ -2320,35 +2320,21 @@ public class UserManager extends RepositoryManager {
                             XmlUtil.attr(ATTR_CODE, CODE_OK),
                             request.getSessionId()), MIME_XML);
                 }
+		String destUrl;
+		String destMsg;
                 if (request.exists(ARG_REDIRECT)) {
-                    String redirect = new String(
-                                          XmlUtil.decodeBase64(
-                                              request.getUnsafeString(
-                                                  ARG_REDIRECT, "")));
-                    if ( !redirect.startsWith("http")) {
-                        redirect = getRepository().absoluteUrl(redirect);
-                    }
-                    //                    System.err.println("xxx  redirecting to:" + redirect);
-                    return new Result(HtmlUtil.url(redirect, ARG_FROMLOGIN,
-                            "true", ARG_MESSAGE,
-                            getRepository().translate(request,
-                                "You are logged in")));
+                    destUrl  = new String(XmlUtil.decodeBase64(
+							       request.getUnsafeString(
+										       ARG_REDIRECT, "")));
+		    destMsg = msg("Continue");
                 } else {
-                    String redirect;
-                    //If we are under ssl then redirect to non-ssl
-                    if (getRepository().isSSLEnabled(request)) {
-                        redirect =
-                            getRepositoryBase().URL_USER_HOME.getFullUrl("");
-                    } else {
-                        redirect =
-                            getRepositoryBase().URL_USER_HOME.toString();
-                    }
-                    //                    System.err.println("yyy redirecting to:" + redirect);
-                    return new Result(HtmlUtil.url(redirect, ARG_FROMLOGIN,
-                            "true", ARG_MESSAGE,
-                            getRepository().translate(request,
-                                "You are logged in")));
+                    destUrl  = getRepositoryBase().URL_USER_HOME.toString();
+		    destMsg = msg("Continue to user home");
                 }
+		StringBuffer response = new StringBuffer();
+		response.append(getRepository().showDialogNote(msg("You are logged in")));
+		response.append(HtmlUtil.href(destUrl, destMsg));
+		return new Result("Login",response);
             } else {
                 if (responseAsXml) {
                     return new Result(XmlUtil.tag(TAG_RESPONSE,
