@@ -565,7 +565,19 @@ public class StorageManager extends RepositoryManager {
     public String getLogDir() {
         if (logDir == null) {
             logDir = IOUtil.joinDir(getRepositoryDir(), DIR_LOGS);
-            IOUtil.makeDirRecursive(new File(logDir));
+	    File f = new File(logDir);
+            IOUtil.makeDirRecursive(f);
+	    File log4JFile = new File(f+"/" + "log4j.properties");
+	    if(!log4JFile.exists()) {
+		try {
+		    String c =IOUtil.readContents("/ucar/unidata/repository/resources/log4j.properties", getClass());
+		    c = c.replace("${ramadda.logdir}", f.toString());
+		    IOUtil.writeFile(log4JFile, c);
+		} catch(Exception exc) {
+		    throw new RuntimeException(exc);
+		}
+	    }
+	    org.apache.log4j.PropertyConfigurator.configure(log4JFile.toString());
         }
         return logDir;
     }
@@ -648,28 +660,6 @@ public class StorageManager extends RepositoryManager {
         }
         return anonymousDir;
     }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public File getFullLogFile() {
-        return new File(IOUtil.joinDir(getLogDir(), FILE_FULLLOG));
-    }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public File getLogFile() {
-        return new File(IOUtil.joinDir(getLogDir(), FILE_LOG));
-    }
-
-
 
 
 

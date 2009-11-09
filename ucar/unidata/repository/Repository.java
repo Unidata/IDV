@@ -456,6 +456,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     public Repository(String[] args, int port, boolean inTomcat)
             throws Exception {
         super(port);
+
         LogUtil.setTestMode(true);
         java.net.InetAddress localMachine =
             java.net.InetAddress.getLocalHost();
@@ -684,10 +685,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
             });
         */
 
-
-
         initProperties(properties);
         initServer();
+        getLogManager().logInfoAndPrint("RAMADDA started");
     }
 
 
@@ -798,6 +798,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         } catch (Exception exc) {}
 
+
+	//create the log dir
+        getStorageManager().getLogDir();
 
         initPlugins();
 
@@ -1926,10 +1929,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
                 } catch (Exception exc) {
                     if ( !required) {
-                        getLogManager().logError(
+                        getLogManager().logWarning(
                             "Couldn't load optional output handler:"
                             + XmlUtil.toString(node));
-                        getLogManager().logError("Warning:" + exc);
+                        getLogManager().logWarning(exc.toString());
                     } else {
                         getLogManager().logError(
                             "Error loading output handler file:" + file, exc);

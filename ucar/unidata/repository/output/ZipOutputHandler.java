@@ -305,6 +305,12 @@ public class ZipOutputHandler extends OutputHandler {
 	throws Exception {
 	long sizeProcessed=0;
         Hashtable       seen = new Hashtable();
+	long sizeLimit;
+	if(request.isAnonymous()) {
+	    sizeLimit = MEGA*getRepository().getProperty(request.PROP_ZIPOUTPUT_ANONYMOUS_MAXSIZEMB, 100);
+	} else {
+	    sizeLimit = MEGA*getRepository().getProperty(request.PROP_ZIPOUTPUT_REGISTERED_MAXSIZEMB, 2000);
+	}
         for (Entry entry : entries) {
 	    if(entry.isGroup() && recurse)  {
 		Group group = (Group) entry;
@@ -330,10 +336,9 @@ public class ZipOutputHandler extends OutputHandler {
 	    }
 	    File f = new File(path);
 	    sizeProcessed += f.length();
-	    //	    System.err.println ("name:" + name + " file length:" + f.length() + " size so far:" + (sizeSoFar+sizeProcessed));
 
-	    //cap it at a gigabyte
-	    if(sizeSoFar+sizeProcessed>MEGA*getRepository().getProperty(PROP_ZIPOUTPUT_MAXSIZEMB, 1000)) {
+	    //check for size limit
+	    if(sizeSoFar+sizeProcessed>sizeLimit) {
 		throw new IllegalArgumentException("Size of request has exceeded maximum size");
 	    }
 

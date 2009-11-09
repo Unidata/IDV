@@ -1421,8 +1421,11 @@ public interface Constants {
     public static final String PROP_CACHE_MAXSIZEGB =
         "ramadda.cache.maxsizegb";
 
-    public static final String PROP_ZIPOUTPUT_MAXSIZEMB =
-        "ramadda.zip.maxsizemb";
+    public static final String PROP_ZIPOUTPUT_REGISTERED_MAXSIZEMB =
+        "ramadda.zip.registered.maxsizemb";
+
+    public static final String PROP_ZIPOUTPUT_ANONYMOUS_MAXSIZEMB =
+        "ramadda.zip.anonymous.maxsizemb";
 
 
 

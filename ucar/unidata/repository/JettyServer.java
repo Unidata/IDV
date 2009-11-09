@@ -25,11 +25,16 @@ package ucar.unidata.repository;
 
 import org.apache.commons.fileupload.MultipartStream;
 
+import org.mortbay.jetty.*;
+import org.mortbay.jetty.handler.*;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.HttpConnection;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.NCSARequestLog;
+
+
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.handler.AbstractHandler;
 
@@ -85,19 +90,40 @@ public class JettyServer extends RepositoryServlet implements Constants {
                 break;
             }
         }
-        Server server = new Server(port);
 
 
         RepositoryServlet repositoryServlet = new RepositoryServlet(this,
                                                   args, port);
-        Context context = new Context(server, "/", Context.SESSIONS);
+
+
+
+
+
+
+
+        Server server = new Server(port);
+        Repository repository = repositoryServlet.getRepository();
+	HandlerCollection handlers = new HandlerCollection();
+	ContextHandlerCollection contexts = new ContextHandlerCollection();
+
+        Context context = new Context(contexts, "/", Context.SESSIONS);
         context.addServlet(new ServletHolder(repositoryServlet), "/*");
 
-        Repository repository = repositoryServlet.getRepository();
+
+	RequestLogHandler requestLogHandler = new RequestLogHandler();
+	NCSARequestLog  logger = new NCSARequestLog(repository.getStorageManager().getLogDir() +"/" + "requests.log");
+	logger.setExtended(false);
+	logger.setRetainDays(90);
+	logger.setAppend(true);
+	logger.setLogTimeZone("GMT");
+
+	requestLogHandler.setRequestLog(logger);
+
+	handlers.setHandlers(new Handler[]{contexts,new DefaultHandler(),requestLogHandler});
+	server.setHandler(handlers);
+
         try {
             initSsl(server, repository);
-            //  } catch(java.net.BindException exc) {
-            //      repository.getLogManager().logInfoAndPrint("SSL: no password and keypassword property defined");
         } catch (Throwable exc) {
             repository.getLogManager().logErrorAndPrint(
                 "SSL: error opening ssl connection", exc);
@@ -128,11 +154,11 @@ public class JettyServer extends RepositoryServlet implements Constants {
         }
 
         if (repository.getProperty(PROP_SSL_IGNORE, false)) {
-            repository.getLogManager().logInfoAndPrint(
+            repository.getLogManager().logInfo(
                 "SSL: ssl.ignore is set.");
             return;
         }
-        repository.getLogManager().logInfoAndPrint("SSL: using keystore: "
+        repository.getLogManager().logInfo("SSL: using keystore: "
                 + keystore);
 
         String password = repository.getPropertyValue(PROP_SSL_PASSWORD,
@@ -140,7 +166,7 @@ public class JettyServer extends RepositoryServlet implements Constants {
         String keyPassword = repository.getPropertyValue(PROP_SSL_PASSWORD,
                                  password, false);
         if (password == null) {
-            repository.getLogManager().logInfoAndPrint(
+            repository.getLogManager().logInfo(
                 "SSL: no password and keypassword property defined");
             repository.getLogManager().logInfoAndPrint(
                 "SSL: define the properties:\n\t" + PROP_SSL_PASSWORD
@@ -178,7 +204,7 @@ public class JettyServer extends RepositoryServlet implements Constants {
             return;
         }
 
-        repository.getLogManager().logInfoAndPrint(
+        repository.getLogManager().logInfo(
             "SSL: creating ssl connection on port:" + sslPort);
         SslSocketConnector sslSocketConnector = new SslSocketConnector();
         sslSocketConnector.setKeystore(keystore.toString());

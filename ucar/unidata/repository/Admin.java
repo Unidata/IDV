@@ -251,26 +251,34 @@ public class Admin extends RepositoryManager {
     public Result adminLog(Request request) throws Exception {
         StringBuffer sb     = new StringBuffer();
         List<String> header = new ArrayList();
+	File f = new File(getStorageManager().getLogDir());
+	File[] logFiles = f.listFiles();
         String       log    = request.getString(ARG_LOG, "access");
-        if (log.equals("access")) {
-            header.add(HtmlUtil.bold(msg("Access Log")));
-            header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                    ARG_LOG, "error"), "Error Log"));
-            header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                    ARG_LOG, "fullerror"), "Full Error Log"));
-        } else if (log.equals("error")) {
-            header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                    ARG_LOG, "access"), "Access"));
-            header.add(HtmlUtil.bold(msg("Error")));
-            header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                    ARG_LOG, "fullerror"), "Full Error Log"));
-        } else {
-            header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                    ARG_LOG, "access"), "Access"));
-            header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                    ARG_LOG, "error"), "Error Log"));
-            header.add(HtmlUtil.bold(msg("Full Error")));
-        }
+	File theFile = null;
+	boolean didOne = false;
+
+	if(log.equals("access")) {
+	    header.add(HtmlUtil.bold("Recent Access"));
+	} else  {
+	    header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
+						  ARG_LOG, "access"), "Recent Access"));
+	}
+
+	for(File logFile: logFiles) {
+	    if(!logFile.toString().endsWith(".log")) continue;
+	    if(logFile.length()==0) continue;
+	    String name = logFile.getName();
+	    String label = IOUtil.stripExtension(name);
+	    label = StringUtil.camelCase(label);
+	    if(log.equals(name)) {
+		header.add(HtmlUtil.bold(label));
+		theFile = logFile;
+	    } else {
+		header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
+						      ARG_LOG, name), label));
+	    }
+	}
+
 
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.space(10));
@@ -280,10 +288,8 @@ public class Admin extends RepositoryManager {
 
         if (log.equals("access")) {
             getAccessLog(request, sb);
-        } else if (log.equals("error")) {
-            getErrorLog(request, sb, getStorageManager().getLogFile());
-        } else {
-            getErrorLog(request, sb, getStorageManager().getFullLogFile());
+        } else  {
+	    getErrorLog(request, sb, theFile);
         }
 
 

@@ -205,7 +205,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         }
         dataSource = doMakeDataSource();
         BasicDataSource bds = (BasicDataSource) dataSource;
-	bds.setLogWriter(new PrintWriter(getLogManager().getLogOutputStream()));
+	//	bds.setLogWriter(new PrintWriter(getLogManager().getLogOutputStream()));
 	
         if (db.equals(DB_MYSQL)) {
             Statement statement = getConnection().createStatement();

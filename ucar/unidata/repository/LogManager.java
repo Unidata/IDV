@@ -37,26 +37,28 @@ import java.util.Date;
 import java.util.List;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+
+
 /**
- *
- *
- * @author IDV Development Team
- * @version $Revision: 1.3 $
- */
-public class LogManager extends RepositoryManager {
+  *
+  *
+  * @author IDV Development Team
+  * @version $Revision: 1.3 $
+  */
+ public class LogManager extends RepositoryManager {
+
+     private final Logger LOG = LoggerFactory.getLogger(LogManager.class);
 
 
-    /** _more_ */
-    private OutputStream fullLogFOS;
 
-
-    /** _more_ */
-    private OutputStream runLogFOS;
 
 
     /** _more_ */
     public static boolean debug = true;
-
 
 
     /** _more_ */
@@ -79,20 +81,8 @@ public class LogManager extends RepositoryManager {
      * _more_
      */
     public void init() {
-        try {
-            fullLogFOS =
-                new FileOutputStream(getStorageManager().getFullLogFile(),
-                                     true);
-            runLogFOS =
-                new FileOutputStream(getStorageManager().getLogFile(), false);
-        } catch (Exception exc) {
-            throw new RuntimeException(exc);
-        }
     }
 
-    public OutputStream getLogOutputStream() {
-	return runLogFOS;
-    }
 
     /**
      * _more_
@@ -110,16 +100,16 @@ public class LogManager extends RepositoryManager {
         }
     }
 
+
     /**
      * _more_
      *
      * @param message _more_
      */
     public void debug(String message) {
-        if (debug) {
-            logInfo(message);
-        }
+	LOG.debug(message);
     }
+
 
     /**
      * _more_
@@ -161,9 +151,7 @@ public class LogManager extends RepositoryManager {
      */
     public void logInfoAndPrint(String message) {
         logInfo(message);
-        if ( !getProperty(PROP_LOG_TOSTDERR, false)) {
-            System.err.println(message);
-        }
+	System.err.println(message);
     }
 
 
@@ -173,7 +161,7 @@ public class LogManager extends RepositoryManager {
      * @param message _more_
      */
     public void logInfo(String message) {
-        log(message, null);
+	LOG.info(message);
     }
 
 
@@ -183,7 +171,12 @@ public class LogManager extends RepositoryManager {
      * @param message _more_
      */
     public void logError(String message) {
-        logError(message, null);
+	LOG.error(message);
+    }
+
+
+    public void logWarning(String message) {
+	LOG.warn(message);
     }
 
 
@@ -196,11 +189,10 @@ public class LogManager extends RepositoryManager {
      */
     public void logErrorAndPrint(String message, Throwable exc) {
         logError(message, exc);
-        if ( !getProperty(PROP_LOG_TOSTDERR, false)) {
-            System.err.println(message);
-            exc.printStackTrace();
-        }
+	System.err.println(message);
+	exc.printStackTrace();
     }
+
 
     /**
      * _more_
@@ -209,7 +201,7 @@ public class LogManager extends RepositoryManager {
      * @param exc _more_
      */
     public void logError(String message, Throwable exc) {
-        log("Error:" + message, exc);
+        log(message, exc);
     }
 
 
@@ -228,46 +220,11 @@ public class LogManager extends RepositoryManager {
             thr = LogUtil.getInnerException(exc);
         }
 
+	if(thr!=null) {
+	    //	    LOG.error(message,thr);
+	    LOG.error(message+"\n<stack>"+LogUtil.getStackTrace(thr)+"</stack>");
+	}
 
-        if (getProperty(PROP_LOG_TOSTDERR, false)) {
-            System.err.println(message);
-            if (thr != null) {
-                if (thr instanceof RepositoryUtil.MissingEntryException) {
-                    System.err.println(encode(thr.getMessage()));
-                } else {
-                    thr.printStackTrace();
-                }
-            }
-        }
-
-        try {
-            String line = new Date() + " -- " + message;
-            for (FileOutputStream os : (List<FileOutputStream>) Misc.newList(
-                    fullLogFOS, runLogFOS)) {
-                synchronized (os) {
-                    os.write(line.getBytes());
-                    os.write("\n".getBytes());
-                    if (thr != null) {
-                        if (thr instanceof RepositoryUtil
-                                .MissingEntryException) {
-                            os.write(encode(thr.toString()).getBytes());
-                            os.write("\n".getBytes());
-                        } else {
-                            os.write("<stack>".getBytes());
-                            os.write("\n".getBytes());
-                            os.write(
-                                encode(LogUtil.getStackTrace(
-                                    thr)).getBytes());
-                            os.write("\n".getBytes());
-                            os.write("</stack>".getBytes());
-                        }
-                    }
-                    os.flush();
-                }
-            }
-        } catch (Exception exc2) {
-            System.err.println("Error writing log:" + exc2);
-        }
     }
 
 
