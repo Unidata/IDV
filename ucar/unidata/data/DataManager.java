@@ -311,8 +311,8 @@ public class DataManager {
         loadIospResources(resourceManager);
 	//	System.setProperty("visad.java3d.imageByRef", "true");
 	//	System.setProperty("visad.java3d.textureNpot", "true");
-        visad.DataCacheManager.getCacheManager().setCacheDir(new File(getDataCacheDirectory()));
-        visad.DataCacheManager.getCacheManager().setMemoryPercent(dataContext.getIdv().getStateManager().getPreferenceOrProperty(PROP_CACHE_PERCENT, 0.25));
+        visad.data.DataCacheManager.getCacheManager().setCacheDir(new File(getDataCacheDirectory()));
+        visad.data.DataCacheManager.getCacheManager().setMemoryPercent(dataContext.getIdv().getStateManager().getPreferenceOrProperty(PROP_CACHE_PERCENT, 0.25));
 
 
         String nj22TmpFile =
