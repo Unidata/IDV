@@ -495,7 +495,7 @@ public class MonitorManager extends RepositoryManager {
                         + HtmlUtil.submit("LDM Action", ARG_MONITOR_CREATE)
                         + HtmlUtil.hidden(ARG_MONITOR_TYPE, "ldm")
                         + HtmlUtil.formClose();
-            if (getRepository().getProperty(PROP_MONITOR_ENABLE_EXEC,
+            if ( getRepository().getProperty(PROP_MONITOR_ENABLE_EXEC,
                                             false)) {
                 execCreate =
                     request.form(getRepositoryBase().URL_USER_MONITORS)

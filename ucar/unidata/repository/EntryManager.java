@@ -5787,11 +5787,23 @@ return new Result(title, sb);
                     continue;
                 }
                 for (Entry child : getChildren(request, p)) {
-                    if (child.getName().equals(tok)) {
+                    String childName = child.getName();
+
+                    if (childName.equals(tok)) {
                         matched.add(child);
-                    } else if (StringUtil.stringMatch(child.getName(), tok,
+                    } else if (StringUtil.stringMatch(childName, tok,
                             false, true)) {
                         matched.add(child);
+                    } else {
+                        if(child.isFile()) {
+                            childName = getStorageManager().getFileTail(child);
+                            if (childName.equals(tok)) {
+                                matched.add(child);
+                            } else if (StringUtil.stringMatch(childName, tok,
+                                                              false, true)) {
+                                matched.add(child);
+                            }
+                        }
                     }
                 }
             }

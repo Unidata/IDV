@@ -225,7 +225,7 @@ public class LogManager extends RepositoryManager {
         }
 
         if (thr != null) {
-            LOG.error(message + "\n<stack>\n" + thr + "\n"
+            log.error(message + "\n<stack>\n" + thr + "\n"
                       + LogUtil.getStackTrace(thr) + "\n</stack>");
         }
 

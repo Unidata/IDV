@@ -272,17 +272,18 @@ public class RepositoryFtplet extends DefaultFtplet {
                 result = handlePwd(request, group, session, ftpRequest);
             } else if (cmd.equals(CMD_CWD)) {
                 result = handleCwd(request, group, session, ftpRequest);
+            } else if (cmd.equals(CMD_SIZE)) {
+                result = handleSize(request, group, session, ftpRequest);
             } else if (cmd.equals(CMD_RETR)) {
                 result = handleRetr(request, group, session, ftpRequest);
             } else {
-                ftpManager.logInfo("Not handling " + cmd);
+                ftpManager.logInfo("Not handling command: " + cmd);
                 return super.beforeCommand(session, ftpRequest);
             }
             //            System.err.println("        done:" + ftpRequest.getCommand());
             return result;
             //          return FtpletResult.SKIP;
         } catch (Exception exc) {
-            exc.printStackTrace();
             ftpManager.logError("Error handling ftp request:"
                                 + ftpRequest.getCommand() + " arg:"
                                 + ftpRequest.getArgument(), exc);
@@ -396,11 +397,11 @@ public class RepositoryFtplet extends DefaultFtplet {
                                     FtpRequest ftpRequest, int reply,
                                     String message)
             throws FtpException, IOException {
-        System.err.println("error:" + message);
+        //        System.err.println("error:" + message);
         session.write(new DefaultFtpReply(reply, message));
         return FtpletResult.SKIP;
-
     }
+
 
 
 
@@ -798,7 +799,7 @@ public class RepositoryFtplet extends DefaultFtplet {
             inputStream = new ByteArrayInputStream(contents);
         } else {
             if ( !entry.isFile()) {
-                return handleError(session, ftpRequest, "Not a file");
+                return handleError(session, ftpRequest, "Not a file: " + entryName);
             }
             File file = entry.getFile();
             inputStream =
@@ -820,6 +821,46 @@ public class RepositoryFtplet extends DefaultFtplet {
 
         return FtpletResult.SKIP;
     }
+
+
+
+
+    public FtpletResult handleSize(Request request, Group group,
+                                   FtpSession session, FtpRequest ftpRequest)
+            throws Exception {
+
+        String entryName  = ftpRequest.getArgument();
+        Entry entry = findEntry(request, group, entryName);
+        ftpManager.logInfo("Group:" + group.getName() +" name:" + entryName);
+        if (entry == null) {
+            return handleError(session, ftpRequest,
+                               "Not a valid file:"
+                               + ftpRequest.getArgument());
+        }
+
+
+
+        if ( !getRepository().getAccessManager().canAccessFile(request,
+                entry)) {
+            System.err.println("permission problem:" + request.getUser()
+                               + " " + entry.getName());
+            return handleError(session, ftpRequest,
+                               "You don't have permission to get the file");
+        }
+
+        if ( !entry.isFile()) {
+            return handleError(session, ftpRequest, "Not a file: " + entryName);
+        }
+        
+        session.write(
+            new DefaultFtpReply(
+                FtpReply.REPLY_250_REQUESTED_FILE_ACTION_OKAY,
+                ""+entry.getFile().length()));
+        return FtpletResult.SKIP;
+
+    }
+
+
 
 
     /**
@@ -874,11 +915,10 @@ public class RepositoryFtplet extends DefaultFtplet {
                 return result;
             }
             //            getRepository().getLogManager().logInfo("ftp: calling findEntryFrom name");
-            Entry entry = getEntryManager().findEntryFromName(name,
-                              request.getUser(), false);
-            if (entry != null) {
-                result.add(entry);
-            }
+
+            result  =  getEntryManager().findDescendants(request, getEntryManager().getTopGroup(),
+                                                          name);
+
             return result;
         } else {
             while (name.startsWith("..")) {

@@ -345,6 +345,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private List<String> pythonLibs = new ArrayList<String>();
 
+    private List<String> pluginPropertyFiles = new ArrayList<String>();
 
 
     /** _more_ */
@@ -815,6 +816,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
         getStorageManager().getLogDir();
 
         initPlugins();
+
+        for(String f: pluginPropertyFiles) {
+            properties.load(IOUtil.getInputStream(f,
+                                                  getClass()));
+
+        }
+
 
         apiDefFiles.addAll(0, getResourcePaths(PROP_API));
         typeDefFiles.addAll(0, getResourcePaths(PROP_TYPES));
@@ -1520,7 +1528,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
          */
         protected String defineResource(JarEntry jarEntry) {
             String path = super.defineResource(jarEntry);
-            checkFile(path);
+            checkFile(path, true);
             return path;
         }
     }
@@ -1554,7 +1562,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     //                    }
                 }
             } else {
-                checkFile(pluginFile);
+                checkFile(pluginFile,true);
             }
         }
     }
@@ -1568,6 +1576,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @return _more_
      */
     protected boolean checkFile(String file) {
+        return checkFile(file, false);
+    }
+
+    protected boolean checkFile(String file, boolean fromPlugin) {
         if (file.indexOf("api.xml") >= 0) {
             apiDefFiles.add(file);
         } else if ((file.indexOf("types.xml") >= 0)
@@ -1579,6 +1591,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
             metadataDefFiles.add(file);
         } else if (file.endsWith(".py")) {
             pythonLibs.add(file);
+        } else if(file.endsWith(".properties")) {
+            if(fromPlugin) {
+                pluginPropertyFiles.add(file);
+            }
         } else {
             return false;
         }

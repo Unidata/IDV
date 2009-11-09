@@ -43,8 +43,6 @@
           <arg value="8080"/>
           <arg value="-Dramadda.db=mysql"/>
           <arg value="-Dramadda.cacheresources=false"/>
-          <arg value="-Dramadda.log.tostderr=true"/>
-
           <classpath>
              <pathelement path="${classpath}"/>
              <pathelement location=""/>

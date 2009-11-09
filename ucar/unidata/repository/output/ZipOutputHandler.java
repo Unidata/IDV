@@ -276,21 +276,34 @@ public class ZipOutputHandler extends OutputHandler {
             doingFile = true;
         }
 
+        Result result = new Result();
+        result.setNeedToWrite(false);
 
-        ZipOutputStream zos  = new ZipOutputStream(os);
-        Hashtable       seen = new Hashtable();
+
         boolean         ok   = true;
+        //First recurse down without a zos to check the size
         try {
-            processZip(request, entries, recurse, zos, prefix, 0);
+            processZip(request, entries, recurse, null, prefix, 0);
         } catch (IllegalArgumentException iae) {
             ok = false;
         }
+
         if ( !ok) {
             javax.servlet.http.HttpServletResponse response =
                 request.getHttpServletResponse();
             response.setStatus(Result.RESPONSE_UNAUTHORIZED);
             response.sendError(response.SC_INTERNAL_SERVER_ERROR,
                                "Size of request has exceeded maximum size");
+            return result;
+        }
+
+
+        ZipOutputStream zos  = new ZipOutputStream(os);
+        Hashtable       seen = new Hashtable();
+        try {
+            processZip(request, entries, recurse, zos, prefix, 0);
+        } catch (IllegalArgumentException iae) {
+            ok = false;
         }
         zos.close();
         if (doingFile) {
@@ -301,8 +314,6 @@ public class ZipOutputHandler extends OutputHandler {
 
         }
 
-        Result result = new Result();
-        result.setNeedToWrite(false);
         return result;
     }
 
@@ -373,12 +384,15 @@ public class ZipOutputHandler extends OutputHandler {
             }
 
 
-            zos.putNextEntry(new ZipEntry(name));
-            InputStream fileInputStream =
-                getStorageManager().getFileInputStream(path);
-            IOUtil.writeTo(fileInputStream, zos);
-            fileInputStream.close();
-            zos.closeEntry();
+            if(zos!=null) {
+                zos.putNextEntry(new ZipEntry(name));
+                InputStream fileInputStream =
+                    getStorageManager().getFileInputStream(path);
+                IOUtil.writeTo(fileInputStream, zos);
+                fileInputStream.close();
+                zos.closeEntry();
+            }
+
         }
 
         return sizeProcessed;
