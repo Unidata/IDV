@@ -3153,11 +3153,11 @@ Misc.run(new Runnable() {
      * _more_
      */
     public void printDataCacheStats() {
-        visad.DataCacheManager.getCacheManager().printStats();
+        visad.data.DataCacheManager.getCacheManager().printStats();
     }
 
     public void flushDataCache() {
-        visad.DataCacheManager.getCacheManager().flushAllCachedData();
+        visad.data.DataCacheManager.getCacheManager().flushAllCachedData();
     }
 
 

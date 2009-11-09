@@ -400,7 +400,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                 double value = (double) Misc.parseNumber(
                                                          (((JTextField) widget).getText().trim()))/100.0;
                 store.put(key, value);
-                visad.DataCacheManager.getCacheManager().setMemoryPercent(value);
+                visad.data.DataCacheManager.getCacheManager().setMemoryPercent(value);
                 continue;
             }
             if (key.equals(PREF_SITEPATH)) {
