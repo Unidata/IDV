@@ -42,7 +42,9 @@ import ucar.nc2.dataset.NetcdfDataset;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
 
+
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.auth.*;
 
 import ucar.unidata.repository.metadata.*;
 

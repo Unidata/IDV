@@ -37,8 +37,8 @@ import ucar.unidata.repository.Repository;
 import ucar.unidata.repository.Result;
 import ucar.unidata.repository.Resource;
 import ucar.unidata.repository.type.TypeHandler;
-import ucar.unidata.repository.Permission;
-import ucar.unidata.repository.UserManager;
+import ucar.unidata.repository.auth.UserManager;
+import ucar.unidata.repository.auth.Permission;
 import ucar.unidata.repository.EntryManager;
 import ucar.unidata.repository.Entry;
 import ucar.unidata.repository.Group;
@@ -250,7 +250,7 @@ public class RepositoryFtplet extends DefaultFtplet {
     private Request getRequest(FtpSession session) throws Exception {
         try {
 	    User user  = session.getUser();
-	    String name = (user==null?ucar.unidata.repository.UserManager.USER_ANONYMOUS:user.getName());
+	    String name = (user==null?ucar.unidata.repository.auth.UserManager.USER_ANONYMOUS:user.getName());
             return new Request(
                 getRepository(),
                 getRepository().getUserManager().findUser(name));

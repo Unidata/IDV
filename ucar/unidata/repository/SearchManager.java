@@ -24,6 +24,8 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.repository.auth.*;
+
 import ucar.unidata.repository.metadata.*;
 
 import ucar.unidata.repository.output.*;

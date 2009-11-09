@@ -35,7 +35,7 @@ import org.apache.ftpserver.usermanager.impl.*;
 
 import ucar.unidata.util.Misc;
 import ucar.unidata.repository.*;
-
+import ucar.unidata.repository.auth.*;
 import java.io.IOException;
 import java.io.File;
 

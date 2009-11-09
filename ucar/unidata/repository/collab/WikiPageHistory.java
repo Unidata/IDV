@@ -24,6 +24,7 @@ package ucar.unidata.repository.collab;
 
 
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.auth.*;
 
 import java.util.Date;
 

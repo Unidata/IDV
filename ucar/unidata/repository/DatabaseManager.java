@@ -1515,7 +1515,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      *
      * @throws Exception _more_
      */
-    protected boolean tableContains(String id, String tableName,
+    public boolean tableContains(String id, String tableName,
                                     String column)
             throws Exception {
         Statement statement = select(column, tableName,

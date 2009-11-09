@@ -19,7 +19,7 @@
  */
 
 package ucar.unidata.repository;
-
+import ucar.unidata.repository.auth.*;
 
 import java.lang.reflect.Method;
 

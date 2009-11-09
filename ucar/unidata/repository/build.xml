@@ -28,11 +28,7 @@
 
 
 
-<!--	<property name="ftp" value="/Users/jeffmc/ftplib"/>
-	<property name="ftpcp" value="${ftp}/ftplet-api-1.0.3.jar:${ftp}/ftpserver-core-1.0.3.jar:${ftp}/mina-core-2.0.0-M6.jar:${ftp}/slf4j-api-1.5.2.jar:${ftp}/slf4j-log4j12-1.5.2.jar"/>
-	<echo message="${ftpcp}"/>
--->
-        <property name="classpath" value="${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar:${libsdir}/servlet-api.jar:${libsdir}/jython.jar:${ftpcp}"/>
+       <property name="classpath" value="${libsdir}/idv.jar:${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar:${libsdir}/servlet-api.jar:${libsdir}/jython.jar"/>
     </target>
 
     <target name="clean" depends="init" >
@@ -242,6 +238,7 @@
         <include name="ucar/unidata/repository/collab/*.java"/>
         <include name="ucar/unidata/repository/type/*.java"/>
         <include name="ucar/unidata/repository/ftp/*.java"/>
+        <include name="ucar/unidata/repository/util/*.java"/>
         <include name="ucar/unidata/repository/monitor/*.java"/>
         <include name="ucar/unidata/repository/idv/IdvWebstartOutputHandler.java"/>
         <include name="ucar/unidata/repository/idv/TdsOutputHandler.java"/>

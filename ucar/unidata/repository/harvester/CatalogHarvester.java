@@ -26,6 +26,7 @@ package ucar.unidata.repository.harvester;
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.data.*;
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.type.*;

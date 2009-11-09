@@ -22,6 +22,8 @@
 
 package ucar.unidata.repository;
 
+import ucar.unidata.repository.auth.*;
+
 
 
 import org.python.core.*;

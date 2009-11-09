@@ -21,6 +21,9 @@
 package ucar.unidata.repository;
 
 
+import ucar.unidata.repository.auth.*;
+
+
 import ucar.unidata.util.HtmlUtil;
 
 import java.io.InputStream;

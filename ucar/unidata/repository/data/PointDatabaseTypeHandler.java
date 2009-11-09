@@ -92,6 +92,7 @@ import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.data.point.TextPointDataSource;
 
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.output.OutputHandler;
 

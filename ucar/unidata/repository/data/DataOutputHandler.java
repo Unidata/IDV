@@ -88,6 +88,7 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.output.*;
 

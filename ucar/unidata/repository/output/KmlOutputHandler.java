@@ -28,6 +28,8 @@ import org.w3c.dom.*;
 import ucar.unidata.data.gis.KmlUtil;
 
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.auth.*;
+
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;

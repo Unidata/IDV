@@ -23,6 +23,7 @@ package ucar.unidata.repository.monitor;
 
 
 import ucar.unidata.repository.*;
+import ucar.unidata.repository.auth.*;
 import ucar.unidata.util.HtmlUtil;
 
 import ucar.unidata.util.IOUtil;

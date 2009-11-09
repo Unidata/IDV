@@ -20,7 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.auth;
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.sql.Clause;
@@ -338,7 +339,7 @@ public class SessionManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void checkSession(Request request) throws Exception {
+    public void checkSession(Request request) throws Exception {
 
         User         user    = request.getUser();
         List<String> cookies = getCookies(request);
@@ -546,7 +547,7 @@ public class SessionManager extends RepositoryManager {
      *
      * @return _more_
      */
-    protected String getSessionId() {
+    public String getSessionId() {
         return getRepository().getGUID() + "_" + Math.random();
     }
 
@@ -559,7 +560,7 @@ public class SessionManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void setUserSession(Request request, User user)
+    public void setUserSession(Request request, User user)
             throws Exception {
         if (request.getSessionId() == null) {
             request.setSessionId(getSessionId());
@@ -576,7 +577,7 @@ public class SessionManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void removeUserSession(Request request) throws Exception {
+    public void removeUserSession(Request request) throws Exception {
         if (request.getSessionId() != null) {
             removeSession(request.getSessionId());
         }

@@ -22,7 +22,7 @@
 
 package ucar.unidata.repository;
 
-
+import ucar.unidata.repository.auth.*;
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.harvester.*;
@@ -145,7 +145,7 @@ public class Admin extends RepositoryManager {
 
 
     /** _more_ */
-    protected RequestUrl[] adminUrls = {
+    public RequestUrl[] adminUrls = {
         URL_ADMIN_SETTINGS, getRepositoryBase().URL_USER_LIST,
         URL_ADMIN_STATS, URL_ADMIN_ACCESS,
         getHarvesterManager().URL_HARVESTERS_LIST,

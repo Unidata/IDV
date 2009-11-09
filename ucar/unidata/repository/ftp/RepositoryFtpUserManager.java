@@ -112,13 +112,13 @@ public class RepositoryFtpUserManager implements ucar.unidata.repository.Constan
 	    if (getRepository().getProperty(PROP_ACCESS_REQUIRELOGIN, false)) {
 		return null;
 	    }
-	    name = ucar.unidata.repository.UserManager.USER_ANONYMOUS;
+	    name = ucar.unidata.repository.auth.UserManager.USER_ANONYMOUS;
 	    ftpManager.logInfo("Logging in user as anonymous");
         } else {
             return null;
         }
 
-	ucar.unidata.repository.User repositoryUser = getRepository().getUserManager().findUser(name);
+	ucar.unidata.repository.auth.User repositoryUser = getRepository().getUserManager().findUser(name);
 	if(repositoryUser == null) {
 	    ftpManager.logInfo("Could not find user:" + name);
 	    return null;

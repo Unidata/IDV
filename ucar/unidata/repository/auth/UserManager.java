@@ -20,7 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.auth;
+import ucar.unidata.repository.*;
 
 
 import ucar.unidata.repository.output.*;
@@ -134,7 +135,7 @@ public class UserManager extends RepositoryManager {
      *
      * @param userAuthenticator _more_
      */
-    protected void addUserAuthenticator(UserAuthenticator userAuthenticator) {
+    public void addUserAuthenticator(UserAuthenticator userAuthenticator) {
         userAuthenticators.add(userAuthenticator);
     }
 
@@ -147,7 +148,7 @@ public class UserManager extends RepositoryManager {
      * @param cmdLineUsers _more_
      * @throws Exception _more_
      */
-    protected void initUsers(List<User> cmdLineUsers) throws Exception {
+    public void initUsers(List<User> cmdLineUsers) throws Exception {
         for (User user : cmdLineUsers) {
             makeOrUpdateUser(user, true);
         }
@@ -487,7 +488,7 @@ public class UserManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected User findUserFromEmail(String email) throws Exception {
+    public User findUserFromEmail(String email) throws Exception {
         Statement statement =
             getDatabaseManager().select(Tables.USERS.COLUMNS,
                                         Tables.USERS.NAME,
@@ -510,7 +511,7 @@ public class UserManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void makeOrUpdateUser(User user, boolean updateIfNeeded)
+    public void makeOrUpdateUser(User user, boolean updateIfNeeded)
             throws Exception {
         makeOrUpdateUser(user, true, false);
     }
@@ -524,7 +525,7 @@ public class UserManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void makeOrUpdateUser(User user, boolean updateIfNeeded,
+    public void makeOrUpdateUser(User user, boolean updateIfNeeded,
                                     boolean onlyPassword)
             throws Exception {
         if (getDatabaseManager().tableContains(user.getId(),
@@ -582,7 +583,7 @@ public class UserManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void makeUserIfNeeded(User user) throws Exception {
+    public void makeUserIfNeeded(User user) throws Exception {
         if (findUser(user.getId()) == null) {
             makeOrUpdateUser(user, true);
         }
@@ -596,7 +597,7 @@ public class UserManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void deleteUser(User user) throws Exception {
+    public void deleteUser(User user) throws Exception {
         userMap.remove(user.getId());
         deleteRoles(user);
         getDatabaseManager().delete(Tables.USERS.NAME,
@@ -611,7 +612,7 @@ public class UserManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void deleteRoles(User user) throws Exception {
+    public void deleteRoles(User user) throws Exception {
         getDatabaseManager().delete(Tables.USERROLES.NAME,
                                     Clause.eq(Tables.USERROLES.COL_USER_ID,
                                         user.getId()));
@@ -619,7 +620,7 @@ public class UserManager extends RepositoryManager {
 
 
     /*
-    protected List<String> getRoles(User user) throws Exception {
+    public List<String> getRoles(User user) throws Exception {
         if(user.getRoles() == null) {
         }
         }*/
@@ -1358,7 +1359,7 @@ public class UserManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected User getUser(ResultSet results) throws Exception {
+    public User getUser(ResultSet results) throws Exception {
         int col = 1;
         User user = new User(results.getString(col++),
                              results.getString(col++),
@@ -2413,7 +2414,7 @@ public class UserManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void initOutputHandlers() throws Exception {
+    public void initOutputHandlers() throws Exception {
         OutputHandler outputHandler = new OutputHandler(getRepository(),
                                           "Cart") {
             public void getEntryLinks(Request request, State state,

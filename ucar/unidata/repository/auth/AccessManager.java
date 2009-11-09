@@ -20,7 +20,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.repository;
+package ucar.unidata.repository.auth;
+import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
@@ -121,7 +122,7 @@ public class AccessManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void initTopGroup(Group topGroup) throws Exception {
+    public void initTopGroup(Group topGroup) throws Exception {
         topGroup.addPermission(new Permission(Permission.ACTION_VIEW,
                 getUserManager().ROLE_ANY));
         topGroup.addPermission(new Permission(Permission.ACTION_VIEWCHILDREN,
@@ -624,7 +625,7 @@ public class AccessManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void listAccess(Request request, Entry entry, StringBuffer sb)
+    public void listAccess(Request request, Entry entry, StringBuffer sb)
             throws Exception {
         if (entry == null) {
             return;
@@ -667,7 +668,7 @@ public class AccessManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected void insertPermissions(Request request, Entry entry,
+    public void insertPermissions(Request request, Entry entry,
                                      List<Permission> permissions)
             throws Exception {
         recentPermissions = new Hashtable();
@@ -718,7 +719,7 @@ public class AccessManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    protected List<Permission> getPermissions(Entry entry) throws Exception {
+    public List<Permission> getPermissions(Entry entry) throws Exception {
         if (entry.isGroup() && ((Group) entry).isDummy()) {
             return new ArrayList<Permission>();
         }
