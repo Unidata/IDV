@@ -49,6 +49,7 @@ import ucar.unidata.idv.publish.IdvPublisher;
 
 import ucar.unidata.metdata.NamedStationTable;
 import ucar.unidata.ui.ImageUtils;
+import ucar.unidata.ui.colortable.ColorTableCanvas;
 
 import ucar.unidata.ui.drawing.Glyph;
 
@@ -3786,6 +3787,12 @@ public class ImageGenerator extends IdvManager {
                         preview.setSize(new Dimension(width, height));
                     }
                     Image previewImage = GuiUtils.getImage(preview);
+		    previewImage = ColorTableCanvas.getImage(colorTable,  (vertical
+								   ? height
+									   : width),(vertical?width:height));
+
+
+		    GuiUtils.showOkCancelDialog(null,null, new JLabel(new ImageIcon(previewImage)), null);
                     if (vertical) {
                         BufferedImage tmpImage =
                             new BufferedImage(width, height,
