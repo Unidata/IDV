@@ -3792,7 +3792,6 @@ public class ImageGenerator extends IdvManager {
 									   : width),(vertical?width:height));
 
 
-		    GuiUtils.showOkCancelDialog(null,null, new JLabel(new ImageIcon(previewImage)), null);
                     if (vertical) {
                         BufferedImage tmpImage =
                             new BufferedImage(width, height,
