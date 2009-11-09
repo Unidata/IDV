@@ -2,6 +2,7 @@
 package ucar.visad.data;
 
 import visad.*;
+import visad.data.*;
 
 /**
  * CachedGriddedSet extends GriddedSet mainly to use CachedGriddedSets

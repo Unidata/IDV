@@ -28,6 +28,8 @@ import edu.wisc.ssec.mcidas.AREAnav;
 import edu.wisc.ssec.mcidas.AreaDirectory;
 import edu.wisc.ssec.mcidas.AreaFile;
 import edu.wisc.ssec.mcidas.AreaFileFactory;
+import visad.data.*;
+
 
 import ucar.ma2.Array;
 import ucar.ma2.Index;
