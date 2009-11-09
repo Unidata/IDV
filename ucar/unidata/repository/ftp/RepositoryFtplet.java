@@ -174,7 +174,7 @@ public class RepositoryFtplet extends DefaultFtplet {
     public FtpletResult beforeCommand(FtpSession session, FtpRequest ftpRequest)
             throws FtpException, IOException {
         try {
-            System.err.println("command:" + ftpRequest.getCommand() + " arg:" + ftpRequest.getArgument());
+            ftpManager.logInfo("command:" + ftpRequest.getCommand() + " arg:" + ftpRequest.getArgument());
 	    Request request = getRequest(session);
 	    Group        group  = getGroup(request, session);
 	    if(group == null) {
@@ -186,6 +186,8 @@ public class RepositoryFtplet extends DefaultFtplet {
 		result =handleError(session, ftpRequest, "Cannot access repository");
 	    } else if (cmd.equals(CMD_LIST)) {
                 result =  handleList(request, group, session, ftpRequest);
+	    } else if (cmd.equals(CMD_NLST)) {
+                result =  handleList(request, group, session, ftpRequest);
 	    } else if (cmd.equals(CMD_MKD)) {
                 result =  handleMkd(request, group, session, ftpRequest);
 	    } else if (cmd.equals(CMD_STOR)) {
@@ -194,15 +196,16 @@ public class RepositoryFtplet extends DefaultFtplet {
                 result =  handleDele(request, group, session, ftpRequest);
 	    } else if (cmd.equals(CMD_RMD)) {
                 result =  handleRmd(request, group, session, ftpRequest);
-	    } else if (ftpRequest.getCommand().equals(CMD_SYST)) {
+	    } else if (cmd.equals(CMD_SYST)) {
                 result = handleSyst(request, group, session, ftpRequest);
-            } else if (ftpRequest.getCommand().equals(CMD_PWD)) {
+            } else if (cmd.equals(CMD_PWD)) {
                 result = handlePwd(request, group, session, ftpRequest);
-            } else  if (ftpRequest.getCommand().equals(CMD_CWD)) {
+            } else  if (cmd.equals(CMD_CWD)) {
                 result =  handleCwd(request, group, session, ftpRequest);
-            } else if (ftpRequest.getCommand().equals(CMD_RETR)) {
+            } else if (cmd.equals(CMD_RETR)) {
                 result =  handleRetr(request, group, session, ftpRequest);
             } else {
+                ftpManager.logInfo("Not handling " + cmd);
                 return super.beforeCommand(session, ftpRequest);
             }
             //            System.err.println("        done:" + ftpRequest.getCommand());
@@ -351,10 +354,19 @@ public class RepositoryFtplet extends DefaultFtplet {
     public FtpletResult handleList(Request request,Group group, FtpSession session, FtpRequest ftpRequest)
             throws Exception {
         //dr-x------   3 user group            0 Oct 20 14:27 Desktop
+        List<Entry> children = null;
+        String arg = ftpRequest.getArgument();
+        if(arg!=null && arg.length()>0) {
+            children = findEntries(request, group, ftpRequest.getArgument());
+        }
+
+
+        if(children == null) {
+            children =
+                getEntryManager().getChildren(request, group);
+        }
 
         StringBuffer result = new StringBuffer();
-        List<Entry> children =
-            getEntryManager().getChildren(getRequest(session), group);
         for (Entry e : children) {
             String prefix;
             String name;
@@ -605,19 +617,31 @@ public class RepositoryFtplet extends DefaultFtplet {
 
 
     private Entry findEntry(Request request,  Group parent,String  name) throws Exception {
+        List<Entry> result = findEntries(request, parent, name);
+        if(result.size()>0)  return result.get(0);
+        return null;
+    }
 
+
+
+    private List<Entry> findEntries(Request request,  Group parent,String  name) throws Exception {
         if(name.endsWith("/")) name = name.substring(0, name.length()-1);
+
+        List<Entry> result = new ArrayList<Entry>();
         if(name.length()==0) {
-            return getEntryManager().getTopGroup();
+            result.add(getEntryManager().getTopGroup());
+            return result;
         }
         if(name.startsWith("/")) {
             name = name.substring(1);
             if(name.length()==0) {
-                return getEntryManager().getTopGroup();
+                result.add(getEntryManager().getTopGroup());
+                return result;
             }
             //            getRepository().getLogManager().logInfo("ftp: calling findEntryFrom name");
             Entry entry = getEntryManager().findEntryFromName(name, request.getUser(), false);
-            return entry;
+            if(entry!=null) result.add(entry);
+            return result;
         } else {
 	    while(name.startsWith("..")) {
 		if(parent.getParentGroup()==null) break;
@@ -625,11 +649,11 @@ public class RepositoryFtplet extends DefaultFtplet {
 		name = name.substring(2);
 		if(name.startsWith("/")) name = name.substring(1);
 	    }
-	    if(name.equals("")) return parent;
-            //            getRepository().getLogManager().logInfo("ftp: calling findDescendant");
-            Entry entry = getEntryManager().findDescendant(request, parent, name);
-            if(entry != null && entry.getName().equals(parent)) return parent;
-            return entry;
+	    if(name.equals("")) {
+                result.add(parent);
+                return result;
+            }
+            return  getEntryManager().findDescendants(request, parent, name);
         }
     }
 

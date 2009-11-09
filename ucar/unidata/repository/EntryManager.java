@@ -5747,28 +5747,30 @@ return new Result(title, sb);
 
 
 
-    public Entry findDescendant(Request request, Group parent, String name) 
+    public List<Entry> findDescendants(Request request, Group parent, String name) 
 	throws Exception {
 	List<String> toks = (List<String>) StringUtil.split(name,
 							    Group.PATHDELIMITER, true, true);
+
+        List<Entry> parents = new ArrayList<Entry>();
+        parents.add(parent);
 	for(int i=0;i<toks.size();i++) {
 	    String tok = toks.get(i);
-	    Entry theChild = null;
-	    for (Entry child : getChildren(request, parent)) {
-		if (child.getName().equals(tok)) {
-		    theChild = child;
-		    break;
-		}
+            List<Entry> matched = new ArrayList<Entry>();
+            for(Entry p: parents) {
+                if(!p.isGroup()) continue;
+                for (Entry child : getChildren(request, p)) {
+                    if (child.getName().equals(tok)) {
+                        matched.add(child);
+                    }  else if(StringUtil.stringMatch(child.getName(),tok,false,true)) {
+                        matched.add(child);
+                    }
+                }
 	    }
-	    if(theChild==null) return null;
 	    if(i==toks.size()-1) {
-		return theChild;
+		return matched;
 	    } 
-	    if(theChild.isGroup()) {
-		parent = (Group) theChild;
-	    } else {
-		return null;
-	    }
+            parents = matched;
 	}
 	return null;
     }

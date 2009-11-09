@@ -103,7 +103,7 @@ public class RepositoryFtpUserManager implements ucar.unidata.repository.Constan
             UsernamePasswordAuthentication upa = (UsernamePasswordAuthentication) auth;
 	    name = upa.getUsername(); 
             password = upa.getPassword();
-	    System.err.println("name:" + name +" password:" + password);
+	    ftpManager.logInfo("name:" + name +" password:" + password);
             if(!ftpManager.getRepository().getUserManager().isPasswordValid(name, password)) {
 		System.err.println("bad pass");
                 return null;
@@ -113,23 +113,29 @@ public class RepositoryFtpUserManager implements ucar.unidata.repository.Constan
 		return null;
 	    }
 	    name = ucar.unidata.repository.UserManager.USER_ANONYMOUS;
+	    ftpManager.logInfo("Logging in user as anonymous");
         } else {
             return null;
         }
 
 	ucar.unidata.repository.User repositoryUser = getRepository().getUserManager().findUser(name);
 	if(repositoryUser == null) {
-	    System.err.println(" no user");
+	    ftpManager.logInfo("Could not find user:" + name);
 	    return null;
 	}
 
 	if (getRepository().getProperty(PROP_ACCESS_ADMINONLY, false)) {
-	    if(!repositoryUser.getAdmin()) return  null;
+	    if(!repositoryUser.getAdmin()) {
+                ftpManager.logInfo("Only site administrators can access this server");
+                return  null;
+            }
 	}
 
         BaseUser user   = new BaseUser();
         user.setName(name);
-	user.setHomeDirectory(getRepository().getStorageManager().getTmpDir().toString());
+        String tmpDir = getRepository().getStorageManager().getTmpDir().toString()+"/dummy";
+	user.setHomeDirectory(tmpDir);
+        ftpManager.logInfo("Setting dir to: " +  tmpDir);
         List<Authority> auths = new ArrayList<Authority>();
         auths.add(new ConcurrentLoginPermission(10, 10));
         user.setAuthorities(auths);

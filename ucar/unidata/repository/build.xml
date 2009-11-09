@@ -325,7 +325,14 @@
     </target>
 
 
+    <target name="war" depends="repositorywar">
+    </target>
+
+
     <target name="repositorywar" depends="init">
+      <delete>
+           <fileset file="${libsdir}/repository.war"/>
+       </delete>
       <war webxml="${repositorydir}/release/web.xml" destfile="${libsdir}/repository.war">
           <webinf file="${repositorydir}/release/repository.properties"/>
           <lib file="${libsdir}/repository.jar"/>

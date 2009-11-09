@@ -33,6 +33,7 @@ import org.apache.ftpserver.usermanager.impl.*;
 
 
 
+import ucar.unidata.util.Misc;
 import ucar.unidata.repository.*;
 
 import java.io.IOException;
@@ -52,6 +53,8 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -61,8 +64,12 @@ import java.util.TimeZone;
  * @version $Revision: 1.3 $
  */
 public class FtpManager extends RepositoryManager {
+    public static final String DFLT_PASSIVE_PORTS = "44001-44099";
+    private final Logger LOG = LoggerFactory.getLogger("org.apache.ftpserver");
+
     private FtpServer server;
     private int port=-1;
+    private String passivePorts;
 
     /**
      * _more_
@@ -74,8 +81,19 @@ public class FtpManager extends RepositoryManager {
         try {
 	    checkServer();
         } catch (Exception exc) {
+            exc.printStackTrace();
             logError("Creating FTP server", exc);
         }
+    }
+
+
+    public void logError(String message, Exception exc) {
+        getRepository().getLogManager().logError(LOG,"RAMADDA:" +  message, exc);
+    }
+
+
+    public void logInfo(String message) {
+        LOG.info("RAMADDA:" + message);
     }
 
 
@@ -87,8 +105,11 @@ public class FtpManager extends RepositoryManager {
 	} 
 	if(newPort!=port) {
 	    stop();
-	}
+	} else  if(!Misc.equals(passivePorts,getRepository().getProperty(PROP_FTP_PASSIVEPORTS,DFLT_PASSIVE_PORTS))) {
+	    stop();
+        }
 
+        logInfo("Calling initFtpServer");
 	port  = newPort;
 	if(server == null) {
 	    initFtpServer();
@@ -97,8 +118,13 @@ public class FtpManager extends RepositoryManager {
     }
 
 
+    public void shutdown() {
+        stop();
+    }
+
     private void stop() {
 	if(server!=null) {
+            logInfo("Calling server.stop");
 	    server.stop();
 	}
 	server= null;
@@ -118,14 +144,15 @@ public class FtpManager extends RepositoryManager {
         serverFactory.setFtplets(ftplets);
 	
         ListenerFactory factory = new ListenerFactory();
+        logInfo("Setting port to " + port);
         // set the port of the listener
         factory.setPort(port);
 
 
         DataConnectionConfigurationFactory dccf = new DataConnectionConfigurationFactory();
-        String passive = "44000-44100";
-        logInfo("FTP: setting passive ports to:" + passive);
-        dccf.setPassivePorts(passive);
+        passivePorts = getRepository().getProperty(PROP_FTP_PASSIVEPORTS,DFLT_PASSIVE_PORTS);
+        logInfo("Setting passive ports to:" + passivePorts);
+        dccf.setPassivePorts(passivePorts);
         factory.setDataConnectionConfiguration(dccf.createDataConnectionConfiguration());
 
         File keystore =
@@ -134,7 +161,7 @@ public class FtpManager extends RepositoryManager {
                 + "/keystore", false));
 	
         if (keystore.exists()) {
-	    logInfo("FTP: using FTPS");
+	    logInfo("Using FTPS");
 	    String password = getRepository().getPropertyValue(PROP_SSL_PASSWORD,
 							       (String) null, false);
 	    String keyPassword = getRepository().getPropertyValue(PROP_SSL_PASSWORD,
@@ -150,7 +177,6 @@ public class FtpManager extends RepositoryManager {
 
 
 
-
         // replace the default listener
         serverFactory.addListener("default", factory.createListener());
 
@@ -159,8 +185,9 @@ public class FtpManager extends RepositoryManager {
 
         // start the server
         server = serverFactory.createServer();
+	logInfo("Calling server.start");
         server.start();
-	logInfo("FTP: starting server on port:" + port);
+	logInfo("Starting server on port:" + port);
     }
 
 

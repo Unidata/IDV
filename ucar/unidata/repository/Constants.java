@@ -1155,6 +1155,7 @@ public interface Constants {
 
 
     public static final String PROP_FTP_PORT = "ramadda.ftp.port";
+    public static final String PROP_FTP_PASSIVEPORTS = "ramadda.ftp.passiveports";
 
 
 

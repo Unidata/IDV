@@ -650,6 +650,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public void close() throws Exception {
         getDatabaseManager().shutdown();
+        getFtpManager().shutdown();
     }
 
 

@@ -26,6 +26,7 @@ package ucar.unidata.repository;
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.harvester.*;
+import ucar.unidata.repository.ftp.FtpManager;
 
 import ucar.unidata.repository.output.*;
 
@@ -979,6 +980,13 @@ public class Admin extends RepositoryManager {
 						     getRepository().getProperty(PROP_FTP_PORT,"-1"),
 						     HtmlUtil.SIZE_10)));
 
+	csb.append(HtmlUtil.formEntry(msgLabel("FTP Passive Ports"),
+				      HtmlUtil.input(PROP_FTP_PASSIVEPORTS, 
+						     getRepository().getProperty(PROP_FTP_PORT,FtpManager.DFLT_PASSIVE_PORTS),
+						     HtmlUtil.SIZE_15)));
+
+
+
 
         String allSslCbx =
             HtmlUtil.space(3)
@@ -1410,6 +1418,8 @@ public class Admin extends RepositoryManager {
                                     "" + request.get(PROP_ACCESS_ALLSSL,
                                         false));
 
+        getRepository().writeGlobal(PROP_FTP_PASSIVEPORTS,
+                                    request.getString(PROP_FTP_PASSIVEPORTS, "").trim());
 
 	if (request.defined(PROP_FTP_PORT)) {
 	    getRepository().writeGlobal(PROP_FTP_PORT,

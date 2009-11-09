@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
   */
  public class LogManager extends RepositoryManager {
 
-     private final Logger LOG = LoggerFactory.getLogger(LogManager.class);
+     private final  Logger LOG = LoggerFactory.getLogger(LogManager.class);
 
 
 
@@ -201,18 +201,10 @@ import org.slf4j.LoggerFactory;
      * @param exc _more_
      */
     public void logError(String message, Throwable exc) {
-        log(message, exc);
+        logError(LOG, message, exc);
     }
 
-
-
-    /**
-     * _more_
-     *
-     * @param message _more_
-     * @param exc _more_
-     */
-    private void log(String message, Throwable exc) {
+        public void logError(Logger log, String message, Throwable exc) {
         message = encode(message);
 
         Throwable thr = null;
@@ -221,8 +213,7 @@ import org.slf4j.LoggerFactory;
         }
 
 	if(thr!=null) {
-	    //	    LOG.error(message,thr);
-	    LOG.error(message+"\n<stack>"+LogUtil.getStackTrace(thr)+"</stack>");
+	    log.error(message+"\n<stack>"+LogUtil.getStackTrace(thr)+"</stack>");
 	}
 
     }
