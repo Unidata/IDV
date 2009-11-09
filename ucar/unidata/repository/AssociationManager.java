@@ -24,10 +24,11 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.repository.auth.*;
+
 import ucar.unidata.repository.data.*;
 import ucar.unidata.repository.output.*;
 import ucar.unidata.repository.type.*;
-import ucar.unidata.repository.auth.*;
 
 
 import ucar.unidata.sql.Clause;

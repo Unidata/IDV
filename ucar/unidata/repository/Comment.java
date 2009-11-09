@@ -22,7 +22,8 @@
 
 package ucar.unidata.repository;
 
-import  ucar.unidata.repository.auth.*;
+
+import ucar.unidata.repository.auth.*;
 
 
 import ucar.unidata.util.Misc;

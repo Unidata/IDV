@@ -381,18 +381,18 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryShow(Request request) throws Exception {
-	
 
-	if(false) {
-	    while(true) {
-		Misc.sleep(1000);
-		if(!request.isConnected()) {
-		    System.err.println("break");
-		    break;
-		}
-		System.err.println("still connected");
-	    }
-	}
+
+        if (false) {
+            while (true) {
+                Misc.sleep(1000);
+                if ( !request.isConnected()) {
+                    System.err.println("break");
+                    break;
+                }
+                System.err.println("still connected");
+            }
+        }
 
 
 
@@ -709,24 +709,38 @@ return new Result(title, sb);
 
 
 
-    public boolean canBeCreatedBy(Request request, TypeHandler  typeHandler) throws Exception  {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param typeHandler _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public boolean canBeCreatedBy(Request request, TypeHandler typeHandler)
+            throws Exception {
         if ( !typeHandler.canBeCreatedBy(request)) {
-	    return false;
+            return false;
         }
 
-	String ips = getRepository().getProperty("ramadda.type." + typeHandler.getType()+".ips",null);
-	if(ips!=null) {
-            String requestIp = request.getIp();
-	    boolean ok = false;
-	    for(String ip: StringUtil.split(ips,";",true,true)) {
-		if(requestIp.startsWith(ip)) {
-		    ok = true;
-		    break;
-		}
-	    }
-	    if(!ok) return false;
-	}
-	return true;
+        String ips = getRepository().getProperty("ramadda.type."
+                         + typeHandler.getType() + ".ips", null);
+        if (ips != null) {
+            String  requestIp = request.getIp();
+            boolean ok        = false;
+            for (String ip : StringUtil.split(ips, ";", true, true)) {
+                if (requestIp.startsWith(ip)) {
+                    ok = true;
+                    break;
+                }
+            }
+            if ( !ok) {
+                return false;
+            }
+        }
+        return true;
     }
 
 
@@ -1133,7 +1147,7 @@ return new Result(title, sb);
 
                 }
 
-                if (! canBeCreatedBy(request,typeHandler)) {
+                if ( !canBeCreatedBy(request, typeHandler)) {
                     fatalError(request,
                                "Cannot create an entry of type "
                                + typeHandler.getDescription());
@@ -2996,7 +3010,7 @@ return new Result(title, sb);
                     ATTR_TODATE));
         }
 
-        if (! canBeCreatedBy(request,typeHandler)) {
+        if ( !canBeCreatedBy(request, typeHandler)) {
             throw new IllegalArgumentException(
                 "Cannot create an entry of type "
                 + typeHandler.getDescription());
@@ -4371,77 +4385,75 @@ return new Result(title, sb);
             return getTopGroup();
         }
 
-	//        synchronized (MUTEX_ENTRY) {
-            Entry entry = getEntryFromCache(entryId);
-            if (entry != null) {
-                checkEntryFileTime(entry);
-                if ( !andFilter) {
-                    return entry;
-                }
-                entry = getAccessManager().filterEntry(request, entry);
+        //        synchronized (MUTEX_ENTRY) {
+        Entry entry = getEntryFromCache(entryId);
+        if (entry != null) {
+            checkEntryFileTime(entry);
+            if ( !andFilter) {
                 return entry;
-	    }
-
-            //catalog:url:dataset:datasetid
-            try {
-                if (entryId.startsWith(ID_PREFIX_REMOTE)) {
-                    String[] tuple = getRemoteEntryInfo(entryId);
-                    return getRemoteEntry(request, tuple[0], tuple[1]);
-                } else if (entryId.startsWith("catalog:")) {
-                    CatalogTypeHandler typeHandler =
-                        (CatalogTypeHandler) getRepository().getTypeHandler(
-                            TypeHandler.TYPE_CATALOG);
-                    entry = typeHandler.makeSynthEntry(request, null,
-                            entryId);
-                } else if (isSynthEntry(entryId)) {
-                    String[] pair          = getSynthId(entryId);
-                    String   parentEntryId = pair[0];
-                    Entry parentEntry = getEntry(request, parentEntryId,
-                                            andFilter, abbreviated);
-                    if (parentEntry == null) {
-                        return null;
-                    }
-                    TypeHandler typeHandler = parentEntry.getTypeHandler();
-                    entry = typeHandler.makeSynthEntry(request, parentEntry,
-                            pair[1]);
-                    if (entry == null) {
-                        return null;
-                    }
-                } else {
-                    Statement entryStmt =
-                        getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
-                            Tables.ENTRIES.NAME,
-                            Clause.eq(Tables.ENTRIES.COL_ID, entryId));
-
-                    ResultSet results = entryStmt.getResultSet();
-                    if ( !results.next()) {
-                        getDatabaseManager().closeAndReleaseConnection(
-                            entryStmt);
-                        return null;
-                    }
-
-                    String entryType = results.getString(2);
-                    TypeHandler typeHandler =
-                        getRepository().getTypeHandler(entryType);
-                    entry = typeHandler.getEntry(results, abbreviated);
-                    getDatabaseManager().closeAndReleaseConnection(entryStmt);
-                    checkEntryFileTime(entry);
-                }
-            } catch (Exception exc) {
-                logError("creating entry:" + entryId, exc);
-                return null;
             }
-
-            if ( !abbreviated && (entry != null)) {
-                cacheEntry(entry);
-            }
-
-            if (andFilter && (entry != null)) {
-                entry = getAccessManager().filterEntry(request, entry);
-            }
-
+            entry = getAccessManager().filterEntry(request, entry);
             return entry;
-	    //    }
+        }
+
+        //catalog:url:dataset:datasetid
+        try {
+            if (entryId.startsWith(ID_PREFIX_REMOTE)) {
+                String[] tuple = getRemoteEntryInfo(entryId);
+                return getRemoteEntry(request, tuple[0], tuple[1]);
+            } else if (entryId.startsWith("catalog:")) {
+                CatalogTypeHandler typeHandler =
+                    (CatalogTypeHandler) getRepository().getTypeHandler(
+                        TypeHandler.TYPE_CATALOG);
+                entry = typeHandler.makeSynthEntry(request, null, entryId);
+            } else if (isSynthEntry(entryId)) {
+                String[] pair          = getSynthId(entryId);
+                String   parentEntryId = pair[0];
+                Entry parentEntry = getEntry(request, parentEntryId,
+                                             andFilter, abbreviated);
+                if (parentEntry == null) {
+                    return null;
+                }
+                TypeHandler typeHandler = parentEntry.getTypeHandler();
+                entry = typeHandler.makeSynthEntry(request, parentEntry,
+                        pair[1]);
+                if (entry == null) {
+                    return null;
+                }
+            } else {
+                Statement entryStmt =
+                    getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
+                        Tables.ENTRIES.NAME,
+                        Clause.eq(Tables.ENTRIES.COL_ID, entryId));
+
+                ResultSet results = entryStmt.getResultSet();
+                if ( !results.next()) {
+                    getDatabaseManager().closeAndReleaseConnection(entryStmt);
+                    return null;
+                }
+
+                String entryType = results.getString(2);
+                TypeHandler typeHandler =
+                    getRepository().getTypeHandler(entryType);
+                entry = typeHandler.getEntry(results, abbreviated);
+                getDatabaseManager().closeAndReleaseConnection(entryStmt);
+                checkEntryFileTime(entry);
+            }
+        } catch (Exception exc) {
+            logError("creating entry:" + entryId, exc);
+            return null;
+        }
+
+        if ( !abbreviated && (entry != null)) {
+            cacheEntry(entry);
+        }
+
+        if (andFilter && (entry != null)) {
+            entry = getAccessManager().filterEntry(request, entry);
+        }
+
+        return entry;
+        //    }
 
     }
 
@@ -5620,7 +5632,7 @@ return new Result(title, sb);
 
         List<Entry> groups = readEntries(statement);
         if (groups.size() > 0) {
-            return (Group)groups.get(0);
+            return (Group) groups.get(0);
         }
         return null;
     }
@@ -5748,32 +5760,47 @@ return new Result(title, sb);
 
 
 
-    public List<Entry> findDescendants(Request request, Group parent, String name) 
-	throws Exception {
-	List<String> toks = (List<String>) StringUtil.split(name,
-							    Group.PATHDELIMITER, true, true);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param parent _more_
+     * @param name _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List<Entry> findDescendants(Request request, Group parent,
+                                       String name)
+            throws Exception {
+        List<String> toks = (List<String>) StringUtil.split(name,
+                                Group.PATHDELIMITER, true, true);
 
         List<Entry> parents = new ArrayList<Entry>();
         parents.add(parent);
-	for(int i=0;i<toks.size();i++) {
-	    String tok = toks.get(i);
+        for (int i = 0; i < toks.size(); i++) {
+            String      tok     = toks.get(i);
             List<Entry> matched = new ArrayList<Entry>();
-            for(Entry p: parents) {
-                if(!p.isGroup()) continue;
+            for (Entry p : parents) {
+                if ( !p.isGroup()) {
+                    continue;
+                }
                 for (Entry child : getChildren(request, p)) {
                     if (child.getName().equals(tok)) {
                         matched.add(child);
-                    }  else if(StringUtil.stringMatch(child.getName(),tok,false,true)) {
+                    } else if (StringUtil.stringMatch(child.getName(), tok,
+                            false, true)) {
                         matched.add(child);
                     }
                 }
-	    }
-	    if(i==toks.size()-1) {
-		return matched;
-	    } 
+            }
+            if (i == toks.size() - 1) {
+                return matched;
+            }
             parents = matched;
-	}
-	return null;
+        }
+        return null;
     }
 
 
@@ -5821,12 +5848,11 @@ return new Result(title, sb);
                         return null;
                     }
                     return getTopGroup();
-                } else {
-                }
+                } else {}
             }
             List<Clause> clauses = new ArrayList<Clause>();
             //            clauses.add(Clause.eq(Tables.ENTRIES.COL_TYPE,
-                                  //                                  TypeHandler.TYPE_GROUP));
+            //                                  TypeHandler.TYPE_GROUP));
             if (parent != null) {
                 clauses.add(Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID,
                                       parent.getId()));
@@ -6132,7 +6158,8 @@ return new Result(title, sb);
      */
     private List<Entry> readEntries(Statement statement) throws Exception {
         ResultSet        results;
-        SqlUtil.Iterator iter   = getDatabaseManager().getIterator(statement);
+        SqlUtil.Iterator iter    =
+            getDatabaseManager().getIterator(statement);
         List<Entry>      entries = new ArrayList<Entry>();
         //        TypeHandler typeHandler =
         //            getRepository().getTypeHandler(TypeHandler.TYPE_GROUP);
@@ -6145,9 +6172,10 @@ return new Result(title, sb);
                 entries.add(entry);
             }
         }
-        for (Entry entry: entries) {
+        for (Entry entry : entries) {
             if (entry.getParentGroupId() != null) {
-                Group parentGroup = (Group)  findGroup(null, entry.getParentGroupId());
+                Group parentGroup = (Group) findGroup(null,
+                                        entry.getParentGroupId());
                 entry.setParentGroup(parentGroup);
             }
         }

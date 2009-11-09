@@ -21,6 +21,8 @@
  */
 
 package ucar.unidata.repository.auth;
+
+
 import ucar.unidata.repository.*;
 
 
@@ -560,8 +562,7 @@ public class SessionManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void setUserSession(Request request, User user)
-            throws Exception {
+    public void setUserSession(Request request, User user) throws Exception {
         if (request.getSessionId() == null) {
             request.setSessionId(getSessionId());
         }

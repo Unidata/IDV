@@ -826,16 +826,20 @@ public class RegistryManager extends RepositoryManager {
         boolean      ok                  = false;
         StringBuffer msg                 = new StringBuffer();
 
-	int requestingPort = requestingServerUrl.getPort();
-	if(requestingPort==-1) requestingPort = 80;
+        int          requestingPort      = requestingServerUrl.getPort();
+        if (requestingPort == -1) {
+            requestingPort = 80;
+        }
         msg.append("requesting server:" + requestingServerUrl.getHost() + ":"
                    + requestingPort + "\n");
 
 
         for (String myServer : servers) {
-            URL myServerUrl = new URL(myServer);
-	    int myServerPort = myServerUrl.getPort();
-	    if(myServerPort==-1) myServerPort = 80;
+            URL myServerUrl  = new URL(myServer);
+            int myServerPort = myServerUrl.getPort();
+            if (myServerPort == -1) {
+                myServerPort = 80;
+            }
             msg.append("    my server:" + myServerUrl.getHost() + ":"
                        + myServerPort + "\n");
             if (myServerUrl.getHost().toLowerCase()
@@ -1000,7 +1004,7 @@ public class RegistryManager extends RepositoryManager {
         } catch (Exception exc) {
             logError(
                 "RegistryManager.checkServer: Could not fetch server xml from:"
-                + serverInfo + " with url:" + serverUrl,exc);
+                + serverInfo + " with url:" + serverUrl, exc);
         }
         if (deleteOnFailure) {
             logInfo("RegistryManager.checkServer: Deleting server:"

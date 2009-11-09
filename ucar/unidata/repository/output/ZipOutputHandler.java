@@ -77,18 +77,20 @@ public class ZipOutputHandler extends OutputHandler {
     /** _more_ */
     public static final OutputType OUTPUT_ZIP = new OutputType("Zip File",
                                                     "zip.zip",
-							       OutputType.TYPE_FILE, "", ICON_ZIP);
+                                                    OutputType.TYPE_FILE, "",
+                                                    ICON_ZIP);
 
 
-    public static final OutputType OUTPUT_ZIPTREE = new OutputType("Zip Tree",
-                                                    "zip.tree",
-							       OutputType.TYPE_FILE, "", ICON_ZIP);
+    /** _more_          */
+    public static final OutputType OUTPUT_ZIPTREE =
+        new OutputType("Zip Tree", "zip.tree", OutputType.TYPE_FILE, "",
+                       ICON_ZIP);
 
 
     /** _more_ */
     public static final OutputType OUTPUT_ZIPGROUP =
-        new OutputType("Zip Group", "zip.zipgroup",
-		       OutputType.TYPE_FILE, "", ICON_ZIP);
+        new OutputType("Zip Group", "zip.zipgroup", OutputType.TYPE_FILE, "",
+                       ICON_ZIP);
 
 
     /**
@@ -129,53 +131,51 @@ public class ZipOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public void getEntryLinks(Request request, State state, List<Link> links)
-	throws Exception {
+            throws Exception {
         if (state.entry != null) {
             if (getAccessManager().canDownload(request, state.entry)) {
                 links.add(
-			  makeLink(
-				   request, state.entry, OUTPUT_ZIP,
-				   "/" + IOUtil.stripExtension(state.entry.getName())
-				   + ".zip"));
+                    makeLink(
+                        request, state.entry, OUTPUT_ZIP,
+                        "/" + IOUtil.stripExtension(state.entry.getName())
+                        + ".zip"));
             }
-	    return;
-        } 
+            return;
+        }
 
-	boolean hasFile = false;
-	boolean hasGroup = false;
-	for (Entry child : state.getAllEntries()) {
-	    if (getAccessManager().canDownload(request, child)) {
-		hasFile = true;
-		break;
-	    }
-	    if(child.isGroup()) {
-		hasGroup = true;
-	    }
-	}
+        boolean hasFile  = false;
+        boolean hasGroup = false;
+        for (Entry child : state.getAllEntries()) {
+            if (getAccessManager().canDownload(request, child)) {
+                hasFile = true;
+                break;
+            }
+            if (child.isGroup()) {
+                hasGroup = true;
+            }
+        }
 
 
 
-	if (hasFile) {
-	    if (state.group != null) {
-		links.add(
-			  makeLink(
-				   request, state.group, OUTPUT_ZIPGROUP,
-				   "/"
-				   + IOUtil.stripExtension(state.group.getName())
-				   + ".zip"));
-	    } else {
-		links.add(makeLink(request, state.group, OUTPUT_ZIP));
-	    }
-	}
-	
-	if (state.group != null &&!state.group.isTopGroup() && (hasFile||hasGroup)) {
-	    links.add(
-		      makeLink(
-			       request, state.group, OUTPUT_ZIPTREE,
-			       "/"
-			       + IOUtil.stripExtension(state.group.getName())
-			       + ".zip"));
-	}
+        if (hasFile) {
+            if (state.group != null) {
+                links.add(
+                    makeLink(
+                        request, state.group, OUTPUT_ZIPGROUP,
+                        "/" + IOUtil.stripExtension(state.group.getName())
+                        + ".zip"));
+            } else {
+                links.add(makeLink(request, state.group, OUTPUT_ZIP));
+            }
+        }
+
+        if ((state.group != null) && !state.group.isTopGroup()
+                && (hasFile || hasGroup)) {
+            links.add(makeLink(request, state.group, OUTPUT_ZIPTREE,
+                               "/"
+                               + IOUtil.stripExtension(state.group.getName())
+                               + ".zip"));
+        }
 
     }
 
@@ -195,7 +195,7 @@ public class ZipOutputHandler extends OutputHandler {
     public Result outputEntry(Request request, Entry entry) throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
-        return toZip(request, "", entries,false);
+        return toZip(request, "", entries, false);
     }
 
 
@@ -214,15 +214,15 @@ public class ZipOutputHandler extends OutputHandler {
     public Result outputGroup(Request request, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        OutputType   output = request.getOutput();
+        OutputType output = request.getOutput();
         if (output.equals(OUTPUT_ZIPTREE)) {
-	    List<Entry> all = new ArrayList<Entry>();
-	    all.addAll(subGroups);
-	    all.addAll(entries);
-	    return toZip(request, group.getName(), all,true);
-	} else {
-	    return toZip(request, group.getName(), entries,false);
-	}
+            List<Entry> all = new ArrayList<Entry>();
+            all.addAll(subGroups);
+            all.addAll(entries);
+            return toZip(request, group.getName(), all, true);
+        } else {
+            return toZip(request, group.getName(), entries, false);
+        }
     }
 
 
@@ -250,13 +250,16 @@ public class ZipOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param prefix _more_
      * @param entries _more_
+     * @param recurse _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    protected Result toZip(Request request, String prefix, List<Entry> entries, boolean recurse)
+    protected Result toZip(Request request, String prefix,
+                           List<Entry> entries, boolean recurse)
             throws Exception {
         OutputStream os;
         boolean      doingFile = false;
@@ -276,17 +279,19 @@ public class ZipOutputHandler extends OutputHandler {
 
         ZipOutputStream zos  = new ZipOutputStream(os);
         Hashtable       seen = new Hashtable();
-	boolean ok = true;
-	try {
-	    processZip(request, entries, recurse, zos, prefix,0);
-	} catch(IllegalArgumentException  iae) {
-	    ok = false;
-	}
-	if(!ok) {
-	    javax.servlet.http.HttpServletResponse response = request.getHttpServletResponse();
-	    response.setStatus(Result.RESPONSE_UNAUTHORIZED);
-            response.sendError(response.SC_INTERNAL_SERVER_ERROR,"Size of request has exceeded maximum size");
-	}
+        boolean         ok   = true;
+        try {
+            processZip(request, entries, recurse, zos, prefix, 0);
+        } catch (IllegalArgumentException iae) {
+            ok = false;
+        }
+        if ( !ok) {
+            javax.servlet.http.HttpServletResponse response =
+                request.getHttpServletResponse();
+            response.setStatus(Result.RESPONSE_UNAUTHORIZED);
+            response.sendError(response.SC_INTERNAL_SERVER_ERROR,
+                               "Size of request has exceeded maximum size");
+        }
         zos.close();
         if (doingFile) {
             os.close();
@@ -302,26 +307,49 @@ public class ZipOutputHandler extends OutputHandler {
     }
 
 
-    protected long processZip(Request request, List<Entry> entries, boolean recurse, ZipOutputStream zos, String prefix, long sizeSoFar)
-	throws Exception {
-	long sizeProcessed=0;
-        Hashtable       seen = new Hashtable();
-	long sizeLimit;
-	if(request.isAnonymous()) {
-	    sizeLimit = MEGA*getRepository().getProperty(request.PROP_ZIPOUTPUT_ANONYMOUS_MAXSIZEMB, 100);
-	} else {
-	    sizeLimit = MEGA*getRepository().getProperty(request.PROP_ZIPOUTPUT_REGISTERED_MAXSIZEMB, 2000);
-	}
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entries _more_
+     * @param recurse _more_
+     * @param zos _more_
+     * @param prefix _more_
+     * @param sizeSoFar _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected long processZip(Request request, List<Entry> entries,
+                              boolean recurse, ZipOutputStream zos,
+                              String prefix, long sizeSoFar)
+            throws Exception {
+        long      sizeProcessed = 0;
+        Hashtable seen          = new Hashtable();
+        long      sizeLimit;
+        if (request.isAnonymous()) {
+            sizeLimit = MEGA
+                        * getRepository().getProperty(
+                            request.PROP_ZIPOUTPUT_ANONYMOUS_MAXSIZEMB, 100);
+        } else {
+            sizeLimit = MEGA
+                        * getRepository().getProperty(
+                            request.PROP_ZIPOUTPUT_REGISTERED_MAXSIZEMB,
+                            2000);
+        }
         for (Entry entry : entries) {
-	    if(entry.isGroup() && recurse)  {
-		Group group = (Group) entry;
-		List<Entry> children= getEntryManager().getChildren(request, group);
-		String path = group.getName();
-		if(prefix.length()>0) {
-		    path = prefix+"/" + path;
-		}
-		sizeProcessed+= processZip(request, children, recurse, zos, path, sizeProcessed+sizeSoFar);
-	    }
+            if (entry.isGroup() && recurse) {
+                Group group = (Group) entry;
+                List<Entry> children = getEntryManager().getChildren(request,
+                                           group);
+                String path = group.getName();
+                if (prefix.length() > 0) {
+                    path = prefix + "/" + path;
+                }
+                sizeProcessed += processZip(request, children, recurse, zos,
+                                            path, sizeProcessed + sizeSoFar);
+            }
             if ( !getAccessManager().canDownload(request, entry)) {
                 continue;
             }
@@ -332,16 +360,17 @@ public class ZipOutputHandler extends OutputHandler {
                 name = (cnt++) + "_" + name;
             }
             seen.put(name, name);
-	    if(prefix.length()>0) {
-		name = prefix+"/" + name;
-	    }
-	    File f = new File(path);
-	    sizeProcessed += f.length();
+            if (prefix.length() > 0) {
+                name = prefix + "/" + name;
+            }
+            File f = new File(path);
+            sizeProcessed += f.length();
 
-	    //check for size limit
-	    if(sizeSoFar+sizeProcessed>sizeLimit) {
-		throw new IllegalArgumentException("Size of request has exceeded maximum size");
-	    }
+            //check for size limit
+            if (sizeSoFar + sizeProcessed > sizeLimit) {
+                throw new IllegalArgumentException(
+                    "Size of request has exceeded maximum size");
+            }
 
 
             zos.putNextEntry(new ZipEntry(name));
@@ -352,7 +381,7 @@ public class ZipOutputHandler extends OutputHandler {
             zos.closeEntry();
         }
 
-	return sizeProcessed;
+        return sizeProcessed;
     }
 
 }

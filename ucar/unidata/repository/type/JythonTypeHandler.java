@@ -67,7 +67,7 @@ import java.util.List;
  */
 public class JythonTypeHandler extends GenericTypeHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_SCRIPT_PASSWORD = "script.password";
 
     /** _more_ */
@@ -390,23 +390,23 @@ public class JythonTypeHandler extends GenericTypeHandler {
      */
     public static class InputInfo {
 
-        /** _more_          */
+        /** _more_ */
         private static final int TYPE_FILE = 0;
 
-        /** _more_          */
+        /** _more_ */
         private static final int TYPE_ENTRY = 1;
 
-        /** _more_          */
+        /** _more_ */
         private static final int TYPE_TEXT = 2;
 
-        /** _more_          */
+        /** _more_ */
         private static final int TYPE_NUMBER = 3;
 
 
-        /** _more_          */
+        /** _more_ */
         int type;
 
-        /** _more_          */
+        /** _more_ */
         String id;
 
 
@@ -430,46 +430,46 @@ public class JythonTypeHandler extends GenericTypeHandler {
      */
     public static class FormInfo {
 
-        /** _more_          */
+        /** _more_ */
         List<InputInfo> inputs = new ArrayList<InputInfo>();
 
 
 
-        /** _more_          */
+        /** _more_ */
         JythonTypeHandler typeHandler;
 
-        /** _more_          */
+        /** _more_ */
         Entry entry;
 
 
-        /** _more_          */
+        /** _more_ */
         StringBuffer sb;
 
-        /** _more_          */
+        /** _more_ */
         int cnt = 0;
 
-        /** _more_          */
+        /** _more_ */
         String title;
 
-        /** _more_          */
+        /** _more_ */
         String prefix = "";
 
-        /** _more_          */
+        /** _more_ */
         Request request;
 
-        /** _more_          */
+        /** _more_ */
         String resultHtml;
 
-        /** _more_          */
+        /** _more_ */
         String mimeType = "text/html";
 
-        /** _more_          */
+        /** _more_ */
         InputStream inputStream;
 
-        /** _more_          */
+        /** _more_ */
         String errorMessage;
 
-        /** _more_          */
+        /** _more_ */
         String resultFileName = null;
 
 

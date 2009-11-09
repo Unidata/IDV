@@ -1473,7 +1473,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /** _more_ */
     public static final String WIKIPROP_CHILDREN = "children";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKIPROP_URL = "url";
 
     //        WIKIPROP_IMPORT = "import";

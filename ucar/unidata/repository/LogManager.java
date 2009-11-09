@@ -21,6 +21,10 @@
 
 package ucar.unidata.repository;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ucar.unidata.repository.auth.*;
 import ucar.unidata.util.HtmlUtil;
 
@@ -37,21 +41,18 @@ import java.util.Date;
 import java.util.List;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 
 
 /**
-  *
-  *
-  * @author IDV Development Team
-  * @version $Revision: 1.3 $
-  */
- public class LogManager extends RepositoryManager {
+ * 
+ * 
+ *  @author IDV Development Team
+ *  @version $Revision: 1.3 $
+ */
+public class LogManager extends RepositoryManager {
 
-     private final  Logger LOG = LoggerFactory.getLogger(LogManager.class);
+    /** _more_          */
+    private final Logger LOG = LoggerFactory.getLogger(LogManager.class);
 
 
 
@@ -80,8 +81,7 @@ import org.slf4j.LoggerFactory;
     /**
      * _more_
      */
-    public void init() {
-    }
+    public void init() {}
 
 
     /**
@@ -107,7 +107,7 @@ import org.slf4j.LoggerFactory;
      * @param message _more_
      */
     public void debug(String message) {
-	LOG.debug(message);
+        LOG.debug(message);
     }
 
 
@@ -151,7 +151,7 @@ import org.slf4j.LoggerFactory;
      */
     public void logInfoAndPrint(String message) {
         logInfo(message);
-	System.err.println(message);
+        System.err.println(message);
     }
 
 
@@ -161,7 +161,7 @@ import org.slf4j.LoggerFactory;
      * @param message _more_
      */
     public void logInfo(String message) {
-	LOG.info(message);
+        LOG.info(message);
     }
 
 
@@ -171,12 +171,17 @@ import org.slf4j.LoggerFactory;
      * @param message _more_
      */
     public void logError(String message) {
-	LOG.error(message);
+        LOG.error(message);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param message _more_
+     */
     public void logWarning(String message) {
-	LOG.warn(message);
+        LOG.warn(message);
     }
 
 
@@ -189,8 +194,8 @@ import org.slf4j.LoggerFactory;
      */
     public void logErrorAndPrint(String message, Throwable exc) {
         logError(message, exc);
-	System.err.println(message);
-	exc.printStackTrace();
+        System.err.println(message);
+        exc.printStackTrace();
     }
 
 
@@ -204,7 +209,14 @@ import org.slf4j.LoggerFactory;
         logError(LOG, message, exc);
     }
 
-        public void logError(Logger log, String message, Throwable exc) {
+    /**
+     * _more_
+     *
+     * @param log _more_
+     * @param message _more_
+     * @param exc _more_
+     */
+    public void logError(Logger log, String message, Throwable exc) {
         message = encode(message);
 
         Throwable thr = null;
@@ -212,9 +224,10 @@ import org.slf4j.LoggerFactory;
             thr = LogUtil.getInnerException(exc);
         }
 
-	if(thr!=null) {
-	    LOG.error(message+"\n<stack>\n"+thr+"\n"+LogUtil.getStackTrace(thr)+"\n</stack>");
-	}
+        if (thr != null) {
+            LOG.error(message + "\n<stack>\n" + thr + "\n"
+                      + LogUtil.getStackTrace(thr) + "\n</stack>");
+        }
 
     }
 

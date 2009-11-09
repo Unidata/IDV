@@ -21,6 +21,8 @@
  */
 
 package ucar.unidata.repository.auth;
+
+
 import ucar.unidata.repository.*;
 
 
@@ -89,8 +91,13 @@ public class AuthorizationMethod {
         return this.type.equals(that.type);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
-	return type;
+        return type;
     }
 
 }

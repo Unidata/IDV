@@ -21,9 +21,11 @@
  */
 
 package ucar.unidata.repository;
-import ucar.unidata.repository.auth.*;
+
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.auth.*;
 
 import ucar.unidata.repository.harvester.*;
 import ucar.unidata.repository.metadata.*;

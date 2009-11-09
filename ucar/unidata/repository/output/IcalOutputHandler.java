@@ -86,7 +86,7 @@ public class IcalOutputHandler extends OutputHandler {
                                                      "", ICON_CALENDAR);
 
 
-    /** _more_          */
+    /** _more_ */
     private SimpleDateFormat sdf;
 
     /**

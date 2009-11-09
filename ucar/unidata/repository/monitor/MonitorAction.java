@@ -34,7 +34,7 @@ import ucar.unidata.repository.auth.*;
  */
 public abstract class MonitorAction implements Constants {
 
-    /** _more_          */
+    /** _more_ */
     public static final String macroTooltip =
         "macros: ${entryid} ${resourcepath} ${resourcename} ${fileextension} ${from_day}  ${from_month} ${from_year} ${from_monthname}  <br>"
         + "${to_day}  ${to_month} ${to_year} ${to_monthname}";

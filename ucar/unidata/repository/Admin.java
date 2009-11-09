@@ -22,11 +22,13 @@
 
 package ucar.unidata.repository;
 
-import ucar.unidata.repository.auth.*;
+
 import org.w3c.dom.*;
 
-import ucar.unidata.repository.harvester.*;
+import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.ftp.FtpManager;
+
+import ucar.unidata.repository.harvester.*;
 
 import ucar.unidata.repository.output.*;
 
@@ -250,35 +252,41 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminLog(Request request) throws Exception {
-        StringBuffer sb     = new StringBuffer();
-        List<String> header = new ArrayList();
-	File f = new File(getStorageManager().getLogDir());
-	File[] logFiles = f.listFiles();
-        String       log    = request.getString(ARG_LOG, "access");
-	File theFile = null;
-	boolean didOne = false;
+        StringBuffer sb       = new StringBuffer();
+        List<String> header   = new ArrayList();
+        File         f        = new File(getStorageManager().getLogDir());
+        File[]       logFiles = f.listFiles();
+        String       log      = request.getString(ARG_LOG, "access");
+        File         theFile  = null;
+        boolean      didOne   = false;
 
-	if(log.equals("access")) {
-	    header.add(HtmlUtil.bold("Recent Access"));
-	} else  {
-	    header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-						  ARG_LOG, "access"), "Recent Access"));
-	}
+        if (log.equals("access")) {
+            header.add(HtmlUtil.bold("Recent Access"));
+        } else {
+            header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
+                    ARG_LOG, "access"), "Recent Access"));
+        }
 
-	for(File logFile: logFiles) {
-	    if(!logFile.toString().endsWith(".log")) continue;
-	    if(logFile.length()==0) continue;
-	    String name = logFile.getName();
-	    String label = IOUtil.stripExtension(name);
-	    label = StringUtil.camelCase(label);
-	    if(log.equals(name)) {
-		header.add(HtmlUtil.bold(label));
-		theFile = logFile;
-	    } else {
-		header.add(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-						      ARG_LOG, name), label));
-	    }
-	}
+        for (File logFile : logFiles) {
+            if ( !logFile.toString().endsWith(".log")) {
+                continue;
+            }
+            if (logFile.length() == 0) {
+                continue;
+            }
+            String name  = logFile.getName();
+            String label = IOUtil.stripExtension(name);
+            label = StringUtil.camelCase(label);
+            if (log.equals(name)) {
+                header.add(HtmlUtil.bold(label));
+                theFile = logFile;
+            } else {
+                header.add(
+                    HtmlUtil.href(
+                        HtmlUtil.url(
+                            URL_ADMIN_LOG.toString(), ARG_LOG, name), label));
+            }
+        }
 
 
         sb.append(HtmlUtil.br());
@@ -289,8 +297,8 @@ public class Admin extends RepositoryManager {
 
         if (log.equals("access")) {
             getAccessLog(request, sb);
-        } else  {
-	    getErrorLog(request, sb, theFile);
+        } else {
+            getErrorLog(request, sb, theFile);
         }
 
 
@@ -356,9 +364,13 @@ public class Admin extends RepositoryManager {
                 lastOneBlank = false;
             }
             if (line.startsWith("</stack>") && (stackSB != null)) {
-                sb.append(HtmlUtil.insetLeft(HtmlUtil.makeShowHideBlock("Stack trace",
-                        HtmlUtil.div(stackSB.toString(),
-                                     HtmlUtil.cssClass("stack")), false),10));
+                sb.append(
+                    HtmlUtil.insetLeft(
+                        HtmlUtil.makeShowHideBlock(
+                            "Stack trace",
+                            HtmlUtil.div(
+                                stackSB.toString(),
+                                HtmlUtil.cssClass("stack")), false), 10));
                 sb.append("<br>");
                 stackSB = null;
             } else if (stackSB != null) {
@@ -975,15 +987,22 @@ public class Admin extends RepositoryManager {
                                           HtmlUtil.SIZE_5)));
 
 
-	csb.append(HtmlUtil.formEntry(msgLabel("FTP Port"),
-				      HtmlUtil.input(PROP_FTP_PORT, 
-						     getRepository().getProperty(PROP_FTP_PORT,"-1"),
-						     HtmlUtil.SIZE_10)));
+        csb.append(
+            HtmlUtil.formEntry(
+                msgLabel("FTP Port"),
+                HtmlUtil.input(
+                    PROP_FTP_PORT,
+                    getRepository().getProperty(PROP_FTP_PORT, "-1"),
+                    HtmlUtil.SIZE_10)));
 
-	csb.append(HtmlUtil.formEntry(msgLabel("FTP Passive Ports"),
-				      HtmlUtil.input(PROP_FTP_PASSIVEPORTS, 
-						     getRepository().getProperty(PROP_FTP_PORT,FtpManager.DFLT_PASSIVE_PORTS),
-						     HtmlUtil.SIZE_15)));
+        csb.append(
+            HtmlUtil.formEntry(
+                msgLabel("FTP Passive Ports"),
+                HtmlUtil.input(
+                    PROP_FTP_PASSIVEPORTS,
+                    getRepository().getProperty(
+                        PROP_FTP_PORT,
+                        FtpManager.DFLT_PASSIVE_PORTS), HtmlUtil.SIZE_15)));
 
 
 
@@ -1419,13 +1438,15 @@ public class Admin extends RepositoryManager {
                                         false));
 
         getRepository().writeGlobal(PROP_FTP_PASSIVEPORTS,
-                                    request.getString(PROP_FTP_PASSIVEPORTS, "").trim());
+                                    request.getString(PROP_FTP_PASSIVEPORTS,
+                                        "").trim());
 
-	if (request.defined(PROP_FTP_PORT)) {
-	    getRepository().writeGlobal(PROP_FTP_PORT,
-					request.getString(PROP_FTP_PORT, "").trim());
-	    getRepository().getFtpManager().checkServer();
-	}
+        if (request.defined(PROP_FTP_PORT)) {
+            getRepository().writeGlobal(PROP_FTP_PORT,
+                                        request.getString(PROP_FTP_PORT,
+                                            "").trim());
+            getRepository().getFtpManager().checkServer();
+        }
 
 
 

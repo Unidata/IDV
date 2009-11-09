@@ -21,6 +21,8 @@
  */
 
 package ucar.unidata.repository.auth;
+
+
 import ucar.unidata.repository.*;
 
 
@@ -34,7 +36,7 @@ import java.util.List;
  *
  * @author IDV Development Team
  */
-public abstract class UserAuthenticatorImpl implements UserAuthenticator  {
+public abstract class UserAuthenticatorImpl implements UserAuthenticator {
 
     /**
      * this gets called when we want to just get a User object from the ID.
@@ -46,7 +48,7 @@ public abstract class UserAuthenticatorImpl implements UserAuthenticator  {
      * @return _more_
      */
     public User findUser(Repository repository, String userId) {
-	return null;
+        return null;
     }
 
     /**
@@ -54,14 +56,17 @@ public abstract class UserAuthenticatorImpl implements UserAuthenticator  {
      * return null if user/password is unknown or incorrect
      *
      * @param repository _more_
+     * @param request _more_
+     * @param loginFormExtra _more_
      * @param userId _more_
      * @param password _more_
      *
      * @return _more_
      */
-    public abstract User authenticateUser(Repository repository, Request request, StringBuffer loginFormExtra, 
-					  String userId,
-					  String password);
+    public abstract User authenticateUser(Repository repository,
+                                          Request request,
+                                          StringBuffer loginFormExtra,
+                                          String userId, String password);
 
 
     /**
@@ -70,7 +75,7 @@ public abstract class UserAuthenticatorImpl implements UserAuthenticator  {
      * @return _more_
      */
     public List<String> getAllRoles() {
-	return new ArrayList<String>();
+        return new ArrayList<String>();
     }
 
 
@@ -82,7 +87,7 @@ public abstract class UserAuthenticatorImpl implements UserAuthenticator  {
      * @return _more_
      */
     public List<User> getAllUsers() {
-	return new ArrayList<User>();
+        return new ArrayList<User>();
     }
 
 
@@ -96,9 +101,7 @@ public abstract class UserAuthenticatorImpl implements UserAuthenticator  {
      * @param sb _more_
      */
     public void addToConfigurationForm(Repository repository,
-                                       StringBuffer sb) {
-
-    }
+                                       StringBuffer sb) {}
 
     /**
      * This will be used to allow this authenticator to set the options from the config form
@@ -109,9 +112,7 @@ public abstract class UserAuthenticatorImpl implements UserAuthenticator  {
      * @param request _more_
      */
     public void applyConfigurationForm(Repository repository,
-                                       Request request) {
-
-    }
+                                       Request request) {}
 
 }
 

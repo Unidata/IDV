@@ -22,8 +22,6 @@
 
 package ucar.unidata.repository;
 
-import ucar.unidata.repository.auth.*;
-
 
 
 import org.python.core.*;
@@ -31,6 +29,8 @@ import org.python.util.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.auth.*;
 
 
 
@@ -244,7 +244,7 @@ public class StorageManager extends RepositoryManager {
     }
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean haveInitializedPython = false;
 
 
@@ -567,19 +567,23 @@ public class StorageManager extends RepositoryManager {
     public String getLogDir() {
         if (logDir == null) {
             logDir = IOUtil.joinDir(getRepositoryDir(), DIR_LOGS);
-	    File f = new File(logDir);
+            File f = new File(logDir);
             IOUtil.makeDirRecursive(f);
-	    File log4JFile = new File(f+"/" + "log4j.properties");
-	    if(!log4JFile.exists()) {
-		try {
-		    String c =IOUtil.readContents("/ucar/unidata/repository/resources/log4j.properties", getClass());
-		    c = c.replace("${ramadda.logdir}", f.toString());
-		    IOUtil.writeFile(log4JFile, c);
-		} catch(Exception exc) {
-		    throw new RuntimeException(exc);
-		}
-	    }
-	    org.apache.log4j.PropertyConfigurator.configure(log4JFile.toString());
+            File log4JFile = new File(f + "/" + "log4j.properties");
+            if ( !log4JFile.exists()) {
+                try {
+                    String c =
+                        IOUtil.readContents(
+                            "/ucar/unidata/repository/resources/log4j.properties",
+                            getClass());
+                    c = c.replace("${ramadda.logdir}", f.toString());
+                    IOUtil.writeFile(log4JFile, c);
+                } catch (Exception exc) {
+                    throw new RuntimeException(exc);
+                }
+            }
+            org.apache.log4j.PropertyConfigurator.configure(
+                log4JFile.toString());
         }
         return logDir;
     }

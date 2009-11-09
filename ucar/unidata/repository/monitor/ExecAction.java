@@ -133,9 +133,10 @@ public class ExecAction extends MonitorAction {
      * @param entry _more_
      */
     protected void entryMatched(EntryMonitor monitor, Entry entry) {
-	if(!monitor.getRepository().getProperty(PROP_MONITOR_ENABLE_EXEC,false)) {
-	    throw new IllegalArgumentException("Exec action not enabled");
-	}
+        if ( !monitor.getRepository().getProperty(PROP_MONITOR_ENABLE_EXEC,
+                false)) {
+            throw new IllegalArgumentException("Exec action not enabled");
+        }
         Resource resource = entry.getResource();
         String command =
             monitor.getRepository().getEntryManager().replaceMacros(entry,

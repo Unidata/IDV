@@ -26,16 +26,16 @@ package ucar.unidata.repository;
 import org.apache.commons.fileupload.MultipartStream;
 
 import org.mortbay.jetty.*;
-import org.mortbay.jetty.handler.*;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.HttpConnection;
+import org.mortbay.jetty.NCSARequestLog;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.NCSARequestLog;
 
 
 import org.mortbay.jetty.bio.SocketConnector;
+import org.mortbay.jetty.handler.*;
 import org.mortbay.jetty.handler.AbstractHandler;
 
 import org.mortbay.jetty.security.SslSocketConnector;
@@ -101,26 +101,29 @@ public class JettyServer extends RepositoryServlet implements Constants {
 
 
 
-        Server server = new Server(port);
-        Repository repository = repositoryServlet.getRepository();
-	HandlerCollection handlers = new HandlerCollection();
-	ContextHandlerCollection contexts = new ContextHandlerCollection();
+        Server                   server   = new Server(port);
+        Repository repository             = repositoryServlet.getRepository();
+        HandlerCollection        handlers = new HandlerCollection();
+        ContextHandlerCollection contexts = new ContextHandlerCollection();
 
         Context context = new Context(contexts, "/", Context.SESSIONS);
         context.addServlet(new ServletHolder(repositoryServlet), "/*");
 
 
-	RequestLogHandler requestLogHandler = new RequestLogHandler();
-	NCSARequestLog  logger = new NCSARequestLog(repository.getStorageManager().getLogDir() +"/" + "requests.log");
-	logger.setExtended(false);
-	logger.setRetainDays(90);
-	logger.setAppend(true);
-	logger.setLogTimeZone("GMT");
+        RequestLogHandler requestLogHandler = new RequestLogHandler();
+        NCSARequestLog logger =
+            new NCSARequestLog(repository.getStorageManager().getLogDir()
+                               + "/" + "requests.log");
+        logger.setExtended(false);
+        logger.setRetainDays(90);
+        logger.setAppend(true);
+        logger.setLogTimeZone("GMT");
 
-	requestLogHandler.setRequestLog(logger);
+        requestLogHandler.setRequestLog(logger);
 
-	handlers.setHandlers(new Handler[]{contexts,new DefaultHandler(),requestLogHandler});
-	server.setHandler(handlers);
+        handlers.setHandlers(new Handler[] { contexts, new DefaultHandler(),
+                                             requestLogHandler });
+        server.setHandler(handlers);
 
         try {
             initSsl(server, repository);
@@ -154,12 +157,11 @@ public class JettyServer extends RepositoryServlet implements Constants {
         }
 
         if (repository.getProperty(PROP_SSL_IGNORE, false)) {
-            repository.getLogManager().logInfo(
-                "SSL: ssl.ignore is set.");
+            repository.getLogManager().logInfo("SSL: ssl.ignore is set.");
             return;
         }
         repository.getLogManager().logInfo("SSL: using keystore: "
-                + keystore);
+                                           + keystore);
 
         String password = repository.getPropertyValue(PROP_SSL_PASSWORD,
                               (String) null, false);

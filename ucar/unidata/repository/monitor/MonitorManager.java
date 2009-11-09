@@ -387,9 +387,11 @@ public class MonitorManager extends RepositoryManager {
             if (type.equals("ldm")) {
                 monitor.addAction(new LdmAction(getRepository().getGUID()));
             } else {
-		if(!getRepository().getProperty(PROP_MONITOR_ENABLE_EXEC,false)) {
-		    throw new IllegalArgumentException("Exec action not enabled");
-		}
+                if ( !getRepository().getProperty(PROP_MONITOR_ENABLE_EXEC,
+                        false)) {
+                    throw new IllegalArgumentException(
+                        "Exec action not enabled");
+                }
                 monitor.addAction(new ExecAction(getRepository().getGUID()));
             }
         } else {
@@ -493,12 +495,14 @@ public class MonitorManager extends RepositoryManager {
                         + HtmlUtil.submit("LDM Action", ARG_MONITOR_CREATE)
                         + HtmlUtil.hidden(ARG_MONITOR_TYPE, "ldm")
                         + HtmlUtil.formClose();
-	    if(getRepository().getProperty(PROP_MONITOR_ENABLE_EXEC,false)) {
-		execCreate = request.form(getRepositoryBase().URL_USER_MONITORS)
-		    + HtmlUtil.submit("Exec Action", ARG_MONITOR_CREATE)
-		    + HtmlUtil.hidden(ARG_MONITOR_TYPE, "exec")
-		    + HtmlUtil.formClose();
-	    }
+            if (getRepository().getProperty(PROP_MONITOR_ENABLE_EXEC,
+                                            false)) {
+                execCreate =
+                    request.form(getRepositoryBase().URL_USER_MONITORS)
+                    + HtmlUtil.submit("Exec Action", ARG_MONITOR_CREATE)
+                    + HtmlUtil.hidden(ARG_MONITOR_TYPE, "exec")
+                    + HtmlUtil.formClose();
+            }
         }
 
         String[] createTypesxxx = {

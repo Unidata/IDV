@@ -591,15 +591,24 @@ public class MetadataType extends MetadataTypeBase {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param template _more_
+     * @param element _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
     public String applyMacros(String template, MetadataElement element,
                               String value) {
-	template = super.applyMacros(template, element, value);
-	if(template!=null) {
-	    while(template.indexOf("${id}")>=0) {
-		template = template.replace("${id}", id);
-	    }
-	}
-	return template;
+        template = super.applyMacros(template, element, value);
+        if (template != null) {
+            while (template.indexOf("${id}") >= 0) {
+                template = template.replace("${id}", id);
+            }
+        }
+        return template;
     }
 
 

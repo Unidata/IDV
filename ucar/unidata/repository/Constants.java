@@ -34,7 +34,7 @@ public interface Constants {
     //j--
 
     /** _more_ */
-   public static final String ICON_ACCESS = "ramadda.icon.access";
+    public static final String ICON_ACCESS = "ramadda.icon.access";
 
     /** _more_ */
     public static final String ICON_ADD = "ramadda.icon.add";
@@ -287,6 +287,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_ZIP = "ramadda.icon.zip";
 
+    /** _more_          */
     public static final String ICON_ZIPTREE = "ramadda.icon.ziptree";
 
 
@@ -294,7 +295,7 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_ADDMETADATA = "addmetadata";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_FILESIZE = "filesize";
 
 
@@ -595,7 +596,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ENTRYID = "entryid";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_LOCALEID = "localeid";
 
     /** _more_ */
@@ -765,7 +766,9 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_MINLON = "minlon";
 
-    public static final String PROP_MONITOR_ENABLE_EXEC = "ramadda.monitor.enable.exec";
+    /** _more_          */
+    public static final String PROP_MONITOR_ENABLE_EXEC =
+        "ramadda.monitor.enable.exec";
 
     /** _more_ */
     public static final String ARG_MONITOR_CHANGE = "monitorchange";
@@ -1028,7 +1031,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_USER_NEW = "user.new";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_PASSWORD = "password";
 
     /** _more_ */
@@ -1106,7 +1109,7 @@ public interface Constants {
     /** _more_ */
     public static final String TAG_DESCRIPTION = "description";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SERVICE = "service";
 
     /** _more_ */
@@ -1154,15 +1157,19 @@ public interface Constants {
     public static final String TAG_TYPES = "types";
 
 
+    /** _more_          */
     public static final String PROP_FTP_PORT = "ramadda.ftp.port";
-    public static final String PROP_FTP_PASSIVEPORTS = "ramadda.ftp.passiveports";
-
-
 
     /** _more_          */
+    public static final String PROP_FTP_PASSIVEPORTS =
+        "ramadda.ftp.passiveports";
+
+
+
+    /** _more_ */
     public static final String PROP_BUILD_VERSION = "ramadda.build.version";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_BUILD_DATE = "ramadda.build.date";
 
     /** _more_ */
@@ -1224,15 +1231,15 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_DB_CANCACHE = "ramadda.db.cancache";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_DB_POOL_MAXACTIVE =
         "ramadda.db.pool.maxactive";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_DB_POOL_MAXIDLE =
         "ramadda.db.pool.maxidle";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_DB_POOL_TIMEUNTILCLOSED =
         "ramadda.db.pool.timeuntilclosed";
 
@@ -1400,14 +1407,14 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_SSL_PORT = "ramadda.ssl.port";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_SSL_PASSWORD = "ramadda.ssl.password";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_SSL_KEYPASSWORD =
         "ramadda.ssl.keypassword";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_SSL_KEYSTORE = "ramadda.ssl.keystore";
 
 
@@ -1422,9 +1429,11 @@ public interface Constants {
     public static final String PROP_CACHE_MAXSIZEGB =
         "ramadda.cache.maxsizegb";
 
+    /** _more_          */
     public static final String PROP_ZIPOUTPUT_REGISTERED_MAXSIZEMB =
         "ramadda.zip.registered.maxsizemb";
 
+    /** _more_          */
     public static final String PROP_ZIPOUTPUT_ANONYMOUS_MAXSIZEMB =
         "ramadda.zip.anonymous.maxsizemb";
 
@@ -1599,15 +1608,18 @@ public interface Constants {
         "The association has been added";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String SERVICE_OPENDAP = "opendap";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SERVICE_FILE = "file";
 
 
-    public static long MEGA =1000000;
-    public static long GIGA =MEGA*1000;
+    /** _more_          */
+    public static long MEGA = 1000000;
+
+    /** _more_          */
+    public static long GIGA = MEGA * 1000;
 
 
 

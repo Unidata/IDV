@@ -21,6 +21,8 @@
  */
 
 package ucar.unidata.repository.auth;
+
+
 import ucar.unidata.repository.*;
 
 
@@ -226,7 +228,9 @@ public class UserManager extends RepositoryManager {
      */
     public List<FavoriteEntry> getFavorites(Request request, User user)
             throws Exception {
-	if(user.getAnonymous()) return new ArrayList<FavoriteEntry>();
+        if (user.getAnonymous()) {
+            return new ArrayList<FavoriteEntry>();
+        }
         List<FavoriteEntry> favorites = user.getFavorites();
         if (favorites == null) {
             favorites = new ArrayList<FavoriteEntry>();
@@ -526,7 +530,7 @@ public class UserManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public void makeOrUpdateUser(User user, boolean updateIfNeeded,
-                                    boolean onlyPassword)
+                                 boolean onlyPassword)
             throws Exception {
         if (getDatabaseManager().tableContains(user.getId(),
                 Tables.USERS.NAME, Tables.USERS.COL_ID)) {
@@ -2221,17 +2225,29 @@ public class UserManager extends RepositoryManager {
     }
 
 
-    public boolean isPasswordValid(String name, String password) throws Exception {
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param password _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public boolean isPasswordValid(String name, String password)
+            throws Exception {
         String hashedPassword = hashPassword(password);
-        Statement statement =
-            getDatabaseManager().select(Tables.USERS.COLUMNS,
-                                        Tables.USERS.NAME,
-                                        Clause.and(Clause.eq(Tables.USERS.COL_ID, name),
-                                                   Clause.eq(Tables.USERS.COL_PASSWORD,
-                                                             hashedPassword)));
+        Statement statement = getDatabaseManager().select(
+                                  Tables.USERS.COLUMNS, Tables.USERS.NAME,
+                                  Clause.and(
+                                      Clause.eq(Tables.USERS.COL_ID, name),
+                                      Clause.eq(
+                                          Tables.USERS.COL_PASSWORD,
+                                          hashedPassword)));
 
         ResultSet results = statement.getResultSet();
-        boolean valid = results.next();
+        boolean   valid   = results.next();
         getDatabaseManager().closeAndReleaseConnection(statement);
         return valid;
     }
@@ -2251,10 +2267,10 @@ public class UserManager extends RepositoryManager {
 
         boolean responseAsXml = request.getString(ARG_RESPONSE,
                                     "").equals(RESPONSE_XML);
-        StringBuffer sb     = new StringBuffer();
-        User         user   = null;
-        String       output = request.getString(ARG_OUTPUT, "");
-	StringBuffer loginFormExtra = new StringBuffer();
+        StringBuffer sb             = new StringBuffer();
+        User         user           = null;
+        String       output         = request.getString(ARG_OUTPUT, "");
+        StringBuffer loginFormExtra = new StringBuffer();
         if (request.exists(ARG_USER_ID)) {
             String name = request.getString(ARG_USER_ID, "").trim();
             if (name.equals(USER_DEFAULT) || name.equals(USER_ANONYMOUS)) {
@@ -2303,14 +2319,15 @@ public class UserManager extends RepositoryManager {
                 if (user == null) {
                     for (UserAuthenticator userAuthenticator : userAuthenticators) {
                         user = userAuthenticator.authenticateUser(
-								  getRepository(), request, loginFormExtra, name, password);
+                            getRepository(), request, loginFormExtra, name,
+                            password);
                         if (user != null) {
                             user.setIsLocal(false);
                             break;
                         }
                     }
                 }
-	    }
+            }
 
 
             if (user != null) {
@@ -2321,21 +2338,22 @@ public class UserManager extends RepositoryManager {
                             XmlUtil.attr(ATTR_CODE, CODE_OK),
                             request.getSessionId()), MIME_XML);
                 }
-		String destUrl;
-		String destMsg;
+                String destUrl;
+                String destMsg;
                 if (request.exists(ARG_REDIRECT)) {
-                    destUrl  = new String(XmlUtil.decodeBase64(
-							       request.getUnsafeString(
-										       ARG_REDIRECT, "")));
-		    destMsg = msg("Continue");
+                    destUrl = new String(
+                        XmlUtil.decodeBase64(
+                            request.getUnsafeString(ARG_REDIRECT, "")));
+                    destMsg = msg("Continue");
                 } else {
-                    destUrl  = getRepositoryBase().URL_USER_HOME.toString();
-		    destMsg = msg("Continue to user home");
+                    destUrl = getRepositoryBase().URL_USER_HOME.toString();
+                    destMsg = msg("Continue to user home");
                 }
-		StringBuffer response = new StringBuffer();
-		response.append(getRepository().showDialogNote(msg("You are logged in")));
-		response.append(HtmlUtil.href(destUrl, destMsg));
-		return new Result("Login",response);
+                StringBuffer response = new StringBuffer();
+                response.append(
+                    getRepository().showDialogNote(msg("You are logged in")));
+                response.append(HtmlUtil.href(destUrl, destMsg));
+                return new Result("Login", response);
             } else {
                 if (responseAsXml) {
                     return new Result(XmlUtil.tag(TAG_RESPONSE,
@@ -2379,7 +2397,7 @@ public class UserManager extends RepositoryManager {
 
 
         if (user == null) {
-            sb.append(makeLoginForm(request,loginFormExtra.toString()));
+            sb.append(makeLoginForm(request, loginFormExtra.toString()));
         }
         return new Result(msg("Login"), sb);
 

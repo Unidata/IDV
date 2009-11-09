@@ -22,6 +22,7 @@
 
 package ucar.unidata.repository;
 
+
 import ucar.unidata.repository.auth.*;
 import ucar.unidata.repository.output.*;
 
@@ -215,18 +216,23 @@ public class Request implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isConnected() {
-	try {
-	    OutputStream os = getHttpServletResponse().getOutputStream();
-	    InputStream is = getHttpServletRequest().getInputStream();
-	    System.err.println(is.available());
-	    is.read();
-	    //System.err.println(is.available());
-	} catch(Exception exc) {
-	    System.err.println ("bad");
-	    return false;
-	}
-	return true;
+        try {
+            OutputStream os = getHttpServletResponse().getOutputStream();
+            InputStream  is = getHttpServletRequest().getInputStream();
+            System.err.println(is.available());
+            is.read();
+            //System.err.println(is.available());
+        } catch (Exception exc) {
+            System.err.println("bad");
+            return false;
+        }
+        return true;
     }
 
 

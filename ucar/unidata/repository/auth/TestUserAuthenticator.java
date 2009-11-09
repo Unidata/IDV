@@ -23,6 +23,7 @@
 
 
 
+
 import ucar.unidata.repository.Repository;
 import ucar.unidata.repository.Request;
 import ucar.unidata.repository.User;
@@ -79,12 +80,15 @@ public class TestUserAuthenticator extends UserAuthenticatorImpl {
      * return null if user/password is unknown or incorrect
      *
      * @param repository _more_
+     * @param request _more_
+     * @param extraLoginForm _more_
      * @param userId _more_
      * @param password _more_
      *
      * @return _more_
      */
-    public User authenticateUser(Repository repository, Request request, StringBuffer extraLoginForm, String userId,
+    public User authenticateUser(Repository repository, Request request,
+                                 StringBuffer extraLoginForm, String userId,
                                  String password) {
         System.err.println("test authenticator authenticateUser: " + userId);
         //This example will create a User for userid=xxx password=yyy

@@ -21,11 +21,14 @@
 
 package ucar.unidata.repository;
 
-import ucar.unidata.repository.auth.*;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.repository.auth.*;
+
 import ucar.unidata.repository.data.*;
+
+import ucar.unidata.repository.ftp.FtpManager;
 import ucar.unidata.repository.harvester.*;
 
 import ucar.unidata.repository.metadata.*;
@@ -33,8 +36,6 @@ import ucar.unidata.repository.monitor.*;
 
 import ucar.unidata.repository.output.*;
 import ucar.unidata.repository.type.*;
-
-import ucar.unidata.repository.ftp.FtpManager;
 
 import ucar.unidata.repository.util.*;
 
@@ -341,7 +342,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private List<String> metadataDefFiles = new ArrayList<String>();
 
 
-    /** _more_          */
+    /** _more_ */
     private List<String> pythonLibs = new ArrayList<String>();
 
 
@@ -365,7 +366,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private UserManager userManager;
 
-    /** _more_          */
+    /** _more_ */
     private OaiManager oaiManager;
 
     /** _more_ */
@@ -407,6 +408,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private DatabaseManager databaseManager;
 
+    /** _more_          */
     private FtpManager ftpManager;
 
     /** _more_ */
@@ -809,7 +811,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         } catch (Exception exc) {}
 
 
-	//create the log dir
+        //create the log dir
         getStorageManager().getLogDir();
 
         initPlugins();
@@ -915,7 +917,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (getInstallationComplete()) {
             getRegistryManager().doFinalInitialization();
         }
-	getFtpManager();
+        getFtpManager();
     }
 
 
@@ -1316,6 +1318,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public FtpManager getFtpManager() {
         if (ftpManager == null) {
             ftpManager = doMakeFtpManager();
@@ -1563,7 +1570,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
     protected boolean checkFile(String file) {
         if (file.indexOf("api.xml") >= 0) {
             apiDefFiles.add(file);
-        } else if (file.indexOf("types.xml") >= 0 || file.indexOf("type.xml") >= 0) {
+        } else if ((file.indexOf("types.xml") >= 0)
+                   || (file.indexOf("type.xml") >= 0)) {
             typeDefFiles.add(file);
         } else if (file.indexOf("outputhandlers.xml") >= 0) {
             outputDefFiles.add(file);
@@ -2198,7 +2206,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                             apiMethod.getAuthMethod());
                     }
                 }
-		//		System.err.println ("auth:" + authMethod);
+                //              System.err.println ("auth:" + authMethod);
                 if (authMethod.equals(AuthorizationMethod.AUTH_HTML)) {
                     sb.append(showDialogError(inner.getMessage()));
                     String redirect =
@@ -2207,17 +2215,19 @@ public class Repository extends RepositoryBase implements RequestHandler {
                             HtmlUtil.hidden(ARG_REDIRECT, redirect)));
                 } else {
                     sb.append(inner.getMessage());
-		    //If the authmethod is basic http auth then, if ssl is enabled, we 
-		    //want to have the authentication go over ssl. Else we do it clear text
-                    if (!request.getSecure() && isSSLEnabled(null)) {
-			/*
-			If ssl then we are a little tricky here. We redirect the request to the generic ssl based SSLREDIRCT url
-			passing the actual request as an argument. The processSslRedirect method checks for authentication. If
-			not authenticated then it throws an access exception which triggers a auth request back to the client
-			If authenticated then it redirects the client back to the original non ssl request
-			*/
-			String redirectUrl = XmlUtil.encodeBase64(request.getUrl().getBytes());
-			String url = HtmlUtil.url(URL_SSLREDIRECT.toString(),ARG_REDIRECT, redirectUrl);
+                    //If the authmethod is basic http auth then, if ssl is enabled, we 
+                    //want to have the authentication go over ssl. Else we do it clear text
+                    if ( !request.getSecure() && isSSLEnabled(null)) {
+                        /*
+                        If ssl then we are a little tricky here. We redirect the request to the generic ssl based SSLREDIRCT url
+                        passing the actual request as an argument. The processSslRedirect method checks for authentication. If
+                        not authenticated then it throws an access exception which triggers a auth request back to the client
+                        If authenticated then it redirects the client back to the original non ssl request
+                        */
+                        String redirectUrl =
+                            XmlUtil.encodeBase64(request.getUrl().getBytes());
+                        String url = HtmlUtil.url(URL_SSLREDIRECT.toString(),
+                                         ARG_REDIRECT, redirectUrl);
                         result = new Result(url);
                     } else {
                         result = new Result("Error", sb);
@@ -2388,7 +2398,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     protected Result getResult(Request request) throws Exception {
 
-        ApiMethod apiMethod  = findApiMethod(request);
+        ApiMethod apiMethod = findApiMethod(request);
 
         if (apiMethod == null) {
             return getHtdocsFile(request);
@@ -2396,10 +2406,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
         //        System.err.println("sslEnabled:" +sslEnabled + "  " + apiMethod.getNeedsSsl());
-	Result sslRedirect = checkForSslRedirect(request, apiMethod);
-	if(sslRedirect!=null) {
-	    return sslRedirect;
-	}
+        Result sslRedirect = checkForSslRedirect(request, apiMethod);
+        if (sslRedirect != null) {
+            return sslRedirect;
+        }
 
 
         //        System.out.println(absoluteUrl(request.getUrl()));
@@ -2469,9 +2479,17 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param apiMethod _more_
+     *
+     * @return _more_
+     */
     private Result checkForSslRedirect(Request request, ApiMethod apiMethod) {
-        boolean   sslEnabled = isSSLEnabled(request);
-        boolean allSsl = false;
+        boolean sslEnabled = isSSLEnabled(request);
+        boolean allSsl     = false;
         if (sslEnabled) {
             allSsl = getProperty(PROP_ACCESS_ALLSSL, false);
             if (allSsl && !request.getSecure()) {
@@ -2486,11 +2504,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     return new Result(httpsUrl(request.getUrl()));
                 } else if ( !allSsl && !apiMethod.getNeedsSsl()
                             && request.getSecure()) {
-		    return new Result(absoluteUrl(request.getUrl()));
+                    return new Result(absoluteUrl(request.getUrl()));
                 }
             }
         }
-	return null;
+        return null;
     }
 
     /**
@@ -3172,6 +3190,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public long getProperty(String name, long dflt) {
         String prop = getProperty(name);
         if (prop != null) {
@@ -3273,7 +3299,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 false));
 
 
-	getDatabaseManager().initComplete();
+        getDatabaseManager().initComplete();
 
 
         readGlobals();
@@ -3837,17 +3863,26 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processSslRedirect(Request request) throws Exception {
         if (request.getCheckingAuthMethod()) {
             return new Result(AuthorizationMethod.AUTH_HTTP);
         }
 
 
-	if(request.isAnonymous()) {
+        if (request.isAnonymous()) {
             throw new AccessException("Cannot access data", request);
-	}
-	String url = request.getString(ARG_REDIRECT,"");
-	url = new String(XmlUtil.decodeBase64(url));
+        }
+        String url = request.getString(ARG_REDIRECT, "");
+        url = new String(XmlUtil.decodeBase64(url));
         return new Result(url);
     }
 

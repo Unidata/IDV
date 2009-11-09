@@ -57,7 +57,9 @@ public class RepositoryBase implements Constants, RepositorySource {
     public final RequestUrl URL_PING = new RequestUrl(this, "/ping");
 
 
-    public final RequestUrl URL_SSLREDIRECT = new RequestUrl(this, "/sslredirect");
+    /** _more_          */
+    public final RequestUrl URL_SSLREDIRECT = new RequestUrl(this,
+                                                  "/sslredirect");
 
     /** _more_ */
     public final RequestUrl URL_INFO = new RequestUrl(this, "/info");
@@ -306,7 +308,7 @@ public class RepositoryBase implements Constants, RepositorySource {
     /** _more_ */
     private int httpPort = 80;
 
-    /** _more_          */
+    /** _more_ */
     private int httpsPort = -1;
 
     /** _more_ */

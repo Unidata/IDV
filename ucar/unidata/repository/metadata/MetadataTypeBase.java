@@ -272,26 +272,26 @@ public class MetadataTypeBase extends RepositoryManager {
             name.replace(" ", "_"), name.toLowerCase().replace(" ", "_"),
             element.getId()
         };
-	Hashtable macros = new Hashtable();
-	macros.put("name",name);
-	//	template = template.replaceAll("\\${name}", name);
+        Hashtable macros = new Hashtable();
+        macros.put("name", name);
+        //      template = template.replaceAll("\\${name}", name);
         for (String key : keys) {
             if (key == null) {
                 continue;
             }
             //                System.err.println("key: " + key);
-	    //            template = template.replaceAll("\\${" + key + "}", value);
-	    //            template = template.replaceAll("\\${" + key + ".label}", label);
-	    //            template = template.replaceAll("\\${" + key + ".cdata}",
-	    //                                        "<![CDATA[" + value + "]]>");
-	    macros.put(key, value);
-	    macros.put(key + ".label", label);
-	    macros.put(key + ".cdata", "<![CDATA[" + value + "]]>");
+            //            template = template.replaceAll("\\${" + key + "}", value);
+            //            template = template.replaceAll("\\${" + key + ".label}", label);
+            //            template = template.replaceAll("\\${" + key + ".cdata}",
+            //                                        "<![CDATA[" + value + "]]>");
+            macros.put(key, value);
+            macros.put(key + ".label", label);
+            macros.put(key + ".cdata", "<![CDATA[" + value + "]]>");
         }
-	template = StringUtil.applyMacros(template, macros, false);
+        template = StringUtil.applyMacros(template, macros, false);
         template = template.replaceAll("\r\n\r\n", "<p>");
         template = template.replace("\n\n", "<p>");
-	return template;
+        return template;
     }
 
     /**

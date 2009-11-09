@@ -21,10 +21,11 @@
  */
 
 package ucar.unidata.repository.auth;
-import ucar.unidata.repository.*;
 
 
 import org.w3c.dom.*;
+
+import ucar.unidata.repository.*;
 
 
 
@@ -165,8 +166,9 @@ public class AccessManager extends RepositoryManager {
             Entry entry = getEntryManager().getEntry(request,
                               request.getString(ARG_ENTRYID, ""), false);
             if (entry == null) {
-                throw new RepositoryUtil.MissingEntryException("Could not find entry:"
-                        + request.getString(ARG_ENTRYID, ""));
+                throw new RepositoryUtil.MissingEntryException(
+                    "Could not find entry:"
+                    + request.getString(ARG_ENTRYID, ""));
             }
             return canDoAction(request, entry, action);
         }
@@ -189,8 +191,9 @@ public class AccessManager extends RepositoryManager {
         if (request.exists(ARG_GROUP)) {
             Group group = getEntryManager().findGroup(request);
             if (group == null) {
-                throw new RepositoryUtil.MissingEntryException("Could not find group:"
-                        + request.getString(ARG_GROUP, ""));
+                throw new RepositoryUtil.MissingEntryException(
+                    "Could not find group:"
+                    + request.getString(ARG_GROUP, ""));
             }
             boolean canDo = canDoAction(request, group, action);
             //            System.err.println ("action:" + action +" found group:" + group + " canDo:" + canDo);
@@ -219,7 +222,8 @@ public class AccessManager extends RepositoryManager {
             }
         }
 
-        throw new RepositoryUtil.MissingEntryException("Could not find entry or group");
+        throw new RepositoryUtil.MissingEntryException(
+            "Could not find entry or group");
         //        return false;
     }
 
@@ -486,7 +490,7 @@ public class AccessManager extends RepositoryManager {
         if ((request != null) && request.isSpider()) {
             return false;
         }
-        return canDoAction(request, entry, Permission.ACTION_FILE,false);
+        return canDoAction(request, entry, Permission.ACTION_FILE, false);
     }
 
     /**
@@ -669,7 +673,7 @@ public class AccessManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public void insertPermissions(Request request, Entry entry,
-                                     List<Permission> permissions)
+                                  List<Permission> permissions)
             throws Exception {
         recentPermissions = new Hashtable();
         getDatabaseManager().delete(

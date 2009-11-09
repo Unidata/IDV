@@ -1446,11 +1446,13 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
         for (PointDataMetadata pdm : columnsToUse) {
             String pdmName = pdm.shortName.toLowerCase();
 
-            if(pdm.columnName.equals(COL_ID)) {
+            if (pdm.columnName.equals(COL_ID)) {
                 continue;
             }
             if (entityCol == null) {
-                if(pdmName.indexOf("station") >= 0 || pdmName.equals("region") || pdmName.equals("id") || pdmName.equals("idn")) {
+                if ((pdmName.indexOf("station") >= 0)
+                        || pdmName.equals("region") || pdmName.equals("id")
+                        || pdmName.equals("idn")) {
                     entityCol = pdm.columnName;
                     continue;
                 }
@@ -1461,7 +1463,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
             }
         }
 
-	//        System.err.println ("entityCol:" + entityCol);
+        //        System.err.println ("entityCol:" + entityCol);
 
         for (PointDataMetadata pdm : columnsToUse) {
             if ((entityCol != null) && pdm.isColumn(entityCol)) {
@@ -2304,7 +2306,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
             doUpload(sb, request, entry);
         } else {
             sb.append(getHeader(request, entry));
-	    sb.append(entry.getDescription());
+            sb.append(entry.getDescription());
             createSearchForm(sb, request, entry);
         }
         return new Result("Point Data", sb);

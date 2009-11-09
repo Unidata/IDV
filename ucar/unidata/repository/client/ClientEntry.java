@@ -111,7 +111,7 @@ public class ClientEntry implements Constants {
     private String type;
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean isGroup = false;
 
 

@@ -21,6 +21,8 @@
  */
 
 package ucar.unidata.repository.auth;
+
+
 import ucar.unidata.repository.*;
 
 
@@ -52,15 +54,15 @@ public interface UserAuthenticator {
      * return null if user/password is unknown or incorrect
      *
      * @param repository _more_
+     * @param request _more_
+     * @param loginFormExtra _more_
      * @param userId _more_
      * @param password _more_
      *
      * @return _more_
      */
-    public User authenticateUser(Repository repository, 
-				 Request request, 
-				 StringBuffer loginFormExtra,
-				 String userId,
+    public User authenticateUser(Repository repository, Request request,
+                                 StringBuffer loginFormExtra, String userId,
                                  String password);
 
 

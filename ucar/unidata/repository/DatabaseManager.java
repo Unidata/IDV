@@ -113,14 +113,14 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     /** _more_ */
     private static final String DB_POSTGRES = "postgres";
 
-    /** _more_          */
+    /** _more_ */
     private DataSource dataSource;
 
     /** Keeps track of active connections */
     private Hashtable<Connection, ConnectionInfo> connectionMap =
         new Hashtable<Connection, ConnectionInfo>();
 
-    /** _more_          */
+    /** _more_ */
     private List<String> scourMessages = new ArrayList<String>();
 
     /**
@@ -138,20 +138,24 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private List<ConnectionInfo> getConnectionInfos() {
-	Hashtable<Connection, ConnectionInfo> tmp =
-	    new Hashtable<Connection, ConnectionInfo>();
-	synchronized (connectionMap) {
-	    tmp.putAll(connectionMap);
-	}
-	List<ConnectionInfo> infos = new ArrayList<ConnectionInfo>();
-	for (Enumeration keys =
-		 tmp.keys(); keys.hasMoreElements(); ) {
-	    Connection connection = (Connection) keys.nextElement();
-	    ConnectionInfo info   = tmp.get(connection);
-	    infos.add(info);
-	}
-	return infos;
+        Hashtable<Connection, ConnectionInfo> tmp = new Hashtable<Connection,
+                                                        ConnectionInfo>();
+        synchronized (connectionMap) {
+            tmp.putAll(connectionMap);
+        }
+        List<ConnectionInfo> infos = new ArrayList<ConnectionInfo>();
+        for (Enumeration keys = tmp.keys(); keys.hasMoreElements(); ) {
+            Connection     connection = (Connection) keys.nextElement();
+            ConnectionInfo info       = tmp.get(connection);
+            infos.add(info);
+        }
+        return infos;
 
     }
 
@@ -166,7 +170,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 int seconds =
                     getRepository().getProperty(PROP_DB_POOL_TIMEUNTILCLOSED,
                         180);
-                for (ConnectionInfo info: getConnectionInfos()) {
+                for (ConnectionInfo info : getConnectionInfos()) {
                     //If a connection has been out for more than seconds then close it
                     if (now - info.time > seconds * 1000) {
                         logInfo("A connection has been open for more than "
@@ -177,12 +181,11 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                             }
                             scourMessages.add("SCOURED @" + new Date()
                                     + " info.date: " + new Date(info.time)
-                                    + " info.id: " + info.myCnt
-					      +"<br>"
+                                    + " info.id: " + info.myCnt + "<br>"
                                     + "  msg:" + info.msg + "  Where:"
                                     + info.where);
                         }
-			closeConnection(info.connection);
+                        closeConnection(info.connection);
                     }
                 }
             } catch (Exception exc) {
@@ -205,8 +208,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         }
         dataSource = doMakeDataSource();
         BasicDataSource bds = (BasicDataSource) dataSource;
-	//	bds.setLogWriter(new PrintWriter(getLogManager().getLogOutputStream()));
-	
+        //      bds.setLogWriter(new PrintWriter(getLogManager().getLogOutputStream()));
+
         if (db.equals(DB_MYSQL)) {
             Statement statement = getConnection().createStatement();
             statement.execute("set time_zone = '+0:00'");
@@ -217,21 +220,26 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         Misc.run(this, "checkConnections", null);
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     public void initComplete() throws Exception {
-	//If nothing  in dummy table then add an entry
-        BasicDataSource bds  = (BasicDataSource) dataSource;
-	int count = getCount(Tables.DUMMY.NAME, null);
-	if (count == 0) {
-	    executeInsert(Tables.DUMMY.INSERT, new Object[]{"dummyentry"});
-	}
-	bds.setValidationQuery("select * from dummy");
+        //If nothing  in dummy table then add an entry
+        BasicDataSource bds   = (BasicDataSource) dataSource;
+        int             count = getCount(Tables.DUMMY.NAME, null);
+        if (count == 0) {
+            executeInsert(Tables.DUMMY.INSERT, new Object[] { "dummyentry" });
+        }
+        bds.setValidationQuery("select * from dummy");
 
-	/*
-	System.err.println("min evict:" +bds.getMinEvictableIdleTimeMillis()/1000);
-	System.err.println("test on borrow:"+bds.getTestOnBorrow());
-	System.err.println("test while idle:"+bds.getTestWhileIdle());
-	System.err.println("time between runs:"+bds.getTimeBetweenEvictionRunsMillis()/1000);
-	*/
+        /*
+        System.err.println("min evict:" +bds.getMinEvictableIdleTimeMillis()/1000);
+        System.err.println("test on borrow:"+bds.getTestOnBorrow());
+        System.err.println("test while idle:"+bds.getTestWhileIdle());
+        System.err.println("time between runs:"+bds.getTimeBetweenEvictionRunsMillis()/1000);
+        */
     }
 
 
@@ -281,30 +289,31 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     public void addStatistics(Request request, StringBuffer dbSB)
             throws Exception {
 
-        BasicDataSource bds  = (BasicDataSource) dataSource;
+        BasicDataSource bds    = (BasicDataSource) dataSource;
 
-	StringBuffer poolSB = new StringBuffer();
-        poolSB.append("&nbsp;&nbsp;#active:"
-                    + bds.getNumActive() + "<br>&nbsp;&nbsp;#idle:"
-                    + bds.getNumIdle() + "<br>&nbsp;&nbsp;max active: "
-                    + bds.getMaxActive() + "<br>&nbsp;&nbsp;max idle:"
-                    + bds.getMaxIdle());
+        StringBuffer    poolSB = new StringBuffer();
+        poolSB.append("&nbsp;&nbsp;#active:" + bds.getNumActive()
+                      + "<br>&nbsp;&nbsp;#idle:" + bds.getNumIdle()
+                      + "<br>&nbsp;&nbsp;max active: " + bds.getMaxActive()
+                      + "<br>&nbsp;&nbsp;max idle:" + bds.getMaxIdle());
 
-	long time = System.currentTimeMillis();
-	StringBuffer openConnections = new StringBuffer();
-	List<ConnectionInfo> infos = getConnectionInfos();
-	for (ConnectionInfo info: infos) {
-	    openConnections.append(HtmlUtil.makeShowHideBlock("Open for:" + ((time-info.time)/1000) +" seconds",
-							      HtmlUtil.pre(info.msg+"\nStack:" + info.where), false));
-	}
-	if(infos.size()>0) {
-	    poolSB.append(HtmlUtil.br());
-	    poolSB.append(msgLabel("Open connections"));
-	    poolSB.append(openConnections);
-	}
+        long                 time            = System.currentTimeMillis();
+        StringBuffer         openConnections = new StringBuffer();
+        List<ConnectionInfo> infos           = getConnectionInfos();
+        for (ConnectionInfo info : infos) {
+            openConnections.append(HtmlUtil.makeShowHideBlock("Open for:"
+                    + ((time - info.time) / 1000)
+                    + " seconds", HtmlUtil.pre(info.msg + "\nStack:"
+                        + info.where), false));
+        }
+        if (infos.size() > 0) {
+            poolSB.append(HtmlUtil.br());
+            poolSB.append(msgLabel("Open connections"));
+            poolSB.append(openConnections);
+        }
 
 
-        StringBuffer    msgb = new StringBuffer();
+        StringBuffer msgb = new StringBuffer();
         synchronized (scourMessages) {
             for (String msg : scourMessages) {
                 msgb.append("<pre>" + msg + "</pre>");
@@ -312,15 +321,18 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             }
             if (scourMessages.size() > 0) {
                 poolSB.append(
-			    HtmlUtil.insetLeft(HtmlUtil.makeShowHideBlock(
-									  msg("Scoured Connections"), msgb.toString(), false),20));
+                    HtmlUtil.insetLeft(
+                        HtmlUtil.makeShowHideBlock(
+                            msg("Scoured Connections"), msgb.toString(),
+                            false), 20));
             }
         }
 
 
-	dbSB.append(
-		    HtmlUtil.insetLeft(HtmlUtil.makeShowHideBlock(
-								  msg("Connection Pool"), poolSB.toString(), false),20));
+        dbSB.append(
+            HtmlUtil.insetLeft(
+                HtmlUtil.makeShowHideBlock(
+                    msg("Connection Pool"), poolSB.toString(), false), 20));
 
         dbSB.append(HtmlUtil.br());
         dbSB.append("<table>\n");
@@ -373,20 +385,23 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      */
     private static class ConnectionInfo {
 
-	static int cnt = 0;
+        /** _more_          */
+        static int cnt = 0;
 
-	int myCnt = cnt++;
-	
+        /** _more_          */
+        int myCnt = cnt++;
 
-	Connection connection;
+
+        /** _more_          */
+        Connection connection;
 
         /** _more_ */
         long time;
 
-        /** _more_          */
+        /** _more_ */
         String where;
 
-        /** _more_          */
+        /** _more_ */
         String msg;
 
         /**
@@ -397,10 +412,10 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
          * @param msg _more_
          */
         ConnectionInfo(Connection connection, String msg) {
-	    this.connection = connection;
-            this.time = System.currentTimeMillis();
-            this.msg  = msg;
-            where     = Misc.getStackTrace();
+            this.connection = connection;
+            this.time       = System.currentTimeMillis();
+            this.msg        = msg;
+            where           = Misc.getStackTrace();
         }
     }
 
@@ -573,7 +588,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     private Connection getConnection(String msg) throws Exception {
         Connection connection = dataSource.getConnection();
         synchronized (connectionMap) {
-            connectionMap.put(connection, new ConnectionInfo(connection, msg));
+            connectionMap.put(connection,
+                              new ConnectionInfo(connection, msg));
         }
         return connection;
     }
@@ -1190,7 +1206,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         Connection connection = getConnection();
         try {
             connection.setAutoCommit(false);
-	    loadSql(connection, sql, ignoreErrors, printStatus);
+            loadSql(connection, sql, ignoreErrors, printStatus);
             connection.commit();
             connection.setAutoCommit(true);
         } finally {
@@ -1200,14 +1216,25 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
 
 
-    public void loadSql(Connection connection, String sql, boolean ignoreErrors, boolean printStatus)
-	throws Exception {
-	Statement statement = connection.createStatement();
-	try {
-	    SqlUtil.loadSql(sql, statement, ignoreErrors, printStatus);
-	} finally {
-	    closeStatement(statement);
-	}
+    /**
+     * _more_
+     *
+     * @param connection _more_
+     * @param sql _more_
+     * @param ignoreErrors _more_
+     * @param printStatus _more_
+     *
+     * @throws Exception _more_
+     */
+    public void loadSql(Connection connection, String sql,
+                        boolean ignoreErrors, boolean printStatus)
+            throws Exception {
+        Statement statement = connection.createStatement();
+        try {
+            SqlUtil.loadSql(sql, statement, ignoreErrors, printStatus);
+        } finally {
+            closeStatement(statement);
+        }
     }
 
 
@@ -1515,8 +1542,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      *
      * @throws Exception _more_
      */
-    public boolean tableContains(String id, String tableName,
-                                    String column)
+    public boolean tableContains(String id, String tableName, String column)
             throws Exception {
         Statement statement = select(column, tableName,
                                      Clause.eq(column, id));
@@ -1537,10 +1563,10 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      */
     public static class Iterator extends SqlUtil.Iterator {
 
-        /** _more_          */
+        /** _more_ */
         Statement statement;
 
-        /** _more_          */
+        /** _more_ */
         DatabaseManager databaseManager;
 
         /**
@@ -1569,17 +1595,25 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
     }
 
-    public static void main(String[]args) throws Exception {
-	int cnt = 0;
-	
-	for(int i=0;i<1000000;i++) {
-	    for(int j=0;i<args.length;j++) {
-		cnt++;
-		if((cnt%1000)==0)
-		    System.err.println("cnt:" + cnt);
-		IOUtil.readContents(args[0],DatabaseManager.class);
-	    }
-	}
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void main(String[] args) throws Exception {
+        int cnt = 0;
+
+        for (int i = 0; i < 1000000; i++) {
+            for (int j = 0; i < args.length; j++) {
+                cnt++;
+                if ((cnt % 1000) == 0) {
+                    System.err.println("cnt:" + cnt);
+                }
+                IOUtil.readContents(args[0], DatabaseManager.class);
+            }
+        }
     }
 
 

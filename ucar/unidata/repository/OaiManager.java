@@ -25,8 +25,9 @@ package ucar.unidata.repository;
 
 import org.w3c.dom.*;
 
-import ucar.unidata.repository.metadata.*;
 import ucar.unidata.repository.auth.*;
+
+import ucar.unidata.repository.metadata.*;
 
 import ucar.unidata.repository.output.*;
 import ucar.unidata.repository.type.*;
@@ -250,7 +251,7 @@ public class OaiManager extends RepositoryManager {
     /** _more_ */
     public static final String TAG_LISTIDENTIFIERS = "ListIdentifiers";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_LISTRECORDS = "ListRecords";
 
 
@@ -319,7 +320,7 @@ public class OaiManager extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_XMLNS_DC = "xmlns:dc";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_XMLNS_OAIDC = "xmlns:oaidc";
 
     /** _more_ */
@@ -1059,11 +1060,12 @@ public class OaiManager extends RepositoryManager {
             "http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd"
         });
 
-	String entryUrl = getRepository().absoluteUrl(request.entryUrl(
-								       getRepository().URL_ENTRY_SHOW, entry));
-	XmlUtil.create(TAG_DC_IDENTIFIER, oaidc,entryUrl);
+        String entryUrl = getRepository().absoluteUrl(
+                              request.entryUrl(
+                                  getRepository().URL_ENTRY_SHOW, entry));
+        XmlUtil.create(TAG_DC_IDENTIFIER, oaidc, entryUrl);
         XmlUtil.create(TAG_DC_TITLE, oaidc, entry.getName());
-	XmlUtil.create(TAG_DC_DESCRIPTION, oaidc,entry.getDescription());
+        XmlUtil.create(TAG_DC_DESCRIPTION, oaidc, entry.getDescription());
         addMetadata(request, entry, oaidc);
 
     }
