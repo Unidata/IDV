@@ -41,7 +41,8 @@ import ucar.nc2.dt.grid.NetcdfCFWriter;
 
 import ucar.unidata.data.DataManager;
 
-import ucar.unidata.data.DataSource;
+import ucar.unidata.data.*;
+import ucar.unidata.data.grid.*;
 import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.idv.IdvServer;
 
@@ -93,10 +94,10 @@ import java.util.List;
  * @version $Revision: 1.3 $
  */
 public class IdvOutputHandler extends OutputHandler {
+    public static final String ARG_PARAM = "param";
 
 
     //    public static void processScript(String scriptFile) throws Exception {
-
 
 
     /** _more_ */
@@ -209,6 +210,7 @@ public class IdvOutputHandler extends OutputHandler {
         return theEntries;
     }
 
+
     /**
      * _more_
      *
@@ -268,19 +270,41 @@ public class IdvOutputHandler extends OutputHandler {
     public Result outputGridForm(final Request request, Entry entry)
             throws Exception {
         StringBuffer sb   = new StringBuffer();
-        String       path = entry.getResource().getPath();
-        String[] crumbs = getEntryManager().getBreadCrumbs(request, entry,
-                              false);
-        sb.append(crumbs[1]);
-        GridDataset dataset = getDataOutputHandler().getGridDataset(path);
-        synchronized (dataset) {
-            for (GridDatatype grid : getDataOutputHandler().sortGrids(
-                    dataset)) {
-                VariableEnhanced var = grid.getVariable();
-                sb.append(var.getName());
-                sb.append(HtmlUtil.br());
-            }
+
+        DataOutputHandler dataOutputHandler = getDataOutputHandler();
+        String path = dataOutputHandler.getPath(entry);
+        if (path == null) {
+            sb.append("Could not load grid");
+            return new Result("Grid Preview", sb);
         }
+
+        GridDataset dataset =
+            dataOutputHandler.getGridDataset(entry,
+                                             path);
+
+
+        String       formUrl  = getRepository().URL_ENTRY_SHOW.getFullUrl();
+        sb.append(HtmlUtil.form(formUrl, ""));
+        sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
+        sb.append(HtmlUtil.hidden(ARG_OUTPUT,OUTPUT_IDV_GRID));
+
+        sb.append(HtmlUtil.formTable());
+
+        List options = new ArrayList();
+
+        GeoGridDataSource dataSource = new GeoGridDataSource(dataset);
+        List<DataChoice> choices = (List<DataChoice>)dataSource.getDataChoices();            
+        for(DataChoice dataChoice: choices) {
+            options.add(new TwoFacedObject(dataChoice.getDescription(), dataChoice.getName()));
+        }
+        sb.append(HtmlUtil.formEntry(msgLabel("Parameter"), HtmlUtil.select(ARG_PARAM, options)));
+        sb.append(HtmlUtil.formTableClose());
+        sb.append(HtmlUtil.submit(msg("Make image"),"doimage"));
+        sb.append(HtmlUtil.formClose());
+
+
+
+        dataOutputHandler.returnGridDataset(path, dataset);
         return new Result("Grid Preview", sb);
     }
 
@@ -297,11 +321,30 @@ public class IdvOutputHandler extends OutputHandler {
      */
     public Result outputGrid(final Request request, Entry entry)
             throws Exception {
-
         if ( !request.exists("doimage")) {
             return outputGridForm(request, entry);
         }
-        return new Result("", new StringBuffer(""));
+
+        String id = entry.getId();
+        File image = getStorageManager().getThumbFile("preview_"
+                         + id.replace("/", "_") + ".gif");
+        StringBuffer isl = new StringBuffer();
+        isl.append("<isl debug=\"false\" loop=\"1\" offscreen=\"true\">\n");
+        isl.append("<datasource times=\"0\">\n");
+        isl.append("<fileset file=\"" + entry.getResource().getPath()
+                       + "\"/>\n");
+        isl.append(
+                   "<display type=\"planviewcolor\" param=\"" + request.getString(ARG_PARAM,"")+"\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
+        isl.append("</datasource>\n");
+        isl.append("<pause/>\n");
+        isl.append("<image file=\"" + image + "\"/>\n");
+        isl.append("</isl>\n");
+        //        System.out.println(isl);
+        idvServer.evaluateIsl(isl);
+        return new Result("preview.gif",
+                          getStorageManager().getFileInputStream(image),
+                          "image/gif");
+
     }
 
     /**
@@ -380,6 +423,7 @@ public class IdvOutputHandler extends OutputHandler {
                               getStorageManager().getFileInputStream(image),
                               "image/gif");
         }
+
 
         StringBuffer isl = new StringBuffer();
         isl.append("<isl debug=\"false\" loop=\"1\" offscreen=\"true\">\n");

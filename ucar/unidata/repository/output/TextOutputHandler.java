@@ -82,7 +82,7 @@ public class TextOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_WORDCLOUD =
-        new OutputType("Word Cloud", "wordclout", OutputType.TYPE_HTML, "",
+        new OutputType("Word Cloud", "wordcloud", OutputType.TYPE_HTML, "",
                        ICON_CLOUD);
 
 
