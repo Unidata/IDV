@@ -329,7 +329,7 @@ public class Admin extends RepositoryManager {
                                              ARG_LOG, log, ARG_BYTES,
                                              numBytes - 2000), "Less..."));
 
-        sb.append(HtmlUtil.p());
+        sb.append(HtmlUtil.br());
         if (offset > 0) {
             fis.skip(offset);
         } else {
@@ -356,10 +356,10 @@ public class Admin extends RepositoryManager {
                 lastOneBlank = false;
             }
             if (line.startsWith("</stack>") && (stackSB != null)) {
-                sb.append(HtmlUtil.makeShowHideBlock("Stack trace",
+                sb.append(HtmlUtil.insetLeft(HtmlUtil.makeShowHideBlock("Stack trace",
                         HtmlUtil.div(stackSB.toString(),
-                                     HtmlUtil.cssClass("stack")), false));
-                sb.append("\n");
+                                     HtmlUtil.cssClass("stack")), false),10));
+                sb.append("<br>");
                 stackSB = null;
             } else if (stackSB != null) {
                 line = HtmlUtil.entityEncode(line);

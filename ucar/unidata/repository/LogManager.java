@@ -213,7 +213,7 @@ import org.slf4j.LoggerFactory;
         }
 
 	if(thr!=null) {
-	    log.error(message+"\n<stack>"+LogUtil.getStackTrace(thr)+"</stack>");
+	    LOG.error(message+"\n<stack>\n"+thr+"\n"+LogUtil.getStackTrace(thr)+"\n</stack>");
 	}
 
     }
