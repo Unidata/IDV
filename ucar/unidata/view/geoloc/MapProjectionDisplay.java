@@ -350,11 +350,16 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             boolean offscreen, Dimension dimension, GraphicsDevice screen)
             throws VisADException, RemoteException {
         if (p == null) {
+	    Trace.call1("MapProjectionDisplay.getInstance:makeProjection");
             p = makeDefaultMapProjection();
+	    Trace.call2("MapProjectionDisplay.getInstance:makeProjection");
         }
         if (((mode == MODE_3D) || (mode == MODE_2Din3D)) && !force2D) {
-            return new MapProjectionDisplayJ3D(p, mode, offscreen, dimension,
+	    Trace.call1("MapProjectionDisplay.getInstance:new MapProjectionDisplayJ3D");
+            MapProjectionDisplay mpd =  new MapProjectionDisplayJ3D(p, mode, offscreen, dimension,
                     screen);
+	    Trace.call2("MapProjectionDisplay.getInstance:new MapProjectionDisplayJ3D");
+	    return mpd;
         } else {
             return new MapProjectionDisplayJ2D(p);
         }
@@ -1535,14 +1540,16 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                     + "Can't do (lat,lon) to (x,y) transformation");
             }
             double x, y;
+	    double[] t2x = t2[xIndex];
+	    double[] t2y = t2[yIndex];
             for (int i = 0; i < numpoints; i++) {
-                if (Double.isNaN(t2[xIndex][i])
-                        || Double.isNaN(t2[yIndex][i])) {
+                if (Double.isNaN(t2x[i])
+                        || Double.isNaN(t2y[i])) {
                     x = Double.NaN;
                     y = Double.NaN;
                 } else {
-                    x = (t2[xIndex][i] - offsetX) / scaleX;
-                    y = (t2[yIndex][i] - offsetY) / scaleY;
+                    x = (t2x[i] - offsetX) / scaleX;
+                    y = (t2y[i] - offsetY) / scaleY;
                 }
                 latlonalt[0][i] = x;
                 latlonalt[1][i] = y;
@@ -1604,21 +1611,29 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                                ? latlonalt[1]
                                : GeoUtils.normalizeLongitude(latlonalt[1]);
             }
+
+	    //            call1("mapProjection.fromReference", numpoints);
+	    //	    Trace.msg("MapProjectionDisplay. class=" + mapProjection.getClass().getName());
             t2 = mapProjection.fromReference(t2);
+	    //            call2("mapProjection.fromReference", numpoints);
+
             if (t2 == null) {
                 throw new VisADException(
                     "MapProjection.toReference: "
                     + "Can't do (lat,lon) to (x,y) transformation");
             }
             float x, y;
+	    float[]t2ax = t2[xIndex];
+	    float[]t2ay = t2[yIndex];
             for (int i = 0; i < numpoints; i++) {
-                if (Float.isNaN(t2[xIndex][i])
-                        || Float.isNaN(t2[yIndex][i])) {
+		float t2x = t2ax[i];
+		float t2y = t2ay[i];
+                if (t2x!=t2x || t2y!=t2y) {
                     x = Float.NaN;
                     y = Float.NaN;
                 } else {
-                    x = (float) ((t2[xIndex][i] - offsetX) / scaleX);
-                    y = (float) ((t2[yIndex][i] - offsetY) / scaleY);
+                    x = (float) ((t2x - offsetX) / scaleX);
+                    y = (float) ((t2y - offsetY) / scaleY);
                 }
                 latlonalt[0][i] = x;
                 latlonalt[1][i] = y;
