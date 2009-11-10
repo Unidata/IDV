@@ -1537,6 +1537,9 @@ public class GeoGridDataSource extends GridDataSource {
             o = ((TwoFacedObject) o).getId();
         }
 
+	if(o instanceof Integer) {
+	    return ((Integer)o).intValue();
+	}
 
         if (o instanceof String) {
             try {
@@ -1635,9 +1638,8 @@ public class GeoGridDataSource extends GridDataSource {
         GeoGrid geoGrid = myDataset.findGridByName(paramName);
 
 
-
-
         Trace.call1("GeoGridDataSource.make GeoGridAdapter");
+	//	System.err.println("levels:" + fromLevelIndex +" " + toLevelIndex);
         GeoGridAdapter adapter = makeGeoGridAdapter(dataChoice,
                                      givenDataSelection, requestProperties,
                                      fromLevelIndex, toLevelIndex, false);
@@ -1679,13 +1681,13 @@ public class GeoGridDataSource extends GridDataSource {
             }
         }
         Trace.call2("GeoGridDataSource.make times");
-        /*
+	/*
         System.err.print("times:");
         for(int i=0;i<timeIndices.length;i++) {
             System.err.print(" " + timeIndices[i]);
         }
         System.err.println("");
-        */
+	*/
 
         Trace.call1("GeoGridDataSource.getSequence");
         Object loadId = JobManager.getManager().startLoad("GeoGrid");
