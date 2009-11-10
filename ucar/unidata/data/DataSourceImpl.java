@@ -3264,13 +3264,17 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if ( !canPoll()) {
             return;
         }
-
-        if (getPollingInfo().getFilePattern() == null) {
-            pollingInfo.setFilePattern(descriptor.getPatterns());
-        }
-        if (pollingInfo.getIsActive()) {
-            startPolling();
-        }
+	if(descriptor==null) return;
+	
+	PollingInfo pollingInfo = getPollingInfo();
+	if(pollingInfo!=null) {
+	    if (pollingInfo.getFilePattern() == null) {
+		pollingInfo.setFilePattern(descriptor.getPatterns());
+	    }
+	    if (pollingInfo.getIsActive()) {
+		startPolling();
+	    }
+	}
     }
 
 
