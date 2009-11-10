@@ -3065,7 +3065,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      *
      * @return true if successful
      */
-    private boolean setProperty(String name, String value,
+    public boolean setProperty(String name, String value,
                                 boolean ignoreError) {
         try {
             return Misc.propertySet(this, name, value, ignoreError);
