@@ -794,16 +794,16 @@ public class GeoGridAdapter {
                 if (is1D && needToWrapLon) {
                     sizeX = sizeX + 1;
                 }
-                Trace.call1("making coordData array",
+                Trace.call1("GeoGridAdapter:making coordData array",
                             " size:" + (sizeX * sizeY * sizeZ));
                 coordData = (is1D)
                             ? new float[3][sizeX * sizeY * sizeZ]
                             : new float[3][sizeX * sizeZ];
-                Trace.call2("making coordData array");
+                Trace.call2("GeoGridAdapter:making coordData array");
 
                 int idx = 0;
                 if (is1D) {
-                    Trace.call1("getCoordValue");
+                    Trace.call1("GeoGridAdapter:getCoordValue");
                     float[] xValues = new float[sizeX];
                     float[] yValues = new float[sizeY];
                     for (int i = 0; i < xValues.length; i++) {
@@ -840,7 +840,7 @@ public class GeoGridAdapter {
                             }
                         }
                     }
-                    Trace.call2("getCoordValue", " cnt=" + idx);
+                    Trace.call2("GeoGridAdapter:getCoordValue", " cnt=" + idx);
                     lengths = (sizeZ > 1)
                               ? new int[] { sizeX, sizeY, sizeZ }
                               : new int[] { sizeX, sizeY };
