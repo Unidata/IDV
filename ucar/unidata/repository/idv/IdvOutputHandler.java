@@ -46,7 +46,9 @@ import ucar.unidata.data.grid.*;
 import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.idv.IdvServer;
 
+
 import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.ui.ImageGenerator;
 
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.data.*;
@@ -56,6 +58,7 @@ import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
 
+import ucar.unidata.util.Trace;
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.HtmlUtil;
@@ -83,6 +86,7 @@ import java.text.SimpleDateFormat;
 
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Date;
 import java.util.List;
 
@@ -95,6 +99,18 @@ import java.util.List;
  */
 public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_PARAM = "param";
+    public static final String ARG_DISPLAY = "display";
+    public static final String ARG_ACTION = "action";
+    public static final String ARG_TIME = "time";
+
+    public static final String ARG_IMAGE_WIDTH = "imagewidth";
+    public static final String ARG_IMAGE_HEIGHT = "imageheight";
+
+
+
+    public static final String ACTION_MAKEFORM = "action.makeform";
+    public static final String ACTION_MAKEPAGE = "action.makepage";
+    public static final String ACTION_MAKEIMAGE = "action.makeimage";
 
 
     //    public static void processScript(String scriptFile) throws Exception {
@@ -129,7 +145,7 @@ public class IdvOutputHandler extends OutputHandler {
             java.awt.GraphicsEnvironment e =
                 java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
             e.getDefaultScreenDevice();
-            idvServer = new IdvServer();
+            idvServer = new IdvServer(new File(getStorageManager().getDir("idv")));
             addType(OUTPUT_IDV_GRID);
         } catch (Throwable exc) {
             System.err.println(
@@ -257,57 +273,6 @@ public class IdvOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result outputGridForm(final Request request, Entry entry)
-            throws Exception {
-        StringBuffer sb   = new StringBuffer();
-
-        DataOutputHandler dataOutputHandler = getDataOutputHandler();
-        String path = dataOutputHandler.getPath(entry);
-        if (path == null) {
-            sb.append("Could not load grid");
-            return new Result("Grid Preview", sb);
-        }
-
-        GridDataset dataset =
-            dataOutputHandler.getGridDataset(entry,
-                                             path);
-
-
-        String       formUrl  = getRepository().URL_ENTRY_SHOW.getFullUrl();
-        sb.append(HtmlUtil.form(formUrl, ""));
-        sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
-        sb.append(HtmlUtil.hidden(ARG_OUTPUT,OUTPUT_IDV_GRID));
-
-        sb.append(HtmlUtil.formTable());
-
-        List options = new ArrayList();
-
-        GeoGridDataSource dataSource = new GeoGridDataSource(dataset);
-        List<DataChoice> choices = (List<DataChoice>)dataSource.getDataChoices();            
-        for(DataChoice dataChoice: choices) {
-            options.add(new TwoFacedObject(dataChoice.getDescription(), dataChoice.getName()));
-        }
-        sb.append(HtmlUtil.formEntry(msgLabel("Parameter"), HtmlUtil.select(ARG_PARAM, options)));
-        sb.append(HtmlUtil.formTableClose());
-        sb.append(HtmlUtil.submit(msg("Make image"),"doimage"));
-        sb.append(HtmlUtil.formClose());
-
-
-
-        dataOutputHandler.returnGridDataset(path, dataset);
-        return new Result("Grid Preview", sb);
-    }
-
 
     /**
      * _more_
@@ -321,26 +286,165 @@ public class IdvOutputHandler extends OutputHandler {
      */
     public Result outputGrid(final Request request, Entry entry)
             throws Exception {
-        if ( !request.exists("doimage")) {
-            return outputGridForm(request, entry);
+	String action = request.getString(ARG_ACTION, ACTION_MAKEFORM);
+
+
+        DataOutputHandler dataOutputHandler = getDataOutputHandler();
+        String path = dataOutputHandler.getPath(entry);
+        if (path == null) {
+	    StringBuffer sb  =new StringBuffer();
+            sb.append("Could not load grid");
+            return new Result("Grid Preview", sb);
         }
 
+        GridDataset dataset =
+            dataOutputHandler.getGridDataset(entry,
+                                             path);
+
+
+        GeoGridDataSource dataSource = new GeoGridDataSource(dataset);
+
+	try {
+	    if(action.equals(ACTION_MAKEFORM)) {
+		return outputGridForm(request, entry, dataSource);
+	    } else	if(action.equals(ACTION_MAKEPAGE)) {
+		return outputGridPage(request, entry, dataSource);
+	    } else {
+		return outputGridImage(request, entry, dataSource);
+	    }
+	} finally {
+	    dataOutputHandler.returnGridDataset(path, dataset);
+	}
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Result outputGridForm(final Request request, Entry entry, GeoGridDataSource dataSource)
+            throws Exception {
+        StringBuffer sb   = new StringBuffer();
+
+        String       formUrl  = getRepository().URL_ENTRY_SHOW.getFullUrl();
+        sb.append(HtmlUtil.form(formUrl, ""));
+        sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
+        sb.append(HtmlUtil.hidden(ARG_OUTPUT,OUTPUT_IDV_GRID));
+        sb.append(HtmlUtil.hidden(ARG_ACTION,ACTION_MAKEPAGE));
+
+
+
+        List<DataChoice> choices = (List<DataChoice>)dataSource.getDataChoices();            
+
+	List<String> tabLabels = new ArrayList<String>();
+	List<String> tabContents = new ArrayList<String>();
+	List displays = new ArrayList();
+	displays.add(new TwoFacedObject("Contour Plan View","planviewcontour"));
+	displays.add(new TwoFacedObject("Color Filled Contour Plan View","planviewcontourfilled"));
+	displays.add(new TwoFacedObject("Color Shaded Plan View","planviewcolor"));
+	for(int i=1;i<=3;i++) {
+	    StringBuffer tab = new StringBuffer();
+	    tab.append(HtmlUtil.formTable());
+	    List options = new ArrayList();
+	    options.add("");
+	    for(DataChoice dataChoice: choices) {
+		options.add(new TwoFacedObject(dataChoice.getDescription(), dataChoice.getName()));
+	    }
+	    tab.append(HtmlUtil.formEntry(msgLabel("Parameter"), HtmlUtil.select(ARG_PARAM+i, options)));
+	    tab.append(HtmlUtil.formEntry(msgLabel("Display Type"), HtmlUtil.select(ARG_DISPLAY+i, displays)));
+	    tab.append(HtmlUtil.formTableClose());
+	    tabLabels.add(msg("Display " + i));
+	    tabContents.add(tab.toString());
+	}
+        sb.append(HtmlUtil.makeTabs(tabLabels, tabContents,true,"tab_content"));
+
+        sb.append(HtmlUtil.submit(msg("Make image"),ARG_SUBMIT));
+        sb.append(HtmlUtil.formClose());
+        return new Result("Grid Preview", sb);
+    }
+
+
+
+
+    private Result outputGridPage(final Request request, Entry entry, GeoGridDataSource dataSource)
+	throws Exception {
+	StringBuffer sb = new StringBuffer();
+
+	int displayIdx=1;
+	String url = getRepository().URL_ENTRY_SHOW.getFullUrl();
+	List<String> args = new ArrayList<String>();
+        args.add(ARG_ENTRYID);
+	args.add(entry.getId());
+        args.add(ARG_OUTPUT);
+	args.add(OUTPUT_IDV_GRID.toString());
+        args.add(ARG_ACTION);
+	args.add(ACTION_MAKEIMAGE);
+	while(request.defined(ARG_PARAM+displayIdx)) {
+	    args.add(ARG_DISPLAY+displayIdx);
+	    args.add(request.getString(ARG_DISPLAY+displayIdx,""));
+	    args.add(ARG_PARAM+displayIdx);
+	    args.add(request.getString(ARG_PARAM+displayIdx,""));
+	    displayIdx++;
+	}
+	sb.append(HtmlUtil.img(HtmlUtil.url(url, args)));
+
+	return new Result("Grid Preview", sb);
+    }
+
+
+    public Result outputGridImage(final Request request, Entry entry, GeoGridDataSource dataSource)
+	throws Exception {
+	Trace.addNot(".*ShadowFunction.*");
+	Trace.addNot(".*GeoGrid.*");
+	//	Trace.addOnly(".*MapProjection.*");
+	//	Trace.addOnly(".*ProjectionCoordinateSystem.*");
+	Trace.startTrace();
         String id = entry.getId();
         File image = getStorageManager().getThumbFile("preview_"
                          + id.replace("/", "_") + ".gif");
         StringBuffer isl = new StringBuffer();
-        isl.append("<isl debug=\"false\" loop=\"1\" offscreen=\"true\">\n");
-        isl.append("<datasource times=\"0\">\n");
-        isl.append("<fileset file=\"" + entry.getResource().getPath()
-                       + "\"/>\n");
-        isl.append(
-                   "<display type=\"planviewcolor\" param=\"" + request.getString(ARG_PARAM,"")+"\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
+        isl.append("<isl debug=\"true\" loop=\"1\" offscreen=\"true\">\n");
+
+	//Create a new viewmanager
+	isl.append("<view><property name=\"wireframe\" value=\"false\"/><property name=\"showMaps\" value=\"false\"/></view>\n");
+
+        isl.append("<datasource id=\"datasource\" times=\"0\" >\n");
+	int displayIdx=1;
+	Hashtable props = new Hashtable();
+	props.put("datasource", dataSource);
+	while(request.defined(ARG_PARAM+displayIdx)) {
+	    String times = "1";
+	    String levels = XmlUtil.attrs(ImageGenerator.ATTR_LEVEL_FROM,"#0",
+					  ImageGenerator.ATTR_LEVEL_TO,"#1");
+	    String attrs = XmlUtil.attrs(ImageGenerator.ATTR_TIMES, times,
+					 ImageGenerator.ATTR_TYPE, request.getString(ARG_DISPLAY+displayIdx,""),
+					 ImageGenerator.ATTR_PARAM,request.getString(ARG_PARAM+displayIdx,""));
+	    isl.append(XmlUtil.tag("display", attrs+levels,XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
+								       XmlUtil.attrs("name","id",
+										     "value","thedisplay"+displayIdx))));
+	    displayIdx++;
+	}
+
         isl.append("</datasource>\n");
-        isl.append("<pause/>\n");
-        isl.append("<image file=\"" + image + "\"/>\n");
+	//        isl.append("<pause/>\n");
+	String clip = XmlUtil.tag("clip","");
+	clip = "";
+        isl.append(XmlUtil.tag("image", XmlUtil.attr("file",  image.toString()), clip));
         isl.append("</isl>\n");
         //        System.out.println(isl);
-        idvServer.evaluateIsl(isl);
+
+	long t1 = System.currentTimeMillis();
+        idvServer.evaluateIsl(isl,props);
+	long t2 = System.currentTimeMillis();
+	System.err.println("isl time:" + (t2-t1));
+
+	Trace.stopTrace();
         return new Result("preview.gif",
                           getStorageManager().getFileInputStream(image),
                           "image/gif");
@@ -352,7 +456,7 @@ public class IdvOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param group _more_
-     * @param subGroups _more_
+     * @param suGbroups _more_
      * @param entries _more_
      *
      * @return _more_

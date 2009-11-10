@@ -456,6 +456,8 @@ public class StorageManager extends RepositoryManager {
 
 
 
+
+
     /**
      * _more_
      *
@@ -692,6 +694,12 @@ public class StorageManager extends RepositoryManager {
 
     public String getPluginsDir() {
         String dir = IOUtil.joinDir(getRepositoryDir(), DIR_PLUGINS);
+        IOUtil.makeDirRecursive(new File(dir));
+        return dir;
+    }
+
+    public String getDir(String name) {
+        String dir = IOUtil.joinDir(getRepositoryDir(), name);
         IOUtil.makeDirRecursive(new File(dir));
         return dir;
     }
