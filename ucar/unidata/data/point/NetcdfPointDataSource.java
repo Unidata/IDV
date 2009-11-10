@@ -238,8 +238,8 @@ public class NetcdfPointDataSource extends PointDataSource {
         Exception        toThrow = new Exception("Datset is null");
         try {
             file = convertSourceFile(file);
-            pods = (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
-                ucar.nc2.constants.FeatureType.POINT, file, null, buf);
+            //pods = (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
+            //    ucar.nc2.constants.FeatureType.POINT, file, null, buf);
             if (pods == null) {  // try as ANY_POINT
                 pods = (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
                     ucar.nc2.constants.FeatureType.ANY_POINT, file, null, buf);
