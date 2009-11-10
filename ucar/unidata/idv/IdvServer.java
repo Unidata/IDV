@@ -24,6 +24,10 @@
 package ucar.unidata.idv;
 
 
+import java.util.Hashtable;
+
+import java.io.File;
+
 
 /**
  * @author IDV development team
@@ -33,33 +37,42 @@ public class IdvServer  {
     private Object MUTEX = new Object();
     private  MyIdv idv;
     private int callCnt=0;
+    private File userDir;
 
-    public IdvServer() throws Exception {
-        idv =new MyIdv();
+
+    public IdvServer(File userDir) throws Exception {
+        idv =new MyIdv((userDir==null?null:userDir.toString()));
+	this.userDir = userDir;
     }
 
 
     public void evaluateIsl(StringBuffer isl) throws Exception {
+	evaluateIsl(isl, new Hashtable());
+    }
+
+
+    public void evaluateIsl(StringBuffer isl, Hashtable properties) throws Exception {
         synchronized (MUTEX) {
             //Make a new one every 100 calls
             if (callCnt++ > 100) {
                 idv.cleanup();
-                idv =new MyIdv();
+		idv =new MyIdv((userDir==null?null:userDir.toString()));
                 callCnt = 0;
             }
-            idv.getImageGenerator().processScriptFile("xml:" + isl);
+            idv.getImageGenerator().processScriptFile("xml:" + isl, properties);
             idv.cleanup();
         }
 
     }
+
 
     public MyIdv getIdv() {
         return idv;
     }
 
     private class MyIdv extends IntegratedDataViewer {
-        public MyIdv() throws Exception {
-            super(false);
+        public MyIdv(String userDir) throws Exception {
+            super((userDir==null?new String[]{}:new String[]{ARG_USERPATH,userDir}),false);
         }
     }
 

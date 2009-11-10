@@ -300,6 +300,7 @@ public class StateManager extends IdvManager {
 
         //Now do any command line argument -Dname=value properties
         for (int i = 0; i < getArgsManager().argPropertyNames.size(); i++) {
+
             idvProperties.put(getArgsManager().argPropertyNames.get(i),
                               getArgsManager().argPropertyValues.get(i));
         }
@@ -343,13 +344,7 @@ public class StateManager extends IdvManager {
 
         //Load in the properties  to get some initial information (e.g., splash screen, store name, etc.)
 
-
-
         loadProperties();
-
-
-
-
 
 
         //Set the sitepath property if we were given it on the command line
@@ -428,7 +423,7 @@ public class StateManager extends IdvManager {
         getIdvUIManager().initSplash();
         getIdvUIManager().splashMsg("Initializing Resources");
 	try {
-	    if(getIdvUIManager().isMac()) {
+	    if(interactiveMode && getIdvUIManager().isMac()) {
 		new ucar.unidata.idv.mac.MacBridge(getIdv());
 	    }
 	} catch(Throwable ignore) {

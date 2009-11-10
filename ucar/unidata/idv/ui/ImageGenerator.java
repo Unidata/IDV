@@ -141,6 +141,8 @@ public class ImageGenerator extends IdvManager {
     public static final String PROP_LOOPINDEX = "loopindex";
 
 
+
+
     /** macro property */
     public static final String PROP_VIEWINDEX = "viewindex";
 
@@ -187,6 +189,9 @@ public class ImageGenerator extends IdvManager {
 
     /** isl tag */
     public static final String TAG_FILESET = "fileset";
+
+
+    public static final String TAG_VIEW = "view";
 
     /** isl tag */
     public static final String TAG_TEMPLATE = "template";
@@ -277,6 +282,10 @@ public class ImageGenerator extends IdvManager {
     public static final String TAG_TRANSPARENT = "transparent";
 
     public static final String TAG_BGTRANSPARENT = "backgroundtransparent";
+
+
+    public static final String ATTR_LEVEL_FROM = "levelfrom";
+    public static final String ATTR_LEVEL_TO = "levelto";
 
     public static final String ATTR_AZIMUTH = "azimuth";
     public static final String ATTR_TILT = "tilt";
@@ -620,7 +629,10 @@ public class ImageGenerator extends IdvManager {
     /** Keep around the last image captured */
     private Image lastImage;
 
+    private Hashtable objectMap;
 
+
+ 
     /**
      * Create me with the IDV
      *
@@ -666,6 +678,11 @@ public class ImageGenerator extends IdvManager {
      * @return Was it successful
      */
     public synchronized boolean processScriptFile(String islFile) {
+	return processScriptFile(islFile, new Hashtable());
+    }
+
+
+    public synchronized boolean processScriptFile(String islFile, Hashtable properties) {
         procs           = new Hashtable();
         idToDataSource  = new Hashtable();
         propertiesStack = new ArrayList();
@@ -724,9 +741,9 @@ public class ImageGenerator extends IdvManager {
             return error("Could not load script file:" + islFile);
         }
         try {
-
             String islPath = IOUtil.getFileRoot(islFile);
             putProperty("islpath", islPath);
+	    objectMap = properties;
             processNode(root);
             popProperties();
         } catch (InvocationTargetException ite) {
@@ -738,7 +755,9 @@ public class ImageGenerator extends IdvManager {
             return handleError(inner);
         } catch (Throwable exc) {
             return handleError(exc);
-        }
+        } finally {
+	    objectMap = null;
+	}
         return true;
     }
 
@@ -782,7 +801,7 @@ public class ImageGenerator extends IdvManager {
      * @return ok
      * @throws Throwable On badness
      */
-    private boolean processNode(Element node) throws Throwable {
+    private boolean processNode(Element node ) throws Throwable {
         String tagName = node.getTagName();
         //        System.err.println("tag:" + tagName);
 
@@ -1513,37 +1532,47 @@ public class ImageGenerator extends IdvManager {
      */
     protected boolean processTagDatasource(Element node) throws Throwable {
         debug("Creating data source");
-        Object dataObject = applyMacros(node, ATTR_URL, (String) null);
-        if (dataObject == null) {
-            dataObject = StringUtil.toString(findFiles(node));
-        }
-        String bundle = applyMacros(node, ATTR_BUNDLE, (String) null);
-        String type   = applyMacros(node, ATTR_TYPE, (String) null);
-        if ((bundle == null) && (dataObject == null)) {
-            return error(
-                "datasource tag requires either a url, fileset or a bundle");
-        }
+
         DataSource dataSource = null;
-        if (dataObject != null) {
-            dataSource = getIdv().makeOneDataSource(dataObject, type, null);
-            if (dataSource == null) {
-                return error("Failed to create data source:" + dataObject
-                             + " " + type);
-            }
-        } else {
-            try {
-                String bundleXml = IOUtil.readContents(bundle);
-                Object obj = getIdv().getEncoderForRead().toObject(bundleXml);
-                if ( !(obj instanceof DataSource)) {
-                    return error("datasource bundle is not a DataSource:"
-                                 + obj.getClass().getName());
-                }
-                dataSource = (DataSource) obj;
-            } catch (Exception exc) {
-                return error("Error loading data source bundle: " + bundle,
-                             exc);
-            }
+        String id = applyMacros(node, ATTR_ID, (String) null);
+        if (id != null && objectMap!=null) {
+	    dataSource = (DataSource) objectMap.get(id);
         }
+
+
+	if(dataSource==null) {
+	    Object dataObject = applyMacros(node, ATTR_URL, (String) null);
+	    if (dataObject == null) {
+		dataObject = StringUtil.toString(findFiles(node));
+	    }
+	    String bundle = applyMacros(node, ATTR_BUNDLE, (String) null);
+	    String type   = applyMacros(node, ATTR_TYPE, (String) null);
+	    if ((bundle == null) && (dataObject == null)) {
+		return error(
+			     "datasource tag requires either a url, fileset or a bundle");
+	    }
+
+	    if (dataObject != null) {
+		dataSource = getIdv().makeOneDataSource(dataObject, type, null);
+		if (dataSource == null) {
+		    return error("Failed to create data source:" + dataObject
+				 + " " + type);
+		}
+	    } else {
+		try {
+		    String bundleXml = IOUtil.readContents(bundle);
+		    Object obj = getIdv().getEncoderForRead().toObject(bundleXml);
+		    if ( !(obj instanceof DataSource)) {
+			return error("datasource bundle is not a DataSource:"
+				     + obj.getClass().getName());
+		    }
+		    dataSource = (DataSource) obj;
+		} catch (Exception exc) {
+		    return error("Error loading data source bundle: " + bundle,
+				 exc);
+		}
+	    }
+	}
 
 
         if (XmlUtil.hasAttribute(node, ATTR_TIMES)) {
@@ -1555,10 +1584,10 @@ public class ImageGenerator extends IdvManager {
 
         Hashtable properties = getProperties(node);
         dataSource.setObjectProperties(properties);
-        String id = applyMacros(node, ATTR_ID, (String) null);
         if (id != null) {
             idToDataSource.put(id, dataSource);
         }
+
         NodeList elements = XmlUtil.getElements(node);
         for (int childIdx = 0; childIdx < elements.getLength(); childIdx++) {
             Element child = (Element) elements.item(childIdx);
@@ -1625,12 +1654,38 @@ public class ImageGenerator extends IdvManager {
         return true;
     }
 
+    protected boolean processTagView(Element node) throws Throwable {
+        List vms = getViewManagers(node);
+        if(vms.size()==0) {
+	    StringBuffer properties = new StringBuffer();
+	    List nodes    = XmlUtil.findChildren(node, TAG_PROPERTY);
+	    for (int childIdx = 0; childIdx < nodes.size(); childIdx++) {
+		Element child = (Element) nodes.get(childIdx);
+		properties.append(applyMacros(child, ATTR_NAME)+"=" +
+				  applyMacros(child, ATTR_VALUE)+";");
+	    }
+	    vms.add(getIdv().getViewManager(ViewDescriptor.LASTACTIVE, false,  properties.toString()));
+	    return true;
+	}
+
+        for(int i=0;i<vms.size();i++) {
+	    ViewManager vm  = (ViewManager) vms.get(i);
+	    List nodes    = XmlUtil.findChildren(node, TAG_PROPERTY);
+	    for (int childIdx = 0; childIdx < nodes.size(); childIdx++) {
+		Element child = (Element) nodes.get(childIdx);
+	       vm.setProperty(applyMacros(child, ATTR_NAME),
+			      applyMacros(child, ATTR_VALUE),false);
+	    }
+	}
+	return true;
+    }
+
+
+
     protected boolean processTagViewpoint(Element node) throws Throwable {
         List vms = getViewManagers(node);
         if(vms.size()==0) debug("Could not find view managers processing:" + XmlUtil.toString(node));
         ViewpointInfo viewpointInfo = null;
-
-
 
 
         for(int i=0;i<vms.size();i++) {
@@ -1929,10 +1984,10 @@ public class ImageGenerator extends IdvManager {
         }
 
         if (applyMacros(node, ATTR_WAIT, true)) {
-            debug("Waiting for displays to render");
+	    debug("calling wait 2");
             getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
                 getIdv().getIdvUIManager());
-            debug("Done waiting for displays to render");
+	    debug("done calling wait 2");
         }
         getPersistenceManager().clearFileMapping();
         Color c = applyMacros(node, ATTR_COLOR, (Color) null);
@@ -1945,10 +2000,13 @@ public class ImageGenerator extends IdvManager {
             }
             viewManager.updateDisplayList();
         }
+
         //One more pause for the display lists
+	debug("Updating view managers");
         updateViewManagers();
         getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
                                                             getIdv().getIdvUIManager());
+	debug("Done updating view managers");
         return true;
     }
 
@@ -2478,7 +2536,9 @@ public class ImageGenerator extends IdvManager {
             return false;
         }
         if (applyMacros(node, ATTR_WAIT, true)) {
+	    debug("calling wait 3");
             pause();
+	    debug("done calling wait 3");
         }
         updateViewManagers();
         return true;
@@ -2530,8 +2590,23 @@ public class ImageGenerator extends IdvManager {
         }
         List dataChoices = new ArrayList();
         if (dataChoice != null) {
+	    dataChoice = dataChoice.createClone();
+	    DataSelection dataSelection = new DataSelection(applyMacros(node,ATTR_LEVEL_FROM,(String)null),
+							    applyMacros(node,ATTR_LEVEL_TO,(String)null));
+	    
+
+	    String timeString = applyMacros(node, ATTR_TIMES, (String)null);
+	    if(timeString!=null) {
+		List times = new ArrayList();
+		for(String tok: StringUtil.split(timeString,",",true,true)) {
+		    times.add(new Integer(tok));
+		}
+		dataSelection.setTimes(times);
+	    }
+	    dataChoice.setDataSelection(dataSelection);
             dataChoices.add(dataChoice);
         }
+
         if (type == null) {
             String bundleXml = null;
             if (XmlUtil.hasAttribute(node, ATTR_TEMPLATE)) {
@@ -3501,8 +3576,10 @@ public class ImageGenerator extends IdvManager {
                     new VectorGraphicsRenderer(viewManager);
                 vectorRenderer.renderTo(loopFilename);
             } else {
+		debug("calling wait 1");
                 getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
                                                                     getIdv().getIdvUIManager(),0);
+		debug("done calling wait 1");
                 //                int taskCnt = ActionImpl.getTaskCount();
                 //                StringBuffer stack = LogUtil.getStackDump(false,true);
                 lastImage = viewManager.getMaster().getImage(false);
