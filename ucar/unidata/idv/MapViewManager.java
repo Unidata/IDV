@@ -245,11 +245,14 @@ public class MapViewManager extends NavigatedViewManager {
     /** _more_          */
     private Flythrough flythrough;
 
+    private boolean showMaps = true;
+
 
     /**
      *  Default constructor
      */
-    public MapViewManager() {}
+    public MapViewManager() {
+    }
 
 
     /**
@@ -432,7 +435,8 @@ public class MapViewManager extends NavigatedViewManager {
             return;
         }
         super.init();
-        Trace.call1("MapViewManager.init checkDefaultMap");
+        Trace.call1("MapViewManager.init checkDefaultMap", " showMap:" + showMaps);
+	
         checkDefaultMap();
         Trace.call2("MapViewManager.init checkDefaultMap");
 
@@ -730,8 +734,6 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 
-
-
     /**
      * are the 2 values close
      *
@@ -754,6 +756,7 @@ public class MapViewManager extends NavigatedViewManager {
      * Check for the default map
      */
     private void checkDefaultMap() {
+	if(!showMaps) return;
         MapDisplayControl defaultMap = findDefaultMap();
         if (defaultMap == null) {
             try {
@@ -2039,8 +2042,6 @@ public class MapViewManager extends NavigatedViewManager {
             // ignore, don't set anything.   Uncomment for debugging
             // LogUtil.logException ( "addDisplayInfo:setMapProjection()", exp);
         }
-
-	
     }
 
 
@@ -2960,6 +2961,26 @@ public class MapViewManager extends NavigatedViewManager {
     public Flythrough getFlythrough() {
         return this.flythrough;
     }
+
+    /**
+       Set the ShowMaps property.
+
+       @param value The new value for ShowMaps
+    **/
+    public void setShowMaps (boolean value) {
+	this.showMaps = value;
+    }
+
+    /**
+       Get the ShowMaps property.
+
+       @return The ShowMaps
+    **/
+    public boolean getShowMaps () {
+	return this.showMaps;
+    }
+
+
 
 
 
