@@ -448,6 +448,8 @@ public class Misc {
                 argument = new Float(value);
             } else if (paramType.equals(Boolean.TYPE)) {
                 argument = new Boolean(value);
+            } else if(paramType.equals(Color.class)) {
+                argument  =GuiUtils.decodeColor(value,Color.white);
             } else if (paramType.equals(Dimension.class)) {
                 int idx = value.indexOf(":");
                 if (idx >= 0) {
