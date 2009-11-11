@@ -1656,6 +1656,16 @@ public class ImageGenerator extends IdvManager {
 
     protected boolean processTagView(Element node) throws Throwable {
         List vms = getViewManagers(node);
+
+        String width  = applyMacros(node, ATTR_WIDTH, (String) null);
+        String height = applyMacros(node, ATTR_HEIGHT, (String) null);
+        if ((width != null) && (height != null)) {
+            getIdv().getStateManager().setViewSize(
+                new Dimension(
+                    new Integer(width).intValue(),
+                    new Integer(height).intValue()));
+        }
+
         if(vms.size()==0) {
 	    StringBuffer properties = new StringBuffer();
 	    List nodes    = XmlUtil.findChildren(node, TAG_PROPERTY);

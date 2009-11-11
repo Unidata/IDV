@@ -42,6 +42,7 @@ public class IdvServer  {
 
     public IdvServer(File userDir) throws Exception {
         idv =new MyIdv((userDir==null?null:userDir.toString()));
+	idv.getStateManager().putProperty(IdvConstants.PROP_MAP_MAP_LEVEL,"0");
 	this.userDir = userDir;
     }
 
@@ -57,6 +58,7 @@ public class IdvServer  {
             if (callCnt++ > 100) {
                 idv.cleanup();
 		idv =new MyIdv((userDir==null?null:userDir.toString()));
+		idv.getStateManager().putProperty(IdvConstants.PROP_MAP_MAP_LEVEL,"0");
                 callCnt = 0;
             }
             idv.getImageGenerator().processScriptFile("xml:" + isl, properties);
