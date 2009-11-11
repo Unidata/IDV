@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data.point;
 
 
@@ -36,8 +37,8 @@ import ucar.unidata.idv.ui.ValueSliderComponent;
 
 import ucar.unidata.ui.TimeLengthField;
 import ucar.unidata.ui.symbol.StationModel;
-import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
@@ -633,7 +634,8 @@ public abstract class PointDataSource extends FilesDataSource {
             List<DataSelectionComponent> components,
             final DataChoice dataChoice) {
 
-        if (dataChoice instanceof CompositeDataChoice || !(dataChoice.getId() instanceof List)) {
+        if ((dataChoice instanceof CompositeDataChoice)
+                || !(dataChoice.getId() instanceof List)) {
             components.add(new PlotModelSelectionComponent(this));
         } else {
             components.add(new GridParameters(this));
@@ -890,14 +892,16 @@ public abstract class PointDataSource extends FilesDataSource {
         for (int i = 0; i < sources.size(); i++) {
             String dataChoiceDesc = getDescription();
             String dataChoiceName = getDataName();
-            if(uberChoice!=null) {
-                dataChoiceDesc = IOUtil.getFileTail(sources.get(i).toString());
-                dataChoiceName = IOUtil.getFileTail(sources.get(i).toString());
+            if (uberChoice != null) {
+                dataChoiceDesc =
+                    IOUtil.getFileTail(sources.get(i).toString());
+                dataChoiceName =
+                    IOUtil.getFileTail(sources.get(i).toString());
             }
 
             DataChoice choice = new DirectDataChoice(this, new Integer(i),
-                                                     dataChoiceDesc, dataChoiceName,
-                                                     getPointCategories(), properties);
+                                    dataChoiceDesc, dataChoiceName,
+                                    getPointCategories(), properties);
 
             /*
               We'd like to create sub choices for each parameter but we don't really
@@ -908,13 +912,15 @@ public abstract class PointDataSource extends FilesDataSource {
                                     getPointCategories(), properties);
                                     choice.addDataChoice(subChoice);*/
 
-            if (uberChoice!=null) {
+            if (uberChoice != null) {
                 ((CompositeDataChoice) uberChoice).addDataChoice(choice);
             } else {
                 addDataChoice(choice);
             }
             //Only add the grid data choices for the first source
-            if(i>0) continue;
+            if (i > 0) {
+                continue;
+            }
             try {
                 FieldImpl sample = (makeGridFields
                                     ? getSample(choice)
@@ -1002,8 +1008,8 @@ public abstract class PointDataSource extends FilesDataSource {
             int idx = ((Integer) id).intValue();
             return (String) sources.get(idx);
         }
-        if(dataChoice instanceof CompositeDataChoice) {
-            return (String)sources.get(0);
+        if (dataChoice instanceof CompositeDataChoice) {
+            return (String) sources.get(0);
         }
 
         return null;
@@ -1044,7 +1050,8 @@ public abstract class PointDataSource extends FilesDataSource {
      */
     protected boolean shouldCache(DataChoice dataChoice, Data data) {
         Object id = dataChoice.getId();
-        if (!(dataChoice instanceof CompositeDataChoice) && id instanceof List) {
+        if ( !(dataChoice instanceof CompositeDataChoice)
+                && (id instanceof List)) {
             //Note: idList can also
             List idList = (List) id;
             //Check if its a first guess field
@@ -1082,12 +1089,12 @@ public abstract class PointDataSource extends FilesDataSource {
         //If it is a list then we are doing a grid field
         boolean doGriddedData = false;
         if (id instanceof List) {
-            if(((List)id).get(0) instanceof Integer) {
+            if (((List) id).get(0) instanceof Integer) {
                 doGriddedData = true;
             }
         }
         if (doGriddedData) {
-            List      idList     = (List) id;
+            List idList = (List) id;
             //            Integer   i          = (Integer) idList.get(0);
             RealType  type       = (RealType) idList.get(1);
             Hashtable properties = dataChoice.getProperties();
@@ -1132,18 +1139,20 @@ public abstract class PointDataSource extends FilesDataSource {
 
             //Merge the point obs
             properties.put(PROP_GRID_PARAM, type);
-            FieldImpl pointObs=null;
-            List datas = new ArrayList();
-            for(int i=0;i<sources.size();i++) {
-                DataChoice choice = new DirectDataChoice(this, new Integer(i), "", "",
-                                                         dataChoice.getCategories(), properties);
+            FieldImpl pointObs = null;
+            List      datas    = new ArrayList();
+            for (int i = 0; i < sources.size(); i++) {
+                DataChoice choice = new DirectDataChoice(this,
+                                        new Integer(i), "", "",
+                                        dataChoice.getCategories(),
+                                        properties);
                 pointObs = (FieldImpl) getDataInner(choice, category,
-                                                              dataSelection, requestProperties);
-                if(pointObs!=null) {
+                        dataSelection, requestProperties);
+                if (pointObs != null) {
                     datas.add(pointObs);
                 }
             }
-            if(datas.size()==0) {
+            if (datas.size() == 0) {
                 return null;
             }
             pointObs = PointObFactory.mergeData(datas);
@@ -1247,12 +1256,11 @@ public abstract class PointDataSource extends FilesDataSource {
             List datas = new ArrayList(choices.size());
             for (int i = 0; i < choices.size(); i++) {
                 DataChoice subDataChoice = (DataChoice) choices.get(i);
-                FieldImpl obs = makeObs(subDataChoice,
-                                        dataSelection, llr);
+                FieldImpl  obs = makeObs(subDataChoice, dataSelection, llr);
                 if (obs == null) {
-                    return null;
+                    continue;
                 }
-                
+
                 //                if (true) {
                 //                    return obs;
                 //                }
@@ -1260,6 +1268,9 @@ public abstract class PointDataSource extends FilesDataSource {
                 if (fieldsDescription == null) {
                     makeFieldDescription(obs);
                 }
+            }
+            if (datas.isEmpty()) {
+                return null;
             }
             retField = PointObFactory.mergeData(datas);
         } catch (Exception exc) {

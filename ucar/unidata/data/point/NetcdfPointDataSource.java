@@ -126,7 +126,7 @@ public class NetcdfPointDataSource extends PointDataSource {
     /**
      * Can this datasource do the geoselection subsetting and decimation
      *
-     * @return _can do geo subsetting
+     * @return can do geo subsetting
      */
     public boolean canDoGeoSelection() {
         return true;
@@ -150,8 +150,6 @@ public class NetcdfPointDataSource extends PointDataSource {
     public boolean canSaveDataToLocalDisk() {
         return !isFileBased();
     }
-
-
 
 
     /**

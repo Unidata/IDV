@@ -1412,9 +1412,10 @@ public class PointObFactory {
                 dateRange = new DateRange(new Date(now.getTime() - timespan),
                                           now);
             }
-        //} else if (true) {
-        //    dateRange = new DateRange(null, new DateType(true, null), new TimeDuration("1 hour"), null);
         }
+        //if (dateRange == null) {
+        //    dateRange = new DateRange(null, new DateType(true, null), new TimeDuration("1 hour"), null);
+        //}
         if (fc instanceof PointFeatureCollection) {
             collection = (PointFeatureCollection) fc;
             if ((llr != null) || (dateRange != null)) {

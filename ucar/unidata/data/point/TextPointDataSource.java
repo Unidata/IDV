@@ -238,6 +238,16 @@ public class TextPointDataSource extends PointDataSource {
         return true;
     }
 
+    /**
+     * Used for the geo subsetting property gui as to whether to
+     * show the stride or not
+     *
+     * @return default is true
+     */
+    protected boolean canDoGeoSelectionStride() {
+        return false;
+    }
+
 
     /**
      * Create a TextPointDataSource from the path name
