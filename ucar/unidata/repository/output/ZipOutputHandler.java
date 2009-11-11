@@ -354,8 +354,9 @@ public class ZipOutputHandler extends OutputHandler {
 	    //We are getting some weirdness in the database connections so lets
 	    //sleep a bit every 100 entries we see
 
-	    if(counter[0]%100) {
-		Misc.sleep(100);
+	    if(counter[0]%100==0) {
+                System.err.println("zip count:" + counter[0]);
+		Misc.sleep(10);
 	    }
             if (entry.isGroup() && recurse) {
                 Group group = (Group) entry;

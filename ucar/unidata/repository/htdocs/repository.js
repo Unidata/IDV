@@ -1098,6 +1098,16 @@ function hide(id) {
     hideObject(util.getDomObject(id));
 }
 
+function setFormValue(id, value) {
+    var obj = util.getDomObject(id);
+    obj.obj.value   = value;
+}
+
+
+function setHtml(id, html) {
+    var obj = util.getDomObject(id);
+    obj.obj.innerHTML = html;
+}
 
 function showAjaxPopup(event,srcId,url) {
     util.loadXML( url, handleAjaxPopup,srcId);
@@ -1207,8 +1217,6 @@ function toggleVisibilityOnObject(obj, display) {
         return 0;
     }
 }
-
-
 
 
 

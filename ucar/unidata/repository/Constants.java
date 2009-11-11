@@ -117,6 +117,8 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_PUBLISH = "ramadda.icon.publish";
 
+    public static final String ICON_PLANVIEW = "ramadda.icon.planview";
+
     /** _more_ */
     public static final String ICON_ENTRY_UPLOAD =
         "ramadda.icon.entry_upload";

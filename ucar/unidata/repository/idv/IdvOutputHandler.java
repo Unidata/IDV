@@ -47,6 +47,7 @@ import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.idv.IdvServer;
 
 
+import ucar.unidata.idv.IdvBase;
 import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.idv.ui.ImageGenerator;
 
@@ -58,6 +59,7 @@ import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
 
+import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.DateUtil;
@@ -99,11 +101,27 @@ import java.util.List;
  */
 public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_PARAM = "param";
+    public static final String ARG_COLORTABLE= "colortable";
+
+
+    public static final String ARG_DISPLAYUNIT = "displayunit";
+    public static final String ARG_ISOSURFACEVALUE = "isosurfacevalue";
+    public static final String ARG_CONTOUR_MIN= "contour_min";
+    public static final String ARG_CONTOUR_MAX= "contour_max";
+    public static final String ARG_CONTOUR_INTERVAL= "contour_interval";
+    public static final String ARG_CONTOUR_BASE= "contour_base";
+    public static final String ARG_CONTOUR_DASHED= "contour_dashed";
+    public static final String ARG_CONTOUR_LABELS= "contour_labels";
+
+
+    public static final String ARG_RANGE_MIN= "range_min";
+    public static final String ARG_RANGE_MAX= "range_max";
     public static final String ARG_DISPLAY = "display";
     public static final String ARG_ACTION = "action";
     public static final String ARG_TIMES = "times";
     public static final String ARG_SHOWMAP = "showmap";
     public static final String ARG_CLIP = "clip";
+    public static final String ARG_WHITEBACKGROUND = "whitebackground";
 
     public static final String ARG_LEVELS = "levels";
 
@@ -118,12 +136,23 @@ public class IdvOutputHandler extends OutputHandler {
 
     public static final int  NUM_PARAMS = 3;
     
+
+
+
+    public static final String DISPLAY_PLANVIEWCONTOUR = "planviewcontour";
+    public static final String DISPLAY_PLANVIEWCONTOURFILLED = "planviewcontourfilled";
+    public static final String DISPLAY_PLANVIEWCOLOR = "planviewcolor";
+    public static final String DISPLAY_ISOSURFACE = "isosurface";
+
+
+
     //    public static void processScript(String scriptFile) throws Exception {
 
 
     /** _more_ */
     public static final OutputType OUTPUT_IDV_GRID =
-        new OutputType("Grid Preview", "idv.grid", OutputType.TYPE_HTML);
+        new OutputType("Grid Visualization", "idv.grid", OutputType.TYPE_HTML,                                                    OutputType.SUFFIX_NONE,
+                       ICON_PLANVIEW);
 
 
     /** _more_ */
@@ -331,6 +360,8 @@ public class IdvOutputHandler extends OutputHandler {
 
         String       formUrl  = getRepository().URL_ENTRY_SHOW.getFullUrl();
         sb.append(HtmlUtil.form(formUrl, ""));
+        sb.append(HtmlUtil.submit(msg("Make image"),ARG_SUBMIT));
+        sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
         sb.append(HtmlUtil.hidden(ARG_OUTPUT,OUTPUT_IDV_GRID));
         sb.append(HtmlUtil.hidden(ARG_ACTION,ACTION_MAKEPAGE));
@@ -340,6 +371,7 @@ public class IdvOutputHandler extends OutputHandler {
         List<DataChoice> choices = (List<DataChoice>)dataSource.getDataChoices();            
 
 	StringBuffer basic = new StringBuffer();
+
 	basic.append(HtmlUtil.formTable());
 	basic.append(HtmlUtil.formEntry(msgLabel("Show map"),
 					HtmlUtil.checkbox(ARG_SHOWMAP,"true",true)));
@@ -347,11 +379,15 @@ public class IdvOutputHandler extends OutputHandler {
 	basic.append(HtmlUtil.formEntry(msgLabel("Clip image"),
 					HtmlUtil.checkbox(ARG_CLIP,"true",false)));
 
+	basic.append(HtmlUtil.formEntry(msgLabel("White Background"),
+					HtmlUtil.checkbox(ARG_WHITEBACKGROUND,"true",false)));
+
+
 	basic.append(HtmlUtil.formEntry(msgLabel("Width"),
-					HtmlUtil.input(ARG_IMAGE_WIDTH,"400",HtmlUtil.attr(HtmlUtil.ATTR_COLS,"5"))));
+					HtmlUtil.input(ARG_IMAGE_WIDTH,"600",HtmlUtil.attr(HtmlUtil.ATTR_SIZE,"5"))));
 
 	basic.append(HtmlUtil.formEntry(msgLabel("Height"),
-					HtmlUtil.input(ARG_IMAGE_HEIGHT,"300",HtmlUtil.attr(HtmlUtil.ATTR_COLS,"5"))));
+					HtmlUtil.input(ARG_IMAGE_HEIGHT,"400",HtmlUtil.attr(HtmlUtil.ATTR_SIZE,"5"))));
 	
 
 
@@ -368,6 +404,8 @@ public class IdvOutputHandler extends OutputHandler {
 	tabContents.add(basic.toString());
 
 
+        List colorTables = idvServer.getIdv().getColorTableManager().getColorTables();
+
 
 	Hashtable<String,DataChoice> idToChoice = new Hashtable<String,DataChoice>();
 	for(DataChoice dataChoice: choices) {
@@ -376,19 +414,22 @@ public class IdvOutputHandler extends OutputHandler {
 
 	List displays = new ArrayList();
 	displays.add(new TwoFacedObject("--skip--",""));
-	displays.add(new TwoFacedObject("Contour Plan View","planviewcontour"));
-	displays.add(new TwoFacedObject("Color Filled Contour Plan View","planviewcontourfilled"));
-	displays.add(new TwoFacedObject("Color Shaded Plan View","planviewcolor"));
+	displays.add(new TwoFacedObject("Color Shaded Plan View",DISPLAY_PLANVIEWCOLOR));
+	displays.add(new TwoFacedObject("Contour Plan View",DISPLAY_PLANVIEWCONTOUR));
+	displays.add(new TwoFacedObject("Color Filled Contour Plan View",DISPLAY_PLANVIEWCONTOURFILLED));
+	displays.add(new TwoFacedObject("Isosurface",DISPLAY_ISOSURFACE));
+
 	for(int displayIdx=1;displayIdx<=NUM_PARAMS;displayIdx++) {
 	    if(!request.defined(ARG_PARAM+displayIdx)) continue;
 	    StringBuffer tab = new StringBuffer();
 	    String param = request.getString(ARG_PARAM+displayIdx,"");
 	    DataChoice choice = idToChoice.get(param);
 	    tab.append(HtmlUtil.hidden(ARG_PARAM+displayIdx,request.getString(ARG_PARAM+displayIdx,"")));
-	    tab.append(HtmlUtil.formTable());
+            StringBuffer formTable = new StringBuffer();
+	    formTable.append(HtmlUtil.formTable());
 	    List options = new ArrayList();
 	    options.add("");
-	    tab.append(HtmlUtil.formEntry(msgLabel("Display Type"), HtmlUtil.select(ARG_DISPLAY+displayIdx, displays)));
+	    formTable.append(HtmlUtil.formEntry(msgLabel("Display Type"), HtmlUtil.select(ARG_DISPLAY+displayIdx, displays)));
 	    List times = choice.getAllDateTimes();
 	    if(times!=null && times.size()>0) {
 		List tfoTimes =new ArrayList();
@@ -396,7 +437,7 @@ public class IdvOutputHandler extends OutputHandler {
 		for(Object time: times) {
 		    tfoTimes.add(new TwoFacedObject(time.toString(), new Integer(cnt++)));
 		}
-		tab.append(HtmlUtil.formEntryTop(msgLabel("Times"), HtmlUtil.select(ARG_TIMES+displayIdx, tfoTimes,"",
+		formTable.append(HtmlUtil.formEntryTop(msgLabel("Times"), HtmlUtil.select(ARG_TIMES+displayIdx, tfoTimes,"",
 										  HtmlUtil.attrs(HtmlUtil.ATTR_MULTIPLE,"true",
 												 HtmlUtil.ATTR_SIZE,"5"))));
 	    }
@@ -408,20 +449,86 @@ public class IdvOutputHandler extends OutputHandler {
 		for(Object level: levels) {
 		    tfoLevels.add(new TwoFacedObject(level.toString(), new Integer(cnt++)));
 		}
-		tab.append(HtmlUtil.formEntryTop(msgLabel("Levels"), HtmlUtil.select(ARG_LEVELS+displayIdx, tfoLevels,"",
+		formTable.append(HtmlUtil.formEntryTop(msgLabel("Levels"), HtmlUtil.select(ARG_LEVELS+displayIdx, tfoLevels,"",
 										  HtmlUtil.attrs(HtmlUtil.ATTR_MULTIPLE,"false",
 												 HtmlUtil.ATTR_SIZE,"5"))));
 		
 	    }
 	    
 
-	    tab.append(HtmlUtil.formTableClose());
+	    formTable.append(HtmlUtil.formTableClose());
 
+
+            List<String> ctCats  = new ArrayList<String>();
+            Hashtable<String, StringBuffer> ctCatMap  = new Hashtable<String,StringBuffer>(); 
+            for(ColorTable colorTable:(List<ColorTable>) colorTables) {
+                StringBuffer catSB = ctCatMap.get(colorTable.getCategory());
+                if(catSB == null) {
+                    catSB = new StringBuffer();
+                    ctCatMap.put(colorTable.getCategory(), catSB);
+                    ctCats.add(colorTable.getCategory());
+                }
+                String icon = IOUtil.cleanFileName(colorTable.getName())+".png";
+                icon  = icon.replace(" ","_");
+                String div = HtmlUtil.div(HtmlUtil.img(getRepository().getUrlBase() +"/colortables/" + icon) +" " + colorTable.getName(),"");
+                String call = HtmlUtil.call("setFormValue","'" + ARG_COLORTABLE+displayIdx+"','" + colorTable.getName()+"'") +";" +
+                    HtmlUtil.call("setHtml","'" + ARG_COLORTABLE+"_html"+ displayIdx+"','" + colorTable.getName()+"'");
+
+                catSB.append(HtmlUtil.mouseClickHref(call, div));
+            }
+
+
+            StringBuffer ctsb = new StringBuffer();
+            ctsb.append(msgLabel("Range")+HtmlUtil.space(1) + HtmlUtil.input(ARG_RANGE_MIN+displayIdx,"", HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"5")) +" - " +
+                        HtmlUtil.input(ARG_RANGE_MAX+displayIdx,"", HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"5")));
+	    ctsb.append(HtmlUtil.hidden(ARG_COLORTABLE+displayIdx,"",HtmlUtil.id(""+ARG_COLORTABLE+displayIdx)));
+            ctsb.append(HtmlUtil.div("-default-", HtmlUtil.id(ARG_COLORTABLE+"_html"+ displayIdx)));
+            String call = HtmlUtil.call("setFormValue","'" + ARG_COLORTABLE+displayIdx+"','" + ""+"'") +";" +
+                HtmlUtil.call("setHtml","'" + ARG_COLORTABLE+"_html"+ displayIdx+"','" + "-default-"+"'");
+            ctsb.append(HtmlUtil.mouseClickHref(call, "Use default"));
+            for(String ctcat: ctCats) {
+                ctsb.append(HtmlUtil.makeShowHideBlock(ctcat,
+                                                      ctCatMap.get(ctcat).toString(),false));
+
+            }
+
+            StringBuffer contoursb  = new StringBuffer();
+            contoursb.append(HtmlUtil.formTable());
+            contoursb.append(HtmlUtil.formEntry(msgLabel("Interval"), HtmlUtil.input(ARG_CONTOUR_INTERVAL+displayIdx,"",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"3"))));
+            contoursb.append(HtmlUtil.formEntry(msgLabel("Base"), HtmlUtil.input(ARG_CONTOUR_BASE+displayIdx,"",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"3"))));
+            contoursb.append(HtmlUtil.formEntry(msgLabel("Min"), HtmlUtil.input(ARG_CONTOUR_MIN+displayIdx,"",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"3"))));
+            contoursb.append(HtmlUtil.formEntry(msgLabel("Max"), HtmlUtil.input(ARG_CONTOUR_MAX+displayIdx,"",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"3"))));
+            contoursb.append(HtmlUtil.formEntry(msgLabel("Dashed"), HtmlUtil.checkbox(ARG_CONTOUR_DASHED+displayIdx,"true",false)));
+            contoursb.append(HtmlUtil.formEntry(msgLabel("Labels"), HtmlUtil.checkbox(ARG_CONTOUR_LABELS+displayIdx,"true",true)));
+            contoursb.append(HtmlUtil.formTableClose());
+
+
+            StringBuffer misc = new StringBuffer();
+            misc.append(HtmlUtil.formTable());
+            misc.append(HtmlUtil.formEntry(msgLabel("Display Unit"), HtmlUtil.input(ARG_DISPLAYUNIT+displayIdx,"",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"6"))));
+            misc.append(HtmlUtil.formEntry(msgLabel("Isosurface Value"), HtmlUtil.input(ARG_ISOSURFACEVALUE+displayIdx,"",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"3"))));
+            misc.append(HtmlUtil.formTableClose());
+
+            List<String> innerTabTitles = new ArrayList<String>();
+            List<String> innerTabContents = new ArrayList<String>();
+            innerTabTitles.add(msg("Color Table"));
+            innerTabContents.add(ctsb.toString());
+
+            innerTabTitles.add(msg("Contours"));
+            innerTabContents.add(contoursb.toString());
+
+            innerTabTitles.add(msg("Misc"));
+            innerTabContents.add(misc.toString());
+
+
+            String innerTab = HtmlUtil.makeTabs(innerTabTitles, innerTabContents,true,"tab_content");
+            tab.append(HtmlUtil.table(new Object[]{formTable, HtmlUtil.inset(HtmlUtil.p()+innerTab,10)}));
 	    tabLabels.add(choice.getDescription());
 	    tabContents.add(tab.toString());
 	}
         sb.append(HtmlUtil.makeTabs(tabLabels, tabContents,true,"tab_content"));
 
+        sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.submit(msg("Make image"),ARG_SUBMIT));
         sb.append(HtmlUtil.formClose());
         return new Result("Grid Preview", sb);
@@ -491,12 +598,20 @@ public class IdvOutputHandler extends OutputHandler {
 	Trace.addNot(".*GeoGrid.*");
 	//	Trace.addOnly(".*MapProjection.*");
 	//	Trace.addOnly(".*ProjectionCoordinateSystem.*");
-	Trace.startTrace();
+        //	Trace.startTrace();
         String id = entry.getId();
         File image = getStorageManager().getThumbFile("preview_"
                          + id.replace("/", "_") + ".gif");
         StringBuffer isl = new StringBuffer();
         isl.append("<isl debug=\"true\" loop=\"1\" offscreen=\"true\">\n");
+
+        StringBuffer viewProps = new StringBuffer();
+        viewProps.append(XmlUtil.tag("property", XmlUtil.attrs("name","wireframe","value","false")));
+        viewProps.append(XmlUtil.tag("property", XmlUtil.attrs("name","showMaps","value",""+request.get(ARG_SHOWMAP, false))));
+        if(request.get(ARG_WHITEBACKGROUND,false)) {
+            viewProps.append(XmlUtil.tag("property", XmlUtil.attrs("name","background","value","white")));
+            viewProps.append(XmlUtil.tag("property", XmlUtil.attrs("name","foreground","value","black")));
+        }
 
 	//Create a new viewmanager
 	isl.append(XmlUtil.tag(ImageGenerator.TAG_VIEW,
@@ -504,9 +619,9 @@ public class IdvOutputHandler extends OutputHandler {
 					     request.getString(ARG_IMAGE_WIDTH,"400"),
 					     ImageGenerator.ATTR_HEIGHT,
 					     request.getString(ARG_IMAGE_HEIGHT,"300")),
-			       XmlUtil.tag("property", XmlUtil.attrs("name","wireframe","value","false")) +
-			       XmlUtil.tag("property", XmlUtil.attrs("name","showMaps","value",""+request.get(ARG_SHOWMAP, false)))));
+                               viewProps.toString()));
 
+        System.err.println (isl);
 
 
         isl.append("<datasource id=\"datasource\" times=\"0\" >\n");
@@ -522,13 +637,75 @@ public class IdvOutputHandler extends OutputHandler {
 
 	    String display = request.getString(ARG_DISPLAY+displayIdx,"");
 	    
+            StringBuffer propSB = new StringBuffer();
+            propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
+                                      XmlUtil.attrs("name","id",
+                                                    "value","thedisplay"+displayIdx)));
 
 
-	    String level = request.getString(ARG_LEVELS+displayIdx,"0");
-	    System.err.println ("level: " + level);
+
+
+
+            if(display.equals(DISPLAY_PLANVIEWCONTOUR)) {
+                StringBuffer  s = new StringBuffer();
+                if(request.defined(ARG_CONTOUR_INTERVAL+displayIdx))
+                    s.append("interval=" +request.getString(ARG_CONTOUR_INTERVAL+displayIdx,"") +";");
+                if(request.defined(ARG_CONTOUR_BASE+displayIdx))
+                    s.append("base=" +request.getString(ARG_CONTOUR_BASE+displayIdx,"") +";");
+                if(request.defined(ARG_CONTOUR_MIN+displayIdx))
+                    s.append("min=" +request.getString(ARG_CONTOUR_MIN+displayIdx,"") +";");
+                if(request.defined(ARG_CONTOUR_MAX+displayIdx))
+                    s.append("max=" +request.getString(ARG_CONTOUR_MAX+displayIdx,"") +";");
+
+                s.append("dashed=" +request.get(ARG_CONTOUR_DASHED+displayIdx,false) +";");
+                s.append("labels=" +request.get(ARG_CONTOUR_LABELS+displayIdx,false) +";");
+                propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
+                                          XmlUtil.attrs("name","contourInfoParams",
+                                                        "value",s.toString())));
+            }
+
+
+
+            if(request.defined(ARG_RANGE_MIN+displayIdx) && request.defined(ARG_RANGE_MAX+displayIdx)) {
+                propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
+                                          XmlUtil.attrs("name","range",
+                                                        "value",request.getString(ARG_RANGE_MIN+displayIdx,"").trim()+":" +
+                                                        request.getString(ARG_RANGE_MAX+displayIdx,"").trim())));
+
+                
+
+            }
+
+
+            if(request.defined(ARG_COLORTABLE+displayIdx)) {
+                propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
+                                          XmlUtil.attrs("name","colorTableName",
+                                                        "value",request.getString(ARG_COLORTABLE+displayIdx,""))));;
+
+            }
+
+            
+
+            String level = request.getString(ARG_LEVELS+displayIdx,"0");
+
 
 	    String levels = XmlUtil.attrs(ImageGenerator.ATTR_LEVEL_FROM,"#" + level,
 					  ImageGenerator.ATTR_LEVEL_TO,"#" + level);
+            if(display.equals(DISPLAY_ISOSURFACE)) {
+                levels ="";
+                if(request.defined(ARG_ISOSURFACEVALUE+displayIdx)) {
+                    propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
+                                              XmlUtil.attrs("name","surfaceValue",
+                                                            "value",request.getString(ARG_ISOSURFACEVALUE+displayIdx,""))));
+                }
+            }
+
+            if(request.defined(ARG_DISPLAYUNIT+displayIdx)) {
+                propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
+                                          XmlUtil.attrs("name","settingsDisplayUnit",
+                                                        "value",request.getString(ARG_DISPLAYUNIT+displayIdx,""))));
+            }
+
 	    String attrs = XmlUtil.attrs(ImageGenerator.ATTR_TYPE, display,
 					 ImageGenerator.ATTR_PARAM,request.getString(ARG_PARAM+displayIdx,""));
 	    String timeAttr = "";
@@ -537,14 +714,10 @@ public class IdvOutputHandler extends OutputHandler {
 	    if(times.size()>0) {
 		timeAttr = XmlUtil.attrs(ImageGenerator.ATTR_TIMES, StringUtil.join(",",times));
 	    }
-	    System.err.println ("Time:" + timeAttr);
 	    
-	    StringBuffer which = (display.equals("planviewcontour")?secondDisplays:firstDisplays);
+	    StringBuffer which = (display.equals(DISPLAY_PLANVIEWCONTOUR)?secondDisplays:firstDisplays);
 
-	    which.append(XmlUtil.tag(ImageGenerator.TAG_DISPLAY, attrs+levels+timeAttr,
-				     XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
-								       XmlUtil.attrs("name","id",
-										     "value","thedisplay"+displayIdx))));
+	    which.append(XmlUtil.tag(ImageGenerator.TAG_DISPLAY, attrs+levels+timeAttr,propSB.toString()));
 	}
 
 	isl.append(firstDisplays);
