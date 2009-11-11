@@ -23,6 +23,7 @@
 
 
 
+
 package ucar.unidata.data.imagery;
 
 
@@ -47,9 +48,9 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.visad.data.AreaImageFlatField;
 
 import visad.*;
+
 import visad.data.DataRange;
 import visad.data.DataRange;
-import visad.util.ThreadManager;
 
 import visad.data.mcidas.AreaAdapter;
 
@@ -57,7 +58,8 @@ import visad.meteorology.ImageSequence;
 import visad.meteorology.ImageSequenceManager;
 import visad.meteorology.SingleBandedImage;
 
-import java.text.SimpleDateFormat;
+import visad.util.ThreadManager;
+
 import java.awt.*;
 import java.awt.event.*;
 
@@ -65,6 +67,8 @@ import java.io.File;
 import java.io.IOException;
 
 import java.rmi.RemoteException;
+
+import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 
@@ -76,10 +80,10 @@ import java.util.Hashtable;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.swing.*;
 import javax.swing.event.*;
-import java.util.TimeZone;
 
 
 /**
@@ -130,6 +134,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
     /** _more_ */
     private AreaDirectory[][] currentDirs;
 
+    /** _more_          */
     private Hashtable timeMap = new Hashtable();
 
     /**
@@ -190,24 +195,30 @@ public abstract class ImageDataSource extends DataSourceImpl {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param object _more_
+     * @param properties _more_
+     */
     public void reloadData(Object object, Hashtable properties) {
-	if(object instanceof ImageDataset) {
-	    ImageDataset ids = (ImageDataset) object;
-	    setImageList(new ArrayList(ids.getImageDescriptors()));
-	} else if(object instanceof List) {
-	    String[]images = StringUtil.listToStringArray((List)object);
+        if (object instanceof ImageDataset) {
+            ImageDataset ids = (ImageDataset) object;
+            setImageList(new ArrayList(ids.getImageDescriptors()));
+        } else if (object instanceof List) {
+            String[] images = StringUtil.listToStringArray((List) object);
             setImageList(makeImageDescriptors(images));
-	} else {
-	    try {
-		String[] images = (String[]) object;
-		setImageList(makeImageDescriptors(images));
-	    } catch(Exception exc) {
-		return;
-	    }
-	}
-	setDescription(getImageDataSourceName());
-	reloadProperties(properties);
-	reloadData();
+        } else {
+            try {
+                String[] images = (String[]) object;
+                setImageList(makeImageDescriptors(images));
+            } catch (Exception exc) {
+                return;
+            }
+        }
+        setDescription(getImageDataSourceName());
+        reloadProperties(properties);
+        reloadData();
     }
 
 
@@ -254,24 +265,25 @@ public abstract class ImageDataSource extends DataSourceImpl {
      */
     public List getDataPaths() {
         List paths = new ArrayList();
-        SimpleDateFormat sdf = new SimpleDateFormat("_" + DATAPATH_DATE_FORMAT);
+        SimpleDateFormat sdf = new SimpleDateFormat("_"
+                                   + DATAPATH_DATE_FORMAT);
         try {
             for (int i = 0; i < imageList.size(); i++) {
-                AddeImageDescriptor aid = getDescriptor(imageList.get(i));
-                String path = aid.getSource();
-                DateTime dttm = (DateTime)   timeMap.get(path);
+                AddeImageDescriptor aid  = getDescriptor(imageList.get(i));
+                String              path = aid.getSource();
+                DateTime            dttm = (DateTime) timeMap.get(path);
                 /*                if(dttm!=null) {
                     String dateString = sdf.format(ucar.visad.Util.makeDate(dttm));
                     if(path.indexOf(".area")>=0 && path.indexOf(dateString)==-1) {
                         path = path.replace(".area", dateString+".area");
-                    } 
+                    }
                     System.err.println("path:" + path);
                     paths.add(new Object[]{path,path+dateString});
                     } else {*/
-                    paths.add(path);
-                    //                }
-            } 
-        } catch(Exception exc) {
+                paths.add(path);
+                //                }
+            }
+        } catch (Exception exc) {
             throw new ucar.unidata.util.WrapperException(exc);
         }
         return paths;
@@ -356,18 +368,20 @@ public abstract class ImageDataSource extends DataSourceImpl {
     protected List saveDataToLocalDisk(String prefix, Object loadId,
                                        boolean changeLinks)
             throws Exception {
-        List urls = new ArrayList();
+        List urls     = new ArrayList();
         List suffixes = new ArrayList();
-        SimpleDateFormat sdf = new SimpleDateFormat("_" + DATAPATH_DATE_FORMAT);
+        SimpleDateFormat sdf = new SimpleDateFormat("_"
+                                   + DATAPATH_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         for (int i = 0; i < imageList.size(); i++) {
-            AddeImageDescriptor aid = getDescriptor(imageList.get(i));
-            String url = aid.getSource();
-            DateTime dttm = (DateTime)   timeMap.get(url);
-            if(dttm!=null) {
-                suffixes.add(sdf.format(ucar.visad.Util.makeDate(dttm))+".area");
+            AddeImageDescriptor aid  = getDescriptor(imageList.get(i));
+            String              url  = aid.getSource();
+            DateTime            dttm = (DateTime) timeMap.get(url);
+            if (dttm != null) {
+                suffixes.add(sdf.format(ucar.visad.Util.makeDate(dttm))
+                             + ".area");
             } else {
-                suffixes.add(i+".area");
+                suffixes.add(i + ".area");
             }
             urls.add(url);
         }
@@ -1133,6 +1147,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
             }
 
 
+
             if (areaDir == null) {
                 areaDir = aid.getDirectory();
             }
@@ -1155,6 +1170,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                         : 0) + "_" + ((areaDir.getStartTime() != null)
                                       ? "" + areaDir.getStartTime().getTime()
                                       : "") + ".dat");
+
 
                 AreaImageFlatField aiff = AreaImageFlatField.create(aid,
                                               areaDir, getCacheDataToDisk(),
@@ -1181,7 +1197,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
                 timeMap.put(aid.getSource(), aa.getImageStartTime());
                 result = aa.getImage();
-                aa = null;
+                aa     = null;
             }
             putCache(source, result);
             return result;
@@ -1199,6 +1215,16 @@ public abstract class ImageDataSource extends DataSourceImpl {
     public void reloadData() {
         currentDirs = null;
         super.reloadData();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getCacheDataToDisk() {
+        return true;
     }
 
 
@@ -1296,7 +1322,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 //                   + "\nfrom aii:" + biggestPosition.makeAddeUrl());
                 //                AreaDirectoryList adl =
                 //                    new AreaDirectoryList(biggestPosition.makeAddeUrl());
-                biggestSource = biggestSource.replace("imagedata", "imagedir");
+                biggestSource = biggestSource.replace("imagedata",
+                        "imagedir");
                 AreaDirectoryList adl = new AreaDirectoryList(biggestSource);
                 biggestPosition.setRequestType(AddeImageInfo.REQ_IMAGEDATA);
                 currentDirs = adl.getSortedDirs();
@@ -1304,15 +1331,19 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 currentDirs = null;
             }
 
-            ThreadManager threadManager = new ThreadManager("image data reading");
+            ThreadManager threadManager =
+                new ThreadManager("image data reading");
             //threadManager.debug = true;
-            final ImageSequenceManager sequenceManager = new ImageSequenceManager();
-            int                  cnt             = 1;
-            DataChoice           parent          = dataChoice.getParent();
-            final List<SingleBandedImage>images = new ArrayList<SingleBandedImage>();
+            final ImageSequenceManager sequenceManager =
+                new ImageSequenceManager();
+            int        cnt    = 1;
+            DataChoice parent = dataChoice.getParent();
+            final List<SingleBandedImage> images =
+                new ArrayList<SingleBandedImage>();
             for (Iterator iter =
                     descriptorsToUse.iterator(); iter.hasNext(); ) {
-                final AddeImageDescriptor aid = (AddeImageDescriptor) iter.next();
+                final AddeImageDescriptor aid =
+                    (AddeImageDescriptor) iter.next();
                 if (currentDirs != null) {
                     int idx =
                         Math.abs(aid.getImageInfo().getDatasetPosition());
@@ -1334,29 +1365,33 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 }
                 label = label + dataChoice.toString();
                 final String readLabel = "Time: " + (cnt++) + "/"
-                                   + descriptorsToUse.size() + "  " + label;
+                                         + descriptorsToUse.size() + "  "
+                                         + label;
 
                 threadManager.addRunnable(new ThreadManager.MyRunnable() {
-                        public void run() throws Exception {
-                            try {
-                                SingleBandedImage image = makeImage(aid, true, readLabel);
-                                if (image != null) {
-                                    synchronized(images) {
-                                        images.add(image);
-                                    }
+                    public void run() throws Exception {
+                        try {
+                            SingleBandedImage image = makeImage(aid, true,
+                                                          readLabel);
+                            if (image != null) {
+                                synchronized (images) {
+                                    images.add(image);
                                 }
-                            } catch (VisADException ve) {
-                                LogUtil.printMessage(ve.toString());
                             }
-                        }});
+                        } catch (VisADException ve) {
+                            LogUtil.printMessage(ve.toString());
+                        }
+                    }
+                });
             }
 
             try {
-                threadManager.runInParallel(getDataContext().getIdv().getMaxDataThreadCount());
+                threadManager.runInParallel(
+                    getDataContext().getIdv().getMaxDataThreadCount());
             } catch (VisADException ve) {
                 LogUtil.printMessage(ve.toString());
             }
-            return    sequenceManager.addImagesToSequence(images);
+            return sequenceManager.addImagesToSequence(images);
         } catch (Exception exc) {
             throw new ucar.unidata.util.WrapperException(exc);
         }
@@ -1666,10 +1701,10 @@ public abstract class ImageDataSource extends DataSourceImpl {
      */
     public void doRemove() {
         super.doRemove();
-        myDataChoices   = null;
+        myDataChoices         = null;
         myCompositeDataChoice = null;
-        imageTimes = null;
-        currentDirs = null;
+        imageTimes            = null;
+        currentDirs           = null;
     }
 
 
