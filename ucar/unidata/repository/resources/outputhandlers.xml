@@ -11,6 +11,7 @@
   <outputhandler class="ucar.unidata.repository.data.CatalogOutputHandler" name="THREDDS Catalog"/>
   <outputhandler class="ucar.unidata.repository.output.KmlOutputHandler" name="KML"/>
   <outputhandler class="ucar.unidata.repository.output.DifOutputHandler" name="GCMD DIF"/>
+  <outputhandler class="ucar.unidata.repository.data.LasOutputHandler" name="LAS XML"/>
   <outputhandler class="ucar.unidata.repository.data.DataOutputHandler" name="Data" required="true"/>
   <outputhandler class="ucar.unidata.repository.output.RssOutputHandler" name="RSS"/>
   <outputhandler class="ucar.unidata.repository.output.IcalOutputHandler" name="ICAL"/>

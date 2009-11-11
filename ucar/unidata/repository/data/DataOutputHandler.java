@@ -531,6 +531,7 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
+
     /**
      * _more_
      *
@@ -538,7 +539,7 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public String getTdsUrl(Entry entry) {
+   public String getOpendapUrl(Entry entry) {
         return "/" + ARG_OUTPUT + ":"
                + Request.encodeEmbedded(OUTPUT_OPENDAP) + "/" + ARG_ENTRYID
                + ":" + Request.encodeEmbedded(entry.getId()) + "/"

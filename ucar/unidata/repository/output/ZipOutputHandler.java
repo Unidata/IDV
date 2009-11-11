@@ -283,7 +283,7 @@ public class ZipOutputHandler extends OutputHandler {
         boolean         ok   = true;
         //First recurse down without a zos to check the size
         try {
-            processZip(request, entries, recurse, null, prefix, 0);
+            processZip(request, entries, recurse, null, prefix, 0, new int[]{0});
         } catch (IllegalArgumentException iae) {
             ok = false;
         }
@@ -301,7 +301,7 @@ public class ZipOutputHandler extends OutputHandler {
         ZipOutputStream zos  = new ZipOutputStream(os);
         Hashtable       seen = new Hashtable();
         try {
-            processZip(request, entries, recurse, zos, prefix, 0);
+            processZip(request, entries, recurse, zos, prefix, 0, new int[]{0});
         } catch (IllegalArgumentException iae) {
             ok = false;
         }
@@ -334,7 +334,7 @@ public class ZipOutputHandler extends OutputHandler {
      */
     protected long processZip(Request request, List<Entry> entries,
                               boolean recurse, ZipOutputStream zos,
-                              String prefix, long sizeSoFar)
+                              String prefix, long sizeSoFar, int[]counter)
             throws Exception {
         long      sizeProcessed = 0;
         Hashtable seen          = new Hashtable();
@@ -350,6 +350,13 @@ public class ZipOutputHandler extends OutputHandler {
                             2000);
         }
         for (Entry entry : entries) {
+	    counter[0]++;
+	    //We are getting some weirdness in the database connections so lets
+	    //sleep a bit every 100 entries we see
+
+	    if(counter[0]%100) {
+		Misc.sleep(100);
+	    }
             if (entry.isGroup() && recurse) {
                 Group group = (Group) entry;
                 List<Entry> children = getEntryManager().getChildren(request,
@@ -359,7 +366,7 @@ public class ZipOutputHandler extends OutputHandler {
                     path = prefix + "/" + path;
                 }
                 sizeProcessed += processZip(request, children, recurse, zos,
-                                            path, sizeProcessed + sizeSoFar);
+                                            path, sizeProcessed + sizeSoFar,counter);
             }
             if ( !getAccessManager().canDownload(request, entry)) {
                 continue;

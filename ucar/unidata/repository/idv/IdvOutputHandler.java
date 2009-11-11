@@ -101,18 +101,23 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_PARAM = "param";
     public static final String ARG_DISPLAY = "display";
     public static final String ARG_ACTION = "action";
-    public static final String ARG_TIME = "time";
+    public static final String ARG_TIMES = "times";
+    public static final String ARG_SHOWMAP = "showmap";
+    public static final String ARG_CLIP = "clip";
+
+    public static final String ARG_LEVELS = "levels";
 
     public static final String ARG_IMAGE_WIDTH = "imagewidth";
     public static final String ARG_IMAGE_HEIGHT = "imageheight";
 
 
-
+    public static final String ACTION_MAKEINITFORM = "action.makeinitform";
     public static final String ACTION_MAKEFORM = "action.makeform";
     public static final String ACTION_MAKEPAGE = "action.makepage";
     public static final String ACTION_MAKEIMAGE = "action.makeimage";
 
-
+    public static final int  NUM_PARAMS = 3;
+    
     //    public static void processScript(String scriptFile) throws Exception {
 
 
@@ -155,17 +160,7 @@ public class IdvOutputHandler extends OutputHandler {
         }
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public DataOutputHandler getDataOutputHandler() throws Exception {
-        return (DataOutputHandler) getRepository().getOutputHandler(
-            DataOutputHandler.OUTPUT_OPENDAP);
-    }
+
 
     /**
      * _more_
@@ -286,7 +281,7 @@ public class IdvOutputHandler extends OutputHandler {
      */
     public Result outputGrid(final Request request, Entry entry)
             throws Exception {
-	String action = request.getString(ARG_ACTION, ACTION_MAKEFORM);
+	String action = request.getString(ARG_ACTION, ACTION_MAKEINITFORM);
 
 
         DataOutputHandler dataOutputHandler = getDataOutputHandler();
@@ -305,7 +300,9 @@ public class IdvOutputHandler extends OutputHandler {
         GeoGridDataSource dataSource = new GeoGridDataSource(dataset);
 
 	try {
-	    if(action.equals(ACTION_MAKEFORM)) {
+	    if(action.equals(ACTION_MAKEINITFORM)) {
+		return outputGridInitForm(request, entry, dataSource);
+	    } else   if(action.equals(ACTION_MAKEFORM)) {
 		return outputGridForm(request, entry, dataSource);
 	    } else	if(action.equals(ACTION_MAKEPAGE)) {
 		return outputGridPage(request, entry, dataSource);
@@ -342,28 +339,132 @@ public class IdvOutputHandler extends OutputHandler {
 
         List<DataChoice> choices = (List<DataChoice>)dataSource.getDataChoices();            
 
+	StringBuffer basic = new StringBuffer();
+	basic.append(HtmlUtil.formTable());
+	basic.append(HtmlUtil.formEntry(msgLabel("Show map"),
+					HtmlUtil.checkbox(ARG_SHOWMAP,"true",true)));
+
+	basic.append(HtmlUtil.formEntry(msgLabel("Clip image"),
+					HtmlUtil.checkbox(ARG_CLIP,"true",false)));
+
+	basic.append(HtmlUtil.formEntry(msgLabel("Width"),
+					HtmlUtil.input(ARG_IMAGE_WIDTH,"400",HtmlUtil.attr(HtmlUtil.ATTR_COLS,"5"))));
+
+	basic.append(HtmlUtil.formEntry(msgLabel("Height"),
+					HtmlUtil.input(ARG_IMAGE_HEIGHT,"300",HtmlUtil.attr(HtmlUtil.ATTR_COLS,"5"))));
+	
+
+
+	
+
+
+
+	basic.append(HtmlUtil.formTableClose());
+
+
 	List<String> tabLabels = new ArrayList<String>();
 	List<String> tabContents = new ArrayList<String>();
+	tabLabels.add(msg("Basic"));
+	tabContents.add(basic.toString());
+
+
+
+	Hashtable<String,DataChoice> idToChoice = new Hashtable<String,DataChoice>();
+	for(DataChoice dataChoice: choices) {
+	    idToChoice.put(dataChoice.getName(),dataChoice);
+	}
+
 	List displays = new ArrayList();
+	displays.add(new TwoFacedObject("--skip--",""));
 	displays.add(new TwoFacedObject("Contour Plan View","planviewcontour"));
 	displays.add(new TwoFacedObject("Color Filled Contour Plan View","planviewcontourfilled"));
 	displays.add(new TwoFacedObject("Color Shaded Plan View","planviewcolor"));
-	for(int i=1;i<=3;i++) {
+	for(int displayIdx=1;displayIdx<=NUM_PARAMS;displayIdx++) {
+	    if(!request.defined(ARG_PARAM+displayIdx)) continue;
 	    StringBuffer tab = new StringBuffer();
+	    String param = request.getString(ARG_PARAM+displayIdx,"");
+	    DataChoice choice = idToChoice.get(param);
+	    tab.append(HtmlUtil.hidden(ARG_PARAM+displayIdx,request.getString(ARG_PARAM+displayIdx,"")));
 	    tab.append(HtmlUtil.formTable());
+	    List options = new ArrayList();
+	    options.add("");
+	    tab.append(HtmlUtil.formEntry(msgLabel("Display Type"), HtmlUtil.select(ARG_DISPLAY+displayIdx, displays)));
+	    List times = choice.getAllDateTimes();
+	    if(times!=null && times.size()>0) {
+		List tfoTimes =new ArrayList();
+		int cnt=0;
+		for(Object time: times) {
+		    tfoTimes.add(new TwoFacedObject(time.toString(), new Integer(cnt++)));
+		}
+		tab.append(HtmlUtil.formEntryTop(msgLabel("Times"), HtmlUtil.select(ARG_TIMES+displayIdx, tfoTimes,"",
+										  HtmlUtil.attrs(HtmlUtil.ATTR_MULTIPLE,"true",
+												 HtmlUtil.ATTR_SIZE,"5"))));
+	    }
+	    
+	    List levels = choice.getAllLevels();
+	    if(levels!=null && levels.size()>0) {
+		List tfoLevels =new ArrayList();
+		int cnt=0;
+		for(Object level: levels) {
+		    tfoLevels.add(new TwoFacedObject(level.toString(), new Integer(cnt++)));
+		}
+		tab.append(HtmlUtil.formEntryTop(msgLabel("Levels"), HtmlUtil.select(ARG_LEVELS+displayIdx, tfoLevels,"",
+										  HtmlUtil.attrs(HtmlUtil.ATTR_MULTIPLE,"false",
+												 HtmlUtil.ATTR_SIZE,"5"))));
+		
+	    }
+	    
+
+	    tab.append(HtmlUtil.formTableClose());
+
+	    tabLabels.add(choice.getDescription());
+	    tabContents.add(tab.toString());
+	}
+        sb.append(HtmlUtil.makeTabs(tabLabels, tabContents,true,"tab_content"));
+
+        sb.append(HtmlUtil.submit(msg("Make image"),ARG_SUBMIT));
+        sb.append(HtmlUtil.formClose());
+        return new Result("Grid Preview", sb);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Result outputGridInitForm(final Request request, Entry entry, GeoGridDataSource dataSource)
+            throws Exception {
+        StringBuffer sb   = new StringBuffer();
+
+        String       formUrl  = getRepository().URL_ENTRY_SHOW.getFullUrl();
+        sb.append(HtmlUtil.form(formUrl, ""));
+        sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
+        sb.append(HtmlUtil.hidden(ARG_OUTPUT,OUTPUT_IDV_GRID));
+        sb.append(HtmlUtil.hidden(ARG_ACTION,ACTION_MAKEFORM));
+
+
+        List<DataChoice> choices = (List<DataChoice>)dataSource.getDataChoices();            
+
+
+	sb.append(msgHeader("Select one or more fields to view"));
+
+	StringBuffer fields  = new StringBuffer();
+	for(int i=1;i<=NUM_PARAMS;i++) {
 	    List options = new ArrayList();
 	    options.add("");
 	    for(DataChoice dataChoice: choices) {
 		options.add(new TwoFacedObject(dataChoice.getDescription(), dataChoice.getName()));
 	    }
-	    tab.append(HtmlUtil.formEntry(msgLabel("Parameter"), HtmlUtil.select(ARG_PARAM+i, options)));
-	    tab.append(HtmlUtil.formEntry(msgLabel("Display Type"), HtmlUtil.select(ARG_DISPLAY+i, displays)));
-	    tab.append(HtmlUtil.formTableClose());
-	    tabLabels.add(msg("Display " + i));
-	    tabContents.add(tab.toString());
+	    fields.append(HtmlUtil.select(ARG_PARAM+i, options));
+	    fields.append(HtmlUtil.p());
 	}
-        sb.append(HtmlUtil.makeTabs(tabLabels, tabContents,true,"tab_content"));
-
+	sb.append(HtmlUtil.insetLeft(fields.toString(), 10));
         sb.append(HtmlUtil.submit(msg("Make image"),ARG_SUBMIT));
         sb.append(HtmlUtil.formClose());
         return new Result("Grid Preview", sb);
@@ -375,25 +476,11 @@ public class IdvOutputHandler extends OutputHandler {
     private Result outputGridPage(final Request request, Entry entry, GeoGridDataSource dataSource)
 	throws Exception {
 	StringBuffer sb = new StringBuffer();
-
-	int displayIdx=1;
 	String url = getRepository().URL_ENTRY_SHOW.getFullUrl();
-	List<String> args = new ArrayList<String>();
-        args.add(ARG_ENTRYID);
-	args.add(entry.getId());
-        args.add(ARG_OUTPUT);
-	args.add(OUTPUT_IDV_GRID.toString());
-        args.add(ARG_ACTION);
-	args.add(ACTION_MAKEIMAGE);
-	while(request.defined(ARG_PARAM+displayIdx)) {
-	    args.add(ARG_DISPLAY+displayIdx);
-	    args.add(request.getString(ARG_DISPLAY+displayIdx,""));
-	    args.add(ARG_PARAM+displayIdx);
-	    args.add(request.getString(ARG_PARAM+displayIdx,""));
-	    displayIdx++;
-	}
-	sb.append(HtmlUtil.img(HtmlUtil.url(url, args)));
-
+	Hashtable exceptArgs = new Hashtable();
+	exceptArgs.put(ARG_ACTION, ARG_ACTION);
+	String args = request.getUrlArgs(exceptArgs, null);
+	sb.append(HtmlUtil.img(url + "?" + ARG_ACTION +"=" + ACTION_MAKEIMAGE+"&" + args));
 	return new Result("Grid Preview", sb);
     }
 
@@ -412,30 +499,65 @@ public class IdvOutputHandler extends OutputHandler {
         isl.append("<isl debug=\"true\" loop=\"1\" offscreen=\"true\">\n");
 
 	//Create a new viewmanager
-	isl.append("<view><property name=\"wireframe\" value=\"false\"/><property name=\"showMaps\" value=\"false\"/></view>\n");
+	isl.append(XmlUtil.tag(ImageGenerator.TAG_VIEW,
+			       XmlUtil.attrs(ImageGenerator.ATTR_WIDTH,
+					     request.getString(ARG_IMAGE_WIDTH,"400"),
+					     ImageGenerator.ATTR_HEIGHT,
+					     request.getString(ARG_IMAGE_HEIGHT,"300")),
+			       XmlUtil.tag("property", XmlUtil.attrs("name","wireframe","value","false")) +
+			       XmlUtil.tag("property", XmlUtil.attrs("name","showMaps","value",""+request.get(ARG_SHOWMAP, false)))));
+
+
 
         isl.append("<datasource id=\"datasource\" times=\"0\" >\n");
-	int displayIdx=1;
 	Hashtable props = new Hashtable();
 	props.put("datasource", dataSource);
-	while(request.defined(ARG_PARAM+displayIdx)) {
-	    String times = "1";
-	    String levels = XmlUtil.attrs(ImageGenerator.ATTR_LEVEL_FROM,"#0",
-					  ImageGenerator.ATTR_LEVEL_TO,"#1");
-	    String attrs = XmlUtil.attrs(ImageGenerator.ATTR_TIMES, times,
-					 ImageGenerator.ATTR_TYPE, request.getString(ARG_DISPLAY+displayIdx,""),
+	StringBuffer firstDisplays = new StringBuffer();
+	StringBuffer secondDisplays = new StringBuffer();
+	boolean multipleTimes = false;
+	
+	for(int displayIdx=1;displayIdx<=NUM_PARAMS;displayIdx++) {
+	    if(!request.defined(ARG_PARAM+displayIdx) ||
+	       !request.defined(ARG_DISPLAY+displayIdx)) continue;
+
+	    String display = request.getString(ARG_DISPLAY+displayIdx,"");
+	    
+
+
+	    String level = request.getString(ARG_LEVELS+displayIdx,"0");
+	    System.err.println ("level: " + level);
+
+	    String levels = XmlUtil.attrs(ImageGenerator.ATTR_LEVEL_FROM,"#" + level,
+					  ImageGenerator.ATTR_LEVEL_TO,"#" + level);
+	    String attrs = XmlUtil.attrs(ImageGenerator.ATTR_TYPE, display,
 					 ImageGenerator.ATTR_PARAM,request.getString(ARG_PARAM+displayIdx,""));
-	    isl.append(XmlUtil.tag("display", attrs+levels,XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
+	    String timeAttr = "";
+	    List times = request.get(ARG_TIMES+displayIdx, new ArrayList());
+	    if(times.size()>1)  multipleTimes = true;
+	    if(times.size()>0) {
+		timeAttr = XmlUtil.attrs(ImageGenerator.ATTR_TIMES, StringUtil.join(",",times));
+	    }
+	    System.err.println ("Time:" + timeAttr);
+	    
+	    StringBuffer which = (display.equals("planviewcontour")?secondDisplays:firstDisplays);
+
+	    which.append(XmlUtil.tag(ImageGenerator.TAG_DISPLAY, attrs+levels+timeAttr,
+				     XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
 								       XmlUtil.attrs("name","id",
 										     "value","thedisplay"+displayIdx))));
-	    displayIdx++;
 	}
 
+	isl.append(firstDisplays);
+	isl.append(secondDisplays);
+	
         isl.append("</datasource>\n");
 	//        isl.append("<pause/>\n");
-	String clip = XmlUtil.tag("clip","");
-	clip = "";
-        isl.append(XmlUtil.tag("image", XmlUtil.attr("file",  image.toString()), clip));
+	String clip = "";
+	if(request.get(ARG_CLIP, false)) {
+	    clip = XmlUtil.tag("clip","");
+	}
+	    
+        isl.append(XmlUtil.tag((multipleTimes?"movie":"image"), XmlUtil.attr("file",  image.toString()), clip));
         isl.append("</isl>\n");
         //        System.out.println(isl);
 

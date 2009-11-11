@@ -515,7 +515,7 @@ public class CatalogOutputHandler extends OutputHandler {
 
         if (canDataLoad(request, entry)) {
             String urlPath =
-                getRepository().getDataOutputHandler().getTdsUrl(entry);
+                getRepository().getDataOutputHandler().getOpendapUrl(entry);
             addService(catalogInfo, SERVICE_OPENDAP,
                        getRepository().URL_ENTRY_SHOW.getFullUrl());
 

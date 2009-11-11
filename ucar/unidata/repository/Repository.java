@@ -2857,6 +2857,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /** _more_ */
     private boolean trackMsg = false;
 
+    public String getRepositoryName() {
+	return getProperty(PROP_REPOSITORY_NAME, "Repository");
+    }
+
+
     /**
      * _more_
      *

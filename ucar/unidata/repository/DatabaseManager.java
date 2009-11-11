@@ -167,9 +167,10 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             try {
                 Misc.sleep(5000);
                 long now = System.currentTimeMillis();
+		//Scour after 5 minutes
                 int seconds =
                     getRepository().getProperty(PROP_DB_POOL_TIMEUNTILCLOSED,
-                        180);
+                        300);
                 for (ConnectionInfo info : getConnectionInfos()) {
                     //If a connection has been out for more than seconds then close it
                     if (now - info.time > seconds * 1000) {
