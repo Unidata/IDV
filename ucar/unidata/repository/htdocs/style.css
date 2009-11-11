@@ -665,20 +665,24 @@ ul {
 	border-bottom:2px #ffffff  solid;
 }
 
+
 .tab_title_off {
    background-color:#dddddd;
    border-left: 1px #000000 solid;
    border-right: 1px #000000 solid;
    border-top: 1px #000000 solid;
+   border-bottom:1px #000000  solid;
+
    font-weight: bold;
    margin-left:3px;
    margin-right:3px;
-   margin-bottom:0px;
+   margin-bottom:1px;
+
    padding-bottom:0;
    padding-top:2;
    padding-left:6;
    padding-right:6;
-   border-bottom:1px #dddddd  solid;
+
 }
 
 

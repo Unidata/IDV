@@ -40,6 +40,8 @@ import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.dt.grid.NetcdfCFWriter;
 
 import ucar.unidata.data.DataManager;
+import ucar.unidata.data.DataSourceDescriptor;
+import ucar.unidata.data.DataCategory;
 
 import ucar.unidata.data.*;
 import ucar.unidata.data.grid.*;
@@ -101,7 +103,10 @@ import java.util.List;
  */
 public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_PARAM = "param";
+
+    public static final String ARG_DISPLAYLISTLABEL = "displaylistlabel";
     public static final String ARG_COLORTABLE= "colortable";
+    public static final String ARG_STRIDE = "stride";
 
 
     public static final String ARG_DISPLAYUNIT = "displayunit";
@@ -326,7 +331,8 @@ public class IdvOutputHandler extends OutputHandler {
                                              path);
 
 
-        GeoGridDataSource dataSource = new GeoGridDataSource(dataset);
+        DataSourceDescriptor descriptor = idvServer.getIdv().getDataManager().getDescriptor("File.Grid");
+        GeoGridDataSource dataSource = new GeoGridDataSource(descriptor, dataset, entry.getName(), path);
 
 	try {
 	    if(action.equals(ACTION_MAKEINITFORM)) {
@@ -368,7 +374,6 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
-        List<DataChoice> choices = (List<DataChoice>)dataSource.getDataChoices();            
 
 	StringBuffer basic = new StringBuffer();
 
@@ -408,6 +413,7 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 	Hashtable<String,DataChoice> idToChoice = new Hashtable<String,DataChoice>();
+        List<DataChoice> choices = (List<DataChoice>)dataSource.getDataChoices();            
 	for(DataChoice dataChoice: choices) {
 	    idToChoice.put(dataChoice.getName(),dataChoice);
 	}
@@ -421,15 +427,25 @@ public class IdvOutputHandler extends OutputHandler {
 
 	for(int displayIdx=1;displayIdx<=NUM_PARAMS;displayIdx++) {
 	    if(!request.defined(ARG_PARAM+displayIdx)) continue;
+
+            List<String> innerTabTitles = new ArrayList<String>();
+            List<String> innerTabContents = new ArrayList<String>();
+
 	    StringBuffer tab = new StringBuffer();
 	    String param = request.getString(ARG_PARAM+displayIdx,"");
 	    DataChoice choice = idToChoice.get(param);
+            if(choice == null) {
+                continue;
+            }
 	    tab.append(HtmlUtil.hidden(ARG_PARAM+displayIdx,request.getString(ARG_PARAM+displayIdx,"")));
-            StringBuffer formTable = new StringBuffer();
-	    formTable.append(HtmlUtil.formTable());
 	    List options = new ArrayList();
 	    options.add("");
-	    formTable.append(HtmlUtil.formEntry(msgLabel("Display Type"), HtmlUtil.select(ARG_DISPLAY+displayIdx, displays)));
+            tab.append(HtmlUtil.br());
+            tab.append(msgLabel("Display Type"));
+            tab.append(HtmlUtil.space(1));
+            tab.append(HtmlUtil.select(ARG_DISPLAY+displayIdx, displays));
+            tab.append(HtmlUtil.p());
+
 	    List times = choice.getAllDateTimes();
 	    if(times!=null && times.size()>0) {
 		List tfoTimes =new ArrayList();
@@ -437,9 +453,10 @@ public class IdvOutputHandler extends OutputHandler {
 		for(Object time: times) {
 		    tfoTimes.add(new TwoFacedObject(time.toString(), new Integer(cnt++)));
 		}
-		formTable.append(HtmlUtil.formEntryTop(msgLabel("Times"), HtmlUtil.select(ARG_TIMES+displayIdx, tfoTimes,"",
-										  HtmlUtil.attrs(HtmlUtil.ATTR_MULTIPLE,"true",
-												 HtmlUtil.ATTR_SIZE,"5"))));
+		innerTabTitles.add(msg("Times"));
+                innerTabContents.add(HtmlUtil.select(ARG_TIMES+displayIdx, tfoTimes,"",
+                                                     HtmlUtil.attrs(HtmlUtil.ATTR_MULTIPLE,"true",
+                                                                    HtmlUtil.ATTR_SIZE,"5")));
 	    }
 	    
 	    List levels = choice.getAllLevels();
@@ -449,14 +466,22 @@ public class IdvOutputHandler extends OutputHandler {
 		for(Object level: levels) {
 		    tfoLevels.add(new TwoFacedObject(level.toString(), new Integer(cnt++)));
 		}
-		formTable.append(HtmlUtil.formEntryTop(msgLabel("Levels"), HtmlUtil.select(ARG_LEVELS+displayIdx, tfoLevels,"",
-										  HtmlUtil.attrs(HtmlUtil.ATTR_MULTIPLE,"false",
-												 HtmlUtil.ATTR_SIZE,"5"))));
-		
-	    }
-	    
+		innerTabTitles.add(msg("Spatial"));
+                String levelWidget = HtmlUtil.select(ARG_LEVELS+displayIdx, tfoLevels,"",
+                                                     HtmlUtil.attrs(HtmlUtil.ATTR_MULTIPLE,"false",
+                                                                    HtmlUtil.ATTR_SIZE,"5"));
+                String spatial = HtmlUtil.table(new Object[]{
+                        msgLabel("Levels"),
+                        levelWidget,
+                        msgLabel("X/Y Stride"),
+                        HtmlUtil.input(ARG_STRIDE+displayIdx,"", HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"5"))}
+                    ,5
+                    );
 
-	    formTable.append(HtmlUtil.formTableClose());
+
+                innerTabContents.add(spatial);
+	    }
+
 
 
             List<String> ctCats  = new ArrayList<String>();
@@ -505,12 +530,15 @@ public class IdvOutputHandler extends OutputHandler {
 
             StringBuffer misc = new StringBuffer();
             misc.append(HtmlUtil.formTable());
+            misc.append(HtmlUtil.formEntry(msgLabel("Display List Label"), HtmlUtil.input(ARG_DISPLAYLISTLABEL+displayIdx,"",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"30"))));
             misc.append(HtmlUtil.formEntry(msgLabel("Display Unit"), HtmlUtil.input(ARG_DISPLAYUNIT+displayIdx,"",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"6"))));
             misc.append(HtmlUtil.formEntry(msgLabel("Isosurface Value"), HtmlUtil.input(ARG_ISOSURFACEVALUE+displayIdx,"",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"3"))));
+
+
+
+
             misc.append(HtmlUtil.formTableClose());
 
-            List<String> innerTabTitles = new ArrayList<String>();
-            List<String> innerTabContents = new ArrayList<String>();
             innerTabTitles.add(msg("Color Table"));
             innerTabContents.add(ctsb.toString());
 
@@ -521,9 +549,11 @@ public class IdvOutputHandler extends OutputHandler {
             innerTabContents.add(misc.toString());
 
 
+
             String innerTab = HtmlUtil.makeTabs(innerTabTitles, innerTabContents,true,"tab_content");
-            tab.append(HtmlUtil.table(new Object[]{formTable, HtmlUtil.inset(HtmlUtil.p()+innerTab,10)}));
-	    tabLabels.add(choice.getDescription());
+            tab.append(HtmlUtil.inset(HtmlUtil.p()+innerTab,10));
+
+	    tabLabels.add(StringUtil.camelCase(choice.getDescription()));
 	    tabContents.add(tab.toString());
 	}
         sb.append(HtmlUtil.makeTabs(tabLabels, tabContents,true,"tab_content"));
@@ -564,10 +594,31 @@ public class IdvOutputHandler extends OutputHandler {
 	StringBuffer fields  = new StringBuffer();
 	for(int i=1;i<=NUM_PARAMS;i++) {
 	    List options = new ArrayList();
-	    options.add("");
+	    options.add(new TwoFacedObject("--Pick one--",""));
+            List<String> cats = new ArrayList<String>();
+            Hashtable<String,List<TwoFacedObject>> catMap = new  Hashtable<String,List<TwoFacedObject>>();
 	    for(DataChoice dataChoice: choices) {
-		options.add(new TwoFacedObject(dataChoice.getDescription(), dataChoice.getName()));
+                String label =     StringUtil.camelCase(dataChoice.getDescription());
+                DataCategory cat = dataChoice.getDisplayCategory();
+                String catName;
+                if(cat!=null)
+                    catName = cat.toString();
+                else
+                    catName="Data";
+                List<TwoFacedObject> tfos = catMap.get(catName);
+                if(tfos==null) {
+                    tfos = new ArrayList<TwoFacedObject>();
+                    catMap.put(catName, tfos);
+                    cats.add(catName);
+                }
+		tfos.add(new TwoFacedObject("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + label, dataChoice.getName()));
 	    }
+
+            for(String cat: cats) {
+                options.add(new TwoFacedObject(cat.replace("-","&gt;"),""));
+                options.addAll(catMap.get(cat));
+            }
+
 	    fields.append(HtmlUtil.select(ARG_PARAM+i, options));
 	    fields.append(HtmlUtil.p());
 	}
@@ -621,7 +672,6 @@ public class IdvOutputHandler extends OutputHandler {
 					     request.getString(ARG_IMAGE_HEIGHT,"300")),
                                viewProps.toString()));
 
-        System.err.println (isl);
 
 
         isl.append("<datasource id=\"datasource\" times=\"0\" >\n");
@@ -686,19 +736,32 @@ public class IdvOutputHandler extends OutputHandler {
 
             
 
-            String level = request.getString(ARG_LEVELS+displayIdx,"0");
 
 
-	    String levels = XmlUtil.attrs(ImageGenerator.ATTR_LEVEL_FROM,"#" + level,
-					  ImageGenerator.ATTR_LEVEL_TO,"#" + level);
+
+	    StringBuffer attrs = new StringBuffer();
+
             if(display.equals(DISPLAY_ISOSURFACE)) {
-                levels ="";
                 if(request.defined(ARG_ISOSURFACEVALUE+displayIdx)) {
                     propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
                                               XmlUtil.attrs("name","surfaceValue",
                                                             "value",request.getString(ARG_ISOSURFACEVALUE+displayIdx,""))));
                 }
+            } else {
+                String level = request.getString(ARG_LEVELS+displayIdx,"0");
+                attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_LEVEL_FROM,"#" + level,
+                                           ImageGenerator.ATTR_LEVEL_TO,"#" + level));
+
             }
+
+
+            if(request.defined(ARG_DISPLAYLISTLABEL+displayIdx)) {
+                propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
+                                          XmlUtil.attrs("name","displayListTemplate",
+                                                        "value",request.getString(ARG_DISPLAYLISTLABEL+displayIdx,""))));
+            }
+
+
 
             if(request.defined(ARG_DISPLAYUNIT+displayIdx)) {
                 propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
@@ -706,18 +769,23 @@ public class IdvOutputHandler extends OutputHandler {
                                                         "value",request.getString(ARG_DISPLAYUNIT+displayIdx,""))));
             }
 
-	    String attrs = XmlUtil.attrs(ImageGenerator.ATTR_TYPE, display,
-					 ImageGenerator.ATTR_PARAM,request.getString(ARG_PARAM+displayIdx,""));
-	    String timeAttr = "";
+            attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_TYPE, display,
+                                       ImageGenerator.ATTR_PARAM,request.getString(ARG_PARAM+displayIdx,"")));
+
+            if(request.defined(ARG_STRIDE+displayIdx)) {
+                attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_STRIDE, request.getString(ARG_STRIDE+displayIdx,"1")));
+            }
+
+
 	    List times = request.get(ARG_TIMES+displayIdx, new ArrayList());
-	    if(times.size()>1)  multipleTimes = true;
 	    if(times.size()>0) {
-		timeAttr = XmlUtil.attrs(ImageGenerator.ATTR_TIMES, StringUtil.join(",",times));
+                if(times.size()>1)  multipleTimes = true;
+		attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_TIMES, StringUtil.join(",",times)));
 	    }
 	    
 	    StringBuffer which = (display.equals(DISPLAY_PLANVIEWCONTOUR)?secondDisplays:firstDisplays);
 
-	    which.append(XmlUtil.tag(ImageGenerator.TAG_DISPLAY, attrs+levels+timeAttr,propSB.toString()));
+	    which.append(XmlUtil.tag(ImageGenerator.TAG_DISPLAY, attrs.toString(),propSB.toString()));
 	}
 
 	isl.append(firstDisplays);
