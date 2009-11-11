@@ -2084,6 +2084,11 @@ public class HtmlUtil {
     }
 
 
+    public static String table(Object[] columns, int spacing) {
+        return table(row(cols(columns), attr(ATTR_VALIGN, VALUE_TOP)), attrs(ATTR_CELLSPACING,""+spacing));
+    }
+
+
     /**
      * _more_
      *
