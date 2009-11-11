@@ -284,6 +284,11 @@ public class ImageGenerator extends IdvManager {
     public static final String TAG_BGTRANSPARENT = "backgroundtransparent";
 
 
+    public static final String ATTR_STRIDE = "stride";
+    public static final String ATTR_STRIDEX = "stridex";
+    public static final String ATTR_STRIDEY = "stridey";
+    public static final String ATTR_STRIDEZ = "stridez";
+
     public static final String ATTR_LEVEL_FROM = "levelfrom";
     public static final String ATTR_LEVEL_TO = "levelto";
 
@@ -2604,6 +2609,33 @@ public class ImageGenerator extends IdvManager {
 	    DataSelection dataSelection = new DataSelection(applyMacros(node,ATTR_LEVEL_FROM,(String)null),
 							    applyMacros(node,ATTR_LEVEL_TO,(String)null));
 	    
+
+	    String strideString = applyMacros(node, ATTR_STRIDE, (String)null);
+            if(strideString!=null) {
+                dataSelection.getGeoSelection(true).setXStride(applyMacros(node,ATTR_STRIDE,1));
+                dataSelection.getGeoSelection(true).setYStride(applyMacros(node,ATTR_STRIDE,1));
+
+            }
+
+
+	    String strideXString = applyMacros(node, ATTR_STRIDEX, (String)null);
+            if(strideXString!=null) {
+                dataSelection.getGeoSelection().setXStride(applyMacros(node,ATTR_STRIDEX,1));
+
+            }
+
+	    String strideYString = applyMacros(node, ATTR_STRIDEY, (String)null);
+            if(strideYString!=null) {
+                dataSelection.getGeoSelection().setYStride(applyMacros(node,ATTR_STRIDEY,1));
+
+            }
+	    String strideZString = applyMacros(node, ATTR_STRIDEZ, (String)null);
+            if(strideZString!=null) {
+                dataSelection.getGeoSelection().setZStride(applyMacros(node,ATTR_STRIDEX,1));
+
+            }
+
+
 
 	    String timeString = applyMacros(node, ATTR_TIMES, (String)null);
 	    if(timeString!=null) {
