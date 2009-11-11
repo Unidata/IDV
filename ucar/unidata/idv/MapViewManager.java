@@ -2876,9 +2876,9 @@ public class MapViewManager extends NavigatedViewManager {
      */
     public float getDefaultMapPosition() {
         if (getUseGlobeDisplay()) {
-            return -0.0f;
+            return (float)getStateManager().getProperty(IdvConstants.PROP_MAP_GLOBE_LEVEL,-0.0f);
         } else {
-            return -0.99f;
+            return (float)getStateManager().getProperty(IdvConstants.PROP_MAP_MAP_LEVEL, -0.99f);
         }
     }
 

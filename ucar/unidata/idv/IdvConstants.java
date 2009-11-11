@@ -329,6 +329,9 @@ public interface IdvConstants {
 
 
 
+    public static final String PROP_MAP_GLOBE_LEVEL = "idv.map.globe.level";
+    public static final String PROP_MAP_MAP_LEVEL = "idv.map.map.level";
+
     public static final String PROP_MONITORPORT = "idv.monitorport";
 
     public static final String PREF_THREADS_RENDER = "idv.threads.render.max";
