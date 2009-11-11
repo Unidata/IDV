@@ -320,6 +320,28 @@ public class ColorTableManager extends ResourceManager {
 
 
 
+    boolean didit = false;
+
+    private void doit() {
+        didit = true;
+        List      tables     = getColorTables();
+        try {
+            for (int i = 0; i < tables.size(); i++) {
+                ColorTable ct   = (ColorTable) tables.get(i);
+                Image image = ColorTableCanvas.getImage(ct, 100, 20);
+                String name = IOUtil.cleanFileName(ct.getName());
+                name  = name.replace(" ","_");
+                ImageUtils.writeImageToFile(image, name+".png");
+                System.out.println("colortable." + ct.getName() +".icon"  +"=" + name+".png");
+                System.out.println("colortable." + ct.getName() +".category"  +"=" + ct.getCategory());
+            }
+        } catch(Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+
+
     /**
      *  Make the set of color table menus. On an action event we will call the listeners actionPerformed \
      *  method, passing in the chosen color table.
@@ -330,6 +352,7 @@ public class ColorTableManager extends ResourceManager {
      */
     public void makeColorTableMenu(final ObjectListener listener, List l,
                                    boolean showLocal) {
+        //        if(!didit) doit();
         int       listIndex  = l.size();
         Hashtable categories = new Hashtable();
         List      tables     = getColorTables();
