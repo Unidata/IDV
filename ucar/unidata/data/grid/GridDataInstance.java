@@ -207,6 +207,10 @@ public class GridDataInstance extends DataInstance {
             return;
         }
         gridData = origData;
+        //jeffmc: for now clear out the origData
+        origData        = null;
+
+
         Trace.call2("GridDataInstance.getData");
 
         boolean isSequence = GridUtil.isSequence(gridData);
@@ -389,6 +393,9 @@ public class GridDataInstance extends DataInstance {
     private void setParamType(boolean copy) throws VisADException {
         Trace.call1("GridDataInstance.calling setParamType", " copy=" + copy);
         gridData = GridUtil.setParamType(gridData, rangeType, copy);
+
+        //jeffmc: call super.setData with the new data
+        super.setData(gridData);
         Trace.call2("GridDataInstance.calling setParamType");
         haveChangedType = true;
     }
@@ -581,9 +588,11 @@ public class GridDataInstance extends DataInstance {
      *
      * @return  the data in a FieldImpl
      */
-    public FieldImpl getOriginalGrid() {
+    private FieldImpl getOriginalGrid() {
         checkInit();
-        return origData;
+        //jeffmc: for now clear out use
+        return gridData;
+        //        return origData;
     }
 
     /**
