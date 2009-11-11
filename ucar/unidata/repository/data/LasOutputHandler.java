@@ -53,78 +53,77 @@ import java.util.List;
  */
 public class LasOutputHandler extends OutputHandler {
 
-    /** _more_          */
+    /** netcdf standard name     */
     public static final String NCATTR_STANDARD_NAME = "standard_name";
 
-    /** _more_          */
+    /** las xml tag          */
     public static final String TAG_LASDATA = "lasdata";
 
-    /** _more_          */
+    /** las xml tag          */
     public static final String TAG_INSTITUTION = "institution";
 
-    /** _more_          */
+    /** las xml tag          */
     public static final String TAG_OPERATIONS = "operations";
 
-    /** _more_          */
+    /** las xml tag          */
     public static final String TAG_SHADE = "shade";
 
-    /** _more_          */
+    /** las xml tag          */
     public static final String TAG_ARG = "arg";
 
-    /** _more_          */
+    /** las xml tag          */
     public static final String TAG_DATASETS = "datasets";
 
-    /** _more_          */
+    /** las xml tag          */
     public static final String TAG_VARIABLES = "variables";
 
-    /** _more_          */
+    /** las xml tag          */
     public static final String TAG_LINK = "link";
 
-    /** _more_          */
+    /** las xml tag          */
     public static final String TAG_COMPOSITE = "composite";
 
-    /** _more_          */
+    /** las xml tag          */
     public static final String TAG_GRIDS = "grids";
 
-    /** _more_          */
+    /** las xml tag          */
     public static final String TAG_AXES = "axes";
 
-    /** _more_          */
+    /** las xml          */
     public static final String ATTR_NAME = "name";
 
-    /** _more_          */
+    /** las xml attribute name          */
     public static final String ATTR_URL = "url";
 
-    /** _more_          */
+    /** las xml attribute name          */
     public static final String ATTR_CLASS = "class";
 
-    /** _more_          */
+    /** las xml attribute name          */
     public static final String ATTR_METHOD = "method";
 
-    /** _more_          */
+    /** las xml attribute name          */
     public static final String ATTR_TYPE = "type";
 
-    /** _more_          */
+    /** las xml attribute name          */
     public static final String ATTR_DOC = "doc";
 
-    /** _more_          */
+    /** las xml attribute name          */
     public static final String ATTR_UNITS = "units";
 
-    /** _more_          */
+    /** las xml attribute name          */
     public static final String ATTR_MATCH = "match";
 
-    /** _more_          */
+    /** las xml attribute name          */
     public static final String ATTR_JS = "js";
 
-    /** _more_          */
+    /** las xml attribute name          */
     public static final String ATTR_SIZE = "size";
 
-    /** _more_          */
+    /** las xml attribute name          */
     public static final String ATTR_START = "start";
 
-    /** _more_          */
+    /** las xml attribute name          */
     public static final String ATTR_STEP = "step";
-
 
 
 
@@ -133,8 +132,9 @@ public class LasOutputHandler extends OutputHandler {
         new OutputType("LAS-XML", "las.xml", OutputType.TYPE_NONHTML, "",
                        null);
 
+
     /**
-     * _more_
+     * ctor
      *
      * @param repository _more_
      * @param element _more_
@@ -159,7 +159,6 @@ public class LasOutputHandler extends OutputHandler {
      */
     public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
-
 
         DataOutputHandler dataOutputHandler = getDataOutputHandler();
         if (state.group != null) {
@@ -242,19 +241,24 @@ public class LasOutputHandler extends OutputHandler {
 
         DataOutputHandler dataOutputHandler = getDataOutputHandler();
         Document          doc               = XmlUtil.makeDocument();
+
+	//create the root element
         Element root = XmlUtil.create(doc, TAG_LASDATA, null,
                                       new String[] {});
-
 
         XmlUtil.create(TAG_INSTITUTION, root, new String[] { ATTR_NAME,
                 getRepository().getRepositoryName(), ATTR_URL,
                 getRepository().absoluteUrl("") });
+
         Element datasetsNode = XmlUtil.create(TAG_DATASETS, root);
 
+	//Loop on the entries
         for (Entry entry : entries) {
             if ( !dataOutputHandler.canLoadAsGrid(entry)) {
+		//not a grid
                 continue;
             }
+
             //<coads_climatology_cdf name="COADS Climatology" url="file:coads_climatology" doc="doc/coads_climatology.html">
             String id = entry.getId();
 
@@ -275,16 +279,18 @@ public class LasOutputHandler extends OutputHandler {
             });
 
             Element variablesNode = XmlUtil.create(TAG_VARIABLES, entryNode);
+
+	    //Get the netcdf dataset from the dataoutputhandler
             String path           = dataOutputHandler.getPath(entry);
             NetcdfDataset dataset = dataOutputHandler.getNetcdfDataset(entry,
                                         path);
             try {
                 //TODO: determine which variables are the actual data variables
+		//and add in the axis information
                 for (Variable var : dataset.getVariables()) {
                     if (var instanceof CoordinateAxis) {
                         CoordinateAxis ca       = (CoordinateAxis) var;
                         AxisType       axisType = ca.getAxisType();
-                        //TODO: put in the axes
                         if (axisType == null) {
                             continue;
                         }
@@ -296,8 +302,9 @@ public class LasOutputHandler extends OutputHandler {
                         }
                         continue;
                     }
-                    //<variables>     <airt name="Air Temperature" units="DEG C">
 
+		    
+                    //<variables>     <airt name="Air Temperature" units="DEG C">
                     String varName = var.getShortName();
                     ucar.nc2.Attribute att =
                         var.findAttribute(NCATTR_STANDARD_NAME);
