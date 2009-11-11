@@ -240,6 +240,8 @@ public class HtmlUtil {
     /** _more_ */
     public static final String ATTR_METHOD = "method";
 
+    public static final String ATTR_MULTIPLE = "multiple";
+
     /** _more_ */
     public static final String ATTR_NAME = "name";
 
