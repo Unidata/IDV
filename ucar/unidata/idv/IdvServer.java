@@ -72,7 +72,7 @@ public class IdvServer  {
         return idv;
     }
 
-    private class MyIdv extends IntegratedDataViewer {
+    public class MyIdv extends IntegratedDataViewer {
         public MyIdv(String userDir) throws Exception {
             super((userDir==null?new String[]{}:new String[]{ARG_USERPATH,userDir}),false);
         }
