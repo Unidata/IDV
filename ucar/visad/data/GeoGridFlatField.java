@@ -204,9 +204,9 @@ public class GeoGridFlatField extends CachedFlatField {
      * @return data
      */
     public float[][] readData() {
-        if (getParent() != null) {
-            return getParent().readData();
-        }
+        //        if (getParent() != null) {
+        //            return getParent().readData();
+        //        }
         //        Misc.printStack("GeoGridFlatField.readData",15,null);
         Array arr;
         try {

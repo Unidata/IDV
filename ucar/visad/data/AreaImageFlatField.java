@@ -129,6 +129,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         this.readLabel  = readLabel;
     }
 
+
     /**
      * Clone this object
      *
@@ -344,9 +345,9 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
      * @return _more_
      */
     protected int[][] getDirNavAux() {
-        if (getParent() != null) {
-            return ((AreaImageFlatField) getParent()).getDirNavAux();
-        }
+        //        if (getParent() != null) {
+        //            return ((AreaImageFlatField) getParent()).getDirNavAux();
+        //        }
         checkReadData();
         String file = getDirNavAuxFile();
         if (dirNavAux == null) {
