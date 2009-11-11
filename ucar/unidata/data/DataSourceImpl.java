@@ -383,6 +383,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         return false;
     }
 
+
+
+
     public IntegratedDataViewer getIdv() {
 	if(getDataContext()==null) return null;
 	return getDataContext().getIdv();
@@ -1422,6 +1425,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                 ? descriptor.getDataContext()
                 : null);
     }
+
 
 
 
@@ -3657,6 +3661,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     public static String getNameForDataSource(DataSource ds, int length,
             boolean alwaysDoIt) {
         String name = ds.toString();
+        if(name == null) name = "";
         if (name.length() < length) {
             return name;
         }

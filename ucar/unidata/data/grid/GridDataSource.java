@@ -87,6 +87,10 @@ public abstract class GridDataSource extends FilesDataSource {
 
 
 
+    public GridDataSource(DataSourceDescriptor descriptor) {
+        super(descriptor);
+        initCategories();
+    }
 
     /**
      * Create a GridDataSource from the specification given.
@@ -123,12 +127,14 @@ public abstract class GridDataSource extends FilesDataSource {
      * Initialize the data categories
      */
     public void initCategories() {
-        twoDTimeSeriesCategories =
-            DataCategory.parseCategories("2D grid;GRID-2D-TIME;");
-        twoDCategories = DataCategory.parseCategories("2D grid;GRID-2D;");
-        threeDTimeSeriesCategories =
-            DataCategory.parseCategories("3D grid;GRID-3D-TIME;");
-        threeDCategories = DataCategory.parseCategories("3D grid;GRID-3D;");
+        if(twoDTimeSeriesCategories==null) {
+            twoDTimeSeriesCategories =
+                DataCategory.parseCategories("2D grid;GRID-2D-TIME;");
+            twoDCategories = DataCategory.parseCategories("2D grid;GRID-2D;");
+            threeDTimeSeriesCategories =
+                DataCategory.parseCategories("3D grid;GRID-3D-TIME;");
+            threeDCategories = DataCategory.parseCategories("3D grid;GRID-3D;");
+        }
     }
 
 

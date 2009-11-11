@@ -105,6 +105,9 @@ public abstract class FilesDataSource extends DataSourceImpl {
     /** Default Constructor */
     public FilesDataSource() {}
 
+    public FilesDataSource(DataSourceDescriptor descriptor) {
+        super(descriptor);
+    }
 
     /**
      * Ctor

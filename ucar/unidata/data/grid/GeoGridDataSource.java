@@ -211,6 +211,12 @@ public class GeoGridDataSource extends GridDataSource {
     public GeoGridDataSource() {}
 
 
+    public GeoGridDataSource(DataSourceDescriptor descriptor, GridDataset gds, String name, String filename) {
+        super(descriptor,filename, name, (Hashtable)null);
+	dataset = gds;
+    }
+
+
     public GeoGridDataSource(GridDataset gds) {
 	dataset = gds;
     }
