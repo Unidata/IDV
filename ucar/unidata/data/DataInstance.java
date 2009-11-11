@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data;
 
 
@@ -244,6 +245,15 @@ public class DataInstance {
     }
 
 
+
+    /**
+     * _more_
+     *
+     * @param newData _more_
+     */
+    protected void setData(Data newData) {
+        data = newData;
+    }
 
     /**
      * Set the data selection
