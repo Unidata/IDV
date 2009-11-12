@@ -31,6 +31,7 @@ import ucar.ma2.StructureMembers;
 
 import ucar.nc2.dataset.VariableEnhanced;
 
+import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.dt.GridDatatype;
 import ucar.nc2.dt.PointObsDataset;
 import ucar.nc2.dt.PointObsDatatype;
@@ -39,9 +40,13 @@ import ucar.nc2.dt.TypedDatasetFactory;
 import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.dt.grid.NetcdfCFWriter;
 
+import ucar.unidata.ui.symbol.StationModel;
+import ucar.unidata.ui.symbol.StationModelManager;
+
 import ucar.unidata.data.DataManager;
 import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.DataCategory;
+import ucar.unidata.data.point.NetcdfPointDataSource;
 
 import ucar.unidata.data.*;
 import ucar.unidata.data.grid.*;
@@ -112,6 +117,9 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String TARGET_JNLP = "jnlp";
     public static final String TARGET_ISL = "isl";
 
+    public static final String ARG_POINT_LAYOUTMODEL = "point.layoutmodel";
+    public static final String ARG_POINT_DOANIMATION = "point.doanimation";
+
     public static final String ARG_DISPLAYLISTLABEL = "displaylistlabel";
     public static final String ARG_COLORTABLE= "colortable";
     public static final String ARG_STRIDE = "stride";
@@ -135,7 +143,6 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_SCALE_VISIBLE="scale_visible";
     public static final String ARG_SCALE_ORIENTATION="scale_orientation";
     public static final String ARG_SCALE_PLACEMENT = "scale_placement";
-    //    public static final String ARG_SCALE="";
 
 
     public static final String ARG_RANGE_MIN= "range_min";
@@ -153,10 +160,14 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_IMAGE_HEIGHT = "imageheight";
 
 
-    public static final String ACTION_MAKEINITFORM = "action.makeinitform";
-    public static final String ACTION_MAKEFORM = "action.makeform";
-    public static final String ACTION_MAKEPAGE = "action.makepage";
-    public static final String ACTION_MAKEIMAGE = "action.makeimage";
+    public static final String ACTION_GRID_MAKEINITFORM = "action.grid.makeinitform";
+    public static final String ACTION_GRID_MAKEFORM = "action.grid.makeform";
+    public static final String ACTION_GRID_MAKEPAGE = "action.grid.makepage";
+    public static final String ACTION_GRID_MAKEIMAGE = "action.grid.makeimage";
+
+
+    public static final String ACTION_POINT_MAKEPAGE = "action.point.makepage";
+    public static final String ACTION_POINT_MAKEIMAGE = "action.point.makeimage";
 
     public static final int  NUM_PARAMS = 3;
     
@@ -181,7 +192,12 @@ public class IdvOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_IDV_GRID =
-        new OutputType("Grid Visualization", "idv.grid", OutputType.TYPE_HTML,                                                    OutputType.SUFFIX_NONE,
+        new OutputType("Grid Displays", "idv.grid", OutputType.TYPE_HTML,                                                    OutputType.SUFFIX_NONE,
+                       ICON_PLANVIEW);
+
+
+    public static final OutputType OUTPUT_IDV_POINT =
+        new OutputType("Point Displays", "idv.point", OutputType.TYPE_HTML,                                                    OutputType.SUFFIX_NONE,
                        ICON_PLANVIEW);
 
 
@@ -224,6 +240,7 @@ public class IdvOutputHandler extends OutputHandler {
             e.getDefaultScreenDevice();
             idvServer = new IdvServer(new File(getStorageManager().getDir("idv")));
             addType(OUTPUT_IDV_GRID);
+            addType(OUTPUT_IDV_POINT);
         } catch (Throwable exc) {
             System.err.println(
                 "To run the IdvOutputHandler a graphics environment is needed");
@@ -249,6 +266,9 @@ public class IdvOutputHandler extends OutputHandler {
         List<Entry> theEntries = null;
         if (state.entry != null) {
             if ( !getDataOutputHandler().canLoadAsGrid(state.entry)) {
+		if (getDataOutputHandler().canLoadAsPoint(state.entry)) {
+		    links.add(makeLink(request, state.getEntry(), OUTPUT_IDV_POINT));
+		}
                 return;
             }
             links.add(makeLink(request, state.getEntry(), OUTPUT_IDV_GRID));
@@ -336,6 +356,9 @@ public class IdvOutputHandler extends OutputHandler {
         if (output.equals(OUTPUT_IDV_GRID)) {
             return outputGrid(request, entry);
         }
+        if (output.equals(OUTPUT_IDV_POINT)) {
+            return outputPoint(request, entry);
+        }
         return super.outputEntry(request, entry);
     }
 
@@ -353,15 +376,13 @@ public class IdvOutputHandler extends OutputHandler {
      */
     public Result outputGrid(final Request request, Entry entry)
             throws Exception {
-	String action = request.getString(ARG_ACTION, ACTION_MAKEINITFORM);
-
-
         DataOutputHandler dataOutputHandler = getDataOutputHandler();
+	String action = request.getString(ARG_ACTION, ACTION_GRID_MAKEINITFORM);
         String path = dataOutputHandler.getPath(entry);
         if (path == null) {
 	    StringBuffer sb  =new StringBuffer();
             sb.append("Could not load grid");
-            return new Result("Grid Preview", sb);
+            return new Result("Grid Displays", sb);
         }
 
         GridDataset dataset =
@@ -373,11 +394,11 @@ public class IdvOutputHandler extends OutputHandler {
         GeoGridDataSource dataSource = new GeoGridDataSource(descriptor, dataset, entry.getName(), path);
 
 	try {
-	    if(action.equals(ACTION_MAKEINITFORM)) {
+	    if(action.equals(ACTION_GRID_MAKEINITFORM)) {
 		return outputGridInitForm(request, entry, dataSource);
-	    } else   if(action.equals(ACTION_MAKEFORM)) {
+	    } else   if(action.equals(ACTION_GRID_MAKEFORM)) {
 		return outputGridForm(request, entry, dataSource);
-	    } else	if(action.equals(ACTION_MAKEPAGE)) {
+	    } else	if(action.equals(ACTION_GRID_MAKEPAGE)) {
 		return outputGridPage(request, entry, dataSource);
 	    } else {
 		return outputGridImage(request, entry, dataSource);
@@ -387,6 +408,9 @@ public class IdvOutputHandler extends OutputHandler {
 	}
 
     }
+
+
+
 
     /**
      * _more_
@@ -408,7 +432,7 @@ public class IdvOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
         sb.append(HtmlUtil.hidden(ARG_OUTPUT,OUTPUT_IDV_GRID));
-        sb.append(HtmlUtil.hidden(ARG_ACTION,ACTION_MAKEPAGE));
+        sb.append(HtmlUtil.hidden(ARG_ACTION,ACTION_GRID_MAKEPAGE));
 
 
 
@@ -632,7 +656,7 @@ public class IdvOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.p());
         sb.append(HtmlUtil.submit(msg("Make image"),ARG_SUBMIT));
         sb.append(HtmlUtil.formClose());
-        return new Result("Grid Preview", sb);
+        return new Result("Grid Displays", sb);
     }
 
 
@@ -654,7 +678,7 @@ public class IdvOutputHandler extends OutputHandler {
         sb.append(HtmlUtil.form(formUrl, ""));
         sb.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
         sb.append(HtmlUtil.hidden(ARG_OUTPUT,OUTPUT_IDV_GRID));
-        sb.append(HtmlUtil.hidden(ARG_ACTION,ACTION_MAKEFORM));
+        sb.append(HtmlUtil.hidden(ARG_ACTION,ACTION_GRID_MAKEFORM));
 
 
         List<DataChoice> choices = (List<DataChoice>)dataSource.getDataChoices();            
@@ -696,7 +720,7 @@ public class IdvOutputHandler extends OutputHandler {
 	sb.append(HtmlUtil.insetLeft(fields.toString(), 10));
         sb.append(HtmlUtil.submit(msg("Make image"),ARG_SUBMIT));
         sb.append(HtmlUtil.formClose());
-        return new Result("Grid Preview", sb);
+        return new Result("Grid Displays", sb);
     }
 
 
@@ -712,18 +736,18 @@ public class IdvOutputHandler extends OutputHandler {
 	Hashtable exceptArgs = new Hashtable();
 	exceptArgs.put(ARG_ACTION, ARG_ACTION);
 	String args = request.getUrlArgs(exceptArgs, null);
-	url = url + "?" + ARG_ACTION +"=" + ACTION_MAKEIMAGE+"&" + args;
+	url = url + "?" + ARG_ACTION +"=" + ACTION_GRID_MAKEIMAGE+"&" + args;
 
 
-	islUrl = islUrl + "?" + ARG_ACTION +"=" + ACTION_MAKEIMAGE+"&" + args +"&" + ARG_TARGET +"=" + TARGET_ISL;
-	jnlpUrl = jnlpUrl + "?" + ARG_ACTION +"=" + ACTION_MAKEIMAGE+"&" + args +"&" + ARG_TARGET +"=" + TARGET_JNLP;
+	islUrl = islUrl + "?" + ARG_ACTION +"=" + ACTION_GRID_MAKEIMAGE+"&" + args +"&" + ARG_TARGET +"=" + TARGET_ISL;
+	jnlpUrl = jnlpUrl + "?" + ARG_ACTION +"=" + ACTION_GRID_MAKEIMAGE+"&" + args +"&" + ARG_TARGET +"=" + TARGET_JNLP;
 
 	sb.append(HtmlUtil.img(url));
 	sb.append(HtmlUtil.br());
 	sb.append(HtmlUtil.href(jnlpUrl,msg("Launch in the IDV")));
 	sb.append(HtmlUtil.br());
 	sb.append(HtmlUtil.href(islUrl,msg("Download IDV ISL script")));
-	return new Result("Grid Preview", sb);
+	return new Result("Grid Displays", sb);
     }
 
 
@@ -731,11 +755,12 @@ public class IdvOutputHandler extends OutputHandler {
 	throws Exception {
         DataOutputHandler dataOutputHandler = getDataOutputHandler();
 
-	Trace.addNot(".*ShadowFunction.*");
-	Trace.addNot(".*GeoGrid.*");
+	//	Trace.addNot(".*ShadowFunction.*");
+	//	Trace.addNot(".*GeoGrid.*");
 	//	Trace.addOnly(".*MapProjection.*");
 	//	Trace.addOnly(".*ProjectionCoordinateSystem.*");
-        //	Trace.startTrace();
+	//Trace.startTrace();
+
         String id = entry.getId();
         File image = getStorageManager().getThumbFile("preview_"
                          + id.replace("/", "_") + ".gif");
@@ -774,8 +799,7 @@ public class IdvOutputHandler extends OutputHandler {
 								  "url",
 								  getRepository().absoluteUrl(
 											      getRepository().URL_ENTRY_SHOW
-											      + dataOutputHandler.getOpendapUrl(entry)),
-								  )));
+											      + dataOutputHandler.getOpendapUrl(entry)))));
 	} else {
 	    isl.append("<datasource id=\"datasource\" times=\"0\" >\n");
 	}
@@ -1123,6 +1147,239 @@ public class IdvOutputHandler extends OutputHandler {
                           getStorageManager().getFileInputStream(image),
                           "image/png");
     }
+
+
+    public Result outputPointPage(final Request request, Entry entry)
+            throws Exception {
+	StringBuffer sb = new StringBuffer();
+
+
+	    
+
+        String       formUrl  = getRepository().URL_ENTRY_SHOW.getFullUrl();
+	StringBuffer formSB = new StringBuffer();
+
+        formSB.append(HtmlUtil.form(formUrl, ""));
+        formSB.append(HtmlUtil.submit(msg("Make image"),ARG_SUBMIT));
+        formSB.append(HtmlUtil.p());
+        formSB.append(HtmlUtil.hidden(ARG_ENTRYID, entry.getId()));
+        formSB.append(HtmlUtil.hidden(ARG_OUTPUT,OUTPUT_IDV_POINT));
+        formSB.append(HtmlUtil.hidden(ARG_ACTION,ACTION_POINT_MAKEPAGE));
+	formSB.append(HtmlUtil.formTable());
+        StationModelManager smm = idvServer.getIdv().getStationModelManager();
+	List layoutModels = smm.getStationModels();
+	List layoutModelNames = new ArrayList();
+	for(StationModel sm:(List<StationModel>)layoutModels) {
+	    layoutModelNames.add(sm.getName());
+	}
+
+
+	formSB.append(HtmlUtil.formEntry(msgLabel("Layout Model"),
+					 HtmlUtil.select(ARG_POINT_LAYOUTMODEL, layoutModelNames,request.getString(ARG_POINT_LAYOUTMODEL,""))));
+
+
+	formSB.append(HtmlUtil.formEntry(msgLabel("Animate"),
+					 HtmlUtil.checkbox(ARG_POINT_DOANIMATION, "true", false)));
+
+
+	formSB.append(HtmlUtil.formEntry(msgLabel("Width"),
+					HtmlUtil.input(ARG_IMAGE_WIDTH,request.getString(ARG_IMAGE_WIDTH,"600"),HtmlUtil.attr(HtmlUtil.ATTR_SIZE,"5"))));
+
+       formSB.append(HtmlUtil.formEntry(msgLabel("Height"),
+					HtmlUtil.input(ARG_IMAGE_HEIGHT,request.getString(ARG_IMAGE_HEIGHT,"400"),HtmlUtil.attr(HtmlUtil.ATTR_SIZE,"5"))));
+
+
+       formSB.append(HtmlUtil.formEntry(msgLabel("Show map"),
+					HtmlUtil.checkbox(ARG_SHOWMAP,"true",request.get(ARG_SHOWMAP, true))));
+
+
+	formSB.append(HtmlUtil.formTableClose());
+        formSB.append(HtmlUtil.formClose());
+
+
+	String url = getRepository().URL_ENTRY_SHOW.getFullUrl();
+	String islUrl = url +"/" + IOUtil.stripExtension(entry.getName())+".isl";
+	String jnlpUrl = url +"/" + IOUtil.stripExtension(entry.getName())+".jnlp";
+	
+	Hashtable exceptArgs = new Hashtable();
+	exceptArgs.put(ARG_ACTION, ARG_ACTION);
+	String args = request.getUrlArgs(exceptArgs, null);
+	url = url + "?" + ARG_ACTION +"=" + ACTION_POINT_MAKEIMAGE+"&" + args;
+	islUrl = islUrl + "?" + ARG_ACTION +"=" + ACTION_POINT_MAKEIMAGE+"&" + args +"&" + ARG_TARGET +"=" + TARGET_ISL;
+	jnlpUrl = jnlpUrl + "?" + ARG_ACTION +"=" + ACTION_POINT_MAKEIMAGE+"&" + args +"&" + ARG_TARGET +"=" + TARGET_JNLP;
+
+	StringBuffer imageSB = new StringBuffer();
+
+	imageSB.append(HtmlUtil.img(url, "", HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,	request.getString(ARG_IMAGE_WIDTH,"400"))));
+	imageSB.append(HtmlUtil.br());
+	imageSB.append(HtmlUtil.href(jnlpUrl,msg("Launch in the IDV")));
+	imageSB.append(HtmlUtil.br());
+	imageSB.append(HtmlUtil.href(islUrl,msg("Download IDV ISL script")));
+
+	if(!request.exists(ARG_SUBMIT)) {
+	    sb.append(formSB);
+	} else {
+	    sb.append(HtmlUtil.table(new Object[]{imageSB, formSB},10));
+	}
+
+
+	return new Result("Point Display", sb);
+    }
+
+
+    private String makeProperty(String name, String value) {
+	return XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
+			   XmlUtil.attrs("name",name,
+					 "value",value));
+    }
+
+    public Result outputPointImage(final Request request, Entry entry)
+	throws Exception {
+
+	Trace.addNot(".*ShadowFunction.*");
+	//	Trace.addNot(".*GeoGrid.*");
+	//	Trace.addOnly(".*MapProjection.*");
+	//	Trace.addOnly(".*ProjectionCoordinateSystem.*");
+	Trace.startTrace();
+
+
+
+
+        DataOutputHandler dataOutputHandler = getDataOutputHandler();
+	String action = request.getString(ARG_ACTION, ACTION_POINT_MAKEPAGE);
+        String path = dataOutputHandler.getPath(entry);
+        if (path == null) {
+	    StringBuffer sb  =new StringBuffer();
+            sb.append("Could not load point data");
+            return new Result("", sb);
+        }
+
+
+	path = "/Users/jeffmc/point.nc";
+
+
+	FeatureDatasetPoint dataset  = 
+            dataOutputHandler.getPointDataset(entry,
+					      path);
+	DataSourceDescriptor descriptor = idvServer.getIdv().getDataManager().getDescriptor("NetCDF.POINT");
+	NetcdfPointDataSource dataSource = new NetcdfPointDataSource(dataset, descriptor, new Hashtable());
+	//	NetcdfPointDataSource dataSource = new NetcdfPointDataSource(descriptor, "/Users/jeffmc/point.nc",new Hashtable());
+
+	try {
+
+
+	    String id = entry.getId();
+	    File image = getStorageManager().getThumbFile("preview_"
+							  + id.replace("/", "_") + ".gif");
+
+	    boolean forIsl = request.getString(ARG_TARGET,"").equals(TARGET_ISL);
+	    boolean forJnlp = request.getString(ARG_TARGET,"").equals(TARGET_JNLP);
+	    if(forJnlp) forIsl = true;
+
+	    StringBuffer isl = new StringBuffer();
+	    isl.append("<isl debug=\"true\" loop=\"1\" offscreen=\"true\">\n");
+
+	    StringBuffer viewProps = new StringBuffer();
+	    viewProps.append(XmlUtil.tag("property", XmlUtil.attrs("name","wireframe","value","false")));
+	    viewProps.append(XmlUtil.tag("property", XmlUtil.attrs("name","showMaps","value",""+request.get(ARG_SHOWMAP, false))));
+	    if(request.get(ARG_WHITEBACKGROUND,false)) {
+		viewProps.append(XmlUtil.tag("property", XmlUtil.attrs("name","background","value","white")));
+		viewProps.append(XmlUtil.tag("property", XmlUtil.attrs("name","foreground","value","black")));
+	    }
+
+
+
+	    //Create a new viewmanager
+	    //For now don't do this if we are doing jnlp
+	    if(!forJnlp) {
+		isl.append(XmlUtil.tag(ImageGenerator.TAG_VIEW,
+				       XmlUtil.attrs(ImageGenerator.ATTR_WIDTH,
+						     request.getString(ARG_IMAGE_WIDTH,"400"),
+						     ImageGenerator.ATTR_HEIGHT,
+						     request.getString(ARG_IMAGE_HEIGHT,"300")),
+				       viewProps.toString()));
+	    }
+
+
+	    if(forIsl) {
+		isl.append(XmlUtil.openTag("datasource",XmlUtil.attrs(
+								      "id","datasource",
+								      "url",
+								      getRepository().absoluteUrl(
+												  getRepository().URL_ENTRY_SHOW
+												  + dataOutputHandler.getOpendapUrl(entry)))));
+	    } else {
+		isl.append("<datasource id=\"datasource\">\n");
+	    }
+
+	    Hashtable props = new Hashtable();
+	    props.put("datasource", dataSource);
+	    StringBuffer propSB = new StringBuffer();
+	    StringBuffer attrs = new StringBuffer();
+	    propSB.append(makeProperty("id","thedisplay"));
+	    propSB.append(makeProperty("stationModelName",
+				       request.getString(ARG_POINT_LAYOUTMODEL, "Location")));
+
+	    System.err.println("Props:" + propSB);
+	    attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_TYPE, "stationmodelcontrol",
+				       ImageGenerator.ATTR_PARAM,"*"));
+	
+	    isl.append(XmlUtil.tag(ImageGenerator.TAG_DISPLAY, attrs.toString(),propSB.toString()));
+	    isl.append("</datasource>\n");
+	    isl.append("<pause/>\n");
+
+	    String clip = "";
+	    if(request.get(ARG_CLIP, false)) {
+		clip = XmlUtil.tag("clip","");
+	    }
+	    
+	    boolean multipleTimes = request.get(ARG_POINT_DOANIMATION,false);
+	    isl.append(XmlUtil.tag((multipleTimes?"movie":"image"), XmlUtil.attr("file",  image.toString()), clip));
+	    isl.append("</isl>\n");
+
+	    if(forJnlp) {
+		String jnlp = getRepository().getResource(
+							  "/ucar/unidata/repository/idv/template.jnlp");
+		StringBuffer args = new StringBuffer();
+		args.append("<argument>-b64isl</argument>");
+		args.append("<argument>" + XmlUtil.encodeBase64(isl.toString().getBytes()) + "</argument>");
+		jnlp = jnlp.replace("${args}", args.toString());
+		return new Result("data.jnlp",
+				  new StringBuffer(jnlp),
+				  "application/x-java-jnlp-file");
+	    }
+	    if(forIsl) {
+		return new Result("data.isl",
+				  new StringBuffer(isl),
+				  "text/xml");
+	    }
+
+	    long t1 = System.currentTimeMillis();
+	    idvServer.evaluateIsl(isl,props);
+	    long t2 = System.currentTimeMillis();
+	    System.err.println("isl time:" + (t2-t1));
+
+	    Trace.stopTrace();
+	    return new Result("preview.gif",
+			      getStorageManager().getFileInputStream(image),
+			      "image/gif");
+	} finally {
+	    dataOutputHandler.returnPointDataset(path, dataset);
+	}
+    }
+
+
+    public Result outputPoint(final Request request, Entry entry)
+            throws Exception {
+	String action = request.getString(ARG_ACTION, ACTION_POINT_MAKEPAGE);
+	if(action.equals(ACTION_POINT_MAKEPAGE)) {
+	    return outputPointPage(request, entry);
+	} else {
+	    return outputPointImage(request, entry);
+	}
+    }
+
+
 
 
 }

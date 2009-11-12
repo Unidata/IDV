@@ -247,6 +247,7 @@ public class MapViewManager extends NavigatedViewManager {
 
     private boolean showMaps = true;
 
+    private double displayProjectionZoom = 0;
 
     /**
      *  Default constructor
@@ -2035,6 +2036,9 @@ public class MapViewManager extends NavigatedViewManager {
 					 mp, true,
 					 getDisplayConventions().getMapProjectionLabel(
 										       mp, display));
+			if(displayProjectionZoom!=0) {
+			    getMapDisplay().zoom(displayProjectionZoom);
+			}
                     }
                 }
             }
@@ -2982,6 +2986,24 @@ public class MapViewManager extends NavigatedViewManager {
 
 
 
+
+    /**
+       Set the DisplayProjectionZoom property.
+
+       @param value The new value for DisplayProjectionZoom
+    **/
+    public void setDisplayProjectionZoom (double value) {
+	this.displayProjectionZoom = value;
+    }
+
+    /**
+       Get the DisplayProjectionZoom property.
+
+       @return The DisplayProjectionZoom
+    **/
+    public double getDisplayProjectionZoom () {
+	return this.displayProjectionZoom;
+    }
 
 
 

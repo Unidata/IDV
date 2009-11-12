@@ -62,6 +62,8 @@ public class NetcdfPointDataSource extends PointDataSource {
         LogUtil.getLogInstance(NetcdfPointDataSource.class.getName());
 
 
+    private FeatureDatasetPoint fixedDataset = null;
+
     /**
      * Default constructor
      *
@@ -70,6 +72,26 @@ public class NetcdfPointDataSource extends PointDataSource {
     public NetcdfPointDataSource() throws VisADException {
         init();
     }
+
+
+    /**
+     * Create a new NetcdfPointDataSource
+     *
+     * @param descriptor    data source descriptor
+     * @param source        source of data (filename/URL)
+     * @param properties    extra properties for initialization
+     *
+     * @throws VisADException   problem creating the data
+     *
+     */
+    public NetcdfPointDataSource(FeatureDatasetPoint fixedDataset, 
+				 DataSourceDescriptor descriptor,
+                                  Hashtable properties)
+            throws VisADException {
+        this(descriptor, Misc.toList(new String[] {""}), properties);
+	this.fixedDataset = fixedDataset;
+    }
+
 
     /**
      * Create a new NetcdfPointDataSource
@@ -193,6 +215,11 @@ public class NetcdfPointDataSource extends PointDataSource {
      * @return dataset
      */
     protected FeatureDatasetPoint getDataset(String file) {
+	if(fixedDataset!=null) {
+	    System.err.println ("Using fixed dataset");
+	    return  fixedDataset;
+	}
+
         FeatureDatasetPoint dataset = null;
         if(file == null) {
             if(sources !=null && sources.size()>0) {
@@ -325,7 +352,9 @@ public class NetcdfPointDataSource extends PointDataSource {
             DateSelection ds = (DateSelection) getProperty(DataSelection.PROP_DATESELECTION);
             obs = PointObFactory.makePointObs(pods, getBinRoundTo(),
                     getBinWidth(), bbox, ds, sample);
-            pods.close();
+	    if(fixedDataset==null) {
+		pods.close();
+	    }
         }
         Trace.call2("NetcdfPointDatasource:makeObs");
         return obs;

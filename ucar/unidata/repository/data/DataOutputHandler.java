@@ -971,6 +971,33 @@ public class DataOutputHandler extends OutputHandler {
         gridPool.put(path, ncd);
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param path _more_
+     *
+     * @return _more_
+     */
+    public FeatureDatasetPoint getPointDataset(Entry entry, String path) {
+        if ( !canLoadAsPoint(entry)) {
+            return null;
+        }
+        return pointPool.get(path);
+    }
+
+    /**
+     * _more_
+     *
+     * @param path _more_
+     * @param ncd _more_
+     */
+    public void returnPointDataset(String path, FeatureDatasetPoint  ncd) {
+        pointPool.put(path, ncd);
+    }
+
     /**
      * _more_
      *
