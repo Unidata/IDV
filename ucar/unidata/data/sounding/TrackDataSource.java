@@ -28,15 +28,7 @@ import ucar.ma2.Range;
 
 import ucar.nc2.*;
 
-import ucar.unidata.data.CompositeDataChoice;
-import ucar.unidata.data.DataCategory;
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.DataSourceDescriptor;
-import ucar.unidata.data.DataSourceImpl;
-import ucar.unidata.data.DirectDataChoice;
-import ucar.unidata.data.FilesDataSource;
-import ucar.unidata.data.VarInfo;
+import ucar.unidata.data.*;
 
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
@@ -53,6 +45,8 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.WrapperException;
+import ucar.visad.Util;
+import ucar.visad.quantities.CommonUnits;
 
 
 import visad.*;
@@ -714,10 +708,12 @@ public class TrackDataSource extends FilesDataSource {
             } else if (id.equals(ID_LASTOB)) {
                 retData = getLastPointOb(dataChoice, dataSelection);
             } else {
+                Object id0 = getChoiceId0(dataChoice);
+
                 List tracks = getTracks(dataChoice, dataSelection,
                                         requestProperties);
                 if ((tracks != null) && (tracks.size() > 0)) {
-                    retData = aggregateTracks(tracks);
+                    retData = aggregateTracks(tracks, id0);
                 }
             }
         } catch (Exception exc) {
@@ -785,7 +781,7 @@ public class TrackDataSource extends FilesDataSource {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    protected FieldImpl aggregateTracks(List tracks)
+    protected FieldImpl aggregateTracks(List tracks, Object id)
             throws VisADException, RemoteException {
         FlatField mergedTracks = mergeTracks(tracks);
         FunctionType fiType = new FunctionType(RealType.Time,
@@ -985,6 +981,16 @@ public class TrackDataSource extends FilesDataSource {
 
 
     /**
+     * Gets the sounding trace associated with this DataChoice
+     * @return associated trace adapter
+     *
+     * @throws Exception On badness
+     */
+    public  TrackAdapter getTraceAdapter()
+            throws Exception {
+        return traceAdapter;
+    }
+    /**
      * Utility to extract the choice id
      *
      * @param dc the data choice
@@ -995,8 +1001,17 @@ public class TrackDataSource extends FilesDataSource {
         String[] idArray = getIdArray(dc);
         return idArray[1];
     }
-
-
+    /**
+     * Utility to extract the choice id
+     *
+     * @param dc the data choice
+     *
+     * @return The id. eg: parameter name
+     */
+    protected String getChoiceId0(DataChoice dc) {
+        String[] idArray = getIdArray(dc);
+        return idArray[0];
+    }
 
     /**
      * Utility to get the track id

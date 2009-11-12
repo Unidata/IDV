@@ -28,6 +28,7 @@ import ucar.ma2.Range;
 import ucar.unidata.data.*;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 import visad.*;
 
@@ -62,6 +63,7 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
     /** Default Constructor */
     public TrajectoryFeatureTypeDataSource() {}
 
+    private List pointCats    = Misc.newList(DataCategory.POINT_PLOT_CATEGORY);
     /**
      * Create a SondeDataSource from the specification given.
      *
@@ -137,7 +139,11 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
      * @throws VisADException  problem in VisAD
      */
     protected FieldImpl aggregateTracks(
-            List tracks) throws VisADException, RemoteException {
+            List tracks, Object id0) throws VisADException, RemoteException {
+
+        if(id0.toString().endsWith("merged")) {
+             return aggregateTracksWithNoTime(tracks);
+        }
         List         adapters = getAdapters();
         FunctionType fiType   = null;
         DateTime[]   times    = new DateTime[tracks.size()];
@@ -160,7 +166,32 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
         return fi;
     }
 
+    /**
+     * Aggregate the tracks
+     *
+     * @param tracks List of sonde tracks
+     *
+     * @return FieldImpl of aggregated tracks
+     *
+     * @throws java.rmi.RemoteException Java RMI Exception
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException  problem in VisAD
+     */
+    protected FieldImpl aggregateTracksWithNoTime(List tracks)
+            throws VisADException, RemoteException {
+       FlatField mergedTracks = mergeTracks(tracks);
+        FunctionType fiType = new FunctionType(RealType.Time,
+                                  mergedTracks.getType());
+        DateTime endTime = getBaseTime();
+        FieldImpl fi =
+            new FieldImpl(fiType,
+                          new SingletonSet(new RealTuple(new Real[] {
+                              endTime })));
+        fi.setSample(0, mergedTracks, false);
+        return fi;
 
+    }
     /**
      * Make the {@link ucar.unidata.data.DataChoice}s associated with this dataset
      */
@@ -174,9 +205,93 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
         if (f.isDirectory()) {
             return;
         }
-        super.doMakeDataChoices();
+        // super.doMakeDataChoices();
 
-        List       adapters       = getAdapters();
+        List adapters = getAdapters();
+        if (adapters == null) {
+            return;
+        }
+        initCategories();
+        List trackInfos = null;
+        try{
+            trackInfos = getTraceAdapter().getTrackInfos();
+        } catch (Exception e) {
+
+        }
+
+        List categories = traceCats;
+
+        for (int trackIdx = 0; trackIdx < trackInfos.size(); trackIdx++) {
+            TrackInfo     trackInfo = (TrackInfo) trackInfos.get(trackIdx);
+            List<VarInfo> vars      = trackInfo.getVariables();
+
+            String        trackName = trackInfo.getTrackName();
+
+
+            String        basicCat  = null;
+            //If there are any categories then use the Basic
+            //            if(parameterCats.size()>0 && parameterCats.get(0)!=null) {
+            //                basicCat = "Basic";
+            //            }
+
+            if (trackInfos.size() > 1) {
+                categories = DataCategory.parseCategories(trackName
+                        + "-Tracks" + ";trace", true);
+            }
+            Hashtable props = Misc.newHashtable(DataChoice.PROP_ICON,
+                                  "/auxdata/ui/icons/TrajectoryData16.gif");
+            for (VarInfo varInfo : vars) {
+                List cats = categories;
+                List cata;
+                cata = DataCategory.parseCategories("Track-" + "Aggregated"
+                            + ";trace", true);
+                if (varInfo.getCategory() != null) {
+                    String cat = StringUtil.replace(varInfo.getCategory(),
+                                     "-", " ");
+                    cats = DataCategory.parseCategories("Track-" + cat
+                            + ";trace", true);
+                    cata = DataCategory.parseCategories("Track-" + "Aggregated" + cat
+                            + ";trace", true);
+                }
+                DirectDataChoice ddc = new DirectDataChoice(this,
+                                           new String[] { trackName,
+                        varInfo.getName() }, varInfo.getName(),
+                                             varInfo.getDescription(), cats,
+                                             props);
+                addDataChoice(ddc);
+                if(varInfo.getCategory() == null) {
+                    DirectDataChoice ddc1 = new DirectDataChoice(this,
+                                               new String[] { trackName+"/merged",
+                            varInfo.getName() }, varInfo.getName(),
+                                                 varInfo.getDescription(), cata,
+                                                 props);
+                    addDataChoice(ddc1);
+                }
+            }
+            // add in a station plot choice as well
+            List pointCatList = pointCats;
+            if (trackInfos.size() > 1) {
+                pointCatList = DataCategory.parseCategories(trackName + ";"
+                        + DataCategory.POINT_PLOT_CATEGORY, true);
+            }
+            props = Misc.newHashtable(DataChoice.PROP_ICON,
+                                      "/auxdata/ui/icons/Placemark16.gif");
+            String pointLabel = getDataChoiceLabel(ID_POINTTRACE);
+            addDataChoice(new DirectDataChoice(this, new String[] { trackName,
+                    ID_POINTTRACE }, pointLabel, pointLabel, pointCatList,
+                                     props));
+            /*
+            addDataChoice(new DirectDataChoice(this, new String[] { trackName,
+                    ID_LASTOB }, getDataChoiceLabel(ID_LASTOB),
+                                 getDataChoiceLabel(ID_LASTOB), pointCatList,
+                                 props));
+             */
+
+        }
+
+
+
+        //List       adapters       = getAdapters();
         DataChoice soundingChoice = null;
         if ((adapters != null) && (adapters.size() > 1)) {
             TrackAdapter    adapter = (TrackAdapter) adapters.get(0);
