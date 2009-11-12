@@ -925,7 +925,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (getInstallationComplete()) {
             getRegistryManager().doFinalInitialization();
         }
-        getFtpManager();
+	//Do this in a thread because (on macs) it hangs sometimes)
+	Misc.run(this,"getFtpManager");
     }
 
 

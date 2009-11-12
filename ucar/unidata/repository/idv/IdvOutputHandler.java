@@ -47,6 +47,7 @@ import ucar.unidata.data.*;
 import ucar.unidata.data.grid.*;
 import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.idv.IdvServer;
+import ucar.unidata.idv.ControlDescriptor;
 
 
 import ucar.unidata.idv.IdvBase;
@@ -61,6 +62,7 @@ import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
 
+import ucar.unidata.util.ThreeDSize;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.CacheManager;
@@ -89,6 +91,7 @@ import java.net.*;
 import java.text.SimpleDateFormat;
 
 
+import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Date;
@@ -104,10 +107,19 @@ import java.util.List;
 public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_PARAM = "param";
 
+    public static final String ARG_TARGET = "target";
+    public static final String TARGET_IMAGE = "image";
+    public static final String TARGET_JNLP = "jnlp";
+    public static final String TARGET_ISL = "isl";
+
     public static final String ARG_DISPLAYLISTLABEL = "displaylistlabel";
     public static final String ARG_COLORTABLE= "colortable";
     public static final String ARG_STRIDE = "stride";
 
+
+    public static final String ARG_FLOW_SCALE = "flow_scale";
+    public static final String ARG_FLOW_DENSITY = "flow_density";
+    public static final String ARG_FLOW_SKIP = "flow_skip";
 
     public static final String ARG_DISPLAYUNIT = "displayunit";
     public static final String ARG_ISOSURFACEVALUE = "isosurfacevalue";
@@ -117,6 +129,13 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_CONTOUR_BASE= "contour_base";
     public static final String ARG_CONTOUR_DASHED= "contour_dashed";
     public static final String ARG_CONTOUR_LABELS= "contour_labels";
+
+
+
+    public static final String ARG_SCALE_VISIBLE="scale_visible";
+    public static final String ARG_SCALE_ORIENTATION="scale_orientation";
+    public static final String ARG_SCALE_PLACEMENT = "scale_placement";
+    //    public static final String ARG_SCALE="";
 
 
     public static final String ARG_RANGE_MIN= "range_min";
@@ -144,6 +163,12 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
+
+    public static final String DISPLAY_PLANVIEWFLOW  = "planviewflow";
+    public static final String DISPLAY_STREAMLINES = "streamlines";  
+    public static final String DISPLAY_WINDBARBPLAN = "windbarbplan";  
+
+
     public static final String DISPLAY_PLANVIEWCONTOUR = "planviewcontour";
     public static final String DISPLAY_PLANVIEWCONTOURFILLED = "planviewcontourfilled";
     public static final String DISPLAY_PLANVIEWCOLOR = "planviewcolor";
@@ -166,9 +191,8 @@ public class IdvOutputHandler extends OutputHandler {
     /** _more_ */
     int callCnt = 0;
 
+    private 	HashSet<String> okControls;
 
-    /** _more_ */
-    public static final Object IDV_MUTEX = new Object();
 
     /**
      *     _more_
@@ -180,6 +204,20 @@ public class IdvOutputHandler extends OutputHandler {
     public IdvOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
+
+	okControls = new HashSet<String>();
+	okControls.add("planviewflow");
+	okControls.add("streamlines");
+	okControls.add("windbarbplan");
+	okControls.add("planviewcontour");
+	okControls.add("planviewcontourfilled");
+	okControls.add("planviewcolor");
+	okControls.add("valuedisplay");
+	okControls.add("isosurface");
+	okControls.add("volumerender");
+	okControls.add("pointvolumerender");
+
+
         try {
             java.awt.GraphicsEnvironment e =
                 java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -418,12 +456,7 @@ public class IdvOutputHandler extends OutputHandler {
 	    idToChoice.put(dataChoice.getName(),dataChoice);
 	}
 
-	List displays = new ArrayList();
-	displays.add(new TwoFacedObject("--skip--",""));
-	displays.add(new TwoFacedObject("Color Shaded Plan View",DISPLAY_PLANVIEWCOLOR));
-	displays.add(new TwoFacedObject("Contour Plan View",DISPLAY_PLANVIEWCONTOUR));
-	displays.add(new TwoFacedObject("Color Filled Contour Plan View",DISPLAY_PLANVIEWCONTOURFILLED));
-	displays.add(new TwoFacedObject("Isosurface",DISPLAY_ISOSURFACE));
+
 
 	for(int displayIdx=1;displayIdx<=NUM_PARAMS;displayIdx++) {
 	    if(!request.defined(ARG_PARAM+displayIdx)) continue;
@@ -437,6 +470,24 @@ public class IdvOutputHandler extends OutputHandler {
             if(choice == null) {
                 continue;
             }
+
+	    List  descriptors =
+		new ArrayList(
+			      ControlDescriptor.getApplicableControlDescriptors(
+										choice.getCategories(),
+										idvServer.getIdv().getControlDescriptors(true)));
+
+
+	    List displays = new ArrayList();
+	    displays.add(new TwoFacedObject("--skip--",""));
+	    for(ControlDescriptor controlDescriptor: (List<ControlDescriptor>) descriptors) {
+		String controlId = controlDescriptor.getControlId();
+		if(!okControls.contains(controlId)) continue;
+		//		System.out.println (controlId +"  " + controlDescriptor.getLabel());
+		displays.add(new TwoFacedObject(controlDescriptor.getLabel(), controlId));
+	    }
+
+
 	    tab.append(HtmlUtil.hidden(ARG_PARAM+displayIdx,request.getString(ARG_PARAM+displayIdx,"")));
 	    List options = new ArrayList();
 	    options.add("");
@@ -460,27 +511,33 @@ public class IdvOutputHandler extends OutputHandler {
 	    }
 	    
 	    List levels = choice.getAllLevels();
+
+	    List spatialComps = new ArrayList();
 	    if(levels!=null && levels.size()>0) {
 		List tfoLevels =new ArrayList();
 		int cnt=0;
 		for(Object level: levels) {
 		    tfoLevels.add(new TwoFacedObject(level.toString(), new Integer(cnt++)));
 		}
-		innerTabTitles.add(msg("Spatial"));
                 String levelWidget = HtmlUtil.select(ARG_LEVELS+displayIdx, tfoLevels,"",
                                                      HtmlUtil.attrs(HtmlUtil.ATTR_MULTIPLE,"false",
                                                                     HtmlUtil.ATTR_SIZE,"5"));
-                String spatial = HtmlUtil.table(new Object[]{
-                        msgLabel("Levels"),
-                        levelWidget,
-                        msgLabel("X/Y Stride"),
-                        HtmlUtil.input(ARG_STRIDE+displayIdx,"", HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"5"))}
-                    ,5
-                    );
-
-
-                innerTabContents.add(spatial);
+		spatialComps.add(msgLabel("Levels"));
+		spatialComps.add(levelWidget);
 	    }
+
+
+            ThreeDSize size =
+                (ThreeDSize) choice.getProperty(GeoGridDataSource.PROP_GRIDSIZE);
+	    spatialComps.add(msgLabel("X/Y Stride"));
+	    String strideComp = HtmlUtil.input(ARG_STRIDE+displayIdx,"", HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"5"));
+	    if(size!=null)
+		strideComp = strideComp+HtmlUtil.br()+size;
+	    spatialComps.add(strideComp);
+	    String spatial = HtmlUtil.table(Misc.listToStringArray(spatialComps), 5);
+	    innerTabTitles.add(msg("Spatial"));
+	    innerTabContents.add(spatial);
+
 
 
 
@@ -517,6 +574,17 @@ public class IdvOutputHandler extends OutputHandler {
 
             }
 
+            StringBuffer scalesb  = new StringBuffer();
+	    scalesb.append(msgHeader("Color Scale"));
+            scalesb.append(HtmlUtil.formTable());
+            scalesb.append(HtmlUtil.formEntry(msgLabel("Visible"), HtmlUtil.checkbox(ARG_SCALE_VISIBLE+displayIdx,"true",false)));
+            scalesb.append(HtmlUtil.formEntry(msgLabel("Place"), HtmlUtil.select(ARG_SCALE_PLACEMENT+displayIdx,Misc.newList("top","left","bottom","right"))));
+            scalesb.append(HtmlUtil.formTableClose());
+
+
+	    
+
+
             StringBuffer contoursb  = new StringBuffer();
             contoursb.append(HtmlUtil.formTable());
             contoursb.append(HtmlUtil.formEntry(msgLabel("Interval"), HtmlUtil.input(ARG_CONTOUR_INTERVAL+displayIdx,"",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"3"))));
@@ -533,6 +601,9 @@ public class IdvOutputHandler extends OutputHandler {
             misc.append(HtmlUtil.formEntry(msgLabel("Display List Label"), HtmlUtil.input(ARG_DISPLAYLISTLABEL+displayIdx,"",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"30"))));
             misc.append(HtmlUtil.formEntry(msgLabel("Display Unit"), HtmlUtil.input(ARG_DISPLAYUNIT+displayIdx,"",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"6"))));
             misc.append(HtmlUtil.formEntry(msgLabel("Isosurface Value"), HtmlUtil.input(ARG_ISOSURFACEVALUE+displayIdx,"",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"3"))));
+            misc.append(HtmlUtil.formEntry(msgLabel("Vector/Barb Size"), HtmlUtil.input(ARG_FLOW_SCALE+displayIdx,"4",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"3"))));
+            misc.append(HtmlUtil.formEntry(msgLabel("Streamline Density"), HtmlUtil.input(ARG_FLOW_DENSITY+displayIdx,"1",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"3"))));
+            misc.append(HtmlUtil.formEntry(msgLabel("Flow Skip"), HtmlUtil.input(ARG_FLOW_SKIP+displayIdx,"0",HtmlUtil.attrs(HtmlUtil.ATTR_SIZE,"3"))));
 
 
 
@@ -540,7 +611,7 @@ public class IdvOutputHandler extends OutputHandler {
             misc.append(HtmlUtil.formTableClose());
 
             innerTabTitles.add(msg("Color Table"));
-            innerTabContents.add(ctsb.toString());
+            innerTabContents.add(HtmlUtil.table(new Object[]{ctsb,scalesb},5));
 
             innerTabTitles.add(msg("Contours"));
             innerTabContents.add(contoursb.toString());
@@ -635,16 +706,31 @@ public class IdvOutputHandler extends OutputHandler {
 	throws Exception {
 	StringBuffer sb = new StringBuffer();
 	String url = getRepository().URL_ENTRY_SHOW.getFullUrl();
+	String islUrl = url +"/" + IOUtil.stripExtension(entry.getName())+".isl";
+	String jnlpUrl = url +"/" + IOUtil.stripExtension(entry.getName())+".jnlp";
+	
 	Hashtable exceptArgs = new Hashtable();
 	exceptArgs.put(ARG_ACTION, ARG_ACTION);
 	String args = request.getUrlArgs(exceptArgs, null);
-	sb.append(HtmlUtil.img(url + "?" + ARG_ACTION +"=" + ACTION_MAKEIMAGE+"&" + args));
+	url = url + "?" + ARG_ACTION +"=" + ACTION_MAKEIMAGE+"&" + args;
+
+
+	islUrl = islUrl + "?" + ARG_ACTION +"=" + ACTION_MAKEIMAGE+"&" + args +"&" + ARG_TARGET +"=" + TARGET_ISL;
+	jnlpUrl = jnlpUrl + "?" + ARG_ACTION +"=" + ACTION_MAKEIMAGE+"&" + args +"&" + ARG_TARGET +"=" + TARGET_JNLP;
+
+	sb.append(HtmlUtil.img(url));
+	sb.append(HtmlUtil.br());
+	sb.append(HtmlUtil.href(jnlpUrl,msg("Launch in the IDV")));
+	sb.append(HtmlUtil.br());
+	sb.append(HtmlUtil.href(islUrl,msg("Download IDV ISL script")));
 	return new Result("Grid Preview", sb);
     }
 
 
     public Result outputGridImage(final Request request, Entry entry, GeoGridDataSource dataSource)
 	throws Exception {
+        DataOutputHandler dataOutputHandler = getDataOutputHandler();
+
 	Trace.addNot(".*ShadowFunction.*");
 	Trace.addNot(".*GeoGrid.*");
 	//	Trace.addOnly(".*MapProjection.*");
@@ -653,6 +739,11 @@ public class IdvOutputHandler extends OutputHandler {
         String id = entry.getId();
         File image = getStorageManager().getThumbFile("preview_"
                          + id.replace("/", "_") + ".gif");
+
+	boolean forIsl = request.getString(ARG_TARGET,"").equals(TARGET_ISL);
+	boolean forJnlp = request.getString(ARG_TARGET,"").equals(TARGET_JNLP);
+	if(forJnlp) forIsl = true;
+
         StringBuffer isl = new StringBuffer();
         isl.append("<isl debug=\"true\" loop=\"1\" offscreen=\"true\">\n");
 
@@ -665,16 +756,30 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
 	//Create a new viewmanager
+	//For now don't do this if we are doing jnlp
+	if(!forJnlp) {
 	isl.append(XmlUtil.tag(ImageGenerator.TAG_VIEW,
 			       XmlUtil.attrs(ImageGenerator.ATTR_WIDTH,
 					     request.getString(ARG_IMAGE_WIDTH,"400"),
 					     ImageGenerator.ATTR_HEIGHT,
 					     request.getString(ARG_IMAGE_HEIGHT,"300")),
                                viewProps.toString()));
+	}
 
 
 
-        isl.append("<datasource id=\"datasource\" times=\"0\" >\n");
+	if(forIsl) {
+	    isl.append(XmlUtil.openTag("datasource",XmlUtil.attrs(
+								  "id","datasource",
+								  "url",
+								  getRepository().absoluteUrl(
+											      getRepository().URL_ENTRY_SHOW
+											      + dataOutputHandler.getOpendapUrl(entry)),
+								  )));
+	} else {
+	    isl.append("<datasource id=\"datasource\" times=\"0\" >\n");
+	}
+
 	Hashtable props = new Hashtable();
 	props.put("datasource", dataSource);
 	StringBuffer firstDisplays = new StringBuffer();
@@ -694,6 +799,30 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
+
+
+	    if(request.get(ARG_SCALE_VISIBLE+displayIdx,false)) {
+	    /*
+    visible=true|false;
+    color=somecolor;
+    orientation=horizontal|vertical;
+    placement=top|left|bottom|right
+	    */
+		String placement = request.getString(ARG_SCALE_PLACEMENT+displayIdx,"");
+		String orientation;
+		if(placement.equals("top") || placement.equals("bottom")) 
+		    orientation = "horizontal";
+		else
+		    orientation = "vertical";
+		String s  = "visible=true;orientation=" + orientation+";placement=" + placement;
+                propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
+                                          XmlUtil.attrs("name","colorScaleInfo",
+                                                        "value",s.toString())));
+
+
+
+
+	    }
 
 
             if(display.equals(DISPLAY_PLANVIEWCONTOUR)) {
@@ -741,6 +870,27 @@ public class IdvOutputHandler extends OutputHandler {
 
 	    StringBuffer attrs = new StringBuffer();
 
+
+	    if(display.equals(DISPLAY_PLANVIEWFLOW) ||
+	       display.equals(DISPLAY_STREAMLINES) ||
+	       display.equals(DISPLAY_WINDBARBPLAN)) {
+                    propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
+                                              XmlUtil.attrs("name","flowScale",
+                                                            "value",request.getString(ARG_FLOW_SCALE+displayIdx,""))));
+                    propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
+                                              XmlUtil.attrs("name","streamlineDensity",
+                                                            "value",request.getString(ARG_FLOW_DENSITY+displayIdx,""))));
+
+                    propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
+                                              XmlUtil.attrs("name","skipValue",
+                                                            "value",request.getString(ARG_FLOW_SKIP+displayIdx,""))));
+
+	    }
+
+
+
+
+
             if(display.equals(DISPLAY_ISOSURFACE)) {
                 if(request.defined(ARG_ISOSURFACEVALUE+displayIdx)) {
                     propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY, 
@@ -769,6 +919,7 @@ public class IdvOutputHandler extends OutputHandler {
                                                         "value",request.getString(ARG_DISPLAYUNIT+displayIdx,""))));
             }
 
+	    System.err.println("Props:" + propSB);
             attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_TYPE, display,
                                        ImageGenerator.ATTR_PARAM,request.getString(ARG_PARAM+displayIdx,"")));
 
@@ -801,6 +952,24 @@ public class IdvOutputHandler extends OutputHandler {
         isl.append(XmlUtil.tag((multipleTimes?"movie":"image"), XmlUtil.attr("file",  image.toString()), clip));
         isl.append("</isl>\n");
         //        System.out.println(isl);
+
+
+	if(forJnlp) {
+	    String jnlp = getRepository().getResource(
+						      "/ucar/unidata/repository/idv/template.jnlp");
+	    StringBuffer args = new StringBuffer();
+            args.append("<argument>-b64isl</argument>");
+            args.append("<argument>" + XmlUtil.encodeBase64(isl.toString().getBytes()) + "</argument>");
+	    jnlp = jnlp.replace("${args}", args.toString());
+	    return new Result("data.jnlp",
+			      new StringBuffer(jnlp),
+			      "application/x-java-jnlp-file");
+	}
+	if(forIsl) {
+	    return new Result("data.isl",
+			      new StringBuffer(isl),
+			      "text/xml");
+	}
 
 	long t1 = System.currentTimeMillis();
         idvServer.evaluateIsl(isl,props);

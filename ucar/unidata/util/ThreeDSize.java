@@ -143,8 +143,8 @@ public class ThreeDSize {
      * @return _more_
      */
     public String toString() {
-        return " sizeX  = " + sizeX + " sizeY  = " + sizeY + " sizeZ  = "
-               + sizeZ;
+        return " Size X: " + sizeX + " Size Y:" + sizeY + (sizeZ<=1?"":" Size Z:"
+							   + sizeZ);
     }
 
 
