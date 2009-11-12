@@ -322,6 +322,8 @@ public interface IdvConstants {
 
     public static final String PROP_FIXFILELOCKUP = "idv.fixfilelockup";
 
+    public static final String PROP_DISPLAYLIST_GROUP = "idv.displaylist.group";
+
 
 
     /** Holds the preference for the one instance port */

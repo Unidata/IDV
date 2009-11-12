@@ -24,6 +24,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -48,8 +49,6 @@ import ucar.unidata.ui.ImagePanel;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.Timeline;
 import ucar.unidata.ui.drawing.Glyph;
-
-import java.text.DecimalFormat;
 
 import ucar.unidata.util.BooleanProperty;
 import ucar.unidata.util.DatedObject;
@@ -110,6 +109,8 @@ import java.beans.PropertyChangeListener;
 import java.io.*;
 
 import java.rmi.RemoteException;
+
+import java.text.DecimalFormat;
 
 import java.util.ArrayList;
 
@@ -461,7 +462,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
 
-    private int  splitPaneLocation  = -1;
+    /** _more_          */
+    private int splitPaneLocation = -1;
 
 
     /**
@@ -582,11 +584,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** properties dialog */
     JDialog propertiesDialog;
 
+    /** _more_          */
     boolean propertiesDialogShown = false;
 
+    /** _more_          */
     JLabel matrixLabel;
 
-    DecimalFormat fmt =  new DecimalFormat("####0.0###");
+    /** _more_          */
+    DecimalFormat fmt = new DecimalFormat("####0.0###");
 
     /** the view menu */
     JMenu viewMenu;
@@ -913,9 +918,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
         contentsWrapper = GuiUtils.center(innerContents);
         menuBar         = doMakeMenuBar();
         if (menuBar != null) {
-	    menuBar.setBorderPainted(false);
-	    menuBar.setMargin(new Insets(0,0,0,0));
-	    menuBar.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            menuBar.setBorderPainted(false);
+            menuBar.setMargin(new Insets(0, 0, 0, 0));
+            menuBar.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
             menuBar.setOpaque(false);
         }
         nameLabel = GuiUtils.cLabel(" ");
@@ -979,7 +984,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             mainSplitPane.setResizeWeight(0.80);
         }
         mainSplitPane.setOneTouchExpandable(true);
-        if(splitPaneLocation>=0) {
+        if (splitPaneLocation >= 0) {
             //SPLIT       mainSplitPane.setDividerLocation(splitPaneLocation);
         }
 
@@ -1036,7 +1041,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     protected void adjustSplitPane() {
         //SPLIT
-        if(true) return;
+        if (true) {
+            return;
+        }
         //        centerPanelWrapper.removeAll();
         if (legendState.equals(IdvLegend.STATE_DOCKED)) {
             mainSplitPane.resetToPreferredSizes();
@@ -1150,12 +1157,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 buttons), 5);
         boolean newOne = false;
         if (propertiesDialog == null) {
-	    IdvWindow myWindow = getDisplayWindow();
-	    Window window = null;
-	    if(myWindow!=null) 
-		window = myWindow.getWindow();
-            propertiesDialog = GuiUtils.createDialog(window, "Properties", false);
-            newOne           = true;
+            IdvWindow myWindow = getDisplayWindow();
+            Window    window   = null;
+            if (myWindow != null) {
+                window = myWindow.getWindow();
+            }
+            propertiesDialog = GuiUtils.createDialog(window, "Properties",
+                    false);
+            newOne = true;
         }
         propertiesDialog.getContentPane().removeAll();
         propertiesDialog.getContentPane().add(comp);
@@ -1498,9 +1507,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
             matrixLabel = new JLabel("<html></html>");
-            matrixLabel.setBorder(BorderFactory.createTitledBorder("Display Matrix Settings"));
+            matrixLabel.setBorder(
+                BorderFactory.createTitledBorder("Display Matrix Settings"));
             setMatrixLabel(true);
-            contents = GuiUtils.centerBottom(contents, GuiUtils.inset(matrixLabel, new Insets(20,0,0,0)));
+            contents = GuiUtils.centerBottom(contents,
+                                             GuiUtils.inset(matrixLabel,
+                                                 new Insets(20, 0, 0, 0)));
             return contents;
         } catch (Exception exc) {
             logException("Creating aspect dialog", exc);
@@ -1509,52 +1521,68 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
-    private double[]lastMatrix;
-    private List<TwoFacedObject>lastCoords;
+    /** _more_          */
+    private double[] lastMatrix;
 
+    /** _more_          */
+    private List<TwoFacedObject> lastCoords;
+
+    /**
+     * _more_
+     *
+     * @param force _more_
+     */
     private void setMatrixLabel(boolean force) {
         try {
-            if(matrixLabel==null) return;
-            if(!force && !propertiesDialogShown) return;
-            if(!force) {
+            if (matrixLabel == null) {
+                return;
+            }
+            if ( !force && !propertiesDialogShown) {
+                return;
+            }
+            if ( !force) {
                 try {
                     matrixLabel.getLocationOnScreen();
                 } catch (Exception exc) {
                     return;
                 }
             }
-            double[] currentMatrix = getDisplayMatrix();
+            double[]             currentMatrix = getDisplayMatrix();
             boolean changed = !Misc.equals(lastMatrix, currentMatrix);
-            List<TwoFacedObject> coords=null;
-            if(getMaster() instanceof NavigatedDisplay) {
-                coords = ((NavigatedDisplay)getMaster()).getScreenCoordinates();
-                if(!Misc.equals(coords,lastCoords)) changed = true;
+            List<TwoFacedObject> coords        = null;
+            if (getMaster() instanceof NavigatedDisplay) {
+                coords =
+                    ((NavigatedDisplay) getMaster()).getScreenCoordinates();
+                if ( !Misc.equals(coords, lastCoords)) {
+                    changed = true;
+                }
             }
-            if(!changed) return;
+            if ( !changed) {
+                return;
+            }
 
             lastMatrix = currentMatrix;
-            double[] trans         = { 0.0, 0.0, 0.0 };
-            double[] rot           = { 0.0, 0.0, 0.0 };
-            double[] scale         = { 0.0, 0.0, 0.0 };
-            getMaster().getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
-                                                                  currentMatrix);
+            double[] trans = { 0.0, 0.0, 0.0 };
+            double[] rot   = { 0.0, 0.0, 0.0 };
+            double[] scale = { 0.0, 0.0, 0.0 };
+            getMaster().getMouseBehavior().instance_unmake_matrix(rot, scale,
+                    trans, currentMatrix);
 
 
 
-            StringBuffer sb= new StringBuffer();
-            sb.append("<html><table width=100%><tr><td width=33%></td><td width=33%>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=33%>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Y&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Z&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>" +
-                      "<tr><td align=right>Rotation:</td><td align=right>" + fmt(rot[0])+"</td><td align=right>"+fmt(rot[1])+"</td><td align=right>" + fmt(rot[2])+"</td></tr>" +
-                      "<tr><td align=right>Translation:</td><td align=right>" + fmt(trans[0])+"</td><td align=right>"+fmt(trans[1])+"</td><td align=right>"+fmt(trans[2]) +"</td></tr>" +
-                      "<tr><td align=right>Scale:</td><td align=right>" + fmt(scale[0])+"</td><td>" +fmt(scale[1])+"</td><td>" +fmt(scale[2])+"</td></tr>");
+            StringBuffer sb = new StringBuffer();
+            sb.append(
+                "<html><table width=100%><tr><td width=33%></td><td width=33%>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=33%>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Y&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Z&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>" + "<tr><td align=right>Rotation:</td><td align=right>" + fmt(rot[0]) + "</td><td align=right>" + fmt(rot[1]) + "</td><td align=right>" + fmt(rot[2]) + "</td></tr>" + "<tr><td align=right>Translation:</td><td align=right>" + fmt(trans[0]) + "</td><td align=right>" + fmt(trans[1]) + "</td><td align=right>" + fmt(trans[2]) + "</td></tr>" + "<tr><td align=right>Scale:</td><td align=right>" + fmt(scale[0]) + "</td><td>" + fmt(scale[1]) + "</td><td>" + fmt(scale[2]) + "</td></tr>");
 
-            if(getMaster() instanceof NavigatedDisplay) {
-                NavigatedDisplay navDisplay = (NavigatedDisplay)getMaster();
-                sb.append("<tr><td></td><td colspan=3 align=center>Box</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td colspan=2 align=center>Screen</td></tr>");
-                for(TwoFacedObject tfo:coords) {
-                    double[]xyz = (double[])tfo.getId();
-                    int []scoords = navDisplay.getScreenCoordinates(xyz);
+            if (getMaster() instanceof NavigatedDisplay) {
+                NavigatedDisplay navDisplay = (NavigatedDisplay) getMaster();
+                sb.append(
+                    "<tr><td></td><td colspan=3 align=center>Box</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td colspan=2 align=center>Screen</td></tr>");
+                for (TwoFacedObject tfo : coords) {
+                    double[] xyz     = (double[]) tfo.getId();
+                    int[]    scoords = navDisplay.getScreenCoordinates(xyz);
                     sb.append("<tr align=right><td align=right>");
-                    sb.append(tfo.toString()+":");
+                    sb.append(tfo.toString() + ":");
                     sb.append("</td><td>");
                     sb.append(fmt(xyz[0]));
                     sb.append("</td><td>");
@@ -1572,14 +1600,23 @@ public class ViewManager extends SharableImpl implements ActionListener,
             sb.append("</table>");
 
             matrixLabel.setText(sb.toString());
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             LogUtil.consoleMessage("Error:" + exc);
         }
 
     }
 
+    /**
+     * _more_
+     *
+     * @param d _more_
+     *
+     * @return _more_
+     */
     private String fmt(double d) {
-        if(d== -0.0) d = 0.0;
+        if (d == -0.0) {
+            d = 0.0;
+        }
         return fmt.format(d);
     }
 
@@ -1683,16 +1720,23 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @throws RemoteException  Java RMI exception
      * @throws VisADException   Couldn't create the VisAD display
      */
-    public  void initAfterUnPersistence(IntegratedDataViewer idv)
+    public void initAfterUnPersistence(IntegratedDataViewer idv)
             throws VisADException, RemoteException {
         setIdv(idv);
         initBooleanProperties();
     }
 
 
-    public  void initWith(ViewState  viewState) throws Exception {
-        double [] matrix = (double[]) viewState.get(ViewState.PROP_MATRIX);
-        if(matrix!=null) {
+    /**
+     * _more_
+     *
+     * @param viewState _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initWith(ViewState viewState) throws Exception {
+        double[] matrix = (double[]) viewState.get(ViewState.PROP_MATRIX);
+        if (matrix != null) {
             setDisplayMatrix(matrix);
         }
     }
@@ -1760,7 +1804,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 }
             }
 
-            if(that.splitPaneLocation>=0) {
+            if (that.splitPaneLocation >= 0) {
                 //SPLIT
                 /*
                 this.splitPaneLocation = that.splitPaneLocation;
@@ -2289,10 +2333,25 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 if ( !getShowDisplayList()) {
                     return;
                 }
-                int  count    = 0;
+
                 List controls = getControls();
 
-                for (int i = 0; i < controls.size(); i++) {
+                Hashtable<String, List<TextDisplayable>> catMap =
+                    new Hashtable<String, List<TextDisplayable>>();
+                List<String> cats = new ArrayList<String>();
+                List<TextDisplayable> textDisplayables =
+                    new ArrayList<TextDisplayable>();
+
+
+                //Seed the list first so we get the right order
+                if (sideLegend != null) {
+                    for (String cat : sideLegend.getDisplayCategories()) {
+                        cats.add(cat);
+                        catMap.put(cat, new ArrayList<TextDisplayable>());
+                    }
+                }
+
+                for (int i = controls.size() - 1; i >= 0; i--) {
                     DisplayControl control = (DisplayControl) controls.get(i);
                     if ( !control.getShowInDisplayList()
                             || !control.getDisplayVisibility()) {
@@ -2304,12 +2363,45 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     if (d == null) {
                         continue;
                     }
-                    count++;
-                    boolean success = setDisplayablePosition(d, count);
-                    if (success) {
-                        displayListDisplayables.addDisplayable(d);
+
+                    String                cat = control.getDisplayCategory();
+                    List<TextDisplayable> l   = catMap.get(cat);
+                    if (l == null) {
+                        l = new ArrayList<TextDisplayable>();
+                        catMap.put(cat, l);
+                        cats.add(cat);
+                    }
+                    l.add(d);
+                    textDisplayables.add(d);
+                }
+
+
+                boolean grouped = getStateManager().getPreferenceOrProperty(
+                                      IdvConstants.PROP_DISPLAYLIST_GROUP,
+                                      false);
+                if (grouped) {
+                    int count = 0;
+                    for (int i = cats.size() - 1; i >= 0; i--) {
+                        String                cat          = cats.get(i);
+                        List<TextDisplayable> displayables = catMap.get(cat);
+                        for (int j = displayables.size() - 1; j >= 0; j--) {
+                            TextDisplayable d = displayables.get(j);
+                            count++;
+                            if (setDisplayablePosition(d, count)) {
+                                displayListDisplayables.addDisplayable(d);
+                            }
+                        }
+                    }
+                } else {
+                    for (int count = 0; count < textDisplayables.size();
+                            count++) {
+                        TextDisplayable d = textDisplayables.get(count);
+                        if (setDisplayablePosition(d, count + 1)) {
+                            displayListDisplayables.addDisplayable(d);
+                        }
                     }
                 }
+
                 getMaster().addDisplayable(displayListDisplayables);
                 //displayListDisplayables.setVisible(true);
             }
@@ -2423,19 +2515,24 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     booleanPropertiesForPersistence);
         }
         for (int i = 0; i < props.size(); i++) {
-            BooleanProperty bp           = (BooleanProperty) props.get(i);
+            BooleanProperty bp = (BooleanProperty) props.get(i);
             initializeBooleanProperty(bp);
         }
     }
 
 
+    /**
+     * _more_
+     *
+     * @param bp _more_
+     */
     protected void initializeBooleanProperty(BooleanProperty bp) {
         StateManager   stateManager = getStateManager();
         XmlObjectStore store        = getStore();
-        boolean         defaultValue = bp.getDefault();
+        boolean        defaultValue = bp.getDefault();
         if (stateManager != null) {
             defaultValue = getStateManager().getProperty(bp.getId(),
-                                                         defaultValue);
+                    defaultValue);
         }
 
         if (store != null) {
@@ -2453,20 +2550,20 @@ public class ViewManager extends SharableImpl implements ActionListener,
         BooleanProperty existingBp =
             (BooleanProperty) booleanPropertyMap.get(bp.getId());
         if ((existingBp != null)
-            && (booleanPropertiesForPersistence == null)) {
+                && (booleanPropertiesForPersistence == null)) {
             // debug("\thave existing " + existingBp);
             bp.setValue(existingBp.getValue());
         }
 
 
         BooleanProperty newBp = new BooleanProperty(bp) {
-                public void setValueInner(boolean value) throws Exception {
-                    super.setValueInner(value);
-                    if (getHaveInitialized()) {
-                        handleBooleanPropertyChange(getId(), value);
-                    }
+            public void setValueInner(boolean value) throws Exception {
+                super.setValueInner(value);
+                if (getHaveInitialized()) {
+                    handleBooleanPropertyChange(getId(), value);
                 }
-            };
+            }
+        };
         newBp.setDefault(defaultValue);
         addBooleanProperty(newBp);
 
@@ -2496,7 +2593,16 @@ public class ViewManager extends SharableImpl implements ActionListener,
         return getBooleanProperty(propertyId, true);
     }
 
-    protected BooleanProperty getBooleanProperty(String propertyId, boolean dflt) {
+    /**
+     * _more_
+     *
+     * @param propertyId _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    protected BooleanProperty getBooleanProperty(String propertyId,
+            boolean dflt) {
         if (booleanPropertyMap.size() == 0) {
             initBooleanProperties();
         }
@@ -2534,6 +2640,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
+    /**
+     * _more_
+     *
+     * @param propertyId _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     protected boolean getBp(String propertyId, boolean dflt) {
         return getBooleanProperty(propertyId, dflt).getValue();
     }
@@ -3066,7 +3180,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @return true if successful
      */
     public boolean setProperty(String name, String value,
-                                boolean ignoreError) {
+                               boolean ignoreError) {
         try {
             return Misc.propertySet(this, name, value, ignoreError);
         } catch (Exception exc) {
@@ -3149,7 +3263,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @return Side legend location
      */
     public int getSideDividerLocation() {
-        JSplitPane tmp=mainSplitPane;
+        JSplitPane tmp = mainSplitPane;
         if (tmp != null) {
             return tmp.getDividerLocation();
         }
@@ -3538,9 +3652,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     protected JMenuBar doMakeMenuBar() {
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-	List items = doMakeMenuList();
-	JMenuBar menuBar =  GuiUtils.makeMenuBar(items);
-	return menuBar;
+        List     items   = doMakeMenuList();
+        JMenuBar menuBar = GuiUtils.makeMenuBar(items);
+        return menuBar;
     }
 
     /**
@@ -3574,8 +3688,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
-    public void displayDataChanged(DisplayControl displayControl) {
-    }
+    /**
+     * _more_
+     *
+     * @param displayControl _more_
+     */
+    public void displayDataChanged(DisplayControl displayControl) {}
 
     /**
      * Return the  list of {@link DisplayControl}s displayed in this ViewManager
@@ -4088,13 +4206,15 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         JMenu captureMenu = new JMenu("Capture");
         viewMenu.add(captureMenu);
-        captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Image...", this,
-                                                               "doSaveImageInThread"),"/auxdata/ui/icons/camera.png"));
-        captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Print...", this,
-                                                               "doPrintImage", null, true),"/auxdata/ui/icons/printer.png"));
+        captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Image...",
+                this,
+                "doSaveImageInThread"), "/auxdata/ui/icons/camera.png"));
+        captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Print...",
+                this, "doPrintImage", null,
+                true), "/auxdata/ui/icons/printer.png"));
 
-        captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Movie...", this,
-                                                               "startImageCapture"),"/auxdata/ui/icons/film.png"));
+        captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Movie...",
+                this, "startImageCapture"), "/auxdata/ui/icons/film.png"));
 
         viewMenu.add(makeShowMenu());
 
@@ -4128,12 +4248,27 @@ public class ViewManager extends SharableImpl implements ActionListener,
         makeViewStateMenu(viewStateMenu);
     }
 
+    /**
+     * _more_
+     *
+     * @param vm _more_
+     *
+     * @return _more_
+     */
     public boolean isCompatibleWith(ViewManager vm) {
         return getClass().equals(vm.getClass());
     }
 
+    /**
+     * _more_
+     *
+     * @param viewState _more_
+     *
+     * @return _more_
+     */
     public boolean isCompatibleWith(ViewState viewState) {
-        return getClass().getName().toString().equals(viewState.getViewClassName().trim());
+        return getClass().getName().toString().equals(
+            viewState.getViewClassName().trim());
     }
 
 
@@ -4651,7 +4786,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 synchronized (MASTER_MUTEX) {
                     //If we had been blocked by another thread creating the DisplayMaste
                     //check if we have a master
-                    if(master!=null) return master;
+                    if (master != null) {
+                        return master;
+                    }
                     // might need these for the display initialization
                     if (initProperties != null) {
                         String tmp = initProperties;
@@ -5465,7 +5602,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                             zos.write(imageBytes, 0, imageBytes.length);
                             zos.close();
                             getIdv().getPublishManager().publishContent(
-                                                                        kmlFilename, this, publishCbx);
+                                kmlFilename, this, publishCbx);
                             return;
                         }
                     }
@@ -5713,8 +5850,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param colorMenu The Color menu to initialize
      */
     public void initColorMenu(JMenu colorMenu) {
-        colorMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Set Colors...", this,
-                                                             "showColorPairDialog"),"/auxdata/ui/icons/color_swatch.png"));
+        colorMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Set Colors...",
+                this,
+                "showColorPairDialog"), "/auxdata/ui/icons/color_swatch.png"));
 
         JMenu deleteMenu = new JMenu("Delete");
         colorMenu.add(deleteMenu);
@@ -5744,18 +5882,18 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                    (colorResourceIdx == 0)));
                 try {
                     JLabel lbl = new JLabel("  T  ");
-                    lbl.setSize(new Dimension(30,20));
+                    lbl.setSize(new Dimension(30, 20));
                     lbl.setForeground(fg);
                     lbl.setBackground(bg);
                     lbl.setOpaque(true);
                     Image image = ImageUtils.getImage(lbl);
                     mi.setIcon(new ImageIcon(image));
                     //                    if(!didone)
-                        //                        didone = !GuiUtils.showOkCancelDialog(null,null,lbl,null);
-                } catch(Exception exc) {
+                    //                        didone = !GuiUtils.showOkCancelDialog(null,null,lbl,null);
+                } catch (Exception exc) {
                     exc.printStackTrace();
                 }
-                    
+
                 colorMenu.add(mi);
                 mi.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent ae) {
@@ -6189,20 +6327,21 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
 
         Runnable runnable = new Runnable() {
-                public void run() {
-                    //                    System.err.println("reset full screen:" + Thread.currentThread());
-                    JComponent navComponent = getComponent();
-                    innerContents.add(BorderLayout.CENTER, navComponent);
-                    fullScreenWindow.setVisible(false);
-                    fullScreenWindow.dispose();
-                    fullScreenWindow = null;
-                    AnimationWidget animationWidget = getAnimationWidget();
-                    if ((animationWidget != null) && (animationHolder != null)) {
-                        //            animationHolder.add(BorderLayout.CENTER,
-                        //                                animationWidget.getContents());
-                        animationHolder.add(animationWidget.getContents());
-                    }
-                }};
+            public void run() {
+                //                    System.err.println("reset full screen:" + Thread.currentThread());
+                JComponent navComponent = getComponent();
+                innerContents.add(BorderLayout.CENTER, navComponent);
+                fullScreenWindow.setVisible(false);
+                fullScreenWindow.dispose();
+                fullScreenWindow = null;
+                AnimationWidget animationWidget = getAnimationWidget();
+                if ((animationWidget != null) && (animationHolder != null)) {
+                    //            animationHolder.add(BorderLayout.CENTER,
+                    //                                animationWidget.getContents());
+                    animationHolder.add(animationWidget.getContents());
+                }
+            }
+        };
         //        GuiUtils.invokeInSwingThread(runnable);
         Misc.run(runnable);
     }
@@ -6450,10 +6589,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
         aspectRatio = value;
     }
 
-    /** _more_          */
+    /** _more_ */
     static int xxx = 0;
 
-    /** _more_          */
+    /** _more_ */
     int xmycnt = xxx++;
 
     /**
@@ -6703,33 +6842,43 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
     /**
-       Set the SplitPaneLocation property.
-
-       @param value The new value for SplitPaneLocation
-    **/
-    public void setSplitPaneLocation (int value) {
-	splitPaneLocation = value;
+     *  Set the SplitPaneLocation property.
+     *
+     *  @param value The new value for SplitPaneLocation
+     */
+    public void setSplitPaneLocation(int value) {
+        splitPaneLocation = value;
     }
 
     /**
-       Get the SplitPaneLocation property.
-
-       @return The SplitPaneLocation
-    **/
-    public int getSplitPaneLocation () {
-        JSplitPane tmp=mainSplitPane;
-        if(tmp!=null) {
+     *  Get the SplitPaneLocation property.
+     *
+     *  @return The SplitPaneLocation
+     */
+    public int getSplitPaneLocation() {
+        JSplitPane tmp = mainSplitPane;
+        if (tmp != null) {
             return tmp.getDividerLocation();
         }
         return -1;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param viewState _more_
+     */
     public void initViewState(ViewState viewState) {
-        viewState.put(ViewState.PROP_MATRIX,getDisplayMatrix());
+        viewState.put(ViewState.PROP_MATRIX, getDisplayMatrix());
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public ViewState doMakeViewState() {
         ViewState viewState = new ViewState(getClass().getName());
         initViewState(viewState);

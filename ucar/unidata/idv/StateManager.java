@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv;
 
 
@@ -33,12 +34,12 @@ import ucar.unidata.ui.Help;
 import ucar.unidata.ui.symbol.StationModelManager;
 import ucar.unidata.util.FileManager;
 
+import ucar.unidata.util.GuiUtils;
+
 import ucar.unidata.util.IOUtil;
 
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
-import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.ResourceCollection;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
@@ -312,8 +313,13 @@ public class StateManager extends IdvManager {
         ucar.unidata.ui.colortable.ColorTableEditor.setHelpTopDir(topDir);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getHelpRoot() {
-        return  getProperty("idv.help.topDir", DEFAULT_DOCPATH);
+        return getProperty("idv.help.topDir", DEFAULT_DOCPATH);
     }
 
 
@@ -326,14 +332,14 @@ public class StateManager extends IdvManager {
     protected void initState(boolean interactiveMode) {
 
 
-	//Seems like we have to have this way up front here as something we do below
-	//triggers the mac to ignore these settings
+        //Seems like we have to have this way up front here as something we do below
+        //triggers the mac to ignore these settings
 
-	//For now don't do this:
-	//System.setProperty("apple.laf.useScreenMenuBar", "true");
+        //For now don't do this:
+        //System.setProperty("apple.laf.useScreenMenuBar", "true");
 
-	System.setProperty("com.apple.mrj.application.apple.menu.about.name", 
-			   "IDV");
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name",
+                           "IDV");
 
 
         LogUtil.setTestMode(getArgsManager().noGui
@@ -422,13 +428,13 @@ public class StateManager extends IdvManager {
         version      = null;
         getIdvUIManager().initSplash();
         getIdvUIManager().splashMsg("Initializing Resources");
-	try {
-	    if(interactiveMode && getIdvUIManager().isMac()) {
-		new ucar.unidata.idv.mac.MacBridge(getIdv());
-	    }
-	} catch(Throwable ignore) {
-	    LogUtil.consoleMessage("Failed to create MacBridge:" + ignore);
-	}
+        try {
+            if (interactiveMode && getIdvUIManager().isMac()) {
+                new ucar.unidata.idv.mac.MacBridge(getIdv());
+            }
+        } catch (Throwable ignore) {
+            LogUtil.consoleMessage("Failed to create MacBridge:" + ignore);
+        }
 
 
 
@@ -528,14 +534,23 @@ public class StateManager extends IdvManager {
         getStore().setTmpDir(
             (String) getProperty(IdvObjectStore.PROP_TMPDIR));
 
-        FileManager.setFileHidingEnabled(!new Boolean(getPreferenceOrProperty(PREF_SHOWHIDDENFILES,"false")).booleanValue());
+        FileManager.setFileHidingEnabled(
+             !new Boolean(
+                 getPreferenceOrProperty(
+                     PREF_SHOWHIDDENFILES, "false")).booleanValue());
 
     }
 
 
 
+    /**
+     * _more_
+     */
     protected void applyPreferences() {
-        FileManager.setFileHidingEnabled(!new Boolean(getPreferenceOrProperty(PREF_SHOWHIDDENFILES,"false")).booleanValue());
+        FileManager.setFileHidingEnabled(
+             !new Boolean(
+                 getPreferenceOrProperty(
+                     PREF_SHOWHIDDENFILES, "false")).booleanValue());
     }
 
     /**
@@ -590,11 +605,12 @@ public class StateManager extends IdvManager {
      */
     public Object getProperty(String name) {
         Object value = null;
-	if(getIdvUIManager().isMac()) {
-	    value = idvProperties.get("mac."+name);
-	}
-        if(value ==null) 
-	    value = idvProperties.get(name);
+        if (getIdvUIManager().isMac()) {
+            value = idvProperties.get("mac." + name);
+        }
+        if (value == null) {
+            value = idvProperties.get(name);
+        }
         if (value == null) {
             String fixedName = StateManager.fixIds(name);
             if ( !name.equals(fixedName)) {
@@ -682,7 +698,7 @@ public class StateManager extends IdvManager {
      * @return The property value or dflt if not found
      */
     public Color getColorProperty(String name, Color dflt) {
-        return GuiUtils.decodeColor((String) getProperty(name),dflt);
+        return GuiUtils.decodeColor((String) getProperty(name), dflt);
     }
 
 
@@ -878,14 +894,16 @@ public class StateManager extends IdvManager {
     protected void initNewUserDirectory(File dir) {
         try {
             //Copy the README file over to the .unidata/idv dir
-            String readMeFile = IOUtil.joinDir(dir, "README");
-            FileOutputStream fos = new FileOutputStream(readMeFile);
-            InputStream readmeInputStream = IOUtil.getInputStream("/ucar/unidata/idv/resources/README.store", getClass());
+            String           readMeFile = IOUtil.joinDir(dir, "README");
+            FileOutputStream fos        = new FileOutputStream(readMeFile);
+            InputStream readmeInputStream =
+                IOUtil.getInputStream(
+                    "/ucar/unidata/idv/resources/README.store", getClass());
             IOUtil.writeTo(readmeInputStream, fos);
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             //noop
         }
-        
+
     }
 
 
@@ -1028,11 +1046,28 @@ public class StateManager extends IdvManager {
      * @param dflt default
      * @return The value of either the preference or the property
      */
-
     public double getPreferenceOrProperty(String pref, double dflt) {
         Object o = getPreferenceOrProperty(pref);
         if (o != null) {
             return new Double(o.toString()).doubleValue();
+        }
+        return dflt;
+    }
+
+
+    /**
+     * Find either the preference with the given name
+     * or, if not found, return the property String value of the given name if found.
+     * If not found return the dflt
+     *
+     * @param pref The preference or property name
+     * @param dflt default
+     * @return The value of either the preference or the property
+     */
+    public boolean getPreferenceOrProperty(String pref, boolean dflt) {
+        Object o = getPreferenceOrProperty(pref);
+        if (o != null) {
+            return new Boolean(o.toString()).booleanValue();
         }
         return dflt;
     }

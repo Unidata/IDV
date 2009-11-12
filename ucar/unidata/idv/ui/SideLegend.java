@@ -131,6 +131,17 @@ public class SideLegend extends IdvLegend {
     }
 
 
+    public List<String> getDisplayCategories() {
+        List<String> cats = new ArrayList();
+        for (int i = 0; i < categoryPanels.size(); i++) {
+            CategoryPanel categoryPanel =
+                (CategoryPanel) categoryPanels.get(i);
+            cats.add(categoryPanel.category);
+        }
+        return cats;
+    }
+
+
     /**
      * Apply the category visibility state from the given that legend
      * to this legend
