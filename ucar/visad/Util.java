@@ -1554,6 +1554,23 @@ public final class Util {
     }
 
     /**
+     * Takes indicated values from an array.
+     *
+     * @param values            The input array of values.
+     * @param indexes           Which elements to extract.
+     * @return                  A new array with the indicated elements.
+     */
+    public static double[] take(double[] values, int[] indexes) {
+
+        double[] newValues = new double[indexes.length];
+
+        for (int i = indexes.length; --i >= 0; ) {
+            newValues[i] = values[indexes[i]];
+        }
+
+        return newValues;
+    }
+    /**
      * Indicates if an array is sorted.  The sense (increasing or decreasing)
      * is irrelevant and is non-strict.
      *
@@ -1592,6 +1609,43 @@ public final class Util {
     }
 
     /**
+     * Indicates if an array is sorted.  The sense (increasing or decreasing)
+     * is irrelevant and is non-strict.
+     *
+     * @param values            The array to check.
+     * @return                  True if and only if the array is sorted.
+     */
+    public static boolean isSorted(double[] values) {
+
+        boolean isSorted = true;
+
+        if (values.length >= 3) {
+            boolean increasing    = true;
+            boolean haveDirection = false;
+            double   previous      = values[0];
+
+            for (int i = 1; i < values.length; ++i) {
+                double value = values[i];
+
+                if (haveDirection) {
+                    if ((increasing && (value < previous))
+                            || ( !increasing && (value > previous))) {
+                        isSorted = false;
+
+                        break;
+                    }
+                } else if (value != previous) {
+                    haveDirection = true;
+                    increasing    = value > previous;
+                }
+
+                previous = value;
+            }
+        }
+
+        return isSorted;
+    }
+    /**
      * Indicates if an array is strictly sorted.  The sense (increasing or
      * decreasing) is irrelevant.
      *
@@ -1610,6 +1664,50 @@ public final class Util {
 
             for (int i = 1; i < values.length; ++i) {
                 float value = values[i];
+
+                if (haveDirection) {
+                    if ((increasing && (value <= previous))
+                            || ( !increasing && (value >= previous))) {
+                        isSorted = false;
+
+                        break;
+                    }
+                } else if (value == previous) {
+                    isSorted = false;
+
+                    break;
+                } else {
+                    haveDirection = true;
+                    increasing    = value > previous;
+                }
+
+                previous = value;
+            }
+        }
+
+        return isSorted;
+    }
+
+
+    /**
+     * Indicates if an array is strictly sorted.  The sense (increasing or
+     * decreasing) is irrelevant.
+     *
+     * @param values            The array to check.
+     * @return                  True if and only if the array is strictly
+     *                          sorted.
+     */
+    public static boolean isStrictlySorted(double[] values) {
+
+        boolean isSorted = true;
+
+        if (values.length >= 2) {
+            boolean increasing    = true;
+            boolean haveDirection = false;
+            double   previous      = values[0];
+
+            for (int i = 1; i < values.length; ++i) {
+                double value = values[i];
 
                 if (haveDirection) {
                     if ((increasing && (value <= previous))
