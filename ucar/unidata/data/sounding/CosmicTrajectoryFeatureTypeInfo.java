@@ -25,6 +25,7 @@ package ucar.unidata.data.sounding;
 
 
 import ucar.ma2.*;
+import ucar.ma2.StructureMembers.Member;
 import ucar.nc2.Attribute;
 import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.ft.PointFeature;
@@ -37,6 +38,7 @@ import ucar.unidata.data.point.PointObTuple;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
+import ucar.unidata.util.DateUtil;
 import ucar.visad.Util;
 import ucar.visad.functiontypes.InSituAirTemperatureProfile;
 import ucar.visad.functiontypes.DewPointProfile;
@@ -164,7 +166,21 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
             }
         }
 
+        PointFeature  pf   = obsList.get(0);
+        StructureData pfsd = pf.getData();
+        List<Member> members = pfsd.getMembers();
+        for(int i=0; i< members.size(); i++){
+            Member mb = members.get(i);
 
+            Unit unit = Util.parseUnit(mb.getUnitsString());
+            if(unit.isConvertible(CommonUnits.DEGREE) ||unit.isConvertible(CommonUnits.KILOMETER) ||
+                 unit.isConvertible(CommonUnit.secondsSinceTheEpoch))
+                addVariable(new VarInfo(mb.getName(), mb.getDescription(), "Basic", unit));
+            else
+               addVariable(new VarInfo(mb.getName(), mb.getDescription(), unit));
+
+         }
+       /*
         addVariable(new VarInfo(time, time, "Basic", getTimeUnit()));
 
         addVariable(new VarInfo(latitude, latitude, "Basic",
@@ -183,7 +199,7 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
                                 DataUtil.parseUnit("dBZ")));
         addVariable(new VarInfo(pressure, pressure, "Basic",
                                 DataUtil.parseUnit("mb")));
-
+       */
     }
 
 
@@ -826,23 +842,12 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
             llaSamples[0], llaSamples[1], llaSamples[2]
         });
 
-        FlatField dewField = new FlatField(dewFType, timeSet,
-                                           (CoordinateSystem[]) null,
-                                           (Set[]) null, dewUnits);
-
-        dewField.setSamples(new float[][] {
-            getFloatData(range, pressureVar), getDewPointFloatData(range),
-            llaSamples[0], llaSamples[1], llaSamples[2]
-        });
-
-        //   return new Field[]{tempField, dewField};
         float[] press   = getFloatData(range, pressureVar);
         float[] temps   = getFloatData(range, tempVar);
-        float[] dews    = getDewPointFloatData(range);
         int[]   indexes = Util.strictlySortedIndexes(press, false);
         press = Util.take(press, indexes);
         temps = Util.take(temps, indexes);
-        dews  = Util.take(dews, indexes);
+
         Set presDomain = new Gridded1DSet(AirPressure.getRealTupleType(),
                                           new float[][] {
             press
@@ -850,12 +855,32 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
            new Unit[] { pressureVar.getUnit() }, (ErrorEstimate[]) null);
         Field tempPro = new FlatField(InSituAirTemperatureProfile.instance(),
                                       presDomain);
-        Field dewPro = new FlatField(DewPointProfile.instance(), presDomain);
-
-
+        
+        FlatField dewField = new FlatField(dewFType, timeSet,
+                                           (CoordinateSystem[]) null,
+                                           (Set[]) null, dewUnits);
         tempPro.setSamples(new float[][] {
             temps
         });
+        if(vaprVar == null)
+          return new Field[] { tempPro, null };
+
+        dewField.setSamples(new float[][] {
+            getFloatData(range, pressureVar), getDewPointFloatData(range),
+            llaSamples[0], llaSamples[1], llaSamples[2]
+        });
+
+        //   return new Field[]{tempField, dewField};
+
+        float[] dews    = getDewPointFloatData(range);
+
+        dews  = Util.take(dews, indexes);
+
+
+        Field dewPro = new FlatField(DewPointProfile.instance(), presDomain);
+
+
+
         dewPro.setSamples(new float[][] {
             dews
         });

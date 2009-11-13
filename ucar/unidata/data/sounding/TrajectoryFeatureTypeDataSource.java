@@ -280,12 +280,12 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
             addDataChoice(new DirectDataChoice(this, new String[] { trackName,
                     ID_POINTTRACE }, pointLabel, pointLabel, pointCatList,
                                      props));
-            /*
-            addDataChoice(new DirectDataChoice(this, new String[] { trackName,
-                    ID_LASTOB }, getDataChoiceLabel(ID_LASTOB),
-                                 getDataChoiceLabel(ID_LASTOB), pointCatList,
-                                 props));
-             */
+
+           // addDataChoice(new DirectDataChoice(this, new String[] { trackName,
+           //         ID_LASTOB }, getDataChoiceLabel(ID_LASTOB),
+           //                      getDataChoiceLabel(ID_LASTOB), pointCatList,
+           //                      props));
+           
 
         }
 
@@ -295,11 +295,12 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
         DataChoice soundingChoice = null;
         if ((adapters != null) && (adapters.size() > 1)) {
             TrackAdapter    adapter = (TrackAdapter) adapters.get(0);
+            String sName = adapter.toString();
             List<TrackInfo> tinfo   = adapter.getTrackInfos();
             String          tName   = tinfo.get(0).trackName;
             String          id;
             List            category;
-            if (tName.startsWith("COSMIC") || tName.contains("point/traj")) {
+            if (sName.contains("wetPrf") || sName.contains("atmPrf")) {
                 id       = ID_SOUNDINGTRACE;
                 category = getSoundingCategories();
             } else {
