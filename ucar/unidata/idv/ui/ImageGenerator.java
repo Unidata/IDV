@@ -944,6 +944,15 @@ public class ImageGenerator extends IdvManager {
 
 
 
+
+
+
+    protected boolean processTagPrintcache(Element node) throws Throwable {
+        visad.data.DataCacheManager.getCacheManager().printStats();
+        return true;
+    }
+
+
     /**
      * process the given node
      *
