@@ -309,6 +309,7 @@ public class DataManager {
                 IdvResourceManager.RSC_DATASOURCE));
 
         loadIospResources(resourceManager);
+	SampledSet.setCacheSizeThreshold(10000);
 	//	System.setProperty("visad.java3d.imageByRef", "true");
 	//	System.setProperty("visad.java3d.textureNpot", "true");
         visad.data.DataCacheManager.getCacheManager().setCacheDir(new File(getDataCacheDirectory()));
