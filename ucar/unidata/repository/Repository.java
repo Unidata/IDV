@@ -1648,7 +1648,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /**
      * _more_
      */
-    protected void clearAllCaches() {
+    private void clearAllCaches() {
         for (OutputHandler outputHandler : outputHandlers) {
             outputHandler.clearCache();
         }
@@ -1659,7 +1659,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * _more_
      */
     protected void clearCache() {
-        //        System.err.println ("Clear full cache ");
         pageCache     = new Hashtable();
         pageCacheList = new ArrayList();
         getEntryManager().clearCache();
@@ -2351,18 +2350,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
 
-        /*
-        List<Group> topGroups =
-            new ArrayList<Group>(getEntryManager().getTopGroups(request));
-        topGroups.add(getEntryManager().getTopGroup());
-        for (Group group : topGroups) {
-            String name = "/" + getEntryManager().getPathFromEntry(group);
-            if (incoming.startsWith(name + "/")) {
-                incoming = incoming.substring(name.length());
-                break;
-            }
-        }
-        */
 
         ApiMethod apiMethod = (ApiMethod) requestMap.get(incoming);
         if (apiMethod == null) {

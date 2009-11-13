@@ -1858,7 +1858,10 @@ public class Admin extends RepositoryManager {
             cleanupTS++;
             return new Result(request.url(URL_ADMIN_CLEANUP));
         } else if (request.defined(ACTION_START)) {
-            Misc.run(this, "runDatabaseCleanUp", request);
+	    Misc.run(this, "runDatabaseCleanUp", request);
+            return new Result(request.url(URL_ADMIN_CLEANUP));
+        } else if (request.defined(ACTION_NEWDB)) {
+	    getDatabaseManager().reInitialize();
             return new Result(request.url(URL_ADMIN_CLEANUP));
         } else if (request.defined(ACTION_CLEARCACHE)) {
             getRepository().clearCache();
@@ -1877,6 +1880,9 @@ public class Admin extends RepositoryManager {
 
             sb.append("<p>");
             sb.append(HtmlUtil.submit(msg("Clear cache"), ACTION_CLEARCACHE));
+
+            sb.append("<p>");
+            sb.append(HtmlUtil.submit(msg("Reinitialize Database Connection"), ACTION_NEWDB));
 
         }
         sb.append("</form>");

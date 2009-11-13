@@ -1492,6 +1492,9 @@ public interface Constants {
     public static final String ACTION_CLEARCACHE = "action.clearcache";
 
     /** _more_ */
+    public static final String ACTION_NEWDB = "action.newdb";
+
+    /** _more_ */
     public static final String ACTION_COPY = "action.copy";
 
     /** _more_ */
@@ -1581,9 +1584,6 @@ public interface Constants {
 
     /** _more_ */
     public static final String ID_PREFIX_SYNTH = "synth:";
-
-    /** _more_ */
-    public static final int ENTRY_CACHE_LIMIT = 5000;
 
 
 

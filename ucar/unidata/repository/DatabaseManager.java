@@ -120,8 +120,16 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     private Hashtable<Connection, ConnectionInfo> connectionMap =
         new Hashtable<Connection, ConnectionInfo>();
 
+
+
     /** _more_ */
     private List<String> scourMessages = new ArrayList<String>();
+
+    private int totalScours = 0;
+
+    private boolean runningCheckConnections = false;
+    private boolean haveInitialized = false;
+
 
     /**
      * _more_
@@ -159,10 +167,15 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
     }
 
+
+
+
     /**
      * _more_
      */
     public void checkConnections() {
+	if(runningCheckConnections) return;
+	runningCheckConnections = true;
         while (true) {
             try {
                 Misc.sleep(5000);
@@ -174,12 +187,17 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 for (ConnectionInfo info : getConnectionInfos()) {
                     //If a connection has been out for more than seconds then close it
                     if (now - info.time > seconds * 1000) {
-                        logInfo("A connection has been open for more than "
-                                + seconds + " seconds:\n" + info.where);
+			getLogManager().logError("SCOURED @" + new Date()
+				 + " info.date: " + new Date(info.time)
+				 + " info.id: " + info.myCnt + "<br>"
+				 + "  msg:" + info.msg + "  Where:"
+				 + info.where);
+
                         synchronized (scourMessages) {
                             while (scourMessages.size() > 100) {
                                 scourMessages.remove(0);
                             }
+			    totalScours++;
                             scourMessages.add("SCOURED @" + new Date()
                                     + " info.date: " + new Date(info.time)
                                     + " info.id: " + info.myCnt + "<br>"
@@ -190,7 +208,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                     }
                 }
             } catch (Exception exc) {
-                scourMessages.add("Error checking connection:" + exc);
+                getLogManager().logError("CONNECTION: Error checking connection", exc);
             }
         }
     }
@@ -203,23 +221,26 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      * @throws Exception _more_
      */
     public void init() throws Exception {
+	if(haveInitialized) return;
+	haveInitialized = true;	
         SqlUtil.setConnectionManager(this);
-        if (dataSource != null) {
-            return;
-        }
         dataSource = doMakeDataSource();
-        BasicDataSource bds = (BasicDataSource) dataSource;
-        //      bds.setLogWriter(new PrintWriter(getLogManager().getLogOutputStream()));
-
-        if (db.equals(DB_MYSQL)) {
-            Statement statement = getConnection().createStatement();
-            statement.execute("set time_zone = '+0:00'");
-            closeAndReleaseConnection(statement);
-        }
-
-
         Misc.run(this, "checkConnections", null);
     }
+
+
+    public void reInitialize() throws Exception {
+	if(dataSource!=null) {
+	    BasicDataSource bds   = (BasicDataSource) dataSource;
+	    try {
+		bds.close();
+	    } catch(Exception exc) {
+		logError("Closing data source", exc);
+	    }
+	    dataSource = doMakeDataSource();
+	}
+    }
+
 
     /**
      * _more_
@@ -252,8 +273,12 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      *
      * @throws Exception _more_
      */
-    protected DataSource doMakeDataSource() throws Exception {
+    private DataSource doMakeDataSource() throws Exception {
+	scourMessages = new ArrayList<String>();
+	totalScours = 0;
+
         BasicDataSource ds = new BasicDataSource();
+
         ds.setMaxActive(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE,
                 100));
         ds.setMaxIdle(getRepository().getProperty(PROP_DB_POOL_MAXIDLE, 100));
@@ -269,11 +294,21 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                                      PROP_DB_DRIVER.replace("${db}", db));
         Misc.findClass(driverClassName);
 
-
         ds.setDriverClassName(driverClassName);
         ds.setUsername(userName);
         ds.setPassword(password);
         ds.setUrl(connectionURL);
+
+
+        //ds.setLogWriter(new PrintWriter(getLogManager().getLogOutputStream()));
+
+        if (db.equals(DB_MYSQL)) {
+            Statement statement = getConnection().createStatement();
+            statement.execute("set time_zone = '+0:00'");
+            closeAndReleaseConnection(statement);
+        }
+
+
         return ds;
     }
 
@@ -316,6 +351,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
         StringBuffer msgb = new StringBuffer();
         synchronized (scourMessages) {
+	    if(totalScours>0) 
+		msgb.append("Total scours:" + totalScours+HtmlUtil.p());
             for (String msg : scourMessages) {
                 msgb.append("<pre>" + msg + "</pre>");
                 msgb.append("<hr>");
@@ -604,16 +641,21 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      * @param connection _more_
      */
     public void closeConnection(Connection connection) {
-        try {
-            synchronized (connectionMap) {
-                connectionMap.remove(connection);
-            }
-            connection.setAutoCommit(true);
-            connection.close();
-            BasicDataSource bds = (BasicDataSource) dataSource;
-        } catch (Exception exc) {
-            exc.printStackTrace();
-        }
+	try {
+	    synchronized (connectionMap) {
+		connectionMap.remove(connection);
+	    }
+	    try {
+		connection.setAutoCommit(true);
+	    } catch(Exception ignore) {}
+
+	    try {
+		connection.close();
+	    } catch(Exception ignore) {}
+
+	} catch(Exception exc) {
+	    getLogManager().logError("Closing connections", exc);
+	}
     }
 
 
@@ -655,14 +697,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         if (connection != null) {
             closeConnection(connection);
         } else {
-            synchronized (scourMessages) {
-                while (scourMessages.size() > 100) {
-                    scourMessages.remove(0);
-                }
-                scourMessages.add(
-                    "Trying to close a statement with no connection:"
-                    + LogUtil.getStackTrace());
-            }
+	    getLogManager().logError("CONNECTION: Tried to close a statement with no connection",new IllegalArgumentException());
         }
     }
 

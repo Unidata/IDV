@@ -1811,6 +1811,7 @@ public class TypeHandler extends RepositoryManager {
 
 
 
+        /**
         List<Group> collectionGroups =
             getEntryManager().getTopGroups(request);
         List<TwoFacedObject> collections = new ArrayList<TwoFacedObject>();
@@ -1821,7 +1822,7 @@ public class TypeHandler extends RepositoryManager {
 
         }
 
-        /**
+
          * Entry collection = request.getCollectionEntry();
          * String collectionSelect = HtmlUtil.select(ARG_COLLECTION,
          *                             collections, ((collection != null)

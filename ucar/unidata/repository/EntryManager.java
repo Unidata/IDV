@@ -104,6 +104,9 @@ import javax.swing.ImageIcon;
  */
 public class EntryManager extends RepositoryManager {
 
+    /** _more_ */
+    public static final int ENTRY_CACHE_LIMIT = 10000;
+
 
     /** _more_ */
     private Object MUTEX_ENTRY = new Object();
@@ -191,18 +194,8 @@ public class EntryManager extends RepositoryManager {
      */
     protected void clearCache() {
         entryCache = new Hashtable<String, Entry>();
-        topGroups  = null;
     }
 
-
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     */
-    protected void cacheGroup(Group entry) {
-        cacheEntry(entry);
-    }
 
     /**
      * _more_
@@ -215,9 +208,9 @@ public class EntryManager extends RepositoryManager {
                 entryCache = new Hashtable();
             }
             entryCache.put(entry.getId(), entry);
-            entryCache.put(entry.getFullName(), entry);
         }
     }
+
 
     /**
      * _more_
@@ -276,16 +269,9 @@ public class EntryManager extends RepositoryManager {
     }
 
 
-
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     */
-    protected void clearCache(Entry entry) {
+    protected void removeFromCache(String id) {
         synchronized (MUTEX_ENTRY) {
-            entryCache.remove(entry.getId());
-            entryCache.remove(entry.getFullName());
+            entryCache.remove(id);
         }
     }
 
@@ -1695,7 +1681,6 @@ return new Result(title, sb);
         } finally {
             getDatabaseManager().closeConnection(connection);
         }
-        getRepository().clearCache();
     }
 
 
@@ -1765,6 +1750,7 @@ return new Result(title, sb);
             for (int i = found.size() - 1; i >= 0; i--) {
                 String[] tuple = found.get(i);
                 String   id    = tuple[0];
+		removeFromCache(id);
                 allIds.add(id);
                 deleteCnt++;
                 totalDeleteCnt++;
@@ -2621,7 +2607,6 @@ return new Result(title, sb);
             }
             getDatabaseManager().closeStatement(statement);
             connection.setAutoCommit(true);
-            getRepository().clearCache();
             return new Result(request.url(getRepository().URL_ENTRY_SHOW,
                                           ARG_ENTRYID,
                                           entries.get(0).getId()));
@@ -4423,21 +4408,23 @@ return new Result(title, sb);
             } else {
                 Statement entryStmt =
                     getDatabaseManager().select(Tables.ENTRIES.COLUMNS,
-                        Tables.ENTRIES.NAME,
-                        Clause.eq(Tables.ENTRIES.COL_ID, entryId));
+						Tables.ENTRIES.NAME,
+						Clause.eq(Tables.ENTRIES.COL_ID, entryId));
 
-                ResultSet results = entryStmt.getResultSet();
-                if ( !results.next()) {
+		try {
+		    ResultSet results = entryStmt.getResultSet();
+		    if ( !results.next()) {
+			return null;
+		    }
+
+		    String entryType = results.getString(2);
+		    TypeHandler typeHandler =
+			getRepository().getTypeHandler(entryType);
+		    entry = typeHandler.getEntry(results, abbreviated);
+		    checkEntryFileTime(entry);
+		} finally {
                     getDatabaseManager().closeAndReleaseConnection(entryStmt);
-                    return null;
-                }
-
-                String entryType = results.getString(2);
-                TypeHandler typeHandler =
-                    getRepository().getTypeHandler(entryType);
-                entry = typeHandler.getEntry(results, abbreviated);
-                getDatabaseManager().closeAndReleaseConnection(entryStmt);
-                checkEntryFileTime(entry);
+		}
             }
         } catch (Exception exc) {
             logError("creating entry:" + entryId, exc);
@@ -4717,10 +4704,6 @@ return new Result(title, sb);
         if (entries.size() == 0) {
             return;
         }
-        if ( !isNew) {
-            clearCache();
-        }
-
 
         //We have our own connection
         Connection connection = getDatabaseManager().getConnection();
@@ -4766,9 +4749,6 @@ return new Result(title, sb);
 
         if (entries.size() == 0) {
             return;
-        }
-        if ( !isNew) {
-            clearCache();
         }
 
         long              t1          = System.currentTimeMillis();
@@ -5654,7 +5634,7 @@ return new Result(title, sb);
     public Group findGroupUnder(Request request, Group group, String name,
                                 User user)
             throws Exception {
-        synchronized (MUTEX_ENTRY) {
+	//        synchronized (MUTEX_ENTRY) {
             List<String> toks = (List<String>) StringUtil.split(name,
                                     Group.PATHDELIMITER, true, true);
 
@@ -5672,7 +5652,7 @@ return new Result(title, sb);
                 group = theChild;
             }
             return group;
-        }
+	    //        }
     }
 
 
@@ -5833,7 +5813,7 @@ return new Result(title, sb);
                                     boolean createIfNeeded, boolean isGroup,
                                     boolean isTop)
             throws Exception {
-        synchronized (MUTEX_ENTRY) {
+	//        synchronized (MUTEX_ENTRY) {
             String topGroupName = ((topGroup != null)
                                    ? topGroup.getName()
                                    : GROUP_TOP);
@@ -5891,7 +5871,7 @@ return new Result(title, sb);
                 return makeNewGroup(parent, lastName, user);
             }
             return entry;
-        }
+	    //        }
     }
 
 
@@ -5949,7 +5929,7 @@ return new Result(title, sb);
     public Group makeNewGroup(Group parent, String name, User user,
                               Entry template, String type)
             throws Exception {
-        synchronized (MUTEX_ENTRY) {
+	//        synchronized (MUTEX_ENTRY) {
             TypeHandler typeHandler = getRepository().getTypeHandler(type);
             Group       group = new Group(getGroupId(parent), typeHandler);
             if (template != null) {
@@ -5962,9 +5942,9 @@ return new Result(title, sb);
             group.setParentGroup(parent);
             group.setUser(user);
             addNewEntry(group);
-            cacheGroup(group);
+            cacheEntry(group);
             return group;
-        }
+	    //        }
     }
 
 
@@ -6093,8 +6073,7 @@ return new Result(title, sb);
 
 
 
-    /** _more_ */
-    List<Group> topGroups;
+
 
     /**
      * _more_
@@ -6106,10 +6085,7 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public List<Group> getTopGroups(Request request) throws Exception {
-        if (topGroups != null) {
-            return topGroups;
-        }
-        //        System.err.println("ramadda: getTopGroups " + topGroup);
+	List<Group> topGroups =null;
 
         Statement statement = getDatabaseManager().select(
                                   Tables.ENTRIES.COL_ID, Tables.ENTRIES.NAME,
@@ -6139,7 +6115,7 @@ return new Result(title, sb);
         //For now don't check for access control
         //        return topGroups = new ArrayList<Group>(
         //            toGroupList(getAccessManager().filterEntries(request, groups)));
-        return topGroups = new ArrayList<Group>(groups);
+        return  new ArrayList<Group>(groups);
     }
 
     /**
@@ -6182,6 +6158,7 @@ return new Result(title, sb);
                     getRepository().getTypeHandler(entryType);
                 Entry entry = (Entry) typeHandler.getEntry(results);
                 entries.add(entry);
+		cacheEntry(entry);
             }
         }
         for (Entry entry : entries) {
