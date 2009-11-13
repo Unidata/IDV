@@ -232,6 +232,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
     /** winds or not? */
     private boolean haveWinds = false;
 
+    /** dewpoint or not? */
+    private boolean haveDewpoints = true;
+
     /** winds as U and V? */
     private boolean haveUAndVWinds = false;
 
@@ -1039,6 +1042,8 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 }
                 //visad.python.JPythonMethods.dumpTypes(windProfiles[i]);
             }
+            if(dewProfiles[i] == null)
+                haveDewpoints = false;
             if (showUVCbx != null) {
                 showUVCbx.setEnabled(haveWinds);
             }
@@ -1048,9 +1053,14 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 hodoDisplay.addProfile(i, windProfiles[i]);
             }
             if ( !haveWinds) {
-                tableSoundings[i] = FieldImpl.combine(new Field[] {
-                    tempProfiles[i],
-                    dewProfiles[i] }, true);
+                if(haveDewpoints == false)
+                    tableSoundings[i] = FieldImpl.combine(new Field[] {
+                        tempProfiles[i]
+                          }, true);
+                else
+                    tableSoundings[i] = FieldImpl.combine(new Field[] {
+                        tempProfiles[i],
+                        dewProfiles[i] }, true);
             } else {
                 tableSoundings[i] = FieldImpl.combine(new Field[] {
                     tempProfiles[i],
