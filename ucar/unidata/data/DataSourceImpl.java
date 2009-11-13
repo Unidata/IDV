@@ -2806,7 +2806,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         }
 
 
-        if (canCacheDataToDisk()) {
+	//Don't have this in the properties anymore
+        if (false && canCacheDataToDisk()) {
             comps.add(GuiUtils.filler());
             comps.add(getPropertiesHeader("Caching"));
             cacheDataToDiskCbx = new JCheckBox("Always cache to disk",

@@ -50,6 +50,7 @@ import ucar.unidata.util.ObjectArray;
 import ucar.visad.Util;
 
 import visad.CommonUnit;
+import visad.Data;
 import visad.DateTime;
 import visad.Real;
 import visad.RealType;
@@ -163,6 +164,15 @@ public class CDMRadarDataSource extends RadarDataSource {
     }
 
 
+    /**
+     * Overwrite base class method so we don't cache to memory
+     *
+     * @param data The data to cache
+     * @return should we cache - false
+     */
+    protected boolean shouldCache(Data data) {
+        return false;
+    }
 
     public void reloadData(Object object, Hashtable properties) {
 	if(object instanceof RadarQuery) {
