@@ -1397,6 +1397,7 @@ function insertTagsInner(txtarea, tagOpen, tagClose, sampleText) {
 var imageDoFirst = 1;
 function editImageClick(event, imgId, pt1x,pt1y,pt2x,pt2y) {
     var obj = util.getDomObject(imgId);
+    util.print("obj:" +obj);
     if(obj) {
 	var ex  = util.getEventX(event);
 	var ey  = util.getEventY(event);

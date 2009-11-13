@@ -225,6 +225,15 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 	haveInitialized = true;	
         SqlUtil.setConnectionManager(this);
         dataSource = doMakeDataSource();
+
+        //ds.setLogWriter(new PrintWriter(getLogManager().getLogOutputStream()));
+        if (db.equals(DB_MYSQL)) {
+            Statement statement = getConnection().createStatement();
+            statement.execute("set time_zone = '+0:00'");
+            closeAndReleaseConnection(statement);
+        }
+
+
         Misc.run(this, "checkConnections", null);
     }
 
@@ -300,13 +309,6 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         ds.setUrl(connectionURL);
 
 
-        //ds.setLogWriter(new PrintWriter(getLogManager().getLogOutputStream()));
-
-        if (db.equals(DB_MYSQL)) {
-            Statement statement = getConnection().createStatement();
-            statement.execute("set time_zone = '+0:00'");
-            closeAndReleaseConnection(statement);
-        }
 
 
         return ds;

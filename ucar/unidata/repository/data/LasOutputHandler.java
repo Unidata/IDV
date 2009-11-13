@@ -186,6 +186,10 @@ public class LasOutputHandler extends OutputHandler {
     private String getTagName(String s) {
         s = s.replace(" ", "_");
         s = s.replace("-", "_");
+        s = s.replace("%", "_");
+        s = s.replace(":", "_");
+        s = s.replace("=", "_");
+        s = s.replace("=", "_");
         return s;
     }
 
@@ -265,6 +269,8 @@ public class LasOutputHandler extends OutputHandler {
             //for now use the entry id as the tag name
             String tagName = "data_" + getTagName(id);
 
+            XmlUtil.create(tagName, datasetsNode);
+ 
             Element entryNode = XmlUtil.create(tagName, datasetsNode,
                                     new String[] {
                 ATTR_NAME, entry.getName(), ATTR_URL,
