@@ -255,7 +255,8 @@ public class Sounding extends CompositeDisplayable {
                           Field dewPointField) throws RemoteException,
                               VisADException {
         temperatureProfile.setProfile(temperatureField);
-        dewPointProfile.setProfile(dewPointField);
+        if(dewPointField!=null)
+            dewPointProfile.setProfile(dewPointField);
     }
 
     /**
