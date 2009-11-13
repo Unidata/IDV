@@ -2365,6 +2365,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     }
 
                     String                cat = control.getDisplayCategory();
+                    if(cat == null) cat = "Displays";
                     List<TextDisplayable> l   = catMap.get(cat);
                     if (l == null) {
                         l = new ArrayList<TextDisplayable>();
