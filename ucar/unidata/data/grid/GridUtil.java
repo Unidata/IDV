@@ -2203,6 +2203,12 @@ public class GridUtil {
         return units;
     }
 
+    public static String printit(FieldImpl field) throws VisADException, RemoteException {
+        Data d = field.getSample(0);
+        return "sample:" + d.getClass().getName();
+
+    }
+
     /**
      * Get the range MathType of the lowest element.  If this is
      * a sequence, it will be the range type of the individual elements.

@@ -64,8 +64,6 @@ public class GridDataInstance extends DataInstance {
         ucar.unidata.util.LogUtil.getLogInstance(
             GridDataInstance.class.getName());
 
-    /** one FlatField of 3D or 2D data grid at one time */
-    private FlatField field;
 
     /** a sequence of such FlatFields for a sequence of times */
     private FieldImpl gridData;
@@ -252,6 +250,7 @@ public class GridDataInstance extends DataInstance {
         // Have either time sequence or 
         // case of radar RHI which has Interger1DSet to several FieldImpls
         // get first FlatField in either case
+        FlatField field = null;
         Data data = null;
         if (isSequence) {
             data = gridData.getSample(0);
@@ -393,7 +392,6 @@ public class GridDataInstance extends DataInstance {
     private void setParamType(boolean copy) throws VisADException {
         Trace.call1("GridDataInstance.calling setParamType", " copy=" + copy);
         gridData = GridUtil.setParamType(gridData, rangeType, copy);
-
         //jeffmc: call super.setData with the new data
         super.setData(gridData);
         Trace.call2("GridDataInstance.calling setParamType");
@@ -688,7 +686,22 @@ public class GridDataInstance extends DataInstance {
      */
     public FlatField getFlatField() {
         checkInit();
-        return field;
+        if(gridData==null) return null;
+        try {
+            if (GridUtil.isSequence(gridData)) {
+                Data data = gridData.getSample(0);
+                if (data instanceof FlatField) {
+                    return  (FlatField) data;
+                } else if (data instanceof FieldImpl) {
+                    return  (FlatField) ((FieldImpl) data).getSample(0);
+                }
+            } else {
+                return (FlatField) gridData;
+            }
+        } catch(Exception exc) {
+            throw new RuntimeException(exc);
+        }
+        return null;
     }
 
     /**
@@ -735,9 +748,8 @@ public class GridDataInstance extends DataInstance {
      * @return  output string
      */
     public String toString() {
-        return "GridDataInstance: " + "\n" + ((field == null)
-                ? " NULL  FIELD"
-                : "") + "\n" + ((gridData == null)
+        return "GridDataInstance: " + "\n"  
+            + "\n" + ((gridData == null)
                                 ? " NULL  FIELDIMPL"
                                 : "") + "\n" + show("dataChoice", dataChoice)
                                       + "\n" + show("realTypes", realTypes)

@@ -204,6 +204,9 @@ public class GeoGridFlatField extends CachedFlatField {
      * @return data
      */
     public float[][] readData() {
+        msg("GeoGrid readData");
+        //        ucar.unidata.util.Misc.printStack("CachedFlatField.readData");
+
         //        if (getParent() != null) {
         //            return getParent().readData();
         //        }

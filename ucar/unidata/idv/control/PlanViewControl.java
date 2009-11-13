@@ -1000,6 +1000,14 @@ public abstract class PlanViewControl extends GridDisplayControl {
     private void loadDataAtLevel(Object level, boolean fromSelector)
             throws VisADException, RemoteException {
 
+        loadDataAtLevelInner(level, fromSelector);
+        workingGrid = null;
+        currentSlice = null;
+    }
+
+    private void loadDataAtLevelInner(Object level, boolean fromSelector)
+            throws VisADException, RemoteException {
+
         Trace.call1("PlanView.loadData");
         if (loadedAny && (level != null) && level.equals(currentLevel)) {
             return;
@@ -1017,6 +1025,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
                     //                    getDataInstance().reInitialize();
                 }
                 workingGrid = (FieldImpl) getGridDataInstance().getGrid();
+                System.err.println ("Got working grid: " + GridUtil.printit(workingGrid));
                 if (workingGrid == null) {
                     return;
                 }

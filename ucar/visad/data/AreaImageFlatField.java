@@ -301,7 +301,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         }
 
 
-        AreaImageFlatField aiff = new AreaImageFlatField(image_type,
+        AreaImageFlatField aiff = new MyAreaImageFlatField(image_type,
                                       domain_set, null, rangeSets,
                                       rangeUnits, null, readLabel);
         aiff.bandIndices = bandIndices;
