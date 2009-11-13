@@ -459,11 +459,11 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
             long tt2 = System.currentTimeMillis();
 
 
-            System.err.println("Time new areafile:" + (tt2-tt1));
+            //            System.err.println("Time new areafile:" + (tt2-tt1));
             long t1 = System.currentTimeMillis();
             float[][][] flt_samples = areaFile.getFloatData();
             long t2 = System.currentTimeMillis();
-            System.err.println("Time getfloatdata:" + (t2-t1));
+            //            System.err.println("Time getfloatdata:" + (t2-t1));
             //            int nLines = (aid.getImageInfo()!=null?aid.getImageInfo().getLines():aid.getDirectory().getLines());
             //            int nEles = (aid.getImageInfo()!=null?aid.getImageInfo().getElements():aid.getDirectory().getElements());
             int nLines = flt_samples[0].length;
