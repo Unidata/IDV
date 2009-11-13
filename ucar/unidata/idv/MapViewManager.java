@@ -2036,9 +2036,14 @@ public class MapViewManager extends NavigatedViewManager {
 					 mp, true,
 					 getDisplayConventions().getMapProjectionLabel(
 										       mp, display));
+
+                        System.err.println ("zoom:" + displayProjectionZoom);
 			if(displayProjectionZoom!=0) {
+                            System.err.println ("zoom:" + displayProjectionZoom);
 			    getMapDisplay().zoom(displayProjectionZoom);
 			}
+                        displayProjectionZoom+=1;
+
                     }
                 }
             }
@@ -2983,6 +2988,7 @@ public class MapViewManager extends NavigatedViewManager {
     public boolean getShowMaps () {
 	return this.showMaps;
     }
+
 
 
 
