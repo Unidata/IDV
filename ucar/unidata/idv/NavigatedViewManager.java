@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -560,11 +561,16 @@ public abstract class NavigatedViewManager extends ViewManager {
     }
 
 
-    private long mouseMovedTime=-1;
-    private long mousePressedTime=-1;
+    /** time of the mouse moved */
+    private long mouseMovedTime = -1;
 
+    /** time of the mouse pressed */
+    private long mousePressedTime = -1;
+
+    /** start matrix */
     private double[] startMoveMatrix;
 
+    /** start point */
     private Point mouseStartPoint;
 
 
@@ -607,7 +613,7 @@ public abstract class NavigatedViewManager extends ViewManager {
 
         if ((eventId == DisplayEvent.MOUSE_PRESSED)
                 || (eventId == DisplayEvent.MOUSE_DRAGGED)) {
-            mouseMovedTime  = System.currentTimeMillis();
+            mouseMovedTime = System.currentTimeMillis();
             MouseEvent mouseEvent  = (MouseEvent) inputEvent;
             int[][][]  functionMap = getMaster().getMouseFunctionMap();
             if (functionMap != null) {
@@ -617,12 +623,16 @@ public abstract class NavigatedViewManager extends ViewManager {
                 int shiftIdx = (mouseEvent.isShiftDown()
                                 ? 1
                                 : 0);
-                int mouseIdx = (SwingUtilities.isLeftMouseButton(mouseEvent)
-                                ? 0
-                                : (SwingUtilities.isMiddleMouseButton(
-                                    mouseEvent)
-                                   ? 1
-                                   : 2));
+                int mouseIdx =
+                    ((SwingUtilities.isLeftMouseButton(mouseEvent)
+                      && !SwingUtilities.isRightMouseButton(mouseEvent))
+                     ? 0
+                     : (SwingUtilities.isMiddleMouseButton(mouseEvent)
+                        ? 1
+                        : ((SwingUtilities.isRightMouseButton(mouseEvent)
+                            && !SwingUtilities.isLeftMouseButton(mouseEvent))
+                           ? 2
+                           : 1)));
                 int function = functionMap[mouseIdx][ctrlIdx][shiftIdx];
                 if (function == MouseHelper.CURSOR_TRANSLATE) {
                     if (cursorReadoutWindow == null) {
@@ -639,29 +649,44 @@ public abstract class NavigatedViewManager extends ViewManager {
                 cursorReadoutWindow = null;
             }
             Point mouseStart = mouseStartPoint;
-            if(mouseStart!=null) {
-                Point toPoint = new Point(mouseEvent.getX(), mouseEvent.getY());
-                double distance = GuiUtils.distance(mouseStart.x, mouseStart.y, toPoint.x, toPoint.y);
-                long deltaTime = System.currentTimeMillis()-mouseMovedTime;
-                if(System.currentTimeMillis()-mousePressedTime>0) {
-                    double speed = distance/(System.currentTimeMillis()-mousePressedTime);
-                    if(distance>50 &&
-                       deltaTime<200 &&
-                       speed>0.5) {
-                        double[] endMatrix = getProjectionControl().getMatrix();
-                        mouseFlicked(mouseStart, toPoint, startMoveMatrix, endMatrix,speed);
+            if (mouseStart != null) {
+                Point toPoint = new Point(mouseEvent.getX(),
+                                          mouseEvent.getY());
+                double distance = GuiUtils.distance(mouseStart.x,
+                                      mouseStart.y, toPoint.x, toPoint.y);
+                long deltaTime = System.currentTimeMillis() - mouseMovedTime;
+                if (System.currentTimeMillis() - mousePressedTime > 0) {
+                    double speed = distance
+                                   / (System.currentTimeMillis()
+                                      - mousePressedTime);
+                    if ((distance > 50) && (deltaTime < 200)
+                            && (speed > 0.5)) {
+                        double[] endMatrix =
+                            getProjectionControl().getMatrix();
+                        mouseFlicked(mouseStart, toPoint, startMoveMatrix,
+                                     endMatrix, speed);
                     }
                 }
             }
-            mouseMovedTime  = -1;
+            mouseMovedTime = -1;
         }
         super.displayChanged(de);
     }
 
 
 
-    protected void mouseFlicked(Point startPoint, Point endPoint, double[] startMatrix, double [] endMatrix,double speed) {
-    }
+    /**
+     * Handle a mouse flicked
+     *
+     * @param startPoint   the start point
+     * @param endPoint     the end point
+     * @param startMatrix  the start matrix
+     * @param endMatrix    the end matrix
+     * @param speed        how fast to move
+     */
+    protected void mouseFlicked(Point startPoint, Point endPoint,
+                                double[] startMatrix, double[] endMatrix,
+                                double speed) {}
 
 
     /**
