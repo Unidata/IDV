@@ -39,6 +39,18 @@
          title="USGS Topography - Static"/>
 
 
+  <image file="/auxdata/images/caida.jpg"
+         layer="fixed-caida"
+         title="Topography/Political - Static"/>
+
+
+  <image file="/auxdata/images/biosphere.jpg"
+         layer="fixed-biosphere"
+         title="Biosphere - Static"/>
+
+
+
+
   <image file="/auxdata/images/landseamask.png"
          layer="fixed-landseamask"
          title="Land/Sea Mask - Static"/>
