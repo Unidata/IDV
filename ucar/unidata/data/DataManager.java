@@ -83,6 +83,8 @@ import java.util.TimeZone;
 
 import javax.swing.filechooser.FileFilter;
 
+import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.util.DiskCache;
 
 /**
  * A class for managing {@link DataSource}s
@@ -469,7 +471,7 @@ public class DataManager {
      * @param resourceManager The resource manager
      */
     protected void loadIospResources(IdvResourceManager resourceManager) {
-        //ucar.nc2.NetcdfFileCache.init(1,10,20*60);
+        NetcdfDataset.initNetcdfFileCache(1,10,20*60);
         ucar.grib.GribResourceReader.setGribResourceReader(
             new ucar.grib.GribResourceReader() {
             public InputStream openInputStream(String resourceName)
