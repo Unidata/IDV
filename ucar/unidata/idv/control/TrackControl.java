@@ -28,11 +28,7 @@ import ucar.unidata.idv.flythrough.FlythroughPoint;
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.collab.SharableImpl;
 
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataInstance;
-
-import ucar.unidata.data.DataTimeRange;
-import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.*;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
@@ -492,12 +488,96 @@ public class TrackControl extends GridDisplayControl {
         }
         if ((ff != null) && (grid != null)) {
             updateTimeSelectRange();
-            trackDisplay.setTrack(grid);
+            if(useTrackTimes)
+                trackDisplay.setTrack(mergeGrid(grid));
+            else
+                trackDisplay.setTrack(grid);
             setTrackTimes();
             applyTimeRange();
         }
         return true;
     }
+
+    protected FieldImpl mergeGrid(FieldImpl fi) throws VisADException, RemoteException {
+        FunctionType fiType = (FunctionType)fi.getType();
+        int len = fi.getLength();
+        List<FlatField> datas = new ArrayList<FlatField>();
+        Set st = fi.getDomainSet();
+        Unit [] ut = fi.getDomainUnits();
+        float [][] t = st.getSamples();
+        DateTime [] times = new DateTime[1];
+        times[0] = new DateTime(t[0][2], ut[0]);
+        for(int i = 0; i< len; i++)
+         datas.add ((FlatField)fi.getSample(i));
+
+       // now merge
+        if (datas.isEmpty()) {
+            return null;
+        }
+        if (datas.size() == 1) {
+            return (FlatField) datas.get(0);
+        }
+        FlatField retField = null;
+        try {
+            int        numObs    = 0;
+            GriddedSet domainSet = null;
+            FlatField  ff        = null;
+            for (int i = 0; i < datas.size(); i++) {
+                ff        = (FlatField) datas.get(i);
+                domainSet = (GriddedSet) ff.getDomainSet();
+                numObs    += domainSet.getLength();
+            }
+            FunctionType  retType = (FunctionType) ff.getType();
+            RealTupleType rtt     = DataUtility.getFlatRangeType(ff);
+            double[][] domainVals =
+                new double[domainSet.getDimension()][numObs + datas.size()];
+            float[][] values = new float[rtt.getDimension()][numObs + datas.size()];
+            int       curPos = 0;
+            for (int i = 0; i < datas.size(); i++) {
+                FlatField  data    = (FlatField) datas.get(i);
+                GriddedSet dset    = (GriddedSet) data.getDomainSet();
+                double[][] samples = dset.getDoubles(false);
+                int        length  = dset.getLength();
+                float[][]  vals    = data.getFloats(false);
+                for (int j = 0; j < samples.length; j++) {
+                    domainVals[j][curPos ] = samples[j][0];
+                    System.arraycopy(samples[j], 0, domainVals[j], curPos+1,
+                                     length);
+                }
+                for (int j = 0; j < vals.length; j++) {
+                    values[j][curPos] = Float.NaN;
+                    System.arraycopy(vals[j], 0, values[j], curPos+1, length);
+                }
+                curPos += length;
+            }
+            // now make the new data
+            // First make the domain set
+            GriddedSet newDomain = null;
+            numObs = numObs + datas.size();
+            if (domainSet instanceof Gridded1DDoubleSet) {
+                newDomain = new Gridded1DDoubleSet(domainSet.getType(),
+                        domainVals, numObs, domainSet.getCoordinateSystem(),
+                        domainSet.getSetUnits(), domainSet.getSetErrors());
+            } else {
+                newDomain = GriddedSet.create(domainSet.getType(),
+                        Set.doubleToFloat(domainVals), new int[] { numObs },
+                        domainSet.getCoordinateSystem(),
+                        domainSet.getSetUnits(), domainSet.getSetErrors());
+            }
+            retField = new FlatField(retType, newDomain);
+            retField.setSamples(values, false);
+
+        } catch (RemoteException re) {
+            throw new VisADException("got RemoteException " + re);
+        }
+       // end merge
+
+        FieldImpl fi0 = new FieldImpl(fiType, DateTime.makeTimeSet(times));
+        fi0.setSample(0, retField, false);
+
+        return fi0;
+    }
+
 
     /**
      * Set the times on the track
@@ -539,7 +619,11 @@ public class TrackControl extends GridDisplayControl {
         }
 
         double[] times = samples[1];
+        if ( !Util.isStrictlySorted(times)) {
+            int [] indexes = Util.strictlySortedIndexes(times, true);
+            times  = Util.take(times, indexes);
 
+        }
         if (getTimeDeclutterEnabled()) {
             LogUtil.message("Track display: subsetting times");
             Trace.call1("declutterTime");
@@ -784,6 +868,19 @@ public class TrackControl extends GridDisplayControl {
             public void actionPerformed(ActionEvent e) {
                 setUseTrackTimes(
                     ((JComboBox) e.getSource()).getSelectedIndex() == 1);
+                FieldImpl grid = getGridDataInstance().getGrid(false);
+                try{
+                    if(useTrackTimes) {
+                       // System.out.println("Use track points times\n");
+                        trackDisplay.setTrack(mergeGrid(grid));
+                    }
+                    else {
+                       // System.out.println("Use track nominal times\n");
+                        trackDisplay.setTrack(grid);
+                    }
+                    setTrackTimes();
+                } catch (Exception e1){}
+
             }
         });
 
