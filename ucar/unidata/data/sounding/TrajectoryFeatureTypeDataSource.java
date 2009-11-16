@@ -141,9 +141,6 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
     protected FieldImpl aggregateTracks(
             List tracks, Object id0) throws VisADException, RemoteException {
 
-        if(id0.toString().endsWith("merged")) {
-             return aggregateTracksWithNoTime(tracks);
-        }
         List         adapters = getAdapters();
         FunctionType fiType   = null;
         DateTime[]   times    = new DateTime[tracks.size()];
@@ -166,32 +163,7 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
         return fi;
     }
 
-    /**
-     * Aggregate the tracks
-     *
-     * @param tracks List of sonde tracks
-     *
-     * @return FieldImpl of aggregated tracks
-     *
-     * @throws java.rmi.RemoteException Java RMI Exception
-     *
-     * @throws RemoteException _more_
-     * @throws VisADException  problem in VisAD
-     */
-    protected FieldImpl aggregateTracksWithNoTime(List tracks)
-            throws VisADException, RemoteException {
-       FlatField mergedTracks = mergeTracks(tracks);
-        FunctionType fiType = new FunctionType(RealType.Time,
-                                  mergedTracks.getType());
-        DateTime endTime = getBaseTime();
-        FieldImpl fi =
-            new FieldImpl(fiType,
-                          new SingletonSet(new RealTuple(new Real[] {
-                              endTime })));
-        fi.setSample(0, mergedTracks, false);
-        return fi;
 
-    }
     /**
      * Make the {@link ucar.unidata.data.DataChoice}s associated with this dataset
      */
@@ -242,16 +214,14 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
                                   "/auxdata/ui/icons/TrajectoryData16.gif");
             for (VarInfo varInfo : vars) {
                 List cats = categories;
-                List cata;
-                cata = DataCategory.parseCategories("Track-" + "Aggregated"
-                            + ";trace", true);
+
+
                 if (varInfo.getCategory() != null) {
                     String cat = StringUtil.replace(varInfo.getCategory(),
                                      "-", " ");
                     cats = DataCategory.parseCategories("Track-" + cat
                             + ";trace", true);
-                    cata = DataCategory.parseCategories("Track-" + "Aggregated" + cat
-                            + ";trace", true);
+
                 }
                 DirectDataChoice ddc = new DirectDataChoice(this,
                                            new String[] { trackName,
@@ -259,14 +229,7 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
                                              varInfo.getDescription(), cats,
                                              props);
                 addDataChoice(ddc);
-                if(varInfo.getCategory() == null) {
-                    DirectDataChoice ddc1 = new DirectDataChoice(this,
-                                               new String[] { trackName+"/merged",
-                            varInfo.getName() }, varInfo.getName(),
-                                                 varInfo.getDescription(), cata,
-                                                 props);
-                    addDataChoice(ddc1);
-                }
+
             }
             // add in a station plot choice as well
             List pointCatList = pointCats;
