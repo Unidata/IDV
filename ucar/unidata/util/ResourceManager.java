@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.util;
 
 
@@ -99,6 +100,7 @@ public abstract class ResourceManager {
     /** _more_ */
     private FileManager fileChooser;
 
+    /** _more_          */
     private int resourceTimestamp = 0;
 
 
@@ -179,6 +181,11 @@ public abstract class ResourceManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getResourceTimestamp() {
         return resourceTimestamp;
     }
@@ -430,11 +437,13 @@ public abstract class ResourceManager {
         }
 
         if (o instanceof List) {
-            List list = (List) o;
-            NamedObject first=null;
+            List        list  = (List) o;
+            NamedObject first = null;
             for (int i = 0; i < list.size(); i++) {
                 NamedObject obj = doImport(list.get(i), forceUnique);
-                if(first == null) first = obj;
+                if (first == null) {
+                    first = obj;
+                }
             }
             System.err.println("first:" + first);
             return first;
@@ -454,7 +463,7 @@ public abstract class ResourceManager {
                 }
             }
 
-            System.err.println ("adding users:" + o);
+            System.err.println("adding users:" + o);
             addUsers((NamedObject) o);
             return (NamedObject) o;
         }
@@ -515,13 +524,25 @@ public abstract class ResourceManager {
      * @return _more_
      */
     public String doNew(Component component, String label) {
-        return doNew(component, label, "",null);
+        return doNew(component, label, "", null);
     }
 
-    public String doNew(Component component, String label, String initName, String tooltip) {
+    /**
+     * _more_
+     *
+     * @param component _more_
+     * @param label _more_
+     * @param initName _more_
+     * @param tooltip _more_
+     *
+     * @return _more_
+     */
+    public String doNew(Component component, String label, String initName,
+                        String tooltip) {
         JTextField field = new JTextField(initName, 20);
-        if(tooltip!=null)
+        if (tooltip != null) {
             field.setToolTipText(tooltip);
+        }
         Component contents = GuiUtils.inset(GuiUtils.label(getTitle()
                                  + " Name: ", field), 4);
         while (true) {
@@ -531,11 +552,11 @@ public abstract class ResourceManager {
             }
             String newName = field.getText().trim();
             if (newName.equals("")) {
-               LogUtil.userMessage("The name cannot be blank");
-               continue;
+                LogUtil.userMessage("The name cannot be blank");
+                continue;
             }
             //Clean up any categories
-            List toks =  StringUtil.split(newName, ">", true,true);
+            List toks = StringUtil.split(newName, ">", true, true);
             newName = StringUtil.join(">", toks);
             if ( !hasUsers(newName)) {
                 return newName;
@@ -567,20 +588,26 @@ public abstract class ResourceManager {
         JTextField field        = new JTextField(o.getName(), 20);
         Component contents = GuiUtils.inset(GuiUtils.label(getTitle()
                                  + " name: ", field), 4);
-        if ( !GuiUtils.showOkCancelDialog(null, "Save", contents, component,
-                                          Misc.newList(field))) {
-            return null;
-        }
-        String newName = field.getText().trim();
-        if ( !(newName.equals(originalName)) && hasUsers(newName)) {
-            if ( !GuiUtils.askYesNo(
-                    getTitle() + " exists",
-                    "A resource with name " + newName
-                    + " exists.  Do you want to overwrite?")) {
+        while (true) {
+            if ( !GuiUtils.showOkCancelDialog(null, "Save", contents,
+                    component, Misc.newList(field))) {
                 return null;
             }
+            String newName = field.getText().trim();
+            if (newName.equals("")) {
+                LogUtil.userMessage("The name cannot be blank");
+                continue;
+            }
+            if ( !(newName.equals(originalName)) && hasUsers(newName)) {
+                if ( !GuiUtils.askYesNo(
+                        getTitle() + " exists",
+                        "A resource with name " + newName
+                        + " exists.  Do you want to overwrite?")) {
+                    return null;
+                }
+            }
+            return newName;
         }
-        return newName;
     }
 
     /**
@@ -639,7 +666,7 @@ public abstract class ResourceManager {
                 xmlEncoder = new XmlEncoder();
             }
             Element root = XmlUtil.getRoot(xml);
-            return  xmlEncoder.toObject(root);
+            return xmlEncoder.toObject(root);
         } catch (Exception exc) {
             if (shouldWeIgnoreThisXml(xml)) {
                 return null;
