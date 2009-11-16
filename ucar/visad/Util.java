@@ -2997,6 +2997,12 @@ public final class Util {
     public static MapProjection makeMapProjection(double lat1, double lon1,
             double lat2, double lon2)
             throws VisADException {
+	return makeMapProjection(lat1,lon1,lat2,lon2,true);
+    }
+
+    public static MapProjection makeMapProjection(double lat1, double lon1,
+						  double lat2, double lon2, boolean makeSquare)
+            throws VisADException {
 
         int lonMax = 180;
         int lonMin = -180;
@@ -3010,17 +3016,21 @@ public final class Util {
         double minY = Math.max(-90, Math.min(lat1, lat2));
         double maxY = Math.min(90, Math.max(lat1, lat2));
         double degX = maxX - minX;
+
         double degY = maxY - minY;
-        //Try to make the box square
-        if (degY > degX) {
-            double delta = degY - degX;
-            minX -= delta / 2;
-            maxX += delta / 2;
-        } else if (degX > degY) {
-            double delta = degX - degY;
-            minY -= delta / 2;
-            maxY += delta / 2;
-        }
+	if(makeSquare) {
+	    //Try to make the box square
+	
+	    if (degY > degX) {
+		double delta = degY - degX;
+		minX -= delta / 2;
+		maxX += delta / 2;
+	    } else if (degX > degY) {
+		double delta = degX - degY;
+		minY -= delta / 2;
+		maxY += delta / 2;
+	    }
+	}
         minX = Math.max(lonMin, minX);
         maxX = Math.min(lonMax, maxX);
         minY = Math.max(-90, minY);
