@@ -22,18 +22,13 @@
 
 
 
-
 package ucar.unidata.util;
-
-
-
-
-
-
 
 
 import java.awt.*;
 import java.awt.event.*;
+
+import java.beans.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +53,7 @@ import javax.swing.filechooser.*;
  */
 public class FileManager {
 
+    /** _more_ */
     private static boolean fixFileLockup = false;
 
 
@@ -188,6 +184,7 @@ public class FileManager {
      */
     public FileManager(Component parent, String defDir, List filters,
                        String title, boolean includeAllFilter) {
+
         this.parent = parent;
 
         if (defDir != null) {
@@ -226,8 +223,61 @@ public class FileManager {
             } else if (includeAllFilter) {
                 chooser.setFileFilter(chooser.getAcceptAllFileFilter());
             }
-
-
+            chooser.addPropertyChangeListener(new PropertyChangeListener() {
+                File   lastFile           = null;
+                String originalFileSuffix = null;
+                public void propertyChange(PropertyChangeEvent e) {
+                    String prop = e.getPropertyName();
+                    if (JFileChooser.SELECTED_FILE_CHANGED_PROPERTY.equals(
+                            prop)) {
+                        if (chooser.getSelectedFile() != null) {
+                            lastFile = chooser.getSelectedFile();
+                            if (originalFileSuffix == null) {
+                                originalFileSuffix = IOUtil.getFileExtension(
+                                    lastFile.toString());
+                            }
+                        }
+                    }
+                    if (JFileChooser.FILE_FILTER_CHANGED_PROPERTY.equals(
+                            prop)) {
+                        File       f          = lastFile;
+                        FileFilter fileFilter = chooser.getFileFilter();
+                        if (f == null) {
+                            return;
+                        }
+                        String suffix      = null;
+                        String newFileName = null;
+                        if ((fileFilter != null)
+                                && (fileFilter
+                                    instanceof PatternFileFilter)) {
+                            String filterSuffix =
+                                ((PatternFileFilter) fileFilter)
+                                    .getPreferredSuffix();
+                            if (filterSuffix != null) {
+                                suffix = filterSuffix;
+                            }
+                            //else {
+                            //suffix = originalFileSuffix;
+                            //}
+                        }
+                        if (suffix != null) {
+                            String filename = f.toString();
+                            String fileSuffix =
+                                IOUtil.getFileExtension(filename);
+                            if ((fileSuffix == null)
+                                    || fileSuffix.equals("")) {
+                                newFileName = filename + suffix;
+                            } else if ( !fileSuffix.equals(suffix)) {
+                                newFileName = IOUtil.stripExtension(filename)
+                                        + suffix;
+                            }
+                        }
+                        if (newFileName != null) {
+                            chooser.setSelectedFile(new File(newFileName));
+                        }
+                    }
+                }
+            });
         } catch (SecurityException se) {
             System.out.println("FileManager SecurityException " + se);
             readOk = false;
@@ -236,6 +286,7 @@ public class FileManager {
                 "Sorry, this Applet does not have disk read permission.");
         }
         System.setSecurityManager(backup);
+
     }
 
 
@@ -247,6 +298,7 @@ public class FileManager {
         return chooser;
     }
 
+    /** _more_ */
     private static boolean fileHidingEnabled = true;
 
 
@@ -261,11 +313,21 @@ public class FileManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public static boolean getFileHidingEnabled() {
         return fileHidingEnabled;
     }
 
-    public static void setFileHidingEnabled( boolean value) {
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public static void setFileHidingEnabled(boolean value) {
         fileHidingEnabled = value;
     }
 
@@ -361,17 +423,16 @@ public class FileManager {
             JPanel urlPanel = LayoutUtil.doLayout(new Component[] { urlButton,
                     urlField }, 2, LayoutUtil.WT_NY, LayoutUtil.WT_N);
             contents = LayoutUtil.centerBottom(contents,
-                                             LayoutUtil.inset(urlPanel, 5));
+                    LayoutUtil.inset(urlPanel, 5));
         }
 
 
         List       directoryHistory = getHistoryList();
         JComponent historyComp = makeDirectoryHistoryComponent(chooser, true);
         if ((directoryHistory != null) && (directoryHistory.size() > 0)) {
-            contents =
-                LayoutUtil.centerRight(contents,
-                                     LayoutUtil.top(LayoutUtil.inset(historyComp,
-                                         new Insets(13, 0, 0, 10))));
+            contents = LayoutUtil.centerRight(contents,
+                    LayoutUtil.top(LayoutUtil.inset(historyComp,
+                        new Insets(13, 0, 0, 10))));
         }
 
 
@@ -379,10 +440,11 @@ public class FileManager {
         dialog.getContentPane().add(contents);
 
         //Show the dialog in the awt thread to prevent a deadlock on macs
-        GuiUtils.invokeInSwingThread(new Runnable() {public void run() {
-                    GuiUtils.showInCenter(dialog);
-                }
-            });
+        GuiUtils.invokeInSwingThread(new Runnable() {
+            public void run() {
+                GuiUtils.showInCenter(dialog);
+            }
+        });
 
 
 
@@ -845,6 +907,7 @@ public class FileManager {
     /** Suffix for XML files */
     public static final String SUFFIX_XML = ".xml";
 
+    /** _more_ */
     public static final String SUFFIX_AVI = ".avi";
 
     /** Suffix for CSV files */
@@ -905,22 +968,17 @@ public class FileManager {
 
     /** Filter for Text files */
     public static final PatternFileFilter FILTER_TXT =
-        new PatternFileFilter(".+\\.txt",
-                              "Text Files (*.txt)",
-                              SUFFIX_TXT);
+        new PatternFileFilter(".+\\.txt", "Text Files (*.txt)", SUFFIX_TXT);
 
 
     /** Filter for xls files */
     public static final PatternFileFilter FILTER_XLS =
-        new PatternFileFilter(".+\\.xls",
-                              "Microsoft Excel files",
+        new PatternFileFilter(".+\\.xls", "Microsoft Excel files",
                               SUFFIX_XLS);
 
     /** Filter for xls files */
     public static final PatternFileFilter FILTER_KML =
-        new PatternFileFilter(".+\\.kml",
-                              "Google Earth files",
-                              SUFFIX_KML);
+        new PatternFileFilter(".+\\.kml", "Google Earth files", SUFFIX_KML);
 
     /** File filter used for bundle files */
     public static final PatternFileFilter FILTER_JAR =
@@ -949,7 +1007,8 @@ public class FileManager {
 
     /** Filter for QuickTime files */
     public static final PatternFileFilter FILTER_MOV =
-        new PatternFileFilter(".+\\.mov", "QuickTime files (*.mov)",SUFFIX_MOV);
+        new PatternFileFilter(".+\\.mov", "QuickTime files (*.mov)",
+                              SUFFIX_MOV);
 
     /** Filter for QuickTime files */
     public static final PatternFileFilter FILTER_AVI =
@@ -1027,20 +1086,38 @@ public class FileManager {
      * to fix the lock up problem on windows.
      */
     public static class MyFileChooser extends JFileChooser {
+
+        /**
+         * _more_
+         *
+         * @param dir _more_
+         */
         public MyFileChooser(File dir) {
             super(dir);
         }
 
+        /**
+         * _more_
+         *
+         * @param path _more_
+         */
         public MyFileChooser(String path) {
             super(path);
         }
 
-        public MyFileChooser() {
-        }
+        /**
+         * _more_
+         */
+        public MyFileChooser() {}
 
+        /**
+         * _more_
+         */
         public void updateUI() {
-            if(fixFileLockup) 
-                putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
+            if (fixFileLockup) {
+                putClientProperty("FileChooser.useShellFolder",
+                                  Boolean.FALSE);
+            }
             super.updateUI();
         }
     }
@@ -1067,7 +1144,7 @@ public class FileManager {
 
         chooser.setApproveButtonText("Save");
         if (accessory != null) {
-	    accessory = GuiUtils.inset(accessory, 2);
+            accessory = GuiUtils.inset(accessory, 2);
             chooser.setAccessory(accessory);
         }
 
@@ -1397,7 +1474,7 @@ public class FileManager {
             }
         }
         if (accessory != null) {
-	    accessory = GuiUtils.inset(accessory, 2);
+            accessory = GuiUtils.inset(accessory, 2);
             fileManager.setAccessory(accessory);
         }
         fileManager.getChooser().setDialogType((forWrite
@@ -1410,12 +1487,15 @@ public class FileManager {
 
 
         while (true) {
+
             String filename = fileManager.chooseFilename(title,
                                   (buttonText != null)
                                   ? buttonText
                                   : (forWrite
                                      ?"Save"
                                      :"Open"),includeUrl);
+
+
             if (filename == null) {
                 return null;
             }
@@ -1510,10 +1590,6 @@ public class FileManager {
         //       JPanel contents = GuiUtils.label("  Directory History: ", goToBtn);
         //        return contents;
     }
-
-
-
-
 
 }
 
