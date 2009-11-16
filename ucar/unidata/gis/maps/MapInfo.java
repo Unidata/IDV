@@ -541,8 +541,8 @@ public class MapInfo {
      *
      * @return The MapData
      */
-    public List getMapDataList() {
-        return mapDataList;
+    public List<MapData> getMapDataList() {
+        return (List<MapData>)mapDataList;
     }
 
 
