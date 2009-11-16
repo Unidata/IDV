@@ -30,6 +30,8 @@ package ucar.unidata.util;
 import java.awt.Color;
 import java.awt.Dimension;
 
+import java.awt.geom.Rectangle2D;
+
 import java.io.*;
 
 import java.lang.reflect.*;
@@ -448,6 +450,21 @@ public class Misc {
                 argument = new Float(value);
             } else if (paramType.equals(Boolean.TYPE)) {
                 argument = new Boolean(value);
+	    } else if(paramType.equals(Rectangle2D.Float.class)) {
+		String[]toks = StringUtil.split(value, ",",4);
+		argument = new Rectangle2D.Float(
+						 Float.parseFloat(toks[0]),
+						 Float.parseFloat(toks[1]),
+						 Float.parseFloat(toks[2]),
+						 Float.parseFloat(toks[3]));
+
+	    } else if(paramType.equals(Rectangle2D.Double.class)) {
+		String[]toks = StringUtil.split(value, ",",4);
+		argument = new Rectangle2D.Double(
+						 Double.parseDouble(toks[0]),
+						 Double.parseDouble(toks[1]),
+						 Double.parseDouble(toks[2]),
+						 Double.parseDouble(toks[3]));
             } else if(paramType.equals(Color.class)) {
                 argument  =GuiUtils.decodeColor(value,Color.white);
             } else if (paramType.equals(Dimension.class)) {

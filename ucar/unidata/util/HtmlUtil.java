@@ -27,6 +27,7 @@ package ucar.unidata.util;
 import ucar.unidata.xml.XmlUtil;
 
 
+import java.awt.Color;
 import java.lang.reflect.*;
 
 import java.util.ArrayList;
@@ -1269,6 +1270,12 @@ public class HtmlUtil {
     }
 
 
+
+    public static String makeLatLonInput(String arg, String value) {
+	return  input(arg, value, attrs(ATTR_SIZE,"5") + id(arg));
+    }
+
+
     /**
      * _more_
      *
@@ -1286,24 +1293,15 @@ public class HtmlUtil {
         //TODO: Clean this up
         return table(
             "<tr><td colspan=\"2\" align=\"center\">"
-            + input(
-                baseName + "_north", north,
-                " size=\"5\" id=\"" + baseName + "_north\"") + "</td></tr>"
-                    + "<tr><td>"
-                    + input(
-                        baseName + "_west", west,
-                        " size=\"5\" id=\"" + baseName
-                        + "_west\"") + "</td><td>"
-                                     + input(
-                                         baseName + "_east", east,
-                                         " size=\"5\"  id=\"" + baseName
-                                         + "_east\"") + "</tr>"
-                                             + "<tr><td colspan=\"2\" align=\"center\">"
-                                             + input(
-                                                 baseName + "_south", south,
-                                                     " size=\"5\"  id=\""
-                                                         + baseName
-                                                             + "_south\""));
+            +makeLatLonInput(baseName + "_north", north)
+	    + "</td></tr>"
+	    + "<tr><td>"
+	    + makeLatLonInput(baseName + "_west", west)
+	    + "</td><td>"
+	    + makeLatLonInput(baseName + "_east", east)
+	    + "</tr>"
+	    + "<tr><td colspan=\"2\" align=\"center\">"
+	    + makeLatLonInput(baseName + "_south", south));
     }
 
     /**
@@ -1320,15 +1318,7 @@ public class HtmlUtil {
     public static String makeLatLonBox(String baseName, double south,
                                        double north, double east,
                                        double west) {
-        return table(
-            "<tr><td colspan=\"2\" align=\"center\">"
-            + input(baseName + "_north", toString(north), " size=\"5\"")
-            + "</td></tr>" + "<tr><td>"
-            + input(baseName + "_west", toString(west), " size=\"5\"")
-            + "</td><td>"
-            + input(baseName + "_east", toString(east), " size=\"5\"")
-            + "</tr>" + "<tr><td colspan=\"2\" align=\"center\">"
-            + input(baseName + "_south", toString(south), " size=\"5\""));
+	return makeLatLonBox(baseName, toString(south), toString(north),toString(east),toString(west));
     }
 
     /**
@@ -1843,9 +1833,9 @@ public class HtmlUtil {
      */
     public static String select(String name, List values, String selected,
                                 String extra, int maxLength) {
-        List<String> selectedList = null;
+        List selectedList = null;
         if ((selected != null) && (selected.length() > 0)) {
-            selectedList = (List<String>) Misc.newList(selected);
+            selectedList = Misc.newList(selected);
         }
         return select(name, values, selectedList, extra, maxLength);
     }
@@ -1893,7 +1883,7 @@ public class HtmlUtil {
      * @return _more_
      */
     public static String select(String name, List values,
-                                List<String> selected, String extra,
+                                List selected, String extra,
                                 int maxLength) {
         StringBuffer sb = new StringBuffer();
         sb.append(open(TAG_SELECT,
@@ -1922,7 +1912,7 @@ public class HtmlUtil {
             }
 
             String selectedAttr = "";
-            if ((selected != null) && selected.contains(value)) {
+            if (selected != null && (selected.contains(value) || selected.contains(obj))) {
                 selectedAttr = attrs(ATTR_SELECTED, VALUE_SELECTED);
             }
             if (label.length() > maxLength) {
@@ -1933,6 +1923,38 @@ public class HtmlUtil {
                           selectedAttr + extraAttr
                           + attrs(ATTR_TITLE, value, ATTR_VALUE,
                                   value), label));
+        }
+        sb.append(close(TAG_SELECT));
+        return sb.toString();
+    }
+
+
+
+
+    public static String colorSelect(String name, String selected) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(open(TAG_SELECT,
+                       attrs(ATTR_NAME, name, ATTR_CLASS, CLASS_SELECT)));
+	String value;
+	value = "none";
+	sb.append(tag(TAG_OPTION,
+		      attrs(ATTR_TITLE, value, ATTR_VALUE,
+			    ""), value));
+
+	for(int i=0;i< GuiUtils.COLORS.length;i++) {
+	    Color c = GuiUtils.COLORS[i];
+	    String label = GuiUtils.COLORNAMES[i];
+	    value = StringUtil.toHexString(c);
+	    String selectedAttr = "";
+	    if(Misc.equals(value, selected)) 
+                selectedAttr = attrs(ATTR_SELECTED, VALUE_SELECTED);
+	    String textColor = "";
+	    if(c.equals(Color.black))
+		textColor = "color:#FFFFFF;";
+            sb.append(tag(TAG_OPTION,
+                          selectedAttr
+                          + attrs(ATTR_TITLE, value, ATTR_VALUE,
+                                  value, ATTR_STYLE, "background-color:" + value+";" +textColor), label));
         }
         sb.append(close(TAG_SELECT));
         return sb.toString();
