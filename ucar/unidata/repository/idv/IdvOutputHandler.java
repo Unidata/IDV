@@ -41,6 +41,7 @@ import ucar.nc2.dt.grid.NetcdfCFWriter;
 
 import ucar.nc2.ft.FeatureDatasetPoint;
 
+import ucar.unidata.gis.maps.MapData;
 import ucar.unidata.data.*;
 import ucar.unidata.data.DataCategory;
 
@@ -50,6 +51,7 @@ import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.grid.*;
 import ucar.unidata.data.point.NetcdfPointDataSource;
 import ucar.unidata.idv.ControlDescriptor;
+import ucar.unidata.idv.DisplayConventions;
 
 
 import ucar.unidata.idv.IdvBase;
@@ -60,13 +62,18 @@ import ucar.unidata.idv.ui.ImageGenerator;
 import ucar.unidata.repository.*;
 import ucar.unidata.repository.data.*;
 import ucar.unidata.repository.output.*;
+import ucar.unidata.repository.auth.*;
 
 import ucar.unidata.sql.SqlUtil;
 
 import ucar.unidata.ui.ImageUtils;
 
+import visad.Unit;
+
 import ucar.unidata.ui.symbol.StationModel;
 import ucar.unidata.ui.symbol.StationModelManager;
+import ucar.unidata.util.Range;
+import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.DateUtil;
@@ -84,6 +91,7 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
+import java.awt.Color;
 import java.io.*;
 
 import java.io.File;
@@ -96,10 +104,13 @@ import java.net.*;
 
 import java.text.SimpleDateFormat;
 
+import java.util.Collections;
+import java.util.Properties;
 import java.util.ArrayList;
 import java.util.Date;
 
 
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
@@ -113,17 +124,25 @@ import java.util.List;
  */
 public class IdvOutputHandler extends OutputHandler {
 
-    /** _more_ */
-    public static final String ARG_IMAGE_CROPX1 = "image.edit.cropx1";
 
     /** _more_ */
-    public static final String ARG_IMAGE_CROPY1 = "image.edit.cropy1";
+    public static final String ARG_IMAGE_CROPX1 = "x1";
 
     /** _more_ */
-    public static final String ARG_IMAGE_CROPX2 = "image.edit.cropx2";
+    public static final String ARG_IMAGE_CROPY1 = "y1";
 
     /** _more_ */
-    public static final String ARG_IMAGE_CROPY2 = "image.edit.cropy2";
+    public static final String ARG_IMAGE_CROPX2 = "x2";
+
+    /** _more_ */
+    public static final String ARG_IMAGE_CROPY2 = "y2";
+
+    public static final String ARG_PUBLISH_ENTRY = "publish.entry";
+    public static final String ARG_PUBLISH_NAME = "publish.name";
+    public static final String ARG_PUBLISH_DESCRIPTION = "publish.description";
+
+    public static final String ARG_VIEW_BOUNDS = "view.bounds";
+
 
 
     /** _more_          */
@@ -145,19 +164,21 @@ public class IdvOutputHandler extends OutputHandler {
 
 
     /** _more_          */
-    public static final String ARG_POINT_LAYOUTMODEL = "point.layoutmodel";
+    public static final String ARG_POINT_LAYOUTMODEL = "layoutmodel";
 
     /** _more_          */
-    public static final String ARG_POINT_DOANIMATION = "point.doanimation";
+    public static final String ARG_POINT_DOANIMATION = "doanimation";
 
     /** _more_          */
-    public static final String ARG_DISPLAYLISTLABEL = "displaylistlabel";
+    public static final String ARG_DISPLAYLISTLABEL = "display_list_label";
+
+    public static final String ARG_DISPLAYCOLOR = "display_color";
 
     /** _more_          */
-    public static final String ARG_COLORTABLE = "colortable";
+    public static final String ARG_COLORTABLE = "display_colortable";
 
     /** _more_          */
-    public static final String ARG_STRIDE = "stride";
+    public static final String ARG_STRIDE = "spatial_stride";
 
 
     /** _more_          */
@@ -170,10 +191,12 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_FLOW_SKIP = "flow_skip";
 
     /** _more_          */
-    public static final String ARG_DISPLAYUNIT = "displayunit";
+    public static final String ARG_DISPLAYUNIT = "display_unit";
 
     /** _more_          */
-    public static final String ARG_ISOSURFACEVALUE = "isosurfacevalue";
+    public static final String ARG_ISOSURFACEVALUE = "iso_value";
+
+    public static final String ARG_CONTOUR_WIDTH = "contour_width";
 
     /** _more_          */
     public static final String ARG_CONTOUR_MIN = "contour_min";
@@ -194,7 +217,6 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_CONTOUR_LABELS = "contour_labels";
 
 
-
     /** _more_          */
     public static final String ARG_SCALE_VISIBLE = "scale_visible";
 
@@ -212,7 +234,7 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_RANGE_MAX = "range_max";
 
     /** _more_          */
-    public static final String ARG_DISPLAY = "display";
+    public static final String ARG_DISPLAY = "display_type";
 
     /** _more_          */
     public static final String ARG_ACTION = "action";
@@ -220,23 +242,36 @@ public class IdvOutputHandler extends OutputHandler {
     /** _more_          */
     public static final String ARG_TIMES = "times";
 
-    /** _more_          */
-    public static final String ARG_SHOWMAP = "showmap";
+
+    public static final String ARG_MAPS = "maps";
+    public static final String ARG_MAPWIDTH = "mapwidth";
+    public static final String ARG_MAPCOLOR = "mapcolor";
+
+
 
     /** _more_          */
     public static final String ARG_CLIP = "clip";
 
     /** _more_          */
-    public static final String ARG_WHITEBACKGROUND = "whitebackground";
+    public static final String ARG_VIEW_BACKGROUND = "view_background";
 
     /** _more_          */
     public static final String ARG_LEVELS = "levels";
 
     /** _more_          */
-    public static final String ARG_IMAGE_WIDTH = "imagewidth";
+    public static final String ARG_IMAGE_WIDTH = "width";
 
     /** _more_          */
-    public static final String ARG_IMAGE_HEIGHT = "imageheight";
+    public static final String ARG_IMAGE_HEIGHT = "height";
+
+
+
+
+    private Properties  valueToAbbrev;
+    private Properties  keyToAbbrev;
+
+    public static final String ACTION_ERROR =
+        "action.error";
 
 
     /** _more_          */
@@ -321,7 +356,7 @@ public class IdvOutputHandler extends OutputHandler {
 
     /** _more_          */
     private boolean idvOk = false;
-
+    private Hashtable<String,File> imageCache = new Hashtable<String,File>();
 
     /**
      *     _more_
@@ -331,7 +366,7 @@ public class IdvOutputHandler extends OutputHandler {
      *     @throws Exception _more_
      */
     public IdvOutputHandler(Repository repository, Element element)
-            throws Exception {
+	throws Exception {
         super(repository, element);
 
         okControls = new HashSet<String>();
@@ -347,9 +382,26 @@ public class IdvOutputHandler extends OutputHandler {
         okControls.add("pointvolumerender");
         addType(OUTPUT_IDV_GRID);
         addType(OUTPUT_IDV_POINT);
+        valueToAbbrev = new Properties();
+        keyToAbbrev = new Properties();
+	try {
+
+
+	    valueToAbbrev.load(
+			       IOUtil.getInputStream(
+						     "/ucar/unidata/repository/idv/values.properties",
+						     getClass()));
+
+
+	    keyToAbbrev.load(
+			     IOUtil.getInputStream(
+						   "/ucar/unidata/repository/idv/keys.properties",
+						   getClass()));
+	} catch(Exception exc) {
+	    exc.printStackTrace();
+	}
         //Call this in a thread because if there is any problem with xvfb this will just hang
         Misc.run(this, "checkIdv");
-
     }
 
 
@@ -366,8 +418,8 @@ public class IdvOutputHandler extends OutputHandler {
             idvOk = true;
         } catch (Throwable exc) {
             logError(
-                "To run the IdvOutputHandler a graphics environment is needed",
-                exc);
+		     "To run the IdvOutputHandler a graphics environment is needed",
+		     exc);
         }
     }
 
@@ -382,7 +434,7 @@ public class IdvOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public void getEntryLinks(Request request, State state, List<Link> links)
-            throws Exception {
+	throws Exception {
 
         if ( !idvOk) {
             return;
@@ -403,8 +455,8 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
         /*        if(theEntries!=null && theEntries.size()>0) {
-            types.add(OUTPUT_IDV);
-            }*/
+		  types.add(OUTPUT_IDV);
+		  }*/
     }
 
 
@@ -456,7 +508,7 @@ public class IdvOutputHandler extends OutputHandler {
                 getIdv().getDataManager().getDescriptors();
             for (DataSourceDescriptor descriptor : descriptors) {
                 if ((descriptor.getPatternFileFilter() != null)
-                        && descriptor.getPatternFileFilter().match(path)) {
+		    && descriptor.getPatternFileFilter().match(path)) {
                     return descriptor;
                 }
             }
@@ -476,7 +528,7 @@ public class IdvOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputEntry(final Request request, Entry entry)
-            throws Exception {
+	throws Exception {
 
         OutputType output = request.getOutput();
         if (output.equals(OUTPUT_IDV_GRID)) {
@@ -501,7 +553,7 @@ public class IdvOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputGrid(final Request request, Entry entry)
-            throws Exception {
+	throws Exception {
         DataOutputHandler dataOutputHandler = getDataOutputHandler();
         String action = request.getString(ARG_ACTION,
                                           ACTION_GRID_MAKEINITFORM);
@@ -518,7 +570,7 @@ public class IdvOutputHandler extends OutputHandler {
         DataSourceDescriptor descriptor =
             idvServer.getIdv().getDataManager().getDescriptor("File.Grid");
         GeoGridDataSource dataSource = new GeoGridDataSource(descriptor,
-                                           dataset, entry.getName(), path);
+							     dataset, entry.getName(), path);
 
         try {
             if (action.equals(ACTION_GRID_MAKEINITFORM)) {
@@ -552,23 +604,41 @@ public class IdvOutputHandler extends OutputHandler {
      */
     private Result outputGridForm(final Request request, Entry entry,
                                   GeoGridDataSource dataSource)
-            throws Exception {
+	throws Exception {
 
         StringBuffer sb      = new StringBuffer();
         makeGridForm(request, sb, entry, dataSource);
+
+
+
         return new Result("Grid Displays", sb);
     }
 
         
 
     private String htmlCheckbox(Request request, String arg, boolean dflt) {
-        return  HtmlUtil.checkbox(arg,  "true", request.get(arg, dflt));
+	boolean value = dflt;
+	if(request.exists(arg)) {
+	    value = request.get(arg, dflt);
+	} else 	if(request.exists(arg+"_dflt")) {
+	    value = false;
+	}
+        return  HtmlUtil.checkbox(arg,  "true", value) +
+	    HtmlUtil.hidden(arg+"_dflt", ""+value);
+    }
+
+
+    private String htmlSelect(Request request, String arg, List items, boolean selectFirstOne, String extra) {
+        List selected  = request.get(arg,new ArrayList());
+	if(selected.size()== 0 && selectFirstOne && items.size()>0) {
+	    selected.add(items.get(0));
+	}
+        return HtmlUtil.select(arg, items, selected, extra);
     }
 
 
     private String htmlSelect(Request request, String arg, List items, String extra) {
-        List selected  = request.get(arg,new ArrayList());
-        return HtmlUtil.select(arg, items, selected, extra);
+        return htmlSelect(request, arg, items, false, extra);
     }
 
     private String htmlSelect(Request request, String arg, List items) {
@@ -612,24 +682,19 @@ public class IdvOutputHandler extends OutputHandler {
                                   HtmlUtil.SIZE_3
                                   + HtmlUtil.id(ARG_IMAGE_CROPY2)));
 
-        sb.append(HtmlUtil.div("",
-                               HtmlUtil.cssClass("image_edit_box")
-                               + HtmlUtil.id("image_edit_box")));
 
         StringBuffer basic = new StringBuffer();
         basic.append(HtmlUtil.formTable());
-        basic.append(HtmlUtil.formEntry(msgLabel("Show map"),
-                                        HtmlUtil.checkbox(ARG_SHOWMAP,
-                                            "true", true)));
 
         basic.append(HtmlUtil.formEntry(msgLabel("Clip image"),
-                                        HtmlUtil.checkbox(ARG_CLIP, "true",
-                                            false)));
+                                        htmlCheckbox(request,ARG_CLIP, 
+							  false)));
 
         basic.append(
-            HtmlUtil.formEntry(
-                msgLabel("White Background"),
-                HtmlUtil.checkbox(ARG_WHITEBACKGROUND, "true", false)));
+		     HtmlUtil.formEntry(
+					msgLabel("Background"),
+					HtmlUtil.colorSelect(ARG_VIEW_BACKGROUND,  
+							     request.getString(ARG_VIEW_BACKGROUND,StringUtil.toHexString(Color.black)))));
 
 
         basic.append(HtmlUtil.formEntry(msgLabel("Width"),
@@ -643,6 +708,7 @@ public class IdvOutputHandler extends OutputHandler {
                                                   "400")));
 
 
+
         basic.append(HtmlUtil.formEntry(msgLabel("Zoom"),
                                         htmlInput(request,ARG_ZOOM,
                                                   "")));
@@ -651,19 +717,101 @@ public class IdvOutputHandler extends OutputHandler {
 
         basic.append(HtmlUtil.formTableClose());
 
+        StringBuffer bounds = new StringBuffer();
+	String llb =HtmlUtil.makeLatLonBox(ARG_VIEW_BOUNDS,
+			       request.getString(ARG_VIEW_BOUNDS+"_south",""),
+			       request.getString(ARG_VIEW_BOUNDS+"_north",""),
+			       request.getString(ARG_VIEW_BOUNDS+"_east",""),
+			       request.getString(ARG_VIEW_BOUNDS+"_west",""));
 
-        List<String> tabLabels   = new ArrayList<String>();
+        String clickParams =
+            "event,'bboximg',"+HtmlUtil.squote(ARG_VIEW_BOUNDS);
+
+        String bboxCall = HtmlUtil.onMouseClick(HtmlUtil.call("bboxClick",
+							  clickParams));
+
+
+        String callParams =
+            "'bboximg',"+HtmlUtil.squote(ARG_VIEW_BOUNDS);
+        String bboxJS = "bboxInit(" + callParams +");";
+
+	llb = llb+HtmlUtil.br() +
+	    HtmlUtil.mouseClickHref(bboxJS,"Draw");
+
+
+
+
+	bounds.append(HtmlUtil.table(new Object[]{llb,
+						  HtmlUtil.img(getRepository().getUrlBase()+ "/images/usgstopo.jpg","",
+							       HtmlUtil.id("bboximg") + bboxCall +
+							       HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "600"))}));
+
+	bounds.append(HtmlUtil.br());
+	bounds.append(HtmlUtil.italics(msg("Click in map to select bounds")));
+	bounds.append(HtmlUtil.br());
+	bounds.append(HtmlUtil.italics(msg("Enter \"\" to use default")));
+
+	bounds.append(HtmlUtil.div("",
+			       HtmlUtil.cssClass("image_edit_box")
+                               + HtmlUtil.id("bbox_div")));
+
+	StringBuffer mapSB= new StringBuffer();
+	List<MapData> maps = idvServer.getIdv().getResourceManager().getMaps();
+	Hashtable<String,List<TwoFacedObject>> mapCatMap = new Hashtable<String,List<TwoFacedObject>>();
+	List<String> mapCats  = new ArrayList<String>();
+	for(MapData mapData: maps) {
+	    List<TwoFacedObject> mapCatList = mapCatMap.get(mapData.getCategory());
+	    if(mapCatList==null) {
+		mapCatList = new ArrayList<TwoFacedObject>();
+		mapCats.add(mapData.getCategory());
+		mapCatMap.put(mapData.getCategory(), mapCatList);
+	    }
+	    mapCatList.add(new TwoFacedObject("&nbsp;&nbsp;"+mapData.getDescription(), mapData.getSource()));
+	}
+
+	List<TwoFacedObject> mapOptions = new ArrayList<TwoFacedObject>();
+	for(String cat: mapCats) {
+	    mapOptions.add(new TwoFacedObject(cat, ""));
+	    mapOptions.addAll(mapCatMap.get(cat));
+	}
+
+	//	mapSB.append(msgHeader("Maps"));
+	String mapSelect = htmlSelect(request, ARG_MAPS, mapOptions, 
+					   HtmlUtil.attrs(HtmlUtil.ATTR_MULTIPLE, "true",
+							  HtmlUtil.ATTR_SIZE, "10"));
+	StringBuffer mapAttrs = new StringBuffer();
+	mapAttrs.append(HtmlUtil.formTable());
+	mapAttrs.append(HtmlUtil.formEntry(msgLabel("Line Width"),
+					   HtmlUtil.select(ARG_MAPWIDTH, Misc.newList("1","2","3","4"), 
+							   request.getString(ARG_MAPWIDTH,"1"))));
+	mapAttrs.append(HtmlUtil.formEntry(msgLabel("Color"),
+					   HtmlUtil.colorSelect(ARG_MAPCOLOR,request.getString(ARG_MAPCOLOR,StringUtil.toHexString(Color.red)))));
+
+
+	mapAttrs.append(HtmlUtil.formTableClose());
+
+	mapSB.append(HtmlUtil.table(new Object[]{mapSelect, mapAttrs}, 10));
+
+	//	basic =new StringBuffer(HtmlUtil.table(new Object[]{basic, mapSB},10));
+	List<String> tabLabels   = new ArrayList<String>();
         List<String> tabContents = new ArrayList<String>();
         tabLabels.add(msg("Basic"));
         tabContents.add(basic.toString());
 
+
+        tabLabels.add(msg("View Bounds"));
+        tabContents.add(bounds.toString());
+
+ 
+	tabLabels.add(msg("Maps"));
+        tabContents.add(mapSB.toString());
 
         List colorTables =
             idvServer.getIdv().getColorTableManager().getColorTables();
 
 
         Hashtable<String, DataChoice> idToChoice = new Hashtable<String,
-                                                       DataChoice>();
+	    DataChoice>();
         List<DataChoice> choices =
             (List<DataChoice>) dataSource.getDataChoices();
         for (DataChoice dataChoice : choices) {
@@ -682,7 +830,7 @@ public class IdvOutputHandler extends OutputHandler {
 
             StringBuffer tab              = new StringBuffer();
             String       param = request.getString(ARG_PARAM + displayIdx,
-                                     "");
+						   "");
             DataChoice   choice           = idToChoice.get(param);
             if (choice == null) {
                 continue;
@@ -691,14 +839,14 @@ public class IdvOutputHandler extends OutputHandler {
 
             List descriptors =
                 new ArrayList(
-                    ControlDescriptor.getApplicableControlDescriptors(
-                        choice.getCategories(),
-                        idvServer.getIdv().getControlDescriptors(true)));
+			      ControlDescriptor.getApplicableControlDescriptors(
+										choice.getCategories(),
+										idvServer.getIdv().getControlDescriptors(true)));
 
 
 
 
-            List displays = new ArrayList();
+            List<TwoFacedObject> displays = new ArrayList<TwoFacedObject>();
             displays.add(new TwoFacedObject("--skip--", ""));
             for (ControlDescriptor controlDescriptor : (List<ControlDescriptor>) descriptors) {
                 String controlId = controlDescriptor.getControlId();
@@ -707,34 +855,49 @@ public class IdvOutputHandler extends OutputHandler {
                 }
                 //              System.out.println (controlId +"  " + controlDescriptor.getLabel());
                 displays.add(new TwoFacedObject(controlDescriptor.getLabel(),
-                        controlId));
+						controlId));
             }
 
 
             tab.append(HtmlUtil.hidden(ARG_PARAM + displayIdx,
                                        request.getString(ARG_PARAM
-                                           + displayIdx, "")));
+							 + displayIdx, "")));
             List options = new ArrayList();
             options.add("");
             tab.append(HtmlUtil.br());
             tab.append(msgLabel("Display Type"));
             tab.append(HtmlUtil.space(1));
-            tab.append(htmlSelect(request, ARG_DISPLAY + displayIdx, displays));
+	    if(displayIdx==1 && displays.size()>1) {
+		//Set the default display for the first param
+		if(request.defined(ARG_DISPLAY+displayIdx)) 
+		    tab.append(htmlSelect(request, ARG_DISPLAY + displayIdx, displays));
+		else
+		    tab.append(HtmlUtil.select(ARG_DISPLAY + displayIdx, displays, displays.get(1).getId().toString()));
+	    } else {
+		tab.append(htmlSelect(request, ARG_DISPLAY + displayIdx, displays));
+	    }
             tab.append(HtmlUtil.p());
 
             List times = choice.getAllDateTimes();
             if ((times != null) && (times.size() > 0)) {
-                List tfoTimes = new ArrayList();
+
+		List<Object[]> tuples = new ArrayList<Object[]>();
                 int  cnt      = 0;
                 for (Object time : times) {
-                    tfoTimes.add(new TwoFacedObject(time.toString(),
-                            new Integer(cnt++)));
+		    tuples.add(new Object[]{time, new Integer(cnt++)});
+		}
+		tuples = (List<Object[]>)Misc.sortTuples(tuples, true);
+                List tfoTimes = new ArrayList();
+                for (Object[]tuple : tuples) {
+                    tfoTimes.add(new TwoFacedObject(tuple[0].toString(),
+						    tuple[1]));
                 }
                 innerTabTitles.add(msg("Times"));
                 innerTabContents.add(htmlSelect(request, ARG_TIMES + displayIdx,
-                        tfoTimes, 
-                        HtmlUtil.attrs(HtmlUtil.ATTR_MULTIPLE, "true",
-                                       HtmlUtil.ATTR_SIZE, "5")));
+						tfoTimes, 
+						true,
+						HtmlUtil.attrs(HtmlUtil.ATTR_MULTIPLE, "true",
+							       HtmlUtil.ATTR_SIZE, "5")));
             }
 
             List levels       = choice.getAllLevels();
@@ -745,19 +908,19 @@ public class IdvOutputHandler extends OutputHandler {
                 int  cnt       = 0;
                 for (Object level : levels) {
                     tfoLevels.add(new TwoFacedObject(level.toString(),
-                            new Integer(cnt++)));
+						     new Integer(cnt++)));
                 }
                 String levelWidget =
-                    htmlSelect(request, ARG_LEVELS + displayIdx, tfoLevels, 
-                                    HtmlUtil.attrs(HtmlUtil.ATTR_MULTIPLE,
-                                        "false", HtmlUtil.ATTR_SIZE, "5"));
+                    htmlSelect(request, ARG_LEVELS + displayIdx, tfoLevels, true,
+			       HtmlUtil.attrs(HtmlUtil.ATTR_MULTIPLE,
+					      "false", HtmlUtil.ATTR_SIZE, "5"));
                 spatialComps.add(msgLabel("Levels"));
                 spatialComps.add(levelWidget);
             }
 
 
             ThreeDSize size = (ThreeDSize) choice.getProperty(
-                                  GeoGridDataSource.PROP_GRIDSIZE);
+							      GeoGridDataSource.PROP_GRIDSIZE);
             spatialComps.add(msgLabel("X/Y Stride"));
             String strideComp = htmlInput(request,ARG_STRIDE + displayIdx, "");
 
@@ -773,9 +936,12 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
+	    ColorTable dfltColorTable  = idvServer.getIdv().getDisplayConventions().getParamColorTable(choice.getName());
+	    Range range  = idvServer.getIdv().getDisplayConventions().getParamRange(choice.getName(),null);
+
             List<String> ctCats = new ArrayList<String>();
             Hashtable<String, StringBuffer> ctCatMap = new Hashtable<String,
-                                                           StringBuffer>();
+		StringBuffer>();
             for (ColorTable colorTable : (List<ColorTable>) colorTables) {
                 StringBuffer catSB = ctCatMap.get(colorTable.getCategory());
                 if (catSB == null) {
@@ -784,51 +950,67 @@ public class IdvOutputHandler extends OutputHandler {
                     ctCats.add(colorTable.getCategory());
                 }
                 String icon = IOUtil.cleanFileName(colorTable.getName())
-                              + ".png";
+		    + ".png";
                 icon = icon.replace(" ", "_");
+		String img = "<img border=0 src=" +getRepository().getUrlBase()
+		    + "/colortables/" + icon+">";
                 String div =
-                    HtmlUtil.div(HtmlUtil.img(getRepository().getUrlBase()
-                        + "/colortables/" + icon) + " "
-                            + colorTable.getName(), "");
-                String call = HtmlUtil.call("setFormValue",
-                                            "'" + ARG_COLORTABLE + displayIdx
-                                            + "','" + colorTable.getName()
-                                            + "'") + ";"
-                                                + HtmlUtil.call("setHtml",
-                                                    "'" + ARG_COLORTABLE
-                                                    + "_html" + displayIdx
-                                                    + "','"
-                                                    + colorTable.getName()
-                                                    + "'");
-
+                    HtmlUtil.div(img + " "
+				 + colorTable.getName(), "");
+                String call1 = HtmlUtil.call("setFormValue",
+					     HtmlUtil.squote(ARG_COLORTABLE + displayIdx) 
+					     +  "," + 
+					     HtmlUtil.squote(colorTable.getName()));
+		String call2 = HtmlUtil.call("setHtml",
+					     HtmlUtil.squote(ARG_COLORTABLE + "_html" + displayIdx)
+					     + "," +
+					     HtmlUtil.squote(colorTable.getName() +" " + img));
+                String call = call1 +";" + call2;
                 catSB.append(HtmlUtil.mouseClickHref(call, div));
             }
 
 
+
+
             StringBuffer ctsb = new StringBuffer();
             ctsb.append(
-                msgLabel("Range") + HtmlUtil.space(1)
-                + htmlInput(request,
-                            ARG_RANGE_MIN + displayIdx, "") + " - "
-                        + htmlInput(request, ARG_RANGE_MAX + displayIdx, ""));
+			msgLabel("Range") + HtmlUtil.space(1)
+			+ htmlInput(request,
+				    ARG_RANGE_MIN + displayIdx, (range==null?"":""+range.getMin())) + " - "
+				    + htmlInput(request, ARG_RANGE_MAX + displayIdx, (range==null?"":range.getMax()+"")));
             
+	    if(!request.defined(ARG_COLORTABLE+displayIdx) && dfltColorTable!=null) {
+		request.put(ARG_COLORTABLE+displayIdx, dfltColorTable.getName());
+	    }
+
             ctsb.append(HtmlUtil.hidden(ARG_COLORTABLE + displayIdx, "",
                                         HtmlUtil.id("" + ARG_COLORTABLE
-                                            + displayIdx)));
-            ctsb.append(HtmlUtil.div("-default-",
-                                     HtmlUtil.id(ARG_COLORTABLE + "_html"
-                                         + displayIdx)));
+						    + displayIdx)));
+            ctsb.append(HtmlUtil.br());
+	    String  ctDiv  = "-default-";
+	    if(request.defined(ARG_COLORTABLE+displayIdx)) {
+                String icon = IOUtil.cleanFileName(request.getString(ARG_COLORTABLE+displayIdx,"")) + ".png";
+		String img = HtmlUtil.img(getRepository().getUrlBase()
+					  + "/colortables/" + icon);
+		ctDiv = request.getString(ARG_COLORTABLE+displayIdx,"-default-")+" " +img;
+
+	    }
+            ctsb.append(HtmlUtil.table(new Object[]{msgLabel("Color table"),
+						    HtmlUtil.div(ctDiv,
+								 HtmlUtil.id(ARG_COLORTABLE + "_html"
+									     + displayIdx))},2));
+
             String call = HtmlUtil.call("setFormValue",
                                         "'" + ARG_COLORTABLE + displayIdx
                                         + "','" + "" + "'") + ";"
-                                            + HtmlUtil.call("setHtml",
-                                                "'" + ARG_COLORTABLE
-                                                + "_html" + displayIdx
-                                                + "','" + "-default-" + "'");
+		+ HtmlUtil.call("setHtml",
+				"'" + ARG_COLORTABLE
+				+ "_html" + displayIdx
+				+ "','" + "-default-" + "'");
             ctsb.append(HtmlUtil.mouseClickHref(call, "Use default"));
             for (String ctcat : ctCats) {
                 ctsb.append(HtmlUtil.makeShowHideBlock(ctcat,
-                        ctCatMap.get(ctcat).toString(), false));
+						       ctCatMap.get(ctcat).toString(), false));
 
             }
 
@@ -836,12 +1018,12 @@ public class IdvOutputHandler extends OutputHandler {
             scalesb.append(msgHeader("Color Scale"));
             scalesb.append(HtmlUtil.formTable());
             scalesb.append(HtmlUtil.formEntry(msgLabel("Visible"),
-                    HtmlUtil.checkbox(ARG_SCALE_VISIBLE + displayIdx, "true",
-                                      false)));
+					      htmlCheckbox(request,ARG_SCALE_VISIBLE + displayIdx, 
+								false)));
             scalesb.append(HtmlUtil.formEntry(msgLabel("Place"),
-                    htmlSelect(request, ARG_SCALE_PLACEMENT + displayIdx,
-                                    Misc.newList("top", "left", "bottom",
-                                        "right"))));
+					      htmlSelect(request, ARG_SCALE_PLACEMENT + displayIdx,
+							 Misc.newList("top", "left", "bottom",
+								      "right"))));
             scalesb.append(HtmlUtil.formTableClose());
 
 
@@ -849,63 +1031,76 @@ public class IdvOutputHandler extends OutputHandler {
 
 
             StringBuffer contoursb = new StringBuffer();
+	    ContourInfo ci = idvServer.getIdv().getDisplayConventions().findDefaultContourInfo(choice.getName());
             contoursb.append(HtmlUtil.formTable());
             contoursb.append(HtmlUtil.formEntry(msgLabel("Interval"),
-                                                htmlInput(request,ARG_CONTOUR_INTERVAL + displayIdx, "", 3)));
+                                                htmlInput(request,ARG_CONTOUR_INTERVAL + displayIdx, (ci==null?"":ci.getInterval()+""), 3)));
             contoursb.append(HtmlUtil.formEntry(msgLabel("Base"),
-                                                htmlInput(request,ARG_CONTOUR_BASE + displayIdx, "", 3)));
+                                                htmlInput(request,ARG_CONTOUR_BASE + displayIdx, (ci==null?"":ci.getBase()+""), 3)));
             contoursb.append(HtmlUtil.formEntry(msgLabel("Min"),
-                                                htmlInput(request,ARG_CONTOUR_MIN + displayIdx, "",3)));
+                                                htmlInput(request,ARG_CONTOUR_MIN + displayIdx, (ci==null?"":ci.getMin()+""),3)));
 
             contoursb.append(HtmlUtil.formEntry(msgLabel("Max"),
-                                                htmlInput(request,ARG_CONTOUR_MAX + displayIdx, "",3)));
+                                                htmlInput(request,ARG_CONTOUR_MAX + displayIdx,(ci==null?"":ci.getMax()+""),3)));
+            contoursb.append(HtmlUtil.formEntry(msgLabel("Line Width"),
+                                                htmlSelect(request,ARG_CONTOUR_WIDTH + displayIdx, Misc.newList("1","2","3","4"))));
             contoursb.append(HtmlUtil.formEntry(msgLabel("Dashed"),
-                    HtmlUtil.checkbox(ARG_CONTOUR_DASHED + displayIdx,
-                                      "true", false)));
+						htmlCheckbox(request,ARG_CONTOUR_DASHED + displayIdx,
+							     (ci==null?false:ci.getDashOn()))));
             contoursb.append(HtmlUtil.formEntry(msgLabel("Labels"),
-                    HtmlUtil.checkbox(ARG_CONTOUR_LABELS + displayIdx,
-                                      "true", true)));
+						htmlCheckbox(request,ARG_CONTOUR_LABELS + displayIdx,
+							     (ci==null?true:ci.getIsLabeled()))));
             contoursb.append(HtmlUtil.formTableClose());
 
 
             StringBuffer misc = new StringBuffer();
             misc.append(HtmlUtil.formTable());
             misc.append(
-                HtmlUtil.formEntry(
-                    msgLabel("Display List Label"),
-                    htmlInput(request,
-                              ARG_DISPLAYLISTLABEL + displayIdx, "", 30)));
+			HtmlUtil.formEntry(
+					   msgLabel("Display List Label"),
+					   htmlInput(request,
+						     ARG_DISPLAYLISTLABEL + displayIdx, "", 30)));
+	    String unitString = "";
+	    Unit displayUnit  = idvServer.getIdv().getDisplayConventions().getDisplayUnit(choice.getName(),null);
+	    if(displayUnit!=null) {
+		unitString = displayUnit.toString();
+	    }
             misc.append(
-                HtmlUtil.formEntry(
-                    msgLabel("Display Unit"),
-                    htmlInput(request, ARG_DISPLAYUNIT + displayIdx, "",6)));
+			HtmlUtil.formEntry(
+					   msgLabel("Display Unit"),
+					   htmlInput(request, ARG_DISPLAYUNIT + displayIdx, unitString,6)));
+
+	    misc.append(HtmlUtil.formEntry(msgLabel("Display Color"),
+					   HtmlUtil.colorSelect(ARG_DISPLAYCOLOR+displayIdx,request.getString(ARG_DISPLAYCOLOR+displayIdx,StringUtil.toHexString(Color.red)))));
+
+
             misc.append(
-                HtmlUtil.formEntry(
-                    msgLabel("Isosurface Value"),
-                    htmlInput(request,
-                              ARG_ISOSURFACEVALUE + displayIdx, "",3)));
+			HtmlUtil.formEntry(
+					   msgLabel("Isosurface Value"),
+					   htmlInput(request,
+						     ARG_ISOSURFACEVALUE + displayIdx, "",3)));
             misc.append(
-                HtmlUtil.formEntry(
-                    msgLabel("Vector/Barb Size"),
-                    htmlInput(request,
-                              ARG_FLOW_SCALE + displayIdx, "4", 3)));
+			HtmlUtil.formEntry(
+					   msgLabel("Vector/Barb Size"),
+					   htmlInput(request,
+						     ARG_FLOW_SCALE + displayIdx, "4", 3)));
             misc.append(
-                HtmlUtil.formEntry(
-                    msgLabel("Streamline Density"),
-                    htmlInput(request,
-                              ARG_FLOW_DENSITY + displayIdx, "1",3)));
+			HtmlUtil.formEntry(
+					   msgLabel("Streamline Density"),
+					   htmlInput(request,
+						     ARG_FLOW_DENSITY + displayIdx, "1",3)));
             misc.append(
-                HtmlUtil.formEntry(
-                    msgLabel("Flow Skip"),
-                    htmlInput(request,
-                              ARG_FLOW_SKIP + displayIdx, "0",3)));
+			HtmlUtil.formEntry(
+					   msgLabel("Flow Skip"),
+					   htmlInput(request,
+						     ARG_FLOW_SKIP + displayIdx, "0",3)));
 
 
             misc.append(HtmlUtil.formTableClose());
 
             innerTabTitles.add(msg("Color Table"));
             innerTabContents.add(HtmlUtil.table(new Object[] { ctsb,
-                    scalesb }, 5));
+							       scalesb }, 5));
 
             innerTabTitles.add(msg("Contours"));
             innerTabContents.add(contoursb.toString());
@@ -916,12 +1111,34 @@ public class IdvOutputHandler extends OutputHandler {
 
 
             String innerTab = HtmlUtil.makeTabs(innerTabTitles,
-                                  innerTabContents, true, "tab_content");
+						innerTabContents, true, "tab_content");
             tab.append(HtmlUtil.inset(HtmlUtil.p() + innerTab, 10));
 
-            tabLabels.add(StringUtil.camelCase(choice.getDescription()));
+            tabLabels.add(StringUtil.camelCase(StringUtil.shorten(choice.getDescription(),20)));
             tabContents.add(tab.toString());
         }
+
+	if(!request.getUser().getAnonymous()) {
+	    StringBuffer publishSB = new StringBuffer();
+	    publishSB.append(HtmlUtil.formTable());
+            publishSB.append(HtmlUtil.hidden(ARG_PUBLISH_ENTRY + "_hidden", "",
+                                      HtmlUtil.id(ARG_PUBLISH_ENTRY + "_hidden")));
+            String select = OutputHandler.getSelect(request, ARG_PUBLISH_ENTRY, "Select group",
+						    false, null, entry);
+            publishSB.append(HtmlUtil.formEntry(msgLabel("Save image to"),
+						HtmlUtil.disabledInput(ARG_PUBLISH_ENTRY, "",
+                                             HtmlUtil.id(ARG_PUBLISH_ENTRY)
+                                             + HtmlUtil.SIZE_60) + select));
+
+            publishSB.append(HtmlUtil.formEntry(msgLabel("Name"),
+						htmlInput(request, ARG_PUBLISH_NAME,"", 30)));
+
+	    publishSB.append(HtmlUtil.formTableClose());
+	    tabLabels.add(msg("Publish"));
+	    tabContents.add(publishSB.toString());
+	}
+
+
         sb.append(HtmlUtil.makeTabs(tabLabels, tabContents, true,
                                     "tab_content"));
 
@@ -944,7 +1161,7 @@ public class IdvOutputHandler extends OutputHandler {
      */
     private Result outputGridInitForm(final Request request, Entry entry,
                                       GeoGridDataSource dataSource)
-            throws Exception {
+	throws Exception {
         StringBuffer sb      = new StringBuffer();
 
         String       formUrl = getRepository().URL_ENTRY_SHOW.getFullUrl();
@@ -1003,6 +1220,54 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
+    private Hashtable getRequestArgs(Request request) {
+	Hashtable requestArgs = new Hashtable(request.getArgs());
+	requestArgs.remove(ARG_ACTION);
+	requestArgs.remove(ARG_ENTRYID);
+	requestArgs.remove(ARG_SUBMIT);
+	requestArgs.remove(ARG_OUTPUT);
+	requestArgs.remove(ARG_PUBLISH_ENTRY);
+	requestArgs.remove(ARG_PUBLISH_ENTRY+"_hidden");
+	requestArgs.remove(ARG_PUBLISH_NAME);
+
+	return requestArgs;
+    }
+
+	/*
+	  Hashtable requestArgs = getRequestArgs(request);
+	  List<String> argList = new ArrayList<String>();
+	  List<String> valueList = new ArrayList<String>();
+
+	  Hashtable abbrev = new Hashtable();
+	  Hashtable abbrev2 = new Hashtable();
+	  for (Enumeration keys = requestArgs.keys(); keys.hasMoreElements(); ) {
+	  String arg = (String) keys.nextElement();
+	  if(abbrev.get(arg)==null) {
+	  String s = null;
+	  for(int length=1;length<10;length++) {
+	  s = null;
+	  for(String tok : StringUtil.split(arg,"_",true,true)) {
+	  String sub = tok.substring(0,Math.min(tok.length(),length));
+	  if(s==null) s = sub;
+	  else s = s+"_" + sub;
+	  }
+	  if(arg.endsWith("1")) s = s+"1";
+	  else if(arg.endsWith("2")) s = s+"2";
+	  else if(arg.endsWith("3")) s = s+"3";
+	  if(abbrev2.get(s)==null || Misc.equals(abbrev2.get(s), arg)) {
+	  abbrev2.put(s, arg);
+	  break;
+	  }
+	  }
+	  System.out.println(arg+ "=" + s);
+	  abbrev.put(arg,s);
+	  } else {
+	  }
+	  }
+	*/
+
+
+
 
     /**
      * _more_
@@ -1017,31 +1282,49 @@ public class IdvOutputHandler extends OutputHandler {
      */
     private Result outputGridPage(final Request request, Entry entry,
                                   GeoGridDataSource dataSource)
-            throws Exception {
+	throws Exception {
         StringBuffer sb  = new StringBuffer();
 
+	if(request.defined(ARG_PUBLISH_ENTRY+"_hidden")) {
+	    Group  parent = getEntryManager().findGroup(request, request.getString(ARG_PUBLISH_ENTRY+"_hidden",""));
+	    if(parent == null) {
+		return new Result("Grid Displays", new StringBuffer(getRepository().showDialogError(msg("Could not find group"))));
+	    }
 
+	    File  imageFile = (File)generateGridImage(request, entry, dataSource);
+	    String name = request.getString(ARG_PUBLISH_NAME,"").trim();
+	    if(name.length()==0) name = "Generated Grid Image";
+	    String fileName = IOUtil.cleanFileName(name).replace(" ", "_");
+	    imageFile = getStorageManager().copyToStorage(request,
+							  imageFile,fileName + IOUtil.getFileExtension(imageFile.toString()));
+
+	    Entry newEntry = getEntryManager().addFileEntry(request, imageFile, parent, name, request.getUser());
+	    getRepository().getAssociationManager().addAssociation(request, newEntry,
+								   entry, "generated image", "product generated from");
+	    return new Result(
+			      request.entryUrl(getRepository().URL_ENTRY_SHOW, newEntry));
+	}
 
 
 
         String       url = getRepository().URL_ENTRY_SHOW.getFullUrl();
         String islUrl = url + "/" + IOUtil.stripExtension(entry.getName())
-                        + ".isl";
+	    + ".isl";
         String jnlpUrl = url + "/" + IOUtil.stripExtension(entry.getName())
-                         + ".jnlp";
+	    + ".jnlp";
 
         Hashtable exceptArgs = new Hashtable();
         exceptArgs.put(ARG_ACTION, ARG_ACTION);
         String args = request.getUrlArgs(exceptArgs, null);
         url = url + "?" + ARG_ACTION + "=" + ACTION_GRID_MAKEIMAGE + "&"
-              + args;
-
+	    + args;
 
         islUrl = islUrl + "?" + ARG_ACTION + "=" + ACTION_GRID_MAKEIMAGE
-                 + "&" + args + "&" + ARG_TARGET + "=" + TARGET_ISL;
+	    + "&" + args + "&" + ARG_TARGET + "=" + TARGET_ISL;
         jnlpUrl = jnlpUrl + "?" + ARG_ACTION + "=" + ACTION_GRID_MAKEIMAGE
-                  + "&" + args + "&" + ARG_TARGET + "=" + TARGET_JNLP;
+	    + "&" + args + "&" + ARG_TARGET + "=" + TARGET_JNLP;
 
+	/*
         String clickParams =
             "event,'imgid',"
             + HtmlUtil.comma(HtmlUtil.squote(ARG_IMAGE_CROPX1),
@@ -1050,26 +1333,31 @@ public class IdvOutputHandler extends OutputHandler {
                              HtmlUtil.squote(ARG_IMAGE_CROPY2));
 
         String call = HtmlUtil.onMouseClick(HtmlUtil.call("editImageClick",
-                          clickParams));
+							  clickParams));
 
-
+	*/
         sb.append(HtmlUtil.img(url, "Image is being processed...",
-                               HtmlUtil.id("imgid") + call +
-                                    HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
-                                        request.getString(ARG_IMAGE_WIDTH,
-                                                          "600")) +
-                                    HtmlUtil.attr(HtmlUtil.ATTR_HEIGHT,
-                                        request.getString(ARG_IMAGE_HEIGHT,
-                                                          "400"))));
+                               //HtmlUtil.id("imgid") + call +
+			       HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
+					     request.getString(ARG_IMAGE_WIDTH,
+							       "600"))));
+
 
         StringBuffer formSB      = new StringBuffer();
         formSB.append(HtmlUtil.href(jnlpUrl, msg("Launch in the IDV")));
         formSB.append(HtmlUtil.br());
         formSB.append(HtmlUtil.href(islUrl, msg("Download IDV ISL script")));
         makeGridForm(request, formSB, entry, dataSource);
+
+        sb.append(HtmlUtil.div("",
+                               HtmlUtil.cssClass("image_edit_box")
+                               + HtmlUtil.id("image_edit_box")));
+
+
+	sb.append("\n");
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.makeShowHideBlock(msg("Form"),
-                                                 formSB.toString(), false));
+					     formSB.toString(), false));
 
         return new Result("Grid Displays", sb);
     }
@@ -1088,10 +1376,20 @@ public class IdvOutputHandler extends OutputHandler {
      */
     public Result outputGridImage(final Request request, Entry entry,
                                   GeoGridDataSource dataSource)
-            throws Exception {
+	throws Exception {
+
+	Object fileOrResult = generateGridImage(request, entry, dataSource);
+	if(fileOrResult instanceof Result) 
+	    return (Result) fileOrResult;
+	File imageFile = (File) fileOrResult;
+        return new Result("preview.gif",
+                          getStorageManager().getFileInputStream(imageFile),
+                          "image/gif");
+    }
+
+    private Object generateGridImage(Request request, Entry entry, GeoGridDataSource dataSource) throws Exception {
 
         DataOutputHandler dataOutputHandler = getDataOutputHandler();
-
         //      Trace.addNot(".*ShadowFunction.*");
         //      Trace.addNot(".*GeoGrid.*");
         //      Trace.addOnly(".*MapProjection.*");
@@ -1099,8 +1397,6 @@ public class IdvOutputHandler extends OutputHandler {
         //Trace.startTrace();
 
         String id = entry.getId();
-        File image = getStorageManager().getThumbFile("preview_"
-                         + id.replace("/", "_") + ".gif");
 
         boolean forIsl = request.getString(ARG_TARGET, "").equals(TARGET_ISL);
         boolean forJnlp = request.getString(ARG_TARGET,
@@ -1109,55 +1405,129 @@ public class IdvOutputHandler extends OutputHandler {
             forIsl = true;
         }
 
+
+	Hashtable requestArgs = getRequestArgs(request);
+	List<String> argList = new ArrayList<String>();
+	List<String> valueList = new ArrayList<String>();
+
+        for (Enumeration keys = requestArgs.keys(); keys.hasMoreElements(); ) {
+            String arg = (String) keys.nextElement();
+	    Object value = requestArgs.get(arg);
+	    String s = value.toString();
+	    if(s.trim().length()==0)  continue;
+	    argList.add(arg);
+	}
+	Collections.sort(argList);
+	StringBuffer fileKey = new StringBuffer();
+	for(String arg: argList) {
+	    Object value = requestArgs.get(arg);
+	    String s = value.toString();
+	    String shortName = (String)keyToAbbrev.get(arg);
+	    if(shortName!=null) 
+		fileKey.append(shortName);
+	    else
+		fileKey.append(arg);
+	    fileKey.append("=");
+	    String shortValue  = (String)valueToAbbrev.get(s);
+	    if(shortValue!=null)
+		fileKey.append(shortValue);
+	    else
+		fileKey.append(s);
+	    fileKey.append(";");
+	}
+
+	String imageKey = fileKey.toString();
+        File imageFile = null;
+	synchronized(imageCache) {
+	    imageFile = imageCache.get(imageKey);
+	}
+	if(imageFile == null) {
+	    imageFile = getStorageManager().getTmpFile(request, "gridimage.gif");
+	}
+
+	if(!forIsl && imageFile.exists()) {
+	    //	  System.err.println("In cache");
+	  return imageFile;
+	}
+
+
         StringBuffer isl = new StringBuffer();
         isl.append("<isl debug=\"true\" loop=\"1\" offscreen=\"true\">\n");
 
         StringBuffer viewProps = new StringBuffer();
-        viewProps.append(XmlUtil.tag("property",
-                                     XmlUtil.attrs("name", "wireframe",
-                                         "value", "false")));
-        viewProps.append(XmlUtil.tag("property",
-                                     XmlUtil.attrs("name", "showMaps",
-                                         "value",
-                                         "" + request.get(ARG_SHOWMAP,
-                                             false))));
-        if (request.get(ARG_WHITEBACKGROUND, false)) {
-            viewProps.append(XmlUtil.tag("property",
-                                         XmlUtil.attrs("name", "background",
-                                             "value", "white")));
-            viewProps.append(XmlUtil.tag("property",
-                                         XmlUtil.attrs("name", "foreground",
-                                             "value", "black")));
-        }
+	viewProps.append(makeProperty( "wireframe","false"));
+
+	viewProps.append(makeProperty("background",request.getString(ARG_VIEW_BACKGROUND,"black")));
+
+	viewProps.append(makeProperty("initMapPaths",StringUtil.join(",",request.get(ARG_MAPS,new ArrayList()))));
+	if(request.defined(ARG_MAPWIDTH)) 
+	    viewProps.append(makeProperty("initMapWidth",request.getString(ARG_MAPWIDTH,"1")));
+	if(request.defined(ARG_MAPCOLOR)) 
+	    viewProps.append(makeProperty("initMapColor",request.getString(ARG_MAPCOLOR,"")));
 
         if(request.defined(ARG_ZOOM)) {
             viewProps.append(makeProperty("displayProjectionZoom",""+request.get(ARG_ZOOM, 0.0)));
         }
 
+        String clip = "";
+        if (request.get(ARG_CLIP, false)) {
+            clip = XmlUtil.tag("clip", "");
+        }
+
+
+	int width =  request.get(ARG_IMAGE_WIDTH, 400);
+	int height = request.get(ARG_IMAGE_HEIGHT, 400);
+	if(request.defined(ARG_VIEW_BOUNDS+"_south") &&
+	   request.defined(ARG_VIEW_BOUNDS+"_north") &&
+	   request.defined(ARG_VIEW_BOUNDS+"_east") &&
+	   request.defined(ARG_VIEW_BOUNDS+"_west")) {
+	    double south = request.get(ARG_VIEW_BOUNDS+"_south",0.0);
+	    double north = request.get(ARG_VIEW_BOUNDS+"_north",0.0);
+	    double east = request.get(ARG_VIEW_BOUNDS+"_east",0.0);
+	    double west = request.get(ARG_VIEW_BOUNDS+"_west",0.0);
+	    double bwidth = Math.abs(east-west);
+	    double bheight = Math.abs(north-south);
+	    viewProps.append(makeProperty("initLatLonBounds",west+","+north+","+bwidth+","+bheight));
+	    height = (int)(width*bheight/bwidth); 
+            clip = XmlUtil.tag("clip", XmlUtil.attrs(
+		    ImageGenerator.ATTR_NORTH,
+		    ""+north,
+		    ImageGenerator.ATTR_SOUTH,
+		    ""+south,
+		    ImageGenerator.ATTR_EAST,
+		    ""+east,
+		    ImageGenerator.ATTR_WEST,
+		    ""+west
+		    ));
+	} 
+
+
+
         //Create a new viewmanager
         //For now don't do this if we are doing jnlp
         if ( !forJnlp) {
             isl.append(XmlUtil.tag(
-                                                     ImageGenerator.TAG_VIEW,
-                                                     XmlUtil.attrs(
-                                                                   ImageGenerator.ATTR_WIDTH,
-                                                                   request.getString(ARG_IMAGE_WIDTH, "400"),
-                                                                   ImageGenerator.ATTR_HEIGHT,
-                                                                   request.getString(
-                                                                                     ARG_IMAGE_HEIGHT, "300")), viewProps.toString()));
+				   ImageGenerator.TAG_VIEW,
+				   XmlUtil.attrs(
+						 ImageGenerator.ATTR_WIDTH,
+						 ""+width) +
+				   XmlUtil.attrs(
+						 ImageGenerator.ATTR_HEIGHT,
+						 ""+height),  
+				   viewProps.toString()));
         }
 
 
 
         if (forIsl) {
             isl.append(
-                XmlUtil.openTag(
-                    "datasource",
-                    XmlUtil.attrs(
-                        "id", "datasource", "url",
-                        getRepository().absoluteUrl(
-                            getRepository().URL_ENTRY_SHOW
-                            + dataOutputHandler.getOpendapUrl(entry)))));
+		       XmlUtil.openTag(
+				       "datasource",
+				       XmlUtil.attrs(
+						     "id", "datasource", "url",
+						     getRepository().absoluteUrl(
+										 getRepository().URL_ENTRY_SHOW
+										 + dataOutputHandler.getOpendapUrl(entry)))));
         } else {
             isl.append("<datasource id=\"datasource\" times=\"0\" >\n");
         }
@@ -1170,7 +1540,7 @@ public class IdvOutputHandler extends OutputHandler {
 
         for (int displayIdx = 1; displayIdx <= NUM_PARAMS; displayIdx++) {
             if ( !request.defined(ARG_PARAM + displayIdx)
-                    || !request.defined(ARG_DISPLAY + displayIdx)) {
+		 || !request.defined(ARG_DISPLAY + displayIdx)) {
                 continue;
             }
 
@@ -1179,7 +1549,7 @@ public class IdvOutputHandler extends OutputHandler {
             StringBuffer propSB = new StringBuffer();
             propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY,
                                       XmlUtil.attrs("name", "id", "value",
-                                          "thedisplay" + displayIdx)));
+						    "thedisplay" + displayIdx)));
 
 
 
@@ -1187,13 +1557,13 @@ public class IdvOutputHandler extends OutputHandler {
 
             if (request.get(ARG_SCALE_VISIBLE + displayIdx, false)) {
                 /*
-        visible=true|false;
-        color=somecolor;
-        orientation=horizontal|vertical;
-        placement=top|left|bottom|right
+		  visible=true|false;
+		  color=somecolor;
+		  orientation=horizontal|vertical;
+		  placement=top|left|bottom|right
                 */
                 String placement = request.getString(ARG_SCALE_PLACEMENT
-                                       + displayIdx, "");
+						     + displayIdx, "");
                 String orientation;
                 if (placement.equals("top") || placement.equals("bottom")) {
                     orientation = "horizontal";
@@ -1201,11 +1571,11 @@ public class IdvOutputHandler extends OutputHandler {
                     orientation = "vertical";
                 }
                 String s = "visible=true;orientation=" + orientation
-                           + ";placement=" + placement;
+		    + ";placement=" + placement;
                 propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY,
                                           XmlUtil.attrs("name",
-                                              "colorScaleInfo", "value",
-                                                  s.toString())));
+							"colorScaleInfo", "value",
+							s.toString())));
 
 
 
@@ -1215,25 +1585,26 @@ public class IdvOutputHandler extends OutputHandler {
 
             if (display.equals(DISPLAY_PLANVIEWCONTOUR)) {
                 StringBuffer s = new StringBuffer();
+		s.append("width="+request.getString(ARG_CONTOUR_WIDTH+displayIdx,"1")+";");
                 if (request.defined(ARG_CONTOUR_INTERVAL + displayIdx)) {
                     s.append("interval="
                              + request.getString(ARG_CONTOUR_INTERVAL
-                                 + displayIdx, "") + ";");
+						 + displayIdx, "") + ";");
                 }
                 if (request.defined(ARG_CONTOUR_BASE + displayIdx)) {
                     s.append("base="
                              + request.getString(ARG_CONTOUR_BASE
-                                 + displayIdx, "") + ";");
+						 + displayIdx, "") + ";");
                 }
                 if (request.defined(ARG_CONTOUR_MIN + displayIdx)) {
                     s.append("min="
                              + request.getString(ARG_CONTOUR_MIN
-                                 + displayIdx, "") + ";");
+						 + displayIdx, "") + ";");
                 }
                 if (request.defined(ARG_CONTOUR_MAX + displayIdx)) {
                     s.append("max="
                              + request.getString(ARG_CONTOUR_MAX
-                                 + displayIdx, "") + ";");
+						 + displayIdx, "") + ";");
                 }
 
                 s.append("dashed="
@@ -1244,24 +1615,24 @@ public class IdvOutputHandler extends OutputHandler {
                                        false) + ";");
                 propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY,
                                           XmlUtil.attrs("name",
-                                              "contourInfoParams", "value",
-                                                  s.toString())));
+							"contourInfoParams", "value",
+							s.toString())));
             }
 
 
 
             if (request.defined(ARG_RANGE_MIN + displayIdx)
-                    && request.defined(ARG_RANGE_MAX + displayIdx)) {
+		&& request.defined(ARG_RANGE_MAX + displayIdx)) {
                 propSB.append(
-                    XmlUtil.tag(
-                        ImageGenerator.TAG_PROPERTY,
-                        XmlUtil.attrs(
-                            "name", "range", "value",
-                            request.getString(
-                                ARG_RANGE_MIN + displayIdx, "").trim() + ":"
-                                    + request.getString(
-                                        ARG_RANGE_MAX + displayIdx,
-                                        "").trim())));
+			      XmlUtil.tag(
+					  ImageGenerator.TAG_PROPERTY,
+					  XmlUtil.attrs(
+							"name", "range", "value",
+							request.getString(
+									  ARG_RANGE_MIN + displayIdx, "").trim() + ":"
+							+ request.getString(
+									    ARG_RANGE_MAX + displayIdx,
+									    "").trim())));
 
 
 
@@ -1270,12 +1641,12 @@ public class IdvOutputHandler extends OutputHandler {
 
             if (request.defined(ARG_COLORTABLE + displayIdx)) {
                 propSB.append(
-                    XmlUtil.tag(
-                        ImageGenerator.TAG_PROPERTY,
-                        XmlUtil.attrs(
-                            "name", "colorTableName", "value",
-                            request.getString(
-                                ARG_COLORTABLE + displayIdx, ""))));;
+			      XmlUtil.tag(
+					  ImageGenerator.TAG_PROPERTY,
+					  XmlUtil.attrs(
+							"name", "colorTableName", "value",
+							request.getString(
+									  ARG_COLORTABLE + displayIdx, ""))));;
 
             }
 
@@ -1286,32 +1657,24 @@ public class IdvOutputHandler extends OutputHandler {
 
             StringBuffer attrs = new StringBuffer();
 
+	    propSB.append(makeProperty("color", 
+				       request.getString(
+							 ARG_DISPLAYCOLOR + displayIdx, "")));
+
 
             if (display.equals(DISPLAY_PLANVIEWFLOW)
-                    || display.equals(DISPLAY_STREAMLINES)
-                    || display.equals(DISPLAY_WINDBARBPLAN)) {
-                propSB.append(
-                    XmlUtil.tag(
-                        ImageGenerator.TAG_PROPERTY,
-                        XmlUtil.attrs(
-                            "name", "flowScale", "value",
-                            request.getString(
-                                ARG_FLOW_SCALE + displayIdx, ""))));
-                propSB.append(
-                    XmlUtil.tag(
-                        ImageGenerator.TAG_PROPERTY,
-                        XmlUtil.attrs(
-                            "name", "streamlineDensity", "value",
-                            request.getString(
-                                ARG_FLOW_DENSITY + displayIdx, ""))));
+		|| display.equals(DISPLAY_STREAMLINES)
+		|| display.equals(DISPLAY_WINDBARBPLAN)) {
+                propSB.append(makeProperty("flowScale", request.getString(
+									  ARG_FLOW_SCALE + displayIdx, "")));
 
-                propSB.append(
-                    XmlUtil.tag(
-                        ImageGenerator.TAG_PROPERTY,
-                        XmlUtil.attrs(
-                            "name", "skipValue", "value",
-                            request.getString(
-                                ARG_FLOW_SKIP + displayIdx, ""))));
+                propSB.append(makeProperty("streamlineDensity", 
+							request.getString(
+									  ARG_FLOW_DENSITY + displayIdx, "")));
+
+                propSB.append(makeProperty("skipValue", 
+					   request.getString(
+							     ARG_FLOW_SKIP + displayIdx, "")));
 
             }
 
@@ -1322,16 +1685,16 @@ public class IdvOutputHandler extends OutputHandler {
             if (display.equals(DISPLAY_ISOSURFACE)) {
                 if (request.defined(ARG_ISOSURFACEVALUE + displayIdx)) {
                     propSB.append(
-                        XmlUtil.tag(
-                            ImageGenerator.TAG_PROPERTY,
-                            XmlUtil.attrs(
-                                "name", "surfaceValue", "value",
-                                request.getString(
-                                    ARG_ISOSURFACEVALUE + displayIdx, ""))));
+				  XmlUtil.tag(
+					      ImageGenerator.TAG_PROPERTY,
+					      XmlUtil.attrs(
+							    "name", "surfaceValue", "value",
+							    request.getString(
+									      ARG_ISOSURFACEVALUE + displayIdx, ""))));
                 }
             } else {
                 String level = request.getString(ARG_LEVELS + displayIdx,
-                                   "0");
+						 "0");
                 attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_LEVEL_FROM,
                                            "#" + level,
                                            ImageGenerator.ATTR_LEVEL_TO,
@@ -1342,36 +1705,36 @@ public class IdvOutputHandler extends OutputHandler {
 
             if (request.defined(ARG_DISPLAYLISTLABEL + displayIdx)) {
                 propSB.append(
-                    XmlUtil.tag(
-                        ImageGenerator.TAG_PROPERTY,
-                        XmlUtil.attrs(
-                            "name", "displayListTemplate", "value",
-                            request.getString(
-                                ARG_DISPLAYLISTLABEL + displayIdx, ""))));
+			      XmlUtil.tag(
+					  ImageGenerator.TAG_PROPERTY,
+					  XmlUtil.attrs(
+							"name", "displayListTemplate", "value",
+							request.getString(
+									  ARG_DISPLAYLISTLABEL + displayIdx, ""))));
             }
 
 
 
             if (request.defined(ARG_DISPLAYUNIT + displayIdx)) {
                 propSB.append(
-                    XmlUtil.tag(
-                        ImageGenerator.TAG_PROPERTY,
-                        XmlUtil.attrs(
-                            "name", "settingsDisplayUnit", "value",
-                            request.getString(
-                                ARG_DISPLAYUNIT + displayIdx, ""))));
+			      XmlUtil.tag(
+					  ImageGenerator.TAG_PROPERTY,
+					  XmlUtil.attrs(
+							"name", "settingsDisplayUnit", "value",
+							request.getString(
+									  ARG_DISPLAYUNIT + displayIdx, ""))));
             }
 
-            System.err.println("Props:" + propSB);
+	    //            System.err.println("Props:" + propSB);
             attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_TYPE, display,
                                        ImageGenerator.ATTR_PARAM,
                                        request.getString(ARG_PARAM
-                                           + displayIdx, "")));
+							 + displayIdx, "")));
 
             if (request.defined(ARG_STRIDE + displayIdx)) {
                 attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_STRIDE,
                                            request.getString(ARG_STRIDE
-                                               + displayIdx, "1")));
+							     + displayIdx, "1")));
             }
 
 
@@ -1384,9 +1747,11 @@ public class IdvOutputHandler extends OutputHandler {
                                            StringUtil.join(",", times)));
             }
 
-            StringBuffer which = (display.equals(DISPLAY_PLANVIEWCONTOUR)
-                                  ? secondDisplays
-                                  : firstDisplays);
+
+            StringBuffer which = (display.equals(DISPLAY_PLANVIEWCONTOURFILLED)||
+				  display.equals(DISPLAY_PLANVIEWCOLOR)
+                                  ? firstDisplays
+                                  : secondDisplays);
 
             which.append(XmlUtil.tag(ImageGenerator.TAG_DISPLAY,
                                      attrs.toString(), propSB.toString()));
@@ -1396,50 +1761,53 @@ public class IdvOutputHandler extends OutputHandler {
         isl.append(secondDisplays);
 
         isl.append("</datasource>\n");
-        //        isl.append("<pause/>\n");
-        String clip = "";
-        if (request.get(ARG_CLIP, false)) {
-            clip = XmlUtil.tag("clip", "");
-        }
+	isl.append("<pause/>\n");
+
 
 
         if ( !forIsl) {
             isl.append(XmlUtil.tag((multipleTimes
                                     ? "movie"
                                     : "image"), XmlUtil.attr("file",
-                                    image.toString()), clip));
+							     imageFile.toString()), clip));
         }
         isl.append("</isl>\n");
-        //        System.out.println(isl);
 
 
         if (forJnlp) {
             String jnlp = getRepository().getResource(
-                              "/ucar/unidata/repository/idv/template.jnlp");
+						      "/ucar/unidata/repository/idv/template.jnlp");
             StringBuffer args = new StringBuffer();
             args.append("<argument>-b64isl</argument>");
             args.append("<argument>"
-                        + XmlUtil.encodeBase64(isl.toString().getBytes())
+			+ XmlUtil.encodeBase64(isl.toString().getBytes()) 
                         + "</argument>");
             jnlp = jnlp.replace("${args}", args.toString());
             return new Result("data.jnlp", new StringBuffer(jnlp),
                               "application/x-java-jnlp-file");
         }
+
         if (forIsl) {
             return new Result("data.isl", new StringBuffer(isl), "text/xml");
         }
+
 
         long t1 = System.currentTimeMillis();
         idvServer.evaluateIsl(isl, props);
         long t2 = System.currentTimeMillis();
         System.err.println("isl time:" + (t2 - t1));
 
+
+	synchronized(imageCache) {
+	    if(imageCache.size()>1000) {
+		imageCache = new Hashtable<String,File>();
+	    }
+	    imageCache.put(imageKey, imageFile);
+	}
+
+
         Trace.stopTrace();
-        return new Result("preview.gif",
-                          getStorageManager().getFileInputStream(image),
-                          "image/gif");
-
-
+	return imageFile;
     }
 
     /**
@@ -1457,7 +1825,7 @@ public class IdvOutputHandler extends OutputHandler {
      */
     public Result xxxoutputGroup(Request request, Group group,
                                  List<Group> subGroups, List<Entry> entries)
-            throws Exception {
+	throws Exception {
 
         final List<Entry> radarEntries = getRadarEntries(entries);
         Entry             theEntry     = null;
@@ -1475,17 +1843,17 @@ public class IdvOutputHandler extends OutputHandler {
             //TODO: the id is wrong if we are a search result
             String url =
                 HtmlUtil.url(
-                    getRepository().URL_ENTRY_SHOW + "/" + theEntry.getId()
-                    + "_preview.gif", ARG_ENTRYID, id, ARG_OUTPUT,
-                                      OUTPUT_IDV_GRID, "doimage", "true");
+			     getRepository().URL_ENTRY_SHOW + "/" + theEntry.getId()
+			     + "_preview.gif", ARG_ENTRYID, id, ARG_OUTPUT,
+			     OUTPUT_IDV_GRID, "doimage", "true");
 
             request.put(ARG_OUTPUT, OutputHandler.OUTPUT_HTML);
             String title = "";
             if ( !group.isDummy() || (theEntry != null)) {
                 String[] crumbs = getEntryManager().getBreadCrumbs(request,
-                                      ((theEntry != null)
-                                       ? theEntry
-                                       : (Entry) group), false);
+								   ((theEntry != null)
+								    ? theEntry
+								    : (Entry) group), false);
                 title = crumbs[0];
                 sb.append(crumbs[1]);
             }
@@ -1494,8 +1862,8 @@ public class IdvOutputHandler extends OutputHandler {
             DataSourceDescriptor descriptor = getDescriptor(theEntry);
             if (false && (descriptor != null)) {
                 DataSource dataSource = getIdv().makeOneDataSource(
-                                            theEntry.getResource().getPath(),
-                                            descriptor.getId(), null);
+								   theEntry.getResource().getPath(),
+								   descriptor.getId(), null);
                 if (dataSource != null) {
                     sb.append(dataSource.getFullDescription());
                     Result result = new Result("Metadata - " + title, sb);
@@ -1513,7 +1881,7 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
         File image = getStorageManager().getThumbFile("preview_"
-                         + id.replace("/", "_") + ".gif");
+						      + id.replace("/", "_") + ".gif");
         if (image.exists()) {
             return new Result("preview.gif",
                               getStorageManager().getFileInputStream(image),
@@ -1535,8 +1903,8 @@ public class IdvOutputHandler extends OutputHandler {
                     getIdv().getDataManager().getDescriptors();
                 for (DataSourceDescriptor descriptor : descriptors) {
                     if ((descriptor.getPatternFileFilter() != null)
-                            && descriptor.getPatternFileFilter().match(
-                                path)) {
+			&& descriptor.getPatternFileFilter().match(
+								   path)) {
                         datasource = descriptor.getId();
                     }
                 }
@@ -1553,17 +1921,17 @@ public class IdvOutputHandler extends OutputHandler {
         //        System.err.println ("datasource:" + datasource);
         if (datasource.equalsIgnoreCase("FILE.RADAR")) {
             isl.append(
-                "<display type=\"planviewcolor\" param=\"#0\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
+		       "<display type=\"planviewcolor\" param=\"#0\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
             isl.append("</datasource>\n");
             //        isl.append("<center display=\"thedisplay\" useprojection=\"true\"/>\n");
             isl.append("<display type=\"rangerings\" wait=\"false\"/>\n");
         } else if (datasource.equalsIgnoreCase("FILE.SHAPEFILE")) {
             isl.append(
-                "<display type=\"shapefilecontrol\" param=\"#0\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
+		       "<display type=\"shapefilecontrol\" param=\"#0\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
             isl.append("</datasource>\n");
         } else if (datasource.equalsIgnoreCase("FILE.AREAFILE")) {
             isl.append(
-                "<display type=\"imagedisplay\" param=\"#0\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
+		       "<display type=\"imagedisplay\" param=\"#0\"><property name=\"id\" value=\"thedisplay\"/></display>\n");
             isl.append("</datasource>\n");
         } else {
             isl.append("</datasource>\n");
@@ -1596,7 +1964,7 @@ public class IdvOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputPointPage(final Request request, Entry entry)
-            throws Exception {
+	throws Exception {
 
         StringBuffer sb      = new StringBuffer();
 
@@ -1622,32 +1990,28 @@ public class IdvOutputHandler extends OutputHandler {
 
 
         formSB.append(
-            HtmlUtil.formEntry(
-                msgLabel("Layout Model"),
-                htmlSelect(request, 
-                           ARG_POINT_LAYOUTMODEL, layoutModelNames)));
+		      HtmlUtil.formEntry(
+					 msgLabel("Layout Model"),
+					 htmlSelect(request, 
+						    ARG_POINT_LAYOUTMODEL, layoutModelNames)));
 
         formSB.append(
-            HtmlUtil.formEntry(
-                msgLabel("Animate"),
-                HtmlUtil.checkbox(ARG_POINT_DOANIMATION, "true", false)));
+		      HtmlUtil.formEntry(
+					 msgLabel("Animate"),
+					htmlCheckbox(request,ARG_POINT_DOANIMATION, false)));
 
 
         formSB.append(
-            HtmlUtil.formEntry(
-                msgLabel("Width"),
-                htmlInput(request, ARG_IMAGE_WIDTH, "600")));
+		      HtmlUtil.formEntry(
+					 msgLabel("Width"),
+					 htmlInput(request, ARG_IMAGE_WIDTH, "600")));
 
         formSB.append(
-            HtmlUtil.formEntry(
-                msgLabel("Height"),
-                htmlInput(request, ARG_IMAGE_HEIGHT,  "400")));
+		      HtmlUtil.formEntry(
+					 msgLabel("Height"),
+					 htmlInput(request, ARG_IMAGE_HEIGHT,  "400")));
 
-        formSB.append(HtmlUtil.formEntry(msgLabel("Show map"),
-                                         HtmlUtil.checkbox(ARG_SHOWMAP,
-                                             "true",
-                                             request.get(ARG_SHOWMAP,
-                                                 true))));
+
 
         formSB.append(HtmlUtil.formTableClose());
         formSB.append(HtmlUtil.formClose());
@@ -1655,26 +2019,26 @@ public class IdvOutputHandler extends OutputHandler {
 
         String url = getRepository().URL_ENTRY_SHOW.getFullUrl();
         String islUrl = url + "/" + IOUtil.stripExtension(entry.getName())
-                        + ".isl";
+	    + ".isl";
         String jnlpUrl = url + "/" + IOUtil.stripExtension(entry.getName())
-                         + ".jnlp";
+	    + ".jnlp";
 
         Hashtable exceptArgs = new Hashtable();
         exceptArgs.put(ARG_ACTION, ARG_ACTION);
         String args = request.getUrlArgs(exceptArgs, null);
         url = url + "?" + ARG_ACTION + "=" + ACTION_POINT_MAKEIMAGE + "&"
-              + args;
+	    + args;
         islUrl = islUrl + "?" + ARG_ACTION + "=" + ACTION_POINT_MAKEIMAGE
-                 + "&" + args + "&" + ARG_TARGET + "=" + TARGET_ISL;
+	    + "&" + args + "&" + ARG_TARGET + "=" + TARGET_ISL;
         jnlpUrl = jnlpUrl + "?" + ARG_ACTION + "=" + ACTION_POINT_MAKEIMAGE
-                  + "&" + args + "&" + ARG_TARGET + "=" + TARGET_JNLP;
+	    + "&" + args + "&" + ARG_TARGET + "=" + TARGET_JNLP;
 
         StringBuffer imageSB = new StringBuffer();
 
         imageSB.append(HtmlUtil.img(url, "",
                                     HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
-                                        request.getString(ARG_IMAGE_WIDTH,
-                                            "400"))));
+						  request.getString(ARG_IMAGE_WIDTH,
+								    "400"))));
         imageSB.append(HtmlUtil.br());
         imageSB.append(HtmlUtil.href(jnlpUrl, msg("Launch in the IDV")));
         imageSB.append(HtmlUtil.br());
@@ -1716,7 +2080,7 @@ public class IdvOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputPointImage(final Request request, Entry entry)
-            throws Exception {
+	throws Exception {
 
         Trace.addNot(".*ShadowFunction.*");
         //      Trace.addNot(".*GeoGrid.*");
@@ -1746,7 +2110,7 @@ public class IdvOutputHandler extends OutputHandler {
         DataSourceDescriptor descriptor =
             idvServer.getIdv().getDataManager().getDescriptor("NetCDF.POINT");
         NetcdfPointDataSource dataSource = new NetcdfPointDataSource(dataset,
-                                               descriptor, new Hashtable());
+								     descriptor, new Hashtable());
         //      NetcdfPointDataSource dataSource = new NetcdfPointDataSource(descriptor, "/Users/jeffmc/point.nc",new Hashtable());
 
         try {
@@ -1754,67 +2118,70 @@ public class IdvOutputHandler extends OutputHandler {
 
             String id = entry.getId();
             File image = getStorageManager().getThumbFile("preview_"
-                             + id.replace("/", "_") + ".gif");
+							  + id.replace("/", "_") + ".gif");
 
             boolean forIsl = request.getString(ARG_TARGET,
-                                 "").equals(TARGET_ISL);
+					       "").equals(TARGET_ISL);
             boolean forJnlp = request.getString(ARG_TARGET,
-                                  "").equals(TARGET_JNLP);
+						"").equals(TARGET_JNLP);
             if (forJnlp) {
                 forIsl = true;
             }
 
             StringBuffer isl = new StringBuffer();
             isl.append(
-                "<isl debug=\"true\" loop=\"1\" offscreen=\"true\">\n");
+		       "<isl debug=\"true\" loop=\"1\" offscreen=\"true\">\n");
 
             StringBuffer viewProps = new StringBuffer();
             viewProps.append(XmlUtil.tag("property",
                                          XmlUtil.attrs("name", "wireframe",
-                                             "value", "false")));
-            viewProps.append(XmlUtil.tag("property",
-                                         XmlUtil.attrs("name", "showMaps",
-                                             "value",
-                                             "" + request.get(ARG_SHOWMAP,
-                                                 false))));
-            if (request.get(ARG_WHITEBACKGROUND, false)) {
-                viewProps.append(XmlUtil.tag("property",
-                                             XmlUtil.attrs("name",
-                                                 "background", "value",
-                                                     "white")));
-                viewProps.append(XmlUtil.tag("property",
-                                             XmlUtil.attrs("name",
-                                                 "foreground", "value",
-                                                     "black")));
-            }
+						       "value", "false")));
 
+	    int width =  request.get(ARG_IMAGE_WIDTH, 400);
+	    int height = request.get(ARG_IMAGE_HEIGHT, 400);
+	    if(request.defined(ARG_VIEW_BOUNDS+"_south") &&
+	       request.defined(ARG_VIEW_BOUNDS+"_north") &&
+	       request.defined(ARG_VIEW_BOUNDS+"_east") &&
+	       request.defined(ARG_VIEW_BOUNDS+"_west")) {
+		double south = request.get(ARG_VIEW_BOUNDS+"_south",0.0);
+		double north = request.get(ARG_VIEW_BOUNDS+"_north",0.0);
+		double east = request.get(ARG_VIEW_BOUNDS+"_east",0.0);
+		double west = request.get(ARG_VIEW_BOUNDS+"_west",0.0);
+		double bwidth = Math.abs(east-west);
+		double bheight = Math.abs(north-south);
+		viewProps.append(makeProperty("initLatLonBounds",west+";"+north+";"+bwidth+";"+bheight));
+		height = (int)(width*bheight/bwidth); 
+	    } 
+
+
+
+
+	    viewProps.append(makeProperty("background",request.getString(ARG_VIEW_BACKGROUND,"black")));
 
 
             //Create a new viewmanager
             //For now don't do this if we are doing jnlp
             if ( !forJnlp) {
                 isl.append(
-                    XmlUtil.tag(
-                        ImageGenerator.TAG_VIEW,
-                        XmlUtil.attrs(
-                            ImageGenerator.ATTR_WIDTH,
-                            request.getString(ARG_IMAGE_WIDTH, "400"),
-                            ImageGenerator.ATTR_HEIGHT,
-                            request.getString(
-                                ARG_IMAGE_HEIGHT,
-                                "300")), viewProps.toString()));
+			   XmlUtil.tag(
+				       ImageGenerator.TAG_VIEW,
+				       XmlUtil.attrs(
+						     ImageGenerator.ATTR_WIDTH,
+						     ""+width,
+						     ImageGenerator.ATTR_HEIGHT,
+						     ""+height), viewProps.toString()));
             }
 
 
             if (forIsl) {
                 isl.append(
-                    XmlUtil.openTag(
-                        "datasource",
-                        XmlUtil.attrs(
-                            "id", "datasource", "url",
-                            getRepository().absoluteUrl(
-                                getRepository().URL_ENTRY_SHOW
-                                + dataOutputHandler.getOpendapUrl(entry)))));
+			   XmlUtil.openTag(
+					   "datasource",
+					   XmlUtil.attrs(
+							 "id", "datasource", "url",
+							 getRepository().absoluteUrl(
+										     getRepository().URL_ENTRY_SHOW
+										     + dataOutputHandler.getOpendapUrl(entry)))));
             } else {
                 isl.append("<datasource id=\"datasource\">\n");
             }
@@ -1825,9 +2192,9 @@ public class IdvOutputHandler extends OutputHandler {
             StringBuffer attrs  = new StringBuffer();
             propSB.append(makeProperty("id", "thedisplay"));
             propSB.append(
-                makeProperty(
-                    "stationModelName",
-                    request.getString(ARG_POINT_LAYOUTMODEL, "Location")));
+			  makeProperty(
+				       "stationModelName",
+				       request.getString(ARG_POINT_LAYOUTMODEL, "Location")));
 
             System.err.println("Props:" + propSB);
             attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_TYPE,
@@ -1848,13 +2215,13 @@ public class IdvOutputHandler extends OutputHandler {
             isl.append(XmlUtil.tag((multipleTimes
                                     ? "movie"
                                     : "image"), XmlUtil.attr("file",
-                                    image.toString()), clip));
+							     image.toString()), clip));
             isl.append("</isl>\n");
 
             if (forJnlp) {
                 String jnlp =
                     getRepository().getResource(
-                        "/ucar/unidata/repository/idv/template.jnlp");
+						"/ucar/unidata/repository/idv/template.jnlp");
                 StringBuffer args = new StringBuffer();
                 args.append("<argument>-b64isl</argument>");
                 args.append("<argument>"
@@ -1895,7 +2262,7 @@ public class IdvOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputPoint(final Request request, Entry entry)
-            throws Exception {
+	throws Exception {
         String action = request.getString(ARG_ACTION, ACTION_POINT_MAKEPAGE);
         if (action.equals(ACTION_POINT_MAKEPAGE)) {
             return outputPointPage(request, entry);

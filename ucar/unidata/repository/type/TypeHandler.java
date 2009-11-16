@@ -1601,12 +1601,39 @@ public class TypeHandler extends RepositoryManager {
                                       && entry.hasWest())
                     ? entry.getWest()
                     : Double.NaN);
+
+	    StringBuffer bboxSelect = new StringBuffer();
+
+	    String clickParams =
+		"event,'bboximg',"+HtmlUtil.squote(ARG_AREA)+",'1'";
+	    String initParams =
+		"'bboximg',"+HtmlUtil.squote(ARG_AREA)+",'1'";
+
+	    String bboxCall = HtmlUtil.onMouseClick(HtmlUtil.call("bboxClick",
+								  clickParams));
+	    String bboxDiv = HtmlUtil.div("",
+					   HtmlUtil.cssClass("latlon_box")
+					   + HtmlUtil.id("bbox_div"));
+	    bboxSelect.append(bboxDiv);
+
+	    bboxSelect.append(HtmlUtil.img(getRepository().getUrlBase()+ "/images/usgstopo.jpg","",
+					   HtmlUtil.id("bboximg") + bboxCall +
+					   HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "600")));
+
+
+
+
+	    String bboxLink =
+		getRepository().makeStickyPopup(
+					      msg("Select"),
+					      bboxSelect.toString(),
+					      HtmlUtil.call("bboxInit",initParams));
+
             sb.append(
                 HtmlUtil.formEntry(
                     "Location:",
-                    HtmlUtil.table(
-                        HtmlUtil.row(
-                            HtmlUtil.cols(latLonForm, mapSB.toString())))));
+                    HtmlUtil.table(new Object[]{latLonForm, bboxLink})));
+
         }
 
 

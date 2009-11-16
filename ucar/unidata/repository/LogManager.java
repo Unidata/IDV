@@ -224,9 +224,14 @@ public class LogManager extends RepositoryManager {
             thr = LogUtil.getInnerException(exc);
         }
 
+
         if (thr != null) {
-            log.error(message + "\n<stack>\n" + thr + "\n"
-                      + LogUtil.getStackTrace(thr) + "\n</stack>");
+	    if(thr instanceof RepositoryUtil.MissingEntryException) {
+		log.error(message + " " + thr);
+	    } else {
+		log.error(message + "\n<stack>\n" + thr + "\n"
+			  + LogUtil.getStackTrace(thr) + "\n</stack>");
+	    }
         }
 
     }

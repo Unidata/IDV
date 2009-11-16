@@ -616,18 +616,8 @@ public class RepositoryFtplet extends DefaultFtplet {
         newFile = getRepository().getStorageManager().moveToStorage(request,
                 newFile);
 
-        TypeHandler typeHandler =
-            getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
-        Entry entry = typeHandler.createEntry(getRepository().getGUID());
-        Resource resource = new Resource(newFile.toString(),
-                                         Resource.TYPE_STOREDFILE);
-        Date dttm = new Date();
-        entry.initEntry(name, "", group, request.getUser(), resource, "",
-                        dttm.getTime(), dttm.getTime(), dttm.getTime(), null);
-        typeHandler.initializeNewEntry(entry);
-        List<Entry> newEntries = new ArrayList<Entry>();
-        newEntries.add(entry);
-        getEntryManager().insertEntries(newEntries, true, true);
+	Entry entry = getEntryManager().addFileEntry(request, newFile, group, name, request.getUser());
+
 
         session.write(
             new DefaultFtpReply(

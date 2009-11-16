@@ -685,18 +685,19 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     protected void init(Properties properties) throws Exception {
-        /*
+
+	/*
         final PrintStream oldErr = System.err;
         final PrintStream oldOut = System.out;
         System.setErr(new PrintStream(oldOut){
                 public void     println(String x) {
-                    if(x.indexOf("Fatal")>=0) {
+		    //                    if(x.indexOf("Fatal")>=0) {
                         Misc.printStack("got it");
-                    }
+			//                    }
                     oldErr.println(x);
                 }
             });
-        */
+	*/
 
         initProperties(properties);
         initServer();
@@ -5174,6 +5175,47 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String href = HtmlUtil.href("javascript:noop();", link,
                                     onClick + HtmlUtil.id(linkId));
         return href + contents;
+    }
+
+
+
+    public String makeStickyPopup(String link, String innerContents, String initCall) {
+	boolean alignLeft  =true;
+        String compId   = "menu_" + HtmlUtil.blockCnt++;
+        String linkId   = "menulink_" + HtmlUtil.blockCnt++;
+        String contents = makeStickyPopupDiv(innerContents, compId);
+        String onClick = HtmlUtil.onMouseClick(HtmlUtil.call("showStickyPopup",
+                             HtmlUtil.comma(new String[] { "event",
+                HtmlUtil.squote(linkId), HtmlUtil.squote(compId), (alignLeft
+                ? "1"
+								   : "0") })) + initCall);
+        String href = HtmlUtil.href("javascript:noop();", link,
+                                    onClick + HtmlUtil.id(linkId));
+        return href + contents;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param contents _more_
+     * @param compId _more_
+     * @param makeClose _more_
+     *
+     * @return _more_
+     */
+    public String makeStickyPopupDiv(String contents, String compId) {
+        StringBuffer menu = new StringBuffer();
+	String cLink =
+	    HtmlUtil.jsLink(HtmlUtil.onMouseClick(HtmlUtil.call("hide", HtmlUtil.squote(compId))),
+			    HtmlUtil.img(iconUrl(ICON_CLOSE)), "");
+	contents = cLink + HtmlUtil.br() + contents;
+
+        menu.append(HtmlUtil.div(contents,
+                                 HtmlUtil.id(compId)
+                                 + HtmlUtil.cssClass("popup")));
+        return menu.toString();
     }
 
 

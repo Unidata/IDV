@@ -522,6 +522,13 @@ public class StorageManager extends RepositoryManager {
     }
 
 
+    public File getThumbDir(String file) {
+        File f =  getTmpDirFile(getThumbDir(), file);
+	IOUtil.makeDirRecursive(f);
+	return f;
+    }
+
+
 
     /**
      * _more_

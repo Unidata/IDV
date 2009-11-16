@@ -82,7 +82,7 @@ public class GraphOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_GRAPH =
-        new OutputType("Graph", "graph.graph", OutputType.TYPE_NONHTML, "",
+        new OutputType("Graph", "graph.graph", OutputType.TYPE_HTML, "",
                        ICON_GRAPH);
 
 
@@ -333,12 +333,13 @@ public class GraphOutputHandler extends OutputHandler {
                 getDatabaseManager().closeAndReleaseConnection(stmt);
                 throw new IllegalArgumentException("Unknown entry id:" + id);
             }
+	    String parentId = results.getString(4);
             sb.append(getEntryNodeXml(request, results));
             getDatabaseManager().closeAndReleaseConnection(stmt);
             getAssociationsGraph(request, id, sb);
 
             Group group = getEntryManager().findGroup(request,
-                              results.getString(4));
+                              parentId);
             sb.append(XmlUtil.tag(TAG_NODE,
                                   XmlUtil.attrs(ATTR_TYPE, NODETYPE_GROUP,
                                       ATTR_ID, group.getId(), ATTR_TOOLTIP,

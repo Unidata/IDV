@@ -785,7 +785,6 @@ return new Result(title, sb);
                     request.entryUrl(getRepository().URL_ENTRY_SHOW, entry));
             }
 
-
             if ((entry != null) && isAnonymousUpload(entry)) {
                 if (request.get(ARG_JUSTPUBLISH, false)) {
                     publishAnonymousEntry(request, entry);
@@ -4615,6 +4614,27 @@ return new Result(title, sb);
     }
 
 
+    public Entry addFileEntry(Request request, File newFile, Group group, String name, User user) throws Exception { 
+
+	if ( !getRepository().getAccessManager().canDoAction(request, group,
+							     Permission.ACTION_NEW)) {
+	    throw new AccessException("Cannot add to group", request);
+	}
+
+        TypeHandler typeHandler =
+            getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
+        Entry entry = typeHandler.createEntry(getRepository().getGUID());
+        Resource resource = new Resource(newFile.toString(),
+                                         Resource.TYPE_STOREDFILE);
+        Date dttm = new Date();
+        entry.initEntry(name, "", group, request.getUser(), resource, "",
+                        dttm.getTime(), dttm.getTime(), dttm.getTime(), null);
+        typeHandler.initializeNewEntry(entry);
+        List<Entry> newEntries = new ArrayList<Entry>();
+        newEntries.add(entry);
+        insertEntries(newEntries, true, true);
+	return entry;
+    }
 
 
 
@@ -6151,16 +6171,22 @@ return new Result(title, sb);
         List<Entry>      entries = new ArrayList<Entry>();
         //        TypeHandler typeHandler =
         //            getRepository().getTypeHandler(TypeHandler.TYPE_GROUP);
-        while ((results = iter.next()) != null) {
-            while (results.next()) {
-                String entryType = results.getString(2);
-                TypeHandler typeHandler =
-                    getRepository().getTypeHandler(entryType);
-                Entry entry = (Entry) typeHandler.getEntry(results);
-                entries.add(entry);
-		cacheEntry(entry);
-            }
-        }
+	try {
+	    while ((results = iter.next()) != null) {
+		while (results.next()) {
+		    String entryType = results.getString(2);
+		    TypeHandler typeHandler =
+			getRepository().getTypeHandler(entryType);
+		    Entry entry = (Entry) typeHandler.getEntry(results);
+		    entries.add(entry);
+		    cacheEntry(entry);
+		}
+	    }
+	} catch(Exception exc) {
+	    getDatabaseManager().closeAndReleaseConnection(statement);
+	    throw exc;
+	}
+
         for (Entry entry : entries) {
             if (entry.getParentGroupId() != null) {
                 Group parentGroup = (Group) findGroup(null,
