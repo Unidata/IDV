@@ -1468,10 +1468,10 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      *
      * @return A list of MapData objects.
      */
-    public List getMaps() {
+    public List<MapData> getMaps() {
         MapInfo mapInfo = new MapInfo(getXmlResources(RSC_MAPS), false,
                                       false);
-        List      results = new ArrayList();
+        List<MapData>      results = new ArrayList<MapData>();
         List      maps    = mapInfo.getMapDataList();
         Hashtable seen    = new Hashtable();
         for (int i = 0; i < maps.size(); i++) {
