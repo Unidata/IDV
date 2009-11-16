@@ -143,14 +143,25 @@ public class CatalogUtil {
     /** Value for the thredds catalog v1.0 */
     public static final double THREDDS_VERSION_1_0 = 1.0;
 
+    /** xml tag name */
+    public static final String TAG_LATLONBOX = "LatLonBox";
 
+    /** xml tag name */
+    public static final String TAG_NORTH = "north";
 
+    /** xml tag name */
+    public static final String TAG_SOUTH = "south";
 
+    /** xml tag name */
+    public static final String TAG_EAST = "east";
 
-    /** _more_ */
+    /** xml tag name */
+    public static final String TAG_WEST = "west";
+
+    /** name */
     public static final String TAG_NAME = "name";
 
-    /** _more_ */
+    /** contact */
     public static final String TAG_CONTACT = "contact";
 
 
