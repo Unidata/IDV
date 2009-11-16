@@ -2008,10 +2008,8 @@ public class ImageGenerator extends IdvManager {
         }
 
         if (applyMacros(node, ATTR_WAIT, true)) {
-	    debug("calling wait 2");
             getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
                 getIdv().getIdvUIManager());
-	    debug("done calling wait 2");
         }
         getPersistenceManager().clearFileMapping();
         Color c = applyMacros(node, ATTR_COLOR, (Color) null);
@@ -2560,9 +2558,7 @@ public class ImageGenerator extends IdvManager {
             return false;
         }
         if (applyMacros(node, ATTR_WAIT, true)) {
-	    debug("calling wait 3");
             pause();
-	    debug("done calling wait 3");
         }
         updateViewManagers();
         return true;
@@ -3627,15 +3623,9 @@ public class ImageGenerator extends IdvManager {
                     new VectorGraphicsRenderer(viewManager);
                 vectorRenderer.renderTo(loopFilename);
             } else {
-		debug("calling wait 1");
                 getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
                                                                     getIdv().getIdvUIManager(),0);
-		debug("done calling wait 1");
-                //                int taskCnt = ActionImpl.getTaskCount();
-                //                StringBuffer stack = LogUtil.getStackDump(false,true);
                 lastImage = viewManager.getMaster().getImage(false);
-                //                System.err.println(stack);
-                //                System.err.println("TASK CNT:" + taskCnt);
                 imageProperties = new Hashtable();
                 lastImage = processImage((BufferedImage) lastImage,
                                          loopFilename, scriptingNode,
