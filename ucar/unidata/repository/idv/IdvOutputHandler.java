@@ -386,17 +386,18 @@ public class IdvOutputHandler extends OutputHandler {
         keyToAbbrev = new Properties();
 	try {
 
+            /*
 
 	    valueToAbbrev.load(
 			       IOUtil.getInputStream(
 						     "/ucar/unidata/repository/idv/values.properties",
 						     getClass()));
-
-
 	    keyToAbbrev.load(
 			     IOUtil.getInputStream(
 						   "/ucar/unidata/repository/idv/keys.properties",
 						   getClass()));
+            */
+
 	} catch(Exception exc) {
 	    exc.printStackTrace();
 	}
@@ -736,15 +737,14 @@ public class IdvOutputHandler extends OutputHandler {
         String bboxJS = "bboxInit(" + callParams +");";
 
 	llb = llb+HtmlUtil.br() +
-	    HtmlUtil.mouseClickHref(bboxJS,"Draw");
-
+	    HtmlUtil.mouseClickHref(bboxJS,"Update Map");
 
 
 
 	bounds.append(HtmlUtil.table(new Object[]{llb,
-						  HtmlUtil.img(getRepository().getUrlBase()+ "/images/usgstopo.jpg","",
+						  HtmlUtil.img(getRepository().getUrlBase()+ "/images/caida.jpg","",
 							       HtmlUtil.id("bboximg") + bboxCall +
-							       HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "600"))}));
+							       HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "800"))}));
 
 	bounds.append(HtmlUtil.br());
 	bounds.append(HtmlUtil.italics(msg("Click in map to select bounds")));
@@ -752,7 +752,7 @@ public class IdvOutputHandler extends OutputHandler {
 	bounds.append(HtmlUtil.italics(msg("Enter \"\" to use default")));
 
 	bounds.append(HtmlUtil.div("",
-			       HtmlUtil.cssClass("image_edit_box")
+			       HtmlUtil.cssClass("image_edit_box") + bboxCall
                                + HtmlUtil.id("bbox_div")));
 
 	StringBuffer mapSB= new StringBuffer();
@@ -1455,7 +1455,8 @@ public class IdvOutputHandler extends OutputHandler {
         isl.append("<isl debug=\"true\" loop=\"1\" offscreen=\"true\">\n");
 
         StringBuffer viewProps = new StringBuffer();
-	viewProps.append(makeProperty( "wireframe","false"));
+        //	viewProps.append(makeProperty( "wireframe","false"));
+	viewProps.append(makeProperty( "wireframe","true"));
 
 	viewProps.append(makeProperty("background",request.getString(ARG_VIEW_BACKGROUND,"black")));
 
@@ -1489,6 +1490,7 @@ public class IdvOutputHandler extends OutputHandler {
 	    double bheight = Math.abs(north-south);
 	    viewProps.append(makeProperty("initLatLonBounds",west+","+north+","+bwidth+","+bheight));
 	    height = (int)(width*bheight/bwidth); 
+            /*
             clip = XmlUtil.tag("clip", XmlUtil.attrs(
 		    ImageGenerator.ATTR_NORTH,
 		    ""+north,
@@ -1498,7 +1500,7 @@ public class IdvOutputHandler extends OutputHandler {
 		    ""+east,
 		    ImageGenerator.ATTR_WEST,
 		    ""+west
-		    ));
+		    ));*/
 	} 
 
 

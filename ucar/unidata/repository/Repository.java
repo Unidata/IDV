@@ -2583,9 +2583,6 @@ public class Repository extends RepositoryBase implements RequestHandler {
         }
 
 
-
-
-
         getLogManager().log(request,
                             "Unknown request:" + request.getUrl()
                             + " user-agent:" + userAgent + " ip:"

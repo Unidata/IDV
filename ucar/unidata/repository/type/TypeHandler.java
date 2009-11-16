@@ -1616,7 +1616,7 @@ public class TypeHandler extends RepositoryManager {
 					   + HtmlUtil.id("bbox_div"));
 	    bboxSelect.append(bboxDiv);
 
-	    bboxSelect.append(HtmlUtil.img(getRepository().getUrlBase()+ "/images/usgstopo.jpg","",
+	    bboxSelect.append(HtmlUtil.img(getRepository().getUrlBase()+ "/images/worldday.jpg","",
 					   HtmlUtil.id("bboximg") + bboxCall +
 					   HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "600")));
 

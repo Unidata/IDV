@@ -395,9 +395,16 @@ public class ZipOutputHandler extends OutputHandler {
                 zos.putNextEntry(new ZipEntry(name));
                 InputStream fileInputStream =
                     getStorageManager().getFileInputStream(path);
-                IOUtil.writeTo(fileInputStream, zos);
-                fileInputStream.close();
-                zos.closeEntry();
+                
+                try {
+                    IOUtil.writeTo(fileInputStream, zos);
+                    zos.closeEntry();
+                } finally {
+                    try {
+                        fileInputStream.close();
+                    } catch(Exception exc){}
+                    zos.closeEntry();
+                }
             }
 
         }

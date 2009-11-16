@@ -5630,6 +5630,7 @@ return new Result(title, sb);
                                         Tables.ENTRIES.NAME,
                                         Clause.eq(Tables.ENTRIES.COL_ID, id));
 
+
         List<Entry> groups = readEntries(statement);
         if (groups.size() > 0) {
             return (Group) groups.get(0);

@@ -226,7 +226,7 @@ public class LogManager extends RepositoryManager {
 
 
         if (thr != null) {
-	    if(thr instanceof RepositoryUtil.MissingEntryException) {
+	    if(thr instanceof RepositoryUtil.MissingEntryException || thr instanceof AccessException) {
 		log.error(message + " " + thr);
 	    } else {
 		log.error(message + "\n<stack>\n" + thr + "\n"
