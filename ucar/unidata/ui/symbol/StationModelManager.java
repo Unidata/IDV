@@ -260,7 +260,7 @@ public class StationModelManager extends ResourceManager {
      * @return The station model or null if none found.
      */
     public StationModel getStationModel(String name) {
-        if (name == null) {
+        if (name == null || name.equals("")) {
             return null;
         }
         StationModel stationModel = (StationModel) getObject(name);

@@ -524,6 +524,7 @@ public class StationModelCanvas extends EditCanvas {
             StationModel sm      = (StationModel) symbols.get(i);
             boolean      isUsers = smm.isUsers(sm);
             String       name    = sm.getName();
+            if (name.equals("")) continue;
             List         toks    = StringUtil.split(name, ">", true, true);
             if (toks.size() > 0) {
                 name = (String) toks.get(toks.size() - 1);
