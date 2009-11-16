@@ -376,6 +376,7 @@ public class MapViewManager extends NavigatedViewManager {
 	    mapDisplay.setClipDistanceFront(getStateManager().getProperty(PROP_CLIPDISTANCE_MAP_FRONT,NavigatedDisplay.CLIP_FRONT_DEFAULT));
 	    mapDisplay.setClipDistanceBack(getStateManager().getProperty(PROP_CLIPDISTANCE_MAP_BACK,NavigatedDisplay.CLIP_BACK_DEFAULT));
 
+
 	    if(initLatLonBounds==null) {
 		double[] aspect = getAspectRatio();
 		if (aspect == null) {
@@ -385,7 +386,13 @@ public class MapViewManager extends NavigatedViewManager {
 					    ? new double[] { aspect[0],
 							     aspect[1] }
 					    : aspect);
-	    }
+	    } else {
+                //If we have a a latlonbounds then we want to display exactly that area
+                double[] aspect = new double[] { 1.0, initLatLonBounds.getHeight()/initLatLonBounds.getWidth(), 1.0 };
+                double[] scaleMatrix =mapDisplay.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                                                                                aspect[0],aspect[1],1, 0.0, 0.0, 0.0);
+                mapDisplay.setProjectionMatrix(scaleMatrix);
+            }
 
             navDisplay = mapDisplay;
             navDisplay.setPerspectiveView(getPerspectiveView());
@@ -875,6 +882,9 @@ public class MapViewManager extends NavigatedViewManager {
      * @throws Exception _more_
      */
     public void initWith(ViewState viewState) throws Exception {
+
+
+
         MapProjection thatProjection =
             (MapProjection) viewState.get(ViewState.PROP_PROJECTION);
         if (thatProjection != null) {
@@ -907,6 +917,13 @@ public class MapViewManager extends NavigatedViewManager {
      */
     protected void initWithInner(ViewManager that, boolean ignoreWindow)
             throws VisADException, RemoteException {
+
+
+        if(initLatLonBounds!=null) {
+            return;
+        }
+
+
         if ( !(that instanceof MapViewManager)) {
             return;
         }
@@ -915,13 +932,10 @@ public class MapViewManager extends NavigatedViewManager {
         this.setAspectRatio(that.getAspectRatio());
 
         if ((mvm.flythrough != null) && (mvm.flythrough != this.flythrough)) {
-            System.err.println ("Initing flythrough");
             if (this.flythrough != null) {
-                System.err.println ("destroying old one");
                 this.flythrough.destroy();
                 //                this.flythrough.initWith(mvm.flythrough);
             }
-            System.err.println ("setting new one");
             this.flythrough = mvm.flythrough;
             this.flythrough.setViewManager(this);
             if (this.flythrough.getShown()) {
@@ -2320,7 +2334,7 @@ public class MapViewManager extends NavigatedViewManager {
             MapProjection mp = ucar.visad.Util.makeMapProjection(minY, minX,
                                    maxY, maxX);
             setMapProjection(mp, true);
-            getMapDisplay().zoom(ZOOM_FACTOR);
+            //            getMapDisplay().zoom(ZOOM_FACTOR);
             getMapDisplay().saveProjection();
         } catch (Exception exp) {
             logException("Setting projection", exp);
