@@ -514,9 +514,11 @@ public class DisplayConventions extends IdvManager {
                 clMax      = max;
             } else {                                // for really big ranges, span > 300 
                 clInterval = (float) rint;
-                clMin      = clBase = (float) ((int) min);
+                clMin      = 
                 clMax      = (float) ((int) max);
             }
+            clMax = clMax + clInterval;
+            clMin = clMin - clInterval;
 
         } catch (Exception exp) {
             logException("Set contour levels for " + paramName, exp);
