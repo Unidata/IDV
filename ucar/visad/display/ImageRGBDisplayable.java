@@ -61,9 +61,6 @@ public class ImageRGBDisplayable extends DisplayableData implements GridDisplaya
     /** color palette */
     private float[][] colorPalette;
 
-    /** renderer */
-    private DataRenderer renderer;
-
     /** What do we map with */
     private DisplayRealType mapType = Display.RGB;
 
