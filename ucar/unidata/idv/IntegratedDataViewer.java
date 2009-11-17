@@ -22,7 +22,6 @@
 
 
 
-
 package ucar.unidata.idv;
 
 
@@ -367,9 +366,9 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
      * @return is interactive
      */
     public boolean getInteractiveMode() {
-	//        if (true) {
-	//            return true;
-	//        }
+        //        if (true) {
+        //            return true;
+        //        }
         return interactiveMode && !getArgsManager().isScriptingMode();
     }
 
@@ -2316,9 +2315,9 @@ Misc.run(new Runnable() {
 
 
     /**
-     * _more_
+     * Get the background images resource
      *
-     * @return _more_
+     * @return  the resource
      */
     public List getBackgroundImages() {
         if (backgroundImages == null) {
@@ -2810,9 +2809,11 @@ Misc.run(new Runnable() {
                                 boolean andRemove) {
         boolean overwriteData = false;
         if (filename == null) {
-            filename = FileManager.getReadFile("Open File",
-                    Misc.newList(getArgsManager().getXidvZidvFileFilter()),
-                    GuiUtils.top(getChangeDataPathCbx()));
+            filename = FileManager.getReadFile(
+                "Open File",
+                Misc.newList(
+                    getArgsManager().getXidvZidvFileFilter(), FILTER_JNLP,
+                    FILTER_ISL), GuiUtils.top(getChangeDataPathCbx()));
             if (filename == null) {
                 return;
             }
@@ -2907,8 +2908,9 @@ Misc.run(new Runnable() {
         //        encoder.registerNewClassName("ucar.unidata.repository.InteractiveRepositoryClient",
         //                                     "ucar.unidata.repository.client.InteractiveRepositoryClient");
 
-	encoder.registerNewClassName("ucar.unidata.idv.FlythroughPoint",
-				     "ucar.unidata.idv.flythrough.FlythroughPoint");
+        encoder.registerNewClassName(
+            "ucar.unidata.idv.FlythroughPoint",
+            "ucar.unidata.idv.flythrough.FlythroughPoint");
         VisADPersistence.init(encoder);
         initEncoder(encoder, forRead);
         return encoder;
@@ -3149,12 +3151,15 @@ Misc.run(new Runnable() {
     }
 
     /**
-     * _more_
+     * Print the data cache stats
      */
     public void printDataCacheStats() {
         visad.data.DataCacheManager.getCacheManager().printStats();
     }
 
+    /**
+     * Flush the data cache
+     */
     public void flushDataCache() {
         visad.data.DataCacheManager.getCacheManager().flushAllCachedData();
     }
