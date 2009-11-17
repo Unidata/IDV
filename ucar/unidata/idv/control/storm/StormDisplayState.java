@@ -20,10 +20,10 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control.storm;
 
 
-import ucar.unidata.idv.flythrough.FlythroughPoint;
 import org.apache.poi.hssf.usermodel.*;
 
 import org.w3c.dom.*;
@@ -48,6 +48,9 @@ import ucar.unidata.idv.control.DisplayControlImpl;
 
 import ucar.unidata.idv.control.LayoutModelWidget;
 import ucar.unidata.idv.control.chart.*;
+
+
+import ucar.unidata.idv.flythrough.FlythroughPoint;
 
 import ucar.unidata.ui.Command;
 import ucar.unidata.ui.CommandManager;
@@ -1069,6 +1072,11 @@ public class StormDisplayState {
      */
     private void initCenterContents() {
 
+        if (mainContents == null) {
+            return;
+        }
+
+
         mainContents.removeAll();
         JButton unloadBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/Cut16.gif", this,
@@ -1082,6 +1090,7 @@ public class StormDisplayState {
         JComponent top =
             GuiUtils.inset(GuiUtils.leftRight(GuiUtils.lLabel(label),
                 unloadBtn), new Insets(0, 0, 0, 0));
+
 
 
         List<StormParam> forecastParams = new ArrayList<StormParam>();
@@ -1384,6 +1393,7 @@ public class StormDisplayState {
         mainContents.validate();
         mainContents.repaint();
 
+
         checkVisibility();
     }
 
@@ -1521,13 +1531,15 @@ public class StormDisplayState {
         //Read the tracks if we haven't
         long t1 = System.currentTimeMillis();
         if (trackCollection == null) {
-            mainContents.removeAll();
-            mainContents.add(
-                GuiUtils.top(
-                    GuiUtils.inset(new JLabel("Loading Tracks..."), 5)));
-            mainContents.invalidate();
-            mainContents.validate();
-            mainContents.repaint();
+            if (mainContents != null) {
+                mainContents.removeAll();
+                mainContents.add(
+                    GuiUtils.top(
+                        GuiUtils.inset(new JLabel("Loading Tracks..."), 5)));
+                mainContents.invalidate();
+                mainContents.validate();
+                mainContents.repaint();
+            }
 
             trackCollection =
                 stormTrackControl.getStormDataSource().getTrackCollection(
@@ -1658,6 +1670,10 @@ public class StormDisplayState {
      * @throws Exception _more_
      */
     protected void updateCharts() throws Exception {
+        if (mainContents == null) {
+            return;
+        }
+
         for (StormTrackChart stormTrackChart : charts) {
             stormTrackChart.updateChart();
         }
@@ -2075,8 +2091,10 @@ public class StormDisplayState {
 
             track.putTemporaryProperty(PROP_TRACK_TABLE, contents);
 
-            JButton flythroughBtn = GuiUtils.makeButton("Fly through", this, "flythroughTrack",track);
-            contents = GuiUtils.centerBottom(contents, GuiUtils.right(flythroughBtn));
+            JButton flythroughBtn = GuiUtils.makeButton("Fly through", this,
+                                        "flythroughTrack", track);
+            contents = GuiUtils.centerBottom(contents,
+                                             GuiUtils.right(flythroughBtn));
             tableTreePanel.addComponent(contents, track.getWay().toString(),
                                         track.getStartTime().toString(),
                                         null, track);
@@ -2087,13 +2105,20 @@ public class StormDisplayState {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param track _more_
+     */
     public void flythroughTrack(StormTrack track) {
         try {
             List<FlythroughPoint> points = new ArrayList<FlythroughPoint>();
-            for( StormTrackPoint stp: track.getTrackPoints()) {
-                EarthLocation newLoc = makePoint(stp.getLocation().getLatitude().getValue(CommonUnit.degree),
-                                                 stp.getLocation().getLongitude().getValue(CommonUnit.degree));
-                points.add(new FlythroughPoint(newLoc,stp.getTime()));
+            for (StormTrackPoint stp : track.getTrackPoints()) {
+                EarthLocation newLoc =
+                    makePoint(stp.getLocation().getLatitude()
+                        .getValue(CommonUnit.degree), stp.getLocation()
+                        .getLongitude().getValue(CommonUnit.degree));
+                points.add(new FlythroughPoint(newLoc, stp.getTime()));
             }
             stormTrackControl.getMapViewManager().flythrough(points);
         } catch (Exception exc) {
@@ -2597,5 +2622,4 @@ public class StormDisplayState {
 
 
 }
-
 

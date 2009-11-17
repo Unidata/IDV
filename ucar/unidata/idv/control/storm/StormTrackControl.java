@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.control.storm;
 
 
@@ -37,8 +38,8 @@ import ucar.unidata.data.storm.StormInfo;
 
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.idv.MapViewManager;
-import ucar.unidata.idv.control.ReadoutInfo;
 import ucar.unidata.idv.control.DisplayControlImpl;
+import ucar.unidata.idv.control.ReadoutInfo;
 import ucar.unidata.ui.TreePanel;
 import ucar.unidata.ui.TwoListPanel;
 
@@ -508,11 +509,15 @@ public class StormTrackControl extends DisplayControlImpl {
      * @return _more_
      */
     public List<StormParam> getTrackParams() {
-        List<StormParam>     params = new ArrayList<StormParam>();
+        List<StormParam>  params = new ArrayList<StormParam>();
 
 
-        StormDisplayState    sds    = getCurrentStormDisplayState();
-        StormTrackCollection stc    = sds.getTrackCollection();
+        StormDisplayState sds    = getCurrentStormDisplayState();
+        if (sds == null) {
+            return params;
+        }
+
+        StormTrackCollection stc = sds.getTrackCollection();
         if (stc == null) {
             for (int i = stormInfos.size() - 1; i >= 0; i--) {
                 StormInfo stormInfo = stormInfos.get(i);
@@ -1751,6 +1756,8 @@ public class StormTrackControl extends DisplayControlImpl {
      *
      * @throws RemoteException _more_
      * @throws VisADException _more_
+     *
+     * @throws Exception _more_
      */
     protected void writeToGE(Element docNode, Hashtable state,
                              Element parent, StormTrack track, Color color)
@@ -2154,6 +2161,7 @@ public class StormTrackControl extends DisplayControlImpl {
      * @param el _more_
      * @param animationValue _more_
      * @param animationStep _more_
+     * @param samples _more_
      *
      * @return _more_
      *
@@ -2572,5 +2580,4 @@ public class StormTrackControl extends DisplayControlImpl {
 
 
 }
-
 
