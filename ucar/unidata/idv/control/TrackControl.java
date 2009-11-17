@@ -21,10 +21,10 @@
  */
 
 
+
 package ucar.unidata.idv.control;
 
 
-import ucar.unidata.idv.flythrough.FlythroughPoint;
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.collab.SharableImpl;
 
@@ -35,6 +35,9 @@ import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.data.sounding.TrackDataSource;
 
 import ucar.unidata.idv.*;
+
+
+import ucar.unidata.idv.flythrough.FlythroughPoint;
 import ucar.unidata.ui.drawing.*;
 
 
@@ -325,8 +328,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    public boolean init(DataChoice dataChoice)
-            throws VisADException, RemoteException {
+    public boolean init(DataChoice dataChoice) throws VisADException,
+            RemoteException {
         if ( !trackDataOk()) {
             return false;
         }
@@ -405,8 +408,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    public LatLonPoint getDisplayCenter()
-            throws RemoteException, VisADException {
+    public LatLonPoint getDisplayCenter() throws RemoteException,
+            VisADException {
         FlatField flatField = getFlatField();
         if (flatField == null) {
             return null;
@@ -447,8 +450,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    protected boolean setData(DataChoice choice)
-            throws VisADException, RemoteException {
+    protected boolean setData(DataChoice choice) throws VisADException,
+            RemoteException {
         if (trackDisplay == null) {
             return true;
         }
@@ -488,29 +491,42 @@ public class TrackControl extends GridDisplayControl {
         }
         if ((ff != null) && (grid != null)) {
             updateTimeSelectRange();
-            if(useTrackTimes)
+            if (useTrackTimes) {
                 trackDisplay.setTrack(mergeGrid(grid));
-            else
+            } else {
                 trackDisplay.setTrack(grid);
+            }
             setTrackTimes();
             applyTimeRange();
         }
         return true;
     }
 
-    protected FieldImpl mergeGrid(FieldImpl fi) throws VisADException, RemoteException {
-        FunctionType fiType = (FunctionType)fi.getType();
-        int len = fi.getLength();
-        List<FlatField> datas = new ArrayList<FlatField>();
-        Set st = fi.getDomainSet();
-        Unit [] ut = fi.getDomainUnits();
-        float [][] t = st.getSamples();
-        DateTime [] times = new DateTime[1];
+    /**
+     * merge tracks into one
+     *
+     * @param fi input fieldimpl contains one or more tracks
+     *
+     * @return one track fieldimpl
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected FieldImpl mergeGrid(FieldImpl fi) throws VisADException,
+            RemoteException {
+        FunctionType    fiType = (FunctionType) fi.getType();
+        int             len    = fi.getLength();
+        List<FlatField> datas  = new ArrayList<FlatField>();
+        Set             st     = fi.getDomainSet();
+        Unit[]          ut     = fi.getDomainUnits();
+        float[][]       t      = st.getSamples();
+        DateTime[]      times  = new DateTime[1];
         times[0] = new DateTime(t[0][2], ut[0]);
-        for(int i = 0; i< len; i++)
-         datas.add ((FlatField)fi.getSample(i));
+        for (int i = 0; i < len; i++) {
+            datas.add((FlatField) fi.getSample(i));
+        }
 
-       // now merge
+        // now merge
         if (datas.isEmpty()) {
             return null;
         }
@@ -531,8 +547,9 @@ public class TrackControl extends GridDisplayControl {
             RealTupleType rtt     = DataUtility.getFlatRangeType(ff);
             double[][] domainVals =
                 new double[domainSet.getDimension()][numObs + datas.size()];
-            float[][] values = new float[rtt.getDimension()][numObs + datas.size()];
-            int       curPos = 0;
+            float[][] values =
+                new float[rtt.getDimension()][numObs + datas.size()];
+            int curPos = 0;
             for (int i = 0; i < datas.size(); i++) {
                 FlatField  data    = (FlatField) datas.get(i);
                 GriddedSet dset    = (GriddedSet) data.getDomainSet();
@@ -540,13 +557,14 @@ public class TrackControl extends GridDisplayControl {
                 int        length  = dset.getLength();
                 float[][]  vals    = data.getFloats(false);
                 for (int j = 0; j < samples.length; j++) {
-                    domainVals[j][curPos ] = samples[j][0];
-                    System.arraycopy(samples[j], 0, domainVals[j], curPos+1,
-                                     length);
+                    domainVals[j][curPos] = samples[j][0];
+                    System.arraycopy(samples[j], 0, domainVals[j],
+                                     curPos + 1, length);
                 }
                 for (int j = 0; j < vals.length; j++) {
                     values[j][curPos] = Float.NaN;
-                    System.arraycopy(vals[j], 0, values[j], curPos+1, length);
+                    System.arraycopy(vals[j], 0, values[j], curPos + 1,
+                                     length);
                 }
                 curPos += length;
             }
@@ -570,7 +588,7 @@ public class TrackControl extends GridDisplayControl {
         } catch (RemoteException re) {
             throw new VisADException("got RemoteException " + re);
         }
-       // end merge
+        // end merge
 
         FieldImpl fi0 = new FieldImpl(fiType, DateTime.makeTimeSet(times));
         fi0.setSample(0, retField, false);
@@ -620,8 +638,8 @@ public class TrackControl extends GridDisplayControl {
 
         double[] times = samples[1];
         if ( !Util.isStrictlySorted(times)) {
-            int [] indexes = Util.strictlySortedIndexes(times, true);
-            times  = Util.take(times, indexes);
+            int[] indexes = Util.strictlySortedIndexes(times, true);
+            times = Util.take(times, indexes);
 
         }
         if (getTimeDeclutterEnabled()) {
@@ -652,8 +670,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    private double[] declutterTime(double[] times)
-            throws VisADException, RemoteException {
+    private double[] declutterTime(double[] times) throws VisADException,
+            RemoteException {
         int numTimes = times.length;
         int seconds  = (int) (timeDeclutterMinutes * 60);
         if (seconds == 0) {
@@ -728,8 +746,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException On Badness
      * @throws VisADException On Badness
      */
-    protected Container doMakeContents()
-            throws VisADException, RemoteException {
+    protected Container doMakeContents() throws VisADException,
+            RemoteException {
         JComponent contents = (JComponent) super.doMakeContents();
         if (trackType.equals(CMD_RANGE)) {
             JTabbedPane jtp = new JTabbedPane();
@@ -816,8 +834,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    public void getControlWidgets(List controlWidgets)
-            throws VisADException, RemoteException {
+    public void getControlWidgets(List controlWidgets) throws VisADException,
+            RemoteException {
 
         super.getControlWidgets(controlWidgets);
 
@@ -869,17 +887,16 @@ public class TrackControl extends GridDisplayControl {
                 setUseTrackTimes(
                     ((JComboBox) e.getSource()).getSelectedIndex() == 1);
                 FieldImpl grid = getGridDataInstance().getGrid(false);
-                try{
-                    if(useTrackTimes) {
-                       // System.out.println("Use track points times\n");
+                try {
+                    if (useTrackTimes) {
+                        // System.out.println("Use track points times\n");
                         trackDisplay.setTrack(mergeGrid(grid));
-                    }
-                    else {
-                       // System.out.println("Use track nominal times\n");
+                    } else {
+                        // System.out.println("Use track nominal times\n");
                         trackDisplay.setTrack(grid);
                     }
                     setTrackTimes();
-                } catch (Exception e1){}
+                } catch (Exception e1) {}
 
             }
         });
@@ -1089,8 +1106,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException remote data error
      * @throws VisADException  VisAD error
      */
-    private Range getRangeForTimeSelect()
-            throws VisADException, RemoteException {
+    private Range getRangeForTimeSelect() throws VisADException,
+            RemoteException {
         Range            range = getRange();
         GridDataInstance gdi   = getGridDataInstance();
         if ((gdi != null) && (gdi.getNumRealTypes() > 1)) {
@@ -1506,8 +1523,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException When bad things happen
      * @throws VisADException When bad things happen
      */
-    private void setScaleOnMarker(float f)
-            throws RemoteException, VisADException {
+    private void setScaleOnMarker(float f) throws RemoteException,
+            VisADException {
         if (indicator != null) {
             indicator.setScale(f);
         }
