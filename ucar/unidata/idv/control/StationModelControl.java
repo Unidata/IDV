@@ -1089,6 +1089,10 @@ public class StationModelControl extends ObsDisplayControl {
         }
 
         setXYPlot(selectedObs);
+        if(selectedObLbl==null) {
+            return;
+        }
+
         if (selectedOb == null) {
             selectedObLbl.setText("  ");
             getChart().setEmptyChartLabel(
