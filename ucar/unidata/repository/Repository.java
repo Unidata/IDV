@@ -256,6 +256,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
 
     private int numberOfCurrentRequests = 0;
+    private Object requestMutex = new Object();
 
     /** _more_ */
     private Properties mimeTypes;
@@ -2193,11 +2194,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     public Result handleRequest(Request request) throws Exception {
-	numberOfCurrentRequests++;
+        synchronized(requestMutex) {
+            numberOfCurrentRequests++;
+        }
 	try {
 	    return handleRequestInner(request);
 	} finally {
-	    numberOfCurrentRequests--;
+            synchronized(requestMutex) {
+                numberOfCurrentRequests--;
+            }
 	}
     }
 
@@ -2206,6 +2211,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         long   t1 = System.currentTimeMillis();
         Result result;
+        if(request.isSpider()) {
+            return new Result("", new StringBuffer("no bots for now"));
+        }
+
 
         //        System.err.println("request:" + request);
         if (debug) {

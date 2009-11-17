@@ -65,7 +65,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
-
+import org.apache.log4j.config.PropertyPrinter;
 
 
 /**
@@ -227,6 +227,7 @@ public class RepositoryFtplet extends DefaultFtplet {
         return super.afterCommand(session, ftpRequest, reply);
     }
 
+    boolean didit  =false;
 
     /**
      * _more_
@@ -243,6 +244,12 @@ public class RepositoryFtplet extends DefaultFtplet {
                                       FtpRequest ftpRequest)
             throws FtpException, IOException {
         try {
+            if(!didit) {
+                didit = true;
+                PrintWriter pw = new PrintWriter(System.err);
+                PropertyPrinter pp = new PropertyPrinter(pw);
+                pp.print(pw);
+            }
             ftpManager.logInfo("command:" + ftpRequest.getCommand() + " arg:"
                                + ftpRequest.getArgument());
             Request request = getRequest(session);
