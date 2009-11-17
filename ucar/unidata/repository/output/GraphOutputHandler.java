@@ -132,7 +132,7 @@ public class GraphOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
         String graphAppletTemplate =
             getRepository().getResource(PROP_HTML_GRAPHAPPLET);
         String type = request.getString(ARG_NODETYPE, (String) null);
@@ -167,10 +167,10 @@ public class GraphOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, Group group,
+    public Result outputGroup(Request request, OutputType outputType, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        return outputEntry(request, group);
+        return outputEntry(request, outputType, group);
     }
 
 
@@ -327,6 +327,7 @@ public class GraphOutputHandler extends OutputHandler {
                                      Tables.ENTRIES.COL_RESOURCE), Clause.eq(
                                          Tables.ENTRIES.COL_ID, id), "");
 
+	    try {
             ResultSet results = stmt.getResultSet();
             if ( !results.next()) {
                 getDatabaseManager().closeAndReleaseConnection(stmt);
@@ -334,7 +335,6 @@ public class GraphOutputHandler extends OutputHandler {
             }
 	    String parentId = results.getString(4);
             sb.append(getEntryNodeXml(request, results));
-            getDatabaseManager().closeAndReleaseConnection(stmt);
             getAssociationsGraph(request, id, sb);
 
             Group group = getEntryManager().findGroup(request,
@@ -349,11 +349,15 @@ public class GraphOutputHandler extends OutputHandler {
                                       ATTR_FROM, group.getId(), ATTR_TO,
                                       results.getString(1))));
 
+	    } finally {
+		getDatabaseManager().closeAndReleaseConnection(stmt);
+	    }
             String xml = StringUtil.replace(graphXmlTemplate, "${content}",
                                             sb.toString());
 
             xml = StringUtil.replace(xml, "${root}",
                                      getRepository().getUrlBase());
+
             //            System.err.println(xml);
             return new Result(BLANK, new StringBuffer(xml),
                               getRepository().getMimeTypeFromSuffix(".xml"));

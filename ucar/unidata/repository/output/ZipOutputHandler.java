@@ -199,7 +199,7 @@ public class ZipOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
         return toZip(request, "", entries, false);
@@ -218,7 +218,7 @@ public class ZipOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, Group group,
+    public Result outputGroup(Request request, OutputType outputType, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
         OutputType output = request.getOutput();
@@ -286,9 +286,8 @@ public class ZipOutputHandler extends OutputHandler {
         Result result = new Result();
         result.setNeedToWrite(false);
 
-
 	if(recurse) {
-	    LOG.info("ZipOutputHandler: zip tree:" + request.getIp() +" -- " + request.getUserAgent());
+	    System.err.println("ZIP LOG");
 	}
 
         boolean         ok   = true;

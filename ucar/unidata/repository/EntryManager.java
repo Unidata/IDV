@@ -484,8 +484,8 @@ return new Result(title, sb);
             throws Exception {
         if (result.getShouldDecorate()) {
             //            if(entry.getDescription().indexOf("<noentryheader>")>=0) return result;
-            String output = request.getString(ARG_OUTPUT, (String) "");
-            request.put(ARG_OUTPUT, output);
+	    //            String output = request.getString(ARG_OUTPUT, (String) "");
+	    //            request.put(ARG_OUTPUT, output);
             StringBuffer sb = new StringBuffer();
             if ( !entry.isGroup() || !((Group) entry).isDummy()) {
                 String[] crumbs = getBreadCrumbs(request, entry, false);
@@ -513,24 +513,85 @@ return new Result(title, sb);
     public Result processEntryShow(Request request, Entry entry)
 	throws Exception {
         Result result = null;
-        if (entry.isGroup()) {
-            result = processGroupShow(request, (Group) entry);
-        } else {
-	    OutputHandler outputHandler = getRepository().getOutputHandler(request);
-	    if(outputHandler.getMaxConnections()>0) {
-		if(outputHandler.getNumberOfConnections()>=outputHandler.getMaxConnections()) {
-		    return new Result("Connection error", new StringBuffer("Unable to process request at this time"));
-		}
+	OutputHandler outputHandler = getRepository().getOutputHandler(request);
+	if(outputHandler.getMaxConnections()>0) {
+	    if(outputHandler.getNumberOfConnections()>=outputHandler.getMaxConnections()) {
+
+		return new Result("Connection error", new StringBuffer("Unable to process request at this time"));
 	    }
-	    outputHandler.incrNumberOfConnections();
-	    try {
-		result = outputHandler.outputEntry(request, entry);
-	    } finally {
-		outputHandler.decrNumberOfConnections();
+	}
+	outputHandler.incrNumberOfConnections();
+	OutputType  outputType = request.getOutput();
+	outputType.incrNumberOfCalls();
+	try {
+	    if (entry.isGroup()) {
+		result = processGroupShow(request, outputHandler, outputType, (Group) entry);
+	    } else {
+		result = outputHandler.outputEntry(request,  outputType, entry);
 	    }
-        }
+	} finally {
+	    outputHandler.decrNumberOfConnections();
+	}
+
         return result;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Result processGroupShow(Request request, OutputHandler outputHandler, OutputType  outputType, Group group)
+            throws Exception {
+        boolean doLatest = request.get(ARG_LATEST, false);
+
+        TypeHandler  typeHandler = getRepository().getTypeHandler(request);
+        List<Clause> where       = typeHandler.assembleWhereClause(request);
+        List<Entry>  entries     = new ArrayList<Entry>();
+        List<Group>  subGroups   = new ArrayList<Group>();
+        try {
+            List<String> ids = getChildIds(request, group, where);
+            for (String id : ids) {
+                Entry entry = getEntry(request, id);
+                if (entry == null) {
+                    continue;
+                }
+                if (entry.isGroup()) {
+                    subGroups.add((Group) entry);
+                } else {
+                    entries.add(entry);
+                }
+            }
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            request.put(ARG_MESSAGE,
+                        getRepository().translate(request,
+                            "Error finding children") + ":"
+                                + exc.getMessage());
+        }
+
+        if (doLatest) {
+            if (entries.size() > 0) {
+                entries = sortEntriesOnDate(entries, true);
+                return outputHandler.outputEntry(request, outputType, entries.get(0));
+            }
+        }
+
+        group.setSubEntries(entries);
+        group.setSubGroups(subGroups);
+
+        Result result = outputHandler.outputGroup(request, outputType, group, subGroups,
+                            entries);
+
+        return result;
+    }
+
 
 
 
@@ -2211,7 +2272,8 @@ return new Result(title, sb);
         entries = getAccessManager().filterEntries(request, entries);
 
         return getRepository().getOutputHandler(request).outputGroup(request,
-                getDummyGroup(), new ArrayList<Group>(), entries);
+								     request.getOutput(),
+								     getDummyGroup(), new ArrayList<Group>(), entries);
 
     }
 
@@ -3715,7 +3777,7 @@ return new Result(title, sb);
             getRepository().getOutputHandler(request);
         if ( !entry.isTopGroup()) {
             links.addAll(outputHandler.getNextPrevLinks(request, entry,
-                    request.getOutput()));
+							request.getOutput()));
         }
         return links;
     }
@@ -4236,7 +4298,7 @@ return new Result(title, sb);
      * _more_
      *
      * @param request _more_
-     *
+    *
      * @return _more_
      *
      * @throws Exception _more_
@@ -5198,65 +5260,6 @@ return new Result(title, sb);
     }
 
 
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processGroupShow(Request request, Group group)
-            throws Exception {
-        boolean doLatest = request.get(ARG_LATEST, false);
-
-        OutputHandler outputHandler =
-            getRepository().getOutputHandler(request);
-        TypeHandler  typeHandler = getRepository().getTypeHandler(request);
-        List<Clause> where       = typeHandler.assembleWhereClause(request);
-
-        List<Entry>  entries     = new ArrayList<Entry>();
-        List<Group>  subGroups   = new ArrayList<Group>();
-        try {
-            List<String> ids = getChildIds(request, group, where);
-            for (String id : ids) {
-                Entry entry = getEntry(request, id);
-                if (entry == null) {
-                    continue;
-                }
-                if (entry.isGroup()) {
-                    subGroups.add((Group) entry);
-                } else {
-                    entries.add(entry);
-                }
-            }
-        } catch (Exception exc) {
-            exc.printStackTrace();
-            request.put(ARG_MESSAGE,
-                        getRepository().translate(request,
-                            "Error finding children") + ":"
-                                + exc.getMessage());
-        }
-
-        if (doLatest) {
-            if (entries.size() > 0) {
-                entries = sortEntriesOnDate(entries, true);
-                return outputHandler.outputEntry(request, entries.get(0));
-            }
-        }
-
-
-        group.setSubEntries(entries);
-        group.setSubGroups(subGroups);
-
-        Result result = outputHandler.outputGroup(request, group, subGroups,
-                            entries);
-
-        return result;
-    }
 
 
 

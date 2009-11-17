@@ -527,7 +527,7 @@ public class IdvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(final Request request, Entry entry)
+    public Result outputEntry(Request request, OutputType outputType, Entry entry)
 	throws Exception {
 
         OutputType output = request.getOutput();
@@ -537,7 +537,7 @@ public class IdvOutputHandler extends OutputHandler {
         if (output.equals(OUTPUT_IDV_POINT)) {
             return outputPoint(request, entry);
         }
-        return super.outputEntry(request, entry);
+        return super.outputEntry(request, outputType, entry);
     }
 
 
@@ -1824,7 +1824,7 @@ public class IdvOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result xxxoutputGroup(Request request, Group group,
+    public Result xxxoutputGroup(Request request, OutputType outputType, Group group,
                                  List<Group> subGroups, List<Entry> entries)
 	throws Exception {
 

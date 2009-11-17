@@ -134,6 +134,9 @@ public class OutputType {
     /** _more_ */
     private int type = TYPE_HTML;
 
+    private int numberOfCalls = 0;
+
+
     /**
      * _more_
      *
@@ -416,6 +419,16 @@ public class OutputType {
     public boolean getIsView() {
         return isType(TYPE_VIEW);
     }
+
+    public int getNumberOfCalls() {
+	return numberOfCalls;
+    }
+
+    public void incrNumberOfCalls() {
+	numberOfCalls++;
+    }
+
+
 
 
 }

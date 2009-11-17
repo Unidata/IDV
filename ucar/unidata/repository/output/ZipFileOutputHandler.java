@@ -146,7 +146,7 @@ public class ZipFileOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
         if ( !getRepository().getAccessManager().canAccessFile(request,
                 entry)) {
             throw new AccessException("Cannot access data", request);

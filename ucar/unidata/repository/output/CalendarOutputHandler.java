@@ -144,15 +144,14 @@ public class CalendarOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, Group group,
+    public Result outputGroup(Request request, OutputType outputType, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        OutputType   output = request.getOutput();
         StringBuffer sb     = new StringBuffer();
         showNext(request, subGroups, entries, sb);
         entries.addAll(subGroups);
         Result result;
-        if (output.equals(OUTPUT_GRID)) {
+        if (outputType.equals(OUTPUT_GRID)) {
             result = outputDateGrid(request, group, entries, sb);
         } else {
             result = outputCalendar(request, group, entries, sb);

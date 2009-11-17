@@ -29,6 +29,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.type.*;
+import ucar.unidata.repository.util.Log4jPrintWriter;
 
 
 
@@ -87,6 +88,9 @@ import javax.sql.DataSource;
 
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *
@@ -94,8 +98,10 @@ import javax.sql.DataSource;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class DatabaseManager extends RepositoryManager implements SqlUtil
-    .ConnectionManager {
+public class DatabaseManager extends RepositoryManager implements SqlUtil.ConnectionManager {
+
+    private final Logger LOG = LoggerFactory.getLogger(DatabaseManager.class);
+
 
     /** _more_ */
     private static final int TIMEOUT = 5000;
@@ -225,7 +231,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         SqlUtil.setConnectionManager(this);
         dataSource = doMakeDataSource();
 
-        //ds.setLogWriter(new PrintWriter(getLogManager().getLogOutputStream()));
+
         if (db.equals(DB_MYSQL)) {
             Statement statement = getConnection().createStatement();
             statement.execute("set time_zone = '+0:00'");
@@ -287,6 +293,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
         BasicDataSource ds = new BasicDataSource();
 
+
         ds.setMaxActive(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE,
                 100));
         ds.setMaxIdle(getRepository().getProperty(PROP_DB_POOL_MAXIDLE, 100));
@@ -308,7 +315,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         ds.setUrl(connectionURL);
 
 
-
+        ds.setLogWriter(new Log4jPrintWriter(LOG));
 
         return ds;
     }
@@ -1652,6 +1659,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             }
         }
     }
+
+
+
 
 
 }

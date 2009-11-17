@@ -193,7 +193,7 @@ public class RssOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, Group group,
+    public Result outputGroup(Request request, OutputType outputType, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
         entries.addAll(subGroups);
@@ -214,9 +214,6 @@ public class RssOutputHandler extends OutputHandler {
      */
     public Result outputEntries(Request request, List<Entry> entries)
             throws Exception {
-
-
-
 
         StringBuffer sb = new StringBuffer();
         sb.append(XmlUtil.XML_HEADER + "\n");

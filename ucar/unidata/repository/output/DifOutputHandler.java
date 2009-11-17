@@ -126,10 +126,10 @@ public class DifOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, Group group,
+    public Result outputGroup(Request request, OutputType outputType, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        return outputEntry(request, group);
+        return outputEntry(request, outputType, group);
     }
 
 
@@ -161,7 +161,7 @@ public class DifOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
         Document doc = XmlUtil.makeDocument();
         Element root = XmlUtil.create(doc, DifUtil.TAG_DIF, null,
                                       new String[] {
@@ -212,7 +212,7 @@ public class DifOutputHandler extends OutputHandler {
 
 
         StringBuffer sb = new StringBuffer();
-        if (request.getOutput().equals(OUTPUT_DIF_TEXT)) {
+        if (outputType.equals(OUTPUT_DIF_TEXT)) {
             XmlUtil.toHtml(sb, root);
             return new Result("DIF-Text", sb);
         } else {

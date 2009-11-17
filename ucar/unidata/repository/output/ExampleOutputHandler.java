@@ -145,12 +145,11 @@ public class ExampleOutputHandler extends OutputHandler {
      *
      * @throws Exception On badness
      */
-    public Result outputGroup(Request request, Group group,
+    public Result outputGroup(Request request, OutputType outputType, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
 
         //Here output should be example1
-        OutputType output = request.getOutput();
 
         //The stringbuffer holds the content we are creating
         StringBuffer sb = new StringBuffer();
@@ -203,11 +202,10 @@ public class ExampleOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, Entry entry) throws Exception {
-        OutputType output = request.getOutput();
+    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
 
         //Check if we are doing example3
-        if (output.equals(OUTPUT_EXAMPLE3)) {
+        if (outputType.equals(OUTPUT_EXAMPLE3)) {
             return outputExample3(request, entry);
         }
 

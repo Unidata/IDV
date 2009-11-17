@@ -150,7 +150,7 @@ public class IdvWebstartOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
         String jnlp = getRepository().getResource(
                           "/ucar/unidata/repository/idv/template.jnlp");
 

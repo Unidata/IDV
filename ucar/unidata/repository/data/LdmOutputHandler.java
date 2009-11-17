@@ -159,7 +159,7 @@ public class LdmOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
         return handleEntries(request, entry,
                              (List<Entry>) Misc.newList(entry));
     }
@@ -176,7 +176,7 @@ public class LdmOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, Group group,
+    public Result outputGroup(Request request, OutputType outputType, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
         return handleEntries(request, group, entries);

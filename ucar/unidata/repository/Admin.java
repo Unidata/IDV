@@ -1640,15 +1640,54 @@ public class Admin extends RepositoryManager {
         statusSB.append(HtmlUtil.formTableClose());
 
 
+	StringBuffer outputSB = new StringBuffer();
+        outputSB.append(HtmlUtil.formTable());
+        List<OutputHandler> outputHandlers =
+            getRepository().getOutputHandlers();
+
+        for (OutputHandler outputHandler : outputHandlers) {
+	    outputHandler.getSystemStats(outputSB);
+	}
+        outputSB.append(HtmlUtil.formTableClose());
+
+
+	StringBuffer apiSB = new StringBuffer();
+	List<Object[]> tuples = new ArrayList<Object[]>();
+        apiSB.append(HtmlUtil.formTable());
+	for(ApiMethod apiMethod: getRepository().getApiMethods()) {
+	    if(apiMethod.getNumberOfCalls()<1) continue;
+	    tuples.add(new Object[]{new Integer(apiMethod.getNumberOfCalls()),
+				    apiMethod});
+
+	}
+	tuples = (List<Object[]>)Misc.sortTuples(tuples, false);
+	for(Object[]tuple: tuples) {
+	    ApiMethod apiMethod = (ApiMethod) tuple[1];
+	    apiSB.append(
+			 HtmlUtil.formEntry(apiMethod.getName(),
+					    "#" +msgLabel("calls")+
+					    apiMethod.getNumberOfCalls()));
+	}
+
+
+        apiSB.append(HtmlUtil.formTableClose());
 
 
         StringBuffer dbSB = new StringBuffer();
 
         getDatabaseManager().addStatistics(request, dbSB);
 
+
         StringBuffer sb = new StringBuffer();
         sb.append(HtmlUtil.makeShowHideBlock(msg("System Status"),
                                              statusSB.toString(), true));
+
+        sb.append(HtmlUtil.makeShowHideBlock(msg("API"),
+                                             apiSB.toString(), false));
+
+        sb.append(HtmlUtil.makeShowHideBlock(msg("Output Handlers"),
+                                             outputSB.toString(), false));
+
         sb.append(HtmlUtil.makeShowHideBlock(msg("Repository State"),
                                              stateSB.toString(), false));
         sb.append(HtmlUtil.makeShowHideBlock(msg("Database Statistics"),

@@ -595,7 +595,7 @@ public class SearchManager extends RepositoryManager {
 
             Result result = getRepository().getOutputHandler(
                                 request).outputGroup(
-                                request, tmpGroup, groups, entries);
+						     request, request.getOutput(),tmpGroup, groups, entries);
             return result;
 
         }
@@ -634,6 +634,7 @@ public class SearchManager extends RepositoryManager {
         }
         Result result =
             getRepository().getOutputHandler(request).outputGroup(request,
+								  request.getOutput(),
                                              theGroup, groups, entries);
         return getEntryManager().addEntryHeader(request, theGroup, result);
     }

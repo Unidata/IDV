@@ -412,7 +412,8 @@ public class DataOutputHandler extends OutputHandler {
 
 
     public void getSystemStats(StringBuffer sb) {
-	sb.append(HtmlUtil.formEntry(msgLabel("Data Cache Size"),
+	super.getSystemStats(sb);
+	sb.append(HtmlUtil.formEntryTop(msgLabel("Data Cache Size"),
 				     msgLabel("NC File Pool") + ncFilePool.getSize() +HtmlUtil.br() +
 				     msgLabel("Grid Pool") + gridPool.getSize() +HtmlUtil.br() +
 				     msgLabel("Point Pool") + pointPool.getSize() +HtmlUtil.br() +
@@ -1909,7 +1910,7 @@ public class DataOutputHandler extends OutputHandler {
      *
      * @throws Exception On badness
      */
-    public Result outputEntry(final Request request, Entry entry)
+    public Result outputEntry(Request request, OutputType outputType, Entry entry)
             throws Exception {
 
         if ( !getRepository().getAccessManager().canDoAction(request, entry,
@@ -1924,37 +1925,37 @@ public class DataOutputHandler extends OutputHandler {
 
 
 
-        OutputType output = request.getOutput();
-        if (output.equals(OUTPUT_CDL)) {
+
+        if (outputType.equals(OUTPUT_CDL)) {
             return outputCdl(request, entry);
         }
-        if (output.equals(OUTPUT_WCS)) {
+        if (outputType.equals(OUTPUT_WCS)) {
             return outputWcs(request, entry);
         }
-        if (output.equals(OUTPUT_GRIDSUBSET)
-                || output.equals(OUTPUT_GRIDSUBSET_FORM)) {
+        if (outputType.equals(OUTPUT_GRIDSUBSET)
+                || outputType.equals(OUTPUT_GRIDSUBSET_FORM)) {
             return outputGridSubset(request, entry);
         }
 
 
-        if (output.equals(OUTPUT_TRAJECTORY_MAP)) {
+        if (outputType.equals(OUTPUT_TRAJECTORY_MAP)) {
             return outputTrajectoryMap(request, entry);
         }
 
 
-        if (output.equals(OUTPUT_POINT_MAP)) {
+        if (outputType.equals(OUTPUT_POINT_MAP)) {
             return outputPointMap(request, entry);
         }
-        if (output.equals(OUTPUT_POINT_CSV)) {
+        if (outputType.equals(OUTPUT_POINT_CSV)) {
             return outputPointCsv(request, entry);
         }
 
-        if (output.equals(OUTPUT_POINT_KML)) {
+        if (outputType.equals(OUTPUT_POINT_KML)) {
             return outputPointKml(request, entry);
         }
 
 
-        if (output.equals(OUTPUT_OPENDAP)) {
+        if (outputType.equals(OUTPUT_OPENDAP)) {
             //If its a head request then just return the content description
             if (request.isHeadRequest()) {
                 Result result = new Result("", new StringBuffer());
@@ -1966,7 +1967,7 @@ public class DataOutputHandler extends OutputHandler {
             return result;
         }
 
-        throw new IllegalArgumentException("Unknown output type:" + output);
+        throw new IllegalArgumentException("Unknown output type:" + outputType);
     }
 
 

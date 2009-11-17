@@ -133,7 +133,7 @@ public class KmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, Group group,
+    public Result outputGroup(Request request, OutputType outputType, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
         boolean justOneEntry = group.isDummy() && (entries.size() == 1)

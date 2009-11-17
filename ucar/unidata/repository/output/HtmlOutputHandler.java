@@ -126,7 +126,7 @@ public class HtmlOutputHandler extends OutputHandler {
     public HtmlOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
-        addType(OUTPUT_HTML);
+	addType(OUTPUT_HTML);
         addType(OUTPUT_TIMELINE);
         addType(OUTPUT_GRAPH);
         addType(OUTPUT_GROUPXML);
@@ -239,15 +239,14 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, Entry entry) throws Exception {
-        OutputType output = request.getOutput();
-        if (output.equals(OUTPUT_METADATAXML)) {
+    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
+        if (outputType.equals(OUTPUT_METADATAXML)) {
             return getMetadataXml(request, entry);
         }
-        if (output.equals(OUTPUT_LINKSXML)) {
+        if (outputType.equals(OUTPUT_LINKSXML)) {
             return getLinksXml(request, entry);
         }
-        if (output.equals(OUTPUT_GROUPXML)) {
+        if (outputType.equals(OUTPUT_GROUPXML)) {
             return getActionXml(request, entry);
         }
 
@@ -305,129 +304,6 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
 
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param typeHandlers _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result listTypes(Request request, List<TypeHandler> typeHandlers)
-            throws Exception {
-        StringBuffer sb     = new StringBuffer();
-        OutputType   output = request.getOutput();
-        if (output.equals(OUTPUT_HTML)) {
-            //            appendListHeader(request, output, WHAT_TYPE, sb);
-            sb.append("<ul>");
-        }
-
-        for (TypeHandler theTypeHandler : typeHandlers) {
-            if (output.equals(OUTPUT_HTML)) {
-                sb.append("<li>");
-                /*
-                sb.append(
-                    HtmlUtil.href(
-                        request.url(
-                            getRepository().URL_SEARCH_FORM, ARG_TYPE,
-                            theTypeHandler.getType()), HtmlUtil.img(
-                                getRepository().iconUrl(ICON_SEARCH),
-                                msg("Search in Group"))));
-                                sb.append(" ");*/
-                sb.append(HtmlUtil
-                    .href(request
-                        .url(getRepository().URL_LIST_HOME, ARG_TYPE,
-                             theTypeHandler.getType()), theTypeHandler
-                                 .getType()));
-            }
-
-        }
-        if (output.equals(OUTPUT_HTML)) {
-            sb.append("</ul>");
-        }
-        return new Result("", sb, getMimeType(output));
-    }
-
-
-
-
-    /*
-      public Result listTags(Request request, List<Tag> tags)
-            throws Exception {
-        StringBuffer sb     = new StringBuffer();
-        OutputType      output = request.getOutput();
-        if (output.equals(OUTPUT_HTML) || output.equals(OUTPUT_CLOUD)) {
-            appendListHeader(request, output, WHAT_TAG, sb);
-            sb.append("<ul>");
-        }
-        request.remove(ARG_OUTPUT);
-        int max = -1;
-        int min = -1;
-
-        for (Tag tag : tags) {
-            if ((max < 0) || (tag.getCount() > max)) {
-                max = tag.getCount();
-            }
-            if ((min < 0) || (tag.getCount() < min)) {
-                min = tag.getCount();
-            }
-        }
-
-        int    diff         = max - min;
-        double distribution = diff / 5.0;
-
-        for (Tag tag : tags) {
-            if (output.equals(OUTPUT_HTML)) {
-                sb.append("<li> ");
-                sb.append(getRepository().getTagLinks(request, tag.getName()));
-                sb.append(" ");
-                sb.append(tag.getName());
-                sb.append(" (" + tag.getCount() + ")");
-
-            } else if (output.equals(OUTPUT_CLOUD)) {
-                double percent = tag.getCount() / distribution;
-                int    bin     = (int) (percent * 5);
-                String css     = "font-size:" + (12 + bin * 2);
-                sb.append("<span style=\"" + css + "\">");
-                String extra = XmlUtil.attrs("alt",
-                                             "Count:" + tag.getCount(),
-                                             "title",
-                                             "Count:" + tag.getCount());
-                sb.append(
-                    HtmlUtil.href(
-                        request.url(
-                            getRepository().URL_GRAPH_VIEW, ARG_ENTRYID, tag.getName(),
-                            ARG_NODETYPE, TYPE_TAG), tag.getName(), extra));
-                sb.append("</span>");
-                sb.append(" &nbsp; ");
-
-            }
-        }
-
-        String pageTitle = "";
-        if (output.equals(OUTPUT_HTML)) {
-            if (tags.size() == 0) {
-                sb.append("No tags found");
-            }
-            pageTitle = "Tags";
-            sb.append("</ul>");
-        } else if (output.equals(OUTPUT_CLOUD)) {
-            if (tags.size() == 0) {
-                sb.append("No tags found");
-            }
-            pageTitle = "Tag Cloud";
-        }
-        Result result = new Result(pageTitle, sb, getMimeType(output));
-        //        StringBuffer  tsb = new StringBuffer();
-        //        appendListHeader(request, output, WHAT_TAG, tsb);
-        //        result.putProperty(PROP_NAVSUBLINKS,
-        return result;
-    }
-
-    */
 
 
 
@@ -872,28 +748,27 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, Group group,
+    public Result outputGroup(Request request, OutputType outputType, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
 
-        OutputType output = request.getOutput();
-        if (output.equals(OUTPUT_GROUPXML)) {
+        if (outputType.equals(OUTPUT_GROUPXML)) {
             return getChildrenXml(request, group, subGroups, entries);
         }
 
-        if (output.equals(OUTPUT_SELECTXML)) {
+        if (outputType.equals(OUTPUT_SELECTXML)) {
             return getSelectXml(request, subGroups, entries);
         }
 
-        if (output.equals(OUTPUT_METADATAXML)) {
+        if (outputType.equals(OUTPUT_METADATAXML)) {
             return getMetadataXml(request, group);
         }
 
-        if (output.equals(OUTPUT_LINKSXML)) {
+        if (outputType.equals(OUTPUT_LINKSXML)) {
             return getLinksXml(request, group);
         }
 
-        boolean      showApplet = output.equals(OUTPUT_TIMELINE);
+        boolean      showApplet = outputType.equals(OUTPUT_TIMELINE);
 
         StringBuffer sb         = new StringBuffer();
         request.appendMessage(sb);

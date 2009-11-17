@@ -1273,7 +1273,12 @@ public class Request implements Constants {
      * @return _more_
      */
     public OutputType getOutput(String dflt) {
-        return new OutputType(getString(ARG_OUTPUT, dflt),
+	String typeId = getString(ARG_OUTPUT, dflt);
+	OutputType outputType = repository.findOutputType(typeId);
+	if(outputType!=null) {
+	    return outputType;
+	}
+        return new OutputType(typeId,
                               OutputType.TYPE_NONHTML);
     }
 

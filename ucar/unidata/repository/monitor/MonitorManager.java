@@ -169,7 +169,8 @@ public class MonitorManager extends RepositoryManager {
                               getRepository().getMimeTypeFromSuffix(".html"));
         }
         return getRepository().getOutputHandler(request).outputEntry(request,
-                entry);
+								     request.getOutput(),
+								     entry);
     }
 
 

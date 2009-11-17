@@ -162,18 +162,13 @@ public class TextOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
         if ( !getRepository().getAccessManager().canAccessFile(request,
                 entry)) {
             throw new AccessException("Cannot access data", request);
         }
 
-
-
-
-
-        Object output = request.getOutput();
-        if (output.equals(OUTPUT_WORDCLOUD)) {
+        if (outputType.equals(OUTPUT_WORDCLOUD)) {
             return outputWordCloud(request, entry);
         }
 

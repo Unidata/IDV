@@ -310,6 +310,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
     private List<OutputHandler> outputHandlers =
         new ArrayList<OutputHandler>();
 
+    private Hashtable<String, OutputType> outputTypeMap = new Hashtable<String,OutputType>();
+
     /** _more_ */
     private List<Class> entryMonitorClasses = new ArrayList<Class>();
 
@@ -688,14 +690,15 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     protected void init(Properties properties) throws Exception {
 
+
 	/*
         final PrintStream oldErr = System.err;
         final PrintStream oldOut = System.out;
         System.setErr(new PrintStream(oldOut){
                 public void     println(String x) {
-		    //                    if(x.indexOf("Fatal")>=0) {
+		    if(x.indexOf("Got")>=0) {
                         Misc.printStack("got it");
-			//                    }
+		    }
                     oldErr.println(x);
                 }
             });
@@ -1869,6 +1872,17 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+
+    public void addOutputType(OutputType type) {
+	outputTypeMap.put(type.getId(), type);
+    }
+
+    public OutputType findOutputType(String id) {
+	if(id == null || id.length()==0) return OutputHandler.OUTPUT_HTML;
+	return 	outputTypeMap.get(id);
+    }
+
+
     /**
      * _more_
      *
@@ -2038,7 +2052,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
             }
 
 
-            public Result outputGroup(Request request, Group group,
+            public Result outputGroup(Request request, OutputType outputType, Group group,
                                       List<Group> subGroups,
                                       List<Entry> entries)
                     throws Exception {
@@ -2096,7 +2110,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 links.add(makeLink(request, state.getEntry(), OUTPUT_COPY));
             }
 
-            public Result outputEntry(Request request, Entry entry)
+            public Result outputEntry(Request request, OutputType outputType, Entry entry)
                     throws Exception {
                 if (request.getUser().getAnonymous()) {
                     return new Result("", "");
@@ -2105,7 +2119,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                         entry.getId()));
             }
 
-            public Result outputGroup(Request request, Group group,
+            public Result outputGroup(Request request, OutputType outputType, Group group,
                                       List<Group> subGroups,
                                       List<Entry> entries)
                     throws Exception {
@@ -2113,7 +2127,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     return new Result("", "");
                 }
                 if ( !group.isDummy()) {
-                    return outputEntry(request, group);
+                    return outputEntry(request, outputType, group);
                 }
                 StringBuffer idBuffer = new StringBuffer();
                 entries.addAll(subGroups);
@@ -2425,11 +2439,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (sslRedirect != null) {
             return sslRedirect;
         }
-
-
         //        System.out.println(absoluteUrl(request.getUrl()));
 
         request.setApiMethod(apiMethod);
+	apiMethod.incrNumberOfCalls();
 
         String userAgent = request.getHeaderArg("User-Agent");
         if (userAgent == null) {

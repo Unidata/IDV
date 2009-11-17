@@ -68,6 +68,9 @@ import java.util.regex.*;
 
 import java.util.zip.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *
@@ -77,6 +80,7 @@ import java.util.zip.*;
  */
 public class ChatOutputHandler extends OutputHandler {
 
+    private final Logger LOG = LoggerFactory.getLogger(ChatOutputHandler.class);
 
 
     /** _more_ */
@@ -174,6 +178,16 @@ public class ChatOutputHandler extends OutputHandler {
         public boolean isValid() {
             return session != null;
         }
+
+
+	public void logError(String message) {
+	    LOG.error(message);        
+	}
+
+	public void logMessage(String message) {
+	    LOG.info(message);        
+	}
+
 
         /**
          * _more_
@@ -278,8 +292,8 @@ public class ChatOutputHandler extends OutputHandler {
                 handleMessage(type, node, s);
             } catch (Exception exc) {
                 try {
+		    LOG.error("Error handling chat message", exc);
                     writeError("An error has occurred:" + exc);
-                    exc.printStackTrace();
                 } catch (Exception ignore) {}
             }
         }
@@ -495,9 +509,7 @@ public class ChatOutputHandler extends OutputHandler {
                 Misc.run(connection);
             }
         } catch (Exception exc) {
-            System.err.println("Error:" + exc);
-            System.err.println("Port:" + getChatPort());
-            exc.printStackTrace();
+	    LOG.error("Chat handling socket on port:" +getChatPort(),exc);
         }
     }
 
@@ -547,10 +559,10 @@ public class ChatOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, Group group,
+    public Result outputGroup(Request request, OutputType outputType, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
-        return outputEntry(request, group);
+        return outputEntry(request, outputType, group);
     }
 
     /**
@@ -563,10 +575,9 @@ public class ChatOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType outputType, Entry entry) throws Exception {
         String chatAppletTemplate =
             getRepository().getResource(PROP_HTML_CHATAPPLET);
-        OutputType output = request.getOutput();
 
         String     params = "";
         chatAppletTemplate = chatAppletTemplate.replace("${root}",

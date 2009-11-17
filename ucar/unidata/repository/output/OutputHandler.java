@@ -99,10 +99,14 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /** _more_ */
     private List<OutputType> types = new ArrayList<OutputType>();
 
+    private Hashtable<String, OutputType> typeMap = new Hashtable<String,OutputType>();
+
 
     private int maxConnections = -1;
 
     private int numberOfConnections = 0;
+
+    private int totalCalls = 0;
 
     /**
      * _more_
@@ -127,11 +131,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      * @return _more_
      */
     public OutputType findOutputType(String id) {
-        int idx = types.indexOf(new OutputType(id, OutputType.TYPE_HTML));
-        if (idx >= 0) {
-            return types.get(idx);
-        }
-        return null;
+	return 	typeMap.get(id);
     }
 
 
@@ -183,6 +183,8 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     public void addType(OutputType type) {
         type.setGroupName(name);
         types.add(type);
+	typeMap.put(type.getId(), type);
+	repository.addOutputType(type);
     }
 
     /**
@@ -333,6 +335,18 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     }
 
     public void getSystemStats(StringBuffer sb) {
+	if(totalCalls>0) {
+	    StringBuffer stats = new StringBuffer();
+	    for(OutputType outputType: types) {
+		if(outputType.getNumberOfCalls()>0) {
+		    stats.append(outputType.getLabel()+ " #" + msgLabel("calls")+outputType.getNumberOfCalls()+HtmlUtil.br());
+		}
+	    }
+
+	    sb.append(HtmlUtil.formEntryTop(msgLabel(name),
+					    stats.toString()));
+
+	}
     }
 
 
@@ -604,6 +618,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
     }
 
+
     /**
      * _more_
      *
@@ -626,10 +641,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, Entry entry) throws Exception {
+    public Result outputEntry(Request request, OutputType  outputType, Entry entry) throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
-        return outputGroup(request, getEntryManager().getDummyGroup(),
+        return outputGroup(request, outputType, getEntryManager().getDummyGroup(),
                            new ArrayList<Group>(), entries);
     }
 
@@ -646,13 +661,24 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public Result outputGroup(Request request, Group group,
+    public Result outputGroup(Request request, OutputType  outputType, Group group,
                               List<Group> subGroups, List<Entry> entries)
             throws Exception {
         return notImplemented("outputGroup");
     }
 
 
+
+    public final Result xoutputGroup(Request request,  Group group,
+                              List<Group> subGroups, List<Entry> entries)
+            throws Exception {
+	return null;
+    }
+
+
+    public final Result xoutputEntry(Request request, Entry entry) throws Exception {
+	return null;
+    }
 
 
     /**
@@ -2477,6 +2503,7 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
 
     public void incrNumberOfConnections() {
 	numberOfConnections++;
+	totalCalls++;
     }
 
 

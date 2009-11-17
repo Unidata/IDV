@@ -119,7 +119,6 @@ public class ApiMethod {
     /** _more_ */
     private RequestUrl url;
 
-
     /** _more_ */
     private boolean needsSsl = false;
 
@@ -131,6 +130,9 @@ public class ApiMethod {
 
     /** _more_ */
     private boolean handlesHead = false;
+
+    private int numberOfCalls=0;
+
 
     /**
      * _more_
@@ -428,6 +430,14 @@ public class ApiMethod {
      */
     public String getAuthMethod() {
         return this.authMethod;
+    }
+
+    public int getNumberOfCalls() {
+	return numberOfCalls;
+    }
+
+    public void incrNumberOfCalls() {
+	numberOfCalls++;
     }
 
 
