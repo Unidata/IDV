@@ -186,6 +186,11 @@ public class Pool<KeyType, ValueType> {
     }
 
 
+    public synchronized int getSize() {
+	    return cache.size();
+    }
+
+
     /**
      * _more_
      *

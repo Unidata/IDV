@@ -581,12 +581,8 @@ public class IOUtil {
             int result = writeTo(is, fos, loadId, length);
             numBytes = result;
         } finally {
-            try {
-                fos.close();
-            } catch (Exception exc) {}
-            try {
-                is.close();
-            } catch (Exception exc) {}
+	    close(fos);
+	    close(is);
             if (numBytes <= 0) {
                 try {
                     file.delete();
@@ -1036,12 +1032,16 @@ public class IOUtil {
     public static void copyFile(InputStream fis, File to)
             throws FileNotFoundException, IOException {
         FileOutputStream fos = new FileOutputStream(to);
-        writeTo(fis, fos);
-
-        fos.close();
-        try {
-            fis.close();
-        } catch (Exception exc) {}
+	try {
+	    writeTo(fis, fos);
+	} finally {
+	    try {
+		fos.close();
+	    } catch (Exception exc) {}
+	    try {
+		fis.close();
+	    } catch (Exception exc) {}
+	}
     }
 
 
@@ -1731,6 +1731,23 @@ public class IOUtil {
         return readBytes(is, loadId, true);
     }
 
+
+    public static void close(InputStream inputStream) {
+	if(inputStream==null) return;
+	try {
+	    inputStream.close();
+	} catch(Exception ignore) {}
+    }
+
+
+
+    public static void close(OutputStream outputStream) {
+	if(outputStream==null) return;
+	try {
+	    outputStream.close();
+	} catch(Exception ignore) {}
+    }
+
     /**
      * Read the bytes in the given input stream.
      *
@@ -1744,42 +1761,42 @@ public class IOUtil {
      */
     public static byte[] readBytes(InputStream is, Object loadId,
                                    boolean closeIt)
-            throws IOException {
+	throws IOException {
         int    totalRead = 0;
         byte[] content   = getByteBuffer();
-        while (true) {
-            int howMany = is.read(content, totalRead,
-                                  content.length - totalRead);
-            //      Trace.msg("IOUtil.readBytes:" + howMany + " buff.length=" + content.length);
-            if ((loadId != null)
+	try {
+	    while (true) {
+		int howMany = is.read(content, totalRead,
+				      content.length - totalRead);
+		//      Trace.msg("IOUtil.readBytes:" + howMany + " buff.length=" + content.length);
+		if ((loadId != null)
                     && !JobManager.getManager().canContinue(loadId)) {
-                try {
-                    if (closeIt) {
-                        is.close();
-                    }
-                } catch (Exception exc) {}
-                //                System.err.println ("Ditching");                
-                return null;
-            }
-            if (howMany < 0) {
-                break;
-            }
-            if (howMany == 0) {
-                continue;
-            }
-            totalRead += howMany;
-            if (totalRead >= content.length) {
-                byte[] tmp       = content;
-                int    newLength = ((content.length < 25000000)
-                                    ? content.length * 2
-                                    : content.length + 5000000);
-                content = new byte[newLength];
-                System.arraycopy(tmp, 0, content, 0, totalRead);
-            }
-        }
-        if (closeIt) {
-            is.close();
-        }
+		    //                System.err.println ("Ditching");                
+		    return null;
+		}
+		if (howMany < 0) {
+		    break;
+		}
+		if (howMany == 0) {
+		    continue;
+		}
+		totalRead += howMany;
+		if (totalRead >= content.length) {
+		    byte[] tmp       = content;
+		    int    newLength = ((content.length < 25000000)
+					? content.length * 2
+					: content.length + 5000000);
+		    content = new byte[newLength];
+		    System.arraycopy(tmp, 0, content, 0, totalRead);
+		}
+	    }
+	} finally {
+	    try {
+		if (closeIt) {
+		    is.close();
+		}
+	    } catch (Exception exc) {}
+	}
         byte[] results = new byte[totalRead];
         System.arraycopy(content, 0, results, 0, totalRead);
         putByteBuffer(content);
