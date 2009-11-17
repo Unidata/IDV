@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.data.grid;
 
 
@@ -49,22 +50,22 @@ import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Parameter;
+import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
 
 import ucar.visad.ProjectionCoordinateSystem;
 
 import ucar.visad.Util;
-
-import visad.data.CachedFlatField;
 import ucar.visad.quantities.AirPressure;
 import ucar.visad.quantities.CommonUnits;
 
 import visad.*;
-import visad.data.DataRange;
-import ucar.unidata.util.Range;
 
 import visad.bom.Radar2DCoordinateSystem;
 import visad.bom.Radar3DCoordinateSystem;
+
+import visad.data.CachedFlatField;
+import visad.data.DataRange;
 
 import visad.data.mcidas.AREACoordinateSystem
 ;
@@ -772,8 +773,8 @@ public class GridUtil {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public static Real sampleToReal(FieldImpl grid, EarthLocation el,
-                                    Real animationValue, int samplingMode)
+    public static RealTuple sampleToRealTuple(FieldImpl grid,
+            EarthLocation el, Real animationValue, int samplingMode)
             throws VisADException, RemoteException {
         if (is3D(grid) && !isVolume(grid)) {
             grid = make2DGridFromSlice(grid, false);
@@ -791,17 +792,42 @@ public class GridUtil {
                      : (Data) sampleAtLocation.evaluate(animationValue,
                          samplingMode, Data.NO_ERRORS));
 
-        while ((data != null) && !(data instanceof Real)) {
+        while ((data != null) && !(data instanceof RealTuple)) {
             if (data instanceof FieldImpl) {
                 data = ((FieldImpl) data).getSample(0);
             } else if (data instanceof Tuple) {
                 data = ((Tuple) data).getComponent(0);
-            } else if ( !(data instanceof Real)) {
+            } else if (data instanceof Real) {
+                data = new RealTuple(new Real[] { (Real) data });
+            } else if ( !(data instanceof RealTuple)) {
                 data = null;
             }
         }
-        return (Real) data;
+        return (RealTuple) data;
 
+    }
+
+    /**
+     * This samples the given grid in both time and space and trys to return a Real value
+     *
+     * @param grid The grid
+     * @param el Location
+     * @param animationValue The time to sample at. If null then we just sample at the location
+     * @param samplingMode mode to use
+     *
+     * @return Real at the given location and time
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public static Real sampleToReal(FieldImpl grid, EarthLocation el,
+                                    Real animationValue, int samplingMode)
+            throws VisADException, RemoteException {
+        RealTuple sample = sampleToRealTuple(grid, el, animationValue,
+                                             samplingMode);
+        return (sample == null)
+               ? (Real) null
+               : sample.getRealComponents()[0];
     }
 
 
@@ -2203,7 +2229,18 @@ public class GridUtil {
         return units;
     }
 
-    public static String printit(FieldImpl field) throws VisADException, RemoteException {
+    /**
+     * _more_
+     *
+     * @param field _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static String printit(FieldImpl field)
+            throws VisADException, RemoteException {
         Data d = field.getSample(0);
         return "sample:" + d.getClass().getName();
 
@@ -3415,9 +3452,11 @@ public class GridUtil {
                        : 0;
 
         // check to see if domain really has RealType.Longitude
-        if ( !(((RealType) (((SetType) domain.getType()).getDomain()
-                .getComponent(lonindex)))
-                    .equalsExceptNameButUnits(RealType.Longitude))) {
+        RealType lonType =
+            (RealType) ((SetType) domain.getType()).getDomain().getComponent(
+                lonindex);
+        if ( !(lonType.equals(RealType.Longitude)
+                || (lonType.getName().toLowerCase().indexOf("lon") >= 0))) {
             return lon;
         }
         if (lonUnit == null) {
@@ -4177,16 +4216,34 @@ public class GridUtil {
     }
 
 
-    public static Range  makeRange(visad.data.DataRange range) {
-        if(range==null) return null;
+    /**
+     * _more_
+     *
+     * @param range _more_
+     *
+     * @return _more_
+     */
+    public static Range makeRange(visad.data.DataRange range) {
+        if (range == null) {
+            return null;
+        }
         return new Range(range.getMin(), range.getMax());
     }
 
 
-    public static Range[]  makeRanges(visad.data.DataRange[] range) {
-        if(range==null) return null;
+    /**
+     * _more_
+     *
+     * @param range _more_
+     *
+     * @return _more_
+     */
+    public static Range[] makeRanges(visad.data.DataRange[] range) {
+        if (range == null) {
+            return null;
+        }
         Range[] r = new Range[range.length];
-        for(int i=0;i<range.length;i++) {
+        for (int i = 0; i < range.length; i++) {
             r[i] = makeRange(range[i]);
         }
         return r;
@@ -4195,16 +4252,34 @@ public class GridUtil {
 
 
 
-    public static DataRange  makeDataRange(Range range) {
-        if(range==null) return null;
+    /**
+     * _more_
+     *
+     * @param range _more_
+     *
+     * @return _more_
+     */
+    public static DataRange makeDataRange(Range range) {
+        if (range == null) {
+            return null;
+        }
         return new DataRange(range.getMin(), range.getMax());
     }
 
 
-    public static DataRange[]  makeDataRanges(Range[] range) {
-        if(range==null) return null;
+    /**
+     * _more_
+     *
+     * @param range _more_
+     *
+     * @return _more_
+     */
+    public static DataRange[] makeDataRanges(Range[] range) {
+        if (range == null) {
+            return null;
+        }
         DataRange[] r = new DataRange[range.length];
-        for(int i=0;i<range.length;i++) {
+        for (int i = 0; i < range.length; i++) {
             r[i] = makeDataRange(range[i]);
         }
         return r;
@@ -5676,54 +5751,87 @@ public class GridUtil {
 
 
 
-    public static List<FieldStats> findMinMaxAverage(FieldImpl field, UnionSet mapSets ) throws VisADException, RemoteException {
-	List<FieldStats> stats = new ArrayList<FieldStats>();
-	if (GridUtil.isTimeSequence(field)) {
-	    int numTimes = field.getDomainSet().getLength();
-	    float[][]result  = new float[numTimes][];
-	    for (int timeStep=0;timeStep<numTimes;timeStep++) {
-		stats.add(findMinMaxAverageFromRange((FlatField)field.getSample(timeStep), mapSets));
-	    }
-	} else {
-	    stats.add(findMinMaxAverageFromRange((FlatField)field, mapSets));
-	}
-	return stats;
+    /**
+     * _more_
+     *
+     * @param field _more_
+     * @param mapSets _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static List<FieldStats> findMinMaxAverage(FieldImpl field,
+            UnionSet mapSets)
+            throws VisADException, RemoteException {
+        List<FieldStats> stats = new ArrayList<FieldStats>();
+        if (GridUtil.isTimeSequence(field)) {
+            int       numTimes = field.getDomainSet().getLength();
+            float[][] result   = new float[numTimes][];
+            for (int timeStep = 0; timeStep < numTimes; timeStep++) {
+                stats.add(
+                    findMinMaxAverageFromRange(
+                        (FlatField) field.getSample(timeStep), mapSets));
+            }
+        } else {
+            stats.add(findMinMaxAverageFromRange((FlatField) field, mapSets));
+        }
+        return stats;
     }
 
 
-    public static FieldStats findMinMaxAverageFromRange(FlatField field, UnionSet mapSets) throws VisADException, RemoteException {
-	int[][]indices = (mapSets==null?null:GridUtil.findContainedIndices((GriddedSet)field.getDomainSet(), mapSets));
-	float[]mma = {0,0,0,0};
-	float[][]values = field.getFloats(false);
-	if(indices==null) {
-	    int len = values[0].length;
-	    indices = new int[1][len];
-	    for(int i=0;i<len;i++) {
-		indices[0][i] = i;
-	    }
-	} else {
-	    //	    System.err.println("indices:" + indices.length +" values:" + values[0].length);
-	}
+    /**
+     * _more_
+     *
+     * @param field _more_
+     * @param mapSets _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static FieldStats findMinMaxAverageFromRange(FlatField field,
+            UnionSet mapSets)
+            throws VisADException, RemoteException {
+        int[][] indices = ((mapSets == null)
+                           ? null
+                           : GridUtil.findContainedIndices(
+                               (GriddedSet) field.getDomainSet(), mapSets));
+        float[]   mma    = { 0, 0, 0, 0 };
+        float[][] values = field.getFloats(false);
+        if (indices == null) {
+            int len = values[0].length;
+            indices = new int[1][len];
+            for (int i = 0; i < len; i++) {
+                indices[0][i] = i;
+            }
+        } else {
+            //      System.err.println("indices:" + indices.length +" values:" + values[0].length);
+        }
 
-	int cnt = 0;
-	for(int mapIdx =0;mapIdx<indices.length;mapIdx++) {
-	    int[] indexArray = indices[mapIdx];
-	    //	    System.err.println("   index:" + indexArray.length);
-	    for(int j=0;j<indexArray.length;j++) {
-		int index = indexArray[j];
-		if(cnt==0) {
-		    mma[2] = mma[1] =  mma[0] = values[0][index];
-		} else {
-		    mma[0]=Math.min(values[0][index],mma[0]);
-		    mma[1]=Math.max(values[0][index],mma[1]);
-		    mma[2]+=values[0][index];
-		}
-		cnt++;
-	    }
-	}
-	if(cnt>0) mma[2] = mma[2]/cnt;
-	mma[3] = cnt;
-	return new FieldStats(mma);
+        int cnt = 0;
+        for (int mapIdx = 0; mapIdx < indices.length; mapIdx++) {
+            int[] indexArray = indices[mapIdx];
+            //      System.err.println("   index:" + indexArray.length);
+            for (int j = 0; j < indexArray.length; j++) {
+                int index = indexArray[j];
+                if (cnt == 0) {
+                    mma[2] = mma[1] = mma[0] = values[0][index];
+                } else {
+                    mma[0] = Math.min(values[0][index], mma[0]);
+                    mma[1] = Math.max(values[0][index], mma[1]);
+                    mma[2] += values[0][index];
+                }
+                cnt++;
+            }
+        }
+        if (cnt > 0) {
+            mma[2] = mma[2] / cnt;
+        }
+        mma[3] = cnt;
+        return new FieldStats(mma);
     }
 
 }
