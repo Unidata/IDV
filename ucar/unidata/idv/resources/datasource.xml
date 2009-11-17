@@ -106,7 +106,7 @@
   <datasource
      id="FILE.TRAJECTORY"
      factory="ucar.unidata.data.sounding.TrajectoryFeatureTypeDataSource"
-     patterns="wetPrf_.*_nc$"
+     patterns="wetPrf_.*_nc$,atmPrf_.*_nc$"
      fileselection="true"
      doesmultiples="true"
      label="Trajectory Sounding files"/>
