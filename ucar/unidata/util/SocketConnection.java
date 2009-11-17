@@ -84,8 +84,10 @@ public class SocketConnection implements Runnable {
                 String s = new String(buffer,0,length);
                 handleMessage(s);
             }
+        } catch(EOFException eofe) {
+	    //ignore
         } catch(IOException ioe) {
-            logError("Got exception: " + ioe);
+            logMessage("Got exception: " + ioe);
         }
         connectionClosed();
     }
