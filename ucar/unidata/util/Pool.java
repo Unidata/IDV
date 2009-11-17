@@ -186,8 +186,8 @@ public class Pool<KeyType, ValueType> {
     }
 
 
-    public synchronized int getSize() {
-	    return cache.size();
+    public int getSize() {
+	return size;
     }
 
 

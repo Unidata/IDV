@@ -230,7 +230,7 @@ public class DataOutputHandler extends OutputHandler {
 
     /** _more_ */
     private Pool<String, NetcdfDataset> ncFilePool = new Pool<String,
-                                                         NetcdfDataset>(100) {
+                                                         NetcdfDataset>(50) {
         protected void removeValue(String key, NetcdfFile file) {
             try {
                 file.close();
@@ -336,6 +336,7 @@ public class DataOutputHandler extends OutputHandler {
 
 
     };
+
 
     /** _more_ */
     private Pool<String, TrajectoryObsDataset> trajectoryPool =
