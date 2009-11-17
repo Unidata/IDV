@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.radar;
 
 
@@ -448,7 +449,7 @@ public class DoradeAdapter implements RadarAdapter {
 
         RealTupleType rangeType = new RealTupleType(pType);
 
-        FunctionType ftype = new FunctionType(radarDomain, pType);
+        FunctionType  ftype     = new FunctionType(radarDomain, pType);
         singleSweep = new FlatField(ftype, productDomain,
                                     (CoordinateSystem[]) null, (Set[]) null,
                                     new Unit[] { u });
@@ -630,6 +631,10 @@ public class DoradeAdapter implements RadarAdapter {
         }
     }
 
+    /**
+     * Clean up whatever we need to when we are removed.
+     */
+    public void doRemove() {}
 
 }
 

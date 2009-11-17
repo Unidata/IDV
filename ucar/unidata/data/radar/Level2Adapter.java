@@ -1577,5 +1577,13 @@ public class Level2Adapter implements RadarAdapter {
               return "Unknown moment";
         }
     }
+
+    /**
+     * Clean up whatever we need to when we are removed.
+     */
+    public void doRemove() {
+        nexradStations = null;
+        clearCachedData();
+    }
 }
 

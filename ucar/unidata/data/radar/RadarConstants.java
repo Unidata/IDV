@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.radar;
 
 
@@ -35,7 +36,9 @@ public interface RadarConstants {
     /** Azimuth value property */
     public static final String PROP_AZIMUTH = "Level2RadarDataSource.azimuth";
 
-    public static final String PROP_AZIMUTHS = "Level2RadarDataSource.azimuths";
+    /** Azimuths property */
+    public static final String PROP_AZIMUTHS =
+        "Level2RadarDataSource.azimuths";
 
     /** Elevation angles property */
     public static final String PROP_ANGLES = "Level2RadarDataSource.angles";

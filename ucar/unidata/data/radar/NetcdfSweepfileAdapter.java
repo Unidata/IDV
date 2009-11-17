@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.radar;
 
 
@@ -39,8 +40,6 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectPair;
 
 import ucar.visad.Util;
-
-
 
 import visad.*;
 
@@ -548,5 +547,10 @@ public class NetcdfSweepfileAdapter implements RadarAdapter {
         Unit u = DataUtil.parseUnit(unitName);
         return u;
     }
+
+    /**
+     * Clean up whatever we need to when we are removed.
+     */
+    public void doRemove() {}
 }
 

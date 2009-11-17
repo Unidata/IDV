@@ -21,8 +21,6 @@
  */
 
 
-
-
 package ucar.unidata.data.radar;
 
 
@@ -174,16 +172,22 @@ public class CDMRadarDataSource extends RadarDataSource {
         return false;
     }
 
+    /**
+     * _more_
+     *
+     * @param object _more_
+     * @param properties _more_
+     */
     public void reloadData(Object object, Hashtable properties) {
-	if(object instanceof RadarQuery) {
-	    reloadProperties(properties);
-	    setProperty(PROP_RADARQUERY, object);
-    
-	    sourcesChanged();
+        if (object instanceof RadarQuery) {
+            reloadProperties(properties);
+            setProperty(PROP_RADARQUERY, object);
 
-	} else {
-	    super.reloadData(object, properties);
-	}
+            sourcesChanged();
+
+        } else {
+            super.reloadData(object, properties);
+        }
     }
 
 
@@ -281,9 +285,9 @@ public class CDMRadarDataSource extends RadarDataSource {
         //
         // just one category
         //
-        List categories;
-        List categories2D;
-        List adapters = getRadarAdapters();
+        List               categories;
+        List               categories2D;
+        List<RadarAdapter> adapters = getRadarAdapters();
         if ((adapters == null) || adapters.isEmpty()) {
             return;
         }
@@ -566,7 +570,7 @@ public class CDMRadarDataSource extends RadarDataSource {
      */
     public void getPropertiesComponents(List comps) {
         super.getPropertiesComponents(comps);
-        List adapters = getRadarAdapters();
+        List<RadarAdapter> adapters = getRadarAdapters();
         if ((adapters == null) || adapters.isEmpty()) {
             return;
         }
@@ -642,7 +646,7 @@ public class CDMRadarDataSource extends RadarDataSource {
 
 
         // update the data adapters
-        List l2as = getRadarAdapters();
+        List<RadarAdapter> l2as = getRadarAdapters();
 
         if (l2as != null) {
             for (int i = 0; i < l2as.size(); i++) {

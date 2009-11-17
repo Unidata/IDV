@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.radar;
 
 
@@ -46,10 +47,13 @@ public class CDMRadarSweepDB {
      * init a CDM radar sweep table
      *
      * @param s sweep
+     * @param sIdx _more_
+     * @param b _more_
      *
      * @throws IOException On badness
      */
-    public CDMRadarSweepDB(float [] s, int [] sIdx, float b) throws IOException {
+    public CDMRadarSweepDB(float[] s, int[] sIdx, float b)
+            throws IOException {
         if (sweepTableHash == null) {
             readSweepTable(s, sIdx, b);
         }
@@ -71,11 +75,13 @@ public class CDMRadarSweepDB {
      * calculate each ray in a sweep to construct a hash map table
      *
      * @param s radialDatasetSweep object
+     * @param sIdx _more_
+     * @param beamWidth _more_
      *
      * @throws IOException On badness
      */
-    private void readSweepTable(
-            float [] s, int [] sIdx, float beamWidth) throws IOException {
+    private void readSweepTable(float[] s, int[] sIdx, float beamWidth)
+            throws IOException {
         sweepTableHash = new HashMap();
 
         int   i, iazim;
@@ -91,16 +97,16 @@ public class CDMRadarSweepDB {
 
             res = beamWidth;
         }
-        float [] _azimuths = s;
+        float[] _azimuths = s;
         for (i = 0; i < numberOfRay; i++) {
             float azi = 0.0f;
-          //  try {
-                azi   = _azimuths[i];  //s.getAzimuth(i);
-                iazim = (int) (azi / res + res / 2.0);  /* Centered on bin. */
-          //  } catch (IOException e) {
-           //     e.printStackTrace();
-           //     iazim = 0;
-          //  }
+            //  try {
+            azi   = _azimuths[i];                   //s.getAzimuth(i);
+            iazim = (int) (azi / res + res / 2.0);  /* Centered on bin. */
+            //  } catch (IOException e) {
+            //     e.printStackTrace();
+            //     iazim = 0;
+            //  }
             if (iazim >= numberOfRay) {
                 iazim -= numberOfRay;
             }

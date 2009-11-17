@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.radar;
 
 
@@ -54,6 +55,7 @@ public interface RadarAdapter extends RadarConstants {
     /** RealType for Azimuth angle */
     public static RealType AZIMUTH_ANGLE_TYPE =
         RealType.getRealType(AZIMUTH_ANGLE, CommonUnit.degree);
+
     /**
      * Get the data for the given DataChoice and selection criteria.
      * @param dataChoice         DataChoice for selection
@@ -89,5 +91,9 @@ public interface RadarAdapter extends RadarConstants {
      */
     public void clearCachedData();
 
+    /**
+     * Clean up whatever we need to when we are removed.
+     */
+    public void doRemove();
 }
 

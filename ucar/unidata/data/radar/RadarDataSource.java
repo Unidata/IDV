@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.radar;
 
 
@@ -27,6 +28,7 @@ import ucar.unidata.data.*;
 import ucar.unidata.util.*;
 
 import visad.*;
+
 import visad.util.ThreadManager;
 
 import java.rmi.RemoteException;
@@ -51,6 +53,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
     public static final DataCategory CATEGORY_RHI =
         DataCategory.parseCategory("RHI", false);
 
+    /** RHI sweep category */
     public static final DataCategory CATEGORY_RHISWEEP =
         DataCategory.parseCategory("RHISWEEP", false);
 
@@ -227,7 +230,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
      */
     public void clearCachedData() {
         super.clearCachedData();
-        List adapters = getAdapters();
+        List<RadarAdapter> adapters = getAdapters();
         for (Iterator iter = adapters.iterator(); iter.hasNext(); ) {
             RadarAdapter adapter = (RadarAdapter) iter.next();
             adapter.clearCachedData();
@@ -243,7 +246,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
      *
      * @return List of adapters or null
      */
-    protected List getAdapters() {
+    protected List<RadarAdapter> getAdapters() {
         if ((adapters == null) || (adapters.size() == 0)) {
             try {
                 makeAdapters(sources);
@@ -267,39 +270,46 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
      * @throws Exception When bad things happen
      */
     private void makeAdapters(List files) throws Exception {
-        adapters = new ArrayList();
-        Hashtable oldAdapterMap = fileToAdapter;
-        fileToAdapter = new Hashtable();
+        adapters = new ArrayList<RadarAdapter>();
+        Hashtable<String, RadarAdapter> oldAdapterMap = fileToAdapter;
+        fileToAdapter = new Hashtable<String, RadarAdapter>();
 
-        int cnt = 0;
+        int                      cnt           = 0;
 
-        final List<String> badFiles          = new ArrayList<String>();
-        final List<Exception> badExceptions = new ArrayList<Exception>();
+        final List<String>       badFiles      = new ArrayList<String>();
+        final List<Exception>    badExceptions = new ArrayList<Exception>();
 
-        final List<RadarAdapter> goodAdapters = new ArrayList<RadarAdapter>();
-        final List<String> goodFiles = new ArrayList<String>();
-        visad.util.ThreadManager threadManager = new visad.util.ThreadManager("radar data initialization");
+        final List<RadarAdapter> goodAdapters  =
+            new ArrayList<RadarAdapter>();
+        final List<String>       goodFiles     = new ArrayList<String>();
+        visad.util.ThreadManager threadManager =
+            new visad.util.ThreadManager("radar data initialization");
         LogUtil.message("Initializing radar files");
         for (Iterator iter = files.iterator(); iter.hasNext(); ) {
-            final String       filename = iter.next().toString();
-            RadarAdapter adapter  =(RadarAdapter) oldAdapterMap.get(filename);
+            final String filename = iter.next().toString();
+            RadarAdapter adapter  =
+                (RadarAdapter) oldAdapterMap.get(filename);
             cnt++;
             if (adapter == null) {
-                threadManager.addRunnable(new visad.util.ThreadManager.MyRunnable() {
-                        public void run() throws Exception {
-                            try {
-                                RadarAdapter myAdapter = makeRadarAdapter(filename);
-                                synchronized(goodAdapters) {
-                                    goodAdapters.add(myAdapter);
-                                    goodFiles.add(filename);
-                                }
-                            } catch (Exception e) {
-                                synchronized(badExceptions) {
-                                    badExceptions.add(e);
-                                    badFiles.add(filename);
-                                }
-                            }}});
-            }  else {
+                threadManager.addRunnable(
+                    new visad.util.ThreadManager.MyRunnable() {
+                    public void run() throws Exception {
+                        try {
+                            RadarAdapter myAdapter =
+                                makeRadarAdapter(filename);
+                            synchronized (goodAdapters) {
+                                goodAdapters.add(myAdapter);
+                                goodFiles.add(filename);
+                            }
+                        } catch (Exception e) {
+                            synchronized (badExceptions) {
+                                badExceptions.add(e);
+                                badFiles.add(filename);
+                            }
+                        }
+                    }
+                });
+            } else {
                 goodAdapters.add(adapter);
                 goodFiles.add(filename);
             }
@@ -307,16 +317,17 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
         }
 
         //        threadManager.debug = true;
-        threadManager.runInParallel(getDataContext().getIdv().getMaxDataThreadCount());
+        threadManager.runInParallel(
+            getDataContext().getIdv().getMaxDataThreadCount());
         LogUtil.message("");
 
-        for(int i=0;i<goodAdapters.size();i++) {
+        for (int i = 0; i < goodAdapters.size(); i++) {
             adapters.add(goodAdapters.get(i));
-            fileToAdapter.put(goodFiles.get(i),goodAdapters.get(i));
+            fileToAdapter.put(goodFiles.get(i), goodAdapters.get(i));
         }
 
 
-        if (!badFiles.isEmpty()) {
+        if ( !badFiles.isEmpty()) {
             StringBuffer buf = new StringBuffer();
             if (badFiles.size() < files.size()) {
                 buf.append("<html>");
@@ -344,6 +355,14 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
                 throw badExceptions.get(0);
             }
         }
+        // clean up any old adapters
+        for (String source : oldAdapterMap.keySet()) {
+            if (fileToAdapter.get(source) == null) {
+                ((RadarAdapter) oldAdapterMap.get(source)).doRemove();
+            }
+        }
+        oldAdapterMap = null;
+
     }
 
 
@@ -352,9 +371,9 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
      * @return list of times.
      */
     protected List doMakeDateTimes() {
-        List    times      = new ArrayList();
-        boolean isRealTime = isRealTime();
-        List    adapters   = getAdapters();
+        List               times      = new ArrayList();
+        boolean            isRealTime = isRealTime();
+        List<RadarAdapter> adapters   = getAdapters();
         for (int i = 0; i < adapters.size(); i++) {
             if ( !isRealTime) {
                 times.add(((RadarAdapter) adapters.get(i)).getBaseTime());
@@ -393,10 +412,12 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
      * @throws RemoteException couldn't create a remote data object
      * @throws VisADException  couldn't create the data
      */
-    protected Data getDataInner(final DataChoice dataChoice, DataCategory category,
+    protected Data getDataInner(final DataChoice dataChoice,
+                                DataCategory category,
                                 final DataSelection subset,
                                 final Hashtable requestProperties)
             throws VisADException, RemoteException {
+
         try {
             List times = null;
             if (subset != null) {
@@ -406,9 +427,9 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
                 times = dataChoice.getSelectedDateTimes();
             }
 
-            List       adapters      = getAdapters();
+            List<RadarAdapter> adapters      = getAdapters();
 
-            DateTime[] realDateTimes = new DateTime[adapters.size()];
+            DateTime[]         realDateTimes = new DateTime[adapters.size()];
             for (int i = 0; i < adapters.size(); i++) {
                 realDateTimes[i] =
                     ((RadarAdapter) adapters.get(i)).getBaseTime();
@@ -442,9 +463,9 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
                 }
             }
             Arrays.sort(dateTimes);
-            final Data[]   datas     = new Data[dateTimes.length];
-            int      timeIndex = 0;
-            final MathType[] mt        = {null};
+            final Data[]     datas     = new Data[dateTimes.length];
+            int              timeIndex = 0;
+            final MathType[] mt        = { null };
             // create a new field of (Time -> (radar data)).
             // fill in the times array and data array with dates/data
             // only from those adapters which match the selected times.
@@ -453,7 +474,8 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
             // so return null.
             //            System.err.println ("Reading " + adapters.size() + " radar files");
             int cnt = 0;
-            ThreadManager threadManager = new visad.util.ThreadManager("radar data reading");
+            ThreadManager threadManager =
+                new visad.util.ThreadManager("radar data reading");
 
             for (Iterator iter = adapters.iterator(); iter.hasNext(); ) {
                 final RadarAdapter adapter = (RadarAdapter) iter.next();
@@ -467,22 +489,25 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
                 LogUtil.message("Time: " + (cnt) + "/" + dateTimes.length
                                 + " From:" + toString());
                 final int theTimeIndex = timeIndex;
-                threadManager.addRunnable(new visad.util.ThreadManager.MyRunnable() {
-                        public void run() throws Exception {
-                            Trace.call1("RDS.getData");
-                            Data d = adapter.getData(dataChoice, subset,
-                                                     requestProperties);
-                            Trace.call2("RDS.getData");
-                            datas[theTimeIndex] = d;
-                            if (d != null) {
-                                mt[0] = d.getType();
-                            } else {}
-                        }});
+                threadManager.addRunnable(
+                    new visad.util.ThreadManager.MyRunnable() {
+                    public void run() throws Exception {
+                        Trace.call1("RDS.getData");
+                        Data d = adapter.getData(dataChoice, subset,
+                                     requestProperties);
+                        Trace.call2("RDS.getData");
+                        datas[theTimeIndex] = d;
+                        if (d != null) {
+                            mt[0] = d.getType();
+                        } else {}
+                    }
+                });
             }
 
             try {
                 //threadManager.debug = true;
-                threadManager.runInParallel(getDataContext().getIdv().getMaxDataThreadCount());
+                threadManager.runInParallel(
+                    getDataContext().getIdv().getMaxDataThreadCount());
             } catch (VisADException ve) {
                 LogUtil.printMessage(ve.toString());
             }
@@ -506,6 +531,7 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
             logException("Creating obs", exc);
         }
         return null;
+
     }
 
 
@@ -516,10 +542,20 @@ public abstract class RadarDataSource extends FilesDataSource implements RadarCo
      * Get the list of adapters.
      * @return list of adapters.
      */
-    protected List getRadarAdapters() {
+    protected List<RadarAdapter> getRadarAdapters() {
         return getAdapters();
     }
 
+    /**
+     * Gets called by the {@link DataManager} when this DataSource has
+     * been removed.
+     */
+    public void doRemove() {
+        for (RadarAdapter ra : getAdapters()) {
+            ra.doRemove();
+        }
+        super.doRemove();
+    }
 
 
 }

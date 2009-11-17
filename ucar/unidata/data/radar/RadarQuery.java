@@ -21,7 +21,6 @@
  */
 
 
-
 package ucar.unidata.data.radar;
 
 
@@ -71,16 +70,17 @@ public class RadarQuery {
      *
      * @param collectionUrl the collection url
      * @param station the station
+     * @param product  the product
      * @param dateSelection the date selection_
      */
-    public RadarQuery(String collectionUrl, String station,
-                      String product,
+    public RadarQuery(String collectionUrl, String station, String product,
                       DateSelection dateSelection) {
         this.collectionUrl = collectionUrl;
         this.station       = station;
         this.product       = product;
         this.dateSelection = dateSelection;
     }
+
     /**
      * Set the CollectionUrl property.
      *
@@ -135,6 +135,7 @@ public class RadarQuery {
     public String getProduct() {
         return product;
     }
+
     /**
      *  Set the DateSelection property.
      *

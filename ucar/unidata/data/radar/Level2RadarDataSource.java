@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.radar;
 
 
@@ -28,9 +29,9 @@ import ucar.unidata.metdata.NamedStation;
 
 import ucar.unidata.metdata.NamedStation;
 import ucar.unidata.metdata.NamedStationTable;
+
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
-
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectArray;
 import ucar.unidata.util.TwoFacedObject;
@@ -161,7 +162,7 @@ public class Level2RadarDataSource extends RadarDataSource {
      */
     public void doMakeDataChoices() {
 
-        List l2as = getRadarAdapters();
+        List<RadarAdapter> l2as = getRadarAdapters();
         if ((l2as == null) || l2as.isEmpty()) {
             return;
         }
@@ -332,7 +333,7 @@ public class Level2RadarDataSource extends RadarDataSource {
         setDescription(getName());
 
         // update the data adapters
-        List l2as = getRadarAdapters();
+        List<RadarAdapter> l2as = getRadarAdapters();
         if (l2as != null) {
             for (int i = 0; i < l2as.size(); i++) {
                 try {
@@ -429,9 +430,11 @@ public class Level2RadarDataSource extends RadarDataSource {
      *
      *
      * @param dataChoice The data choice we are getting levels for
+     * @param dataSelection  the date selection
      * @return  List of all available levels
      */
-    public List getAllLevels(DataChoice dataChoice,DataSelection dataSelection) {
+    public List getAllLevels(DataChoice dataChoice,
+                             DataSelection dataSelection) {
         dataSelection = DataSelection.merge(dataSelection,
                                             getDataSelection());
 

@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.data.radar;
 
 
@@ -309,7 +310,7 @@ public class Level2Data {
     private void readHeaderInfo() throws IOException {
 
         try {
-            dataType     = new String(fileHeader, 0, 8);
+            dataType = new String(fileHeader, 0, 8);
             volumeNumber = (int) Misc.parseDouble(new String(fileHeader, 9,
                     3));
             timeSinceEpoch =
