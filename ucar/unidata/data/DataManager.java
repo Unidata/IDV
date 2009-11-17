@@ -471,7 +471,7 @@ public class DataManager {
      * @param resourceManager The resource manager
      */
     protected void loadIospResources(IdvResourceManager resourceManager) {
-        NetcdfDataset.initNetcdfFileCache(1,10,20*60);
+        NetcdfDataset.initNetcdfFileCache(1,15,-1);
         ucar.grib.GribResourceReader.setGribResourceReader(
             new ucar.grib.GribResourceReader() {
             public InputStream openInputStream(String resourceName)
