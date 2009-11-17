@@ -449,10 +449,10 @@ public class SoundingSelector extends IdvChooser {
             public void propertyChange(PropertyChangeEvent pe) {
                 if (pe.getPropertyName().equals(
                         StationLocationMap.SELECTED_PROPERTY)) {
-                    stationSelected((Station) pe.getNewValue());
+                    stationSelected((SoundingStation) pe.getNewValue());
                 } else if (pe.getPropertyName().equals(
                         StationLocationMap.UNSELECTED_PROPERTY)) {
-                    stationUnselected((Station) pe.getNewValue());
+                    stationUnselected((SoundingStation) pe.getNewValue());
                 } else if (pe.getPropertyName().equals(
                         StationLocationMap.ALL_UNSELECTED_PROPERTY)) {
                     unselectAll();
@@ -471,7 +471,7 @@ public class SoundingSelector extends IdvChooser {
      *
      * @param station  selected station
      */
-    private void stationSelected(Station station) {
+    private void stationSelected(SoundingStation station) {
         List selectedTimes = getSelectedTimes();
         if ((selectedTimes == null) || (selectedTimes.size() < 1)) {
             return;
@@ -479,7 +479,7 @@ public class SoundingSelector extends IdvChooser {
         for (int i = 0; i < selectedTimes.size(); i++) {
             DateTime dt = (DateTime) selectedTimes.get(i);
             List times =
-                soundingAdapter.getSoundingTimes((SoundingStation) station);
+                soundingAdapter.getSoundingTimes(station);
             if ((times != null) && (times.size() > 0)) {
                 if (times.contains(dt)) {
                     SoundingOb newObs = new SoundingOb(station, dt);
@@ -516,7 +516,7 @@ public class SoundingSelector extends IdvChooser {
      *
      * @param station  station to unselect
      */
-    private void stationUnselected(Station station) {
+    private void stationUnselected(SoundingStation station) {
         List selectedTimes = getSelectedTimes();
         if ((selectedTimes == null) || (selectedTimes.size() < 1)) {
             return;
