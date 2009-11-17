@@ -21,19 +21,24 @@
  */
 
 
+
 package ucar.unidata.data.sounding;
 
 
 import ucar.ma2.Range;
+
 import ucar.unidata.data.*;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
+
 import visad.*;
 
 import java.io.File;
+
 import java.rmi.RemoteException;
+
 import java.util.Hashtable;
 import java.util.List;
 
@@ -63,7 +68,9 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
     /** Default Constructor */
     public TrajectoryFeatureTypeDataSource() {}
 
-    private List pointCats    = Misc.newList(DataCategory.POINT_PLOT_CATEGORY);
+    /** _more_          */
+    private List pointCats = Misc.newList(DataCategory.POINT_PLOT_CATEGORY);
+
     /**
      * Create a SondeDataSource from the specification given.
      *
@@ -101,7 +108,7 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
 
 
     /**
-     * _more_
+     * init sounding category
      */
     protected void initCategories() {
         if (traceCats == null) {
@@ -130,6 +137,7 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
      * Aggregate the tracks
      *
      * @param tracks List of sonde tracks
+     * @param id0 _more_
      *
      * @return FieldImpl of aggregated tracks
      *
@@ -138,8 +146,9 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
      * @throws RemoteException _more_
      * @throws VisADException  problem in VisAD
      */
-    protected FieldImpl aggregateTracks(
-            List tracks, Object id0) throws VisADException, RemoteException {
+    protected FieldImpl aggregateTracks(List tracks,
+                                        Object id0) throws VisADException,
+                                            RemoteException {
 
         List         adapters = getAdapters();
         FunctionType fiType   = null;
@@ -152,7 +161,7 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
                 fiType = new FunctionType(RealType.Time, data.getType());
 
             }
-            times[i] = time; //adapter.getStartTime();
+            times[i] = time;  //adapter.getStartTime();
         }
 
         FieldImpl fi = new FieldImpl(fiType, DateTime.makeTimeSet(times));
@@ -168,6 +177,7 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
      * Make the {@link ucar.unidata.data.DataChoice}s associated with this dataset
      */
     protected void doMakeDataChoices() {
+
         List sources = getSources();
         if (sources.size() == 0) {
             return;
@@ -185,11 +195,9 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
         }
         initCategories();
         List trackInfos = null;
-        try{
+        try {
             trackInfos = getTraceAdapter().getTrackInfos();
-        } catch (Exception e) {
-
-        }
+        } catch (Exception e) {}
 
         List categories = traceCats;
 
@@ -244,11 +252,11 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
                     ID_POINTTRACE }, pointLabel, pointLabel, pointCatList,
                                      props));
 
-           // addDataChoice(new DirectDataChoice(this, new String[] { trackName,
-           //         ID_LASTOB }, getDataChoiceLabel(ID_LASTOB),
-           //                      getDataChoiceLabel(ID_LASTOB), pointCatList,
-           //                      props));
-           
+            // addDataChoice(new DirectDataChoice(this, new String[] { trackName,
+            //         ID_LASTOB }, getDataChoiceLabel(ID_LASTOB),
+            //                      getDataChoiceLabel(ID_LASTOB), pointCatList,
+            //                      props));
+
 
         }
 
@@ -258,7 +266,7 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
         DataChoice soundingChoice = null;
         if ((adapters != null) && (adapters.size() > 1)) {
             TrackAdapter    adapter = (TrackAdapter) adapters.get(0);
-            String sName = adapter.toString();
+            String          sName   = adapter.toString();
             List<TrackInfo> tinfo   = adapter.getTrackInfos();
             String          tName   = tinfo.get(0).trackName;
             String          id;
@@ -278,7 +286,7 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
                 TrackInfo    trackInfo =
                     (TrackInfo) ta.getTrackInfos().get(0);
                 String       trackName = trackInfo.getTrackName() + i;
-               // System.err.println("track name = " + trackName);
+                // System.err.println("track name = " + trackName);
                 ((CompositeDataChoice) soundingChoice).addDataChoice(
                     new DirectDataChoice(
                         this, id, trackName, ("Sonde " + i), category));
@@ -295,14 +303,14 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
 
 
         List locCats = DataCategory.parseCategories("locations", false);
-   //     addDataChoice(new DirectDataChoice(this, ID_SONDESTARTLOCATIONS,
-   //                                        "Sonde Start Locations",
-   //                                        "Sonde Start Locations", locCats));
+        //     addDataChoice(new DirectDataChoice(this, ID_SONDESTARTLOCATIONS,
+        //                                        "Sonde Start Locations",
+        //                                        "Sonde Start Locations", locCats));
         /*  End locations don't work now because lat/lon/alt values are NaN  */
-        addDataChoice(
-            new DirectDataChoice(
-                this, ID_SONDEENDLOCATIONS, "Sonde End Locations",
-                "Sonde End Locations", locCats));
+        addDataChoice(new DirectDataChoice(this, ID_SONDEENDLOCATIONS,
+                                           "Sonde End Locations",
+                                           "Sonde End Locations", locCats));
+
 
     }
 
