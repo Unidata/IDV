@@ -1303,8 +1303,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      * construct the sweep table
      * in parameter list.  Assume PPI mode.
      * @param azi         sweep object
-     * @param aziIdx _more_
-     * @param b _more_
+     * @param aziIdx       azi index
+     * @param b
      * @return  the hash map table for sweep
      *
      */
@@ -1378,8 +1378,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      * in parameter list.  Assume PPI mode.
      * @param ray_angle  ray angle
      * @param limit      limit
-     * @param tableIdx _more_
-     * @param azimuths _more_
+     * @param tableIdx index
+     * @param azimuths angle
      * @return  the ray index
      *
      */
@@ -1875,12 +1875,12 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
-     * _more_
+     * finding the index of an angle
      *
-     * @param angles _more_
-     * @param angle _more_
+     * @param angles array of angles
+     * @param angle input angle
      *
-     * @return _more_
+     * @return index of angle or 0
      */
     int getAngleIdx(double[] angles, double angle) {
         int size = angles.length;
@@ -1905,7 +1905,7 @@ public class CDMRadarAdapter implements RadarAdapter {
     /**
      * Get the data for the given DataChoice and selection criteria.
      * @param vname
-     * @param u _more_
+     * @param u unit
      * @return  the real type of request variable
      * private RealTupleType getMomentType(String vname) throws VisADException {
      *   //        return RealType.getRealType(vname);
@@ -1913,7 +1913,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      *   //return new RealTupleType(RealType.getRealType(vname));
      * }
      *
-     * @throws VisADException _more_
+     * @throws VisADException
      */
 
     /**
@@ -1922,7 +1922,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @return  the real type of request variable
      *
      *
-     * @throws VisADException _more_
+     * @throws VisADException
      */
     private RealTupleType getMomentType(String vname, Unit u)
             throws VisADException {
@@ -2496,12 +2496,11 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
-     * _more_
+     * calculate the bearing of one location to the radar location
      *
-     * @param lat _more_
-     * @param lon _more_
-     *
-     * @return _more_
+     * @param lat input latitude
+     * @param lon input longitude
+     * @return bearing
      */
     public Bearing getBearing(double lat, double lon) {
         Bearing b1 =
@@ -2512,14 +2511,14 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
-     * _more_
+     * setting the init crosssection line position with azimuth angle
      *
-     * @param azi _more_
+     * @param azi input azimuth angle
      *
-     * @return _more_
+     * @return lat lon point
      *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
+     * @throws RemoteException
+     * @throws VisADException
      */
     public LatLonPoint setCrossSectionLinePosition(float azi)
             throws VisADException, RemoteException {
@@ -2537,16 +2536,15 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
-     * _more_
+     * calculate the intersection of ray and a line
      *
-     * @param radarCenter _more_
-     * @param azi _more_
-     * @param lat3 _more_
-     * @param lon3 _more_
-     * @param lat4 _more_
-     * @param lon4 _more_
+     * @param radarCenter earthlocation of radar
+     * @param azi ray azimuth
+     * @param lat3 line latitude of one end
+     * @param lon3 line longitude of one end
+     * @param lat4 line latitude of another end
      *
-     * @return _more_
+     * @return lat lon points
      */
     public float[] getIntersectionOfRayAndLine(EarthLocation radarCenter,
             float azi, float lat3, float lon3, float lat4, float lon4) {
@@ -2565,18 +2563,18 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
-     * _more_
+     * alculate the intersection of two lines
      *
-     * @param lat1 _more_
-     * @param lon1 _more_
-     * @param lat2 _more_
-     * @param lon2 _more_
-     * @param lat3 _more_
-     * @param lon3 _more_
-     * @param lat4 _more_
-     * @param lon4 _more_
+     * @param lat1 latitude of line 1
+     * @param lon1 longitude of line 1
+     * @param lat2 latitude of line 1
+     * @param lon2 longitude of line 1
+     * @param lat3 latitude of line 2
+     * @param lon3 longitude of line 2
+     * @param lat4 latitude of line 2
+     * @param lon4 longitude of line 2
      *
-     * @return _more_
+     * @return lat lon float array
      */
     public float[] getIntersectionOfTwoLines(float lat1, float lon1,
                                              float lat2, float lon2,
@@ -2820,11 +2818,11 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
-     * _more_
+     * get RHI data
      *
-     * @param sweepVar _more_
+     * @param sweepVar radar variable
      *
-     * @throws IOException _more_
+     * @throws IOException
      */
     private void getRHIData(RadialDatasetSweep.RadialVariable sweepVar)
             throws IOException {
@@ -2973,11 +2971,11 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
-     * _more_
+     * get radar gate number
      *
-     * @param sweepVar _more_
+     * @param sweepVar radar variable
      *
-     * @return _more_
+     * @return int
      */
     private int getGateNumber(RadialDatasetSweep.RadialVariable sweepVar) {
         int numSweep = sweepVar.getNumSweeps();
@@ -3217,7 +3215,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @param moment moment
      * @param azimus  azimuth angle
      * @param varName    variable name
-     * @param idx _more_
+     * @param idx index
      * @param want3D     true if should return a 3D field
      *
      * @return sweep as a FieldImpl
@@ -3638,11 +3636,11 @@ public class CDMRadarAdapter implements RadarAdapter {
 
 
     /**
-     * _more_
+     * get number of ray
      *
-     * @param azimuths _more_
+     * @param azimuths array
      *
-     * @return _more_
+     * @return int
      */
     int getRayNumber(float[] azimuths) {
         int azn = azimuths.length;
@@ -3725,10 +3723,10 @@ public class CDMRadarAdapter implements RadarAdapter {
     static boolean newWay = true;
 
     /**
+     *  get radar sweep index
      *
-     *
-     * @param sweepVar _more_
-     * @return _more_
+     * @param sweepVar radar variable
+     * @return sweep index array
      */
     public Object[] getCutIdx(RadialDatasetSweep.RadialVariable sweepVar) {
 
@@ -3763,13 +3761,13 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
-     * _more_
+     * get azimuth array
      *
-     * @param s1 _more_
+     * @param s1 sweep
      *
-     * @return _more_
+     * @return float array
      *
-     * @throws IOException _more_
+     * @throws IOException   e
      */
     float[] getAzimuth(RadialDatasetSweep.Sweep s1) throws IOException {
         float[] az    = s1.getAzimuth();
@@ -4249,11 +4247,11 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
-     * _more_
+     * get float array init with NaN
      *
-     * @param n _more_
+     * @param n 1 D array length
      *
-     * @return _more_
+     * @return float array
      */
     public float[] getFloatNaN(int n) {
         float[] data = new float[n];
