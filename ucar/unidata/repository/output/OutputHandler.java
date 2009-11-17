@@ -50,8 +50,6 @@ import ucar.unidata.xml.XmlUtil;
 import java.io.*;
 
 import java.io.File;
-import java.io.InputStream;
-
 
 
 import java.net.*;
@@ -83,6 +81,8 @@ import java.util.zip.*;
 public class OutputHandler extends RepositoryManager implements WikiUtil
     .WikiPageHandler {
 
+    public static final String ATTR_MAXCONNECTIONS = "maxconnections";
+
     /** _more_ */
     public static final String LABEL_LINKS = "View &amp; Edit";
 
@@ -99,6 +99,10 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
     /** _more_ */
     private List<OutputType> types = new ArrayList<OutputType>();
 
+
+    private int maxConnections = -1;
+
+    private int numberOfConnections = 0;
 
     /**
      * _more_
@@ -142,6 +146,9 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             throws Exception {
         this(repository,
              XmlUtil.getAttribute(element, ATTR_NAME, (String) null));
+	maxConnections = XmlUtil.getAttribute(element, ATTR_MAXCONNECTIONS,maxConnections);
+
+
     }
 
     /**
@@ -324,6 +331,11 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
         }
         return false;
     }
+
+    public void getSystemStats(StringBuffer sb) {
+    }
+
+
 
     /**
      * Class State _more_
@@ -2426,6 +2438,53 @@ public class OutputHandler extends RepositoryManager implements WikiUtil
             DataOutputHandler.OUTPUT_OPENDAP);
     }
 
+
+    /**
+       Set the MaxConnections property.
+
+       @param value The new value for MaxConnections
+    **/
+    public void setMaxConnections (int value) {
+	this.maxConnections = value;
+    }
+
+    /**
+       Get the MaxConnections property.
+
+       @return The MaxConnections
+    **/
+    public int getMaxConnections () {
+	return this.maxConnections;
+    }
+
+    /**
+       Set the NumberOfConnections property.
+
+       @param value The new value for NumberOfConnections
+    **/
+    public void setNumberOfConnections (int value) {
+	this.numberOfConnections = value;
+    }
+
+    /**
+       Get the NumberOfConnections property.
+
+       @return The NumberOfConnections
+    **/
+    public int getNumberOfConnections () {
+	return this.numberOfConnections;
+    }
+
+    public void incrNumberOfConnections() {
+	numberOfConnections++;
+    }
+
+
+
+    public void decrNumberOfConnections() {
+	numberOfConnections--;
+	if(numberOfConnections<0) numberOfConnections= 0;
+    }
 
 }
 

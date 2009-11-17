@@ -982,6 +982,7 @@ public class StorageManager extends RepositoryManager {
 
         File newFile = new File(IOUtil.joinDir(storageDir, targetName));
         IOUtil.copyFile(original, newFile);
+	IOUtil.close(original);
         return newFile;
     }
 
@@ -1331,7 +1332,12 @@ public class StorageManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public String readSystemResource(String path) throws Exception {
-        return IOUtil.readInputStream(getInputStream(path));
+	InputStream stream = getInputStream(path);
+	try {
+	    return IOUtil.readInputStream(stream);
+	} finally {
+	    IOUtil.close(stream);
+	}
     }
 
 

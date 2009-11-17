@@ -153,9 +153,11 @@ public class ZipFileOutputHandler extends OutputHandler {
         }
         StringBuffer sb = new StringBuffer();
 
-        ZipInputStream zin = new ZipInputStream(
-                                 getStorageManager().getFileInputStream(
-                                     entry.getResource().getPath()));
+	FileInputStream fis =  getStorageManager().getFileInputStream(
+								      entry.getResource().getPath());
+	ZipInputStream zin = new ZipInputStream(fis);
+	try {
+
         ZipEntry ze = null;
         sb.append("<ul>");
         String fileToFetch = request.getString(ARG_FILE, null);
@@ -179,7 +181,10 @@ public class ZipFileOutputHandler extends OutputHandler {
             sb.append(HtmlUtil.href(url, path));
         }
         sb.append("</ul>");
-
+	} finally {
+	    IOUtil.close(zin);
+	    IOUtil.close(fis);
+	}
         return makeLinksResult(request, msg("Zip File Listing"), sb,
                                new State(entry));
     }

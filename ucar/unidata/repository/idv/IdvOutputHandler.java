@@ -387,7 +387,6 @@ public class IdvOutputHandler extends OutputHandler {
 	try {
 
             /*
-
 	    valueToAbbrev.load(
 			       IOUtil.getInputStream(
 						     "/ucar/unidata/repository/idv/values.properties",

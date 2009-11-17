@@ -20,7 +20,7 @@
 <!--
   <outputhandler class="ucar.unidata.repository.output.CsvOutputHandler" name="CSV"/>
 -->
-  <outputhandler class="ucar.unidata.repository.output.ZipOutputHandler" name="ZIP Files"/>
+  <outputhandler class="ucar.unidata.repository.output.ZipOutputHandler" name="ZIP Files" maxconnections="1"/>
   <outputhandler class="ucar.unidata.repository.output.WgetOutputHandler" name="WGET script"/>
   <outputhandler class="ucar.unidata.repository.data.LdmOutputHandler" name="LDM Insert"/>
   <outputhandler class="ucar.unidata.repository.output.GraphOutputHandler" name="Graph"/>

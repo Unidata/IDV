@@ -22,6 +22,10 @@
 package ucar.unidata.repository.output;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 import org.w3c.dom.*;
 
 import ucar.unidata.repository.*;
@@ -72,6 +76,9 @@ import java.util.zip.*;
  * @version $Revision: 1.3 $
  */
 public class ZipOutputHandler extends OutputHandler {
+
+    /** _more_          */
+    private final Logger LOG = LoggerFactory.getLogger(ZipOutputHandler.class);
 
 
     /** _more_ */
@@ -280,6 +287,10 @@ public class ZipOutputHandler extends OutputHandler {
         result.setNeedToWrite(false);
 
 
+	if(recurse) {
+	    LOG.info("ZipOutputHandler: zip tree:" + request.getIp() +" -- " + request.getUserAgent());
+	}
+
         boolean         ok   = true;
         //First recurse down without a zos to check the size
         try {
@@ -297,15 +308,15 @@ public class ZipOutputHandler extends OutputHandler {
             return result;
         }
 
-
         ZipOutputStream zos  = new ZipOutputStream(os);
         Hashtable       seen = new Hashtable();
         try {
             processZip(request, entries, recurse, zos, prefix, 0, new int[]{0});
         } catch (IllegalArgumentException iae) {
             ok = false;
-        }
-        zos.close();
+        } finally  {
+	    IOUtil.close(zos);
+	}
         if (doingFile) {
             os.close();
             return new Result(
@@ -393,22 +404,17 @@ public class ZipOutputHandler extends OutputHandler {
 
             if(zos!=null) {
                 zos.putNextEntry(new ZipEntry(name));
-                InputStream fileInputStream =
+                InputStream fis =
                     getStorageManager().getFileInputStream(path);
-                
                 try {
-                    IOUtil.writeTo(fileInputStream, zos);
+                    IOUtil.writeTo(fis, zos);
                     zos.closeEntry();
                 } finally {
-                    try {
-                        fileInputStream.close();
-                    } catch(Exception exc){}
+		    IOUtil.close(fis);
                     zos.closeEntry();
                 }
             }
-
         }
-
         return sizeProcessed;
     }
 

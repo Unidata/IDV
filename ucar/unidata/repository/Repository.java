@@ -255,6 +255,8 @@ public class Repository extends RepositoryBase implements RequestHandler {
                        ICON_MOVE);
 
 
+    private int numberOfCurrentRequests = 0;
+
     /** _more_ */
     private Properties mimeTypes;
 
@@ -704,6 +706,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
         getLogManager().logInfoAndPrint("RAMADDA started");
     }
 
+    private void load(Properties properties, String path) throws Exception {
+	InputStream inputStream =  IOUtil.getInputStream(
+							 path,
+							 getClass());
+        properties.load(inputStream);
+	IOUtil.close(inputStream);
+    } 
 
     /**
      * _more_
@@ -727,15 +736,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
          */
 
         properties = new Properties();
-        properties.load(
-            IOUtil.getInputStream(
-                "/ucar/unidata/repository/resources/repository.properties",
-                getClass()));
+        load(properties, "/ucar/unidata/repository/resources/repository.properties");
         try {
-            properties.load(
-                IOUtil.getInputStream(
-                    "/ucar/unidata/repository/resources/build.properties",
-                    getClass()));
+            load(properties,"/ucar/unidata/repository/resources/build.properties");
         } catch (Exception exc) {}
 
         for (int i = 0; i < args.length; i++) {
@@ -743,8 +746,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 continue;
             }
             if (args[i].endsWith(".properties")) {
-                cmdLineProperties.load(IOUtil.getInputStream(args[i],
-                        getClass()));
+                load(cmdLineProperties,args[i]);
             } else if (args[i].equals("-dump")) {
                 dumpFile = args[i + 1];
                 i++;
@@ -792,8 +794,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 IOUtil.joinDir(getStorageManager().getRepositoryDir(),
                                "repository.properties");
             if (new File(localPropertyFile).exists()) {
-                properties.load(IOUtil.getInputStream(localPropertyFile,
-                        getClass()));
+                load(properties,localPropertyFile);
             }
 
             File[] localFiles =
@@ -805,9 +806,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                 if (f.getName().equals("repository.properties")) {
                     continue;
                 }
-                properties.load(IOUtil.getInputStream(f.toString(),
-                        getClass()));
-
+                load(properties,f.toString());
             }
 
         } catch (Exception exc) {}
@@ -819,9 +818,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         initPlugins();
 
         for(String f: pluginPropertyFiles) {
-            properties.load(IOUtil.getInputStream(f,
-                                                  getClass()));
-
+            load(properties,f);
         }
 
 
@@ -849,8 +846,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         mimeTypes = new Properties();
         for (String path : getResourcePaths(PROP_HTML_MIMEPROPERTIES)) {
             try {
-                InputStream is = IOUtil.getInputStream(path, getClass());
-                mimeTypes.load(is);
+                load(mimeTypes,path);
             } catch (Exception exc) {
                 //noop
             }
@@ -912,7 +908,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (dumpFile != null) {
             FileOutputStream fos = new FileOutputStream(dumpFile);
             getDatabaseManager().makeDatabaseCopy(fos, true);
-            fos.close();
+            IOUtil.close(fos);
         }
 
         HtmlUtil.setBlockHideShowImage(iconUrl(ICON_MINUS),
@@ -1958,9 +1954,10 @@ public class Repository extends RepositoryBase implements RequestHandler {
                     Constructor ctor = Misc.findConstructor(c,
                                            new Class[] { Repository.class,
                             Element.class });
-                    addOutputHandler(
-                        (OutputHandler) ctor.newInstance(new Object[] { this,
-                            node }));
+		    OutputHandler outputHandler = (OutputHandler) ctor.newInstance(new Object[] { this,
+												  node });
+                    addOutputHandler(outputHandler);
+
 
                 } catch (Exception exc) {
                     if ( !required) {
@@ -2168,6 +2165,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
+    public int getNumberOfCurrentRequests() {
+	return numberOfCurrentRequests;
+    }
 
     /**
      * _more_
@@ -2179,6 +2179,16 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     public Result handleRequest(Request request) throws Exception {
+	numberOfCurrentRequests++;
+	try {
+	    return handleRequestInner(request);
+	} finally {
+	    numberOfCurrentRequests--;
+	}
+    }
+
+
+    private Result handleRequestInner(Request request) throws Exception {
 
         long   t1 = System.currentTimeMillis();
         Result result;
@@ -2552,13 +2562,13 @@ public class Repository extends RepositoryBase implements RequestHandler {
             root = getStorageManager().localizePath(root);
             String fullPath = root + path;
             try {
-                InputStream is = getStorageManager().getInputStream(fullPath);
+                InputStream inputStream = getStorageManager().getInputStream(fullPath);
                 if (path.endsWith(".js") || path.endsWith(".css")) {
-                    String js = IOUtil.readInputStream(is);
+                    String js = IOUtil.readInputStream(inputStream);
                     js = js.replace("${urlroot}", getUrlBase());
-                    is = new ByteArrayInputStream(js.getBytes());
+                    inputStream = new ByteArrayInputStream(js.getBytes());
                 }
-                Result result = new Result(BLANK, is, type);
+                Result result = new Result(BLANK, inputStream, type);
                 result.setCacheOk(true);
                 return result;
             } catch (IOException fnfe) {
@@ -3080,10 +3090,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         String prop = null;
         if ( !cacheResources()) {
             try {
-                properties.load(
-                    IOUtil.getInputStream(
-                        "/ucar/unidata/repository/resources/repository.properties",
-                        getClass()));
+                load(properties,"/ucar/unidata/repository/resources/repository.properties");
             } catch (Exception exc) {}
         }
 
@@ -4876,8 +4883,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
         if (names == null) {
             try {
                 names = new Properties();
-                InputStream s = getStorageManager().getInputStream(namesFile);
-                names.load(s);
+                load(names, namesFile);
                 namesHolder.put(namesFile, names);
             } catch (Exception exc) {
                 getLogManager().logError("err:" + exc, exc);

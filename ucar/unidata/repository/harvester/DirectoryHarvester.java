@@ -41,10 +41,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
-import java.io.ByteArrayInputStream;
-
 import java.io.File;
-import java.io.InputStream;
 
 import java.lang.reflect.*;
 

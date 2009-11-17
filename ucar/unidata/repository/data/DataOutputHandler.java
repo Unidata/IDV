@@ -411,6 +411,15 @@ public class DataOutputHandler extends OutputHandler {
     }
 
 
+    public void getSystemStats(StringBuffer sb) {
+	sb.append(HtmlUtil.formEntry(msgLabel("Data Cache Size"),
+				     msgLabel("NC File Pool") + ncFilePool.getSize() +HtmlUtil.br() +
+				     msgLabel("Grid Pool") + gridPool.getSize() +HtmlUtil.br() +
+				     msgLabel("Point Pool") + pointPool.getSize() +HtmlUtil.br() +
+				     msgLabel("Trajectory Pool") + trajectoryPool.getSize() +HtmlUtil.br()));
+
+    }
+
 
     /**
      * _more_

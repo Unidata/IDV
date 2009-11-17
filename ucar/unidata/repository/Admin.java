@@ -319,80 +319,84 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     private void getErrorLog(Request request, StringBuffer sb, File logFile)
-            throws Exception {
+	throws Exception {
         FileInputStream fis = getStorageManager().getFileInputStream(logFile);
-        String          log      = request.getString(ARG_LOG, "error");
-        int             numBytes = request.get(ARG_BYTES, 10000);
-        if (numBytes < 0) {
-            numBytes = 100;
-        }
-        long length = logFile.length();
-        long offset = length - numBytes;
-        if (numBytes < length) {
-            sb.append(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                    ARG_LOG, log, ARG_BYTES, numBytes + 2000), "More..."));
-        }
-        sb.append(HtmlUtil.space(2));
-        sb.append(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
-                                             ARG_LOG, log, ARG_BYTES,
-                                             numBytes - 2000), "Less..."));
+	try {
+	    String          log      = request.getString(ARG_LOG, "error");
+	    int             numBytes = request.get(ARG_BYTES, 10000);
+	    if (numBytes < 0) {
+		numBytes = 100;
+	    }
+	    long length = logFile.length();
+	    long offset = length - numBytes;
+	    if (numBytes < length) {
+		sb.append(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
+						     ARG_LOG, log, ARG_BYTES, numBytes + 2000), "More..."));
+	    }
+	    sb.append(HtmlUtil.space(2));
+	    sb.append(HtmlUtil.href(HtmlUtil.url(URL_ADMIN_LOG.toString(),
+						 ARG_LOG, log, ARG_BYTES,
+						 numBytes - 2000), "Less..."));
 
-        sb.append(HtmlUtil.br());
-        if (offset > 0) {
-            fis.skip(offset);
-        } else {
-            numBytes = (int) length;
-        }
-        byte[] bytes = new byte[numBytes];
-        fis.read(bytes);
-        String       logString    = new String(bytes);
-        boolean      didOne       = false;
-        StringBuffer stackSB      = null;
-        boolean      lastOneBlank = false;
-        for (String line : StringUtil.split(logString, "\n", false, false)) {
-            if ( !didOne) {
-                didOne = true;
-                continue;
-            }
-            line = line.trim();
-            if (line.length() == 0) {
-                if (lastOneBlank) {
-                    continue;
-                }
-                lastOneBlank = true;
-            } else {
-                lastOneBlank = false;
-            }
-            if (line.startsWith("</stack>") && (stackSB != null)) {
-                sb.append(
-                    HtmlUtil.insetLeft(
-                        HtmlUtil.makeShowHideBlock(
-                            "Stack trace",
-                            HtmlUtil.div(
-                                stackSB.toString(),
-                                HtmlUtil.cssClass("stack")), false), 10));
-                sb.append("<br>");
-                stackSB = null;
-            } else if (stackSB != null) {
-                line = HtmlUtil.entityEncode(line);
-                stackSB.append(line);
-                stackSB.append("<br>");
-            } else if (line.startsWith("<stack>")) {
-                stackSB = new StringBuffer();
-            } else {
-                line = HtmlUtil.entityEncode(line);
-                sb.append(line);
-                sb.append("<br>");
-                sb.append("\n");
-            }
-        }
-        if (stackSB != null) {
-            sb.append(HtmlUtil.makeShowHideBlock("Stack trace",
-                    HtmlUtil.div(stackSB.toString(),
-                                 HtmlUtil.cssClass("stack")), false));
-        }
+	    sb.append(HtmlUtil.br());
+	    if (offset > 0) {
+		fis.skip(offset);
+	    } else {
+		numBytes = (int) length;
+	    }
+	    byte[] bytes = new byte[numBytes];
+	    fis.read(bytes);
+	    String       logString    = new String(bytes);
+	    boolean      didOne       = false;
+	    StringBuffer stackSB      = null;
+	    boolean      lastOneBlank = false;
+	    for (String line : StringUtil.split(logString, "\n", false, false)) {
+		if ( !didOne) {
+		    didOne = true;
+		    continue;
+		}
+		line = line.trim();
+		if (line.length() == 0) {
+		    if (lastOneBlank) {
+			continue;
+		    }
+		    lastOneBlank = true;
+		} else {
+		    lastOneBlank = false;
+		}
+		if (line.startsWith("</stack>") && (stackSB != null)) {
+		    sb.append(
+			      HtmlUtil.insetLeft(
+						 HtmlUtil.makeShowHideBlock(
+									    "Stack trace",
+									    HtmlUtil.div(
+											 stackSB.toString(),
+											 HtmlUtil.cssClass("stack")), false), 10));
+		    sb.append("<br>");
+		    stackSB = null;
+		} else if (stackSB != null) {
+		    line = HtmlUtil.entityEncode(line);
+		    stackSB.append(line);
+		    stackSB.append("<br>");
+		} else if (line.startsWith("<stack>")) {
+		    stackSB = new StringBuffer();
+		} else {
+		    line = HtmlUtil.entityEncode(line);
+		    sb.append(line);
+		    sb.append("<br>");
+		    sb.append("\n");
+		}
+	    }
+	    if (stackSB != null) {
+		sb.append(HtmlUtil.makeShowHideBlock("Stack trace",
+						     HtmlUtil.div(stackSB.toString(),
+								  HtmlUtil.cssClass("stack")), false));
+	    }
 
-        //        sb.append("</pre>");
+	    //        sb.append("</pre>");
+	} finally {
+	    IOUtil.close(fis);
+	}
     }
 
 
@@ -900,8 +904,9 @@ public class Admin extends RepositoryManager {
         FileOutputStream     fos = new FileOutputStream(tmp);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         getDatabaseManager().makeDatabaseCopy(bos, true);
-        bos.close();
-        fos.close();
+
+        IOUtil.close(bos);
+	IOUtil.close(fos);
         FileInputStream is = new FileInputStream(tmp);
         return new Result("", is, "text/sql");
     }
@@ -1625,12 +1630,13 @@ public class Admin extends RepositoryManager {
             HtmlUtil.formEntry(
                 msgLabel("Up Time"),
                 fmt.format((double) (uptime / 1000 / 60)) + " "
-                + msg("minutes") + HtmlUtil.space(2) + "# Requests:"
+                + msg("minutes") + 
+		HtmlUtil.space(2) + "# Current Requests:"
+                + getRepository().getNumberOfCurrentRequests()+
+		HtmlUtil.space(2) + "Total # Requests:"
                 + getLogManager().getRequestCount()));
 
         getEntryManager().addStatusInfo(statusSB);
-
-
         statusSB.append(HtmlUtil.formTableClose());
 
 

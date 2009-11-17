@@ -47,6 +47,7 @@ import ucar.unidata.repository.type.TypeHandler;
 
 
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.IOUtil;
 
 import java.io.*;
 
@@ -610,8 +611,12 @@ public class RepositoryFtplet extends DefaultFtplet {
             getRepository().getStorageManager().getTmpFile(request, name);
         FileOutputStream fos =
             getRepository().getStorageManager().getFileOutputStream(newFile);
-        session.getDataConnection().openConnection().transferFromClient(
-            session, fos);
+	try {
+	    session.getDataConnection().openConnection().transferFromClient(
+									    session, fos);
+	} finally {
+	    IOUtil.close(fos);
+	}
 
         newFile = getRepository().getStorageManager().moveToStorage(request,
                 newFile);
@@ -780,34 +785,37 @@ public class RepositoryFtplet extends DefaultFtplet {
 
         InputStream inputStream = null;
 
+	try {
+	    if (outputType != null) {
+		request.put(Constants.ARG_OUTPUT, outputType);
+		Result result = getEntryManager().processEntryShow(request,
+								   entry);
+		byte[] contents = result.getContent();
+		inputStream = new ByteArrayInputStream(contents);
+	    } else {
+		if ( !entry.isFile()) {
+		    return handleError(session, ftpRequest, "Not a file: " + entryName);
+		}
+		File file = entry.getFile();
+		inputStream =
+		    getRepository().getStorageManager().getFileInputStream(file);
+	    }
 
-        if (outputType != null) {
-            request.put(Constants.ARG_OUTPUT, outputType);
-            Result result = getEntryManager().processEntryShow(request,
-                                entry);
-            byte[] contents = result.getContent();
-            inputStream = new ByteArrayInputStream(contents);
-        } else {
-            if ( !entry.isFile()) {
-                return handleError(session, ftpRequest, "Not a file: " + entryName);
-            }
-            File file = entry.getFile();
-            inputStream =
-                getRepository().getStorageManager().getFileInputStream(file);
-        }
+	    session.write(
+			  new DefaultFtpReply(
+					      FtpReply.REPLY_150_FILE_STATUS_OKAY,
+					      "Opening binary mode connect."));
+	    session.getDataConnection().openConnection().transferToClient(
+									  session, inputStream);
+	    session.write(
+			  new DefaultFtpReply(
+					      FtpReply.REPLY_226_CLOSING_DATA_CONNECTION,
+					      "Closing data connection."));
 
-        session.write(
-            new DefaultFtpReply(
-                FtpReply.REPLY_150_FILE_STATUS_OKAY,
-                "Opening binary mode connect."));
-        session.getDataConnection().openConnection().transferToClient(
-            session, inputStream);
-        session.write(
-            new DefaultFtpReply(
-                FtpReply.REPLY_226_CLOSING_DATA_CONNECTION,
-                "Closing data connection."));
-
-        session.getDataConnection().closeDataConnection();
+	    session.getDataConnection().closeDataConnection();
+	} finally {
+	    IOUtil.close(inputStream);
+	}
 
         return FtpletResult.SKIP;
     }

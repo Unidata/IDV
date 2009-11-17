@@ -520,11 +520,8 @@ public class MetadataElement extends MetadataTypeBase {
                 throw new IllegalArgumentException("Could not download url:"
                         + url);
             } finally {
-                try {
-                    toStream.close();
-                    fromStream.close();
-                } catch (Exception exc) {}
-
+		IOUtil.close(toStream);
+		IOUtil.close(fromStream);
             }
             theFile = tmpFile.toString();
         } else {

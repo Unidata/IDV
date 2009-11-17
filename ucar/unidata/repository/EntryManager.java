@@ -368,7 +368,6 @@ return new Result(title, sb);
      */
     public Result processEntryShow(Request request) throws Exception {
 
-
         if (false) {
             while (true) {
                 Misc.sleep(1000);
@@ -512,13 +511,23 @@ return new Result(title, sb);
      * @throws Exception _more_
      */
     public Result processEntryShow(Request request, Entry entry)
-            throws Exception {
+	throws Exception {
         Result result = null;
         if (entry.isGroup()) {
             result = processGroupShow(request, (Group) entry);
         } else {
-            result = getRepository().getOutputHandler(request).outputEntry(
-                request, entry);
+	    OutputHandler outputHandler = getRepository().getOutputHandler(request);
+	    if(outputHandler.getMaxConnections()>0) {
+		if(outputHandler.getNumberOfConnections()>=outputHandler.getMaxConnections()) {
+		    return new Result("Connection error", new StringBuffer("Unable to process request at this time"));
+		}
+	    }
+	    outputHandler.incrNumberOfConnections();
+	    try {
+		result = outputHandler.outputEntry(request, entry);
+	    } finally {
+		outputHandler.decrNumberOfConnections();
+	    }
         }
         return result;
     }
@@ -969,10 +978,8 @@ return new Result(title, sb);
                                     parentGroup));
                         }
                     } finally {
-                        try {
-                            toStream.close();
-                            fromStream.close();
-                        } catch (Exception exc) {}
+			IOUtil.close(toStream);
+			IOUtil.close(fromStream);
                     }
                 }
             }
@@ -989,53 +996,59 @@ return new Result(title, sb);
             } else {
                 isLocalFile = false;
                 Hashtable<String, Group> nameToGroup = new Hashtable<String,
-                                                           Group>();
-                ZipInputStream zin =
-                    new ZipInputStream(
-                        getStorageManager().getFileInputStream(resource));
+		    Group>();
+		FileInputStream fis = getStorageManager().getFileInputStream(resource);
+		FileOutputStream fos =null;
+                ZipInputStream zin = new ZipInputStream(fis);
                 ZipEntry ze = null;
-                while ((ze = zin.getNextEntry()) != null) {
-                    if (ze.isDirectory()) {
-                        continue;
-                    }
-                    String path = ze.getName();
-                    String name = IOUtil.getFileTail(path);
-                    if (name.equals("MANIFEST.MF")) {
-                        continue;
-                    }
-                    Group parent = parentGroup;
-                    if (request.get(ARG_FILE_PRESERVEDIRECTORY, false)) {
-                        List<String> toks = StringUtil.split(path, "/", true,
-                                                true);
-                        String ancestors = "";
-                        if (toks.size() > 1) {
-                            toks.remove(toks.size() - 1);
-                        }
-                        for (String parentName : toks) {
-                            ancestors = ancestors + "/" + parentName;
-                            Group group = nameToGroup.get(ancestors);
-                            if (group == null) {
-                                Request tmpRequest =
-                                    getRepository().getTmpRequest();
-                                tmpRequest.setUser(user);
-                                group = findGroupUnder(tmpRequest, parent,
-                                        parentName, user);
-                                nameToGroup.put(ancestors, group);
-                            }
-                            parent = group;
-                        }
-                    }
-                    File f = getStorageManager().getTmpFile(request, name);
-                    FileOutputStream fos =
-                        getStorageManager().getFileOutputStream(f);
-                    IOUtil.writeTo(zin, fos);
-                    fos.close();
-                    parents.add(parent);
-                    resources.add(f.toString());
-                    origNames.add(name);
-                }
+		try {
+		    while ((ze = zin.getNextEntry()) != null) {
+			if (ze.isDirectory()) {
+			    continue;
+			}
+			String path = ze.getName();
+			String name = IOUtil.getFileTail(path);
+			if (name.equals("MANIFEST.MF")) {
+			    continue;
+			}
+			Group parent = parentGroup;
+			if (request.get(ARG_FILE_PRESERVEDIRECTORY, false)) {
+			    List<String> toks = StringUtil.split(path, "/", true,
+								 true);
+			    String ancestors = "";
+			    if (toks.size() > 1) {
+				toks.remove(toks.size() - 1);
+			    }
+			    for (String parentName : toks) {
+				ancestors = ancestors + "/" + parentName;
+				Group group = nameToGroup.get(ancestors);
+				if (group == null) {
+				    Request tmpRequest =
+					getRepository().getTmpRequest();
+				    tmpRequest.setUser(user);
+				    group = findGroupUnder(tmpRequest, parent,
+							   parentName, user);
+				    nameToGroup.put(ancestors, group);
+				}
+				parent = group;
+			    }
+			}
+			File f = getStorageManager().getTmpFile(request, name);
+			fos = getStorageManager().getFileOutputStream(f);
+			try {
+			    IOUtil.writeTo(zin, fos);
+			} finally {
+			    IOUtil.close(fos);
+			}
+			parents.add(parent);
+			resources.add(f.toString());
+			origNames.add(name);
+		    }
+		} finally {
+		    IOUtil.close(fis);
+		    IOUtil.close(zin);
+		}
             }
-
 
             if (request.exists(ARG_CANCEL)) {
                 return new Result(
@@ -2725,8 +2738,8 @@ return new Result(title, sb);
         String    entriesXml        = null;
         Hashtable origFileToStorage = new Hashtable();
 
+	InputStream fis = getStorageManager().getFileInputStream(file);
         try {
-            InputStream fis = getStorageManager().getFileInputStream(file);
             if (file.endsWith(".zip")) {
                 ZipInputStream zin = new ZipInputStream(fis);
                 ZipEntry       ze;
@@ -2757,9 +2770,8 @@ return new Result(title, sb);
             if (entriesXml == null) {
                 entriesXml = IOUtil.readInputStream(fis);
             }
-            fis.close();
-
         } finally {
+            IOUtil.close(fis);
             getStorageManager().deleteFile(new File(file));
         }
 
