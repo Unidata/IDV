@@ -25,6 +25,9 @@ package ucar.unidata.data.sounding;
 
 import ucar.unidata.metdata.NamedStationImpl;
 
+import ucar.unidata.geoloc.Station;
+
+
 
 import visad.VisADException;
 
@@ -63,6 +66,14 @@ public class SoundingStation extends ucar.unidata.metdata.NamedStationImpl {
         super(id, id, lat, lon, elev, visad.CommonUnit.meter);
     }
 
+    /**
+     * Make a SoundingStation from a Station
+     * @param s  station 
+     */
+    public SoundingStation(Station s)
+            throws VisADException, RemoteException {
+        this(s.getName(), s.getLatitude(), s.getLongitude(), s.getAltitude());
+    }
 
 }
 

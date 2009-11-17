@@ -48,7 +48,7 @@ public class SoundingOb {
 
 
     /** station for this ob */
-    private Station station_;
+    private SoundingStation station_;
 
     /** time for this ob */
     private DateTime timestamp_;
@@ -68,7 +68,7 @@ public class SoundingOb {
      * @param   station     location information (lat, lon, id);
      * @param   timestamp   time of the observation
      */
-    public SoundingOb(Station station, DateTime timestamp) {
+    public SoundingOb(SoundingStation station, DateTime timestamp) {
         this(station, timestamp, null);
     }
 
@@ -81,7 +81,7 @@ public class SoundingOb {
      * @param   timestamp   time of the observation
      * @param   raob        the data
      */
-    public SoundingOb(Station station, DateTime timestamp, RAOB raob) {
+    public SoundingOb(SoundingStation station, DateTime timestamp, RAOB raob) {
         station_   = station;
         timestamp_ = timestamp;
         raob_      = raob;
@@ -91,7 +91,7 @@ public class SoundingOb {
      * Return the station information associated with this observation
      * @return   the station
      */
-    public Station getStation() {
+    public SoundingStation getStation() {
         return station_;
     }
 
@@ -100,7 +100,7 @@ public class SoundingOb {
      *
      * @param s  the station
      */
-    public void setStation(Station s) {
+    public void setStation(SoundingStation s) {
         station_ = s;
     }
 

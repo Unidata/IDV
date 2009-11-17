@@ -64,7 +64,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
     String filename = null;
 
     /** The list of levels */
-    List soundingLevels;
+    List<List<SoundingLevelData>> soundingLevels;
 
     /** Height unit */
     Unit heightUnit;
@@ -162,11 +162,11 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
             return;
         }
         super.init();
-        times = new ArrayList();
+        times = new ArrayList<DateTime>();
         // get the station list and number of stations
-        stations       = new ArrayList();  // array of stations
-        soundings      = new ArrayList();  // array of soundings
-        soundingLevels = new ArrayList();
+        stations       = new ArrayList<SoundingStation>();  // array of stations
+        soundings      = new ArrayList<SoundingOb>();  // array of soundings
+        soundingLevels = new ArrayList<List<SoundingLevelData>>();
 
         String       s            = IOUtil.readContents(filename);
         List<String> lines        = StringUtil.split(s, "\n", true, true);
@@ -199,7 +199,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
                 
             // fill the station and sounding lists
             SoundingStation currentStation = null;
-            List            levels         = null;
+            List<SoundingLevelData> levels         = null;
             int             numFound       = 0;
 
             while (numFound < numStations && currentIndex < lines.size()) {
@@ -220,7 +220,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
                         numFound++;
                     }
                     currentStation = makeSoundingStationList(dtoks);
-                    levels         = new ArrayList();
+                    levels         = new ArrayList<SoundingLevelData>();
                 } else if(numToks == 6){
                     appendLevelList(levels, dtoks);
                 } else if(numToks == 5) {
@@ -276,20 +276,20 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
         buf.append(tok.nextToken());
         // now should have something like 2007-1-27-0
         DateTime dt = parseDate(buf.toString());
-        times = new ArrayList(1);
+        times = new ArrayList<DateTime>(1);
         times.add(dt);
 
         int numStations = Integer.parseInt(tok.nextToken());
         // System.err.println("numStations = " + numStations);
 
         // get the station list and number of stations
-        stations       = new ArrayList(numStations);  // array of stations
-        soundings      = new ArrayList(numStations);  // array of soundings
-        soundingLevels = new ArrayList(numStations);
+        stations       = new ArrayList<SoundingStation>(numStations);  // array of stations
+        soundings      = new ArrayList<SoundingOb>(numStations);  // array of soundings
+        soundingLevels = new ArrayList<List<SoundingLevelData>>(numStations);
 
         // fill the station and sounding lists
         SoundingStation currentStation = null;
-        List            levels         = null;
+        List<SoundingLevelData>            levels         = null;
         int             numFound       = 0;
         while (true) {
 
@@ -310,7 +310,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
                     numFound++;
                 }
                 currentStation = makeSoundingStation(tok);
-                levels         = new ArrayList();
+                levels         = new ArrayList<SoundingLevelData>();
             } else {
                 appendLevels(levels, tok);
             }
@@ -324,7 +324,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
      * @param levels  the list of levels
      * @param tok  a list of tokens for the level
      */
-    private void appendLevels(List levels, StringTokenizer tok) {
+    private void appendLevels(List<SoundingLevelData> levels, StringTokenizer tok) {
         if (levels == null) {
             return;
         }
@@ -364,7 +364,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
      * @param levels  the list of levels
      * @param toks  a list of tokens for the level
      */
-    private void appendLevelList(List levels, List<String> toks) {
+    private void appendLevelList(List<SoundingLevelData> levels, List<String> toks) {
         if (levels == null) {
             return;
         }
@@ -479,7 +479,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
      * @param so  the SoundingOb
      * @param levels  list of SoundingLevelData
      */
-    protected void setRAOBData(SoundingOb so, List levels) {
+    protected void setRAOBData(SoundingOb so, List<SoundingLevelData> levels) {
         if (levels == null) {
             return;
         }

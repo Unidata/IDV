@@ -286,9 +286,9 @@ public class NetcdfSoundingAdapter extends SoundingAdapterImpl implements Soundi
 
         // get the station list and number of stations
         numStations = stid.getLengths()[0];
-        stations    = new ArrayList(numStations);  // array of stations
-        soundings   = new ArrayList(numStations);  // array of soundings
-        times       = new ArrayList(10);
+        stations    = new ArrayList<SoundingStation>(numStations);  // array of stations
+        soundings   = new ArrayList<SoundingOb>(numStations);  // array of soundings
+        times       = new ArrayList<DateTime>(10);
         int index[] = new int[1];  // index array to specify which value
 
         // fill the station and sounding lists

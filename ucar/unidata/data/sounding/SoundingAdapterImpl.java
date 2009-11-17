@@ -66,13 +66,13 @@ public abstract class SoundingAdapterImpl extends InvisiblePropertiedBean {
     protected Defaults defaults = null;  // configuration object
 
     /** List of stations */
-    protected List stations;
+    protected List<SoundingStation> stations;
 
     /** List of soundings */
-    protected List soundings;
+    protected List<SoundingOb> soundings;
 
     /** List of times */
-    protected List times;
+    protected List<DateTime> times;
 
 
 
@@ -148,11 +148,11 @@ public abstract class SoundingAdapterImpl extends InvisiblePropertiedBean {
      *
      * @return   list of sounding stations or empty list if none found
      */
-    public List getStations() {
+    public List<SoundingStation> getStations() {
         checkInit();
-        List stnList = new ArrayList();
+        List<SoundingStation> stnList = new ArrayList();
         if (stations != null) {
-            stnList = new ArrayList(stations);
+            stnList = new ArrayList<SoundingStation>(stations);
         }
 
         dbPrint(stnList.size() + " stations");
@@ -166,12 +166,11 @@ public abstract class SoundingAdapterImpl extends InvisiblePropertiedBean {
      *
      * @return   list of sounding stations or null if none found
      */
-    public List getStations(DateTime time) {
+    public List<SoundingStation> getStations(DateTime time) {
         checkInit();
-        List stnList = new ArrayList();
+        List<SoundingStation> stnList = new ArrayList();
         if (stations != null) {
-            for (int i = 0; i < soundings.size(); i++) {
-                SoundingOb snd = (SoundingOb) soundings.get(i);
+            for (SoundingOb snd : soundings) {
                 DateTime   e   = snd.getTimestamp();
                 if (time.equals(e)) {
                     stnList.add(snd.getStation());
@@ -205,7 +204,7 @@ public abstract class SoundingAdapterImpl extends InvisiblePropertiedBean {
         if (soundings != null) {
             for (int i = 0; i < soundings.size(); i++) {
                 SoundingOb      snd = (SoundingOb) soundings.get(i);
-                SoundingStation sta = (SoundingStation) snd.getStation();
+                SoundingStation sta = snd.getStation();
                 if (sta.equals(station)) {
                     return initSoundingOb(snd);
                 }
@@ -254,13 +253,12 @@ public abstract class SoundingAdapterImpl extends InvisiblePropertiedBean {
      *
      * @return   list of times or empty list if none found
      */
-    public List getSoundingTimes(SoundingStation station) {
+    public List<DateTime> getSoundingTimes(SoundingStation station) {
         checkInit();
         List timesList = new ArrayList();
         if (soundings != null) {
-            for (int i = 0; i < soundings.size(); i++) {
-                SoundingOb      snd = (SoundingOb) soundings.get(i);
-                SoundingStation sta = (SoundingStation) snd.getStation();
+            for (SoundingOb snd : soundings) {
+                SoundingStation sta = snd.getStation();
                 if (sta.equals(station)) {
                     timesList.add(snd.getTimestamp());
                 }
