@@ -169,6 +169,10 @@ public class WMSControl extends ImageControl implements ImageObserver {
     /** A cache of data */
     private List cachedData = new ArrayList();
 
+    /** A cache of data */
+    private static Hashtable<String,FieldImpl> fixedImageCache = new Hashtable<String,FieldImpl>();
+
+
     /** The lable that shows the legend icon */
     private JLabel legendIconLbl;
 
@@ -248,6 +252,8 @@ public class WMSControl extends ImageControl implements ImageObserver {
                         IdvResourceManager.RSC_BACKGROUNDWMS));
             setWmsInfos(defaultInfos);
         }
+
+
         return true;
     }
 
@@ -525,6 +531,9 @@ public class WMSControl extends ImageControl implements ImageObserver {
         }
 
 
+        GeoLocationInfo bounds =wmsInfo.getBounds(); 
+        if(bounds==null && wmsInfo.isFixedImage()) return null;
+
         if (inGlobe || !wmsInfo.getAllowSubsets()) {
             return new GeoLocationInfo(wmsInfo.getBounds());
         } else {
@@ -533,9 +542,11 @@ public class WMSControl extends ImageControl implements ImageObserver {
             double minLat = rect.y;
             double maxLat = rect.y + rect.height;
             gli = new GeoLocationInfo(minLat, minLon, maxLat, maxLon);
-            gli.rectify(wmsInfo.getBounds(), 0.0);
-            gli.snapToGrid();
-            gli.rectify(wmsInfo.getBounds(), 0.0);
+            if(bounds!=null) {
+                gli.rectify(bounds, 0.0);
+                gli.snapToGrid();
+                gli.rectify(bounds, 0.0);
+            }
         }
         return gli;
     }
@@ -867,9 +878,13 @@ public class WMSControl extends ImageControl implements ImageObserver {
      * @param myLoadId Job manager load id
      */
     private void loadImage(Object myLoadId) {
+
         showWaitCursor();
         try {
+            long t1 = System.currentTimeMillis();
             FieldImpl imageData = readImageData();
+            long t2 = System.currentTimeMillis();
+            //            System.err.println ("WMS:reading image data " + (t2-t1)); 
             if (imageData != null) {
                 applyData(imageData);
             }
@@ -890,7 +905,7 @@ public class WMSControl extends ImageControl implements ImageObserver {
     private FieldImpl readImageData() throws Exception {
 
 
-        //Hard code the iamge widths based on the resolution when we're in the globe
+        //Hard code the image widths based on the resolution when we're in the globe
         if (inGlobe) {
             if ((wmsInfo != null) && (wmsInfo.getFixedWidth() > -1)) {
                 imageWidth = wmsInfo.getFixedWidth();
@@ -910,10 +925,10 @@ public class WMSControl extends ImageControl implements ImageObserver {
 
 
 
-
         if (currentBounds != null) {
             if ((currentBounds.getDegreesX() == 0.0)
                     || (currentBounds.getDegreesY() == 0.0)) {
+                System.err.println ("current bounds is bad");
                 return null;
             }
         }
@@ -965,26 +980,45 @@ public class WMSControl extends ImageControl implements ImageObserver {
             return imageData;
         }
 
+
+
+
+
+
+
+
+        //        System.err.println(wmsInfo.getAllowSubsets() + " " + wmsInfo.getBounds());
         GeoLocationInfo boundsToUse = ((inGlobe || !wmsInfo.getAllowSubsets())
                                        ? wmsInfo.getBounds()
                                        : currentBounds);
 
 
 
-        String url = wmsInfo.assembleRequest(boundsToUse,
-                                             (int) (imageWidth / resolution),
-                                             (int) (imageHeight
-                                                 / resolution));
-
-
         Image  image        = null;
+        String url;
+        if(wmsInfo.isFixedImage()) {
+            url = wmsInfo.getImageFile();
+            FieldImpl result = fixedImageCache.get(url);
+            if(result!=null) return result;
+        } else {
+            url = wmsInfo.assembleRequest(boundsToUse,
+                                          (int) (imageWidth / resolution),
+                                          (int) (imageHeight
+                                                 / resolution));
+        }
+
+
+
+
         String cacheGroup   = "WMS";
         byte[] imageContent = null;
-        synchronized (cachedUrls) {
-            for (int i = 0; i < cachedUrls.size(); i++) {
-                if (url.equals(cachedUrls.get(i))) {
-                    image = (Image) cachedData.get(i);
-                    break;
+        if(image == null) {
+            synchronized (cachedUrls) {
+                for (int i = 0; i < cachedUrls.size(); i++) {
+                    if (url.equals(cachedUrls.get(i))) {
+                        image = (Image) cachedData.get(i);
+                        break;
+                    }
                 }
             }
         }
@@ -1048,7 +1082,11 @@ public class WMSControl extends ImageControl implements ImageObserver {
                             domain.getY().getLength());
 
 
-        return GridUtil.setSpatialDomain(xyData, imageDomain, true);
+        FieldImpl result = GridUtil.setSpatialDomain(xyData, imageDomain, true);
+        if(wmsInfo.isFixedImage()) {
+            fixedImageCache.put(url, result);
+        }
+        return result;
     }
 
 
@@ -1509,7 +1547,21 @@ public class WMSControl extends ImageControl implements ImageObserver {
         wmsSelections = value;
         if ((wmsSelections != null) && (wmsSelections.size() > 0)
                 && (wmsInfo == null)) {
-            wmsInfo = (WmsSelection) wmsSelections.get(0);
+
+
+            if(theLayer!=null && theLayer instanceof String) {
+                for(WmsSelection selection: (List<WmsSelection>)wmsSelections) {
+                    if(Misc.equals(theLayer, selection.getLayer())) {
+                        wmsInfo = selection;
+                        break;
+                    }
+                }
+            }
+
+
+            if(wmsInfo==null) {
+                wmsInfo = (WmsSelection) wmsSelections.get(0);
+            }
             updateLegendAndList();
         }
     }
