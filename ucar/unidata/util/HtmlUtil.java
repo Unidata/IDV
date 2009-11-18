@@ -1788,6 +1788,9 @@ public class HtmlUtil {
     }
 
 
+
+
+
     /**
      * _more_
      *
@@ -1798,7 +1801,7 @@ public class HtmlUtil {
      *
      * @return _more_
      */
-    public static String select(String name, String[] values,
+    public static String select(String name, Object[] values,
                                 String selected, int maxLength) {
         return select(name, Misc.toList(values), selected, maxLength);
     }
@@ -1889,6 +1892,7 @@ public class HtmlUtil {
         sb.append(open(TAG_SELECT,
                        attrs(ATTR_NAME, name, ATTR_CLASS, CLASS_SELECT)
                        + extra));
+
         for (int i = 0; i < values.size(); i++) {
             Object obj = values.get(i);
             String value;
