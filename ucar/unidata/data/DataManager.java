@@ -311,9 +311,9 @@ public class DataManager {
                 IdvResourceManager.RSC_DATASOURCE));
 
         loadIospResources(resourceManager);
-	SampledSet.setCacheSizeThreshold(10000);
-	//	System.setProperty("visad.java3d.imageByRef", "true");
-	//	System.setProperty("visad.java3d.textureNpot", "true");
+        SampledSet.setCacheSizeThreshold(10000);
+        //      System.setProperty("visad.java3d.imageByRef", "true");
+        //      System.setProperty("visad.java3d.textureNpot", "true");
         visad.data.DataCacheManager.getCacheManager().setCacheDir(new File(getDataCacheDirectory()));
         visad.data.DataCacheManager.getCacheManager().setMemoryPercent(dataContext.getIdv().getStateManager().getPreferenceOrProperty(PROP_CACHE_PERCENT, 0.25));
 
@@ -471,7 +471,7 @@ public class DataManager {
      * @param resourceManager The resource manager
      */
     protected void loadIospResources(IdvResourceManager resourceManager) {
-        NetcdfDataset.initNetcdfFileCache(1,15,-1);
+        //NetcdfDataset.initNetcdfFileCache(1,15,-1);
         ucar.grib.GribResourceReader.setGribResourceReader(
             new ucar.grib.GribResourceReader() {
             public InputStream openInputStream(String resourceName)
@@ -1517,12 +1517,12 @@ public class DataManager {
                 }
 
 
-		Hashtable propertiesToUse; 
-		if(type.properties!=null) {
-		    propertiesToUse = type.properties;
-		} else {
-		    propertiesToUse = properties;
-		}
+                Hashtable propertiesToUse; 
+                if(type.properties!=null) {
+                    propertiesToUse = type.properties;
+                } else {
+                    propertiesToUse = properties;
+                }
                 DataSourceFactory factory =
                     (DataSourceFactory) ctor.newInstance(new Object[] {
                         descriptor,
