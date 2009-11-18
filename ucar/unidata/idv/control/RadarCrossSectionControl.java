@@ -244,6 +244,42 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
     }
 
     /**
+     * Set the start location of the cross section line
+     *
+     *
+     */
+    public void setStartLocation(EarthLocation sl) {
+        startLocation = sl;
+    }
+
+    /**
+     * Get the start location of the cross section line
+     *
+     * @return earthlocation object of line
+     */
+    public EarthLocation getStartLocation() {
+        return startLocation;
+    }
+
+
+    /**
+     * Set the end location of the cross section line
+     *
+     *
+     */
+    public void setEndLocation(EarthLocation sl) {
+        endLocation = sl;
+    }
+
+    /**
+     * Get the end location of the cross section line
+     *
+     * @return earthlocation object of line
+     */
+    public EarthLocation getEndLocation() {
+        return endLocation;
+    }
+    /**
      * _more_
      *
      * @return _more_
@@ -412,16 +448,18 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
         Radar3DCoordinateSystem transform =
             (Radar3DCoordinateSystem) domainSet.getCoordinateSystem();
         //   get station location from the data coordinate transform
-        float  stationLat = (transform.getCenterPoint())[0];
-        float  stationLon = (transform.getCenterPoint())[1];
-        float  stationEl  = (transform.getCenterPoint())[2];
+        if(startLocation == null || endLocation == null) {
+            float  stationLat = (transform.getCenterPoint())[0];
+            float  stationLon = (transform.getCenterPoint())[1];
+            float  stationEl  = (transform.getCenterPoint())[2];
 
-        List   choices    = getDataChoices();
-        String staname    = ((DataChoice) choices.get(0)).getName();
+            List   choices    = getDataChoices();
+            String staname    = ((DataChoice) choices.get(0)).getName();
 
 
-        initLinePosition(stationLat, stationLon);
-        setCSLineLength(defaultLen);
+            initLinePosition(stationLat, stationLon);
+            setCSLineLength(defaultLen);
+        }
     }
 
     /**
