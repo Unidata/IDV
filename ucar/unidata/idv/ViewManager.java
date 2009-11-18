@@ -688,6 +688,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** Vector Graphics renderer */
     private VectorGraphicsRenderer vectorRenderer;
 
+    private String initViewStateName;
+
+
 
 
     /**
@@ -1830,9 +1833,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
             this.animationWidget.setProperties(that.animationInfo);
         }
 
-
-        if (that.initMatrix != null) {
-            setDisplayMatrix(that.initMatrix);
+        if(initViewStateName==null) {
+            if (that.initMatrix != null) {
+                setDisplayMatrix(that.initMatrix);
+            }
         }
 
 
@@ -6887,6 +6891,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
 
+
+    public void setInitViewStateName(String s) {
+        initViewStateName = s;
+    }
+
+    public String getInitViewStateName() {
+        return initViewStateName;
+    }
 
 
 

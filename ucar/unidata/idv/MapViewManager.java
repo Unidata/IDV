@@ -248,6 +248,8 @@ public class MapViewManager extends NavigatedViewManager {
 
     private Rectangle2D.Float initLatLonBounds;
 
+    private boolean defaultGlobeBackground = false;
+
     private double displayProjectionZoom = 0;
 
     /**
@@ -394,10 +396,13 @@ public class MapViewManager extends NavigatedViewManager {
                 mapDisplay.setProjectionMatrix(scaleMatrix);
             }
 
+
             navDisplay = mapDisplay;
             navDisplay.setPerspectiveView(getPerspectiveView());
             Trace.call2("MapViewManager.doMakeDisplayMaster projection");
         }
+
+
         return navDisplay;
     }
 
@@ -465,7 +470,7 @@ public class MapViewManager extends NavigatedViewManager {
             initializeBooleanProperty(
                 new BooleanProperty(
                     PREF_SHOWGLOBEBACKGROUND, "Show Globe Background",
-                    "Show Globe Background", false));
+                    "Show Globe Background", defaultGlobeBackground));
             //            }
         }
 
@@ -883,8 +888,6 @@ public class MapViewManager extends NavigatedViewManager {
      */
     public void initWith(ViewState viewState) throws Exception {
 
-
-
         MapProjection thatProjection =
             (MapProjection) viewState.get(ViewState.PROP_PROJECTION);
         if (thatProjection != null) {
@@ -919,8 +922,30 @@ public class MapViewManager extends NavigatedViewManager {
             throws VisADException, RemoteException {
 
 
+        if(getInitViewStateName()!=null) {
+            List vms = getIdv().getVMManager().getVMState();
+            for (int i = 0; i < vms.size(); i++) {
+                ViewState viewState = (ViewState) vms.get(i);
+                if(viewState.getName().equals(getInitViewStateName())) {
+                    try {
+                        initWith(viewState);
+                        break;
+                    } catch(Exception exc) {
+                        throw new RuntimeException(exc);
+                    }
+                }
+            }
+        }
+
+
+
+
         if(initLatLonBounds!=null) {
             return;
+        }
+
+        if(displayProjectionZoom!=0) {
+            getMapDisplay().zoom(displayProjectionZoom);
         }
 
 
@@ -929,7 +954,9 @@ public class MapViewManager extends NavigatedViewManager {
         }
         MapViewManager mvm            = (MapViewManager) that;
         MapProjection  thatProjection = mvm.getMainProjection();
-        this.setAspectRatio(that.getAspectRatio());
+        if(getInitViewStateName()==null) {
+            this.setAspectRatio(that.getAspectRatio());
+        }
 
         if ((mvm.flythrough != null) && (mvm.flythrough != this.flythrough)) {
             if (this.flythrough != null) {
@@ -949,12 +976,13 @@ public class MapViewManager extends NavigatedViewManager {
                                              mvm.mainProjectionName);
         }
 
-        if ( !setProjection) {
-            if (getAspectRatio() != null) {
-                getMapDisplay().setDisplayAspect(getAspectRatio());
+        if(getInitViewStateName()==null) {
+            if ( !setProjection) {
+                if (getAspectRatio() != null) {
+                    getMapDisplay().setDisplayAspect(getAspectRatio());
+                }
             }
         }
-
 
         //Only save the projection if we're not a globe
         //        getMapDisplay().saveProjection();
@@ -967,9 +995,6 @@ public class MapViewManager extends NavigatedViewManager {
         if (globeBackgroundDisplayable != null) {
             setGlobeBackground((GlobeDisplay) getMapDisplay());
         }
-
-
-
 
 
 
@@ -1155,7 +1180,7 @@ public class MapViewManager extends NavigatedViewManager {
             { "Show Overview Map", PREF_SHOWPIP,
               new Boolean(getStore().get(PREF_SHOWPIP, false)) },
             { "Show Globe Background", PREF_SHOWGLOBEBACKGROUND,
-              new Boolean(getStore().get(PREF_SHOWGLOBEBACKGROUND, false)) }
+              new Boolean(getStore().get(PREF_SHOWGLOBEBACKGROUND, defaultGlobeBackground)) }
         };
 
         Object[][] toolbarObjects = {
@@ -2762,7 +2787,7 @@ public class MapViewManager extends NavigatedViewManager {
         if (useGlobeDisplay) {
             props.add(new BooleanProperty(PREF_SHOWGLOBEBACKGROUND,
                                           "Show Globe Background",
-                                          "Show Globe Background", false));
+                                          "Show Globe Background", defaultGlobeBackground));
         }
     }
 
@@ -2966,6 +2991,7 @@ public class MapViewManager extends NavigatedViewManager {
      *  @param value The new value for GlobeBackgroundShow
      */
     public void setGlobeBackgroundShow(boolean value) {
+        defaultGlobeBackground= value;
         setBp(PREF_SHOWGLOBEBACKGROUND, value);
     }
 
@@ -3134,6 +3160,8 @@ Get the InitLatLonBounds property.
 public Rectangle2D.Float getInitLatLonBounds () {
 	return this.initLatLonBounds;
 }
+
+
 
 
 
