@@ -1635,7 +1635,7 @@ public class DerivedGridFactory {
             (FlatField) SaturationVaporPressure.create((FlatField) temp);
 
         // make grid of actual vapor pressure
-        FlatField eFF = (FlatField) (esFF.multiply((FlatField) rh));
+        FlatField eFF = (FlatField) (GridMath.multiply(esFF, (FlatField) rh));
 
         // The vapor pressure e will be the saturation vapor pressure
         // when the temperature is at the dewpoint.
