@@ -43,6 +43,7 @@ import ucar.nc2.ft.FeatureDatasetPoint;
 
 import ucar.unidata.gis.maps.MapData;
 import ucar.unidata.data.*;
+import ucar.unidata.data.gis.WmsSelection;
 import ucar.unidata.data.DataCategory;
 
 import ucar.unidata.data.DataManager;
@@ -51,6 +52,9 @@ import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.grid.*;
 import ucar.unidata.data.point.NetcdfPointDataSource;
 import ucar.unidata.idv.ControlDescriptor;
+import ucar.unidata.idv.*;
+import ucar.unidata.idv.ViewState;
+import ucar.unidata.idv.VMManager;
 import ucar.unidata.idv.DisplayConventions;
 
 
@@ -125,6 +129,17 @@ import java.util.List;
 public class IdvOutputHandler extends OutputHandler {
 
 
+    public static final String ARG_PRODUCT = "product";
+
+
+    public static final String PRODUCT_IMAGE = "product.image";
+    public static final String PRODUCT_MOV = "product.mov";
+    public static final String PRODUCT_KMZ = "product.kmz";
+
+    private static TwoFacedObject[] products = {new TwoFacedObject("Image", PRODUCT_IMAGE),
+                                                new TwoFacedObject("Quicktime Movie", PRODUCT_MOV),
+                                                new TwoFacedObject("Google Earth KMZ", PRODUCT_KMZ)};
+
     /** _more_ */
     public static final String ARG_IMAGE_CROPX1 = "x1";
 
@@ -141,7 +156,15 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_PUBLISH_NAME = "publish.name";
     public static final String ARG_PUBLISH_DESCRIPTION = "publish.description";
 
+
+
+
+    public static final String ARG_VIEW_GLOBE = "view.globe";
+
+    public static final String ARG_VIEW_VIEWPOINT = "view.viewpoint";
+
     public static final String ARG_VIEW_BOUNDS = "view.bounds";
+    public static final String ARG_VIEW_BACKGROUNDIMAGE = "view.backgroundimage";
 
 
 
@@ -349,6 +372,8 @@ public class IdvOutputHandler extends OutputHandler {
 
     /** _more_ */
     int callCnt = 0;
+
+    private List backgrounds;
 
     /** _more_          */
     private HashSet<String> okControls;
@@ -686,6 +711,30 @@ public class IdvOutputHandler extends OutputHandler {
         StringBuffer basic = new StringBuffer();
         basic.append(HtmlUtil.formTable());
 
+        basic.append(HtmlUtil.formEntry(msgLabel("Product"),
+                                        htmlSelect(request,ARG_PRODUCT,Misc.toList(products)) + HtmlUtil.space(2) +
+                                        msg("Note: For KMZ make sure to set the view bounds"))); 
+
+
+        basic.append(HtmlUtil.formEntry(msgLabel("Make globe"),
+                                        htmlCheckbox(request,ARG_VIEW_GLOBE, 
+							  false)));
+
+        List vms = idvServer.getIdv().getVMManager().getVMState();
+        if (vms.size() >= 0) {
+            List viewPoints = new  ArrayList<String>();
+            viewPoints.add(new TwoFacedObject("--none--",""));
+            for (int i = 0; i < vms.size(); i++) {
+                ViewState viewState = (ViewState) vms.get(i);
+                viewPoints.add(viewState.getName());
+            }
+            basic.append(HtmlUtil.formEntry(msgLabel("Viewpoint"),
+                                            htmlSelect(request,ARG_VIEW_VIEWPOINT,viewPoints)));
+        }
+
+
+
+
         basic.append(HtmlUtil.formEntry(msgLabel("Clip image"),
                                         htmlCheckbox(request,ARG_CLIP, 
 							  false)));
@@ -709,9 +758,19 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
+        Object[] zoomList = new Object[]{
+            new TwoFacedObject("Zoom in even more", "4"),
+            new TwoFacedObject("Zoom in more", "3"),
+            new TwoFacedObject("Zoom in", "2"),
+            new TwoFacedObject("--none--", ""),
+            new TwoFacedObject("Zoom out", "0.75"),
+            new TwoFacedObject("Zoom out more", "0.5"),
+            new TwoFacedObject("Zoom out even more", "0.25"),
+
+        };
+
         basic.append(HtmlUtil.formEntry(msgLabel("Zoom"),
-                                        htmlInput(request,ARG_ZOOM,
-                                                  "")));
+                                        HtmlUtil.select(ARG_ZOOM, Misc.toList(zoomList), Misc.newList(request.getString(ARG_ZOOM, "")),"")));
 
 
 
@@ -754,10 +813,25 @@ public class IdvOutputHandler extends OutputHandler {
 					   HtmlUtil.colorSelect(ARG_MAPCOLOR,request.getString(ARG_MAPCOLOR,StringUtil.toHexString(Color.red)))));
 
 
+
+
+        if(backgrounds==null) {
+            backgrounds = new ArrayList();
+            backgrounds.add(new TwoFacedObject("--none--", ""));
+            for(WmsSelection selection: (List<WmsSelection>)getIdv().getBackgroundImages()) {
+                if(selection.getLayer().indexOf("fixed")>=0) {
+                    backgrounds.add(new TwoFacedObject(selection.getTitle(), selection.getLayer()));
+                }
+            }
+        }
+
+
+	mapAttrs.append(HtmlUtil.formEntry(msgLabel("Background Image"),
+					   htmlSelect(request, ARG_VIEW_BACKGROUNDIMAGE, backgrounds)));
+        
 	mapAttrs.append(HtmlUtil.formTableClose());
 
 	mapSB.append(HtmlUtil.table(new Object[]{mapSelect, mapAttrs}, 10));
-
 	//	basic =new StringBuffer(HtmlUtil.table(new Object[]{basic, mapSB},10));
 	List<String> tabLabels   = new ArrayList<String>();
         List<String> tabContents = new ArrayList<String>();
@@ -1271,13 +1345,23 @@ public class IdvOutputHandler extends OutputHandler {
 			      request.entryUrl(getRepository().URL_ENTRY_SHOW, newEntry));
 	}
 
-
-
+        String baseName = IOUtil.stripExtension(entry.getName());
+        String product = request.getString(ARG_PRODUCT, PRODUCT_IMAGE);
         String       url = getRepository().URL_ENTRY_SHOW.getFullUrl();
-        String islUrl = url + "/" + IOUtil.stripExtension(entry.getName())
+
+
+        String islUrl = url + "/" + baseName
 	    + ".isl";
-        String jnlpUrl = url + "/" + IOUtil.stripExtension(entry.getName())
+        String jnlpUrl = url + "/" + baseName
 	    + ".jnlp";
+
+        if(product.equals(PRODUCT_IMAGE)) 
+            url = url +"/" +baseName +".gif";
+        else if(product.equals(PRODUCT_MOV)) 
+            url = url +"/" +baseName +".mov";
+        else if(product.equals(PRODUCT_KMZ)) 
+            url = url +"/" +baseName +".kmz";
+
 
         Hashtable exceptArgs = new Hashtable();
         exceptArgs.put(ARG_ACTION, ARG_ACTION);
@@ -1290,23 +1374,21 @@ public class IdvOutputHandler extends OutputHandler {
         jnlpUrl = jnlpUrl + "?" + ARG_ACTION + "=" + ACTION_GRID_MAKEIMAGE
 	    + "&" + args + "&" + ARG_TARGET + "=" + TARGET_JNLP;
 
-	/*
-        String clickParams =
-            "event,'imgid',"
-            + HtmlUtil.comma(HtmlUtil.squote(ARG_IMAGE_CROPX1),
-                             HtmlUtil.squote(ARG_IMAGE_CROPY1),
-                             HtmlUtil.squote(ARG_IMAGE_CROPX2),
-                             HtmlUtil.squote(ARG_IMAGE_CROPY2));
+        boolean showForm = true;
+        if(product.equals(PRODUCT_IMAGE)) {
+            sb.append(HtmlUtil.img(url, "Image is being processed...",
+                                   HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
+                                                 request.getString(ARG_IMAGE_WIDTH,
+                                                                   "600")))); 
+            showForm = false;
+        }    else if(product.equals(PRODUCT_MOV)) {
+            sb.append(HtmlUtil.href(url, "Click here to retrieve the movie"));
+        }   else if(product.equals(PRODUCT_KMZ))  {
 
-        String call = HtmlUtil.onMouseClick(HtmlUtil.call("editImageClick",
-							  clickParams));
+            sb.append(HtmlUtil.href(url, "Click here to retrieve the KMZ file"));
+        }
 
-	*/
-        sb.append(HtmlUtil.img(url, "Image is being processed...",
-                               //HtmlUtil.id("imgid") + call +
-			       HtmlUtil.attr(HtmlUtil.ATTR_WIDTH,
-					     request.getString(ARG_IMAGE_WIDTH,
-							       "600"))));
+
 
 
         StringBuffer formSB      = new StringBuffer();
@@ -1323,7 +1405,7 @@ public class IdvOutputHandler extends OutputHandler {
 	sb.append("\n");
         sb.append(HtmlUtil.br());
         sb.append(HtmlUtil.makeShowHideBlock(msg("Form"),
-					     formSB.toString(), false));
+					     formSB.toString(), showForm));
 
         return new Result("Grid Displays", sb);
     }
@@ -1348,9 +1430,10 @@ public class IdvOutputHandler extends OutputHandler {
 	if(fileOrResult instanceof Result) 
 	    return (Result) fileOrResult;
 	File imageFile = (File) fileOrResult;
-        return new Result("preview.gif",
+        String extension = IOUtil.getFileExtension(imageFile.toString());
+        return new Result("",
                           getStorageManager().getFileInputStream(imageFile),
-                          "image/gif");
+                          getRepository().getMimeTypeFromSuffix(extension));
     }
 
     private Object generateGridImage(Request request, Entry entry, GeoGridDataSource dataSource) throws Exception {
@@ -1402,13 +1485,26 @@ public class IdvOutputHandler extends OutputHandler {
 	    fileKey.append(";");
 	}
 
+        boolean      multipleTimes  = false;
+        String product = request.getString(ARG_PRODUCT, PRODUCT_IMAGE);
+        String suffix = ".gif";
+        if(product.equals(PRODUCT_IMAGE)) {
+            suffix = ".gif";
+        } else if(product.equals(PRODUCT_MOV))  {
+            multipleTimes = true;
+            suffix=".mov";
+        }  else if(product.equals(PRODUCT_KMZ)) {
+            multipleTimes = true;
+            suffix=".kmz";
+        }
+
 	String imageKey = fileKey.toString();
         File imageFile = null;
 	synchronized(imageCache) {
 	    imageFile = imageCache.get(imageKey);
 	}
 	if(imageFile == null) {
-	    imageFile = getStorageManager().getTmpFile(request, "gridimage.gif");
+	    imageFile = getStorageManager().getTmpFile(request, "gridimage" + suffix);
 	}
 
 	if(!forIsl && imageFile.exists()) {
@@ -1421,8 +1517,19 @@ public class IdvOutputHandler extends OutputHandler {
         isl.append("<isl debug=\"true\" loop=\"1\" offscreen=\"true\">\n");
 
         StringBuffer viewProps = new StringBuffer();
-        //	viewProps.append(makeProperty( "wireframe","false"));
-	viewProps.append(makeProperty( "wireframe","true"));
+        viewProps.append(makeProperty( "wireframe","false"));
+        //	viewProps.append(makeProperty( "wireframe","true"));
+
+        if(request.defined(ARG_VIEW_VIEWPOINT)) {
+            viewProps.append(makeProperty( "initViewStateName",request.getString(ARG_VIEW_VIEWPOINT,"")));
+        } 
+
+
+        if(request.get(ARG_VIEW_GLOBE, false)) {
+            viewProps.append(makeProperty( "useGlobeDisplay",true));
+        }
+
+
 
 	viewProps.append(makeProperty("background",request.getString(ARG_VIEW_BACKGROUND,"black")));
 
@@ -1486,6 +1593,20 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
 
+        if(request.defined(ARG_VIEW_BACKGROUNDIMAGE)) {
+            StringBuffer propSB = new StringBuffer();
+            propSB.append(makeProperty("id", "backgroundimage"));
+            propSB.append(makeProperty("theLayer", request.getString(ARG_VIEW_BACKGROUNDIMAGE,"")));
+            StringBuffer attrs = new StringBuffer();
+            attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_TYPE, "wmscontrol"));
+
+
+            isl.append(XmlUtil.tag(ImageGenerator.TAG_DISPLAY,
+                                   attrs.toString(), propSB.toString()));
+        }
+
+
+
 
         if (forIsl) {
             isl.append(
@@ -1504,7 +1625,9 @@ public class IdvOutputHandler extends OutputHandler {
         props.put("datasource", dataSource);
         StringBuffer firstDisplays  = new StringBuffer();
         StringBuffer secondDisplays = new StringBuffer();
-        boolean      multipleTimes  = false;
+
+
+
 
         for (int displayIdx = 1; displayIdx <= NUM_PARAMS; displayIdx++) {
             if ( !request.defined(ARG_PARAM + displayIdx)
@@ -1693,6 +1816,9 @@ public class IdvOutputHandler extends OutputHandler {
 									  ARG_DISPLAYUNIT + displayIdx, ""))));
             }
 
+
+
+
 	    //            System.err.println("Props:" + propSB);
             attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_TYPE, display,
                                        ImageGenerator.ATTR_PARAM,
@@ -1732,6 +1858,7 @@ public class IdvOutputHandler extends OutputHandler {
 	isl.append("<pause/>\n");
 
 
+        System.err.println (isl);
 
         if ( !forIsl) {
             isl.append(XmlUtil.tag((multipleTimes
@@ -2021,6 +2148,12 @@ public class IdvOutputHandler extends OutputHandler {
 
         return new Result("Point Display", sb);
 
+    }
+
+
+    
+    private String makeProperty(String name, boolean value) {
+        return makeProperty(name, ""+value);
     }
 
 
