@@ -716,17 +716,10 @@ public class IdvOutputHandler extends OutputHandler {
 
 
         basic.append(HtmlUtil.formTableClose());
-
 	
         StringBuffer bounds = new StringBuffer();
 	String llb =getRepository().makeMapSelector(request, ARG_VIEW_BOUNDS, false);
 	bounds.append(llb);
-	bounds.append(HtmlUtil.br());
-	bounds.append(HtmlUtil.italics(msg("Click in map to select bounds")));
-	bounds.append(HtmlUtil.br());
-	bounds.append(HtmlUtil.italics(msg("Enter \"\" to use default")));
-
-
 
 	StringBuffer mapSB= new StringBuffer();
 	List<MapData> maps = idvServer.getIdv().getResourceManager().getMaps();

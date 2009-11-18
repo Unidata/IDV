@@ -787,10 +787,11 @@ a.menulink {
 }
 
 
+
 .latlon_box {
    border : 3px red solid;
-   #padding:10px;
-   #margin:10px;
+   padding:0px;
+   margin:0px;
    #background-color : black;
    position: absolute; 
    visibility: hidden; 
