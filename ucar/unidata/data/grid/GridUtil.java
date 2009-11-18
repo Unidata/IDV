@@ -3450,13 +3450,17 @@ public class GridUtil {
         int lonindex = isLatLonOrder(domain)
                        ? 1
                        : 0;
+        int latindex = lonindex == 0 ? 1 : 0;
 
-        // check to see if domain really has RealType.Longitude
+        // check to see if domain really has lat/lon
         RealType lonType =
             (RealType) ((SetType) domain.getType()).getDomain().getComponent(
                 lonindex);
-        if ( !(lonType.equals(RealType.Longitude)
-                || (lonType.getName().toLowerCase().indexOf("lon") >= 0))) {
+        RealType latType =
+            (RealType) ((SetType) domain.getType()).getDomain().getComponent(
+                latindex);
+        if ( !(lonType.equalsExceptNameButUnits(RealType.Longitude) &&
+               latType.equalsExceptNameButUnits(RealType.Latitude))) {
             return lon;
         }
         if (lonUnit == null) {
