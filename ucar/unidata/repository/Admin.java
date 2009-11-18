@@ -36,6 +36,7 @@ import ucar.unidata.sql.Clause;
 
 import ucar.unidata.sql.SqlUtil;
 
+import ucar.unidata.util.Counter;
 import ucar.unidata.util.HtmlUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
@@ -1141,6 +1142,14 @@ public class Admin extends RepositoryManager {
                         PROP_ACCESS_REQUIRELOGIN, false)) + HtmlUtil.space(2)
                             + msg("Require login to access the site")));
 
+        asb.append(
+            HtmlUtil.formEntry(
+                "",
+                HtmlUtil.checkbox(
+                    PROP_ACCESS_NOBOTS, "true",
+                    getProperty(
+                        PROP_ACCESS_NOBOTS, false)) + HtmlUtil.space(2)
+                            + msg("Disallow robots")));
 
 
 
@@ -1496,6 +1505,9 @@ public class Admin extends RepositoryManager {
         getRepository().writeGlobal(PROP_ACCESS_REQUIRELOGIN,
                                     request.get(PROP_ACCESS_REQUIRELOGIN,
                                         false));
+        getRepository().writeGlobal(PROP_ACCESS_NOBOTS,
+                                    request.get(PROP_ACCESS_NOBOTS,
+                                        false));
 
 
         return new Result(request.url(URL_ADMIN_SETTINGS));
@@ -1626,19 +1638,28 @@ public class Admin extends RepositoryManager {
                                            fmt.format(usedMemory) + " (MB)"));
 
         long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
+	Counter  counter = getRepository().getNumberOfCurrentRequests();
         statusSB.append(
             HtmlUtil.formEntry(
                 msgLabel("Up Time"),
-                fmt.format((double) (uptime / 1000 / 60)) + " "
-                + msg("minutes") + 
-		HtmlUtil.space(2) + "# Current Requests:"
-                + getRepository().getNumberOfCurrentRequests()+
-		HtmlUtil.space(2) + "Total # Requests:"
-                + getLogManager().getRequestCount()));
+                fmt.format((double) (uptime / 1000 / 60)) + " "+
+                msg("minutes")));
+
+        statusSB.append(
+            HtmlUtil.formEntry(
+			       msgLabel("Total # Requests"),
+			       getLogManager().getRequestCount()+""));
+        statusSB.append(
+            HtmlUtil.formEntryTop(
+			       msgLabel("# Active Requests"),
+			       counter.getCount()+ 
+			       HtmlUtil.space(2)		 +
+			       HtmlUtil.makeShowHideBlock(msg("List"),
+							  StringUtil.join("<br>", counter.getMessages()),false)));
+
 
         getEntryManager().addStatusInfo(statusSB);
         statusSB.append(HtmlUtil.formTableClose());
-
 
 	StringBuffer outputSB = new StringBuffer();
         outputSB.append(HtmlUtil.formTable());

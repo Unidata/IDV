@@ -717,42 +717,16 @@ public class IdvOutputHandler extends OutputHandler {
 
         basic.append(HtmlUtil.formTableClose());
 
+	
         StringBuffer bounds = new StringBuffer();
-	String llb =HtmlUtil.makeLatLonBox(ARG_VIEW_BOUNDS,
-			       request.getString(ARG_VIEW_BOUNDS+"_south",""),
-			       request.getString(ARG_VIEW_BOUNDS+"_north",""),
-			       request.getString(ARG_VIEW_BOUNDS+"_east",""),
-			       request.getString(ARG_VIEW_BOUNDS+"_west",""));
-
-        String clickParams =
-            "event,'bboximg',"+HtmlUtil.squote(ARG_VIEW_BOUNDS);
-
-        String bboxCall = HtmlUtil.onMouseClick(HtmlUtil.call("bboxClick",
-							  clickParams));
-
-
-        String callParams =
-            "'bboximg',"+HtmlUtil.squote(ARG_VIEW_BOUNDS);
-        String bboxJS = "bboxInit(" + callParams +");";
-
-	llb = llb+HtmlUtil.br() +
-	    HtmlUtil.mouseClickHref(bboxJS,"Update Map");
-
-
-
-	bounds.append(HtmlUtil.table(new Object[]{llb,
-						  HtmlUtil.img(getRepository().getUrlBase()+ "/images/caida.jpg","",
-							       HtmlUtil.id("bboximg") + bboxCall +
-							       HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "800"))}));
-
+	String llb =getRepository().makeMapSelector(request, ARG_VIEW_BOUNDS, false);
+	bounds.append(llb);
 	bounds.append(HtmlUtil.br());
 	bounds.append(HtmlUtil.italics(msg("Click in map to select bounds")));
 	bounds.append(HtmlUtil.br());
 	bounds.append(HtmlUtil.italics(msg("Enter \"\" to use default")));
 
-	bounds.append(HtmlUtil.div("",
-			       HtmlUtil.cssClass("image_edit_box") + bboxCall
-                               + HtmlUtil.id("bbox_div")));
+
 
 	StringBuffer mapSB= new StringBuffer();
 	List<MapData> maps = idvServer.getIdv().getResourceManager().getMaps();

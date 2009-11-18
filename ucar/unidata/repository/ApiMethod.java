@@ -29,6 +29,7 @@ import java.util.ArrayList;
 
 import java.util.Hashtable;
 import java.util.List;
+import ucar.unidata.util.Counter;
 
 
 /**
@@ -131,7 +132,7 @@ public class ApiMethod {
     /** _more_ */
     private boolean handlesHead = false;
 
-    private int numberOfCalls=0;
+    private Counter numberOfCalls=new Counter();
 
 
     /**
@@ -433,11 +434,11 @@ public class ApiMethod {
     }
 
     public int getNumberOfCalls() {
-	return numberOfCalls;
+	return numberOfCalls.getCount();
     }
 
     public void incrNumberOfCalls() {
-	numberOfCalls++;
+	numberOfCalls.incr();
     }
 
 

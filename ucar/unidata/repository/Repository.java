@@ -1,5 +1,5 @@
 /**
- *
+*
  * Copyright 1997-2005 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
@@ -38,6 +38,8 @@ import ucar.unidata.repository.output.*;
 import ucar.unidata.repository.type.*;
 
 import ucar.unidata.repository.util.*;
+
+import ucar.unidata.util.Counter;
 
 
 
@@ -255,8 +257,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
                        ICON_MOVE);
 
 
-    private int numberOfCurrentRequests = 0;
-    private Object requestMutex = new Object();
+    private Counter numberOfCurrentRequests = new Counter();
 
     /** _more_ */
     private Properties mimeTypes;
@@ -2180,7 +2181,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
 
-    public int getNumberOfCurrentRequests() {
+    public Counter getNumberOfCurrentRequests() {
 	return numberOfCurrentRequests;
     }
 
@@ -2194,15 +2195,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
      * @throws Exception _more_
      */
     public Result handleRequest(Request request) throws Exception {
-        synchronized(requestMutex) {
-            numberOfCurrentRequests++;
-        }
+	numberOfCurrentRequests.incr(request.getRequestPath());
 	try {
 	    return handleRequestInner(request);
 	} finally {
-            synchronized(requestMutex) {
-                numberOfCurrentRequests--;
-            }
+	    numberOfCurrentRequests.decr(request.getRequestPath());
 	}
     }
 
@@ -2211,10 +2208,11 @@ public class Repository extends RepositoryBase implements RequestHandler {
 
         long   t1 = System.currentTimeMillis();
         Result result;
-        if(request.isSpider()) {
-            return new Result("", new StringBuffer("no bots for now"));
+	if(getProperty(PROP_ACCESS_NOBOTS,false)) {
+	    if(request.isSpider()) {
+		return new Result("", new StringBuffer("no bots for now"));
+	    }
         }
-
 
         //        System.err.println("request:" + request);
         if (debug) {
@@ -3786,6 +3784,63 @@ public class Repository extends RepositoryBase implements RequestHandler {
      */
     public String getDescription() {
         return getProperty(PROP_REPOSITORY_DESCRIPTION, "");
+    }
+
+    public String getMapUrl() {
+	return getUrlBase()+ "/images/worldday.jpg";
+    }
+
+    public String makeMapSelector(Request request, String arg, boolean popup) {
+	return makeMapSelector(arg, popup,request.getString(arg+"_south",""),
+					 request.getString(arg+"_north",""),
+					 request.getString(arg+"_east",""),
+					 request.getString(arg+"_west",""));
+    }
+
+    
+    public String makeMapSelector(String arg, boolean popup, String south, String north, String east, String west) {
+	StringBuffer sb = new StringBuffer();
+	
+	String llb = HtmlUtil.makeLatLonBox(arg,south, north, east,west);
+
+	String imageId = arg+"_bbox_image";
+
+	String clickParams ="event," + HtmlUtil.squote(imageId) +  "," +
+	    HtmlUtil.squote(arg)+"," + (popup?"1":"0");
+	String initParams =
+	    HtmlUtil.squote(imageId) +","+HtmlUtil.squote(arg)+"," + (popup?"1":"0");
+
+
+	String onClickCall = HtmlUtil.onMouseClick(HtmlUtil.call("bboxClick",
+							      clickParams));
+	String bboxDiv = HtmlUtil.div("",
+				      HtmlUtil.cssClass("latlon_box") +
+				      onClickCall +
+				      HtmlUtil.id(arg+"_bbox_div"));
+
+	String imageHtml = bboxDiv +HtmlUtil.img(getMapUrl(),"",
+					HtmlUtil.id(imageId) + onClickCall +
+						 HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "800"));
+
+
+	String rightSide=null;
+	String clearLink =HtmlUtil.mouseClickHref(HtmlUtil.call("bboxClear", HtmlUtil.squote(arg)), msg("Clear"));
+	String updateLink = HtmlUtil.mouseClickHref(HtmlUtil.call("bboxInit",initParams), msg("Update Map"));
+
+	if(popup) {
+	    rightSide =
+		makeStickyPopup(
+				msg("Select"),
+				imageHtml,
+				HtmlUtil.call("bboxInit",initParams)) 
+		+HtmlUtil.space(2) + clearLink +HtmlUtil.space(2) + updateLink;
+	} else {
+	    rightSide = clearLink +HtmlUtil.space(2) + updateLink +HtmlUtil.br() +
+		imageHtml;
+	}
+
+	return HtmlUtil.table(new Object[]{llb, rightSide});
+
     }
 
     /**

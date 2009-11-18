@@ -1178,6 +1178,9 @@ public interface Constants {
     public static final String PROP_ACCESS_ADMINONLY =
         "ramadda.access.adminonly";
 
+    public static final String PROP_ACCESS_NOBOTS =
+        "ramadda.access.nobots";
+
     /** _more_ */
 
     public static final String PROP_ACCESS_REQUIRELOGIN =

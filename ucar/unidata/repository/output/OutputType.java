@@ -37,6 +37,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
+import ucar.unidata.util.Counter;
 
 
 import java.io.*;
@@ -134,7 +135,7 @@ public class OutputType {
     /** _more_ */
     private int type = TYPE_HTML;
 
-    private int numberOfCalls = 0;
+    private Counter numberOfCalls = new Counter();
 
 
     /**
@@ -421,11 +422,11 @@ public class OutputType {
     }
 
     public int getNumberOfCalls() {
-	return numberOfCalls;
+	return numberOfCalls.getCount();
     }
 
     public void incrNumberOfCalls() {
-	numberOfCalls++;
+	numberOfCalls.incr();
     }
 
 

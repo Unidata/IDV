@@ -26,9 +26,7 @@
         <property name="docs_javadoc_dest" value="${docs_dest}/javadoc" />
         <mkdir dir="${docs_javadoc_dest}"/>
 
-
-
-       <property name="classpath" value="${libsdir}/idv.jar:${libsdir}/repositorytds.jar:${libsdir}/repositorylib.jar:${libsdir}/servlet-api.jar:${libsdir}/jython.jar"/>
+       <property name="classpath" value="${libsdir}/idv.jar:${libsdir}/repositorylib.jar:${libsdir}/repositorytds.jar:${libsdir}/servlet-api.jar"/>
     </target>
 
     <target name="clean" depends="init" >
@@ -264,7 +262,7 @@
               <attribute name="Implementation-Version" value="1.0"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.repository.RepositoryServer"/>
-              <attribute name="Class-Path" value="repositorylib.jar idv.jar  jython.jar external.jar repositorytds.jar servlet-api.jar"/>
+              <attribute name="Class-Path" value="idv.jar repositorylib.jar  repositorytds.jar servlet-api.jar"/>
             </manifest> 
             <include name="ucar/**/*.class"/>
             <include name="ucar/unidata/repository/htdocs/**/*.*"/>
@@ -289,9 +287,10 @@
             <fileset dir="${releasedir}" includes="**/*"/>
         </delete>
         <copy  file="${libsdir}/repository.jar" todir="${releasedir}"/>
-        <copy  file="${libsdir}/repositorylib.jar" todir="${releasedir}"/>
         <copy  file="${libsdir}/idv.jar" todir="${releasedir}"/>
+        <copy  file="${libsdir}/repositorylib.jar" todir="${releasedir}"/>
         <copy  file="${repositorydir}/release/ramadda.sh" todir="${releasedir}"/>
+        <copy  file="${repositorydir}/release/ramadda.bat" todir="${releasedir}"/>
         <copy  file="${repositorydir}/release/ramaddamysql.sh" todir="${releasedir}"/>
         <copy  file="${repositorydir}/README" todir="${releasedir}"/>
         <copy  file="${libsdir}/repositorytds.jar" todir="${releasedir}"/>
@@ -335,9 +334,9 @@
       <war webxml="${repositorydir}/release/web.xml" destfile="${libsdir}/repository.war">
           <webinf file="${repositorydir}/release/repository.properties"/>
           <lib file="${libsdir}/repository.jar"/>
+          <lib file="${libsdir}/idv.jar"/>
           <lib file="${libsdir}/repositorylib.jar"/>
           <lib file="${libsdir}/repositorytds.jar"/>
-          <lib file="${libsdir}/idv.jar"/>
       </war>
 
 

@@ -1482,6 +1482,22 @@ var latLonIdxY1;
 var latLonIdxX2=-1;
 var latLonIdxY2=-1;
 
+function bboxClear(argBase) { 
+    var    fldNorth= util.getDomObject(argBase+"_north");
+    var    fldSouth= util.getDomObject(argBase+"_south");
+    var    fldEast= util.getDomObject(argBase+"_east");
+    var    fldWest= util.getDomObject(argBase+"_west");
+    fldNorth.obj.value = "";
+    fldSouth.obj.value = "";
+    fldEast.obj.value = "";
+    fldWest.obj.value = "";
+    var box = util.getDomObject(argBase+ "_bbox_div");
+    if(box) {
+	var style = util.getStyle(box);
+	style.visibility =  "hidden";
+    }
+}
+
 function bboxInit(imgId, argBase, absolute) { 
     var image = util.getDomObject(imgId);
     if(!image) {
@@ -1497,7 +1513,7 @@ function bboxInit(imgId, argBase, absolute) {
     var    fldWest= util.getDomObject(argBase+"_west");
 
 
-    var box = util.getDomObject("bbox_div");
+    var box = util.getDomObject(argBase+ "_bbox_div");
     var valuesOk = true;
 
     if(fldNorth.obj.value == "") valuesOk = false;
@@ -1523,14 +1539,12 @@ function bboxInit(imgId, argBase, absolute) {
     ix1 = (lon1+180)*imgWidth/360;
     iy1 = -(lat1-90)*imgHeight/180;
 
-
     ix2 = (lon2+180)*imgWidth/360;
     iy2 = -(lat2-90)*imgHeight/180;
 
 
-
-    var  idx =  util.getLeft(image.obj);
-    var  idy =  util.getTop(image.obj);
+    var  imageLeft =  util.getLeft(image.obj);
+    var  imageTop =  util.getTop(image.obj);
 
 
     if(box) {
@@ -1538,16 +1552,15 @@ function bboxInit(imgId, argBase, absolute) {
 	style.visibility =  "visible";
 	if(absolute) {
 	    style.left = ix1;
-	    style.top =  iy2;
+	    style.top =  iy1+image.obj.offsetTop;
 	} else {
-	    style.left = idx+ix1;
-	    style.top =  idy+iy1;
+	    style.left = imageLeft+ix1;
+	    style.top =  imageTop+iy1;
 	}
-	var x2 = ix2;
-	var y2 = iy2;
-	if(x2>0) {
-	    style.width = x2-ix1;
-	    style.height = y2-iy1;
+
+	if(ix2>0) {
+	    style.width = ix2-ix1;
+	    style.height = iy2-iy1;
 	}  else {
 	    style.width = 0;
 	    style.height = 0;
@@ -1561,8 +1574,8 @@ function bboxClick(event, imgId, argBase,absolute) {
 	return;
     }
 
-    imgWidth = image.obj.width;
-    imgHeight = image.obj.height;
+    imageWidth = image.obj.width;
+    imageHeight = image.obj.height;
 
     var ulX =  util.getLeft(image.obj);
     var ulY =  util.getTop(image.obj);
@@ -1574,15 +1587,13 @@ function bboxClick(event, imgId, argBase,absolute) {
     var imageY = ey - ulY;
 
 
-    var lon =  -180 + imageX/imgWidth*360;
-    var lat =  90-imageY/imgHeight*180;
-
+    var lon =  -180 + imageX/imageWidth*360;
+    var lat =  90-imageY/imageHeight*180;
 
     var    fldNorth= util.getDomObject(argBase+"_north");
     var    fldSouth= util.getDomObject(argBase+"_south");
     var    fldEast= util.getDomObject(argBase+"_east");
     var    fldWest= util.getDomObject(argBase+"_west");
-
 
 
     if(bboxDoFirst) {
@@ -1601,13 +1612,16 @@ function bboxClick(event, imgId, argBase,absolute) {
 	fldEast.obj.value = lon;
     }
 
-    var box = util.getDomObject("bbox_div");
+
+    var box = util.getDomObject(argBase+"_bbox_div");
+
+
     if(box) {
 	var style = util.getStyle(box);
 	style.visibility =  "visible";
 	if(absolute) {
 	    style.left = latLonIdxX1;
-	    style.top =  latLonIdxY1;
+	    style.top =  latLonIdxY1+image.obj.offsetTop;
 	} else {
 	    style.left = ulX+latLonIdxX1;
 	    style.top =  ulY+latLonIdxY1;

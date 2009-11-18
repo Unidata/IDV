@@ -591,7 +591,6 @@ public class StorageManager extends RepositoryManager {
                     throw new RuntimeException(exc);
                 }
             }
-            System.err.println ("Configuring log4j: " + log4JFile);
             org.apache.log4j.PropertyConfigurator.configure(
                 log4JFile.toString());
         }

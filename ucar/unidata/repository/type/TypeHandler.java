@@ -1589,50 +1589,22 @@ public class TypeHandler extends RepositoryManager {
                 }
                 //                mapOutputHandler.getMap( request, entries,mapSB, 300,200,false);
             }
-            String latLonForm = HtmlUtil.makeLatLonBox(ARG_AREA,
-                                    ((entry != null) && entry.hasSouth())
-                                    ? entry.getSouth()
-                                    : Double.NaN, ((entry != null)
-                                        && entry.hasNorth())
-                    ? entry.getNorth()
-                    : Double.NaN, ((entry != null) && entry.hasEast())
-                                  ? entry.getEast()
-                                  : Double.NaN, ((entry != null)
-                                      && entry.hasWest())
-                    ? entry.getWest()
-                    : Double.NaN);
-
-	    StringBuffer bboxSelect = new StringBuffer();
-
-	    String clickParams =
-		"event,'bboximg',"+HtmlUtil.squote(ARG_AREA)+",'1'";
-	    String initParams =
-		"'bboximg',"+HtmlUtil.squote(ARG_AREA)+",'1'";
-
-	    String bboxCall = HtmlUtil.onMouseClick(HtmlUtil.call("bboxClick",
-								  clickParams));
-	    String bboxDiv = HtmlUtil.div("",
-					   HtmlUtil.cssClass("latlon_box")
-					   + HtmlUtil.id("bbox_div"));
-	    bboxSelect.append(bboxDiv);
-
-	    bboxSelect.append(HtmlUtil.img(getRepository().getUrlBase()+ "/images/worldday.jpg","",
-					   HtmlUtil.id("bboximg") + bboxCall +
-					   HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "600")));
-
-
-
-
-	    String bboxLink =
-		getRepository().makeStickyPopup(
-					      msg("Select"),
-					      bboxSelect.toString(),
-					      HtmlUtil.call("bboxInit",initParams));
+            String mapSelector = getRepository().makeMapSelector(ARG_AREA, true,
+								 ((entry != null) && entry.hasSouth())
+								 ? ""+entry.getSouth()
+								 : "", ((entry != null)
+										&& entry.hasNorth())
+								 ? ""+entry.getNorth()
+								 : "", ((entry != null) && entry.hasEast())
+								 ? ""+entry.getEast()
+								 : "", ((entry != null)
+										&& entry.hasWest())
+								 ? ""+entry.getWest()
+								 : "");
 
             sb.append(
                 HtmlUtil.formEntry(
-                    "Location:",
-                    HtmlUtil.table(new Object[]{latLonForm, bboxLink})));
+				   "Location:",mapSelector));
 
         }
 
@@ -1936,39 +1908,11 @@ public class TypeHandler extends RepositoryManager {
                                   request.get(ARG_INCLUDENONGEO,
                                       true)) + " Include non-geographic";
 
-            String areaWidget = HtmlUtil.makeLatLonBox(
-                                    ARG_AREA,
-                                    request.getString(
-                                        ARG_AREA + "_south",
-                                        ""), request.getString(
-                                            ARG_AREA + "_north",
-                                            ""), request.getString(
-                                                ARG_AREA + "_east",
-                                                ""), request.getString(
-                                                    ARG_AREA + "_west", ""));
 
-            boolean      doMap    = false;
-
-            StringBuffer scriptSB = new StringBuffer();
-            if (doMap) {}
-
-            String mapCanvas = (doMap
-                                ? HtmlUtil.div("",
-                                    " id=\"mapcanvas\" class=\"mapcanvas\"")
-                                : "");
-            areaWidget = "<table><tr valign=top>"
-                         + HtmlUtil.cols(areaWidget, mapCanvas)
-                         + "</tr></table>";
-            String mapJS = (doMap
-                            ? HtmlUtil.script(
-                                "function initTheMap() {\ninitMap('mapcanvas');\n}\ndojo.addOnLoad(initTheMap);\n")
-                            : "");
-            areaWidget += mapJS;
-
+	    String mapSelector = getRepository().makeMapSelector(request, ARG_AREA,true);
             advancedSB.append(HtmlUtil.formEntry(msgLabel("Extent"),
-                    areaWidget));
+                    mapSelector));
             advancedSB.append("\n");
-
         }
 
 
