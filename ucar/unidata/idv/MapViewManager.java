@@ -360,11 +360,12 @@ public class MapViewManager extends NavigatedViewManager {
                                                                        initLatLonBounds.getY(),
                                                                        initLatLonBounds.getX()+initLatLonBounds.getWidth(),false);
 
-                } else {
-                    ProjectionImpl dfltProjection = getDefaultProjection();
-                    mainProjection =
-                        new ProjectionCoordinateSystem(dfltProjection);
-                }
+                    
+		} else {
+		    ProjectionImpl dfltProjection = getDefaultProjection();
+		    mainProjection =
+			new ProjectionCoordinateSystem(dfltProjection);
+		}
             }
             if (isInteractive()) {
                 addProjectionToHistory(mainProjection, "Default");
@@ -379,21 +380,21 @@ public class MapViewManager extends NavigatedViewManager {
             mapDisplay.setClipDistanceBack(getStateManager().getProperty(PROP_CLIPDISTANCE_MAP_BACK,NavigatedDisplay.CLIP_BACK_DEFAULT));
 
 
-            if(initLatLonBounds==null) {
-                double[] aspect = getAspectRatio();
-                if (aspect == null) {
-                    aspect = new double[] { 1.0, 1.0, 0.4 };
-                }
-                mapDisplay.setDisplayAspect((mode == NavigatedDisplay.MODE_2D)
-                                            ? new double[] { aspect[0],
-                                                             aspect[1] }
-                                            : aspect);
-            } else {
+	    if(initLatLonBounds==null) {
+		double[] aspect = getAspectRatio();
+		if (aspect == null) {
+		    aspect = new double[] { 1.0, 1.0, 0.4 };
+		}
+		mapDisplay.setDisplayAspect((mode == NavigatedDisplay.MODE_2D)
+					    ? new double[] { aspect[0],
+							     aspect[1] }
+					    : aspect);
+	    } else {
                 //If we have a a latlonbounds then we want to display exactly that area
                 double[] aspect = new double[] { 1.0, initLatLonBounds.getHeight()/initLatLonBounds.getWidth(), 1.0 };
                 double[] scaleMatrix =mapDisplay.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
                                                                                 aspect[0],aspect[1],1, 0.0, 0.0, 0.0);
-                mapDisplay.setProjectionMatrix(scaleMatrix);
+                //                mapDisplay.setProjectionMatrix(scaleMatrix);
             }
 
 
@@ -927,31 +928,40 @@ public class MapViewManager extends NavigatedViewManager {
             for (int i = 0; i < vms.size(); i++) {
                 ViewState viewState = (ViewState) vms.get(i);
                 if(viewState.getName().equals(getInitViewStateName())) {
-                    try {
-                        initWith(viewState);
+                    if(isCompatibleWith(viewState)) {
+                        try {
+                            initWith(viewState);
+                            break;
+                        } catch(Exception exc) {
+                            throw new RuntimeException(exc);
+                        }
+                    } else {
+                        setInitViewStateName(null);
                         break;
-                    } catch(Exception exc) {
-                        throw new RuntimeException(exc);
                     }
                 }
             }
+            
         }
 
-
-
-
-        if(initLatLonBounds!=null) {
-            return;
-        }
-
-        if(displayProjectionZoom!=0) {
-            getMapDisplay().zoom(displayProjectionZoom);
-        }
 
 
         if ( !(that instanceof MapViewManager)) {
             return;
         }
+
+
+        if(displayProjectionZoom!=0) {
+            getMapDisplay().zoom(displayProjectionZoom);
+        }
+
+        if(initLatLonBounds!=null) {
+            return;
+        }
+
+
+
+
         MapViewManager mvm            = (MapViewManager) that;
         MapProjection  thatProjection = mvm.getMainProjection();
         if(getInitViewStateName()==null) {
