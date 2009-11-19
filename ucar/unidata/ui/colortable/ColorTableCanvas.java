@@ -130,6 +130,8 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
     private static final int[] modes = { MODE_FILL, MODE_INTERPOLATE,
                                          MODE_BRIGHTNESS, MODE_TRANSPARENCY };
 
+    private int DFLT_COLOR_SPACE = -999;
+
     /** The drawing mode names */
     private static final String[] modeNames = { "Fill", "Interpolate",
             "Brightness:", "Transparency:" };
@@ -555,7 +557,11 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         setColorFromChooserCbx.setToolTipText(
             "Automatically change the color of the selected breakpoint");
         Vector colorSpaces = new Vector();
-        colorSpaces.add(new TwoFacedObject("RGB", ColorSpace.CS_LINEAR_RGB));
+	
+
+
+	colorSpaces.add(new TwoFacedObject("Default", DFLT_COLOR_SPACE));
+	colorSpaces.add(new TwoFacedObject("RGB", ColorSpace.CS_LINEAR_RGB));
         colorSpaces.add(new TwoFacedObject("SRGB", ColorSpace.CS_sRGB));
         colorSpaces.add(new TwoFacedObject("CIE", ColorSpace.CS_CIEXYZ));
         colorSpaces.add(new TwoFacedObject("GRAY", ColorSpace.CS_GRAY));
@@ -568,7 +574,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
                     GuiUtils.hbox(
                         setColorFromChooserCbx,
                         GuiUtils.wrap(
-                            colorSwatch)), colorSpaceCbx), colorChooser);
+				      colorSwatch)), GuiUtils.label("Color Space:",colorSpaceCbx)), colorChooser);
 
 
         JPanel contents = GuiUtils.inset(
@@ -1237,7 +1243,7 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      * @param e event
      */
     public void checkCursor(MouseEvent e) {
-        if (cursorOver == isInBox(e)) {
+        if (cursorOver == reallyInBox(e)) {
             if (cursorPosition != e.getX()) {
                 cursorPosition = e.getX();
                 repaint();
@@ -1262,7 +1268,17 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      */
     public boolean isInBox(MouseEvent event) {
         Rectangle box = getColorBox();
-        return box.contains(new Point(event.getX(), event.getY()));
+	int ex = event.getX();
+	int ey = event.getY();
+	if(ey<box.y) return false;
+	if(ey>box.y+box.height) return false;
+	return true;
+	//        return box.contains(new Point(event.getX(), event.getY()));
+    }
+
+    public boolean reallyInBox(MouseEvent event) {
+        Rectangle box = getColorBox();
+	return box.contains(new Point(event.getX(), event.getY()));
     }
 
 
@@ -2168,19 +2184,29 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
      * @param lowerColor The lower color
      * @param upperColor The upper color
      */
-    public void interpolate(int lowerColorIndex, int upperColorIndex,
-                            Color lowerColor, Color upperColor) {
-        float      steps = (float) (upperColorIndex - lowerColorIndex + 1);
-
-
-	//        ColorSpace rgb   = ColorSpace.getInstance(ColorSpace.CS_sRGB);
-        ColorSpace rgb   = ColorSpace.getInstance(ColorSpace.CS_LINEAR_RGB);
-
+     public void interpolate(int lowerColorIndex, int upperColorIndex,
+			Color lowerColor, Color upperColor) {
         int colorSpace =
             ((Integer) ((TwoFacedObject) colorSpaceCbx.getSelectedItem())
                 .getId()).intValue();
-        ColorSpace other = ColorSpace.getInstance(colorSpace);
+	if(colorSpace  ==DFLT_COLOR_SPACE) {
+	    oldInterpolate(lowerColorIndex, upperColorIndex, lowerColor, upperColor);
+	} else {
+	    newInterpolate(colorSpace, lowerColorIndex, upperColorIndex, lowerColor, upperColor);
+	}
+        tableChanged();
+        repaint();
+    }
 
+
+    public void newInterpolate(int colorSpace, int lowerColorIndex, int upperColorIndex,
+			   Color lowerColor, Color upperColor) {
+
+        float      steps = (float) (upperColorIndex - lowerColorIndex + 1);
+	ColorSpace rgb   = ColorSpace.getInstance(ColorSpace.CS_LINEAR_RGB);
+	rgb =  lowerColor.getColorSpace();
+
+        ColorSpace other = ColorSpace.getInstance(colorSpace);
 
         float[] comps1 = rgb.toCIEXYZ(lowerColor.getColorComponents(rgb,
                              null));
@@ -2189,62 +2215,61 @@ public class ColorTableCanvas extends JPanel implements MouseMotionListener,
         comps1 = other.fromCIEXYZ(comps1);
         comps2 = other.fromCIEXYZ(comps2);
 
-
-        /*
-        double redStep = (upperColor.getRed() - lowerColor.getRed()) / steps;
-        double greenStep = (upperColor.getGreen() - lowerColor.getGreen())
-                           / steps;
-        double blueStep = (upperColor.getBlue() - lowerColor.getBlue())
-                          / steps;
-
-        */
-
         float[] stepArray = new float[comps1.length];
         for (int j = 0; j < comps1.length; j++) {
             stepArray[j] = (comps2[j] - comps1[j]) / steps;
-            //            System.err.println("step:" + j +"  " +stepArray[j]);
         }
-
-        float redStep = (upperColor.getRed() - lowerColor.getRed()) / steps;
-        float greenStep = (upperColor.getGreen() - lowerColor.getGreen())
-                          / steps;
-        float blueStep = (upperColor.getBlue() - lowerColor.getBlue())
-                         / steps;
-
         int     cnt = 0;
         float[] tmp = new float[comps1.length];
-
         for (int i = lowerColorIndex; i <= upperColorIndex; i++, cnt++) {
             try {
                 Color current = (Color) colorList.get(i);
                 for (int j = 0; j < comps1.length; j++) {
                     tmp[j] = comps1[j] + stepArray[j] * i;
-                    //                System.err.print(tmp[j] +" ");
+		    if(tmp[j]<0.0001f) tmp[j] = 0f;
+		    else if(tmp[j]>1.0f) tmp[j] = 1.0f;
                 }
-                //            System.err.println("");
-
-                //            Color c = new Color(other, tmp,current.getAlpha());
                 Color c = new Color(other, tmp,
                                     ((float) current.getAlpha()) / 255.0f);
                 colorList.set(i, c);
-
-                //            int   newRed   = lowerColor.getRed() + (int) (redStep * cnt);
-                //            int   newGreen = lowerColor.getGreen() + (int) (greenStep * cnt);
-                //            int   newBlue  = lowerColor.getBlue() + (int) (blueStep * cnt);
-                //            colorList.set(i, new Color(newRed, newGreen, newBlue,
-                //                                       current.getAlpha()));
             } catch (IllegalArgumentException iae) {
-                //                throw iae;
-                System.err.print("bad  ");
+		/*
+		System.err.print("bad  tmp:");
                 for (int j = 0; j < comps1.length; j++) {
                     System.err.print(tmp[j] + " ");
                 }
+
+		System.err.print(" steps:");
+                for (int j = 0; j < comps1.length; j++) {
+                    System.err.print(stepArray[j] + " ");
+                }
                 System.err.println("");
+		*/
             }
         }
-        tableChanged();
-        repaint();
     }
+
+
+    public void oldInterpolate(int lowerColorIndex, int upperColorIndex,
+                            Color lowerColor, Color upperColor) {
+        float      steps = (float) (upperColorIndex - lowerColorIndex + 1);
+        double redStep = (upperColor.getRed() - lowerColor.getRed()) / steps;
+        double greenStep = (upperColor.getGreen() - lowerColor.getGreen())
+                           / steps;
+        double blueStep = (upperColor.getBlue() - lowerColor.getBlue())
+                          / steps;
+        int     cnt = 0;
+
+        for (int i = lowerColorIndex; i <= upperColorIndex; i++, cnt++) {
+	    Color current = (Color) colorList.get(i);
+	    int   newRed   = lowerColor.getRed() + (int) (redStep * cnt);
+	    int   newGreen = lowerColor.getGreen() + (int) (greenStep * cnt);
+	    int   newBlue  = lowerColor.getBlue() + (int) (blueStep * cnt);
+	    colorList.set(i, new Color(newRed, newGreen, newBlue,
+				       current.getAlpha()));
+        }
+    }
+
 
     /**
      * Do a linear interpolation of the colors in the range defined
