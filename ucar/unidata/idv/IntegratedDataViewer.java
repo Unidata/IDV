@@ -22,6 +22,7 @@
 
 
 
+
 package ucar.unidata.idv;
 
 
@@ -359,6 +360,16 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         getDataManager();
         getPublishManager().initPublisher();
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getServerMode() {
+        return !interactiveMode;
+    }
+
 
     /**
      * Are we interactive
