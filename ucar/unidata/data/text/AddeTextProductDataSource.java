@@ -217,7 +217,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
 
                 // Major  hack
                 String apro = ti.fileExtension;
-                if (apro.length() == 3) {
+                if (apro.length() == 3 && StringUtil.isUpperCase(apro)) {
                     buf.append("APRO=");
                     buf.append(apro);
                     if (station != null) {
