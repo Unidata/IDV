@@ -1650,7 +1650,7 @@ public class Repository extends RepositoryBase implements RequestHandler {
     /**
      * _more_
      */
-    private void clearAllCaches() {
+    public void clearAllCaches() {
         for (OutputHandler outputHandler : outputHandlers) {
             outputHandler.clearCache();
         }

@@ -1930,7 +1930,7 @@ public class Admin extends RepositoryManager {
 	    getDatabaseManager().reInitialize();
             return new Result(request.url(URL_ADMIN_CLEANUP));
         } else if (request.defined(ACTION_CLEARCACHE)) {
-            getRepository().clearCache();
+            getRepository().clearAllCaches();
         }
         String status = cleanupStatus.toString();
         if (runningCleanup) {
