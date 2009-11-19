@@ -21,6 +21,7 @@
  */
 
 
+
 package ucar.unidata.data;
 
 
@@ -32,6 +33,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import ucar.grib.grib2.Grib2Indexer;
+
+import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.util.DiskCache;
 
 import ucar.unidata.idv.IdvConstants;
 
@@ -83,8 +87,6 @@ import java.util.TimeZone;
 
 import javax.swing.filechooser.FileFilter;
 
-import ucar.nc2.dataset.NetcdfDataset;
-import ucar.nc2.util.DiskCache;
 
 /**
  * A class for managing {@link DataSource}s
@@ -139,6 +141,7 @@ public class DataManager {
     /** The show in tree property */
     public static final String PROP_SHOW_IN_TREE = "show_in_tree";
 
+    /** _more_          */
     public static final String PROP_CACHE_PERCENT = "idv.data.cache.percent";
 
     /** bbox property */
@@ -311,46 +314,54 @@ public class DataManager {
                 IdvResourceManager.RSC_DATASOURCE));
 
         loadIospResources(resourceManager);
-        SampledSet.setCacheSizeThreshold(10000);
         //      System.setProperty("visad.java3d.imageByRef", "true");
         //      System.setProperty("visad.java3d.textureNpot", "true");
-        visad.data.DataCacheManager.getCacheManager().setCacheDir(new File(getDataCacheDirectory()));
-        visad.data.DataCacheManager.getCacheManager().setMemoryPercent(dataContext.getIdv().getStateManager().getPreferenceOrProperty(PROP_CACHE_PERCENT, 0.25));
 
+        //The IDV can run normally (i.e., the usual interactive IDV) and also in server mode (e.g., within RAMADDA)
+        //If in server mode then its expected that the server has done this configuration
+        //If we aren't in server mode  then we configure things here
+        if ( !dataContext.getIdv().getServerMode()) {
+            //Initialize the nc file cache
+            //Don't do this for now
+            //            NetcdfDataset.initNetcdfFileCache(1, 15, -1);
 
-        String nj22TmpFile =
-            IOUtil.joinDir(
-                dataContext.getObjectStore().getUserTmpDirectory(), "nj22/");
-        IOUtil.makeDir(nj22TmpFile);
+            //Set the temp file and the cache policy
+            String nj22TmpFile =
+                IOUtil.joinDir(
+                    dataContext.getObjectStore().getUserTmpDirectory(),
+                    "nj22/");
+            IOUtil.makeDir(nj22TmpFile);
+            ucar.nc2.util.DiskCache.setRootDirectory(nj22TmpFile);
+            ucar.nc2.util.DiskCache.setCachePolicy(true);
+            // have to do this since nj2.2.20
+            ucar.nc2.iosp.grib.GribServiceProvider.setIndexAlwaysInCache(
+                true);
+            ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(
+                true);
 
+            SampledSet.setCacheSizeThreshold(10000);
+            visad.data.DataCacheManager.getCacheManager().setCacheDir(
+                new File(getDataCacheDirectory()));
+            visad.data.DataCacheManager.getCacheManager()
+                .setMemoryPercent(dataContext.getIdv().getStateManager()
+                    .getPreferenceOrProperty(PROP_CACHE_PERCENT, 0.25));
 
-
-
-        //Set the temp file and the cache policy
-        ucar.nc2.util.DiskCache.setRootDirectory(nj22TmpFile);
-        ucar.nc2.util.DiskCache.setCachePolicy(true);
-        // have to do this since nj2.2.20
-        ucar.nc2.iosp.grib.GribServiceProvider.setIndexAlwaysInCache(true);
-        ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(true);
-
-        visad.util.ThreadManager.setGlobalMaxThreads(
-            dataContext.getIdv().getMaxRenderThreadCount());
-
-
-        AccountManager accountManager =
-            AccountManager.getGlobalAccountManager();
-        if (accountManager == null) {
-            accountManager = new AccountManager(
-                dataContext.getIdv().getStore().getUserDirectory());
-            AccountManager.setGlobalAccountManager(accountManager);
+            AccountManager accountManager =
+                AccountManager.getGlobalAccountManager();
+            if (accountManager == null) {
+                accountManager = new AccountManager(
+                    dataContext.getIdv().getStore().getUserDirectory());
+                AccountManager.setGlobalAccountManager(accountManager);
+            }
+            org.apache.commons.httpclient.auth.CredentialsProvider provider =
+                accountManager;
+            //ucar.nc2.dataset.HttpClientManager.init(provider, "IDV");
+            org.apache.commons.httpclient.HttpClient client =
+                ucar.nc2.util.net.HttpClientManager.init(provider, "IDV");
+            opendap.dap.DConnect2.setHttpClient(client);
+            ucar.unidata.io.http.HTTPRandomAccessFile.setHttpClient(client);
         }
-        org.apache.commons.httpclient.auth.CredentialsProvider provider =
-            accountManager;
-        //ucar.nc2.dataset.HttpClientManager.init(provider, "IDV");
-        org.apache.commons.httpclient.HttpClient client =
-            ucar.nc2.util.net.HttpClientManager.init(provider, "IDV");
-        opendap.dap.DConnect2.setHttpClient(client);
-        ucar.unidata.io.http.HTTPRandomAccessFile.setHttpClient(client);
+
 
         String defaultBoundingBoxString =
             dataContext.getIdv().getProperty(PROP_GEOSUBSET_BBOX,
@@ -471,7 +482,6 @@ public class DataManager {
      * @param resourceManager The resource manager
      */
     protected void loadIospResources(IdvResourceManager resourceManager) {
-        //NetcdfDataset.initNetcdfFileCache(1,15,-1);
         ucar.grib.GribResourceReader.setGribResourceReader(
             new ucar.grib.GribResourceReader() {
             public InputStream openInputStream(String resourceName)
@@ -1517,8 +1527,8 @@ public class DataManager {
                 }
 
 
-                Hashtable propertiesToUse; 
-                if(type.properties!=null) {
+                Hashtable propertiesToUse;
+                if (type.properties != null) {
                     propertiesToUse = type.properties;
                 } else {
                     propertiesToUse = properties;
@@ -1526,7 +1536,7 @@ public class DataManager {
                 DataSourceFactory factory =
                     (DataSourceFactory) ctor.newInstance(new Object[] {
                         descriptor,
-                        definingObject, propertiesToUse});
+                        definingObject, propertiesToUse });
                 DataSource dataSource = factory.getDataSource();
 
                 if (dataSource != null) {
