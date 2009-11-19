@@ -175,4 +175,56 @@
       </property>
     </object>
   </method>
+
+
+
+  <method name="add">
+    <object class="ucar.unidata.idv.ViewState">
+      <property name="Name">
+        <string><![CDATA[Arctic]]></string>
+      </property>
+      <property name="Properties">
+        <object class="java.util.Hashtable">
+          <method name="put">
+            <string><![CDATA[matrix]]></string>
+            <parray class="double" length="16">-0.7368809025827918,3.212652361981934E-6,0.0,0.0,-3.212652361981934E-6,-0.7368809025827918,0.0,0.0,0.0,0.0,0.7368809025897952,0.0,0.0,0.0,0.0,1.0</parray>
+          </method>
+          <method name="put">
+            <string><![CDATA[globe]]></string>
+            <java.lang.Boolean>true</java.lang.Boolean>
+          </method>
+        </object>
+      </property>
+      <property name="ViewClassName">
+        <string><![CDATA[ucar.unidata.idv.MapViewManager]]></string>
+      </property>
+    </object>
+  </method>
+  <method name="add">
+    <object class="ucar.unidata.idv.ViewState">
+      <property name="Name">
+        <string><![CDATA[Greenland]]></string>
+      </property>
+      <property name="Properties">
+        <object class="java.util.Hashtable">
+          <method name="put">
+            <string><![CDATA[matrix]]></string>
+            <parray class="double" length="16">-1.3249177865121864,-1.1117303700061267,0.0,0.0,1.050860370524221,-1.252375246383395,0.5644468801562621,0.0,-0.362817994669031,0.4323926262813474,1.634855123884735,0.0,0.0,0.0,0.0,1.0</parray>
+          </method>
+          <method name="put">
+            <string><![CDATA[globe]]></string>
+            <java.lang.Boolean>true</java.lang.Boolean>
+          </method>
+        </object>
+      </property>
+      <property name="ViewClassName">
+        <string><![CDATA[ucar.unidata.idv.MapViewManager]]></string>
+      </property>
+    </object>
+  </method>
+
+
+
+
+
 </object>
