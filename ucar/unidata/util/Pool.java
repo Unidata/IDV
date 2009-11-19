@@ -101,7 +101,12 @@ public class Pool<KeyType, ValueType> {
             List<ValueType> list = cache.get(key);
             if ((list != null) && (list.size() > 0)) {
                 size--;
-                return getFromPool(list);
+                ValueType value= getFromPool(list);
+                if(list.size()==0) {
+                    cache.remove(key);
+                    keys.remove(key);
+                }
+                return value;
             }
         }
         return createValue(key);
@@ -121,8 +126,8 @@ public class Pool<KeyType, ValueType> {
      * @return _more_
      */
     public  boolean containsOrCreate(KeyType key) {
+        if(key == null) return false;
         synchronized(this) { 
-            if(key == null) return false;
             if (contains(key)) {
                 return true;
             }
@@ -136,7 +141,6 @@ public class Pool<KeyType, ValueType> {
     }
 
 
-
     /**
      * _more_
      *
@@ -145,8 +149,7 @@ public class Pool<KeyType, ValueType> {
      */
     public synchronized void put(KeyType key, ValueType value) {
         if(key == null) return;
-        keys.remove(key);
-        keys.add(key);
+        List<KeyType> keysToRemove = null;
         while (size >= maxSize - 1) {
             for (KeyType keyToCheck : keys) {
                 List<ValueType> listToCheck = cache.get(keyToCheck);
@@ -158,8 +161,25 @@ public class Pool<KeyType, ValueType> {
                         break;
                     }
                 }
+                if(listToCheck.size()==0) {
+                    if(keysToRemove==null) {
+                        keysToRemove = new ArrayList<KeyType>();
+                    }
+                    keysToRemove.add(keyToCheck);
+                }
             }
         }
+
+        if(keysToRemove!=null) {
+            for(KeyType keyToRemove: keysToRemove) {
+                cache.remove(keyToRemove);
+                keys.remove(keyToRemove);
+            }
+        }
+
+ 
+        keys.remove(key);
+        keys.add(key);
         List<ValueType> list = cache.get(key);
         if ((list == null) || (list.size() == 0)) {
             list = new ArrayList<ValueType>();
@@ -170,19 +190,30 @@ public class Pool<KeyType, ValueType> {
     }
 
 
+    public synchronized void getStats(StringBuffer sb) {
+            sb.append("Cache size:" + cache.size());
+            sb.append("\n");
+            for(Enumeration<KeyType> keys= cache.keys();keys.hasMoreElements(); ) {
+                KeyType key = keys.nextElement();
+                sb.append(key +" #:" + cache.get(key).size());
+                sb.append("\n");
+            }
+        }
+
+
     /**
      * Clear the cache
      */
     public synchronized void clear() {
-        for(Enumeration<KeyType> keys= cache.keys();keys.hasMoreElements(); ) {
-            KeyType key = keys.nextElement();
-            for (ValueType value : cache.get(key)) {
-                removeValue(key, value);
+            for(Enumeration<KeyType> keys= cache.keys();keys.hasMoreElements(); ) {
+                KeyType key = keys.nextElement();
+                for (ValueType value : cache.get(key)) {
+                    removeValue(key, value);
+                }
             }
-        }
-        size  = 0;
-        cache = new Hashtable();
-        keys  = new ArrayList();
+            size  = 0;
+            cache = new Hashtable();
+            keys  = new ArrayList();
     }
 
 
