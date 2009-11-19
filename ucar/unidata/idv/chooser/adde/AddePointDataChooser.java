@@ -20,6 +20,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 package ucar.unidata.idv.chooser.adde;
 
 
@@ -27,6 +28,7 @@ import edu.wisc.ssec.mcidas.McIDASUtil;
 import edu.wisc.ssec.mcidas.adde.AddePointDataReader;
 
 import org.w3c.dom.Element;
+
 import ucar.unidata.data.AddeUtil;
 import ucar.unidata.data.point.AddePointDataSource;
 
@@ -99,6 +101,9 @@ public class AddePointDataChooser extends AddeChooser {
     /** label for synoptic data */
     private static final String SYNOPTIC = "Synoptic Data";
 
+    /** label for synoptic data */
+    private static final String SHIPBUOY = "Ship/Buoy Data";
+
     /** station model manager */
     private StationModelManager stationModelManager;
 
@@ -129,8 +134,6 @@ public class AddePointDataChooser extends AddeChooser {
         super(mgr, root);
         init(getIdv().getStationModelManager());
     }
-
-
 
 
     /**
@@ -195,7 +198,7 @@ public class AddePointDataChooser extends AddeChooser {
         }
         //        allComps.add(addServerComp(GuiUtils.rLabel("Layout Model:")));
         //        allComps.add(addServerComp(GuiUtils.left(lastPanel)));
-        JComponent top = GuiUtils.formLayout(allComps,GRID_INSETS);                                           
+        JComponent top = GuiUtils.formLayout(allComps, GRID_INSETS);
         return GuiUtils.top(GuiUtils.centerBottom(top, getDefaultButtons()));
     }
 
@@ -292,10 +295,9 @@ public class AddePointDataChooser extends AddeChooser {
         //        if(prefSize!=null) {
         //            relTimeIncBox.setPreferredSize(new Dimension(20,prefSize.height));
         //        }
-        relTimeIncComp =
-            GuiUtils.hbox(new JLabel("Increment: "),
-                          relTimeIncBox,
-                          GuiUtils.lLabel(" hours"));
+        relTimeIncComp = GuiUtils.hbox(new JLabel("Increment: "),
+                                       relTimeIncBox,
+                                       GuiUtils.lLabel(" hours"));
         return GuiUtils.left(relTimeIncComp);
     }
 
@@ -452,8 +454,9 @@ public class AddePointDataChooser extends AddeChooser {
         StringBuffer buf = getGroupUrl(REQ_POINTDATA, getGroup());
         appendKeyValue(buf, PROP_DESCR, getDescriptor());
         // this is hokey, but take a smattering of stations.  
-        //buf.append("&select='ID KDEN'");
-        appendKeyValue(buf, PROP_SELECT, "'LAT 39.5 40.5;LON 104.5 105.5'");
+        //appendKeyValue(buf, PROP_SELECT, "'LAT 39.5 40.5;LON 104.5 105.5'");
+        // include buoys
+        appendKeyValue(buf, PROP_SELECT, "'LAT 38 42;LON 70 75'");
         appendKeyValue(buf, PROP_POS, "0");  // set to 0 for now
         if (getDoAbsoluteTimes()) {
             appendKeyValue(buf, PROP_NUM, "all");
@@ -517,6 +520,11 @@ public class AddePointDataChooser extends AddeChooser {
         }
     }
 
+    /**
+     * Get the default number of times to select
+     *
+     * @return 1
+     */
     protected int getNumTimesToSelect() {
         return 1;
     }
@@ -631,7 +639,8 @@ public class AddePointDataChooser extends AddeChooser {
     protected TwoFacedObject[] getDefaultDatasets() {
         return new TwoFacedObject[] {
             new TwoFacedObject(METAR, "RTPTSRC/SFCHOURLY"),
-            new TwoFacedObject(SYNOPTIC, "RTPTSRC/SYNOPTIC") };
+            new TwoFacedObject(SYNOPTIC, "RTPTSRC/SYNOPTIC"),
+            new TwoFacedObject(SHIPBUOY, "RTPTSRC/SHIPBUOY") };
     }
 
 
