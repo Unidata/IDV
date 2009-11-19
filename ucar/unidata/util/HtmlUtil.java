@@ -33,6 +33,7 @@ import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -1893,6 +1894,7 @@ public class HtmlUtil {
                        attrs(ATTR_NAME, name, ATTR_CLASS, CLASS_SELECT)
                        + extra));
 
+        HashSet seenSelected = new HashSet();
         for (int i = 0; i < values.size(); i++) {
             Object obj = values.get(i);
             String value;
@@ -1917,7 +1919,10 @@ public class HtmlUtil {
 
             String selectedAttr = "";
             if (selected != null && (selected.contains(value) || selected.contains(obj))) {
-                selectedAttr = attrs(ATTR_SELECTED, VALUE_SELECTED);
+                if(!seenSelected.contains(value)) {
+                    selectedAttr = attrs(ATTR_SELECTED, VALUE_SELECTED);
+                    seenSelected.add(value);
+                }
             }
             if (label.length() > maxLength) {
                 label = "..." + label.substring(label.length() - maxLength);
