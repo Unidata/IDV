@@ -409,7 +409,7 @@ public class AddePointDataSource extends PointDataSource {
                 try {
                     Trace.call1("AddePointDataSource.pda ctor");
                     PointDataAdapter pda = new PointDataAdapter(sourceUrl,
-                                               false);
+                                               false,true);
                     Trace.call1("AddePointDataSource.pda ctor");
                     Data data = pda.getData();
                     Trace.call2("AddePointDataSource.pda ctor");
@@ -528,7 +528,7 @@ public class AddePointDataSource extends PointDataSource {
             for (int i = 0; i < args.length; i++) {
                 Trace.call1("AddePointDataSource.pda ctor");
                 long             t1  = System.currentTimeMillis();
-                PointDataAdapter pda = new PointDataAdapter(args[i], false);
+                PointDataAdapter pda = new PointDataAdapter(args[i], false,true);
                 Trace.call2("AddePointDataSource.pda ctor", (newWay
                         ? " new way"
                         : " old way"));
