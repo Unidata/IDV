@@ -320,11 +320,6 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ACTION_POINT_MAKEIMAGE =
         "action.point.makeimage";
 
-    /** _more_          */
-    public static final int NUM_PARAMS = 3;
-
-
-
 
 
     /** _more_          */
@@ -716,10 +711,7 @@ public class IdvOutputHandler extends OutputHandler {
                                         msg("Note: For KMZ make sure to set the view bounds"))); 
 
 
-        basic.append(HtmlUtil.formEntry(msgLabel("Make globe"),
-                                        htmlCheckbox(request,ARG_VIEW_GLOBE, 
-							  false)));
-
+        String viewPointHtml = "";
         List vms = idvServer.getIdv().getVMManager().getVMState();
         if (vms.size() >= 0) {
             List viewPoints = new  ArrayList<String>();
@@ -728,22 +720,20 @@ public class IdvOutputHandler extends OutputHandler {
                 ViewState viewState = (ViewState) vms.get(i);
                 viewPoints.add(viewState.getName());
             }
-            basic.append(HtmlUtil.formEntry(msgLabel("Viewpoint"),
-                                            htmlSelect(request,ARG_VIEW_VIEWPOINT,viewPoints)));
+            viewPointHtml = msgLabel("Viewpoint") + HtmlUtil.space(2) +
+                htmlSelect(request,ARG_VIEW_VIEWPOINT,viewPoints);
         }
 
-
-
+        basic.append(HtmlUtil.formEntry(msgLabel("Make globe"),
+                                        htmlCheckbox(request,ARG_VIEW_GLOBE, 
+                                                     false) + HtmlUtil.space(2) +viewPointHtml));
+                                        
 
         basic.append(HtmlUtil.formEntry(msgLabel("Clip image"),
                                         htmlCheckbox(request,ARG_CLIP, 
 							  false)));
 
-        basic.append(
-		     HtmlUtil.formEntry(
-					msgLabel("Background"),
-					HtmlUtil.colorSelect(ARG_VIEW_BACKGROUND,  
-							     request.getString(ARG_VIEW_BACKGROUND,StringUtil.toHexString(Color.black)))));
+
 
 
         basic.append(HtmlUtil.formEntry(msgLabel("Width"),
@@ -758,19 +748,23 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
-        Object[] zoomList = new Object[]{
-            new TwoFacedObject("Zoom in even more", "4"),
-            new TwoFacedObject("Zoom in more", "3"),
-            new TwoFacedObject("Zoom in", "2"),
-            new TwoFacedObject("--none--", ""),
-            new TwoFacedObject("Zoom out", "0.75"),
-            new TwoFacedObject("Zoom out more", "0.5"),
-            new TwoFacedObject("Zoom out even more", "0.25"),
 
+
+        double zoom = request.get(ARG_ZOOM, 1.0);
+        Object[] zoomList = new Object[]{
+            new TwoFacedObject("Current", ""+zoom),
+            new TwoFacedObject("Reset", "1.0"),
+            new TwoFacedObject("Zoom in", ""+(zoom*1.25)),
+            new TwoFacedObject("Zoom in more", ""+(zoom*1.5)),
+            new TwoFacedObject("Zoom in even more", ""+(zoom*1.75)),
+            new TwoFacedObject("Zoom out", ""+(zoom*0.9)),
+            new TwoFacedObject("Zoom out more", ""+(zoom*0.7)),
+            new TwoFacedObject("Zoom out even more", ""+(zoom*0.5))
         };
 
-        basic.append(HtmlUtil.formEntry(msgLabel("Zoom"),
-                                        HtmlUtil.select(ARG_ZOOM, Misc.toList(zoomList), Misc.newList(request.getString(ARG_ZOOM, "")),"")));
+
+        basic.append(HtmlUtil.formEntry(msgLabel("Zoom Level"),
+                                        HtmlUtil.select(ARG_ZOOM, Misc.toList(zoomList), Misc.newList(request.defined(ARG_ZOOM)?""+zoom:""),"")));
 
 
 
@@ -806,12 +800,17 @@ public class IdvOutputHandler extends OutputHandler {
 							  HtmlUtil.ATTR_SIZE, "10"));
 	StringBuffer mapAttrs = new StringBuffer();
 	mapAttrs.append(HtmlUtil.formTable());
-	mapAttrs.append(HtmlUtil.formEntry(msgLabel("Line Width"),
+	mapAttrs.append(HtmlUtil.formEntry(msgLabel("Map Line Width"),
 					   HtmlUtil.select(ARG_MAPWIDTH, Misc.newList("1","2","3","4"), 
 							   request.getString(ARG_MAPWIDTH,"1"))));
-	mapAttrs.append(HtmlUtil.formEntry(msgLabel("Color"),
+	mapAttrs.append(HtmlUtil.formEntry(msgLabel("Map Color"),
 					   HtmlUtil.colorSelect(ARG_MAPCOLOR,request.getString(ARG_MAPCOLOR,StringUtil.toHexString(Color.red)))));
 
+        mapAttrs.append(
+		     HtmlUtil.formEntry(
+					msgLabel("Background Color"),
+					HtmlUtil.colorSelect(ARG_VIEW_BACKGROUND,  
+							     request.getString(ARG_VIEW_BACKGROUND,StringUtil.toHexString(Color.black)))));
 
 
 
@@ -843,7 +842,7 @@ public class IdvOutputHandler extends OutputHandler {
         tabContents.add(bounds.toString());
 
  
-	tabLabels.add(msg("Maps"));
+	tabLabels.add(msg("Maps and Background"));
         tabContents.add(mapSB.toString());
 
         List colorTables =
@@ -859,18 +858,18 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
 
+        List params = request.get(ARG_PARAM, new ArrayList());
+        int displayIdx =-1;
+        for (int i=0;i<params.size();i++) {
+            String param = (String) params.get(i);
+            if(param.length()==0) continue;
+            displayIdx++;
 
-        for (int displayIdx = 1; displayIdx <= NUM_PARAMS; displayIdx++) {
-            if ( !request.defined(ARG_PARAM + displayIdx)) {
-                continue;
-            }
 
             List<String> innerTabTitles   = new ArrayList<String>();
             List<String> innerTabContents = new ArrayList<String>();
 
             StringBuffer tab              = new StringBuffer();
-            String       param = request.getString(ARG_PARAM + displayIdx,
-						   "");
             DataChoice   choice           = idToChoice.get(param);
             if (choice == null) {
                 continue;
@@ -899,15 +898,15 @@ public class IdvOutputHandler extends OutputHandler {
             }
 
 
-            tab.append(HtmlUtil.hidden(ARG_PARAM + displayIdx,
-                                       request.getString(ARG_PARAM
-							 + displayIdx, "")));
+            tab.append(HtmlUtil.hidden(ARG_PARAM, param));
+
+
             List options = new ArrayList();
             options.add("");
             tab.append(HtmlUtil.br());
             tab.append(msgLabel("Display Type"));
             tab.append(HtmlUtil.space(1));
-	    if(displayIdx==1 && displays.size()>1) {
+	    if(displayIdx==0 && displays.size()>1) {
 		//Set the default display for the first param
 		if(request.defined(ARG_DISPLAY+displayIdx)) 
 		    tab.append(htmlSelect(request, ARG_DISPLAY + displayIdx, displays));
@@ -1154,7 +1153,7 @@ public class IdvOutputHandler extends OutputHandler {
 						innerTabContents, true, "tab_content");
             tab.append(HtmlUtil.inset(HtmlUtil.p() + innerTab, 10));
 
-            tabLabels.add(StringUtil.camelCase(StringUtil.shorten(choice.getDescription(),20)));
+            tabLabels.add(StringUtil.camelCase(StringUtil.shorten(choice.getDescription(),25)));
             tabContents.add(tab.toString());
         }
 
@@ -1218,9 +1217,8 @@ public class IdvOutputHandler extends OutputHandler {
         sb.append(msgHeader("Select one or more fields to view"));
 
         StringBuffer fields = new StringBuffer();
-        for (int i = 1; i <= NUM_PARAMS; i++) {
-            List options = new ArrayList();
-            options.add(new TwoFacedObject("--Pick one--", ""));
+        List options = new ArrayList();
+            //            options.add(new TwoFacedObject("--Pick one--", ""));
             List<String> cats = new ArrayList<String>();
             Hashtable<String, List<TwoFacedObject>> catMap =
                 new Hashtable<String, List<TwoFacedObject>>();
@@ -1249,9 +1247,12 @@ public class IdvOutputHandler extends OutputHandler {
                 options.addAll(catMap.get(cat));
             }
 
-            fields.append(htmlSelect(request, ARG_PARAM + i, options));
+
+            fields.append(htmlSelect(request, ARG_PARAM, options,
+                                     HtmlUtil.attrs(HtmlUtil.ATTR_MULTIPLE, "true",
+                                                    HtmlUtil.ATTR_SIZE, "10")));
             fields.append(HtmlUtil.p());
-        }
+
         sb.append(HtmlUtil.insetLeft(fields.toString(), 10));
         sb.append(HtmlUtil.submit(msg("Make image"), ARG_SUBMIT));
         sb.append(HtmlUtil.formClose());
@@ -1518,29 +1519,42 @@ public class IdvOutputHandler extends OutputHandler {
 
         StringBuffer viewProps = new StringBuffer();
         viewProps.append(makeProperty( "wireframe","false"));
+        viewProps.append("\n");
         //	viewProps.append(makeProperty( "wireframe","true"));
 
-        if(request.defined(ARG_VIEW_VIEWPOINT)) {
-            viewProps.append(makeProperty( "initViewStateName",request.getString(ARG_VIEW_VIEWPOINT,"")));
-        } 
+
 
 
         if(request.get(ARG_VIEW_GLOBE, false)) {
             viewProps.append(makeProperty( "useGlobeDisplay",true));
+            viewProps.append("\n");
+            if(request.defined(ARG_VIEW_VIEWPOINT)) {
+                viewProps.append(makeProperty( "initViewStateName",request.getString(ARG_VIEW_VIEWPOINT,"")));
+                viewProps.append("\n");
+            } 
         }
 
 
 
 	viewProps.append(makeProperty("background",request.getString(ARG_VIEW_BACKGROUND,"black")));
+        viewProps.append("\n");
 
 	viewProps.append(makeProperty("initMapPaths",StringUtil.join(",",request.get(ARG_MAPS,new ArrayList()))));
-	if(request.defined(ARG_MAPWIDTH)) 
-	    viewProps.append(makeProperty("initMapWidth",request.getString(ARG_MAPWIDTH,"1")));
-	if(request.defined(ARG_MAPCOLOR)) 
-	    viewProps.append(makeProperty("initMapColor",request.getString(ARG_MAPCOLOR,"")));
+        viewProps.append("\n");
 
-        if(request.defined(ARG_ZOOM)) {
-            viewProps.append(makeProperty("displayProjectionZoom",""+request.get(ARG_ZOOM, 0.0)));
+	if(request.defined(ARG_MAPWIDTH)) {
+	    viewProps.append(makeProperty("initMapWidth",request.getString(ARG_MAPWIDTH,"1")));
+            viewProps.append("\n");
+        }
+	if(request.defined(ARG_MAPCOLOR))  {
+	    viewProps.append(makeProperty("initMapColor",request.getString(ARG_MAPCOLOR,"")));
+            viewProps.append("\n");
+        }
+
+        double zoom = request.get(ARG_ZOOM, 1.0);
+        if(zoom!=1.0) {
+            viewProps.append(makeProperty("displayProjectionZoom",""+zoom));
+            viewProps.append("\n");
         }
 
         String clip = "";
@@ -1562,6 +1576,7 @@ public class IdvOutputHandler extends OutputHandler {
 	    double bwidth = Math.abs(east-west);
 	    double bheight = Math.abs(north-south);
 	    viewProps.append(makeProperty("initLatLonBounds",west+","+north+","+bwidth+","+bheight));
+            viewProps.append("\n");
 	    height = (int)(width*bheight/bwidth); 
             /*
             clip = XmlUtil.tag("clip", XmlUtil.attrs(
@@ -1629,11 +1644,12 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
-        for (int displayIdx = 1; displayIdx <= NUM_PARAMS; displayIdx++) {
-            if ( !request.defined(ARG_PARAM + displayIdx)
-		 || !request.defined(ARG_DISPLAY + displayIdx)) {
-                continue;
-            }
+        List params = request.get(ARG_PARAM, new ArrayList());
+        int displayIdx =-1;
+        for (int i=0;i<params.size();i++) {
+            String param = (String) params.get(i);
+            if(param.length()==0) continue;
+            displayIdx++;
 
             String display = request.getString(ARG_DISPLAY + displayIdx, "");
 
@@ -1641,8 +1657,6 @@ public class IdvOutputHandler extends OutputHandler {
             propSB.append(XmlUtil.tag(ImageGenerator.TAG_PROPERTY,
                                       XmlUtil.attrs("name", "id", "value",
 						    "thedisplay" + displayIdx)));
-
-
 
 
 
@@ -1822,8 +1836,8 @@ public class IdvOutputHandler extends OutputHandler {
 	    //            System.err.println("Props:" + propSB);
             attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_TYPE, display,
                                        ImageGenerator.ATTR_PARAM,
-                                       request.getString(ARG_PARAM
-							 + displayIdx, "")));
+                                       param));
+
 
             if (request.defined(ARG_STRIDE + displayIdx)) {
                 attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_STRIDE,
@@ -1858,7 +1872,7 @@ public class IdvOutputHandler extends OutputHandler {
 	isl.append("<pause/>\n");
 
 
-        System.err.println (isl);
+        //        System.err.println (isl);
 
         if ( !forIsl) {
             isl.append(XmlUtil.tag((multipleTimes
@@ -1886,6 +1900,8 @@ public class IdvOutputHandler extends OutputHandler {
             return new Result("data.isl", new StringBuffer(isl), "text/xml");
         }
 
+
+        System.err.println(isl);
 
         long t1 = System.currentTimeMillis();
         idvServer.evaluateIsl(isl, props);

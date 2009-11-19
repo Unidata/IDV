@@ -320,7 +320,6 @@ public class DataOutputHandler extends OutputHandler {
 
         protected GridDataset createValue(String path) {
             try {
-                if(true) return null;
                 getStorageManager().dirTouched(nj22Dir, null);
                 gridOpenCounter.incr();
                
@@ -359,8 +358,6 @@ public class DataOutputHandler extends OutputHandler {
 
         protected FeatureDatasetPoint createValue(String path) {
             try {
-                if(true) return null;
-                
                 Formatter buf = new Formatter();
                 getStorageManager().dirTouched(nj22Dir, null);
 
@@ -402,7 +399,6 @@ public class DataOutputHandler extends OutputHandler {
 
         protected TrajectoryObsDataset createValue(String path) {
             try {
-                if(true) return null;
                 getStorageManager().dirTouched(nj22Dir, null);
 
                 //                System.err.println("track:" + path);
