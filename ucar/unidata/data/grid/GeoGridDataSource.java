@@ -92,6 +92,7 @@ import visad.georef.EarthLocationTuple;
 import visad.util.DataUtility;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -272,6 +273,11 @@ public class GeoGridDataSource extends GridDataSource {
         //Make sure we pass filename up here - as opposed to calling
         //this (new File (filename)) because the new File (filename).getPath () != filename
         super(descriptor, files, "Geogrid data source", properties);
+    }
+
+
+    public void setDefaultSelectionBounds(Rectangle2D.Float rect) {
+	getDataSelection().getGeoSelection(true).setLatLonRect(rect);
     }
 
 
@@ -1452,6 +1458,7 @@ public class GeoGridDataSource extends GridDataSource {
                 filename.append("_x_" + geoSelection.getXStrideToUse());
                 filename.append("_y_" + geoSelection.getYStrideToUse());
                 filename.append("_z_" + geoSelection.getZStrideToUse());
+
                 if (geoSelection.getLatLonRect() != null) {
                     filename.append(
                         "_rect_"

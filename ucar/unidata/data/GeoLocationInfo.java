@@ -24,6 +24,8 @@ package ucar.unidata.data;
 
 
 import ucar.unidata.geoloc.*;
+import java.awt.geom.Rectangle2D;
+
 
 
 /**
@@ -72,6 +74,13 @@ public class GeoLocationInfo {
         this.minLat = that.minLat;
         this.minLon = that.minLon;
         this.maxLon = that.maxLon;
+    }
+
+
+
+    public GeoLocationInfo(Rectangle2D.Float rect) { 
+	this(rect.getY(), rect.getX(), rect.getY()-rect.getHeight(),
+	     rect.getX()+rect.getWidth());
     }
 
 

@@ -314,7 +314,7 @@ public class DataManager {
                 IdvResourceManager.RSC_DATASOURCE));
 
         loadIospResources(resourceManager);
-        //      System.setProperty("visad.java3d.imageByRef", "true");
+	System.setProperty("visad.java3d.imageByRef", "true");
         //      System.setProperty("visad.java3d.textureNpot", "true");
 
         //The IDV can run normally (i.e., the usual interactive IDV) and also in server mode (e.g., within RAMADDA)

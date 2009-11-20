@@ -195,6 +195,8 @@ public class GeoSelection {
 
 
 
+
+
     /**
      * Get the default bbox
      *
@@ -216,6 +218,13 @@ public class GeoSelection {
     public static void setDefaultBoundingBox(GeoLocationInfo defaultBox) {
         defaultBoundingBox = defaultBox;
     }
+
+
+    public void setLatLonRect(Rectangle2D.Float rect) { 
+	this.boundingBox = new GeoLocationInfo(rect);
+    }
+
+
 
 
     /**
