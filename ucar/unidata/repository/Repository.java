@@ -3787,21 +3787,29 @@ public class Repository extends RepositoryBase implements RequestHandler {
     }
 
     public String getMapUrl() {
-	return getUrlBase()+ "/images/worldday.jpg";
+	return getUrlBase()+ "/images/caida.jpg";
     }
 
-    public String makeMapSelector(Request request, String arg, boolean popup) {
-	return makeMapSelector(arg, popup,request.getString(arg+"_south",""),
+    public String makeMapSelector(Request request, String arg, boolean popup, String extraLeft, String extraTop) {
+	return makeMapSelector(arg, popup,extraLeft, extraTop, request.getString(arg+"_south",""),
 					 request.getString(arg+"_north",""),
 					 request.getString(arg+"_east",""),
 					 request.getString(arg+"_west",""));
     }
 
     
-    public String makeMapSelector(String arg, boolean popup, String south, String north, String east, String west) {
+    public String makeMapSelector(String arg, boolean popup, 
+				  String south, String north, String east, String west) {
+	return makeMapSelector(arg, popup, "","", south, north, east, west);
+    }
+
+    public String makeMapSelector(String arg, boolean popup, String extraLeft, String extraTop,
+				  String south, String north, String east, String west) {
 	StringBuffer sb = new StringBuffer();
 	
 	String llb = HtmlUtil.makeLatLonBox(arg,south, north, east,west);
+	if(extraLeft!=null && extraLeft.length()>0) 
+	    llb = llb +HtmlUtil.br() + extraLeft;
 
 	String imageId = arg+"_bbox_image";
 
@@ -3818,9 +3826,14 @@ public class Repository extends RepositoryBase implements RequestHandler {
 				      onClickCall +
 				      HtmlUtil.id(arg+"_bbox_div"));
 
-	String imageHtml = bboxDiv +HtmlUtil.img(getMapUrl(),"",
+	StringBuffer imageHtml = new StringBuffer();
+	String nextMapLink = HtmlUtil.mouseClickHref(HtmlUtil.call("cycleMap", HtmlUtil.squote(imageId)),
+						     HtmlUtil.img(iconUrl(ICON_MAP), " View another map",""));
+	imageHtml.append(bboxDiv);
+	imageHtml.append(HtmlUtil.table(new Object[]{HtmlUtil.img(getMapUrl(),"",
 					HtmlUtil.id(imageId) + onClickCall +
-						 HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, "800"));
+								  HtmlUtil.attr(HtmlUtil.ATTR_WIDTH, (popup?"800":"1000"))),
+						     nextMapLink}));
 
 
 	String rightSide=null;
@@ -3831,9 +3844,9 @@ public class Repository extends RepositoryBase implements RequestHandler {
 	    rightSide =
 		makeStickyPopup(
 				msg("Select"),
-				imageHtml,
+				imageHtml.toString(),
 				HtmlUtil.call("bboxInit",initParams)) 
-		+HtmlUtil.space(2) + clearLink +HtmlUtil.space(2) + updateLink;
+		+HtmlUtil.space(2) + clearLink +HtmlUtil.space(2) + updateLink +HtmlUtil.space(2) + extraTop;
 	} else {
 	    rightSide = clearLink +HtmlUtil.space(2) + updateLink +HtmlUtil.br() +
 		imageHtml;

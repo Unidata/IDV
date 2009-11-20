@@ -1651,3 +1651,27 @@ function bboxClick(event, imgId, argBase,absolute) {
 }
 
 
+
+var mapImages;
+var mapIdx=0;
+
+function initMaps() {
+    if(mapImages) return;
+    mapImages= new Array();
+    mapImages[mapImages.length] = "${urlroot}/images/caida.jpg";
+    mapImages[mapImages.length] = "${urlroot}/images/usgstopo.jpg";
+    mapImages[mapImages.length] = "${urlroot}/images/worldday.jpg";
+    mapIdx=0;
+}
+
+function cycleMap(id) {
+    var mapImg = util.getDomObject(id);
+    if(!mapImg) return;
+    initMaps();
+    mapIdx++;
+    if(mapIdx >= mapImages.length) mapIdx=0;
+    mapImg.obj.src = mapImages[mapIdx];
+}
+
+
+

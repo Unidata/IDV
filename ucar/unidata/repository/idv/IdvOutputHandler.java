@@ -164,6 +164,7 @@ public class IdvOutputHandler extends OutputHandler {
     public static final String ARG_VIEW_VIEWPOINT = "view.viewpoint";
 
     public static final String ARG_VIEW_BOUNDS = "view.bounds";
+    public static final String ARG_VIEW_JUSTCLIP = "view.justclip";
     public static final String ARG_VIEW_BACKGROUNDIMAGE = "view.backgroundimage";
 
 
@@ -771,7 +772,7 @@ public class IdvOutputHandler extends OutputHandler {
         basic.append(HtmlUtil.formTableClose());
 	
         StringBuffer bounds = new StringBuffer();
-	String llb =getRepository().makeMapSelector(request, ARG_VIEW_BOUNDS, false);
+	String llb =getRepository().makeMapSelector(request, ARG_VIEW_BOUNDS, false,htmlCheckbox(request, ARG_VIEW_JUSTCLIP, false) + " " + msg("Just subset data")+HtmlUtil.space(2),"");
 	bounds.append(llb);
 
 	StringBuffer mapSB= new StringBuffer();
@@ -1563,6 +1564,10 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
 
+	String dataSourceExtra = "";
+	StringBuffer dataSourceProps= new StringBuffer();
+
+
 	int width =  request.get(ARG_IMAGE_WIDTH, 400);
 	int height = request.get(ARG_IMAGE_HEIGHT, 400);
 	if(request.defined(ARG_VIEW_BOUNDS+"_south") &&
@@ -1575,9 +1580,22 @@ public class IdvOutputHandler extends OutputHandler {
 	    double west = request.get(ARG_VIEW_BOUNDS+"_west",0.0);
 	    double bwidth = Math.abs(east-west);
 	    double bheight = Math.abs(north-south);
-	    viewProps.append(makeProperty("initLatLonBounds",west+","+north+","+bwidth+","+bheight));
-            viewProps.append("\n");
+
+
+	    //view.bounds_north=41.849999999999994&view.bounds_west=-117&view.bounds_east=-97.64999999999999&view.bounds_south=27.000000000000007
+
+	    //	    System.err.println("WEST:" + request.getString(ARG_VIEW_BOUNDS+"_west",""));
+	    //	    System.err.println(request);
+
+	    if(!request.get(ARG_VIEW_JUSTCLIP,false)) {
+		viewProps.append(makeProperty("initLatLonBounds",west+","+north+","+bwidth+","+bheight));
+		viewProps.append("\n");
+	    }
+	    dataSourceProps.append(makeProperty("defaultSelectionBounds", west+","+north+","+bwidth+","+bheight));
+            dataSourceProps.append("\n");
+
 	    height = (int)(width*bheight/bwidth); 
+
             /*
             clip = XmlUtil.tag("clip", XmlUtil.attrs(
 		    ImageGenerator.ATTR_NORTH,
@@ -1626,15 +1644,21 @@ public class IdvOutputHandler extends OutputHandler {
         if (forIsl) {
             isl.append(
 		       XmlUtil.openTag(
-				       "datasource",
+				       ImageGenerator.TAG_DATASOURCE,
 				       XmlUtil.attrs(
 						     "id", "datasource", "url",
 						     getRepository().absoluteUrl(
 										 getRepository().URL_ENTRY_SHOW
 										 + dataOutputHandler.getOpendapUrl(entry)))));
         } else {
-            isl.append("<datasource id=\"datasource\" times=\"0\" >\n");
+            isl.append(XmlUtil.openTag(
+				       ImageGenerator.TAG_DATASOURCE,
+				       XmlUtil.attrs("id", "datasource", "times", "0")));
         }
+
+	isl.append(dataSourceProps);
+
+
 
         Hashtable props = new Hashtable();
         props.put("datasource", dataSource);
@@ -1757,9 +1781,6 @@ public class IdvOutputHandler extends OutputHandler {
 
 
 
-
-
-
             StringBuffer attrs = new StringBuffer();
 
 	    propSB.append(makeProperty("color", 
@@ -1782,7 +1803,6 @@ public class IdvOutputHandler extends OutputHandler {
 							     ARG_FLOW_SKIP + displayIdx, "")));
 
             }
-
 
 
 
@@ -1901,7 +1921,7 @@ public class IdvOutputHandler extends OutputHandler {
         }
 
 
-        System.err.println(isl);
+	//        System.err.println(isl);
 
         long t1 = System.currentTimeMillis();
         idvServer.evaluateIsl(isl, props);
@@ -2252,7 +2272,10 @@ public class IdvOutputHandler extends OutputHandler {
             StringBuffer viewProps = new StringBuffer();
             viewProps.append(XmlUtil.tag("property",
                                          XmlUtil.attrs("name", "wireframe",
-						       "value", "false")));
+						       "value", "true")));
+
+
+
 
 	    int width =  request.get(ARG_IMAGE_WIDTH, 400);
 	    int height = request.get(ARG_IMAGE_HEIGHT, 400);
@@ -2293,14 +2316,14 @@ public class IdvOutputHandler extends OutputHandler {
             if (forIsl) {
                 isl.append(
 			   XmlUtil.openTag(
-					   "datasource",
+					   ImageGenerator.TAG_DATASOURCE,
 					   XmlUtil.attrs(
 							 "id", "datasource", "url",
 							 getRepository().absoluteUrl(
 										     getRepository().URL_ENTRY_SHOW
 										     + dataOutputHandler.getOpendapUrl(entry)))));
             } else {
-                isl.append("<datasource id=\"datasource\">\n");
+                isl.append(XmlUtil.openTag(ImageGenerator.TAG_DATASOURCE, XmlUtil.attrs("id","datasource")));
             }
 
             Hashtable props = new Hashtable();
@@ -2313,7 +2336,7 @@ public class IdvOutputHandler extends OutputHandler {
 				       "stationModelName",
 				       request.getString(ARG_POINT_LAYOUTMODEL, "Location")));
 
-            System.err.println("Props:" + propSB);
+
             attrs.append(XmlUtil.attrs(ImageGenerator.ATTR_TYPE,
                                        "stationmodelcontrol",
                                        ImageGenerator.ATTR_PARAM, "*"));
