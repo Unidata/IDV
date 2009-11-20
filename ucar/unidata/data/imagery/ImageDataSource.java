@@ -1174,8 +1174,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
 
                 AreaImageFlatField aiff = AreaImageFlatField.create(aid,
-                                              areaDir, getCacheDataToDisk(),
-                                              filename, getCacheClearDelay(),
+                                              areaDir, 
+                                              filename,                                                                    
                                               readLabel);
                 result = aiff;
                 if (sampleRanges == null) {
