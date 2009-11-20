@@ -99,10 +99,6 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     /** _more_ */
     private int[] bandIndices;
 
-
-
-
-
     /**
      * copy ctor
      *
@@ -246,10 +242,18 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         // If we have calibration units, might as well use them.
         Unit calUnit = null;
         try {
-            calUnit = visad.data.units.Parser.parse(
-                visad.jmet.MetUnits.makeSymbol(
-                    areaDirectory.getCalibrationUnitName()));
+            String unit = areaDirectory.getCalibrationUnitName();
+            if (unit != null) {
+                String unitName = visad.jmet.MetUnits.makeSymbol(
+                        areaDirectory.getCalibrationUnitName());
+                calUnit = visad.data.units.Parser.parse(unitName);
+                // can't clone BaseUnit
+                try {
+                    calUnit = calUnit.clone(unitName);
+                } catch (UnitException ue) {}
+            }
         } catch (Exception e) {
+            //e.printStackTrace();
             calUnit = null;
         }
         String calType = areaDirectory.getCalibrationType();
