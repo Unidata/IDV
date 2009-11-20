@@ -1821,6 +1821,7 @@ public class MapViewManager extends NavigatedViewManager {
         }
 
         boolean actuallyChangedProjection = false;
+	double[] matrix = getDisplayMatrix();
         try {
             setMasterInactive();
             if (addToCommandHistory && (mainProjection != null)) {
@@ -1848,16 +1849,20 @@ public class MapViewManager extends NavigatedViewManager {
                 }
                 try {
                     actuallyChangedProjection = true;
-                    double[] matrix = getDisplayMatrix();
-                    getMapDisplay().setMapProjection(mainProjection);
-                    setAspectRatio(getMapDisplay().getDisplayAspect());
+                    if (false && maintainViewpoint) {
+			System.err.println("zooming");
+			getMapDisplay().zoom(2.0);
+			Misc.sleep(5000);
+		    } else {
+			getMapDisplay().setMapProjection(mainProjection);
+			setAspectRatio(getMapDisplay().getDisplayAspect());
+		    }
+
                     // override the aspect ratio
                     //if (getAspectRatio() != null) {
                        //getMapDisplay().setDisplayAspect(getAspectRatio());
                     //}
-                    if (maintainViewpoint) {
-                        setDisplayMatrix(matrix);
-                    }
+		    setDisplayMatrix(matrix);
                 } catch (Exception e) {
                     logException("setProjection", e);
                 }
@@ -1867,7 +1872,7 @@ public class MapViewManager extends NavigatedViewManager {
             // if the projections are the same, reset to main view in case
             // they are zoomed/panned
             try {
-                if (projection.equals(mainProjection)) {
+                if (!maintainViewpoint  && projection.equals(mainProjection)) {
                     getMaster().resetProjection();
                 }
             } catch (Exception e) {
@@ -2111,6 +2116,11 @@ public class MapViewManager extends NavigatedViewManager {
 
 
     public void displayDataChanged(DisplayControl display) {
+	displayDataChanged(display, false);
+    }
+
+
+    public void displayDataChanged(DisplayControl display,boolean fromInitialLoad) {
         try {
             if ( !getUseGlobeDisplay() && getUseProjectionFromData()
                  && !getStateManager().getProperty(
@@ -2119,17 +2129,17 @@ public class MapViewManager extends NavigatedViewManager {
                 if (displayProjectionOk(mp)) {
                     if ((mainProjection == null)
                         || !mp.equals(mainProjection)) {
+			boolean maintainViewpoint = !fromInitialLoad;
+
                         setMapProjection(
                                          mp, true,
                                          getDisplayConventions().getMapProjectionLabel(
-                                                                                       mp, display));
+                                                                                       mp, display),true,true,maintainViewpoint);
 
-                        //                        System.err.println ("zoom:" + displayProjectionZoom);
+
                         if(displayProjectionZoom!=0) {
-                            //                            System.err.println ("zoom:" + displayProjectionZoom);
                             getMapDisplay().zoom(displayProjectionZoom);
                         }
-                        //                        displayProjectionZoom+=1;
                     }
                 }
             }
@@ -2171,7 +2181,7 @@ public class MapViewManager extends NavigatedViewManager {
         }
 
 
-        displayDataChanged(display);
+        displayDataChanged(display,true);
 
         if ( !super.addDisplayInfo(displayInfo)) {
             return false;
