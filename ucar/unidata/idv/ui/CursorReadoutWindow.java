@@ -91,7 +91,6 @@ public class CursorReadoutWindow {
         this.vm = vm;
         this.ignoreMissing = ignoreMissing;
         label = GuiUtils.getFixedWidthLabel("");
-        label.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
     }
 
 
@@ -111,6 +110,34 @@ public class CursorReadoutWindow {
 
 
 
+    private void setWindowLocation() {
+        JComponent contents = (JComponent)vm.getContents();
+        Rectangle b   = contents.bounds();
+        Point     loc = contents.getLocationOnScreen();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+        int left = loc.x;
+        if(left<0) {
+            left = 0;
+        }
+
+        int right = left + window.getBounds().width;
+        if(right>screenSize.width) {
+            left += screenSize.width-right;            
+        }
+
+
+        int top = loc.y +contents.bounds().height;
+        int bottom = top + window.getBounds().height;
+
+        if(bottom>screenSize.height) {
+            top += screenSize.height-bottom-10;
+        }
+
+
+        window.setLocation(left, top);
+
+    }
 
     /**
      * _more_
@@ -123,11 +150,7 @@ public class CursorReadoutWindow {
             Window parent = GuiUtils.getWindow(contents);
             window = new JWindow(parent);
             window.pack();
-            Rectangle b   = contents.bounds();
-            Point     loc = contents.getLocationOnScreen();
-            window.setLocation(
-                (int) loc.getX(),
-                (int) (loc.getY() /*+contents.bounds().height*/));
+            setWindowLocation();
             window.show();
         }
         double[] box =
@@ -144,11 +167,19 @@ public class CursorReadoutWindow {
         if(lastEarthLocation == null || window == null) return;
         String readout =  getReadout(lastEarthLocation,true,false,new ArrayList<ReadoutInfo>());
         if(readout==null) readout = "";
-        label.setText(readout);
-        window.getContentPane().removeAll();
-        window.getContentPane().add(label);
-        window.pack(); 
-        window.toFront();
+
+        final String theReadout = readout;
+        GuiUtils.invokeInSwingThread(new Runnable() {
+                public void run() {
+                    label.setText(theReadout);
+                    window.getContentPane().removeAll();
+                    JComponent wrapper = GuiUtils.inset(label,new Insets(2,5,1,5));
+                    wrapper.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                    window.getContentPane().add(wrapper);
+                    window.pack(); 
+                    setWindowLocation();
+                    window.toFront();
+                }});
     }
 
 
@@ -187,8 +218,8 @@ public class CursorReadoutWindow {
             }
 
 
-
             String llp = (earthLocation==null?"":vm.getIdv().getDisplayConventions().formatEarthLocation(earthLocation,showAlt));
+            llp = StringUtil.padRight(llp,6*100,"&nbsp;");
 
             return "<html>Location: " + llp +(didone?"<hr>":"") +"<table cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">"+sb + "</table></html>";
         } catch (Exception exc) {
